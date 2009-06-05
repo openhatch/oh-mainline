@@ -4,7 +4,6 @@ from mysite.search.models import Bug
 
 def query(request, query):
     # FIXME: Give bugs some date field
-    # FIXME: Use a provided query
     bunch_of_bugs = Bug.objects.filter(
         project__language=query)
     return render_to_response('search/search.html', {'bunch_of_bugs': bunch_of_bugs})
