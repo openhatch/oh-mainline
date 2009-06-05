@@ -14,7 +14,7 @@ def query(request, query):
 def query_json(request, query):
     # FIXME: Give bugs some date field
     bunch_of_bugs = Bug.objects.filter(
-        project__language=query)
+        project__language=query)[:10]
     json_serializer = serializers.get_serializer('python')()
     data = json_serializer.serialize(bunch_of_bugs)
     for elt in data:
