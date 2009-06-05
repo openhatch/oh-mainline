@@ -1,0 +1,10 @@
+{% if bunch_of_bugs %}
+    <ul>
+    {% for bug in bunch_of_bugs %}
+        <li>{{ bug.title }}</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No bugs are available.</p>
+{% endif %}
+
