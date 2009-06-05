@@ -11,6 +11,7 @@ h1 {
 	font-size: 150%;
 }
 #wrapper-outer {
+	margin: 0 auto;
 	width: 800px;
 }
 #wrapper-inner {
