@@ -20,7 +20,7 @@ def query_json(request, query):
     for elt in data:
         elt['fields']['project'] = Project.objects.get(pk=int(elt['fields']['project'])).name
     jsonned = simplejson.dumps(data)
-    return HttpResponse(jsonned)
+    return HttpResponse(request.GET.get('jsoncallback', 'alert') + '(' + jsonned + ')' )
 
 def index(request):
     return render_to_response('search/index.html')
