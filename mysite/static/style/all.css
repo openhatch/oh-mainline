@@ -1,5 +1,5 @@
 body {
-	font: 0.9em/130% Arial;
+	font: 0.8em/130% Arial;
 	background-color: #fff;
 }
 h1, h2, h3, h4, h5 {
@@ -92,7 +92,6 @@ p {
 }
 #opps li {
 	font-size: 100%;
-	line-height: 110%;
 	float: left;
 	list-style: none;
 	border: 1px dotted #ccc;
@@ -100,14 +99,21 @@ p {
 	padding: 8px;
 	width: 250px;
 	margin: 0 5px 5px 0;
-	overflow: hidden;
-	height: 75px;
 	cursor: pointer;
 	cursor: hand;
 }
+#opps li h3 {
+	font-size: 125%;
+}
 #opps li h3 span {
+	font-size: 100%;
+	line-height: 125%;
 	background-color: #ffa;
+	border-bottom: 1px solid #fc3;
+	padding-right: 2px;
 }
 #opps li p {
+	font-size: 85%;
 	margin-top: 3px;
+	line-height: 110%;
 }
