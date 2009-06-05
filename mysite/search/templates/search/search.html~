@@ -10,6 +10,7 @@
 		<style type='text/css'>
 			/*<![CDATA[*/ @import url('http://localhost:8000/static/style/all.css'); /*]]>*/
 		</style>
+		<base href='http://localhost:8000/'>
 		<!--[if IE]><style type='text/css'>/*<![CDATA[*/@import url('../style/ie/all.css');/*]]>*/</style><![endif]-->
 		<!--[if lte IE 6]><style type='text/css'>/*<![CDATA[*/@import url('../style/ie/6-/all.css');/*]]>*/</style><![endif]-->
 		<!--[if gte IE 7]><style type='text/css'>/*<![CDATA[*/@import url('../style/ie/7+/all.css');/*]]>*/</style><![endif]-->

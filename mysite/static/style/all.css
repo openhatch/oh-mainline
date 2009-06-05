@@ -1,0 +1,112 @@
+body {
+	font: 0.9em/130% Arial;
+	background-color: #fff;
+}
+h1, h2, h3, h4, h5 {
+	font-family: Trebuchet MS;
+	font-weight: normal;
+	margin: 0;
+}
+h1 {
+	font-size: 150%;
+}
+#wrapper-outer {
+	width: 800px;
+}
+#wrapper-inner {
+	width: 800px;
+}
+#heading {
+	margin: 20px 0 10px 0;
+}
+.box {
+	float: left;
+	background-color: #f0f0f0;
+	padding: 10px 10px 5px 10px;
+	margin-bottom: 10px;
+	border-top: 3px solid #ddd;
+	border-bottom: 1px dotted #ddd;
+}
+.box h2 {
+	font-size: 100%;
+	font-weight: bold;
+	color: #444; #b5c200; 9cc200; #ff6e57;
+	margin-bottom: 5px;
+}
+#sidebar {
+	float: left;
+	width: 220px;
+	margin-right: 10px;
+}
+#main {
+	width: 560px;
+	float: left;
+}
+#main .box {
+	width: 540px;
+}
+#main-1 {
+	height: 400px;
+}
+#projects {
+	padding: 10px;
+	width: 200px;
+}
+#projects table {
+	padding: 0;
+	border-spacing: 0;
+}
+#projects td {
+	padding: 0 5px 3px 0;
+}
+#add-another-bug-tracker {
+}
+#sidebar .box {
+	width: 200px;
+}
+ul {
+	margin: 0;
+	padding: 0 0 0 10%;
+}
+li {
+	list-style: square;
+}
+p {
+	margin: 0;
+}
+.yes img {
+	width: 15px;
+	vertical-align: -10%;
+}
+
+#opps.box {
+	width: 550px;
+	padding-right: 0;
+	padding-bottom: 0;
+}
+#opps ul {
+	margin: 0;
+	padding: 0;
+	float: left;
+}
+#opps li {
+	font-size: 100%;
+	line-height: 110%;
+	float: left;
+	list-style: none;
+	border: 1px dotted #ccc;
+	background-color: #fff;
+	padding: 8px;
+	width: 250px;
+	margin: 0 5px 5px 0;
+	overflow: hidden;
+	height: 75px;
+	cursor: pointer;
+	cursor: hand;
+}
+#opps li h3 span {
+	background-color: #ffa;
+}
+#opps li p {
+	margin-top: 3px;
+}
