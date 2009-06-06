@@ -103,6 +103,7 @@ new function(settings) {
       return self;
     };
     
+  jQuery.queryObject = queryObject;
     queryObject.prototype = {
       queryObject: true,
       has: function(key, type) {
@@ -217,4 +218,5 @@ new function(settings) {
     
     return new queryObject(location.search, location.hash);
   };
+
 }(jQuery.query || {}); // Pass in jQuery.query as settings object

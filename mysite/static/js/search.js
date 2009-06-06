@@ -7,27 +7,40 @@ $(document).ready(function() {
             query = ($('#query').val());
 
             /* Put form values into an associative array. */
-            thisPageQueryArray = $('form').serializeArray();
-            thisPageQueryArray.push({'name': 'format', value: 'json'});
+            queryArrayFormatJSON = $('form').serializeArray();
+            queryArrayFormatJSON.push({'name': 'format', value: 'json'});
 
-            queryString = $.param(thisPageQueryArray);
+            queryStringFormatJSON = $.param(queryArrayFormatJSON);
 
             /* Fetch JSON and put in DOM. */
-            Opps.fetchOppsToDOM(queryString);
+            Opps.fetchOppsToDOM(queryStringFormatJSON);
+
+            var oldstart = 0, oldend = 0;
+            $(queryArrayFormatJSON).each(function () {
+                if(this.name == 'start') oldstart = parseInt(this.value);
+                if(this.name == 'end') oldend = parseInt(this.value);
+                })
+
+            console.log(oldstart, oldend);
+
+            diff = oldend - oldstart;
 
             prevPageQueryArray = $('form').serializeArray();
-            prevPageQueryArray.start = thisPageQueryArray.start * 2 - thisPageQueryArray.end;
-            prevPageQueryArray.end = thisPageQueryArray.start;
+            $(prevPageQueryArray).each(function () {
+                    if (this.name == 'start') this.value = oldstart - diff;
+                    if (this.name == 'end') this.value = oldstart;
+                    }
+                    );
 
-            nextPageQueryArray = $('form').serializeArray();
-            nextPageQueryArray.start = thisPageQueryArray.end;
-            nextPageQueryArray.end = thisPageQueryArray.end * 2 - thisPageQueryArray.start;
+            prevPageQueryArray = $('form').serializeArray();
+            $(prevPageQueryArray).each(function () {
+                    if (this.name == 'start') this.value = oldend;
+                    if (this.name == 'end') this.value = oldend + diff;
+                    });
 
             /* Update navigation links to reflect new query. */
-            /*
-               $('#prev-page').attr('href', '/search/' + $.param(prevPageQueryArray));
-               $('#next-page').attr('href', '/search/' + $.param(nextPageQueryArray));
-               */
+            $('#prev-page').attr('href', '/search/' + $.param(prevPageQueryArray));
+            $('#next-page').attr('href', '/search/' + $.param(nextPageQueryArray));
 
             return false;
         });
