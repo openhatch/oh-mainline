@@ -1,22 +1,17 @@
 $(document).ready(function() {
 
-        /* Takes a query and updates the page. */
-        $("#button").click(function() {
+        function update(queryArray) {
 
-            /* Get query; language for the moment. */
-            query = ($('#query').val());
+            queryArray.push({'name': 'format', value: 'json'});
 
-            /* Put form values into an associative array. */
-            queryArrayFormatJSON = $('form').serializeArray();
-            queryArrayFormatJSON.push({'name': 'format', value: 'json'});
-
-            queryStringFormatJSON = $.param(queryArrayFormatJSON);
+            queryStringFormatJSON = $.param(queryArray);
 
             /* Fetch JSON and put in DOM. */
             Opps.fetchOppsToDOM(queryStringFormatJSON);
 
+            /* Update navigation links */
             var oldstart = 0, oldend = 0;
-            $(queryArrayFormatJSON).each(function () {
+            $(queryArray).each(function () {
                 if(this.name == 'start') oldstart = parseInt(this.value);
                 if(this.name == 'end') oldend = parseInt(this.value);
                 })
@@ -43,7 +38,22 @@ $(document).ready(function() {
             $('#next-page').attr('href', '/search/' + $.param(nextPageQueryArray));
 
             return false;
-        });
+        };
+
+        /* Takes a query and updates the page. */
+        $("#button").click(function() {
+            /* Get query; language for the moment. */
+            query = ($('#query').val());
+
+            /* Put form values into an associative array. */
+            update($('form').serializeArray());
+            });
+
+
+        $('#prev-page, #next-page').click(function() {
+                
+                });
+
 });
 
 Opps = {
