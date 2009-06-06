@@ -10,12 +10,10 @@ def fetch_bugs(request):
 
     language = request.GET.get('language', '')
     format = request.GET.get('format', None)
-    start = int(request.GET.get('start', 0))
+    start = int(request.GET.get('start', 1))
     end = int(request.GET.get('end', 10))
 
     bugs = Bug.objects.all()
-
-    results_summary = "You searched the bug database for '%s'." % language
 
     if language:
         bugs = bugs.filter(project__language=language)
@@ -23,10 +21,7 @@ def fetch_bugs(request):
     #if status:
     #    bugs = bugs.filter(project__status=status)
         
-    bugs = bugs[start:end]
-
-    if bugs:
-        results_summary += " Showing matching bugs %d to %d." % (start, end)
+    bugs = bugs[start-1:end]
 
     if format == 'json':
         return bugs_to_json_response(bugs,
@@ -43,15 +38,14 @@ def fetch_bugs(request):
             prev_page_query_str['format'] = format
             next_page_query_str['format'] = format
         diff = end - start
-        prev_page_query_str['start'] = start - diff
-        prev_page_query_str['end'] = start
-        next_page_query_str['start'] = end
-        next_page_query_str['end'] = end + diff
+        prev_page_query_str['start'] = start - diff - 1
+        prev_page_query_str['end'] = start - 1
+        next_page_query_str['start'] = end + 1
+        next_page_query_str['end'] = end + diff + 1
         return render_to_response('search/search.html', {
             'bunch_of_bugs': bugs,
             'language': language,
             'start': start, 'end': end,
-            'results_summary': results_summary,
             'prev_page_url': '/search/?' + prev_page_query_str.urlencode(),
             'next_page_url': '/search/?' + next_page_query_str.urlencode()
             })
