@@ -1,131 +1,134 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-	<head>
-		<title>Asheesh Laroia | Developer | OpenHatch</title>
-		<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
-		<meta http-equiv='Content-Language' content='en-us' />
-		<meta http-equiv='Content-Script-Type' content='text/javascript' />
-		<meta http-equiv='Content-Style-Type' content='text/css' />
-		<meta name='Description' content=''>
-		<style>
-			/*<![CDATA[*/ @import url('http://localhost:8000/static/style/all.css'); /*]]>*/
-		</style>
-		<!--[if IE]><style>/*<![CDATA[*/@import url('../style/ie/all.css');/*]]>*/</style><![endif]-->
-		<!--[if lte IE 6]><style>/*<![CDATA[*/@import url('../style/ie/6-/all.css');/*]]>*/</style><![endif]-->
-		<!--[if gte IE 7]><style>/*<![CDATA[*/@import url('../style/ie/7+/all.css');/*]]>*/</style><![endif]-->
-		<script src='http://localhost:8000/static/js/jquery.js'></script>
-		<script src='http://localhost:8000/static/js/search.js'></script>
-	</head>
-	<body>
-		<div id='images'></div>
-		<div id='wrapper-outer'>
-			<div id='wrapper-inner'>
-				<div id='breadcrumb-display'>
-					<a href=''>OpenHatch</a> &raquo;
-					<a href=''>Developers</a> &raquo;
-					<a href=''>Asheesh Laroia</a>
-				</div>
-				<div id='heading'>
-					<h1>Asheesh Paranoia</h1>
-				</div>
-				<div id='sidebar'>
-					<div id='projects' class='box'>
-						<h2>Registered projects:</h2>
-						<table>
-							<tr>
-								<td>Debian</td>
-								<td class='yes'>
-									<img src='../images/button_ok.png'
-									alt='y'/>
-								</td>
-								<td class='yes'>
-									<img src='../images/button_ok.png'
-									alt='y'/>
-								</td>
-								<td class='yes'>
-									<img src='../images/button_ok.png'
-									alt='y'/>
-								</td>
-							</tr>
-							<tr>
-								<td>GNOME</td>
-								<td class='yes'>y</td>
-								<td class='yes'>y</td>
-								<td class='yes'>y</td>
-							</tr>
-							<tr>
-								<td>cc-tools</td>
-								<td class='yes'>y</td>
-								<td class='yes'>y</td>
-								<td class='no'>n</td>
-							</tr>
-							<tr>
-								<td>Ubuntu</td>
-								<td>y</td>
-								<td>y</td>
-								<td>y</td>
-							</tr>
-							<tr>
-								<td>Pidgin</td>
-								<td>y</td>
-								<td>n</td>
-								<td>n</td>
-							</tr>
-						</table>
-					</div>
-					<div id='add-another-bug-tracker' 
-						class='box'>
-						<h2>Add projects auto-magically</h2>
-						<p>Type your username or email
-						address and we will look for your 
-						trackers.</p>
-						<input type='text'
-						value='Type your username'/>
-					</div>
-					<div id='skill-list' class='box'>
-						<h2>Deduced skill list</h2>
-					</div>
-					<div id='add-a-skill' class='box'>
-						<h2>Add a skill</h2>
-					</div>
-				</div>
-				<div id='main'>
-					<div id='interests' class='box'>
-						<form method='get'> 
-							<h2>What are you interested in?</h2>
-							<input type='text' name='language' id='language' />
-							<input type='text' name='start' value='{{ start }}' />
-							<input type='text' name='end' value='{{ end }}' />
-							<input type='submit' id='button' />
-						</form>
-					</div>
-					<div id='opps' class='box'>
-						<h2>Opportunities</h2>
+    <head>
+        <title>Asheesh Laroia | Developer | OpenHatch</title>
+        <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
+        <meta http-equiv='Content-Language' content='en-us' />
+        <meta http-equiv='Content-Script-Type' content='text/javascript' />
+        <meta http-equiv='Content-Style-Type' content='text/css' />
+        <meta name='Description' content=''>
+        <style>
+            /*<![CDATA[*/ @import url('http://localhost:8000/static/style/all.css'); /*]]>*/
+        </style>
+        <!--[if IE]><style>/*<![CDATA[*/@import url('../style/ie/all.css');/*]]>*/</style><![endif]-->
+        <!--[if lte IE 6]><style>/*<![CDATA[*/@import url('../style/ie/6-/all.css');/*]]>*/</style><![endif]-->
+        <!--[if gte IE 7]><style>/*<![CDATA[*/@import url('../style/ie/7+/all.css');/*]]>*/</style><![endif]-->
+        <script src='http://localhost:8000/static/js/jquery.js'></script>
+        <script src='http://localhost:8000/static/js/search.js'></script>
+    </head>
+    <body>
+        <div id='images'></div>
+        <div id='wrapper-outer'>
+            <div id='wrapper-inner'>
+                <div id='breadcrumb-display'>
+                    <a href=''>OpenHatch</a> &raquo;
+                    <a href=''>Developers</a> &raquo;
+                    <a href=''>Asheesh Laroia</a>
+                </div>
+                <div id='heading'>
+                    <h1>Asheesh Paranoia</h1>
+                </div>
+                <div id='sidebar'>
+                    <div id='projects' class='box'>
+                        <h2>Registered projects:</h2>
+                        <table>
+                            <tr>
+                                <td>Debian</td>
+                                <td class='yes'>
+                                    <img src='../images/button_ok.png'
+                                    alt='y'/>
+                                </td>
+                                <td class='yes'>
+                                    <img src='../images/button_ok.png'
+                                    alt='y'/>
+                                </td>
+                                <td class='yes'>
+                                    <img src='../images/button_ok.png'
+                                    alt='y'/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>GNOME</td>
+                                <td class='yes'>y</td>
+                                <td class='yes'>y</td>
+                                <td class='yes'>y</td>
+                            </tr>
+                            <tr>
+                                <td>cc-tools</td>
+                                <td class='yes'>y</td>
+                                <td class='yes'>y</td>
+                                <td class='no'>n</td>
+                            </tr>
+                            <tr>
+                                <td>Ubuntu</td>
+                                <td>y</td>
+                                <td>y</td>
+                                <td>y</td>
+                            </tr>
+                            <tr>
+                                <td>Pidgin</td>
+                                <td>y</td>
+                                <td>n</td>
+                                <td>n</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div id='add-another-bug-tracker' 
+                        class='box'>
+                        <h2>Add projects auto-magically</h2>
+                        <p>Type your username or email
+                        address and we will look for your 
+                        trackers.</p>
+                        <input type='text'
+                        value='Type your username'/>
+                    </div>
+                    <div id='skill-list' class='box'>
+                        <h2>Deduced skill list</h2>
+                    </div>
+                    <div id='add-a-skill' class='box'>
+                        <h2>Add a skill</h2>
+                    </div>
+                </div>
+                <div id='main'>
+                    <div id='interests' class='box'>
+                        <form method='get'> 
+                            <h2>What are you interested in?</h2>
+                            <input type='text' name='language'
+                                id='language' value='{{ language }}' />
+                            <input type='hidden' name='start' value='{{ start }}' />
+                            <input type='hidden' name='end' value='{{ end }}' />
+                            <input type='submit' id='button' />
+                        </form>
+                    </div>
+                    <div id='opps' class='box'>
+                        <h2>Opportunities</h2>
 
-						<a href='{{ prev_page_url }}'>Prev page</a>
-						<a href='{{ next_page_url }}'>Next page</a>
+                        {{ results_summary }}
 
-							{% if bunch_of_bugs %}
-							<ul>
-								{% for bug in bunch_of_bugs %}
-								<li class='bug'>
-								<h3><span class='title'>
-										{{ bug.title }}
-								</span></h3>
-								<p class='description'>
-										{{ bug.description }}&hellip;
-								</p></li>
-								{% endfor %}
-							</ul>
-							{% else %}
-							<p>No bugs are available.</p>
-							{% endif %}
+                        <a href='{{ prev_page_url }}'>Prev page</a>
+                        <a href='{{ next_page_url }}'>Next page</a>
 
-						</ul>
-					</div>
-				</div>
-			</div>
-		</div>
-	</body>
+                            {% if bunch_of_bugs %}
+                            <ul>
+                                {% for bug in bunch_of_bugs %}
+                                <li class='bug'>
+                                <h3><span class='title'>
+                                        {{ bug.title }}
+                                </span></h3>
+                                <p class='description'>
+                                        {{ bug.description }}&hellip;
+                                </p></li>
+                                {% endfor %}
+                            </ul>
+                            {% else %}
+                            <p>No bugs are available.</p>
+                            {% endif %}
+
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
 </html>
-<!-- :vim set tabstop=2 shiftwidth=2: -->
+<!-- :vim set tabstop=4 shiftwidth=4 expandtab: -->

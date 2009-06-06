@@ -15,7 +15,7 @@ def fetch_bugs(request):
 
     bugs = Bug.objects.all()
 
-    total = len(bugs)
+    results_summary = "You searched the bug database for '%s'." % language
 
     if language:
         bugs = bugs.filter(project__language=language)
@@ -24,6 +24,9 @@ def fetch_bugs(request):
     #    bugs = bugs.filter(project__status=status)
         
     bugs = bugs[start:end]
+
+    if bugs:
+        results_summary += "Showing matching bugs %d to %d." % (start, end)
 
     if format == 'json':
         return bugs_to_json_response(bugs,
@@ -43,12 +46,14 @@ def fetch_bugs(request):
         prev_page_query_str['end'] = end
         next_page_query_str['start'] = end
         next_page_query_str['end'] = 2*end - start
-        return render_to_response('search/search.html',
-                {'bunch_of_bugs': bugs,
-                'start': start, 'end': end,
-                'prev_page_url': '/search/?' + prev_page_query_str.urlencode(),
-                'next_page_url': '/search/?' + next_page_query_str.urlencode()
-                })
+        return render_to_response('search/search.html', {
+            'bunch_of_bugs': bugs,
+            'language': language,
+            'start': start, 'end': end,
+            'results_summary': results_summary,
+            'prev_page_url': '/search/?' + prev_page_query_str.urlencode(),
+            'next_page_url': '/search/?' + next_page_query_str.urlencode()
+            })
 
 def bugs_to_json_response(bunch_of_bugs, callback_function_name=''):
     json_serializer = serializers.get_serializer('python')()
@@ -62,4 +67,4 @@ def bugs_to_json_response(bunch_of_bugs, callback_function_name=''):
 def index(request):
     return render_to_response('search/index.html')
     
-#:vim set ts=1 sw=3 expandtab:
+#:vim set ts=4 sw=4 expandtab:
