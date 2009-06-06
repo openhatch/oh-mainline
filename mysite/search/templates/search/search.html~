@@ -105,8 +105,8 @@
 
                         {{ results_summary }}
 
-                        <a href='{{ prev_page_url }}'>Prev page</a>
-                        <a href='{{ next_page_url }}'>Next page</a>
+                        <a href='{{ prev_page_url }}' id='prev-page'>Prev page</a>
+                        <a href='{{ next_page_url }}' id='next-page'>Next page</a>
 
                             {% if bunch_of_bugs %}
                             <ul>

@@ -42,10 +42,11 @@ def fetch_bugs(request):
         if format:
             prev_page_query_str['format'] = format
             next_page_query_str['format'] = format
-        prev_page_query_str['start'] = 2*start - end
-        prev_page_query_str['end'] = end
+        diff = end - start
+        prev_page_query_str['start'] = start - diff
+        prev_page_query_str['end'] = start
         next_page_query_str['start'] = end
-        next_page_query_str['end'] = 2*end - start
+        next_page_query_str['end'] = end + diff
         return render_to_response('search/search.html', {
             'bunch_of_bugs': bugs,
             'language': language,
