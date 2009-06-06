@@ -16,6 +16,14 @@ $(document).ready(function() {
             /* Fetch JSON and put in DOM. */
             Opps.fetchOppsToDOM(queryString);
 
+            prevPageQueryArray = $('form').serializeArray();
+            prevPageQueryArray.start = thisPageQueryArray.start * 2 - thisPageQueryArray.end;
+            prevPageQueryArray.end = thisPageQueryArray.start;
+
+            nextPageQueryArray = $('form').serializeArray();
+            nextPageQueryArray.start = thisPageQueryArray.end;
+            nextPageQueryArray.end = thisPageQueryArray.end * 2 - thisPageQueryArray.start;
+
             /* Update navigation links to reflect new query. */
             /*
                $('#prev-page').attr('href', '/search/' + $.param(prevPageQueryArray));
@@ -63,14 +71,4 @@ Opps = {
 
 $("#opps ul");
 
-/*
- *
- prevPageQueryArray = $('form').serializeArray();
- prevPageQueryArray.start = thisPageQueryArray.start * 2 - thisPageQueryArray.end;
- prevPageQueryArray.end = thisPageQueryArray.start;
-
- nextPageQueryArray = $('form').serializeArray();
- nextPageQueryArray.start = thisPageQueryArray.end;
- nextPageQueryArray.end = thisPageQueryArray.end * 2 - thisPageQueryArray.start;
- */
 /* vim:set sw=4 ts=4 expandtab: */
