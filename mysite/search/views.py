@@ -5,7 +5,7 @@ from django.core import serializers
 from mysite.search.models import Bug, Project
 import simplejson
 
-def fetch_bugs(request, language=False, format='html', start_at=0, how_many=10):
+def fetch_bugs(request, language=False, format='html', start=0, end=10):
     # FIXME: Give bugs some date field
 
 	bugs = Bug.objects.all()
@@ -16,7 +16,7 @@ def fetch_bugs(request, language=False, format='html', start_at=0, how_many=10):
 	#if status:
 	#	bugs = bugs.filter(project__status=status)
 		
-	bugs = bugs[start_at:start_at+how_many]
+	bugs = bugs[start_at:end]
 
 	if format == 'json':
 		return bugs_to_json_response(bugs, \
@@ -26,17 +26,14 @@ def fetch_bugs(request, language=False, format='html', start_at=0, how_many=10):
 				{'bunch_of_bugs': bugs, \
 				'start_at': start_at, 'how_many': how_many})
 
-def bugs_to_json_response(bunch_of_bugs, callback_function_name=0):
+def bugs_to_json_response(bunch_of_bugs, callback_function_name=''):
 	json_serializer = serializers.get_serializer('python')()
 	data = json_serializer.serialize(bunch_of_bugs)
 	for elt in data:
 		elt['fields']['project'] = \
 				Project.objects.get(pk=int(elt['fields']['project'])).name
 	jsonned = simplejson.dumps(data)
-	if callback_function_name:
-		return HttpResponse( callback_function_name + '(' + jsonned + ')' )
-	else:
-		return HttpResponse( '(' + jsonned + ')' )
+	return HttpResponse( callback_function_name + '(' + jsonned + ')' )
 
 def index(request):
     return render_to_response('search/index.html')
