@@ -132,15 +132,9 @@
 							<ul>
 								{% for bug in bunch_of_bugs %}
 								<li class='bug'>
-									<span class='project'>
-										{{ bug.fields.project }}
-									</span>
-									<span class='title'>
-										{{ bug.title }}
-									</span>
-									<span class='description'>
-										{{ bug.fields.description }}
-									</span>
+									<span class='project'>{{ bug.project.name }}</span>
+									&ndash; <span class='title'>{{ bug.title }}</span>
+									&ndash; <span class='description'>{{ bug.description }}</span>
 								</li>
 								{% endfor %}
 							</ul>

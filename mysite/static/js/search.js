@@ -35,10 +35,12 @@
             $('#prev-page').attr('href', prefix + $.param(prevPageQueryArray));
             $('#next-page').attr('href', prefix + $.param(nextPageQueryArray));
 
-            $('#results-description-language').text(language);
-            $('#results-description-start').text(thisstart);
-            $('#results-description-end').text(thisend);
+            $('#results-summary-language').text(language);
+            $('#results-summary-start').text(thisstart);
+            $('#results-summary-end').text(thisend);
             
+            console.log(thisstart);
+            console.log(thisend);
             return false;
         };
 
@@ -80,20 +82,12 @@ Opps = {
     },
     'jsonArrayToDocument': function (jsonArray) {
         $(jsonArray).each( function(i) {
-                $opp = $("<li>");
-                $opp.addClass(this.model);
+                $opp = $("li").eq(i);
                 $opp.attr('id', "opp-" + this.pk);
 
-                $opp.append($("<span class='project'>").text(this.fields.project));
-                $opp.append($("<span class='title'>").text(this.title));
-                $opp.append($("<span class='description'>").text(this.fields.description));
-
-                // Remove only one at a time.
-                // This always keeps bugs on the page, so it looks nicer, I think.
-                $('#opps li').eq(i).remove();
-
-                // Add to DOM
-                $('#opps ul').append($opp);
+                $opp.find('.project').text(this.fields.project);
+                $opp.find('.title').text(this.fields.title);
+                $opp.find('.description').text(this.fields.description);
         });
     }
 }

@@ -1,5 +1,5 @@
 body {
-	font: 0.8em/130% Arial;
+	font: 0.8em/130% Verdana, Arial, sans-serif;
 	background-color: #fff;
 }
 h1, h2, h3, h4, h5 {
@@ -29,9 +29,9 @@ h1 {
 	padding: 4px 8px;
 	font-size: 100%;
 	font-weight: bold;
-	color: #444; #b5c200; 9cc200; #ff6e57;
+	color: #446; #b5c200; 9cc200; #ff6e57;
 	margin-bottom: 5px;
-	background-color: #f0f0f0;
+	background-color: #f0f0fc;
 }
 .box .content {
 	padding: 4px 8px;
@@ -77,9 +77,7 @@ p {
 	width: 15px;
 	vertical-align: -10%;
 }
-
 #opps.box {
-	width: 550px;
 	padding-right: 0;
 	padding-bottom: 0;
 }
@@ -92,24 +90,25 @@ p {
 	font-size: 100%;
 	float: left;
 	list-style: none;
-	border: 1px dotted #fcc;
+	border: 1px dotted #ccf;
 	background-color: #fff;
-	width: 520px;
-	margin: 5px 5px 5px 0;
+	width: 512px;
 	cursor: pointer;
+	margin-top: 3px;
 	cursor: hand;
 	text-overflow: ellipsis;
 	overflow: hidden;
-	border-bottom: 1px solid #fc3;
+	padding: .3em;
+	height: 1.3em;
+	white-space: nowrap;
+}
+#opps li .project {
+	background-color: #ffa;
 }
 #opps li .title {
-	padding: 8px;
-	background-color: #fff;
-	font-size: 100%;
 }
-#opps li h3 .description {
-	font-size: 100%;
-	line-height: 125%;
+#opps li .description {
+	color: #888;
 }
 #opp-nav {
 
