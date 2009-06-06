@@ -71,7 +71,6 @@ Opps = {
         $.getJSON(url, this.jsonArrayToDocument);
     },
     'jsonArrayToDocument': function (jsonArray) {
-        console.log(jsonArray);
         $(jsonArray).each( function() {
                 $opp = $("<li>");
                 $opp.addClass(this.model);
@@ -87,12 +86,8 @@ Opps = {
                 $summary = $("<p>").text(this.fields.description);
                 $opp.append($summary);
 
-                console.log($opp[0]);
-
                 // Add to DOM
                 $('#opps ul').append($opp);
-                console.log(Opps);
-
         });
     }
 }
