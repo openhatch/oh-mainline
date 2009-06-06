@@ -31,8 +31,9 @@
                     });
 
             /* Update navigation links to reflect new query. */
-            $('#prev-page').attr('href', '/search/' + $.param(prevPageQueryArray));
-            $('#next-page').attr('href', '/search/' + $.param(nextPageQueryArray));
+            prefix = '/search/?';
+            $('#prev-page').attr('href', prefix + $.param(prevPageQueryArray));
+            $('#next-page').attr('href', prefix + $.param(nextPageQueryArray));
 
             return false;
         };
@@ -59,10 +60,10 @@ $(document).ready(function() {
 		}
 		console.log('FRUITYSERIALIZED:');
 		console.log(fruitySerialized);
-		console.log('SLASH FRUITYSERIALIZED:');
+        console.log('SLASH FRUITYSERIALIZED:');
 
-                return update(fruitySerialized);
-                });
+        return update(fruitySerialized);
+        });
 
 });
 
