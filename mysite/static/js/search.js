@@ -36,9 +36,9 @@
             $('#prev-page').attr('href', prefix + $.param(prevPageQueryArray));
             $('#next-page').attr('href', prefix + $.param(nextPageQueryArray));
 
-            $('#results-summary-language').text(language);
-            $('#results-summary-start').text(thisstart);
-            $('#results-summary-end').text(thisend);
+            $('#results-description-language').text(language);
+            $('#results-description-start').text(thisstart);
+            $('#results-description-end').text(thisend);
             
             return false;
         };
@@ -76,25 +76,22 @@ Opps = {
     'oppsQueryURL': "http://localhost:8000/search/?",
     '$oppsDOMList': $('#opps ul'),
     'fetchOppsToDOM': function (queryString) {
-        $('#opps li').remove();
         url = this.oppsQueryURL + queryString + "&jsoncallback=?";
         $.getJSON(url, this.jsonArrayToDocument);
     },
     'jsonArrayToDocument': function (jsonArray) {
-        $(jsonArray).each( function() {
+        $(jsonArray).each( function(i) {
                 $opp = $("<li>");
                 $opp.addClass(this.model);
                 $opp.attr('id', "opp-" + this.pk);
 
-                // Heading
-                $h3 = $("<h3>");
-                $title = $("<span>").text(this.fields.title);
-                $h3.append($title);
-                $opp.append($h3);
+                $opp.append($("<span class='project'>").text(this.fields.project));
+                $opp.append($("<span class='title'>").text(this.title));
+                $opp.append($("<span class='description'>").text(this.fields.description));
 
-                // Summary
-                $summary = $("<p>").text(this.fields.description);
-                $opp.append($summary);
+                // Remove only one at a time.
+                // This always keeps bugs on the page, so it looks nicer, I think.
+                $('#opps li').eq(i).remove();
 
                 // Add to DOM
                 $('#opps ul').append($opp);

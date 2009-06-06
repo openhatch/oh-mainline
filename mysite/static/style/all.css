@@ -22,17 +22,19 @@ h1 {
 }
 .box {
 	float: left;
-	background-color: #f0f0f0;
-	padding: 10px 10px 5px 10px;
+	background-color: #fff;
 	margin-bottom: 10px;
-	border-top: 3px solid #ddd;
-	border-bottom: 1px dotted #ddd;
 }
 .box h2 {
+	padding: 4px 8px;
 	font-size: 100%;
 	font-weight: bold;
 	color: #444; #b5c200; 9cc200; #ff6e57;
 	margin-bottom: 5px;
+	background-color: #f0f0f0;
+}
+.box .content {
+	padding: 4px 8px;
 }
 #sidebar {
 	float: left;
@@ -48,10 +50,6 @@ h1 {
 }
 #main-1 {
 	height: 400px;
-}
-#projects {
-	padding: 10px;
-	width: 200px;
 }
 #projects table {
 	padding: 0;
@@ -97,24 +95,22 @@ p {
 	border: 1px dotted #fcc;
 	background-color: #fff;
 	width: 520px;
-	margin: 0 5px 5px 0;
+	margin: 5px 5px 5px 0;
 	cursor: pointer;
 	cursor: hand;
 	text-overflow: ellipsis;
 	overflow: hidden;
-	border-top: 1px solid #fc3;
+	border-bottom: 1px solid #fc3;
 }
-#opps li h3 {
+#opps li .title {
 	padding: 8px;
-	background-color: #ffa;
-	font-size: 125%;
+	background-color: #fff;
+	font-size: 100%;
 }
-#opps li h3 span {
+#opps li h3 .description {
 	font-size: 100%;
 	line-height: 125%;
 }
-#opps li p {
-	font-size: 85%;
-	margin-top: 3px;
-	line-height: 110%;
+#opp-nav {
+
 }
