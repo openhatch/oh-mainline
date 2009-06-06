@@ -91,9 +91,13 @@
 				</div>
 				<div id='main'>
 					<div id='interests' class='box'>
-						<h2>What are you interested in?</h2>
-						<input type='text' id='query' />
-						<input type='submit' id='button' />
+						<form method='get'> 
+							<h2>What are you interested in?</h2>
+							<input type='text' name='language' id='language' />
+							<input type='text' name='start' value='{{ start }}' />
+							<input type='text' name='end' value='{{ end }}' />
+							<input type='submit' id='button' />
+						</form>
 					</div>
 					<div id='opps' class='box'>
 						<h2>Opportunities</h2>

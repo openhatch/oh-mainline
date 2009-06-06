@@ -2,6 +2,7 @@ $(document).ready(function() {
 	 $("#button").click(function() {
 		query = ($('#query').val());
 		Opps.fetchOppsToDOM(query);
+		return false;
 		});
 	 });
 
