@@ -7,27 +7,28 @@
             Opps.fetchOppsToDOM(queryStringFormatJSON);
 
             /* Update navigation links */
-            var oldstart = 0, oldend = 0;
+            var language, thisstart = 0, thisend = 0;
             $(queryArray).each(function () {
-                if(this.name == 'start') oldstart = parseInt(this.value);
-                if(this.name == 'end') oldend = parseInt(this.value);
+                if(this.name == 'language') language = this.value;
+                if(this.name == 'start') thisstart = parseInt(this.value);
+                if(this.name == 'end') thisend = parseInt(this.value);
                 })
 
-            console.log(oldstart, oldend);
+            console.log(thisstart, thisend);
 
-            diff = oldend - oldstart;
+            diff = thisend - thisstart;
 
             prevPageQueryArray = $('form').serializeArray();
             $(prevPageQueryArray).each(function () {
-                    if (this.name == 'start') this.value = oldstart - diff;
-                    if (this.name == 'end') this.value = oldstart;
+                    if (this.name == 'start') this.value = thisstart - diff;
+                    if (this.name == 'end') this.value = thisstart;
                     }
                     );
 
             nextPageQueryArray = $('form').serializeArray();
             $(nextPageQueryArray).each(function () {
-                    if (this.name == 'start') this.value = oldend;
-                    if (this.name == 'end') this.value = oldend + diff;
+                    if (this.name == 'start') this.value = thisend;
+                    if (this.name == 'end') this.value = thisend + diff;
                     });
 
             /* Update navigation links to reflect new query. */
@@ -35,6 +36,10 @@
             $('#prev-page').attr('href', prefix + $.param(prevPageQueryArray));
             $('#next-page').attr('href', prefix + $.param(nextPageQueryArray));
 
+            $('#results-summary-language').text(language);
+            $('#results-summary-start').text(thisstart);
+            $('#results-summary-end').text(thisend);
+            
             return false;
         };
 

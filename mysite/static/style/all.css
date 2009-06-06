@@ -94,24 +94,24 @@ p {
 	font-size: 100%;
 	float: left;
 	list-style: none;
-	border: 1px dotted #ccc;
+	border: 1px dotted #fcc;
 	background-color: #fff;
-	padding: 8px;
-	width: 250px;
+	width: 520px;
 	margin: 0 5px 5px 0;
 	cursor: pointer;
 	cursor: hand;
 	text-overflow: ellipsis;
+	overflow: hidden;
+	border-top: 1px solid #fc3;
 }
 #opps li h3 {
+	padding: 8px;
+	background-color: #ffa;
 	font-size: 125%;
 }
 #opps li h3 span {
 	font-size: 100%;
 	line-height: 125%;
-	background-color: #ffa;
-	border-bottom: 1px solid #fc3;
-	padding-right: 2px;
 }
 #opps li p {
 	font-size: 85%;
