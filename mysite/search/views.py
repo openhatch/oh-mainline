@@ -5,25 +5,38 @@ from django.core import serializers
 from mysite.search.models import Bug, Project
 import simplejson
 
-def query(request, query, format='html', start_at=0, how_many=10):
+def fetch_bugs(request, language=False, format='html', start_at=0, how_many=10):
     # FIXME: Give bugs some date field
-    bunch_of_bugs = Bug.objects.filter(
-			project__language=query)[start_at:start_at+how_many]
-	return render_to_response('search/search.html', \
-			{'bunch_of_bugs': bunch_of_bugs, \
-			'start_at': start_at, 'how_many': how_many})
 
-def bugs_to_json(request, query):
-    # FIXME: Give bugs some date field
-    bunch_of_bugs = Bug.objects.filter(
-        project__language=query)[:10]
-    json_serializer = serializers.get_serializer('python')()
-    data = json_serializer.serialize(bunch_of_bugs)
-    for elt in data:
-        elt['fields']['project'] = \
+	bugs = Bug.objects.all()
+
+	if language:
+		bugs = bugs.filter(project__language=language)
+
+	#if status:
+	#	bugs = bugs.filter(project__status=status)
+		
+	bugs = bugs[start_at:start_at+how_many]
+
+	if format == 'json':
+		return bugs_to_json_response(bugs, \
+				request.GET.get('jsoncallback', 'alert'))
+	else:
+		return render_to_response('search/search.html', \
+				{'bunch_of_bugs': bugs, \
+				'start_at': start_at, 'how_many': how_many})
+
+def bugs_to_json_response(bunch_of_bugs, callback_function_name=0):
+	json_serializer = serializers.get_serializer('python')()
+	data = json_serializer.serialize(bunch_of_bugs)
+	for elt in data:
+		elt['fields']['project'] = \
 				Project.objects.get(pk=int(elt['fields']['project'])).name
-    jsonned = simplejson.dumps(data)
-    return HttpResponse(request.GET.get('jsoncallback', 'alert') + '(' + jsonned + ')' )
+	jsonned = simplejson.dumps(data)
+	if callback_function_name:
+		return HttpResponse( callback_function_name + '(' + jsonned + ')' )
+	else:
+		return HttpResponse( '(' + jsonned + ')' )
 
 def index(request):
     return render_to_response('search/index.html')
