@@ -9,3 +9,10 @@ class NonJavascriptSearch(django.test.TestCase):
         for n in range(1, 11):
             self.assertContains(response, 'Title #%d' % n)
             self.assertContains(response, 'Description #%d' % n)
+
+    def testMatchingBugsFromMtoN(self):
+        response = self.client.get('/search/')
+        self.assertContains(response, '1 to 10')
+
+    
+
