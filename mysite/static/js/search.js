@@ -8,12 +8,12 @@ $(document).ready(function() {
 
 
       prevPageQueryArray = $('form').serializeArray();
-      prevPageQueryArray.start = thisPageQueryArray.end;
-      prevPageQueryArray.end = thisPageQueryArray.end * 2 - thisPageQueryArray.start;
+      prevPageQueryArray.start = thisPageQueryArray.start * 2 - thisPageQueryArray.end;
+      prevPageQueryArray.end = thisPageQueryArray.start;
 
       nextPageQueryArray = $('form').serializeArray();
-      nextPageQueryArray.start = thisPageQueryArray.start * 2 - thisPageQueryArray.end;
-      nextPageQueryArray.end = thisPageQueryArray.start;
+      nextPageQueryArray.start = thisPageQueryArray.end;
+      nextPageQueryArray.end = thisPageQueryArray.end * 2 - thisPageQueryArray.start;
    alert('zee');
       $('#prev-page').attr('href', '/search/' + $.param(prevPageQueryArray));
       $('#next-page').attr('href', '/search/' + $.param(nextPageQueryArray));
