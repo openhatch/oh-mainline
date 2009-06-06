@@ -11,13 +11,10 @@ $(document).ready(function() {
             /* Put form values into an associative array. */
             thisPageQueryArray = $('form').serializeArray();
 
-            /* Make a copy of this array,
-             * and tack on a request to format as JSON. */
-            thisPageQueryArrayJSON = $('form').serializeArray();
-            thisPageQueryArrayJSON['format'] = 'json';
+            queryString = $.param(thisPageQueryArray) + "&format=json";
 
             /* Fetch JSON and put in DOM. */
-            Opps.fetchOppsToDOM($.param(thisPageQueryArrayJSON));
+            Opps.fetchOppsToDOM(queryString);
 
             /* Update navigation links to reflect new query. */
             /*
