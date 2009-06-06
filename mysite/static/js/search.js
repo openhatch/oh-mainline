@@ -1,17 +1,18 @@
 $(document).ready(function() {
 	 $("#button").click(function() {
 		query = ($('#query').val());
-		Opps.fetchOppsToDOM(query);
+      $('form').append($("<input name='format' type='hidden'>").val('json'));
+		Opps.fetchOppsToDOM($('form').serialize());
 		return false;
 		});
 	 });
 
 Opps = {
-	'oppsQueryJSONURL': "http://renaissance.local:8000/search/query_json/",
+	'oppsQueryURL': "http://localhost:8000/search/?",
 	'$oppsDOMList': $('#opps ul'),
-	'fetchOppsToDOM': function (query) {
+	'fetchOppsToDOM': function (queryString) {
 	  $('#opps li').remove();
-	  url = this.oppsQueryJSONURL + encodeURIComponent(query) + "?jsoncallback=?";
+	  url = this.oppsQueryURL + queryString + "&jsoncallback=?";
 	  $.getJSON(url, this.jsonArrayToDocument);
 	},
 	'jsonArrayToDocument': function (jsonArray) {
