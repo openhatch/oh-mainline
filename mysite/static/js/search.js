@@ -47,7 +47,17 @@ $(document).ready(function() {
 
 
         $('#prev-page, #next-page').click(function() {
-                
+                /* Take the HREF and convert to wacky serializeArray, send to update() */
+		var fruitySerialized = new Array();
+                var splitted_on_ampersands = this.href.split('&');
+                for (var keyvalue in splitted_on_ampersands) {
+		    var splitted = keyvalue.split('=');    
+		    var key = splitted[0];
+		    var value = splitted[1];
+		    var fruity_pushable = {'name': key, 'value': value};
+		    fruitySerialized.push(fruity_pushable);
+		}
+                return update(fruitySerialized);
                 });
 
 });
