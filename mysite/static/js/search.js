@@ -1,7 +1,4 @@
-$(document).ready(function() {
-
         function update(queryArray) {
-
             queryArray.push({'name': 'format', value: 'json'});
 
             queryStringFormatJSON = $.param(queryArray);
@@ -27,8 +24,8 @@ $(document).ready(function() {
                     }
                     );
 
-            prevPageQueryArray = $('form').serializeArray();
-            $(prevPageQueryArray).each(function () {
+            nextPageQueryArray = $('form').serializeArray();
+            $(nextPageQueryArray).each(function () {
                     if (this.name == 'start') this.value = oldend;
                     if (this.name == 'end') this.value = oldend + diff;
                     });
@@ -40,13 +37,12 @@ $(document).ready(function() {
             return false;
         };
 
+$(document).ready(function() {
+
         /* Takes a query and updates the page. */
         $("#button").click(function() {
-            /* Get query; language for the moment. */
-            query = ($('#query').val());
-
             /* Put form values into an associative array. */
-            update($('form').serializeArray());
+            return update($('form').serializeArray());
             });
 
 
