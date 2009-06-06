@@ -49,14 +49,18 @@ $(document).ready(function() {
         $('#prev-page, #next-page').click(function() {
                 /* Take the HREF and convert to wacky serializeArray, send to update() */
 		var fruitySerialized = new Array();
-                var splitted_on_ampersands = this.href.split('&');
-                for (var keyvalue in splitted_on_ampersands) {
-		    var splitted = keyvalue.split('=');    
-		    var key = splitted[0];
-		    var value = splitted[1];
+                var splitted_on_ampersands = this.href.split('?')[1].split('&');
+                for (var index in splitted_on_ampersands) {
+		    var splitted = splitted_on_ampersands[index].split('=');    
+		    var key = decodeURIComponent(splitted[0]);
+		    var value = decodeURIComponent(splitted[1]);
 		    var fruity_pushable = {'name': key, 'value': value};
 		    fruitySerialized.push(fruity_pushable);
 		}
+		console.log('FRUITYSERIALIZED:');
+		console.log(fruitySerialized);
+		console.log('SLASH FRUITYSERIALIZED:');
+
                 return update(fruitySerialized);
                 });
 
