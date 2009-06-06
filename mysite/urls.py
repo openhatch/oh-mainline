@@ -11,7 +11,7 @@ parameter_grabbers = {
 		'slice': 'slice[=:](?P<start>\d+):(?P<end>\d+)',
 		}
 urlpatterns = patterns('',
-    (r'^search/$', 'mysite.search.views.index'),
+    (r'^search/$', 'mysite.search.views.fetch_bugs'),
     (r'^search/%(language)s/%(format)s/%(slice)s/$' % \
 			parameter_grabbers, 'mysite.search.views.fetch_bugs'),
     (r'^search/%(language)s/%(format)s/$' % \

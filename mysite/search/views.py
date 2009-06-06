@@ -16,7 +16,7 @@ def fetch_bugs(request, language=False, format='html', start=0, end=10):
 	#if status:
 	#	bugs = bugs.filter(project__status=status)
 		
-	bugs = bugs[start_at:end]
+	bugs = bugs[start:end]
 
 	if format == 'json':
 		return bugs_to_json_response(bugs, \
@@ -24,7 +24,7 @@ def fetch_bugs(request, language=False, format='html', start=0, end=10):
 	else:
 		return render_to_response('search/search.html', \
 				{'bunch_of_bugs': bugs, \
-				'start_at': start_at, 'how_many': how_many})
+				'start': start, 'end': end})
 
 def bugs_to_json_response(bunch_of_bugs, callback_function_name=''):
 	json_serializer = serializers.get_serializer('python')()
