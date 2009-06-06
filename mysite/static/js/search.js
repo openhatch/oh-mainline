@@ -20,15 +20,14 @@
 
             prevPageQueryArray = $('form').serializeArray();
             $(prevPageQueryArray).each(function () {
-                    if (this.name == 'start') this.value = thisstart - diff;
-                    if (this.name == 'end') this.value = thisstart;
-                    }
-                    );
+                    if (this.name == 'start') this.value = thisstart - diff - 1;
+                    if (this.name == 'end') this.value = thisstart - 1;
+                    });
 
             nextPageQueryArray = $('form').serializeArray();
             $(nextPageQueryArray).each(function () {
-                    if (this.name == 'start') this.value = thisend;
-                    if (this.name == 'end') this.value = thisend + diff;
+                    if (this.name == 'start') this.value = thisend + 1;
+                    if (this.name == 'end') this.value = thisend + diff + 1;
                     });
 
             /* Update navigation links to reflect new query. */
