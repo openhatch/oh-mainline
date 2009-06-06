@@ -1,5 +1,3 @@
-alert('new');
-
 $(document).ready(function() {
 
         /* Takes a query and updates the page. */
@@ -10,7 +8,7 @@ $(document).ready(function() {
 
             /* Put form values into an associative array. */
             thisPageQueryArray = $('form').serializeArray();
-            thisPageQueryArray[] = {name: 'format', value: 'json'};
+            thisPageQueryArray.push({'name': 'format', value: 'json'});
 
             queryString = $.param(thisPageQueryArray);
 
