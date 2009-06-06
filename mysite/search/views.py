@@ -8,7 +8,7 @@ import simplejson
 def fetch_bugs(request):
     # FIXME: Give bugs some date field
 
-    language = request.GET.get('language', None)
+    language = request.GET.get('language', '')
     format = request.GET.get('format', None)
     start = int(request.GET.get('start', 0))
     end = int(request.GET.get('end', 10))
