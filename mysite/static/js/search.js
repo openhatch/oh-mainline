@@ -1,8 +1,22 @@
 $(document).ready(function() {
 	 $("#button").click(function() {
 		query = ($('#query').val());
-      $('form').append($("<input name='format' type='hidden'>").val('json'));
-		Opps.fetchOppsToDOM($('form').serialize());
+      thisPageQueryArray = $('form').serializeArray();
+      thisPageQueryArrayJSON = $('form').serializeArray();
+      thisPageQueryArrayJSON.format = 'json';
+		Opps.fetchOppsToDOM($.param(thisPageQueryArrayJSON));
+
+
+      prevPageQueryArray = $('form').serializeArray();
+      prevPageQueryArray.start = thisPageQueryArray.end;
+      prevPageQueryArray.end = thisPageQueryArray.end * 2 - thisPageQueryArray.start;
+
+      nextPageQueryArray = $('form').serializeArray();
+      nextPageQueryArray.start = thisPageQueryArray.start * 2 - thisPageQueryArray.end;
+      nextPageQueryArray.end = thisPageQueryArray.start;
+   alert('zee');
+      $('#prev-page').attr('href', '/search/' + $.param(prevPageQueryArray));
+      $('#next-page').attr('href', '/search/' + $.param(nextPageQueryArray));
 		return false;
 		});
 	 });
