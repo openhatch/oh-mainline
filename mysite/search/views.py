@@ -26,7 +26,7 @@ def fetch_bugs(request):
     bugs = bugs[start:end]
 
     if bugs:
-        results_summary += "Showing matching bugs %d to %d." % (start, end)
+        results_summary += " Showing matching bugs %d to %d." % (start, end)
 
     if format == 'json':
         return bugs_to_json_response(bugs,
