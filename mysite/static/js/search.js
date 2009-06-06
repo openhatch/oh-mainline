@@ -10,8 +10,9 @@ $(document).ready(function() {
 
             /* Put form values into an associative array. */
             thisPageQueryArray = $('form').serializeArray();
+            thisPageQueryArray[] = {name: 'format', value: 'json'};
 
-            queryString = $.param(thisPageQueryArray) + "&format=json";
+            queryString = $.param(thisPageQueryArray);
 
             /* Fetch JSON and put in DOM. */
             Opps.fetchOppsToDOM(queryString);
