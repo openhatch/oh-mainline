@@ -14,7 +14,7 @@ $(document).ready(function() {
             /* Make a copy of this array,
              * and tack on a request to format as JSON. */
             thisPageQueryArrayJSON = $('form').serializeArray();
-            thisPageQueryArrayJSON.format = 'json';
+            thisPageQueryArrayJSON['format'] = 'json';
 
             /* Fetch JSON and put in DOM. */
             Opps.fetchOppsToDOM($.param(thisPageQueryArrayJSON));
