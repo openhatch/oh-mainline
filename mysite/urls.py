@@ -12,7 +12,11 @@ parameter_grabbers = {
 		}
 urlpatterns = patterns('',
     (r'^search/$', 'mysite.search.views.fetch_bugs'),
+    (r'^search/%(slice)s/$' % \
+			parameter_grabbers, 'mysite.search.views.fetch_bugs'),
     (r'^search/%(language)s/%(format)s/%(slice)s/$' % \
+			parameter_grabbers, 'mysite.search.views.fetch_bugs'),
+    (r'^search/%(language)s/%(slice)s/$' % \
 			parameter_grabbers, 'mysite.search.views.fetch_bugs'),
     (r'^search/%(language)s/%(format)s/$' % \
 			parameter_grabbers, 'mysite.search.views.fetch_bugs'),
