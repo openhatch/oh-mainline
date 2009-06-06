@@ -15,8 +15,6 @@ def fetch_bugs(request):
 
     bugs = Bug.objects.all()
 
-    results_summary = "You searched the bug database for '%s'." % language
-
     if language:
         bugs = bugs.filter(project__language=language)
 
@@ -24,9 +22,6 @@ def fetch_bugs(request):
     #    bugs = bugs.filter(project__status=status)
         
     bugs = bugs[start:end]
-
-    if bugs:
-        results_summary += " Showing matching bugs %d to %d." % (start, end)
 
     if format == 'json':
         return bugs_to_json_response(bugs,
@@ -51,7 +46,6 @@ def fetch_bugs(request):
             'bunch_of_bugs': bugs,
             'language': language,
             'start': start, 'end': end,
-            'results_summary': results_summary,
             'prev_page_url': '/search/?' + prev_page_query_str.urlencode(),
             'next_page_url': '/search/?' + next_page_query_str.urlencode()
             })

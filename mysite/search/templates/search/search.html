@@ -104,10 +104,21 @@
                     <div id='opps' class='box'>
                         <h2>Opportunities</h2>
 
-                        {{ results_summary }}
+						<span id='results-summary'>
+							You searched the bug database for '<span id='results-summary-language'>{{ language }}</span>'
 
-                        <a href='{{ prev_page_url }}' id='prev-page'>Prev page</a>
-                        <a href='{{ next_page_url }}' id='next-page'>Next page</a>
+							{% if bunch_of_bugs %}
+							Showing matching bugs
+							<span id='results-summary-start'>{{ start }}</span>
+							to
+							<span id='results-summary-end'>{{ end }}</span>.
+							{% endif %}
+						</span>
+
+						<div id='navigation'>
+							<a href='{{ prev_page_url }}' id='prev-page'>Prev page</a>
+							<a href='{{ next_page_url }}' id='next-page'>Next page</a>
+						</div>
 
                             {% if bunch_of_bugs %}
                             <ul>
