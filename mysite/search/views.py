@@ -1,17 +1,21 @@
 # Create your views here.
-from django.http import HttpResponse
+from django.http import HttpResponse, QueryDict
 from django.shortcuts import render_to_response
 from django.core import serializers
 from mysite.search.models import Bug, Project
 import simplejson
 
-def fetch_bugs(request, language=None, format='html', start=0, end=10):
+def fetch_bugs(request):
     # FIXME: Give bugs some date field
 
-    start = int(start)
-    end = int(end)
+    language = request.GET.get('language', None)
+    format = request.GET.get('format', None)
+    start = int(request.GET.get('start', 0))
+    end = int(request.GET.get('end', 10))
 
     bugs = Bug.objects.all()
+
+    total = len(bugs)
 
     if language:
         bugs = bugs.filter(project__language=language)
@@ -25,18 +29,25 @@ def fetch_bugs(request, language=None, format='html', start=0, end=10):
         return bugs_to_json_response(bugs,
                 request.GET.get('jsoncallback', 'alert'))
     else:
-        language_query = ''
+        prev_page_query_str = QueryDict('')
+        prev_page_query_str = prev_page_query_str.copy()
+        next_page_query_str = QueryDict('')
+        next_page_query_str = next_page_query_str.copy()
         if language:
-            language_query = '/language=' + language
-        prev_page_url = '/search%s/slice=%d:%d/' % (
-                language_query, 2*start - end, start)
-        next_page_url = '/search%s/slice=%d:%d/' % (
-                language_query, end, 2*end-start)
+            prev_page_query_str['language'] = language
+            next_page_query_str['language'] = language
+        if format:
+            prev_page_query_str['format'] = format
+            next_page_query_str['format'] = format
+        prev_page_query_str['start'] = 2*start - end
+        prev_page_query_str['end'] = end
+        next_page_query_str['start'] = end
+        next_page_query_str['end'] = 2*end - start
         return render_to_response('search/search.html',
-                {'bunch_of_bugs': bugs, 
+                {'bunch_of_bugs': bugs,
                 'start': start, 'end': end,
-                'prev_page_url': prev_page_url,
-                'next_page_url': next_page_url
+                'prev_page_url': '/search/?' + prev_page_query_str.urlencode(),
+                'next_page_url': '/search/?' + next_page_query_str.urlencode()
                 })
 
 def bugs_to_json_response(bunch_of_bugs, callback_function_name=''):
