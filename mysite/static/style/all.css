@@ -99,19 +99,46 @@ p {
 	cursor: hand;
 	text-overflow: ellipsis;
 	overflow: hidden;
-	padding: .3em;
 	height: 2.5em;
 	white-space: nowrap;
 }
+#opps li .quick-summary {
+}
+#opps li .details {
+	padding: .3em;
+	padding-top: 0;
+	float: left;
+}
+#opps li label {
+	color: #777;
+}
+#opps li .field {
+	float: left;
+	width: 50%;
+	margin-top: .3em;
+}
 #opps li.expanded {
 	height: auto;
+	white-space: normal;
+}
+#opps li.expanded .quick-summary {
+	background-color: #fff;
+	border-bottom: 1px dotted #ccc;
+}
+#opps li.expanded .first-line {
+	border-bottom: 1px dotted #ccc;
+}
+#opps li.expanded .description {
+	color: #222;
 }
 #opps li.expanded {
 }
 #opps li .first-line {
+	padding: .3em;
 	display: block;
 }
 #opps li .second-line {
+	padding: .3em;
 	display: block;
 }
 #opps li .project {

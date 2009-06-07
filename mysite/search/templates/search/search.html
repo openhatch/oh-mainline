@@ -131,33 +131,34 @@
 							{% if bunch_of_bugs %}
 							<ul>
 								{% for bug in bunch_of_bugs %}
-								<li class='bug'>
+								<li class='bug expanded'>
 								<div class='quick-summary'>
 									<div class='first-line'>
-										<span class='project'>{{ bug.project.name }}</span>
-										<span class='separator'>&ndash;</span>
 										<span class='title'>{{ bug.title }}</span>
 										<span class='separator'>&ndash;</span>
 										<span class='age'>3 days old</span>
 									</div>
 									<div class='second-line'>
-										<span class='description'>{{ bug.description }}</span>
+										<span class='project'>{{ bug.project.name }}</span>
+										<span class='separator'>&ndash;</span>
+										<span class='description'>{{ bug.description }}&hellip;</span>
 									</div>
 								</div>
 								<div class='details'>
-									<span class='last-polled'>
+									<span class='field last-polled'>
 										<label>Last polled: </label>
-										<span class='value'>Three days ago</span>
+										<span class='value'>3 days ago</span>
+										<a href=''>[poll now]</a>
 									</span>
-									<span class='status'>
+									<span class='field status'>
 										<label>Status: </label>
 										<span class='value'>triaged</span>
 									</span>
-									<span class='status'>
+									<span class='field importance'>
 										<label>Importance: </label>
 										<span class='value'>wishlist</span>
 									</span>
-									<span class='tracker'>
+									<span class='field origin'>
 										<label>Origin: </label>
 										<span class='value'>
 											<a href='https://bugs.launchpad.net/ubuntu/+source/apport/+bug/321566'>Launchpad</a>
