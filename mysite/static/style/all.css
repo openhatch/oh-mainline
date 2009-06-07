@@ -106,21 +106,27 @@ p {
 #opps li.expanded .quick-summary {
 	border-bottom: none;
 }
+#opps li.expanded {
+	margin: 5px 0;
+}
+#opps li .age {
+	float: right;
+}
 #opps li .details {
 	border-top: 1px dotted #ccf;
-	padding: .3em;
+	padding: .3em .7em;
 	padding-top: 0;
 	float: left;
 	font-size: 85%;
 	width: 100%;
-	background-color: #eee;
+	background-color: #eeeefc;
 }
 #opps li label {
 	color: #777;
 }
 #opps li .field {
 	float: left;
-	width: 50%;
+	width: 33%;
 	margin-top: .3em;
 }
 #opps li.expanded {
@@ -139,25 +145,25 @@ p {
 #opps li.expanded .first-line {
 }
 #opps li.expanded .description {
-	border-left: 1px dotted #ccf;
-	color: #222;
-	padding: .3em;
-	position: relative;
-	left: -1px;
+	border-right: 1px dotted #ccf;
+	color: #000;
+	padding: .3em .7em;
 	float: left;
 	width: 437px;
 }
 #opps li.expanded .project {
 	background-color: inherit;
+	width: 91px;
 }
-#opps li .logo img {
-	width: 100%;
+#opps li .logo {
+	width: 20px;
+	vertical-align: middle;
 }
 #opps li.expanded .separator {
 	display: none;
 }
 #opps li .first-line {
-	padding: .3em;
+	padding: .3em .7em;
 	display: block;
 }
 #opps li .second-line {

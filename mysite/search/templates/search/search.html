@@ -142,34 +142,45 @@
 										<span class='age'>3 days old</span>
 									</div>
 									<div class='second-line'>
-										<span class='project'>
-											<span class='logo'><img src='/static/images/Exaile-icon.png' /></span>
-											<span class='name'>{{ bug.project.name }}</span>
+										<span class='description'>
+											{{ bug.description }}
 										</span>
 										<span class='separator'>&ndash;</span>
-										<span class='description'>{{ bug.description }}&hellip;
+										<span class='project'>
+												<img class='logo' src='/static/images/Exaile-icon.png' />
+												{{ bug.project.name }}
 										</span>
 									</div>
 								</div>
 								<div class='details'>
-									<span class='field last-polled'>
-										<label>Last polled: </label>
-										<span class='value'>3 days ago</span>
-										<a href=''>[poll now]</a>
+									<span class='field importance'>
+										<label>People involved: </label>
+										<span class='value'>
+											<a href=''>13</a>
+										</span>
 									</span>
 									<span class='field status'>
 										<label>Status: </label>
 										<span class='value'>triaged</span>
 									</span>
-									<span class='field importance'>
-										<label>Importance: </label>
-										<span class='value'>wishlist</span>
+									<span class='field last-polled'>
+										<label>Last touched: </label>
+										<span class='value'>2 weeks ago</span>
 									</span>
 									<span class='field origin'>
 										<label>Origin: </label>
 										<span class='value'>
 											<a href='https://bugs.launchpad.net/ubuntu/+source/apport/+bug/321566'>Launchpad</a>
 										</span>
+									</span>
+									<span class='field importance'>
+										<label>Importance: </label>
+										<span class='value'>wishlist</span>
+									</span>
+									<span class='field last-polled'>
+										<label>Last polled: </label>
+										<span class='value'>3 days ago</span>
+										<a href=''>poll now</a>
 									</span>
 								</div>
 								</li>
