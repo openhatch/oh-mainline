@@ -27,18 +27,15 @@ h1 {
 .box {
 	float: left;
 	background-color: #fff;
-	margin-bottom: 10px;
+	margin-top: 30px;
 }
 .box h2 {
-	padding: 4px 8px;
 	font-size: 100%;
 	font-weight: bold;
 	color: #446; #b5c200; 9cc200; #ff6e57;
 	margin-bottom: 5px;
-	background-color: #f0f0fc;
 }
 .box .content {
-	padding: 4px 8px;
 }
 #sidebar {
 	float: left;
@@ -136,6 +133,10 @@ p {
 	float: left;
 	width: 80px;
 }
+#opps li .tags .project {
+	padding: .3em .7em;
+	float: left;
+}
 #opps li .quick-summary {
 }
 #opps li.expanded .first-line {
@@ -194,11 +195,18 @@ p {
 	padding: .3em .7em;
 }
 #opps li .description {
-	width: 439px;
+	width: 455px;
 	padding: .3em .7em;
 	color: #888;
 	float: left;
 	overflow: hidden;
+}
+:focus {
+	-moz-outline-style: none;
+	outline: none;
+}
+a:focus {
+	text-decoration: underline;
 }
 .separator {
 	color: #aaa;
