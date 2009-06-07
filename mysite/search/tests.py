@@ -9,6 +9,8 @@ from django.core.servers.basehttp import AdminMediaHandler
 from django.core.handlers.wsgi import WSGIHandler
 from StringIO import StringIO
 
+# FIXME: Later look into http://stackoverflow.com/questions/343622/how-do-i-submit-a-form-given-only-the-html-source
+
 # Functions you'll need:
 
 def twill_setup():
@@ -47,5 +49,49 @@ class NonJavascriptSearch(django.test.TestCase):
         response = self.client.get('/search/')
         self.failUnlessEqual(response.context['start'], 1)
         self.failUnlessEqual(response.context['end'], 10)
-        
 
+    def testSearchWithArgs(self):
+        url = 'http://openhatch.org/search/'
+        tc.go(make_twill_url(url))
+        tc.fv('search_opps', 'language', 'python')
+        tc.submit()
+        for n in range(1, 11):
+            tc.find('Description #%d' % n)
+        
+        tc.fv('search_opps', 'language', 'c#')
+        tc.submit()
+        for n in range(717, 727):
+            tc.find('Description #%d' % n)
+        
+    def testPagination(self):
+        url = 'http://openhatch.org/search/'
+        tc.go(make_twill_url(url))
+        tc.fv('search_opps', 'language', 'python')
+        tc.submit()
+        for n in range(1, 11):
+            tc.find('Description #%d' % n)
+
+        tc.follow('Next')
+        for n in range(11, 21):
+            tc.find('Description #%d' % n)
+
+    def testPaginationAndChangingSearchQuery(self):
+        
+        url = 'http://openhatch.org/search/'
+        tc.go(make_twill_url(url))
+        tc.fv('search_opps', 'language', 'python')
+        tc.submit()
+        for n in range(1, 11):
+            tc.find('Description #%d' % n)
+
+        tc.follow('Next')
+        for n in range(11, 21):
+            tc.find('Description #%d' % n)
+
+        tc.fv('search_opps', 'language', 'c#')
+        tc.submit()
+        for n in range(717, 727):
+            tc.find('Description #%d' % n)
+        tc.follow('Next')
+        for n in range(727, 737):
+            tc.find('Description #%d' % n)

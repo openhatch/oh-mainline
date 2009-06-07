@@ -16,6 +16,10 @@
 		<script src='/static/js/jquery.js'></script>
 		<script src='/static/js/jquery.query.js'></script>
 		<script src='/static/js/search.js'></script>
+		<script type='text/javascript'>
+		  var pagination_start = {{ start }};
+		  var pagination_end = {{ end }};
+		</script>
 	</head>
 	<body>
 		<div id='images'></div>
@@ -101,10 +105,6 @@
 							<input type='text'
 							name='language' id='language'
 							value='{{ language }}' />
-							<input type='hidden' name='start' 
-							value='{{ start }}' />
-							<input type='hidden' name='end' 
-							value='{{ end }}' />
 							<input type='submit' id='button' />
 						</form>
 					</div>
