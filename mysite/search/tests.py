@@ -63,4 +63,35 @@ class NonJavascriptSearch(django.test.TestCase):
         for n in range(717, 727):
             tc.find('Description #%d' % n)
         
+    def testPagination(self):
+        url = 'http://openhatch.org/search/'
+        tc.go(make_twill_url(url))
+        tc.fv('search_opps', 'language', 'python')
+        tc.submit()
+        for n in range(1, 11):
+            tc.find('Description #%d' % n)
 
+        tc.follow('Next')
+        for n in range(11, 21):
+            tc.find('Description #%d' % n)
+
+    def testPaginationAndChangingSearchQuery(self):
+        
+        url = 'http://openhatch.org/search/'
+        tc.go(make_twill_url(url))
+        tc.fv('search_opps', 'language', 'python')
+        tc.submit()
+        for n in range(1, 11):
+            tc.find('Description #%d' % n)
+
+        tc.follow('Next')
+        for n in range(11, 21):
+            tc.find('Description #%d' % n)
+
+        tc.fv('search_opps', 'language', 'c#')
+        tc.submit()
+        for n in range(717, 727):
+            tc.find('Description #%d' % n)
+        tc.follow('Next')
+        for n in range(727, 737):
+            tc.find('Description #%d' % n)
