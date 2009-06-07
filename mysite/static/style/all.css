@@ -7,6 +7,10 @@ h1, h2, h3, h4, h5 {
 	font-weight: normal;
 	margin: 0;
 }
+a {
+	color: #379;
+	text-decoration: none;
+}
 h1 {
 	font-size: 150%;
 }
@@ -106,7 +110,7 @@ p {
 #opps li {
 	margin: 5px 0;
 }
-#opps li.expanded .age {
+#opps li .age {
 	float: right;
 }
 #opps li .details {
@@ -142,7 +146,6 @@ p {
 #opps li.expanded .description {
 	border-right: 1px dotted #ccf;
 	color: #000;
-	padding: .3em .7em;
 	float: left;
 	width: 437px;
 }
@@ -165,11 +168,24 @@ p {
 #opps li .first-line {
 	padding: .3em .7em;
 	display: block;
+	cursor: hand;
+	cursor: pointer;
 }
 #opps li .second-line {
 	display: block;
 	float: left;
-	padding: .3em .7em;
+}
+#opps li .aposeopesis {
+	float: right;
+	width: 20px;
+}
+#opps li .tags {
+	display: none;
+}
+#opps li .details {
+}
+#opps li.expanded .aposeopesis {
+	display: none;
 }
 #opps li.expanded .second-line {
 	padding: 0;
@@ -180,11 +196,17 @@ p {
 #opps li .title {
 }
 #opps li .description {
+	padding: .3em .7em;
 	color: #888;
+	float: left;
 }
 .separator {
 	color: #aaa;
 }
 #opp-nav {
 
+}
+#opps li.expanded .tags, 
+#opps li.expanded .details {
+	display: block;
 }

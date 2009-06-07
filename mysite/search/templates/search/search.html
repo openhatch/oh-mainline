@@ -113,7 +113,7 @@
 						<div class='content'>
 
 							<span id='results-summary'>
-								You searched the bug database for '<span id='results-summary-language'>{{ language }}</span>'.
+								Search: <span id='results-summary-language'>{{ language }}</span>
 
 								{% if bunch_of_bugs %}
 								Showing results 
@@ -129,21 +129,20 @@
 								<a href='{{ prev_page_url }}' id='prev-page'>&laquo; Prev</a>
 								<span class='separator'>&ndash;</span>
 								<a href='{{ next_page_url }}' id='next-page'>Next page &raquo;</a>
-							</span>
-
+							</span> 
 							{% if bunch_of_bugs %}
 							<ul>
 								{% for bug in bunch_of_bugs %}
 								<li class='bug' >
 								<div class='quick-summary'>
 									<div class='first-line'>
-										<span class='title'>
-											<a href='opp?id=?'>{{ bug.title }}</a>
-										</span>
-										<span class='separator'>&ndash;</span>
 										<span class='age'>3 days old</span>
+										<a class='title' href='opp?id=?'>{{ bug.title }}</a>
 									</div>
 									<div class='second-line'>
+										<!--span class='aposeopesis'>
+											&hellip;
+										</span-->
 										<span class='description'>
 											{{ bug.description }}
 										</span>

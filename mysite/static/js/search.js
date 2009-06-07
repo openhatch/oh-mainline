@@ -41,8 +41,13 @@ function update(queryArray) {
 
 $(document).ready(function() {
 
-        $('.first-line .title a').click(function () {
-            $(this.parentNode.parentNode.parentNode.parentNode).toggleClass('expanded');
+        $('.first-line').click(function () {
+            $(this.parentNode.parentNode).toggleClass('expanded');
+            return false;
+            });
+
+        $('.first-line a.title').click(function () {
+            $(this.parentNode.parentNode.parentNode).toggleClass('expanded');
             return false;
             });
 
