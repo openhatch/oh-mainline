@@ -11,9 +11,8 @@ class NonJavascriptSearch(django.test.TestCase):
             self.assertContains(response, 'Description #%d' % n)
 
     def testMatchingBugsFromMtoN(self):
-        # FIXME: This should test for 1 to 10, not 0 to 10
         response = self.client.get('/search/')
-        self.assertContains(response, '0 to 10')
-
-    
+        self.failUnlessEqual(response.context['start'], 1)
+        self.failUnlessEqual(response.context['end'], 10)
+        
 
