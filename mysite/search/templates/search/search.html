@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
-		<title>Asheesh Laroia | Developer | OpenHatch</title>
+		<title>{{ developer_name }} | Developer | OpenHatch</title>
 		<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
 		<meta http-equiv='Content-Language' content='en-us' />
 		<meta http-equiv='Content-Script-Type' content='text/javascript' />
@@ -24,10 +24,10 @@
 				<div id='breadcrumb-display'>
 					<a href=''>OpenHatch</a> &raquo;
 					<a href=''>Developers</a> &raquo;
-					<a href=''>Asheesh Laroia</a>
+					<a href=''>{{ developer_name }}</a>
 				</div>
 				<div id='heading'>
-					<h1>Asheesh Paranoia</h1>
+					<h1>{{ developer_name }}</h1>
 				</div>
 				<div id='sidebar'>
 					<div id='projects' class='box'>
@@ -109,23 +109,26 @@
 						</form>
 					</div>
 					<div id='opps' class='box'>
-						<h2>Opportunities</h2>
+						<h2>Open projects</h2>
 						<div class='content'>
 
 							<span id='results-summary'>
 								You searched the bug database for '<span id='results-summary-language'>{{ language }}</span>'.
 
 								{% if bunch_of_bugs %}
-								Showing matching bugs
+								Showing results 
 								<span id='results-summary-start'>{{ start }}</span>
 								to
 								<span id='results-summary-end'>{{ end }}</span>.
 								{% endif %}
 							</span>
 
+							<span class='separator'>&ndash;</span>
+
 							<span id='navigation'>
-								<a href='{{ prev_page_url }}' id='prev-page'>Prev page</a>
-								<a href='{{ next_page_url }}' id='next-page'>Next page</a>
+								<a href='{{ prev_page_url }}' id='prev-page'>&laquo; Prev</a>
+								<span class='separator'>&ndash;</span>
+								<a href='{{ next_page_url }}' id='next-page'>Next page &raquo;</a>
 							</span>
 
 							{% if bunch_of_bugs %}
@@ -139,9 +142,13 @@
 										<span class='age'>3 days old</span>
 									</div>
 									<div class='second-line'>
-										<span class='project'>{{ bug.project.name }}</span>
+										<span class='project'>
+											<span class='logo'><img src='/static/images/Exaile-icon.png' /></span>
+											<span class='name'>{{ bug.project.name }}</span>
+										</span>
 										<span class='separator'>&ndash;</span>
-										<span class='description'>{{ bug.description }}&hellip;</span>
+										<span class='description'>{{ bug.description }}&hellip;
+										</span>
 									</div>
 								</div>
 								<div class='details'>

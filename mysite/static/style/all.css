@@ -1,5 +1,5 @@
 body {
-	font: 0.8em/130% Verdana, Arial, sans-serif;
+	font: 0.8em/130% "Bitstream Vera Sans", "Lucida Grande", Verdana, Arial, sans-serif;
 	background-color: #fff;
 }
 h1, h2, h3, h4, h5 {
@@ -87,11 +87,12 @@ p {
 	float: left;
 }
 #opps li {
+	-moz-border-radius: .3em;
 	letter-spacing: 0px;
 	font-size: 100%;
 	float: left;
 	list-style: none;
-	border: 1px dotted #ccf;
+	border: 1px solid #ccf;
 	background-color: #fff;
 	width: 555px;
 	cursor: pointer;
@@ -102,12 +103,17 @@ p {
 	height: 2.5em;
 	white-space: nowrap;
 }
-#opps li .quick-summary {
+#opps li.expanded .quick-summary {
+	border-bottom: none;
 }
 #opps li .details {
+	border-top: 1px dotted #ccf;
 	padding: .3em;
 	padding-top: 0;
 	float: left;
+	font-size: 85%;
+	width: 100%;
+	background-color: #eee;
 }
 #opps li label {
 	color: #777;
@@ -121,25 +127,42 @@ p {
 	height: auto;
 	white-space: normal;
 }
+#opps li.expanded .project {
+	float: left;
+	width: 60px;
+	padding: .3em;
+}
 #opps li.expanded .quick-summary {
 	background-color: #fff;
-	border-bottom: 1px dotted #ccc;
+	border-bottom: 1px dotted #ccf;
 }
 #opps li.expanded .first-line {
-	border-bottom: 1px dotted #ccc;
 }
 #opps li.expanded .description {
+	border-left: 1px dotted #ccf;
 	color: #222;
+	padding: .3em;
+	position: relative;
+	left: -1px;
+	float: left;
+	width: 437px;
 }
-#opps li.expanded {
+#opps li.expanded .project {
+	background-color: inherit;
+}
+#opps li .logo img {
+	width: 100%;
+}
+#opps li.expanded .separator {
+	display: none;
 }
 #opps li .first-line {
 	padding: .3em;
 	display: block;
 }
 #opps li .second-line {
-	padding: .3em;
 	display: block;
+	float: left;
 }
 #opps li .project {
 	background-color: #ffa;
