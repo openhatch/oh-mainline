@@ -10,4 +10,7 @@ urlpatterns = patterns('',
     (r'^admin/(.*)', admin.site.root),
     (r'^static/(?P<path>.*)$', 'django.views.static.serve',
      {'document_root': settings.STATIC_DOC_ROOT}),
+    (r'^$', 'mysite.search.views.fetch_bugs'),
 )
+
+
