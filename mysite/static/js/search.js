@@ -41,10 +41,25 @@ function update(queryArray) {
 
 $(document).ready(function() {
 
+        $('.first-line').hover(
+            function() { $(this).addClass('hover'); },
+            function() { $(this).removeClass('hover'); }
+            );
+
         $('.first-line').click(function () {
             $(this.parentNode.parentNode).toggleClass('expanded');
             return false;
             });
+
+        $('.show-details').click(function () {
+            $(this.parentNode.parentNode.parentNode).toggleClass('expanded');
+            return false;
+            });
+
+        $('.show-details').toggle(
+            function () { $(this).text('close'); },
+            function () { $(this).text('details'); }
+            );
 
         $('.first-line a.title').click(function () {
             $(this.parentNode.parentNode.parentNode).toggleClass('expanded');

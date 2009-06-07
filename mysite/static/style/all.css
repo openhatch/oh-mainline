@@ -1,5 +1,5 @@
 body {
-	font: 0.8em/130% "Bitstream Vera Sans", "Lucida Grande", Verdana, Arial, sans-serif;
+	font: .85em/130% Arial, "Bitstream Vera Sans", "Lucida Grande", Verdana, Arial, sans-serif;
 	background-color: #fff;
 }
 h1, h2, h3, h4, h5 {
@@ -91,6 +91,7 @@ p {
 	float: left;
 }
 #opps li {
+	overflow: hidden;
 	-moz-border-radius: .3em;
 	letter-spacing: 0px;
 	font-size: 100%;
@@ -102,23 +103,21 @@ p {
 	margin-top: 3px;
 	height: 4em;
 	white-space: nowrap;
-	overflow: hidden;
-}
-#opps li.expanded {
-	overflow: normal;
 }
 #opps li {
 	margin: 5px 0;
 }
 #opps li .age {
-	float: right;
+	float: left;
+	text-align: right;
+	padding: .3em .7em;
 }
 #opps li .details {
 	border-top: 1px dotted #ccf;
 	padding: .3em .7em;
 	padding-top: 0;
 	float: left;
-	font-size: 85%;
+	font-size: 90%;
 	background-color: #eeeefc;
 }
 #opps li label {
@@ -133,21 +132,20 @@ p {
 	height: auto;
 	white-space: normal;
 }
-#opps li.expanded .tags {
+#opps li .tags {
 	float: left;
-	width: 60px;
-	padding: .3em;
+	width: 80px;
 }
 #opps li .quick-summary {
-	border-bottom: 1px dotted #ccf;
 }
 #opps li.expanded .first-line {
 }
 #opps li.expanded .description {
+	width: 437px;
 	border-right: 1px dotted #ccf;
 	color: #000;
 	float: left;
-	width: 437px;
+	overflow: normal;
 }
 #opps li.expanded .description.pre {
 	white-space: pre;
@@ -162,51 +160,49 @@ p {
 	width: 20px;
 	vertical-align: middle;
 }
-#opps li.expanded .separator {
+#opps li .first-line {
+	float: left;
+	cursor: hand;
+	width: 100%;
+	cursor: pointer;
+	border-bottom: 1px dotted #ccf;
+}
+#opps .tag-details {
 	display: none;
 }
-#opps li .first-line {
-	padding: .3em .7em;
+#opps li.expanded .tag-details {
 	display: block;
-	cursor: hand;
-	cursor: pointer;
+}
+#opps li .first-line.hover {
+	background-color: #efd;
 }
 #opps li .second-line {
 	display: block;
 	float: left;
 }
-#opps li .aposeopesis {
+#opps li .show-details {
+	padding: .3em .7em;
 	float: right;
-	width: 20px;
-}
-#opps li .tags {
-	display: none;
-}
-#opps li .details {
-}
-#opps li.expanded .aposeopesis {
-	display: none;
+	width: 36px;
 }
 #opps li.expanded .second-line {
 	padding: 0;
 }
-#opps li .tags {
-	background-color: #ffa;
-}
 #opps li .title {
+	float: left;
+	width: 400px;
+	padding: .3em .7em;
 }
 #opps li .description {
+	width: 439px;
 	padding: .3em .7em;
 	color: #888;
 	float: left;
+	overflow: hidden;
 }
 .separator {
 	color: #aaa;
 }
 #opp-nav {
 
-}
-#opps li.expanded .tags, 
-#opps li.expanded .details {
-	display: block;
 }

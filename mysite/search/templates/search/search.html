@@ -1,202 +1,204 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-	<head>
-		<title>{{ developer_name }} | Developer | OpenHatch</title>
-		<meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
-		<meta http-equiv='Content-Language' content='en-us' />
-		<meta http-equiv='Content-Script-Type' content='text/javascript' />
-		<meta http-equiv='Content-Style-Type' content='text/css' />
-		<meta name='Description' content=''>
-		<style>
-			/*<![CDATA[*/ @import url('http://localhost:8000/static/style/all.css'); /*]]>*/
-		</style>
-		<!--[if IE]><style>/*<![CDATA[*/@import url('../style/ie/all.css');/*]]>*/</style><![endif]-->
-		<!--[if lte IE 6]><style>/*<![CDATA[*/@import url('../style/ie/6-/all.css');/*]]>*/</style><![endif]-->
-		<!--[if gte IE 7]><style>/*<![CDATA[*/@import url('../style/ie/7+/all.css');/*]]>*/</style><![endif]-->
-		<script src='/static/js/jquery.js'></script>
-		<script src='/static/js/jquery.query.js'></script>
-		<script type='text/javascript'>
-		  var thisstart = {{ start }};
-		  var thisend = {{ end }};
-		</script>
-		<script src='/static/js/search.js'></script>
-	</head>
-	<body>
-		<div id='images'></div>
-		<div id='wrapper-outer'>
-			<div id='wrapper-inner'>
-				<div id='breadcrumb-display'>
-					<a href=''>OpenHatch</a> &raquo;
-					<a href=''>Developers</a> &raquo;
-					<a href=''>{{ developer_name }}</a>
-				</div>
-				<div id='heading'>
-					<h1>{{ developer_name }}</h1>
-				</div>
-				<div id='sidebar'>
-					<div id='projects' class='box'>
-						<h2>Registered projects:</h2>
-						<div class='content'>
-							<table>
-								<tr>
-									<td>Debian</td>
-									<td class='yes'>
-										<img src='/static/images/button_ok.png'
-										alt='y'/>
-									</td>
-									<td class='yes'>
-										<img src='/static/images/button_ok.png'
-										alt='y'/>
-									</td>
-									<td class='yes'>
-										<img src='/static/images/button_ok.png'
-										alt='y'/>
-									</td>
-								</tr>
-								<tr>
-									<td>GNOME</td>
-									<td class='yes'>y</td>
-									<td class='yes'>y</td>
-									<td class='yes'>y</td>
-								</tr>
-								<tr>
-									<td>cc-tools</td>
-									<td class='yes'>y</td>
-									<td class='yes'>y</td>
-									<td class='no'>n</td>
-								</tr>
-								<tr>
-									<td>Ubuntu</td>
-									<td>y</td>
-									<td>y</td>
-									<td>y</td>
-								</tr>
-								<tr>
-									<td>Pidgin</td>
-									<td>y</td>
-									<td>n</td>
-									<td>n</td>
-								</tr>
-							</table>
-						</div>
-					</div>
-					<div id='add-another-bug-tracker' 
-						class='box'>
-						<h2>Add projects auto-magically</h2>
-						<div class='content'>
-							<p>Type your username or email
-							address and we will look for your 
-							trackers.</p>
-							<input type='text'
-							value='Type your username'/>
-						</div>
-					</div>
-					<div id='skill-list' class='box'>
-						<h2>Deduced skill list</h2>
-					</div>
-					<div id='add-a-skill' class='box'>
-						<h2>Add a skill</h2>
-					</div>
-				</div>
-				<div id='main'>
-					<div id='interests' class='box'>
-						<form name='search_opps' method='get'> 
-							<h2>What are you interested in?</h2>
-							<input type='text'
-							name='language' id='language'
-							value='{{ language }}' />
-							<input type='submit' id='button' />
-						</form>
-					</div>
-					<div id='opps' class='box'>
-						<h2>Open projects</h2>
-						<div class='content'>
+   <head>
+      <title>{{ developer_name }} | Developer | OpenHatch</title>
+      <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
+      <meta http-equiv='Content-Language' content='en-us' />
+      <meta http-equiv='Content-Script-Type' content='text/javascript' />
+      <meta http-equiv='Content-Style-Type' content='text/css' />
+      <meta name='Description' content=''>
+      <style>
+         /*<![CDATA[*/ @import url('http://localhost:8000/static/style/all.css'); /*]]>*/
+      </style>
+      <!--[if IE]><style>/*<![CDATA[*/@import url('../style/ie/all.css');/*]]>*/</style><![endif]-->
+      <!--[if lte IE 6]><style>/*<![CDATA[*/@import url('../style/ie/6-/all.css');/*]]>*/</style><![endif]-->
+      <!--[if gte IE 7]><style>/*<![CDATA[*/@import url('../style/ie/7+/all.css');/*]]>*/</style><![endif]-->
+      <script src='/static/js/jquery.js'></script>
+      <script src='/static/js/jquery.query.js'></script>
+      <script type='text/javascript'>
+         var thisstart = {{ start }};
+var thisend = {{ end }};
+</script>
+<script src='/static/js/search.js'></script>
+   </head>
+   <body>
+      <div id='images'></div>
+      <div id='wrapper-outer'>
+         <div id='wrapper-inner'>
+            <div id='breadcrumb-display'>
+               <a href=''>OpenHatch</a> &raquo;
+               <a href=''>Developers</a> &raquo;
+               <a href=''>{{ developer_name }}</a>
+            </div>
+            <div id='heading'>
+               <h1>{{ developer_name }}</h1>
+            </div>
+            <div id='sidebar'>
+               <div id='projects' class='box'>
+                  <h2>Registered projects:</h2>
+                  <div class='content'>
+                     <table>
+                        <tr>
+                           <td>Debian</td>
+                           <td class='yes'>
+                              <img src='/static/images/button_ok.png'
+                              alt='y'/>
+                           </td>
+                           <td class='yes'>
+                              <img src='/static/images/button_ok.png'
+                              alt='y'/>
+                           </td>
+                           <td class='yes'>
+                              <img src='/static/images/button_ok.png'
+                              alt='y'/>
+                           </td>
+                        </tr>
+                        <tr>
+                           <td>GNOME</td>
+                           <td class='yes'>y</td>
+                           <td class='yes'>y</td>
+                           <td class='yes'>y</td>
+                        </tr>
+                        <tr>
+                           <td>cc-tools</td>
+                           <td class='yes'>y</td>
+                           <td class='yes'>y</td>
+                           <td class='no'>n</td>
+                        </tr>
+                        <tr>
+                           <td>Ubuntu</td>
+                           <td>y</td>
+                           <td>y</td>
+                           <td>y</td>
+                        </tr>
+                        <tr>
+                           <td>Pidgin</td>
+                           <td>y</td>
+                           <td>n</td>
+                           <td>n</td>
+                        </tr>
+                     </table>
+                  </div>
+               </div>
+               <div id='add-another-bug-tracker' 
+                  class='box'>
+                  <h2>Add projects auto-magically</h2>
+                  <div class='content'>
+                     <p>Type your username or email
+                     address and we will look for your 
+                     trackers.</p>
+                     <input type='text'
+                     value='Type your username'/>
+                  </div>
+               </div>
+               <div id='skill-list' class='box'>
+                  <h2>Deduced skill list</h2>
+               </div>
+               <div id='add-a-skill' class='box'>
+                  <h2>Add a skill</h2>
+               </div>
+            </div>
+            <div id='main'>
+               <div id='interests' class='box'>
+                  <form name='search_opps' method='get'> 
+                     <h2>What are you interested in?</h2>
+                     <input type='text'
+                     name='language' id='language'
+                     value='{{ language }}' />
+                     <input type='submit' id='button' />
+                  </form>
+               </div>
+               <div id='opps' class='box'>
+                  <h2>Open projects</h2>
+                  <div class='content'>
 
-							<span id='results-summary'>
-								Search: <span id='results-summary-language'>{{ language }}</span>
+                     <span id='results-summary'>
+                        Search: <span id='results-summary-language'>{{ language }}</span>
 
-								{% if bunch_of_bugs %}
-								Showing results 
-								<span id='results-summary-start'>{{ start }}</span>
-								to
-								<span id='results-summary-end'>{{ end }}</span>.
-								{% endif %}
-							</span>
+                        {% if bunch_of_bugs %}
+                        Showing results 
+                        <span id='results-summary-start'>{{ start }}</span>
+                        to
+                        <span id='results-summary-end'>{{ end }}</span>.
+                        {% endif %}
+                     </span>
 
-							<span class='separator'>&ndash;</span>
+                     <span class='separator'>&ndash;</span>
 
-							<span id='navigation'>
-								<a href='{{ prev_page_url }}' id='prev-page'>&laquo; Prev</a>
-								<span class='separator'>&ndash;</span>
-								<a href='{{ next_page_url }}' id='next-page'>Next page &raquo;</a>
-							</span> 
-							{% if bunch_of_bugs %}
-							<ul>
-								{% for bug in bunch_of_bugs %}
-								<li class='bug' >
-								<div class='quick-summary'>
-									<div class='first-line'>
-										<span class='age'>3 days old</span>
-										<a class='title' href='opp?id=?'>{{ bug.title }}</a>
-									</div>
-									<div class='second-line'>
-										<!--span class='aposeopesis'>
-											&hellip;
-										</span-->
-										<span class='description'>
-											{{ bug.description }}
-										</span>
-										<span class='separator'>&ndash;</span>
-										<span class='tags'>
-												<img class='logo' src='/static/images/Exaile-icon.png' />
-												{{ bug.project.name }}
-										</span>
-									</div>
-								</div>
-								<div class='details'>
-									<span class='field importance'>
-										<label>People involved: </label>
-										<span class='value'>
-											<a href=''>13</a>
-										</span>
-									</span>
-									<span class='field status'>
-										<label>Status: </label>
-										<span class='value'>triaged</span>
-									</span>
-									<span class='field last-polled'>
-										<label>Last touched: </label>
-										<span class='value'>2 weeks ago</span>
-									</span>
-									<span class='field origin'>
-										<label>Origin: </label>
-										<span class='value'>
-											<a href='https://bugs.launchpad.net/ubuntu/+source/apport/+bug/321566'>Launchpad</a>
-										</span>
-									</span>
-									<span class='field importance'>
-										<label>Importance: </label>
-										<span class='value'>wishlist</span>
-									</span>
-									<span class='field last-polled'>
-										<label>Last polled: </label>
-										<span class='value'>3 days ago</span>
-										<a href=''>poll now</a>
-									</span>
-								</div>
-								</li>
-								{% endfor %}
-							</ul>
-							{% else %}
-							<p>No bugs are available.</p>
-							{% endif %}
+                     <span id='navigation'>
+                        <a href='{{ prev_page_url }}' id='prev-page'>&laquo; Prev</a>
+                        <span class='separator'>&ndash;</span>
+                        <a href='{{ next_page_url }}' id='next-page'>Next page &raquo;</a>
+                     </span> 
+                     {% if bunch_of_bugs %}
+                     <ul>
+                        {% for bug in bunch_of_bugs %}
+                        <li class='bug' >
+                        <div class='quick-summary'>
+                           <div class='first-line'>
+                              <a href='BUG_LINK' class='show-details'>details</a>
+                              <a class='title' href='BUG_LINK'>{{ bug.title }}</a>
+                           </div>
+                           <div class='second-line'>
+                              <span class='description'>
+                                 {{ bug.description }}
+                              </span>
+                              <span class='tags'>
+                                 <div class='age'>3 days old</div>
+                                 <div class='tag-details'>
+                                    <div class='project'>
+                                       <img class='logo' src='/static/images/Exaile-icon.png' />
+                                       {{ bug.project.name }}
+                                    </div>
 
-						</ul>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+                                 </div>
+                              </span>
+                           </div>
+                        </div>
+                        <div class='details'>
+                           <span class='field importance'>
+                              <label>People involved: </label>
+                              <span class='value'>
+                                 <a href=''>13</a>
+                              </span>
+                           </span>
+                           <span class='field status'>
+                              <label>Status: </label>
+                              <span class='value'>triaged</span>
+                           </span>
+                           <span class='field last-polled'>
+                              <label>Last touched: </label>
+                              <span class='value'>2 weeks ago</span>
+                           </span>
+                           <span class='field origin'>
+                              <label>Origin: </label>
+                              <span class='value'>
+                                 <a href='https://bugs.launchpad.net/ubuntu/+source/apport/+bug/321566'>Launchpad</a>
+                              </span>
+                           </span>
+                           <span class='field importance'>
+                              <label>Importance: </label>
+                              <span class='value'>wishlist</span>
+                           </span>
+                           <span class='field last-polled'>
+                              <label>Last polled: </label>
+                              <span class='value'>3 days ago</span>
+                              <a href=''>poll now</a>
+                           </span>
+                        </div>
+                        </li>
+                        {% endfor %}
+                     </ul>
+                     {% else %}
+                     <p>No bugs are available.</p>
+                     {% endif %}
+
+                  </ul>
+               </div>
+            </div>
+         </div>
+      </div>
+   </div>
 </body>
 </html>
-<!-- :vim set tabstop=3 shiftwidth=3 expandtab: -->
+<!-- vim: set tabstop=3 shiftwidth=3 expandtab: -->
