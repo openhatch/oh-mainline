@@ -57,6 +57,13 @@ $(document).ready(function() {
 		    var key = decodeURIComponent(splitted[0]);
 		    var value = decodeURIComponent(splitted[1]);
 		    var fruity_pushable = {'name': key, 'value': value};
+		    /* update the thisstart and thisend globals */
+		    if (key == 'start') {
+			thisstart = parseInt(value);
+		    }
+		    if (key == 'end') {
+			thisend = parseInt(value);
+		    }
 		    fruitySerialized.push(fruity_pushable);
 		}
 		console.log('FRUITYSERIALIZED:');
