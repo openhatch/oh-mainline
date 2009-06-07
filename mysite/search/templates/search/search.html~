@@ -96,7 +96,7 @@
 				</div>
 				<div id='main'>
 					<div id='interests' class='box'>
-						<form method='get'> 
+						<form name='search_opps' method='get'> 
 							<h2>What are you interested in?</h2>
 							<input type='text'
 							name='language' id='language'
@@ -132,9 +132,38 @@
 							<ul>
 								{% for bug in bunch_of_bugs %}
 								<li class='bug'>
-									<span class='project'>{{ bug.project.name }}</span>
-									&ndash; <span class='title'>{{ bug.title }}</span>
-									&ndash; <span class='description'>{{ bug.description }}</span>
+								<div class='quick-summary'>
+									<div class='first-line'>
+										<span class='project'>{{ bug.project.name }}</span>
+										<span class='separator'>&ndash;</span>
+										<span class='title'>{{ bug.title }}</span>
+										<span class='separator'>&ndash;</span>
+										<span class='age'>3 days old</span>
+									</div>
+									<div class='second-line'>
+										<span class='description'>{{ bug.description }}</span>
+									</div>
+								</div>
+								<div class='details'>
+									<span class='last-polled'>
+										<label>Last polled: </label>
+										<span class='value'>Three days ago</span>
+									</span>
+									<span class='status'>
+										<label>Status: </label>
+										<span class='value'>triaged</span>
+									</span>
+									<span class='status'>
+										<label>Importance: </label>
+										<span class='value'>wishlist</span>
+									</span>
+									<span class='tracker'>
+										<label>Origin: </label>
+										<span class='value'>
+											<a href='https://bugs.launchpad.net/ubuntu/+source/apport/+bug/321566'>Launchpad</a>
+										</span>
+									</span>
+								</div>
 								</li>
 								{% endfor %}
 							</ul>

@@ -39,14 +39,14 @@ h1 {
 #sidebar {
 	float: left;
 	width: 220px;
-	margin-right: 10px;
 }
 #main {
-	width: 560px;
+	width: 580px;
 	float: left;
 }
 #main .box {
-	width: 540px;
+	width: 580px;
+	float: left;
 }
 #main-1 {
 	height: 400px;
@@ -87,28 +87,44 @@ p {
 	float: left;
 }
 #opps li {
+	letter-spacing: 0px;
 	font-size: 100%;
 	float: left;
 	list-style: none;
 	border: 1px dotted #ccf;
 	background-color: #fff;
-	width: 512px;
+	width: 555px;
 	cursor: pointer;
 	margin-top: 3px;
 	cursor: hand;
 	text-overflow: ellipsis;
 	overflow: hidden;
 	padding: .3em;
-	height: 1.3em;
+	height: 2.5em;
 	white-space: nowrap;
+}
+#opps li.expanded {
+	height: auto;
+}
+#opps li.expanded {
+}
+#opps li .first-line {
+	display: block;
+}
+#opps li .second-line {
+	display: block;
 }
 #opps li .project {
 	background-color: #ffa;
 }
 #opps li .title {
+	font-weight: bold;
 }
 #opps li .description {
 	color: #888;
+}
+.separator {
+	color: #aaa;
 }
 #opp-nav {
 
