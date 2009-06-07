@@ -95,9 +95,7 @@ p {
 	border: 1px solid #ccf;
 	background-color: #fff;
 	width: 555px;
-	cursor: pointer;
 	margin-top: 3px;
-	cursor: hand;
 	height: 4em;
 	white-space: nowrap;
 	overflow: hidden;
@@ -105,10 +103,7 @@ p {
 #opps li.expanded {
 	overflow: normal;
 }
-#opps li.expanded .quick-summary {
-	border-bottom: none;
-}
-#opps li.expanded {
+#opps li {
 	margin: 5px 0;
 }
 #opps li.expanded .age {
@@ -134,13 +129,12 @@ p {
 	height: auto;
 	white-space: normal;
 }
-#opps li.expanded .project {
+#opps li.expanded .tags {
 	float: left;
 	width: 60px;
 	padding: .3em;
 }
-#opps li.expanded .quick-summary {
-	background-color: #fff;
+#opps li .quick-summary {
 	border-bottom: 1px dotted #ccf;
 }
 #opps li.expanded .first-line {
@@ -157,7 +151,7 @@ p {
 	font-family: monospace;
 	font-size: 125%;
 }
-#opps li.expanded .project {
+#opps li.expanded .tags {
 	background-color: inherit;
 	width: 91px;
 }
@@ -180,11 +174,10 @@ p {
 #opps li.expanded .second-line {
 	padding: 0;
 }
-#opps li .project {
+#opps li .tags {
 	background-color: #ffa;
 }
 #opps li .title {
-	font-weight: bold;
 }
 #opps li .description {
 	color: #888;
