@@ -134,7 +134,7 @@
 							{% if bunch_of_bugs %}
 							<ul>
 								{% for bug in bunch_of_bugs %}
-								<li class='bug expanded'>
+								<li class='bug' onclick="$(this).toggleClass('expanded');">
 								<div class='quick-summary'>
 									<div class='first-line'>
 										<span class='title'>{{ bug.title }}</span>
