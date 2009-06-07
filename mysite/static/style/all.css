@@ -98,7 +98,7 @@ p {
 	cursor: pointer;
 	margin-top: 3px;
 	cursor: hand;
-	height: 2.5em;
+	height: 4em;
 	white-space: nowrap;
 	overflow: hidden;
 }
@@ -111,7 +111,7 @@ p {
 #opps li.expanded {
 	margin: 5px 0;
 }
-#opps li .age {
+#opps li.expanded .age {
 	float: right;
 }
 #opps li .details {
@@ -175,6 +175,10 @@ p {
 #opps li .second-line {
 	display: block;
 	float: left;
+	padding: .3em .7em;
+}
+#opps li.expanded .second-line {
+	padding: 0;
 }
 #opps li .project {
 	background-color: #ffa;
