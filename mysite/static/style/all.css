@@ -98,10 +98,12 @@ p {
 	cursor: pointer;
 	margin-top: 3px;
 	cursor: hand;
-	text-overflow: ellipsis;
-	overflow: hidden;
 	height: 2.5em;
 	white-space: nowrap;
+	overflow: hidden;
+}
+#opps li.expanded {
+	overflow: normal;
 }
 #opps li.expanded .quick-summary {
 	border-bottom: none;
@@ -118,7 +120,6 @@ p {
 	padding-top: 0;
 	float: left;
 	font-size: 85%;
-	width: 100%;
 	background-color: #eeeefc;
 }
 #opps li label {
@@ -150,6 +151,11 @@ p {
 	padding: .3em .7em;
 	float: left;
 	width: 437px;
+}
+#opps li.expanded .description.pre {
+	white-space: pre;
+	font-family: monospace;
+	font-size: 125%;
 }
 #opps li.expanded .project {
 	background-color: inherit;
