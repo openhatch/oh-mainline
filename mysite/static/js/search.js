@@ -7,11 +7,9 @@
             Opps.fetchOppsToDOM(queryStringFormatJSON);
 
             /* Update navigation links */
-            var language, thisstart = 0, thisend = 0;
+            var language;
             $(queryArray).each(function () {
                 if(this.name == 'language') language = this.value;
-                if(this.name == 'start') thisstart = parseInt(this.value);
-                if(this.name == 'end') thisend = parseInt(this.value);
                 })
 
             console.log(thisstart, thisend);
@@ -19,16 +17,13 @@
             diff = thisend - thisstart;
 
             prevPageQueryArray = $('form').serializeArray();
-            $(prevPageQueryArray).each(function () {
-                    if (this.name == 'start') this.value = thisstart - diff - 1;
-                    if (this.name == 'end') this.value = thisstart - 1;
-                    });
+	    prevPageQueryArray.push( {'name': 'start', 'value': thisstart - diff - 1});
+	    prevPageQueryArray.push( {'name': 'end', 'value': thisstart - 1});
+
 
             nextPageQueryArray = $('form').serializeArray();
-            $(nextPageQueryArray).each(function () {
-                    if (this.name == 'start') this.value = thisend + 1;
-                    if (this.name == 'end') this.value = thisend + diff + 1;
-                    });
+	    nextPageQueryArray.push( {'name': 'start', 'value': thisend + 1});
+	    nextPageQueryArray.push( {'name': 'end', 'value': thisend + diff + 1});
 
             /* Update navigation links to reflect new query. */
             prefix = '/search/?';
