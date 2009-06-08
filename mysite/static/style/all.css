@@ -110,12 +110,16 @@ p {
 	padding: .3em .7em;
 }
 #opps li .details {
+	display: none;
 	border-top: 1px dotted #ccf;
 	padding: .3em .7em;
 	padding-top: 0;
 	float: left;
 	font-size: 90%;
 	background-color: #eeeefc;
+}
+#opps li.expanded .details {
+	display: block;
 }
 #opps li label {
 	color: #777;
@@ -174,7 +178,7 @@ p {
 #opps li.expanded .tag-details {
 	display: block;
 }
-#opps li .first-line.hover {
+#opps li.lit-up .first-line {
 	background-color: #efd;
 }
 #opps li .second-line {

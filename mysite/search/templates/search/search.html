@@ -7,14 +7,13 @@
       <meta http-equiv='Content-Script-Type' content='text/javascript' />
       <meta http-equiv='Content-Style-Type' content='text/css' />
       <meta name='Description' content=''>
-      <style>
-         /*<![CDATA[*/ @import url('/static/style/all.css'); /*]]>*/
-      </style>
+      <style> /*<![CDATA[*/ @import url('/static/style/all.css'); /*]]>*/ </style>
       <!--[if IE]><style>/*<![CDATA[*/@import url('../style/ie/all.css');/*]]>*/</style><![endif]-->
       <!--[if lte IE 6]><style>/*<![CDATA[*/@import url('../style/ie/6-/all.css');/*]]>*/</style><![endif]-->
       <!--[if gte IE 7]><style>/*<![CDATA[*/@import url('../style/ie/7+/all.css');/*]]>*/</style><![endif]-->
       <script src='/static/js/jquery.js'></script>
       <script src='/static/js/jquery.query.js'></script>
+      <script src='/static/js/jquery.hotkey.js'></script>
       <script type='text/javascript'>
          var thisstart = {{ start }};
 var thisend = {{ end }};
@@ -133,7 +132,7 @@ var thisend = {{ end }};
                      {% if bunch_of_bugs %}
                      <ul>
                         {% for bug in bunch_of_bugs %}
-                        <li class='bug' >
+                        <li class='bug'>
                         <div class='quick-summary'>
                            <div class='first-line'>
                               <a href='BUG_LINK' class='show-details'>details</a>

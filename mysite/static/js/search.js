@@ -1,3 +1,8 @@
+$.fn.toggleText = function(text1, text2) {
+    newtext = (this.text() == text2) ? text1 : text2;
+    return this.text(newtext);
+}
+
 function update(queryArray) {
     queryArray.push({'name': 'format', value: 'json'});
 
@@ -34,12 +39,27 @@ function update(queryArray) {
     $('#results-summary-start').text(thisstart);
     $('#results-summary-end').text(thisend);
 
-    console.log(thisstart);
-    console.log(thisend);
     return false;
 };
 
 $(document).ready(function() {
+
+        console.log('document.ready');
+
+        Opps.lightOpp(0);
+
+        $(document).bind('keyup', 'j', function() {
+            console.log(Opps.getLitOppIndex());
+            Opps.lightOpp(Opps.getLitOppIndex() + 1);
+            });
+
+        $(document).bind('keyup', 'k', function() {
+            Opps.lightOpp(Opps.getLitOppIndex() - 1);
+            });
+
+        $(document).bind('keyup', 'o', function() {
+            $('#opps li').eq(Opps.getLitOppIndex()).toggleClass('expanded');
+            });
 
         $('.first-line').hover(
             function() { $(this).addClass('hover'); },
@@ -55,11 +75,6 @@ $(document).ready(function() {
             $(this.parentNode.parentNode.parentNode).toggleClass('expanded');
             return false;
             });
-
-        $('.show-details').toggle(
-            function () { $(this).text('close'); },
-            function () { $(this).text('details'); }
-            );
 
         $('.first-line a.title').click(function () {
             $(this.parentNode.parentNode.parentNode).toggleClass('expanded');
@@ -103,6 +118,11 @@ $(document).ready(function() {
 Opps = {
     'oppsQueryURL': "http://localhost:8000/search/?",
     '$oppsDOMList': $('#opps ul'),
+    'getLitOppIndex': function() {
+        // FIXME: Remember the index of the lit opp in Javascript,
+        // and avoid going through CSS.
+        return $('#opps li').index($('.lit-up')[0]);
+    },
     'fetchOppsToDOM': function (queryString) {
         url = this.oppsQueryURL + queryString + "&jsoncallback=?";
         $.getJSON(url, this.jsonArrayToDocument);
@@ -116,6 +136,16 @@ Opps = {
                 $opp.find('.title').text(this.fields.title);
                 $opp.find('.description').text(this.fields.description);
                 });
+    },
+    'lightOpp': function(oppIndex) {
+        if($('#opps li').eq(oppIndex).size() == 1) {
+            $('#opps li')
+                .removeClass('lit-up')
+                .eq(oppIndex).addClass('lit-up');
+        }
+        else {
+            console.log('no opp to highlight');
+        }
     }
 }
 
