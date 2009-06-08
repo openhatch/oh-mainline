@@ -5,6 +5,18 @@ from django.core import serializers
 from mysite.search.models import Bug, Project
 import simplejson
 
+# Via http://www.djangosnippets.org/snippets/1435/
+import datetime
+from dateutil import tz
+import pytz
+def encode_datetime(obj):
+    if isinstance(obj, datetime.date):
+        fixed = datetime.datetime(obj.year, obj.month, obj.day, tzinfo=pytz.utc)
+        obj = fixed
+    if isinstance(obj, datetime.datetime):
+        return obj.astimezone(tz.tzutc()).strftime('%Y-%m-%dT%H:%M:%SZ')
+    raise TypeError("%s" % type(obj) + repr(obj) + " is not JSON serializable")
+
 def fetch_bugs(request):
     # FIXME: Give bugs some date field
 
@@ -62,7 +74,7 @@ def bugs_to_json_response(bunch_of_bugs, callback_function_name=''):
     for elt in data:
         elt['fields']['project'] = \
                 Project.objects.get(pk=int(elt['fields']['project'])).name
-    jsonned = simplejson.dumps(data)
+    jsonned = simplejson.dumps(data, default=encode_datetime)
     return HttpResponse( callback_function_name + '(' + jsonned + ')' )
 
 def index(request):
