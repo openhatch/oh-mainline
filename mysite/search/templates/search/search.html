@@ -26,7 +26,7 @@
       <div id='images'></div>
       <div id='wrapper-outer'>
          <div id='wrapper-inner'>
-            <h2 id='banner'>OpenHatch</h2>
+            <h2 id='banner'>OpenHatch &alpha;</h2>
             <div id='content'>
                <div id='sidebar'>
                   <div id='heading' class='box'>
@@ -136,6 +136,12 @@
                            <li class='bug'>
                            <div class='first-line'>
                               <a class='title' href='BUG_LINK'>{{ bug.title }}</a>
+                              <span class='project-info'>
+                                 <img class='logo' src='/static/images/Exaile-icon.png' />
+                                 <span class='project'>
+                                    {{ bug.project.name }}
+                                 </span>
+                              </span>
                               <a href='BUG_LINK' class='show-details'>details</a>
                            </div>
                            <div class='second-line'>
@@ -145,12 +151,6 @@
                               <span class='tags'>
                                  <div class='age'>3 days old</div>
                                  <div class='tag-details'>
-                                    <div class='project-info'>
-                                       <img class='logo' src='/static/images/Exaile-icon.png' />
-                                       <span class='project'>
-                                          {{ bug.project.name }}
-                                       </span>
-                                    </div>
                                  </div>
                               </span>
                            </div>

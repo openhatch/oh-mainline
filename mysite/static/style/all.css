@@ -211,7 +211,8 @@ p {
 }
 #opps li .title {
 	float: left;
-	width: 445px;
+	width: 385px;
+	overflow: hidden;
 	padding: .3em .7em;
 }
 #opps li .description {
@@ -233,4 +234,10 @@ a:focus {
 }
 #opp-nav {
 
+}
+.project-info {
+	padding: .3em;
+	width: 30px;
+	float: left;
+	margin-right: 20px;
 }
