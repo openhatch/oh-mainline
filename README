@@ -1,0 +1,9 @@
+How to run this code:
+
+$ sudo apt-get install python-django python-twill
+$ sudo easy_install windmill
+
+$ cd mysite
+$ python manage.py runserver
+
+Now load http://127.0.0.1:8000/search/ in your web browser.
