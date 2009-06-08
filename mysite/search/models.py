@@ -4,10 +4,17 @@ from django.db import models
 class Project(models.Model):
     name = models.CharField(max_length=200)
     language = models.CharField(max_length=200)
+    icon_url = models.URLField(max_length=200)
 
 class Bug(models.Model):
     project = models.ForeignKey(Project)
     title = models.CharField(max_length=200)
     description = models.TextField()
     status = models.CharField(max_length=200)
-
+    importance = models.CharField(max_length=200)
+    people_involved = models.IntegerField()
+    last_touched = models.DateField()
+    last_polled = models.DateField()
+    submitter_username = models.CharField(max_length=200)
+    submitter_realname = models.CharField(max_length=200)
+    
