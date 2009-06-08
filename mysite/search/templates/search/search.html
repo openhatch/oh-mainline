@@ -26,119 +26,117 @@
       <div id='images'></div>
       <div id='wrapper-outer'>
          <div id='wrapper-inner'>
-            <div id='breadcrumb-display'>
-               <a href=''>OpenHatch</a> &raquo;
-               <a href=''>Developers</a> &raquo;
-               <a href=''>{{ developer_name }}</a>
-            </div>
-            <div id='heading'>
-               <h1>{{ developer_name }}</h1>
-            </div>
-            <div id='sidebar'>
-               <div id='projects' class='box'>
-                  <h2>Registered projects:</h2>
-                  <div class='content'>
-                     <table>
-                        <tr>
-                           <td>Debian</td>
-                           <td class='yes'>
-                              <img src='/static/images/button_ok.png'
-                              alt='y'/>
-                           </td>
-                           <td class='yes'>
-                              <img src='/static/images/button_ok.png'
-                              alt='y'/>
-                           </td>
-                           <td class='yes'>
-                              <img src='/static/images/button_ok.png'
-                              alt='y'/>
-                           </td>
-                        </tr>
-                        <tr>
-                           <td>GNOME</td>
-                           <td class='yes'>y</td>
-                           <td class='yes'>y</td>
-                           <td class='yes'>y</td>
-                        </tr>
-                        <tr>
-                           <td>cc-tools</td>
-                           <td class='yes'>y</td>
-                           <td class='yes'>y</td>
-                           <td class='no'>n</td>
-                        </tr>
-                        <tr>
-                           <td>Ubuntu</td>
-                           <td>y</td>
-                           <td>y</td>
-                           <td>y</td>
-                        </tr>
-                        <tr>
-                           <td>Pidgin</td>
-                           <td>y</td>
-                           <td>n</td>
-                           <td>n</td>
-                        </tr>
-                     </table>
+            <h2 id='banner'>OpenHatch</h2>
+            <div id='content'>
+               <div id='sidebar'>
+                  <div id='heading' class='box'>
+                     You are logged in as: {{ developer_name }}
+                  </div>
+                  <div id='projects' class='box'>
+                     <h2>Registered projects:</h2>
+                     <div class='content'>
+                        <table>
+                           <tr>
+                              <td>Debian</td>
+                              <td class='yes'>
+                                 <img src='/static/images/button_ok.png'
+                                 alt='y'/>
+                              </td>
+                              <td class='yes'>
+                                 <img src='/static/images/button_ok.png'
+                                 alt='y'/>
+                              </td>
+                              <td class='yes'>
+                                 <img src='/static/images/button_ok.png'
+                                 alt='y'/>
+                              </td>
+                           </tr>
+                           <tr>
+                              <td>GNOME</td>
+                              <td class='yes'>y</td>
+                              <td class='yes'>y</td>
+                              <td class='yes'>y</td>
+                           </tr>
+                           <tr>
+                              <td>cc-tools</td>
+                              <td class='yes'>y</td>
+                              <td class='yes'>y</td>
+                              <td class='no'>n</td>
+                           </tr>
+                           <tr>
+                              <td>Ubuntu</td>
+                              <td>y</td>
+                              <td>y</td>
+                              <td>y</td>
+                           </tr>
+                           <tr>
+                              <td>Pidgin</td>
+                              <td>y</td>
+                              <td>n</td>
+                              <td>n</td>
+                           </tr>
+                        </table>
+                     </div>
+                  </div>
+                  <div id='add-another-bug-tracker' 
+                     class='box'>
+                     <h2>Add projects auto-magically</h2>
+                     <div class='content'>
+                        <p>Type your username or email
+                        address and we will look for your 
+                        trackers.</p>
+                        <input type='text'
+                        value='Type your username'/>
+                     </div>
+                  </div>
+                  <div id='skill-list' class='box'>
+                     <h2>Deduced skill list</h2>
+                  </div>
+                  <div id='add-a-skill' class='box'>
+                     <h2>Add a skill</h2>
                   </div>
                </div>
-               <div id='add-another-bug-tracker' 
-                  class='box'>
-                  <h2>Add projects auto-magically</h2>
-                  <div class='content'>
-                     <p>Type your username or email
-                     address and we will look for your 
-                     trackers.</p>
-                     <input type='text'
-                     value='Type your username'/>
+               <div id='main'>
+                  <div id='interests' class='box'>
+                     <form name='search_opps' method='get'> 
+                        <h2>What are you interested in?</h2>
+                        <input type='text'
+                        name='language' id='language'
+                        value='{{ language }}' />
+                        <input type='submit' id='button' />
+                     </form>
                   </div>
-               </div>
-               <div id='skill-list' class='box'>
-                  <h2>Deduced skill list</h2>
-               </div>
-               <div id='add-a-skill' class='box'>
-                  <h2>Add a skill</h2>
-               </div>
-            </div>
-            <div id='main'>
-               <div id='interests' class='box'>
-                  <form name='search_opps' method='get'> 
-                     <h2>What are you interested in?</h2>
-                     <input type='text'
-                     name='language' id='language'
-                     value='{{ language }}' />
-                     <input type='submit' id='button' />
-                  </form>
-               </div>
-               <div id='opps' class='box'>
-                  <h2>Open projects</h2>
-                  <div class='content'>
+                  <div id='opps' class='box'>
+                     <h2>Open tasks</h2>
+                     <div class='content'>
+                        <span id='results-summary'>
+                           Search: <span id='results-summary-language'>{{ language }}</span>
 
-                     <span id='results-summary'>
-                        Search: <span id='results-summary-language'>{{ language }}</span>
+                           {% if bunch_of_bugs %}
+                           Showing results 
+                           <span id='results-summary-start'>{{ start }}</span>
+                           to
+                           <span id='results-summary-end'>{{ end }}</span>.
+                           {% endif %}
+                        </span>
 
-                        {% if bunch_of_bugs %}
-                        Showing results 
-                        <span id='results-summary-start'>{{ start }}</span>
-                        to
-                        <span id='results-summary-end'>{{ end }}</span>.
-                        {% endif %}
-                     </span>
-
-                     <span class='separator'>&ndash;</span>
-
-                     <span id='navigation'>
-                        <a href='{{ prev_page_url }}' id='prev-page'>&laquo; Prev</a>
                         <span class='separator'>&ndash;</span>
-                        <a href='{{ next_page_url }}' id='next-page'>Next page &raquo;</a>
-                     </span> 
-                     {% if bunch_of_bugs %}
-                     <ul>
-                        {% for bug in bunch_of_bugs %}
-                        <li class='bug'>
-                        <div class='quick-summary'>
+
+                        <span id='navigation'>
+                           <a href='{{ prev_page_url }}' id='prev-page'>&laquo; Prev</a>
+                           <span class='separator'>&ndash;</span>
+                           <a href='{{ next_page_url }}' id='next-page'>Next page &raquo;</a>
+                           <span class='separator'>&ndash;</span>
+                           <a href='EXPAND_ALL_URL' id='expand-all-link'>Expand all</a>
+                           <a href='COLLAPSE_ALL_URL' id='collapse-all-link'>Collapse all</a>
+                        </span> 
+                        {% if bunch_of_bugs %}
+                        <ul>
+                           {% for bug in bunch_of_bugs %}
+                           <li class='bug'>
                            <div class='first-line'>
-                              <a href='BUG_LINK' class='show-details'>details</a>
                               <a class='title' href='BUG_LINK'>{{ bug.title }}</a>
+                              <a href='BUG_LINK' class='show-details'>details</a>
                            </div>
                            <div class='second-line'>
                               <span class='description'>
@@ -156,46 +154,48 @@
                                  </div>
                               </span>
                            </div>
-                        </div>
-                        <div class='details'>
-                           <span class='field importance'>
-                              <label>People involved: </label>
-                              <span class='value'>
-                                 <a href=''>13</a>
-                              </span>
-                           </span>
-                           <span class='field status'>
-                              <label>Status: </label>
-                              <span class='value'>triaged</span>
-                           </span>
-                           <span class='field last-polled'>
-                              <label>Last touched: </label>
-                              <span class='value'>2 weeks ago</span>
-                           </span>
-                           <span class='field origin'>
-                              <label>Origin: </label>
-                              <span class='value'>
-                                 <a href='https://bugs.launchpad.net/ubuntu/+source/apport/+bug/321566'>Launchpad</a>
-                              </span>
-                           </span>
-                           <span class='field importance'>
-                              <label>Importance: </label>
-                              <span class='value'>wishlist</span>
-                           </span>
-                           <span class='field last-polled'>
-                              <label>Last polled: </label>
-                              <span class='value'>3 days ago</span>
-                              <a href=''>poll now</a>
-                           </span>
-                        </div>
-                        </li>
-                        {% endfor %}
-                     </ul>
-                     {% else %}
-                     <p>No bugs are available.</p>
-                     {% endif %}
+                           <div class='details'>
+                              <div class='fields'>
+                                 <span class='field importance'>
+                                    <label>People involved: </label>
+                                    <span class='value'>
+                                       <a href=''>13</a>
+                                    </span>
+                                 </span>
+                                 <span class='field status'>
+                                    <label>Status: </label>
+                                    <span class='value'>triaged</span>
+                                 </span>
+                                 <span class='field last-polled'>
+                                    <label>Last touched: </label>
+                                    <span class='value'>2 weeks ago</span>
+                                 </span>
+                                 <span class='field origin'>
+                                    <label>Origin: </label>
+                                    <span class='value'>
+                                       <a href='https://bugs.launchpad.net/ubuntu/+source/apport/+bug/321566'>Launchpad</a>
+                                    </span>
+                                 </span>
+                                 <span class='field importance'>
+                                    <label>Importance: </label>
+                                    <span class='value'>wishlist</span>
+                                 </span>
+                                 <span class='field last-polled'>
+                                    <label>Last polled: </label>
+                                    <span class='value'>3 days ago</span>
+                                    <a href=''>poll now</a>
+                                 </span>
+                              </div>
+                           </div>
+                           </li>
+                           {% endfor %}
+                        </ul>
+                        {% else %}
+                        <p>No bugs are available.</p>
+                        {% endif %}
 
-                  </ul>
+                     </ul>
+                  </div>
                </div>
             </div>
          </div>
