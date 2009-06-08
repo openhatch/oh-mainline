@@ -144,6 +144,10 @@ p {
 #opps li .quick-summary {
 }
 #opps li.expanded .first-line {
+	
+}
+#opps li.expanded .title {
+	font-weight: bold;
 }
 #opps li.expanded .description {
 	width: 437px;

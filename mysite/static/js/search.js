@@ -2,6 +2,23 @@ $.fn.toggleText = function(text1, text2) {
     newtext = (this.text() == text2) ? text1 : text2;
     return this.text(newtext);
 }
+// Return the available content height space in browser window
+
+$.viewportHeight = function() { var h = 0; if (typeof(window.innerHeight) == "number") { h = window.innerHeight; } else { if (document.documentElement && document.documentElement.clientHeight) { h = document.documentElement.clientHeight; } else { if (document.body && document.body.clientHeight) { h = document.body.clientHeight; } } } return h; }
+
+$.fn.scrollIntoView = function() {
+    elemTop = this.offset().top;
+    elemBottom = elemTop + this.height();
+    scrollTop = $(document).scrollTop();
+    viewportHeight = $.viewportHeight();
+    scrollBottom = scrollTop + viewportHeight;
+    if (elemTop < scrollTop)  {
+        $.scrollTo(this, 0, {offset: -5});
+    }
+    if (elemBottom > scrollBottom) {
+        $.scrollTo(elemBottom - viewportHeight + 10);
+    }
+}
 
 function update(queryArray) {
     queryArray.push({'name': 'format', value: 'json'});
@@ -16,8 +33,6 @@ function update(queryArray) {
     $(queryArray).each(function () {
             if(this.name == 'language') language = this.value;
             })
-
-    console.log(thisstart, thisend);
 
     diff = thisend - thisstart;
 
@@ -44,12 +59,9 @@ function update(queryArray) {
 
 $(document).ready(function() {
 
-        console.log('document.ready');
-
         Opps.lightOpp(0);
 
         $(document).bind('keyup', 'j', function() {
-            console.log(Opps.getLitOppIndex());
             Opps.lightOpp(Opps.getLitOppIndex() + 1);
             });
 
@@ -58,7 +70,7 @@ $(document).ready(function() {
             });
 
         $(document).bind('keyup', 'o', function() {
-            $('#opps li').eq(Opps.getLitOppIndex()).toggleClass('expanded');
+            $('#opps li').eq(Opps.getLitOppIndex()).toggleClass('expanded').scrollIntoView();
             });
 
         $('.first-line').hover(
@@ -67,17 +79,17 @@ $(document).ready(function() {
             );
 
         $('.first-line').click(function () {
-            $(this.parentNode.parentNode).toggleClass('expanded');
+            $(this.parentNode.parentNode).toggleClass('expanded').scrollIntoView();
             return false;
             });
 
         $('.show-details').click(function () {
-            $(this.parentNode.parentNode.parentNode).toggleClass('expanded');
+            $(this.parentNode.parentNode.parentNode).toggleClass('expanded').scrollIntoView();
             return false;
             });
 
         $('.first-line a.title').click(function () {
-            $(this.parentNode.parentNode.parentNode).toggleClass('expanded');
+            $(this.parentNode.parentNode.parentNode).toggleClass('expanded').scrollIntoView();
             return false;
             });
 
@@ -112,7 +124,6 @@ $(document).ready(function() {
 
             return update(fruitySerialized);
         });
-
 });
 
 Opps = {
@@ -141,7 +152,8 @@ Opps = {
         if($('#opps li').eq(oppIndex).size() == 1) {
             $('#opps li')
                 .removeClass('lit-up')
-                .eq(oppIndex).addClass('lit-up');
+                .eq(oppIndex).addClass('lit-up').scrollIntoView();
+            // FIXME: Automatically scroll when opp is expanded such that its content is off-screen.
         }
         else {
             console.log('no opp to highlight');
