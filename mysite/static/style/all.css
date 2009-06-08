@@ -108,7 +108,7 @@ p {
 	background-color: #fff;
 	width: 555px;
 	margin-top: 3px;
-	height: 4.1em;
+	height: 4.3em;
 	white-space: nowrap;
 }
 #opps li {
@@ -126,7 +126,7 @@ p {
 	padding-top: 0;
 	float: left;
 	font-size: 90%;
-	background-color: #eeeefc;
+	background-color: #eef;
 }
 #opps li .details .fields {
 }
@@ -152,6 +152,10 @@ p {
 #opps li .tags .project {
 	padding: .3em .7em;
 	float: left;
+}
+#opps li .title {
+	float: left;
+	padding: .3em .7em;
 }
 #opps li.expanded .title {
 	font-weight: bold;
@@ -189,10 +193,6 @@ p {
 #opps li.expanded .tag-details {
 	display: block;
 }
-#opps li.lit-up .first-line {
-}
-#opps li.lit-up {
-}
 #opps li.lit-up .first-line a {
 	font-weight: bold;
 }
@@ -209,11 +209,11 @@ p {
 #opps li.expanded .second-line {
 	padding: 0;
 }
-#opps li .title {
+#opps li .left {
+	white-space: nowrap;
 	float: left;
-	width: 385px;
+	width: 460px;
 	overflow: hidden;
-	padding: .3em .7em;
 }
 #opps li .description {
 	width: 445px;
@@ -236,8 +236,6 @@ a:focus {
 
 }
 .project-info {
-	padding: .3em;
-	width: 30px;
 	float: left;
-	margin-right: 20px;
+	padding: .3em .7em;
 }

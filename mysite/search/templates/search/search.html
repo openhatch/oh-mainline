@@ -28,74 +28,6 @@
          <div id='wrapper-inner'>
             <h2 id='banner'>OpenHatch &alpha;</h2>
             <div id='content'>
-               <div id='sidebar'>
-                  <div id='heading' class='box'>
-                     You are logged in as: {{ developer_name }}
-                  </div>
-                  <div id='projects' class='box'>
-                     <h2>Registered projects:</h2>
-                     <div class='content'>
-                        <table>
-                           <tr>
-                              <td>Debian</td>
-                              <td class='yes'>
-                                 <img src='/static/images/button_ok.png'
-                                 alt='y'/>
-                              </td>
-                              <td class='yes'>
-                                 <img src='/static/images/button_ok.png'
-                                 alt='y'/>
-                              </td>
-                              <td class='yes'>
-                                 <img src='/static/images/button_ok.png'
-                                 alt='y'/>
-                              </td>
-                           </tr>
-                           <tr>
-                              <td>GNOME</td>
-                              <td class='yes'>y</td>
-                              <td class='yes'>y</td>
-                              <td class='yes'>y</td>
-                           </tr>
-                           <tr>
-                              <td>cc-tools</td>
-                              <td class='yes'>y</td>
-                              <td class='yes'>y</td>
-                              <td class='no'>n</td>
-                           </tr>
-                           <tr>
-                              <td>Ubuntu</td>
-                              <td>y</td>
-                              <td>y</td>
-                              <td>y</td>
-                           </tr>
-                           <tr>
-                              <td>Pidgin</td>
-                              <td>y</td>
-                              <td>n</td>
-                              <td>n</td>
-                           </tr>
-                        </table>
-                     </div>
-                  </div>
-                  <div id='add-another-bug-tracker' 
-                     class='box'>
-                     <h2>Add projects auto-magically</h2>
-                     <div class='content'>
-                        <p>Type your username or email
-                        address and we will look for your 
-                        trackers.</p>
-                        <input type='text'
-                        value='Type your username'/>
-                     </div>
-                  </div>
-                  <div id='skill-list' class='box'>
-                     <h2>Deduced skill list</h2>
-                  </div>
-                  <div id='add-a-skill' class='box'>
-                     <h2>Add a skill</h2>
-                  </div>
-               </div>
                <div id='main'>
                   <div id='interests' class='box'>
                      <form name='search_opps' method='get'> 
@@ -135,12 +67,14 @@
                            {% for bug in bunch_of_bugs %}
                            <li class='bug'>
                            <div class='first-line'>
-                              <a class='title' href='BUG_LINK'>{{ bug.title }}</a>
-                              <span class='project-info'>
-                                 <img class='logo' src='/static/images/Exaile-icon.png' />
-                                 <span class='project'>
-                                    {{ bug.project.name }}
+                              <span class='left'>
+                                 <span class='project-info'>
+                                    <img class='logo' src='/static/images/Exaile-icon.png' />
+                                    <span class='project'>
+                                       {{ bug.project.name }}
+                                    </span>
                                  </span>
+                                 <a class='title' href='BUG_LINK'>{{ bug.title }}</a>
                               </span>
                               <a href='BUG_LINK' class='show-details'>details</a>
                            </div>
@@ -196,6 +130,74 @@
 
                      </ul>
                   </div>
+               </div>
+            </div>
+            <div id='sidebar'>
+               <div id='heading' class='box'>
+                  You are logged in as: {{ developer_name }}
+               </div>
+               <div id='projects' class='box'>
+                  <h2>Registered projects:</h2>
+                  <div class='content'>
+                     <table>
+                        <tr>
+                           <td>Debian</td>
+                           <td class='yes'>
+                              <img src='/static/images/button_ok.png'
+                              alt='y'/>
+                           </td>
+                           <td class='yes'>
+                              <img src='/static/images/button_ok.png'
+                              alt='y'/>
+                           </td>
+                           <td class='yes'>
+                              <img src='/static/images/button_ok.png'
+                              alt='y'/>
+                           </td>
+                        </tr>
+                        <tr>
+                           <td>GNOME</td>
+                           <td class='yes'>y</td>
+                           <td class='yes'>y</td>
+                           <td class='yes'>y</td>
+                        </tr>
+                        <tr>
+                           <td>cc-tools</td>
+                           <td class='yes'>y</td>
+                           <td class='yes'>y</td>
+                           <td class='no'>n</td>
+                        </tr>
+                        <tr>
+                           <td>Ubuntu</td>
+                           <td>y</td>
+                           <td>y</td>
+                           <td>y</td>
+                        </tr>
+                        <tr>
+                           <td>Pidgin</td>
+                           <td>y</td>
+                           <td>n</td>
+                           <td>n</td>
+                        </tr>
+                     </table>
+                  </div>
+               </div>
+               <div id='add-another-bug-tracker' 
+                  class='box'>
+                  <h2>Add projects auto-magically</h2>
+                  <div class='content'>
+                     <p>Type your username or email
+                     address and we will look for your 
+                     trackers.</p>
+                     <input type='text'
+                     value='Type your username'/>
+                  </div>
+               </div>
+               <div id='skill-list' class='box'>
+                  <h2>Deduced skill list</h2>
+               </div>
+               <div id='add-a-skill' class='box'>
+                  <h2>Add a skill</h2>
                </div>
             </div>
          </div>
