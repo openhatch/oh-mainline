@@ -1,7 +1,7 @@
 How to run this code:
 
 $ sudo apt-get install python-django python-twill
-$ sudo easy_install windmill
+$ sudo easy_install windmill south
 
 $ cd mysite
 $ python manage.py runserver
