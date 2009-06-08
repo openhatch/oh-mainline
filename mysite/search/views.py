@@ -51,6 +51,7 @@ def fetch_bugs(request):
             'developer_name': "Orrin Hatch",
             'language': language,
             'start': start, 'end': end,
+			'url': 'http://launchpad.net/',
             'prev_page_url': '/search/?' + prev_page_query_str.urlencode(),
             'next_page_url': '/search/?' + next_page_query_str.urlencode()
             })

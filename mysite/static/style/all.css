@@ -1,5 +1,6 @@
 body {
 	font: .85em/130% Arial, "Bitstream Vera Sans", "Lucida Grande", Verdana, Arial, sans-serif;
+	background-color: #f4f4bc;
 	background-color: #eef;
 }
 h1, h2, h3, h4, h5 {
@@ -8,13 +9,13 @@ h1, h2, h3, h4, h5 {
 	margin: 0;
 }
 #banner {
+	color: #446; #b5c200; 9cc200; #ff6e57;
 	font: bold 23pt Tuffy;
 	margin: 10px 0;
 	text-align: center;
-	color: #3d220e;
 }
 a {
-	color: #379;
+	color: #446; #379;
 	text-decoration: none;
 }
 h1 {
@@ -27,12 +28,23 @@ h1 {
 #wrapper-inner {
 }
 #content {
+	background-color: #fff;
 	width: 800px;
 	padding: 20px;
 	border: 1px solid #d2e6df;
 	-moz-border-radius: 10px;
-	background-color: #fff;
 	float: left;
+}
+.no-opps {
+	border: 1px solid #d2e6df;
+	background-color: #eef;
+	color: #222;
+	padding: 10px;
+	font-size: 130%;
+	line-height: 130%;
+	width: 460px;
+	margin-top: 20px;
+	-moz-border-radius: 10px;
 }
 #heading {
 	margin: 20px 0 10px 0;
@@ -239,3 +251,5 @@ a:focus {
 	float: left;
 	padding: .3em .7em;
 }
+
+/* vim:set sw=2 ts=2 expandtab: */

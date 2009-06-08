@@ -177,4 +177,4 @@ Opps = {
     }
 }
 
-/* vim:set sw=4 ts=4 expandtab: */
+/* vim:set sw=2 ts=2 expandtab: */
