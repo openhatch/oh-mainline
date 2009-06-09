@@ -15,7 +15,8 @@ h1, h2, h3, h4, h5 {
 	text-align: center;
 }
 a {
-	color: #446; #379;
+	color: #447; #379;
+	text-decoration: none;
 }
 h1 {
 	font-size: 150%;
@@ -136,9 +137,9 @@ p {
 	border-top: 1px solid #ccf;
 	padding: .3em .7em;
 	padding-top: 0;
-	float: left;
 	font-size: 90%;
 	background-color: #eef;
+	clear: left;
 }
 #opps li .details .fields {
 }
@@ -149,7 +150,6 @@ p {
 	color: #777;
 }
 #opps li .field {
-	float: left;
 	width: 33%;
 	margin-top: .3em;
 }
@@ -164,7 +164,8 @@ p {
 	min-width: 100px;
 }
 #opps li .title {
-	padding: .3em .7em;
+	font-size: 110%;
+	padding: .3em;
 }
 #opps li.expanded .title {
 	font-weight: bold;
