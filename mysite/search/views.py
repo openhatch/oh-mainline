@@ -3,6 +3,7 @@ from django.shortcuts import render_to_response
 from django.core import serializers
 from mysite.search.models import Bug, Project
 import simplejson
+from django.db.models import Q
 
 # Via http://www.djangosnippets.org/snippets/1435/
 import datetime
@@ -28,7 +29,7 @@ def fetch_bugs(request):
     bugs = Bug.objects.all()
 
     for word in query_words:
-        bugs = bugs.filter(project__language=word)
+        bugs = bugs.filter(Q(project__language=word) | Q(title__contains=word) | Q(description__contains=word))
 
     #if status:
     #    bugs = bugs.filter(project__status=status)
