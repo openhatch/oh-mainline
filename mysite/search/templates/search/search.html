@@ -66,23 +66,13 @@
                   <div class='first-line'>
                     <span class='left'>
                       <a class='title' href='BUG_LINK'>{{ bug.title }}</a>
+                      <div class='age'>3 days old</div>
                     </span>
-                    <a href='BUG_LINK' class='show-details'>details</a>
+                    <!--a href='BUG_LINK' class='show-details'>details</a-->
                   </div>
                   <div class='second-line'>
-                    <span class='project-info'>
-                      <img class='logo' src='{{ bug.project.icon_url }}' />
-                      <span class='project'>
-                        {{ bug.project.name }}
-                      </span>
-                    </span>
                     <span class='description'>
                       {{ bug.description }}
-                    </span>
-                    <span class='tags'>
-                      <div class='age'>3 days old</div>
-                      <div class='tag-details'>
-                      </div>
                     </span>
                   </div>
                   <div class='details'>
@@ -117,6 +107,12 @@
                         <a href=''>poll now</a>
                       </span>
                     </div>
+                  </div>
+                  <div class='project-info'>
+                    <img class='logo' src='{{ bug.project.icon_url }}' />
+                    <span class='project'>
+                      {{ bug.project.name }}
+                    </span>
                   </div>
                   </li>
                   {% endfor %}

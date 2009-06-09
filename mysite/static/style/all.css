@@ -16,20 +16,18 @@ h1, h2, h3, h4, h5 {
 }
 a {
 	color: #446; #379;
-	text-decoration: none;
 }
 h1 {
 	font-size: 150%;
 }
 #wrapper-outer {
 	margin: 0 auto;
-	width: 800px;
+	max-width: 1100px;
 }
 #wrapper-inner {
 }
 #content {
 	background-color: #fff;
-	width: 800px;
 	padding: 20px;
 	border: 1px solid #d2e6df;
 	-moz-border-radius: 10px;
@@ -42,7 +40,7 @@ h1 {
 	padding: 10px;
 	font-size: 130%;
 	line-height: 130%;
-	width: 460px;
+	width: 100%;
 	margin-top: 20px;
 	-moz-border-radius: 10px;
 }
@@ -52,7 +50,7 @@ h1 {
 .box {
 	float: left;
 	background-color: #fff;
-	margin-top: 30px;
+	margin-bottom: 30px;
 }
 .box h2 {
 	font-size: 100%;
@@ -64,14 +62,16 @@ h1 {
 }
 #sidebar {
 	float: left;
-	width: 220px;
+	width: 20%;
+	max-width: 200px;
+	min-width: 100px;
+	margin-left: 20px;
 }
 #main {
-	width: 580px;
+	width: 80%;
 	float: left;
 }
 #main .box {
-	width: 580px;
 	float: left;
 }
 #projects table {
@@ -84,7 +84,7 @@ h1 {
 #add-another-bug-tracker {
 }
 #sidebar .box {
-	width: 200px;
+	width: 100%;
 }
 ul {
 	margin: 0;
@@ -118,7 +118,6 @@ p {
 	list-style: none;
 	border: 1px solid #ccf;
 	background-color: #fff;
-	width: 555px;
 	margin-top: 3px;
 	height: 4.3em;
 	white-space: nowrap;
@@ -159,24 +158,18 @@ p {
 }
 #opps li .tags {
 	float: left;
-	width: 80px;
-}
-#opps li .tags .project {
 	padding: .3em .7em;
-	float: left;
+	width: 30%;
+	min-width: 100px;
 }
 #opps li .title {
-	float: left;
 	padding: .3em .7em;
 }
 #opps li.expanded .title {
 	font-weight: bold;
 }
 #opps li.expanded .description {
-	width: 437px;
-	border-right: 1px dotted #ccf;
 	color: #000;
-	float: left;
 	overflow: normal;
 }
 #opps li.expanded .description.pre {
@@ -184,20 +177,14 @@ p {
 	font-family: monospace;
 	font-size: 125%;
 }
-#opps li.expanded .tags {
-	background-color: inherit;
-	width: 91px;
-}
 #opps li .logo {
-	width: 20px;
 	vertical-align: middle;
 }
 #opps li .first-line {
-	float: left;
 	cursor: hand;
-	width: 100%;
 	cursor: pointer;
 	border-bottom: 1px dotted #ccf;
+	padding: .3em;
 }
 #opps .tag-details {
 	display: none;
@@ -223,12 +210,11 @@ p {
 }
 #opps li .left {
 	white-space: nowrap;
-	float: left;
-	width: 460px;
 	overflow: hidden;
 }
 #opps li .description {
 	width: 445px;
+	width: 400px;
 	padding: .3em .7em;
 	color: #888;
 	float: left;
@@ -248,8 +234,13 @@ a:focus {
 
 }
 .project-info {
-	float: left;
-	padding: .3em .7em;
+	width: 20%;
+	/*
+	min-width: 150px;
+	max-width: 200px;
+	*/
+}
+.logo {
 }
 
 /* vim:set sw=2 ts=2 expandtab: */
