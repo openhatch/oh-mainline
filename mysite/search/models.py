@@ -18,4 +18,4 @@ class Bug(models.Model):
     last_polled = models.DateTimeField()
     submitter_username = models.CharField(max_length=200)
     submitter_realname = models.CharField(max_length=200)
-    
+    canonical_bug_link = models.URLField(max_length=200)
