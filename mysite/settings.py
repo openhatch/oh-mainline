@@ -10,6 +10,10 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
+DATABASE_OPTIONS = {
+    'read_default_file': './my.cnf',
+}
+
 DATABASE_CHARSET = 'utf8' # omg I hate you MySQL
 DATABASE_ENGINE = 'mysql'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
 DATABASE_NAME = 'oh_milestone_a'             # Or path to database file if using sqlite3.
