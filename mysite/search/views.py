@@ -35,11 +35,11 @@ def fetch_bugs(request):
     bugs = bugs[start-1:end]
 
     for b in bugs:
-		"""
+        """
         b.description += "Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
         b.description = b.description[:65] + "..."
-		"""
-		b.project.icon_url = "/static/images/icons/projects/%s.png" % b.project.name.lower()
+        """
+        b.project.icon_url = "/static/images/icons/projects/%s.png" % b.project.name.lower()
 
     if format == 'json':
         return bugs_to_json_response(bugs,
@@ -65,7 +65,7 @@ def fetch_bugs(request):
             'developer_name': "Orrin Hatch",
             'language': language,
             'start': start, 'end': end,
-			'url': 'http://launchpad.net/',
+            'url': 'http://launchpad.net/',
             'prev_page_url': '/search/?' + prev_page_query_str.urlencode(),
             'next_page_url': '/search/?' + next_page_query_str.urlencode()
             })
@@ -82,4 +82,4 @@ def bugs_to_json_response(bunch_of_bugs, callback_function_name=''):
 def index(request):
     return render_to_response('search/index.html')
     
-#vim:set ts=3 sw=3 expandtab:
+# vim: set ts=4 sw=4 expandtab:
