@@ -88,4 +88,5 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'windmill',
     'south',
+    'profile',
 )
