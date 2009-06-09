@@ -139,6 +139,7 @@ p {
 	padding-top: 0;
 	font-size: 90%;
 	background-color: #eef;
+	clear: left;
 }
 #opps li .details .fields {
 }
