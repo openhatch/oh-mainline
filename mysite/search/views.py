@@ -3,6 +3,7 @@ from django.shortcuts import render_to_response
 from django.core import serializers
 from mysite.search.models import Bug, Project
 import simplejson
+from django.db.models import Q
 
 # Via http://www.djangosnippets.org/snippets/1435/
 import datetime
@@ -19,15 +20,16 @@ def encode_datetime(obj):
 def fetch_bugs(request):
     # FIXME: Give bugs some date field
 
-    language = request.GET.get('language', '')
+    query = request.GET.get('language', '')
+    query_words = query.split()
     format = request.GET.get('format', None)
     start = int(request.GET.get('start', 1))
     end = int(request.GET.get('end', 10))
 
     bugs = Bug.objects.all()
 
-    if language:
-        bugs = bugs.filter(project__language=language)
+    for word in query_words:
+        bugs = bugs.filter(Q(project__language=word) | Q(title__contains=word) | Q(description__contains=word))
 
     #if status:
     #    bugs = bugs.filter(project__status=status)
@@ -49,9 +51,9 @@ def fetch_bugs(request):
         prev_page_query_str = prev_page_query_str.copy()
         next_page_query_str = QueryDict('')
         next_page_query_str = next_page_query_str.copy()
-        if language:
-            prev_page_query_str['language'] = language
-            next_page_query_str['language'] = language
+        if query:
+            prev_page_query_str['language'] = query
+            next_page_query_str['language'] = query
         if format:
             prev_page_query_str['format'] = format
             next_page_query_str['format'] = format
@@ -63,7 +65,7 @@ def fetch_bugs(request):
         return render_to_response('search/search.html', {
             'bunch_of_bugs': bugs,
             'developer_name': "Orrin Hatch",
-            'language': language,
+            'language': query,
             'start': start, 'end': end,
             'url': 'http://launchpad.net/',
             'prev_page_url': '/search/?' + prev_page_query_str.urlencode(),
