@@ -28,7 +28,7 @@ h1 {
 }
 #content {
 	background-color: #fff;
-	padding: 20px;
+	padding: 1.5%;
 	border: 1px solid #d2e6df;
 	-moz-border-radius: 10px;
 	float: left;
@@ -121,6 +121,7 @@ p {
 	margin-top: 3px;
 	height: 4.3em;
 	white-space: nowrap;
+	width: 80%;
 }
 #opps li {
 	margin: 5px 0;
@@ -213,11 +214,16 @@ p {
 	overflow: hidden;
 }
 #opps li .description {
+	float: left;
+	/*
 	width: 445px;
 	width: 400px;
+	*/
 	padding: .3em .7em;
 	color: #888;
+	/*
 	float: left;
+	*/
 	overflow: hidden;
 }
 :focus {
