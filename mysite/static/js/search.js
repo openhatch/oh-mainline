@@ -143,7 +143,7 @@ $(document).ready(function() {
 });
 
 Opps = {
-    'oppsQueryURL': "http://localhost:8000/search/?",
+    'oppsQueryURL': "/search/?",
     '$oppsDOMList': $('#opps ul'),
     'getLitOppIndex': function() {
         // FIXME: Remember the index of the lit opp in Javascript,

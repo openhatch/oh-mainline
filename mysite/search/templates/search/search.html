@@ -29,17 +29,14 @@
         <h2 id='banner'>OpenHatch &alpha;</h2>
         <div id='content'>
           <div id='main'>
-            <div id='interests' class='box'>
+            <div id='opps' class='box'>
               <form name='search_opps' method='get'> 
-                <h2>What are you interested in?</h2>
+                <h2>Search open tasks</h2>
                 <input type='text'
                 name='language' id='language'
                 value='{{ language }}' />
                 <input type='submit' id='button' />
               </form>
-            </div>
-            <div id='opps' class='box'>
-              <h2>Open tasks</h2>
               <div class='content'>
                 <span id='results-summary'>
                   Search: <span id='results-summary-language'>{{ language }}</span>
@@ -68,17 +65,17 @@
                   <li class='bug'>
                   <div class='first-line'>
                     <span class='left'>
-                      <span class='project-info'>
-                        <img class='logo' src='{{ bug.project.icon_url }}' />
-                        <span class='project'>
-                          {{ bug.project.name }}
-                        </span>
-                      </span>
                       <a class='title' href='BUG_LINK'>{{ bug.title }}</a>
                     </span>
                     <a href='BUG_LINK' class='show-details'>details</a>
                   </div>
                   <div class='second-line'>
+                    <span class='project-info'>
+                      <img class='logo' src='{{ bug.project.icon_url }}' />
+                      <span class='project'>
+                        {{ bug.project.name }}
+                      </span>
+                    </span>
                     <span class='description'>
                       {{ bug.description }}
                     </span>
