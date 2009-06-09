@@ -13,9 +13,9 @@ class Bug(models.Model):
     status = models.CharField(max_length=200)
     importance = models.CharField(max_length=200)
     people_involved = models.IntegerField()
-    date_reported = models.DateField()
-    last_touched = models.DateField()
-    last_polled = models.DateField()
+    date_reported = models.DateTimeField()
+    last_touched = models.DateTimeField()
+    last_polled = models.DateTimeField()
     submitter_username = models.CharField(max_length=200)
     submitter_realname = models.CharField(max_length=200)
     
