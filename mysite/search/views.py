@@ -31,6 +31,8 @@ def fetch_bugs(request):
     for word in query_words:
         bugs = bugs.filter(Q(project__language=word) | Q(title__contains=word) | Q(description__contains=word))
 
+    bugs.order_by('last_touched')
+
     #if status:
     #    bugs = bugs.filter(project__status=status)
         
