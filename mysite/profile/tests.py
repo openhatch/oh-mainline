@@ -48,6 +48,10 @@ class ProfileTests(django.test.TestCase):
         tc.fv('add_contrib', 'url', 'http://babel.edgewall.org/ticket/54')
         tc.submit()
 
+        # Assert that we are not in some weird GET place with
+        # CGI args
+        tc.url(r'^[^?]*$')
+
         # The following will launch into an interactive
         # twill session
         tc.find('Babel')

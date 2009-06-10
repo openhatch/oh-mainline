@@ -2,9 +2,9 @@ from django.http import HttpResponse
 from django.shortcuts import render_to_response
 
 def index(request):
-    project = request.GET.get('project', '')
-    contrib_text = request.GET.get('contrib_text', '')
-    url = request.GET.get('url', '')
+    project = request.POST.get('project', '')
+    contrib_text = request.POST.get('contrib_text', '')
+    url = request.POST.get('url', '')
 
     if project and contrib_text and url:
         if 'saved_data' not in request.session:
