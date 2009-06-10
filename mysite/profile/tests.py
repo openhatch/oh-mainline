@@ -48,3 +48,13 @@ class ProfileTests(django.test.TestCase):
         tc.fv('add_contrib', 'url', 'http://babel.edgewall.org/ticket/54')
         tc.submit()
 
+        # The following will launch into an interactive
+        # twill session
+        tc.find('Babel')
+
+        # Verify that leaving and coming back has it still
+        # there
+        tc.go(make_twill_url(url))
+        tc.find('Babel')
+
+

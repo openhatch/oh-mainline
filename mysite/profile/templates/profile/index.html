@@ -224,3 +224,20 @@
     </html>
 <!--
 vim: set ts=2 sw=2 expandtab: -->
+
+{% if saved_data %}
+<p>You have contributed to the following projects:</p>
+<ul>
+{% for datum in saved_data %}
+  <li>
+    {{ datum.project }}
+  </li><li>
+    {{ datum.url }}
+  </li></li>
+    {{ datum.contrib_text }}
+  </li>
+{% endfor %}
+</ul>
+{% endif %}
+
+
