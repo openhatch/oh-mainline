@@ -53,10 +53,15 @@ class ProfileTests(django.test.TestCase):
         tc.url(r'^[^?]*$')
 
         tc.find('Babel')
+        tc.fv('add_contrib', 'project', 'Baber')
+        tc.fv('add_contrib', 'contrib_text', 'msgctxt support')
+        tc.fv('add_contrib', 'url', 'http://babel.edgewall.org/ticket/54')
+        tc.submit()
 
         # Verify that leaving and coming back has it still
         # there
         tc.go(make_twill_url(url))
         tc.find('Babel')
+        tc.find('Baber')
 
 
