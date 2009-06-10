@@ -52,8 +52,6 @@ class ProfileTests(django.test.TestCase):
         # CGI args
         tc.url(r'^[^?]*$')
 
-        # The following will launch into an interactive
-        # twill session
         tc.find('Babel')
 
         # Verify that leaving and coming back has it still
