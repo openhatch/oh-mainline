@@ -13,12 +13,12 @@ def add_contribution(request):
     url = request.POST.get('url', '')
 
     if project and contrib_text and url:
-        if 'saved_data' not in request.session:
-            request.session['saved_data'] = []
+        saved = request.session.get('saved_data', [])
         # always append the data
-        request.session['saved_data'].append(
+        saved.append(
             dict(project=project,
                  url=url,
                  contrib_text=contrib_text))
+        request.session['saved_data'] = saved
     return HttpResponseRedirect('/profile/')
 
