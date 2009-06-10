@@ -1,3 +1,10 @@
+ul.gewgaws {
+	margin: 0;
+	padding: 0;
+}
+ul.gewgaws#opps {
+	padding: 0 0 0 10%;
+}
 .gewgaws.box {
 	padding-right: 0;
 	padding-bottom: 0;

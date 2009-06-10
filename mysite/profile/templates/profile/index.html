@@ -8,8 +8,9 @@
     <meta http-equiv='Content-Style-Type' content='text/css' />
     <meta name='Description' content=''>
     <style> /*<![CDATA[*/
-      @import url('/static/style/all.css'); 
-      @import url('/static/style/profile/all.css');
+      @import url('/static/style/all.css') all; 
+      @import url('/static/style/gewgaws.css') all; 
+      @import url('/static/style/profile/all.css') all;
       /*]]>*/ </style>
     <!--[if IE]><style>/*<![CDATA[*/@import url('../style/ie/all.css');/*]]>*/</style><![endif]-->
     <!--[if lte IE 6]><style>/*<![CDATA[*/@import url('../style/ie/6-/all.css');/*]]>*/</style><![endif]-->
@@ -21,8 +22,9 @@
     <script src='/static/js/jquery.scrollTo.js'></script>
     <!-- FIXME: remove what we don't need here -->
     <script>
+      /*
       thisstart = {{ start }};
-      thisend = {{ end }};
+      thisend = {{ end }};*/
     </script>
     <script src='/static/js/search.js'></script>
   </head>
@@ -36,153 +38,109 @@
         <h1 class='name'>{{ person.name.full }}</h1>
 
         <h2>Experience</h2>
-        <ul id='opps experiences swanky-list'>
-          <li class='experience'>
-            <div class='project-name'><a href=''>gnome-control-center</a></div>
-            <div class='role'>Kibitzer</div>
-            <div class='when'>Jan 2006</div>
-            <div class='with'>GNOME Foundation</div>
-            <div class='description'>
-              <ul>
-                <li>Managed the project.</li>
-                <li>Recruited seven volunteers.</li>
-                <li>Committed oodles of C code.</li>
-              </ul>
-            </div>
-          </div>
+        <form id='add-contrib' action='/profile/add_contrib'>
+          <label for='project-name'></label>
+          <input id='project-name' type='text' name='project'/>
 
-          <div class='experience'>
-            <h3 class='with'>GNOME Foundation</h2>
-            <div class='project-name'><a href=''>gnome-control-center</a></div>
-            <div class='role'></div>
-            <div class='when'>Jan 2006</div>
-            <div class='description'>
-              <ul>
-                <li>Managed the project.</li>
-                <li>Recruited seven volunteers.</li>
-                <li>Committed oodles of C code.</li>
-              </ul>
-            </div>
-          </div>
+          <label for='contrib-description'></label>
+          <input id='contrib-description' type='text' name='contrib_text' />
 
-          <div class='experience'>
-            <div class='project-name'><a href=''>gnome-control-center</a></div>
-            <div class='role'></div>
-            <div class='when'>Jan 2006</div>
-            <div class='with'>GNOME Foundation</div>
-            <div class='description'>
-              <ul>
-                <li>Managed the project.</li>
-                <li>Recruited seven volunteers.</li>
-                <li>Committed oodles of C code.</li>
-              </ul>
-            </div>
+          <label for='url'></label>
+          <input id='url' type='text' name='url' />
+        </form>
+        <ul id='experiences' class='gewgaws'>
+          <li>
+          <div class='project-name'>
+            <a href=''>gnome-control-center</a>
           </div>
-          <div class='experience'>
-            <div class='project-name'><a href=''>gnome-control-center</a></div>
-            <div class='role'></div>
-            <div class='when'>Jan 2006</div>
-            <div class='with'>GNOME Foundation</div>
-            <div class='description'>
-              <ul>
-                <li>Managed the project.</li>
-                <li>Recruited seven volunteers.</li>
-                <li>Committed oodles of C code.</li>
-              </ul>
-            </div>
+          <div class='role'>Kibitzer</div>
+          <div class='when'>Jan 2006</div>
+          <div class='with'>GNOME Foundation</div>
+          <div class='description'>
+            <ul>
+              <li>Managed the project.</li>
+              <li>Recruited seven volunteers.</li>
+              <li>Committed oodles of C code.</li>
+            </ul>
           </div>
-          <div class='experience'>
-            <div class='project-name'><a href=''>gnome-control-center</a></div>
-            <div class='role'></div>
-            <div class='when'>Jan 2006</div>
-            <div class='with'>GNOME Foundation</div>
-            <div class='description'>
-              <ul>
-                <li>Managed the project.</li>
-                <li>Recruited seven volunteers.</li>
-                <li>Committed oodles of C code.</li>
-              </ul>
-            </div>
+          </li>
+
+          <li>
+          <div class='project-name'>
+            <a href=''>gnome-control-center</a>
           </div>
-          <div class='experience'>
-            <div class='project-name'><a href=''>gnome-control-center</a></div>
-            <div class='role'></div>
-            <div class='when'>Jan 2006</div>
-            <div class='with'>GNOME Foundation</div>
-            <div class='description'>
-              <ul>
-                <li>Managed the project.</li>
-                <li>Recruited seven volunteers.</li>
-                <li>Committed oodles of C code.</li>
-              </ul>
-            </div>
+          <div class='role'>Kibitzer</div>
+          <div class='when'>Jan 2006</div>
+          <div class='with'>GNOME Foundation</div>
+          <div class='description'>
+            <ul>
+              <li>Managed the project.</li>
+              <li>Recruited seven volunteers.</li>
+              <li>Committed oodles of C code.</li>
+            </ul>
           </div>
-          <div class='experience'>
-            <div class='project-name'><a href=''>gnome-control-center</a></div>
-            <div class='role'></div>
-            <div class='when'>Jan 2006</div>
-            <div class='with'>GNOME Foundation</div>
-            <div class='description'>
-              <ul>
-                <li>Managed the project.</li>
-                <li>Recruited seven volunteers.</li>
-                <li>Committed oodles of C code.</li>
-              </ul>
-            </div>
+          </li>
+          <li>
+          <div class='project-name'>
+            <a href=''>gnome-control-center</a>
           </div>
-          <div class='experience'>
-            <div class='project-name'><a href=''>gnome-control-center</a></div>
-            <div class='role'></div>
-            <div class='when'>Jan 2006</div>
-            <div class='with'>GNOME Foundation</div>
-            <div class='description'>
-              <ul>
-                <li>Managed the project.</li>
-                <li>Recruited seven volunteers.</li>
-                <li>Committed oodles of C code.</li>
-              </ul>
-            </div>
+          <div class='role'>Kibitzer</div>
+          <div class='when'>Jan 2006</div>
+          <div class='with'>GNOME Foundation</div>
+          <div class='description'>
+            <ul>
+              <li>Managed the project.</li>
+              <li>Recruited seven volunteers.</li>
+              <li>Committed oodles of C code.</li>
+            </ul>
           </div>
-          <div class='experience'>
-            <div class='project-name'><a href=''>gnome-control-center</a></div>
-            <div class='role'></div>
-            <div class='when'>Jan 2006</div>
-            <div class='with'>GNOME Foundation</div>
-            <div class='description'>
-              <ul>
-                <li>Managed the project.</li>
-                <li>Recruited seven volunteers.</li>
-                <li>Committed oodles of C code.</li>
-              </ul>
-            </div>
+          </li>
+          <li>
+          <div class='project-name'>
+            <a href=''>gnome-control-center</a>
           </div>
-          <div class='experience'>
-            <div class='project-name'><a href=''>gnome-control-center</a></div>
-            <div class='role'></div>
-            <div class='when'>Jan 2006</div>
-            <div class='with'>GNOME Foundation</div>
-            <div class='description'>
-              <ul>
-                <li>Managed the project.</li>
-                <li>Recruited seven volunteers.</li>
-                <li>Committed oodles of C code.</li>
-              </ul>
-            </div>
+          <div class='role'>Kibitzer</div>
+          <div class='when'>Jan 2006</div>
+          <div class='with'>GNOME Foundation</div>
+          <div class='description'>
+            <ul>
+              <li>Managed the project.</li>
+              <li>Recruited seven volunteers.</li>
+              <li>Committed oodles of C code.</li>
+            </ul>
           </div>
-          <div class='experience'>
-            <div class='project-name'><a href=''>gnome-control-center</a></div>
-            <div class='role'></div>
-            <div class='when'>Jan 2006</div>
-            <div class='with'>GNOME Foundation</div>
-            <div class='description'>
-              <ul>
-                <li>Managed the project.</li>
-                <li>Recruited seven volunteers.</li>
-                <li>Committed oodles of C code.</li>
-              </ul>
-            </div>
+          </li>
+          <li>
+          <div class='project-name'>
+            <a href=''>gnome-control-center</a>
           </div>
-          Language Experience
+          <div class='role'>Kibitzer</div>
+          <div class='when'>Jan 2006</div>
+          <div class='with'>GNOME Foundation</div>
+          <div class='description'>
+            <ul>
+              <li>Managed the project.</li>
+              <li>Recruited seven volunteers.</li>
+              <li>Committed oodles of C code.</li>
+            </ul>
+          </div>
+          </li>
+          <li>
+          <div class='project-name'>
+            <a href=''>gnome-control-center</a>
+          </div>
+          <div class='role'>Kibitzer</div>
+          <div class='when'>Jan 2006</div>
+          <div class='with'>GNOME Foundation</div>
+          <div class='description'>
+            <ul>
+              <li>Managed the project.</li>
+              <li>Recruited seven volunteers.</li>
+              <li>Committed oodles of C code.</li>
+            </ul>
+          </div>
+          </li>
+          <h2>Language Experience</h2>
           <table>
             <tr>
               <tr>
@@ -264,10 +222,5 @@
         </div>
       </body>
     </html>
-    <!--
-    vim: set ts=2 sw=2 expandtab: -->
-<form name='add_contrib' action=''>
-  <input type='text' name='project'></input>
-  <input type='text' name='contrib_text'></input>
-  <input type='text' name='url'></input>
-</form>
+<!--
+vim: set ts=2 sw=2 expandtab: -->

@@ -87,10 +87,6 @@ h1 {
 #sidebar .box {
 	width: 100%;
 }
-ul {
-	margin: 0;
-	padding: 0 0 0 10%;
-}
 li {
 	list-style: square;
 }
