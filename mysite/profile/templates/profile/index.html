@@ -38,15 +38,21 @@
         <h1 class='name'>{{ person.name.full }}</h1>
 
         <h2>Experience</h2>
-        <form name='add_contrib' action=''>
-          <label for='project-name'></label>
-          <input id='project-name' type='text' name='project'/>
 
-          <label for='contrib-description'></label>
-          <input id='contrib-description' type='text' name='contrib_text' />
+		<div class='section'>
+			<h3>Log some experience we didn't find</h3>
+			<form id='add-contrib' name='add_contrib' action=''>
 
-          <label for='url'></label>
-          <input id='url' type='text' name='url' />
+          <label for='project-name'>Project name: </label>
+          <input id='contrib-project-name' type='text' name='project'/>
+
+          <label for='contrib-description'>Describe your contribution: </label>
+		  <textarea id='contrib-description' name='contrib_text'></textarea>
+
+          <label for='contrib-url'>Any related URL: </label>
+          <input id='contrib-url' type='text' name='url' />
+
+		  <input type='submit' value='Log it' />
         </form>
         <ul id='experiences' class='gewgaws'>
           <li>
@@ -239,5 +245,4 @@ vim: set ts=2 sw=2 expandtab: -->
 {% endfor %}
 </ul>
 {% endif %}
-
 

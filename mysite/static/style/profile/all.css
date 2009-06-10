@@ -1,2 +1,22 @@
 ul.gewgaws.experience {
 }
+form#add-contrib label {
+	width: 200px;
+	margin-right: 10px;
+	padding: 5px;
+	text-align: right;
+	clear: left;
+	float: left;
+}
+form#add-contrib input[type='text'],
+form#add-contrib textarea {
+	float: left;
+	width: 300px;
+	font: 100% Arial;
+	padding: 5px;
+	border: 1px solid #ccf;
+	-moz-border-radius: 3px;
+}
+form#add-contrib .hover {
+	background-color: #eef;
+}
