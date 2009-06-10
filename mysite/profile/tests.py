@@ -52,4 +52,9 @@ class ProfileTests(django.test.TestCase):
         # twill session
         tc.find('Babel')
 
+        # Verify that leaving and coming back has it still
+        # there
+        tc.go(make_twill_url(url))
+        tc.find('Babel')
+
 

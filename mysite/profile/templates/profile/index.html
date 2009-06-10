@@ -4,14 +4,19 @@
   <input type='text' name='url'></input>
 </form>
 
-<p>You submitted this information:</p>
+{% if saved_data %}
+<p>You have contributed to the following projects:</p>
 <ul>
+{% for datum in saved_data %}
   <li>
-    {{ project }}
+    {{ datum.project }}
   </li><li>
-    {{ url }} 
+    {{ datum.url }}
   </li></li>
-    {{ contrib_text }}
+    {{ datum.contrib_text }}
   </li>
+{% endfor %}
 </ul>
+{% endif %}
+
 

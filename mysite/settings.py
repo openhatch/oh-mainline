@@ -79,6 +79,9 @@ TEMPLATE_DIRS = (
 
 STATIC_DOC_ROOT = 'static/'
 
+# Sessions in /tmp
+SESSION_ENGINE="django.contrib.sessions.backends.file"
+
 INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -90,3 +93,4 @@ INSTALLED_APPS = (
     'south',
     'profile',
 )
+
