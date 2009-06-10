@@ -1,0 +1,126 @@
+.gewgaws.box {
+	padding-right: 0;
+	padding-bottom: 0;
+}
+.gewgaws ul {
+	margin: 0;
+	padding: 0;
+	float: left;
+}
+.gewgaws li {
+	overflow: hidden;
+	-moz-border-radius: .3em;
+	letter-spacing: 0px;
+	font-size: 100%;
+	float: left;
+	list-style: none;
+	border: 1px solid #ccf;
+	background-color: #fff;
+	margin-top: 3px;
+	height: 4.3em;
+	white-space: nowrap;
+	width: 80%;
+}
+.gewgaws li {
+	margin: 5px 0;
+}
+.gewgaws li .age {
+	float: left;
+	padding: .3em .7em;
+	width: 71px;
+	text-align: right;
+}
+.gewgaws li .details {
+	border-top: 1px solid #ccf;
+	padding: .3em .7em;
+	padding-top: 0;
+	font-size: 90%;
+	background-color: #eef;
+	clear: left;
+}
+.gewgaws li .details .fields {
+}
+.gewgaws li.expanded .details .fields {
+	display: block;
+}
+.gewgaws li label {
+	color: #777;
+}
+.gewgaws li .field {
+	width: 33%;
+	margin-top: .3em;
+}
+.gewgaws li.expanded {
+	height: auto;
+	white-space: normal;
+}
+.gewgaws li .tags {
+	float: left;
+	padding: .3em .7em;
+	width: 30%;
+	min-width: 100px;
+}
+.gewgaws li .title {
+	font-size: 110%;
+	padding: .3em;
+}
+.gewgaws li.expanded .title {
+	font-weight: bold;
+}
+.gewgaws li.expanded .description {
+	color: #000;
+	overflow: normal;
+}
+.gewgaws li.expanded .description.pre {
+	white-space: pre;
+	font-family: monospace;
+	font-size: 125%;
+}
+.gewgaws li .logo {
+	vertical-align: middle;
+}
+.gewgaws li .first-line {
+	cursor: hand;
+	cursor: pointer;
+	border-bottom: 1px dotted #ccf;
+	padding: .3em;
+}
+.gewgaws .tag-details {
+	display: none;
+}
+.gewgaws li.expanded .tag-details {
+	display: block;
+}
+.gewgaws li.lit-up .first-line a {
+	font-weight: bold;
+}
+.gewgaws li .second-line {
+	display: block;
+	float: left;
+}
+.gewgaws li .show-details {
+	padding: .3em .7em;
+	float: left;
+	width: 71px;
+	text-align: right;
+}
+.gewgaws li.expanded .second-line {
+	padding: 0;
+}
+.gewgaws li .left {
+	white-space: nowrap;
+	overflow: hidden;
+}
+.gewgaws li .description {
+	float: left;
+	/*
+	width: 445px;
+	width: 400px;
+	*/
+	padding: .3em .7em;
+	color: #888;
+	/*
+	float: left;
+	*/
+	overflow: hidden;
+}
