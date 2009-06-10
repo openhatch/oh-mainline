@@ -4,6 +4,7 @@ $.fn.toggleText = function(text1, text2) {
 }
 // Return the available content height space in browser window
 
+// FIXME: This doesn't handle a bottom scrollbar well.
 $.viewportHeight = function() { var h = 0; if (typeof(window.innerHeight) == "number") { h = window.innerHeight; } else { if (document.documentElement && document.documentElement.clientHeight) { h = document.documentElement.clientHeight; } else { if (document.body && document.body.clientHeight) { h = document.body.clientHeight; } } } return h; }
 
 $.fn.scrollIntoView = function() {
@@ -143,7 +144,7 @@ $(document).ready(function() {
 });
 
 Opps = {
-    'oppsQueryURL': "http://localhost:8000/search/?",
+    'oppsQueryURL': "/search/?",
     '$oppsDOMList': $('#opps ul'),
     'getLitOppIndex': function() {
         // FIXME: Remember the index of the lit opp in Javascript,
