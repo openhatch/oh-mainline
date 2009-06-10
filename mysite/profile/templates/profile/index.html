@@ -38,11 +38,9 @@
         <h1 class='name'>{{ person.name.full }}</h1>
 
         <h2>Experience</h2>
-
 		<div class='section'>
 			<h3>Log some experience we didn't find</h3>
-			<form id='add-contrib' name='add_contrib' action=''>
-
+        <form id='add-contrib' name='add_contrib' method='POST' action='/profile/add_contribution'>
           <label for='project-name'>Project name: </label>
           <input id='contrib-project-name' type='text' name='project'/>
 
