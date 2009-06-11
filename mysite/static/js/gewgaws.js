@@ -176,4 +176,4 @@ Gewgaws = {
   }
 }
 
-/* vim:set sw=2 ts=2 expandtab: */
+/* vim: ai ts=4 sts=4 et sw=4 */

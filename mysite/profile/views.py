@@ -22,3 +22,4 @@ def add_contribution(request):
         request.session['saved_data'] = saved
     return HttpResponseRedirect('/profile/')
 
+# vim: ai ts=4 sts=4 et sw=4

@@ -86,4 +86,4 @@ def bugs_to_json_response(bunch_of_bugs, callback_function_name=''):
 def index(request):
     return render_to_response('search/index.html')
     
-# vim: set ts=4 sw=4 expandtab:
+# vim: set ai ts=4 sw=4 et:

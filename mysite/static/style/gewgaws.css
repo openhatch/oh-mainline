@@ -32,7 +32,6 @@ ul.gewgaws#opps {
 	margin: 5px 0;
 }
 .gewgaws li .age {
-	float: left;
 	padding: .3em .7em;
 	width: 71px;
 	text-align: right;
@@ -131,3 +130,5 @@ ul.gewgaws#opps {
 	*/
 	overflow: hidden;
 }
+
+/* vim: ai ts=4 sts=4 et sw=4 */
