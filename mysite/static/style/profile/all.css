@@ -1,24 +1,24 @@
 ul.gewgaws.experience {
 }
 form#add-contrib label {
-	width: 200px;
-	margin-right: 10px;
-	padding: 5px;
-	text-align: right;
-	clear: left;
-	float: left;
+    width: 200px;
+    margin-right: 10px;
+    padding: 5px;
+    text-align: right;
+    clear: left;
+    float: left;
 }
 form#add-contrib input[type='text'],
 form#add-contrib textarea {
-	float: left;
-	width: 300px;
-	font: 100% Arial;
-	padding: 5px;
-	border: 1px solid #ccf;
-	-moz-border-radius: 3px;
+    float: left;
+    width: 300px;
+    font: 100% Arial;
+    padding: 5px;
+    border: 1px solid #ccf;
+    -moz-border-radius: 3px;
 }
 form#add-contrib .hover {
-	background-color: #eef;
+    background-color: #eef;
 }
 
-/* vim: ai ts=4 sts=4 et sw=4 */
+/* vim: set ai ts=4 sts=4 et sw=4: */

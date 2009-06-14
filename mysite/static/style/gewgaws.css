@@ -69,6 +69,7 @@ ul.gewgaws#opps {
 .gewgaws li .title {
 	font-size: 110%;
 	padding: .3em;
+	float: left;
 }
 .gewgaws li.expanded .title {
 	font-weight: bold;

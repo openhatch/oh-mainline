@@ -1,123 +1,124 @@
 body {
-	font: .85em/130% Arial, "Bitstream Vera Sans", "Lucida Grande", Verdana, Arial, sans-serif;
-	background-color: #f4f4bc;
-	background-color: #eef;
+    font: .85em/130% Arial, "Bitstream Vera Sans", "Lucida Grande", Verdana, Arial, sans-serif;
+    background-color: #f4f4bc;
+    background-color: #eef;
+    background-color: #d2e6df;
 }
 h1, h2, h3, h4, h5 {
-	font-family: Trebuchet MS;
-	font-weight: normal;
-	margin: 0;
+    font-family: Trebuchet MS;
+    font-weight: normal;
+    margin: 0;
 }
 #banner {
-	color: #446; #b5c200; 9cc200; #ff6e57;
-	font: bold 23pt Tuffy;
-	margin: 10px 0;
-	text-align: center;
+    color: #446; #b5c200; 9cc200; #ff6e57;
+    font: bold 23pt Tuffy;
+    margin: 10px 0;
+    text-align: center;
 }
 a {
-	color: #447; #379;
-	text-decoration: none;
+    color: #447; #379;
+    text-decoration: none;
 }
 h1 {
-	font-size: 150%;
+    font-size: 150%;
 }
 #wrapper-outer {
-	margin: 0 auto;
-	max-width: 1100px;
+    margin: 0 auto;
+    max-width: 1100px;
 }
 #wrapper-inner {
 }
 #content {
-	background-color: #fff;
-	padding: 1.5%;
-	border: 1px solid #d2e6df;
-	-moz-border-radius: 10px;
-	float: left;
+    background-color: #fff;
+    padding: 1.5%;
+    border: 1px solid #d2e6df;
+    -moz-border-radius: 10px;
+    float: left;
 }
 .no-opps {
-	border: 1px solid #d2e6df;
-	background-color: #eef;
-	color: #222;
-	padding: 10px;
-	font-size: 130%;
-	line-height: 130%;
-	width: 100%;
-	margin-top: 20px;
-	-moz-border-radius: 10px;
+    border: 1px solid #d2e6df;
+    background-color: #eef;
+    color: #222;
+    padding: 10px;
+    font-size: 130%;
+    line-height: 130%;
+    width: 100%;
+    margin-top: 20px;
+    -moz-border-radius: 10px;
 }
 #heading {
-	margin: 20px 0 10px 0;
+    margin: 20px 0 10px 0;
 }
 .box {
-	float: left;
-	background-color: #fff;
-	margin-bottom: 30px;
+    float: left;
+    background-color: #fff;
+    margin-bottom: 30px;
 }
 .box h2 {
-	font-size: 100%;
-	font-weight: bold;
-	color: #446; #b5c200; 9cc200; #ff6e57;
-	margin-bottom: 5px;
+    font-size: 100%;
+    font-weight: bold;
+    color: #446; #b5c200; 9cc200; #ff6e57;
+    margin-bottom: 5px;
 }
 .box .content {
 }
 #sidebar {
-	float: left;
-	width: 20%;
-	max-width: 200px;
-	min-width: 100px;
-	margin-left: 20px;
+    float: left;
+    width: 20%;
+    max-width: 200px;
+    min-width: 100px;
+    margin-left: 20px;
 }
 #main {
-	width: 80%;
-	float: left;
+    width: 80%;
+    float: left;
 }
 #main .box {
-	float: left;
+    float: left;
 }
 #projects table {
-	padding: 0;
-	border-spacing: 0;
+    padding: 0;
+    border-spacing: 0;
 }
 #projects td {
-	padding: 0 5px 3px 0;
+    padding: 0 5px 3px 0;
 }
 #add-another-bug-tracker {
 }
 #sidebar .box {
-	width: 100%;
+    width: 100%;
 }
 li {
-	list-style: square;
+    list-style: square;
 }
 p {
-	margin: 0;
+    margin: 0;
 }
 .yes img {
-	width: 15px;
-	vertical-align: -10%;
+    width: 15px;
+    vertical-align: -10%;
 }
 :focus {
-	-moz-outline-style: none;
-	outline: none;
+    -moz-outline-style: none;
+    outline: none;
 }
 a:focus {
-	text-decoration: underline;
+    text-decoration: underline;
 }
 .separator {
-	color: #aaa;
+    color: #aaa;
 }
 #opp-nav {
 
 }
 .project-info {
-	width: 20%;
-	/*
-	min-width: 150px;
-	max-width: 200px;
-	*/
+    width: 20%;
+    /*
+    min-width: 150px;
+    max-width: 200px;
+     */
 }
 .logo {
 }
 
-/* vim: ai ts=4 sts=4 et sw=4 */
+/* vim: set ai ts=4 sts=4 et sw=4: */
