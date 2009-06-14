@@ -9,7 +9,7 @@
     <meta name='Description' content=''>
     <style> /*<![CDATA[*/
       @import url('/static/style/all.css');
-      @import url('/static/style/gewgaws.css');
+      /*@import url('/static/style/gewgaws.css');*/
       /*]]>*/
     </style>
     <!--[if IE]><style>/*<![CDATA[*/@import url('../style/ie/all.css');/*]]>*/</style><![endif]-->
@@ -31,7 +31,21 @@
     <div id='images'></div>
     <div id='wrapper-outer'>
       <div id='wrapper-inner'>
-        <h2 id='banner'>OpenHatch &alpha;</h2>
+        <h2 id='banner'><img alt='OpenHatch' src='/static/images/openhatch2.png'/></h2>
+        <div id='explanation'>
+          <div class='explanation-heading'><h3 id=''>Code; feel good.</h3></div>
+          <p> Thank you for visiting OpenHatch. <strong>We help people who write code find jobs and volunteer opportunities.</strong></p>
+
+          <p>Here you can <strong>find gigs</strong>, and <strong>pimp out your professional profile</strong> with real data.</p>
+
+          <div class='explanation-heading'><h3 id=''>Questions we ask ourselves frequently</h3></div>
+
+          <p><strong>Q: Why are you doing this?</strong> A: We support software freedom and want to give software authors another excuse to work on free and open source software &mdash; it'll help you find a job.</p>
+          
+          <p><strong>Q: How will you make money?</strong> A: We will eventually charge fee for job postings. Right now the service is free of cost for everybody.</p>
+
+          <p><strong>Q: Is this a fun website, or a serious website?</strong> A: We hope we don't have to choose. We apologize in advance if some relatively serious matters (like job hunting) are treated here with  atypical whimsy.</p>
+        </div>
         <div id='content'>
           <div id='main'>
             <div id='opps' class='gewgaws box'>
@@ -68,6 +82,12 @@
                 <ul>
                   {% for bug in bunch_of_bugs %}
                   <li class='bug'>
+                  <!--div class='project-info'>
+                    <img class='logo' src='{{ bug.project.icon_url }}' />
+                    <span class='project'>
+                      {{ bug.project.name }}
+                    </span>
+                  </div-->
                   <div class='first-line'>
                       <a class='title' href='BUG_LINK'>{{ bug.title }}</a>
                       <div class='age'>3 days old</div>
@@ -107,15 +127,9 @@
                       <span class='field last-polled'>
                         <label>Last polled: </label>
                         <span class='value'>3 days ago</span>
-                        <a href=''>poll now</a>
+                        <!--a href=''>poll now</a-->
                       </span>
                     </div>
-                  </div>
-                  <div class='project-info'>
-                    <img class='logo' src='{{ bug.project.icon_url }}' />
-                    <span class='project'>
-                      {{ bug.project.name }}
-                    </span>
                   </div>
                   </li>
                   {% endfor %}
