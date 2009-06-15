@@ -99,7 +99,7 @@ def request_jquery_autocompletion_suggestions(request):
 
     suggestions = get_autocompletion_suggestions(partial_query)
     #return list_to_jquery_autocompletion_format(suggestions)
-    return suggestions
+    return HttpResponse(suggestions)
 
 def list_to_jquery_autocompletion_format(list):
     """Converts a list to the format required by
@@ -170,7 +170,7 @@ def get_autocompletion_suggestions(partial_query):
             # Add prefix and convert to string.
             suggestions += ("\n%s" + "\n%s".join(langs)) % (fields['language']['prefix'] + separator)
 
-    return HttpResponse(suggestions)
+    return suggestions
 
 """
 Ways we could do autocompletion:
