@@ -1,5 +1,5 @@
 body {
-    font: 1em/130% Arial, "Bitstream Vera Sans", "Lucida Grande", Verdana, Arial, sans-serif;
+    font: .85em/130% Arial, "Bitstream Vera Sans", "Lucida Grande", Verdana, Arial, sans-serif;
     background-color: #f4f4bc;
     background-color: #eef;
     background-color: #d8f171; #fcffd9;
@@ -41,7 +41,7 @@ h1, h2, h3, h4, h5 {
     margin-bottom: 15px;
 }
 a {
-    color: #ce1836; #59baa9; #446; #379;
+    color: #222; #ce1836; #59baa9; #446; #379;
     text-decoration: none;
 }
 h1 {
@@ -58,7 +58,7 @@ h1 {
     width: 800px;
     padding: 20px;
     /*border: 5px solid #59baa9; #656273; #d2e6df;*/
-    -moz-border-radius: 10px;
+    /*-moz-border-radius: 10px;*/
     /*
     border-style: solid;
     border-width: 1px;
@@ -90,6 +90,12 @@ h1 {
     margin-bottom: 5px;
 }
 .box .content {
+}
+#results-widget {
+    padding: 12px;
+    padding-bottom: 6px;
+    float: left;
+    width: 500px;
 }
 #sidebar {
     float: left;
@@ -139,19 +145,26 @@ p {
     float: left;
 }
 #opps li {
+    border: solid #ffcaa9;
+    border-width: 0 0 0 6px; 
     overflow: hidden;
-    -moz-border-radius: .3em;
     letter-spacing: 0px;
     font-size: 100%;
     float: left;
     list-style: none;
-    border: 1px solid #ccf; #a3a948; ccf;
-    background-color: #fff;
     width: 555px;
     margin-top: 3px;
-    height: 4.1em;
+    height: 56px;
     white-space: nowrap;
 }
+#opps li.odd {
+    border-color: #ff94ad; 
+}
+/*
+#opps li.odd.lit-up {
+    border-color: #ce1836;
+}
+    */
 #opps li {
     margin: 5px 0;
 }
@@ -163,11 +176,11 @@ p {
     color: #888;
 }
 #opps li .details {
-    border-top: 1px solid #ccf;
+    /*border-top: 1px solid #ccf;*/
     padding: .3em .7em;
     padding-top: 0;
     float: left;
-    font-size: 80%;
+    font-size: 13px;
     background-color: #eef;
 }
 #opps li .details .fields {
@@ -196,14 +209,16 @@ p {
     float: left;
 }
 #opps li .title {
+    font-size: 17px;
     float: left;
-    padding: .3em .7em;
+    padding: 5px 10px;
+    width: 435px;
+    overflow: hidden;
 }
 #opps li.expanded .title {
-    font-weight: bold;
 }
 #opps li.expanded .description {
-    width: 437px;
+    width: 467px;
     /*border-right: 1px dotted #ccf;*/
     color: #000;
     float: left;
@@ -227,7 +242,7 @@ p {
     cursor: hand;
     width: 100%;
     cursor: pointer;
-    border-bottom: 1px dotted #ccf;
+    /*border-bottom: 1px dotted #ccf;*/
 }
 #opps .tag-details {
     display: none;
@@ -235,8 +250,8 @@ p {
 #opps li.expanded .tag-details {
     display: block;
 }
-#opps li.lit-up .first-line a {
-    font-weight: bold;
+#opps li.lit-up {
+    border-color: #777; #f85931;
 }
 #opps li .second-line {
     display: block;
@@ -280,6 +295,35 @@ a:focus {
 .project-info {
     float: left;
     padding: .3em .7em;
+}
+#opps form {
+    float: left;
+    width: 500px;
+}
+#opps form input[type='text'] {
+    border: none;
+    background-color: #caffff; 
+    font-size: 19px;
+    font-family: Arial;
+    padding: 9px;
+    padding-top: 10px;
+    color: #222;
+}
+#opps form input[type='submit'] {
+    border: none;
+    background-color: #caffff; 
+    font-size: 19px;
+    font-family: Arial;
+    padding: 9px;
+    color: #222;
+}
+#opps form label {
+    float: left;
+    background-color: #caffff; 
+    font-size: 19px;
+    font-family: Arial;
+    padding: 12px;
+    color: #666; #656273; b2c3be; 777;
 }
 
 /* vim: set ai ts=4 sts=4 et sw=4: */

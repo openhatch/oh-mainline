@@ -41,56 +41,58 @@
           <div class='explanation-heading'><h3 id=''>Questions we ask ourselves frequently</h3></div>
 
           <p><strong>Q: Why are you doing this?</strong> A: We support software freedom and want to give software authors another excuse to work on free and open source software &mdash; it'll help you find a job.</p>
-          
+
           <p><strong>Q: How will you make money?</strong> A: We will eventually charge fee for job postings. Right now the service is free of cost for everybody.</p>
 
-          <p><strong>Q: Is this a fun website, or a serious website?</strong> A: We hope we don't have to choose. We apologize in advance if some relatively serious matters (like job hunting) are treated here with  atypical whimsy.</p>
+          <p><strong>Q: Is this a fun website, or a serious website?</strong> A: We hope we don't have to choose. We apologize in advance if some relatively serious matters, like job hunting, are treated here with  atypical whimsy.</p>
         </div>
         <div id='content'>
           <div id='main'>
             <div id='opps' class='gewgaws box'>
               <form name='search_opps' method='get'> 
-                <h2>Search open tasks</h2>
+                <h3><label for='language'>Search tasks</label></h3>
                 <input type='text'
                 name='language' id='language'
                 value='{{ language }}' />
-                <input type='submit' id='button' />
+                <input type='submit' id='button' value='GO' />
               </form>
               <div class='content'>
-                <span id='results-summary'>
-                  Search: <span id='results-summary-language'>{{ language }}</span>
+                <div id='results-widget'>
+                  <span id='results-summary'>
+                    <span id='results-summary-language'>{{ language }}</span>
 
-                  {% if bunch_of_bugs %}
-                  Showing results 
-                  <span id='results-summary-start'>{{ start }}</span>
-                  to
-                  <span id='results-summary-end'>{{ end }}</span>.
-                  {% endif %}
-                </span>
+                    {% if bunch_of_bugs %}
+                    Showing results 
+                    <span id='results-summary-start'>{{ start }}</span>
+                    to
+                    <span id='results-summary-end'>{{ end }}</span>.
+                    {% endif %}
+                  </span>
 
-                <span class='separator'>&ndash;</span>
+                  <span class='separator'>&nbsp;</span>
 
-                <span id='navigation'>
-                  <a href='{{ prev_page_url }}' id='prev-page'>&laquo; Prev</a>
-                  <span class='separator'>&ndash;</span>
-                  <a href='{{ next_page_url }}' id='next-page'>Next page &raquo;</a>
-                  <span class='separator'>&ndash;</span>
-                  <a href='EXPAND_ALL_URL' id='expand-all-link'>Expand all</a>
-                  <a href='COLLAPSE_ALL_URL' id='collapse-all-link'>Collapse all</a>
-                </span> 
+                  <span id='navigation'>
+                    <a href='{{ prev_page_url }}' id='prev-page'>&laquo; Prev</a>
+                  <span class='separator'>&nbsp;</span>
+                    <a href='{{ next_page_url }}' id='next-page'>Next page &raquo;</a>
+                  <span class='separator'>&nbsp;</span>
+                    <a href='EXPAND_ALL_URL' id='expand-all-link'>Expand all</a>
+                    <a href='COLLAPSE_ALL_URL' id='collapse-all-link'>Collapse all</a>
+                </span> </div>
                 {% if bunch_of_bugs %}
                 <ul>
                   {% for bug in bunch_of_bugs %}
-                  <li class='bug'>
+                  <li class='bug {% cycle "even" "odd"%}'>
                   <!--div class='project-info'>
-                    <img class='logo' src='{{ bug.project.icon_url }}' />
-                    <span class='project'>
-                      {{ bug.project.name }}
-                    </span>
+                  <img class='logo' src='{{ bug.project.icon_url }}' />
+                  <span class='project'>
+                    {{ bug.project.name }}
+                  </span>
                   </div-->
                   <div class='first-line'>
-                      <a class='title' href='BUG_LINK'>{{ bug.title }}</a>
-                      <div class='age'>3 days old</div>
+                    <a class='title' href='BUG_LINK'>⇕ {{ bug.title }}</a>
+                    <!--div class='toggle-details'>⇕</div-->
+                    <div class='age'>3 days old</div>
                     <!--a href='BUG_LINK' class='show-details'>details</a-->
                   </div>
                   <div class='second-line'>
