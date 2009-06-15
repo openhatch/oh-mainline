@@ -8,18 +8,25 @@
     <meta http-equiv='Content-Style-Type' content='text/css' />
     <meta name='Description' content=''>
     <style> /*<![CDATA[*/
-      @import url('/static/style/all.css');
-      /*@import url('/static/style/gewgaws.css');*/
+      @import url('/static/css/all.css');
+      @import url('/static/css/jquery.autocomplete.css');
+      /*@import url('/static/css/gewgaws.css');*/
       /*]]>*/
     </style>
-    <!--[if IE]><style>/*<![CDATA[*/@import url('../style/ie/all.css');/*]]>*/</style><![endif]-->
-    <!--[if lte IE 6]><style>/*<![CDATA[*/@import url('../style/ie/6-/all.css');/*]]>*/</style><![endif]-->
-    <!--[if gte IE 7]><style>/*<![CDATA[*/@import url('../style/ie/7+/all.css');/*]]>*/</style><![endif]-->
+    <!--[if IE]><style>/*<![CDATA[*/@import url('../css/ie/all.css');/*]]>*/</style><![endif]-->
+    <!--[if lte IE 6]><style>/*<![CDATA[*/@import url('../css/ie/6-/all.css');/*]]>*/</style><![endif]-->
+    <!--[if gte IE 7]><style>/*<![CDATA[*/@import url('../css/ie/7+/all.css');/*]]>*/</style><![endif]-->
     <script src='/static/js/jquery.js'></script>
     <!-- by jove I love jQuery plugins ~ rkl -->
     <script src='/static/js/jquery.query.js'></script>
     <script src='/static/js/jquery.hotkey.js'></script>
+    {% comment %}
+    FIXME: If user has shortcuts off, don't load jquery.hotkey.js
+    {% endcomment %}
     <script src='/static/js/jquery.scrollTo.js'></script>
+    <script src='/static/js/jquery.bgiFrame.js'></script>
+    <script src='/static/js/jquery.ajaxQueue.js'></script>
+    <script src='/static/js/jquery.autocomplete.js'></script>
     <script>
       thisstart = {{ start }};
       thisend = {{ end }};
@@ -33,18 +40,35 @@
       <div id='wrapper-inner'>
         <h2 id='banner'><img alt='OpenHatch' src='/static/images/openhatch2.png'/></h2>
         <div id='explanation'>
-          <div class='explanation-heading'><h3 id=''>Code; feel good.</h3></div>
-          <p> Thank you for visiting OpenHatch. <strong>We help people who write code find jobs and volunteer opportunities.</strong></p>
+          <div class='explanation-heading'><h3 id=''>Write code; feel good.</h3></div>
+          <p> Thank you for visiting OpenHatch.
+          <strong>We help people who write code find jobs
+            and volunteer opportunities.</strong></p>
 
-          <p>Here you can <strong>find gigs</strong>, and <strong>pimp out your professional profile</strong> with real data.</p>
+          <p>Here you can <strong>find gigs</strong>, and
+          <strong>pimp out your professional profile</strong>
+          with real data.</p>
 
-          <div class='explanation-heading'><h3 id=''>Questions we ask ourselves frequently</h3></div>
+          <div class='explanation-heading'>
+            <h3 id=''>Questions we ask ourselves frequently</h3>
+          </div>
 
-          <p><strong>Q: Why are you doing this?</strong> A: We support software freedom and want to give software authors another excuse to work on free and open source software &mdash; it'll help you find a job.</p>
+          <p><strong>Q: Why are you doing this?</strong>
+          A: We support software freedom and want to give
+          software authors another excuse to work on free
+          and open source software &mdash; it'll help you
+          find a job.</p>
 
-          <p><strong>Q: How will you make money?</strong> A: We will eventually charge fee for job postings. Right now the service is free of cost for everybody.</p>
+          <p><strong>Q: How will you make money?</strong>
+          A: We will eventually charge fee for job postings.
+          Right now the service is free of cost for everybody.</p>
 
-          <p><strong>Q: Is this a fun website, or a serious website?</strong> A: We hope we don't have to choose. We apologize in advance if some relatively serious matters, like job hunting, are treated here with  atypical whimsy.</p>
+          <p><strong>Q: Is this a fun website, or a serious
+            website?</strong> A: We hope we don't have to
+          choose. We apologize in advance if some relatively
+          serious matters, job hunting for instance, are
+          treated here with atypical whimsy.</p>
+
         </div>
         <div id='content'>
           <div id='main'>
@@ -90,14 +114,16 @@
                   </span>
                   </div-->
                   <div class='first-line'>
-                    <a class='title' href='BUG_LINK'>⇕ {{ bug.title }}</a>
+                    <a class='title' href='BUG_LINK'>⇕ <span>{{ bug.title }}</span></a>
                     <!--div class='toggle-details'>⇕</div-->
                     <div class='age'>3 days old</div>
                     <!--a href='BUG_LINK' class='show-details'>details</a-->
                   </div>
                   <div class='second-line'>
                     <span class='description'>
+                      {% autoescape off %}
                       {{ bug.description }}
+                      {% endautoescape %}
                     </span>
                   </div>
                   <div class='details'>

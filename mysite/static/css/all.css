@@ -223,6 +223,14 @@ p {
     color: #000;
     float: left;
     overflow: normal;
+    white-space: normal;
+}
+#opps li.expanded .description * {
+    white-space: normal;
+    display: inherit;
+}
+#opps li .description p {
+    margin-top: 5px;
 }
 #opps li.expanded .description.pre {
     white-space: pre;
@@ -251,7 +259,10 @@ p {
     display: block;
 }
 #opps li.lit-up {
-    border-color: #777; #f85931;
+    /*border-color: #777; #f85931;*/
+}
+#opps li.lit-up .title span {
+    background-color: #ffffa6;
 }
 #opps li .second-line {
     display: block;
@@ -278,13 +289,16 @@ p {
     color: #888;
     float: left;
     overflow: hidden;
+    white-space: nowrap;
+}
+#opps li .description * {
+    display: inline;
 }
 :focus {
     -moz-outline-style: none;
     outline: none;
 }
 a:focus {
-    text-decoration: underline;
 }
 .separator {
     color: #aaa;
@@ -300,9 +314,19 @@ a:focus {
     float: left;
     width: 500px;
 }
+#opps form label {
+    border: solid #d6ffde;
+    border-width: 0 0 0 6px;
+    float: left;
+    background-color: #fff;
+    font-size: 19px;
+    font-family: Arial;
+    padding: 12px;
+    color: #666; #656273; b2c3be; 777;
+}
 #opps form input[type='text'] {
     border: none;
-    background-color: #caffff; 
+    background-color: #d6ffde; 777;
     font-size: 19px;
     font-family: Arial;
     padding: 9px;
@@ -311,19 +335,11 @@ a:focus {
 }
 #opps form input[type='submit'] {
     border: none;
-    background-color: #caffff; 
+    background-color: #fff;
     font-size: 19px;
     font-family: Arial;
     padding: 9px;
     color: #222;
-}
-#opps form label {
-    float: left;
-    background-color: #caffff; 
-    font-size: 19px;
-    font-family: Arial;
-    padding: 12px;
-    color: #666; #656273; b2c3be; 777;
 }
 
 /* vim: set ai ts=4 sts=4 et sw=4: */
