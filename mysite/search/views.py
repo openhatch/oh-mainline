@@ -90,8 +90,8 @@ def index(request):
 
 def request_jquery_autocompletion_suggestions(request):
 
-    partial_query = request.GET.get('q', False)
-    if not partial_query:
+    partial_query = request.GET.get('q', None)
+    if (partial_query is None) or (partial_query == ''):
         return HttpResponseServerError("Need partial_query in GET")
 
     # jQuery autocomplete also gives us this variable:
