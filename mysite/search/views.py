@@ -29,7 +29,8 @@ def fetch_bugs(request):
     bugs = Bug.objects.all()
 
     for word in query_words:
-        bugs = bugs.filter(Q(project__language=word) | Q(title__contains=word) | Q(description__contains=word))
+        bugs = bugs.filter(Q(project__language=word) | \
+                Q(title__contains=word) | Q(description__contains=word))
 
     bugs.order_by('last_touched')
 
@@ -43,7 +44,8 @@ def fetch_bugs(request):
         """
         b.description = b.description[:65] + "..."
         """
-        b.project.icon_url = "/static/images/icons/projects/%s.png" % b.project.name.lower()
+        b.project.icon_url = "/static/images/icons/projects/%s.png" % \
+                b.project.name.lower()
 
     if format == 'json':
         return bugs_to_json_response(bugs,
@@ -86,36 +88,87 @@ def bugs_to_json_response(bunch_of_bugs, callback_function_name=''):
 def index(request):
     return render_to_response('search/index.html')
 
-def get_autocompletion_suggestions(request):
+def request_jquery_autocompletion_suggestions(request):
 
     partial_query = request.GET.get('q', False)
-    if not partial_query: return HttpResponseServerError("Need partial_query in GET")
+    if not partial_query:
+        return HttpResponseServerError("Need partial_query in GET")
 
     # jQuery autocomplete also gives us this variable:
     # timestamp = request.GET.get('timestamp', None)
+
+    suggestions = get_autocompletion_suggestions(partial_query)
+    #return list_to_jquery_autocompletion_format(suggestions)
+    return suggestions
+
+def list_to_jquery_autocompletion_format(list):
+    """Converts a list to the format required by
+    jQuery's autocomplete plugin."""
+    return "\n".join(list)
+
+def get_autocompletion_suggestions(partial_query):
+    """
+    This method returns a list of suggested queries.
+    It checks the query substring against a number of
+    fields in the database:
+      - project.name
+      - project.language
+
+    Not yet implemented:
+      - libraries (frameworks? toolkits?) like Django
+    """
+
+    fields = {
+            'project': {'prefix': 'project'},
+            'language': {'prefix': 'lang'},
+            'dependency': {'prefix': 'dep'},
+            'library': {'prefix': 'lib'},
+            }
+    separator = ":"
+
+    for field in fields: fields[field]['is_queried'] = True
+
+    if partial_query.find(':') > 0:
+        prefix = partial_query.split(":")[0]
+        for field in fields:
+            if fields[field]['prefix'] == prefix:
+                fields[field]['is_queried'] = True
+        partial_query = partial_query.split(":")[1]
+    else:
+        for field in fields: fields[field]['is_queried'] = True
 
     project_max = 5
     lang_max = 5
 
     suggestions = ''
 
-    # Compile lists of searchable strings
-    projects_by_name = Project.objects.filter(name__istartswith=partial_query).values_list('name', flat=True)[:project_max]
-    # FIXME: Is __istartswith faster?
+    if fields['project']['is_queried']:
 
-    if (projects_by_name):
-        suggestions += ("%s" + "\n%s".join(projects_by_name)) % "project:"
+        # Compile list of projects
+        projects_by_name = Project.objects.filter(name__istartswith=partial_query)
+        project_names = projects_by_name.values_list('name', flat=True)
 
-    # For languages, get projects first
-    projects_by_lang = Project.objects.filter(language__istartswith=partial_query)
+        # Limit
+        project_names = project_names[:project_max]
+        # FIXME: Is __istartswith faster?
 
-    # Then use bugs to compile a list of languages.
-    langs = projects_by_lang.values_list('language', flat=True).order_by('language')[:lang_max]
+        # Add prefix and convert to string.
+        if (project_names):
+            project_str = "%s" + "\n%s".join(project_names)
+            suggestions += project_str % (fields['project']['prefix'] + separator)
 
-    if (langs):
-        suggestions += ("\n%s" + "\n%s".join(langs)) % "lang:"
+    if fields['language']['is_queried']:
 
-    # Add prefixes and make a string.
+        # For languages, get projects first
+        projects_by_lang = Project.objects.filter(language__istartswith=partial_query)
+
+        # Then use bugs to compile a list of languages.
+        langs = projects_by_lang.values_list('language', flat=True).order_by('language')[:lang_max]
+
+        if (langs):
+
+            # Add prefix and convert to string.
+            suggestions += ("\n%s" + "\n%s".join(langs)) % (fields['language']['prefix'] + separator)
 
     return HttpResponse(suggestions)
 
@@ -133,4 +186,4 @@ Ask server to give a list of projects and languages beginning with "c"
 Add top 100 fulltext words to the mix.
 """
     
-# vim: set ai ts=4 sw=4 et:
+# vim: set ai ts=4 sw=4 et columns=80:

@@ -133,7 +133,7 @@ $(document).ready(function() {
 
         url = "/search/get_autocompletion_suggestions";
         acOptions = {
-            'minChars': 0,
+            'minChars': 1,
             /*
             'extraParams': {
                 'partial_query': '',
