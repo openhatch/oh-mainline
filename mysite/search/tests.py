@@ -62,8 +62,8 @@ class AutoCompleteTests(django.test.TestCase):
         self.assert_('project:ComicChat' in c_suggestions)
 
     def testQueryNotFieldSpecificFindProject(self):
-        c_suggestions = search.views.get_autocompletion_suggestions('Micros')
-        self.assert_('project:MicrosoftComicChat' in c_suggestions)
+        c_suggestions = search.views.get_autocompletion_suggestions('Comi')
+        self.assert_('project:ComicChat' in c_suggestions)
 
     def testQueryFieldSpecific(self):
         lang_C_suggestions = search.views.get_autocompletion_suggestions(
