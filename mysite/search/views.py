@@ -167,7 +167,7 @@ def get_autocompletion_suggestions(partial_query):
 
         print sf_project.prefix
         print separator
-        print project_names[0]
+        print project_names
 
         suggestions += [sf_project.prefix + separator + name
                 for name in project_names]
@@ -182,8 +182,10 @@ def get_autocompletion_suggestions(partial_query):
 
         if langs:
 
-            suggestions += [sf_language.prefix + separator + name
-                    for name in project_names]
+            suggestions += [sf_language.prefix + separator + lang
+                    for lang in langs]
+
+    print partial_query + " gives " + str(suggestions)
 
     return suggestions
 
