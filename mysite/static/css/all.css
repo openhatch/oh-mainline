@@ -11,7 +11,6 @@ body {
     color: #3d2f25; 
 }
 h1, h2, h3, h4, h5 {
-    font-family: Trebuchet MS;
     font-weight: normal;
     margin: 0;
 }
@@ -320,7 +319,7 @@ a:focus {
     float: left;
     background-color: #fff;
     font-size: 19px;
-    font-family: Arial;
+    font-family: arial;
     padding: 12px;
     color: #666; #656273; b2c3be; 777;
 }
@@ -328,7 +327,7 @@ a:focus {
     border: none;
     background-color: #d6ffde; 777;
     font-size: 19px;
-    font-family: Arial;
+    font-family: arial;
     padding: 9px;
     padding-top: 10px;
     color: #222;
@@ -337,7 +336,7 @@ a:focus {
     border: none;
     background-color: #fff;
     font-size: 19px;
-    font-family: Arial;
+    font-family: arial;
     padding: 9px;
     color: #222;
 }

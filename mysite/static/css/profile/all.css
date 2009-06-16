@@ -1,24 +1,47 @@
 ul.gewgaws.experience {
 }
-form#add-contrib label {
-    width: 200px;
-    margin-right: 10px;
-    padding: 5px;
-    text-align: right;
+h3 {
+    float: left;
+    margin-bottom: 15px;
+}
+form {
     clear: left;
     float: left;
+    width: 500px;
 }
-form#add-contrib input[type='text'],
-form#add-contrib textarea {
+form label {
     float: left;
-    width: 300px;
-    font: 100% Arial;
-    padding: 5px;
-    border: 1px solid #ccf;
-    -moz-border-radius: 3px;
+    clear: left;
+    background-color: #fff;
+    font-size: 15px;
+    font-family: arial;
+    padding: 12px;
+    padding-left: 0;
+    width: 150px;
+    color: #666; #656273; b2c3be; 777;
 }
-form#add-contrib .hover {
-    background-color: #eef;
+form input[type='text'], textarea {
+    float: left;
+    border: none;
+    background-color: #ddd; #d6ffde; 777;
+    font-size: 15px;
+    font-family: arial;
+    padding: 9px;
+    padding-top: 10px;
+    color: #222;
+    width: 300px;
+}
+form input[type='submit'] {
+    border: none;
+    background-color: #fff;
+    font-size: 19px;
+    font-family: arial;
+    padding: 9px;
+    color: #222;
+    float: left;
+}
+input[type='text'].focus, textarea.focus {
+    background-color: #ddf;
 }
 
 /* vim: set ai ts=4 sts=4 et sw=4: */
