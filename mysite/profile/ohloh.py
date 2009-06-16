@@ -53,9 +53,10 @@ class Ohloh(object):
             raise ValueError, "Ohloh gave us back an error. Wonder why."
 
         # For each contributor fact, grab the project it was for
-        for c_f in root.find('contributor_fact'):
-            analysis_id = c_f.find('analysis_id')[0].text
-            ret.add(self.analysis2projectname(analysis_id))
+        for c_f in root.findall('result/contributor_fact'):
+            if c_f.find('analysis_id') is not None:
+                eyedee = int(c_f.find('analysis_id').text)
+                ret.add(self.analysis2projectname(eyedee))
         return ret
 
 _ohloh = Ohloh()
