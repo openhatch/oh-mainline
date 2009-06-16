@@ -78,4 +78,8 @@ class OmanTests(django.test.TestCase):
 
         tc.find('ccHost')
 
+class OhlohTests(django.test.TestCase):
+    def testFindByUsername(self):
+        import ohloh
+
 # vim: set ai et ts=4 sw=4:
