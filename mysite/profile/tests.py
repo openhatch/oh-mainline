@@ -16,14 +16,13 @@ from StringIO import StringIO
 def twill_setup():
     app = AdminMediaHandler(WSGIHandler())
     twill.add_wsgi_intercept("127.0.0.1", 8080, lambda: app)
-    
+
 def twill_teardown():
     twill.remove_wsgi_intercept('127.0.0.1', 8080)
 
 def make_twill_url(url):
     # modify this
-    return url.replace("http://openhatch.org/",
-                       "http://127.0.0.1:8080/")
+    return url.replace("http://openhatch.org/", "http://127.0.0.1:8080/")
 
 def twill_quiet():
     # suppress normal output of twill.. You don't want to
@@ -64,4 +63,19 @@ class ProfileTests(django.test.TestCase):
         tc.find('Babel')
         tc.find('Baber')
 
+class OmanTests(django.test.TestCase):
+    def setUp(self):
+        twill_setup()
 
+    def tearDown(self):
+        twill_teardown()
+
+    def testFormEnterYourUsername(self):
+        url = 'http://openhatch.org/profile/'
+        tc.go(make_twill_url(url))
+        tc.fv('free_software_username', 'username', 'paulproteus')
+        tc.submit()
+
+        tc.find('ccHost')
+
+# vim: set ai et ts=4 sw=4:
