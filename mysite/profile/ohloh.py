@@ -1,10 +1,14 @@
 API_KEY='JeXHeaQhjXewhdktn4nUw' # "Oman testing"
 
-def ohloh_url2data(url, selector):
+def ohloh_url2data(url, selector, params = {}):
+    my_params = {'api_key': API_KEY}
+    my_params.update(params)
+    params = my_params ; del my_params
+    
     ret = {}
     
-    params = urllib.urlencode({'api_key': API_KEY})
-    url += params
+    encoded = urllib.urlencode(params)
+    url += encoded
     tree = ET.parse(urllib.urlopen(url))
         
     # Did Ohloh return an error?
