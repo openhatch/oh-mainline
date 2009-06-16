@@ -95,7 +95,7 @@ INSTALLED_APPS = (
     'mysite.search',
     'django.contrib.admin',
     'windmill',
-#    'south',
+    'south',
     'profile',
 )
 

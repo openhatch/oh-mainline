@@ -61,7 +61,11 @@ class AutoCompleteTests(django.test.TestCase):
         self.assert_('lang:C++' in c_suggestions)
         self.assert_('project:ComicChat' in c_suggestions)
 
-    def testSuggestForSpecificField(self):
+    def testQueryNotFieldSpecificFindProject(self):
+        c_suggestions = search.views.get_autocompletion_suggestions('Comi')
+        self.assert_('project:ComicChat' in c_suggestions)
+
+    def testQueryFieldSpecific(self):
         lang_C_suggestions = search.views.get_autocompletion_suggestions(
                 'lang:C')
         self.assert_('lang:C++' in lang_C_suggestions)
