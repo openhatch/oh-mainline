@@ -80,9 +80,12 @@ class OmanTests(django.test.TestCase):
 
 import ohloh
 class OhlohTests(django.test.TestCase):
-    def testProjectNameById(self):
+    def testProjectDataById(self):
         oh = ohloh.get_ohloh()
-        self.assertEqual('ccHost', oh.project_id2projectname(15329))
+        data = oh.project_id2projectdata(15329)
+        self.assertEqual('ccHost', data['name'])
+        self.assertEqual('http://wiki.creativecommons.org/CcHost',
+                         data['homepage_url'])
         
     def testProjectNameByAnalysisId(self):
         oh = ohloh.get_ohloh()

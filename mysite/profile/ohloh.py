@@ -1,5 +1,23 @@
 API_KEY='JeXHeaQhjXewhdktn4nUw' # "Oman testing"
 
+def ohloh_url2data(url, selector):
+    ret = {}
+    
+    params = urllib.urlencode({'api_key': API_KEY})
+    url += params
+    tree = ET.parse(urllib.urlopen(url))
+        
+    # Did Ohloh return an error?
+    root = tree.getroot()
+    if root.find('error') is not None:
+        raise ValueError, "Ohloh gave us back an error. Wonder why."
+
+    interesting = root.find(selector)
+    for child in interesting.getchildren():
+        if child.text:
+            ret[unicode(child.tag)] = unicode(child.text, 'utf-8')
+    return ret
+
 from typecheck import accepts, returns
 from typecheck import Any as __
 
@@ -8,20 +26,10 @@ import sys, urllib, hashlib
 
 class Ohloh(object):
     @accepts(object, int)
-    @returns(unicode)
-    def project_id2projectname(self, project_id):
-        params = urllib.urlencode({'api_key': API_KEY})
+    def project_id2projectdata(self, project_id):
         url = 'http://www.ohloh.net/projects/%d.xml?' % project_id
-        url += params
-        tree = ET.parse(urllib.urlopen(url))
-        
-        # Did Ohloh return an error?
-        root = tree.getroot()
-        if root.find('error') is not None:
-            raise ValueError, "Ohloh gave us back an error. Wonder why."
-
-        # Otherwise, get the project name
-        return unicode(root.find('result/project/name').text)
+        data = ohloh_url2data(url, 'result/project')
+        return data
     
     @accepts(object, int)
     @returns(unicode)
@@ -38,7 +46,7 @@ class Ohloh(object):
 
         # Otherwise, get the project name
         proj_id = tree.find('result/analysis/project_id').text
-        return self.project_id2projectname(int(proj_id))
+        return self.project_id2projectdata(int(proj_id))['name']
         
     def get_contribution_info_by_username(self, username):
         ret = []
