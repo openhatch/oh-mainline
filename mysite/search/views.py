@@ -152,22 +152,25 @@ def get_autocompletion_suggestions(partial_query):
     project_max = 5
     lang_max = 5
 
-    suggestions = ''
+    suggestions = []
 
     if sf_project.is_queried:
 
         # Compile list of projects
-        projects_by_name = Project.objects.filter(name__istartswith=partial_query)
+        projects_by_name = Project.objects.filter(
+                name__istartswith=partial_query)
         project_names = projects_by_name.values_list('name', flat=True)
 
         # Limit
         project_names = project_names[:project_max]
         # FIXME: Is __istartswith faster?
 
-        # Add prefix and convert to string.
-        if (project_names):
-            project_str = "%s" + "\n%s".join(project_names)
-            suggestions += project_str % (fields['project']['prefix'] + separator)
+        print sf_project.prefix
+        print separator
+        print project_names[0]
+
+        suggestions += [sf_project.prefix + separator + name
+                for name in project_names]
 
     if sf_language.is_queried:
 
@@ -177,10 +180,10 @@ def get_autocompletion_suggestions(partial_query):
         # Then use bugs to compile a list of languages.
         langs = projects_by_lang.values_list('language', flat=True).order_by('language')[:lang_max]
 
-        if (langs):
+        if langs:
 
-            # Add prefix and convert to string.
-            suggestions += ("\n%s" + "\n%s".join(langs)) % (fields['language']['prefix'] + separator)
+            suggestions += [sf_language.prefix + separator + name
+                    for name in project_names]
 
     return suggestions
 
