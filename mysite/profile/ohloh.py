@@ -34,18 +34,11 @@ class Ohloh(object):
     @accepts(object, int)
     @returns(unicode)
     def analysis2projectname(self, analysis_id):
-        params = urllib.urlencode({'api_key': API_KEY})
         url = 'http://www.ohloh.net/analyses/%d.xml?' % analysis_id
-        url += params
-        tree = ET.parse(urllib.urlopen(url))
-
-        # Did Ohloh return an error?
-        root = tree.getroot()
-        if root.find('error') is not None:
-            raise ValueError, "Ohloh gave us back an error. Wonder why."
+        data = ohloh_url2data(url, 'result/analysis')
 
         # Otherwise, get the project name
-        proj_id = tree.find('result/analysis/project_id').text
+        proj_id = data['project_id']
         return self.project_id2projectdata(int(proj_id))['name']
         
     def get_contribution_info_by_username(self, username):
