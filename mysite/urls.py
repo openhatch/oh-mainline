@@ -13,6 +13,7 @@ urlpatterns = patterns('',
             {'document_root': settings.STATIC_DOC_ROOT}),
         (r'^profile/$', 'mysite.profile.views.index'),
         (r'^profile/add_contribution$', 'mysite.profile.views.add_contribution'),
+        (r'^profile/get_data_for_username$', 'mysite.profile.views.get_data_for_username'),
 
         # Get a list of suggestions for the search input, formatted the way that
         # the jQuery autocomplete plugin wants it.
