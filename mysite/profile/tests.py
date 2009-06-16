@@ -78,4 +78,22 @@ class OmanTests(django.test.TestCase):
 
         tc.find('ccHost')
 
+import ohloh
+class OhlohTests(django.test.TestCase):
+    def testProjectNameById(self):
+        oh = ohloh.get_ohloh()
+        self.assertEqual('ccHost', oh.project_id2projectname(15329))
+        
+    def testProjectNameByAnalysisId(self):
+        oh = ohloh.get_ohloh()
+        self.assertEqual('ccHost', oh.analysis2projectname(603185))
+
+    def testFindByUsername(self):
+        oh = ohloh.get_ohloh()
+        projects = oh.get_contribution_info_by_username('paulproteus')
+        self.assertEqual([{'project': u'ccHost',
+                           'man_months': 1,
+                           'primary_language': 'shell script'}],
+                         projects)
+
 # vim: set ai et ts=4 sw=4:
