@@ -40,8 +40,8 @@ class Ohloh(object):
         proj_id = tree.find('result/analysis/project_id').text
         return self.project_id2projectname(int(proj_id))
         
-    def get_project_set_by_username(self, username):
-        ret = set()
+    def get_contribution_info_by_username(self, username):
+        ret = []
         
         params = urllib.urlencode({'api_key': API_KEY, 'query': username})
         url = 'http://www.ohloh.net/contributors.xml?' + params
@@ -54,9 +54,16 @@ class Ohloh(object):
 
         # For each contributor fact, grab the project it was for
         for c_f in root.findall('result/contributor_fact'):
-            if c_f.find('analysis_id') is not None:
-                eyedee = int(c_f.find('analysis_id').text)
-                ret.add(self.analysis2projectname(eyedee))
+            eyedee_elt = c_f.find('analysis_id')
+            if eyedee_elt is None:
+                continue # this contributor fact is useless
+            eyedee = int(eyedee_elt.text)
+            this = dict(
+                project=self.analysis2projectname(eyedee),
+                primary_language=c_f.find('primary_language_nice_name').text,
+                man_months=int(c_f.find('man_months').text))
+            ret.append(this)
+
         return ret
 
 _ohloh = Ohloh()

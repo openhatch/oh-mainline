@@ -90,7 +90,10 @@ class OhlohTests(django.test.TestCase):
 
     def testFindByUsername(self):
         oh = ohloh.get_ohloh()
-        projects = oh.get_project_set_by_username('paulproteus')
-        self.assert_('ccHost' in projects)
+        projects = oh.get_contribution_info_by_username('paulproteus')
+        self.assertEqual([{'project': u'ccHost',
+                           'man_months': 1,
+                           'primary_language': 'shell script'}],
+                         projects)
 
 # vim: set ai et ts=4 sw=4:
