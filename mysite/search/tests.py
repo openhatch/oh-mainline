@@ -68,7 +68,7 @@ class AutoCompleteTests(django.test.TestCase):
         self.assert_('lang:Python' not in lang_C_suggestions)
         self.assert_('project:ComicChat' not in lang_C_suggestions)
 
-    def testSuggestsSomethingFormattedForJQueryAutocompletePlugin(self):
+    def testSuggestsCorrectStringsFormattedForJQueryAutocompletePlugin(self):
         suggestions_list = search.views.get_autocompletion_suggestions('')
         suggestions_string = search.views.list_to_jquery_autocompletion_format(
                 suggestions_list)
@@ -81,11 +81,11 @@ class AutoCompleteTests(django.test.TestCase):
         response = self.client.get( '/search/get_suggestions', {'q': 'C'})
         self.assertContains(response, "project:ComicChat\nlang:C++")
 
-    def testSuggestionFailsOnEmptyString(self):
+    def testSuggesterFailsOnEmptyString(self):
         response = self.client.get( '/search/get_suggestions', {'q': ''})
         self.assertEquals(response.status_code, 500)
 
-    def testSuggestionFailsWithImproperQueryString(self):
+    def testSuggesterFailsWithImproperQueryString(self):
         response = self.client.get( '/search/get_suggestions', {})
         self.assertEquals(response.status_code, 500)
 
