@@ -1,6 +1,7 @@
 import django.test
 from search.models import Project, Bug
 import search.views
+import datetime
 
 import twill
 from twill import commands as tc
@@ -39,25 +40,33 @@ class AutoCompleteTests(django.test.TestCase):
     """
 
     def setUp(self):
-        """
-        self.project_chat = Project.objects.create(name='Microsoft Comic Chat', language='C++')
+        self.project_chat = Project.objects.create(name='MicrosoftComicChat', language='C++')
         self.project_kazaa = Project.objects.create(name='Kazaa', language='Vogon')
-        self.bug_in_chat = Bug.objects.create(project=self.project_chat)
-        """
+        self.bug_in_chat = Bug.objects.create(project=self.project_chat,
+                people_involved=2,
+                date_reported=datetime.date(2009, 4, 1),
+                last_touched=datetime.date(2009, 4, 2),
+                last_polled=datetime.date(2009, 4, 2),
+                submitter_realname="Zaphod Beeblebrox",
+                submitter_username="zb",
+                canonical_bug_link="http://example.com/",
+                )
 
     def testInstantiateSuggestions(self):
         suggestions = search.views.get_autocompletion_suggestions('')
 
-    """
     def testQueryNotFieldSpecific(self):
-        response = c.post('/search/get_autocompletion_suggestions', {'q': 'C'})
-        self.assertEquals(response.status_code, 200)
+        suggestions = search.views.get_autocompletion_suggestions('C')
+        self.assertContains(lang_C_suggestions, 'lang:C++')
+        self.assertContains(lang_C_suggestions, 'project:MicrosoftComicChat')
+        self.assertNotContains(lang_C_suggestions, 'lang:Python')
 
     def testQueryFieldSpecific(self):
-        response = c.post('/search/get_autocompletion_suggestions', {'q': 'lang:C'})
-        lang_C_suggestions = get_autocompletion_suggestions("lang:py")
-        self.assertContains(lang_py_suggestions, 'lang:python')
-    """
+        lang_C_suggestions = search.views.get_autocompletion_suggestions(
+                'lang:C')
+        self.assertContains(lang_C_suggestions, 'lang:C++')
+        self.assertNotContains(lang_C_suggestions, 'lang:Python')
+        self.assertNotContains(lang_C_suggestions, 'project:MicrosoftComicChat')
 
 class NonJavascriptSearch(django.test.TestCase):
     fixtures = ['bugs-for-two-projects.json']

@@ -109,10 +109,10 @@ def list_to_jquery_autocompletion_format(list):
 class SearchableField:
     prefix = ''
     is_queried = False
-    all = []
-    def __init__(_prefix):
-        prefix = _prefix
-        all.append(self)
+    all_fields = []
+    def __init__(self, _prefix):
+        self.prefix = _prefix
+        self.all_fields.append(self)
 
 def get_autocompletion_suggestions(partial_query):
     """
@@ -138,14 +138,15 @@ def get_autocompletion_suggestions(partial_query):
 
     if separator in partial_query[1:-1]:
         prefix = partial_query.split(separator)[0]
-        for sf in SearchableField.all:
+        for sf in SearchableField.all_fields:
             if sf.prefix == prefix:
                 sf.is_queried = True
                 break
         partial_query = partial_query.split(separator)[1]
         print partial_query
     else:
-        for field in fields: fields[field]['is_queried'] = True
+        for sf in SearchableField.all_fields:
+            sf.is_queried = True
         print "querying everything"
 
     project_max = 5
@@ -153,7 +154,7 @@ def get_autocompletion_suggestions(partial_query):
 
     suggestions = ''
 
-    if fields['project']['is_queried']:
+    if sf_project.is_queried:
 
         # Compile list of projects
         projects_by_name = Project.objects.filter(name__istartswith=partial_query)
@@ -168,7 +169,7 @@ def get_autocompletion_suggestions(partial_query):
             project_str = "%s" + "\n%s".join(project_names)
             suggestions += project_str % (fields['project']['prefix'] + separator)
 
-    if fields['language']['is_queried']:
+    if sf_language.is_queried:
 
         # For languages, get projects first
         projects_by_lang = Project.objects.filter(language__istartswith=partial_query)
