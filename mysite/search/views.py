@@ -114,7 +114,7 @@ class SearchableField:
         self.prefix = _prefix
         self.all_fields.append(self)
 
-def get_autocompletion_suggestions(partial_query):
+def get_autocompletion_suggestions(input):
     """
     This method returns a list of suggested queries.
     It checks the query substring against a number of
@@ -136,18 +136,20 @@ def get_autocompletion_suggestions(partial_query):
 
     separator = ":"
 
-    if separator in partial_query[1:-1]:
-        prefix = partial_query.split(separator)[0]
+    if separator in input[1:-1]:
+        prefix = input.split(separator)[0]
         for sf in SearchableField.all_fields:
             if sf.prefix == prefix:
                 sf.is_queried = True
+                partial_query = input.split(separator)[1]
+                print "sf detected with prefix " + sf.prefix
+                print "partial_query" + partial_query
                 break
-        partial_query = partial_query.split(separator)[1]
-        print partial_query
     else:
+        print "querying everything"
         for sf in SearchableField.all_fields:
             sf.is_queried = True
-        print "querying everything"
+        partial_query = input
 
     project_max = 5
     lang_max = 5
@@ -173,6 +175,8 @@ def get_autocompletion_suggestions(partial_query):
                 for name in project_names]
 
     if sf_language.is_queried:
+
+        print "lang is queried."
 
         # For languages, get projects first
         projects_by_lang = Project.objects.filter(language__istartswith=partial_query)
