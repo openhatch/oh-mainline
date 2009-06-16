@@ -126,6 +126,8 @@ def get_autocompletion_suggestions(input):
       - search by date
     """
 
+    print "\n\ninput: " + input
+
     sf_project = SearchableField('project')
     sf_language = SearchableField('lang')
     sf_dependency = SearchableField('dep')
@@ -140,12 +142,17 @@ def get_autocompletion_suggestions(input):
     if separator in input[1:-1]:
         prefix = input.split(separator)[0]
         partial_query = input.split(separator)[1]
+        print "prefix = " + prefix
+        print "partial_query = " + partial_query
+        print "Input appears to contain prefix: %s" % prefix
         sf = SearchableField.fields_by_prefix.get(prefix, None)
         if sf is None:
             print "No SearchableField found with prefix: %s" % prefix
         else:
+            print "Setting sf(prefix=%s).is_queried to True" % sf.prefix
             sf.is_queried = True
     else:
+        print "querying everything"
         for p in SearchableField.fields_by_prefix:
             SearchableField.fields_by_prefix[p].is_queried = True
         partial_query = input
@@ -155,8 +162,11 @@ def get_autocompletion_suggestions(input):
 
     suggestions = []
 
+    print "sf_language.is_queried: %s" % sf_language.is_queried
 
     if sf_project.is_queried:
+
+        print "sf_project.is_queried = True"
 
         # Compile list of projects
         projects_by_name = Project.objects.filter(
@@ -170,10 +180,16 @@ def get_autocompletion_suggestions(input):
         # Limit
         project_names = project_names[:project_max]
 
+        print sf_project.prefix
+        print separator
+        print project_names
+
         suggestions += [sf_project.prefix + separator + name
                 for name in project_names]
 
     if sf_language.is_queried:
+
+        print "lang is queried."
 
         # For languages, get projects first
         projects_by_lang = Project.objects.filter(language__istartswith=partial_query)

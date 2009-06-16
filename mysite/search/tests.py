@@ -40,7 +40,7 @@ class AutoCompleteTests(django.test.TestCase):
     """
 
     def setUp(self):
-        self.project_chat = Project.objects.create(name='MicrosoftComicChat', language='C++')
+        self.project_chat = Project.objects.create(name='ComicChat', language='C++')
         self.project_kazaa = Project.objects.create(name='Kazaa', language='Vogon')
         self.bug_in_chat = Bug.objects.create(project=self.project_chat,
                 people_involved=2,
@@ -59,15 +59,14 @@ class AutoCompleteTests(django.test.TestCase):
     def testQueryNotFieldSpecific(self):
         c_suggestions = search.views.get_autocompletion_suggestions('C')
         self.assert_('lang:C++' in c_suggestions)
-        self.assert_('project:MicrosoftComicChat' in c_suggestions)
-        self.assert_('lang:Vogon' in c_suggestions)
+        self.assert_('project:ComicChat' in c_suggestions)
 
     def testQueryFieldSpecific(self):
         lang_C_suggestions = search.views.get_autocompletion_suggestions(
                 'lang:C')
         self.assert_('lang:C++' in lang_C_suggestions)
         self.assert_('lang:Python' not in lang_C_suggestions)
-        self.assert_('project:MicrosoftComicChat' not in lang_C_suggestions)
+        self.assert_('project:ComicChat' not in lang_C_suggestions)
 
 class NonJavascriptSearch(django.test.TestCase):
     fixtures = ['bugs-for-two-projects.json']
