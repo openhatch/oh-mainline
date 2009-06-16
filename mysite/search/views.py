@@ -100,7 +100,6 @@ def request_jquery_autocompletion_suggestions(request):
     suggestions_list = get_autocompletion_suggestions(partial_query)
     suggestions_string = list_to_jquery_autocompletion_format(
                 suggestions_list)
-    print suggestions_string
     return HttpResponse(suggestions_string)
 
 def list_to_jquery_autocompletion_format(list):
@@ -128,8 +127,6 @@ def get_autocompletion_suggestions(input):
       - search by date
     """
 
-    print "\n\ninput: " + input
-
     sf_project = SearchableField('project')
     sf_language = SearchableField('lang')
     sf_dependency = SearchableField('dep')
@@ -144,19 +141,15 @@ def get_autocompletion_suggestions(input):
     if separator in input[1:-1]:
         prefix = input.split(separator)[0]
         partial_query = input.split(separator)[1]
-        print "prefix = " + prefix
-        print "partial_query = " + partial_query
-        print "Input appears to contain prefix: %s" % prefix
         sf = SearchableField.fields_by_prefix.get(prefix, None)
-        if sf is None:
-            print "No SearchableField found with prefix: %s" % prefix
-        else:
-            print "Setting sf(prefix=%s).is_queried to True" % sf.prefix
+        if sf is not None:
             sf.is_queried = True
+            # FIXME: What happens when
+            # the user enters a bad prefix?
     else:
-        print "querying everything"
         for p in SearchableField.fields_by_prefix:
-            SearchableField.fields_by_prefix[p].is_queried = True
+            SearchableField.fields_by_prefix[
+                    p].is_queried = True
         partial_query = input
 
     project_max = 5
@@ -164,11 +157,7 @@ def get_autocompletion_suggestions(input):
 
     suggestions = []
 
-    print "sf_language.is_queried: %s" % sf_language.is_queried
-
     if sf_project.is_queried:
-
-        print "sf_project.is_queried = True"
 
         # Compile list of projects
         projects_by_name = Project.objects.filter(
@@ -182,16 +171,10 @@ def get_autocompletion_suggestions(input):
         # Limit
         project_names = project_names[:project_max]
 
-        print sf_project.prefix
-        print separator
-        print project_names
-
         suggestions += [sf_project.prefix + separator + name
                 for name in project_names]
 
     if sf_language.is_queried:
-
-        print "lang is queried."
 
         # For languages, get projects first
         projects_by_lang = Project.objects.filter(
@@ -206,9 +189,6 @@ def get_autocompletion_suggestions(input):
 
             suggestions += [sf_language.prefix + separator + lang
                     for lang in langs]
-
-    print "For '%s' with prefix '%s' I suggest %s" % (
-            partial_query, prefix, suggestions)
 
     return suggestions
 

@@ -131,7 +131,7 @@ $(document).ready(function() {
 
         /* data = "lang:python lang:c# lang:c lang:javascript lang:xul library:django library:symfony project:django project:apache project:exaile project:muine"; */
 
-        url = "/search/get_autocompletion_suggestions";
+        url = "/search/get_suggestions";
         acOptions = {
             'minChars': 1,
             /*
