@@ -1,5 +1,6 @@
 import django.test
-from search.models import Project
+from search.models import Project, Bug
+import search.views
 
 import twill
 from twill import commands as tc
@@ -16,19 +17,47 @@ from StringIO import StringIO
 def twill_setup():
     app = AdminMediaHandler(WSGIHandler())
     twill.add_wsgi_intercept("127.0.0.1", 8080, lambda: app)
-    
+
 def twill_teardown():
     twill.remove_wsgi_intercept('127.0.0.1', 8080)
 
 def make_twill_url(url):
     # modify this
     return url.replace("http://openhatch.org/",
-                       "http://127.0.0.1:8080/")
+            "http://127.0.0.1:8080/")
 
 def twill_quiet():
     # suppress normal output of twill.. You don't want to
     # call this if you want an interactive session
     twill.set_output(StringIO())
+
+class AutoCompleteTests(django.test.TestCase):
+    """
+    Test whether the autocomplete can handle
+     - a field-specific query
+     - a non-field-specific (fulltext) query
+    """
+
+    def setUp(self):
+        """
+        self.project_chat = Project.objects.create(name='Microsoft Comic Chat', language='C++')
+        self.project_kazaa = Project.objects.create(name='Kazaa', language='Vogon')
+        self.bug_in_chat = Bug.objects.create(project=self.project_chat)
+        """
+
+    def testInstantiateSuggestions(self):
+        suggestions = search.views.get_autocompletion_suggestions('')
+
+    """
+    def testQueryNotFieldSpecific(self):
+        response = c.post('/search/get_autocompletion_suggestions', {'q': 'C'})
+        self.assertEquals(response.status_code, 200)
+
+    def testQueryFieldSpecific(self):
+        response = c.post('/search/get_autocompletion_suggestions', {'q': 'lang:C'})
+        lang_C_suggestions = get_autocompletion_suggestions("lang:py")
+        self.assertContains(lang_py_suggestions, 'lang:python')
+    """
 
 class NonJavascriptSearch(django.test.TestCase):
     fixtures = ['bugs-for-two-projects.json']
@@ -57,12 +86,12 @@ class NonJavascriptSearch(django.test.TestCase):
         tc.submit()
         for n in range(1, 11):
             tc.find('Description #%d' % n)
-        
+
         tc.fv('search_opps', 'language', 'c#')
         tc.submit()
         for n in range(717, 727):
             tc.find('Description #%d' % n)
-        
+
     def testPagination(self):
         url = 'http://openhatch.org/search/'
         tc.go(make_twill_url(url))
@@ -76,7 +105,7 @@ class NonJavascriptSearch(django.test.TestCase):
             tc.find('Description #%d' % n)
 
     def testPaginationAndChangingSearchQuery(self):
-        
+
         url = 'http://openhatch.org/search/'
         tc.go(make_twill_url(url))
         tc.fv('search_opps', 'language', 'python')
@@ -95,3 +124,5 @@ class NonJavascriptSearch(django.test.TestCase):
         tc.follow('Next')
         for n in range(727, 737):
             tc.find('Description #%d' % n)
+
+# vim: set ai et ts=4 sw=4 columns=80:

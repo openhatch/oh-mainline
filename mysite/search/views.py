@@ -106,6 +106,14 @@ def list_to_jquery_autocompletion_format(list):
     jQuery's autocomplete plugin."""
     return "\n".join(list)
 
+class SearchableField:
+    prefix = ''
+    is_queried = False
+    all = []
+    def __init__(_prefix):
+        prefix = _prefix
+        all.append(self)
+
 def get_autocompletion_suggestions(partial_query):
     """
     This method returns a list of suggested queries.
@@ -116,26 +124,29 @@ def get_autocompletion_suggestions(partial_query):
 
     Not yet implemented:
       - libraries (frameworks? toolkits?) like Django
+      - search by date
     """
 
-    fields = {
-            'project': {'prefix': 'project'},
-            'language': {'prefix': 'lang'},
-            'dependency': {'prefix': 'dep'},
-            'library': {'prefix': 'lib'},
-            }
+    sf_project = SearchableField('project')
+    sf_language = SearchableField('lang')
+    sf_dependency = SearchableField('dep')
+    sf_library = SearchableField('lib')
+    sf_date_before = SearchableField('before')
+    sf_date_after = SearchableField('after')
+
     separator = ":"
 
-    for field in fields: fields[field]['is_queried'] = True
-
-    if partial_query.find(':') > 0:
-        prefix = partial_query.split(":")[0]
-        for field in fields:
-            if fields[field]['prefix'] == prefix:
-                fields[field]['is_queried'] = True
-        partial_query = partial_query.split(":")[1]
+    if separator in partial_query[1:-1]:
+        prefix = partial_query.split(separator)[0]
+        for sf in SearchableField.all:
+            if sf.prefix == prefix:
+                sf.is_queried = True
+                break
+        partial_query = partial_query.split(separator)[1]
+        print partial_query
     else:
         for field in fields: fields[field]['is_queried'] = True
+        print "querying everything"
 
     project_max = 5
     lang_max = 5
