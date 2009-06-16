@@ -107,12 +107,11 @@ def list_to_jquery_autocompletion_format(list):
     return "\n".join(list)
 
 class SearchableField:
-    prefix = ''
-    is_queried = False
-    all_fields = []
+    fields_by_prefix = {}
     def __init__(self, _prefix):
         self.prefix = _prefix
-        self.all_fields.append(self)
+        self.is_queried = False
+        self.fields_by_prefix[self.prefix] = self
 
 def get_autocompletion_suggestions(input):
     """
@@ -135,20 +134,22 @@ def get_autocompletion_suggestions(input):
     sf_date_after = SearchableField('after')
 
     separator = ":"
+    prefix = ''
+    partial_query = ''
 
     if separator in input[1:-1]:
         prefix = input.split(separator)[0]
-        for sf in SearchableField.all_fields:
-            if sf.prefix == prefix:
-                sf.is_queried = True
-                partial_query = input.split(separator)[1]
-                print "sf detected with prefix " + sf.prefix
-                print "partial_query" + partial_query
-                break
+        partial_query = input.split(separator)[1]
+        sf = SearchableField.fields_by_prefix.get(prefix, None)
+        if sf is None:
+            print "No SearchableField found with prefix: %s" % prefix
+        else:
+            print "Setting sf(prefix=%s).is_queried to True" % sf.prefix
+            sf.is_queried = True
     else:
         print "querying everything"
-        for sf in SearchableField.all_fields:
-            sf.is_queried = True
+        for p in SearchableField.fields_by_prefix:
+            SearchableField.fields_by_prefix[p].is_queried = True
         partial_query = input
 
     project_max = 5
@@ -156,16 +157,23 @@ def get_autocompletion_suggestions(input):
 
     suggestions = []
 
+    print "sf_language.is_queried: %s" % sf_language.is_queried
+
     if sf_project.is_queried:
+
+        print "sf_project.is_queried = True"
 
         # Compile list of projects
         projects_by_name = Project.objects.filter(
                 name__istartswith=partial_query)
+        # FIXME: Is __istartswith faster than
+        # lowercasing and using startswith?
+
+        # Produce a list of names like ['Exaile', 'GNOME-DO', ...]
         project_names = projects_by_name.values_list('name', flat=True)
 
         # Limit
         project_names = project_names[:project_max]
-        # FIXME: Is __istartswith faster?
 
         print sf_project.prefix
         print separator
@@ -189,7 +197,7 @@ def get_autocompletion_suggestions(input):
             suggestions += [sf_language.prefix + separator + lang
                     for lang in langs]
 
-    print partial_query + " gives " + str(suggestions)
+    print "For '%s' with prefix '%s' I suggest %s" % (partial_query, prefix, suggestions)
 
     return suggestions
 
