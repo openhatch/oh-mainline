@@ -16,7 +16,7 @@ urlpatterns = patterns('',
 
         # Get a list of suggestions for the search input, formatted the way that
         # the jQuery autocomplete plugin wants it.
-        (r'^search/get_autocompletion_suggestions$', 'mysite.search.views.request_jquery_autocompletion_suggestions'),
+        (r'^search/get_suggestions$', 'mysite.search.views.request_jquery_autocompletion_suggestions'),
         )
 
 # vim: set ai ts=4 sts=4 et sw=4:

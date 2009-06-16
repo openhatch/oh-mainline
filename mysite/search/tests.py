@@ -52,23 +52,44 @@ class AutoCompleteTests(django.test.TestCase):
                 canonical_bug_link="http://example.com/",
                 )
 
-    def testInstantiateSuggestions(self):
+    def testSuggestionsMinimallyWorks(self):
         suggestions = search.views.get_autocompletion_suggestions('')
         self.assert_("lang:Vogon" in suggestions)
 
-    def testQueryNotFieldSpecific(self):
+    def testSuggestForAllFields(self):
         c_suggestions = search.views.get_autocompletion_suggestions('C')
         self.assert_('lang:C++' in c_suggestions)
         self.assert_('project:ComicChat' in c_suggestions)
 
-    def testQueryFieldSpecific(self):
+    def testSuggestForSpecificField(self):
         lang_C_suggestions = search.views.get_autocompletion_suggestions(
                 'lang:C')
         self.assert_('lang:C++' in lang_C_suggestions)
         self.assert_('lang:Python' not in lang_C_suggestions)
         self.assert_('project:ComicChat' not in lang_C_suggestions)
 
-class NonJavascriptSearch(django.test.TestCase):
+    def testSuggestsSomethingFormattedForJQueryAutocompletePlugin(self):
+        suggestions_list = search.views.get_autocompletion_suggestions('')
+        suggestions_string = search.views.list_to_jquery_autocompletion_format(
+                suggestions_list)
+        suggestions_list_reconstructed = suggestions_string.split("\n")
+        self.assert_("project:ComicChat" in suggestions_list_reconstructed)
+        self.assert_("lang:Vogon" in suggestions_list_reconstructed)
+        self.assert_("lang:C++" in suggestions_list_reconstructed)
+
+    def testSuggestsSomethingOverHttp(self):
+        response = self.client.get( '/search/get_suggestions', {'q': 'C'})
+        self.assertContains(response, "project:ComicChat\nlang:C++")
+
+    def testSuggestionFailsOnEmptyString(self):
+        response = self.client.get( '/search/get_suggestions', {'q': ''})
+        self.assertEquals(response.status_code, 500)
+
+    def testSuggestionFailsWithImproperQueryString(self):
+        response = self.client.get( '/search/get_suggestions', {})
+        self.assertEquals(response.status_code, 500)
+
+class TestNonJavascriptSearch(django.test.TestCase):
     fixtures = ['bugs-for-two-projects.json']
 
     def setUp(self):

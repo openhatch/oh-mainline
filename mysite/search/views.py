@@ -1,4 +1,4 @@
-from django.http import HttpResponse, QueryDict
+from django.http import HttpResponse, QueryDict, HttpResponseServerError
 from django.shortcuts import render_to_response
 from django.core import serializers
 from mysite.search.models import Bug, Project
@@ -97,9 +97,11 @@ def request_jquery_autocompletion_suggestions(request):
     # jQuery autocomplete also gives us this variable:
     # timestamp = request.GET.get('timestamp', None)
 
-    suggestions = get_autocompletion_suggestions(partial_query)
-    #return list_to_jquery_autocompletion_format(suggestions)
-    return HttpResponse(suggestions)
+    suggestions_list = get_autocompletion_suggestions(partial_query)
+    suggestions_string = list_to_jquery_autocompletion_format(
+                suggestions_list)
+    print suggestions_string
+    return HttpResponse(suggestions_string)
 
 def list_to_jquery_autocompletion_format(list):
     """Converts a list to the format required by
@@ -192,17 +194,21 @@ def get_autocompletion_suggestions(input):
         print "lang is queried."
 
         # For languages, get projects first
-        projects_by_lang = Project.objects.filter(language__istartswith=partial_query)
+        projects_by_lang = Project.objects.filter(
+                language__istartswith=partial_query)
 
         # Then use bugs to compile a list of languages.
-        langs = projects_by_lang.values_list('language', flat=True).order_by('language')[:lang_max]
+        langs = projects_by_lang.values_list(
+                'language', flat=True).order_by(
+                        'language')[:lang_max]
 
         if langs:
 
             suggestions += [sf_language.prefix + separator + lang
                     for lang in langs]
 
-    print "For '%s' with prefix '%s' I suggest %s" % (partial_query, prefix, suggestions)
+    print "For '%s' with prefix '%s' I suggest %s" % (
+            partial_query, prefix, suggestions)
 
     return suggestions
 
@@ -219,5 +225,4 @@ Ask server to give a list of projects and languages beginning with "c"
 
 Add top 100 fulltext words to the mix.
 """
-    
-# vim: set ai ts=4 sw=4 et columns=80:
+# vim: set ai ts=4 sw=4 et:
