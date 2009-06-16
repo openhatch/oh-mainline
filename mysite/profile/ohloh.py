@@ -10,11 +10,9 @@ class Ohloh(object):
     @accepts(object, int)
     @returns(unicode)
     def project_id2projectname(self, project_id):
-        pass
         params = urllib.urlencode({'api_key': API_KEY})
         url = 'http://www.ohloh.net/projects/%d.xml?' % project_id
         url += params
-        print url
         tree = ET.parse(urllib.urlopen(url))
         
         # Did Ohloh return an error?
@@ -39,7 +37,7 @@ class Ohloh(object):
             raise ValueError, "Ohloh gave us back an error. Wonder why."
 
         # Otherwise, get the project name
-        proj_id = tree.find('project_id')[0].text
+        proj_id = tree.find('result/analysis/project_id').text
         return self.project_id2projectname(int(proj_id))
         
     def get_project_set_by_username(self, username):
