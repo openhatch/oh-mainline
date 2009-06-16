@@ -224,10 +224,15 @@
             </div>
           </div>
         </div>
+		<form id='enter-free-software-username' 
+			action='/profile/get_data_for_username'
+			method='post'
+			name='enter_free_software_username'>
+			<input type='text' name='username' />
+			<input type='submit' />
+		</form
       </body>
     </html>
-<!--
-vim: set ts=2 sw=2 expandtab: -->
 
 {% if saved_data %}
 <p>You have contributed to the following projects:</p>
@@ -244,3 +249,4 @@ vim: set ts=2 sw=2 expandtab: -->
 </ul>
 {% endif %}
 
+<!-- vim: set ts=2 sw=2 et: -->

@@ -73,7 +73,7 @@ class OmanTests(django.test.TestCase):
     def testFormEnterYourUsername(self):
         url = 'http://openhatch.org/profile/'
         tc.go(make_twill_url(url))
-        tc.fv('free_software_username', 'username', 'paulproteus')
+        tc.fv('enter_free_software_username', 'username', 'paulproteus')
         tc.submit()
 
         tc.find('ccHost')
