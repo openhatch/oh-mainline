@@ -28,11 +28,13 @@ def get_data_for_username(request):
     if username:
         saved = request.session.get('saved_data', [])
         # always append the data
-        # FIXME: Actually call out to e.g. Ohloh
-        if username == 'paulproteus':
-            new_values = {'project': 'ccHost',
-                          'url': 'http://wiki.creativecommons.org/CcHost',
-                          'contrib_text': 'Contributed a little bit'}
+        import ohloh
+        oh = ohloh.get_ohloh()
+        projects = oh.get_contribution_info_by_username('paulproteus')
+        for project in projects:
+            new_values = {'project': project['project'],
+                          'url': project['project_homepage_url'],
+                          'contrib_text': str(project['man_months']) + ' measured month(s) of primarily ' + project['primary_language'] + ' activity'}
             saved.append(new_values)
             request.session['saved_data'] = saved
     return HttpResponseRedirect('/profile/')
