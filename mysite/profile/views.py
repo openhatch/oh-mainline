@@ -58,5 +58,14 @@ def display_person(request, input_username=None):
 
     # }}}
 def get_data_for_email(request):
-    return HttpResponse('ccHost')
+    email = request.POST.get('email', '')
+    if email:
+        saved = request.session.get('saved_data', [])
+        # FIXME: This is faked out
+        new_values = dict(project='ccHost',
+                          url='whatever',
+                          contrib_text='whatever')
+        saved.append(new_values)
+        request.session['saved_data'] = saved
+    return HttpResponseRedirect('/profile/')
 
