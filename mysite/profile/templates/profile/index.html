@@ -68,40 +68,29 @@
             </form>
           </div>
 
-          {% if acts_of_kindness %}
-          {% for act in acts_of_kindness %}
+          {% if saved_data %}
+          {% for datum in saved_data %}
           <div class='box'>
-            <div class='project-name'>{{ act.project_name }}</div>
-            <div class='quantitative-summary'>{{ act.quant_sum }}</div>
-            <div class='qualitative-summary'>{{ act.qual_sum }}</div>
+            <div class='project-name'>
+              {% if datum.url %}
+              <a href='{{ datum.url }}'>
+                {{ datum.project }}
+              </a>
+              {% else %}
+              {{ datum.project }}
+              {% endif %}
+            </div>
+            <div class='summary'>
+              {{ datum.contrib_text }}
+            </div>
           </div>
           {% endfor %}
           {% else %}
-          There are no acts of kindness.
+          Could not find experience in our database for that username.
           {% endif %}
         </div>
       </div>
     </body>
   </html>
-
-  {% if saved_data %}
-  <p>You have contributed to the following projects:</p>
-  <ul>
-    {% for datum in saved_data %}
-    <li>
-    {% if datum.url %}
-    <a href='{{ datum.url }}'>
-      {{ datum.project }}
-    </a>
-    {% else %}
-      {{ datum.project }}
-    {% endif %}
-    </li>
-    <li>
-    {{ datum.contrib_text }}
-    </li>
-    {% endfor %}
-  </ul>
-  {% endif %}
 
   <!-- vim: set ts=4 sw=4 et: -->
