@@ -89,10 +89,15 @@
   <ul>
     {% for datum in saved_data %}
     <li>
-    {{ datum.project }}
-    </li><li>
-    {{ datum.url }}
-    </li></li>
+    {% if datum.url %}
+    <a href='{{ datum.url }}'>
+      {{ datum.project }}
+    </a>
+    {% else %}
+      {{ datum.project }}
+    {% endif %}
+    </li>
+    <li>
     {{ datum.contrib_text }}
     </li>
     {% endfor %}
