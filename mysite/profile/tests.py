@@ -95,6 +95,7 @@ class OhlohTests(django.test.TestCase):
         oh = ohloh.get_ohloh()
         projects = oh.get_contribution_info_by_username('paulproteus')
         self.assertEqual([{'project': u'ccHost',
+                           'homepage_url': 'http://wiki.creativecommons.org/CcHost',
                            'man_months': 1,
                            'primary_language': 'shell script'}],
                          projects)
