@@ -1,42 +1,58 @@
+{% comment %}
+vim: set ts=4 sw=4 et:
+{% endcomment %}
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    {% comment %} Prefatory remarks {{{ {% endcomment %}
     <title>{{ developer_name }} &bull; Resume &bull; OpenHatch</title>
     <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
     <meta http-equiv='Content-Language' content='en-us' />
     <meta http-equiv='Content-Script-Type' content='text/javascript' />
     <meta http-equiv='Content-Style-Type' content='text/css' />
     <meta name='Description' content=''>
+    {% comment %} }}} {% endcomment %}
+
     <style> /*<![CDATA[*/
       @import url('/static/css/all.css') all; 
       @import url('/static/css/gewgaws.css') all; 
       @import url('/static/css/profile/all.css') all;
       /*]]>*/
     </style>
-    <!--[if IE]><style>/*<![CDATA[*/@import url('../css/ie/all.css');/*]]>*/</style><![endif]-->
-      <!--[if lte IE 6]><style>/*<![CDATA[*/@import url('../css/ie/6-/all.css');/*]]>*/</style><![endif]-->
-      <!--[if gte IE 7]><style>/*<![CDATA[*/@import url('../css/ie/7+/all.css');/*]]>*/</style><![endif]-->
-      <script src='/static/js/jquery.js'></script>
-      <!-- by jove I love jQuery plugins ~ rkl -->
-      <script src='/static/js/jquery.query.js'></script>
-      <script src='/static/js/jquery.hotkey.js'></script>
-      <script src='/static/js/jquery.scrollTo.js'></script>
-      <!-- FIXME: remove what we don't need here -->
-      <script>
-        /*
-        thisstart = {{ start }};
-        thisend = {{ end }};*/
-      </script>
-      <script src='/static/js/profile/domakesaythink.js'></script>
-      <script src='/static/js/profile/lookfeel.js'></script>
-    </head>
-    <body>
-      <div id='wrapper-outer'>
-        <div id='wrapper-inner'>
-          <div id='content'>
-            <h1 class='name'>{{ person.name.full }}</h1>
 
-            <div class='box'>
+    <!--[if IE]>
+    <style>/*<![CDATA[*/@import url('../css/ie/all.css');/*]]>*/</style>
+    <![endif]-->
+
+    <!--[if lte IE 6]>
+    <style>/*<![CDATA[*/@import url('../css/ie/6-/all.css');/*]]>*/</style>
+    <![endif]-->
+
+    <!--[if gte IE 7]>
+    <style>/*<![CDATA[*/@import url('../css/ie/7+/all.css');/*]]>*/</style>
+    <![endif]-->
+
+    <script src='/static/js/jquery.js'></script>
+    <!-- by jove I love jQuery plugins ~ rkl -->
+    <script src='/static/js/jquery.query.js'></script>
+    <script src='/static/js/jquery.hotkey.js'></script>
+    <script src='/static/js/jquery.scrollTo.js'></script>
+    <!-- FIXME: remove what we don't need here -->
+    <script>
+      /*
+      thisstart = {{ start }};
+      thisend = {{ end }};*/
+    </script>
+    <script src='/static/js/profile/domakesaythink.js'></script>
+    <script src='/static/js/profile/lookfeel.js'></script>
+  </head>
+  <body>
+    <div id='wrapper-outer'>
+      <div id='wrapper-inner'>
+        <div id='content'>
+          <h1 class='name'>{{ person.name.full }}</h1>
+
+          <div class='box'>
             <h3>Log some experience we didn't find</h3>
             <form id='add-contrib' name='add_contrib'
               method='POST' action='/profile/add_contribution'>
@@ -68,31 +84,32 @@
             </form>
           </div>
 
-          {% if saved_data %}
-          <ul>
-          {% for datum in saved_data %}
-          <li class='exp-box'>
-            <div class='project-name'>
-              {% if datum.url %}
-              <a href='{{ datum.url }}'>
+          <div>
+            {% if saved_data %}
+            <ul id='exp'>
+              {% for datum in saved_data %}
+              <li>
+              <div class='project-name'>
+                {% if datum.url %}
+                <a href='{{ datum.url }}'>
+                  {{ datum.project }}
+                </a>
+                {% else %}
                 {{ datum.project }}
-              </a>
-              {% else %}
-              {{ datum.project }}
-              {% endif %}
-            </div>
-            <div class='summary'>
-              {{ datum.contrib_text }}
-            </div>
-          </li>
-          {% endfor %}
-          </ul>
-          {% else %}
-          Could not find experience in our database for that username.
-          {% endif %}
+                {% endif %}
+              </div>
+              <div class='summary'>
+                {{ datum.contrib_text }}
+              </div>
+              </li>
+              {% endfor %}
+            </ul>
+            {% else %}
+            Could not find experience in our database for that username.
+            {% endif %}
+          </div>
         </div>
       </div>
     </body>
   </html>
 
-  <!-- vim: set ts=4 sw=4 et: -->

@@ -1,21 +1,32 @@
+{% comment %}
+Opp finder template
+{% endcomment %}
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
+  <head>{% comment %} {{{ {% endcomment %}
+
+    {% comment %} Prefatory remarks {{{ {% endcomment %}
     <title>{{ developer_name }} &bull; Developer &bull; OpenHatch</title>
     <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
     <meta http-equiv='Content-Language' content='en-us' />
     <meta http-equiv='Content-Script-Type' content='text/javascript' />
     <meta http-equiv='Content-Style-Type' content='text/css' />
     <meta name='Description' content=''>
-    <style> /*<![CDATA[*/
-      @import url('/static/css/all.css');
-      @import url('/static/css/jquery.autocomplete.css');
+    {% comment %} }}} {% endcomment %}
+
+    {% comment %} Cansei de Ser Sexy {{{ {% endcomment %}
+    <style>/*<![CDATA[*/
+      @import url('/static/css/all.css') all;
+      @import url('/static/css/jquery.autocomplete.css') screen;
       /*@import url('/static/css/gewgaws.css');*/
-      /*]]>*/
-    </style>
+      /*]]>*/</style>
+
     <!--[if IE]><style>/*<![CDATA[*/@import url('../css/ie/all.css');/*]]>*/</style><![endif]-->
     <!--[if lte IE 6]><style>/*<![CDATA[*/@import url('../css/ie/6-/all.css');/*]]>*/</style><![endif]-->
     <!--[if gte IE 7]><style>/*<![CDATA[*/@import url('../css/ie/7+/all.css');/*]]>*/</style><![endif]-->
+    {% comment %} }}} {% endcomment %}
+
+    {% comment %} Include some ECMAScript {{{ {% endcomment %}
     <script src='/static/js/jquery.js'></script>
     <!-- by jove I love jQuery plugins ~ rkl -->
     <script src='/static/js/jquery.query.js'></script>
@@ -32,14 +43,20 @@
       thisend = {{ end }};
     </script>
     <script src='/static/js/gewgaws.js'></script>
-  </head>
+    {% comment %} }}} {% comment %}
+
+  </head>{% comment %} }}} {% endcomment %}
   <body>
     <div id='images'></div>
     <div id='wrapper-outer'>
       <div id='wrapper-inner'>
-        <h2 id='banner'><img alt='OpenHatch' src='/static/images/openhatch2.png'/></h2>
-        <div id='explanation'>
-          <div class='explanation-heading'><h3 id=''>Write code; feel good.</h3></div>
+        <h2 id='banner'>
+          <img alt='OpenHatch' src='/static/images/openhatch2.png'/>
+        </h2>
+        <div id='explanation'>{% comment %} {{{ {% endcomment %}
+          <div class='explanation-heading'>
+            <h3 id=''>Write code; feel good.</h3>
+          </div>
           <p> Thank you for visiting OpenHatch.
           <strong>We help people who write code find jobs
             and volunteer opportunities.</strong></p>
@@ -68,7 +85,7 @@
           serious matters, job hunting for instance, are
           treated here with atypical whimsy.</p>
 
-        </div>
+        </div>{% comment %} }}} {% endcomment %}
         <div id='content'>
           <div id='main'>
             <div id='opps' class='gewgaws box'>
@@ -121,6 +138,7 @@
                   <div class='second-line'>
                     <span class='description'>
                       {{ bug.description }}
+                      {% lorem 2 p random %}
                     </span>
                   </div>
                   <div class='details'>

@@ -40,18 +40,8 @@ def fetch_bugs(request):
     bugs = bugs[start-1:end]
 
     for b in bugs:
-        filler_text = """
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit,
-        sed do eiusmod tempor incididunt ut labore et dolore magna
-        aliqua. Ut enim ad minim veniam, quis nostrud exercitation
-        ullamco laboris nisi ut aliquip ex ea commodo consequat.
-        Duis aute irure dolor in reprehenderit in voluptate velit
-        esse cillum dolore eu fugiat nulla pariatur. Excepteur sint
-        occaecat cupidatat non proident, sunt in culpa qui officia
-        deserunt mollit anim id est laborum."""
-        b.description += filler_text
         # b.description = b.description[:65] + "..."
-        b.project.icon_url = "/static/images/icons/projects/%s.png" % 
+        b.project.icon_url = "/static/images/icons/projects/%s.png" % \
                 b.project.name.lower()
 
     if format == 'json':
