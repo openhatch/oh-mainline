@@ -50,10 +50,11 @@ Opp finder template
     <div id='images'></div>
     <div id='wrapper-outer'>
       <div id='wrapper-inner'>
+        {% comment %} Logo and explanation {{{ {% endcomment %}
         <h2 id='banner'>
           <img alt='OpenHatch' src='/static/images/openhatch2.png'/>
         </h2>
-        <div id='explanation'>{% comment %} {{{ {% endcomment %}
+        <div id='explanation'>
           <div class='explanation-heading'>
             <h3 id=''>Write code; feel good.</h3>
           </div>
@@ -85,15 +86,16 @@ Opp finder template
           serious matters, job hunting for instance, are
           treated here with atypical whimsy.</p>
 
-        </div>{% comment %} }}} {% endcomment %}
+        </div>
+        {% comment %} }}} {% endcomment %}
         <div id='content'>
           <div id='main'>
             <div id='opps' class='gewgaws box'>
+              {% comment %} Search form {% endcomment %}
               <form name='search_opps' method='get'> 
                 <h3><label for='language'>Search tasks</label></h3>
-                <input type='text'
-                name='language' id='language'
-                value='{{ language }}' />
+                <input type='text' name='language' id='language'
+                  value='{{ language }}' />
                 <input type='submit' id='button' value='GO' />
               </form>
               <div class='content'>
