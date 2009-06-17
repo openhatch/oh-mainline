@@ -40,16 +40,23 @@ def fetch_bugs(request):
     bugs = bugs[start-1:end]
 
     for b in bugs:
-        b.description += "<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-        """
-        b.description = b.description[:65] + "..."
-        """
-        b.project.icon_url = "/static/images/icons/projects/%s.png" % \
+        filler_text = """
+        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit,
+        sed do eiusmod tempor incididunt ut labore et dolore magna
+        aliqua. Ut enim ad minim veniam, quis nostrud exercitation
+        ullamco laboris nisi ut aliquip ex ea commodo consequat.
+        Duis aute irure dolor in reprehenderit in voluptate velit
+        esse cillum dolore eu fugiat nulla pariatur. Excepteur sint
+        occaecat cupidatat non proident, sunt in culpa qui officia
+        deserunt mollit anim id est laborum."""
+        b.description += filler_text
+        # b.description = b.description[:65] + "..."
+        b.project.icon_url = "/static/images/icons/projects/%s.png" % 
                 b.project.name.lower()
 
     if format == 'json':
-        return bugs_to_json_response(bugs,
-                request.GET.get('jsoncallback', 'alert'))
+        return bugs_to_json_response(bugs, request.GET.get(
+            'jsoncallback', 'alert'))
     else:
         prev_page_query_str = QueryDict('')
         prev_page_query_str = prev_page_query_str.copy()
@@ -89,7 +96,15 @@ def index(request):
     return render_to_response('search/index.html')
 
 def request_jquery_autocompletion_suggestions(request):
-
+    """
+    Wraps get_autocompletion_suggestions and
+    list_to_jquery_autocompletion_format in a
+    HttpRequest -> HttpResponse loop.
+    Validates GET parameters. Expected:
+        ?q=[suggestion fodder]
+    If q is absent or empty, this function
+    returns an HttpResponseServerError.
+    """
     partial_query = request.GET.get('q', None)
     if (partial_query is None) or (partial_query == ''):
         return HttpResponseServerError("Need partial_query in GET")
@@ -108,6 +123,7 @@ def list_to_jquery_autocompletion_format(list):
     return "\n".join(list)
 
 class SearchableField:
+    "A field in the database you can search."
     fields_by_prefix = {}
     def __init__(self, _prefix):
         self.prefix = _prefix

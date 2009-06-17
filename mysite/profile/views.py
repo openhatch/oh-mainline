@@ -2,10 +2,8 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 
 def index(request):
-    return render_to_response('profile/index.html',
-                              {'saved_data':
-                               request.session.get('saved_data',
-                                                   [])})
+    return render_to_response('profile/index.html', {
+        'saved_data': request.session.get('saved_data', [])})
 
 def add_contribution(request):
     project = request.POST.get('project', '')
