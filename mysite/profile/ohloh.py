@@ -47,27 +47,19 @@ class Ohloh(object):
         
     def get_contribution_info_by_username(self, username):
         ret = []
-        
-        params = urllib.urlencode({'api_key': API_KEY, 'query': username})
-        url = 'http://www.ohloh.net/contributors.xml?' + params
-        tree = ET.parse(urllib.urlopen(url))
-
-        # Did Ohloh return an error?
-        root = tree.getroot()
-        if root.find('error') is not None:
-            raise ValueError, "Ohloh gave us back an error. Wonder why."
+        url = 'http://www.ohloh.net/contributors.xml?'
+        c_f = ohloh_url2data(url, 'result/contributor_fact',
+                              {'query': username})
 
         # For each contributor fact, grab the project it was for
-        for c_f in root.findall('result/contributor_fact'):
-            eyedee_elt = c_f.find('analysis_id')
-            if eyedee_elt is None:
-                continue # this contributor fact is useless
-            eyedee = int(eyedee_elt.text)
-            this = dict(
-                project=self.analysis2projectname(eyedee),
-                primary_language=c_f.find('primary_language_nice_name').text,
-                man_months=int(c_f.find('man_months').text))
-            ret.append(this)
+        if 'analysis_id' not in c_f:
+            return {} # this contributor fact is useless
+        eyedee = int(c_f['analysis_id'])
+        this = dict(
+            project=self.analysis2projectname(eyedee),
+            primary_language=c_f['primary_language_nice_name'],
+            man_months=int(c_f['man_months']))
+        ret.append(this)
 
         return ret
 
