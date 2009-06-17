@@ -1,11 +1,11 @@
 API_KEY='JeXHeaQhjXewhdktn4nUw' # "Oman testing"
 
-def ohloh_url2data(url, selector, params = {}):
+def ohloh_url2data(url, selector, params = {}, many = False):
     my_params = {'api_key': API_KEY}
     my_params.update(params)
     params = my_params ; del my_params
-    
-    ret = {}
+
+    ret = []
     
     encoded = urllib.urlencode(params)
     url += encoded
@@ -16,11 +16,19 @@ def ohloh_url2data(url, selector, params = {}):
     if root.find('error') is not None:
         raise ValueError, "Ohloh gave us back an error. Wonder why."
 
-    interesting = root.find(selector)
-    for child in interesting.getchildren():
-        if child.text:
-            ret[unicode(child.tag)] = unicode(child.text, 'utf-8')
-    return ret
+    interestings = root.findall(selector)
+    for interesting in interestings:
+        this = {}
+        for child in interesting.getchildren():
+            if child.text:
+                this[unicode(child.tag)] = unicode(child.text, 'utf-8')
+        ret.append(this)
+
+    if many:
+        return ret
+    if ret:
+        return ret[0]
+    return None
 
 from typecheck import accepts, returns
 from typecheck import Any as __
@@ -48,18 +56,19 @@ class Ohloh(object):
     def get_contribution_info_by_username(self, username):
         ret = []
         url = 'http://www.ohloh.net/contributors.xml?'
-        c_f = ohloh_url2data(url, 'result/contributor_fact',
-                              {'query': username})
+        c_fs = ohloh_url2data(url, 'result/contributor_fact',
+                              {'query': username}, many=True)
 
         # For each contributor fact, grab the project it was for
-        if 'analysis_id' not in c_f:
-            return {} # this contributor fact is useless
-        eyedee = int(c_f['analysis_id'])
-        this = dict(
-            project=self.analysis2projectname(eyedee),
-            primary_language=c_f['primary_language_nice_name'],
-            man_months=int(c_f['man_months']))
-        ret.append(this)
+        for c_f in c_fs:
+            if 'analysis_id' not in c_f:
+                continue # this contributor fact is useless
+            eyedee = int(c_f['analysis_id'])
+            this = dict(
+                project=self.analysis2projectname(eyedee),
+                primary_language=c_f['primary_language_nice_name'],
+                man_months=int(c_f['man_months']))
+            ret.append(this)
 
         return ret
 

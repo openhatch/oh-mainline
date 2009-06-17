@@ -99,4 +99,9 @@ class OhlohTests(django.test.TestCase):
                            'primary_language': 'shell script'}],
                          projects)
 
+    def testFindByUsernameNotAsheesh(self):
+        oh = ohloh.get_ohloh()
+        projects = oh.get_contribution_info_by_username('keescook')
+        assert len(projects) > 1
+
 # vim: set ai et ts=4 sw=4:
