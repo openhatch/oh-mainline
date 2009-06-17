@@ -28,20 +28,21 @@ form input[type='text'], textarea {
     font-family: arial;
     padding: 9px;
     padding-top: 10px;
-    color: #222;
+    color: #221;
     width: 300px;
 }
 form input[type='submit'] {
     border: none;
-    background-color: #fff;
-    font-size: 19px;
-    font-family: arial;
-    padding: 9px;
-    color: #222;
+    color: #84a878; 59baa9;
+    font-size: 15px;
+    font-family: Arial;
+    padding: 7px;
+    font-weight: bold;
+    background-color: #eee;
     float: left;
 }
 input[type='text'].focus, textarea.focus {
     background-color: #ddf;
 }
 
-/* vim: set ai ts=4 sts=4 et sw=4: */
+/* vim: set ai ts=3 sts=4 et sw=4: */
