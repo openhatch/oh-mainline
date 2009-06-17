@@ -73,6 +73,27 @@ class Ohloh(object):
 
         return ret
 
+    def get_contribution_info_by_email(self, email):
+        ret = []
+        url = 'http://www.ohloh.net/contributors.xml?'
+        c_fs = ohloh_url2data(url, 'result/contributor_fact',
+                              {'query': email}, many=True)
+
+        # For each contributor fact, grab the project it was for
+        for c_f in c_fs:
+            if 'analysis_id' not in c_f:
+                continue # this contributor fact is useless
+            eyedee = int(c_f['analysis_id'])
+            project_data = self.analysis2projectdata(eyedee)
+            this = dict(
+                project=project_data['name'],
+                project_homepage_url=project_data.get('homepage_url', None),
+                primary_language=c_f['primary_language_nice_name'],
+                man_months=int(c_f['man_months']))
+            ret.append(this)
+
+        return ret
+
 _ohloh = Ohloh()
 def get_ohloh():
     return _ohloh
