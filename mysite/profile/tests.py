@@ -110,6 +110,11 @@ class OhlohTests(django.test.TestCase):
                 'man_months': 1,
                 'primary_language': 'Python'} in projects
 
+    def testFindUsernameByEmail(self):
+        oh = ohloh.get_ohloh()
+        username = oh.email_address_to_ohloh_username('paulproteus.ohloh@asheesh.org')
+        self.assertEquals(username, 'paulproteus')
+
     def testFindByUsernameNotAsheesh(self):
         oh = ohloh.get_ohloh()
         projects = oh.get_contribution_info_by_username('keescook')

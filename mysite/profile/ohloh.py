@@ -75,6 +75,20 @@ class Ohloh(object):
 
     def get_contribution_info_by_email(self, email):
         ret = []
+        ret.extend(self.search_contribution_info_by_email(email))
+        #ret.extend(self.search_contribution_info_by_account(
+        #    self.email_address_to_ohloh_username(email)))
+        return ret
+
+    def email_address_to_ohloh_username(self, email):
+        hasher = hashlib.md5(); hasher.update(email)
+        hashed = hasher.hexdigest()
+        url = 'http://www.ohloh.net/accounts/%s.xml?' % hashed
+        data = ohloh_url2data(url, 'result/account')
+        return data['name']
+
+    def search_contribution_info_by_email(self, email):
+        ret = []
         url = 'http://www.ohloh.net/contributors.xml?'
         c_fs = ohloh_url2data(url, 'result/contributor_fact',
                               {'query': email}, many=True)
