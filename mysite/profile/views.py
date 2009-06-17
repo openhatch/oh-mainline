@@ -57,3 +57,6 @@ def display_person(request, input_username=None):
     return render_to_response('profile/profile.html', context)
 
     # }}}
+def get_data_for_email(request):
+    return HttpResponse('ccHost')
+
