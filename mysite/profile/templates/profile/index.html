@@ -69,8 +69,9 @@
           </div>
 
           {% if saved_data %}
+          <ul>
           {% for datum in saved_data %}
-          <div class='box'>
+          <li class='exp-box'>
             <div class='project-name'>
               {% if datum.url %}
               <a href='{{ datum.url }}'>
@@ -83,8 +84,9 @@
             <div class='summary'>
               {{ datum.contrib_text }}
             </div>
-          </div>
+          </li>
           {% endfor %}
+          </ul>
           {% else %}
           Could not find experience in our database for that username.
           {% endif %}

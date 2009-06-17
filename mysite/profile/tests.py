@@ -1,3 +1,5 @@
+# Testing suite for profile
+
 import django.test
 from search.models import Project
 
