@@ -89,13 +89,13 @@ class OhlohTests(django.test.TestCase):
         
     def testProjectNameByAnalysisId(self):
         oh = ohloh.get_ohloh()
-        self.assertEqual('ccHost', oh.analysis2projectname(603185))
+        self.assertEqual('ccHost', oh.analysis2projectdata(603185)['name'])
 
     def testFindByUsername(self):
         oh = ohloh.get_ohloh()
         projects = oh.get_contribution_info_by_username('paulproteus')
         self.assertEqual([{'project': u'ccHost',
-                           'homepage_url': 'http://wiki.creativecommons.org/CcHost',
+                           'project_homepage_url': 'http://wiki.creativecommons.org/CcHost',
                            'man_months': 1,
                            'primary_language': 'shell script'}],
                          projects)

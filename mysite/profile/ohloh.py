@@ -44,14 +44,13 @@ class Ohloh(object):
         return data
     
     @accepts(object, int)
-    @returns(unicode)
-    def analysis2projectname(self, analysis_id):
+    def analysis2projectdata(self, analysis_id):
         url = 'http://www.ohloh.net/analyses/%d.xml?' % analysis_id
         data = ohloh_url2data(url, 'result/analysis')
 
         # Otherwise, get the project name
         proj_id = data['project_id']
-        return self.project_id2projectdata(int(proj_id))['name']
+        return self.project_id2projectdata(int(proj_id))
         
     def get_contribution_info_by_username(self, username):
         ret = []
@@ -64,8 +63,10 @@ class Ohloh(object):
             if 'analysis_id' not in c_f:
                 continue # this contributor fact is useless
             eyedee = int(c_f['analysis_id'])
+            project_data = self.analysis2projectdata(eyedee)
             this = dict(
-                project=self.analysis2projectname(eyedee),
+                project=project_data['name'],
+                project_homepage_url=project_data.get('homepage_url', None),
                 primary_language=c_f['primary_language_nice_name'],
                 man_months=int(c_f['man_months']))
             ret.append(this)
