@@ -107,4 +107,23 @@ class OhlohTests(django.test.TestCase):
         projects = oh.get_contribution_info_by_username('keescook')
         assert len(projects) > 1
 
+class PerthTests(django.test.TestCase):
+    '''
+    The Perth milestone says:
+    * The web form needs to be able to search by email also.
+    '''
+    def setUp(self):
+        twill_setup()
+
+    def tearDown(self):
+        twill_teardown()
+
+    def testFormEnterYourEmail(self):
+        url = 'http://openhatch.org/profile/'
+        tc.go(make_twill_url(url))
+        tc.fv('enter_free_software_email', 'email', 'asheesh@asheesh.org')
+        tc.submit()
+
+        tc.find('ccHost')
+
 # vim: set ai et ts=4 sw=4:
