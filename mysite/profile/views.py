@@ -1,5 +1,6 @@
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
+from mysite.profile.models import Person, PersonToProjectRelationship
 
 def index(request):
     #{{{
@@ -9,19 +10,18 @@ def index(request):
 
 def add_contribution(request):
     # {{{
-    username = request.POST.get('username', '')
-    project = request.POST.get('project', '')
-    contrib_text = request.POST.get('contrib_text', '')
-    url = request.POST.get('url', '')
+    input_contrib_username = request.POST.get('username', '')
+    input_contrib_project = request.POST.get('project', '')
+    input_contrib_description = request.POST.get('contrib_text', '')
+    input_contrib_url = request.POST.get('url', '')
 
     if username and project and contrib_text and url:
-        saved = request.session.get('saved_data', [])
-        # always append the data
-        saved.append(
-            dict(project=project,
-                 url=url,
-                 contrib_text=contrib_text))
-        request.session['saved_data'] = saved
+
+        ppr = PersonToProjectRelationship(
+                project=project,
+                url=url,
+                description=contrib_text)
+        ppr.save()
 
     return HttpResponseRedirect('/profile/')
     #}}}
@@ -33,18 +33,20 @@ def get_data_for_username(request):
     if username:
         saved = request.session.get('saved_data', [])
         # always append the data
-        import ohloh
-        oh = ohloh.get_ohloh()
-        projects = oh.get_contribution_info_by_username('paulproteus')
-        for project in projects:
-            new_values = {
-                    'project': project['project'],
-                    'url': project['project_homepage_url'],
-                    'contrib_text': '%d measured month(s) of primarily %s activity' % \
-                            (project['man_months'], project['primary_language'])
-                            }
             saved.append(new_values)
             request.session['saved_data'] = saved
     return HttpResponseRedirect('/profile/')
 
+def get_data_for_person(_person):
+    if not _person:
+        pass # implement fail
+
+    import ohloh
+    oh = ohloh.get_ohloh()
+    person_to_project_rels = [PersonToProjectRelationship(**vals) for vals in ]
+    contrib_info_list = oh.get_contribution_info_by_username(person.username)
+    for contrib_info in contrib_info_list:
+        ppr = PersonToProjectRelationship(person=_person)
+
+def person_to_project_rels_ohloh_style
 # vim: ai ts=4 sts=4 et sw=4
