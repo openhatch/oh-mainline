@@ -2,15 +2,19 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 
 def index(request):
+    #{{{
     return render_to_response('profile/index.html', {
         'saved_data': request.session.get('saved_data', [])})
+    #}}}
 
 def add_contribution(request):
+    # {{{
+    username = request.POST.get('username', '')
     project = request.POST.get('project', '')
     contrib_text = request.POST.get('contrib_text', '')
     url = request.POST.get('url', '')
 
-    if project and contrib_text and url:
+    if username and project and contrib_text and url:
         saved = request.session.get('saved_data', [])
         # always append the data
         saved.append(
@@ -18,9 +22,12 @@ def add_contribution(request):
                  url=url,
                  contrib_text=contrib_text))
         request.session['saved_data'] = saved
+
     return HttpResponseRedirect('/profile/')
+    #}}}
 
 def get_data_for_username(request):
+    # {{{
     username = request.POST.get('username', '')
 
     if username:
@@ -30,9 +37,12 @@ def get_data_for_username(request):
         oh = ohloh.get_ohloh()
         projects = oh.get_contribution_info_by_username('paulproteus')
         for project in projects:
-            new_values = {'project': project['project'],
-                          'url': project['project_homepage_url'],
-                          'contrib_text': str(project['man_months']) + ' measured month(s) of primarily ' + project['primary_language'] + ' activity'}
+            new_values = {
+                    'project': project['project'],
+                    'url': project['project_homepage_url'],
+                    'contrib_text': '%d measured month(s) of primarily %s activity' % \
+                            (project['man_months'], project['primary_language'])
+                            }
             saved.append(new_values)
             request.session['saved_data'] = saved
     return HttpResponseRedirect('/profile/')

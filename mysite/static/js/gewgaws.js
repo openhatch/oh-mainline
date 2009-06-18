@@ -1,3 +1,5 @@
+/* vim: set ai ts=4 sts=4 et sw=4: */
+
 $.fn.toggleText = function(text1, text2) {
     newtext = (this.text() == text2) ? text1 : text2;
     return this.text(newtext);
@@ -84,12 +86,14 @@ $(document).ready(function() {
                 });
 
         $('.show-details').click(function () {
-                $(this.parentNode.parentNode.parentNode).toggleClass('expanded').scrollIntoView();
+                $gewgaw = $(this.parentNode.parentNode.parentNode);
+                $gewgaw.toggleExpanded();
                 return false;
                 });
 
         $('.first-line a.title').click(function () {
-                $(this.parentNode.parentNode.parentNode).toggleClass('expanded').scrollIntoView();
+                $gewgaw = $(this.parentNode.parentNode.parentNode);
+                $gewgaw.toggleExpanded();
                 return false;
                 });
 
@@ -125,115 +129,109 @@ $(document).ready(function() {
                 return Gewgaws.update(fruitySerialized);
         });
 
-        // Handle autocomplete.
+        // Handle autocomplete. {{{
         $input = $("#opps form input[type='text']");
         console.log("input", $input);
-
-        /* data = "lang:python lang:c# lang:c lang:javascript lang:xul library:django library:symfony project:django project:apache project:exaile project:muine"; */
-
         url = "/search/get_suggestions";
         acOptions = {
             'minChars': 1,
             /*
-            'extraParams': {
-                'partial_query': '',
-            },*/
+               'extraParams': {
+               'partial_query': '',
+               },*/
             'multiple': true,
             'multipleSeparator': " ",
             'matchContains': true
         };
-        $input.autocomplete(url, acOptions);
-        /*
-        $input.change(function() {
-                if(this.val().length > 2) {
-                acOptions.extraParams.partial_query = this.val();
-                }
-                });*/
+        // Disable $input.autocomplete(url, acOptions);
+        // }}}
 });
 
-Gewgaws = {
-    'focusSearchInput': function () {
-        console.log('focus search input called');
-        $("#opps form input[type='text']").focus();
-    },
-    'gewgawsQueryURL': "/search/?",
-    '$gewgawsDOMList': $('.gewgaws ul'),
-    'getLitGewgawIndex': function() {
-        // FIXME: Remember the index of the lit gewgaw in Javascript,
-        // and avoid going through CSS.
-        return $('.gewgaws li').index($('.lit-up')[0]);
-    },
-    'fetchGewgawsToDOM': function (queryString) {
-        url = this.gewgawsQueryURL + queryString + "&jsoncallback=?";
-        $.getJSON(url, this.jsonArrayToDocument);
-    },
-    'jsonArrayToDocument': function (jsonArray) {
-        $(jsonArray).each( function(i) {
-                $gewgaw = $("li").eq(i);
-                $gewgaw.attr('id', "gewgaw-" + this.pk);
+Gewgaws = {}
 
-                $gewgaw.find('.project').text(this.fields.project);
-                $gewgaw.find('.title').text(this.fields.title);
-                $gewgaw.find('.description').text(this.fields.description);
-                });
-    },
-    'lightGewgaw': function(gewgawIndex) {
-        if($('.gewgaws li').eq(gewgawIndex).size() == 1) {
-            $('.gewgaws li')
-                .removeClass('lit-up')
-                .eq(gewgawIndex).addClass('lit-up').scrollIntoView();
-            // FIXME: Automatically scroll when gewgaw is expanded such that its content is off-screen.
-        }
-        else {
-            console.log('no gewgaw to highlight');
-        }
-    },
-    'update': function(queryArray) {
-        queryArray.push({'name': 'format', value: 'json'});
+Gewgaws.focusSearchInput = function () {
+    console.log('focus search input called');
+    $("#opps form input[type='text']").focus();
+};
 
-        queryStringFormatJSON = $.param(queryArray);
+Gewgaws.queryURL = "/search/?";
 
-        /* Fetch JSON and put in DOM. */
-        Gewgaws.fetchGewgawsToDOM(queryStringFormatJSON);
+Gewgaws.$gewgawsDOMList = $('.gewgaws ul');
 
-        /* Update navigation links */
-        var language;
-        $(queryArray).each(function () {
-                if(this.name == 'language') language = this.value;
-                })
+Gewgaws.getLitGewgawIndex = function() {
+    // FIXME: Remember the index of the lit gewgaw in Javascript,
+    // and avoid going through CSS.
+    return $('.gewgaws li').index($('.lit-up')[0]);
+};
 
-        diff = thisend - thisstart;
+Gewgaws.fetchGewgawsToDOM = function (queryString) {
+    url = this.queryURL + queryString + "&jsoncallback=?";
+    $.getJSON(url, this.jsonArrayToDocument);
+};
 
-        prevPageQueryArray = $('form').serializeArray();
-        prevPageQueryArray.push( {'name': 'start', 'value': thisstart - diff - 1});
-        prevPageQueryArray.push( {'name': 'end', 'value': thisstart - 1});
+Gewgaws.jsonArrayToDocument = function (jsonArray) {
+    $(jsonArray).each( function(i) {
+            $gewgaw = $("li").eq(i);
+            $gewgaw.attr('id', "gewgaw-" + this.pk);
 
-        nextPageQueryArray = $('form').serializeArray();
-        nextPageQueryArray.push( {'name': 'start', 'value': thisend + 1});
-        nextPageQueryArray.push( {'name': 'end', 'value': thisend + diff + 1});
+            $gewgaw.find('.project').text(this.fields.project);
+            $gewgaw.find('.title').text(this.fields.title);
+            $gewgaw.find('.description').text(this.fields.description);
+            });
+};
 
-        /* Update navigation links to reflect new query. */
-        prefix = '/search/?';
-        $('#prev-page').attr('href', prefix + $.param(prevPageQueryArray));
-        $('#next-page').attr('href', prefix + $.param(nextPageQueryArray));
+Gewgaws.lightGewgaw = function(gewgawIndex) {
+    if($('.gewgaws li').eq(gewgawIndex).size() == 1) {
+        $('.gewgaws li')
+            .removeClass('lit-up')
+            .eq(gewgawIndex).addClass('lit-up').scrollIntoView();
+        // FIXME: Automatically scroll when gewgaw is expanded such that its content is off-screen.
+    }
+    else {
+        console.log('no gewgaw to highlight');
+    }
+};
 
-        $('#results-summary-language').text(language);
-        $('#results-summary-start').text(thisstart);
-        $('#results-summary-end').text(thisend);
+Gewgaws.update = function(queryArray) {
+    queryArray.push({'name': 'format', value: 'json'});
 
-        return false;
-    },
-    'moveGewgawFocusDown': function() {
-        if (Gewgaws.useShortcutKeys) {
-            Gewgaws.lightGewgaw(Gewgaws.getLitGewgawIndex() + 1);
-        }
-    },
-    'moveGewgawFocusUp': function() {
-        if (Gewgaws.useShortcutKeys) {
-            Gewgaws.lightGewgaw(Gewgaws.getLitGewgawIndex() - 1);
-        }
-    },
-    'useShortcutKeys': true
-}
+    queryStringFormatJSON = $.param(queryArray);
 
-/* vim: set ai ts=4 sts=4 et sw=4: */
+    /* Fetch JSON and put in DOM. */
+    Gewgaws.fetchGewgawsToDOM(queryStringFormatJSON);
+
+    /* Update navigation links */
+    var language;
+    $(queryArray).each(function () {
+            if(this.name == 'language') language = this.value;
+            })
+
+    diff = thisend - thisstart;
+
+    prevPageQueryArray = $('form').serializeArray();
+    prevPageQueryArray.push( {'name': 'start', 'value': thisstart - diff - 1});
+    prevPageQueryArray.push( {'name': 'end', 'value': thisstart - 1});
+
+    nextPageQueryArray = $('form').serializeArray();
+    nextPageQueryArray.push( {'name': 'start', 'value': thisend + 1});
+    nextPageQueryArray.push( {'name': 'end', 'value': thisend + diff + 1});
+
+    /* Update navigation links to reflect new query. */
+    prefix = '/search/?';
+    $('#prev-page').attr('href', prefix + $.param(prevPageQueryArray));
+    $('#next-page').attr('href', prefix + $.param(nextPageQueryArray));
+
+    $('#results-summary-language').text(language);
+    $('#results-summary-start').text(thisstart);
+    $('#results-summary-end').text(thisend);
+
+    return false;
+};
+
+Gewgaws.moveGewgawFocusDown = function() {
+    Gewgaws.lightGewgaw(Gewgaws.getLitGewgawIndex() + 1);
+};
+
+Gewgaws.moveGewgawFocusUp = function() {
+    Gewgaws.lightGewgaw(Gewgaws.getLitGewgawIndex() - 1);
+};

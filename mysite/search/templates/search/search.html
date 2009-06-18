@@ -1,5 +1,6 @@
+{% load webdesign %}
 {% comment %}
-Opp finder template
+OPP FINDER TEMPLATE
 {% endcomment %}
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -36,7 +37,7 @@ Opp finder template
     {% endcomment %}
     <script src='/static/js/jquery.scrollTo.js'></script>
     <!--script src='/static/js/jquery.bgiFrame.js'></script>
-    <script src='/static/js/jquery.ajaxQueue.js'></script-->
+  <script src='/static/js/jquery.ajaxQueue.js'></script-->
     <script src='/static/js/jquery.autocomplete.js'></script>
     <script>
       thisstart = {{ start }};
@@ -47,9 +48,9 @@ Opp finder template
 
   </head>{% comment %} }}} {% endcomment %}
   <body>
-    <div id='images'></div>
     <div id='wrapper-outer'>
       <div id='wrapper-inner'>
+
         {% comment %} Logo and explanation {{{ {% endcomment %}
         <h2 id='banner'>
           <img alt='OpenHatch' src='/static/images/openhatch2.png'/>
@@ -88,17 +89,26 @@ Opp finder template
 
         </div>
         {% comment %} }}} {% endcomment %}
+
+        {% comment %} Search and results {{{ {% endcomment %}
         <div id='content'>
+
           <div id='main'>
+
             <div id='opps' class='gewgaws box'>
-              {% comment %} Search form {% endcomment %}
+
+              {% comment %} Search form {{{ {% endcomment %}
               <form name='search_opps' method='get'> 
                 <h3><label for='language'>Search tasks</label></h3>
                 <input type='text' name='language' id='language'
-                  value='{{ language }}' />
+                value='{{ language }}' />
                 <input type='submit' id='button' value='GO' />
               </form>
+              {% comment %} }}} {% endcomment %}
+
               <div class='content'>
+
+                {% comment %} Results summary widget {{{ {% endcomment %}
                 <div id='results-widget'>
                   <span id='results-summary'>
                     <span id='results-summary-language'>{{ language }}</span>
@@ -115,12 +125,17 @@ Opp finder template
 
                   <span id='navigation'>
                     <a href='{{ prev_page_url }}' id='prev-page'>&laquo; Prev</a>
-                  <span class='separator'>&nbsp;</span>
+                    <span class='separator'>&nbsp;</span>
                     <a href='{{ next_page_url }}' id='next-page'>Next page &raquo;</a>
-                  <span class='separator'>&nbsp;</span>
+                    <span class='separator'>&nbsp;</span>
                     <a href='EXPAND_ALL_URL' id='expand-all-link'>Expand all</a>
                     <a href='COLLAPSE_ALL_URL' id='collapse-all-link'>Collapse all</a>
-                </span> </div>
+                  </span>
+
+                </div><!-- /#results-widget -->
+                {% comment %} }}} {% endcomment %}
+
+                {% comment %} Search results {{{ {% endcomment %}
                 {% if bunch_of_bugs %}
                 <ul>
                   {% for bug in bunch_of_bugs %}
@@ -143,6 +158,7 @@ Opp finder template
                       {% lorem 2 p random %}
                     </span>
                   </div>
+                  {% comment %} Details {{{ {% endcomment %}
                   <div class='details'>
                     <div class='fields'>
                       <span class='field importance'>
@@ -176,21 +192,31 @@ Opp finder template
                       </span>
                     </div>
                   </div>
+                  {% comment %} }}} {% endcomment %}
                   </li>
                   {% endfor %}
                 </ul>
                 {% else %}
-                <p class='no-opps'>No opportunities found matching your query: {{ language }}.</p>
+                <p class='no-opps'>
+                No opportunities found matching your query: {{ language }}.
+                </p>
                 {% endif %}
-
               </ul>
-            </div>
-          </div>
-        </div>
+              {% comment %} End of search results }}} {% endcomment %}
+
+            </div> <!-- /#opps -->
+
+          </div><!-- /#main -->
+
+        </div><!-- /#content -->
+        {% comment %} }}} {% endcomment %}
+
+        {% comment %} Sidebar {{{ {% endcomment %}
         <div id='sidebar'>
           <div id='heading' class='box'>
             You are logged in as: {{ developer_name }}
           </div>
+          {% comment %} Projects {{{ {% endcomment %}
           <div id='projects' class='box'>
             <h2>Registered projects:</h2>
             <div class='content'>
@@ -237,6 +263,7 @@ Opp finder template
               </table>
             </div>
           </div>
+          {% comment %} }}} {% endcomment %}
           <div id='add-another-bug-tracker' 
             class='box'>
             <h2>Add projects auto-magically</h2>
@@ -244,8 +271,7 @@ Opp finder template
               <p>Type your username or email
               address and we will look for your 
               trackers.</p>
-              <input type='text'
-              value='Type your username'/>
+              <input type='text' value='Type your username'/>
             </div>
           </div>
           <div id='skill-list' class='box'>
@@ -255,9 +281,10 @@ Opp finder template
             <h2>Add a skill</h2>
           </div>
         </div>
-      </div>
-    </div>
-  </div>
-</body>
+        {% comment %} }}} {% endcomment %}
+
+      </div> <!-- /#wrapper-inner -->
+    </div> <!-- /#wrapper-outer -->
+  </body>
 </html>
 <!-- vim: set ts=2 sw=2 expandtab: -->
