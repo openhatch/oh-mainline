@@ -4,7 +4,7 @@
 # Imports {{{
 import django.test
 from search.models import Project
-from profile.models import Person, ProjectExp, Tag, TagType
+from profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag
 
 import twill
 from twill import commands as tc
@@ -230,7 +230,7 @@ class QuebecTests(django.test.TestCase):
 
     # }}}
 
-class SomervilleTest(django.test.TestCase):
+class SomervilleTests(django.test.TestCase):
     '''
     The Somerville milestone says:
     * You can add tags to annotate each code experience
@@ -243,8 +243,8 @@ class SomervilleTest(django.test.TestCase):
         twill_teardown()
 
     def testNewLink_ProjectExp_Tag(self):
-        tag_type_lang = TagType(text='language', prefix='lang')
-        tag_python = Tag(name='python')
+        tag_type_lang = TagType(name='language', prefix='lang')
+        tag_python = Tag(text='python')
         project_exp = ProjectExp()
         proj_exp_tag = Link_ProjectExp_Tag()
 
