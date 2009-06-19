@@ -4,6 +4,7 @@
 # Imports {{{
 import django.test
 from search.models import Project
+from profile.models import Person, PersonToProjectRelationship
 
 import twill
 from twill import commands as tc
@@ -210,18 +211,14 @@ class QuebecTests(django.test.TestCase):
 
     def tearDown(self):
         twill_teardown()
+        # FIXME: delete the paulproteus person
+        # and all related PersonToProjectRelationships
 
-    def testFetchContribDataFromOhlohIntoPerson(self):
+    def testPersonModel(self):
+        # Test creating a Person and fetching his contribution info
         username = 'paulproteus'
-        p2p_rels_before_fetch = PersonToProjectRelationship.objects.filter(username=username)[:]
-
-        p = Person.objects.create(username=username)
-        p.fetch_data_from_ohloh()
-
-        p2p_rels_after_fetch = PersonToProjectRelationship.objects.filter(username=username)[:]
-
-        # Test that at least one P2PRel object has now been saved into the DB
-        [p2p_rel for p2p_rel in p2p_rels_before_fetch in p2p_rels_after_fetch]
+        new_person = Person(username=username)
+        new_person.fetch_contrib_data_from_ohloh()
 
     # }}}
 
