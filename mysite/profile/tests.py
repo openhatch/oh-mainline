@@ -4,7 +4,7 @@
 # Imports {{{
 import django.test
 from search.models import Project
-from profile.models import Person, PersonToProjectRelationship
+from profile.models import Person, ProjectExp
 
 import twill
 from twill import commands as tc
@@ -214,7 +214,7 @@ class QuebecTests(django.test.TestCase):
     def tearDown(self):
         twill_teardown()
         # FIXME: delete the paulproteus person
-        # and all related PersonToProjectRelationships
+        # and all related ProjectExps
 
     def testPersonModel(self):
         # Test creating a Person and fetching his contribution info
@@ -222,11 +222,11 @@ class QuebecTests(django.test.TestCase):
         new_person = Person(username=username)
         new_person.fetch_contrib_data_from_ohloh()
         self.to_be_deleted.append(new_person)
-        # Verify that we actually created some PersonToProjectRelationships
-        all_p2prs = list(
-            PersonToProjectRelationship.objects.filter(person=new_person).all())
-        self.to_be_deleted.extend(all_p2prs)
-        self.assert_(all_p2prs, all_p2prs)
+        # Verify that we actually created some ProjectExps
+        all_proj_exps = list(
+            ProjectExp.objects.filter(person=new_person).all())
+        self.to_be_deleted.extend(all_proj_exps)
+        self.assert_(all_proj_exps, all_proj_exps)
 
     # }}}
 
