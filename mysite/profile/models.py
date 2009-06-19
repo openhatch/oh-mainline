@@ -40,7 +40,7 @@ class Person(models.Model):
     # }}}
 
 class PersonToProjectRelationship(models.Model):
-    """ Many-to-one relation between projects and people """
+    "Many-to-one relation between projects and people."
     # {{{
     person = models.ForeignKey(Person)
     project = models.ForeignKey(Project)
@@ -76,18 +76,6 @@ class PersonToProjectRelationship(models.Model):
         self.time_gathered_from_source = datetime.date.today()
     # }}}
 
-"""
-Not yet implemented or needed.
-class Commit(models.Model):
-    # {{{
-    person_to_project_relationship = models.ForeignKey(
-            PersonToProjectRelationship)
-    person = models.ForeignKey(Person) # Redundant
-    project = models.ForeignKey(Project) # Redundant
-    time = models.DateTimeField()
-    description = models.TextField()
-    # }}}
-
 class Tag(models.Model):
     # {{{
     text = models.CharField(max_length=50)
@@ -98,4 +86,14 @@ class TagTypes(models.Model):
     # {{{
     prefix = models.CharField(max_length=20)
     # }}}
-"""
+
+class Link_PersonToProjectRelationship_Tag(models.Model):
+    "Many-to-many relation between p2prels and tags."
+    # {{{
+    tag = models.ForeignKey(Tag)
+    person_to_project_relationship = models.ForeignKey(
+            PersonToProjectRelationship)
+    time_record_was_created = models.DateTimeField(
+            default=datetime.datetime.now())
+    source = models.CharField(max_length=200)
+    # }}}
