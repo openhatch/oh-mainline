@@ -215,15 +215,14 @@ class QuebecTests(django.test.TestCase):
         username = 'paulproteus'
         p2p_rels_before_fetch = PersonToProjectRelationship.objects.filter(username=username)[:]
 
-        p = Person.objects.create(username=username):
+        p = Person.objects.create(username=username)
         p.fetch_data_from_ohloh()
 
         p2p_rels_after_fetch = PersonToProjectRelationship.objects.filter(username=username)[:]
 
         # Test that at least one P2PRel object has now been saved into the DB
-        [p2p_rel for p2p_rel not in p2p_rels_before_fetch in p2p_rels_after_fetch]
+        [p2p_rel for p2p_rel in p2p_rels_before_fetch in p2p_rels_after_fetch]
 
-        self.assert_(
     # }}}
 
 # vim: set ai et ts=4 sw=4:
