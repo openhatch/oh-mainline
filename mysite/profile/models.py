@@ -56,10 +56,6 @@ class PersonToProjectRelationship(models.Model):
 
     source = models.CharField(max_length=100)
 
-    def save(self):
-        if not self.id:
-            self.time_record_was_created = datetime.date.today()
-
     def from_ohloh_contrib_info(self, ohloh_contrib_info):
         if not self.person:
             self.person = Person.objects.get_or_create(
