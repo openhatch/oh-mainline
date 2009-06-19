@@ -151,6 +151,17 @@ class OhlohTests(django.test.TestCase):
         # }}}
 
 
+    def testFindContributionsInOhlohAccountByEmail(self):
+        oh = ohloh.get_ohloh()
+        username = oh.email_address_to_ohloh_username('paulproteus.ohloh@asheesh.org')
+        projects = oh.get_contribution_info_by_ohloh_username(username)
+        
+        assert {'project': u'ccHost',
+                'project_homepage_url': 'http://wiki.creativecommons.org/CcHost',
+                'man_months': 1,
+                'primary_language': 'shell script'} in projects
+
+
     def testFindUsernameByEmail(self):
         # {{{
         oh = ohloh.get_ohloh()
