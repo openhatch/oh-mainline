@@ -1,3 +1,5 @@
+# vim: ai ts=4 sts=4 et sw=4
+
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from mysite.profile.models import Person, PersonToProjectRelationship
@@ -26,27 +28,32 @@ def add_contribution(request):
     return HttpResponseRedirect('/profile/')
     #}}}
 
-def get_person_and_fetch_from_ohloh_web(input_username=None):
+def get_data_dict_for_display_person(username):
+
+    person, bool_created = Person.objects.get_or_create(
+            username=username)
+    # Not doing anything with bool_created at the moment.
+
+    if person.poll_on_next_web_view:
+        person.fetch_data_from_ohloh()
+        person.poll_on_next_web_view = False
+        person.save()
+
+    rels_to_projects = PersonToProjectRelationship.objects.filter(
+            person=person)
+
+    return { 'person': person, 'rels_to_projects': rels_to_projects, }
+
+def display_person(request, input_username=None):
     # {{{
 
     if input_username is None:
-        return HttpResponseServerError()
+        input_username = request.GET.get('u', None)
+        if input_username is None:
+            return HttpResponseServerError()
 
-    person = Person.object.get(username=input_username)
-    if person.poll_on_next_web_view:
-        person.fetch_data_from_ohloh()
-        person.poll_on_next_web_view = True
-        person.save()
+    context = get_data_dict_for_display_person(input_username)
 
-    relationships_with_projects = PersonToProjectRelationship.objects.filter(
-            person=self)
-
-    return render_to_response('profile/profile.html',
-            person: person,
-            relationships_with_projects: relationships_with_projects
-            )
+    return render_to_response('profile/profile.html', context)
 
     # }}}
-
-
-# vim: ai ts=4 sts=4 et sw=4

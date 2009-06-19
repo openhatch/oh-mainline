@@ -2,35 +2,34 @@
 
 from django.db import models
 from mysite.search.models import Project, Bug
+import datetime
 
 class Person(models.Model):
+    """ A human bean. """
     # {{{
     name = models.CharField(max_length=200)
     username = models.CharField(max_length=200)
     password_hash_md5 = models.CharField(max_length=200) #FIXME: Get specific length of hash
-    time_record_created = models.DateTimeField()
-    last_polled = models.DateTimeField()
+    time_record_was_created = models.DateTimeField(default=datetime.datetime.now())
+    last_polled = models.DateTimeField(blank=True, null=True)
     last_touched = models.DateTimeField()
     poll_on_next_web_view = models.BooleanField(default=True)
 
-    def save(self):
-        now = date.datetime.today()
-        if not self.id:
-            self.time_record_created = now
-        self.last_touched = now
-        super(Person, self).save()
+    def save(self, *args, **kwargs):
+        self.last_touched = datetime.datetime.now()
+        super(Person, self).save(*args, **kwargs)
 
     def fetch_data_from_ohloh(self):
         import ohloh
         oh = ohloh.get_ohloh()
         ohloh_contrib_info_list = oh.get_contribution_info_by_username(
-                person.username)
+                self.username)
         for ohloh_contrib_info in ohloh_contrib_info_list:
             p2p_rel = PersonToProjectRelationship()
             p2p_rel.person = self
             p2p_rel.from_ohloh_contrib_info(ohloh_contrib_info)
             p2p_rel.save()
-        self.last_polled = date.datetime.today()
+        self.last_polled = datetime.datetime.now()
         self.save()
 
     # }}}
@@ -50,20 +49,20 @@ class PersonToProjectRelationship(models.Model):
     man_months = models.PositiveIntegerField()
     primary_language = models.CharField(max_length=200)
 
-    source = model.CharField(max_length=100)
+    source = models.CharField(max_length=100)
 
     def save(self):
         if not self.id:
             self.time_record_was_created = datetime.date.today()
 
-    def from_ohloh_contrib_info(self):
+    def from_ohloh_contrib_info(self, ohloh_contrib_info):
         if not self.person:
             self.person = Person.objects.get_or_create(
                     username=ohloh_contrib_info['username'])
         else:
             pass # Don't overwrite.
 
-        self.project = Project.objects.get_or_create(
+        self.project, bool_created = Project.objects.get_or_create(
                 name=ohloh_contrib_info['project'])
         # FIXME: Automatically populate project url here.
         self.man_months = ohloh_contrib_info['man_months']
@@ -72,6 +71,8 @@ class PersonToProjectRelationship(models.Model):
         self.time_gathered_from_source = datetime.date.today()
     # }}}
 
+"""
+Not yet implemented or needed.
 class Commit(models.Model):
     # {{{
     person_to_project_relationship = models.ForeignKey(
@@ -92,3 +93,4 @@ class TagTypes(models.Model):
     # {{{
     prefix = models.CharField(max_length=20)
     # }}}
+"""

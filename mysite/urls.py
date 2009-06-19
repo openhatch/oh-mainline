@@ -11,9 +11,8 @@ urlpatterns = patterns('',
         (r'^admin/(.*)', admin.site.root),
         (r'^static/(?P<path>.*)$', 'django.views.static.serve',
             {'document_root': settings.STATIC_DOC_ROOT}),
-        (r'^profile/$', 'mysite.profile.views.index'),
-        (r'^profile/add_contribution$', 'mysite.profile.views.add_contribution'),
-        (r'^people/(?P<username>.*)$', 'mysite.profile.views.get_person_web', {'username': username}),
+        (r'^people/add_contribution$', 'mysite.profile.views.add_contribution'),
+        (r'^people/$', 'mysite.profile.views.display_person'),
 
         # Get a list of suggestions for the search input, formatted the way that
         # the jQuery autocomplete plugin wants it.

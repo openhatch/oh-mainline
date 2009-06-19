@@ -4,8 +4,11 @@ vim: set ts=3 sw=3 et:
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
+
         {% comment %} Prefatory remarks {{{ {% endcomment %}
-        <title>{{ developer_name }} &bull; Resume &bull; OpenHatch</title>
+        <title>
+           {{ developer_name }} &bull; Resume &bull; OpenHatch
+        </title>
         <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
         <meta http-equiv='Content-Language' content='en-us' />
         <meta http-equiv='Content-Script-Type' content='text/javascript' />
@@ -35,7 +38,7 @@ vim: set ts=3 sw=3 et:
 
         {% comment %} }}} {% endcomment %}
 
-        {% comment %} ECMAScriptss {{{ {% endcomment %}
+        {% comment %} ECMAScripts {{{ {% endcomment %}
 
         <script src='/static/js/jquery.js'></script>
         <!-- by jove I love jQuery plugins ~ rkl -->
@@ -68,9 +71,12 @@ vim: set ts=3 sw=3 et:
                     <div class='box'>
                         <h3>Log some experience we didn't find</h3>
                         <form id='add-contrib' name='add_contrib'
-                            method='POST' action='/profile/add_contribution'>
-                            <label for='project-name'>Type a project name</label>
-                            <input id='contrib-project-name' type='text' name='project'/>
+                            method='POST' action='/people/add_contribution'>
+                            <label for='project-name'>
+                               Type a project name
+                            </label>
+                            <input id='contrib-project-name'
+                            type='text' name='project'/>
 
                             <label for='contrib-description'>
                                 Describe your contribution </label>
@@ -81,7 +87,8 @@ vim: set ts=3 sw=3 et:
                             <input id='contrib-url' type='text' name='url' />
 
                             <label></label>
-                            <input type='submit' id='add-contrib-submit' value='Log it' />
+                            <input type='submit' id='add-contrib-submit' 
+                            value='Log it' />
                         </form>
                     </div>
                     {% comment %} }}} {% endcomment %}
@@ -92,28 +99,33 @@ vim: set ts=3 sw=3 et:
                             free and open source software community</h3>
                         <form id='enter-free-software-username' 
                             name='enter_free_software_username'
-                            action='/profile/get_data_for_username' method='POST' >
-                            <label for='get-data-username'>Type a username</label>
-                            <input type='text' id='get-data-username' name='username' />
-                            <input type='image' src='/static/images/add.png' />
-                        </form>
-                    </div>
-                    {% comment %} }}} {% endcomment %}
+                            action='/profile/get_data_for_username' 
+                            method='POST' >
+                            <label for='get-data-username'>
+                               Type a username</label>
+                            <input type='text'
+                            id='get-data-username' 
+                            name='username' />
+                            <input type='image'
+                            src='/static/images/add.png' />
+                         </form>
+                      </div>
+                      {% comment %} }}} {% endcomment %}
 
-                    {% comment %} Show FOSS experience {{{ {% endcomment %}
-                    <div>
-                        {% if saved_data %}
-                        <ul id='exp'>
-                            {% for datum in saved_data %}
+                      {% comment %} Show FOSS experience {{{ {% endcomment %}
+                      <div>
+                         {% if rels_to_projects %}
+                         <ul id='exp'>
+                            {% for rel in rels_to_projects %}
                             <li>
                             <div class='project-name'>
-                                {% if datum.url %}
-                                <a href='{{ datum.url }}'>
-                                    {{ datum.project }}
-                                </a>
-                                {% else %}
-                                {{ datum.project }}
-                                {% endif %}
+                               {% if datum.url %}
+                               <a href='{{ datum.url }}'>
+                                  {{ datum.project }}
+                               </a>
+                               {% else %}
+                               {{ datum.project }}
+                               {% endif %}
                             </div>
                             <div class='summary'>
                                 {{ datum.contrib_text }}
