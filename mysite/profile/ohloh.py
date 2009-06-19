@@ -28,6 +28,7 @@ def ohloh_url2data(url, selector, params = {}, many = False):
     encoded = urllib.urlencode(params)
     url += encoded
     b = mechanize_get(url)
+    s = b.response()
     tree = ET.parse(b.response())
         
     # Did Ohloh return an error?
@@ -97,8 +98,17 @@ class Ohloh(object):
         hasher = hashlib.md5(); hasher.update(email)
         hashed = hasher.hexdigest()
         url = 'http://www.ohloh.net/accounts/%s.xml?' % hashed
-        url, data = ohloh_url2data(url, 'result/account')
-        return data['name']
+        _url = 'https://www.ohloh.net/accounts/%s' % hashed
+        b = mechanize_get(_url)
+        parsed = lxml.html.parse(b.response()).getroot()
+        one, two = parsed.cssselect('h1 a')[0], parsed.cssselect('a.avatar')[0]
+        href1, href2 = one.attrib['href'], two.attrib['href']
+        assert href1 == href2
+        parts = filter(lambda s: bool(s), href1.split('/'))
+        assert len(parts) == 2
+        assert parts[0] == 'accounts'
+        username = parts[1]
+        return username
 
     def get_contribution_info_by_ohloh_username(self, ohloh_username):
         b = mechanize.Browser()
