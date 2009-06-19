@@ -102,13 +102,32 @@ class OhlohTests(django.test.TestCase):
                            'primary_language': 'shell script'}],
                          projects)
 
-    def testFindByEmail(self):
+    def testFindByOhlohUsername(self):
+        oh = ohloh.get_ohloh()
+        projects = oh.get_contribution_info_by_ohloh_username('paulproteus')
+        self.assertEqual([{'project': u'ccHost',
+                           'project_homepage_url': 'http://wiki.creativecommons.org/CcHost',
+                           'man_months': 1,
+                           'primary_language': 'shell script'}],
+                         projects)
+
+    def testFindByEmail(self): 
         oh = ohloh.get_ohloh()
         projects = oh.get_contribution_info_by_email('asheesh@asheesh.org')
         assert {'project': u'playerpiano',
                 'project_homepage_url': 'http://code.google.com/p/playerpiano',
                 'man_months': 1,
                 'primary_language': 'Python'} in projects
+
+    def testFindContributionsInOhlohAccountByUsername(self):
+        oh = ohloh.get_ohloh()
+        projects = oh.get_contribution_info_by_ohloh_username('paulproteus')
+        
+        assert {'project': u'ccHost',
+                'project_homepage_url': 'http://wiki.creativecommons.org/CcHost',
+                'man_months': 1,
+                'primary_language': 'shell script'} in projects
+
 
     def testFindUsernameByEmail(self):
         oh = ohloh.get_ohloh()
