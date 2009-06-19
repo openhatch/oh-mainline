@@ -26,27 +26,27 @@ def add_contribution(request):
     return HttpResponseRedirect('/profile/')
     #}}}
 
-def get_data_for_username(request):
+def get_person_and_fetch_from_ohloh_web(input_username=None):
     # {{{
-    username = request.POST.get('username', '')
 
-    if username:
-        saved = request.session.get('saved_data', [])
-        # always append the data
-            saved.append(new_values)
-            request.session['saved_data'] = saved
-    return HttpResponseRedirect('/profile/')
+    if input_username is None:
+        return HttpResponseServerError()
 
-def get_data_for_person(_person):
-    if not _person:
-        pass # implement fail
+    person = Person.object.get(username=input_username)
+    if person.poll_on_next_web_view:
+        person.fetch_data_from_ohloh()
+        person.poll_on_next_web_view = True
+        person.save()
 
-    import ohloh
-    oh = ohloh.get_ohloh()
-    person_to_project_rels = [PersonToProjectRelationship(**vals) for vals in ]
-    contrib_info_list = oh.get_contribution_info_by_username(person.username)
-    for contrib_info in contrib_info_list:
-        ppr = PersonToProjectRelationship(person=_person)
+    relationships_with_projects = PersonToProjectRelationship.objects.filter(
+            person=self)
 
-def person_to_project_rels_ohloh_style
+    return render_to_response('profile/profile.html',
+            person: person,
+            relationships_with_projects: relationships_with_projects
+            )
+
+    # }}}
+
+
 # vim: ai ts=4 sts=4 et sw=4

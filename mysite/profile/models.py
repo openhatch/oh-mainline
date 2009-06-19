@@ -3,18 +3,36 @@
 from django.db import models
 from mysite.search.models import Project, Bug
 
-# Create your models here.
 class Person(models.Model):
     # {{{
     name = models.CharField(max_length=200)
     username = models.CharField(max_length=200)
     password_hash_md5 = models.CharField(max_length=200) #FIXME: Get specific length of hash
     time_record_created = models.DateTimeField()
+    last_polled = models.DateTimeField()
+    last_touched = models.DateTimeField()
+    poll_on_next_web_view = models.BooleanField(default=True)
 
     def save(self):
+        now = date.datetime.today()
         if not self.id:
-            self.time_record_created = date_reported.datetime.today()
+            self.time_record_created = now
+        self.last_touched = now
         super(Person, self).save()
+
+    def fetch_data_from_ohloh(self):
+        import ohloh
+        oh = ohloh.get_ohloh()
+        ohloh_contrib_info_list = oh.get_contribution_info_by_username(
+                person.username)
+        for ohloh_contrib_info in ohloh_contrib_info_list:
+            p2p_rel = PersonToProjectRelationship()
+            p2p_rel.person = self
+            p2p_rel.from_ohloh_contrib_info(ohloh_contrib_info)
+            p2p_rel.save()
+        self.last_polled = date.datetime.today()
+        self.save()
+
     # }}}
 
 class PersonToProjectRelationship(models.Model):
@@ -38,7 +56,7 @@ class PersonToProjectRelationship(models.Model):
         if not self.id:
             self.time_record_was_created = datetime.date.today()
 
-    def from_ohloh_contrib_info(self, ohloh_contrib_info):
+    def from_ohloh_contrib_info(self):
         if not self.person:
             self.person = Person.objects.get_or_create(
                     username=ohloh_contrib_info['username'])
