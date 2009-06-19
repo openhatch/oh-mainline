@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# vim: set ai et ts=4 sw=4:
 # Testing suite for profile
 
 # Imports {{{
@@ -259,6 +260,19 @@ class SomervilleTests(django.test.TestCase):
 
     def testAddTagToProjectExp(self):
         # {{{
+        person, person_created = Person.objects.get_or_create(
+                username='stipe')
+        if person_created: print "person %s was created" % person
+
+        project, project_created = Project.objects.get_or_create(
+                name='exaile')
+        if project_created: print "project %s was created" % project
+
+        add_tag_to_project_exp(person, project, "awesome")
+        # }}}
+
+    def testAddTagToProjectExpWithoutFunction(self):
+        # {{{
 
         tag_type, created = TagType.objects.get_or_create(name='misc')
         if created: print "tag type %s was created" % tag_type
@@ -287,4 +301,3 @@ class SomervilleTests(django.test.TestCase):
         # }}}
 
     # }}}
-# vim: set ai et ts=4 sw=4:

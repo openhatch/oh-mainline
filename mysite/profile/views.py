@@ -30,9 +30,8 @@ def add_contribution(request):
 
 def get_data_dict_for_display_person(username):
 
-    person, bool_created = Person.objects.get_or_create(
+    person, person_created = Person.objects.get_or_create(
             username=username)
-    # Not doing anything with bool_created at the moment.
 
     if person.poll_on_next_web_view:
         person.fetch_data_from_ohloh()
@@ -70,3 +69,26 @@ def get_data_for_email(request):
         request.session['saved_data'] = saved
     return HttpResponseRedirect('/profile/')
 
+def add_tag_to_project_exp(username, project_name,
+        tag_text, tag_type_name='user_generated'):
+
+    tag_type, created = TagType.objects.get_or_create(name=tag_type_name)
+
+    tag, tag_created = Tag.objects.get_or_create(
+            text=tag_text, type=tag_type)
+
+    person = Person.objects.get(
+            username=username)
+    # FIXME: Catch when no such person exists.
+
+    project = Project.objects.get(
+            name=project_name)
+    # FIXME: Catch when no such project exists.
+
+    project_exp = ProjectExp.objects.get(
+            person=person, project=project)
+    # FIXME: Catch when no such project exp exists.
+
+    new_link = Link_ProjectExp_Tag.objects.create(
+            tag=tag, project_exp=project_exp)
+    # FIXME: Catch when link already exists.
