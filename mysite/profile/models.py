@@ -80,6 +80,7 @@ class Tag(models.Model):
 
 class TagType(models.Model):
     # {{{
+    name = models.CharField(max_length=100)
     prefix = models.CharField(max_length=20)
     # }}}
 

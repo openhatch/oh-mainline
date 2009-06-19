@@ -4,7 +4,7 @@
 # Imports {{{
 import django.test
 from search.models import Project
-from profile.models import Person, ProjectExp
+from profile.models import Person, ProjectExp, Tag, TagType
 
 import twill
 from twill import commands as tc
