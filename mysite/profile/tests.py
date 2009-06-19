@@ -3,13 +3,14 @@
 # Testing suite for profile
 
 # Imports {{{
-import django.test
 from search.models import Project
 from profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag
+import profile.views
 
 import twill
 from twill import commands as tc
 from twill.shell import TwillCommandLoop
+import django.test
 from django.test import TestCase
 from django.core.servers.basehttp import AdminMediaHandler
 from django.core.handlers.wsgi import WSGIHandler
@@ -249,7 +250,7 @@ class SomervilleTests(django.test.TestCase):
         # {{{
         stipe = Person(name='Michael Stipe', username='stipe')
         language = TagType(name='language', prefix='lang')
-        python = Tag(text='python', type=language)
+        python = Tag(text='python', tag_type=language)
         exaile = Project(name='exaile')
         project_exp = ProjectExp(person=stipe, project=exaile)
         proj_exp_tag = Link_ProjectExp_Tag(
@@ -262,13 +263,17 @@ class SomervilleTests(django.test.TestCase):
         # {{{
         person, person_created = Person.objects.get_or_create(
                 username='stipe')
-        if person_created: print "person %s was created" % person
+        if person_created: print "Person %s was created" % person
 
         project, project_created = Project.objects.get_or_create(
-                name='exaile')
-        if project_created: print "project %s was created" % project
+                name='murmur')
+        if project_created: print "Project %s was created" % project
 
-        add_tag_to_project_exp(person, project, "awesome")
+        project_exp, proj_exp_created = ProjectExp.objects.get_or_create(
+                person=person, project=project)
+        if proj_exp_created: print "ProjectExp %s was created" % project_exp
+
+        profile.views.add_tag_to_project_exp("stipe", "murmur", "awesome")
         # }}}
 
     def testAddTagToProjectExpWithoutFunction(self):
@@ -279,7 +284,7 @@ class SomervilleTests(django.test.TestCase):
 
         tag, tag_created = Tag.objects.get_or_create(
                 text='exemplary futility',
-                type=tag_type)
+                tag_type=tag_type)
         if tag_created: print "tag %s was created" % tag
 
         person, person_created = Person.objects.get_or_create(

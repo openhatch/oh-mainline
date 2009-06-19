@@ -16,7 +16,7 @@ class Person(models.Model):
             default=datetime.datetime.now())
     last_polled = models.DateTimeField(
             blank=True, null=True)
-    last_touched = models.DateTimeField()
+    last_touched = models.DateTimeField(null=True)
     poll_on_next_web_view = models.BooleanField(
             default=True)
 
@@ -52,11 +52,11 @@ class ProjectExp(models.Model):
     project = models.ForeignKey(Project)
     person_role = models.CharField(max_length=200)
     time_record_was_created = models.DateTimeField(null=True)
-    last_touched = models.DateTimeField()
+    last_touched = models.DateTimeField(null=True)
     description = models.TextField()
     url = models.URLField(max_length=200, null=True)
-    time_start = models.DateTimeField(null=True)
-    time_finish = models.DateTimeField(null=True)
+    #time_start = models.DateTimeField(null=True)
+    #time_finish = models.DateTimeField(null=True)
     man_months = models.PositiveIntegerField(null=True)
     primary_language = models.CharField(max_length=200, null=True)
     source = models.CharField(max_length=100, null=True)
@@ -98,7 +98,7 @@ class TagType(models.Model):
 class Tag(models.Model):
     # {{{
     text = models.CharField(max_length=50)
-    type = models.ForeignKey(TagType)
+    tag_type = models.ForeignKey(TagType)
     # }}}
 
 class Link_ProjectExp_Tag(models.Model):

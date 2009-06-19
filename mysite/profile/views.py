@@ -2,7 +2,8 @@
 
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
-from mysite.profile.models import Person, ProjectExp
+from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag
+from mysite.search.models import Project
 
 def index(request):
     #{{{
@@ -75,14 +76,12 @@ def add_tag_to_project_exp(username, project_name,
     tag_type, created = TagType.objects.get_or_create(name=tag_type_name)
 
     tag, tag_created = Tag.objects.get_or_create(
-            text=tag_text, type=tag_type)
+            text=tag_text, tag_type=tag_type)
 
-    person = Person.objects.get(
-            username=username)
+    person = Person.objects.get(username=username)
     # FIXME: Catch when no such person exists.
 
-    project = Project.objects.get(
-            name=project_name)
+    project = Project.objects.get(name=project_name)
     # FIXME: Catch when no such project exists.
 
     project_exp = ProjectExp.objects.get(
