@@ -220,6 +220,8 @@ class QuebecTests(django.test.TestCase):
         # Test creating a Person and fetching his contribution info
         username = 'paulproteus'
         new_person = Person(username=username)
+        new_person.save()
+        
         new_person.fetch_contrib_data_from_ohloh()
         self.to_be_deleted.append(new_person)
         # Verify that we actually created some ProjectExps

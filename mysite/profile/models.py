@@ -21,10 +21,14 @@ class Person(models.Model):
             default=True)
 
     def save(self, *args, **kwargs):
+        if self.time_record_was_created is None:
+            self.time_record_was_created = datetime.datetime.now()
         self.last_touched = datetime.datetime.now()
         super(Person, self).save(*args, **kwargs)
 
     def fetch_contrib_data_from_ohloh(self):
+        # self has to be saved, otherwise person_id becomes null
+        self.save()
         import ohloh
         oh = ohloh.get_ohloh()
         ohloh_contrib_info_list = oh.get_contribution_info_by_username(
@@ -49,8 +53,6 @@ class ProjectExp(models.Model):
     time_record_was_created = models.DateTimeField()
     url = models.URLField(max_length=200)
     description = models.TextField()
-    time_start = models.DateTimeField()
-    time_finish = models.DateTimeField()
     man_months = models.PositiveIntegerField()
     primary_language = models.CharField(max_length=200)
 
@@ -70,6 +72,14 @@ class ProjectExp(models.Model):
         self.primary_language = ohloh_contrib_info['primary_language']
         self.source = "Ohloh"
         self.time_gathered_from_source = datetime.date.today()
+
+    def save(self, *args, **kwargs):
+        if self.time_record_was_created is None:
+            self.time_record_was_created = datetime.datetime.now()
+        super(ProjectExp, self).save(*args, **kwargs)
+
+
+
     # }}}
 
 class Tag(models.Model):
