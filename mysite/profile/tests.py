@@ -72,7 +72,8 @@ class ProfileTests(django.test.TestCase):
         # }}}
     # }}}
 
-class OmanTests(django.test.TestCase): # {{{
+class OmanTests(django.test.TestCase):
+    # {{{
     def setUp(self):
         twill_setup()
 
@@ -225,4 +226,23 @@ class QuebecTests(django.test.TestCase):
 
     # }}}
 
+class SomervilleTest(django.test.TestCase):
+    '''
+    The Somerville milestone says:
+    * You can add tags to annotate each code experience
+    '''
+    # {{{
+    def setUp(self):
+        twill_setup()
+
+    def tearDown(self):
+        twill_teardown()
+
+    def testNewLink_ProjectExp_Tag(self):
+        tag_type_lang = TagType(text='language', prefix='lang')
+        tag_python = Tag(name='python')
+        project_exp = ProjectExp()
+        proj_exp_tag = Link_ProjectExp_Tag()
+
+    # }}}
 # vim: set ai et ts=4 sw=4:

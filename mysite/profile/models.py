@@ -30,7 +30,7 @@ class Person(models.Model):
         ohloh_contrib_info_list = oh.get_contribution_info_by_username(
                 self.username)
         for ohloh_contrib_info in ohloh_contrib_info_list:
-            p2p_rel = PersonToProjectRelationship()
+            p2p_rel = ProjectExp()
             p2p_rel.person = self
             p2p_rel.from_ohloh_contrib_info(ohloh_contrib_info)
             p2p_rel.save()
@@ -39,7 +39,7 @@ class Person(models.Model):
 
     # }}}
 
-class PersonToProjectRelationship(models.Model):
+class ProjectExp(models.Model):
     "Many-to-one relation between projects and people."
     # {{{
     person = models.ForeignKey(Person)
@@ -82,17 +82,16 @@ class Tag(models.Model):
     type = models.CharField(max_length=50)
     # }}}
 
-class TagTypes(models.Model):
+class TagType(models.Model):
     # {{{
     prefix = models.CharField(max_length=20)
     # }}}
 
-class Link_PersonToProjectRelationship_Tag(models.Model):
+class Link_ProjectExp_Tag(models.Model):
     "Many-to-many relation between p2prels and tags."
     # {{{
     tag = models.ForeignKey(Tag)
-    person_to_project_relationship = models.ForeignKey(
-            PersonToProjectRelationship)
+    project_exp = models.ForeignKey(ProjectExp)
     time_record_was_created = models.DateTimeField(
             default=datetime.datetime.now())
     source = models.CharField(max_length=200)

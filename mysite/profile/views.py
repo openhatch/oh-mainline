@@ -2,7 +2,7 @@
 
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render_to_response
-from mysite.profile.models import Person, PersonToProjectRelationship
+from mysite.profile.models import Person, ProjectExp
 
 def index(request):
     #{{{
@@ -19,7 +19,7 @@ def add_contribution(request):
 
     if username and project and contrib_text and url:
 
-        ppr = PersonToProjectRelationship(
+        ppr = ProjectExp(
                 project=project,
                 url=url,
                 description=contrib_text)
@@ -39,10 +39,10 @@ def get_data_dict_for_display_person(username):
         person.poll_on_next_web_view = False
         person.save()
 
-    rels_to_projects = PersonToProjectRelationship.objects.filter(
+    project_exps = ProjectExp.objects.filter(
             person=person)
 
-    return { 'person': person, 'rels_to_projects': rels_to_projects, }
+    return { 'person': person, 'project_exps': project_exps, }
 
 def display_person(request, input_username=None):
     # {{{
