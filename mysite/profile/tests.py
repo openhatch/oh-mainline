@@ -255,5 +255,34 @@ class SomervilleTests(django.test.TestCase):
                 source="test")
         # }}}
 
+    def testAddTagToProjectExp(self):
+        # {{{
+
+        tag_type, created = TagType.objects.get_or_create(name='misc')
+        if created: print "tag type %s was created" % tag_type
+
+        tag, tag_created = Tag.objects.get_or_create(
+                text='exemplary futility',
+                type=tag_type)
+        if tag_created: print "tag %s was created" % tag
+
+        person, person_created = Person.objects.get_or_create(
+                username='stipe')
+        if person_created: print "person %s was created" % person
+
+        project, project_created = Project.objects.get_or_create(
+                name='exaile')
+        if project_created: print "project %s was created" % project
+
+        project_exp, project_exp_created = ProjectExp.objects.get_or_create(
+                person=person, project=project)
+        if project_exp_created: print "project_exp %s was created" % project_exp
+
+        link, link_created = Link_ProjectExp_Tag.objects.get_or_create(
+                tag=tag, project_exp=project_exp)
+        if link_created: print "link %s was created" % link
+
+        # }}}
+
     # }}}
 # vim: set ai et ts=4 sw=4:

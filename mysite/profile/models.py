@@ -47,14 +47,19 @@ class ProjectExp(models.Model):
     person = models.ForeignKey(Person)
     project = models.ForeignKey(Project)
     person_role = models.CharField(max_length=200)
-    time_record_was_created = models.DateTimeField()
-    url = models.URLField(max_length=200)
+    time_record_was_created = models.DateTimeField(null=True)
+    last_touched = models.DateTimeField()
     description = models.TextField()
-    time_start = models.DateTimeField()
-    time_finish = models.DateTimeField()
-    man_months = models.PositiveIntegerField()
-    primary_language = models.CharField(max_length=200)
-    source = models.CharField(max_length=100)
+    url = models.URLField(max_length=200, null=True)
+    time_start = models.DateTimeField(null=True)
+    time_finish = models.DateTimeField(null=True)
+    man_months = models.PositiveIntegerField(null=True)
+    primary_language = models.CharField(max_length=200, null=True)
+    source = models.CharField(max_length=100, null=True)
+
+    def save(self, *args, **kwargs):
+        self.last_touched = datetime.datetime.now()
+        super(ProjectExp, self).save(*args, **kwargs)
 
     def from_ohloh_contrib_info(self, ohloh_contrib_info):
         if not self.person:
