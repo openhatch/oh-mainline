@@ -208,6 +208,7 @@ class QuebecTests(django.test.TestCase):
     # {{{
     def setUp(self):
         twill_setup()
+        self.to_be_deleted = []
 
     def tearDown(self):
         twill_teardown()
@@ -219,6 +220,12 @@ class QuebecTests(django.test.TestCase):
         username = 'paulproteus'
         new_person = Person(username=username)
         new_person.fetch_contrib_data_from_ohloh()
+        self.to_be_deleted.append(new_person)
+        # Verify that we actually created some PersonToProjectRelationships
+        all_p2prs = list(
+            PersonToProjectRelationship.objects.filter(person=new_person).all())
+        self.to_be_deleted.extend(all_p2prs)
+        self.assert_(all_p2prs, all_p2prs)
 
     # }}}
 
