@@ -97,9 +97,8 @@ class Ohloh(object):
     def email_address_to_ohloh_username(self, email):
         hasher = hashlib.md5(); hasher.update(email)
         hashed = hasher.hexdigest()
-        url = 'http://www.ohloh.net/accounts/%s.xml?' % hashed
-        _url = 'https://www.ohloh.net/accounts/%s' % hashed
-        b = mechanize_get(_url)
+        url = 'https://www.ohloh.net/accounts/%s' % hashed
+        b = mechanize_get(url)
         parsed = lxml.html.parse(b.response()).getroot()
         one, two = parsed.cssselect('h1 a')[0], parsed.cssselect('a.avatar')[0]
         href1, href2 = one.attrib['href'], two.attrib['href']
