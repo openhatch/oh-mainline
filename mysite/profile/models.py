@@ -36,7 +36,9 @@ class Person(models.Model):
             p2p_rel.save()
         self.last_polled = datetime.datetime.now()
         self.save()
-
+        
+    def __unicode__(self):
+        return "username: %s, name: %s" % (self.username, self.name)
     # }}}
 
 class ProjectExp(models.Model):
@@ -45,7 +47,6 @@ class ProjectExp(models.Model):
     person = models.ForeignKey(Person)
     project = models.ForeignKey(Project)
     person_role = models.CharField(max_length=200)
-    tags = models.TextField() # A list of tags, delimited with spaces.
     time_record_was_created = models.DateTimeField()
     url = models.URLField(max_length=200)
     description = models.TextField()
@@ -53,7 +54,6 @@ class ProjectExp(models.Model):
     time_finish = models.DateTimeField()
     man_months = models.PositiveIntegerField()
     primary_language = models.CharField(max_length=200)
-
     source = models.CharField(max_length=100)
 
     def from_ohloh_contrib_info(self, ohloh_contrib_info):
@@ -72,20 +72,20 @@ class ProjectExp(models.Model):
         self.time_gathered_from_source = datetime.date.today()
     # }}}
 
-class Tag(models.Model):
-    # {{{
-    text = models.CharField(max_length=50)
-    type = models.CharField(max_length=50)
-    # }}}
-
 class TagType(models.Model):
     # {{{
     name = models.CharField(max_length=100)
     prefix = models.CharField(max_length=20)
     # }}}
 
+class Tag(models.Model):
+    # {{{
+    text = models.CharField(max_length=50)
+    type = models.ForeignKey(TagType)
+    # }}}
+
 class Link_ProjectExp_Tag(models.Model):
-    "Many-to-many relation between p2prels and tags."
+    "Many-to-many relation between ProjectExps and Tags."
     # {{{
     tag = models.ForeignKey(Tag)
     project_exp = models.ForeignKey(ProjectExp)

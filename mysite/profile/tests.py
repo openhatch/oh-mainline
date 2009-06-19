@@ -243,10 +243,17 @@ class SomervilleTests(django.test.TestCase):
         twill_teardown()
 
     def testNewLink_ProjectExp_Tag(self):
-        tag_type_lang = TagType(name='language', prefix='lang')
-        tag_python = Tag(text='python')
-        project_exp = ProjectExp()
-        proj_exp_tag = Link_ProjectExp_Tag()
+        # {{{
+        stipe = Person(name='Michael Stipe', username='stipe')
+        language = TagType(name='language', prefix='lang')
+        python = Tag(text='python', type=language)
+        exaile = Project(name='exaile')
+        project_exp = ProjectExp(person=stipe, project=exaile)
+        proj_exp_tag = Link_ProjectExp_Tag(
+                project_exp=project_exp,
+                tag=python,
+                source="test")
+        # }}}
 
     # }}}
 # vim: set ai et ts=4 sw=4:
