@@ -9,17 +9,22 @@ class Person(models.Model):
     # {{{
     name = models.CharField(max_length=200)
     username = models.CharField(max_length=200)
-    password_hash_md5 = models.CharField(max_length=200) #FIXME: Get specific length of hash
-    time_record_was_created = models.DateTimeField(default=datetime.datetime.now())
-    last_polled = models.DateTimeField(blank=True, null=True)
+    password_hash_md5 = models.CharField(
+            max_length=200)
+    #FIXME: Get specific length of hash
+    time_record_was_created = models.DateTimeField(
+            default=datetime.datetime.now())
+    last_polled = models.DateTimeField(
+            blank=True, null=True)
     last_touched = models.DateTimeField()
-    poll_on_next_web_view = models.BooleanField(default=True)
+    poll_on_next_web_view = models.BooleanField(
+            default=True)
 
     def save(self, *args, **kwargs):
         self.last_touched = datetime.datetime.now()
         super(Person, self).save(*args, **kwargs)
 
-    def fetch_data_from_ohloh(self):
+    def fetch_contrib_data_from_ohloh(self):
         import ohloh
         oh = ohloh.get_ohloh()
         ohloh_contrib_info_list = oh.get_contribution_info_by_username(

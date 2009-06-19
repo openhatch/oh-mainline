@@ -1,5 +1,6 @@
 # Testing suite for profile
 
+# Imports {{{
 import django.test
 from search.models import Project
 
@@ -10,11 +11,11 @@ from django.test import TestCase
 from django.core.servers.basehttp import AdminMediaHandler
 from django.core.handlers.wsgi import WSGIHandler
 from StringIO import StringIO
+# }}}
 
 # FIXME: Later look into http://stackoverflow.com/questions/343622/how-do-i-submit-a-form-given-only-the-html-source
 
-# Functions you'll need:
-
+# Functions you'll need: {{{
 def twill_setup():
     app = AdminMediaHandler(WSGIHandler())
     twill.add_wsgi_intercept("127.0.0.1", 8080, lambda: app)
@@ -30,8 +31,10 @@ def twill_quiet():
     # suppress normal output of twill.. You don't want to
     # call this if you want an interactive session
     twill.set_output(StringIO())
+# }}}
 
 class ProfileTests(django.test.TestCase):
+    # {{{
     def setUp(self):
         twill_setup()
 
@@ -42,6 +45,7 @@ class ProfileTests(django.test.TestCase):
         response = self.client.get('/profile/')
 
     def testAddContribution(self):
+        # {{{
         url = 'http://openhatch.org/profile/'
         tc.go(make_twill_url(url))
         tc.fv('add_contrib', 'project', 'Babel')
@@ -64,8 +68,10 @@ class ProfileTests(django.test.TestCase):
         tc.go(make_twill_url(url))
         tc.find('Babel')
         tc.find('Baber')
+        # }}}
+    # }}}
 
-class OmanTests(django.test.TestCase):
+class OmanTests(django.test.TestCase): # {{{
     def setUp(self):
         twill_setup()
 
@@ -73,27 +79,36 @@ class OmanTests(django.test.TestCase):
         twill_teardown()
 
     def testFormEnterYourUsername(self):
+        # {{{
         url = 'http://openhatch.org/profile/'
         tc.go(make_twill_url(url))
         tc.fv('enter_free_software_username', 'username', 'paulproteus')
         tc.submit()
 
         tc.find('ccHost')
+        # }}}
+    # }}}
 
 import ohloh
 class OhlohTests(django.test.TestCase):
+    # {{{
     def testProjectDataById(self):
+        # {{{
         oh = ohloh.get_ohloh()
         data = oh.project_id2projectdata(15329)
         self.assertEqual('ccHost', data['name'])
         self.assertEqual('http://wiki.creativecommons.org/CcHost',
                          data['homepage_url'])
+        # }}}
         
     def testProjectNameByAnalysisId(self):
+        # {{{
         oh = ohloh.get_ohloh()
         self.assertEqual('ccHost', oh.analysis2projectdata(603185)['name'])
+        # }}}
 
     def testFindByUsername(self):
+        # {{{
         oh = ohloh.get_ohloh()
         projects = oh.get_contribution_info_by_username('paulproteus')
         self.assertEqual([{'project': u'ccHost',
@@ -101,8 +116,10 @@ class OhlohTests(django.test.TestCase):
                            'man_months': 1,
                            'primary_language': 'shell script'}],
                          projects)
+        # }}}
 
     def testFindByOhlohUsername(self):
+        # {{{
         oh = ohloh.get_ohloh()
         projects = oh.get_contribution_info_by_ohloh_username('paulproteus')
         self.assertEqual([{'project': u'ccHost',
@@ -110,16 +127,20 @@ class OhlohTests(django.test.TestCase):
                            'man_months': 1,
                            'primary_language': 'shell script'}],
                          projects)
+        # }}}
 
     def testFindByEmail(self): 
+        # {{{
         oh = ohloh.get_ohloh()
         projects = oh.get_contribution_info_by_email('asheesh@asheesh.org')
         assert {'project': u'playerpiano',
                 'project_homepage_url': 'http://code.google.com/p/playerpiano',
                 'man_months': 1,
                 'primary_language': 'Python'} in projects
+        # }}}
 
     def testFindContributionsInOhlohAccountByUsername(self):
+        # {{{
         oh = ohloh.get_ohloh()
         projects = oh.get_contribution_info_by_ohloh_username('paulproteus')
         
@@ -127,23 +148,30 @@ class OhlohTests(django.test.TestCase):
                 'project_homepage_url': 'http://wiki.creativecommons.org/CcHost',
                 'man_months': 1,
                 'primary_language': 'shell script'} in projects
+        # }}}
 
 
     def testFindUsernameByEmail(self):
+        # {{{
         oh = ohloh.get_ohloh()
         username = oh.email_address_to_ohloh_username('paulproteus.ohloh@asheesh.org')
         self.assertEquals(username, 'paulproteus')
+        # }}}
 
     def testFindByUsernameNotAsheesh(self):
+        # {{{
         oh = ohloh.get_ohloh()
         projects = oh.get_contribution_info_by_username('keescook')
-        assert len(projects) > 1
+        self.assert_(len(projects) > 1)
+        # }}}
+    # }}}
 
 class PerthTests(django.test.TestCase):
     '''
     The Perth milestone says:
     * The web form needs to be able to search by email also.
     '''
+    # {{{
     def setUp(self):
         twill_setup()
 
@@ -157,5 +185,33 @@ class PerthTests(django.test.TestCase):
         tc.submit()
 
         tc.find('ccHost')
+    # }}}
+
+class QuebecTests(django.test.TestCase):
+    '''
+    The Québec milestone says:
+    * You can save your profile.
+    '''
+    # {{{
+    def setUp(self):
+        twill_setup()
+
+    def tearDown(self):
+        twill_teardown()
+
+    def testFetchContribDataFromOhlohIntoPerson(self):
+        username = 'paulproteus'
+        p2p_rels_before_fetch = PersonToProjectRelationship.objects.filter(username=username)[:]
+
+        p = Person.objects.create(username=username):
+        p.fetch_data_from_ohloh()
+
+        p2p_rels_after_fetch = PersonToProjectRelationship.objects.filter(username=username)[:]
+
+        # Test that at least one P2PRel object has now been saved into the DB
+        [p2p_rel for p2p_rel not in p2p_rels_before_fetch in p2p_rels_after_fetch]
+
+        self.assert_(
+    # }}}
 
 # vim: set ai et ts=4 sw=4:

@@ -52,11 +52,12 @@ def display_person(request, input_username=None):
         if input_username is None:
             return HttpResponseServerError()
 
-    context = get_data_dict_for_display_person(input_username)
+    data_dict = get_data_dict_for_display_person(input_username)
 
-    return render_to_response('profile/profile.html', context)
+    return render_to_response('profile/profile.html', data_dict)
 
     # }}}
+
 def get_data_for_email(request):
     email = request.POST.get('email', '')
     if email:
