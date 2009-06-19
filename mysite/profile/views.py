@@ -30,7 +30,7 @@ def add_contribution(request):
     #}}}
 
 def get_data_dict_for_display_person(username):
-
+    # {{{
     person, person_created = Person.objects.get_or_create(
             username=username)
 
@@ -43,6 +43,7 @@ def get_data_dict_for_display_person(username):
             person=person)
 
     return { 'person': person, 'project_exps': project_exps, }
+    # }}}
 
 def display_person(request, input_username=None):
     # {{{
@@ -59,6 +60,7 @@ def display_person(request, input_username=None):
     # }}}
 
 def get_data_for_email(request):
+    # {{{
     email = request.POST.get('email', '')
     if email:
         saved = request.session.get('saved_data', [])
@@ -69,11 +71,34 @@ def get_data_for_email(request):
         saved.append(new_values)
         request.session['saved_data'] = saved
     return HttpResponseRedirect('/profile/')
+    # }}}
+
+def add_tag_to_project_exp_web(request):
+    # Get data
+    username = request.GET.get('username', None)
+    project_name = request.GET.get('project_name', None)
+    tag_text = request.GET.get('tag_text', None)
+    format = request.GET.get('format', 'html')
+
+    # Validate data
+    if username and project_name and tag_text:
+        add_tag_to_project_exp(username, project_name, tag_text)
+        notification = "You tagged %s's experience with %s as %s" % (
+                username, project_name, tag_text)
+        if format == 'json':
+            return HttpResponse("({'notification': '%s'})" % notification)
+        else:
+            return render_to_response('profile/profile.html', {
+                'notification': notification })
+    else:
+        return HttpResponseServerError()
 
 def add_tag_to_project_exp(username, project_name,
         tag_text, tag_type_name='user_generated'):
 
-    tag_type, created = TagType.objects.get_or_create(name=tag_type_name)
+    # {{{
+    tag_type, created = TagType.objects.get_or_create(
+            name=tag_type_name)
 
     tag, tag_created = Tag.objects.get_or_create(
             text=tag_text, tag_type=tag_type)
@@ -91,3 +116,4 @@ def add_tag_to_project_exp(username, project_name,
     new_link = Link_ProjectExp_Tag.objects.create(
             tag=tag, project_exp=project_exp)
     # FIXME: Catch when link already exists.
+    # }}}

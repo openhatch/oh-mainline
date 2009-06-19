@@ -15,6 +15,8 @@ from django.test import TestCase
 from django.core.servers.basehttp import AdminMediaHandler
 from django.core.handlers.wsgi import WSGIHandler
 from StringIO import StringIO
+
+from django.test.client import Client
 # }}}
 
 # FIXME: Later look into http://stackoverflow.com/questions/343622/how-do-i-submit-a-form-given-only-the-html-source
@@ -304,5 +306,29 @@ class SomervilleTests(django.test.TestCase):
         if link_created: print "link %s was created" % link
 
         # }}}
+
+    def testAddTagFailsOnBadInput(self):
+        url = '/profile/add_tag'
+
+        username = 'stipe'
+        project_name = 'automatic'
+
+        Person.objects.get_or_create(username=username)
+        Project.objects.get_or_create(name=project_name)
+
+        good_input = {
+            'username': username,
+            'project_name': project_name,
+            'tag_text': 'baller'
+            }
+
+        client = Client()
+
+        # Test that add tag fails if any of the fields are missing.
+        for key in good_input.keys():
+            bad_input = {}
+            bad_input.update(good_input)
+            del bad_input[key]
+            self.assertEquals(client.get(url, bad_input).statusCode, 500)
 
     # }}}
