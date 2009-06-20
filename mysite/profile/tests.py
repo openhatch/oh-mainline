@@ -213,10 +213,15 @@ class DebTagsTests(django.test.TestCase):
         twill_teardown()
 
     def testAddOneDebtag(self):
-        profile.views.add_one_debtag_to_project('alpine', 'implemented-in::c')
+        tag = profile.views.add_one_debtag_to_project('alpine', 'implemented-in::c')
         self.assertEqual(profile.views.list_debtags_of_project('alpine'),
                          ['implemented-in::c'])
-    
+
+    def testImportDebtags(self):
+        profile.views.import_debtags(cooked_string=
+                                     'alpine: works-with::mail, protocol::smtp') # side effects galore!
+        self.assertEqual(set(profile.views.list_debtags_of_project('alpine')),
+                         set(['works-with::mail', 'protocol::smtp']))
 
 class QuebecTests(django.test.TestCase):
     '''

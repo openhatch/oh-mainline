@@ -4,6 +4,7 @@ from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerEr
 from django.shortcuts import render_to_response
 from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag, Link_Project_Tag
 from mysite.search.models import Project
+import StringIO
 import datetime
 
 def index(request):
@@ -85,6 +86,7 @@ def add_one_debtag_to_project(project_name, tag_text):
             time_record_was_created = datetime.datetime.now(),
             source='Debtags')
     new_link.save()
+    return new_link
 
 def list_debtags_of_project(project_name):
     debtags_list = list(TagType.objects.filter(name='Debtags'))
@@ -102,7 +104,28 @@ def list_debtags_of_project(project_name):
     resluts = list(Link_Project_Tag.objects.filter(project=project,
                                                    tag__tag_type=debtags))
     return [link.tag.text for link in resluts]
-    
+
+def import_debtags(cooked_string = None):
+    if cooked_string is None:
+        # Warning: this re-downloads the list from Alioth every time this
+        # is called
+        import urllib2
+        import gzip
+        fd = urllib2.urlopen('http://debtags.alioth.debian.org/tags/tags-current.gz')
+        gzipped_sio = StringIO.StringIO(fd.read()) # this sucks, but I
+        # can't stream to
+        # gzip.GzipFile because
+        # urlopen()'s result
+        # lacks tell()
+        gunzipped = gzip.GzipFile(fileobj=gzipped_sio)
+    else:
+        gunzipped = StringIO.StringIO(cooked_string)
+    for line in gunzipped:
+        if ':' in line:
+            package, tagstring = line.split(':', 1)
+            tags = map(lambda s: s.strip(), tagstring.split(','))
+            for tag in tags:
+                add_one_debtag_to_project(package, tag)
 
 def get_data_for_email(request):
     # {{{
