@@ -104,6 +104,17 @@ vim: set ts=3 sw=3 et:
 
                {% if person %}
 
+      <!-- Unadilla additions below this line -->
+      <form id='enter-what-you-like-working-on'
+         name='what_you_like_working_on'
+         action='/people/change_what_like_working_on' method='POST' >
+         <label for='like-working-on'>What do you like working on? <br />
+         Use commas to separate entries.</label>
+         <input type='text' id='like-working-on' name='like-working-on' />
+         <input type='image' src='/static/images/add.png' />
+      </form>
+
+
                {% comment %} Display a person's FOSS experience {{{ {% endcomment %}
                <div class='box'>
                   <h3>{{ person.username }}</h3>
@@ -187,13 +198,5 @@ vim: set ts=3 sw=3 et:
 
 
 
-      <!-- Unadilla additions below this line -->
-      <form id='enter-what-you-like-working-on'
-         name='what_you_like_working_on'
-         action='/people/change_what_like_working_on' method='POST' >
-         <label for='like-working-on'>What do you like working on? <br />
-         Use commas to separate entries.</label>
-         <input type='text' id='like-working-on' name='like-working-on' />
-         <input type='image' src='/static/images/add.png' />
-      </form>
+
 
