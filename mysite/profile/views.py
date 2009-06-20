@@ -8,12 +8,7 @@ import StringIO
 import datetime
 import urllib
 
-def index(request):
-    #{{{
-    return render_to_response('profile/index.html', {
-        'saved_data': request.session.get('saved_data', [])})
-    #}}}
-
+# Add a contribution {{{
 def add_contribution(request):
     # {{{
     username = request.POST.get('u', '')
@@ -35,7 +30,9 @@ def add_contribution(request):
 
     return display_person_redirect(username)
     #}}}
+# }}}
 
+# Display profile {{{
 def profile_data_from_username(username):
     # {{{
     person, person_created = Person.objects.get_or_create(
@@ -77,6 +74,8 @@ def display_person(request, input_username=None):
     return render_to_response('profile/profile.html', data_dict)
 
     # }}}
+
+# }}}
 
 # Debtags {{{
 
@@ -217,6 +216,8 @@ def add_tag_to_project_exp(username, project_name,
 
 # }}}
 
+# Specify what you like working on {{{
+
 def change_what_like_working_on(username, new_like_working_on):
     # {{{
     if username is None:
@@ -240,3 +241,5 @@ def change_what_like_working_on_web(request):
 def display_person_redirect(username):
     return HttpResponseRedirect('/people/?' + urllib.urlencode({'u': username}))
     # }}}
+
+# }}}
