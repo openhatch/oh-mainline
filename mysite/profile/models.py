@@ -19,6 +19,7 @@ class Person(models.Model):
     last_touched = models.DateTimeField(null=True)
     poll_on_next_web_view = models.BooleanField(
             default=True)
+    interested_in_working_on = models.CharField(max_length=1024, default='')
 
     def save(self, *args, **kwargs):
         if self.time_record_was_created is None:

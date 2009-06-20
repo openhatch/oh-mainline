@@ -481,8 +481,11 @@ class UnadillaTests(django.test.TestCase):
         tc.go(make_twill_url(url))
         tc.fv('what_you_like_working_on', 'like-working-on', 'barbies')
         tc.submit()
-
         tc.find('barbies')
+        
+        tc.fv('what_you_like_working_on', 'like-working-on', 'barbiequeue')
+        tc.submit()
+        tc.find('barbiequeue')
         # }}}
 
     # }}}

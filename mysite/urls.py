@@ -15,7 +15,7 @@ urlpatterns = patterns('',
         (r'^people/$', 'mysite.profile.views.display_person'),
 
         (r'^people/get_data_for_email$', 'mysite.profile.views.get_data_for_email'),
-        (r'^people/change_what_like_working_on$', 'mysite.profile.views.change_what_like_working_on'),
+        (r'^people/change_what_like_working_on$', 'mysite.profile.views.change_what_like_working_on_web'),
         (r'^people/add_tag_to_project_exp$', 'mysite.profile.views.add_tag_to_project_exp_web'),
 
         # Get a list of suggestions for the search input, formatted the way that

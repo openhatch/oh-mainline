@@ -198,5 +198,20 @@ def add_tag_to_project_exp(username, project_name,
     # FIXME: Catch when link already exists.
     # }}}
 
-def change_what_like_working_on(request):
-    return HttpResponse('barbies')
+def change_what_like_working_on(username, new_like_working_on):
+    if username is None:
+        return
+    if new_like_working_on:
+        return
+
+    person = get_object_or_404(Person, username=username)
+    person.interested_in_working_on = new_like_working_on
+    person.save()
+    return person
+
+def change_what_like_working_on_web(request):
+    username = request.GET.get('u', None)
+    new_like = request.POST.get('like-working-on')
+    change_what_like_working_on(username, new_like)
+    return HttpResponseRedirect('/people/?' + urllib.urlencode({'u':
+                                                                username}))
