@@ -52,7 +52,8 @@ class ProfileTests(django.test.TestCase):
 
     def testAddContribution(self):
         # {{{
-        url = 'http://openhatch.org/people/'
+        username = 'paulproteus'
+        url = 'http://openhatch.org/people/?u=%s' % username
         tc.go(make_twill_url(url))
         tc.fv('add_contrib', 'project', 'Babel')
         tc.fv('add_contrib', 'contrib_text', 'msgctxt support')

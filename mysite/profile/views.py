@@ -45,19 +45,19 @@ def get_data_dict_for_display_person(username):
     project_exps = ProjectExp.objects.filter(
             person=person)
 
-    tags = {}
+    exps_to_tags = {}
     for exp in project_exps:
         tag_links = Link_ProjectExp_Tag.objects.filter(project_exp=exp)
-        tags[exp] = [link.tag for link in tag_links]
+        exps_to_tags[exp] = [link.tag for link in tag_links]
 
     # {
     #   Experience1:
     #   ["awesome", "fun", "illuminating", "helped_me_get_laid"],
     # }
 
-    print tags
+    exp_taglist_pairs = exps_to_tags.items()
 
-    return { 'person': person, 'project_exps': project_exps, 'tags': tags }
+    return { 'person': person, 'exp_taglist_pairs': exp_taglist_pairs } 
     # }}}
 
 def display_person(request, input_username=None):
