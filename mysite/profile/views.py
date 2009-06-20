@@ -75,6 +75,7 @@ def display_person(request, input_username=None):
     # }}}
 
 def add_one_debtag_to_project(project_name, tag_text):
+    # {{{
     tag_type, created = TagType.objects.get_or_create(name='Debtags')
 
     project, project_created = Project.objects.get_or_create(name=project_name)
@@ -88,8 +89,10 @@ def add_one_debtag_to_project(project_name, tag_text):
             source='Debtags')
     new_link.save()
     return new_link
+    # }}}
 
 def list_debtags_of_project(project_name):
+    # {{{
     debtags_list = list(TagType.objects.filter(name='Debtags'))
     if debtags_list:
         debtags = debtags_list[0]
@@ -106,8 +109,10 @@ def list_debtags_of_project(project_name):
                                                    tag__tag_type=debtags))
     return [link.tag.text for link in resluts]
     # lol -rkl
+    # }}}
 
 def import_debtags(cooked_string = None):
+    # {{{
     if cooked_string is None:
         # Warning: this re-downloads the list from Alioth every time this
         # is called
@@ -128,6 +133,7 @@ def import_debtags(cooked_string = None):
             tags = map(lambda s: s.strip(), tagstring.split(','))
             for tag in tags:
                 add_one_debtag_to_project(package, tag)
+    # }}}
 
 def get_data_for_email(request):
     # {{{
@@ -200,6 +206,7 @@ def add_tag_to_project_exp(username, project_name,
     # }}}
 
 def change_what_like_working_on(username, new_like_working_on):
+    # {{{
     if username is None:
         return
     if new_like_working_on is None:
@@ -209,10 +216,13 @@ def change_what_like_working_on(username, new_like_working_on):
     person.interested_in_working_on = new_like_working_on
     person.save()
     return person
+    # }}}
 
 def change_what_like_working_on_web(request):
+    # {{{
     username = request.POST.get('username')
     new_like = request.POST.get('like-working-on')
     person = change_what_like_working_on(username, new_like)
     return HttpResponseRedirect('/people/?' + urllib.urlencode({'u':
+    # }}}
                                                                 person.username}))
