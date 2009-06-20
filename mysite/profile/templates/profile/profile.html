@@ -65,12 +65,15 @@ vim: set ts=3 sw=3 et:
 
             <div id='content'>
 
+               {% comment %} Notification {{{ {% endcomment %}
                {% if notification %}
                <div class='notification'
                   style='background-color: #fca; color: #444; padding: 5px;'>
                   Notification: {{ notification }}
                </div>
                {% endif %}
+               {% comment %} }}} {% endcomment %}
+
                <h1 class='name'>{{ person.name }}</h1>
 
                {% comment %} Submit a FOSS username {{{ {% endcomment %}
@@ -124,7 +127,15 @@ vim: set ts=3 sw=3 et:
                         {{ tag.text }}
                         {% endfor %}
                      </div>
-                     <form name='add-tag-to-exp'>
+                     <form name='add-tag-to-exp' method='GET'
+                        action='/people/add_tag_to_project_exp'>
+                        <label for='exp-{{ exp.id }}-tag-text'>Add tag</label>
+                        <input type='hidden' name='username'
+                        value='{{ person.username }}'/>
+                        <input type='hidden' name='project_name'
+                        value='{{ exp.project.name }}'/>
+                        <input type='text' id='exp-{{ exp.id }}-tag-text' 
+                        name='tag_text' />
                      </form>
                      </li>
                      {% endfor %}
