@@ -1,7 +1,7 @@
 # vim: ai ts=4 sts=4 et sw=4
 
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, get_object_or_404
 from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag, Link_Project_Tag
 from mysite.search.models import Project
 import StringIO
@@ -201,7 +201,7 @@ def add_tag_to_project_exp(username, project_name,
 def change_what_like_working_on(username, new_like_working_on):
     if username is None:
         return
-    if new_like_working_on:
+    if new_like_working_on is None:
         return
 
     person = get_object_or_404(Person, username=username)
@@ -210,8 +210,8 @@ def change_what_like_working_on(username, new_like_working_on):
     return person
 
 def change_what_like_working_on_web(request):
-    username = request.GET.get('u', None)
+    username = request.POST.get('username')
     new_like = request.POST.get('like-working-on')
-    change_what_like_working_on(username, new_like)
+    person = change_what_like_working_on(username, new_like)
     return HttpResponseRedirect('/people/?' + urllib.urlencode({'u':
-                                                                username}))
+                                                                person.username}))

@@ -110,8 +110,10 @@ vim: set ts=3 sw=3 et:
          action='/people/change_what_like_working_on' method='POST' >
          <label for='like-working-on'>What do you like working on? <br />
          Use commas to separate entries.</label>
-         <input type='text' id='like-working-on' name='like-working-on' />
+         <input type='text' id='like-working-on' name='like-working-on'
+		value='{{ person.interested_in_working_on }}'/>
          <input type='image' src='/static/images/add.png' />
+	 <input type='hidden' name='username' value='{{ person.username }}' />
       </form>
 
 
