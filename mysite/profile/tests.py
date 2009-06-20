@@ -203,6 +203,13 @@ class PerthTests(django.test.TestCase):
         tc.fv('enter_free_software_email', 'email', 'paulproteus.ohloh@asheesh.org')
         tc.submit()
         tc.find('ccHost')
+
+    def testFormDoesntBlowUpForNoMatch(self):
+        url = 'http://openhatch.org/people/'
+        tc.go(make_twill_url(url))
+        tc.fv('enter_free_software_email', 'email', 'asheesh@asheesh.org')
+        tc.submit()
+        tc.find('playerpiano')
     # }}}
 
 class DebTagsTests(django.test.TestCase):
@@ -481,8 +488,11 @@ class UnadillaTests(django.test.TestCase):
         tc.go(make_twill_url(url))
         tc.fv('what_you_like_working_on', 'like-working-on', 'barbies')
         tc.submit()
-
         tc.find('barbies')
+        
+        tc.fv('what_you_like_working_on', 'like-working-on', 'barbiequeue')
+        tc.submit()
+        tc.find('barbiequeue')
         # }}}
 
     # }}}

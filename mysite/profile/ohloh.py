@@ -1,5 +1,6 @@
 import xml.etree.ElementTree as ET
 import sys, urllib, hashlib
+import urllib2
 
 import lxml.html
 import mechanize
@@ -98,7 +99,12 @@ class Ohloh(object):
         hasher = hashlib.md5(); hasher.update(email)
         hashed = hasher.hexdigest()
         url = 'https://www.ohloh.net/accounts/%s' % hashed
-        b = mechanize_get(url)
+        try:
+            b = mechanize_get(url)
+        except urllib2.HTTPError:
+            # well, it failed. get outta here
+            return None
+            
         parsed = lxml.html.parse(b.response()).getroot()
         one, two = parsed.cssselect('h1 a')[0], parsed.cssselect('a.avatar')[0]
         href1, href2 = one.attrib['href'], two.attrib['href']
@@ -110,6 +116,9 @@ class Ohloh(object):
         return username
 
     def get_contribution_info_by_ohloh_username(self, ohloh_username):
+        if ohloh_username is None:
+            return []
+
         b = mechanize.Browser()
         b.set_handle_robots(False)
         b.addheaders = [('User-Agent',

@@ -1,7 +1,7 @@
 # vim: ai ts=4 sts=4 et sw=4
 
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, get_object_or_404
 from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag, Link_Project_Tag
 from mysite.search.models import Project
 import StringIO
@@ -198,5 +198,20 @@ def add_tag_to_project_exp(username, project_name,
     # FIXME: Catch when link already exists.
     # }}}
 
-def change_what_like_working_on(request):
-    return HttpResponse('barbies')
+def change_what_like_working_on(username, new_like_working_on):
+    if username is None:
+        return
+    if new_like_working_on is None:
+        return
+
+    person = get_object_or_404(Person, username=username)
+    person.interested_in_working_on = new_like_working_on
+    person.save()
+    return person
+
+def change_what_like_working_on_web(request):
+    username = request.POST.get('username')
+    new_like = request.POST.get('like-working-on')
+    person = change_what_like_working_on(username, new_like)
+    return HttpResponseRedirect('/people/?' + urllib.urlencode({'u':
+                                                                person.username}))
