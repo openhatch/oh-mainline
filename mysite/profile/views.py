@@ -16,20 +16,24 @@ def index(request):
 
 def add_contribution(request):
     # {{{
-    input_contrib_username = request.POST.get('username', '')
-    input_contrib_project = request.POST.get('project', '')
-    input_contrib_description = request.POST.get('contrib_text', '')
-    input_contrib_url = request.POST.get('url', '')
+    username = request.POST.get('u', '')
+    project_name = request.POST.get('project', '')
+    description = request.POST.get('description', '')
+    url = request.POST.get('url', '')
 
-    if username and project and contrib_text and url:
+    if username and project_name and description and url:
 
-        ppr = ProjectExp(
+        person = Person.objects.get(username=username)
+        project = Project.objects.get(name=project_name)
+
+        exp = ProjectExp(
+                person=person,
                 project=project,
                 url=url,
-                description=contrib_text)
-        ppr.save()
+                description=description)
+        exp.save()
 
-    return HttpResponseRedirect('/people/')
+    return display_person_redirect(username)
     #}}}
 
 def profile_data_from_username(username):
@@ -231,6 +235,8 @@ def change_what_like_working_on_web(request):
     username = request.POST.get('username')
     new_like = request.POST.get('like-working-on')
     person = change_what_like_working_on(username, new_like)
-    return HttpResponseRedirect('/people/?' + urllib.urlencode({'u':
+    return display_person_redirect(username)
+
+def display_person_redirect(username):
+    return HttpResponseRedirect('/people/?' + urllib.urlencode({'u': username}))
     # }}}
-                                                                person.username}))

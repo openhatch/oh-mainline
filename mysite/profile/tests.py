@@ -55,18 +55,14 @@ class ProfileTests(django.test.TestCase):
         username = 'paulproteus'
         url = 'http://openhatch.org/people/?u=%s' % username
         tc.go(make_twill_url(url))
-        tc.fv('add_contrib', 'project', 'Babel')
-        tc.fv('add_contrib', 'contrib_text', 'msgctxt support')
+        tc.fv('add_contrib', 'project_name', 'Babel')
+        tc.fv('add_contrib', 'description', 'msgctxt support')
         tc.fv('add_contrib', 'url', 'http://babel.edgewall.org/ticket/54')
         tc.submit()
 
-        # Assert that we are not in some weird GET place with
-        # CGI args
-        tc.url(r'^[^?]*$')
-
         tc.find('Babel')
-        tc.fv('add_contrib', 'project', 'Baber')
-        tc.fv('add_contrib', 'contrib_text', 'msgctxt support')
+        tc.fv('add_contrib', 'project_name', 'Baber')
+        tc.fv('add_contrib', 'description', 'msgctxt support')
         tc.fv('add_contrib', 'url', 'http://babel.edgewall.org/ticket/54')
         tc.submit()
 
@@ -213,6 +209,7 @@ class PerthTests(django.test.TestCase):
     # }}}
 
 class DebTagsTests(django.test.TestCase):
+    # {{{
     def setUp(self):
         twill_setup()
 
@@ -229,6 +226,7 @@ class DebTagsTests(django.test.TestCase):
                                      'alpine: works-with::mail, protocol::smtp') # side effects galore!
         self.assertEqual(set(profile.views.list_debtags_of_project('alpine')),
                          set(['works-with::mail', 'protocol::smtp']))
+    # }}}
 
 class QuebecTests(django.test.TestCase):
     '''

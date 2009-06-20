@@ -165,16 +165,21 @@ vim: set ts=3 sw=3 et:
                   <h3>Log some experience we didn't find</h3>
                   <form id='add-contrib' name='add_contrib'
                      method='POST' action='/people/add_contribution'>
-                     <label for='project-name'>
+
+                     <input type='hidden' name='u'
+                     value='{{ person.username }}' />
+
+                     <label for='add-contrib-project-name'>
                         Type a project name
                      </label>
-                     <input id='contrib-project-name'
-                     type='text' name='project'/>
+                     <input id='add-contrib-project-name'
+                     type='text' name='project_name'/>
 
-                     <label for='contrib-description'>
+                     <label for='add-contrib-description'>
                         Describe your contribution </label>
-                     <textarea id='contrib-description'
-                        name='contrib_text'></textarea>
+                     <textarea id='add-contrib-description'
+                        name='description'></textarea>
+
                      <label for='contrib-url'>
                         Type a related URL </label>
                      <input id='contrib-url' type='text' name='url' />
