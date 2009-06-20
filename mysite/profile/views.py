@@ -231,11 +231,13 @@ def add_tag_to_project_exp(username, project_name,
 def project_exp_tag__remove(request):
     # {{{
     # }}}
+    pass
 
 def project_exp_tag__remove__web(username, project_name,
         tag_text, tag_type_name='user_generated'):
     # {{{
     # }}}
+    pass
 
 # }}}
 # }}}
