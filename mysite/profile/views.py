@@ -2,8 +2,9 @@
 
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
 from django.shortcuts import render_to_response
-from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag
+from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag, Link_Project_Tag
 from mysite.search.models import Project
+import datetime
 
 def index(request):
     #{{{
@@ -70,6 +71,38 @@ def display_person(request, input_username=None):
     return render_to_response('profile/profile.html', data_dict)
 
     # }}}
+
+def add_one_debtag_to_project(project_name, tag_text):
+    tag_type, created = TagType.objects.get_or_create(name='Debtags')
+
+    project, project_created = Project.objects.get_or_create(name=project_name)
+
+    tag, tag_created = Tag.objects.get_or_create(
+            text=tag_text, tag_type=tag_type)
+
+    new_link = Link_Project_Tag.objects.create(
+            tag=tag, project=project,
+            time_record_was_created = datetime.datetime.now(),
+            source='Debtags')
+    new_link.save()
+
+def list_debtags_of_project(project_name):
+    debtags_list = list(TagType.objects.filter(name='Debtags'))
+    if debtags_list:
+        debtags = debtags_list[0]
+    else:
+        return []
+    
+    project_list = list(Project.objects.filter(name=project_name))
+    if project_list:
+        project = project_list[0]
+    else:
+        return []
+
+    resluts = list(Link_Project_Tag.objects.filter(project=project,
+                                                   tag__tag_type=debtags))
+    return [link.tag.text for link in resluts]
+    
 
 def get_data_for_email(request):
     # {{{

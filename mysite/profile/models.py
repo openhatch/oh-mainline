@@ -110,3 +110,13 @@ class Link_ProjectExp_Tag(models.Model):
             default=datetime.datetime.now())
     source = models.CharField(max_length=200)
     # }}}
+
+class Link_Project_Tag(models.Model):
+    "Many-to-many relation between ProjectExps and Tags."
+    # {{{
+    tag = models.ForeignKey(Tag)
+    project = models.ForeignKey(Project)
+    time_record_was_created = models.DateTimeField(
+            default=datetime.datetime.now())
+    source = models.CharField(max_length=200)
+    # }}}

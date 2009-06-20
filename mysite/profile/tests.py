@@ -205,6 +205,19 @@ class PerthTests(django.test.TestCase):
         tc.find('ccHost')
     # }}}
 
+class DebTagsTests(django.test.TestCase):
+    def setUp(self):
+        twill_setup()
+
+    def tearDown(self):
+        twill_teardown()
+
+    def testAddOneDebtag(self):
+        profile.views.add_one_debtag_to_project('alpine', 'implemented-in::c')
+        self.assertEqual(profile.views.list_debtags_of_project('alpine'),
+                         ['implemented-in::c'])
+    
+
 class QuebecTests(django.test.TestCase):
     '''
     The Québec milestone says:
