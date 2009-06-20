@@ -32,7 +32,7 @@ def add_contribution(request):
     return HttpResponseRedirect('/people/')
     #}}}
 
-def get_data_dict_for_display_person(username):
+def profile_data_from_username(username):
     # {{{
     person, person_created = Person.objects.get_or_create(
             username=username)
@@ -68,11 +68,13 @@ def display_person(request, input_username=None):
         if input_username is None:
             return render_to_response('profile/profile.html')
 
-    data_dict = get_data_dict_for_display_person(input_username)
+    data_dict = profile_data_from_username(input_username)
 
     return render_to_response('profile/profile.html', data_dict)
 
     # }}}
+
+# Debtags {{{
 
 def add_one_debtag_to_project(project_name, tag_text):
     # {{{
@@ -155,6 +157,10 @@ def get_data_for_email(request):
                                                                 username}))
     # }}}
 
+# }}}
+
+# Project experience tags {{{
+
 def add_tag_to_project_exp_web(request):
     # {{{
     # Get data
@@ -204,6 +210,8 @@ def add_tag_to_project_exp(username, project_name,
             tag=tag, project_exp=project_exp)
     # FIXME: Catch when link already exists.
     # }}}
+
+# }}}
 
 def change_what_like_working_on(username, new_like_working_on):
     # {{{

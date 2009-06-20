@@ -261,7 +261,7 @@ class QuebecTests(django.test.TestCase):
 
     def testGetPersonDataDict(self):
         username = 'paulproteus'
-        data = profile.views.get_data_dict_for_display_person(username)
+        data = profile.views.profile_data_from_username(username)
         self.assertEquals(data['person'].username, username)
         cchost_among_project_exps = False
         for exp in data['project_exps']:
