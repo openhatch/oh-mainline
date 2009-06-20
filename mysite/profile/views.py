@@ -131,15 +131,16 @@ def import_debtags(cooked_string = None):
 def get_data_for_email(request):
     # {{{
     # FIXME: Hard-coded username
-    username='paulproteus'
     email = request.POST.get('email', '')
+    username=email
     if email:
         import ohloh
         oh = ohloh.get_ohloh()
         from_ohloh = oh.get_contribution_info_by_email(email)
         for data in from_ohloh:
             person, created = Person.objects.get_or_create(
-                username=username) # FIXME: Which username?
+                username=username) # FIXME: Later we'll have to be
+                                   # able to merge user objects
             pe = ProjectExp(person=person)
             pe.from_ohloh_contrib_info(data)
             pe.save()
