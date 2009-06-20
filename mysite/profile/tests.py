@@ -390,3 +390,29 @@ class SomervilleTests(django.test.TestCase):
         # }}}
 
     # }}}
+
+
+class UnadillaTests(django.test.TestCase):
+    """
+    The Unadilla milestone says:
+    * You can write what you're interested in working on
+    """
+    # {{{
+    def setUp(self):
+        twill_setup()
+
+    def tearDown(self):
+        twill_teardown()
+
+    def testEnterWhatYouLikeWorkingOn(self):
+        # {{{
+        url = 'http://openhatch.org/people/?u=paulproteus'
+        tc.go(make_twill_url(url))
+        tc.fv('what_you_like_working_on', 'like-working-on', 'barbies')
+        tc.submit()
+
+        tc.find('barbies')
+        # }}}
+
+    # }}}
+
