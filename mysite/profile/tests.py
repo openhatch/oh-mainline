@@ -308,7 +308,8 @@ class SomervilleTests(django.test.TestCase):
         # }}}
 
     def testAddTagFailsOnBadInput(self):
-        url = '/profile/add_tag'
+        # {{{
+        url = '/people/add_tag_to_project_exp'
 
         username = 'stipe'
         project_name = 'automatic'
@@ -329,6 +330,35 @@ class SomervilleTests(django.test.TestCase):
             bad_input = {}
             bad_input.update(good_input)
             del bad_input[key]
-            self.assertEquals(client.get(url, bad_input).statusCode, 500)
+            self.assertEquals(client.get(url, bad_input).status_code, 500)
+        # }}}
+
+    def testAddTagWorks(self):
+        # {{{
+        url = '/people/add_tag_to_project_exp'
+
+        username = 'stipe'
+        project_name = 'automatic'
+        tag_text = 'baller'
+
+        person, person_created = Person.objects.get_or_create(
+                username=username)
+        project, project_created = Project.objects.get_or_create(
+                name=project_name)
+        exp, exp_created = ProjectExp.objects.get_or_create(
+                person=person, project=project)
+
+        good_input = {
+            'username': username,
+            'project_name': project_name,
+            'tag_text': tag_text
+            }
+
+        client = Client()
+
+        self.assertContains(client.get(url, good_input), username)
+        self.assertContains(client.get(url, good_input), project_name)
+        self.assertContains(client.get(url, good_input), tag_text)
+        # }}}
 
     # }}}

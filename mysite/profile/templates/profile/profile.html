@@ -65,7 +65,63 @@ vim: set ts=3 sw=3 et:
 
             <div id='content'>
 
-               <h1 class='name'>{{ person.name.full }}</h1>
+               {% if notification %}
+               <div class='notification' style='background-color: #fca; color: #444; padding: 5px;'>
+                  Notification: {{ notification }}
+               </div>
+               {% endif %}
+               <h1 class='name'>{{ person.name }}</h1>
+
+               {% comment %} Submit a FOSS username {{{ {% endcomment %}
+               <div class='box'>
+                  <h3>Find a person in the community</h3>
+                  <form id='enter-free-software-username' 
+                     name='enter_free_software_username'
+                     action='/profile/get_data_for_username' 
+                     method='POST' >
+                     <label for='get-data-username'>
+                        Type a username</label>
+                     <input type='text'
+                     id='get-data-username' 
+                     name='username' />
+                     <!--input type='image'
+                     src='/static/images/add.png' /-->
+                  </form>
+               </div>
+               {% comment %} }}} {% endcomment %}
+
+               {% comment %} Display person's FOSS experience {{{ {% endcomment %}
+               <div class='box'>
+                  <h3>{{ person.username }}</h3>
+                  {% if project_exps %}
+                  <ul id='exp'>
+                     {% for exp in project_exps %}
+                     <li>
+                     <div class='project-name'>
+                        {% if exp.url %}
+                        <a href='{{ exp.url }}'>{{ exp.project.name }}</a>
+                        {% else %}
+                        {{ exp.project.name }}
+                        {% endif %}
+                     </div>
+                     <div class='summary'>
+                        Clocked {{ exp.man_months }} month(s) of work in
+                        {{ exp.primary_language }}
+                     </div>
+                     <div class='project-exp-tags'>
+                        {% for tag in tags.exp %}
+                        {{ tag.text }}
+                        {% endfor %}
+                     </div>
+                     </li>
+                     {% endfor %}
+                  </ul>
+                  {% else %}
+                  Could not find experience in our
+                  database for that username.
+                  {% endif %}
+               </div>
+               {% comment %} }}} {% endcomment %}
 
                {% comment %} Log some experience we didn't find {{{ {% endcomment %}
                <div class='box'>
@@ -93,58 +149,15 @@ vim: set ts=3 sw=3 et:
                </div>
                {% comment %} }}} {% endcomment %}
 
-               {% comment %} Submit a FOSS username {{{ {% endcomment %}
-               <div class='box'>
-                  <h3>Find a person in the
-                     free and open source software community</h3>
-                  <form id='enter-free-software-username' 
-                     name='enter_free_software_username'
-                     action='/profile/get_data_for_username' 
-                     method='POST' >
-                     <label for='get-data-username'>
-                        Type a username</label>
-                     <input type='text'
-                     id='get-data-username' 
-                     name='username' />
-                     <input type='image'
-                     src='/static/images/add.png' />
-                  </form>
-               </div>
-               {% comment %} }}} {% endcomment %}
+            </div><!-- /#content -->
 
-               {% comment %} Show FOSS experience {{{ {% endcomment %}
-               <div>
-                  {% if rels_to_projects %}
-                  <ul id='exp'>
-                     {% for rel in rels_to_projects %}
-                     <li>
-                     <div class='project-name'>
-                        {% if datum.url %}
-                        <a href='{{ datum.url }}'>
-                           {{ datum.project }}
-                        </a>
-                        {% else %}
-                        {{ datum.project }}
-                        {% endif %}
-                     </div>
-                     <div class='summary'>
-                        {{ datum.contrib_text }}
-                     </div>
-                     </li>
-                     {% endfor %}
-                  </ul>
-                  {% else %}
-                  Could not find experience in our
-                  database for that username.
-                  {% endif %}
-               </div>
-               {% comment %} }}} {% endcomment %}
+         </div><!-- /#wrapper-inner -->
 
-            </div>
+      </div><!-- /#wrapper-outer -->
 
-         </body>
+   </body>
 
-      </html>
+</html>
 
       <!-- Perth additions below this line -->
       <form id='enter-free-software-email'

@@ -34,10 +34,12 @@ class Person(models.Model):
         ohloh_contrib_info_list = oh.get_contribution_info_by_username(
                 self.username)
         for ohloh_contrib_info in ohloh_contrib_info_list:
-            p2p_rel = ProjectExp()
-            p2p_rel.person = self
-            p2p_rel.from_ohloh_contrib_info(ohloh_contrib_info)
-            p2p_rel.save()
+            exp = ProjectExp()
+            exp.person = self
+            exp.from_ohloh_contrib_info(ohloh_contrib_info)
+            exp.last_polled = datetime.datetime.now()
+            exp.last_touched = datetime.datetime.now()
+            exp.save()
         self.last_polled = datetime.datetime.now()
         self.save()
         
@@ -84,8 +86,6 @@ class ProjectExp(models.Model):
         if self.time_record_was_created is None:
             self.time_record_was_created = datetime.datetime.now()
         super(ProjectExp, self).save(*args, **kwargs)
-
-
 
     # }}}
 

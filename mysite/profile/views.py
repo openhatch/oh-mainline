@@ -1,6 +1,6 @@
 # vim: ai ts=4 sts=4 et sw=4
 
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
 from django.shortcuts import render_to_response
 from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag
 from mysite.search.models import Project
@@ -35,14 +35,24 @@ def get_data_dict_for_display_person(username):
             username=username)
 
     if person.poll_on_next_web_view:
-        person.fetch_data_from_ohloh()
+        person.fetch_contrib_data_from_ohloh()
         person.poll_on_next_web_view = False
         person.save()
 
     project_exps = ProjectExp.objects.filter(
             person=person)
 
-    return { 'person': person, 'project_exps': project_exps, }
+    tags = {}
+    for exp in project_exps:
+        tag_links = Link_ProjectExp_Tag.objects.filter(project_exp=exp)
+        tags[exp] = [link.tag for link in tag_links]
+
+    # {
+    #   Experience1:
+    #   ["awesome", "fun", "illuminating", "helped_me_get_laid"],
+    # }
+
+    return { 'person': person, 'project_exps': project_exps, 'tags': tags}
     # }}}
 
 def display_person(request, input_username=None):
@@ -74,6 +84,7 @@ def get_data_for_email(request):
     # }}}
 
 def add_tag_to_project_exp_web(request):
+    # {{{
     # Get data
     username = request.GET.get('username', None)
     project_name = request.GET.get('project_name', None)
@@ -88,14 +99,15 @@ def add_tag_to_project_exp_web(request):
         if format == 'json':
             return HttpResponse("({'notification': '%s'})" % notification)
         else:
-            return render_to_response('profile/profile.html', {
-                'notification': notification })
+            data_dict = get_data_dict_for_display_person(username)
+            data_dict['notification'] = notification
+            return render_to_response('profile/profile.html', data_dict)
     else:
         return HttpResponseServerError()
+    # }}}
 
 def add_tag_to_project_exp(username, project_name,
         tag_text, tag_type_name='user_generated'):
-
     # {{{
     tag_type, created = TagType.objects.get_or_create(
             name=tag_type_name)
