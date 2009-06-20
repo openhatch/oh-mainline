@@ -197,3 +197,6 @@ def add_tag_to_project_exp(username, project_name,
             tag=tag, project_exp=project_exp)
     # FIXME: Catch when link already exists.
     # }}}
+
+def change_what_like_working_on(request):
+    return HttpResponse('barbies')
