@@ -48,11 +48,11 @@ class ProfileTests(django.test.TestCase):
         twill_teardown()
 
     def testSlash(self):
-        response = self.client.get('/profile/')
+        response = self.client.get('/people/')
 
     def testAddContribution(self):
         # {{{
-        url = 'http://openhatch.org/profile/'
+        url = 'http://openhatch.org/people/'
         tc.go(make_twill_url(url))
         tc.fv('add_contrib', 'project', 'Babel')
         tc.fv('add_contrib', 'contrib_text', 'msgctxt support')
@@ -87,9 +87,9 @@ class OmanTests(django.test.TestCase):
 
     def testFormEnterYourUsername(self):
         # {{{
-        url = 'http://openhatch.org/profile/'
+        url = 'http://openhatch.org/people/'
         tc.go(make_twill_url(url))
-        tc.fv('enter_free_software_username', 'username', 'paulproteus')
+        tc.fv('enter_free_software_username', 'u', 'paulproteus')
         tc.submit()
 
         tc.find('ccHost')
@@ -197,7 +197,7 @@ class PerthTests(django.test.TestCase):
         twill_teardown()
 
     def testFormEnterYourEmail(self):
-        url = 'http://openhatch.org/profile/'
+        url = 'http://openhatch.org/people/'
         tc.go(make_twill_url(url))
         tc.fv('enter_free_software_email', 'email', 'asheesh@asheesh.org')
         tc.submit()
@@ -221,7 +221,7 @@ class QuebecTests(django.test.TestCase):
         # and all related ProjectExps
 
     def testPersonModel(self):
-        # Test creating a Person and fetching his contribution info
+        # Test creating a Person and fetching his or her contribution info
         username = 'paulproteus'
         new_person = Person(username=username)
         new_person.save()
@@ -234,6 +234,16 @@ class QuebecTests(django.test.TestCase):
         self.to_be_deleted.extend(all_proj_exps)
         self.assert_(all_proj_exps, all_proj_exps)
 
+    def testGetPersonDataDict(self):
+        username = 'paulproteus'
+        data = profile.views.get_data_dict_for_display_person(username)
+        self.assertEquals(data['person'].username, username)
+        cchost_among_project_exps = False
+        for exp in data['project_exps']:
+            if exp.project.name == 'ccHost':
+                cchost_among_project_exps = True
+                break
+        self.assert_(cchost_among_project_exps)
     # }}}
 
 class SomervilleTests(django.test.TestCase):

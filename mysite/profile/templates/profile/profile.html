@@ -66,31 +66,33 @@ vim: set ts=3 sw=3 et:
             <div id='content'>
 
                {% if notification %}
-               <div class='notification' style='background-color: #fca; color: #444; padding: 5px;'>
+               <div class='notification'
+                  style='background-color: #fca; color: #444; padding: 5px;'>
                   Notification: {{ notification }}
                </div>
                {% endif %}
                <h1 class='name'>{{ person.name }}</h1>
+
+               {{ tags }}
 
                {% comment %} Submit a FOSS username {{{ {% endcomment %}
                <div class='box'>
                   <h3>Find a person in the community</h3>
                   <form id='enter-free-software-username' 
                      name='enter_free_software_username'
-                     action='/profile/get_data_for_username' 
-                     method='POST' >
+                     action='/people/' 
+                     method='GET'>
                      <label for='get-data-username'>
                         Type a username</label>
-                     <input type='text'
-                     id='get-data-username' 
-                     name='username' />
+                     <input type='text' id='u' name='u' />
+                     <input type='submit' />
                      <!--input type='image'
                      src='/static/images/add.png' /-->
                   </form>
                </div>
                {% comment %} }}} {% endcomment %}
 
-               {% comment %} Display person's FOSS experience {{{ {% endcomment %}
+               {% comment %} Display a person's FOSS experience {{{ {% endcomment %}
                <div class='box'>
                   <h3>{{ person.username }}</h3>
                   {% if project_exps %}
@@ -162,7 +164,7 @@ vim: set ts=3 sw=3 et:
       <!-- Perth additions below this line -->
       <form id='enter-free-software-email'
          name='enter_free_software_email'
-         action='/profile/get_data_for_email' method='POST' >
+         action='/people/get_data_for_email' method='POST' >
          <label for='get-data-email'>Type an email address</label>
          <input type='text' id='get-data-email' name='email' />
          <input type='image' src='/static/images/add.png' />

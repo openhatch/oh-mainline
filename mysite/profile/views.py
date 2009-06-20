@@ -26,7 +26,7 @@ def add_contribution(request):
                 description=contrib_text)
         ppr.save()
 
-    return HttpResponseRedirect('/profile/')
+    return HttpResponseRedirect('/people/')
     #}}}
 
 def get_data_dict_for_display_person(username):
@@ -52,7 +52,9 @@ def get_data_dict_for_display_person(username):
     #   ["awesome", "fun", "illuminating", "helped_me_get_laid"],
     # }
 
-    return { 'person': person, 'project_exps': project_exps, 'tags': tags}
+    print tags
+
+    return { 'person': person, 'project_exps': project_exps, 'tags': tags }
     # }}}
 
 def display_person(request, input_username=None):
@@ -61,7 +63,7 @@ def display_person(request, input_username=None):
     if input_username is None:
         input_username = request.GET.get('u', None)
         if input_username is None:
-            return HttpResponseServerError()
+            return render_to_response('profile/profile.html')
 
     data_dict = get_data_dict_for_display_person(input_username)
 
@@ -80,7 +82,7 @@ def get_data_for_email(request):
                           contrib_text='whatever')
         saved.append(new_values)
         request.session['saved_data'] = saved
-    return HttpResponseRedirect('/profile/')
+    return HttpResponseRedirect('/people/')
     # }}}
 
 def add_tag_to_project_exp_web(request):
@@ -121,9 +123,12 @@ def add_tag_to_project_exp(username, project_name,
     project = Project.objects.get(name=project_name)
     # FIXME: Catch when no such project exists.
 
-    project_exp = ProjectExp.objects.get(
-            person=person, project=project)
+    project_exp = ProjectExp.objects.filter(
+            person=person, project=project)[0]
     # FIXME: Catch when no such project exp exists.
+    # Not using get; the error of multiple
+    # project_exps with the same person and project
+    # need not be caught here.
 
     new_link = Link_ProjectExp_Tag.objects.create(
             tag=tag, project_exp=project_exp)
