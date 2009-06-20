@@ -445,8 +445,15 @@ class ExpTag(django.test.TestCase):
 
     def test__exp_tag_add_multiple_tags__unit(self):
         # {{{
-        #profile.views.add_multiple
-        pass
+        username = 'stipe'
+        project_name = 'automatic'
+        tag_string = 'insidious mellifluous unctuous'
+        delimiter = ' '
+        profile.views.add_multiple_tags(
+                username=username,
+                project_name=project_name,
+                tag_string=tag_string,
+                delimiter=delimiter)
         # }}}
 
     """
