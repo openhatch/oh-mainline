@@ -50,7 +50,7 @@ class ProfileTests(django.test.TestCase):
     def testSlash(self):
         response = self.client.get('/people/')
 
-    def testAddContribution(self):
+    def test__add_contribution__web(self):
         # {{{
         username = 'paulproteus'
         url = 'http://openhatch.org/people/?u=%s' % username
@@ -72,6 +72,31 @@ class ProfileTests(django.test.TestCase):
         tc.find('Babel')
         tc.find('Baber')
         # }}}
+
+    def test__project_exp_create_from_text__unit(self):
+        # {{{
+
+        # Create requisite objects
+        person = sample_person()
+        project = sample_project()
+
+        # Assemble text input
+        username = person.username
+        project_name = project.name
+        description = "sample description"
+        url = "http://sample.com"
+        man_months = "3"
+        primary_language = "brainfuck"
+
+        ProjectExp.create_from_text(
+                person.username,
+                project.name,
+                description,
+                url,
+                man_months,
+                primary_language)
+        # }}}
+
     # }}}
 
 class OmanTests(django.test.TestCase):

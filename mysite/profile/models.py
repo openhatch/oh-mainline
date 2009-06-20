@@ -77,6 +77,46 @@ class ProjectExp(models.Model):
         self.source = "Ohloh"
         self.time_gathered_from_source = datetime.date.today()
 
+    @staticmethod
+    def create_from_text(
+            username,
+            project_name,
+            description='',
+            url='',
+            man_months=None,
+            primary_language=''
+            ):
+
+        exp = ProjectExp(
+                person=Person.objects.get(username=username),
+                project=Project.objects.get(name=project_name),
+                url=str(url),
+                description=str(description),
+                man_months=int(man_months),
+                primary_language=primary_language)
+
+        exp.save()
+
+    @staticmethod
+    def create_from_text(
+            username,
+            project_name,
+            description='',
+            url='',
+            man_months=None,
+            primary_language=''
+            ):
+
+        exp = ProjectExp(
+                person=Person.objects.get(username=username),
+                project=Project.objects.get(name=project_name),
+                url=str(url),
+                description=str(description),
+                man_months=int(man_months),
+                primary_language=primary_language)
+
+        exp.save()
+
     def save(self, *args, **kwargs):
         if self.time_record_was_created is None:
             self.time_record_was_created = datetime.datetime.now()

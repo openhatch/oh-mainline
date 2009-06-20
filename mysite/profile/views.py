@@ -9,27 +9,39 @@ import datetime
 import urllib
 
 # Add a contribution {{{
-def add_contribution(request):
+
+def add_project_exp_web(request):
     # {{{
     username = request.POST.get('u', '')
     project_name = request.POST.get('project', '')
     description = request.POST.get('description', '')
     url = request.POST.get('url', '')
+    format = request.POST.get('format', 'html')
 
+    notif = ''
     if username and project_name and description and url:
+        ProjectExp.create_from_text(username, project_name, description, url)
+        notif = "Added experience with %s to %s's profile." % (
+                project_name, username)
+    else:
+        notif = "Er, like, bad input: {project_name: %s, username: %s}" % (
+                project_name, username)
 
-        person = Person.objects.get(username=username)
-        project = Project.objects.get(name=project_name)
+    if format == 'json':
+        return HttpResponse("({'notification':'%s'})") 
 
-        exp = ProjectExp(
-                person=person,
-                project=project,
-                url=url,
-                description=description)
-        exp.save()
+    data = profile_data_from_username(username)
+    data['notification'] = notif
 
-    return display_person_redirect(username)
+    return HttpResponseRedirect('/people/?' +
+            urllib.urlencode({'u': username}))
     #}}}
+
+def add_contribution(username, project_name, url='', description=''):
+    # {{{
+    pass
+    # }}}
+
 # }}}
 
 # Display profile {{{
@@ -164,6 +176,7 @@ def get_data_for_email(request):
 
 # Project experience tags {{{
 
+# FIXME: rename to project_exp_tag__add__web
 def add_tag_to_project_exp_web(request):
     # {{{
     # Get data
@@ -180,13 +193,14 @@ def add_tag_to_project_exp_web(request):
         if format == 'json':
             return HttpResponse("({'notification': '%s'})" % notification)
         else:
-            data_dict = get_data_dict_for_display_person(username)
+            data_dict = profile_data_from_username(username)
             data_dict['notification'] = notification
             return render_to_response('profile/profile.html', data_dict)
     else:
         return HttpResponseServerError()
     # }}}
 
+# FIXME: rename to project_exp_tag__add
 def add_tag_to_project_exp(username, project_name,
         tag_text, tag_type_name='user_generated'):
     # {{{
@@ -214,6 +228,16 @@ def add_tag_to_project_exp(username, project_name,
     # FIXME: Catch when link already exists.
     # }}}
 
+def project_exp_tag__remove(request):
+    # {{{
+    # }}}
+
+def project_exp_tag__remove__web(username, project_name,
+        tag_text, tag_type_name='user_generated'):
+    # {{{
+    # }}}
+
+# }}}
 # }}}
 
 # Specify what you like working on {{{
