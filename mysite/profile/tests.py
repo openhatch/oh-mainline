@@ -264,11 +264,7 @@ class QuebecTests(django.test.TestCase):
         self.assert_(cchost_among_project_exps)
     # }}}
 
-class SomervilleTests(django.test.TestCase):
-    '''
-    The Somerville milestone says:
-    * You can add tags to annotate each code experience
-    '''
+class ExpTag(django.test.TestCase):
     # {{{
     def setUp(self):
         twill_setup()
@@ -276,20 +272,32 @@ class SomervilleTests(django.test.TestCase):
     def tearDown(self):
         twill_teardown()
 
-    def testNewLink_ProjectExp_Tag(self):
+    def test__exp_tag_model_create_and_delete(self):
         # {{{
-        stipe = Person(name='Michael Stipe', username='stipe')
-        language = TagType(name='language', prefix='lang')
-        python = Tag(text='python', tag_type=language)
-        exaile = Project(name='exaile')
-        project_exp = ProjectExp(person=stipe, project=exaile)
-        proj_exp_tag = Link_ProjectExp_Tag(
-                project_exp=project_exp,
-                tag=python,
-                source="test")
+
+        tag_type, created = TagType.objects.get_or_create(name='misc')
+
+        tag, tag_created = Tag.objects.get_or_create(
+                text='exemplary futility',
+                tag_type=tag_type)
+
+        person, person_created = Person.objects.get_or_create(
+                username='stipe')
+
+        project, project_created = Project.objects.get_or_create(
+                name='exaile')
+
+        project_exp, project_exp_created = ProjectExp.objects.get_or_create(
+                person=person, project=project)
+
+        link_exp_tag, link_created = Link_ProjectExp_Tag.objects.get_or_create(
+                tag=tag, project_exp=project_exp)
+        self.assert_(link_created)
+
+        link_exp_tag.delete()
         # }}}
 
-    def testAddTagToProjectExp(self):
+    def test__exp_tag_add__unit(self):
         # {{{
         person, person_created = Person.objects.get_or_create(
                 username='stipe')
@@ -306,36 +314,84 @@ class SomervilleTests(django.test.TestCase):
         profile.views.add_tag_to_project_exp("stipe", "murmur", "awesome")
         # }}}
 
-    def testAddTagToProjectExpWithoutFunction(self):
+    def test__exp_tag_remove__unit(self):
         # {{{
-
-        tag_type, created = TagType.objects.get_or_create(name='misc')
-        if created: print "tag type %s was created" % tag_type
-
-        tag, tag_created = Tag.objects.get_or_create(
-                text='exemplary futility',
-                tag_type=tag_type)
-        if tag_created: print "tag %s was created" % tag
-
         person, person_created = Person.objects.get_or_create(
                 username='stipe')
-        if person_created: print "person %s was created" % person
+        if person_created: print "Person %s was created" % person
 
         project, project_created = Project.objects.get_or_create(
-                name='exaile')
-        if project_created: print "project %s was created" % project
+                name='murmur')
+        if project_created: print "Project %s was created" % project
 
-        project_exp, project_exp_created = ProjectExp.objects.get_or_create(
+        project_exp, proj_exp_created = ProjectExp.objects.get_or_create(
                 person=person, project=project)
-        if project_exp_created: print "project_exp %s was created" % project_exp
+        if proj_exp_created: print "ProjectExp %s was created" % project_exp
 
-        link, link_created = Link_ProjectExp_Tag.objects.get_or_create(
-                tag=tag, project_exp=project_exp)
-        if link_created: print "link %s was created" % link
-
+        profile.views.add_tag_to_project_exp("stipe", "murmur", "awesome")
         # }}}
 
-    def testAddTagFailsOnBadInput(self):
+    def test__exp_tag_add__web(self):
+        # {{{
+        url = '/people/add_tag_to_project_exp'
+
+        username = 'stipe'
+        project_name = 'automatic'
+        tag_text = 'baller'
+
+        person, person_created = Person.objects.get_or_create(
+                username=username)
+
+        project, project_created = Project.objects.get_or_create(
+                name=project_name)
+
+        exp, exp_created = ProjectExp.objects.get_or_create(
+                person=person, project=project)
+
+        good_input = {
+            'username': username,
+            'project_name': project_name,
+            'tag_text': tag_text
+            }
+
+        response = Client().get(url, good_input)
+
+        self.assertContains(response, username)
+        self.assertContains(response, project_name)
+        self.assertContains(response, tag_text)
+        # }}}
+
+    def test__exp_tag_remove__web(self):
+        # {{{
+        url = '/people/remove_tag_from_project_exp'
+
+        username = 'stipe'
+        project_name = 'automatic'
+        tag_text = 'baller'
+
+        person, person_created = Person.objects.get_or_create(
+                username=username)
+
+        project, project_created = Project.objects.get_or_create(
+                name=project_name)
+
+        exp, exp_created = ProjectExp.objects.get_or_create(
+                person=person, project=project)
+
+        good_input = {
+            'username': username,
+            'project_name': project_name,
+            'tag_text': tag_text
+            }
+
+        response = Client().get(url, good_input)
+
+        self.assertContains(response, username)
+        self.assertContains(response, project_name)
+        self.assertContains(response, tag_text)
+        # }}}
+
+    def test__exp_tag_add__web__failure(self):
         # {{{
         url = '/people/add_tag_to_project_exp'
 
@@ -361,36 +417,44 @@ class SomervilleTests(django.test.TestCase):
             self.assertEquals(client.get(url, bad_input).status_code, 500)
         # }}}
 
-    def testAddTagWorks(self):
+    def test__exp_tag_remove__web__failure(self):
         # {{{
-        url = '/people/add_tag_to_project_exp'
+        url = '/people/remove_tag_to_project_exp'
 
         username = 'stipe'
         project_name = 'automatic'
-        tag_text = 'baller'
 
-        person, person_created = Person.objects.get_or_create(
-                username=username)
-        project, project_created = Project.objects.get_or_create(
-                name=project_name)
-        exp, exp_created = ProjectExp.objects.get_or_create(
-                person=person, project=project)
+        Person.objects.get_or_create(username=username)
+        Project.objects.get_or_create(name=project_name)
 
         good_input = {
             'username': username,
             'project_name': project_name,
-            'tag_text': tag_text
+            'tag_text': 'baller'
             }
 
         client = Client()
 
-        self.assertContains(client.get(url, good_input), username)
-        self.assertContains(client.get(url, good_input), project_name)
-        self.assertContains(client.get(url, good_input), tag_text)
+        # Test that add tag fails if any of the fields are missing.
+        for key in good_input.keys():
+            bad_input = {}
+            bad_input.update(good_input)
+            del bad_input[key]
+            self.assertEquals(client.get(url, bad_input).status_code, 500)
         # }}}
 
-    # }}}
+    def test__exp_tag_add_multiple_tags__unit(self):
+        # {{{
+        #profile.views.add_multiple
+        pass
+        # }}}
 
+    """
+    test that tag dupes aren't added, and that a notification is returned 'you tried to add a duplicate tag: %s'.
+    do that for each dupe, and return a summary notification: 'you tried to add the following duplicate tags: ...'
+    """
+
+    # }}}
 
 class UnadillaTests(django.test.TestCase):
     """
@@ -415,4 +479,3 @@ class UnadillaTests(django.test.TestCase):
         # }}}
 
     # }}}
-
