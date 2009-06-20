@@ -6,6 +6,7 @@ from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_Project
 from mysite.search.models import Project
 import StringIO
 import datetime
+import urllib
 
 def index(request):
     #{{{
@@ -129,16 +130,21 @@ def import_debtags(cooked_string = None):
 
 def get_data_for_email(request):
     # {{{
+    # FIXME: Hard-coded username
+    username='paulproteus'
     email = request.POST.get('email', '')
     if email:
-        saved = request.session.get('saved_data', [])
-        # FIXME: This is faked out
-        new_values = dict(project='ccHost',
-                          url='whatever',
-                          contrib_text='whatever')
-        saved.append(new_values)
-        request.session['saved_data'] = saved
-    return HttpResponseRedirect('/people/')
+        import ohloh
+        oh = ohloh.get_ohloh()
+        from_ohloh = oh.get_contribution_info_by_email(email)
+        for data in from_ohloh:
+            person, created = Person.objects.get_or_create(
+                username=username) # FIXME: Which username?
+            pe = ProjectExp(person=person)
+            pe.from_ohloh_contrib_info(data)
+            pe.save()
+    return HttpResponseRedirect('/people/?' + urllib.urlencode({'u':
+                                                                username}))
     # }}}
 
 def add_tag_to_project_exp_web(request):

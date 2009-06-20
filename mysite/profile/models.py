@@ -68,12 +68,6 @@ class ProjectExp(models.Model):
         super(ProjectExp, self).save(*args, **kwargs)
 
     def from_ohloh_contrib_info(self, ohloh_contrib_info):
-        if not self.person:
-            self.person = Person.objects.get_or_create(
-                    username=ohloh_contrib_info['username'])
-        else:
-            pass # Don't overwrite.
-
         self.project, bool_created = Project.objects.get_or_create(
                 name=ohloh_contrib_info['project'])
         # FIXME: Automatically populate project url here.

@@ -90,8 +90,8 @@ class Ohloh(object):
     def get_contribution_info_by_email(self, email):
         ret = []
         ret.extend(self.search_contribution_info_by_email(email))
-        #ret.extend(self.search_contribution_info_by_account(
-        #    self.email_address_to_ohloh_username(email)))
+        ret.extend(self.get_contribution_info_by_ohloh_username(
+            self.email_address_to_ohloh_username(email)))
         return ret
 
     def email_address_to_ohloh_username(self, email):
