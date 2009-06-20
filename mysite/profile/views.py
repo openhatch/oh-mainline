@@ -105,6 +105,7 @@ def list_debtags_of_project(project_name):
     resluts = list(Link_Project_Tag.objects.filter(project=project,
                                                    tag__tag_type=debtags))
     return [link.tag.text for link in resluts]
+    # lol -rkl
 
 def import_debtags(cooked_string = None):
     if cooked_string is None:

@@ -450,15 +450,30 @@ class ExpTag(django.test.TestCase):
             self.assertEquals(client.get(url, bad_input).status_code, 500)
         # }}}
 
+    def sample_person(self):
+        # {{{
+        return Person(username='stipe')
+        # }}}
+
+    def sample_project(self):
+        return Project(project_name='automatic')
+
+    def sample_tag(self):
+        tag_text = 'baller'
+
+    def sample_exp(self):
+        exp, exp_created = ProjectExp(
+                person=sample_person(),
+                project=sample_project())
+        return exp
+
     def test__exp_tag_add_multiple_tags__unit(self):
         # {{{
-        username = 'stipe'
-        project_name = 'automatic'
         tag_string = 'insidious mellifluous unctuous'
         delimiter = ' '
         profile.views.add_multiple_tags(
-                username=username,
-                project_name=project_name,
+                username=sample_person(),
+                project_name=sample_project(),
                 tag_string=tag_string,
                 delimiter=delimiter)
         # }}}
