@@ -476,8 +476,10 @@ class ExpTag(django.test.TestCase):
             'tag_text': tag_text
             }
 
-        response = Client().get(url, good_input)
-
+        response = Client().post(url, good_input)
+        # handle the redirect
+        new_loc = response['Location'].split('/', 1)[1]
+        response = Client().get(new_loc)
         self.assertContains(response, username)
         self.assertContains(response, project_name)
         self.assertContains(response, tag_text)
