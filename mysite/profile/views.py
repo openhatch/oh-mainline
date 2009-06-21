@@ -238,6 +238,7 @@ def project_exp_tag__remove(username, project_name,
     # in case we want to run stats on what tags people are deleting, etc.
     Link_ProjectExp_Tag.get_from_strings(username, project_name, tag_text).delete()
     # }}}
+    pass
 
 def project_exp_tag__remove__web(username, project_name,
         tag_text, tag_type_name='user_generated'):
@@ -252,6 +253,7 @@ def project_exp_tag__remove__web(username, project_name,
 
     project_exp_tag__remove(username, project_name, tag_text)
     # }}}
+    pass
 
 # }}}
 
