@@ -182,10 +182,10 @@ def get_data_for_email(request):
 def add_tag_to_project_exp_web(request):
     # {{{
     # Get data
-    username = request.GET.get('username', None)
-    project_name = request.GET.get('project_name', None)
-    tag_text = request.GET.get('tag_text', None)
-    format = request.GET.get('format', 'html')
+    username = request.POST.get('username', None)
+    project_name = request.POST.get('project_name', None)
+    tag_text = request.POST.get('tag_text', None)
+    format = request.POST.get('format', 'html')
 
     # Validate data
     if username and project_name and tag_text:

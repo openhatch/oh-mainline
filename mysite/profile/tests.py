@@ -437,7 +437,7 @@ class ExpTag(django.test.TestCase):
             'tag_text': tag_text
             }
         
-        response = Client().get(url, good_input)
+        response = Client().post(url, good_input)
 
 
         self.assertContains(response, username)
