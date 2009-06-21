@@ -377,7 +377,7 @@ class ExpTag(django.test.TestCase):
         link_exp_tag.delete()
         # }}}
 
-    def test__exp_tag_add__unit(self):
+    def test__exp_tag_add__unit(self, return_it = False):
         # {{{
         # Constants:
         project_name='murmur'
@@ -403,25 +403,27 @@ class ExpTag(django.test.TestCase):
         self.assertEqual(inserted.tag.text, tag_text)
         self.assertEqual(inserted.project_exp.person, person)
         self.assert_(inserted.id) # make sure it got in there
-        inserted.delete()
+        if return_it:
+            return inserted
+        else:
+            inserted.delete()
         # }}}
 
     def test__exp_tag_remove__unit(self):
-        # {{{
-        person, person_created = Person.objects.get_or_create(
-                username='stipe')
-        #if person_created: print "Person %s was created" % person
+        tag_link = self.test__exp_tag_add__unit(return_it = True)
+        returned = profile.views.project_exp_tag__remove(
+            tag_link.project_exp.person.username,
+            tag_link.project_exp.project.name,
+            tag_link.tag.text)
 
-        project, project_created = Project.objects.get_or_create(
-                name='murmur')
-        #if project_created: print "Project %s was created" % project
-
-        project_exp, proj_exp_created = ProjectExp.objects.get_or_create(
-                person=person, project=project)
-        #if proj_exp_created: print "ProjectExp %s was created" % project_exp
-
-        profile.views.add_tag_to_project_exp("stipe", "murmur", "awesome")
-        # }}}
+        try:
+            profile.views.project_exp_tag__remove(
+            tag_link.project_exp.person.username,
+            tag_link.project_exp.project.name,
+            tag_link.tag.text)
+            assert False, "Should have NOT found it"
+        except Link_ProjectExp_Tag.DoesNotExist:
+            pass # w00t
 
     def test__exp_tag_add__web(self):
         # {{{

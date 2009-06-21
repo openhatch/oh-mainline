@@ -142,9 +142,9 @@ class Link_ProjectExp_Tag(models.Model):
     @staticmethod
     def get_from_strings(username, project_name, tag_text):
         # FIXME: Add support for tag-type-specific grabbing of Link_ProjectExp_Tags
-        return Link_ProjectExp_Tag(
+        return Link_ProjectExp_Tag.objects.get(
                 project_exp=ProjectExp.get_from_text(username, project_name),
-                tag = Tag.objects.filter(text=tag_text)
+                tag = Tag.objects.get(text=tag_text)
                 )
     # }}}
 

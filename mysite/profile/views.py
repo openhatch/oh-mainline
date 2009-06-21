@@ -238,7 +238,9 @@ def project_exp_tag__remove(username, project_name,
 
     # FIXME: Maybe don't actually delete, but merely disable (e.g. deleted=yes),
     # in case we want to run stats on what tags people are deleting, etc.
-    Link_ProjectExp_Tag.get_from_strings(username, project_name, tag_text).delete()
+    tag_link = Link_ProjectExp_Tag.get_from_strings(username, project_name, tag_text)
+    tag_link.delete()
+    return tag_link
     # }}}
 
 def project_exp_tag__remove__web(request):
