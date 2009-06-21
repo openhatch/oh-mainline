@@ -43,9 +43,15 @@ class ProfileTests(django.test.TestCase):
     # {{{
     def setUp(self):
         twill_setup()
+        self.sample_person = Person(username='stipe')
+        self.sample_person.save()
+        self.sample_project = Project(name='automatic')
+        self.sample_project.save()
 
     def tearDown(self):
         twill_teardown()
+        self.sample_person.delete()
+        self.sample_project.delete()
 
     def testSlash(self):
         response = self.client.get('/people/')
@@ -77,8 +83,8 @@ class ProfileTests(django.test.TestCase):
         # {{{
 
         # Create requisite objects
-        person = sample_person()
-        project = sample_project()
+        person = self.sample_person
+        project = self.sample_project
 
         # Assemble text input
         username = person.username
