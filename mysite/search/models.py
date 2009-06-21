@@ -2,7 +2,7 @@ from django.db import models
 
 # Create your models here.
 class Project(models.Model):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, unique = True)
     language = models.CharField(max_length=200)
     icon_url = models.URLField(max_length=200)
 
