@@ -454,21 +454,24 @@ class ExpTag(django.test.TestCase):
         self.test__exp_tag_add__web(tag_text=tag_text,
                                     username=username,
                                     project_name=project_name)
-        url = '/people/project_exp_tag__remove'
 
-        good_input = {
-            'username': username,
-            'project_name': project_name,
-            'tag_text': tag_text
-            }
+        url = 'http://openhatch.org/people/?u=' + username
+        tc.go(make_twill_url(url))
+        
+        # FIXME: Loop over forms
+        tc.fv('add-tag-to-exp', 'tag_text', tag_text)
+        tc.submit()
+        tc.find(tag_text)
 
-        response = Client().post(url, good_input)
-        # handle the redirect
-        new_loc = response['Location'].split('/', 1)[1]
-        response = Client().get(new_loc)
-        self.assertContains(response, username)
-        self.assertContains(response, project_name)
-        self.assertContains(response, tag_text)
+        desired = None
+        for form in tc.showforms():
+            if 'remove-tag' in form.name:
+                desired = form
+        tc.config('readonly_controls_writeable', True)
+        tc.fv(desired.name, 'tag_text', desired.get_value('tag_text'))
+        tc.submit()
+        tc.notfind(tag_text)
+        
         # }}}
 
     def test__project_exp_tag_add__web__failure(self):
