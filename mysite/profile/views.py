@@ -7,6 +7,7 @@ from mysite.search.models import Project
 import StringIO
 import datetime
 import urllib
+import simplejson
 
 # Add a contribution {{{
 
@@ -238,22 +239,43 @@ def project_exp_tag__remove(username, project_name,
     # in case we want to run stats on what tags people are deleting, etc.
     Link_ProjectExp_Tag.get_from_strings(username, project_name, tag_text).delete()
     # }}}
-    pass
 
 def project_exp_tag__remove__web(username, project_name,
-        tag_text, tag_type_name='user_generated'):
+        tag_text, format='html', tag_type_name='user_generated'):
     # {{{
 
+    # Collect errors in this list
+    errors = []
+
     # Verify person with that username exists
-    person = Person.objects.get(username=username)
+    if Person.objects.filter(username=username).count() == 0:
+        errors.append("No person found with username: %s" % username)
 
     # Verify project with that name exists
+    if Project.objects.filter(name=project_name).count() == 0:
+        errors.append("No project found with name: %s" % project_name)
     
-    # Verify tag with that name exists
+    # Verify tag with that text exists
+    if Tag.objects.filter(text=tag_text).count() == 0:
+        errors.append("No project found with name: %s" % project_name)
+
+    if errors:
+        if format == 'json':
+            return json_serialize(errors)
+        else:
+            return HttpResponseRedirect('/people/?' + urllib.urlencode(
+                {'u': username, 'errors': errors}))
 
     project_exp_tag__remove(username, project_name, tag_text)
+
+    notification = "Successfully removed tag: {username: %s, project_name: %s, tag_text: %s}" % (username, project_name, tag_text)
+
+    if format == 'json':
+        return json_serialize({'notification' : notification})
+    else:
+        return HttpResponseRedirect('/people/?' + urllib.urlencode(
+            {'u': username, 'notification': notification}))
     # }}}
-    pass
 
 # }}}
 
