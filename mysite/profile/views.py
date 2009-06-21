@@ -197,7 +197,9 @@ def add_tag_to_project_exp_web(request):
         else:
             data_dict = profile_data_from_username(username)
             data_dict['notification'] = notification
-            return render_to_response('profile/profile.html', data_dict)
+            return HttpResponseRedirect('/people/?' +
+                                        urllib.urlencode({'u':
+                                                          username}))
     else:
         return HttpResponseServerError()
     # }}}
