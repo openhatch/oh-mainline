@@ -29,8 +29,7 @@ def add_project_exp_web(request):
                 project_name, username)
 
     if format == 'json':
-        import simplejson
-        return HttpResponse(simplejson.dumps([{}]))
+        return HttpResponse(simplejson.dumps([{'notification': notif}]))
 
     data = profile_data_from_username(username)
     data['notification'] = notif
@@ -194,7 +193,7 @@ def add_tag_to_project_exp_web(request):
         notification = "You tagged %s's experience with %s as %s" % (
                 username, project_name, tag_text)
         if format == 'json':
-            return HttpResponse("({'notification': '%s'})" % notification)
+            return HttpResponse(simplejson.dumps([{'notification': notification}]))
         else:
             data_dict = profile_data_from_username(username)
             data_dict['notification'] = notification
@@ -242,41 +241,56 @@ def project_exp_tag__remove(username, project_name,
     Link_ProjectExp_Tag.get_from_strings(username, project_name, tag_text).delete()
     # }}}
 
-def project_exp_tag__remove__web(username, project_name,
-        tag_text, format='html', tag_type_name='user_generated'):
+def project_exp_tag__remove__web(request):
     # {{{
+    username = request.POST.get('username', None)
+    project_name = request.POST.get('project_name', None)
+    tag_text = request.POST.get('tag_text', None)
+    format = request.POST.get('format', 'html')
+    tag_type_name = request.POST.get('tag_type_name', 'user_generated')
 
-    # Collect errors in this list
-    errors = []
+    if username and project_name and tag_text:
+        # Collect errors in this list
+        errors = []
 
-    # Verify person with that username exists
-    if Person.objects.filter(username=username).count() == 0:
-        errors.append("No person found with username: %s" % username)
+        # Verify person with that username exists
+        if Person.objects.filter(username=username).count() == 0:
+            errors.append("No person found with username: %s" % username)
 
-    # Verify project with that name exists
-    if Project.objects.filter(name=project_name).count() == 0:
-        errors.append("No project found with name: %s" % project_name)
-    
-    # Verify tag with that text exists
-    if Tag.objects.filter(text=tag_text).count() == 0:
-        errors.append("No project found with name: %s" % project_name)
+        # Verify project with that name exists
+        if Project.objects.filter(name=project_name).count() == 0:
+            errors.append("No project found with name: %s" % project_name)
+        
+        # Verify tag with that text exists
+        if Tag.objects.filter(text=tag_text).count() == 0:
+            errors.append("No project found with name: %s" % project_name)
 
-    if errors:
+        if errors:
+            if format == 'json':
+                return HttpResponse(simplejson.dumps([{'errors': errors}]))
+            else:
+                return HttpResponseRedirect('/people/?' + urllib.urlencode(
+                    {'u': username, 'errors': errors}))
+
+        project_exp_tag__remove(username, project_name, tag_text)
+
+        notification = "Successfully removed tag: {username: %s, project_name: %s, tag_text: %s}" % (username, project_name, tag_text)
+
         if format == 'json':
-            return json_serialize(errors)
+            return HttpResponse(simplejson.dumps([
+                {'notification': notification}
+                ]))
+        else:
+            return HttpResponseRedirect('/people/?' + urllib.urlencode(
+                {'u': username, 'notification': notification}))
+    else:
+        errors = ["You're missing some crucial input."]
+        if format == 'json':
+            return HttpResponse(simplejson.dumps([{'errors': errors}]))
         else:
             return HttpResponseRedirect('/people/?' + urllib.urlencode(
                 {'u': username, 'errors': errors}))
 
-    project_exp_tag__remove(username, project_name, tag_text)
-
-    notification = "Successfully removed tag: {username: %s, project_name: %s, tag_text: %s}" % (username, project_name, tag_text)
-
-    if format == 'json':
-        return json_serialize({'notification' : notification})
-    else:
-        return HttpResponseRedirect('/people/?' + urllib.urlencode(
-            {'u': username, 'notification': notification}))
     # }}}
 
 # }}}

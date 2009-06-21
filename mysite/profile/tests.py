@@ -304,9 +304,30 @@ class ExpTag(django.test.TestCase):
     # {{{
     def setUp(self):
         twill_setup()
+        self.sample_person = Person(username='stipe')
+        self.sample_person.save()
+
+        self.sample_project = Project(name='automatic')
+        self.sample_project.save()
+
+        self.sample_tag_type = TagType(name='asdf')
+        self.sample_tag_type.save()
+
+        self.sample_tag = Tag(tag_type=self.sample_tag_type, text='baller')
+        self.sample_tag.save()
+
+        self.sample_exp = ProjectExp(
+                person=self.sample_person,
+                project=self.sample_project)
+        self.sample_exp.save()
 
     def tearDown(self):
         twill_teardown()
+        self.sample_person.delete()
+        self.sample_project.delete()
+        self.sample_tag.delete()
+        self.sample_exp.delete()
+        self.sample_tag_type.delete()
 
     def test__exp_tag_model_create_and_delete(self):
         # {{{
@@ -354,15 +375,15 @@ class ExpTag(django.test.TestCase):
         # {{{
         person, person_created = Person.objects.get_or_create(
                 username='stipe')
-        if person_created: print "Person %s was created" % person
+        #if person_created: print "Person %s was created" % person
 
         project, project_created = Project.objects.get_or_create(
                 name='murmur')
-        if project_created: print "Project %s was created" % project
+        #if project_created: print "Project %s was created" % project
 
         project_exp, proj_exp_created = ProjectExp.objects.get_or_create(
                 person=person, project=project)
-        if proj_exp_created: print "ProjectExp %s was created" % project_exp
+        #if proj_exp_created: print "ProjectExp %s was created" % project_exp
 
         profile.views.add_tag_to_project_exp("stipe", "murmur", "awesome")
         # }}}
@@ -397,9 +418,9 @@ class ExpTag(django.test.TestCase):
         self.assertContains(response, tag_text)
         # }}}
 
-    def test__exp_tag_remove__web(self):
+    def test__project_exp_tag__remove__web(self):
         # {{{
-        url = '/people/remove_tag_from_project_exp'
+        url = '/people/project_exp_tag__remove'
 
         username = 'stipe'
         project_name = 'automatic'
@@ -427,7 +448,7 @@ class ExpTag(django.test.TestCase):
         self.assertContains(response, tag_text)
         # }}}
 
-    def test__exp_tag_add__web__failure(self):
+    def test__project_exp_tag_add__web__failure(self):
         # {{{
         url = '/people/add_tag_to_project_exp'
 
@@ -453,9 +474,9 @@ class ExpTag(django.test.TestCase):
             self.assertEquals(client.get(url, bad_input).status_code, 500)
         # }}}
 
-    def test__exp_tag_remove__web__failure(self):
+    def stet__project_exp_tag_remove__web__failure(self):
         # {{{
-        url = '/people/remove_tag_to_project_exp'
+        url = '/people/project_exp_tag__remove'
 
         username = 'stipe'
         project_name = 'automatic'
@@ -476,33 +497,16 @@ class ExpTag(django.test.TestCase):
             bad_input = {}
             bad_input.update(good_input)
             del bad_input[key]
-            self.assertEquals(client.get(url, bad_input).status_code, 500)
+            self.assertContains(client.get(url, bad_input), "Error")
         # }}}
 
-    def sample_person(self):
-        # {{{
-        return Person(username='stipe')
-        # }}}
-
-    def sample_project(self):
-        return Project(project_name='automatic')
-
-    def sample_tag(self):
-        tag_text = 'baller'
-
-    def sample_exp(self):
-        exp, exp_created = ProjectExp(
-                person=sample_person(),
-                project=sample_project())
-        return exp
-
-    def test__exp_tag_add_multiple_tags__unit(self):
+    def stet__exp_tag_add_multiple_tags__unit(self):
         # {{{
         tag_string = 'insidious mellifluous unctuous'
         delimiter = ' '
         profile.views.add_multiple_tags(
-                username=sample_person(),
-                project_name=sample_project(),
+                username=self.sample_person,
+                project_name=self.sample_project,
                 tag_string=tag_string,
                 delimiter=delimiter)
         # }}}
