@@ -14,7 +14,7 @@ import simplejson
 def add_project_exp_web(request):
     # {{{
     username = request.POST.get('u', '')
-    project_name = request.POST.get('project', '')
+    project_name = request.POST.get('project_name', '')
     description = request.POST.get('description', '')
     url = request.POST.get('url', '')
     format = request.POST.get('format', 'html')

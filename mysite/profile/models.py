@@ -101,6 +101,7 @@ class ProjectExp(models.Model):
                 primary_language=primary_language)
 
         exp.save()
+        return exp
 
     @staticmethod
     def get_from_text(username, project_name):
