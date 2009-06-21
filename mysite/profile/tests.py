@@ -56,6 +56,29 @@ class ProfileTests(django.test.TestCase):
     def testSlash(self):
         response = self.client.get('/people/')
 
+    def test__add_contribution(self):
+        username = 'paulproteus'
+        url = 'http://openhatch.org/people/?u=%s' % username
+        tc.go(make_twill_url(url))
+
+        username = 'paulproteus'
+        project_name = 'seeseehost'
+        description = 'did some work'
+        url = 'http://example.com/'
+        exp = ProjectExp.create_from_text(username, project_name,
+                                    description, url)
+        found = list(ProjectExp.objects.filter(person__username=username))
+        # Verify it shows up in the DB
+        self.assert_('seeseehost' in [f.project.name for f in found])
+        # Verify it shows up in profile_data_from_username
+        data = profile.views.profile_data_from_username('paulproteus')
+        self.assert_(data['person'].username == 'paulproteus')
+        projects = [thing[0].project.name for thing in
+                    data['exp_taglist_pairs']]
+        self.assert_('seeseehost' in projects)
+        # Delete it!
+        exp.delete()
+
     def test__add_contribution__web(self):
         # {{{
         username = 'paulproteus'
