@@ -98,24 +98,11 @@ class ProjectExp(models.Model):
         exp.save()
 
     @staticmethod
-    def create_from_text(
-            username,
-            project_name,
-            description='',
-            url='',
-            man_months=None,
-            primary_language=''
-            ):
-
-        exp = ProjectExp(
+    def get_from_text(username, project_name):
+        return ProjectExp.objects.get(
                 person=Person.objects.get(username=username),
                 project=Project.objects.get(name=project_name),
-                url=str(url),
-                description=str(description),
-                man_months=int(man_months),
-                primary_language=primary_language)
-
-        exp.save()
+                )
 
     def save(self, *args, **kwargs):
         if self.time_record_was_created is None:
@@ -134,6 +121,7 @@ class Tag(models.Model):
     # {{{
     text = models.CharField(max_length=50)
     tag_type = models.ForeignKey(TagType)
+
     # }}}
 
 class Link_ProjectExp_Tag(models.Model):
@@ -144,6 +132,14 @@ class Link_ProjectExp_Tag(models.Model):
     time_record_was_created = models.DateTimeField(
             default=datetime.datetime.now())
     source = models.CharField(max_length=200)
+
+    @staticmethod
+    def get_from_strings(username, project_name, tag_text):
+        # FIXME: Add support for tag-type-specific grabbing of Link_ProjectExp_Tags
+        return Link_ProjectExp_Tag(
+                project_exp=ProjectExp.get_from_text(username, project_name),
+                tag = Tag.objects.filter(text=tag_text)
+                )
     # }}}
 
 class Link_Project_Tag(models.Model):

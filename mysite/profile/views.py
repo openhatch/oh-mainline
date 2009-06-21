@@ -226,18 +226,33 @@ def add_tag_to_project_exp(username, project_name,
     new_link = Link_ProjectExp_Tag.objects.create(
             tag=tag, project_exp=project_exp)
     # FIXME: Catch when link already exists.
+
+    # FIXME: Move to Link_ProjectExp_Tag.create_from_strings
     # }}}
 
-def project_exp_tag__remove(request):
+def project_exp_tag__remove(username, project_name,
+        tag_text, tag_type_name='user_generated'):
     # {{{
+
+    # FIXME: Maybe don't actually delete, but merely disable (e.g. deleted=yes),
+    # in case we want to run stats on what tags people are deleting, etc.
+    Link_ProjectExp_Tag.get_from_strings(username, project_name, tag_text).delete()
     # }}}
 
 def project_exp_tag__remove__web(username, project_name,
         tag_text, tag_type_name='user_generated'):
     # {{{
+
+    # Verify person with that username exists
+    person = Person.objects.get(username=username)
+
+    # Verify project with that name exists
+    
+    # Verify tag with that name exists
+
+    project_exp_tag__remove(username, project_name, tag_text)
     # }}}
 
-# }}}
 # }}}
 
 # Specify what you like working on {{{
