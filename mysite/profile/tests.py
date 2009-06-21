@@ -425,30 +425,20 @@ class ExpTag(django.test.TestCase):
         except Link_ProjectExp_Tag.DoesNotExist:
             pass # w00t
 
-    def test__exp_tag_add__web(self):
+    def test__exp_tag_add__web(self, username='stipe',
+                               project_name='automatic',
+                               tag_text='baller'):
         # {{{
         url = '/people/add_tag_to_project_exp'
-
-        username = 'stipe'
-        project_name = 'automatic'
-        tag_text = 'baller'
-
-        person, person_created = Person.objects.get_or_create(
-                username=username)
-
-        project, project_created = Project.objects.get_or_create(
-                name=project_name)
-
-        exp, exp_created = ProjectExp.objects.get_or_create(
-                person=person, project=project)
 
         good_input = {
             'username': username,
             'project_name': project_name,
             'tag_text': tag_text
             }
-
+        
         response = Client().get(url, good_input)
+
 
         self.assertContains(response, username)
         self.assertContains(response, project_name)
@@ -457,20 +447,14 @@ class ExpTag(django.test.TestCase):
 
     def test__project_exp_tag__remove__web(self):
         # {{{
-        url = '/people/project_exp_tag__remove'
-
+        tag_text='ballew'
         username = 'stipe'
         project_name = 'automatic'
-        tag_text = 'baller'
-
-        person, person_created = Person.objects.get_or_create(
-                username=username)
-
-        project, project_created = Project.objects.get_or_create(
-                name=project_name)
-
-        exp, exp_created = ProjectExp.objects.get_or_create(
-                person=person, project=project)
+        
+        self.test__exp_tag_add__web(tag_text=tag_text,
+                                    username=username,
+                                    project_name=project_name)
+        url = '/people/project_exp_tag__remove'
 
         good_input = {
             'username': username,
