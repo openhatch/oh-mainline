@@ -29,7 +29,8 @@ def add_project_exp_web(request):
                 project_name, username)
 
     if format == 'json':
-        return HttpResponse("({'notification':'%s'})") 
+        import simplejson
+        return HttpResponse(simplejson.dumps([{}]))
 
     data = profile_data_from_username(username)
     data['notification'] = notif
@@ -37,6 +38,7 @@ def add_project_exp_web(request):
     return HttpResponseRedirect('/people/?' +
             urllib.urlencode({'u': username}))
     #}}}
+add_contribution_web = add_project_exp_web
 
 def add_contribution(username, project_name, url='', description=''):
     # {{{

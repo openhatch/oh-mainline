@@ -87,12 +87,17 @@ class ProjectExp(models.Model):
             primary_language=''
             ):
 
+        person = Person.objects.get(username=username)
+        project, created = Project.objects.get_or_create(name=project_name)
+        if man_months is not None:
+            man_months = int(man_months)
+
         exp = ProjectExp(
-                person=Person.objects.get(username=username),
-                project=Project.objects.get(name=project_name),
+                person=person,
+                project=project,
                 url=str(url),
                 description=str(description),
-                man_months=int(man_months),
+                man_months=man_months,
                 primary_language=primary_language)
 
         exp.save()
