@@ -316,8 +316,8 @@ class QuebecTests(django.test.TestCase):
         data = profile.views.profile_data_from_username(username)
         self.assertEquals(data['person'].username, username)
         cchost_among_project_exps = False
-        for exp in data['project_exps']:
-            if exp.project.name == 'ccHost':
+        for proj, tags in data['exp_taglist_pairs']:
+            if proj.project.name == 'ccHost':
                 cchost_among_project_exps = True
                 break
         self.assert_(cchost_among_project_exps)
