@@ -294,8 +294,8 @@ class QuebecTests(django.test.TestCase):
 
     def tearDown(self):
         twill_teardown()
-        # FIXME: delete the paulproteus person
-        # and all related ProjectExps
+        for delete_me in self.to_be_deleted:
+            delete_me.delete()
 
     def testPersonModel(self):
         # Test creating a Person and fetching his or her contribution info
