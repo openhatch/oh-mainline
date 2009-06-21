@@ -64,6 +64,11 @@ class ProjectExp(models.Model):
     primary_language = models.CharField(max_length=200, null=True)
     source = models.CharField(max_length=100, null=True)
 
+    class Meta:
+        unique_together = [
+            ('person', 'project'),
+            ]
+
     def save(self, *args, **kwargs):
         self.last_touched = datetime.datetime.now()
         super(ProjectExp, self).save(*args, **kwargs)
