@@ -144,6 +144,10 @@ class Link_ProjectExp_Tag(models.Model):
             default=datetime.datetime.now())
     source = models.CharField(max_length=200)
 
+    class Meta:
+        unique_together = [ ('tag', 'project_exp', 'source'),
+                            ]
+
     @staticmethod
     def get_from_strings(username, project_name, tag_text):
         # FIXME: Add support for tag-type-specific grabbing of Link_ProjectExp_Tags
