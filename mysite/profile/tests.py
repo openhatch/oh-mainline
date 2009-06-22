@@ -463,11 +463,13 @@ class ExpTag(django.test.TestCase):
         tc.submit()
         tc.find(tag_text)
 
+        # All this so we can click the right Delete button
         desired = None
         for form in tc.showforms():
             if 'remove-tag' in form.name:
                 desired = form
         tc.config('readonly_controls_writeable', True)
+        self.assertEqual(desired.get_value('tag_text'), tag_text)
         tc.fv(desired.name, 'tag_text', desired.get_value('tag_text'))
         tc.submit()
         tc.notfind(tag_text)
