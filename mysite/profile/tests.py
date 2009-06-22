@@ -429,20 +429,23 @@ class ExpTag(django.test.TestCase):
                                project_name='automatic',
                                tag_text='baller'):
         # {{{
-        url = '/people/add_tag_to_project_exp'
+        # Do it twice: note that it doesn't fail
+        for k in range(2):
+            url = '/people/add_tag_to_project_exp'
+            
+            good_input = {
+                'username': username,
+                'project_name': project_name,
+                'tag_text': tag_text
+                }
+            
+            response = Client().post(url, good_input)
+            response = Client().get('/people/', {'u': username})
+            
+            self.assertContains(response, username)
+            self.assertContains(response, project_name)
+            self.assertContains(response, tag_text)
 
-        good_input = {
-            'username': username,
-            'project_name': project_name,
-            'tag_text': tag_text
-            }
-        
-        response = Client().post(url, good_input)
-        response = Client().get('/people/', {'u': username})
-
-        self.assertContains(response, username)
-        self.assertContains(response, project_name)
-        self.assertContains(response, tag_text)
         # }}}
 
     def test__project_exp_tag__remove__web(self):

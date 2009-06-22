@@ -227,10 +227,13 @@ def add_tag_to_project_exp(username, project_name,
     # project_exps with the same person and project
     # need not be caught here.
 
-    new_link = Link_ProjectExp_Tag.objects.create(
+    # Does it already exist? If so, we're golden.
+    # FIXME: Use get_or_create
+    old_links = list(Link_ProjectExp_Tag.objects.filter(
+        tag=tag, project_exp=project_exp))
+    if not old_links:
+        new_link = Link_ProjectExp_Tag.objects.create(
             tag=tag, project_exp=project_exp)
-    # FIXME: Catch when link already exists.
-
     # FIXME: Move to Link_ProjectExp_Tag.create_from_strings
     # }}}
 
