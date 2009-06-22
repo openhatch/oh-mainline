@@ -1,5 +1,8 @@
 body {
     font: 10pt Helvetica, Bitstream Vera Sans, Arial;
+    /*background: #e0825f url('/static/images/bg-turq.png');*/
+    background-repeat: no-repeat;
+    background-position: top center;
     background-color: #f4f4f4;
 }
 #outermost {
@@ -16,11 +19,15 @@ h1, h2, h3, h4 {
 }
 #content {
     float: left;
-    width: 1000px;
+    width: 960px;
     background-color: #fff;
     padding: 20px;
-    border-top: 2px solid #f0f0f0;
+    margin-top: 50px;
+    /*
+    border: solid #f0f0f0;
+    border-width: 2px 0;
     -moz-border-radius: 10px;
+    */
 }
 #heading {
     float: left;
@@ -53,7 +60,6 @@ h1, h2, h3, h4 {
     font-weight: normal;
 }
 .below-the-fold {
-    display: none;
 }
 #contributions ul {
     margin: 0;
@@ -62,9 +68,28 @@ h1, h2, h3, h4 {
 }
 #contributions li {
     float: left;
-    width: 400px;
-    padding: 10px;
-    background-color: #e4e4ff;
+    width: 500px;
     margin-top: 10px;
+}
+.project-escutcheon {
+    float: left;
+    margin-right: 10px;
+    width: 70px;
+    text-align: center;
+}
+#contributions ul li ul li {
+    padding: 8px 10px;
+    padding-bottom: 6px;
+    font-size: 10pt;
+    background-color: #f4f4ff; f4f4bc; c9dc59; d2e6df;
     -moz-border-radius: 10px;
+    border: solid #d2e6df; f0f0ff;
+    border-width: 0 0 2px 0;
+    float: left;
+    width: 250px;
+}
+#contributions ul li ul li img {
+    float: right;
+    position: relative;
+    top: 1px;
 }
