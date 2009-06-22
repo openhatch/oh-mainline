@@ -154,7 +154,7 @@ vim: set ts=3 sw=3 et:
 
                         {% endfor %}
                      </div>
-                     <form name='add-tag-to-exp' method='POST'
+                     <form name='add-tag-to-exp-{{ exp.id }}' method='POST'
                         action='/people/add_tag_to_project_exp'>
                         <label for='exp-{{ exp.id }}-tag-text'>Add tag</label>
                         <input type='hidden' name='username'
