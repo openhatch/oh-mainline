@@ -653,6 +653,9 @@ class TrentonTests(django.test.TestCase):
                             desired = form
                             break
         assert desired is not None
+        # Grab experience ID
+        exp_id = int(desired.find_control('exp_id').value)
+        
         # Give it two tags
         tc.config('readonly_controls_writeable', True)
         tc.fv(desired.name, 'tag_text', 'totally rad')

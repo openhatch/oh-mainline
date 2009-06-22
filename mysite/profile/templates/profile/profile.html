@@ -159,6 +159,8 @@ vim: set ts=3 sw=3 et:
                         <label for='exp-{{ exp.id }}-tag-text'>Add tag</label>
                         <input type='hidden' name='username'
                         value='{{ person.username }}'/>
+                        <input type='hidden' name='exp_id'
+                        value='{{ exp.id }}'/>
                         <input type='hidden' name='project_name'
                         value='{{ exp.project.name }}'/>
                         <input type='text' id='exp-{{ exp.id }}-tag-text' 
