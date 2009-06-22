@@ -37,7 +37,7 @@ class Person(models.Model):
         for ohloh_contrib_info in ohloh_contrib_info_list:
             exp = ProjectExp()
             exp.person = self
-            exp.from_ohloh_contrib_info(ohloh_contrib_info)
+            exp = exp.from_ohloh_contrib_info(ohloh_contrib_info)
             exp.last_polled = datetime.datetime.now()
             exp.last_touched = datetime.datetime.now()
             exp.save()
@@ -76,11 +76,17 @@ class ProjectExp(models.Model):
     def from_ohloh_contrib_info(self, ohloh_contrib_info):
         self.project, bool_created = Project.objects.get_or_create(
                 name=ohloh_contrib_info['project'])
-        # FIXME: Automatically populate project url here.
-        self.man_months = ohloh_contrib_info['man_months']
-        self.primary_language = ohloh_contrib_info['primary_language']
-        self.source = "Ohloh"
-        self.time_gathered_from_source = datetime.date.today()
+        matches = list(ProjectExp.objects.filter(project=self.project,
+                                           person=self.person))
+        if matches:
+            return matches[0]
+        else:
+            # FIXME: Automatically populate project url here.
+            self.man_months = ohloh_contrib_info['man_months']
+            self.primary_language = ohloh_contrib_info['primary_language']
+            self.source = "Ohloh"
+            self.time_gathered_from_source = datetime.date.today()
+            return self
 
     @staticmethod
     def create_from_text(
