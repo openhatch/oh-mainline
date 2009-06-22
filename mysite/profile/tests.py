@@ -622,7 +622,7 @@ class TrentonTests(django.test.TestCase):
         # Make the last one a favorite
         desired = None
         for form in tc.showforms():
-            if 'make-favorite' in form.name:
+            if 'make-exp-favorite' in form.name:
                 desired = form
         assert desired is not None
 
