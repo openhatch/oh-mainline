@@ -619,13 +619,18 @@ class TrentonTests(django.test.TestCase):
         tc.submit()
         tc.find('TrentonProj2')
 
-        # Make the second one a favorite
+        # Make the last one a favorite
         desired = None
         for form in tc.showforms():
             if 'make-favorite' in form.name:
                 desired = form
-                break
         assert desired is not None
-        
+
+        # Select that form by "editing" it
+        tc.config('readonly_controls_writeable', True)
+        tc.fv(desired.name, 'exp_id', desired.get_value('exp_id'))
+        tc.submit()
+
+        tc.find('Favorite: TrentonProj2')
         
         

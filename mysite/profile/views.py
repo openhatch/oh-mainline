@@ -328,4 +328,20 @@ def display_person_redirect(username):
     return HttpResponseRedirect('/people/?' + urllib.urlencode({'u': username}))
     # }}}
 
+def make_favorite_project_exp(exp_id_obj):
+    if exp_id_obj is None:
+        return
+    exp_id = int(exp_id_obj)
+    desired_pe = ProjectExp.objects.get(id=exp_id)
+    desired_pe.favorite = True
+    desired_pe.save()
+    return
+
+
+def make_favorite_project_exp_web(request):
+    exp_id = request.POST.get('exp_id', None)
+    username = request.POST.get('username', '')
+    make_favorite_project_exp(exp_id)
+    return HttpResponseRedirect('/people/?' + urllib.urlencode({'u': username}))
+
 # }}}

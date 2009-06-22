@@ -126,9 +126,11 @@ vim: set ts=3 sw=3 et:
                      <li>
                      <div class='project-name'>
                         {% if exp.url %}
-                        <a href='{{ exp.url }}'>{{ exp.project.name }}</a>
-                        {% else %}
-                        {{ exp.project.name }}
+                        <a href='{{ exp.url }}'>
+                        {% endif %}
+			{% if exp.favorite %}Favorite: {% endif %}{{ exp.project.name }}
+                        {% if exp.url %}
+                        </a>
                         {% endif %}
                      </div>
                      <div class='summary'>
@@ -165,6 +167,8 @@ vim: set ts=3 sw=3 et:
 
                      <form name='make-favorite-{{ exp.id }}' method='POST'
                         action='/people/make_favorite_project_exp'>
+                        <input type='hidden' name='username'
+                        value='{{ person.username }}'/>
                         <input type='hidden' name='exp_id'
                         value='{{ exp.id }}'/>
 			<input type='submit' value='Make Favorite' />

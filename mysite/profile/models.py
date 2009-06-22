@@ -61,6 +61,7 @@ class ProjectExp(models.Model):
     #time_start = models.DateTimeField(null=True)
     #time_finish = models.DateTimeField(null=True)
     man_months = models.PositiveIntegerField(null=True)
+    favorite = models.BooleanField(default=0)
     primary_language = models.CharField(max_length=200, null=True)
     source = models.CharField(max_length=100, null=True)
 
