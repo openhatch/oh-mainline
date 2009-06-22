@@ -632,5 +632,36 @@ class TrentonTests(django.test.TestCase):
         tc.submit()
 
         tc.find('Favorite: TrentonProj2')
-        
+
+    def test_make_favorite_tag(self):
+        url = 'http://openhatch.org/people/?u=paulproteus'
+        # Add an experience
+        tc.go(make_twill_url(url))
+        tc.fv('add_contrib', 'project_name', 'TrentonProj3')
+        tc.fv('add_contrib', 'url', 'http://example.com')
+        tc.fv('add_contrib', 'description', 'Totally rad')
+        tc.submit()
+        tc.find('TrentonProj3')
+
+        # Find its tag submission form
+        desired = None
+        for form in tc.showforms():
+            if 'add-tag-to-exp' in form.name:
+                for control in form.controls:
+                    if control.name == 'project_name':
+                        if control.value == 'TrentonProj3':
+                            desired = form
+                            break
+        assert desired is not None
+        # Give it two tags
+        tc.config('readonly_controls_writeable', True)
+        tc.fv(desired.name, 'tag_text', 'totally rad')
+        tc.submit()
+
+        # Verify the tags stuck
+        tc.find('totally')
+        tc.find('rad')
+
+        # FIXME: Make 'rad' a favorite tag for this experience
+
         
