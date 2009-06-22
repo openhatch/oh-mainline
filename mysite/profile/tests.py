@@ -505,7 +505,7 @@ class ExpTag(django.test.TestCase):
             self.assertEquals(client.get(url, bad_input).status_code, 500)
         # }}}
 
-    def stet__project_exp_tag_remove__web__failure(self):
+    def test__project_exp_tag_remove__web__failure(self):
         # {{{
         url = '/people/project_exp_tag__remove'
 
@@ -528,7 +528,8 @@ class ExpTag(django.test.TestCase):
             bad_input = {}
             bad_input.update(good_input)
             del bad_input[key]
-            self.assertContains(client.get(url, bad_input), "Error")
+            self.assert_('error' in
+                         client.get(url, bad_input)['Location'])
         # }}}
 
     def stet__exp_tag_add_multiple_tags__unit(self):
