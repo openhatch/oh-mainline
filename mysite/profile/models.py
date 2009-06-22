@@ -147,6 +147,7 @@ class Link_ProjectExp_Tag(models.Model):
     "Many-to-many relation between ProjectExps and Tags."
     # {{{
     tag = models.ForeignKey(Tag)
+    favorite = models.BooleanField(default=False)
     project_exp = models.ForeignKey(ProjectExp)
     time_record_was_created = models.DateTimeField(
             default=datetime.datetime.now())
