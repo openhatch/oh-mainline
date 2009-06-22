@@ -683,4 +683,5 @@ class TrentonTests(django.test.TestCase):
         tc.fv(desired.name, 'exp_id', exp_id)
         tc.submit()
 
-        # FIXME: Verify we have a favorite tagging
+        tc.find('Favorite: rad')
+

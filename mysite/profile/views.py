@@ -63,6 +63,11 @@ def profile_data_from_username(username):
     exps_to_tags = {}
     for exp in project_exps:
         tag_links = Link_ProjectExp_Tag.objects.filter(project_exp=exp)
+        for link in tag_links:
+            if link.favorite:
+                link.tag.prefix = 'Favorite: ' # FIXME: evil hack, will fix later
+            else:
+                link.tag.prefix = ''
         exps_to_tags[exp] = [link.tag for link in tag_links]
 
     # {
@@ -342,6 +347,23 @@ def make_favorite_project_exp_web(request):
     exp_id = request.POST.get('exp_id', None)
     username = request.POST.get('username', '')
     make_favorite_project_exp(exp_id)
+    return HttpResponseRedirect('/people/?' + urllib.urlencode({'u': username}))
+
+def make_favorite_tag(exp_id_obj, tag_text):
+    if exp_id_obj is None:
+        return
+    exp_id = int(exp_id_obj)
+    desired_tag = Link_ProjectExp_Tag.objects.get(project_exp__id=exp_id,
+                                                  tag__text=tag_text)
+    desired_tag.favorite = True
+    desired_tag.save()
+    return
+
+def make_favorite_exp_tag_web(request):
+    exp_id = request.POST.get('exp_id', None)
+    tag_text = request.POST.get('tag_text', None)
+    username = request.POST.get('username', None)
+    make_favorite_tag(exp_id, tag_text)
     return HttpResponseRedirect('/people/?' + urllib.urlencode({'u': username}))
 
 # }}}
