@@ -532,16 +532,31 @@ class ExpTag(django.test.TestCase):
                          client.get(url, bad_input)['Location'])
         # }}}
 
-    def stet__exp_tag_add_multiple_tags__unit(self):
-        # {{{
-        tag_string = 'insidious mellifluous unctuous'
-        delimiter = ' '
-        profile.views.add_multiple_tags(
-                username=self.sample_person,
-                project_name=self.sample_project,
-                tag_string=tag_string,
-                delimiter=delimiter)
-        # }}}
+    def test__exp_tag_add_multiple_tags__web(self):
+        tag_text = 'rofl, con, hipster'
+        desired_tags = ['rofl', 'con', 'hipster']
+        username='stipe'
+        project_name='automatic'
+        
+        url = '/people/add_tag_to_project_exp'
+        
+        good_input = {
+            'username': username,
+            'project_name': project_name,
+            'tag_text': tag_text
+            }
+        
+        response = Client().post(url, good_input)
+        response = Client().get('/people/', {'u': username})
+        
+        self.assertContains(response, username)
+        self.assertContains(response, project_name)
+        self.assertNotContains(response, tag_text) # the thing
+                                                   # withspaces will
+                                                   # not fly
+        for tag in desired_tags: # but each tag alone, that's splendid
+            self.assertContains(response, tag)
+
 
     """
     test that tag dupes aren't added, and that a notification is returned 'you tried to add a duplicate tag: %s'.

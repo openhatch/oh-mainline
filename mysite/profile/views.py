@@ -184,24 +184,24 @@ def add_tag_to_project_exp_web(request):
     # Get data
     username = request.POST.get('username', None)
     project_name = request.POST.get('project_name', None)
-    tag_text = request.POST.get('tag_text', None)
+    big_tag_text = request.POST.get('tag_text', '')
     format = request.POST.get('format', 'html')
 
+    useful_tags = filter(None, map(lambda s: s.strip(),
+                           big_tag_text.split(',')))
+
     # Validate data
-    if username and project_name and tag_text:
-        add_tag_to_project_exp(username, project_name, tag_text)
-        notification = "You tagged %s's experience with %s as %s" % (
-                username, project_name, tag_text)
-        if format == 'json':
-            return HttpResponse(simplejson.dumps([{'notification': notification}]))
-        else:
-            data_dict = profile_data_from_username(username)
-            data_dict['notification'] = notification
-            return HttpResponseRedirect('/people/?' +
-                                        urllib.urlencode({'u':
-                                                          username}))
-    else:
+    if not username or not project_name or not big_tag_text:
         return HttpResponseServerError()
+
+    for tag_text in useful_tags:
+        # Great, we have all we need:
+        add_tag_to_project_exp(username, project_name, tag_text)
+    notification = "You tagged %s's experience with %s as %s" % (
+        username, project_name, ','.join(useful_tags))
+    return HttpResponseRedirect('/people/?' +
+                                urllib.urlencode({'u': username,
+                                                  'notification': notification}))
     # }}}
 
 # FIXME: rename to project_exp_tag__add
