@@ -591,3 +591,38 @@ class UnadillaTests(django.test.TestCase):
         # }}}
 
     # }}}
+
+class TrentonTests(django.test.TestCase):
+    '''
+    The Trenton milestone says:
+    * You can mark an experience as a favorite.
+    '''
+    def setUp(self):
+        twill_setup()
+
+    def tearDown(self):
+        twill_teardown()
+
+    def test_make_favorite_experience(self):
+        url = 'http://openhatch.org/people/?u=paulproteus'
+        # Add two experiences
+        tc.go(make_twill_url(url))
+        tc.fv('add_contrib', 'project_name', 'TrentonProj1')
+        tc.fv('add_contrib', 'url', 'http://example.com')
+        tc.fv('add_contrib', 'description', 'Not my favorite')
+        tc.submit()
+        tc.find('TrentonProj1')
+
+        tc.fv('add_contrib', 'project_name', 'TrentonProj2')
+        tc.fv('add_contrib', 'url', 'http://example.com')
+        tc.fv('add_contrib', 'description', 'OMG totally my fav')
+        tc.submit()
+        tc.find('TrentonProj2')
+
+        #desired = None
+        #for form in tc.showforms():
+        #    if 'make-favorite' in form.name:
+        #        desired = form
+        #        break
+        
+        
