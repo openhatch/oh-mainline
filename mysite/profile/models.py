@@ -73,6 +73,7 @@ class ProjectExp(models.Model):
         self.last_touched = datetime.datetime.now()
         super(ProjectExp, self).save(*args, **kwargs)
 
+    # FIXME: Make this a static method or something
     def from_ohloh_contrib_info(self, ohloh_contrib_info):
         self.project, bool_created = Project.objects.get_or_create(
                 name=ohloh_contrib_info['project'])
