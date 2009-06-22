@@ -619,10 +619,13 @@ class TrentonTests(django.test.TestCase):
         tc.submit()
         tc.find('TrentonProj2')
 
-        #desired = None
-        #for form in tc.showforms():
-        #    if 'make-favorite' in form.name:
-        #        desired = form
-        #        break
+        # Make the second one a favorite
+        desired = None
+        for form in tc.showforms():
+            if 'make-favorite' in form.name:
+                desired = form
+                break
+        assert desired is not None
+        
         
         
