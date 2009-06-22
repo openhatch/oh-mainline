@@ -100,3 +100,7 @@ INSTALLED_APPS = (
     'profile',
 )
 
+### HACK
+from socket import gethostname
+if gethostname() == 'renaissance' and DEBUG:
+    DEBUG_PROPAGATE_EXCEPTIONS=True
