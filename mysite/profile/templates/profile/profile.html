@@ -150,6 +150,18 @@ vim: set ts=3 sw=3 et:
                         {{ tag.text }}
 			<input type='submit' value='Delete' />
                      </form>
+                     <form name='favorite-tag-exp-{{ tag.id }}' method='POST'
+                        action='/people/favorite_exp_tag'>
+                        <input type='hidden' name='tag_text'
+                        value='{{ tag.text }}'/>
+			<input type='hidden' name='exp_id'
+			value='{{ exp.id }}' />
+                        <input type='hidden' name='project_name'
+                        value='{{ exp.project.name }}'/>
+                        <input type='hidden' name='username'
+                        value='{{ person.username }}'/>
+			<input type='submit' value='Make tag a fav' />
+                     </form>
 
 
                         {% endfor %}

@@ -653,18 +653,34 @@ class TrentonTests(django.test.TestCase):
                             desired = form
                             break
         assert desired is not None
-        # Grab experience ID
-        exp_id = int(desired.find_control('exp_id').value)
         
+        # Grab experience ID
+        exp_id = str(int(desired.find_control('exp_id').value))
+        if exp_id == 1:
+            import pdb
+            pdb.set_trace()
+
         # Give it two tags
         tc.config('readonly_controls_writeable', True)
-        tc.fv(desired.name, 'tag_text', 'totally rad')
+        tc.fv(desired.name, 'tag_text', 'totally, rad')
         tc.submit()
 
         # Verify the tags stuck
         tc.find('totally')
         tc.find('rad')
 
-        # FIXME: Make 'rad' a favorite tag for this experience
+        # Find the tag favoriting form for "rad"
+        favorite_tag_forms = [form for form in tc.showforms()
+                              if 'favorite-tag-exp' in form.name]
+        matching_exp_id_forms = [f for f in favorite_tag_forms
+                                 if f.find_control('exp_id').value == exp_id]
+        right_tag_text_form = [f for f in matching_exp_id_forms
+                               if f.find_control('tag_text').value == 'rad']
+        assert len(right_tag_text_form) == 1
+        desired = right_tag_text_form[0]
 
-        
+        # Select it and submit
+        tc.fv(desired.name, 'exp_id', exp_id)
+        tc.submit()
+
+        # FIXME: Verify we have a favorite tagging
