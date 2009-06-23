@@ -9,67 +9,133 @@
         <div id='outermost'>
             <div id='penoutermost'>
                 <!--div id='menu'>
-                    <ul>
-                        <li>Featured content</li>
-                        <li>Contributions</li>
-                        <li>Verb-nouns</li>
-                        <li>Software</li>
-                        <li>Personal</li>
-                        <li>Mentoring</li>
-                        <li>Space/time continuum</li>
-                    </ul>
+                <ul>
+                    <li>Featured content</li>
+                    <li>Contributions</li>
+                    <li>Verb-nouns</li>
+                    <li>Software</li>
+                    <li>Personal</li>
+                    <li>Mentoring</li>
+                    <li>Space/time continuum</li>
+                </ul>
                 </div-->
                 <div id='content'>
 
                     <div id='heading'>
                         <h1>Venkatesh Srinivas</h1>
-                        <div id='sep'>&bull;</div>
-                        <h2>Featured content</h2>
+                        <ul>
+                            <li>phrases</li>
+                            <li>participation</li>
+                            <li>consumption</li>
+                            <li>nerdstream</li>
+                        </ul>
                     </div>
 
                     <div id='widgets'>
-                        <div id='contributions'>
-                            <h3>Contributions</h3>
-                            <ul>
-                                <li>
-                                <div class='above-the-fold'>
+
+                        <div id='left'>
+                            <!-- {{{ -->
+                            <div id='portfolio' class='widget'>
+                                <!-- {{{ -->
+                                <h3>participation log:</h3>
+                                <ul>
+                                    <li>
                                     <div class='project-escutcheon'>
-                                        <div class='logo'><img src='/static/images/icons/projects/f-spot-50px.png' /></div>
+                                        <div class='logo'>
+                                            <img src='/static/images/icons/projects/f-spot-100px.png' /></div>
                                         <div class='name'>f-spot</div>
                                     </div>
-                                    <ul>
-                                        <li>Submitted 3 patches (all committed)
-                                        <img src='/static/images/icons/Add.png' alt='show more'>
+                                    <ul class='contrib-descriptions'>
+                                        <li>
+                                        Submitted 3 patches (all committed)
+                                        <img src='/static/images/icons/Add.png' alt='show more'
+                                        class='show-more-link'>
                                         <div class='more description'>pretty l33t hax0ring</div>
+                                        <div class='more urls'>
+                                            <a href=''>http://launchpad.net/</a>
+                                        </div>
                                         <div class='more phrases'>
                                             <a href=''>i18n</a>,
-                                            <a href=''>translation into french</a></div>
+                                            <a href=''>translation into french</a>
+                                        </div>
                                         </li>
                                         <li>Translated 10 features into Italian
-                                        <img src='/static/images/icons/Add.png' alt='show more'>
+                                        <img src='/static/images/icons/Add.png' alt='show more'
+                                        class='show-more-link'>
                                         </li>
                                     </ul>
-                                </div>
-                                <!--div class='show-more-link'>
-                                    <a href='exp_link'>+</a>
-                                </div-->
-                                <div class='below-the-fold'>
-                                    <div class='contribution-details'>
+                                    </li>
+                                </ul>
+                                <!-- }}} -->
+                            </div><!-- /#portfolio -->
+
+                            <div id='software' class='widget'>
+                                <!-- {{{ -->
+                                <h3>fanships:</h3>
+                                <ul>
+                                    <li>
+                                    <div class='icon'>
+                                        <img src='/static/images/icons/projects/iceweasel-100px.png' />
                                     </div>
-                                    <div class='project-details'>
-                                        <div class='more description'>photo management</div>
-                                        <div class='more contributors'>
-                                            Other contributors:
-                                            <a href=''>Alyce</a>,
-                                            <a href=''>Yves</a>,
-                                            <a href=''>Amarachi</a>
-                                        </div>
-                                        <div class='more phrases'>I18n, Translation into French</div>
-                                    </div>
-                                </div>
-                                </li>
-                            </ul>
-                        </div><!-- /#contributions -->
+                                    <div class='project-name'>iceweasel-3.5b</div>
+                                    </li>
+                                    <li>
+                                    <img src='/static/images/icons/projects/songbird-100px.png' />
+                                    <div class='project-name'>songbird-1.2.0</div>
+                                    </li>
+                                    <li>
+                                    <img src='/static/images/icons/projects/f-spot-100px.png' />
+                                    <div class='project-name'>f-spot-3.1.0</div>
+                                    </li>
+                                </ul>
+                                <!-- }}} -->
+                            </div><!-- /#software -->
+
+                            <div id='system' class='widget'>
+                                <!-- {{{ -->
+                                <h3>systems:</h3>
+                                <ul>
+                                    <li>
+                                    <img src='/static/images/icons/projects/ubuntu-50px.png' />
+                                    ubuntu jaunty
+                                    </li>
+                                </ul>
+                                <!-- }}} -->
+                            </div><!-- /#system -->
+                            <!-- }}} -->
+                        </div> <!-- /#left -->
+
+                        <div id='right'>
+                            <!-- {{{ -->
+
+                            <div id='taglines' class='widget'>
+                                <!-- {{{ -->
+                                <h3>groks: <a href=''>screen scraping</a>, <a href=''>boar hunting</a></h3>
+                                <h3>seeks knowledge in: <a href=''>tiger trapping</a>, <a href=''>regular expressions</a></h3>
+                                <h3>offers knowledge in: <a href=''>lanyard swinging</a>, <a href=''>django</a></h3>
+                                <h3>disapproves of: <a href=''>hamletism</a>, <a href=''>meat</a></h3>
+                                <!-- }}} -->
+                            </div>
+
+                            <div id='lately' class='widget'>
+                                <!-- {{{ -->
+                                <h3>lately:</h3>
+                                <ul>
+                                    <!--li>
+                                    <img src='/static/images/icons/projects/f-spot-50px.png' />
+                                    Reported a bug in f-spot
+                                    </li-->
+                                    <li>
+                                    <img src='/static/images/icons/projects/exaile-50px.png' />
+                                    Reported a bug in exaile 
+                                    </li>
+                                </ul>
+                                <!-- }}} -->
+                            </div><!-- /#lately -->
+
+                            <!-- }}} -->
+                        </div>
+
                     </div><!-- /# widget -->
 
                 </div>
