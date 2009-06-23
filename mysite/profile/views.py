@@ -85,7 +85,7 @@ def display_person(request, input_username=None):
 
     data_dict = profile_data_from_username(input_username)
 
-    return render_to_response('profile/profile.html', data_dict)
+    return render_to_response('profile/main.html', data_dict)
 
     # }}}
 

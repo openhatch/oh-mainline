@@ -8,14 +8,20 @@
     <body>
         <div id='outermost'>
             <div id='penoutermost'>
+                <div id='nav'><h2>OpenHatch</h2></div>
                 <div id='content'>
 
                     <div id='heading'>
-                        <h1>Venkatesh Srinivas</h1>
+                        <h1>
+                            {{ person.username }}
+                            {% if person.name %}
+                            {{ person.name }}
+                            {% endif %}
+                        </h1>
                         <ul>
-                            <li>tags</li>
-                            <li>up</li>
-                            <li>down</li>
-                            <li>stream</li>
+                            <li><a href=''>involvement</a></li>
+                            <li><a href=''>tags</a></li>
+                            <li><a href=''>tech</a></li>
+                            <li><a href=''>recently</a></li>
                         </ul>
                     </div>
