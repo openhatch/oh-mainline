@@ -63,6 +63,11 @@ def profile_data_from_username(username):
     exps_to_tags = {}
     for exp in project_exps:
         tag_links = Link_ProjectExp_Tag.objects.filter(project_exp=exp)
+        for link in tag_links:
+            if link.favorite:
+                link.tag.prefix = 'Favorite: ' # FIXME: evil hack, will fix later
+            else:
+                link.tag.prefix = ''
         exps_to_tags[exp] = [link.tag for link in tag_links]
 
     # {
@@ -184,24 +189,24 @@ def add_tag_to_project_exp_web(request):
     # Get data
     username = request.POST.get('username', None)
     project_name = request.POST.get('project_name', None)
-    tag_text = request.POST.get('tag_text', None)
+    big_tag_text = request.POST.get('tag_text', '')
     format = request.POST.get('format', 'html')
 
+    useful_tags = filter(None, map(lambda s: s.strip(),
+                           big_tag_text.split(',')))
+
     # Validate data
-    if username and project_name and tag_text:
-        add_tag_to_project_exp(username, project_name, tag_text)
-        notification = "You tagged %s's experience with %s as %s" % (
-                username, project_name, tag_text)
-        if format == 'json':
-            return HttpResponse(simplejson.dumps([{'notification': notification}]))
-        else:
-            data_dict = profile_data_from_username(username)
-            data_dict['notification'] = notification
-            return HttpResponseRedirect('/people/?' +
-                                        urllib.urlencode({'u':
-                                                          username}))
-    else:
+    if not username or not project_name or not big_tag_text:
         return HttpResponseServerError()
+
+    for tag_text in useful_tags:
+        # Great, we have all we need:
+        add_tag_to_project_exp(username, project_name, tag_text)
+    notification = "You tagged %s's experience with %s as %s" % (
+        username, project_name, ','.join(useful_tags))
+    return HttpResponseRedirect('/people/?' +
+                                urllib.urlencode({'u': username,
+                                                  'notification': notification}))
     # }}}
 
 # FIXME: rename to project_exp_tag__add
@@ -227,10 +232,13 @@ def add_tag_to_project_exp(username, project_name,
     # project_exps with the same person and project
     # need not be caught here.
 
-    new_link = Link_ProjectExp_Tag.objects.create(
+    # Does it already exist? If so, we're golden.
+    # FIXME: Use get_or_create
+    old_links = list(Link_ProjectExp_Tag.objects.filter(
+        tag=tag, project_exp=project_exp))
+    if not old_links:
+        new_link = Link_ProjectExp_Tag.objects.create(
             tag=tag, project_exp=project_exp)
-    # FIXME: Catch when link already exists.
-
     # FIXME: Move to Link_ProjectExp_Tag.create_from_strings
     # }}}
 
@@ -324,5 +332,38 @@ def change_what_like_working_on_web(request):
 def display_person_redirect(username):
     return HttpResponseRedirect('/people/?' + urllib.urlencode({'u': username}))
     # }}}
+
+def make_favorite_project_exp(exp_id_obj):
+    if exp_id_obj is None:
+        return
+    exp_id = int(exp_id_obj)
+    desired_pe = ProjectExp.objects.get(id=exp_id)
+    desired_pe.favorite = True
+    desired_pe.save()
+    return
+
+
+def make_favorite_project_exp_web(request):
+    exp_id = request.POST.get('exp_id', None)
+    username = request.POST.get('username', '')
+    make_favorite_project_exp(exp_id)
+    return HttpResponseRedirect('/people/?' + urllib.urlencode({'u': username}))
+
+def make_favorite_tag(exp_id_obj, tag_text):
+    if exp_id_obj is None:
+        return
+    exp_id = int(exp_id_obj)
+    desired_tag = Link_ProjectExp_Tag.objects.get(project_exp__id=exp_id,
+                                                  tag__text=tag_text)
+    desired_tag.favorite = True
+    desired_tag.save()
+    return
+
+def make_favorite_exp_tag_web(request):
+    exp_id = request.POST.get('exp_id', None)
+    tag_text = request.POST.get('tag_text', None)
+    username = request.POST.get('username', None)
+    make_favorite_tag(exp_id, tag_text)
+    return HttpResponseRedirect('/people/?' + urllib.urlencode({'u': username}))
 
 # }}}

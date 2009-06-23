@@ -2,6 +2,11 @@ import xml.etree.ElementTree as ET
 import sys, urllib, hashlib
 import urllib2
 
+def uni_text(s):
+    if type(s) == unicode:
+        return s
+    return s.decode('utf-8')
+
 import lxml.html
 import mechanize
 import re
@@ -42,7 +47,7 @@ def ohloh_url2data(url, selector, params = {}, many = False):
         this = {}
         for child in interesting.getchildren():
             if child.text:
-                this[unicode(child.tag)] = unicode(child.text, 'utf-8')
+                this[unicode(child.tag)] = uni_text(child.text)
         ret.append(this)
 
     if many:

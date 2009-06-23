@@ -37,7 +37,7 @@ class Person(models.Model):
         for ohloh_contrib_info in ohloh_contrib_info_list:
             exp = ProjectExp()
             exp.person = self
-            exp.from_ohloh_contrib_info(ohloh_contrib_info)
+            exp = exp.from_ohloh_contrib_info(ohloh_contrib_info)
             exp.last_polled = datetime.datetime.now()
             exp.last_touched = datetime.datetime.now()
             exp.save()
@@ -61,6 +61,7 @@ class ProjectExp(models.Model):
     #time_start = models.DateTimeField(null=True)
     #time_finish = models.DateTimeField(null=True)
     man_months = models.PositiveIntegerField(null=True)
+    favorite = models.BooleanField(default=0)
     primary_language = models.CharField(max_length=200, null=True)
     source = models.CharField(max_length=100, null=True)
 
@@ -73,14 +74,21 @@ class ProjectExp(models.Model):
         self.last_touched = datetime.datetime.now()
         super(ProjectExp, self).save(*args, **kwargs)
 
+    # FIXME: Make this a static method or something
     def from_ohloh_contrib_info(self, ohloh_contrib_info):
         self.project, bool_created = Project.objects.get_or_create(
                 name=ohloh_contrib_info['project'])
-        # FIXME: Automatically populate project url here.
-        self.man_months = ohloh_contrib_info['man_months']
-        self.primary_language = ohloh_contrib_info['primary_language']
-        self.source = "Ohloh"
-        self.time_gathered_from_source = datetime.date.today()
+        matches = list(ProjectExp.objects.filter(project=self.project,
+                                           person=self.person))
+        if matches:
+            return matches[0]
+        else:
+            # FIXME: Automatically populate project url here.
+            self.man_months = ohloh_contrib_info['man_months']
+            self.primary_language = ohloh_contrib_info['primary_language']
+            self.source = "Ohloh"
+            self.time_gathered_from_source = datetime.date.today()
+            return self
 
     @staticmethod
     def create_from_text(
@@ -139,6 +147,7 @@ class Link_ProjectExp_Tag(models.Model):
     "Many-to-many relation between ProjectExps and Tags."
     # {{{
     tag = models.ForeignKey(Tag)
+    favorite = models.BooleanField(default=False)
     project_exp = models.ForeignKey(ProjectExp)
     time_record_was_created = models.DateTimeField(
             default=datetime.datetime.now())

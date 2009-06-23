@@ -429,20 +429,23 @@ class ExpTag(django.test.TestCase):
                                project_name='automatic',
                                tag_text='baller'):
         # {{{
-        url = '/people/add_tag_to_project_exp'
+        # Do it twice: note that it doesn't fail
+        for k in range(2):
+            url = '/people/add_tag_to_project_exp'
+            
+            good_input = {
+                'username': username,
+                'project_name': project_name,
+                'tag_text': tag_text
+                }
+            
+            response = Client().post(url, good_input)
+            response = Client().get('/people/', {'u': username})
+            
+            self.assertContains(response, username)
+            self.assertContains(response, project_name)
+            self.assertContains(response, tag_text)
 
-        good_input = {
-            'username': username,
-            'project_name': project_name,
-            'tag_text': tag_text
-            }
-        
-        response = Client().post(url, good_input)
-        response = Client().get('/people/', {'u': username})
-
-        self.assertContains(response, username)
-        self.assertContains(response, project_name)
-        self.assertContains(response, tag_text)
         # }}}
 
     def test__project_exp_tag__remove__web(self):
@@ -463,11 +466,13 @@ class ExpTag(django.test.TestCase):
         tc.submit()
         tc.find(tag_text)
 
+        # All this so we can click the right Delete button
         desired = None
         for form in tc.showforms():
             if 'remove-tag' in form.name:
                 desired = form
         tc.config('readonly_controls_writeable', True)
+        self.assertEqual(desired.get_value('tag_text'), tag_text)
         tc.fv(desired.name, 'tag_text', desired.get_value('tag_text'))
         tc.submit()
         tc.notfind(tag_text)
@@ -500,7 +505,7 @@ class ExpTag(django.test.TestCase):
             self.assertEquals(client.get(url, bad_input).status_code, 500)
         # }}}
 
-    def stet__project_exp_tag_remove__web__failure(self):
+    def test__project_exp_tag_remove__web__failure(self):
         # {{{
         url = '/people/project_exp_tag__remove'
 
@@ -523,19 +528,35 @@ class ExpTag(django.test.TestCase):
             bad_input = {}
             bad_input.update(good_input)
             del bad_input[key]
-            self.assertContains(client.get(url, bad_input), "Error")
+            self.assert_('error' in
+                         client.get(url, bad_input)['Location'])
         # }}}
 
-    def stet__exp_tag_add_multiple_tags__unit(self):
-        # {{{
-        tag_string = 'insidious mellifluous unctuous'
-        delimiter = ' '
-        profile.views.add_multiple_tags(
-                username=self.sample_person,
-                project_name=self.sample_project,
-                tag_string=tag_string,
-                delimiter=delimiter)
-        # }}}
+    def test__exp_tag_add_multiple_tags__web(self):
+        tag_text = 'rofl, con, hipster'
+        desired_tags = ['rofl', 'con', 'hipster']
+        username='stipe'
+        project_name='automatic'
+        
+        url = '/people/add_tag_to_project_exp'
+        
+        good_input = {
+            'username': username,
+            'project_name': project_name,
+            'tag_text': tag_text
+            }
+        
+        response = Client().post(url, good_input)
+        response = Client().get('/people/', {'u': username})
+        
+        self.assertContains(response, username)
+        self.assertContains(response, project_name)
+        self.assertNotContains(response, tag_text) # the thing
+                                                   # withspaces will
+                                                   # not fly
+        for tag in desired_tags: # but each tag alone, that's splendid
+            self.assertContains(response, tag)
+
 
     """
     test that tag dupes aren't added, and that a notification is returned 'you tried to add a duplicate tag: %s'.
@@ -570,3 +591,97 @@ class UnadillaTests(django.test.TestCase):
         # }}}
 
     # }}}
+
+class TrentonTests(django.test.TestCase):
+    '''
+    The Trenton milestone says:
+    * You can mark an experience as a favorite.
+    '''
+    def setUp(self):
+        twill_setup()
+
+    def tearDown(self):
+        twill_teardown()
+
+    def test_make_favorite_experience(self):
+        url = 'http://openhatch.org/people/?u=paulproteus'
+        # Add two experiences
+        tc.go(make_twill_url(url))
+        tc.fv('add_contrib', 'project_name', 'TrentonProj1')
+        tc.fv('add_contrib', 'url', 'http://example.com')
+        tc.fv('add_contrib', 'description', 'Not my favorite')
+        tc.submit()
+        tc.find('TrentonProj1')
+
+        tc.fv('add_contrib', 'project_name', 'TrentonProj2')
+        tc.fv('add_contrib', 'url', 'http://example.com')
+        tc.fv('add_contrib', 'description', 'OMG totally my fav')
+        tc.submit()
+        tc.find('TrentonProj2')
+
+        # Make the last one a favorite
+        desired = None
+        for form in tc.showforms():
+            if 'make-exp-favorite' in form.name:
+                desired = form
+        assert desired is not None
+
+        # Select that form by "editing" it
+        tc.config('readonly_controls_writeable', True)
+        tc.fv(desired.name, 'exp_id', desired.get_value('exp_id'))
+        tc.submit()
+
+        tc.find('Favorite: TrentonProj2')
+
+    def test_make_favorite_tag(self):
+        url = 'http://openhatch.org/people/?u=paulproteus'
+        # Add an experience
+        tc.go(make_twill_url(url))
+        tc.fv('add_contrib', 'project_name', 'TrentonProj3')
+        tc.fv('add_contrib', 'url', 'http://example.com')
+        tc.fv('add_contrib', 'description', 'Totally rad')
+        tc.submit()
+        tc.find('TrentonProj3')
+
+        # Find its tag submission form
+        desired = None
+        for form in tc.showforms():
+            if 'add-tag-to-exp' in form.name:
+                for control in form.controls:
+                    if control.name == 'project_name':
+                        if control.value == 'TrentonProj3':
+                            desired = form
+                            break
+        assert desired is not None
+        
+        # Grab experience ID
+        exp_id = str(int(desired.find_control('exp_id').value))
+        if exp_id == 1:
+            import pdb
+            pdb.set_trace()
+
+        # Give it two tags
+        tc.config('readonly_controls_writeable', True)
+        tc.fv(desired.name, 'tag_text', 'totally, rad')
+        tc.submit()
+
+        # Verify the tags stuck
+        tc.find('totally')
+        tc.find('rad')
+
+        # Find the tag favoriting form for "rad"
+        favorite_tag_forms = [form for form in tc.showforms()
+                              if 'favorite-tag-exp' in form.name]
+        matching_exp_id_forms = [f for f in favorite_tag_forms
+                                 if f.find_control('exp_id').value == exp_id]
+        right_tag_text_form = [f for f in matching_exp_id_forms
+                               if f.find_control('tag_text').value == 'rad']
+        assert len(right_tag_text_form) == 1
+        desired = right_tag_text_form[0]
+
+        # Select it and submit
+        tc.fv(desired.name, 'exp_id', exp_id)
+        tc.submit()
+
+        tc.find('Favorite: rad')
+
