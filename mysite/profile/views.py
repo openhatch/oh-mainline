@@ -132,7 +132,6 @@ def list_debtags_of_project(project_name):
     resluts = list(Link_Project_Tag.objects.filter(project=project,
                                                    tag__tag_type=debtags))
     return [link.tag.text for link in resluts]
-    # lol -rkl
     # }}}
 
 def import_debtags(cooked_string = None):
@@ -341,7 +340,6 @@ def make_favorite_project_exp(exp_id_obj):
     desired_pe.favorite = True
     desired_pe.save()
     return
-
 
 def make_favorite_project_exp_web(request):
     exp_id = request.POST.get('exp_id', None)
