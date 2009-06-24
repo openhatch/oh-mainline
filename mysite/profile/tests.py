@@ -667,9 +667,6 @@ class TrentonTests(django.test.TestCase):
         
         # Grab experience ID
         exp_id = str(int(desired.find_control('exp_id').value))
-        if exp_id == 1:
-            import pdb
-            pdb.set_trace()
 
         # Give it two tags
         tc.config('readonly_controls_writeable', True)

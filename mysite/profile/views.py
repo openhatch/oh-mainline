@@ -419,8 +419,6 @@ def sf_projects_by_person_web(request):
     projects = Link_SF_Proj_Dude_FM.objects.filter(
         person__username=sf_username).all()
     project_names = [p.project.unixname for p in projects]
-    import pdb
-    pdb.set_trace()
     return HttpResponse('\n'.join(project_names))
     
 
