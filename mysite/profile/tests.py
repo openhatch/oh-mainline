@@ -718,7 +718,9 @@ class CambridgeTests(django.test.TestCase):
 
     def test_import_one_flossmole_row(self, delete_now = True):
         row = ['paulproteus', 'zoph', '1', 'Developer', '2009-06-11 21:53:19']
-        profile.models.Link_SF_Proj_Dude_FM.create_from_flossmole_row_data(*row)
+        # make it
+        m, _ = profile.models.Link_SF_Proj_Dude_FM.create_from_flossmole_row_data(
+            *row)
         # find it
         o = profile.models.Link_SF_Proj_Dude_FM.objects.get(
             person__username='paulproteus', project__unixname='zoph')
@@ -735,5 +737,10 @@ class CambridgeTests(django.test.TestCase):
         tc.go(make_twill_url(url))
         tc.find('zoph')
 
-
+    def test_sf_person_projects_lookup(self):
+        self.test_import_one_flossmole_row(delete_now=False)
+        self._test_sf_person_projects_lookup()
+        for thing in self.delete_me:
+            thing.delete()
+        self.delete_me = []
 
