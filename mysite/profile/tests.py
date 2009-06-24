@@ -749,7 +749,7 @@ class CambridgeTests(django.test.TestCase):
         self._create_one_flossmole_row_from_text()
         self._test_import_one_flossmole_row(delete_now = delete_now)
 
-    def test_sf_person_projects_lookup(self):
+    def _test_sf_person_projects_lookup(self):
         self.test_import_one_flossmole_row(delete_now=False)
         url = 'http://openhatch.org/people/sf_projects_by_person?u=paulproteus'
         tc.go(make_twill_url(url))
