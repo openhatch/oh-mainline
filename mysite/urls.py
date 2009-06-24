@@ -28,7 +28,7 @@ urlpatterns = patterns('',
             'mysite.profile.views.display_person_old'),
 
         (r'^exp_scraper$',
-            'mysite.profile.views.exp_scraper_input'),
+            'mysite.profile.views.exp_scraper__check_input_and_scrape'),
 
         (r'^exp_scraper.check_input_and_scrape$',
             'mysite.profile.views.check_input_and_scrape'),
