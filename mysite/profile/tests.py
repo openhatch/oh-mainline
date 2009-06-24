@@ -608,7 +608,7 @@ class TrentonTests(django.test.TestCase):
         twill_teardown()
 
     def test_make_favorite_experience(self):
-        url = 'http://openhatch.org/people/?u=paulproteus'
+        url = 'http://openhatch.org/people/add_contrib?u=paulproteus'
         # Add two experiences
         tc.go(make_twill_url(url))
         tc.fv('add_contrib', 'project_name', 'TrentonProj1')
@@ -617,6 +617,7 @@ class TrentonTests(django.test.TestCase):
         tc.submit()
         tc.find('TrentonProj1')
 
+        tc.go(make_twill_url(url))
         tc.fv('add_contrib', 'project_name', 'TrentonProj2')
         tc.fv('add_contrib', 'url', 'http://example.com')
         tc.fv('add_contrib', 'description', 'OMG totally my fav')
@@ -635,16 +636,18 @@ class TrentonTests(django.test.TestCase):
         tc.fv(desired.name, 'exp_id', desired.get_value('exp_id'))
         tc.submit()
 
+        tc.go(make_twill_url(url))
         tc.find('Favorite: TrentonProj2')
 
     def test_make_favorite_tag(self):
-        url = 'http://openhatch.org/people/?u=paulproteus'
+        url = 'http://openhatch.org/people/add_contrib?u=paulproteus'
         # Add an experience
         tc.go(make_twill_url(url))
         tc.fv('add_contrib', 'project_name', 'TrentonProj3')
         tc.fv('add_contrib', 'url', 'http://example.com')
         tc.fv('add_contrib', 'description', 'Totally rad')
         tc.submit()
+        tc.go(make_twill_url(url))
         tc.find('TrentonProj3')
 
         # Find its tag submission form
@@ -669,6 +672,7 @@ class TrentonTests(django.test.TestCase):
         tc.fv(desired.name, 'tag_text', 'totally, rad')
         tc.submit()
 
+        tc.go(make_twill_url(url))
         # Verify the tags stuck
         tc.find('totally')
         tc.find('rad')
@@ -687,5 +691,6 @@ class TrentonTests(django.test.TestCase):
         tc.fv(desired.name, 'exp_id', exp_id)
         tc.submit()
 
+        tc.go(make_twill_url(url))
         tc.find('Favorite: rad')
 
