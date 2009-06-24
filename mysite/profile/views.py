@@ -46,16 +46,33 @@ def add_contribution(username, project_name, url='', description=''):
 
 # }}}
 
+class AutoPopulator:
+
+    def response(self, request):
+        return render_to_response('profile/autopopulator.html')
+
+    def validate_input_and_run(self, request):
+
+        # Validate input
+        input_username = request.GET.get('u', None)
+        if input_username is None:
+            return self.response(request)
+
+        run(input_username)
+
+    def run(self, username):
+
+        person.fetch_project_names_from_sourceforge()
+        person.fetch_contrib_data_from_ohloh()
+        person.save()
+
+        return display_person(request, input_username)
+
 # Display profile {{{
 def profile_data_from_username(username):
     # {{{
     person, person_created = Person.objects.get_or_create(
             username=username)
-
-    if person.poll_on_next_web_view:
-        person.fetch_contrib_data_from_ohloh()
-        person.poll_on_next_web_view = False
-        person.save()
 
     project_exps = ProjectExp.objects.filter(
             person=person)
@@ -80,17 +97,21 @@ def profile_data_from_username(username):
     return { 'person': person, 'exp_taglist_pairs': exp_taglist_pairs } 
     # }}}
 
-def display_person(request, input_username=None):
-    # {{{
-
+def display_person_web(request, input_username=None):
     if input_username is None:
         input_username = request.GET.get('u', None)
         if input_username is None:
             return render_to_response('profile/profile.html')
 
-    data_dict = profile_data_from_username(input_username)
-
     tab = request.GET.get('tab', None)
+
+    return display_person(input_username, tab)
+
+def display_person(username, tab):
+    # {{{
+
+    data_dict = profile_data_from_username(username)
+
     if tab == 'inv':
         return render_to_response('profile/participation.html', data_dict)
     if tab == 'tags':

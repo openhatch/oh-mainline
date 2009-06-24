@@ -27,6 +27,9 @@ urlpatterns = patterns('',
         (r'^people/add_contrib$',
             'mysite.profile.views.display_person_old'),
 
+        (r'^people_auto/$',
+            'mysite.profile.views.person__autopopulate'),
+
         # Get a list of suggestions for the search input, formatted the way that
         # the jQuery autocomplete plugin wants it.
         (r'^search/get_suggestions$', 'mysite.search.views.request_jquery_autocompletion_suggestions'),
