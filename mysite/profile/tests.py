@@ -705,6 +705,7 @@ class CambridgeTests(django.test.TestCase):
     The Cambridge milestone says:
     * You can look up what projects (via local cache of sf.net) a person is on.
     '''
+    # {{{
     def setUp(self):
         self.delete_me = []
         self.row = ['paulproteus', 'zoph', '1', 'Developer', '2009-06-11 21:53:19']
@@ -766,4 +767,4 @@ class CambridgeTests(django.test.TestCase):
         for thing in self.delete_me:
             thing.delete()
         self.delete_me = []        
-
+    # }}}
