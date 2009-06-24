@@ -583,14 +583,16 @@ class UnadillaTests(django.test.TestCase):
 
     def testEnterWhatYouLikeWorkingOn(self):
         # {{{
-        url = 'http://openhatch.org/people/?u=paulproteus'
+        url = 'http://openhatch.org/people/add_contrib?u=paulproteus'
         tc.go(make_twill_url(url))
         tc.fv('what_you_like_working_on', 'like-working-on', 'barbies')
         tc.submit()
+        tc.go(make_twill_url(url))
         tc.find('barbies')
         
         tc.fv('what_you_like_working_on', 'like-working-on', 'barbiequeue')
         tc.submit()
+        tc.go(make_twill_url(url))
         tc.find('barbiequeue')
         # }}}
 
