@@ -724,6 +724,12 @@ class CambridgeTests(django.test.TestCase):
             *self.row)
         return m
 
+    def _create_one_flossmole_row_from_text(self):
+        # make it
+        m, _ = profile.models.Link_SF_Proj_Dude_FM.create_from_flossmole_row_string(
+            '\t'.join(self.row))
+        return m
+
     def _test_import_one_flossmole_row(self, delete_now = True):
         # find it
         o = profile.models.Link_SF_Proj_Dude_FM.objects.get(
@@ -738,7 +744,10 @@ class CambridgeTests(django.test.TestCase):
     def test_import_one_flossmole_row(self, delete_now = True):
         self._create_one_flossmole_row_from_data()
         self._test_import_one_flossmole_row(delete_now = delete_now)
-            
+
+    def test_import_one_flossmole_row_text(self, delete_now = True):
+        self._create_one_flossmole_row_from_text()
+        self._test_import_one_flossmole_row(delete_now = delete_now)
 
     def test_sf_person_projects_lookup(self):
         self.test_import_one_flossmole_row(delete_now=False)
@@ -752,4 +761,11 @@ class CambridgeTests(django.test.TestCase):
         for thing in self.delete_me:
             thing.delete()
         self.delete_me = []
+
+    def test_sf_person_projects_lookup_text(self):
+        self.test_import_one_flossmole_row_text(delete_now=False)
+        self._test_sf_person_projects_lookup()
+        for thing in self.delete_me:
+            thing.delete()
+        self.delete_me = []        
 
