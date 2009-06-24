@@ -721,14 +721,30 @@ class CambridgeTests(django.test.TestCase):
     * You can look up what projects (via local cache of sf.net) a person is on.
     '''
     def setUp(self):
+        self.delete_me = []
         twill_setup()
 
     def tearDown(self):
+        for thing in self.delete_me:
+            thing.delete()
         twill_teardown()
 
+    def test_import_one_flossmole_row(self, delete_now = True):
+        row = ['paulproteus', 'zoph', '1', 'Developer', '2009-06-11 21:53:19']
+        profile.models.Link_SF_Proj_Dude_FM.create_from_flossmole_row_data(*row)
+        # find it
+        o = profile.models.Link_SF_Proj_Dude_FM.objects.get(
+            person__username='paulproteus', project__unixname='zoph')
+        self.assertEqual(o.position, 'Developer')
+        self.assert_(o.is_admin)
+        if delete_now:
+            o.delete()
+        else:
+            self.delete_me.append(o)
+
     def test_sf_person_projects_lookup(self):
+        self.test_import_one_flossmole_row(delete_now=False)
         url = 'http://openhatch.org/people/sf_projects_by_person?u=paulproteus'
-        # Add an experience
         tc.go(make_twill_url(url))
         tc.find('zoph')
 
