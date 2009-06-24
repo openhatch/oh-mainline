@@ -142,10 +142,11 @@ class OmanTests(django.test.TestCase):
 
     def testFormEnterYourUsername(self):
         # {{{
-        url = 'http://openhatch.org/people/'
+        url = 'http://openhatch.org/people/add_contrib'
         tc.go(make_twill_url(url))
         tc.fv('enter_free_software_username', 'u', 'paulproteus')
         tc.submit()
+        tc.go(make_twill_url(url) + '?u=paulproteus')
 
         tc.find('ccHost')
         # }}}

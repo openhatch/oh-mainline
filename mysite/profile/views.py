@@ -136,7 +136,7 @@ def display_person_old(request, input_username=None):
         if input_username is None:
             return render_to_response('profile/profile.html')
 
-    data_dict = profile_data_from_username(input_username)
+    data_dict = profile_data_from_username(input_username, fetch_ohloh_data = True)
 
     return render_to_response('profile/profile.html', data_dict)
 
