@@ -26,7 +26,7 @@ urlpatterns = patterns('',
             'mysite.profile.views.make_favorite_exp_tag_web'),
 
         (r'^exp_scraper$',
-            'mysite.profile.views.exp_scraper_input'),
+            'mysite.profile.views.exp_scraper_input_form'),
 
         (r'^exp_scraper.check_input_and_scrape$',
             'mysite.profile.views.check_input_and_scrape'),

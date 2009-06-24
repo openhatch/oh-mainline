@@ -46,7 +46,7 @@ def add_contribution(username, project_name, url='', description=''):
 
 # }}}
 
-    def exp_scraper__render_wizard_to_response(self, request):
+    def exp_scraper__display_input_form(self, request):
         return render_to_response('profile/exp_scraper_input.html')
 
     def exp_scraper__check_input_and_scrape(self, request):
