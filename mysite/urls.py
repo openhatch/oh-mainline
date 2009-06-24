@@ -12,7 +12,7 @@ urlpatterns = patterns('',
         (r'^static/(?P<path>.*)$', 'django.views.static.serve',
             {'document_root': settings.STATIC_DOC_ROOT}),
         (r'^people/add_contribution$', 'mysite.profile.views.add_contribution_web'),
-        (r'^people/$', 'mysite.profile.views.display_person'),
+        (r'^people/$', 'mysite.profile.views.display_person_web'),
         (r'^people/get_data_for_email$', 'mysite.profile.views.get_data_for_email'),
         (r'^people/change_what_like_working_on$',
             'mysite.profile.views.change_what_like_working_on_web'),
@@ -30,8 +30,8 @@ urlpatterns = patterns('',
         # Experience scraper
         (r'^people/exp_scraper$',
             'mysite.profile.views.exp_scraper_display_input_form'),
-        (r'^people/exp_scraper_check_input_and_scrape$',
-            'mysite.profile.views.exp_scraper_check_input_and_scrape'),
+        (r'^people/exp_scrape$',
+            'mysite.profile.views.exp_scraper_scrape'),
 
         # Get a list of suggestions for the search input, formatted the way that
         # the jQuery autocomplete plugin wants it.

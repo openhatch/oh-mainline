@@ -695,7 +695,7 @@ class AnchorageTests(django.test.TestCase):
         # to scraper input form with a notification.
         self.assertContains(
                 self.client.get(
-                    '/people/exp_scraper_check_input_and_scrape'), 
+                    '/people/exp_scrape'), 
                 "Please enter a username.")
 
     # }}}
