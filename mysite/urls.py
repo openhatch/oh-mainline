@@ -27,11 +27,11 @@ urlpatterns = patterns('',
         (r'^people/add_contrib$',
             'mysite.profile.views.display_person_old'),
 
+        # Experience scraper
         (r'^exp_scraper$',
-            'mysite.profile.views.exp_scraper__check_input_and_scrape'),
-
+            'mysite.profile.views.exp_scraper__display_input_form'),
         (r'^exp_scraper.check_input_and_scrape$',
-            'mysite.profile.views.check_input_and_scrape'),
+            'mysite.profile.views.exp_scraper__check_input_and_scrape'),
 
         # Get a list of suggestions for the search input, formatted the way that
         # the jQuery autocomplete plugin wants it.
