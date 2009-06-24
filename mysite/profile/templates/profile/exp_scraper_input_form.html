@@ -1,0 +1,16 @@
+{% include 'profile/header.html' %}
+
+<form id='enter-free-software-username' 
+    name='enter_free_software_username'
+    action='/people/' 
+    method='GET' style=''>
+    <label for='get-data-username'>Type your username: </label>
+    <input type='text' id='u' name='u' />
+    <input type='submit' style='float: right;'/>
+    <!--input type='image'
+    src='/static/images/add.png' /-->
+</form>
+
+<!-- check : profile.autopopulator -->
+
+{% include 'profile/footer.html' %}
