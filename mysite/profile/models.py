@@ -157,17 +157,19 @@ class Link_ProjectExp_Tag(models.Model):
         unique_together = [ ('tag', 'project_exp', 'source'),
                             ]
     @staticmethod
-    def get_from_strings(username, project_name, tag_text=None):
+    def get_from_strings(username, project_name, tag_text, tag_type=None):
         # {{{
         # FIXME: Add support for tag-type-specific grabbing of Link_ProjectExp_Tags
 
         exp = ProjectExp.get_from_text(username, project_name)
-        tag = Tag.objects.get(text=tag_text)
 
-        if tag_text is None:
-            new_link = Link_ProjectExp_Tag.objects.get(project_exp=exp, tag=tag)
+        if tag_type is not None:
+            tag_type_obj = TagType.objects.get(name=tag_type)
+            tag = Tag.objects.get(text=tag_text, tag_type=tag_type_obj)
         else:
-            new_link = Link_ProjectExp_Tag.objects.get(project_exp=exp, tag=tag, tag_text=tag_text)
+            tag = Tag.objects.get(text=tag_text)
+
+        new_link = Link_ProjectExp_Tag.objects.get(project_exp=exp, tag=tag)
 
         return new_link
         # }}}
