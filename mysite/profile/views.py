@@ -46,22 +46,21 @@ def add_contribution(username, project_name, url='', description=''):
 
 # }}}
 
-def exp_scraper__display_input_form(request):
-    return render_to_response('profile/exp_scraper_input.html')
+def exp_scraper_display_input_form(request, notification=None):
+    return render_to_response('profile/exp_scraper_input_form.html', {
+        'notification': notification})
 
-def exp_scraper__check_input_and_scrape(request):
-    return HttpResponse('')
-    
+def exp_scraper_check_input_and_scrape(request):
     # Check input
     input_username = request.GET.get('u', None)
     if input_username is None:
-        return response(request)
+        return exp_scraper_display_input_form(request, "Please enter a username.")
     
-    exp_scraper__scrape(input_username)
+    exp_scraper_scrape(input_username)
 
     return display_person(request, input_username)
 
-def exp_scraper__scrape(username):
+def exp_scraper_scrape(username):
 
     #person.fetch_projects_from_sourceforge()
     #Execute script on server: person.fetch_contrib_data_from_ohloh_for_user_and_projects()

@@ -702,9 +702,15 @@ class AnchorageTests(django.test.TestCase):
     # {{{
 
     def test__exp_scraper_input_form(self):
-        c = Client()
-        response = c.get('/exp_scraper')
-        #self.assertEqual(response.template.name,
-        #        "profile/exp_scraper_input_form.html")
+        response = self.client.get('/people/exp_scraper')
+        self.assertContains(response, "exp_scraper_input_form")
+
+    def test__exp_scraper_fails_without_username(self):
+
+        # If no username entered, user is returned
+        # to scraper input form with a notification.
+        self.assertContains(
+                self.client.get('/people/exp_scraper_check_input_and_scrape'), 
+                "Please enter a username.")
 
     # }}}
