@@ -24,6 +24,8 @@ urlpatterns = patterns('',
             'mysite.profile.views.make_favorite_project_exp_web'),
         (r'^people/make_favorite_exp_tag$',
             'mysite.profile.views.make_favorite_exp_tag_web'),
+        (r'^people/add_contrib$',
+            'mysite.profile.views.display_person_old'),
 
         # Get a list of suggestions for the search input, formatted the way that
         # the jQuery autocomplete plugin wants it.

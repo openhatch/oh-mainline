@@ -94,6 +94,20 @@ def display_person(request, input_username=None):
 
     # }}}
 
+def display_person_old(request, input_username=None):
+    # {{{
+
+    if input_username is None:
+        input_username = request.GET.get('u', None)
+        if input_username is None:
+            return render_to_response('profile/profile.html')
+
+    data_dict = profile_data_from_username(input_username)
+
+    return render_to_response('profile/profile.html', data_dict)
+
+    # }}}
+
 # }}}
 
 # Debtags {{{
