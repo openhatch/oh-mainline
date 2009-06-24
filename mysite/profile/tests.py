@@ -701,3 +701,23 @@ class AnchorageTests(django.test.TestCase):
                 "Please enter a username.")
 
     # }}}
+
+class CambridgeTests(django.test.TestCase):
+    '''
+    The Cambridge milestone says:
+    * You can look up what projects (via local cache of sf.net) a person is on.
+    '''
+    def setUp(self):
+        twill_setup()
+
+    def tearDown(self):
+        twill_teardown()
+
+    def test_sf_person_projects_lookup(self):
+        url = 'http://openhatch.org/people/sf_projects_by_person?u=paulproteus'
+        # Add an experience
+        tc.go(make_twill_url(url))
+        tc.find('zoph')
+
+
+
