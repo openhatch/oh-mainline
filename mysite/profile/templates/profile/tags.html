@@ -1,114 +1,91 @@
+{% include 'profile/header.html' %}
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html>
-    <head>
-        <style>
-            @import url('/static/css/people/all.css');
-        </style>
-    </head>
-    <body>
-        <div id='outermost'>
-            <div id='penoutermost'>
-                <div id='content'>
+<h3 id='tag-heading'>tags</h3>
 
-                    <div id='heading'>
-                        <h1>Venkatesh Srinivas</h1>
-                        <ul>
-                            <li>tags</li>
-                            <li>up</li>
-                            <li>down</li>
-                            <li>stream</li>
-                        </ul>
-                    </div>
+<div id='widgets'>
 
-                    <div id='widgets'>
-
-                        <div id='taglines'>
-                            <!-- {{{ -->
-                            <div id='left'>
-                                <div class='widget'>
-                                    <h3>understands:
-                                        <a href=''>screen scraping</a>,
-                                        <a href=''>boar hunting</a>,
-                                        <a href=''>base jumping</a>,
-                                        <a href=''>python</a>,
-                                        <a href=''>c++</a>,
-                                        <a href=''>smalltalk</a>,
-                                        <a href=''>javascript</a>,
-                                        <a href=''>COBOL</a>,
-                                        <a href=''>delphi</a>,
-                                        <a href=''>ajax</a>,
-                                        <a href=''>twill</a>
-                                    </h3>
-                                </div>
-                                <div class='widget'>
-                                    <h3>will never understand:
-                                        <a href=''>florida</a>,
-                                        <a href=''>conceptual art</a>,
-                                        <a href=''>furries</a>
-                                    </h3>
-                                </div>
-                            </div>
-                            <div id='right'>
-                                <div class='widget'>
-                                    <h3>currently learning about:
-                                        <a href=''>tiger trapping</a>,
-                                        <a href=''>regular expressions</a>
-                                    </h3>
-                                </div>
-                                <div class='widget'>
-                                    <h3>teaches:
-                                        <a href=''>lanyard swinging</a>,
-                                        <a href=''>django</a>
-                                    </h3>
-                                </div>
-                            </div>
-                            <!-- }}} -->
-                        </div>
-
-                        <div id='taglines'>
-                            <!-- {{{ -->
-                            <div id='left'>
-                                <div class='widget'>
-                                    <h3>groks:
-                                        <form name='form_tags_groks'>
-                                            <textarea name='tags_groks'>screen scraping, boar hunting, base jumping, python, c++, smalltalk, javascript, COBOL, delphi, ajax</textarea>
-                                            <input type='submit' value='save'/>
-                                        </form>
-                                    </h3>
-                                </div>
-                                <div class='widget'>
-                                    <h3>will never grok:
-                                        <form name='form_tags_groks'>
-                                            <textarea name='tags_groks'>academia, furries</textarea>
-                                            <input type='submit' value='save'/>
-                                        </form>
-                                    </h3>
-                                </div>
-                            </div>
-                            <div id='right'>
-                                <div class='widget'>
-                                    <h3>would like to learn about:
-                                        <form name='form_tags_groks'>
-                                            <textarea name='tags_seeks_knowledge_in'>screen scraping, boar hunting, base jumping, python, c++, smalltalk, javascript, COBOL, delphi, ajax</textarea>
-                                            <input type='submit' value='save'/>
-                                        </form>
-                                    </h3>
-                                </div>
-                                <div class='widget'>
-                                    <h3>can mentor in:
-                                            <textarea name='tags_offers_knowledge_in'>screen scraping, boar hunting, base jumping, python, c++, smalltalk, javascript, COBOL, delphi, ajax</textarea>
-                                            <input type='submit' value='save'/>
-                                    </h3>
-                                </div>
-                            </div>
-                            <!-- }}} -->
-                        </div>
-
-                    </div><!-- /# widgets-->
-
-                </div>
+    <div id='taglines'>
+        <!-- {{{ -->
+        <div id='left'>
+            <div class='widget'>
+                <h3>understands:
+                    <a href=''>screen scraping</a>,
+                    <a href=''>boar hunting</a>,
+                    <a href=''>base jumping</a>,
+                    <a href=''>python</a>,
+                    <a href=''>c++</a>,
+                    <a href=''>smalltalk</a>,
+                    <a href=''>javascript</a>,
+                    <a href=''>COBOL</a>,
+                    <a href=''>delphi</a>,
+                    <a href=''>ajax</a>,
+                    <a href=''>twill</a>
+                </h3>
+            </div>
+            <div class='widget'>
+                <h3>will never understand:
+                    <a href=''>florida</a>,
+                    <a href=''>conceptual art</a>,
+                    <a href=''>furries</a>
+                </h3>
             </div>
         </div>
-    </body>
-</html>
+        <div id='right'>
+            <div class='widget'>
+                <h3>currently learning about:
+                    <a href=''>tiger trapping</a>,
+                    <a href=''>regular expressions</a>
+                </h3>
+            </div>
+            <div class='widget'>
+                <h3>teaches:
+                    <a href=''>lanyard swinging</a>,
+                    <a href=''>django</a>
+                </h3>
+            </div>
+        </div>
+        <!-- }}} -->
+    </div>
+
+    <div id='taglines'>
+        <!-- {{{ -->
+        <div id='left'>
+            <div class='widget'>
+                <h3>groks:
+                    <form name='form_tags_groks'>
+                        <textarea name='tags_groks'>screen scraping, boar hunting, base jumping, python, c++, smalltalk, javascript, COBOL, delphi, ajax</textarea>
+                        <input type='submit' value='save'/>
+                    </form>
+                </h3>
+            </div>
+            <div class='widget'>
+                <h3>will never grok:
+                    <form name='form_tags_groks'>
+                        <textarea name='tags_groks'>academia, furries</textarea>
+                        <input type='submit' value='save'/>
+                    </form>
+                </h3>
+            </div>
+        </div>
+        <div id='right'>
+            <div class='widget'>
+                <h3>would like to learn about:
+                    <form name='form_tags_groks'>
+                        <textarea name='tags_seeks_knowledge_in'>screen scraping, boar hunting, base jumping, python, c++, smalltalk, javascript, COBOL, delphi, ajax</textarea>
+                        <input type='submit' value='save'/>
+                    </form>
+                </h3>
+            </div>
+            <div class='widget'>
+                <h3>can mentor in:
+                    <textarea name='tags_offers_knowledge_in'>screen scraping, boar hunting, base jumping, python, c++, smalltalk, javascript, COBOL, delphi, ajax</textarea>
+                    <input type='submit' value='save'/>
+                </h3>
+            </div>
+        </div>
+        <!-- }}} -->
+    </div>
+
+</div><!-- /# widgets-->
+
+{% include 'profile/footer.html' %}

@@ -11,6 +11,7 @@
                 <div id='nav'><h2>OpenHatch</h2></div>
                 <div id='content'>
 
+                    {% comment %} Heading {{{ {% endcomment %}
                     <div id='heading'>
                         <h1>
                             {{ person.username }}
@@ -19,9 +20,17 @@
                             {% endif %}
                         </h1>
                         <ul>
-                            <li><a href=''>involvement</a></li>
-                            <li><a href=''>tags</a></li>
-                            <li><a href=''>tech</a></li>
-                            <li><a href=''>recently</a></li>
+                            <li><a href='?u={{ person.username }}'>home</a></li>
+                            <li><a href='?u={{ person.username }}&amp;tab=inv'>involvement</a></li>
+                            <li><a href='?u={{ person.username }}&amp;tab=tags'>tags</a></li>
+                            <li><a href='?u={{ person.username }}&amp;tab=tech'>tech</a></li>
+                            <!--li><a href='?u={{ person.username }}&amp;tab=inv'>recently</a></li-->
                         </ul>
                     </div>
+                    {% comment %} }}} {% endcomment %}
+
+                    {% comment %} Notification {{{ {% endcomment %}
+                    {% if notification %}
+                    <div class='notification'>{{ notification }}</div>
+                    {% endif %}
+                    {% comment %} }}} {% endcomment %}

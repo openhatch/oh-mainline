@@ -90,7 +90,15 @@ def display_person(request, input_username=None):
 
     data_dict = profile_data_from_username(input_username)
 
-    return render_to_response('profile/main.html', data_dict)
+    tab = request.GET.get('tab', None)
+    if tab == 'inv':
+        return render_to_response('profile/participation.html', data_dict)
+    if tab == 'tags':
+        return render_to_response('profile/tags.html', data_dict)
+    if tab == 'tech':
+        return render_to_response('profile/tech.html', data_dict)
+    else:
+        return render_to_response('profile/main.html', data_dict)
 
     # }}}
 
