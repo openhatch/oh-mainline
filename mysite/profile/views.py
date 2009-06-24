@@ -57,11 +57,11 @@ def exp_scraper_check_input_and_scrape(request):
     if input_username is None:
         return exp_scraper_display_input_form(request, "Please enter a username.")
 
-    exp_scraper_scrape(input_username)
+    exp_scraper_scrape(Person.objects.get(username=input_username))
 
     return display_person(request, input_username)
 
-def exp_scraper_scrape(username):
+def exp_scraper_scrape(person):
 
     #person.fetch_projects_from_sourceforge()
     #Execute script on server: person.fetch_contrib_data_from_ohloh_for_user_and_projects()

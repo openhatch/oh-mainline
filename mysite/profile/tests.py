@@ -697,7 +697,8 @@ class AnchorageTests(django.test.TestCase):
         # If no username entered, user is returned
         # to scraper input form with a notification.
         self.assertContains(
-                self.client.get('/people/exp_scraper_check_input_and_scrape'), 
+                self.client.get(
+                    '/people/exp_scraper_check_input_and_scrape'), 
                 "Please enter a username.")
 
     # }}}
