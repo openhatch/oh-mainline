@@ -317,7 +317,8 @@ class QuebecTests(django.test.TestCase):
 
     def testGetPersonDataDict(self):
         username = 'paulproteus'
-        data = profile.views.profile_data_from_username(username)
+        data = profile.views.profile_data_from_username(username,
+                                                        fetch_ohloh_data=True)
         self.assertEquals(data['person'].username, username)
         cchost_among_project_exps = False
         for proj, tags in data['exp_taglist_pairs']:

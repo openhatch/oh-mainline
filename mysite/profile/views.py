@@ -69,13 +69,18 @@ class AutoPopulator:
         return display_person(request, input_username)
 
 # Display profile {{{
-def profile_data_from_username(username):
+def profile_data_from_username(username, fetch_ohloh_data = False):
     # {{{
     person, person_created = Person.objects.get_or_create(
             username=username)
 
     project_exps = ProjectExp.objects.filter(
             person=person)
+
+    if fetch_ohloh_data and person.poll_on_next_web_view:
+        person.fetch_contrib_data_from_ohloh()
+        person.poll_on_next_web_view = False
+        person.save()
 
     exps_to_tags = {}
     for exp in project_exps:
