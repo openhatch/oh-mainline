@@ -234,6 +234,8 @@ class Link_SF_Proj_Dude_FM(models.Model):
         if row.startswith('dev_loginname'):
             return None
         person, proj_unixname, is_admin, position, date_collected = row.split('\t')
-        return create_from_flossmole_row_data(person, proj_unixname, is_admin,
-                                              position, date_collected)
+        return Link_SF_Proj_Dude_FM.create_from_flossmole_row_data(person,
+                                                   proj_unixname,
+                                                   is_admin, position,
+                                                   date_collected)
             
