@@ -709,6 +709,8 @@ class CambridgeTests(django.test.TestCase):
     '''
     def setUp(self):
         self.delete_me = []
+        self.row = ['paulproteus', 'zoph', '1', 'Developer', '2009-06-11 21:53:19']
+                
         twill_setup()
 
     def tearDown(self):
@@ -716,11 +718,13 @@ class CambridgeTests(django.test.TestCase):
             thing.delete()
         twill_teardown()
 
-    def test_import_one_flossmole_row(self, delete_now = True):
-        row = ['paulproteus', 'zoph', '1', 'Developer', '2009-06-11 21:53:19']
+    def _create_one_flossmole_row_from_data(self):
         # make it
         m, _ = profile.models.Link_SF_Proj_Dude_FM.create_from_flossmole_row_data(
-            *row)
+            *self.row)
+        return m
+
+    def _test_import_one_flossmole_row(self, delete_now = True):
         # find it
         o = profile.models.Link_SF_Proj_Dude_FM.objects.get(
             person__username='paulproteus', project__unixname='zoph')
@@ -730,6 +734,11 @@ class CambridgeTests(django.test.TestCase):
             o.delete()
         else:
             self.delete_me.append(o)
+
+    def test_import_one_flossmole_row(self, delete_now = True):
+        self._create_one_flossmole_row_from_data()
+        self._test_import_one_flossmole_row(delete_now = delete_now)
+            
 
     def test_sf_person_projects_lookup(self):
         self.test_import_one_flossmole_row(delete_now=False)
