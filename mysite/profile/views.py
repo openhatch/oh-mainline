@@ -46,7 +46,7 @@ def add_contribution(username, project_name, url='', description=''):
 
 # }}}
 
-class AutoPopulator:
+class Autopopulator:
 
     def response(self, request):
         return render_to_response('profile/autopopulator.html')
@@ -62,7 +62,8 @@ class AutoPopulator:
 
     def run(self, username):
 
-        person.fetch_project_names_from_sourceforge()
+        #person.fetch_projects_from_sourceforge()
+        #Execute script on server: person.fetch_contrib_data_from_ohloh_for_user_and_projects()
         person.fetch_contrib_data_from_ohloh()
         person.save()
 
