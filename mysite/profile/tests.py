@@ -698,3 +698,13 @@ class TrentonTests(django.test.TestCase):
         tc.go(make_twill_url(url))
         tc.find('Favorite: rad')
 
+class AnchorageTests(django.test.TestCase):
+    # {{{
+
+    def test__exp_scraper_input_form(self):
+        c = Client()
+        response = c.get('/exp_scraper')
+        self.assertEqual(response.template.name,
+                "profile/exp_scraper_input_form.html")
+
+    # }}}

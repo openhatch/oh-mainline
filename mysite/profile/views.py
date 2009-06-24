@@ -46,28 +46,26 @@ def add_contribution(username, project_name, url='', description=''):
 
 # }}}
 
-class Autopopulator:
+    def exp_scraper__render_wizard_to_response(self, request):
+        return render_to_response('profile/exp_scraper_input.html')
 
-    def response(self, request):
-        return render_to_response('profile/autopopulator.html')
+    def exp_scraper__check_input_and_scrape(self, request):
 
-    def validate_input_and_run(self, request):
-
-        # Validate input
+        # Check input
         input_username = request.GET.get('u', None)
         if input_username is None:
             return self.response(request)
 
-        run(input_username)
+        exp_scraper__scrape(input_username)
 
-    def run(self, username):
+        return display_person(request, input_username)
+
+    def exp_scraper__scrape(self, username):
 
         #person.fetch_projects_from_sourceforge()
         #Execute script on server: person.fetch_contrib_data_from_ohloh_for_user_and_projects()
         person.fetch_contrib_data_from_ohloh()
         person.save()
-
-        return display_person(request, input_username)
 
 # Display profile {{{
 def profile_data_from_username(username, fetch_ohloh_data = False):
