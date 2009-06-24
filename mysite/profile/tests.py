@@ -656,9 +656,6 @@ class TrentonTests(django.test.TestCase):
         
         # Grab experience ID
         exp_id = str(int(desired.find_control('exp_id').value))
-        if exp_id == 1:
-            import pdb
-            pdb.set_trace()
 
         # Give it two tags
         tc.config('readonly_controls_writeable', True)
@@ -702,3 +699,71 @@ class AnchorageTests(django.test.TestCase):
                 "Please enter a username.")
 
     # }}}
+
+class CambridgeTests(django.test.TestCase):
+    '''
+    The Cambridge milestone says:
+    * You can look up what projects (via local cache of sf.net) a person is on.
+    '''
+    def setUp(self):
+        self.delete_me = []
+        self.row = ['paulproteus', 'zoph', '1', 'Developer', '2009-06-11 21:53:19']
+                
+        twill_setup()
+
+    def tearDown(self):
+        for thing in self.delete_me:
+            thing.delete()
+        twill_teardown()
+
+    def _create_one_flossmole_row_from_data(self):
+        # make it
+        m, _ = profile.models.Link_SF_Proj_Dude_FM.create_from_flossmole_row_data(
+            *self.row)
+        return m
+
+    def _create_one_flossmole_row_from_text(self):
+        # make it
+        m, _ = profile.models.Link_SF_Proj_Dude_FM.create_from_flossmole_row_string(
+            '\t'.join(self.row))
+        return m
+
+    def _test_import_one_flossmole_row(self, delete_now = True):
+        # find it
+        o = profile.models.Link_SF_Proj_Dude_FM.objects.get(
+            person__username='paulproteus', project__unixname='zoph')
+        self.assertEqual(o.position, 'Developer')
+        self.assert_(o.is_admin)
+        if delete_now:
+            o.delete()
+        else:
+            self.delete_me.append(o)
+
+    def test_import_one_flossmole_row(self, delete_now = True):
+        self._create_one_flossmole_row_from_data()
+        self._test_import_one_flossmole_row(delete_now = delete_now)
+
+    def test_import_one_flossmole_row_text(self, delete_now = True):
+        self._create_one_flossmole_row_from_text()
+        self._test_import_one_flossmole_row(delete_now = delete_now)
+
+    def _test_sf_person_projects_lookup(self):
+        self.test_import_one_flossmole_row(delete_now=False)
+        url = 'http://openhatch.org/people/sf_projects_by_person?u=paulproteus'
+        tc.go(make_twill_url(url))
+        tc.find('zoph')
+
+    def test_sf_person_projects_lookup(self):
+        self.test_import_one_flossmole_row(delete_now=False)
+        self._test_sf_person_projects_lookup()
+        for thing in self.delete_me:
+            thing.delete()
+        self.delete_me = []
+
+    def test_sf_person_projects_lookup_text(self):
+        self.test_import_one_flossmole_row_text(delete_now=False)
+        self._test_sf_person_projects_lookup()
+        for thing in self.delete_me:
+            thing.delete()
+        self.delete_me = []        
+

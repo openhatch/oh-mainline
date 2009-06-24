@@ -183,3 +183,57 @@ class Link_Project_Tag(models.Model):
             default=datetime.datetime.now())
     source = models.CharField(max_length=200)
     # }}}
+
+class SourceForgePerson(models.Model):
+    '''A person in SourceForge.'''
+    username = models.CharField(max_length=200)
+
+class SourceForgeProject(models.Model):
+    '''A project in SourceForge.'''
+    unixname = models.CharField(max_length=200)
+
+
+class Link_SF_Proj_Dude_FM(models.Model):
+    '''Link from SourceForge Project to Person, via FlossMOLE'''
+    person  = models.ForeignKey(SourceForgePerson)
+    project = models.ForeignKey(SourceForgeProject)
+    is_admin = models.BooleanField(default=False)
+    position = models.CharField(max_length=200)
+    date_collected = models.DateTimeField()
+    class Meta:
+        unique_together = [
+            ('person', 'project'),]
+            
+    # FIXME: One day, this should
+
+    @staticmethod
+    def create_from_flossmole_row_data(dev_loginname, proj_unixname, is_admin,
+                                       position, date_collected):
+        """Given:
+        {'dev_loginname': x, 'proj_unixname': y, is_admin: z,
+        'position': a, 'date_collected': b}, return a
+        SourceForgeProjectMembershipFromFlossMole instance."""
+        person, _ = SourceForgePerson.objects.get_or_create(username=
+                                                            dev_loginname)
+        project, _ = SourceForgeProject.objects.get_or_create(unixname=
+                                                              proj_unixname)
+        is_admin = bool(int(is_admin))
+        date_collected = datetime.datetime.strptime(
+            date_collected, '%Y-%m-%d %H:%M:%S') # no time zone
+        return Link_SF_Proj_Dude_FM.objects.get_or_create(
+            person=person, project=project, is_admin=is_admin,
+            position=position, date_collected=date_collected)
+
+    @staticmethod
+    def create_from_flossmole_row_string(row):
+        row = row.strip()
+        if row.startswith('#'):
+            return None
+        if row.startswith('dev_loginname'):
+            return None
+        person, proj_unixname, is_admin, position, date_collected = row.split('\t')
+        return Link_SF_Proj_Dude_FM.create_from_flossmole_row_data(person,
+                                                   proj_unixname,
+                                                   is_admin, position,
+                                                   date_collected)
+            
