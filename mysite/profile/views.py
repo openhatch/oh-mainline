@@ -2,7 +2,7 @@
 
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
 from django.shortcuts import render_to_response, get_object_or_404
-from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag, Link_Project_Tag
+from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag, Link_Project_Tag, Link_SF_Proj_Dude_FM
 from mysite.search.models import Project
 import StringIO
 import datetime
@@ -392,5 +392,18 @@ def make_favorite_exp_tag_web(request):
     username = request.POST.get('username', None)
     make_favorite_tag(exp_id, tag_text)
     return HttpResponseRedirect('/people/?' + urllib.urlencode({'u': username}))
+
+def sf_projects_by_person_web(request):
+    sf_username = request.GET.get('u', None)
+    if sf_username is None:
+        return HttpResponseServerError()
+
+    projects = Link_SF_Proj_Dude_FM.objects.filter(
+        person__username=sf_username).all()
+    project_names = [p.project.unixname for p in projects]
+    import pdb
+    pdb.set_trace()
+    return HttpResponse('\n'.join(project_names))
+    
 
 # }}}
