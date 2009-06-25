@@ -585,16 +585,14 @@ class UnadillaTests(django.test.TestCase):
 
     def testEnterWhatYouLikeWorkingOn(self):
         # {{{
-        url = 'http://openhatch.org/people/add_contrib?u=paulproteus'
+        url = 'http://openhatch.org/people/?u=paulproteus&tab=tags&edit=1'
         tc.go(make_twill_url(url))
         tc.fv('what_you_like_working_on', 'like-working-on', 'barbies')
         tc.submit()
-        tc.go(make_twill_url(url))
         tc.find('barbies')
         
         tc.fv('what_you_like_working_on', 'like-working-on', 'barbiequeue')
         tc.submit()
-        tc.go(make_twill_url(url))
         tc.find('barbiequeue')
         # }}}
 
@@ -605,6 +603,7 @@ class TrentonTests(django.test.TestCase):
     The Trenton milestone says:
     * You can mark an experience as a favorite.
     '''
+    # {{{
     def setUp(self):
         twill_setup()
 
@@ -612,7 +611,8 @@ class TrentonTests(django.test.TestCase):
         twill_teardown()
 
     def test_make_favorite_experience(self):
-        url = 'http://openhatch.org/people/add_contrib?u=paulproteus'
+        # {{{
+        url = 'http://openhatch.org/people/?u=paulproteus'
         # Add two experiences
         tc.go(make_twill_url(url))
         tc.fv('add_contrib', 'project_name', 'TrentonProj1')
@@ -621,7 +621,6 @@ class TrentonTests(django.test.TestCase):
         tc.submit()
         tc.find('TrentonProj1')
 
-        tc.go(make_twill_url(url))
         tc.fv('add_contrib', 'project_name', 'TrentonProj2')
         tc.fv('add_contrib', 'url', 'http://example.com')
         tc.fv('add_contrib', 'description', 'OMG totally my fav')
@@ -642,16 +641,17 @@ class TrentonTests(django.test.TestCase):
 
         tc.go(make_twill_url(url))
         tc.find('Favorite: TrentonProj2')
+        # }}}
 
     def test_make_favorite_tag(self):
-        url = 'http://openhatch.org/people/add_contrib?u=paulproteus'
+        # {{{
+        url = 'http://openhatch.org/people/?u=paulproteus'
         # Add an experience
         tc.go(make_twill_url(url))
         tc.fv('add_contrib', 'project_name', 'TrentonProj3')
         tc.fv('add_contrib', 'url', 'http://example.com')
         tc.fv('add_contrib', 'description', 'Totally rad')
         tc.submit()
-        tc.go(make_twill_url(url))
         tc.find('TrentonProj3')
 
         # Find its tag submission form
@@ -673,7 +673,6 @@ class TrentonTests(django.test.TestCase):
         tc.fv(desired.name, 'tag_text', 'totally, rad')
         tc.submit()
 
-        tc.go(make_twill_url(url))
         # Verify the tags stuck
         tc.find('totally')
         tc.find('rad')
@@ -692,8 +691,9 @@ class TrentonTests(django.test.TestCase):
         tc.fv(desired.name, 'exp_id', exp_id)
         tc.submit()
 
-        tc.go(make_twill_url(url))
         tc.find('Favorite: rad')
+        # }}}
+    # }}}
 
 class AnchorageTests(django.test.TestCase):
     # {{{
@@ -708,7 +708,7 @@ class AnchorageTests(django.test.TestCase):
         # to scraper input form with a notification.
         self.assertContains(
                 self.client.get(
-                    '/people/exp_scrape'), 
+                    '/people/exp_scrape_do'), 
                 "Please enter a username.")
 
     # }}}

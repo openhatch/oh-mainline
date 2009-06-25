@@ -51,6 +51,7 @@ def exp_scraper_display_input_form(request, notification=None):
         'notification': notification})
 
 def exp_scraper_scrape_web(request):
+    # {{{
     # Check input
     input_username = request.GET.get('u', None)
     if input_username is None:
@@ -62,13 +63,15 @@ def exp_scraper_scrape_web(request):
     person = Person.objects.get(username=input_username)
 
     return display_person(person, "main")
+    # }}}
 
 def exp_scraper_scrape(person):
-
+    # {{{
     #person.fetch_projects_from_sourceforge()
     #Execute script on server: person.fetch_contrib_data_from_ohloh_for_user_and_projects()
     person.fetch_contrib_data_from_ohloh()
     person.save()
+    # }}}
 
 # Display profile {{{
 def profile_data_from_username(username, fetch_ohloh_data = False):
@@ -112,12 +115,14 @@ def display_person_web(request, input_username=None):
 
     tab = request.GET.get('tab', None)
 
-    return display_person(input_username, tab)
+    person = Person.objects.get(username=input_username)
+
+    return display_person(person, tab)
 
 def display_person(person, tab):
     # {{{
 
-    data_dict = profile_data_from_username(person)
+    data_dict = profile_data_from_username(person.username)
 
     if tab == 'inv':
         return render_to_response('profile/participation.html', data_dict)
