@@ -142,8 +142,7 @@ class OmanTests(django.test.TestCase):
 
     def test_slurper_accepts_username(self):
         # {{{
-        # FIXME: Use the correct url in urls.py
-        url = 'http://openhatch.org/people/exp_scraper_display_input_form'
+        url = 'http://openhatch.org/people/exp_scraper'
         tc.go(make_twill_url(url))
         tc.fv('enter_free_software_username', 'u', 'paulproteus')
         tc.submit()
