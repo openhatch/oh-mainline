@@ -115,7 +115,7 @@ def display_person_web(request, input_username=None):
 
     tab = request.GET.get('tab', None)
 
-    person = Person.objects.get(username=input_username)
+    person, _ = Person.objects.get_or_create(username=input_username)
 
     return display_person(person, tab)
 
