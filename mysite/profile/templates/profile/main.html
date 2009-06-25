@@ -108,3 +108,83 @@
                     </div><!-- /# widget -->
 
 {% include 'profile/footer.html' %}
+
+               <div class='box'>
+                  <h3>{{ person.username }}</h3>
+                  {% if exp_taglist_pairs %}
+                  <ul id='exp'>
+                     {% for exp, taglist in exp_taglist_pairs %}
+                     <li>
+                     <div class='project-name'>
+                        {% if exp.url %}
+                        <a href='{{ exp.url }}'>
+                        {% endif %}
+			{% if exp.favorite %}Favorite: {% endif %}{{ exp.project.name }}
+                        {% if exp.url %}
+                        </a>
+                        {% endif %}
+                     </div>
+                     <div class='summary'>
+                        Clocked {{ exp.man_months }} month(s) of work in
+                        {{ exp.primary_language }}
+                     </div>
+                     <div class='project-exp-tags'>
+                        {% for tag in taglist %}
+                     <form name='remove-tag-to-exp-{{ tag.id }}' method='POST'
+                        action='/people/project_exp_tag__remove'>
+                        <input type='hidden' name='tag_text'
+                        value='{{ tag.text }}'/>
+                        <input type='hidden' name='project_name'
+                        value='{{ exp.project.name }}'/>
+                        <input type='hidden' name='username'
+                        value='{{ person.username }}'/>
+                        {{ tag.prefix }}{{ tag.text }}
+			<input type='submit' value='Delete' />
+                     </form>
+                     <form name='favorite-tag-exp-{{ tag.id }}' method='POST'
+                        action='/people/make_favorite_exp_tag'>
+                        <input type='hidden' name='tag_text'
+                        value='{{ tag.text }}'/>
+                        <input type='hidden' name='tag_id'
+                        value='{{ tag.id }}'/>
+			<input type='hidden' name='exp_id'
+			value='{{ exp.id }}' />
+                        <input type='hidden' name='project_name'
+                        value='{{ exp.project.name }}'/>
+                        <input type='hidden' name='username'
+                        value='{{ person.username }}'/>
+			<input type='submit' value='Make tag a fav' />
+                     </form>
+
+
+                        {% endfor %}
+                     </div>
+                     <form name='add-tag-to-exp-{{ exp.id }}' method='POST'
+                        action='/people/add_tag_to_project_exp'>
+                        <label for='exp-{{ exp.id }}-tag-text'>Add tag</label>
+                        <input type='hidden' name='username'
+                        value='{{ person.username }}'/>
+                        <input type='hidden' name='exp_id'
+                        value='{{ exp.id }}'/>
+                        <input type='hidden' name='project_name'
+                        value='{{ exp.project.name }}'/>
+                        <input type='text' id='exp-{{ exp.id }}-tag-text' 
+                        name='tag_text' />
+                     </form>
+
+                     <form name='make-exp-favorite-{{ exp.id }}' method='POST'
+                        action='/people/make_favorite_project_exp'>
+                        <input type='hidden' name='username'
+                        value='{{ person.username }}'/>
+                        <input type='hidden' name='exp_id'
+                        value='{{ exp.id }}'/>
+			<input type='submit' value='Make Favorite' />
+                     </form>
+                     </li>
+                     {% endfor %}
+                  </ul>
+                  {% else %}
+                  Could not find experience in our
+                  database for that username.
+                  {% endif %}
+               </div>

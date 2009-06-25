@@ -56,7 +56,7 @@ def exp_scraper_scrape_web(request):
     input_username = request.GET.get('u', None)
     if input_username is None:
         return exp_scraper_display_input_form(request, "Please enter a username.")
-
+    
     # FIXME: get or get_or_create?
     exp_scraper_scrape(Person.objects.get(username=input_username))
 
@@ -74,13 +74,18 @@ def exp_scraper_scrape(person):
     # }}}
 
 # Display profile {{{
-def profile_data_from_username(username):
+def profile_data_from_username(username, fetch_ohloh_data = False):
     # {{{
     person, person_created = Person.objects.get_or_create(
             username=username)
 
     project_exps = ProjectExp.objects.filter(
             person=person)
+
+    if fetch_ohloh_data and person.poll_on_next_web_view:
+        person.fetch_contrib_data_from_ohloh()
+        person.poll_on_next_web_view = False
+        person.save()
 
     exps_to_tags = {}
     for exp in project_exps:
@@ -110,7 +115,7 @@ def display_person_web(request, input_username=None):
 
     tab = request.GET.get('tab', None)
 
-    person = Person.objects.get(username=input_username)
+    person, _ = Person.objects.get_or_create(username=input_username)
 
     return display_person(person, tab)
 
@@ -127,6 +132,20 @@ def display_person(person, tab):
         return render_to_response('profile/tech.html', data_dict)
     else:
         return render_to_response('profile/main.html', data_dict)
+
+    # }}}
+
+def display_person_old(request, input_username=None):
+    # {{{
+
+    if input_username is None:
+        input_username = request.GET.get('u', None)
+        if input_username is None:
+            return render_to_response('profile/profile.html')
+
+    data_dict = profile_data_from_username(input_username, fetch_ohloh_data = True)
+
+    return render_to_response('profile/profile.html', data_dict)
 
     # }}}
 

@@ -24,6 +24,8 @@ urlpatterns = patterns('',
             'mysite.profile.views.make_favorite_project_exp_web'),
         (r'^people/make_favorite_exp_tag$',
             'mysite.profile.views.make_favorite_exp_tag_web'),
+        (r'^people/add_contrib$',
+            'mysite.profile.views.display_person_old'),
         (r'^people/sf_projects_by_person$',
             'mysite.profile.views.sf_projects_by_person_web'),
 

@@ -82,7 +82,7 @@ class ProfileTests(django.test.TestCase):
     def test__add_contribution__web(self):
         # {{{
         username = 'paulproteus'
-        url = 'http://openhatch.org/people/?u=%s' % username
+        url = 'http://openhatch.org/people/add_contrib?u=%s' % username
         tc.go(make_twill_url(url))
         tc.fv('add_contrib', 'project_name', 'Babel')
         tc.fv('add_contrib', 'description', 'msgctxt support')
@@ -90,6 +90,10 @@ class ProfileTests(django.test.TestCase):
         tc.submit()
 
         tc.find('Babel')
+
+        # Go to old form again
+        url = 'http://openhatch.org/people/add_contrib?u=%s' % username
+        tc.go(make_twill_url(url))
         tc.fv('add_contrib', 'project_name', 'Baber')
         tc.fv('add_contrib', 'description', 'msgctxt support')
         tc.fv('add_contrib', 'url', 'http://babel.edgewall.org/ticket/54')
@@ -138,10 +142,11 @@ class OmanTests(django.test.TestCase):
 
     def testFormEnterYourUsername(self):
         # {{{
-        url = 'http://openhatch.org/people/'
+        url = 'http://openhatch.org/people/add_contrib'
         tc.go(make_twill_url(url))
         tc.fv('enter_free_software_username', 'u', 'paulproteus')
         tc.submit()
+        tc.go(make_twill_url(url) + '?u=paulproteus')
 
         tc.find('ccHost')
         # }}}
@@ -313,7 +318,8 @@ class QuebecTests(django.test.TestCase):
 
     def testGetPersonDataDict(self):
         username = 'paulproteus'
-        data = profile.views.profile_data_from_username(username)
+        data = profile.views.profile_data_from_username(username,
+                                                        fetch_ohloh_data=True)
         self.assertEquals(data['person'].username, username)
         cchost_among_project_exps = False
         for proj, tags in data['exp_taglist_pairs']:
@@ -566,6 +572,7 @@ class ExpTag(django.test.TestCase):
     # }}}
 
 class UnadillaTests(django.test.TestCase):
+    fixtures = ['user-paulproteus']
     """
     The Unadilla milestone says:
     * You can write what you're interested in working on
@@ -597,6 +604,7 @@ class UnadillaTests(django.test.TestCase):
     # }}}
 
 class TrentonTests(django.test.TestCase):
+    fixtures = ['user-paulproteus']
     '''
     The Trenton milestone says:
     * You can mark an experience as a favorite.
@@ -610,7 +618,7 @@ class TrentonTests(django.test.TestCase):
 
     def test_make_favorite_experience(self):
         # {{{
-        url = 'http://openhatch.org/people/?u=paulproteus'
+        url = 'http://openhatch.org/people/add_contrib?u=paulproteus'
         # Add two experiences
         tc.go(make_twill_url(url))
         tc.fv('add_contrib', 'project_name', 'TrentonProj1')
@@ -619,6 +627,7 @@ class TrentonTests(django.test.TestCase):
         tc.submit()
         tc.find('TrentonProj1')
 
+        tc.go(make_twill_url(url))
         tc.fv('add_contrib', 'project_name', 'TrentonProj2')
         tc.fv('add_contrib', 'url', 'http://example.com')
         tc.fv('add_contrib', 'description', 'OMG totally my fav')
@@ -637,12 +646,13 @@ class TrentonTests(django.test.TestCase):
         tc.fv(desired.name, 'exp_id', desired.get_value('exp_id'))
         tc.submit()
 
+        tc.go(make_twill_url(url))
         tc.find('Favorite: TrentonProj2')
         # }}}
 
     def test_make_favorite_tag(self):
         # {{{
-        url = 'http://openhatch.org/people/?u=paulproteus'
+        url = 'http://openhatch.org/people/add_contrib?u=paulproteus'
         # Add an experience
         tc.go(make_twill_url(url))
         tc.fv('add_contrib', 'project_name', 'TrentonProj3')
