@@ -579,12 +579,9 @@ class UnadillaTests(django.test.TestCase):
     # {{{
     fixtures = ['user-paulproteus']
     def setUp(self):
-        self.sample_person = Person(username='stipe')
-        self.sample_person.save()
         twill_setup()
 
     def tearDown(self):
-        self.sample_person.delete()
         twill_teardown()
 
     def testEnterWhatYouLikeWorkingOn(self):
