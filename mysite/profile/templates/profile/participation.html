@@ -131,6 +131,39 @@
                             <!-- }}} -->
                         </div> <!-- /#left -->
 
+                        <div>
+                            {% comment %} Add project experience {{{ {% endcomment %}
+                            <div class='box'>
+                                <h3>Add project experience</h3>
+                                <form id='add-contrib' name='add_contrib'
+                                    method='POST' action='/people/add_contribution'>
+
+                                    <input type='hidden' name='u'
+                                    value='{{ person.username }}' />
+
+                                    <label for='add-contrib-project-name'>
+                                        Type a project name
+                                    </label>
+                                    <input id='add-contrib-project-name'
+                                    type='text' name='project_name'/>
+
+                                    <label for='add-contrib-description'>
+                                        Describe your contribution </label>
+                                    <textarea id='add-contrib-description'
+                                        name='description'></textarea>
+
+                                    <label for='contrib-url'>
+                                        Type a related URL </label>
+                                    <input id='contrib-url' type='text' name='url' />
+
+                                    <label></label>
+                                    <input type='submit' id='add-contrib-submit' 
+                                    value='Log it' />
+                                </form>
+                            </div>
+                            {% comment %} }}} {% endcomment %}
+                        </div>
+
                     </div><!-- /# widget -->
 
 {% include 'profile/footer.html' %}

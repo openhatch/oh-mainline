@@ -82,7 +82,7 @@ class ProfileTests(django.test.TestCase):
     def test__add_contribution__web(self):
         # {{{
         username = 'paulproteus'
-        url = 'http://openhatch.org/people/add_contrib?u=%s' % username
+        url = 'http://openhatch.org/people/?u=%s&tab=inv' % username
         tc.go(make_twill_url(url))
         tc.fv('add_contrib', 'project_name', 'Babel')
         tc.fv('add_contrib', 'description', 'msgctxt support')
@@ -92,7 +92,7 @@ class ProfileTests(django.test.TestCase):
         tc.find('Babel')
 
         # Go to old form again
-        url = 'http://openhatch.org/people/add_contrib?u=%s' % username
+        url = 'http://openhatch.org/people/?u=%s&tab=inv' % username
         tc.go(make_twill_url(url))
         tc.fv('add_contrib', 'project_name', 'Baber')
         tc.fv('add_contrib', 'description', 'msgctxt support')

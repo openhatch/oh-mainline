@@ -11,7 +11,6 @@ urlpatterns = patterns('',
         (r'^admin/(.*)', admin.site.root),
         (r'^static/(?P<path>.*)$', 'django.views.static.serve',
             {'document_root': settings.STATIC_DOC_ROOT}),
-        (r'^people/add_contribution$', 'mysite.profile.views.add_contribution_web'),
         (r'^people/$', 'mysite.profile.views.display_person_web'),
         (r'^people/get_data_for_email$', 'mysite.profile.views.get_data_for_email'),
         (r'^people/change_what_like_working_on$',
@@ -24,8 +23,12 @@ urlpatterns = patterns('',
             'mysite.profile.views.make_favorite_project_exp_web'),
         (r'^people/make_favorite_exp_tag$',
             'mysite.profile.views.make_favorite_exp_tag_web'),
+
+        # Add contributions
         (r'^people/add_contrib$',
             'mysite.profile.views.display_person_old'),
+        (r'^people/add_contribution$', 'mysite.profile.views.add_contribution_web'),
+
         (r'^people/sf_projects_by_person$',
             'mysite.profile.views.sf_projects_by_person_web'),
 
