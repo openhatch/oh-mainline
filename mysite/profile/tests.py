@@ -599,6 +599,7 @@ class UnadillaTests(django.test.TestCase):
     # }}}
 
 class TrentonTests(django.test.TestCase):
+    fixtures = ['user-paulproteus']
     '''
     The Trenton milestone says:
     * You can mark an experience as a favorite.
@@ -612,7 +613,7 @@ class TrentonTests(django.test.TestCase):
 
     def test_make_favorite_experience(self):
         # {{{
-        url = 'http://openhatch.org/people/?u=paulproteus'
+        url = 'http://openhatch.org/people/add_contrib?u=paulproteus'
         # Add two experiences
         tc.go(make_twill_url(url))
         tc.fv('add_contrib', 'project_name', 'TrentonProj1')
@@ -621,6 +622,7 @@ class TrentonTests(django.test.TestCase):
         tc.submit()
         tc.find('TrentonProj1')
 
+        tc.go(make_twill_url(url))
         tc.fv('add_contrib', 'project_name', 'TrentonProj2')
         tc.fv('add_contrib', 'url', 'http://example.com')
         tc.fv('add_contrib', 'description', 'OMG totally my fav')
@@ -645,7 +647,7 @@ class TrentonTests(django.test.TestCase):
 
     def test_make_favorite_tag(self):
         # {{{
-        url = 'http://openhatch.org/people/?u=paulproteus'
+        url = 'http://openhatch.org/people/add_contrib?u=paulproteus'
         # Add an experience
         tc.go(make_twill_url(url))
         tc.fv('add_contrib', 'project_name', 'TrentonProj3')
