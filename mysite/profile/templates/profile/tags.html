@@ -31,7 +31,11 @@
             </div>
             <div class='widget'>
                 <h3>looking for volunteering opportunities in:
-                    {{ person.interested_in_working_on }}
+                    {% if interested_in_working_on_list %}
+                    {% for interest in interested_in_working_on_list %}
+                    <a href=''>{{ interest }}</a>,
+                    {% endfor %}
+                    {% endif %}
                 </h3>
             </div>
         </div>
@@ -75,13 +79,8 @@
                 <h3>looking for volunteering opportunities matching these characteristics:
                     <form name='what_you_like_working_on' method='POST' 
                         action='/people/change_what_like_working_on'>
-                        <textarea name='like-working-on'>
-                            {% if interested_in_working_on_list %}
-                            {% for interest in interested_in_working_on_list %}
-                            {{ interest }},
-                            {% endfor %}
-                            {% endif %}
-                        </textarea>
+                        <textarea name='like-working-on'
+                            >{{ person.interested_in_working_on }}</textarea>
                         <input type='hidden' name='username' value='{{ person.username }}' />
                         <input type='submit' value='save'/>
                     </form>
