@@ -293,6 +293,7 @@ class QuebecTests(django.test.TestCase):
     * You can save your profile.
     '''
     # {{{
+    fixtures = ['user-paulproteus', 'cchost-data-imported-from-ohloh']
     def setUp(self):
         twill_setup()
         self.to_be_deleted = []
@@ -327,6 +328,7 @@ class QuebecTests(django.test.TestCase):
                 cchost_among_project_exps = True
                 break
         self.assert_(cchost_among_project_exps)
+
     # }}}
 
 class ExpTag(django.test.TestCase):
@@ -784,4 +786,22 @@ class CambridgeTests(django.test.TestCase):
         for thing in self.delete_me:
             thing.delete()
         self.delete_me = []        
+    # }}}
+
+class PersonTabProjectExpTests(django.test.TestCase):
+    # {{{
+    fixtures = ['user-paulproteus', 'cchost-data-imported-from-ohloh']
+
+    def setUp(self):
+        twill_setup()
+
+    def tearDown(self):
+        twill_teardown()
+
+    def test_project_exp_page_template_displays_project_exp(self):
+        # {{{
+        url = 'http://openhatch.org/people/?u=paulproteus&tab=inv'
+        tc.go(make_twill_url(url))
+        tc.find('ccHost')
+        # }}}
     # }}}

@@ -113,6 +113,50 @@ def profile_data_from_username(username, fetch_ohloh_data = False):
             'exp_taglist_pairs': exp_taglist_pairs } 
     # }}}
 
+def profile_data_from_username_without_ohloh(person):
+    # {{{
+    project_exps = ProjectExp.objects.filter(person=person)
+    projects = [project_exp.project for project_exp in project_exps]
+
+    pairs_of_Projects_and_their_Tags = []
+    for project in projects:
+        tags = Link_Project_Tag.objects.filter(project=project)
+        pairs_of_Projects_and_their_Tags = (project, tags)
+
+    # pairs_of_Projects_and_their_Tags now looks like this:
+    # [
+    #   (Project, list of Tags ),
+    #   (Project, list of Tags ),
+    #   ...
+    # [
+
+    pairs_of_ProjectExps_and_their_Tags = []
+    for project_exp in project_exps:
+        tag_links = Link_ProjectExp_Tag.objects.filter(project_exp=project_exp)
+        for link in tag_links:
+            if link.favorite:
+                link.tag.prefix = 'Favorite: ' # FIXME: evil hack, will fix later
+            else:
+                link.tag.prefix = ''
+        pairs_of_ProjectExps_and_their_Tags (exp, [link.tag for link in tag_links])
+
+    # pairs_of_ProjectExps_and_their_Tags now looks like this
+    # [
+    #   (Project, list of Tags ),
+    #   (Project, list of Tags ),
+    #   ...
+    # [
+
+    interested_in_working_on_list = re.split(r', ',person.interested_in_working_on)
+
+    return {
+            'person': person,
+            'interested_in_working_on_list': interested_in_working_on_list, 
+            'pairs_of_Projects_and_their_Tags': pairs_of_Projects_and_their_Tags,
+            'pairs_of_ProjectExps_and_their_Tags': exp_taglist_pairs
+            } 
+    # }}}
+
 def display_person_web(request, input_username=None):
     if input_username is None:
         input_username = request.GET.get('u', None)

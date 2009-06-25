@@ -8,6 +8,38 @@
                                 <!-- {{{ -->
                                 <h3>participation log:</h3>
                                 <ul>
+                                    {{ pairs_of_Projects_and_their_Tags }}
+                                    {% if exp_taglist_pairs %}
+                                    regroup exp_taglist_pairs by project_name
+                                    <li>
+                                    <!-- {{{ -->
+                                    <div class='project-escutcheon'>
+                                        <div class='logo'>
+                                            <img src='/static/images/icons/projects/f-spot-100px.png' /></div>
+                                        <div class='name'>f-spot</div>
+                                    </div>
+                                    <ul class='contrib-descriptions'>
+                                        <li>
+                                        Submitted 3 patches (all committed)
+                                        <img src='/static/images/icons/Add.png' alt='show more'
+                                        class='show-more-link'>
+                                        <div class='more description'>pretty l33t hax0ring</div>
+                                        <div class='more urls'>
+                                            <a href=''>http://launchpad.net/</a>
+                                        </div>
+                                        <div class='more phrases'>
+                                            <a href=''>i18n</a>,
+                                            <a href=''>translation into french</a>
+                                        </div>
+                                        </li>
+                                        <li>Translated 10 features into Italian
+                                        <img src='/static/images/icons/Add.png' alt='show more'
+                                        class='show-more-link'>
+                                        </li>
+                                    </ul>
+                                    <!-- }}} -->
+                                    </li>
+                                    {% endif %}
                                     <li>
                                     <!-- {{{ -->
                                     <div class='project-escutcheon'>
