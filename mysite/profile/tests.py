@@ -601,7 +601,7 @@ class UnadillaTests(django.test.TestCase):
     # }}}
 
 class TrentonTests(django.test.TestCase):
-    fixtures = ['user-paulproteus']
+    fixtures = ['user-paulproteus', 'trenton-fixtures']
     '''
     The Trenton milestone says:
     * You can mark an experience as a favorite.
