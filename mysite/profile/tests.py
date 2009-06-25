@@ -619,19 +619,9 @@ class TrentonTests(django.test.TestCase):
 
         tc.go(make_twill_url(url))
 
-        #FIXME: Create a fixture so that there are two experiences.
-        # Add two experiences
-        tc.fv('add_contrib', 'project_name', 'TrentonProj1')
-        tc.fv('add_contrib', 'url', 'http://example.com')
-        tc.fv('add_contrib', 'description', 'Not my favorite')
-        tc.submit()
-        tc.find('TrentonProj1')
-
-        tc.fv('add_contrib', 'project_name', 'TrentonProj2')
-        tc.fv('add_contrib', 'url', 'http://example.com')
-        tc.fv('add_contrib', 'description', 'OMG totally my fav')
-        tc.submit()
-        tc.find('TrentonProj2')
+        # Verify neither is a favorite right now
+        tc.notfind('Favorite: TrentonProj1')
+        tc.notfind('Favorite: TrentonProj2')
 
         # Make the last one a favorite
         desired = None
@@ -645,6 +635,8 @@ class TrentonTests(django.test.TestCase):
         tc.fv(desired.name, 'exp_id', desired.get_value('exp_id'))
         tc.submit()
 
+        # Verify that the last one has become a favorite
+        tc.notfind('Favorite: TrentonProj1')
         tc.find('Favorite: TrentonProj2')
         # }}}
 
