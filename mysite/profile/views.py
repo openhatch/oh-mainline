@@ -1,5 +1,6 @@
 # vim: ai ts=4 sts=4 et sw=4
 
+# Imports {{{
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
 from django.shortcuts import render_to_response, get_object_or_404
 from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag, Link_Project_Tag, Link_SF_Proj_Dude_FM
@@ -8,6 +9,7 @@ import StringIO
 import datetime
 import urllib
 import simplejson
+# }}}
 
 # Add a contribution {{{
 
@@ -46,6 +48,7 @@ def add_contribution(username, project_name, url='', description=''):
 
 # }}}
 
+# Scraper {{{
 def exp_scraper_display_input_form(request, notification=None):
     return render_to_response('profile/exp_scraper_input_form.html', {
         'notification': notification})
@@ -72,6 +75,7 @@ def exp_scraper_scrape(person):
     person.fetch_contrib_data_from_ohloh()
     person.save()
     # }}}
+# }}}
 
 # Display profile {{{
 def profile_data_from_username(username):
