@@ -8,15 +8,15 @@
                                 <!-- {{{ -->
                                 <h3>participation log:</h3>
                                 <ul>
-                                    {{ pairs_of_Projects_and_their_Tags }}
-                                    {% if exp_taglist_pairs %}
-                                    regroup exp_taglist_pairs by project_name
+                                    {% if pairs_of_Projects_and_their_Tags %}
+                                    <!--regroup pairs_of_Projects_and_their_Tags by project_name-->
+                                    {% for project, tags in pairs_of_Projects_and_their_Tags %}
                                     <li>
                                     <!-- {{{ -->
                                     <div class='project-escutcheon'>
                                         <div class='logo'>
-                                            <img src='/static/images/icons/projects/f-spot-100px.png' /></div>
-                                        <div class='name'>f-spot</div>
+                                            <img src='project' src=''/></div>
+                                        <div class='name'>{{ project.name }}</div>
                                     </div>
                                     <ul class='contrib-descriptions'>
                                         <li>
@@ -39,6 +39,7 @@
                                     </ul>
                                     <!-- }}} -->
                                     </li>
+                                    {% endfor %}
                                     {% endif %}
                                     <li>
                                     <!-- {{{ -->

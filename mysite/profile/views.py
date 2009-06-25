@@ -113,7 +113,8 @@ def profile_data_from_username(username, fetch_ohloh_data = False):
             'exp_taglist_pairs': exp_taglist_pairs } 
     # }}}
 
-def profile_data_from_username_without_ohloh(person):
+def data_for_person_display_without_ohloh(person):
+    "This replaces profile_data_from_username"
     # {{{
     project_exps = ProjectExp.objects.filter(person=person)
     projects = [project_exp.project for project_exp in project_exps]
@@ -121,14 +122,14 @@ def profile_data_from_username_without_ohloh(person):
     pairs_of_Projects_and_their_Tags = []
     for project in projects:
         tags = Link_Project_Tag.objects.filter(project=project)
-        pairs_of_Projects_and_their_Tags = (project, tags)
+        pairs_of_Projects_and_their_Tags.append((project, tags))
 
     # pairs_of_Projects_and_their_Tags now looks like this:
     # [
     #   (Project, list of Tags ),
     #   (Project, list of Tags ),
     #   ...
-    # [
+    # ]
 
     pairs_of_ProjectExps_and_their_Tags = []
     for project_exp in project_exps:
@@ -138,22 +139,24 @@ def profile_data_from_username_without_ohloh(person):
                 link.tag.prefix = 'Favorite: ' # FIXME: evil hack, will fix later
             else:
                 link.tag.prefix = ''
-        pairs_of_ProjectExps_and_their_Tags (exp, [link.tag for link in tag_links])
+        project_Tags = [link.tag for link in tag_links]
+        pairs_of_ProjectExps_and_their_Tags.append(
+                (project_exp, tags))
 
     # pairs_of_ProjectExps_and_their_Tags now looks like this
     # [
     #   (Project, list of Tags ),
     #   (Project, list of Tags ),
     #   ...
-    # [
+    # ]
 
-    interested_in_working_on_list = re.split(r', ',person.interested_in_working_on)
+    interested_in_working_on_list = re.split(r', ', person.interested_in_working_on)
 
     return {
             'person': person,
             'interested_in_working_on_list': interested_in_working_on_list, 
             'pairs_of_Projects_and_their_Tags': pairs_of_Projects_and_their_Tags,
-            'pairs_of_ProjectExps_and_their_Tags': exp_taglist_pairs
+            'pairs_of_ProjectExps_and_their_Tags': pairs_of_ProjectExps_and_their_Tags
             } 
     # }}}
 
@@ -172,7 +175,7 @@ def display_person_web(request, input_username=None):
 def display_person(person, tab):
     # {{{
 
-    data_dict = profile_data_from_username(person.username)
+    data_dict = data_for_person_display_without_ohloh(person)
 
     if tab == 'inv':
         return render_to_response('profile/participation.html', data_dict)
