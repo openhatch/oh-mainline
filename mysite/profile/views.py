@@ -8,6 +8,7 @@ import StringIO
 import datetime
 import urllib
 import simplejson
+import re
 
 # Add a contribution {{{
 
@@ -104,7 +105,9 @@ def profile_data_from_username(username, fetch_ohloh_data = False):
 
     exp_taglist_pairs = exps_to_tags.items()
 
-    return { 'person': person, 'exp_taglist_pairs': exp_taglist_pairs } 
+    interested_in_working_on_list = re.split(r'(\s*),(\s*)',person.interested_in_working_on)
+
+    return { 'person': person, 'interested_in_working_on_list': interested_in_working_on_list, 'exp_taglist_pairs': exp_taglist_pairs } 
     # }}}
 
 def display_person_web(request, input_username=None):
