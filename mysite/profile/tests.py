@@ -615,16 +615,18 @@ class TrentonTests(django.test.TestCase):
 
     def test_make_favorite_experience(self):
         # {{{
-        url = 'http://openhatch.org/people/add_contrib?u=paulproteus'
-        # Add two experiences
+        url = 'http://openhatch.org/people/?u=paulproteus&tab=inv'
+
         tc.go(make_twill_url(url))
+
+        #FIXME: Create a fixture so that there are two experiences.
+        # Add two experiences
         tc.fv('add_contrib', 'project_name', 'TrentonProj1')
         tc.fv('add_contrib', 'url', 'http://example.com')
         tc.fv('add_contrib', 'description', 'Not my favorite')
         tc.submit()
         tc.find('TrentonProj1')
 
-        tc.go(make_twill_url(url))
         tc.fv('add_contrib', 'project_name', 'TrentonProj2')
         tc.fv('add_contrib', 'url', 'http://example.com')
         tc.fv('add_contrib', 'description', 'OMG totally my fav')
@@ -643,13 +645,12 @@ class TrentonTests(django.test.TestCase):
         tc.fv(desired.name, 'exp_id', desired.get_value('exp_id'))
         tc.submit()
 
-        tc.go(make_twill_url(url))
         tc.find('Favorite: TrentonProj2')
         # }}}
 
     def test_make_favorite_tag(self):
         # {{{
-        url = 'http://openhatch.org/people/add_contrib?u=paulproteus'
+        url = 'http://openhatch.org/people/?u=paulproteus&tab=inv'
         # Add an experience
         tc.go(make_twill_url(url))
         tc.fv('add_contrib', 'project_name', 'TrentonProj3')
