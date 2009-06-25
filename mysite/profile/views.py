@@ -50,7 +50,7 @@ def exp_scraper_display_input_form(request, notification=None):
     return render_to_response('profile/exp_scraper_input_form.html', {
         'notification': notification})
 
-def exp_scraper_check_input_and_scrape(request):
+def exp_scraper_scrape_web(request):
     # Check input
     input_username = request.GET.get('u', None)
     if input_username is None:
@@ -59,7 +59,9 @@ def exp_scraper_check_input_and_scrape(request):
     # FIXME: get or get_or_create?
     exp_scraper_scrape(Person.objects.get(username=input_username))
 
-    return display_person(request, input_username)
+    person = Person.objects.get(username=input_username)
+
+    return display_person(person, "main")
 
 def exp_scraper_scrape(person):
 
@@ -112,7 +114,7 @@ def display_person_web(request, input_username=None):
 
     return display_person(input_username, tab)
 
-def display_person(username, tab):
+def display_person(person, tab):
     # {{{
 
     data_dict = profile_data_from_username(username)
