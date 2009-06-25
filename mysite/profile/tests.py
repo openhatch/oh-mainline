@@ -572,6 +572,7 @@ class ExpTag(django.test.TestCase):
     # }}}
 
 class UnadillaTests(django.test.TestCase):
+    fixtures = ['user-paulproteus']
     """
     The Unadilla milestone says:
     * You can write what you're interested in working on
@@ -579,12 +580,11 @@ class UnadillaTests(django.test.TestCase):
     # {{{
     def setUp(self):
         self.sample_person = Person(username='stipe')
-        self.sample_person = Person(username='stipe')
+        self.sample_person.save()
         twill_setup()
 
     def tearDown(self):
         self.sample_person.delete()
-        self.sample_tag 
         twill_teardown()
 
     def testEnterWhatYouLikeWorkingOn(self):
