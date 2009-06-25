@@ -29,6 +29,13 @@
                     <a href=''>furries</a>
                 </h3>
             </div>
+            <div class='widget'>
+                <h3>looking for volunteering opportunities in:
+                    <a href=''>python</a>,
+                    <a href=''>c++</a>,
+                    <a href=''>javascript</a>
+                </h3>
+            </div>
         </div>
         <div id='right'>
             <div class='widget'>
@@ -38,7 +45,7 @@
                 </h3>
             </div>
             <div class='widget'>
-                <h3>teaches:
+                <h3>can mentor in:
                     <a href=''>lanyard swinging</a>,
                     <a href=''>django</a>
                 </h3>
@@ -51,7 +58,7 @@
         <!-- {{{ -->
         <div id='left'>
             <div class='widget'>
-                <h3>groks:
+                <h3>understands:
                     <form name='form_tags_groks'>
                         <textarea name='tags_groks'>screen scraping, boar hunting, base jumping, python, c++, smalltalk, javascript, COBOL, delphi, ajax</textarea>
                         <input type='submit' value='save'/>
@@ -59,9 +66,19 @@
                 </h3>
             </div>
             <div class='widget'>
-                <h3>will never grok:
+                <h3>will never understand:
                     <form name='form_tags_groks'>
                         <textarea name='tags_groks'>academia, furries</textarea>
+                        <input type='submit' value='save'/>
+                    </form>
+                </h3>
+            </div>
+            <div class='widget'>
+                <h3>looking for volunteering opportunities matching these characteristics:
+                    <form name='what_you_like_working_on' method='POST' 
+                        action='/people/change_what_like_working_on'>
+                        <textarea name='like-working-on'>smalltalk, javascript, COBOL, delphi, ajax</textarea>
+                        <input type='text' name='username' />
                         <input type='submit' value='save'/>
                     </form>
                 </h3>
@@ -69,7 +86,7 @@
         </div>
         <div id='right'>
             <div class='widget'>
-                <h3>would like to learn about:
+                <h3>currently studying:
                     <form name='form_tags_groks'>
                         <textarea name='tags_seeks_knowledge_in'>screen scraping, boar hunting, base jumping, python, c++, smalltalk, javascript, COBOL, delphi, ajax</textarea>
                         <input type='submit' value='save'/>
