@@ -387,7 +387,7 @@ def change_what_like_working_on_web(request):
     username = request.POST.get('username')
     new_like = request.POST.get('like-working-on')
     person = change_what_like_working_on(username, new_like)
-    return display_person_redirect(username)
+    return HttpResponseRedirect('/people/?' + urllib.urlencode({'u': username, 'tab': 'tags'}))
 
 def display_person_redirect(username):
     return HttpResponseRedirect('/people/?' + urllib.urlencode({'u': username}))
