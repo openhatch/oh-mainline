@@ -48,7 +48,7 @@ def add_contribution(username, project_name, url='', description=''):
 
 # }}}
 
-# Scraper {{{
+# Experience scraper {{{
 def exp_scraper_display_input_form(request, notification=None):
     return render_to_response('profile/exp_scraper_input_form.html', {
         'notification': notification})
