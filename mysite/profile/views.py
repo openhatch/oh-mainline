@@ -117,7 +117,7 @@ def display_person_web(request, input_username=None):
 def display_person(person, tab):
     # {{{
 
-    data_dict = profile_data_from_username(username)
+    data_dict = profile_data_from_username(person)
 
     if tab == 'inv':
         return render_to_response('profile/participation.html', data_dict)
