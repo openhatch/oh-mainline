@@ -573,12 +573,11 @@ class UnadillaTests(django.test.TestCase):
     # {{{
     def setUp(self):
         self.sample_person = Person(username='stipe')
-        self.sample_person = Person(username='stipe')
+        self.sample_person.save()
         twill_setup()
 
     def tearDown(self):
         self.sample_person.delete()
-        self.sample_tag 
         twill_teardown()
 
     def testEnterWhatYouLikeWorkingOn(self):
