@@ -572,16 +572,21 @@ class UnadillaTests(django.test.TestCase):
     """
     # {{{
     def setUp(self):
+        self.sample_person = Person(username='stipe')
+        self.sample_person = Person(username='stipe')
         twill_setup()
 
     def tearDown(self):
+        self.sample_person.delete()
+        self.sample_tag 
         twill_teardown()
 
     def testEnterWhatYouLikeWorkingOn(self):
         # {{{
-        url = 'http://openhatch.org/people/?u=paulproteus&tab=tags&edit=1'
+        url = 'http://openhatch.org/people/?u=paulproteus&tab=tags'
         tc.go(make_twill_url(url))
         tc.fv('what_you_like_working_on', 'like-working-on', 'barbies')
+        tc.fv('what_you_like_working_on', 'username', 'paulproteus')
         tc.submit()
         tc.find('barbies')
         
