@@ -572,12 +572,12 @@ class ExpTag(django.test.TestCase):
     # }}}
 
 class UnadillaTests(django.test.TestCase):
-    fixtures = ['user-paulproteus']
     """
     The Unadilla milestone says:
     * You can write what you're interested in working on
     """
     # {{{
+    fixtures = ['user-paulproteus']
     def setUp(self):
         self.sample_person = Person(username='stipe')
         self.sample_person.save()
