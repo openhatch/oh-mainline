@@ -55,7 +55,7 @@
     </div>
 
     <div id='taglines'>
-        <!-- {{{ -->
+ j       <!-- {{{ -->
         <div id='left'>
             <div class='widget'>
                 <h3>understands:
@@ -78,7 +78,7 @@
                     <form name='what_you_like_working_on' method='POST' 
                         action='/people/change_what_like_working_on'>
                         <textarea name='like-working-on'>smalltalk, javascript, COBOL, delphi, ajax</textarea>
-                        <input type='text' name='username' />
+                        <input type='hidden' name='username' value='{{ person.username }}' />
                         <input type='submit' value='save'/>
                     </form>
                 </h3>
