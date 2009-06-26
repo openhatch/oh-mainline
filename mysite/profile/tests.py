@@ -1025,7 +1025,7 @@ class CeleryTests(django.test.TestCase):
         self.assertContains(response, 'ccHost')
 
     def test_slow_loading_via_emulated_bgtask(self,
-                                              cooked_data=True):
+                                              use_cooked_data=True):
         username='paulproteus'
         url = '/people/show_all_data_for_person'
         
@@ -1039,18 +1039,19 @@ class CeleryTests(django.test.TestCase):
         self.assertNotContains(response, 'ccHost')
 
         # do the background load ourselves
-        if cooked_data:
-            ohloh_results = [{'man_months': 1, 'project': u'ccHost',
+        if use_cooked_data:
+            cooked_data = [{'man_months': 1, 'project': u'ccHost',
             'project_homepage_url': 
             u'http://wiki.creativecommons.org/CcHost',
             'primary_language': u'shell script'}]
         else:
-            # via Ohloh API
-            import ohloh
-            oh = ohloh.get_ohloh()
-            ohloh_results = oh.get_contribution_info_by_username(username)
+            cooked_data=None
+
+        # Instantiate the task
+        from tasks import FetchPersonDataFromOhloh
+        task = FetchPersonDataFromOhloh()
+        task.run(username, cooked_data=cooked_data)
 
         # always
-        profile.views.exp_scraper_handle_ohloh_results(username, ohloh_results)
         response = Client().get(url, good_input)
         self.assertContains(response, 'ccHost')
