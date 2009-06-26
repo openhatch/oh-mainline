@@ -140,13 +140,12 @@ class OmanTests(django.test.TestCase):
     def tearDown(self):
         twill_teardown()
 
-    def testFormEnterYourUsername(self):
+    def test_slurper_accepts_username(self):
         # {{{
-        url = 'http://openhatch.org/people/add_contrib'
+        url = 'http://openhatch.org/people/exp_scraper'
         tc.go(make_twill_url(url))
         tc.fv('enter_free_software_username', 'u', 'paulproteus')
         tc.submit()
-        tc.go(make_twill_url(url) + '?u=paulproteus')
 
         tc.find('ccHost')
         # }}}
