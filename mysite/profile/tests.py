@@ -999,3 +999,29 @@ class PersonInvolvementTests(django.test.TestCase):
         # }}}
 
     # }}}
+
+from profile.tasks import MyTask
+import time
+class CeleryTests(django.test.TestCase):
+    fixtures = ['user-paulproteus']
+    
+    def test_celery(self):
+        username='paulproteus'
+        url = '/people/show_all_data_for_person'
+        
+        good_input = {
+            'u': username,
+            'nobgtask': 'yes',
+            }
+        
+        response = Client().get(url, good_input)
+        self.assertContains(response, 'paulproteus')
+        return
+        
+        result = MyTask.delay("do_something", some_arg="foo bar baz")
+        self.assert_(not result.ready())
+        # Synchronously start the celery daemon
+        time.sleep(1)
+        self.assert_(result.ready())
+        self.assert_(result.successful())
+        self.assertEqual(result.result, 42)

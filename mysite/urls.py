@@ -58,6 +58,8 @@ urlpatterns = patterns('',
             'mysite.profile.views.xp_slurper_display_input_form'),
         (r'^people/xp_slurp_do$',
             'mysite.profile.views.exp_scraper_scrape_web'),
+        (r'^people/show_all_data_for_person$',
+            'mysite.profile.views.exp_scraper_display_for_person_web'),
 
         # Get a list of suggestions for the search input, formatted the way that
         # the jQuery autocomplete plugin wants it.

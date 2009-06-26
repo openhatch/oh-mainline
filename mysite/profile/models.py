@@ -194,10 +194,12 @@ class Link_Person_Tag(models.Model):
 
 class SourceForgePerson(models.Model):
     '''A person in SourceForge.'''
+    # FIXME: Make this unique
     username = models.CharField(max_length=200)
 
 class SourceForgeProject(models.Model):
     '''A project in SourceForge.'''
+    # FIXME: Make this unique
     unixname = models.CharField(max_length=200)
 
 

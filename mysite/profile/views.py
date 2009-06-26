@@ -738,4 +738,27 @@ def project_icon_web(request, project_name):
     url = project_icon_url(project_name)
     return HttpResponseRedirect(url)
 
+def exp_scraper_display_for_person_web(request):
+    username = request.GET.get('u', None)
+    nobgtask_s = request.GET.get('nobgtask', 'False')
+
+    involved_projects = []
+    
+    try:
+        nobgtask = bool(nobgtask_s)
+    except ValueError:
+        nobgtask = False
+    
+    if username is None:
+        return HttpResponseServerError()
+
+    # get the person
+    person = get_object_or_404(Person, username=username)
+
+    # Find the existing ProjectExps
+    project_exps = ProjectExp.objects.filter(person=person)
+    involved_projects.extend([exp.project.name for exp in project_exps])
+
+    return HttpResponse(person.username)
+
 # }}}
