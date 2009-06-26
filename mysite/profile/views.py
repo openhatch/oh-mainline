@@ -456,7 +456,8 @@ def change_what_like_working_on_web(request):
     return HttpResponseRedirect('/people/?' + urllib.urlencode({'u': username, 'tab': 'tags'}))
     # }}}
 
-def display_person_redirect(username):
+def DISABLE_display_person_redirect(username):
+    # {{{
     return HttpResponseRedirect('/people/?' + urllib.urlencode({'u': username}))
     # }}}
 
