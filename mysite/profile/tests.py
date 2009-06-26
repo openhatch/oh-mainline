@@ -253,14 +253,14 @@ class PerthTests(django.test.TestCase):
         twill_teardown()
 
     def testFormEnterYourEmail(self):
-        url = 'http://openhatch.org/xp_slurp'
+        url = 'http://openhatch.org/people/xp_slurp'
         tc.go(make_twill_url(url))
         tc.fv('enter_free_software_email', 'email', 'paulproteus.ohloh@asheesh.org')
         tc.submit()
         tc.find('ccHost')
 
     def testFormDoesntBlowUpForNoMatch(self):
-        url = 'http://openhatch.org/xp_slurp'
+        url = 'http://openhatch.org/people/xp_slurp'
         tc.go(make_twill_url(url))
         tc.fv('enter_free_software_email', 'email', 'asheesh@asheesh.org')
         tc.submit()
