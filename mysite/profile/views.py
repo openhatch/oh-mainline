@@ -28,9 +28,8 @@ def add_project_exp_web(request):
     else:
         notif = "Er, like, bad input: {project_name: %s, username: %s}" % (
                 project_name, username)
-
-    if format == 'json':
-        return HttpResponse(simplejson.dumps([{'notification': notif}]))
+        if format == 'json':
+            return HttpResponse(simplejson.dumps([{'notification': notif}]))
 
     data = profile_data_from_username(username)
     data['notification'] = notif
@@ -43,13 +42,16 @@ add_contribution_web = add_project_exp_web
 def add_contribution(username, project_name, url='', description=''):
     # {{{
     pass
-    # }}}
+# }}}
 
 # }}}
 
+# XP slurper {{{
 def exp_scraper_display_input_form(request, notification=None):
+    # {{{
     return render_to_response('profile/exp_scraper_input_form.html', {
         'notification': notification})
+    # }}}
 
 def exp_scraper_scrape_web(request):
     # {{{
@@ -57,7 +59,7 @@ def exp_scraper_scrape_web(request):
     input_username = request.GET.get('u', None)
     if input_username is None:
         return exp_scraper_display_input_form(request, "Please enter a username.")
-    
+
     # FIXME: get or get_or_create?
     exp_scraper_scrape(Person.objects.get(username=input_username))
 
@@ -73,6 +75,7 @@ def exp_scraper_scrape(person):
     person.fetch_contrib_data_from_ohloh()
     person.save()
     # }}}
+# }}}
 
 # Display profile {{{
 def profile_data_from_username(username, fetch_ohloh_data = False):
