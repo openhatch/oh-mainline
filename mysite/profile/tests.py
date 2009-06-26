@@ -703,8 +703,10 @@ class AnchorageTests(django.test.TestCase):
     # {{{
 
     def test__exp_scraper_input_form(self):
-        response = self.client.get('/people/exp_scraper')
-        self.assertContains(response, "exp_scraper_input_form")
+        response = self.client.get('/people/xp_slurp')
+        # FIXME: Check the actual template instead of
+        # using a check string.
+        self.assertContains(response, "[xp_slurper]")
 
     def test__exp_scraper_fails_without_username(self):
 
@@ -712,7 +714,7 @@ class AnchorageTests(django.test.TestCase):
         # to scraper input form with a notification.
         self.assertContains(
                 self.client.get(
-                    '/people/exp_scrape_do'), 
+                    '/people/xp_slurp'), 
                 "Please enter a username.")
 
     # }}}
