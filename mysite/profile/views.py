@@ -253,7 +253,7 @@ def list_debtags_of_project(project_name):
         return []
 
     resluts = list(Link_Project_Tag.objects.filter(project=project,
-                                                   tag__tag_type=debtags))
+        tag__tag_type=debtags))
     return [link.tag.text for link in resluts]
     # }}}
 
