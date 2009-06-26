@@ -454,12 +454,14 @@ def change_what_like_working_on_web(request):
     new_like = request.POST.get('like-working-on')
     person = change_what_like_working_on(username, new_like)
     return HttpResponseRedirect('/people/?' + urllib.urlencode({'u': username, 'tab': 'tags'}))
+    # }}}
 
 def display_person_redirect(username):
     return HttpResponseRedirect('/people/?' + urllib.urlencode({'u': username}))
     # }}}
 
 def make_favorite_project_exp(exp_id_obj):
+    # {{{
     if exp_id_obj is None:
         return
     exp_id = int(exp_id_obj)
