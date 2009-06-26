@@ -394,15 +394,15 @@ class ExpTag(django.test.TestCase):
     
         person, person_created = Person.objects.get_or_create(
                 username=username)
-        if person_created: print "Person %s was created" % person
+        #if person_created: print "Person %s was created" % person
 
         project, project_created = Project.objects.get_or_create(
                 name=project_name)
-        if project_created: print "Project %s was created" % project
+        #if project_created: print "Project %s was created" % project
 
         project_exp, proj_exp_created = ProjectExp.objects.get_or_create(
                 person=person, project=project)
-        if proj_exp_created: print "ProjectExp %s was created" % project_exp
+        #if proj_exp_created: print "ProjectExp %s was created" % project_exp
 
         profile.views.add_tag_to_project_exp(username, project_name, tag_text)
         # Verify it worked

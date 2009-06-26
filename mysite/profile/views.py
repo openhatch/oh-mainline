@@ -118,45 +118,59 @@ def data_for_person_display_without_ohloh(person):
     # {{{
     project_exps = ProjectExp.objects.filter(person=person)
     projects = [project_exp.project for project_exp in project_exps]
-
-    pairs_of_Projects_and_their_Tags = []
+    projects_extended = {}
     for project in projects:
-        tags = Link_Project_Tag.objects.filter(project=project)
-        pairs_of_Projects_and_their_Tags.append((project, tags))
+        exps_with_this_project = ProjectExp.objects.filter(
+                person=person, project=project)
+        exps_with_this_project_extended = {}
+        for exp in exps_with_this_project:
+            tag_links = Link_ProjectExp_Tag.objects.filter(project_exp=exp)
+            tags_for_this_exp = [link.tag for link in tag_links]
+            exps_with_this_project_extended[exp] = {
+                    'tags': tags_for_this_exp}
+            tags_for_this_project = Link_Project_Tag.objects.filter(
+                    project=project)
+            projects_extended[project] = {
+                    'tags': tags_for_this_project,
+                    'experiences': exps_with_this_project_extended}
 
-    # pairs_of_Projects_and_their_Tags now looks like this:
-    # [
-    #   (Project, list of Tags ),
-    #   (Project, list of Tags ),
-    #   ...
-    # ]
+            # projects_extended now looks like this:
+    # {
+    #   Project: {
+    #       'tags': [Tag, Tag, ...],
+    #       'experiences': {
+    #               ProjectExp: [Tag, Tag, ...],
+    #               ProjectExp: [Tag, Tag, ...],
+    #               ...
+    #           }
+    #   },
+    #   Project: {
+    #       'tags': [Tag, Tag, ...],
+    #       'experiences': {
+    #               ProjectExp: [Tag, Tag, ...],
+    #               ProjectExp: [Tag, Tag, ...],
+    #               ...
+    #           }
+    #   }
+    # }
 
-    pairs_of_ProjectExps_and_their_Tags = []
-    for project_exp in project_exps:
-        tag_links = Link_ProjectExp_Tag.objects.filter(project_exp=project_exp)
-        for link in tag_links:
+    # Asheesh's evil hack
+    for exp in project_exps:
+        links = Link_ProjectExp_Tag.objects.filter(project_exp=exp)
+        for link in links:
             if link.favorite:
                 link.tag.prefix = 'Favorite: ' # FIXME: evil hack, will fix later
             else:
                 link.tag.prefix = ''
-        project_Tags = [link.tag for link in tag_links]
-        pairs_of_ProjectExps_and_their_Tags.append(
-                (project_exp, tags))
-
-    # pairs_of_ProjectExps_and_their_Tags now looks like this
-    # [
-    #   (Project, list of Tags ),
-    #   (Project, list of Tags ),
-    #   ...
-    # ]
 
     interested_in_working_on_list = re.split(r', ', person.interested_in_working_on)
+
+    # Tell person templates about
 
     return {
             'person': person,
             'interested_in_working_on_list': interested_in_working_on_list, 
-            'pairs_of_Projects_and_their_Tags': pairs_of_Projects_and_their_Tags,
-            'pairs_of_ProjectExps_and_their_Tags': pairs_of_ProjectExps_and_their_Tags
+            'projects': projects_extended,
             } 
     # }}}
 
@@ -345,8 +359,8 @@ def add_tag_to_project_exp(username, project_name,
         tag=tag, project_exp=project_exp))
     if not old_links:
         new_link = Link_ProjectExp_Tag.objects.create(
-            tag=tag, project_exp=project_exp)
-    # FIXME: Move to Link_ProjectExp_Tag.create_from_strings
+                tag=tag, project_exp=project_exp)
+        # FIXME: Move to Link_ProjectExp_Tag.create_from_strings
     # }}}
 
 def project_exp_tag__remove(username, project_name,
@@ -453,14 +467,15 @@ def make_favorite_project_exp_web(request):
     exp_id = request.POST.get('exp_id', None)
     username = request.POST.get('username', '')
     make_favorite_project_exp(exp_id)
-    return HttpResponseRedirect('/people/?' + urllib.urlencode({'u': username}))
+    return HttpResponseRedirect('/people/?' + urllib.urlencode(
+        {'u': username, 'tab': 'inv'}))
 
 def make_favorite_tag(exp_id_obj, tag_text):
     if exp_id_obj is None:
         return
     exp_id = int(exp_id_obj)
     desired_tag = Link_ProjectExp_Tag.objects.get(project_exp__id=exp_id,
-                                                  tag__text=tag_text)
+            tag__text=tag_text)
     desired_tag.favorite = True
     desired_tag.save()
     return
@@ -478,9 +493,9 @@ def sf_projects_by_person_web(request):
         return HttpResponseServerError()
 
     projects = Link_SF_Proj_Dude_FM.objects.filter(
-        person__username=sf_username).all()
+            person__username=sf_username).all()
     project_names = [p.project.unixname for p in projects]
     return HttpResponse('\n'.join(project_names))
-    
+
 
 # }}}
