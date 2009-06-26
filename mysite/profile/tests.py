@@ -1055,3 +1055,34 @@ class CeleryTests(django.test.TestCase):
         # always
         response = Client().get(url, good_input)
         self.assertContains(response, 'ccHost')
+
+    def test_slow_loading_via_emulated_bg_user_project(self):
+        username='paulproteus'
+        url = '/people/show_all_data_for_person'
+        
+        good_input = {
+            'u': username,
+            'nobgtask': 'yes',
+            }
+       
+        response = Client().get(url, good_input)
+        self.assertContains(response, 'paulproteus')
+        self.assertNotContains(response, 'ccHost')
+
+        from tasks import FetchPersonDataFromOhlohGivenProject
+        # Instantiate the task - but first try to find
+        # unrelated info
+        task = FetchPersonDataFromOhlohGivenProject()
+        task.run(username=username, project='zoph')
+
+        response = Client().get(url, good_input)
+        self.assertContains(response, 'paulproteus')
+        self.assertNotContains(response, 'ccHost')
+
+        # Now do it right
+        task = FetchPersonDataFromOhlohGivenProject()
+        task.run(username=username, project='ccHost')
+
+        # finally, we should see ccHost
+        response = Client().get(url, good_input)
+        self.assertContains(response, 'ccHost')        
