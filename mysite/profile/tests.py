@@ -1085,4 +1085,8 @@ class CeleryTests(django.test.TestCase):
 
         # finally, we should see ccHost
         response = Client().get(url, good_input)
-        self.assertContains(response, 'ccHost')        
+        self.assertContains(response, 'ccHost')
+
+# FIXME: One day, stub out the background jobs with mocks
+# that ensure we actually call them!
+        
