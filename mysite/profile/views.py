@@ -759,6 +759,6 @@ def exp_scraper_display_for_person_web(request):
     project_exps = ProjectExp.objects.filter(person=person)
     involved_projects.extend([exp.project.name for exp in project_exps])
 
-    return HttpResponse(person.username)
+    return HttpResponse(person.username + '\n'.join(involved_projects))
 
 # }}}

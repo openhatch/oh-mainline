@@ -1002,7 +1002,8 @@ class PersonInvolvementTests(django.test.TestCase):
 
 import time
 class CeleryTests(django.test.TestCase):
-    fixtures = ['user-paulproteus']
+    fixtures = ['user-paulproteus',
+                'cchost-data-imported-from-ohloh']
     
     def test_celery(self):
         username='paulproteus'
@@ -1015,6 +1016,7 @@ class CeleryTests(django.test.TestCase):
         
         response = Client().get(url, good_input)
         self.assertContains(response, 'paulproteus')
+        self.assertContains(response, 'ccHost')
         return
         
         result = MyTask.delay("do_something", some_arg="foo bar baz")
