@@ -1000,7 +1000,6 @@ class PersonInvolvementTests(django.test.TestCase):
 
     # }}}
 
-from profile.tasks import MyTask
 import time
 class CeleryTests(django.test.TestCase):
     fixtures = ['user-paulproteus']
