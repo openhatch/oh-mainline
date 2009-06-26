@@ -1001,11 +1001,11 @@ class PersonInvolvementTests(django.test.TestCase):
     # }}}
 
 import time
+from django.core import management
 class CeleryTests(django.test.TestCase):
-    fixtures = ['user-paulproteus',
-                'cchost-data-imported-from-ohloh']
+    fixtures = ['user-paulproteus']
     
-    def test_celery(self):
+    def test_slow_loading_via_fixture(self):
         username='paulproteus'
         url = '/people/show_all_data_for_person'
         
@@ -1016,13 +1016,31 @@ class CeleryTests(django.test.TestCase):
         
         response = Client().get(url, good_input)
         self.assertContains(response, 'paulproteus')
+        self.assertNotContains(response, 'ccHost')
+
+        # load the fixture now
+        management.call_command('loaddata',
+                                'cchost-data-imported-from-ohloh', verbosity=0)
+        response = Client().get(url, good_input)
         self.assertContains(response, 'ccHost')
-        return
+
+    def test_slow_loading_via_emulated_bgtask(self):
+        username='paulproteus'
+        url = '/people/show_all_data_for_person'
         
-        result = MyTask.delay("do_something", some_arg="foo bar baz")
-        self.assert_(not result.ready())
-        # Synchronously start the celery daemon
-        time.sleep(1)
-        self.assert_(result.ready())
-        self.assert_(result.successful())
-        self.assertEqual(result.result, 42)
+        good_input = {
+            'u': username,
+            'nobgtask': 'yes',
+            }
+        
+        response = Client().get(url, good_input)
+        self.assertContains(response, 'paulproteus')
+        self.assertNotContains(response, 'ccHost')
+
+        # do the background load ourselves via Ohloh API
+        import ohloh
+        oh = ohloh.get_ohloh()
+        ohloh_results = oh.get_contribution_info_by_username(username)
+        profile.views.exp_scraper_handle_ohloh_results(username, ohloh_results)
+        response = Client().get(url, good_input)
+        self.assertContains(response, 'ccHost')

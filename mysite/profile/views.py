@@ -761,4 +761,19 @@ def exp_scraper_display_for_person_web(request):
 
     return HttpResponse(person.username + '\n'.join(involved_projects))
 
+def exp_scraper_handle_ohloh_results(username, ohloh_results):
+    '''Input: A sequence of Ohloh ContributorInfo dicts.
+    Side-effect: Create matching structures in the DB.'''
+    person = Person.objects.get(username=username)
+    for c_i in ohloh_results:
+        for ohloh_contrib_info in ohloh_results:
+            exp = ProjectExp()
+            exp.person = person
+            exp = exp.from_ohloh_contrib_info(ohloh_contrib_info)
+            exp.last_polled = datetime.datetime.now()
+            exp.last_touched = datetime.datetime.now()
+            exp.save()
+        person.last_polled = datetime.datetime.now()
+        person.save()
+
 # }}}
