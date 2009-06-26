@@ -207,7 +207,6 @@ def display_person(person, tab):
 
 def display_person_old(request, input_username=None):
     # {{{
-
     if input_username is None:
         input_username = request.GET.get('u', None)
         if input_username is None:
@@ -216,7 +215,6 @@ def display_person_old(request, input_username=None):
     data_dict = profile_data_from_username(input_username, fetch_ohloh_data = True)
 
     return render_to_response('profile/profile.html', data_dict)
-
     # }}}
 
 # }}}
@@ -238,7 +236,7 @@ def add_one_debtag_to_project(project_name, tag_text):
             source='Debtags')
     new_link.save()
     return new_link
-    # }}}
+# }}}
 
 def list_debtags_of_project(project_name):
     # {{{
@@ -247,7 +245,7 @@ def list_debtags_of_project(project_name):
         debtags = debtags_list[0]
     else:
         return []
-    
+
     project_list = list(Project.objects.filter(name=project_name))
     if project_list:
         project = project_list[0]
