@@ -32,7 +32,7 @@ urlpatterns = patterns('',
         (r'^people/sf_projects_by_person$',
             'mysite.profile.views.sf_projects_by_person_web'),
 
-        # Experience scraper
+        # Experience slurper
         (r'^people/xp_slurp$',
             'mysite.profile.views.xp_slurper_display_input_form'),
         (r'^people/xp_slurp_do$',

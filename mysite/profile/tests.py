@@ -601,12 +601,14 @@ class UnadillaTests(django.test.TestCase):
     # }}}
 
 class TrentonTests(django.test.TestCase):
-    fixtures = ['user-paulproteus']
     '''
     The Trenton milestone says:
     * You can mark an experience as a favorite.
     '''
     # {{{
+
+    fixtures = ['user-paulproteus']
+
     def setUp(self):
         twill_setup()
 
@@ -702,21 +704,25 @@ class TrentonTests(django.test.TestCase):
 class AnchorageTests(django.test.TestCase):
     # {{{
 
-    def test__exp_scraper_input_form(self):
-        response = self.client.get('/people/xp_slurp')
+    def setUp(self):
+        twill_setup()
+
+    def tearDown(self):
+        twill_teardown()
+
+    def test_xp_slurper_input_form(self):
+        url = 'http://openhatch.org/people/xp_slurp'
+        tc.go(make_twill_url(url))
         # FIXME: Check the actual template instead of
         # using a check string.
-        self.assertContains(response, "[xp_slurper]")
+        tc.find("[xp_slurper]")
 
-    def test__exp_scraper_fails_without_username(self):
-
+    def test_xp_slurper_fails_without_username(self):
         # If no username entered, user is returned
         # to scraper input form with a notification.
-        self.assertContains(
-                self.client.get(
-                    '/people/xp_slurp'), 
-                "Please enter a username.")
-
+        url = 'http://openhatch.org/people/xp_slurp_do'
+        tc.go(make_twill_url(url))
+        tc.find("Please enter a username.")
     # }}}
 
 class CambridgeTests(django.test.TestCase):

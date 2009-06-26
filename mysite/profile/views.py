@@ -47,23 +47,27 @@ def add_contribution(username, project_name, url='', description=''):
 
 # }}}
 
-def xp_slurper_display_input_form(request, notification=None):
-    return render_to_response('profile/xp_slurper.html', {
-        'notification': notification})
+def xp_slurper_display_input_form(request):
+    notification = None
+    error = request.GET.get('error', None)
+    if error == 'missing_username':
+        notification = "Please enter a username."
+    return render_to_response('profile/xp_slurper.html', {'notification': notification})
 
 def exp_scraper_scrape_web(request):
     # {{{
     # Check input
     input_username = request.GET.get('u', None)
-    if input_username is None:
-        return exp_scraper_display_input_form(request, "Please enter a username.")
+    if input_username is None or input_username == '':
+        return HttpResponseRedirect('xp_slurp?' + urllib.urlencode(
+            {'error': 'missing_username'}))
     
-    Person.objects.get_or_create(username=input_username)
-    exp_scraper_scrape()
+    person, _ = Person.objects.get_or_create(username=input_username)
 
-    person = Person.objects.get(username=input_username)
+    exp_scraper_scrape(person)
 
-    return display_person(person, "main")
+    return HttpResponseRedirect('/people/?' + urllib.urlencode(
+        {'u': username, 'tab': 'main'}))
     # }}}
 
 def exp_scraper_scrape(person):
