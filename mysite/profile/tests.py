@@ -257,6 +257,7 @@ class PerthTests(django.test.TestCase):
         tc.go(make_twill_url(url))
         tc.fv('enter_free_software_email', 'email', 'paulproteus.ohloh@asheesh.org')
         tc.submit()
+        tc.follow('involvement')
         tc.find('ccHost')
 
     def testFormDoesntBlowUpForNoMatch(self):
@@ -264,6 +265,7 @@ class PerthTests(django.test.TestCase):
         tc.go(make_twill_url(url))
         tc.fv('enter_free_software_email', 'email', 'asheesh@asheesh.org')
         tc.submit()
+        tc.follow('involvement')
         tc.find('playerpiano')
     # }}}
 
