@@ -292,13 +292,15 @@ def get_data_for_email(request):
         from_ohloh = oh.get_contribution_info_by_email(email)
         for data in from_ohloh:
             person, created = Person.objects.get_or_create(
-                username=username) # FIXME: Later we'll have to be
-                                   # able to merge user objects
+                    username=username)
+            # FIXME: Later we'll have to be
+            # able to merge user objects
             pe = ProjectExp(person=person)
             pe.from_ohloh_contrib_info(data)
             pe.save()
-    return HttpResponseRedirect('/people/?' + urllib.urlencode({'u':
-                                                                username}))
+    request_GET = {'u': username}
+    query_str = "?" + urllib.urlencode(request_GET)
+    return HttpResponseRedirect('/people/%s' % query_str)
     # }}}
 
 # }}}
@@ -315,7 +317,7 @@ def add_tag_to_project_exp_web(request):
     format = request.POST.get('format', 'html')
 
     useful_tags = filter(None, map(lambda s: s.strip(),
-                           big_tag_text.split(',')))
+        big_tag_text.split(',')))
 
     # Validate data
     if not username or not project_name or not big_tag_text:
@@ -325,10 +327,13 @@ def add_tag_to_project_exp_web(request):
         # Great, we have all we need:
         add_tag_to_project_exp(username, project_name, tag_text)
     notification = "You tagged %s's experience with %s as %s" % (
-        username, project_name, ','.join(useful_tags))
-    return HttpResponseRedirect('/people/?' +
-                                urllib.urlencode({'u': username,
-                                                  'notification': notification}))
+            username, project_name, ','.join(useful_tags))
+    request_GET = {
+            'u': username,
+            'notification': notification
+            }
+    query_str = "?" + urllib.urlencode(request_GET)
+    return HttpResponseRedirect('/people/%s' % query_str)
     # }}}
 
 # FIXME: rename to project_exp_tag__add
@@ -367,7 +372,6 @@ def add_tag_to_project_exp(username, project_name,
 def project_exp_tag__remove(username, project_name,
         tag_text, tag_type_name='user_generated'):
     # {{{
-
     # FIXME: Maybe don't actually delete, but merely disable (e.g. deleted=yes),
     # in case we want to run stats on what tags people are deleting, etc.
     tag_link = Link_ProjectExp_Tag.get_from_strings(username, project_name, tag_text)
@@ -394,7 +398,7 @@ def project_exp_tag__remove__web(request):
         # Verify project with that name exists
         if Project.objects.filter(name=project_name).count() == 0:
             errors.append("No project found with name: %s" % project_name)
-        
+
         # Verify tag with that text exists
         if Tag.objects.filter(text=tag_text).count() == 0:
             errors.append("No project found with name: %s" % project_name)
@@ -463,15 +467,19 @@ def make_favorite_project_exp(exp_id_obj):
     desired_pe.favorite = True
     desired_pe.save()
     return
+    # }}}
 
 def make_favorite_project_exp_web(request):
+    # {{{
     exp_id = request.POST.get('exp_id', None)
     username = request.POST.get('username', '')
     make_favorite_project_exp(exp_id)
     return HttpResponseRedirect('/people/?' + urllib.urlencode(
         {'u': username, 'tab': 'inv'}))
+    # }}}
 
 def make_favorite_tag(exp_id_obj, tag_text):
+    # {{{
     if exp_id_obj is None:
         return
     exp_id = int(exp_id_obj)
@@ -480,15 +488,19 @@ def make_favorite_tag(exp_id_obj, tag_text):
     desired_tag.favorite = True
     desired_tag.save()
     return
+    # }}}
 
 def make_favorite_exp_tag_web(request):
+    # {{{
     exp_id = request.POST.get('exp_id', None)
     tag_text = request.POST.get('tag_text', None)
     username = request.POST.get('username', None)
     make_favorite_tag(exp_id, tag_text)
     return HttpResponseRedirect('/people/?' + urllib.urlencode({'u': username}))
+    # }}}
 
 def sf_projects_by_person_web(request):
+    # {{{
     sf_username = request.GET.get('u', None)
     if sf_username is None:
         return HttpResponseServerError()
@@ -497,6 +509,6 @@ def sf_projects_by_person_web(request):
             person__username=sf_username).all()
     project_names = [p.project.unixname for p in projects]
     return HttpResponse('\n'.join(project_names))
-
+    # }}}
 
 # }}}
