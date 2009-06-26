@@ -58,8 +58,8 @@ def exp_scraper_scrape_web(request):
     if input_username is None:
         return exp_scraper_display_input_form(request, "Please enter a username.")
     
-    # FIXME: get or get_or_create?
-    exp_scraper_scrape(Person.objects.get(username=input_username))
+    Person.objects.get_or_create(username=input_username)
+    exp_scraper_scrape()
 
     person = Person.objects.get(username=input_username)
 
