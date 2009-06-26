@@ -33,9 +33,9 @@ urlpatterns = patterns('',
             'mysite.profile.views.sf_projects_by_person_web'),
 
         # Experience scraper
-        (r'^people/exp_scraper$',
-            'mysite.profile.views.exp_scraper_display_input_form'),
-        (r'^people/exp_scrape_do$',
+        (r'^people/xp_slurp$',
+            'mysite.profile.views.xp_slurper_display_input_form'),
+        (r'^people/xp_slurp_do$',
             'mysite.profile.views.exp_scraper_scrape_web'),
 
         # Get a list of suggestions for the search input, formatted the way that

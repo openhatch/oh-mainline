@@ -47,8 +47,8 @@ def add_contribution(username, project_name, url='', description=''):
 
 # }}}
 
-def exp_scraper_display_input_form(request, notification=None):
-    return render_to_response('profile/exp_scraper_input_form.html', {
+def xp_slurper_display_input_form(request, notification=None):
+    return render_to_response('profile/xp_slurper.html', {
         'notification': notification})
 
 def exp_scraper_scrape_web(request):
