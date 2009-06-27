@@ -817,7 +817,7 @@ class PersonTabProjectExpTests(django.test.TestCase):
 
     def test_project_exp_page_template_displays_project_exp(self):
         # {{{
-        url = 'http://openhatch.org/people/?u=paulproteus&tab=inv'
+        url = 'http://openhatch.org/people/paulproteus?tab=inv'
         tc.go(make_twill_url(url))
         tc.find('ccHost')
         # }}}
