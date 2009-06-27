@@ -12,7 +12,6 @@ urlpatterns = patterns('',
         (r'^static/(?P<path>.*)$', 'django.views.static.serve',
             {'document_root': settings.STATIC_DOC_ROOT}),
         (r'^people/$', 'mysite.profile.views.display_person_web'),
-        (r'^people/(?P<input_username>.*)$', 'mysite.profile.views.display_person_web'),
         (r'^people/get_data_for_email$', 'mysite.profile.views.get_data_for_email'),
         (r'^people/change_what_like_working_on$',
             'mysite.profile.views.change_what_like_working_on_web'),
@@ -42,6 +41,10 @@ urlpatterns = patterns('',
         # Get a list of suggestions for the search input, formatted the way that
         # the jQuery autocomplete plugin wants it.
         (r'^search/get_suggestions$', 'mysite.search.views.request_jquery_autocompletion_suggestions'),
+
+        # This dangerous regex is last
+        (r'^people/(?P<input_username>.*)$', 'mysite.profile.views.display_person_web'),
+
         )
 
 # vim: set ai ts=4 sts=4 et sw=4:
