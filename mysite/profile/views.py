@@ -446,7 +446,7 @@ import tempfile
 def project_icon_url(project_name, actually_fetch = True):
     project_hash = _project_hash(project_name)
     # Check for static path for project icons
-    project_icons_root = os.path.join(os.getcwd(), 'static', 'project-icons')
+    project_icons_root = os.path.join('static', 'project-icons')
     # If no such directory exists, make it
     if not os.path.exists(project_icons_root):
         os.makedirs(project_icons_root)
@@ -474,5 +474,9 @@ def project_icon_url(project_name, actually_fetch = True):
 
     return '/' + project_icon_path
     # FIXME: One day, add cache expiry.
+
+def project_icon_web(request, project_name):
+    url = project_icon_url(project_name)
+    return HttpResponseRedirect(url)
 
 # }}}

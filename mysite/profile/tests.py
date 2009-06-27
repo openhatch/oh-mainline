@@ -741,6 +741,28 @@ class OhlohIconTests(django.test.TestCase):
         self.assert_(os.path.exists(path))
         os.unlink(path)
 
+
+    def test_project_image_link(self):
+        # First, delete the project icon
+        url = profile.views.project_icon_url('f-spot',
+                                             actually_fetch=False)
+        path = url[1:] # strip leading '/'
+        if os.path.exists(path):
+            os.unlink(path)
+
+        # Then retrieve (slowly) this URL that redirects to the image
+        go_to_url = '/people/project_icon/f-spot'
+        
+        response = Client().get(go_to_url)
+        # Assure ourselves that we were redirected to the above URL...
+        self.assertEqual(response['Location'], 'http://testserver' + url)
+        # and that the file exists on disk
+
+        self.assert_(os.path.exists(path))
+
+        # Remove it so the test has no side-effects
+        os.unlink(path)
+
 class AnchorageTests(django.test.TestCase):
     # {{{
 
