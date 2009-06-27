@@ -41,26 +41,17 @@ def twill_quiet():
 
 class ProfileTests(django.test.TestCase):
     # {{{
+    fixtures = ['user-paulproteus', 'cchost-data-imported-from-ohloh']
     def setUp(self):
         twill_setup()
-        self.sample_person = Person(username='stipe')
-        self.sample_person.save()
-        self.sample_project = Project(name='automatic')
-        self.sample_project.save()
 
     def tearDown(self):
         twill_teardown()
-        self.sample_person.delete()
-        self.sample_project.delete()
 
     def testSlash(self):
         response = self.client.get('/people/')
 
     def test__add_contribution(self):
-        username = 'paulproteus'
-        url = 'http://openhatch.org/people/?u=%s' % username
-        tc.go(make_twill_url(url))
-
         username = 'paulproteus'
         project_name = 'seeseehost'
         description = 'did some work'
@@ -81,22 +72,26 @@ class ProfileTests(django.test.TestCase):
 
     def test__add_contribution__web(self):
         # {{{
+        url_prefix = "http://openhatch.org"
         username = 'paulproteus'
-        url = 'http://openhatch.org/people/?u=%s&tab=inv' % username
+        person = Person.objects.get(username=username)
+        first_exp = ProjectExp.objects.filter(person=person)[0]
+        url = '%s/people.contribs.edit/?u=%s&projectexp.pk=%d' % (
+                url_prefix, username, first_exp.pk)
         tc.go(make_twill_url(url))
-        tc.fv('add_contrib', 'project_name', 'Babel')
-        tc.fv('add_contrib', 'description', 'msgctxt support')
-        tc.fv('add_contrib', 'url', 'http://babel.edgewall.org/ticket/54')
+
+        tc.fv('edit_contrib', 'project_name', 'Babel')
+        tc.fv('edit_contrib', 'description', 'msgctxt support')
+        tc.fv('edit_contrib', 'url', 'http://babel.edgewall.org/ticket/54')
         tc.submit()
 
         tc.find('Babel')
 
         # Go to old form again
-        url = 'http://openhatch.org/people/?u=%s&tab=inv' % username
         tc.go(make_twill_url(url))
-        tc.fv('add_contrib', 'project_name', 'Baber')
-        tc.fv('add_contrib', 'description', 'msgctxt support')
-        tc.fv('add_contrib', 'url', 'http://babel.edgewall.org/ticket/54')
+        tc.fv('edit_contrib', 'project_name', 'Baber')
+        tc.fv('edit_contrib', 'description', 'msgctxt support')
+        tc.fv('edit_contrib', 'url', 'http://babel.edgewall.org/ticket/54')
         tc.submit()
 
         # Verify that leaving and coming back has it still
