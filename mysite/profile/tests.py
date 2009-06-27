@@ -728,6 +728,19 @@ class OhlohIconTests(django.test.TestCase):
         self.assert_(os.path.exists(path))
         os.unlink(path)
 
+    def test_given_project_generate_internal_url_for_proj_fail(self):
+        # First, delete the project icon
+        url = profile.views.project_icon_url('lolnomatzch',
+                                             actually_fetch=False)
+        path = url[1:] # strip leading '/'
+        if os.path.exists(path):
+            os.unlink(path)
+
+        # Download the icon
+        url = profile.views.project_icon_url('lolnomatzch')
+        self.assert_(os.path.exists(path))
+        os.unlink(path)
+
 class AnchorageTests(django.test.TestCase):
     # {{{
 
