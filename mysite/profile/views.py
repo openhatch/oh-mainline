@@ -126,7 +126,7 @@ def exp_scraper_scrape_web(request):
     exp_scraper_scrape(person)
 
     return HttpResponseRedirect('/people/?' + urllib.urlencode(
-        {'u': username, 'tab': 'main'}))
+        {'u': input_username, 'tab': 'main'}))
     # }}}
 
 def exp_scraper_scrape(person):

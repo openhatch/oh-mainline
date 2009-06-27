@@ -130,6 +130,7 @@ class ProfileTests(django.test.TestCase):
 
 class OmanTests(django.test.TestCase):
     # {{{
+    fixtures = ['user-paulproteus', 'cchost-data-imported-from-ohloh']
     def setUp(self):
         twill_setup()
 
@@ -138,11 +139,12 @@ class OmanTests(django.test.TestCase):
 
     def test_slurper_accepts_username(self):
         # {{{
-        url = 'http://openhatch.org/people/exp_scraper'
+        url = 'http://openhatch.org/people/xp_slurp'
         tc.go(make_twill_url(url))
         tc.fv('enter_free_software_username', 'u', 'paulproteus')
         tc.submit()
 
+        tc.follow('involvement')
         tc.find('ccHost')
         # }}}
     # }}}
