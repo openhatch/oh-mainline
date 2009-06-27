@@ -699,6 +699,7 @@ class TrentonTests(django.test.TestCase):
         # }}}
     # }}}
 
+import os
 class OhlohIconTests(django.test.TestCase):
     '''Test that we can grab icons from Ohloh.'''
     def test_given_project_find_icon(self):
@@ -714,6 +715,18 @@ class OhlohIconTests(django.test.TestCase):
         import ohloh
         oh = ohloh.get_ohloh()
         self.assertRaises(ValueError, oh.get_icon_for_project, 'lolnomatxh')
+
+    def test_given_project_generate_internal_url(self):
+        # First, delete the project icon
+        url = profile.views.project_icon_url('f-spot', actually_fetch=False)
+        path = url[1:] # strip leading '/'
+        if os.path.exists(path):
+            os.unlink(path)
+
+        # Download the icon
+        url = profile.views.project_icon_url('f-spot')
+        self.assert_(os.path.exists(path))
+        os.unlink(path)
 
 class AnchorageTests(django.test.TestCase):
     # {{{

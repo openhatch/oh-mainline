@@ -198,7 +198,6 @@ class Ohloh(object):
         if '/bits.ohloh.net/' not in med_logo:
             med_logo = med_logo.replace('attachments/',
                                         'bits.ohloh.net/attachments/')
-        print med_logo
         b = mechanize_get(med_logo)
         return b.response().read()
         
