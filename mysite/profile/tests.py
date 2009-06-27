@@ -58,7 +58,7 @@ class ProfileTests(django.test.TestCase):
 
     def test__add_contribution(self):
         username = 'paulproteus'
-        url = 'http://openhatch.org/people/?u=%s' % username
+        url = 'http://openhatch.org/people/%s' % username
         tc.go(make_twill_url(url))
 
         username = 'paulproteus'
