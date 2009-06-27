@@ -710,6 +710,11 @@ class OhlohIconTests(django.test.TestCase):
         image = Image.open(icon_fd)
         self.assertEqual(image.size, (64, 64))
 
+    def test_given_project_find_icon_failure(self):
+        import ohloh
+        oh = ohloh.get_ohloh()
+        self.assertRaises(ValueError, oh.get_icon_for_project, 'lolnomatxh')
+
 class AnchorageTests(django.test.TestCase):
     # {{{
 

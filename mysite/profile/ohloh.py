@@ -190,7 +190,10 @@ class Ohloh(object):
         return ret
 
     def get_icon_for_project(self, project):
-        data = self.project_id2projectdata(project_name=project)
+        try:
+            data = self.project_id2projectdata(project_name=project)
+        except urllib2.HTTPError, e:
+            raise ValueError
         med_logo = data['medium_logo_url']
         if '/bits.ohloh.net/' not in med_logo:
             med_logo = med_logo.replace('attachments/',
