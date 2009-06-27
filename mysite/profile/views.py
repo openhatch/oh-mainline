@@ -14,7 +14,18 @@ import re
 
 # Add a contribution {{{
 
-def add_project_exp_web(request):
+def display_edit_project_exp_form(request):
+    # {{{
+    username = request.POST.get('u', None)
+    project_name = request.POST.get('project_name', '')
+    description = request.POST.get('description', '')
+    url = request.POST.get('url', '')
+    alteration_type = request.POST.get('alteration_type', 'add')
+
+    return render_to_response('profile/templates/profiles/people.contribs.edit')
+    # }}}
+
+def project_exp_insert_web(request):
     # {{{
     username = request.POST.get('u', '')
     project_name = request.POST.get('project_name', '')
@@ -22,29 +33,58 @@ def add_project_exp_web(request):
     url = request.POST.get('url', '')
     format = request.POST.get('format', 'html')
 
-    notif = ''
+    notification = ''
     if username and project_name and description and url:
         ProjectExp.create_from_text(username, project_name, description, url)
-        notif = "Added experience with %s to %s's profile." % (
-                project_name, username)
+        notification = "Added %s's experience with %s." % (
+                username, project_name)
     else:
-        notif = "Er, like, bad input: {project_name: %s, username: %s}" % (
-                project_name, username)
+        notification = "Unexpectedly imperfect input: {username: %s, project_name: %s}" % (
+                username, project_name)
         if format == 'json':
-            return HttpResponse(simplejson.dumps([{'notification': notif}]))
+            dictionary = {'notification': notification}
+            return HttpResponse(simplejson.dumps([dictionary]))
 
     data = profile_data_from_username(username)
-    data['notification'] = notif
+    data['notification'] = notification
 
     return HttpResponseRedirect('/people/?' +
             urllib.urlencode({'u': username, 'tab': 'inv'}))
     #}}}
 add_contribution_web = add_project_exp_web
 
-def add_contribution(username, project_name, url='', description=''):
+def project_exp_update_web(request):
     # {{{
+    username = request.POST.get('u', '')
+    project_name = request.POST.get('project_name', '')
+    description = request.POST.get('description', '')
+    url = request.POST.get('url', '')
+    format = request.POST.get('format', 'html')
+
+    notification = ''
+    if username and project_name and description and url:
+        exp = ProjectExp.get_from_strings(username, project_name)
+        exp.description = description
+        exp.url = url
+        exp.save()
+        notification = "Updated %s's experience with %s." % (
+                username, project_name)
+    else:
+        notification = "Unexpectedly imperfect input: {project_name: %s, username: %s}" % (
+                project_name, username)
+        if format == 'json':
+            dict = {'notification': notification}
+            return HttpResponse(simplejson.dumps([dict]))
+
+    data = profile_data_from_username(username)
+    data['notification'] = notification
+
+    return HttpResponseRedirect('/people/?' +
+            urllib.urlencode({'u': username, 'tab': 'inv'}))
+    # }}}
+
+def add_contribution(username, project_name, url='', description=''):
     pass
-# }}}
 
 # }}}
 
