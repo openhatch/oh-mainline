@@ -699,6 +699,18 @@ class TrentonTests(django.test.TestCase):
         # }}}
     # }}}
 
+class OhlohIconTests(django.test.TestCase):
+    '''Test that we can grab icons from Ohloh.'''
+    def test_given_project_find_icon(self):
+        import ohloh
+        oh = ohloh.get_ohloh()
+        icon = oh.get_icon_for_project('f-spot')
+        icon_fd = StringIO.StringIO(icon)
+        from PIL import Image
+        image = Image.open(icon_fd)
+        self.assertEqual(image.size, (64, 64))
+        
+
 class AnchorageTests(django.test.TestCase):
     # {{{
 
