@@ -36,8 +36,8 @@ def add_project_exp_web(request):
     data = profile_data_from_username(username)
     data['notification'] = notif
 
-    return HttpResponseRedirect('/people/?' +
-            urllib.urlencode({'u': username, 'tab': 'inv'}))
+    return HttpResponseRedirect('/people/%s?' % urllib.quote(username) +
+            urllib.urlencode({'tab': 'inv'}))
     #}}}
 add_contribution_web = add_project_exp_web
 
