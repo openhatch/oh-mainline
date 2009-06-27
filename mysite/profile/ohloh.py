@@ -199,7 +199,7 @@ class Ohloh(object):
             med_logo = med_logo.replace('attachments/',
                                         'bits.ohloh.net/attachments/')
         print med_logo
-        b = mechanize_get(med_logo, referrer='https://ohloh.net/p/%s' % project)
+        b = mechanize_get(med_logo)
         return b.response().read()
         
 
