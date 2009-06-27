@@ -1,29 +1,31 @@
 {% include 'profile/header.global.html' %}
 {% include 'profile/header.html' %}
 
-    <div>
+    <!-- Begin template: profile/template/profile/people.contribs.edit.html -->
+
         {% comment %} Edit project experience {{{ {% endcomment %}
-        <div class='box'>
-            <h3>Edit project experience</h3>
+        <div class='box' id='edit-contribution'>
+            <h3>Edit contribution</h3>
             <form id='edit-contrib' name='edit_contrib'
-                method='POST' action='/people.contribs.edit.do'>
+                method='POST' action='/people.contribs.{{ alteration_type }}.do'>
 
                 <input type='hidden' name='u'
                 value='{{ person.username }}' />
 
                 <label for='add-contrib-project-name'>
-                    Type a project name
+                    Type a project name:
                 </label>
                 <input id='add-contrib-project-name'
                 type='text' name='project_name'/>
 
                 <label for='add-contrib-description'>
-                    Describe your contribution </label>
+                    Describe your contribution:</label>
                 <textarea id='add-contrib-description'
                     name='description'></textarea>
 
                 <label for='contrib-url'>
-                    Type a related URL </label>
+                    Type a related URL (a link to a patch attached to
+                    an email on a mailing list):</label>
                 <input id='contrib-url' type='text' name='url' />
 
                 <label></label>
@@ -32,6 +34,5 @@
             </form>
         </div>
         {% comment %} }}} {% endcomment %}
-    </div>
 
 {% include 'profile/footer.html' %}

@@ -16,13 +16,23 @@ import re
 
 def display_edit_project_exp_form(request):
     # {{{
-    username = request.POST.get('u', None)
-    project_name = request.POST.get('project_name', '')
-    description = request.POST.get('description', '')
-    url = request.POST.get('url', '')
-    alteration_type = request.POST.get('alteration_type', 'add')
+    username = request.GET.get('u', None)
+    project_name = request.GET.get('project_name', '')
+    description = request.GET.get('description', '')
+    url = request.GET.get('url', '')
+    alteration_type = request.GET.get('alteration_type', 'add')
 
-    return render_to_response('profile/templates/profiles/people.contribs.edit')
+    if username is not None:
+        return render_to_response('profile/people.contribs.edit.html', {
+            'person': Person.objects.get(username=username),
+            'project_name': project_name,
+            'description': description,
+            'url': url,
+            'alteration_type': alteration_type
+            })
+    else:
+        return render_to_response('profile/error.html', {
+            'message': 'Please enter a username.'})
     # }}}
 
 def project_exp_insert_web(request):
@@ -51,7 +61,7 @@ def project_exp_insert_web(request):
     return HttpResponseRedirect('/people/?' +
             urllib.urlencode({'u': username, 'tab': 'inv'}))
     #}}}
-add_contribution_web = add_project_exp_web
+add_contribution_web = project_exp_insert_web
 
 def project_exp_update_web(request):
     # {{{
@@ -63,7 +73,11 @@ def project_exp_update_web(request):
 
     notification = ''
     if username and project_name and description and url:
-        exp = ProjectExp.get_from_strings(username, project_name)
+        person = Person.objects.get(username=username)
+        project, _ = Project.objects.get_or_create(name=project_name)
+        exp, _ = ProjectExp.objects.get_or_create(
+                person=person,
+                project=project)
         exp.description = description
         exp.url = url
         exp.save()

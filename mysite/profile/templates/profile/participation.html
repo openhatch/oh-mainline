@@ -60,17 +60,13 @@
                     {% endcomment %}
                     </li>
                     {% endfor %}
-                    <li>Translated 10 features into Italian
-                    {% comment %}
-                    <img src='/static/images/icons/Add.png' alt='show more'
-                    class='show-more-link'>
-                    {% endcomment %}
-                    </li>
                 </ul>
                 <!-- }}} -->
                 </li>
                 {% endfor %}
                 {% endif %}
+                <a href='/people.contribs.edit?u={{ person.username }}&amp;alteration_type=insert'>Add a contribution</a>
+                {% comment %}
                 <li>
                 <!-- {{{ -->
                 <div class='project-escutcheon'>
@@ -187,6 +183,7 @@
                 </ul>
                 <!-- }}} -->
                 </li>
+                {% endcomment %}
             </ul>
             <!-- }}} -->
         </div><!-- /#portfolio -->

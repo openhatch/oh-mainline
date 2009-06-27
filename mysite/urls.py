@@ -30,7 +30,7 @@ urlpatterns = patterns('',
         (r'^people/add_contribution$', 'mysite.profile.views.add_contribution_web'),
 
         (r'^people.contribs.edit$', 'mysite.profile.views.display_edit_project_exp_form'),
-        (r'^people.contribs.edit$', 'mysite.profile.views.add_project_exp_web'),
+        (r'^people.contribs.edit.do$', 'mysite.profile.views.project_exp_update_web'),
 
         (r'^people/sf_projects_by_person$',
             'mysite.profile.views.sf_projects_by_person_web'),

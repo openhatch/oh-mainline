@@ -729,7 +729,7 @@ class AnchorageTests(django.test.TestCase):
         # to scraper input form with a notification.
         url = 'http://openhatch.org/people/xp_slurp_do'
         tc.go(make_twill_url(url))
-        tc.find("Please enter a username.")
+        tc.find("[error:missing_username]")
     # }}}
 
 class CambridgeTests(django.test.TestCase):
@@ -828,9 +828,10 @@ class PersonUpdateProjectExpsTests(django.test.TestCase):
         username = 'paulproteus'
         project_name = 'ccHost'
         description = 'fiddlesticks'
-        url = url_prefix + '/people.contribs.edit/' + urllib.urlencode({
+        url = url_prefix + '/people.contribs.edit?' + urllib.urlencode({
             'u': username, 'project_name': project_name})
         tc.go(make_twill_url(url))
+        tc.find('Edit contribution')
         tc.fv('edit_contrib', 'description', description)
         tc.fv('edit_contrib', 'url', url)
         tc.submit()

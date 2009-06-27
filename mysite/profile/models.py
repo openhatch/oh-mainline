@@ -122,6 +122,7 @@ class ProjectExp(models.Model):
                 person=Person.objects.get(username=username),
                 project=Project.objects.get(name=project_name),
                 )
+    get_from_strings = get_from_text
 
     def save(self, *args, **kwargs):
         if self.time_record_was_created is None:
