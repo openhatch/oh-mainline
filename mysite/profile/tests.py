@@ -15,6 +15,7 @@ from django.test import TestCase
 from django.core.servers.basehttp import AdminMediaHandler
 from django.core.handlers.wsgi import WSGIHandler
 from StringIO import StringIO
+import urllib
 
 from django.test.client import Client
 # }}}
@@ -815,5 +816,25 @@ class PersonTabProjectExpTests(django.test.TestCase):
         url = 'http://openhatch.org/people/?u=paulproteus&tab=inv'
         tc.go(make_twill_url(url))
         tc.find('ccHost')
+        # }}}
+    # }}}
+
+class PersonUpdateProjectExpsTests(django.test.TestCase):
+    # {{{
+    fixtures = ['user-paulproteus', 'cchost-data-imported-from-ohloh']
+    def test_project_exp_update_web(self):
+        # {{{
+        url_prefix = 'http://openhatch.org'
+        username = 'paulproteus'
+        project_name = 'ccHost'
+        description = 'fiddlesticks'
+        url = url_prefix + '/people.contribs.edit/' + urllib.urlencode({
+            'u': username, 'project_name': project_name})
+        tc.go(make_twill_url(url))
+        tc.fv('edit_contrib', 'description', description)
+        tc.fv('edit_contrib', 'url', url)
+        tc.submit()
+        tc.find(description)
+        tc.find(url)
         # }}}
     # }}}
