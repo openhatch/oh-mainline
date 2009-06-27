@@ -16,11 +16,16 @@ from typecheck import Any as __
 
 API_KEY='0cWqe4uPw7b8Q5337ybPQ' # "Oman testing"
 
-def mechanize_get(url):
+def mechanize_get(url, referrer=None):
     b = mechanize.Browser()
     b.set_handle_robots(False)
-    b.addheaders = [('User-Agent',
+    addheaders = [('User-Agent',
                      'Mozilla/4.0 (compatible; MSIE 5.0; Windows 98; (compatible;))')]
+    if referrer is not None:
+        b.set_handle_referer(False)
+        addheaders.extend([('Referer',
+                           referrer)])
+    b.addheaders = addheaders
     b.open(url)
     return b
 
@@ -57,9 +62,12 @@ def ohloh_url2data(url, selector, params = {}, many = False):
     return b.geturl(), None
 
 class Ohloh(object):
-    @accepts(object, int)
-    def project_id2projectdata(self, project_id):
-        url = 'http://www.ohloh.net/projects/%d.xml?' % project_id
+    def project_id2projectdata(self, project_id=None, project_name=None):
+        if project_name is None:
+            project_query = str(int(project_id))
+        else:
+            project_query = str(project_name)
+        url = 'http://www.ohloh.net/projects/%s.xml?' % project_query
         url, data = ohloh_url2data(url, 'result/project')
         return data
     
@@ -180,6 +188,17 @@ class Ohloh(object):
             ret.append(this)
 
         return ret
+
+    def get_icon_for_project(self, project):
+        data = self.project_id2projectdata(project_name=project)
+        med_logo = data['medium_logo_url']
+        if '/bits.ohloh.net/' not in med_logo:
+            med_logo = med_logo.replace('attachments/',
+                                        'bits.ohloh.net/attachments/')
+        print med_logo
+        b = mechanize_get(med_logo, referrer='https://ohloh.net/p/%s' % project)
+        return b.response().read()
+        
 
 _ohloh = Ohloh()
 def get_ohloh():

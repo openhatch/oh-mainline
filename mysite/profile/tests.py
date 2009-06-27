@@ -705,11 +705,10 @@ class OhlohIconTests(django.test.TestCase):
         import ohloh
         oh = ohloh.get_ohloh()
         icon = oh.get_icon_for_project('f-spot')
-        icon_fd = StringIO.StringIO(icon)
+        icon_fd = StringIO(icon)
         from PIL import Image
         image = Image.open(icon_fd)
         self.assertEqual(image.size, (64, 64))
-        
 
 class AnchorageTests(django.test.TestCase):
     # {{{
