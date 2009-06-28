@@ -201,6 +201,9 @@ class Ohloh(object):
         return ret
 
     def get_icon_for_project(self, project):
+        return self.get_icon_for_project_by_id(project)
+
+    def get_icon_for_project_by_id(self, project):
         try:
             data = self.project_id2projectdata(project_name=project)
         except urllib2.HTTPError, e:
