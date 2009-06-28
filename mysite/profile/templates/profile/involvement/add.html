@@ -14,7 +14,7 @@
                 $.cookie('bubble-closed', true);
                 $('#help-bubble-1').fadeOut('slow');
                 return false;
-            })
+            });
         }
     });
 </script>
@@ -27,8 +27,8 @@
 </div>
 <div class='box' id='add-contribution'>
     <h3>Add contribution</h3>
-    <form id='add-contrib' name='add_contrib'
-        method='POST' action='/people.contribs.add.do'>
+    <form id='add-contrib' name='add_contrib' method='POST'
+        action='/people/{{person.username}}/involvement/add/do'>
 
         <input type='hidden' name='u'
         value='{{ person.username }}' />

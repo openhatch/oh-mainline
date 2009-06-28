@@ -14,30 +14,24 @@ import re
 
 # Add a contribution {{{
 
-def display_edit_project_exp_form(request):
+def person_involvement_add_input(request, username):
     # {{{
-    username = request.GET.get('u', None)
     project_name = request.GET.get('project_name', '')
     description = request.GET.get('description', '')
     url = request.GET.get('url', '')
     alteration_type = request.GET.get('alteration_type', 'add')
 
-    if username is not None:
-        return render_to_response('profile/people.contribs.edit.html', {
-            'person': Person.objects.get(username=username),
-            'project_name': project_name,
-            'description': description,
-            'url': url,
-            'alteration_type': alteration_type
-            })
-    else:
-        return render_to_response('profile/error.html', {
-            'message': 'Please enter a username.'})
+    return render_to_response('profile/involvement/add.html', {
+        'person': Person.objects.get(username=username),
+        'project_name': project_name,
+        'description': description,
+        'url': url,
+        'alteration_type': alteration_type
+        })
     # }}}
 
-def project_exp_insert_web(request):
+def person_involvement_add(request, username):
     # {{{
-    username = request.POST.get('u', '')
     project_name = request.POST.get('project_name', '')
     description = request.POST.get('description', '')
     url = request.POST.get('url', '')
@@ -61,8 +55,8 @@ def project_exp_insert_web(request):
     return HttpResponseRedirect('/people/?' +
             urllib.urlencode({'u': username, 'tab': 'inv'}))
     #}}}
-add_contribution_web = project_exp_insert_web
 
+"""
 def project_exp_update_web(request):
     # {{{
     username = request.POST.get('u', '')
@@ -96,6 +90,7 @@ def project_exp_update_web(request):
     return HttpResponseRedirect('/people/?' +
             urllib.urlencode({'u': username, 'tab': 'inv'}))
     # }}}
+"""
 
 def add_contribution(username, project_name, url='', description=''):
     pass

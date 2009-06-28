@@ -77,27 +77,28 @@ class ProfileTests(django.test.TestCase):
         username = 'paulproteus'
         person = Person.objects.get(username=username)
         first_exp = ProjectExp.objects.filter(person=person)[0]
-        url = '%s/people.contribs.edit/?u=%s&projectexp.pk=%d' % (
-                url_prefix, username, first_exp.pk)
+        url = '%s/people/%s/involvement/add/input' % (
+                url_prefix, username)
         tc.go(make_twill_url(url))
 
-        tc.fv('edit_contrib', 'project_name', 'Babel')
-        tc.fv('edit_contrib', 'description', 'msgctxt support')
-        tc.fv('edit_contrib', 'url', 'http://babel.edgewall.org/ticket/54')
+        tc.fv('add_contrib', 'project_name', 'Babel')
+        tc.fv('add_contrib', 'description', 'msgctxt support')
+        tc.fv('add_contrib', 'url', 'http://babel.edgewall.org/ticket/54')
         tc.submit()
 
         tc.find('Babel')
 
         # Go to old form again
         tc.go(make_twill_url(url))
-        tc.fv('edit_contrib', 'project_name', 'Baber')
-        tc.fv('edit_contrib', 'description', 'msgctxt support')
-        tc.fv('edit_contrib', 'url', 'http://babel.edgewall.org/ticket/54')
+        tc.fv('add_contrib', 'project_name', 'Baber')
+        tc.fv('add_contrib', 'description', 'msgctxt support')
+        tc.fv('add_contrib', 'url', 'http://babel.edgewall.org/ticket/54')
         tc.submit()
 
         # Verify that leaving and coming back has it still
         # there
-        tc.go(make_twill_url(url))
+        tc.go(make_twill_url(url_prefix + '/people?u=paulproteus&tab=inv'))
+        tc.show()
         tc.find('Babel')
         tc.find('Baber')
         # }}}
@@ -106,8 +107,8 @@ class ProfileTests(django.test.TestCase):
         # {{{
 
         # Create requisite objects
-        person = self.sample_person
-        project = self.sample_project
+        person = Person.objects.get(username='paulproteus')
+        project = Project.objects.get(name='ccHost')
 
         # Assemble text input
         username = person.username
@@ -115,7 +116,7 @@ class ProfileTests(django.test.TestCase):
         description = "sample description"
         url = "http://sample.com"
         man_months = "3"
-        primary_language = "brainfuck"
+        primary_language = "perl"
 
         ProjectExp.create_from_text(
                 person.username,
@@ -844,18 +845,17 @@ class PersonTabProjectExpTests(django.test.TestCase):
 class PersonUpdateProjectExpsTests(django.test.TestCase):
     # {{{
     fixtures = ['user-paulproteus', 'cchost-data-imported-from-ohloh']
-    def test_project_exp_update_web(self):
+    def test_person_involvement_add(self):
         # {{{
         url_prefix = 'http://openhatch.org'
         username = 'paulproteus'
         project_name = 'ccHost'
         description = 'fiddlesticks'
-        url = url_prefix + '/people.contribs.edit?' + urllib.urlencode({
-            'u': username, 'project_name': project_name})
+        url = url_prefix + '/%s/involvement/add' % username
         tc.go(make_twill_url(url))
-        tc.find('Edit contribution')
-        tc.fv('edit_contrib', 'description', description)
-        tc.fv('edit_contrib', 'url', url)
+        tc.find('Add contribution')
+        tc.fv('add_contrib', 'description', description)
+        tc.fv('add_contrib', 'url', url)
         tc.submit()
         tc.find(description)
         tc.find(url)
