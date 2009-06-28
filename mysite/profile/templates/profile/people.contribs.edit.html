@@ -4,15 +4,18 @@
 
 <script>
     $(document).ready(function() {
-        $('#help-bubble-1 .help-bubble-close').click(function() {
-            console.log('clicked');
-            url = '/people/{{person.username}}/bubbles/add-contribution/close.json'
-            $.get(url, function() {
-                console.log('callback function');
-            });
-            $('#help-bubble-1').fadeOut('slow');
-            return false;
-        })
+        if ($.cookie('bubble-closed')) {
+            $('#help-bubble-1').hide();
+        }
+        else {
+            $('#help-bubble-1 .help-bubble-close').click(function() {
+                /*url = '/people/{{person.username}}/' +
+                'bubbles/add-contribution/close.json'*/
+                $.cookie('bubble-closed', true);
+                $('#help-bubble-1').fadeOut('slow');
+                return false;
+            })
+        }
     });
 </script>
 <div class='help-bubble' id='help-bubble-1'>
