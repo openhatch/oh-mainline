@@ -4,9 +4,7 @@
 <div id='widgets'>
 
     <div id='left'>
-        <!-- {{{ -->
         <div id='portfolio' class='widget'>
-            <!-- {{{ -->
             <h3>Contributions to community projects:</h3>
             <ul>
                 {% if projects %}
@@ -15,7 +13,7 @@
                 <!-- {{{ -->
                 <div class='project-escutcheon'>
                     <div class='logo'>
-                        <img src='project' src='/people/project_icon/{{ project.name }}.png'/>
+                        <img alt='logo for {{project.name}}' src='/people/project_icon/{{ project.name }}'/>
                     </div>
                     <div class='name'>{{ project.name }}</div>
                     <div class='tags'>
@@ -185,10 +183,8 @@
                 </li>
                 {% endcomment %}
             </ul>
-            <!-- }}} -->
         </div><!-- /#portfolio -->
 
-        <!-- }}} -->
     </div> <!-- /#left -->
 
 
