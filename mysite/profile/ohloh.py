@@ -121,7 +121,7 @@ class Ohloh(object):
     def email_address_to_ohloh_username(self, email):
         hasher = hashlib.md5(); hasher.update(email)
         hashed = hasher.hexdigest()
-        url = 'https://www.ohloh.net/accounts/%s' % hashed
+        url = 'https://www.ohloh.net/accounts/%s' % urllib.quote(hashed)
         try:
             b = mechanize_get(url)
         except urllib2.HTTPError:
@@ -146,7 +146,8 @@ class Ohloh(object):
         b.set_handle_robots(False)
         b.addheaders = [('User-Agent',
                         'Mozilla/4.0 (compatible; MSIE 5.0; Windows 98; (compatible;))')]
-        b.open('https://www.ohloh.net/accounts/%s' % ohloh_username)
+        b.open('https://www.ohloh.net/accounts/%s' % urllib.quote(
+            ohloh_username))
         root = lxml.html.parse(b.response()).getroot()
         relevant_links = root.cssselect('a.position')
         relevant_hrefs = [link.attrib['href'] for link in relevant_links]
@@ -162,7 +163,7 @@ class Ohloh(object):
         
         for (project, contributor_id) in relevant_project_and_contributor_id_pairs:
             url = 'https://www.ohloh.net/p/%s/contributors/%d.xml?' % (
-                project, contributor_id)
+                urlib.quote(project), urllib.quote(contributor_id))
             url, c_fs = ohloh_url2data(url, 'result/contributor_fact', many=True)
             # For each contributor fact, grab the project it was for
             for c_f in c_fs:
