@@ -907,7 +907,7 @@ class PersonTabProjectExpTests(django.test.TestCase):
         # }}}
     # }}}
 
-class PersonUpdateProjectExpsTests(django.test.TestCase):
+class PersonInvolvementTests(django.test.TestCase):
     # {{{
     fixtures = ['user-paulproteus', 'cchost-data-imported-from-ohloh']
     def test_person_involvement_add(self):
@@ -916,7 +916,7 @@ class PersonUpdateProjectExpsTests(django.test.TestCase):
         username = 'paulproteus'
         project_name = 'ccHost'
         description = 'fiddlesticks'
-        url = url_prefix + '/%s/involvement/add' % username
+        url = url_prefix + '/people/%s/involvement/add' % username
         tc.go(make_twill_url(url))
         tc.find('Add contribution')
         tc.fv('add_contrib', 'description', description)
