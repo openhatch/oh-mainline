@@ -1,6 +1,8 @@
 import xml.etree.ElementTree as ET
+import xml.parsers.expat
 import sys, urllib, hashlib
 import urllib2
+import cStringIO as StringIO
 
 def uni_text(s):
     if type(s) == unicode:
@@ -40,7 +42,14 @@ def ohloh_url2data(url, selector, params = {}, many = False):
     url += encoded
     b = mechanize_get(url)
     s = b.response()
-    tree = ET.parse(b.response())
+    try:
+        s = b.response().read()
+        tree = ET.parse(StringIO.StringIO(s))
+    except xml.parsers.expat.ExpatError:
+        # well, I'll be. it doesn't parse.
+        return b.geturl(), None
+        #import pdb
+        #pdb.set_trace()
         
     # Did Ohloh return an error?
     root = tree.getroot()
@@ -67,7 +76,8 @@ class Ohloh(object):
             project_query = str(int(project_id))
         else:
             project_query = str(project_name)
-        url = 'http://www.ohloh.net/projects/%s.xml?' % project_query
+        url = 'http://www.ohloh.net/projects/%s.xml?' % urllib.quote(
+            project_query)
         url, data = ohloh_url2data(url, 'result/project')
         return data
     
