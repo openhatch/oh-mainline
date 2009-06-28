@@ -10,6 +10,7 @@ import datetime
 import urllib
 import simplejson
 import re
+from odict import odict
 # }}}
 
 # Add a contribution {{{
@@ -177,7 +178,8 @@ def data_for_person_display_without_ohloh(person):
     # {{{
     project_exps = ProjectExp.objects.filter(person=person)
     projects = [project_exp.project for project_exp in project_exps]
-    projects_extended = {}
+    projects_extended = odict({})
+
     for project in projects:
         exps_with_this_project = ProjectExp.objects.filter(
                 person=person, project=project)
@@ -229,7 +231,7 @@ def data_for_person_display_without_ohloh(person):
     return {
             'person': person,
             'interested_in_working_on_list': interested_in_working_on_list, 
-            'projects': projects_extended,
+            'projects': projects_extended
             } 
     # }}}
 
@@ -250,13 +252,19 @@ def display_person(person, tab):
 
     data_dict = data_for_person_display_without_ohloh(person)
 
+    title = person.username + " / %s : openhatch"
     if tab == 'inv':
+        data_dict['title'] = title % "community involvement"
         return render_to_response('profile/participation.html', data_dict)
     if tab == 'tags':
+        data_dict['title'] = title % "tags"
         return render_to_response('profile/tags.html', data_dict)
     if tab == 'tech':
+        data_dict['title'] = title % "tech"
         return render_to_response('profile/tech.html', data_dict)
     else:
+        data_dict['title'] = title % "profile"
+        data_dict['projects'] = dict(data_dict['projects'].items()[:4])
         return render_to_response('profile/main.html', data_dict)
 
     # }}}

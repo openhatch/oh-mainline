@@ -18,13 +18,6 @@
         }
     });
 </script>
-<div class='help-bubble' id='help-bubble-1'>
-    <div>
-        <a href='/people/{{person.username}}/bubbles/add-contribution/close'
-            class='help-bubble-close'>close</a>
-        Lorem {% lorem 20 w random %}
-    </div>
-</div>
 <div class='box' id='add-contribution'>
     <h3>Add contribution</h3>
     <form id='add-contrib' name='add_contrib' method='POST'
@@ -36,19 +29,35 @@
         <label for='add-contrib-project-name'>
             Type a project name:
         </label>
-        <input id='add-contrib-project-name'
-        type='text' name='project_name'/>
+        <div class='right'>
+            <input id='add-contrib-project-name'
+            type='text' name='project_name'/>
+        </div>
 
         <label for='add-contrib-description'>
             Describe your contribution:</label>
-        <textarea id='add-contrib-description'
-            name='description'></textarea>
+        <div class='right'>
+            <textarea id='add-contrib-description'
+                name='description'></textarea>
+        </div>
 
         <label for='contrib-url'>
-            Type a related URL (a link to a patch attached to
-            an email on a mailing list):</label>
-        <input id='contrib-url' type='text' name='url' />
-
+            Cite your involvement:
+        </label>
+        <div class='right'>
+            <input id='contrib-url' type='text' name='url' />
+            <div class='help-bubble' id='help-bubble-1'>
+                <a href='/people/{{person.username}}/bubbles/add-contribution/close'
+                    class='help-bubble-close'>x<!--img src='/static/images/icons/close.png' width='20' height='20' alt='close' /--></a>
+                <img src='/static/images/icons/info.png' />
+                <p>
+                A good citation is a link to a bug report or archived
+                mailing list post that includes your patch,
+                translation, design idea, or other contribution.
+                (Cue some tactical Googling.)
+                </p>
+            </div>
+        </div>
         <label></label>
         <input type='submit' id='add-contrib-submit' 
         value='Save' />

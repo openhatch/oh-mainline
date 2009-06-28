@@ -56,7 +56,7 @@ urlpatterns = patterns('',
         (r'^search/get_suggestions$', 'mysite.search.views.request_jquery_autocompletion_suggestions'),
 
         # This dangerous regex is last
-        (r'^people/(?P<input_username>.*)$', 'mysite.profile.views.display_person_web'),
+        (r'^people/(?P<input_username>[^/]+)$', 'mysite.profile.views.display_person_web'),
 
         )
 

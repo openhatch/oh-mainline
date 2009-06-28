@@ -4,7 +4,11 @@
 
       {% comment %} prefatory remarks {{{ {% endcomment %}
       <title>
-         {{ developer_name }} &bull; Resume &bull; OpenHatch
+          {% if title %}
+          {{ title }} 
+          {% else %}
+          unnamed page : openhatch
+          {% endif %}
       </title>
       <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
       <meta http-equiv='Content-Language' content='en-us' />
