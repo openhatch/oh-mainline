@@ -52,8 +52,8 @@ def person_involvement_add(request, username):
     data = profile_data_from_username(username)
     data['notification'] = notification
 
-    return HttpResponseRedirect('/people/?' +
-            urllib.urlencode({'u': username, 'tab': 'inv'}))
+    return HttpResponseRedirect('/people/%s?' % urllib.quote(username) +
+            urllib.urlencode({'tab': 'inv'}))
     #}}}
 
 """
@@ -569,5 +569,48 @@ def sf_projects_by_person_web(request):
     project_names = [p.project.unixname for p in projects]
     return HttpResponse('\n'.join(project_names))
     # }}}
+def _project_hash(project_name):
+    PREFIX='_project_hash_2136870e40a759b56b9ba97a0d7f60b84dbc90097a32da284306e871105d96cd' # sha256 of 1MiB of /dev/urandom
+    import hashlib
+    hashed = hashlib.sha256(PREFIX + project_name)
+    return hashed.hexdigest()
+
+import os
+import tempfile
+def project_icon_url(project_name, actually_fetch = True):
+    project_hash = _project_hash(project_name)
+    # Check for static path for project icons
+    project_icons_root = os.path.join('static', 'project-icons')
+    # If no such directory exists, make it
+    if not os.path.exists(project_icons_root):
+        os.makedirs(project_icons_root)
+
+    # where should the image exist?
+    project_icon_path = os.path.join(project_icons_root, project_hash + '.png')
+
+    if actually_fetch:
+        # Then verify the image exists
+        if not os.path.exists(project_icon_path):
+            # See if Ohloh will give us an icon
+            import ohloh
+            oh = ohloh.get_ohloh()
+            try:
+                icon_data = oh.get_icon_for_project(project_name)
+            except ValueError:
+                icon_data = open('static/no-project-icon.png').read()
+        
+            # then mktemp and save the Ohloh icon there, and rename it in
+            tmp = tempfile.mkstemp(dir=project_icons_root)
+            fd = open(tmp[1], 'w')
+            fd.write(icon_data)
+            fd.close()
+            os.rename(tmp[1], project_icon_path)
+
+    return '/' + project_icon_path
+    # FIXME: One day, add cache expiry.
+
+def project_icon_web(request, project_name):
+    url = project_icon_url(project_name)
+    return HttpResponseRedirect(url)
 
 # }}}

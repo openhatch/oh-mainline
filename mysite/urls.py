@@ -24,6 +24,10 @@ urlpatterns = patterns('',
         (r'^people/make_favorite_exp_tag$',
             'mysite.profile.views.make_favorite_exp_tag_web'),
 
+        # Project icons
+        (r'^people/project_icon/(?P<project_name>.*)$',
+            'mysite.profile.views.project_icon_web'),
+
         # Add contributions
         (r'^people/add_contrib$',
             'mysite.profile.views.display_person_old'),
@@ -50,6 +54,10 @@ urlpatterns = patterns('',
         # Get a list of suggestions for the search input, formatted the way that
         # the jQuery autocomplete plugin wants it.
         (r'^search/get_suggestions$', 'mysite.search.views.request_jquery_autocompletion_suggestions'),
+
+        # This dangerous regex is last
+        (r'^people/(?P<input_username>.*)$', 'mysite.profile.views.display_person_web'),
+
         )
 
 # vim: set ai ts=4 sts=4 et sw=4:
