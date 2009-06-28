@@ -81,6 +81,12 @@ class Ohloh(object):
         url, data = ohloh_url2data(url, 'result/project')
         return data
     
+    def project_name2projectdata(self, project_name_query):
+        url = 'http://www.ohloh.net/projects.xml?'
+        args = {'query': project_name_query}
+        url, data = ohloh_url2data(url, 'result/project', args)
+        return data
+    
     @accepts(object, int)
     def analysis2projectdata(self, analysis_id):
         url = 'http://www.ohloh.net/analyses/%d.xml?' % analysis_id
@@ -201,7 +207,29 @@ class Ohloh(object):
         return ret
 
     def get_icon_for_project(self, project):
-        return self.get_icon_for_project_by_id(project)
+        try:
+            return self.get_icon_for_project_by_id(project)
+        except ValueError:
+            return self.get_icon_for_project_by_human_name(project)
+
+    def get_icon_for_project_by_human_name(self, project):
+        # Do a real search to find the project
+        try:
+            data = self.project_name2projectdata(project)
+        except urllib2.HTTPError, e:
+            raise ValueError
+        try:
+            med_logo = data['medium_logo_url']
+        except TypeError:
+            raise ValueError, "Ohloh gave us back nothing."
+        except KeyError:
+            raise ValueError, "The project exists, but Ohloh knows no icon."
+        if '/bits.ohloh.net/' not in med_logo:
+            med_logo = med_logo.replace('attachments/',
+                                        'bits.ohloh.net/attachments/')
+        b = mechanize_get(med_logo)
+        return b.response().read()
+        
 
     def get_icon_for_project_by_id(self, project):
         try:
