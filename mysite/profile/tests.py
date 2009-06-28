@@ -749,6 +749,25 @@ class OhlohIconTests(django.test.TestCase):
         oh = ohloh.get_ohloh()
         self.assertRaises(ValueError, oh.get_icon_for_project, 'lolnomatxh')
 
+    def test_find_icon_failure_when_proj_exists_but_lacks_icon(self):
+        import ohloh
+        oh = ohloh.get_ohloh()
+        self.assertRaises(ValueError, oh.get_icon_for_project, 'asdf')
+
+    def test_find_icon_for_mozilla_firefox(self):
+        import ohloh
+        oh = ohloh.get_ohloh()
+        icon = oh.get_icon_for_project('Mozilla Firefox')
+        icon_fd = StringIO(icon)
+        from PIL import Image
+        image = Image.open(icon_fd)
+        self.assertEqual(image.size, (64, 64))
+
+    def test_find_icon_for_proj_with_space(self):
+        import ohloh
+        oh = ohloh.get_ohloh()
+        self.assertRaises(ValueError, oh.get_icon_for_project, 'surely nothing is called this name')
+
     def test_given_project_generate_internal_url(self):
         # First, delete the project icon
         url = profile.views.project_icon_url('f-spot', actually_fetch=False)
