@@ -78,7 +78,7 @@ class ProfileTests(django.test.TestCase):
         username = 'paulproteus'
         person = Person.objects.get(username=username)
         first_exp = ProjectExp.objects.filter(person=person)[0]
-        url = '%s/people/%s/involvement/add/input' % (
+        url = '%s/people/%s/involvement/add' % (
                 url_prefix, username)
         tc.go(make_twill_url(url))
 

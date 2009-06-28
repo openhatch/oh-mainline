@@ -15,7 +15,8 @@
                 <!-- {{{ -->
                 <div class='project-escutcheon'>
                     <div class='logo'>
-                        <img alt='logo for {{project.name}}' src='/people/project_icon/{{ project.name }}'/>
+                        <img alt='logo for {{project.name}}' src='/people/project_icon/{{ project.name }}'
+                        width='64' height='64' />
                     </div>
                     <div class='name'>{{ project.name }}</div>
                     <div class='tags'>
@@ -64,16 +65,22 @@
                 <!-- }}} -->
                 </li>
                 {% endfor %}
-                {% else %}
-                <li>No contributions listed.</li>
-                {% endif %}
             </ul>
+            {% else %}
+            No contributions listed.
+            <form method='post' action='/people/xp_slurp_do'>
+                <input type='submit' value='Import code contributions automatically from around the Internet.' />
+                <input type='hidden' name='u' value='{{person.username}}' />
+            </form>
+        {% endif %}
+    </ul>
+            <a style='float: left; margin-top: 10px;' href='/people/{{person.username}}/involvement/add/input'>Add a contribution.</a>
             <!-- }}} -->
         </div><!-- /#portfolio -->
 
-        <div id='software' class='widget'>
+        <div id='software' class='widget' style='margin-top: 20px;'>
             <!-- {{{ -->
-            <h3>user log:</h3>
+            <h3>Software I use (coming soon):</h3>
             <ul>
                 <li>
                 <div class='icon'>

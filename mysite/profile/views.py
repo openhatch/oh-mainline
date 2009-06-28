@@ -27,12 +27,14 @@ def person_involvement_add_input(request, username):
         'project_name': project_name,
         'description': description,
         'url': url,
-        'alteration_type': alteration_type
+        'alteration_type': alteration_type,
+        'title': '+involvement / ' + username + ' / openhatch'
         })
     # }}}
 
-def person_involvement_add(request, username):
+def person_involvement_add(request):
     # {{{
+    username = request.POST.get('u', '')
     project_name = request.POST.get('project_name', '')
     description = request.POST.get('description', '')
     url = request.POST.get('url', '')
@@ -111,7 +113,7 @@ def xp_slurper_display_input_form(request):
 def exp_scraper_scrape_web(request):
     # {{{
     # Check input
-    input_username = request.GET.get('u', None)
+    input_username = request.POST.get('u', None)
 
     if input_username is None or input_username == '':
         return HttpResponseRedirect('xp_slurp?' + urllib.urlencode(

@@ -7,10 +7,10 @@
                             {% endif %}
                         </h1>
                         <ul>
-                            <li><a href='?u={{ person.username }}'>home</a></li>
-                            <li><a href='?u={{ person.username }}&amp;tab=inv'>involvement</a></li>
-                            <li><a href='?u={{ person.username }}&amp;tab=tags'>tags</a></li>
-                            <li><a href='?u={{ person.username }}&amp;tab=tech'>tech</a></li>
+                            <li><a href='/people/{{ person.username }}'>home</a></li>
+                            <li><a href='/people/{{ person.username }}?tab=inv'>involvement</a></li>
+                            <li><a href='/people/{{ person.username }}?tab=tags'>tags</a></li>
+                            <li><a href='/people/{{ person.username }}?tab=tech'>tech</a></li>
                             <!--li><a href='?u={{ person.username }}&amp;tab=inv'>recently</a></li-->
                         </ul>
                     </div>
