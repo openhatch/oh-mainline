@@ -194,7 +194,10 @@ class Ohloh(object):
             data = self.project_id2projectdata(project_name=project)
         except urllib2.HTTPError, e:
             raise ValueError
-        med_logo = data['medium_logo_url']
+        try:
+            med_logo = data['medium_logo_url']
+        except KeyError:
+            raise ValueError, "The project exists, but Ohloh knows no icon."
         if '/bits.ohloh.net/' not in med_logo:
             med_logo = med_logo.replace('attachments/',
                                         'bits.ohloh.net/attachments/')

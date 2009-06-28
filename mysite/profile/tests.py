@@ -749,6 +749,11 @@ class OhlohIconTests(django.test.TestCase):
         oh = ohloh.get_ohloh()
         self.assertRaises(ValueError, oh.get_icon_for_project, 'lolnomatxh')
 
+    def test_find_icon_failure_when_proj_exists_but_lacks_icon(self):
+        import ohloh
+        oh = ohloh.get_ohloh()
+        self.assertRaises(ValueError, oh.get_icon_for_project, 'asdf')
+
     def test_given_project_generate_internal_url(self):
         # First, delete the project icon
         url = profile.views.project_icon_url('f-spot', actually_fetch=False)
