@@ -65,11 +65,6 @@ class ProjectExp(models.Model):
     primary_language = models.CharField(max_length=200, null=True)
     source = models.CharField(max_length=100, null=True)
 
-    class Meta:
-        unique_together = [
-            ('person', 'project'),
-            ]
-
     def save(self, *args, **kwargs):
         self.last_touched = datetime.datetime.now()
         super(ProjectExp, self).save(*args, **kwargs)
@@ -122,6 +117,7 @@ class ProjectExp(models.Model):
                 person=Person.objects.get(username=username),
                 project=Project.objects.get(name=project_name),
                 )
+    get_from_strings = get_from_text
 
     def save(self, *args, **kwargs):
         if self.time_record_was_created is None:

@@ -1,3 +1,4 @@
+{% include 'profile/header.global.html' %}
 {% include 'profile/header.html' %}
 
 <h3 id='tag-heading'>tags</h3>
@@ -31,9 +32,11 @@
             </div>
             <div class='widget'>
                 <h3>looking for volunteering opportunities in:
-                    <a href=''>python</a>,
-                    <a href=''>c++</a>,
-                    <a href=''>javascript</a>
+                    {% if interested_in_working_on_list %}
+                    {% for interest in interested_in_working_on_list %}
+                    <a href=''>{{ interest }}</a>,
+                    {% endfor %}
+                    {% endif %}
                 </h3>
             </div>
         </div>
@@ -55,7 +58,7 @@
     </div>
 
     <div id='taglines'>
- j       <!-- {{{ -->
+        <!-- {{{ -->
         <div id='left'>
             <div class='widget'>
                 <h3>understands:
@@ -77,7 +80,8 @@
                 <h3>looking for volunteering opportunities matching these characteristics:
                     <form name='what_you_like_working_on' method='POST' 
                         action='/people/change_what_like_working_on'>
-                        <textarea name='like-working-on'>smalltalk, javascript, COBOL, delphi, ajax</textarea>
+                        <textarea name='like-working-on'
+                            >{{ person.interested_in_working_on }}</textarea>
                         <input type='hidden' name='username' value='{{ person.username }}' />
                         <input type='submit' value='save'/>
                     </form>

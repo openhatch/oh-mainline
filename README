@@ -1,6 +1,6 @@
 How to run this code:
 
-$ sudo apt-get install python-django python-twill python-lxml python-dateutil python-tz
+$ sudo apt-get install python-django python-twill python-lxml python-dateutil python-tz python-simplejson
 $ sudo easy_install windmill south typecheck
 
 $ cd mysite

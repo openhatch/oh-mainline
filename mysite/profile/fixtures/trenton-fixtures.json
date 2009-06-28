@@ -1,0 +1,6 @@
+[ {"pk": 10, "model": "search.project", "fields": {"icon_url": "", 
+"name": "TrentonProj1", "language": ""}},
+{"pk": 11, "model": "search.project", "fields": {"icon_url": "", 
+"name": "TrentonProj2", "language": ""}},
+{"pk": 11, "model": "profile.projectexp", "fields": {"man_months": 1, "description": "Did some work, yo", "last_touched": null, "url": "http://example.com/", "primary_language": null, "favorite": 0, "project": 11, "person": 1, "source": "Cooked data", "person_role": "Do-gooder", "time_record_was_created": "2009-06-25 16:11:29"}}, {"pk": 12, "model": "profile.projectexp", "fields": {"man_months": 1, "description": "Did some work, yo", "last_touched": null, "url": "http://example.com/", "primary_language": null, "favorite": 0, "project": 10, "person": 1, "source": "Cooked data", "person_role": "Do-gooder", "time_record_was_created": "2009-06-25 16:11:37"}}]
+

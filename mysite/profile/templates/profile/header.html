@@ -1,28 +1,3 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html>
-    <head>
-        <style>
-            @import url('/static/css/people/all.css');
-        </style>
-    </head>
-    <body>
-        <div id='outermost'>
-            <div id='penoutermost'>
-                <div id='nav'>
-                    <h2>OpenHatch</h2>
-                    <form id='enter-free-software-username' 
-                        name='enter_free_software_username'
-                        action='/people/' 
-                        method='GET' style=''>
-                        <label for='get-data-username'>Search usernames: </label>
-                        <input type='text' id='u' name='u' />
-                        <input type='submit' style='float: right;'/>
-                        <!--input type='image'
-                        src='/static/images/add.png' /-->
-                    </form>
-                </div>
-                <div id='content'>
-
                     {% comment %} Heading {{{ {% endcomment %}
                     <div id='heading'>
                         <h1>
@@ -41,8 +16,3 @@
                     </div>
                     {% comment %} }}} {% endcomment %}
 
-                    {% comment %} Notification {{{ {% endcomment %}
-                    {% if notification %}
-                    <div class='notification'>{{ notification }}</div>
-                    {% endif %}
-                    {% comment %} }}} {% endcomment %}

@@ -1,0 +1,4 @@
+[
+ {"pk": 3, "model": "search.project", "fields": {"icon_url": "", "name": "ccHost", "language": ""}},
+ {"pk": 13, "model": "profile.projectexp", "fields": {"man_months": 1, "description": "", "last_touched": "2009-06-25 16:26:11", "url": null, "primary_language": "shell script", "favorite": 0, "project": 3, "person": 1, "source": "Ohloh", "person_role": "", "time_record_was_created": "2009-06-25 16:26:11"}}
+]
