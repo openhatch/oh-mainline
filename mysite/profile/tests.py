@@ -732,6 +732,70 @@ class TrentonTests(django.test.TestCase):
         # }}}
     # }}}
 
+import os
+class OhlohIconTests(django.test.TestCase):
+    '''Test that we can grab icons from Ohloh.'''
+    def test_given_project_find_icon(self):
+        import ohloh
+        oh = ohloh.get_ohloh()
+        icon = oh.get_icon_for_project('f-spot')
+        icon_fd = StringIO(icon)
+        from PIL import Image
+        image = Image.open(icon_fd)
+        self.assertEqual(image.size, (64, 64))
+
+    def test_given_project_find_icon_failure(self):
+        import ohloh
+        oh = ohloh.get_ohloh()
+        self.assertRaises(ValueError, oh.get_icon_for_project, 'lolnomatxh')
+
+    def test_given_project_generate_internal_url(self):
+        # First, delete the project icon
+        url = profile.views.project_icon_url('f-spot', actually_fetch=False)
+        path = url[1:] # strip leading '/'
+        if os.path.exists(path):
+            os.unlink(path)
+
+        # Download the icon
+        url = profile.views.project_icon_url('f-spot')
+        self.assert_(os.path.exists(path))
+        os.unlink(path)
+
+    def test_given_project_generate_internal_url_for_proj_fail(self):
+        # First, delete the project icon
+        url = profile.views.project_icon_url('lolnomatzch',
+                                             actually_fetch=False)
+        path = url[1:] # strip leading '/'
+        if os.path.exists(path):
+            os.unlink(path)
+
+        # Download the icon
+        url = profile.views.project_icon_url('lolnomatzch')
+        self.assert_(os.path.exists(path))
+        os.unlink(path)
+
+
+    def test_project_image_link(self):
+        # First, delete the project icon
+        url = profile.views.project_icon_url('f-spot',
+                                             actually_fetch=False)
+        path = url[1:] # strip leading '/'
+        if os.path.exists(path):
+            os.unlink(path)
+
+        # Then retrieve (slowly) this URL that redirects to the image
+        go_to_url = '/people/project_icon/f-spot'
+        
+        response = Client().get(go_to_url)
+        # Assure ourselves that we were redirected to the above URL...
+        self.assertEqual(response['Location'], 'http://testserver' + url)
+        # and that the file exists on disk
+
+        self.assert_(os.path.exists(path))
+
+        # Remove it so the test has no side-effects
+        os.unlink(path)
+
 class AnchorageTests(django.test.TestCase):
     # {{{
 

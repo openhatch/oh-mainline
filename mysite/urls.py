@@ -24,6 +24,10 @@ urlpatterns = patterns('',
         (r'^people/make_favorite_exp_tag$',
             'mysite.profile.views.make_favorite_exp_tag_web'),
 
+        # Project icons
+        (r'^people/project_icon/(?P<project_name>.*)$',
+            'mysite.profile.views.project_icon_web'),
+
         # Add contributions
         (r'^people/add_contrib$',
             'mysite.profile.views.display_person_old'),
