@@ -1,0 +1,58 @@
+{% load webdesign %}
+{% include 'profile/header.global.html' %}
+{% include 'profile/header.html' %}
+
+<script>
+    $(document).ready(function() {
+        if ($.cookie('bubble-closed')) {
+            $('#help-bubble-1').hide();
+        }
+        else {
+            $('#help-bubble-1 .help-bubble-close').click(function() {
+                /*url = '/people/{{person.username}}/' +
+                'bubbles/add-contribution/close.json'*/
+                $.cookie('bubble-closed', true);
+                $('#help-bubble-1').fadeOut('slow');
+                return false;
+            });
+        }
+    });
+</script>
+<div class='help-bubble' id='help-bubble-1'>
+    <div>
+        <a href='/people/{{person.username}}/bubbles/add-contribution/close'
+            class='help-bubble-close'>close</a>
+        Lorem {% lorem 20 w random %}
+    </div>
+</div>
+<div class='box' id='add-contribution'>
+    <h3>Add contribution</h3>
+    <form id='add-contrib' name='add_contrib' method='POST'
+        action='/people/{{person.username}}/involvement/add/do'>
+
+        <input type='hidden' name='u'
+        value='{{ person.username }}' />
+
+        <label for='add-contrib-project-name'>
+            Type a project name:
+        </label>
+        <input id='add-contrib-project-name'
+        type='text' name='project_name'/>
+
+        <label for='add-contrib-description'>
+            Describe your contribution:</label>
+        <textarea id='add-contrib-description'
+            name='description'></textarea>
+
+        <label for='contrib-url'>
+            Type a related URL (a link to a patch attached to
+            an email on a mailing list):</label>
+        <input id='contrib-url' type='text' name='url' />
+
+        <label></label>
+        <input type='submit' id='add-contrib-submit' 
+        value='Save' />
+    </form>
+</div>
+
+{% include 'profile/footer.html' %}

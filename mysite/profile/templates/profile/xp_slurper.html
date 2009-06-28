@@ -1,14 +1,18 @@
-{% include 'profile/header.html' %}
+{% include 'profile/header.global.html' %}
+
+<h3>Welcome, cowpoke. Identify yourself!</h3>
+
+{% include 'profile/notifications.html' %}
 
 <form id='enter-free-software-username' 
     name='enter_free_software_username'
     action='/people/xp_slurp_do' 
     method='GET' style=''>
     <label for='get-data-username'>
-        Username you use in free and open source software:
+        by username:
     </label>
     <input type='text' id='u' name='u' />
-    <input type='submit' style='float: right;'/>
+    <input type='submit' style='float: right;' value='go!' />
     <!--input type='image'
     src='/static/images/add.png' /-->
 </form>
@@ -17,9 +21,11 @@
     name='enter_free_software_email'
     action='/people/get_data_for_email' method='POST'
     style='margin-bottom: 10px; float: left; width: 478px;'>
-    <label for='get-data-email'>Type an email address</label>
+    <label for='get-data-email'>
+        by email address:
+    </label>
     <input type='text' id='get-data-email' name='email' />
-    <input type='submit' style='float: right;'/>
+    <input type='submit' style='float: right;' value='go!'/>
     <!--input type='image' src='/static/images/add.png' /-->
 </form>
 

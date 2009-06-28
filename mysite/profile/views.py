@@ -14,7 +14,50 @@ import re
 
 # Add a contribution {{{
 
-def add_project_exp_web(request):
+def person_involvement_add_input(request, username):
+    # {{{
+    project_name = request.GET.get('project_name', '')
+    description = request.GET.get('description', '')
+    url = request.GET.get('url', '')
+    alteration_type = request.GET.get('alteration_type', 'add')
+
+    return render_to_response('profile/involvement/add.html', {
+        'person': Person.objects.get(username=username),
+        'project_name': project_name,
+        'description': description,
+        'url': url,
+        'alteration_type': alteration_type
+        })
+    # }}}
+
+def person_involvement_add(request, username):
+    # {{{
+    project_name = request.POST.get('project_name', '')
+    description = request.POST.get('description', '')
+    url = request.POST.get('url', '')
+    format = request.POST.get('format', 'html')
+
+    notification = ''
+    if username and project_name and description and url:
+        ProjectExp.create_from_text(username, project_name, description, url)
+        notification = "Added %s's experience with %s." % (
+                username, project_name)
+    else:
+        notification = "Unexpectedly imperfect input: {username: %s, project_name: %s}" % (
+                username, project_name)
+        if format == 'json':
+            dictionary = {'notification': notification}
+            return HttpResponse(simplejson.dumps([dictionary]))
+
+    data = profile_data_from_username(username)
+    data['notification'] = notification
+
+    return HttpResponseRedirect('/people/%s?' % urllib.quote(username) +
+            urllib.urlencode({'tab': 'inv'}))
+    #}}}
+
+"""
+def project_exp_update_web(request):
     # {{{
     username = request.POST.get('u', '')
     project_name = request.POST.get('project_name', '')
@@ -22,29 +65,35 @@ def add_project_exp_web(request):
     url = request.POST.get('url', '')
     format = request.POST.get('format', 'html')
 
-    notif = ''
+    notification = ''
     if username and project_name and description and url:
-        ProjectExp.create_from_text(username, project_name, description, url)
-        notif = "Added experience with %s to %s's profile." % (
-                project_name, username)
+        person = Person.objects.get(username=username)
+        project, _ = Project.objects.get_or_create(name=project_name)
+        exp, _ = ProjectExp.objects.get_or_create(
+                person=person,
+                project=project)
+        exp.description = description
+        exp.url = url
+        exp.save()
+        notification = "Updated %s's experience with %s." % (
+                username, project_name)
     else:
-        notif = "Er, like, bad input: {project_name: %s, username: %s}" % (
+        notification = "Unexpectedly imperfect input: {project_name: %s, username: %s}" % (
                 project_name, username)
         if format == 'json':
-            return HttpResponse(simplejson.dumps([{'notification': notif}]))
+            dict = {'notification': notification}
+            return HttpResponse(simplejson.dumps([dict]))
 
     data = profile_data_from_username(username)
-    data['notification'] = notif
+    data['notification'] = notification
 
-    return HttpResponseRedirect('/people/%s?' % urllib.quote(username) +
-            urllib.urlencode({'tab': 'inv'}))
-    #}}}
-add_contribution_web = add_project_exp_web
+    return HttpResponseRedirect('/people/?' +
+            urllib.urlencode({'u': username, 'tab': 'inv'}))
+    # }}}
+"""
 
 def add_contribution(username, project_name, url='', description=''):
-    # {{{
     pass
-# }}}
 
 # }}}
 
@@ -72,7 +121,7 @@ def exp_scraper_scrape_web(request):
     exp_scraper_scrape(person)
 
     return HttpResponseRedirect('/people/?' + urllib.urlencode(
-        {'u': username, 'tab': 'main'}))
+        {'u': input_username, 'tab': 'main'}))
     # }}}
 
 def exp_scraper_scrape(person):
