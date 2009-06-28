@@ -1,38 +1,55 @@
+{% load webdesign %}
 {% include 'profile/header.global.html' %}
 {% include 'profile/header.html' %}
 
-    <!-- Begin template: profile/template/profile/people.contribs.edit.html -->
+<script>
+    $(document).ready(function() {
+        $('#help-bubble-1 .help-bubble-close').click(function() {
+            console.log('clicked');
+            url = '/people/{{person.username}}/bubbles/add-contribution/close.json'
+            $.get(url, function() {
+                console.log('callback function');
+            });
+            $('#help-bubble-1').fadeOut('slow');
+            return false;
+        })
+    });
+</script>
+<div class='help-bubble' id='help-bubble-1'>
+    <div>
+        <a href='/people/{{person.username}}/bubbles/add-contribution/close'
+            class='help-bubble-close'>close</a>
+        Lorem {% lorem 20 w random %}
+    </div>
+</div>
+<div class='box' id='add-contribution'>
+    <h3>Add contribution</h3>
+    <form id='add-contrib' name='add_contrib'
+        method='POST' action='/people.contribs.add.do'>
 
-        {% comment %} Edit project experience {{{ {% endcomment %}
-        <div class='box' id='edit-contribution'>
-            <h3>Edit contribution</h3>
-            <form id='edit-contrib' name='edit_contrib'
-                method='POST' action='/people.contribs.{{ alteration_type }}.do'>
+        <input type='hidden' name='u'
+        value='{{ person.username }}' />
 
-                <input type='hidden' name='u'
-                value='{{ person.username }}' />
+        <label for='add-contrib-project-name'>
+            Type a project name:
+        </label>
+        <input id='add-contrib-project-name'
+        type='text' name='project_name'/>
 
-                <label for='add-contrib-project-name'>
-                    Type a project name:
-                </label>
-                <input id='add-contrib-project-name'
-                type='text' name='project_name'/>
+        <label for='add-contrib-description'>
+            Describe your contribution:</label>
+        <textarea id='add-contrib-description'
+            name='description'></textarea>
 
-                <label for='add-contrib-description'>
-                    Describe your contribution:</label>
-                <textarea id='add-contrib-description'
-                    name='description'></textarea>
+        <label for='contrib-url'>
+            Type a related URL (a link to a patch attached to
+            an email on a mailing list):</label>
+        <input id='contrib-url' type='text' name='url' />
 
-                <label for='contrib-url'>
-                    Type a related URL (a link to a patch attached to
-                    an email on a mailing list):</label>
-                <input id='contrib-url' type='text' name='url' />
-
-                <label></label>
-                <input type='submit' id='add-contrib-submit' 
-                value='Save' />
-            </form>
-        </div>
-        {% comment %} }}} {% endcomment %}
+        <label></label>
+        <input type='submit' id='add-contrib-submit' 
+        value='Save' />
+    </form>
+</div>
 
 {% include 'profile/footer.html' %}

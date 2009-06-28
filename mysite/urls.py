@@ -32,6 +32,12 @@ urlpatterns = patterns('',
         (r'^people.contribs.edit$', 'mysite.profile.views.display_edit_project_exp_form'),
         (r'^people.contribs.edit.do$', 'mysite.profile.views.project_exp_update_web'),
 
+        # URL Raffi was writing for the bubble-closing page as he realized
+        # we can't do this until we support authentication, la la la.
+        #(r'^/people/%s/bubbles/%s/keep_closed[\.?]%s$' % (
+        #    '(?P<username>\w_@-+)', '(?P<message_id>\w_-+)', '(?P<format>[a-z]+)'),
+        #    'mysite.profile.views.bubble_keep_closed'),
+
         (r'^people/sf_projects_by_person$',
             'mysite.profile.views.sf_projects_by_person_web'),
 
