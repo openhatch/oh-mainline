@@ -761,7 +761,7 @@ def exp_scraper_display_for_person_web(request):
 
     # if we are allowed to make bgtasks, create background tasks
     # to pull in this user's data (just the one huge one)
-    if nobgtask:
+    if nobgtask or person.ohloh_grab_completed:
         pass
     else:
         from tasks import FetchPersonDataFromOhloh

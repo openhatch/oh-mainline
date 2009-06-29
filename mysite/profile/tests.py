@@ -1119,6 +1119,9 @@ class CeleryTests(django.test.TestCase):
         tc.go(make_twill_url(url))
         tc.find('True')
 
+    # FIXME: One day, test that after self.test_slow_loading_via_emulated_bgtask
+    # getting the data does not go out to Ohloh.
+
 # FIXME: One day, stub out the background jobs with mocks
 # that ensure we actually call them!
         
