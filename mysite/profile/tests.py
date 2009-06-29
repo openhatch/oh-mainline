@@ -970,8 +970,8 @@ class PersonInvolvementTests(django.test.TestCase):
         tags = ['jquery', 'python', 'c++',
                 'qwer', 'jkl', 'qergqer', 
                 'qe3rga', 'tvauetb', 'aerbgaeg',
-                'q40ghqt', 'bgbhgb', '!#%!&JG%!',
-                '%!!!\'', 'erqergqerg', '5g&%GYQ#%UGQ#*%GQ#GQ$%GQHGIHhhghghghghg'
+                'q40ghqt', 'bgbhgb', '!#%!JG%!',
+                'aye', 'bee', 'sea',
                 ]
         tc.fv('edit-tags', 'edit-tags-understands', ', '.join(tags[:3]))
         tc.fv('edit-tags', 'edit-tags-understands_not', ', '.join(tags[3:6]))
@@ -985,7 +985,13 @@ class PersonInvolvementTests(django.test.TestCase):
             tag__text='bgbhgb', person__username='paulproteus')))
         #out = profile.views.tags_dict_for_person(Person.objects.get(
         #    username='paulproteus'))
-        tc.find(".*".join(map(re.escape, tags)))
+        for (n, thing) in enumerate(['understands',
+                                    'will never understand',
+                                    'looking for volunteering opportunities in',
+                                    'currently learning about',
+                                    'can mentor in']):
+            tc.find(thing + '.*'
+                    + ".*".join(map(re.escape, tags[n*3:(n+1)*3])))
         # }}}
 
     # }}}
