@@ -51,11 +51,8 @@
                     {% endcomment %}
                     <!--div class='more description'>pretty l33t hax0ring</div-->
                     <div class='url'>{{ exp.url }}</div>
-                    {% comment %}
                     <div class='more phrases'>
-                        tags here
                         {% if more_exp_attributes.tags %}
-                        {{ more_exp_attributes.tags }}
                         {% for tag in more_exp_attributes.tags %}
                         {{ tag.text }}
                         {% endfor %}
@@ -64,7 +61,6 @@
                         {% endif %}
                     </div>
                     <a href="/people/edit-exp/tags/{{ exp.id }}">Edit tags for this experience</a>
-                    {% comment %}
                     <div class='make-projectexp-favorite'>
                         <form name='make-exp-favorite-{{ exp.id }}' 
                             method='POST'
@@ -76,7 +72,6 @@
                             <input type='submit' value='Make Favorite' />
                         </form>
                     </div>
-                    {% endcomment %}
                     </li>
                     {% endfor %}
                 </ul>
