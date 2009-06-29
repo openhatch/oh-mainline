@@ -244,7 +244,7 @@ def display_person_web(request, input_username=None):
             return render_to_response('profile/profile.html')
 
     edit = False
-    if request.GET.get('edit', 0) == 1:
+    if request.GET.get('edit', 0) == '1':
         edit = True
 
     tab = request.GET.get('tab', None)

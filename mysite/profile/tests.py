@@ -951,8 +951,8 @@ class PersonInvolvementTests(django.test.TestCase):
         # {{{
         url = 'http://openhatch.org/people/paulproteus?tab=inv'
         tc.go(make_twill_url(url))
-        tc.find('man-month')
-        tc.find('1 man-month')
+        tc.find('month')
+        tc.find('1 month')
         # }}}
 
     def test_tag_editor(self):

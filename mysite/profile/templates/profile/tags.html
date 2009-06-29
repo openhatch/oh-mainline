@@ -1,11 +1,15 @@
 {% include 'profile/header.global.html' %}
 {% include 'profile/header.html' %}
 
+{% if edit %}
 <h3 id='tag-heading'>tags</h3>
+{{ edit }}
+{% endif %}
 
 <div id='widgets'>
 
     {% if edit %}
+    <h3>Edit tags</h3>
     <div id='taglines'>
         <!-- {{{ -->
         <div id='left'>
