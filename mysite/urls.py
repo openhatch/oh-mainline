@@ -33,7 +33,7 @@ urlpatterns = patterns('',
             'mysite.profile.views.display_person_old'),
         (r'^people/add_contribution$', 'mysite.profile.views.add_contribution_web'),
 
-        (r'^people/(?P<username>\w+)/involvement/add$', 'mysite.profile.views.person_involvement_add_input'),
+        (r'^people/(?P<username>\w+)/involvement/add/input$', 'mysite.profile.views.person_involvement_add_input'),
         (r'^people-actions/involvement/add$', 'mysite.profile.views.person_involvement_add'),
 
         # URL Raffi was writing for the bubble-closing page as he realized
