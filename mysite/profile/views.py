@@ -11,6 +11,8 @@ import urllib
 import simplejson
 import re
 from odict import odict
+import collections
+import difflib
 # }}}
 
 # Add a contribution {{{
@@ -270,12 +272,23 @@ def display_person(person, tab, edit):
         return render_to_response('profile/tags.html', data_dict)
     if tab == 'tech':
         data_dict['title'] = title % "tech"
+        data_dict['tags'] = tags_dict_for_person(person)
         return render_to_response('profile/tech.html', data_dict)
     else:
         data_dict['title'] = title % "profile"
         data_dict['projects'] = dict(data_dict['projects'].items()[:4])
         return render_to_response('profile/main.html', data_dict)
 
+    # }}}
+
+def tags_dict_for_person(person):
+    # {{
+    ret = collections.defaultdict(list)
+    tags = Link_Person_Tags.objects.filter(person=person)
+    for tag in tags:
+        ret[tag.tag_type.text].append(tag)
+
+    return ret
     # }}}
 
 def display_person_old(request, input_username=None):
@@ -645,7 +658,6 @@ def edit_exp_tag(request, exp_id):
 
         to_be_added = []
         to_be_removed = []
-        import difflib
         for modification in difflib.ndiff(tag_texts, tags):
             first_two, rest = modification[:2], modification[2:]
             if first_two == '  ':

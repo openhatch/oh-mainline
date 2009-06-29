@@ -1,6 +1,8 @@
 {% include 'profile/header.global.html' %}
 {% include 'profile/header.html' %}
 
+{{ tags }}
+
 {% if not edit %}
 <h3 id='tag-heading'>Tags</h3>
 {% else %}
@@ -21,7 +23,7 @@
                 </div>
                 <div class='widget'>
                     <h3>will never understand:
-                        <textarea name='edit-tags-!understands'></textarea>
+                        <textarea name='edit-tags-understands-not'></textarea>
                     </h3>
                 </div>
                 <div class='widget'>
@@ -53,47 +55,39 @@
         <div id='left'>
             <div class='widget'>
                 <h3>understands:
-                    <a href=''>screen scraping</a>,
-                    <a href=''>boar hunting</a>,
-                    <a href=''>base jumping</a>,
-                    <a href=''>python</a>,
-                    <a href=''>c++</a>,
-                    <a href=''>smalltalk</a>,
-                    <a href=''>javascript</a>,
-                    <a href=''>COBOL</a>,
-                    <a href=''>delphi</a>,
-                    <a href=''>ajax</a>,
-                    <a href=''>twill</a>
+                    {% for tag in tags.understands %}
+                    <a href='#'>{{ tag }}</a>
+                    {% endfor %}
                 </h3>
             </div>
             <div class='widget'>
                 <h3>will never understand:
-                    <a href=''>florida</a>,
-                    <a href=''>conceptual art</a>,
-                    <a href=''>furries</a>
+                    {% for tag in tags.understands_not %}
+                    <a href='#'>{{ tag }}</a>
+                    {% endfor %}
                 </h3>
             </div>
             <div class='widget'>
                 <h3>looking for volunteering opportunities in:
-                    {% if interested_in_working_on_list %}
-                    {% for interest in interested_in_working_on_list %}
-                    <a href=''>{{ interest }}</a>,
+                    {% for tag in tags.seeking %}
+                    <a href='#'>{{ tag }}</a>
                     {% endfor %}
-                    {% endif %}
                 </h3>
             </div>
         </div>
         <div id='right'>
             <div class='widget'>
                 <h3>currently learning about:
-                    <a href=''>tiger trapping</a>,
-                    <a href=''>regular expressions</a>
+                    {% for tag in tags.studying %}
+                    <a href='#'>{{ tag }}</a>
+                    {% endfor %}
                 </h3>
             </div>
             <div class='widget'>
                 <h3>can mentor in:
-                    <a href=''>lanyard swinging</a>,
-                    <a href=''>django</a>
+                    {% for tag in tags.can_mentor %}
+                    <a href='#'>{{ tag }}</a>
+                    {% endfor %}
                 </h3>
             </div>
         </div>
