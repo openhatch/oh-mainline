@@ -777,7 +777,8 @@ def ohloh_grab_done_web(request, username):
 
 def exp_scraper_handle_ohloh_results(username, ohloh_results):
     '''Input: A sequence of Ohloh ContributorInfo dicts.
-    Side-effect: Create matching structures in the DB.'''
+    Side-effect: Create matching structures in the DB
+    and mark our success in the database.'''
     person = Person.objects.get(username=username)
     for c_i in ohloh_results:
         for ohloh_contrib_info in ohloh_results:
@@ -787,7 +788,8 @@ def exp_scraper_handle_ohloh_results(username, ohloh_results):
             exp.last_polled = datetime.datetime.now()
             exp.last_touched = datetime.datetime.now()
             exp.save()
-        person.last_polled = datetime.datetime.now()
-        person.save()
+    person.last_polled = datetime.datetime.now()
+    person.ohloh_grab_completed = True
+    person.save()
 
 # }}}

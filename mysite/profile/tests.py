@@ -1107,6 +1107,18 @@ class CeleryTests(django.test.TestCase):
         tc.go(make_twill_url(url))
         tc.find('True')
 
+    def test_bg_loading_marks_grab_completed(self):
+        username = 'paulproteus'
+        url = 'http://openhatch.org/people/%s/ohloh_grab_done' % urllib.quote(
+            username)
+        tc.go(make_twill_url(url))
+        tc.find('False')
+
+        self.test_slow_loading_via_emulated_bgtask(use_cooked_data=True)
+
+        tc.go(make_twill_url(url))
+        tc.find('True')
+
 # FIXME: One day, stub out the background jobs with mocks
 # that ensure we actually call them!
         
