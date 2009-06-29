@@ -123,7 +123,7 @@ def exp_scraper_scrape_web(request):
     
     person, _ = Person.objects.get_or_create(username=input_username)
 
-    exp_scraper_scrape(person)
+    #exp_scraper_scrape(person)
 
     return HttpResponseRedirect('/people/?' + urllib.urlencode(
         {'u': input_username, 'tab': 'main'}))
@@ -131,10 +131,10 @@ def exp_scraper_scrape_web(request):
 
 def exp_scraper_scrape(person):
     # {{{
-    #person.fetch_projects_from_sourceforge()
-    #Execute script on server: person.fetch_contrib_data_from_ohloh_for_user_and_projects()
     person.fetch_contrib_data_from_ohloh()
     person.save()
+    person.poll_on_next_web_view = False
+    return HttpResponseRedirect('/static/images/data-ready.png')
     # }}}
 # }}}
 
@@ -289,7 +289,7 @@ def display_person(person, tab, edit):
     # }}}
 
 def tags_dict_for_person(person):
-    # {{
+    # {{{
     ret = collections.defaultdict(list)
     links = Link_Person_Tag.objects.filter(person=person)
     for link in links:

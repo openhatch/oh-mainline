@@ -59,6 +59,9 @@ urlpatterns = patterns('',
         (r'^people/xp_slurp_do$',
             'mysite.profile.views.exp_scraper_scrape_web'),
 
+        (r'^people/(?P<input_username>[^/]+)/get_data$',
+            'mysite.profile.views.exp_scraper_scrape_web'),
+
         # Get a list of suggestions for the search input, formatted the way that
         # the jQuery autocomplete plugin wants it.
         (r'^search/get_suggestions$', 'mysite.search.views.request_jquery_autocompletion_suggestions'),

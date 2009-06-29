@@ -8,6 +8,9 @@
         <div id='portfolio' class='widget'>
             <!-- {{{ -->
             <h3>Community involvement</h3>
+            {% if person.poll_on_next_web_view %}
+            <img src='/people/{{person.username}}/get_data' alt='Loading data' />
+            {% endif %}
             <ul>
                 {% if projects %}
                 {% for project, more_project_attributes in projects.items %}
