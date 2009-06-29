@@ -30,7 +30,7 @@ urlpatterns = patterns('',
 
         # Edit a person's tags
         (r'^people/(?P<username>\w+)/tags/edit$',
-            'mysite.profile.views.edit_person_tag'),
+            'mysite.profile.views.edit_person_tags'),
 
         # Project icons
         (r'^people/project_icon/(?P<project_name>.*)$',

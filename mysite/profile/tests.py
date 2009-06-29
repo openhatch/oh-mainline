@@ -974,11 +974,13 @@ class PersonInvolvementTests(django.test.TestCase):
                 '%!!!\'', 'erqergqerg', '5g&%GYQ#%UGQ#*%GQ#GQ$%GQHGIHhhghghghghg'
                 ]
         tc.fv('edit-tags', 'edit-tags-understands', ', '.join(tags[:3]))
-        tc.fv('edit-tags', 'edit-tags-!understands', ', '.join(tags[3:6]))
+        tc.fv('edit-tags', 'edit-tags-understands-not', ', '.join(tags[3:6]))
         tc.fv('edit-tags', 'edit-tags-seeking', ', '.join(tags[6:9]))
         tc.fv('edit-tags', 'edit-tags-studying', ', '.join(tags[9:12]))
         tc.fv('edit-tags', 'edit-tags-can-mentor', ', '.join(tags[12:15]))
         tc.submit()
+        self.assert_(list(profile.models.Link_Person_Tag.objects.filter(
+            tag__text='jquery', person__username='paulproteus')))
         tc.find(".*".join(map(re.escape, tags)))
         # }}}
 

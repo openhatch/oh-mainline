@@ -3,7 +3,7 @@
 # Imports {{{
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
 from django.shortcuts import render_to_response, get_object_or_404
-from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag, Link_Project_Tag, Link_SF_Proj_Dude_FM
+from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag, Link_Project_Tag, Link_SF_Proj_Dude_FM, Link_Person_Tag
 from mysite.search.models import Project
 import StringIO
 import datetime
@@ -688,7 +688,7 @@ def edit_person_tags(request, username):
     person = Person.objects.get(username=username)
 
     # We can map from some strings to some TagTypes
-    for known_tag_type in ('understands', '!understands',
+    for known_tag_type in ('understands', 'understands-not',
                            'studying', 'seeking', 'can-mentor'):
         tag_type, _ = TagType.objects.get_or_create(name=known_tag_type)
 
@@ -720,13 +720,13 @@ def edit_person_tags(request, username):
                                                person=person,
                                                tag__text=tag))
         for tag in to_be_added:
-            new_tag = Tag.objects.get_or_create(tag_type=tag_type, text=tag)
+            new_tag, _ = Tag.objects.get_or_create(tag_type=tag_type, text=tag)
             new_link, _ = Link_Person_Tag.objects.get_or_create(tag=new_tag,
                                                                 person=
                                                                 person)
             
         return HttpResponseRedirect('/people/%s?tab=inv' %
-                                    urllib.quote(project_exp.person.username))
+                                    urllib.quote(person.username))
 
 def project_icon_web(request, project_name):
     url = project_icon_url(project_name)

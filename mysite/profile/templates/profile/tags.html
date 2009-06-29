@@ -14,7 +14,8 @@
     {% if edit %}
     <div id='taglines'>
         <!-- {{{ -->
-        <form name='edit-tags'>
+        <form name='edit-tags' action='/people/{{person.username}}/tags/edit'
+	      method='POST'>
             <div id='left'>
                 <div class='widget'>
                     <h3>understands:
