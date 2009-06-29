@@ -992,6 +992,10 @@ class PersonInvolvementTests(django.test.TestCase):
                                     'can mentor in']):
             tc.find(thing + '.*'
                     + ".*".join(map(re.escape, tags[n*3:(n+1)*3])))
+
+        # Go back to the form and make sure some of these are there
+        tc.go(make_twill_url(url))
+        tc.find('aye')
         # }}}
 
     # }}}
