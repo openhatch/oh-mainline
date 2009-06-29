@@ -269,14 +269,15 @@ def display_person(person, tab, edit):
         return render_to_response('profile/participation.html', data_dict)
     if tab == 'tags':
         data_dict['title'] = title % "tags"
+        data_dict['tags'] = tags_dict_for_person(person)
         return render_to_response('profile/tags.html', data_dict)
     if tab == 'tech':
         data_dict['title'] = title % "tech"
-        data_dict['tags'] = tags_dict_for_person(person)
         return render_to_response('profile/tech.html', data_dict)
     else:
         data_dict['title'] = title % "profile"
         data_dict['projects'] = dict(data_dict['projects'].items()[:4])
+        data_dict['tags'] = tags_dict_for_person(person)
         return render_to_response('profile/main.html', data_dict)
 
     # }}}
@@ -688,8 +689,8 @@ def edit_person_tags(request, username):
     person = Person.objects.get(username=username)
 
     # We can map from some strings to some TagTypes
-    for known_tag_type in ('understands', 'understands-not',
-                           'studying', 'seeking', 'can-mentor'):
+    for known_tag_type in ('understands', 'understands_not',
+                           'studying', 'seeking', 'can_mentor'):
         tag_type, _ = TagType.objects.get_or_create(name=known_tag_type)
 
         text = request.POST.get('edit-tags-' + known_tag_type, '')
@@ -725,7 +726,7 @@ def edit_person_tags(request, username):
                                                                 person=
                                                                 person)
             
-    return HttpResponseRedirect('/people/%s?tab=inv' %
+    return HttpResponseRedirect('/people/%s?tab=tags' %
                                 urllib.quote(person.username))
 
 def project_icon_web(request, project_name):
