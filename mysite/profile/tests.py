@@ -926,6 +926,13 @@ class PersonTabProjectExpTests(django.test.TestCase):
 class PersonInvolvementTests(django.test.TestCase):
     # {{{
     fixtures = ['user-paulproteus', 'cchost-data-imported-from-ohloh']
+
+    def setUp(self):
+        twill_setup()
+
+    def tearDown(self):
+        twill_teardown()
+
     def test_person_involvement_add(self):
         # {{{
         url_prefix = 'http://openhatch.org'
@@ -941,4 +948,10 @@ class PersonInvolvementTests(django.test.TestCase):
         tc.find(description)
         tc.find(url)
         # }}}
+
+    def test_person_involvement_description(self):
+        # {{{
+
+        # }}}
+
     # }}}
