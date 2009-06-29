@@ -1,62 +1,50 @@
 {% include 'profile/header.global.html' %}
 {% include 'profile/header.html' %}
 
-{% if edit %}
-<h3 id='tag-heading'>tags</h3>
-{{ edit }}
+{% if not edit %}
+<h3 id='tag-heading'>Tags</h3>
+{% else %}
+    <h3 id='tag-heading'>Edit tags</h3>
 {% endif %}
 
 <div id='widgets'>
 
     {% if edit %}
-    <h3>Edit tags</h3>
     <div id='taglines'>
         <!-- {{{ -->
-        <div id='left'>
-            <div class='widget'>
-                <h3>understands:
-                    <form name='form_tags_groks'>
-                        <textarea name='tags_groks'>screen scraping, boar hunting, base jumping, python, c++, smalltalk, javascript, COBOL, delphi, ajax</textarea>
-                        <input type='submit' value='save'/>
-                    </form>
-                </h3>
+        <form name='edit-tags'>
+            <div id='left'>
+                <div class='widget'>
+                    <h3>understands:
+                        <textarea name='edit-tags-understands'></textarea>
+                    </h3>
+                </div>
+                <div class='widget'>
+                    <h3>will never understand:
+                        <textarea name='edit-tags-!understands'></textarea>
+                    </h3>
+                </div>
+                <div class='widget'>
+                    <h3>looking for volunteering opportunities
+                        tagged with:
+                        <textarea name='edit-tags-seeking'></textarea>
+                    </h3>
+                </div>
             </div>
-            <div class='widget'>
-                <h3>will never understand:
-                    <form name='form_tags_groks'>
-                        <textarea name='tags_groks'>academia, furries</textarea>
-                        <input type='submit' value='save'/>
-                    </form>
-                </h3>
+            <div id='right'>
+                <div class='widget'>
+                    <h3>currently studying:
+                        <textarea name='edit-tags-studying'></textarea>
+                    </h3>
+                </div>
+                <div class='widget'>
+                    <h3>can mentor in:
+                        <textarea name='edit-tags-can-mentor'></textarea>
+                    </h3>
+                </div>
             </div>
-            <div class='widget'>
-                <h3>looking for volunteering opportunities matching these characteristics:
-                    <form name='what_you_like_working_on' method='POST' 
-                        action='/people/change_what_like_working_on'>
-                        <textarea name='like-working-on'
-                            >{{ person.interested_in_working_on }}</textarea>
-                        <input type='hidden' name='username' value='{{ person.username }}' />
-                        <input type='submit' value='save'/>
-                    </form>
-                </h3>
-            </div>
-        </div>
-        <div id='right'>
-            <div class='widget'>
-                <h3>currently studying:
-                    <form name='form_tags_groks'>
-                        <textarea name='tags_seeks_knowledge_in'>screen scraping, boar hunting, base jumping, python, c++, smalltalk, javascript, COBOL, delphi, ajax</textarea>
-                        <input type='submit' value='save'/>
-                    </form>
-                </h3>
-            </div>
-            <div class='widget'>
-                <h3>can mentor in:
-                    <textarea name='tags_offers_knowledge_in'>screen scraping, boar hunting, base jumping, python, c++, smalltalk, javascript, COBOL, delphi, ajax</textarea>
-                    <input type='submit' value='save'/>
-                </h3>
-            </div>
-        </div>
+            <input type='submit' value='save'/>
+        </form>
         <!-- }}} -->
     </div>
     {% else %}
@@ -116,3 +104,13 @@
 </div><!-- /# widgets-->
 
 {% include 'profile/footer.html' %}
+
+{% comment %}
+<form name='what_you_like_working_on' method='POST' 
+    action='/people/change_what_like_working_on'>
+    <textarea name='like-working-on'
+        >{{ person.interested_in_working_on }}</textarea>
+    <input type='hidden' name='username' value='{{ person.username }}' />
+    <input type='submit' value='save'/>
+</form>
+{% endcomment %}
