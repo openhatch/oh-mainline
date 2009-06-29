@@ -167,7 +167,7 @@ img.show-more-link {
 .widget {
     float: left;
     width: 400px;
-    margin-top: 10px;
+    margin-top: 20px;
 }
 #software ul {
     list-style: none;
@@ -205,7 +205,6 @@ textarea {
     border-width: 1px; 
     background-color: #eee; d9eeff;
     -moz-border-radius: 5px;
-    -moz-border-radius-bottomright: 0;
     border-bottom-color: #ccc;
     margin-top: 5px;
     margin-bottom: 2px;

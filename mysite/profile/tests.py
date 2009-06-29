@@ -962,4 +962,23 @@ class PersonInvolvementTests(django.test.TestCase):
         tc.find('Edit tags')
         # }}}
 
+    def test_tag_editor_save(self):
+        # {{{
+        url = 'http://openhatch.org/people/paulproteus?tab=tags&edit=1'
+        tc.go(make_twill_url(url))
+        tags = ['jquery', 'python', 'c++',
+                'qwer', 'jkl', 'qergqer', 
+                'qe3rga', 'tvauetb', 'aerbgaeg',
+                'q40ghqt', 'bgbhgb', '!#%!&JG%!',
+                '%!!!\'', 'erqergqerg', '5g&%GYQ#%UGQ#*%GQ#GQ$%GQHGIHhhghghghghg'
+                ]
+        tc.fv('edit-tags', 'edit-tags-understands', tags[:3])
+        tc.fv('edit-tags', 'edit-tags-!understands', tags[3:6])
+        tc.fv('edit-tags', 'edit-tags-seeking', tags[6:9])
+        tc.fv('edit-tags', 'edit-tags-studying', tags[9:12])
+        tc.fv('edit-tags', 'edit-tags-can-mentor', tags[12:15])
+        tc.submit()
+        tc.find(".*".join(map(re.escape, tags))
+        # }}}
+
     # }}}
