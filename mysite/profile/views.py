@@ -774,9 +774,9 @@ def exp_scraper_display_for_person_web(request):
     if do_it:
         from tasks import FetchPersonDataFromOhloh
         # say we're trying
-        person_obj.poll_on_next_web_view = False
-        person_obj.last_polled = datetime.datetime.now()
-        person_obj.save()
+        person.poll_on_next_web_view = False
+        person.last_polled = datetime.datetime.now()
+        person.save()
         result = FetchPersonDataFromOhloh.delay(username=username)
         
     return HttpResponse(person.username + '\n'.join(involved_projects))
