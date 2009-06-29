@@ -182,6 +182,16 @@ class Link_Project_Tag(models.Model):
     source = models.CharField(max_length=200)
     # }}}
 
+class Link_Person_Tag(models.Model):
+    "Many-to-many relation between Person and Tags."
+    # {{{
+    tag = models.ForeignKey(Tag)
+    project = models.ForeignKey(Person)
+    time_record_was_created = models.DateTimeField(
+            default=datetime.datetime.now())
+    source = models.CharField(max_length=200)
+    # }}}
+
 class SourceForgePerson(models.Model):
     '''A person in SourceForge.'''
     username = models.CharField(max_length=200)
