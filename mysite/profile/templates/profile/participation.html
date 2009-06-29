@@ -5,7 +5,11 @@
 
     <div id='left'>
         <div id='portfolio' class='widget'>
-            <h3>Contributions to community projects:</h3>
+            <h3>Contributions to community projects</h3>
+            <a class='add-a-contribution'
+                href='/people/{{ person.username }}/involvement/add/input'>
+                <img src='/static/images/icons/Add.png' />Add a contribution
+            </a>
             <ul>
                 {% if projects %}
                 {% for project, more_project_attributes in projects.items %}
@@ -16,22 +20,38 @@
                         <img alt='logo for {{project.name}}' src='/people/project_icon/{{ project.name }}'/>
                     </div>
                     <div class='name'>{{ project.name }}</div>
+                    {% comment %}
                     <div class='tags'>
                         {% for tag in more_project_attributes.tags %}
                         <a href=''>{{ tag.text }}</a>,
                         {% endfor %}
                     </div>
+                    {% endcomment %}
                 </div>
                 <ul class='contrib-descriptions'>
                     {% for exp, more_exp_attributes in more_project_attributes.experiences.items %}
                     <li>
                     <div class='description'>{{ exp.description }}</div>
+                    <div class='description'>
+                    {% if exp.man_months and exp.primary_language %}
+                    Clocked {{ exp.man_months }} month(s) of work
+                    in {{ exp.primary_language }}.
+                    {% else %}
+                        {% if exp.man_months %}
+                        Clocked {{ exp.man_months }} month(s) of work.
+                        {% endif %}
+                        {% if exp.primary_language %}
+                        Primarily written in {{ exp.primary_language }}.
+                        {% endif %}
+                    {% endif %}
+                    </div>
                     {% comment %}
                     <img src='/static/images/icons/Add.png' alt='show more'
                     class='show-more-link'>
                     {% endcomment %}
                     <!--div class='more description'>pretty l33t hax0ring</div-->
                     <div class='url'>{{ exp.url }}</div>
+                    {% comment %}
                     <div class='more phrases'>
                         tags here
                         {% if more_exp_attributes.tags %}
@@ -64,7 +84,6 @@
                 </li>
                 {% endfor %}
                 {% endif %}
-                <a href='/people/{{ person.username }}/involvement/add/input'>Add a contribution</a>
                 {% comment %}
                 <li>
                 <!-- {{{ -->
@@ -184,6 +203,10 @@
                 </li>
                 {% endcomment %}
             </ul>
+            <a class='add-a-contribution'
+                href='/people/{{ person.username }}/involvement/add/input'>
+                Add a contribution
+            </a>
         </div><!-- /#portfolio -->
 
     </div> <!-- /#left -->

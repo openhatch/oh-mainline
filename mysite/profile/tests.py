@@ -934,18 +934,17 @@ class PersonInvolvementTests(django.test.TestCase):
         # {{{
         url_prefix = 'http://openhatch.org'
         username = 'paulproteus'
-        project_name = 'ccHost'
-        description = 'fiddlesticks'
         url = url_prefix + '/people/%s/involvement/add/input' % username
         tc.go(make_twill_url(url))
         tc.find('Add contribution')
-        tc.fv('add_contrib', 'description', description)
-        tc.fv('add_contrib', 'url', url)
+        tc.fv('add_contrib', 'project_name', 'bumble')
+        tc.fv('add_contrib', 'description', 'fiddlesticks')
+        tc.fv('add_contrib', 'url', 'http://example.com')
         tc.submit()
         tc.show()
         #tc.follow('involvement')
-        tc.find(description)
-        tc.find(url)
+        tc.find('fiddlesticks')
+        tc.find('http://example.com')
         # }}}
 
     def test_person_involvement_description(self):
@@ -954,6 +953,13 @@ class PersonInvolvementTests(django.test.TestCase):
         tc.go(make_twill_url(url))
         tc.find('man-month')
         tc.find('1 man-month')
+        # }}}
+
+    def test_tag_editor(self):
+        # {{{
+        url = 'http://openhatch.org/people/paulproteus?tab=tags&edit=1'
+        tc.go(make_twill_url(url))
+        tc.find('Edit tags')
         # }}}
 
     # }}}

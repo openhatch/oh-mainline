@@ -243,16 +243,23 @@ def display_person_web(request, input_username=None):
         if input_username is None:
             return render_to_response('profile/profile.html')
 
+    edit = False
+    if request.GET.get('edit', 0) == 1:
+        edit = True
+
     tab = request.GET.get('tab', None)
 
     person, _ = Person.objects.get_or_create(username=input_username)
 
-    return display_person(person, tab)
+    return display_person(person, tab, edit)
 
-def display_person(person, tab):
+def display_person(person, tab, edit):
     # {{{
 
     data_dict = data_for_person_display_without_ohloh(person)
+
+    data_dict['edit'] = edit
+    print data_dict
 
     title = person.username + " / %s : openhatch"
     if tab == 'inv':
