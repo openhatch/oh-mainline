@@ -981,6 +981,10 @@ class PersonInvolvementTests(django.test.TestCase):
         tc.submit()
         self.assert_(list(profile.models.Link_Person_Tag.objects.filter(
             tag__text='jquery', person__username='paulproteus')))
+        self.assert_(list(profile.models.Link_Person_Tag.objects.filter(
+            tag__text='bgbhgb', person__username='paulproteus')))
+        #out = profile.views.tags_dict_for_person(Person.objects.get(
+        #    username='paulproteus'))
         tc.find(".*".join(map(re.escape, tags)))
         # }}}
 

@@ -284,9 +284,9 @@ def display_person(person, tab, edit):
 def tags_dict_for_person(person):
     # {{
     ret = collections.defaultdict(list)
-    tags = Link_Person_Tags.objects.filter(person=person)
-    for tag in tags:
-        ret[tag.tag_type.text].append(tag)
+    links = Link_Person_Tag.objects.filter(person=person)
+    for link in links:
+        ret[link.tag.tag_type.name].append(link.tag)
 
     return ret
     # }}}
@@ -725,8 +725,8 @@ def edit_person_tags(request, username):
                                                                 person=
                                                                 person)
             
-        return HttpResponseRedirect('/people/%s?tab=inv' %
-                                    urllib.quote(person.username))
+    return HttpResponseRedirect('/people/%s?tab=inv' %
+                                urllib.quote(person.username))
 
 def project_icon_web(request, project_name):
     url = project_icon_url(project_name)
