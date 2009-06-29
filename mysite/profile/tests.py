@@ -396,8 +396,6 @@ class ExpTag(django.test.TestCase):
     def test__exp_tag_add__unit(self, return_it = False):
         # {{{
 
-        # Disable for now.
-
         # Constants:
         project_name='murmur'
         username='stipe'
