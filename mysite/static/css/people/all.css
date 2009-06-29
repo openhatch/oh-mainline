@@ -308,6 +308,23 @@ input[type='text'] {
     text-decoration: none;
     font-weight: bold;
 }
+a.add-a-contribution {
+    text-decoration: none;
+    float: left;
+    margin-top: 10px;
+    border: solid #dde;
+    border-width: 1px 1px 3px 1px;
+    background-color: #eee; d9eeff; b5deff; 7fc4ff; dde; 
+    padding: 1px 8px;
+    color: #668;
+    -moz-border-radius: 5px;
+    font-weight: bold;
+}
+a.add-a-contribution img {
+    margin-right: 5px;
+    position: relative;
+    top: 3px;
+}
 .right {
     float: left;
     width: 380px;

@@ -29,11 +29,22 @@
                     {% for exp, more_exp_attributes in more_project_attributes.experiences.items %}
                     <li>
                     <div class='description'>{{ exp.description }}</div>
+                    <div class='description'>
+                    {% if exp.man_months and exp.primary_language %}
+                    Clocked {{ exp.man_months }} month(s) of work
+                    in {{ exp.primary_language }}.
+                    {% else %}
+                        {% if exp.man_months %}
+                        Clocked {{ exp.man_months }} month(s) of work.
+                        {% else %}
+                        Primarily written in {{ exp.primary_language }}.
+                        {% endif %}
+                    {% endif %}
+                    </div>
                     {% comment %}
                     <img src='/static/images/icons/Add.png' alt='show more'
                     class='show-more-link'>
                     {% endcomment %}
-                    <!--div class='more description'>pretty l33t hax0ring</div-->
                     <div class='url'>{{ exp.url }}</div>
                     <div class='more phrases'>
                         tags here
