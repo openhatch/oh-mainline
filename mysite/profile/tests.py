@@ -461,7 +461,7 @@ class ExpTag(django.test.TestCase):
         one_tags = list(profile.models.Link_ProjectExp_Tag.objects.filter(
             tag__text='one'))
         self.assert_(list(profile.models.Link_ProjectExp_Tag.objects.filter(
-            tag__text='two')))
+            tag__text='two', person__username='paulproteus')))
         self.assert_(list(profile.models.Link_ProjectExp_Tag.objects.filter(
             tag__text='three')))
         tc.find('three')

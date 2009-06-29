@@ -672,6 +672,50 @@ def edit_exp_tag(request, exp_id):
         return HttpResponseRedirect('/people/%s?tab=inv' %
                                     urllib.quote(project_exp.person.username))
 
+def edit_person_tags(request, username):
+    person = Person.objects.get(username=username)
+
+    # We can map from some strings to some TagTypes
+    for known_tag_type in ('understands', '!understands',
+                           'studying', 'seeking', 'can-mentor'):
+        tag_type, _ = TagType.objects.get_or_create(name=known_tag_type)
+
+        text = request.POST.get('edit-tags-' + known_tag_type, '')
+        # set the tags to this thing
+        tags = text.split(',')
+        tags = [tag.strip() for tag in tags]
+        # Now figure out what tags there in the DB
+        tag_links = Link_Person_Tag.objects.filter(tag__tag_type=tag_type,
+                                                   person=person)
+        tag_texts = [l.tag.text for l in tag_links]
+
+        to_be_added = []
+        to_be_removed = []
+        import difflib
+        for modification in difflib.ndiff(tag_texts, tags):
+            first_two, rest = modification[:2], modification[2:]
+            if first_two == '  ':
+                continue
+            elif first_two == '+ ':
+                to_be_added.append(rest)
+            elif first_two == '- ':
+                to_be_removed.append(rest)
+            else:
+                raise ValueError, "Weird."
+        for tag in to_be_removed:
+            map(lambda thing: thing.delete(),
+                Link_Person_Tag.objects.filter(tag__tag_type=tag_type,
+                                               person=person,
+                                               tag__text=tag))
+        for tag in to_be_added:
+            new_tag = Tag.objects.get_or_create(tag_type=tag_type, text=tag)
+            new_link, _ = Link_Person_Tag.objects.get_or_create(tag=new_tag,
+                                                                person=
+                                                                person)
+            
+        return HttpResponseRedirect('/people/%s?tab=inv' %
+                                    urllib.quote(project_exp.person.username))
+
 def project_icon_web(request, project_name):
     url = project_icon_url(project_name)
     return HttpResponseRedirect(url)
