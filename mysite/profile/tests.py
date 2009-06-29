@@ -978,7 +978,7 @@ class PersonInvolvementTests(django.test.TestCase):
         tc.fv('edit-tags', 'edit-tags-studying', tags[9:12])
         tc.fv('edit-tags', 'edit-tags-can-mentor', tags[12:15])
         tc.submit()
-        tc.find(".*".join(map(re.escape, tags))
+        tc.find(".*".join(map(re.escape, tags)))
         # }}}
 
     # }}}
