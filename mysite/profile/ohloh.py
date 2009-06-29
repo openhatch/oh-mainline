@@ -169,7 +169,7 @@ class Ohloh(object):
         
         for (project, contributor_id) in relevant_project_and_contributor_id_pairs:
             url = 'https://www.ohloh.net/p/%s/contributors/%d.xml?' % (
-                urlib.quote(project), urllib.quote(contributor_id))
+                urllib.quote(project), contributor_id)
             url, c_fs = ohloh_url2data(url, 'result/contributor_fact', many=True)
             # For each contributor fact, grab the project it was for
             for c_f in c_fs:
