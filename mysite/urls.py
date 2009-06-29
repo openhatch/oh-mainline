@@ -72,8 +72,14 @@ urlpatterns = patterns('',
         (r'^people/(?P<input_username>[^/]+)/test_commit_importer_json$',
             'mysite.profile.views.get_commit_importer_json'),
 
+        # Tabs
+        (r'^people/(?P<input_username>[^/]+)/tabs/(?P<tab>[a-z]+)[/?]$',
+                'mysite.profile.views.display_person_web'),
+
         # This dangerous regex is last
-        (r'^people/(?P<input_username>[^/]+)$', 'mysite.profile.views.display_person_web'),
+        (r'^people/(?P<input_username>[^/]+)[/?]$',
+                'mysite.profile.views.display_person_web'),
+
 
         )
 

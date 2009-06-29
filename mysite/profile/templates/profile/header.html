@@ -1,18 +1,15 @@
-                    {% comment %} Heading {{{ {% endcomment %}
-                    <div id='heading'>
-                        <h1>
-                            {{ person.username }}
-                            {% if person.name %}
-                            {{ person.name }}
-                            {% endif %}
-                        </h1>
-                        <ul>
-                            <li><a href='/people/{{ person.username }}'>home</a></li>
-                            <li><a href='/people/{{ person.username }}?tab=inv'>involvement</a></li>
-                            <li><a href='/people/{{ person.username }}?tab=tags'>tags</a></li>
-                            <li><a href='/people/{{ person.username }}?tab=tech'>tech</a></li>
-                            <!--li><a href='?u={{ person.username }}&amp;tab=inv'>recently</a></li-->
-                        </ul>
-                    </div>
-                    {% comment %} }}} {% endcomment %}
-
+<div id='heading'>
+    <h1>
+        {{ person.username }}
+        {% if person.name %}
+        {{ person.name }}
+        {% endif %}
+    </h1>
+    <ul>
+        <li><a href='/people/{{ person.username }}'>home</a></li>
+        <li><a href='/people/{{ person.username }}/tab/involvement'>involvement</a></li>
+        <li><a href='/people/{{ person.username }}/tab/tags'>tags</a></li>
+        <!--li><a href='/people/{{ person.username }}/tab/tech'>tech</a></li-->
+        <!--li><a href='?u={{ person.username }}&amp;tab=inv'>recently</a></li-->
+    </ul>
+</div>

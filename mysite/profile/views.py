@@ -7,6 +7,7 @@ from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_Project
 from mysite.search.models import Project
 import StringIO
 import datetime
+import time
 import urllib
 import simplejson
 import re
@@ -151,7 +152,7 @@ def display_test_page_for_commit_importer(request, input_username):
         'username': input_username})
 
 def get_commit_importer_json(request, input_username):
-    success = 1
+    success = (time.time() % 10 < 4)
     list_of_dictionaries = [{'success': success}]
     json = "(%s)" % simplejson.dumps(list_of_dictionaries)
     return HttpResponse(json)
@@ -259,7 +260,7 @@ def data_for_person_display_without_ohloh(person):
             } 
     # }}}
 
-def display_person_web(request, input_username=None):
+def display_person_web(request, input_username=None, tab=None):
     if input_username is None:
         input_username = request.GET.get('u', None)
         if input_username is None:
@@ -269,7 +270,8 @@ def display_person_web(request, input_username=None):
     if request.GET.get('edit', 0) == '1':
         edit = True
 
-    tab = request.GET.get('tab', None)
+    if tab is None:
+        tab = request.GET.get('tab', None)
 
     person, _ = Person.objects.get_or_create(username=input_username)
 
@@ -283,7 +285,7 @@ def display_person(person, tab, edit):
     data_dict['edit'] = edit
 
     title = person.username + " / %s : openhatch"
-    if tab == 'inv':
+    if tab == 'inv' or tab == 'involvement':
         data_dict['title'] = title % "community involvement"
         return render_to_response('profile/participation.html', data_dict)
     if tab == 'tags':
