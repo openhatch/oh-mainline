@@ -281,7 +281,7 @@ def display_person(person, tab, edit):
         data_dict['projects'] = dict(data_dict['projects'].items()[:4])
         data_dict['tags'] = tags_dict_for_person(person)
         data_dict['tags_flat'] = dict(
-            [ (key, ', '.join(data_dict['tags'][key]))
+            [ (key, ', '.join([k.text for k in data_dict['tags'][key]]))
               for key in data_dict['tags'] ])
         return render_to_response('profile/main.html', data_dict)
 
