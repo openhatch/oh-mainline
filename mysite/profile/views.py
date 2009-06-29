@@ -619,6 +619,52 @@ def project_icon_url(project_name, actually_fetch = True):
     return '/' + project_icon_path
     # FIXME: One day, add cache expiry.
 
+def edit_exp_tag(request, exp_id):
+    project_exp = ProjectExp.objects.get(id=exp_id)
+    
+    text = request.POST.get('text', None)
+    if text is None:
+        return render_to_response('profile/edit_exp_tags.html',
+                                  {'text': ''})
+    else:
+        # set the tags to this thing
+        tags = text.split(',')
+        tags = [tag.strip() for tag in tags]
+        # Now figure out what tags there in the DB
+        tag_type, _ = TagType.objects.get_or_create(name='user_generated')
+        tag_links = Link_ProjectExp_Tag.objects.filter(tag__tag_type=tag_type,
+                                                       project_exp__id=exp_id)
+        tag_texts = [l.tag.text for l in tag_links]
+
+        to_be_added = []
+        to_be_removed = []
+        import difflib
+        for modification in difflib.ndiff(tag_texts, tags):
+            first_two, rest = modification[:2], modification[2:]
+            if first_two == '  ':
+                continue
+            elif first_two == '+ ':
+                to_be_added.append(rest)
+            elif first_two == '- ':
+                to_be_removed.append(rest)
+            else:
+                raise ValueError, "Weird."
+        map(lambda thing: thing.delete(),
+            Link_ProjectExp_Tag.objects.filter(tag__tag_type=tag_type,
+                                               project_exp__id=exp_id,
+                                               tag__text=tag))
+        for tag in to_be_added:
+            new_tag, _ = Tag.objects.get_or_create(tag_type=tag_type, text=tag)
+            new_tag.save()
+            new_link, _ = Link_ProjectExp_Tag.objects.get_or_create(tag=new_tag,
+                                              project_exp=project_exp)
+            new_link.save()
+            #import pdb
+            #pdb.set_trace()
+            
+        return HttpResponseRedirect('/people/%s?tab=inv' %
+                                    urllib.quote(project_exp.person.username))
+
 def project_icon_web(request, project_name):
     url = project_icon_url(project_name)
     return HttpResponseRedirect(url)

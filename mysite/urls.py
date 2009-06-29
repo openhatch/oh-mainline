@@ -24,6 +24,10 @@ urlpatterns = patterns('',
         (r'^people/make_favorite_exp_tag$',
             'mysite.profile.views.make_favorite_exp_tag_web'),
 
+        # Edit tags for an experience
+        (r'^people/edit-exp/tags/(?P<exp_id>\d+)$',
+            'mysite.profile.views.edit_exp_tag'),
+
         # Project icons
         (r'^people/project_icon/(?P<project_name>.*)$',
             'mysite.profile.views.project_icon_web'),

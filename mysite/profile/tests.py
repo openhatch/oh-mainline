@@ -455,6 +455,16 @@ class ExpTag(django.test.TestCase):
         url = 'http://openhatch.org/people/paulproteus?tab=inv'
         tc.go(make_twill_url(url))
         tc.follow('Edit tags for this experience')
+        tc.fv('all_tags', 'text', 'one, two, three')
+        tc.submit()
+        print tc.show()
+        one_tags = list(profile.models.Link_ProjectExp_Tag.objects.filter(
+            tag__text='one'))
+        self.assert_(list(profile.models.Link_ProjectExp_Tag.objects.filter(
+            tag__text='two')))
+        self.assert_(list(profile.models.Link_ProjectExp_Tag.objects.filter(
+            tag__text='three')))
+        tc.find('three')
         # }}}
 
     def test__project_exp_tag__remove__web(self):
