@@ -761,10 +761,22 @@ def exp_scraper_display_for_person_web(request):
 
     # if we are allowed to make bgtasks, create background tasks
     # to pull in this user's data (just the one huge one)
-    if nobgtask or person.ohloh_grab_completed:
-        pass
-    else:
+    do_it = True # unless...
+    do_it = (not nobgtask) and (not person.ohloh_grab_completed)
+
+    # finally, check for an attempt sitting in the queue
+    if not person.poll_on_next_web_view:
+        # if this is set, it means someone created a background job
+        # if said job is less than two minutes old, then let it run
+        if (person.last_polled - datetime.datetime.now()).minutes < 2:
+            do_it = False
+    
+    if do_it:
         from tasks import FetchPersonDataFromOhloh
+        # say we're trying
+        person_obj.poll_on_next_web_view = False
+        person_obj.last_polled = datetime.datetime.now()
+        person_obj.save()
         result = FetchPersonDataFromOhloh.delay(username=username)
         
     return HttpResponse(person.username + '\n'.join(involved_projects))

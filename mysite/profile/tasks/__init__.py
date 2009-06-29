@@ -1,5 +1,7 @@
+import datetime
 from .profile import ohloh
 from .profile.views import exp_scraper_handle_ohloh_results
+from .profile.models import Person
 from celery.task import Task
 from celery.registry import tasks
 
@@ -10,6 +12,10 @@ class FetchPersonDataFromOhloh(Task):
         logger = self.get_logger(**kwargs)
         if cooked_data is None:
             logger.info("Fetching Ohloh data for " + username)
+            person_obj = Person.objects.get(username=username)
+            if person_obj.ohloh_grab_completed:
+                logger.info("Bailing out of Ohloh grab for " + username)
+                return
             oh = ohloh.get_ohloh()
             ohloh_results = oh.get_contribution_info_by_username(username)
         else:
