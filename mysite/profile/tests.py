@@ -1015,7 +1015,16 @@ class CommitImportTests(django.test.TestCase):
         url = 'http://openhatch.org/people/paulproteus/test_commit_importer'
         url = make_twill_url(url)
         tc.go(url)
-        tc.show()
-        tc.find('hello')
+        tc.find('test commit importer')
+        # }}}
+
+    def test_poller_json_fakes_it(self):
+        # {{{
+        url = 'http://openhatch.org/people/paulproteus/test_commit_importer_json'
+        url = make_twill_url(url)
+        tc.go(url)
+        # FIXME: Check it's valid JSON.
+        tc.find('"success": 1')
+        tc.find('\(\[\{"success": (0|1)\}\]\)')
         # }}}
     # }}}

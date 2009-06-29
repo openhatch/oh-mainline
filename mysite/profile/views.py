@@ -150,6 +150,12 @@ def display_test_page_for_commit_importer(request, input_username):
     return render_to_response('profile/test_commit_importer.html', {
         'username': input_username})
 
+def get_commit_importer_json(request, input_username):
+    success = 1
+    list_of_dictionaries = [{'success': success}]
+    json = "(%s)" % simplejson.dumps(list_of_dictionaries)
+    return HttpResponse(json)
+
 # }}}
 
 # Display profile {{{
