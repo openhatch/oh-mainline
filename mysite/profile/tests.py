@@ -341,6 +341,7 @@ class QuebecTests(django.test.TestCase):
 
 class ExpTag(django.test.TestCase):
     # {{{
+    fixtures = ['user-paulproteus', 'cchost-data-imported-from-ohloh']
     def setUp(self):
         twill_setup()
         self.sample_person = Person(username='stipe')
@@ -447,27 +448,13 @@ class ExpTag(django.test.TestCase):
             pass # w00t
         # }}}
 
-    def test__exp_tag_add__web(self, username='stipe',
-                               project_name='automatic',
+    def test__exp_tag_add__web(self, username='paulproteus',
+                               project_name='ccHost',
                                tag_text='baller'):
         # {{{
-        # Do it twice: note that it doesn't fail
-        for k in range(2):
-            url = '/people/add_tag_to_project_exp'
-            
-            good_input = {
-                'username': username,
-                'project_name': project_name,
-                'tag_text': tag_text
-                }
-            
-            response = Client().post(url, good_input)
-            response = Client().get('/people/', {'u': username, 'tab': 'inv'})
-            
-            self.assertContains(response, username)
-            self.assertContains(response, project_name)
-            self.assertContains(response, tag_text)
-
+        url = 'http://openhatch.org/people/paulproteus?tab=inv'
+        tc.go(make_twill_url(url))
+        tc.follow('Edit tags for this experience')
         # }}}
 
     def test__project_exp_tag__remove__web(self):
