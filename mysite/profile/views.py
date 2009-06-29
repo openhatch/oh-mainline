@@ -115,10 +115,11 @@ def xp_slurper_display_input_form(request):
 def exp_scraper_scrape_web(request):
     # {{{
     # Check input
-    input_username = request.POST.get('u', None)
+    if input_username is None:
+        input_username = request.POST.get('u', None)
 
     if input_username is None or input_username == '':
-        return HttpResponseRedirect('xp_slurp?' + urllib.urlencode(
+        return HttpResponseRedirect('/xp_slurp?' + urllib.urlencode(
             {'error': 'missing_username'}))
     
     person, _ = Person.objects.get_or_create(username=input_username)
@@ -132,10 +133,23 @@ def exp_scraper_scrape_web(request):
 def exp_scraper_scrape(person):
     # {{{
     person.fetch_contrib_data_from_ohloh()
-    person.save()
     person.poll_on_next_web_view = False
-    return HttpResponseRedirect('/static/images/data-ready.png')
+    person.save()
     # }}}
+
+def import_contributions_image(request, input_username=None):
+    # {{{
+    person = Person.objects.get(username=input_username)
+    # FIXME: Catch no username
+    exp_scraper_scrape(person)
+    return HttpResponseRedirect('/static/images/data-ready.png')
+    # FIXME: Catch errors, display error graphic.
+    # }}}
+
+def display_test_page_for_commit_importer(request, input_username):
+    return render_to_response('profile/test_commit_importer.html', {
+        'username': input_username})
+
 # }}}
 
 # Display profile {{{

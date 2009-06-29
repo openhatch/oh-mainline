@@ -999,3 +999,23 @@ class PersonInvolvementTests(django.test.TestCase):
         # }}}
 
     # }}}
+
+class CommitImportTests(django.test.TestCase):
+    # {{{
+    fixtures = ['user-paulproteus']
+
+    def setUp(self):
+        twill_setup()
+
+    def tearDown(self):
+        twill_teardown()
+
+    def test_poller_appears_correctly(self):
+        # {{{
+        url = 'http://openhatch.org/people/paulproteus/test_commit_importer'
+        url = make_twill_url(url)
+        tc.go(url)
+        tc.show()
+        tc.find('hello')
+        # }}}
+    # }}}

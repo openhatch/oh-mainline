@@ -59,12 +59,15 @@ urlpatterns = patterns('',
         (r'^people/xp_slurp_do$',
             'mysite.profile.views.exp_scraper_scrape_web'),
 
-        (r'^people/(?P<input_username>[^/]+)/get_data$',
-            'mysite.profile.views.exp_scraper_scrape_web'),
+        (r'^people/(?P<input_username>[^/]+)/import_contributions_image$',
+            'mysite.profile.views.import_contributions_image'),
 
         # Get a list of suggestions for the search input, formatted the way that
         # the jQuery autocomplete plugin wants it.
         (r'^search/get_suggestions$', 'mysite.search.views.request_jquery_autocompletion_suggestions'),
+
+        (r'^people/(?P<input_username>[^/]+)/test_commit_importer$',
+            'mysite.profile.views.display_test_page_for_commit_importer'),
 
         # This dangerous regex is last
         (r'^people/(?P<input_username>[^/]+)$', 'mysite.profile.views.display_person_web'),
