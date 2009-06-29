@@ -261,7 +261,6 @@ def display_person(person, tab, edit):
     data_dict = data_for_person_display_without_ohloh(person)
 
     data_dict['edit'] = edit
-    print data_dict
 
     title = person.username + " / %s : openhatch"
     if tab == 'inv':
