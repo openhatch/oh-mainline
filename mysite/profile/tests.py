@@ -1004,7 +1004,13 @@ import time
 from django.core import management
 class CeleryTests(django.test.TestCase):
     fixtures = ['user-paulproteus']
-    
+
+    def setUp(self):
+        twill_setup()
+
+    def tearDown(self):
+        twill_teardown()
+
     def test_slow_loading_via_fixture(self):
         username='paulproteus'
         url = '/people/show_all_data_for_person'
@@ -1086,6 +1092,20 @@ class CeleryTests(django.test.TestCase):
         # finally, we should see ccHost
         response = Client().get(url, good_input)
         self.assertContains(response, 'ccHost')
+
+    def test_background_check_if_ohloh_grab_completed(self):
+        username = 'paulproteus'
+        url = 'http://openhatch.org/people/%s/ohloh_grab_done' % urllib.quote(
+            username)
+        tc.go(make_twill_url(url))
+        tc.find('False')
+
+        person_obj = Person.objects.get(username=username)
+        person_obj.ohloh_grab_completed = True
+        person_obj.save()
+
+        tc.go(make_twill_url(url))
+        tc.find('True')
 
 # FIXME: One day, stub out the background jobs with mocks
 # that ensure we actually call them!

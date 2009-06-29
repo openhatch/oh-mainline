@@ -769,6 +769,12 @@ def exp_scraper_display_for_person_web(request):
         
     return HttpResponse(person.username + '\n'.join(involved_projects))
 
+def ohloh_grab_done_web(request, username):
+    # get the person
+    person = get_object_or_404(Person, username=username)
+
+    return HttpResponse(bool(person.ohloh_grab_completed))
+
 def exp_scraper_handle_ohloh_results(username, ohloh_results):
     '''Input: A sequence of Ohloh ContributorInfo dicts.
     Side-effect: Create matching structures in the DB.'''
