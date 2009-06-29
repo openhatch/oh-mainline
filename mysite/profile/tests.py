@@ -76,9 +76,9 @@ class ProfileTests(django.test.TestCase):
         # {{{
         url_prefix = "http://openhatch.org"
         username = 'paulproteus'
-        person = Person.objects.get(username=username)
-        first_exp = ProjectExp.objects.filter(person=person)[0]
-        url = '%s/people/%s/involvement/add' % (
+        #person = Person.objects.get(username=username)
+        #first_exp = ProjectExp.objects.filter(person=person)[0]
+        url = '%s/people/%s/involvement/add/input' % (
                 url_prefix, username)
         tc.go(make_twill_url(url))
 
@@ -98,7 +98,7 @@ class ProfileTests(django.test.TestCase):
 
         # Verify that leaving and coming back has it still
         # there
-        tc.go(make_twill_url(url_prefix + '/people?u=paulproteus&tab=inv'))
+        tc.go(make_twill_url(url_prefix + '/people/paulproteus?tab=inv'))
         tc.show()
         tc.find('Babel')
         tc.find('Baber')
@@ -939,19 +939,24 @@ class PersonInvolvementTests(django.test.TestCase):
         username = 'paulproteus'
         project_name = 'ccHost'
         description = 'fiddlesticks'
-        url = url_prefix + '/people/%s/involvement/add' % username
+        url = url_prefix + '/people/%s/involvement/add/input' % username
         tc.go(make_twill_url(url))
         tc.find('Add contribution')
         tc.fv('add_contrib', 'description', description)
         tc.fv('add_contrib', 'url', url)
         tc.submit()
+        tc.show()
+        #tc.follow('involvement')
         tc.find(description)
         tc.find(url)
         # }}}
 
     def test_person_involvement_description(self):
         # {{{
-
+        url = 'http://openhatch.org/people/paulproteus?tab=inv'
+        tc.go(make_twill_url(url))
+        tc.find('man-month')
+        tc.find('1 man-month')
         # }}}
 
     # }}}
