@@ -397,7 +397,6 @@ class ExpTag(django.test.TestCase):
         # {{{
 
         # Disable for now.
-        return 
 
         # Constants:
         project_name='murmur'
