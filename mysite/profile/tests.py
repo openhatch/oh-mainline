@@ -7,6 +7,7 @@ from search.models import Project
 from profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag
 import profile.views
 
+import re
 import twill
 from twill import commands as tc
 from twill.shell import TwillCommandLoop
@@ -972,11 +973,11 @@ class PersonInvolvementTests(django.test.TestCase):
                 'q40ghqt', 'bgbhgb', '!#%!&JG%!',
                 '%!!!\'', 'erqergqerg', '5g&%GYQ#%UGQ#*%GQ#GQ$%GQHGIHhhghghghghg'
                 ]
-        tc.fv('edit-tags', 'edit-tags-understands', tags[:3])
-        tc.fv('edit-tags', 'edit-tags-!understands', tags[3:6])
-        tc.fv('edit-tags', 'edit-tags-seeking', tags[6:9])
-        tc.fv('edit-tags', 'edit-tags-studying', tags[9:12])
-        tc.fv('edit-tags', 'edit-tags-can-mentor', tags[12:15])
+        tc.fv('edit-tags', 'edit-tags-understands', ', '.join(tags[:3]))
+        tc.fv('edit-tags', 'edit-tags-!understands', ', '.join(tags[3:6]))
+        tc.fv('edit-tags', 'edit-tags-seeking', ', '.join(tags[6:9]))
+        tc.fv('edit-tags', 'edit-tags-studying', ', '.join(tags[9:12]))
+        tc.fv('edit-tags', 'edit-tags-can-mentor', ', '.join(tags[12:15]))
         tc.submit()
         tc.find(".*".join(map(re.escape, tags)))
         # }}}
