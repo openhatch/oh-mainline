@@ -19,6 +19,8 @@ class Person(models.Model):
     last_touched = models.DateTimeField(null=True)
     poll_on_next_web_view = models.BooleanField(
             default=True)
+    ohloh_grab_completed = models.BooleanField(
+        default=False)
     interested_in_working_on = models.CharField(max_length=1024, default='')
 
     def save(self, *args, **kwargs):
@@ -194,10 +196,12 @@ class Link_Person_Tag(models.Model):
 
 class SourceForgePerson(models.Model):
     '''A person in SourceForge.'''
+    # FIXME: Make this unique
     username = models.CharField(max_length=200)
 
 class SourceForgeProject(models.Model):
     '''A project in SourceForge.'''
+    # FIXME: Make this unique
     unixname = models.CharField(max_length=200)
 
 

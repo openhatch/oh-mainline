@@ -32,6 +32,10 @@ urlpatterns = patterns('',
         (r'^people/(?P<username>\w+)/tags/edit$',
             'mysite.profile.views.edit_person_tags'),
 
+        # Check if Ohloh grab is done
+        (r'^people/(?P<username>\w+)/ohloh_grab_done$',
+            'mysite.profile.views.ohloh_grab_done_web'),
+
         # Project icons
         (r'^people/project_icon/(?P<project_name>.*)$',
             'mysite.profile.views.project_icon_web'),
@@ -58,6 +62,8 @@ urlpatterns = patterns('',
             'mysite.profile.views.xp_slurper_display_input_form'),
         (r'^people/xp_slurp_do$',
             'mysite.profile.views.exp_scraper_scrape_web'),
+        (r'^people/show_all_data_for_person$',
+            'mysite.profile.views.exp_scraper_display_for_person_web'),
 
         (r'^people/(?P<input_username>[^/]+)/import_contributions_image$',
             'mysite.profile.views.import_contributions_image'),

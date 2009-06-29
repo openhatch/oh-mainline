@@ -760,4 +760,77 @@ def project_icon_web(request, project_name):
     url = project_icon_url(project_name)
     return HttpResponseRedirect(url)
 
+def exp_scraper_display_for_person_web(request):
+    username = request.GET.get('u', None)
+    nobgtask_s = request.GET.get('nobgtask', False)
+
+    involved_projects = []
+    
+    try:
+        nobgtask = bool(nobgtask_s)
+    except ValueError:
+        nobgtask = False
+    
+    if username is None:
+        return HttpResponseServerError()
+
+    # get the person
+    person = get_object_or_404(Person, username=username)
+
+    # Find the existing ProjectExps
+    project_exps = ProjectExp.objects.filter(person=person)
+    involved_projects.extend([exp.project.name for exp in project_exps])
+
+    # if we are allowed to make bgtasks, create background tasks
+    # to pull in this user's data (just the one huge one)
+    do_it = True # unless...
+
+    # finally, check for an attempt sitting in the queue
+    if not person.poll_on_next_web_view:
+        # if this is set, it means someone created a background job
+        # if said job is less than two minutes old, then let it run
+        now_epoch = int(datetime.datetime.now().strftime('%s'))
+        then_epoch = int(person.last_polled.strftime('%s'))
+        if (now_epoch - then_epoch) < 120:
+            do_it = False
+
+    if nobgtask:
+        do_it = False
+
+    if person.ohloh_grab_completed:
+        do_it = False
+    
+    if do_it:
+        from tasks import FetchPersonDataFromOhloh
+        # say we're trying
+        person.poll_on_next_web_view = False
+        person.last_polled = datetime.datetime.now()
+        person.save()
+        result = FetchPersonDataFromOhloh.delay(username=username)
+        
+    return HttpResponse(person.username + '\n'.join(involved_projects))
+
+def ohloh_grab_done_web(request, username):
+    # get the person
+    person = get_object_or_404(Person, username=username)
+
+    return HttpResponse(bool(person.ohloh_grab_completed))
+
+def exp_scraper_handle_ohloh_results(username, ohloh_results):
+    '''Input: A sequence of Ohloh ContributorInfo dicts.
+    Side-effect: Create matching structures in the DB
+    and mark our success in the database.'''
+    person = Person.objects.get(username=username)
+    for c_i in ohloh_results:
+        for ohloh_contrib_info in ohloh_results:
+            exp = ProjectExp()
+            exp.person = person
+            exp = exp.from_ohloh_contrib_info(ohloh_contrib_info)
+            exp.last_polled = datetime.datetime.now()
+            exp.last_touched = datetime.datetime.now()
+            exp.save()
+    person.last_polled = datetime.datetime.now()
+    person.ohloh_grab_completed = True
+    person.save()
+
 # }}}

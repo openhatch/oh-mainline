@@ -1009,7 +1009,6 @@ class CommitImportTests(django.test.TestCase):
 
     def tearDown(self):
         twill_teardown()
-
     def test_poller_appears_correctly(self):
         # {{{
         url = 'http://openhatch.org/people/paulproteus/test_commit_importer'
@@ -1028,3 +1027,128 @@ class CommitImportTests(django.test.TestCase):
         tc.find('\(\[\{"success": (0|1)\}\]\)')
         # }}}
     # }}}
+
+import time
+from django.core import management
+class CeleryTests(django.test.TestCase):
+    fixtures = ['user-paulproteus']
+
+    def setUp(self):
+        twill_setup()
+
+    def tearDown(self):
+        twill_teardown()
+
+    def test_slow_loading_via_fixture(self):
+        username='paulproteus'
+        url = '/people/show_all_data_for_person'
+        
+        good_input = {
+            'u': username,
+            'nobgtask': 'yes',
+            }
+        
+        response = Client().get(url, good_input)
+        self.assertContains(response, 'paulproteus')
+        self.assertNotContains(response, 'ccHost')
+
+        # load the fixture now
+        management.call_command('loaddata',
+                                'cchost-data-imported-from-ohloh', verbosity=0)
+        response = Client().get(url, good_input)
+        self.assertContains(response, 'ccHost')
+
+    def test_slow_loading_via_emulated_bgtask(self,
+                                              use_cooked_data=True):
+        username='paulproteus'
+        url = '/people/show_all_data_for_person'
+        
+        good_input = {
+            'u': username,
+            'nobgtask': 'yes',
+            }
+        
+        response = Client().get(url, good_input)
+        self.assertContains(response, 'paulproteus')
+        self.assertNotContains(response, 'ccHost')
+
+        # do the background load ourselves
+        if use_cooked_data:
+            cooked_data = [{'man_months': 1, 'project': u'ccHost',
+            'project_homepage_url': 
+            u'http://wiki.creativecommons.org/CcHost',
+            'primary_language': u'shell script'}]
+        else:
+            cooked_data=None
+
+        # Instantiate the task
+        from tasks import FetchPersonDataFromOhloh
+        task = FetchPersonDataFromOhloh()
+        task.run(username, cooked_data=cooked_data)
+
+        # always
+        response = Client().get(url, good_input)
+        self.assertContains(response, 'ccHost')
+
+    def test_slow_loading_via_emulated_bg_user_project(self):
+        username='paulproteus'
+        url = '/people/show_all_data_for_person'
+        
+        good_input = {
+            'u': username,
+            'nobgtask': 'yes',
+            }
+       
+        response = Client().get(url, good_input)
+        self.assertContains(response, 'paulproteus')
+        self.assertNotContains(response, 'ccHost')
+
+        from tasks import FetchPersonDataFromOhlohGivenProject
+        # Instantiate the task - but first try to find
+        # unrelated info
+        task = FetchPersonDataFromOhlohGivenProject()
+        task.run(username=username, project='zoph')
+
+        response = Client().get(url, good_input)
+        self.assertContains(response, 'paulproteus')
+        self.assertNotContains(response, 'ccHost')
+
+        # Now do it right
+        task = FetchPersonDataFromOhlohGivenProject()
+        task.run(username=username, project='ccHost')
+
+        # finally, we should see ccHost
+        response = Client().get(url, good_input)
+        self.assertContains(response, 'ccHost')
+
+    def test_background_check_if_ohloh_grab_completed(self):
+        username = 'paulproteus'
+        url = 'http://openhatch.org/people/%s/ohloh_grab_done' % urllib.quote(
+            username)
+        tc.go(make_twill_url(url))
+        tc.find('False')
+
+        person_obj = Person.objects.get(username=username)
+        person_obj.ohloh_grab_completed = True
+        person_obj.save()
+
+        tc.go(make_twill_url(url))
+        tc.find('True')
+
+    def test_bg_loading_marks_grab_completed(self):
+        username = 'paulproteus'
+        url = 'http://openhatch.org/people/%s/ohloh_grab_done' % urllib.quote(
+            username)
+        tc.go(make_twill_url(url))
+        tc.find('False')
+
+        self.test_slow_loading_via_emulated_bgtask(use_cooked_data=True)
+
+        tc.go(make_twill_url(url))
+        tc.find('True')
+
+    # FIXME: One day, test that after self.test_slow_loading_via_emulated_bgtask
+    # getting the data does not go out to Ohloh.
+
+# FIXME: One day, stub out the background jobs with mocks
+# that ensure we actually call them!
