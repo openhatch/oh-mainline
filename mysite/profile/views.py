@@ -740,7 +740,7 @@ def project_icon_web(request, project_name):
 
 def exp_scraper_display_for_person_web(request):
     username = request.GET.get('u', None)
-    nobgtask_s = request.GET.get('nobgtask', 'False')
+    nobgtask_s = request.GET.get('nobgtask', False)
 
     involved_projects = []
     
@@ -759,6 +759,14 @@ def exp_scraper_display_for_person_web(request):
     project_exps = ProjectExp.objects.filter(person=person)
     involved_projects.extend([exp.project.name for exp in project_exps])
 
+    # if we are allowed to make bgtasks, create background tasks
+    # to pull in this user's data (just the one huge one)
+    if nobgtask:
+        pass
+    else:
+        from tasks import FetchPersonDataFromOhloh
+        result = FetchPersonDataFromOhloh.delay(username=username)
+        
     return HttpResponse(person.username + '\n'.join(involved_projects))
 
 def exp_scraper_handle_ohloh_results(username, ohloh_results):
