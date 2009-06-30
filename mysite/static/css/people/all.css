@@ -13,6 +13,9 @@ a {
 a:hover {
     text-decoration: underline;
 }
+a img {
+    border-style: none;
+}
 ul {
     padding: 0;
     margin: 0;
@@ -23,28 +26,82 @@ ul {
     width: 1000px;
 }
 #penoutermost {
-    float: left;
     width: 1000px;
+    float: left;
+    margin: 0;
+    padding: 0;
 }
 h1, h2, h3, h4 {
     letter-spacing: -1px;
     margin: 0;
 }
-#nav {
-    float: left;
-    width: 960px;
+#header {
+    background: url('/static/images/tracks-top.png') bottom right no-repeat;
+    width: 920px;
+    height: 80px;
     color: #555;
     margin-top: 15px;
     padding: 5px 20px;
     -moz-border-radius-bottomleft: 10px;
     -moz-border-radius-bottomright: 10px;
+    padding: 5px 65px 5px 5px;
+	}
 }
-#nav h2 {
-    font-weight: normal;
-    font-size: 11pt;
-    letter-spacing: 0;
+#headerlogo {
     float: left;
 }
+
+#nav {
+    float: right;
+}
+
+#login {
+    float: right;
+    font-size: 1.4em;
+}
+
+#login .text {
+ font-family: Verdana, Arial, Helvetica, sans-serif;
+ font-size: .7em;
+ width: 100px;
+ margin-right: 6px;
+}
+
+#login .button {
+ font-family: Verdana, Arial, Helvetica, sans-serif;
+ font-size: .7em;
+ background-color: #333333;
+ color: #FFFFFF;
+ margin: -17px 6px 0 0;
+}
+
+#navlinks {
+    clear: right;
+    margin: 50px 0 0 0;
+}
+
+#navlinks ul {
+    float: right;
+    display: inline;
+    list-style-type: none;
+}
+
+#navlinks li {
+    padding: 0 0 0 20px;
+    display: inline;
+}
+
+#navlinks a {
+    color: #333;
+    font-size: 2.5em;
+    text-decoration: none;
+}
+
+#navlinks a:hover {
+    color: black;
+    text-decoration: none;
+}
+
 #enter-free-software-username {
     float: left;
     width: 400px;
@@ -52,8 +109,22 @@ h1, h2, h3, h4 {
     padding: 0;
     font-size: 11pt;
 }
+
+#content_container {
+    width: 1000px;
+    height: 836px;
+    margin: 0;
+    padding: 0;
+    background-image: url(/static/images/tracks.png);
+    background-repeat: repeat-y;
+    background-position: top right;
+}
 #content {
     float: left;
+/* Karen's dimensions
+    width: 920px;
+    height: 800px;
+*/
     width: 960px;
     min-height: 750px;
     background: #fff; url('/static/images/gradient-top.png');
@@ -66,8 +137,44 @@ h1, h2, h3, h4 {
     border-width: 0 0 3px 0;
     */
     -moz-border-radius: 10px;
-    margin-bottom: 20px;
 }
+
+#footer_container{
+    background: url('/static/images/hatchling.png') no-repeat top right;
+    width: 1000px;
+    height: 90px;
+    margin: 0;
+    padding: 0;
+}
+
+#footer {
+    float: left;
+    width: 900px;
+    height: 60px;
+    padding: 5px;
+    margin: 0;
+    text-align: center;
+}
+
+#footer ul {
+    display: inline;
+    list-style-type: none;
+    font-size: 1.2em;
+}
+
+#footer li {
+    padding: 0 0 0 20px;
+    display: inline;
+}
+
+#footer a {
+    color: #333;
+}
+
+#footer a:hover {
+    color: black;
+}
+
 #heading {
     float: left;
     width: 800px;
