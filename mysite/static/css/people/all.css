@@ -52,7 +52,8 @@ h1, h2, h3, h4 {
 }
 
 #nav {
-    float: right;
+    margin-top: 10px;
+    float: left;
 }
 
 #login {
@@ -140,10 +141,11 @@ h1, h2, h3, h4 {
 }
 
 #footer_container{
-    background: url('/static/images/hatchling.png') no-repeat top right;
+    float: left;
+    background: url('/static/images/hatchling.png') no-repeat center;
     width: 1000px;
     height: 90px;
-    margin: 0;
+    margin: 10px 0 20px 0;
     padding: 0;
 }
 
