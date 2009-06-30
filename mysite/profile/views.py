@@ -316,7 +316,8 @@ def display_person(person, tab, edit):
         return render_to_response('profile/tech.html', data_dict)
     else:
         data_dict['title'] = title % "profile"
-        data_dict['projects'] = dict(data_dict['projects'].items()[:4])
+        #Don't use a short list, for now, since we don't have that much stuff on this page.
+        #data_dict['projects'] = dict(data_dict['projects'].items()[:4])
         data_dict['tags'] = tags_dict_for_person(person)
         data_dict['tags_flat'] = dict(
             [ (key, ', '.join([k.text for k in data_dict['tags'][key]]))
