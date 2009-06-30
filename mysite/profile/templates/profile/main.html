@@ -90,11 +90,11 @@
                 success = (json[0].success == 1);
                 status = "status";
                 if (success) {
-                    status_html = "<img src='/static/images/data-ready.png' /> "
-                        + "Your code contributions have been imported. "
+                    status_html = "<img src='/static/images/data-ready.png' style='float: left;'/> <div style='float: left;'>"
+                        + "{{person.username}}'s code contributions have been imported. "
                         + "<a href='/people/{{ person.username }}/tabs/involvement'>"
-                        + "Follow this link to see them</a>.";
-                    $('#commit-importer-status').html(status_html);
+                        + "Follow this link to see them</a>.</div>";
+                    $('#commit-importer-status').html(status_html).addClass('done');
                     window.clearInterval(updateIntervalID);
                 } 
             }

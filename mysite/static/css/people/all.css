@@ -145,7 +145,7 @@ h1, h2, h3, h4 {
     background: url('/static/images/hatchling.png') no-repeat center;
     width: 1000px;
     height: 90px;
-    margin: 10px 0 20px 0;
+    margin: 30px 0 20px 0;
     padding: 0;
 }
 
@@ -162,6 +162,7 @@ h1, h2, h3, h4 {
     display: inline;
     list-style-type: none;
     font-size: 1.2em;
+    display: none;
 }
 
 #footer li {
@@ -223,7 +224,7 @@ h1, h2, h3, h4 {
     margin-top: 20px;
 }
 h3 {
-    margin-top: 20px;
+    margin-bottom: 0px;
     float: left;
     clear: left;
     font-size: 12pt;
@@ -244,7 +245,7 @@ h3 {
     width: 400px;
 }
 .tags {
-    margin-bottom: 5px;
+    margin-top: 10px;
 }
 .below-the-fold {
 }
@@ -308,7 +309,7 @@ img.show-more-link {
 .widget {
     float: left;
     width: 400px;
-    margin-top: 20px;
+    margin-bottom: 20px;
 }
 #software ul {
     list-style: none;
@@ -478,4 +479,8 @@ img {
     text-align: center;
     font-size: 12pt;
     margin: 10px 0;
+    padding: 10px;
+}
+#commit-importer-status.done {
+    background-color: #ffc;
 }
