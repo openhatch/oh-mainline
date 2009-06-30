@@ -34,7 +34,7 @@ def person_involvement_add_input(request, username):
         'description': description,
         'url': url,
         'alteration_type': alteration_type,
-        'title': '+involvement / ' + username + ' / openhatch'
+        'title': 'openhatch / %s / add involvement ' % username
         })
     # }}}
 
@@ -158,7 +158,8 @@ def display_test_page_for_commit_importer(request, input_username):
 
 def get_commit_importer_json(request, input_username):
     # {{{
-    person = Person.objects.get_object_or_404(username=input_username)
+    exp_scraper_display_for_person_web(request, input_username)
+    person = get_object_or_404(Person, username=input_username)
     success = person.ohloh_grab_completed
     list_of_dictionaries = [{'success': success}]
     json = "(%s)" % simplejson.dumps(list_of_dictionaries)
@@ -298,7 +299,8 @@ def display_person(person, tab, edit):
 
     data_dict['edit'] = edit
 
-    title = person.username + " / %s : openhatch"
+    title = 'openhatch / %s' % person.username
+    title += ' / %s'
     if tab == 'inv' or tab == 'involvement':
         data_dict['title'] = title % "community involvement"
         return render_to_response('profile/participation.html', data_dict)
@@ -791,9 +793,8 @@ def project_icon_web(request, project_name):
 
 # }}}
 
-def exp_scraper_display_for_person_web(request):
+def exp_scraper_display_for_person_web(request, username):
     # {{{
-    username = request.GET.get('u', None)
     nobgtask_s = request.GET.get('nobgtask', False)
 
     involved_projects = []
@@ -839,8 +840,6 @@ def exp_scraper_display_for_person_web(request):
         person.last_polled = datetime.datetime.now()
         person.save()
         result = FetchPersonDataFromOhloh.delay(username=username)
-        
-    return HttpResponse(person.username + '\n'.join(involved_projects))
 
 def ohloh_grab_done_web(request, username):
 # {{{

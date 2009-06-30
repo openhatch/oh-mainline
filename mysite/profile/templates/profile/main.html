@@ -3,6 +3,7 @@
 
 <div id='widgets'>
 
+
     <div id='right'>
         <!-- {{{ -->
 
@@ -79,9 +80,35 @@
                     <img src='/static/images/icons/Add.png' alt='+' /><span>Add</span>
                 </a>
             </h3>
-            {% if person.poll_on_next_web_view %}
-            <img src='/people/{{person.username}}/import_contributions_image' alt='Importing your data from around the web...' />
-            {% endif %}
+    {% if person.poll_on_next_web_view %}
+    <script type='text/javascript'>
+        // FIXME: Change host
+        url = '/people/{{ person.username }}/test_commit_importer_json';
+        updateIntervalID = window.setInterval(updateCommitImporterStatus, 2000);
+        function updateCommitImporterStatus() {
+            function updateStatusDialog(json) {
+                success = (json[0].success == 1);
+                status = "status";
+                if (success) {
+                    status_html = "<img src='/static/images/data-ready.png' /> "
+                        + "Your code contributions have been imported. "
+                        + "<a href='/people/{{ person.username }}/tabs/involvement'>"
+                        + "Follow this link to see them</a>.";
+                    $('#commit-importer-status').html(status_html);
+                    window.clearInterval(updateIntervalID);
+                } 
+            }
+            $.getJSON(url, updateStatusDialog);
+        }
+    </script>
+
+    <div id='commit-importer-status'>
+        <img src='/static/images/throbber.gif' />
+        <span style='position: relative; top: -11px;'>
+            Importing <strong>{{person.username}}</strong>'s code contributions from around the web...
+        </span>
+    </div>
+    {% endif %}
             {% if projects %}
             <ul>
                 {% for project, more_project_attributes in projects.items %}
@@ -145,7 +172,7 @@
                         {% else %}
                         {% endif %}
                         <a href="/people/{{people.username}}/edit-exp/tags/{{exp.id}}"
-                            >edit tags</a>
+                            >tag this</a>
                     </div>
                     </li>
                     {% endfor %}
@@ -155,11 +182,11 @@
                 {% endfor %}
             </ul>
             {% else %}
-            No contributions listed.
-            <form method='post' action='/people/xp_slurp_do'>
+            <div style='float: left; width: 400px;'>No contributions listed.</div>
+            <!--form method='post' action='/people/xp_slurp_do'>
                 <input type='submit' value='Import code contributions automatically from around the Internet.' />
                 <input type='hidden' name='u' value='{{person.username}}' />
-            </form>
+            </form-->
             {% endif %}
         </ul>
         <!-- }}} -->

@@ -472,3 +472,10 @@ a.add-a-contribution img {
 img {
     border: 0;
 }
+#commit-importer-status {
+    float: left;
+    width: 400px;
+    text-align: center;
+    font-size: 12pt;
+    margin: 10px 0;
+}
