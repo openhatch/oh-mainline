@@ -150,15 +150,19 @@ def import_contributions_image(request, input_username=None):
     # }}}
 
 def display_test_page_for_commit_importer(request, input_username):
+    # {{{
     return render_to_response('profile/test_commit_importer.html', {
         'username': input_username})
+    # }}}
 
 def get_commit_importer_json(request, input_username):
-    success = (time.time() % 10 < 4)
+    # {{{
+    person = Person.objects.get_object_or_404(username=input_username)
+    success = person.ohloh_grab_completed
     list_of_dictionaries = [{'success': success}]
     json = "(%s)" % simplejson.dumps(list_of_dictionaries)
     return HttpResponse(json)
-
+    # }}}
 # }}}
 
 # Display profile {{{
@@ -775,6 +779,8 @@ def project_icon_web(request, project_name):
     return HttpResponseRedirect(url)
     # }}}
 
+# }}}
+
 def exp_scraper_display_for_person_web(request):
     # {{{
     username = request.GET.get('u', None)
@@ -853,4 +859,3 @@ def exp_scraper_handle_ohloh_results(username, ohloh_results):
     person.save()
 # }}}
 
-# }}}
