@@ -34,15 +34,15 @@
                     <div class='description'>{{ exp.description }}</div>
                     <div class='description'>
                     {% if exp.man_months and exp.primary_language %}
-                    Clocked {{ exp.man_months }} month(s) of work
-                    in {{ exp.primary_language }}.
+                    Months: {{ exp.man_months }}
+                    <br/>Primary language: {{ exp.primary_language }}.
                     {% else %}
-                        {% if exp.man_months %}
-                        Clocked {{ exp.man_months }} month(s) of work.
-                        {% endif %}
-                        {% if exp.primary_language %}
-                        Primarily written in {{ exp.primary_language }}.
-                        {% endif %}
+                    {% if exp.man_months %}
+                    Months: {{ exp.man_months }}
+                    {% endif %}
+                    {% if exp.primary_language %}
+                    <br/>Primary language: {{ exp.primary_language }}.
+                    {% endif %}
                     {% endif %}
                     </div>
                     {% comment %}
@@ -51,16 +51,16 @@
                     {% endcomment %}
                     <!--div class='more description'>pretty l33t hax0ring</div-->
                     <div class='url'>{{ exp.url }}</div>
-                    <div class='more phrases'>
+                    <div class='tags'>
                         {% if more_exp_attributes.tags %}
                         {% for tag in more_exp_attributes.tags %}
                         {{ tag.text }}
                         {% endfor %}
                         {% else %}
-                        no tags
                         {% endif %}
+                        <a href="/people/{{people.username}}/edit-exp/tags/{{exp.id}}"
+                            >edit tags</a>
                     </div>
-                    <a href="/people/edit-exp/tags/{{ exp.id }}">Edit tags for this experience</a>
                     <div class='make-projectexp-favorite'>
                         <form name='make-exp-favorite-{{ exp.id }}' 
                             method='POST'

@@ -3,6 +3,63 @@
 
 <div id='widgets'>
 
+    <div id='right'>
+        <!-- {{{ -->
+
+        <div id='taglines' class='widget'>
+            <!-- {{{ -->
+            {% if tags.understands %}
+            <div class='tags'>
+                understands:
+                {% for tag in tags.understands %} <a href='#'>{{ tag.text }}</a> {% endfor %}
+            </div>
+            {% endif %}
+            {% if tags.understands_not %}
+            <div class='tags'>
+                will never understand:
+                {% for tag in tags.understands_not %} <a href='#'>{{ tag.text }}</a> {% endfor %}
+            </div>
+            {% endif %}
+            {% if tags.seeking %}
+            <div class='tags'>
+                looking for volunteering opportunities in:
+                {% for tag in tags.seeking %} <a href='#'>{{ tag.text }}</a> {% endfor %}
+            </div>
+            {% endif %}
+            {% if tags.studying %}
+            <div class='tags'>
+                currently learning about:
+                {% for tag in tags.studying %} <a href='#'>{{ tag.text }}</a> {% endfor %}
+            </div>
+            {% endif %}
+            {% if tags.can_mentor %}
+            <div class='tags'>
+                can mentor in:
+                {% for tag in tags.can_mentor %} <a href='#'>{{ tag.text }}</a> {% endfor %}
+            </div>
+            {% endif %}
+            <!-- }}} -->
+        </div>
+
+        <div id='nerdstream' class='widget'>
+            <!-- {{{ -->
+            <h3>Stream (coming soon):</h3>
+            <ul>
+                <!--li>
+                <img src='/static/images/icons/projects/f-spot-50px.png' />
+                Reported a bug in f-spot
+                </li-->
+                <li>
+                <img src='/static/images/icons/projects/exaile-50px.png' />
+                Reported a bug in exaile 
+                </li>
+            </ul>
+            <!-- }}} -->
+        </div><!-- /#nerdstream -->
+
+        <!-- }}} -->
+    </div>
+
     <div id='left'>
         <!-- {{{ -->
         <div id='portfolio' class='widget'>
@@ -11,56 +68,27 @@
             {% if person.poll_on_next_web_view %}
             <img src='/people/{{person.username}}/import_contributions_image' alt='Importing your data from around the web...' />
             {% endif %}
+            {% if projects %}
             <ul>
-                {% if projects %}
                 {% for project, more_project_attributes in projects.items %}
                 <li>
                 <!-- {{{ -->
                 <div class='project-escutcheon'>
                     <div class='logo'>
-                        <img alt='logo for {{project.name}}' src='/people/project_icon/{{ project.name }}'
-                        width='64' height='64' />
+                        <img alt='logo for {{project.name}}' src='/people/project_icon/{{ project.name }}'/>
                     </div>
                     <div class='name'>{{ project.name }}</div>
+                    {% comment %}
                     <div class='tags'>
                         {% for tag in more_project_attributes.tags %}
                         <a href=''>{{ tag.text }}</a>,
                         {% endfor %}
                     </div>
+                    {% endcomment %}
                 </div>
                 <ul class='contrib-descriptions'>
                     {% for exp, more_exp_attributes in more_project_attributes.experiences.items %}
                     <li>
-                    <div class='description'>{{ exp.description }}</div>
-                    <div class='description'>
-                    {% if exp.man_months and exp.primary_language %}
-                    Clocked {{ exp.man_months }} month(s) of work
-                    in {{ exp.primary_language }}.
-                    {% else %}
-                        {% if exp.man_months %}
-                        Clocked {{ exp.man_months }} month(s) of work.
-                        {% else %}
-                        Primarily written in {{ exp.primary_language }}.
-                        {% endif %}
-                    {% endif %}
-                    </div>
-                    {% comment %}
-                    <img src='/static/images/icons/Add.png' alt='show more'
-                    class='show-more-link'>
-                    {% endcomment %}
-                    <div class='url'>{{ exp.url }}</div>
-                    <div class='more phrases'>
-                        tags here
-                        {% if more_exp_attributes.tags %}
-                        {{ more_exp_attributes.tags }}
-                        {% for tag in more_exp_attributes.tags %}
-                        {{ tag.text }}
-                        {% endfor %}
-                        {% else %}
-                        no tags
-                        {% endif %}
-                    </div>
-                    {% comment %}
                     <div class='make-projectexp-favorite'>
                         <form name='make-exp-favorite-{{ exp.id }}' 
                             method='POST'
@@ -69,10 +97,42 @@
                             value='{{ person.username }}'/>
                             <input type='hidden' name='exp_id'
                             value='{{ exp.id }}'/>
-                            <input type='submit' value='Make Favorite' />
+                            <input type='image' src='/static/images/icons/star-off.png'/>
+                            <!--input type='submit' value='Make Favorite' /-->
                         </form>
                     </div>
+                    <div class='description'>{{ exp.description }}</div>
+                    <div class='description'>
+                    {% if exp.man_months and exp.primary_language %}
+                    Months: {{ exp.man_months }}
+                    <br/>Primary language: {{ exp.primary_language }}.
+                    {% else %}
+                    {% if exp.man_months %}
+                    Months: {{ exp.man_months }}
+                    {% endif %}
+                    {% if exp.primary_language %}
+                    <br/>Primary language: {{ exp.primary_language }}.
+                    {% endif %}
+                    {% endif %}
+                    </div>
+                    {% comment %}
+                    <img src='/static/images/icons/Add.png' alt='show more'
+                    class='show-more-link'>
                     {% endcomment %}
+                    <!--div class='more description'>pretty l33t hax0ring</div-->
+                    {% if url %}
+                    <div class='url'>{{ exp.url }}</div>
+                    {% endif %}
+                    <div class='tags'>
+                        {% if more_exp_attributes.tags %}
+                        {% for tag in more_exp_attributes.tags %}
+                        {{ tag.text }}
+                        {% endfor %}
+                        {% else %}
+                        {% endif %}
+                        <a href="/people/{{people.username}}/edit-exp/tags/{{exp.id}}"
+                            >edit tags</a>
+                    </div>
                     </li>
                     {% endfor %}
                 </ul>
@@ -127,37 +187,6 @@
         </div><!-- /#system -->
         <!-- }}} -->
     </div> <!-- /#left -->
-
-    <div id='right'>
-        <!-- {{{ -->
-
-        <div id='taglines' class='widget'>
-            <!-- {{{ -->
-            <h3>understands: <a href=''>screen scraping</a>, <a href=''>boar hunting</a></h3>
-            <h3>will never understand: <a href=''>californians</a>, <a href=''>beckett</a></h3>
-            <h3>studying: <a href=''>tiger trapping</a>, <a href=''>regular expressions</a></h3>
-            <h3>can mentor in: <a href=''>lanyard swinging</a>, <a href=''>django</a></h3>
-            <!-- }}} -->
-        </div>
-
-        <div id='nerdstream' class='widget'>
-            <!-- {{{ -->
-            <h3>Stream (coming soon):</h3>
-            <ul>
-                <!--li>
-                <img src='/static/images/icons/projects/f-spot-50px.png' />
-                Reported a bug in f-spot
-                </li-->
-                <li>
-                <img src='/static/images/icons/projects/exaile-50px.png' />
-                Reported a bug in exaile 
-                </li>
-            </ul>
-            <!-- }}} -->
-        </div><!-- /#nerdstream -->
-
-        <!-- }}} -->
-    </div>
 
 </div><!-- /# widget -->
 

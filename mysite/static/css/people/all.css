@@ -1,6 +1,7 @@
 body {
     font: 10pt Helvetica, Bitstream Vera Sans, Arial, sans-serif;
     background: #a5b5d9 url('/static/images/bg-puffy.png');
+    /*background: #ddf url('/static/images/bg-puffy-grainy.png');*/
     background-repeat: no-repeat;
     background-position: top center;
     margin: 0;
@@ -52,7 +53,9 @@ h1, h2, h3, h4 {
     float: left;
     width: 960px;
     min-height: 800px;
-    background-color: #fff;
+    background: #fff url('/static/images/gradient-left.png');
+    background-repeat: repeat-y;
+    background-position: left;
     padding: 20px;
     margin-top: 5px;
     /*
@@ -90,18 +93,23 @@ h1, h2, h3, h4 {
 }
 #heading li {
     font-size: 14pt;
+    padding: 1px;
     list-style: none;
     float: left;
-    padding: 2px;
     margin-left: 10px;
+}
+#heading li a {
+    text-decoration: none;
+    color: #999;
+    font-weight: bold;
 }
 #widgets {
     float: left;
     width: 960px;
 }
 h3 {
-    font-size: 16pt;
-    font-weight: normal;
+    font-size: 12pt;
+    font-weight: bold;
     color: #777;
 }
 #tag-heading {
@@ -124,8 +132,18 @@ h3 {
     list-style: none;
 }
 #portfolio > ul > li {
+    padding-top: 10px;
+    -moz-border-radius: 10px;
+    border: solid #dde; #d2e6df; f0f0ff;
+    border-width: 1px 1px 2px 1px;
     float: left;
     margin-top: 20px;
+    background-color: #fff;
+    padding: 10px;
+}
+.make-projectexp-favorite input[type='image'] {
+    float: right;
+    margin-left: 10px;
 }
 .project-escutcheon {
     float: left;
@@ -135,19 +153,18 @@ h3 {
 }
 .contrib-descriptions {
     float: left;
-    width: 270px;
+    width: 268px;
 }
 .contrib-descriptions > li {
+    list-style: square;
+    margin-left: 25px;
     margin-top: 10px;
     padding: 8px 10px;
     padding-bottom: 6px;
     font-size: 10pt;
     /*background-color: #f4f4ff; f4f4bc; c9dc59; d2e6df;*/
-    -moz-border-radius: 10px;
-    border: solid #eee; #d2e6df; f0f0ff;
-    border-width: 2px 0 0 0;
     float: left;
-    width: 250px;
+    width: 210px;
 }
 img.show-more-link {
     float: right;

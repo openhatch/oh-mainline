@@ -25,7 +25,7 @@ urlpatterns = patterns('',
             'mysite.profile.views.make_favorite_exp_tag_web'),
 
         # Edit tags for an experience
-        (r'^people/edit-exp/tags/(?P<exp_id>\d+)$',
+        (r'^people/(?P<username>\w+)/edit-exp/tags/(?P<exp_id>\d+)$',
             'mysite.profile.views.edit_exp_tag'),
 
         # Edit a person's tags
@@ -79,7 +79,7 @@ urlpatterns = patterns('',
             'mysite.profile.views.get_commit_importer_json'),
 
         # Tabs
-        (r'^people/(?P<input_username>[^/]+)/tabs/(?P<tab>[a-z]+)[/?]$',
+        (r'^people/(?P<input_username>[^/]+)/tabs?/(?P<tab>[a-z]+)[/?]$',
                 'mysite.profile.views.display_person_web'),
 
         # This dangerous regex is last

@@ -54,25 +54,30 @@
         <!-- {{{ -->
         <div id='left'>
             <div class='widget'>
-                <h3>understands:                     {% for tag in tags.understands %} <a href='#'>{{ tag.text }}</a> {% endfor %}
+                <h3>understands:
+                    {% for tag in tags.understands %} <a href='#'>{{ tag.text }}</a> {% endfor %}
                 </h3>
             </div>
             <div class='widget'>
-                <h3>will never understand:                     {% for tag in tags.understands_not %} <a href='#'>{{ tag.text }}</a> {% endfor %}
+                <h3>will never understand:
+                    {% for tag in tags.understands_not %} <a href='#'>{{ tag.text }}</a> {% endfor %}
                 </h3>
             </div>
             <div class='widget'>
-                <h3>looking for volunteering opportunities in:                     {% for tag in tags.seeking %} <a href='#'>{{ tag.text }}</a> {% endfor %}
+                <h3>looking for volunteering opportunities in:
+                    {% for tag in tags.seeking %} <a href='#'>{{ tag.text }}</a> {% endfor %}
                 </h3>
             </div>
         </div>
         <div id='right'>
             <div class='widget'>
-                <h3>currently learning about:                     {% for tag in tags.studying %} <a href='#'>{{ tag.text }}</a> {% endfor %}
+                <h3>currently learning about:
+                    {% for tag in tags.studying %} <a href='#'>{{ tag.text }}</a> {% endfor %}
                 </h3>
             </div>
             <div class='widget'>
-                <h3>can mentor in:                     {% for tag in tags.can_mentor %} <a href='#'>{{ tag.text }}</a> {% endfor %}
+                <h3>can mentor in:
+                    {% for tag in tags.can_mentor %} <a href='#'>{{ tag.text }}</a> {% endfor %}
                 </h3>
             </div>
         </div>
