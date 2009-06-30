@@ -1,190 +1,246 @@
+{% include 'profile/header.global.html' %}
 {% include 'profile/header.html' %}
 
-                    <div id='widgets'>
+<div id='widgets'>
 
-                        <div id='left'>
-                            <!-- {{{ -->
-                            <div id='portfolio' class='widget'>
-                                <!-- {{{ -->
-                                <h3>participation log:</h3>
-                                <ul>
-                                    <li>
-                                    <div class='project-escutcheon'>
-                                        <div class='logo'>
-                                            <img src='/static/images/icons/projects/f-spot-100px.png' /></div>
-                                        <div class='name'>f-spot</div>
-                                    </div>
-                                    <ul class='contrib-descriptions'>
-                                        <li>
-                                        Submitted 3 patches (all committed)
-                                        <img src='/static/images/icons/Add.png' alt='show more'
-                                        class='show-more-link'>
-                                        <div class='more description'>pretty l33t hax0ring</div>
-                                        <div class='more urls'>
-                                            <a href=''>http://launchpad.net/</a>
-                                        </div>
-                                        <div class='more phrases'>
-                                            <a href=''>i18n</a>,
-                                            <a href=''>translation into french</a>
-                                        </div>
-                                        </li>
-                                        <li>Translated 10 features into Italian
-                                        <img src='/static/images/icons/Add.png' alt='show more'
-                                        class='show-more-link'>
-                                        </li>
-                                    </ul>
-                                    </li>
-                                </ul>
-                                <!-- }}} -->
-                            </div><!-- /#portfolio -->
+    <div id='left'>
+        <!-- {{{ -->
+        <div id='portfolio' class='widget'>
+            <!-- {{{ -->
+            <h3>Community involvement</h3>
+            {% if person.poll_on_next_web_view %}
+            <img src='/people/{{person.username}}/import_contributions_image' alt='Importing your data from around the web...' />
+            {% endif %}
+            <ul>
+                {% if projects %}
+                {% for project, more_project_attributes in projects.items %}
+                <li>
+                <!-- {{{ -->
+                <div class='project-escutcheon'>
+                    <div class='logo'>
+                        <img alt='logo for {{project.name}}' src='/people/project_icon/{{ project.name }}'
+                        width='64' height='64' />
+                    </div>
+                    <div class='name'>{{ project.name }}</div>
+                    <div class='tags'>
+                        {% for tag in more_project_attributes.tags %}
+                        <a href=''>{{ tag.text }}</a>,
+                        {% endfor %}
+                    </div>
+                </div>
+                <ul class='contrib-descriptions'>
+                    {% for exp, more_exp_attributes in more_project_attributes.experiences.items %}
+                    <li>
+                    <div class='description'>{{ exp.description }}</div>
+                    <div class='description'>
+                    {% if exp.man_months and exp.primary_language %}
+                    Clocked {{ exp.man_months }} month(s) of work
+                    in {{ exp.primary_language }}.
+                    {% else %}
+                        {% if exp.man_months %}
+                        Clocked {{ exp.man_months }} month(s) of work.
+                        {% else %}
+                        Primarily written in {{ exp.primary_language }}.
+                        {% endif %}
+                    {% endif %}
+                    </div>
+                    {% comment %}
+                    <img src='/static/images/icons/Add.png' alt='show more'
+                    class='show-more-link'>
+                    {% endcomment %}
+                    <div class='url'>{{ exp.url }}</div>
+                    <div class='more phrases'>
+                        tags here
+                        {% if more_exp_attributes.tags %}
+                        {{ more_exp_attributes.tags }}
+                        {% for tag in more_exp_attributes.tags %}
+                        {{ tag.text }}
+                        {% endfor %}
+                        {% else %}
+                        no tags
+                        {% endif %}
+                    </div>
+                    {% comment %}
+                    <div class='make-projectexp-favorite'>
+                        <form name='make-exp-favorite-{{ exp.id }}' 
+                            method='POST'
+                            action='/people/make_favorite_project_exp'>
+                            <input type='hidden' name='username'
+                            value='{{ person.username }}'/>
+                            <input type='hidden' name='exp_id'
+                            value='{{ exp.id }}'/>
+                            <input type='submit' value='Make Favorite' />
+                        </form>
+                    </div>
+                    {% endcomment %}
+                    </li>
+                    {% endfor %}
+                </ul>
+                <!-- }}} -->
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            No contributions listed.
+            <form method='post' action='/people/xp_slurp_do'>
+                <input type='submit' value='Import code contributions automatically from around the Internet.' />
+                <input type='hidden' name='u' value='{{person.username}}' />
+            </form>
+        {% endif %}
+    </ul>
+            <a style='float: left; margin-top: 10px;' href='/people/{{person.username}}/involvement/add/input'>Add a contribution.</a>
+            <!-- }}} -->
+        </div><!-- /#portfolio -->
 
-                            <div id='software' class='widget'>
-                                <!-- {{{ -->
-                                <h3>user log:</h3>
-                                <ul>
-                                    <li>
-                                    <div class='icon'>
-                                        <img src='/static/images/icons/projects/iceweasel-100px.png' />
-                                    </div>
-                                    <div class='project-name'>iceweasel-3.5b</div>
-                                    </li>
-                                    <li>
-                                    <img src='/static/images/icons/projects/songbird-100px.png' />
-                                    <div class='project-name'>songbird-1.2.0</div>
-                                    </li>
-                                    <li>
-                                    <img src='/static/images/icons/projects/f-spot-100px.png' />
-                                    <div class='project-name'>f-spot-3.1.0</div>
-                                    </li>
-                                </ul>
-                                <!-- }}} -->
-                            </div><!-- /#software -->
+        <div id='software' class='widget' style='margin-top: 20px;'>
+            <!-- {{{ -->
+            <h3>Software I use (coming soon):</h3>
+            <ul>
+                <li>
+                <div class='icon'>
+                    <img src='/static/images/icons/projects/iceweasel-100px.png' />
+                </div>
+                <div class='project-name'>iceweasel-3.5b</div>
+                </li>
+                <li>
+                <img src='/static/images/icons/projects/songbird-100px.png' />
+                <div class='project-name'>songbird-1.2.0</div>
+                </li>
+                <li>
+                <img src='/static/images/icons/projects/f-spot-100px.png' />
+                <div class='project-name'>f-spot-3.1.0</div>
+                </li>
+            </ul>
+            <!-- }}} -->
+        </div><!-- /#software -->
 
-                            <div id='system' class='widget'>
-                                <!-- {{{ -->
-                                <h3>systems:</h3>
-                                <ul>
-                                    <li>
-                                    <img src='/static/images/icons/projects/ubuntu-50px.png' />
-                                    ubuntu jaunty
-                                    </li>
-                                </ul>
-                                <!-- }}} -->
-                            </div><!-- /#system -->
-                            <!-- }}} -->
-                        </div> <!-- /#left -->
+        <div id='system' class='widget'>
+            <!-- {{{ -->
+            <h3>systems:</h3>
+            <ul>
+                <li>
+                <img src='/static/images/icons/projects/ubuntu-50px.png' />
+                ubuntu jaunty
+                </li>
+            </ul>
+            <!-- }}} -->
+        </div><!-- /#system -->
+        <!-- }}} -->
+    </div> <!-- /#left -->
 
-                        <div id='right'>
-                            <!-- {{{ -->
+    <div id='right'>
+        <!-- {{{ -->
 
-                            <div id='taglines' class='widget'>
-                                <!-- {{{ -->
-                                <h3>understands: <a href=''>screen scraping</a>, <a href=''>boar hunting</a></h3>
-                                <h3>will never understand: <a href=''>californians</a>, <a href=''>beckett</a></h3>
-                                <h3>studying: <a href=''>tiger trapping</a>, <a href=''>regular expressions</a></h3>
-                                <h3>can mentor in: <a href=''>lanyard swinging</a>, <a href=''>django</a></h3>
-                                <!-- }}} -->
-                            </div>
+        <div id='taglines' class='widget'>
+            <!-- {{{ -->
+            <h3>understands: <a href=''>screen scraping</a>, <a href=''>boar hunting</a></h3>
+            <h3>will never understand: <a href=''>californians</a>, <a href=''>beckett</a></h3>
+            <h3>studying: <a href=''>tiger trapping</a>, <a href=''>regular expressions</a></h3>
+            <h3>can mentor in: <a href=''>lanyard swinging</a>, <a href=''>django</a></h3>
+            <!-- }}} -->
+        </div>
 
-                            <div id='nerdstream' class='widget'>
-                                <!-- {{{ -->
-                                <h3>stream:</h3>
-                                <ul>
-                                    <!--li>
-                                    <img src='/static/images/icons/projects/f-spot-50px.png' />
-                                    Reported a bug in f-spot
-                                    </li-->
-                                    <li>
-                                    <img src='/static/images/icons/projects/exaile-50px.png' />
-                                    Reported a bug in exaile 
-                                    </li>
-                                </ul>
-                                <!-- }}} -->
-                            </div><!-- /#nerdstream -->
+        <div id='nerdstream' class='widget'>
+            <!-- {{{ -->
+            <h3>Stream (coming soon):</h3>
+            <ul>
+                <!--li>
+                <img src='/static/images/icons/projects/f-spot-50px.png' />
+                Reported a bug in f-spot
+                </li-->
+                <li>
+                <img src='/static/images/icons/projects/exaile-50px.png' />
+                Reported a bug in exaile 
+                </li>
+            </ul>
+            <!-- }}} -->
+        </div><!-- /#nerdstream -->
 
-                            <!-- }}} -->
-                        </div>
+        <!-- }}} -->
+    </div>
 
-                    </div><!-- /# widget -->
+</div><!-- /# widget -->
 
 {% include 'profile/footer.html' %}
 
-               <div class='box'>
-                  <h3>{{ person.username }}</h3>
-                  {% if exp_taglist_pairs %}
-                  <ul id='exp'>
-                     {% for exp, taglist in exp_taglist_pairs %}
-                     <li>
-                     <div class='project-name'>
-                        {% if exp.url %}
-                        <a href='{{ exp.url }}'>
-                        {% endif %}
-			{% if exp.favorite %}Favorite: {% endif %}{{ exp.project.name }}
-                        {% if exp.url %}
-                        </a>
-                        {% endif %}
-                     </div>
-                     <div class='summary'>
-                        Clocked {{ exp.man_months }} month(s) of work in
-                        {{ exp.primary_language }}
-                     </div>
-                     <div class='project-exp-tags'>
-                        {% for tag in taglist %}
-                     <form name='remove-tag-to-exp-{{ tag.id }}' method='POST'
-                        action='/people/project_exp_tag__remove'>
-                        <input type='hidden' name='tag_text'
-                        value='{{ tag.text }}'/>
-                        <input type='hidden' name='project_name'
-                        value='{{ exp.project.name }}'/>
-                        <input type='hidden' name='username'
-                        value='{{ person.username }}'/>
-                        {{ tag.prefix }}{{ tag.text }}
-			<input type='submit' value='Delete' />
-                     </form>
-                     <form name='favorite-tag-exp-{{ tag.id }}' method='POST'
-                        action='/people/make_favorite_exp_tag'>
-                        <input type='hidden' name='tag_text'
-                        value='{{ tag.text }}'/>
-                        <input type='hidden' name='tag_id'
-                        value='{{ tag.id }}'/>
-			<input type='hidden' name='exp_id'
-			value='{{ exp.id }}' />
-                        <input type='hidden' name='project_name'
-                        value='{{ exp.project.name }}'/>
-                        <input type='hidden' name='username'
-                        value='{{ person.username }}'/>
-			<input type='submit' value='Make tag a fav' />
-                     </form>
+{% comment %}
+<div class='box'>
+    <h3>{{ person.username }}</h3>
+    {% if exp_taglist_pairs %}
+    <ul id='exp'>
+        {% for exp, taglist in exp_taglist_pairs %}
+        <li>
+        <div class='project-name'>
+            {% if exp.url %}
+            <a href='{{ exp.url }}'>
+                {% endif %}
+                {% if exp.favorite %}Favorite: {% endif %}{{ exp.project.name }}
+                {% if exp.url %}
+            </a>
+            {% endif %}
+        </div>
+        <div class='summary'>
+            Clocked {{ exp.man_months }} month(s) of work in
+            {{ exp.primary_language }}
+        </div>
+        <div class='project-exp-tags'>
+            {% for tag in taglist %}
+            <form name='remove-tag-to-exp-{{ tag.id }}' method='POST'
+                action='/people/project_exp_tag__remove'>
+                <input type='hidden' name='tag_text'
+                value='{{ tag.text }}'/>
+                <input type='hidden' name='project_name'
+                value='{{ exp.project.name }}'/>
+                <input type='hidden' name='username'
+                value='{{ person.username }}'/>
+                {{ tag.prefix }}{{ tag.text }}
+                <input type='submit' value='Delete' />
+            </form>
+            <form name='favorite-tag-exp-{{ tag.id }}' method='POST'
+                action='/people/make_favorite_exp_tag'>
+                <input type='hidden' name='tag_text'
+                value='{{ tag.text }}'/>
+                <input type='hidden' name='tag_id'
+                value='{{ tag.id }}'/>
+                <input type='hidden' name='exp_id'
+                value='{{ exp.id }}' />
+                <input type='hidden' name='project_name'
+                value='{{ exp.project.name }}'/>
+                <input type='hidden' name='username'
+                value='{{ person.username }}'/>
+                <input type='submit' value='Make tag a fav' />
+            </form>
 
 
-                        {% endfor %}
-                     </div>
-                     <form name='add-tag-to-exp-{{ exp.id }}' method='POST'
-                        action='/people/add_tag_to_project_exp'>
-                        <label for='exp-{{ exp.id }}-tag-text'>Add tag</label>
-                        <input type='hidden' name='username'
-                        value='{{ person.username }}'/>
-                        <input type='hidden' name='exp_id'
-                        value='{{ exp.id }}'/>
-                        <input type='hidden' name='project_name'
-                        value='{{ exp.project.name }}'/>
-                        <input type='text' id='exp-{{ exp.id }}-tag-text' 
-                        name='tag_text' />
-                     </form>
+            {% endfor %}
+        </div>
+        <form name='add-tag-to-exp-{{ exp.id }}' method='POST'
+            action='/people/add_tag_to_project_exp'>
+            <label for='exp-{{ exp.id }}-tag-text'>Add tag</label>
+            <input type='hidden' name='username'
+            value='{{ person.username }}'/>
+            <input type='hidden' name='exp_id'
+            value='{{ exp.id }}'/>
+            <input type='hidden' name='project_name'
+            value='{{ exp.project.name }}'/>
+            <input type='text' id='exp-{{ exp.id }}-tag-text' 
+            name='tag_text' />
+        </form>
 
-                     <form name='make-exp-favorite-{{ exp.id }}' method='POST'
-                        action='/people/make_favorite_project_exp'>
-                        <input type='hidden' name='username'
-                        value='{{ person.username }}'/>
-                        <input type='hidden' name='exp_id'
-                        value='{{ exp.id }}'/>
-			<input type='submit' value='Make Favorite' />
-                     </form>
-                     </li>
-                     {% endfor %}
-                  </ul>
-                  {% else %}
-                  Could not find experience in our
-                  database for that username.
-                  {% endif %}
-               </div>
+        <form name='make-exp-favorite-{{ exp.id }}' method='POST'
+            action='/people/make_favorite_project_exp'>
+            <input type='hidden' name='username'
+            value='{{ person.username }}'/>
+            <input type='hidden' name='exp_id'
+            value='{{ exp.id }}'/>
+            <input type='submit' value='Make Favorite' />
+        </form>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    Could not find experience in our
+    database for that username.
+    {% endif %}
+</div>
+{% endcomment %}

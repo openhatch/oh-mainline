@@ -19,6 +19,8 @@ class Person(models.Model):
     last_touched = models.DateTimeField(null=True)
     poll_on_next_web_view = models.BooleanField(
             default=True)
+    ohloh_grab_completed = models.BooleanField(
+        default=False)
     interested_in_working_on = models.CharField(max_length=1024, default='')
 
     def save(self, *args, **kwargs):
@@ -64,11 +66,6 @@ class ProjectExp(models.Model):
     favorite = models.BooleanField(default=0)
     primary_language = models.CharField(max_length=200, null=True)
     source = models.CharField(max_length=100, null=True)
-
-    class Meta:
-        unique_together = [
-            ('person', 'project'),
-            ]
 
     def save(self, *args, **kwargs):
         self.last_touched = datetime.datetime.now()
@@ -122,6 +119,7 @@ class ProjectExp(models.Model):
                 person=Person.objects.get(username=username),
                 project=Project.objects.get(name=project_name),
                 )
+    get_from_strings = get_from_text
 
     def save(self, *args, **kwargs):
         if self.time_record_was_created is None:
@@ -186,12 +184,24 @@ class Link_Project_Tag(models.Model):
     source = models.CharField(max_length=200)
     # }}}
 
+class Link_Person_Tag(models.Model):
+    "Many-to-many relation between Person and Tags."
+    # {{{
+    tag = models.ForeignKey(Tag)
+    person = models.ForeignKey(Person)
+    time_record_was_created = models.DateTimeField(
+            default=datetime.datetime.now())
+    source = models.CharField(max_length=200)
+    # }}}
+
 class SourceForgePerson(models.Model):
     '''A person in SourceForge.'''
+    # FIXME: Make this unique
     username = models.CharField(max_length=200)
 
 class SourceForgeProject(models.Model):
     '''A project in SourceForge.'''
+    # FIXME: Make this unique
     unixname = models.CharField(max_length=200)
 
 

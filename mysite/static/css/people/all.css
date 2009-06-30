@@ -1,12 +1,13 @@
 body {
 	font-size: 62.5%; /* Resets 1em to 10px */
-	font-family: 'Lucida Grande', Verdana, Arial, Sans-Serif;
 	background: #ccd8e7;
 	color: #333;
-	text-align: center;
-	margin: 0;
-	padding: 0;
-	}
+	font-family: Helvetica, Bitstream Vera Sans, Arial;
+    background: #a5b5d9 url('/static/images/bg-puffy.png');
+    background-repeat: no-repeat;
+    background-position: top center;
+    margin: 0;
+}
 a {
     color: #d0715f;
 }
@@ -37,7 +38,6 @@ h1, h2, h3, h4 {
     width: 920px;
     height: 80px;
     color: #555;
-    text-align: left;
     padding: 5px 65px 5px 5px;
 	}
 }
@@ -115,34 +115,19 @@ h1, h2, h3, h4 {
 }
 #content {
     float: left;
+/* Karen's dimensions
     width: 920px;
     height: 800px;
+*/
+    width: 960px;
+    min-height: 800px;
     background-color: #fff;
     padding: 18px 5px 0 18px;
-    margin: 0 50px 0 0;
+    margin: 0 50px 20px 0;
     /*
     border: solid #ddd; d08f5f; f0f0f0;
     border-width: 0 0 3px 0;
     */
-    -moz-border-radius: 10px;
-}
-
-#content_container_stretch {
-    width: 1000px;
-    height: 1000px;
-    margin: 0;
-    padding: 0 0 10px 0;
-    background-image: url(/static/images/tracks.png);
-    background-repeat: repeat-y;
-    background-position: top right;
-}
-
-#content_stretchy {
-    float: left;
-    width: 920px;
-    background-color: #fff;
-    padding: 18px 5px 0 18px;
-    margin: 0 50px 0 0;
     -moz-border-radius: 10px;
 }
 
@@ -287,7 +272,7 @@ img.show-more-link {
 .widget {
     float: left;
     width: 400px;
-    margin-top: 10px;
+    margin-top: 20px;
 }
 #software ul {
     list-style: none;
@@ -322,32 +307,132 @@ textarea {
     width: 378px;
     float: left;
     border: solid #dde;
-    border-width: 1px 1px 3px 1px;
+    border-width: 1px; 
     background-color: #eee; d9eeff;
     -moz-border-radius: 5px;
-    -moz-border-radius-bottomright: 0;
     border-bottom-color: #ccc;
     margin-top: 5px;
-    margin-bottom: 0;
+    margin-bottom: 2px;
 }
 input[type='submit'] {
     float: right;
     border: solid #dde;
-    border-width: 0px 1px 3px 1px;
-    border-bottom-color: #ccc;
+    border-width: 1px 1px 3px 1px;
     background-color: #eee; d9eeff; b5deff; 7fc4ff; dde; 
     padding: 1px 8px;
     color: #668;
-    -moz-border-radius-bottomleft: 5px;
-    -moz-border-radius-bottomright: 5px;
+    -moz-border-radius: 5px;
+    -moz-border-radius: 5px;
     font-weight: bold;
-    position: relative;
-    top: -3px;
 }
 .notification {
+    float: left;
+    width: 1000px;
+    text-align: center;
+    padding: 15px 0;
+}
+.notification div {
+    display: inline;
     background-color: #fca;
     color: #444;
-    padding: 5px;
+    padding: 8px 15px;
+    width: 250px;
+    font-size: 11pt;
+    -moz-border-radius: 5px;
 }
 input[type='text'] {
+}
+#add-contribution {
+    float: left;
+    width: 740px;
+    margin-top: 20px;
+}
+#add-contribution label {
+    clear: left;
+    float: left;
+    width: 180px;
+    padding: 15px 10px 15px 0;
+}
+#add-contribution textarea {
+    -moz-border-radius: 5px;
+}
+#add-contribution input[type='text'] {
+    float: left;
+    padding: 10px;
+    font: 11pt Arial;
+    width: 378px;
+    float: left;
+    border: solid #dde;
+    border-width: 1px;
+    background-color: #eee; d9eeff;
+    -moz-border-radius: 5px;
+    border-bottom-color: #ccc;
+    margin-top: 5px;
+    margin-bottom: 0;
+}
+#add-contribution input[type='submit'] {
+    margin-top: 0;
+}
+#add-contribution input[type='text']:focus,
+#add-contribution input[type='submit']:focus,
+#add-contribution textarea:focus {
+    background-color: #eef;
+}
+.help-bubble {
+    float: left;
+    width: 373px;
+    float: left;
+    background: #f0ffc4 url('/static/images/bg-help-bubble.png');
+    background-position: bottom;
+    background-repeat: repeat-x;
+    color: #222;
+    font-size: 10pt;
+    padding: 6px 12px;
+    -moz-border-radius: 5px;
+    margin-top: 5px;
+    border: 1px solid #deb;
+    border-bottom: 1px solid #ddd;
+}
+.help-bubble img {
+    float: left;
+    margin-right: 12px;
+}
+.help-bubble p {
+    float: left;
+    width: 300px;
+    margin: 0;
+}
+.help-bubble a {
+    float: right;
+    position: relative;
+    top: -5px;
+    left: 12px;
+    color: #555;
+    padding: 2px 7px;
+    text-decoration: none;
+    font-weight: bold;
+}
+a.add-a-contribution {
+    text-decoration: none;
+    float: left;
+    margin-top: 10px;
+    border: solid #dde;
+    border-width: 1px 1px 3px 1px;
+    background-color: #eee; d9eeff; b5deff; 7fc4ff; dde; 
+    padding: 1px 8px;
+    color: #668;
+    -moz-border-radius: 5px;
+    font-weight: bold;
+}
+a.add-a-contribution img {
+    margin-right: 5px;
+    position: relative;
+    top: 3px;
+}
+.right {
+    float: left;
+    width: 380px;
+}
+img {
+    border: 0;
 }

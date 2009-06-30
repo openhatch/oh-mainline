@@ -1,6 +1,8 @@
 import xml.etree.ElementTree as ET
+import xml.parsers.expat
 import sys, urllib, hashlib
 import urllib2
+import cStringIO as StringIO
 
 def uni_text(s):
     if type(s) == unicode:
@@ -16,11 +18,16 @@ from typecheck import Any as __
 
 API_KEY='0cWqe4uPw7b8Q5337ybPQ' # "Oman testing"
 
-def mechanize_get(url):
+def mechanize_get(url, referrer=None):
     b = mechanize.Browser()
     b.set_handle_robots(False)
-    b.addheaders = [('User-Agent',
+    addheaders = [('User-Agent',
                      'Mozilla/4.0 (compatible; MSIE 5.0; Windows 98; (compatible;))')]
+    if referrer is not None:
+        b.set_handle_referer(False)
+        addheaders.extend([('Referer',
+                           referrer)])
+    b.addheaders = addheaders
     b.open(url)
     return b
 
@@ -35,7 +42,14 @@ def ohloh_url2data(url, selector, params = {}, many = False):
     url += encoded
     b = mechanize_get(url)
     s = b.response()
-    tree = ET.parse(b.response())
+    try:
+        s = b.response().read()
+        tree = ET.parse(StringIO.StringIO(s))
+    except xml.parsers.expat.ExpatError:
+        # well, I'll be. it doesn't parse.
+        return b.geturl(), None
+        #import pdb
+        #pdb.set_trace()
         
     # Did Ohloh return an error?
     root = tree.getroot()
@@ -57,10 +71,20 @@ def ohloh_url2data(url, selector, params = {}, many = False):
     return b.geturl(), None
 
 class Ohloh(object):
-    @accepts(object, int)
-    def project_id2projectdata(self, project_id):
-        url = 'http://www.ohloh.net/projects/%d.xml?' % project_id
+    def project_id2projectdata(self, project_id=None, project_name=None):
+        if project_name is None:
+            project_query = str(int(project_id))
+        else:
+            project_query = str(project_name)
+        url = 'http://www.ohloh.net/projects/%s.xml?' % urllib.quote(
+            project_query)
         url, data = ohloh_url2data(url, 'result/project')
+        return data
+    
+    def project_name2projectdata(self, project_name_query):
+        url = 'http://www.ohloh.net/projects.xml?'
+        args = {'query': project_name_query}
+        url, data = ohloh_url2data(url, 'result/project', args)
         return data
     
     @accepts(object, int)
@@ -93,6 +117,28 @@ class Ohloh(object):
 
         return ret
 
+    def get_contribution_info_by_username_and_project(self, project, username):
+        ret = []
+        url = 'http://www.ohloh.net/p/%s/contributors.xml?' % project
+        url, c_fs = ohloh_url2data(url, 'result/contributor_fact',
+                                   {'query': username}, many=True)
+
+        # Filter these guys down and be sure to only return the ones
+        # where contributor_name==username
+        for c_f in c_fs:
+            if 'analysis_id' not in c_f:
+                continue # this contributor fact is useless
+            eyedee = int(c_f['analysis_id'])
+            project_data = self.analysis2projectdata(eyedee)
+            this = dict(
+                project=project_data['name'],
+                project_homepage_url=project_data.get('homepage_url', None),
+                primary_language=c_f['primary_language_nice_name'],
+                man_months=int(c_f['man_months']))
+            ret.append(this)
+
+        return ret
+
     def get_contribution_info_by_email(self, email):
         ret = []
         ret.extend(self.search_contribution_info_by_email(email))
@@ -103,7 +149,7 @@ class Ohloh(object):
     def email_address_to_ohloh_username(self, email):
         hasher = hashlib.md5(); hasher.update(email)
         hashed = hasher.hexdigest()
-        url = 'https://www.ohloh.net/accounts/%s' % hashed
+        url = 'https://www.ohloh.net/accounts/%s' % urllib.quote(hashed)
         try:
             b = mechanize_get(url)
         except urllib2.HTTPError:
@@ -128,7 +174,8 @@ class Ohloh(object):
         b.set_handle_robots(False)
         b.addheaders = [('User-Agent',
                         'Mozilla/4.0 (compatible; MSIE 5.0; Windows 98; (compatible;))')]
-        b.open('https://www.ohloh.net/accounts/%s' % ohloh_username)
+        b.open('https://www.ohloh.net/accounts/%s' % urllib.quote(
+            ohloh_username))
         root = lxml.html.parse(b.response()).getroot()
         relevant_links = root.cssselect('a.position')
         relevant_hrefs = [link.attrib['href'] for link in relevant_links]
@@ -144,7 +191,7 @@ class Ohloh(object):
         
         for (project, contributor_id) in relevant_project_and_contributor_id_pairs:
             url = 'https://www.ohloh.net/p/%s/contributors/%d.xml?' % (
-                project, contributor_id)
+                urllib.quote(project), contributor_id)
             url, c_fs = ohloh_url2data(url, 'result/contributor_fact', many=True)
             # For each contributor fact, grab the project it was for
             for c_f in c_fs:
@@ -180,6 +227,47 @@ class Ohloh(object):
             ret.append(this)
 
         return ret
+
+    def get_icon_for_project(self, project):
+        try:
+            return self.get_icon_for_project_by_id(project)
+        except ValueError:
+            return self.get_icon_for_project_by_human_name(project)
+
+    def get_icon_for_project_by_human_name(self, project):
+        # Do a real search to find the project
+        try:
+            data = self.project_name2projectdata(project)
+        except urllib2.HTTPError, e:
+            raise ValueError
+        try:
+            med_logo = data['medium_logo_url']
+        except TypeError:
+            raise ValueError, "Ohloh gave us back nothing."
+        except KeyError:
+            raise ValueError, "The project exists, but Ohloh knows no icon."
+        if '/bits.ohloh.net/' not in med_logo:
+            med_logo = med_logo.replace('attachments/',
+                                        'bits.ohloh.net/attachments/')
+        b = mechanize_get(med_logo)
+        return b.response().read()
+        
+
+    def get_icon_for_project_by_id(self, project):
+        try:
+            data = self.project_id2projectdata(project_name=project)
+        except urllib2.HTTPError, e:
+            raise ValueError
+        try:
+            med_logo = data['medium_logo_url']
+        except KeyError:
+            raise ValueError, "The project exists, but Ohloh knows no icon."
+        if '/bits.ohloh.net/' not in med_logo:
+            med_logo = med_logo.replace('attachments/',
+                                        'bits.ohloh.net/attachments/')
+        b = mechanize_get(med_logo)
+        return b.response().read()
+        
 
 _ohloh = Ohloh()
 def get_ohloh():

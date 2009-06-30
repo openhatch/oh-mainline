@@ -98,9 +98,21 @@ INSTALLED_APPS = (
     'windmill',
     'south',
     'profile',
+    'celery',
 )
 
 ### HACK
 from socket import gethostname
-if gethostname() == 'renaissance' and DEBUG:
+if gethostname() in ('renaissance', 'yggdrasil') and DEBUG:
     DEBUG_PROPAGATE_EXCEPTIONS=True
+
+# file: settings.py #
+TEST_RUNNER = '_profiling.profile_tests'
+TEST_PROFILE = '/tmp/profile'
+
+## AMQP, Rabbit Queue, Celery
+AMQP_SERVER = "localhost"
+AMQP_PORT = 5672
+AMQP_USER = "rabbiter"
+AMQP_PASSWORD = "johT4qui"
+AMQP_VHOST = "localhost"

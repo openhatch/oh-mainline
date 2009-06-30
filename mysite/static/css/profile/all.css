@@ -69,4 +69,8 @@ ul#exp li {
     padding: 5px 10px;
     border-bottom: 3px solid #eee;
 }
+.help-bubble {
+    float: left;
+    width: 400px;
+}
 /* vim: set ai ts=3 sts=4 et sw=4: */
