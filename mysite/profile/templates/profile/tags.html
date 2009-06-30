@@ -7,7 +7,7 @@
     <a href='/people/{{person.username}}/tags/edit' style=' font-size: 10pt;'>[Edit]</a>
 </h3>
 {% else %}
-    <h3 id='tag-heading'>Edit tags</h3>
+    <h3 style='float: left; margin-top: 20px; '>Edit tags</h3>
 {% endif %}
 
 <div id='widgets'>
@@ -15,8 +15,9 @@
     {% if edit %}
     <div id='taglines'>
         <!-- {{{ -->
-        <form name='edit-tags' action='/people/{{person.username}}/tags/edit/do'
-	      method='POST'>
+        <form name='edit-tags'
+            action='/people/{{person.username}}/tags/edit/do'
+	        method='POST'>
             <div id='left'>
                 <div class='widget'>
                     <h3>understands:
@@ -47,12 +48,12 @@
                     </h3>
                 </div>
             </div>
+            <input type='submit' value='Save' />
+            <div style='float: left; width: 600px; margin-top: 20px;'>
+                <a href="/people/{{person.username}}/tab/tags/"
+                    style='font-size: 10pt; border: solid #dde; border-width: 1px; background-color: #eee; d9eeff; b5deff; 7fc4ff; dde; padding: 1px 8px; color: #668; -moz-border-radius: 5px; -moz-border-radius: 5px; font-weight: bold;' >Cancel edit</a>
+            </div>
         </form>
-        <div style='float: left; width: 600px; margin-top: 20px;'>
-            <input type='submit' value='Save'/>
-            <a href="/people/{{person.username}}/tab/tags/"
-                style='font-size: 10pt; border: solid #dde; border-width: 1px; background-color: #eee; d9eeff; b5deff; 7fc4ff; dde; padding: 1px 8px; color: #668; -moz-border-radius: 5px; -moz-border-radius: 5px; font-weight: bold;' >Cancel edit</a>
-        </div>
         <!-- }}} -->
     </div>
     {% else %}
