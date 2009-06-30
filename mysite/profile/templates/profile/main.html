@@ -6,6 +6,10 @@
     <div id='right'>
         <!-- {{{ -->
 
+        <div id='avatar' style='float: left; width: 150px;'>
+            <img src='{{ photo_url }}' />
+        </div>
+
         <div id='taglines' class='widget'>
             <!-- {{{ -->
             {% if tags.understands %}
@@ -41,7 +45,7 @@
             <!-- }}} -->
         </div>
 
-        <div id='nerdstream' class='widget'>
+        <div id='nerdstream' class='widget' style='display: none;'>
             <!-- {{{ -->
             <h3>Stream (coming soon):</h3>
             <ul>
@@ -64,7 +68,17 @@
         <!-- {{{ -->
         <div id='portfolio' class='widget'>
             <!-- {{{ -->
-            <h3>Community involvement</h3>
+            <h3>
+                <div style='float: left; margin-right: 20px; margin-top: 0;'>Community involvement</div>
+                <a class='add-a-contribution'
+                    style='text-decoration: none; font-size: 10pt;
+                    letter-spacing: 0; margin-top: -3px; float: left;'
+                    onmouseover="$(this).find('span').css('text-decoration','underline');"
+                    onmouseout="$(this).find('span').css('text-decoration','none');"
+                    href='/people/{{person.username}}/involvement/add/input'>
+                    <img src='/static/images/icons/Add.png' alt='+' /><span>Add</span>
+                </a>
+            </h3>
             {% if person.poll_on_next_web_view %}
             <img src='/people/{{person.username}}/import_contributions_image' alt='Importing your data from around the web...' />
             {% endif %}
@@ -103,17 +117,17 @@
                     </div>
                     <div class='description'>{{ exp.description }}</div>
                     <div class='description'>
-                    {% if exp.man_months and exp.primary_language %}
-                    Months: {{ exp.man_months }}
-                    <br/>Primary language: {{ exp.primary_language }}.
-                    {% else %}
-                    {% if exp.man_months %}
-                    Months: {{ exp.man_months }}
-                    {% endif %}
-                    {% if exp.primary_language %}
-                    <br/>Primary language: {{ exp.primary_language }}.
-                    {% endif %}
-                    {% endif %}
+                        {% if exp.man_months and exp.primary_language %}
+                        Months: {{ exp.man_months }}
+                        <br/>Primary language: {{ exp.primary_language }}.
+                        {% else %}
+                        {% if exp.man_months %}
+                        Months: {{ exp.man_months }}
+                        {% endif %}
+                        {% if exp.primary_language %}
+                        <br/>Primary language: {{ exp.primary_language }}.
+                        {% endif %}
+                        {% endif %}
                     </div>
                     {% comment %}
                     <img src='/static/images/icons/Add.png' alt='show more'
@@ -146,47 +160,46 @@
                 <input type='submit' value='Import code contributions automatically from around the Internet.' />
                 <input type='hidden' name='u' value='{{person.username}}' />
             </form>
-        {% endif %}
-    </ul>
-            <a style='float: left; margin-top: 10px;' href='/people/{{person.username}}/involvement/add/input'>Add a contribution.</a>
-            <!-- }}} -->
-        </div><!-- /#portfolio -->
-
-        <div id='software' class='widget' style='margin-top: 20px;'>
-            <!-- {{{ -->
-            <h3>Software I use (coming soon):</h3>
-            <ul>
-                <li>
-                <div class='icon'>
-                    <img src='/static/images/icons/projects/iceweasel-100px.png' />
-                </div>
-                <div class='project-name'>iceweasel-3.5b</div>
-                </li>
-                <li>
-                <img src='/static/images/icons/projects/songbird-100px.png' />
-                <div class='project-name'>songbird-1.2.0</div>
-                </li>
-                <li>
-                <img src='/static/images/icons/projects/f-spot-100px.png' />
-                <div class='project-name'>f-spot-3.1.0</div>
-                </li>
-            </ul>
-            <!-- }}} -->
-        </div><!-- /#software -->
-
-        <div id='system' class='widget'>
-            <!-- {{{ -->
-            <h3>systems:</h3>
-            <ul>
-                <li>
-                <img src='/static/images/icons/projects/ubuntu-50px.png' />
-                ubuntu jaunty
-                </li>
-            </ul>
-            <!-- }}} -->
-        </div><!-- /#system -->
+            {% endif %}
+        </ul>
         <!-- }}} -->
-    </div> <!-- /#left -->
+    </div><!-- /#portfolio -->
+
+    <div id='software' class='widget' style='margin-top: 20px; display: none;'>
+        <!-- {{{ -->
+        <h3>Software I use (coming soon):</h3>
+        <ul>
+            <li>
+            <div class='icon'>
+                <img src='/static/images/icons/projects/iceweasel-100px.png' />
+            </div>
+            <div class='project-name'>iceweasel-3.5b</div>
+            </li>
+            <li>
+            <img src='/static/images/icons/projects/songbird-100px.png' />
+            <div class='project-name'>songbird-1.2.0</div>
+            </li>
+            <li>
+            <img src='/static/images/icons/projects/f-spot-100px.png' />
+            <div class='project-name'>f-spot-3.1.0</div>
+            </li>
+        </ul>
+        <!-- }}} -->
+    </div><!-- /#software -->
+
+    <div id='system' class='widget' style='display: none;'>
+        <!-- {{{ -->
+        <h3>systems:</h3>
+        <ul>
+            <li>
+            <img src='/static/images/icons/projects/ubuntu-50px.png' />
+            ubuntu jaunty
+            </li>
+        </ul>
+        <!-- }}} -->
+    </div><!-- /#system -->
+    <!-- }}} -->
+</div> <!-- /#left -->
 
 </div><!-- /# widget -->
 

@@ -5,13 +5,22 @@
 
     <div id='left'>
         <div id='portfolio' class='widget'>
-            <h3>Contributions to community projects</h3>
-            <a class='add-a-contribution'
-                href='/people/{{ person.username }}/involvement/add/input'>
-                <img src='/static/images/icons/Add.png' />Add a contribution
-            </a>
+            <h3>
+                <div style='float: left; margin-right: 20px; margin-top: 0;'>Community involvement</div>
+                <a class='add-a-contribution'
+                    style='text-decoration: none; font-size: 10pt;
+                    letter-spacing: 0; margin-top: -3px; float: left;'
+                    onmouseover="$(this).find('span').css('text-decoration','underline');"
+                    onmouseout="$(this).find('span').css('text-decoration','none');"
+                    href='/people/{{person.username}}/involvement/add/input'>
+                    <img src='/static/images/icons/Add.png' alt='+' /><span>Add</span>
+                </a>
+            </h3>
+            {% if person.poll_on_next_web_view %}
+            <img src='/people/{{person.username}}/import_contributions_image' alt='Importing your data from around the web...' />
+            {% endif %}
+            {% if projects %}
             <ul>
-                {% if projects %}
                 {% for project, more_project_attributes in projects.items %}
                 <li>
                 <!-- {{{ -->
@@ -31,26 +40,40 @@
                 <ul class='contrib-descriptions'>
                     {% for exp, more_exp_attributes in more_project_attributes.experiences.items %}
                     <li>
+                    <div class='make-projectexp-favorite'>
+                        <form name='make-exp-favorite-{{ exp.id }}' 
+                            method='POST'
+                            action='/people/make_favorite_project_exp'>
+                            <input type='hidden' name='username'
+                            value='{{ person.username }}'/>
+                            <input type='hidden' name='exp_id'
+                            value='{{ exp.id }}'/>
+                            <input type='image' src='/static/images/icons/star-off.png'/>
+                            <!--input type='submit' value='Make Favorite' /-->
+                        </form>
+                    </div>
                     <div class='description'>{{ exp.description }}</div>
                     <div class='description'>
-                    {% if exp.man_months and exp.primary_language %}
-                    Months: {{ exp.man_months }}
-                    <br/>Primary language: {{ exp.primary_language }}.
-                    {% else %}
-                    {% if exp.man_months %}
-                    Months: {{ exp.man_months }}
-                    {% endif %}
-                    {% if exp.primary_language %}
-                    <br/>Primary language: {{ exp.primary_language }}.
-                    {% endif %}
-                    {% endif %}
+                        {% if exp.man_months and exp.primary_language %}
+                        Months: {{ exp.man_months }}
+                        <br/>Primary language: {{ exp.primary_language }}.
+                        {% else %}
+                        {% if exp.man_months %}
+                        Months: {{ exp.man_months }}
+                        {% endif %}
+                        {% if exp.primary_language %}
+                        <br/>Primary language: {{ exp.primary_language }}.
+                        {% endif %}
+                        {% endif %}
                     </div>
                     {% comment %}
                     <img src='/static/images/icons/Add.png' alt='show more'
                     class='show-more-link'>
                     {% endcomment %}
                     <!--div class='more description'>pretty l33t hax0ring</div-->
+                    {% if url %}
                     <div class='url'>{{ exp.url }}</div>
+                    {% endif %}
                     <div class='tags'>
                         {% if more_exp_attributes.tags %}
                         {% for tag in more_exp_attributes.tags %}
@@ -61,148 +84,23 @@
                         <a href="/people/{{people.username}}/edit-exp/tags/{{exp.id}}"
                             >edit tags</a>
                     </div>
-                    <div class='make-projectexp-favorite'>
-                        <form name='make-exp-favorite-{{ exp.id }}' 
-                            method='POST'
-                            action='/people/make_favorite_project_exp'>
-                            <input type='hidden' name='username'
-                            value='{{ person.username }}'/>
-                            <input type='hidden' name='exp_id'
-                            value='{{ exp.id }}'/>
-                            <input type='submit' value='Make Favorite' />
-                        </form>
-                    </div>
                     </li>
                     {% endfor %}
                 </ul>
                 <!-- }}} -->
                 </li>
                 {% endfor %}
-                {% endif %}
-                {% comment %}
-                <li>
-                <!-- {{{ -->
-                <div class='project-escutcheon'>
-                    <div class='logo'>
-                        <img src='/static/images/icons/projects/f-spot-100px.png' /></div>
-                    <div class='name'>f-spot</div>
-                </div>
-                <ul class='contrib-descriptions'>
-                    <li>
-                    Submitted 3 patches (all committed)
-                    <img src='/static/images/icons/Add.png' alt='show more'
-                    class='show-more-link'>
-                    <div class='more description'>pretty l33t hax0ring</div>
-                    <div class='more urls'>
-                        <a href=''>http://launchpad.net/</a>
-                    </div>
-                    <div class='more phrases'>
-                        <a href=''>i18n</a>,
-                        <a href=''>translation into french</a>
-                    </div>
-                    </li>
-                    <li>Translated 10 features into Italian
-                    <img src='/static/images/icons/Add.png' alt='show more'
-                    class='show-more-link'>
-                    </li>
-                </ul>
-                <!-- }}} -->
-                </li>
-                <li>
-                <!-- {{{ -->
-                <div class='project-escutcheon'>
-                    <div class='logo'>
-                        <img src='/static/images/icons/projects/ubuntu-100px.png' /></div>
-                    <div class='name'>ubuntu</div>
-                </div>
-                <ul class='contrib-descriptions'>
-                    <li>
-                    Submitted 3 patches (all committed)
-                    <img src='/static/images/icons/Add.png' alt='show more'
-                    class='show-more-link'>
-                    </li>
-                    <li>Translated 10 features into Italian
-                    <img src='/static/images/icons/Add.png' alt='show more'
-                    class='show-more-link'>
-                    </li>
-                    <li>Translated 10 features into Spanish
-                    <img src='/static/images/icons/Add.png' alt='show more'
-                    class='show-more-link'>
-                    </li>
-                    <li>Translated 10 features into Greek
-                    <img src='/static/images/icons/Add.png' alt='show more'
-                    class='show-more-link'>
-                    </li>
-                    <li>Translated 10 features into Manx
-                    <img src='/static/images/icons/Add.png' alt='show more'
-                    class='show-more-link'>
-                    </li>
-                </ul>
-                <!-- }}} -->
-                </li>
-                <li>
-                <!-- {{{ -->
-                <div class='project-escutcheon'>
-                    <div class='logo'>
-                        <img src='/static/images/icons/projects/songbird-100px.png' /></div>
-                    <div class='name'>songbird</div>
-                </div>
-                <ul class='contrib-descriptions'>
-                    <li>
-                    Submitted 3 patches (all committed)
-                    <img src='/static/images/icons/Add.png' alt='show more'
-                    class='show-more-link'>
-                    <div class='more description'>pretty l33t hax0ring</div>
-                    <div class='more urls'>
-                        <a href=''>http://launchpad.net/</a>
-                    </div>
-                    <div class='more phrases'>
-                        <a href=''>i18n</a>,
-                        <a href=''>translation into french</a>
-                    </div>
-                    </li>
-                    <li>Translated 10 features into Italian
-                    <img src='/static/images/icons/Add.png' alt='show more'
-                    class='show-more-link'>
-                    </li>
-                </ul>
-                <!-- }}} -->
-                </li>
-                <li>
-                <!-- {{{ -->
-                <div class='project-escutcheon'>
-                    <div class='logo'>
-                        <img src='/static/images/icons/projects/iceweasel-100px.png' /></div>
-                    <div class='name'>iceweasel</div>
-                </div>
-                <ul class='contrib-descriptions'>
-                    <li>
-                    Submitted 3 patches (all committed)
-                    <img src='/static/images/icons/Add.png' alt='show more'
-                    class='show-more-link'>
-                    <div class='more description'>pretty l33t hax0ring</div>
-                    <div class='more urls'>
-                        <a href=''>http://launchpad.net/</a>
-                    </div>
-                    <div class='more phrases'>
-                        <a href=''>i18n</a>,
-                        <a href=''>translation into french</a>
-                    </div>
-                    </li>
-                    <li>Translated 10 features into Italian
-                    <img src='/static/images/icons/Add.png' alt='show more'
-                    class='show-more-link'>
-                    </li>
-                </ul>
-                <!-- }}} -->
-                </li>
-                {% endcomment %}
             </ul>
-            <a class='add-a-contribution'
-                href='/people/{{ person.username }}/involvement/add/input'>
-                Add a contribution
-            </a>
-        </div><!-- /#portfolio -->
+            {% else %}
+            No contributions listed.
+            <form method='post' action='/people/xp_slurp_do'>
+                <input type='submit' value='Import code contributions automatically from around the Internet.' />
+                <input type='hidden' name='u' value='{{person.username}}' />
+            </form>
+            {% endif %}
+        </ul>
+        <!-- }}} -->
+    </div><!-- /#portfolio -->
 
     </div> <!-- /#left -->
 

@@ -30,6 +30,8 @@ urlpatterns = patterns('',
 
         # Edit a person's tags
         (r'^people/(?P<username>\w+)/tags/edit$',
+            'mysite.profile.views.ask_for_tag_input'),
+        (r'^people/(?P<username>\w+)/tags/edit/do$',
             'mysite.profile.views.edit_person_tags'),
 
         # Check if Ohloh grab is done

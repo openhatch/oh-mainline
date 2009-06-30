@@ -1,14 +1,19 @@
 <div id='heading'>
     <h1>
+        <a href='/people/{{ person.username }}' style='color: #333; text-decoration: none;'>
         {{ person.username }}
         {% if person.name %}
         {{ person.name }}
         {% endif %}
+        </a>
     </h1>
     <ul>
-        <li><a href='/people/{{ person.username }}'>snapshot</a></li>
-        <li><a href='/people/{{ person.username }}/tab/involvement'>community involvement</a></li>
-        <li><a href='/people/{{ person.username }}/tab/tags'>tags</a></li>
+        <li><a href='/people/{{ person.username }}'
+            >profile</a></li>
+        <li><a href='/people/{{ person.username }}/tab/involvement'
+            >community involvement</a></li>
+        <li><a href='/people/{{ person.username }}/tab/tags'
+            >tags</a></li>
         <!--li><a href='/people/{{ person.username }}/tab/tech'>tech</a></li-->
         <!--li><a href='?u={{ person.username }}&amp;tab=inv'>recently</a></li-->
     </ul>

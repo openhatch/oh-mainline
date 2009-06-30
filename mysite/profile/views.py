@@ -16,6 +16,7 @@ import collections
 import difflib
 import os
 import tempfile
+import random
 # }}}
 
 # Add a contribution {{{
@@ -259,22 +260,29 @@ def data_for_person_display_without_ohloh(person):
 
     # Tell person templates about
 
+    photos_url_prefix = '/static/images/profile-photos/'
+    photos = ['collins.jpg', 'sufjan.jpg', 'iris.jpg', 'selleck.jpg']
+    photo_url = photos_url_prefix + photos[random.randint(0, len(photos)-1)]
+
     return {
             'person': person,
+            'photo_url': photo_url,
             'interested_in_working_on_list': interested_in_working_on_list, 
             'projects': projects_extended
             } 
     # }}}
 
-def display_person_web(request, input_username=None, tab=None):
+def display_person_web(request, input_username=None, tab=None, edit=None):
     if input_username is None:
         input_username = request.GET.get('u', None)
         if input_username is None:
             return render_to_response('profile/profile.html')
 
-    edit = False
-    if request.GET.get('edit', 0) == '1':
-        edit = True
+    if edit is None:
+        edit = False
+        if request.GET.get('edit', 0) == '1':
+            edit = True
+
 
     if tab is None:
         tab = request.GET.get('tab', None)
@@ -769,7 +777,7 @@ def edit_person_tags(request, username):
                                                                 person=
                                                                 person)
             
-    return HttpResponseRedirect('/people/%s?tab=tags' %
+    return HttpResponseRedirect('/people/%s/tab/tags' %
                                 urllib.quote(person.username))
     # }}}
 
@@ -861,3 +869,5 @@ def exp_scraper_handle_ohloh_results(username, ohloh_results):
     person.save()
 # }}}
 
+def ask_for_tag_input(request, username):
+    return display_person_web(request, username, 'tags', edit='1')

@@ -16,6 +16,9 @@ h1, h2, h3, h4, h5 {
     margin: 10px 0;
     text-align: center;
 }
+img {
+    border: 0;
+}
 #explanation {
     width: 500px;
     margin: 0 auto;
@@ -336,5 +339,9 @@ a:focus {
     padding: 9px;
     color: #222;
 }
-
+.good-for-beginners {
+    color: #444;
+}
+.good-for-beginners img {
+}
 /* vim: set ai ts=4 sts=4 et sw=4: */

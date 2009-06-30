@@ -19,3 +19,4 @@ class Bug(models.Model):
     submitter_username = models.CharField(max_length=200)
     submitter_realname = models.CharField(max_length=200)
     canonical_bug_link = models.URLField(max_length=200)
+    good_for_newcomers = models.BooleanField(default=False)

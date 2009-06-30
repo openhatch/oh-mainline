@@ -147,13 +147,23 @@ OPP FINDER TEMPLATE
                   </span>
                   </div-->
                   <div class='first-line'>
-                    <a class='title' href='BUG_LINK'>⇩ <span>{{ bug.title }}</span></a>
+                    <a class='title' href='BUG_LINK'
+                      >⇩
+                      <span>{{ bug.title }}</span>
+                    </a>
                     <!--div class='toggle-details'>⇕</div-->
                     <div class='age'>3 days old</div>
                     <!--a href='BUG_LINK' class='show-details'>details</a-->
                   </div>
                   <div class='second-line'>
                     <span class='description'>
+                      {% if bug.good_for_beginners %}
+                      <span class='good-for-beginners'>
+                        <img src='/static/images/icons/green-circle.png'
+                        />
+                        Good for newcomers &bull;
+                      </span>
+                      {% endif %}
                       {{ bug.description }}
                       {% lorem 2 p random %}
                     </span>

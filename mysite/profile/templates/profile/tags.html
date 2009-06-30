@@ -2,7 +2,10 @@
 {% include 'profile/header.html' %}
 
 {% if not edit %}
-<h3 id='tag-heading'>Tags</h3>
+<h3>
+    <div style='float: left; margin-right: 20px; margin-top: 0;'>Tags</div>
+    <a href='/people/{{person.username}}/tags/edit' style=' font-size: 10pt;'>[Edit]</a>
+</h3>
 {% else %}
     <h3 id='tag-heading'>Edit tags</h3>
 {% endif %}
@@ -12,7 +15,7 @@
     {% if edit %}
     <div id='taglines'>
         <!-- {{{ -->
-        <form name='edit-tags' action='/people/{{person.username}}/tags/edit'
+        <form name='edit-tags' action='/people/{{person.username}}/tags/edit/do'
 	      method='POST'>
             <div id='left'>
                 <div class='widget'>
@@ -44,44 +47,48 @@
                     </h3>
                 </div>
             </div>
-            <input type='submit' value='save'/>
-	    <a style="float: right;" href="?tab=tags">Cancel edit</a>
         </form>
+        <div style='float: left; width: 600px; margin-top: 20px;'>
+            <input type='submit' value='Save'/>
+            <a href="/people/{{person.username}}/tab/tags/"
+                style='font-size: 10pt; border: solid #dde; border-width: 1px; background-color: #eee; d9eeff; b5deff; 7fc4ff; dde; padding: 1px 8px; color: #668; -moz-border-radius: 5px; -moz-border-radius: 5px; font-weight: bold;' >Cancel edit</a>
+        </div>
         <!-- }}} -->
     </div>
     {% else %}
-    <div id='taglines'>
+    
+    <div id='taglines' class='widget'>
         <!-- {{{ -->
-        <div id='left'>
-            <div class='widget'>
-                <h3>understands:
-                    {% for tag in tags.understands %} <a href='#'>{{ tag.text }}</a> {% endfor %}
-                </h3>
-            </div>
-            <div class='widget'>
-                <h3>will never understand:
-                    {% for tag in tags.understands_not %} <a href='#'>{{ tag.text }}</a> {% endfor %}
-                </h3>
-            </div>
-            <div class='widget'>
-                <h3>looking for volunteering opportunities in:
-                    {% for tag in tags.seeking %} <a href='#'>{{ tag.text }}</a> {% endfor %}
-                </h3>
-            </div>
+        {% if tags.understands %}
+        <div class='tags'>
+            understands:
+            {% for tag in tags.understands %} <a href='#'>{{ tag.text }}</a> {% endfor %}
         </div>
-        <div id='right'>
-            <div class='widget'>
-                <h3>currently learning about:
-                    {% for tag in tags.studying %} <a href='#'>{{ tag.text }}</a> {% endfor %}
-                </h3>
-            </div>
-            <div class='widget'>
-                <h3>can mentor in:
-                    {% for tag in tags.can_mentor %} <a href='#'>{{ tag.text }}</a> {% endfor %}
-                </h3>
-            </div>
+        {% endif %}
+        {% if tags.understands_not %}
+        <div class='tags'>
+            will never understand:
+            {% for tag in tags.understands_not %} <a href='#'>{{ tag.text }}</a> {% endfor %}
         </div>
-	<a href="?tab=tags&amp;edit=1">Edit these tags</a>
+        {% endif %}
+        {% if tags.seeking %}
+        <div class='tags'>
+            looking for volunteering opportunities in:
+            {% for tag in tags.seeking %} <a href='#'>{{ tag.text }}</a> {% endfor %}
+        </div>
+        {% endif %}
+        {% if tags.studying %}
+        <div class='tags'>
+            currently learning about:
+            {% for tag in tags.studying %} <a href='#'>{{ tag.text }}</a> {% endfor %}
+        </div>
+        {% endif %}
+        {% if tags.can_mentor %}
+        <div class='tags'>
+            can mentor in:
+            {% for tag in tags.can_mentor %} <a href='#'>{{ tag.text }}</a> {% endfor %}
+        </div>
+        {% endif %}
         <!-- }}} -->
     </div>
     {% endif %}

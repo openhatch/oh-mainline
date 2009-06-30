@@ -1,6 +1,6 @@
 body {
-    font: 10pt Helvetica, Bitstream Vera Sans, Arial, sans-serif;
-    background: #a5b5d9 url('/static/images/bg-puffy.png');
+    font: 10pt Trebuchet MS, Bitstream Vera Sans, Helvetica, Arial, sans-serif;
+    background: #a5c5c9 url('/static/images/bg-puffy.png');
     /*background: #ddf url('/static/images/bg-puffy-grainy.png');*/
     background-repeat: no-repeat;
     background-position: top center;
@@ -8,6 +8,10 @@ body {
 }
 a {
     color: #d0715f;
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
 }
 ul {
     padding: 0;
@@ -30,7 +34,6 @@ h1, h2, h3, h4 {
     float: left;
     width: 960px;
     color: #555;
-    /*background: #777; url('/static/images/bg-white-opacity-75.png');*/
     margin-top: 15px;
     padding: 5px 20px;
     -moz-border-radius-bottomleft: 10px;
@@ -52,10 +55,10 @@ h1, h2, h3, h4 {
 #content {
     float: left;
     width: 960px;
-    min-height: 800px;
-    background: #fff url('/static/images/gradient-left.png');
-    background-repeat: repeat-y;
-    background-position: left;
+    min-height: 750px;
+    background: #fff; url('/static/images/gradient-top.png');
+    background-repeat: repeat-x;
+    background-position: top;
     padding: 20px;
     margin-top: 5px;
     /*
@@ -71,7 +74,7 @@ h1, h2, h3, h4 {
 }
 #heading h1, #heading #sep, #heading h2 {
     float: left;
-    font-size: 16pt;
+    font-size: 14pt;
     margin-right: 10px;
 }
 #heading h1 {
@@ -92,37 +95,47 @@ h1, h2, h3, h4 {
     padding: 0;
 }
 #heading li {
-    font-size: 14pt;
-    padding: 1px;
     list-style: none;
     float: left;
-    margin-left: 10px;
+    margin-left: 25px;
 }
 #heading li a {
+    font-size: 14pt;
     text-decoration: none;
     color: #999;
-    font-weight: bold;
+}
+#heading li a:hover {
+    color: #666;
+    text-decoration: underline;
 }
 #widgets {
     float: left;
     width: 960px;
+    margin-top: 20px;
 }
 h3 {
+    margin-top: 20px;
+    float: left;
+    clear: left;
     font-size: 12pt;
     font-weight: bold;
     color: #777;
+    letter-spacing: 0;
 }
 #tag-heading {
     float: left;
-    margin-top: 20px;
     width: 800px;
+}
+#avatar { 
+    margin-right: 10px;
 }
 #taglines {
     margin-bottom: 10px;
+    font-size: 10pt;
+    width: 400px;
 }
-#taglines h3 {
-    font-size: 13pt;
-    letter-spacing: 0;
+.tags {
+    margin-bottom: 5px;
 }
 .below-the-fold {
 }
@@ -132,14 +145,16 @@ h3 {
     list-style: none;
 }
 #portfolio > ul > li {
+    margin: 0;
     padding-top: 10px;
+    /*
     -moz-border-radius: 10px;
     border: solid #dde; #d2e6df; f0f0ff;
     border-width: 1px 1px 2px 1px;
+    */
     float: left;
     margin-top: 20px;
     background-color: #fff;
-    padding: 10px;
 }
 .make-projectexp-favorite input[type='image'] {
     float: right;
@@ -148,8 +163,8 @@ h3 {
 .project-escutcheon {
     float: left;
     margin-right: 10px;
-    width: 100px;
     text-align: center;
+    width: 70px;
 }
 .contrib-descriptions {
     float: left;
@@ -227,9 +242,8 @@ textarea {
     margin-bottom: 2px;
 }
 input[type='submit'] {
-    float: right;
     border: solid #dde;
-    border-width: 1px 1px 3px 1px;
+    border-width: 1px 1px 1px 1px;
     background-color: #eee; d9eeff; b5deff; 7fc4ff; dde; 
     padding: 1px 8px;
     color: #668;
@@ -285,9 +299,9 @@ input[type='text'] {
 #add-contribution input[type='submit'] {
     margin-top: 0;
 }
-#add-contribution input[type='text']:focus,
-#add-contribution input[type='submit']:focus,
-#add-contribution textarea:focus {
+input[type='text']:focus,
+input[type='submit']:focus,
+textarea:focus {
     background-color: #eef;
 }
 .help-bubble {
@@ -325,12 +339,13 @@ input[type='text'] {
     font-weight: bold;
 }
 a.add-a-contribution {
-    text-decoration: none;
     float: left;
     margin-top: 10px;
+    /*
     border: solid #dde;
-    border-width: 1px 1px 3px 1px;
+    border-width: 1px 1px 2px 1px;
     background-color: #eee; d9eeff; b5deff; 7fc4ff; dde; 
+    */
     padding: 1px 8px;
     color: #668;
     -moz-border-radius: 5px;
