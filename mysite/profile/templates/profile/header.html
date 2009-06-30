@@ -8,19 +8,33 @@
     <body>
         <div id='outermost'>
             <div id='penoutermost'>
-                <div id='nav'>
-                    <h2>OpenHatch</h2>
-                    <form id='enter-free-software-username' 
-                        name='enter_free_software_username'
-                        action='/people/' 
-                        method='GET' style=''>
-                        <label for='get-data-username'>Search usernames: </label>
-                        <input type='text' id='u' name='u' />
-                        <input type='submit' style='float: right;'/>
-                        <!--input type='image'
-                        src='/static/images/add.png' /-->
+                <div id='header'>
+         
+                    <div id="nav">
+                        <div id="login">
+                    <form name="login" id="login" method="post" action="#">
+                    <label class="text">username:  
+                    <input type="text" class="text" name="user" tabindex="1" />
+                    </label>
+                    <label class="text">password:  
+                    <input type="password" class="text" name="password" tabindex="2" />
+                    <input type="submit" name="Submit" value="enter" class="button" tabindex="3" />
+                    </label>
                     </form>
+                         </div>
+                         <div id="navlinks">
+	                       <ul>
+	                       <li><a href="">home</a></li>
+	                        <li><a href="">about</a></li>
+	                        <li><a href="">people</a></li>
+	                        <li><a href="">tasks</a></li>
+	                        <li><a href="">contact</a></li>
+	                       </ul>
+	                     </div>
+	                </div>
+	                <a href="http://www.openhatch.org"><img id='headerlogo' src="/static/images/logo.png"/></a>
                 </div>
+                <div id='content_container'>
                 <div id='content'>
 
                     {% comment %} Heading {{{ {% endcomment %}
