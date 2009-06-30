@@ -7,7 +7,7 @@ class Migration:
     
     def forwards(self, orm):
         "Write your forwards migration here"
-        db.add_column('search_bug', 'canonical_bug_link', models.URLField(max_length=200))
+        #db.add_column('search_bug', 'canonical_bug_link', models.URLField(max_length=200))
     
     
     def backwards(self, orm):
