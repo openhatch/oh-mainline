@@ -14,6 +14,8 @@ import re
 from odict import odict
 import collections
 import difflib
+import os
+import tempfile
 # }}}
 
 # Add a contribution {{{
@@ -570,6 +572,8 @@ def change_what_like_working_on_web(request):
     return HttpResponseRedirect('/people/?' + urllib.urlencode({'u': username, 'tab': 'tags'}))
     # }}}
 
+# }}}
+
 def DISABLE_display_person_redirect(username):
     # {{{
     return HttpResponseRedirect('/people/?' + urllib.urlencode({'u': username}))
@@ -627,15 +631,19 @@ def sf_projects_by_person_web(request):
     project_names = [p.project.unixname for p in projects]
     return HttpResponse('\n'.join(project_names))
     # }}}
+
 def _project_hash(project_name):
-    PREFIX='_project_hash_2136870e40a759b56b9ba97a0d7f60b84dbc90097a32da284306e871105d96cd' # sha256 of 1MiB of /dev/urandom
+    # {{{
+    # This prefix is a sha256 of 1MiB of /dev/urandom
+    PREFIX = '_project_hash_2136870e40a759b56b9ba97a0'
+    PREFIX += 'd7f60b84dbc90097a32da284306e871105d96cd'
     import hashlib
     hashed = hashlib.sha256(PREFIX + project_name)
     return hashed.hexdigest()
+    # }}}
 
-import os
-import tempfile
 def project_icon_url(project_name, actually_fetch = True):
+    # {{{
     project_hash = _project_hash(project_name)
     # Check for static path for project icons
     project_icons_root = os.path.join('static', 'project-icons')
@@ -666,8 +674,10 @@ def project_icon_url(project_name, actually_fetch = True):
 
     return '/' + project_icon_path
     # FIXME: One day, add cache expiry.
+    # }}}
 
 def edit_exp_tag(request, exp_id):
+    # {{{
     project_exp = ProjectExp.objects.get(id=exp_id)
     
     text = request.POST.get('text', None)
@@ -711,8 +721,10 @@ def edit_exp_tag(request, exp_id):
             
         return HttpResponseRedirect('/people/%s?tab=inv' %
                                     urllib.quote(project_exp.person.username))
+    # }}}
 
 def edit_person_tags(request, username):
+    # {{{
     person = Person.objects.get(username=username)
 
     # We can map from some strings to some TagTypes
@@ -755,12 +767,16 @@ def edit_person_tags(request, username):
             
     return HttpResponseRedirect('/people/%s?tab=tags' %
                                 urllib.quote(person.username))
+    # }}}
 
 def project_icon_web(request, project_name):
+    # {{{
     url = project_icon_url(project_name)
     return HttpResponseRedirect(url)
+    # }}}
 
 def exp_scraper_display_for_person_web(request):
+    # {{{
     username = request.GET.get('u', None)
     nobgtask_s = request.GET.get('nobgtask', False)
 
@@ -811,12 +827,15 @@ def exp_scraper_display_for_person_web(request):
     return HttpResponse(person.username + '\n'.join(involved_projects))
 
 def ohloh_grab_done_web(request, username):
+# {{{
     # get the person
     person = get_object_or_404(Person, username=username)
 
     return HttpResponse(bool(person.ohloh_grab_completed))
+# }}}
 
 def exp_scraper_handle_ohloh_results(username, ohloh_results):
+# {{{
     '''Input: A sequence of Ohloh ContributorInfo dicts.
     Side-effect: Create matching structures in the DB
     and mark our success in the database.'''
@@ -832,5 +851,6 @@ def exp_scraper_handle_ohloh_results(username, ohloh_results):
     person.last_polled = datetime.datetime.now()
     person.ohloh_grab_completed = True
     person.save()
+# }}}
 
 # }}}
