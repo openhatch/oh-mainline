@@ -1,5 +1,5 @@
 body {
-    font: 10pt Helvetica, Bitstream Vera Sans, Arial;
+    font: 10pt Helvetica, Bitstream Vera Sans, Arial, sans-serif;
     background: #a5b5d9 url('/static/images/bg-puffy.png');
     background-repeat: no-repeat;
     background-position: top center;

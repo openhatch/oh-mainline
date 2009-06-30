@@ -115,7 +115,7 @@ def xp_slurper_display_input_form(request):
     return render_to_response('profile/xp_slurper.html', {'notification': notification})
     # }}}
 
-def exp_scraper_scrape_web(request):
+def exp_scraper_scrape_web(request, input_username=None):
     # {{{
     # Check input
     if input_username is None:
