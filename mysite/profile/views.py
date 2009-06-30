@@ -781,6 +781,8 @@ def project_icon_web(request, project_name):
 
 # }}}
 
+# }}}
+
 def exp_scraper_display_for_person_web(request):
     # {{{
     username = request.GET.get('u', None)
