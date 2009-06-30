@@ -17,6 +17,7 @@ $.fn.toggleExpanded = function() {
 $.viewportHeight = function() { var h = 0; if (typeof(window.innerHeight) == "number") { h = window.innerHeight; } else { if (document.documentElement && document.documentElement.clientHeight) { h = document.documentElement.clientHeight; } else { if (document.body && document.body.clientHeight) { h = document.body.clientHeight; } } } return h; }
 
 $.fn.scrollIntoView = function() {
+    return; //disable for video demo. FIXME: restore
     elemTop = this.offset().top;
     elemBottom = elemTop + this.height();
     scrollTop = $(document).scrollTop();

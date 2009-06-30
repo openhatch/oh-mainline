@@ -6,7 +6,7 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-        (r'^$', 'mysite.search.views.fetch_bugs'),
+        (r'^$', 'mysite.search.views.index'),
         (r'^search/$', 'mysite.search.views.fetch_bugs'),
         (r'^admin/(.*)', admin.site.root),
         (r'^static/(?P<path>.*)$', 'django.views.static.serve',

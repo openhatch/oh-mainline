@@ -200,6 +200,9 @@ def get_autocompletion_suggestions(input):
 
     return suggestions
 
+def index(request):
+    return render_to_response('search/index.html')
+
 """
 Ways we could do autocompletion:
 
