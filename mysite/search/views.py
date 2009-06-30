@@ -44,7 +44,9 @@ def fetch_bugs(request):
         b.project.icon_url = "/static/images/icons/projects/%s.png" % \
                 b.project.name.lower()
         # FIXME: Randomize for camera
-        b.good_for_newcomers = True
+
+    bugs = list(bugs)
+    bugs.insert(1, Bug.objects.get(pk=1004))
 
     if format == 'json':
         return bugs_to_json_response(bugs, request.GET.get(

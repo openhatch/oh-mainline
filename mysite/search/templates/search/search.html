@@ -122,15 +122,12 @@ OPP FINDER TEMPLATE
                   </div>
                   <div class='second-line'>
                     <span class='description'>
-                      {% if bug.good_for_beginners %}
-                      <span class='good-for-beginners'>
-                        <img src='/static/images/icons/green-circle.png'
-                        />
+                      {% if bug.good_for_newcomers %}
+                      <span class='good-for-beginners' style='width: 300px; '>
                         Good for newcomers &bull;
                       </span>
                       {% endif %}
                       {{ bug.description }}
-                      {% lorem 2 p random %}
                     </span>
                   </div>
                   {% comment %} Details {{{ {% endcomment %}
@@ -198,6 +195,7 @@ OPP FINDER TEMPLATE
             <ul>
               <li><a href='http://yggdrasil.local:8000/search/?language=exaile'>user_interface_design</a></li>
               <li><a href='http://yggdrasil.local:8000/search/?language=ruby_on_rails'>ruby_on_rails</a></li>
+              <li><a href='http://yggdrasil.local:8000/search/?language=python'>python</a></li>
               <li><a href='http://yggdrasil.local:8000/search/?language=music_player'>music_player</a></li>
             </ul>
           </div>
