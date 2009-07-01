@@ -264,6 +264,7 @@ def data_for_person_display_without_ohloh(person):
     photos_url_prefix = '/static/images/profile-photos/'
     photos = ['collins.jpg', 'sufjan.jpg', 'iris.jpg', 'selleck.jpg']
     photo_url = photos_url_prefix + photos[random.randint(0, len(photos)-1)]
+    photo_url = photos_url_prefix + photos[1]
 
     return {
             'person': person,

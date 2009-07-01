@@ -13,36 +13,36 @@
 
         <div id='taglines' class='widget'>
             <!-- {{{ -->
-            {% if tags.understands %}
-            <div class='tags'>
-                understands:
-                {% for tag in tags.understands %} <a href='#'>{{ tag.text }}</a> {% endfor %}
-            </div>
-            {% endif %}
-            {% if tags.understands_not %}
-            <div class='tags'>
-                will never understand:
-                {% for tag in tags.understands_not %} <a href='#'>{{ tag.text }}</a> {% endfor %}
-            </div>
-            {% endif %}
-            {% if tags.seeking %}
-            <div class='tags'>
-                looking for volunteering opportunities in:
-                {% for tag in tags.seeking %} <a href='#'>{{ tag.text }}</a> {% endfor %}
-            </div>
-            {% endif %}
-            {% if tags.studying %}
-            <div class='tags'>
-                currently learning about:
-                {% for tag in tags.studying %} <a href='#'>{{ tag.text }}</a> {% endfor %}
-            </div>
-            {% endif %}
-            {% if tags.can_mentor %}
-            <div class='tags'>
-                can mentor in:
-                {% for tag in tags.can_mentor %} <a href='#'>{{ tag.text }}</a> {% endfor %}
-            </div>
-            {% endif %}
+        {% if tags_flat.understands %}
+        <div class='tags'>
+            understands:
+            {{ tags_flat.understands }}
+        </div>
+        {% endif %}
+        {% if tags.understands_not %}
+        <div class='tags'>
+            will never understand:
+            {{ tags_flat.understands_not }}
+        </div>
+        {% endif %}
+        {% if tags.seeking %}
+        <div class='tags'>
+            looking for volunteering opportunities in:
+            {{ tags_flat.seeking }}
+        </div>
+        {% endif %}
+        {% if tags.studying %}
+        <div class='tags'>
+            currently learning about:
+            {{ tags_flat.studying }}
+        </div>
+        {% endif %}
+        {% if tags.can_mentor %}
+        <div class='tags'>
+            can mentor in:
+            {{ tags_flat.can_mentor }}
+        </div>
+        {% endif %}
             <!-- }}} -->
         </div>
 
