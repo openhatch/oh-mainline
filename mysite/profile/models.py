@@ -22,6 +22,7 @@ class Person(models.Model):
     ohloh_grab_completed = models.BooleanField(
         default=False)
     interested_in_working_on = models.CharField(max_length=1024, default='')
+    gotten_name_from_ohloh = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         if self.time_record_was_created is None:
@@ -29,11 +30,27 @@ class Person(models.Model):
         self.last_touched = datetime.datetime.now()
         super(Person, self).save(*args, **kwargs)
 
+    def try_to_get_name_from_ohloh(self):
+        if self.gotten_name_from_ohloh:
+            return
+        # otherwise, do it
+        import ohloh
+        oh = ohloh.get_ohloh()
+        # Preferably get the human name...
+        try:
+            self.name = oh.get_name_by_username(self.username)
+        except ValueError:
+            pass
+        # say we did it, and save
+        self.gotten_name_from_ohloh = True
+        self.save()
+
     def fetch_contrib_data_from_ohloh(self):
         # self has to be saved, otherwise person_id becomes null
         self.save()
         import ohloh
         oh = ohloh.get_ohloh()
+
         ohloh_contrib_info_list = oh.get_contribution_info_by_username(
                 self.username)
         for ohloh_contrib_info in ohloh_contrib_info_list:

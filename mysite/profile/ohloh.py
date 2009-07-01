@@ -117,6 +117,13 @@ class Ohloh(object):
 
         return ret
 
+    def get_name_by_username(self, username):
+        url = 'https://www.ohloh.net/accounts/paulproteus.xml?' % urllib.quote(username)
+        url, account_info = ohloh_url2data(url, 'result/account')
+        if 'name' in account_info:
+            return account_info['name']
+        raise ValueError
+
     def get_contribution_info_by_username_and_project(self, project, username):
         ret = []
         url = 'http://www.ohloh.net/p/%s/contributors.xml?' % project
