@@ -866,6 +866,7 @@ def exp_scraper_handle_ohloh_results(username, ohloh_results):
             exp.save()
     person.last_polled = datetime.datetime.now()
     person.ohloh_grab_completed = True
+    person.try_to_get_name_from_ohloh()
     person.save()
 # }}}
 
