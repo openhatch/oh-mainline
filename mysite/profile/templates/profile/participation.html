@@ -52,7 +52,15 @@
                             <!--input type='submit' value='Make Favorite' /-->
                         </form>
                     </div>
-                    <div class='description'>{{ exp.description }}</div>
+                    <div class='description'>
+                        {% if exp.url %}
+                        <a href='{{ exp.url }}'>
+                        {% endif %}
+                            {{ exp.description }}
+                        {% if exp.url %}
+                        </a>
+                        {% endif %}
+                    </div>
                     <div class='description'>
                         {% if exp.man_months and exp.primary_language %}
                         Months: {{ exp.man_months }}
