@@ -1,7 +1,10 @@
 body {
-    font: 10pt Trebuchet MS, Bitstream Vera Sans, Helvetica, Arial, sans-serif;
+    font: 10pt Helvetica, Bitstream Vera Sans, Arial, sans-serif;
     background: #a5c5c9 url('/static/images/bg-puffy.png');
     /*background: #ddf url('/static/images/bg-puffy-grainy.png');*/
+    background: #edf5e0; url('/static/images/bg-puffy.png');
+    background: #edf5e0 url('/static/images/bg-scape3.png');
+    background: #edf5e0 url('/static/images/banner-olive.png');
     background-repeat: no-repeat;
     background-position: top center;
     margin: 0;
@@ -52,10 +55,34 @@ h1, h2, h3, h4 {
 }
 
 #nav {
+    padding: 0 10px;
     margin-top: 10px;
     float: left;
 }
-
+#nav h2 {
+    float: left;
+    margin-right: 10px;
+}
+#nav ul {
+    list-style: none;
+    margin: 0;
+    float: left;
+    width: 500px;
+}
+#nav li {
+    float: left;
+    margin-right: 10px;
+    font-size: 13pt;
+    /*letter-spacing: -0.25pt;*/
+    padding: 10px;
+}
+#nav li a {
+    padding: 1px 5px;
+    color: #fff;
+    font-weight: bold;
+}
+#nav li a:hover {
+}
 #login {
     float: right;
     font-size: 1.4em;
@@ -132,12 +159,12 @@ h1, h2, h3, h4 {
     background-repeat: repeat-x;
     background-position: top;
     padding: 20px;
-    margin-top: 5px;
     /*
     border: solid #ddd; d08f5f; f0f0f0;
     border-width: 0 0 3px 0;
     */
-    -moz-border-radius: 10px;
+    /*-moz-border-radius: 10px;*/
+    border-top: 5px solid #edf5e0;
 }
 
 #footer_container{
