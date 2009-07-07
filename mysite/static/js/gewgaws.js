@@ -1,12 +1,20 @@
 /* vim: set ai ts=4 sts=4 et sw=4: */
 
+function log(thing) {
+    if (window.console === undefined) {
+        /* do nothing */
+    } else {
+       console.log(thing);
+    }
+}
+
 $.fn.toggleText = function(text1, text2) {
     newtext = (this.text() == text2) ? text1 : text2;
     return this.text(newtext);
 }
 
 $.fn.toggleExpanded = function() {
-    console.log(this, 'toggleExpanded');
+    log(this, 'toggleExpanded');
     this.toggleClass('expanded');
     // this.scrollIntoView(); //disable for video demo. FIXME: restore
     return this;
@@ -68,7 +76,7 @@ $(document).ready(function() {
         $(document).bind('keyup',
                 {combi: 'o', disableInInput: true}, 
                 function() {
-                console.log('open lit gewgaw');
+                log('open lit gewgaw');
                 $('.gewgaws .lit-up').toggleExpanded();
                 });
 
@@ -81,7 +89,7 @@ $(document).ready(function() {
         $('.title').click(function () {
                 $gewgaw = $(this.parentNode.parentNode);
                 $gewgaw.toggleExpanded();
-                console.log($gewgaw[0]);
+                log($gewgaw[0]);
                 return false;
                 });
 
@@ -122,16 +130,16 @@ $(document).ready(function() {
                 }
                 fruitySerialized.push(fruity_pushable);
                 }
-                console.log('FRUITYSERIALIZED:');
-                console.log(fruitySerialized);
-                console.log('SLASH FRUITYSERIALIZED:');
+                log('FRUITYSERIALIZED:');
+                log(fruitySerialized);
+                log('SLASH FRUITYSERIALIZED:');
 
                 return Gewgaws.update(fruitySerialized);
         });
 
         // Handle autocomplete. {{{
         $input = $("#opps form input[type='text']");
-        console.log("input", $input);
+        log("input", $input);
         url = "/search/get_suggestions";
         acOptions = {
             'minChars': 1,
@@ -150,7 +158,7 @@ $(document).ready(function() {
 Gewgaws = {}
 
 Gewgaws.focusSearchInput = function () {
-    console.log('focus search input called');
+    log('focus search input called');
     $("#opps form input[type='text']").focus();
 };
 
@@ -188,7 +196,7 @@ Gewgaws.lightGewgaw = function(gewgawIndex) {
         // FIXME: Automatically scroll when gewgaw is expanded such that its content is off-screen.
     }
     else {
-        console.log('no gewgaw to highlight');
+        log('no gewgaw to highlight');
     }
 };
 
