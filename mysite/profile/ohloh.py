@@ -71,6 +71,17 @@ def ohloh_url2data(url, selector, params = {}, many = False):
     return b.geturl(), None
 
 class Ohloh(object):
+
+    def get_latest_project_analysis_id(self, project_name):
+        """ Retrieve from Ohloh.net the latest project
+        analysis id for a given project."""
+        # {{{
+        url = 'https://www.ohloh.net/p/%s/analyses/latest.xml?' % urllib.quote(
+                project_name)
+        url, data = ohloh_url2data(url, 'result/analysis')
+        return int(data['id'])
+        # }}}
+
     def project_id2projectdata(self, project_id=None, project_name=None):
         if project_name is None:
             project_query = str(int(project_id))
@@ -275,7 +286,6 @@ class Ohloh(object):
         b = mechanize_get(med_logo)
         return b.response().read()
         
-
 _ohloh = Ohloh()
 def get_ohloh():
     return _ohloh

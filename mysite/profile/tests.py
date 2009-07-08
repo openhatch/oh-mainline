@@ -169,7 +169,9 @@ class OhlohTests(django.test.TestCase):
     def testProjectNameByAnalysisId(self):
         # {{{
         oh = ohloh.get_ohloh()
-        self.assertEqual('ccHost', oh.analysis2projectdata(603185)['name'])
+        project_name = 'ccHost'
+        analysis_id = oh.get_latest_project_analysis_id(project_name);
+        self.assertEqual(project_name, oh.analysis2projectdata(analysis_id)['name'])
         # }}}
 
     def testFindByUsername(self):
@@ -214,7 +216,6 @@ class OhlohTests(django.test.TestCase):
                 'man_months': 1,
                 'primary_language': 'shell script'} in projects
         # }}}
-
 
     def testFindContributionsInOhlohAccountByEmail(self):
         oh = ohloh.get_ohloh()
