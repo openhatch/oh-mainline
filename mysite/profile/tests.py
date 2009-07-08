@@ -453,7 +453,7 @@ class ExpTag(django.test.TestCase):
                                project_name='ccHost',
                                tag_text='baller'):
         # {{{
-        url = 'http://openhatch.org/people/paulproteus?tab=inv'
+        url = 'http://openhatch.org/people/paulproteus/tabs/involvement'
         tc.go(make_twill_url(url))
         tc.follow('Edit tags for this experience')
         tc.fv('all_tags', 'text', 'one, two, three')
