@@ -451,7 +451,8 @@ class ExpTag(django.test.TestCase):
             pass # w00t
         # }}}
 
-    def test__exp_tag_add__web(self, username='paulproteus',
+    # FIXME: Restore this test when we come back to this story.
+    def stet__exp_tag_add__web(self, username='paulproteus',
                                project_name='ccHost',
                                tag_text='baller'):
         # {{{
