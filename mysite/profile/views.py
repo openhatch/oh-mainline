@@ -156,13 +156,14 @@ def display_test_page_for_commit_importer(request, input_username):
         'username': input_username})
     # }}}
 
+# FIXME: Change name to gimme_json_that_says_that_commit_importer_is_done
 def get_commit_importer_json(request, input_username):
     # {{{
     exp_scraper_display_for_person_web(request, input_username)
     person = get_object_or_404(Person, username=input_username)
     success = person.ohloh_grab_completed
     list_of_dictionaries = [{'success': success}]
-    json = "(%s)" % simplejson.dumps(list_of_dictionaries)
+    json = simplejson.dumps(list_of_dictionaries)
     return HttpResponse(json)
     # }}}
 # }}}
@@ -852,7 +853,7 @@ def ohloh_grab_done_web(request, username):
 # }}}
 
 def exp_scraper_handle_ohloh_results(username, ohloh_results):
-# {{{
+    # {{{
     '''Input: A sequence of Ohloh ContributorInfo dicts.
     Side-effect: Create matching structures in the DB
     and mark our success in the database.'''
@@ -869,7 +870,7 @@ def exp_scraper_handle_ohloh_results(username, ohloh_results):
     person.ohloh_grab_completed = True
     person.try_to_get_name_from_ohloh()
     person.save()
-# }}}
+    # }}}
 
 def ask_for_tag_input(request, username):
     return display_person_web(request, username, 'tags', edit='1')

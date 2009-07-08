@@ -17,8 +17,10 @@ from django.core.servers.basehttp import AdminMediaHandler
 from django.core.handlers.wsgi import WSGIHandler
 from StringIO import StringIO
 import urllib
+import simplejson
 
 from django.test.client import Client
+from tasks import FetchPersonDataFromOhloh
 # }}}
 
 # FIXME: Later look into http://stackoverflow.com/questions/343622/how-do-i-submit-a-form-given-only-the-html-source
@@ -1039,87 +1041,58 @@ class CeleryTests(django.test.TestCase):
     def tearDown(self):
         twill_teardown()
 
-    def test_slow_loading_via_fixture(self):
-        username='paulproteus'
-        url = '/people/show_all_data_for_person'
-        
-        good_input = {
-            'u': username,
-            'nobgtask': 'yes',
-            }
-        
-        response = Client().get(url, good_input)
-        self.assertContains(response, 'paulproteus')
-        self.assertNotContains(response, 'ccHost')
-
-        # load the fixture now
-        management.call_command('loaddata',
-                                'cchost-data-imported-from-ohloh', verbosity=0)
-        response = Client().get(url, good_input)
-        self.assertContains(response, 'ccHost')
-
     def test_slow_loading_via_emulated_bgtask(self,
                                               use_cooked_data=True):
+        """
+        1. Go to the page that has paulproteus' data.
+        2. Verify that the page doesn't yet know about ccHost
+        3. Run the celery task ourselves, but instead of going to Ohloh, we hand-prepare data for it.
+        """
         username='paulproteus'
-        url = '/people/show_all_data_for_person'
+        url = '/people/paulproteus/test_commit_importer_json'
         
         good_input = {
-            'u': username,
             'nobgtask': 'yes',
             }
         
-        response = Client().get(url, good_input)
-        self.assertContains(response, 'paulproteus')
-        self.assertNotContains(response, 'ccHost')
+        # Ask if background job has been completed.
+        # We haven't called it, so the answer should be no.
+        response_before = Client().get(url, good_input)
+        print "RESPONSE CONTENT: " + response_before.content
+        self.assertEquals(simplejson.loads(response_before.content),
+                [{'success': 0}])
+
+        # Ask if involvement fact has been loaded.
+        # We haven't loaded it, so the answer should be no.
+        project_name = 'ccHost'
+        self.assertFalse(list(ProjectExp.objects.filter(
+            project__name=project_name)))
 
         # do the background load ourselves
         if use_cooked_data:
             cooked_data = [{'man_months': 1, 'project': u'ccHost',
-            'project_homepage_url': 
-            u'http://wiki.creativecommons.org/CcHost',
+            'project_homepage_url': u'http://wiki.creativecommons.org/CcHost',
             'primary_language': u'shell script'}]
         else:
             cooked_data=None
 
         # Instantiate the task
-        from tasks import FetchPersonDataFromOhloh
         task = FetchPersonDataFromOhloh()
         task.run(username, cooked_data=cooked_data)
+        # NB: The task knows not to call Ohloh when we give it cooked data.
 
-        # always
-        response = Client().get(url, good_input)
-        self.assertContains(response, 'ccHost')
+        self.assert_(Person.objects.get(username='paulproteus').ohloh_grab_completed)
 
-    def test_slow_loading_via_emulated_bg_user_project(self):
-        username='paulproteus'
-        url = '/people/show_all_data_for_person'
-        
-        good_input = {
-            'u': username,
-            'nobgtask': 'yes',
-            }
-       
-        response = Client().get(url, good_input)
-        self.assertContains(response, 'paulproteus')
-        self.assertNotContains(response, 'ccHost')
+        # Check again
+        response_after = Client().get(url, good_input)
 
-        from tasks import FetchPersonDataFromOhlohGivenProject
-        # Instantiate the task - but first try to find
-        # unrelated info
-        task = FetchPersonDataFromOhlohGivenProject()
-        task.run(username=username, project='zoph')
+        # Ask if background job has been completed. (Hoping for yes.)
+        self.assertEquals(simplejson.loads(response_after.content),
+                [{'success': 1}])
 
-        response = Client().get(url, good_input)
-        self.assertContains(response, 'paulproteus')
-        self.assertNotContains(response, 'ccHost')
-
-        # Now do it right
-        task = FetchPersonDataFromOhlohGivenProject()
-        task.run(username=username, project='ccHost')
-
-        # finally, we should see ccHost
-        response = Client().get(url, good_input)
-        self.assertContains(response, 'ccHost')
+        # Ask if involvement fact has been loaded. (Hoping for yes.)
+        self.assert_(list(ProjectExp.objects.filter(
+            project__name=project_name)))
 
     def test_background_check_if_ohloh_grab_completed(self):
         username = 'paulproteus'

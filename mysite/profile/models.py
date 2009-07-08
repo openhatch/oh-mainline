@@ -3,6 +3,7 @@
 from django.db import models
 from mysite.search.models import Project, Bug
 import datetime
+import ohloh
 
 class Person(models.Model):
     """ A human bean. """
@@ -34,7 +35,6 @@ class Person(models.Model):
         if self.gotten_name_from_ohloh:
             return
         # otherwise, do it
-        import ohloh
         oh = ohloh.get_ohloh()
         # Preferably get the human name...
         try:
