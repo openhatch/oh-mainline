@@ -46,7 +46,6 @@ def fetch_bugs(request):
         # FIXME: Randomize for camera
 
     bugs = list(bugs)
-    bugs.insert(1, Bug.objects.get(pk=1004))
 
     if format == 'json':
         return bugs_to_json_response(bugs, request.GET.get(
