@@ -93,12 +93,13 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.webdesign',
-    'mysite.search',
     'django.contrib.admin',
     'windmill',
     'south',
-    'profile',
     'celery',
+    'search',
+    'profile',
+    'customs',
 )
 
 ### HACK

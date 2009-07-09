@@ -103,7 +103,6 @@ class ProfileTests(django.test.TestCase):
         # Verify that leaving and coming back has it still
         # there
         tc.go(make_twill_url(url_prefix + '/people/paulproteus?tab=inv'))
-        tc.show()
         tc.find('Babel')
         tc.find('Baber')
         # }}}
@@ -132,95 +131,6 @@ class ProfileTests(django.test.TestCase):
                 primary_language)
         # }}}
 
-    # }}}
-
-import ohloh
-class OhlohTests(django.test.TestCase):
-    # {{{
-    def testProjectDataById(self):
-        # {{{
-        oh = ohloh.get_ohloh()
-        data = oh.project_id2projectdata(15329)
-        self.assertEqual('ccHost', data['name'])
-        self.assertEqual('http://wiki.creativecommons.org/CcHost',
-                         data['homepage_url'])
-        # }}}
-        
-    def testProjectNameByAnalysisId(self):
-        # {{{
-        oh = ohloh.get_ohloh()
-        project_name = 'ccHost'
-        analysis_id = oh.get_latest_project_analysis_id(project_name);
-        self.assertEqual(project_name, oh.analysis2projectdata(analysis_id)['name'])
-        # }}}
-
-    def testFindByUsername(self):
-        # {{{
-        oh = ohloh.get_ohloh()
-        projects = oh.get_contribution_info_by_username('paulproteus')
-        self.assertEqual([{'project': u'ccHost',
-                           'project_homepage_url': 'http://wiki.creativecommons.org/CcHost',
-                           'man_months': 1,
-                           'primary_language': 'shell script'}],
-                         projects)
-        # }}}
-
-    def testFindByOhlohUsername(self):
-        # {{{
-        oh = ohloh.get_ohloh()
-        projects = oh.get_contribution_info_by_ohloh_username('paulproteus')
-        self.assertEqual([{'project': u'ccHost',
-                           'project_homepage_url': 'http://wiki.creativecommons.org/CcHost',
-                           'man_months': 1,
-                           'primary_language': 'shell script'}],
-                         projects)
-        # }}}
-
-    def testFindByEmail(self): 
-        # {{{
-        oh = ohloh.get_ohloh()
-        projects = oh.get_contribution_info_by_email('asheesh@asheesh.org')
-        assert {'project': u'playerpiano',
-                'project_homepage_url': 'http://code.google.com/p/playerpiano',
-                'man_months': 1,
-                'primary_language': 'Python'} in projects
-        # }}}
-
-    def testFindContributionsInOhlohAccountByUsername(self):
-        # {{{
-        oh = ohloh.get_ohloh()
-        projects = oh.get_contribution_info_by_ohloh_username('paulproteus')
-        
-        assert {'project': u'ccHost',
-                'project_homepage_url': 'http://wiki.creativecommons.org/CcHost',
-                'man_months': 1,
-                'primary_language': 'shell script'} in projects
-        # }}}
-
-    def testFindContributionsInOhlohAccountByEmail(self):
-        oh = ohloh.get_ohloh()
-        username = oh.email_address_to_ohloh_username('paulproteus.ohloh@asheesh.org')
-        projects = oh.get_contribution_info_by_ohloh_username(username)
-        
-        assert {'project': u'ccHost',
-                'project_homepage_url': 'http://wiki.creativecommons.org/CcHost',
-                'man_months': 1,
-                'primary_language': 'shell script'} in projects
-
-
-    def testFindUsernameByEmail(self):
-        # {{{
-        oh = ohloh.get_ohloh()
-        username = oh.email_address_to_ohloh_username('paulproteus.ohloh@asheesh.org')
-        self.assertEquals(username, 'paulproteus')
-        # }}}
-
-    def testFindByUsernameNotAsheesh(self):
-        # {{{
-        oh = ohloh.get_ohloh()
-        projects = oh.get_contribution_info_by_username('keescook')
-        self.assert_(len(projects) > 1)
-        # }}}
     # }}}
 
 class DebTagsTests(django.test.TestCase):
@@ -589,7 +499,6 @@ class PersonInvolvementTests(django.test.TestCase):
         tc.fv('add_contrib', 'description', 'fiddlesticks')
         tc.fv('add_contrib', 'url', 'http://example.com')
         tc.submit()
-        tc.show()
         #tc.follow('involvement')
         tc.find('fiddlesticks')
         tc.find('http://example.com')
@@ -695,7 +604,6 @@ class CeleryTests(django.test.TestCase):
         # Ask if background job has been completed.
         # We haven't called it, so the answer should be no.
         response_before = Client().get(url, good_input)
-        print "RESPONSE CONTENT: " + response_before.content
         self.assertEquals(simplejson.loads(response_before.content),
                 [{'success': 0}])
 
