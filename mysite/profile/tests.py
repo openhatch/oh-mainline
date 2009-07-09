@@ -133,27 +133,6 @@ class ProfileTests(django.test.TestCase):
 
     # }}}
 
-class OmanTests(django.test.TestCase):
-    # {{{
-    fixtures = ['user-paulproteus', 'cchost-data-imported-from-ohloh']
-    def setUp(self):
-        twill_setup()
-
-    def tearDown(self):
-        twill_teardown()
-
-    def test_slurper_accepts_username(self):
-        # {{{
-        url = 'http://openhatch.org/people/xp_slurp'
-        tc.go(make_twill_url(url))
-        tc.fv('enter_free_software_username', 'u', 'paulproteus')
-        tc.submit()
-
-        tc.follow('involvement')
-        tc.find('ccHost')
-        # }}}
-    # }}}
-
 import ohloh
 class OhlohTests(django.test.TestCase):
     # {{{
@@ -243,35 +222,6 @@ class OhlohTests(django.test.TestCase):
         # }}}
     # }}}
 
-class PerthTests(django.test.TestCase):
-    '''
-    The Perth milestone says:
-    * The web form needs to be able to search by email also.
-    '''
-    # {{{
-    def setUp(self):
-        twill_setup()
-
-    def tearDown(self):
-        twill_teardown()
-
-    def testFormEnterYourEmail(self):
-        url = 'http://openhatch.org/people/xp_slurp'
-        tc.go(make_twill_url(url))
-        tc.fv('enter_free_software_email', 'email', 'paulproteus.ohloh@asheesh.org')
-        tc.submit()
-        tc.follow('involvement')
-        tc.find('ccHost')
-
-    def testFormDoesntBlowUpForNoMatch(self):
-        url = 'http://openhatch.org/people/xp_slurp'
-        tc.go(make_twill_url(url))
-        tc.fv('enter_free_software_email', 'email', 'asheesh@asheesh.org')
-        tc.submit()
-        tc.follow('involvement')
-        tc.find('playerpiano')
-    # }}}
-
 class DebTagsTests(django.test.TestCase):
     # {{{
     def setUp(self):
@@ -343,262 +293,7 @@ class QuebecTests(django.test.TestCase):
         # }}}
     # }}}
 
-class ExpTag(django.test.TestCase):
-    # {{{
-    fixtures = ['user-paulproteus', 'cchost-data-imported-from-ohloh']
-    def setUp(self):
-        twill_setup()
-        self.sample_person = Person(username='stipe')
-        self.sample_person.save()
-
-        self.sample_project = Project(name='automatic')
-        self.sample_project.save()
-
-        self.sample_tag_type = TagType(name='asdf')
-        self.sample_tag_type.save()
-
-        self.sample_tag = Tag(tag_type=self.sample_tag_type, text='baller')
-        self.sample_tag.save()
-
-        self.sample_exp = ProjectExp(
-                person=self.sample_person,
-                project=self.sample_project)
-        self.sample_exp.save()
-
-    def tearDown(self):
-        twill_teardown()
-        self.sample_person.delete()
-        self.sample_project.delete()
-        self.sample_tag.delete()
-        self.sample_exp.delete()
-        self.sample_tag_type.delete()
-
-    def test__exp_tag_model_create_and_delete(self):
-        # {{{
-
-        tag_type, created = TagType.objects.get_or_create(name='misc')
-
-        tag, tag_created = Tag.objects.get_or_create(
-                text='exemplary futility',
-                tag_type=tag_type)
-
-        person, person_created = Person.objects.get_or_create(
-                username='stipe')
-
-        project, project_created = Project.objects.get_or_create(
-                name='exaile')
-
-        project_exp, project_exp_created = ProjectExp.objects.get_or_create(
-                person=person, project=project)
-
-        link_exp_tag, link_created = Link_ProjectExp_Tag.objects.get_or_create(
-                tag=tag, project_exp=project_exp)
-        self.assert_(link_created)
-
-        link_exp_tag.delete()
-        # }}}
-
-    def test__exp_tag_add__unit(self, return_it = False):
-        # {{{
-
-        # Constants:
-        project_name='murmur'
-        username='stipe'
-        tag_text='awesome'
-    
-        person, person_created = Person.objects.get_or_create(
-                username=username)
-        #if person_created: print "Person %s was created" % person
-
-        project, project_created = Project.objects.get_or_create(
-                name=project_name)
-        #if project_created: print "Project %s was created" % project
-
-        project_exp, proj_exp_created = ProjectExp.objects.get_or_create(
-                person=person, project=project)
-        #if proj_exp_created: print "ProjectExp %s was created" % project_exp
-
-        profile.views.add_tag_to_project_exp(username, project_name, tag_text)
-        # Verify it worked
-        inserted = Link_ProjectExp_Tag.objects.get(tag__text='awesome')
-        self.assertEqual(inserted.project_exp.project, project)
-        self.assertEqual(inserted.tag.text, tag_text)
-        self.assertEqual(inserted.project_exp.person, person)
-        self.assert_(inserted.id) # make sure it got in there
-        if return_it:
-            return inserted
-        else:
-            inserted.delete()
-        # }}}
-
-    def test__exp_tag_remove__unit(self):
-        # {{{
-        # Disable for now.
-        return 
-
-        tag_link = self.test__exp_tag_add__unit(return_it = True)
-        returned = profile.views.project_exp_tag__remove(
-            tag_link.project_exp.person.username,
-            tag_link.project_exp.project.name,
-            tag_link.tag.text)
-
-        try:
-            profile.views.project_exp_tag__remove(
-            tag_link.project_exp.person.username,
-            tag_link.project_exp.project.name,
-            tag_link.tag.text)
-            assert False, "Should have NOT found it"
-        except Link_ProjectExp_Tag.DoesNotExist:
-            pass # w00t
-        # }}}
-
-    # FIXME: Restore this test when we come back to this story.
-    def stet__exp_tag_add__web(self, username='paulproteus',
-                               project_name='ccHost',
-                               tag_text='baller'):
-        # {{{
-        url = 'http://openhatch.org/people/paulproteus/tabs/involvement'
-        tc.go(make_twill_url(url))
-        tc.follow('Edit tags for this experience')
-        tc.fv('all_tags', 'text', 'one, two, three')
-        tc.submit()
-        print tc.show()
-        one_tags = list(profile.models.Link_ProjectExp_Tag.objects.filter(
-            tag__text='one'))
-        self.assert_(list(profile.models.Link_ProjectExp_Tag.objects.filter(
-            tag__text='two', person__username='paulproteus')))
-        self.assert_(list(profile.models.Link_ProjectExp_Tag.objects.filter(
-            tag__text='three')))
-        tc.find('three')
-        # }}}
-
-    def test__project_exp_tag__remove__web(self):
-        # {{{
-        # Disabled for the moment so we can focus on other stuff.
-        return
-
-        tag_text='ballew'
-        username = 'stipe'
-        project_name = 'automatic'
-        
-        self.test__exp_tag_add__web(tag_text=tag_text,
-                                    username=username,
-                                    project_name=project_name)
-
-        url = 'http://openhatch.org/people/?u=' + username
-        tc.go(make_twill_url(url))
-        
-        # FIXME: Loop over forms
-        tc.fv('add-tag-to-exp', 'tag_text', tag_text)
-        tc.submit()
-        tc.find(tag_text)
-
-        # All this so we can click the right Delete button
-        desired = None
-        for form in tc.showforms():
-            if 'remove-tag' in form.name:
-                desired = form
-        tc.config('readonly_controls_writeable', True)
-        self.assertEqual(desired.get_value('tag_text'), tag_text)
-        tc.fv(desired.name, 'tag_text', desired.get_value('tag_text'))
-        tc.submit()
-        tc.notfind(tag_text)
-        
-        # }}}
-
-    def test__project_exp_tag_add__web__failure(self):
-        # {{{
-        # Disabled for the moment so we can focus on other stuff.
-        return
-        url = '/people/add_tag_to_project_exp'
-
-        username = 'stipe'
-        project_name = 'automatic'
-
-        Person.objects.get_or_create(username=username)
-        Project.objects.get_or_create(name=project_name)
-
-        good_input = {
-            'username': username,
-            'project_name': project_name,
-            'tag_text': 'baller'
-            }
-
-        client = Client()
-
-        # Test that add tag fails if any of the fields are missing.
-        for key in good_input.keys():
-            bad_input = {}
-            bad_input.update(good_input)
-            del bad_input[key]
-            self.assertEquals(client.get(url, bad_input).status_code, 500)
-        # }}}
-
-    def test__project_exp_tag_remove__web__failure(self):
-        # {{{
-        # Disabled for the moment so we can focus on other stuff.
-        return
-        url = '/people/project_exp_tag__remove'
-
-        username = 'stipe'
-        project_name = 'automatic'
-
-        Person.objects.get_or_create(username=username)
-        Project.objects.get_or_create(name=project_name)
-
-        good_input = {
-            'username': username,
-            'project_name': project_name,
-            'tag_text': 'baller'
-            }
-
-        client = Client()
-
-        # Test that add tag fails if any of the fields are missing.
-        for key in good_input.keys():
-            bad_input = {}
-            bad_input.update(good_input)
-            del bad_input[key]
-            self.assert_('error' in
-                         client.get(url, bad_input)['Location'])
-        # }}}
-
-    def test__exp_tag_add_multiple_tags__web(self):
-        # {{{
-        # Disabled for the moment so we can focus on other stuff.
-        return
-        tag_text = 'rofl, con, hipster'
-        desired_tags = ['rofl', 'con', 'hipster']
-        username='stipe'
-        project_name='automatic'
-        
-        url = '/people/add_tag_to_project_exp'
-        
-        good_input = {
-            'username': username,
-            'project_name': project_name,
-            'tag_text': tag_text
-            }
-        
-        response = Client().post(url, good_input)
-        response = Client().get('/people/', {'u': username})
-        
-        self.assertContains(response, username)
-        self.assertContains(response, project_name)
-        self.assertNotContains(response, tag_text) # the thing
-                                                   # withspaces will
-                                                   # not fly
-        for tag in desired_tags: # but each tag alone, that's splendid
-            self.assertContains(response, tag)
-        # }}}
-
-
-    """
-    test that tag dupes aren't added, and that a notification is returned 'you tried to add a duplicate tag: %s'.
-    do that for each dupe, and return a summary notification: 'you tried to add the following duplicate tags: ...'
-    """
-
-    # }}}
+#class ExpTag(django.test.TestCase):
 
 class TrentonTests(django.test.TestCase):
     '''
@@ -785,30 +480,6 @@ class OhlohIconTests(django.test.TestCase):
         # Remove it so the test has no side-effects
         os.unlink(path)
 
-class AnchorageTests(django.test.TestCase):
-    # {{{
-
-    def setUp(self):
-        twill_setup()
-
-    def tearDown(self):
-        twill_teardown()
-
-    def test_xp_slurper_input_form(self):
-        url = 'http://openhatch.org/people/xp_slurp'
-        tc.go(make_twill_url(url))
-        # FIXME: Check the actual template instead of
-        # using a check string.
-        tc.find("[xp_slurper]")
-
-    def test_xp_slurper_fails_without_username(self):
-        # If no username entered, user is returned
-        # to scraper input form with a notification.
-        url = 'http://openhatch.org/people/xp_slurp_do'
-        tc.go(make_twill_url(url))
-        tc.find("[error:missing_username]")
-    # }}}
-
 class CambridgeTests(django.test.TestCase):
     '''
     The Cambridge milestone says:
@@ -933,8 +604,9 @@ class PersonInvolvementTests(django.test.TestCase):
 
     def test_tag_editor(self):
         # {{{
-        url = 'http://openhatch.org/people/paulproteus?tab=tags&edit=1'
-        tc.go(make_twill_url(url))
+        tc.follow('tags')
+        tc.follow('Edit')
+        url = 'http://openhatch.org/people/paulproteus/'
         tc.find('Edit tags')
         # }}}
 

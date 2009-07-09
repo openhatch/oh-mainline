@@ -7,7 +7,6 @@ from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_Project
 from mysite.search.models import Project
 import StringIO
 import datetime
-import time
 import urllib
 import simplejson
 import re
@@ -65,90 +64,9 @@ def person_involvement_add(request):
             urllib.urlencode({'tab': 'inv'}))
     #}}}
 
-"""
-def project_exp_update_web(request):
-    # {{{
-    username = request.POST.get('u', '')
-    project_name = request.POST.get('project_name', '')
-    description = request.POST.get('description', '')
-    url = request.POST.get('url', '')
-    format = request.POST.get('format', 'html')
-
-    notification = ''
-    if username and project_name and description and url:
-        person = Person.objects.get(username=username)
-        project, _ = Project.objects.get_or_create(name=project_name)
-        exp, _ = ProjectExp.objects.get_or_create(
-                person=person,
-                project=project)
-        exp.description = description
-        exp.url = url
-        exp.save()
-        notification = "Updated %s's experience with %s." % (
-                username, project_name)
-    else:
-        notification = "Unexpectedly imperfect input: {project_name: %s, username: %s}" % (
-                project_name, username)
-        if format == 'json':
-            dict = {'notification': notification}
-            return HttpResponse(simplejson.dumps([dict]))
-
-    data = profile_data_from_username(username)
-    data['notification'] = notification
-
-    return HttpResponseRedirect('/people/?' +
-            urllib.urlencode({'u': username, 'tab': 'inv'}))
-    # }}}
-"""
-
-def add_contribution(username, project_name, url='', description=''):
-    pass
-
 # }}}
 
 # XP slurper {{{
-def xp_slurper_display_input_form(request):
-    # {{{
-    notification = None
-    error = request.GET.get('error', None)
-    if error == 'missing_username':
-        notification = "Please enter a username."
-    return render_to_response('profile/xp_slurper.html', {'notification': notification})
-    # }}}
-
-def exp_scraper_scrape_web(request, input_username=None):
-    # {{{
-    # Check input
-    if input_username is None:
-        input_username = request.POST.get('u', None)
-
-    if input_username is None or input_username == '':
-        return HttpResponseRedirect('/xp_slurp?' + urllib.urlencode(
-            {'error': 'missing_username'}))
-    
-    person, _ = Person.objects.get_or_create(username=input_username)
-
-    #exp_scraper_scrape(person)
-
-    return HttpResponseRedirect('/people/?' + urllib.urlencode(
-        {'u': input_username, 'tab': 'main'}))
-    # }}}
-
-def exp_scraper_scrape(person):
-    # {{{
-    person.fetch_contrib_data_from_ohloh()
-    person.poll_on_next_web_view = False
-    person.save()
-    # }}}
-
-def import_contributions_image(request, input_username=None):
-    # {{{
-    person = Person.objects.get(username=input_username)
-    # FIXME: Catch no username
-    exp_scraper_scrape(person)
-    return HttpResponseRedirect('/static/images/data-ready.png')
-    # FIXME: Catch errors, display error graphic.
-    # }}}
 
 def display_test_page_for_commit_importer(request, input_username):
     # {{{
@@ -441,201 +359,18 @@ def get_data_for_email(request):
 # Project experience tags {{{
 
 # FIXME: rename to project_exp_tag__add__web
-def add_tag_to_project_exp_web(request):
-    # {{{
-    # Get data
-    username = request.POST.get('username', None)
-    project_name = request.POST.get('project_name', None)
-    big_tag_text = request.POST.get('tag_text', '')
-    format = request.POST.get('format', 'html')
-
-    useful_tags = filter(None, map(lambda s: s.strip(),
-        big_tag_text.split(',')))
-
-    # Validate data
-    if not username or not project_name or not big_tag_text:
-        return HttpResponseServerError()
-
-    for tag_text in useful_tags:
-        # Great, we have all we need:
-        add_tag_to_project_exp(username, project_name, tag_text)
-    notification = "You tagged %s's experience with %s as %s" % (
-            username, project_name, ','.join(useful_tags))
-    request_GET = {
-            'u': username,
-            'notification': notification
-            }
-    query_str = "?" + urllib.urlencode(request_GET)
-    return HttpResponseRedirect('/people/%s' % query_str)
-    # }}}
+#def add_tag_to_project_exp_web(request):
 
 # FIXME: rename to project_exp_tag__add
-def add_tag_to_project_exp(username, project_name,
-        tag_text, tag_type_name='user_generated'):
-    # {{{
-    tag_type, created = TagType.objects.get_or_create(
-            name=tag_type_name)
+#def add_tag_to_project_exp(username, project_name,
+#        tag_text, tag_type_name='user_generated'):
 
-    tag, tag_created = Tag.objects.get_or_create(
-            text=tag_text, tag_type=tag_type)
+#def project_exp_tag__remove(username, project_name,
+#        tag_text, tag_type_name='user_generated'):
 
-    person = Person.objects.get(username=username)
-    # FIXME: Catch when no such person exists.
-
-    project = Project.objects.get(name=project_name)
-    # FIXME: Catch when no such project exists.
-
-    project_exp = ProjectExp.objects.filter(
-            person=person, project=project)[0]
-    # FIXME: Catch when no such project exp exists.
-    # Not using get; the error of multiple
-    # project_exps with the same person and project
-    # need not be caught here.
-
-    # Does it already exist? If so, we're golden.
-    # FIXME: Use get_or_create
-    old_links = list(Link_ProjectExp_Tag.objects.filter(
-        tag=tag, project_exp=project_exp))
-    if not old_links:
-        new_link = Link_ProjectExp_Tag.objects.create(
-                tag=tag, project_exp=project_exp)
-        # FIXME: Move to Link_ProjectExp_Tag.create_from_strings
-    # }}}
-
-def project_exp_tag__remove(username, project_name,
-        tag_text, tag_type_name='user_generated'):
-    # {{{
-    # FIXME: Maybe don't actually delete, but merely disable (e.g. deleted=yes),
-    # in case we want to run stats on what tags people are deleting, etc.
-    tag_link = Link_ProjectExp_Tag.get_from_strings(username, project_name, tag_text)
-    tag_link.delete()
-    return tag_link
-    # }}}
-
-def project_exp_tag__remove__web(request):
-    # {{{
-    username = request.POST.get('username', None)
-    project_name = request.POST.get('project_name', None)
-    tag_text = request.POST.get('tag_text', None)
-    format = request.POST.get('format', 'html')
-    tag_type_name = request.POST.get('tag_type_name', 'user_generated')
-
-    if username and project_name and tag_text:
-        # Collect errors in this list
-        errors = []
-
-        # Verify person with that username exists
-        if Person.objects.filter(username=username).count() == 0:
-            errors.append("No person found with username: %s" % username)
-
-        # Verify project with that name exists
-        if Project.objects.filter(name=project_name).count() == 0:
-            errors.append("No project found with name: %s" % project_name)
-
-        # Verify tag with that text exists
-        if Tag.objects.filter(text=tag_text).count() == 0:
-            errors.append("No project found with name: %s" % project_name)
-
-        if errors:
-            if format == 'json':
-                return HttpResponse(simplejson.dumps([{'errors': errors}]))
-            else:
-                return HttpResponseRedirect('/people/?' + urllib.urlencode(
-                    {'u': username, 'errors': errors}))
-
-        project_exp_tag__remove(username, project_name, tag_text)
-
-        notification = "Successfully removed tag: {username: %s, project_name: %s, tag_text: %s}" % (username, project_name, tag_text)
-
-        if format == 'json':
-            return HttpResponse(simplejson.dumps([
-                {'notification': notification}
-                ]))
-        else:
-            return HttpResponseRedirect('/people/?' + urllib.urlencode(
-                {'u': username, 'notification': notification}))
-    else:
-        errors = ["You're missing some crucial input."]
-        if format == 'json':
-            return HttpResponse(simplejson.dumps([{'errors': errors}]))
-        else:
-            return HttpResponseRedirect('/people/?' + urllib.urlencode(
-                {'u': username, 'errors': errors}))
-
-    # }}}
+#def project_exp_tag__remove__web(request):
 
 # }}}
-
-# Specify what you like working on {{{
-
-def change_what_like_working_on(username, new_like_working_on):
-    # {{{
-    if username is None:
-        return
-    if new_like_working_on is None:
-        return
-
-    person = get_object_or_404(Person, username=username)
-    person.interested_in_working_on = new_like_working_on
-    person.save()
-    return person
-    # }}}
-
-def change_what_like_working_on_web(request):
-    # {{{
-    username = request.POST.get('username')
-    new_like = request.POST.get('like-working-on')
-    person = change_what_like_working_on(username, new_like)
-    return HttpResponseRedirect('/people/?' + urllib.urlencode({'u': username, 'tab': 'tags'}))
-    # }}}
-
-# }}}
-
-def DISABLE_display_person_redirect(username):
-    # {{{
-    return HttpResponseRedirect('/people/?' + urllib.urlencode({'u': username}))
-    # }}}
-
-def make_favorite_project_exp(exp_id_obj):
-    # {{{
-    if exp_id_obj is None:
-        return
-    exp_id = int(exp_id_obj)
-    desired_pe = ProjectExp.objects.get(id=exp_id)
-    desired_pe.favorite = True
-    desired_pe.save()
-    return
-    # }}}
-
-def make_favorite_project_exp_web(request):
-    # {{{
-    exp_id = request.POST.get('exp_id', None)
-    username = request.POST.get('username', '')
-    make_favorite_project_exp(exp_id)
-    return HttpResponseRedirect('/people/?' + urllib.urlencode(
-        {'u': username, 'tab': 'inv'}))
-    # }}}
-
-def make_favorite_tag(exp_id_obj, tag_text):
-    # {{{
-    if exp_id_obj is None:
-        return
-    exp_id = int(exp_id_obj)
-    desired_tag = Link_ProjectExp_Tag.objects.get(project_exp__id=exp_id,
-            tag__text=tag_text)
-    desired_tag.favorite = True
-    desired_tag.save()
-    return
-    # }}}
-
-def make_favorite_exp_tag_web(request):
-    # {{{
-    exp_id = request.POST.get('exp_id', None)
-    tag_text = request.POST.get('tag_text', None)
-    username = request.POST.get('username', None)
-    make_favorite_tag(exp_id, tag_text)
-    return HttpResponseRedirect('/people/?' + urllib.urlencode({'u': username}))
-    # }}}
 
 def sf_projects_by_person_web(request):
     # {{{
@@ -693,53 +428,6 @@ def project_icon_url(project_name, actually_fetch = True):
     # FIXME: One day, add cache expiry.
     # }}}
 
-def edit_exp_tag(request, exp_id):
-    # {{{
-    project_exp = ProjectExp.objects.get(id=exp_id)
-    
-    text = request.POST.get('text', None)
-    if text is None:
-        return render_to_response('profile/edit_exp_tags.html',
-                                  {'text': ''})
-    else:
-        # set the tags to this thing
-        tags = text.split(',')
-        tags = [tag.strip() for tag in tags]
-        # Now figure out what tags there in the DB
-        tag_type, _ = TagType.objects.get_or_create(name='user_generated')
-        tag_links = Link_ProjectExp_Tag.objects.filter(tag__tag_type=tag_type,
-                                                       project_exp__id=exp_id)
-        tag_texts = [l.tag.text for l in tag_links]
-
-        to_be_added = []
-        to_be_removed = []
-        for modification in difflib.ndiff(tag_texts, tags):
-            first_two, rest = modification[:2], modification[2:]
-            if first_two == '  ':
-                continue
-            elif first_two == '+ ':
-                to_be_added.append(rest)
-            elif first_two == '- ':
-                to_be_removed.append(rest)
-            else:
-                raise ValueError, "Weird."
-        map(lambda thing: thing.delete(),
-            Link_ProjectExp_Tag.objects.filter(tag__tag_type=tag_type,
-                                               project_exp__id=exp_id,
-                                               tag__text=tag))
-        for tag in to_be_added:
-            new_tag, _ = Tag.objects.get_or_create(tag_type=tag_type, text=tag)
-            new_tag.save()
-            new_link, _ = Link_ProjectExp_Tag.objects.get_or_create(tag=new_tag,
-                                              project_exp=project_exp)
-            new_link.save()
-            #import pdb
-            #pdb.set_trace()
-            
-        return HttpResponseRedirect('/people/%s?tab=inv' %
-                                    urllib.quote(project_exp.person.username))
-    # }}}
-
 def edit_person_tags(request, username):
     # {{{
     person = Person.objects.get(username=username)
@@ -791,10 +479,6 @@ def project_icon_web(request, project_name):
     url = project_icon_url(project_name)
     return HttpResponseRedirect(url)
     # }}}
-
-# }}}
-
-# }}}
 
 def exp_scraper_display_for_person_web(request, username):
     # {{{
@@ -874,3 +558,14 @@ def exp_scraper_handle_ohloh_results(username, ohloh_results):
 
 def ask_for_tag_input(request, username):
     return display_person_web(request, username, 'tags', edit='1')
+
+#def make_favorite_project_exp(exp_id_obj):
+
+#def make_favorite_project_exp_web(request):
+
+#def make_favorite_tag(exp_id_obj, tag_text):
+
+#def make_favorite_exp_tag_web(request):
+
+#def edit_exp_tag(request, exp_id):
+
