@@ -1,0 +1,14 @@
+{% include 'profile/header.global.html' %}
+
+<h2>List of registered users</h2>
+<ul>
+    {% for person in people %}
+    <li>
+    <a href='/people/{{person.username}}'>
+        {{ person.name }} ({{ person.username }})
+    </a>
+    </li>
+    {% endfor %}
+</ul>
+
+{% include 'profile/footer.html' %}

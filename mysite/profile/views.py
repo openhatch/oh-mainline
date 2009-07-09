@@ -5,6 +5,7 @@ from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerEr
 from django.shortcuts import render_to_response, get_object_or_404
 from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag, Link_Project_Tag, Link_SF_Proj_Dude_FM, Link_Person_Tag
 from mysite.search.models import Project
+import profile.controllers
 import StringIO
 import datetime
 import urllib
@@ -527,6 +528,7 @@ def exp_scraper_display_for_person_web(request, username):
         person.last_polled = datetime.datetime.now()
         person.save()
         result = FetchPersonDataFromOhloh.delay(username=username)
+    # }}}
 
 def ohloh_grab_done_web(request, username):
 # {{{
@@ -557,7 +559,9 @@ def exp_scraper_handle_ohloh_results(username, ohloh_results):
     # }}}
 
 def ask_for_tag_input(request, username):
+    # {{{
     return display_person_web(request, username, 'tags', edit='1')
+    # }}}
 
 #def make_favorite_project_exp(exp_id_obj):
 
@@ -569,3 +573,10 @@ def ask_for_tag_input(request, username):
 
 #def edit_exp_tag(request, exp_id):
 
+def display_list_of_people(request):
+    # {{{
+    return render_to_response('profile/search_people.html', {
+        'title': 'List of people : OpenHatch',
+        'people': profile.controllers.queryset_of_people()
+        })
+    # }}}

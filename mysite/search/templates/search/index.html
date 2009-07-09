@@ -1,103 +1,107 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-  <head>{% comment %} {{{ {% endcomment %}
+    <head>{% comment %} {{{ {% endcomment %}
 
-    {% comment %} prefatory remarks {{{ {% endcomment %}
-    <title>openhatch</title>
-    <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
-    <meta http-equiv='Content-Language' content='en-us' />
-    <meta http-equiv='Content-Script-Type' content='text/javascript' />
-    <meta http-equiv='Content-Style-Type' content='text/css' />
-    <meta name='Description' content=''>
-    {% comment %} }}} {% endcomment %}
-
-    {% comment %} css {{{ {% endcomment %}
-    <style>/*<![CDATA[*/
-      @import url('/static/css/all.css') all;
-      @import url('/static/css/jquery.autocomplete.css') screen;
-      /*@import url('/static/css/gewgaws.css');*/
-      /*]]>*/</style>
-
-    <!--[if IE]><style>/*<![CDATA[*/@import url('../css/ie/all.css');/*]]>*/</style><![endif]-->
-    <!--[if lte IE 6]><style>/*<![CDATA[*/@import url('../css/ie/6-/all.css');/*]]>*/</style><![endif]-->
-    <!--[if gte IE 7]><style>/*<![CDATA[*/@import url('../css/ie/7+/all.css');/*]]>*/</style><![endif]-->
-    {% comment %} }}} {% endcomment %}
-
-    {% comment %} js {{{ {% endcomment %}
-    <script src='/static/js/jquery.js'></script>
-    <!-- by jove I love jQuery plugins ~ rkl -->
-    <script src='/static/js/jquery.query.js'></script>
-    <script src='/static/js/jquery.hotkey.js'></script>
-    {% comment %}
-    FIXME: If user has shortcuts off, don't load jquery.hotkey.js
-    {% endcomment %}
-    <script src='/static/js/jquery.scrollTo.js'></script>
-    <!--script src='/static/js/jquery.bgiFrame.js'></script>
-  <script src='/static/js/jquery.ajaxQueue.js'></script-->
-    <script src='/static/js/jquery.autocomplete.js'></script>
-    <script>
-      thisstart = {{ start }};
-      thisend = {{ end }};
-    </script>
-    <script src='/static/js/gewgaws.js'></script>
-    {% comment %} }}} {% comment %}
-
-  </head>{% comment %} }}} {% endcomment %}
-  <body>
-    <div id='wrapper-outer'>
-      <div id='wrapper-inner'>
-
-        {% comment %} Logo and explanation {{{ {% endcomment %}
-        <h2 id='banner'>
-          <img alt='OpenHatch' src='/static/images/openhatch2.png'/>
-        </h2>
-        <div id='explanation'>
-            <!--p style='text-align: center;'>
-                <h3 style=''>Dig in!</h3>
-            </p>
-          <p>Here you can <strong>find opportunities to volunteer in software engineering and design</strong>, and
-          <strong>meet other volunteers</strong>.</p-->
-
-          <p style='font-size: 21pt; text-align: center;'>Find: <a href='/search'>gigs</a>, <a href='/people'>people</a>.</p>
-
-          {% comment %}
-          <div class='explanation-heading'>
-            <h3 id=''>Questions we ask ourselves frequently</h3>
-          </div>
-
-          <p><strong>Q: Why are you doing this?</strong>
-          A: We support software freedom and want to give
-          software authors another excuse to work on free
-          and open source software &mdash; it'll help you
-          find a job.</p>
-
-          <p><strong>Q: How will you make money?</strong>
-          A: We will eventually charge fee for job postings.
-          Right now the service is free of cost for everybody.</p>
-
-          <p><strong>Q: Is this a fun website, or a serious
-            website?</strong> A: We hope we don't have to
-          choose. We apologize in advance if some relatively
-          serious matters, job hunting for instance, are
-          treated here with atypical whimsy.</p>
-          {% endcomment %}
-
-               {% comment %} Submit a FOSS username {{{ {% endcomment %}
-               <div class='box' style='float: left; width: 500px; text-align: center;'>
-                   <h2>Start your profile.</h2>
-                  <form id='enter-free-software-username' 
-                     name='enter_free_software_username'
-                     action='/people/' 
-                     method='GET' style='margin-bottom: 10px; float: left; width: 478px;'>
-                     <label for='get-data-username' style='margin-right: 10px; font-size: 12pt;'>
-                        Type a username</label>
-                     <input type='text' id='u' name='u' style='padding: 10px; border: 1px solid #eee;' />
-                     <input type='submit' value='go' style='padding: 7px; position: relative; top: 1px; font-size: 12pt; background-color: #eee; border: 1px solid #dde;' />
-                     <!--input type='image'
-                     src='/static/images/add.png' /-->
-                  </form>
-               </div>
-               {% comment %} }}} {% endcomment %}
-        </div>
+        {% comment %} prefatory remarks {{{ {% endcomment %}
+        <title>openhatch</title>
+        <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
+        <meta http-equiv='Content-Language' content='en-us' />
+        <meta http-equiv='Content-Script-Type' content='text/javascript' />
+        <meta http-equiv='Content-Style-Type' content='text/css' />
+        <meta name='Description' content=''>
         {% comment %} }}} {% endcomment %}
 
+        {% comment %} css {{{ {% endcomment %}
+        <style>/*<![CDATA[*/
+            @import url('/static/css/all.css') all;
+            @import url('/static/css/jquery.autocomplete.css') screen;
+            /*@import url('/static/css/gewgaws.css');*/
+            /*]]>*/</style>
+
+        <!--[if IE]><style>/*<![CDATA[*/@import url('../css/ie/all.css');/*]]>*/</style><![endif]-->
+        <!--[if lte IE 6]><style>/*<![CDATA[*/@import url('../css/ie/6-/all.css');/*]]>*/</style><![endif]-->
+        <!--[if gte IE 7]><style>/*<![CDATA[*/@import url('../css/ie/7+/all.css');/*]]>*/</style><![endif]-->
+        {% comment %} }}} {% endcomment %}
+
+        {% comment %} js {{{ {% endcomment %}
+        <script src='/static/js/jquery.js'></script>
+        <!-- by jove I love jQuery plugins ~ rkl -->
+        <script src='/static/js/jquery.query.js'></script>
+        <script src='/static/js/jquery.hotkey.js'></script>
+        {% comment %}
+        FIXME: If user has shortcuts off, don't load jquery.hotkey.js
+        {% endcomment %}
+        <script src='/static/js/jquery.scrollTo.js'></script>
+        <!--script src='/static/js/jquery.bgiFrame.js'></script>
+    <script src='/static/js/jquery.ajaxQueue.js'></script-->
+        <script src='/static/js/jquery.autocomplete.js'></script>
+        <script>
+            thisstart = {{ start }};
+            thisend = {{ end }};
+        </script>
+        <script src='/static/js/gewgaws.js'></script>
+        {% comment %} }}} {% comment %}
+
+    </head>{% comment %} }}} {% endcomment %}
+    <body>
+        <div id='wrapper-outer'>
+            <div id='wrapper-inner'>
+
+                {% comment %} Logo and explanation {{{ {% endcomment %}
+                <h2 id='banner'>
+                    <img alt='OpenHatch' src='/static/images/openhatch2.png'/>
+                </h2>
+                <div id='explanation'>
+                    <!--p style='text-align: center;'>
+                    <h3 style=''>Dig in!</h3>
+                    </p>
+                    <p>Here you can <strong>find opportunities to volunteer in software engineering and design</strong>, and
+                    <strong>meet other volunteers</strong>.</p-->
+
+                    <p style='font-size: 21pt; text-align: center;'>Find: <a href='/search'>gigs</a>, <a href='/people'>people</a>.</p>
+
+                    {% comment %}
+                    <div class='explanation-heading'>
+                        <h3 id=''>Questions we ask ourselves frequently</h3>
+                    </div>
+
+                    <p><strong>Q: Why are you doing this?</strong>
+                    A: We support software freedom and want to give
+                    software authors another excuse to work on free
+                    and open source software &mdash; it'll help you
+                    find a job.</p>
+
+                    <p><strong>Q: How will you make money?</strong>
+                    A: We will eventually charge fee for job postings.
+                    Right now the service is free of cost for everybody.</p>
+
+                    <p><strong>Q: Is this a fun website, or a serious
+                        website?</strong> A: We hope we don't have to
+                    choose. We apologize in advance if some relatively
+                    serious matters, job hunting for instance, are
+                    treated here with atypical whimsy.</p>
+                    {% endcomment %}
+
+                    {% comment %} }}} {% endcomment %}
+                    {% comment %} Submit a FOSS username {{{ {% endcomment %}
+                    <div class='box' style='float: left; width: 500px; text-align: center;'>
+                        <h2>Start your profile.</h2>
+                        <form id='enter-free-software-username' 
+                            name='enter_free_software_username'
+                            action='/people/' 
+                            method='GET' style='margin-bottom: 10px; float: left; width: 478px;'>
+                            <label for='get-data-username' style='margin-right: 10px; font-size: 12pt;'>
+                                Type a username</label>
+                            <input type='text' id='u' name='u' style='padding: 10px; border: 1px solid #eee;' />
+                            <input type='submit' value='go' style='padding: 7px; position: relative; top: 1px; font-size: 12pt; background-color: #eee; border: 1px solid #dde;' />
+                            <!--input type='image'
+                            src='/static/images/add.png' /-->
+                        </form>
+                    </div>
+                    {% comment %} }}} {% endcomment %}
+                    {% comment %} See who else is on OpenHatch {{{ {% endcomment %}
+                    <div class='box' style='float: left; width: 500px; text-align: center;'>
+                        <a href='/people/'>See who else is on OpenHatch</a>
+                    </div>
+                    {% comment %} }}} {% endcomment %}
+                </div>

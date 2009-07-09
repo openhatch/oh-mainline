@@ -6,6 +6,7 @@
 from search.models import Project
 from profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag
 import profile.views
+import profile.controllers
 
 import re
 import twill
@@ -761,3 +762,36 @@ class CeleryTests(django.test.TestCase):
 
 # FIXME: One day, stub out the background jobs with mocks
 # that ensure we actually call them!
+
+class UserListTests(django.test.TestCase):
+    fixtures = ['user-paulproteus', 'user-steve']
+
+    def setUp(self):
+        twill_setup()
+
+    def tearDown(self):
+        twill_teardown()
+    
+    def test_display_list_of_users(self):
+        people = [(p.username, p.name)
+                for p in profile.controllers.queryset_of_people()]
+        self.assertEqual(people, [
+            ('paulproteus', 'Asheesh Laroia'),
+            ('steve', 'Steve Stevey')])
+
+    def test_display_list_of_users_web(self):
+        url = 'http://openhatch.org/people/'
+        url = make_twill_url(url)
+        tc.go(url)
+        tc.find(r'Asheesh Laroia \(paulproteus\)')
+        tc.find(r'Steve Stevey \(steve\)')
+
+        tc.follow('Asheesh Laroia')
+        tc.url('people/paulproteus') 
+        tc.find('paulproteus')
+
+    def test_front_page_link_to_list_of_users(self):
+        url = 'http://openhatch.org/'
+        url = make_twill_url(url)
+        tc.go(url)
+        tc.follow('See who else is on OpenHatch')
