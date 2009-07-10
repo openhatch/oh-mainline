@@ -86,7 +86,14 @@ def bugs_to_json_response(bunch_of_bugs, callback_function_name=''):
     return HttpResponse( callback_function_name + '(' + jsonned + ')' )
 
 def index(request):
-    return render_to_response('search/index.html')
+    notification = notification_id = None
+    if request.GET.get('msg', None) == 'ciao':
+        notification = "You've been logged out. Thanks for dropping in!"
+        notification_id = 'ciao'
+    return render_to_response('search/index.html', {
+        'notification_id': notification_id,
+        'notification': notification 
+        })
 
 def request_jquery_autocompletion_suggestions(request):
     """
@@ -200,9 +207,6 @@ def get_autocompletion_suggestions(input):
                     for lang in langs]
 
     return suggestions
-
-def index(request):
-    return render_to_response('search/index.html')
 
 """
 Ways we could do autocompletion:

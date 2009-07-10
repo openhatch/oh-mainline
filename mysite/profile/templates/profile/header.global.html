@@ -59,3 +59,12 @@
                     </ul>
                 </div>
                 <div id='content'>
+
+                    <div class='notification'>
+                    {% if notification %}
+                    {% if notification_id %}
+                    <!-- notification_id: {{ notification_id }} -->
+                    {% endif %}
+                    {{ notification }}
+                    {% endif %}
+                    </div>

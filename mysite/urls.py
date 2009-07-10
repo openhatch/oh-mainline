@@ -12,6 +12,12 @@ urlpatterns = patterns('',
         (r'^static/(?P<path>.*)$', 'django.views.static.serve',
             {'document_root': settings.STATIC_DOC_ROOT}),
         (r'^people/$', 'mysite.profile.views.display_list_of_people'),
+
+        (r'^people/login/$', 'mysite.profile.views.login'),
+        (r'^people/login/do$', 'mysite.profile.views.login_do'),
+        (r'^people/logout/$', 'mysite.profile.views.logout'),
+
+        # FIXME: Add trailing slashes, as this is more permissive.
         (r'^people/get_data_for_email$', 'mysite.profile.views.get_data_for_email'),
         (r'^people/change_what_like_working_on$',
             'mysite.profile.views.change_what_like_working_on_web'),

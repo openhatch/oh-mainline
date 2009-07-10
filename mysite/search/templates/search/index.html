@@ -47,6 +47,15 @@
         <div id='wrapper-outer'>
             <div id='wrapper-inner'>
 
+                    {% if notification %}
+                    <div class='notification' style='background-color: #ffc; border: 1px solid #ff9; text-align: center; padding: 10px;'>
+                    {{ notification }}
+                    </div>
+                    {% endif %}
+                    {% if notification_id %}
+                    <!-- notification_id: {{ notification_id }} -->
+                    {% endif %}
+
                 {% comment %} Logo and explanation {{{ {% endcomment %}
                 <h2 id='banner'>
                     <img alt='OpenHatch' src='/static/images/openhatch2.png'/>
@@ -86,17 +95,6 @@
                     {% comment %} Submit a FOSS username {{{ {% endcomment %}
                     <div class='box' style='float: left; width: 500px; text-align: center;'>
                         <h2>Start your profile.</h2>
-                        <form id='enter-free-software-username' 
-                            name='enter_free_software_username'
-                            action='/people/' 
-                            method='GET' style='margin-bottom: 10px; float: left; width: 478px;'>
-                            <label for='get-data-username' style='margin-right: 10px; font-size: 12pt;'>
-                                Type a username</label>
-                            <input type='text' id='u' name='u' style='padding: 10px; border: 1px solid #eee;' />
-                            <input type='submit' value='go' style='padding: 7px; position: relative; top: 1px; font-size: 12pt; background-color: #eee; border: 1px solid #dde;' />
-                            <!--input type='image'
-                            src='/static/images/add.png' /-->
-                        </form>
                     </div>
                     {% comment %} }}} {% endcomment %}
                     {% comment %} See who else is on OpenHatch {{{ {% endcomment %}
@@ -104,4 +102,75 @@
                         <a href='/people/'>See who else is on OpenHatch</a>
                     </div>
                     {% comment %} }}} {% endcomment %}
+
+                    Do you contribute to open source software?
+
+                    Yep &rarr;
+                    <ul>
+                        <li>
+                        <a href='#'>Create a profile</a> 
+                        <form id='enter-free-software-username' 
+                            name='enter_free_software_username'
+                            action='/people/' 
+                            method='GET' style=''>
+                            <div class='form-row'>
+                                <label for='get-data-username'>Type a username</label>
+                                <input type='text' id='get-data-username' name='u' />
+                            </div>
+                            <div class='form-row'>
+                                <input type='submit' value='go' />
+                            </div>
+                        </form>
+                        </li>
+                        <li>
+                        <a href='#'>Already on OpenHatch? Log in!</a>
+                        <form id='login' name='login'
+                            action='/people/login/do' method='POST'>
+                            <div class='form-row'>
+                                <label for='login-username'>Username</label>
+                                <input type='text' id='login-username' name='login-username' />
+                            </div>
+                            <div class='form-row'>
+                                <label for='login-password'>Password</label>
+                                <input type='password' id='login-password' name='login-password' />
+                            </div>
+                            <div class='form-row'>
+                                <input type='submit' value='go' style='' />
+                            </div>
+                            <style>
+                                form {
+                                    margin-bottom: 10px;
+                                    float: left;
+                                    width: 478px;
+                                }
+                                .form-row {
+                                    float: left;
+                                    width: 400px;
+                                }
+                                label {
+                                    float: left;
+                                    width: 130px;
+                                    padding: 12px;
+                                    margin-right: 10px;
+                                    font-size: 12pt;
+                                }
+                                input[type='text'], input[type='password'] {
+                                    padding: 10px;
+                                    border: 1px solid #eee;
+                                    float: left;
+                                    width: 214px;
+                                }
+                                input[type='submit'] {
+                                    padding: 7px;
+                                    position: relative;
+                                    top: 1px;
+                                    font-size: 12pt;
+                                    background-color: #eee;
+                                    border: 1px solid #dde;
+                                    float: right;
+                                }
+                            </style>
+                        </form>
+                        </li>
+                    </ul>
                 </div>

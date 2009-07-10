@@ -17,6 +17,7 @@ import difflib
 import os
 import tempfile
 import random
+import django.contrib.auth 
 # }}}
 
 # Add a contribution {{{
@@ -580,3 +581,27 @@ def display_list_of_people(request):
         'people': profile.controllers.queryset_of_people()
         })
     # }}}
+
+def login_do(request):
+    username = request.POST['login-username']
+    password = request.POST['login-password']
+    user = django.contrib.auth.authenticate(username=username, password=password)
+    if user is not None:
+        django.contrib.auth.login(request, user)
+        return HttpResponse('logged in')
+    else:
+        return HttpResponseRedirect('/people/login/?msg=oops')
+
+def login(request):
+    if request.GET['msg'] == 'oops':
+        notification_id = "oops"
+        notification = "Couldn't find that pair of username and password. "
+        notification += "Did you type your password correctly?"
+    return render_to_response('profile/login.html', {
+        'notification_id': notification_id,
+        'notification': notification,
+        } )
+
+def logout(request):
+    django.contrib.auth.logout(request)
+    return HttpResponseRedirect("/?msg=ciao")

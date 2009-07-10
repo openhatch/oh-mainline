@@ -22,6 +22,7 @@ import simplejson
 
 from django.test.client import Client
 from tasks import FetchPersonDataFromOhloh
+from django.contrib.auth import authenticate
 # }}}
 
 # FIXME: Later look into http://stackoverflow.com/questions/343622/how-do-i-submit-a-form-given-only-the-html-source
@@ -703,3 +704,42 @@ class UserListTests(django.test.TestCase):
         url = make_twill_url(url)
         tc.go(url)
         tc.follow('See who else is on OpenHatch')
+
+class AuthTests(django.test.TestCase):
+    fixtures = ['user-paulproteus']
+
+    def setUp(self):
+        twill_setup()
+
+    def tearDown(self):
+        twill_teardown()
+    
+    def test_login(self):
+        user = authenticate(username='paulproteus', password="paulproteus's unbreakable password")
+        self.assert_(user and user.is_active)
+
+    def test_login_web(self):
+        url = 'http://openhatch.org/'
+        url = make_twill_url(url)
+        tc.go(url)
+        tc.fv('login','login-username',"paulproteus")
+        tc.fv('login','login-password',"paulproteus's unbreakable password")
+        tc.submit()
+        tc.find('logged in')
+
+    def test_logout_web(self):
+        self.test_login_web()
+        url = 'http://openhatch.org/search/'
+        url = make_twill_url(url)
+        tc.go(url)
+        tc.follow('Log out')
+        tc.find('ciao')
+
+    def test_login_bad_password_web(self):
+        url = 'http://openhatch.org/'
+        url = make_twill_url(url)
+        tc.go(url)
+        tc.fv('login','login-username',"paulproteus")
+        tc.fv('login','login-password',"not actually paulproteus's unbreakable password")
+        tc.submit()
+        tc.find("oops")
