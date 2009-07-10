@@ -1,0 +1,1 @@
+[{"pk": 1, "model": "auth.user", "fields": {"username": "paulproteus", "first_name": "", "last_name": "", "is_active": 1, "is_superuser": 1, "is_staff": 1, "last_login": "2009-06-05 11:39:46", "groups": [], "user_permissions": [], "password": "sha1$4367c$4e1e9ee4948a10a370993b67258e6408d5cb3a13", "email": "asheesh@openhatch.org", "date_joined": "2009-06-04 23:29:59"}}]

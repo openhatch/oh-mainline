@@ -706,7 +706,7 @@ class UserListTests(django.test.TestCase):
         tc.follow('See who else is on OpenHatch')
 
 class AuthTests(django.test.TestCase):
-    fixtures = ['user-paulproteus']
+    fixtures = ['user-paulproteus', 'auth-user-paulproteus']
 
     def setUp(self):
         twill_setup()
