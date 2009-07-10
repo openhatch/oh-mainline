@@ -1,6 +1,7 @@
 # vim: ai ts=4 sts=4 et sw=4
 
 # Imports {{{
+import settings
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
 from django.shortcuts import render_to_response, get_object_or_404
 from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag, Link_Project_Tag, Link_SF_Proj_Dude_FM, Link_Person_Tag
@@ -79,12 +80,7 @@ def display_test_page_for_commit_importer(request, input_username):
 # FIXME: Change name to gimme_json_that_says_that_commit_importer_is_done
 def get_commit_importer_json(request, input_username):
     # {{{
-    exp_scraper_display_for_person_web(request, input_username)
-    person = get_object_or_404(Person, username=input_username)
-    success = person.ohloh_grab_completed
-    list_of_dictionaries = [{'success': success}]
-    json = simplejson.dumps(list_of_dictionaries)
-    return HttpResponse(json)
+    return import_do(request, input_username, format='json')
     # }}}
 # }}}
 
@@ -482,9 +478,21 @@ def project_icon_web(request, project_name):
     return HttpResponseRedirect(url)
     # }}}
 
-def exp_scraper_display_for_person_web(request, username):
+def import_commits_by_commit_username(request, username):
     # {{{
     nobgtask_s = request.GET.get('nobgtask', False)
+
+    cooked_data = None
+    cooked_data_password = request.POST.get('cooked_data_password', None)
+    cooked_data_string = request.POST.get('cooked_data', None)
+    if cooked_data_string:
+        if cooked_data_password == settings.cooked_data_password:
+            cooked_data = simplejson.loads(cooked_data_string)
+        else:
+            note = """Oops, that cooked data password didn't match.
+            If you weren't expecting this error, please file a bug at 
+            <a href='http://openhatch.org/bugs'>http://openhatch.org/bugs</a>."""
+            raise ValueError(note)
 
     involved_projects = []
     
@@ -523,12 +531,17 @@ def exp_scraper_display_for_person_web(request, username):
         do_it = False
     
     if do_it:
-        from tasks import FetchPersonDataFromOhloh
+        import tasks 
         # say we're trying
         person.poll_on_next_web_view = False
         person.last_polled = datetime.datetime.now()
         person.save()
-        result = FetchPersonDataFromOhloh.delay(username=username)
+        if cooked_data is None:
+            result = tasks.FetchPersonDataFromOhloh.delay(
+                    username=username)
+        else:
+            task = tasks.FetchPersonDataFromOhloh()
+            task.run(username, cooked_data)
     # }}}
 
 def ohloh_grab_done_web(request, username):
@@ -615,9 +628,24 @@ def signup_do(request):
     if username and password_raw:
         user = django.contrib.auth.models.User.objects.create_user(
             username=username, email="", password=password_raw)
-        user = django.contrib.auth.authenticate(username=username, password=password_raw)
+        user = django.contrib.auth.authenticate(
+                username=username, password=password_raw)
         #FIXME: Catch username collisions, bad (e.g., blank) passwords.
         django.contrib.auth.login(request, user)
     else:
         fail
     return HttpResponseRedirect("/people/%s" % urllib.quote(username))
+
+def import_do(request, input_username, format='html'):
+    # {{{
+    import_commits_by_commit_username(request, input_username)
+
+    if format=='json':
+        person = get_object_or_404(Person, username=input_username)
+        success = person.ohloh_grab_completed
+        list_of_dictionaries = [{'success': success}]
+        json = simplejson.dumps(list_of_dictionaries)
+        return HttpResponse(json)
+    else:
+        return HttpResponseRedirect('/people/%s' % urllib.quote(input_username))
+    # }}}

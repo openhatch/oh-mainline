@@ -3,7 +3,7 @@ from .profile import ohloh
 from .profile.views import exp_scraper_handle_ohloh_results
 from .profile.models import Person
 from celery.task import Task
-from celery.registry import tasks
+import celery.registry
 
 class FetchPersonDataFromOhloh(Task):
     name = "profile.FetchPersonDataFromOhloh"
@@ -30,4 +30,7 @@ class FetchPersonDataFromOhloh(Task):
             person_obj.save() # race condition?
             raise
 
-tasks.register(FetchPersonDataFromOhloh)
+try:
+    celery.registry.tasks.register(FetchPersonDataFromOhloh)
+except celery.registry.AlreadyRegistered:
+    pass

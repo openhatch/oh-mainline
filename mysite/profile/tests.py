@@ -7,6 +7,7 @@ from search.models import Project
 from profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag
 import profile.views
 import profile.controllers
+import settings
 
 import re
 import twill
@@ -21,7 +22,7 @@ import urllib
 import simplejson
 
 from django.test.client import Client
-from tasks import FetchPersonDataFromOhloh
+import tasks 
 from django.contrib.auth import authenticate
 # }}}
 
@@ -623,7 +624,7 @@ class CeleryTests(django.test.TestCase):
             cooked_data=None
 
         # Instantiate the task
-        task = FetchPersonDataFromOhloh()
+        task = tasks.FetchPersonDataFromOhloh()
         task.run(username, cooked_data=cooked_data)
         # NB: The task knows not to call Ohloh when we give it cooked data.
 
@@ -765,3 +766,38 @@ class SetAPasswordTests(django.test.TestCase):
         tc.fv('signup', 'login-password', "paulproteus's unbreakable password")
         tc.submit()
         tc.find("Log out")
+
+class ImportCommitsViaCommitUsernameViaOhloh(django.test.TestCase):
+    fixtures = ['user-paulproteus']
+
+    def setUp(self):
+        twill_setup()
+
+    def tearDown(self):
+        twill_teardown()
+
+    def submit_commit_name(self, cooked_data_password):
+        tc.go(make_twill_url('http://openhatch.org/people/paulproteus'))
+        tc.fv('enter_free_software_username', 'u', 'paulproteus')
+
+        # Since we don't actually want to call Ohloh,
+        # we thought to create a mock object, but ran into difficulties.
+        # So we're fudging by using pre-cooked data.
+        cooked_data = [{'man_months': 1, 'project': u'ccHost',
+            'project_homepage_url': u'http://wiki.creativecommons.org/CcHost',
+            'primary_language': u'shell script'}]
+        # FIXME: Secure this better.
+        cooked_data_string = simplejson.dumps(cooked_data)
+        tc.config('readonly_controls_writeable', True)
+        tc.fv('enter_free_software_username', 'cooked_data', cooked_data_string)
+        tc.fv('enter_free_software_username', 
+                'cooked_data_password', cooked_data_password)
+        tc.submit()
+        tc.find('ccHost')
+
+    def test_commit_name_submission_triggers_ohloh_import_via_commit_username(self):
+        self.submit_commit_name(settings.cooked_data_password)
+
+    def test_cooked_data_fails_on_bad_password(self):
+        self.assertRaises(ValueError, self.submit_commit_name,
+                settings.cooked_data_password + '...NOT')

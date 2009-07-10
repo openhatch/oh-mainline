@@ -72,8 +72,6 @@ urlpatterns = patterns('',
             'mysite.profile.views.xp_slurper_display_input_form'),
         (r'^people/xp_slurp_do$',
             'mysite.profile.views.exp_scraper_scrape_web'),
-        (r'^people/(?P<username>\w+)/show_all_data$',
-            'mysite.profile.views.exp_scraper_display_for_person_web'),
 
         (r'^people/(?P<input_username>[^/]+)/import_contributions_image$',
             'mysite.profile.views.import_contributions_image'),
@@ -87,6 +85,9 @@ urlpatterns = patterns('',
 
         (r'^people/(?P<input_username>[^/]+)/test_commit_importer_json$',
             'mysite.profile.views.get_commit_importer_json'),
+
+        (r'^people/(?P<input_username>[^/]+)/import/do$',
+            'mysite.profile.views.import_do'),
 
         # Tabs
         (r'^people/(?P<input_username>[^/]+)/tabs?/(?P<tab>[a-z]+)[/?]$',

@@ -4,7 +4,7 @@
 <div id='widgets'>
 
 
-    <div id='right'>
+    <div id='left'>
         <!-- {{{ -->
 
         <div id='avatar' style='float: left; width: 150px;'>
@@ -65,8 +65,24 @@
         <!-- }}} -->
     </div>
 
-    <div id='left'>
+    <div id='right'>
         <!-- {{{ -->
+        <div id='importer' class='widget'>
+            Enter one of your FOSS usernames. (You'll soon be able to enter multiple usernames.)
+            <form id='enter-free-software-username' 
+                name='enter_free_software_username'
+                action='/people/{{ person.username }}/import/do' method='POST'>
+                <div class='form-row'>
+                    <label for='get-data-username'>Type a username</label>
+                    <input type='text' id='get-data-username' name='u' />
+                    <input type='hidden' name='cooked_data' />
+                    <input type='hidden' name='cooked_data_password' />
+                </div>
+                <div class='form-row'>
+                    <input type='submit' value='go' />
+                </div>
+            </form>
+        </div>
         <div id='portfolio' class='widget'>
             <!-- {{{ -->
             <h3>
