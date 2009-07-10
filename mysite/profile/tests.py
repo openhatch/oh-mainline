@@ -743,3 +743,25 @@ class AuthTests(django.test.TestCase):
         tc.fv('login','login-password',"not actually paulproteus's unbreakable password")
         tc.submit()
         tc.find("oops")
+
+class SetAPasswordTests(django.test.TestCase):
+    # FIXME: I suppose the fixture should be called person-paulproteus
+    fixtures = ['user-paulproteus', 'cchost-data-imported-from-ohloh']
+
+    def setUp(self):
+        twill_setup()
+
+    def tearDown(self):
+        twill_teardown()
+
+    def test_profile_links_to_signup(self):
+        tc.go(make_twill_url('http://openhatch.org/people/paulproteus'))
+        tc.follow("Sign up to save your work")
+        tc.find("Password: ")
+
+    def test_signup_submission_creates_user(self):
+        tc.go(make_twill_url('http://openhatch.org/people/signup'))
+        tc.fv('signup', 'login-username', 'paulproteus')
+        tc.fv('signup', 'login-password', "paulproteus's unbreakable password")
+        tc.submit()
+        tc.find("Log out")

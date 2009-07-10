@@ -57,6 +57,14 @@
                         <li><a href=''>find people</a></li>
                         <li><a href=''>find volunteer opportunities</a></li>
                     </ul>
+                    {% if the_user.is_authenticated %}
+                    <!-- user.is_authenticated indeed -->
+                    <ul>
+                        <li>
+                            <a href='/people/logout/'>Log out</a>
+                        </li>
+                    </ul>
+                    {% endif %}
                 </div>
                 <div id='content'>
 

@@ -16,6 +16,8 @@ urlpatterns = patterns('',
         (r'^people/login/$', 'mysite.profile.views.login'),
         (r'^people/login/do$', 'mysite.profile.views.login_do'),
         (r'^people/logout/$', 'mysite.profile.views.logout'),
+        (r'^people/signup$', 'mysite.profile.views.signup'),
+        (r'^people/signup/do$', 'mysite.profile.views.signup_do'),
 
         # FIXME: Add trailing slashes, as this is more permissive.
         (r'^people/get_data_for_email$', 'mysite.profile.views.get_data_for_email'),

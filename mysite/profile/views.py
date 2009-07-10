@@ -191,7 +191,7 @@ def data_for_person_display_without_ohloh(person):
             'person': person,
             'photo_url': photo_url,
             'interested_in_working_on_list': interested_in_working_on_list, 
-            'projects': projects_extended
+            'projects': projects_extended,
             } 
     # }}}
 
@@ -206,20 +206,20 @@ def display_person_web(request, input_username=None, tab=None, edit=None):
         if request.GET.get('edit', 0) == '1':
             edit = True
 
-
     if tab is None:
         tab = request.GET.get('tab', None)
 
     person, _ = Person.objects.get_or_create(username=input_username)
 
-    return display_person(person, tab, edit)
+    return display_person(person, request.user, tab, edit)
 
-def display_person(person, tab, edit):
+def display_person(person, user, tab, edit):
     # {{{
 
     data_dict = data_for_person_display_without_ohloh(person)
 
     data_dict['edit'] = edit
+    data_dict['the_user'] = user
 
     title = 'openhatch / %s' % person.username
     title += ' / %s'
@@ -605,3 +605,19 @@ def login(request):
 def logout(request):
     django.contrib.auth.logout(request)
     return HttpResponseRedirect("/?msg=ciao")
+
+def signup(request):
+    return render_to_response("profile/signup.html")
+
+def signup_do(request):
+    username = request.POST.get('login-username', None)
+    password_raw = request.POST.get('login-password', None)
+    if username and password_raw:
+        user = django.contrib.auth.models.User.objects.create_user(
+            username=username, email="", password=password_raw)
+        user = django.contrib.auth.authenticate(username=username, password=password_raw)
+        #FIXME: Catch username collisions, bad (e.g., blank) passwords.
+        django.contrib.auth.login(request, user)
+    else:
+        fail
+    return HttpResponseRedirect("/people/%s" % urllib.quote(username))
