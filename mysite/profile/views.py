@@ -1,4 +1,4 @@
-# vim: ai ts=4 sts=4 et sw=4
+# vim: ai ts=3 sts=4 et sw=4 nu
 
 # Imports {{{
 import settings
@@ -19,6 +19,8 @@ import os
 import tempfile
 import random
 import django.contrib.auth 
+from django.contrib.auth.models import User
+from customs import ohloh
 # }}}
 
 # Add a contribution {{{
@@ -31,7 +33,7 @@ def person_involvement_add_input(request, username):
     alteration_type = request.GET.get('alteration_type', 'add')
 
     return render_to_response('profile/involvement/add.html', {
-        'person': Person.objects.get(username=username),
+        'person': Person.objects.get(user__username=username),
         'project_name': project_name,
         'description': description,
         'url': url,
@@ -42,7 +44,7 @@ def person_involvement_add_input(request, username):
 
 def person_involvement_add(request):
     # {{{
-    username = request.POST.get('u', '')
+    username = request.POST['u']
     project_name = request.POST.get('project_name', '')
     description = request.POST.get('description', '')
     url = request.POST.get('url', '')
@@ -77,18 +79,13 @@ def display_test_page_for_commit_importer(request, input_username):
         'username': input_username})
     # }}}
 
-# FIXME: Change name to gimme_json_that_says_that_commit_importer_is_done
-def get_commit_importer_json(request, input_username):
-    # {{{
-    return import_do(request, input_username, format='json')
-    # }}}
 # }}}
 
 # Display profile {{{
 def profile_data_from_username(username, fetch_ohloh_data = False):
     # {{{
-    person, person_created = Person.objects.get_or_create(
-            username=username)
+    person = Person.objects.get(
+            user__username=username)
 
     project_exps = ProjectExp.objects.filter(
             person=person)
@@ -192,6 +189,7 @@ def data_for_person_display_without_ohloh(person):
     # }}}
 
 def display_person_web(request, input_username=None, tab=None, edit=None):
+    # {{{
     if input_username is None:
         input_username = request.GET.get('u', None)
         if input_username is None:
@@ -205,19 +203,22 @@ def display_person_web(request, input_username=None, tab=None, edit=None):
     if tab is None:
         tab = request.GET.get('tab', None)
 
-    person, _ = Person.objects.get_or_create(username=input_username)
+    user = django.contrib.auth.models.User.objects.get(username=input_username)
 
-    return display_person(person, request.user, tab, edit)
+    return display_person(user, request.user, tab, edit)
+    # }}}
 
-def display_person(person, user, tab, edit):
+def display_person(user, logged_in_user, tab, edit):
     # {{{
+
+    person = user.get_profile()
 
     data_dict = data_for_person_display_without_ohloh(person)
 
     data_dict['edit'] = edit
     data_dict['the_user'] = user
 
-    title = 'openhatch / %s' % person.username
+    title = 'openhatch / %s' % user.username
     title += ' / %s'
     if tab == 'inv' or tab == 'involvement':
         data_dict['title'] = title % "community involvement"
@@ -281,7 +282,6 @@ def add_one_debtag_to_project(project_name, tag_text):
 
     new_link = Link_Project_Tag.objects.create(
             tag=tag, project=project,
-            time_record_was_created = datetime.datetime.now(),
             source='Debtags')
     new_link.save()
     return new_link
@@ -336,12 +336,11 @@ def get_data_for_email(request):
     email = request.POST.get('email', '')
     username=email
     if email:
-        import ohloh
         oh = ohloh.get_ohloh()
         from_ohloh = oh.get_contribution_info_by_email(email)
         for data in from_ohloh:
             person, created = Person.objects.get_or_create(
-                    username=username)
+                    user__username=username)
             # FIXME: Later we'll have to be
             # able to merge user objects
             pe = ProjectExp(person=person)
@@ -408,7 +407,6 @@ def project_icon_url(project_name, actually_fetch = True):
         # Then verify the image exists
         if not os.path.exists(project_icon_path):
             # See if Ohloh will give us an icon
-            import ohloh
             oh = ohloh.get_ohloh()
             try:
                 icon_data = oh.get_icon_for_project(project_name)
@@ -428,7 +426,7 @@ def project_icon_url(project_name, actually_fetch = True):
 
 def edit_person_tags(request, username):
     # {{{
-    person = Person.objects.get(username=username)
+    person = Person.objects.get(user__username=username)
 
     # We can map from some strings to some TagTypes
     for known_tag_type in ('understands', 'understands_not',
@@ -469,7 +467,7 @@ def edit_person_tags(request, username):
                                                                 person)
             
     return HttpResponseRedirect('/people/%s/tab/tags' %
-                                urllib.quote(person.username))
+                                urllib.quote(person.user.username))
     # }}}
 
 def project_icon_web(request, project_name):
@@ -478,8 +476,14 @@ def project_icon_web(request, project_name):
     return HttpResponseRedirect(url)
     # }}}
 
-def import_commits_by_commit_username(request, username):
+def import_commits_by_commit_username(request):
     # {{{
+
+    commit_username = request.POST.get('commit_username', None)
+
+    if not commit_username:
+        fail
+
     nobgtask_s = request.GET.get('nobgtask', False)
 
     cooked_data = None
@@ -501,11 +505,8 @@ def import_commits_by_commit_username(request, username):
     except ValueError:
         nobgtask = False
     
-    if username is None:
-        return HttpResponseServerError()
-
     # get the person
-    person = get_object_or_404(Person, username=username)
+    person = request.user.get_profile()
 
     # Find the existing ProjectExps
     project_exps = ProjectExp.objects.filter(person=person)
@@ -531,6 +532,7 @@ def import_commits_by_commit_username(request, username):
         do_it = False
     
     if do_it:
+        username= request.user.username
         import tasks 
         # say we're trying
         person.poll_on_next_web_view = False
@@ -538,16 +540,19 @@ def import_commits_by_commit_username(request, username):
         person.save()
         if cooked_data is None:
             result = tasks.FetchPersonDataFromOhloh.delay(
-                    username=username)
+                    username=username, 
+                    commit_username=commit_username)
         else:
             task = tasks.FetchPersonDataFromOhloh()
-            task.run(username, cooked_data)
+            task.run(username=username,
+                    commit_username=commit_username,
+                    cooked_data=cooked_data)
     # }}}
 
 def ohloh_grab_done_web(request, username):
 # {{{
     # get the person
-    person = get_object_or_404(Person, username=username)
+    person = get_object_or_404(Person, user__username=username)
 
     return HttpResponse(bool(person.ohloh_grab_completed))
 # }}}
@@ -557,7 +562,7 @@ def exp_scraper_handle_ohloh_results(username, ohloh_results):
     '''Input: A sequence of Ohloh ContributorInfo dicts.
     Side-effect: Create matching structures in the DB
     and mark our success in the database.'''
-    person = Person.objects.get(username=username)
+    person = Person.objects.get(user__username=username)
     for c_i in ohloh_results:
         for ohloh_contrib_info in ohloh_results:
             exp = ProjectExp()
@@ -596,17 +601,22 @@ def display_list_of_people(request):
     # }}}
 
 def login_do(request):
-    username = request.POST['login-username']
-    password = request.POST['login-password']
-    user = django.contrib.auth.authenticate(username=username, password=password)
+    try:
+        username = request.POST['login_username']
+        password = request.POST['login_password']
+    except KeyError:
+        return HttpResponseServerError("Missing username or password.")
+    user = django.contrib.auth.authenticate(
+            username=username, password=password)
     if user is not None:
         django.contrib.auth.login(request, user)
-        return HttpResponse('logged in')
+        return HttpResponseRedirect('/people/%s' % urllib.quote(username))
     else:
         return HttpResponseRedirect('/people/login/?msg=oops')
 
 def login(request):
-    if request.GET['msg'] == 'oops':
+    notification = notification_id = None
+    if request.GET.get('msg', None) == 'oops':
         notification_id = "oops"
         notification = "Couldn't find that pair of username and password. "
         notification += "Did you type your password correctly?"
@@ -620,32 +630,70 @@ def logout(request):
     return HttpResponseRedirect("/?msg=ciao")
 
 def signup(request):
-    return render_to_response("profile/signup.html")
+    return render_to_response("profile/signup.html", {'user': request.user} )
 
 def signup_do(request):
-    username = request.POST.get('login-username', None)
     password_raw = request.POST.get('login-password', None)
-    if username and password_raw:
-        user = django.contrib.auth.models.User.objects.create_user(
-            username=username, email="", password=password_raw)
-        user = django.contrib.auth.authenticate(
-                username=username, password=password_raw)
-        #FIXME: Catch username collisions, bad (e.g., blank) passwords.
-        django.contrib.auth.login(request, user)
+    if password_raw:
+        request.user.set_password(password_raw)
+        request.user.save()
+
+        # From <http://docs.djangoproject.com/en/1.0/topics/auth/#storing-additional-information-about-users>
+        # The method get_profile() does not create the profile, if it does not exist.
+        # You need to register a handler for the signal django.db.models.signals.post_save
+        # on the User model, and, in the handler, if created=True, create the associated user profile.
+
+        #FIXME: Catch bad (e.g., blank) passwords.
     else:
         fail
-    return HttpResponseRedirect("/people/%s" % urllib.quote(username))
+    return HttpResponseRedirect("/people/%s" % urllib.quote(request.user.username))
 
-def import_do(request, input_username, format='html'):
+def gimme_json_that_says_that_commit_importer_is_done(request):
+    ''' This web controller is called when you want JSON that tells you 
+    if the background job we started has finished. It has no side-effects.'''
+    person = request.user.get_profile()
+    success = person.ohloh_grab_completed
+    list_of_dictionaries = [{'success': success}]
+    return HttpResponse(simplejson.dumps(list_of_dictionaries))
+
+def import_do(request):
     # {{{
-    import_commits_by_commit_username(request, input_username)
+    # This is POSTed to when you want to start
+    # a background job that gets some data from Ohloh.
 
-    if format=='json':
-        person = get_object_or_404(Person, username=input_username)
-        success = person.ohloh_grab_completed
-        list_of_dictionaries = [{'success': success}]
-        json = simplejson.dumps(list_of_dictionaries)
-        return HttpResponse(json)
-    else:
-        return HttpResponseRedirect('/people/%s' % urllib.quote(input_username))
+    # So naturally we should create that job:
+    import_commits_by_commit_username(request)
+
+    # and then just redirect to the profile page
+    return HttpResponseRedirect('/people/%s' % urllib.quote(
+            request.user.username))
     # }}}
+
+def new_user_do(request):
+    username = request.POST.get('create_profile_username', None)
+    if username:
+        #FIXME: Catch username collisions
+
+        # create a user
+        user = django.contrib.auth.models.User.objects.create_user(
+                username=username, 
+                email='', password='qwertyuiop')
+
+        # create a linked person
+        person = Person(user=user)
+        person.save()
+
+        # authenticate and login
+        user = django.contrib.auth.authenticate(
+                username=username, password='qwertyuiop')
+        django.contrib.auth.login(request, user)
+
+        user.set_unusable_password()
+
+        user.save()
+
+        # redirect to profile
+        return HttpResponseRedirect('/people/%s/' % urllib.quote(username))
+    else:
+        pass
+        # FIXME: Validate, Catch no username

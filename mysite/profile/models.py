@@ -2,34 +2,19 @@
 
 from django.db import models
 from mysite.search.models import Project, Bug
+from django.contrib.auth.models import User
+import customs.ohloh as ohloh
 import datetime
-import ohloh
 
 class Person(models.Model):
     """ A human bean. """
     # {{{
-    name = models.CharField(max_length=200)
-    username = models.CharField(max_length=200)
-    password_hash_md5 = models.CharField(
-            max_length=200)
-    #FIXME: Get specific length of hash
-    time_record_was_created = models.DateTimeField(
-            default=datetime.datetime.now())
-    last_polled = models.DateTimeField(
-            blank=True, null=True)
-    last_touched = models.DateTimeField(null=True)
-    poll_on_next_web_view = models.BooleanField(
-            default=True)
-    ohloh_grab_completed = models.BooleanField(
-        default=False)
-    interested_in_working_on = models.CharField(max_length=1024, default='')
+    user = models.ForeignKey(User, unique=True)
+    poll_on_next_web_view = models.BooleanField(default=True)
+    ohloh_grab_completed = models.BooleanField(default=False)
     gotten_name_from_ohloh = models.BooleanField(default=False)
-
-    def save(self, *args, **kwargs):
-        if self.time_record_was_created is None:
-            self.time_record_was_created = datetime.datetime.now()
-        self.last_touched = datetime.datetime.now()
-        super(Person, self).save(*args, **kwargs)
+    interested_in_working_on = models.CharField(max_length=1024, default='')
+    last_polled = models.DateTimeField(default=datetime.datetime(1970, 1, 1))
 
     def try_to_get_name_from_ohloh(self):
         if self.gotten_name_from_ohloh:
@@ -38,7 +23,7 @@ class Person(models.Model):
         oh = ohloh.get_ohloh()
         # Preferably get the human name...
         try:
-            self.name = oh.get_name_by_username(self.username)
+            self.name = oh.get_name_by_username(self.user.username)
         except ValueError:
             pass
         # say we did it, and save
@@ -48,23 +33,20 @@ class Person(models.Model):
     def fetch_contrib_data_from_ohloh(self):
         # self has to be saved, otherwise person_id becomes null
         self.save()
-        import ohloh
         oh = ohloh.get_ohloh()
 
         ohloh_contrib_info_list = oh.get_contribution_info_by_username(
-                self.username)
+                self.user.username)
         for ohloh_contrib_info in ohloh_contrib_info_list:
             exp = ProjectExp()
             exp.person = self
             exp = exp.from_ohloh_contrib_info(ohloh_contrib_info)
-            exp.last_polled = datetime.datetime.now()
-            exp.last_touched = datetime.datetime.now()
             exp.save()
-        self.last_polled = datetime.datetime.now()
         self.save()
         
     def __unicode__(self):
-        return "username: %s, name: %s" % (self.username, self.name)
+        return "username: %s, name: %s %s" % (self.user.username,
+                self.user.first_name, self.user.last_name)
     # }}}
 
 class ProjectExp(models.Model):
@@ -73,20 +55,12 @@ class ProjectExp(models.Model):
     person = models.ForeignKey(Person)
     project = models.ForeignKey(Project)
     person_role = models.CharField(max_length=200)
-    time_record_was_created = models.DateTimeField(null=True)
-    last_touched = models.DateTimeField(null=True)
     description = models.TextField()
     url = models.URLField(max_length=200, null=True)
-    #time_start = models.DateTimeField(null=True)
-    #time_finish = models.DateTimeField(null=True)
     man_months = models.PositiveIntegerField(null=True)
     favorite = models.BooleanField(default=0)
     primary_language = models.CharField(max_length=200, null=True)
     source = models.CharField(max_length=100, null=True)
-
-    def save(self, *args, **kwargs):
-        self.last_touched = datetime.datetime.now()
-        super(ProjectExp, self).save(*args, **kwargs)
 
     # FIXME: Make this a static method or something
     def from_ohloh_contrib_info(self, ohloh_contrib_info):
@@ -114,7 +88,7 @@ class ProjectExp(models.Model):
             primary_language=''
             ):
 
-        person = Person.objects.get(username=username)
+        person = Person.objects.get(user__username=username)
         project, created = Project.objects.get_or_create(name=project_name)
         if man_months is not None:
             man_months = int(man_months)
@@ -133,15 +107,10 @@ class ProjectExp(models.Model):
     @staticmethod
     def get_from_text(username, project_name):
         return ProjectExp.objects.get(
-                person=Person.objects.get(username=username),
+                person=Person.objects.get(user__username=username),
                 project=Project.objects.get(name=project_name),
                 )
     get_from_strings = get_from_text
-
-    def save(self, *args, **kwargs):
-        if self.time_record_was_created is None:
-            self.time_record_was_created = datetime.datetime.now()
-        super(ProjectExp, self).save(*args, **kwargs)
 
     # }}}
 
@@ -164,8 +133,6 @@ class Link_ProjectExp_Tag(models.Model):
     tag = models.ForeignKey(Tag)
     favorite = models.BooleanField(default=False)
     project_exp = models.ForeignKey(ProjectExp)
-    time_record_was_created = models.DateTimeField(
-            default=datetime.datetime.now())
     source = models.CharField(max_length=200)
 
     class Meta:
@@ -196,8 +163,6 @@ class Link_Project_Tag(models.Model):
     # {{{
     tag = models.ForeignKey(Tag)
     project = models.ForeignKey(Project)
-    time_record_was_created = models.DateTimeField(
-            default=datetime.datetime.now())
     source = models.CharField(max_length=200)
     # }}}
 
@@ -206,8 +171,6 @@ class Link_Person_Tag(models.Model):
     # {{{
     tag = models.ForeignKey(Tag)
     person = models.ForeignKey(Person)
-    time_record_was_created = models.DateTimeField(
-            default=datetime.datetime.now())
     source = models.CharField(max_length=200)
     # }}}
 
@@ -265,4 +228,3 @@ class Link_SF_Proj_Dude_FM(models.Model):
                                                    proj_unixname,
                                                    is_admin, position,
                                                    date_collected)
-            

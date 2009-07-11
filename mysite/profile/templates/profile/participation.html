@@ -12,12 +12,12 @@
                     letter-spacing: 0; margin-top: -3px; float: left;'
                     onmouseover="$(this).find('span').css('text-decoration','underline');"
                     onmouseout="$(this).find('span').css('text-decoration','none');"
-                    href='/people/{{person.username}}/involvement/add/input'>
+                    href='/people/{{person.user.username}}/involvement/add/input'>
                     <img src='/static/images/icons/Add.png' alt='+' /><span>Add</span>
                 </a>
             </h3>
             {% if person.poll_on_next_web_view %}
-            <img src='/people/{{person.username}}/import_contributions_image' alt='Importing your data from around the web...' />
+            <img src='/people/{{person.user.username}}/import_contributions_image' alt='Importing your data from around the web...' />
             {% endif %}
             {% if projects %}
             <ul>
@@ -45,7 +45,7 @@
                             method='POST'
                             action='/people/make_favorite_project_exp'>
                             <input type='hidden' name='username'
-                            value='{{ person.username }}'/>
+                            value='{{ person.user.username }}'/>
                             <input type='hidden' name='exp_id'
                             value='{{ exp.id }}'/>
                             <input type='image' src='/static/images/icons/star-off.png'/>
@@ -103,7 +103,7 @@
             No contributions listed.
             <form method='post' action='/people/xp_slurp_do'>
                 <input type='submit' value='Import code contributions automatically from around the Internet.' />
-                <input type='hidden' name='u' value='{{person.username}}' />
+                <input type='hidden' name='u' value='{{person.user.username}}' />
             </form>
             {% endif %}
         </ul>

@@ -9,7 +9,7 @@
         }
         else {
             $('#help-bubble-1 .help-bubble-close').click(function() {
-                /*url = '/people/{{person.username}}/' +
+                /*url = '/people/{{person.user.username}}/' +
                 'bubbles/add-contribution/close.json'*/
                 $.cookie('bubble-closed', true);
                 $('#help-bubble-1').fadeOut('slow');
@@ -24,7 +24,7 @@
         action='/people-actions/involvement/add'>
 
         <input type='hidden' name='u'
-        value='{{ person.username }}' />
+        value='{{ person.user.username }}' />
 
         <label for='add-contrib-project-name'>
             Type a project name:
@@ -47,7 +47,7 @@
         <div class='right'>
             <input id='contrib-url' type='text' name='url' />
             <div class='help-bubble' id='help-bubble-1'>
-                <a href='/people/{{person.username}}/bubbles/add-contribution/close'
+                <a href='/people/{{person.user.username}}/bubbles/add-contribution/close'
                     class='help-bubble-close'>x<!--img src='/static/images/icons/close.png' width='20' height='20' alt='close' /--></a>
                 <img src='/static/images/icons/info.png' />
                 <p>

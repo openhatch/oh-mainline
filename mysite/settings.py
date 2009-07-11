@@ -119,3 +119,4 @@ AMQP_PASSWORD = "johT4qui"
 AMQP_VHOST = "localhost"
 
 cooked_data_password = 'AXQaTjp3'
+AUTH_PROFILE_MODULE = "profile.Person"

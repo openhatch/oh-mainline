@@ -3,8 +3,9 @@
     action='/people/signup/do' method='POST'>
     <div class='form-row'>
         <label for='login-username'>Username: </label>
-        <input type='text' id='login-username'
-        name='login-username' value='{{ logged_in_user.username}}' />
+        <!--input type='text' id='login-username'
+        name='login-username' value='{{ logged_in_user.username}}' /-->
+        {{ user.username }}
     </div>
     <div class='form-row'>
         <label for='login-password'>Password: </label>

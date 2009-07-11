@@ -19,6 +19,8 @@ urlpatterns = patterns('',
         (r'^people/signup$', 'mysite.profile.views.signup'),
         (r'^people/signup/do$', 'mysite.profile.views.signup_do'),
 
+        (r'^people/new/do$', 'mysite.profile.views.new_user_do'),
+
         # FIXME: Add trailing slashes, as this is more permissive.
         (r'^people/get_data_for_email$', 'mysite.profile.views.get_data_for_email'),
         (r'^people/change_what_like_working_on$',
@@ -83,10 +85,10 @@ urlpatterns = patterns('',
         (r'^people/(?P<input_username>[^/]+)/test_commit_importer$',
             'mysite.profile.views.display_test_page_for_commit_importer'),
 
-        (r'^people/(?P<input_username>[^/]+)/test_commit_importer_json$',
-            'mysite.profile.views.get_commit_importer_json'),
+        (r'^people/[^/]+/test_commit_importer_json$',
+            'mysite.profile.views.gimme_json_that_says_that_commit_importer_is_done'),
 
-        (r'^people/(?P<input_username>[^/]+)/import/do$',
+        (r'^people/[^/]+/import/do$',
             'mysite.profile.views.import_do'),
 
         # Tabs

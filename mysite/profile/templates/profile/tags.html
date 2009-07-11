@@ -4,7 +4,7 @@
 {% if not edit %}
 <h3>
     <div style='float: left; margin-right: 20px; margin-top: 0;'>Tags</div>
-    <a href='/people/{{person.username}}/tags/edit' style=' font-size: 10pt;'>[Edit]</a>
+    <a href='/people/{{person.user.username}}/tags/edit' style=' font-size: 10pt;'>[Edit]</a>
 </h3>
 {% else %}
     <h3 style='float: left; margin-top: 20px; '>Edit tags</h3>
@@ -16,7 +16,7 @@
     <div id='taglines'>
         <!-- {{{ -->
         <form name='edit-tags'
-            action='/people/{{person.username}}/tags/edit/do'
+            action='/people/{{person.user.username}}/tags/edit/do'
 	        method='POST'>
             <div id='left'>
                 <div class='widget'>
@@ -50,7 +50,7 @@
             </div>
             <input type='submit' value='Save' />
             <div style='float: left; width: 600px; margin-top: 20px;'>
-                <a href="/people/{{person.username}}/tab/tags/"
+                <a href="/people/{{person.user.username}}/tab/tags/"
                     style='font-size: 10pt; border: solid #dde; border-width: 1px; background-color: #eee; d9eeff; b5deff; 7fc4ff; dde; padding: 1px 8px; color: #668; -moz-border-radius: 5px; -moz-border-radius: 5px; font-weight: bold;' >Cancel edit</a>
             </div>
         </form>
@@ -98,7 +98,7 @@
     action='/people/change_what_like_working_on'>
     <textarea name='like-working-on'
         >{{ person.interested_in_working_on }}</textarea>
-    <input type='hidden' name='username' value='{{ person.username }}' />
+    <input type='hidden' name='username' value='{{ person.user.username }}' />
     <input type='submit' value='save'/>
 </form>
 {% endcomment %}

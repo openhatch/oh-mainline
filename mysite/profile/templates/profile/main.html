@@ -71,10 +71,10 @@
             Enter one of your FOSS usernames. (You'll soon be able to enter multiple usernames.)
             <form id='enter-free-software-username' 
                 name='enter_free_software_username'
-                action='/people/{{ person.username }}/import/do' method='POST'>
+                action='/people/{{ person.user.username }}/import/do' method='POST'>
                 <div class='form-row'>
-                    <label for='get-data-username'>Type a username</label>
-                    <input type='text' id='get-data-username' name='u' />
+                    <label for='commit_username'>Type a username</label>
+                    <input type='text' id='commit_username' name='commit_username' />
                     <input type='hidden' name='cooked_data' />
                     <input type='hidden' name='cooked_data_password' />
                 </div>
@@ -92,14 +92,14 @@
                     letter-spacing: 0; margin-top: -3px; float: left;'
                     onmouseover="$(this).find('span').css('text-decoration','underline');"
                     onmouseout="$(this).find('span').css('text-decoration','none');"
-                    href='/people/{{person.username}}/involvement/add/input'>
+                    href='/people/{{person.user.username}}/involvement/add/input'>
                     <img src='/static/images/icons/Add.png' alt='+' /><span>Add</span>
                 </a>
             </h3>
     {% if person.poll_on_next_web_view %}
     <script type='text/javascript'>
         // FIXME: Change host
-        url = '/people/{{ person.username }}/test_commit_importer_json';
+        url = '/people/{{ person.user.username }}/test_commit_importer_json';
         updateIntervalID = window.setInterval(updateCommitImporterStatus, 2000);
         function updateCommitImporterStatus() {
             function updateStatusDialog(json) {
@@ -107,8 +107,8 @@
                 status = "status";
                 if (success) {
                     status_html = "<img src='/static/images/data-ready.png' style='float: left;'/> <div style='float: left;'>"
-                        + "{{person.username}}'s code contributions have been imported. "
-                        + "<a href='/people/{{ person.username }}/tabs/involvement'>"
+                        + "{{person.user.username}}'s code contributions have been imported. "
+                        + "<a href='/people/{{ person.user.username }}/tabs/involvement'>"
                         + "Follow this link to see them</a>.</div>";
                     $('#commit-importer-status').html(status_html).addClass('done');
                     window.clearInterval(updateIntervalID);
@@ -121,7 +121,7 @@
     <div id='commit-importer-status'>
         <img src='/static/images/throbber.gif' />
         <span style='position: relative; top: -11px;'>
-            Importing <strong>{{person.username}}</strong>'s
+            Importing <strong>{{person.user.username}}</strong>'s
             code contributions from around the web...
         </span>
     </div>
@@ -152,7 +152,7 @@
                             method='POST'
                             action='/people/make_favorite_project_exp'>
                             <input type='hidden' name='username'
-                            value='{{ person.username }}'/>
+                            value='{{ person.user.username }}'/>
                             <input type='hidden' name='exp_id'
                             value='{{ exp.id }}'/>
                             <input type='image' src='/static/images/icons/star-off.png'/>
@@ -207,7 +207,7 @@
             <div style='float: left; width: 400px;'>No contributions listed.</div>
             <!--form method='post' action='/people/xp_slurp_do'>
                 <input type='submit' value='Import code contributions automatically from around the Internet.' />
-                <input type='hidden' name='u' value='{{person.username}}' />
+                <input type='hidden' name='u' value='{{person.user.username}}' />
             </form-->
             {% endif %}
         </ul>

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# vim: set ai et ts=4 sw=4:
+# vim: set ai et ts=4 sw=4 nu:
 # Testing suite for profile
 
 # Imports {{{
@@ -8,6 +8,7 @@ from profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag
 import profile.views
 import profile.controllers
 import settings
+from customs import ohloh 
 
 import re
 import twill
@@ -48,7 +49,7 @@ def twill_quiet():
 
 class ProfileTests(django.test.TestCase):
     # {{{
-    fixtures = ['user-paulproteus', 'cchost-data-imported-from-ohloh']
+    fixtures = ['user-paulproteus', 'person-paulproteus', 'cchost-data-imported-from-ohloh']
     def setUp(self):
         twill_setup()
 
@@ -66,12 +67,12 @@ class ProfileTests(django.test.TestCase):
         url = 'http://example.com/'
         exp = ProjectExp.create_from_text(username, project_name,
                                     description, url)
-        found = list(ProjectExp.objects.filter(person__username=username))
+        found = list(ProjectExp.objects.filter(person__user__username=username))
         # Verify it shows up in the DB
         self.assert_('seeseehost' in [f.project.name for f in found])
         # Verify it shows up in profile_data_from_username
         data = profile.views.profile_data_from_username('paulproteus')
-        self.assert_(data['person'].username == 'paulproteus')
+        self.assert_(data['person'].user.username == 'paulproteus')
         projects = [thing[0].project.name for thing in
                     data['exp_taglist_pairs']]
         self.assert_('seeseehost' in projects)
@@ -82,7 +83,7 @@ class ProfileTests(django.test.TestCase):
         # {{{
         url_prefix = "http://openhatch.org"
         username = 'paulproteus'
-        #person = Person.objects.get(username=username)
+        #person = Person.objects.get(user__username=username)
         #first_exp = ProjectExp.objects.filter(person=person)[0]
         url = '%s/people/%s/involvement/add/input' % (
                 url_prefix, username)
@@ -113,11 +114,11 @@ class ProfileTests(django.test.TestCase):
         # {{{
 
         # Create requisite objects
-        person = Person.objects.get(username='paulproteus')
+        person = Person.objects.get(user__username='paulproteus')
         project = Project.objects.get(name='ccHost')
 
         # Assemble text input
-        username = person.username
+        username = person.user.username
         project_name = project.name
         description = "sample description"
         url = "http://sample.com"
@@ -125,7 +126,7 @@ class ProfileTests(django.test.TestCase):
         primary_language = "perl"
 
         ProjectExp.create_from_text(
-                person.username,
+                person.user.username,
                 project.name,
                 description,
                 url,
@@ -155,57 +156,6 @@ class DebTagsTests(django.test.TestCase):
                          set(['works-with::mail', 'protocol::smtp']))
     # }}}
 
-class QuebecTests(django.test.TestCase):
-    '''
-    The Québec milestone says:
-    * You can save your profile.
-    '''
-    # {{{
-    fixtures = ['user-paulproteus', 'cchost-data-imported-from-ohloh']
-    def setUp(self):
-        # {{{
-        twill_setup()
-        self.to_be_deleted = []
-        # }}}
-
-    def tearDown(self):
-        # {{{
-        twill_teardown()
-        for delete_me in self.to_be_deleted:
-            delete_me.delete()
-        # }}}
-
-    def testPersonModel(self):
-        # {{{
-        # Test creating a Person and fetching his or her contribution info
-        username = 'paulproteus'
-        new_person = Person(username=username)
-        new_person.save()
-        
-        new_person.fetch_contrib_data_from_ohloh()
-        self.to_be_deleted.append(new_person)
-        # Verify that we actually created some ProjectExps related to me
-        all_proj_exps = list(
-            ProjectExp.objects.filter(person=new_person).all())
-        self.to_be_deleted.extend(all_proj_exps)
-        self.assert_(all_proj_exps, all_proj_exps)
-        # }}}
-
-    def testGetPersonDataDict(self):
-        # {{{
-        username = 'paulproteus'
-        data = profile.views.profile_data_from_username(username,
-                                                        fetch_ohloh_data=True)
-        self.assertEquals(data['person'].username, username)
-        cchost_among_project_exps = False
-        for proj, tags in data['exp_taglist_pairs']:
-            if proj.project.name == 'ccHost':
-                cchost_among_project_exps = True
-                break
-        self.assert_(cchost_among_project_exps)
-        # }}}
-    # }}}
-
 #class ExpTag(django.test.TestCase):
 
 class TrentonTests(django.test.TestCase):
@@ -215,7 +165,7 @@ class TrentonTests(django.test.TestCase):
     '''
     # {{{
 
-    fixtures = ['user-paulproteus']
+    fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def setUp(self):
         twill_setup()
@@ -314,7 +264,6 @@ import os
 class OhlohIconTests(django.test.TestCase):
     '''Test that we can grab icons from Ohloh.'''
     def test_given_project_find_icon(self):
-        import ohloh
         oh = ohloh.get_ohloh()
         icon = oh.get_icon_for_project('f-spot')
         icon_fd = StringIO(icon)
@@ -323,17 +272,14 @@ class OhlohIconTests(django.test.TestCase):
         self.assertEqual(image.size, (64, 64))
 
     def test_given_project_find_icon_failure(self):
-        import ohloh
         oh = ohloh.get_ohloh()
         self.assertRaises(ValueError, oh.get_icon_for_project, 'lolnomatxh')
 
     def test_find_icon_failure_when_proj_exists_but_lacks_icon(self):
-        import ohloh
         oh = ohloh.get_ohloh()
         self.assertRaises(ValueError, oh.get_icon_for_project, 'asdf')
 
     def test_find_icon_for_mozilla_firefox(self):
-        import ohloh
         oh = ohloh.get_ohloh()
         icon = oh.get_icon_for_project('Mozilla Firefox')
         icon_fd = StringIO(icon)
@@ -342,7 +288,6 @@ class OhlohIconTests(django.test.TestCase):
         self.assertEqual(image.size, (64, 64))
 
     def test_find_icon_for_proj_with_space(self):
-        import ohloh
         oh = ohloh.get_ohloh()
         self.assertRaises(ValueError, oh.get_icon_for_project, 'surely nothing is called this name')
 
@@ -464,7 +409,7 @@ class CambridgeTests(django.test.TestCase):
 
 class PersonTabProjectExpTests(django.test.TestCase):
     # {{{
-    fixtures = ['user-paulproteus', 'cchost-data-imported-from-ohloh']
+    fixtures = ['user-paulproteus', 'person-paulproteus', 'cchost-data-imported-from-ohloh']
 
     def setUp(self):
         twill_setup()
@@ -482,7 +427,7 @@ class PersonTabProjectExpTests(django.test.TestCase):
 
 class PersonInvolvementTests(django.test.TestCase):
     # {{{
-    fixtures = ['user-paulproteus', 'cchost-data-imported-from-ohloh']
+    fixtures = ['user-paulproteus', 'person-paulproteus', 'cchost-data-imported-from-ohloh']
 
     def setUp(self):
         twill_setup()
@@ -539,9 +484,9 @@ class PersonInvolvementTests(django.test.TestCase):
         tc.fv('edit-tags', 'edit-tags-can_mentor', ', '.join(tags[12:15]))
         tc.submit()
         self.assert_(list(profile.models.Link_Person_Tag.objects.filter(
-            tag__text='jquery', person__username='paulproteus')))
+            tag__text='jquery', person__user__username='paulproteus')))
         self.assert_(list(profile.models.Link_Person_Tag.objects.filter(
-            tag__text='bgbhgb', person__username='paulproteus')))
+            tag__text='bgbhgb', person__user__username='paulproteus')))
         #out = profile.views.tags_dict_for_person(Person.objects.get(
         #    username='paulproteus'))
         for (n, thing) in enumerate(['understands',
@@ -561,7 +506,7 @@ class PersonInvolvementTests(django.test.TestCase):
 
 class CommitImportTests(django.test.TestCase):
     # {{{
-    fixtures = ['user-paulproteus']
+    fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def setUp(self):
         twill_setup()
@@ -581,7 +526,7 @@ class CommitImportTests(django.test.TestCase):
 import time
 from django.core import management
 class CeleryTests(django.test.TestCase):
-    fixtures = ['user-paulproteus']
+    fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def setUp(self):
         twill_setup()
@@ -603,9 +548,13 @@ class CeleryTests(django.test.TestCase):
             'nobgtask': 'yes',
             }
         
+        client = Client()
+        client.login(username=username,
+                     password="paulproteus's unbreakable password")
+
         # Ask if background job has been completed.
         # We haven't called it, so the answer should be no.
-        response_before = Client().get(url, good_input)
+        response_before = client.get(url, good_input)
         self.assertEquals(simplejson.loads(response_before.content),
                 [{'success': 0}])
 
@@ -624,14 +573,20 @@ class CeleryTests(django.test.TestCase):
             cooked_data=None
 
         # Instantiate the task
+        # For us, commit_username is also paulproteus. The above cooked_data
+        # is a snapshot of paulproteus's contributions as indexed by Ohloh.
+        commit_username=username # = 'paulproteus'
+
         task = tasks.FetchPersonDataFromOhloh()
-        task.run(username, cooked_data=cooked_data)
+        task.run(username=username,
+                 commit_username=commit_username,
+                 cooked_data=cooked_data)
         # NB: The task knows not to call Ohloh when we give it cooked data.
 
-        self.assert_(Person.objects.get(username='paulproteus').ohloh_grab_completed)
+        self.assert_(Person.objects.get(user__username='paulproteus').ohloh_grab_completed)
 
         # Check again
-        response_after = Client().get(url, good_input)
+        response_after = client.get(url, good_input)
 
         # Ask if background job has been completed. (Hoping for yes.)
         self.assertEquals(simplejson.loads(response_after.content),
@@ -642,13 +597,19 @@ class CeleryTests(django.test.TestCase):
             project__name=project_name)))
 
     def test_background_check_if_ohloh_grab_completed(self):
-        username = 'paulproteus'
+        username='paulproteus'
+
+        tc.go(make_twill_url('http://openhatch.org/people/login'))
+        tc.fv('login', 'login_username', username)
+        tc.fv('login', 'login_password', "paulproteus's unbreakable password")
+        tc.submit()
+
         url = 'http://openhatch.org/people/%s/ohloh_grab_done' % urllib.quote(
             username)
         tc.go(make_twill_url(url))
         tc.find('False')
 
-        person_obj = Person.objects.get(username=username)
+        person_obj = Person.objects.get(user__username=username)
         person_obj.ohloh_grab_completed = True
         person_obj.save()
 
@@ -674,7 +635,8 @@ class CeleryTests(django.test.TestCase):
 # that ensure we actually call them!
 
 class UserListTests(django.test.TestCase):
-    fixtures = ['user-paulproteus', 'user-steve']
+    fixtures = [ 'user-paulproteus', 'person-paulproteus',
+            'user-barry', 'person-barry']
 
     def setUp(self):
         twill_setup()
@@ -683,18 +645,18 @@ class UserListTests(django.test.TestCase):
         twill_teardown()
     
     def test_display_list_of_users(self):
-        people = [(p.username, p.name)
+        people = [(p.user.username, p.user.first_name, p.user.last_name)
                 for p in profile.controllers.queryset_of_people()]
         self.assertEqual(people, [
-            ('paulproteus', 'Asheesh Laroia'),
-            ('steve', 'Steve Stevey')])
+            ('paulproteus', 'Asheesh', 'Laroia'),
+            ('barry', 'Barry', 'Spinoza')])
 
     def test_display_list_of_users_web(self):
         url = 'http://openhatch.org/people/'
         url = make_twill_url(url)
         tc.go(url)
         tc.find(r'Asheesh Laroia \(paulproteus\)')
-        tc.find(r'Steve Stevey \(steve\)')
+        tc.find(r'Barry Spinoza \(barry\)')
 
         tc.follow('Asheesh Laroia')
         tc.url('people/paulproteus') 
@@ -707,7 +669,7 @@ class UserListTests(django.test.TestCase):
         tc.follow('See who else is on OpenHatch')
 
 class AuthTests(django.test.TestCase):
-    fixtures = ['user-paulproteus', 'auth-user-paulproteus']
+    fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def setUp(self):
         twill_setup()
@@ -723,10 +685,10 @@ class AuthTests(django.test.TestCase):
         url = 'http://openhatch.org/'
         url = make_twill_url(url)
         tc.go(url)
-        tc.fv('login','login-username',"paulproteus")
-        tc.fv('login','login-password',"paulproteus's unbreakable password")
+        tc.fv('login','login_username',"paulproteus")
+        tc.fv('login','login_password',"paulproteus's unbreakable password")
         tc.submit()
-        tc.find('logged in')
+        tc.find('paulproteus')
 
     def test_logout_web(self):
         self.test_login_web()
@@ -740,14 +702,15 @@ class AuthTests(django.test.TestCase):
         url = 'http://openhatch.org/'
         url = make_twill_url(url)
         tc.go(url)
-        tc.fv('login','login-username',"paulproteus")
-        tc.fv('login','login-password',"not actually paulproteus's unbreakable password")
+        tc.fv('login','login_username',"paulproteus")
+        tc.fv('login','login_password',"not actually paulproteus's unbreakable password")
         tc.submit()
         tc.find("oops")
 
 class SetAPasswordTests(django.test.TestCase):
     # FIXME: I suppose the fixture should be called person-paulproteus
-    fixtures = ['user-paulproteus', 'cchost-data-imported-from-ohloh']
+    fixtures = ['user-paulproteus', 'person-paulproteus',
+            'cchost-data-imported-from-ohloh']
 
     def setUp(self):
         twill_setup()
@@ -755,20 +718,25 @@ class SetAPasswordTests(django.test.TestCase):
     def tearDown(self):
         twill_teardown()
 
-    def test_profile_links_to_signup(self):
-        tc.go(make_twill_url('http://openhatch.org/people/paulproteus'))
+    def test_follow_link_from_front_page(self):
+        tc.go(make_twill_url('http://openhatch.org/'))
+        tc.fv('create_profile', 'create_profile_username', 'ziggy')
+        tc.submit()
+        # Should be at paulproteus' profile.
+        tc.find('ziggy')
         tc.follow("Sign up to save your work")
         tc.find("Password: ")
 
-    def test_signup_submission_creates_user(self):
-        tc.go(make_twill_url('http://openhatch.org/people/signup'))
-        tc.fv('signup', 'login-username', 'paulproteus')
-        tc.fv('signup', 'login-password', "paulproteus's unbreakable password")
+    def test_signup_submission_links_user_to_person(self):
+        self.test_follow_link_from_front_page()
+        tc.find('ziggy')
+        tc.fv('signup', 'login-password', "ziggy's impregnable passkey")
         tc.submit()
-        tc.find("Log out")
+        tc.find("ziggy")
+        # FIXME: Check that you can log in with those credentials.
 
 class ImportCommitsViaCommitUsernameViaOhloh(django.test.TestCase):
-    fixtures = ['user-paulproteus']
+    fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def setUp(self):
         twill_setup()
@@ -777,8 +745,12 @@ class ImportCommitsViaCommitUsernameViaOhloh(django.test.TestCase):
         twill_teardown()
 
     def submit_commit_name(self, cooked_data_password):
-        tc.go(make_twill_url('http://openhatch.org/people/paulproteus'))
-        tc.fv('enter_free_software_username', 'u', 'paulproteus')
+        tc.go(make_twill_url('http://openhatch.org/people/login'))
+        tc.fv('login', 'login_username', 'paulproteus')
+        tc.fv('login', 'login_password', "paulproteus's unbreakable password")
+        tc.submit()
+
+        tc.fv('enter_free_software_username', 'commit_username', 'paulproteus')
 
         # Since we don't actually want to call Ohloh,
         # we thought to create a mock object, but ran into difficulties.
@@ -795,9 +767,10 @@ class ImportCommitsViaCommitUsernameViaOhloh(django.test.TestCase):
         tc.submit()
         tc.find('ccHost')
 
-    def test_commit_name_submission_triggers_ohloh_import_via_commit_username(self):
+    def test_commit_name_submit_triggers_ohloh_import_via_commit_username(self):
         self.submit_commit_name(settings.cooked_data_password)
 
     def test_cooked_data_fails_on_bad_password(self):
         self.assertRaises(ValueError, self.submit_commit_name,
                 settings.cooked_data_password + '...NOT')
+

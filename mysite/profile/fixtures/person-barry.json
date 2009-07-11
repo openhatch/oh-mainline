@@ -1,0 +1,1 @@
+[{ "pk": 2, "model": "profile.person", "fields": {"user": 2, "poll_on_next_web_view": 0, "interested_in_working_on": "qqq", "gotten_name_from_ohloh": 1} }]

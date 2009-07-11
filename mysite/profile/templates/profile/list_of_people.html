@@ -3,8 +3,8 @@
 <ul>
 {% for person in people %}
     <li>
-    <a href='/people/{{person.username}}'>
-        {{ person.name }} ({{ person.username }})
+    <a href='/people/{{person.user.username}}'>
+        {{ person.user.first_name }} {{ person.user.last_name }} ({{ person.user.username }})
     </a>
     </li>
 {% endfor %}
