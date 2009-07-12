@@ -451,6 +451,62 @@ class PersonInvolvementTests(django.test.TestCase):
         tc.find('http://example.com')
         # }}}
 
+    def test_remove_cchost_involvement(self):
+        '''This test:
+        * Logs in
+        * Discovers that the ccHost involvement is on the page
+        * Posts to where the delete button should POST to
+        * Discovers that the ccHost involvement is gone.'''
+        client = Client()
+        username='paulproteus'
+        client.login(username=username,
+                     password="paulproteus's unbreakable password")
+
+        person_page = '/people/%s/' % urllib.quote(username)
+        
+        # Load up the profile page
+        response = client.get(person_page)
+        # See! It talks about ccHost!
+        self.assertContains(response, 'ccHost')
+
+        # POST saying we want to delete the ccHost experience...
+        # luckily I read the fixture and I know its ID is 13
+        response = client.post('/people/delete-experience/do',
+                               {'id': '13'})
+        
+        # Now re-GET the profile
+        response = client.get(person_page)
+        # See! It no longer talks about ccHost!
+        self.assertNotContains(response, 'ccHost')
+
+
+    def test_remove_cchost_involvement_click(self):
+        '''This test:
+        * Logs in
+        * Discovers that the ccHost involvement is on the page
+        * Clicks the Delete button
+        * Discovers that the ccHost involvement is gone.'''
+
+        # Log in
+        username='paulproteus'
+
+        tc.go(make_twill_url('http://openhatch.org/people/login'))
+        tc.fv('login', 'login_username', username)
+        tc.fv('login', 'login_password', "paulproteus's unbreakable password")
+        tc.submit()
+
+        # Load up the profile page; oh wait, we're already there.
+
+        tc.find('ccHost')
+
+        # Click the right delete button...
+        tc.config('readonly_controls_writeable', True)
+        tc.fv('delete-projectexp-13', 'id', '13') # no-op
+        tc.submit()
+
+        # Alakazam! It's gone.
+        tc.notfind('ccHost')
+
     def test_person_involvement_description(self):
         # {{{
         url = 'http://openhatch.org/people/paulproteus/tabs/involvement'

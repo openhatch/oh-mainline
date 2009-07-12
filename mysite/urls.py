@@ -21,6 +21,9 @@ urlpatterns = patterns('',
 
         (r'^people/new/do$', 'mysite.profile.views.new_user_do'),
 
+        (r'^people/delete-experience/do$',
+         'mysite.profile.views.delete_experience_do'),
+
         # FIXME: Add trailing slashes, as this is more permissive.
         (r'^people/get_data_for_email$', 'mysite.profile.views.get_data_for_email'),
         (r'^people/change_what_like_working_on$',

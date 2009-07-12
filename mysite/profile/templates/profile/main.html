@@ -181,6 +181,15 @@
                         {% endif %}
                         {% endif %}
                     </div>
+                    <div class='delete-projectexp'>
+                        <form name='delete-projectexp-{{ exp.id }}'
+                            method='POST'
+                            action='/people/delete-experience/do'>
+                            <input type='hidden' name='id'
+                            value='{{ exp.id }}'/>
+                            <input type='submit' value='Delete'/>
+                        </form>
+                    </div>
                     {% comment %}
                     <img src='/static/images/icons/Add.png' alt='show more'
                     class='show-more-link'>

@@ -697,3 +697,22 @@ def new_user_do(request):
     else:
         pass
         # FIXME: Validate, Catch no username
+
+def delete_experience_do(request):
+    person = request.user.get_profile()
+
+    project_exp_id = int(request.POST['id'])
+    
+    exps = ProjectExp.objects.filter(id=project_exp_id,
+                                    person=person)
+
+    # this way, if there are no matches, we fail gently.
+    # Presumably a crazy-reloading user might run into that,
+    # so it's probably be best to allow ourselves to "redelete"
+    # a ProjectExp that has already been deleted.
+    for exp in exps:
+        exp.delete()
+
+    return HttpResponseRedirect('/people/%s/' % urllib.quote(
+            request.user.username))
+
