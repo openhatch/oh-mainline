@@ -104,7 +104,7 @@ INSTALLED_APPS = (
 
 ### HACK
 from socket import gethostname
-if gethostname() in ('renaissance', 'yggdrasil', 'builder') and DEBUG:
+if gethostname() in ('renaissance', 'yggdrasil', 'builder', 'vellum') and DEBUG:
     DEBUG_PROPAGATE_EXCEPTIONS=True
 
 # file: settings.py #
