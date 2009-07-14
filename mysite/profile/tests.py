@@ -737,23 +737,35 @@ class SetAPasswordTests(TwillTests):
     # {{{
     fixtures = ['user-paulproteus', 'person-paulproteus',
             'cchost-data-imported-from-ohloh']
+    username = 'ziggy'
+    password = "ziggy's impregnable passkey"
 
     def test_follow_link_from_front_page(self):
+        """This test:
+        * Creates a new user
+        * Verifies that we are at ziggy's profile page"""
         tc.go(make_twill_url('http://openhatch.org/'))
-        tc.fv('create_profile', 'create_profile_username', 'ziggy')
+        tc.fv('create_profile', 'create_profile_username', self.username)
+        tc.fv('create_profile', 'create_profile_password', self.password)
         tc.submit()
         # Should be at ziggy's profile.
-        tc.find('ziggy')
-        tc.follow("Sign up to save your work")
-        tc.find("Password: ")
+        tc.find(self.username)
+        tc.find('profile')
 
-    def test_signup_submission_links_user_to_person(self):
+    def test_signup_on_front_page_lets_person_sign_back_in(self):
+        ''' The point of this test is to:
+        * Create the account for ziggy
+        * Log out
+        * Log back in as him '''
         self.test_follow_link_from_front_page()
-        tc.find('ziggy')
-        tc.fv('signup', 'login-password', "ziggy's impregnable passkey")
+        tc.follow('logout')
+        tc.go(make_twill_url('http://openhatch.org/'))
+        tc.fv('login', 'login_username', self.username)
+        tc.fv('login', 'login_password', self.password)
         tc.submit()
-        tc.find("ziggy")
-        # FIXME: Check that you can log in with those credentials.
+        # Should be back at ziggy's profile
+        tc.find(self.username)
+        tc.find('profile')
     # }}}
 
 class ImportCommitsViaCommitUsernameViaOhloh(TwillTests):

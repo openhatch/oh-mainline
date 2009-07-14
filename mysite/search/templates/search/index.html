@@ -47,21 +47,21 @@
         <div id='wrapper-outer'>
             <div id='wrapper-inner'>
 
-                    {% if notification %}
-                    <div class='notification' style='background-color: #ffc; border: 1px solid #ff9; text-align: center; padding: 10px;'>
+                {% if notification %}
+                <div class='notification' style='background-color: #ffc; border: 1px solid #ff9; text-align: center; padding: 10px;'>
                     {{ notification }}
-                    </div>
-                    {% endif %}
-                    {% if notification_id %}
-                    <!-- notification_id: {{ notification_id }} -->
-                    {% endif %}
+                </div>
+                {% endif %}
+                {% if notification_id %}
+                <!-- notification_id: {{ notification_id }} -->
+                {% endif %}
 
                 {% comment %} Logo and explanation {{{ {% endcomment %}
                 <div id='banner'>
                     <img alt='OpenHatch' src='/static/images/the-logo.png'/>
                     <h1>Find: <a href='/people'>people</a>, <a href='/search'>volunteer opportunities</a>.</h1>
                 </div>
-                
+
 
                 <div id='explanation'>
                     <!--p style='text-align: center;'>
@@ -70,22 +70,30 @@
                     <p>Here you can <strong>find opportunities to volunteer in software engineering and design</strong>, and
                     <strong>meet other volunteers</strong>.</p-->
 
-                <h3><span>Do you contribute to open source software?</span></h3>
-                    
-                <h3>Then OpenHatch is here for you!</h3>
-                <!--h2>Just tell us your <span>skills</span>, <span>experience</span>, and <span>interests</span>, and we help you:</h2-->
-                <ul><li><span>Find tailored ways that you can help</span> with open source projects</li>
-                <li><span>Find people</span> who like the same projects as you do</li>
-                <li><span>Track and show off</span> all your open source software experience in one place</li></ul>
-                <h3>To get started...</h3> 
+                    <h3><span>Do you contribute to open source software?</span></h3>
+
+                    <h3>Then OpenHatch is here for you!</h3>
+                    <!--h2>Just tell us your <span>skills</span>, <span>experience</span>, and <span>interests</span>, and we help you:</h2-->
+                    <ul><li><span>Find tailored ways that you can help</span> with open source projects</li>
+                        <li><span>Find people</span> who like the same projects as you do</li>
+                        <li><span>Track and show off</span> all your open source software experience in one place</li></ul>
+                    <h3>To get started...</h3> 
                     <ul id='stuff-to-do'>
                         <li>
+                        <a href='#'>Create a profile: Sign up</a> 
                         <form id='create_profile' name='create_profile'
                             action='/people/new/do' method='POST'>
                             <div class='form-row'>
                                 <label for='create_profile_username'>Username</label>
                                 <input type='text' name='create_profile_username' id='create_profile_username' />
-                                <input type='submit' id='create-profile' value='Create a profile' />
+                            </div>
+                            <div class='form-row'>
+                                <label for='create_profile_password'>Choose your password (OpenID coming soon)</label>
+                                <input type='text' id='create_profile_password' 
+                                name='create_profile_password' />
+                            </div>
+                            <div class='form-row'>
+                                <input type='submit' style='float: right;' id='create-profile' value='Create a profile' />
                             </div>
                         </form>
                         </li>

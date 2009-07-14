@@ -694,13 +694,14 @@ def import_do(request):
 def new_user_do(request):
 # {{{
     username = request.POST.get('create_profile_username', None)
-    if username:
+    password = request.POST.get('create_profile_password', None)
+    if username and password:
         #FIXME: Catch username collisions
 
         # create a user
         user = django.contrib.auth.models.User.objects.create_user(
                 username=username, 
-                email='', password='qwertyuiop')
+                email='', password=password)
 
         # create a linked person
         person = Person(user=user)
@@ -708,17 +709,15 @@ def new_user_do(request):
 
         # authenticate and login
         user = django.contrib.auth.authenticate(
-                username=username, password='qwertyuiop')
+                username=username, password=password)
         django.contrib.auth.login(request, user)
-
-        user.set_unusable_password()
 
         user.save()
 
         # redirect to profile
         return HttpResponseRedirect('/people/%s/' % urllib.quote(username))
     else:
-        pass
+        fail
         # FIXME: Validate, Catch no username
     # }}}
 
