@@ -2,77 +2,91 @@
 <html>
     <head>
 
-      {% comment %} prefatory remarks {{{ {% endcomment %}
-      <title>
-          {% if title %}
-          {{ title }} 
-          {% else %}
-          unnamed page : openhatch
-          {% endif %}
-      </title>
-      <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
-      <meta http-equiv='Content-Language' content='en-us' />
-      <meta http-equiv='Content-Script-Type' content='text/javascript' />
-      <meta http-equiv='Content-Style-Type' content='text/css' />
-      <meta name='Description' content=''>
-      {% comment %} }}} {% endcomment %}
+        {% comment %} prefatory remarks {{{ {% endcomment %}
+        <title>
+            {% if title %}
+            {{ title }} 
+            {% else %}
+            unnamed page : openhatch
+            {% endif %}
+        </title>
+        <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
+        <meta http-equiv='Content-Language' content='en-us' />
+        <meta http-equiv='Content-Script-Type' content='text/javascript' />
+        <meta http-equiv='Content-Style-Type' content='text/css' />
+        <meta name='Description' content=''>
+        {% comment %} }}} {% endcomment %}
 
-      {% comment %} css {{{ {% endcomment %}
-      <style> /*<![CDATA[*/
-         @import url('/static/css/gewgaws.css') all; 
-         @import url('/static/css/people/all.css') all;
-         /*]]>*/
-      </style>
+        {% comment %} css {{{ {% endcomment %}
+        <style> /*<![CDATA[*/
+            @import url('/static/css/gewgaws.css') all; 
+            @import url('/static/css/people/all.css') all;
+            /*]]>*/
+        </style>
 
-      <!--[if IE]>
-      <style>/*<![CDATA[*/@import url('../css/ie/all.css');/*]]>*/</style>
-      <![endif]-->
+        <!--[if IE]>
+        <style>/*<![CDATA[*/@import url('../css/ie/all.css');/*]]>*/</style>
+        <![endif]-->
 
-      <!--[if lte IE 6]>
-      <style>/*<![CDATA[*/@import url('../css/ie/6-/all.css');/*]]>*/</style>
-      <![endif]-->
+        <!--[if lte IE 6]>
+        <style>/*<![CDATA[*/@import url('../css/ie/6-/all.css');/*]]>*/</style>
+        <![endif]-->
 
-      <!--[if gte IE 7]>
-      <style>/*<![CDATA[*/@import url('../css/ie/7+/all.css');/*]]>*/</style>
-      <![endif]-->
+        <!--[if gte IE 7]>
+        <style>/*<![CDATA[*/@import url('../css/ie/7+/all.css');/*]]>*/</style>
+        <![endif]-->
 
-      {% comment %} }}} {% endcomment %}
+        {% comment %} }}} {% endcomment %}
 
-      {% comment %} js {{{ {% endcomment %}
+        {% comment %} js {{{ {% endcomment %}
 
-      <script src='/static/js/jquery.js'></script>
-      <script src='/static/js/jquery.query.js'></script>
-      <script src='/static/js/jquery.cookie.js'></script>
+        <script src='/static/js/jquery.js'></script>
+        <script src='/static/js/jquery.query.js'></script>
+        <script src='/static/js/jquery.cookie.js'></script>
 
-      {% comment %} }}} {% endcomment %}
+        {% comment %} }}} {% endcomment %}
 
     </head>
     <body>
         <div id='outermost'>
             <div id='penoutermost'>
-                <div id='nav'>
-                    <h2><img src='/static/images/openhatch-logo.png' 
-                        alt='openhatch' height='40' /></h2>
-                    <ul>
-                        <li><a href=''>find people</a></li>
-                        <li><a href=''>find volunteer opportunities</a></li>
-                    </ul>
-                    {% if the_user.is_authenticated %}
-                    <!-- user.is_authenticated indeed -->
-                    <ul>
-                        <li>
-                            <a href='/people/logout/'>Log out</a>
-                        </li>
-                    </ul>
+        <div class='section' id='nav'>
+            <div class='center'>
+                <div class='float'>
+                <h2>
+                    <a href='/'>
+                        <img src='/static/images/the-logo-bluegreen-125px.png' 
+                        alt='openhatch' />
+                    </a>
+                </h2>
+                <ul id='links'>
+                    <li><a href=''>find people</a></li>
+                    <li><a href=''>find volunteer opportunities</a></li>
+                </ul>
+                {% if the_user.is_authenticated %}
+                <!-- user.is_authenticated indeed -->
+                <ul id='user-actions'>
+                    <li>
+                    <a href='/people/signup'>Sign up to save your work</a>
+                    {% if not the_user.has_unusable_password %}
+                    <a href='/people/logout/'>Log out</a>
                     {% endif %}
-                </div>
-                <div id='content'>
+                    </li>
+                </ul>
+                {% endif %}
+            </div>
 
+            {% if notification_id %}
+            <!-- notification_id: {{ notification_id }} -->
+            {% endif %}
+            {% if notification %}
+            <div class='section'>
+                <div class='center'>
                     <div class='notification'>
-                    {% if notification %}
-                    {% if notification_id %}
-                    <!-- notification_id: {{ notification_id }} -->
-                    {% endif %}
-                    {{ notification }}
-                    {% endif %}
+                        {{ notification }}
                     </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>

@@ -1,0 +1,4 @@
+for file in *-40px.jpg; do
+	convert -crop 40x40 "$file" "${file%.jpg}x40px.jpg"
+done
+

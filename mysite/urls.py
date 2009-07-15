@@ -6,6 +6,8 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
+        # FIXME: Automatically remove trailing slashes from input URLs,
+        # and remove trailing slashes from the urls below.
         (r'^$', 'mysite.search.views.index'),
         (r'^search/$', 'mysite.search.views.fetch_bugs'),
         (r'^admin/(.*)', admin.site.root),
@@ -16,7 +18,7 @@ urlpatterns = patterns('',
         (r'^people/login/$', 'mysite.profile.views.login'),
         (r'^people/login/do$', 'mysite.profile.views.login_do'),
         (r'^people/logout/$', 'mysite.profile.views.logout'),
-        (r'^people/signup$', 'mysite.profile.views.signup'),
+        (r'^people/signup/$', 'mysite.profile.views.signup'),
         (r'^people/signup/do$', 'mysite.profile.views.signup_do'),
 
         (r'^people/new/do$', 'mysite.profile.views.new_user_do'),
@@ -97,6 +99,12 @@ urlpatterns = patterns('',
         # Tabs
         (r'^people/(?P<input_username>[^/]+)/tabs?/(?P<tab>[a-z]+)[/?]$',
                 'mysite.profile.views.display_person_web'),
+
+        (r'^people/(?P<input_username>[^/]+)/projects/(?P<name>[a-zA-Z -]+)[/?]$',
+                'mysite.profile.views.display_person_project_web'),
+
+        (r'^people/(?P<input_username>[^/]+)/edit[/?]$',
+                'mysite.profile.views.display_person_edit_web'),
 
         # This dangerous regex is last
         (r'^people/(?P<input_username>[^/]+)[/?]$',

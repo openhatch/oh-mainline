@@ -180,12 +180,25 @@ def data_for_person_display_without_ohloh(person):
     photo_url = photos_url_prefix + photos[random.randint(0, len(photos)-1)]
     photo_url = photos_url_prefix + photos[1]
 
-    return {
+    # FIXME: Make this more readable.
+    data_dict = {
             'person': person,
             'photo_url': photo_url,
             'interested_in_working_on_list': interested_in_working_on_list, 
             'projects': projects_extended,
             } 
+    data_dict['tags'] = tags_dict_for_person(person)
+    data_dict['tags_flat'] = dict(
+        [ (key, ', '.join([k.text for k in data_dict['tags'][key]]))
+          for key in data_dict['tags'] ])
+
+    return data_dict
+
+    # }}}
+
+def display_person_edit_web(request, input_username=None, tab=None):
+    # {{{
+    return display_person_web(request, input_username, tab, True)
     # }}}
 
 def display_person_web(request, input_username=None, tab=None, edit=None):
@@ -208,6 +221,14 @@ def display_person_web(request, input_username=None, tab=None, edit=None):
     return display_person(user, request.user, tab, edit)
     # }}}
 
+def display_person_project_web(request, input_username, name):
+    person = get_object_or_404(Person, user__username=input_username)
+    data = data_for_person_display_without_ohloh(person)
+    data['project'] = get_object_or_404(Project, name=name)
+    data['exp'] = get_object_or_404(ProjectExp,
+            person__user__username=input_username, project__name=name)
+    return render_to_response('profile/projectexp.html', data)
+
 def display_person(user, logged_in_user, tab, edit):
     # {{{
 
@@ -219,22 +240,18 @@ def display_person(user, logged_in_user, tab, edit):
     data_dict['the_user'] = user
 
     title = 'openhatch / %s' % user.username
-    title += ' / %s'
-    if tab == 'inv' or tab == 'involvement':
+    title += ' %s'
+    if tab == 'inv' or tab == '/ involvement':
         data_dict['title'] = title % "community involvement"
         return render_to_response('profile/participation.html', data_dict)
     if tab == 'tags':
-        data_dict['title'] = title % "tags"
-        data_dict['tags'] = tags_dict_for_person(person)
-        data_dict['tags_flat'] = dict(
-            [ (key, ', '.join([k.text for k in data_dict['tags'][key]]))
-              for key in data_dict['tags'] ])
+        data_dict['title'] = title % "/ tags"
         return render_to_response('profile/tags.html', data_dict)
     if tab == 'tech':
-        data_dict['title'] = title % "tech"
+        data_dict['title'] = title % "/ tech"
         return render_to_response('profile/tech.html', data_dict)
     else:
-        data_dict['title'] = title % "profile"
+        data_dict['title'] = title % ""
         #Don't use a short list, for now, since we don't have that much stuff on this page.
         #data_dict['projects'] = dict(data_dict['projects'].items()[:4])
         data_dict['tags'] = tags_dict_for_person(person)
@@ -670,6 +687,7 @@ def import_do(request):
     # }}}
 
 def new_user_do(request):
+# {{{
     username = request.POST.get('create_profile_username', None)
     if username:
         #FIXME: Catch username collisions
@@ -697,11 +715,16 @@ def new_user_do(request):
     else:
         pass
         # FIXME: Validate, Catch no username
+    # }}}
 
 def delete_experience_do(request):
     person = request.user.get_profile()
 
-    project_exp_id = int(request.POST['id'])
+    try:
+        project_exp_id = int(request.POST['id'])
+    except KeyError:
+        error_msg = "Oops, an error occurred."
+        return HttpResponseServerError(error_msg)
     
     exps = ProjectExp.objects.filter(id=project_exp_id,
                                     person=person)
@@ -715,4 +738,3 @@ def delete_experience_do(request):
 
     return HttpResponseRedirect('/people/%s/' % urllib.quote(
             request.user.username))
-

@@ -1,264 +1,107 @@
 {% include 'profile/header.global.html' %}
 {% include 'profile/header.html' %}
 
-<div id='widgets'>
+<div id='content'>
 
+<div id='save-me'>
+    Two-field sign up:
+    Username: <input type='text' name='username' />
+    Password: <input type='text' name='password_raw' />
+</div>
 
-    <div id='left'>
-        <!-- {{{ -->
-
-        <div id='avatar' style='float: left; width: 150px;'>
-            <img src='{{ photo_url }}' />
-        </div>
-
-        <div id='taglines' class='widget'>
-            <!-- {{{ -->
-        {% if tags_flat.understands %}
-        <div class='tags'>
-            understands:
-            {{ tags_flat.understands }}
-        </div>
-        {% endif %}
-        {% if tags.understands_not %}
-        <div class='tags'>
-            will never understand:
-            {{ tags_flat.understands_not }}
-        </div>
-        {% endif %}
-        {% if tags.seeking %}
-        <div class='tags'>
-            looking for volunteering opportunities in:
-            {{ tags_flat.seeking }}
-        </div>
-        {% endif %}
-        {% if tags.studying %}
-        <div class='tags'>
-            currently learning about:
-            {{ tags_flat.studying }}
-        </div>
-        {% endif %}
-        {% if tags.can_mentor %}
-        <div class='tags'>
-            can mentor in:
-            {{ tags_flat.can_mentor }}
-        </div>
-        {% endif %}
-            <!-- }}} -->
-        </div>
-
-        <div id='nerdstream' class='widget' style='display: none;'>
-            <!-- {{{ -->
-            <h3>Stream (coming soon):</h3>
-            <ul>
-                <!--li>
-                <img src='/static/images/icons/projects/f-spot-50px.png' />
-                Reported a bug in f-spot
-                </li-->
-                <li>
-                <img src='/static/images/icons/projects/exaile-50px.png' />
-                Reported a bug in exaile 
-                </li>
-            </ul>
-            <!-- }}} -->
-        </div><!-- /#nerdstream -->
-
-        <!-- }}} -->
-    </div>
+{% include 'profile/personal.html' %}
 
     <div id='right'>
         <!-- {{{ -->
-        <div id='importer' class='widget'>
-            Enter one of your FOSS usernames. (You'll soon be able to enter multiple usernames.)
-            <form id='enter-free-software-username' 
-                name='enter_free_software_username'
-                action='/people/{{ person.user.username }}/import/do' method='POST'>
-                <div class='form-row'>
-                    <label for='commit_username'>Type a username</label>
-                    <input type='text' id='commit_username' name='commit_username' />
-                    <input type='hidden' name='cooked_data' />
-                    <input type='hidden' name='cooked_data_password' />
-                </div>
-                <div class='form-row'>
-                    <input type='submit' value='go' />
-                </div>
-            </form>
-        </div>
-        <div id='portfolio' class='widget'>
+        <div id='portfolio'>
             <!-- {{{ -->
-            <h3>
-                <div style='float: left; margin-right: 20px; margin-top: 0;'>Community involvement</div>
-                <a class='add-a-contribution'
-                    style='text-decoration: none; font-size: 10pt;
-                    letter-spacing: 0; margin-top: -3px; float: left;'
-                    onmouseover="$(this).find('span').css('text-decoration','underline');"
-                    onmouseout="$(this).find('span').css('text-decoration','none');"
-                    href='/people/{{person.user.username}}/involvement/add/input'>
-                    <img src='/static/images/icons/Add.png' alt='+' /><span>Add</span>
-                </a>
-            </h3>
-    {% if person.poll_on_next_web_view %}
-    <script type='text/javascript'>
-        // FIXME: Change host
-        url = '/people/{{ person.user.username }}/test_commit_importer_json';
-        updateIntervalID = window.setInterval(updateCommitImporterStatus, 2000);
-        function updateCommitImporterStatus() {
-            function updateStatusDialog(json) {
-                success = (json[0].success == 1);
-                status = "status";
-                if (success) {
-                    status_html = "<img src='/static/images/data-ready.png' style='float: left;'/> <div style='float: left;'>"
-                        + "{{person.user.username}}'s code contributions have been imported. "
-                        + "<a href='/people/{{ person.user.username }}/tabs/involvement'>"
-                        + "Follow this link to see them</a>.</div>";
-                    $('#commit-importer-status').html(status_html).addClass('done');
-                    window.clearInterval(updateIntervalID);
-                } 
+            <!--h3>
+            Community involvement
+            <a class='add-a-contribution'
+                style='text-decoration: none; font-size: 10pt;
+                letter-spacing: 0; margin-top: -3px; float: left;'
+                onmouseover="$(this).find('span').css('text-decoration','underline');"
+                onmouseout="$(this).find('span').css('text-decoration','none');"
+                href='/people/{{person.user.username}}/involvement/add/input'>
+                <img src='/static/images/icons/Add.png' alt='+' /><span>Add</span>
+            </a>
+            </h3-->
+            {% comment %}
+            Old importer {{{
+            {% if person.poll_on_next_web_view %}
+            <script type='text/javascript'>
+                // FIXME: Change host
+                url = '/people/{{ person.user.username }}/test_commit_importer_json';
+            updateIntervalID = window.setInterval(updateCommitImporterStatus, 2000);
+            function updateCommitImporterStatus() {
+                function updateStatusDialog(json) {
+                    success = (json[0].success == 1);
+                    status = "status";
+                    if (success) {
+                        status_html = "<img src='/static/images/data-ready.png' style='float: left;'/> <div style='float: left;'>"
+                            + "{{person.user.username}}'s code contributions have been imported. "
+                            + "<a href='/people/{{ person.user.username }}/tabs/involvement'>"
+                            + "Follow this link to see them</a>.</div>";
+                        $('#commit-importer-status').html(status_html).addClass('done');
+                        window.clearInterval(updateIntervalID);
+                    } 
+                }
+                $.getJSON(url, updateStatusDialog);
             }
-            $.getJSON(url, updateStatusDialog);
-        }
-    </script>
+            </script>
 
-    <div id='commit-importer-status'>
-        <img src='/static/images/throbber.gif' />
-        <span style='position: relative; top: -11px;'>
-            Importing <strong>{{person.user.username}}</strong>'s
-            code contributions from around the web...
-        </span>
-    </div>
-    {% endif %}
-            {% if projects %}
-            <ul>
-                {% for project, more_project_attributes in projects.items %}
-                <li>
-                <!-- {{{ -->
-                <div class='project-escutcheon'>
-                    <div class='logo'>
-                        <img alt='logo for {{project.name}}' src='/people/project_icon/{{ project.name }}'/>
-                    </div>
-                    <div class='name'>{{ project.name }}</div>
-                    {% comment %}
-                    <div class='tags'>
-                        {% for tag in more_project_attributes.tags %}
-                        <a href=''>{{ tag.text }}</a>,
-                        {% endfor %}
-                    </div>
-                    {% endcomment %}
-                </div>
-                <ul class='contrib-descriptions'>
-                    {% for exp, more_exp_attributes in more_project_attributes.experiences.items %}
+            <div id='commit-importer-status'>
+                <img src='/static/images/throbber.gif' />
+                <span style='position: relative; top: -11px;'>
+                    Importing <strong>{{person.user.username}}</strong>'s
+                    code contributions from around the web...
+                </span>
+            </div>
+            {% endif %}
+            }}}
+            {% endcomment %}
+            <div class='project-display project-viewer column'>
+                <h4>Projects</h4>
+                {% if projects %}
+                <ul>
+                    {% for project, more_project_attributes in projects.items %}
                     <li>
-                    <div class='make-projectexp-favorite'>
-                        <form name='make-exp-favorite-{{ exp.id }}' 
-                            method='POST'
-                            action='/people/make_favorite_project_exp'>
-                            <input type='hidden' name='username'
-                            value='{{ person.user.username }}'/>
-                            <input type='hidden' name='exp_id'
-                            value='{{ exp.id }}'/>
-                            <input type='image' src='/static/images/icons/star-off.png'/>
-                            <!--input type='submit' value='Make Favorite' /-->
-                        </form>
+                    <!-- {{{ -->
+                    <div class='project-escutcheon'>
+                        <div class='logo'>
+                            <a href='/people/{{ person.user.username }}/projects/{{ project.name }}'>
+                                <img alt='logo for {{project.name}}'
+                                src='/people/project_icon/{{ project.name }}'/>
+                            </a>
+                        </div>
+                        <a href='/people/{{ person.user.username }}/projects/{{ project.name }}' 
+                            class='name'>{{ project.name }}</a>
+                        {% comment %}
+                        <div class='tags'>
+                            {% for tag in more_project_attributes.tags %}
+                            <a href=''>{{ tag.text }}</a>,
+                            {% endfor %}
+                        </div>
+                        {% endcomment %}
                     </div>
-                    <div class='description'>
-                        {% if exp.url %}
-                        <a href='{{ exp.url }}'>
-                        {% endif %}
-                            {{ exp.description }}
-                        {% if exp.url %}
-                        </a>
-                        {% endif %}
-                    </div>
-                    <div class='description'>
-                        {% if exp.man_months and exp.primary_language %}
-                        Months: {{ exp.man_months }}
-                        <br/>Primary language: {{ exp.primary_language }}.
-                        {% else %}
-                        {% if exp.man_months %}
-                        Months: {{ exp.man_months }}
-                        {% endif %}
-                        {% if exp.primary_language %}
-                        <br/>Primary language: {{ exp.primary_language }}.
-                        {% endif %}
-                        {% endif %}
-                    </div>
-                    <div class='delete-projectexp'>
-                        <form name='delete-projectexp-{{ exp.id }}'
-                            method='POST'
-                            action='/people/delete-experience/do'>
-                            <input type='hidden' name='id'
-                            value='{{ exp.id }}'/>
-                            <input type='submit' value='Delete'/>
-                        </form>
-                    </div>
-                    {% comment %}
-                    <img src='/static/images/icons/Add.png' alt='show more'
-                    class='show-more-link'>
-                    {% endcomment %}
-                    <!--div class='more description'>pretty l33t hax0ring</div-->
-                    <div class='tags'>
-                        {% if more_exp_attributes.tags %}
-                        {% for tag in more_exp_attributes.tags %}
-                        {{ tag.text }}
-                        {% endfor %}
-                        {% else %}
-                        {% endif %}
-                        <a href="/people/{{people.username}}/edit-exp/tags/{{exp.id}}"
-                            >tag this</a>
-                    </div>
+                    <!-- }}} -->
                     </li>
                     {% endfor %}
                 </ul>
-                <!-- }}} -->
-                </li>
-                {% endfor %}
-            </ul>
-            {% else %}
-            <div style='float: left; width: 400px;'>No contributions listed.</div>
-            <!--form method='post' action='/people/xp_slurp_do'>
+                {% else %}
+                <div style='float: left; width: 400px;'>No contributions listed.</div>
+                <!--form method='post' action='/people/xp_slurp_do'>
                 <input type='submit' value='Import code contributions automatically from around the Internet.' />
                 <input type='hidden' name='u' value='{{person.user.username}}' />
-            </form-->
-            {% endif %}
-        </ul>
-        <!-- }}} -->
-    </div><!-- /#portfolio -->
-
-    <div id='software' class='widget' style='margin-top: 20px; display: none;'>
-        <!-- {{{ -->
-        <h3>Software I use (coming soon):</h3>
-        <ul>
-            <li>
-            <div class='icon'>
-                <img src='/static/images/icons/projects/iceweasel-100px.png' />
+                </form-->
+                {% endif %}
             </div>
-            <div class='project-name'>iceweasel-3.5b</div>
-            </li>
-            <li>
-            <img src='/static/images/icons/projects/songbird-100px.png' />
-            <div class='project-name'>songbird-1.2.0</div>
-            </li>
-            <li>
-            <img src='/static/images/icons/projects/f-spot-100px.png' />
-            <div class='project-name'>f-spot-3.1.0</div>
-            </li>
-        </ul>
+            <!-- }}} -->
+        </div><!-- /#portfolio -->
         <!-- }}} -->
-    </div><!-- /#software -->
+    </div> <!-- /#right -->
 
-    <div id='system' class='widget' style='display: none;'>
-        <!-- {{{ -->
-        <h3>systems:</h3>
-        <ul>
-            <li>
-            <img src='/static/images/icons/projects/ubuntu-50px.png' />
-            ubuntu jaunty
-            </li>
-        </ul>
-        <!-- }}} -->
-    </div><!-- /#system -->
-    <!-- }}} -->
-</div> <!-- /#left -->
-
-</div><!-- /# widget -->
+</div> <!-- /#content -->
 
 {% include 'profile/footer.html' %}
+{% include 'profile/footer.global.html' %}

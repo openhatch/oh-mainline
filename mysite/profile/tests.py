@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# vim: set ai et ts=4 sw=4 nu:
+# vim: set ai et ts=4 sw=4 nu columns=80:
 # Testing suite for profile
 
 # Imports {{{
@@ -452,11 +452,8 @@ class PersonInvolvementTests(django.test.TestCase):
         # }}}
 
     def test_remove_cchost_involvement(self):
-        '''This test:
-        * Logs in
-        * Discovers that the ccHost involvement is on the page
-        * Posts to where the delete button should POST to
-        * Discovers that the ccHost involvement is gone.'''
+        '''The server can log in paulproteus remove the word 'ccHost' from his profile by posting to the delete controller's URL.'''
+        # {{{
         client = Client()
         username='paulproteus'
         client.login(username=username,
@@ -476,51 +473,83 @@ class PersonInvolvementTests(django.test.TestCase):
         
         # Now re-GET the profile
         response = client.get(person_page)
+
         # See! It no longer talks about ccHost!
         self.assertNotContains(response, 'ccHost')
-
+        # }}}
 
     def test_remove_cchost_involvement_click(self):
-        '''This test:
-        * Logs in
-        * Discovers that the ccHost involvement is on the page
-        * Clicks the Delete button
-        * Discovers that the ccHost involvement is gone.'''
+        '''Notorious user of OpenHatch, paulproteus, can log in and remove the word 'ccHost' from his profile by clicking the appropriate delete button.'''
+        # {{{
+
+        # Visit login page
+        login_url = 'http://openhatch.org/people/login'
+        tc.go(make_twill_url(login_url))
 
         # Log in
-        username='paulproteus'
-
-        tc.go(make_twill_url('http://openhatch.org/people/login'))
+        username = "paulproteus"
+        password = "paulproteus's unbreakable password"
         tc.fv('login', 'login_username', username)
-        tc.fv('login', 'login_password', "paulproteus's unbreakable password")
+        tc.fv('login', 'login_password', password)
         tc.submit()
 
-        # Load up the profile page; oh wait, we're already there.
+        # Load up the ProjectExp page.
+        project_name = 'ccHost'
+        exp_url = 'http://openhatch.org/people/%s/projects/%s/' % (
+                urllib.quote(username), urllib.quote(project_name))
+        tc.go(make_twill_url(exp_url))
 
-        tc.find('ccHost')
+        # See! It talks about ccHost!
+        tc.find(project_name)
 
-        # Click the right delete button...
+        # Click the correct delete button...
         tc.config('readonly_controls_writeable', True)
-        tc.fv('delete-projectexp-13', 'id', '13') # no-op
+        tc.fv('delete-projectexp-13', 'id', '13')   # Bring twill's attention
+                                                    # to the form named
+                                                    # ``delete-projectexp-13''.
         tc.submit()
 
         # Alakazam! It's gone.
         tc.notfind('ccHost')
+        # }}}
+
+    def test_cannot_delete_exps_without_id(self):
+        '''While paulproteus is logged in, he posts directly to /people/delete-experience/do without specifying the id of the projectexp you want to delete. The server returns a 500 error and a check string.'''
+        # {{{
+        
+        client = Client()
+        username='paulproteus'
+        client.login(username=username,
+                     password="paulproteus's unbreakable password")
+
+        person_page = '/people/%s/' % urllib.quote(username)
+        
+        # POST saying we want to delete the
+        # ccHost experience...
+        # But it's missing the ID!
+        post_data = {}
+        response = client.post('/people/delete-experience/do',
+                post_data)
+        
+        self.assertEquals(response.status_code, 500)
+        # }}}
 
     def test_person_involvement_description(self):
         # {{{
-        url = 'http://openhatch.org/people/paulproteus/tabs/involvement'
+        username = 'paulproteus'
+        project_name = 'ccHost'
+        url = 'http://openhatch.org/people/%s/projects/%s' % (
+                urllib.quote(username), urllib.quote(project_name))
         tc.go(make_twill_url(url))
-        tc.find('Month')
-        tc.find('Months: 1')
+        tc.find('1 month')
+        tc.find('shell script')
         # }}}
 
     def test_tag_editor(self):
         # {{{
-        tc.follow('tags')
+        tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
         tc.follow('Edit')
-        url = 'http://openhatch.org/people/paulproteus/'
-        tc.find('Edit tags')
+        tc.find('Edit info')
         # }}}
 
     def test_tag_editor_save(self):
@@ -590,14 +619,10 @@ class CeleryTests(django.test.TestCase):
     def tearDown(self):
         twill_teardown()
 
-    def test_slow_loading_via_emulated_bgtask(self,
-                                              use_cooked_data=True):
-        """
-        1. Go to the page that has paulproteus' data.
-        2. Verify that the page doesn't yet know about ccHost
-        3. Run the celery task ourselves, but instead of going to Ohloh, we hand-prepare data for it.
-        """
-        username='paulproteus'
+    def test_slow_loading_via_emulated_bgtask(self, 
+            use_cooked_data=True):
+        """1. Go to the page that has paulproteus' data.  2. Verify that the page doesn't yet know about ccHost. 3. Run the celery task ourselves, but instead of going to Ohloh, we hand-prepare data for it."""
+
         url = '/people/paulproteus/test_commit_importer_json'
         
         good_input = {
@@ -605,13 +630,16 @@ class CeleryTests(django.test.TestCase):
             }
         
         client = Client()
+        username='paulproteus'
+        password="paulproteus's unbreakable password"
         client.login(username=username,
-                     password="paulproteus's unbreakable password")
+                     password=password)
 
         # Ask if background job has been completed.
         # We haven't called it, so the answer should be no.
         response_before = client.get(url, good_input)
-        self.assertEquals(simplejson.loads(response_before.content),
+        self.assertEquals(
+                simplejson.loads(response_before.content),
                 [{'success': 0}])
 
         # Ask if involvement fact has been loaded.
@@ -622,15 +650,19 @@ class CeleryTests(django.test.TestCase):
 
         # do the background load ourselves
         if use_cooked_data:
-            cooked_data = [{'man_months': 1, 'project': u'ccHost',
-            'project_homepage_url': u'http://wiki.creativecommons.org/CcHost',
-            'primary_language': u'shell script'}]
+            cooked_data = [{
+                'man_months': 1,
+                'project': u'ccHost',
+                'project_homepage_url':
+                u'http://wiki.creativecommons.org/CcHost',
+                'primary_language': u'shell script'}]
         else:
             cooked_data=None
 
         # Instantiate the task
-        # For us, commit_username is also paulproteus. The above cooked_data
-        # is a snapshot of paulproteus's contributions as indexed by Ohloh.
+        # For us, commit_username is also paulproteus.
+        # The above cooked_data is a snapshot of 
+        # paulproteus's contributions as indexed by Ohloh.
         commit_username=username # = 'paulproteus'
 
         task = tasks.FetchPersonDataFromOhloh()
@@ -778,7 +810,7 @@ class SetAPasswordTests(django.test.TestCase):
         tc.go(make_twill_url('http://openhatch.org/'))
         tc.fv('create_profile', 'create_profile_username', 'ziggy')
         tc.submit()
-        # Should be at paulproteus' profile.
+        # Should be at ziggy's profile.
         tc.find('ziggy')
         tc.follow("Sign up to save your work")
         tc.find("Password: ")

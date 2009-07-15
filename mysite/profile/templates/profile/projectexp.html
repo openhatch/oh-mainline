@@ -1,0 +1,122 @@
+{% include 'profile/header.global.html' %}
+{% include 'profile/header.html' %}
+{% include 'profile/personal.html' %}
+
+<!-- begin profile/projectexp.html -->
+<div id='right'>
+    <div class='single-project column project-display project-viewer'>
+        <!-- {{{ -->
+        <a href='/people/{{ person.user.username }}'>All projects</a>
+        <div id='role-details' class='section'>
+            <div class='section-heading'>
+                <h4>Role</h4>
+            </div>
+            <div class='section-content' id='role'>
+                <h5>Translator, {{ exp.project.name }}</h5>        
+                <p id='role-description'>
+                Worked on translating Preferences dialog into Mandarin and Tagalog.
+                </p>
+            </div>
+            {% if exp.url %}
+            <div class='section-heading'>
+                <h4>Link</h4>
+            </div>
+            <div class='section-content'>
+                <a href='{{ exp.url }}'>{{ exp.url }}</a>
+            </div>
+            {% endif %}
+            <div class='section-heading'>
+                <h4>Specifics</h4>
+            </div>
+            <div class='section-content'>
+                {% if exp.man_months and exp.primary_language %}
+                Coded for about
+                {{ exp.man_months }} month(s)
+                in {{ exp.primary_language }}.
+                {% else %}
+                {% if exp.man_months %}
+                Coded for about 
+                {{ exp.man_months }} month(s)
+                {% endif %}
+                {% if exp.primary_language %}
+                Coded mostly in {{ exp.primary_language }}.
+                {% endif %}
+                {% endif %}
+            </div>
+        </div>
+        <div class='make-projectexp-favorite'>
+            <form name='make-exp-favorite-{{ exp.id }}' 
+                method='POST'
+                action='/people/make_favorite_project_exp'>
+                <input type='hidden' name='username'
+                value='{{ person.user.username }}'/>
+                <input type='hidden' name='exp_id'
+                value='{{ exp.id }}'/>
+                <input type='image' src='/static/images/icons/star-off.png'/>
+                <!--input type='submit' value='Make Favorite' /-->
+            </form>
+        </div>
+        <div class='description'>
+        </div>
+        <div class='tags'>
+            {% if more_exp_attributes.tags %}
+            {% for tag in more_exp_attributes.tags %}
+            {{ tag.text }}
+            {% endfor %}
+            {% else %}
+            {% endif %}
+            <a href="/people/{{people.username}}/edit-exp/tags/{{exp.id}}"
+                >tag this</a>
+        </div>
+        <div class='section about-this-project'>
+            <div class='section-heading'>
+                <h4>About this project</h4>
+            </div>
+            <div class='section-content' id='role'>
+                <div id='project-description'>
+                    <h5>{{ exp.project.name }}</h5>
+                    <p>
+                    {{ exp.project.description }}
+                    </p>
+                </div>
+                <div id='project-escutcheon'>
+                    <a href='#'>
+                        <img src='{{ exp.project.icon_url }}' />
+                        <div class='name'>
+                            {{ exp.project.name }}
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class='section other-contributors'>
+            <div class='section-heading'>
+                <h4>Other contributors</h4>
+            </div>
+            <div class='section-content' id='role'>
+                <ul id='contributors'>
+                    <li><a href=''><img class='logo' src='/static/images/profile-photos/iris-40px.jpg' width='40' />
+                        <span>Somebody</span></a></li>
+                    <li><a href=''><img class='logo' src='/static/images/profile-photos/selleck-40px.jpg' width='40' />
+                        <span>Somebody</span></a></li>
+                    <li><a href=''><img class='logo' src='/static/images/profile-photos/collins-40px.jpg' width='40' />
+                        <span>Somebody</span></a></li>
+                    <li><a href=''><img class='logo' src='/static/images/profile-photos/sufjan-40px.jpg' width='40' />
+                        <span>Somebody</span></a></li>
+                </ul>
+            </div>
+        </div>
+        <div class='delete-projectexp'>
+            <form name='delete-projectexp-{{ exp.id }}'
+                method='POST' action='/people/delete-experience/do'>
+                <input type='hidden' name='id' value='{{ exp.id }}'/>
+                <input type='submit' value='Delete'/>
+            </form>
+        </div>
+        <!-- }}} -->
+    </div>
+</div> <!-- /#right -->
+<!-- end profile/projectexp.html -->
+
+{% include 'profile/footer.html %}
+{% include 'profile/footer.global.html' %}

@@ -3,11 +3,11 @@
 
 {% if not edit %}
 <h3>
-    <div style='float: left; margin-right: 20px; margin-top: 0;'>Tags</div>
+    <div style='float: left; margin-right: 20px; margin-top: 0;'>Info</div>
     <a href='/people/{{person.user.username}}/tags/edit' style=' font-size: 10pt;'>[Edit]</a>
 </h3>
 {% else %}
-    <h3 style='float: left; margin-top: 20px; '>Edit tags</h3>
+    <h3 style='float: left; margin-top: 20px; '>Edit info</h3>
 {% endif %}
 
 <div id='widgets'>
@@ -92,13 +92,3 @@
 </div><!-- /# widgets-->
 
 {% include 'profile/footer.html' %}
-
-{% comment %}
-<form name='what_you_like_working_on' method='POST' 
-    action='/people/change_what_like_working_on'>
-    <textarea name='like-working-on'
-        >{{ person.interested_in_working_on }}</textarea>
-    <input type='hidden' name='username' value='{{ person.user.username }}' />
-    <input type='submit' value='save'/>
-</form>
-{% endcomment %}
