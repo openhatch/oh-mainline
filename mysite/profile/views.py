@@ -25,34 +25,19 @@ from customs import ohloh
 
 # Add a contribution {{{
 
-def person_involvement_add_input(request, username):
+def projectexp_add_do(request):
     # {{{
-    project_name = request.GET.get('project_name', '')
-    description = request.GET.get('description', '')
-    url = request.GET.get('url', '')
-    alteration_type = request.GET.get('alteration_type', 'add')
-
-    return render_to_response('profile/involvement/add.html', {
-        'person': Person.objects.get(user__username=username),
-        'project_name': project_name,
-        'description': description,
-        'url': url,
-        'alteration_type': alteration_type,
-        'title': 'openhatch / %s / add involvement ' % username
-        })
-    # }}}
-
-def person_involvement_add(request):
-    # {{{
-    username = request.POST['u']
-    project_name = request.POST.get('project_name', '')
-    description = request.POST.get('description', '')
-    url = request.POST.get('url', '')
+    project_name = request.POST['project__name']
+    description = request.POST.get('project_exp__description', '')
+    url = request.POST.get('project_exp__url', '')
     format = request.POST.get('format', 'html')
 
+    username = request.user.username
     notification = ''
-    if username and project_name and description and url:
-        ProjectExp.create_from_text(username, project_name, description, url)
+    if project_name and description and url:
+        ProjectExp.create_from_text(
+                username, project_name,
+                description, url)
         notification = "Added %s's experience with %s." % (
                 username, project_name)
     else:
@@ -65,8 +50,9 @@ def person_involvement_add(request):
     data = profile_data_from_username(username)
     data['notification'] = notification
 
-    return HttpResponseRedirect('/people/%s?' % urllib.quote(username) +
-            urllib.urlencode({'tab': 'inv'}))
+    url_that_displays_project_exp = '/people/%s/projects/%s/' % (
+            urllib.quote(username), urllib.quote(project_name))
+    return HttpResponseRedirect(url_that_displays_project_exp)
     #}}}
 
 # }}}
@@ -228,6 +214,12 @@ def display_person_project_web(request, input_username, name):
     data['exp'] = get_object_or_404(ProjectExp,
             person__user__username=input_username, project__name=name)
     return render_to_response('profile/projectexp.html', data)
+projectexp_display = display_person_project_web
+
+def projectexp_add_form(request):
+    person = request.user.get_profile()
+    data = data_for_person_display_without_ohloh(person)
+    return render_to_response('profile/projectexp_add.html', data)
 
 def display_person(user, logged_in_user, tab, edit):
     # {{{
@@ -718,6 +710,7 @@ def new_user_do(request):
     # }}}
 
 def delete_experience_do(request):
+    # {{{
     person = request.user.get_profile()
 
     try:
@@ -738,3 +731,4 @@ def delete_experience_do(request):
 
     return HttpResponseRedirect('/people/%s/' % urllib.quote(
             request.user.username))
+    # }}}

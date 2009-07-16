@@ -222,7 +222,7 @@ p {
     padding: .3em .7em;
     padding-top: 0;
     float: left;
-    font-size: 13px;
+    font-size: 11px;
     background-color: #eef;
 }
 #opps li .details .fields {
@@ -366,8 +366,7 @@ a:focus {
     width: 500px;
 }
 #opps form label {
-    border: solid #99CCFF;
-    border-width: 3px;
+    border-right: 3px solid #99CCFF;
     float: left;
     background-color: #fff;
     font-size: 19px;
@@ -377,7 +376,7 @@ a:focus {
 }
 #opps form input[type='text'] {
     border: none;
-    background-color: #99CCFF;
+    background-color: #fff; /*#99CCFF;*/
     font-size: 19px;
     font-family: arial;
     padding: 9px;
@@ -385,9 +384,9 @@ a:focus {
     color: #222;
 }
 #opps form input[type='submit'] {
-    border: solid #66BB33;
-    border-width: 3px;
-    background-color: #fff;
+    background-color: #99CCFF;
+    border: 0;
+    color: #fff;
     font-size: 19px;
     font-family: arial;
     padding: 6px;
@@ -397,5 +396,8 @@ a:focus {
     color: #444;
 }
 .good-for-beginners img {
+}
+.bug {
+    background-color: #fff;
 }
 /* vim: set ai ts=4 sts=4 et sw=4: */

@@ -99,7 +99,7 @@ ul#links {
     display: inline;
 }
 
-/*ul#user-actions {
+ul#user-actions {
     margin: 0;
     padding: 0;
     float: left;
@@ -133,7 +133,7 @@ ul#user-actions a {
 }
 
 #importer {
-    width: 900px;
+    width: 940px;
     padding: 20px;
     border: 10px solid #fff;
     float: left;
@@ -161,6 +161,15 @@ ul#user-actions a {
     font-size: 11pt;
 }
 
+#importer input[type='text'] {
+    font-size: 11pt;
+}
+#importer input[type='submit'] {
+    float: left; margin-left: 10px;
+    position: relative;
+    top: 8px;
+    padding: 5px;
+}
 #content {
     float: left;
     width: 960px;
@@ -367,8 +376,6 @@ input[type='text'] {
     border-width: 1px; 
     background-color: #fff; d9eeff;
     border-bottom-color: #ccc;
-    margin-top: 5px;
-    margin-bottom: 2px;
 }
 textarea {
     padding: 10px;
@@ -505,6 +512,8 @@ img {
 #nameplate .name {
     float: left;
     width: 200px;
+    font-weight: normal;
+    margin-bottom: 10px;
 }
 .usernames {
     float: left;
@@ -590,7 +599,7 @@ h4 {
 
 .project-display {
     float: left;
-    width: 440px;
+    width: 480px;
     margin-bottom: 20px;
 }
 .project-display ul {

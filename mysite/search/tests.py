@@ -110,8 +110,9 @@ class TestNonJavascriptSearch(django.test.TestCase):
 
     def testMatchingBugsFromMtoN(self):
         response = self.client.get('/search/')
-        self.failUnlessEqual(response.context['start'], 1)
-        self.failUnlessEqual(response.context['end'], 10)
+        ctxt_we_care_about = [c for c in response.context if 'start' in c][0]
+        self.failUnlessEqual(ctxt_we_care_about['start'], 1)
+        self.failUnlessEqual(ctxt_we_care_about['end'], 10)
 
     def testSearchWithArgs(self):
         url = 'http://openhatch.org/search/'

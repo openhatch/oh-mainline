@@ -12,9 +12,9 @@
                 <h4>Role</h4>
             </div>
             <div class='section-content' id='role'>
-                <h5>Translator, {{ exp.project.name }}</h5>        
+                <h5>Contributor, {{ exp.project.name }}</h5>        
                 <p id='role-description'>
-                Worked on translating Preferences dialog into Mandarin and Tagalog.
+                {{ exp.description }}
                 </p>
             </div>
             {% if exp.url %}
@@ -44,6 +44,7 @@
                 {% endif %}
             </div>
         </div>
+        {% if show_favorite %}
         <div class='make-projectexp-favorite'>
             <form name='make-exp-favorite-{{ exp.id }}' 
                 method='POST'
@@ -56,6 +57,7 @@
                 <!--input type='submit' value='Make Favorite' /-->
             </form>
         </div>
+        {% endif %}
         <div class='description'>
         </div>
         <div class='tags'>
@@ -65,8 +67,6 @@
             {% endfor %}
             {% else %}
             {% endif %}
-            <a href="/people/{{people.username}}/edit-exp/tags/{{exp.id}}"
-                >tag this</a>
         </div>
         <div class='section about-this-project'>
             <div class='section-heading'>
@@ -81,7 +81,7 @@
                 </div>
                 <div id='project-escutcheon'>
                     <a href='#'>
-                        <img src='{{ exp.project.icon_url }}' />
+                        <img src='/static/project-icons/{{ exp.project.icon_url }}' />
                         <div class='name'>
                             {{ exp.project.name }}
                         </div>

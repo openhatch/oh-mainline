@@ -22,6 +22,8 @@ a img {
     width: 900px;
 }
 #wrapper-inner {
+    float: left;
+    margin-top: 30px;
 }
 
 h1 {
@@ -68,10 +70,10 @@ h4 {
 
 span {
     font-weight: bold;
+    background-color: #fff;
 }
 
 #banner {
-    margin: -30px 0 0 0;
     width: 350px;
     float: left;
 }
@@ -95,6 +97,8 @@ span {
 
 #stuff-to-do li {
     list-style-type: none;
+    border: 10px solid #fff;
+    background: url('/static/images/motif.png');
 }
 
 #stuff-to-do span {

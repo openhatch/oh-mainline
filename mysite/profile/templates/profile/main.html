@@ -3,16 +3,11 @@
 
 <div id='content'>
 
-<div id='save-me'>
-    Two-field sign up:
-    Username: <input type='text' name='username' />
-    Password: <input type='text' name='password_raw' />
-</div>
-
 {% include 'profile/personal.html' %}
 
     <div id='right'>
         <!-- {{{ -->
+        <a href='/form/projectexp_add'>Add project to your portfolio.</a>
         <div id='portfolio'>
             <!-- {{{ -->
             <!--h3>
@@ -76,13 +71,6 @@
                         </div>
                         <a href='/people/{{ person.user.username }}/projects/{{ project.name }}' 
                             class='name'>{{ project.name }}</a>
-                        {% comment %}
-                        <div class='tags'>
-                            {% for tag in more_project_attributes.tags %}
-                            <a href=''>{{ tag.text }}</a>,
-                            {% endfor %}
-                        </div>
-                        {% endcomment %}
                     </div>
                     <!-- }}} -->
                     </li>

@@ -73,16 +73,18 @@
                 <h3><span>Do you contribute to open source software?</span></h3>
                     
                 <h3>Then OpenHatch is here for you!</h3>
-                <h2>Just tell us your <span>skills</span>, <span>experience</span>, and <span>interests</span>, and we help you:</h2>
-                <ul><li><span>find tailored ways that you can help</span> with open source projects; </li>
-                <li><span>find people</span> who like the same programs and projects as you do; and</li>
-                <li><span>track and show off</span> all your open source software experience in one place.</li></ul>
+                <!--h2>Just tell us your <span>skills</span>, <span>experience</span>, and <span>interests</span>, and we help you:</h2-->
+                <ul><li><span>Find tailored ways that you can help</span> with open source projects</li>
+                <li><span>Find people</span> who like the same projects as you do</li>
+                <li><span>Track and show off</span> all your open source software experience in one place</li></ul>
                 <h3>To get started...</h3> 
                     <ul id='stuff-to-do'>
                         <li>
                         <form id='create_profile' name='create_profile'
                             action='/people/new/do' method='POST'>
                             <div class='form-row'>
+                                <label for='create_profile_username'>Username</label>
+                                <input type='text' name='create_profile_username' id='create_profile_username' />
                                 <input type='submit' id='create-profile' value='Create a profile' />
                             </div>
                         </form>

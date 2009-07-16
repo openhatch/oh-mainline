@@ -67,6 +67,7 @@ def fetch_bugs(request):
         next_page_query_str['start'] = end + 1
         next_page_query_str['end'] = end + diff + 1
         return render_to_response('search/search.html', {
+            'the_user': request.user,
             'bunch_of_bugs': bugs,
             'developer_name': "Orrin Hatch",
             'language': query,

@@ -59,7 +59,7 @@ class ProfileTests(django.test.TestCase):
     def testSlash(self):
         response = self.client.get('/people/')
 
-    def test__add_contribution(self):
+    def test__projectexp_add(self):
         username = 'paulproteus'
 
         project_name = 'seeseehost'
@@ -76,39 +76,6 @@ class ProfileTests(django.test.TestCase):
         projects = [thing[0].project.name for thing in
                     data['exp_taglist_pairs']]
         self.assert_('seeseehost' in projects)
-        # Delete it!
-        exp.delete()
-
-    def test__add_contribution__web(self):
-        # {{{
-        url_prefix = "http://openhatch.org"
-        username = 'paulproteus'
-        #person = Person.objects.get(user__username=username)
-        #first_exp = ProjectExp.objects.filter(person=person)[0]
-        url = '%s/people/%s/involvement/add/input' % (
-                url_prefix, username)
-        tc.go(make_twill_url(url))
-
-        tc.fv('add_contrib', 'project_name', 'Babel')
-        tc.fv('add_contrib', 'description', 'msgctxt support')
-        tc.fv('add_contrib', 'url', 'http://babel.edgewall.org/ticket/54')
-        tc.submit()
-
-        tc.find('Babel')
-
-        # Go to old form again
-        tc.go(make_twill_url(url))
-        tc.fv('add_contrib', 'project_name', 'Baber')
-        tc.fv('add_contrib', 'description', 'msgctxt support')
-        tc.fv('add_contrib', 'url', 'http://babel.edgewall.org/ticket/54')
-        tc.submit()
-
-        # Verify that leaving and coming back has it still
-        # there
-        tc.go(make_twill_url(url_prefix + '/people/paulproteus?tab=inv'))
-        tc.find('Babel')
-        tc.find('Baber')
-        # }}}
 
     def test__project_exp_create_from_text__unit(self):
         # {{{
@@ -213,9 +180,9 @@ class TrentonTests(django.test.TestCase):
         url = 'http://openhatch.org/people/paulproteus?tab=inv'
         # Add an experience
         tc.go(make_twill_url(url))
-        tc.fv('add_contrib', 'project_name', 'TrentonProj3')
-        tc.fv('add_contrib', 'url', 'http://example.com')
-        tc.fv('add_contrib', 'description', 'Totally rad')
+        tc.fv('projectexp_add', 'project_name', 'TrentonProj3')
+        tc.fv('projectexp_add', 'url', 'http://example.com')
+        tc.fv('projectexp_add', 'description', 'Totally rad')
         tc.submit()
         tc.find('TrentonProj3')
 
@@ -435,18 +402,28 @@ class PersonInvolvementTests(django.test.TestCase):
     def tearDown(self):
         twill_teardown()
 
-    def test_person_involvement_add(self):
+    def test_projectexp_add(self):
+        """Paulproteus can login and add a projectexp."""
         # {{{
-        url_prefix = 'http://openhatch.org'
-        username = 'paulproteus'
-        url = url_prefix + '/people/%s/involvement/add/input' % username
-        tc.go(make_twill_url(url))
-        tc.find('Add contribution')
-        tc.fv('add_contrib', 'project_name', 'bumble')
-        tc.fv('add_contrib', 'description', 'fiddlesticks')
-        tc.fv('add_contrib', 'url', 'http://example.com')
+
+        # Visit login page
+        login_url = 'http://openhatch.org/people/login'
+        tc.go(make_twill_url(login_url))
+
+        # Log in
+        username = "paulproteus"
+        password = "paulproteus's unbreakable password"
+        tc.fv('login', 'login_username', username)
+        tc.fv('login', 'login_password', password)
         tc.submit()
-        #tc.follow('involvement')
+
+        tc.follow('Add project to your portfolio')
+
+        tc.find('Add project to your portfolio')
+        tc.fv('projectexp_add', 'project__name', 'bumble')
+        tc.fv('projectexp_add', 'project_exp__description', 'fiddlesticks')
+        tc.fv('projectexp_add', 'project_exp__url', 'http://example.com')
+        tc.submit()
         tc.find('fiddlesticks')
         tc.find('http://example.com')
         # }}}
