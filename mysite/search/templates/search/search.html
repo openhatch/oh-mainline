@@ -48,19 +48,32 @@ OPP FINDER TEMPLATE
 
   </head>{% comment %} }}} {% endcomment %}
   <body>
-    <a href='/people/logout/'>Log out</a>
-    <div id='wrapper-outer'>
-      <div id='wrapper-inner'>
-
-        <style>
-          a { color: #333; }
-        </style>
-        {% comment %} Search and results {{{ {% endcomment %}
-        <div id='content'>
-
-            <img src='/static/images/logo.png'>
-          <div id='main'>
-
+        <div id='outermost'>
+            <div id='penoutermost'>
+        <div class='section' id='nav'>
+            <div class='center'>
+                <div class='float'>
+                <h2>
+                    <a href='/'>
+                        <img src='/static/images/the-logo-bluegreen-125px.png' 
+                        alt='openhatch' />
+                    </a>
+                </h2>
+                <ul id='links'>
+                    <li><a href=''>find people</a></li>
+                    <li><a href=''>find volunteer opportunities</a></li>
+                {% if the_user.is_authenticated %}
+                    {% if not the_user.has_unusable_password %}
+                    <li><a href='/people/logout/'>Log out</a></li>
+                    {% endif %}
+                {% endif %}
+                    <li><a href=''>log out</a></li>
+                </ul>
+            </div>
+            </div>
+            </div>
+            <div id='content'>
+            <div id='main'>
             <div id='opps' class='gewgaws box'>
 
               {% comment %} Search form {{{ {% endcomment %}
@@ -188,11 +201,6 @@ OPP FINDER TEMPLATE
         <div id='sidebar'>
           <div id='projects' class='box' style='margin-top: 40px;'>
             <h2 style='margin-bottom: 10px;'>Suggested searches:</h2>
-            <style>
-              #projects a {
-                color: #d0715f;
-              }
-            </style>
             <ul>
               <li><a href='/search/?language=exaile'>user_interface_design</a></li>
               <li><a href='/search/?language=ruby_on_rails'>ruby_on_rails</a></li>

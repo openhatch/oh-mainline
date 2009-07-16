@@ -1,68 +1,111 @@
 body {
-    font: .85em/130% Arial, "Bitstream Vera Sans", "Lucida Grande", Verdana, Arial, sans-serif;
-    background-color: #f4f4bc;
-    background-color: #eef;
-    background-color: #d8f171; #fcffd9;
-    background-color: #fff;
-    color: #3d2f25; 
+    font: 8pt Verdana, Bitstream Vera Sans, Arial, sans-serif;
+    background: url('/static/images/motif-blue.png');
+    margin: 0;
 }
+
+a {
+    color: #66AA33;
+    text-decoration: none;
+}
+a:hover {
+    color: #338800;
+    text-decoration: underline;
+}
+
+a img {
+    border-style: none;
+}
+
+h1 {
+    font-size: 32px; 
+    text-align: center;
+}
+
+h1 a {
+    color: #2288BB;
+    text-decoration: none;
+}
+
+h1 a:hover {
+    color: #223366;
+    text-decoration: none;
+}
+
 h1, h2, h3, h4, h5 {
     font-weight: normal;
     margin: 0;
 }
-#banner {
-    color: #446; #b5c200; 9cc200; #ff6e57;
-    font: bold 23pt Tuffy;
-    margin: 10px 0;
-    text-align: center;
-}
-img {
-    border: 0;
-}
-#explanation {
-    width: 500px;
+#outermost {
     margin: 0 auto;
+    width: 1000px;
 }
-.explanation-heading {
-    margin: 0 auto;
-}
-#explanation h3 {
+#penoutermost {
     float: left;
-    font-size: 19pt;
-    margin-bottom: 15px;
+    width: 1000px;
+}
+h1, h2, h3, h4 {
+    margin: 0;
+}
+#header {
+    width: 920px;
+    height: 80px;
+    color: #555;
     margin-top: 15px;
-}
-#explanation p {
+    padding: 5px 20px;
+    padding: 5px 65px 5px 5px;
+	}
+#headerlogo {
     float: left;
-    width: 500px;
-    font: 14pt Arial;
-    margin-bottom: 15px;
 }
-a {
-    color: #222; #ce1836; #59baa9; #446; #379;
+
+#nav {
+    padding: 10px 20px 0 20px;
+    float: left;
+    background-color: transparent;
+    width: 1000px;
+}
+#nav h2 {
+    width: 200px;
+    text-align: center;
+    float: left;
+}
+#nav h2 a {
+}
+#nav ul {
+    list-style: none;
+    margin: 0;
+    float: left;
+}
+#nav li {
+    float: left;
+    margin-right: 10px;
+    padding: 10px;
+}
+#nav li a {
+    padding: 1px 5px;
+    color: #777;
+    font-size: 9pt;
+    background-color: #fff; d8d8e4; 00afff; caffff; 7fc4ff;
+    padding: 5px 10px;
+    border: 1px solid #fcfcfc;
+    margin-top: 20px;
+    float: left;
     text-decoration: none;
-    color: #d0715f;
 }
-h1 {
-    font-size: 150%;
+#nav li a:hover {
+    color: #222;
 }
-#wrapper-outer {
-    margin: 0 auto;
-    width: 800px;
+ul#links {
+    margin-left: 20px;
 }
-#wrapper-inner {
+
+#links li {
+    display: inline;
 }
 #content {
-    /*background-color: #fcffd9; #d8f171; #fff;*/
     width: 800px;
     padding: 20px;
-    /*border: 5px solid #59baa9; #656273; #d2e6df;*/
-    /*-moz-border-radius: 10px;*/
-    /*
-    border-style: solid;
-    border-width: 1px;
-    border-color: #d8f171; #fcffd9;
-     */
     float: left;
 }
 .no-opps {
@@ -170,7 +213,7 @@ p {
 #opps li .age {
     float: right;
     padding: .3em .7em;
-    width: 75px;
+    width: 65px;
     text-align: right;
     color: #888;
 }
@@ -213,6 +256,15 @@ p {
     padding: 5px 10px;
     width: 435px;
     overflow: hidden;
+}
+
+.first-line a {
+    color: #2288BB;
+}
+
+.first-line a:hover {
+    color: #223366;
+    text-decoration: none;
 }
 #opps li.expanded .title {
 }
@@ -314,18 +366,18 @@ a:focus {
     width: 500px;
 }
 #opps form label {
-    border: solid #d6ffde;
-    border-width: 0 0 0 6px;
+    border: solid #99CCFF;
+    border-width: 3px;
     float: left;
     background-color: #fff;
     font-size: 19px;
     font-family: arial;
-    padding: 12px;
-    color: #666; #656273; b2c3be; 777;
+    padding: 6px 10px 7px 10px;
+    color: #555;
 }
 #opps form input[type='text'] {
     border: none;
-    background-color: #d6ffde; 777;
+    background-color: #99CCFF;
     font-size: 19px;
     font-family: arial;
     padding: 9px;
@@ -333,11 +385,12 @@ a:focus {
     color: #222;
 }
 #opps form input[type='submit'] {
-    border: none;
+    border: solid #66BB33;
+    border-width: 3px;
     background-color: #fff;
     font-size: 19px;
     font-family: arial;
-    padding: 9px;
+    padding: 6px;
     color: #222;
 }
 .good-for-beginners {

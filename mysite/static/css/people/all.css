@@ -4,14 +4,28 @@ body {
     margin: 0;
 }
 a {
-    color: #d0715f;
+    color: #66AA33;
     text-decoration: none;
 }
 a:hover {
+    color: #338800;
+    text-decoration: underline;
 }
+
 a img {
     border-style: none;
 }
+
+h1 a {
+    color: #2288BB;
+    text-decoration: none;
+}
+
+h1 a:hover {
+    color: #223366;
+    text-decoration: none;
+}
+
 ul {
     padding: 0;
     margin: 0;
@@ -29,7 +43,6 @@ h1, h2, h3, h4 {
     margin: 0;
 }
 #header {
-    background: url('/static/images/tracks-top.png') bottom right no-repeat;
     width: 920px;
     height: 80px;
     color: #555;
@@ -42,7 +55,7 @@ h1, h2, h3, h4 {
 }
 
 #nav {
-    padding: 20px;
+    padding: 10px 20px 0 20px;
     float: left;
     background-color: transparent;
     width: 1000px;
@@ -57,7 +70,6 @@ h1, h2, h3, h4 {
 #nav ul {
     list-style: none;
     margin: 0;
-    width: 400px;
     float: left;
 }
 #nav li {
@@ -74,6 +86,7 @@ h1, h2, h3, h4 {
     border: 1px solid #fcfcfc;
     margin-top: 20px;
     float: left;
+    text-decoration: none;
 }
 #nav li a:hover {
     color: #222;
@@ -81,7 +94,12 @@ h1, h2, h3, h4 {
 ul#links {
     margin-left: 20px;
 }
-ul#user-actions {
+
+#links li {
+    display: inline;
+}
+
+/*ul#user-actions {
     margin: 0;
     padding: 0;
     float: left;
@@ -114,31 +132,25 @@ ul#user-actions a {
  margin: -17px 6px 0 0;
 }
 
-#navlinks {
-    clear: right;
-    margin: 50px 0 0 0;
+#importer {
+    width: 900px;
+    padding: 20px;
+    border: 10px solid #fff;
+    float: left;
+    background-image: url('/static/images/motif-orange.png');
+    margin-bottom: 20px;
 }
 
-#navlinks ul {
-    float: right;
-    display: inline;
-    list-style-type: none;
+#importer h2 {
+    font-size: 16pt;
+    font-weight: normal;
+    margin-bottom: 5px;
+    color: #555;
 }
 
-#navlinks li {
-    padding: 0 0 0 20px;
-    display: inline;
-}
 
-#navlinks a {
-    color: #333;
-    font-size: 2.5em;
-    text-decoration: none;
-}
-
-#navlinks a:hover {
-    color: black;
-    text-decoration: none;
+#commit_username {
+    color: #555;
 }
 
 #enter-free-software-username {
@@ -149,32 +161,15 @@ ul#user-actions a {
     font-size: 11pt;
 }
 
-#content_container {
-    width: 1000px;
-    height: 836px;
-    margin: 0;
-    padding: 0;
-    background-image: url(/static/images/tracks.png);
-    background-repeat: repeat-y;
-    background-position: top right;
-}
 #content {
     float: left;
     width: 960px;
-}
-
-#footer_container{
-    float: left;
-    background: url('/static/images/hatchling.png') no-repeat center;
-    width: 1000px;
-    height: 90px;
-    margin: 30px 0 20px 0;
-    padding: 0;
+    padding: 0 20px 20px 20px;
 }
 
 #footer {
     float: left;
-    width: 900px;
+    width: 1000px;
     height: 60px;
     padding: 5px;
     margin: 0;
@@ -506,19 +501,6 @@ img {
 }
 #commit-importer-status.done {
     background-color: #ffc;
-}
-#importer {
-    width: 940px;
-    padding: 20px;
-    border: 10px solid #fff;
-    float: left;
-    background-image: url('/static/images/motif-orange.png');
-    margin-bottom: 20px;
-}
-#importer h2 {
-    font-size: 16pt;
-    font-weight: normal;
-    margin-bottom: 5px;
 }
 #nameplate .name {
     float: left;

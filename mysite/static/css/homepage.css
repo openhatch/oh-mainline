@@ -1,0 +1,123 @@
+body {
+    font: 8pt Verdana, Bitstream Vera Sans, Arial, sans-serif;
+    background: url('/static/images/motif-blue.png');
+    margin: 0;
+}
+
+a {
+    color: #66AA33;
+    text-decoration: none;
+}
+a:hover {
+    color: #338800;
+    text-decoration: underline;
+}
+
+a img {
+    border-style: none;
+}
+
+#wrapper-outer {
+    margin: 0 auto;
+    width: 900px;
+}
+#wrapper-inner {
+}
+
+h1 {
+    font-size: 24px; 
+    text-align: center;
+    padding: 0 0 15px 0;
+}
+
+h1 a {
+    color: #2288BB;
+    text-decoration: none;
+}
+
+h1 a:hover {
+    color: #223366;
+    text-decoration: none;
+}
+
+h1, h2, h3, h4, h5 {
+    font-weight: normal;
+    margin: 0;
+}
+
+h3 {
+    font-size: 20px;
+    text-align: center;
+    margin: 10px 0;
+}
+
+h2 {
+    text-align: center;
+    font-size: 14px;
+    margin: 5px 0;
+}
+
+h4 {
+    text-align: center;
+    font-family: Tuffy;
+    font-size: 36px;
+    font-style: italic;
+    color: #555;
+    margin: 10px 0 20px 0;
+}
+
+span {
+    font-weight: bold;
+}
+
+#banner {
+    margin: -30px 0 0 0;
+    width: 350px;
+    float: left;
+}
+#banner img {
+    border: 0;
+    width: 350px;
+}
+#explanation {
+    width: 500px;
+    margin: 40px 0 0 440px;
+}
+.explanation-heading {
+}
+
+#explanation p {
+    text-align: left;
+    width: 500px;
+    font: 14pt Arial;
+    margin-bottom: 15px;
+}
+
+#stuff-to-do li {
+    list-style-type: none;
+}
+
+#stuff-to-do span {
+    color: #2288BB;
+    font-weight: normal;
+    font-size: 140%;
+    }
+
+
+ul {
+    margin: 0;
+    padding: 0 0 0 10px;
+}
+li {
+    list-style: square;
+    font-size: 14px;
+}
+
+li a {
+    padding: 0 0 10px 0;
+    font-size: 140%;
+}
+p {
+    margin: 0;
+}
+/* vim: set ai ts=4 sts=4 et sw=4: */

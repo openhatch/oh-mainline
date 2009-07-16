@@ -13,7 +13,7 @@
 
         {% comment %} css {{{ {% endcomment %}
         <style>/*<![CDATA[*/
-            @import url('/static/css/all.css') all;
+            @import url('/static/css/homepage.css') all;
             @import url('/static/css/jquery.autocomplete.css') screen;
             /*@import url('/static/css/gewgaws.css');*/
             /*]]>*/</style>
@@ -57,9 +57,12 @@
                     {% endif %}
 
                 {% comment %} Logo and explanation {{{ {% endcomment %}
-                <h2 id='banner'>
-                    <img alt='OpenHatch' src='/static/images/openhatch2.png'/>
-                </h2>
+                <div id='banner'>
+                    <img alt='OpenHatch' src='/static/images/the-logo.png'/>
+                    <h1>Find: <a href='/people'>people</a>, <a href='/search'>volunteer opportunities</a>.</h1>
+                </div>
+                
+
                 <div id='explanation'>
                     <!--p style='text-align: center;'>
                     <h3 style=''>Dig in!</h3>
@@ -67,62 +70,25 @@
                     <p>Here you can <strong>find opportunities to volunteer in software engineering and design</strong>, and
                     <strong>meet other volunteers</strong>.</p-->
 
-                    <p style='font-size: 21pt; text-align: center;'>Find: <a href='/search'>gigs</a>, <a href='/people'>people</a>.</p>
-
-                    {% comment %}
-                    <div class='explanation-heading'>
-                        <h3 id=''>Questions we ask ourselves frequently</h3>
-                    </div>
-
-                    <p><strong>Q: Why are you doing this?</strong>
-                    A: We support software freedom and want to give
-                    software authors another excuse to work on free
-                    and open source software &mdash; it'll help you
-                    find a job.</p>
-
-                    <p><strong>Q: How will you make money?</strong>
-                    A: We will eventually charge fee for job postings.
-                    Right now the service is free of cost for everybody.</p>
-
-                    <p><strong>Q: Is this a fun website, or a serious
-                        website?</strong> A: We hope we don't have to
-                    choose. We apologize in advance if some relatively
-                    serious matters, job hunting for instance, are
-                    treated here with atypical whimsy.</p>
-                    {% endcomment %}
-
-                    {% comment %} }}} {% endcomment %}
-                    {% comment %} Submit a FOSS username {{{ {% endcomment %}
-                    <div class='box' style='float: left; width: 500px; text-align: center;'>
-                        <h2>Start your profile.</h2>
-                    </div>
-                    {% comment %} }}} {% endcomment %}
-                    {% comment %} See who else is on OpenHatch {{{ {% endcomment %}
-                    <div class='box' style='float: left; width: 500px; text-align: center;'>
-                        <a href='/people/'>See who else is on OpenHatch</a>
-                    </div>
-                    {% comment %} }}} {% endcomment %}
-
-                    Do you contribute to open source software?
-
-                    Yep &rarr;
-                    <ul>
+                <h3><span>Do you contribute to open source software?</span></h3>
+                    
+                <h3>Then OpenHatch is here for you!</h3>
+                <h2>Just tell us your <span>skills</span>, <span>experience</span>, and <span>interests</span>, and we help you:</h2>
+                <ul><li><span>find tailored ways that you can help</span> with open source projects; </li>
+                <li><span>find people</span> who like the same programs and projects as you do; and</li>
+                <li><span>track and show off</span> all your open source software experience in one place.</li></ul>
+                <h3>To get started...</h3> 
+                    <ul id='stuff-to-do'>
                         <li>
-                        <a href='#'>Create a profile</a> 
                         <form id='create_profile' name='create_profile'
                             action='/people/new/do' method='POST'>
                             <div class='form-row'>
-                                <label for='create_profile_username'>Type a username</label>
-                                <input type='text' id='create_profile_username' 
-                                name='create_profile_username' />
-                            </div>
-                            <div class='form-row'>
-                                <input type='submit' value='go' />
+                                <input type='submit' id='create-profile' value='Create a profile' />
                             </div>
                         </form>
                         </li>
                         <li>
-                        <a href='#'>Already on OpenHatch? Log in!</a>
+                        <span>Already on OpenHatch? Log in!</span>
                         <form id='login' name='login'
                             action='/people/login/do' method='POST'>
                             <div class='form-row'>
@@ -140,16 +106,16 @@
                                 form {
                                     margin-bottom: 10px;
                                     float: left;
-                                    width: 478px;
+                                    width: 500px;
                                 }
                                 .form-row {
                                     float: left;
-                                    width: 400px;
+                                    width: 422px;
                                 }
                                 label {
                                     float: left;
-                                    width: 130px;
-                                    padding: 12px;
+                                    width: 150px;
+                                    padding: 10px;
                                     margin-right: 10px;
                                     font-size: 12pt;
                                 }
@@ -157,7 +123,7 @@
                                     padding: 10px;
                                     border: 1px solid #eee;
                                     float: left;
-                                    width: 214px;
+                                    width: 220px;
                                 }
                                 input[type='submit'] {
                                     padding: 7px;
@@ -168,8 +134,18 @@
                                     border: 1px solid #dde;
                                     float: right;
                                 }
+                                #create-profile {
+                                    border: 3px solid #66AA33;
+                                    background-color: #AADD66;
+                                    padding: 10px;
+                                    text-align: center;
+                                    float: none;
+                                    margin: 10px auto 10px auto;
+                                    font-size: 25px;
+                                }
                             </style>
                         </form>
                         </li>
+                        <li><a href='/people/'>See who else is on OpenHatch</a></li>
                     </ul>
                 </div>

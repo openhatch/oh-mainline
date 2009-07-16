@@ -4,16 +4,16 @@ vim: set ai et ts=4 sw=4 nu columns=80:
 
 <div id='importer'>
     <!-- {{{ -->
-    <h2>Import commits from around the web</h2>
-    If you've contributed to free and open source software,
+    <h2>Import commits from around the web!</h2>
+    <p>If you've contributed to free and open source software,
     enter the username or email address under which you committed
-    to a public repository.
+    to a public repository.</p>
     <small>(You'll soon be able to enter multiple usernames.)</small>
     <form id='enter-free-software-username' 
         name='enter_free_software_username' method='POST'
         action='/people/{{ person.user.username }}/import/do'>
         <div class='form-row'>
-            <label for='commit_username_or_email'>
+            <label id='commit_username' for='commit_username_or_email'>
                 Username or email: </label>
             <input type='text' id='commit_username_or_email' 
             name='commit_username' />
