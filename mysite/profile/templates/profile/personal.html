@@ -82,51 +82,45 @@ vim: set ai et ts=4 sw=4 nu columns=80:
         <form name='edit-tags'
             action='/people/{{person.user.username}}/tags/edit/do'
             method='POST'>
+            {% comment %} THIS IS EDIT MODE FOOLS {% endcomment %}
             <h4>understands:</h4>
             <textarea name='edit-tags-understands'>{{ tags_flat.understands }}</textarea>
             <h4>will never understand:</h4>
             <textarea name='edit-tags-understands_not'>{{ tags_flat.understands_not }}</textarea>
-            <h4>looking for volunteering opportunities
-                tagged with:</h4>
+            <h4>looking for volunteering opportunities tagged with:</h4>
             <textarea name='edit-tags-seeking'>{{ tags_flat.seeking }}</textarea>
-        </h4>
-        <h4>currently studying:</h4>
-        <textarea name='edit-tags-studying'>{{ tags_flat.studying }}</textarea>
-        <h4>can mentor in:</h4>
-        <textarea name='edit-tags-can_mentor'>{{ tags_flat.can_mentor }}</textarea>
-        <input class='save-button' type='submit' value='Save' />
-    </form>
+            <h4>currently studying:</h4>
+            <textarea name='edit-tags-studying'>{{ tags_flat.studying }}</textarea>
+            <h4>can mentor in:</h4>
+            <textarea name='edit-tags-can_mentor'>{{ tags_flat.can_mentor }}</textarea>
+            <input class='save-button' type='submit' value='Save' />
+        </form>
     <!-- }}} -->
     {% else %}
     <!-- {{{ -->
     {% if tags_flat.understands %}
     <div class='tags'>
-        <span class='tag-type'>understands:</span>
-        {{ tags_flat.understands }}
+        <span class='tag-type'>understands:</span> {{ tags_flat.understands }}
     </div>
     {% endif %}
     {% if tags.understands_not %}
     <div class='tags'>
-        <span class='tag-type'>will never understand:</span>
-        {{ tags_flat.understands_not }}
+        <span class='tag-type'>will never understand:</span> {{ tags_flat.understands_not }}
     </div>
     {% endif %}
     {% if tags.seeking %}
     <div class='tags'>
-        <span class='tag-type'>looking for volunteering opportunities in:</span>
-        {{ tags_flat.seeking }}
+        <span class='tag-type'>looking for volunteering opportunities in:</span> {{ tags_flat.seeking }}
     </div>
     {% endif %}
     {% if tags.studying %}
     <div class='tags'>
-        <span class='tag-type'>currently learning about:</span>
-        {{ tags_flat.studying }}
+        <span class='tag-type'>currently learning about:</span> {{ tags_flat.studying }}
     </div>
     {% endif %}
     {% if tags.can_mentor %}
     <div class='tags'>
-        <span class='tag-type'>can mentor in:</span>
-        {{ tags_flat.can_mentor }}
+        <span class='tag-type'>can mentor in:</span> {{ tags_flat.can_mentor }}
     </div>
     {% endif %}
     <!-- }}} -->

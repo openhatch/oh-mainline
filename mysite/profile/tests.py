@@ -47,19 +47,38 @@ def twill_quiet():
     twill.set_output(StringIO())
 # }}}
 
-class ProfileTests(django.test.TestCase):
+class TwillTests(django.test.TestCase):
+    '''Some basic methods needed by other testing classes.'''
     # {{{
-    fixtures = ['user-paulproteus', 'person-paulproteus', 'cchost-data-imported-from-ohloh']
     def setUp(self):
         twill_setup()
 
     def tearDown(self):
         twill_teardown()
 
+    def login(self):
+        # Visit login page
+        login_url = 'http://openhatch.org/people/login'
+        tc.go(make_twill_url(login_url))
+
+        # Log in
+        username = "paulproteus"
+        password = "paulproteus's unbreakable password"
+        tc.fv('login', 'login_username', username)
+        tc.fv('login', 'login_password', password)
+        tc.submit()
+    # }}}
+
+class ProfileTests(TwillTests):
+    # {{{
+    fixtures = ['user-paulproteus', 'person-paulproteus',
+            'cchost-data-imported-from-ohloh']
+
     def testSlash(self):
         response = self.client.get('/people/')
 
     def test__projectexp_add(self):
+        # {{{
         username = 'paulproteus'
 
         project_name = 'seeseehost'
@@ -76,6 +95,7 @@ class ProfileTests(django.test.TestCase):
         projects = [thing[0].project.name for thing in
                     data['exp_taglist_pairs']]
         self.assert_('seeseehost' in projects)
+        # }}}
 
     def test__project_exp_create_from_text__unit(self):
         # {{{
@@ -103,13 +123,8 @@ class ProfileTests(django.test.TestCase):
 
     # }}}
 
-class DebTagsTests(django.test.TestCase):
+class DebTagsTests(TwillTests):
     # {{{
-    def setUp(self):
-        twill_setup()
-
-    def tearDown(self):
-        twill_teardown()
 
     def testAddOneDebtag(self):
         tag = profile.views.add_one_debtag_to_project('alpine', 'implemented-in::c')
@@ -123,9 +138,9 @@ class DebTagsTests(django.test.TestCase):
                          set(['works-with::mail', 'protocol::smtp']))
     # }}}
 
-#class ExpTag(django.test.TestCase):
+#class ExpTag(TwillTests):
 
-class TrentonTests(django.test.TestCase):
+class TrentonTests(TwillTests):
     '''
     The Trenton milestone says:
     * You can mark an experience as a favorite.
@@ -133,12 +148,6 @@ class TrentonTests(django.test.TestCase):
     # {{{
 
     fixtures = ['user-paulproteus', 'person-paulproteus']
-
-    def setUp(self):
-        twill_setup()
-
-    def tearDown(self):
-        twill_teardown()
 
     def test_make_favorite_experience(self):
         # {{{
@@ -228,8 +237,9 @@ class TrentonTests(django.test.TestCase):
     # }}}
 
 import os
-class OhlohIconTests(django.test.TestCase):
+class OhlohIconTests(TwillTests):
     '''Test that we can grab icons from Ohloh.'''
+    # {{{
     def test_given_project_find_icon(self):
         oh = ohloh.get_ohloh()
         icon = oh.get_icon_for_project('f-spot')
@@ -256,7 +266,8 @@ class OhlohIconTests(django.test.TestCase):
 
     def test_find_icon_for_proj_with_space(self):
         oh = ohloh.get_ohloh()
-        self.assertRaises(ValueError, oh.get_icon_for_project, 'surely nothing is called this name')
+        self.assertRaises(ValueError, oh.get_icon_for_project,
+                'surely nothing is called this name')
 
     def test_given_project_generate_internal_url(self):
         # First, delete the project icon
@@ -304,23 +315,16 @@ class OhlohIconTests(django.test.TestCase):
 
         # Remove it so the test has no side-effects
         os.unlink(path)
+    # }}}
 
-class CambridgeTests(django.test.TestCase):
+class CambridgeTests(TwillTests):
     '''
     The Cambridge milestone says:
-    * You can look up what projects (via local cache of sf.net) a person is on.
+    * You can look up what projects (via local cache of sf.net) a person is 
+    on.
     '''
     # {{{
-    def setUp(self):
-        self.delete_me = []
-        self.row = ['paulproteus', 'zoph', '1', 'Developer', '2009-06-11 21:53:19']
-                
-        twill_setup()
-
-    def tearDown(self):
-        for thing in self.delete_me:
-            thing.delete()
-        twill_teardown()
+    row = ['paulproteus', 'zoph', '1', 'Developer', '2009-06-11 21:53:19']
 
     def _create_one_flossmole_row_from_data(self):
         # make it
@@ -334,55 +338,40 @@ class CambridgeTests(django.test.TestCase):
             '\t'.join(self.row))
         return m
 
-    def _test_import_one_flossmole_row(self, delete_now = True):
+    def _test_import_one_flossmole_row(self):
         # find it
         o = profile.models.Link_SF_Proj_Dude_FM.objects.get(
             person__username='paulproteus', project__unixname='zoph')
         self.assertEqual(o.position, 'Developer')
         self.assert_(o.is_admin)
-        if delete_now:
-            o.delete()
-        else:
-            self.delete_me.append(o)
 
-    def test_import_one_flossmole_row(self, delete_now = True):
+    def test_import_one_flossmole_row(self):
         self._create_one_flossmole_row_from_data()
-        self._test_import_one_flossmole_row(delete_now = delete_now)
+        self._test_import_one_flossmole_row()
 
-    def test_import_one_flossmole_row_text(self, delete_now = True):
+    def test_import_one_flossmole_row_text(self):
         self._create_one_flossmole_row_from_text()
-        self._test_import_one_flossmole_row(delete_now = delete_now)
+        self._test_import_one_flossmole_row()
 
     def _test_sf_person_projects_lookup(self):
-        self.test_import_one_flossmole_row(delete_now=False)
+        self.test_import_one_flossmole_row()
         url = 'http://openhatch.org/people/sf_projects_by_person?u=paulproteus'
         tc.go(make_twill_url(url))
         tc.find('zoph')
 
     def test_sf_person_projects_lookup(self):
-        self.test_import_one_flossmole_row(delete_now=False)
+        self.test_import_one_flossmole_row()
         self._test_sf_person_projects_lookup()
-        for thing in self.delete_me:
-            thing.delete()
-        self.delete_me = []
 
     def test_sf_person_projects_lookup_text(self):
-        self.test_import_one_flossmole_row_text(delete_now=False)
+        self.test_import_one_flossmole_row_text()
         self._test_sf_person_projects_lookup()
-        for thing in self.delete_me:
-            thing.delete()
-        self.delete_me = []        
     # }}}
 
-class PersonTabProjectExpTests(django.test.TestCase):
+class PersonTabProjectExpTests(TwillTests):
     # {{{
     fixtures = ['user-paulproteus', 'person-paulproteus', 'cchost-data-imported-from-ohloh']
 
-    def setUp(self):
-        twill_setup()
-
-    def tearDown(self):
-        twill_teardown()
 
     def test_project_exp_page_template_displays_project_exp(self):
         # {{{
@@ -392,15 +381,10 @@ class PersonTabProjectExpTests(django.test.TestCase):
         # }}}
     # }}}
 
-class PersonInvolvementTests(django.test.TestCase):
+class PersonInvolvementTests(TwillTests):
     # {{{
     fixtures = ['user-paulproteus', 'person-paulproteus', 'cchost-data-imported-from-ohloh']
 
-    def setUp(self):
-        twill_setup()
-
-    def tearDown(self):
-        twill_teardown()
 
     def test_projectexp_add(self):
         """Paulproteus can login and add a projectexp."""
@@ -531,7 +515,7 @@ class PersonInvolvementTests(django.test.TestCase):
 
     def test_tag_editor_save(self):
         # {{{
-        url = 'http://openhatch.org/people/paulproteus?tab=tags&edit=1'
+        url = 'http://openhatch.org/people/paulproteus/edit'
         tc.go(make_twill_url(url))
         tags = ['jquery', 'python', 'c++',
                 'qwer', 'jkl', 'qergqer', 
@@ -566,15 +550,10 @@ class PersonInvolvementTests(django.test.TestCase):
 
     # }}}
 
-class CommitImportTests(django.test.TestCase):
+class CommitImportTests(TwillTests):
     # {{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
-    def setUp(self):
-        twill_setup()
-
-    def tearDown(self):
-        twill_teardown()
     def test_poller_appears_correctly(self):
         # {{{
         url = 'http://openhatch.org/people/paulproteus/test_commit_importer'
@@ -587,14 +566,10 @@ class CommitImportTests(django.test.TestCase):
 
 import time
 from django.core import management
-class CeleryTests(django.test.TestCase):
+class CeleryTests(TwillTests):
+    # {{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
-    def setUp(self):
-        twill_setup()
-
-    def tearDown(self):
-        twill_teardown()
 
     def test_slow_loading_via_emulated_bgtask(self, 
             use_cooked_data=True):
@@ -648,7 +623,8 @@ class CeleryTests(django.test.TestCase):
                  cooked_data=cooked_data)
         # NB: The task knows not to call Ohloh when we give it cooked data.
 
-        self.assert_(Person.objects.get(user__username='paulproteus').ohloh_grab_completed)
+        self.assert_(Person.objects.get(
+            user__username='paulproteus').ohloh_grab_completed)
 
         # Check again
         response_after = client.get(url, good_input)
@@ -698,17 +674,13 @@ class CeleryTests(django.test.TestCase):
 
 # FIXME: One day, stub out the background jobs with mocks
 # that ensure we actually call them!
+    # }}}
 
-class UserListTests(django.test.TestCase):
+class UserListTests(TwillTests):
+    # {{{
     fixtures = [ 'user-paulproteus', 'person-paulproteus',
             'user-barry', 'person-barry']
 
-    def setUp(self):
-        twill_setup()
-
-    def tearDown(self):
-        twill_teardown()
-    
     def test_display_list_of_users(self):
         people = [(p.user.username, p.user.first_name, p.user.last_name)
                 for p in profile.controllers.queryset_of_people()]
@@ -733,14 +705,9 @@ class UserListTests(django.test.TestCase):
         tc.go(url)
         tc.follow('See who else is on OpenHatch')
 
-class AuthTests(django.test.TestCase):
+class AuthTests(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
-    def setUp(self):
-        twill_setup()
-
-    def tearDown(self):
-        twill_teardown()
     
     def test_login(self):
         user = authenticate(username='paulproteus', password="paulproteus's unbreakable password")
@@ -772,16 +739,10 @@ class AuthTests(django.test.TestCase):
         tc.submit()
         tc.find("oops")
 
-class SetAPasswordTests(django.test.TestCase):
-    # FIXME: I suppose the fixture should be called person-paulproteus
+class SetAPasswordTests(TwillTests):
+    # {{{
     fixtures = ['user-paulproteus', 'person-paulproteus',
             'cchost-data-imported-from-ohloh']
-
-    def setUp(self):
-        twill_setup()
-
-    def tearDown(self):
-        twill_teardown()
 
     def test_follow_link_from_front_page(self):
         tc.go(make_twill_url('http://openhatch.org/'))
@@ -799,15 +760,11 @@ class SetAPasswordTests(django.test.TestCase):
         tc.submit()
         tc.find("ziggy")
         # FIXME: Check that you can log in with those credentials.
+    # }}}
 
-class ImportCommitsViaCommitUsernameViaOhloh(django.test.TestCase):
+class ImportCommitsViaCommitUsernameViaOhloh(TwillTests):
+    # {{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
-
-    def setUp(self):
-        twill_setup()
-
-    def tearDown(self):
-        twill_teardown()
 
     def submit_commit_name(self, cooked_data_password):
         tc.go(make_twill_url('http://openhatch.org/people/login'))
@@ -838,4 +795,4 @@ class ImportCommitsViaCommitUsernameViaOhloh(django.test.TestCase):
     def test_cooked_data_fails_on_bad_password(self):
         self.assertRaises(ValueError, self.submit_commit_name,
                 settings.cooked_data_password + '...NOT')
-
+    # }}}

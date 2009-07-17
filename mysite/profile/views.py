@@ -447,8 +447,8 @@ def edit_person_tags(request, username):
         tags = text.split(',')
         tags = [tag.strip() for tag in tags]
         # Now figure out what tags there in the DB
-        tag_links = Link_Person_Tag.objects.filter(tag__tag_type=tag_type,
-                                                   person=person)
+        tag_links = Link_Person_Tag.objects.filter(
+                tag__tag_type=tag_type, person=person)
         tag_texts = [l.tag.text for l in tag_links]
 
         to_be_added = []
@@ -472,10 +472,9 @@ def edit_person_tags(request, username):
         for tag in to_be_added:
             new_tag, _ = Tag.objects.get_or_create(tag_type=tag_type, text=tag)
             new_link, _ = Link_Person_Tag.objects.get_or_create(tag=new_tag,
-                                                                person=
-                                                                person)
+                                                                person=person)
             
-    return HttpResponseRedirect('/people/%s/tab/tags' %
+    return HttpResponseRedirect('/people/%s/' %
                                 urllib.quote(person.user.username))
     # }}}
 
