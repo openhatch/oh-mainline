@@ -3,6 +3,7 @@ import xml.parsers.expat
 import sys, urllib, hashlib
 import urllib2
 import cStringIO as StringIO
+from urllib2 import HTTPError
 
 def uni_text(s):
     if type(s) == unicode:
@@ -18,7 +19,7 @@ from typecheck import Any as __
 
 API_KEY='0cWqe4uPw7b8Q5337ybPQ' # "Oman testing"
 
-def mechanize_get(url, referrer=None):
+def mechanize_get(url, referrer=None, attempts_remaining=3):
     b = mechanize.Browser()
     b.set_handle_robots(False)
     addheaders = [('User-Agent',
@@ -28,7 +29,18 @@ def mechanize_get(url, referrer=None):
         addheaders.extend([('Referer',
                            referrer)])
     b.addheaders = addheaders
-    b.open(url)
+    try:
+        b.open(url)
+    except HTTPError, e:
+        # FIXME: Test with mock object.
+        if e.code == 504 and attempts_remaining > 0:
+            msg = "Tried to get %s, got 504, retrying %d more times..." % (
+                    url, attempts_remaining)
+            print >> sys.stderr, msg
+            return mechanize_get(url, referrer, attempts_remaining - 1)
+        else:
+            raise
+
     return b
 
 def ohloh_url2data(url, selector, params = {}, many = False):
