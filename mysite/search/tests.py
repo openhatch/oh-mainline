@@ -1,7 +1,9 @@
 import django.test
 from search.models import Project, Bug
 import search.views
+import lpb2json
 import datetime
+import search.launchpad_crawl
 
 import twill
 from twill import commands as tc
@@ -159,5 +161,102 @@ class TestNonJavascriptSearch(django.test.TestCase):
         tc.follow('Next')
         for n in range(727, 737):
             tc.find('Description #%d' % n)
+
+class AutoCrawlTests(django.test.TestCase):
+    def setUp(self):
+        twill_setup()
+
+    def tearDown(self):
+        twill_teardown()
+
+    def testSearch(self):
+        # Verify that we can't find a bug with the right description
+        self.assertRaises(search.models.Bug.DoesNotExist,
+                          search.models.Bug.objects.get,
+                          title="Joi's Lab AFS")
+        # Now get all the bugs about rose
+        search.launchpad_crawl.grab_lp_bugs(lp_project='rose',
+                                            openhatch_project=
+                                            'rose.makesad.us')
+        # Now see, we have one!
+        b = search.models.Bug.objects.get(title="Joi's Lab AFS")
+        self.assertEqual(b.project.name, 'rose.makesad.us')
+        # Ta-da.
+        return b
+
+    def test_running_job_twice_does_update(self):
+        b = self.testSearch()
+        b.description = 'Eat more potato starch'
+        b.title = 'Yummy potato paste'
+        b.save()
+
+        new_b = self.testSearch()
+        self.assertEqual(new_b.title, "Joi's Lab AFS") # bug title restored
+        # thanks to fresh import
+
+class LaunchpadImporterTests(django.test.TestCase):
+    def test_lp_update_handler(self):
+        '''Test the Launchpad import handler with some fake data.'''
+        some_date = datetime.datetime(2009, 4, 1, 2, 2, 2)
+        query_data = dict(project='GNOME-Do',
+                          canonical_bug_link='http://example.com/1')
+        new_data = dict(title='Title', status='Godforsaken',
+                        description='Everything should be better',
+                        importance='High',
+                        people_involved=1000 * 1000,
+                        submitter_username='yourmom',
+                        submitter_realname='Your Mom',
+                        date_reported=some_date,
+                        last_touched=some_date,
+                        last_polled=some_date)
+
+        # Create the bug...
+        search.launchpad_crawl.handle_launchpad_bug_update(query_data, new_data)
+        # Verify that the bug was stored.
+        bug = Bug.objects.get(canonical_bug_link=
+                                       query_data['canonical_bug_link'])
+        for key in new_data:
+            self.assertEqual(getattr(bug, key), new_data[key])
+
+        # Now re-do the update, this time with more people involved
+        new_data['people_involved'] = 1000 * 1000 * 1000
+        # pass the data in...
+        bug = search.launchpad_crawl.handle_launchpad_bug_update(query_data,
+                                                                 new_data)
+        # Do a get; this will explode if there's more than one with the
+        # canonical_bug_link, so it tests duplicate finding.
+        bug = Bug.objects.get(canonical_bug_link=
+                                       query_data['canonical_bug_link'])
+
+        for key in new_data:
+            self.assertEqual(getattr(bug, key), new_data[key])
+
+    def test_lp_data_clean(self):
+        now_t = (2009, 4, 1, 5, 13, 2) # partial time tuple
+        now_d = datetime.datetime(2009, 4, 1, 5, 13, 2)
+        # NOTE: We do not test for time zone correctness.
+        sample_in = dict(project='GNOME-Do', url='http://example.com/1',
+                         title='Title', text='Some long text',
+                         importance=None, status='Ready for take-off',
+                         comments=[{'user': {
+                             'lplogin': 'jones', 'realname': 'Jones'}}],
+                         reporter={'lplogin': 'bob', 'realname': 'Bob'},
+                         date_reported=now_t,
+                         date_updated=now_t,
+                         )
+        sample_out_query = dict(project='GNOME-Do',
+                                canonical_bug_link='http://example.com/1')
+        sample_out_data = dict(title='Title', description='Some long text',
+                               importance='Unknown', status='Ready for take-off',
+                               people_involved=2, submitter_realname='Bob',
+                               submitter_username='bob',
+                               date_reported=now_d,
+                               last_touched=now_d)
+        out_q, out_d = search.launchpad_crawl.clean_lp_data_dict(sample_in)
+        self.assertEqual(sample_out_query, out_q)
+        # Make sure last_polled is at least in the same year
+        self.assertEqual(out_d['last_polled'].year, datetime.date.today().year)
+        del out_d['last_polled']
+        self.assertEqual(sample_out_data, out_d)
 
 # vim: set ai et ts=4 sw=4 columns=80:
