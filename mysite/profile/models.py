@@ -58,7 +58,6 @@ class ProjectExp(models.Model):
     description = models.TextField()
     url = models.URLField(max_length=200, null=True)
     man_months = models.PositiveIntegerField(null=True)
-    favorite = models.BooleanField(default=0)
     primary_language = models.CharField(max_length=200, null=True)
     source = models.CharField(max_length=100, null=True)
 
