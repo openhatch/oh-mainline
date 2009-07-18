@@ -60,10 +60,10 @@ def projectexp_add_do(request):
 
 # XP slurper {{{
 
-def display_test_page_for_commit_importer(request, input_username):
+def display_test_page_for_commit_importer(request):
     # {{{
     return render_to_response('profile/test_commit_importer.html', {
-        'username': input_username})
+        'username': request.user.username})
     # }}}
 
 # }}}
@@ -183,29 +183,41 @@ def data_for_person_display_without_ohloh(person):
 
     # }}}
 
-def display_person_edit_web(request, input_username=None, tab=None):
+def display_person_edit_web(request):
     # {{{
-    return display_person_web(request, input_username, tab, True)
+
+    title = 'openhatch / %s / edit' % request.user.username
+
+    person = request.user.get_profile()
+
+    data = data_for_person_display_without_ohloh(person)
+
+    data['edit_mode'] = True
+
+    # FIXME: Django builds this in.
+    data['the_user'] = request.user
+
+    return render_to_response('profile/main.html', data)
     # }}}
 
-def display_person_web(request, input_username=None, tab=None, edit=None):
+def display_person_web(request, user_to_display__username=None):
     # {{{
-    if input_username is None:
-        input_username = request.GET.get('u', None)
-        if input_username is None:
-            return render_to_response('profile/profile.html')
+    user = django.contrib.auth.models.User.objects.get(
+            username=user_to_display__username)
 
-    if edit is None:
-        edit = False
-        if request.GET.get('edit', 0) == '1':
-            edit = True
+    title = 'openhatch / %s' % user.username
 
-    if tab is None:
-        tab = request.GET.get('tab', None)
+    person = user.get_profile()
 
-    user = django.contrib.auth.models.User.objects.get(username=input_username)
+    data = data_for_person_display_without_ohloh(person)
 
-    return display_person(user, request.user, tab, edit)
+    data['edit_mode'] = False
+
+    # FIXME: Django builds this in.
+    data['the_user'] = request.user
+
+    return render_to_response('profile/main.html', data)
+
     # }}}
 
 def projectexp_display(request, user_to_display__username, project__name):
@@ -214,12 +226,14 @@ def projectexp_display(request, user_to_display__username, project__name):
     data = data_for_person_display_without_ohloh(person)
     data['project'] = get_object_or_404(Project, name=project__name)
     data['exp'] = get_object_or_404(ProjectExp,
-            person__user__username=user_to_display__username, project__name=project__name)
+            person__user__username=user_to_display__username, 
+            project__name=project__name)
     return render_to_response('profile/projectexp.html', data)
     # }}}
 
-def projectexp_edit(request, user_to_display__username, project__name):
+def projectexp_edit(request, project__name):
     # {{{
+    user_to_display__username=request.user.username
     person = get_object_or_404(Person, user__username=user_to_display__username)
     data = data_for_person_display_without_ohloh(person)
     data['exp'] = get_object_or_404( ProjectExp,
@@ -231,41 +245,10 @@ def projectexp_edit(request, user_to_display__username, project__name):
     # }}}
 
 def projectexp_add_form(request):
+    # {{{
     person = request.user.get_profile()
     data = data_for_person_display_without_ohloh(person)
     return render_to_response('profile/projectexp_add.html', data)
-
-def display_person(user, logged_in_user, tab, edit):
-    # {{{
-
-    person = user.get_profile()
-
-    data_dict = data_for_person_display_without_ohloh(person)
-
-    data_dict['edit'] = edit
-    data_dict['the_user'] = user
-
-    title = 'openhatch / %s' % user.username
-    title += ' %s'
-    if tab == 'inv' or tab == '/ involvement':
-        data_dict['title'] = title % "community involvement"
-        return render_to_response('profile/participation.html', data_dict)
-    if tab == 'tags':
-        data_dict['title'] = title % "/ tags"
-        return render_to_response('profile/tags.html', data_dict)
-    if tab == 'tech':
-        data_dict['title'] = title % "/ tech"
-        return render_to_response('profile/tech.html', data_dict)
-    else:
-        data_dict['title'] = title % ""
-        #Don't use a short list, for now, since we don't have that much stuff on this page.
-        #data_dict['projects'] = dict(data_dict['projects'].items()[:4])
-        data_dict['tags'] = tags_dict_for_person(person)
-        data_dict['tags_flat'] = dict(
-            [ (key, ', '.join([k.text for k in data_dict['tags'][key]]))
-              for key in data_dict['tags'] ])
-        return render_to_response('profile/main.html', data_dict)
-
     # }}}
 
 def tags_dict_for_person(person):
@@ -276,18 +259,6 @@ def tags_dict_for_person(person):
         ret[link.tag.tag_type.name].append(link.tag)
 
     return ret
-    # }}}
-
-def display_person_old(request, input_username=None):
-    # {{{
-    if input_username is None:
-        input_username = request.GET.get('u', None)
-        if input_username is None:
-            return render_to_response('profile/profile.html')
-
-    data_dict = profile_data_from_username(input_username, fetch_ohloh_data = True)
-
-    return render_to_response('profile/profile.html', data_dict)
     # }}}
 
 # }}}
@@ -447,9 +418,9 @@ def project_icon_url(project_name, actually_fetch = True):
     # FIXME: One day, add cache expiry.
     # }}}
 
-def edit_person_tags(request, username):
+def edit_person_tags(request):
     # {{{
-    person = Person.objects.get(user__username=username)
+    person = request.user.get_profile()
 
     # We can map from some strings to some TagTypes
     for known_tag_type in ('understands', 'understands_not',
@@ -489,7 +460,7 @@ def edit_person_tags(request, username):
                                                                 person=person)
             
     return HttpResponseRedirect('/people/%s/' %
-                                urllib.quote(person.user.username))
+                                urllib.quote(request.user.username))
     # }}}
 
 def project_icon_web(request, project_name):
@@ -571,10 +542,10 @@ def import_commits_by_commit_username(request):
                     cooked_data=cooked_data)
     # }}}
 
-def ohloh_grab_done_web(request, username):
+def ohloh_grab_done_web(request):
 # {{{
     # get the person
-    person = get_object_or_404(Person, user__username=username)
+    person = request.user.get_profile()
 
     return HttpResponse(bool(person.ohloh_grab_completed))
 # }}}

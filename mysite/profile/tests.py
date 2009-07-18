@@ -25,6 +25,7 @@ import simplejson
 from django.test.client import Client
 import tasks 
 from django.contrib.auth import authenticate
+from django.contrib.auth.models import User
 # }}}
 
 # FIXME: Later look into http://stackoverflow.com/questions/343622/how-do-i-submit-a-form-given-only-the-html-source
@@ -139,102 +140,6 @@ class DebTagsTests(TwillTests):
     # }}}
 
 #class ExpTag(TwillTests):
-
-class TrentonTests(TwillTests):
-    '''
-    The Trenton milestone says:
-    * You can mark an experience as a favorite.
-    '''
-    # {{{
-
-    fixtures = ['user-paulproteus', 'person-paulproteus']
-
-    def test_make_favorite_experience(self):
-        # {{{
-        return
-        # NB: Disabled so we can focus on more important stuff.
-        # FIXME: Re-enable.
-
-        url = 'http://openhatch.org/people/paulproteus?tab=inv'
-
-        tc.go(make_twill_url(url))
-
-        # Verify neither is a favorite right now
-        tc.notfind('Favorite: TrentonProj1')
-        tc.notfind('Favorite: TrentonProj2')
-
-        # Make the last one a favorite
-        desired = None
-        for form in tc.showforms():
-            if 'make-exp-favorite' in form.name:
-                desired = form
-        assert desired is not None
-
-        # Select that form by "editing" it
-        tc.config('readonly_controls_writeable', True)
-        tc.fv(desired.name, 'exp_id', desired.get_value('exp_id'))
-        tc.submit()
-
-        # Verify that the last one has become a favorite
-        tc.notfind('Favorite: TrentonProj1')
-        tc.find('Favorite: TrentonProj2')
-        # }}}
-
-    def test_make_favorite_tag(self):
-        # {{{
-        return
-        # NB: Disabled so we can focus on more important stuff.
-        # FIXME: Re-enable.
-
-        url = 'http://openhatch.org/people/paulproteus?tab=inv'
-        # Add an experience
-        tc.go(make_twill_url(url))
-        tc.fv('projectexp_add', 'project_name', 'TrentonProj3')
-        tc.fv('projectexp_add', 'url', 'http://example.com')
-        tc.fv('projectexp_add', 'description', 'Totally rad')
-        tc.submit()
-        tc.find('TrentonProj3')
-
-        # Find its tag submission form
-        desired = None
-        for form in tc.showforms():
-            if 'add-tag-to-exp' in form.name:
-                for control in form.controls:
-                    if control.name == 'project_name':
-                        if control.value == 'TrentonProj3':
-                            desired = form
-                            break
-        assert desired is not None
-        
-        # Grab experience ID
-        exp_id = str(int(desired.find_control('exp_id').value))
-
-        # Give it two tags
-        tc.config('readonly_controls_writeable', True)
-        tc.fv(desired.name, 'tag_text', 'totally, rad')
-        tc.submit()
-
-        # Verify the tags stuck
-        tc.find('totally')
-        tc.find('rad')
-
-        # Find the tag favoriting form for "rad"
-        favorite_tag_forms = [form for form in tc.showforms()
-                              if 'favorite-tag-exp' in form.name]
-        matching_exp_id_forms = [f for f in favorite_tag_forms
-                                 if f.find_control('exp_id').value == exp_id]
-        right_tag_text_form = [f for f in matching_exp_id_forms
-                               if f.find_control('tag_text').value == 'rad']
-        assert len(right_tag_text_form) == 1
-        desired = right_tag_text_form[0]
-
-        # Select it and submit
-        tc.fv(desired.name, 'exp_id', exp_id)
-        tc.submit()
-
-        tc.find('Favorite: rad')
-        # }}}
-    # }}}
 
 import os
 class OhlohIconTests(TwillTests):
@@ -372,19 +277,18 @@ class PersonTabProjectExpTests(TwillTests):
     # {{{
     fixtures = ['user-paulproteus', 'person-paulproteus', 'cchost-data-imported-from-ohloh']
 
-
     def test_project_exp_page_template_displays_project_exp(self):
         # {{{
-        url = 'http://openhatch.org/people/paulproteus?tab=inv'
+        url = 'http://openhatch.org/people/paulproteus'
         tc.go(make_twill_url(url))
         tc.find('ccHost')
         # }}}
     # }}}
 
-class PersonInvolvementTests(TwillTests):
+class ProjectExpTests(TwillTests):
     # {{{
-    fixtures = ['user-paulproteus', 'person-paulproteus', 'cchost-data-imported-from-ohloh']
-
+    fixtures = ['user-paulproteus', 'user-barry', 'person-barry',
+            'person-paulproteus', 'cchost-data-imported-from-ohloh']
 
     def test_projectexp_add(self):
         """Paulproteus can login and add a projectexp."""
@@ -403,7 +307,7 @@ class PersonInvolvementTests(TwillTests):
         tc.find('http://example.com')
         # }}}
 
-    def test_remove_cchost_involvement(self):
+    def test_projectexp_delete(self):
         '''The server can log in paulproteus remove the word 'ccHost' from his profile by posting to the delete controller's URL.'''
         # {{{
         client = Client()
@@ -430,7 +334,32 @@ class PersonInvolvementTests(TwillTests):
         self.assertNotContains(response, 'ccHost')
         # }}}
 
-    def test_remove_cchost_involvement_click(self):
+    def test_projectexp_delete_unauthorized(self):
+        '''Barry tries to delete a ProjectExp he doesn't own and fails.'''
+        # {{{
+
+        # Meet Barry, a shady character.
+        barry = User.objects.get(username='barry')
+        barry_password = 'parallelism'
+        client = Client()
+        login_success = client.login( username=barry.username, 
+                password=barry_password)
+        self.assert_(login_success)
+
+        # Barry doesn't own ProjectExp #13
+        self.assertNotEqual( barry,
+                ProjectExp.objects.get(id=13).person.user)
+
+        # What happens if he tries to delete ProjectExp #13
+        response = client.post('/people/delete-experience/do',
+                {'id': '13'})
+
+        # Still there, Barry. Keep on truckin'.
+        self.assert_(ProjectExp.objects.get(id=13))
+
+        # }}}
+
+    def test_projectexp_delete_web(self):
         '''Notorious user of OpenHatch, paulproteus, can log in and remove the word 'ccHost' from his profile by clicking the appropriate delete button.'''
         # {{{
 
@@ -447,8 +376,8 @@ class PersonInvolvementTests(TwillTests):
 
         # Load up the ProjectExp edit page.
         project_name = 'ccHost'
-        exp_url = 'http://openhatch.org/people/%s/projects/edit/%s/' % (
-                urllib.quote(username), urllib.quote(project_name))
+        exp_url = 'http://openhatch.org/people/projects/edit/%s/' % (
+                urllib.quote(project_name))
         tc.go(make_twill_url(exp_url))
 
         # See! It talks about ccHost!
@@ -499,7 +428,8 @@ class PersonInvolvementTests(TwillTests):
         tc.find('shell script')
         # }}}
 
-    def test_tag_editor(self):
+    # FIXME: Move these next two functions to their proper home.
+    def test_info_go_to_edit_mode(self):
         # {{{
         self.login()
         tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
@@ -507,9 +437,10 @@ class PersonInvolvementTests(TwillTests):
         tc.find('personal_info_edit_mode') # a check-string
         # }}}
 
-    def test_tag_editor_save(self):
+    # FIXME: Write a unit test for this.
+    def test_edit_info_web(self):
         # {{{
-        url = 'http://openhatch.org/people/paulproteus/edit'
+        url = 'http://openhatch.org/people/edit'
         tc.go(make_twill_url(url))
         tags = ['jquery', 'python', 'c++',
                 'qwer', 'jkl', 'qergqer', 
@@ -550,7 +481,7 @@ class CommitImportTests(TwillTests):
 
     def test_poller_appears_correctly(self):
         # {{{
-        url = 'http://openhatch.org/people/paulproteus/test_commit_importer'
+        url = 'http://openhatch.org/people/test_commit_importer'
         url = make_twill_url(url)
         tc.go(url)
         tc.find('test commit importer')
@@ -569,7 +500,7 @@ class CeleryTests(TwillTests):
             use_cooked_data=True):
         """1. Go to the page that has paulproteus' data.  2. Verify that the page doesn't yet know about ccHost. 3. Run the celery task ourselves, but instead of going to Ohloh, we hand-prepare data for it."""
 
-        url = '/people/paulproteus/test_commit_importer_json'
+        url = '/people/test_commit_importer_json'
         
         good_input = {
             'nobgtask': 'yes',
@@ -639,8 +570,7 @@ class CeleryTests(TwillTests):
         tc.fv('login', 'login_password', "paulproteus's unbreakable password")
         tc.submit()
 
-        url = 'http://openhatch.org/people/%s/ohloh_grab_done' % urllib.quote(
-            username)
+        url = 'http://openhatch.org/people/ohloh_grab_done'
         tc.go(make_twill_url(url))
         tc.find('False')
 
@@ -653,8 +583,7 @@ class CeleryTests(TwillTests):
 
     def test_bg_loading_marks_grab_completed(self):
         username = 'paulproteus'
-        url = 'http://openhatch.org/people/%s/ohloh_grab_done' % urllib.quote(
-            username)
+        url = 'http://openhatch.org/people/ohloh_grab_done'
         tc.go(make_twill_url(url))
         tc.find('False')
 
@@ -698,6 +627,7 @@ class UserListTests(TwillTests):
         url = make_twill_url(url)
         tc.go(url)
         tc.follow('See who else is on OpenHatch')
+    # }}}
 
 class AuthTests(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']

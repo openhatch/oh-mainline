@@ -12,7 +12,7 @@ vim: set ai et ts=4 sw=4 nu:
     </p>
     <form id='enter-free-software-username' 
         name='enter_free_software_username' method='POST'
-        action='/people/{{ person.user.username }}/import/do'
+        action='/people/import/do'
         style='width: 300px;'>
         <div class='form-row' style='width: 400px;'>
             <label id='commit_username' for='commit_username_or_email'>
@@ -29,7 +29,7 @@ vim: set ai et ts=4 sw=4 nu:
 
 <div class='widget' id='left'>
 
-    {% if edit %}
+    {% if edit_mode %}
     <div id='avatar' class='edit'>
         <a href='/people/{{ person.user.username }}/photos/default/set'>
             This space reserved for doodling or
@@ -45,7 +45,7 @@ vim: set ai et ts=4 sw=4 nu:
 <div class='widget' id='middle'>
     <!-- {{{ -->
 
-    {% if edit %}
+    {% if edit_mode %}
     <div id='nameplate'>
         <form method='POST'
             action='/people/{{ person.user.username }}/name/set'>
@@ -76,11 +76,11 @@ vim: set ai et ts=4 sw=4 nu:
     {% endif %}
 
     <div id='info' class='widget'>
-        <a style='font: 8pt Verdana; background-color: #fff; float: right;' href='/people/{{ person.user.username }}/edit'>Edit</a>
-        {% if edit %}
+        <a style='font: 8pt Verdana; background-color: #fff; float: right;' href='/people/edit'>Edit</a>
+        {% if edit_mode %}
         <!-- {{{ -->
         <form name='edit-tags'
-            action='/people/{{person.user.username}}/tags/edit/do'
+            action='/people/tags/edit/do'
             method='POST'>
             <!-- personal_info_edit_mode -->
             {% comment %} THIS IS EDIT MODE FOOLS {% endcomment %}

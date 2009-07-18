@@ -21,6 +21,7 @@ urlpatterns = patterns('',
         (r'^people/signup/$', 'mysite.profile.views.signup'),
         (r'^people/signup/do$', 'mysite.profile.views.signup_do'),
 
+        # FIXME: Either this or signup_do is dead code.
         (r'^people/new/do$', 'mysite.profile.views.new_user_do'),
 
         (r'^people/delete-experience/do$',
@@ -46,11 +47,11 @@ urlpatterns = patterns('',
         # Edit a person's tags
         (r'^people/(?P<username>\w+)/tags/edit$',
             'mysite.profile.views.ask_for_tag_input'),
-        (r'^people/(?P<username>\w+)/tags/edit/do$',
+        (r'^people/tags/edit/do$',
             'mysite.profile.views.edit_person_tags'),
 
         # Check if Ohloh grab is done
-        (r'^people/(?P<username>\w+)/ohloh_grab_done$',
+        (r'^people/ohloh_grab_done$',
             'mysite.profile.views.ohloh_grab_done_web'),
 
         # Project icons
@@ -80,20 +81,17 @@ urlpatterns = patterns('',
         (r'^people/xp_slurp_do$',
             'mysite.profile.views.exp_scraper_scrape_web'),
 
-        (r'^people/(?P<input_username>[^/]+)/import_contributions_image$',
-            'mysite.profile.views.import_contributions_image'),
-
         # Get a list of suggestions for the search input, formatted the way that
         # the jQuery autocomplete plugin wants it.
         (r'^search/get_suggestions$', 'mysite.search.views.request_jquery_autocompletion_suggestions'),
 
-        (r'^people/(?P<input_username>[^/]+)/test_commit_importer$',
+        (r'^people/test_commit_importer$',
             'mysite.profile.views.display_test_page_for_commit_importer'),
 
-        (r'^people/[^/]+/test_commit_importer_json$',
+        (r'^people/test_commit_importer_json$',
             'mysite.profile.views.gimme_json_that_says_that_commit_importer_is_done'),
 
-        (r'^people/[^/]+/import/do$',
+        (r'^people/import/do$',
             'mysite.profile.views.import_do'),
 
         # Tabs
@@ -103,14 +101,14 @@ urlpatterns = patterns('',
         (r'^people/(?P<user_to_display__username>[^/]+)/projects/(?P<project__name>[a-zA-Z -]+)[/?]$',
                 'mysite.profile.views.projectexp_display'),
 
-        (r'^people/(?P<user_to_display__username>[^/]+)/projects/edit/(?P<project__name>[a-zA-Z -]+)[/?]$',
+        (r'^people/projects/edit/(?P<project__name>[a-zA-Z -]+)[/?]$',
                 'mysite.profile.views.projectexp_edit'),
 
-        (r'^people/(?P<input_username>[^/]+)/edit[/?]$',
+        (r'^people/edit[/?]$',
                 'mysite.profile.views.display_person_edit_web'),
 
         # This dangerous regex is last
-        (r'^people/(?P<input_username>[^/]+)[/?]$',
+        (r'^people/(?P<user_to_display__username>[^/]+)[/?]$',
                 'mysite.profile.views.display_person_web'),
 
         )

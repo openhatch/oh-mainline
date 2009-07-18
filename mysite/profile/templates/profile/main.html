@@ -17,7 +17,7 @@
                 letter-spacing: 0; margin-top: -3px; float: left;'
                 onmouseover="$(this).find('span').css('text-decoration','underline');"
                 onmouseout="$(this).find('span').css('text-decoration','none');"
-                href='/people/{{person.user.username}}/involvement/add/input'>
+                href='/people/involvement/add/input'>
                 <img src='/static/images/icons/Add.png' alt='+' /><span>Add</span>
             </a>
             </h3-->
@@ -26,7 +26,7 @@
             {% if person.poll_on_next_web_view %}
             <script type='text/javascript'>
                 // FIXME: Change host
-                url = '/people/{{ person.user.username }}/test_commit_importer_json';
+                url = '/people/test_commit_importer_json';
             updateIntervalID = window.setInterval(updateCommitImporterStatus, 2000);
             function updateCommitImporterStatus() {
                 function updateStatusDialog(json) {
