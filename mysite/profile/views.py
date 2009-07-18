@@ -21,6 +21,7 @@ import random
 import django.contrib.auth 
 from django.contrib.auth.models import User
 from customs import ohloh
+import forms
 # }}}
 
 # Add a contribution {{{
@@ -207,14 +208,27 @@ def display_person_web(request, input_username=None, tab=None, edit=None):
     return display_person(user, request.user, tab, edit)
     # }}}
 
-def display_person_project_web(request, input_username, name):
-    person = get_object_or_404(Person, user__username=input_username)
+def projectexp_display(request, user_to_display__username, project__name):
+    # {{{
+    person = get_object_or_404(Person, user__username=user_to_display__username)
     data = data_for_person_display_without_ohloh(person)
-    data['project'] = get_object_or_404(Project, name=name)
+    data['project'] = get_object_or_404(Project, name=project__name)
     data['exp'] = get_object_or_404(ProjectExp,
-            person__user__username=input_username, project__name=name)
+            person__user__username=user_to_display__username, project__name=project__name)
     return render_to_response('profile/projectexp.html', data)
-projectexp_display = display_person_project_web
+    # }}}
+
+def projectexp_edit(request, user_to_display__username, project__name):
+    # {{{
+    person = get_object_or_404(Person, user__username=user_to_display__username)
+    data = data_for_person_display_without_ohloh(person)
+    data['exp'] = get_object_or_404( ProjectExp,
+            person__user__username=user_to_display__username,
+            project__name=project__name)
+    data['form'] = forms.ProjectExpForm()
+    data['edit_mode'] = True
+    return render_to_response('profile/projectexp.html', data)
+    # }}}
 
 def projectexp_add_form(request):
     person = request.user.get_profile()

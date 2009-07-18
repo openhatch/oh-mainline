@@ -65,6 +65,7 @@
                 {% if the_user.is_authenticated %}
                 <!-- user.is_authenticated indeed -->
                 <ul id='user-actions'>
+                    You're logged in as {{ the_user.username }}.
                     <li>
                     <a href='/people/signup'>Sign up to save your work</a>
                     {% if not the_user.has_unusable_password %}

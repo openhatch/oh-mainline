@@ -8,26 +8,22 @@
         <!-- {{{ -->
         <a href='/people/{{ person.user.username }}'>All projects</a>
         <div id='role-details' class='section'>
+            {% if not edit_mode %}
             <div class='section-heading'>
-                <h4>Role</h4>
-            </div>
+                <h4>Role</h4> </div>
             <div class='section-content' id='role'>
-                <h5>Contributor, {{ exp.project.name }}</h5>        
+                <h5>Contributor, {{ exp.project.name }}</h5>
                 <p id='role-description'>
                 {{ exp.description }}
-                </p>
-            </div>
+                </p> </div>
             {% if exp.url %}
             <div class='section-heading'>
-                <h4>Link</h4>
-            </div>
+                <h4>Link</h4> </div>
             <div class='section-content'>
-                <a href='{{ exp.url }}'>{{ exp.url }}</a>
-            </div>
+                <a href='{{ exp.url }}'>{{ exp.url }}</a> </div>
             {% endif %}
             <div class='section-heading'>
-                <h4>Specifics</h4>
-            </div>
+                <h4>Specifics</h4> </div>
             <div class='section-content'>
                 {% if exp.man_months and exp.primary_language %}
                 Coded for about
@@ -41,77 +37,56 @@
                 {% if exp.primary_language %}
                 Coded mostly in {{ exp.primary_language }}.
                 {% endif %}
-                {% endif %}
+                {% endif %} </div>
+            <div class='section about-this-project'>
+                <div class='section-heading'>
+                    <h4>About this project</h4> </div>
+                <div class='section-content' id='role'>
+                    <div id='project-description'>
+                        <h5>{{ exp.project.name }}</h5>
+                        <p> {{ exp.project.description }} </p>
+                    </div>
+                    <div id='project-escutcheon'>
+                        <a href='#'>
+                            <img src='/static/project-icons/{{ exp.project.icon_url }}' />
+                            <div class='name'>
+                                {{ exp.project.name }}
+                            </div>
+                        </a>
+                    </div>
+                </div>
             </div>
-        </div>
-        {% if show_favorite %}
-        <div class='make-projectexp-favorite'>
-            <form name='make-exp-favorite-{{ exp.id }}' 
-                method='POST'
-                action='/people/make_favorite_project_exp'>
-                <input type='hidden' name='username'
-                value='{{ person.user.username }}'/>
-                <input type='hidden' name='exp_id'
-                value='{{ exp.id }}'/>
-                <input type='image' src='/static/images/icons/star-off.png'/>
-                <!--input type='submit' value='Make Favorite' /-->
-            </form>
-        </div>
-        {% endif %}
-        <div class='description'>
-        </div>
-        <div class='tags'>
-            {% if more_exp_attributes.tags %}
-            {% for tag in more_exp_attributes.tags %}
-            {{ tag.text }}
-            {% endfor %}
+            <div class='section other-contributors'>
+                <div class='section-heading'>
+                    <h4>Other contributors</h4>
+                </div>
+                <div class='section-content' id='role'>
+                    <ul id='contributors'>
+                        <li><a href=''><img class='logo' src='/static/images/profile-photos/iris-40px.jpg' width='40' />
+                            <span>Somebody</span></a></li>
+                        <li><a href=''><img class='logo' src='/static/images/profile-photos/selleck-40px.jpg' width='40' />
+                            <span>Somebody</span></a></li>
+                        <li><a href=''><img class='logo' src='/static/images/profile-photos/collins-40px.jpg' width='40' />
+                            <span>Somebody</span></a></li>
+                        <li><a href=''><img class='logo' src='/static/images/profile-photos/sufjan-40px.jpg' width='40' />
+                            <span>Somebody</span></a></li>
+                    </ul>
+                </div>
+            </div>
             {% else %}
-            {% endif %}
-        </div>
-        <div class='section about-this-project'>
-            <div class='section-heading'>
-                <h4>About this project</h4>
-            </div>
-            <div class='section-content' id='role'>
-                <div id='project-description'>
-                    <h5>{{ exp.project.name }}</h5>
-                    <p>
-                    {{ exp.project.description }}
-                    </p>
-                </div>
-                <div id='project-escutcheon'>
-                    <a href='#'>
-                        <img src='/static/project-icons/{{ exp.project.icon_url }}' />
-                        <div class='name'>
-                            {{ exp.project.name }}
-                        </div>
-                    </a>
-                </div>
-            </div>
-        </div>
-        <div class='section other-contributors'>
-            <div class='section-heading'>
-                <h4>Other contributors</h4>
-            </div>
-            <div class='section-content' id='role'>
-                <ul id='contributors'>
-                    <li><a href=''><img class='logo' src='/static/images/profile-photos/iris-40px.jpg' width='40' />
-                        <span>Somebody</span></a></li>
-                    <li><a href=''><img class='logo' src='/static/images/profile-photos/selleck-40px.jpg' width='40' />
-                        <span>Somebody</span></a></li>
-                    <li><a href=''><img class='logo' src='/static/images/profile-photos/collins-40px.jpg' width='40' />
-                        <span>Somebody</span></a></li>
-                    <li><a href=''><img class='logo' src='/static/images/profile-photos/sufjan-40px.jpg' width='40' />
-                        <span>Somebody</span></a></li>
-                </ul>
-            </div>
-        </div>
-        <div class='delete-projectexp'>
+            <form method='POST' action=''>
+                <ul>{{ form.as_ul }}</ul>
+                <input type='hidden' name='pk' value='{{ exp.pk }}' />
+                <input type='hidden' name='pk' value='{{ exp.project.pk }}' />
+                <input type='submit' value='Save' />
+                <a href='../../{{ exp.project.name }}'>Cancel</a>
+            </form>
             <form name='delete-projectexp-{{ exp.id }}'
                 method='POST' action='/people/delete-experience/do'>
                 <input type='hidden' name='id' value='{{ exp.id }}'/>
                 <input type='submit' value='Delete'/>
             </form>
+            {% endif %}
         </div>
         <!-- }}} -->
     </div>

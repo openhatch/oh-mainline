@@ -604,7 +604,28 @@ h4 {
 }
 .project-display ul {
     float: left;
-    width: 440px;
+    width: 480px;
+}
+
+/* Styling for django form output. */
+.project-display label {
+    float: left;
+    font-size: 7pt;
+    font-style: italic;
+    color: #666;
+    float: left;
+    text-transform: uppercase;
+    margin: 0;
+    padding: 1px;
+    font-weight: bold;
+    width: 115px;
+    margin-right: 10px;
+    margin-top: 10px;
+}
+.project-display input[type='text'],
+.project-display textarea {
+    float: left;
+    width: 300px;
 }
 .section {
     margin-bottom: 10px;

@@ -100,8 +100,11 @@ urlpatterns = patterns('',
         (r'^people/(?P<input_username>[^/]+)/tabs?/(?P<tab>[a-z]+)[/?]$',
                 'mysite.profile.views.display_person_web'),
 
-        (r'^people/(?P<input_username>[^/]+)/projects/(?P<name>[a-zA-Z -]+)[/?]$',
-                'mysite.profile.views.display_person_project_web'),
+        (r'^people/(?P<user_to_display__username>[^/]+)/projects/(?P<project__name>[a-zA-Z -]+)[/?]$',
+                'mysite.profile.views.projectexp_display'),
+
+        (r'^people/(?P<user_to_display__username>[^/]+)/projects/edit/(?P<project__name>[a-zA-Z -]+)[/?]$',
+                'mysite.profile.views.projectexp_edit'),
 
         (r'^people/(?P<input_username>[^/]+)/edit[/?]$',
                 'mysite.profile.views.display_person_edit_web'),

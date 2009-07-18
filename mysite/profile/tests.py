@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# vim: set ai et ts=4 sw=4 nu columns=80:
+# vim: set ai et ts=4 sw=4 nu:
 # Testing suite for profile
 
 # Imports {{{
@@ -390,16 +390,7 @@ class PersonInvolvementTests(TwillTests):
         """Paulproteus can login and add a projectexp."""
         # {{{
 
-        # Visit login page
-        login_url = 'http://openhatch.org/people/login'
-        tc.go(make_twill_url(login_url))
-
-        # Log in
-        username = "paulproteus"
-        password = "paulproteus's unbreakable password"
-        tc.fv('login', 'login_username', username)
-        tc.fv('login', 'login_password', password)
-        tc.submit()
+        self.login()
 
         tc.follow('Add project to your portfolio')
 
@@ -454,9 +445,9 @@ class PersonInvolvementTests(TwillTests):
         tc.fv('login', 'login_password', password)
         tc.submit()
 
-        # Load up the ProjectExp page.
+        # Load up the ProjectExp edit page.
         project_name = 'ccHost'
-        exp_url = 'http://openhatch.org/people/%s/projects/%s/' % (
+        exp_url = 'http://openhatch.org/people/%s/projects/edit/%s/' % (
                 urllib.quote(username), urllib.quote(project_name))
         tc.go(make_twill_url(exp_url))
 
@@ -469,6 +460,8 @@ class PersonInvolvementTests(TwillTests):
                                                     # to the form named
                                                     # ``delete-projectexp-13''.
         tc.submit()
+
+        # FIXME: What page are we on now?
 
         # Alakazam! It's gone.
         tc.notfind('ccHost')
@@ -508,9 +501,10 @@ class PersonInvolvementTests(TwillTests):
 
     def test_tag_editor(self):
         # {{{
+        self.login()
         tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
         tc.follow('Edit')
-        tc.find('Edit info')
+        tc.find('personal_info_edit_mode') # a check-string
         # }}}
 
     def test_tag_editor_save(self):

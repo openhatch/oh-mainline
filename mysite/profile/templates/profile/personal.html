@@ -1,5 +1,5 @@
 {% comment %}
-vim: set ai et ts=4 sw=4 nu columns=80:
+vim: set ai et ts=4 sw=4 nu:
 {% endcomment %}
 
 <div id='importer'>
@@ -76,12 +76,13 @@ vim: set ai et ts=4 sw=4 nu columns=80:
     {% endif %}
 
     <div id='info' class='widget'>
-        <a style='font: 8pt Verdana; background-color: #fff; float: right;' href='/people/{{ person.user.username }}/tags/edit'>Edit</a>
+        <a style='font: 8pt Verdana; background-color: #fff; float: right;' href='/people/{{ person.user.username }}/edit'>Edit</a>
         {% if edit %}
         <!-- {{{ -->
         <form name='edit-tags'
             action='/people/{{person.user.username}}/tags/edit/do'
             method='POST'>
+            <!-- personal_info_edit_mode -->
             {% comment %} THIS IS EDIT MODE FOOLS {% endcomment %}
             <h4>understands:</h4>
             <textarea name='edit-tags-understands'>{{ tags_flat.understands }}</textarea>
