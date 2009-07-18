@@ -91,6 +91,9 @@ def index(request):
     if request.GET.get('msg', None) == 'ciao':
         notification = "You've been logged out. Thanks for dropping in!"
         notification_id = 'ciao'
+    elif request.GET.get('msg', None) == 'username_taken':
+        notification = "Your chosen username is already taken. Try another one."
+        notification_id = 'username_taken'
     return render_to_response('search/index.html', {
         'notification_id': notification_id,
         'notification': notification 

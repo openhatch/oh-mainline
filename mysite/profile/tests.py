@@ -608,7 +608,7 @@ class SetAPasswordTests(TwillTests):
     username = 'ziggy'
     password = "ziggy's impregnable passkey"
 
-    def test_follow_link_from_front_page(self):
+    def test_create_user_from_front_page(self):
         """This test:
         * Creates a new user
         * Verifies that we are at ziggy's profile page"""
@@ -620,12 +620,30 @@ class SetAPasswordTests(TwillTests):
         tc.find(self.username)
         tc.find('profile')
 
+    def test_create_duplicate_user_from_front_page(self):
+        # The fixtures show that we have paulproteus already
+        # registered
+        tc.go(make_twill_url('http://openhatch.org/'))
+        duplicated_username='paulproteus'
+        nondup_username='paulproteus2'
+        password='new password'
+        tc.fv('create_profile', 'create_profile_username', duplicated_username)
+        tc.fv('create_profile', 'create_profile_password', password)
+        tc.submit()
+        # Should be back at the front page, with a message
+        # saying that you need to pick a different username.
+        tc.find('username_taken')
+        tc.fv('create_profile', 'create_profile_username', nondup_username)
+        tc.fv('create_profile', 'create_profile_password', password)
+        tc.submit()
+        tc.find(nondup_username)
+
     def test_signup_on_front_page_lets_person_sign_back_in(self):
         ''' The point of this test is to:
         * Create the account for ziggy
         * Log out
         * Log back in as him '''
-        self.test_follow_link_from_front_page()
+        self.test_create_user_from_front_page()
         tc.follow('logout')
         tc.go(make_twill_url('http://openhatch.org/'))
         tc.fv('login', 'login_username', self.username)

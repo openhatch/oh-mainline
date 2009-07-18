@@ -202,8 +202,7 @@ def display_person_edit_web(request):
 
 def display_person_web(request, user_to_display__username=None):
     # {{{
-    user = django.contrib.auth.models.User.objects.get(
-            username=user_to_display__username)
+    user = User.objects.get(username=user_to_display__username)
 
     title = 'openhatch / %s' % user.username
 
@@ -655,13 +654,17 @@ def new_user_do(request):
     username = request.POST.get('create_profile_username', None)
     password = request.POST.get('create_profile_password', None)
     if username and password:
-        #FIXME: Catch username collisions
-
         # create a user
-        user = django.contrib.auth.models.User.objects.create_user(
-                username=username, 
-                email='', password=password)
-
+        user, created = User.objects.get_or_create(username=username)
+        if not created:
+            # eep, redirect back to the front page with a message
+            return HttpResponseRedirect('/?msg=username_taken')
+        
+        # Good, set the user's parameters.
+        user.email=''
+        user.set_password(password)
+        user.save()
+        
         # create a linked person
         person = Person(user=user)
         person.save()
@@ -670,8 +673,6 @@ def new_user_do(request):
         user = django.contrib.auth.authenticate(
                 username=username, password=password)
         django.contrib.auth.login(request, user)
-
-        user.save()
 
         # redirect to profile
         return HttpResponseRedirect('/people/%s/' % urllib.quote(username))
