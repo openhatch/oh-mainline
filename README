@@ -1,6 +1,6 @@
 How to run this code:
 
-$ sudo apt-get install python-django python-twill python-lxml python-dateutil python-tz python-simplejson rabbitmq-server python-mysqldb python-imaging python-libxml2 python-apt
+$ sudo apt-get install python-django python-twill python-lxml python-dateutil python-tz python-simplejson rabbitmq-server python-mysqldb python-imaging python-libxml2 python-apt python-beautifulsoup
 $ sudo rabbitmqctl add_user rabbiter johT4qui
 $ sudo rabbitmqctl add_host localhost
 $ rabbitmqctl set_permissions -p localhost rabbiter "" ".*" ".*" || rabbitmqctl map_user_vhost rabbiter localhost || echo EEEP
