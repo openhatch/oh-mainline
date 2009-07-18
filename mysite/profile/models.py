@@ -16,20 +16,6 @@ class Person(models.Model):
     interested_in_working_on = models.CharField(max_length=1024, default='')
     last_polled = models.DateTimeField(default=datetime.datetime(1970, 1, 1))
 
-    def try_to_get_name_from_ohloh(self):
-        if self.gotten_name_from_ohloh:
-            return
-        # otherwise, do it
-        oh = ohloh.get_ohloh()
-        # Preferably get the human name...
-        try:
-            self.name = oh.get_name_by_username(self.user.username)
-        except ValueError:
-            pass
-        # say we did it, and save
-        self.gotten_name_from_ohloh = True
-        self.save()
-
     def fetch_contrib_data_from_ohloh(self):
         # self has to be saved, otherwise person_id becomes null
         self.save()

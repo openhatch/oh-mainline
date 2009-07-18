@@ -4,7 +4,7 @@
 
 # Imports {{{
 from search.models import Project
-from profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag
+from profile.models import Person, ProjectExp, Tag, TagType, Link_Person_Tag, Link_ProjectExp_Tag
 import profile.views
 import profile.controllers
 import settings
@@ -21,6 +21,7 @@ from django.core.handlers.wsgi import WSGIHandler
 from StringIO import StringIO
 import urllib
 import simplejson
+import BeautifulSoup
 
 from django.test.client import Client
 import tasks 
@@ -53,6 +54,7 @@ class TwillTests(django.test.TestCase):
     # {{{
     def setUp(self):
         twill_setup()
+        twill_quiet()
 
     def tearDown(self):
         twill_teardown()
@@ -140,87 +142,6 @@ class DebTagsTests(TwillTests):
     # }}}
 
 #class ExpTag(TwillTests):
-
-import os
-class OhlohIconTests(TwillTests):
-    '''Test that we can grab icons from Ohloh.'''
-    # {{{
-    def test_given_project_find_icon(self):
-        oh = ohloh.get_ohloh()
-        icon = oh.get_icon_for_project('f-spot')
-        icon_fd = StringIO(icon)
-        from PIL import Image
-        image = Image.open(icon_fd)
-        self.assertEqual(image.size, (64, 64))
-
-    def test_given_project_find_icon_failure(self):
-        oh = ohloh.get_ohloh()
-        self.assertRaises(ValueError, oh.get_icon_for_project, 'lolnomatxh')
-
-    def test_find_icon_failure_when_proj_exists_but_lacks_icon(self):
-        oh = ohloh.get_ohloh()
-        self.assertRaises(ValueError, oh.get_icon_for_project, 'asdf')
-
-    def test_find_icon_for_mozilla_firefox(self):
-        oh = ohloh.get_ohloh()
-        icon = oh.get_icon_for_project('Mozilla Firefox')
-        icon_fd = StringIO(icon)
-        from PIL import Image
-        image = Image.open(icon_fd)
-        self.assertEqual(image.size, (64, 64))
-
-    def test_find_icon_for_proj_with_space(self):
-        oh = ohloh.get_ohloh()
-        self.assertRaises(ValueError, oh.get_icon_for_project,
-                'surely nothing is called this name')
-
-    def test_given_project_generate_internal_url(self):
-        # First, delete the project icon
-        url = profile.views.project_icon_url('f-spot', actually_fetch=False)
-        path = url[1:] # strip leading '/'
-        if os.path.exists(path):
-            os.unlink(path)
-
-        # Download the icon
-        url = profile.views.project_icon_url('f-spot')
-        self.assert_(os.path.exists(path))
-        os.unlink(path)
-
-    def test_given_project_generate_internal_url_for_proj_fail(self):
-        # First, delete the project icon
-        url = profile.views.project_icon_url('lolnomatzch',
-                                             actually_fetch=False)
-        path = url[1:] # strip leading '/'
-        if os.path.exists(path):
-            os.unlink(path)
-
-        # Download the icon
-        url = profile.views.project_icon_url('lolnomatzch')
-        self.assert_(os.path.exists(path))
-        os.unlink(path)
-
-
-    def test_project_image_link(self):
-        # First, delete the project icon
-        url = profile.views.project_icon_url('f-spot',
-                                             actually_fetch=False)
-        path = url[1:] # strip leading '/'
-        if os.path.exists(path):
-            os.unlink(path)
-
-        # Then retrieve (slowly) this URL that redirects to the image
-        go_to_url = '/people/project_icon/f-spot'
-        
-        response = Client().get(go_to_url)
-        # Assure ourselves that we were redirected to the above URL...
-        self.assertEqual(response['Location'], 'http://testserver' + url)
-        # and that the file exists on disk
-
-        self.assert_(os.path.exists(path))
-
-        # Remove it so the test has no side-effects
-        os.unlink(path)
-    # }}}
 
 class CambridgeTests(TwillTests):
     '''
@@ -437,40 +358,57 @@ class ProjectExpTests(TwillTests):
         tc.find('personal_info_edit_mode') # a check-string
         # }}}
 
+    tags = {
+            'understands': ['ack', 'b', 'c'],
+            'understands_not': ['dad', 'e', 'f'],
+            'seeking': ['gone', 'h', 'i'],
+            'studying': ['jam', 'k', 'l'],
+            'can_mentor': ['mop', 'n', 'o'],
+            }
+    tags_2 = {
+            'understands': ['Ack!', 'B!', 'C!'],
+            'understands_not': ['dad', 'e', 'f'],
+            'seeking': ['gone', 'h', 'i'],
+            'studying': ['Jam?', 'K?', 'L?'],
+            'can_mentor': ['mop', 'n', 'o'],
+            }
+    # FIXME: Test whitespace, too.
+
     # FIXME: Write a unit test for this.
-    def test_edit_info_web(self):
+    def update_tags(self, tag_dict):
         # {{{
         url = 'http://openhatch.org/people/edit'
         tc.go(make_twill_url(url))
-        tags = ['jquery', 'python', 'c++',
-                'qwer', 'jkl', 'qergqer', 
-                'qe3rga', 'tvauetb', 'aerbgaeg',
-                'q40ghqt', 'bgbhgb', '!#%!JG%!',
-                'aye', 'bee', 'sea',
-                ]
-        tc.fv('edit-tags', 'edit-tags-understands', ', '.join(tags[:3]))
-        tc.fv('edit-tags', 'edit-tags-understands_not', ', '.join(tags[3:6]))
-        tc.fv('edit-tags', 'edit-tags-seeking', ', '.join(tags[6:9]))
-        tc.fv('edit-tags', 'edit-tags-studying', ', '.join(tags[9:12]))
-        tc.fv('edit-tags', 'edit-tags-can_mentor', ', '.join(tags[12:15]))
+        for tag_type_name in tag_dict:
+            tc.fv('edit-tags', 'edit-tags-' + tag_type_name, ", ".join(tag_dict[tag_type_name]))
         tc.submit()
-        self.assert_(list(profile.models.Link_Person_Tag.objects.filter(
-            tag__text='jquery', person__user__username='paulproteus')))
-        self.assert_(list(profile.models.Link_Person_Tag.objects.filter(
-            tag__text='bgbhgb', person__user__username='paulproteus')))
-        #out = profile.views.tags_dict_for_person(Person.objects.get(
-        #    username='paulproteus'))
-        for (n, thing) in enumerate(['understands',
-                                    'will never understand',
-                                    'looking for volunteering opportunities in',
-                                    'currently learning about',
-                                    'can mentor in']):
-            tc.find(thing + '.*'
-                    + ".*".join(map(re.escape, tags[n*3:(n+1)*3])))
+
+        # Check that at least the first tag made it into the database.
+        self.assert_(list(Link_Person_Tag.objects.filter(
+            tag__text=tag_dict.values()[0][0], person__user__username='paulproteus')))
+
+        # Check that the output is correct.
+        soup = BeautifulSoup.BeautifulSoup(tc.show())
+        for tag_type_name in tag_dict:
+            text = ''.join(soup(id='tags-%s' % tag_type_name)[0].findAll(text=True))
+            self.assert_(', '.join(tag_dict[tag_type_name]) in text)
 
         # Go back to the form and make sure some of these are there
         tc.go(make_twill_url(url))
-        tc.find('aye')
+        tc.find(tag_dict.values()[0][0])
+        # }}}
+
+    def test_tag_edit_once(self):
+        # {{{
+        self.login()
+        self.update_tags(self.tags)
+        # }}}
+
+    def test_tag_edit_twice(self):
+        # {{{
+        self.login()
+        self.update_tags(self.tags)
+        self.update_tags(self.tags_2)
         # }}}
 
     # }}}

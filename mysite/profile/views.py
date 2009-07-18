@@ -254,7 +254,7 @@ def projectexp_add_form(request):
 def tags_dict_for_person(person):
     # {{{
     ret = collections.defaultdict(list)
-    links = Link_Person_Tag.objects.filter(person=person)
+    links = Link_Person_Tag.objects.filter(person=person).order_by('id')
     for link in links:
         ret[link.tag.tag_type.name].append(link.tag)
 
@@ -423,44 +423,33 @@ def edit_person_tags(request):
     person = request.user.get_profile()
 
     # We can map from some strings to some TagTypes
-    for known_tag_type in ('understands', 'understands_not',
+    for known_tag_type_name in ('understands', 'understands_not',
                            'studying', 'seeking', 'can_mentor'):
-        tag_type, _ = TagType.objects.get_or_create(name=known_tag_type)
+        tag_type, _ = TagType.objects.get_or_create(name=known_tag_type_name)
 
-        text = request.POST.get('edit-tags-' + known_tag_type, '')
-        # set the tags to this thing
-        tags = text.split(',')
-        tags = [tag.strip() for tag in tags]
-        # Now figure out what tags there in the DB
-        tag_links = Link_Person_Tag.objects.filter(
+        text = request.POST.get('edit-tags-' + known_tag_type_name, '')
+        # Set the tags to this thing
+        new_tag_texts_for_this_type_raw = text.split(',')
+        new_tag_texts_for_this_type = [tag.strip()
+                for tag in new_tag_texts_for_this_type_raw]
+        # Now figure out what tags are in the DB
+        old_tag_links = Link_Person_Tag.objects.filter(
                 tag__tag_type=tag_type, person=person)
-        tag_texts = [l.tag.text for l in tag_links]
 
-        to_be_added = []
-        to_be_removed = []
-        import difflib
-        for modification in difflib.ndiff(tag_texts, tags):
-            first_two, rest = modification[:2], modification[2:]
-            if first_two == '  ':
-                continue
-            elif first_two == '+ ':
-                to_be_added.append(rest)
-            elif first_two == '- ':
-                to_be_removed.append(rest)
-            else:
-                raise ValueError, "Weird."
-        for tag in to_be_removed:
-            map(lambda thing: thing.delete(),
-                Link_Person_Tag.objects.filter(tag__tag_type=tag_type,
-                                               person=person,
-                                               tag__text=tag))
-        for tag in to_be_added:
-            new_tag, _ = Tag.objects.get_or_create(tag_type=tag_type, text=tag)
-            new_link, _ = Link_Person_Tag.objects.get_or_create(tag=new_tag,
-                                                                person=person)
+        # FIXME: Churn, baby churn
+        for link in old_tag_links:
+            link.delete()
+
+        for tag_text in new_tag_texts_for_this_type:
+            new_tag, _ = Tag.objects.get_or_create(
+                    tag_type=tag_type, text=tag_text)
+            new_link, _ = Link_Person_Tag.objects.get_or_create(
+                    tag=new_tag, person=person)
             
     return HttpResponseRedirect('/people/%s/' %
                                 urllib.quote(request.user.username))
+
+    # FIXME: This is racey. Only one of these functions should run at once.
     # }}}
 
 def project_icon_web(request, project_name):
@@ -566,7 +555,6 @@ def exp_scraper_handle_ohloh_results(username, ohloh_results):
             exp.save()
     person.last_polled = datetime.datetime.now()
     person.ohloh_grab_completed = True
-    person.try_to_get_name_from_ohloh()
     person.save()
     # }}}
 
