@@ -212,9 +212,8 @@ class ProjectExpTests(TwillTests):
             'person-paulproteus', 'cchost-data-imported-from-ohloh']
 
     def test_projectexp_add(self):
-        """Paulproteus can login and add a projectexp."""
+        """Paulproteus can login and add a projectexp to bumble."""
         # {{{
-
         self.login()
 
         tc.follow('Add project to your portfolio')
@@ -226,6 +225,21 @@ class ProjectExpTests(TwillTests):
         tc.submit()
         tc.find('fiddlesticks')
         tc.find('http://example.com')
+        # }}}
+
+    def test_projectexp_add_another(self):
+        """Paulproteus can login and add a second projectexp to bumble."""
+        # {{{
+        self.test_projectexp_add()
+        tc.follow('All projects')
+
+        tc.follow('Add project to your portfolio')
+        tc.fv('projectexp_add', 'project__name', 'bumble')
+        tc.fv('projectexp_add', 'project_exp__description', 'fiddlesticks2')
+        tc.fv('projectexp_add', 'project_exp__url', 'http://example.com/2')
+        tc.submit()
+        tc.find('fiddlesticks2')
+        tc.find('http://example.com/2')
         # }}}
 
     def test_projectexp_delete(self):

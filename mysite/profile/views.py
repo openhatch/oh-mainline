@@ -3,7 +3,7 @@
 # Imports {{{
 import settings
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
-from django.shortcuts import render_to_response, get_object_or_404
+from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404
 from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag, Link_Project_Tag, Link_SF_Proj_Dude_FM, Link_Person_Tag
 from mysite.search.models import Project
 import profile.controllers
@@ -224,7 +224,7 @@ def projectexp_display(request, user_to_display__username, project__name):
     person = get_object_or_404(Person, user__username=user_to_display__username)
     data = data_for_person_display_without_ohloh(person)
     data['project'] = get_object_or_404(Project, name=project__name)
-    data['exp'] = get_object_or_404(ProjectExp,
+    data['exp_list'] = get_list_or_404(ProjectExp,
             person__user__username=user_to_display__username, 
             project__name=project__name)
     return render_to_response('profile/projectexp.html', data)
@@ -235,7 +235,7 @@ def projectexp_edit(request, project__name):
     user_to_display__username=request.user.username
     person = get_object_or_404(Person, user__username=user_to_display__username)
     data = data_for_person_display_without_ohloh(person)
-    data['exp'] = get_object_or_404( ProjectExp,
+    data['exp_list'] = get_list_or_404( ProjectExp,
             person__user__username=user_to_display__username,
             project__name=project__name)
     data['form'] = forms.ProjectExpForm()
