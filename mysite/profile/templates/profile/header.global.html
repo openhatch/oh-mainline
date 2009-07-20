@@ -64,13 +64,8 @@
                     <li><a href='/search/'>find volunteer opportunities</a></li>
                 {% if the_user.is_authenticated %}
                 <!-- user.is_authenticated indeed -->
-                <ul id='user-actions'>
-                    You're logged in as {{ the_user.username }}.
-                    <li>
-                    <a href='/people/signup'>Sign up to save your work</a>
-                    {% if not the_user.has_unusable_password %}
+                    <li><span>You're logged in as {{ the_user.username }}.</span></li>
                     <li><a href='/people/logout/'>Log out</a></li>
-                    {% endif %}
                 {% endif %}
                 </ul>
             </div>
