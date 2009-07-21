@@ -167,19 +167,6 @@ class QuebecTests(django.test.TestCase):
         self.assert_(all_proj_exps, all_proj_exps)
         # }}}
 
-    def testGetPersonDataDict(self):
-        # {{{
-        username = 'paulproteus'
-        data = profile.views.profile_data_from_username(username,
-                                                        fetch_ohloh_data=True)
-        self.assertEquals(data['person'].user.username, username)
-        cchost_among_project_exps = False
-        for proj, tags in data['exp_taglist_pairs']:
-            if proj.project.name == 'ccHost':
-                cchost_among_project_exps = True
-                break
-        self.assert_(cchost_among_project_exps)
-        # }}}
     # }}}
 
 class OhlohIconTests(django.test.TestCase):

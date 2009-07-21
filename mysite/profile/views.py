@@ -4,7 +4,7 @@
 import settings
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
 from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404
-from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag, Link_Project_Tag, Link_SF_Proj_Dude_FM, Link_Person_Tag
+from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag, Link_Project_Tag, Link_SF_Proj_Dude_FM, Link_Person_Tag, DataImportAttempt
 from mysite.search.models import Project
 import profile.controllers
 import StringIO
@@ -69,18 +69,13 @@ def display_test_page_for_commit_importer(request):
 # }}}
 
 # Display profile {{{
-def profile_data_from_username(username, fetch_ohloh_data = False):
+def profile_data_from_username(username):
     # {{{
     person = Person.objects.get(
             user__username=username)
 
     project_exps = ProjectExp.objects.filter(
             person=person)
-
-    if fetch_ohloh_data and person.poll_on_next_web_view:
-        person.fetch_contrib_data_from_ohloh()
-        person.poll_on_next_web_view = False
-        person.save()
 
     exps_to_tags = {}
     for exp in project_exps:
@@ -497,53 +492,34 @@ def import_commits_by_commit_username(request):
     # to pull in this user's data (just the one huge one)
     do_it = True # unless...
 
-    # finally, check for an attempt sitting in the queue
-    if not person.poll_on_next_web_view:
-        # if this is set, it means someone created a background job
-        # if said job is less than two minutes old, then let it run
-        now_epoch = int(datetime.datetime.now().strftime('%s'))
-        then_epoch = int(person.last_polled.strftime('%s'))
-        if (now_epoch - then_epoch) < 120:
-            do_it = False
-
     if nobgtask:
         do_it = False
 
-    if person.ohloh_grab_completed:
-        do_it = False
-    
     if do_it:
         username= request.user.username
         import tasks 
         # say we're trying
-        person.poll_on_next_web_view = False
-        person.last_polled = datetime.datetime.now()
-        person.save()
+        dia = DataImportAttempt(source='rs', person=person,
+                                query=commit_username)
+        dia.save()
+
         if cooked_data is None:
-            result = tasks.FetchPersonDataFromOhloh.delay(
-                    username=username, 
-                    commit_username=commit_username)
+            result = tasks.FetchPersonDataFromOhloh.delay(dia.id)
         else:
             task = tasks.FetchPersonDataFromOhloh()
-            task.run(username=username,
-                    commit_username=commit_username,
-                    cooked_data=cooked_data)
+            task.run(dia.id, cooked_data=cooked_data)
     # }}}
 
-def ohloh_grab_done_web(request):
-# {{{
-    # get the person
-    person = request.user.get_profile()
-
-    return HttpResponse(bool(person.ohloh_grab_completed))
-# }}}
-
-def exp_scraper_handle_ohloh_results(username, ohloh_results):
+def exp_scraper_handle_ohloh_results(dia_id,
+                                     ohloh_results):
     # {{{
-    '''Input: A sequence of Ohloh ContributorInfo dicts.
+    '''Input: A sequence of Ohloh ContributorInfo dicts
+    and the id of the DataImport they came from.
+
     Side-effect: Create matching structures in the DB
     and mark our success in the database.'''
-    person = Person.objects.get(user__username=username)
+    dia = DataImportAttempt.objects.get(id=dia_id)
+    person = dia.person
     for c_i in ohloh_results:
         for ohloh_contrib_info in ohloh_results:
             exp = ProjectExp()
@@ -553,7 +529,8 @@ def exp_scraper_handle_ohloh_results(username, ohloh_results):
             exp.last_touched = datetime.datetime.now()
             exp.save()
     person.last_polled = datetime.datetime.now()
-    person.ohloh_grab_completed = True
+    dia.completed = True
+    dia.save()
     person.save()
     # }}}
 
@@ -630,10 +607,17 @@ def signup_do(request):
 
 def gimme_json_that_says_that_commit_importer_is_done(request):
     ''' This web controller is called when you want JSON that tells you 
-    if the background job we started has finished. It has no side-effects.'''
+    if the background jobs for the logged-in user have finished.
+
+    It has no side-effects.'''
     person = request.user.get_profile()
-    success = person.ohloh_grab_completed
-    list_of_dictionaries = [{'success': success}]
+    dias = get_list_or_404(DataImportAttempt, person=person)
+    list_of_dictionaries = []
+    for dia in dias:
+        this_one = {'success': dia.completed,
+                    'id': dia.id,
+                    'query': dia.query}
+        list_of_dictionaries.append(this_one)
     return HttpResponse(simplejson.dumps(list_of_dictionaries))
 
 def import_do(request):

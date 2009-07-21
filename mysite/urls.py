@@ -50,10 +50,6 @@ urlpatterns = patterns('',
         (r'^people/tags/edit/do$',
             'mysite.profile.views.edit_person_tags'),
 
-        # Check if Ohloh grab is done
-        (r'^people/ohloh_grab_done$',
-            'mysite.profile.views.ohloh_grab_done_web'),
-
         # Project icons
         (r'^people/project_icon/(?P<project_name>.*)$',
             'mysite.profile.views.project_icon_web'),

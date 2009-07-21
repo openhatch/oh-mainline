@@ -4,7 +4,7 @@
 
 # Imports {{{
 from search.models import Project
-from profile.models import Person, ProjectExp, Tag, TagType, Link_Person_Tag, Link_ProjectExp_Tag
+from profile.models import Person, ProjectExp, Tag, TagType, Link_Person_Tag, Link_ProjectExp_Tag, DataImportAttempt
 import profile.views
 import profile.controllers
 import settings
@@ -452,25 +452,36 @@ class CeleryTests(TwillTests):
             use_cooked_data=True):
         """1. Go to the page that has paulproteus' data.  2. Verify that the page doesn't yet know about ccHost. 3. Run the celery task ourselves, but instead of going to Ohloh, we hand-prepare data for it."""
 
+        # do this work for user = paulproteus
+        username='paulproteus'
+
+        # Store a note in the DB we're about to do a background task
+        dia = DataImportAttempt(query=username, source='rs',
+                                person=Person.objects.get(
+                user__username=username))
+        dia.save()
+        
+
         url = '/people/test_commit_importer_json'
+
         
         good_input = {
             'nobgtask': 'yes',
             }
         
         client = Client()
-        username='paulproteus'
         password="paulproteus's unbreakable password"
         client.login(username=username,
                      password=password)
 
         # Ask if background job has been completed.
-        # We haven't called it, so the answer should be no.
+        # We haven't even created the background job, so it should
+        # 404.
         response_before = client.get(url, good_input)
         self.assertEquals(
-                simplejson.loads(response_before.content),
-                [{'success': 0}])
-
+            simplejson.loads(response_before.content),
+            [{'id': dia.id, 'query': username, 'success': 0}])
+        
         # Ask if involvement fact has been loaded.
         # We haven't loaded it, so the answer should be no.
         project_name = 'ccHost'
@@ -488,61 +499,26 @@ class CeleryTests(TwillTests):
         else:
             cooked_data=None
 
-        # Instantiate the task
-        # For us, commit_username is also paulproteus.
-        # The above cooked_data is a snapshot of 
-        # paulproteus's contributions as indexed by Ohloh.
-        commit_username=username # = 'paulproteus'
-
         task = tasks.FetchPersonDataFromOhloh()
-        task.run(username=username,
-                 commit_username=commit_username,
+        task.run(dia_id=dia.id,
                  cooked_data=cooked_data)
         # NB: The task knows not to call Ohloh when we give it cooked data.
 
-        self.assert_(Person.objects.get(
-            user__username='paulproteus').ohloh_grab_completed)
+        # Now that we have synchronously run the task, it should be
+        # marked as completed.
+        self.assert_(DataImportAttempt.objects.get(id=dia.id).completed)
 
         # Check again
         response_after = client.get(url, good_input)
 
         # Ask if background job has been completed. (Hoping for yes.)
         self.assertEquals(simplejson.loads(response_after.content),
-                [{'success': 1}])
+                          [{'id': dia.id, 'query': username,
+                            'success': 1}])
 
         # Ask if involvement fact has been loaded. (Hoping for yes.)
         self.assert_(list(ProjectExp.objects.filter(
             project__name=project_name)))
-
-    def test_background_check_if_ohloh_grab_completed(self):
-        username='paulproteus'
-
-        tc.go(make_twill_url('http://openhatch.org/people/login'))
-        tc.fv('login', 'login_username', username)
-        tc.fv('login', 'login_password', "paulproteus's unbreakable password")
-        tc.submit()
-
-        url = 'http://openhatch.org/people/ohloh_grab_done'
-        tc.go(make_twill_url(url))
-        tc.find('False')
-
-        person_obj = Person.objects.get(user__username=username)
-        person_obj.ohloh_grab_completed = True
-        person_obj.save()
-
-        tc.go(make_twill_url(url))
-        tc.find('True')
-
-    def test_bg_loading_marks_grab_completed(self):
-        username = 'paulproteus'
-        url = 'http://openhatch.org/people/ohloh_grab_done'
-        tc.go(make_twill_url(url))
-        tc.find('False')
-
-        self.test_slow_loading_via_emulated_bgtask(use_cooked_data=True)
-
-        tc.go(make_twill_url(url))
-        tc.find('True')
 
     # FIXME: One day, test that after self.test_slow_loading_via_emulated_bgtask
     # getting the data does not go out to Ohloh.

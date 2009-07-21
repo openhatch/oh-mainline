@@ -10,8 +10,6 @@ class Person(models.Model):
     """ A human bean. """
     # {{{
     user = models.ForeignKey(User, unique=True)
-    poll_on_next_web_view = models.BooleanField(default=True)
-    ohloh_grab_completed = models.BooleanField(default=False)
     gotten_name_from_ohloh = models.BooleanField(default=False)
     interested_in_working_on = models.CharField(max_length=1024, default='')
     last_polled = models.DateTimeField(default=datetime.datetime(1970, 1, 1))
@@ -35,10 +33,24 @@ class Person(models.Model):
                 self.user.first_name, self.user.last_name)
     # }}}
 
+class DataImportAttempt(models.Model):
+    IMPORT_TYPE_CHOICES = (
+        ('rs', 'Ohloh repository search'),
+        ('ou', 'Ohloh username import'),
+        )
+    completed = models.BooleanField(default=False)
+    failed = models.BooleanField(default=False)
+    source = models.CharField(max_length=2,
+                              choices=IMPORT_TYPE_CHOICES)
+    person = models.ForeignKey(Person)
+    query = models.CharField(max_length=200)
+
 class ProjectExp(models.Model):
     "Many-to-one relation between projects and people."
     # {{{
     person = models.ForeignKey(Person)
+    should_show_this = models.BooleanField(default=False)
+    data_import_attempt = models.ForeignKey(DataImportAttempt, null=True)
     project = models.ForeignKey(Project)
     person_role = models.CharField(max_length=200)
     description = models.TextField()
