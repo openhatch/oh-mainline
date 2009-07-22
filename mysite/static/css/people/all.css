@@ -354,12 +354,6 @@ textarea {
     padding: 10px;
     font: 8pt Verdana;
     float: left;
-    border: solid #dde;
-    border-width: 1px; 
-    background-color: #fff; 
-    border-bottom-color: #ccc;
-    margin-bottom: 10px;
-    float: left;
 }
 input[type='submit'] {
     padding: 1px 8px;

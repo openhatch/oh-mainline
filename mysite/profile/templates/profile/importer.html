@@ -21,6 +21,7 @@
                     <input type='submit' value='Show me the data sources!' />
                 </form>
             </div>
+            <div class='data_import_attempts'>
                 Select data sources:
                 <ul>
                     {% for dia in dias %}
@@ -46,6 +47,7 @@
                     {% endif %}
                     {% endfor %}
                 </ul>
+            </div>
         </div>
         <div class=''>
             <input type='submit' value='Submit' id='submit_data_sources' />
