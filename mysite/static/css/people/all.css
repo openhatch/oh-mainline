@@ -780,6 +780,15 @@ input[type='submit'] {
     margin-right: 10px;
     clear: left;
 }
+#importer #right label {
+    float: left;
+    width: 130px;
+    margin-right: 10px;
+}
+#importer #right .data_import_status {
+    float: left;
+    width: 32px;
+}
 #importer p {
     margin: 0;
     margin-bottom: 10px;
