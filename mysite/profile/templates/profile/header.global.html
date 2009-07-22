@@ -1,4 +1,5 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+"http://www.w3.org/TR/1999/REC-html401-19991224/strict.dtd">
 <html>
     <head>
 
@@ -47,7 +48,7 @@
         {% comment %} }}} {% endcomment %}
 
     </head>
-    <body>
+    <body{% if body_id %} id='{{ body_id }}'{% endif %}>
         <div id='outermost'>
             <div id='penoutermost'>
         <div class='section' id='nav'>

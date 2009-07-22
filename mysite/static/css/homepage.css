@@ -68,11 +68,6 @@ h4 {
     margin: 10px 0 20px 0;
 }
 
-span {
-    font-weight: bold;
-    background-color: #fff;
-}
-
 #banner {
     width: 350px;
     float: left;
@@ -99,6 +94,9 @@ span {
     list-style-type: none;
     border: 10px solid #fff;
     background: url('/static/images/motif.png');
+    margin-bottom: 10px;
+    float: left;
+    padding: 10px;
 }
 
 #stuff-to-do span {

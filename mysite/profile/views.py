@@ -2,6 +2,7 @@
 
 # Imports {{{
 import settings
+from django.core import serializers
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
 from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404
 from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag, Link_Project_Tag, Link_SF_Proj_Dude_FM, Link_Person_Tag, DataImportAttempt
@@ -51,7 +52,7 @@ def projectexp_add_do(request):
     data = profile_data_from_username(username)
     data['notification'] = notification
 
-    url_that_displays_project_exp = '/people/%s/projects/%s/' % (
+    url_that_displays_project_exp = '/people/%s/projects/%s' % (
             urllib.quote(username), urllib.quote(project_name))
     return HttpResponseRedirect(url_that_displays_project_exp)
     #}}}
@@ -198,13 +199,11 @@ def display_person_edit_web(request):
 def display_person_web(request, user_to_display__username=None):
     # {{{
     user = User.objects.get(username=user_to_display__username)
-
-    title = 'openhatch / %s' % user.username
-
     person = user.get_profile()
 
     data = data_for_person_display_without_ohloh(person)
 
+    data['title'] = 'openhatch / %s' % user.username
     data['edit_mode'] = False
 
     # FIXME: Django builds this in.
@@ -462,18 +461,6 @@ def import_commits_by_commit_username(request):
 
     nobgtask_s = request.GET.get('nobgtask', False)
 
-    cooked_data = None
-    cooked_data_password = request.POST.get('cooked_data_password', None)
-    cooked_data_string = request.POST.get('cooked_data', None)
-    if cooked_data_string:
-        if cooked_data_password == settings.cooked_data_password:
-            cooked_data = simplejson.loads(cooked_data_string)
-        else:
-            note = """Oops, that cooked data password didn't match.
-            If you weren't expecting this error, please file a bug at 
-            <a href='http://openhatch.org/bugs'>http://openhatch.org/bugs</a>."""
-            raise ValueError(note)
-
     involved_projects = []
     
     try:
@@ -503,11 +490,7 @@ def import_commits_by_commit_username(request):
                                 query=commit_username)
         dia.save()
 
-        if cooked_data is None:
-            result = tasks.FetchPersonDataFromOhloh.delay(dia.id)
-        else:
-            task = tasks.FetchPersonDataFromOhloh()
-            task.run(dia.id, cooked_data=cooked_data)
+        result = tasks.FetchPersonDataFromOhloh.delay(dia.id)
     # }}}
 
 def exp_scraper_handle_ohloh_results(dia_id,
@@ -523,7 +506,6 @@ def exp_scraper_handle_ohloh_results(dia_id,
     for c_i in ohloh_results:
         for ohloh_contrib_info in ohloh_results:
             exp = ProjectExp()
-            exp.person = person
             exp = exp.from_ohloh_contrib_info(ohloh_contrib_info)
             exp.last_polled = datetime.datetime.now()
             exp.last_touched = datetime.datetime.now()
@@ -532,6 +514,9 @@ def exp_scraper_handle_ohloh_results(dia_id,
     dia.completed = True
     dia.save()
     person.save()
+
+    if dia.person_wants_data:
+        dia.give_data_to_person()
     # }}}
 
 def ask_for_tag_input(request, username):
@@ -558,6 +543,7 @@ def display_list_of_people(request):
     # }}}
 
 def login_do(request):
+    #{{{
     try:
         username = request.POST['login_username']
         password = request.POST['login_password']
@@ -570,8 +556,10 @@ def login_do(request):
         return HttpResponseRedirect('/people/%s' % urllib.quote(username))
     else:
         return HttpResponseRedirect('/people/login/?msg=oops')
+    #}}}
 
 def login(request):
+    #{{{
     notification = notification_id = None
     if request.GET.get('msg', None) == 'oops':
         notification_id = "oops"
@@ -581,15 +569,21 @@ def login(request):
         'notification_id': notification_id,
         'notification': notification,
         } )
+    #}}}
 
 def logout(request):
+    #{{{
     django.contrib.auth.logout(request)
     return HttpResponseRedirect("/?msg=ciao")
+    #}}}
 
 def signup(request):
+    #{{{
     return render_to_response("profile/signup.html", {'user': request.user} )
+    #}}}
 
 def signup_do(request):
+    # {{{
     password_raw = request.POST.get('login-password', None)
     if password_raw:
         request.user.set_password(password_raw)
@@ -604,21 +598,19 @@ def signup_do(request):
     else:
         fail
     return HttpResponseRedirect("/people/%s" % urllib.quote(request.user.username))
+    # }}}
 
 def gimme_json_that_says_that_commit_importer_is_done(request):
     ''' This web controller is called when you want JSON that tells you 
     if the background jobs for the logged-in user have finished.
 
     It has no side-effects.'''
+    # {{{
     person = request.user.get_profile()
     dias = get_list_or_404(DataImportAttempt, person=person)
-    list_of_dictionaries = []
-    for dia in dias:
-        this_one = {'success': dia.completed,
-                    'id': dia.id,
-                    'query': dia.query}
-        list_of_dictionaries.append(this_one)
-    return HttpResponse(simplejson.dumps(list_of_dictionaries))
+    json = serializers.serialize('json', dias)
+    return HttpResponse(json)
+    # }}}
 
 def import_do(request):
     # {{{
@@ -688,3 +680,77 @@ def delete_experience_do(request):
     return HttpResponseRedirect('/people/%s/' % urllib.quote(
             request.user.username))
     # }}}
+
+def prepare_data_import_attempts_do(request):
+    """This function:
+    * Pulls out from the POST a list of usernames or email addresses under which somebody has
+    committed code to an open-source repository.
+    
+    Side-effects: Create DIAs that a user might want to execute. This means,
+    don't show the user DIAs that relate to non-existent accounts on remote
+    networks. And what *that* means is, before bothering the user, ask those
+    networks beforehand if they even have accounts named commit_usernames[0],
+    etc.
+
+    NB: We don't yet implement sentences 2 and 3 of the preceding paragraph."""
+    # for each commit_username_*, call some silly controller """
+    commit_usernames = []
+    for key in request.POST:
+        if key.startswith('commit_username_'):
+            value = request.POST[key].strip()
+            if not value:
+                continue # Skip blanks
+            commit_usernames.append(value)
+
+    # Side-effects: Create DIAs that a user might want to execute.
+    for cu in commit_usernames:
+        for source_key, _ in DataImportAttempt.SOURCE_CHOICES:
+            # FIXME: "...that a user might want to execute" means,
+            # don't show the user DIAs that relate to non-existent
+            # accounts on remote networks.
+            # And what *that* means is, before bothering the user,
+            # ask those networks beforehand if they even have
+            # accounts named commit_usernames[0], etc.
+            dia = DataImportAttempt(source=source_key,
+                    person=request.user.get_profile(), query=cu)
+            dia.save()
+            dia.do_what_it_says_on_the_tin()
+
+    return HttpResponseRedirect('/people/portfolio/import/')
+
+def importer(request):
+    """Get the DIAs for the logged-in user's profile. Pass them to the template."""
+    # {{{
+
+    data = data_for_person_display_without_ohloh(request.user.get_profile())
+    data.update({
+        'title': 'Find your contributions around the web! - OpenHatch',
+        'the_user': request.user,
+        'body_id': 'importer',
+        'dias': DataImportAttempt.objects.filter(person=request.user.get_profile()).order_by('id')
+        })
+
+    return render_to_response('profile/importer.html', data)
+    # }}}
+
+def user_selected_these_dia_checkboxes(request):
+    """ Input: Request POST contains a list of checkbox IDs corresponding to DIAs.
+    Side-effect: Make a note on the DIA that its affiliated person wants it.
+    Output: Success?
+    """
+    try:
+        checkbox_ids = request.POST['checkboxIDs']
+    except KeyError:
+        return HttpResponseServerError('0')
+
+    for checkbox_id in checkbox_ids.split(" "):
+        dia_id = int(checkbox_id.rsplit('_', 1)[1])
+        dia = DataImportAttempt.objects.get(id=dia_id)
+        dia.person_wants_data = True
+        dia.save()
+
+        # There may or may not be data waiting,
+        # but this function may run unconditionally.
+        dia.give_data_to_person()
+
+    return HttpResponse('1')

@@ -34,21 +34,71 @@ class Person(models.Model):
     # }}}
 
 class DataImportAttempt(models.Model):
-    IMPORT_TYPE_CHOICES = (
-        ('rs', 'Ohloh repository search'),
-        ('ou', 'Ohloh username import'),
+    # {{{
+    SOURCE_CHOICES = (
+        ('rs', "Search all repositories for %s."),
+        ('ou', "I'm %s on Ohloh; import my data."),
         )
     completed = models.BooleanField(default=False)
     failed = models.BooleanField(default=False)
     source = models.CharField(max_length=2,
-                              choices=IMPORT_TYPE_CHOICES)
+                              choices=SOURCE_CHOICES)
     person = models.ForeignKey(Person)
+    person_wants_data = models.BooleanField(default=False)
     query = models.CharField(max_length=200)
+
+    def get_formatted_source_description(self):
+        return self.get_source_display() % self.query
+
+    def give_data_to_person(self):
+        """ This DataImportAttempt assigns its person to its ProjectExps. """
+        project_exps = ProjectExp.objects.filter(data_import_attempt=self)
+        for pe in project_exps:
+            if pe.person and pe.person != self.person:
+                raise ValueError, ("You tried to give some ProjectExps to "
+                + "a person (%s), but those ProjectExps already belonged to somebody else (%s)." % (
+                        self.person, pe.person))
+            pe.person = self.person
+            pe.save()
+
+    def do_what_it_says_on_the_tin(self):
+        """Attempt to import data."""
+        from profile.tasks import FetchPersonDataFromOhloh
+        FetchPersonDataFromOhloh.delay(self.id)
+
+    def __unicode__(self):
+        return "Attempt to import data, source = %s, person = %s, query = %s" % (self.source, self.person, self.query)
+
+    # }}}
+
+"""
+Scenario A.
+* Dia creates background job.
+* User marks Dia "I want it"
+* Background job finishes.
+* Background job asks, Does anybody want this?
+* Background job realizes, "yes, User wants this"
+* Background job attaches the projects to the user
+
+Scenario B.
+* Dia creates background job.
+* Background job finishes.
+* Background job asks, Does anybody want this?
+* Background job realizes, "Nobody has claimed this yet. I'll just sit tight."
+* User marks Dia "I want it"
+* The marking method attaches the projects to the user
+"""
+
+def reject_when_query_is_only_whitespace(sender, instance, **kwargs):
+    if not instance.query.strip():
+        raise ValueError, "You tried to save a DataImportAttempt whose query was only whitespace, and we rejected it."
+
+models.signals.pre_save.connect(reject_when_query_is_only_whitespace, sender=DataImportAttempt)
 
 class ProjectExp(models.Model):
     "Many-to-one relation between projects and people."
     # {{{
-    person = models.ForeignKey(Person)
+    person = models.ForeignKey(Person, null=True)
     should_show_this = models.BooleanField(default=False)
     data_import_attempt = models.ForeignKey(DataImportAttempt, null=True)
     project = models.ForeignKey(Project)

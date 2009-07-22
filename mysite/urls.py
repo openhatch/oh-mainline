@@ -84,24 +84,34 @@ urlpatterns = patterns('',
         (r'^people/test_commit_importer$',
             'mysite.profile.views.display_test_page_for_commit_importer'),
 
-        (r'^people/test_commit_importer_json$',
+        (r'^people/gimme_json_that_says_that_commit_importer_is_done$',
             'mysite.profile.views.gimme_json_that_says_that_commit_importer_is_done'),
 
         (r'^people/import/do$',
             'mysite.profile.views.import_do'),
 
         # Tabs
+        # FIXME: Remove
         (r'^people/(?P<input_username>[^/]+)/tabs?/(?P<tab>[a-z]+)[/?]$',
                 'mysite.profile.views.display_person_web'),
 
-        (r'^people/(?P<user_to_display__username>[^/]+)/projects/(?P<project__name>[a-zA-Z -]+)[/?]$',
+        (r'^people/(?P<user_to_display__username>[^/]+)/projects/(?P<project__name>.+)$',
                 'mysite.profile.views.projectexp_display'),
 
-        (r'^people/projects/edit/(?P<project__name>[a-zA-Z -]+)[/?]$',
+        (r'^people/projects/edit/(?P<project__name>.+)$',
                 'mysite.profile.views.projectexp_edit'),
+
+        (r'^people/portfolio/import/$',
+                'mysite.profile.views.importer'),
 
         (r'^people/edit[/?]$',
                 'mysite.profile.views.display_person_edit_web'),
+
+        (r'^people/portfolio/import/prepare_data_import_attempts_do$',
+                'mysite.profile.views.prepare_data_import_attempts_do'),
+
+        (r'^people/user_selected_these_dia_checkboxes$',
+                'mysite.profile.views.user_selected_these_dia_checkboxes'),
 
         # This dangerous regex is last
         (r'^people/(?P<user_to_display__username>[^/]+)[/?]$',

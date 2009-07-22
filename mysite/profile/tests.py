@@ -22,11 +22,14 @@ from StringIO import StringIO
 import urllib
 import simplejson
 import BeautifulSoup
+import time
+from django.core import management
 
 from django.test.client import Client
 import tasks 
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
+import mock
 # }}}
 
 # FIXME: Later look into http://stackoverflow.com/questions/343622/how-do-i-submit-a-form-given-only-the-html-source
@@ -311,7 +314,7 @@ class ProjectExpTests(TwillTests):
 
         # Load up the ProjectExp edit page.
         project_name = 'ccHost'
-        exp_url = 'http://openhatch.org/people/projects/edit/%s/' % (
+        exp_url = 'http://openhatch.org/people/projects/edit/%s' % (
                 urllib.quote(project_name))
         tc.go(make_twill_url(exp_url))
 
@@ -441,15 +444,36 @@ class CommitImportTests(TwillTests):
 
     # }}}
 
-import time
-from django.core import management
+# Create a mock Ohloh get_contribution_by_username
+mock_gcibu = mock.Mock()
+mock_gcibu.return_value = [{
+        'man_months': 1,
+        'project': u'ccHost',
+        'project_homepage_url':
+            u'http://wiki.creativecommons.org/CcHost',
+        'primary_language': u'shell script'}]
+
+# Create a mock Ohloh get_contribution_info_by_ohloh_username
+mock_gcibou = mock.Mock()
+mock_gcibou.return_value = [{
+        'man_months': 1,
+        'project': u'who knows',
+        'project_homepage_url':
+            u'http://wiki.creativecommons.org/CcHost',
+        'primary_language': u'Vala'}]
+
+def patch_explosive(*args, **kwargs):
+    raise AssertionError, "You should not call me."
+
+# do the background load ourselves
+
 class CeleryTests(TwillTests):
     # {{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
 
-    def test_slow_loading_via_emulated_bgtask(self, 
-            use_cooked_data=True):
+    @mock.patch('customs.ohloh.Ohloh.get_contribution_info_by_username', mock_gcibu)
+    def test_slow_loading_via_emulated_bgtask(self):
         """1. Go to the page that has paulproteus' data.  2. Verify that the page doesn't yet know about ccHost. 3. Run the celery task ourselves, but instead of going to Ohloh, we hand-prepare data for it."""
 
         # do this work for user = paulproteus
@@ -462,12 +486,7 @@ class CeleryTests(TwillTests):
         dia.save()
         
 
-        url = '/people/test_commit_importer_json'
-
-        
-        good_input = {
-            'nobgtask': 'yes',
-            }
+        url = '/people/gimme_json_that_says_that_commit_importer_is_done'
         
         client = Client()
         password="paulproteus's unbreakable password"
@@ -476,11 +495,12 @@ class CeleryTests(TwillTests):
 
         # Ask if background job has been completed.
         # We haven't even created the background job, so it should
-        # 404.
-        response_before = client.get(url, good_input)
+        # not be!
+        response_before = client.get(url)
+        response_json = simplejson.loads(response_before.content)
         self.assertEquals(
-            simplejson.loads(response_before.content),
-            [{'id': dia.id, 'query': username, 'success': 0}])
+            response_json[0]['pk'], dia.id)
+        self.assertFalse(response_json[0]['fields']['completed'])
         
         # Ask if involvement fact has been loaded.
         # We haven't loaded it, so the answer should be no.
@@ -488,33 +508,23 @@ class CeleryTests(TwillTests):
         self.assertFalse(list(ProjectExp.objects.filter(
             project__name=project_name)))
 
-        # do the background load ourselves
-        if use_cooked_data:
-            cooked_data = [{
-                'man_months': 1,
-                'project': u'ccHost',
-                'project_homepage_url':
-                u'http://wiki.creativecommons.org/CcHost',
-                'primary_language': u'shell script'}]
-        else:
-            cooked_data=None
-
         task = tasks.FetchPersonDataFromOhloh()
-        task.run(dia_id=dia.id,
-                 cooked_data=cooked_data)
-        # NB: The task knows not to call Ohloh when we give it cooked data.
+        task.run(dia_id=dia.id)
+        # NB: The task is being run, but the ohloh API communication
+        # is mocked out.
 
         # Now that we have synchronously run the task, it should be
         # marked as completed.
         self.assert_(DataImportAttempt.objects.get(id=dia.id).completed)
 
         # Check again
-        response_after = client.get(url, good_input)
+        response_after = client.get(url)
 
         # Ask if background job has been completed. (Hoping for yes.)
-        self.assertEquals(simplejson.loads(response_after.content),
-                          [{'id': dia.id, 'query': username,
-                            'success': 1}])
+        response_json = simplejson.loads(response_after.content)
+        self.assertEquals(
+            response_json[0]['pk'], dia.id)
+        self.assert_(response_json[0]['fields']['completed'])
 
         # Ask if involvement fact has been loaded. (Hoping for yes.)
         self.assert_(list(ProjectExp.objects.filter(
@@ -558,8 +568,8 @@ class UserListTests(TwillTests):
     # }}}
 
 class AuthTests(TwillTests):
+    # {{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
-
     
     def test_login(self):
         user = authenticate(username='paulproteus', password="paulproteus's unbreakable password")
@@ -590,6 +600,7 @@ class AuthTests(TwillTests):
         tc.fv('login','login_password',"not actually paulproteus's unbreakable password")
         tc.submit()
         tc.find("oops")
+    # }}}
 
 class SetAPasswordTests(TwillTests):
     # {{{
@@ -644,37 +655,155 @@ class SetAPasswordTests(TwillTests):
         tc.find('profile')
     # }}}
 
-class ImportCommitsViaCommitUsernameViaOhloh(TwillTests):
+# FIXME: If this is made dynamically, it would be easier!
+class MockFetchPersonDataFromOhloh(object):
+    real_task_class = profile.tasks.FetchPersonDataFromOhloh
+    @classmethod
+    def delay(*args, **kwargs):
+        args = args[1:] # FIXME: Wonder why I need this
+        task = MockFetchPersonDataFromOhloh.real_task_class()
+        task.run(*args, **kwargs)
+
+class ImportContributionsTests(TwillTests):
+    """ """
     # {{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
+    # Don't include cchost-paulproteus, because we need paulproteus to have
+    # zero projectexps at the beginning of test_person_gets_data_iff_they_want_it
 
-    def submit_commit_name(self, cooked_data_password):
-        tc.go(make_twill_url('http://openhatch.org/people/login'))
-        tc.fv('login', 'login_username', 'paulproteus')
-        tc.fv('login', 'login_password', "paulproteus's unbreakable password")
+    form_url = "http://openhatch.org/people/portfolio/import/"
+
+    def test_show_suggested_data_sources(self):
+        self.login()
+        tc.go(make_twill_url(self.form_url))
+
+        # Check we're on the right page.
+        # FIXME: Check URL instead.
+        tc.find('Find your contributions around the web!')
+
+        # Enter a username
+        username = 'paulproteus'
+        tc.fv('usernames_or_emails', 'commit_username_0', username)
+
+        # Click the button that says 'Show me the data sources!'
         tc.submit()
 
-        tc.fv('enter_free_software_username', 'commit_username', 'paulproteus')
+        # ... Magic happens behind the scenes ...
 
-        # Since we don't actually want to call Ohloh,
-        # we thought to create a mock object, but ran into difficulties.
-        # So we're fudging by using pre-cooked data.
-        cooked_data = [{'man_months': 1, 'project': u'ccHost',
-            'project_homepage_url': u'http://wiki.creativecommons.org/CcHost',
-            'primary_language': u'shell script'}]
-        # FIXME: Secure this better.
-        cooked_data_string = simplejson.dumps(cooked_data)
-        tc.config('readonly_controls_writeable', True)
-        tc.fv('enter_free_software_username', 'cooked_data', cooked_data_string)
-        tc.fv('enter_free_software_username', 
-                'cooked_data_password', cooked_data_password)
-        tc.submit()
-        tc.find('ccHost')
+        # Check we're on the right page.
+        # FIXME: Check URL instead.
+        tc.find('Find your contributions around the web!')
 
-    def test_commit_name_submit_triggers_ohloh_import_via_commit_username(self):
-        self.submit_commit_name(settings.cooked_data_password)
+        # Check that suggestions correctly appear
+        tc.find("Search all repositories for %s" % username)
+        tc.find("I&#39;m %s on Ohloh; import my data." % username)
+        # tc.find("I&#39;m %s on Launchpad; import my data." % username)
 
-    def test_cooked_data_fails_on_bad_password(self):
-        self.assertRaises(ValueError, self.submit_commit_name,
-                settings.cooked_data_password + '...NOT')
+        # FIXME: Verify that BG jobs get created.
+
+    def test_select_data_sources(self):
+
+        client = Client()
+        username='paulproteus'
+        password="paulproteus's unbreakable password"
+        client.login(username=username,
+                     password=password)
+
+        ohloh_repo_search_dia = DataImportAttempt(
+                    query='who cares',
+                    person=Person.objects.get(user__username='paulproteus'),
+                    source='rs')
+        ohloh_repo_search_dia.save()
+
+        ohloh_account_dia = DataImportAttempt(
+                    query='who cares',
+                    person=Person.objects.get(user__username='paulproteus'),
+                    source='ou')
+        ohloh_account_dia.save()
+
+        self.assertFalse(ohloh_repo_search_dia.person_wants_data)
+        self.assertFalse(ohloh_account_dia.person_wants_data)
+
+        url = "/people/user_selected_these_dia_checkboxes"
+        checkbox_ids_string = "data_import_attempt_%d" % ohloh_repo_search_dia.id
+        response = client.post(url, {'checkboxIDs': 
+                                     checkbox_ids_string })
+
+        self.assertEqual(response.status_code, 200)
+
+        # Re-get the Ohloh Repository Search object from the DB
+        ohloh_repo_search_dia = DataImportAttempt.objects.get(
+                    query='who cares',
+                    person=Person.objects.get(user__username='paulproteus'),
+                    source='rs')
+        self.assert_(ohloh_repo_search_dia.person_wants_data)
+        self.assertFalse(ohloh_account_dia.person_wants_data)
+
+    @mock.patch('customs.ohloh.Ohloh.get_contribution_info_by_username', mock_gcibu)
+    @mock.patch('customs.ohloh.Ohloh.get_contribution_info_by_ohloh_username', mock_gcibou)
+    @mock.patch('profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
+    def test_person_gets_data_iff_they_want_it(self):
+        client = Client()
+        username='paulproteus'
+        password="paulproteus's unbreakable password"
+        client.login(username=username,
+                     password=password)
+
+        a_person = Person.objects.get(user__username='paulproteus')
+
+        # Make two DIAs, attach some ProjectExps to each,
+        # as if user had successfully imported some ProjectExps.
+
+        ohloh_repo_search_dia = DataImportAttempt(
+                    query='who cares',
+                    person=a_person,
+                    source='rs')
+        ohloh_repo_search_dia.person_wants_data = True
+        ohloh_repo_search_dia.save()
+
+        ohloh_account_dia = DataImportAttempt(
+                    query='who cares',
+                    person=a_person,
+                    source='ou')
+        ohloh_account_dia.save()
+
+        # person_wants_data should be false by default
+        self.assertFalse(ohloh_account_dia.person_wants_data)
+
+        a_project, _ = Project.objects.get_or_create(name='a project name')
+        an_exp = ProjectExp(project=a_project, description='the description')
+        an_exp.data_import_attempt = ohloh_repo_search_dia
+        an_exp.save()
+
+        another_project, _ = Project.objects.get_or_create(name='a project name')
+        another_exp = ProjectExp(project=another_project, description='the description')
+        another_exp.data_import_attempt = ohloh_account_dia
+        another_exp.save()
+
+        ohloh_repo_search_dia.do_what_it_says_on_the_tin()
+        ohloh_account_dia.do_what_it_says_on_the_tin()
+
+        x = ProjectExp.objects.get(person=a_person)
+        self.assertEqual(x.id, an_exp.id)
+
+    def test_action_via_view(self):
+        """Send a Person objects and a list of usernames and email addresses to the action controller. Test that the controller really added some corresponding DIAs for that Person."""
+        client = Client()
+        username='paulproteus'
+        client.login(username=username,
+                     password="paulproteus's unbreakable password")
+
+        data = {}
+        commit_usernames_and_emails = ["bilbo", "bilbo@baggin.gs"]
+        for n, cu in enumerate(commit_usernames_and_emails):
+            data["commit_username_%d" % n] = cu
+
+        # Not a DIA in sight.
+        self.assertFalse(list(DataImportAttempt.objects.filter(person=Person.objects.get(user__username='paulproteus'))))
+
+        response = client.post('/people/portfolio/import/prepare_data_import_attempts_do', data) 
+
+        # DIAs, nu?
+        self.assert_(list(DataImportAttempt.objects.filter(person=Person.objects.get(user__username='paulproteus'))))
+
     # }}}

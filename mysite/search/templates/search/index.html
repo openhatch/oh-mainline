@@ -56,7 +56,6 @@
                 <!-- notification_id: {{ notification_id }} -->
                 {% endif %}
 
-                {% comment %} Logo and explanation {{{ {% endcomment %}
                 <div id='banner'>
                     <img alt='OpenHatch' src='/static/images/the-logo.png'/>
                     <h1>Find: <a href='/people'>people</a>, <a href='/search'>volunteer opportunities</a>.</h1>
@@ -80,7 +79,7 @@
                     <h3>To get started...</h3> 
                     <ul id='stuff-to-do'>
                         <li>
-                        <a href='#'>Create a profile: Sign up</a> 
+                        <a style='float: left; width: 400px;' href='#'>Create a profile</a> 
                         <form id='create_profile' name='create_profile'
                             action='/people/new/do' method='POST'>
                             <div class='form-row'>
@@ -88,7 +87,8 @@
                                 <input type='text' name='create_profile_username' id='create_profile_username' />
                             </div>
                             <div class='form-row'>
-                                <label for='create_profile_password'>Choose your password (OpenID coming soon)</label>
+                                <label for='create_profile_password'>Choose your password
+                                    <small style='display: block;'>Coming soon: OpenID!</small></label>
                                 <input type='password' id='create_profile_password'
                                 name='create_profile_password' />
                             </div>
@@ -98,7 +98,8 @@
                         </form>
                         </li>
                         <li>
-                        <span>Already on OpenHatch? Log in!</span>
+                        <span style='float: left; width: 400px;
+                            margin-bottom: 10px;'>Already on OpenHatch? Log in!</span>
                         <form id='login' name='login'
                             action='/people/login/do' method='POST'>
                             <div class='form-row'>
@@ -116,7 +117,7 @@
                                 form {
                                     margin-bottom: 10px;
                                     float: left;
-                                    width: 500px;
+                                    width: 422px;
                                 }
                                 .form-row {
                                     float: left;
@@ -125,9 +126,9 @@
                                 label {
                                     float: left;
                                     width: 150px;
-                                    padding: 10px;
                                     margin-right: 10px;
-                                    font-size: 12pt;
+                                    font-size: 10pt;
+                                    padding: 10px 0;
                                 }
                                 input[type='text'], input[type='password'] {
                                     padding: 10px;
@@ -145,13 +146,11 @@
                                     float: right;
                                 }
                                 #create-profile {
-                                    border: 3px solid #66AA33;
+                                    border: 1px solid #66AA33;
                                     background-color: #AADD66;
                                     padding: 10px;
                                     text-align: center;
-                                    float: none;
-                                    margin: 10px auto 10px auto;
-                                    font-size: 25px;
+                                    font-size: 14pt;
                                 }
                             </style>
                         </form>

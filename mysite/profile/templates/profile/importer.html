@@ -1,0 +1,64 @@
+{% include 'profile/header.global.html' %}
+{% include 'profile/header.html' %}
+{% include 'profile/personal.html' %}
+
+<!-- begin profile/importer.html -->
+
+<div id='right'>
+    <div id='import-from-repositories-content'>
+        <h2>Find your contributions around the web!</h2>
+
+            <div id='importer_input_section'>
+            <div class='queries'>
+                <p>To find data sources, type in
+                usernames and email addresses
+                you've used in open source.</p>
+                <form id='usernames_or_emails' name='usernames_or_emails'
+                    method='POST' action='/people/portfolio/import/prepare_data_import_attempts_do'>
+                    <input type='text'
+                    id='commit_username_0' 
+                    name='commit_username_0' />
+                    <input type='submit' value='Show me the data sources!' />
+                </form>
+            </div>
+                Select data sources:
+                <ul>
+                    {% for dia in dias %}
+                    {% if dia.query %}
+                    {% ifchanged %}
+                    <li class='heading'>
+                    Data sources for
+                    <strong>{{ dia.query }}</strong>:
+                    </li>
+                    {% endifchanged %}
+                    <li>
+                    <input type='checkbox' checked
+                    id='data_import_attempt_{{ dia.id }}'
+                    name='data_import_attempt_{{ dia.id }}' />
+                    <label for='data_import_attempt_{{ dia.id }}'>
+                        {{ dia.get_formatted_source_description }} 
+                    </label>
+                    <div class='data_import_status'>
+                        <img style='visibility: hidden;' src='/static/images/throbber.gif'
+                        height='32' width='32' />
+                    </div>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+                </ul>
+        </div>
+        <div class=''>
+            <input type='submit' value='Submit' id='submit_data_sources' />
+        </div>
+        <div style='float: left; width: 400px; padding: 10px; font-size: 12pt;'>
+            <a style='font-weight: bold;' href='/people/{{ the_user.username }}'>
+                &laquo; Show my projects</a>
+        </div>
+    </div>
+</div> <!-- /#right -->
+<!-- end profile/importer.html -->
+
+<script type='text/javascript' src='/static/js/importer.js'></script>
+
+{% include 'profile/footer.html %}
+{% include 'profile/footer.global.html' %}

@@ -135,23 +135,6 @@ ul#user-actions a {
  margin: -17px 6px 0 0;
 }
 
-#importer {
-    width: 940px;
-    padding: 20px;
-    border: 10px solid #fff;
-    float: left;
-    background-image: url('/static/images/motif-orange.png');
-    margin-bottom: 20px;
-}
-
-#importer h2 {
-    font-size: 16pt;
-    font-weight: normal;
-    margin-bottom: 5px;
-    color: #555;
-}
-
-
 #commit_username {
     color: #555;
 }
@@ -164,15 +147,6 @@ ul#user-actions a {
     font-size: 11pt;
 }
 
-#importer input[type='text'] {
-    font-size: 11pt;
-}
-#importer input[type='submit'] {
-    float: left; margin-left: 10px;
-    position: relative;
-    top: 8px;
-    padding: 5px;
-}
 #content {
     float: left;
     width: 960px;
@@ -375,10 +349,6 @@ input[type='text'] {
     padding: 10px;
     font: 8pt Verdana;
     float: left;
-    border: solid #dde;
-    border-width: 1px; 
-    background-color: #fff; d9eeff;
-    border-bottom-color: #ccc;
 }
 textarea {
     padding: 10px;
@@ -577,10 +547,10 @@ img {
     margin: 0;
     margin-bottom: 10px;
 }
-h4 {
+h4, .cute-header {
+    font-weight: bold;
     font-size: 7pt;
     font-style: italic;
-    background-color: #fff;
     color: #666;
     float: left;
     text-transform: uppercase;
@@ -777,4 +747,49 @@ input[type='submit'] {
     width: 940px;
     border: 10px solid #fff;
     margin-bottom: 20px;
+}
+#importer #right {
+    border: 10px solid #fff;
+    padding: 10px;
+    background: url('/static/images/motif.png');
+}
+#importer form .cute-header {
+    width: 400px;
+}
+#importer #right input[type='text'] {
+    width: 180px;
+    font-size: 10pt;
+}
+#importer #right input[type='submit'] {
+    float: right;
+}
+#importer #importer_input_section {
+    float: left;
+    padding-top: 10px;
+}
+#importer #right .queries {
+    float: left;
+    width: 240px;
+    margin-right: 10px;
+}
+#importer #right .data_import_attempts {
+    float: left;
+    width: 200px;
+}
+#importer #right li {
+    float: left;
+    margin-top: 10px;
+}
+#importer #right input[type='checkbox'] {
+    float: left;
+    width: 30px;
+    margin-right: 10px;
+    clear: left;
+}
+#importer p {
+    margin: 0;
+    margin-bottom: 10px;
+}
+#importer span {
+    font-weight: bold;
 }
