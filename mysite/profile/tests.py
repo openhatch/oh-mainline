@@ -462,20 +462,34 @@ mock_gcibou.return_value = [{
             u'http://wiki.creativecommons.org/CcHost',
         'primary_language': u'Vala'}]
 
-def patch_explosive(*args, **kwargs):
-    raise AssertionError, "You should not call me."
+# Create a mock Launchpad get_info_for_launchpad_username
+mock_giflu = mock.Mock()
+mock_giflu.return_value = {
+        'F-Spot': {
+            'url': 'http://launchpad.net/f-spot',
+            'involvement_types': ['Bug Management', 'Bazaar Branches'],
+            'languages': ['python', 'ruby'],
+            }
+        }
 
-# do the background load ourselves
+# FIXME: If this is made dynamically, it would be easier!
+class MockFetchPersonDataFromOhloh(object):
+    real_task_class = profile.tasks.FetchPersonDataFromOhloh
+    @classmethod
+    def delay(*args, **kwargs):
+        args = args[1:] # FIXME: Wonder why I need this
+        task = MockFetchPersonDataFromOhloh.real_task_class()
+        task.run(*args, **kwargs)
 
 class CeleryTests(TwillTests):
     # {{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
-
     @mock.patch('customs.ohloh.Ohloh.get_contribution_info_by_username', mock_gcibu)
-    def test_slow_loading_via_emulated_bgtask(self):
+    @mock.patch('profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
+    def test_ohloh_import_via_emulated_bgtask(self):
         """1. Go to the page that has paulproteus' data.  2. Verify that the page doesn't yet know about ccHost. 3. Run the celery task ourselves, but instead of going to Ohloh, we hand-prepare data for it."""
-
+        # {{{
         # do this work for user = paulproteus
         username='paulproteus'
 
@@ -508,8 +522,7 @@ class CeleryTests(TwillTests):
         self.assertFalse(list(ProjectExp.objects.filter(
             project__name=project_name)))
 
-        task = tasks.FetchPersonDataFromOhloh()
-        task.run(dia_id=dia.id)
+        dia.do_what_it_says_on_the_tin()
         # NB: The task is being run, but the ohloh API communication
         # is mocked out.
 
@@ -529,12 +542,75 @@ class CeleryTests(TwillTests):
         # Ask if involvement fact has been loaded. (Hoping for yes.)
         self.assert_(list(ProjectExp.objects.filter(
             project__name=project_name)))
+        # }}}
 
     # FIXME: One day, test that after self.test_slow_loading_via_emulated_bgtask
     # getting the data does not go out to Ohloh.
 
-# FIXME: One day, stub out the background jobs with mocks
-# that ensure we actually call them!
+    @mock.patch('customs.lp_grabber.get_info_for_launchpad_username', mock_giflu)
+    @mock.patch('profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
+    def test_launchpad_import_via_emulated_bgtask(self):
+        """1. Go to the page that has paulproteus' data.  2. Verify that the page doesn't yet know about F-Spot. 3. Run the celery task ourselves, but instead of going to Launchpad, we hand-prepare data for it."""
+        # {{{
+        # do this work for user = paulproteus
+        username='paulproteus'
+        person = Person.objects.get(user__username=username)
+
+        # Store a note in the DB we're about to do a background task
+        dia = DataImportAttempt(query=username, source='lp',
+                                person=Person.objects.get(
+                                    user__username=username))
+        dia.person_wants_data = True
+        dia.save()
+
+        url = '/people/gimme_json_that_says_that_commit_importer_is_done'
+        
+        client = Client()
+        password="paulproteus's unbreakable password"
+        client.login(username=username,
+                     password=password)
+
+        # Ask if background job has been completed.
+        # We haven't even created the background job, so it should
+        # not be!
+        response_before = client.get(url)
+        response_json = simplejson.loads(response_before.content)
+        self.assertEquals(
+            response_json[0]['pk'], dia.id)
+        self.assertFalse(response_json[0]['fields']['completed'])
+        
+        # Ask if involvement fact has been loaded.
+        # We haven't loaded it, so the answer should be no.
+        project_name = 'F-Spot'
+        self.assertFalse(list(ProjectExp.objects.filter(
+            project__name=project_name)))
+
+        dia.do_what_it_says_on_the_tin()
+        # NB: The task is being run, but the ohloh API communication
+        # is mocked out.
+
+        # Now that we have synchronously run the task, it should be
+        # marked as completed.
+        self.assert_(DataImportAttempt.objects.get(id=dia.id).completed)
+
+        # Check again
+        response_after = client.get(url)
+
+        # Ask if background job has been completed. (Hoping for yes.)
+        response_json = simplejson.loads(response_after.content)
+        self.assertEquals(
+            response_json[0]['pk'], dia.id)
+        self.assert_(response_json[0]['fields']['completed'])
+
+        # Ask if involvement fact has been loaded. (Hoping for yes.)
+        self.assert_(list(ProjectExp.objects.filter(
+            project__name=project_name, person=person)))
+
+        # }}}
+
+    # FIXME: One day, test that after self.test_slow_loading_via_emulated_bgtask
+    # getting the data does not go out to Ohloh.
+
     # }}}
 
 class UserListTests(TwillTests):
@@ -655,15 +731,6 @@ class SetAPasswordTests(TwillTests):
         tc.find('profile')
     # }}}
 
-# FIXME: If this is made dynamically, it would be easier!
-class MockFetchPersonDataFromOhloh(object):
-    real_task_class = profile.tasks.FetchPersonDataFromOhloh
-    @classmethod
-    def delay(*args, **kwargs):
-        args = args[1:] # FIXME: Wonder why I need this
-        task = MockFetchPersonDataFromOhloh.real_task_class()
-        task.run(*args, **kwargs)
-
 class ImportContributionsTests(TwillTests):
     """ """
     # {{{
@@ -674,7 +741,9 @@ class ImportContributionsTests(TwillTests):
     form_url = "http://openhatch.org/people/portfolio/import/"
 
     def test_show_suggested_data_sources(self):
+        # {{{
         self.login()
+
         tc.go(make_twill_url(self.form_url))
 
         # Check we're on the right page.
@@ -697,12 +766,13 @@ class ImportContributionsTests(TwillTests):
         # Check that suggestions correctly appear
         tc.find("Search all repositories for %s" % username)
         tc.find("I&#39;m %s on Ohloh; import my data." % username)
-        # tc.find("I&#39;m %s on Launchpad; import my data." % username)
+        tc.find("I&#39;m %s on Launchpad; import my data." % username)
 
         # FIXME: Verify that BG jobs get created.
+        # }}}
 
     def test_select_data_sources(self):
-
+        # {{{
         client = Client()
         username='paulproteus'
         password="paulproteus's unbreakable password"
@@ -721,8 +791,17 @@ class ImportContributionsTests(TwillTests):
                     source='ou')
         ohloh_account_dia.save()
 
+        launchpad_account_dia = DataImportAttempt(
+                    query='query',
+                    person=Person.objects.get(user__username='paulproteus'),
+                    source='lp')
+        launchpad_account_dia.save()
+
+        # The default value of person_wants_data is False
+        # and this test depends on that being so.
         self.assertFalse(ohloh_repo_search_dia.person_wants_data)
         self.assertFalse(ohloh_account_dia.person_wants_data)
+        self.assertFalse(launchpad_account_dia.person_wants_data)
 
         url = "/people/user_selected_these_dia_checkboxes"
         checkbox_ids_string = "data_import_attempt_%d" % ohloh_repo_search_dia.id
@@ -738,11 +817,14 @@ class ImportContributionsTests(TwillTests):
                     source='rs')
         self.assert_(ohloh_repo_search_dia.person_wants_data)
         self.assertFalse(ohloh_account_dia.person_wants_data)
+        self.assertFalse(launchpad_account_dia.person_wants_data)
+#}}}
 
     @mock.patch('customs.ohloh.Ohloh.get_contribution_info_by_username', mock_gcibu)
     @mock.patch('customs.ohloh.Ohloh.get_contribution_info_by_ohloh_username', mock_gcibou)
     @mock.patch('profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
     def test_person_gets_data_iff_they_want_it(self):
+        # {{{
         client = Client()
         username='paulproteus'
         password="paulproteus's unbreakable password"
@@ -767,8 +849,16 @@ class ImportContributionsTests(TwillTests):
                     source='ou')
         ohloh_account_dia.save()
 
-        # person_wants_data should be false by default
+        launchpad_account_dia = DataImportAttempt(
+                    query='query',
+                    person=Person.objects.get(user__username='paulproteus'),
+                    source='lp')
+        launchpad_account_dia.save()
+
+        # The default value of person_wants_data is False
+        # and this test depends on that being so.
         self.assertFalse(ohloh_account_dia.person_wants_data)
+        self.assertFalse(launchpad_account_dia.person_wants_data)
 
         a_project, _ = Project.objects.get_or_create(name='a project name')
         an_exp = ProjectExp(project=a_project, description='the description')
@@ -782,12 +872,15 @@ class ImportContributionsTests(TwillTests):
 
         ohloh_repo_search_dia.do_what_it_says_on_the_tin()
         ohloh_account_dia.do_what_it_says_on_the_tin()
+        launchpad_account_dia.do_what_it_says_on_the_tin()
 
         x = ProjectExp.objects.get(person=a_person)
         self.assertEqual(x.id, an_exp.id)
+        # }}}
 
     def test_action_via_view(self):
         """Send a Person objects and a list of usernames and email addresses to the action controller. Test that the controller really added some corresponding DIAs for that Person."""
+        # {{{
         client = Client()
         username='paulproteus'
         client.login(username=username,
@@ -805,5 +898,6 @@ class ImportContributionsTests(TwillTests):
 
         # DIAs, nu?
         self.assert_(list(DataImportAttempt.objects.filter(person=Person.objects.get(user__username='paulproteus'))))
+        #}}}
 
     # }}}

@@ -20,6 +20,7 @@ from StringIO import StringIO
 import urllib
 import simplejson
 import ohloh
+import lp_grabber
 
 from django.test.client import Client
 from profile.tasks import FetchPersonDataFromOhloh
@@ -248,3 +249,27 @@ class OhlohIconTests(django.test.TestCase):
         # Remove it so the test has no side-effects
         os.unlink(path)
     # }}}
+
+class LaunchpadDataTests(django.test.TestCase):
+    def test_project2language(self):
+        langs = lp_grabber.project2languages('gwibber')
+        self.assertEqual(langs, ['Python'])
+
+        # The project, lazr, is registered on Launchpad, but doesn't
+        # have a language assigned to it.
+        no_langs = lp_grabber.project2languages('lazr')
+        self.assertEqual(no_langs, [])
+
+    def test_greg_has_branch_for_gwibber(self):
+        info = lp_grabber.get_info_for_launchpad_username(
+            'greg.grossmeier')
+        self.assertEqual(info['Gwibber']['involvement_types'],
+                         set(['Bazaar Branches', 'Bug Management']))
+        self.assertEqual(info['Gwibber']['url'],
+                         'https://launchpad.net/gwibber')
+        return info
+
+    def test_greg_has_python_involvement(self):
+        langs = lp_grabber.person_to_bazaar_branch_languages('greg.grossmeier')
+        self.assertEqual(langs, ['Python'])
+

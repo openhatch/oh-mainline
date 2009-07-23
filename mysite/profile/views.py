@@ -493,7 +493,7 @@ def import_commits_by_commit_username(request):
         result = tasks.FetchPersonDataFromOhloh.delay(dia.id)
     # }}}
 
-def exp_scraper_handle_ohloh_results(dia_id,
+def ohloh_contributor_facts_to_project_exps(dia_id,
                                      ohloh_results):
     # {{{
     '''Input: A sequence of Ohloh ContributorInfo dicts
@@ -517,6 +517,49 @@ def exp_scraper_handle_ohloh_results(dia_id,
 
     if dia.person_wants_data:
         dia.give_data_to_person()
+    # }}}
+
+def create_project_exps_from_launchpad_contributor_facts(dia_id, lp_results):
+    # {{{
+    '''Input: A sequence of Ohloh ContributorInfo dicts
+    and the id of the DataImport they came from.
+
+    Side-effect: Create matching structures in the DB
+    and mark our success in the database.'''
+    dia = DataImportAttempt.objects.get(id=dia_id)
+    person = dia.person
+    # lp_results looks like this:
+    # 
+    # It returns a dictionary like this:
+    #     {
+    #         'F-Spot': {
+    #             'url': 'http://launchpad.net/f-spot',
+    #             'involvement_types': ['Bug Management', 'Bazaar Branches'],
+    #             'languages': ['python', 'ruby'],
+    #         }
+    #     }
+    for project_name in lp_results:
+        result = lp_results[project_name]
+        for involvement_type in result['involvement_types']:
+            person_role = involvement_type
+            exp = ProjectExp()
+            if result['languages']:
+                primary_language = result['languages'][0]
+            else:
+                primary_language = None
+            exp = exp.from_launchpad_result(project_name, primary_language, person_role)
+            exp.last_polled = datetime.datetime.now()
+            exp.last_touched = datetime.datetime.now()
+            exp.data_import_attempt = dia
+            exp.save()
+    person.last_polled = datetime.datetime.now()
+    dia.completed = True
+    dia.save()
+    person.save()
+
+    if dia.person_wants_data:
+        dia.give_data_to_person()
+
     # }}}
 
 def ask_for_tag_input(request, username):

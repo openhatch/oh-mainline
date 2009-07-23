@@ -1,7 +1,8 @@
 import datetime
 from customs import ohloh
-from .profile.views import exp_scraper_handle_ohloh_results
-from .profile.models import Person, DataImportAttempt
+import customs.lp_grabber 
+from profile.views import ohloh_contributor_facts_to_project_exps, create_project_exps_from_launchpad_contributor_facts
+from profile.models import Person, DataImportAttempt
 from celery.task import Task
 import celery.registry
 
@@ -15,9 +16,23 @@ def ou_action(dia):
     return oh.get_contribution_info_by_ohloh_username(
             dia.query)
 
+def lp_action(dia):
+    # NB: Don't change the way this is called, because calling it this way
+    # permits this function to be mocked when we test it.
+    # FIXME: Is that true?
+    return customs.lp_grabber.get_info_for_launchpad_username(dia.query)
+
 source2actual_action = {
+        'rs': rs_action,
         'ou': ou_action,
-        'rs': rs_action}
+        'lp': lp_action
+        }
+
+source2result_handler = {
+        'rs': ohloh_contributor_facts_to_project_exps,
+        'ou': ohloh_contributor_facts_to_project_exps,
+        'lp': create_project_exps_from_launchpad_contributor_facts,
+        }
 
 class FetchPersonDataFromOhloh(Task):
     name = "profile.FetchPersonDataFromOhloh"
@@ -30,8 +45,9 @@ class FetchPersonDataFromOhloh(Task):
             if dia.completed:
                 logger.info("Bailing out job for <%s>" % dia)
                 return
-            ohloh_results = source2actual_action[dia.source](dia)
-            exp_scraper_handle_ohloh_results(dia.id, ohloh_results)
+            results = source2actual_action[dia.source](dia)
+            source2result_handler[dia.source](dia.id, results)
+            logger.info("Results: %s" % results)
 
         except:
             dia.completed = True

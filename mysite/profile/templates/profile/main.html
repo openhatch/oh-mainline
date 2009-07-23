@@ -6,55 +6,8 @@
 {% include 'profile/personal.html' %}
 
     <div id='right'>
-        <!-- {{{ -->
         <a href='/form/projectexp_add'>Add project to your portfolio.</a>
         <div id='portfolio'>
-            <!-- {{{ -->
-            <!--h3>
-            Community involvement
-            <a class='add-a-contribution'
-                style='text-decoration: none; font-size: 10pt;
-                letter-spacing: 0; margin-top: -3px; float: left;'
-                onmouseover="$(this).find('span').css('text-decoration','underline');"
-                onmouseout="$(this).find('span').css('text-decoration','none');"
-                href='/people/involvement/add/input'>
-                <img src='/static/images/icons/Add.png' alt='+' /><span>Add</span>
-            </a>
-            </h3-->
-            {% comment %}
-            Old importer {{{
-            {% if person.poll_on_next_web_view %}
-            <script type='text/javascript'>
-                // FIXME: Change host
-                url = '/people/test_commit_importer_json';
-            updateIntervalID = window.setInterval(updateCommitImporterStatus, 2000);
-            function updateCommitImporterStatus() {
-                function updateStatusDialog(json) {
-                    success = (json[0].success == 1);
-                    status = "status";
-                    if (success) {
-                        status_html = "<img src='/static/images/data-ready.png' style='float: left;'/> <div style='float: left;'>"
-                            + "{{person.user.username}}'s code contributions have been imported. "
-                            + "<a href='/people/{{ person.user.username }}/tabs/involvement'>"
-                            + "Follow this link to see them</a>.</div>";
-                        $('#commit-importer-status').html(status_html).addClass('done');
-                        window.clearInterval(updateIntervalID);
-                    } 
-                }
-                $.getJSON(url, updateStatusDialog);
-            }
-            </script>
-
-            <div id='commit-importer-status'>
-                <img src='/static/images/throbber.gif' />
-                <span style='position: relative; top: -11px;'>
-                    Importing <strong>{{person.user.username}}</strong>'s
-                    code contributions from around the web...
-                </span>
-            </div>
-            {% endif %}
-            }}}
-            {% endcomment %}
             <div class='project-display project-viewer column'>
                 <h4>Projects</h4>
                 {% if projects %}
@@ -69,7 +22,8 @@
                                 src='/people/project_icon/{{ project.name }}'/>
                             </a>
                         </div>
-                        <a href='/people/{{ person.user.username }}/projects/{{ project.name }}' 
+                        <a style='height: 30px;'
+                            href='/people/{{ person.user.username }}/projects/{{ project.name }}' 
                             class='name'>{{ project.name }}</a>
                     </div>
                     <!-- }}} -->
@@ -77,16 +31,11 @@
                     {% endfor %}
                 </ul>
                 {% else %}
-                <div style='float: left; margin-top: 10px; width: 500px;'>No contributions listed.</div>
-                <!--form method='post' action='/people/xp_slurp_do'>
-                <input type='submit' value='Import code contributions automatically from around the Internet.' />
-                <input type='hidden' name='u' value='{{person.user.username}}' />
-                </form-->
+                <div style='float: left; margin-top: 10px; width: 500px;'>No contributions listed yet.</div>
                 {% endif %}
             </div>
             <!-- }}} -->
         </div><!-- /#portfolio -->
-        <!-- }}} -->
     </div> <!-- /#right -->
 
 </div> <!-- /#content -->

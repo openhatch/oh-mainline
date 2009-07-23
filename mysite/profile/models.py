@@ -38,6 +38,7 @@ class DataImportAttempt(models.Model):
     SOURCE_CHOICES = (
         ('rs', "Search all repositories for %s."),
         ('ou', "I'm %s on Ohloh; import my data."),
+        ('lp', "I'm %s on Launchpad; import my data."),
         )
     completed = models.BooleanField(default=False)
     failed = models.BooleanField(default=False)
@@ -52,6 +53,7 @@ class DataImportAttempt(models.Model):
 
     def give_data_to_person(self):
         """ This DataImportAttempt assigns its person to its ProjectExps. """
+
         project_exps = ProjectExp.objects.filter(data_import_attempt=self)
         for pe in project_exps:
             if pe.person and pe.person != self.person:
@@ -67,7 +69,7 @@ class DataImportAttempt(models.Model):
         FetchPersonDataFromOhloh.delay(self.id)
 
     def __unicode__(self):
-        return "Attempt to import data, source = %s, person = %s, query = %s" % (self.source, self.person, self.query)
+        return "Attempt to import data, source = %s, person = <%s>, query = %s" % (self.source, self.person, self.query)
 
     # }}}
 
@@ -124,6 +126,24 @@ class ProjectExp(models.Model):
             self.source = "Ohloh"
             self.time_gathered_from_source = datetime.date.today()
             return self
+    
+    # FIXME: Make this a static method or something
+    def from_launchpad_result(self, project_name, language, person_role):
+        # {{{
+        self.project, bool_created = Project.objects.get_or_create(
+                name=project_name)
+        matches = list(ProjectExp.objects.filter(project=self.project,
+                                           person=self.person))
+        if matches:
+            return matches[0]
+        else:
+            # FIXME: Automatically populate project url here.
+            self.primary_language = language
+            self.person_role = person_role
+            self.source = "Launchpad"
+            self.time_gathered_from_source = datetime.date.today()
+            return self
+        # }}}
 
     @staticmethod
     def create_from_text(
