@@ -58,11 +58,8 @@
 
                 <div id='banner'>
                     <img alt='OpenHatch' src='/static/images/the-logo.png'/>
-                    <h1>Find: <a href='/people'>people</a>, <a href='/search'>volunteer opportunities</a>.</h1>
-                </div>
-
-
-                <div id='explanation'>
+                    
+                    <div id='explanation'>
                     <!--p style='text-align: center;'>
                     <h3 style=''>Dig in!</h3>
                     </p>
@@ -76,10 +73,15 @@
                     <ul><li><span>Find tailored ways that you can help</span> with open source projects</li>
                         <li><span>Find people</span> who like the same projects as you do</li>
                         <li><span>Track and show off</span> all your open source software experience in one place</li></ul>
-                    <h3>To get started...</h3> 
+                     </div>
+                </div>
+
+
+                <div id='right-hand'>
+                    <h1 id='find'>Find: <a href='/people'>people</a>, <a href='/search'>volunteer opportunities</a>.</h1>
                     <ul id='stuff-to-do'>
                         <li>
-                        <a style='float: left; width: 400px;' href='#'>Create a profile</a> 
+                        <div id='create-a-profile'><span>Create a profile:</span> </div>
                         <form id='create_profile' name='create_profile'
                             action='/people/new/do' method='POST'>
                             <div class='form-row'>
@@ -93,7 +95,7 @@
                                 name='create_profile_password' />
                             </div>
                             <div class='form-row'>
-                                <input type='submit' style='float: right;' id='create-profile' value='Create a profile' />
+                                <input type='submit' style='float: right;' value='begin!' />
                             </div>
                         </form>
                         </li>
@@ -111,48 +113,9 @@
                                 <input type='password' id='login_password' name='login_password' />
                             </div>
                             <div class='form-row'>
-                                <input type='submit' value='go' style='' />
+                                <input type='submit' value='log in!' style='' />
                             </div>
-                            <style>
-                                form {
-                                    margin-bottom: 10px;
-                                    float: left;
-                                    width: 422px;
-                                }
-                                .form-row {
-                                    float: left;
-                                    width: 422px;
-                                }
-                                label {
-                                    float: left;
-                                    width: 150px;
-                                    margin-right: 10px;
-                                    font-size: 10pt;
-                                    padding: 10px 0;
-                                }
-                                input[type='text'], input[type='password'] {
-                                    padding: 10px;
-                                    border: 1px solid #eee;
-                                    float: left;
-                                    width: 220px;
-                                }
-                                input[type='submit'] {
-                                    padding: 7px;
-                                    position: relative;
-                                    top: 1px;
-                                    font-size: 12pt;
-                                    background-color: #eee;
-                                    border: 1px solid #dde;
-                                    float: right;
-                                }
-                                #create-profile {
-                                    border: 1px solid #66AA33;
-                                    background-color: #AADD66;
-                                    padding: 10px;
-                                    text-align: center;
-                                    font-size: 14pt;
-                                }
-                            </style>
+
                         </form>
                         </li>
                         <li><a href='/people/'>See who else is on OpenHatch</a></li>

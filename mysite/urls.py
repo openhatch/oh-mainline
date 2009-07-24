@@ -107,6 +107,13 @@ urlpatterns = patterns('',
         (r'^people/edit[/?]$',
                 'mysite.profile.views.display_person_edit_web'),
 
+        (r'^people/edit/info$', 'mysite.profile.views.display_person_edit_web',
+                { 'info_edit_mode': True, 'title': 'Edit your info | OpenHatch'}),
+        (r'^edit/name$', 'mysite.profile.views.display_person_edit_name',
+                { 'name_edit_mode': True, 'title': 'Tell us your name | OpenHatch'}),
+
+        (r'^edit/name/do$', 'mysite.profile.views.display_person_edit_name_do'),
+
         (r'^people/portfolio/import/prepare_data_import_attempts_do$',
                 'mysite.profile.views.prepare_data_import_attempts_do'),
 

@@ -95,6 +95,7 @@ def index(request):
         notification = "Your chosen username is already taken. Try another one."
         notification_id = 'username_taken'
     return render_to_response('search/index.html', {
+        'title' : 'Welcome to OpenHatch', # FIXME: This doesn't work.
         'notification_id': notification_id,
         'notification': notification 
         })

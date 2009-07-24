@@ -113,6 +113,7 @@ class ProjectExp(models.Model):
 
     # FIXME: Make this a static method or something
     def from_ohloh_contrib_info(self, ohloh_contrib_info):
+        # {{{
         self.project, bool_created = Project.objects.get_or_create(
                 name=ohloh_contrib_info['project'])
         matches = list(ProjectExp.objects.filter(project=self.project,
@@ -126,7 +127,7 @@ class ProjectExp(models.Model):
             self.source = "Ohloh"
             self.time_gathered_from_source = datetime.date.today()
             return self
-    
+        # }}}
     # FIXME: Make this a static method or something
     def from_launchpad_result(self, project_name, language, person_role):
         # {{{

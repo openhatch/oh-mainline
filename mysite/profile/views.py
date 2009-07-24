@@ -23,6 +23,7 @@ import django.contrib.auth
 from django.contrib.auth.models import User
 from customs import ohloh
 import forms
+from django.contrib.auth.decorators import login_required
 # }}}
 
 # Add a contribution {{{
@@ -56,16 +57,6 @@ def projectexp_add_do(request):
             urllib.quote(username), urllib.quote(project_name))
     return HttpResponseRedirect(url_that_displays_project_exp)
     #}}}
-
-# }}}
-
-# XP slurper {{{
-
-def display_test_page_for_commit_importer(request):
-    # {{{
-    return render_to_response('profile/test_commit_importer.html', {
-        'username': request.user.username})
-    # }}}
 
 # }}}
 
@@ -179,19 +170,21 @@ def data_for_person_display_without_ohloh(person):
 
     # }}}
 
-def display_person_edit_web(request):
+def display_person_edit_web(request, info_edit_mode=False, title=''):
     # {{{
-
-    title = 'openhatch / %s / edit' % request.user.username
 
     person = request.user.get_profile()
 
     data = data_for_person_display_without_ohloh(person)
 
-    data['edit_mode'] = True
-
     # FIXME: Django builds this in.
     data['the_user'] = request.user
+    data['info_edit_mode'] = info_edit_mode
+
+    if title:
+        data['title'] = title
+    else:
+        data['title'] = 'openhatch / %s / edit' % request.user.username
 
     return render_to_response('profile/main.html', data)
     # }}}
@@ -203,11 +196,10 @@ def display_person_web(request, user_to_display__username=None):
 
     data = data_for_person_display_without_ohloh(person)
 
+    data['the_user'] = request.user
     data['title'] = 'openhatch / %s' % user.username
     data['edit_mode'] = False
-
-    # FIXME: Django builds this in.
-    data['the_user'] = request.user
+    data['editable'] = (request.user == user)
 
     return render_to_response('profile/main.html', data)
 
@@ -215,32 +207,51 @@ def display_person_web(request, user_to_display__username=None):
 
 def projectexp_display(request, user_to_display__username, project__name):
     # {{{
-    person = get_object_or_404(Person, user__username=user_to_display__username)
+    user = get_object_or_404(User, username=user_to_display__username)
+    person = get_object_or_404(Person, user=user)
+    project = get_object_or_404(Project, name=project__name)
     data = data_for_person_display_without_ohloh(person)
-    data['project'] = get_object_or_404(Project, name=project__name)
+    data['project'] = project
     data['exp_list'] = get_list_or_404(ProjectExp,
-            person__user__username=user_to_display__username, 
-            project__name=project__name)
+            person=person, project=project)
+    data['title'] = "%s's contributions to %s" % (
+            user.username, project.name)
+    data['the_user'] = request.user
+    data['projectexp_editable'] = user = request.user
     return render_to_response('profile/projectexp.html', data)
     # }}}
 
 def projectexp_edit(request, project__name):
     # {{{
-    user_to_display__username=request.user.username
-    person = get_object_or_404(Person, user__username=user_to_display__username)
+    try:
+        person = request.user.get_profile()
+    except AttributeError:
+        return render_to_response('search/index.html', {
+            'notification': "You've gotta be logged in to do that!"
+            })
+
+    project = get_object_or_404(Project, name=project__name)
     data = data_for_person_display_without_ohloh(person)
-    data['exp_list'] = get_list_or_404( ProjectExp,
-            person__user__username=user_to_display__username,
-            project__name=project__name)
+    data['exp_list'] = get_list_or_404(ProjectExp,
+            person=person, project=project)
     data['form'] = forms.ProjectExpForm()
     data['edit_mode'] = True
+    data['title'] = "Edit your contributions to %s" % project.name
+    data['the_user'] = request.user
     return render_to_response('profile/projectexp.html', data)
     # }}}
 
 def projectexp_add_form(request):
     # {{{
-    person = request.user.get_profile()
+    try:
+        person = request.user.get_profile()
+    except AttributeError:
+        return render_to_response('search/index.html', {
+            'notification': "You've gotta be logged in to do that! (Coming soon: a slightly easier way to get back to where you were.)"
+            })
     data = data_for_person_display_without_ohloh(person)
+    data['the_user'] = request.user
+    data['title'] = "Log a contribution in your portfolio | OpenHatch"
     return render_to_response('profile/projectexp_add.html', data)
     # }}}
 
@@ -451,6 +462,7 @@ def project_icon_web(request, project_name):
     return HttpResponseRedirect(url)
     # }}}
 
+# FIXME: This method is dead
 def import_commits_by_commit_username(request):
     # {{{
 
@@ -726,8 +738,8 @@ def delete_experience_do(request):
 
 def prepare_data_import_attempts_do(request):
     """This function:
-    * Pulls out from the POST a list of usernames or email addresses under which somebody has
-    committed code to an open-source repository.
+    * Pulls out from the POST a list of usernames or email addresses under
+    which somebody has committed code to an open-source repository.
     
     Side-effects: Create DIAs that a user might want to execute. This means,
     don't show the user DIAs that relate to non-existent accounts on remote
@@ -736,6 +748,7 @@ def prepare_data_import_attempts_do(request):
     etc.
 
     NB: We don't yet implement sentences 2 and 3 of the preceding paragraph."""
+    # {{{
     # for each commit_username_*, call some silly controller """
     commit_usernames = []
     for key in request.POST:
@@ -760,6 +773,7 @@ def prepare_data_import_attempts_do(request):
             dia.do_what_it_says_on_the_tin()
 
     return HttpResponseRedirect('/people/portfolio/import/')
+    # }}}
 
 def importer(request):
     """Get the DIAs for the logged-in user's profile. Pass them to the template."""
@@ -769,7 +783,7 @@ def importer(request):
     data.update({
         'title': 'Find your contributions around the web! - OpenHatch',
         'the_user': request.user,
-        'body_id': 'importer',
+        'body_id': 'importer-body',
         'dias': DataImportAttempt.objects.filter(person=request.user.get_profile()).order_by('id')
         })
 
@@ -781,6 +795,7 @@ def user_selected_these_dia_checkboxes(request):
     Side-effect: Make a note on the DIA that its affiliated person wants it.
     Output: Success?
     """
+    # {{{
     try:
         checkbox_ids = request.POST['checkboxIDs']
     except KeyError:
@@ -797,3 +812,32 @@ def user_selected_these_dia_checkboxes(request):
         dia.give_data_to_person()
 
     return HttpResponse('1')
+    # }}}
+
+@login_required
+def display_person_edit_name(request, name_edit_mode, title):
+    '''Show a little edit form for first name and last name.
+
+    Why separately handle first and last names? The Django user
+    model already stores them separately.
+    '''
+    data = {}
+    data = data_for_person_display_without_ohloh(request.user.get_profile())
+    data['name_edit_mode'] = name_edit_mode
+    data['title'] = title
+    return render_to_response('profile/main.html', data)
+
+def display_person_edit_name_do(request):
+    '''Take the new first name and last name out of the POST.
+
+    Jam them into the Django user model.'''
+    user = request.user
+
+    new_first = request.POST['first_name']
+    new_last = request.POST['last_name']
+
+    user.first_name = new_first
+    user.last_name = new_last
+    user.save()
+
+    return HttpResponseRedirect('/people/%s' % urllib.quote(user.username))

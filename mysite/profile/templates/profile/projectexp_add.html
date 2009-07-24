@@ -1,7 +1,97 @@
-{% include 'profile/header.global.html' %}
-{% include 'profile/header.html' %}
-{% include 'profile/personal.html' %}
+{% extends 'profile/base_profile.html' %}
 
+{% block right %}
+<div class='edit single-project column project-display'>
+    <!-- {{{ -->
+    <h2>
+        <a href='/people/{{ the_user.username }}/'>
+            My <abbr title='Free and open source software!' 
+                class='foss'>foss</abbr>
+            portfolio
+        </a>
+    </h2>
+    <h3>Log a contribution</h3>
+    <form name='projectexp_add' method='POST'
+        action='/do/projectexp_add'>
+        <div class='section'>
+            <div class='section-heading'>
+                <h4>
+                    <label for='project__name'>
+                        Project
+                    </label>
+                </h4>
+            </div>
+            <div class='section-content' id='role'>
+                <input type='text'
+                id='project__name'
+                name='project__name'
+                value='{{ exp.project__name }}' />
+            </div>
+        </div>
+
+        <div class='section'>
+            <div class='section-heading'>
+                <h4>
+                    <label for='project_exp__description'>
+                        Description
+                    </label>
+                </h4>
+            </div>
+            <div class='section-content' id='role'>
+                <textarea
+                    id=  'project_exp__description'
+                    name='project_exp__description'
+                    >{{ exp.description }}</textarea>
+            </div>
+        </div>
+
+        <div class='section'>
+            <div class='section-heading'>
+                <h4>
+                    <label for='project_exp__url'>
+                        Cite your involvement
+                    </label>
+                </h4>
+            </div>
+            <div class='section-content'>
+                <input type='text'
+                id=  'project_exp__url' 
+                name='project_exp__url' />
+            </div>
+        </div>
+        <div class='section'>
+            <div class='section-heading'>
+                <!-- This just takes up space. -->
+                &nbsp;
+            </div>
+            <div class='section-content help-bubble'
+                id='help-bubble-1'>
+                <a href='#' class='help-bubble-close'>x</a>
+                <img src='/static/images/icons/info.png' />
+                <p>
+                A good citation is a link to a bug report or archived
+                post to a mailing list that includes your patch,
+                translation, design idea, or other contribution.
+                (Cue some tactical Googling!)
+                </p>
+            </div>
+        </div>
+        <div class='section'>
+            <div class='section-heading'>
+                &nbsp;
+            </div>
+            <div class='section-content'>
+                <input type='submit' value='Save' />
+            </div>
+        </div>
+    </form>
+</div>
+<!-- }}} -->
+</div>
+{% endblock right %}
+
+{% block js %}
+<script src='/static/js/jquery.cookie.js'></script>
 <script>
     $(document).ready(function() {
         if ($.cookie('bubble-closed')) {
@@ -18,78 +108,4 @@
         }
     });
 </script>
-
-<!-- begin body of template 'profile/projectexp_edit.html' -->
-<div id='right'>
-    <div class='edit single-project column project-display project-viewer'>
-        <!-- {{{ -->
-        <h3>Add project to your portfolio</h3>
-        <form name='projectexp_add' method='POST'
-            action='/do/projectexp_add'>
-            <div id='role-details' class='section'>
-                <div class='section-heading'>
-                    <h4><label for='project__name'
-                            >Project</label></h4> </div>
-                <div class='section-content' id='role'>
-                    <input type='text' name='project__name'
-                    value='{{ exp.project__name }}' /> </div>
-
-                <div class='section-heading'>
-                    <h4>Description</h4> </div>
-                <div class='section-content' id='role'>
-                    <textarea
-                        id=  'project_exp__description'
-                        name='project_exp__description'
-                        >{{ exp.description }}</textarea> </div>
-
-                <div class='section-heading'>
-                    <h4><label for='project_exp__url'
-                            >Cite your involvement</label></h4>
-                </div>
-                <div class='section-content'>
-                    <input type='text'
-                    id=  'project_exp__url' 
-                    name='project_exp__url' /> </div>
-
-                {% if show_favorite %}
-                <div class='make-projectexp-favorite'>
-                    <form name='make-exp-favorite-{{ exp.id }}' 
-                        method='POST'
-                        action='/people/make_favorite_project_exp'>
-                        <input type='hidden' name='username'
-                        value='{{ person.user.username }}'/>
-                        <input type='hidden' name='exp_id'
-                        value='{{ exp.id }}'/>
-                        <input type='image' src='/static/images/icons/star-off.png'/>
-                        <!--input type='submit' value='Make Favorite' /-->
-                    </form>
-                </div>
-                {% endif %}
-
-                <div class='help-bubble' id='help-bubble-1'>
-                    <a href='#' class='help-bubble-close'>x</a>
-                    <img src='/static/images/icons/info.png' />
-                    <p>
-                    A good citation is a link to a bug report or archived
-                    mailing list post that includes your patch,
-                    translation, design idea, or other contribution.
-                    (Cue some tactical Googling.)
-                    </p>
-                </div>
-                <!--div class='delete-projectexp'>
-                    <form name='delete-projectexp-{{ exp.id }}'
-                        method='POST' action='/people/delete-experience/do'>
-                        <input type='hidden' name='id' value='{{ exp.id }}'/>
-                        <input type='submit' value='Delete'/>
-                    </form>
-                </div-->
-                <input type='submit' value='Save' />
-            </form>
-        </div>
-        <!-- }}} -->
-    </div>
-</div> <!-- /#right -->
-<!-- end body of template 'profile/projectexp_edit.html' -->
-
-{% include 'profile/footer.html %}
-{% include 'profile/footer.global.html' %}
+{% endblock js %}

@@ -1,9 +1,6 @@
-{% comment %}
-vim: set ai et ts=4 sw=4 nu:
-{% endcomment %}
+{% extends 'profile/base.html' %}
 
-<div class='widget' id='left'>
-
+{% block left %}
     <div id='nameplate'>
     {% if name_edit_mode %}
         <form method='POST'
@@ -59,6 +56,8 @@ vim: set ai et ts=4 sw=4 nu:
     {% else %}
     <div id='avatar'><img src='{{ photo_url }}' /></div>
     {% endif %}
-
-</div>
+{% endblock left %}
+{% comment %}
+vim: set ai et ts=4 sw=4 nu:
+{% endcomment %}
 

@@ -1,44 +1,104 @@
-{% include 'profile/header.global.html' %}
-{% include 'profile/header.html' %}
+{% extends 'profile/base_profile.html' %}
 
-<div id='content'>
+{% block title %}
+{{person.user.username}}'s profile : openhatch
+{% endblock title %}
 
-{% include 'profile/personal.html' %}
-
-    <div id='right'>
-        <a href='/form/projectexp_add'>Add project to your portfolio.</a>
-        <div id='portfolio'>
-            <div class='project-display project-viewer column'>
-                <h4>Projects</h4>
-                {% if projects %}
-                <ul>
-                    {% for project, more_project_attributes in projects.items %}
-                    <li>
-                    <!-- {{{ -->
-                    <div class='project-escutcheon'>
-                        <div class='logo'>
-                            <a href='/people/{{ person.user.username }}/projects/{{ project.name }}'>
-                                <img alt='logo for {{project.name}}'
-                                src='/people/project_icon/{{ project.name }}'/>
-                            </a>
-                        </div>
-                        <a style='height: 30px;'
-                            href='/people/{{ person.user.username }}/projects/{{ project.name }}' 
-                            class='name'>{{ project.name }}</a>
-                    </div>
-                    <!-- }}} -->
-                    </li>
-                    {% endfor %}
-                </ul>
-                {% else %}
-                <div style='float: left; margin-top: 10px; width: 500px;'>No contributions listed yet.</div>
-                {% endif %}
+{% block middle %}
+<div id='portfolio'>
+    <div class='project-display column'>
+        <h3>Contributions</h3>
+        {% if editable %}
+        <a class='portfolio-edit-button' href='/people/portfolio/import'>
+            Import +
+        </a>
+        <a class='portfolio-edit-button' href='/form/projectexp_add'>
+            Add +
+        </a>
+        {% endif %}
+        {% if projects %}
+        <ul>
+            {% for project, more_project_attributes in projects.items %}
+            <li>
+            <!-- {{{ -->
+            <div class='project-escutcheon'>
+                <div class='logo'>
+                    <a href='/people/{{ person.user.username }}/projects/{{ project.name }}'>
+                        <img alt='logo for {{project.name}}'
+                        src='/people/project_icon/{{ project.name }}'/>
+                    </a>
+                </div>
+                <a style='height: 30px;'
+                    href='/people/{{ person.user.username }}/projects/{{ project.name }}' 
+                    class='name'>{{ project.name }}</a>
             </div>
             <!-- }}} -->
-        </div><!-- /#portfolio -->
-    </div> <!-- /#right -->
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <div style='float: left; margin-top: 10px; width: 500px;'>No contributions listed yet.</div>
+        {% endif %}
+    </div>
+    <!-- }}} -->
+</div> <!-- /#portfolio -->
+{% endblock middle %}
 
-</div> <!-- /#content -->
-
-{% include 'profile/footer.html' %}
-{% include 'profile/footer.global.html' %}
+{% block right %}
+<div id='info' class='widget'>
+    <h3>Info</h3>
+    {% if info_edit_mode %}
+    <!-- {{{ -->
+    <form name='edit-tags'
+        action='/people/tags/edit/do'
+        method='POST'>
+        <!-- personal_info_edit_mode -->
+        {% comment %} THIS IS EDIT MODE FOOLS {% endcomment %}
+        <h4>understands:</h4>
+        <textarea name='edit-tags-understands'>{{ tags_flat.understands }}</textarea>
+        <h4>will never understand:</h4>
+        <textarea name='edit-tags-understands_not'>{{ tags_flat.understands_not }}</textarea>
+        <h4>looking for volunteering opportunities tagged with:</h4>
+        <textarea name='edit-tags-seeking'>{{ tags_flat.seeking }}</textarea>
+        <h4>currently studying:</h4>
+        <textarea name='edit-tags-studying'>{{ tags_flat.studying }}</textarea>
+        <h4>can mentor in:</h4>
+        <textarea name='edit-tags-can_mentor'>{{ tags_flat.can_mentor }}</textarea>
+        <input class='save-button' type='submit' value='Save' />
+    </form>
+    <!-- }}} -->
+    {% else %}
+    {% if editable %}
+    <a class='edit'
+        href='/people/edit/info'>Edit</a>
+    {% endif %}
+    <!-- {{{ -->
+    {% if tags_flat.understands %}
+    <div class='tags' id='tags-understands'>
+        <span class='tag-type'>understands:</span> {{ tags_flat.understands }}
+    </div>
+    {% endif %}
+    {% if tags.understands_not %}
+    <div class='tags' id='tags-understands_not'>
+        <span class='tag-type'>will never understand:</span> {{ tags_flat.understands_not }}
+    </div>
+    {% endif %}
+    {% if tags.seeking %}
+    <div class='tags' id='tags-seeking'>
+        <span class='tag-type'>looking for volunteering opportunities in:</span> {{ tags_flat.seeking }}
+    </div>
+    {% endif %}
+    {% if tags.studying %}
+    <div class='tags' id='tags-studying'>
+        <span class='tag-type'>currently learning about:</span> {{ tags_flat.studying }}
+    </div>
+    {% endif %}
+    {% if tags.can_mentor %}
+    <div class='tags' id='tags-can_mentor'>
+        <span class='tag-type'>can mentor in:</span> {{ tags_flat.can_mentor }}
+    </div>
+    {% endif %}
+    <!-- }}} -->
+    {% endif %}
+</div>
+{% endblock right %}

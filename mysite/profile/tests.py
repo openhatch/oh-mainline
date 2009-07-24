@@ -127,6 +127,31 @@ class ProfileTests(TwillTests):
                 primary_language)
         # }}}
 
+    def test_change_my_name(self):
+        """Test that user can change his/her first and last name, and that it appears in the logged-in user's profile page."""
+        # {{{
+        self.login()
+
+        # Assert we're on profile page.
+        tc.url('/people/paulproteus')
+
+        # No named entered yet
+        tc.notfind('Newfirst Newlast')
+
+        # Let's go enter a name
+        tc.follow('Edit name')
+
+        tc.url('/edit/name')
+        tc.fv('edit_name', 'first_name', 'Newfirst')
+        tc.fv('edit_name', 'last_name', 'Newlast')
+        tc.submit()
+
+        tc.url('/people/paulproteus')
+
+        # Has name been entered correctly? Hope so!
+        tc.find('Newfirst Newlast')
+        # }}}
+
     # }}}
 
 class DebTagsTests(TwillTests):
@@ -214,35 +239,29 @@ class ProjectExpTests(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry',
             'person-paulproteus', 'cchost-data-imported-from-ohloh']
 
-    def test_projectexp_add(self):
+    def projectexp_add(self, project__name, project_exp__description, project_exp__url):
         """Paulproteus can login and add a projectexp to bumble."""
         # {{{
         self.login()
 
-        tc.follow('Add project to your portfolio')
+        tc.follow('Add +')
 
-        tc.find('Add project to your portfolio')
-        tc.fv('projectexp_add', 'project__name', 'bumble')
-        tc.fv('projectexp_add', 'project_exp__description', 'fiddlesticks')
-        tc.fv('projectexp_add', 'project_exp__url', 'http://example.com')
+        tc.url('/form/projectexp_add')
+        tc.fv('projectexp_add', 'project__name', project__name)
+        tc.fv('projectexp_add', 'project_exp__description', project_exp__description)
+        tc.fv('projectexp_add', 'project_exp__url', project_exp__url)
         tc.submit()
-        tc.find('fiddlesticks')
-        tc.find('http://example.com')
+        tc.find(project__name)
+        tc.find(project_exp__description)
+        tc.find(project_exp__url)
         # }}}
 
-    def test_projectexp_add_another(self):
-        """Paulproteus can login and add a second projectexp to bumble."""
+    def test_projectexp_add(self):
+        """Paulproteus can login and add two projectexps."""
         # {{{
-        self.test_projectexp_add()
-        tc.follow('All projects')
-
-        tc.follow('Add project to your portfolio')
-        tc.fv('projectexp_add', 'project__name', 'bumble')
-        tc.fv('projectexp_add', 'project_exp__description', 'fiddlesticks2')
-        tc.fv('projectexp_add', 'project_exp__url', 'http://example.com/2')
-        tc.submit()
-        tc.find('fiddlesticks2')
-        tc.find('http://example.com/2')
+        self.login()
+        self.projectexp_add('asdf', 'qwer', 'jkl')
+        self.projectexp_add('asdf', 'QWER!', 'JKL!')
         # }}}
 
     def test_projectexp_delete(self):
@@ -367,13 +386,6 @@ class ProjectExpTests(TwillTests):
         # }}}
 
     # FIXME: Move these next two functions to their proper home.
-    def test_info_go_to_edit_mode(self):
-        # {{{
-        self.login()
-        tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
-        tc.follow('Edit')
-        tc.find('personal_info_edit_mode') # a check-string
-        # }}}
 
     tags = {
             'understands': ['ack', 'b', 'c'],
@@ -394,7 +406,7 @@ class ProjectExpTests(TwillTests):
     # FIXME: Write a unit test for this.
     def update_tags(self, tag_dict):
         # {{{
-        url = 'http://openhatch.org/people/edit'
+        url = 'http://openhatch.org/people/edit/info'
         tc.go(make_twill_url(url))
         for tag_type_name in tag_dict:
             tc.fv('edit-tags', 'edit-tags-' + tag_type_name, ", ".join(tag_dict[tag_type_name]))
@@ -426,20 +438,6 @@ class ProjectExpTests(TwillTests):
         self.login()
         self.update_tags(self.tags)
         self.update_tags(self.tags_2)
-        # }}}
-
-    # }}}
-
-class CommitImportTests(TwillTests):
-    # {{{
-    fixtures = ['user-paulproteus', 'person-paulproteus']
-
-    def test_poller_appears_correctly(self):
-        # {{{
-        url = 'http://openhatch.org/people/test_commit_importer'
-        url = make_twill_url(url)
-        tc.go(url)
-        tc.find('test commit importer')
         # }}}
 
     # }}}

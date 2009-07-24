@@ -1,13 +1,13 @@
 // Depends on jQuery.
 
 var makeNewInput = function() {
-    var $form = $('.queries form');
+    var $form = $('.queries form div');
     html = "<input type='text' name='NAME' id='NAME' />";
     html = html.replace(/NAME/g, 
             "commit_username_" + $form.find('input').size());
     $new_input = $(html).appendTo($form);
 }
-var keyupHandler = function() {
+var keydownHandler = function() {
     $input = $(this);
     var oneInputIsBlank = function() {
         var ret = false;
@@ -24,8 +24,7 @@ var keyupHandler = function() {
     }
 }
 var bindKeyupHandlers = function() {
-    var $form = $('.queries form');
-    $form.children('input').keyup(keyupHandler);
+    $('.queries form div input').keydown(keydownHandler);
 }
 $(bindKeyupHandlers);
 
@@ -48,14 +47,13 @@ var submitDataSources = function() {
         }
     };
     var data = {'checkboxIDs': checkboxIDs.join(" ")};
-    console.debug(data);
     $.post(url, data, callback);
 }
 $.fn.setThrobberStatus = function(theStatus) {
     $cb = this;
     var $throbber = $cb.parent().find(
             '.data_import_status img');
-    console.debug("Trying to set status of throbber: ", $throbber.get(0));
+    //console.debug("Trying to set status of throbber: ", $throbber.get(0));
     $throbber.css('visibility', 'visible');
     mapStatusToImage = {
         'working': '/static/images/throbber.gif',
@@ -66,7 +64,7 @@ $.fn.setThrobberStatus = function(theStatus) {
     if ($throbber.attr('src') != src) {
         $throbber.attr('src', src);
     }
-    console.debug($throbber.get(0));
+    //console.debug($throbber.get(0));
 }
 var enableThrobbersThenPollForStatusForever = function() {
     var $checkboxes = $(".data_import_attempts input[type='checkbox']:checked");

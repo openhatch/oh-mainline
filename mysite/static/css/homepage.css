@@ -69,18 +69,13 @@ h4 {
 }
 
 #banner {
-    width: 350px;
+    width: 400px;
     float: left;
+    margin-top: -25px;
 }
 #banner img {
     border: 0;
     width: 350px;
-}
-#explanation {
-    width: 500px;
-    margin: 40px 0 0 440px;
-}
-.explanation-heading {
 }
 
 #explanation p {
@@ -90,9 +85,26 @@ h4 {
     margin-bottom: 15px;
 }
 
+.explanation-heading {
+}
+
+#right-hand {
+    width: 500px;
+    margin: 10px 0 0 440px;
+}
+
+#find {
+    font-size: 26px;
+    margin: 10px 0 25px 0;
+}
+
+#stuff-to-do {
+    margin-top: 10px;
+}
+
 #stuff-to-do li {
     list-style-type: none;
-    border: 10px solid #fff;
+    border: 30px solid #fff;
     background: url('/static/images/motif.png');
     margin-bottom: 10px;
     float: left;
@@ -103,8 +115,13 @@ h4 {
     color: #2288BB;
     font-weight: normal;
     font-size: 140%;
+    background-color: transparent;
     }
 
+#create-a-profile span {
+    color: #66AA33;
+    font-size: 24px;
+    }
 
 ul {
     margin: 0;
@@ -122,4 +139,43 @@ li a {
 p {
     margin: 0;
 }
+
+/*form style stuff*/
+
+form {
+    margin-bottom: 10px;
+    float: left;
+    width: 500px;
+}
+.form-row {
+    float: left;
+    width: 422px;
+}
+label {
+    float: left;
+    width: 150px;
+    padding: 10px;
+    margin-right: 10px;
+    font-size: 12pt;
+}
+input[type='text'], input[type='password'] {
+    padding: 10px;
+    margin: 8px 0;
+    border: 1px solid #ddd;
+    float: left;
+    width: 220px;
+}
+input[type='submit'] {
+    padding: 7px;
+    position: relative;
+    top: 1px;
+    font-size: 12pt;
+    background-color: #eee;
+    border-top: 1px solid #ddd;
+    border-right: 2px solid #ccc;
+    border-bottom: 2px solid #ccc;
+    border-left: 1px solid #ddd;
+    float: right;
+}
+
 /* vim: set ai ts=4 sts=4 et sw=4: */

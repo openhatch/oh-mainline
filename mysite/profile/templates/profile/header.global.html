@@ -60,13 +60,13 @@
                         alt='openhatch' />
                     </a>
                 </h2>
-                <ul id='links'>
+                <ul style='width: 740px;' id='links'>
                     <li><a href='/people/'>find people</a></li>
                     <li><a href='/search/'>find volunteer opportunities</a></li>
                 {% if the_user.is_authenticated %}
                 <!-- user.is_authenticated indeed -->
-                    <li><span>You're logged in as {{ the_user.username }}.</span></li>
-                    <li><a href='/people/logout/'>Log out</a></li>
+                    <li style='float: right;'><a href='/people/logout/'>Log out</a></li>
+                    <li style='float: right;'><span>{{ the_user.username }}</span></li>
                 {% endif %}
                 </ul>
             </div>

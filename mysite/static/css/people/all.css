@@ -1,5 +1,5 @@
 body {
-    font: 8pt Verdana, Bitstream Vera Sans, Arial, sans-serif;
+    font: 9pt Verdana, Bitstream Vera Sans, Arial, sans-serif;
     background: url('/static/images/motif-blue.png');
     margin: 0;
 }
@@ -57,8 +57,7 @@ h1, h2, h3, h4 {
 #nav {
     padding: 10px 20px 0 20px;
     float: left;
-    background-color: transparent;
-    width: 1000px;
+    width: 960px;
 }
 #nav h2 {
     width: 200px;
@@ -121,18 +120,18 @@ ul#user-actions a {
 }
 
 #login .text {
- font-family: Verdana, Arial, Helvetica, sans-serif;
- font-size: .7em;
- width: 100px;
- margin-right: 6px;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: .7em;
+    width: 100px;
+    margin-right: 6px;
 }
 
 #login .button {
- font-family: Verdana, Arial, Helvetica, sans-serif;
- font-size: .7em;
- background-color: #333333;
- color: #FFFFFF;
- margin: -17px 6px 0 0;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: .7em;
+    background-color: #333333;
+    color: #FFFFFF;
+    margin: -17px 6px 0 0;
 }
 
 #commit_username {
@@ -149,8 +148,7 @@ ul#user-actions a {
 
 #content {
     float: left;
-    width: 960px;
-    padding: 0 20px 20px 20px;
+    width: 1000px;
 }
 
 #footer {
@@ -245,12 +243,14 @@ h3 {
     width: 800px;
 }
 #info {
-    margin-top: 10px;
     width: 180px;
     border: 10px solid #fff;
     padding: 10px;
     padding-bottom: 0;
     background: url('/static/images/motif.png');
+}
+#info h3 {
+    width: 180px;
 }
 .tags {
     margin-bottom: 10px;
@@ -302,57 +302,21 @@ img.show-more-link {
 }
 #middle {
     float: left;
-    width: 220px;
+    width: 520px;
     margin-right: 20px;
 }
 #right {
+    width: 220px;
     float: left;
-    width: 470px;
-    margin-right: 10px;
 }
 .widget {
     float: left;
     width: 400px;
     margin-bottom: 20px;
 }
-.widget.full-width {
-    width: 900px;
-}
-#software ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-#software li {
-    width: 80px;
-    padding: 10px;
-    text-align: center;
-    margin-bottom: 10px;
-    margin-right: 20px;
-    float: left;
-}
-#nerdstream li img {
-    vertical-align: middle;
-    margin-right: 10px;
-}
-#system h3 {
-    margin-bottom: 10px;
-}
-#system li {
-    float: left;
-}
-#system img {
-    vertical-align: middle;
-    margin-right: 10px;
-}
-input[type='text'] {
-    padding: 10px;
-    font: 8pt Verdana;
-    float: left;
-}
-textarea {
-    padding: 10px;
-    font: 8pt Verdana;
+input[type='text'], textarea {
+    padding: 5px;
+    font-size: 11pt;
     float: left;
 }
 input[type='submit'] {
@@ -406,20 +370,19 @@ input[type='submit'] {
 #add-contribution input[type='submit'] {
     margin-top: 0;
 }
-.help-bubble {
+.section-content.help-bubble {
     float: left;
-    width: 373px;
-    float: left;
-    background: #f0ffc4 url('/static/images/bg-help-bubble.png');
+    background: #fff;
     background-position: bottom;
     background-repeat: repeat-x;
     color: #222;
-    font-size: 10pt;
-    padding: 6px 12px;
+    font-size: 9pt;
+    padding: 12px;
     -moz-border-radius: 5px;
     margin-top: 5px;
-    border: 1px solid #deb;
+    border: 1px solid #ddd;
     border-bottom: 1px solid #ddd;
+    width: 320px;
 }
 .help-bubble img {
     float: left;
@@ -427,8 +390,8 @@ input[type='submit'] {
 }
 .help-bubble p {
     float: left;
-    width: 300px;
-    margin: 0;
+    width: 230px;
+    margin: 0 ! important;
 }
 .help-bubble a {
     float: right;
@@ -443,11 +406,6 @@ input[type='submit'] {
 a.add-a-contribution {
     float: left;
     margin-top: 10px;
-    /*
-    border: solid #dde;
-    border-width: 1px 1px 2px 1px;
-    background-color: #eee; d9eeff; b5deff; 7fc4ff; dde; 
-    */
     padding: 1px 8px;
     color: #668;
     -moz-border-radius: 5px;
@@ -491,13 +449,9 @@ img {
     float: left;
     width: 200px;
 }
-#right ul {
+#portfolio ul {
     float: left;
     background: url('/static/images/motif.png');
-}
-#info {
-    font-weight: bold;
-    font-size: 10pt;
 }
 #info .tag-type {
     font-weight: normal;
@@ -523,80 +477,63 @@ img {
     border: 10px solid #fff;
     padding: 10px;
 }
-.project-viewer h3 {
+.project-display {
+    padding-bottom: 0;
+    float: left;
+    margin-bottom: 20px;
+    margin-right: 0;
+}
+.project-display h3 {
     float: left;
 }
-.project-viewer p {
+.project-display p {
     margin: 0;
     margin-bottom: 10px;
     float: left;
 }
-.project-viewer h2 {
-    font: bold 13pt Verdana;
+.project-display h2 {
+    font-size: 9pt;
     margin: 0;
-    margin-bottom: 10px;
+    margin-bottom: 3px;
 }
-.project-viewer h3 {
+h3 {
     font: 13pt Verdana;
     margin: 0;
     margin-bottom: 10px;
 }
 h4, .cute-header {
-    font-weight: bold;
-    font-size: 7pt;
-    font-style: italic;
+    font-size: 9pt;
     color: #666;
     float: left;
-    text-transform: uppercase;
     margin: 0;
     padding: 1px;
 }
-.project-viewer h5 {
+.project-display h5 {
     font-size: 12pt;
     margin: 0;
     margin-bottom: 10px;
     font-weight: normal;
 }
-.project-viewer a {
+.project-display a {
     text-decoration: none;
-}
-.project-viewer a:hover {
-    background-color: #fff;
-}
-
-.project-display {
-    float: left;
-    width: 480px;
-    margin-bottom: 20px;
 }
 .project-display ul {
     float: left;
-    width: 480px;
 }
 
 /* Styling for django form output. */
-.project-display label {
-    float: left;
-    font-size: 7pt;
-    font-style: italic;
-    color: #666;
-    float: left;
-    text-transform: uppercase;
-    margin: 0;
-    padding: 1px;
-    font-weight: bold;
-    width: 115px;
-    margin-right: 10px;
-    margin-top: 10px;
-}
 .project-display input[type='text'],
 .project-display textarea {
     float: left;
-    width: 300px;
+    width: 330px;
 }
 .section {
+    float: left;
     margin-bottom: 10px;
-    width: 500px;
+    width: 480px;
+}
+#left .section {
+    width: 180px;
 }
 .section .section-heading {
     width: 115px;
@@ -607,7 +544,7 @@ h4, .cute-header {
 }
 .section-content {
     float: left;
-    width: 325px;
+    width: 345px;
 }
 #role-details h3, #role-details #role p, #role-description {
     width: 325px;
@@ -636,11 +573,6 @@ h4, .cute-header {
     font-size: 11pt;
     line-height: 120%;
 }
-#role-details p {
-    margin: 0;
-    margin-bottom: 10px;
-    float: left;
-}
 .single-project #project-escutcheon {
     float: right;
     width: 64px;
@@ -659,7 +591,7 @@ h4, .cute-header {
     font-size: 11pt;
 }
 #project-description p {
-    font-size: 7.5pt;
+    font-size: 9pt;
 }
 .about-this-project {
     float: left;
@@ -715,7 +647,7 @@ ul#contributors li span {
     background-color: #f5f5f5;
 }
 #nameplate {
-    margin-bottom: 0;
+    margin-bottom: 10px;
 }
 #nameplate input[type='text'] {
     width: 160px;
@@ -730,7 +662,6 @@ ul#contributors li span {
     display: inline;
 }
 input[type='submit'] {
-    margin-bottom: 10px;
     color: #333;
     float: right;
 }
@@ -742,7 +673,8 @@ input[type='submit'] {
     border: 10px solid #fff;
     margin-bottom: 20px;
 }
-#importer #right {
+#importer {
+    float: left;
     border: 10px solid #fff;
     padding: 10px;
     background: url('/static/images/motif.png');
@@ -750,42 +682,42 @@ input[type='submit'] {
 #importer form .cute-header {
     width: 400px;
 }
-#importer #right input[type='text'] {
+#importer input[type='text'] {
     width: 180px;
     font-size: 10pt;
 }
-#importer #right input[type='submit'] {
+#importer input[type='submit'] {
     float: right;
 }
 #importer #importer_input_section {
     float: left;
     padding-top: 10px;
 }
-#importer #right .queries {
+#importer .queries {
     float: left;
     width: 240px;
     margin-right: 10px;
 }
-#importer #right .data_import_attempts {
+#importer .data_import_attempts {
     float: left;
     width: 200px;
 }
-#importer #right li {
+#importer li {
     float: left;
     margin-top: 10px;
 }
-#importer #right input[type='checkbox'] {
+#importer input[type='checkbox'] {
     float: left;
     width: 30px;
     margin-right: 10px;
     clear: left;
 }
-#importer #right label {
+#importer label {
     float: left;
     width: 130px;
     margin-right: 10px;
 }
-#importer #right .data_import_status {
+#importer .data_import_status {
     float: left;
     width: 32px;
 }
@@ -795,4 +727,28 @@ input[type='submit'] {
 }
 #importer span {
     font-weight: bold;
+}
+#info a.edit {
+    font-size: 8pt;
+    float: right;
+}
+#info a.edit.loud {
+}
+.project-display .portfolio-edit-button {
+    padding: 5px 8px;
+    position: relative;
+    top: -5px;
+    left: 5px;
+    background-color: #eee;
+    border-top: 1px solid #ddd;
+    border-right: 2px solid #ccc;
+    border-bottom: 2px solid #ccc;
+    border-left: 1px solid #ddd;
+    float: right;
+    color: #222;
+    margin-left: 10px;
+}
+abbr.foss {
+    border: 0;
+    font-variant: small-caps;
 }
