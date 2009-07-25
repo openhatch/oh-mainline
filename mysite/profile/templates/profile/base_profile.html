@@ -23,7 +23,11 @@
             </table>
         </form>
     {% else %}
-        <h1>
+    {% if editable %}
+    <a style='float: right;' href='/edit/name'>
+        Edit name</a>
+    {% endif %}
+        <h1 style='float: left;'>
             {% if person.user.first_name or person.user.last_name %}
             <a href='/people/{{ person.user.username }}'>
                 <div class='name'>
@@ -46,13 +50,9 @@
             {% endif %}
         </h1>
         <div>
-            {% comment %}
-            <div class='invitation'>Tell us your name</div>
-            {% endcomment %}
-            {% if editable %}
-            <a class='edit'
-                href='/edit/name'>
-                Edit name</a>
+            {% if editable and not person.user.first_name and not person.user.last_name %}
+            <div id='edit_your_name_notification' 
+                class='notification'>Tell us your name!</div>
             {% endif %}
         </div>
     {% endif %}
@@ -69,6 +69,7 @@
     <div id='avatar'><img src='{{ photo_url }}' /></div>
     {% endif %}
 {% endblock left %}
+
 {% comment %}
 vim: set ai et ts=4 sw=4 nu:
 {% endcomment %}

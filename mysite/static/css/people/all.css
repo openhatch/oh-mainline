@@ -258,6 +258,7 @@ h3 {
 .below-the-fold {
 }
 #portfolio ul {
+    width: 480px;
     float: left;
     padding: 20px 0;
 }
@@ -325,13 +326,13 @@ input[type='submit'] {
     font-weight: bold;
     float: left;
 }
-.notification {
+.alert {
     float: left;
     width: 1000px;
     text-align: center;
     padding: 15px 0;
 }
-.notification div {
+.alert div {
     display: inline;
     background-color: #fca;
     color: #444;
@@ -482,6 +483,7 @@ img {
     float: left;
     margin-bottom: 20px;
     margin-right: 0;
+    width: 480px;
 }
 .project-display h3 {
     float: left;
@@ -772,4 +774,19 @@ abbr.foss {
     padding-top: 10px;
     margin-left: 15px;
     list-style: square;
+}
+.notification {
+    float: left;
+    width: 130px;
+    background-color: #ffc; /* "Fresh Food Café!"-- Asheesh */
+    border: 1px solid #ff7;
+    padding: 5px;
+    margin: 0 20px;
+    text-align: center;
+    font-size: 10pt;
+    color: #000;
+    margin-bottom: 10px;
+}
+#middle .notification {
+    width: 450px;
 }

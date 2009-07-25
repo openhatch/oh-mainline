@@ -161,6 +161,9 @@ def get_personal_data(person):
         [ (key, ', '.join([k.text for k in data_dict['tags'][key]]))
           for key in data_dict['tags'] ])
 
+    # FIXME: Fix this please.
+    data_dict['no_info'] = True
+
     return data_dict
 
     # }}}
@@ -812,6 +815,7 @@ def display_person_edit_name(request, name_edit_mode):
     data = get_personal_data(
             request.user.get_profile())
     data['name_edit_mode'] = name_edit_mode
+    data['editable'] = True
     return render_to_response('profile/main.html', data)
 
 def display_person_edit_name_do(request):
@@ -828,3 +832,19 @@ def display_person_edit_name_do(request):
     user.save()
 
     return HttpResponseRedirect('/people/%s' % urllib.quote(user.username))
+
+def dismiss_notification_do(request):
+    # FIXME: Handle request.POST['format']
+    try:
+        notification__short_name = request.POST[
+                'notification__short_name']
+        notification = Notification.objects.get(
+                short_name=notification__short_name)
+    except Notification.DoesNotExist:
+        return HttpResponse("0")
+
+    person = request.user.get_profile()
+    person.has_dismissed_these_notifications.add(
+            notification)
+    person.save()
+    return HttpResponse("1")

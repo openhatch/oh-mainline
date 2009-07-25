@@ -37,7 +37,13 @@
             {% endfor %}
         </ul>
         {% else %}
+        {% if editable %}
+        <div id='add_contribs_notification' class='notification'>
+            If you've contributed to open source, click one of the buttons above to start your profile. If you're a new contributor, go forth and find a bug to  work on! (Coming soon: Mentoring for everybody weathered or new.)
+        </div>
+        {% else %}
         <div style='float: left; margin-top: 10px; width: 500px;'>No contributions listed yet.</div>
+        {% endif %}
         {% endif %}
     </div>
     <!-- }}} -->
@@ -46,11 +52,17 @@
 
 {% block right %}
 <div id='info' class='widget'>
-    <h3 style='float: left; width: 200px;'>Info</h3>
+
     {% if editable %}
-    <a class='edit'
-        href='/people/edit/info'>Edit</a>
+    <a class='edit' href='/people/edit/info'>Edit</a>
     {% endif %}
+
+    <h3 style='float: left; width: 100px;'>Info</h3>
+
+    {% if editable and not edit_mode and no_info %}
+    <div id='edit_your_info_notification' class='notification'>Edit your info!</div>
+    {% endif %}
+
     {% if info_edit_mode %}
     <!-- {{{ -->
     <form name='edit-tags'

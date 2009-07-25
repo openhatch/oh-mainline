@@ -61,7 +61,7 @@ class TwillTests(django.test.TestCase):
     def tearDown(self):
         twill_teardown()
 
-    def login(self):
+    def login_with_twill(self):
         # Visit login page
         login_url = 'http://openhatch.org/people/login'
         tc.go(make_twill_url(login_url))
@@ -72,6 +72,15 @@ class TwillTests(django.test.TestCase):
         tc.fv('login', 'login_username', username)
         tc.fv('login', 'login_password', password)
         tc.submit()
+
+    def login_with_client(self):
+        client = Client()
+        username='paulproteus'
+        password="paulproteus's unbreakable password"
+        client.login(username=username,
+                     password=password)
+        return client
+
     # }}}
 
 class ProfileTests(TwillTests):
@@ -129,7 +138,7 @@ class ProfileTests(TwillTests):
     def test_change_my_name(self):
         """Test that user can change his/her first and last name, and that it appears in the logged-in user's profile page."""
         # {{{
-        self.login()
+        self.login_with_twill()
 
         # Assert we're on profile page.
         tc.url('/people/paulproteus')
@@ -242,7 +251,7 @@ class ProjectExpTests(TwillTests):
     def projectexp_add(self, project__name, project_exp__description, project_exp__url):
         """Paulproteus can login and add a projectexp to bumble."""
         # {{{
-        self.login()
+        self.login_with_twill()
 
         tc.follow('Add +')
 
@@ -259,7 +268,7 @@ class ProjectExpTests(TwillTests):
     def test_projectexp_add(self):
         """Paulproteus can login and add two projectexps."""
         # {{{
-        self.login()
+        self.login_with_twill()
         self.projectexp_add('asdf', 'qwer', 'jkl')
         self.projectexp_add('asdf', 'QWER!', 'JKL!')
         # }}}
@@ -320,7 +329,7 @@ class ProjectExpTests(TwillTests):
         '''Notorious user of OpenHatch, paulproteus, can log in and remove the word 'ccHost' from his profile by clicking the appropriate delete button.'''
         # {{{
 
-        self.login()
+        self.login_with_twill()
 
         # Load up the ProjectExp edit page.
         project_name = 'ccHost'
@@ -420,13 +429,13 @@ class ProjectExpTests(TwillTests):
 
     def test_tag_edit_once(self):
         # {{{
-        self.login()
+        self.login_with_twill()
         self.update_tags(self.tags)
         # }}}
 
     def test_tag_edit_twice(self):
         # {{{
-        self.login()
+        self.login_with_twill()
         self.update_tags(self.tags)
         self.update_tags(self.tags_2)
         # }}}
@@ -611,10 +620,10 @@ class UserListTests(TwillTests):
         url = 'http://openhatch.org/people/'
         url = make_twill_url(url)
         tc.go(url)
-        tc.find(r'Asheesh Laroia \(paulproteus\)')
+        tc.find(r'paulproteus')
         tc.find(r'Barry Spinoza \(barry\)')
 
-        tc.follow('Asheesh Laroia')
+        tc.follow('paulproteus')
         tc.url('people/paulproteus') 
         tc.find('paulproteus')
 
@@ -724,7 +733,7 @@ class ImportContributionsTests(TwillTests):
 
     def test_show_suggested_data_sources(self):
         # {{{
-        self.login()
+        self.login_with_twill()
 
         tc.go(make_twill_url(self.form_url))
 
