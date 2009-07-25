@@ -7,7 +7,6 @@ from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerEr
 from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404
 from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag, Link_Project_Tag, Link_SF_Proj_Dude_FM, Link_Person_Tag, DataImportAttempt
 from mysite.search.models import Project
-import profile.controllers
 import StringIO
 import datetime
 import urllib
@@ -50,9 +49,6 @@ def projectexp_add_do(request):
             dictionary = {'notification': notification}
             return HttpResponse(simplejson.dumps([dictionary]))
 
-    data = profile_data_from_username(username)
-    data['notification'] = notification
-
     url_that_displays_project_exp = '/people/%s/projects/%s' % (
             urllib.quote(username), urllib.quote(project_name))
     return HttpResponseRedirect(url_that_displays_project_exp)
@@ -94,8 +90,7 @@ def profile_data_from_username(username):
             'exp_taglist_pairs': exp_taglist_pairs } 
     # }}}
 
-def data_for_person_display_without_ohloh(person):
-    "This replaces profile_data_from_username"
+def get_personal_data(person):
     # {{{
     project_exps = ProjectExp.objects.filter(person=person)
     projects = [project_exp.project for project_exp in project_exps]
@@ -170,21 +165,18 @@ def data_for_person_display_without_ohloh(person):
 
     # }}}
 
+@login_required
 def display_person_edit_web(request, info_edit_mode=False, title=''):
     # {{{
 
     person = request.user.get_profile()
 
-    data = data_for_person_display_without_ohloh(person)
+    data = get_personal_data(person)
 
     # FIXME: Django builds this in.
     data['the_user'] = request.user
+    data['editable'] = True
     data['info_edit_mode'] = info_edit_mode
-
-    if title:
-        data['title'] = title
-    else:
-        data['title'] = 'openhatch / %s / edit' % request.user.username
 
     return render_to_response('profile/main.html', data)
     # }}}
@@ -194,7 +186,7 @@ def display_person_web(request, user_to_display__username=None):
     user = User.objects.get(username=user_to_display__username)
     person = user.get_profile()
 
-    data = data_for_person_display_without_ohloh(person)
+    data = get_personal_data(person)
 
     data['the_user'] = request.user
     data['title'] = 'openhatch / %s' % user.username
@@ -210,28 +202,23 @@ def projectexp_display(request, user_to_display__username, project__name):
     user = get_object_or_404(User, username=user_to_display__username)
     person = get_object_or_404(Person, user=user)
     project = get_object_or_404(Project, name=project__name)
-    data = data_for_person_display_without_ohloh(person)
+    data = get_personal_data(person)
     data['project'] = project
     data['exp_list'] = get_list_or_404(ProjectExp,
             person=person, project=project)
     data['title'] = "%s's contributions to %s" % (
             user.username, project.name)
     data['the_user'] = request.user
-    data['projectexp_editable'] = user = request.user
+    data['projectexp_editable'] = (user == request.user)
     return render_to_response('profile/projectexp.html', data)
     # }}}
 
+@login_required
 def projectexp_edit(request, project__name):
     # {{{
-    try:
-        person = request.user.get_profile()
-    except AttributeError:
-        return render_to_response('search/index.html', {
-            'notification': "You've gotta be logged in to do that!"
-            })
-
+    person = request.user.get_profile()
     project = get_object_or_404(Project, name=project__name)
-    data = data_for_person_display_without_ohloh(person)
+    data = get_personal_data(person)
     data['exp_list'] = get_list_or_404(ProjectExp,
             person=person, project=project)
     data['form'] = forms.ProjectExpForm()
@@ -249,7 +236,7 @@ def projectexp_add_form(request):
         return render_to_response('search/index.html', {
             'notification': "You've gotta be logged in to do that! (Coming soon: a slightly easier way to get back to where you were.)"
             })
-    data = data_for_person_display_without_ohloh(person)
+    data = get_personal_data(person)
     data['the_user'] = request.user
     data['title'] = "Log a contribution in your portfolio | OpenHatch"
     return render_to_response('profile/projectexp_add.html', data)
@@ -593,7 +580,7 @@ def display_list_of_people(request):
     # {{{
     return render_to_response('profile/search_people.html', {
         'title': 'List of people : OpenHatch',
-        'people': profile.controllers.queryset_of_people()
+        'people': Person.objects.all().order_by('user__username')
         })
     # }}}
 
@@ -779,7 +766,7 @@ def importer(request):
     """Get the DIAs for the logged-in user's profile. Pass them to the template."""
     # {{{
 
-    data = data_for_person_display_without_ohloh(request.user.get_profile())
+    data = get_personal_data(request.user.get_profile())
     data.update({
         'title': 'Find your contributions around the web! - OpenHatch',
         'the_user': request.user,
@@ -815,16 +802,16 @@ def user_selected_these_dia_checkboxes(request):
     # }}}
 
 @login_required
-def display_person_edit_name(request, name_edit_mode, title):
+def display_person_edit_name(request, name_edit_mode):
     '''Show a little edit form for first name and last name.
 
     Why separately handle first and last names? The Django user
     model already stores them separately.
     '''
     data = {}
-    data = data_for_person_display_without_ohloh(request.user.get_profile())
+    data = get_personal_data(
+            request.user.get_profile())
     data['name_edit_mode'] = name_edit_mode
-    data['title'] = title
     return render_to_response('profile/main.html', data)
 
 def display_person_edit_name_do(request):

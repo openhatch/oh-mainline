@@ -6,7 +6,6 @@
 from search.models import Project
 from profile.models import Person, ProjectExp, Tag, TagType, Link_Person_Tag, Link_ProjectExp_Tag, DataImportAttempt
 import profile.views
-import profile.controllers
 import settings
 from customs import ohloh 
 
@@ -149,7 +148,8 @@ class ProfileTests(TwillTests):
         tc.url('/people/paulproteus')
 
         # Has name been entered correctly? Hope so!
-        tc.find('Newfirst Newlast')
+        tc.find('Newfirst')
+        tc.find('Newlast')
         # }}}
 
     # }}}
@@ -320,20 +320,11 @@ class ProjectExpTests(TwillTests):
         '''Notorious user of OpenHatch, paulproteus, can log in and remove the word 'ccHost' from his profile by clicking the appropriate delete button.'''
         # {{{
 
-        # Visit login page
-        login_url = 'http://openhatch.org/people/login'
-        tc.go(make_twill_url(login_url))
-
-        # Log in
-        username = "paulproteus"
-        password = "paulproteus's unbreakable password"
-        tc.fv('login', 'login_username', username)
-        tc.fv('login', 'login_password', password)
-        tc.submit()
+        self.login()
 
         # Load up the ProjectExp edit page.
         project_name = 'ccHost'
-        exp_url = 'http://openhatch.org/people/projects/edit/%s' % (
+        exp_url = 'http://openhatch.org/people/paulproteus/projects/%s' % (
                 urllib.quote(project_name))
         tc.go(make_twill_url(exp_url))
 
@@ -615,13 +606,6 @@ class UserListTests(TwillTests):
     # {{{
     fixtures = [ 'user-paulproteus', 'person-paulproteus',
             'user-barry', 'person-barry']
-
-    def test_display_list_of_users(self):
-        people = [(p.user.username, p.user.first_name, p.user.last_name)
-                for p in profile.controllers.queryset_of_people()]
-        self.assertEqual(people, [
-            ('paulproteus', 'Asheesh', 'Laroia'),
-            ('barry', 'Barry', 'Spinoza')])
 
     def test_display_list_of_users_web(self):
         url = 'http://openhatch.org/people/'

@@ -1,70 +1,77 @@
-{% include 'profile/header.global.html' %}
-{% include 'profile/header.html' %}
-{% include 'profile/personal.html' %}
+{% extends 'profile/base_profile.html' %}
 
+{% block middle %}
 <!-- begin profile/projectexp.html -->
 <div id='right'>
     <div class='single-project column project-display project-viewer'>
-        <a href='/people/{{ person.user.username }}'>All projects</a>
+        <a style='float: right;' href='/people/{{ person.user.username }}'>&laquo; Back to portfolio</a>
+        <h3>{{ person.user.username }}'s contributions to {{ project.name }}</h3>
         <div id='role-details' class='section'>
             {% if not edit_mode %}
             {% for exp in exp_list %}
-            <div class='section'>
-                <div class='section-heading'>
-                    <h4>Role</h4>
+            <div class='contribution'>
+                <div class='section'>
+                    <div class='section-heading'>
+                        <h4>Role</h4>
+                    </div>
+                    <div class='section-content' id='role'>
+                        {% if editable %}
+                        <a style='float: right; margin-left: 10px;'
+                            href='/people/projects/edit/{{ exp.project.name }}'>Edit</a>
+                        {% endif %}
+                        <h5>Contributor,
+                            {{ exp.project.name }}
+                        </h5>
+                        <p id='role-description'>
+                        {{ exp.description }}
+                        </p>
+                    </div>
                 </div>
-                <div class='section-content' id='role'>
-                    {% if editable %}
-                    <a style='float: right; margin-left: 10px;'
-                        href='/people/projects/edit/{{ exp.project.name }}'>Edit</a>
-                    {% endif %}
-                    <h5>Contributor,
-                        {{ exp.project.name }}
-                    </h5>
-                    <p id='role-description'>
-                    {{ exp.description }}
-                    </p>
+                {% if exp.url %}
+                <div class='section'>
+                    <div class='section-heading'>
+                        <h4>Link</h4>
+                    </div>
+                    <div class='section-content'>
+                        <a href='{{ exp.url }}'>{{ exp.url }}</a>
+                    </div>
                 </div>
+                {% endif %}
+                {% if exp.man_months or exp.primary_language %}
+                <div class='section'>
+                    <div class='section-heading'>
+                        <h4>Specifics</h4>
+                    </div>
+                    <div class='section-content'>
+                        {% if exp.man_months and exp.primary_language %}
+                        Coded for about
+                        {{ exp.man_months }} month(s)
+                        in {{ exp.primary_language }}.
+                        {% else %}
+                        {% if exp.man_months %}
+                        Coded for about 
+                        {{ exp.man_months }} month(s)
+                        {% endif %}
+                        {% if exp.primary_language %}
+                        Coded mostly in {{ exp.primary_language }}.
+                        {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+                {% if projectexp_editable %}
+                <form name='delete-projectexp-{{ exp.id }}'
+                    method='POST' action='/people/delete-experience/do'>
+                    <input type='hidden' name='id' value='{{ exp.id }}'/>
+                    <input type='submit' value='Delete'/>
+                </form>
+                {% endif %}
             </div>
-            {% if exp.url %}
-            <div class='section'>
-                <div class='section-heading'>
-                    <h4>Link</h4>
-                </div>
-                <div class='section-content'>
-                    <a href='{{ exp.url }}'>{{ exp.url }}</a>
-                </div>
-            </div>
-            {% endif %}
-            {% if exp.man_months or exp.primary_language %}
-            <div class='section'>
-                <div class='section-heading'>
-                    <h4>Specifics</h4>
-                </div>
-                <div class='section-content'>
-                    {% if exp.man_months and exp.primary_language %}
-                    Coded for about
-                    {{ exp.man_months }} month(s)
-                    in {{ exp.primary_language }}.
-                    {% else %}
-                    {% if exp.man_months %}
-                    Coded for about 
-                    {{ exp.man_months }} month(s)
-                    {% endif %}
-                    {% if exp.primary_language %}
-                    Coded mostly in {{ exp.primary_language }}.
-                    {% endif %}
-                    {% endif %}
-                </div>
-            </div>
-            {% endif %}
             {% endfor %}
 
-            {% if 1 %}
-            <div class='section about-this-project'>
+            <div class='section about-this-project coming-soon'>
                 <div class='section-heading'>
                     <h4>About this project</h4>
-                    <small>This is sample text &rarr;</small>
                 </div>
                 <div class='section-content' id='role'>
                     <div id='project-description'>
@@ -72,7 +79,7 @@
                         {% if project.description %}
                         {{ project.description }}
                         {% else %}
-                        <strong>Songbird</strong> is an open-source 
+                        <strong>Lorem ipsum</strong> is an open-source 
                         customizable music player that's under active 
                         development. We're working on creating a
                         non-proprietary, cross platform, extensible tool 
@@ -91,7 +98,6 @@
                     </div>
                 </div>
             </div>
-            {% endif %}
             <div class='section other-contributors'>
                 <div class='section-heading'>
                     <h4>Other contributors</h4>
@@ -128,7 +134,4 @@
         </div>
     </div>
 </div> <!-- /#right -->
-<!-- end profile/projectexp.html -->
-
-{% include 'profile/footer.html %}
-{% include 'profile/footer.global.html' %}
+{% endblock middle %}

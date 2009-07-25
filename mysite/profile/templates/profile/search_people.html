@@ -1,14 +1,19 @@
 {% include 'profile/header.global.html' %}
 
-<h2>List of registered users</h2>
+<div id='big-people-list'>
+<h3>List of registered users</h3>
 <ul>
     {% for person in people %}
     <li>
     <a href='/people/{{person.user.username}}'>
+        {% if person.user.first_name or person.user.last_name %}
         {{ person.user.first_name }} {{ person.user.last_name }} ({{ person.user.username }})
+        {% else %}
+        {{ person.user.username }}
+        {% endif %}
     </a>
     </li>
     {% endfor %}
 </ul>
-
+</div>
 {% include 'profile/footer.html' %}

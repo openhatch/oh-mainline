@@ -2,14 +2,6 @@
 
 {% block right %}
 <div class='edit single-project column project-display'>
-    <!-- {{{ -->
-    <h2>
-        <a href='/people/{{ the_user.username }}/'>
-            My <abbr title='Free and open source software!' 
-                class='foss'>foss</abbr>
-            portfolio
-        </a>
-    </h2>
     <h3>Log a contribution</h3>
     <form name='projectexp_add' method='POST'
         action='/do/projectexp_add'>
@@ -82,11 +74,12 @@
             </div>
             <div class='section-content'>
                 <input type='submit' value='Save' />
+                <a style='padding: 6px; margin-right: 10px; float: right;' href='/people/{{ the_user.username }}/'>
+                    &laquo; Back to portfolio
+                </a>
             </div>
         </div>
     </form>
-</div>
-<!-- }}} -->
 </div>
 {% endblock right %}
 

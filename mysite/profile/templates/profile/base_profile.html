@@ -27,10 +27,16 @@
             {% if person.user.first_name or person.user.last_name %}
             <a href='/people/{{ person.user.username }}'>
                 <div class='name'>
-                    {{ person.user.first_name }} {{ person.user.last_name }}
+                    {{ person.user.first_name }}
+                    {{ person.user.last_name }}
                 </div>
             </a>
-            <small class='usernames'><span class='aka'>a.k.a.</span> {{ person.user.username }}</small>
+            <small class='usernames'>
+                <span class='aka'>
+                    a.k.a.
+                </span>
+                {{ person.user.username }}
+            </small>
             {% else %}
             <a href='/people/{{ person.user.username }}'>
                 <div class='name'>
@@ -40,9 +46,15 @@
             {% endif %}
         </h1>
         <div>
-           <a class='edit{% if not person.user.first_name and not person.user.last_name %} loud {% endif %}'
-              href='/edit/name'>
-              Edit name</a></div>
+            {% comment %}
+            <div class='invitation'>Tell us your name</div>
+            {% endcomment %}
+            {% if editable %}
+            <a class='edit'
+                href='/edit/name'>
+                Edit name</a>
+            {% endif %}
+        </div>
     {% endif %}
     </div>
 

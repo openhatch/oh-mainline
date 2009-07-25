@@ -232,8 +232,9 @@ class Ohloh(object):
                 this = dict(
                     project=project_data['name'],
                     project_homepage_url=project_data.get('homepage_url', None),
-                    primary_language=c_f['primary_language_nice_name'],
-                    man_months=int(c_f['man_months']))
+                    primary_language=c_f.get(
+                        'primary_language_nice_name',''),
+                    man_months=int(c_f.get('man_months',0)))
                 ret.append(this)
         return ret
 

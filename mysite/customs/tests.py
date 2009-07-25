@@ -5,7 +5,6 @@
 from search.models import Project
 from profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag
 import profile.views
-import profile.controllers
 
 import os
 import re

@@ -77,8 +77,8 @@ urlpatterns = patterns('',
         (r'^people/xp_slurp_do$',
             'mysite.profile.views.exp_scraper_scrape_web'),
 
-        # Get a list of suggestions for the search input, formatted the way that
-        # the jQuery autocomplete plugin wants it.
+        # Get a list of suggestions for the search input,
+        # formatted the way that the jQuery autocomplete plugin wants it.
         (r'^search/get_suggestions$', 'mysite.search.views.request_jquery_autocompletion_suggestions'),
 
         (r'^people/test_commit_importer$',
@@ -107,12 +107,16 @@ urlpatterns = patterns('',
         (r'^people/edit[/?]$',
                 'mysite.profile.views.display_person_edit_web'),
 
-        (r'^people/edit/info$', 'mysite.profile.views.display_person_edit_web',
-                { 'info_edit_mode': True, 'title': 'Edit your info | OpenHatch'}),
-        (r'^edit/name$', 'mysite.profile.views.display_person_edit_name',
-                { 'name_edit_mode': True, 'title': 'Tell us your name | OpenHatch'}),
+        (r'^people/edit/info$',
+                'mysite.profile.views.display_person_edit_web',
+                { 'info_edit_mode': True }),
 
-        (r'^edit/name/do$', 'mysite.profile.views.display_person_edit_name_do'),
+        (r'^edit/name$',
+                'mysite.profile.views.display_person_edit_name',
+                { 'name_edit_mode': True }),
+
+        (r'^edit/name/do$',
+                'mysite.profile.views.display_person_edit_name_do'),
 
         (r'^people/portfolio/import/prepare_data_import_attempts_do$',
                 'mysite.profile.views.prepare_data_import_attempts_do'),

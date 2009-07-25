@@ -752,3 +752,24 @@ abbr.foss {
     border: 0;
     font-variant: small-caps;
 }
+.project-display.single-project .contribution {
+    border-bottom: 3px double #ddd;
+    float: left;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+}
+#big-people-list {
+    float: left;
+    border: 10px solid #fff;
+    width: 980px;
+    padding: 10px;
+    background: url('/static/images/motif.png');
+}
+#big-people-list h3 {
+    width: 980px;
+}
+#big-people-list li {
+    padding-top: 10px;
+    margin-left: 15px;
+    list-style: square;
+}

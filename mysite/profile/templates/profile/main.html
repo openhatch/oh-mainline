@@ -1,7 +1,7 @@
 {% extends 'profile/base_profile.html' %}
 
 {% block title %}
-{{person.user.username}}'s profile : openhatch
+{{person.user.username}}'s profile | OpenHatch
 {% endblock title %}
 
 {% block middle %}
@@ -46,7 +46,11 @@
 
 {% block right %}
 <div id='info' class='widget'>
-    <h3>Info</h3>
+    <h3 style='float: left; width: 200px;'>Info</h3>
+    {% if editable %}
+    <a class='edit'
+        href='/people/edit/info'>Edit</a>
+    {% endif %}
     {% if info_edit_mode %}
     <!-- {{{ -->
     <form name='edit-tags'
@@ -68,10 +72,6 @@
     </form>
     <!-- }}} -->
     {% else %}
-    {% if editable %}
-    <a class='edit'
-        href='/people/edit/info'>Edit</a>
-    {% endif %}
     <!-- {{{ -->
     {% if tags_flat.understands %}
     <div class='tags' id='tags-understands'>
