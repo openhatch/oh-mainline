@@ -489,21 +489,19 @@ class CeleryTests(TwillTests):
         """1. Go to the page that has paulproteus' data.  2. Verify that the page doesn't yet know about ccHost. 3. Run the celery task ourselves, but instead of going to Ohloh, we hand-prepare data for it."""
         # {{{
         # do this work for user = paulproteus
-        username='paulproteus'
+        username = 'paulproteus'
+        person = Person.objects.get(user__username=username)
 
         # Store a note in the DB we're about to do a background task
         dia = DataImportAttempt(query=username, source='rs',
-                                person=Person.objects.get(
-                user__username=username))
+                                person=person)
+        dia.person_wants_data = True
         dia.save()
         
 
         url = '/people/gimme_json_that_says_that_commit_importer_is_done'
         
-        client = Client()
-        password="paulproteus's unbreakable password"
-        client.login(username=username,
-                     password=password)
+        client = self.login_with_client()
 
         # Ask if background job has been completed.
         # We haven't even created the background job, so it should
@@ -539,7 +537,8 @@ class CeleryTests(TwillTests):
 
         # Ask if involvement fact has been loaded. (Hoping for yes.)
         self.assert_(list(ProjectExp.objects.filter(
-            project__name=project_name)))
+            project__name=project_name, person=person)))
+
         # }}}
 
     # FIXME: One day, test that after self.test_slow_loading_via_emulated_bgtask
@@ -851,7 +850,7 @@ class ImportContributionsTests(TwillTests):
         self.assertFalse(ohloh_account_dia.person_wants_data)
         self.assertFalse(launchpad_account_dia.person_wants_data)
 
-        a_project, _ = Project.objects.get_or_create(name='a project name')
+	a_project, _ = Project.objects.get_or_create(name='ccHost')
         an_exp = ProjectExp(project=a_project, description='the description')
         an_exp.data_import_attempt = ohloh_repo_search_dia
         an_exp.save()

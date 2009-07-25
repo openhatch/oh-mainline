@@ -69,7 +69,7 @@ class DataImportAttempt(models.Model):
         FetchPersonDataFromOhloh.delay(self.id)
 
     def __unicode__(self):
-        return "Attempt to import data, source = %s, person = <%s>, query = %s" % (self.source, self.person, self.query)
+        return "Attempt to import data, source = %s, person = <%s>, query = %s" % (self.get_source_display(), self.person, self.query)
 
     # }}}
 

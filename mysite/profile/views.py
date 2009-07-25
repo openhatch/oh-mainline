@@ -511,6 +511,7 @@ def ohloh_contributor_facts_to_project_exps(dia_id,
             exp = exp.from_ohloh_contrib_info(ohloh_contrib_info)
             exp.last_polled = datetime.datetime.now()
             exp.last_touched = datetime.datetime.now()
+            exp.data_import_attempt = dia
             exp.save()
     person.last_polled = datetime.datetime.now()
     dia.completed = True
