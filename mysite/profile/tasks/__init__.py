@@ -1,5 +1,6 @@
 import datetime
 from customs import ohloh
+import urllib2
 import customs.lp_grabber 
 from profile.views import ohloh_contributor_facts_to_project_exps, create_project_exps_from_launchpad_contributor_facts
 from profile.models import Person, DataImportAttempt
@@ -49,11 +50,21 @@ class FetchPersonDataFromOhloh(Task):
             source2result_handler[dia.source](dia.id, results)
             logger.info("Results: %s" % results)
 
-        except:
+        except Exception, e:
             dia.completed = True
             dia.failed = True
             dia.save()
-            raise
+            if isinstance(e, urllib2.HTTPError):
+                if hasattr(e, 'getcode'):
+                    code = str(e.getcode())
+                else:
+                    code = 'UNKNOWN'
+                if hasattr(e, 'geturl'):
+                    url = str(e.geturl())
+                else:
+                    url = 'UNKNOWN'
+                logger.error('Dying: ' + code + ' getting ' + url)
+            raise ValueError, {'code': code, 'url': url}
 
 try:
     celery.registry.tasks.register(FetchPersonDataFromOhloh)
