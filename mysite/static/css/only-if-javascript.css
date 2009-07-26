@@ -1,0 +1,10 @@
+.invisible_if_js {
+    display: none;
+}
+.tab-links a.my-tab-is-hidden {
+    background-color: #eee;
+    color: #222;
+}
+.visible_iff_js {
+    display: inline ! important; /* Overrides declaration in homepage.css */
+}

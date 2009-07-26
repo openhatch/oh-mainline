@@ -579,6 +579,9 @@ def login(request):
         notification_id = "oops"
         notification = "Couldn't find that pair of username and password. "
         notification += "Did you type your password correctly?"
+    if request.GET.get('next', None) is not None:
+        notification_id = "next"
+        notification = "You've got to be logged in to do that!"
     return render_to_response('profile/login.html', {
         'notification_id': notification_id,
         'notification': notification,

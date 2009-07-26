@@ -43,19 +43,15 @@
     width: 220px;
 }
 #main {
-    width: 580px;
+    width: 630px;
     float: left;
 }
 #main .box {
     width: 580px;
     float: left;
 }
-#projects table {
-    padding: 0;
-    border-spacing: 0;
-}
-#projects td {
-    padding: 0 5px 3px 0;
+#suggested-searches ul {
+    margin-left: 15px;
 }
 #add-another-bug-tracker {
 }
@@ -324,26 +320,18 @@ p {
 }
 #opps form label {
     float: left;
-    background-color: #99CCFF;
     font-size: 19px;
     font-family: Arial;
-    color: black;
     padding: 14px 14px 0 0;
 }
 #opps form input[type='text'] {
     font-size: 19px;
-    padding: 3px;
-    padding-top: 4px;
+    padding: 10px;
     color: #222;
 }
 #opps form input[type='submit'] {
-    background-color: #99CCFF;
-    border: 0;
-    color: #fff;
     font-size: 19px;
-    font-family: arial;
-    padding: 6px;
-    padding-bottom: 5px;
+    padding: 8px;
     color: #222;
 }
 .good-for-beginners {

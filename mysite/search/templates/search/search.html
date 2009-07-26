@@ -13,7 +13,7 @@ Search bugs | OpenHatch
             <h3><label for='language'>Find some bugs!</label></h3>
             <input type='text' name='language' id='language'
             value='{{ language }}' />
-            <input type='submit' id='button' value='GO' />
+            <input type='submit' id='button' value='Go' />
             {% comment %} }}} {% endcomment %}
         </form>
 
@@ -126,8 +126,8 @@ Search bugs | OpenHatch
 {% endblock main %}
 
 {% block sidebar %}
-<div id='projects' class='box' style='margin-top: 40px;'>
-    <h2 style='margin-bottom: 10px;'>Suggested searches:</h2>
+<div id='suggested-searches' class='box module'>
+    <h3 style='margin-bottom: 10px;'>Suggested searches:</h3>
     <ul>
         <li><a href='/search/?language=exaile'>user_interface_design</a></li>
         <li><a href='/search/?language=ruby_on_rails'>ruby_on_rails</a></li>

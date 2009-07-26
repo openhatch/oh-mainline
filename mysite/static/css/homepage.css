@@ -1,30 +1,7 @@
-body {
-    font: 8pt Verdana, Bitstream Vera Sans, Arial, sans-serif;
-    background: url('/static/images/motif-blue.png');
-    margin: 0;
-}
-
-a {
-    color: #66AA33;
-    text-decoration: none;
-}
-a:hover {
-    color: #338800;
-    text-decoration: underline;
-}
-
 a img {
     border-style: none;
 }
 
-#wrapper-outer {
-    margin: 0 auto;
-    width: 920px;
-}
-#wrapper-inner {
-    float: left;
-    margin-top: 30px;
-}
 
 h1 {
     font-size: 24px; 
@@ -34,10 +11,12 @@ h1 {
 
 h1 a {
     color: #2288BB;
+    text-decoration: none;
 }
 
 h1 a:hover {
     color: #223366;
+    text-decoration: none;
 }
 
 h1, h2, h3, h4, h5 {
@@ -49,6 +28,13 @@ h3 {
     font-size: 20px;
     text-align: center;
     margin: 10px 0;
+}
+
+#entry-points h3 {
+    text-align: left;
+    float: left;
+    width: 300px;
+    margin: 0;
 }
 
 h2 {
@@ -71,124 +57,45 @@ small {
      float: right;
 }
 
+#content {
+    margin-top: 50px;
+}
+
 #banner {
-    width: 420px;
+    width: 350px;
     float: left;
-    margin-top: -25px;
+    margin-right: 50px;
+}
+#explanation {
+    font-size: 9pt;
 }
 #banner img {
     border: 0;
     width: 350px;
-    margin: 0 auto;
-}
-
-#explanation {
-    background: white;
-    padding: 5px 10px 20px 10px;
 }
 
 #explanation p {
-    text-align: left;
-    font-size: 12pt;
     margin-bottom: 15px;
 }
 
 .explanation-heading {
 }
 
-#rightcolumn {
-    margin: 10px 0 0 400px;
-    padding: 10px 40px 0 40px;
-    background-color: white;
-}
-
-#find {
-    font-size: 26px;
-    margin: 10px 0 25px 0;
-}
-
-#stuff-to-do {
-    margin-top: 10px;
-}
-
-#stuff-to-do li {
-    list-style-type: none;
-    margin-bottom: 10px;
-    float: left;
-    padding: 0;
-}
-
-#options span {
-    font-weight: normal;
-    float: right;
-    padding: 5px 6px 3px 6px;
-    margin-bottom: -3px;
-    -moz-border-radius-topleft: 4px;
-    -moz-border-radius-topright: 4px;
-    z-index: 2;
-    }
-    
-#options span a {
-    color: black;
-    font-size: 20px;
-}
-
-#options span a:hover {
-    color: black;
-}
-
-#create-a-profile span {
-    float: left;
-    background: #CCDDFF;
-}
-
-#create-a-profile span a {
-}
-    
-#logon span {
-    background: #DDFFAA;
-}
-
-#logon span a {
-}
-
 ul {
     margin: 0;
     padding: 0 0 0 10px;
 }
-li {
-    list-style: square;
-    font-size: 16px;
-}
-
-li a {
-    padding: 0 0 10px 0;
-    margin-bottom: 30px;
-    font-size: 24px;
-    }
 
 /*form style stuff*/
 
 form {
-    padding: 20px 10px;
     margin: 0 0 10px 0;
     float: left;
     width: 500px;
-    -moz-border-radius-bottomleft: 4px;
-    -moz-border-radius-bottomright: 4px;
-    z-index: 1;
-}
-
-#form-a {
-    background: #CCDDFF;
-}
-
-#form-b {
-    background: #DDFFAA;
 }
 .form-row {
     float: left;
-    width: 500px;
+    width: 422px;
 }
 
 form small {
@@ -198,17 +105,18 @@ form small {
 
 label {
     float: left;
-    width: 140px;
-    font-size: 18px;
-    padding: 3px 5px 0 10px;
-    margin: 0 2px 0 5px;
+    width: 150px;
+    padding: 10px;
+    padding-left: 0;
+    margin-right: 10px;
+    font-size: 12pt;
 }
-                                input[type='text'], input[type='password'] {
-                                    padding: 10px 0 10px 5px;
-                                    margin: 8px 0;
-                                    float: right;
-                                    width: 320px;
-                                }
+input[type='text'], input[type='password'] {
+    padding: 10px;
+    margin-bottom: 4px;
+    float: left;
+    width: 225px;
+}
 input[type='submit'] {
     padding: 7px;
     position: relative;
@@ -216,10 +124,41 @@ input[type='submit'] {
     font-size: 12pt;
     background-color: #eee;
     border-top: 1px solid #ddd;
-    border-right: 2px solid #CCC;
-    border-bottom: 2px solid #CCC;
+    border-right: 2px solid #ccc;
+    border-bottom: 2px solid #ccc;
     border-left: 1px solid #ddd;
     float: right;
-                                }
-
+}
+#entry-points {
+    float: left;
+    margin-top: 100px;
+}
+#entry-points #no-authorization-necessary li {
+    list-style: square;
+    font-size: 10pt;
+}
+#entry-points #account-related {
+    margin-top: 40px;
+    float: left;
+}
+#entry-points #account-related li {
+    float: left;
+    margin-right: 10px;
+    list-style: none;
+}
+.tab-links a {
+    float: left;
+    background-color: #fff;
+    margin-right: 10px;
+    padding: 10px 10px 5px 10px;
+    font-size: 10pt;
+    font-weight: bold;
+}
+#tabs {
+    float: left;
+    width: 430px;
+}
+.visible_iff_js {
+    display: none;
+}
 /* vim: set ai ts=4 sts=4 et sw=4: */

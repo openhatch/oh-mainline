@@ -1,148 +1,135 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
-    <head>{% comment %} {{{ {% endcomment %}
+{% extends 'profile/base.html' %}
 
-        {% comment %} prefatory remarks {{{ {% endcomment %}
-        <title>Welcome to OpenHatch</title>
-        <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
-        <meta http-equiv='Content-Language' content='en-us' />
-        <meta http-equiv='Content-Script-Type' content='text/javascript' />
-        <meta http-equiv='Content-Style-Type' content='text/css' />
-        <meta name='Description' content=''>
-        {% comment %} }}} {% endcomment %}
+{% block title %}
+Welcome to OpenHatch!
+{% endblock title %}
 
-        {% comment %} css {{{ {% endcomment %}
-        <style>/*<![CDATA[*/
-            @import url('/static/css/homepage.css') all;
-            @import url('/static/css/jquery.autocomplete.css') screen;
-            /*@import url('/static/css/gewgaws.css');*/
-            /*]]>*/</style>
+{% block nav %}
+{% endblock nav %}
 
-        <!--[if IE]><style>/*<![CDATA[*/@import url('../css/ie/all.css');/*]]>*/</style><![endif]-->
-        <!--[if lte IE 6]><style>/*<![CDATA[*/@import url('../css/ie/6-/all.css');/*]]>*/</style><![endif]-->
-        <!--[if gte IE 7]><style>/*<![CDATA[*/@import url('../css/ie/7+/all.css');/*]]>*/</style><![endif]-->
-        {% comment %} }}} {% endcomment %}
+{% block js_in_head %}
+<script src='/static/js/css_if_js.js'></script>
+{% endblock js_in_head %}
 
-        {% comment %} js {{{ {% endcomment %}
-        <script src='/static/js/jquery.js'></script>
-        <!-- by jove I love jQuery plugins ~ rkl -->
-        <script src='/static/js/jquery.query.js'></script>
-        <script src='/static/js/jquery.hotkey.js'></script>
-        {% comment %}
-        FIXME: If user has shortcuts off, don't load jquery.hotkey.js
-        {% endcomment %}
-        <script src='/static/js/jquery.scrollTo.js'></script>
-        <!-- FIXME: tabs doesn't f-ing work -->
-        <script src='/static/js/jquery.tabs.js'></script>
-    <!--<script src='/static/js/jquery.ajaxQueue.js'></script-->
-        <script src='/static/js/jquery.autocomplete.js'></script>
-        <script>
-            thisstart = {{ start }};
-            thisend = {{ end }};
-        </script>
-        <script src='/static/js/gewgaws.js'></script>
-        <script 
-        $(document).ready(function(){
-            $("#tabs").tabs();
-        });
-</script>
-        {% comment %} }}} {% comment %}
+{% block more_css %}
+@import url('/static/css/homepage.css') all;
+{% endblock more_css %}
 
-    </head>{% comment %} }}} {% endcomment %}
-    <body>
-        <div id='wrapper-outer'>
-            <div id='wrapper-inner'>
+{% block content %}
+<div id='banner'>
+    <img alt='OpenHatch' src='/static/images/the-logo.png' width='350' height='363' />
 
+    <div id='explanation'>
+        <h3>OpenHatch is an open source involvement engine.</h3>
+        <small><a href="#" id='learn-more-link'>Learn more +</a></small>
+        <div id='more-information' class='invisible_if_js'>
+            <p>OpenHatch makes it easy to:</p>
+            <ul>
+                <li>Find new ways that you can help with open source projects</li>
+                <li>Find mentors or mentees and learn new skills</li>
+                <li>Track and show off all your open source software experience in one place.</li>
+            </ul>
+            <p>By providing us with the usernames and email addresses you use in the open source software community,
+            we automatically compile your contributions to open source. We then use your past contributions to make
+            recommendations on how you could contribute further.</p>
+            <p>First, we collect open bugs from open source bug trackers across the web and highlight 
+            tasks that match your skill set. <!--If you indicate a skill you want to learn, we automatically link you
+            to potential mentors who have substantial experience in that area. (Vice-versa, if you know a lot
+            about a particular skill, we encourage and facilitate you in mentoring less-experienced members of the
+            site!)--></p>
+        </div>
+    </div>
+</div>
+
+<div id='entry-points'>
+    <div id='no-authorization-necessary'>
+        <ul>
+            <li>
+            <a href='/people'>Find other folks on OpenHatch</a>
+            </li>
+            <li>
+            <a href='/search'>Find the perfect opportunity to volunteer</a>
+            </li>
+        </ul>
+    </div>
+    <div id='account-related' class='tab-links'>
+        <ul>
+            <li><a href="/people/signup" class='visible_iff_js'
+                tab_selector="#create_profile">Sign up</a></li>
+            <li><a href="/people/login"
+                class='visible_iff_js my-tab-is-hidden'
+                tab_selector="#login">Log in</a></li>
+        </ul>
+        <div id='tabs' class='module'>
+            <h3 class='invisible_if_js'>Sign up</h3>
+            <div id='create_profile' class='tab'>
                 {% if notification %}
-                <div class='notification' style='background-color: #ffc; border: 1px solid #ff9; text-align: center; padding: 10px;'>
+                <div class='float: left; notification' style='background-color: #ffc; border: 1px solid #ff9; text-align: center; padding: 10px;'>
                     {{ notification }}
                 </div>
                 {% endif %}
                 {% if notification_id %}
                 <!-- notification_id: {{ notification_id }} -->
                 {% endif %}
-
-                <div id='banner'>
-                    <img alt='OpenHatch' src='/static/images/the-logo.png'/>
-                    
-                    <div id='explanation'>
-                    <h3>OpenHatch is an open source involvement engine.</h3>
-                    <small><a href="">+ More?</a></small>
-                    {% comment %}
-                    <p>OpenHatch makes it easy to:</p>
-                    <ul>
-                        <li>Find new ways that you can help with open source projects</li>
-                        <li>Find mentors or mentees and learn new skills</li>
-                        <br />and
-                        <li>Track and show off all your open source software experience in one place.</li>
-                    </ul>
-                    <p>By providing us with the usernames and email addresses you use in the open source software community, we automatically compile your contributions to open source. We then use your past contributions to make recommendations on how you could contribute further.</p>
-                    <p>First, we collect open bugs from open source project bugtrackers across the web and highlight those tasks that match your skill set. If you indicate a skill you want to learn, we automatically link you to potential mentors who have substantial experience in that area. (Vice-versa, if you know a lot about a particular skill, we encourage and facilitate you in mentoring less-experienced members of the site!) Finally, something something.</p>
-                    {% endcomment %}
-                    
-                     </div>
+                <form id='create_profile' name='create_profile'
+                    action='/people/new/do' method='POST'>
+                    <div class='form-row'>
+                        <label for='create_profile_username'>
+                            Username
+                        </label>
+                        <input type='text' 
+                        name='create_profile_username' 
+                        id='create_profile_username' />
+                    </div>
+                    <div class='form-row'>
+                        <label for='create_profile_password'>Choose your password
+                            <small style='display: block;'>Coming soon: OpenID!</small></label>
+                        <input type='password' 
+                        id='create_profile_password'
+                        name='create_profile_password' />
+                    </div>
+                    <div class='form-row'>
+                        <input type='submit' style='float: right;' 
+                        value='begin!' />
+                    </div>
+                </form>
+            </div>
+            <h3 class='invisible_if_js'>Log in</h3>
+            <div id='login' class='tab invisible_if_js'>
+                {% if notification %}
+                <div class='float: left; notification' style='background-color: #ffc; border: 1px solid #ff9; text-align: center; padding: 10px;'>
+                    {{ notification }}
                 </div>
+                {% endif %}
+                {% if notification_id %}
+                <!-- notification_id: {{ notification_id }} -->
+                {% endif %}
+                <form id='login' name='login' action='/people/login/do' method='POST'>
+                    <div class='form-row'>
+                        <label for='login_username'>username</label>
+                        <input type='text' id='login_username' name='login_username' />
+                    </div>
+                    <div class='form-row'>
+                        <label for='login_password'>password</label>
+                        <input type='password' id='login_password' name='login_password' />
+                    </div>
+                    <div class='form-row'>
+                        <input type='submit' value='log in!' style='' />
+                    </div>
+                </form>
+            </div> 
+        </div>
+    </div>
+</div>
+{% endblock content %}
 
-
-                <div id='rightcolumn'>
-                    <h1 id='find'>Find: <a href='/people'>people</a>, <a href='/search'>volunteer opportunities</a>.</h1>
-                    <ul id='stuff-to-do'>
-                        <li>
-                        <div id='options'>
-
-                            <div id='create-a-profile'><span><a href="#form-a">Create a profile:</a></span>
-                            </div>
-                            <div id='logon'><span><a href="#form-b">Already on OpenHatch? Log in!</a></span>
-                            </div>
-                        </div>
-                        <div>
-                        <form id='form-a' name='create_profile' action='/people/new/do' method='POST'>
-                            <div class='form-row'>
-                                <label for='create_profile_username'>
-                                    Username
-                                </label>
-                                <input type='text' 
-                                name='create_profile_username' 
-                                id='create_profile_username' />
-                            </div>
-                            <div class='form-row'>
-                                <label for='create_profile_password'>choose your password
-                                    <small>Coming soon: OpenID!</small></label>
-                                <input type='password' 
-                                id='create_profile_password'
-                                name='create_profile_password' />
-                            </div>
-                            <div class='form-row'>
-                                <input type='submit' style='float: right;' 
-                                value='begin!' />
-                            </div>
-                        </form>
-                        </div>
-                        {% comment %}
-                        <div>
-                        <form id='form-b' name='login' action='/people/login/do' method='POST'>
-                            margin-bottom: 10px;'>
-                            Already on OpenHatch? Log in!
-                        </span>
-                            <div class='form-row'>
-                                <label for='login_username'>username</label>
-                                <input type='text' id='login_username' name='login_username' />
-                            </div>
-                            <div class='form-row'>
-                                <label for='login_password'>password</label>
-                                <input type='password' id='login_password' name='login_password' />
-                            </div>
-                            <div class='form-row'>
-                                <input type='submit' value='log in!' style='' />
-                            </div>
-                        </form>
-                        </div>
-                        {% endcomment %}
-                        </li>
-                         {% comment %} <li><a href='/people/'>See who else is on OpenHatch</a></li> {% endcomment %}
-                    </ul>
-                </div>
-          </div>
-          
-     </div>
-</body>
+{% block js %}
+<script src='/static/js/homepage.js'></script>
+<script>
+    $('#learn-more-link').click(function () {
+        var $more_info = $('#more-information');
+        var hidden = $more_info.css('display') == 'none';
+        $more_info['fade' + (hidden ? 'In' : 'Out')]('slow');
+    });
+</script>
+{% endblock js %}

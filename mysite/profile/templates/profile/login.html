@@ -1,6 +1,14 @@
-{% include 'profile/header.global.html' %}
-<form id='login' name='login'
+{% extends 'profile/base.html' %}
+
+{% block more_css %}
+@import url('/static/css/login.css');
+{% endblock more_css %}
+
+{% block content %}
+<div id='login' class='module'>
+<form name='login'
     action='/people/login/do' method='POST'>
+    <h3>Please log in!</h3>
     <div class='form-row'>
         <label for='login_username'>Username</label>
         <input type='text' id='login_username' name='login_username' />
@@ -12,38 +20,6 @@
     <div class='form-row'>
         <input type='submit' value='go' style='' />
     </div>
-    <style type='text/css'>
-        form {
-        margin-bottom: 10px;
-        float: left;
-        width: 478px;
-        }
-        .form-row {
-        float: left;
-        width: 400px;
-        }
-        label {
-        float: left;
-        width: 130px;
-        padding: 12px;
-        margin-right: 10px;
-        font-size: 12pt;
-        }
-        input[type='text'], input[type='password'] {
-        padding: 10px;
-        border: 1px solid #eee;
-        float: left;
-        width: 214px;
-        }
-        input[type='submit'] {
-        padding: 7px;
-        position: relative;
-        top: 1px;
-        font-size: 12pt;
-        background-color: #eee;
-        border: 1px solid #dde;
-        float: right;
-        }
-    </style>
 </form>
-{% include 'profile/footer.html' %}
+</div>
+{% endblock content %}

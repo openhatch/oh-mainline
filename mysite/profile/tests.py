@@ -581,7 +581,7 @@ class UserListTests(TwillTests):
         url = 'http://openhatch.org/'
         url = make_twill_url(url)
         tc.go(url)
-        tc.follow('See who else is on OpenHatch')
+        tc.follow('Find other folks on OpenHatch')
     # }}}
 
 class AuthTests(TwillTests):
@@ -589,7 +589,8 @@ class AuthTests(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
     
     def test_login(self):
-        user = authenticate(username='paulproteus', password="paulproteus's unbreakable password")
+        user = authenticate(username='paulproteus',
+                password="paulproteus's unbreakable password")
         self.assert_(user and user.is_active)
 
     def test_login_web(self):

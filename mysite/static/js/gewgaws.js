@@ -11,14 +11,14 @@ function log(thing) {
 $.fn.toggleText = function(text1, text2) {
     newtext = (this.text() == text2) ? text1 : text2;
     return this.text(newtext);
-}
+};
 
 $.fn.toggleExpanded = function() {
     log(this, 'toggleExpanded');
     this.toggleClass('expanded');
     // this.scrollIntoView(); //disable for video demo. FIXME: restore
     return this;
-}
+};
 // Return the available content height space in browser window
 
 // FIXME: This doesn't handle a bottom scrollbar well.

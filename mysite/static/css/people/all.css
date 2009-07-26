@@ -119,25 +119,6 @@ ul#user-actions li {
 ul#user-actions a {
     font-size: 10pt;
 }
-#login {
-    float: right;
-    font-size: 1.4em;
-}
-
-#login .text {
-    font-family: Verdana, Arial, Helvetica, sans-serif;
-    font-size: .7em;
-    width: 100px;
-    margin-right: 6px;
-}
-
-#login .button {
-    font-family: Verdana, Arial, Helvetica, sans-serif;
-    font-size: .7em;
-    background-color: #333333;
-    color: #FFFFFF;
-    margin: -17px 6px 0 0;
-}
 
 #commit_username {
     color: #555;
