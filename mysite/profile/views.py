@@ -56,7 +56,6 @@ def projectexp_add_do(request):
 
 # }}}
 
-# Display profile {{{
 def profile_data_from_username(username):
     # {{{
     person = Person.objects.get(
@@ -230,6 +229,7 @@ def projectexp_edit(request, project__name):
     return render_to_response('profile/projectexp.html', data)
     # }}}
 
+@login_required
 def projectexp_add_form(request):
     # {{{
     try:
@@ -317,27 +317,6 @@ def import_debtags(cooked_string = None):
                 add_one_debtag_to_project(package, tag)
     # }}}
 
-def get_data_for_email(request):
-    # {{{
-    # FIXME: Hard-coded username
-    email = request.POST.get('email', '')
-    username=email
-    if email:
-        oh = ohloh.get_ohloh()
-        from_ohloh = oh.get_contribution_info_by_email(email)
-        for data in from_ohloh:
-            person, created = Person.objects.get_or_create(
-                    user__username=username)
-            # FIXME: Later we'll have to be
-            # able to merge user objects
-            pe = ProjectExp(person=person)
-            pe.from_ohloh_contrib_info(data)
-            pe.save()
-    request_GET = {'u': username}
-    query_str = "?" + urllib.urlencode(request_GET)
-    return HttpResponseRedirect('/people/%s' % query_str)
-    # }}}
-
 # }}}
 
 # Project experience tags {{{
@@ -355,18 +334,6 @@ def get_data_for_email(request):
 #def project_exp_tag__remove__web(request):
 
 # }}}
-
-def sf_projects_by_person_web(request):
-    # {{{
-    sf_username = request.GET.get('u', None)
-    if sf_username is None:
-        return HttpResponseServerError()
-
-    projects = Link_SF_Proj_Dude_FM.objects.filter(
-            person__username=sf_username).all()
-    project_names = [p.project.unixname for p in projects]
-    return HttpResponse('\n'.join(project_names))
-    # }}}
 
 def _project_hash(project_name):
     # {{{
@@ -411,7 +378,8 @@ def project_icon_url(project_name, actually_fetch = True):
     # FIXME: One day, add cache expiry.
     # }}}
 
-def edit_person_tags(request):
+@login_required
+def edit_person_info(request):
     # {{{
     person = request.user.get_profile()
 
@@ -564,6 +532,7 @@ def create_project_exps_from_launchpad_contributor_facts(dia_id, lp_results):
 
     # }}}
 
+@login_required
 def ask_for_tag_input(request, username):
     # {{{
     return display_person_web(request, username, 'tags', edit='1')
@@ -657,6 +626,7 @@ def gimme_json_that_says_that_commit_importer_is_done(request):
     return HttpResponse(json)
     # }}}
 
+@login_required
 def import_do(request):
     # {{{
     # This is POSTed to when you want to start
@@ -702,6 +672,7 @@ def new_user_do(request):
         # FIXME: Validate, Catch no username
     # }}}
 
+@login_required
 def delete_experience_do(request):
     # {{{
     person = request.user.get_profile()
@@ -726,18 +697,19 @@ def delete_experience_do(request):
             request.user.username))
     # }}}
 
+@login_required
 def prepare_data_import_attempts_do(request):
-    """This function:
-    * Pulls out from the POST a list of usernames or email addresses under
-    which somebody has committed code to an open-source repository.
+    """
+    Input: request.POST contains a list of usernames or email addresses.
+    These are identifiers under which the authorized user has committed code
+    to an open-source repository, or at least so says the user.
     
-    Side-effects: Create DIAs that a user might want to execute. This means,
-    don't show the user DIAs that relate to non-existent accounts on remote
-    networks. And what *that* means is, before bothering the user, ask those
-    networks beforehand if they even have accounts named commit_usernames[0],
-    etc.
+    Side-effects: Create DataImportAttempts that a user might want to execute.
 
-    NB: We don't yet implement sentences 2 and 3 of the preceding paragraph."""
+    Not yet implemented: This means, don't show the user DIAs that relate to
+    non-existent accounts on remote networks. And what *that* means is, 
+    before bothering the user, ask those networks beforehand if they even 
+    have accounts named commit_usernames[0], etc."""
     # {{{
     # for each commit_username_*, call some silly controller """
     commit_usernames = []
@@ -765,6 +737,7 @@ def prepare_data_import_attempts_do(request):
     return HttpResponseRedirect('/people/portfolio/import/')
     # }}}
 
+@login_required
 def importer(request):
     """Get the DIAs for the logged-in user's profile. Pass them to the template."""
     # {{{
@@ -780,6 +753,7 @@ def importer(request):
     return render_to_response('profile/importer.html', data)
     # }}}
 
+@login_required
 def user_selected_these_dia_checkboxes(request):
     """ Input: Request POST contains a list of checkbox IDs corresponding to DIAs.
     Side-effect: Make a note on the DIA that its affiliated person wants it.
@@ -811,17 +785,21 @@ def display_person_edit_name(request, name_edit_mode):
     Why separately handle first and last names? The Django user
     model already stores them separately.
     '''
+    # {{{
     data = {}
     data = get_personal_data(
             request.user.get_profile())
     data['name_edit_mode'] = name_edit_mode
     data['editable'] = True
     return render_to_response('profile/main.html', data)
+    # }}}
 
+@login_required
 def display_person_edit_name_do(request):
     '''Take the new first name and last name out of the POST.
 
     Jam them into the Django user model.'''
+    # {{{
     user = request.user
 
     new_first = request.POST['first_name']
@@ -832,19 +810,4 @@ def display_person_edit_name_do(request):
     user.save()
 
     return HttpResponseRedirect('/people/%s' % urllib.quote(user.username))
-
-def dismiss_notification_do(request):
-    # FIXME: Handle request.POST['format']
-    try:
-        notification__short_name = request.POST[
-                'notification__short_name']
-        notification = Notification.objects.get(
-                short_name=notification__short_name)
-    except Notification.DoesNotExist:
-        return HttpResponse("0")
-
-    person = request.user.get_profile()
-    person.has_dismissed_these_notifications.add(
-            notification)
-    person.save()
-    return HttpResponse("1")
+    # }}}

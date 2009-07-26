@@ -27,55 +27,20 @@ urlpatterns = patterns('',
         (r'^people/delete-experience/do$',
          'mysite.profile.views.delete_experience_do'),
 
-        # FIXME: Add trailing slashes, as this is more permissive.
-        (r'^people/get_data_for_email$', 'mysite.profile.views.get_data_for_email'),
-        (r'^people/change_what_like_working_on$',
-            'mysite.profile.views.change_what_like_working_on_web'),
-        (r'^people/add_tag_to_project_exp$',
-            'mysite.profile.views.add_tag_to_project_exp_web'),
         (r'^people/project_exp_tag__remove$',
             'mysite.profile.views.project_exp_tag__remove__web'),
-        (r'^people/make_favorite_project_exp$',
-            'mysite.profile.views.make_favorite_project_exp_web'),
-        (r'^people/make_favorite_exp_tag$',
-            'mysite.profile.views.make_favorite_exp_tag_web'),
 
-        # Edit tags for an experience
-        (r'^people/(?P<username>\w+)/edit-exp/tags/(?P<exp_id>\d+)$',
-            'mysite.profile.views.edit_exp_tag'),
+        (r'^people/info/edit/do$',
+            'mysite.profile.views.edit_person_info'),
 
-        # Edit a person's tags
-        (r'^people/(?P<username>\w+)/tags/edit$',
-            'mysite.profile.views.ask_for_tag_input'),
-        (r'^people/tags/edit/do$',
-            'mysite.profile.views.edit_person_tags'),
-
-        # Project icons
         (r'^people/project_icon/(?P<project_name>.*)$',
             'mysite.profile.views.project_icon_web'),
 
-        # Add contributions
-        (r'^people/add_contrib$',
-            'mysite.profile.views.display_person_old'),
-        (r'^people/add_contribution$', 'mysite.profile.views.add_contribution_web'),
+        (r'^form/projectexp_add$',
+            'mysite.profile.views.projectexp_add_form'),
 
-        (r'^form/projectexp_add$', 'mysite.profile.views.projectexp_add_form'),
-        (r'^do/projectexp_add$', 'mysite.profile.views.projectexp_add_do'),
-
-        # URL Raffi was writing for the bubble-closing page as he realized
-        # we can't do this until we support authentication, la la la.
-        #(r'^/people/%s/bubbles/%s/keep_closed[\.?]%s$' % (
-        #    '(?P<username>\w_@-+)', '(?P<message_id>\w_-+)', '(?P<format>[a-z]+)'),
-        #    'mysite.profile.views.bubble_keep_closed'),
-
-        (r'^people/sf_projects_by_person$',
-            'mysite.profile.views.sf_projects_by_person_web'),
-
-        # Experience slurper
-        (r'^people/xp_slurp$',
-            'mysite.profile.views.xp_slurper_display_input_form'),
-        (r'^people/xp_slurp_do$',
-            'mysite.profile.views.exp_scraper_scrape_web'),
+        (r'^do/projectexp_add$',
+            'mysite.profile.views.projectexp_add_do'),
 
         # Get a list of suggestions for the search input,
         # formatted the way that the jQuery autocomplete plugin wants it.
@@ -90,11 +55,6 @@ urlpatterns = patterns('',
         (r'^people/import/do$',
             'mysite.profile.views.import_do'),
 
-        # Tabs
-        # FIXME: Remove
-        (r'^people/(?P<input_username>[^/]+)/tabs?/(?P<tab>[a-z]+)[/?]$',
-                'mysite.profile.views.display_person_web'),
-
         (r'^people/(?P<user_to_display__username>[^/]+)/projects/(?P<project__name>.+)$',
                 'mysite.profile.views.projectexp_display'),
 
@@ -103,9 +63,6 @@ urlpatterns = patterns('',
 
         (r'^people/portfolio/import/$',
                 'mysite.profile.views.importer'),
-
-        (r'^people/edit[/?]$',
-                'mysite.profile.views.display_person_edit_web'),
 
         (r'^people/edit/info$',
                 'mysite.profile.views.display_person_edit_web',

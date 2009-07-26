@@ -64,12 +64,11 @@
     {% endif %}
 
     {% if info_edit_mode %}
-    <!-- {{{ -->
     <form name='edit-tags'
-        action='/people/tags/edit/do'
+        action='/people/info/edit/do'
         method='POST'>
         <!-- personal_info_edit_mode -->
-        {% comment %} THIS IS EDIT MODE FOOLS {% endcomment %}
+        {% comment %} THIS HURR IS EDIT MODE {% endcomment %}
         <h4>understands:</h4>
         <textarea name='edit-tags-understands'>{{ tags_flat.understands }}</textarea>
         <h4>will never understand:</h4>
@@ -82,7 +81,6 @@
         <textarea name='edit-tags-can_mentor'>{{ tags_flat.can_mentor }}</textarea>
         <input class='save-button' type='submit' value='Save' />
     </form>
-    <!-- }}} -->
     {% else %}
     <!-- {{{ -->
     {% if tags_flat.understands %}

@@ -180,56 +180,7 @@ class DebTagsTests(TwillTests):
 
 #class ExpTag(TwillTests):
 
-class CambridgeTests(TwillTests):
-    '''
-    The Cambridge milestone says:
-    * You can look up what projects (via local cache of sf.net) a person is 
-    on.
-    '''
-    # {{{
-    row = ['paulproteus', 'zoph', '1', 'Developer', '2009-06-11 21:53:19']
-
-    def _create_one_flossmole_row_from_data(self):
-        # make it
-        m, _ = profile.models.Link_SF_Proj_Dude_FM.create_from_flossmole_row_data(
-            *self.row)
-        return m
-
-    def _create_one_flossmole_row_from_text(self):
-        # make it
-        m, _ = profile.models.Link_SF_Proj_Dude_FM.create_from_flossmole_row_string(
-            '\t'.join(self.row))
-        return m
-
-    def _test_import_one_flossmole_row(self):
-        # find it
-        o = profile.models.Link_SF_Proj_Dude_FM.objects.get(
-            person__username='paulproteus', project__unixname='zoph')
-        self.assertEqual(o.position, 'Developer')
-        self.assert_(o.is_admin)
-
-    def test_import_one_flossmole_row(self):
-        self._create_one_flossmole_row_from_data()
-        self._test_import_one_flossmole_row()
-
-    def test_import_one_flossmole_row_text(self):
-        self._create_one_flossmole_row_from_text()
-        self._test_import_one_flossmole_row()
-
-    def _test_sf_person_projects_lookup(self):
-        self.test_import_one_flossmole_row()
-        url = 'http://openhatch.org/people/sf_projects_by_person?u=paulproteus'
-        tc.go(make_twill_url(url))
-        tc.find('zoph')
-
-    def test_sf_person_projects_lookup(self):
-        self.test_import_one_flossmole_row()
-        self._test_sf_person_projects_lookup()
-
-    def test_sf_person_projects_lookup_text(self):
-        self.test_import_one_flossmole_row_text()
-        self._test_sf_person_projects_lookup()
-    # }}}
+# If you're looking for SourceForge and FLOSSMole stuff, look in the repository history.
 
 class PersonTabProjectExpTests(TwillTests):
     # {{{
