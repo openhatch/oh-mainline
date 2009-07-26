@@ -25,6 +25,11 @@ h1 a:hover {
     color: #223366;
     text-decoration: none;
 }
+.module {
+    border: 10px solid #fff;
+    background: url('/static/images/motif.png');
+    padding: 10px;
+}
 
 ul {
     padding: 0;

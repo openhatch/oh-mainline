@@ -53,10 +53,6 @@
 #sidebar .box {
     width: 200px;
 }
-ul {
-    margin: 0;
-    padding: 0 0 0 10%;
-}
 li {
     list-style: square;
 }
@@ -256,19 +252,14 @@ a:focus {
     width: 500px;
 }
 #opps form label {
-    border-right: 3px solid #99CCFF;
     float: left;
-    background-color: #fff;
     font-size: 19px;
-    font-family: arial;
-    padding: 6px 10px 7px 10px;
+    font-family: Arial;
     color: #555;
+    padding: 14px 14px 0 0;
 }
 #opps form input[type='text'] {
-    border: none;
-    background-color: #fff; /*#99CCFF;*/
     font-size: 19px;
-    font-family: arial;
     padding: 9px;
     padding-top: 10px;
     color: #222;
