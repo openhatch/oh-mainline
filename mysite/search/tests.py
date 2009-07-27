@@ -5,6 +5,8 @@ import lpb2json
 import datetime
 import search.launchpad_crawl
 
+import mock
+import time
 import twill
 from twill import commands as tc
 from twill.shell import TwillCommandLoop
@@ -162,6 +164,15 @@ class TestNonJavascriptSearch(django.test.TestCase):
         for n in range(727, 737):
             tc.find('Description #%d' % n)
 
+sample_launchpad_data_dump = mock.Mock()
+sample_launchpad_data_dump.return_value = [dict(
+        url='', project='rose.makesad.us', text='', status='',
+        importance='low', reporter={'lplogin': 'a',
+                                    'realname': 'b'},
+        comments=[], date_updated=time.localtime(),
+        date_reported=time.localtime(),
+        title="Joi's Lab AFS",)]
+
 class AutoCrawlTests(django.test.TestCase):
     def setUp(self):
         twill_setup()
@@ -169,6 +180,8 @@ class AutoCrawlTests(django.test.TestCase):
     def tearDown(self):
         twill_teardown()
 
+    @mock.patch('search.launchpad_crawl.dump_data_from_project', 
+                sample_launchpad_data_dump)
     def testSearch(self):
         # Verify that we can't find a bug with the right description
         self.assertRaises(search.models.Bug.DoesNotExist,
