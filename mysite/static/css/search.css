@@ -1,3 +1,4 @@
+
 .no-opps {
     border: 1px solid #d2e6df;
     background-color: #eef;
@@ -14,7 +15,7 @@
 }
 .box {
     float: left;
-    margin-top: 30px;
+    margin-top: 10px;
 }
 .box h2 {
     font-size: 130%;
@@ -23,6 +24,14 @@
 }
 .box .content {
 }
+
+.search-terms {
+    font-size: 20px;
+    background: white;
+    padding: 5px;
+    width: 550px;
+}
+
 #results-widget {
     padding: 12px;
     padding-bottom: 6px;
@@ -63,6 +72,179 @@ p {
     width: 15px;
     vertical-align: -10%;
 }
+/* generic list code */
+#results.box {
+    padding-right: 0;
+    padding-bottom: 0;
+}
+#results ul {
+    margin: 0;
+    padding: 0;
+    float: left;
+}
+#results li {
+    border: solid #999;
+    border-width: 0 0 0 6px; 
+    overflow: hidden;
+    letter-spacing: 0px;
+    font-size: 100%;
+    float: left;
+    list-style: none;
+    width: 555px;
+    height: 56px;
+    white-space: nowrap;
+    margin: 5px 0;
+}
+
+#results li .details {
+    /*border-top: 1px solid #ccf;*/
+    padding: .3em .7em;
+    padding-top: 0;
+    float: left;
+    font-size: 11px;
+    background-color: #eef;
+}
+
+#results li label {
+    color: #777;
+}
+#results li .field {
+    float: left;
+    margin-top: .3em;
+}
+
+#results li .tags {
+    float: left;
+    width: 80px;
+}
+
+#results li .title {
+    font-size: 17px;
+    float: left;
+    padding: 5px 10px;
+    width: 435px;
+    overflow: hidden;
+}
+
+.first-line a {
+    color: #2288BB;
+}
+
+.first-line a:hover {
+    color: #223366;
+    text-decoration: none;
+}
+
+#results li .description p {
+    margin-top: 5px;
+}
+
+#results li .first-line {
+    float: left;
+    cursor: hand;
+    width: 100%;
+    cursor: pointer;
+    /*border-bottom: 1px dotted #ccf;*/
+}
+#results .tag-details {
+    display: none;
+}
+
+#results li .show-details {
+    padding: .3em .7em;
+    float: left;
+    width: 71px;
+    text-align: right;
+}
+
+#results li .left {
+    white-space: nowrap;
+    float: left;
+    width: 460px;
+    overflow: hidden;
+}
+#results li .description {
+    width: 445px;
+    padding: .3em .7em;
+    color: #888;
+    float: left;
+    overflow: hidden;
+    white-space: nowrap;
+}
+#results li .description * {
+    display: inline;
+}
+
+/* </generic list code> */
+
+/* human list code */
+
+#humans li {
+    height: 56px;
+}
+
+#humans li .title {
+    float: left;
+    clear: none;
+}
+
+#humans li .details {
+    float: left;
+    margin: 0;
+    width: 490px;
+}
+
+#humans li .details a {
+    color: #66AA33;
+}
+
+#humans li .details a:hover {
+    color: #338800;
+}
+
+#humans li .details .contact {
+    float: right;
+    font-weight: bold;
+}
+
+#humans li .details .contact a:hover {
+    text-decoration: underline;
+}
+
+#humans li .details .available {
+    font-weight: bold;
+    background-color: #ffffa6;
+    padding: 0 2px;
+}
+
+#humans li .icon {
+    float: right;
+    padding: .3em .7em;
+    width: 65px;
+    text-align: right;
+}
+
+#humans li .field {
+    margin: 0 10px 0 0;
+}
+
+.person {
+    background-color: #fff;
+}
+
+.profile-pic {
+    border: 4px solid white;
+    float: left;
+}
+
+.first-line {
+    float: left;
+    clear: none;
+}
+
+/* </human list code> */
+
+/* bug list code */
 #opps.box {
     padding-right: 0;
     padding-bottom: 0;
@@ -76,23 +258,11 @@ p {
     border: solid #ffcaa9;
     border-width: 0 0 0 6px; 
     overflow: hidden;
-    letter-spacing: 0px;
-    font-size: 100%;
-    float: left;
-    list-style: none;
-    width: 555px;
-    margin-top: 3px;
-    height: 56px;
-    white-space: nowrap;
 }
 #opps li.odd {
     border-color: #ff94ad; 
 }
-/*
-#opps li.odd.lit-up {
-    border-color: #ce1836;
-}
-    */
+
 #opps li {
     margin: 5px 0;
 }
@@ -116,13 +286,12 @@ p {
 #opps li.expanded .details .fields {
     display: block;
 }
+
 #opps li label {
     color: #777;
 }
 #opps li .field {
-    float: left;
     width: 33%;
-    margin-top: .3em;
 }
 #opps li.expanded {
     height: auto;
@@ -136,132 +305,35 @@ p {
     padding: .3em .7em;
     float: left;
 }
-#opps li .title {
-    font-size: 17px;
-    float: left;
-    padding: 5px 10px;
-    width: 435px;
-    overflow: hidden;
-}
 
-.first-line a {
-    color: #2288BB;
-}
-
-.first-line a:hover {
-    color: #223366;
-    text-decoration: none;
-}
-#opps li.expanded .title {
-}
-#opps li.expanded .description {
-    width: 467px;
-    /*border-right: 1px dotted #ccf;*/
-    color: #000;
-    float: left;
-    overflow: normal;
-    white-space: normal;
-}
-#opps li.expanded .description * {
-    white-space: normal;
-    display: inherit;
-}
-#opps li .description p {
-    margin-top: 5px;
-}
-#opps li.expanded .description.pre {
-    white-space: pre;
-    font-family: monospace;
-    font-size: 125%;
-}
-#opps li.expanded .tags {
-    background-color: inherit;
-    width: 91px;
-}
-#opps li .logo {
-    width: 20px;
-    vertical-align: middle;
-}
-#opps li .first-line {
-    float: left;
-    cursor: hand;
-    width: 100%;
-    cursor: pointer;
-    /*border-bottom: 1px dotted #ccf;*/
-}
-#opps .tag-details {
-    display: none;
-}
-#opps li.expanded .tag-details {
-    display: block;
-}
 #opps li.lit-up {
     /*border-color: #777; #f85931;*/
 }
 #opps li.lit-up .title span {
     background-color: #ffffa6;
 }
+
 #opps li .second-line {
     display: block;
     float: left;
 }
-#opps li .show-details {
-    padding: .3em .7em;
-    float: left;
-    width: 71px;
-    text-align: right;
-}
-#opps li.expanded .second-line {
-    padding: 0;
-}
-#opps li .left {
-    white-space: nowrap;
-    float: left;
-    width: 460px;
-    overflow: hidden;
-}
-#opps li .description {
-    width: 445px;
-    padding: .3em .7em;
-    color: #888;
-    float: left;
-    overflow: hidden;
-    white-space: nowrap;
-}
-#opps li .description * {
-    display: inline;
-}
-:focus {
-    -moz-outline-style: none;
-    outline: none;
-}
-a:focus {
-}
-.separator {
-    color: #aaa;
-}
-#opp-nav {
 
-}
-.project-info {
-    float: left;
-    padding: .3em .7em;
-}
 #opps form {
     float: left;
     width: 500px;
 }
 #opps form label {
     float: left;
+    background-color: #99CCFF;
     font-size: 19px;
     font-family: Arial;
-    color: #555;
+    color: black;
     padding: 14px 14px 0 0;
 }
 #opps form input[type='text'] {
     font-size: 19px;
-    padding: 9px;
-    padding-top: 10px;
+    padding: 3px;
+    padding-top: 4px;
     color: #222;
 }
 #opps form input[type='submit'] {
@@ -271,6 +343,7 @@ a:focus {
     font-size: 19px;
     font-family: arial;
     padding: 6px;
+    padding-bottom: 5px;
     color: #222;
 }
 .good-for-beginners {
@@ -278,7 +351,25 @@ a:focus {
 }
 .good-for-beginners img {
 }
+
 .bug {
     background-color: #fff;
+}
+
+/* </bug list code> */
+
+:focus {
+    -moz-outline-style: none;
+    outline: none;
+}
+a:focus {
+}
+.separator {
+    color: #aaa;
+}
+
+.project-info {
+    float: left;
+    padding: .3em .7em;
 }
 /* vim: set ai ts=4 sts=4 et sw=4: */

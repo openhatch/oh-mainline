@@ -21,6 +21,12 @@ urlpatterns = patterns('',
         (r'^people/signup/$', 'mysite.profile.views.signup'),
         (r'^people/signup/do$', 'mysite.profile.views.signup_do'),
 
+        #Karen messes around with templates
+        (r'^jobs/$', 
+            'mysite.consulting.views.search'),
+        (r'^jobs/(?P<query>.*)/$',
+            'mysite.consulting.views.list'),
+
         # FIXME: Either this or signup_do is dead code.
         (r'^people/new/do$', 'mysite.profile.views.new_user_do'),
 

@@ -6,8 +6,8 @@ Search bugs | OpenHatch
 
 {% block main %}
 <div id='main'>
-    <div id='opps' class='gewgaws box module'>
-
+    <div id='results' class='gewgaws module box results'>
+    <div id='opps'>
         <form name='search_opps' method='get'> 
             {% comment %} {{{ {% endcomment %}
             <h3><label for='language'>Find some bugs!</label></h3>
@@ -119,6 +119,7 @@ Search bugs | OpenHatch
         </p>
     {% endif %}
 
+    </div> <!-- /#results -->
     </div> <!-- /#opps -->
 
 </div><!-- /#main -->
