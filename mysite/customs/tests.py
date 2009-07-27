@@ -155,44 +155,6 @@ class SlowlohTests(django.test.TestCase):
         # }}}
     # }}}
 
-class QuebecTests(django.test.TestCase):
-    '''
-    The Québec milestone says:
-    * You can save your profile.
-    '''
-    # {{{
-    fixtures = ['user-paulproteus', 'person-paulproteus', 'cchost-data-imported-from-ohloh']
-    def setUp(self):
-        # {{{
-        twill_setup()
-        self.to_be_deleted = []
-        # }}}
-
-    def tearDown(self):
-        # {{{
-        twill_teardown()
-        for delete_me in self.to_be_deleted:
-            delete_me.delete()
-        # }}}
-
-    def testPersonModel(self):
-        # {{{
-        # Test creating a Person and fetching his or her contribution info
-        username = 'paulproteus'
-        new_person = Person.objects.get(user__username=username)
-        new_person.save()
-        
-        new_person.fetch_contrib_data_from_ohloh()
-        self.to_be_deleted.append(new_person)
-        # Verify that we actually created some ProjectExps related to me
-        all_proj_exps = list(
-            ProjectExp.objects.filter(person=new_person).all())
-        self.to_be_deleted.extend(all_proj_exps)
-        self.assert_(all_proj_exps, all_proj_exps)
-        # }}}
-
-    # }}}
-
 class OhlohIconTests(django.test.TestCase):
     '''Test that we can grab icons from Ohloh.'''
     # {{{
