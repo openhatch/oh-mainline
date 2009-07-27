@@ -59,6 +59,8 @@ def ohloh_url2data(url, selector, params = {}, many = False):
             if many:
                 return url, []
             return url, {}
+        else:
+            raise
     s = b.response()
     try:
         s = b.response().read()
