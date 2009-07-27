@@ -6,6 +6,7 @@ from search.models import Project
 from profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag
 import profile.views
 
+import mock
 import os
 import re
 import twill
@@ -71,6 +72,18 @@ class SlowlohTests(django.test.TestCase):
                            'man_months': 1,
                            'primary_language': 'shell script'}],
                          projects)
+        # }}}
+
+    @mock.patch('mechanize.Browser.open')
+    def testFindByUsernameWith404(self, mock_open):
+        # {{{
+        def generate_404(self):
+            import urllib2
+            raise urllib2.HTTPError('', 404, {}, {}, None)
+        mock_open.side_effect = generate_404
+        oh = ohloh.get_ohloh()
+        projects = oh.get_contribution_info_by_username('paulproteus')
+        self.assertEqual([], projects)
         # }}}
 
     def testFindByOhlohUsername(self):

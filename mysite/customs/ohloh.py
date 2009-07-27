@@ -52,7 +52,13 @@ def ohloh_url2data(url, selector, params = {}, many = False):
     
     encoded = urllib.urlencode(params)
     url += encoded
-    b = mechanize_get(url)
+    try:
+        b = mechanize_get(url)
+    except urllib2.HTTPError, e:
+        if str(e.code) == '404':
+            if many:
+                return url, []
+            return url, {}
     s = b.response()
     try:
         s = b.response().read()
