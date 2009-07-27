@@ -1,0 +1,35 @@
+{% extends 'profile/base.html' %}
+
+{% block js_in_head %}
+<script src='/static/js/jquery.js'></script>
+<script src='/static/js/jquery.query.js'></script>
+<script src='/static/js/jquery.hotkey.js'></script>
+<script src='/static/js/jquery.scrollTo.js'></script>
+<script src='/static/js/jquery.autocomplete.js'></script>
+<script>
+    thisstart = {{ start }};
+    thisend = {{ end }};
+</script>
+<script src='/static/js/gewgaws.js'></script>
+{% endblock js_in_head %}
+
+{% block more_css %}
+    @import url('/static/css/search.css');
+{% endblock more_css %}
+
+{% block content %}
+
+<div id='main'>
+{% block main %}
+{% endblock main %}
+</div>
+
+<div id='sidebar'>
+{% block sidebar %}
+{% endblock sidebar %}
+</div>
+
+{% endblock content %}
+
+{% block js %}
+{% endblock js %}

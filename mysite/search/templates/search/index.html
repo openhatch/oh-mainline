@@ -85,23 +85,35 @@
                         <form id='create_profile' name='create_profile'
                             action='/people/new/do' method='POST'>
                             <div class='form-row'>
-                                <label for='create_profile_username'>Username</label>
-                                <input type='text' name='create_profile_username' id='create_profile_username' />
+                                <label for='create_profile_username'>
+                                    Username
+                                </label>
+                                <input type='text' 
+                                name='create_profile_username' 
+                                id='create_profile_username' />
                             </div>
                             <div class='form-row'>
-                                <label for='create_profile_password'>Choose your password
-                                    <small style='display: block;'>Coming soon: OpenID!</small></label>
-                                <input type='password' id='create_profile_password'
+                                <label for='create_profile_password'>
+                                    Choose your password
+                                    <small style='display: block;'>
+                                        Coming soon: OpenID!
+                                    </small>
+                                </label>
+                                <input type='password' 
+                                id='create_profile_password'
                                 name='create_profile_password' />
                             </div>
                             <div class='form-row'>
-                                <input type='submit' style='float: right;' value='begin!' />
+                                <input type='submit' style='float: right;' 
+                                value='begin!' />
                             </div>
                         </form>
                         </li>
                         <li>
                         <span style='float: left; width: 400px;
-                            margin-bottom: 10px;'>Already on OpenHatch? Log in!</span>
+                            margin-bottom: 10px;'>
+                            Already on OpenHatch? Log in!
+                        </span>
                         <form id='login' name='login'
                             action='/people/login/do' method='POST'>
                             <div class='form-row'>
