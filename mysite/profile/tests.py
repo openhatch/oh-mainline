@@ -843,3 +843,62 @@ class ImportContributionsTests(TwillTests):
         #}}}
 
     # }}}
+
+class UserSignupInvolvesEmailAddress(TwillTests):
+    """Signing up as a user forces you to add an email address."""
+    # {{{
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def test_signing_up_forces_email_address_setting(self):
+        # {{{
+        # Verify there is no user named newuser
+        username = 'newuser'
+        password = 'password'
+        self.assertFalse(list(Person.objects.filter(user__username=username)))
+
+        # Try to create a user, emaillessly
+        tc.go(make_twill_url('http://openhatch.org/'))
+        tc.fv('create_profile', 'create_profile_username', username)
+        tc.fv('create_profile', 'create_profile_password', password)
+        tc.submit()
+
+        # Still false! You need an email address.
+        self.assertFalse(list(Person.objects.filter(user__username=username)))
+        tc.find('need_email')
+        # }}}
+
+    def sign_up_with_email(self, email_address):
+        # {{{
+        # Verify there is no user named newuser
+        username = 'newuser'
+        password = 'password'
+        self.assertFalse(list(Person.objects.filter(user__username=username)))
+
+        # Try to create one (with email address)
+        tc.go(make_twill_url('http://openhatch.org/'))
+        tc.fv('create_profile', 'create_profile_username', username)
+        tc.fv('create_profile', 'create_profile_email', email_address)
+        tc.fv('create_profile', 'create_profile_password', password)
+        tc.submit()
+
+        users = list(Person.objects.filter(user__username=username))
+        return users
+
+        #}}}
+
+    def test_signup_with_good_email_address(self):
+        # {{{
+        email_address = 'good@email.com'
+        users = self.sign_up_with_email(email_address)
+        self.assert_(users)
+        self.assertEqual(user[0].email, email_address)
+        # }}}
+
+    def test_signup_with_bad_email_address(self):
+        # {{{
+        email_address = 'ThatsNoEmailAddress!'
+        users = self.sign_up_with_email(email_address)
+        self.assertNot(users)
+        # }}}
+
+    # }}}
