@@ -17,7 +17,7 @@ import re
 from typecheck import accepts, returns
 from typecheck import Any as __
 
-API_KEY='0cWqe4uPw7b8Q5337ybPQ' # "Oman testing"
+API_KEY='JeXHeaQhjXewhdktn4nUw' # "Oman testing"
 
 def mechanize_get(url, referrer=None, attempts_remaining=6):
     b = mechanize.Browser()
