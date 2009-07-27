@@ -80,7 +80,6 @@ $(document).ready(function() {
                 $('.gewgaws .lit-up').toggleExpanded();
                 });
 
-
         $('.first-line').hover(
                 function() { $(this).addClass('hover'); },
                 function() { $(this).removeClass('hover'); }
@@ -190,9 +189,11 @@ Gewgaws.jsonArrayToDocument = function (jsonArray) {
 
 Gewgaws.lightGewgaw = function(gewgawIndex) {
     if($('.gewgaws li').eq(gewgawIndex).size() == 1) {
+        /* FIXME: Put this back when it matters.
         $('.gewgaws li')
             .removeClass('lit-up')
             .eq(gewgawIndex).addClass('lit-up').scrollIntoView();
+            */
         // FIXME: Automatically scroll when gewgaw is expanded such that its content is off-screen.
     }
     else {

@@ -3,7 +3,7 @@
     <head>{% comment %} {{{ {% endcomment %}
 
         {% comment %} prefatory remarks {{{ {% endcomment %}
-        <title>openhatch</title>
+        <title>Welcome to OpenHatch</title>
         <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
         <meta http-equiv='Content-Language' content='en-us' />
         <meta http-equiv='Content-Script-Type' content='text/javascript' />
@@ -32,14 +32,20 @@
         FIXME: If user has shortcuts off, don't load jquery.hotkey.js
         {% endcomment %}
         <script src='/static/js/jquery.scrollTo.js'></script>
-        <!--script src='/static/js/jquery.bgiFrame.js'></script>
-    <script src='/static/js/jquery.ajaxQueue.js'></script-->
+        <!-- FIXME: tabs doesn't f-ing work -->
+        <script src='/static/js/jquery.tabs.js'></script>
+    <!--<script src='/static/js/jquery.ajaxQueue.js'></script-->
         <script src='/static/js/jquery.autocomplete.js'></script>
         <script>
             thisstart = {{ start }};
             thisend = {{ end }};
         </script>
         <script src='/static/js/gewgaws.js'></script>
+        <script 
+        $(document).ready(function(){
+            $("#tabs").tabs();
+        });
+</script>
         {% comment %} }}} {% comment %}
 
     </head>{% comment %} }}} {% endcomment %}
@@ -60,30 +66,37 @@
                     <img alt='OpenHatch' src='/static/images/the-logo.png'/>
                     
                     <div id='explanation'>
-                    <!--p style='text-align: center;'>
-                    <h3 style=''>Dig in!</h3>
-                    </p>
-                    <p>Here you can <strong>find opportunities to volunteer in software engineering and design</strong>, and
-                    <strong>meet other volunteers</strong>.</p-->
-
-                    <h3><span>Do you contribute to open source software?</span></h3>
-
-                    <h3>Then OpenHatch is here for you!</h3>
-                    <!--h2>Just tell us your <span>skills</span>, <span>experience</span>, and <span>interests</span>, and we help you:</h2-->
-                    <ul><li><span>Find tailored ways that you can help</span> with open source projects</li>
-                        <li><span>Find people</span> who like the same projects as you do</li>
-                        <li><span>Track and show off</span> all your open source software experience in one place</li></ul>
+                    <h3>OpenHatch is an open source involvement engine.</h3>
+                    <small><a href="">+ More?</a></small>
+                    {% comment %}
+                    <p>OpenHatch makes it easy to:</p>
+                    <ul>
+                        <li>Find new ways that you can help with open source projects</li>
+                        <li>Find mentors or mentees and learn new skills</li>
+                        <br />and
+                        <li>Track and show off all your open source software experience in one place.</li>
+                    </ul>
+                    <p>By providing us with the usernames and email addresses you use in the open source software community, we automatically compile your contributions to open source. We then use your past contributions to make recommendations on how you could contribute further.</p>
+                    <p>First, we collect open bugs from open source project bugtrackers across the web and highlight those tasks that match your skill set. If you indicate a skill you want to learn, we automatically link you to potential mentors who have substantial experience in that area. (Vice-versa, if you know a lot about a particular skill, we encourage and facilitate you in mentoring less-experienced members of the site!) Finally, something something.</p>
+                    {% endcomment %}
+                    
                      </div>
                 </div>
 
 
-                <div id='right-hand'>
+                <div id='rightcolumn'>
                     <h1 id='find'>Find: <a href='/people'>people</a>, <a href='/search'>volunteer opportunities</a>.</h1>
                     <ul id='stuff-to-do'>
                         <li>
-                        <div id='create-a-profile'><span>Create a profile:</span> </div>
-                        <form id='create_profile' name='create_profile'
-                            action='/people/new/do' method='POST'>
+                        <div id='options'>
+
+                            <div id='create-a-profile'><span><a href="#form-a">Create a profile:</a></span>
+                            </div>
+                            <div id='logon'><span><a href="#form-b">Already on OpenHatch? Log in!</a></span>
+                            </div>
+                        </div>
+                        <div>
+                        <form id='form-a' name='create_profile' action='/people/new/do' method='POST'>
                             <div class='form-row'>
                                 <label for='create_profile_username'>
                                     Username
@@ -93,12 +106,8 @@
                                 id='create_profile_username' />
                             </div>
                             <div class='form-row'>
-                                <label for='create_profile_password'>
-                                    Choose your password
-                                    <small style='display: block;'>
-                                        Coming soon: OpenID!
-                                    </small>
-                                </label>
+                                <label for='create_profile_password'>choose your password
+                                    <small>Coming soon: OpenID!</small></label>
                                 <input type='password' 
                                 id='create_profile_password'
                                 name='create_profile_password' />
@@ -108,28 +117,32 @@
                                 value='begin!' />
                             </div>
                         </form>
-                        </li>
-                        <li>
-                        <span style='float: left; width: 400px;
+                        </div>
+                        {% comment %}
+                        <div>
+                        <form id='form-b' name='login' action='/people/login/do' method='POST'>
                             margin-bottom: 10px;'>
                             Already on OpenHatch? Log in!
                         </span>
-                        <form id='login' name='login'
-                            action='/people/login/do' method='POST'>
                             <div class='form-row'>
-                                <label for='login_username'>Username</label>
+                                <label for='login_username'>username</label>
                                 <input type='text' id='login_username' name='login_username' />
                             </div>
                             <div class='form-row'>
-                                <label for='login_password'>Password</label>
+                                <label for='login_password'>password</label>
                                 <input type='password' id='login_password' name='login_password' />
                             </div>
                             <div class='form-row'>
                                 <input type='submit' value='log in!' style='' />
                             </div>
-
                         </form>
+                        </div>
+                        {% endcomment %}
                         </li>
-                        <li><a href='/people/'>See who else is on OpenHatch</a></li>
+                         {% comment %} <li><a href='/people/'>See who else is on OpenHatch</a></li> {% endcomment %}
                     </ul>
                 </div>
+          </div>
+          
+     </div>
+</body>

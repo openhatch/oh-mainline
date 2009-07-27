@@ -1,7 +1,8 @@
-{% include 'profile/header.global.html' %}
+{% extends 'profile/base.html' %}
 
+{% block content %}
 <div id='big-people-list'>
-<h3>List of registered users</h3>
+<h3>This is everybody on OpenHatch</h3>
 <ul>
     {% for person in people %}
     <li>
@@ -16,4 +17,4 @@
     {% endfor %}
 </ul>
 </div>
-{% include 'profile/footer.html' %}
+{% endblock content %}

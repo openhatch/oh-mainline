@@ -1,10 +1,11 @@
+{% extends 'search/base.html' %}
 {% load webdesign %}
-{% comment %}
-OPP FINDER TEMPLATE
-{% endcomment %}
-{% include 'search/header.global.html' %}
 
-<div id='content'>
+{% block title %}
+Search bugs | OpenHatch
+{% endblock title %}
+
+{% block main %}
   <div id='main'>
     <div id='opps' class='gewgaws box'>
 
@@ -126,11 +127,9 @@ OPP FINDER TEMPLATE
 
   </div><!-- /#main -->
 
-</div><!-- /#content -->
-{% comment %} }}} {% endcomment %}
+{% endblock main %}
 
-{% comment %} Sidebar {{{ {% endcomment %}
-<div id='sidebar'>
+{% block sidebar %}
   <div id='projects' class='box' style='margin-top: 40px;'>
     <h2 style='margin-bottom: 10px;'>Suggested searches:</h2>
     <ul>
@@ -194,24 +193,9 @@ OPP FINDER TEMPLATE
     </div>
   </div>
   {% endcomment %}
-  {% comment %} }}} {% endcomment %}
-  {% comment %}
-  <div id='add-another-bug-tracker' 
-    class='box'>
-    <h2>Add projects auto-magically</h2>
-    <div class='content'>
-      <p>Type your username or email
-      address and we will look for your 
-      trackers.</p>
-      <input type='text' value='Type your username'/>
-    </div>
-  </div>
-  <div id='skill-list' class='box'>
-    <h2>Deduced skill list</h2>
-  </div>
-  <div id='add-a-skill' class='box'>
-    <h2>Add a skill</h2>
-  </div>
-  {% endcomment %}
 </div>
-{% comment %} }}} {% endcomment %}
+{% endblock sidebar %}
+
+{% block more_js %}
+
+{% endblock more_js %}

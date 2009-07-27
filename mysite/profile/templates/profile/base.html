@@ -14,10 +14,11 @@
         <meta http-equiv='Content-Style-Type' content='text/css' />
         <meta name='Description' content=''>
 
+        {% block css %}
         <style> /*<![CDATA[*/
             @import url('/static/css/people/all.css') all;
-            {% block css %}
-            {% endblock css %}
+            {% block more_css %}
+            {% endblock more_css %}
             /*]]>*/
         </style>
 
@@ -32,6 +33,10 @@
         <!--[if gte IE 7]>
         <style>/*<![CDATA[*/@import url('../css/ie/7+/all.css');/*]]>*/</style>
         <![endif]-->
+        {% endblock css %}
+
+        {% block js_in_head %}
+        {% endblock js_in_head %}
 
     </head>
     <body>
@@ -72,20 +77,11 @@
                     </div>
                 </div>
                 <div id='content'>
-                    <div id='left'>
-                        {% block left %}
-                        {% endblock left %}
-                    </div>
-                    <div id='middle'>
-                        {% block middle %}
-                        {% endblock middle %}
-                    </div>
-                    <div id='right'>
-                        {% block right %}
-                        {% endblock right %}
-                    </div>
+                    {% block content %}
+                    {% endblock content %}
                 </div><!-- /#content -->
                 <div id='footer'>
+                    {% block footer %}
                     <ul>
                         <li><a href="">home</a></li>
                         <li><a href="">about</a></li>
@@ -93,12 +89,18 @@
                         <li><a href="">tasks</a></li>
                         <li><a href="">contact</a></li>
                     </ul>
+                    {% endblock footer %}
                 </div>
             </div><!-- /#penoutermost -->
         </div><!-- /#outermost -->
+
+        {% block jquery %}
         <script src='/static/js/jquery.js'></script>
         <script src='/static/js/jquery.query.js'></script>
+        {% endblock jquery %}
+
         {% block js %}
         {% endblock js %}
+
     </body>
 </html>

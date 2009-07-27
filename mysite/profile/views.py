@@ -161,8 +161,7 @@ def get_personal_data(person):
         [ (key, ', '.join([k.text for k in data_dict['tags'][key]]))
           for key in data_dict['tags'] ])
 
-    # FIXME: Fix this please.
-    data_dict['no_info'] = True
+    data_dict['has_set_info'] = any(data_dict['tags_flat'].values())
 
     return data_dict
 

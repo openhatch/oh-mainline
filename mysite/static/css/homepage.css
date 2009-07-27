@@ -19,7 +19,7 @@ a img {
 
 #wrapper-outer {
     margin: 0 auto;
-    width: 900px;
+    width: 920px;
 }
 #wrapper-inner {
     float: left;
@@ -34,12 +34,10 @@ h1 {
 
 h1 a {
     color: #2288BB;
-    text-decoration: none;
 }
 
 h1 a:hover {
     color: #223366;
-    text-decoration: none;
 }
 
 h1, h2, h3, h4, h5 {
@@ -68,29 +66,40 @@ h4 {
     margin: 10px 0 20px 0;
 }
 
+small {
+     font-size: 12px;
+     float: right;
+}
+
 #banner {
-    width: 400px;
+    width: 420px;
     float: left;
     margin-top: -25px;
 }
 #banner img {
     border: 0;
     width: 350px;
+    margin: 0 auto;
+}
+
+#explanation {
+    background: white;
+    padding: 5px 10px 20px 10px;
 }
 
 #explanation p {
     text-align: left;
-    width: 500px;
-    font: 14pt Arial;
+    font-size: 12pt;
     margin-bottom: 15px;
 }
 
 .explanation-heading {
 }
 
-#right-hand {
-    width: 500px;
-    margin: 10px 0 0 440px;
+#rightcolumn {
+    margin: 10px 0 0 400px;
+    padding: 10px 40px 0 40px;
+    background-color: white;
 }
 
 #find {
@@ -104,24 +113,44 @@ h4 {
 
 #stuff-to-do li {
     list-style-type: none;
-    border: 30px solid #fff;
-    background: url('/static/images/motif.png');
     margin-bottom: 10px;
     float: left;
-    padding: 10px;
+    padding: 0;
 }
 
-#stuff-to-do span {
-    color: #2288BB;
+#options span {
     font-weight: normal;
-    font-size: 140%;
-    background-color: transparent;
+    float: right;
+    padding: 5px 6px 3px 6px;
+    margin-bottom: -3px;
+    -moz-border-radius-topleft: 4px;
+    -moz-border-radius-topright: 4px;
+    z-index: 2;
     }
+    
+#options span a {
+    color: black;
+    font-size: 20px;
+}
+
+#options span a:hover {
+    color: black;
+}
 
 #create-a-profile span {
-    color: #66AA33;
-    font-size: 24px;
-    }
+    float: left;
+    background: #CCDDFF;
+}
+
+#create-a-profile span a {
+}
+    
+#logon span {
+    background: #DDFFAA;
+}
+
+#logon span a {
+}
 
 ul {
     margin: 0;
@@ -129,42 +158,57 @@ ul {
 }
 li {
     list-style: square;
-    font-size: 14px;
+    font-size: 16px;
 }
 
 li a {
     padding: 0 0 10px 0;
-    font-size: 140%;
-}
-p {
-    margin: 0;
-}
+    margin-bottom: 30px;
+    font-size: 24px;
+    }
 
 /*form style stuff*/
 
 form {
-    margin-bottom: 10px;
+    padding: 20px 10px;
+    margin: 0 0 10px 0;
     float: left;
     width: 500px;
+    -moz-border-radius-bottomleft: 4px;
+    -moz-border-radius-bottomright: 4px;
+    z-index: 1;
+}
+
+#form-a {
+    background: #CCDDFF;
+}
+
+#form-b {
+    background: #DDFFAA;
 }
 .form-row {
     float: left;
-    width: 422px;
+    width: 500px;
 }
+
+form small {
+    text-align: left;
+    display: block;
+}
+
 label {
     float: left;
-    width: 150px;
-    padding: 10px;
-    margin-right: 10px;
-    font-size: 12pt;
+    width: 140px;
+    font-size: 18px;
+    padding: 3px 5px 0 10px;
+    margin: 0 2px 0 5px;
 }
-input[type='text'], input[type='password'] {
-    padding: 10px;
-    margin: 8px 0;
-    border: 1px solid #ddd;
-    float: left;
-    width: 220px;
-}
+                                input[type='text'], input[type='password'] {
+                                    padding: 10px 0 10px 5px;
+                                    margin: 8px 0;
+                                    float: right;
+                                    width: 320px;
+                                }
 input[type='submit'] {
     padding: 7px;
     position: relative;
@@ -172,10 +216,10 @@ input[type='submit'] {
     font-size: 12pt;
     background-color: #eee;
     border-top: 1px solid #ddd;
-    border-right: 2px solid #ccc;
-    border-bottom: 2px solid #ccc;
+    border-right: 2px solid #CCC;
+    border-bottom: 2px solid #CCC;
     border-left: 1px solid #ddd;
     float: right;
-}
+                                }
 
 /* vim: set ai ts=4 sts=4 et sw=4: */

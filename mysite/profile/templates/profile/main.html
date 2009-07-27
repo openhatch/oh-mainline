@@ -53,13 +53,13 @@
 {% block right %}
 <div id='info' class='widget'>
 
-    {% if editable %}
+    {% if editable and not info_edit_mode %}
     <a class='edit' href='/people/edit/info'>Edit</a>
     {% endif %}
 
     <h3 style='float: left; width: 100px;'>Info</h3>
 
-    {% if editable and not edit_mode and no_info %}
+    {% if editable and not info_edit_mode and not has_set_info %}
     <div id='edit_your_info_notification' class='notification'>Edit your info!</div>
     {% endif %}
 
