@@ -591,7 +591,7 @@ def login(request):
 def logout(request):
     #{{{
     django.contrib.auth.logout(request)
-    return HttpResponseRedirect("/?msg=ciao")
+    return HttpResponseRedirect("/?msg=ciao#tab=login")
     #}}}
 
 def signup(request):
@@ -652,7 +652,7 @@ def new_user_do(request):
         user, created = User.objects.get_or_create(username=username)
         if not created:
             # eep, redirect back to the front page with a message
-            return HttpResponseRedirect('/?msg=username_taken')
+            return HttpResponseRedirect('/?msg=username_taken#tab=create_profile')
         
         # Good, set the user's parameters.
         user.email=''

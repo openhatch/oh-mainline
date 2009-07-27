@@ -63,9 +63,9 @@ Welcome to OpenHatch!
         <div id='tabs' class='module'>
             <h3 class='invisible_if_js'>Sign up</h3>
             <div id='create_profile' class='tab'>
-                {% if notification %}
+                {% if signup_notification %}
                 <div class='float: left; notification' style='background-color: #ffc; border: 1px solid #ff9; text-align: center; padding: 10px;'>
-                    {{ notification }}
+                    {{ signup_notification }}
                 </div>
                 {% endif %}
                 {% if notification_id %}
@@ -96,9 +96,9 @@ Welcome to OpenHatch!
             </div>
             <h3 class='invisible_if_js'>Log in</h3>
             <div id='login' class='tab invisible_if_js'>
-                {% if notification %}
+                {% if login_notification %}
                 <div class='float: left; notification' style='background-color: #ffc; border: 1px solid #ff9; text-align: center; padding: 10px;'>
-                    {{ notification }}
+                    {{ login_notification }}
                 </div>
                 {% endif %}
                 {% if notification_id %}

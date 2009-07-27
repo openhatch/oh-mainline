@@ -87,17 +87,18 @@ def bugs_to_json_response(bunch_of_bugs, callback_function_name=''):
     return HttpResponse( callback_function_name + '(' + jsonned + ')' )
 
 def index(request):
-    notification = notification_id = None
+    signup_notification = login_notification = notification_id = None
     if request.GET.get('msg', None) == 'ciao':
-        notification = "You've been logged out. Thanks for dropping in!"
+        login_notification = "You've been logged out. Thanks for dropping in!"
         notification_id = 'ciao'
     elif request.GET.get('msg', None) == 'username_taken':
-        notification = "Your chosen username is already taken. Try another one."
+        signup_notification = "Your chosen username is already taken. Try another one."
         notification_id = 'username_taken'
     return render_to_response('search/index.html', {
         'title' : 'Welcome to OpenHatch', # FIXME: This doesn't work.
         'notification_id': notification_id,
-        'notification': notification 
+        'login_notification': login_notification,
+        'signup_notification': signup_notification,
         })
 
 def request_jquery_autocompletion_suggestions(request):
