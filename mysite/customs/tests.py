@@ -283,6 +283,12 @@ class LaunchpadDataTests(django.test.TestCase):
         no_langs = lp_grabber.project2languages('lazr')
         self.assertEqual(no_langs, [])
 
+
+    @mock.patch('mechanize.Browser.open', open_causes_404)
+    def test_person_who_404s(self):
+        info = lp_grabber.get_info_for_launchpad_username('Mr. 404')
+        self.assertEqual(info, {})
+
     def test_greg_has_branch_for_gwibber(self):
         info = lp_grabber.get_info_for_launchpad_username(
             'greg.grossmeier')

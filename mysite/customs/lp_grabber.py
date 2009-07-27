@@ -1,6 +1,7 @@
 import lxml.html # scraper library
 from ohloh import mechanize_get
 import urllib
+import urllib2
 import urlparse
 
 def project2languages(project_name):
@@ -35,8 +36,14 @@ def get_info_for_launchpad_username(username):
         }
     }
     """
-    b = mechanize_get('https://launchpad.net/~%s' % 
-                      urllib.quote(username))
+    try:
+        b = mechanize_get('https://launchpad.net/~%s' % 
+                          urllib.quote(username))
+    except urllib2.HTTPError, e:
+        if str(e.code) == '404':
+            return {}
+        else:
+            raise # not a 404? Bubble-up the explosion.
     doc = b.response().read()
     doc_u = unicode(doc, 'utf-8')
     tree = lxml.html.document_fromstring(doc_u)
