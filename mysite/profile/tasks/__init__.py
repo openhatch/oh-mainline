@@ -55,8 +55,8 @@ class FetchPersonDataFromOhloh(Task):
             dia.failed = True
             dia.save()
             if isinstance(e, urllib2.HTTPError):
-                if hasattr(e, 'getcode'):
-                    code = str(e.getcode())
+                if hasattr(e, 'code'):
+                    code = str(e.code)
                 else:
                     code = 'UNKNOWN'
                 if hasattr(e, 'geturl'):
