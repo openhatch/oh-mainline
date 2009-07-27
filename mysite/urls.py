@@ -15,20 +15,16 @@ urlpatterns = patterns('',
             {'document_root': settings.STATIC_DOC_ROOT}),
         (r'^people/$', 'mysite.profile.views.display_list_of_people'),
 
-        (r'^people/login/$', 'mysite.profile.views.login'),
-        (r'^people/login/do$', 'mysite.profile.views.login_do'),
-        (r'^people/logout/$', 'mysite.profile.views.logout'),
-        (r'^people/signup/$', 'mysite.profile.views.signup'),
-        (r'^people/signup/do$', 'mysite.profile.views.signup_do'),
+        (r'^accounts/login/$', 'mysite.accounts.views.login'),
+        (r'^accounts/login/do$', 'mysite.accounts.views.login_do'),
+        (r'^accounts/logout/$', 'mysite.accounts.views.logout'),
+        (r'^accounts/signup/do$', 'mysite.accounts.views.signup_do'),
 
         #Karen messes around with templates
         (r'^jobs/$', 
             'mysite.consulting.views.search'),
         (r'^jobs/(?P<query>.*)/$',
             'mysite.consulting.views.list'),
-
-        # FIXME: Either this or signup_do is dead code.
-        (r'^people/new/do$', 'mysite.profile.views.new_user_do'),
 
         (r'^people/delete-experience/do$',
          'mysite.profile.views.delete_experience_do'),

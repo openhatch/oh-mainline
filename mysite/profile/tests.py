@@ -63,7 +63,7 @@ class TwillTests(django.test.TestCase):
 
     def login_with_twill(self):
         # Visit login page
-        login_url = 'http://openhatch.org/people/login'
+        login_url = 'http://openhatch.org/accounts/login'
         tc.go(make_twill_url(login_url))
 
         # Log in
@@ -658,10 +658,7 @@ class SetAPasswordTests(TwillTests):
         tc.find(nondup_username)
 
     def test_signup_on_front_page_lets_person_sign_back_in(self):
-        ''' The point of this test is to:
-        * Create the account for ziggy
-        * Log out
-        * Log back in as him '''
+        ''' The point of this test is to: * Create the account for ziggy * Log out * Log back in as him '''
         self.test_create_user_from_front_page()
         tc.follow('logout')
         tc.go(make_twill_url('http://openhatch.org/'))

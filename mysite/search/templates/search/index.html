@@ -54,9 +54,9 @@ Welcome to OpenHatch!
     </div>
     <div id='account-related' class='tab-links'>
         <ul>
-            <li><a href="/people/signup" class='visible_iff_js'
+            <li><a href="#create_profile" class='visible_iff_js'
                 tab_selector="#create_profile">Sign up</a></li>
-            <li><a href="/people/login"
+            <li><a href="/accounts/login"
                 class='visible_iff_js my-tab-is-hidden'
                 tab_selector="#login">Log in</a></li>
         </ul>
@@ -72,7 +72,7 @@ Welcome to OpenHatch!
                 <!-- notification_id: {{ notification_id }} -->
                 {% endif %}
                 <form id='create_profile' name='create_profile'
-                    action='/people/new/do' method='POST'>
+                    action='/accounts/signup/do' method='POST'>
                     <div class='form-row'>
                         <label for='create_profile_username'>
                             Username
@@ -80,6 +80,14 @@ Welcome to OpenHatch!
                         <input type='text' 
                         name='create_profile_username' 
                         id='create_profile_username' />
+                    </div>
+                    <div class='form-row'>
+                        <label for='create_profile_email'>
+                            E-mail
+                        </label>
+                        <input type='text' 
+                        name='create_profile_email' 
+                        id='create_profile_email' />
                     </div>
                     <div class='form-row'>
                         <label for='create_profile_password'>Choose your password
@@ -104,7 +112,7 @@ Welcome to OpenHatch!
                 {% if notification_id %}
                 <!-- notification_id: {{ notification_id }} -->
                 {% endif %}
-                <form id='login' name='login' action='/people/login/do' method='POST'>
+                <form id='login' name='login' action='/accounts/login/do' method='POST'>
                     <div class='form-row'>
                         <label for='login_username'>username</label>
                         <input type='text' id='login_username' name='login_username' />
