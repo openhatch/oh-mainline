@@ -19,7 +19,7 @@ from typecheck import Any as __
 
 API_KEY='0cWqe4uPw7b8Q5337ybPQ' # "Oman testing"
 
-def mechanize_get(url, referrer=None, attempts_remaining=3):
+def mechanize_get(url, referrer=None, attempts_remaining=6):
     b = mechanize.Browser()
     b.set_handle_robots(False)
     addheaders = [('User-Agent',
