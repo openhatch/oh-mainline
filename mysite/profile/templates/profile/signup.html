@@ -1,11 +1,18 @@
-{% include 'profile/header.global.html' %}
-<form id='signup' name='signup'
+{% extends 'profile/base.html' %}
+
+{% block more_css %}
+@import url('/static/css/auth.css') all;
+{% endblock more_css %}
+
+{% block content %}
+<div id='signup' class='module'>
+<form name='signup'
     action='/people/signup/do' method='POST'>
+    <h3>Please sign up!</h3>
     <div class='form-row'>
         <label for='login-username'>Username: </label>
-        <!--input type='text' id='login-username'
-        name='login-username' value='{{ logged_in_user.username}}' /-->
-        {{ user.username }}
+        <input type='text' id='login-username'
+        name='login-username' value='{{ logged_in_user.username}}' />
     </div>
     <div class='form-row'>
         <label for='login-password'>Password: </label>
@@ -14,38 +21,9 @@
     <div class='form-row'>
         <input type='submit' value='Sign up' />
     </div>
-    <style type='text/css'>
-        form {
-        margin-bottom: 10px;
-        float: left;
-        width: 478px;
-        }
-        .form-row {
-        float: left;
-        width: 400px;
-        }
-        label {
-        float: left;
-        width: 130px;
-        padding: 12px;
-        margin-right: 10px;
-        font-size: 12pt;
-        }
-        input[type='text'], input[type='password'] {
-        padding: 10px;
-        border: 1px solid #eee;
-        float: left;
-        width: 214px;
-        }
-        input[type='submit'] {
-        padding: 7px;
-        position: relative;
-        top: 1px;
-        font-size: 12pt;
-        background-color: #eee;
-        border: 1px solid #dde;
-        float: right;
-        }
-    </style>
 </form>
-{% include 'profile/footer.html' %}
+<div style='margin-top: 50px; clear: left; float: left;'>
+Already have an account? Then <a style='font-weight: bold;' href='/people/login'>log yourself in</a>.
+</div>
+</div>
+{% endblock content %}

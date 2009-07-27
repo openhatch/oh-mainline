@@ -1,7 +1,7 @@
 {% extends 'profile/base.html' %}
 
 {% block more_css %}
-@import url('/static/css/login.css');
+@import url('/static/css/auth.css') all;
 {% endblock more_css %}
 
 {% block content %}
@@ -21,5 +21,8 @@
         <input type='submit' value='go' style='' />
     </div>
 </form>
+<div style='margin-top: 50px; clear: left; float: left;'>
+Don't have an account yet? Then <a style='font-weight: bold;' href='/people/signup'>sign your bad self up for one</a>.
+</div>
 </div>
 {% endblock content %}
