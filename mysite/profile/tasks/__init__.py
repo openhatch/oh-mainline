@@ -54,16 +54,15 @@ class FetchPersonDataFromOhloh(Task):
             dia.completed = True
             dia.failed = True
             dia.save()
-            if isinstance(e, urllib2.HTTPError):
-                if hasattr(e, 'code'):
-                    code = str(e.code)
-                else:
-                    code = 'UNKNOWN'
-                if hasattr(e, 'geturl'):
-                    url = str(e.geturl())
-                else:
-                    url = 'UNKNOWN'
-                logger.error('Dying: ' + code + ' getting ' + url)
+            if hasattr(e, 'code'):
+                code = str(e.code)
+            else:
+                code = 'UNKNOWN'
+            if hasattr(e, 'geturl'):
+                url = str(e.geturl())
+            else:
+                url = 'UNKNOWN'
+            logger.error('Dying: ' + code + ' getting ' + url)
             raise ValueError, {'code': code, 'url': url}
 
 try:
