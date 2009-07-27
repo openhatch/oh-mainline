@@ -5,6 +5,7 @@ import lpb2json
 import datetime
 import search.launchpad_crawl
 
+import simplejson
 import mock
 import time
 import twill
@@ -130,6 +131,17 @@ class TestNonJavascriptSearch(django.test.TestCase):
         tc.submit()
         for n in range(717, 727):
             tc.find('Description #%d' % n)
+
+    def test_json_view(self):
+        tc.go(make_twill_url('http://openhatch.org/search/?format=json&jsoncallback=callback'))
+        response = tc.show()
+        self.assert_(response.startswith('callback'))
+        json_string_with_parens = response.split('callback', 1)[1]
+        self.assert_(json_string_with_parens[0] == '(')
+        self.assert_(json_string_with_parens[-1] == ')')
+        json_string = json_string_with_parens[1:-1]
+        objects = simplejson.loads(json_string)
+        self.assert_('pk' in objects[0])
 
     def testPagination(self):
         url = 'http://openhatch.org/search/'
