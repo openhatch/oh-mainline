@@ -15,10 +15,11 @@ urlpatterns = patterns('',
             {'document_root': settings.STATIC_DOC_ROOT}),
         (r'^people/$', 'mysite.profile.views.display_list_of_people'),
 
-        (r'^accounts/login/$', 'mysite.accounts.views.login'),
-        (r'^accounts/login/do$', 'mysite.accounts.views.login_do'),
-        (r'^accounts/logout/$', 'mysite.accounts.views.logout'),
-        (r'^accounts/signup/do$', 'mysite.accounts.views.signup_do'),
+        (r'^account/login/$', 'mysite.accounts.views.login'),
+        (r'^account/login/do$', 'mysite.accounts.views.login_do'),
+        (r'^account/logout/$', 'mysite.accounts.views.logout'),
+        (r'^account/signup/do$', 'mysite.accounts.views.signup_do'),
+        (r'^account/$', 'mysite.accounts.views.signup_do'),
 
         #Karen messes around with templates
         (r'^jobs/$', 

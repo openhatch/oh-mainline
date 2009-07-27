@@ -123,4 +123,4 @@ AMQP_VHOST = "localhost"
 cooked_data_password = 'AXQaTjp3'
 AUTH_PROFILE_MODULE = "profile.Person"
 
-LOGIN_URL = '/accounts/login/'
+LOGIN_URL = '/account/login/'

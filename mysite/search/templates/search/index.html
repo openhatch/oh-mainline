@@ -56,7 +56,7 @@ Welcome to OpenHatch!
         <ul>
             <li><a href="#create_profile" class='visible_iff_js'
                 tab_selector="#create_profile">Sign up</a></li>
-            <li><a href="/accounts/login"
+            <li><a href="/account/login"
                 class='visible_iff_js my-tab-is-hidden'
                 tab_selector="#login">Log in</a></li>
         </ul>
@@ -72,7 +72,7 @@ Welcome to OpenHatch!
                 <!-- notification_id: {{ notification_id }} -->
                 {% endif %}
                 <form id='create_profile' name='create_profile'
-                    action='/accounts/signup/do' method='POST'>
+                    action='/account/signup/do' method='POST'>
                     <div class='form-row'>
                         <label for='create_profile_username'>
                             Username
@@ -112,7 +112,7 @@ Welcome to OpenHatch!
                 {% if notification_id %}
                 <!-- notification_id: {{ notification_id }} -->
                 {% endif %}
-                <form id='login' name='login' action='/accounts/login/do' method='POST'>
+                <form id='login' name='login' action='/account/login/do' method='POST'>
                     <div class='form-row'>
                         <label for='login_username'>username</label>
                         <input type='text' id='login_username' name='login_username' />
