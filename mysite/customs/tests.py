@@ -26,6 +26,14 @@ from django.test.client import Client
 from profile.tasks import FetchPersonDataFromOhloh
 # }}}
 
+# Mocked out browser.open
+open_causes_404 = mock.Mock()
+def generate_404(self):
+    import urllib2
+    raise urllib2.HTTPError('', 404, {}, {}, None)
+open_causes_404.side_effect = generate_404
+
+
 # Functions you'll need: {{{
 def twill_setup():
     app = AdminMediaHandler(WSGIHandler())
@@ -63,38 +71,41 @@ class SlowlohTests(django.test.TestCase):
         self.assertEqual(project_name, oh.analysis2projectdata(analysis_id)['name'])
         # }}}
 
-    def testFindByUsername(self):
+    def testFindByUsername(self, should_equal = None):
         # {{{
         oh = ohloh.get_ohloh()
         projects = oh.get_contribution_info_by_username('paulproteus')
-        self.assertEqual([{'project': u'ccHost',
-                           'project_homepage_url': 'http://wiki.creativecommons.org/CcHost',
-                           'man_months': 1,
-                           'primary_language': 'shell script'}],
-                         projects)
+        if should_equal is None:
+            should_equal = [{'project': u'ccHost',
+                             'project_homepage_url': 'http://wiki.creativecommons.org/CcHost',
+                             'man_months': 1,
+                             'primary_language': 'shell script'}]
+
+        self.assertEqual(projects, should_equal)
         # }}}
 
-    @mock.patch('mechanize.Browser.open')
-    def testFindByUsernameWith404(self, mock_open):
+    @mock.patch('mechanize.Browser.open', open_causes_404)
+    def testFindByUsernameWith404(self):
         # {{{
-        def generate_404(self):
-            import urllib2
-            raise urllib2.HTTPError('', 404, {}, {}, None)
-        mock_open.side_effect = generate_404
-        oh = ohloh.get_ohloh()
-        projects = oh.get_contribution_info_by_username('paulproteus')
-        self.assertEqual([], projects)
+        self.testFindByUsername([])
         # }}}
 
-    def testFindByOhlohUsername(self):
+    def testFindByOhlohUsername(self, should_equal = None):
         # {{{
         oh = ohloh.get_ohloh()
         projects = oh.get_contribution_info_by_ohloh_username('paulproteus')
-        self.assertEqual([{'project': u'ccHost',
-                           'project_homepage_url': 'http://wiki.creativecommons.org/CcHost',
+        if should_equal is None:
+            should_equal = [{'project': u'ccHost',
+                             'project_homepage_url': 'http://wiki.creativecommons.org/CcHost',
                            'man_months': 1,
-                           'primary_language': 'shell script'}],
-                         projects)
+                             'primary_language': 'shell script'}]
+        self.assertEqual(should_equal, projects)
+        # }}}
+
+    @mock.patch('mechanize.Browser.open', open_causes_404)
+    def testFindByOhlohUsernameWith404(self):
+        # {{{
+        self.testFindByOhlohUsername([])
         # }}}
 
     def testFindByEmail(self): 

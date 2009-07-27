@@ -210,8 +210,14 @@ class Ohloh(object):
         b.set_handle_robots(False)
         b.addheaders = [('User-Agent',
                         'Mozilla/4.0 (compatible; MSIE 5.0; Windows 98; (compatible;))')]
-        b.open('https://www.ohloh.net/accounts/%s' % urllib.quote(
+        try:
+            b.open('https://www.ohloh.net/accounts/%s' % urllib.quote(
             ohloh_username))
+        except urllib2.HTTPError, e:
+            if str(e.code) == '404':
+                return []
+            else:
+                raise
         root = lxml.html.parse(b.response()).getroot()
         relevant_links = root.cssselect('a.position')
         relevant_hrefs = [link.attrib['href'] for link in relevant_links]
