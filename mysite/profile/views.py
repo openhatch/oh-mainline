@@ -816,11 +816,14 @@ def display_person_edit_name_do(request):
     # }}}
 
 @login_required
-def my_account(request):
+def my_account(request, form = None):
     data = get_personal_data(
             request.user.get_profile())
     data['the_user'] = request.user
-    data['passwordchangeform'] = django.contrib.auth.forms.PasswordChangeForm({})
+    if form is None:
+        data['passwordchangeform'] = django.contrib.auth.forms.PasswordChangeForm({})
+    else:
+        data['passwordchangeform'] = form
     return render_to_response('profile/edit-self.html',
                               data)
 
@@ -830,5 +833,5 @@ def change_password_do(request):
     if form.is_valid():
         form.save() # I hope this works
     else:
-        pass # lala
+        return my_account(request, form)
     return HttpResponseRedirect('/my-account')
