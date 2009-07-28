@@ -8,7 +8,7 @@ admin.autodiscover()
 urlpatterns = patterns('',
         # FIXME: Automatically remove trailing slashes from input URLs,
         # and remove trailing slashes from the urls below.
-        (r'^$', 'mysite.base.views.index'),
+        (r'^$', 'mysite.base.views.homepage'),
         (r'^search/$', 'mysite.search.views.fetch_bugs'),
         (r'^admin/(.*)', admin.site.root),
         (r'^static/(?P<path>.*)$', 'django.views.static.serve',

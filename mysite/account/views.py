@@ -1,10 +1,14 @@
 # Imports {{{
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
 from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404
-from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag, Link_Project_Tag, Link_SF_Proj_Dude_FM, Link_Person_Tag, DataImportAttempt
 import django.contrib.auth 
 from django.contrib.auth.models import User
+
 import urllib
+
+import account.forms
+import base.views
+from profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag, Link_Project_Tag, Link_SF_Proj_Dude_FM, Link_Person_Tag, DataImportAttempt
 # }}}
 
 def login(request):
@@ -41,25 +45,33 @@ def login_do(request):
 
 def signup_do(request):
     # {{{
-    # FIXME: Use Django form on homepage.
-    form = UserCreationFormWithEmail(request.POST)
-    if not form.errors:
+    post = {}
+    post.update(dict(request.POST.items()))
+    post['password2'] = post['password1'] 
+    signup_form = account.forms.UserCreationFormWithEmail(post)
+    if not signup_form.errors:
 
-        form.save()
+        user = signup_form.save()
 
         # create a linked person
         person = Person(user=user)
         person.save()
 
+        username = request.POST['username']
+        password = request.POST['password1']
+
         # authenticate and login
         user = django.contrib.auth.authenticate(
-                username=request.POST['username'],
-                password=request.POST['password'])
+                username=username,
+                password=password)
         django.contrib.auth.login(request, user)
 
         # redirect to profile
         return HttpResponseRedirect(
                 '/people/%s/' % urllib.quote(username))
+
+    else:
+        return base.views.homepage(request, signup_form=signup_form)
     # }}}
 
 def logout(request):
