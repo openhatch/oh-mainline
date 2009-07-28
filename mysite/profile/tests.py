@@ -843,3 +843,14 @@ class ImportContributionsTests(TwillTests):
         #}}}
 
     # }}}
+
+### FIXME: Add change password tests to account app
+class ChangePasswordTests(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+    def test_account_edit_page_exists(self):
+        self.login_with_twill()
+        tc.go(make_twill_url('http://openhatch.org/people/paulproteus'))
+        tc.follow('Edit account')
+        tc.find('Change password')
+
+        
