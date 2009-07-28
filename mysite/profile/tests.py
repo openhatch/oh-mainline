@@ -857,6 +857,15 @@ class ChangePasswordTests(TwillTests):
         tc.fv('change_password', 'new_password1', 'new')
         tc.fv('change_password', 'new_password2', 'new')
         tc.submit()
+
+        # Try to log in with the new password now
+        client = Client()
+        username='paulproteus'
+        success = client.login(username=username,
+                               password="new")
+        self.assert_(success)
+        
+        
         
         
 
