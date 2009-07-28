@@ -101,7 +101,7 @@ INSTALLED_APPS = (
     'profile',
     'customs',
     'consulting',
-    'accounts',
+    'account',
 )
 
 ### HACK
