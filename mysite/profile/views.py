@@ -829,5 +829,5 @@ def change_password_do(request):
     if form.is_valid():
         form.save() # I hope this works
     else:
-        FIXME
+        pass # lala
     return HttpResponseRedirect('/my-account')

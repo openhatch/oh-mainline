@@ -847,7 +847,8 @@ class ImportContributionsTests(TwillTests):
 ### FIXME: Add change password tests to account app
 class ChangePasswordTests(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
-    def change_password(self, old_pass, new_pass):
+    def change_password(self, old_pass, new_pass,
+                        should_succeed = True):
         tc.go(make_twill_url('http://openhatch.org/people/paulproteus'))
         tc.follow('Account')
         tc.find('Change password')
@@ -862,6 +863,10 @@ class ChangePasswordTests(TwillTests):
         username='paulproteus'
         success = client.login(username=username,
                                password=new_pass)
+        if should_succeed:
+            success = success
+        else:
+            success = not success
         self.assert_(success)
         
     def test_change_password(self):
@@ -869,8 +874,13 @@ class ChangePasswordTests(TwillTests):
         oldpass="paulproteus's unbreakable password"
         newpass='new'
         self.change_password(oldpass, newpass)
-        
-        
+
+    def test_change_password_should_fail(self):
+        self.login_with_twill()
+        oldpass="wrong"
+        newpass='new'
+        self.change_password(oldpass, newpass,
+                             should_succeed = False)
         
 
         
