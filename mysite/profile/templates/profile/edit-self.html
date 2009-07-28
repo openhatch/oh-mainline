@@ -3,6 +3,12 @@
 {% block right %}
 <div class='edit single-project column project-display'>
     <h3>Change password</h3>
+    <form method='POST'
+	  name='change_password'
+	  action='/change-password/do'>
+    {{ passwordchangeform }}
+    <input type="submit" value="Change it!">
+    </form>
 </div>
 {% endblock right %}
 

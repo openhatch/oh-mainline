@@ -820,5 +820,6 @@ def my_account(request):
     data = get_personal_data(
             request.user.get_profile())
     data['the_user'] = request.user
+    data['passwordchangeform'] = django.contrib.auth.forms.PasswordChangeForm({})
     return render_to_response('profile/edit-self.html',
                               data)

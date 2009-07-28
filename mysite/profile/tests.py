@@ -852,5 +852,12 @@ class ChangePasswordTests(TwillTests):
         tc.go(make_twill_url('http://openhatch.org/people/paulproteus'))
         tc.follow('Edit account')
         tc.find('Change password')
+        tc.fv('change_password', 'old_password',
+              "paulproteus's unbreakable password")
+        tc.fv('change_password', 'new_password1', 'new')
+        tc.fv('change_password', 'new_password2', 'new')
+        tc.submit()
+        
+        
 
         
