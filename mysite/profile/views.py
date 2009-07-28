@@ -823,3 +823,11 @@ def my_account(request):
     data['passwordchangeform'] = django.contrib.auth.forms.PasswordChangeForm({})
     return render_to_response('profile/edit-self.html',
                               data)
+
+def change_password_do(request):
+    form = django.contrib.auth.forms.PasswordChangeForm(request.user, request.POST)
+    if form.is_valid():
+        form.save() # I hope this works
+    else:
+        FIXME
+    return HttpResponseRedirect('/my-account')
