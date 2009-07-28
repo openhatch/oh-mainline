@@ -41,34 +41,25 @@ def login_do(request):
 
 def signup_do(request):
     # {{{
-    username = request.POST.get('create_profile_username', None)
-    password = request.POST.get('create_profile_password', None)
-    if username and password:
-        # create a user
-        user, created = User.objects.get_or_create(username=username)
-        if not created:
-            # eep, redirect back to the front page with a message
-            return HttpResponseRedirect('/?msg=username_taken#tab=create_profile')
-        
-        # Good, set the user's parameters.
-        user.email=''
-        user.set_password(password)
-        user.save()
-        
+    # FIXME: Use Django form on homepage.
+    form = UserCreationFormWithEmail(request.POST)
+    if not form.errors:
+
+        form.save()
+
         # create a linked person
         person = Person(user=user)
         person.save()
 
         # authenticate and login
         user = django.contrib.auth.authenticate(
-                username=username, password=password)
+                username=request.POST['username'],
+                password=request.POST['password'])
         django.contrib.auth.login(request, user)
 
         # redirect to profile
-        return HttpResponseRedirect('/people/%s/' % urllib.quote(username))
-    else:
-        fail
-        # FIXME: Validate, Catch no username
+        return HttpResponseRedirect(
+                '/people/%s/' % urllib.quote(username))
     # }}}
 
 def logout(request):

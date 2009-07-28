@@ -4,11 +4,13 @@ from django.core import serializers
 from mysite.search.models import Bug, Project
 import simplejson
 from django.db.models import Q
+import account.forms
 
-# Via http://www.djangosnippets.org/snippets/1435/
 import datetime
 from dateutil import tz
 import pytz
+
+# Via http://www.djangosnippets.org/snippets/1435/
 def encode_datetime(obj):
     if isinstance(obj, datetime.date):
         fixed = datetime.datetime(obj.year, obj.month, obj.day, tzinfo=pytz.utc)
@@ -94,11 +96,14 @@ def index(request):
     elif request.GET.get('msg', None) == 'username_taken':
         signup_notification = "Your chosen username is already taken. Try another one."
         notification_id = 'username_taken'
+
+    user_creation_form = account.forms.UserCreationFormWithEmail()
     return render_to_response('search/index.html', {
         'title' : 'Welcome to OpenHatch', # FIXME: This doesn't work.
         'notification_id': notification_id,
         'login_notification': login_notification,
         'signup_notification': signup_notification,
+        'user_creation_form': user_creation_form 
         })
 
 def request_jquery_autocompletion_suggestions(request):

@@ -102,6 +102,7 @@ INSTALLED_APPS = (
     'customs',
     'consulting',
     'account',
+    'base',
 )
 
 ### HACK

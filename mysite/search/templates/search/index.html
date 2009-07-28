@@ -78,7 +78,7 @@ Welcome to OpenHatch!
                             Username
                         </label>
                         <input type='text' 
-                        name='create_profile_username' 
+                        name='username' 
                         id='create_profile_username' />
                     </div>
                     <div class='form-row'>
@@ -86,15 +86,15 @@ Welcome to OpenHatch!
                             E-mail
                         </label>
                         <input type='text' 
-                        name='create_profile_email' 
-                        id='create_profile_email' />
+                        id='create_profile_email'
+                        name='email' />
                     </div>
                     <div class='form-row'>
                         <label for='create_profile_password'>Choose your password
                             <small style='display: block;'>Coming soon: OpenID!</small></label>
                         <input type='password' 
                         id='create_profile_password'
-                        name='create_profile_password' />
+                        name='password' />
                     </div>
                     <div class='form-row'>
                         <input type='submit' style='float: right;' 
@@ -114,11 +114,11 @@ Welcome to OpenHatch!
                 {% endif %}
                 <form id='login' name='login' action='/account/login/do' method='POST'>
                     <div class='form-row'>
-                        <label for='login_username'>username</label>
+                        <label for='login_username'>Username</label>
                         <input type='text' id='login_username' name='login_username' />
                     </div>
                     <div class='form-row'>
-                        <label for='login_password'>password</label>
+                        <label for='login_password'>Password</label>
                         <input type='password' id='login_password' name='login_password' />
                     </div>
                     <div class='form-row'>
