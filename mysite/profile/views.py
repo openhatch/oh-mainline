@@ -824,6 +824,7 @@ def my_account(request):
     return render_to_response('profile/edit-self.html',
                               data)
 
+@login_required
 def change_password_do(request):
     form = django.contrib.auth.forms.PasswordChangeForm(request.user, request.POST)
     if form.is_valid():
