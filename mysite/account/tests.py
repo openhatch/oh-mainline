@@ -31,7 +31,7 @@ class Login(base.tests.TwillTests):
         url = 'http://openhatch.org/search/'
         url = make_twill_url(url)
         tc.go(url)
-        tc.follow('Log out')
+        tc.follow('log out')
         tc.find('ciao')
 
     def test_login_bad_password_web(self):
@@ -148,7 +148,7 @@ class EditPassword(base.tests.TwillTests):
     def change_password(self, old_pass, new_pass,
             should_succeed = True):
         tc.go(make_twill_url('http://openhatch.org/people/paulproteus'))
-        tc.follow('Account')
+        tc.follow('settings')
         tc.find('Change password')
         tc.fv('change_password', 'old_password',
                 old_pass)
