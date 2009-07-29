@@ -496,6 +496,7 @@ h4, .cute-header {
     float: left;
     margin: 0;
     padding: 1px;
+    width: 100px;
 }
 .project-display h5 {
     font-size: 12pt;
