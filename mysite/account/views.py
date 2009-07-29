@@ -15,17 +15,12 @@ from profile.views import get_personal_data
 
 def login(request):
     # {{{
-    notification = notification_id = None
-    if request.GET.get('msg', None) == 'oops':
-        notification_id = "oops"
-        notification = "Couldn't find that pair of username and password. "
-        notification += "Did you type your password correctly?"
-    if request.GET.get('next', None) is not None:
-        notification_id = "next"
-        notification = "You've got to be logged in to do that!"
+    notification_id = request.GET.get('msg', None)
+    notifications_dict = {'oops': "Couldn't find that pair of username and password. Did you type your password correctly?",
+            'next': "You've got to be logged in to do that!"}
+    data = {}
+    data['notifications'] = [{'id': notification_id, 'text': notifications_dict[notification_id]}]
     return render_to_response('account/login.html', {
-        'notification_id': notification_id,
-        'notification': notification,
         } )
     # }}}
 
@@ -96,10 +91,14 @@ def edit_password(request, form = None):
 
 @login_required
 def edit_password_do(request):
+    # {{{
     form = django.contrib.auth.forms.PasswordChangeForm(
             request.user, request.POST)
     if form.is_valid():
         form.save() 
-        return HttpResponseRedirect('/account/edit/')
+        return HttpResponseRedirect('/people/%s/?msg=edit_password_done' % urllib.quote(request.user.username))
     else:
         return edit_password(request, form)
+    # }}}
+
+# vim: ai ts=3 sts=4 et sw=4 nu

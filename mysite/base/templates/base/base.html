@@ -77,9 +77,19 @@
                             </div>
                         </div>
                         {% endif %}
+
                     </div>
                 </div>
                 {% endblock nav %}
+                <ul id='notifications'>
+                    {% block notifications %}
+                    {% if notifications %}
+                    {% for notification in notifications %}
+                    <li class='alert' id='{{ notification.id }}'>{{ notification.text }}</li>
+                    {% endfor %}
+                    {% endif %}
+                    {% endblock %}
+                </ul>
                 <div id='content'>
                     {% block content %}
                     {% endblock content %}

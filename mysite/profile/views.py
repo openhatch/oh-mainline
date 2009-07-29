@@ -193,6 +193,11 @@ def display_person_web(request, user_to_display__username=None):
     data['title'] = 'openhatch / %s' % user.username
     data['edit_mode'] = False
     data['editable'] = (request.user == user)
+    notification_id = request.GET.get('msg', None)
+    notifications_dict = {'edit_password_done': 'Your password has been changed.'}
+    data['notifications'] = []
+    if notification_id in notifications_dict.keys():
+         data['notifications'].append({'id': notification_id, 'text': notifications_dict[notification_id]})
 
     return render_to_response('profile/main.html', data)
 

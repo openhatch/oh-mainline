@@ -776,3 +776,17 @@ abbr.foss {
 #middle .notification {
     width: 450px;
 }
+.errorlist ul {
+    float: left;
+    margin: 0;
+    padding: 0;
+}
+.errorlist li {
+    float: left;
+    padding: 5px 10px;
+    width: 410px;
+    color: #522;
+    background-color: #ffe4e4;
+    margin: 10px 0;
+    -moz-border-radius: 5px;
+}
