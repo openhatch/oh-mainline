@@ -123,3 +123,6 @@ cooked_data_password = 'AXQaTjp3'
 AUTH_PROFILE_MODULE = "profile.Person"
 
 LOGIN_URL = '/people/login/'
+
+OHLOH_API_KEY='JeXHeaQhjXewhdktn4nUw' # "Oman testing"
+
