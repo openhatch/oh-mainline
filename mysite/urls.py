@@ -40,6 +40,12 @@ urlpatterns = patterns('',
         (r'^people/project_icon/(?P<project_name>.*)$',
             'mysite.profile.views.project_icon_web'),
 
+        (r'^my-account$',
+            'mysite.profile.views.my_account'),
+
+        (r'^change-password/do$',
+            'mysite.profile.views.change_password_do'),
+
         (r'^form/projectexp_add$',
             'mysite.profile.views.projectexp_add_form'),
 
