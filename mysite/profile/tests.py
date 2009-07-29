@@ -1,89 +1,37 @@
-# -*- coding: utf-8 -*-
-# vim: set ai et ts=4 sw=4 nu:
-# Testing suite for profile
-
 # Imports {{{
+import base.tests
+from base.tests import make_twill_url
+
 from search.models import Project
 from profile.models import Person, ProjectExp, Tag, TagType, Link_Person_Tag, Link_ProjectExp_Tag, DataImportAttempt
+
 import profile.views
+
 import settings
+
 from customs import ohloh 
 
 import re
-import twill
-from twill import commands as tc
-from twill.shell import TwillCommandLoop
-import django.test
-from django.test import TestCase
-from django.core.servers.basehttp import AdminMediaHandler
-from django.core.handlers.wsgi import WSGIHandler
 from StringIO import StringIO
 import urllib
 import simplejson
 import BeautifulSoup
 import time
-from django.core import management
-
-from django.test.client import Client
 import tasks 
+import mock
+
+import django.test
+from django.core import management
+from django.test.client import Client
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
-import mock
+
+import twill
+from twill import commands as tc
+from twill.shell import TwillCommandLoop
 # }}}
 
-# FIXME: Later look into http://stackoverflow.com/questions/343622/how-do-i-submit-a-form-given-only-the-html-source
-
-# Functions you'll need: {{{
-def twill_setup():
-    app = AdminMediaHandler(WSGIHandler())
-    twill.add_wsgi_intercept("127.0.0.1", 8080, lambda: app)
-
-def twill_teardown():
-    twill.remove_wsgi_intercept('127.0.0.1', 8080)
-
-def make_twill_url(url):
-    # modify this
-    return url.replace("http://openhatch.org/", "http://127.0.0.1:8080/")
-
-def twill_quiet():
-    # suppress normal output of twill.. You don't want to
-    # call this if you want an interactive session
-    twill.set_output(StringIO())
-# }}}
-
-class TwillTests(django.test.TestCase):
-    '''Some basic methods needed by other testing classes.'''
-    # {{{
-    def setUp(self):
-        twill_setup()
-        twill_quiet()
-
-    def tearDown(self):
-        twill_teardown()
-
-    def login_with_twill(self):
-        # Visit login page
-        login_url = 'http://openhatch.org/people/login'
-        tc.go(make_twill_url(login_url))
-
-        # Log in
-        username = "paulproteus"
-        password = "paulproteus's unbreakable password"
-        tc.fv('login', 'login_username', username)
-        tc.fv('login', 'login_password', password)
-        tc.submit()
-
-    def login_with_client(self):
-        client = Client()
-        username='paulproteus'
-        password="paulproteus's unbreakable password"
-        client.login(username=username,
-                     password=password)
-        return client
-
-    # }}}
-
-class ProfileTests(TwillTests):
+class ProfileTests(base.tests.TwillTests):
     # {{{
     fixtures = ['user-paulproteus', 'person-paulproteus',
             'cchost-data-imported-from-ohloh']
@@ -163,7 +111,7 @@ class ProfileTests(TwillTests):
 
     # }}}
 
-class DebTagsTests(TwillTests):
+class DebTagsTests(base.tests.TwillTests):
     # {{{
 
     def testAddOneDebtag(self):
@@ -178,11 +126,11 @@ class DebTagsTests(TwillTests):
                          set(['works-with::mail', 'protocol::smtp']))
     # }}}
 
-#class ExpTag(TwillTests):
+#class ExpTag(base.tests.TwillTests):
 
 # If you're looking for SourceForge and FLOSSMole stuff, look in the repository history.
 
-class PersonTabProjectExpTests(TwillTests):
+class PersonTabProjectExpTests(base.tests.TwillTests):
     # {{{
     fixtures = ['user-paulproteus', 'person-paulproteus', 'cchost-data-imported-from-ohloh']
 
@@ -194,7 +142,7 @@ class PersonTabProjectExpTests(TwillTests):
         # }}}
     # }}}
 
-class ProjectExpTests(TwillTests):
+class ProjectExpTests(base.tests.TwillTests):
     # {{{
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry',
             'person-paulproteus', 'cchost-data-imported-from-ohloh']
@@ -430,7 +378,7 @@ class MockFetchPersonDataFromOhloh(object):
         task = MockFetchPersonDataFromOhloh.real_task_class()
         task.run(*args, **kwargs)
 
-class CeleryTests(TwillTests):
+class CeleryTests(base.tests.TwillTests):
     # {{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -561,7 +509,7 @@ class CeleryTests(TwillTests):
 
     # }}}
 
-class UserListTests(TwillTests):
+class UserListTests(base.tests.TwillTests):
     # {{{
     fixtures = [ 'user-paulproteus', 'person-paulproteus',
             'user-barry', 'person-barry']
@@ -584,96 +532,7 @@ class UserListTests(TwillTests):
         tc.follow('Find other folks on OpenHatch')
     # }}}
 
-class AuthTests(TwillTests):
-    # {{{
-    fixtures = ['user-paulproteus', 'person-paulproteus']
-    
-    def test_login(self):
-        user = authenticate(username='paulproteus',
-                password="paulproteus's unbreakable password")
-        self.assert_(user and user.is_active)
-
-    def test_login_web(self):
-        url = 'http://openhatch.org/'
-        url = make_twill_url(url)
-        tc.go(url)
-        tc.fv('login','login_username',"paulproteus")
-        tc.fv('login','login_password',"paulproteus's unbreakable password")
-        tc.submit()
-        tc.find('paulproteus')
-
-    def test_logout_web(self):
-        self.test_login_web()
-        url = 'http://openhatch.org/search/'
-        url = make_twill_url(url)
-        tc.go(url)
-        tc.follow('Log out')
-        tc.find('ciao')
-
-    def test_login_bad_password_web(self):
-        url = 'http://openhatch.org/'
-        url = make_twill_url(url)
-        tc.go(url)
-        tc.fv('login','login_username',"paulproteus")
-        tc.fv('login','login_password',"not actually paulproteus's unbreakable password")
-        tc.submit()
-        tc.find("oops")
-    # }}}
-
-class SetAPasswordTests(TwillTests):
-    # {{{
-    fixtures = ['user-paulproteus', 'person-paulproteus',
-            'cchost-data-imported-from-ohloh']
-    username = 'ziggy'
-    password = "ziggy's impregnable passkey"
-
-    def test_create_user_from_front_page(self):
-        """This test:
-        * Creates a new user
-        * Verifies that we are at ziggy's profile page"""
-        tc.go(make_twill_url('http://openhatch.org/'))
-        tc.fv('create_profile', 'create_profile_username', self.username)
-        tc.fv('create_profile', 'create_profile_password', self.password)
-        tc.submit()
-        # Should be at ziggy's profile.
-        tc.find(self.username)
-        tc.find('profile')
-
-    def test_create_duplicate_user_from_front_page(self):
-        # The fixtures show that we have paulproteus already
-        # registered
-        tc.go(make_twill_url('http://openhatch.org/'))
-        duplicated_username='paulproteus'
-        nondup_username='paulproteus2'
-        password='new password'
-        tc.fv('create_profile', 'create_profile_username', duplicated_username)
-        tc.fv('create_profile', 'create_profile_password', password)
-        tc.submit()
-        # Should be back at the front page, with a message
-        # saying that you need to pick a different username.
-        tc.find('username_taken')
-        tc.fv('create_profile', 'create_profile_username', nondup_username)
-        tc.fv('create_profile', 'create_profile_password', password)
-        tc.submit()
-        tc.find(nondup_username)
-
-    def test_signup_on_front_page_lets_person_sign_back_in(self):
-        ''' The point of this test is to:
-        * Create the account for ziggy
-        * Log out
-        * Log back in as him '''
-        self.test_create_user_from_front_page()
-        tc.follow('logout')
-        tc.go(make_twill_url('http://openhatch.org/'))
-        tc.fv('login', 'login_username', self.username)
-        tc.fv('login', 'login_password', self.password)
-        tc.submit()
-        # Should be back at ziggy's profile
-        tc.find(self.username)
-        tc.find('profile')
-    # }}}
-
-class ImportContributionsTests(TwillTests):
+class ImportContributionsTests(base.tests.TwillTests):
     """ """
     # {{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
@@ -843,3 +702,5 @@ class ImportContributionsTests(TwillTests):
         #}}}
 
     # }}}
+
+# vim: set ai et ts=4 sw=4 nu:

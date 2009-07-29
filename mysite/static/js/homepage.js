@@ -7,7 +7,6 @@ if (typeof $ == 'undefined') {
 var abstractTabLinkClickHandler = function (link) {
     $('.tab-links a').addClass('my-tab-is-hidden');
     $(link).removeClass('my-tab-is-hidden');
-    console.log("tablinkclickhandler's this = ", $(link));
     $('.tab').addClass('invisible_if_js');
     var tab_selector = $(link).attr('tab_selector');
     $(tab_selector).removeClass('invisible_if_js');

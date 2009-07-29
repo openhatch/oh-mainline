@@ -1,4 +1,4 @@
-{% extends 'profile/base.html' %}
+{% extends 'base/base.html' %}
 
 {% block title %}
 Welcome to OpenHatch!
@@ -54,9 +54,9 @@ Welcome to OpenHatch!
     </div>
     <div id='account-related' class='tab-links'>
         <ul>
-            <li><a href="/people/signup" class='visible_iff_js'
+            <li><a href="#create_profile" class='visible_iff_js'
                 tab_selector="#create_profile">Sign up</a></li>
-            <li><a href="/people/login"
+            <li><a href="/account/login"
                 class='visible_iff_js my-tab-is-hidden'
                 tab_selector="#login">Log in</a></li>
         </ul>
@@ -72,22 +72,20 @@ Welcome to OpenHatch!
                 <!-- notification_id: {{ notification_id }} -->
                 {% endif %}
                 <form id='create_profile' name='create_profile'
-                    action='/people/new/do' method='POST'>
+                    action='/account/signup/do' method='POST'>
+                    {% for field in signup_form %}
+                    {% ifnotequal field.html_name "password2" %}
                     <div class='form-row'>
-                        <label for='create_profile_username'>
-                            Username
-                        </label>
-                        <input type='text' 
-                        name='create_profile_username' 
-                        id='create_profile_username' />
+                        {% if field.errors %}
+                        <div class='field-errors'>
+                            {{ field.errors }}
+                        </div>
+                        {% endif %}
+                        {{ field.label_tag }}
+                        {{ field }}
                     </div>
-                    <div class='form-row'>
-                        <label for='create_profile_password'>Choose your password
-                            <small style='display: block;'>Coming soon: OpenID!</small></label>
-                        <input type='password' 
-                        id='create_profile_password'
-                        name='create_profile_password' />
-                    </div>
+                    {% endifnotequal %}
+                    {% endfor %}
                     <div class='form-row'>
                         <input type='submit' style='float: right;' 
                         value='begin!' />
@@ -104,13 +102,13 @@ Welcome to OpenHatch!
                 {% if notification_id %}
                 <!-- notification_id: {{ notification_id }} -->
                 {% endif %}
-                <form id='login' name='login' action='/people/login/do' method='POST'>
+                <form id='login' name='login' action='/account/login/do' method='POST'>
                     <div class='form-row'>
-                        <label for='login_username'>username</label>
+                        <label for='login_username'>Username</label>
                         <input type='text' id='login_username' name='login_username' />
                     </div>
                     <div class='form-row'>
-                        <label for='login_password'>password</label>
+                        <label for='login_password'>Password</label>
                         <input type='password' id='login_password' name='login_password' />
                     </div>
                     <div class='form-row'>

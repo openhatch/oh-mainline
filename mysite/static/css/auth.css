@@ -1,0 +1,46 @@
+form {
+    margin-bottom: 10px;
+    float: left;
+    width: 478px;
+}
+.form-row {
+    float: left;
+    width: 400px;
+}
+label {
+    float: left;
+    width: 130px;
+    padding: 12px 12px 12px 0;
+    margin-right: 10px;
+    font-size: 12pt;
+}
+input[type='text'], input[type='password'] {
+    padding: 10px;
+    float: left;
+    width: 220px;
+}
+input[type='submit'] {
+    padding: 7px;
+    font-size: 12pt;
+    float: right;
+}
+.account-dialog {
+    float: left;
+    width: 460px;
+}
+.account-dialog form {
+    margin-bottom: 10px;
+    float: left;
+    width: 460px;
+}
+
+#login .text, #signup .text {
+    font-size: .7em;
+    width: 100px;
+    margin-right: 6px;
+}
+
+#login .button, #signup .button {
+    font-size: .7em;
+    margin: -17px 6px 0 0;
+}

@@ -101,6 +101,8 @@ INSTALLED_APPS = (
     'profile',
     'customs',
     'consulting',
+    'account',
+    'base',
 )
 
 ### HACK
@@ -122,7 +124,7 @@ AMQP_VHOST = "localhost"
 cooked_data_password = 'AXQaTjp3'
 AUTH_PROFILE_MODULE = "profile.Person"
 
-LOGIN_URL = '/people/login/'
+LOGIN_URL = '/account/login/'
 
 OHLOH_API_KEY='JeXHeaQhjXewhdktn4nUw' # "Oman testing"
 

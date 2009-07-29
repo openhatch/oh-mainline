@@ -556,67 +556,6 @@ def display_list_of_people(request):
         })
     # }}}
 
-def login_do(request):
-    #{{{
-    try:
-        username = request.POST['login_username']
-        password = request.POST['login_password']
-    except KeyError:
-        return HttpResponseServerError("Missing username or password.")
-    user = django.contrib.auth.authenticate(
-            username=username, password=password)
-    if user is not None:
-        django.contrib.auth.login(request, user)
-        return HttpResponseRedirect('/people/%s' % urllib.quote(username))
-    else:
-        return HttpResponseRedirect('/people/login/?msg=oops')
-    #}}}
-
-def login(request):
-    #{{{
-    notification = notification_id = None
-    if request.GET.get('msg', None) == 'oops':
-        notification_id = "oops"
-        notification = "Couldn't find that pair of username and password. "
-        notification += "Did you type your password correctly?"
-    if request.GET.get('next', None) is not None:
-        notification_id = "next"
-        notification = "You've got to be logged in to do that!"
-    return render_to_response('profile/login.html', {
-        'notification_id': notification_id,
-        'notification': notification,
-        } )
-    #}}}
-
-def logout(request):
-    #{{{
-    django.contrib.auth.logout(request)
-    return HttpResponseRedirect("/?msg=ciao#tab=login")
-    #}}}
-
-def signup(request):
-    #{{{
-    return render_to_response("profile/signup.html", {'user': request.user} )
-    #}}}
-
-def signup_do(request):
-    # {{{
-    password_raw = request.POST.get('login-password', None)
-    if password_raw:
-        request.user.set_password(password_raw)
-        request.user.save()
-
-        # From <http://docs.djangoproject.com/en/1.0/topics/auth/#storing-additional-information-about-users>
-        # The method get_profile() does not create the profile, if it does not exist.
-        # You need to register a handler for the signal django.db.models.signals.post_save
-        # on the User model, and, in the handler, if created=True, create the associated user profile.
-
-        #FIXME: Catch bad (e.g., blank) passwords.
-    else:
-        fail
-    return HttpResponseRedirect("/people/%s" % urllib.quote(request.user.username))
-    # }}}
-
 def gimme_json_that_says_that_commit_importer_is_done(request):
     ''' This web controller is called when you want JSON that tells you 
     if the background jobs for the logged-in user have finished.
@@ -641,38 +580,6 @@ def import_do(request):
     # and then just redirect to the profile page
     return HttpResponseRedirect('/people/%s' % urllib.quote(
             request.user.username))
-    # }}}
-
-def new_user_do(request):
-# {{{
-    username = request.POST.get('create_profile_username', None)
-    password = request.POST.get('create_profile_password', None)
-    if username and password:
-        # create a user
-        user, created = User.objects.get_or_create(username=username)
-        if not created:
-            # eep, redirect back to the front page with a message
-            return HttpResponseRedirect('/?msg=username_taken#tab=create_profile')
-        
-        # Good, set the user's parameters.
-        user.email=''
-        user.set_password(password)
-        user.save()
-        
-        # create a linked person
-        person = Person(user=user)
-        person.save()
-
-        # authenticate and login
-        user = django.contrib.auth.authenticate(
-                username=username, password=password)
-        django.contrib.auth.login(request, user)
-
-        # redirect to profile
-        return HttpResponseRedirect('/people/%s/' % urllib.quote(username))
-    else:
-        fail
-        # FIXME: Validate, Catch no username
     # }}}
 
 @login_required

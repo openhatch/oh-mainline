@@ -8,27 +8,24 @@ admin.autodiscover()
 urlpatterns = patterns('',
         # FIXME: Automatically remove trailing slashes from input URLs,
         # and remove trailing slashes from the urls below.
-        (r'^$', 'mysite.search.views.index'),
+        (r'^$', 'mysite.base.views.homepage'),
         (r'^search/$', 'mysite.search.views.fetch_bugs'),
         (r'^admin/(.*)', admin.site.root),
         (r'^static/(?P<path>.*)$', 'django.views.static.serve',
             {'document_root': settings.STATIC_DOC_ROOT}),
         (r'^people/$', 'mysite.profile.views.display_list_of_people'),
 
-        (r'^people/login/$', 'mysite.profile.views.login'),
-        (r'^people/login/do$', 'mysite.profile.views.login_do'),
-        (r'^people/logout/$', 'mysite.profile.views.logout'),
-        (r'^people/signup/$', 'mysite.profile.views.signup'),
-        (r'^people/signup/do$', 'mysite.profile.views.signup_do'),
+        (r'^account/login/$', 'mysite.account.views.login'),
+        (r'^account/logout/$', 'mysite.account.views.logout'),
+
+        (r'^account/login/do$', 'mysite.account.views.login_do'),
+        (r'^account/signup/do$', 'mysite.account.views.signup_do'),
 
         #Karen messes around with templates
         (r'^jobs/$', 
             'mysite.consulting.views.search'),
         (r'^jobs/(?P<query>.*)/$',
             'mysite.consulting.views.list'),
-
-        # FIXME: Either this or signup_do is dead code.
-        (r'^people/new/do$', 'mysite.profile.views.new_user_do'),
 
         (r'^people/delete-experience/do$',
          'mysite.profile.views.delete_experience_do'),
@@ -41,6 +38,12 @@ urlpatterns = patterns('',
 
         (r'^people/project_icon/(?P<project_name>.*)$',
             'mysite.profile.views.project_icon_web'),
+
+        (r'^account/edit/password/$',
+            'mysite.account.views.edit_password'),
+
+        (r'^account/edit/password/do$',
+            'mysite.account.views.edit_password_do'),
 
         (r'^form/projectexp_add$',
             'mysite.profile.views.projectexp_add_form'),
