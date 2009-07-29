@@ -148,7 +148,7 @@ class EditPassword(base.tests.TwillTests):
     def change_password(self, old_pass, new_pass,
             should_succeed = True):
         tc.go(make_twill_url('http://openhatch.org/people/paulproteus'))
-        tc.follow('account')
+        tc.follow('settings')
         tc.find('Change password')
         tc.fv('change_password', 'old_password',
                 old_pass)
