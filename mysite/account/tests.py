@@ -31,7 +31,7 @@ class Login(base.tests.TwillTests):
         url = 'http://openhatch.org/search/'
         url = make_twill_url(url)
         tc.go(url)
-        tc.follow('Log out')
+        tc.follow('log out')
         tc.find('ciao')
 
     def test_login_bad_password_web(self):
