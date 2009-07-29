@@ -490,6 +490,7 @@ h3 {
     margin-bottom: 10px;
 }
 h4, .cute-header {
+    width: 900px; /* infinity */
     font-size: 9pt;
     color: #666;
     float: left;
