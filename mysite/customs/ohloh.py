@@ -4,6 +4,7 @@ import sys, urllib, hashlib
 import urllib2
 import cStringIO as StringIO
 from urllib2 import HTTPError
+from django.conf import settings
 
 def uni_text(s):
     if type(s) == unicode:
@@ -16,8 +17,6 @@ import re
 
 from typecheck import accepts, returns
 from typecheck import Any as __
-
-API_KEY='JeXHeaQhjXewhdktn4nUw' # "Oman testing"
 
 def mechanize_get(url, referrer=None, attempts_remaining=6):
     b = mechanize.Browser()
@@ -43,7 +42,10 @@ def mechanize_get(url, referrer=None, attempts_remaining=6):
 
     return b
 
-def ohloh_url2data(url, selector, params = {}, many = False):
+def ohloh_url2data(url, selector, params = {}, many = False, API_KEY = None):
+    if API_KEY is None:
+        API_KEY = settings.OHLOH_API_KEY
+
     my_params = {'api_key': API_KEY}
     my_params.update(params)
     params = my_params ; del my_params
