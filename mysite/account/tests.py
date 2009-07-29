@@ -43,7 +43,7 @@ class Login(base.tests.TwillTests):
 
 class Signup(base.tests.TwillTests):
     # {{{
-    fixtures = ['profile/user-paulproteus', 'profile/person-paulproteus']
+    fixtures = ['user-paulproteus', 'person-paulproteus']
 
     username = 'ziggy'
     email = 'ziggy@zig.gy'
@@ -53,7 +53,7 @@ class Signup(base.tests.TwillTests):
         """This test:
         * Creates a new user
         * Verifies that we are at ziggy's profile page"""
-        base.tests.signup_with_twill(
+        self.signup_with_twill(
                 self.username, self.email, self.password)
         # Should be at ziggy's profile.
         tc.find(self.username)
@@ -63,15 +63,17 @@ class Signup(base.tests.TwillTests):
         # The fixtures show that we have paulproteus already
         # registered
         duplicated_username='paulproteus'
-        nondup_username='paulproteus2'
         email='pp@openhatch.org'
         password='new password'
-        self.twill_signup(duplicated_username, email, password)
-        # Should be back at the front page, with a message
-        # saying that you need to pick a different username.
-        tc.find('username_taken')
-        self.twill_signup(nondup_username, email, password)
-        tc.find(nondup_username)
+
+        # There's already somebody with this username.
+        User.objects.get(username=duplicated_username)
+
+        # Try to sign up.
+        self.signup_with_twill(duplicated_username, email, password)
+
+        # Assert there's still only one user with this username.
+        User.objects.get(username=duplicated_username)
 
     def test_signup_on_front_page_lets_person_sign_back_in(self):
         ''' The point of this test is to: * Create the account for ziggy * Log out * Log back in as him '''
@@ -102,39 +104,38 @@ class Signup(base.tests.TwillTests):
         # Still false! You need an email address.
         self.assertFalse(list(
             Person.objects.filter(user__username=username)))
-        tc.find('need_email')
         # }}}
 
-    def sign_up_with_email(self, email_address):
+    def signup_with_email(self, email):
         # {{{
         # Verify there is no user named newuser
         username = 'newuser'
-        email = 'new@us.er'
         password = 'password'
         self.assertFalse(list(
             Person.objects.filter(user__username=username)))
 
         # Try to create one (with email address)
-        self.twill_signup(username, email, password)
+        self.signup_with_twill(username, email, password)
 
-        users = list(User.objects.filter(username=username))
-        return users
-
-        #}}}
+        try:
+            return User.objects.get(username=username)
+        except User.DoesNotExist:
+            return None
+        # }}}
 
     def test_signup_with_good_email_address(self):
         # {{{
         email_address = 'good@email.com'
-        users = self.sign_up_with_email(email_address)
-        self.assert_(users)
-        self.assertEqual(users[0].email, email_address)
+        user = self.signup_with_email(email_address)
+        self.assert_(user)
+        self.assertEqual(user.email, email_address)
         # }}}
 
     def test_signup_with_bad_email_address(self):
         # {{{
         email_address = 'ThatsNoEmailAddress!'
-        users = self.sign_up_with_email(email_address)
-        self.assertFalse(users)
+        user = self.signup_with_email(email_address)
+        self.assertFalse(user)
         # }}}
 
     # }}}
