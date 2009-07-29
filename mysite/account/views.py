@@ -3,12 +3,14 @@ from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerEr
 from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404
 import django.contrib.auth 
 from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 
 import urllib
 
 import account.forms
 import base.views
 from profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag, Link_Project_Tag, Link_SF_Proj_Dude_FM, Link_Person_Tag, DataImportAttempt
+from profile.views import get_personal_data
 # }}}
 
 def login(request):
@@ -49,7 +51,7 @@ def signup_do(request):
     post.update(dict(request.POST.items()))
     post['password2'] = post['password1'] 
     signup_form = account.forms.UserCreationFormWithEmail(post)
-    if not signup_form.errors:
+    if signup_form.is_valid():
 
         user = signup_form.save()
 
@@ -79,3 +81,25 @@ def logout(request):
     django.contrib.auth.logout(request)
     return HttpResponseRedirect("/?msg=ciao#tab=login")
     # }}}
+
+@login_required
+def edit_password(request, form = None):
+    data = get_personal_data(
+            request.user.get_profile())
+    data['the_user'] = request.user
+    if form is None:
+        data['passwordchangeform'] = django.contrib.auth.forms.PasswordChangeForm({})
+    else:
+        data['passwordchangeform'] = form
+    return render_to_response('account/edit_password.html',
+                              data)
+
+@login_required
+def edit_password_do(request):
+    form = django.contrib.auth.forms.PasswordChangeForm(
+            request.user, request.POST)
+    if form.is_valid():
+        form.save() 
+        return HttpResponseRedirect('/account/edit/')
+    else:
+        return edit_password(request, form)

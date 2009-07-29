@@ -2,7 +2,7 @@ form {
     margin-bottom: 10px;
     float: left;
     width: 478px;
-    }
+}
 .form-row {
     float: left;
     width: 400px;
@@ -24,9 +24,14 @@ input[type='submit'] {
     font-size: 12pt;
     float: right;
 }
-#login, #signup {
+.account-dialog {
     float: left;
-    width: 960px;
+    width: 460px;
+}
+.account-dialog form {
+    margin-bottom: 10px;
+    float: left;
+    width: 460px;
 }
 
 #login .text, #signup .text {

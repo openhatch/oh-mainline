@@ -17,7 +17,6 @@ urlpatterns = patterns('',
 
         (r'^account/login/$', 'mysite.account.views.login'),
         (r'^account/logout/$', 'mysite.account.views.logout'),
-        (r'^account/edit/$', 'mysite.account.views.account_edit'),
 
         (r'^account/login/do$', 'mysite.account.views.login_do'),
         (r'^account/signup/do$', 'mysite.account.views.signup_do'),
@@ -40,11 +39,11 @@ urlpatterns = patterns('',
         (r'^people/project_icon/(?P<project_name>.*)$',
             'mysite.profile.views.project_icon_web'),
 
-        (r'^my-account$',
-            'mysite.profile.views.my_account'),
+        (r'^account/edit/password/$',
+            'mysite.account.views.edit_password'),
 
-        (r'^change-password/do$',
-            'mysite.profile.views.change_password_do'),
+        (r'^account/edit/password/do$',
+            'mysite.account.views.edit_password_do'),
 
         (r'^form/projectexp_add$',
             'mysite.profile.views.projectexp_add_form'),

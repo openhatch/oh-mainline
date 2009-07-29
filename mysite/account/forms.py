@@ -7,8 +7,8 @@ class UserCreationFormWithEmail(django.contrib.auth.forms.UserCreationForm):
         help_text = "Please pick a username, of 30 characters or fewer. Stick to letters, digits and underscores.",
         error_messages = {'invalid': "Stick to letters, digits and underscores.", 'required': "Gotta pick a username!"})
     email = django.forms.EmailField(error_messages={
-        'required': "Your email address required. We promise to use it respectfully.",
-        'invalid': "This email address looks fishy. Is it real?"})
+        'required': "Your email address is required. We promise to use it respectfully.",
+        'invalid': "This email address looks fishy. Real, or malarkey?"})
     class Meta:
         model = django.contrib.auth.models.User
         fields = ('username', 'email', 'password1')
