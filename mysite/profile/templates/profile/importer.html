@@ -1,8 +1,10 @@
 {% extends 'profile/base_profile.html' %}
 
 {% block title %}
-Import your contributions from around the web
+Import your contributions from around the web | OpenHatch
 {% endblock title %}
+
+{% block more_css %}@import url('/static/css/importer.css') all;{% endblock more_css %}
 
 {% block main %}
 <div id='importer' class='module'>
@@ -17,40 +19,6 @@ Import your contributions from around the web
             <form name='import' method='POST'
                 action='{% url mysite.profile.views.import_do %}'>
                 <table>
-                    {% for query in queries %}
-                    <tr>
-                        <td class='username'>
-                            <span>{{ query.identifier }}</span>
-                        </td>
-                        {% for dia in query.data_import_attempts %}
-                        {% with dia.person_wants_data__post_key as input_id %}
-                        <td>
-                            <input type='checkbox' checked class='selected'
-                            id='{{ input_id }}' name='{{ input_id }}' />
-                            <label for='{{ input_id }}'>
-                                {{ s.get_source_display }}
-                            </label>
-                        </td>
-                        {% endwith %}
-                        {% endfor %}
-                    </tr>
-                    {% endfor %}
-                    {% if blank_query %}
-                    <tr>
-                        <td class='username'>
-                            <input type='text' />
-                        </td>
-                        {% for checkbox in blank_query.checkboxes %}
-                        <td class='selected'>
-                            <input type='checkbox' checked 
-                            id='{{ checkbox.id }}' name='{{ checkbox.id }}' />
-                            <label for='{{ checkbox.id }}'>
-                                {{ checkbox.label }}
-                            </label>
-                        </td>
-                        {% endfor %}
-                    </tr>
-                    {% endif %}
                 </table>
             </form>
         </div>

@@ -63,7 +63,8 @@ var getStrings = function(schema, dictionaries) {
         var str = schema;
         for (var mapFrom in dictionary) {
             var mapTo = dictionary[mapFrom];
-            str = str.replace(mapFrom, mapTo);
+            mapFrom = mapFrom.replace("$", "\\$");
+            str = str.replace(new RegExp(mapFrom, "g"), mapTo);
         }
         strings.push(str);
     }
@@ -73,34 +74,33 @@ var getStrings = function(schema, dictionaries) {
 var makeNewInput = function() {
     var $table = $('.input table');
     var index = $('.input tr').size();
-    var row1 = "<tr id='query_$INDEX' class='query'>";
-    row1 += "<td class='username'><input type='text' /></td>";
-
-    var row2 = "<tr id='status_$INDEX' class='status'>";
-    row2 += "<td style='visibility: hidden;'></td>";
+    var html = "<tr id='query_$INDEX' class='query'>";
+    html += "<td class='username'><input type='text' /></td>";
 
     var sourceDictionaries = [
         {'$ID': 'rs', '$LABEL': 'All repositories'},
-        {'$ID': 'ou', '$LABEL': 'Ohloh'},
-        {'$ID': 'lp', '$LABEL': 'Launchpad'},
+        {'$ID': 'ou', '$LABEL': 'Ohloh',
+            '$IMGFILENAME': 'ohloh.png'},
+        {'$ID': 'lp', '$LABEL': 'Launchpad',
+            '$IMGFILENAME': 'launchpad.png'},
     ];
 
-    var checkboxTDSchema = "<td class='selected'>"
+    var checkboxTDSchema = "<td class='checkbox_or_status selected'>"
         + "<input type='checkbox' checked "
         + "name='checkbox_$INDEX_$ID' "
         + "id='checkbox_$INDEX_$ID' />"
-        + "<label for='checkbox_$INDEX_$ID'>$LABEL</label>"
+        + "</td>"
+        + "<td class='data_source selected'>"
+        + "<label for='checkbox_$INDEX_$ID'>"
+        + "<img src='/static/images/icons/data-sources/$IMGFILENAME' "
+        + "alt='$LABEL' />"
+        + "</label>"
         + "</td>";
 
-    var statusTDSchema = "<td class='$ID'>&nbsp;</td>";
+    html += getStrings(checkboxTDSchema, sourceDictionaries).join("\n");
+    html += "</tr>";
+    html = html.replace(/\$INDEX/g, index);
 
-    row1 += getStrings(checkboxTDSchema, sourceDictionaries).join("\n");
-    row1 += "</tr>";
-    row1 = row1.replace(/\$INDEX/, index);
-
-    row2 += getStrings(statusTDSchema, sourceDictionaries).join("\n");
-    row2 += "</tr>";
-    html = row1 + row2;
     $(html).appendTo($table);
 };
 
@@ -128,8 +128,8 @@ var diaCheckboxChangeHandler = function() {
 };
 
 $.fn.hoverClass = function(className) {
-    var mouseoverHandler = function() { this.addClass(className); };
-    var mouseoutHandler = function() { this.removeClass(className); };
+    var mouseoverHandler = function() { $(this).addClass(className); };
+    var mouseoutHandler = function() { $(this).removeClass(className); };
     return this.hover(mouseoutHandler, mouseoutHandler);
 };
 
@@ -238,3 +238,6 @@ var bindSubmitButtonClickHandler = function() {
 };
 
 $(bindSubmitButtonClickHandler);
+
+// Create first blank row of input table.
+$(makeNewInput);

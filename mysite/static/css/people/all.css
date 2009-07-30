@@ -4,15 +4,12 @@ body {
     margin: 0;
     padding: 0;
 }
-#like-everything-jeez {
-    min-height: 100%;
-    height: auto;
-    background: url("/static/images/motif.png");
-}
+
 a {
     color: #66AA33;
     text-decoration: none;
 }
+
 a:hover {
     color: #338800;
     text-decoration: underline;
@@ -31,20 +28,25 @@ h1 a:hover {
     color: #223366;
     text-decoration: none;
 }
+
 .module {
     float: left;
     margin-bottom: 15px;
-    border-top: 2px solid #bfe2ff;
     background-color: #f4f4f4;
+    border-bottom: 1px solid #f4f4f4;
 }
+
 .module-header {
+    border-top: 2px solid #bfe2ff;
     float: left;
     border-bottom: 1px solid #eee;
 }
+
 .module-header h3 {
     padding: 15px 20px;
     color: #222;
 }
+
 .module-content {
     float: left;
     background-color: #fff;
@@ -309,9 +311,15 @@ img.show-more-link {
     width: 220px;
     float: left;
 }
-#main, #main .module-content, #main .module-header {
+#main {
+}
+#main,  #main .module-header {
     float: left;
-    width: 706px;
+    width: 745px;
+}
+#main .module-content {
+    margin-left: 1px;
+    width: 703px;
 }
 #portfolio .module-content {
     width: 740px;
@@ -625,6 +633,7 @@ ul#contributors li span {
 #avatar {
     width: 200px;
     padding: 0;
+    border: 0;
 }
 #avatar img {
     float: left;
@@ -657,73 +666,6 @@ ul#contributors li span {
 input[type='submit'] {
     color: #333;
     float: right;
-}
-#importer {
-    float: left;
-}
-#importer form .cute-header {
-    width: 400px;
-}
-#importer input[type='text'] {
-    width: 180px;
-    font-size: 10pt;
-}
-#importer input[type='submit'] {
-    float: right;
-}
-#importer .input {
-    float: left;
-    width: 680px;
-}
-#importer .input table {
-    width: 680px;
-}
-#importer .input td {
-    border: 1px solid #ddd;
-    border-spacing: 0;
-    width: 160px;
-    padding: 5px;
-    border-top: 2px solid #ddd; 
-}
-#importer .input td.username,
-#importer .input td.email {
-    padding: 5px;
-    width: 200px;
-}
-#importer .input td.username span,
-#importer .input td.email span {
-    padding: 5px;
-    float: left;
-}
-#importer .input td.selected {
-    background-color: #ffffe4;
-    border-top-color: orange;
-}
-#importer td label {
-}
-#importer .data_import_attempts {
-    float: left;
-    width: 200px;
-}
-#importer li {
-    float: left;
-    margin-top: 10px;
-}
-#importer input[type='checkbox'] {
-    float: left;
-    width: 30px;
-    margin-right: 10px;
-}
-#importer .data_import_status {
-    float: left;
-    width: 32px;
-}
-#importer p {
-    margin: 0;
-    margin-bottom: 10px;
-}
-#importer span {
-    font-weight: bold;
 }
 #info a.edit {
     font-size: 8pt;
