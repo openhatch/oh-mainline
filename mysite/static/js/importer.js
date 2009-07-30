@@ -4,12 +4,6 @@ var askServerToBeginQuerying = function () {
     console.log('Query add');
 }
 
-var bindQueryTextInputChangeHandler = function() {
-}
-
-var updateInputTableInLightOfNewQuery = function() {
-}
-
 var getStrings = function(schema, dictionaries) {
     /* Returns an array of strings.
      * Each string is `schema' saturated with the mappings
@@ -102,9 +96,12 @@ var makeNewInput = function() {
     html = html.replace(/\$INDEX/g, index);
 
     $(html).appendTo($table);
+
+    bindHandlers();
 };
 
 var keydownHandler = function() {
+    console.log('keydown!');
     $input = $(this);
     var oneInputIsBlank = function() {
         var ret = false;
@@ -133,8 +130,10 @@ $.fn.hoverClass = function(className) {
     return this.hover(mouseoutHandler, mouseoutHandler);
 };
 
+$.fn.debug = function() { console.debug(this); return this; }
+
 var bindHandlers = function() {
-    $(".input table input[type='text']").keydown(keydownHandler);
+    $(".input table input[type='text']").keydown(keydownHandler).debug();
     $(".input table input[type='checkbox']")
         .change(diaCheckboxChangeHandler)
         .hoverClass('selected');
@@ -241,3 +240,5 @@ $(bindSubmitButtonClickHandler);
 
 // Create first blank row of input table.
 $(makeNewInput);
+
+$(function() { $('#hide_on_doc_ready').hide(); });
