@@ -141,12 +141,10 @@ def get_personal_data(person):
 
     interested_in_working_on_list = re.split(r', ', person.interested_in_working_on)
 
-    # Tell person templates about
-
-    photos_url_prefix = '/static/images/profile-photos/'
-    photos = ['collins.jpg', 'sufjan.jpg', 'iris.jpg', 'selleck.jpg']
-    photo_url = photos_url_prefix + photos[random.randint(0, len(photos)-1)]
-    photo_url = photos_url_prefix + photos[1]
+    try:
+        photo_url = person.photo.url
+    except ValueError:
+        photo_url = '/static/images/profile-photos/sufjan.jpg'
 
     # FIXME: Make this more readable.
     data_dict = {
