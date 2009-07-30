@@ -34,26 +34,16 @@ h1 a:hover {
 .module {
     float: left;
     margin-bottom: 15px;
-    border: 1px dotted #eee;
+    border-top: 2px solid #bfe2ff;
+    background-color: #f4f4f4;
 }
 .module-header {
     float: left;
+    border-bottom: 1px solid #eee;
 }
 .module-header h3 {
     padding: 15px 20px;
-}
-#portfolio .module-header ul {
-    float: right;
-    padding: 0;
-    margin: 0;
-}
-#portfolio .module-header ul.edit-buttons li {
-    margin: 0;
-}
-#portfolio .module-header ul.edit-buttons li a {
-    float: right;
-    padding: 15px 20px;
-    line-height: 13pt;
+    color: #222;
 }
 .module-content {
     float: left;
@@ -257,24 +247,33 @@ h3 {
 #info h3 {
     width: 180px;
 }
+#portfolio .module-header ul {
+    float: right;
+    padding: 0;
+    margin: 0;
+}
+#portfolio .module-header ul.edit-buttons li {
+    float: left;
+    margin: 0;
+}
+#portfolio .module-header ul.edit-buttons li a {
+    float: right;
+    padding: 17px 20px;
+    line-height: 13pt;
+}
+#portfolio .module-content {
+    padding: 0;
+}
+#portfolio .module-content ul li {
+    float: left;
+    padding: 20px;
+}
 .tags {
     float: left;
     width: 200px;
     margin-bottom: 10px;
 }
 .below-the-fold {
-}
-#portfolio ul {
-    float: left;
-    padding: 20px 0;
-}
-#portfolio ul li {
-    float: left;
-    margin-bottom: 20px;
-}
-.make-projectexp-favorite input[type='image'] {
-    float: right;
-    margin-left: 10px;
 }
 .contrib-descriptions {
     float: left;
@@ -310,9 +309,9 @@ img.show-more-link {
     width: 220px;
     float: left;
 }
-#main {
+#main, #main .module-content, #main .module-header {
     float: left;
-    width: 740px;
+    width: 706px;
 }
 .widget {
     float: left;
@@ -437,9 +436,6 @@ img {
 #nameplate .name {
     float: left;
 }
-#portfolio ul {
-    float: left;
-}
 #info .tag-type {
     font-weight: normal;
     display: block;
@@ -448,18 +444,17 @@ img {
 .project-escutcheon {
     float: left;
     margin-right: 10px;
-    width: 300px;
+    width: 320px;
 }
 .project-escutcheon .logo {
     width: 64px;
     height: 64px;
     float: left;
-    padding-right: 20px;
 }
 .project-escutcheon .name {
     width: 200px;
     float: left;
-    padding: 20px 0;
+    padding: 20px;
     font-size: 11pt;
 }
 .aka {
@@ -672,10 +667,6 @@ input[type='submit'] {
 }
 #importer input[type='submit'] {
     float: right;
-}
-#importer #importer_input_section {
-    float: left;
-    padding-top: 10px;
 }
 #importer .queries {
     float: left;
