@@ -1,17 +1,29 @@
 // Depends on jQuery.
 
 var makeNewInput = function() {
-    var $form = $('.queries form div');
-    html = "<input type='text' name='NAME' id='NAME' />";
-    html = html.replace(/NAME/g, 
-            "commit_username_" + $form.find('input').size());
-    $new_input = $(html).appendTo($form);
+    var $table = $('.input table');
+    var html = "<tr><td class='username'><input type='text' /></td>";
+    var dia_selector_template = "<td><input type='checkbox' name='SLUG' id='SLUG' /><label for='SLUG'>NAME</label></td>";
+    var data_sources = {
+        'rs': 'All repositories',
+        'ou': 'Ohloh',
+        'lp': 'Launchpad'};
+    var slug_prefix = 'link_dia_'
+    for (data_source_id in data_sources) {
+        var dia_html = dia_selector_template.replace(/SLUG/g,
+                slug_prefix + "FIXME");
+        dia_html = dia_html.replace(/NAME/g,
+                data_sources[data_source_id]);
+        html += dia_html;
+    }
+    html += "</tr>";
+    $(html).appendTo($table);
 }
 var keydownHandler = function() {
     $input = $(this);
     var oneInputIsBlank = function() {
         var ret = false;
-        $('.queries form input').each(function () {
+        $(".input table input[type='text']").each(function () {
                 var thisInputIsBlank = (
                     $(this).val().replace(/\s/g,'') == '' );
                 if (thisInputIsBlank) ret = true;
@@ -20,13 +32,22 @@ var keydownHandler = function() {
     }();
     if (!oneInputIsBlank) {
         makeNewInput();
-        bindKeyupHandlers();
+        bindHandlers();
     }
 }
-var bindKeyupHandlers = function() {
-    $('.queries form div input').keydown(keydownHandler);
+$.fn.getLabel = function() {
+    return $('label[for=ID]'.replace(/ID/, this.attr("id")));
 }
-$(bindKeyupHandlers);
+var changeHandler = function() {
+    var $checkbox = $(this);
+    var checked = $checkbox.is(':checked')
+    $checkbox.parent()[(checked?'add':'remove') + 'Class']('selected');
+}
+var bindHandlers = function() {
+    $(".input table input[type='text']").keydown(keydownHandler);
+    $(".input table input[type='checkbox']").change(changeHandler);
+}
+$(bindHandlers);
 
 var submitDataSources = function() {
     $checkboxes = $(".data_import_attempts input[type='checkbox']:checked");

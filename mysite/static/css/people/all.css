@@ -668,10 +668,35 @@ input[type='submit'] {
 #importer input[type='submit'] {
     float: right;
 }
-#importer .queries {
+#importer .input {
     float: left;
-    width: 240px;
-    margin-right: 10px;
+    width: 680px;
+}
+#importer .input table {
+    width: 680px;
+}
+#importer .input td {
+    border: 1px solid #ddd;
+    border-spacing: 0;
+    width: 160px;
+    padding: 5px;
+    border-top: 2px solid #ddd; 
+}
+#importer .input td.username,
+#importer .input td.email {
+    padding: 5px;
+    width: 200px;
+}
+#importer .input td.username span,
+#importer .input td.email span {
+    padding: 5px;
+    float: left;
+}
+#importer .input td.selected {
+    background-color: #ffffe4;
+    border-top-color: orange;
+}
+#importer td label {
 }
 #importer .data_import_attempts {
     float: left;
@@ -684,12 +709,6 @@ input[type='submit'] {
 #importer input[type='checkbox'] {
     float: left;
     width: 30px;
-    margin-right: 10px;
-    clear: left;
-}
-#importer label {
-    float: left;
-    width: 130px;
     margin-right: 10px;
 }
 #importer .data_import_status {
