@@ -1,0 +1,46 @@
+{% load i18n %}
+
+        <script>
+            // allow IE to recognize HTMl5 elements
+            document.createElement('section');
+            document.createElement('article');
+            document.createElement('aside');
+            document.createElement('footer');
+            document.createElement('header');
+            document.createElement('nav');
+            document.createElement('time');
+
+        </script>
+        <link rel="stylesheet" href="/static/openid/css/openid.css" />
+
+
+<script type="text/javascript" src="/static/js/jquery.js"></script>
+<script type="text/javascript" src="/static/openid/js/openid-jquery.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+    openid.init('id_openid_url');
+});
+</script>
+
+
+<h2>Make a choice:</h2>
+<p> <a href="">Register</a> | <a href="">Log-In</a></p>
+<div class="login">
+
+<form id="openid_form" name="openid_form" action="" method="post">
+    <input type="hidden" name="action" value="verify" />
+    <input type="hidden" name="next" value="{{ next }}" />
+        <fieldset>
+                <legend>{% trans "Sign In Using Your OpenID URL" %}</legend>
+                <div id="openid_choice">
+                <p>Please click your account provider:</p>
+                <div id="openid_btns"></div>
+        </div>
+            <div id="openid_input_area">
+                <label for="id_openid_ul">{% trans "OpenId URL :" %}</label>{{ form1.openid_url }}
+                <input name="openid_submit" type="submit" value="{% trans "Sign in with OpenID" %}">
+            </div>
+                
+        </fieldset>
+</form>
+</div>
