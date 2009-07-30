@@ -61,6 +61,15 @@ ADMIN_MEDIA_PREFIX = '/media/'
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = 'k%&pic%c5%6$%(h&eynhgwhibe9-h!_iq&(@ktx#@1-5g2+he)'
 
+TEMPLATE_CONTEXT_PROCESSORS = (
+            'django.core.context_processors.auth',
+            'django.core.context_processors.debug',
+            'django.core.context_processors.i18n',
+            'django.core.context_processors.media',
+            'django.core.context_processors.request',
+            'django_authopenid.context_processors.authopenid',
+        )
+
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.load_template_source',
@@ -72,6 +81,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django_authopenid.middleware.OpenIDMiddleware',
 )
 
 ROOT_URLCONF = 'mysite.urls'
@@ -94,6 +104,8 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.webdesign',
     'django.contrib.admin',
+    'registration',
+    'django_authopenid',
     'windmill',
     'south',
     'celery',
@@ -125,6 +137,7 @@ cooked_data_password = 'AXQaTjp3'
 AUTH_PROFILE_MODULE = "profile.Person"
 
 LOGIN_URL = '/account/login/'
+LOGIN_REDIRECT_URL = '/account/login/'
 
 OHLOH_API_KEY='JeXHeaQhjXewhdktn4nUw' # "Oman testing"
 

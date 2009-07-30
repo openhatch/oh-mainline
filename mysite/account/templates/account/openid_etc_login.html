@@ -27,7 +27,7 @@ $(document).ready(function() {
 <p> <a href="">Register</a> | <a href="">Log-In</a></p>
 <div class="login">
 
-<form id="openid_form" name="openid_form" action="" method="post">
+<form id="openid_form" name="openid_form" action="{% url user_signin %}" method="post">
     <input type="hidden" name="action" value="verify" />
     <input type="hidden" name="next" value="{{ next }}" />
         <fieldset>

@@ -4,8 +4,10 @@ from django.shortcuts import render_to_response, get_object_or_404, get_list_or_
 import django.contrib.auth 
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django_authopenid.forms import OpenidSigninForm
 
 import urllib
+
 
 import account.forms
 import base.views
@@ -103,3 +105,22 @@ def edit_password_do(request):
         return HttpResponseRedirect('/account/edit/')
     else:
         return edit_password(request, form)
+# -*- coding: utf-8 -*-
+from django.contrib.auth.forms import *
+from django.shortcuts import render_to_response as render
+from django.template import RequestContext, loader, Context
+
+from django_authopenid.forms import *
+
+
+def openid_etc_login(request):
+    form1 = OpenidSigninForm()
+    form2 = AuthenticationForm()
+    return render("account/openid_etc_login.html", {
+        'form1': form1,
+        'form2': form2
+    }, context_instance=RequestContext(request))
+
+def catch_me(request):
+    import pdb
+    pdb.set_trace()
