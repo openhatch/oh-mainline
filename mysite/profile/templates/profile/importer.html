@@ -1,47 +1,58 @@
 {% extends 'profile/base_profile.html' %}
 
+{% block title %}
+Import your contributions from around the web
+{% endblock title %}
+
 {% block main %}
 <div id='importer' class='module'>
     <div class='module-header'>
-        <h3>Find your contributions around the web!</h3>
+        <h3>Import your contributions from around the web</h3>
     </div>
     <div class='module-content'>
         <div class='input'>
             <p>To find data sources, type in
             usernames and email addresses
             you've used in open source.</p>
-            <table>
-                <tr>
-                    <td class='username'><span>paulproteus</span></td>
-                    <td>
-                        <input type='checkbox' id='link_dia_paulproteus_rs' />
-                        <label for='link_dia_paulproteus_rs'>All repositories</label>
-                    </td>
-                    <td>
-                        <input type='checkbox' id='link_dia_paulproteus_ou' />
-                        <label for='link_dia_paulproteus_ou'>Ohloh</label>
-                    </td>
-                    <td>
-                        <input type='checkbox' id='link_dia_paulproteus_lp' />
-                        <label for='link_dia_paulproteus_lp'>Launchpad</label>
-                    </td>
-                </tr>
-                <tr>
-                    <td class='username'><input type='text' /></td>
-                    <td>
-                        <input type='checkbox' id='link_dia_asheesh@asheesh.org_rs' />
-                        <label for='link_dia_asheesh@asheesh.org_rs'>All repositories</label>
-                    </td>
-                    <td>
-                        <input type='checkbox' id='link_dia_asheesh@asheesh.org_ou' />
-                        <label for='link_dia_asheesh@asheesh.org_ou'>Ohloh</label>
-                    </td>
-                    <td>
-                        <input type='checkbox' id='link_dia_asheesh@asheesh.org_lp' />
-                        <label for='link_dia_asheesh@asheesh.org_lp'>Launchpad</label>
-                    </td>
-                </tr>
-            </table>
+            <form name='import' method='POST'
+                action='{% url mysite.profile.views.import_do %}'>
+                <table>
+                    {% for query in queries %}
+                    <tr>
+                        <td class='username'>
+                            <span>{{ query.identifier }}</span>
+                        </td>
+                        {% for dia in query.data_import_attempts %}
+                        {% with dia.person_wants_data__post_key as input_id %}
+                        <td>
+                            <input type='checkbox' checked class='selected'
+                            id='{{ input_id }}' name='{{ input_id }}' />
+                            <label for='{{ input_id }}'>
+                                {{ s.get_source_display }}
+                            </label>
+                        </td>
+                        {% endwith %}
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                    {% if blank_query %}
+                    <tr>
+                        <td class='username'>
+                            <input type='text' />
+                        </td>
+                        {% for checkbox in blank_query.checkboxes %}
+                        <td class='selected'>
+                            <input type='checkbox' checked 
+                            id='{{ checkbox.id }}' name='{{ checkbox.id }}' />
+                            <label for='{{ checkbox.id }}'>
+                                {{ checkbox.label }}
+                            </label>
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    {% endif %}
+                </table>
+            </form>
         </div>
 
         <div class=''>

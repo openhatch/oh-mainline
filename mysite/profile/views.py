@@ -439,7 +439,6 @@ def project_icon_web(request, project_name):
     return HttpResponseRedirect(url)
     # }}}
 
-# FIXME: This method is dead
 def import_commits_by_commit_username(request):
     # {{{
 
@@ -673,12 +672,22 @@ def importer(request):
     """Get the DIAs for the logged-in user's profile. Pass them to the template."""
     # {{{
 
+    blank_query_index = 0
+    checkboxes = []
+    for source_key, source_display in DataImportAttempt.SOURCE_CHOICES:
+        checkboxes.append({
+            'id': "%s%d" % (source_key, blank_query_index),
+            'label': source_display,
+            })
+    blank_query = {
+            'index': blank_query_index,
+            'checkboxes': checkboxes
+            }
     data = get_personal_data(request.user.get_profile())
     data.update({
-        'title': 'Find your contributions around the web! - OpenHatch',
         'the_user': request.user,
-        'body_id': 'importer-body',
-        'dias': DataImportAttempt.objects.filter(person=request.user.get_profile()).order_by('id')
+        'dias': DataImportAttempt.objects.filter(person=request.user.get_profile()).order_by('id'),
+        'blank_query': blank_query
         })
 
     return render_to_response('profile/importer.html', data)
