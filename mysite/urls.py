@@ -45,6 +45,9 @@ urlpatterns = patterns('',
         (r'^account/edit/password/do$',
             'mysite.account.views.edit_password_do'),
 
+        (r'^account/edit/show-email/do$',
+            'mysite.account.views.show_email_do'),
+
         (r'^form/projectexp_add$',
             'mysite.profile.views.projectexp_add_form'),
 

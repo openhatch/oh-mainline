@@ -91,6 +91,11 @@ def edit_password(request, edit_password_form = None):
         data['passwordchangeform'] = django.contrib.auth.forms.PasswordChangeForm({})
     else:
         data['passwordchangeform'] = edit_password_form
+
+    # Always show an Edit email form
+    data['show_email_form'] = account.forms.ShowEmailForm(
+        {'show_email': request.user.get_profile().show_email})
+
     return render_to_response('account/edit_password.html',
                               data)
 
@@ -103,3 +108,13 @@ def edit_password_do(request):
         return HttpResponseRedirect('/account/edit/')
     else:
         return edit_password(request, edit_password_form=form)
+
+@login_required
+def show_email_do(request):
+    # Check if request.POST contains show_email_address
+    form = account.forms.ShowEmailForm(request.POST)
+    if form.is_valid():
+        profile = request.user.get_profile()
+        profile.show_email = form.cleaned_data['show_email']
+        profile.save()
+    return HttpResponseRedirect('/account/edit/password/')

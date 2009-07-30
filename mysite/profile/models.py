@@ -13,6 +13,7 @@ class Person(models.Model):
     gotten_name_from_ohloh = models.BooleanField(default=False)
     interested_in_working_on = models.CharField(max_length=1024, default='')
     last_polled = models.DateTimeField(default=datetime.datetime(1970, 1, 1))
+    show_email = models.BooleanField(default=False)
 
     def fetch_contrib_data_from_ohloh(self):
         # self has to be saved, otherwise person_id becomes null
