@@ -1,0 +1,74 @@
+#importer {
+    float: left;
+}
+#importer form .cute-header {
+    width: 400px;
+}
+#importer input[type='text'] {
+    width: 180px;
+    font-size: 10pt;
+}
+#importer input[type='submit'] {
+    float: right;
+}
+#importer .input {
+    float: left;
+    width: 680px;
+}
+#importer .input table {
+    width: 680px;
+    border-collapse: collapse;
+}
+#importer .input td {
+    border: 1px solid #ddd;
+    border-spacing: 0;
+    width: 160px;
+    padding: 5px;
+    border-top: 2px solid #ddd; 
+    margin: 0;
+}
+#importer .input td.checkbox_or_status.selected {
+    width: 30px;
+    text-align: center;
+    border-right: 0;
+}
+#importer .input td.data_source {
+    border-left: 0;
+}
+#importer .input td.username,
+#importer .input td.email {
+    padding: 5px;
+    width: 200px;
+}
+#importer .input td.username span,
+#importer .input td.email span {
+    padding: 5px;
+    float: left;
+}
+#importer .input td.selected {
+    background-color: #ffffe4;
+    border-top-color: orange;
+}
+#importer td label {
+}
+#importer .data_import_attempts {
+    float: left;
+    width: 200px;
+}
+#importer li {
+    float: left;
+    margin-top: 10px;
+}
+#importer input[type='checkbox'] {
+}
+#importer .data_import_status {
+    float: left;
+    width: 32px;
+}
+#importer p {
+    margin: 0;
+    margin-bottom: 10px;
+}
+#importer span {
+    font-weight: bold;
+}
