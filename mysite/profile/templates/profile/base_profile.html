@@ -35,12 +35,6 @@
                     {{ person.user.last_name }}
                 </div>
             </a>
-            <small class='usernames'>
-                <span class='aka'>
-                    a.k.a.
-                </span>
-                {{ person.user.username }}
-            </small>
             {% else %}
             <a href='/people/{{ person.user.username }}'>
                 <div class='name'>
@@ -48,6 +42,30 @@
                 </div>
             </a>
             {% endif %}
+
+	    {% if person.user.first_name or person.user.last_name or person.show_email %}
+            <small class='usernames'>
+                <span class='aka'>
+                    a.k.a.
+                </span>
+	    </small>
+		<ul>
+		  {% if person.user.first_name or person.user.last_name %}
+		  <li>
+		    <small class='usernames'>
+		      {{ the_user.username }}
+		    </small>
+		  </li>
+		  {% endif %}
+
+		  {% if person.show_email %}
+		  <li>
+		    <small class='usernames'>
+		      {{ the_user.email }}
+		    </small>
+		  </li>
+		  {% endif %}
+		  {% endif %}
         </h1>
         <div>
             {% if editable and not person.user.first_name and not person.user.last_name %}
