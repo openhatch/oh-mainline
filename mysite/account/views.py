@@ -4,6 +4,7 @@ from django.shortcuts import render_to_response, get_object_or_404, get_list_or_
 import django.contrib.auth 
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+import mock
 
 import urllib
 
@@ -131,7 +132,8 @@ def edit_photo(request, form = None):
                               data)
 
 @login_required
-def edit_photo_do(request):
+@mock.patch('PIL.ImageFile.ImageFile.load')
+def edit_photo_do(request, mock):
     data = get_personal_data(
             request.user.get_profile())
     person = request.user.get_profile()

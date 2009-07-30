@@ -6,6 +6,7 @@
 
 {% block content %}
 <div class='module account-dialog'>
+  <img src="{{ the_user.get_profile.photo.url }}"></img>
     <form method='POST'
 	  name='edit_photo'
 	  action='/account/edit/photo/do'
