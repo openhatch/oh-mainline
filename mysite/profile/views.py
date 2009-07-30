@@ -212,7 +212,7 @@ def display_person_web(request, user_to_display__username=None):
     data['title'] = 'openhatch / %s' % user.username
     data['edit_mode'] = False
     data['editable'] = (request.user == user)
-    data['notifications'] = base.controllers.get_notes_from_request(request)
+    data['notifications'] = base.controllers.get_notification_from_request(request)
 
     return render_to_response('profile/main.html', data)
 
