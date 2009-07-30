@@ -83,14 +83,14 @@ def logout(request):
     # }}}
 
 @login_required
-def edit_password(request, form = None):
+def edit_password(request, edit_password_form = None):
     data = get_personal_data(
             request.user.get_profile())
     data['the_user'] = request.user
-    if form is None:
+    if edit_password_form is None:
         data['passwordchangeform'] = django.contrib.auth.forms.PasswordChangeForm({})
     else:
-        data['passwordchangeform'] = form
+        data['passwordchangeform'] = edit_password_form
     return render_to_response('account/edit_password.html',
                               data)
 
@@ -102,4 +102,4 @@ def edit_password_do(request):
         form.save() 
         return HttpResponseRedirect('/account/edit/')
     else:
-        return edit_password(request, form)
+        return edit_password(request, edit_password_form=form)

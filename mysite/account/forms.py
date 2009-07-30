@@ -36,3 +36,4 @@ class UserCreationFormWithEmail(django.contrib.auth.forms.UserCreationForm):
             return email
         raise django.forms.ValidationError(
             "A user with that email already exists.")
+
