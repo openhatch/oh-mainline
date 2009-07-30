@@ -1,7 +1,21 @@
+html {
+    background: #fff url('/static/images/motif.png');
+    height: 100%;
+}
 body {
     font: 9pt Verdana, Bitstream Vera Sans, Arial, sans-serif;
-    background: url('/static/images/motif-blue.png');
     margin: 0;
+    background: url("/static/images/motif-band-blue.png") repeat-x;
+    background-position: top;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+html > body {
+    min-height: 100%;
+    height: auto;
+}
+body {
 }
 a {
     color: #66AA33;

@@ -23,14 +23,15 @@
             </table>
         </form>
     {% else %}
-    {% if editable %}
-    <a style='float: right;' href='/edit/name'>
-        Edit name</a>
-    {% endif %}
-        <h1 style='float: left;'>
+        <h1>
+            {% if editable %}
+            <a style='float: right; width: 20px; padding-right: 5px;' href='/edit/name'>
+                <img src='/static/images/icons/pencil.png' alt='Edit name' />
+            </a>
+            {% endif %}
             {% if person.user.first_name or person.user.last_name %}
             <a href='/people/{{ person.user.username }}'>
-                <div class='name'>
+                <div class='name' style='float: left; width: 150px;'>
                     {{ person.user.first_name }}
                     {{ person.user.last_name }}
                 </div>
