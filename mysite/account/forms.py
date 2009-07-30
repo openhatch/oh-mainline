@@ -2,6 +2,7 @@ import django.contrib.auth.forms
 from django.contrib.auth.models import User
 import django.forms
 from profile.models import Person
+from django.core.files.images import get_image_dimensions
 
 class UserCreationFormWithEmail(django.contrib.auth.forms.UserCreationForm):
     username = django.forms.RegexField(label="Username", max_length=30, regex=r'^\w+$',
@@ -45,4 +46,10 @@ class EditPhotoForm(django.forms.ModelForm):
     class Meta:
         model = Person
         fields = ('photo',)
+    
+    def clean_photo(self):
+        w, h = get_image_dimensions(self.cleaned_data['photo'])
+        if w > 200:
+            raise django.forms.ValidationError(u'That image is too wide.')
+        return image
 

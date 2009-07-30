@@ -120,10 +120,25 @@ def show_email_do(request):
     return HttpResponseRedirect('/account/edit/password/')
 
 @login_required
-def edit_photo(request):
+def edit_photo(request, form = None):
     data = get_personal_data(
             request.user.get_profile())
     data['the_user'] = request.user
-    data['edit_photo_form'] = account.forms.EditPhotoForm()
+    if form is None:
+        form = account.forms.EditPhotoForm()
+    data['edit_photo_form'] = form
     return render_to_response('account/edit_photo.html',
                               data)
+
+@login_required
+def edit_photo_do(request):
+    data = get_personal_data(
+            request.user.get_profile())
+    person = request.user.get_profile()
+    form = account.forms.EditPhotoForm(request.POST,
+                                       request.FILES,
+                                       instance=person)
+    if form.is_valid():
+        form.save()
+    return edit_photo(request, form = form)
+

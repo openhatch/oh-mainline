@@ -1,0 +1,24 @@
+{% extends 'base/base.html' %}
+
+{% block more_css %}
+@import url('/static/css/auth.css') all;
+{% endblock more_css %}
+
+{% block content %}
+<div class='module account-dialog'>
+    <form method='POST'
+	  name='edit_photo'
+	  action='/account/edit/photo/do'
+	  enctype="multipart/form-data">
+      <h3 style='float: left; width: 900px;'>Edit photo</h3>
+      {% for field in edit_photo_form %}
+      <div class='form-row'>
+	{{ field.errors }}
+	{{ field.label_tag }}
+	{{ field }}
+      </div>
+      {% endfor %}
+    <input type="submit" value="Change it!">
+    </form>
+</div>
+{% endblock content %}
