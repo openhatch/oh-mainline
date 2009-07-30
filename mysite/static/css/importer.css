@@ -27,7 +27,7 @@
     border-top: 2px solid #ddd; 
     margin: 0;
 }
-#importer .input td.checkbox_or_status.selected {
+#importer .input td.checkbox_or_status {
     width: 30px;
     text-align: center;
     border-right: 0;
@@ -71,4 +71,9 @@
 }
 #importer span {
     font-weight: bold;
+}
+#importer .loading-notification {
+    text-align: center;
+    font-size: 13pt;
+    color: #222;
 }

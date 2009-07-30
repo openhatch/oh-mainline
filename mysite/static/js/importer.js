@@ -121,7 +121,9 @@ var keydownHandler = function() {
 var diaCheckboxChangeHandler = function() {
     var $checkbox = $(this);
     var checked = $checkbox.is(':checked')
-    $checkbox.parent()[(checked?'add':'remove') + 'Class']('selected');
+    $checkboxAndLabelCells = $checkbox.parent().add(
+            $checkbox.getLabel().parent());
+    $checkboxAndLabelCells[(checked?'add':'remove') + 'Class']('selected');
 };
 
 $.fn.hoverClass = function(className) {
@@ -241,4 +243,4 @@ $(bindSubmitButtonClickHandler);
 // Create first blank row of input table.
 $(makeNewInput);
 
-$(function() { $('#hide_on_doc_ready').hide(); });
+$(function() { $('.hide_on_doc_ready').hide(); });
