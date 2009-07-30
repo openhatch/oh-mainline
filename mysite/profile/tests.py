@@ -713,7 +713,7 @@ class UserCanShowEmailAddress(base.tests.TwillTests):
         tc.notfind('my@ema.il')
 
         tc.follow('settings')
-        tc.fv('show_email', 'show_email_address', '1')
+        tc.fv('show_email', 'show_email', '1')
         tc.submit()
 
         tc.go('/people/paulproteus/')
