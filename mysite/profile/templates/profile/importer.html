@@ -1,9 +1,11 @@
 {% extends 'profile/base_profile.html' %}
 
-{% block middle %}
-<div id='importer'>
-    <h3>Find your contributions around the web!</h3>
-
+{% block main %}
+<div id='importer' class='module'>
+    <div class='module-header'>
+        <h3>Find your contributions around the web!</h3>
+    </div>
+    <div class='module-content'>
     <div class='queries'>
         <p>To find data sources, type in
         usernames and email addresses
@@ -54,7 +56,8 @@
             &laquo; Show my projects</a>
     </div>
 </div>
-{% endblock middle %}
+</div>
+{% endblock main %}
 
 {% block js %}
 <script type='text/javascript' src='/static/js/importer.js'></script>

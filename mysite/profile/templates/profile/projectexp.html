@@ -1,11 +1,14 @@
 {% extends 'profile/base_profile.html' %}
 
-{% block middle %}
+{% block main %}
 <!-- begin profile/projectexp.html -->
-<div id='right'>
+<div id='right' class='module'>
     <div class='single-project column project-display project-viewer'>
         <a style='float: right;' href='/people/{{ person.user.username }}'>&laquo; Back to portfolio</a>
-        <h3>{{ person.user.username }}'s contributions to {{ project.name }}</h3>
+        <div class='module-header'>
+            <h3>{{ person.user.username }}'s contributions to {{ project.name }}</h3>
+        </div>
+        <div class='module-content'>
         <div id='role-details' class='section'>
             {% if not edit_mode %}
             {% for exp in exp_list %}
@@ -133,5 +136,6 @@
             {% endif %}
         </div>
     </div>
+    </div>
 </div> <!-- /#right -->
-{% endblock middle %}
+{% endblock main %}

@@ -1,7 +1,13 @@
 body {
     font: 9pt Verdana, Bitstream Vera Sans, Arial, sans-serif;
-    background: url('/static/images/motif-blue.png');
+    background: #fff;
     margin: 0;
+    padding: 0;
+}
+#like-everything-jeez {
+    min-height: 100%;
+    height: auto;
+    background: url("/static/images/motif.png");
 }
 a {
     color: #66AA33;
@@ -26,11 +32,34 @@ h1 a:hover {
     text-decoration: none;
 }
 .module {
-    border: 10px solid #fff;
-    background: url('/static/images/motif.png');
-    padding: 10px;
+    float: left;
+    margin-bottom: 15px;
+    border: 1px dotted #eee;
 }
-
+.module-header {
+    float: left;
+}
+.module-header h3 {
+    padding: 15px 20px;
+}
+#portfolio .module-header ul {
+    float: right;
+    padding: 0;
+    margin: 0;
+}
+#portfolio .module-header ul.edit-buttons li {
+    margin: 0;
+}
+#portfolio .module-header ul.edit-buttons li a {
+    float: right;
+    padding: 15px 20px;
+    line-height: 13pt;
+}
+.module-content {
+    float: left;
+    background-color: #fff;
+    padding: 20px;
+}
 ul {
     padding: 0;
     margin: 0;
@@ -63,6 +92,7 @@ h1, h2, h3, h4 {
     padding: 10px 20px 0 20px;
     float: left;
     width: 960px;
+    height: 111px;
 }
 #nav h2 {
     width: 200px;
@@ -125,21 +155,12 @@ ul#user-actions a {
     font-size: 10pt;
 }
 
-#commit_username {
-    color: #555;
-}
-
-#enter-free-software-username {
-    float: left;
-    width: 400px;
-    margin: 0;
-    padding: 0;
-    font-size: 11pt;
-}
-
 #content {
     float: left;
-    width: 1000px;
+    width: 960px;
+    padding: 20px;
+    border: 5px solid #f4f4f4;
+    background: url("/static/images/motif.png");
 }
 
 #footer {
@@ -173,11 +194,11 @@ ul#user-actions a {
 
 #nameplate {
     float: left;
-    width: 960px;
-    border: 10px solid #fff;
-    background-color: #f5f5f5; 
+    width: 940px;
     color: #888;
+    background: #fff;
     padding: 10px;
+    border: 1px dotted #eee;
 }
 #nameplate h1, #nameplate #sep, #nameplate h2 {
     font-size: 13pt;
@@ -230,10 +251,8 @@ h3 {
 }
 #info {
     width: 180px;
-    border: 10px solid #fff;
     padding: 10px;
     padding-bottom: 0;
-    background: url('/static/images/motif.png');
 }
 #info h3 {
     width: 180px;
@@ -246,7 +265,6 @@ h3 {
 .below-the-fold {
 }
 #portfolio ul {
-    width: 480px;
     float: left;
     padding: 20px 0;
 }
@@ -257,12 +275,6 @@ h3 {
 .make-projectexp-favorite input[type='image'] {
     float: right;
     margin-left: 10px;
-}
-.project-escutcheon {
-    float: left;
-    margin-right: 10px;
-    text-align: center;
-    width: 100px;
 }
 .contrib-descriptions {
     float: left;
@@ -286,8 +298,8 @@ img.show-more-link {
 }
 #left {
     float: left;
-    width: 220px;
-    margin-right: 20px;
+    width: 200px;
+    margin-right: 15px;
 }
 #middle {
     float: left;
@@ -297,6 +309,10 @@ img.show-more-link {
 #right {
     width: 220px;
     float: left;
+}
+#main {
+    float: left;
+    width: 740px;
 }
 .widget {
     float: left;
@@ -423,37 +439,40 @@ img {
 }
 #portfolio ul {
     float: left;
-    background: url('/static/images/motif.png');
 }
 #info .tag-type {
     font-weight: normal;
     display: block;
     font-size: 8pt;
 }
+.project-escutcheon {
+    float: left;
+    margin-right: 10px;
+    width: 300px;
+}
 .project-escutcheon .logo {
     width: 64px;
     height: 64px;
     float: left;
+    padding-right: 20px;
 }
 .project-escutcheon .name {
-    width: 64px;
+    width: 200px;
     float: left;
-    padding: 10px 0;
+    padding: 20px 0;
+    font-size: 11pt;
 }
 .aka {
 }
 .column {
     float: left;
     margin-right: 10px;
-    background: #f4f4f4 url('/static/images/motif.png');
-    border: 10px solid #fff;
-    padding: 10px;
 }
 .project-display {
     float: left;
     margin-bottom: 20px;
     margin-right: 0;
-    width: 480px;
+    width: 740px;
 }
 .project-display h3 {
     float: left;
@@ -471,7 +490,6 @@ img {
 h3 {
     font: 13pt Verdana;
     margin: 0;
-    margin-bottom: 10px;
 }
 h4, .cute-header {
     width: 900px; /* infinity */
@@ -607,10 +625,8 @@ ul#contributors li span {
 }
 
 #avatar {
-    float: left;
-    border: 10px solid #fff;
-    margin-right: 10px;
     width: 200px;
+    padding: 0;
 }
 #avatar img {
     float: left;
@@ -644,19 +660,8 @@ input[type='submit'] {
     color: #333;
     float: right;
 }
-#save-me {
-    padding: 20px;
-    background: url('/static/images/motif.png');
-    float: left;
-    width: 940px;
-    border: 10px solid #fff;
-    margin-bottom: 20px;
-}
 #importer {
     float: left;
-    border: 10px solid #fff;
-    padding: 10px;
-    background: url('/static/images/motif.png');
 }
 #importer form .cute-header {
     width: 400px;
@@ -713,20 +718,6 @@ input[type='submit'] {
 }
 #info a.edit.loud {
 }
-.project-display .portfolio-edit-button {
-    padding: 5px 8px;
-    position: relative;
-    top: -5px;
-    left: 5px;
-    background-color: #eee;
-    border-top: 1px solid #ddd;
-    border-right: 2px solid #ccc;
-    border-bottom: 2px solid #ccc;
-    border-left: 1px solid #ddd;
-    float: right;
-    color: #222;
-    margin-left: 10px;
-}
 abbr.foss {
     border: 0;
     font-variant: small-caps;
@@ -739,13 +730,14 @@ abbr.foss {
 }
 #big-people-list {
     float: left;
-    border: 10px solid #fff;
     width: 980px;
-    padding: 10px;
-    background: url('/static/images/motif.png');
 }
 #big-people-list h3 {
     width: 980px;
+}
+#big-people-list ul {
+    width: 980px;
+    float: left;
 }
 #big-people-list li {
     padding-top: 10px;
