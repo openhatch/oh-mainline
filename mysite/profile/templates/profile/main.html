@@ -10,10 +10,10 @@
         <h3>Contributions</h3>
         {% if editable %}
         <a class='portfolio-edit-button' href='/people/portfolio/import'>
-            Import +
+            Import lots
         </a>
         <a class='portfolio-edit-button' href='/form/projectexp_add'>
-            Add +
+            Add one
         </a>
         {% endif %}
         {% if projects %}
@@ -69,6 +69,7 @@
         method='POST'>
         <!-- personal_info_edit_mode -->
         {% comment %} THIS HURR IS EDIT MODE {% endcomment %}
+        <h4>(eg. c++, lambda calculus, juggling)</h4>
         <h4>understands:</h4>
         <textarea name='edit-tags-understands'>{{ tags_flat.understands }}</textarea>
         <h4>will never understand:</h4>

@@ -571,6 +571,7 @@ def ask_for_tag_input(request, username):
 def display_list_of_people(request):
     # {{{
     return render_to_response('profile/search_people.html', {
+        'the_user': request.user,
         'title': 'List of people : OpenHatch',
         'people': Person.objects.all().order_by('user__username')
         })
