@@ -1,6 +1,7 @@
 import django.contrib.auth.forms
 from django.contrib.auth.models import User
 import django.forms
+from profile.models import Person
 
 class UserCreationFormWithEmail(django.contrib.auth.forms.UserCreationForm):
     username = django.forms.RegexField(label="Username", max_length=30, regex=r'^\w+$',
@@ -39,3 +40,9 @@ class UserCreationFormWithEmail(django.contrib.auth.forms.UserCreationForm):
 
 class ShowEmailForm(django.forms.Form):
     show_email = django.forms.BooleanField(required=False)
+
+class EditPhotoForm(django.forms.ModelForm):
+    class Meta:
+        model = Person
+        fields = ('photo',)
+

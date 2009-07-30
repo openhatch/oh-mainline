@@ -118,3 +118,12 @@ def show_email_do(request):
         profile.show_email = form.cleaned_data['show_email']
         profile.save()
     return HttpResponseRedirect('/account/edit/password/')
+
+@login_required
+def edit_photo(request):
+    data = get_personal_data(
+            request.user.get_profile())
+    data['the_user'] = request.user
+    data['edit_photo_form'] = account.forms.EditPhotoForm()
+    return render_to_response('account/edit_photo.html',
+                              data)

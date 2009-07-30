@@ -187,4 +187,7 @@ class EditPhoto(base.tests.TwillTests):
         url = 'http://openhatch.org/people/paulproteus/'
         tc.go(make_twill_url(url))
         tc.follow('Change photo')
+        tc.formfile('edit_photo', 'photo', 'static/sample-photo.png')
+        tc.submit()
+        
 
