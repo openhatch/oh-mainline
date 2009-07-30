@@ -15,13 +15,10 @@ from profile.views import get_personal_data
 
 def login(request):
     # {{{
-    notification_id = request.GET.get('msg', None)
-    notifications_dict = {'oops': "Couldn't find that pair of username and password. Did you type your password correctly?",
-            'next': "You've got to be logged in to do that!"}
     data = {}
-    data['notifications'] = [{'id': notification_id, 'text': notifications_dict[notification_id]}]
-    return render_to_response('account/login.html', {
-        } )
+    data['notifications'] = base.controllers.get_notification_from_request(
+            request)
+    return render_to_response('account/login.html', data)
     # }}}
 
 def login_do(request):

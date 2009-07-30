@@ -1,12 +1,8 @@
 # vim: ai ts=3 sts=4 et sw=4 nu
 
 # Imports {{{
-import settings
-from django.core import serializers
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
-from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404
-from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag, Link_Project_Tag, Link_SF_Proj_Dude_FM, Link_Person_Tag, DataImportAttempt
-from mysite.search.models import Project
+
+# Python
 import StringIO
 import datetime
 import urllib
@@ -18,11 +14,33 @@ import difflib
 import os
 import tempfile
 import random
+
+# Django
+from django.core import serializers
+from django.http import \
+        HttpResponse, HttpResponseRedirect, HttpResponseServerError
+from django.shortcuts import \
+        render_to_response, get_object_or_404, get_list_or_404
 import django.contrib.auth 
 from django.contrib.auth.models import User
-from customs import ohloh
-import forms
 from django.contrib.auth.decorators import login_required
+
+# OpenHatch global
+import settings
+
+# OpenHatch apps
+import base.controllers
+from customs import ohloh
+from profile.models import \
+        Person, ProjectExp, \
+        Tag, TagType, \
+        Link_ProjectExp_Tag, Link_Project_Tag, \
+        Link_SF_Proj_Dude_FM, Link_Person_Tag, \
+        DataImportAttempt
+from search.models import Project
+
+# This app
+import forms
 # }}}
 
 # Add a contribution {{{
@@ -184,6 +202,7 @@ def display_person_edit_web(request, info_edit_mode=False, title=''):
 
 def display_person_web(request, user_to_display__username=None):
     # {{{
+
     user = User.objects.get(username=user_to_display__username)
     person = user.get_profile()
 
@@ -193,11 +212,7 @@ def display_person_web(request, user_to_display__username=None):
     data['title'] = 'openhatch / %s' % user.username
     data['edit_mode'] = False
     data['editable'] = (request.user == user)
-    notification_id = request.GET.get('msg', None)
-    notifications_dict = {'edit_password_done': 'Your password has been changed.'}
-    data['notifications'] = []
-    if notification_id in notifications_dict.keys():
-         data['notifications'].append({'id': notification_id, 'text': notifications_dict[notification_id]})
+    data['notifications'] = base.controllers.get_notes_from_request(request)
 
     return render_to_response('profile/main.html', data)
 
