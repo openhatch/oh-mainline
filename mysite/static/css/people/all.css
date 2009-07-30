@@ -313,6 +313,9 @@ img.show-more-link {
     float: left;
     width: 706px;
 }
+#portfolio .module-content {
+    width: 740px;
+}
 .widget {
     float: left;
     width: 400px;
