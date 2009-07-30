@@ -21,7 +21,8 @@ class Person(models.Model):
     last_polled = models.DateTimeField(default=datetime.datetime(1970, 1, 1))
     show_email = models.BooleanField(default=False)
     photo = models.ImageField(upload_to=
-                              lambda a, b: 'static/photos/' + generate_person_photo_path(a, b))
+                              lambda a, b: 'static/photos/profile-photos/' + generate_person_photo_path(a, b),
+                              default='static/images/profile-photos/sufjan.jpg')
 
     def fetch_contrib_data_from_ohloh(self):
         # self has to be saved, otherwise person_id becomes null
