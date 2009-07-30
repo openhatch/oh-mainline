@@ -179,3 +179,12 @@ class EditPassword(base.tests.TwillTests):
         newpass='new'
         self.change_password(oldpass, newpass,
                 should_succeed = False)
+
+class EditPhoto(base.tests.TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+    def test_set_avatar(self):
+        self.login_with_twill()
+        url = 'http://openhatch.org/people/paulproteus/'
+        tc.go(make_twill_url(url))
+        tc.follow('Change photo')
+
