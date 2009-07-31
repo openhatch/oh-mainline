@@ -152,7 +152,7 @@ ul#user-actions a {
     width: 960px;
     padding: 20px;
     border: 5px solid #f4f4f4;
-    background: url("/static/images/motif.png");
+    background: url("/static/images/motif-eee.png");
 }
 
 #footer {
@@ -299,7 +299,7 @@ img.show-more-link {
 }
 #left {
     float: left;
-    width: 200px;
+    width: 220px;
     margin-right: 15px;
 }
 #middle {
@@ -315,14 +315,14 @@ img.show-more-link {
 }
 #main,  #main .module-header {
     float: left;
-    width: 745px;
+    width: 725px;
 }
 #main .module-content {
     margin-left: 1px;
-    width: 703px;
+    width: 683px;
 }
 #portfolio .module-content {
-    width: 740px;
+    width: 720px;
 }
 .widget {
     float: left;
@@ -633,7 +633,7 @@ ul#contributors li span {
 #avatar {
     width: 200px;
     padding: 0;
-    border: 0;
+    border: 10px solid #fff;
 }
 #avatar img {
     float: left;

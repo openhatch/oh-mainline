@@ -12,10 +12,32 @@ Import your contributions from around the web | OpenHatch
         <h3>Import your contributions from around the web</h3>
     </div>
     <div class='module-content'>
+            <div class='howto'>
+                <h3 class='head'>
+                    How this works
+                    <a class='hide-link' href='#'>Hide this</a>
+                </h3>
+                <div class='body'>
+                    <ol>
+                        <li class='handle'>
+                        <h4>What's your handle?</h4>
+                        Type in some usernames and
+                        email addresses you've used
+                        in open source.
+                        </li>
+                        <li class='hangout'>
+                        <h4>Where do you hang out?</h4>
+                        Specify where you've used the username/email.
+
+                        Select &ldquo;All repositories&rdquo; to automatically scan 20,000 open source repositories for your footprints.
+                        Or import data associated with your account on another network.
+                        </li>
+                    </ol>
+                </div>
+                <div class='foot'>
+                </div>
+            </div>
         <div class='input'>
-            <p>To find data sources, type in
-            usernames and email addresses
-            you've used in open source.</p>
             <form name='import' method='POST'
                 action='{% url mysite.profile.views.import_do %}'>
                 <table>

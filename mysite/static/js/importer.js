@@ -69,25 +69,21 @@ var makeNewInput = function() {
     var $table = $('.input table');
     var index = $('.input tr').size();
     var html = "<tr id='query_$INDEX' class='query'>";
-    html += "<td class='username'><input type='text' /></td>";
+    html += "<td class='username'><div>Username or email address:</div>";
+    html += "<input type='text' /></td>";
 
     var sourceDictionaries = [
-        {'$ID': 'rs', '$LABEL': 'All repositories'},
-        {'$ID': 'ou', '$LABEL': 'Ohloh',
-            '$IMGFILENAME': 'ohloh.png'},
-        {'$ID': 'lp', '$LABEL': 'Launchpad',
-            '$IMGFILENAME': 'launchpad.png'},
+        {'$ID': 'rs', '$DISPLAY': 'All repositories'},
+        {'$ID': 'lp', '$DISPLAY': "<img src='/static/images/icons/data-sources/launchpad.png' alt='Launchpad' />"},
+        {'$ID': 'ou', '$DISPLAY': "<img src='/static/images/icons/data-sources/ohloh.png' alt='Ohloh' />"},
     ];
 
-    var checkboxTDSchema = "<td class='checkbox_or_status selected'>"
+    var checkboxTDSchema = "<td class='data_source selected'>"
         + "<input type='checkbox' checked "
         + "name='checkbox_$INDEX_$ID' "
         + "id='checkbox_$INDEX_$ID' />"
-        + "</td>"
-        + "<td class='data_source selected'>"
         + "<label for='checkbox_$INDEX_$ID'>"
-        + "<img src='/static/images/icons/data-sources/$IMGFILENAME' "
-        + "alt='$LABEL' />"
+        + "$DISPLAY"
         + "</label>"
         + "</td>";
 
@@ -121,15 +117,13 @@ var keydownHandler = function() {
 var diaCheckboxChangeHandler = function() {
     var $checkbox = $(this);
     var checked = $checkbox.is(':checked')
-    $checkboxAndLabelCells = $checkbox.parent().add(
-            $checkbox.getLabel().parent());
-    $checkboxAndLabelCells[(checked?'add':'remove') + 'Class']('selected');
+    $checkbox.parent()[(checked?'add':'remove') + 'Class']('selected');
 };
 
 $.fn.hoverClass = function(className) {
-    var mouseoverHandler = function() { $(this).addClass(className); };
-    var mouseoutHandler = function() { $(this).removeClass(className); };
-    return this.hover(mouseoutHandler, mouseoutHandler);
+    mouseoverHandler = function() { $(this).addClass(className); };
+    mouseoutHandler = function() { $(this).removeClass(className); };
+    return this.hover(mouseoverHandler, mouseoutHandler);
 };
 
 $.fn.debug = function() { console.debug(this); return this; }
@@ -137,8 +131,8 @@ $.fn.debug = function() { console.debug(this); return this; }
 var bindHandlers = function() {
     $(".input table input[type='text']").keydown(keydownHandler).debug();
     $(".input table input[type='checkbox']")
-        .change(diaCheckboxChangeHandler)
-        .hoverClass('selected');
+        .change(diaCheckboxChangeHandler);
+    $(".input table td.data_source").hoverClass('hover');
 };
 
 $(bindHandlers);
