@@ -24,20 +24,6 @@ class Person(models.Model):
                               lambda a, b: 'static/photos/profile-photos/' + generate_person_photo_path(a, b),
                               default='static/images/profile-photos/sufjan.jpg')
 
-    def fetch_contrib_data_from_ohloh(self):
-        # self has to be saved, otherwise person_id becomes null
-        self.save()
-        oh = ohloh.get_ohloh()
-
-        ohloh_contrib_info_list = oh.get_contribution_info_by_username(
-                self.user.username)
-        for ohloh_contrib_info in ohloh_contrib_info_list:
-            exp = ProjectExp()
-            exp.person = self
-            exp = exp.from_ohloh_contrib_info(ohloh_contrib_info)
-            exp.save()
-        self.save()
-        
     def __unicode__(self):
         return "username: %s, name: %s %s" % (self.user.username,
                 self.user.first_name, self.user.last_name)
