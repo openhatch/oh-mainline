@@ -8,7 +8,8 @@
     width: 400px;
 }
 #importer input[type='text'] {
-    width: 150px;
+    width: 170px;
+    float: left;
     font-size: 12pt;
 }
 #importer input[type='submit'] {
@@ -23,15 +24,17 @@
     width: 660px;
     border-collapse: collapse;
 }
-#importer .input td {
+#importer .input .username, 
+#importer .input .email,
+#importer .input .data_sources {
     border: 1px solid #ddd;
     border-spacing: 0;
     padding: 5px;
     border-top: 2px solid #ddd; 
     margin: 0;
 }
-#importer .input td.username,
-#importer .input td.email {
+#importer .input .username,
+#importer .input .email {
     padding: 5px;
 }
 #importer .input td.username span,
@@ -40,7 +43,7 @@
     float: left;
 }
 #importer .input td.selected {
-    background-color: #ffffe4;
+    background-color: #ffffd4;
     border-top-color: orange;
 }
 #importer .data_import_attempts {
@@ -53,10 +56,9 @@
 }
 #importer input[type='checkbox'] {
     float: left;
-    width: 30px;
-    margin-right: 15px;
+    margin-right: 10px;
     position: relative;
-    top: 5px;
+    top: 7px;
 }
 #importer td label {
     float: left;
@@ -131,5 +133,4 @@
     float: right;
 }
 #importer .input td.data_source.hover {
-    background-color: #bfe2ff;
 }

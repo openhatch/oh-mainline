@@ -6,8 +6,10 @@ var askServerToBeginQuerying = function () {
 
 var getStrings = function(schema, dictionaries) {
     /* Returns an array of strings.
-     * Each string is `schema' saturated with the mappings
+     * Each string is the result of the string `schema'
+     * translated according to the mappings
      * provided by a dictionary in `dictionaries'.
+     *
      * <example>
      * <input>
      *
@@ -50,6 +52,7 @@ var getStrings = function(schema, dictionaries) {
      *      ]
      *
      * </output>
+     * </example>
      */
     var strings = [];
     for (var d = 0; d < dictionaries.length; d++) {
@@ -57,8 +60,8 @@ var getStrings = function(schema, dictionaries) {
         var str = schema;
         for (var mapFrom in dictionary) {
             var mapTo = dictionary[mapFrom];
-            mapFrom = mapFrom.replace("$", "\\$");
-            str = str.replace(new RegExp(mapFrom, "g"), mapTo);
+            mapFromRegExp = new RegExp(mapFrom.replace("$", "\\$"), "g");
+            str = str.replace(mapFromRegExp, mapTo);
         }
         strings.push(str);
     }
@@ -67,10 +70,13 @@ var getStrings = function(schema, dictionaries) {
 
 var makeNewInput = function() {
     var $table = $('.input table');
-    var index = $('.input tr').size();
-    var html = "<tr id='query_$INDEX' class='query'>";
-    html += "<td class='username'><div>Username or email address:</div>";
-    html += "<input type='text' /></td>";
+    var index = $('.input .query').size();
+    var html = ""
+        + "<div id='query_$INDEX' class='query'>"
+        + "   <div class='username'>"
+        + "       <input type='text' />"
+        + "   </div>"
+        + "   <ul class='data_sources'>"
 
     var sourceDictionaries = [
         {'$ID': 'rs', '$DISPLAY': 'All repositories'},
@@ -78,17 +84,20 @@ var makeNewInput = function() {
         {'$ID': 'ou', '$DISPLAY': "<img src='/static/images/icons/data-sources/ohloh.png' alt='Ohloh' />"},
     ];
 
-    var checkboxTDSchema = "<td class='data_source selected'>"
-        + "<input type='checkbox' checked "
-        + "name='checkbox_$INDEX_$ID' "
-        + "id='checkbox_$INDEX_$ID' />"
-        + "<label for='checkbox_$INDEX_$ID'>"
-        + "$DISPLAY"
-        + "</label>"
-        + "</td>";
+    var checkboxTDSchema = ""
+        + "       <li class='data_source selected'>"
+        + "            <input type='checkbox' checked "
+        + "                name='checkbox_$INDEX_$ID' "
+        + "                id='checkbox_$INDEX_$ID' />"
+        + "            <label for='checkbox_$INDEX_$ID'>"
+        + "                $DISPLAY"
+        + "            </label>"
+        + "       </li>";
 
-    html += getStrings(checkboxTDSchema, sourceDictionaries).join("\n");
-    html += "</tr>";
+    html += getStrings(checkboxTDSchema, sourceDictionaries).join("\n")
+        + "    </ul>"
+        + "</div>";
+
     html = html.replace(/\$INDEX/g, index);
 
     $(html).appendTo($table);
