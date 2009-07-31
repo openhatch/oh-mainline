@@ -4,6 +4,7 @@ import django.forms
 from profile.models import Person
 import StringIO
 from django.core.files.images import get_image_dimensions
+import PIL.Image
 
 class UserCreationFormWithEmail(django.contrib.auth.forms.UserCreationForm):
     username = django.forms.RegexField(label="Username", max_length=30, regex=r'^\w+$',
@@ -57,6 +58,16 @@ class EditPhotoForm(django.forms.ModelForm):
 
         w, h = get_image_dimensions(data_fd)
         if w > 200:
-            raise django.forms.ValidationError(u'That image is too wide.')
+            # Scale it down.
+            too_big = PIL.Image.open(StringIO.StringIO(data))
+            new_w = 200
+            new_h = (h * 1.0 / w) * 200
+            #try:
+            #    smaller = too_big.resize((new_w, new_h), PIL.Image.ANTIALIAS)
+            #except ValueError:
+            smaller = too_big.resize((new_w, new_h),
+                                     PIL.Image.ANTIALIAS)
+            smaller.save(self.cleaned_data[
+                    'photo'].temporary_file_path(), 'PNG')
         return self.cleaned_data['photo']
 
