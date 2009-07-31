@@ -691,6 +691,16 @@ def importer(request):
     return render_to_response('profile/importer.html', data)
     # }}}
 
+def filter_by_key_prefix(dict, prefix):
+    """Return those and only those items in a dictionary whose keys have the given prefix."""
+    out_dict = {}
+    for key, value in dict.items():
+        if "^^^" in key:
+            fail
+        if "^^^"+prefix in "^^^"+key:
+            out_dict.update({key: value})
+    return out_dict
+
 @login_required
 def user_selected_these_dia_checkboxes(request):
     """ Input: Request POST contains a list of checkbox IDs corresponding to DIAs.
@@ -698,20 +708,26 @@ def user_selected_these_dia_checkboxes(request):
     Output: Success?
     """
     # {{{
-    try:
-        checkbox_ids = request.POST['checkboxIDs']
-    except KeyError:
-        return HttpResponseServerError('0')
+    checkboxes = filter_by_key_prefix(request.POST, "person_wants_")
+    identifiers = filter_by_key_prefix(request.POST, "identifier_")
 
-    for checkbox_id in checkbox_ids.split(" "):
-        dia_id = int(checkbox_id.rsplit('_', 1)[1])
-        dia = DataImportAttempt.objects.get(id=dia_id)
-        dia.person_wants_data = True
-        dia.save()
+    for checkbox_id, value in checkboxes.items():
+        if value == 'on':
+            x, y, identifier_index, source = checkbox_id.split('_')
+            identifier = identifiers["identifier_%s" % identifier_index]
+            if identifier:
+                # FIXME: For security, ought this filter include only dias
+                # associated with the logged-in user's profile?
+                dia, _ = DataImportAttempt.objects.get_or_create(
+                        query=identifier, source=source,
+                        person=request.user.get_profile())
+                dia.person_wants_data = True
+                dia.save()
 
-        # There may or may not be data waiting,
-        # but this function may run unconditionally.
-        dia.give_data_to_person()
+                # There may be data waiting or not,
+                # but no matter; this function may
+                # run unconditionally.
+                dia.give_data_to_person()
 
     return HttpResponse('1')
     # }}}
