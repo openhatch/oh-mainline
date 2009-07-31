@@ -1,6 +1,6 @@
-{% extends 'profile/base_three_column.html' %}
+{% extends 'profile/base_two_column.html' %}
 
-{% block left %}
+{% block pagetop %}
     <div id='nameplate'>
     {% if name_edit_mode %}
         <form method='POST'
@@ -23,18 +23,19 @@
             </table>
         </form>
     {% else %}
-    {% if editable %}
-    <a style='float: right;' href='/edit/name'>
-        Edit name</a>
-    {% endif %}
-        <h1 style='float: left;'>
             {% if person.user.first_name or person.user.last_name %}
-            <a href='/people/{{ person.user.username }}'>
-                <div class='name'>
+            <h1 class='name'>
+                <a href='/people/{{ person.user.username }}'>
                     {{ person.user.first_name }}
                     {{ person.user.last_name }}
-                </div>
+                </a>
+            </h1>
+            {% if editable %}
+            <a href='/edit/name'>
+                <img src='/static/images/icons/pencil.png'
+                alt='Edit name' />
             </a>
+            {% endif %}
             {% else %}
             <a href='/people/{{ person.user.username }}'>
                 <div class='name'>
@@ -66,7 +67,6 @@
 		  </li>
 		  {% endif %}
 		  {% endif %}
-        </h1>
         <div>
             {% if editable and not person.user.first_name and not person.user.last_name %}
             <div id='edit_your_name_notification' 
@@ -76,20 +76,84 @@
     {% endif %}
     </div>
 
-    {% if edit_mode %}
-    <div id='avatar' class='edit'>
-        <a href='/people/{{ person.user.username }}/photos/default/set'>
-            This space reserved for doodling or
-            other visual jiggerypokery.
-        </a>
-    </div>
-    {% else %}
+{% endblock pagetop %}
+
+{% block left %}
+{% if edit_mode %}
+<div id='avatar' class='edit module'>
+    <a href='/people/{{ person.user.username }}/photos/default/set'>
+        This space reserved for doodling or
+        other visual jiggerypokery.
+    </a>
+</div>
+{% else %}
     <div><a href="/account/edit/photo/">Change photo</a></div>
-    <div id='avatar'><img src='{{ photo_url }}' /></div>
+<div id='avatar' class='module'><img src='{{ photo_url }}' /></div>
+{% endif %}
+
+<div id='info' class='module'>
+
+    {% if editable and not info_edit_mode %}
+    <a class='edit' href='/people/edit/info'>Edit</a>
     {% endif %}
+
+    <h3 style='float: left; width: 100px;'>Info</h3>
+
+    {% if editable and not info_edit_mode and not has_set_info %}
+    <div id='edit_your_info_notification' class='notification'>Edit your info!</div>
+    {% endif %}
+
+    {% if info_edit_mode %}
+    <form name='edit-tags'
+        action='/people/info/edit/do'
+        method='POST'>
+        <!-- personal_info_edit_mode -->
+        {% comment %} THIS HURR IS EDIT MODE {% endcomment %}
+        <h4>(eg. c++, lambda calculus, juggling)</h4>
+        <h4>understands:</h4>
+        <textarea name='edit-tags-understands'>{{ tags_flat.understands }}</textarea>
+        <h4>will never understand:</h4>
+        <textarea name='edit-tags-understands_not'>{{ tags_flat.understands_not }}</textarea>
+        <h4>looking for volunteering opportunities tagged with:</h4>
+        <textarea name='edit-tags-seeking'>{{ tags_flat.seeking }}</textarea>
+        <h4>currently studying:</h4>
+        <textarea name='edit-tags-studying'>{{ tags_flat.studying }}</textarea>
+        <h4>can mentor in:</h4>
+        <textarea name='edit-tags-can_mentor'>{{ tags_flat.can_mentor }}</textarea>
+        <input class='save-button' type='submit' value='Save' />
+    </form>
+    {% else %}
+    <!-- {{{ -->
+    {% if tags_flat.understands %}
+    <div class='tags' id='tags-understands'>
+        <span class='tag-type'>understands:</span> {{ tags_flat.understands }}
+    </div>
+    {% endif %}
+    {% if tags.understands_not %}
+    <div class='tags' id='tags-understands_not'>
+        <span class='tag-type'>will never understand:</span> {{ tags_flat.understands_not }}
+    </div>
+    {% endif %}
+    {% if tags.seeking %}
+    <div class='tags' id='tags-seeking'>
+        <span class='tag-type'>looking for volunteering opportunities in:</span> {{ tags_flat.seeking }}
+    </div>
+    {% endif %}
+    {% if tags.studying %}
+    <div class='tags' id='tags-studying'>
+        <span class='tag-type'>currently learning about:</span> {{ tags_flat.studying }}
+    </div>
+    {% endif %}
+    {% if tags.can_mentor %}
+    <div class='tags' id='tags-can_mentor'>
+        <span class='tag-type'>can mentor in:</span> {{ tags_flat.can_mentor }}
+    </div>
+    {% endif %}
+    <!-- }}} -->
+    {% endif %}
+</div>
 {% endblock left %}
 
 {% comment %}
 vim: set ai et ts=4 sw=4 nu:
 {% endcomment %}
-

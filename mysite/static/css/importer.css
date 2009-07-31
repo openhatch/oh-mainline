@@ -1,0 +1,135 @@
+#importer {
+    float: left;
+}
+#importer .module-content {
+    background: #fff url('/static/images/motif.png');
+}
+#importer form .cute-header {
+    width: 400px;
+}
+#importer input[type='text'] {
+    width: 150px;
+    font-size: 12pt;
+}
+#importer input[type='submit'] {
+    float: right;
+}
+#importer .input {
+    float: left;
+    width: 680px;
+    background-color: #fff;
+}
+#importer .input table {
+    width: 660px;
+    border-collapse: collapse;
+}
+#importer .input td {
+    border: 1px solid #ddd;
+    border-spacing: 0;
+    padding: 5px;
+    border-top: 2px solid #ddd; 
+    margin: 0;
+}
+#importer .input td.username,
+#importer .input td.email {
+    padding: 5px;
+}
+#importer .input td.username span,
+#importer .input td.email span {
+    padding: 5px;
+    float: left;
+}
+#importer .input td.selected {
+    background-color: #ffffe4;
+    border-top-color: orange;
+}
+#importer .data_import_attempts {
+    float: left;
+    width: 200px;
+}
+#importer li {
+    float: left;
+    margin-top: 10px;
+}
+#importer input[type='checkbox'] {
+    float: left;
+    width: 30px;
+    margin-right: 15px;
+    position: relative;
+    top: 5px;
+}
+#importer td label {
+    float: left;
+    padding: 10px;
+    cursor: hand;
+    cursor: pointer;
+}
+#importer .data_import_status {
+    float: left;
+    width: 32px;
+}
+#importer p {
+    margin: 0;
+    margin-bottom: 10px;
+}
+#importer span {
+    font-weight: bold;
+}
+#importer .loading-notification {
+    text-align: center;
+    font-size: 13pt;
+    color: #222;
+}
+#importer .howto {
+    float: left;
+    width: 680px;
+    margin-bottom: 20px;
+    background-color: #f4f4f4;
+    border: 1px solid #f4f4f4;
+    border-top: 2px solid #ff0;
+}
+#importer .howto h3.head {
+    color: #222;
+    font-size: 11pt;
+    float: left;
+    padding: 10px 20px;
+    width: 640px;
+}
+#importer .howto .body {
+    float: left;
+    padding: 20px;
+    width: 640px;
+    background-color: #fff;
+}
+#importer .howto ol {
+    margin: 0;
+    padding: 0;
+}
+#importer .howto li {
+    margin-left: 20px;
+    float: left;
+    width: 200px;
+    margin-right: 50px;
+}
+#importer .howto li.hangout {
+    width: 300px;
+}
+#importer .howto h4 {
+    float: none;
+    width: 200px;
+    margin-bottom: 10px;
+}
+#importer .howto .foot {
+    float: left;
+    height: 3px;
+    border-top: 1px dotted #ddd;
+    border-bottom: 1px solid #ddd;
+    width: 680px;
+    text-align: right;
+}
+#importer .howto .hide-link {
+    float: right;
+}
+#importer .input td.data_source.hover {
+    background-color: #bfe2ff;
+}

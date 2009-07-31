@@ -46,9 +46,9 @@ class Person(models.Model):
 class DataImportAttempt(models.Model):
     # {{{
     SOURCE_CHOICES = (
-        ('rs', "Search all repositories for %s."),
-        ('ou', "I'm %s on Ohloh; import my data."),
-        ('lp', "I'm %s on Launchpad; import my data."),
+        ('rs', "All repositories"),
+        ('ou', "Ohloh"),
+        ('lp', "Launchpad"),
         )
     completed = models.BooleanField(default=False)
     failed = models.BooleanField(default=False)

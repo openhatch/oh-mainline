@@ -1,12 +1,8 @@
 # vim: ai ts=3 sts=4 et sw=4 nu
 
 # Imports {{{
-import settings
-from django.core import serializers
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
-from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404
-from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag, Link_Project_Tag, Link_SF_Proj_Dude_FM, Link_Person_Tag, DataImportAttempt
-from mysite.search.models import Project
+
+# Python
 import StringIO
 import datetime
 import urllib
@@ -18,11 +14,33 @@ import difflib
 import os
 import tempfile
 import random
+
+# Django
+from django.core import serializers
+from django.http import \
+        HttpResponse, HttpResponseRedirect, HttpResponseServerError
+from django.shortcuts import \
+        render_to_response, get_object_or_404, get_list_or_404
 import django.contrib.auth 
 from django.contrib.auth.models import User
-from customs import ohloh
-import forms
 from django.contrib.auth.decorators import login_required
+
+# OpenHatch global
+import settings
+
+# OpenHatch apps
+import base.controllers
+from customs import ohloh
+from profile.models import \
+        Person, ProjectExp, \
+        Tag, TagType, \
+        Link_ProjectExp_Tag, Link_Project_Tag, \
+        Link_SF_Proj_Dude_FM, Link_Person_Tag, \
+        DataImportAttempt
+from search.models import Project
+
+# This app
+import forms
 # }}}
 
 # Add a contribution {{{
@@ -182,6 +200,7 @@ def display_person_edit_web(request, info_edit_mode=False, title=''):
 
 def display_person_web(request, user_to_display__username=None):
     # {{{
+
     user = User.objects.get(username=user_to_display__username)
     person = user.get_profile()
 
@@ -191,6 +210,7 @@ def display_person_web(request, user_to_display__username=None):
     data['title'] = 'openhatch / %s' % user.username
     data['edit_mode'] = False
     data['editable'] = (request.user == user)
+    data['notifications'] = base.controllers.get_notification_from_request(request)
 
     return render_to_response('profile/main.html', data)
 
@@ -417,7 +437,6 @@ def project_icon_web(request, project_name):
     return HttpResponseRedirect(url)
     # }}}
 
-# FIXME: This method is dead
 def import_commits_by_commit_username(request):
     # {{{
 
@@ -651,12 +670,22 @@ def importer(request):
     """Get the DIAs for the logged-in user's profile. Pass them to the template."""
     # {{{
 
+    blank_query_index = 0
+    checkboxes = []
+    for source_key, source_display in DataImportAttempt.SOURCE_CHOICES:
+        checkboxes.append({
+            'id': "%s%d" % (source_key, blank_query_index),
+            'label': source_display,
+            })
+    blank_query = {
+            'index': blank_query_index,
+            'checkboxes': checkboxes
+            }
     data = get_personal_data(request.user.get_profile())
     data.update({
-        'title': 'Find your contributions around the web! - OpenHatch',
         'the_user': request.user,
-        'body_id': 'importer-body',
-        'dias': DataImportAttempt.objects.filter(person=request.user.get_profile()).order_by('id')
+        'dias': DataImportAttempt.objects.filter(person=request.user.get_profile()).order_by('id'),
+        'blank_query': blank_query
         })
 
     return render_to_response('profile/importer.html', data)

@@ -30,8 +30,10 @@ urlpatterns = patterns('',
         (r'^people/delete-experience/do$',
          'mysite.profile.views.delete_experience_do'),
 
-        (r'^people/project_exp_tag__remove$',
-            'mysite.profile.views.project_exp_tag__remove__web'),
+        # FIXME: I think this is dead code and it causes problems when using
+        # Django's %url% template tag.
+        #(r'^people/project_exp_tag__remove$',
+        #    'mysite.profile.views.project_exp_tag__remove__web'),
 
         (r'^people/info/edit/do$',
             'mysite.profile.views.edit_person_info'),
@@ -63,9 +65,6 @@ urlpatterns = patterns('',
         # Get a list of suggestions for the search input,
         # formatted the way that the jQuery autocomplete plugin wants it.
         (r'^search/get_suggestions$', 'mysite.search.views.request_jquery_autocompletion_suggestions'),
-
-        (r'^people/test_commit_importer$',
-            'mysite.profile.views.display_test_page_for_commit_importer'),
 
         (r'^people/gimme_json_that_says_that_commit_importer_is_done$',
             'mysite.profile.views.gimme_json_that_says_that_commit_importer_is_done'),

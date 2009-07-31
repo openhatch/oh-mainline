@@ -161,18 +161,4 @@ input[type='submit'] {
 .visible_iff_js {
     display: none;
 }
-.field-errors ul {
-    float: left;
-    margin: 0;
-    padding: 0;
-}
-.field-errors li {
-    float: left;
-    padding: 5px 10px;
-    width: 410px;
-    color: #522;
-    background-color: #ffe4e4;
-    margin: 10px 0;
-    -moz-border-radius: 5px;
-}
 /* vim: set ai ts=4 sts=4 et sw=4: */

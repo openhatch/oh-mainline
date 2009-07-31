@@ -16,18 +16,10 @@ from profile.views import get_personal_data
 
 def login(request):
     # {{{
-    notification = notification_id = None
-    if request.GET.get('msg', None) == 'oops':
-        notification_id = "oops"
-        notification = "Couldn't find that pair of username and password. "
-        notification += "Did you type your password correctly?"
-    if request.GET.get('next', None) is not None:
-        notification_id = "next"
-        notification = "You've got to be logged in to do that!"
-    return render_to_response('account/login.html', {
-        'notification_id': notification_id,
-        'notification': notification,
-        } )
+    data = {}
+    data['notifications'] = base.controllers.get_notification_from_request(
+            request)
+    return render_to_response('account/login.html', data)
     # }}}
 
 def login_do(request):
@@ -102,13 +94,15 @@ def edit_password(request, edit_password_form = None):
 
 @login_required
 def edit_password_do(request):
+    # {{{
     form = django.contrib.auth.forms.PasswordChangeForm(
             request.user, request.POST)
     if form.is_valid():
         form.save() 
-        return HttpResponseRedirect('/account/edit/')
+        return HttpResponseRedirect('/people/%s/?msg=edit_password_done' % urllib.quote(request.user.username))
     else:
         return edit_password(request, edit_password_form=form)
+    # }}}
 
 @login_required
 def show_email_do(request):
@@ -144,3 +138,4 @@ def edit_photo_do(request, mock=None):
         form.save()
     return edit_photo(request, form = form)
 
+# vim: ai ts=3 sts=4 et sw=4 nu

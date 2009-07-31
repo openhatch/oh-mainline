@@ -4,23 +4,31 @@
 {{person.user.username}}'s profile | OpenHatch
 {% endblock title %}
 
-{% block middle %}
-<div id='portfolio'>
+{% block main %}
+<div id='portfolio' class='module'>
     <div class='project-display column'>
-        <h3>Contributions</h3>
-        {% if editable %}
-        <a class='portfolio-edit-button' href='/people/portfolio/import'>
-            Import lots
-        </a>
-        <a class='portfolio-edit-button' href='/form/projectexp_add'>
-            Add one
-        </a>
-        {% endif %}
+        <div class='module-header'>
+            {% if editable %}
+            <ul class='edit-buttons'>
+                <li>
+                <a class='portfolio-edit-button' href='/form/projectexp_add'>
+                    Add one
+                </a>
+                </li>
+                <li>
+                <a class='portfolio-edit-button' href='/people/portfolio/import'>
+                    Import lots
+                </a>
+                </li>
+            </ul>
+            {% endif %}
+            <h3>Contributions</h3>
+        </div>
+        <div class='module-content'>
         {% if projects %}
         <ul>
             {% for project, more_project_attributes in projects.items %}
             <li>
-            <!-- {{{ -->
             <div class='project-escutcheon'>
                 <div class='logo'>
                     <a href='/people/{{ person.user.username }}/projects/{{ project.name }}'>
@@ -32,7 +40,6 @@
                     href='/people/{{ person.user.username }}/projects/{{ project.name }}' 
                     class='name'>{{ project.name }}</a>
             </div>
-            <!-- }}} -->
             </li>
             {% endfor %}
         </ul>
@@ -46,70 +53,7 @@
         {% endif %}
         {% endif %}
     </div>
+    </div>
     <!-- }}} -->
 </div> <!-- /#portfolio -->
-{% endblock middle %}
-
-{% block right %}
-<div id='info' class='widget'>
-
-    {% if editable and not info_edit_mode %}
-    <a class='edit' href='/people/edit/info'>Edit</a>
-    {% endif %}
-
-    <h3 style='float: left; width: 100px;'>Info</h3>
-
-    {% if editable and not info_edit_mode and not has_set_info %}
-    <div id='edit_your_info_notification' class='notification'>Edit your info!</div>
-    {% endif %}
-
-    {% if info_edit_mode %}
-    <form name='edit-tags'
-        action='/people/info/edit/do'
-        method='POST'>
-        <!-- personal_info_edit_mode -->
-        {% comment %} THIS HURR IS EDIT MODE {% endcomment %}
-        <h4>(eg. c++, lambda calculus, juggling)</h4>
-        <h4>understands:</h4>
-        <textarea name='edit-tags-understands'>{{ tags_flat.understands }}</textarea>
-        <h4>will never understand:</h4>
-        <textarea name='edit-tags-understands_not'>{{ tags_flat.understands_not }}</textarea>
-        <h4>looking for volunteering opportunities tagged with:</h4>
-        <textarea name='edit-tags-seeking'>{{ tags_flat.seeking }}</textarea>
-        <h4>currently studying:</h4>
-        <textarea name='edit-tags-studying'>{{ tags_flat.studying }}</textarea>
-        <h4>can mentor in:</h4>
-        <textarea name='edit-tags-can_mentor'>{{ tags_flat.can_mentor }}</textarea>
-        <input class='save-button' type='submit' value='Save' />
-    </form>
-    {% else %}
-    <!-- {{{ -->
-    {% if tags_flat.understands %}
-    <div class='tags' id='tags-understands'>
-        <span class='tag-type'>understands:</span> {{ tags_flat.understands }}
-    </div>
-    {% endif %}
-    {% if tags.understands_not %}
-    <div class='tags' id='tags-understands_not'>
-        <span class='tag-type'>will never understand:</span> {{ tags_flat.understands_not }}
-    </div>
-    {% endif %}
-    {% if tags.seeking %}
-    <div class='tags' id='tags-seeking'>
-        <span class='tag-type'>looking for volunteering opportunities in:</span> {{ tags_flat.seeking }}
-    </div>
-    {% endif %}
-    {% if tags.studying %}
-    <div class='tags' id='tags-studying'>
-        <span class='tag-type'>currently learning about:</span> {{ tags_flat.studying }}
-    </div>
-    {% endif %}
-    {% if tags.can_mentor %}
-    <div class='tags' id='tags-can_mentor'>
-        <span class='tag-type'>can mentor in:</span> {{ tags_flat.can_mentor }}
-    </div>
-    {% endif %}
-    <!-- }}} -->
-    {% endif %}
-</div>
-{% endblock right %}
+{% endblock main %}

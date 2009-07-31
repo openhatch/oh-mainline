@@ -41,6 +41,7 @@
 
     </head>
     <body>
+        <div id='like-everything-jeez'>
         <div id='outermost'>
             <div id='penoutermost'>
                 {% block nav %}
@@ -82,10 +83,24 @@
                             </div>
                         </div>
                         {% endif %}
+
                     </div>
                 </div>
                 {% endblock nav %}
+                <ul id='notifications'>
+                    {% block notifications %}
+                    {% if notifications %}
+                    {% for notification in notifications %}
+                    <li class='alert' id='{{ notification.id }}'>{{ notification.text }}</li>
+                    {% endfor %}
+                    {% endif %}
+                    {% endblock %}
+                </ul>
                 <div id='content'>
+                    <div id='page-top'>
+                    {% block pagetop %}
+                    {% endblock %}
+                    </div>
                     {% block content %}
                     {% endblock content %}
                 </div><!-- /#content -->
@@ -102,6 +117,7 @@
                 </div>
             </div><!-- /#penoutermost -->
         </div><!-- /#outermost -->
+    </div<!-- /#like-everything-jeez -->
 
         {% block jquery %}
         <script src='/static/js/jquery.js'></script>

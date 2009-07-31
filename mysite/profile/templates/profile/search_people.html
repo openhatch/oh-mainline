@@ -5,6 +5,7 @@
 <h3>This is everybody on OpenHatch</h3>
 <ul>
     {% for person in people %}
+    {% if person.user.username %}
     <li>
     <a href='/people/{{person.user.username}}'>
         {% if person.user.first_name or person.user.last_name %}
@@ -14,6 +15,7 @@
         {% endif %}
     </a>
     </li>
+    {% endif %}
     {% endfor %}
 </ul>
 </div>

@@ -3,7 +3,7 @@ form {
     float: left;
     width: 478px;
 }
-.form-row {
+form p, .form-row {
     float: left;
     width: 400px;
 }

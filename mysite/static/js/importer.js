@@ -1,17 +1,107 @@
 // Depends on jQuery.
 
-var makeNewInput = function() {
-    var $form = $('.queries form div');
-    html = "<input type='text' name='NAME' id='NAME' />";
-    html = html.replace(/NAME/g, 
-            "commit_username_" + $form.find('input').size());
-    $new_input = $(html).appendTo($form);
+var askServerToBeginQuerying = function () {
+    console.log('Query add');
 }
+
+var getStrings = function(schema, dictionaries) {
+    /* Returns an array of strings.
+     * Each string is `schema' saturated with the mappings
+     * provided by a dictionary in `dictionaries'.
+     * <example>
+     * <input>
+     *
+     *  var schema = "In $LANGUAGE, hello is '$HELLO', "
+     *      + "goodbye is '$GOODBYE', thank you is '$THANKYOU'";
+     *
+     *  var french = {
+     *      '$LANGUAGE': 'French',
+     *      '$HELLO': 'Salut',
+     *      '$GOODBYE': "A tout à l'heure",
+     *      '$THANKYOU' 'Merci beaucoup'
+     *      };
+     *
+     *  var turkish = {
+     *      '$LANGUAGE': 'Turkish',
+     *      '$HELLO': 'Merhaba',
+     *      '$GOODBYE': 'Hoscakal',
+     *      '$THANKYOU' 'Tesekkurler'
+     *      };
+     *
+     *  var yiddish = {
+     *      '$LANGUAGE': 'Yiddish',
+     *      '$HELLO': 'Sholem aleykham',
+     *      '$GOODBYE': 'Zay gesunt',
+     *      '$THANKYOU' 'A sheynem dank'
+     *      };
+     *
+     *  var dictionaries = [french, turkish, yiddish];
+     *
+     *  applyDictionariesToSchema(dictionaries, schema);
+     *
+     * </input>
+     *
+     * <output>
+     * // Array of strings.
+     * [
+     *      "In French, hello is 'Salut', goodbye is 'A tout à l'heure', thank you is 'Merci beaucoup'",
+     *      "In Turkish... etc.",
+     *      "In Yiddish... etc."
+     *      ]
+     *
+     * </output>
+     */
+    var strings = [];
+    for (var d = 0; d < dictionaries.length; d++) {
+        var dictionary = dictionaries[d];
+        var str = schema;
+        for (var mapFrom in dictionary) {
+            var mapTo = dictionary[mapFrom];
+            mapFrom = mapFrom.replace("$", "\\$");
+            str = str.replace(new RegExp(mapFrom, "g"), mapTo);
+        }
+        strings.push(str);
+    }
+    return strings;
+};
+
+var makeNewInput = function() {
+    var $table = $('.input table');
+    var index = $('.input tr').size();
+    var html = "<tr id='query_$INDEX' class='query'>";
+    html += "<td class='username'><div>Username or email address:</div>";
+    html += "<input type='text' /></td>";
+
+    var sourceDictionaries = [
+        {'$ID': 'rs', '$DISPLAY': 'All repositories'},
+        {'$ID': 'lp', '$DISPLAY': "<img src='/static/images/icons/data-sources/launchpad.png' alt='Launchpad' />"},
+        {'$ID': 'ou', '$DISPLAY': "<img src='/static/images/icons/data-sources/ohloh.png' alt='Ohloh' />"},
+    ];
+
+    var checkboxTDSchema = "<td class='data_source selected'>"
+        + "<input type='checkbox' checked "
+        + "name='checkbox_$INDEX_$ID' "
+        + "id='checkbox_$INDEX_$ID' />"
+        + "<label for='checkbox_$INDEX_$ID'>"
+        + "$DISPLAY"
+        + "</label>"
+        + "</td>";
+
+    html += getStrings(checkboxTDSchema, sourceDictionaries).join("\n");
+    html += "</tr>";
+    html = html.replace(/\$INDEX/g, index);
+
+    $(html).appendTo($table);
+
+    bindHandlers();
+};
+
 var keydownHandler = function() {
+    console.log('keydown!');
     $input = $(this);
     var oneInputIsBlank = function() {
         var ret = false;
-        $('.queries form input').each(function () {
+        $(".input table input[type='text']").each(function () {
                 var thisInputIsBlank = (
                     $(this).val().replace(/\s/g,'') == '' );
                 if (thisInputIsBlank) ret = true;
@@ -20,13 +110,32 @@ var keydownHandler = function() {
     }();
     if (!oneInputIsBlank) {
         makeNewInput();
-        bindKeyupHandlers();
+        bindHandlers();
     }
-}
-var bindKeyupHandlers = function() {
-    $('.queries form div input').keydown(keydownHandler);
-}
-$(bindKeyupHandlers);
+};
+
+var diaCheckboxChangeHandler = function() {
+    var $checkbox = $(this);
+    var checked = $checkbox.is(':checked')
+    $checkbox.parent()[(checked?'add':'remove') + 'Class']('selected');
+};
+
+$.fn.hoverClass = function(className) {
+    mouseoverHandler = function() { $(this).addClass(className); };
+    mouseoutHandler = function() { $(this).removeClass(className); };
+    return this.hover(mouseoverHandler, mouseoutHandler);
+};
+
+$.fn.debug = function() { console.debug(this); return this; }
+
+var bindHandlers = function() {
+    $(".input table input[type='text']").keydown(keydownHandler).debug();
+    $(".input table input[type='checkbox']")
+        .change(diaCheckboxChangeHandler);
+    $(".input table td.data_source").hoverClass('hover');
+};
+
+$(bindHandlers);
 
 var submitDataSources = function() {
     $checkboxes = $(".data_import_attempts input[type='checkbox']:checked");
@@ -48,7 +157,8 @@ var submitDataSources = function() {
     };
     var data = {'checkboxIDs': checkboxIDs.join(" ")};
     $.post(url, data, callback);
-}
+};
+
 $.fn.setThrobberStatus = function(theStatus) {
     $cb = this;
     var $throbber = $cb.parent().find(
@@ -65,7 +175,8 @@ $.fn.setThrobberStatus = function(theStatus) {
         $throbber.attr('src', src);
     }
     //console.debug($throbber.get(0));
-}
+};
+
 var enableThrobbersThenPollForStatusForever = function() {
     var $checkboxes = $(".data_import_attempts input[type='checkbox']:checked");
     // Enable throbbers.
@@ -115,8 +226,15 @@ var enableThrobbersThenPollForStatusForever = function() {
         }
     }
     window.askIfDoneInterval = window.setInterval(ask_if_done, 1000);
-}
+};
+
 var bindSubmitButtonClickHandler = function() {
     $('#submit_data_sources').click(submitDataSources);
-}
+};
+
 $(bindSubmitButtonClickHandler);
+
+// Create first blank row of input table.
+$(makeNewInput);
+
+$(function() { $('.hide_on_doc_ready').hide(); });
