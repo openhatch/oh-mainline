@@ -41,7 +41,7 @@ class Login(base.tests.TwillTests):
         tc.fv('login','login_username',"paulproteus")
         tc.fv('login','login_password',"not actually paulproteus's unbreakable password")
         tc.submit()
-        tc.find("oops")
+        tc.notfind('is_authenticated indeed')
     # }}}
 
 class Signup(base.tests.TwillTests):
