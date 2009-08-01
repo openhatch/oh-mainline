@@ -64,14 +64,9 @@ class EditPhotoForm(django.forms.ModelForm):
             format = too_big.format
             new_w = 200
             new_h = (h * 1.0 / w) * 200
-            #try:
-            #    smaller = too_big.resize((new_w, new_h), PIL.Image.ANTIALIAS)
-            #except ValueError:
+
             smaller = too_big.resize((new_w, new_h),
                                      PIL.Image.ANTIALIAS)
-
-            import pdb
-            pdb.set_trace()
 
             # "Save" it to memory
             new_image_fd = StringIO.StringIO()
