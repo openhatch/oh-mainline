@@ -45,6 +45,9 @@ urlpatterns = patterns('',
         # OpenID URL prefix for django_authopenid.urls
         url(r'^openid/signin/$', oid_views.signin, name='user_signin'),
 
+        # OpenID URL prefix for django_authopenid.urls
+        url(r'^openid/register/$', oid_views.register, dict(send_email=False)),
+
         (r'^openid/', include('django_authopenid.urls')),
 
         (r'^account/edit/password/$',
