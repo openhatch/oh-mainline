@@ -35,7 +35,8 @@ h3 {
 #content {
     background: #fff;
     border: 0;
-    padding-top: 0;
+    padding: 0;
+    float: left;
 }
 
 #entry-points h3 {
@@ -138,14 +139,21 @@ input[type='submit'] {
     float: left;
     margin-top: 0px;
     background: #fff url('/static/images/motif-eee.png');
-    padding: 40px;
+    padding: 20px;
+    width: 500px;
+}
+#entry-points #no-authorization-necessary {
+    float: left;
+    margin-bottom: 40px;
+}
+#entry-points #no-authorization-necessary ul {
+    float: left;
 }
 #entry-points #no-authorization-necessary li {
     list-style: square;
     font-size: 10pt;
 }
 #entry-points #account-related {
-    margin-top: 40px;
     float: left;
 }
 #entry-points #account-related li {
@@ -168,9 +176,15 @@ input[type='submit'] {
     -moz-border-radius-topleft: 7px;
     -moz-border-radius-topright: 8px;
 }
+.tab-links a:active {
+    outline: none;
+}
+.tab-links a:focus {
+    -moz-outline-style: none;
+}
 #tabs {
     float: left;
-    width: 430px;
+    width: 470px;
     background-color: #fff;
     padding: 10px;
     border: 3px solid #ddd;
