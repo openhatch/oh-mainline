@@ -1,87 +1,91 @@
 {% extends 'profile/base_profile.html' %}
 
-{% block right %}
-<div class='edit single-project column project-display'>
-    <h3>Log a contribution</h3>
-    <form name='projectexp_add' method='POST'
-        action='/do/projectexp_add'>
-        <div class='section'>
-            <div class='section-heading'>
-                <h4>
-                    <label for='project__name'>
-                        Project
-                    </label>
-                </h4>
+{% block main %}
+<div class='single-project project-display module'>
+    <div class='module-header'>
+        <h3>Log a contribution</h3>
+    </div>
+    <div class='module-content'>
+        <form name='projectexp_add' method='POST'
+            action='/do/projectexp_add'>
+            <div class='section'>
+                <div class='section-heading'>
+                    <h4>
+                        <label for='project__name'>
+                            Project
+                        </label>
+                    </h4>
+                </div>
+                <div class='section-content' id='role'>
+                    <input type='text'
+                    id='project__name'
+                    name='project__name'
+                    value='{{ exp.project__name }}' />
+                </div>
             </div>
-            <div class='section-content' id='role'>
-                <input type='text'
-                id='project__name'
-                name='project__name'
-                value='{{ exp.project__name }}' />
-            </div>
-        </div>
 
-        <div class='section'>
-            <div class='section-heading'>
-                <h4>
-                    <label for='project_exp__description'>
-                        Describe your involvement
-                    </label>
-                </h4>
+            <div class='section'>
+                <div class='section-heading'>
+                    <h4>
+                        <label for='project_exp__description'>
+                            Describe your involvement
+                        </label>
+                    </h4>
+                </div>
+                <div class='section-content' id='role'>
+                    <textarea
+                        id=  'project_exp__description'
+                        name='project_exp__description'
+                        >{{ exp.description }}</textarea>
+                </div>
             </div>
-            <div class='section-content' id='role'>
-                <textarea
-                    id=  'project_exp__description'
-                    name='project_exp__description'
-                    >{{ exp.description }}</textarea>
-            </div>
-        </div>
 
-        <div class='section'>
-            <div class='section-heading'>
-                <h4>
-                    <label for='project_exp__url'>
-                        Cite your involvement
-                    </label>
-                </h4>
+            <div class='section'>
+                <div class='section-heading'>
+                    <h4>
+                        <label for='project_exp__url'>
+                            Cite your involvement
+                        </label>
+                    </h4>
+                </div>
+                <div class='section-content'>
+                    <input type='text' value='http://'
+                    id=  'project_exp__url' 
+                    name='project_exp__url' />
+                </div>
             </div>
-            <div class='section-content'>
-                <input type='text' value='http://'
-                id=  'project_exp__url' 
-                name='project_exp__url' />
+            <div class='section'>
+                <div class='section-heading'>
+                    <!-- This just takes up space. -->
+                    &nbsp;
+                </div>
+                <div class='section-content help-bubble'
+                    id='help-bubble-1'>
+                    <a href='#' class='help-bubble-close'>x</a>
+                    <img src='/static/images/icons/info.png' />
+                    <p>
+                    A good citation is a link to a bug report or archived
+                    post to a mailing list that includes your patch,
+                    translation, design idea, or other contribution.
+                    (Cue some tactical Googling!)
+                    </p>
+                </div>
             </div>
-        </div>
-        <div class='section'>
-            <div class='section-heading'>
-                <!-- This just takes up space. -->
-                &nbsp;
+            <div class='section'>
+                <div class='section-heading'>
+                    &nbsp;
+                </div>
+                <div class='section-content'>
+                    <input type='submit' value='Save' />
+                    <a style='padding: 6px; margin-right: 10px; float: right;' href='/people/{{ the_user.username }}/'>
+                        &laquo; Back to portfolio
+                    </a>
+                </div>
             </div>
-            <div class='section-content help-bubble'
-                id='help-bubble-1'>
-                <a href='#' class='help-bubble-close'>x</a>
-                <img src='/static/images/icons/info.png' />
-                <p>
-                A good citation is a link to a bug report or archived
-                post to a mailing list that includes your patch,
-                translation, design idea, or other contribution.
-                (Cue some tactical Googling!)
-                </p>
-            </div>
-        </div>
-        <div class='section'>
-            <div class='section-heading'>
-                &nbsp;
-            </div>
-            <div class='section-content'>
-                <input type='submit' value='Save' />
-                <a style='padding: 6px; margin-right: 10px; float: right;' href='/people/{{ the_user.username }}/'>
-                    &laquo; Back to portfolio
-                </a>
-            </div>
-        </div>
-    </form>
+        </form>
+    </div>
 </div>
-{% endblock right %}
+{% endblock main %}
 
 {% block js %}
 <script src='/static/js/jquery.cookie.js'></script>

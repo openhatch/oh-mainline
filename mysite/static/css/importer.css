@@ -8,61 +8,93 @@
     width: 400px;
 }
 #importer input[type='text'] {
-    width: 150px;
+    width: 170px;
+    float: left;
     font-size: 12pt;
 }
 #importer input[type='submit'] {
     float: right;
 }
-#importer .input {
+#importer form {
+    float: left;
+    background-color: #fff;
+    border-top: 1px solid #eee;
+    border-bottom: 3px double #eee;
+    border-left: 1px solid #eee;
+    border-right: 1px solid #eee;
+    border: 5px solid #ddd;
+}
+#importer form,
+#importer form .head,
+#importer form .body,
+#importer form .foot {
     float: left;
     width: 680px;
-    background-color: #fff;
 }
-#importer .input table {
+#importer form .foot {
+    padding: 10px;
     width: 660px;
-    border-collapse: collapse;
+    background-color: #eee;
 }
-#importer .input td {
-    border: 1px solid #ddd;
-    border-spacing: 0;
-    padding: 5px;
-    border-top: 2px solid #ddd; 
+#importer form .head {
+    background-color: #bfe2ff;
+    font-weight: bold;
+}
+#importer form .head .who,
+#importer form .head .data_sources {
+}
+#importer form .body .who,
+#importer form .body .data_sources {
+}
+#importer form .who, 
+#importer form .data_sources {
+    float: left;
     margin: 0;
+    padding: 10px;
 }
-#importer .input td.username,
-#importer .input td.email {
-    padding: 5px;
+#importer form .body .data_sources {
+    padding: 0 10px;
 }
-#importer .input td.username span,
-#importer .input td.email span {
+#importer form .query {
+    float: left;
+    width: 680px;
+}
+#importer form .query.odd {
+    background-color: #f4f4f4;
+}
+#importer form .who {
+    width: 180px;
+    margin-right: 10px;
+}
+#importer form .data_sources {
+    width: 450px;
+}
+#importer form .who span {
     padding: 5px;
     float: left;
 }
-#importer .input td.selected {
-    background-color: #ffffe4;
-    border-top-color: orange;
-}
-#importer .data_import_attempts {
+#importer form .data_source span {
+    padding: 4px 0;
     float: left;
-    width: 200px;
 }
 #importer li {
     float: left;
-    margin-top: 10px;
 }
 #importer input[type='checkbox'] {
     float: left;
-    width: 30px;
-    margin-right: 15px;
+    margin-right: 10px;
     position: relative;
-    top: 5px;
+    top: 18px;
 }
-#importer td label {
+#importer label {
     float: left;
-    padding: 10px;
+    padding: 16px 10px;
     cursor: hand;
     cursor: pointer;
+    height: 25px;
+}
+#importer .data_source {
+    margin-right: 20px;
 }
 #importer .data_import_status {
     float: left;
@@ -72,13 +104,11 @@
     margin: 0;
     margin-bottom: 10px;
 }
-#importer span {
-    font-weight: bold;
-}
 #importer .loading-notification {
     text-align: center;
     font-size: 13pt;
     color: #222;
+    padding: 18px;
 }
 #importer .howto {
     float: left;
@@ -87,6 +117,8 @@
     background-color: #f4f4f4;
     border: 1px solid #f4f4f4;
     border-top: 2px solid #ff0;
+    border-bottom: 3px double #eee;
+    border: 5px solid #ddd;
 }
 #importer .howto h3.head {
     color: #222;
@@ -121,15 +153,7 @@
 }
 #importer .howto .foot {
     float: left;
-    height: 3px;
-    border-top: 1px dotted #ddd;
-    border-bottom: 1px solid #ddd;
-    width: 680px;
-    text-align: right;
 }
 #importer .howto .hide-link {
     float: right;
-}
-#importer .input td.data_source.hover {
-    background-color: #bfe2ff;
 }

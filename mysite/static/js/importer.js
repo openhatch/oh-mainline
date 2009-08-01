@@ -1,4 +1,6 @@
-// Depends on jQuery.
+// Depends on:
+//  - jQuery <http://jquery.com>
+//  - the jQuery Form Plugin <http://malsup.com/jquery/form/#code-samples>
 
 var askServerToBeginQuerying = function () {
     console.log('Query add');
@@ -6,8 +8,10 @@ var askServerToBeginQuerying = function () {
 
 var getStrings = function(schema, dictionaries) {
     /* Returns an array of strings.
-     * Each string is `schema' saturated with the mappings
+     * Each string is the result of the string `schema'
+     * translated according to the mappings
      * provided by a dictionary in `dictionaries'.
+     *
      * <example>
      * <input>
      *
@@ -44,12 +48,14 @@ var getStrings = function(schema, dictionaries) {
      * <output>
      * // Array of strings.
      * [
-     *      "In French, hello is 'Salut', goodbye is 'A tout à l'heure', thank you is 'Merci beaucoup'",
+     *      "In French, hello is 'Salut', goodbye is 'A tout à l'heure', \
+     *          thank you is 'Merci beaucoup'",
      *      "In Turkish... etc.",
      *      "In Yiddish... etc."
-     *      ]
+     * ]
      *
      * </output>
+     * </example>
      */
     var strings = [];
     for (var d = 0; d < dictionaries.length; d++) {
@@ -57,8 +63,8 @@ var getStrings = function(schema, dictionaries) {
         var str = schema;
         for (var mapFrom in dictionary) {
             var mapTo = dictionary[mapFrom];
-            mapFrom = mapFrom.replace("$", "\\$");
-            str = str.replace(new RegExp(mapFrom, "g"), mapTo);
+            mapFromRegExp = new RegExp(mapFrom.replace("$", "\\$"), "g");
+            str = str.replace(mapFromRegExp, mapTo);
         }
         strings.push(str);
     }
@@ -66,42 +72,60 @@ var getStrings = function(schema, dictionaries) {
 };
 
 var makeNewInput = function() {
-    var $table = $('.input table');
-    var index = $('.input tr').size();
-    var html = "<tr id='query_$INDEX' class='query'>";
-    html += "<td class='username'><div>Username or email address:</div>";
-    html += "<input type='text' /></td>";
+    var $form = $('form .body');
+    var index = $form.find('.query').size();
+    var extraClass = (index % 2 == 0) ? "" : " odd";
+    var html = ""
+        + "<div id='query_$INDEX' class='query"+ extraClass +"'>"
+        + "   <div class='who'>"
+        + "       <input type='text' name='identifier_$INDEX' />"
+        + "   </div>"
+        + "   <ul class='data_sources'>"
 
+    var imgPrefix = "/static/images/icons/data-sources/";
     var sourceDictionaries = [
-        {'$ID': 'rs', '$DISPLAY': 'All repositories'},
-        {'$ID': 'lp', '$DISPLAY': "<img src='/static/images/icons/data-sources/launchpad.png' alt='Launchpad' />"},
-        {'$ID': 'ou', '$DISPLAY': "<img src='/static/images/icons/data-sources/ohloh.png' alt='Ohloh' />"},
+        {
+            '$ID': 'rs',
+            '$DISPLAY': "<span>All repositories</span>"
+        },
+        {
+            '$ID': 'lp',
+            '$DISPLAY': "<img src='"
+                + imgPrefix + "launchpad.png' alt='Launchpad' />"
+        },
+        {
+            '$ID': 'ou',
+            '$DISPLAY': "<img src='"
+                + imgPrefix + "ohloh.png' alt='Ohloh' />"
+        },
     ];
 
-    var checkboxTDSchema = "<td class='data_source selected'>"
-        + "<input type='checkbox' checked "
-        + "name='checkbox_$INDEX_$ID' "
-        + "id='checkbox_$INDEX_$ID' />"
-        + "<label for='checkbox_$INDEX_$ID'>"
-        + "$DISPLAY"
-        + "</label>"
-        + "</td>";
+    var checkboxTDSchema = ""
+        + "       <li class='data_source selected'>"
+        + "            <input type='checkbox' checked "
+        + "                name='person_wants_$INDEX_$ID' "
+        + "                id='person_wants_$INDEX_$ID' />"
+        + "            <label for='person_wants_$INDEX_$ID'>"
+        + "                $DISPLAY"
+        + "            </label>"
+        + "       </li>";
 
-    html += getStrings(checkboxTDSchema, sourceDictionaries).join("\n");
-    html += "</tr>";
+    html += getStrings(checkboxTDSchema, sourceDictionaries).join("\n")
+        + "    </ul>"
+        + "</div>";
+
     html = html.replace(/\$INDEX/g, index);
 
-    $(html).appendTo($table);
+    $(html).appendTo($form);
 
     bindHandlers();
 };
 
 var keydownHandler = function() {
-    console.log('keydown!');
     $input = $(this);
     var oneInputIsBlank = function() {
         var ret = false;
-        $(".input table input[type='text']").each(function () {
+        $("form input[type='text']").each(function () {
                 var thisInputIsBlank = (
                     $(this).val().replace(/\s/g,'') == '' );
                 if (thisInputIsBlank) ret = true;
@@ -129,42 +153,16 @@ $.fn.hoverClass = function(className) {
 $.fn.debug = function() { console.debug(this); return this; }
 
 var bindHandlers = function() {
-    $(".input table input[type='text']").keydown(keydownHandler).debug();
-    $(".input table input[type='checkbox']")
+    $("form input[type='text']").keydown(keydownHandler).debug();
+    $("form input[type='checkbox']")
         .change(diaCheckboxChangeHandler);
-    $(".input table td.data_source").hoverClass('hover');
+    $("form .data_source").hoverClass('hover');
 };
 
 $(bindHandlers);
 
-var submitDataSources = function() {
-    $checkboxes = $(".data_import_attempts input[type='checkbox']:checked");
-    checkboxIDs = [];
-    $checkboxes.each(function () {
-        $cb = $(this);
-        checkboxIDs.push($cb.attr('id'));
-    });
-
-    // Post
-    var url = "/people/user_selected_these_dia_checkboxes";
-    var callback = function(response) {
-        if (response == '0') {
-            alert('Oops. An error occurred while trying ' +
-                    'to import your data. Please reload the page.');
-        } else {
-            enableThrobbersThenPollForStatusForever();
-        }
-    };
-    var data = {'checkboxIDs': checkboxIDs.join(" ")};
-    $.post(url, data, callback);
-};
-
 $.fn.setThrobberStatus = function(theStatus) {
-    $cb = this;
-    var $throbber = $cb.parent().find(
-            '.data_import_status img');
-    //console.debug("Trying to set status of throbber: ", $throbber.get(0));
-    $throbber.css('visibility', 'visible');
+    var $throbber = this;
     mapStatusToImage = {
         'working': '/static/images/throbber.gif',
         'succeeded': '/static/images/icons/finished-successfully.png',
@@ -174,15 +172,22 @@ $.fn.setThrobberStatus = function(theStatus) {
     if ($throbber.attr('src') != src) {
         $throbber.attr('src', src);
     }
-    //console.debug($throbber.get(0));
+    console.debug($throbber.get(0));
 };
 
+$.fn.convertCheckboxToThrobber = function() {
+    var $cb = this;
+    var $throbber = $("<img src='/static/images/snake.gif'/>").insertBefore($cb);
+    $cb.remove();
+}
+
 var enableThrobbersThenPollForStatusForever = function() {
-    var $checkboxes = $(".data_import_attempts input[type='checkbox']:checked");
+    var $checkboxes = $("#importer form input[type='checkbox']:checked");
+    console.debug($checkboxes);
     // Enable throbbers.
     $checkboxes.each(function () {
             $cb = $(this);
-            $cb.setThrobberStatus('working');
+            $cb.convertCheckboxToThrobber();
             });
 
     // Ask server for a list of dias, which will tell us
@@ -228,11 +233,29 @@ var enableThrobbersThenPollForStatusForever = function() {
     window.askIfDoneInterval = window.setInterval(ask_if_done, 1000);
 };
 
-var bindSubmitButtonClickHandler = function() {
-    $('#submit_data_sources').click(submitDataSources);
-};
+var submission = {
+    'init': function () {
+        submission.$form = $('#importer form');
+        submission.bindHandler();
+    },
+    '$form': null,
+    'handler': function () {
+        console.log('handler');
+        $(this).ajaxSubmit({'success': submission.callback});
+        return false; // Bypass the form's native submission logic.
+    },
+    'bindHandler': function () {
+        console.log('bindHandler');
+        console.log(submission.$form);
+        submission.$form.submit(submission.handler);
+    },
+    'callback': function (response) {
+        console.log(response);
+        enableThrobbersThenPollForStatusForever();
+    }
+}
 
-$(bindSubmitButtonClickHandler);
+$(submission.init);
 
 // Create first blank row of input table.
 $(makeNewInput);

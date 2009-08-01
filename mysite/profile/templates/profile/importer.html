@@ -21,34 +21,36 @@ Import your contributions from around the web | OpenHatch
                     <ol>
                         <li class='handle'>
                         <h4>What's your handle?</h4>
-                        Type in some usernames and
+                        Enter some usernames and
                         email addresses you've used
-                        in open source.
+                        in free software / open source.
                         </li>
                         <li class='hangout'>
                         <h4>Where do you hang out?</h4>
-                        Specify where you've used the username/email.
-
-                        Select &ldquo;All repositories&rdquo; to automatically scan 20,000 open source repositories for your footprints.
-                        Or import data associated with your account on another network.
+                        <p>Specify where you've used the username/email.</p>
+                        <p>&ldquo;All repositories&rdquo; &rarr; Automatically
+                        scan 20,000 open source repositories for your footprints.</p>
+                        <p>Or import data associated with your account on another network.</p>
                         </li>
                     </ol>
                 </div>
                 <div class='foot'>
                 </div>
             </div>
-        <div class='input'>
             <form name='import' method='POST'
-                action='{% url mysite.profile.views.import_do %}'>
-                <table>
+                action='{% url mysite.profile.views.user_selected_these_dia_checkboxes %}'>
+                <div class='head'>
+                    <div class='who'>Username or email</div>
+                    <div class='data_sources'>Data sources</div>
+                </div>
+                <div class='body'>
                     <div class='loading-notification hide_on_doc_ready'>Getting ready...</div>
-                </table>
+                </div>
+                <div class='foot'>
+                    <input type='submit' value='Submit' id='submit_data_sources' />
+                </div>
             </form>
-        </div>
 
-        <div class=''>
-            <input type='submit' value='Submit' id='submit_data_sources' />
-        </div>
         <div style='float: left; width: 400px; padding: 10px; font-size: 12pt;'>
             <a style='font-weight: bold;' href='/people/{{ the_user.username }}'>
                 &laquo; Show my projects</a>
@@ -58,5 +60,6 @@ Import your contributions from around the web | OpenHatch
 {% endblock main %}
 
 {% block js %}
+<script type='text/javascript' src='/static/js/jquery.form.js'></script>
 <script type='text/javascript' src='/static/js/importer.js'></script>
 {% endblock js %}
