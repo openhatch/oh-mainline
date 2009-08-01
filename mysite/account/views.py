@@ -129,7 +129,6 @@ def edit_photo(request, form = None):
                               data)
 
 @login_required
-@mock.patch('PIL.PngImagePlugin.PngImageFile.load')
 def edit_photo_do(request, mock=None):
     data = get_personal_data(
             request.user.get_profile())

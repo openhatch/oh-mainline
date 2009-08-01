@@ -4,6 +4,7 @@ import django.forms
 from profile.models import Person
 import StringIO
 from django.core.files.images import get_image_dimensions
+from django.core.files.uploadedfile import InMemoryUploadedFile
 import PIL.Image
 
 class UserCreationFormWithEmail(django.contrib.auth.forms.UserCreationForm):
@@ -60,14 +61,25 @@ class EditPhotoForm(django.forms.ModelForm):
         if w > 200:
             # Scale it down.
             too_big = PIL.Image.open(StringIO.StringIO(data))
+            format = too_big.format
             new_w = 200
             new_h = (h * 1.0 / w) * 200
-            #try:
-            #    smaller = too_big.resize((new_w, new_h), PIL.Image.ANTIALIAS)
-            #except ValueError:
+
             smaller = too_big.resize((new_w, new_h),
                                      PIL.Image.ANTIALIAS)
-            smaller.save(self.cleaned_data[
-                    'photo'].temporary_file_path(), 'PNG')
+
+            # "Save" it to memory
+            new_image_fd = StringIO.StringIO()
+            smaller.save(new_image_fd, format=format)
+            new_image_fd.seek(0)
+
+            old = self.cleaned_data['photo']
+
+            new_image_uploaded_file = InMemoryUploadedFile(
+                new_image_fd, old.field_name, old.name,
+                old.content_type, new_image_fd.len, old.charset)
+
+            # Modify the self.cleaned_data[]
+            self.cleaned_data['photo'] = new_image_uploaded_file
         return self.cleaned_data['photo']
 
