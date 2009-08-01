@@ -2,7 +2,6 @@
 
 {% load i18n %}
 
-
 {% block title %}
 Welcome to OpenHatch!
 {% endblock title %}
@@ -11,23 +10,23 @@ Welcome to OpenHatch!
 {% endblock nav %}
 
 {% block js_in_head %}
-        <script>
-            // allow IE to recognize HTMl5 elements
-            document.createElement('section');
-            document.createElement('article');
-            document.createElement('aside');
-            document.createElement('footer');
-            document.createElement('header');
-            document.createElement('nav');
-            document.createElement('time');
+<script>
+    // allow IE to recognize HTMl5 elements
+    document.createElement('section');
+    document.createElement('article');
+    document.createElement('aside');
+    document.createElement('footer');
+    document.createElement('header');
+    document.createElement('nav');
+    document.createElement('time');
 
-        </script>
-        <link rel="stylesheet" href="/static/openid/css/openid.css" />
+</script>
+<link rel="stylesheet" href="/static/openid/css/openid.css" />
 
 <script type="text/javascript" src="/static/js/jquery.js"></script>
 <script type="text/javascript" src="/static/openid/js/openid-jquery.js"></script>
 <script type="text/javascript">
-$(document).ready(function() {
+$(function() {
     openid.init('id_openid_url');
 });
 </script>

@@ -2,8 +2,10 @@
     display: none;
 }
 .tab-links a.my-tab-is-hidden {
-    background-color: #eee;
+    background-color: #bfe2ff;
     color: #222;
+    padding-bottom: 5px;
+    border-color: #fff;
 }
 .visible_iff_js {
     display: inline ! important; /* Overrides declaration in homepage.css */

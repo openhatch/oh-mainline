@@ -1,7 +1,9 @@
+body {
+    border-top: 20px solid #666;
+}
 a img {
     border-style: none;
 }
-
 
 h1 {
     font-size: 24px; 
@@ -28,6 +30,12 @@ h3 {
     font-size: 20px;
     text-align: center;
     margin: 10px 0;
+}
+
+#content {
+    background: #fff;
+    border: 0;
+    padding-top: 0;
 }
 
 #entry-points h3 {
@@ -57,14 +65,11 @@ small {
      float: right;
 }
 
-#content {
-    margin-top: 50px;
-}
-
 #banner {
     width: 350px;
     float: left;
     margin-right: 50px;
+    padding-top: 30px;
 }
 #explanation {
     font-size: 9pt;
@@ -131,7 +136,9 @@ input[type='submit'] {
 }
 #entry-points {
     float: left;
-    margin-top: 100px;
+    margin-top: 0px;
+    background: #fff url('/static/images/motif-eee.png');
+    padding: 40px;
 }
 #entry-points #no-authorization-necessary li {
     list-style: square;
@@ -150,15 +157,23 @@ input[type='submit'] {
     float: left;
     background-color: #fff;
     margin-right: 10px;
-    padding: 10px 10px 5px 10px;
+    padding: 10px 10px 8px 10px;
     font-size: 10pt;
     font-weight: bold;
+    border: 3px solid #ddd;
+    border-top-width: 2px;
+    border-bottom: 0;
+    position: relative;
+    top: 3px;
+    -moz-border-radius-topleft: 7px;
+    -moz-border-radius-topright: 8px;
 }
 #tabs {
     float: left;
     width: 430px;
     background-color: #fff;
     padding: 10px;
+    border: 3px solid #ddd;
 }
 .visible_iff_js {
     display: none;
