@@ -29,6 +29,16 @@ class Person(models.Model):
                 self.user.first_name, self.user.last_name)
     # }}}
 
+def create_profile_when_user_created(instance, created, *args, **kwargs):
+    if created:
+        person = Person(user=instance)
+        person.save()
+
+import django
+django.db.models.signals.post_save.connect(
+    create_profile_when_user_created,
+    sender=django.contrib.auth.models.User)
+
 class DataImportAttempt(models.Model):
     # {{{
     SOURCE_CHOICES = (

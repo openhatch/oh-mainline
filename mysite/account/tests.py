@@ -191,3 +191,15 @@ class EditPhoto(base.tests.TwillTests):
         tc.submit()
         
 
+class LoginWithOpenId(base.tests.TwillTests):
+    fixtures = ['user-paulproteus']
+    def test_login_creates_user_profile(self):
+        # Front page
+        url = 'http://openhatch.org/'
+
+        self.assertFalse(list(
+            Person.objects.filter(user__username='paulproteus')))
+        self.login_with_client()
+
+        self.assert_(list(
+            Person.objects.filter(user__username='paulproteus')))
