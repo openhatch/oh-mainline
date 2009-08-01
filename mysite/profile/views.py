@@ -637,19 +637,28 @@ def prepare_data_import_attempts_do(request):
     Not yet implemented: This means, don't show the user DIAs that relate to
     non-existent accounts on remote networks. And what *that* means is, 
     before bothering the user, ask those networks beforehand if they even 
-    have accounts named commit_usernames[0], etc."""
+    have accounts named identifiers[0], etc."""
     # {{{
     # for each commit_username_*, call some silly controller """
-    commit_usernames = []
-    for key in request.POST:
-        if key.startswith('commit_username_'):
-            value = request.POST[key].strip()
+    prepare_data_import_attempts(request.POST, request.user)
+
+    if request.POST.get('format', None) == 'success_code':
+        return HttpResponse('1')
+    else:
+        return HttpResponseRedirect('/people/portfolio/import/')
+    # }}}
+
+def prepare_data_import_attempts(post, user):
+    identifiers = []
+    for key in post:
+        if key.startswith('identifier_'):
+            value = post[key].strip()
             if not value:
                 continue # Skip blanks
-            commit_usernames.append(value)
+            identifiers.append(value)
 
     # Side-effects: Create DIAs that a user might want to execute.
-    for cu in commit_usernames:
+    for identifier in identifiers:
         for source_key, _ in DataImportAttempt.SOURCE_CHOICES:
             # FIXME: "...that a user might want to execute" means,
             # don't show the user DIAs that relate to non-existent
@@ -657,16 +666,10 @@ def prepare_data_import_attempts_do(request):
             # And what *that* means is, before bothering the user,
             # ask those networks beforehand if they even have
             # accounts named commit_usernames[0], etc.
-            dia = DataImportAttempt(source=source_key,
-                    person=request.user.get_profile(), query=cu)
-            dia.save()
-            dia.do_what_it_says_on_the_tin()
-
-    if request.POST.get('format', None) == 'success_code':
-        return HttpResponse('1')
-    else:
-        return HttpResponseRedirect('/people/portfolio/import/')
-    # }}}
+            dia = get_most_recent_data_import_attempt_or_create(
+                    query=identifier,
+                    source=source_key,
+                    person=user.get_profile())
 
 @login_required
 def importer(request):
@@ -702,6 +705,21 @@ def filter_by_key_prefix(dict, prefix):
             out_dict[key] = value
     return out_dict
 
+def get_most_recent_data_import_attempt_or_create(query, source, person):
+    dias = DataImportAttempt.objects.filter(
+            query=query, source=source,
+            person=person).order_by("-pk")
+    if not dias:
+        dia = DataImportAttempt(
+                query=query,
+                source=source,
+                person=person)
+        dia.save()
+        dia.do_what_it_says_on_the_tin()
+        return dia
+    else:
+        return dias[0]
+
 @login_required
 def user_selected_these_dia_checkboxes(request):
     """ Input: Request POST contains a list of checkbox IDs corresponding to DIAs.
@@ -709,6 +727,9 @@ def user_selected_these_dia_checkboxes(request):
     Output: Success?
     """
     # {{{
+
+    prepare_data_import_attempts(request.POST, request.user)
+
     checkboxes = filter_by_key_prefix(request.POST, "person_wants_")
     identifiers = filter_by_key_prefix(request.POST, "identifier_")
 
@@ -719,12 +740,9 @@ def user_selected_these_dia_checkboxes(request):
             if identifier:
                 # FIXME: For security, ought this filter include only dias
                 # associated with the logged-in user's profile?
-                dia, created = DataImportAttempt.objects.get_or_create(
-                            query=identifier, source=source_key,
-                            person=request.user.get_profile())
-                if created:
-                    dia.save()
-                    dia.do_what_it_says_on_the_tin()
+                dia = get_most_recent_data_import_attempt_or_create(
+                        identifier, source_key,
+                        request.user.get_profile())
 
                 dia.person_wants_data = True
                 dia.save()

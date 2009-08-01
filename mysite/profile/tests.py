@@ -701,6 +701,18 @@ class ImportContributionsTests(base.tests.TwillTests):
         self.assert_(list(DataImportAttempt.objects.filter(person=Person.objects.get(user__username='paulproteus'))))
         #}}}
 
+    def test_prepare_data_import_attempts(self):
+        user = User.objects.get(username='paulproteus')
+        self.assertEqual(len(DataImportAttempt.objects.filter(person=user.get_profile())), 0)
+        post = {
+                'identifier_0': 'paulproteus',
+                'checkbox_0_rs': 'on',
+                'checkbox_0_lp': 'on',
+                'checkbox_0_ou': 'on'
+                }
+        profile.views.prepare_data_import_attempts(post, user)
+        self.assertEqual(len(DataImportAttempt.objects.filter(person=user.get_profile())), 3)
+
     # }}}
 
 class UserCanShowEmailAddress(base.tests.TwillTests):
