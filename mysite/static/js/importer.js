@@ -211,7 +211,7 @@ $.fn.setThrobberStatus = function(theStatus) {
     // {{{
     var $throbber = this;
     mapStatusToImage = {
-        'working': '/static/images/throbber.gif',
+        'working': '/static/images/snake.gif',
         'succeeded': '/static/images/icons/finished-successfully.png',
         'failed': '/static/images/icons/finished-unsuccessfully.png',
     }
@@ -227,14 +227,18 @@ $.fn.convertCheckboxesToThrobber = function() {
     // {{{
     var convert = function () {
         var $checkbox = $(this);
-        bits = $checkbox.id.split('_');
+        bits = $checkbox.attr('id').split('_');
         var query_index = bits[2];
         var query = $('input[type="text"]').get(query_index).value;
+
+        // Skip checkboxes whose queries are blank.
+        if (query.replace(/\s/g, '') == '') return;
+
         var source = bits[3];
         var imageHTML = "<img class='throbber' src='/static/images/snake.gif'/>";
         var $throbber = $(imageHTML).insertBefore($checkbox);
-        $throbber.attr('query', query);
-        $throbber.attr('source', source);
+        $throbber.data('query', query);
+        $throbber.data('source', source);
         $checkbox.remove();
     };
     return this.each(convert);
@@ -270,9 +274,9 @@ enableThrobbersThenPollForStatusForever = function() {
                 else {
                     diaStatus = 'working';
                 }
-                if ($checkbox.is(':checked')) {
-                    $checkbox.setThrobberStatus(diaStatus);
-                }
+                $(findThrobbersForDia(dia)).each(function () {
+                        $(this).setThrobberStatus(diaStatus);
+                        });
                 if (diaStatus == 'working') {
                     allSeemsDone = false;
                 }
@@ -292,9 +296,18 @@ enableThrobbersThenPollForStatusForever = function() {
     // }}}
 };
 
-findThrobberForDia = function(dia) {
-    $throbbers = $('.throbbers');
-    return $('[query="'+dia.query+'"][source="'+dia.source+'"]').get(0);
+findThrobbersForDia = function(dia) {
+    var $throbbers = $('.throbber');
+    var matching = [];
+    var pushIfMatch = function () {
+        $throbber = $(this);
+        if ($throbber.data('query') == dia.fields.query
+                && $throbber.data('source') == dia.fields.source) {
+            matching.push($throbber);
+        }
+    };
+    $throbbers.each(pushIfMatch);
+    return matching;
 };
 
 Preparation = {
@@ -308,7 +321,9 @@ Preparation = {
     '$inputs': null,
     'handler': function () {
         var url = '/people/portfolio/import/prepare_data_import_attempts_do';
-        var query = $("[type='text']", this).val();
+        var query = $(this).val();
+        fireunit.ok(typeof query != 'undefined', "query: " + query);
+
         var data = {'format': 'success_code'};
 
         // About the below; the old POST handler used to expect
@@ -348,6 +363,7 @@ Submission = {
     'callback': function (response) {
         console.log(response);
         enableThrobbersThenPollForStatusForever();
+        $('input', Submission.$form).attr('disabled', 'disabled');
     }
     // }}}
 };
@@ -360,3 +376,21 @@ init = function () {
 $(init);
 
 $(function() { $('.hide_on_doc_ready').hide(); });
+
+fireunit.ok(typeof console != 'undefined', "Yep");
+fireunit.ok(typeof $ == 'undefined', "Yep");
+fireunit.testDone();
+
+tests = {
+    'Preparation': function () {
+        $('form input[type="text"]').val('paulproteus').blur();
+        fireunit.testDone();
+    }
+};
+runTests = function () {
+    for (t in tests) {
+        fireunit.ok(true, "test: " + t);
+        tests[t](); 
+    }
+};
+//$(runTests);

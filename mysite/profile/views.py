@@ -659,17 +659,18 @@ def prepare_data_import_attempts(post, user):
 
     # Side-effects: Create DIAs that a user might want to execute.
     for identifier in identifiers:
-        for source_key, _ in DataImportAttempt.SOURCE_CHOICES:
-            # FIXME: "...that a user might want to execute" means,
-            # don't show the user DIAs that relate to non-existent
-            # accounts on remote networks.
-            # And what *that* means is, before bothering the user,
-            # ask those networks beforehand if they even have
-            # accounts named commit_usernames[0], etc.
-            dia = get_most_recent_data_import_attempt_or_create(
-                    query=identifier,
-                    source=source_key,
-                    person=user.get_profile())
+        if identifier:
+            for source_key, _ in DataImportAttempt.SOURCE_CHOICES:
+                # FIXME: "...that a user might want to execute" means,
+                # don't show the user DIAs that relate to non-existent
+                # accounts on remote networks.
+                # And what *that* means is, before bothering the user,
+                # ask those networks beforehand if they even have
+                # accounts named commit_usernames[0], etc.
+                dia = get_most_recent_data_import_attempt_or_create(
+                        query=identifier,
+                        source=source_key,
+                        person=user.get_profile())
 
 @login_required
 def importer(request):
