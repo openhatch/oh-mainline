@@ -95,9 +95,7 @@ class ProfileTests(base.tests.TwillTests):
         tc.notfind('Newfirst Newlast')
 
         # Let's go enter a name
-        tc.follow('Edit name')
-
-        tc.url('/edit/name')
+        tc.go(make_twill_url('http://openhatch.org/edit/name'))
         tc.fv('edit_name', 'first_name', 'Newfirst')
         tc.fv('edit_name', 'last_name', 'Newlast')
         tc.submit()
