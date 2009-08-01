@@ -96,28 +96,23 @@ h1, h2, h3, h4 {
 #nav ul {
     list-style: none;
     margin: 0;
-    float: left;
+    float: right;
 }
 #nav li {
-    float: left;
-    margin-right: 10px;
-    margin-top: 20px;
-    font-size: 9pt;
-    padding: 10px;
+    float: right;
+    margin-left: 20px;
+    margin-top: 10px;
 }
-#nav li a {
+#links li a {
     color: #777;
-    padding: 5px 10px;
+    padding: 3px 10px 5px 10px;
     background-color: #fff; d8d8e4; 00afff; caffff; 7fc4ff;
-    border: 1px solid #fcfcfc;
+    border-top: 2px solid #eee;
     float: left;
     text-decoration: none;
 }
-#nav li span {
-    padding: 5px 10px;
-    float: left;
-}
-#nav li a:hover {
+
+#links li a:hover {
     color: #222;
 }
 
@@ -131,6 +126,28 @@ ul#links {
 
 #links li {
     display: inline;
+    font-size: 12pt;
+    margin-top: 20px;
+}
+
+#account-links li {
+    background-color: #F4F4F4;
+    border-top: 2px solid #BFE2FF;
+    padding: 5px 10px;
+    margin: 0;
+    font-size: 9pt;
+}
+
+#account-links li a {
+    color: #2288BB;
+}
+
+#account-links li a:hover {
+    color: #223366;
+}
+
+ul#account-links {
+    margin-left: 20px;
 }
 
 ul#user-actions {
