@@ -28,7 +28,7 @@ def ensure_user_has_a_profile(request):
 
 def login(request):
     # {{{
-    if request.user.is_authenticated:
+    if request.user.is_authenticated():
         # Get the user's profile; if he doesn't have one, create it.
         ensure_user_has_a_profile(request)
         # always, if the user is logged in, redirect to his profile page
