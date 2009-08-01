@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.test.client import Client
 from django.core.files.images import get_image_dimensions
+import Image
 
 from twill import commands as tc
 
@@ -194,8 +195,8 @@ class EditPhoto(base.tests.TwillTests):
             tc.submit()
             # Now check that the photo == what we uploaded
             p = Person.objects.get(user__username='paulproteus')
-            self.assertEqual(p.photo.read(),
-                             open(image).read())
+            self.assert_(p.photo.read() ==
+                         open(image).read())
 
     def test_set_avatar_too_wide(self):
         for image in ('static/images/too-wide.jpg', 
@@ -206,10 +207,11 @@ class EditPhoto(base.tests.TwillTests):
             tc.follow('Change photo')
             tc.formfile('edit_photo', 'photo', image)
             tc.submit()
-            # Now check that the photo == what we uploaded
+            # Now check that the photo is 200px wide
             p = Person.objects.get(user__username='paulproteus')
-            image = p.photo.read()
-            
+            image_as_stored = Image.open(p.photo.file)
+            w, h = image_as_stored.size
+            self.assertEqual(w, 200)
 
 class LoginWithOpenId(base.tests.TwillTests):
     fixtures = ['user-paulproteus']
