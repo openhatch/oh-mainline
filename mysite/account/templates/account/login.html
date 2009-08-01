@@ -6,22 +6,24 @@
 
 {% block content %}
 <div id='login' class='module account-dialog'>
-    <form name='login'
-        action='/account/login/do' method='POST'>
-        <h3 >Please log in!</h3>
-        <div class='form-row'>
-            <label for='login_username'>Username</label>
-            <input type='text' id='login_username' name='login_username' />
-        </div>
-        <div class='form-row'>
-            <label for='login_password'>Password</label>
-            <input type='password' id='login_password' name='login_password' />
-        </div>
-        <div class='form-row'>
-            <input type='submit' value='go' style='' />
-        </div>
-    </form>
-    <div style='margin-top: 50px; clear: left; float: left;'>
+    <h3 class='module-header'>Please log in!</h3>
+    <div class='module-content'>
+        <form name='login'
+            action='/account/login/do' method='POST'>
+            <div class='form-row'>
+                <label for='login_username'>Username</label>
+                <input type='text' id='login_username' name='login_username' />
+            </div>
+            <div class='form-row'>
+                <label for='login_password'>Password</label>
+                <input type='password' id='login_password' name='login_password' />
+            </div>
+            <div class='form-row'>
+                <input type='submit' value='go' style='' />
+            </div>
+        </form>
+    </div>
+    <div class='foot' style='margin-top: 50px; clear: left; float: left;'>
         Don't have an account yet? Then <a style='font-weight: bold;' href='/#tab=create_profile'>sign your bad self up for one</a>.
     </div>
 </div>

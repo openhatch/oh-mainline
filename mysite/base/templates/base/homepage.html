@@ -45,22 +45,8 @@ $(function() {
 
     <div id='explanation'>
         <h3>OpenHatch is an open source involvement engine.</h3>
-        <small><a href="#" id='learn-more-link'>Learn more +</a></small>
-        <div id='more-information' class='invisible_if_js'>
-            <p>OpenHatch makes it easy to:</p>
-            <ul>
-                <li>Find new ways that you can help with open source projects</li>
-                <li>Find mentors or mentees and learn new skills</li>
-                <li>Track and show off all your open source software experience in one place.</li>
-            </ul>
-            <p>By providing us with the usernames and email addresses you use in the open source software community,
-            we automatically compile your contributions to open source. We then use your past contributions to make
-            recommendations on how you could contribute further.</p>
-            <p>First, we collect open bugs from open source bug trackers across the web and highlight 
-            tasks that match your skill set. <!--If you indicate a skill you want to learn, we automatically link you
-            to potential mentors who have substantial experience in that area. (Vice-versa, if you know a lot
-            about a particular skill, we encourage and facilitate you in mentoring less-experienced members of the
-            site!)--></p>
+        <div id='love-code'>
+            <img src='/static/images/love-code.png' />
         </div>
     </div>
 </div>
@@ -86,6 +72,9 @@ $(function() {
             <li><a href="/account/login"
                 class='visible_iff_js my-tab-is-hidden'
                 tab_selector="#openid">OpenID</a></li>
+            <li><a href="#learn_more"
+                class='visible_iff_js my-tab-is-hidden'
+                tab_selector="#learn-more">Learn more</a></li>
         </ul>
         <div id='tabs' class='module'>
             <h3 class='invisible_if_js'>Sign up</h3>
@@ -162,6 +151,15 @@ $(function() {
         </fieldset>
 </form>
 
+            </div>
+            <h3 class='invisible_if_js'>What is OpenHatch?</h3>
+            <div id='learn-more' class='tab invisible_if_js'>
+            <p>OpenHatch makes it easy to:</p>
+            <ul>
+                <li>Find new ways that you can help with open source projects</li>
+                <li>Find mentors or mentees and learn new skills</li>
+                <li>Track and show off all your open source software experience in one place.</li>
+            </ul>
             </div>
         </div>
     </div>

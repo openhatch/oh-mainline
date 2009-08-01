@@ -1,6 +1,7 @@
 body {
-    background: #bfe2ff url('/static/images/bg-grey-band.png') top repeat-x;
+    background: #a6de8d url('/static/images/bg-grey-band.png') top repeat-x;
 }
+
 a img {
     border-style: none;
 }
@@ -77,8 +78,9 @@ small {
 }
 #banner img {
     border: 0;
-    width: 222px;
-    height: 152px;
+}
+#love-code {
+    margin-top: 50px;
 }
 
 #explanation p {
@@ -153,8 +155,6 @@ input[type='submit'] {
 #entry-points #no-authorization-necessary ul {
     float: left;
     width: 540px;
-    padding: 10px;
-    background-color: #f4f4f4;
 }
 #entry-points #no-authorization-necessary li {
     list-style: none;
@@ -178,31 +178,33 @@ input[type='submit'] {
     border-color: #ddd;
 }
 #entry-points #account-related {
-    padding: 15px;
     float: left;
-    background: #ddd;
     border: 10px solid #fff;
-    width: 560px;
+    width: 600px;
 }
 #entry-points #account-related li {
     float: left;
     margin-right: 10px;
     list-style: none;
 }
+.tab-links ul {
+    margin: 0;
+    padding: 0;
+}
 .tab-links a {
     float: left;
-    background-color: #fff;
+    background-color: #f4f4f4;
     margin-right: 10px;
-    padding: 10px 10px 8px 10px;
+    padding: 15px 15px 13px 15px;
     font-size: 10pt;
     font-weight: bold;
-    border: 3px solid #ddd;
-    border-top-width: 2px;
-    border-bottom: 0;
     position: relative;
-    top: 3px;
     /*-moz-border-radius-topleft: 7px;
     -moz-border-radius-topright: 8px;*/
+}
+.tab-links a:hover {
+    background-color: #eee;
+    text-decoration: none;
 }
 .tab-links a:active {
     outline: none;
@@ -212,12 +214,22 @@ input[type='submit'] {
 }
 #tabs {
     float: left;
-    width: 470px;
-    background-color: #fff;
-    padding: 10px;
-    border: 3px solid #ddd;
+    width: 560px;
+    background-color: #f4f4f4;
+    padding: 20px;
+    margin: 0;
 }
 .visible_iff_js {
     display: none;
+}
+#learn-more {
+    font-size: 12pt;
+}
+#entry-points #account-related #learn-more ul {
+    margin-left: 10px;
+}
+#entry-points #account-related #learn-more li {
+    list-style: square;
+    margin-bottom: 10px;
 }
 /* vim: set ai ts=4 sts=4 et sw=4: */
