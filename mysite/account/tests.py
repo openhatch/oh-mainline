@@ -5,6 +5,7 @@ from profile.models import Person
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.test.client import Client
+from django.core.files.images import get_image_dimensions
 
 from twill import commands as tc
 
@@ -195,6 +196,20 @@ class EditPhoto(base.tests.TwillTests):
             p = Person.objects.get(user__username='paulproteus')
             self.assertEqual(p.photo.read(),
                              open(image).read())
+
+    def test_set_avatar_too_wide(self):
+        for image in ('static/images/too-wide.jpg', 
+                      'static/images/too-wide.png'):
+            self.login_with_twill()
+            url = 'http://openhatch.org/people/paulproteus/'
+            tc.go(make_twill_url(url))
+            tc.follow('Change photo')
+            tc.formfile('edit_photo', 'photo', image)
+            tc.submit()
+            # Now check that the photo == what we uploaded
+            p = Person.objects.get(user__username='paulproteus')
+            image = p.photo.read()
+            
 
 class LoginWithOpenId(base.tests.TwillTests):
     fixtures = ['user-paulproteus']
