@@ -690,7 +690,7 @@ class ImportContributionsTests(base.tests.TwillTests):
         data = {}
         commit_usernames_and_emails = ["bilbo", "bilbo@baggin.gs"]
         for n, cu in enumerate(commit_usernames_and_emails):
-            data["commit_username_%d" % n] = cu
+            data["identifier_%d" % n] = cu
 
         # Not a DIA in sight.
         self.assertFalse(list(DataImportAttempt.objects.filter(person=Person.objects.get(user__username='paulproteus'))))
