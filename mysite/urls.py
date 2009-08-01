@@ -47,9 +47,6 @@ urlpatterns = patterns('',
 
         (r'^openid/', include('django_authopenid.urls')),
 
-        (r'^account/openid_etc_login$',
-         'mysite.account.views.openid_etc_login'),
-
         (r'^account/edit/password/$',
             'mysite.account.views.edit_password'),
 

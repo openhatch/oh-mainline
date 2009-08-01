@@ -1,8 +1,13 @@
 from django.http import HttpResponse, HttpResponseServerError
 from django.shortcuts import render_to_response
 import account.forms
+from django_authopenid.forms import OpenidSigninForm
+from django.template import RequestContext, loader, Context
 
 def homepage(request, signup_form=None):
+    # For OpenID
+    form1 = OpenidSigninForm()
+
     signup_notification = login_notification = notification_id = None
     if request.GET.get('msg', None) == 'ciao':
         login_notification = "You've been logged out. Thanks for dropping in!"
@@ -20,4 +25,8 @@ def homepage(request, signup_form=None):
         'notification_id': notification_id,
         'login_notification': login_notification,
         'signup_notification': signup_notification,
-        })
+        'form1': form1,
+        }, context_instance=RequestContext(request))
+
+
+
