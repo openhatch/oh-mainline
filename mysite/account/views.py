@@ -16,8 +16,24 @@ from profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag
 from profile.views import get_personal_data
 # }}}
 
+def ensure_user_has_a_profile(request):
+    if request.user.is_authenticated:
+        # Get the user's profile; if he doesn't have one, create it.
+        try:
+            profile = request.user.get_profile()
+        except Person.DoesNotExist:
+            new_person = Person(user=request.user)
+            new_person.save()
+            profile = request.user.get_profile()
+
 def login(request):
     # {{{
+    if request.user.is_authenticated:
+        # Get the user's profile; if he doesn't have one, create it.
+        ensure_user_has_a_profile(request)
+        # always, if the user is logged in, redirect to his profile page
+        return HttpResponseRedirect('/people/%s/' %
+                                    urllib.quote(request.user.username))
     data = {}
     data['notifications'] = base.controllers.get_notification_from_request(
             request)
