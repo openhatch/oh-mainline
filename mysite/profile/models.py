@@ -22,7 +22,7 @@ class Person(models.Model):
     show_email = models.BooleanField(default=False)
     photo = models.ImageField(upload_to=
                               lambda a, b: 'static/photos/profile-photos/' + generate_person_photo_path(a, b),
-                              default='static/images/profile-photos/sufjan.jpg')
+                              default='images/profile-photos/sufjan.jpg')
 
     def __unicode__(self):
         return "username: %s, name: %s %s" % (self.user.username,
