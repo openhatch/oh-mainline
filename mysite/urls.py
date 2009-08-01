@@ -2,8 +2,11 @@ from django.conf.urls.defaults import *
 
 import settings
 
+import django_authopenid
 from django.contrib import admin
 admin.autodiscover()
+
+from django_authopenid import views as oid_views
 
 urlpatterns = patterns('',
         # FIXME: Automatically remove trailing slashes from input URLs,
@@ -16,6 +19,7 @@ urlpatterns = patterns('',
         (r'^people/$', 'mysite.profile.views.display_list_of_people'),
 
         (r'^account/login/$', 'mysite.account.views.login'),
+        (r'^account/catch-me$', 'mysite.account.views.catch_me'),
         (r'^account/logout/$', 'mysite.account.views.logout'),
 
         (r'^account/login/do$', 'mysite.account.views.login_do'),
@@ -30,16 +34,21 @@ urlpatterns = patterns('',
         (r'^people/delete-experience/do$',
          'mysite.profile.views.delete_experience_do'),
 
-        # FIXME: I think this is dead code and it causes problems when using
-        # Django's %url% template tag.
         #(r'^people/project_exp_tag__remove$',
         #    'mysite.profile.views.project_exp_tag__remove__web'),
-
         (r'^people/info/edit/do$',
             'mysite.profile.views.edit_person_info'),
 
         (r'^people/project_icon/(?P<project_name>.*)$',
             'mysite.profile.views.project_icon_web'),
+
+        # OpenID URL prefix for django_authopenid.urls
+        url(r'^openid/signin/$', oid_views.signin, name='user_signin'),
+
+        # OpenID URL prefix for django_authopenid.urls
+        url(r'^openid/register/$', oid_views.register, dict(send_email=False)),
+
+        (r'^openid/', include('django_authopenid.urls')),
 
         (r'^account/edit/password/$',
             'mysite.account.views.edit_password'),

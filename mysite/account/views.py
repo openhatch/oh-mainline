@@ -5,8 +5,10 @@ import django.contrib.auth
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 import mock
+from django_authopenid.forms import OpenidSigninForm
 
 import urllib
+
 
 import account.forms
 import base.views
@@ -16,6 +18,10 @@ from profile.views import get_personal_data
 
 def login(request):
     # {{{
+    if request.user.is_authenticated():
+        # always, if the user is logged in, redirect to his profile page
+        return HttpResponseRedirect('/people/%s/' %
+                                    urllib.quote(request.user.username))
     data = {}
     data['notifications'] = base.controllers.get_notification_from_request(
             request)
@@ -48,9 +54,6 @@ def signup_do(request):
 
         user = signup_form.save()
 
-        # create a linked person
-        person = Person(user=user)
-        person.save()
 
         username = request.POST['username']
         password = request.POST['password1']
@@ -137,5 +140,9 @@ def edit_photo_do(request, mock=None):
     if form.is_valid():
         form.save()
     return edit_photo(request, form = form)
+
+def catch_me(request):
+    import pdb
+    pdb.set_trace()
 
 # vim: ai ts=3 sts=4 et sw=4 nu

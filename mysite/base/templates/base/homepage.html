@@ -1,5 +1,8 @@
 {% extends 'base/base.html' %}
 
+{% load i18n %}
+
+
 {% block title %}
 Welcome to OpenHatch!
 {% endblock title %}
@@ -8,6 +11,28 @@ Welcome to OpenHatch!
 {% endblock nav %}
 
 {% block js_in_head %}
+        <script>
+            // allow IE to recognize HTMl5 elements
+            document.createElement('section');
+            document.createElement('article');
+            document.createElement('aside');
+            document.createElement('footer');
+            document.createElement('header');
+            document.createElement('nav');
+            document.createElement('time');
+
+        </script>
+        <link rel="stylesheet" href="/static/openid/css/openid.css" />
+
+<script type="text/javascript" src="/static/js/jquery.js"></script>
+<script type="text/javascript" src="/static/openid/js/openid-jquery.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+    openid.init('id_openid_url');
+});
+</script>
+
+
 <script src='/static/js/css_if_js.js'></script>
 {% endblock js_in_head %}
 
@@ -52,13 +77,16 @@ Welcome to OpenHatch!
             </li>
         </ul>
     </div>
-    <div id='account-related' class='tab-links'>
-        <ul>
-            <li><a href="#create_profile" class='visible_iff_js'
+    <div id='account-related'>
+        <ul class='tab-links'>
+          <li><a href="#create_profile" class='visible_iff_js'
                 tab_selector="#create_profile">Sign up</a></li>
             <li><a href="/account/login"
                 class='visible_iff_js my-tab-is-hidden'
                 tab_selector="#login">Log in</a></li>
+            <li><a href="/account/login"
+                class='visible_iff_js my-tab-is-hidden'
+                tab_selector="#openid">OpenID</a></li>
         </ul>
         <div id='tabs' class='module'>
             <h3 class='invisible_if_js'>Sign up</h3>
@@ -116,6 +144,26 @@ Welcome to OpenHatch!
                     </div>
                 </form>
             </div> 
+            <h3 class='invisible_if_js'>OpenID</h3>
+            <div id='openid' class='tab invisible_if_js'>
+<form id="openid_form" name="openid_form" action="{% url user_signin %}" method="post">
+    <input type="hidden" name="action" value="verify" />
+    <input type="hidden" name="next" value="{{ next }}" />
+        <fieldset>
+                <legend>{% trans "Sign In Using Your OpenID URL" %}</legend>
+                <div id="openid_choice">
+                <p>Please click your account provider:</p>
+                <div id="openid_btns"></div>
+        </div>
+            <div id="openid_input_area">
+                <label for="id_openid_ul">{% trans "OpenId URL :" %}</label>{{ form1.openid_url }}
+                <input name="openid_submit" type="submit" value="{% trans "Sign in with OpenID" %}">
+            </div>
+                
+        </fieldset>
+</form>
+
+            </div>
         </div>
     </div>
 </div>

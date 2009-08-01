@@ -1,10 +1,10 @@
 How to run this code:
 
-$ sudo apt-get install python-django python-twill python-lxml python-dateutil python-tz python-simplejson rabbitmq-server python-mysqldb python-imaging python-libxml2 python-apt python-beautifulsoup
+$ sudo apt-get install python-django python-twill python-lxml python-dateutil python-tz python-simplejson rabbitmq-server python-mysqldb python-imaging python-libxml2 python-apt python-beautifulsoup python-openid
 $ sudo rabbitmqctl add_user rabbiter johT4qui
 $ sudo rabbitmqctl add_host localhost
 $ rabbitmqctl set_permissions -p localhost rabbiter "" ".*" ".*" || rabbitmqctl map_user_vhost rabbiter localhost || echo EEEP
-$ sudo easy_install windmill south typecheck celery odict http://linode.openhatch.org/~paulproteus/python_launchpad_bugs-0.3.6-py2.5.egg mock
+$ sudo easy_install windmill south typecheck celery odict http://linode.openhatch.org/~paulproteus/python_launchpad_bugs-0.3.6-py2.5.egg mock django-registration django-authopenid
 
 $ cd mysite
 $ python manage.py runserver
