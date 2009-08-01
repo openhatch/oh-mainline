@@ -1,5 +1,5 @@
 body {
-    border-top: 20px solid #666;
+    background: #bfe2ff url('/static/images/bg-grey-band.png') top repeat-x;
 }
 a img {
     border-style: none;
@@ -33,7 +33,7 @@ h3 {
 }
 
 #content {
-    background: #fff;
+    background: transparent;
     border: 0;
     padding: 0;
     float: left;
@@ -67,17 +67,18 @@ small {
 }
 
 #banner {
-    width: 350px;
+    width: 220px;
     float: left;
     margin-right: 50px;
-    padding-top: 30px;
+    padding: 40px;
 }
 #explanation {
     font-size: 9pt;
 }
 #banner img {
     border: 0;
-    width: 350px;
+    width: 222px;
+    height: 152px;
 }
 
 #explanation p {
@@ -138,23 +139,50 @@ input[type='submit'] {
 #entry-points {
     float: left;
     margin-top: 0px;
-    background: #fff url('/static/images/motif-eee.png');
-    padding: 20px;
-    width: 500px;
+    width: 600px;
 }
 #entry-points #no-authorization-necessary {
+    background-color: #f4f4f4;
+    padding: 20px;
     float: left;
     margin-bottom: 40px;
+    width: 560px;
+    border: solid #fff;
+    border-width: 0 10px;
 }
 #entry-points #no-authorization-necessary ul {
     float: left;
+    width: 540px;
+    padding: 10px;
+    background-color: #f4f4f4;
 }
 #entry-points #no-authorization-necessary li {
-    list-style: square;
-    font-size: 10pt;
+    list-style: none;
+    font-size: 15pt;
+    float: left;
+    width: 270px;
+}
+#entry-points #no-authorization-necessary li a {
+    float: left;
+    background: #fff url('/static/images/motif-eee.png');
+    color: #222;
+    padding: 20px;
+    height: 100px;
+    border: solid #eee;
+    border-width: 5px 0 0 0;
+}
+#entry-points #no-authorization-necessary li a:hover {
+    background: #fff;
+    color: #00afff; 7fc4ff; bfe2ff;
+    text-decoration: none;
+    border-color: #ddd;
 }
 #entry-points #account-related {
+    padding: 15px;
     float: left;
+    background: #ddd;
+    border: 10px solid #fff;
+    width: 560px;
 }
 #entry-points #account-related li {
     float: left;
@@ -173,8 +201,8 @@ input[type='submit'] {
     border-bottom: 0;
     position: relative;
     top: 3px;
-    -moz-border-radius-topleft: 7px;
-    -moz-border-radius-topright: 8px;
+    /*-moz-border-radius-topleft: 7px;
+    -moz-border-radius-topright: 8px;*/
 }
 .tab-links a:active {
     outline: none;
