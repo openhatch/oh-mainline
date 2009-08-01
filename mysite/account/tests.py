@@ -41,7 +41,7 @@ class Login(base.tests.TwillTests):
         tc.fv('login','login_username',"paulproteus")
         tc.fv('login','login_password',"not actually paulproteus's unbreakable password")
         tc.submit()
-        tc.find("oops")
+        tc.notfind('is_authenticated indeed')
     # }}}
 
 class Signup(base.tests.TwillTests):
@@ -197,9 +197,8 @@ class LoginWithOpenId(base.tests.TwillTests):
         # Front page
         url = 'http://openhatch.org/'
 
-        self.assertFalse(list(
-            Person.objects.filter(user__username='paulproteus')))
-        self.login_with_client()
-
+        # Even though we didn't add the person-paulproteus
+        # fixture, a Person object is created.
         self.assert_(list(
             Person.objects.filter(user__username='paulproteus')))
+

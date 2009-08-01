@@ -35,7 +35,7 @@ class TwillTests(django.test.TestCase):
 
     def login_with_twill(self):
         # Visit login page
-        login_url = 'http://openhatch.org/account/login'
+        login_url = 'http://openhatch.org/'
         tc.go(make_twill_url(login_url))
 
         # Log in
