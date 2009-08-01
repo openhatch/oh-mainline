@@ -183,13 +183,18 @@ class EditPassword(base.tests.TwillTests):
 class EditPhoto(base.tests.TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
     def test_set_avatar(self):
-        self.login_with_twill()
-        url = 'http://openhatch.org/people/paulproteus/'
-        tc.go(make_twill_url(url))
-        tc.follow('Change photo')
-        tc.formfile('edit_photo', 'photo', 'static/sample-photo.png')
-        tc.submit()
-        
+        for image in ('static/sample-photo.png', 
+                      'static/sample-photo.jpg'):
+            self.login_with_twill()
+            url = 'http://openhatch.org/people/paulproteus/'
+            tc.go(make_twill_url(url))
+            tc.follow('Change photo')
+            tc.formfile('edit_photo', 'photo', image)
+            tc.submit()
+            # Now check that the photo == what we uploaded
+            p = Person.objects.get(user__username='paulproteus')
+            self.assertEqual(p.photo.read(),
+                             open(image).read())
 
 class LoginWithOpenId(base.tests.TwillTests):
     fixtures = ['user-paulproteus']
