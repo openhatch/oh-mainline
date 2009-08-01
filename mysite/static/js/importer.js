@@ -1,12 +1,44 @@
-// Depends on:
-//  - jQuery <http://jquery.com>
-//  - the jQuery Form Plugin <http://malsup.com/jquery/form/#code-samples>
+/* 
+ * {{{
+ * Ze importer.
+ *
+ * == Dependencies ==
+ *  * jQuery <http://jquery.com>
+ *  * the jQuery Form Plugin <http://malsup.com/jquery/form/#code-samples>
+ *
+ * == The order of things ==
+ *
+ *  1.  User enters an identifier (username or email address)
+ *      into an input field.
+ *
+ *  2.  When the user exits the input field, we grab as much
+ *      data as we can about that identifier.
+ *      (This code is handled in Preparation below.)
+ *
+ *  3.  The user selects/deselects some checkboxes.
+ *
+ *  4.  When the user clicks the submit button, we set the 
+ *      'person_wants_data' field of their DataImportAttempts
+ *      according to which checkboxes they've clicked.
+ *      (This code is handled in Submission below.)
+ *
+ *  5.  When the server responds, we show some throbbers to
+ *      the user, to let them know we're working behind the
+ *      scenes.
+ *      (This code is also handled in Submission below.)
+ *
+ *  6.  We ping the server repeatedly, asking "Are you done yet?"
+ *
+ *  7.  On each ping the server responds with a list of DIAs and
+ *      their attributes.
+ *
+ *  8.  If all the DIAs read 'I'm done!', we encourage the user
+ *      to visit his/her portfolio.
+ *  }}}
+ */
 
-var askServerToBeginQuerying = function () {
-    console.log('Query add');
-}
-
-var getStrings = function(schema, dictionaries) {
+getStrings = function(schema, dictionaries) {
+    // {{{
     /* Returns an array of strings.
      * Each string is the result of the string `schema'
      * translated according to the mappings
@@ -41,7 +73,7 @@ var getStrings = function(schema, dictionaries) {
      *
      *  var dictionaries = [french, turkish, yiddish];
      *
-     *  applyDictionariesToSchema(dictionaries, schema);
+     *  getStrings(dictionaries, schema);
      *
      * </input>
      *
@@ -69,9 +101,11 @@ var getStrings = function(schema, dictionaries) {
         strings.push(str);
     }
     return strings;
+    // }}}
 };
 
-var makeNewInput = function() {
+makeNewInput = function() {
+    // {{{
     var $form = $('form .body');
     var index = $form.find('.query').size();
     var extraClass = (index % 2 == 0) ? "" : " odd";
@@ -119,9 +153,11 @@ var makeNewInput = function() {
     $(html).appendTo($form);
 
     bindHandlers();
+    // }}}
 };
 
-var keydownHandler = function() {
+keydownHandler = function() {
+    // {{{
     $input = $(this);
     var oneInputIsBlank = function() {
         var ret = false;
@@ -136,32 +172,43 @@ var keydownHandler = function() {
         makeNewInput();
         bindHandlers();
     }
+    // }}}
 };
 
-var diaCheckboxChangeHandler = function() {
+diaCheckboxChangeHandler = function() {
+    // {{{
     var $checkbox = $(this);
     var checked = $checkbox.is(':checked')
     $checkbox.parent()[(checked?'add':'remove') + 'Class']('selected');
+    // }}}
 };
 
 $.fn.hoverClass = function(className) {
+    // {{{
     mouseoverHandler = function() { $(this).addClass(className); };
     mouseoutHandler = function() { $(this).removeClass(className); };
     return this.hover(mouseoverHandler, mouseoutHandler);
+    // }}}
 };
 
-$.fn.debug = function() { console.debug(this); return this; }
+$.fn.debug = function() {
+    // {{{
+    console.debug(this);
+    return this;
+    // }}}
+};
 
-var bindHandlers = function() {
+bindHandlers = function() {
+    // {{{
     $("form input[type='text']").keydown(keydownHandler).debug();
     $("form input[type='checkbox']")
         .change(diaCheckboxChangeHandler);
     $("form .data_source").hoverClass('hover');
+    // }}}
 };
 
-$(bindHandlers);
-
 $.fn.setThrobberStatus = function(theStatus) {
+    // {{{
     var $throbber = this;
     mapStatusToImage = {
         'working': '/static/images/throbber.gif',
@@ -173,22 +220,33 @@ $.fn.setThrobberStatus = function(theStatus) {
         $throbber.attr('src', src);
     }
     console.debug($throbber.get(0));
+    // }}}
 };
 
-$.fn.convertCheckboxToThrobber = function() {
-    var $cb = this;
-    var $throbber = $("<img src='/static/images/snake.gif'/>").insertBefore($cb);
-    $cb.remove();
-}
+$.fn.convertCheckboxesToThrobber = function() {
+    // {{{
+    var convert = function () {
+        var $checkbox = $(this);
+        bits = $checkbox.id.split('_');
+        var query_index = bits[2];
+        var query = $('input[type="text"]').get(query_index).value;
+        var source = bits[3];
+        var imageHTML = "<img class='throbber' src='/static/images/snake.gif'/>";
+        var $throbber = $(imageHTML).insertBefore($checkbox);
+        $throbber.attr('query', query);
+        $throbber.attr('source', source);
+        $checkbox.remove();
+    };
+    return this.each(convert);
+    // }}}
+};
 
-var enableThrobbersThenPollForStatusForever = function() {
+enableThrobbersThenPollForStatusForever = function() {
+    // {{{
     var $checkboxes = $("#importer form input[type='checkbox']:checked");
     console.debug($checkboxes);
     // Enable throbbers.
-    $checkboxes.each(function () {
-            $cb = $(this);
-            $cb.convertCheckboxToThrobber();
-            });
+    $checkboxes.convertCheckboxesToThrobber();
 
     // Ask server for a list of dias, which will tell us
     // which importation background jobs have finished,
@@ -199,12 +257,12 @@ var enableThrobbersThenPollForStatusForever = function() {
         console.log('Asking if done yet.');
         var callback = function(dias) {
             var allSeemsDone = true;
-            console.log(dias);
+            /*console.log(dias);*/
             for (var d = 0; d < dias.length; d++) {
                 var dia = dias[d];
-                console.debug("while polling for status, server returned this dia", dia);
-                var $checkbox = $("#data_import_attempt_" + dia.pk);
-                console.debug("while polling for status, attempted to set status of throbber for checkbox: ", $checkbox.get(0));
+                /*console.debug("while polling for status, server returned this dia", dia);*/
+                var $throbber = $('');
+                /*console.debug("while polling for status, attempted to set status of throbber for checkbox: ", $checkbox.get(0));*/
                 var diaStatus = null;
                 if (dia.fields.completed) {
                     diaStatus = dia.fields.failed ? "failed" : "succeeded";
@@ -231,33 +289,74 @@ var enableThrobbersThenPollForStatusForever = function() {
         }
     }
     window.askIfDoneInterval = window.setInterval(ask_if_done, 1000);
+    // }}}
 };
 
-var submission = {
+findThrobberForDia = function(dia) {
+    $throbbers = $('.throbbers');
+    return $('[query="'+dia.query+'"][source="'+dia.source+'"]').get(0);
+};
+
+Preparation = {
+    // {{{
     'init': function () {
-        submission.$form = $('#importer form');
-        submission.bindHandler();
+        console.log('Preparation.init');
+        Preparation.$inputs = $('#importer form input[type="text"]');
+        console.log("Preparation.$inputs.size(): ", Preparation.$inputs.size());
+        Preparation.bindHandler();
+    },
+    '$inputs': null,
+    'handler': function () {
+        var url = '/people/portfolio/import/prepare_data_import_attempts_do';
+        var query = $("[type='text']", this).val();
+        var data = {'format': 'success_code'};
+
+        // About the below; the old POST handler used to expect
+        // a digit instead of "x", but I don't think it will matter.
+        data['commit_username_x'] = query;
+
+        $.post(url, data, Preparation.callback);
+    },
+    'bindHandler': function () {
+        console.log('Preparation.bindHandler');
+        Preparation.$inputs.blur(Preparation.handler);
+    },
+    'callback': function (response) {
+        console.log('Preparation.callback response', response);
+    }
+    // }}}
+};
+
+Submission = {
+    // {{{
+    'init': function () {
+        console.log('Submission.init');
+        Submission.$form = $('#importer form');
+        Submission.bindHandler();
     },
     '$form': null,
     'handler': function () {
-        console.log('handler');
-        $(this).ajaxSubmit({'success': submission.callback});
-        return false; // Bypass the form's native submission logic.
+        console.log('Submission.handler');
+        $(this).ajaxSubmit({'success': Submission.callback});
+        return false; // Bypass the form's native Submission logic.
     },
     'bindHandler': function () {
-        console.log('bindHandler');
-        console.log(submission.$form);
-        submission.$form.submit(submission.handler);
+        console.log('Submission.bindHandler');
+        console.log(Submission.$form);
+        Submission.$form.submit(Submission.handler);
     },
     'callback': function (response) {
         console.log(response);
         enableThrobbersThenPollForStatusForever();
     }
-}
+    // }}}
+};
 
-$(submission.init);
-
-// Create first blank row of input table.
-$(makeNewInput);
+init = function () {
+    makeNewInput(); // Create first blank row of input table.
+    Preparation.init();
+    Submission.init();
+};
+$(init);
 
 $(function() { $('.hide_on_doc_ready').hide(); });

@@ -662,7 +662,10 @@ def prepare_data_import_attempts_do(request):
             dia.save()
             dia.do_what_it_says_on_the_tin()
 
-    return HttpResponseRedirect('/people/portfolio/import/')
+    if request.POST.get('format', None) == 'success_code':
+        return HttpResponse('1')
+    else:
+        return HttpResponseRedirect('/people/portfolio/import/')
     # }}}
 
 @login_required
@@ -695,10 +698,8 @@ def filter_by_key_prefix(dict, prefix):
     """Return those and only those items in a dictionary whose keys have the given prefix."""
     out_dict = {}
     for key, value in dict.items():
-        if "^^^" in key:
-            fail
-        if "^^^"+prefix in "^^^"+key:
-            out_dict.update({key: value})
+        if key.startswith(prefix):
+            out_dict[key] = value
     return out_dict
 
 @login_required
@@ -713,14 +714,18 @@ def user_selected_these_dia_checkboxes(request):
 
     for checkbox_id, value in checkboxes.items():
         if value == 'on':
-            x, y, identifier_index, source = checkbox_id.split('_')
+            x, y, identifier_index, source_key = checkbox_id.split('_')
             identifier = identifiers["identifier_%s" % identifier_index]
             if identifier:
                 # FIXME: For security, ought this filter include only dias
                 # associated with the logged-in user's profile?
-                dia, _ = DataImportAttempt.objects.get_or_create(
-                        query=identifier, source=source,
-                        person=request.user.get_profile())
+                dia, created = DataImportAttempt.objects.get_or_create(
+                            query=identifier, source=source_key,
+                            person=request.user.get_profile())
+                if created:
+                    dia.save()
+                    dia.do_what_it_says_on_the_tin()
+
                 dia.person_wants_data = True
                 dia.save()
 
