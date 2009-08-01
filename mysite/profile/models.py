@@ -34,10 +34,7 @@ def create_profile_when_user_created(instance, created, *args, **kwargs):
         person = Person(user=instance)
         person.save()
 
-import django
-django.db.models.signals.post_save.connect(
-    create_profile_when_user_created,
-    sender=django.contrib.auth.models.User)
+models.signals.post_save.connect(create_profile_when_user_created, User)
 
 class DataImportAttempt(models.Model):
     # {{{
