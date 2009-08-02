@@ -1,10 +1,12 @@
 {% extends 'base/two_columns.html' %}
 
-{% block more_css %}
-@import url('/static/css/profile.css');
-{% endblock more_css %}
+{% block css %}
+{{ block.super }}
+@import url('/static/css/profile.css') all;
+{% endblock css %}
 
 {% block pagetop %}
+
     <div id='nameplate'>
     {% if name_edit_mode %}
         <form method='POST'
@@ -73,19 +75,10 @@
 {% endblock pagetop %}
 
 {% block left %}
-{% if edit_mode %}
-<div id='avatar' class='edit module'>
-    <a href='/people/{{ person.user.username }}/photos/default/set'>
-        This space reserved for doodling or
-        other visual jiggerypokery.
-    </a>
-</div>
-{% else %}
 <div id='avatar' class='module'>
     <img src='{{ photo_url }}' />
     <div class='change-photo-link'><a href="/account/edit/photo/">Change photo</a></div>
 </div>
-{% endif %}
 
 <div id='info' class='module'>
 

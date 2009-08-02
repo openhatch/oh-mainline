@@ -4,7 +4,12 @@
 Import your contributions from around the web | OpenHatch
 {% endblock title %}
 
-{% block more_css %}@import url('/static/css/importer.css') all;{% endblock more_css %}
+{% block css %}
+{{ block.super }}
+@import url('/static/css/profile/importer.css') all;
+{% endblock css %}
+
+
 
 {% block main %}
 <div id='importer' class='module'>

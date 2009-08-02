@@ -1,0 +1,15 @@
+{% extends 'base/base.html' %}
+
+{% block css %}
+{{ block.super }}
+@import url('/static/css/base/one_column.css');
+{% endblock css %}
+
+{% block content %}
+<div id='one_column'>
+    <div id='main'>
+        {% block main %}
+        {% endblock main %}
+    </div>
+</div>
+{% endblock content %}

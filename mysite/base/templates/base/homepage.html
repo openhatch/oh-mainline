@@ -3,8 +3,11 @@
 {% load i18n %}
 
 {% block title %}
-Your OpenID is verified - OpenHatch
+Welcome to OpenHatch!
 {% endblock title %}
+
+{% block nav %}
+{% endblock nav %}
 
 {% block js_in_head %}
 <script>
@@ -29,10 +32,11 @@ $(function() {
 <script src='/static/js/css_if_js.js'></script>
 {% endblock js_in_head %}
 
-{% block more_css %}
-@import url('/static/css/homepage.css') all;
+{% block css %}
+{{ block.super }}
+@import url('/static/css/base/homepage.css') all;
 @import url('/static/openid/css/openid.css') all;
-{% endblock more_css %}
+{% endblock css %}
 
 {% block content %}
 <div id='banner'>

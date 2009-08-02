@@ -1,0 +1,17 @@
+#main,  {
+    float: left;
+    width: 905px;
+}
+
+#main .module-header,
+#main .module-content {
+    width: 910px;
+    border-left: 1px solid #f4f4f4;
+    border-right: 1px solid #f4f4f4;
+}
+#main .module .head {
+    width: 950px;
+}
+#main .module-content {
+    border-bottom: 1px solid #f4f4f4;
+}

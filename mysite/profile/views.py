@@ -229,6 +229,7 @@ def projectexp_display(request, user_to_display__username, project__name):
             user.username, project.name)
     data['the_user'] = request.user
     data['projectexp_editable'] = (user == request.user)
+    data['editable'] = (user == request.user)
     return render_to_response('profile/projectexp.html', data)
     # }}}
 
@@ -244,6 +245,7 @@ def projectexp_edit(request, project__name):
     data['edit_mode'] = True
     data['title'] = "Edit your contributions to %s" % project.name
     data['the_user'] = request.user
+    data['editable'] = True
     return render_to_response('profile/projectexp.html', data)
     # }}}
 

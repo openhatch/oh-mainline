@@ -1,5 +1,10 @@
 {% extends 'profile/base_profile.html' %}
 
+{% block css %}
+{{ block.super }}
+@import url('/static/css/profile/projectexp.css') all;
+{% endblock css %}
+
 {% block main %}
 <!-- begin profile/projectexp.html -->
     <div class='single-project project-display module'>

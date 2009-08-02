@@ -52,6 +52,13 @@ h1 a:hover {
     background-color: #fff;
     padding: 20px;
 }
+
+.module-header,
+.module-content {
+    border-left: 1px solid #f4f4f4;
+    border-right: 1px solid #f4f4f4;
+}
+
 ul {
     padding: 0;
     margin: 0;

@@ -17,9 +17,11 @@
 <!-- jquery loaded in head instead -->
 {% endblock jquery %}
 
-{% block more_css %}
-    @import url('/static/css/search.css');
-{% endblock more_css %}
+{% block css_append_to_base_base %}
+{% block css_append_to_search_base %}
+    @import url('/static/css/search/search.css');
+{% endblock css_append_to_search_base %}
+{% endblock css_append_to_base_base %}
 
 {% block content %}
 

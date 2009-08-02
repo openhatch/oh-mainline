@@ -4,9 +4,10 @@
 {{person.user.username}}'s portfolio | OpenHatch
 {% endblock title %}
 
-{% block more_css %}
+{% block css %}
+{{ block.super }}
 @import url('/static/css/profile/portfolio.css');
-{% endblock more_css %}
+{% endblock css %}
 
 {% block main %}
 <div id='portfolio' class='module'>

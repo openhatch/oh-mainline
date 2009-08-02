@@ -1,14 +1,19 @@
 #left {
     float: left;
     margin-right: 15px;
+    width: 220px;
 }
-#left,  #left .module-header {
+#left .module {
+    width: 200px;
+}
+#left .module-header {
     float: left;
-    width: 210px;
+    width: 198px;
 }
 #left .module-content {
-    width: 200px;
+    width: 178px;
     padding: 10px;
+    border-bottom: 1px solid #f4f4f4;
 }
 #left .section {
     width: 180px;
@@ -17,11 +22,6 @@
     float: left;
     width: 703px;
 }
-#main,  .module-header,
-#main,  .module-content {
-    border-left: 1px solid #f4f4f4;
-    border-right: 1px solid #f4f4f4;
-}
 #main .module-content {
     width: 662px;
     border-bottom: 1px solid #f4f4f4;
@@ -29,7 +29,7 @@
 
 #left .notification {
     padding: 10px 20px;
-    width: 160px;
+    width: 140px;
     margin: 0;
 }
 #main .notification {

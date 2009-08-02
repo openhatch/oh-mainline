@@ -1,5 +1,7 @@
-{% include 'profile/header.global.html' %}
+{% extend 'base/one_column.html' %}
 
+{% block main %}
+<div class='list-of-people module'>
 <ul>
 {% for person in people %}
     <li>
@@ -9,5 +11,5 @@
     </li>
 {% endfor %}
 </ul>
-
-{% include 'profile/footer.html' %}
+</div>
+{% block main %}
