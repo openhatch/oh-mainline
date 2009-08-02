@@ -6,12 +6,12 @@ body {
 }
 
 a {
-    color: #66AA33;
+    color: darkorange; #66AA33;
     text-decoration: none;
 }
 
 a:hover {
-    color: #338800;
+    color: orange; #338800;
     text-decoration: underline;
 }
 
@@ -266,25 +266,25 @@ h3 {
 #info h3 {
     width: 180px;
 }
-#portfolio .module-header ul {
+.module-header ul {
     float: right;
     padding: 0;
     margin: 0;
 }
-#portfolio .module-header ul.edit-buttons li {
+.module-header ul li {
     float: left;
     margin: 0;
 }
-#portfolio .module-header ul.edit-buttons li a {
+.module-header ul li a {
     float: right;
     padding: 17px 20px;
     line-height: 13pt;
     font-weight: bold;
-    color: #555;
 }
-#portfolio .module-header ul.edit-buttons li a:hover {
+.module-header ul li a:hover {
     background: #fff;
-    color: #222;
+    color: orange;
+    text-decoration: none;
 }
 #portfolio .module-content {
     padding: 0;
@@ -540,7 +540,7 @@ h4, .cute-header {
 .project-display a {
     text-decoration: none;
 }
-.project-display ul {
+.module-content .project-display ul {
     float: left;
 }
 
