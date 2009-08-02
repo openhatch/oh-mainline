@@ -38,6 +38,7 @@ class Login(base.tests.TwillTests):
 
     def test_login_bad_password_web(self):
         url = 'http://openhatch.org/'
+        tc.go(make_twill_url('http://openhatch.org/account/logout')
         url = make_twill_url(url)
         tc.go(url)
         tc.fv('login','login_username',"paulproteus")
