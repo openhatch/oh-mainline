@@ -4,6 +4,10 @@
 {{person.user.username}}'s portfolio | OpenHatch
 {% endblock title %}
 
+{% block more_css %}
+@import url('/static/css/profile/portfolio.css');
+{% endblock more_css %}
+
 {% block main %}
 <div id='portfolio' class='module'>
     <div class='project-display column'>

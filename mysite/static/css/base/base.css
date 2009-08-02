@@ -1,0 +1,345 @@
+body {
+    font: 9pt Verdana, Bitstream Vera Sans, Arial, sans-serif;
+    background: #fff; url('/static/images/leitmotif.png');
+    margin: 0;
+    padding: 0;
+    border-top: 5px solid #bbb;
+}
+a {
+    color: darkorange; #66AA33;
+    text-decoration: none;
+}
+
+a:hover {
+    color: orange; #338800;
+    text-decoration: underline;
+}
+
+a img {
+    border-style: none;
+}
+
+h1 a {
+    color: #2288BB;
+    text-decoration: none;
+}
+
+h1 a:hover {
+    color: #223366;
+    text-decoration: none;
+}
+
+.module {
+    float: left;
+    margin-bottom: 15px;
+    background-color: #f4f4f4;
+    border-bottom: 1px solid #f4f4f4;
+}
+
+.module-header {
+    border-top: 2px solid #bfe2ff;
+    float: left;
+    border-bottom: 1px solid #eee;
+}
+
+.module-header h3 {
+    padding: 15px 20px;
+    color: #222;
+}
+
+.module-content {
+    float: left;
+    background-color: #fff;
+    padding: 20px;
+}
+ul {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+#outermost {
+    margin: 0 auto;
+    width: 1000px;
+}
+#penoutermost {
+    float: left;
+    width: 1000px;
+}
+h1, h2, h3, h4 {
+    margin: 0;
+}
+#header {
+    width: 920px;
+    height: 80px;
+    color: #555;
+    margin-top: 15px;
+    padding: 5px 20px;
+    padding: 5px 65px 5px 5px;
+	}
+#headerlogo {
+    float: left;
+}
+
+#nav {
+    padding: 10px 20px 0 20px;
+    float: left;
+    width: 960px;
+    height: 90px;
+    border-top: 0;
+}
+#nav h2 {
+    width: 200px;
+    text-align: center;
+    float: left;
+}
+#nav h2 a {
+}
+#nav ul {
+    list-style: none;
+    margin: 0;
+    float: right;
+}
+#nav li {
+    float: right;
+    margin-left: 20px;
+    margin-top: 10px;
+}
+#links li a {
+    color: #777;
+    padding: 3px 10px 5px 10px;
+    background-color: #fff; d8d8e4; 00afff; caffff; 7fc4ff;
+    border-top: 2px solid #eee;
+    float: left;
+    text-decoration: none;
+}
+
+#links li a:hover {
+    color: #222;
+}
+
+#page-top {
+    width: 1000px;
+}
+
+ul#links {
+    margin-left: 20px;
+}
+
+#links li {
+    display: inline;
+    font-size: 12pt;
+    margin-top: 20px;
+}
+
+#account-links li {
+    background-color: #F4F4F4;
+    border-top: 2px solid #BFE2FF;
+    padding: 5px 10px;
+    margin: 0;
+    font-size: 9pt;
+}
+
+#account-links li a {
+    color: #2288BB;
+}
+
+#account-links li a:hover {
+    color: #223366;
+}
+
+ul#account-links {
+    margin-left: 20px;
+}
+
+ul#user-actions {
+    margin: 0;
+    padding: 0;
+    float: left;
+    width: 300px;
+}
+ul#user-actions li {
+    list-style: none;
+    float: left;
+}
+ul#user-actions a {
+    font-size: 10pt;
+}
+
+#content {
+    float: left;
+    width: 960px;
+    padding: 20px;
+    padding-bottom: 5px;
+    background: url("/static/images/motif-eee.png");
+}
+
+#footer {
+    float: left;
+    width: 1000px;
+    height: 60px;
+    padding: 5px;
+    margin: 0;
+    text-align: center;
+}
+
+#footer ul {
+    display: inline;
+    list-style-type: none;
+    font-size: 1.2em;
+    display: none;
+}
+
+#footer li {
+    padding: 0 0 0 20px;
+    display: inline;
+}
+
+#footer a {
+    color: #333;
+}
+
+#footer a:hover {
+    color: black;
+}
+
+#widgets {
+    float: left;
+    width: 960px;
+}
+h3 {
+    margin-bottom: 0px;
+    float: left;
+    clear: left;
+    font-size: 12pt;
+    font-weight: bold;
+    color: #777;
+    letter-spacing: 0;
+}
+.module-header ul {
+    float: right;
+    padding: 0;
+    margin: 0;
+}
+.module-header ul li {
+    float: left;
+    margin: 0;
+}
+.module-header ul li a {
+    float: right;
+    padding: 17px 20px;
+    line-height: 13pt;
+    font-weight: bold;
+    border-right: 3px solid #f4f4f4;
+}
+.module-header ul li a:hover {
+    background: #fff;
+    color: orange;
+    text-decoration: none;
+}
+.tags {
+    float: left;
+    width: 200px;
+    margin-bottom: 10px;
+}
+img.show-more-link {
+    float: right;
+    position: relative;
+    top: 1px;
+}
+.module {
+    border: 5px solid #fff;
+}
+.widget {
+    float: left;
+    width: 400px;
+    margin-bottom: 20px;
+}
+input[type='text'], input[type='file'], textarea {
+    padding: 5px;
+    font-size: 11pt;
+    float: left;
+}
+input[type='submit'] {
+    padding: 1px 8px;
+    color: #222;
+    font-weight: bold;
+    float: left;
+}
+.alert {
+    float: left;
+    width: 1000px;
+    text-align: center;
+    padding: 15px 0;
+}
+.alert div {
+    display: inline;
+    background-color: #fca;
+    color: #444;
+    padding: 8px 15px;
+    width: 250px;
+    font-size: 11pt;
+    -moz-border-radius: 5px;
+}
+img {
+    border: 0;
+}
+.usernames {
+    font-size: 10pt;
+}
+#info .tag-type {
+    font-weight: normal;
+    display: block;
+    font-size: 8pt;
+}
+.aka {
+}
+.column {
+    float: left;
+    margin-right: 10px;
+}
+h3 {
+    font: 13pt Verdana;
+    margin: 0;
+}
+h4, .cute-header {
+    width: 900px; /* infinity */
+    font-size: 9pt;
+    color: #666;
+    float: left;
+    margin: 0;
+    padding: 1px;
+    width: 100px;
+}
+input[type='submit'] {
+    color: #333;
+    float: right;
+}
+abbr.foss {
+    border: 0;
+    font-variant: small-caps;
+}
+.notification {
+    float: left;
+    width: 130px;
+    background-color: #ffc; /* "Fresh Food Café!"-- Asheesh */
+    border-top: 2px solid #ff7;
+    padding: 10px;
+    margin: 0 15px;
+    font-size: 10pt;
+    color: #000;
+    margin-bottom: 10px;
+}
+.errorlist ul {
+    float: left;
+    margin: 0;
+    padding: 0;
+}
+.errorlist li {
+    float: left;
+    padding: 5px 10px;
+    width: 410px;
+    color: #522;
+    background-color: #ffe4e4;
+    margin: 10px 0;
+    -moz-border-radius: 5px;
+}

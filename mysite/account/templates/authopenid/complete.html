@@ -1,88 +1,72 @@
-{% extends 'base/homepage.html' %}
+{% extends 'base/base_one_column.html' %}
 {% load i18n %}
 
+{% block title %}
+{% endblock title %}
+
 {% block content %}
+<div class='module' id='openid-associate'>
 
+    <div class='module-header head'>
+        <h3>{% trans "Associate your OpenID with an OpenHatch account." %}</h3>
+    </div>
 
-<div id='banner'>
-    <img alt='OpenHatch' src='/static/images/the-logo.png' width='222' height='152' />
+    <div class='module-content body'>
 
-    <div id='explanation'>
-        <h3>OpenHatch is an open source involvement engine.</h3>
-        <div id='love-code'>
-            <img src='/static/images/love-code.png' />
+        <div class=''>
+            <div class='body'>
+                {% blocktrans %}
+                <p>If you're joining <strong>OpenHatch</strong>, tell us what username you want to use for your new account. If you're already a member, associate with your existing account.</p>
+                {% endblocktrans %}
+            </div>
         </div>
-    </div>
-</div>
-
-<div id='entry-points'>
-    <div id='no-authorization-necessary'>
-        <ul>
-            <li>
-            <a href='/people'>Find other folks on OpenHatch</a>
-            </li>
-            <li>
-            <a href='/search'>Find the perfect opportunity to volunteer</a>
-            </li>
-        </ul>
-    </div>
-    <div id='account-related'>
-        <h1>{% trans "Your OpenID is verified! " %}</h1>
-
-        <h2>{% trans "Associate your OpenID" %}</h2>
-        {% blocktrans %}
-        <p>If you're joining <strong>OpenHatch</strong>, tell us what username you want to use for your new account. If you're already a member, associate with your existing account.</p>
-        {% endblocktrans %}
-
 
         {% if form1.errors %}
         <p class="errors">{% trans "Please correct errors below:" %}<br />
-                {% if form1.username.errors %} 
-                        <span class="error">{{ form1.username.errors|join:", " }}</span>
-                {% endif %}
-                {% if form1.email.errors %} 
-                        <span class="error">{{ form1.email.errors|join:", " }}</span>
-                {% endif %}
+        {% if form1.username.errors %} 
+        <span class="error">{{ form1.username.errors|join:", " }}</span>
+        {% endif %}
+        {% if form1.email.errors %} 
+        <span class="error">{{ form1.email.errors|join:", " }}</span>
+        {% endif %}
         </p>
         {% endif %}
+
         {% if form2.errors %}
         <p class="errors">{% trans "Please correct errors below:" %}<br />
-                {% if form2.username.errors %} 
-                        <span class="error">{{ form2.username.errors|join:", " }}</span>
-                {% endif %}
-                {% if form2.password.errors %} 
-                        <span class="error">{{ form2.password.errors|join:", " }}</span>
-                {% endif %}
+        {% if form2.username.errors %} 
+        <span class="error">{{ form2.username.errors|join:", " }}</span>
+        {% endif %}
+        {% if form2.password.errors %} 
+        <span class="error">{{ form2.password.errors|join:", " }}</span>
+        {% endif %}
         </p>
         {% endif %}
 
         <div class="login">
-        <form name="fregister" action="{% url user_register %}" method="POST">
-            <input type="hidden" name="next" value="{{ next }}" />
-                        <fieldset>
-                                <legend>{% trans "A new account" %}</legend>
-                                <div class="form-row"><label for="id_username">{% trans "Username" %}</label><br />{{ form1.username }}</div>
-                                <div class="form-row"><label for="id_email">{% trans "Email" %}</label><br />{{ form1.email }}</div>
-                                <div class="submit-row"><input type="submit" name="bnewaccount" value="Create account"></div>
-                                <hr class="clear" />
+            <form name="fregister" action="{% url user_register %}" method="POST">
+                <input type="hidden" name="next" value="{{ next }}" />
+                <fieldset>
+                    <legend>{% trans "A new account" %}</legend>
+                    <div class="form-row"><label for="id_username">{% trans "Username" %}</label><br />{{ form1.username }}</div>
+                    <div class="form-row"><label for="id_email">{% trans "Email" %}</label><br />{{ form1.email }}</div>
+                    <div class="submit-row"><input type="submit" name="bnewaccount" value="Create account"></div>
+                    <hr class="clear" />
                 </fieldset>
-                </form>
+            </form>
         </div>
 
         <div class="login">
-        <form name="fverify" action="{% url user_register %}" method="POST">
-            <input type="hidden" name="next" value="{{ next }}" />
-                        <fieldset>
-                                <legend>{% trans "An exisiting account" %}</legend>
-                                <div class="form-row"><label for="id_username">{% trans "Username" %}</label><br />{{ form2.username }}</div>
-                                <div class="form-row"><label for="id_passwordl">{% trans "Password" %}</label><br />{{ form2.password }}</div>
-                                <div class="submit-row"><input type="submit" name="bverify" value="Verify"></div>
-                        </fieldset>
-                </form>
+            <form name="fverify" action="{% url user_register %}" method="POST">
+                <input type="hidden" name="next" value="{{ next }}" />
+                <fieldset>
+                    <legend>{% trans "An existing account" %}</legend>
+                    <div class="form-row"><label for="id_username">{% trans "Username" %}</label><br />{{ form2.username }}</div>
+                    <div class="form-row"><label for="id_passwordl">{% trans "Password" %}</label><br />{{ form2.password }}</div>
+                    <div class="submit-row"><input type="submit" name="bverify" value="Verify"></div>
+                </fieldset>
+            </form>
         </div>
-
-
     </div>
 </div>
-
 {% endblock content %}

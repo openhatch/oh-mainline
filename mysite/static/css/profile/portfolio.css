@@ -1,0 +1,81 @@
+.project-display {
+    float: left;
+    margin-right: 0;
+    width: 705px;
+}
+.project-display h3 {
+    float: left;
+}
+.project-display p {
+    margin: 0;
+    margin-bottom: 10px;
+    float: left;
+}
+.project-display h2 {
+    font-size: 9pt;
+    margin: 0;
+    margin-bottom: 3px;
+}
+.project-display h5 {
+    font-size: 12pt;
+    margin: 0;
+    margin-bottom: 10px;
+    font-weight: normal;
+}
+.project-display a {
+    text-decoration: none;
+}
+
+/* Styling for django form output. */
+.project-display input[type='text'],
+.project-display textarea {
+    float: left;
+    width: 330px;
+}
+.module-content .project-display ul {
+    float: left;
+}
+#portfolio .module-content {
+    padding: 0;
+}
+#portfolio .module-content ul li {
+    float: left;
+    padding: 20px;
+    width: 311px;
+}
+#portfolio .module-content {
+    width: 703px;
+}
+.project-escutcheon {
+    float: left;
+    margin-right: 10px;
+    width: 320px;
+}
+.project-escutcheon .logo {
+    width: 64px;
+    height: 64px;
+    float: left;
+}
+.project-escutcheon .name {
+    width: 200px;
+    float: left;
+    padding: 20px;
+    font-size: 11pt;
+}
+
+/* FIXME: Test if this code is dead. */
+.contrib-descriptions {
+    float: left;
+    width: 268px;
+}
+.contrib-descriptions > li {
+    list-style: square;
+    margin-left: 25px;
+    margin-top: 10px;
+    padding: 8px 10px;
+    padding-bottom: 6px;
+    font-size: 10pt;
+    /*background-color: #f4f4ff; f4f4bc; c9dc59; d2e6df;*/
+    float: left;
+    width: 210px;
+}

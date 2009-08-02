@@ -1,4 +1,8 @@
-{% extends 'profile/base_two_column.html' %}
+{% extends 'base/two_columns.html' %}
+
+{% block more_css %}
+@import url('/static/css/profile.css');
+{% endblock more_css %}
 
 {% block pagetop %}
     <div id='nameplate'>

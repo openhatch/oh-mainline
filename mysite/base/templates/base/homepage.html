@@ -3,11 +3,8 @@
 {% load i18n %}
 
 {% block title %}
-Welcome to OpenHatch!
+Your OpenID is verified - OpenHatch
 {% endblock title %}
-
-{% block nav %}
-{% endblock nav %}
 
 {% block js_in_head %}
 <script>
@@ -21,8 +18,6 @@ Welcome to OpenHatch!
     document.createElement('time');
 
 </script>
-<link rel="stylesheet" href="/static/openid/css/openid.css" />
-
 <script type="text/javascript" src="/static/js/jquery.js"></script>
 <script type="text/javascript" src="/static/openid/js/openid-jquery.js"></script>
 <script type="text/javascript">
@@ -31,12 +26,12 @@ $(function() {
 });
 </script>
 
-
 <script src='/static/js/css_if_js.js'></script>
 {% endblock js_in_head %}
 
 {% block more_css %}
 @import url('/static/css/homepage.css') all;
+@import url('/static/openid/css/openid.css') all;
 {% endblock more_css %}
 
 {% block content %}
@@ -134,32 +129,32 @@ $(function() {
             </div> 
             <h3 class='invisible_if_js'>OpenID</h3>
             <div id='openid' class='tab invisible_if_js'>
-<form id="openid_form" name="openid_form" action="{% url user_signin %}" method="post">
-    <input type="hidden" name="action" value="verify" />
-    <input type="hidden" name="next" value="{{ next }}" />
-        <fieldset>
-                <legend>{% trans "Sign In Using Your OpenID URL" %}</legend>
-                <div id="openid_choice">
-                <p>Please click your account provider:</p>
-                <div id="openid_btns"></div>
-        </div>
-            <div id="openid_input_area">
-                <label for="id_openid_ul">{% trans "OpenId URL :" %}</label>{{ form1.openid_url }}
-                <input name="openid_submit" type="submit" value="{% trans "Sign in with OpenID" %}">
-            </div>
-                
-        </fieldset>
-</form>
+                <form id="openid_form" name="openid_form" action="{% url user_signin %}" method="post">
+                    <input type="hidden" name="action" value="verify" />
+                    <input type="hidden" name="next" value="{{ next }}" />
+                    <fieldset>
+                        <legend>{% trans "Sign In Using Your OpenID URL" %}</legend>
+                        <div id="openid_choice">
+                            <p>Please click your account provider:</p>
+                            <div id="openid_btns"></div>
+                        </div>
+                        <div id="openid_input_area">
+                            <label for="id_openid_ul">{% trans "OpenId URL :" %}</label>{{ form1.openid_url }}
+                            <input name="openid_submit" type="submit" value="{% trans "Sign in with OpenID" %}">
+                        </div>
+
+                    </fieldset>
+                </form>
 
             </div>
             <h3 class='invisible_if_js'>What is OpenHatch?</h3>
             <div id='learn-more' class='tab invisible_if_js'>
-            <p>OpenHatch makes it easy to:</p>
-            <ul>
-                <li>Find new ways that you can help with open source projects</li>
-                <li>Find mentors or mentees and learn new skills</li>
-                <li>Track and show off all your open source software experience in one place.</li>
-            </ul>
+                <p>OpenHatch makes it easy to:</p>
+                <ul>
+                    <li>Find new ways that you can help with open source projects</li>
+                    <li>Find mentors or mentees and learn new skills</li>
+                    <li>Track and show off all your open source software experience in one place.</li>
+                </ul>
             </div>
         </div>
     </div>
