@@ -10,26 +10,25 @@
 {% endblock css %}
 
 {% block main %}
-<div id='portfolio' class='module'>
-    <div class='project-display column'>
-        <div class='module-header'>
-            {% if editable %}
-            <ul>
-                <li>
-                <a href='/form/projectexp_add'>
-                    Add one
-                </a>
-                </li>
-                <li>
-                <a href='/people/portfolio/import'>
-                    Import lots
-                </a>
-                </li>
-            </ul>
-            {% endif %}
-            <h3>Contributions</h3>
-        </div>
-        <div class='module-content'>
+<div id='portfolio' class='module project-display'>
+    <div class='head'>
+        {% if editable %}
+        <ul>
+            <li>
+            <a href='/form/projectexp_add'>
+                Add one
+            </a>
+            </li>
+            <li>
+            <a href='/people/portfolio/import'>
+                Import lots
+            </a>
+            </li>
+        </ul>
+        {% endif %}
+        <h3>Contributions</h3>
+    </div>
+    <div class='body'>
         {% if projects %}
         <ul>
             {% for project, more_project_attributes in projects.items %}
@@ -59,7 +58,5 @@
         <div style='float: left; font-size: 10pt; padding: 10px 20px; width: 500px;'>This person hasn't listed any contributions yet.</div>
         {% endif %}
     </div>
-    </div>
-    <!-- }}} -->
 </div> <!-- /#portfolio -->
 {% endblock main %}

@@ -1,11 +1,19 @@
 {% extends 'profile/base_profile.html' %}
 
+{% block css %}
+{{ block.super }}
+@import url('/static/css/profile/projectexp.css') all;
+{% endblock css %}
+
 {% block main %}
 <div class='single-project project-display module'>
-    <div class='module-header'>
+    <div class='head'>
         <h3>Log a contribution</h3>
+        <ul>
+            <li><a href='{% url profile.views.display_person_web user_to_display__username=the_user.username %}'>&laquo; Back to portfolio</a></li>
+        </ul>
     </div>
-    <div class='module-content'>
+    <div class='body'>
         <form name='projectexp_add' method='POST'
             action='/do/projectexp_add'>
             <div class='section'>

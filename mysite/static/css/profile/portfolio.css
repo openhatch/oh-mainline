@@ -32,18 +32,18 @@
     float: left;
     width: 330px;
 }
-.module-content .project-display ul {
+.module > .body .project-display ul {
     float: left;
 }
-#portfolio .module-content {
+#portfolio .module > .body {
     padding: 0;
 }
-#portfolio .module-content ul li {
+#portfolio .module > .body ul li {
     float: left;
     padding: 20px;
     width: 311px;
 }
-#portfolio .module-content {
+#portfolio .module > .body {
     width: 703px;
 }
 .project-escutcheon {

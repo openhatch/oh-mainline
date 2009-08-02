@@ -1,19 +1,20 @@
-{% extends 'base/base.html' %}
+{% extends 'base/one_column.html' %}
 
 {% block title %}
 Log in - OpenHatch
 {% endblock title %}
 
-{% block more_css %}
+{% block css %}
+{{ block.super }}
 @import url('/static/css/account/auth.css') all;
-{% endblock more_css %}
+{% endblock css %}
 
-{% block content %}
-<div id='login' class='module account-dialog'>
-    <div class='module-header head'>
+{% block main %}
+<div id='login' class='module'>
+    <div class='head'>
         <h3>Please log in!</h3>
     </div>
-    <div class='module-content body'>
+    <div class='body'>
         <form name='login'
             action='/account/login/do' method='POST'>
             <div class='form-row'>
@@ -33,4 +34,4 @@ Log in - OpenHatch
         Don't have an account yet? Then <a style='font-weight: bold;' href='/#tab=create_profile'>sign up for one</a>.
     </div>
 </div>
-{% endblock content %}
+{% endblock main %}

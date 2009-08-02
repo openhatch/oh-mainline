@@ -99,9 +99,9 @@
     width: 160px;
 }
 #info h4 {
+    width: 160px;
     margin-top: 10px;
     float: left;
-    display: inline;
 }
 .change-photo-link {
     background: #f4f4f4;

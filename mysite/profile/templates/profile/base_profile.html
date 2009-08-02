@@ -12,10 +12,10 @@
         <form method='POST'
             name='edit_name'
             action='/edit/name/do'>
-            <div class='module-header head'>
+            <div class='head'>
                 <h3>What d'you go by?</h3>
             </div>
-            <div class='module-content body'>
+            <div class='body'>
             <div class='section'>
                 <h4>First name:</h4>
                 <input type='text' name='first_name'
@@ -82,7 +82,7 @@
 
 <div id='info' class='module'>
 
-    <div class='module-header head'>
+    <div class='head'>
         {% if editable and not info_edit_mode %}
         <ul>
             <li><a class='edit' href='/people/edit/info'>Edit</a></li>
@@ -93,7 +93,7 @@
 
     </div>
 
-    <div class='module-content body'>
+    <div class='body'>
         {% if editable and not info_edit_mode and not has_set_info %}
         <div id='edit_your_info_notification' class='notification'>
             <div class='body'>
@@ -107,7 +107,7 @@
             method='POST'>
             <!-- personal_info_edit_mode -->
             {% comment %} THIS HURR IS EDIT MODE {% endcomment %}
-            <h4>(eg. c++, lambda calculus, juggling)</h4>
+            <h4>(e.g., c++, lambda calculus, juggling)</h4>
             <h4>understands:</h4>
             <textarea name='edit-tags-understands'>{{ tags_flat.understands }}</textarea>
             <h4>will never understand:</h4>

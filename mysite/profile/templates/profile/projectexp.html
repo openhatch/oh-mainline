@@ -6,9 +6,8 @@
 {% endblock css %}
 
 {% block main %}
-<!-- begin profile/projectexp.html -->
     <div class='single-project project-display module'>
-        <div class='module-header'>
+        <div class='head'>
             <h3>{{ person.user.username }}'s contributions to {{ project.name }}</h3>
             <ul>
                 <li>
@@ -16,7 +15,7 @@
                 </li>
             </ul>
         </div>
-        <div class='module-content'>
+        <div class='body'>
         <div id='role-details' class='section'>
             {% if not edit_mode %}
             {% for exp in exp_list %}
@@ -145,5 +144,5 @@
         </div>
     </div>
     </div>
-</div> <!-- /#right -->
+</div> 
 {% endblock main %}

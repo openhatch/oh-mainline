@@ -1,7 +1,3 @@
-#content {
-    border: 0;
-    background: none;
-}
 form {
     margin-bottom: 10px;
     float: left;
@@ -32,32 +28,6 @@ input[type='submit'] {
     font-size: 12pt;
     float: right;
 }
-.account-dialog {
-    float: left;
-    width: 460px;
-    border: solid #eee;
-    border-width: 0 1px 1px 1px;
-}
-.account-dialog form {
-    margin-bottom: 10px;
-    float: left;
-    width: 420px;
-}
-.account-dialog .head,
-.account-dialog .foot {
-    width: 460px;
-}
-
-.account-dialog .body {
-    width: 420px;
-}
-
-.module .foot {
-    float: left;
-    border-top: 1px solid #eee;
-    padding: 15px;
-}
-
 #login .text, #signup .text {
     font-size: .7em;
     width: 100px;

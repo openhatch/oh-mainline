@@ -3,15 +3,42 @@
     width: 905px;
 }
 
-#main .module-header,
-#main .module-content {
+#main .module > .head,
+#main .module > .body {
     width: 910px;
     border-left: 1px solid #f4f4f4;
     border-right: 1px solid #f4f4f4;
 }
-#main .module .head {
+#main .module > .head {
     width: 950px;
 }
-#main .module-content {
+#main .module > .body {
     border-bottom: 1px solid #f4f4f4;
+}
+#main .contains-submodules.two-columns .submodule.skinny {
+    width: 240px;
+    margin-right: 20px;
+}
+#main .contains-submodules.two-columns .submodule.fat {
+    width: 645px;
+}
+#main .contains-submodules.two-columns .submodule .body {
+    float: left;
+    background-color: #fff;
+    padding: 20px;
+}
+#main .contains-submodules.two-columns .submodule.skinny .head h3 {
+    width: 200px;
+}
+#main .contains-submodules.two-columns .submodule.skinny .body {
+    width: 200px;
+}
+#main .contains-submodules.two-columns .submodule.fat .head h3 {
+    width: 605px;
+}
+#main .contains-submodules.two-columns .submodule.fat .body {
+    width: 605px;
+}
+#main .contains-submodules.two-columns .submodule.fat .foot {
+    width: 615px;
 }

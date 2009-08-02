@@ -6,11 +6,11 @@
 #left .module {
     width: 200px;
 }
-#left .module-header {
+#left .module > .head {
     float: left;
     width: 198px;
 }
-#left .module-content {
+#left .module > .body {
     width: 178px;
     padding: 10px;
     border-bottom: 1px solid #f4f4f4;
@@ -18,11 +18,11 @@
 #left .section {
     width: 180px;
 }
-#main,  #main .module-header {
+#main,  #main .module > .head {
     float: left;
     width: 703px;
 }
-#main .module-content {
+#main .module > .body {
     width: 662px;
     border-bottom: 1px solid #f4f4f4;
 }
@@ -36,4 +36,17 @@
     padding: 10px 20px;
     width: 635px;
     margin-top: 10px;
+}
+
+#main .submodule {
+    width: 660px;
+}
+#main .submodule .head h3 {
+    width: 620px;
+}
+#main .submodule .body {
+    float: left;
+    padding: 20px;
+    width: 620px;
+    background-color: #fff;
 }

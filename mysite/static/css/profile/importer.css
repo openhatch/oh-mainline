@@ -1,7 +1,7 @@
 #importer {
     float: left;
 }
-#importer .module-content {
+#importer .module > .body {
     background: #fff url('/static/images/motif.png');
 }
 #importer form .cute-header {
@@ -14,21 +14,6 @@
 }
 #importer input[type='submit'] {
     float: right;
-}
-#importer form {
-    float: left;
-    background-color: #fff;
-    border-top: 2px solid #ddd;
-    border-bottom: 3px double #ddd;
-    border-left: 1px solid #ddd;
-    border-right: 1px solid #ddd;
-}
-#importer form,
-#importer form .head,
-#importer form .body,
-#importer form .foot {
-    float: left;
-    width: 660px;
 }
 #importer form .foot {
     padding: 10px;
@@ -49,7 +34,6 @@
 #importer form .data_sources {
     float: left;
     margin: 0;
-    padding: 10px;
 }
 #importer form .body .data_sources {
     padding: 0 10px;
@@ -103,33 +87,20 @@
     margin: 0;
     margin-bottom: 10px;
 }
+#importer form.submodule .body {
+    padding: 5px;
+    width: 650px;
+}
+#importer form.submodule .body .who {
+    padding: 10px;
+}
 #importer .loading-notification {
     text-align: center;
     font-size: 13pt;
     color: #222;
     padding: 18px;
 }
-#importer .howto {
-    float: left;
-    width: 660px;
-    margin-bottom: 20px;
-    background-color: #f4f4f4;
-    border: 1px solid #ddd;
-    border-top: 3px double #ddd;
-    border-bottom: 3px double #ddd;
-}
-#importer .howto h3.head {
-    color: #222;
-    font-size: 11pt;
-    float: left;
-    padding: 10px 20px;
-    width: 620px;
-}
 #importer .howto .body {
-    float: left;
-    padding: 20px;
-    width: 620px;
-    background-color: #fff;
 }
 #importer .howto ol {
     margin: 0;

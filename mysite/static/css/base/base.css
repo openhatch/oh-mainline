@@ -36,27 +36,62 @@ h1 a:hover {
     border-bottom: 1px solid #f4f4f4;
 }
 
-.module-header {
+.module > .head {
     border-top: 2px solid #bfe2ff;
     float: left;
     border-bottom: 1px solid #eee;
 }
 
-.module-header h3 {
+.module > .head h3 {
     padding: 15px 20px;
-    color: #222;
 }
 
-.module-content {
+.module > .body {
     float: left;
     background-color: #fff;
     padding: 20px;
 }
 
-.module-header,
-.module-content {
+.module > .head, 
+.module > .body {
     border-left: 1px solid #f4f4f4;
     border-right: 1px solid #f4f4f4;
+}
+
+.module > .foot,
+.submodule > .foot {
+    float: left;
+    border-top: 1px solid #eee;
+    padding: 15px;
+}
+
+.module > .body.contains-submodules {
+    background: #fff url('/static/images/motif.png');
+}
+
+.submodule {
+    margin-bottom: 20px;
+    background-color: #f4f4f4;
+    border: 1px solid #ddd;
+    border-top: 3px double #ddd;
+    border-bottom: 3px double #ddd;
+    float: left;
+}
+
+.submodule > .head {
+    float: left;
+    background-color: #f4f4f4;
+    float: left;
+    padding: 10px 20px;
+    border-bottom: 1px solid #ddd;
+}
+
+.submodule > .body {
+    background-color: #fff;
+}
+
+.submodule > .foot {
+    border-top: 1px solid #ddd;
 }
 
 ul {
@@ -219,26 +254,26 @@ h3 {
     clear: left;
     font-size: 12pt;
     font-weight: bold;
-    color: #777;
+    color: #555;
     letter-spacing: 0;
 }
-.module-header ul {
+.module > .head ul {
     float: right;
     padding: 0;
     margin: 0;
 }
-.module-header ul li {
+.module > .head ul li {
     float: left;
     margin: 0;
 }
-.module-header ul li a {
+.module > .head ul li a {
     float: right;
     padding: 17px 20px;
     line-height: 13pt;
     font-weight: bold;
     border-right: 3px solid #f4f4f4;
 }
-.module-header ul li a:hover {
+.module > .head ul li a:hover {
     background: #fff;
     color: orange;
     text-decoration: none;
