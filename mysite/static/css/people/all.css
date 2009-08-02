@@ -468,6 +468,8 @@ img {
 }
 #nameplate h1 {
     font-weight: normal;
+    font-size: 15pt;
+    padding: 6px;
 }
 #nameplate .name {
     float: left;
@@ -676,9 +678,30 @@ ul#contributors li span {
     width: 20px;
     margin-left: 5px;
 }
+#nameplate .name-edit-link {
+    float: left;
+    padding: 10px 0;
+    margin-right: 10px;
+}
 #nameplate input[type='text'] {
     width: 160px;
     float: left;
+}
+#nameplate form,
+#nameplate form .section,
+#nameplate form h3 {
+    width: 280px;
+}
+#nameplate form h3 {
+    background-color: #f4f4f4;
+}
+#nameplate form h4 {
+    padding: 8px 0;
+}
+#nameplate .another-identifier {
+    float: left;
+    padding: 12px 0;
+    margin-left: 20px;
 }
 #info textarea {
     width: 160px;
@@ -741,6 +764,11 @@ abbr.foss {
     padding: 10px 20px;
     width: 650px;
     margin-top: 10px;
+}
+#nameplate .notification {
+    margin: 0;
+    float: left;
+    width: 200px;
 }
 .errorlist ul {
     float: left;

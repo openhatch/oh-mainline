@@ -6,7 +6,10 @@
         <form method='POST'
             name='edit_name'
             action='/edit/name/do'>
-            <h3>What d'you go by?</h3>
+            <div class='module-header head'>
+                <h3>What d'you go by?</h3>
+            </div>
+            <div class='module-content body'>
             <div class='section'>
                 <h4>First name:</h4>
                 <input type='text' name='first_name'
@@ -18,24 +21,18 @@
                 value='{{ person.user.last_name }}' />
             </div>
             <div class='section'>
-                <input class='save-button' type='submit' value='Save' /></td></tr>
+                <input class='save-button' type='submit' value='Save' />
+            </div>
             </div>
             </table>
         </form>
     {% else %}
-            {% if person.user.first_name or person.user.last_name %}
             <h1 class='name'>
+            {% if person.user.first_name or person.user.last_name %}
                 <a href='/people/{{ person.user.username }}'>
                     {{ person.user.first_name }}
                     {{ person.user.last_name }}
                 </a>
-            </h1>
-            {% if editable %}
-            <a href='/edit/name'>
-                <img src='/static/images/icons/pencil.png'
-                alt='Edit name' />
-            </a>
-            {% endif %}
             {% else %}
             <a href='/people/{{ person.user.username }}'>
                 <div class='name'>
@@ -43,34 +40,29 @@
                 </div>
             </a>
             {% endif %}
+            </h1>
+            {% if editable %}
+            <a class='name-edit-link' href='/edit/name'>
+                <img src='/static/images/icons/pencil.png'
+                alt='Edit name' />
+            </a>
+            {% endif %}
 
-	    {% if person.user.first_name or person.user.last_name or person.show_email %}
-            <small class='usernames'>
-                <span class='aka'>
-                    a.k.a.
-                </span>
-	    </small>
-		<ul>
 		  {% if person.user.first_name or person.user.last_name %}
-		  <li>
-		    <small class='usernames'>
-		      {{ person.user.username }}
-		    </small>
-		  </li>
+          <div class='another-identifier'>
+              username: <strong>{{ person.user.username }}</strong>
+          </div>
 		  {% endif %}
 
 		  {% if person.show_email %}
-		  <li>
-		    <small class='usernames'>
-		      {{ the_user.email }}
-		    </small>
-		  </li>
-		  {% endif %}
+          <div class='another-identifier'>
+              email: <strong>{{ the_user.email }}</strong>
+          </div>
 		  {% endif %}
         <div>
             {% if editable and not person.user.first_name and not person.user.last_name %}
             <div id='edit_your_name_notification' 
-                class='notification'>Tell us your name!</div>
+                class='notification'>&laquo; Tell us your name!</div>
             {% endif %}
         </div>
     {% endif %}

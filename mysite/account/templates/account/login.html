@@ -1,5 +1,9 @@
 {% extends 'base/base.html' %}
 
+{% block title %}
+Log in - OpenHatch
+{% endblock title %}
+
 {% block more_css %}
 @import url('/static/css/auth.css') all;
 {% endblock more_css %}
@@ -21,7 +25,7 @@
                 <input type='password' id='login_password' name='login_password' />
             </div>
             <div class='form-row'>
-                <input type='submit' value='go' style='' />
+                <input type='submit' value='Log in' style='' />
             </div>
         </form>
     </div>

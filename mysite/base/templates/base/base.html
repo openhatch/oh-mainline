@@ -62,9 +62,12 @@
                             <ul style='width: 740px;' id='account-links'>
                                 {% if the_user.is_authenticated %}
                                 <!-- user.is_authenticated indeed -->
-                                <li><a href='/account/logout/'>log out</a></li>
-                                <li><a href='/account/edit/password/'>settings</a></li>
+                                <li><a href='{% url account.views.logout %}'>log out</a></li>
+                                <li><a href='{% url account.views.edit_password %}'>settings</a></li>
                                 <li><a href='/people/{{ the_user.username }}/'>{{ the_user.username }}</a></li>
+                                {% else %}
+                                <li><a href='{% url account.views.login %}'>log in</a></li>
+                                <li><a href='/#create_profile'>sign up</a></li>
                                 {% endif %}
                             </ul>
                             <!-- due to right float, bottom of list is leftmost element -->

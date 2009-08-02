@@ -187,7 +187,9 @@ input[type='submit'] {
     margin-right: 10px;
     list-style: none;
 }
-.tab-links ul {
+.tab-links, .tab-links ul {
+    float: left;
+    width: 600px;
     margin: 0;
     padding: 0;
 }
@@ -199,8 +201,19 @@ input[type='submit'] {
     font-size: 10pt;
     font-weight: bold;
     position: relative;
+    top: 6px;
     /*-moz-border-radius-topleft: 7px;
     -moz-border-radius-topright: 8px;*/
+}
+.tab-links li.right-link,
+.tab-links li.right-link a {
+    float: right;
+    font-size: 14pt;
+}
+.tab-links li.learn-more a {
+    margin-left: 120px;
+    font-size: 14pt;
+    top: 0;
 }
 .tab-links a:hover {
     background-color: #eee;
@@ -214,15 +227,24 @@ input[type='submit'] {
 }
 #tabs {
     float: left;
-    width: 560px;
+    width: 600px;
     background-color: #f4f4f4;
-    padding: 20px;
     margin: 0;
+}
+.tab {
+    padding: 20px;
 }
 .visible_iff_js {
     display: none;
 }
+.learn-more a {
+    color: orange;
+    background-color: #555;
+}
 #learn-more {
+    float: left;
+    background-color: #555;
+    color: #fff;
     font-size: 12pt;
 }
 #entry-points #account-related #learn-more ul {
