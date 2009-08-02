@@ -279,6 +279,12 @@ h3 {
     float: right;
     padding: 17px 20px;
     line-height: 13pt;
+    font-weight: bold;
+    color: #555;
+}
+#portfolio .module-header ul.edit-buttons li a:hover {
+    background: #fff;
+    color: #222;
 }
 #portfolio .module-content {
     padding: 0;
@@ -722,16 +728,19 @@ abbr.foss {
     float: left;
     width: 130px;
     background-color: #ffc; /* "Fresh Food Café!"-- Asheesh */
-    border: 1px solid #ff7;
-    padding: 5px;
-    margin: 0 20px;
+    border-top: 2px solid #ff7;
+    padding: 10px;
+    margin: 0 15px;
     text-align: center;
     font-size: 10pt;
     color: #000;
     margin-bottom: 10px;
 }
-#middle .notification {
-    width: 450px;
+#middle .notification,
+#main .notification {
+    padding: 10px 20px;
+    width: 650px;
+    margin-top: 10px;
 }
 .errorlist ul {
     float: left;
