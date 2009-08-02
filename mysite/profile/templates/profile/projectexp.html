@@ -3,9 +3,13 @@
 {% block main %}
 <!-- begin profile/projectexp.html -->
     <div class='single-project project-display module'>
-        <a style='float: right;' href='/people/{{ person.user.username }}'>&laquo; Back to portfolio</a>
         <div class='module-header'>
             <h3>{{ person.user.username }}'s contributions to {{ project.name }}</h3>
+            <ul>
+                <li>
+                <a style='float: right;' href='/people/{{ person.user.username }}'>&laquo; Back to portfolio</a>
+                </li>
+            </ul>
         </div>
         <div class='module-content'>
         <div id='role-details' class='section'>

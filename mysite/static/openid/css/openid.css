@@ -11,10 +11,6 @@
     width: 470px;
     float: left;
 }
-#openid_form legend,
-#auth_form legend {
-    font-weight: bold;
-}
 #openid_choice {
     display: none;
 }
@@ -52,5 +48,12 @@ a.openid_large_btn:focus {
 }
 .openid_selected {
     border: 4px solid #DDD;
+}
+fieldset {
+    padding: 0;
+    border: 0;
+}
+legend {
+    font-size: 13pt;
 }
 

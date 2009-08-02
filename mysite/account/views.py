@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 import mock
 from django_authopenid.forms import OpenidSigninForm
+from django.core.urlresolvers import reverse
 
 import urllib
 
@@ -115,7 +116,7 @@ def show_email_do(request):
         profile = request.user.get_profile()
         profile.show_email = form.cleaned_data['show_email']
         profile.save()
-    return HttpResponseRedirect('/account/edit/password/')
+    return HttpResponseRedirect(reverse(edit_password))
 
 @login_required
 def edit_photo(request, form = None):
@@ -125,8 +126,7 @@ def edit_photo(request, form = None):
     if form is None:
         form = account.forms.EditPhotoForm()
     data['edit_photo_form'] = form
-    return render_to_response('account/edit_photo.html',
-                              data)
+    return render_to_response('account/edit_photo.html', data)
 
 @login_required
 def edit_photo_do(request, mock=None):
@@ -138,7 +138,7 @@ def edit_photo_do(request, mock=None):
                                        instance=person)
     if form.is_valid():
         form.save()
-    return edit_photo(request, form = form)
+    return HttpResponseRedirect('/account/edit/photo')
 
 def catch_me(request):
     import pdb

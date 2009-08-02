@@ -8,7 +8,7 @@
     width: 400px;
 }
 #importer input[type='text'] {
-    width: 170px;
+    width: 150px;
     float: left;
     font-size: 12pt;
 }
@@ -18,22 +18,21 @@
 #importer form {
     float: left;
     background-color: #fff;
-    border-top: 1px solid #eee;
-    border-bottom: 3px double #eee;
-    border-left: 1px solid #eee;
-    border-right: 1px solid #eee;
-    border: 5px solid #ddd;
+    border-top: 2px solid #ddd;
+    border-bottom: 3px double #ddd;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
 }
 #importer form,
 #importer form .head,
 #importer form .body,
 #importer form .foot {
     float: left;
-    width: 680px;
+    width: 660px;
 }
 #importer form .foot {
     padding: 10px;
-    width: 660px;
+    width: 640px;
     background-color: #eee;
 }
 #importer form .head {
@@ -57,13 +56,13 @@
 }
 #importer form .query {
     float: left;
-    width: 680px;
+    width: 660px;
 }
 #importer form .query.odd {
     background-color: #f4f4f4;
 }
 #importer form .who {
-    width: 180px;
+    width: 160px;
     margin-right: 10px;
 }
 #importer form .data_sources {
@@ -112,25 +111,24 @@
 }
 #importer .howto {
     float: left;
-    width: 680px;
+    width: 660px;
     margin-bottom: 20px;
     background-color: #f4f4f4;
-    border: 1px solid #f4f4f4;
-    border-top: 2px solid #ff0;
-    border-bottom: 3px double #eee;
-    border: 5px solid #ddd;
+    border: 1px solid #ddd;
+    border-top: 3px double #ddd;
+    border-bottom: 3px double #ddd;
 }
 #importer .howto h3.head {
     color: #222;
     font-size: 11pt;
     float: left;
     padding: 10px 20px;
-    width: 640px;
+    width: 620px;
 }
 #importer .howto .body {
     float: left;
     padding: 20px;
-    width: 640px;
+    width: 620px;
     background-color: #fff;
 }
 #importer .howto ol {
@@ -140,7 +138,7 @@
 #importer .howto li {
     margin-left: 20px;
     float: left;
-    width: 200px;
+    width: 180px;
     margin-right: 50px;
 }
 #importer .howto li.hangout {
@@ -154,6 +152,9 @@
 #importer .howto .foot {
     float: left;
 }
-#importer .howto .hide-link {
+#importer .hide-link {
     float: right;
+}
+#importer .show-howto-link {
+    display: none;
 }

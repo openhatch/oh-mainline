@@ -1,10 +1,10 @@
 body {
     font: 9pt Verdana, Bitstream Vera Sans, Arial, sans-serif;
-    background: #fff;
+    background: #fff; url('/static/images/leitmotif.png');
     margin: 0;
     padding: 0;
+    border-top: 5px solid #bbb;
 }
-
 a {
     color: darkorange; #66AA33;
     text-decoration: none;
@@ -84,7 +84,8 @@ h1, h2, h3, h4 {
     padding: 10px 20px 0 20px;
     float: left;
     width: 960px;
-    height: 111px;
+    height: 90px;
+    border-top: 0;
 }
 #nav h2 {
     width: 200px;
@@ -168,7 +169,7 @@ ul#user-actions a {
     float: left;
     width: 960px;
     padding: 20px;
-    border: 5px solid #f4f4f4;
+    padding-bottom: 5px;
     background: url("/static/images/motif-eee.png");
 }
 
@@ -204,10 +205,13 @@ ul#user-actions a {
 #nameplate {
     float: left;
     width: 940px;
-    color: #888;
-    background: #fff;
-    padding: 10px;
-    border: 1px dotted #eee;
+}
+#nameplate h1 {
+    font-weight: bold;
+    font-size: 15pt;
+}
+#nameplate h1 a {
+    color: #000;
 }
 #nameplate h1, #nameplate #sep, #nameplate h2 {
     font-size: 13pt;
@@ -258,14 +262,6 @@ h3 {
     float: left;
     width: 800px;
 }
-#info {
-    width: 180px;
-    padding: 10px;
-    padding-bottom: 0;
-}
-#info h3 {
-    width: 180px;
-}
 .module-header ul {
     float: right;
     padding: 0;
@@ -280,6 +276,7 @@ h3 {
     padding: 17px 20px;
     line-height: 13pt;
     font-weight: bold;
+    border-right: 3px solid #f4f4f4;
 }
 .module-header ul li a:hover {
     background: #fff;
@@ -292,7 +289,7 @@ h3 {
 #portfolio .module-content ul li {
     float: left;
     padding: 20px;
-    width: 321px;
+    width: 311px;
 }
 .tags {
     float: left;
@@ -323,8 +320,15 @@ img.show-more-link {
 }
 #left {
     float: left;
-    width: 220px;
     margin-right: 15px;
+}
+#left,  #left .module-header {
+    float: left;
+    width: 210px;
+}
+#left .module-content {
+    width: 200px;
+    padding: 10px;
 }
 #middle {
     float: left;
@@ -335,26 +339,31 @@ img.show-more-link {
     width: 220px;
     float: left;
 }
-#main {
+.module {
+    border: 5px solid #fff;
 }
 #main,  #main .module-header {
     float: left;
-    width: 725px;
+    width: 703px;
+}
+#main,  .module-header,
+#main,  .module-content {
+    border-left: 1px solid #f4f4f4;
+    border-right: 1px solid #f4f4f4;
 }
 #main .module-content {
-    margin-left: 1px;
-    width: 683px;
+    width: 662px;
+    border-bottom: 1px solid #f4f4f4;
 }
 #portfolio .module-content {
-    width: 724px;
-    border-right: 1px solid #f4f4f4;
+    width: 703px;
 }
 .widget {
     float: left;
     width: 400px;
     margin-bottom: 20px;
 }
-input[type='text'], textarea {
+input[type='text'], input[type='file'], textarea {
     padding: 5px;
     font-size: 11pt;
     float: left;
@@ -466,11 +475,6 @@ img {
 .usernames {
     font-size: 10pt;
 }
-#nameplate h1 {
-    font-weight: normal;
-    font-size: 15pt;
-    padding: 6px;
-}
 #nameplate .name {
     float: left;
 }
@@ -503,9 +507,8 @@ img {
 }
 .project-display {
     float: left;
-    margin-bottom: 20px;
     margin-right: 0;
-    width: 725px;
+    width: 705px;
 }
 .project-display h3 {
     float: left;
@@ -660,7 +663,7 @@ ul#contributors li span {
 #avatar {
     width: 200px;
     padding: 0;
-    border: 10px solid #fff;
+    border: 5px solid #fff;
 }
 #avatar img {
     float: left;
@@ -693,14 +696,13 @@ ul#contributors li span {
     width: 280px;
 }
 #nameplate form h3 {
-    background-color: #f4f4f4;
 }
 #nameplate form h4 {
     padding: 8px 0;
 }
 #nameplate .another-identifier {
     float: left;
-    padding: 12px 0;
+    padding: 4px 0;
     margin-left: 20px;
 }
 #info textarea {
@@ -714,12 +716,6 @@ ul#contributors li span {
 input[type='submit'] {
     color: #333;
     float: right;
-}
-#info a.edit {
-    font-size: 8pt;
-    float: right;
-}
-#info a.edit.loud {
 }
 abbr.foss {
     border: 0;
@@ -754,16 +750,30 @@ abbr.foss {
     border-top: 2px solid #ff7;
     padding: 10px;
     margin: 0 15px;
-    text-align: center;
     font-size: 10pt;
     color: #000;
     margin-bottom: 10px;
 }
+#left .notification {
+    padding: 10px 20px;
+    width: 160px;
+    margin: 0;
+}
 #middle .notification,
 #main .notification {
     padding: 10px 20px;
-    width: 650px;
+    width: 635px;
     margin-top: 10px;
+}
+#left .notification img {
+    position: relative;
+    top: -36px;
+    left: 20px;
+}
+#main .notification img {
+    position: relative;
+    top: -36px;
+    left: -50px;
 }
 #nameplate .notification {
     margin: 0;
@@ -784,3 +794,11 @@ abbr.foss {
     margin: 10px 0;
     -moz-border-radius: 5px;
 }
+.change-photo-link {
+    background: #f4f4f4;
+    padding: 10px;
+    float: left;
+    width: 180px;
+    border-top: 10px solid #fff;
+}
+

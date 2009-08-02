@@ -1,17 +1,24 @@
-from django.http import HttpResponse, HttpResponseServerError
+from django.http import HttpResponse, \
+        HttpResponseRedirect, HttpResponseServerError
 from django.shortcuts import render_to_response
 import account.forms
 from django_authopenid.forms import OpenidSigninForm
 from django.template import RequestContext, loader, Context
+from django.core.urlresolvers import reverse
+import profile.views
+from profile.views import display_person_web
 
 def homepage(request, signup_form=None):
-    # For OpenID
+    if request.user.is_authenticated():
+        return HttpResponseRedirect('/people/%s' % request.user.username)
+
     form1 = OpenidSigninForm()
 
     signup_notification = login_notification = notification_id = None
     if request.GET.get('msg', None) == 'ciao':
         login_notification = "You've been logged out. Thanks for dropping in!"
         notification_id = 'ciao'
+    # FIXME: I think the control block below is dead.
     elif request.GET.get('msg', None) == 'username_taken':
         signup_notification = "Your chosen username is already taken. Try another one."
         notification_id = 'username_taken'
@@ -20,7 +27,6 @@ def homepage(request, signup_form=None):
         signup_form = account.forms.UserCreationFormWithEmail()
 
     return render_to_response('base/homepage.html', {
-        'title' : 'Welcome to OpenHatch', # FIXME: This doesn't work.
         'signup_form': signup_form,
         'notification_id': notification_id,
         'login_notification': login_notification,

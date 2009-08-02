@@ -1,25 +1,33 @@
 {% extends 'base/base.html' %}
 
+{% block title %}
+Change your photo - OpenHatch
+{% endblock title %}
+
 {% block more_css %}
 @import url('/static/css/auth.css') all;
 {% endblock more_css %}
 
 {% block content %}
 <div class='module account-dialog'>
-  <img src="{{ the_user.get_profile.photo.url }}"></img>
-    <form method='POST'
-	  name='edit_photo'
-	  action='/account/edit/photo/do'
-	  enctype="multipart/form-data">
-      <h3 style='float: left; width: 900px;'>Edit photo</h3>
-      {% for field in edit_photo_form %}
-      <div class='form-row'>
-	{{ field.errors }}
-	{{ field.label_tag }}
-	{{ field }}
-      </div>
-      {% endfor %}
-    <input type="submit" value="Change it!">
-    </form>
+    <div class='module-header head'>
+        <h3>Change your photo</h3>
+    </div>
+    <div class='module-content body'>
+        <img src="{{ the_user.get_profile.photo.url }}"></img>
+        <form method='POST'
+            name='edit_photo'
+            action='/account/edit/photo/do'
+            enctype="multipart/form-data">
+            {% for field in edit_photo_form %}
+            <div class='form-row'>
+                {{ field.errors }}
+                <label>Change your photo</label>
+                {{ field }}
+            </div>
+            {% endfor %}
+            <input type="submit" value="Change it!">
+        </form>
+    </div>
 </div>
 {% endblock content %}

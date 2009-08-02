@@ -18,10 +18,14 @@ label {
     margin-right: 10px;
     font-size: 12pt;
 }
-input[type='text'], input[type='password'] {
+input[type='text'], input[type='file'], input[type='password'] {
     padding: 10px;
     float: left;
     width: 220px;
+}
+input[type='file'] {
+    margin: 10px 0;
+    width: 200px;
 }
 input[type='submit'] {
     padding: 7px;

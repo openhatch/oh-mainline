@@ -46,11 +46,12 @@
         {% else %}
         {% if editable %}
         <div id='add_contribs_notification' class='notification'>
-            If you've contributed to open source, click one of these links to start your contribution portfolio. If you're a new contributor, go forth and find a bug to  work on! (Coming soon: Mentoring for everybody weathered or new.)
+            <div class='body'>
+                If you've contributed to open source, click one of the links on the right to start your contribution portfolio. If you're a new contributor, go forth and find a bug to  work on! (Coming soon: Mentoring for everybody weathered or new.)
+            </div>
         </div>
-        {% else %}
-        <div style='float: left; font-size: 10pt; padding: 20px; width: 500px;'>This person hasn't listed any contributions yet.</div>
         {% endif %}
+        <div style='float: left; font-size: 10pt; padding: 10px 20px; width: 500px;'>This person hasn't listed any contributions yet.</div>
         {% endif %}
     </div>
     </div>

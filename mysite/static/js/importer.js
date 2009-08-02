@@ -377,9 +377,54 @@ $(init);
 
 $(function() { $('.hide_on_doc_ready').hide(); });
 
-fireunit.ok(typeof console != 'undefined', "Yep");
-fireunit.ok(typeof $ == 'undefined', "Yep");
-fireunit.testDone();
+HowTo = {
+    'init': function () {
+        HowTo.$element = $('#importer .howto');
+        HowTo.$hideLink = $('#importer .howto .hide-link');
+        HowTo.$showLink = $('#importer .show-howto-link');
+        console.debug(HowTo.$element, HowTo.$hideLink, HowTo.$showLink);
+
+        var tests = ["HowTo.$element.size() == 1",
+                "HowTo.$hideLink.size() == 1",
+                "HowTo.$showLink.size() == 1"];
+        for (var i = 0; i < tests.length; i++) {
+            fireunit.ok(eval(tests[i]), tests[i]);
+        }
+
+        for (var e in HowTo.events) {
+            HowTo.events[e].bind();
+        }
+    },
+    '$element': null,
+    '$hideLink': null,
+    '$showLink': null,
+    'events': {
+        'hide': {
+            'go': function () {
+                console.log('hide go');
+                HowTo.$element.fadeOut('slow');
+                HowTo.$showLink.fadeIn('slow');
+                console.debug(HowTo.$element);
+                return false;
+            },
+            'bind': function () {
+                console.log("bind hide");
+                HowTo.$hideLink.click(HowTo.events.hide.go);
+            },
+        },
+        'show': {
+            'go': function () {
+                HowTo.$element.fadeIn('slow');
+                return false;
+            },
+            'bind': function () {
+                console.log("bind show");
+                HowTo.$showLink.click(HowTo.events.show.go);
+            },
+        }
+    }
+};
+$(HowTo.init);
 
 tests = {
     'Preparation': function () {
