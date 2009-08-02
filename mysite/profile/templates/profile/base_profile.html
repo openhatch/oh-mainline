@@ -87,21 +87,25 @@
     </a>
 </div>
 {% else %}
-    <div><a href="/account/edit/photo/">Change photo</a></div>
-<div id='avatar' class='module'><img src='{{ photo_url }}' /></div>
+<div id='avatar' class='module'>
+    <img src='{{ photo_url }}' />
+    <div class='change-photo-link'><a href="/account/edit/photo/">Change photo</a></div>
+</div>
 {% endif %}
 
 <div id='info' class='module'>
 
-    {% if editable and not info_edit_mode %}
-    <a class='edit' href='/people/edit/info'>Edit</a>
-    {% endif %}
+    <div class='module-header'>
+        {% if editable and not info_edit_mode %}
+        <a class='edit' href='/people/edit/info'>Edit</a>
+        {% endif %}
 
-    <h3 style='float: left; width: 100px;'>Info</h3>
+        <h3>Info</h3>
 
-    {% if editable and not info_edit_mode and not has_set_info %}
-    <div id='edit_your_info_notification' class='notification'>Edit your info!</div>
-    {% endif %}
+        {% if editable and not info_edit_mode and not has_set_info %}
+        <div id='edit_your_info_notification' class='notification'>Edit your info!</div>
+        {% endif %}
+    </div>
 
     {% if info_edit_mode %}
     <form name='edit-tags'

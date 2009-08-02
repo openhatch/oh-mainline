@@ -6,8 +6,10 @@
 
 {% block content %}
 <div id='login' class='module account-dialog'>
-    <h3 class='module-header'>Please log in!</h3>
-    <div class='module-content'>
+    <div class='module-header head'>
+        <h3>Please log in!</h3>
+    </div>
+    <div class='module-content body'>
         <form name='login'
             action='/account/login/do' method='POST'>
             <div class='form-row'>
@@ -23,8 +25,8 @@
             </div>
         </form>
     </div>
-    <div class='foot' style='margin-top: 50px; clear: left; float: left;'>
-        Don't have an account yet? Then <a style='font-weight: bold;' href='/#tab=create_profile'>sign your bad self up for one</a>.
+    <div class='foot'>
+        Don't have an account yet? Then <a style='font-weight: bold;' href='/#tab=create_profile'>sign up for one</a>.
     </div>
 </div>
 {% endblock content %}

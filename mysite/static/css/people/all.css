@@ -286,6 +286,7 @@ h3 {
 #portfolio .module-content ul li {
     float: left;
     padding: 20px;
+    width: 321px;
 }
 .tags {
     float: left;
@@ -339,7 +340,8 @@ img.show-more-link {
     width: 683px;
 }
 #portfolio .module-content {
-    width: 720px;
+    width: 724px;
+    border-right: 1px solid #f4f4f4;
 }
 .widget {
     float: left;
@@ -495,7 +497,7 @@ img {
     float: left;
     margin-bottom: 20px;
     margin-right: 0;
-    width: 740px;
+    width: 725px;
 }
 .project-display h3 {
     float: left;
