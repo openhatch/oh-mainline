@@ -30,6 +30,8 @@ urlpatterns = patterns('',
             'mysite.consulting.views.search'),
         (r'^jobs/(?P<query>.*)/$',
             'mysite.consulting.views.list'),
+        (r'^people/(?P<user_to_display__username>[^/]+)/widget/$',
+                'mysite.profile.views.widget_display'),
 
         (r'^people/delete-experience/do$',
          'mysite.profile.views.delete_experience_do'),
