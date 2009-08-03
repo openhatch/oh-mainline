@@ -3,6 +3,7 @@ from django.http import HttpResponse, \
 from django.shortcuts import render_to_response
 import account.forms
 from django_authopenid.forms import OpenidSigninForm
+import simplejson
 from django.template import RequestContext, loader, Context
 from django.core.urlresolvers import reverse
 import profile.views
@@ -35,4 +36,14 @@ def homepage(request, signup_form=None):
         }, context_instance=RequestContext(request))
 
 
-
+def page_to_js(request):
+    # FIXME: In the future, use:
+    # from django.template.loader import render_to_string
+    # to generate html_doc
+    html_doc = "<strong>zomg</strong>"
+    encoded_for_js = simplejson.dumps(html_doc)
+    # Note: using application/javascript as suggested by
+    # http://www.ietf.org/rfc/rfc4329.txt
+    return render_to_response('base/append_ourselves.js',
+                              {'in_string': encoded_for_js},
+                              mimetype='application/javascript')

@@ -109,6 +109,10 @@ urlpatterns = patterns('',
         (r'^people/user_selected_these_dia_checkboxes$',
                 'mysite.profile.views.user_selected_these_dia_checkboxes'),
 
+        # Generate widget JavaScript
+        (r'^openhatch-widget.js$',
+                'mysite.base.views.page_to_js'),
+
         # This dangerous regex is last
         (r'^people/(?P<user_to_display__username>[^/]+)[/?]$',
                 'mysite.profile.views.display_person_web'),
