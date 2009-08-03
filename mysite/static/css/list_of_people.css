@@ -1,0 +1,16 @@
+#big-people-list {
+    float: left;
+    width: 980px;
+}
+#big-people-list h3 {
+    width: 980px;
+}
+#big-people-list ul {
+    width: 980px;
+    float: left;
+}
+#big-people-list li {
+    padding-top: 10px;
+    margin-left: 15px;
+    list-style: square;
+}
