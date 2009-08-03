@@ -1,4 +1,5 @@
 import os
+import logging
 # Django settings for mysite project.
 
 DEBUG = True
@@ -142,3 +143,9 @@ LOGIN_REDIRECT_URL = '/account/login/'
 
 OHLOH_API_KEY='JeXHeaQhjXewhdktn4nUw' # "Oman testing"
 
+applog = logging.getLogger('applog')
+applog.setLevel(logging.DEBUG)
+_handler = logging.StreamHandler()
+_formatter = logging.Formatter('%(asctime)s %(funcName)s:%(lineno)d %(levelname)-8s %(message)s')
+_handler.setFormatter(_formatter)
+applog.addHandler(_handler)

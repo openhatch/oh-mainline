@@ -225,3 +225,24 @@ class LoginWithOpenId(base.tests.TwillTests):
         self.assert_(list(
             Person.objects.filter(user__username='paulproteus')))
 
+class EditEmail(base.tests.TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+    def test_edit_email_address(self):
+        self.login_with_twill()
+        
+        # Go to edit email form
+        tc.go(make_twill_url('http://openhatch.org/account/edit/password/'))
+        tc.notfind('new@ema.il')
+
+        # Edit email
+        tc.fv('edit_email', 'email', 'new@ema.il')
+        tc.submit()
+
+        # Check that it stuck
+        tc.go(make_twill_url('http://openhatch.org/account/edit/password/'))
+        tc.find('new@ema.il')
+
+
+        
+             
+    
