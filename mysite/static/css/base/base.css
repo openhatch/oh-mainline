@@ -40,6 +40,7 @@ h1 a:hover {
     border-top: 2px solid #bfe2ff;
     float: left;
     border-bottom: 1px solid #eee;
+    background: #fff url('/static/images/module-head-bg.png') bottom repeat-x;
 }
 
 .module > .head h3 {
@@ -80,7 +81,7 @@ h1 a:hover {
 
 .submodule > .head {
     float: left;
-    background-color: #f4f4f4;
+    background: #f4f4f4 url('/static/images/module-head-bg.png') bottom repeat-x;
     float: left;
     padding: 10px 20px;
     border-bottom: 1px solid #ddd;
@@ -126,7 +127,7 @@ h1, h2, h3, h4 {
     padding: 10px 20px 0 20px;
     float: left;
     width: 960px;
-    height: 90px;
+    height: 100px;
     border-top: 0;
 }
 #nav h2 {
@@ -271,12 +272,11 @@ h3 {
     padding: 17px 20px;
     line-height: 13pt;
     font-weight: bold;
-    border-right: 3px solid #f4f4f4;
+    margin-right: 3px;
 }
 .module > .head ul li a:hover {
-    background: #fff;
     color: orange;
-    text-decoration: none;
+    text-decoration: underline;
 }
 .tags {
     float: left;

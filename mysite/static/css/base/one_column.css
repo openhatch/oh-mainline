@@ -1,6 +1,7 @@
-#main,  {
+#main {
     float: left;
     width: 905px;
+    border: 1px solid #f4f4f4;
 }
 
 #main .module > .head,
@@ -27,18 +28,36 @@
     background-color: #fff;
     padding: 20px;
 }
-#main .contains-submodules.two-columns .submodule.skinny .head h3 {
-    width: 200px;
-}
+#main .contains-submodules.two-columns .submodule.skinny .head h3,
 #main .contains-submodules.two-columns .submodule.skinny .body {
     width: 200px;
 }
-#main .contains-submodules.two-columns .submodule.fat .head h3 {
-    width: 605px;
-}
+#main .contains-submodules.two-columns .submodule.fat .head h3,
 #main .contains-submodules.two-columns .submodule.fat .body {
     width: 605px;
 }
 #main .contains-submodules.two-columns .submodule.fat .foot {
     width: 615px;
+}
+
+#main .contains-submodules.two-columns.equal-width .submodule {
+    width: 440px;
+}
+
+#main .contains-submodules.two-columns.equal-width .submodule .head h3,
+#main .contains-submodules.two-columns.equal-width .submodule .body {
+    width: 400px;
+}
+#main .contains-submodules.two-columns.equal-width .submodule .foot {
+    width: 410px;
+}
+#main .contains-submodules.two-columns .submodule.fat .head h3,
+#main .contains-submodules.two-columns .submodule.fat .body {
+    width: 605px;
+}
+#main .contains-submodules.two-columns .submodule.fat .foot {
+    width: 615px;
+}
+#main .contains-submodules.two-columns .submodule.left {
+    margin-right: 20px;
 }
