@@ -150,9 +150,7 @@ class ProjectExpTests(base.tests.TwillTests):
         # {{{
         self.login_with_twill()
 
-        tc.follow('Add +')
-
-        tc.url('/form/projectexp_add')
+        tc.go(make_twill_url('http://openhatch.org/form/projectexp_add'))
         tc.fv('projectexp_add', 'project__name', project__name)
         tc.fv('projectexp_add', 'project_exp__description', project_exp__description)
         tc.fv('projectexp_add', 'project_exp__url', project_exp__url)
