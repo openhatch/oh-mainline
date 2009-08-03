@@ -3,6 +3,7 @@
 }
 .tab-links a.my-tab-is-hidden {
     background-color: #fff;
+    font-weight: normal;
     color: #222;
 }
 .tab-links a.my-tab-is-hidden:hover {

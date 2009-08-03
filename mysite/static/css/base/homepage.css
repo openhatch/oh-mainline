@@ -199,6 +199,7 @@ input[type='submit'] {
     font-weight: bold;
     position: relative;
     top: 6px;
+    color: #000;
     /*-moz-border-radius-topleft: 7px;
     -moz-border-radius-topright: 8px;*/
 }
