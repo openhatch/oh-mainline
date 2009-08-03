@@ -75,6 +75,7 @@ small {
     padding-right: 80px;
 }
 #explanation {
+    width: 300px;
     font-size: 9pt;
 }
 #banner img {
