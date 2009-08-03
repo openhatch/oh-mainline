@@ -38,3 +38,8 @@ input[type='submit'] {
     font-size: .7em;
     margin: -17px 6px 0 0;
 }
+input[type='checkbox'] {
+    position: relative;
+    top: 13px;
+    left: -20px;
+}
