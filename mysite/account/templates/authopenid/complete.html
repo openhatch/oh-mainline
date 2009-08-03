@@ -5,22 +5,20 @@
 Associate your OpenID - OpenHatch
 {% endblock title %}
 
-{% block content %}
+{% block main %}
 <div class='module' id='openid-associate'>
 
     <div class='head'>
         <h3>{% trans "Associate your OpenID with an OpenHatch account." %}</h3>
     </div>
 
-    <div class='body'>
+    <div class='body contains-submodules two-columns equal-width'>
 
-        <div class=''>
             <div class='body'>
                 {% blocktrans %}
                 <p>If you're joining <strong>OpenHatch</strong>, tell us what username you want to use for your new account. If you're already a member, associate with your existing account.</p>
                 {% endblocktrans %}
             </div>
-        </div>
 
         {% if form1.errors %}
         <p class="errors">{% trans "Please correct errors below:" %}<br />
@@ -44,30 +42,38 @@ Associate your OpenID - OpenHatch
         </p>
         {% endif %}
 
-        <div class="login">
-            <form name="fregister" action="{% url user_register %}" method="POST">
-                <input type="hidden" name="next" value="{{ next }}" />
-                <fieldset>
-                    <legend>{% trans "A new account" %}</legend>
+            <form name="fregister" action="{% url user_register %}" method="POST" class="login left submodule">
+                <div class='head'>
+                    <h3>{% trans "A new account" %}</h3>
+                </div>
+                <div class='body'>
+                    <input type="hidden" name="next" value="{{ next }}" />
+                    <style>
+                        .form-row {
+                            clear: left;
+                        }
+                    </style>
                     <div class="form-row"><label for="id_username">{% trans "Username" %}</label><br />{{ form1.username }}</div>
                     <div class="form-row"><label for="id_email">{% trans "Email" %}</label><br />{{ form1.email }}</div>
+                </div>
+                <div class='foot'>
                     <div class="submit-row"><input type="submit" name="bnewaccount" value="Create account"></div>
-                    <hr class="clear" />
-                </fieldset>
+                </div>
             </form>
-        </div>
 
-        <div class="login">
-            <form name="fverify" action="{% url user_register %}" method="POST">
-                <input type="hidden" name="next" value="{{ next }}" />
-                <fieldset>
-                    <legend>{% trans "An existing account" %}</legend>
+            <form name="fverify" action="{% url user_register %}" method="POST" class='login right submodule'>
+                <div class='head'>
+                    <h3>{% trans "An existing account" %}</h3>
+                </div>
+                <div class='body'>
+                    <input type="hidden" name="next" value="{{ next }}" />
                     <div class="form-row"><label for="id_username">{% trans "Username" %}</label><br />{{ form2.username }}</div>
                     <div class="form-row"><label for="id_passwordl">{% trans "Password" %}</label><br />{{ form2.password }}</div>
+                </div>
+                <div class='foot'>
                     <div class="submit-row"><input type="submit" name="bverify" value="Verify"></div>
-                </fieldset>
+                </div>
             </form>
-        </div>
     </div>
 </div>
-{% endblock content %}
+{% endblock main %}
