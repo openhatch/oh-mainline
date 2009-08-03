@@ -232,6 +232,18 @@ def projectexp_display(request, user_to_display__username, project__name):
     data['editable'] = (user == request.user)
     return render_to_response('profile/projectexp.html', data)
     # }}}
+    
+def widget_display(request, user_to_display__username):
+    # {{{
+    user = get_object_or_404(User, username=user_to_display__username)
+    person = get_object_or_404(Person, user=user)
+    data = get_personal_data(person)
+    data['title'] = "Widget"
+    data['the_user'] = request.user
+    data['projectexp_editable'] = (user == request.user)
+    data['editable'] = (user == request.user)
+    return render_to_response('profile/widget-test.html', data)
+    # }}}
 
 @login_required
 def projectexp_edit(request, project__name):

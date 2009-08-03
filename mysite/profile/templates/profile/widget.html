@@ -1,0 +1,38 @@
+<div id='portfolio' class='module'>
+    <div class='project-display column'>
+        <div class='module-header'>
+        <h3>{{person.user.username}}'s contributions</h3>
+        </div>
+        <div class='module-content'>
+        {% if projects %}
+        <ul>
+            {% for project, more_project_attributes in projects.items %}
+            <li>
+            <div class='project-escutcheon'>
+                <div class='logo'>
+                    <a href='/people/{{ person.user.username }}/projects/{{ project.name }}'>
+                        <img alt='logo for {{project.name}}'
+                        src='/people/project_icon/{{ project.name }}'/>
+                    </a>
+                </div>
+                <a style='height: 30px;'
+                    href='/people/{{ person.user.username }}/projects/{{ project.name }}' 
+                    class='name'>{{ project.name }}</a>
+            </div>
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        {% if editable %}
+        <div id='add_contribs_notification' class='notification'>
+            If you've contributed to open source, click one of the buttons above to start your profile. If you're a new contributor, go forth and find a bug to  work on! (Coming soon: Mentoring for everybody weathered or new.)
+        </div>
+        {% else %}
+        <div style='float: left; margin-top: 10px; width: 500px;'>No contributions listed yet.</div>
+        {% endif %}
+        {% endif %}
+    </div>
+    </div>
+    <!-- }}} -->
+</div> <!-- /#portfolio -->
+</div>

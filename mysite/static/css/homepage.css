@@ -1,10 +1,11 @@
 body {
-    background-color: #ddeeff;
+    background: url('/static/images/motif-blue.png') repeat;
 }
 
 a img {
     border-style: none;
 }
+
 
 h1 {
     font-size: 24px; 
@@ -31,13 +32,6 @@ h3 {
     font-size: 20px;
     text-align: center;
     margin: 10px 0;
-}
-
-#content {
-    background: transparent;
-    border: 0;
-    padding: 0;
-    float: left;
 }
 
 #entry-points h3 {
@@ -67,21 +61,22 @@ small {
      float: right;
 }
 
+#content {
+    margin-top: 50px;
+    background-color: #fff;
+}
+
 #banner {
-    width: 220px;
+    width: 350px;
     float: left;
     margin-right: 50px;
-    padding: 40px 0;
-    padding-right: 80px;
 }
 #explanation {
     font-size: 9pt;
 }
 #banner img {
     border: 0;
-}
-#love-code {
-    margin-top: 50px;
+    width: 350px;
 }
 
 #explanation p {
@@ -141,118 +136,35 @@ input[type='submit'] {
 }
 #entry-points {
     float: left;
-    margin-top: 0px;
-    width: 600px;
-}
-#entry-points #no-authorization-necessary {
-    float: left;
-    margin-top: 20px;
-    margin-bottom: 40px;
-    width: 600px;
-}
-#entry-points #no-authorization-necessary ul {
-    float: left;
-    width: 560px;
-    margin: 0;
-    padding: 0;
+    margin-top: 100px;
 }
 #entry-points #no-authorization-necessary li {
-    list-style: none;
-    font-size: 15pt;
-    float: left;
-    width: 270px;
-}
-#entry-points #no-authorization-necessary li a {
-    float: left;
-    background-color: #f4f4f4;
-    color: #222;
-    padding: 20px;
-    height: 100px;
-}
-#entry-points #no-authorization-necessary li a:hover {
-    background: #fff;
-    color: #00afff; 7fc4ff; bfe2ff;
-    text-decoration: none;
-    border-color: #ddd;
+    list-style: square;
+    font-size: 10pt;
 }
 #entry-points #account-related {
+    margin-top: 40px;
     float: left;
-    width: 600px;
 }
 #entry-points #account-related li {
     float: left;
     margin-right: 10px;
     list-style: none;
 }
-.tab-links, .tab-links ul {
-    float: left;
-    width: 600px;
-    margin: 0;
-    padding: 0;
-}
 .tab-links a {
     float: left;
-    background-color: #f4f4f4;
+    background-color: #fff;
     margin-right: 10px;
-    padding: 15px 15px 13px 15px;
+    padding: 10px 10px 5px 10px;
     font-size: 10pt;
     font-weight: bold;
-    position: relative;
-    top: 6px;
-    /*-moz-border-radius-topleft: 7px;
-    -moz-border-radius-topright: 8px;*/
-}
-.tab-links li.right-link,
-.tab-links li.right-link a {
-    float: right;
-    font-size: 14pt;
-}
-.tab-links li.learn-more a {
-    margin-left: 120px;
-    font-size: 14pt;
-    top: 0;
-}
-.tab-links a:hover {
-    background-color: #eee;
-    text-decoration: none;
-}
-.tab-links a:active {
-    outline: none;
-}
-.tab-links a:focus {
-    -moz-outline-style: none;
 }
 #tabs {
     float: left;
-    width: 600px;
-    background-color: #f4f4f4;
-    margin: 0;
-    border: 0;
-}
-.tab {
-    padding: 20px;
+    width: 430px;
+    padding: 10px;
 }
 .visible_iff_js {
     display: none;
-}
-#learn-more {
-    float: left;
-    font-size: 12pt;
-}
-#entry-points #account-related #learn-more ul {
-    margin-left: 10px;
-}
-#entry-points #account-related #learn-more li {
-    list-style: square;
-    margin-bottom: 10px;
-}
-#tabs .notification {
-    float: left;
-    background-color: #ff7;
-    text-align: center;
-    padding: 10px;
-    width: 540px;
-    margin: 0;
-    margin-bottom: 10px;
 }
 /* vim: set ai ts=4 sts=4 et sw=4: */
