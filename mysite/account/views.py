@@ -9,6 +9,7 @@ from django_authopenid.forms import OpenidSigninForm
 from django.core.urlresolvers import reverse
 
 import urllib
+import logging
 
 
 import account.forms
@@ -16,6 +17,8 @@ import base.views
 from profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag, Link_Project_Tag, Link_SF_Proj_Dude_FM, Link_Person_Tag, DataImportAttempt
 from profile.views import get_personal_data
 # }}}
+
+applog = logging.getLogger('applog')
 
 def login(request):
     # {{{
@@ -80,7 +83,8 @@ def logout(request):
     # }}}
 
 @login_required
-def edit_password(request, edit_password_form = None):
+def edit_password(request, edit_password_form = None,
+                  edit_email_form = None):
     data = get_personal_data(
             request.user.get_profile())
     data['the_user'] = request.user
@@ -89,7 +93,13 @@ def edit_password(request, edit_password_form = None):
     else:
         data['passwordchangeform'] = edit_password_form
 
-    # Always show an Edit email form
+    # Store edit_email_form in data[], even if we weren't passed one
+    if edit_email_form is None:
+        edit_email_form = account.forms.EditEmailForm(
+            instance=request.user)
+    data['edit_email_form'] = edit_email_form
+    
+    # Always show the Privacy settings form
     data['show_email_form'] = account.forms.ShowEmailForm(
         {'show_email': request.user.get_profile().show_email})
 
@@ -139,6 +149,20 @@ def edit_photo_do(request, mock=None):
     if form.is_valid():
         form.save()
     return HttpResponseRedirect('/account/edit/photo')
+
+@login_required
+def edit_email_do(request):
+    # Check if request.POST contains show_email_address
+    form = account.forms.EditEmailForm(request.POST,
+                                       instance=request.user)
+    if form.is_valid():
+        applog.debug('Changing email of user <%s> to <%s>' % (
+                request.user, form.cleaned_data['email']))
+        form.save()
+    else:
+        return edit_password(request, edit_email_form=form)
+    return HttpResponseRedirect(reverse(edit_password))
+    
 
 def catch_me(request):
     import pdb
