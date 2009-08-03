@@ -1,9 +1,9 @@
 body {
     font: 9pt Verdana, Bitstream Vera Sans, Arial, sans-serif;
-    background: #fff; url('/static/images/leitmotif.png');
+    background: #DDEEFF; #fff; url('/static/images/leitmotif.png');
     margin: 0;
     padding: 0;
-    border-top: 5px solid #bbb;
+    border-top: 7px solid #b1aea0;
 }
 a {
     color: darkorange; #66AA33;
@@ -148,10 +148,10 @@ h1, h2, h3, h4 {
     margin-top: 10px;
 }
 #links li a {
-    color: #777;
+    color: #76746b;
     padding: 3px 10px 5px 10px;
     background-color: #fff; d8d8e4; 00afff; caffff; 7fc4ff;
-    border-top: 2px solid #eee;
+    border-top: 2px solid #ded8be;
     float: left;
     text-decoration: none;
 }
@@ -176,7 +176,7 @@ ul#links {
 
 #account-links li {
     background-color: #F4F4F4;
-    border-top: 2px solid #BFE2FF;
+    border-top: 2px solid #CCDDFF;
     padding: 5px 10px;
     margin: 0;
     font-size: 9pt;
