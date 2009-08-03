@@ -1,9 +1,8 @@
 body {
     font: 9pt Verdana, Bitstream Vera Sans, Arial, sans-serif;
-    background: #DDEEFF; #fff; url('/static/images/leitmotif.png');
+    background-color:: #ddeeff; 
     margin: 0;
     padding: 0;
-    border-top: 7px solid #b1aea0;
 }
 a {
     color: darkorange; #66AA33;

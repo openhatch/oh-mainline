@@ -40,13 +40,10 @@ $(function() {
 
 {% block content %}
 <div id='banner'>
-    <img alt='OpenHatch' src='/static/images/the-logo.png' width='222' height='152' />
+    <img alt='OpenHatch' src='/static/images/the-logo.png' width='300'/>
 
     <div id='explanation'>
         <h3>OpenHatch is an open source involvement engine.</h3>
-        <div id='love-code'>
-            <img src='/static/images/love-code.png' />
-        </div>
     </div>
 </div>
 
@@ -79,7 +76,7 @@ $(function() {
             <h3 class='invisible_if_js'>Sign up</h3>
             <div id='create_profile' class='tab'>
                 {% if signup_notification %}
-                <div class='float: left; notification' style='background-color: #ffc; border: 1px solid #ff9; text-align: center; padding: 10px;'>
+                <div class='notification'>
                     {{ signup_notification }}
                 </div>
                 {% endif %}
@@ -110,7 +107,7 @@ $(function() {
             <h3 class='invisible_if_js'>Log in</h3>
             <div id='login' class='tab invisible_if_js'>
                 {% if login_notification %}
-                <div class='float: left; notification' style='background-color: #ffc; border: 1px solid #ff9; text-align: center; padding: 10px;'>
+                <div class='notification'>
                     {{ login_notification }}
                 </div>
                 {% endif %}

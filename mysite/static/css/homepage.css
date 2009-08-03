@@ -162,7 +162,6 @@ input[type='submit'] {
 #tabs {
     float: left;
     width: 430px;
-    background-color: #fff;
     padding: 10px;
 }
 .visible_iff_js {
