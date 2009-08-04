@@ -124,7 +124,7 @@ if gethostname() in ('renaissance', 'yggdrasil', 'builder', 'vellum') and DEBUG:
     DEBUG_PROPAGATE_EXCEPTIONS=True
 
 # file: settings.py #
-TEST_RUNNER = '_profiling.profile_tests'
+TEST_RUNNER = 'mysite._profiling.profile_tests'
 TEST_PROFILE = '/tmp/profile'
 
 ## AMQP, Rabbit Queue, Celery
