@@ -1,0 +1,16 @@
+{% extends 'account/settings.html' %}
+
+{% block settings_main %}
+<form class='submodule fat' method='POST'
+    action='{% block form_action %}{% endblock %}'>
+    <div class='head'>
+        <h3>{% block submodule_head %}{% endblock %}</h3>
+    </div>
+    <div class='body'>
+        {% block submodule_body %}{% endblock %}
+    </div>
+    <div class='foot'>
+        <input type='submit' value='Save' />
+    </div>
+</form>
+{% endblock settings_main %}

@@ -1,0 +1,49 @@
+{% extends 'base/one_column.html' %}
+
+{% block title %}
+Account settings - OpenHatch
+{% endblock title %}
+
+{% block css %}
+{{ block.super }}
+@import url('/static/css/account/auth.css') all;
+{% endblock css %}
+
+{% block main %}
+<div class='module'>
+    <div class='head'>
+        <h3>Account settings</h3>
+    </div>
+    <div class='body contains-submodules two-columns'>
+        <div class='submodule skinny'>
+            <div class='body'>
+                <ul>
+                    <li>
+                    <a href='{% url account.settings.views.edit_contact_info %}'>
+                        Contact info
+                    </a>
+                    </li>
+                    <li>
+                    <a href='{% url account.settings.views.change_password %}'>
+                       Password 
+                    </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <form method='POST' name='change_password'
+            action='{% url account.views.edit_password_do %}'
+            class='submodule fat'>
+            <div class='head'>
+                <h3>Change password</h3>
+            </div>
+            <div class='body'>
+                {{ edit_email_form.as_p }}
+            </div>
+            <div class='foot'>
+                <input type="submit" value="Change it!">
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock main %}
