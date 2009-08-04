@@ -83,52 +83,6 @@ def logout(request):
     # }}}
 
 @login_required
-def edit_password(request, edit_password_form = None,
-                  edit_email_form = None):
-    data = get_personal_data(
-            request.user.get_profile())
-    data['the_user'] = request.user
-    if edit_password_form is None:
-        data['passwordchangeform'] = django.contrib.auth.forms.PasswordChangeForm({})
-    else:
-        data['passwordchangeform'] = edit_password_form
-
-    # Store edit_email_form in data[], even if we weren't passed one
-    if edit_email_form is None:
-        edit_email_form = account.forms.EditEmailForm(
-            instance=request.user)
-    data['edit_email_form'] = edit_email_form
-    
-    # Always show the Privacy settings form
-    data['show_email_form'] = account.forms.ShowEmailForm(
-        {'show_email': request.user.get_profile().show_email})
-
-    return render_to_response('account/edit_password.html',
-                              data)
-
-@login_required
-def edit_password_do(request):
-    # {{{
-    form = django.contrib.auth.forms.PasswordChangeForm(
-            request.user, request.POST)
-    if form.is_valid():
-        form.save() 
-        return HttpResponseRedirect('/people/%s/?msg=edit_password_done' % urllib.quote(request.user.username))
-    else:
-        return edit_password(request, edit_password_form=form)
-    # }}}
-
-@login_required
-def show_email_do(request):
-    # Check if request.POST contains show_email_address
-    form = account.forms.ShowEmailForm(request.POST)
-    if form.is_valid():
-        profile = request.user.get_profile()
-        profile.show_email = form.cleaned_data['show_email']
-        profile.save()
-    return HttpResponseRedirect(reverse(edit_password))
-
-@login_required
 def edit_photo(request, form = None):
     data = get_personal_data(
             request.user.get_profile())
@@ -150,22 +104,109 @@ def edit_photo_do(request, mock=None):
         form.save()
     return HttpResponseRedirect('/account/edit/photo')
 
-@login_required
-def edit_email_do(request):
-    # Check if request.POST contains show_email_address
-    form = account.forms.EditEmailForm(request.POST,
-                                       instance=request.user)
-    if form.is_valid():
-        applog.debug('Changing email of user <%s> to <%s>' % (
-                request.user, form.cleaned_data['email']))
-        form.save()
-    else:
-        return edit_password(request, edit_email_form=form)
-    return HttpResponseRedirect(reverse(edit_password))
-    
-
 def catch_me(request):
     import pdb
     pdb.set_trace()
+
+@login_required
+def settings(request):
+    # {{{
+    data = get_personal_data(
+            request.user.get_profile())
+    data['the_user'] = request.user
+
+    return render_to_response('account/settings.html', data)
+    # }}}
+
+@login_required
+def edit_contact_info(request, edit_email_form = None, show_email_form = None):
+    # {{{
+    data = get_personal_data(
+            request.user.get_profile())
+    data['the_user'] = request.user
+
+    # Store edit_email_form in data[], even if we weren't passed one
+    if edit_email_form is None:
+        edit_email_form = account.forms.EditEmailForm(
+            instance=request.user, prefix='edit-email')
+    data['edit_email_form'] = edit_email_form
+    
+    if show_email_form is None:
+        data['show_email_form'] = account.forms.ShowEmailForm(
+                prefix='show-email')
+    else:
+        data['show_email_form'] = show_email_form
+
+    return render_to_response('account/edit_contact_info.html', data)
+    # }}}
+
+@login_required
+def edit_contact_info_do(request):
+    # {{{
+
+    # Handle "Edit email"
+    edit_email_form = account.forms.EditEmailForm(
+            request.POST, prefix='edit_email', instance=request.user)
+
+    show_email_form = account.forms.ShowEmailForm(
+            request.POST, prefix='show_email')
+
+    if edit_email_form.is_valid() and show_email_form.is_valid():
+        applog.debug('Changing email of user <%s> to <%s>' % (
+                request.user, edit_email_form.cleaned_data['email']))
+        edit_email_form.save()
+    else:
+        return edit_contact_info(request,
+                edit_email_form=edit_email_form,
+                show_email_form=show_email_form)
+    return HttpResponseRedirect(reverse(edit_email))
+    # }}}
+
+@login_required
+def change_password(request, change_password_form = None):
+    # {{{
+    data = get_personal_data(
+            request.user.get_profile())
+    data['the_user'] = request.user
+    if change_password_form is None:
+        data['change_password_form'] = django.contrib.auth.forms.PasswordChangeForm({})
+    else:
+        data['change_password_form'] = change_password_form
+
+    return render_to_response('account/change_password.html', data)
+    # }}}
+
+@login_required
+def change_password_do(request):
+    # {{{
+    form = django.contrib.auth.forms.PasswordChangeForm(
+            request.user, request.POST)
+    if form.is_valid():
+        form.save() 
+        return HttpResponseRedirect(reverse(change_password))
+    else:
+        return change_password(request, change_password_form=form)
+    # }}}
+
+@login_required
+def show_email(request, show_email_form = None):
+    # {{{
+    data = get_personal_data(
+            request.user.get_profile())
+    data['the_user'] = request.user
+    return render_to_response('account/show_email.html', data)
+    # }}}
+
+@login_required
+def show_email_do(request):
+    # {{{
+    # Check if request.POST contains show_email_address
+    form = account.forms.ShowEmailForm(request.POST)
+    if form.is_valid():
+        profile = request.user.get_profile()
+        profile.show_email = form.cleaned_data['show_email']
+        profile.save()
+    return HttpResponseRedirect(reverse(edit_password))
+    # }}}
 
 # vim: ai ts=3 sts=4 et sw=4 nu

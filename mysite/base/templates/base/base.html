@@ -4,7 +4,7 @@
     <head>
         <title>
             {% block title %}
-            OpenHatch
+            - OpenHatch
             {% endblock title %}
         </title>
 
@@ -61,7 +61,7 @@
                                 {% if the_user.is_authenticated %}
                                 <!-- user.is_authenticated indeed -->
                                 <li><a href='{% url mysite.account.views.logout %}'>log out</a></li>
-                                <li><a href='{% url mysite.account.views.edit_password %}'>settings</a></li>
+                                <li><a href='{% url mysite.account.views.settings %}'>settings</a></li>
                                 <li><a href='/people/{{ the_user.username }}/'>{{ the_user.username }}</a></li>
                                 {% else %}
                                 <li><a href='{% url mysite.account.views.login %}'>log in</a></li>
