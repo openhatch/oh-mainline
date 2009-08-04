@@ -1,9 +1,9 @@
 import datetime
-from customs import ohloh
+from ...customs import ohloh
 import urllib2
-import customs.lp_grabber 
-from profile.views import ohloh_contributor_facts_to_project_exps, create_project_exps_from_launchpad_contributor_facts
-from profile.models import Person, DataImportAttempt
+from ...customs import lp_grabber
+from ..views import ohloh_contributor_facts_to_project_exps, create_project_exps_from_launchpad_contributor_facts
+from ..models import Person, DataImportAttempt
 from celery.task import Task
 import celery.registry
 
@@ -21,7 +21,7 @@ def lp_action(dia):
     # NB: Don't change the way this is called, because calling it this way
     # permits this function to be mocked when we test it.
     # FIXME: Is that true?
-    return customs.lp_grabber.get_info_for_launchpad_username(dia.query)
+    return lp_grabber.get_info_for_launchpad_username(dia.query)
 
 source2actual_action = {
         'rs': rs_action,

@@ -1,6 +1,5 @@
-import base.tests 
-from base.tests import make_twill_url
-from profile.models import Person
+from mysite.base.tests import make_twill_url, TwillTests
+from mysite.profile.models import Person
 
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
@@ -10,7 +9,7 @@ import Image
 
 from twill import commands as tc
 
-class Login(base.tests.TwillTests):
+class Login(TwillTests):
     # {{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
     
@@ -47,7 +46,7 @@ class Login(base.tests.TwillTests):
         tc.notfind('is_authenticated indeed')
     # }}}
 
-class Signup(base.tests.TwillTests):
+class Signup(TwillTests):
     # {{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -146,7 +145,7 @@ class Signup(base.tests.TwillTests):
 
     # }}}
 
-class EditPassword(base.tests.TwillTests):
+class EditPassword(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
     def change_password(self, old_pass, new_pass,
             should_succeed = True):
@@ -183,7 +182,7 @@ class EditPassword(base.tests.TwillTests):
         self.change_password(oldpass, newpass,
                 should_succeed = False)
 
-class EditPhoto(base.tests.TwillTests):
+class EditPhoto(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
     def test_set_avatar(self):
         for image in ('static/sample-photo.png', 
@@ -214,7 +213,7 @@ class EditPhoto(base.tests.TwillTests):
             w, h = image_as_stored.size
             self.assertEqual(w, 200)
 
-class LoginWithOpenId(base.tests.TwillTests):
+class LoginWithOpenId(TwillTests):
     fixtures = ['user-paulproteus']
     def test_login_creates_user_profile(self):
         # Front page

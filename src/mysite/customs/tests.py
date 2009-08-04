@@ -2,9 +2,9 @@
 # vim: set ai et ts=4 sw=4:
 
 # Imports {{{
-from search.models import Project
-from profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag
-import profile.views
+from mysite.search.models import Project
+from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag
+import mysite.profile.views
 
 import mock
 import os
@@ -23,7 +23,7 @@ import ohloh
 import lp_grabber
 
 from django.test.client import Client
-from profile.tasks import FetchPersonDataFromOhloh
+from mysite.profile.tasks import FetchPersonDataFromOhloh
 # }}}
 
 # Mocked out browser.open
@@ -189,33 +189,33 @@ class OhlohIconTests(django.test.TestCase):
 
     def test_given_project_generate_internal_url(self):
         # First, delete the project icon
-        url = profile.views.project_icon_url('f-spot', actually_fetch=False)
+        url = mysite.profile.views.project_icon_url('f-spot', actually_fetch=False)
         path = url[1:] # strip leading '/'
         if os.path.exists(path):
             os.unlink(path)
 
         # Download the icon
-        url = profile.views.project_icon_url('f-spot')
+        url = mysite.profile.views.project_icon_url('f-spot')
         self.assert_(os.path.exists(path))
         os.unlink(path)
 
     def test_given_project_generate_internal_url_for_proj_fail(self):
         # First, delete the project icon
-        url = profile.views.project_icon_url('lolnomatzch',
+        url = mysite.profile.views.project_icon_url('lolnomatzch',
                                              actually_fetch=False)
         path = url[1:] # strip leading '/'
         if os.path.exists(path):
             os.unlink(path)
 
         # Download the icon
-        url = profile.views.project_icon_url('lolnomatzch')
+        url = mysite.profile.views.project_icon_url('lolnomatzch')
         self.assert_(os.path.exists(path))
         os.unlink(path)
 
 
     def test_project_image_link(self):
         # First, delete the project icon
-        url = profile.views.project_icon_url('f-spot',
+        url = mysite.profile.views.project_icon_url('f-spot',
                                              actually_fetch=False)
         path = url[1:] # strip leading '/'
         if os.path.exists(path):
