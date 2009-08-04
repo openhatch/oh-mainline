@@ -1,0 +1,40 @@
+{% extends 'base/one_column.html' %}
+
+{% block title %}
+Account settings 
+{{ block.super }}
+{% endblock title %}
+
+{% block css %}
+{{ block.super }}
+@import url('/static/css/account/auth.css') all;
+@import url('/static/css/account/settings.css') all;
+{% endblock css %}
+
+{% block main %}
+<div class='module'>
+    <div class='head'>
+        <h3>Account settings</h3>
+    </div>
+    <div class='body contains-submodules two-columns'>
+        <div class='submodule skinny'>
+            <div class='body'>
+                <ul>
+                    <li>
+                    <a href='{% url mysite.account.views.edit_contact_info %}'>
+                        Edit your contact info
+                    </a>
+                    </li>
+                    <li>
+                    <a href='{% url mysite.account.views.change_password %}'>
+                        Change your password
+                    </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        {% block settings_main %}
+        {% endblock settings_main %}
+    </div>
+</div>
+{% endblock main %}

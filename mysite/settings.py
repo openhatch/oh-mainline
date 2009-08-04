@@ -1,4 +1,5 @@
 import os
+import logging
 # Django settings for mysite project.
 
 DEBUG = True
@@ -107,6 +108,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'registration',
     'django_authopenid',
+    'django_extensions',
     'windmill',
     'south',
     'celery',
@@ -117,11 +119,6 @@ INSTALLED_APPS = (
     'mysite.account',
     'mysite.base',
 )
-
-### HACK
-from socket import gethostname
-if gethostname() in ('renaissance', 'yggdrasil', 'builder', 'vellum') and DEBUG:
-    DEBUG_PROPAGATE_EXCEPTIONS=True
 
 # file: settings.py #
 TEST_RUNNER = 'mysite._profiling.profile_tests'
@@ -142,3 +139,9 @@ LOGIN_REDIRECT_URL = '/account/login/'
 
 OHLOH_API_KEY='JeXHeaQhjXewhdktn4nUw' # "Oman testing"
 
+applog = logging.getLogger('applog')
+applog.setLevel(logging.DEBUG)
+_handler = logging.StreamHandler()
+_formatter = logging.Formatter('%(asctime)s %(funcName)s:%(lineno)d %(levelname)-8s %(message)s')
+_handler.setFormatter(_formatter)
+applog.addHandler(_handler)

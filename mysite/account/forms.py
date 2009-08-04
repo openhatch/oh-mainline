@@ -45,6 +45,23 @@ class UserCreationFormWithEmail(django.contrib.auth.forms.UserCreationForm):
 class ShowEmailForm(django.forms.Form):
     show_email = django.forms.BooleanField(required=False)
 
+class EditEmailForm(django.forms.ModelForm):
+    class Meta:
+        model = django.contrib.auth.models.User
+        fields = ('email',)
+
+    def clean_email(self):
+        """Verify that their email is unique."""
+        email = self.cleaned_data["email"]
+        other_users_with_this_email = list(
+                User.objects.filter(email=email).exclude(
+                    username=self.instance.username))
+        if not other_users_with_this_email:
+            return email
+        else:
+            raise django.forms.ValidationError(
+                "A user with that email already exists.")
+
 class EditPhotoForm(django.forms.ModelForm):
     class Meta:
         model = Person

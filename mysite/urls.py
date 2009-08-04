@@ -52,20 +52,26 @@ urlpatterns = patterns('',
 
         (r'^openid/', include('django_authopenid.urls')),
 
-        (r'^account/edit/password/$',
-            'mysite.account.views.edit_password'),
+        (r'^account/settings/$',
+            'mysite.account.views.settings'),
 
-        (r'^account/edit/password/do$',
-            'mysite.account.views.edit_password_do'),
+        (r'^account/settings/password/$',
+            'mysite.account.views.change_password'),
+
+        (r'^account/settings/password/change$',
+            'mysite.account.views.change_password_do'),
+
+        (r'^account/settings/contact-info/$',
+            'mysite.account.views.edit_contact_info'),
+
+        (r'^account/settings/contact-info/do$',
+            'mysite.account.views.edit_contact_info_do'),
 
         (r'^account/edit/photo/$',
             'mysite.account.views.edit_photo'),
 
         (r'^account/edit/photo/do$',
             'mysite.account.views.edit_photo_do'),
-
-        (r'^account/edit/show-email/do$',
-            'mysite.account.views.show_email_do'),
 
         (r'^form/projectexp_add$',
             'mysite.profile.views.projectexp_add_form'),
@@ -108,6 +114,10 @@ urlpatterns = patterns('',
 
         (r'^people/user_selected_these_dia_checkboxes$',
                 'mysite.profile.views.user_selected_these_dia_checkboxes'),
+
+        # Generate widget JavaScript
+        (r'^openhatch-widget.js$',
+                'mysite.base.views.page_to_js'),
 
         # This dangerous regex is last
         (r'^people/(?P<user_to_display__username>[^/]+)[/?]$',
