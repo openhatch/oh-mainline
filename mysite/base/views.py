@@ -11,7 +11,7 @@ from profile.views import display_person_web
 
 def homepage(request, signup_form=None):
     if request.user.is_authenticated():
-        return HttpResponseRedirect('/people/%s' % request.user.username)
+        return landing_page
 
     form1 = OpenidSigninForm()
 
@@ -35,6 +35,9 @@ def homepage(request, signup_form=None):
         'form1': form1,
         }, context_instance=RequestContext(request))
 
+def landing_page(request):
+    data = profile.views.get_personal_data()
+    return render_to_response('base/landing.html', data)
 
 def page_to_js(request):
     # FIXME: In the future, use:

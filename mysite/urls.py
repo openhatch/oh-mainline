@@ -16,6 +16,7 @@ urlpatterns = patterns('',
         (r'^admin/(.*)', admin.site.root),
         (r'^static/(?P<path>.*)$', 'django.views.static.serve',
             {'document_root': settings.STATIC_DOC_ROOT}),
+
         (r'^people/$', 'mysite.profile.views.display_list_of_people'),
 
         (r'^account/login/$', 'mysite.account.views.login'),

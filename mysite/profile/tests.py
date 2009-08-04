@@ -693,10 +693,26 @@ class UserCanShowEmailAddress(base.tests.TwillTests):
         tc.notfind('my@ema.il')
 
         tc.follow('settings')
-        tc.fv('show_email', 'show_email', '1')
+        tc.follow('contact info')
+        tc.fv(1, 'show_email', '1')
         tc.submit()
 
         tc.go('/people/paulproteus/')
         tc.find('my@ema.il')
+
+class LandingPage(base.tests.TwillTests):
+    def test_show_landing_page_when_logged_in(self):
+        client = Client()
+        response = client.get('/')
+        self.assertTemplateUsed(response, 'base/homepage.html')
+
+        client2 = self.login_with_client()
+        response2 = client.get('/')
+        self.assertTemplateUsed(response2, 'base/landing.html')
+
+    def test_badge_on_landing_page(self):
+        self.login_with_twill()
+        tc.go('/')
+        tc.find('Badge')
 
 # vim: set ai et ts=4 sw=4 nu:
