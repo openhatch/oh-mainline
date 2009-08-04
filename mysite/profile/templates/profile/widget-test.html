@@ -1,46 +1,13 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-"http://www.w3.org/TR/1999/REC-html401-19991224/strict.dtd">
-<html>
-    <head>
-        <title>
-            {% block title %}
-            OpenHatch
-            {% endblock title %}
-        </title>
+{% extends 'base/one_column.html' %}
 
-        <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
-        <meta http-equiv='Content-Language' content='en-us' />
-        <meta http-equiv='Content-Script-Type' content='text/javascript' />
-        <meta http-equiv='Content-Style-Type' content='text/css' />
-        <meta name='Description' content=''>
+{% block title %}
+Widget
+{% endblock title %}
 
-        <style> /*<![CDATA[*/
-            {% block css %}
-            @import url('/static/css/profile/widget.css') all;
-            {% endblock css %}
-            /*]]>*/
-        </style>
+{% block css %}
+@import url('/static/css/profile/widget.css') all;
+{% endblock css %}
 
-        <!--[if IE]>
-        <style>/*<![CDATA[*/@import url('../css/ie/all.css');/*]]>*/</style>
-        <![endif]-->
-
-        <!--[if lte IE 6]>
-        <style>/*<![CDATA[*/@import url('../css/ie/6-/all.css');/*]]>*/</style>
-        <![endif]-->
-
-        <!--[if gte IE 7]>
-        <style>/*<![CDATA[*/@import url('../css/ie/7+/all.css');/*]]>*/</style>
-        <![endif]-->
-        
-        <script src='/static/js/base.js'></script>
-        {% block js_in_head %}
-        {% endblock js_in_head %}
-
-    </head>
-    <body>
-    
-    {% include 'profile/widget.html' %}
-    
-    </body>
-</html>
+{% block main %}
+{% include 'profile/widget.html' %}
+{% endblock main %}

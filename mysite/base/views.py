@@ -10,8 +10,6 @@ import profile.views
 from profile.views import display_person_web
 
 def homepage(request, signup_form=None):
-    import pdb
-    pdb.set_trace()
     if request.user.is_authenticated():
         return landing_page(request)
 
