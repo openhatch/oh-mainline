@@ -10,8 +10,10 @@ import profile.views
 from profile.views import display_person_web
 
 def homepage(request, signup_form=None):
+    import pdb
+    pdb.set_trace()
     if request.user.is_authenticated():
-        return landing_page
+        return landing_page(request)
 
     form1 = OpenidSigninForm()
 
@@ -36,7 +38,8 @@ def homepage(request, signup_form=None):
         }, context_instance=RequestContext(request))
 
 def landing_page(request):
-    data = profile.views.get_personal_data()
+    data = profile.views.get_personal_data(request.user.get_profile())
+    data['the_user'] = request.user
     return render_to_response('base/landing.html', data)
 
 def page_to_js(request):
