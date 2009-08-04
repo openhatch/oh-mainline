@@ -25,7 +25,7 @@ setup(
     author = 'Asheesh Laroia, Raphael Krut-Landau, Karen Rustad',
     author_email = 'all@openhatch.org',
 
-    package_dir = {'': 'src'},
+    package_dir = {'': '.'},
 
 )
 
