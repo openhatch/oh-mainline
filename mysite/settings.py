@@ -108,6 +108,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'registration',
     'django_authopenid',
+    'django_extensions',
     'windmill',
     'south',
     'celery',
@@ -118,11 +119,6 @@ INSTALLED_APPS = (
     'account',
     'base',
 )
-
-### HACK
-from socket import gethostname
-if gethostname() in ('renaissance', 'yggdrasil', 'builder', 'vellum') and DEBUG:
-    DEBUG_PROPAGATE_EXCEPTIONS=True
 
 # file: settings.py #
 TEST_RUNNER = '_profiling.profile_tests'
