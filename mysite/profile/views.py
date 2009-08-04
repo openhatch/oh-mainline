@@ -29,7 +29,7 @@ from django.contrib.auth.decorators import login_required
 from django.conf import settings
 
 # OpenHatch apps
-import mysite.base as base
+import mysite.base.controllers
 from mysite.customs import ohloh
 from mysite.profile.models import \
         Person, ProjectExp, \
@@ -210,7 +210,7 @@ def display_person_web(request, user_to_display__username=None):
     data['title'] = 'openhatch / %s' % user.username
     data['edit_mode'] = False
     data['editable'] = (request.user == user)
-    data['notifications'] = base.controllers.get_notification_from_request(request)
+    data['notifications'] = mysite.base.controllers.get_notification_from_request(request)
 
     return render_to_response('profile/main.html', data)
 
