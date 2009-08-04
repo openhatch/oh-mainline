@@ -1,8 +1,7 @@
 #{{{ imports
 from mysite.profile.models import Person
-import base.tests 
-from base.tests import make_twill_url
-from profile.models import Person
+from mysite.base.tests import make_twill_url, TwillTests
+from mysite.profile.models import Person
 
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
@@ -50,7 +49,7 @@ class Login(TwillTests):
         tc.notfind('is_authenticated indeed')
     # }}}
 
-class LoginWithOpenID(base.tests.TwillTests):
+class LoginWithOpenID(TwillTests):
     #{{{
     fixtures = ['user-paulproteus']
     def test_login_creates_user_profile(self):
@@ -203,7 +202,7 @@ class EditPassword(TwillTests):
                 should_succeed = False)
 #}}}
 
-class EditContactInfo(base.tests.TwillTests):
+class EditContactInfo(TwillTests):
     #{{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
     def test_edit_email_address(self):
@@ -294,7 +293,7 @@ class EditPhoto(TwillTests):
             self.assertEqual(w, 200)
     #}}}
 
-class EditPhotoWithOldPerson(base.tests.TwillTests):
+class EditPhotoWithOldPerson(TwillTests):
     #{{{
     fixtures = ['user-paulproteus', 'person-paulproteus-with-blank-photo']
     def test_set_avatar(self):
