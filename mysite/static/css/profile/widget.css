@@ -1,0 +1,64 @@
+#portfolio {
+    width: 260px;
+    padding: 0 5px 3px 5px;
+    margin: 0;
+}
+
+.module > .head {
+    border-top: 2px solid #BF#2FF;
+}
+
+.project-display {
+    width: 260px;
+    margin: 0 auto 2px auto;
+}
+
+.project-display h3 {
+    margin: 0;
+    padding: 5px 0 8px 0;
+    font-size: 11pt;
+    text-align: center;
+    width: 100%;
+}
+
+.project-display li {
+    float: left;
+    display: inline;
+    background-color: white;
+    margin: 0;
+    padding: 0;
+}
+
+.project-escutcheon {
+    width: 80px;
+    height: 70px;
+    margin: 4px 3px 3px 3px;
+}
+
+.project-escutcheon .logo {
+    width: 40px;
+    height: 40px;
+    margin: 0 auto;
+}
+
+.project-escutcheon .name {
+    font-size: 8pt;
+    padding: 4px;
+    width: 72px;
+    clear: left;
+}
+
+#credit {
+    float: right;
+    padding-right: 5px;
+}
+
+#credit h3 {
+    font-size: 10pt;
+    padding: 23px 0 0 0;
+}
+
+#credit-logo {
+    float: right;
+    padding: 5px 0 0 0;
+}

@@ -4,7 +4,7 @@
     <head>
         <title>
             {% block title %}
-            OpenHatch
+            {{person.user.username}}'s OSS contributions | OpenHatch
             {% endblock title %}
         </title>
 
@@ -16,6 +16,8 @@
 
         <style> /*<![CDATA[*/
             {% block css %}
+            @import url('/static/css/base/base.css') all;
+            @import url('/static/css/profile/portfolio.css') all;
             @import url('/static/css/profile/widget.css') all;
             {% endblock css %}
             /*]]>*/
