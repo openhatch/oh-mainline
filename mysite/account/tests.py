@@ -1,4 +1,7 @@
 #{{{ imports
+import os
+import Image
+
 from mysite.profile.models import Person
 from mysite.base.tests import make_twill_url, TwillTests
 from mysite.profile.models import Person
@@ -7,7 +10,6 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.test.client import Client
 from django.core.files.images import get_image_dimensions
-import Image
 
 from twill import commands as tc
 #}}}
@@ -260,12 +262,23 @@ class EditContactInfo(TwillTests):
         # [2]: This assertion works b/c there's only one checkbox.
     #}}}
 
+photos = [os.path.join(os.path.dirname(__file__),
+                       '..', '..', 'sample-photo.' + ext)
+                       for ext in ('png', 'jpg')]
+
+def photo(f):
+    filename = os.path.join(
+        os.path.dirname(__file__),
+        '..', f)
+    assert os.path.exists(filename)
+    return filename
+
 class EditPhoto(TwillTests):
     #{{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
     def test_set_avatar(self):
-        for image in ('static/sample-photo.png', 
-                      'static/sample-photo.jpg'):
+        for image in [photo('static/sample-photo.png'),
+                      photo('static/sample-photo.jpg')]:
             self.login_with_twill()
             url = 'http://openhatch.org/people/paulproteus/'
             tc.go(make_twill_url(url))
@@ -278,8 +291,8 @@ class EditPhoto(TwillTests):
                          open(image).read())
 
     def test_set_avatar_too_wide(self):
-        for image in ('static/images/too-wide.jpg', 
-                      'static/images/too-wide.png'):
+        for image in [photo('static/images/too-wide.jpg'),
+                      photo('static/images/too-wide.png')]:
             self.login_with_twill()
             url = 'http://openhatch.org/people/paulproteus/'
             tc.go(make_twill_url(url))
@@ -297,8 +310,8 @@ class EditPhotoWithOldPerson(TwillTests):
     #{{{
     fixtures = ['user-paulproteus', 'person-paulproteus-with-blank-photo']
     def test_set_avatar(self):
-        for image in ('static/sample-photo.png', 
-                'static/sample-photo.jpg'):
+        for image in (photo('static/sample-photo.png'),
+                      photo('static/sample-photo.jpg')):
             self.login_with_twill()
             url = 'http://openhatch.org/people/paulproteus/'
             tc.go(make_twill_url(url))
