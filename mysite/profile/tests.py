@@ -683,20 +683,4 @@ class ImportContributionsTests(base.tests.TwillTests):
 
     # }}}
 
-class UserCanShowEmailAddress(base.tests.TwillTests):
-    fixtures = ['user-paulproteus', 'person-paulproteus']
-    def test_show_email(self):
-        """This test: (a) verifies my@ema.il does not appear on paulproteus's profile page, then goes to his account settings and opts in to showing it, and then verifies it does appear."""
-        self.login_with_twill()
-
-        tc.go('/people/paulproteus/')
-        tc.notfind('my@ema.il')
-
-        tc.follow('settings')
-        tc.fv('show_email', 'show_email', '1')
-        tc.submit()
-
-        tc.go('/people/paulproteus/')
-        tc.find('my@ema.il')
-
 # vim: set ai et ts=4 sw=4 nu:

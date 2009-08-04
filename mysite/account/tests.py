@@ -234,6 +234,25 @@ class EditContactInfo(base.tests.TwillTests):
         # Was email visibility successfully edited? [2]
         tc.find('checked="checked"')
 
+        # And does the email address show up on the profile?
+        tc.go(make_twill_url(
+                'http://openhatch.org/people/paulproteus'))
+        tc.find(email)
+
+        # 2. And when we uncheck, does it go away?
+        
+        # 2.1. Go to contact info form
+        tc.go(url)
+
+        # 2.2. Don't show email
+        tc.fv(1, 'show_email-show_email', '0') # [1]
+        tc.submit()
+
+        # 2.3. Verify it's not on profile anymore
+        tc.go(make_twill_url(
+                'http://openhatch.org/people/paulproteus'))
+        tc.notfind(email)
+
         # [1]: This email suggests that twill only accepts
         # *single quotes* around the '1'.
         # <http://lists.idyll.org/pipermail/twill/2006-February/000224.html>
