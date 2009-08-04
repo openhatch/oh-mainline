@@ -61,10 +61,10 @@ urlpatterns = patterns('',
         (r'^account/settings/password/change$',
             'mysite.account.views.change_password_do'),
 
-        (r'^account/edit/contact-info/$',
+        (r'^account/settings/contact-info/$',
             'mysite.account.views.edit_contact_info'),
 
-        (r'^account/edit/contact-info/do$',
+        (r'^account/settings/contact-info/do$',
             'mysite.account.views.edit_contact_info_do'),
 
         (r'^account/edit/photo/$',

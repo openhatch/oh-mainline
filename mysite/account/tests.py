@@ -162,17 +162,19 @@ class Signup(base.tests.TwillTests):
     # }}}
 
 class EditPassword(base.tests.TwillTests):
-#{{{
+    #{{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
     def change_password(self, old_pass, new_pass,
             should_succeed = True):
         tc.go(make_twill_url('http://openhatch.org/people/paulproteus'))
         tc.follow('settings')
+        tc.follow('Change your password')
+        tc.url('/account/settings/password')
+
         tc.find('Change password')
-        tc.fv('change_password', 'old_password',
-                old_pass)
-        tc.fv('change_password', 'new_password1', new_pass)
-        tc.fv('change_password', 'new_password2', new_pass)
+        tc.fv('a_settings_tab_form', 'old_password', old_pass)
+        tc.fv('a_settings_tab_form', 'new_password1', new_pass)
+        tc.fv('a_settings_tab_form', 'new_password2', new_pass)
         tc.submit()
 
         # Try to log in with the new password now
@@ -200,23 +202,43 @@ class EditPassword(base.tests.TwillTests):
                 should_succeed = False)
 #}}}
 
-class EditEmail(base.tests.TwillTests):
+class EditContactInfo(base.tests.TwillTests):
     #{{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
     def test_edit_email_address(self):
         self.login_with_twill()
         
-        # Go to edit email form
-        tc.go(make_twill_url('http://openhatch.org/account/settings/'))
-        tc.notfind('new@ema.il')
+        _url = 'http://openhatch.org/account/settings/contact-info/'
+        url = make_twill_url(_url)
+
+        email = 'new@ema.il'
+
+        # Go to contact info form
+        tc.go(url)
+
+        tc.notfind('checked="checked"')
+        tc.notfind(email)
 
         # Edit email
-        tc.fv('edit_email', 'email', 'new@ema.il')
+        tc.fv(1, 'edit_email-email', email)
+        # Show email
+        tc.fv(1, 'show_email-show_email', '1') # [1]
         tc.submit()
 
-        # Check that it stuck
-        tc.go(make_twill_url('http://openhatch.org/account/settings/'))
-        tc.find('new@ema.il')
+        # Form submission ought to redirect us back to the form.
+        tc.url(url)
+
+        # Was email successfully edited? 
+        tc.find(email)
+
+        # Was email visibility successfully edited? [2]
+        tc.find('checked="checked"')
+
+        # [1]: This email suggests that twill only accepts
+        # *single quotes* around the '1'.
+        # <http://lists.idyll.org/pipermail/twill/2006-February/000224.html>
+        #
+        # [2]: This assertion works b/c there's only one checkbox.
     #}}}
 
 class EditPhoto(base.tests.TwillTests):
@@ -269,3 +291,5 @@ class EditPhotoWithOldPerson(base.tests.TwillTests):
             self.assert_(p.photo.read() ==
                     open(image).read())
     #}}}
+
+# vim: set nu:

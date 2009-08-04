@@ -213,7 +213,7 @@ def show_email_do(request):
         profile = request.user.get_profile()
         profile.show_email = form.cleaned_data['show_email']
         profile.save()
-    return HttpResponseRedirect(reverse(edit_password))
+    return HttpResponseRedirect(reverse(change_password))
     # }}}
 
 # vim: ai ts=3 sts=4 et sw=4 nu
