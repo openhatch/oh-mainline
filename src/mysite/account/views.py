@@ -13,6 +13,7 @@ import urllib
 
 import mysite.account.forms
 import mysite.base.views
+import mysite.base.controllers
 from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag, Link_Project_Tag, Link_SF_Proj_Dude_FM, Link_Person_Tag, DataImportAttempt
 from mysite.profile.views import get_personal_data
 # }}}
@@ -24,7 +25,7 @@ def login(request):
         return HttpResponseRedirect('/people/%s/' %
                                     urllib.quote(request.user.username))
     data = {}
-    data['notifications'] = base.controllers.get_notification_from_request(
+    data['notifications'] = mysite.base.controllers.get_notification_from_request(
             request)
     return render_to_response('account/login.html', data)
     # }}}
