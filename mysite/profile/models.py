@@ -67,7 +67,7 @@ class DataImportAttempt(models.Model):
 
     def do_what_it_says_on_the_tin(self):
         """Attempt to import data."""
-        from profile.tasks import FetchPersonDataFromOhloh
+        from mysite.profile.tasks import FetchPersonDataFromOhloh
         FetchPersonDataFromOhloh.delay(self.id)
 
     def __unicode__(self):
