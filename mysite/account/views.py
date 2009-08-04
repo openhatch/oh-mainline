@@ -132,8 +132,10 @@ def edit_contact_info(request, edit_email_form = None, show_email_form = None):
     data['edit_email_form'] = edit_email_form
     
     if show_email_form is None:
+        show_email = request.user.get_profile().show_email
+        prefix = "show_email"
         data['show_email_form'] = account.forms.ShowEmailForm(
-                prefix='show_email')
+                initial={'show_email': show_email}, prefix=prefix)
     else:
         data['show_email_form'] = show_email_form
 
@@ -152,14 +154,19 @@ def edit_contact_info_do(request):
             request.POST, prefix='show_email')
 
     if edit_email_form.is_valid() and show_email_form.is_valid():
+        p = request.user.get_profile()
+        p.show_email = show_email_form.cleaned_data['show_email']
+        p.save()
+
         applog.debug('Changing email of user <%s> to <%s>' % (
                 request.user, edit_email_form.cleaned_data['email']))
         edit_email_form.save()
+
+        return HttpResponseRedirect(reverse(edit_contact_info))
     else:
         return edit_contact_info(request,
                 edit_email_form=edit_email_form,
                 show_email_form=show_email_form)
-    return HttpResponseRedirect(reverse(edit_contact_info))
     # }}}
 
 @login_required
