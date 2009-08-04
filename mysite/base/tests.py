@@ -84,7 +84,7 @@ class LandingPage(TwillTests):
         self.assertTemplateUsed(response2, 'base/landing.html')
         # }}}
 
-    def test_badge_on_landing_page(self):
+    def test_widget_on_landing_page(self):
         # {{{
         self.login_with_twill()
         tc.go('/')

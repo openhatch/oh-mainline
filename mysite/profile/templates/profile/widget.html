@@ -1,35 +1,31 @@
-
-<div id='portfolio' class='module'>
-    <div class='project-display column'>
-        <div class='head'>
-        <h3>{{person.user.username}}'s OSS contributions</h3>
-        </div>
-        <div class='body'>
-        {% if projects %}
-        <ul>
-            {% for project, more_project_attributes in projects.items %}
-            <li>
-            <div class='project-escutcheon'>
-                <div class='logo'>
-                    <a href='/people/{{ person.user.username }}/projects/{{ project.name }}'>
-                        <img alt='logo for {{project.name}}'
-                        src='/people/project_icon/{{ project.name }}' width='40'/>
-                    </a>
-                </div>
-                <a href='/people/{{ person.user.username }}/projects/{{ project.name }}' 
-                    class='name'>{{ project.name|truncatewords:2 }}</a>
+<div class='head'>
+    <h3>{{person.user.username}}'s contributions to open source</h3>
+</div>
+<div class='body'>
+    {% if projects %}
+    <ul>
+        {% for project, more_project_attributes in projects.items %}
+        <li>
+        <div class='project-escutcheon'>
+            <div class='logo'>
+                <a href='/people/{{ person.user.username }}/projects/{{ project.name }}'>
+                    <img alt='logo for {{project.name}}'
+                    src='/people/project_icon/{{ project.name }}' width='40'/>
+                </a>
             </div>
-            </li>
-            {% endfor %}
-        </ul>
-        {% else %}
-        <div style='float: left; margin-top: 10px; width: 500px;'>No contributions listed yet.</div>
-        {% endif %}
-    </div>
-    <div id='credit-logo'>
+            <a href='/people/{{ person.user.username }}/projects/{{ project.name }}' 
+                class='name'>{{ project.name|truncatewords:2 }}</a>
+        </div>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <div style='float: left; margin-top: 10px; width: 500px;'>No contributions listed yet.</div>
+    {% endif %}
+</div>
+<div id='credit-logo'>
     <a href='/people/{{ person.user.username }}/'><img src='/static/images/the-logo-bluegreen-125px.png' height='55' width='80'></a>
-    </div>
-    <div id='credit'>
+</div>
+<div id='credit'>
     <a href='/people/{{ person.user.username }}/'><h3>see my full profile at</h3></a>
-    </div>
-</div> <!-- /#portfolio -->
+</div>

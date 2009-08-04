@@ -59,3 +59,16 @@
     float: right;
     padding: 5px 0 0 0;
 }
+
+#widget {
+    float: left;
+    width: 300px ! important;
+}
+#widget .head,
+#widget .body {
+    float: left;
+    width: 260px ! important;
+}
+#widget .head h3 {
+    width: 240px ! important;
+}
