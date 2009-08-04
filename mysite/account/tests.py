@@ -1,3 +1,4 @@
+#{{{ imports
 import base.tests 
 from base.tests import make_twill_url
 from profile.models import Person
@@ -9,6 +10,7 @@ from django.core.files.images import get_image_dimensions
 import Image
 
 from twill import commands as tc
+#}}}
 
 class Login(base.tests.TwillTests):
     # {{{
@@ -46,6 +48,19 @@ class Login(base.tests.TwillTests):
         tc.submit()
         tc.notfind('is_authenticated indeed')
     # }}}
+
+class LoginWithOpenID(base.tests.TwillTests):
+    #{{{
+    fixtures = ['user-paulproteus']
+    def test_login_creates_user_profile(self):
+        # Front page
+        url = 'http://openhatch.org/'
+
+        # Even though we didn't add the person-paulproteus
+        # fixture, a Person object is created.
+        self.assert_(list(
+            Person.objects.filter(user__username='paulproteus')))
+    #}}}
 
 class Signup(base.tests.TwillTests):
     # {{{
@@ -147,6 +162,7 @@ class Signup(base.tests.TwillTests):
     # }}}
 
 class EditPassword(base.tests.TwillTests):
+#{{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
     def change_password(self, old_pass, new_pass,
             should_succeed = True):
@@ -182,8 +198,29 @@ class EditPassword(base.tests.TwillTests):
         newpass='new'
         self.change_password(oldpass, newpass,
                 should_succeed = False)
+#}}}
+
+class EditEmail(base.tests.TwillTests):
+    #{{{
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+    def test_edit_email_address(self):
+        self.login_with_twill()
+        
+        # Go to edit email form
+        tc.go(make_twill_url('http://openhatch.org/account/settings/'))
+        tc.notfind('new@ema.il')
+
+        # Edit email
+        tc.fv('edit_email', 'email', 'new@ema.il')
+        tc.submit()
+
+        # Check that it stuck
+        tc.go(make_twill_url('http://openhatch.org/account/settings/'))
+        tc.find('new@ema.il')
+    #}}}
 
 class EditPhoto(base.tests.TwillTests):
+    #{{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
     def test_set_avatar(self):
         for image in ('static/sample-photo.png', 
@@ -213,12 +250,15 @@ class EditPhoto(base.tests.TwillTests):
             image_as_stored = Image.open(p.photo.file)
             w, h = image_as_stored.size
             self.assertEqual(w, 200)
+    #}}}
 
 class EditPhotoWithOldPerson(base.tests.TwillTests):
+    #{{{
+    # What, Asheesh, you don't want old people in your photos? -rkl
     fixtures = ['user-paulproteus', 'person-paulproteus-with-blank-photo']
     def test_set_avatar(self):
         for image in ('static/sample-photo.png', 
-                      'static/sample-photo.jpg'):
+                'static/sample-photo.jpg'):
             self.login_with_twill()
             url = 'http://openhatch.org/people/paulproteus/'
             tc.go(make_twill_url(url))
@@ -228,37 +268,5 @@ class EditPhotoWithOldPerson(base.tests.TwillTests):
             # Now check that the photo == what we uploaded
             p = Person.objects.get(user__username='paulproteus')
             self.assert_(p.photo.read() ==
-                         open(image).read())
-
-class LoginWithOpenId(base.tests.TwillTests):
-    fixtures = ['user-paulproteus']
-    def test_login_creates_user_profile(self):
-        # Front page
-        url = 'http://openhatch.org/'
-
-        # Even though we didn't add the person-paulproteus
-        # fixture, a Person object is created.
-        self.assert_(list(
-            Person.objects.filter(user__username='paulproteus')))
-
-class EditEmail(base.tests.TwillTests):
-    fixtures = ['user-paulproteus', 'person-paulproteus']
-    def test_edit_email_address(self):
-        self.login_with_twill()
-        
-        # Go to edit email form
-        tc.go(make_twill_url('http://openhatch.org/account/edit/password/'))
-        tc.notfind('new@ema.il')
-
-        # Edit email
-        tc.fv('edit_email', 'email', 'new@ema.il')
-        tc.submit()
-
-        # Check that it stuck
-        tc.go(make_twill_url('http://openhatch.org/account/edit/password/'))
-        tc.find('new@ema.il')
-
-
-        
-             
-    
+                    open(image).read())
+    #}}}
