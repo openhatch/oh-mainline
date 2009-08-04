@@ -11,10 +11,10 @@ from django.core.urlresolvers import reverse
 import urllib
 
 
-import account.forms
-import base.views
-from profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag, Link_Project_Tag, Link_SF_Proj_Dude_FM, Link_Person_Tag, DataImportAttempt
-from profile.views import get_personal_data
+import mysite.account.forms
+import mysite.base.views
+from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag, Link_Project_Tag, Link_SF_Proj_Dude_FM, Link_Person_Tag, DataImportAttempt
+from mysite.profile.views import get_personal_data
 # }}}
 
 def login(request):
@@ -50,7 +50,7 @@ def signup_do(request):
     post = {}
     post.update(dict(request.POST.items()))
     post['password2'] = post['password1'] 
-    signup_form = account.forms.UserCreationFormWithEmail(post)
+    signup_form = mysite.account.forms.UserCreationFormWithEmail(post)
     if signup_form.is_valid():
 
         user = signup_form.save()
@@ -70,7 +70,7 @@ def signup_do(request):
                 '/people/%s/' % urllib.quote(username))
 
     else:
-        return base.views.homepage(request, signup_form=signup_form)
+        return mysite.base.views.homepage(request, signup_form=signup_form)
     # }}}
 
 def logout(request):
@@ -90,7 +90,7 @@ def edit_password(request, edit_password_form = None):
         data['passwordchangeform'] = edit_password_form
 
     # Always show an Edit email form
-    data['show_email_form'] = account.forms.ShowEmailForm(
+    data['show_email_form'] = mysite.account.forms.ShowEmailForm(
         {'show_email': request.user.get_profile().show_email})
 
     return render_to_response('account/edit_password.html',

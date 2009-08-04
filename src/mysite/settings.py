@@ -110,12 +110,12 @@ INSTALLED_APPS = (
     'windmill',
     'south',
     'celery',
-    'search',
-    'profile',
-    'customs',
-    'consulting',
-    'account',
-    'base',
+    'mysite.search',
+    'mysite.profile',
+    'mysite.customs',
+    'mysite.consulting',
+    'mysite.account',
+    'mysite.base',
 )
 
 ### HACK

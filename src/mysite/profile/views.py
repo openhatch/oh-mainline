@@ -26,18 +26,18 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 
 # OpenHatch global
-import settings
+from django.conf import settings
 
 # OpenHatch apps
-import base.controllers
-from customs import ohloh
-from profile.models import \
+import mysite.base as base
+from mysite.customs import ohloh
+from mysite.profile.models import \
         Person, ProjectExp, \
         Tag, TagType, \
         Link_ProjectExp_Tag, Link_Project_Tag, \
         Link_SF_Proj_Dude_FM, Link_Person_Tag, \
         DataImportAttempt
-from search.models import Project
+from mysite.search.models import Project
 
 # This app
 import forms

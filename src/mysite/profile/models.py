@@ -3,7 +3,7 @@
 from django.db import models
 from mysite.search.models import Project, Bug
 from django.contrib.auth.models import User
-import customs.ohloh as ohloh
+from mysite.customs import ohloh
 import datetime
 
 import uuid
