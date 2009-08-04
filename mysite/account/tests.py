@@ -254,7 +254,6 @@ class EditPhoto(base.tests.TwillTests):
 
 class EditPhotoWithOldPerson(base.tests.TwillTests):
     #{{{
-    # What, Asheesh, you don't want old people in your photos? -rkl
     fixtures = ['user-paulproteus', 'person-paulproteus-with-blank-photo']
     def test_set_avatar(self):
         for image in ('static/sample-photo.png', 
