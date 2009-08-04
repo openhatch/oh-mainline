@@ -112,7 +112,7 @@ def edit_password_do(request):
 @login_required
 def show_email_do(request):
     # Check if request.POST contains show_email_address
-    form = account.forms.ShowEmailForm(request.POST)
+    form = mysite.account.forms.ShowEmailForm(request.POST)
     if form.is_valid():
         profile = request.user.get_profile()
         profile.show_email = form.cleaned_data['show_email']
@@ -125,7 +125,7 @@ def edit_photo(request, form = None):
             request.user.get_profile())
     data['the_user'] = request.user
     if form is None:
-        form = account.forms.EditPhotoForm()
+        form = mysite.account.forms.EditPhotoForm()
     data['edit_photo_form'] = form
     return render_to_response('account/edit_photo.html', data)
 
@@ -134,7 +134,7 @@ def edit_photo_do(request, mock=None):
     data = get_personal_data(
             request.user.get_profile())
     person = request.user.get_profile()
-    form = account.forms.EditPhotoForm(request.POST,
+    form = mysite.account.forms.EditPhotoForm(request.POST,
                                        request.FILES,
                                        instance=person)
     if form.is_valid():
