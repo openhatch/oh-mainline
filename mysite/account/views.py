@@ -128,12 +128,12 @@ def edit_contact_info(request, edit_email_form = None, show_email_form = None):
     # Store edit_email_form in data[], even if we weren't passed one
     if edit_email_form is None:
         edit_email_form = account.forms.EditEmailForm(
-            instance=request.user, prefix='edit-email')
+            instance=request.user, prefix='edit_email')
     data['edit_email_form'] = edit_email_form
     
     if show_email_form is None:
         data['show_email_form'] = account.forms.ShowEmailForm(
-                prefix='show-email')
+                prefix='show_email')
     else:
         data['show_email_form'] = show_email_form
 
@@ -159,7 +159,7 @@ def edit_contact_info_do(request):
         return edit_contact_info(request,
                 edit_email_form=edit_email_form,
                 show_email_form=show_email_form)
-    return HttpResponseRedirect(reverse(edit_email))
+    return HttpResponseRedirect(reverse(edit_contact_info))
     # }}}
 
 @login_required

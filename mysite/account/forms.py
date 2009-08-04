@@ -53,12 +53,14 @@ class EditEmailForm(django.forms.ModelForm):
     def clean_email(self):
         """Verify that their email is unique."""
         email = self.cleaned_data["email"]
-        try:
-            User.objects.get(email=email)
-        except User.DoesNotExist:
+        other_users_with_this_email = list(
+                User.objects.filter(email=email).exclude(
+                    username=self.instance.username))
+        if not other_users_with_this_email:
             return email
-        raise django.forms.ValidationError(
-            "A user with that email already exists.")
+        else:
+            raise django.forms.ValidationError(
+                "A user with that email already exists.")
 
 class EditPhotoForm(django.forms.ModelForm):
     class Meta:
