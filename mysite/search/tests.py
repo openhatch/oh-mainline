@@ -269,29 +269,50 @@ class Recommend(base.tests.TwillTests):
                 [u'Automake', u'C#', u'C++', u'Make', 
                     u'Python', u'shell script', u'XUL'])
 
-    def test_recommendations_controller(self):
+    def test_search_page_context_includes_recommendations(self):
         client = self.login_with_client()
-        data = {}
-        data['suggestions'] = 'Automake C C++ *Firefox *Python *XUL'
-        search.views.fetch_bugs
+        response = client.get('/search/')
+        self.assertEqual(response.context[0]['suggestions'],
+                [(0, 'Automake', 'on'),
+                    (1, 'C#', 'off'),
+                    (2, 'C++', 'off'),
+                    (3, 'Make', 'off'),
+                    (4, 'Mozilla Firefox', 'off'),
+                    (5, 'Python', 'off'),
+                    (6, 'shell script', 'off'),
+                    (7, 'XUL', 'off')])
 
     def test_recommendations_with_twill(self):
         self.login_with_twill()
         tc.go(make_twill_url('http://openhatch.org/search/'))
-        tc.fv('suggested_criteria', 'criterion_lang_automake', '0')
-        tc.fv('suggested_criteria', 'criterion_lang_c', '0')
-        # FIXME: Deal with weird characters.
-        # tc.fv('suggested_criteria', 'criterion_c++', '1')
-        tc.fv('suggested_criteria', 'criterion_lang_python', '0')
-        tc.fv('suggested_criteria', 'criterion_lang_xul', '1')
+        tc.fv('suggested_criteria', 'use_0', '0') # Automake
+        tc.fv('suggested_criteria', 'use_1', '0') # C
+        tc.fv('suggested_criteria', 'use_2', '0') # C++
+        tc.fv('suggested_criteria', 'use_3', '0') # Firefox
+        tc.fv('suggested_criteria', 'use_4', '0') # Python
+        tc.fv('suggested_criteria', 'use_5', '1') # XUL
+        tc.fv('suggested_criteria', 'start', '0')
+        tc.fv('suggested_criteria', 'end', '100')
         tc.submit()
 
-        # Good morning!
-        # FIXME: Check that fixtures work.
-        # FIXME: Check that if you click checkboxes,
+        # Check that if you click checkboxes,
         # you get the right list of bugs.
-        # Test for bugs that ought to be there and bug that ought not to be. 
-        # FIXME: Don't use twill in this test, because then you have
-        # to work around pagination.
+        # Test for bugs that ought to be there
+        # and bugs that ought not to be. 
+        tc.find("Yo! This is a bug in XUL but not Firefox")
+        tc.find("Oy! This is a bug in XUL and Firefox")
+
+        tc.fv('suggested_criteria', 'use_0', '0') # Automake
+        tc.fv('suggested_criteria', 'use_1', '0') # C
+        tc.fv('suggested_criteria', 'use_2', '0') # C++
+        tc.fv('suggested_criteria', 'use_3', '1') # Firefox
+        tc.fv('suggested_criteria', 'use_4', '0') # Python
+        tc.fv('suggested_criteria', 'use_5', '1') # XUL
+        tc.fv('suggested_criteria', 'start', '0')
+        tc.fv('suggested_criteria', 'end', '100')
+        tc.submit()
+
+        tc.notfind("Yo! This is a bug in XUL but not Firefox")
+        tc.find("Oy! This is a bug in XUL and Firefox")
 
 # vim: set ai et ts=4 sw=4 columns=80:

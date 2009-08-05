@@ -38,6 +38,7 @@
 #sidebar {
     float: left;
     width: 220px;
+    margin-right: 20px;
 }
 #main {
     width: 630px;
@@ -52,15 +53,16 @@
     padding: 10px;
 }
 #suggested-searches ul {
-    margin-left: 15px;
+}
+#suggested-searches li {
+    list-style: none;
+    margin: 0;
+    margin-bottom: 10px;
 }
 #add-another-bug-tracker {
 }
 #sidebar .box {
     width: 200px;
-}
-#suggested-searches li {
-    list-style: square;
 }
 p {
     margin: 0;
@@ -360,5 +362,8 @@ a:focus {
 
 #opps li.expanded .description {
     white-space: normal;
+}
+.hidden {
+    display: none;
 }
 /* vim: set ai ts=4 sts=4 et sw=4: */

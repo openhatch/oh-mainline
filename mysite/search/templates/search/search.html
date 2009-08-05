@@ -5,8 +5,28 @@ Search bugs
 {{ block.super }}
 {% endblock title %}
 
+{% block sidebar %}
+<div id='suggested-searches' class='box module'>
+    <h3 style='margin-bottom: 10px;'>Suggested searches:</h3>
+    <form name='suggested_searches'
+        method='GET' action=''>
+        <ul>
+            {% for index, show_me, term, czeched in suggestions %}
+            <li{% if not show_me %} class='hidden'{% endif %}>
+            <input id='term_{{ index }}' name='term_{{ index }}' type='checkbox'
+            {% if czeched %}checked='on'{% endif %} %} />
+            <label for='term_{{ index }}'>{{ term }}</label>
+            </li>
+            {% endfor %}
+        </ul>
+        <a id='toggle-more-suggestions' href='#'>
+            Show <span>more</span> suggestions
+        </a>
+    </form>
+</div>
+{% endblock sidebar %}
+
 {% block main %}
-<div id='main'>
     <div id='results' class='gewgaws module box results'>
     <div id='opps'>
         <form name='search_opps' method='get'> 
@@ -117,22 +137,33 @@ Search bugs
 
     </div> <!-- /#results -->
     </div> <!-- /#opps -->
-
-</div><!-- /#main -->
 {% endblock main %}
-
-{% block sidebar %}
-<div id='suggested-searches' class='box module'>
-    <h3 style='margin-bottom: 10px;'>Suggested searches:</h3>
-    <ul>
-        <li><a href='/search/?language=exaile'>user_interface_design</a></li>
-        <li><a href='/search/?language=ruby_on_rails'>ruby_on_rails</a></li>
-        <li><a href='/search/?language=python'>python</a></li>
-        <li><a href='/search/?language=music_player'>music_player</a></li>
-    </ul>
-</div>
-</div>
-{% endblock sidebar %}
-
-{% block more_js %}
-{% endblock more_js %}
+{% block js %}
+{{ block.super }}
+<script>
+Suggestions = {
+    '$list': null,
+    '$toggleButton': null,
+    '$hiddenItems': null,
+    'init': function() {
+        Suggestions.$list = $('#suggested-searches ul');
+        Suggestions.$toggleLink = $('#toggle-more-suggestions');
+        Suggestions.$hiddenItems = $('#suggested-searches li.hidden');
+        Suggestions.bindToggler();
+        console.debug(Suggestions);
+    },
+    'bindToggler': function() {
+        Suggestions.$toggleLink.click(Suggestions.toggler);
+    },
+    'toggler': function() {
+        var hidden = Suggestions.$hiddenItems.eq(0).is(':hidden');
+        var action = hidden ? 'show' : 'hide';
+        var adjective = hidden ? 'fewer' : 'more';
+        Suggestions.$hiddenItems[action]();
+        Suggestions.$toggleLink.find('span').text(adjective);
+        return false;
+    },
+};
+$(Suggestions.init);
+</script>
+{% endblock js %}

@@ -22,6 +22,11 @@ def encode_datetime(obj):
 def fetch_bugs(request):
     # FIXME: Give bugs some date field
 
+    suggestion_keys = request.user.get_profile().get_recommended_search_terms()
+    suggestions = [(i+1, i+1 < 4, k, False) for i, k in enumerate(suggestion_keys[1:])]
+    if suggestion_keys:
+        suggestions.insert(0,(0, True, suggestion_keys[0], True))
+
     query = request.GET.get('language', '')
     query_words = query.split()
     format = request.GET.get('format', None)
@@ -70,6 +75,7 @@ def fetch_bugs(request):
         next_page_query_str['end'] = end + diff + 1
         return render_to_response('search/search.html', {
             'the_user': request.user,
+            'suggestions': suggestions,
             'bunch_of_bugs': bugs,
             'developer_name': "Orrin Hatch",
             'language': query,

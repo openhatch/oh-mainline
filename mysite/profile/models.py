@@ -21,7 +21,8 @@ class Person(models.Model):
     last_polled = models.DateTimeField(default=datetime.datetime(1970, 1, 1))
     show_email = models.BooleanField(default=False)
     photo = models.ImageField(upload_to=
-                              lambda a, b: 'static/photos/profile-photos/' + generate_person_photo_path(a, b),
+                              lambda a, b: 'static/photos/profile-photos/' + 
+                              generate_person_photo_path(a, b),
                               default='')
 
     def __unicode__(self):
@@ -31,7 +32,11 @@ class Person(models.Model):
     def get_recommended_search_terms(self):
         # {{{
         project_exps = ProjectExp.objects.filter(person=self)
-        terms = [p.primary_language for p in project_exps]
+        terms = [p.primary_language for p in project_exps
+                if p.primary_language and p.primary_language.strip()]
+        terms.extend(
+                [p.project.name for p in project_exps
+                    if p.project.name and p.project.name.strip()])
         terms = sorted(set(terms), key=lambda s: s.lower())
         return terms
 
