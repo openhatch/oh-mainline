@@ -14,7 +14,6 @@ import difflib
 import os
 import tempfile
 import random
-import premailer
 
 # Django
 from django.template.loader import render_to_string
@@ -253,7 +252,6 @@ def widget_display(request, user_to_display__username, please_return_string=Fals
 def widget_display_js(request, user_to_display__username):
     # FIXME: In the future, use:
     html_doc = widget_display(request, user_to_display__username, please_return_string=True)
-    html_doc = premailer.premailer.Premailer(html_doc).transform()
     html_doc = re.replace("</?(html|body)>","", html_doc)
     # to generate html_doc
     encoded_for_js = simplejson.dumps(html_doc)
