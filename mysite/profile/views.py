@@ -252,7 +252,6 @@ def widget_display(request, user_to_display__username, please_return_string=Fals
 def widget_display_js(request, user_to_display__username):
     # FIXME: In the future, use:
     html_doc = widget_display(request, user_to_display__username, please_return_string=True)
-    html_doc = re.replace("</?(html|body)>","", html_doc)
     # to generate html_doc
     encoded_for_js = simplejson.dumps(html_doc)
     # Note: using application/javascript as suggested by
