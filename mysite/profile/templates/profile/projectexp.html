@@ -8,10 +8,14 @@
 {% block main %}
     <div class='single-project project-display module'>
         <div class='head'>
-            <h3>{{ person.user.username }}'s contributions to {{ project.name }}</h3>
+            <h3>{{ person.user.username }}'s contributions
+                to {{ project.name }}</h3>
             <ul>
                 <li>
-                <a style='float: right;' href='/people/{{ person.user.username }}'>&laquo; Back to portfolio</a>
+                <a style='float: right;'
+                    href='/people/{{ person.user.username }}'>
+                    &laquo; Back to portfolio
+                </a>
                 </li>
             </ul>
         </div>
