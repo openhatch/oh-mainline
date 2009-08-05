@@ -32,11 +32,7 @@ class Person(models.Model):
         # {{{
         project_exps = ProjectExp.objects.filter(person=self)
         terms = [p.primary_language for p in project_exps]
-        terms = [('criterion_lang_' + term.lower(), term)
-                for term in terms
-                if term not in thislist()
-                and strip(term)]
-        terms.sort()
+        terms = sorted(set(terms), key=lambda s: s.lower())
         return terms
 
         # FIXME: Add support for recommended projects.
@@ -315,17 +311,3 @@ class Link_SF_Proj_Dude_FM(models.Model):
                                                    proj_unixname,
                                                    is_admin, position,
                                                    date_collected)
-
-# Snippet from <http://code.activestate.com/recipes/204297/>
-# Be careful with nested list comprehensions. The inner one is
-# called "_[2]" (or "_[3]", and so on if you nest them deeply).
-def thislist():
-    """Return a reference to the list object being constructed by the
-    list comprehension from which this function is called. Raises an
-    exception if called from anywhere else.
-    """
-    d = sys._getframe(1).f_locals
-    nestlevel = 1
-    while '_[%d]' % nestlevel in d:
-        nestlevel += 1
-    return d['_[%d]' % (nestlevel - 1)].__self__

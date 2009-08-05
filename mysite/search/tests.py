@@ -266,8 +266,8 @@ class Recommend(base.tests.TwillTests):
         person = Person.objects.get(user__username='paulproteus')
         terms = person.get_recommended_search_terms()
         self.assertEqual(terms,
-                [u'Automake', u'C#', u'C++', u'Make', u'PHP',
-                    u'Python', u'shell script'])
+                [u'Automake', u'C#', u'C++', u'Make', 
+                    u'Python', u'shell script', u'XUL'])
 
     def test_recommendations_controller(self):
         client = self.login_with_client()
@@ -293,6 +293,5 @@ class Recommend(base.tests.TwillTests):
         # Test for bugs that ought to be there and bug that ought not to be. 
         # FIXME: Don't use twill in this test, because then you have
         # to work around pagination.
-        tc.find(
 
 # vim: set ai et ts=4 sw=4 columns=80:
