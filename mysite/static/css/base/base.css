@@ -5,12 +5,12 @@ body {
     padding: 0;
 }
 a {
-    color: darkorange; #66AA33;
+    color: darkorange; 
     text-decoration: none;
 }
 
 a:hover {
-    color: orange; #338800;
+    color: orange; 
     text-decoration: underline;
 }
 
@@ -148,7 +148,7 @@ h1, h2, h3, h4 {
 #links li a {
     color: #76746b;
     padding: 3px 10px 5px 10px;
-    background-color: #fff; d8d8e4; 00afff; caffff; 7fc4ff;
+    background-color: #fff; 
     border-top: 2px solid #ded8be;
     float: left;
     text-decoration: none;

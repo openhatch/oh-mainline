@@ -1,0 +1,26 @@
+{% extends 'base/one_column.html' %}
+
+{% block title %}
+Home
+{{ block.super }}
+{% endblock title %}
+
+{% block css %}
+{{ block.super }}
+@import url('/static/css/base/landing.css') all;
+@import url('/static/css/profile/portfolio.css') all;
+@import url('/static/css/profile/widget.css') all;
+{% endblock css %}
+
+{% block main %}
+<div class='module'>
+    <div class='head'>
+        <h3>Welcome</h3>
+    </div>
+    <div class='body contains-submodules two-columns'>
+        <div id='widget' class='submodule fat'>
+            {% include 'profile/widget.html' %}
+        </div>
+    </div>
+</div>
+{% endblock main %}

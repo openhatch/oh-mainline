@@ -14,8 +14,10 @@ import difflib
 import os
 import tempfile
 import random
+import premailer
 
 # Django
+from django.template.loader import render_to_string
 from django.core import serializers
 from django.http import \
         HttpResponse, HttpResponseRedirect, HttpResponseServerError
@@ -233,7 +235,7 @@ def projectexp_display(request, user_to_display__username, project__name):
     return render_to_response('profile/projectexp.html', data)
     # }}}
     
-def widget_display(request, user_to_display__username):
+def widget_display(request, user_to_display__username, please_return_string=False):
     # {{{
     user = get_object_or_404(User, username=user_to_display__username)
     person = get_object_or_404(Person, user=user)
@@ -242,9 +244,24 @@ def widget_display(request, user_to_display__username):
     data['the_user'] = request.user
     data['projectexp_editable'] = (user == request.user)
     data['editable'] = (user == request.user)
-    return render_to_response('profile/widget-test.html', data)
+    if please_return_string:
+        return render_to_string('profile/widget.html', data)
+    else:
+        return render_to_response('profile/widget.html', data)
     # }}}
 
+def widget_display_js(request, user_to_display__username):
+    # FIXME: In the future, use:
+    html_doc = widget_display(request, user_to_display__username, please_return_string=True)
+    html_doc = premailer.premailer.Premailer(html_doc).transform()
+    html_doc = re.replace("</?(html|body)>","", html_doc)
+    # to generate html_doc
+    encoded_for_js = simplejson.dumps(html_doc)
+    # Note: using application/javascript as suggested by
+    # http://www.ietf.org/rfc/rfc4329.txt
+    return render_to_response('base/append_ourselves.js',
+                              {'in_string': encoded_for_js},
+                              mimetype='application/javascript')
 @login_required
 def projectexp_edit(request, project__name):
     # {{{

@@ -34,6 +34,9 @@ urlpatterns = patterns('',
         (r'^people/(?P<user_to_display__username>[^/]+)/widget/$',
                 'mysite.profile.views.widget_display'),
 
+        (r'^people/(?P<user_to_display__username>[^/]+)/openhatch-widget.js$',
+                'mysite.profile.views.widget_display_js'),
+
         (r'^people/delete-experience/do$',
          'mysite.profile.views.delete_experience_do'),
 
@@ -115,10 +118,6 @@ urlpatterns = patterns('',
 
         (r'^people/user_selected_these_dia_checkboxes$',
                 'mysite.profile.views.user_selected_these_dia_checkboxes'),
-
-        # Generate widget JavaScript
-        (r'^openhatch-widget.js$',
-                'mysite.base.views.page_to_js'),
 
         # This dangerous regex is last
         (r'^people/(?P<user_to_display__username>[^/]+)[/?]$',
