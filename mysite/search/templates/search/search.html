@@ -1,7 +1,8 @@
 {% extends 'search/base.html' %}
 
 {% block title %}
-Search bugs - OpenHatch
+Search bugs 
+{{ block.super }}
 {% endblock title %}
 
 {% block main %}
@@ -51,18 +52,13 @@ Search bugs - OpenHatch
             <li class='bug {% cycle "even" "odd"%}'>
             <!--div class='project-info'>
             <img class='logo' src='{{ bug.project.icon_url }}' />
-            <span class='project'>
-                {{ bug.project.name }}
-            </span>
             </div-->
             <div class='first-line'>
                 <a class='title' href='{{ bug.canonical_bug_link }}'
                     >+
-                    <span>{{ bug.title }}</span>
+                    <span>{{ bug.project.name }} - {{ bug.title }}</span>
                 </a>
-                <!--div class='toggle-details'>⇕</div-->
-                <div class='age'>3 days old</div>
-                <!--a href='BUG_LINK' class='show-details'>details</a-->
+                <!--div class='age'>3 days old</div-->
             </div>
             <div class='second-line'>
                 <span class='description'>

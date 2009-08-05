@@ -1,3 +1,6 @@
+import base.tests
+from base.tests import make_twill_url
+
 import django.test
 from search.models import Project, Bug
 import search.views
@@ -16,28 +19,7 @@ from django.core.servers.basehttp import AdminMediaHandler
 from django.core.handlers.wsgi import WSGIHandler
 from StringIO import StringIO
 
-# FIXME: Later look into http://stackoverflow.com/questions/343622/how-do-i-submit-a-form-given-only-the-html-source
-
-# Functions you'll need:
-
-def twill_setup():
-    app = AdminMediaHandler(WSGIHandler())
-    twill.add_wsgi_intercept("127.0.0.1", 8080, lambda: app)
-
-def twill_teardown():
-    twill.remove_wsgi_intercept('127.0.0.1', 8080)
-
-def make_twill_url(url):
-    # modify this
-    return url.replace("http://openhatch.org/",
-            "http://127.0.0.1:8080/")
-
-def twill_quiet():
-    # suppress normal output of twill.. You don't want to
-    # call this if you want an interactive session
-    twill.set_output(StringIO())
-
-class AutoCompleteTests(django.test.TestCase):
+class AutoCompleteTests(base.tests.TwillTests):
     """
     Test whether the autocomplete can handle
      - a field-specific query
@@ -98,14 +80,8 @@ class AutoCompleteTests(django.test.TestCase):
         response = self.client.get( '/search/get_suggestions', {})
         self.assertEquals(response.status_code, 500)
 
-class TestNonJavascriptSearch(django.test.TestCase):
+class TestNonJavascriptSearch(base.tests.TwillTests):
     fixtures = ['bugs-for-two-projects.json']
-
-    def setUp(self):
-        twill_setup()
-
-    def tearDown(self):
-        twill_teardown()
 
     def testSearch(self):
         response = self.client.get('/search/')
@@ -185,13 +161,7 @@ sample_launchpad_data_dump.return_value = [dict(
         date_reported=time.localtime(),
         title="Joi's Lab AFS",)]
 
-class AutoCrawlTests(django.test.TestCase):
-    def setUp(self):
-        twill_setup()
-
-    def tearDown(self):
-        twill_teardown()
-
+class AutoCrawlTests(base.tests.TwillTests):
     @mock.patch('search.launchpad_crawl.dump_data_from_project', 
                 sample_launchpad_data_dump)
     def testSearch(self):
@@ -219,7 +189,7 @@ class AutoCrawlTests(django.test.TestCase):
         self.assertEqual(new_b.title, "Joi's Lab AFS") # bug title restored
         # thanks to fresh import
 
-class LaunchpadImporterTests(django.test.TestCase):
+class LaunchpadImporterTests(base.tests.TwillTests):
     def test_lp_update_handler(self):
         '''Test the Launchpad import handler with some fake data.'''
         some_date = datetime.datetime(2009, 4, 1, 2, 2, 2)
