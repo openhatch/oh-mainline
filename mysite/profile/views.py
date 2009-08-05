@@ -24,6 +24,7 @@ from django.shortcuts import \
 import django.contrib.auth 
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
 
 # OpenHatch global
 from django.conf import settings
@@ -397,7 +398,9 @@ def project_icon_url(project_name, actually_fetch = True):
             try:
                 icon_data = oh.get_icon_for_project(project_name)
             except ValueError:
-                icon_data = open('static/no-project-icon.png').read()
+                icon_data = open(os.path.join(
+                        settings.MEDIA_ROOT,
+                        'no-project-icon.png')).read()
         
             # then mktemp and save the Ohloh icon there, and rename it in
             tmp = tempfile.mkstemp(dir=project_icons_root)
