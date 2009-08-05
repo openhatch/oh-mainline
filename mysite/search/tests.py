@@ -1,6 +1,8 @@
 import base.tests
 from base.tests import make_twill_url
 
+from profile.models import Person
+
 import django.test
 from search.models import Project, Bug
 import search.views
@@ -253,5 +255,44 @@ class LaunchpadImporterTests(base.tests.TwillTests):
         self.assertEqual(out_d['last_polled'].year, datetime.date.today().year)
         del out_d['last_polled']
         self.assertEqual(sample_out_data, out_d)
+
+class Recommend(base.tests.TwillTests):
+    fixtures = ['user-paulproteus.json',
+            'person-paulproteus.json',
+            'cchost-data-imported-from-ohloh.json',
+            'bugs-for-two-projects.json']
+
+    def test_get_recommended_search_terms_for_user(self):
+        person = Person.objects.get(user__username='paulproteus')
+        terms = person.get_recommended_search_terms()
+        self.assertEqual(terms,
+                [u'Automake', u'C#', u'C++', u'Make', u'PHP',
+                    u'Python', u'shell script'])
+
+    def test_recommendations_controller(self):
+        client = self.login_with_client()
+        data = {}
+        data['suggestions'] = 'Automake C C++ *Firefox *Python *XUL'
+        search.views.fetch_bugs
+
+    def test_recommendations_with_twill(self):
+        self.login_with_twill()
+        tc.go(make_twill_url('http://openhatch.org/search/'))
+        tc.fv('suggested_criteria', 'criterion_lang_automake', '0')
+        tc.fv('suggested_criteria', 'criterion_lang_c', '0')
+        # FIXME: Deal with weird characters.
+        # tc.fv('suggested_criteria', 'criterion_c++', '1')
+        tc.fv('suggested_criteria', 'criterion_lang_python', '0')
+        tc.fv('suggested_criteria', 'criterion_lang_xul', '1')
+        tc.submit()
+
+        # Good morning!
+        # FIXME: Check that fixtures work.
+        # FIXME: Check that if you click checkboxes,
+        # you get the right list of bugs.
+        # Test for bugs that ought to be there and bug that ought not to be. 
+        # FIXME: Don't use twill in this test, because then you have
+        # to work around pagination.
+        tc.find(
 
 # vim: set ai et ts=4 sw=4 columns=80:
