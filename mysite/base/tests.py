@@ -88,7 +88,7 @@ class LandingPage(TwillTests):
         # {{{
         self.login_with_twill()
         tc.go('/')
-        tc.find('Badge')
+        tc.find('contributions to open source')
         # }}}
     # }}}
 
