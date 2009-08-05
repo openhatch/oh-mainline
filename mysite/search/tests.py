@@ -196,15 +196,15 @@ class AutoCrawlTests(django.test.TestCase):
                 sample_launchpad_data_dump)
     def testSearch(self):
         # Verify that we can't find a bug with the right description
-        self.assertRaises(search.models.Bug.DoesNotExist,
-                          search.models.Bug.objects.get,
+        self.assertRaises(mysite.search.models.Bug.DoesNotExist,
+                          mysite.search.models.Bug.objects.get,
                           title="Joi's Lab AFS")
         # Now get all the bugs about rose
         mysite.search.launchpad_crawl.grab_lp_bugs(lp_project='rose',
                                             openhatch_project=
                                             'rose.makesad.us')
         # Now see, we have one!
-        b = search.models.Bug.objects.get(title="Joi's Lab AFS")
+        b = mysite.search.models.Bug.objects.get(title="Joi's Lab AFS")
         self.assertEqual(b.project.name, 'rose.makesad.us')
         # Ta-da.
         return b
