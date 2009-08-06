@@ -292,3 +292,10 @@ Keywords: Torrent unittest""")
         self.assertEqual(bug.canonical_bug_link, 'http://bugzilla.pculture.org/show_bug.cgi?id=2294')
         self.assert_(bug.good_for_newcomers)
 
+    def test_csv_parsing(self):
+        csv_fd = StringIO('''some_header,whatever
+1,silly bug
+2,other silly bug''')
+        bugs = mysite.customs.miro.bugzilla_query_to_bug_ids(
+            csv_fd)
+        self.assertEqual(bugs, [1, 2])

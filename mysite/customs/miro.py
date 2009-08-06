@@ -1,6 +1,7 @@
 # vim: set columns=80:
 import os
 import datetime
+import csv
 
 import simplejson
 import datetime
@@ -63,3 +64,14 @@ def xml2bug_object(xml_fd):
         canonical_bug_link = 'http://bugzilla.pculture.org/show_bug.cgi?id=%d' % bug_id,
         good_for_newcomers = ('bitesized' in keywords))
     return ret
+
+def bugzilla_query_to_bug_ids(csv_fd):
+    doc = csv.reader(csv_fd)
+    doc.next() # throw away header row
+
+    bugs = []
+    
+    for row in doc:
+        bugs.append(int(row[0]))
+
+    return bugs
