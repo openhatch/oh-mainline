@@ -22,7 +22,11 @@ def encode_datetime(obj):
 def fetch_bugs(request):
     # FIXME: Give bugs some date field
 
-    suggestion_keys = request.user.get_profile().get_recommended_search_terms()
+    if request.user.is_authenticated():
+        suggestion_keys = request.user.get_profile().get_recommended_search_terms()
+    else:
+        suggestion_keys = []
+
     suggestions = [(i+1, i+1 < 4, k, False) for i, k in enumerate(suggestion_keys[1:])]
     if suggestion_keys:
         suggestions.insert(0,(0, True, suggestion_keys[0], True))
