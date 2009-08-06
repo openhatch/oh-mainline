@@ -11,12 +11,24 @@ Home
 {% endblock css %}
 
 {% block main %}
-<div class='module'>
+<div class='module' id='landing'>
     <div class='head'>
         <h3>Welcome</h3>
     </div>
     <div class='body contains-submodules two-columns'>
-        {% include 'profile/widget.html' %}
+        <div class='submodule fat'>
+            <div class='head'>
+                <h3>Your widget</h3>
+            </div>
+            <div class='body'>
+                <p>Show off your open source participation on your web things.</p>
+                <script type='text/javascript' src='/people/{{ person.user.username }}/openhatch-widget.js'></script>
+                <div id='widget-instructions'>
+                    Include this tag wherever in your page you want to put the widget:
+                    <xmp><script type='text/javascript' src='http://openhatch.org/people/{{ person.user.username }}/openhatch-widget.js'></script></xmp>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock main %}

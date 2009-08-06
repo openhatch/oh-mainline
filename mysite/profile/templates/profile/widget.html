@@ -2,7 +2,7 @@
 
     #openhatch-widget {
         font: 10pt Verdana;
-        width: 292px;
+        width: 292px ! important;
         float: left;
     }
     #openhatch-widget h3 {
@@ -15,13 +15,13 @@
     }
     
     #openhatch-widget .module > .head {
-        width: 290px;
+        width: 290px ! important;
     }
 
     #openhatch-widget .module > .head h3,
     #openhatch-widget .module > .body,
     #openhatch-widget .module > .foot {
-        width: 260px;
+        width: 260px ! important;
     }
     #openhatch-widget .foot img {
         vertical-align: middle;
@@ -74,13 +74,13 @@
     }
 
     #openhatch-widget .module > .head h3 {
-        padding: 10px 15px;
+        padding: 10px 15px ! important;
     }
 
     #openhatch-widget .module > .body {
         float: left;
         background-color: #fff;
-        padding: 10px 15px;
+        padding: 10px 15px ! important;
     }
 
     #openhatch-widget .module > .head, 
@@ -295,7 +295,7 @@
 <div id='openhatch-widget'>
     <div class='module'>
         <div class='head'>
-            <h3>{{ person.get_full_name }}'s open source communities</h3>
+            <h3>{{ person.get_full_name }}'s FOSS communities</h3>
         </div>
         <div class='body'>
             {% if projects %}
@@ -306,7 +306,7 @@
                     <div class='logo'>
                         <a href='/people/{{ person.user.username }}/projects/{{ project.name }}'>
                             <img alt='logo for {{project.name}}'
-                            src='/people/project_icon/{{ project.name }}' width='40'/>
+                            src='http://alpha.openhatch.org/people/project_icon/{{ project.name }}' width='40'/>
                         </a>
                     </div>
                     <a href='/people/{{ person.user.username }}/projects/{{ project.name }}' 
