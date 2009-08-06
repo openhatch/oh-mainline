@@ -1,0 +1,27 @@
+{% extends 'account/settings_tab.html' %}
+
+{% block title %}
+It's a widget. -
+{{ block.super }}
+{% endblock title %}
+
+{% block css %}
+{{ block.super }}
+@import url('/static/css/account/widget.css') all;
+{% endblock css %}
+
+{% block settings_main %}
+<div class='submodule fat' id='widget-settings'>
+    <div class='head'>
+        <h3>Widgetize yourself</h3>
+    </div>
+    <div class='body'>
+        <p>Show off your open source participation on your web things.</p>
+        <script type='text/javascript' src='/people/{{ person.user.username }}/openhatch-widget.js'></script>
+        <div id='widget-instructions'>
+            Include this tag wherever in your page you want to put the widget:
+            <xmp><script type='text/javascript' src='http://openhatch.org/people/{{ person.user.username }}/openhatch-widget.js'></script></xmp>
+        </div>
+    </div>
+</div>
+{% endblock settings_main %}

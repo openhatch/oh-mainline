@@ -1,17 +1,3 @@
-{% extends 'base/one_column.html' %}
+Asheesh's blog
 
-{% block title %}
-{{person.user.username}}'s open source contributions | OpenHatch
-{% endblock title %}
-
-{% block css %}
-@import url('/static/css/base/base.css') all;
-@import url('/static/css/profile/portfolio.css') all;
-@import url('/static/css/profile/widget.css') all;
-{% endblock css %}
-
-{% block main %}
-<div class='module' id='widget'>
 {% include 'profile/widget.html' %}
-</div>
-{% endblock main %}

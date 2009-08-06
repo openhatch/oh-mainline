@@ -16,9 +16,21 @@ import account.forms
 import base.views
 from profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag, Link_Project_Tag, Link_SF_Proj_Dude_FM, Link_Person_Tag, DataImportAttempt
 from profile.views import get_personal_data
+
+from decorator import decorator
 # }}}
 
 applog = logging.getLogger('applog')
+
+@decorator
+def view(func, *args, **kw):
+    """Decorator for views."""
+    request, template, view_data = func(*args, **kw)
+    data = get_personal_data(request.user.get_profile())
+    data['the_user'] = request.user
+    data['slug'] = func.__name__
+    data.update(view_data)
+    return render_to_response(template, data)
 
 def login(request):
     # {{{
@@ -119,6 +131,7 @@ def settings(request):
     # }}}
 
 @login_required
+@view
 def edit_contact_info(request, edit_email_form = None, show_email_form = None):
     # {{{
     data = get_personal_data(
@@ -139,7 +152,7 @@ def edit_contact_info(request, edit_email_form = None, show_email_form = None):
     else:
         data['show_email_form'] = show_email_form
 
-    return render_to_response('account/edit_contact_info.html', data)
+    return (request, 'account/edit_contact_info.html', data)
     # }}}
 
 @login_required
@@ -170,6 +183,7 @@ def edit_contact_info_do(request):
     # }}}
 
 @login_required
+@view
 def change_password(request, change_password_form = None):
     # {{{
     data = get_personal_data(
@@ -180,7 +194,7 @@ def change_password(request, change_password_form = None):
     else:
         data['change_password_form'] = change_password_form
 
-    return render_to_response('account/change_password.html', data)
+    return (request, 'account/change_password.html', data)
     # }}}
 
 @login_required
@@ -195,25 +209,8 @@ def change_password_do(request):
         return change_password(request, change_password_form=form)
     # }}}
 
-@login_required
-def show_email(request, show_email_form = None):
-    # {{{
-    data = get_personal_data(
-            request.user.get_profile())
-    data['the_user'] = request.user
-    return render_to_response('account/show_email.html', data)
-    # }}}
-
-@login_required
-def show_email_do(request):
-    # {{{
-    # Check if request.POST contains show_email_address
-    form = account.forms.ShowEmailForm(request.POST)
-    if form.is_valid():
-        profile = request.user.get_profile()
-        profile.show_email = form.cleaned_data['show_email']
-        profile.save()
-    return HttpResponseRedirect(reverse(change_password))
-    # }}}
+@view
+def widget(request):
+    return (request, 'account/widget.html', {})
 
 # vim: ai ts=3 sts=4 et sw=4 nu
