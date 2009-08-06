@@ -22,6 +22,7 @@ Search bugs
         <a id='toggle-more-suggestions' href='#'>
             Show <span>more</span> suggestions
         </a>
+        <input type='submit' value='Find bugs'/>
     </form>
 </div>
 {% endblock sidebar %}
@@ -30,16 +31,13 @@ Search bugs
     <div id='results' class='gewgaws module box results'>
     <div id='opps'>
         <form name='search_opps' method='get'> 
-            {% comment %} {{{ {% endcomment %}
             <h3><label for='language'>Find some bugs!</label></h3>
             <input type='text' name='language' id='language'
             value='{{ language }}' />
             <input type='submit' id='button' value='Go' />
-            {% comment %} }}} {% endcomment %}
         </form>
 
         <div id='results-widget'>
-            {% comment %} {{{ {% endcomment %}
             <span id='results-summary'>
                 <span id='results-summary-language'>{{ language }}</span>
 
@@ -62,12 +60,11 @@ Search bugs
                 <a href='COLLAPSE_ALL_URL' id='collapse-all-link'>Collapse all</a>
             </span>
 
-            {% comment %} }}} {% endcomment %}
         </div><!-- /#results-widget -->
 
         {% if bunch_of_bugs %}
         <ul>
-            {% comment %} Search results {{{ {% endcomment %}
+            {# Search results {{{ #}
             {% for bug in bunch_of_bugs %}
             <li class='bug {% cycle "even" "odd"%}'>
             <!--div class='project-info'>
@@ -127,7 +124,7 @@ Search bugs
             {% comment %} }}} {% endcomment %}
             </li>
             {% endfor %}
-        {% comment %} End of search results }}} {% endcomment %}
+            {# }}} #}
         </ul>
         {% else %}
         <p class='no-opps'>
@@ -143,14 +140,21 @@ Search bugs
 <script>
 Suggestions = {
     '$list': null,
-    '$toggleButton': null,
+    '$toggleLink': null,
+    '$submitButton': null,
     '$hiddenItems': null,
+    '$terms': null,
+    '$queryField': null,
     'init': function() {
         Suggestions.$list = $('#suggested-searches ul');
         Suggestions.$toggleLink = $('#toggle-more-suggestions');
+        Suggestions.$submitButton = $('#suggested-searches input[type="submit"]');
         Suggestions.$hiddenItems = $('#suggested-searches li.hidden');
+        Suggestions.$terms = $('#suggested-searches li');
+        Suggestions.$queryField = $('#language');
         Suggestions.bindToggler();
-        console.debug(Suggestions);
+        Suggestions.bindQueryManipulators();
+        Suggestions.$submitButton.hide();
     },
     'bindToggler': function() {
         Suggestions.$toggleLink.click(Suggestions.toggler);
@@ -163,6 +167,23 @@ Suggestions = {
         Suggestions.$toggleLink.find('span').text(adjective);
         return false;
     },
+    'bindQueryManipulators': function() {
+        Suggestions.$terms.find('input[type="checkbox"]').change(Suggestions.queryManipulator);
+    },
+    'queryManipulator': function() {
+        var q = Suggestions.$queryField;
+        var term = $(this).parent().find('label').text();
+        if ($(this).is(":checked")) {
+            var separator = (q.val().replace(/\s/g, "") == "") ? "" : " ";
+            q.val(q.val() + separator + term);
+        }
+        else {
+            // FIXME: Escape term.
+            var termRegExp = new RegExp("\\s" + term + "\\s", "i");
+            q.val((" "+q.val()+" ").replace(termRegExp, ""));
+        }
+        q.val($.trim(q.val().replace(/\s+/g, " ")));
+    }
 };
 $(Suggestions.init);
 </script>
