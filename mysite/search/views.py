@@ -9,6 +9,7 @@ import account.forms
 import datetime
 from dateutil import tz
 import pytz
+import re
 
 # Via http://www.djangosnippets.org/snippets/1435/
 def encode_datetime(obj):
@@ -18,6 +19,24 @@ def encode_datetime(obj):
     if isinstance(obj, datetime.datetime):
         return obj.astimezone(tz.tzutc()).strftime('%Y-%m-%dT%H:%M:%SZ')
     raise TypeError("%s" % type(obj) + repr(obj) + " is not JSON serializable")
+
+def split_query_words(string):
+    # We're given some query terms "between quotes" and some glomped on with spaces
+    # Strategy: Find the strings validly inside quotes, and remove them
+    # from the original string. Then split the remainder (and probably trim
+    # whitespace from the remaining words).
+    ret = []
+    splitted = re.split(r'(".*?")', string)
+
+    for (index, word) in enumerate(splitted):
+        if (index % 2) == 0:
+            ret.extend(word.split())
+        else:
+            assert word[0] == '"'
+            assert word[-1] == '"'
+            ret.append(word[1:-1])
+
+    return ret
 
 def fetch_bugs(request):
     # FIXME: Give bugs some date field
@@ -32,7 +51,7 @@ def fetch_bugs(request):
         suggestions.insert(0,(0, True, suggestion_keys[0], True))
 
     query = request.GET.get('language', '')
-    query_words = query.split()
+    query_words = split_query_words(query)
     format = request.GET.get('format', None)
     start = int(request.GET.get('start', 1))
     end = int(request.GET.get('end', 10))

@@ -319,4 +319,14 @@ class Recommend(base.tests.TwillTests):
         tc.notfind("Yo! This is a bug in XUL but not Firefox")
         tc.find("Oy! This is a bug in XUL and Firefox")
 
+class TestQuerySplitter(django.test.TestCase):
+    def test_split_query_words(self):
+        easy = '1 2 3'
+        self.assertEqual(search.views.split_query_words(easy),
+                         ['1', '2', '3'])
+
+        easy = '"1"'
+        self.assertEqual(search.views.split_query_words(easy),
+                         ['1'])
+
 # vim: set ai et ts=4 sw=4 columns=80:
