@@ -48,11 +48,10 @@ def xml2bug_object(xml_fd):
                    keywords_text.split(','))
     project, _ = Project.objects.get_or_create(name='Miro')
 
-
     ret = Bug(
         project = project,
         title = get_tag_text_from_xml(parsed, 'short_desc'),
-        description = get_tag_text_from_xml(parsed, 'long_desc'),
+        description = get_tag_text_from_xml(parsed, 'long_desc/thetext'),
         status = get_tag_text_from_xml(parsed, 'bug_status'),
         importance = get_tag_text_from_xml(parsed, 'bug_severity'),
         people_involved = count_people_involved(parsed),

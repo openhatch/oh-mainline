@@ -20,6 +20,7 @@ from django.core.handlers.wsgi import WSGIHandler
 from StringIO import StringIO
 import urllib
 import simplejson
+import datetime
 import ohloh
 import lp_grabber
 
@@ -273,6 +274,21 @@ class MiroTests(django.test.TestCase):
         f = os.path.join(settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml')
         xml_fd = file(f)
         bug = mysite.customs.miro.xml2bug_object(xml_fd)
-        import pdb
-        pdb.set_trace()
+
+        self.assertEqual(bug.project.name, 'Miro')
+        self.assertEqual(bug.title, "Add test for torrents that use gzip'd urls")
+        self.assertEqual(bug.description, """This broke. We should make sure it doesn't break again.
+Trac ticket id: 2294
+Owner: wguaraldi
+Reporter: nassar
+Keywords: Torrent unittest""")
+        self.assertEqual(bug.status, 'NEW')
+        self.assertEqual(bug.importance, 'normal')
+        self.assertEqual(bug.people_involved, 5)
+        self.assertEqual(bug.date_reported, datetime.datetime(2006, 6, 9, 12, 49))
+        self.assertEqual(bug.last_touched, datetime.datetime(2008, 6, 11, 23, 56, 27))
+        self.assertEqual(bug.submitter_username, 'nassar@pculture.org')
+        self.assertEqual(bug.submitter_realname, 'Nick Nassar')
+        self.assertEqual(bug.canonical_bug_link, 'http://bugzilla.pculture.org/show_bug.cgi?id=2294')
+        self.assert_(bug.good_for_newcomers)
 
