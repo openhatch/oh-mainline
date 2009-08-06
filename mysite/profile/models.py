@@ -45,6 +45,14 @@ class Person(models.Model):
 
         # }}}
 
+    def get_full_name(self):
+        # {{{
+        name = self.user.first_name 
+        if self.user.first_name and self.user.last_name:
+            name += " "
+        name += self.user.last_name
+        return name
+    # }}}
     # }}}
 
 def create_profile_when_user_created(instance, created, *args, **kwargs):

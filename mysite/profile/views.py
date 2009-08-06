@@ -26,6 +26,7 @@ from django.shortcuts import \
 import django.contrib.auth 
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.contrib.sites.models import Site
 
 # OpenHatch global
 import settings
