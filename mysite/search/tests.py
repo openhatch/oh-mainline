@@ -111,7 +111,20 @@ class TestNonJavascriptSearch(base.tests.TwillTests):
 
         tc.fv('search_opps', 'language', 'c#')
         tc.submit()
-        for n in range(717, 727):
+        for n in range(717, 723):
+            tc.find('Description #%d' % n)
+
+    def testSearchWithArgsWithQuotes(self):
+        url = 'http://openhatch.org/search/'
+        tc.go(make_twill_url(url))
+        tc.fv('search_opps', 'language', '"python"')
+        tc.submit()
+        for n in range(1, 11):
+            tc.find('Description #%d' % n)
+
+        tc.fv('search_opps', 'language', 'c#')
+        tc.submit()
+        for n in range(717, 723):
             tc.find('Description #%d' % n)
 
     def test_json_view(self):
@@ -152,7 +165,7 @@ class TestNonJavascriptSearch(base.tests.TwillTests):
 
         tc.fv('search_opps', 'language', 'c#')
         tc.submit()
-        for n in range(717, 727):
+        for n in range(717, 723):
             tc.find('Description #%d' % n)
         tc.follow('Next')
         for n in range(727, 737):
@@ -328,5 +341,9 @@ class TestQuerySplitter(django.test.TestCase):
         easy = '"1"'
         self.assertEqual(search.views.split_query_words(easy),
                          ['1'])
+
+        easy = 'c#'
+        self.assertEqual(search.views.split_query_words(easy),
+                         ['c#'])
 
 # vim: set ai et ts=4 sw=4 columns=80:
