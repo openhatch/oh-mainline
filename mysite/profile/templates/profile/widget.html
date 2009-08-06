@@ -306,7 +306,7 @@
                     <div class='logo'>
                         <a href='/people/{{ person.user.username }}/projects/{{ project.name }}'>
                             <img alt='logo for {{project.name}}'
-                            src='http://alpha.openhatch.org/people/project_icon/{{ project.name }}' width='40'/>
+                            src='http://{{ url_prefix }}/people/project_icon/{{ project.name }}' width='40'/>
                         </a>
                     </div>
                     <a href='/people/{{ person.user.username }}/projects/{{ project.name }}' 
@@ -321,7 +321,7 @@
         </div>
         <div class='foot'>
             <a href='/people/{{ person.user.username }}/'>See my full profile at
-            <img src='http://yggdrasil.local:8000/static/images/logo-for-widget.png' height='55' width='80'></a>
+            <img src='http://{{ url_prefix }}/static/images/logo-for-widget.png' height='55' width='80'></a>
             {# FIXME: Don't hard-code our URL. #}
         </div>
     </div>

@@ -244,6 +244,7 @@ def widget_display(request, user_to_display__username, please_return_string=Fals
     data['the_user'] = request.user
     data['projectexp_editable'] = (user == request.user)
     data['editable'] = (user == request.user)
+    data['url_prefix'] = request.META['SERVER_NAME'] + ':' + request.META['SERVER_PORT']
     if please_return_string:
         return render_to_string('profile/widget.html', data)
     else:
