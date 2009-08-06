@@ -366,4 +366,9 @@ a:focus {
 .hidden {
     display: none;
 }
+#toggle-more-suggestions {
+    float: left;
+    width: 95%;
+    margin-bottom: 10px;
+}
 /* vim: set ai ts=4 sts=4 et sw=4: */

@@ -8,6 +8,9 @@ Search bugs
 {% block sidebar %}
 <div id='suggested-searches' class='box module'>
     <h3 style='margin-bottom: 10px;'>Suggested searches:</h3>
+    <a id='toggle-more-suggestions' href='#'>
+        Show <span>more</span> suggestions
+    </a>
     <form name='suggested_searches'
         method='GET' action=''>
         <ul>
@@ -19,9 +22,6 @@ Search bugs
             </li>
             {% endfor %}
         </ul>
-        <a id='toggle-more-suggestions' href='#'>
-            Show <span>more</span> suggestions
-        </a>
         <input type='submit' value='Find bugs'/>
     </form>
 </div>
@@ -138,7 +138,7 @@ Search bugs
 {% block js %}
 {{ block.super }}
 <script>
-Suggestions = {
+Suggns = {
     '$list': null,
     '$toggleLink': null,
     '$submitButton': null,
@@ -146,32 +146,39 @@ Suggestions = {
     '$terms': null,
     '$queryField': null,
     'init': function() {
-        Suggestions.$list = $('#suggested-searches ul');
-        Suggestions.$toggleLink = $('#toggle-more-suggestions');
-        Suggestions.$submitButton = $('#suggested-searches input[type="submit"]');
-        Suggestions.$hiddenItems = $('#suggested-searches li.hidden');
-        Suggestions.$terms = $('#suggested-searches li');
-        Suggestions.$queryField = $('#language');
-        Suggestions.bindToggler();
-        Suggestions.bindQueryManipulators();
-        Suggestions.$submitButton.hide();
+
+        // Initialize variables that store jQuery objects.
+        Suggns.$list = $('#suggested-searches ul');
+        Suggns.$toggleLink = $('#toggle-more-suggestions');
+        Suggns.$submitButton = $('#suggested-searches input[type="submit"]');
+        Suggns.$hiddenItems = $('#suggested-searches li.hidden');
+        Suggns.$terms = $('#suggested-searches li');
+        Suggns.$queryField = $('#language');
+
+        // Bind event handlers.
+        Suggns.bindToggler();
+        Suggns.bindQueryManipulators();
+        Suggns.bindCheckboxUpdater();
+
+        // 
+        Suggns.$submitButton.hide();
     },
     'bindToggler': function() {
-        Suggestions.$toggleLink.click(Suggestions.toggler);
+        Suggns.$toggleLink.click(Suggns.toggler);
     },
     'toggler': function() {
-        var hidden = Suggestions.$hiddenItems.eq(0).is(':hidden');
-        var action = hidden ? 'show' : 'hide';
-        var adjective = hidden ? 'fewer' : 'more';
-        Suggestions.$hiddenItems[action]();
-        Suggestions.$toggleLink.find('span').text(adjective);
+        var isHidden = Suggns.$hiddenItems.eq(0).is(':hidden');
+        var verb = isHidden ? 'show' : 'hide';
+        var determiner = isHidden ? 'fewer' : 'more';
+        Suggns.$hiddenItems[verb]();
+        Suggns.$toggleLink.find('span').text(determiner);
         return false;
     },
     'bindQueryManipulators': function() {
-        Suggestions.$terms.find('input[type="checkbox"]').change(Suggestions.queryManipulator);
+        Suggns.$terms.find('input[type="checkbox"]').change(Suggns.queryManipulator);
     },
     'queryManipulator': function() {
-        var q = Suggestions.$queryField;
+        var q = Suggns.$queryField;
         var term = $(this).parent().find('label').text();
         if ($(this).is(":checked")) {
             var separator = (q.val().replace(/\s/g, "") == "") ? "" : " ";
@@ -183,8 +190,25 @@ Suggestions = {
             q.val((" "+q.val()+" ").replace(termRegExp, ""));
         }
         q.val($.trim(q.val().replace(/\s+/g, " ")));
+    },
+    'checkboxUpdater': function() {
+        var query = Suggns.$queryField.val();
+        var terms = query.toLowerCase().split(/\s/);
+        Suggns.$terms.each(function() {
+            if ($(this).find('label').text().toLowercase()) {
+                $(this).find('input:checkbox').attr('checked','checked');
+            }
+            else {
+                $(this).find('input:checkbox').attr('checked','checked');
+            }
+        });
+    },
+    'bindCheckboxUpdater': function() {
+        Suggns.$queryField.keyup(Suggns.checkboxUpdater);
+    },
+    'getCheckboxByTerm': function(term) {
     }
 };
-$(Suggestions.init);
+$(Suggns.init);
 </script>
 {% endblock js %}
