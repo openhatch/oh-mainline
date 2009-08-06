@@ -18,4 +18,13 @@ class GrabLaunchpadBugs(PeriodicTask):
             grab_lp_bugs(lp_project=lp_project,
                          openhatch_project=openhatch_project)
 
+
+class GrabMiroBugs(PeriodicTask):
+    name = "search.GrabMiroBugs"
+    run_every = timedelta(days=1)
+    def run(self, **kwargs):
+        logger = self.get_logger(**kwargs)
+        logger.info("Started to grab Miro bitesized bugs")
+        mysite.customs.miro.grab_miro_bugs()
+
 tasks.register(GrabLaunchpadBugs)

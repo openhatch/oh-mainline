@@ -2,6 +2,7 @@
 import os
 import datetime
 import csv
+import urllib2
 
 import simplejson
 import datetime
@@ -75,3 +76,33 @@ def bugzilla_query_to_bug_ids(csv_fd):
         bugs.append(int(row[0]))
 
     return bugs
+
+def bitesized_bugs_csv_fd():
+    csv_url = 'http://bugzilla.pculture.org/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&field-1-0-0=bug_status&field-1-1-0=product&field-1-2-0=keywords&keywords=bitesized&product=Miro&query_format=advanced&remaction=&type-1-0-0=anyexact&type-1-1-0=anyexact&type-1-2-0=anywords&value-1-0-0=NEW%2CASSIGNED%2CREOPENED&value-1-1-0=Miro&value-1-2-0=bitesized&ctype=csv'
+    csv_fd = urllib2.urlopen(csv_url)
+    return csv_fd
+
+def open_xml_url(xml_url):
+    return urllib2.urlopen(xml_url)
+    
+def grab_miro_bugs():
+    '''Input: Nothing.
+
+    Side-effect: Loops over the Miro bitesized bugs and refreshes them into the DB.
+
+    FIXME: Old bugs that do not get listed in this round of updates will be left
+    stale and unchecked.'''
+    csv_fd = bitesized_bugs_csv_fd()
+    for bug_id in bugzilla_query_to_bug_ids(csv_fd):
+        xml_url = 'http://bugzilla.pculture.org/show_bug.cgi?ctype=xml&id=%d' % bug_id
+        xml_fd = open_xml_url(xml_url)
+        bug = xml2bug_object(xml_fd)
+        # If there is already a bug with this canonical_bug_link in the DB, just delete it.
+        bugs_this_one_replaces = Bug.objects.filter(canonical_bug_link=
+                                                    bug.canonical_bug_link)
+        for delete_me in bugs_this_one_replaces:
+            delete_me.delete()
+
+        # With the coast clear, we save the bug we just extracted from the Miro tracker.
+        bug.save()
+

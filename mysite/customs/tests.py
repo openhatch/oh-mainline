@@ -2,7 +2,7 @@
 # vim: set ai et ts=4 sw=4:
 
 # Imports {{{
-from search.models import Project
+from search.models import Project, Bug
 from profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag
 import profile.views
 
@@ -268,6 +268,10 @@ class LaunchpadDataTests(django.test.TestCase):
         langs = lp_grabber.person_to_bazaar_branch_languages('greg.grossmeier')
         self.assertEqual(langs, ['Python'])
 
+mock_xml_opener = mock.Mock()
+mock_xml_opener.return_value = open(os.path.join(
+    settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml'))
+
 class MiroTests(django.test.TestCase):
     def test_miro_bug_object(self):
         # Parse XML document as if we got it from the web
@@ -299,3 +303,15 @@ Keywords: Torrent unittest""")
         bugs = mysite.customs.miro.bugzilla_query_to_bug_ids(
             csv_fd)
         self.assertEqual(bugs, [1, 2])
+
+    @mock.patch("mysite.customs.miro.open_xml_url", mock_xml_opener)
+    @mock.patch("mysite.customs.miro.bitesized_bugs_csv_fd")
+    def test_full_grab_miro_bugs(self, mock_csv_maker):
+        mock_csv_maker.return_value = StringIO("""bug_id,useless
+1,useless""")
+        mysite.customs.miro.grab_miro_bugs()
+        all_bugs = Bug.objects.all()
+        self.assertEqual(len(all_bugs), 1)
+        bug = all_bugs[0]
+        self.assertEqual(bug.canonical_bug_link,
+                         'http://bugzilla.pculture.org/show_bug.cgi?id=2294')
