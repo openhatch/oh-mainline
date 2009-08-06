@@ -179,28 +179,32 @@ Suggns = {
     },
     'queryManipulator': function() {
         var q = Suggns.$queryField;
-        var term = $(this).parent().find('label').text();
+        var term = $.trim($(this).parent().find('label').text());
+
+        /* Add quotes to terms with whitespace.*/
+        if (term.match(/\s/) !== null) {
+            term = "\"" + term + "\"";
+        }
         if ($(this).is(":checked")) {
             var separator = (q.val().replace(/\s/g, "") == "") ? "" : " ";
             q.val(q.val() + separator + term);
         }
         else {
-            // FIXME: Escape term.
-            var termRegExp = new RegExp("\\s" + term + "\\s", "i");
+            var termRegExp = new RegExp("\\s" + RegExp.escape(term) + "\\s", "i");
             q.val((" "+q.val()+" ").replace(termRegExp, ""));
         }
         q.val($.trim(q.val().replace(/\s+/g, " ")));
     },
     'checkboxUpdater': function() {
         var query = Suggns.$queryField.val();
-        var terms = query.toLowerCase().split(/\s/);
+        var termDelimiter = RegExp(/\s/);
+        var terms = query.toLowerCase().split(termDelimiter);
         Suggns.$terms.each(function() {
-            if ($(this).find('label').text().toLowercase()) {
-                $(this).find('input:checkbox').attr('checked','checked');
+            var value = "";
+            if (terms.contains($(this).find('label').text().toLowerCase())) {
+                value = "checked";
             }
-            else {
-                $(this).find('input:checkbox').attr('checked','checked');
-            }
+            $(this).find('input:checkbox').attr('checked', value);
         });
     },
     'bindCheckboxUpdater': function() {
