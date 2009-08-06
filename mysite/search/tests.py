@@ -2,6 +2,7 @@ import base.tests
 from base.tests import make_twill_url
 
 from profile.models import Person
+import mysite.customs.miro
 
 import django.test
 from search.models import Project, Bug
@@ -11,6 +12,7 @@ import datetime
 import search.launchpad_crawl
 
 import simplejson
+import os
 import mock
 import time
 import twill
@@ -20,6 +22,8 @@ from django.test import TestCase
 from django.core.servers.basehttp import AdminMediaHandler
 from django.core.handlers.wsgi import WSGIHandler
 from StringIO import StringIO
+
+from django.conf import settings
 
 class AutoCompleteTests(base.tests.TwillTests):
     """

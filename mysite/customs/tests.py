@@ -10,6 +10,7 @@ import mock
 import os
 import re
 import twill
+import lxml
 from twill import commands as tc
 from twill.shell import TwillCommandLoop
 import django.test
@@ -23,7 +24,9 @@ import ohloh
 import lp_grabber
 
 from django.test.client import Client
+from django.conf import settings
 from profile.tasks import FetchPersonDataFromOhloh
+import mysite.customs.miro
 # }}}
 
 # Mocked out browser.open
@@ -263,4 +266,13 @@ class LaunchpadDataTests(django.test.TestCase):
     def test_greg_has_python_involvement(self):
         langs = lp_grabber.person_to_bazaar_branch_languages('greg.grossmeier')
         self.assertEqual(langs, ['Python'])
+
+class MiroTests(django.test.TestCase):
+    def test_miro_bug_object(self):
+        # Parse XML document as if we got it from the web
+        f = os.path.join(settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml')
+        xml_fd = file(f)
+        bug = mysite.customs.miro.xml2bug_object(xml_fd)
+        import pdb
+        pdb.set_trace()
 
