@@ -59,8 +59,10 @@ Search bugs
 <div id='results' class='gewgaws module box results'>
     <div id='opps'>
         <form name='search_opps' method='get'> 
-            <input type='text' name='language' id='language'
-            class='default-text' title='Search bugs by language, project or description'
+            <input type='text'
+            name='language' id='language'
+            class='default-text'
+            title='Search bugs by language, project or description'
             value='{{ language }}' />
             <input type='submit' id='button' value='Search' />
         </form>
@@ -91,6 +93,15 @@ Search bugs
 </div> <!-- /#opps -->
 {% endblock main %}
 {% block js %}
+<style>
+    #result-template {
+        display: none;
+    }
+</style>
+<li id='result-template'>
+{# Javascript uses this HTML to regenerate the results list. #}
+{% include 'search/result.html' %}
+</li>
 {{ block.super }}
 <script src='/static/js/search/suggestions.js'></script>
 <script src='/static/js/search/defaultText.js'></script>
