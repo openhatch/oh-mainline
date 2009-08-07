@@ -168,9 +168,9 @@ Gewgaws.fetchGewgawsToDOM = function (queryString) {
 };
 
 Gewgaws.jsonArrayToDocument = function (jsonArray) {
-    $('.gewgaws .li').hide();
+    $('.gewgaws li').hide();
     $(jsonArray).each( function(i) {
-            $gewgaw = $("li").eq(i);
+            $gewgaw = $(".gewgaws li").eq(i);
             $gewgaw.show();
             $gewgaw.attr('id', "gewgaw-" + this.pk);
 

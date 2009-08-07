@@ -5,7 +5,9 @@ if (typeof console == "undefined") {
     console.info = function() {};
 }
 
+fireunitEnabled = true;
 if (typeof fireunit == "undefined") {
+    fireunitEnabled = false;
     fireunit = {};
     fireunit.ok = function() {};
     fireunit.testDone = function() {};
