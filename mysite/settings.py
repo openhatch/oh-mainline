@@ -112,16 +112,16 @@ INSTALLED_APPS = (
     'windmill',
     'south',
     'celery',
-    'search',
-    'profile',
-    'customs',
-    'consulting',
-    'account',
-    'base',
+    'mysite.search',
+    'mysite.profile',
+    'mysite.customs',
+    'mysite.consulting',
+    'mysite.account',
+    'mysite.base',
 )
 
 # file: settings.py #
-TEST_RUNNER = '_profiling.profile_tests'
+TEST_RUNNER = 'mysite._profiling.profile_tests'
 TEST_PROFILE = '/tmp/profile'
 
 ## AMQP, Rabbit Queue, Celery

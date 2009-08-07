@@ -5,11 +5,11 @@ from profile.models import Person
 import mysite.customs.miro
 
 import django.test
-from search.models import Project, Bug
-import search.views
+from .models import Project, Bug
+from . import views
 import lpb2json
 import datetime
-import search.launchpad_crawl
+import mysite.search.launchpad_crawl
 
 import simplejson
 import os
@@ -46,28 +46,28 @@ class AutoCompleteTests(base.tests.TwillTests):
                 )
 
     def testSuggestionsMinimallyWorks(self):
-        suggestions = search.views.get_autocompletion_suggestions('')
+        suggestions = views.get_autocompletion_suggestions('')
         self.assert_("lang:Vogon" in suggestions)
 
     def testSuggestForAllFields(self):
-        c_suggestions = search.views.get_autocompletion_suggestions('C')
+        c_suggestions = views.get_autocompletion_suggestions('C')
         self.assert_('lang:C++' in c_suggestions)
         self.assert_('project:ComicChat' in c_suggestions)
 
     def testQueryNotFieldSpecificFindProject(self):
-        c_suggestions = search.views.get_autocompletion_suggestions('Comi')
+        c_suggestions = views.get_autocompletion_suggestions('Comi')
         self.assert_('project:ComicChat' in c_suggestions)
 
     def testQueryFieldSpecific(self):
-        lang_C_suggestions = search.views.get_autocompletion_suggestions(
+        lang_C_suggestions = views.get_autocompletion_suggestions(
                 'lang:C')
         self.assert_('lang:C++' in lang_C_suggestions)
         self.assert_('lang:Python' not in lang_C_suggestions)
         self.assert_('project:ComicChat' not in lang_C_suggestions)
 
     def testSuggestsCorrectStringsFormattedForJQueryAutocompletePlugin(self):
-        suggestions_list = search.views.get_autocompletion_suggestions('')
-        suggestions_string = search.views.list_to_jquery_autocompletion_format(
+        suggestions_list = views.get_autocompletion_suggestions('')
+        suggestions_string = views.list_to_jquery_autocompletion_format(
                 suggestions_list)
         suggestions_list_reconstructed = suggestions_string.split("\n")
         self.assert_("project:ComicChat" in suggestions_list_reconstructed)
@@ -181,19 +181,19 @@ sample_launchpad_data_dump.return_value = [dict(
         title="Joi's Lab AFS",)]
 
 class AutoCrawlTests(base.tests.TwillTests):
-    @mock.patch('search.launchpad_crawl.dump_data_from_project', 
+    @mock.patch('mysite.search.launchpad_crawl.dump_data_from_project', 
                 sample_launchpad_data_dump)
     def testSearch(self):
         # Verify that we can't find a bug with the right description
-        self.assertRaises(search.models.Bug.DoesNotExist,
-                          search.models.Bug.objects.get,
+        self.assertRaises(mysite.search.models.Bug.DoesNotExist,
+                          mysite.search.models.Bug.objects.get,
                           title="Joi's Lab AFS")
         # Now get all the bugs about rose
-        search.launchpad_crawl.grab_lp_bugs(lp_project='rose',
+        mysite.search.launchpad_crawl.grab_lp_bugs(lp_project='rose',
                                             openhatch_project=
                                             'rose.makesad.us')
         # Now see, we have one!
-        b = search.models.Bug.objects.get(title="Joi's Lab AFS")
+        b = mysite.search.models.Bug.objects.get(title="Joi's Lab AFS")
         self.assertEqual(b.project.name, 'rose.makesad.us')
         # Ta-da.
         return b
@@ -225,7 +225,7 @@ class LaunchpadImporterTests(base.tests.TwillTests):
                         last_polled=some_date)
 
         # Create the bug...
-        search.launchpad_crawl.handle_launchpad_bug_update(query_data, new_data)
+        mysite.search.launchpad_crawl.handle_launchpad_bug_update(query_data, new_data)
         # Verify that the bug was stored.
         bug = Bug.objects.get(canonical_bug_link=
                                        query_data['canonical_bug_link'])
@@ -235,7 +235,7 @@ class LaunchpadImporterTests(base.tests.TwillTests):
         # Now re-do the update, this time with more people involved
         new_data['people_involved'] = 1000 * 1000 * 1000
         # pass the data in...
-        bug = search.launchpad_crawl.handle_launchpad_bug_update(query_data,
+        bug = mysite.search.launchpad_crawl.handle_launchpad_bug_update(query_data,
                                                                  new_data)
         # Do a get; this will explode if there's more than one with the
         # canonical_bug_link, so it tests duplicate finding.
@@ -266,7 +266,7 @@ class LaunchpadImporterTests(base.tests.TwillTests):
                                submitter_username='bob',
                                date_reported=now_d,
                                last_touched=now_d)
-        out_q, out_d = search.launchpad_crawl.clean_lp_data_dict(sample_in)
+        out_q, out_d = mysite.search.launchpad_crawl.clean_lp_data_dict(sample_in)
         self.assertEqual(sample_out_query, out_q)
         # Make sure last_polled is at least in the same year
         self.assertEqual(out_d['last_polled'].year, datetime.date.today().year)

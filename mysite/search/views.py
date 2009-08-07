@@ -4,7 +4,6 @@ from django.core import serializers
 from mysite.search.models import Bug, Project
 import simplejson
 from django.db.models import Q
-import account.forms
 
 import datetime
 from dateutil import tz

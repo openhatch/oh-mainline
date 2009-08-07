@@ -12,10 +12,11 @@ import urllib
 import logging
 
 
-import account.forms
-import base.views
-from profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag, Link_Project_Tag, Link_SF_Proj_Dude_FM, Link_Person_Tag, DataImportAttempt
-from profile.views import get_personal_data
+import mysite.account.forms
+import mysite.base.views
+import mysite.base.controllers
+from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag, Link_Project_Tag, Link_SF_Proj_Dude_FM, Link_Person_Tag, DataImportAttempt
+from mysite.profile.views import get_personal_data
 
 from decorator import decorator
 # }}}
@@ -39,7 +40,7 @@ def login(request):
         return HttpResponseRedirect('/people/%s/' %
                                     urllib.quote(request.user.username))
     data = {}
-    data['notifications'] = base.controllers.get_notification_from_request(
+    data['notifications'] = mysite.base.controllers.get_notification_from_request(
             request)
     return render_to_response('account/login.html', data)
     # }}}
@@ -65,7 +66,7 @@ def signup_do(request):
     post = {}
     post.update(dict(request.POST.items()))
     post['password2'] = post['password1'] 
-    signup_form = account.forms.UserCreationFormWithEmail(post)
+    signup_form = mysite.account.forms.UserCreationFormWithEmail(post)
     if signup_form.is_valid():
 
         user = signup_form.save()
@@ -85,7 +86,7 @@ def signup_do(request):
                 '/people/%s/' % urllib.quote(username))
 
     else:
-        return base.views.homepage(request, signup_form=signup_form)
+        return mysite.base.views.homepage(request, signup_form=signup_form)
     # }}}
 
 def logout(request):
@@ -100,7 +101,7 @@ def edit_photo(request, form = None):
             request.user.get_profile())
     data['the_user'] = request.user
     if form is None:
-        form = account.forms.EditPhotoForm()
+        form = mysite.account.forms.EditPhotoForm()
     data['edit_photo_form'] = form
     return render_to_response('account/edit_photo.html', data)
 
@@ -109,7 +110,7 @@ def edit_photo_do(request, mock=None):
     data = get_personal_data(
             request.user.get_profile())
     person = request.user.get_profile()
-    form = account.forms.EditPhotoForm(request.POST,
+    form = mysite.account.forms.EditPhotoForm(request.POST,
                                        request.FILES,
                                        instance=person)
     if form.is_valid():
@@ -140,14 +141,14 @@ def edit_contact_info(request, edit_email_form = None, show_email_form = None):
 
     # Store edit_email_form in data[], even if we weren't passed one
     if edit_email_form is None:
-        edit_email_form = account.forms.EditEmailForm(
+        edit_email_form = mysite.account.forms.EditEmailForm(
             instance=request.user, prefix='edit_email')
     data['edit_email_form'] = edit_email_form
     
     if show_email_form is None:
         show_email = request.user.get_profile().show_email
         prefix = "show_email"
-        data['show_email_form'] = account.forms.ShowEmailForm(
+        data['show_email_form'] =  mysite.account.forms.ShowEmailForm(
                 initial={'show_email': show_email}, prefix=prefix)
     else:
         data['show_email_form'] = show_email_form
@@ -160,10 +161,10 @@ def edit_contact_info_do(request):
     # {{{
 
     # Handle "Edit email"
-    edit_email_form = account.forms.EditEmailForm(
+    edit_email_form = mysite.account.forms.EditEmailForm(
             request.POST, prefix='edit_email', instance=request.user)
 
-    show_email_form = account.forms.ShowEmailForm(
+    show_email_form = mysite.account.forms.ShowEmailForm(
             request.POST, prefix='show_email')
 
     if edit_email_form.is_valid() and show_email_form.is_valid():

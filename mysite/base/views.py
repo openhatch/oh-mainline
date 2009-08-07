@@ -1,13 +1,14 @@
 from django.http import HttpResponse, \
         HttpResponseRedirect, HttpResponseServerError
 from django.shortcuts import render_to_response
-import account.forms
+import mysite.account
+import mysite.account.forms
 from django_authopenid.forms import OpenidSigninForm
 import simplejson
 from django.template import RequestContext, loader, Context
 from django.core.urlresolvers import reverse
-import profile.views
-from profile.views import display_person_web
+import mysite.profile as profile
+from mysite.profile.views import display_person_web
 
 def homepage(request, signup_form=None):
     if request.user.is_authenticated():
@@ -25,7 +26,7 @@ def homepage(request, signup_form=None):
         notification_id = 'username_taken'
 
     if not signup_form:
-        signup_form = account.forms.UserCreationFormWithEmail()
+        signup_form = mysite.account.forms.UserCreationFormWithEmail()
 
     return render_to_response('base/homepage.html', {
         'signup_form': signup_form,

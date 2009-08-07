@@ -25,21 +25,22 @@ from django.shortcuts import \
 import django.contrib.auth 
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
 from django.contrib.sites.models import Site
 
 # OpenHatch global
-import settings
+from django.conf import settings
 
 # OpenHatch apps
-import base.controllers
-from customs import ohloh
-from profile.models import \
+import mysite.base.controllers
+from mysite.customs import ohloh
+from mysite.profile.models import \
         Person, ProjectExp, \
         Tag, TagType, \
         Link_ProjectExp_Tag, Link_Project_Tag, \
         Link_SF_Proj_Dude_FM, Link_Person_Tag, \
         DataImportAttempt
-from search.models import Project
+from mysite.search.models import Project
 
 # This app
 import forms
@@ -212,7 +213,7 @@ def display_person_web(request, user_to_display__username=None):
     data['title'] = 'openhatch / %s' % user.username
     data['edit_mode'] = False
     data['editable'] = (request.user == user)
-    data['notifications'] = base.controllers.get_notification_from_request(request)
+    data['notifications'] = mysite.base.controllers.get_notification_from_request(request)
 
     return render_to_response('profile/main.html', data)
 
@@ -413,7 +414,9 @@ def project_icon_url(project_name, actually_fetch = True):
             try:
                 icon_data = oh.get_icon_for_project(project_name)
             except ValueError:
-                icon_data = open('static/no-project-icon.png').read()
+                icon_data = open(os.path.join(
+                        settings.MEDIA_ROOT,
+                        'no-project-icon.png')).read()
         
             # then mktemp and save the Ohloh icon there, and rename it in
             tmp = tempfile.mkstemp(dir=project_icons_root)

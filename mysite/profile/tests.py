@@ -1,15 +1,14 @@
 # Imports {{{
-import base.tests
-from base.tests import make_twill_url
+from ..base.tests import make_twill_url, TwillTests
 
-from search.models import Project
-from profile.models import Person, ProjectExp, Tag, TagType, Link_Person_Tag, Link_ProjectExp_Tag, DataImportAttempt
+from ..search.models import Project
+from .models import Person, ProjectExp, Tag, TagType, Link_Person_Tag, Link_ProjectExp_Tag, DataImportAttempt
 
-import profile.views
+from . import views
 
-import settings
+from django.conf import settings
 
-from customs import ohloh 
+from ..customs import ohloh 
 
 import re
 from StringIO import StringIO
@@ -31,7 +30,7 @@ from twill import commands as tc
 from twill.shell import TwillCommandLoop
 # }}}
 
-class ProfileTests(base.tests.TwillTests):
+class ProfileTests(TwillTests):
     # {{{
     fixtures = ['user-paulproteus', 'person-paulproteus',
             'cchost-data-imported-from-ohloh']
@@ -52,7 +51,7 @@ class ProfileTests(base.tests.TwillTests):
         # Verify it shows up in the DB
         self.assert_('seeseehost' in [f.project.name for f in found])
         # Verify it shows up in profile_data_from_username
-        data = profile.views.profile_data_from_username('paulproteus')
+        data = views.profile_data_from_username('paulproteus')
         self.assert_(data['person'].user.username == 'paulproteus')
         projects = [thing[0].project.name for thing in
                     data['exp_taglist_pairs']]
@@ -109,26 +108,26 @@ class ProfileTests(base.tests.TwillTests):
 
     # }}}
 
-class DebTagsTests(base.tests.TwillTests):
+class DebTagsTests(TwillTests):
     # {{{
 
     def testAddOneDebtag(self):
-        tag = profile.views.add_one_debtag_to_project('alpine', 'implemented-in::c')
-        self.assertEqual(profile.views.list_debtags_of_project('alpine'),
+        tag = views.add_one_debtag_to_project('alpine', 'implemented-in::c')
+        self.assertEqual(views.list_debtags_of_project('alpine'),
                          ['implemented-in::c'])
 
     def testImportDebtags(self):
-        profile.views.import_debtags(cooked_string=
+        views.import_debtags(cooked_string=
                                      'alpine: works-with::mail, protocol::smtp') # side effects galore!
-        self.assertEqual(set(profile.views.list_debtags_of_project('alpine')),
+        self.assertEqual(set(views.list_debtags_of_project('alpine')),
                          set(['works-with::mail', 'protocol::smtp']))
     # }}}
 
-#class ExpTag(base.tests.TwillTests):
+#class ExpTag(TwillTests):
 
 # If you're looking for SourceForge and FLOSSMole stuff, look in the repository history.
 
-class PersonTabProjectExpTests(base.tests.TwillTests):
+class PersonTabProjectExpTests(TwillTests):
     # {{{
     fixtures = ['user-paulproteus', 'person-paulproteus', 'cchost-data-imported-from-ohloh']
 
@@ -140,7 +139,7 @@ class PersonTabProjectExpTests(base.tests.TwillTests):
         # }}}
     # }}}
 
-class ProjectExpTests(base.tests.TwillTests):
+class ProjectExpTests(TwillTests):
     # {{{
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry',
             'person-paulproteus', 'cchost-data-imported-from-ohloh']
@@ -367,19 +366,19 @@ mock_giflu.return_value = {
 
 # FIXME: If this is made dynamically, it would be easier!
 class MockFetchPersonDataFromOhloh(object):
-    real_task_class = profile.tasks.FetchPersonDataFromOhloh
+    real_task_class = tasks.FetchPersonDataFromOhloh
     @classmethod
     def delay(*args, **kwargs):
         args = args[1:] # FIXME: Wonder why I need this
         task = MockFetchPersonDataFromOhloh.real_task_class()
         task.run(*args, **kwargs)
 
-class CeleryTests(base.tests.TwillTests):
+class CeleryTests(TwillTests):
     # {{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
-    @mock.patch('customs.ohloh.Ohloh.get_contribution_info_by_username', mock_gcibu)
-    @mock.patch('profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
+    @mock.patch('mysite.customs.ohloh.Ohloh.get_contribution_info_by_username', mock_gcibu)
+    @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
     def test_ohloh_import_via_emulated_bgtask(self):
         """1. Go to the page that has paulproteus' data.  2. Verify that the page doesn't yet know about ccHost. 3. Run the celery task ourselves, but instead of going to Ohloh, we hand-prepare data for it."""
         # {{{
@@ -439,8 +438,8 @@ class CeleryTests(base.tests.TwillTests):
     # FIXME: One day, test that after self.test_slow_loading_via_emulated_bgtask
     # getting the data does not go out to Ohloh.
 
-    @mock.patch('customs.lp_grabber.get_info_for_launchpad_username', mock_giflu)
-    @mock.patch('profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
+    @mock.patch('mysite.customs.lp_grabber.get_info_for_launchpad_username', mock_giflu)
+    @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
     def test_launchpad_import_via_emulated_bgtask(self):
         """1. Go to the page that has paulproteus' data.  2. Verify that the page doesn't yet know about F-Spot. 3. Run the celery task ourselves, but instead of going to Launchpad, we hand-prepare data for it."""
         # {{{
@@ -505,7 +504,7 @@ class CeleryTests(base.tests.TwillTests):
 
     # }}}
 
-class UserListTests(base.tests.TwillTests):
+class UserListTests(TwillTests):
     # {{{
     fixtures = [ 'user-paulproteus', 'person-paulproteus',
             'user-barry', 'person-barry']
@@ -528,7 +527,7 @@ class UserListTests(base.tests.TwillTests):
         tc.follow('Find other folks on OpenHatch')
     # }}}
 
-class ImportContributionsTests(base.tests.TwillTests):
+class ImportContributionsTests(TwillTests):
     """ """
     # {{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
@@ -589,9 +588,9 @@ class ImportContributionsTests(base.tests.TwillTests):
         self.assertFalse(launchpad_account_dia.person_wants_data)
 #}}}
 
-    @mock.patch('customs.ohloh.Ohloh.get_contribution_info_by_username', mock_gcibu)
-    @mock.patch('customs.ohloh.Ohloh.get_contribution_info_by_ohloh_username', mock_gcibou)
-    @mock.patch('profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
+    @mock.patch('mysite.customs.ohloh.Ohloh.get_contribution_info_by_username', mock_gcibu)
+    @mock.patch('mysite.customs.ohloh.Ohloh.get_contribution_info_by_ohloh_username', mock_gcibou)
+    @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
     def test_person_gets_data_iff_they_want_it(self):
         # {{{
         client = Client()
@@ -678,7 +677,7 @@ class ImportContributionsTests(base.tests.TwillTests):
                 'checkbox_0_lp': 'on',
                 'checkbox_0_ou': 'on'
                 }
-        profile.views.prepare_data_import_attempts(post, user)
+        views.prepare_data_import_attempts(post, user)
         self.assertEqual(len(DataImportAttempt.objects.filter(person=user.get_profile())), 3)
 
     # }}}

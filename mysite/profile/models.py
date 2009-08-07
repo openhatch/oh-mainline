@@ -3,7 +3,7 @@
 from django.db import models
 from mysite.search.models import Project, Bug
 from django.contrib.auth.models import User
-import customs.ohloh as ohloh
+from mysite.customs import ohloh
 import datetime
 import sys
 import uuid
@@ -93,7 +93,7 @@ class DataImportAttempt(models.Model):
 
     def do_what_it_says_on_the_tin(self):
         """Attempt to import data."""
-        from profile.tasks import FetchPersonDataFromOhloh
+        from mysite.profile.tasks import FetchPersonDataFromOhloh
         FetchPersonDataFromOhloh.delay(self.id)
 
     def __unicode__(self):

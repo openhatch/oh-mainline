@@ -1,7 +1,7 @@
 import django.contrib.auth.forms
 from django.contrib.auth.models import User
 import django.forms
-from profile.models import Person
+from mysite.profile.models import Person
 import StringIO
 from django.core.files.images import get_image_dimensions
 from django.core.files.uploadedfile import InMemoryUploadedFile
