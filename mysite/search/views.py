@@ -56,8 +56,11 @@ def fetch_bugs(request):
     bugs = Bug.objects.all()
 
     for word in query_words:
-        bugs = bugs.filter(Q(project__language=word) | \
-                Q(title__contains=word) | Q(description__contains=word))
+        bugs = bugs.filter(
+            Q(project__language=word) |
+            Q(title__contains=word) |
+            Q(description__contains=word) |
+            Q(project__name__iexact=word))
 
     bugs.order_by('last_touched')
 
