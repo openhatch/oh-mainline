@@ -298,38 +298,38 @@ class Recommend(TwillTests):
                  (6, 'shell script', False),
                  (7, 'XUL', False)])
 
-    def test_recommendations_with_twill(self):
-        self.login_with_twill()
-        tc.go(make_twill_url('http://openhatch.org/search/'))
-        tc.fv('suggested_searches', 'use_0', '0') # Automake
-        tc.fv('suggested_searches', 'use_1', '0') # C
-        tc.fv('suggested_searches', 'use_2', '0') # C++
-        tc.fv('suggested_searches', 'use_3', '0') # Firefox
-        tc.fv('suggested_searches', 'use_4', '0') # Python
-        tc.fv('suggested_searches', 'use_5', '1') # XUL
-        tc.fv('suggested_searches', 'start', '0')
-        tc.fv('suggested_searches', 'end', '100')
-        tc.submit()
-
-        # Check that if you click checkboxes,
-        # you get the right list of bugs.
-        # Test for bugs that ought to be there
-        # and bugs that ought not to be. 
-        tc.find("Yo! This is a bug in XUL but not Firefox")
-        tc.find("Oy! This is a bug in XUL and Firefox")
-
-        tc.fv('suggested_searches', 'use_0', '0') # Automake
-        tc.fv('suggested_searches', 'use_1', '0') # C
-        tc.fv('suggested_searches', 'use_2', '0') # C++
-        tc.fv('suggested_searches', 'use_3', '1') # Firefox
-        tc.fv('suggested_searches', 'use_4', '0') # Python
-        tc.fv('suggested_searches', 'use_5', '1') # XUL
-        tc.fv('suggested_searches', 'start', '0')
-        tc.fv('suggested_searches', 'end', '100')
-        tc.submit()
-
-        tc.notfind("Yo! This is a bug in XUL but not Firefox")
-        tc.find("Oy! This is a bug in XUL and Firefox")
+#    def test_recommendations_with_twill(self):
+#        self.login_with_twill()
+#        tc.go(make_twill_url('http://openhatch.org/search/'))
+#        tc.fv('suggested_searches', 'use_0', '0') # Automake
+#        tc.fv('suggested_searches', 'use_1', '0') # C
+#        tc.fv('suggested_searches', 'use_2', '0') # C++
+#        tc.fv('suggested_searches', 'use_3', '0') # Firefox
+#        tc.fv('suggested_searches', 'use_4', '0') # Python
+#        tc.fv('suggested_searches', 'use_5', '1') # XUL
+#        tc.fv('suggested_searches', 'start', '0')
+#        tc.fv('suggested_searches', 'end', '100')
+#        tc.submit()
+#
+#        # Check that if you click checkboxes,
+#        # you get the right list of bugs.
+#        # Test for bugs that ought to be there
+#        # and bugs that ought not to be. 
+#        tc.find("Yo! This is a bug in XUL but not Firefox")
+#        tc.find("Oy! This is a bug in XUL and Firefox")
+#
+#        tc.fv('suggested_searches', 'use_0', '0') # Automake
+#        tc.fv('suggested_searches', 'use_1', '0') # C
+#        tc.fv('suggested_searches', 'use_2', '0') # C++
+#        tc.fv('suggested_searches', 'use_3', '1') # Firefox
+#        tc.fv('suggested_searches', 'use_4', '0') # Python
+#        tc.fv('suggested_searches', 'use_5', '1') # XUL
+#        tc.fv('suggested_searches', 'start', '0')
+#        tc.fv('suggested_searches', 'end', '100')
+#        tc.submit()
+#
+#        tc.notfind("Yo! This is a bug in XUL but not Firefox")
+#        tc.find("Oy! This is a bug in XUL and Firefox")
 
 class TestQuerySplitter(django.test.TestCase):
     def test_split_query_words(self):
