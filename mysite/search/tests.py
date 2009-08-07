@@ -266,21 +266,21 @@ class Recommend(base.tests.TwillTests):
         person = Person.objects.get(user__username='paulproteus')
         terms = person.get_recommended_search_terms()
         self.assertEqual(terms,
-                [u'Automake', u'C#', u'C++', u'Make', 
-                    u'Python', u'shell script', u'XUL'])
+                [u'Automake', u'C#', u'C++', u'Make', u'Mozilla Firefox', 
+                 u'Python', u'shell script', u'XUL'])
 
     def test_search_page_context_includes_recommendations(self):
         client = self.login_with_client()
         response = client.get('/search/')
         self.assertEqual(response.context[0]['suggestions'],
                 [(0, 'Automake', 'on'),
-                    (1, 'C#', 'off'),
-                    (2, 'C++', 'off'),
-                    (3, 'Make', 'off'),
-                    (4, 'Mozilla Firefox', 'off'),
-                    (5, 'Python', 'off'),
-                    (6, 'shell script', 'off'),
-                    (7, 'XUL', 'off')])
+                 (1, 'C#', 'off'),
+                 (2, 'C++', 'off'),
+                 (3, 'Make', 'off'),
+                 (4, 'Mozilla Firefox', 'off'),
+                 (5, 'Python', 'off'),
+                 (6, 'shell script', 'off'),
+                 (7, 'XUL', 'off')])
 
     def test_recommendations_with_twill(self):
         self.login_with_twill()
