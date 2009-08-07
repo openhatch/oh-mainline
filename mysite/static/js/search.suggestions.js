@@ -9,10 +9,10 @@ Suggns = {
     'init': function() {
 
         // Initialize variables that store jQuery objects.
-        Suggns.$list = $('#suggested-searches ul');
+        Suggns.$list = $('form#suggested_searches ul');
         Suggns.$toggleLink = $('#toggle-more-suggestions');
-        Suggns.$submitButton = $('#suggested-searches input:submit');
-        Suggns.$terms = $('#suggested-searches li');
+        Suggns.$submitButton = $('form#suggested_searches input:submit');
+        Suggns.$terms = $('form#suggested_searches li');
         Suggns.$queryField = $('#language');
 
         Suggns.updateSuggestionsToHide();
@@ -29,7 +29,7 @@ Suggns = {
     },
     'updateSuggestionsToHide': function() {
         // At first, prepare to conceal *all* suggestions.
-        Suggns.$suggestionsToHide = $('#suggested-searches li');
+        Suggns.$suggestionsToHide = $('#suggested_searches li');
 
         var keepMeVisible = function() {
             // Call this function on a jQuery object that

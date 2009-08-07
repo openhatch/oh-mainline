@@ -164,11 +164,14 @@ Gewgaws.getLitGewgawIndex = function() {
 Gewgaws.fetchGewgawsToDOM = function (queryString) {
     url = this.queryURL + queryString + "&jsoncallback=?";
     $.getJSON(url, this.jsonArrayToDocument);
+    Gewgaws.lightGewgaw(0);
 };
 
 Gewgaws.jsonArrayToDocument = function (jsonArray) {
+    $('.gewgaws .li').hide();
     $(jsonArray).each( function(i) {
             $gewgaw = $("li").eq(i);
+            $gewgaw.show();
             $gewgaw.attr('id', "gewgaw-" + this.pk);
 
             $gewgaw.find('.project').text(this.fields.project);
@@ -178,10 +181,12 @@ Gewgaws.jsonArrayToDocument = function (jsonArray) {
 };
 
 Gewgaws.lightGewgaw = function(gewgawIndex) {
+    console.log('lightGewgaw called');
     if($('.gewgaws li').eq(gewgawIndex).size() == 1) {
-        $('.gewgaws li')
-            .removeClass('lit-up')
-            .eq(gewgawIndex).addClass('lit-up').scrollIntoView();
+        $gg = $('.gewgaws li');
+        console.debug($gg);
+        $gg.removeClass('lit-up')
+        $gg.eq(gewgawIndex).addClass('lit-up').scrollIntoView();
         // FIXME: Automatically scroll when gewgaw is expanded such that its content is off-screen.
     }
     else {

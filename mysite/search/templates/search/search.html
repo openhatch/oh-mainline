@@ -6,13 +6,16 @@ Search bugs
 {% endblock title %}
 
 {% block pagetop %}
-<h3><img alt='Volunteer opportunities' src='/static/images/volunteer-opportunities.png' /></h3>
+<h3><img alt='Volunteer opportunities'alt='Volunteer opportunities'  src='/static/images/volunteer-opportunities.png' /></h3>
 {% endblock pagetop %}
 
 {% block sidebar %}
 <div id='suggested-searches' class='box module'>
+    <h4 style='margin-bottom: 10px;'>
+        <img alt='Recommended searches' src='/static/images/recommended-searches.png' />
+    </h4>
+    {% if the_user.is_authenticated %}
     {% if suggestions %}
-    <h4 style='margin-bottom: 10px;'>Recommended searches</h4>
     <a id='toggle-more-suggestions' href='#'>
         Show <span>more</span> suggestions
     </a>
@@ -30,9 +33,23 @@ Search bugs
         <input type='submit' value='Find bugs'/>
     </form>
     {% else %}
-    <a href='{% url mysite.account.views.login %}'>
-        Log in to get recommended searches.
-    </a>
+        <a href='{% url mysite.profile.views.display_person_web the_user.username %}'>
+            <strong>Log your contributions</strong> to receive recommendations.
+        </a>
+    {% endif %}
+    {% else %}
+    <ul>
+        <li>
+        <a href='{% url mysite.account.views.login %}'>
+            <strong>Log in </strong>to receive recommendations.
+        </a>
+        </li>
+        <li>
+        <a href='{% url mysite.base.views.homepage %}'>
+            Or <strong>sign up</strong> in 10,000 milliseconds (we support OpenID!)
+        </a>
+        </li>
+    </ul>
     {% endif %}
 </div>
 {% endblock sidebar %}
@@ -73,6 +90,21 @@ Search bugs
         <div id='results-sidebar'>
             <a href='#' id='expand-all-link'><img src='/static/images/icons/zoom-in.png' />Expand all</a>
             <a href='#' id='collapse-all-link'><img src='/static/images/icons/zoom-out.png' />Collapse all</a>
+            <div id='shortcuts-legend'>
+                <h5>Shortcuts</h5>
+                <dt>
+                <strong>j</strong>, <strong>n</strong> -&nbsp;
+                </dt>
+                <dd>down</dd>
+                <dt>
+                <strong>k</strong>, <strong>p</strong> -&nbsp;
+                </dt>
+                <dd>up</dd>
+                <dt>
+                <strong>o</strong> -&nbsp;
+                </dt>
+                <dd>expand</dd>
+            </div>
         </div>
         {% if bunch_of_bugs %}
         <ul>

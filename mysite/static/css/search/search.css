@@ -37,8 +37,8 @@
 
 #results-sidebar {
     float: right;
-    width: 100px;
-    padding: 40px 20px;
+    width: 120px;
+    padding: 40px 10px;
 }
 #results-sidebar img {
     float: left;
@@ -138,7 +138,7 @@ p {
     font-size: 17px;
     float: left;
     padding: 5px 10px;
-    width: 520px;
+    width: 535px;
     overflow: hidden;
 }
 
@@ -316,8 +316,10 @@ p {
 #opps li.lit-up {
     /*border-color: #777; #f85931;*/
 }
-#opps li.lit-up .title span {
-    background-color: #ffffa6;
+#opps li.lit-up {
+    border-left: 4px solid pink;
+    position: relative;
+    left: -4px;
 }
 
 #opps li .second-line {
@@ -392,4 +394,35 @@ a:focus {
 input[type='text'].default-text-active {
     color: #999 ! important;
 }
+#shortcuts-legend {
+    float: left;
+    font-size: 8pt;
+}
+#shortcuts-legend h5 {
+    font-size: 9pt;
+    font-weight: normal;
+    margin-bottom: 10px;
+}
+#shortcuts-legend dt {
+    float: left;
+    width: 40px;
+    text-align: right;
+    clear: left;
+}
+#shortcuts-legend dt strong {
+    font-family: monospace;
+    background-color: #f9f9f9;
+    padding: 0 1px;
+}
+#shortcuts-legend dd {
+    float: left;
+    width: 60px;
+    margin: 0;
+}
+#shortcuts-legend dt,
+#shortcuts-legend dd {
+    margin-bottom: 5px;
+}
+
+
 /* vim: set ai ts=4 sts=4 et sw=4: */
