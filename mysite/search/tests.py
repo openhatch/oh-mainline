@@ -276,7 +276,8 @@ class Recommend(TwillTests):
     fixtures = ['user-paulproteus.json',
             'person-paulproteus.json',
             'cchost-data-imported-from-ohloh.json',
-            'bugs-for-two-projects.json']
+            'bugs-for-two-projects.json',
+            'extra-fake-cchost-related-projectexps.json']
 
     def test_get_recommended_search_terms_for_user(self):
         person = Person.objects.get(user__username='paulproteus')
