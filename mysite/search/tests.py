@@ -114,12 +114,26 @@ class TestNonJavascriptSearch(TwillTests):
             tc.find('Description #%d' % n)
 
     def testSearchCombinesQueries(self):
-        url = 'http://openhatch.org/search/'
-        tc.go(make_twill_url(url))
-        tc.fv('search_opps', 'language', 'python "Description #10"')
-        tc.submit()
-        tc.notfind('Description #9')
-        tc.find('Description #10')
+        response = self.client.get('/search/',
+                                   {'language': 'python "Description #10"'})
+
+        found_it = False
+        for bug in response.context[0]['bunch_of_bugs']:
+            if bug.title == 'Title #10':
+                found_it = True
+
+        self.assert_(found_it)
+
+    def testSearchProjectName(self):
+        response = self.client.get('/search/',
+                                   {'language': 'exaile #10'})
+
+        found_it = False
+        for bug in response.context[0]['bunch_of_bugs']:
+            if bug.title == 'Title #10':
+                found_it = True
+
+        self.assert_(found_it)
 
     def testSearchWithArgsWithQuotes(self):
         url = 'http://openhatch.org/search/'
