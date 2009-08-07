@@ -115,7 +115,6 @@ Suggns = {
         Suggns.$queryField.keyup(Suggns.checkboxUpdater);
     },
     'checkboxLabelEmphasisToggler': function() {
-        console.log('yeah');
         var isChecked = $(this).is(':checked');
         var method = (isChecked ? "add" : "remove") + "Class";
         $(this).parent().find('label')[method]("on");

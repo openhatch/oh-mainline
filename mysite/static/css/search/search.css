@@ -1,4 +1,15 @@
-#page-top h3 {
+#page-top img#hatchers {
+    float: right;
+    border: 0;
+}
+#content {
+    position: relative;
+    top: -14px;
+    padding-top: 0;
+}
+#page-top img#volunteer-opportunities {
+}
+#page-top {
     float: left;
     width: 1000px;
     font-size: 19pt;
@@ -119,6 +130,7 @@ p {
     float: left;
     font-size: 11px;
     background-color: #eee;
+    display: none;
 }
 
 #results li label {
@@ -290,6 +302,9 @@ p {
 }
 #opps li .details .fields {
 }
+#opps li.expanded .details {
+    display: block;
+}
 #opps li.expanded .details .fields {
     display: block;
 }
@@ -360,11 +375,9 @@ p {
 
 /* </bug list code> */
 
-:focus {
+a.title:focus {
     -moz-outline-style: none;
     outline: none;
-}
-a:focus {
 }
 .separator {
     color: #aaa;

@@ -1,9 +1,9 @@
 from datetime import timedelta
-from .search.models import Project
+from mysite.search.models import Project
 from celery.task import PeriodicTask
 from celery.registry import tasks
-from .search.launchpad_crawl import grab_lp_bugs, lpproj2ohproj
-from . import search.controllers
+from mysite.search.launchpad_crawl import grab_lp_bugs, lpproj2ohproj
+from mysite.search import controllers
 import mysite.customs.miro
 
 class GrabLaunchpadBugs(PeriodicTask):
@@ -26,5 +26,3 @@ class GrabMiroBugs(PeriodicTask):
         logger = self.get_logger(**kwargs)
         logger.info("Started to grab Miro bitesized bugs")
         mysite.customs.miro.grab_miro_bugs()
-
-tasks.register(GrabLaunchpadBugs)

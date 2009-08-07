@@ -6,7 +6,7 @@ Search bugs
 {% endblock title %}
 
 {% block pagetop %}
-<h3><img alt='Volunteer opportunities'alt='Volunteer opportunities'  src='/static/images/volunteer-opportunities.png' /></h3>
+<h3><img alt='Volunteer opportunities' id='volunteer-opportunities' alt='Volunteer opportunities' src='/static/images/volunteer-opportunities-full.png' /></h3>
 {% endblock pagetop %}
 
 {% block sidebar %}
@@ -16,10 +16,8 @@ Search bugs
     </h4>
     {% if the_user.is_authenticated %}
     {% if suggestions %}
-    <a id='toggle-more-suggestions' href='#'>
-        Show <span>more</span> suggestions
-    </a>
     <form name='suggested_searches'
+        id='suggested_searches'
         method='GET' action=''>
         <ul>
             {% for index, term, czeched in suggestions %}
@@ -30,6 +28,9 @@ Search bugs
             </li>
             {% endfor %}
         </ul>
+        <a id='toggle-more-suggestions' href='#'>
+            Show <span>more</span> suggestions
+        </a>
         <input type='submit' value='Find bugs'/>
     </form>
     {% else %}

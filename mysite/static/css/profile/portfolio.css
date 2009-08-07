@@ -22,9 +22,6 @@
     margin-bottom: 10px;
     font-weight: normal;
 }
-.project-display a {
-    text-decoration: none;
-}
 
 /* Styling for django form output. */
 .project-display input[type='text'],

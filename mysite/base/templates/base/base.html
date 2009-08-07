@@ -46,22 +46,16 @@
                     <div class='center'>
                         <div class='float'>
                             <h2>
-                            {% if the_user.is_authenticated %}
-                            
-                                <a href='/people/{{ the_user.username }}/'>
-                            {% else %}
                                 <a href='/'>
-                            {% endif %}
-                                    <img src='/static/images/the-logo-bluegreen-125px.png' 
-                                    alt='openhatch' />
+                                    <img src='/static/images/the-logo-bluegreen-125px.png' alt='openhatch' />
                                 </a>
                             </h2>
-                            <ul style='width: 740px;' id='account-links'>
+                            <ul id='account-links'>
                                 {% if the_user.is_authenticated %}
                                 <!-- user.is_authenticated indeed -->
                                 <li><a href='{% url mysite.account.views.logout %}'>log out</a></li>
                                 <li><a href='{% url mysite.account.views.settings %}'>settings</a></li>
-                                <li><a href='/people/{{ the_user.username }}/'>{{ the_user.username }}</a></li>
+                                <li id='username'><a href='/people/{{ the_user.username }}/'>{{ the_user.username }}</a></li>
                                 {% else %}
                                 <li><a href='{% url mysite.account.views.login %}'>log in</a></li>
                                 <li><a href='/#create_profile'>sign up</a></li>
@@ -99,6 +93,10 @@
                     {% endif %}
                     {% endblock %}
                 </ul>
+                <div id='page-top'>
+                    {% block pagetop %}
+                    {% endblock pagetop %}
+                </div>
                 <div id='content'>
                     {% block content %}
                     {% endblock content %}
