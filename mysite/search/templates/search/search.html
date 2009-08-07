@@ -112,61 +112,7 @@ Search bugs
             {# Search results {{{ #}
             {% for bug in bunch_of_bugs %}
             <li class='bug {% cycle "even" "odd"%}'>
-            <!--div class='project-info'>
-            <img class='logo' src='{{ bug.project.icon_url }}' />
-            </div-->
-            <div class='first-line'>
-                <a class='title' href='{{ bug.canonical_bug_link }}'
-                    >+
-                    <span>{{ bug.project.name }} - {{ bug.title }}</span>
-                </a>
-                <!--div class='age'>3 days old</div-->
-            </div>
-            <div class='second-line'>
-                <span class='description'>
-                    {% if bug.good_for_newcomers %}
-                    <span class='good-for-beginners' style='width: 300px; '>
-                        Good for newcomers &bull;
-                    </span>
-                    {% endif %}
-                    {{ bug.description }}
-                </span>
-            </div>
-            {% comment %} Details {{{ {% endcomment %}
-            <div class='details'>
-                <div class='fields'>
-                    <span class='field importance'>
-                        <label>People involved: </label>
-                        <span class='value'>
-                            <a href=''>13</a>
-                        </span>
-                    </span>
-                    <span class='field status'>
-                        <label>Status: </label>
-                        <span class='value'>triaged</span>
-                    </span>
-                    <span class='field last-polled'>
-                        <label>Last touched: </label>
-                        <span class='value'>2 weeks ago</span>
-                    </span>
-                    <span class='field origin'>
-                        <label>Link: </label>
-                        <span class='value'>
-                            <a href='{{ bug.canonical_bug_link }}'>Upstream issue</a>
-                        </span>
-                    </span>
-                    <span class='field importance'>
-                        <label>Importance: </label>
-                        <span class='value'>wishlist</span>
-                    </span>
-                    <span class='field last-polled'>
-                        <label>Last polled: </label>
-                        <span class='value'>3 days ago</span>
-                        <!--a href=''>poll now</a-->
-                    </span>
-                </div>
-            </div>
-            {% comment %} }}} {% endcomment %}
+            {% include 'search/result.html' %}
             </li>
             {% endfor %}
             {# }}} #}
