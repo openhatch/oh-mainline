@@ -1,10 +1,4 @@
 [
  {"pk": 3, "model": "search.project", "fields": {"icon_url": "", "name": "ccHost", "language": ""}},
- {"pk": 13, "model": "profile.projectexp", "fields": {"man_months": 1, "description": "", "url": null, "primary_language": "shell script", "project": 3, "person": 1, "source": "Ohloh", "person_role": ""}},
- {"pk": 14, "model": "profile.projectexp", "fields": {"man_months": 1, "description": "", "url": null, "primary_language": "Python", "project": 3, "person": 1, "source": "Ohloh", "person_role": ""}},
- {"pk": 15, "model": "profile.projectexp", "fields": {"man_months": 1, "description": "", "url": null, "primary_language": "C#", "project": 3, "person": 1, "source": "Ohloh", "person_role": ""}},
- {"pk": 16, "model": "profile.projectexp", "fields": {"man_months": 1, "description": "", "url": null, "primary_language": "C++", "project": 3, "person": 1, "source": "Ohloh", "person_role": ""}},
- {"pk": 17, "model": "profile.projectexp", "fields": {"man_months": 1, "description": "", "url": null, "primary_language": "XUL", "project": 3, "person": 1, "source": "Ohloh", "person_role": ""}},
- {"pk": 19, "model": "profile.projectexp", "fields": {"man_months": 1, "description": "", "url": null, "primary_language": "Automake", "project": 3, "person": 1, "source": "Ohloh", "person_role": ""}},
- {"pk": 20, "model": "profile.projectexp", "fields": {"man_months": 1, "description": "", "url": null, "primary_language": "Make", "project": 3, "person": 1, "source": "Ohloh", "person_role": ""}}
+ {"pk": 13, "model": "profile.projectexp", "fields": {"man_months": 1, "description": "", "url": null, "primary_language": "shell script", "project": 3, "person": 1, "source": "Ohloh", "person_role": ""}}
 ]
