@@ -335,15 +335,15 @@ class Recommend(base.tests.TwillTests):
 class TestQuerySplitter(django.test.TestCase):
     def test_split_query_words(self):
         easy = '1 2 3'
-        self.assertEqual(search.views.split_query_words(easy),
+        self.assertEqual(mysite.search.views.split_query_words(easy),
                          ['1', '2', '3'])
 
         easy = '"1"'
-        self.assertEqual(search.views.split_query_words(easy),
+        self.assertEqual(mysite.search.views.split_query_words(easy),
                          ['1'])
 
         easy = 'c#'
-        self.assertEqual(search.views.split_query_words(easy),
+        self.assertEqual(mysite.search.views.split_query_words(easy),
                          ['c#'])
 
 # vim: set ai et ts=4 sw=4 columns=80:
