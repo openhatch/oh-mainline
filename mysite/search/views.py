@@ -46,9 +46,9 @@ def fetch_bugs(request):
     else:
         suggestion_keys = []
 
-    suggestions = [(i+1, i+1 < 4, k, False) for i, k in enumerate(suggestion_keys[1:])]
+    suggestions = [(i+1, k, False) for i, k in enumerate(suggestion_keys[1:])]
     if suggestion_keys:
-        suggestions.insert(0,(0, True, suggestion_keys[0], True))
+        suggestions.insert(0,(0, suggestion_keys[0], True))
 
     query = request.GET.get('language', '')
     query_words = split_query_words(query)

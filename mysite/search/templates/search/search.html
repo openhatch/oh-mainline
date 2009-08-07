@@ -14,8 +14,8 @@ Search bugs
     <form name='suggested_searches'
         method='GET' action=''>
         <ul>
-            {% for index, show_me, term, czeched in suggestions %}
-            <li{% if not show_me %} class='hidden'{% endif %}>
+            {% for index, term, czeched in suggestions %}
+            <li>
             <input id='term_{{ index }}' name='term_{{ index }}' type='checkbox'
             {% if czeched %}checked='on'{% endif %} %} />
             <label for='term_{{ index }}'>{{ term }}</label>
