@@ -113,6 +113,14 @@ class TestNonJavascriptSearch(TwillTests):
         for n in range(717, 723):
             tc.find('Description #%d' % n)
 
+    def testSearchCombinesQueries(self):
+        url = 'http://openhatch.org/search/'
+        tc.go(make_twill_url(url))
+        tc.fv('search_opps', 'language', 'python "Description #10"')
+        tc.submit()
+        tc.notfind('Description #9')
+        tc.find('Description #10')
+
     def testSearchWithArgsWithQuotes(self):
         url = 'http://openhatch.org/search/'
         tc.go(make_twill_url(url))
