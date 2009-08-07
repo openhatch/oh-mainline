@@ -2,6 +2,7 @@ import base.tests
 from base.tests import make_twill_url
 
 from profile.models import Person
+import mysite.customs.miro
 
 import django.test
 from search.models import Project, Bug
@@ -11,6 +12,7 @@ import datetime
 import search.launchpad_crawl
 
 import simplejson
+import os
 import mock
 import time
 import twill
@@ -20,6 +22,8 @@ from django.test import TestCase
 from django.core.servers.basehttp import AdminMediaHandler
 from django.core.handlers.wsgi import WSGIHandler
 from StringIO import StringIO
+
+from django.conf import settings
 
 class AutoCompleteTests(base.tests.TwillTests):
     """
@@ -107,7 +111,20 @@ class TestNonJavascriptSearch(base.tests.TwillTests):
 
         tc.fv('search_opps', 'language', 'c#')
         tc.submit()
-        for n in range(717, 727):
+        for n in range(717, 723):
+            tc.find('Description #%d' % n)
+
+    def testSearchWithArgsWithQuotes(self):
+        url = 'http://openhatch.org/search/'
+        tc.go(make_twill_url(url))
+        tc.fv('search_opps', 'language', '"python"')
+        tc.submit()
+        for n in range(1, 11):
+            tc.find('Description #%d' % n)
+
+        tc.fv('search_opps', 'language', 'c#')
+        tc.submit()
+        for n in range(717, 723):
             tc.find('Description #%d' % n)
 
     def test_json_view(self):
@@ -148,7 +165,7 @@ class TestNonJavascriptSearch(base.tests.TwillTests):
 
         tc.fv('search_opps', 'language', 'c#')
         tc.submit()
-        for n in range(717, 727):
+        for n in range(717, 723):
             tc.find('Description #%d' % n)
         tc.follow('Next')
         for n in range(727, 737):
@@ -314,5 +331,19 @@ class Recommend(base.tests.TwillTests):
 
         tc.notfind("Yo! This is a bug in XUL but not Firefox")
         tc.find("Oy! This is a bug in XUL and Firefox")
+
+class TestQuerySplitter(django.test.TestCase):
+    def test_split_query_words(self):
+        easy = '1 2 3'
+        self.assertEqual(search.views.split_query_words(easy),
+                         ['1', '2', '3'])
+
+        easy = '"1"'
+        self.assertEqual(search.views.split_query_words(easy),
+                         ['1'])
+
+        easy = 'c#'
+        self.assertEqual(search.views.split_query_words(easy),
+                         ['c#'])
 
 # vim: set ai et ts=4 sw=4 columns=80:
