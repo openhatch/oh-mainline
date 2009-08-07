@@ -682,7 +682,7 @@ class ImportContributionsTests(TwillTests):
 
     # }}}
 
-class UserCanShowEmailAddress(base.tests.TwillTests):
+class UserCanShowEmailAddress(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
     def test_show_email(self):
         """This test: (a) verifies my@ema.il does not appear on paulproteus's profile page, then goes to his account settings and opts in to showing it, and then verifies it does appear."""

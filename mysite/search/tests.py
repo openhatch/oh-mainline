@@ -1,7 +1,6 @@
-import base.tests
-from base.tests import make_twill_url
+from mysite.base.tests import make_twill_url, TwillTests
 
-from profile.models import Person
+from mysite.profile.models import Person
 import mysite.customs.miro
 
 import django.test
@@ -25,7 +24,7 @@ from StringIO import StringIO
 
 from django.conf import settings
 
-class AutoCompleteTests(base.tests.TwillTests):
+class AutoCompleteTests(TwillTests):
     """
     Test whether the autocomplete can handle
      - a field-specific query
@@ -86,7 +85,7 @@ class AutoCompleteTests(base.tests.TwillTests):
         response = self.client.get( '/search/get_suggestions', {})
         self.assertEquals(response.status_code, 500)
 
-class TestNonJavascriptSearch(base.tests.TwillTests):
+class TestNonJavascriptSearch(TwillTests):
     fixtures = ['bugs-for-two-projects.json']
 
     def testSearch(self):
@@ -180,7 +179,7 @@ sample_launchpad_data_dump.return_value = [dict(
         date_reported=time.localtime(),
         title="Joi's Lab AFS",)]
 
-class AutoCrawlTests(base.tests.TwillTests):
+class AutoCrawlTests(TwillTests):
     @mock.patch('mysite.search.launchpad_crawl.dump_data_from_project', 
                 sample_launchpad_data_dump)
     def testSearch(self):
@@ -208,7 +207,7 @@ class AutoCrawlTests(base.tests.TwillTests):
         self.assertEqual(new_b.title, "Joi's Lab AFS") # bug title restored
         # thanks to fresh import
 
-class LaunchpadImporterTests(base.tests.TwillTests):
+class LaunchpadImporterTests(TwillTests):
     def test_lp_update_handler(self):
         '''Test the Launchpad import handler with some fake data.'''
         some_date = datetime.datetime(2009, 4, 1, 2, 2, 2)
@@ -273,7 +272,7 @@ class LaunchpadImporterTests(base.tests.TwillTests):
         del out_d['last_polled']
         self.assertEqual(sample_out_data, out_d)
 
-class Recommend(base.tests.TwillTests):
+class Recommend(TwillTests):
     fixtures = ['user-paulproteus.json',
             'person-paulproteus.json',
             'cchost-data-imported-from-ohloh.json',

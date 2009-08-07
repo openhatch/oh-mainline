@@ -8,7 +8,7 @@ import simplejson
 import datetime
 import glob
 import lxml
-from .search.models import Project, Bug
+from ..search.models import Project, Bug
 import codecs
 
 def get_tag_text_from_xml(xml_doc, tag_name, index = 0):
