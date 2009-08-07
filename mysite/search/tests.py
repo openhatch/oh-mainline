@@ -289,26 +289,26 @@ class Recommend(TwillTests):
         client = self.login_with_client()
         response = client.get('/search/')
         self.assertEqual(response.context[0]['suggestions'],
-                [(0, 'Automake', 'on'),
-                 (1, 'C#', 'off'),
-                 (2, 'C++', 'off'),
-                 (3, 'Make', 'off'),
-                 (4, 'Mozilla Firefox', 'off'),
-                 (5, 'Python', 'off'),
-                 (6, 'shell script', 'off'),
-                 (7, 'XUL', 'off')])
+                [(0, 'Automake', True),
+                 (1, 'C#', False),
+                 (2, 'C++', False),
+                 (3, 'Make', False),
+                 (4, 'Mozilla Firefox', False),
+                 (5, 'Python', False),
+                 (6, 'shell script', False),
+                 (7, 'XUL', False)])
 
     def test_recommendations_with_twill(self):
         self.login_with_twill()
         tc.go(make_twill_url('http://openhatch.org/search/'))
-        tc.fv('suggested_criteria', 'use_0', '0') # Automake
-        tc.fv('suggested_criteria', 'use_1', '0') # C
-        tc.fv('suggested_criteria', 'use_2', '0') # C++
-        tc.fv('suggested_criteria', 'use_3', '0') # Firefox
-        tc.fv('suggested_criteria', 'use_4', '0') # Python
-        tc.fv('suggested_criteria', 'use_5', '1') # XUL
-        tc.fv('suggested_criteria', 'start', '0')
-        tc.fv('suggested_criteria', 'end', '100')
+        tc.fv('suggested_searches', 'use_0', '0') # Automake
+        tc.fv('suggested_searches', 'use_1', '0') # C
+        tc.fv('suggested_searches', 'use_2', '0') # C++
+        tc.fv('suggested_searches', 'use_3', '0') # Firefox
+        tc.fv('suggested_searches', 'use_4', '0') # Python
+        tc.fv('suggested_searches', 'use_5', '1') # XUL
+        tc.fv('suggested_searches', 'start', '0')
+        tc.fv('suggested_searches', 'end', '100')
         tc.submit()
 
         # Check that if you click checkboxes,
@@ -318,14 +318,14 @@ class Recommend(TwillTests):
         tc.find("Yo! This is a bug in XUL but not Firefox")
         tc.find("Oy! This is a bug in XUL and Firefox")
 
-        tc.fv('suggested_criteria', 'use_0', '0') # Automake
-        tc.fv('suggested_criteria', 'use_1', '0') # C
-        tc.fv('suggested_criteria', 'use_2', '0') # C++
-        tc.fv('suggested_criteria', 'use_3', '1') # Firefox
-        tc.fv('suggested_criteria', 'use_4', '0') # Python
-        tc.fv('suggested_criteria', 'use_5', '1') # XUL
-        tc.fv('suggested_criteria', 'start', '0')
-        tc.fv('suggested_criteria', 'end', '100')
+        tc.fv('suggested_searches', 'use_0', '0') # Automake
+        tc.fv('suggested_searches', 'use_1', '0') # C
+        tc.fv('suggested_searches', 'use_2', '0') # C++
+        tc.fv('suggested_searches', 'use_3', '1') # Firefox
+        tc.fv('suggested_searches', 'use_4', '0') # Python
+        tc.fv('suggested_searches', 'use_5', '1') # XUL
+        tc.fv('suggested_searches', 'start', '0')
+        tc.fv('suggested_searches', 'end', '100')
         tc.submit()
 
         tc.notfind("Yo! This is a bug in XUL but not Firefox")

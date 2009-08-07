@@ -5,6 +5,8 @@ class Project(models.Model):
     name = models.CharField(max_length=200, unique = True)
     language = models.CharField(max_length=200)
     icon_url = models.URLField(max_length=200)
+    def __unicode__(self):
+        return "<Project name='%s' language='%s'>" % (self.name, self.language)
 
 class Bug(models.Model):
     project = models.ForeignKey(Project)
@@ -20,3 +22,6 @@ class Bug(models.Model):
     submitter_realname = models.CharField(max_length=200)
     canonical_bug_link = models.URLField(max_length=200)
     good_for_newcomers = models.BooleanField(default=False)
+
+    def __unicode__(self):
+        return "<Bug title='%s' project='%s' description='%s...'>" % (self.title, self.project.name, self.description[:50])

@@ -14,8 +14,8 @@ Search bugs
     <form name='suggested_searches'
         method='GET' action=''>
         <ul>
-            {% for index, show_me, term, czeched in suggestions %}
-            <li{% if not show_me %} class='hidden'{% endif %}>
+            {% for index, term, czeched in suggestions %}
+            <li>
             <input id='term_{{ index }}' name='term_{{ index }}' type='checkbox'
             {% if czeched %}checked='on'{% endif %} %} />
             <label for='term_{{ index }}'>{{ term }}</label>
@@ -137,82 +137,5 @@ Search bugs
 {% endblock main %}
 {% block js %}
 {{ block.super }}
-<script>
-Suggns = {
-    '$list': null,
-    '$toggleLink': null,
-    '$submitButton': null,
-    '$hiddenItems': null,
-    '$terms': null,
-    '$queryField': null,
-    'init': function() {
-
-        // Initialize variables that store jQuery objects.
-        Suggns.$list = $('#suggested-searches ul');
-        Suggns.$toggleLink = $('#toggle-more-suggestions');
-        Suggns.$submitButton = $('#suggested-searches input[type="submit"]');
-        Suggns.$hiddenItems = $('#suggested-searches li.hidden');
-        Suggns.$terms = $('#suggested-searches li');
-        Suggns.$queryField = $('#language');
-
-        // Bind event handlers.
-        Suggns.bindToggler();
-        Suggns.bindQueryManipulators();
-        Suggns.bindCheckboxUpdater();
-
-        // 
-        Suggns.$submitButton.hide();
-    },
-    'bindToggler': function() {
-        Suggns.$toggleLink.click(Suggns.toggler);
-    },
-    'toggler': function() {
-        var isHidden = Suggns.$hiddenItems.eq(0).is(':hidden');
-        var verb = isHidden ? 'show' : 'hide';
-        var determiner = isHidden ? 'fewer' : 'more';
-        Suggns.$hiddenItems[verb]();
-        Suggns.$toggleLink.find('span').text(determiner);
-        return false;
-    },
-    'bindQueryManipulators': function() {
-        Suggns.$terms.find('input[type="checkbox"]').change(Suggns.queryManipulator);
-    },
-    'queryManipulator': function() {
-        var q = Suggns.$queryField;
-        var term = $.trim($(this).parent().find('label').text());
-
-        /* Add quotes to terms with whitespace.*/
-        if (term.match(/\s/) !== null) {
-            term = "\"" + term + "\"";
-        }
-        if ($(this).is(":checked")) {
-            var separator = (q.val().replace(/\s/g, "") == "") ? "" : " ";
-            q.val(q.val() + separator + term);
-        }
-        else {
-            var termRegExp = new RegExp("\\s" + RegExp.escape(term) + "\\s", "i");
-            q.val((" "+q.val()+" ").replace(termRegExp, ""));
-        }
-        q.val($.trim(q.val().replace(/\s+/g, " ")));
-    },
-    'checkboxUpdater': function() {
-        var query = Suggns.$queryField.val();
-        var termDelimiter = RegExp(/\s/);
-        var terms = query.toLowerCase().split(termDelimiter);
-        Suggns.$terms.each(function() {
-            var value = "";
-            if (terms.contains($(this).find('label').text().toLowerCase())) {
-                value = "checked";
-            }
-            $(this).find('input:checkbox').attr('checked', value);
-        });
-    },
-    'bindCheckboxUpdater': function() {
-        Suggns.$queryField.keyup(Suggns.checkboxUpdater);
-    },
-    'getCheckboxByTerm': function(term) {
-    }
-};
-$(Suggns.init);
-</script>
+<script src='/static/js/search.suggestions.js'></script>
 {% endblock js %}
