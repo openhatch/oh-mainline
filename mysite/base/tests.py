@@ -84,12 +84,6 @@ class LandingPage(TwillTests):
         self.assertTemplateUsed(response2, 'base/landing.html')
         # }}}
 
-    def test_widget_on_landing_page(self):
-        # {{{
-        self.login_with_twill()
-        tc.go('/')
-        tc.find('contributions to open source')
-        # }}}
     # }}}
 
 # vim: set ai et ts=4 sw=4 nu:

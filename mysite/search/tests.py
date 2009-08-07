@@ -111,7 +111,20 @@ class TestNonJavascriptSearch(base.tests.TwillTests):
 
         tc.fv('search_opps', 'language', 'c#')
         tc.submit()
-        for n in range(717, 727):
+        for n in range(717, 723):
+            tc.find('Description #%d' % n)
+
+    def testSearchWithArgsWithQuotes(self):
+        url = 'http://openhatch.org/search/'
+        tc.go(make_twill_url(url))
+        tc.fv('search_opps', 'language', '"python"')
+        tc.submit()
+        for n in range(1, 11):
+            tc.find('Description #%d' % n)
+
+        tc.fv('search_opps', 'language', 'c#')
+        tc.submit()
+        for n in range(717, 723):
             tc.find('Description #%d' % n)
 
     def test_json_view(self):
@@ -152,7 +165,7 @@ class TestNonJavascriptSearch(base.tests.TwillTests):
 
         tc.fv('search_opps', 'language', 'c#')
         tc.submit()
-        for n in range(717, 727):
+        for n in range(717, 723):
             tc.find('Description #%d' % n)
         tc.follow('Next')
         for n in range(727, 737):
@@ -270,21 +283,21 @@ class Recommend(base.tests.TwillTests):
         person = Person.objects.get(user__username='paulproteus')
         terms = person.get_recommended_search_terms()
         self.assertEqual(terms,
-                [u'Automake', u'C#', u'C++', u'Make', 
-                    u'Python', u'shell script', u'XUL'])
+                [u'Automake', u'C#', u'C++', u'Make', u'Mozilla Firefox', 
+                 u'Python', u'shell script', u'XUL'])
 
     def test_search_page_context_includes_recommendations(self):
         client = self.login_with_client()
         response = client.get('/search/')
         self.assertEqual(response.context[0]['suggestions'],
                 [(0, 'Automake', 'on'),
-                    (1, 'C#', 'off'),
-                    (2, 'C++', 'off'),
-                    (3, 'Make', 'off'),
-                    (4, 'Mozilla Firefox', 'off'),
-                    (5, 'Python', 'off'),
-                    (6, 'shell script', 'off'),
-                    (7, 'XUL', 'off')])
+                 (1, 'C#', 'off'),
+                 (2, 'C++', 'off'),
+                 (3, 'Make', 'off'),
+                 (4, 'Mozilla Firefox', 'off'),
+                 (5, 'Python', 'off'),
+                 (6, 'shell script', 'off'),
+                 (7, 'XUL', 'off')])
 
     def test_recommendations_with_twill(self):
         self.login_with_twill()
@@ -318,5 +331,19 @@ class Recommend(base.tests.TwillTests):
 
         tc.notfind("Yo! This is a bug in XUL but not Firefox")
         tc.find("Oy! This is a bug in XUL and Firefox")
+
+class TestQuerySplitter(django.test.TestCase):
+    def test_split_query_words(self):
+        easy = '1 2 3'
+        self.assertEqual(search.views.split_query_words(easy),
+                         ['1', '2', '3'])
+
+        easy = '"1"'
+        self.assertEqual(search.views.split_query_words(easy),
+                         ['1'])
+
+        easy = 'c#'
+        self.assertEqual(search.views.split_query_words(easy),
+                         ['c#'])
 
 # vim: set ai et ts=4 sw=4 columns=80:

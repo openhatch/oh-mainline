@@ -268,10 +268,6 @@ class LaunchpadDataTests(django.test.TestCase):
         langs = lp_grabber.person_to_bazaar_branch_languages('greg.grossmeier')
         self.assertEqual(langs, ['Python'])
 
-mock_xml_opener = mock.Mock()
-mock_xml_opener.return_value = open(os.path.join(
-    settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml'))
-
 class MiroTests(django.test.TestCase):
     def test_miro_bug_object(self):
         # Parse XML document as if we got it from the web
@@ -304,9 +300,12 @@ Keywords: Torrent unittest""")
             csv_fd)
         self.assertEqual(bugs, [1, 2])
 
-    @mock.patch("mysite.customs.miro.open_xml_url", mock_xml_opener)
+    @mock.patch("mysite.customs.miro.open_xml_url")
     @mock.patch("mysite.customs.miro.bitesized_bugs_csv_fd")
-    def test_full_grab_miro_bugs(self, mock_csv_maker):
+    def test_full_grab_miro_bugs(self, mock_csv_maker, mock_xml_opener):
+        mock_xml_opener.return_value = open(os.path.join(
+            settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml'))
+
         mock_csv_maker.return_value = StringIO("""bug_id,useless
 1,useless""")
         mysite.customs.miro.grab_miro_bugs()
@@ -315,3 +314,61 @@ Keywords: Torrent unittest""")
         bug = all_bugs[0]
         self.assertEqual(bug.canonical_bug_link,
                          'http://bugzilla.pculture.org/show_bug.cgi?id=2294')
+
+    @mock.patch("mysite.customs.miro.open_xml_url")
+    @mock.patch("mysite.customs.miro.bitesized_bugs_csv_fd")
+    def test_full_grab_miro_bugs_refreshes_older_bugs(self, mock_csv_maker, mock_xml_opener):
+        mock_xml_opener.return_value = open(os.path.join(
+            settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml'))
+
+        mock_csv_maker.return_value = StringIO("""bug_id,useless
+2294,useless""")
+        mysite.customs.miro.grab_miro_bugs()
+
+        # Pretend there's old data lying around:
+        bug = Bug.objects.get()
+        bug.people_involved = 1
+        bug.save()
+
+        mock_xml_opener.return_value = open(os.path.join(
+            settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml'))
+
+        # Now refresh
+        mysite.customs.miro.grab_miro_bugs()
+
+        # Now verify there is only one bug, and its people_involved is 5
+        bug = Bug.objects.get()
+        self.assertEqual(bug.people_involved, 5)
+
+
+    @mock.patch("mysite.customs.miro.open_xml_url")
+    @mock.patch("mysite.customs.miro.bitesized_bugs_csv_fd")
+    def test_regrab_miro_bugs_refreshes_older_bugs_even_when_missing_from_csv(self, mock_csv_maker, mock_xml_opener):
+        mock_xml_opener.return_value = open(os.path.join(
+            settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml'))
+
+        # Situation: Assume there are zero bitesized bugs today.
+        # Desire: We re-get old bugs that don't show up in the CSV.
+
+        # Prereq: We have some bug with lame data:
+        bug = Bug()
+        bug.people_involved = 1
+        bug.canonical_bug_link = 'http://bugzilla.pculture.org/show_bug.cgi?id=2294'
+        bug.date_reported = datetime.datetime.now()
+        bug.last_touched = datetime.datetime.now()
+        bug.last_polled = datetime.datetime.now()
+        bug.project, _ = Project.objects.get_or_create(name='Miro')
+        bug.save()
+
+        # Prepare a fake CSV that is empty
+        mock_csv_maker.return_value = StringIO('')
+
+        # Now, do a crawl and notice that we updated the bug even though the CSV is empty
+        
+        mysite.customs.miro.grab_miro_bugs() # refreshes no bugs since CSV is empty!
+        all_bugs = Bug.objects.all()
+        self.assertEqual(len(all_bugs), 1)
+        bug = all_bugs[0]
+        self.assertEqual(bug.people_involved, 5)
+
+
