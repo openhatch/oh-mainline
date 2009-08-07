@@ -1,13 +1,19 @@
+#page-top h3 {
+    float: left;
+    width: 1000px;
+    font-size: 19pt;
+}
+#suggested-searches h4 {
+    width: 95%;
+    font-size: 10pt;
+    font-weight: normal;
+}
 .no-opps {
-    border: 1px solid #d2e6df;
-    background-color: #eef;
     color: #222;
     padding: 10px;
     font-size: 120%;
     line-height: 130%;
     width: 460px;
-    margin-top: 20px;
-    -moz-border-radius: 10px;
 }
 #heading {
     margin: 20px 0 10px 0;
@@ -29,6 +35,19 @@
     width: 550px;
 }
 
+#results-sidebar {
+    float: right;
+    width: 100px;
+    padding: 40px 20px;
+}
+#results-sidebar img {
+    float: left;
+    margin-right: 5px;
+}
+#results-sidebar a {
+    float: left;
+    margin-bottom: 10px;
+}
 #results-widget {
     padding: 12px;
     padding-bottom: 6px;
@@ -41,12 +60,12 @@
     margin-right: 20px;
 }
 #main {
-    width: 630px;
+    width: 715px;
     float: left;
 }
 #main .box {
     padding: 10px;
-    width: 580px;
+    width: 700px;
     float: left;
 }
 #suggested-searches {
@@ -99,7 +118,7 @@ p {
     padding-top: 0;
     float: left;
     font-size: 11px;
-    background-color: #eef;
+    background-color: #eee;
 }
 
 #results li label {
@@ -119,7 +138,7 @@ p {
     font-size: 17px;
     float: left;
     padding: 5px 10px;
-    width: 435px;
+    width: 520px;
     overflow: hidden;
 }
 
@@ -161,7 +180,7 @@ p {
     overflow: hidden;
 }
 #results li .description {
-    width: 445px;
+    width: 525px;
     padding: .3em .7em;
     color: #888;
     float: left;
@@ -250,6 +269,7 @@ p {
     margin: 0;
     padding: 0;
     float: left;
+    width: 560px;
 }
 #opps li {
     overflow: hidden;
@@ -267,14 +287,6 @@ p {
     width: 65px;
     text-align: right;
     color: #888;
-}
-#opps li .details {
-    /*border-top: 1px solid #ccf;*/
-    padding: .3em .7em;
-    padding-top: 0;
-    float: left;
-    font-size: 11px;
-    background-color: #eef;
 }
 #opps li .details .fields {
 }
@@ -315,7 +327,7 @@ p {
 
 #opps form {
     float: left;
-    width: 500px;
+    width: 690px;
 }
 #opps form label {
     float: left;
@@ -327,6 +339,7 @@ p {
     font-size: 19px;
     padding: 10px;
     color: #222;
+    width: 570px;
 }
 #opps form input[type='submit'] {
     font-size: 19px;
@@ -375,5 +388,8 @@ a:focus {
 }
 #suggested-searches label.on {
     font-weight: bold;
+}
+input[type='text'].default-text-active {
+    color: #999 ! important;
 }
 /* vim: set ai ts=4 sts=4 et sw=4: */

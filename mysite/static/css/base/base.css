@@ -6,12 +6,11 @@ body {
     padding: 0;
 }
 a {
-    color: darkorange; 
+    color: #ff7800; /*00a8ff; eeb300; */
     text-decoration: none;
 }
 
 a:hover {
-    color: orange; 
     text-decoration: underline;
 }
 

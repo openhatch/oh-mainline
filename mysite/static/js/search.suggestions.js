@@ -69,6 +69,10 @@ Suggns = {
     },
     'queryManipulator': function() {
         var query = Suggns.$queryField.val()
+        if(query == Suggns.$queryField[0].title) {
+            query = "";
+            Suggns.$queryField.removeClass('default-text-active');
+        }
         var term = $.trim($(this).parent().find('label').text());
 
         // Add quotes to terms with whitespace.

@@ -1,22 +1,12 @@
-/* vim: set ai ts=4 sts=4 et sw=4: */
-
-function log(thing) {
-    if (window.console === undefined) {
-        /* do nothing */
-    } else {
-       console.log(thing);
-    }
-}
-
 $.fn.toggleText = function(text1, text2) {
     newtext = (this.text() == text2) ? text1 : text2;
     return this.text(newtext);
 };
 
 $.fn.toggleExpanded = function() {
-    log(this, 'toggleExpanded');
+    console.log(this, 'toggleExpanded');
     this.toggleClass('expanded');
-    // this.scrollIntoView(); //disable for video demo. FIXME: restore
+    this.scrollIntoView(); //disable for video demo. FIXME: restore
     return this;
 };
 // Return the available content height space in browser window
@@ -39,7 +29,7 @@ $.fn.scrollIntoView = function() {
 }
 
 
-$(document).ready(function() {
+$(function() {
 
         Gewgaws.lightGewgaw(0);
 
@@ -76,7 +66,7 @@ $(document).ready(function() {
         $(document).bind('keyup',
                 {combi: 'o', disableInInput: true}, 
                 function() {
-                log('open lit gewgaw');
+                console.log('open lit gewgaw');
                 $('.gewgaws .lit-up').toggleExpanded();
                 });
 
@@ -88,7 +78,7 @@ $(document).ready(function() {
         $('.title').click(function () {
                 $gewgaw = $(this.parentNode.parentNode);
                 $gewgaw.toggleExpanded();
-                log($gewgaw[0]);
+                console.log($gewgaw[0]);
                 return false;
                 });
 
@@ -129,16 +119,16 @@ $(document).ready(function() {
                 }
                 fruitySerialized.push(fruity_pushable);
                 }
-                log('FRUITYSERIALIZED:');
-                log(fruitySerialized);
-                log('SLASH FRUITYSERIALIZED:');
+                console.log('FRUITYSERIALIZED:');
+                console.log(fruitySerialized);
+                console.log('SLASH FRUITYSERIALIZED:');
 
                 return Gewgaws.update(fruitySerialized);
         });
 
         // Handle autocomplete. {{{
         $input = $("#opps form input[type='text']");
-        log("input", $input);
+        console.log("input", $input);
         url = "/search/get_suggestions";
         acOptions = {
             'minChars': 1,
@@ -157,7 +147,7 @@ $(document).ready(function() {
 Gewgaws = {}
 
 Gewgaws.focusSearchInput = function () {
-    log('focus search input called');
+    console.log('focus search input called');
     $("#opps form input[type='text']").focus();
 };
 
@@ -189,15 +179,13 @@ Gewgaws.jsonArrayToDocument = function (jsonArray) {
 
 Gewgaws.lightGewgaw = function(gewgawIndex) {
     if($('.gewgaws li').eq(gewgawIndex).size() == 1) {
-        /* FIXME: Put this back when it matters.
         $('.gewgaws li')
             .removeClass('lit-up')
             .eq(gewgawIndex).addClass('lit-up').scrollIntoView();
-            */
         // FIXME: Automatically scroll when gewgaw is expanded such that its content is off-screen.
     }
     else {
-        log('no gewgaw to highlight');
+        console.log('no gewgaw to highlight');
     }
 };
 
@@ -244,3 +232,6 @@ Gewgaws.moveGewgawFocusDown = function() {
 Gewgaws.moveGewgawFocusUp = function() {
     Gewgaws.lightGewgaw(Gewgaws.getLitGewgawIndex() - 1);
 };
+
+/* vim: set ai ts=4 sts=4 et sw=4: */
+

@@ -5,9 +5,14 @@ Search bugs
 {{ block.super }}
 {% endblock title %}
 
+{% block pagetop %}
+<h3><img alt='Volunteer opportunities' src='/static/images/volunteer-opportunities.png' /></h3>
+{% endblock pagetop %}
+
 {% block sidebar %}
 <div id='suggested-searches' class='box module'>
-    <h3 style='margin-bottom: 10px;'>Suggested searches:</h3>
+    {% if suggestions %}
+    <h4 style='margin-bottom: 10px;'>Recommended searches</h4>
     <a id='toggle-more-suggestions' href='#'>
         Show <span>more</span> suggestions
     </a>
@@ -24,17 +29,22 @@ Search bugs
         </ul>
         <input type='submit' value='Find bugs'/>
     </form>
+    {% else %}
+    <a href='{% url mysite.account.views.login %}'>
+        Log in to get recommended searches.
+    </a>
+    {% endif %}
 </div>
 {% endblock sidebar %}
 
 {% block main %}
-    <div id='results' class='gewgaws module box results'>
+<div id='results' class='gewgaws module box results'>
     <div id='opps'>
         <form name='search_opps' method='get'> 
-            <h3><label for='language'>Find some bugs!</label></h3>
             <input type='text' name='language' id='language'
+            class='default-text' title='Search bugs by language, project or description'
             value='{{ language }}' />
-            <input type='submit' id='button' value='Go' />
+            <input type='submit' id='button' value='Search' />
         </form>
 
         <div id='results-widget'>
@@ -56,12 +66,14 @@ Search bugs
                 <span class='separator'>&nbsp;</span>
                 <a href='{{ next_page_url }}' id='next-page'>Next page &raquo;</a>
                 <span class='separator'>&nbsp;</span>
-                <a href='EXPAND_ALL_URL' id='expand-all-link'>Expand all</a>
-                <a href='COLLAPSE_ALL_URL' id='collapse-all-link'>Collapse all</a>
             </span>
 
         </div><!-- /#results-widget -->
 
+        <div id='results-sidebar'>
+            <a href='#' id='expand-all-link'><img src='/static/images/icons/zoom-in.png' />Expand all</a>
+            <a href='#' id='collapse-all-link'><img src='/static/images/icons/zoom-out.png' />Collapse all</a>
+        </div>
         {% if bunch_of_bugs %}
         <ul>
             {# Search results {{{ #}
@@ -130,12 +142,13 @@ Search bugs
         <p class='no-opps'>
         No opportunities found matching your query: {{ language }}.
         </p>
-    {% endif %}
+        {% endif %}
 
     </div> <!-- /#results -->
-    </div> <!-- /#opps -->
+</div> <!-- /#opps -->
 {% endblock main %}
 {% block js %}
 {{ block.super }}
 <script src='/static/js/search.suggestions.js'></script>
+<script src='/static/js/search.js'></script>
 {% endblock js %}

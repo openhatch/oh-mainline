@@ -24,14 +24,19 @@
 
 {% block content %}
 
+<div id='page-top'>
+{% block pagetop %}
+{% endblock pagetop %}
+</div>
+
 <div id='sidebar'>
-{% block sidebar %}
-{% endblock sidebar %}
+    {% block sidebar %}
+    {% endblock sidebar %}
 </div>
 
 <div id='main'>
-{% block main %}
-{% endblock main %}
+    {% block main %}
+    {% endblock main %}
 </div>
 
 {% endblock content %}
