@@ -363,12 +363,17 @@ a:focus {
 #opps li.expanded .description {
     white-space: normal;
 }
-.hidden {
-    display: none;
-}
 #toggle-more-suggestions {
     float: left;
     width: 95%;
     margin-bottom: 10px;
+}
+#suggested-searches input[type='checkbox'],
+#suggested-searches label {
+    cursor: pointer;
+    cursor: hand;
+}
+#suggested-searches label.on {
+    font-weight: bold;
 }
 /* vim: set ai ts=4 sts=4 et sw=4: */
