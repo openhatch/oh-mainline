@@ -104,7 +104,6 @@ p {
 /* generic list code */
 #results.box {
     padding-right: 0;
-    padding-bottom: 0;
 }
 #results ul {
     margin: 0;

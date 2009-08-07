@@ -53,29 +53,30 @@ def fetch_bugs(request):
     start = int(request.GET.get('start', 1))
     end = int(request.GET.get('end', 10))
 
-    bugs = Bug.objects.all()
+    if query:
+        bugs = Bug.objects.all()
 
-    for word in query_words:
-        bugs = bugs.filter(
-            Q(project__language=word) |
-            Q(title__contains=word) |
-            Q(description__contains=word) |
-            Q(project__name__iexact=word))
+        for word in query_words:
+            bugs = bugs.filter(
+                Q(project__language=word) |
+                Q(title__contains=word) |
+                Q(description__contains=word) |
+                Q(project__name__iexact=word))
 
-    bugs.order_by('last_touched')
+        bugs.order_by('last_touched')
 
-    #if status:
-    #    bugs = bugs.filter(project__status=status)
-        
-    bugs = bugs[start-1:end]
+        bugs = bugs[start-1:end]
 
-    for b in bugs:
-        # b.description = b.description[:65] + "..."
-        b.project.icon_url = "/static/images/icons/projects/%s.png" % \
-                b.project.name.lower()
-        # FIXME: Randomize for camera
+        for b in bugs:
+            # b.description = b.description[:65] + "..."
+            b.project.icon_url = "/static/images/icons/projects/%s.png" % \
+                    b.project.name.lower()
+            # FIXME: Randomize for camera
 
-    bugs = list(bugs)
+        bugs = list(bugs)
+
+    else:
+        bugs = []
 
     if format == 'json':
         return bugs_to_json_response(bugs, request.GET.get(

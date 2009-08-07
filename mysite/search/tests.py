@@ -20,9 +20,10 @@ from twill.shell import TwillCommandLoop
 from django.test import TestCase
 from django.core.servers.basehttp import AdminMediaHandler
 from django.core.handlers.wsgi import WSGIHandler
-from StringIO import StringIO
+from django.core.urlresolvers import reverse
 
 from django.conf import settings
+from StringIO import StringIO
 
 class AutoCompleteTests(TwillTests):
     """
@@ -93,6 +94,15 @@ class TestNonJavascriptSearch(TwillTests):
         for n in range(1, 11):
             self.assertContains(response, 'Title #%d' % n)
             self.assertContains(response, 'Description #%d' % n)
+
+    def testSearchBlankQuery(self):
+        response = self.client.get(reverse(search.views.fetch_bugs))
+        self.assertNotContains(response, 'Showing results')
+        self.assertNotContains(response, 'Prev')
+        self.assertNotContains(response, 'Next page')
+        self.assertNotContains(response, 'Expand all')
+        self.assertNotContains(response, 'Collapse all')
+        self.assertNotContains(response, 'Shortcuts')
 
     def testMatchingBugsFromMtoN(self):
         response = self.client.get('/search/')

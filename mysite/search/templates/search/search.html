@@ -85,10 +85,9 @@ Search bugs
                 <a href='{{ next_page_url }}' id='next-page'>Next page &raquo;</a>
                 <span class='separator'>&nbsp;</span>
             </span>
-
         </div><!-- /#results-widget -->
 
-        <div id='results-sidebar'>
+        <div class='show-if-query' id='results-sidebar'>
             <a href='#' id='expand-all-link'><img src='/static/images/icons/zoom-in.png' />Expand all</a>
             <a href='#' id='collapse-all-link'><img src='/static/images/icons/zoom-out.png' />Collapse all</a>
             <div id='shortcuts-legend'>
@@ -107,6 +106,7 @@ Search bugs
                 <dd>expand</dd>
             </div>
         </div>
+
         {% if bunch_of_bugs %}
         <ul>
             {# Search results {{{ #}
@@ -172,9 +172,13 @@ Search bugs
             {# }}} #}
         </ul>
         {% else %}
+        {% if language %}
         <p class='no-opps'>
         No opportunities found matching your query: {{ language }}.
         </p>
+        {% else %}
+        <!-- No search query -->
+        {% endif %}
         {% endif %}
 
     </div> <!-- /#results -->
@@ -182,8 +186,8 @@ Search bugs
 {% endblock main %}
 {% block js %}
 {{ block.super }}
-<script src='/static/js/search.suggestions.js'></script>
-<script src='/static/js/search.js'></script>
+<script src='/static/js/search/suggestions.js'></script>
+<script src='/static/js/search/defaultText.js'></script>
 <script src='/static/js/search/testData.js'></script>
 <script src='/static/js/search/tests.js'></script>
 {% endblock js %}

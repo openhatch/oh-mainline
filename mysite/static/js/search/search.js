@@ -31,7 +31,7 @@ $.fn.scrollIntoView = function() {
 
 $(function() {
 
-        Gewgaws.lightGewgaw(0);
+        Search.lightGewgaw(0);
 
         $('#expand-all-link').click(function() {
             $('.gewgaws li').addClass('expanded');
@@ -45,23 +45,23 @@ $(function() {
 
         $(document).bind('keypress',
             {combi: '\\', disableInInput: true},
-            Gewgaws.focusSearchInput);
+            Search.focusSearchInput);
 
         $(document).bind('keyup',
             {combi: 'j', disableInInput: true},
-            Gewgaws.moveGewgawFocusDown);
+            Search.moveGewgawFocusDown);
 
         $(document).bind('keyup',
                 {combi: 'n', disableInInput: true},
-                Gewgaws.moveGewgawFocusDown);
+                Search.moveGewgawFocusDown);
 
         $(document).bind('keyup',
                 {combi: 'k', disableInInput: true},
-                Gewgaws.moveGewgawFocusUp);
+                Search.moveGewgawFocusUp);
 
         $(document).bind('keyup',
                 {combi: 'p', disableInInput: true},
-                Gewgaws.moveGewgawFocusUp);
+                Search.moveGewgawFocusUp);
 
         $(document).bind('keyup',
                 {combi: 'o', disableInInput: true}, 
@@ -97,7 +97,7 @@ $(function() {
         /* Takes a query and updates the page. */
         $("#button").click(function() {
                 /* Put form values into an associative array. */
-                return Gewgaws.update($('form').serializeArray());
+                return Search.update($('form').serializeArray());
                 });
 
 
@@ -123,7 +123,7 @@ $(function() {
                 console.log(fruitySerialized);
                 console.log('SLASH FRUITYSERIALIZED:');
 
-                return Gewgaws.update(fruitySerialized);
+                return Search.update(fruitySerialized);
         });
 
         // Handle autocomplete. {{{
@@ -140,34 +140,34 @@ $(function() {
             'multipleSeparator': " ",
             'matchContains': true
         };
-        // Disable $input.autocomplete(url, acOptions);
+        // $input.autocomplete(url, acOptions);
         // }}}
 });
 
-Gewgaws = {}
+Search = {}
 
-Gewgaws.focusSearchInput = function () {
+Search.focusSearchInput = function () {
     console.log('focus search input called');
     $("#opps form input[type='text']").focus();
 };
 
-Gewgaws.queryURL = "/search/?";
+Search.queryURL = "/search/?";
 
-Gewgaws.$gewgawsDOMList = $('.gewgaws ul');
+Search.$gewgawsDOMList = $('.gewgaws ul');
 
-Gewgaws.getLitGewgawIndex = function() {
+Search.getLitGewgawIndex = function() {
     // FIXME: Remember the index of the lit gewgaw in Javascript,
     // and avoid going through CSS.
     return $('.gewgaws li').index($('.lit-up')[0]);
 };
 
-Gewgaws.fetchGewgawsToDOM = function (queryString) {
+Search.fetchSearchToDOM = function (queryString) {
     url = this.queryURL + queryString + "&jsoncallback=?";
     $.getJSON(url, this.jsonArrayToDocument);
-    Gewgaws.lightGewgaw(0);
+    Search.lightGewgaw(0);
 };
 
-Gewgaws.jsonArrayToDocument = function (jsonArray) {
+Search.jsonArrayToDocument = function (jsonArray) {
     $('.gewgaws li').hide();
     $(jsonArray).each( function(i) {
             $gewgaw = $(".gewgaws li").eq(i);
@@ -180,7 +180,7 @@ Gewgaws.jsonArrayToDocument = function (jsonArray) {
             });
 };
 
-Gewgaws.lightGewgaw = function(gewgawIndex) {
+Search.lightGewgaw = function(gewgawIndex) {
     console.log('lightGewgaw called');
     if($('.gewgaws li').eq(gewgawIndex).size() == 1) {
         $gg = $('.gewgaws li');
@@ -194,13 +194,13 @@ Gewgaws.lightGewgaw = function(gewgawIndex) {
     }
 };
 
-Gewgaws.update = function(queryArray) {
+Search.update = function(queryArray) {
     queryArray.push({'name': 'format', value: 'json'});
 
     queryStringFormatJSON = $.param(queryArray);
 
     /* Fetch JSON and put in DOM. */
-    Gewgaws.fetchGewgawsToDOM(queryStringFormatJSON);
+    Search.fetchSearchToDOM(queryStringFormatJSON);
 
     /* Update navigation links */
     var language;
@@ -230,12 +230,12 @@ Gewgaws.update = function(queryArray) {
     return false;
 };
 
-Gewgaws.moveGewgawFocusDown = function() {
-    Gewgaws.lightGewgaw(Gewgaws.getLitGewgawIndex() + 1);
+Search.moveGewgawFocusDown = function() {
+    Search.lightGewgaw(Search.getLitGewgawIndex() + 1);
 };
 
-Gewgaws.moveGewgawFocusUp = function() {
-    Gewgaws.lightGewgaw(Gewgaws.getLitGewgawIndex() - 1);
+Search.moveGewgawFocusUp = function() {
+    Search.lightGewgaw(Search.getLitGewgawIndex() - 1);
 };
 
 /* vim: set ai ts=4 sts=4 et sw=4: */
