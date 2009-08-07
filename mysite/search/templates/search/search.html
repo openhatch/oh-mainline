@@ -65,57 +65,17 @@ Search bugs
             <input type='submit' id='button' value='Search' />
         </form>
 
-        <div id='results-widget'>
-            <span id='results-summary'>
-                <span id='results-summary-language'>{{ language }}</span>
+        {% include 'search/results_widget.html' %}
 
-                {% if bunch_of_bugs %}
-                Showing results 
-                <span id='results-summary-start'>{{ start }}</span>
-                to
-                <span id='results-summary-end'>{{ end }}</span>.
-                {% endif %}
-            </span>
-
-            <span class='separator'>&nbsp;</span>
-
-            <span id='navigation'>
-                <a href='{{ prev_page_url }}' id='prev-page'>&laquo; Prev</a>
-                <span class='separator'>&nbsp;</span>
-                <a href='{{ next_page_url }}' id='next-page'>Next page &raquo;</a>
-                <span class='separator'>&nbsp;</span>
-            </span>
-        </div><!-- /#results-widget -->
-
-        <div class='show-if-query' id='results-sidebar'>
-            <a href='#' id='expand-all-link'><img src='/static/images/icons/zoom-in.png' />Expand all</a>
-            <a href='#' id='collapse-all-link'><img src='/static/images/icons/zoom-out.png' />Collapse all</a>
-            <div id='shortcuts-legend'>
-                <h5>Shortcuts</h5>
-                <dt>
-                <strong>j</strong>, <strong>n</strong> -&nbsp;
-                </dt>
-                <dd>down</dd>
-                <dt>
-                <strong>k</strong>, <strong>p</strong> -&nbsp;
-                </dt>
-                <dd>up</dd>
-                <dt>
-                <strong>o</strong> -&nbsp;
-                </dt>
-                <dd>expand</dd>
-            </div>
-        </div>
+        {% include 'search/results_sidebar.html' %}
 
         {% if bunch_of_bugs %}
         <ul>
-            {# Search results {{{ #}
             {% for bug in bunch_of_bugs %}
             <li class='bug {% cycle "even" "odd"%}'>
             {% include 'search/result.html' %}
             </li>
             {% endfor %}
-            {# }}} #}
         </ul>
         {% else %}
         {% if language %}
