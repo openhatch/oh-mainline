@@ -140,10 +140,10 @@ h1, h2, h3, h4 {
     margin-top: 10px;
 }
 #links li a {
-    color: #76746b;
+    color: #777;
     padding: 3px 10px 5px 10px;
     background-color: #fff; 
-    border-top: 2px solid #ded8be;
+    border-top: 2px solid #ccc;
     float: left;
 }
 
@@ -207,18 +207,19 @@ ul#user-actions a {
 
 #footer {
     float: left;
-    width: 1000px;
-    height: 60px;
-    padding: 5px;
-    margin: 0;
+    width: 990px;
+    padding: 15px 5px;
+    margin: 20px 0 0 0;
     text-align: center;
+    border-top: 2px solid #ccc;
+    border-bottom: 1px solid #eee;
+    background: #fff url('/static/images/module-head-bg.png') bottom repeat-x;
 }
 
 #footer ul {
     display: inline;
     list-style-type: none;
-    font-size: 1.2em;
-    display: none;
+    font-size: 10pt;
 }
 
 #footer li {
@@ -227,11 +228,11 @@ ul#user-actions a {
 }
 
 #footer a {
-    color: #333;
+    color: #555;
 }
 
 #footer a:hover {
-    color: black;
+    color: #222;
 }
 
 #widgets {
@@ -242,7 +243,7 @@ h3 {
     margin-bottom: 0px;
     float: left;
     clear: left;
-    font-size: 12pt;
+    font-size: 10pt;
     font-weight: bold;
     color: #555;
     letter-spacing: 0;
