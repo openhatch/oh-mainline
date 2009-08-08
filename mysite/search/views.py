@@ -1,14 +1,17 @@
 from django.http import HttpResponse, QueryDict, HttpResponseServerError
 from django.shortcuts import render_to_response
 from django.core import serializers
-from mysite.search.models import Bug, Project
-import simplejson
 from django.db.models import Q
+from django.utils.timesince import timesince
+
+from mysite.search.models import Bug, Project
 
 import datetime
 from dateutil import tz
 import pytz
 import re
+import simplejson
+
 
 # Via http://www.djangosnippets.org/snippets/1435/
 def encode_datetime(obj):
@@ -77,6 +80,21 @@ def fetch_bugs(request):
 
     else:
         bugs = []
+
+    # Make some changes to how bug data is displayed.
+    for bug in bugs:
+        if bug.last_touched:
+            try:
+                bug.last_touched = timesince(bug.last_touched) + " ago"
+                bug.last_touched.split(",")[0]
+            except AtrributeError:
+                pass
+        if bug.last_polled:
+            try:
+                bug.last_polled = timesince(bug.last_polled) + " ago"
+                bug.last_polled.split(",")[0]
+            except AtrributeError:
+                pass
 
     if format == 'json':
         return bugs_to_json_response(bugs, request.GET.get(

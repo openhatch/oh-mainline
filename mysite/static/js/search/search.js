@@ -189,8 +189,6 @@ SearchResults.jsonArrayToDocument = function (jsonArray) {
         // However...
         if ( $result.size() == 0 ) {
 
-            console.log('creating a list item');
-
             // Sometimes we run out of list items. 
             // E.g., when no list items were generated in the first place.
             // E.g., when the search query was an empty string,
@@ -212,7 +210,6 @@ SearchResults.jsonArrayToDocument = function (jsonArray) {
                 .addClass((i % 2 == 0) ? "even" : "odd")
                 .appendTo('.gewgaws ul');
 
-            console.debug($result);
         }
         $result.show();
         $result.attr('id', "gewgaw-" + this.pk);
@@ -246,7 +243,6 @@ SearchResults.jsonArrayToDocument = function (jsonArray) {
                 verb = pair[2]; //lol ok not really a pair anymore.
             }
             x = $result.find(selector)[verb](newText);
-            console.debug("", x);
         }
     };
 
@@ -265,9 +261,6 @@ SearchResults.lightSearchResult = function(gewgawIndex) {
         $gg.removeClass('lit-up')
         $gg.eq(gewgawIndex).addClass('lit-up').scrollIntoView();
         // FIXME: Automatically scroll when gewgaw is expanded such that its content is off-screen.
-    }
-    else {
-        console.log('no gewgaw to highlight');
     }
 };
 

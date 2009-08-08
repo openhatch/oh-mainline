@@ -10,7 +10,7 @@ SearchTests = {
             var $domField = $result.find(selector);
             console.debug('test function is about to check element:', 
                     $domField);
-            var domFieldValue = $domField.text(); //[valueGetter]();
+            var domFieldValue = $domField[valueGetter]();
             var jsonFieldValue = testData.jsonArray[0].fields[fieldName];
             var success = ($.trim(domFieldValue) == $.trim(jsonFieldValue));
             fireunit.ok(success,
