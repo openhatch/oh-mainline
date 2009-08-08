@@ -44,6 +44,7 @@ h1 a:hover {
 .module > .body {
     float: left;
     padding: 20px;
+    background: #fff url('/static/images/motif.png');
 }
 
 .module > .head, 
