@@ -38,7 +38,7 @@ def get_info_for_launchpad_username(username):
         }
     }
     """
-    if username:
+    if username == 'paulproteus':
         time.sleep(random.randrange(0, 2))
         return {'CtrlProxy': {'involvement_types': set(['Bug Management']),
                               'languages': ['C'],
