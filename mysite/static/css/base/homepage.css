@@ -154,11 +154,12 @@ input[type='submit'] {
     float: left;
     margin-top: 20px;
     margin-bottom: 40px;
-    width: 600px;
+    width: 590px;
+    border: 5px solid white;
 }
 #entry-points #no-authorization-necessary ul {
     float: left;
-    width: 600px;
+    width: 590px;
     margin: 0;
     padding: 0;
 }
@@ -166,11 +167,11 @@ input[type='submit'] {
     list-style: none;
     font-size: 15pt;
     float: left;
-    width: 300px;
+    width: 295px;
 }
 #entry-points #no-authorization-necessary li a {
     float: left;
-    background-color: #e4e4dd;
+    background-color: #f4f4f4;
     color: #222;
     padding: 20px;
     height: 100px;
@@ -198,7 +199,7 @@ input[type='submit'] {
 }
 .tab-links a {
     float: left;
-    background-color: #e4e4dd;
+    background-color: #e4e4e4;
     margin-right: 10px;
     padding: 15px 15px 13px 15px;
     font-size: 10pt;
@@ -232,7 +233,7 @@ input[type='submit'] {
 #tabs {
     float: left;
     width: 600px;
-    background-color: #e4e4dd;
+    background-color: #e4e4e4;
     margin: 0;
     border: 0;
 }
