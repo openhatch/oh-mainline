@@ -3,6 +3,8 @@ from ohloh import mechanize_get
 import urllib
 import urllib2
 import urlparse
+import time
+import random
 
 def project2languages(project_name):
     """Find the Launchpad URL for the given project. Scrape launchpad page for languages."""
@@ -36,6 +38,27 @@ def get_info_for_launchpad_username(username):
         }
     }
     """
+    if dia.query == 'paulproteus':
+        time.sleep(random.randrange(0, 2))
+        return {'CtrlProxy': {'involvement_types': set(['Bug Management']),
+                              'languages': ['C'],
+                              'url': 'https://launchpad.net/ctrlproxy'},
+                'Makesad networks runs rose.makesad.us and perhaps other things': {'involvement_types': set(['Bug Management']),
+                                                                                   'languages': [],
+                                                                                   'url': 'https://launchpad.net/rose'},
+                'Ubuntu': {'involvement_types': set(['Bug Management', 'Soyuz']),
+                           'languages': [],
+                           'url': 'https://launchpad.net/ubuntu'},
+                'Web Team projects': {'involvement_types': set(['Bug Management']),
+                                      'languages': [],
+                                      'url': 'https://launchpad.net/web'},
+                'django-openid-auth': {'involvement_types': set(['Bazaar Branches']),
+                                       'languages': ['Python'],
+                                       'url': 'https://launchpad.net/django-openid-auth'}}
+    if dia.query == 'asheesh@asheesh.org':
+        time.sleep(random.randrange(0, 2))
+        return {}
+
     try:
         b = mechanize_get('https://launchpad.net/~%s' % 
                           urllib.quote(username))
