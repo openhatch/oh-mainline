@@ -90,10 +90,11 @@ class TestNonJavascriptSearch(TwillTests):
     fixtures = ['bugs-for-two-projects.json']
 
     def testSearch(self):
+        bugs = Bug.objects.order_by('last_touched')[:10]
+
         response = self.client.get('/search/')
-        for n in range(1, 11):
-            self.assertContains(response, 'Title #%d' % n)
-            self.assertContains(response, 'Description #%d' % n)
+        # Search shows nothing when you have no query.
+        self.assertEqual(response.context[0]['bunch_of_bugs'], [])
 
     def testMatchingBugsFromMtoN(self):
         response = self.client.get('/search/')
