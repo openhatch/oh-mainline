@@ -3,9 +3,9 @@
 from django.db import models
 from mysite.search.models import Project, Bug
 from django.contrib.auth.models import User
-import customs.ohloh as ohloh
+from mysite.customs import ohloh
 import datetime
-
+import sys
 import uuid
 
 def generate_person_photo_path(instance, filename):
@@ -21,12 +21,41 @@ class Person(models.Model):
     last_polled = models.DateTimeField(default=datetime.datetime(1970, 1, 1))
     show_email = models.BooleanField(default=False)
     photo = models.ImageField(upload_to=
-                              lambda a, b: 'static/photos/profile-photos/' + generate_person_photo_path(a, b),
-                              default='images/profile-photos/sufjan.jpg')
+                              lambda a, b: 'static/photos/profile-photos/' + 
+                              generate_person_photo_path(a, b),
+                              default='')
 
     def __unicode__(self):
         return "username: %s, name: %s %s" % (self.user.username,
                 self.user.first_name, self.user.last_name)
+
+    def get_recommended_search_terms(self):
+        # {{{
+        project_exps = ProjectExp.objects.filter(person=self)
+        terms = [p.primary_language for p in project_exps
+                if p.primary_language and p.primary_language.strip()]
+        terms.extend(
+                [p.project.name for p in project_exps
+                    if p.project.name and p.project.name.strip()])
+        terms = sorted(set(terms), key=lambda s: s.lower())
+        return terms
+
+        # FIXME: Add support for recommended projects.
+        # FIXME: Add support for recommended project tags.
+
+        # }}}
+
+    def get_full_name(self):
+        # {{{
+        name = self.user.first_name 
+        if self.user.first_name and self.user.last_name:
+            name += " "
+        name += self.user.last_name
+        return name
+        # }}}
+
+    def get_full_name_or_username(self):
+        return self.get_full_name() or self.user.username
     # }}}
 
 def create_profile_when_user_created(instance, created, *args, **kwargs):
@@ -67,7 +96,7 @@ class DataImportAttempt(models.Model):
 
     def do_what_it_says_on_the_tin(self):
         """Attempt to import data."""
-        from profile.tasks import FetchPersonDataFromOhloh
+        from mysite.profile.tasks import FetchPersonDataFromOhloh
         FetchPersonDataFromOhloh.delay(self.id)
 
     def __unicode__(self):
@@ -298,4 +327,3 @@ class Link_SF_Proj_Dude_FM(models.Model):
                                                    proj_unixname,
                                                    is_admin, position,
                                                    date_collected)
-

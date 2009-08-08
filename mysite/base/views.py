@@ -1,16 +1,18 @@
 from django.http import HttpResponse, \
         HttpResponseRedirect, HttpResponseServerError
 from django.shortcuts import render_to_response
-import account.forms
+import mysite.account
+import mysite.account.forms
 from django_authopenid.forms import OpenidSigninForm
+import simplejson
 from django.template import RequestContext, loader, Context
 from django.core.urlresolvers import reverse
-import profile.views
-from profile.views import display_person_web
+import mysite.profile as profile
+from mysite.profile.views import display_person_web
 
 def homepage(request, signup_form=None):
     if request.user.is_authenticated():
-        return HttpResponseRedirect('/people/%s' % request.user.username)
+        return landing_page(request)
 
     form1 = OpenidSigninForm()
 
@@ -24,7 +26,7 @@ def homepage(request, signup_form=None):
         notification_id = 'username_taken'
 
     if not signup_form:
-        signup_form = account.forms.UserCreationFormWithEmail()
+        signup_form = mysite.account.forms.UserCreationFormWithEmail()
 
     return render_to_response('base/homepage.html', {
         'signup_form': signup_form,
@@ -34,5 +36,19 @@ def homepage(request, signup_form=None):
         'form1': form1,
         }, context_instance=RequestContext(request))
 
+def landing_page(request):
+    data = profile.views.get_personal_data(request.user.get_profile())
+    data['the_user'] = request.user
+    return render_to_response('base/landing.html', data)
 
-
+def page_to_js(request):
+    # FIXME: In the future, use:
+    # from django.template.loader import render_to_string
+    # to generate html_doc
+    html_doc = "<strong>zomg</strong>"
+    encoded_for_js = simplejson.dumps(html_doc)
+    # Note: using application/javascript as suggested by
+    # http://www.ietf.org/rfc/rfc4329.txt
+    return render_to_response('base/append_ourselves.js',
+                              {'in_string': encoded_for_js},
+                              mimetype='application/javascript')

@@ -1,0 +1,13 @@
+.submodule.skinny {
+    padding: 0 ! important;
+    border: 0;
+    background-color: transparent ! important;
+}
+.submodule.skinny .body {
+    padding: 10px ! important;
+    background-color: transparent ! important;
+}
+.submodule.skinny ul li {
+    margin-bottom: 10px;
+    font-size: 11pt;
+}

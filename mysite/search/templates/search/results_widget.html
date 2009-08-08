@@ -1,0 +1,22 @@
+<div class='search-result-control' id='results-widget'>
+    <span id='results-summary'>
+        <span id='results-summary-language'>{{ language }}</span>
+
+        {% if bunch_of_bugs %}
+        Showing results 
+        <span id='results-summary-start'>{{ start }}</span>
+        to
+        <span id='results-summary-end'>{{ end }}</span>.
+        {% endif %}
+    </span>
+
+    <span class='separator'>&nbsp;</span>
+
+    <span id='navigation'>
+        <a href='{{ prev_page_url }}' id='prev-page'>&laquo; Prev</a>
+        <span class='separator'>&nbsp;</span>
+        <a href='{{ next_page_url }}' id='next-page'>Next page &raquo;</a>
+        <span class='separator'>&nbsp;</span>
+    </span>
+</div><!-- /#results-widget -->
+{# vim: set filetype=htmldjango: #}

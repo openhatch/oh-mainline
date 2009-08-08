@@ -1,0 +1,21 @@
+#widget-settings textarea {
+    width: 500px;
+    font: 8pt monospace;
+    height: 300px;
+}
+#widget-settings #widget-instructions {
+    margin-left: 30px;
+    margin-top: 10px;
+    float: left;
+    width: 240px;
+    padding: 21px;
+    background-color: #ffc;
+}
+#widget-settings xmp {
+    white-space: normal;
+    margin-bottom: 0;
+}
+#widget-settings .submodule p {
+    padding: 5px;
+    margin: 0;
+}

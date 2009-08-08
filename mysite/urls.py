@@ -1,6 +1,6 @@
 from django.conf.urls.defaults import *
 
-import settings
+from django.conf import settings
 
 import django_authopenid
 from django.contrib import admin
@@ -15,7 +15,8 @@ urlpatterns = patterns('',
         (r'^search/$', 'mysite.search.views.fetch_bugs'),
         (r'^admin/(.*)', admin.site.root),
         (r'^static/(?P<path>.*)$', 'django.views.static.serve',
-            {'document_root': settings.STATIC_DOC_ROOT}),
+            {'document_root': settings.MEDIA_ROOT}),
+
         (r'^people/$', 'mysite.profile.views.display_list_of_people'),
 
         (r'^account/login/$', 'mysite.account.views.login'),
@@ -32,6 +33,9 @@ urlpatterns = patterns('',
             'mysite.consulting.views.list'),
         (r'^people/(?P<user_to_display__username>[^/]+)/widget/$',
                 'mysite.profile.views.widget_display'),
+
+        (r'^people/(?P<user_to_display__username>[^/]+)/openhatch-widget.js$',
+                'mysite.profile.views.widget_display_js'),
 
         (r'^people/delete-experience/do$',
          'mysite.profile.views.delete_experience_do'),
@@ -52,20 +56,29 @@ urlpatterns = patterns('',
 
         (r'^openid/', include('django_authopenid.urls')),
 
-        (r'^account/edit/password/$',
-            'mysite.account.views.edit_password'),
+        (r'^account/settings/$',
+            'mysite.account.views.settings'),
 
-        (r'^account/edit/password/do$',
-            'mysite.account.views.edit_password_do'),
+        (r'^account/settings/password/$',
+            'mysite.account.views.change_password'),
+
+        (r'^account/settings/password/change$',
+            'mysite.account.views.change_password_do'),
+
+        (r'^account/settings/contact-info/$',
+            'mysite.account.views.edit_contact_info'),
+
+        (r'^account/settings/contact-info/do$',
+            'mysite.account.views.edit_contact_info_do'),
+
+        (r'^account/settings/widget/$',
+                'mysite.account.views.widget'),
 
         (r'^account/edit/photo/$',
             'mysite.account.views.edit_photo'),
 
         (r'^account/edit/photo/do$',
             'mysite.account.views.edit_photo_do'),
-
-        (r'^account/edit/show-email/do$',
-            'mysite.account.views.show_email_do'),
 
         (r'^form/projectexp_add$',
             'mysite.profile.views.projectexp_add_form'),

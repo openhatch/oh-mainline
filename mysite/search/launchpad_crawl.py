@@ -13,7 +13,7 @@ import simplejson
 import simplejson
 import datetime
 import glob
-from .search.models import Project, Bug
+from .models import Project, Bug
 import codecs
 
 # Look, ma, a hard-coded table that maps to

@@ -10,7 +10,7 @@
     thisstart = {{ start }};
     thisend = {{ end }};
 </script>
-<script src='/static/js/gewgaws.js'></script>
+<script src='/static/js/search/search.js'></script>
 {% endblock js_in_head %}
 
 {% block jquery %}
@@ -22,16 +22,19 @@
 @import url('/static/css/search/search.css');
 {% endblock css %}
 
+{% block pagetop %}
+{% endblock pagetop %}
+
 {% block content %}
 
-<div id='main'>
-{% block main %}
-{% endblock main %}
+<div id='sidebar'>
+    {% block sidebar %}
+    {% endblock sidebar %}
 </div>
 
-<div id='sidebar'>
-{% block sidebar %}
-{% endblock sidebar %}
+<div id='main'>
+    {% block main %}
+    {% endblock main %}
 </div>
 
 {% endblock content %}

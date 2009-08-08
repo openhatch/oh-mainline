@@ -2,14 +2,15 @@
 # vim: set ai et ts=4 sw=4:
 
 # Imports {{{
-from search.models import Project
-from profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag
-import profile.views
+from mysite.search.models import Project, Bug
+from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag
+import mysite.profile.views
 
 import mock
 import os
 import re
 import twill
+import lxml
 from twill import commands as tc
 from twill.shell import TwillCommandLoop
 import django.test
@@ -19,11 +20,14 @@ from django.core.handlers.wsgi import WSGIHandler
 from StringIO import StringIO
 import urllib
 import simplejson
+import datetime
 import ohloh
 import lp_grabber
 
 from django.test.client import Client
-from profile.tasks import FetchPersonDataFromOhloh
+from django.conf import settings
+from mysite.profile.tasks import FetchPersonDataFromOhloh
+import mysite.customs.miro
 # }}}
 
 # Mocked out browser.open
@@ -189,33 +193,33 @@ class OhlohIconTests(django.test.TestCase):
 
     def test_given_project_generate_internal_url(self):
         # First, delete the project icon
-        url = profile.views.project_icon_url('f-spot', actually_fetch=False)
+        url = mysite.profile.views.project_icon_url('f-spot', actually_fetch=False)
         path = url[1:] # strip leading '/'
         if os.path.exists(path):
             os.unlink(path)
 
         # Download the icon
-        url = profile.views.project_icon_url('f-spot')
+        url = mysite.profile.views.project_icon_url('f-spot')
         self.assert_(os.path.exists(path))
         os.unlink(path)
 
     def test_given_project_generate_internal_url_for_proj_fail(self):
         # First, delete the project icon
-        url = profile.views.project_icon_url('lolnomatzch',
+        url = mysite.profile.views.project_icon_url('lolnomatzch',
                                              actually_fetch=False)
         path = url[1:] # strip leading '/'
         if os.path.exists(path):
             os.unlink(path)
 
         # Download the icon
-        url = profile.views.project_icon_url('lolnomatzch')
+        url = mysite.profile.views.project_icon_url('lolnomatzch')
         self.assert_(os.path.exists(path))
         os.unlink(path)
 
 
     def test_project_image_link(self):
         # First, delete the project icon
-        url = profile.views.project_icon_url('f-spot',
+        url = mysite.profile.views.project_icon_url('f-spot',
                                              actually_fetch=False)
         path = url[1:] # strip leading '/'
         if os.path.exists(path):
@@ -263,4 +267,108 @@ class LaunchpadDataTests(django.test.TestCase):
     def test_greg_has_python_involvement(self):
         langs = lp_grabber.person_to_bazaar_branch_languages('greg.grossmeier')
         self.assertEqual(langs, ['Python'])
+
+class MiroTests(django.test.TestCase):
+    def test_miro_bug_object(self):
+        # Parse XML document as if we got it from the web
+        f = os.path.join(settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml')
+        xml_fd = file(f)
+        bug = mysite.customs.miro.xml2bug_object(xml_fd)
+
+        self.assertEqual(bug.project.name, 'Miro')
+        self.assertEqual(bug.title, "Add test for torrents that use gzip'd urls")
+        self.assertEqual(bug.description, """This broke. We should make sure it doesn't break again.
+Trac ticket id: 2294
+Owner: wguaraldi
+Reporter: nassar
+Keywords: Torrent unittest""")
+        self.assertEqual(bug.status, 'NEW')
+        self.assertEqual(bug.importance, 'normal')
+        self.assertEqual(bug.people_involved, 5)
+        self.assertEqual(bug.date_reported, datetime.datetime(2006, 6, 9, 12, 49))
+        self.assertEqual(bug.last_touched, datetime.datetime(2008, 6, 11, 23, 56, 27))
+        self.assertEqual(bug.submitter_username, 'nassar@pculture.org')
+        self.assertEqual(bug.submitter_realname, 'Nick Nassar')
+        self.assertEqual(bug.canonical_bug_link, 'http://bugzilla.pculture.org/show_bug.cgi?id=2294')
+        self.assert_(bug.good_for_newcomers)
+
+    def test_csv_parsing(self):
+        csv_fd = StringIO('''some_header,whatever
+1,silly bug
+2,other silly bug''')
+        bugs = mysite.customs.miro.bugzilla_query_to_bug_ids(
+            csv_fd)
+        self.assertEqual(bugs, [1, 2])
+
+    @mock.patch("mysite.customs.miro.open_xml_url")
+    @mock.patch("mysite.customs.miro.bitesized_bugs_csv_fd")
+    def test_full_grab_miro_bugs(self, mock_csv_maker, mock_xml_opener):
+        mock_xml_opener.return_value = open(os.path.join(
+            settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml'))
+
+        mock_csv_maker.return_value = StringIO("""bug_id,useless
+1,useless""")
+        mysite.customs.miro.grab_miro_bugs()
+        all_bugs = Bug.objects.all()
+        self.assertEqual(len(all_bugs), 1)
+        bug = all_bugs[0]
+        self.assertEqual(bug.canonical_bug_link,
+                         'http://bugzilla.pculture.org/show_bug.cgi?id=2294')
+
+    @mock.patch("mysite.customs.miro.open_xml_url")
+    @mock.patch("mysite.customs.miro.bitesized_bugs_csv_fd")
+    def test_full_grab_miro_bugs_refreshes_older_bugs(self, mock_csv_maker, mock_xml_opener):
+        mock_xml_opener.return_value = open(os.path.join(
+            settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml'))
+
+        mock_csv_maker.return_value = StringIO("""bug_id,useless
+2294,useless""")
+        mysite.customs.miro.grab_miro_bugs()
+
+        # Pretend there's old data lying around:
+        bug = Bug.objects.get()
+        bug.people_involved = 1
+        bug.save()
+
+        mock_xml_opener.return_value = open(os.path.join(
+            settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml'))
+
+        # Now refresh
+        mysite.customs.miro.grab_miro_bugs()
+
+        # Now verify there is only one bug, and its people_involved is 5
+        bug = Bug.objects.get()
+        self.assertEqual(bug.people_involved, 5)
+
+
+    @mock.patch("mysite.customs.miro.open_xml_url")
+    @mock.patch("mysite.customs.miro.bitesized_bugs_csv_fd")
+    def test_regrab_miro_bugs_refreshes_older_bugs_even_when_missing_from_csv(self, mock_csv_maker, mock_xml_opener):
+        mock_xml_opener.return_value = open(os.path.join(
+            settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml'))
+
+        # Situation: Assume there are zero bitesized bugs today.
+        # Desire: We re-get old bugs that don't show up in the CSV.
+
+        # Prereq: We have some bug with lame data:
+        bug = Bug()
+        bug.people_involved = 1
+        bug.canonical_bug_link = 'http://bugzilla.pculture.org/show_bug.cgi?id=2294'
+        bug.date_reported = datetime.datetime.now()
+        bug.last_touched = datetime.datetime.now()
+        bug.last_polled = datetime.datetime.now()
+        bug.project, _ = Project.objects.get_or_create(name='Miro')
+        bug.save()
+
+        # Prepare a fake CSV that is empty
+        mock_csv_maker.return_value = StringIO('')
+
+        # Now, do a crawl and notice that we updated the bug even though the CSV is empty
+        
+        mysite.customs.miro.grab_miro_bugs() # refreshes no bugs since CSV is empty!
+        all_bugs = Bug.objects.all()
+        self.assertEqual(len(all_bugs), 1)
+        bug = all_bugs[0]
+        self.assertEqual(bug.people_involved, 5)
+
 

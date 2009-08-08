@@ -1,37 +1,330 @@
+<style type='text/css'>
 
-<div id='portfolio' class='module'>
-    <div class='project-display column'>
+    #openhatch-widget {
+        font: 10pt Verdana;
+        width: 292px ! important;
+        float: left;
+    }
+    #openhatch-widget h3 {
+        font: 11pt Verdana;
+        margin: 0;
+    }
+    #openhatch-widget .module {
+        width: 292px;
+        border-bottom: 1px solid #eee;
+    }
+    
+    #openhatch-widget .module > .head {
+        width: 290px ! important;
+    }
+
+    #openhatch-widget .module > .head h3,
+    #openhatch-widget .module > .body,
+    #openhatch-widget .module > .foot {
+        width: 260px ! important;
+    }
+    #openhatch-widget .foot img {
+        vertical-align: middle;
+    }
+    #openhatch-widget a {
+        color: darkorange; 
+        text-decoration: none;
+    }
+
+    #openhatch-widget a:hover {
+        color: orange; 
+    }
+
+    #openhatch-widget a img {
+        border-style: none;
+    }
+
+    #openhatch-widget .project-escutcheon img {
+        text-align: center;
+    }
+    #openhatch-widget .project-escutcheon .logo {
+        width: 100%;
+    }
+    #openhatch-widget .project-escutcheon a {
+        width: 100%;
+    }
+
+    #openhatch-widget h1 a {
+        color: #2288BB;
+        text-decoration: none;
+    }
+
+    #openhatch-widget h1 a:hover {
+        color: #223366;
+        text-decoration: none;
+    }
+
+    #openhatch-widget .module {
+        float: left;
+        margin-bottom: 15px;
+        background-color: #f4f4f4;
+        border-bottom: 1px solid #f4f4f4;
+    }
+
+    #openhatch-widget .module > .head {
+        border-top: 2px solid #bfe2ff;
+        float: left;
+        border-bottom: 1px solid #eee;
+        background: #fdfdfe url('/static/images/module-head-bg.png') bottom repeat-x;
+    }
+
+    #openhatch-widget .module > .head h3 {
+        padding: 10px 15px ! important;
+    }
+
+    #openhatch-widget .module > .body {
+        float: left;
+        background-color: #fff;
+        padding: 10px 15px ! important;
+    }
+
+    #openhatch-widget .module > .head, 
+    #openhatch-widget .module > .body {
+        border-left: 1px solid #f4f4f4;
+        border-right: 1px solid #f4f4f4;
+    }
+
+    #openhatch-widget .module > .foot,
+    #openhatch-widget .submodule > .foot {
+        float: left;
+        border-top: 1px solid #eee;
+        padding: 10px 15px;
+        font-size: 8pt;
+        text-align: right;
+    }
+
+    #openhatch-widget .module > .body.contains-submodules {
+        background: #fff url('/static/images/motif.png');
+    }
+
+    #openhatch-widget .submodule {
+        margin-bottom: 20px;
+        border: 1px solid #ddd;
+        border-top: 3px double #ddd;
+        border-bottom: 3px double #ddd;
+        float: left;
+    }
+
+    #openhatch-widget .submodule > .head {
+        float: left;
+        background: #fdfdfe url('/static/images/module-head-bg.png') bottom repeat-x;
+        float: left;
+        padding: 10px 20px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    #openhatch-widget .submodule > .body {
+        background-color: #fff;
+    }
+
+    #openhatch-widget .submodule > .foot {
+        border-top: 1px solid #ddd;
+    }
+
+    #openhatch-widget ul {
+        padding: 0;
+        margin: 0;
+        list-style: none;
+    }
+    #openhatch-widget .module > .head ul {
+        float: right;
+        padding: 0;
+        margin: 0;
+    }
+    #openhatch-widget .module > .head ul li {
+        float: left;
+        margin: 0;
+    }
+    #openhatch-widget .module > .head ul li a {
+        float: right;
+        padding: 17px 20px;
+        line-height: 13pt;
+        font-weight: bold;
+        margin-right: 3px;
+    }
+    #openhatch-widget .module > .head ul li a:hover {
+        color: orange;
+        text-decoration: underline;
+    }
+    #openhatch-widget .module {
+        border: 5px solid #fff;
+    }
+    #openhatch-widget img {
+        border: 0;
+    }
+    #openhatch-widget .usernames {
+        font-size: 10pt;
+    }
+    #openhatch-widget #info .tag-type {
+        font-weight: normal;
+        display: block;
+        font-size: 8pt;
+    }
+    #openhatch-widget .aka {
+    }
+    #openhatch-widget .column {
+        float: left;
+        margin-right: 10px;
+    }
+    #openhatch-widget .project-display h3 {
+        float: left;
+    }
+    #openhatch-widget .project-display p {
+        margin: 0;
+        margin-bottom: 10px;
+        float: left;
+    }
+    #openhatch-widget .project-display h2 {
+        font-size: 9pt;
+        margin: 0;
+        margin-bottom: 3px;
+    }
+    #openhatch-widget .project-display h5 {
+        font-size: 12pt;
+        margin: 0;
+        margin-bottom: 10px;
+        font-weight: normal;
+    }
+    #openhatch-widget .project-display a {
+        text-decoration: none;
+    }
+
+    #openhatch-widget .module > .body .project-display ul {
+        float: left;
+    }
+    #openhatch-widget #portfolio .module > .body {
+        padding: 0;
+    }
+    #openhatch-widget #portfolio .module > .body ul li {
+        float: left;
+        padding: 20px;
+        width: 100px;
+    }
+    #openhatch-widget .project-escutcheon {
+        float: left;
+        margin-right: 10px;
+        width: 100px;
+        margin-bottom: 20px;
+    }
+    #openhatch-widget .project-escutcheon .logo {
+        width: 64px;
+        height: 64px;
+        float: left;
+    }
+    #openhatch-widget .project-escutcheon .name {
+        width: 100px;
+        float: left;
+        padding: 20px;
+        font-size: 11pt;
+    }
+
+    #openhatch-widget #portfolio {
+        width: 200px;
+        padding: 0 5px 3px 5px;
+        margin: 0;
+    }
+
+    #openhatch-widget .project-display {
+        width: 200px;
+        margin: 0 auto 2px auto;
+    }
+
+    #openhatch-widget .project-display h3 {
+        margin: 0;
+        padding: 5px 0 8px 0;
+        font-size: 11pt;
+        text-align: center;
+        width: 100%;
+    }
+
+    #openhatch-widget .project-display li {
+        float: left;
+        display: inline;
+        background-color: white;
+        margin: 0;
+        padding: 0;
+    }
+
+    #openhatch-widget .project-escutcheon {
+        width: 80px;
+        height: 70px;
+        margin: 4px 3px 3px 3px;
+    }
+
+    #openhatch-widget .project-escutcheon .logo {
+        width: 70px;
+        height: 40px;
+        margin: 0 auto;
+        text-align: center;
+    }
+
+    #openhatch-widget .project-escutcheon .name {
+        font-size: 8pt;
+        padding: 4px;
+        width: 72px;
+        clear: left;
+        text-align: center;
+    }
+
+    #openhatch-widget #credit {
+        float: right;
+    }
+
+    #openhatch-widget #credit h3 {
+        font-size: 10pt;
+        padding: 23px 0 0 0;
+        margin-right: 10px;
+        float: left;
+    }
+
+    #openhatch-widget #credit-logo {
+        float: right;
+        padding: 5px 0 0 0;
+    }
+
+    #openhatch-widget #widget .head h3 {
+        width: 240px ! important;
+    }
+
+</style>
+<div id='openhatch-widget'>
+    <div class='module'>
         <div class='head'>
-        <h3>{{person.user.username}}'s OSS contributions</h3>
+            <h3>{{ person.get_full_name_or_username }}'s FOSS communities</h3>
         </div>
         <div class='body'>
-        {% if projects %}
-        <ul>
-            {% for project, more_project_attributes in projects.items %}
-            <li>
-            <div class='project-escutcheon'>
-                <div class='logo'>
-                    <a href='/people/{{ person.user.username }}/projects/{{ project.name }}'>
-                        <img alt='logo for {{project.name}}'
-                        src='/people/project_icon/{{ project.name }}' width='40'/>
-                    </a>
+            {% if projects %}
+            <ul>
+                {% for project, more_project_attributes in projects.items %}
+                <li>
+                <div class='project-escutcheon'>
+                    <div class='logo'>
+                        <a href='/people/{{ person.user.username }}/projects/{{ project.name }}'>
+                            <img alt='logo for {{project.name}}'
+                            src='http://{{ url_prefix }}/people/project_icon/{{ project.name }}' width='40'/>
+                        </a>
+                    </div>
+                    <a href='/people/{{ person.user.username }}/projects/{{ project.name }}' 
+                        class='name'>{{ project.name|truncatewords:2 }}</a>
                 </div>
-                <a href='/people/{{ person.user.username }}/projects/{{ project.name }}' 
-                    class='name'>{{ project.name|truncatewords:2 }}</a>
-            </div>
-            </li>
-            {% endfor %}
-        </ul>
-        {% else %}
-        <div style='float: left; margin-top: 10px; width: 500px;'>No contributions listed yet.</div>
-        {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <div style='float: left; margin-top: 10px; width: 500px;'>No contributions listed yet.</div>
+            {% endif %}
+        </div>
+        <div class='foot'>
+            <a href='/people/{{ person.user.username }}/'>See my full profile at
+            <img src='http://{{ url_prefix }}/static/images/logo-for-widget.png' height='55' width='80'></a>
+            {# FIXME: Don't hard-code our URL. #}
+        </div>
     </div>
-    </div>
-    <!-- }}} -->
-    <div id='credit-logo'>
-    <a href='/people/{{ person.user.username }}/'><img src='/static/images/the-logo-bluegreen-125px.png' height='55' width='80'></a>
-    </div>
-    <div id='credit'>
-    <a href='/people/{{ person.user.username }}/'><h3>see my full profile at</h3></a>
-    </div>
-</div> <!-- /#portfolio -->
+</div>
+
+{# vim: set nu filetype=htmldjango: #}

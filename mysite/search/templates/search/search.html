@@ -1,142 +1,120 @@
 {% extends 'search/base.html' %}
+{#%load filters %#}
 
 {% block title %}
-Search bugs - OpenHatch
+Search bugs 
+{{ block.super }}
 {% endblock title %}
 
-{% block main %}
-<div id='main'>
-    <div id='results' class='gewgaws module box results'>
-    <div id='opps'>
-        <form name='search_opps' method='get'> 
-            {% comment %} {{{ {% endcomment %}
-            <h3><label for='language'>Find some bugs!</label></h3>
-            <input type='text' name='language' id='language'
-            value='{{ language }}' />
-            <input type='submit' id='button' value='Go' />
-            {% comment %} }}} {% endcomment %}
-        </form>
+{% block css %}
+{{ block.super }}
+{% if not bunch_of_bugs %}
+.search-result-control {
+    display: none;
+}
+{% endif %}
+{% endblock css %}
 
-        <div id='results-widget'>
-            {% comment %} {{{ {% endcomment %}
-            <span id='results-summary'>
-                <span id='results-summary-language'>{{ language }}</span>
-
-                {% if bunch_of_bugs %}
-                Showing results 
-                <span id='results-summary-start'>{{ start }}</span>
-                to
-                <span id='results-summary-end'>{{ end }}</span>.
-                {% endif %}
-            </span>
-
-            <span class='separator'>&nbsp;</span>
-
-            <span id='navigation'>
-                <a href='{{ prev_page_url }}' id='prev-page'>&laquo; Prev</a>
-                <span class='separator'>&nbsp;</span>
-                <a href='{{ next_page_url }}' id='next-page'>Next page &raquo;</a>
-                <span class='separator'>&nbsp;</span>
-                <a href='EXPAND_ALL_URL' id='expand-all-link'>Expand all</a>
-                <a href='COLLAPSE_ALL_URL' id='collapse-all-link'>Collapse all</a>
-            </span>
-
-            {% comment %} }}} {% endcomment %}
-        </div><!-- /#results-widget -->
-
-        {% if bunch_of_bugs %}
-        <ul>
-            {% comment %} Search results {{{ {% endcomment %}
-            {% for bug in bunch_of_bugs %}
-            <li class='bug {% cycle "even" "odd"%}'>
-            <!--div class='project-info'>
-            <img class='logo' src='{{ bug.project.icon_url }}' />
-            <span class='project'>
-                {{ bug.project.name }}
-            </span>
-            </div-->
-            <div class='first-line'>
-                <a class='title' href='{{ bug.canonical_bug_link }}'
-                    >+
-                    <span>{{ bug.title }}</span>
-                </a>
-                <!--div class='toggle-details'>⇕</div-->
-                <div class='age'>3 days old</div>
-                <!--a href='BUG_LINK' class='show-details'>details</a-->
-            </div>
-            <div class='second-line'>
-                <span class='description'>
-                    {% if bug.good_for_newcomers %}
-                    <span class='good-for-beginners' style='width: 300px; '>
-                        Good for newcomers &bull;
-                    </span>
-                    {% endif %}
-                    {{ bug.description }}
-                </span>
-            </div>
-            {% comment %} Details {{{ {% endcomment %}
-            <div class='details'>
-                <div class='fields'>
-                    <span class='field importance'>
-                        <label>People involved: </label>
-                        <span class='value'>
-                            <a href=''>13</a>
-                        </span>
-                    </span>
-                    <span class='field status'>
-                        <label>Status: </label>
-                        <span class='value'>triaged</span>
-                    </span>
-                    <span class='field last-polled'>
-                        <label>Last touched: </label>
-                        <span class='value'>2 weeks ago</span>
-                    </span>
-                    <span class='field origin'>
-                        <label>Link: </label>
-                        <span class='value'>
-                            <a href='{{ bug.canonical_bug_link }}'>Upstream issue</a>
-                        </span>
-                    </span>
-                    <span class='field importance'>
-                        <label>Importance: </label>
-                        <span class='value'>wishlist</span>
-                    </span>
-                    <span class='field last-polled'>
-                        <label>Last polled: </label>
-                        <span class='value'>3 days ago</span>
-                        <!--a href=''>poll now</a-->
-                    </span>
-                </div>
-            </div>
-            {% comment %} }}} {% endcomment %}
-            </li>
-            {% endfor %}
-        {% comment %} End of search results }}} {% endcomment %}
-        </ul>
-        {% else %}
-        <p class='no-opps'>
-        No opportunities found matching your query: {{ language }}.
-        </p>
-    {% endif %}
-
-    </div> <!-- /#results -->
-    </div> <!-- /#opps -->
-
-</div><!-- /#main -->
-{% endblock main %}
+{% block pagetop %}
+<h3><img alt='Volunteer opportunities' id='volunteer-opportunities' alt='Volunteer opportunities' src='/static/images/volunteer-opportunities-full.png' /></h3>
+{% endblock pagetop %}
 
 {% block sidebar %}
 <div id='suggested-searches' class='box module'>
-    <h3 style='margin-bottom: 10px;'>Suggested searches:</h3>
+    <h4 style='margin-bottom: 10px;'>
+        <img alt='Recommended searches' src='/static/images/recommended-searches.png' />
+    </h4>
+    {% if the_user.is_authenticated %}
+    {% if suggestions %}
+    <form name='suggested_searches'
+        id='suggested_searches'
+        method='GET' action=''>
+        <ul>
+            {% for index, term, czeched in suggestions %}
+            <li>
+            <input id='term_{{ index }}' name='term_{{ index }}' type='checkbox'
+            {% if czeched %}checked='on'{% endif %} %} />
+            <label for='term_{{ index }}'>{{ term }}</label>
+            </li>
+            {% endfor %}
+        </ul>
+        <a id='toggle-more-suggestions' href='#'>
+            Show <span>more</span> suggestions
+        </a>
+        <input type='submit' value='Find bugs'/>
+    </form>
+    {% else %}
+        <a href='{% url mysite.profile.views.display_person_web the_user.username %}'>
+            <strong>Log your contributions</strong> to receive recommendations.
+        </a>
+    {% endif %}
+    {% else %}
     <ul>
-        <li><a href='/search/?language=exaile'>user_interface_design</a></li>
-        <li><a href='/search/?language=ruby_on_rails'>ruby_on_rails</a></li>
-        <li><a href='/search/?language=python'>python</a></li>
-        <li><a href='/search/?language=music_player'>music_player</a></li>
+        <li>
+        <a href='{% url mysite.account.views.login %}'>
+            <strong>Log in </strong>to receive recommendations.
+        </a>
+        </li>
+        <li>
+        <a href='{% url mysite.base.views.homepage %}'>
+            Or <strong>sign up</strong> in 10,000 milliseconds (we support OpenID!)
+        </a>
+        </li>
     </ul>
-</div>
+    {% endif %}
 </div>
 {% endblock sidebar %}
 
-{% block more_js %}
-{% endblock more_js %}
+{% block main %}
+<div id='results' class='gewgaws module box results'>
+    <div id='opps'>
+        <form name='search_opps' method='get'> 
+            <input type='text'
+            name='language' id='language'
+            class='default-text'
+            title='Search bugs by language, project or description'
+            value='{{ language }}' />
+            <input type='submit' id='button' value='Search' />
+        </form>
+
+        {% include 'search/results_widget.html' %}
+
+        {% include 'search/results_sidebar.html' %}
+
+        {% if bunch_of_bugs %}
+        <ul>
+            {% for bug in bunch_of_bugs %}
+            <li class='bug {% cycle "even" "odd"%}'>
+            {% include 'search/result.html' %}
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        {% if language %}
+        <p class='no-opps'>
+        No opportunities found matching your query: {{ language }}.
+        </p>
+        {% else %}
+        <!-- No search query -->
+        {% endif %}
+        {% endif %}
+
+    </div> <!-- /#results -->
+</div> <!-- /#opps -->
+{% endblock main %}
+{% block js %}
+<style>
+    #result-template {
+        display: none;
+    }
+</style>
+<li class='bug' id='result-template'>
+{# Javascript uses this HTML to regenerate the results list. #}
+{% include 'search/result.html' %}
+</li>
+{{ block.super }}
+<script src='/static/js/search/suggestions.js'></script>
+<script src='/static/js/search/defaultText.js'></script>
+<script src='/static/js/search/testData.js'></script>
+<script src='/static/js/search/tests.js'></script>
+{% endblock js %}

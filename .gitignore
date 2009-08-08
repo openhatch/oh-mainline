@@ -1,2 +1,15 @@
 mysite/static/project-icons/*.png
 *.pyc
+*.pyo
+.installed.cfg
+bin
+develop-eggs
+dist
+downloads
+eggs
+parts
+src/*.egg-info
+.coverage
+.figleaf
+html/
+htmlcov/

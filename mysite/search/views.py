@@ -4,11 +4,11 @@ from django.core import serializers
 from mysite.search.models import Bug, Project
 import simplejson
 from django.db.models import Q
-import account.forms
 
 import datetime
 from dateutil import tz
 import pytz
+import re
 
 # Via http://www.djangosnippets.org/snippets/1435/
 def encode_datetime(obj):
@@ -19,35 +19,64 @@ def encode_datetime(obj):
         return obj.astimezone(tz.tzutc()).strftime('%Y-%m-%dT%H:%M:%SZ')
     raise TypeError("%s" % type(obj) + repr(obj) + " is not JSON serializable")
 
+def split_query_words(string):
+    # We're given some query terms "between quotes" and some glomped on with spaces
+    # Strategy: Find the strings validly inside quotes, and remove them
+    # from the original string. Then split the remainder (and probably trim
+    # whitespace from the remaining words).
+    ret = []
+    splitted = re.split(r'(".*?")', string)
+
+    for (index, word) in enumerate(splitted):
+        if (index % 2) == 0:
+            ret.extend(word.split())
+        else:
+            assert word[0] == '"'
+            assert word[-1] == '"'
+            ret.append(word[1:-1])
+
+    return ret
+
 def fetch_bugs(request):
     # FIXME: Give bugs some date field
 
+    if request.user.is_authenticated():
+        suggestion_keys = request.user.get_profile().get_recommended_search_terms()
+    else:
+        suggestion_keys = []
+
+    suggestions = [(i, k, False) for i, k in enumerate(suggestion_keys)]
+
     query = request.GET.get('language', '')
-    query_words = query.split()
+    query_words = split_query_words(query)
     format = request.GET.get('format', None)
     start = int(request.GET.get('start', 1))
     end = int(request.GET.get('end', 10))
 
-    bugs = Bug.objects.all()
+    if query:
+        bugs = Bug.objects.all()
 
-    for word in query_words:
-        bugs = bugs.filter(Q(project__language=word) | \
-                Q(title__contains=word) | Q(description__contains=word))
+        for word in query_words:
+            bugs = bugs.filter(
+                Q(project__language=word) |
+                Q(title__contains=word) |
+                Q(description__contains=word) |
+                Q(project__name__iexact=word))
 
-    bugs.order_by('last_touched')
+        bugs.order_by('last_touched')
 
-    #if status:
-    #    bugs = bugs.filter(project__status=status)
-        
-    bugs = bugs[start-1:end]
+        bugs = bugs[start-1:end]
 
-    for b in bugs:
-        # b.description = b.description[:65] + "..."
-        b.project.icon_url = "/static/images/icons/projects/%s.png" % \
-                b.project.name.lower()
-        # FIXME: Randomize for camera
+        for b in bugs:
+            # b.description = b.description[:65] + "..."
+            b.project.icon_url = "/static/images/icons/projects/%s.png" % \
+                    b.project.name.lower()
+            # FIXME: Randomize for camera
 
-    bugs = list(bugs)
+        bugs = list(bugs)
+
+    else:
+        bugs = []
 
     if format == 'json':
         return bugs_to_json_response(bugs, request.GET.get(
@@ -70,6 +99,7 @@ def fetch_bugs(request):
         next_page_query_str['end'] = end + diff + 1
         return render_to_response('search/search.html', {
             'the_user': request.user,
+            'suggestions': suggestions,
             'bunch_of_bugs': bugs,
             'developer_name': "Orrin Hatch",
             'language': query,

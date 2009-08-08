@@ -16,6 +16,7 @@ import tempfile
 import random
 
 # Django
+from django.template.loader import render_to_string
 from django.core import serializers
 from django.http import \
         HttpResponse, HttpResponseRedirect, HttpResponseServerError
@@ -24,20 +25,22 @@ from django.shortcuts import \
 import django.contrib.auth 
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
+from django.contrib.sites.models import Site
 
 # OpenHatch global
-import settings
+from django.conf import settings
 
 # OpenHatch apps
-import base.controllers
-from customs import ohloh
-from profile.models import \
+import mysite.base.controllers
+from mysite.customs import ohloh
+from mysite.profile.models import \
         Person, ProjectExp, \
         Tag, TagType, \
         Link_ProjectExp_Tag, Link_Project_Tag, \
         Link_SF_Proj_Dude_FM, Link_Person_Tag, \
         DataImportAttempt
-from search.models import Project
+from mysite.search.models import Project
 
 # This app
 import forms
@@ -210,7 +213,7 @@ def display_person_web(request, user_to_display__username=None):
     data['title'] = 'openhatch / %s' % user.username
     data['edit_mode'] = False
     data['editable'] = (request.user == user)
-    data['notifications'] = base.controllers.get_notification_from_request(request)
+    data['notifications'] = mysite.base.controllers.get_notification_from_request(request)
 
     return render_to_response('profile/main.html', data)
 
@@ -233,7 +236,7 @@ def projectexp_display(request, user_to_display__username, project__name):
     return render_to_response('profile/projectexp.html', data)
     # }}}
     
-def widget_display(request, user_to_display__username):
+def widget_display(request, user_to_display__username, please_return_string=False):
     # {{{
     user = get_object_or_404(User, username=user_to_display__username)
     person = get_object_or_404(Person, user=user)
@@ -242,9 +245,23 @@ def widget_display(request, user_to_display__username):
     data['the_user'] = request.user
     data['projectexp_editable'] = (user == request.user)
     data['editable'] = (user == request.user)
-    return render_to_response('profile/widget-test.html', data)
+    data['url_prefix'] = request.META['SERVER_NAME'] + ':' + request.META['SERVER_PORT']
+    if please_return_string:
+        return render_to_string('profile/widget.html', data)
+    else:
+        return render_to_response('profile/widget.html', data)
     # }}}
 
+def widget_display_js(request, user_to_display__username):
+    # FIXME: In the future, use:
+    html_doc = widget_display(request, user_to_display__username, please_return_string=True)
+    # to generate html_doc
+    encoded_for_js = simplejson.dumps(html_doc)
+    # Note: using application/javascript as suggested by
+    # http://www.ietf.org/rfc/rfc4329.txt
+    return render_to_response('base/append_ourselves.js',
+                              {'in_string': encoded_for_js},
+                              mimetype='application/javascript')
 @login_required
 def projectexp_edit(request, project__name):
     # {{{
@@ -397,7 +414,9 @@ def project_icon_url(project_name, actually_fetch = True):
             try:
                 icon_data = oh.get_icon_for_project(project_name)
             except ValueError:
-                icon_data = open('static/no-project-icon.png').read()
+                icon_data = open(os.path.join(
+                        settings.MEDIA_ROOT,
+                        'no-project-icon.png')).read()
         
             # then mktemp and save the Ohloh icon there, and rename it in
             tmp = tempfile.mkstemp(dir=project_icons_root)

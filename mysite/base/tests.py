@@ -53,8 +53,9 @@ class TwillTests(django.test.TestCase):
         client = Client()
         username='paulproteus'
         password="paulproteus's unbreakable password"
-        client.login(username=username,
+        success = client.login(username=username,
                      password=password)
+        self.assert_(success)
         return client
 
     def signup_with_twill(self, username, email, password):
@@ -66,6 +67,22 @@ class TwillTests(django.test.TestCase):
         tc.fv('create_profile', 'password',
                 password)
         tc.submit()
+
+    # }}}
+
+class LandingPage(TwillTests):
+    # {{{
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+    def test_show_landing_page_iff_logged_in(self):
+        # {{{
+        client = Client()
+        response = client.get('/')
+        self.assertTemplateUsed(response, 'base/homepage.html')
+
+        client2 = self.login_with_client()
+        response2 = client2.get('/')
+        self.assertTemplateUsed(response2, 'base/landing.html')
+        # }}}
 
     # }}}
 

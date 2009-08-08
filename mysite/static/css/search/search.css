@@ -1,14 +1,30 @@
-
+#page-top img#hatchers {
+    float: right;
+    border: 0;
+}
+#content {
+    position: relative;
+    top: -14px;
+    padding-top: 0;
+}
+#page-top img#volunteer-opportunities {
+}
+#page-top {
+    float: left;
+    width: 1000px;
+    font-size: 19pt;
+}
+#suggested-searches h4 {
+    width: 95%;
+    font-size: 10pt;
+    font-weight: normal;
+}
 .no-opps {
-    border: 1px solid #d2e6df;
-    background-color: #eef;
     color: #222;
     padding: 10px;
     font-size: 120%;
     line-height: 130%;
     width: 460px;
-    margin-top: 20px;
-    -moz-border-radius: 10px;
 }
 #heading {
     margin: 20px 0 10px 0;
@@ -22,8 +38,6 @@
     color: #3d2f25; 
     margin-bottom: 5px;
 }
-.box .content {
-}
 
 .search-terms {
     font-size: 20px;
@@ -32,6 +46,19 @@
     width: 550px;
 }
 
+#results-sidebar {
+    float: right;
+    width: 120px;
+    padding: 40px 10px;
+}
+#results-sidebar img {
+    float: left;
+    margin-right: 5px;
+}
+#results-sidebar a {
+    float: left;
+    margin-bottom: 10px;
+}
 #results-widget {
     padding: 12px;
     padding-bottom: 6px;
@@ -41,29 +68,31 @@
 #sidebar {
     float: left;
     width: 220px;
+    margin-right: 20px;
 }
 #main {
-    width: 630px;
+    width: 715px;
     float: left;
 }
 #main .box {
     padding: 10px;
-    width: 580px;
+    width: 700px;
     float: left;
 }
 #suggested-searches {
     padding: 10px;
 }
 #suggested-searches ul {
-    margin-left: 15px;
+}
+#suggested-searches li {
+    list-style: none;
+    margin: 0;
+    margin-bottom: 10px;
 }
 #add-another-bug-tracker {
 }
 #sidebar .box {
     width: 200px;
-}
-#suggested-searches li {
-    list-style: square;
 }
 p {
     margin: 0;
@@ -75,7 +104,6 @@ p {
 /* generic list code */
 #results.box {
     padding-right: 0;
-    padding-bottom: 0;
 }
 #results ul {
     margin: 0;
@@ -83,8 +111,6 @@ p {
     float: left;
 }
 #results li {
-    border: solid #999;
-    border-width: 0 0 0 6px; 
     overflow: hidden;
     letter-spacing: 0px;
     font-size: 100%;
@@ -102,7 +128,8 @@ p {
     padding-top: 0;
     float: left;
     font-size: 11px;
-    background-color: #eef;
+    background-color: #eee;
+    display: none;
 }
 
 #results li label {
@@ -122,7 +149,7 @@ p {
     font-size: 17px;
     float: left;
     padding: 5px 10px;
-    width: 435px;
+    width: 535px;
     overflow: hidden;
 }
 
@@ -164,7 +191,7 @@ p {
     overflow: hidden;
 }
 #results li .description {
-    width: 445px;
+    width: 525px;
     padding: .3em .7em;
     color: #888;
     float: left;
@@ -253,10 +280,9 @@ p {
     margin: 0;
     padding: 0;
     float: left;
+    width: 560px;
 }
 #opps li {
-    border: solid #ffcaa9;
-    border-width: 0 0 0 6px; 
     overflow: hidden;
 }
 #opps li.odd {
@@ -273,15 +299,10 @@ p {
     text-align: right;
     color: #888;
 }
-#opps li .details {
-    /*border-top: 1px solid #ccf;*/
-    padding: .3em .7em;
-    padding-top: 0;
-    float: left;
-    font-size: 11px;
-    background-color: #eef;
-}
 #opps li .details .fields {
+}
+#opps li.expanded .details {
+    display: block;
 }
 #opps li.expanded .details .fields {
     display: block;
@@ -309,8 +330,10 @@ p {
 #opps li.lit-up {
     /*border-color: #777; #f85931;*/
 }
-#opps li.lit-up .title span {
-    background-color: #ffffa6;
+#opps li.lit-up {
+    border-left: 4px solid pink;
+    position: relative;
+    left: -4px;
 }
 
 #opps li .second-line {
@@ -320,7 +343,7 @@ p {
 
 #opps form {
     float: left;
-    width: 500px;
+    width: 690px;
 }
 #opps form label {
     float: left;
@@ -332,6 +355,7 @@ p {
     font-size: 19px;
     padding: 10px;
     color: #222;
+    width: 570px;
 }
 #opps form input[type='submit'] {
     font-size: 19px;
@@ -350,11 +374,9 @@ p {
 
 /* </bug list code> */
 
-:focus {
+a.title:focus {
     -moz-outline-style: none;
     outline: none;
-}
-a:focus {
 }
 .separator {
     color: #aaa;
@@ -364,4 +386,55 @@ a:focus {
     float: left;
     padding: .3em .7em;
 }
+
+#opps li.expanded .description {
+    white-space: normal;
+}
+#toggle-more-suggestions {
+    float: left;
+    width: 95%;
+    margin-bottom: 10px;
+}
+#suggested-searches input[type='checkbox'],
+#suggested-searches label {
+    cursor: pointer;
+    cursor: hand;
+}
+#suggested-searches label.on {
+    font-weight: bold;
+}
+input[type='text'].default-text-active {
+    color: #999 ! important;
+}
+#shortcuts-legend {
+    float: left;
+    font-size: 8pt;
+}
+#shortcuts-legend h5 {
+    font-size: 9pt;
+    font-weight: normal;
+    margin-bottom: 10px;
+}
+#shortcuts-legend dt {
+    float: left;
+    width: 40px;
+    text-align: right;
+    clear: left;
+}
+#shortcuts-legend dt strong {
+    font-family: monospace;
+    background-color: #f9f9f9;
+    padding: 0 1px;
+}
+#shortcuts-legend dd {
+    float: left;
+    width: 60px;
+    margin: 0;
+}
+#shortcuts-legend dt,
+#shortcuts-legend dd {
+    margin-bottom: 5px;
+}
+
+
 /* vim: set ai ts=4 sts=4 et sw=4: */

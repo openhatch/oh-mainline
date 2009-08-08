@@ -1,11 +1,17 @@
+from mysite.base.tests import make_twill_url, TwillTests
+
+from mysite.profile.models import Person
+import mysite.customs.miro
+
 import django.test
-from search.models import Project, Bug
-import search.views
+from .models import Project, Bug
+from . import views
 import lpb2json
 import datetime
-import search.launchpad_crawl
+import mysite.search.launchpad_crawl
 
 import simplejson
+import os
 import mock
 import time
 import twill
@@ -14,30 +20,12 @@ from twill.shell import TwillCommandLoop
 from django.test import TestCase
 from django.core.servers.basehttp import AdminMediaHandler
 from django.core.handlers.wsgi import WSGIHandler
+from django.core.urlresolvers import reverse
+
+from django.conf import settings
 from StringIO import StringIO
 
-# FIXME: Later look into http://stackoverflow.com/questions/343622/how-do-i-submit-a-form-given-only-the-html-source
-
-# Functions you'll need:
-
-def twill_setup():
-    app = AdminMediaHandler(WSGIHandler())
-    twill.add_wsgi_intercept("127.0.0.1", 8080, lambda: app)
-
-def twill_teardown():
-    twill.remove_wsgi_intercept('127.0.0.1', 8080)
-
-def make_twill_url(url):
-    # modify this
-    return url.replace("http://openhatch.org/",
-            "http://127.0.0.1:8080/")
-
-def twill_quiet():
-    # suppress normal output of twill.. You don't want to
-    # call this if you want an interactive session
-    twill.set_output(StringIO())
-
-class AutoCompleteTests(django.test.TestCase):
+class AutoCompleteTests(TwillTests):
     """
     Test whether the autocomplete can handle
      - a field-specific query
@@ -58,28 +46,28 @@ class AutoCompleteTests(django.test.TestCase):
                 )
 
     def testSuggestionsMinimallyWorks(self):
-        suggestions = search.views.get_autocompletion_suggestions('')
+        suggestions = views.get_autocompletion_suggestions('')
         self.assert_("lang:Vogon" in suggestions)
 
     def testSuggestForAllFields(self):
-        c_suggestions = search.views.get_autocompletion_suggestions('C')
+        c_suggestions = views.get_autocompletion_suggestions('C')
         self.assert_('lang:C++' in c_suggestions)
         self.assert_('project:ComicChat' in c_suggestions)
 
     def testQueryNotFieldSpecificFindProject(self):
-        c_suggestions = search.views.get_autocompletion_suggestions('Comi')
+        c_suggestions = views.get_autocompletion_suggestions('Comi')
         self.assert_('project:ComicChat' in c_suggestions)
 
     def testQueryFieldSpecific(self):
-        lang_C_suggestions = search.views.get_autocompletion_suggestions(
+        lang_C_suggestions = views.get_autocompletion_suggestions(
                 'lang:C')
         self.assert_('lang:C++' in lang_C_suggestions)
         self.assert_('lang:Python' not in lang_C_suggestions)
         self.assert_('project:ComicChat' not in lang_C_suggestions)
 
     def testSuggestsCorrectStringsFormattedForJQueryAutocompletePlugin(self):
-        suggestions_list = search.views.get_autocompletion_suggestions('')
-        suggestions_string = search.views.list_to_jquery_autocompletion_format(
+        suggestions_list = views.get_autocompletion_suggestions('')
+        suggestions_string = views.list_to_jquery_autocompletion_format(
                 suggestions_list)
         suggestions_list_reconstructed = suggestions_string.split("\n")
         self.assert_("project:ComicChat" in suggestions_list_reconstructed)
@@ -98,14 +86,8 @@ class AutoCompleteTests(django.test.TestCase):
         response = self.client.get( '/search/get_suggestions', {})
         self.assertEquals(response.status_code, 500)
 
-class TestNonJavascriptSearch(django.test.TestCase):
+class TestNonJavascriptSearch(TwillTests):
     fixtures = ['bugs-for-two-projects.json']
-
-    def setUp(self):
-        twill_setup()
-
-    def tearDown(self):
-        twill_teardown()
 
     def testSearch(self):
         response = self.client.get('/search/')
@@ -129,7 +111,42 @@ class TestNonJavascriptSearch(django.test.TestCase):
 
         tc.fv('search_opps', 'language', 'c#')
         tc.submit()
-        for n in range(717, 727):
+        for n in range(717, 723):
+            tc.find('Description #%d' % n)
+
+    def testSearchCombinesQueries(self):
+        response = self.client.get('/search/',
+                                   {'language': 'python "Description #10"'})
+
+        found_it = False
+        for bug in response.context[0]['bunch_of_bugs']:
+            if bug.title == 'Title #10':
+                found_it = True
+
+        self.assert_(found_it)
+
+    def testSearchProjectName(self):
+        response = self.client.get('/search/',
+                                   {'language': 'exaile #10'})
+
+        found_it = False
+        for bug in response.context[0]['bunch_of_bugs']:
+            if bug.title == 'Title #10':
+                found_it = True
+
+        self.assert_(found_it)
+
+    def testSearchWithArgsWithQuotes(self):
+        url = 'http://openhatch.org/search/'
+        tc.go(make_twill_url(url))
+        tc.fv('search_opps', 'language', '"python"')
+        tc.submit()
+        for n in range(1, 11):
+            tc.find('Description #%d' % n)
+
+        tc.fv('search_opps', 'language', 'c#')
+        tc.submit()
+        for n in range(717, 723):
             tc.find('Description #%d' % n)
 
     def test_json_view(self):
@@ -161,19 +178,19 @@ class TestNonJavascriptSearch(django.test.TestCase):
         tc.go(make_twill_url(url))
         tc.fv('search_opps', 'language', 'python')
         tc.submit()
-        for n in range(1, 11):
+        for n in range(1, 10):
             tc.find('Description #%d' % n)
 
         tc.follow('Next')
-        for n in range(11, 21):
+        for n in range(11, 20):
             tc.find('Description #%d' % n)
 
         tc.fv('search_opps', 'language', 'c#')
         tc.submit()
-        for n in range(717, 727):
+        for n in range(1001, 1010):
             tc.find('Description #%d' % n)
         tc.follow('Next')
-        for n in range(727, 737):
+        for n in range(1011, 1020):
             tc.find('Description #%d' % n)
 
 sample_launchpad_data_dump = mock.Mock()
@@ -185,26 +202,20 @@ sample_launchpad_data_dump.return_value = [dict(
         date_reported=time.localtime(),
         title="Joi's Lab AFS",)]
 
-class AutoCrawlTests(django.test.TestCase):
-    def setUp(self):
-        twill_setup()
-
-    def tearDown(self):
-        twill_teardown()
-
-    @mock.patch('search.launchpad_crawl.dump_data_from_project', 
+class AutoCrawlTests(TwillTests):
+    @mock.patch('mysite.search.launchpad_crawl.dump_data_from_project', 
                 sample_launchpad_data_dump)
     def testSearch(self):
         # Verify that we can't find a bug with the right description
-        self.assertRaises(search.models.Bug.DoesNotExist,
-                          search.models.Bug.objects.get,
+        self.assertRaises(mysite.search.models.Bug.DoesNotExist,
+                          mysite.search.models.Bug.objects.get,
                           title="Joi's Lab AFS")
         # Now get all the bugs about rose
-        search.launchpad_crawl.grab_lp_bugs(lp_project='rose',
+        mysite.search.launchpad_crawl.grab_lp_bugs(lp_project='rose',
                                             openhatch_project=
                                             'rose.makesad.us')
         # Now see, we have one!
-        b = search.models.Bug.objects.get(title="Joi's Lab AFS")
+        b = mysite.search.models.Bug.objects.get(title="Joi's Lab AFS")
         self.assertEqual(b.project.name, 'rose.makesad.us')
         # Ta-da.
         return b
@@ -219,7 +230,7 @@ class AutoCrawlTests(django.test.TestCase):
         self.assertEqual(new_b.title, "Joi's Lab AFS") # bug title restored
         # thanks to fresh import
 
-class LaunchpadImporterTests(django.test.TestCase):
+class LaunchpadImporterTests(TwillTests):
     def test_lp_update_handler(self):
         '''Test the Launchpad import handler with some fake data.'''
         some_date = datetime.datetime(2009, 4, 1, 2, 2, 2)
@@ -236,7 +247,7 @@ class LaunchpadImporterTests(django.test.TestCase):
                         last_polled=some_date)
 
         # Create the bug...
-        search.launchpad_crawl.handle_launchpad_bug_update(query_data, new_data)
+        mysite.search.launchpad_crawl.handle_launchpad_bug_update(query_data, new_data)
         # Verify that the bug was stored.
         bug = Bug.objects.get(canonical_bug_link=
                                        query_data['canonical_bug_link'])
@@ -246,7 +257,7 @@ class LaunchpadImporterTests(django.test.TestCase):
         # Now re-do the update, this time with more people involved
         new_data['people_involved'] = 1000 * 1000 * 1000
         # pass the data in...
-        bug = search.launchpad_crawl.handle_launchpad_bug_update(query_data,
+        bug = mysite.search.launchpad_crawl.handle_launchpad_bug_update(query_data,
                                                                  new_data)
         # Do a get; this will explode if there's more than one with the
         # canonical_bug_link, so it tests duplicate finding.
@@ -277,11 +288,89 @@ class LaunchpadImporterTests(django.test.TestCase):
                                submitter_username='bob',
                                date_reported=now_d,
                                last_touched=now_d)
-        out_q, out_d = search.launchpad_crawl.clean_lp_data_dict(sample_in)
+        out_q, out_d = mysite.search.launchpad_crawl.clean_lp_data_dict(sample_in)
         self.assertEqual(sample_out_query, out_q)
         # Make sure last_polled is at least in the same year
         self.assertEqual(out_d['last_polled'].year, datetime.date.today().year)
         del out_d['last_polled']
         self.assertEqual(sample_out_data, out_d)
+
+class Recommend(TwillTests):
+    fixtures = ['user-paulproteus.json',
+            'person-paulproteus.json',
+            'cchost-data-imported-from-ohloh.json',
+            'bugs-for-two-projects.json',
+            'extra-fake-cchost-related-projectexps.json']
+
+    def test_get_recommended_search_terms_for_user(self):
+        person = Person.objects.get(user__username='paulproteus')
+        terms = person.get_recommended_search_terms()
+        self.assertEqual(terms,
+                [u'Automake', u'C#', u'C++', u'Make', u'Mozilla Firefox', 
+                 u'Python', u'shell script', u'XUL'])
+
+    def test_search_page_context_includes_recommendations(self):
+        client = self.login_with_client()
+        response = client.get('/search/')
+        self.assertEqual(
+                response.context[0]['suggestions'],
+                [
+                    (0, 'Automake',        False),
+                    (1, 'C#',              False),
+                    (2, 'C++',             False),
+                    (3, 'Make',            False),
+                    (4, 'Mozilla Firefox', False),
+                    (5, 'Python',          False),
+                    (6, 'shell script',    False),
+                    (7, 'XUL',             False),
+                    ])
+
+# We're not doing this one because at the moment suggestions only work in JS.
+#    def test_recommendations_with_twill(self):
+#        self.login_with_twill()
+#        tc.go(make_twill_url('http://openhatch.org/search/'))
+#        tc.fv('suggested_searches', 'use_0', '0') # Automake
+#        tc.fv('suggested_searches', 'use_1', '0') # C
+#        tc.fv('suggested_searches', 'use_2', '0') # C++
+#        tc.fv('suggested_searches', 'use_3', '0') # Firefox
+#        tc.fv('suggested_searches', 'use_4', '0') # Python
+#        tc.fv('suggested_searches', 'use_5', '1') # XUL
+#        tc.fv('suggested_searches', 'start', '0')
+#        tc.fv('suggested_searches', 'end', '100')
+#        tc.submit()
+#
+#        # Check that if you click checkboxes,
+#        # you get the right list of bugs.
+#        # Test for bugs that ought to be there
+#        # and bugs that ought not to be. 
+#        tc.find("Yo! This is a bug in XUL but not Firefox")
+#        tc.find("Oy! This is a bug in XUL and Firefox")
+#
+#        tc.fv('suggested_searches', 'use_0', '0') # Automake
+#        tc.fv('suggested_searches', 'use_1', '0') # C
+#        tc.fv('suggested_searches', 'use_2', '0') # C++
+#        tc.fv('suggested_searches', 'use_3', '1') # Firefox
+#        tc.fv('suggested_searches', 'use_4', '0') # Python
+#        tc.fv('suggested_searches', 'use_5', '1') # XUL
+#        tc.fv('suggested_searches', 'start', '0')
+#        tc.fv('suggested_searches', 'end', '100')
+#        tc.submit()
+#
+#        tc.notfind("Yo! This is a bug in XUL but not Firefox")
+#        tc.find("Oy! This is a bug in XUL and Firefox")
+
+class TestQuerySplitter(django.test.TestCase):
+    def test_split_query_words(self):
+        easy = '1 2 3'
+        self.assertEqual(mysite.search.views.split_query_words(easy),
+                         ['1', '2', '3'])
+
+        easy = '"1"'
+        self.assertEqual(mysite.search.views.split_query_words(easy),
+                         ['1'])
+
+        easy = 'c#'
+        self.assertEqual(mysite.search.views.split_query_words(easy),
+                         ['c#'])
 
 # vim: set ai et ts=4 sw=4 columns=80:

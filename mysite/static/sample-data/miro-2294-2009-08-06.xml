@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<!DOCTYPE bugzilla SYSTEM "http://bugzilla.pculture.org/bugzilla.dtd">
+
+<bugzilla version="3.0"
+          urlbase="http://bugzilla.pculture.org/"
+          maintainer="admin@pculture.org"
+>
+
+    <bug>
+          <bug_id>2294</bug_id>
+          
+          <creation_ts>2006-06-09 12:49</creation_ts>
+          <short_desc>Add test for torrents that use gzip&apos;d urls</short_desc>
+          <delta_ts>2008-06-11 23:56:27</delta_ts>
+          <reporter_accessible>1</reporter_accessible>
+          <cclist_accessible>1</cclist_accessible>
+          <classification_id>1</classification_id>
+          <classification>Unclassified</classification>
+          <product>Miro</product>
+          <component>main</component>
+          <version>None</version>
+          <rep_platform>all</rep_platform>
+          <op_sys>all</op_sys>
+          <bug_status>NEW</bug_status>
+          
+          
+          
+          
+          <keywords>bitesized, unittest</keywords>
+          <priority>P1</priority>
+          <bug_severity>normal</bug_severity>
+          <target_milestone>Future</target_milestone>
+          
+          
+          
+          <everconfirmed>1</everconfirmed>
+          <reporter name="Nick Nassar">nassar@pculture.org</reporter>
+          <assigned_to name="Administrator">admin@pculture.org</assigned_to>
+          <cc>cwebber@dustycloud.org</cc>
+
+      
+
+      
+          <long_desc isprivate="0">
+            <who name="Nick Nassar">nassar@pculture.org</who>
+            <bug_when>2006-06-09 12:49:15</bug_when>
+            <thetext>This broke. We should make sure it doesn&apos;t break again.
+Trac ticket id: 2294
+Owner: wguaraldi
+Reporter: nassar
+Keywords: Torrent unittest</thetext>
+          </long_desc>
+          <long_desc isprivate="0">
+            <who name="Christopher Webber">cwebber@dustycloud.org</who>
+            <bug_when>2008-06-11 23:56:27</bug_when>
+            <thetext>Looks like the rest of the unit tests work by actually by retrieving a page from participatoryculture.org. 
+
+Do we need to put up a gzipped page?  Or, is there some sort of resource out there that&apos;s known to have and retain a gzipped page?  Or should we use some other solution?</thetext>
+          </long_desc>
+          <long_desc isprivate="0">
+            <who name="Will Kahn-Greene">will.guaraldi@pculture.org</who>
+            <bug_when>2008-03-05 10:04:14</bug_when>
+            <thetext>This is a bitesized task for a new contributor or someone looking for something to do.
+
+Documentation on unit tests is located in the wiki at:
+
+https://develop.participatoryculture.org/trac/democracy/wiki/UnitTesting
+
+Any status or thoughts should be in the comments on this bug.</thetext>
+          </long_desc>
+          <long_desc isprivate="0">
+            <who name="Will Kahn-Greene">will.guaraldi@pculture.org</who>
+            <bug_when>2007-07-24 13:06:15</bug_when>
+            <thetext>This either needs a unittest or has one.  Need to investigate.
+Original author: wguaraldi</thetext>
+          </long_desc>
+          <long_desc isprivate="0">
+            <who name="Janet">jed@pculture.org</who>
+            <bug_when>2006-12-21 22:29:24</bug_when>
+            <thetext>
+Original author: jed</thetext>
+          </long_desc>
+          <long_desc isprivate="0">
+            <who name="Chris Lahey">clahey@clahey.net</who>
+            <bug_when>2006-11-10 15:56:33</bug_when>
+            <thetext>
+Original author: clahey</thetext>
+          </long_desc>
+          <long_desc isprivate="0">
+            <who name="Nick Nassar">nassar@pculture.org</who>
+            <bug_when>2006-09-27 13:51:47</bug_when>
+            <thetext>Tests?! QA! Who needs that?!
+
+No, seriously, we&apos;ll do this by 1.0. I swear.
+Original author: nassar</thetext>
+          </long_desc>
+          <long_desc isprivate="0">
+            <who name="Nick Nassar">nassar@pculture.org</who>
+            <bug_when>2006-08-09 16:20:49</bug_when>
+            <thetext>Tests are the first things cut in a crunch.
+Original author: nassar</thetext>
+          </long_desc>
+      
+    </bug>
+
+</bugzilla>

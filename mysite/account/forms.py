@@ -1,7 +1,7 @@
 import django.contrib.auth.forms
 from django.contrib.auth.models import User
 import django.forms
-from profile.models import Person
+from mysite.profile.models import Person
 import StringIO
 from django.core.files.images import get_image_dimensions
 from django.core.files.uploadedfile import InMemoryUploadedFile
@@ -44,6 +44,23 @@ class UserCreationFormWithEmail(django.contrib.auth.forms.UserCreationForm):
 
 class ShowEmailForm(django.forms.Form):
     show_email = django.forms.BooleanField(required=False)
+
+class EditEmailForm(django.forms.ModelForm):
+    class Meta:
+        model = django.contrib.auth.models.User
+        fields = ('email',)
+
+    def clean_email(self):
+        """Verify that their email is unique."""
+        email = self.cleaned_data["email"]
+        other_users_with_this_email = list(
+                User.objects.filter(email=email).exclude(
+                    username=self.instance.username))
+        if not other_users_with_this_email:
+            return email
+        else:
+            raise django.forms.ValidationError(
+                "A user with that email already exists.")
 
 class EditPhotoForm(django.forms.ModelForm):
     class Meta:

@@ -1,16 +1,16 @@
 body {
     font: 9pt Verdana, Bitstream Vera Sans, Arial, sans-serif;
-    background-color: #ddeeff; 
+    /*background-color: #ddeeff;*/
+    background: #fff url("/static/images/motif-eee.png");
     margin: 0;
     padding: 0;
 }
 a {
-    color: darkorange; #66AA33;
+    color: #ff6d3d; /*#ff613f; #ff7800; 00a8ff; eeb300; */
     text-decoration: none;
 }
 
 a:hover {
-    color: orange; #338800;
     text-decoration: underline;
 }
 
@@ -19,12 +19,10 @@ a img {
 }
 
 h1 a {
-    color: #2288BB;
     text-decoration: none;
 }
 
 h1 a:hover {
-    color: #223366;
     text-decoration: none;
 }
 
@@ -39,16 +37,12 @@ h1 a:hover {
     border-top: 2px solid #bfe2ff;
     float: left;
     border-bottom: 1px solid #eee;
-    background: #fff url('/static/images/module-head-bg.png') bottom repeat-x;
-}
-
-.module > .head h3 {
-    padding: 15px 20px;
+    float: left;
+    background-color: #fff;
 }
 
 .module > .body {
     float: left;
-    background-color: #fff;
     padding: 20px;
 }
 
@@ -71,7 +65,6 @@ h1 a:hover {
 
 .submodule {
     margin-bottom: 20px;
-    background-color: #f4f4f4;
     border: 1px solid #ddd;
     border-top: 3px double #ddd;
     border-bottom: 3px double #ddd;
@@ -80,7 +73,7 @@ h1 a:hover {
 
 .submodule > .head {
     float: left;
-    background: #f4f4f4 url('/static/images/module-head-bg.png') bottom repeat-x;
+    background: #fdfdfe url('/static/images/module-head-bg.png') bottom repeat-x;
     float: left;
     padding: 10px 20px;
     border-bottom: 1px solid #ddd;
@@ -130,7 +123,7 @@ h1, h2, h3, h4 {
     border-top: 0;
 }
 #nav h2 {
-    width: 200px;
+    width: 128px;
     text-align: center;
     float: left;
 }
@@ -149,10 +142,9 @@ h1, h2, h3, h4 {
 #links li a {
     color: #777;
     padding: 3px 10px 5px 10px;
-    background-color: #fff; d8d8e4; 00afff; caffff; 7fc4ff;
+    background-color: #fff; 
     border-top: 2px solid #ccc;
     float: left;
-    text-decoration: none;
 }
 
 #links li a:hover {
@@ -160,7 +152,9 @@ h1, h2, h3, h4 {
 }
 
 #page-top {
-    width: 1000px;
+    width: 960px;
+    float: left;
+    padding: 0 20px;
 }
 
 ul#links {
@@ -173,24 +167,21 @@ ul#links {
     margin-top: 20px;
 }
 
+#account-links #username {
+    font-weight: bold;
+}
+#account-links {
+    float: right;
+    border: 5px solid #fff;
+}
 #account-links li {
-    background-color: #F4F4F4;
-    border-top: 2px solid #CCDDFF;
+    background-color: #f4f4f4;
     padding: 5px 10px;
     margin: 0;
     font-size: 9pt;
 }
 
-#account-links li a {
-    color: #2288BB;
-}
-
-#account-links li a:hover {
-    color: #223366;
-}
-
 ul#account-links {
-    margin-left: 20px;
 }
 
 ul#user-actions {
@@ -212,7 +203,6 @@ ul#user-actions a {
     width: 960px;
     padding: 20px;
     padding-bottom: 5px;
-    background: url("/static/images/motif-eee.png");
 }
 
 #footer {
@@ -257,6 +247,11 @@ h3 {
     font-weight: bold;
     color: #555;
     letter-spacing: 0;
+    font: 13pt Verdana;
+    margin: 0;
+}
+.module > .head h3 {
+    padding: 15px 20px;
 }
 .module > .head ul {
     float: right;
@@ -273,10 +268,6 @@ h3 {
     line-height: 13pt;
     font-weight: bold;
     margin-right: 3px;
-}
-.module > .head ul li a:hover {
-    color: orange;
-    text-decoration: underline;
 }
 .tags {
     float: left;
@@ -338,10 +329,6 @@ img {
 .column {
     float: left;
     margin-right: 10px;
-}
-h3 {
-    font: 13pt Verdana;
-    margin: 0;
 }
 h4, .cute-header {
     width: 900px; /* infinity */

@@ -1,16 +1,20 @@
-import base.tests 
-from base.tests import make_twill_url
-from profile.models import Person
+#{{{ imports
+import os
+import Image
+
+from mysite.profile.models import Person
+from mysite.base.tests import make_twill_url, TwillTests
+from mysite.profile.models import Person
 
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.test.client import Client
 from django.core.files.images import get_image_dimensions
-import Image
 
 from twill import commands as tc
+#}}}
 
-class Login(base.tests.TwillTests):
+class Login(TwillTests):
     # {{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
     
@@ -47,8 +51,21 @@ class Login(base.tests.TwillTests):
         tc.notfind('is_authenticated indeed')
     # }}}
 
-class Signup(base.tests.TwillTests):
-    # {{{
+class LoginWithOpenID(TwillTests):
+    #{{{
+    fixtures = ['user-paulproteus']
+    def test_login_creates_user_profile(self):
+        # Front page
+        url = 'http://openhatch.org/'
+
+        # Even though we didn't add the person-paulproteus
+        # fixture, a Person object is created.
+        self.assert_(list(
+            Person.objects.filter(user__username='paulproteus')))
+    #}}}
+
+class Signup(TwillTests):
+        # {{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     username = 'ziggy'
@@ -146,17 +163,20 @@ class Signup(base.tests.TwillTests):
 
     # }}}
 
-class EditPassword(base.tests.TwillTests):
+class EditPassword(TwillTests):
+    #{{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
     def change_password(self, old_pass, new_pass,
             should_succeed = True):
         tc.go(make_twill_url('http://openhatch.org/people/paulproteus'))
         tc.follow('settings')
+        tc.follow('Change your password')
+        tc.url('/account/settings/password')
+
         tc.find('Change password')
-        tc.fv('change_password', 'old_password',
-                old_pass)
-        tc.fv('change_password', 'new_password1', new_pass)
-        tc.fv('change_password', 'new_password2', new_pass)
+        tc.fv('a_settings_tab_form', 'old_password', old_pass)
+        tc.fv('a_settings_tab_form', 'new_password1', new_pass)
+        tc.fv('a_settings_tab_form', 'new_password2', new_pass)
         tc.submit()
 
         # Try to log in with the new password now
@@ -182,12 +202,83 @@ class EditPassword(base.tests.TwillTests):
         newpass='new'
         self.change_password(oldpass, newpass,
                 should_succeed = False)
+#}}}
 
-class EditPhoto(base.tests.TwillTests):
+class EditContactInfo(TwillTests):
+    #{{{
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+    def test_edit_email_address(self):
+        self.login_with_twill()
+        
+        _url = 'http://openhatch.org/account/settings/contact-info/'
+        url = make_twill_url(_url)
+
+        email = 'new@ema.il'
+
+        # Go to contact info form
+        tc.go(url)
+
+        tc.notfind('checked="checked"')
+        tc.notfind(email)
+
+        # Edit email
+        tc.fv(1, 'edit_email-email', email)
+        # Show email
+        tc.fv(1, 'show_email-show_email', '1') # [1]
+        tc.submit()
+
+        # Form submission ought to redirect us back to the form.
+        tc.url(url)
+
+        # Was email successfully edited? 
+        tc.find(email)
+
+        # Was email visibility successfully edited? [2]
+        tc.find('checked="checked"')
+
+        # And does the email address show up on the profile?
+        tc.go(make_twill_url(
+                'http://openhatch.org/people/paulproteus'))
+        tc.find(email)
+
+        # 2. And when we uncheck, does it go away?
+        
+        # 2.1. Go to contact info form
+        tc.go(url)
+
+        # 2.2. Don't show email
+        tc.fv(1, 'show_email-show_email', '0') # [1]
+        tc.submit()
+
+        # 2.3. Verify it's not on profile anymore
+        tc.go(make_twill_url(
+                'http://openhatch.org/people/paulproteus'))
+        tc.notfind(email)
+
+        # [1]: This email suggests that twill only accepts
+        # *single quotes* around the '1'.
+        # <http://lists.idyll.org/pipermail/twill/2006-February/000224.html>
+        #
+        # [2]: This assertion works b/c there's only one checkbox.
+    #}}}
+
+photos = [os.path.join(os.path.dirname(__file__),
+                       '..', '..', 'sample-photo.' + ext)
+                       for ext in ('png', 'jpg')]
+
+def photo(f):
+    filename = os.path.join(
+        os.path.dirname(__file__),
+        '..', f)
+    assert os.path.exists(filename)
+    return filename
+
+class EditPhoto(TwillTests):
+    #{{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
     def test_set_avatar(self):
-        for image in ('static/sample-photo.png', 
-                      'static/sample-photo.jpg'):
+        for image in [photo('static/sample-photo.png'),
+                      photo('static/sample-photo.jpg')]:
             self.login_with_twill()
             url = 'http://openhatch.org/people/paulproteus/'
             tc.go(make_twill_url(url))
@@ -200,8 +291,8 @@ class EditPhoto(base.tests.TwillTests):
                          open(image).read())
 
     def test_set_avatar_too_wide(self):
-        for image in ('static/images/too-wide.jpg', 
-                      'static/images/too-wide.png'):
+        for image in [photo('static/images/too-wide.jpg'),
+                      photo('static/images/too-wide.png')]:
             self.login_with_twill()
             url = 'http://openhatch.org/people/paulproteus/'
             tc.go(make_twill_url(url))
@@ -213,15 +304,24 @@ class EditPhoto(base.tests.TwillTests):
             image_as_stored = Image.open(p.photo.file)
             w, h = image_as_stored.size
             self.assertEqual(w, 200)
+    #}}}
 
-class LoginWithOpenId(base.tests.TwillTests):
-    fixtures = ['user-paulproteus']
-    def test_login_creates_user_profile(self):
-        # Front page
-        url = 'http://openhatch.org/'
+class EditPhotoWithOldPerson(TwillTests):
+    #{{{
+    fixtures = ['user-paulproteus', 'person-paulproteus-with-blank-photo']
+    def test_set_avatar(self):
+        for image in (photo('static/sample-photo.png'),
+                      photo('static/sample-photo.jpg')):
+            self.login_with_twill()
+            url = 'http://openhatch.org/people/paulproteus/'
+            tc.go(make_twill_url(url))
+            tc.follow('Change photo')
+            tc.formfile('edit_photo', 'photo', image)
+            tc.submit()
+            # Now check that the photo == what we uploaded
+            p = Person.objects.get(user__username='paulproteus')
+            self.assert_(p.photo.read() ==
+                    open(image).read())
+    #}}}
 
-        # Even though we didn't add the person-paulproteus
-        # fixture, a Person object is created.
-        self.assert_(list(
-            Person.objects.filter(user__username='paulproteus')))
-
+# vim: set nu:
