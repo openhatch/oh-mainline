@@ -30,9 +30,15 @@
             <label>Status: </label>
             <span class='value'>triaged</span>
         </span>
-        <span class='field last-polled'>
+        <span class='field last-touched'>
             <label>Last touched: </label>
-            <span class='value'>2 weeks ago</span>
+            <span class='value'>
+                {% if bug.last_touched %}
+                {{ bug.last_touched|timesince}} ago
+                {% else %}
+                Unknown
+                {% endif %}
+            </span>
         </span>
         <span class='field origin'>
             <label>Link: </label>
