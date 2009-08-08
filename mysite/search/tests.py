@@ -186,20 +186,35 @@ class TestNonJavascriptSearch(TwillTests):
         tc.go(make_twill_url(url))
         tc.fv('search_opps', 'language', 'python')
         tc.submit()
-        for n in range(1, 10):
-            tc.find('Description #%d' % n)
 
+        # Grab descriptions of first 10 Exaile bugs
+        bugs = Bug.objects.filter(project__name=
+                                  'Exaile').order_by('last_touched')[:10]
+
+        for bug in bugs:
+            tc.find(bug.description)
+
+        # Hit the next button
         tc.follow('Next')
-        for n in range(11, 20):
-            tc.find('Description #%d' % n)
 
+        # Grab descriptions of next 10 Exaile bugs
+        bugs = Bug.objects.filter(project__name=
+                                  'Exaile').order_by('last_touched')[10:20]
+
+        for bug in bugs:
+            tc.find(bug.description)
+
+        # Now, change the query - do we stay that paginated?
         tc.fv('search_opps', 'language', 'c#')
         tc.submit()
-        for n in range(1001, 1010):
-            tc.find('Description #%d' % n)
-        tc.follow('Next')
-        for n in range(1011, 1020):
-            tc.find('Description #%d' % n)
+
+        # Grab descriptions of first 10 GNOME-Do bugs
+        bugs = Bug.objects.filter(project__name=
+                                  'GNOME-Do').order_by(
+            'last_touched')[:10]
+
+        for bug in bugs:
+            tc.find(bug.description)
 
 sample_launchpad_data_dump = mock.Mock()
 sample_launchpad_data_dump.return_value = [dict(
