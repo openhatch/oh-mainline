@@ -4,6 +4,13 @@
 }
 #big-people-list h3 {
     width: 980px;
+    margin: 0 0 -10px 0;
+    padding: 0;
+}
+
+#big-people-list img {
+    margin: 0 0 -5px 0;
+    padding: 0;
 }
 #big-people-list ul {
     width: 980px;
