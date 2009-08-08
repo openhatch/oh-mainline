@@ -145,7 +145,7 @@ p {
     width: 80px;
 }
 
-#results li .title {
+#results li .head {
     font-size: 17px;
     float: left;
     padding: 5px 10px;
@@ -162,7 +162,7 @@ p {
     text-decoration: none;
 }
 
-#results li .description p {
+#results li .description-container p {
     margin-top: 5px;
 }
 
@@ -190,7 +190,7 @@ p {
     width: 460px;
     overflow: hidden;
 }
-#results li .description {
+#results li .description-container {
     width: 525px;
     padding: .3em .7em;
     color: #888;
@@ -198,7 +198,7 @@ p {
     overflow: hidden;
     white-space: nowrap;
 }
-#results li .description * {
+#results li .description-container * {
     display: inline;
 }
 
@@ -387,7 +387,7 @@ a.title:focus {
     padding: .3em .7em;
 }
 
-#opps li.expanded .description {
+#opps li.expanded .description-container {
     white-space: normal;
 }
 #toggle-more-suggestions {

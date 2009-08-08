@@ -1,36 +1,47 @@
-<!--div class='project-info'>
+<!-- <div class='project-info'>
 <img class='logo' src='{{ bug.project.icon_url }}' />
-</div-->
+</div> -->
 <div class='first-line'>
-    <a class='title' href='{{ bug.canonical_bug_link }}'
-        >+
-        <span>{{ bug.project.name }} - {{ bug.title }}</span>
-    </a>
-    <!--div class='age'>3 days old</div-->
+    <div class='head'>
+        <span class='project__name'>{{ bug.project.name }}</span>
+        -
+        <a class='canonical_bug_link' href='{{ bug.canonical_bug_link }}'>
+            <span class='title'>{{ bug.title }}</span>
+        </a>
+        {#<div class='age'>3 days old</div>#}
+    </div>
 </div>
 <div class='second-line'>
-    <span class='description'>
-        {% if bug.good_for_newcomers %}
-        <span class='good-for-beginners' style='width: 300px; '>
+    <span class='description-container'>
+        <span class='good-for-beginners'
+            {% if bug.good_for_newcomers %}
+            style='width: 300px; '
+            {% endif %}
+            >
+            {% if bug.good_for_newcomers %}
             Good for newcomers &bull;
+            {% endif %}
+            <span class='description'>
+                {{ bug.description }}
+            </span>
         </span>
-        {% endif %}
-        {{ bug.description }}
     </span>
 </div>
 <div class='details'>
     <div class='fields'>
-        <span class='field importance'>
+        <span class='field people_involved'>
             <label>People involved: </label>
             <span class='value'>
-                <a href=''>13</a>
+                {{ bug.people_involved }}
             </span>
         </span>
         <span class='field status'>
             <label>Status: </label>
-            <span class='value'>triaged</span>
+            <span class='value'>
+                {{ bug.status }}
+            </span>
         </span>
-        <span class='field last-touched'>
+        <span class='field last_touched'>
             <label>Last touched: </label>
             <span class='value'>
                 {% if bug.last_touched %}
@@ -43,17 +54,24 @@
         <span class='field origin'>
             <label>Link: </label>
             <span class='value'>
-                <a href='{{ bug.canonical_bug_link }}'>Upstream issue</a>
+                <a class='canonical_bug_link'
+                    href='{{ bug.canonical_bug_link }}'>Upstream issue</a>
             </span>
         </span>
         <span class='field importance'>
             <label>Importance: </label>
-            <span class='value'>wishlist</span>
+            <span class='value'>
+                {{ bug.importance }}
+            </span>
         </span>
-        <span class='field last-polled'>
+        <span class='field last_polled'>
             <label>Last polled: </label>
-            <span class='value'>3 days ago</span>
-            <!--a href=''>poll now</a-->
+            <span class='value'>
+                {% if bug.last_polled %}
+                {{ bug.last_polled|timesince }}
+                {% endif %}
+            </span>
+            {# <a href=''>poll now</a> #}
         </span>
     </div>
 </div>

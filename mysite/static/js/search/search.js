@@ -131,20 +131,20 @@ SearchResults = {}
 SearchResults.bindEventHandlers = function () {
 
         $('.title').click(function () {
-                $gewgaw = $(this.parentNode.parentNode);
-                $gewgaw.toggleExpanded();
+                $result = $(this.parentNode.parentNode);
+                $result.toggleExpanded();
                 return false;
                 });
 
         $('.show-details').click(function () {
-                $gewgaw = $(this.parentNode.parentNode.parentNode);
-                $gewgaw.toggleExpanded();
+                $result = $(this.parentNode.parentNode.parentNode);
+                $result.toggleExpanded();
                 return false;
                 });
 
         $('.first-line a.title').click(function () {
-                $gewgaw = $(this.parentNode.parentNode.parentNode);
-                $gewgaw.toggleExpanded();
+                $result = $(this.parentNode.parentNode.parentNode);
+                $result.toggleExpanded();
                 return false;
                 });
 }
@@ -156,7 +156,7 @@ SearchResults.focusSearchInput = function () {
 
 SearchResults.queryURL = "/search/?";
 
-SearchResults.$gewgawsDOMList = $('.gewgaws ul');
+SearchResults.$resultsDOMList = $('.gewgaws ul');
 
 SearchResults.getLitGewgawIndex = function() {
     // FIXME: Remember the index of the lit gewgaw in Javascript,
@@ -181,13 +181,13 @@ SearchResults.jsonArrayToDocument = function (jsonArray) {
 
     var dataToDOM = function(i) {
         // Add data from JSON array element to DOM.
-        $gewgaw = $(".gewgaws li").eq(i);
+        $result = $(".gewgaws li").eq(i);
 
         // This function updates the result list.
         // It will attempt to recycle list items
         // that are already in the DOM.
         // However...
-        if ( $gewgaw.size() == 0 ) {
+        if ( $result.size() == 0 ) {
 
             console.log('creating a list item');
 
@@ -207,19 +207,47 @@ SearchResults.jsonArrayToDocument = function (jsonArray) {
             // using the exact same template that creates the visible
             // search results.
             
-            $gewgaw = $('#result-template').clone()
+            $result = $('#result-template').clone()
                 .attr('id','')
                 .addClass((i % 2 == 0) ? "even" : "odd")
                 .appendTo('.gewgaws ul');
 
-            console.debug($gewgaw);
+            console.debug($result);
         }
-        $gewgaw.show();
-        $gewgaw.attr('id', "gewgaw-" + this.pk);
+        $result.show();
+        $result.attr('id', "gewgaw-" + this.pk);
 
-        $gewgaw.find('.project').text(this.fields.project);
-        $gewgaw.find('.title').text(this.fields.title);
-        $gewgaw.find('.description').text(this.fields.description);
+        var pairs = [
+            // Each pair is of the form:
+            // Class name that's used to select a DOM element, JSON field name.
+            ['title', '.title'],
+            ['project', '.project__name'],
+            ['description', '.description'],
+            ['status', 'status .value'],
+            ['importance', '.importance .value'],
+            ['last_touched', '.last_touched .value'],
+            ['last_polled', '.last_polled .value'],
+            ['canonical_bug_link', '.canonical_bug_link', 'href'],
+            ['people_involved', '.people_involved .value'],
+        ];
+
+        $.fn.href = function (url) {
+            this.attr('href', url);
+        };
+
+        for (var p = 0; p < pairs.length; p++) {
+            var pair = pairs[p];
+            var newText = this.fields[pair[0]];
+            var selector = pair[1];
+            var verb;
+            if (typeof pair[2] == "undefined") {
+                verb = "text";
+            } else {
+                verb = pair[2]; //lol ok not really a pair anymore.
+            }
+            x = $result.find(selector)[verb](newText);
+            console.debug("", x);
+        }
     };
 
     $(jsonArray).each( dataToDOM );
