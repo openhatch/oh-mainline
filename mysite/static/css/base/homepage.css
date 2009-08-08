@@ -133,7 +133,7 @@ input[type='submit'] {
     position: relative;
     top: 1px;
     font-size: 12pt;
-    background-color: #eee;
+    background-color: #fff;
     border-top: 1px solid #ddd;
     border-right: 2px solid #ccc;
     border-bottom: 2px solid #ccc;
@@ -170,7 +170,7 @@ input[type='submit'] {
 }
 #entry-points #no-authorization-necessary li a {
     float: left;
-    background-color: #f4f4f4;
+    background-color: #e4e4dd;
     color: #222;
     padding: 20px;
     height: 100px;
@@ -198,7 +198,7 @@ input[type='submit'] {
 }
 .tab-links a {
     float: left;
-    background-color: #f4f4f4;
+    background-color: #e4e4dd;
     margin-right: 10px;
     padding: 15px 15px 13px 15px;
     font-size: 10pt;
@@ -220,7 +220,7 @@ input[type='submit'] {
     top: 0;
 }
 .tab-links a:hover {
-    background-color: #eee;
+    color: #ff6d3d;
     text-decoration: none;
 }
 .tab-links a:active {
@@ -232,7 +232,7 @@ input[type='submit'] {
 #tabs {
     float: left;
     width: 600px;
-    background-color: #f4f4f4;
+    background-color: #e4e4dd;
     margin: 0;
     border: 0;
 }
