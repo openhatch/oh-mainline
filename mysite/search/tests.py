@@ -146,19 +146,6 @@ class TestNonJavascriptSearch(TwillTests):
 
         self.assert_(found_it)
 
-    def testSearchWithArgsWithQuotes(self):
-        url = 'http://openhatch.org/search/'
-        tc.go(make_twill_url(url))
-        tc.fv('search_opps', 'language', '"python"')
-        tc.submit()
-        for n in range(1, 11):
-            tc.find('Description #%d' % n)
-
-        tc.fv('search_opps', 'language', 'c#')
-        tc.submit()
-        for n in range(717, 723):
-            tc.find('Description #%d' % n)
-
     def test_json_view(self):
         tc.go(make_twill_url('http://openhatch.org/search/?format=json&jsoncallback=callback'))
         response = tc.show()
