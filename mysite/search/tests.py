@@ -90,10 +90,11 @@ class TestNonJavascriptSearch(TwillTests):
     fixtures = ['bugs-for-two-projects.json']
 
     def testSearch(self):
+        bugs = Bug.objects.order_by('last_touched')[:10]
+
         response = self.client.get('/search/')
-        for n in range(1, 11):
-            self.assertContains(response, 'Title #%d' % n)
-            self.assertContains(response, 'Description #%d' % n)
+        # Search shows nothing when you have no query.
+        self.assertEqual(response.context[0]['bunch_of_bugs'], [])
 
     def testMatchingBugsFromMtoN(self):
         response = self.client.get('/search/')
@@ -106,13 +107,22 @@ class TestNonJavascriptSearch(TwillTests):
         tc.go(make_twill_url(url))
         tc.fv('search_opps', 'language', 'python')
         tc.submit()
-        for n in range(1, 11):
-            tc.find('Description #%d' % n)
+
+        # Grab descriptions of first 10 Exaile bugs
+        bugs = Bug.objects.filter(project__name=
+                                  'Exaile').order_by('last_touched')[:10]
+
+        for bug in bugs:
+            tc.find(bug.description)
 
         tc.fv('search_opps', 'language', 'c#')
         tc.submit()
-        for n in range(717, 723):
-            tc.find('Description #%d' % n)
+        
+        # Grab descriptions of first 10 GNOME-Do bugs
+        bugs = Bug.objects.filter(project__name=
+                                  'GNOME-Do').order_by('last_touched')[:10]
+        for bug in bugs:
+            tc.find(bug.description)
 
     def testSearchCombinesQueries(self):
         response = self.client.get('/search/',
@@ -136,21 +146,8 @@ class TestNonJavascriptSearch(TwillTests):
 
         self.assert_(found_it)
 
-    def testSearchWithArgsWithQuotes(self):
-        url = 'http://openhatch.org/search/'
-        tc.go(make_twill_url(url))
-        tc.fv('search_opps', 'language', '"python"')
-        tc.submit()
-        for n in range(1, 11):
-            tc.find('Description #%d' % n)
-
-        tc.fv('search_opps', 'language', 'c#')
-        tc.submit()
-        for n in range(717, 723):
-            tc.find('Description #%d' % n)
-
     def test_json_view(self):
-        tc.go(make_twill_url('http://openhatch.org/search/?format=json&jsoncallback=callback'))
+        tc.go(make_twill_url('http://openhatch.org/search/?format=json&jsoncallback=callback&language=python'))
         response = tc.show()
         self.assert_(response.startswith('callback'))
         json_string_with_parens = response.split('callback', 1)[1]

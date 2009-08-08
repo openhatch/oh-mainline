@@ -63,7 +63,7 @@ def fetch_bugs(request):
                 Q(description__contains=word) |
                 Q(project__name__iexact=word))
 
-        bugs.order_by('last_touched')
+        bugs = bugs.order_by('last_touched')
 
         bugs = bugs[start-1:end]
 
