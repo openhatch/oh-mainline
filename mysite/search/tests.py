@@ -20,9 +20,10 @@ from twill.shell import TwillCommandLoop
 from django.test import TestCase
 from django.core.servers.basehttp import AdminMediaHandler
 from django.core.handlers.wsgi import WSGIHandler
-from StringIO import StringIO
+from django.core.urlresolvers import reverse
 
 from django.conf import settings
+from StringIO import StringIO
 
 class AutoCompleteTests(TwillTests):
     """
@@ -177,19 +178,19 @@ class TestNonJavascriptSearch(TwillTests):
         tc.go(make_twill_url(url))
         tc.fv('search_opps', 'language', 'python')
         tc.submit()
-        for n in range(1, 11):
+        for n in range(1, 10):
             tc.find('Description #%d' % n)
 
         tc.follow('Next')
-        for n in range(11, 21):
+        for n in range(11, 20):
             tc.find('Description #%d' % n)
 
         tc.fv('search_opps', 'language', 'c#')
         tc.submit()
-        for n in range(717, 723):
+        for n in range(1001, 1010):
             tc.find('Description #%d' % n)
         tc.follow('Next')
-        for n in range(727, 737):
+        for n in range(1011, 1020):
             tc.find('Description #%d' % n)
 
 sample_launchpad_data_dump = mock.Mock()
@@ -311,16 +312,20 @@ class Recommend(TwillTests):
     def test_search_page_context_includes_recommendations(self):
         client = self.login_with_client()
         response = client.get('/search/')
-        self.assertEqual(response.context[0]['suggestions'],
-                [(0, 'Automake', True),
-                 (1, 'C#', False),
-                 (2, 'C++', False),
-                 (3, 'Make', False),
-                 (4, 'Mozilla Firefox', False),
-                 (5, 'Python', False),
-                 (6, 'shell script', False),
-                 (7, 'XUL', False)])
+        self.assertEqual(
+                response.context[0]['suggestions'],
+                [
+                    (0, 'Automake',        False),
+                    (1, 'C#',              False),
+                    (2, 'C++',             False),
+                    (3, 'Make',            False),
+                    (4, 'Mozilla Firefox', False),
+                    (5, 'Python',          False),
+                    (6, 'shell script',    False),
+                    (7, 'XUL',             False),
+                    ])
 
+# We're not doing this one because at the moment suggestions only work in JS.
 #    def test_recommendations_with_twill(self):
 #        self.login_with_twill()
 #        tc.go(make_twill_url('http://openhatch.org/search/'))

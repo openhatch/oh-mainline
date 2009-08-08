@@ -122,7 +122,113 @@
 {"pk": 1002, "model": "search.bug", "fields": 
 {"status": "Confirmed", "last_polled": "2009-06-08 23:04:31", "submitter_realname": "Mister 1002", "description": "Description #1002", "title": "Title #1002", "importance": "Importance #1002", "people_involved": 18, "last_touched": "2009-06-06 11:23:31", "submitter_username": "username 1002", "project": 1, "canonical_bug_link": "https://bugs.launchpad.net/+bug/projname/1002", "date_reported": "2006-09-10 23:02:07"}},
 {"pk": 1003, "model": "search.bug", "fields": 
-{"status": "Confirmed", "last_polled": "2009-06-08 23:04:31", "submitter_realname": "Mister 1003", "description": "Oy! This is a bug in XUL and Firefox!", "title": "Title #1003", "importance": "Importance #1003", "people_involved": 18, "last_touched": "2009-06-06 11:23:31", "submitter_username": "username 1002", "project": 3, "canonical_bug_link": "https://bugs.launchpad.net/+bug/projname/1002", "date_reported": "2006-09-10 23:02:07"}},
+{"status": "Unknown", "last_polled": "2009-06-08 23:04:31", "submitter_realname": "Mister 1003", "description": "Description #1003", "title": "Title #1003", "importance": "Importance #1003", "people_involved": 25, "last_touched": "2009-06-06 04:47:24", "submitter_username": "username 1003", "project": 1, "canonical_bug_link": "https://bugs.launchpad.net/+bug/projname/1003", "date_reported": "2006-09-12 23:02:07"}}, 
 {"pk": 1004, "model": "search.bug", "fields": 
-{"status": "Confirmed", "last_polled": "2009-06-08 23:04:31", "submitter_realname": "Mister 1003", "description": "Yo! This is a bug in XUL but not Firefox.", "title": "Title #1003", "importance": "Importance #1003", "people_involved": 18, "last_touched": "2009-06-06 11:23:31", "submitter_username": "username 1002", "project": 4, "canonical_bug_link": "https://bugs.launchpad.net/+bug/projname/1002", "date_reported": "2006-09-10 23:02:07"}}
+{"status": "Fix Committed", "last_polled": "2009-06-08 23:04:31", "submitter_realname": "Miss 1004", "description": "Description #1004", "title": "Title #1004", "importance": "Importance #1004", "people_involved": 28, "last_touched": "2009-06-08 05:51:42", "submitter_username": "username 1004", "project": 1, "canonical_bug_link": "https://bugs.launchpad.net/+bug/projname/1004", "date_reported": "2006-09-11 23:02:07"}}, 
+
+{"pk": 1005, "model": "search.bug", "fields": 
+{"status": "Fix Committed", "last_polled": "2009-06-08 23:04:31", "submitter_realname": "Miss 1005", "description": "Description #1005", "title": "Title #1005", "importance": "Importance #1005", "people_involved": 28, "last_touched": "2009-06-08 05:51:42", "submitter_username": "username 1005", "project": 1, "canonical_bug_link": "https://bugs.launchpad.net/+bug/projname/1005", "date_reported": "2006-09-11 23:02:07"}}, 
+
+{"pk": 1006, "model": "search.bug", "fields": 
+{"status": "Confirmed", "last_polled": "2009-06-08 23:04:31", "submitter_realname": "Mister 1006", "description": "Description #1006", "title": "Title #1006", "importance": "Importance #1006", "people_involved": 18, "last_touched": "2009-06-06 11:23:31", "submitter_username": "username 1006", "project": 1, "canonical_bug_link": "https://bugs.launchpad.net/+bug/projname/1006", "date_reported": "2006-09-10 23:02:07"}},
+
+{"pk": 1007, "model": "search.bug", "fields": 
+{"status": "Confirmed", "last_polled": "2009-06-08 23:04:31", "submitter_realname": "Mister 1007", "description": "Description #1007", "title": "Title #1007", "importance": "Importance #1007", "people_involved": 18, "last_touched": "2009-06-06 11:23:31", "submitter_username": "username 1007", "project": 1, "canonical_bug_link": "https://bugs.launchpad.net/+bug/projname/1007", "date_reported": "2006-09-10 23:02:07"}},
+
+{"pk": 1008, "model": "search.bug", "fields": 
+{"status": "Confirmed", "last_polled": "2009-06-08 23:04:31", "submitter_realname": "Mister 1008", "description": "Description #1008", "title": "Title #1008", "importance": "Importance #1008", "people_involved": 18, "last_touched": "2009-06-06 11:23:31", "submitter_username": "username 1008", "project": 1, "canonical_bug_link": "https://bugs.launchpad.net/+bug/projname/1008", "date_reported": "2006-09-10 23:02:07"}},
+
+{"pk": 1009, "model": "search.bug", "fields": 
+{"status": "Confirmed", "last_polled": "2009-06-08 23:04:31", "submitter_realname": "Mister 1009", "description": "Description #1009", "title": "Title #1009", "importance": "Importance #1009", "people_involved": 18, "last_touched": "2009-06-06 11:23:31", "submitter_username": "username 1009", "project": 1, "canonical_bug_link": "https://bugs.launchpad.net/+bug/projname/1009", "date_reported": "2006-09-10 23:02:07"}},
+
+{"pk": 1010, "model": "search.bug", "fields": 
+{"status": "Confirmed", "last_polled": "2009-06-08 23:04:31", "submitter_realname": "Mister 1010", "description": "Description #1010", "title": "Title #1010", "importance": "Importance #1010", "people_involved": 18, "last_touched": "2009-06-06 11:23:31", "submitter_username": "username 1010", "project": 1, "canonical_bug_link": "https://bugs.launchpad.net/+bug/projname/1010", "date_reported": "2006-09-10 23:02:07"}},
+
+{"pk": 1011, "model": "search.bug", "fields": 
+{"status": "Confirmed", "last_polled": "2009-06-08 23:04:31", "submitter_realname": "Mister 1011", "description": "Description #1011", "title": "Title #1011", "importance": "Importance #1011", "people_involved": 18, "last_touched": "2009-06-06 11:23:31", "submitter_username": "username 1011", "project": 1, "canonical_bug_link": "https://bugs.launchpad.net/+bug/projname/1011", "date_reported": "2006-09-10 23:02:07"}},
+
+{"pk": 1012, "model": "search.bug", "fields": 
+{"status": "Confirmed", "last_polled": "2009-06-08 23:04:31", "submitter_realname": "Mister 1012", "description": "Description #1012", "title": "Title #1012", "importance": "Importance #1012", "people_involved": 18, "last_touched": "2009-06-06 11:23:31", "submitter_username": "username 1012", "project": 1, "canonical_bug_link": "https://bugs.launchpad.net/+bug/projname/1012", "date_reported": "2006-09-10 23:02:07"}},
+
+{"pk": 1013, "model": "search.bug", "fields": 
+{"status": "Confirmed", "last_polled": "2009-06-08 23:04:31", "submitter_realname": "Mister 1013", "description": "Description #1013", "title": "Title #1013", "importance": "Importance #1013", "people_involved": 18, "last_touched": "2009-06-06 11:23:31", "submitter_username": "username 1013", "project": 1, "canonical_bug_link": "https://bugs.launchpad.net/+bug/projname/1013", "date_reported": "2006-09-10 23:02:07"}},
+
+{"pk": 1014, "model": "search.bug", "fields": 
+{"status": "Confirmed", "last_polled": "2009-06-08 23:04:31", "submitter_realname": "Mister 1014", "description": "Description #1014", "title": "Title #1014", "importance": "Importance #1014", "people_involved": 18, "last_touched": "2009-06-06 11:23:31", "submitter_username": "username 1014", "project": 1, "canonical_bug_link": "https://bugs.launchpad.net/+bug/projname/1014", "date_reported": "2006-09-10 23:02:07"}},
+
+{"pk": 1015, "model": "search.bug", "fields": 
+{"status": "Confirmed", "last_polled": "2009-06-08 23:04:31", "submitter_realname": "Mister 1015", "description": "Description #1015", "title": "Title #1015", "importance": "Importance #1015", "people_involved": 18, "last_touched": "2009-06-06 11:23:31", "submitter_username": "username 1015", "project": 1, "canonical_bug_link": "https://bugs.launchpad.net/+bug/projname/1015", "date_reported": "2006-09-10 23:02:07"}},
+
+{"pk": 1016, "model": "search.bug", "fields": 
+{"status": "Confirmed", "last_polled": "2009-06-08 23:04:31", "submitter_realname": "Mister 1016", "description": "Description #1016", "title": "Title #1016", "importance": "Importance #1016", "people_involved": 18, "last_touched": "2009-06-06 11:23:31", "submitter_username": "username 1016", "project": 1, "canonical_bug_link": "https://bugs.launchpad.net/+bug/projname/1016", "date_reported": "2006-09-10 23:02:07"}},
+
+{"pk": 1017, "model": "search.bug", "fields": 
+{"status": "Confirmed", "last_polled": "2009-06-08 23:04:31", "submitter_realname": "Mister 1017", "description": "Description #1017", "title": "Title #1017", "importance": "Importance #1017", "people_involved": 18, "last_touched": "2009-06-06 11:23:31", "submitter_username": "username 1017", "project": 1, "canonical_bug_link": "https://bugs.launchpad.net/+bug/projname/1017", "date_reported": "2006-09-10 23:02:07"}},
+
+{"pk": 1018, "model": "search.bug", "fields": 
+{"status": "Confirmed", "last_polled": "2009-06-08 23:04:31", "submitter_realname": "Mister 1018", "description": "Description #1018", "title": "Title #1018", "importance": "Importance #1018", "people_involved": 18, "last_touched": "2009-06-06 11:23:31", "submitter_username": "username 1018", "project": 1, "canonical_bug_link": "https://bugs.launchpad.net/+bug/projname/1018", "date_reported": "2006-09-10 23:02:07"}},
+
+{"pk": 1019, "model": "search.bug", "fields": 
+{"status": "Confirmed", "last_polled": "2009-06-08 23:04:31", "submitter_realname": "Mister 1019", "description": "Description #1019", "title": "Title #1019", "importance": "Importance #1019", "people_involved": 18, "last_touched": "2009-06-06 11:23:31", "submitter_username": "username 1019", "project": 1, "canonical_bug_link": "https://bugs.launchpad.net/+bug/projname/1019", "date_reported": "2006-09-10 23:02:07"}},
+
+{"pk": 1020, "model": "search.bug", "fields": 
+{"status": "Confirmed", "last_polled": "2009-06-08 23:04:31", "submitter_realname": "Mister 1020", "description": "Description #1020", "title": "Title #1020", "importance": "Importance #1020", "people_involved": 18, "last_touched": "2009-06-06 11:23:31", "submitter_username": "username 1020", "project": 1, "canonical_bug_link": "https://bugs.launchpad.net/+bug/projname/1020", "date_reported": "2006-09-10 23:02:07"}},
+
+{"pk": 1021, "model": "search.bug", "fields": 
+{"status": "Confirmed", "last_polled": "2009-06-08 23:04:31", "submitter_realname": "Mister 1021", "description": "Description #1021", "title": "Title #1021", "importance": "Importance #1021", "people_involved": 18, "last_touched": "2009-06-06 11:23:31", "submitter_username": "username 1021", "project": 1, "canonical_bug_link": "https://bugs.launchpad.net/+bug/projname/1021", "date_reported": "2006-09-10 23:02:07"}},
+
+{"pk": 1022, "model": "search.bug", "fields": 
+{"status": "Confirmed", "last_polled": "2009-06-08 23:04:31", "submitter_realname": "Mister 1022", "description": "Description #1022", "title": "Title #1022", "importance": "Importance #1022", "people_involved": 18, "last_touched": "2009-06-06 11:23:31", "submitter_username": "username 1022", "project": 1, "canonical_bug_link": "https://bugs.launchpad.net/+bug/projname/1022", "date_reported": "2006-09-10 23:02:07"}},
+
+{"pk": 1023, "model": "search.bug", "fields": 
+{"status": "Confirmed", "last_polled": "2009-06-08 23:04:31", "submitter_realname": "Mister 1023", "description": "Description #1023", "title": "Title #1023", "importance": "Importance #1023", "people_involved": 18, "last_touched": "2009-06-06 11:23:31", "submitter_username": "username 1023", "project": 1, "canonical_bug_link": "https://bugs.launchpad.net/+bug/projname/1023", "date_reported": "2006-09-10 23:02:07"}},
+
+{"pk": 1024, "model": "search.bug", "fields": 
+{"status": "Confirmed", "last_polled": "2009-06-08 23:04:31", "submitter_realname": "Mister 1024", "description": "Description #1024", "title": "Title #1024", "importance": "Importance #1024", "people_involved": 18, "last_touched": "2009-06-06 11:23:31", "submitter_username": "username 1024", "project": 1, "canonical_bug_link": "https://bugs.launchpad.net/+bug/projname/1024", "date_reported": "2006-09-10 23:02:07"}},
+
+{"pk": 1025, "model": "search.bug", "fields": 
+{"status": "Confirmed", "last_polled": "2009-06-08 23:04:31", "submitter_realname": "Mister 1025", "description": "Description #1025", "title": "Title #1025", "importance": "Importance #1025", "people_involved": 18, "last_touched": "2009-06-06 11:23:31", "submitter_username": "username 1025", "project": 1, "canonical_bug_link": "https://bugs.launchpad.net/+bug/projname/1025", "date_reported": "2006-09-10 23:02:07"}},
+
+{"pk": 1026, "model": "search.bug", "fields": 
+{"status": "Confirmed", "last_polled": "2009-06-08 23:04:31", "submitter_realname": "Mister 1026", "description": "Description #1026", "title": "Title #1026", "importance": "Importance #1026", "people_involved": 18, "last_touched": "2009-06-06 11:23:31", "submitter_username": "username 1026", "project": 1, "canonical_bug_link": "https://bugs.launchpad.net/+bug/projname/1026", "date_reported": "2006-09-10 23:02:07"}},
+
+{"pk": 1027, "model": "search.bug", "fields": 
+{"status": "Confirmed", "last_polled": "2009-06-08 23:04:31", "submitter_realname": "Mister 1027", "description": "Description #1027", "title": "Title #1027", "importance": "Importance #1027", "people_involved": 18, "last_touched": "2009-06-06 11:23:31", "submitter_username": "username 1027", "project": 1, "canonical_bug_link": "https://bugs.launchpad.net/+bug/projname/1027", "date_reported": "2006-09-10 23:02:07"}},
+
+{"pk": 1028, "model": "search.bug", "fields": 
+{"status": "Confirmed", "last_polled": "2009-06-08 23:04:31", "submitter_realname": "Mister 1028", "description": "Description #1028", "title": "Title #1028", "importance": "Importance #1028", "people_involved": 18, "last_touched": "2009-06-06 11:23:31", "submitter_username": "username 1028", "project": 1, "canonical_bug_link": "https://bugs.launchpad.net/+bug/projname/1028", "date_reported": "2006-09-10 23:02:07"}},
+
+{"pk": 1029, "model": "search.bug", "fields": 
+{"status": "Confirmed", "last_polled": "2009-06-08 23:04:31", "submitter_realname": "Mister 1029", "description": "Description #1029", "title": "Title #1029", "importance": "Importance #1029", "people_involved": 18, "last_touched": "2009-06-06 11:23:31", "submitter_username": "username 1029", "project": 1, "canonical_bug_link": "https://bugs.launchpad.net/+bug/projname/1029", "date_reported": "2006-09-10 23:02:07"}},
+
+{"pk": 1029, "model": "search.bug", "fields": 
+{"status": "Confirmed", "last_polled": "2009-06-08 23:04:31", "submitter_realname": "Mister 1029", "description": "Description #1029", "title": "Title #1029", "importance": "Importance #1029", "people_involved": 18, "last_touched": "2009-06-06 11:23:31", "submitter_username": "username 1029", "project": 1, "canonical_bug_link": "https://bugs.launchpad.net/+bug/projname/1029", "date_reported": "2006-09-10 23:02:07"}},
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{"pk": 2007, "model": "search.bug", "fields": 
+{"status": "Confirmed", "last_polled": "2009-06-08 23:04:31", "submitter_realname": "Mister 2007", "description": "Oy! This is a bug in XUL and Firefox!", "title": "Title #2007", "importance": "Importance #2007", "people_involved": 18, "last_touched": "2009-06-06 11:23:31", "submitter_username": "username 2007", "project": 3, "canonical_bug_link": "https://bugs.launchpad.net/+bug/projname/2007", "date_reported": "2006-09-10 23:02:07"}},
+
+{"pk": 2008, "model": "search.bug", "fields": 
+{"status": "Confirmed", "last_polled": "2009-06-08 23:04:31", "submitter_realname": "Mister 2008", "description": "Yo! This is a bug in XUL but not Firefox.", "title": "Title #2008", "importance": "Importance #2008", "people_involved": 18, "last_touched": "2009-06-06 11:23:31", "submitter_username": "username 2008", "project": 4, "canonical_bug_link": "https://bugs.launchpad.net/+bug/projname/2008", "date_reported": "2006-09-10 23:02:07"}}
 ]

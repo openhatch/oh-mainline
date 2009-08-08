@@ -1,19 +1,19 @@
 #main {
     float: left;
-    width: 905px;
     border: 1px solid #f4f4f4;
 }
 
 #main .module > .head,
 #main .module > .body {
-    width: 910px;
     border-left: 1px solid #f4f4f4;
     border-right: 1px solid #f4f4f4;
 }
+
 #main .module > .head {
     width: 950px;
 }
 #main .module > .body {
+    width: 910px;
     border-bottom: 1px solid #f4f4f4;
 }
 #main .contains-submodules.two-columns .submodule.skinny {

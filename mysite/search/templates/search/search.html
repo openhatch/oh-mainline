@@ -5,6 +5,15 @@ Search bugs
 {{ block.super }}
 {% endblock title %}
 
+{% block css %}
+{{ block.super }}
+{% if not bunch_of_bugs %}
+.search-result-control {
+    display: none;
+}
+{% endif %}
+{% endblock css %}
+
 {% block pagetop %}
 <h3><img alt='Volunteer opportunities' id='volunteer-opportunities' alt='Volunteer opportunities' src='/static/images/volunteer-opportunities-full.png' /></h3>
 {% endblock pagetop %}
@@ -59,131 +68,52 @@ Search bugs
 <div id='results' class='gewgaws module box results'>
     <div id='opps'>
         <form name='search_opps' method='get'> 
-            <input type='text' name='language' id='language'
-            class='default-text' title='Search bugs by language, project or description'
+            <input type='text'
+            name='language' id='language'
+            class='default-text'
+            title='Search bugs by language, project or description'
             value='{{ language }}' />
             <input type='submit' id='button' value='Search' />
         </form>
 
-        <div id='results-widget'>
-            <span id='results-summary'>
-                <span id='results-summary-language'>{{ language }}</span>
+        {% include 'search/results_widget.html' %}
 
-                {% if bunch_of_bugs %}
-                Showing results 
-                <span id='results-summary-start'>{{ start }}</span>
-                to
-                <span id='results-summary-end'>{{ end }}</span>.
-                {% endif %}
-            </span>
+        {% include 'search/results_sidebar.html' %}
 
-            <span class='separator'>&nbsp;</span>
-
-            <span id='navigation'>
-                <a href='{{ prev_page_url }}' id='prev-page'>&laquo; Prev</a>
-                <span class='separator'>&nbsp;</span>
-                <a href='{{ next_page_url }}' id='next-page'>Next page &raquo;</a>
-                <span class='separator'>&nbsp;</span>
-            </span>
-
-        </div><!-- /#results-widget -->
-
-        <div id='results-sidebar'>
-            <a href='#' id='expand-all-link'><img src='/static/images/icons/zoom-in.png' />Expand all</a>
-            <a href='#' id='collapse-all-link'><img src='/static/images/icons/zoom-out.png' />Collapse all</a>
-            <div id='shortcuts-legend'>
-                <h5>Shortcuts</h5>
-                <dt>
-                <strong>j</strong>, <strong>n</strong> -&nbsp;
-                </dt>
-                <dd>down</dd>
-                <dt>
-                <strong>k</strong>, <strong>p</strong> -&nbsp;
-                </dt>
-                <dd>up</dd>
-                <dt>
-                <strong>o</strong> -&nbsp;
-                </dt>
-                <dd>expand</dd>
-            </div>
-        </div>
         {% if bunch_of_bugs %}
         <ul>
-            {# Search results {{{ #}
             {% for bug in bunch_of_bugs %}
             <li class='bug {% cycle "even" "odd"%}'>
-            <!--div class='project-info'>
-            <img class='logo' src='{{ bug.project.icon_url }}' />
-            </div-->
-            <div class='first-line'>
-                <a class='title' href='{{ bug.canonical_bug_link }}'
-                    >+
-                    <span>{{ bug.project.name }} - {{ bug.title }}</span>
-                </a>
-                <!--div class='age'>3 days old</div-->
-            </div>
-            <div class='second-line'>
-                <span class='description'>
-                    {% if bug.good_for_newcomers %}
-                    <span class='good-for-beginners' style='width: 300px; '>
-                        Good for newcomers &bull;
-                    </span>
-                    {% endif %}
-                    {{ bug.description }}
-                </span>
-            </div>
-            {% comment %} Details {{{ {% endcomment %}
-            <div class='details'>
-                <div class='fields'>
-                    <span class='field importance'>
-                        <label>People involved: </label>
-                        <span class='value'>
-                            <a href=''>13</a>
-                        </span>
-                    </span>
-                    <span class='field status'>
-                        <label>Status: </label>
-                        <span class='value'>triaged</span>
-                    </span>
-                    <span class='field last-polled'>
-                        <label>Last touched: </label>
-                        <span class='value'>2 weeks ago</span>
-                    </span>
-                    <span class='field origin'>
-                        <label>Link: </label>
-                        <span class='value'>
-                            <a href='{{ bug.canonical_bug_link }}'>Upstream issue</a>
-                        </span>
-                    </span>
-                    <span class='field importance'>
-                        <label>Importance: </label>
-                        <span class='value'>wishlist</span>
-                    </span>
-                    <span class='field last-polled'>
-                        <label>Last polled: </label>
-                        <span class='value'>3 days ago</span>
-                        <!--a href=''>poll now</a-->
-                    </span>
-                </div>
-            </div>
-            {% comment %} }}} {% endcomment %}
+            {% include 'search/result.html' %}
             </li>
             {% endfor %}
-            {# }}} #}
         </ul>
         {% else %}
+        {% if language %}
         <p class='no-opps'>
         No opportunities found matching your query: {{ language }}.
         </p>
+        {% else %}
+        <!-- No search query -->
+        {% endif %}
         {% endif %}
 
     </div> <!-- /#results -->
 </div> <!-- /#opps -->
 {% endblock main %}
 {% block js %}
+<style>
+    #result-template {
+        display: none;
+    }
+</style>
+<li class='bug' id='result-template'>
+{# Javascript uses this HTML to regenerate the results list. #}
+{% include 'search/result.html' %}
+</li>
 {{ block.super }}
-<script src='/static/js/search.suggestions.js'></script>
-<script src='/static/js/search.js'></script>
+<script src='/static/js/search/suggestions.js'></script>
+<script src='/static/js/search/defaultText.js'></script>
 <script src='/static/js/search/testData.js'></script>
 <script src='/static/js/search/tests.js'></script>
 {% endblock js %}

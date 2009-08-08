@@ -52,7 +52,10 @@ class Person(models.Model):
             name += " "
         name += self.user.last_name
         return name
-    # }}}
+        # }}}
+
+    def get_full_name_or_username(self):
+        return self.get_full_name() or self.user.username
     # }}}
 
 def create_profile_when_user_created(instance, created, *args, **kwargs):

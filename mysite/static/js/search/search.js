@@ -4,9 +4,9 @@ $.fn.toggleText = function(text1, text2) {
 };
 
 $.fn.toggleExpanded = function() {
-    console.log(this, 'toggleExpanded');
+    //console.log(this, 'toggleExpanded');
     this.toggleClass('expanded');
-    this.scrollIntoView(); //disable for video demo. FIXME: restore
+    this.scrollIntoView(); 
     return this;
 };
 // Return the available content height space in browser window
@@ -31,7 +31,7 @@ $.fn.scrollIntoView = function() {
 
 $(function() {
 
-        Gewgaws.lightGewgaw(0);
+        SearchResults.lightSearchResult(0);
 
         $('#expand-all-link').click(function() {
             $('.gewgaws li').addClass('expanded');
@@ -45,28 +45,27 @@ $(function() {
 
         $(document).bind('keypress',
             {combi: '\\', disableInInput: true},
-            Gewgaws.focusSearchInput);
+            SearchResults.focusSearchInput);
 
         $(document).bind('keyup',
             {combi: 'j', disableInInput: true},
-            Gewgaws.moveGewgawFocusDown);
+            SearchResults.moveSearchResultFocusDown);
 
         $(document).bind('keyup',
                 {combi: 'n', disableInInput: true},
-                Gewgaws.moveGewgawFocusDown);
+                SearchResults.moveSearchResultFocusDown);
 
         $(document).bind('keyup',
                 {combi: 'k', disableInInput: true},
-                Gewgaws.moveGewgawFocusUp);
+                SearchResults.moveSearchResultFocusUp);
 
         $(document).bind('keyup',
                 {combi: 'p', disableInInput: true},
-                Gewgaws.moveGewgawFocusUp);
+                SearchResults.moveSearchResultFocusUp);
 
         $(document).bind('keyup',
                 {combi: 'o', disableInInput: true}, 
                 function() {
-                console.log('open lit gewgaw');
                 $('.gewgaws .lit-up').toggleExpanded();
                 });
 
@@ -75,29 +74,10 @@ $(function() {
                 function() { $(this).removeClass('hover'); }
                 );
 
-        $('.title').click(function () {
-                $gewgaw = $(this.parentNode.parentNode);
-                $gewgaw.toggleExpanded();
-                console.log($gewgaw[0]);
-                return false;
-                });
-
-        $('.show-details').click(function () {
-                $gewgaw = $(this.parentNode.parentNode.parentNode);
-                $gewgaw.toggleExpanded();
-                return false;
-                });
-
-        $('.first-line a.title').click(function () {
-                $gewgaw = $(this.parentNode.parentNode.parentNode);
-                $gewgaw.toggleExpanded();
-                return false;
-                });
-
         /* Takes a query and updates the page. */
         $("#button").click(function() {
                 /* Put form values into an associative array. */
-                return Gewgaws.update($('form').serializeArray());
+                return SearchResults.update($('form').serializeArray());
                 });
 
 
@@ -119,16 +99,18 @@ $(function() {
                 }
                 fruitySerialized.push(fruity_pushable);
                 }
+                /*
                 console.log('FRUITYSERIALIZED:');
                 console.log(fruitySerialized);
                 console.log('SLASH FRUITYSERIALIZED:');
+                */
 
-                return Gewgaws.update(fruitySerialized);
+                return SearchResults.update(fruitySerialized);
         });
 
         // Handle autocomplete. {{{
         $input = $("#opps form input[type='text']");
-        console.log("input", $input);
+        //console.log("input", $input);
         url = "/search/get_suggestions";
         acOptions = {
             'minChars': 1,
@@ -140,51 +122,118 @@ $(function() {
             'multipleSeparator': " ",
             'matchContains': true
         };
-        // Disable $input.autocomplete(url, acOptions);
+        // $input.autocomplete(url, acOptions);
         // }}}
 });
 
-Gewgaws = {}
+SearchResults = {}
 
-Gewgaws.focusSearchInput = function () {
-    console.log('focus search input called');
+SearchResults.bindEventHandlers = function () {
+
+        $('.title').click(function () {
+                $gewgaw = $(this.parentNode.parentNode);
+                $gewgaw.toggleExpanded();
+                return false;
+                });
+
+        $('.show-details').click(function () {
+                $gewgaw = $(this.parentNode.parentNode.parentNode);
+                $gewgaw.toggleExpanded();
+                return false;
+                });
+
+        $('.first-line a.title').click(function () {
+                $gewgaw = $(this.parentNode.parentNode.parentNode);
+                $gewgaw.toggleExpanded();
+                return false;
+                });
+}
+
+SearchResults.focusSearchInput = function () {
+    //console.log('focus search input called');
     $("#opps form input[type='text']").focus();
 };
 
-Gewgaws.queryURL = "/search/?";
+SearchResults.queryURL = "/search/?";
 
-Gewgaws.$gewgawsDOMList = $('.gewgaws ul');
+SearchResults.$gewgawsDOMList = $('.gewgaws ul');
 
-Gewgaws.getLitGewgawIndex = function() {
+SearchResults.getLitGewgawIndex = function() {
     // FIXME: Remember the index of the lit gewgaw in Javascript,
     // and avoid going through CSS.
     return $('.gewgaws li').index($('.lit-up')[0]);
 };
 
-Gewgaws.fetchGewgawsToDOM = function (queryString) {
+SearchResults.fetchSearchResultsToDOM = function (queryString) {
     url = this.queryURL + queryString + "&jsoncallback=?";
     $.getJSON(url, this.jsonArrayToDocument);
-    Gewgaws.lightGewgaw(0);
+    SearchResults.lightSearchResult(0);
 };
 
-Gewgaws.jsonArrayToDocument = function (jsonArray) {
+SearchResults.jsonArrayToDocument = function (jsonArray) {
     $('.gewgaws li').hide();
-    $(jsonArray).each( function(i) {
-            $gewgaw = $(".gewgaws li").eq(i);
-            $gewgaw.show();
-            $gewgaw.attr('id', "gewgaw-" + this.pk);
 
-            $gewgaw.find('.project').text(this.fields.project);
-            $gewgaw.find('.title').text(this.fields.title);
-            $gewgaw.find('.description').text(this.fields.description);
-            });
+    // Create a results list if there's isn't one already.
+    var noResultsList = $('#opps ul').size() == 0;
+    if (noResultsList) { $("<ul>").appendTo('#opps'); }
+
+    SearchResults.setSearchControlsForTheHeartOfTheSunAlsoMakeThemVisible();
+
+    var dataToDOM = function(i) {
+        // Add data from JSON array element to DOM.
+        $gewgaw = $(".gewgaws li").eq(i);
+
+        // This function updates the result list.
+        // It will attempt to recycle list items
+        // that are already in the DOM.
+        // However...
+        if ( $gewgaw.size() == 0 ) {
+
+            console.log('creating a list item');
+
+            // Sometimes we run out of list items. 
+            // E.g., when no list items were generated in the first place.
+            // E.g., when the search query was an empty string,
+            // and the Django template didn't print any results.
+
+            // Remove any messages to the effect of "No results here."
+            $('.no-opps').remove();
+
+            // Let's make a new list item.
+            // Let's actually clone a secret list item we've stored in the template 
+            // for just this purpose.
+
+            // NB: The html inside the LI named "#result-template" is generated
+            // using the exact same template that creates the visible
+            // search results.
+            
+            $gewgaw = $('#result-template').clone()
+                .attr('id','')
+                .addClass((i % 2 == 0) ? "even" : "odd")
+                .appendTo('.gewgaws ul');
+
+            console.debug($gewgaw);
+        }
+        $gewgaw.show();
+        $gewgaw.attr('id', "gewgaw-" + this.pk);
+
+        $gewgaw.find('.project').text(this.fields.project);
+        $gewgaw.find('.title').text(this.fields.title);
+        $gewgaw.find('.description').text(this.fields.description);
+    };
+
+    $(jsonArray).each( dataToDOM );
+
+    SearchResults.bindEventHandlers();
+
+    SearchResults.lightSearchResult(0);
 };
 
-Gewgaws.lightGewgaw = function(gewgawIndex) {
-    console.log('lightGewgaw called');
+SearchResults.lightSearchResult = function(gewgawIndex) {
+    //console.log('lightSearchResult called');
     if($('.gewgaws li').eq(gewgawIndex).size() == 1) {
         $gg = $('.gewgaws li');
-        console.debug($gg);
+        //console.debug($gg);
         $gg.removeClass('lit-up')
         $gg.eq(gewgawIndex).addClass('lit-up').scrollIntoView();
         // FIXME: Automatically scroll when gewgaw is expanded such that its content is off-screen.
@@ -194,13 +243,13 @@ Gewgaws.lightGewgaw = function(gewgawIndex) {
     }
 };
 
-Gewgaws.update = function(queryArray) {
+SearchResults.update = function(queryArray) {
     queryArray.push({'name': 'format', value: 'json'});
 
     queryStringFormatJSON = $.param(queryArray);
 
     /* Fetch JSON and put in DOM. */
-    Gewgaws.fetchGewgawsToDOM(queryStringFormatJSON);
+    SearchResults.fetchSearchResultsToDOM(queryStringFormatJSON);
 
     /* Update navigation links */
     var language;
@@ -230,12 +279,16 @@ Gewgaws.update = function(queryArray) {
     return false;
 };
 
-Gewgaws.moveGewgawFocusDown = function() {
-    Gewgaws.lightGewgaw(Gewgaws.getLitGewgawIndex() + 1);
+SearchResults.moveSearchResultFocusDown = function () {
+    SearchResults.lightSearchResult(SearchResults.getLitGewgawIndex() + 1);
 };
 
-Gewgaws.moveGewgawFocusUp = function() {
-    Gewgaws.lightGewgaw(Gewgaws.getLitGewgawIndex() - 1);
+SearchResults.moveSearchResultFocusUp = function () {
+    SearchResults.lightSearchResult(SearchResults.getLitGewgawIndex() - 1);
+};
+
+SearchResults.setSearchControlsForTheHeartOfTheSunAlsoMakeThemVisible = function () {
+    $('.search-result-control').show();
 };
 
 /* vim: set ai ts=4 sts=4 et sw=4: */
