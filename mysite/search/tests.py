@@ -106,13 +106,22 @@ class TestNonJavascriptSearch(TwillTests):
         tc.go(make_twill_url(url))
         tc.fv('search_opps', 'language', 'python')
         tc.submit()
-        for n in range(1, 11):
-            tc.find('Description #%d' % n)
+
+        # Grab descriptions of first 10 Exaile bugs
+        bugs = Bug.objects.filter(project__name=
+                                  'Exaile').order_by('last_touched')[:10]
+
+        for bug in bugs:
+            tc.find(bug.description)
 
         tc.fv('search_opps', 'language', 'c#')
         tc.submit()
-        for n in range(717, 723):
-            tc.find('Description #%d' % n)
+        
+        # Grab descriptions of first 10 GNOME-Do bugs
+        bugs = Bug.objects.filter(project__name=
+                                  'GNOME-Do').order_by('last_touched')[:10]
+        for bug in bugs:
+            tc.find(bug.description)
 
     def testSearchCombinesQueries(self):
         response = self.client.get('/search/',
