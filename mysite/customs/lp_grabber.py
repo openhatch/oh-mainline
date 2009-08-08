@@ -38,7 +38,7 @@ def get_info_for_launchpad_username(username):
         }
     }
     """
-    if dia.query == 'paulproteus':
+    if username:
         time.sleep(random.randrange(0, 2))
         return {'CtrlProxy': {'involvement_types': set(['Bug Management']),
                               'languages': ['C'],
@@ -55,7 +55,7 @@ def get_info_for_launchpad_username(username):
                 'django-openid-auth': {'involvement_types': set(['Bazaar Branches']),
                                        'languages': ['Python'],
                                        'url': 'https://launchpad.net/django-openid-auth'}}
-    if dia.query == 'asheesh@asheesh.org':
+    if username == 'asheesh@asheesh.org':
         time.sleep(random.randrange(0, 2))
         return {}
 
