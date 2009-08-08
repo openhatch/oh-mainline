@@ -178,19 +178,19 @@ class TestNonJavascriptSearch(TwillTests):
         tc.go(make_twill_url(url))
         tc.fv('search_opps', 'language', 'python')
         tc.submit()
-        for n in range(1, 11):
+        for n in range(1, 10):
             tc.find('Description #%d' % n)
 
         tc.follow('Next')
-        for n in range(11, 21):
+        for n in range(11, 20):
             tc.find('Description #%d' % n)
 
         tc.fv('search_opps', 'language', 'c#')
         tc.submit()
-        for n in range(711, 721):
+        for n in range(1001, 1010):
             tc.find('Description #%d' % n)
         tc.follow('Next')
-        for n in range(722, 732):
+        for n in range(1011, 1020):
             tc.find('Description #%d' % n)
 
 sample_launchpad_data_dump = mock.Mock()
