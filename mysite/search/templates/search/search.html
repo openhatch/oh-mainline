@@ -5,6 +5,15 @@ Search bugs
 {{ block.super }}
 {% endblock title %}
 
+{% block css %}
+{{ block.super }}
+{% if not bunch_of_bugs %}
+.search-result-control {
+    display: none;
+}
+{% endif %}
+{% endblock css %}
+
 {% block pagetop %}
 <h3><img alt='Volunteer opportunities' id='volunteer-opportunities' alt='Volunteer opportunities' src='/static/images/volunteer-opportunities-full.png' /></h3>
 {% endblock pagetop %}
@@ -98,7 +107,7 @@ Search bugs
         display: none;
     }
 </style>
-<li id='result-template'>
+<li class='bug' id='result-template'>
 {# Javascript uses this HTML to regenerate the results list. #}
 {% include 'search/result.html' %}
 </li>
