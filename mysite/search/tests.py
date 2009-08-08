@@ -147,7 +147,7 @@ class TestNonJavascriptSearch(TwillTests):
         self.assert_(found_it)
 
     def test_json_view(self):
-        tc.go(make_twill_url('http://openhatch.org/search/?format=json&jsoncallback=callback'))
+        tc.go(make_twill_url('http://openhatch.org/search/?format=json&jsoncallback=callback&language=python'))
         response = tc.show()
         self.assert_(response.startswith('callback'))
         json_string_with_parens = response.split('callback', 1)[1]
