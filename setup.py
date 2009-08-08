@@ -13,6 +13,7 @@ setup(
 
     install_requires = ['setuptools',
                         'python-distutils-extra',
+                        'twill==0.9.1-cc',
                        ],
 
     dependency_links = ['http://linode.openhatch.org/~paulproteus/',
