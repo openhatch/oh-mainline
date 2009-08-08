@@ -6,6 +6,8 @@ $ sudo rabbitmqctl add_host localhost
 $ rabbitmqctl set_permissions -p localhost rabbiter "" ".*" ".*" || rabbitmqctl map_user_vhost rabbiter localhost || echo EEEP
 
 $ cd mysite
-$ python manage.py runserver
+$ python bootstrap.py
+$ ./bin/buildout
+$ ./bin/mysite runserver
 
 Now load http://127.0.0.1:8000/search/ in your web browser.
