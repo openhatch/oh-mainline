@@ -644,7 +644,8 @@ def gimme_json_that_says_that_commit_importer_is_done(request):
     # {{{
     person = request.user.get_profile()
     dias = get_list_or_404(DataImportAttempt, person=person)
-    json = serializers.serialize('json', dias)
+    non_stale_dias =  [ d for d in dias if not d.stale]
+    json = serializers.serialize('json', non_stale_dias)
     return HttpResponse(json)
     # }}}
 

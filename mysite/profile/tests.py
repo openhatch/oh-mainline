@@ -503,6 +503,31 @@ class CeleryTests(TwillTests):
 
         # }}}
 
+    @mock.patch('mysite.customs.ohloh.Ohloh.get_contribution_info_by_username', mock_gcibu)
+    @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
+    def test_stale_dias_are_not_shown_in_json(self):
+        """Create a DIA that is stale. Verify it is ignored by JSON."""
+        # {{{
+        # do this work for user = paulproteus
+        username = 'paulproteus'
+        person = Person.objects.get(user__username=username)
+
+        stale_dia = DataImportAttempt(
+                    stale=True,
+                    query='who cares',
+                    person=person,
+                    source='rs')
+        stale_dia.save()
+
+        # Verify the JSON gives back an empty list
+        c = self.login_with_client()
+
+        url = '/people/gimme_json_that_says_that_commit_importer_is_done'
+        response = c.get(url)
+        decoded = simplejson.loads(response.content)
+
+        self.assertEqual(decoded, [])
+
     # FIXME: One day, test that after self.test_slow_loading_via_emulated_bgtask
     # getting the data does not go out to Ohloh.
 
