@@ -8,7 +8,19 @@ import simplejson
 from django.template import RequestContext, loader, Context
 from django.core.urlresolvers import reverse
 import mysite.profile as profile
-from mysite.profile.views import display_person_web
+from mysite.profile.views import get_personal_data, display_person_web
+
+from decorator import decorator
+
+@decorator
+def view(func, *args, **kw):
+    """Decorator for views."""
+    request, template, view_data = func(*args, **kw)
+    data = get_personal_data(request.user.get_profile())
+    data['the_user'] = request.user
+    data['slug'] = func.__name__
+    data.update(view_data)
+    return render_to_response(template, data)
 
 def homepage(request, signup_form=None):
     if request.user.is_authenticated():

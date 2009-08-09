@@ -6,3 +6,31 @@
     width: 29px;
     background: #fff url('/static/images/senseknocker/something-sucks.png') no-repeat;
 }
+
+#senseknocker {
+    font-size: 13pt;
+}
+#senseknocker h3 {
+    margin-top: 10px;
+}
+#senseknocker form div {
+    width: 550px;
+    float: left;
+    margin-top: 10px;
+}
+#senseknocker form label {
+    float: left;
+    width: 200px;
+    margin-right: 10px;
+}
+#senseknocker form input[type='text'],
+#senseknocker form textarea {
+    float: left;
+    width: 320px;
+}
+#senseknocker form textarea {
+    height: 100px;
+}
+#senseknocker form input[type='submit'] {
+    float: right;
+}

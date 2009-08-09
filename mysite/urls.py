@@ -103,6 +103,9 @@ urlpatterns = patterns('',
         (r'^do/projectexp_add$',
             'mysite.profile.views.projectexp_add_do'),
 
+        (r'^senseknocker$',
+            'mysite.senseknocker.views.form'),
+
         # Get a list of suggestions for the search input,
         # formatted the way that the jQuery autocomplete plugin wants it.
         (r'^search/get_suggestions$', 'mysite.search.views.request_jquery_autocompletion_suggestions'),
