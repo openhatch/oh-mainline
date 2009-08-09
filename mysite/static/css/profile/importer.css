@@ -24,16 +24,14 @@
     background-color: #bfe2ff;
     font-weight: bold;
 }
-#importer form .head .who,
-#importer form .head .data_sources {
-}
-#importer form .body .who,
-#importer form .body .data_sources {
-}
 #importer form .who, 
 #importer form .data_sources {
     float: left;
     margin: 0;
+}
+#importer form .head .data_sources {
+    padding-left: 15px;
+    width: 435px;
 }
 #importer form .body .data_sources {
     padding: 0 10px;
@@ -127,5 +125,18 @@
     float: right;
 }
 #importer .show-howto-link {
+    display: none;
+}
+.throbber {
+    position: relative;
+    top: 17px;
+}
+#jobs-are-done {
+    text-align: center;
+    float: left;
+    width: 645px;
+    padding: 10px;
+    font-size: 12pt;
+    font-weight: bold;
     display: none;
 }

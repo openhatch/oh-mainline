@@ -1,3 +1,6 @@
+.module {
+    border: 5px solid #fff;
+}
 #page-top img#hatchers {
     float: right;
     border: 0;

@@ -200,7 +200,7 @@ $.fn.debug = function() {
 
 bindHandlers = function() {
     // {{{
-    $("form input[type='text']").keydown(keydownHandler).debug();
+    $("form input[type='text']").keydown(keydownHandler);
     $("form input[type='checkbox']")
         .change(diaCheckboxChangeHandler);
     $("form .data_source").hoverClass('hover');
@@ -219,7 +219,6 @@ $.fn.setThrobberStatus = function(theStatus) {
     if ($throbber.attr('src') != src) {
         $throbber.attr('src', src);
     }
-    console.debug($throbber.get(0));
     // }}}
 };
 
@@ -248,7 +247,6 @@ $.fn.convertCheckboxesToThrobber = function() {
 enableThrobbersThenPollForStatusForever = function() {
     // {{{
     var $checkboxes = $("#importer form input[type='checkbox']:checked");
-    console.debug($checkboxes);
     // Enable throbbers.
     $checkboxes.convertCheckboxesToThrobber();
 
@@ -290,6 +288,7 @@ enableThrobbersThenPollForStatusForever = function() {
         if (allDone) {
             console.log('All the jobs have finished!');
             window.clearInterval(window.askIfDoneInterval);
+            $('#jobs-are-done').show();
         }
     }
     window.askIfDoneInterval = window.setInterval(ask_if_done, 1000);
@@ -313,9 +312,7 @@ findThrobbersForDia = function(dia) {
 Preparation = {
     // {{{
     'init': function () {
-        console.log('Preparation.init');
         Preparation.$inputs = $('#importer form input[type="text"]');
-        console.log("Preparation.$inputs.size(): ", Preparation.$inputs.size());
         Preparation.bindHandler();
     },
     '$inputs': null,
@@ -333,11 +330,9 @@ Preparation = {
         $.post(url, data, Preparation.callback);
     },
     'bindHandler': function () {
-        console.log('Preparation.bindHandler');
         Preparation.$inputs.blur(Preparation.handler);
     },
     'callback': function (response) {
-        console.log('Preparation.callback response', response);
     }
     // }}}
 };
@@ -345,23 +340,18 @@ Preparation = {
 Submission = {
     // {{{
     'init': function () {
-        console.log('Submission.init');
         Submission.$form = $('#importer form');
         Submission.bindHandler();
     },
     '$form': null,
     'handler': function () {
-        console.log('Submission.handler');
         $(this).ajaxSubmit({'success': Submission.callback});
         return false; // Bypass the form's native Submission logic.
     },
     'bindHandler': function () {
-        console.log('Submission.bindHandler');
-        console.log(Submission.$form);
         Submission.$form.submit(Submission.handler);
     },
     'callback': function (response) {
-        console.log(response);
         enableThrobbersThenPollForStatusForever();
         $('input', Submission.$form).attr('disabled', 'disabled');
     }
@@ -382,7 +372,6 @@ HowTo = {
         HowTo.$element = $('#importer .howto');
         HowTo.$hideLink = $('#importer .howto .hide-link');
         HowTo.$showLink = $('#importer .show-howto-link');
-        console.debug(HowTo.$element, HowTo.$hideLink, HowTo.$showLink);
 
         var tests = ["HowTo.$element.size() == 1",
                 "HowTo.$hideLink.size() == 1",
@@ -401,14 +390,11 @@ HowTo = {
     'events': {
         'hide': {
             'go': function () {
-                console.log('hide go');
                 HowTo.$element.fadeOut('slow');
                 HowTo.$showLink.fadeIn('slow');
-                console.debug(HowTo.$element);
                 return false;
             },
             'bind': function () {
-                console.log("bind hide");
                 HowTo.$hideLink.click(HowTo.events.hide.go);
             },
         },
@@ -418,7 +404,6 @@ HowTo = {
                 return false;
             },
             'bind': function () {
-                console.log("bind show");
                 HowTo.$showLink.click(HowTo.events.show.go);
             },
         }
