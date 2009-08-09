@@ -5,12 +5,15 @@ import Image
 from mysite.profile.models import Person
 from mysite.base.tests import make_twill_url, TwillTests
 from mysite.profile.models import Person
+import mysite.account.views
 
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.test.client import Client
 from django.core.files.images import get_image_dimensions
+from django.core.urlresolvers import reverse
 
+from django.conf import settings
 from twill import commands as tc
 #}}}
 
@@ -323,5 +326,23 @@ class EditPhotoWithOldPerson(TwillTests):
             self.assert_(p.photo.read() ==
                     open(image).read())
     #}}}
+
+class SignupRequiresInvite(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def setUp(self):
+        settings.INVITE_MODE = True
+
+    def tearDown(self):
+        settings.INVITE_MODE = False
+
+    def test_signup_without_invite(self):
+        client = Client()
+        r = client.post(reverse(mysite.account.views.signup_do),
+                        {'username': 'bob',
+                         'email': 'new@ema.il',
+                         'password1': 'newpassword'})
+        # watch it fail
+        self.assertFalse(list(User.objects.filter(username='bob')))
 
 # vim: set nu:
