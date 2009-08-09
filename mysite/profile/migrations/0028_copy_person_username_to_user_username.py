@@ -1,6 +1,6 @@
 from south.db import db
 from django.db import models
-from profile.models import *
+from mysite.profile.models import *
 
 class Migration:
     
