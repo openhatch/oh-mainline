@@ -360,4 +360,12 @@ class SignupRequiresInvite(TwillTests):
         # watch it succeed
         self.assert_(list(User.objects.filter(username='bob')))
 
+    def test_invite_someone_web(self):
+        self.login_with_twill()
+        tc.go(make_twill_url('http://openhatch.org' + 
+                             reverse('mysite.account.views.invite_someone')))
+        import pdb
+        pdb.set_trace()
+              
+
 # vim: set nu:

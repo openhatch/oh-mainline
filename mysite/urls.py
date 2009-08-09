@@ -68,6 +68,9 @@ urlpatterns = patterns('',
         (r'^account/settings/invite_someone/$',
             'mysite.account.views.invite_someone'),
 
+        (r'^account/settings/invite_someone/do$',
+            'mysite.account.views.invite_someone_do'),
+
         (r'^account/settings/password/change$',
             'mysite.account.views.change_password_do'),
 
