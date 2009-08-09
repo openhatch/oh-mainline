@@ -753,7 +753,7 @@ def importer(request):
     data = get_personal_data(request.user.get_profile())
     data.update({
         'the_user': request.user,
-        'dias': DataImportAttempt.objects.filter(person=request.user.get_profile()).order_by('id'),
+        'dias': DataImportAttempt.objects.filter(person=request.user.get_profile(),stale=False).order_by('id'),
         'blank_query': blank_query
         })
 
