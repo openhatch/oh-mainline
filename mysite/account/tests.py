@@ -15,6 +15,8 @@ from django.core.urlresolvers import reverse
 
 from django.conf import settings
 from twill import commands as tc
+
+from invitation.models import InvitationKey
 #}}}
 
 class Login(TwillTests):
@@ -344,5 +346,20 @@ class SignupRequiresInvite(TwillTests):
                          'password1': 'newpassword'})
         # watch it fail
         self.assertFalse(list(User.objects.filter(username='bob')))
+
+    def test_signup_with_invite(self):
+        # Make a good invite code from paulproteus.
+        invite_code = InvitationKey.objects.create_invitation(
+            User.objects.get(username='paulproteus')).key
+        client = Client()
+        r = client.post(reverse(mysite.account.views.signup_do),
+                        {'username': 'bob',
+                         'email': 'new@ema.il',
+                         'password1': 'newpassword',
+                         'invite_code': invite_code})
+        # watch it succeed
+        self.assert_(list(User.objects.filter(username='bob')))
+
+    
 
 # vim: set nu:
