@@ -17,6 +17,7 @@
         <style> /*<![CDATA[*/
             {% block css %}
             @import url('/static/css/base/base.css') all;
+            @import url('/static/css/senseknocker/thing.css') all;
             {% endblock css %}
             /*]]>*/
         </style>
@@ -39,6 +40,7 @@
 
     </head>
     <body>
+        <div id='senseknocker-thing'><a href='#'></a></div>
         <div id='outermost'>
             <div id='penoutermost'>
                 {% block nav %}

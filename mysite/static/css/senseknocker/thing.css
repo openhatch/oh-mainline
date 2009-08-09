@@ -1,0 +1,8 @@
+#senseknocker-thing a {
+    position: fixed;
+    left: 0;
+    top: 220px;
+    height: 170px;
+    width: 29px;
+    background: #fff url('/static/images/senseknocker/something-sucks.png') no-repeat;
+}
