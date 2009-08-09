@@ -1,0 +1,21 @@
+Hello!
+
+You've been invited to join OpenHatch, a community of open source
+programmers talking about what they know and finding opportunities
+to make a difference with their skills.
+
+The website is still in alpha, but you can use it right now.
+
+Please sign up! Go to http://openhatch.org/ and enter this invitation
+code:
+
+{{ invitation_key }}
+
+See you soon,
+
+The OpenHatch team - Asheesh, Raphael, and Karen.
+
+-- 
+The grass is always greener on the other side of your sunglasses.
+
+

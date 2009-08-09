@@ -14,6 +14,7 @@ import difflib
 import os
 import tempfile
 import random
+import Image
 
 # Django
 from django.template.loader import render_to_string
@@ -26,6 +27,7 @@ import django.contrib.auth
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
+from django.core.files.images import get_image_dimensions
 from django.contrib.sites.models import Site
 
 # OpenHatch global
@@ -394,11 +396,14 @@ def _project_hash(project_name):
     return hashed.hexdigest()
     # }}}
 
-def project_icon_url(project_name, actually_fetch = True):
+def project_icon_url(project_name, width = None, actually_fetch = True):
     # {{{
     project_hash = _project_hash(project_name)
     # Check for static path for project icons
     project_icons_root = os.path.join('static', 'project-icons')
+    # If we specify a width, put that into the path too.
+    if width is not None:
+        project_icons_root = os.path.join(project_icons_root, 'w=%d' % width)
     # If no such directory exists, make it
     if not os.path.exists(project_icons_root):
         os.makedirs(project_icons_root)
@@ -417,6 +422,28 @@ def project_icon_url(project_name, actually_fetch = True):
                 icon_data = open(os.path.join(
                         settings.MEDIA_ROOT,
                         'no-project-icon.png')).read()
+
+            if width is not None:
+                # scale it
+                icon_fd = StringIO.StringIO(icon_data)
+                im = Image.open(icon_fd)
+                icon_fd.seek(0)
+
+                w, h = get_image_dimensions(icon_fd)
+
+                new_w = width
+                new_h = (h * 1.0 / w) * width
+
+                smaller = im.resize((new_w, new_h),
+                                    Image.ANTIALIAS)
+
+                # "Save" it to memory
+                new_image_fd = StringIO.StringIO()
+                smaller.save(new_image_fd, format='PNG')
+                new_image_fd.seek(0)
+
+                # pull data out
+                icon_data = new_image_fd.getvalue()
         
             # then mktemp and save the Ohloh icon there, and rename it in
             tmp = tempfile.mkstemp(dir=project_icons_root)
@@ -464,9 +491,9 @@ def edit_person_info(request):
     # FIXME: This is racey. Only one of these functions should run at once.
     # }}}
 
-def project_icon_web(request, project_name):
+def project_icon_web(request, project_name, width = None):
     # {{{
-    url = project_icon_url(project_name)
+    url = project_icon_url(project_name, width)
     return HttpResponseRedirect(url)
     # }}}
 

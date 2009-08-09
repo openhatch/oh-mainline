@@ -9,6 +9,9 @@ admin.autodiscover()
 from django_authopenid import views as oid_views
 
 urlpatterns = patterns('',
+        # Invitation-related URLs
+        (r'^invitation/', include('invitation.urls')),
+
         # FIXME: Automatically remove trailing slashes from input URLs,
         # and remove trailing slashes from the urls below.
         (r'^$', 'mysite.base.views.homepage'),
@@ -48,6 +51,10 @@ urlpatterns = patterns('',
         (r'^people/project_icon/(?P<project_name>.*)$',
             'mysite.profile.views.project_icon_web'),
 
+        (r'^people/project_icon_badge/(?P<project_name>.*)$',
+            'mysite.profile.views.project_icon_web',
+         {'width': 40}),
+
         # OpenID URL prefix for django_authopenid.urls
         url(r'^openid/signin/$', oid_views.signin, name='user_signin'),
 
@@ -61,6 +68,12 @@ urlpatterns = patterns('',
 
         (r'^account/settings/password/$',
             'mysite.account.views.change_password'),
+
+        (r'^account/settings/invite_someone/$',
+            'mysite.account.views.invite_someone'),
+
+        (r'^account/settings/invite_someone/do$',
+            'mysite.account.views.invite_someone_do'),
 
         (r'^account/settings/password/change$',
             'mysite.account.views.change_password_do'),

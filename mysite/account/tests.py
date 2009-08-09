@@ -5,13 +5,19 @@ import Image
 from mysite.profile.models import Person
 from mysite.base.tests import make_twill_url, TwillTests
 from mysite.profile.models import Person
+import mysite.account.views
 
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.test.client import Client
 from django.core.files.images import get_image_dimensions
+from django.core.urlresolvers import reverse
+import django.core.mail
 
+from django.conf import settings
 from twill import commands as tc
+
+from invitation.models import InvitationKey
 #}}}
 
 class Login(TwillTests):
@@ -323,5 +329,48 @@ class EditPhotoWithOldPerson(TwillTests):
             self.assert_(p.photo.read() ==
                     open(image).read())
     #}}}
+
+class SignupRequiresInvite(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def setUp(self, *args, **kwargs):
+        TwillTests.setUp(self)
+        settings.INVITE_MODE = True
+
+    def tearDown(self, *args, **kwargs):
+        TwillTests.tearDown(self)
+        settings.INVITE_MODE = False
+
+    def test_signup_without_invite(self):
+        client = Client()
+        r = client.post(reverse(mysite.account.views.signup_do),
+                        {'username': 'bob',
+                         'email': 'new@ema.il',
+                         'password1': 'newpassword'})
+        # watch it fail
+        self.assertFalse(list(User.objects.filter(username='bob')))
+
+    def test_signup_with_invite(self):
+        # Make a good invite code from paulproteus.
+        invite_code = InvitationKey.objects.create_invitation(
+            User.objects.get(username='paulproteus')).key
+        client = Client()
+        r = client.post(reverse(mysite.account.views.signup_do),
+                        {'username': 'bob',
+                         'email': 'new@ema.il',
+                         'password1': 'newpassword',
+                         'invite_code': invite_code})
+        # watch it succeed
+        self.assert_(list(User.objects.filter(username='bob')))
+
+    def test_invite_someone_web(self):
+        target_email = 'new@ema.il'
+        client = self.login_with_client()
+        
+        r = client.post(reverse(mysite.account.views.invite_someone_do),
+                        {'email': target_email})
+
+        self.assertEqual(django.core.mail.outbox[0].recipients(),
+                         [target_email])
 
 # vim: set nu:

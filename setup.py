@@ -14,10 +14,12 @@ setup(
     install_requires = ['setuptools',
                         'python-distutils-extra',
                         'twill==0.9.1-cc',
+                        'invitation',
                        ],
 
     dependency_links = ['http://linode.openhatch.org/~paulproteus/',
                         'http://linode.openhatch.org/~paulproteus/python_apt-0.6.17-py2.6-linux-i686.egg#egg=python-apt',
+                        'http://linode.openhatch.org/~paulproteus/invitation-1.0.tar.gz#egg=invitation',
                        ],
 
     zip_safe = False,
