@@ -7,7 +7,7 @@ sys.path.append('/home/deploy/milestone-a/mysite/')
 
 os.environ['PYTHON_EGG_CACHE'] = '/tmp/egg-cache'
 
-os.environ['DJANGO_SETTINGS_MODULE'] = 'mysite.production_settings'
+os.environ['DJANGO_SETTINGS_MODULE'] = 'mysite.deployment_settings'
 import django.core.handlers.wsgi
 application = django.core.handlers.wsgi.WSGIHandler()
 
