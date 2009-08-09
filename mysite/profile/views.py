@@ -203,6 +203,7 @@ def display_person_edit_web(request, info_edit_mode=False, title=''):
     return render_to_response('profile/main.html', data)
     # }}}
 
+@login_required
 def display_person_web(request, user_to_display__username=None):
     # {{{
 
@@ -625,6 +626,7 @@ def ask_for_tag_input(request, username):
 
 #def edit_exp_tag(request, exp_id):
 
+@login_required
 def display_list_of_people(request):
     # {{{
     return render_to_response('profile/search_people.html', {
