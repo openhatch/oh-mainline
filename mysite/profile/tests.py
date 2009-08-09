@@ -1,14 +1,17 @@
 # Imports {{{
-from ..base.tests import make_twill_url, TwillTests
+from mysite.base.tests import make_twill_url, TwillTests
 
-from ..search.models import Project
-from .models import Person, ProjectExp, Tag, TagType, Link_Person_Tag, Link_ProjectExp_Tag, DataImportAttempt
+from mysite.search.models import Project
+from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_Person_Tag, Link_ProjectExp_Tag, DataImportAttempt
 
-from . import views
+import mysite.profile.views
+import mysite.profile.models
+
+from mysite.profile import views
 
 from django.conf import settings
 
-from ..customs import ohloh 
+from mysite.customs import ohloh 
 
 import re
 from StringIO import StringIO
@@ -698,5 +701,21 @@ class UserCanShowEmailAddress(TwillTests):
 
         tc.go('/people/paulproteus/')
         tc.find('my@ema.il')
+
+class OnlyFreshDiasAreSelected(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    @mock.patch("mysite.profile.models.DataImportAttempt.do_what_it_says_on_the_tin")
+    def test_dias_created_only_once(self, mock_dia_do_what_it_says):
+        query = 'query'
+        source = 'oh'
+        person = Person.objects.get(user__username='paulproteus')
+
+        self.assertEqual(0, DataImportAttempt.objects.count())
+        
+        mysite.profile.views.get_most_recent_data_import_attempt_or_create(
+            query, source, person)
+
+        self.assertEqual(1, DataImportAttempt.objects.count())
 
 # vim: set ai et ts=4 sw=4 nu:
