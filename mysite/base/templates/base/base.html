@@ -17,6 +17,7 @@
         <style> /*<![CDATA[*/
             {% block css %}
             @import url('/static/css/base/base.css') all;
+            @import url('/static/css/thickbox.css') all;
             @import url('/static/css/senseknocker/thing.css') all;
             {% endblock css %}
             /*]]>*/
@@ -40,7 +41,7 @@
 
     </head>
     <body>
-        <div id='senseknocker-thing'><a href='#'></a></div>
+        <div id='senseknocker-thing'><a class='thickbox' href='/senseknocker'></a></div>
         <div id='outermost'>
             <div id='penoutermost'>
                 {% block nav %}
@@ -121,6 +122,7 @@
         <script src='/static/js/jquery.js'></script>
         <script src='/static/js/jquery.query.js'></script>
         {% endblock jquery %}
+        <script src='/static/js/thickbox-compressed.js'></script>
 
         {% block js %}
         {% endblock js %}
