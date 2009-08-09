@@ -30,6 +30,10 @@ urlpatterns = patterns('',
         (r'^account/signup/do$', 'mysite.account.views.signup_do'),
 
         #Karen messes around with templates
+        (r'^about/$', 
+            'mysite.info.views.aboutpage'),
+        (r'^contact/$', 
+            'mysite.info.views.contactpage'),
         (r'^jobs/$', 
             'mysite.consulting.views.search'),
         (r'^jobs/(?P<query>.*)/$',
