@@ -12,6 +12,7 @@ from django.contrib.auth import authenticate
 from django.test.client import Client
 from django.core.files.images import get_image_dimensions
 from django.core.urlresolvers import reverse
+import django.core.mail
 
 from django.conf import settings
 from twill import commands as tc
@@ -363,11 +364,13 @@ class SignupRequiresInvite(TwillTests):
         self.assert_(list(User.objects.filter(username='bob')))
 
     def test_invite_someone_web(self):
-        self.login_with_twill()
-        tc.go(make_twill_url('http://openhatch.org' + 
-                             reverse('mysite.account.views.invite_someone')))
-        import pdb
-        pdb.set_trace()
-              
+        target_email = 'new@ema.il'
+        client = self.login_with_client()
+        
+        r = client.post(reverse(mysite.account.views.invite_someone_do),
+                        {'email': target_email})
+
+        self.assertEqual(django.core.mail.outbox[0].recipients(),
+                         [target_email])
 
 # vim: set nu:
