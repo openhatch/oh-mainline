@@ -1,15 +1,18 @@
 from django.http import HttpResponse, \
         HttpResponseRedirect, HttpResponseServerError
 from django.shortcuts import render_to_response
-import mysite.account
-import mysite.account.forms
+from django.core import serializers
 from django_authopenid.forms import OpenidSigninForm
-import simplejson
 from django.template import RequestContext, loader, Context
 from django.core.urlresolvers import reverse
-import mysite.profile as profile
-from mysite.profile.views import get_personal_data, display_person_web
 
+import mysite.account
+import mysite.account.forms
+import mysite.profile as profile
+from mysite.profile.views import \
+        get_personal_data, display_person_web
+
+import simplejson
 from decorator import decorator
 
 @decorator
@@ -21,6 +24,14 @@ def view(func, *args, **kw):
     data['slug'] = func.__name__
     data.update(view_data)
     return render_to_response(template, data)
+
+@decorator
+def gimme_json(func, *args, **kw):
+    """Decorator for POST handlers that return JSON.
+    Typically, such a handler would be called asynchronously."""
+    data = func(*args, **kw)
+    json = simplejson.dumps(data)
+    return HttpResponse(json)
 
 def homepage(request, signup_form=None):
     if request.user.is_authenticated():
