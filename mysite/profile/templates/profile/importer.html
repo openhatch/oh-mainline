@@ -16,7 +16,7 @@ Import your contributions from around the web | OpenHatch
         <ul>
             <li>
             <a href='/people/{{ the_user.username }}'>
-                &laquo; Portfolio
+                &laquo; Back to portfolio
             </a>
             </li>
             <li>
@@ -46,7 +46,8 @@ Import your contributions from around the web | OpenHatch
                     <h4>Where do you hang out?</h4>
                     <p>Specify where you've used the username/email.</p>
                     <p>&ldquo;All repositories&rdquo; &rarr; Automatically
-                    scan 20,000 open source repositories for your footprints.</p>
+                    scan <span style='background-color: yellow;'>FIXME</span>
+                    open source repositories for your footprints.</p>
                     <p>Or import data associated with your account on another 
                     network.</p>
                     </li>
@@ -67,9 +68,11 @@ Import your contributions from around the web | OpenHatch
             </div>
         </form>
 
-        <div style='float: left; width: 400px; padding: 10px; font-size: 12pt;'>
-            <a style='font-weight: bold;' href='/people/{{ the_user.username }}'>
-                &laquo; Show my projects</a>
+        <div id='jobs-are-done'>
+            Import finished!
+            <a href='{% url mysite.profile.views.display_person_web the_user.username %}'>
+                &laquo; Back to portfolio
+            </a>
         </div>
     </div>
 </div>

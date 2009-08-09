@@ -11,8 +11,8 @@
     width: 198px;
 }
 #left .module > .body {
-    width: 178px;
-    padding: 10px;
+    width: 158px;
+    padding: 20px;
     border-bottom: 1px solid #f4f4f4;
 }
 #left .section {
@@ -20,10 +20,10 @@
 }
 #main,  #main .module > .head {
     float: left;
-    width: 703px;
+    width: 723px;
 }
 #main .module > .body {
-    width: 662px;
+    width: 682px;
     border-bottom: 1px solid #f4f4f4;
 }
 
