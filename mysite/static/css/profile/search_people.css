@@ -1,6 +1,12 @@
 #big-people-list {
     float: left;
 }
+
+#main img {
+    margin: 0 0 -3px 0;
+    padding: 0;
+}
+
 #big-people-list ul {
     width: 910px;
     float: left;
