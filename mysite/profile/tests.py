@@ -136,7 +136,8 @@ class PersonTabProjectExpTests(TwillTests):
 
     def test_project_exp_page_template_displays_project_exp(self):
         # {{{
-        url = 'http://openhatch.org/people/paulproteus'
+        self.login_with_twill()
+        url = 'http://openhatch.org/people/paulproteus/'
         tc.go(make_twill_url(url))
         tc.find('ccHost')
         # }}}
@@ -513,6 +514,7 @@ class UserListTests(TwillTests):
             'user-barry', 'person-barry']
 
     def test_display_list_of_users_web(self):
+        self.login_with_twill()
         url = 'http://openhatch.org/people/'
         url = make_twill_url(url)
         tc.go(url)
