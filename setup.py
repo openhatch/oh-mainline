@@ -15,6 +15,7 @@ setup(
                         'python-distutils-extra',
                         'twill==0.9.1-cc',
                         'invitation',
+                        'celery==0.4.1',
                         'south==0.6-rc1',
                        ],
 
