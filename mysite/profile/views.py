@@ -400,21 +400,26 @@ def _project_hash(project_name):
 def project_icon_url(project_name, width = None, actually_fetch = True):
     # {{{
     project_hash = _project_hash(project_name)
-    # Check for static path for project icons
-    project_icons_root = os.path.join('static', 'project-icons')
+
+    # First, do it all with relative links.
+    relative_root ='project-icons'
     # If we specify a width, put that into the path too.
     if width is not None:
-        project_icons_root = os.path.join(project_icons_root, 'w=%d' % width)
-    # If no such directory exists, make it
-    if not os.path.exists(project_icons_root):
-        os.makedirs(project_icons_root)
+        relative_root = os.path.join(relative_project_icons_root,
+                                     'w=%d' % width)
 
     # where should the image exist?
-    project_icon_path = os.path.join(project_icons_root, project_hash + '.png')
+    relative_path = os.path.join(relative_root, project_hash + '.png')
+
+
+    path = os.path.join(settings.MEDIA_ROOT, relative_path)
+    url  = urlparse.urljoin(settings.MEDIA_URL, relative_path)
+
+    os.makedirs(os.path.dirname(path))
 
     if actually_fetch:
         # Then verify the image exists
-        if not os.path.exists(project_icon_path):
+        if not os.path.exists(path):
             # See if Ohloh will give us an icon
             oh = ohloh.get_ohloh()
             try:
@@ -451,9 +456,9 @@ def project_icon_url(project_name, width = None, actually_fetch = True):
             fd = open(tmp[1], 'w')
             fd.write(icon_data)
             fd.close()
-            os.rename(tmp[1], project_icon_path)
+            os.rename(tmp[1], path)
 
-    return '/' + project_icon_path
+    return url
     # FIXME: One day, add cache expiry.
     # }}}
 
