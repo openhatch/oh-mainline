@@ -9,6 +9,9 @@ admin.autodiscover()
 from django_authopenid import views as oid_views
 
 urlpatterns = patterns('',
+        # Invitation-related URLs
+        (r'^invitation/', include('invitation.urls')),
+
         # FIXME: Automatically remove trailing slashes from input URLs,
         # and remove trailing slashes from the urls below.
         (r'^$', 'mysite.base.views.homepage'),

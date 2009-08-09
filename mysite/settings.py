@@ -112,6 +112,7 @@ INSTALLED_APPS = (
     'windmill',
     'south',
     'celery',
+    'invitation',
     'mysite.search',
     'mysite.profile',
     'mysite.customs',
@@ -145,3 +146,6 @@ _handler = logging.StreamHandler()
 _formatter = logging.Formatter('%(asctime)s %(funcName)s:%(lineno)d %(levelname)-8s %(message)s')
 _handler.setFormatter(_formatter)
 applog.addHandler(_handler)
+
+# Invite codes last seven days
+ACCOUNT_INVITATION_DAYS=7
