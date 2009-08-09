@@ -149,3 +149,5 @@ applog.addHandler(_handler)
 
 # Invite codes last seven days
 ACCOUNT_INVITATION_DAYS=7
+INVITE_MODE=False # Enable this on production site ...?
+INVITATIONS_PER_USER=5
