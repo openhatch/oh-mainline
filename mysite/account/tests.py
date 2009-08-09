@@ -360,6 +360,4 @@ class SignupRequiresInvite(TwillTests):
         # watch it succeed
         self.assert_(list(User.objects.filter(username='bob')))
 
-    
-
 # vim: set nu:

@@ -8,6 +8,9 @@ import mock
 from django_authopenid.forms import OpenidSigninForm
 from django.core.urlresolvers import reverse
 
+from invitation.forms import InvitationKeyForm
+from invitation.models import InvitationKey
+
 import urllib
 import logging
 
@@ -213,5 +216,16 @@ def change_password_do(request):
 @view
 def widget(request):
     return (request, 'account/widget.html', {})
+
+@login_required
+@view
+def invite_someone(request):
+    invite_someone_form = InvitationKeyForm()
+    remaining_invites = InvitationKey.objects.remaining_invitations_for_user(
+        request.user)
+
+    return (request, 'account/invite_someone.html', {
+            'invite_someone_form': invite_someone_form,
+            'remaining_invites': remaining_invites})
 
 # vim: ai ts=3 sts=4 et sw=4 nu
