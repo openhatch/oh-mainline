@@ -1,8 +1,14 @@
 {% extends 'base/one_column.html' %}
 
-{% block css_append_to_base_one_column %}
+{% block title %}
+People
+{{ block.super }}
+{% endblock title %}
+
+{% block css %}
+{{ block.super}}
 @import url('/static/css/profile/search_people.css') all;
-{% endblock css_append_to_base_one_column %}
+{% endblock css %}
 
 {% block main %}
 <img alt='People on OpenHatch' id='people-search' alt='People on OpenHatch' src='/static/images/people-search.png' />

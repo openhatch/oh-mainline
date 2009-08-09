@@ -8,8 +8,9 @@
     padding: 0;
 }
 
-#big-people-list img {
-    margin: 0 0 -5px 0;
+#main img {
+    position: relative;
+    top: 3px;
     padding: 0;
 }
 #big-people-list ul {
