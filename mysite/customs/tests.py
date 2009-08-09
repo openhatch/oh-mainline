@@ -199,7 +199,20 @@ class OhlohIconTests(django.test.TestCase):
             os.unlink(path)
 
         # Download the icon
-        url = mysite.profile.views.project_icon_url('f-spot')
+        path, url = mysite.profile.views.project_icon_url('f-spot')
+        self.assert_(os.path.exists(path))
+        os.unlink(path)
+
+    def test_given_project_generate_internal_url_with_width(self):
+        # First, delete the project icon
+        path, url = mysite.profile.views.project_icon_url('f-spot', actually_fetch=False,
+                                                          width=40)
+
+        if os.path.exists(path):
+            os.unlink(path)
+
+        # Download the icon
+        path, url = mysite.profile.views.project_icon_url('f-spot')
         self.assert_(os.path.exists(path))
         os.unlink(path)
 

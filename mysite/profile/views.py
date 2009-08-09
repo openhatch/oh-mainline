@@ -406,8 +406,7 @@ def project_icon_url(project_name, width = None, actually_fetch = True):
     relative_root ='project-icons'
     # If we specify a width, put that into the path too.
     if width is not None:
-        relative_root = os.path.join(relative_project_icons_root,
-                                     'w=%d' % width)
+        relative_root = os.path.join(relative_root, 'w=%d' % width)
 
     # where should the image exist?
     relative_path = os.path.join(relative_root, project_hash + '.png')
