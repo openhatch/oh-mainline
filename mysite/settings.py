@@ -118,6 +118,7 @@ INSTALLED_APPS = (
     'mysite.consulting',
     'mysite.account',
     'mysite.base',
+    'mysite.info',
 )
 
 # file: settings.py #
