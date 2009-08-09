@@ -6,11 +6,17 @@ import StringIO
 from django.core.files.images import get_image_dimensions
 from django.core.files.uploadedfile import InMemoryUploadedFile
 import PIL.Image
+from django.conf import settings
+from invitation.models import InvitationKey
 
 class UserCreationFormWithEmail(django.contrib.auth.forms.UserCreationForm):
     username = django.forms.RegexField(label="Username", max_length=30, regex=r'^\w+$',
         help_text = "Please pick a username, of 30 characters or fewer. Stick to letters, digits and underscores.",
         error_messages = {'invalid': "Stick to letters, digits and underscores.", 'required': "Gotta pick a username!"})
+    invite_code = django.forms.CharField(required=False,
+                                         label='Invite code',
+                                         error_messages={
+            'invalid': 'You must enter a valid invite code.'})
     email = django.forms.EmailField(error_messages={
         'required': "Your email address is required. We promise to use it respectfully.",
         'invalid': "This email address looks fishy. Real, or malarkey?"})
@@ -21,6 +27,7 @@ class UserCreationFormWithEmail(django.contrib.auth.forms.UserCreationForm):
     def __init__(self, *args, **kw):
         super(django.contrib.auth.forms.UserCreationForm,
                 self).__init__(*args, **kw)
+
         custom_error_messages = {}
         custom_error_messages_dict = {
                 "A user with that username already exists.": "Oops, we've already got a user in our database with that username. Pick another one!",
@@ -31,6 +38,15 @@ class UserCreationFormWithEmail(django.contrib.auth.forms.UserCreationForm):
             for index, error_text in enumerate(self.errors[fieldname]):
                 uet = unicode(error_text)
                 self.errors[fieldname][index] = custom_error_messages_dict.get(uet, uet)
+
+    def clean_invite_code(self):
+        if settings.INVITE_MODE:
+            if InvitationKey.objects.is_key_valid(self.cleaned_data['invite_code']):
+                return self.cleaned_data['invite_code']
+            raise django.forms.ValidationError(
+                'You need a valid invite code for now.')
+        else:
+            return self.cleaned_data['invite_code']
 
     def clean_email(self):
         """Verify that their email is unique."""
