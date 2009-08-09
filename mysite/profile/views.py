@@ -769,6 +769,22 @@ def filter_by_key_prefix(dict, prefix):
     return out_dict
 
 def get_most_recent_data_import_attempt_or_create(query, source, person):
+    '''NOTE: This is a bit weird, so let me explain it.
+
+    Here are three different use cases:
+
+    1. Someone did an import of a new username. This case is
+       easy. The DIA is created the first time this function
+       is called, and it is the one reflected by the checkmarks
+       or clouds.
+
+    2. Someone did an import of a username one week ago, and
+       they are re-doing it right now. The DIA in the past
+       failed or otherwise returned nothing; that's the reason
+       to run it again.
+
+    3. ...?
+    '''
     dias = DataImportAttempt.objects.filter(
             query=query, source=source,
             person=person).order_by("-pk")
