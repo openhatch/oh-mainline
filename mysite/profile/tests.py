@@ -718,4 +718,34 @@ class OnlyFreshDiasAreSelected(TwillTests):
 
         self.assertEqual(1, DataImportAttempt.objects.count())
 
+        mysite.profile.views.get_most_recent_data_import_attempt_or_create(
+            query, source, person)
+
+        self.assertEqual(1, DataImportAttempt.objects.count())        
+
+    @mock.patch("mysite.profile.models.DataImportAttempt.do_what_it_says_on_the_tin")
+    def test_dias_created_again_for_stale_dias(self, mock_dia_do_what_it_says):
+        query = 'query'
+        source = 'oh'
+        person = Person.objects.get(user__username='paulproteus')
+
+        self.assertEqual(0, DataImportAttempt.objects.count())
+        
+        mysite.profile.views.get_most_recent_data_import_attempt_or_create(
+            query, source, person)
+
+        self.assertEqual(1, DataImportAttempt.objects.count())
+
+        # Now, set that one to stale:
+        dia = DataImportAttempt.objects.get()
+        dia.stale = True
+        dia.save()
+
+        mysite.profile.views.get_most_recent_data_import_attempt_or_create(
+            query, source, person)
+
+        self.assertEqual(2, DataImportAttempt.objects.count())        
+
+
+
 # vim: set ai et ts=4 sw=4 nu:
