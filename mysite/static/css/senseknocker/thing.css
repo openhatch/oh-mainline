@@ -34,3 +34,6 @@
 #senseknocker form input[type='submit'] {
     float: right;
 }
+#senseknocker #status {
+    float: right; color: green; padding: 5px; margin-right: 5px;
+}
