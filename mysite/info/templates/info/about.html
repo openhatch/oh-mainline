@@ -5,23 +5,28 @@ About
 {{ block.super }}
 {% endblock title %}
 
+{% block css %}
+{{ block.super }}
+@import url('/static/css/info/info.css') all;
+{% endblock css %}
+
 {% block main %}
 <div id='landing' class='module'>
     <div class='head'>
     <h3>About us</h3>
     </div>
     <div class='body two-columns'>
-    <h3>The company</h3><br/>
+    <h3>The company</h3>
     <p>OpenHatch was founded by in May 2009 by three alumni of the free culture and free software movements. The company was part of startup incubator <a href="http://www.shotputventures.com/">Shotput Ventures'</a> inaugural class.</p>
     
     <p>Our core product is an open source software involvement engine. For developers, we provide tools for them to demonstrate and grow their experience and expertise in the open source community. For businesses, we connect them with the code gurus who helped write the software they use to fix their problems or recruit ideal job candidates.</p>	<p>Our vision is to make the open source community better connected, more productive, and well rewarded for its expertise. By gathering the most brilliant, passionate minds in software development in one place and helping them collaborate with one another for love and for pay, OpenHatch will facilitate cross-pollination between open source projects and accelerate open source software development and adoption.</p>
 	
     <h3>The team</h3><br/>
-    <p><b>Asheesh Laroia </b> - Lead engineer<br/>
-    Asheesh has seduced language through computing (B.A., cognitive science, 2006; M.S.E., computer science, 2007). At the same time, he deployed hundreds of inflatable pink flamingos, wrote testimony for an Electronic Frontier Foundation lawsuit, came to love the S.C.U.M. Manifesto, and juggled fire. He has volunteered his technical skills for the UN in Uganda, the EFF, and Students for Free Culture, and remains active in Debian. Until recently he engineered software and scalability at Creative Commons in San Francisco.</p>
-    <p><b>Raphael Krut-Landau</b> - Lead designer<br/>
-Raphael has lived in (ranked by fun he had, descending) Baltimore, New Orleans, London, Harlem, Paris and Westchester (N.Y.). He refuses to choose between art and science, and earned a B.A. at the fuzzy intersection of the two (philosophy & cognitive science, Johns Hopkins, 2009). He gets his kicks from (ordered by time of discovery, ascending) the Oxford English Dictionary, Comic Sans MS, Kant, and Really Raw Honey.</p>
-    <p><b>Karen Rustad</b> - Director of business development, research, and art<br/>
+    <img src="/static/images/info/asheesh.jpg" width="120" /><p><b>Asheesh Laroia </b> - Lead engineer<br/>
+    Asheesh has seduced language through computing (B.A., cognitive science, 2006; M.S.E., computer science, 2007). At the same time, he deployed hundreds of inflatable pink flamingos, wrote testimony for an Electronic Frontier Foundation lawsuit, came to love the S.C.U.M. Manifesto, and juggled fire. He has volunteered his technical skills for the UN in Uganda, the EFF, and Students for Free Culture, and remains active in Debian. Until recently he engineered software and scalability at Creative Commons in San Francisco.</p><br/><br/>
+    <img src="/static/images/info/Raffi.jpg" width="120" /><p><b>Raphael Krut-Landau</b> - Lead designer<br/>
+Raphael has lived in (ranked by fun he had, descending) Baltimore, New Orleans, London, Harlem, Paris and Westchester (N.Y.). He refuses to choose between art and science, and earned a B.A. at the fuzzy intersection of the two (philosophy & cognitive science, Johns Hopkins, 2009). He gets his kicks from (ordered by time of discovery, ascending) the Oxford English Dictionary, Comic Sans MS, Kant, and Really Raw Honey.</p><br/><br/><br/>
+    <img src="/static/images/info/karen-cartoon.png" width="120" /><p><b>Karen Rustad</b> - Director of business development, research, and art<br/>
     Karen served on the board of <a href="http://freeculture.org">Students for Free Culture</a> from 2005 to 2008 and helped organize a number of campaigns related to free/open source software there. She has also worked on viral media and outreach for library advocate <a href="http://www.arl.org/sparc/">SPARC</a>.</p>
     </div>
 </div>
