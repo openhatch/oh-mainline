@@ -15,6 +15,7 @@ import os
 import tempfile
 import random
 import Image
+import urlparse
 
 # Django
 from django.template.loader import render_to_string
@@ -415,7 +416,8 @@ def project_icon_url(project_name, width = None, actually_fetch = True):
     path = os.path.join(settings.MEDIA_ROOT, relative_path)
     url  = urlparse.urljoin(settings.MEDIA_URL, relative_path)
 
-    os.makedirs(os.path.dirname(path))
+    if not os.path.exists(os.path.dirname(path)):
+        os.makedirs(os.path.dirname(path))
 
     if actually_fetch:
         # Then verify the image exists
@@ -452,13 +454,13 @@ def project_icon_url(project_name, width = None, actually_fetch = True):
                 icon_data = new_image_fd.getvalue()
         
             # then mktemp and save the Ohloh icon there, and rename it in
-            tmp = tempfile.mkstemp(dir=project_icons_root)
+            tmp = tempfile.mkstemp(dir=os.path.dirname(path))
             fd = open(tmp[1], 'w')
             fd.write(icon_data)
             fd.close()
             os.rename(tmp[1], path)
 
-    return url
+    return path, url
     # FIXME: One day, add cache expiry.
     # }}}
 
@@ -499,7 +501,7 @@ def edit_person_info(request):
 
 def project_icon_web(request, project_name, width = None):
     # {{{
-    url = project_icon_url(project_name, width)
+    path, url = project_icon_url(project_name, width)
     return HttpResponseRedirect(url)
     # }}}
 
