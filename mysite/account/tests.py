@@ -332,10 +332,12 @@ class EditPhotoWithOldPerson(TwillTests):
 class SignupRequiresInvite(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
-    def setUp(self):
+    def setUp(self, *args, **kwargs):
+        TwillTests.setUp(self)
         settings.INVITE_MODE = True
 
-    def tearDown(self):
+    def tearDown(self, *args, **kwargs):
+        TwillTests.tearDown(self)
         settings.INVITE_MODE = False
 
     def test_signup_without_invite(self):
