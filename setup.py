@@ -15,11 +15,13 @@ setup(
                         'python-distutils-extra',
                         'twill==0.9.1-cc',
                         'invitation',
+                        'south==0.6-rc1',
                        ],
 
     dependency_links = ['http://linode.openhatch.org/~paulproteus/',
                         'http://linode.openhatch.org/~paulproteus/python_apt-0.6.17-py2.6-linux-i686.egg#egg=python-apt',
                         'http://linode.openhatch.org/~paulproteus/invitation-1.0.tar.gz#egg=invitation',
+                        'http://linode.openhatch.org/~paulproteus/South-0.6_pre-py2.6.egg#egg=south',
                        ],
 
     zip_safe = False,
