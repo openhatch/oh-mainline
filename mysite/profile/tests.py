@@ -771,7 +771,31 @@ class OnlyFreshDiasAreSelected(TwillTests):
         mysite.profile.views.get_most_recent_data_import_attempt_or_create(
             query, source, person)
 
-        self.assertEqual(2, DataImportAttempt.objects.count())        
+        self.assertEqual(2, DataImportAttempt.objects.count())
+
+
+    def test_showing_checkbox_marks_dia_as_stale(self):
+        c = self.login_with_client()
+        
+        # First, make a DIA. Make it already completed.
+        dia_done = DataImportAttempt(
+                    query='query',
+                    completed=True,
+                    person=Person.objects.get(user__username='paulproteus'),
+                    source='lp')
+        dia_done.save()
+
+        self.assertFalse(dia_done.stale)
+
+        # Now, get the JSON
+        
+        url = '/people/gimme_json_that_says_that_commit_importer_is_done'
+        response = c.get(url)
+
+        # Now verify it's done
+        self.assert_(DataImportAttempt.objects.get().stale)
+        
+        
 
 
 
