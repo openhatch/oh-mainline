@@ -56,7 +56,10 @@
 }
 #importer form .data_source span {
     padding: 4px 0;
-    float: left;
+    display: inline;
+}
+#importer form .data_source img {
+    display: inline;
 }
 #importer li {
     float: left;
@@ -128,8 +131,7 @@
     display: none;
 }
 .throbber {
-    position: relative;
-    top: 17px;
+    margin-right: 10px;
 }
 #jobs-are-done {
     text-align: center;

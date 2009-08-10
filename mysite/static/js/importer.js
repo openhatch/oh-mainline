@@ -235,7 +235,8 @@ $.fn.convertCheckboxesToThrobber = function() {
 
         var source = bits[3];
         var imageHTML = "<img class='throbber' src='/static/images/snake.gif'/>";
-        var $throbber = $(imageHTML).insertBefore($checkbox);
+        var $labelContents = $("label[for='"+$checkbox.attr('id')+"'] *");
+        var $throbber = $(imageHTML).insertBefore($labelContents);
         $throbber.data('query', query);
         $throbber.data('source', source);
         $checkbox.remove();
