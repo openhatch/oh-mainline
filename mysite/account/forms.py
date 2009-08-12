@@ -8,6 +8,7 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 import PIL.Image
 from django.conf import settings
 from invitation.models import InvitationKey
+from models import InvitationRequest
 
 class UserCreationFormWithEmail(django.contrib.auth.forms.UserCreationForm):
     username = django.forms.RegexField(label="Username", max_length=30, regex=r'^\w+$',
@@ -116,3 +117,6 @@ class EditPhotoForm(django.forms.ModelForm):
             self.cleaned_data['photo'] = new_image_uploaded_file
         return self.cleaned_data['photo']
 
+class InvitationRequestForm(django.forms.ModelForm):
+    class Meta:
+        model = InvitationRequest

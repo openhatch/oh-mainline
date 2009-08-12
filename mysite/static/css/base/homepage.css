@@ -1,7 +1,3 @@
-body {
-    background-color: #ddeeff;
-}
-
 a img {
     border-style: none;
 }
@@ -186,10 +182,11 @@ input[type='submit'] {
     float: left;
     width: 600px;
 }
-#entry-points #account-related li {
+.tab-links li {
     float: left;
-    margin-right: 10px;
+    margin-right: 5px;
     list-style: none;
+    float: right;
 }
 .tab-links, .tab-links ul {
     float: left;
@@ -198,15 +195,18 @@ input[type='submit'] {
     padding: 0;
 }
 .tab-links a {
-    float: left;
-    background-color: #e4e4e4;
+    float: right;
+    background-color: #f4f4f4;
     margin-right: 10px;
     padding: 15px 15px 13px 15px;
     font-size: 10pt;
     font-weight: bold;
     position: relative;
-    top: 6px;
-    color: #000;
+    top: 5px;
+    color: #222;
+    border: 5px solid #fff;
+    border-bottom: 0;
+    background: #f9f9f9; /*url('/static/images/module-head-bg.png') repeat-x bottom;*/
     /*-moz-border-radius-topleft: 7px;
     -moz-border-radius-topright: 8px;*/
 }
@@ -215,13 +215,10 @@ input[type='submit'] {
     float: right;
     font-size: 14pt;
 }
-.tab-links li.learn-more a {
-    margin-left: 120px;
-    font-size: 14pt;
-    top: 0;
+.tab-links li.learn-more {
+    float: left;
 }
 .tab-links a:hover {
-    color: #ff6d3d;
     text-decoration: none;
 }
 .tab-links a:active {
@@ -233,9 +230,9 @@ input[type='submit'] {
 #tabs {
     float: left;
     width: 600px;
-    background-color: #e4e4e4;
+    background-color: #f9f9f9; /* #f6f5fc; */
     margin: 0;
-    border: 0;
+    border: 5px solid #fff;
 }
 .tab {
     padding: 20px;

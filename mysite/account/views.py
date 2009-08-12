@@ -15,7 +15,7 @@ import urllib
 import logging
 
 
-import mysite.account.forms
+from mysite.account.forms import InvitationRequestForm
 import mysite.base.views
 import mysite.base.controllers
 from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag, Link_Project_Tag, Link_SF_Proj_Dude_FM, Link_Person_Tag, DataImportAttempt
@@ -253,5 +253,18 @@ def invite_someone_do(request):
                                   error_message='No more invites.')
     else:
         return invite_someone(request, form=form)
+
+def request_invitation(request):
+    invitation_request_form = mysite.account.forms.InvitationRequestForm(request.POST)
+    if invitation_request_form.is_valid():
+        invitation_request_form.save()
+
+        # Send user back to homepage with a notification
+        email = invitation_request_form.cleaned_data['email']
+        url = reverse(base.views.homepage,
+                kw={'invitation_requested_for': email})
+        return HttpResponseRedirect(url)
+    else:
+        return mysite.base.views.homepage(request, invitation_request_form)
 
 # vim: ai ts=3 sts=4 et sw=4 nu

@@ -28,12 +28,15 @@ def homepage(request, signup_form=None):
     if not signup_form:
         signup_form = mysite.account.forms.UserCreationFormWithEmail()
 
+    invitation_request_form = mysite.account.forms.InvitationRequestForm()
+
     return render_to_response('base/homepage.html', {
-        'signup_form': signup_form,
         'notification_id': notification_id,
         'login_notification': login_notification,
         'signup_notification': signup_notification,
         'form1': form1,
+        'signup_form': signup_form,
+        'invitation_request_form': invitation_request_form,
         }, context_instance=RequestContext(request))
 
 def landing_page(request):

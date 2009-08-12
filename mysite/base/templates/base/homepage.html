@@ -60,19 +60,54 @@ $(function() {
     </div>
     <div id='account-related'>
         <ul class='tab-links'>
+            <li class='learn-more'>
+            <a href="#learn_more"
+                class='visible_iff_js my-tab-is-hidden'
+                tab_selector="#learn-more">
+                <img src='/static/images/base/hm.png' alt='Hm?' />
+            </a>
+            </li>
+            <li>
+            <a href="#request_invitation" class='visible_iff_js'
+                tab_selector="#request_invitation">
+                <img src='/static/images/base/request-an-invitation.png'
+                alt='Request an invitation' />
+            </a>
+            </li>
+            {% comment %}
             <li><a href="#create_profile" class='visible_iff_js'
                 tab_selector="#create_profile">Sign up</a></li>
-            <li><a href="/account/login"
-                class='visible_iff_js my-tab-is-hidden'
-                tab_selector="#login">Log in</a></li>
-            <li><a href="/account/login"
-                class='visible_iff_js my-tab-is-hidden'
-                tab_selector="#openid">OpenID</a></li>
-            <li class='learn-more'><a href="#learn_more"
-                class='visible_iff_js my-tab-is-hidden'
-                tab_selector="#learn-more">Learn more</a></li>
+            {% endcomment %}
+            <li>
+            <a href="#login" class='visible_iff_js'
+                tab_selector="#login">
+                <img src='/static/images/base/sign-in.png'
+                alt='Sign in' />
+            </a>
+            </li>
         </ul>
         <div id='tabs' class='module'>
+            <h3 class='invisible_if_js'>Request an invitation</h3>
+            <div id='request_invitation' class='tab'>
+                <form name='request_invitation' method='POST'
+                    action='{% url mysite.account.views.request_invitation %}'>
+                    {% for field in invitation_request_form %}
+                    <div class='form-row'>
+                        {% if field.errors %}
+                        <div class='field-errors'>
+                            {{ field.errors }}
+                        </div>
+                        {% endif %}
+                        {{ field.label_tag }}
+                        {{ field }}
+                    </div>
+                    {% endfor %}
+                    <div class='form-row'>
+                        <input type='submit' style='float: right;' 
+                        value='begin!' />
+                    </div>
+                </form>
+            </div>
             <h3 class='invisible_if_js'>Sign up</h3>
             <div id='create_profile' class='tab'>
                 {% if signup_notification %}
@@ -127,9 +162,6 @@ $(function() {
                         <input type='submit' value='log in!' style='' />
                     </div>
                 </form>
-            </div> 
-            <h3 class='invisible_if_js'>OpenID</h3>
-            <div id='openid' class='tab invisible_if_js'>
                 <form id="openid_form" name="openid_form" action="{% url user_signin %}" method="post">
                     <input type="hidden" name="action" value="verify" />
                     <input type="hidden" name="next" value="{{ next }}" />
@@ -146,8 +178,7 @@ $(function() {
 
                     </fieldset>
                 </form>
-
-            </div>
+            </div> 
             <h3 class='invisible_if_js'>What is OpenHatch?</h3>
             <div id='learn-more' class='tab invisible_if_js'>
                 <p>OpenHatch makes it easy to:</p>
