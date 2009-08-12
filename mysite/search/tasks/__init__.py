@@ -14,7 +14,7 @@ class GrabLaunchpadBugs(PeriodicTask):
             logger.info("Started to grab lp.net bugs for %s into %s" % (
                     lp_project, openhatch_proj))
             grab_lp_bugs(lp_project=lp_project,
-                         openhatch_project=openhatch_project)
+                         openhatch_project=openhatch_proj)
 
 
 class GrabMiroBugs(PeriodicTask):
