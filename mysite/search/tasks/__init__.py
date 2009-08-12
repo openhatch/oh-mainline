@@ -23,3 +23,6 @@ class GrabMiroBugs(PeriodicTask):
         logger = self.get_logger(**kwargs)
         logger.info("Started to grab Miro bitesized bugs")
         mysite.customs.miro.grab_miro_bugs()
+
+tasks.register(GrabMiroBugs)
+tasks.register(GrabLaunchpadBugs)
