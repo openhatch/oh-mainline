@@ -7,7 +7,6 @@ from mysite.search import controllers
 import mysite.customs.miro
 
 class GrabLaunchpadBugs(PeriodicTask):
-    name = "search.GrabLaunchpadBugs"
     run_every = timedelta(days=1)
     def run(self, **kwargs):
         logger = self.get_logger(**kwargs)
@@ -20,7 +19,6 @@ class GrabLaunchpadBugs(PeriodicTask):
 
 
 class GrabMiroBugs(PeriodicTask):
-    name = "search.GrabMiroBugs"
     run_every = timedelta(days=1)
     def run(self, **kwargs):
         logger = self.get_logger(**kwargs)
