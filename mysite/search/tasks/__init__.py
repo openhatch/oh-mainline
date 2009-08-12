@@ -12,7 +12,7 @@ class GrabLaunchpadBugs(PeriodicTask):
         for lp_project in lpproj2ohproj:
             openhatch_proj = lpproj2ohproj[lp_project]
             logger.info("Started to grab lp.net bugs for %s into %s" % (
-                    lp_project, openhatch_project))
+                    lp_project, openhatch_proj))
             grab_lp_bugs(lp_project=lp_project,
                          openhatch_project=openhatch_project)
 
