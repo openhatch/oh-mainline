@@ -3,7 +3,6 @@ from mysite.search.models import Project
 from celery.task import PeriodicTask
 from celery.registry import tasks
 from mysite.search.launchpad_crawl import grab_lp_bugs, lpproj2ohproj
-from mysite.search import controllers
 import mysite.customs.miro
 
 class GrabLaunchpadBugs(PeriodicTask):
