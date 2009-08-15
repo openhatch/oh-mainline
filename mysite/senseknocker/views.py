@@ -9,11 +9,13 @@ def form(request):
 @gimme_json
 def handle_form(request):
     form = BugForm(request.POST)
-    #form.user = request.user
-    form.save()
-
-    # FIXME: Actually handle the form.
-    data = [{'success': 1}]
+    if form.is_valid():
+        form.user = request.user
+        form.save()
+        success = 1
+    else:
+        success = 0
+    data = [{'success': success}]
     return data
 
 # vim: ai ts=3 sts=4 et sw=4 nu

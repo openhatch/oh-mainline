@@ -1,6 +1,5 @@
-# {{{ Imports
 from mysite.base.tests import make_twill_url, TwillTests
-# }}}
+from mysite import senseknocker
 
 class Form(TwillTests):
     fixtures = ['person-paulproteus.json', 'user-paulproteus.json']
@@ -14,9 +13,10 @@ class Form(TwillTests):
 
         # Check there exists at least one bug with the given characteristics
         # in the DB. (There can be more than one, hypothechnically.)
-        self.assert_(list(senseknocker.Bug.objects.filter(
-                before=bug_data['before'], 
-                expected_behavior=bug_data['expected_behavior'],
-                actual_behavior=bug_data['actual_behavior']
-                )))
+        bugs = list(senseknocker.models.Bug.objects.filter(
+            before=bug_data['before'], 
+            expected_behavior=bug_data['expected_behavior'],
+            actual_behavior=bug_data['actual_behavior']
+            ))
+        self.assert_(bugs)
         self.assertEqual(json.content, '[{"success": 1}]')
