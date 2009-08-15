@@ -11,6 +11,8 @@ def handle_form(request):
     form = BugForm(request.POST)
     if form.is_valid():
         form.user = request.user
+        import pdb
+        pdb.set_trace()
         form.save()
         success = 1
     else:

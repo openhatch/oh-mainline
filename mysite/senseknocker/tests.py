@@ -9,6 +9,8 @@ class Form(TwillTests):
         bug_data = {'background': 'I was singing "Ave Maria" to a potful of dal.', 
                     'expected_behavior': 'I expected the dal to be stirred.', 
                     'actual_behavior': 'Instead, burnination.'}
+        import pdb
+        pdb.set_trace()
         json = client.post('/senseknocker/handle_form', bug_data)
 
         # Check there exists at least one bug with the given characteristics
@@ -18,7 +20,5 @@ class Form(TwillTests):
             expected_behavior=bug_data['expected_behavior'],
             actual_behavior=bug_data['actual_behavior']
             ))
-        import pdb
-        pdb.set_trace()
         self.assert_(bugs)
         self.assertEqual(json.content, '[{"success": 1}]')
