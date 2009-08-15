@@ -19,7 +19,6 @@ Welcome to OpenHatch!
     document.createElement('header');
     document.createElement('nav');
     document.createElement('time');
-
 </script>
 <script type="text/javascript" src="/static/js/jquery.js"></script>
 <script type="text/javascript" src="/static/openid/js/openid-jquery.js"></script>
@@ -41,7 +40,6 @@ $(function() {
 {% block content %}
 <div id='banner'>
     <img alt='OpenHatch' src='/static/images/the-logo.png' width='300'/>
-
     <div id='explanation'>
         <h3>OpenHatch is an open source involvement engine.</h3>
     </div>
@@ -58,17 +56,23 @@ $(function() {
             </li>
         </ul>
     </div>
+        {{ initial_tab_open }}
     <div id='account-related'>
-        <ul class='tab-links'>
+        <ul class='tab-links' class='visible_iff_js'>
             <li class='learn-more'>
             <a href="#learn_more"
-                class='visible_iff_js my-tab-is-hidden'
+                {% ifnotequal initial_tab_open 'about' %}
+                class='my-tab-is-hidden'
+                {% endifnotequal %}
                 tab_selector="#learn-more">
                 <img src='/static/images/base/hm.png' alt='Hm?' />
             </a>
             </li>
             <li>
-            <a href="#request_invitation" class='visible_iff_js'
+            <a href="#request_invitation"
+                {% ifnotequal initial_tab_open 'request_invitation' %}
+                class='my-tab-is-hidden'
+                {% endifnotequal %}
                 tab_selector="#request_invitation">
                 <img src='/static/images/base/request-an-invitation.png'
                 alt='Request an invitation' />
@@ -79,7 +83,10 @@ $(function() {
                 tab_selector="#create_profile">Sign up</a></li>
             {% endcomment %}
             <li>
-            <a href="#login" class='visible_iff_js'
+            <a href="#login"
+                {% ifnotequal initial_tab_open 'login' %}
+                class='my-tab-is-hidden'
+                {% endifnotequal %}
                 tab_selector="#login">
                 <img src='/static/images/base/sign-in.png'
                 alt='Sign in' />
@@ -87,8 +94,29 @@ $(function() {
             </li>
         </ul>
         <div id='tabs' class='module'>
+            <h3 class='invisible_if_js'>What is OpenHatch?</h3>
+            <div id='learn-more' 
+                {% ifequal initial_tab_open 'about' %}
+                class='tab'
+                {% else %}
+                class='tab invisible_if_js'
+                {% endifequal %}
+                >
+                <p>OpenHatch makes it easy to:</p>
+                <ul>
+                    <li>Find new ways that you can help with open source projects</li>
+                    <li>Find mentors or mentees and learn new skills</li>
+                    <li>Track and show off all your open source software experience in one place.</li>
+                </ul>
+            </div>
             <h3 class='invisible_if_js'>Request an invitation</h3>
-            <div id='request_invitation' class='tab'>
+            <div id='request_invitation' 
+                {% ifequal initial_tab_open 'request_invitation' %}
+                class='tab'
+                {% else %}
+                class='tab invisible_if_js'
+                {% endifequal %}
+                >
                 <form name='request_invitation' method='POST'
                     action='{% url mysite.account.views.request_invitation %}'>
                     {% for field in invitation_request_form %}
@@ -104,10 +132,11 @@ $(function() {
                     {% endfor %}
                     <div class='form-row'>
                         <input type='submit' style='float: right;' 
-                        value='begin!' />
+                        value='Begin!' />
                     </div>
                 </form>
             </div>
+            {% comment %}
             <h3 class='invisible_if_js'>Sign up</h3>
             <div id='create_profile' class='tab'>
                 {% if signup_notification %}
@@ -139,8 +168,15 @@ $(function() {
                     </div>
                 </form>
             </div>
+            {% endcomment %}
             <h3 class='invisible_if_js'>Log in</h3>
-            <div id='login' class='tab invisible_if_js'>
+            <div id='login' 
+                {% ifequal initial_tab_open 'request_invitation' %}
+                class='tab'
+                {% else %}
+                class='tab invisible_if_js'
+                {% endifequal %}
+                >
                 {% if login_notification %}
                 <div class='notification'>
                     {{ login_notification }}
@@ -149,7 +185,8 @@ $(function() {
                 {% if notification_id %}
                 <!-- notification_id: {{ notification_id }} -->
                 {% endif %}
-                <form id='login' name='login' action='/account/login/do' method='POST'>
+                <form id='login' name='login'
+                    action='/account/login/do' method='POST'>
                     <div class='form-row'>
                         <label for='login_username'>Username</label>
                         <input type='text' id='login_username' name='login_username' />
@@ -162,32 +199,27 @@ $(function() {
                         <input type='submit' value='log in!' style='' />
                     </div>
                 </form>
-                <form id="openid_form" name="openid_form" action="{% url user_signin %}" method="post">
+                <form id="openid_form" name="openid_form"
+                    action="{% url user_signin %}" method="post">
                     <input type="hidden" name="action" value="verify" />
                     <input type="hidden" name="next" value="{{ next }}" />
                     <fieldset>
-                        <legend>{% trans "Sign In Using Your OpenID URL" %}</legend>
+                        <legend>{% trans "Sign in with your OpenID URL" %}</legend>
                         <div id="openid_choice">
                             <p>Please click your account provider:</p>
                             <div id="openid_btns"></div>
                         </div>
                         <div id="openid_input_area">
-                            <label for="id_openid_ul">{% trans "OpenId URL :" %}</label>{{ form1.openid_url }}
-                            <input name="openid_submit" type="submit" value="{% trans "Sign in with OpenID" %}">
+                            <label for="id_openid_ul">
+                                {% trans "OpenId URL :" %}
+                            </label>
+                            {{ openid_signin_form.openid_url }}
+                            <input name="openid_submit" type="submit"
+                            value="{% trans "Sign in with OpenID" %}">
                         </div>
-
                     </fieldset>
                 </form>
             </div> 
-            <h3 class='invisible_if_js'>What is OpenHatch?</h3>
-            <div id='learn-more' class='tab invisible_if_js'>
-                <p>OpenHatch makes it easy to:</p>
-                <ul>
-                    <li>Find new ways that you can help with open source projects</li>
-                    <li>Find mentors or mentees and learn new skills</li>
-                    <li>Track and show off all your open source software experience in one place.</li>
-                </ul>
-            </div>
         </div>
     </div>
 </div>
@@ -195,11 +227,4 @@ $(function() {
 
 {% block js %}
 <script src='/static/js/homepage.js'></script>
-<script>
-    $('#learn-more-link').click(function () {
-        var $more_info = $('#more-information');
-        var hidden = $more_info.css('display') == 'none';
-        $more_info['fade' + (hidden ? 'In' : 'Out')]('slow');
-    });
-</script>
 {% endblock js %}

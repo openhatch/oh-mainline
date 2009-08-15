@@ -126,15 +126,14 @@ input[type='text'], input[type='password'] {
 }
 input[type='submit'] {
     padding: 7px;
-    position: relative;
-    top: 1px;
-    font-size: 12pt;
-    background-color: #fff;
-    border-top: 1px solid #ddd;
-    border-right: 2px solid #ccc;
-    border-bottom: 2px solid #ccc;
-    border-left: 1px solid #ddd;
     float: right;
+    font-size: 11pt;
+    /*background: #fff url('/static/images/button-bg-green.png');
+    border: 0;
+    color: #fff;
+    height: 40px;
+    border-radius: 7px;
+    -moz-border-radius: 7px;*/
 }
 
 #footer {

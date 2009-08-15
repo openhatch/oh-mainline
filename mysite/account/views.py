@@ -260,11 +260,17 @@ def request_invitation(request):
         invitation_request_form.save()
 
         # Send user back to homepage with a notification
-        email = invitation_request_form.cleaned_data['email']
-        url = reverse(base.views.homepage,
-                kw={'invitation_requested_for': email})
+        url = "%s?%s#%s" % (
+                reverse(mysite.base.views.homepage),
+                urllib.urlencode({
+                    'invitation_requested_for': 
+                    invitation_request_form.cleaned_data['email']}),
+                "tab=request_invitation"
+                )
         return HttpResponseRedirect(url)
     else:
-        return mysite.base.views.homepage(request, invitation_request_form)
+        return mysite.base.views.homepage(request, 
+                invitation_request_form=invitation_request_form,
+                initial_tab_open='request_invitation')
 
 # vim: ai ts=3 sts=4 et sw=4 nu
