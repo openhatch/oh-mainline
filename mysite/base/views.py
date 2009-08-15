@@ -27,11 +27,12 @@ def view(func, *args, **kw):
 
 @decorator
 def gimme_json(func, *args, **kw):
-    """Decorator for POST handlers that return JSON.
-    Typically, such a handler would be called asynchronously."""
+    """Func is a view, typically a POST handler, that returns a dictionary.
+    This decorator makes the handler return JSON. Typically, such a handler
+    would be called asynchronously."""
     data = func(*args, **kw)
     json = simplejson.dumps(data)
-    return HttpResponse(json)
+    return HttpResponse(json, mimetype='text/javascript')
 
 def homepage(request, signup_form=None):
     if request.user.is_authenticated():
