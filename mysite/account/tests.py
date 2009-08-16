@@ -373,9 +373,4 @@ class SignupRequiresInvite(TwillTests):
         self.assertEqual(django.core.mail.outbox[0].recipients(),
                          [target_email])
 
-class RequestInvitation(TwillTests):
-
-    def test_invitation_request_model(self):
-        ri = In
-
 # vim: set nu:
