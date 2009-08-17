@@ -71,8 +71,10 @@ small {
     padding-right: 80px;
 }
 #explanation {
-    width: 300px;
     font-size: 9pt;
+    float: left;
+    width: 500px;
+    margin-top: 50px;
 }
 #banner img {
     border: 0;
