@@ -33,15 +33,22 @@ def homepage(request, signup_form=None,
     if not invitation_request_form:
         invitation_request_form = mysite.account.forms.InvitationRequestForm()
 
-    return render_to_response('base/homepage.html', {
-        'notification_id': notification_id,
-        'login_notification': login_notification,
-        'signup_notification': signup_notification,
-        'openid_signin_form': openid_signin_form,
-        'signup_form': signup_form,
-        'invitation_request_form': invitation_request_form,
-        'initial_tab_open': initial_tab_open,
-        }, context_instance=RequestContext(request))
+    data = {
+            'notification_id': notification_id,
+            'login_notification': login_notification,
+            'signup_notification': signup_notification,
+            'openid_signin_form': openid_signin_form,
+            'signup_form': signup_form,
+            'invitation_request_form': invitation_request_form,
+            }
+
+    invitation_requested_for = request.GET.get("invitation_requested_for", None)
+    if invitation_requested_for:
+        data['invitation_requested_for'] = invitation_requested_for
+        data['invitation_success'] = True
+        data['initial_tab_open'] = "request_invitation"
+
+    return render_to_response('base/homepage.html', data, context_instance=RequestContext(request))
 
 def landing_page(request):
     data = profile.views.get_personal_data(request.user.get_profile())

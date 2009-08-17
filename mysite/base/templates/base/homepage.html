@@ -18,10 +18,6 @@ Welcome to OpenHatch!
     t = html5tags.length; while (t-- > 0) { document.createElement(html5tags[t]); }
     /*]]>*/
 </script>
-<script>
-    {% comment %} FIXME: But is it safe? {% endcomment %}
-    initial_tab_open = "{{ initial_tab_open }}";
-</script>
 <script src="/static/js/jquery.js"></script>
 <script src="/static/openid/js/openid-jquery.js"></script>
 <script>
@@ -41,12 +37,12 @@ $(function() {
 {% block content %}
 <div id='banner'>
     <img alt='OpenHatch' src='/static/images/the-logo.png' width='300'/>
-    <div id='explanation'>
-        <h3>OpenHatch is an open source involvement engine.</h3>
-    </div>
 </div>
 
 <div id='entry-points'>
+    <div id='explanation'>
+        <h3>Want to use your knowledge to make a difference? Proud of what you've already contributed?</h3>
+    </div>
     <div id='no-authorization-necessary'>
         <ul>
             <li>
@@ -119,6 +115,11 @@ $(function() {
                 >
                 <form name='request_invitation' method='POST'
                     action='{% url mysite.account.views.request_invitation %}'>
+                    {% if invitation_success %}
+                    <div class='form-row' style='color: green; font-weight: bold; margin-bottom: 10px;'>
+                        Success! An invitation has been requested for {{ invitation_requested_for }}.
+                    </div>
+                    {% endif %}
                     {% for field in invitation_request_form %}
                     <div class='form-row'>
                         {% if field.errors %}
