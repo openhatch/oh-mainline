@@ -71,12 +71,47 @@ small {
     padding-right: 80px;
 }
 #explanation {
-    font-size: 9pt;
     margin-top: 50px;
+    padding: 20px;
+    width: 550px;
+    font-size: 10pt;
+    border: 5px solid #fff;
+}
+#explanation h4 {
+    font-weight: bold;
+    margin-left: -20px;
+    margin-top: -20px;
+    margin-bottom: 10px;
+    background: #fff;
+    padding: 5px;
+    font-size: 8pt;
+    font-style: normal;
+    float: left;
+    width: auto;
 }
 #explanation h3 {
     float: left;
     width: 500px;
+}
+#explanation li {
+    float: left;
+    margin-top: 10px;
+    width: 510px;
+}
+
+#explanation li a {
+    float: left;
+    padding: 10px;
+    background: #f9f9f9;
+    border: 1px solid #eee;
+    color: #777;
+    margin-right: 10px;
+}
+#explanation li a:hover {
+    text-decoration: none;
+}
+#explanation li a:hover span {
+    color: #00afff; 
 }
 #banner img {
     border: 0;
@@ -86,15 +121,12 @@ small {
 }
 
 #explanation p {
-    margin-bottom: 15px;
+    float: left;
+    margin-left: 10px;
+    width: 200px;
 }
 
 .explanation-heading {
-}
-
-ul {
-    margin: 0;
-    padding: 0 0 0 10px;
 }
 
 /*form style stuff*/

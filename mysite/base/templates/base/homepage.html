@@ -40,18 +40,42 @@ $(function() {
 </div>
 
 <div id='entry-points'>
-    <div id='explanation'>
+    <div class='module' id='explanation'>
+        <h4>Hm?</h4>
         <h3>Want to put your knowledge to work in open source?
             Proud of what you've already contributed?</h3>
-    </div>
-    <div id='no-authorization-necessary'>
         <ul>
             <li>
-            <a href='/people'>Find other folks on OpenHatch</a>
+            <strong>
+                <a href='/search/'>
+                    &rarr;
+                    <span>Volunteer opportunities</span>
+                </a>
+            </strong> 
+            <p>Whether you're a newcomer or an old hat, discover new ways that you
+            can help free software and open source projects.
+            </p>
             </li>
             <li>
-            <a href='/search'>Find the perfect opportunity to volunteer</a>
+            <strong>
+                <a href='#'>
+                    &rarr;
+                    <span>Create a profile</span>
+                </a>
+            </strong>
+            <p>Track and show off your involvement in free and open source software. 
+            We'll find your VCS commits, and you can add other contributions: 
+            patches, bug activity, and design ideas.
+            </p>
             </li>
+            <li>
+            <strong>
+                <a href='/people/'>
+                    &rarr;
+                    Find collaborators and connections
+                </a>
+            </strong>
+            <p>Check out the list of other folks on OpenHatch.</p></li>
         </ul>
     </div>
     <div id='account-related'>
@@ -91,21 +115,6 @@ $(function() {
             </li>
         </ul>
         <div id='tabs' class='module'>
-            <h3 class='invisible_if_js'>What is OpenHatch?</h3>
-            <div id='learn-more' 
-                {% ifequal initial_tab_open 'about' %}
-                class='tab'
-                {% else %}
-                class='tab invisible_if_js'
-                {% endifequal %}
-                >
-                <p>OpenHatch makes it easy to:</p>
-                <ul>
-                    <li>Find new ways that you can help with open source projects</li>
-                    <li>Find mentors or mentees and learn new skills</li>
-                    <li>Track and show off all your open source software experience in one place.</li>
-                </ul>
-            </div>
             <h3 class='invisible_if_js'>Request an invitation</h3>
             <div id='request_invitation' 
                 {% ifequal initial_tab_open 'request_invitation' %}
