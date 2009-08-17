@@ -72,9 +72,11 @@ small {
 }
 #explanation {
     font-size: 9pt;
+    margin-top: 50px;
+}
+#explanation h3 {
     float: left;
     width: 500px;
-    margin-top: 50px;
 }
 #banner img {
     border: 0;
