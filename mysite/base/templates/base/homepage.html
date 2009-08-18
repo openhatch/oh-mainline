@@ -41,41 +41,57 @@ $(function() {
 
 <div id='entry-points'>
     <div class='module' id='explanation'>
-        <h4>Hm?</h4>
-        <h3>Want to put your knowledge to work in open source?
-            Proud of what you've already contributed?</h3>
+        <h5 class='interrogative_grunt'>
+            {{ interrogative_grunt|random }}
+            <!-- Affectionately filched from thesixtyone's "Huh?" -->
+        </h5>
+        <h3>
+            Want to get (more) involved in <strong>open source</strong>?
+            Proud of what you've already contributed?
+        </h3>
         <ul>
             <li>
             <strong>
-                <a href='/search/'>
-                    &rarr;
-                    <span>Volunteer opportunities</span>
+                <a href='/search/' id='bug-search'>
+                    <img src='/static/images/base/homepage/teaser-bug-search.png'
+                    alt='Volunteer opportunities' />
                 </a>
             </strong> 
-            <p>Whether you're a newcomer or an old hat, discover new ways that you
-            can help free software and open source projects.
-            </p>
+            <div class='right'>
+                <h4>Volunteer opportunities</h4>
+                <p>
+                Whether you're a newcomer or an old hat, discover new ways that you
+                can help free software and open source projects.
+                </p>
+            </div>
             </li>
             <li>
-            <strong>
-                <a href='#'>
-                    &rarr;
-                    <span>Create a profile</span>
-                </a>
-            </strong>
-            <p>Track and show off your involvement in free and open source software. 
+            <div class='left'>
+            <h4>Create a profile</h4>
+            <p>
+            Track and show off your involvement in free and open source software. 
             We'll find your VCS commits, and you can add other contributions: 
             patches, bug activity, and design ideas.
             </p>
-            </li>
-            <li>
-            <strong>
-                <a href='/people/'>
-                    &rarr;
-                    Find collaborators and connections
+            </div>
+            <strong class='right'>
+                <a href='#' id='create-profile'>
+                    <img src='/static/images/base/homepage/teaser-profile.png' 
+                    alt='Create a profile' />
                 </a>
             </strong>
-            <p>Check out the list of other folks on OpenHatch.</p></li>
+            </li>
+            <li>
+            <strong class='left'>
+                <a href='/people/' id='people-search'>
+                    <img src='/static/images/base/homepage/teaser-people-search.png'
+                    alt='Find collaborators and connections' />
+                </a>
+            </strong>
+            <div class='right'>
+                <h4>Find collaborators and connections</h4>
+                <p>Check out the list of other folks on OpenHatch.</p></li>
+            </div>
         </ul>
     </div>
     <div id='account-related'>

@@ -42,27 +42,6 @@ h3 {
     width: 300px;
     margin: 0;
 }
-
-h2 {
-    text-align: center;
-    font-size: 14px;
-    margin: 5px 0;
-}
-
-h4 {
-    text-align: center;
-    font-family: Tuffy;
-    font-size: 36px;
-    font-style: italic;
-    color: #555;
-    margin: 10px 0 20px 0;
-}
-
-small {
-     font-size: 12px;
-     float: right;
-}
-
 #banner {
     width: 220px;
     float: left;
@@ -72,46 +51,64 @@ small {
 }
 #explanation {
     margin-top: 50px;
-    padding: 20px;
     width: 550px;
     font-size: 10pt;
     border: 5px solid #fff;
 }
-#explanation h4 {
+#explanation h5 {
     font-weight: bold;
-    margin-left: -20px;
-    margin-top: -20px;
+    color: #555;
+    text-align: center;
+    font-weight: normal;
+    margin-top: -16px;
+    margin-left: 20px;
     margin-bottom: 10px;
-    background: #fff;
-    padding: 5px;
     font-size: 8pt;
     font-style: normal;
     float: left;
-    width: auto;
+    padding: 5px;
+    background-color: #fff;
+    float: left;
+    width: 50px;
+}
+#explanation h5 span {
 }
 #explanation h3 {
     float: left;
     width: 500px;
+    padding: 10px 20px;
 }
 #explanation li {
     float: left;
     margin-top: 10px;
-    width: 510px;
+    width: 550px;
+    border-top: 5px solid #fff;
 }
-
 #explanation li a {
     float: left;
-    padding: 10px;
     background: #f9f9f9;
-    border: 1px solid #eee;
-    color: #777;
     margin-right: 10px;
+    width: 240px;
+    height: 100px;
 }
 #explanation li a:hover {
     text-decoration: none;
 }
 #explanation li a:hover span {
     color: #00afff; 
+}
+#explanation li p {
+    float: left;
+    width: 250px;
+}
+#explanation h4 {
+    font-size: 12pt;
+    margin: 0;
+    padding: 10px;
+    padding-top: 20px;
+    width: 200px;
+    font-style: normal;
+    font-weight: bold;
 }
 #banner img {
     border: 0;
@@ -122,7 +119,7 @@ small {
 
 #explanation p {
     float: left;
-    margin-left: 10px;
+    padding: 0 10px;
     width: 200px;
 }
 

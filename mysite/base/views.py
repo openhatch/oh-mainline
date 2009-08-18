@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from django.http import HttpResponse, \
         HttpResponseRedirect, HttpResponseServerError
 from django.shortcuts import render_to_response
@@ -41,6 +43,8 @@ def homepage(request, signup_form=None,
             'signup_form': signup_form,
             'invitation_request_form': invitation_request_form,
             }
+
+    data['interrogative_grunt'] = [u'Hm?', u'Huh?', u'Quoi?', u'¿Que?', u'What‽']
 
     invitation_requested_for = request.GET.get("invitation_requested_for", None)
     if invitation_requested_for:
