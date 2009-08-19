@@ -21,9 +21,9 @@ Welcome to OpenHatch!
 <script src="/static/js/jquery.js"></script>
 <script src="/static/openid/js/openid-jquery.js"></script>
 <script>
-$(function() {
-    openid.init('id_openid_url');
-});
+    $(function() {
+        openid.init('id_openid_url');
+    });
 </script>
 <script src='/static/js/css_if_js.js'></script>
 {% endblock js_in_head %}
@@ -35,76 +35,12 @@ $(function() {
 {% endblock css %}
 
 {% block content %}
-<div id='banner'>
-    <img alt='OpenHatch' src='/static/images/the-logo.png' width='300'/>
-</div>
-
-<div id='entry-points'>
-    <div class='module' id='explanation'>
-        <h5 class='interrogative_grunt'>
-            {{ interrogative_grunt|random }}
-            <!-- Affectionately filched from thesixtyone's "Huh?" -->
-        </h5>
-        <h3>
-            Want to get (more) involved in <strong>open source</strong>?
-            Proud of what you've already contributed?
-        </h3>
-        <ul>
-            <li>
-            <strong>
-                <a href='/search/' id='bug-search'>
-                    <img src='/static/images/base/homepage/teaser-bug-search.png'
-                    alt='Volunteer opportunities' />
-                </a>
-            </strong> 
-            <div class='right'>
-                <h4>Volunteer opportunities</h4>
-                <p>
-                Whether you're a newcomer or an old hat, discover new ways that you
-                can help free software and open source projects.
-                </p>
-            </div>
-            </li>
-            <li>
-            <div class='left'>
-            <h4>Create a profile</h4>
-            <p>
-            Track and show off your involvement in free and open source software. 
-            We'll find your VCS commits, and you can add other contributions: 
-            patches, bug activity, and design ideas.
-            </p>
-            </div>
-            <strong class='right'>
-                <a href='#' id='create-profile'>
-                    <img src='/static/images/base/homepage/teaser-profile.png' 
-                    alt='Create a profile' />
-                </a>
-            </strong>
-            </li>
-            <li>
-            <strong class='left'>
-                <a href='/people/' id='people-search'>
-                    <img src='/static/images/base/homepage/teaser-people-search.png'
-                    alt='Find collaborators and connections' />
-                </a>
-            </strong>
-            <div class='right'>
-                <h4>Find collaborators and connections</h4>
-                <p>Check out the list of other folks on OpenHatch.</p></li>
-            </div>
-        </ul>
+<div class='left'>
+    <div id='banner'>
+        <img alt='OpenHatch' src='/static/images/the-logo.png' width='300'/>
     </div>
     <div id='account-related'>
         <ul class='tab-links' class='visible_iff_js'>
-            <li class='learn-more'>
-            <a href="#learn_more"
-                {% ifnotequal initial_tab_open 'about' %}
-                class='my-tab-is-hidden'
-                {% endifnotequal %}
-                tab_selector="#learn-more">
-                <img src='/static/images/base/hm.png' alt='Hm?' />
-            </a>
-            </li>
             <li>
             <a href="#request_invitation"
                 {% ifnotequal initial_tab_open 'request_invitation' %}
@@ -249,6 +185,64 @@ $(function() {
             </div> 
         </div>
     </div>
+</div>
+
+<div id='entry-points'>
+    <div class='module' id='explanation'>
+        <h5 class='interrogative_grunt'>
+            {{ interrogative_grunt|random }}
+            <!-- Affectionately filched from thesixtyone's "Huh?" -->
+        </h5>
+        <h3>
+            Want to get (more) involved in <strong>open source</strong>?
+            Proud of what you've already contributed?
+        </h3>
+        <ul>
+            <li>
+            <strong>
+                <a href='/search/' id='bug-search'>
+                    <img src='/static/images/base/homepage/teaser-bug-search.png'
+                    alt='Volunteer opportunities' />
+                </a>
+            </strong> 
+            <div class='right'>
+                <h4>Volunteer opportunities</h4>
+                <p>
+                Whether you're a newcomer or an old hat, discover new ways that you
+                can help free software and open source projects.
+                </p>
+            </div>
+            </li>
+            <li>
+            <div class='left'>
+                <h4>Create a profile</h4>
+                <p>
+                Track and show off your involvement in free and open source software. 
+                We'll find your VCS commits, and you can add other contributions: 
+                patches, bug activity, and design ideas.
+                </p>
+            </div>
+            <strong class='right'>
+                <a href='#' id='create-profile'>
+                    <img src='/static/images/base/homepage/penguin.png' 
+                    alt='Create a profile' />
+                </a>
+            </strong>
+            </li>
+            <li>
+            <strong class='left'>
+                <a href='/people/' id='people-search'>
+                    <img src='/static/images/base/homepage/teaser-people-search.png'
+                    alt='Find collaborators and connections' />
+                </a>
+            </strong>
+            <div class='right'>
+                <h4>Find collaborators and connections</h4>
+                <p>Check out the list of other folks on OpenHatch.</p></li>
+            </div>
+        </ul>
+    </div>
+
 </div>
 {% endblock content %}
 

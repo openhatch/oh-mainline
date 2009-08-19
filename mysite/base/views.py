@@ -13,7 +13,7 @@ import mysite.profile as profile
 from mysite.profile.views import display_person_web
 
 def homepage(request, signup_form=None,
-        invitation_request_form=None, initial_tab_open='about'):
+        invitation_request_form=None, initial_tab_open='request_invitation'):
 
     if request.user.is_authenticated():
         return landing_page(request)
@@ -44,6 +44,7 @@ def homepage(request, signup_form=None,
             'invitation_request_form': invitation_request_form,
             }
 
+    data['initial_tab_open'] = initial_tab_open
     data['interrogative_grunt'] = [u'Hm?', u'Huh?', u'Quoi?', u'¿Que?', u'What‽']
 
     invitation_requested_for = request.GET.get("invitation_requested_for", None)

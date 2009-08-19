@@ -36,18 +36,27 @@ h3 {
     float: left;
 }
 
-#entry-points h3 {
-    text-align: left;
+#content > .left,
+#content > .right {
     float: left;
-    width: 300px;
-    margin: 0;
 }
+#content > .left {
+    width: 400px;
+}
+#content > .right {
+    width: 550px;
+}
+
 #banner {
     width: 220px;
     float: left;
     margin-right: 50px;
     padding: 40px 0;
     padding-right: 80px;
+}
+#account-related {
+    width: 350px;
+    float: left;
 }
 #explanation {
     margin-top: 50px;
@@ -80,22 +89,27 @@ h3 {
 }
 #explanation li {
     float: left;
-    margin-top: 10px;
     width: 550px;
     border-top: 5px solid #fff;
 }
 #explanation li a {
     float: left;
     background: #f9f9f9;
-    margin-right: 10px;
     width: 240px;
-    height: 100px;
+}
+#explanation .left {
+    margin-right: 10px;
 }
 #explanation li a:hover {
     text-decoration: none;
 }
 #explanation li a:hover span {
     color: #00afff; 
+}
+#explanation li div {
+    width: 260px;
+    padding: 20px;
+    float: left;
 }
 #explanation li p {
     float: left;
@@ -104,26 +118,12 @@ h3 {
 #explanation h4 {
     font-size: 12pt;
     margin: 0;
-    padding: 10px;
-    padding-top: 20px;
-    width: 200px;
+    width: 250px;
     font-style: normal;
     font-weight: bold;
 }
 #banner img {
     border: 0;
-}
-#love-code {
-    margin-top: 50px;
-}
-
-#explanation p {
-    float: left;
-    padding: 0 10px;
-    width: 200px;
-}
-
-.explanation-heading {
 }
 
 /*form style stuff*/
@@ -131,11 +131,11 @@ h3 {
 form {
     margin: 0 0 10px 0;
     float: left;
-    width: 500px;
+    width: 200px;
 }
 .form-row {
     float: left;
-    width: 430px;
+    width: 200px;
 }
 
 form small {
@@ -149,7 +149,7 @@ label {
     padding: 10px;
     padding-left: 0;
     margin-right: 10px;
-    font-size: 12pt;
+    font-size: 8pt;
 }
 input[type='text'], input[type='password'] {
     padding: 10px;
@@ -173,47 +173,6 @@ input[type='submit'] {
     width: 940px;
 }
 
-#entry-points {
-    float: left;
-    margin-top: 0px;
-    width: 600px;
-}
-#entry-points #no-authorization-necessary {
-    float: left;
-    margin-top: 20px;
-    margin-bottom: 40px;
-    width: 590px;
-    border: 5px solid white;
-}
-#entry-points #no-authorization-necessary ul {
-    float: left;
-    width: 590px;
-    margin: 0;
-    padding: 0;
-}
-#entry-points #no-authorization-necessary li {
-    list-style: none;
-    font-size: 15pt;
-    float: left;
-    width: 295px;
-}
-#entry-points #no-authorization-necessary li a {
-    float: left;
-    background-color: #f4f4f4;
-    color: #222;
-    padding: 20px;
-    height: 100px;
-}
-#entry-points #no-authorization-necessary li a:hover {
-    background: #fff;
-    color: #00afff; 7fc4ff; bfe2ff;
-    text-decoration: none;
-    border-color: #ddd;
-}
-#entry-points #account-related {
-    float: left;
-    width: 600px;
-}
 .tab-links li {
     float: left;
     margin-right: 5px;
@@ -222,7 +181,7 @@ input[type='submit'] {
 }
 .tab-links, .tab-links ul {
     float: left;
-    width: 600px;
+    width: 320px;
     margin: 0;
     padding: 0;
 }
@@ -244,7 +203,7 @@ input[type='submit'] {
 }
 .tab-links li.right-link,
 .tab-links li.right-link a {
-    float: right;
+    float: left;
     font-size: 14pt;
 }
 .tab-links li.learn-more {
@@ -261,7 +220,7 @@ input[type='submit'] {
 }
 #tabs {
     float: left;
-    width: 600px;
+    width: 360px;
     background-color: #f9f9f9; /* #f6f5fc; */
     margin: 0;
     border: 5px solid #fff;
