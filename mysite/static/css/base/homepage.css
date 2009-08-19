@@ -131,11 +131,10 @@ h3 {
 form {
     margin: 0 0 10px 0;
     float: left;
-    width: 200px;
 }
 .form-row {
     float: left;
-    width: 200px;
+    width: 316px;
 }
 
 form small {
@@ -145,17 +144,17 @@ form small {
 
 label {
     float: left;
-    width: 150px;
+    width: 100px;
     padding: 10px;
     padding-left: 0;
     margin-right: 10px;
-    font-size: 8pt;
+    font-size: 10pt;
 }
 input[type='text'], input[type='password'] {
     padding: 10px;
     margin-bottom: 4px;
     float: left;
-    width: 234px;
+    width: 170px;
 }
 input[type='submit'] {
     padding: 7px;

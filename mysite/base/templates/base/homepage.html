@@ -95,7 +95,7 @@ Welcome to OpenHatch!
                     {% endfor %}
                     <div class='form-row'>
                         <input type='submit' style='float: right;' 
-                        value='Begin!' />
+                        value='Submit' />
                     </div>
                 </form>
             </div>
@@ -148,39 +148,23 @@ Welcome to OpenHatch!
                 {% if notification_id %}
                 <!-- notification_id: {{ notification_id }} -->
                 {% endif %}
-                <form id='login' name='login'
-                    action='/account/login/do' method='POST'>
-                    <div class='form-row'>
-                        <label for='login_username'>Username</label>
-                        <input type='text' id='login_username' name='login_username' />
-                    </div>
-                    <div class='form-row'>
-                        <label for='login_password'>Password</label>
-                        <input type='password' id='login_password' name='login_password' />
-                    </div>
-                    <div class='form-row'>
-                        <input type='submit' value='log in!' style='' />
-                    </div>
-                </form>
                 <form id="openid_form" name="openid_form"
                     action="{% url user_signin %}" method="post">
                     <input type="hidden" name="action" value="verify" />
                     <input type="hidden" name="next" value="{{ next }}" />
-                    <fieldset>
-                        <legend>{% trans "Sign in with your OpenID URL" %}</legend>
+                    <p>Sign in using an account on another network</p>
                         <div id="openid_choice">
                             <p>Please click your account provider:</p>
                             <div id="openid_btns"></div>
                         </div>
                         <div id="openid_input_area">
                             <label for="id_openid_ul">
-                                {% trans "OpenId URL :" %}
+                                OpenID URL:
                             </label>
                             {{ openid_signin_form.openid_url }}
                             <input name="openid_submit" type="submit"
-                            value="{% trans "Sign in with OpenID" %}">
+                            value="Sign in">
                         </div>
-                    </fieldset>
                 </form>
             </div> 
         </div>

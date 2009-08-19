@@ -8,7 +8,6 @@
 
 #openid_form {
     display: block;
-    width: 470px;
     float: left;
 }
 #openid_choice {
@@ -52,6 +51,8 @@ a.openid_large_btn:focus {
 fieldset {
     padding: 0;
     border: 0;
+    float: left;
+    width: 250px;
 }
 legend {
     font-size: 13pt;
