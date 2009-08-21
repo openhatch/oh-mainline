@@ -81,6 +81,11 @@ Welcome to OpenHatch!
                     <div class='form-row' style='color: green; font-weight: bold; margin-bottom: 10px;'>
                         Success! An invitation has been requested for {{ invitation_requested_for }}.
                     </div>
+                    {% else %}
+                    <p>
+                    We're currently in invitation-only beta.
+                    Sign up for a sneak peek.
+                    </p>
                     {% endif %}
                     {% for field in invitation_request_form %}
                     <div class='form-row'>
@@ -152,7 +157,7 @@ Welcome to OpenHatch!
                     action="{% url user_signin %}" method="post">
                     <input type="hidden" name="action" value="verify" />
                     <input type="hidden" name="next" value="{{ next }}" />
-                    <p>Sign in using an account on another network</p>
+                    <p>Sign in using an account on another network.</p>
                         <div id="openid_choice">
                             <p>Please click your account provider:</p>
                             <div id="openid_btns"></div>
@@ -190,25 +195,28 @@ Welcome to OpenHatch!
                 </a>
             </strong> 
             <div class='right'>
-                <h4>Volunteer opportunities</h4>
+                <h4>Find open source opportunities tailored to you</h4>
                 <p>
-                Whether you're a newcomer or an old hat, discover new ways that you
-                can help free software and open source projects.
+                Whether you're a newcomer or an old hat,
+                discover new ways that you can help free software
+                and open source projects.
                 </p>
             </div>
             </li>
             <li>
             <div class='left'>
-                <h4>Create a profile</h4>
+                <h4>Showcase your contributions</h4>
                 <p>
-                Track and show off your involvement in free and open source software. 
-                We'll find your VCS commits, and you can add other contributions: 
+                Track and show off your involvement in
+                free and open source software. 
+                We'll find your VCS commits,
+                and you can add other contributions: 
                 patches, bug activity, and design ideas.
                 </p>
             </div>
             <strong class='right'>
                 <a href='#' id='create-profile'>
-                    <img src='/static/images/base/homepage/penguin.png' 
+                    <img src='/static/images/base/homepage/feathered-penguin.png' 
                     alt='Create a profile' />
                 </a>
             </strong>
@@ -216,13 +224,12 @@ Welcome to OpenHatch!
             <li>
             <strong class='left'>
                 <a href='/people/' id='people-search'>
-                    <img src='/static/images/base/homepage/teaser-people-search.png'
+                    <img src='/static/images/base/homepage/heads.png'
                     alt='Find collaborators and connections' />
                 </a>
             </strong>
             <div class='right'>
                 <h4>Find collaborators and connections</h4>
-                <p>Check out the list of other folks on OpenHatch.</p></li>
             </div>
         </ul>
     </div>

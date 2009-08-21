@@ -1,5 +1,14 @@
+@font-face {
+    font-family: Tuffy;
+    src: url('/static/fonts/tuffy_regular.ttf');
+}
+@font-face {
+    font-family: "Graublau Web";
+    src: url('/static/fonts/GraublauWeb.otf'); /*format("opentype");*/
+}
 body {
-    font: 9pt Verdana, Bitstream Vera Sans, Arial, sans-serif;
+    font: 9pt "Graublau Web", Tuffy, Verdana,
+    "Bitstream Vera Sans", Helvetica, Arial, sans-serif;
     background: #fff url("/static/images/motif-eee.png");
     margin: 0;
     padding: 0;
@@ -245,7 +254,7 @@ h3 {
     font-weight: bold;
     color: #555;
     letter-spacing: 0;
-    font: 13pt Verdana;
+    font-size: 13pt;
     margin: 0;
 }
 .module > .head h3 {

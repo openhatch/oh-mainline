@@ -62,7 +62,10 @@ h3 {
     margin-top: 50px;
     width: 550px;
     font-size: 10pt;
-    border: 5px solid #fff;
+    border: 5px solid #f9f9f9;
+    border-radius: 10px;
+    -moz-border-radius: 10px;
+    background: #fff;
 }
 #explanation h5 {
     font-weight: bold;
@@ -76,7 +79,10 @@ h3 {
     font-style: normal;
     float: left;
     padding: 5px;
-    background-color: #fff;
+    color: #222; 
+    background-color: #f9f9f9;
+    border-radius: 5px;
+    -moz-border-radius: 5px;
     float: left;
     width: 50px;
 }
@@ -90,12 +96,11 @@ h3 {
 #explanation li {
     float: left;
     width: 550px;
-    border-top: 5px solid #fff;
 }
 #explanation li a {
     float: left;
-    background: #f9f9f9;
-    width: 240px;
+    width: 220px;
+    padding: 5px;
 }
 #explanation .left {
     margin-right: 10px;
@@ -107,7 +112,7 @@ h3 {
     color: #00afff; 
 }
 #explanation li div {
-    width: 260px;
+    width: 240px;
     padding: 20px;
     float: left;
 }
@@ -117,7 +122,8 @@ h3 {
 }
 #explanation h4 {
     font-size: 12pt;
-    margin: 0;
+    line-height: 110%;
+    margin: 0 0 10px 0;
     width: 250px;
     font-style: normal;
     font-weight: bold;
@@ -248,6 +254,10 @@ input[type='submit'] {
     padding: 10px;
     width: 540px;
     margin: 0;
+    margin-bottom: 10px;
+}
+p {
+    margin-top: 0;
     margin-bottom: 10px;
 }
 /* vim: set ai ts=4 sts=4 et sw=4: */
