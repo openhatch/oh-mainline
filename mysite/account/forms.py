@@ -118,5 +118,13 @@ class EditPhotoForm(django.forms.ModelForm):
         return self.cleaned_data['photo']
 
 class InvitationRequestForm(django.forms.ModelForm):
+
     class Meta:
         model = InvitationRequest
+
+    first_name = django.forms.CharField(error_messages = {
+        'required': "We need at least your first name."})
+    last_name = django.forms.CharField(required=False)
+    email = django.forms.EmailField(error_messages={
+        'required': "Uh, we want to email you an invitation.",
+        'invalid': "This email address got caught in a regex; try again."})

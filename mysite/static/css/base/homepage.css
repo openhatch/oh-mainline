@@ -140,7 +140,7 @@ form {
 }
 .form-row {
     float: left;
-    width: 316px;
+    width: 320px;
 }
 
 form small {
@@ -260,4 +260,13 @@ p {
     margin-top: 0;
     margin-bottom: 10px;
 }
+
+#tabs .errorlist li {
+    width: 300px;
+}
+
+#tabs input[type='text'], #tabs input[type='password'] {
+    width: 174px;
+}
+
 /* vim: set ai ts=4 sts=4 et sw=4: */
