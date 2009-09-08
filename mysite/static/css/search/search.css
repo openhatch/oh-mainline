@@ -359,11 +359,14 @@ p {
     padding: 10px;
     color: #222;
     width: 570px;
+    height: 25px;
 }
 #opps form input[type='submit'] {
     font-size: 19px;
     padding: 8px;
     color: #222;
+    width: 90px;
+    height: 50px;
 }
 .good-for-beginners {
     color: #444;
