@@ -168,6 +168,16 @@ SearchResults.fetchSearchResultsToDOM = function (queryString) {
     url = this.queryURL + queryString + "&jsoncallback=?";
     $.getJSON(url, this.jsonArrayToDocument);
     SearchResults.lightSearchResult(0);
+
+    // Fix <https://openhatch.org/bugs/issue5>:
+    // In opp search, keyboard shortcuts are not enabled immediately
+    // because focus not on search results.
+    // Tested by function: `SearchTests.blurSearchFieldWhenNewResultsAppear`.
+    if (SearchResults.shortcutsEnabled) {
+        console.debug("opps ul: ", $("#opps ul"));
+        $("#opps ul a:first-child").focus();
+    }
+
 };
 
 SearchResults.jsonArrayToDocument = function (jsonArray) {
@@ -299,6 +309,8 @@ SearchResults.update = function(queryArray) {
 
     return false;
 };
+
+SearchResults.shortcutsEnabled = true;
 
 SearchResults.moveSearchResultFocusDown = function () {
     SearchResults.lightSearchResult(SearchResults.getLitGewgawIndex() + 1);
