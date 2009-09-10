@@ -153,21 +153,6 @@ Welcome to OpenHatch!
                 {% if notification_id %}
                 <!-- notification_id: {{ notification_id }} -->
                 {% endif %}
-                <a id='toggleNormalLogin' href='#'>Show normal login</a>
-                <form id='normal_login_form' name='login'
-                    action='/account/login/do' method='POST'>
-                    <div class='form-row'>
-                        <label for='login_username'>Username</label>
-                        <input type='text' id='login_username' name='login_username' />
-                    </div>
-                    <div class='form-row'>
-                        <label for='login_password'>Password</label>
-                        <input type='password' id='login_password' name='login_password' />
-                    </div>
-                    <div class='form-row'>
-                        <input type='submit' value='log in!' style='' />
-                    </div>
-                </form>
                 <form id="openid_form" name="openid_form"
                     action="{% url user_signin %}" method="post">
                     <input type="hidden" name="action" value="verify" />
@@ -185,6 +170,23 @@ Welcome to OpenHatch!
                             <input name="openid_submit" type="submit"
                             value="Sign in">
                         </div>
+                </form>
+                <a id='toggleNormalLogin' href='#'>
+                    <span class='verb'>Show</span> normal login
+                </a>
+                <form id='normal_login_form' name='login'
+                    action='/account/login/do' method='POST'>
+                    <div class='form-row'>
+                        <label for='login_username'>Username</label>
+                        <input type='text' id='login_username' name='login_username' />
+                    </div>
+                    <div class='form-row'>
+                        <label for='login_password'>Password</label>
+                        <input type='password' id='login_password' name='login_password' />
+                    </div>
+                    <div class='form-row'>
+                        <input type='submit' value='log in!' style='' />
+                    </div>
                 </form>
             </div> 
         </div>
