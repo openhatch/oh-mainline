@@ -39,5 +39,29 @@ var prepareTabs = function () {
     }
 }
 
+$.fn.log = function () {
+    console.log(this);
+    return this;
+};
+
+// Show or hide the normal, non-OpenID login form.
+ToggleNormalLoginForm = {
+    '$toggleLink': null,
+    '$form': null,
+    'initialize': function () {
+        console.log('tnlf.init');
+        this.$toggleLink = $('#toggleNormalLogin').click(this.toggle).log();
+        this.$form = $('#normal_login_form').hide().log();
+    },
+    'toggle': function () {
+        console.log('tnlf.toggle');
+        var isLoginFormHidden = this.$form.css('display') == 'none';
+        var methodName = isLoginFormHidden ? 'show' : 'hide';
+        this.$form[methodName]();
+        return false;
+    }
+};
+
 $(bindTabEventHandlers);
 $(prepareTabs);
+$(ToggleNormalLoginForm.initialize);

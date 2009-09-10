@@ -153,7 +153,8 @@ Welcome to OpenHatch!
                 {% if notification_id %}
                 <!-- notification_id: {{ notification_id }} -->
                 {% endif %}
-                <form id='login' name='login'
+                <a id='toggleNormalLogin' href='#'>Show normal login</a>
+                <form id='normal_login_form' name='login'
                     action='/account/login/do' method='POST'>
                     <div class='form-row'>
                         <label for='login_username'>Username</label>
