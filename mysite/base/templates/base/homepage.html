@@ -202,13 +202,15 @@ Welcome to OpenHatch!
         </h3>
         <ul>
             <li>
+            {% comment %}
             <strong>
                 <a href='/search/' id='bug-search'>
                     <img src='/static/images/base/homepage/teaser-bug-search.png'
                     alt='Volunteer opportunities' />
                 </a>
             </strong> 
-            <div class='right'>
+            {% endcomment %}
+            <div class='left'>
                 <h4>Find open source opportunities tailored to you</h4>
                 <p>
                 Whether you're a newcomer or an old hat,
@@ -228,20 +230,24 @@ Welcome to OpenHatch!
                 patches, bug activity, and design ideas.
                 </p>
             </div>
+            {% comment %}
             <strong class='right'>
                 <a href='#' id='create-profile'>
                     <img src='/static/images/base/homepage/penguin2.png' 
                     alt='Create a profile' />
                 </a>
             </strong>
+            {% endcomment %}
             </li>
             <li>
+            {% comment %}
             <strong class='left'>
                 <a href='/people/' id='people-search'>
                     <img src='/static/images/base/homepage/heads.png'
                     alt='Find collaborators and connections' />
                 </a>
             </strong>
+            {% endcomment %}
             <div class='right'>
                 <h4>Find collaborators and connections</h4>
             </div>
