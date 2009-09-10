@@ -528,10 +528,12 @@ class CeleryTests(TwillTests):
 
         self.assertEqual(decoded, [])
 
-    # FIXME: One day, test that after self.test_slow_loading_via_emulated_bgtask
-    # getting the data does not go out to Ohloh.
+        # FIXME: One day, test that, after
+        # self.test_slow_loading_via_emulated_bgtask,
+        # getting the data does not go out to Ohloh.
 
-    # }}}
+        # }}}
+
     # }}}
 
 class UserListTests(TwillTests):
