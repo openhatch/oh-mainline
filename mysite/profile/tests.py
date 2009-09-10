@@ -532,6 +532,7 @@ class CeleryTests(TwillTests):
     # getting the data does not go out to Ohloh.
 
     # }}}
+    # }}}
 
 class UserListTests(TwillTests):
     # {{{
