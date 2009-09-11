@@ -85,7 +85,6 @@ class EditPassword(TwillTests):
         tc.follow('Change your password')
         tc.url('/account/settings/password')
 
-        tc.find('Change password')
         tc.fv('a_settings_tab_form', 'old_password', old_pass)
         tc.fv('a_settings_tab_form', 'new_password1', new_pass)
         tc.fv('a_settings_tab_form', 'new_password2', new_pass)

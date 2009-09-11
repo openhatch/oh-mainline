@@ -17,11 +17,13 @@ setup(
                         'invitation',
                         'celery==0.6.0',
                         'south==0.6-rc1',
+                        'multiprocessing==2.6.2.1-oh',
                        ],
 
     dependency_links = ['http://linode.openhatch.org/~paulproteus/',
                         'http://linode.openhatch.org/~paulproteus/python_apt-0.6.17-py2.6-linux-i686.egg#egg=python-apt',
                         'http://linode.openhatch.org/~paulproteus/invitation-1.0.tar.gz#egg=invitation',
+                        'http://linode.openhatch.org/~paulproteus/multiprocessing-2.6.2.1-oh.tar.gz#egg=multiprocessing',
                         'http://linode.openhatch.org/~paulproteus/South-0.6_pre-py2.6.egg#egg=south',
                        ],
 

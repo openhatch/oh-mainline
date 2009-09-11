@@ -77,7 +77,9 @@
 {% block left %}
 <div id='avatar' class='module'>
     <img src='{{ photo_url }}' />
+    {% if editable %}
     <div class='change-photo-link'><a href="/account/edit/photo/">Change photo</a></div>
+    {% endif %}
 </div>
 
 <div id='info' class='module'>
