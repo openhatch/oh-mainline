@@ -153,20 +153,6 @@ Welcome to OpenHatch!
                 {% if notification_id %}
                 <!-- notification_id: {{ notification_id }} -->
                 {% endif %}
-                <form id='login' name='login'
-                    action='/account/login/do' method='POST'>
-                    <div class='form-row'>
-                        <label for='login_username'>Username</label>
-                        <input type='text' id='login_username' name='login_username' />
-                    </div>
-                    <div class='form-row'>
-                        <label for='login_password'>Password</label>
-                        <input type='password' id='login_password' name='login_password' />
-                    </div>
-                    <div class='form-row'>
-                        <input type='submit' value='log in!' style='' />
-                    </div>
-                </form>
                 <form id="openid_form" name="openid_form"
                     action="{% url user_signin %}" method="post">
                     <input type="hidden" name="action" value="verify" />
@@ -184,6 +170,23 @@ Welcome to OpenHatch!
                             <input name="openid_submit" type="submit"
                             value="Sign in">
                         </div>
+                </form>
+                <a id='toggleNormalLogin' href='#'>
+                    <span class='verb'>Show</span> normal login
+                </a>
+                <form id='normal_login_form' name='login'
+                    action='/account/login/do' method='POST'>
+                    <div class='form-row'>
+                        <label for='login_username'>Username</label>
+                        <input type='text' id='login_username' name='login_username' />
+                    </div>
+                    <div class='form-row'>
+                        <label for='login_password'>Password</label>
+                        <input type='password' id='login_password' name='login_password' />
+                    </div>
+                    <div class='form-row'>
+                        <input type='submit' value='log in!' style='' />
+                    </div>
                 </form>
             </div> 
         </div>
@@ -204,16 +207,15 @@ Welcome to OpenHatch!
             <li>
             <strong>
                 <a href='/search/' id='bug-search'>
-                    <img src='/static/images/base/homepage/teaser-bug-search.png'
+                    <img src='/static/images/base/homepage/opps-frontpage.png'
                     alt='Volunteer opportunities' />
                 </a>
             </strong> 
-            <div class='right'>
+            <div class='left'>
                 <h4>Find open source opportunities tailored to you</h4>
                 <p>
-                Whether you're a newcomer or an old hat,
-                discover new ways that you can help free software
-                and open source projects.
+                Discover new ways that you can contribute to free 
+                and open source software.
                 </p>
             </div>
             </li>
@@ -223,14 +225,14 @@ Welcome to OpenHatch!
                 <p>
                 Track and show off your involvement in
                 free and open source software. 
-                We'll find your VCS commits,
-                and you can add other contributions: 
+                We'll find your <abbr title='version control system'>VCS</abbr> 
+                commits, and you can add other contributions: 
                 patches, bug activity, and design ideas.
                 </p>
             </div>
             <strong class='right'>
                 <a href='#' id='create-profile'>
-                    <img src='/static/images/base/homepage/penguin2.png' 
+                    <img src='/static/images/base/homepage/portfolio-frontpage.png' 
                     alt='Create a profile' />
                 </a>
             </strong>
@@ -238,7 +240,7 @@ Welcome to OpenHatch!
             <li>
             <strong class='left'>
                 <a href='/people/' id='people-search'>
-                    <img src='/static/images/base/homepage/heads.png'
+                    <img src='/static/images/base/homepage/people-frontpage.png'
                     alt='Find collaborators and connections' />
                 </a>
             </strong>
