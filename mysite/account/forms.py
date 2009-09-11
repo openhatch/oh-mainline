@@ -116,3 +116,4 @@ class EditPhotoForm(django.forms.ModelForm):
             self.cleaned_data['photo'] = new_image_uploaded_file
         return self.cleaned_data['photo']
 
+

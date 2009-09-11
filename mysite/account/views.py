@@ -3,6 +3,7 @@ from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerEr
 from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404
 import django.contrib.auth 
 from django.contrib.auth.models import User
+from django.contrib.auth.views import password_reset
 from django.contrib.auth.decorators import login_required
 import mock
 from django_authopenid.forms import OpenidSigninForm

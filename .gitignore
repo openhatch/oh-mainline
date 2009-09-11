@@ -13,3 +13,7 @@ src/*.egg-info
 .figleaf
 html/
 htmlcov/
+*.orig
+*#
+.#*
+*~
