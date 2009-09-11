@@ -24,7 +24,8 @@ def encode_datetime(obj):
     # }}}
 
 def split_query_words(string):
-    # We're given some query terms "between quotes" and some glomped on with spaces
+    # We're given some query terms "between quotes"
+    # and some glomped on with spaces.
     # Strategy: Find the strings validly inside quotes, and remove them
     # from the original string. Then split the remainder (and probably trim
     # whitespace from the remaining words).
@@ -105,38 +106,40 @@ def fetch_bugs(request):
             except AtrributeError:
                 pass
 
+    data = {}
+    data['language'] = query
+
+    prev_page_query_str = QueryDict('')
+    prev_page_query_str = prev_page_query_str.copy()
+    next_page_query_str = QueryDict('')
+    next_page_query_str = next_page_query_str.copy()
+    if query:
+        prev_page_query_str['language'] = query
+        next_page_query_str['language'] = query
+    if format:
+        prev_page_query_str['format'] = format
+        next_page_query_str['format'] = format
+    diff = end - start
+    prev_page_query_str['start'] = start - diff - 1
+    prev_page_query_str['end'] = start - 1
+    next_page_query_str['start'] = end + 1
+    next_page_query_str['end'] = end + diff + 1
+
+    data['start'] = start
+    data['end'] = end
+    data['prev_page_url'] = '/search/?' + prev_page_query_str.urlencode()
+    data['next_page_url'] = '/search/?' + next_page_query_str.urlencode()
+
     if format == 'json':
-        return bugs_to_json_response(bugs, request.GET.get(
+        # FIXME: Why alert? Is that undeployable debug logic?
+        return bugs_to_json_response(data, bugs, request.GET.get(
             'jsoncallback', 'alert'))
     else:
-        data = {}
         data['the_user'] = request.user
         data['suggestions'] = suggestions
         data['bunch_of_bugs'] = bugs
         data['developer_name'] = "Orrin Hatch"
-        data['language'] = query
         data['url'] = 'http://launchpad.net/'
-
-        prev_page_query_str = QueryDict('')
-        prev_page_query_str = prev_page_query_str.copy()
-        next_page_query_str = QueryDict('')
-        next_page_query_str = next_page_query_str.copy()
-        if query:
-            prev_page_query_str['language'] = query
-            next_page_query_str['language'] = query
-        if format:
-            prev_page_query_str['format'] = format
-            next_page_query_str['format'] = format
-        diff = end - start
-        prev_page_query_str['start'] = start - diff - 1
-        prev_page_query_str['end'] = start - 1
-        next_page_query_str['start'] = end + 1
-        next_page_query_str['end'] = end + diff + 1
-
-        data['start'] = start
-        data['end'] = end
-        data['prev_page_url'] = '/search/?' + prev_page_query_str.urlencode()
-        data['next_page_url'] = '/search/?' + next_page_query_str.urlencode()
 
         # FIXME: Actually calculate / figure these out.
         data['total_bug_count'] = total_bug_count
@@ -146,14 +149,19 @@ def fetch_bugs(request):
         return render_to_response('search/search.html', data)
     # }}}
 
-def bugs_to_json_response(bunch_of_bugs, callback_function_name=''):
+def bugs_to_json_response(data, bunch_of_bugs, callback_function_name=''):
     # {{{
     json_serializer = serializers.get_serializer('python')()
-    data = json_serializer.serialize(bunch_of_bugs)
-    for elt in data:
-        elt['fields']['project'] = \
-                    Project.objects.get(pk=int(elt['fields']['project'])).name
-    jsonned = simplejson.dumps(data, default=encode_datetime)
+    bugs = json_serializer.serialize(bunch_of_bugs)
+
+    # Throughout the list, replace project primary keys with project names.
+    for bug in bugs:
+        project = Project.objects.get(pk=int(bug['fields']['project']))
+        bug['fields']['project'] = project.name
+
+    data['bugs'] = bugs
+
+    jsonned = simplejson.dumps([data], default=encode_datetime)
     return HttpResponse( callback_function_name + '(' + jsonned + ')' )
     # }}}
 
@@ -286,4 +294,4 @@ Ask server to give a list of projects and languages beginning with "c"
 
 Add top 100 fulltext words to the mix.
 """
-# vim: set ai ts=4 sw=4 et:
+# vim: set ai ts=4 sw=4 et nu:

@@ -187,7 +187,7 @@ SearchResults.jsonArrayToDocument = function (jsonArray) {
     var noResultsList = $('#opps ul').size() == 0;
     if (noResultsList) { $("<ul>").appendTo('#opps'); }
 
-    SearchResults.setSearchControlsForTheHeartOfTheSunAlsoMakeThemVisible();
+    $('.search-result-control').show();
 
     var dataToDOM = function(i) {
         // Add data from JSON array element to DOM.
@@ -256,7 +256,8 @@ SearchResults.jsonArrayToDocument = function (jsonArray) {
         }
     };
 
-    $(jsonArray).each( dataToDOM );
+    bugs = jsonArray[0].bugs;
+    $(bugs).each( dataToDOM );
 
     SearchResults.bindEventHandlers();
 
@@ -318,10 +319,6 @@ SearchResults.moveSearchResultFocusDown = function () {
 
 SearchResults.moveSearchResultFocusUp = function () {
     SearchResults.lightSearchResult(SearchResults.getLitGewgawIndex() - 1);
-};
-
-SearchResults.setSearchControlsForTheHeartOfTheSunAlsoMakeThemVisible = function () {
-    $('.search-result-control').show();
 };
 
 /* vim: set ai ts=4 sts=4 et sw=4: */
