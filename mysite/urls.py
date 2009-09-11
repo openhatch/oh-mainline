@@ -24,6 +24,7 @@ urlpatterns = patterns('',
 
         (r'^account/login/$', 'mysite.account.views.login'),
         (r'^account/forgot_pass/$', 'django.contrib.auth.views.password_reset', {'template_name': 'account/password_reset.html'}),
+
         (r'^account/catch-me$', 'mysite.account.views.catch_me'),
         (r'^account/logout/$', 'mysite.account.views.logout'),
 
@@ -67,6 +68,9 @@ urlpatterns = patterns('',
         url(r'^openid/register/$', oid_views.register, dict(send_email=False)),
 
         (r'^openid/', include('django_authopenid.urls')),
+
+        (r'^account/forgot_pass_done/$', 'django.contrib.auth.views.password_reset_done', {'template_name': 'account/password_reset_done.html'}),
+                       
 
         (r'^account/settings/$',
             'mysite.account.views.settings'),
