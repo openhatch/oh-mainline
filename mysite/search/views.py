@@ -12,21 +12,23 @@ import pytz
 import re
 import simplejson
 
-
 # Via http://www.djangosnippets.org/snippets/1435/
 def encode_datetime(obj):
+    # {{{
     if isinstance(obj, datetime.date):
         fixed = datetime.datetime(obj.year, obj.month, obj.day, tzinfo=pytz.utc)
         obj = fixed
     if isinstance(obj, datetime.datetime):
         return obj.astimezone(tz.tzutc()).strftime('%Y-%m-%dT%H:%M:%SZ')
     raise TypeError("%s" % type(obj) + repr(obj) + " is not JSON serializable")
+    # }}}
 
 def split_query_words(string):
     # We're given some query terms "between quotes" and some glomped on with spaces
     # Strategy: Find the strings validly inside quotes, and remove them
     # from the original string. Then split the remainder (and probably trim
     # whitespace from the remaining words).
+    # {{{
     ret = []
     splitted = re.split(r'(".*?")', string)
 
@@ -39,8 +41,10 @@ def split_query_words(string):
             ret.append(word[1:-1])
 
     return ret
+    # }}}
 
 def fetch_bugs(request):
+    # {{{
     # FIXME: Give bugs some date field
 
     if request.user.is_authenticated():
@@ -115,7 +119,8 @@ def fetch_bugs(request):
         prev_page_query_str['end'] = start - 1
         next_page_query_str['start'] = end + 1
         next_page_query_str['end'] = end + diff + 1
-        return render_to_response('search/search.html', {
+
+        data = {
             'the_user': request.user,
             'suggestions': suggestions,
             'bunch_of_bugs': bugs,
@@ -125,16 +130,26 @@ def fetch_bugs(request):
             'url': 'http://launchpad.net/',
             'prev_page_url': '/search/?' + prev_page_query_str.urlencode(),
             'next_page_url': '/search/?' + next_page_query_str.urlencode()
-            })
+            }
+
+        # FIXME: Actually calculate / figure these out.
+        data['total_bug_count'] = 60
+        data['show_prev_page_link'] = True
+        data['show_next_page_link'] = True
+
+        return render_to_response('search/search.html', data)
+    # }}}
 
 def bugs_to_json_response(bunch_of_bugs, callback_function_name=''):
+    # {{{
     json_serializer = serializers.get_serializer('python')()
     data = json_serializer.serialize(bunch_of_bugs)
     for elt in data:
         elt['fields']['project'] = \
-                Project.objects.get(pk=int(elt['fields']['project'])).name
+                    Project.objects.get(pk=int(elt['fields']['project'])).name
     jsonned = simplejson.dumps(data, default=encode_datetime)
     return HttpResponse( callback_function_name + '(' + jsonned + ')' )
+    # }}}
 
 def request_jquery_autocompletion_suggestions(request):
     """
@@ -146,6 +161,7 @@ def request_jquery_autocompletion_suggestions(request):
     If q is absent or empty, this function
     returns an HttpResponseServerError.
     """
+    # {{{
     partial_query = request.GET.get('q', None)
     if (partial_query is None) or (partial_query == ''):
         return HttpResponseServerError("Need partial_query in GET")
@@ -157,6 +173,7 @@ def request_jquery_autocompletion_suggestions(request):
     suggestions_string = list_to_jquery_autocompletion_format(
                 suggestions_list)
     return HttpResponse(suggestions_string)
+    # }}}
 
 def list_to_jquery_autocompletion_format(list):
     """Converts a list to the format required by
@@ -183,7 +200,7 @@ def get_autocompletion_suggestions(input):
       - libraries (frameworks? toolkits?) like Django
       - search by date
     """
-
+    # {{{
     sf_project = SearchableField('project')
     sf_language = SearchableField('lang')
     sf_dependency = SearchableField('dep')
@@ -248,6 +265,7 @@ def get_autocompletion_suggestions(input):
                     for lang in langs]
 
     return suggestions
+    # }}}
 
 """
 Ways we could do autocompletion:
