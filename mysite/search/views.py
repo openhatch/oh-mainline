@@ -60,6 +60,8 @@ def fetch_bugs(request):
     start = int(request.GET.get('start', 1))
     end = int(request.GET.get('end', 10))
 
+    total_bug_count = 0
+
     if query:
         bugs = Bug.objects.all()
 
@@ -71,6 +73,9 @@ def fetch_bugs(request):
                 Q(project__name__iexact=word))
 
         bugs = bugs.order_by('-last_touched')
+
+        # FIXME: Potential resource drain.
+        total_bug_count = bugs.count()
 
         bugs = bugs[start-1:end]
 
@@ -104,6 +109,14 @@ def fetch_bugs(request):
         return bugs_to_json_response(bugs, request.GET.get(
             'jsoncallback', 'alert'))
     else:
+        data = {}
+        data['the_user'] = request.user
+        data['suggestions'] = suggestions
+        data['bunch_of_bugs'] = bugs
+        data['developer_name'] = "Orrin Hatch"
+        data['language'] = query
+        data['url'] = 'http://launchpad.net/'
+
         prev_page_query_str = QueryDict('')
         prev_page_query_str = prev_page_query_str.copy()
         next_page_query_str = QueryDict('')
@@ -120,22 +133,15 @@ def fetch_bugs(request):
         next_page_query_str['start'] = end + 1
         next_page_query_str['end'] = end + diff + 1
 
-        data = {
-            'the_user': request.user,
-            'suggestions': suggestions,
-            'bunch_of_bugs': bugs,
-            'developer_name': "Orrin Hatch",
-            'language': query,
-            'start': start, 'end': end,
-            'url': 'http://launchpad.net/',
-            'prev_page_url': '/search/?' + prev_page_query_str.urlencode(),
-            'next_page_url': '/search/?' + next_page_query_str.urlencode()
-            }
+        data['start'] = start
+        data['end'] = end
+        data['prev_page_url'] = '/search/?' + prev_page_query_str.urlencode()
+        data['next_page_url'] = '/search/?' + next_page_query_str.urlencode()
 
         # FIXME: Actually calculate / figure these out.
-        data['total_bug_count'] = 60
-        data['show_prev_page_link'] = True
-        data['show_next_page_link'] = True
+        data['total_bug_count'] = total_bug_count
+        data['show_prev_page_link'] = start > 1
+        data['show_next_page_link'] = end < (total_bug_count - 1)
 
         return render_to_response('search/search.html', data)
     # }}}
