@@ -23,7 +23,8 @@ urlpatterns = patterns('',
         (r'^people/$', 'mysite.profile.views.display_list_of_people'),
 
         (r'^account/login/$', 'mysite.account.views.login'),
-        (r'^account/forgot_pass/$', 'django.contrib.auth.views.password_reset', {'template_name': 'account/password_reset.html'}),
+        (r'^account/forgot_pass/$', 'django.contrib.auth.views.password_reset', {'template_name': 'account/password_reset.html',
+                                                                                 'email_template_name': 'account/password_reset_email.html'}),
 
         (r'^account/catch-me$', 'mysite.account.views.catch_me'),
         (r'^account/logout/$', 'mysite.account.views.logout'),
@@ -69,8 +70,9 @@ urlpatterns = patterns('',
 
         (r'^openid/', include('django_authopenid.urls')),
 
-        (r'^account/forgot_pass_done/$', 'django.contrib.auth.views.password_reset_done', {'template_name': 'account/password_reset_done.html'}),
-                       
+        url(r'^account/forgot_pass_confirm/(?P<uidb36>[^/]+)/(?P<token>[^/]+)/$', 'django.contrib.auth.views.password_reset_confirm', {'template_name': 'account/password_reset_confirm.html'}, name='password_reset_confirm'),
+
+        (r'^account/forgot_pass_done/', 'django.contrib.auth.views.password_reset_done', {'template_name': 'account/password_reset_done.html'}),
 
         (r'^account/settings/$',
             'mysite.account.views.settings'),
