@@ -158,7 +158,7 @@ SearchResults.queryURL = "/search/?";
 
 SearchResults.$resultsDOMList = $('.gewgaws ul');
 
-SearchResults.getLitGewgawIndex = function() {
+SearchResults.getLitSearchResultIndex = function() {
     // FIXME: Remember the index of the lit gewgaw in Javascript,
     // and avoid going through CSS.
     return $('.gewgaws li').index($('.lit-up')[0]);
@@ -250,7 +250,9 @@ SearchResults.jsonArrayToDocument = function (jsonArray) {
             if (typeof pair[2] == "undefined") {
                 verb = "text";
             } else {
-                verb = pair[2]; //lol ok not really a pair anymore.
+                verb = pair[2];
+                //er, ok, not really a pair in this case.
+                //bad variable naming ... self-flagellations.
             }
             x = $result.find(selector)[verb](newText);
         }
@@ -264,16 +266,98 @@ SearchResults.jsonArrayToDocument = function (jsonArray) {
     SearchResults.lightSearchResult(0);
 };
 
-SearchResults.lightSearchResult = function(gewgawIndex) {
+SearchResults.lightSearchResult = function(resultIndex) {
     //console.log('lightSearchResult called');
-    if($('.gewgaws li').eq(gewgawIndex).size() == 1) {
+    if($('.gewgaws li').eq(resultIndex).size() == 1) {
         $gg = $('.gewgaws li');
         //console.debug($gg);
         $gg.removeClass('lit-up')
-        $gg.eq(gewgawIndex).addClass('lit-up').scrollIntoView();
-        // FIXME: Automatically scroll when gewgaw is expanded such that its content is off-screen.
+        $gg.eq(resultIndex).addClass('lit-up').scrollIntoView();
+        // FIXME: Automatically scroll when search result is expanded
+        // such that its content is off-screen.
     }
 };
+
+// The PageLinks are the "prev" and "next" links that
+// allow the user to browse through the list of search
+// results.
+SearchResults.PageLinks = {};
+
+// Data used for manipulating these links.
+SearchResults.PageLinks.manipulationData = {
+    'prev': {
+        '$element': $('#prev-page'), 
+
+        'getVisibility': function() {
+            // This is a function because `thisstart` changes;
+            // we need to figure out during runtime whether
+            // the element will be visible.
+            return thisstart > 0;
+        },
+        
+        'queryArrayCalculators': {
+            // These calculate numbers we'll need to compose URLs
+            // for neighboring pages.
+            'start': function() {
+                // The index of the *first* result to show on the linked page.
+                var diff = thisend - thisstart;
+                return thisstart - diff - 1;
+            },
+            'end': function() {
+                // The index of the *last* result to show on the linked page.
+                return thisstart - 1;
+            },
+        }
+    },
+    'next': {
+        // See SearchResults.PageLinks.manipulationData.prev for documentation.
+        '$element': $('#next-page'), 
+        'getVisibility': function() {
+            return thisend < (totalBugCount - 1);
+        },
+        'queryArrayCalculators': {
+            'start': function() { return thisend + 1; },
+            'end': function() {
+                var diff = thisend - thisstart;
+                return thisend + diff + 1;
+            },
+        }
+    }
+};
+
+totalBugCount = 10; // FIXME: Merely temporary.
+
+SearchResults.PageLinks.update = function() {
+
+    for (pl in pageLinks) {
+        var link = pageLinks[pl];
+        if (link.getVisibility()) {
+            var showHide = link.getVisibility() ? 'show' : 'hide';
+            link.$element[showHide]();
+
+            /**************
+             * Create URL *
+             **************/
+            
+            // Begin with a query array
+            // (shortly to be converted to query string).
+            var queryArray = $('form').serializeArray(); // FIXME: 'Form' looks fishy.
+
+            // Calculate the values of query string parameters.
+            for (name in link.queryArrayCalculators) {
+                var value = link.queryArrayCalculators[name]();
+                queryArray.push( { 'name': name, 'value': value });
+            }
+            
+            // Use jQuery's array to query string converter.
+            var queryString = $.param(queryArray);
+
+            // Set HREF.
+            link.$element.attr('href', '/search/?' + queryString);
+        }
+    }
+};
+
 
 SearchResults.update = function(queryArray) {
     queryArray.push({'name': 'format', value: 'json'});
@@ -283,26 +367,16 @@ SearchResults.update = function(queryArray) {
     /* Fetch JSON and put in DOM. */
     SearchResults.fetchSearchResultsToDOM(queryStringFormatJSON);
 
+    console.debug(queryArray);
+
     /* Update navigation links */
     var language;
     $(queryArray).each(function () {
             if(this.name == 'language') language = this.value;
             })
 
-    diff = thisend - thisstart;
-
-    prevPageQueryArray = $('form').serializeArray();
-    prevPageQueryArray.push( {'name': 'start', 'value': thisstart - diff - 1});
-    prevPageQueryArray.push( {'name': 'end', 'value': thisstart - 1});
-
-    nextPageQueryArray = $('form').serializeArray();
-    nextPageQueryArray.push( {'name': 'start', 'value': thisend + 1});
-    nextPageQueryArray.push( {'name': 'end', 'value': thisend + diff + 1});
-
-    /* Update navigation links to reflect new query. */
-    prefix = '/search/?';
-    $('#prev-page').attr('href', prefix + $.param(prevPageQueryArray));
-    $('#next-page').attr('href', prefix + $.param(nextPageQueryArray));
+    /* Update the links to neighboring pages: "prev" and "next". */
+    SearchResults.PageLinks.update();
 
     $('#results-summary-language').text(language);
     $('#results-summary-start').text(thisstart);
@@ -314,11 +388,11 @@ SearchResults.update = function(queryArray) {
 SearchResults.shortcutsEnabled = true;
 
 SearchResults.moveSearchResultFocusDown = function () {
-    SearchResults.lightSearchResult(SearchResults.getLitGewgawIndex() + 1);
+    SearchResults.lightSearchResult(SearchResults.getLitSearchResultIndex() + 1);
 };
 
 SearchResults.moveSearchResultFocusUp = function () {
-    SearchResults.lightSearchResult(SearchResults.getLitGewgawIndex() - 1);
+    SearchResults.lightSearchResult(SearchResults.getLitSearchResultIndex() - 1);
 };
 
 /* vim: set ai ts=4 sts=4 et sw=4: */

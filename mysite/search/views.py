@@ -49,7 +49,8 @@ def fetch_bugs(request):
     # FIXME: Give bugs some date field
 
     if request.user.is_authenticated():
-        suggestion_keys = request.user.get_profile().get_recommended_search_terms()
+        suggestion_keys = request.user.get_profile().\
+                get_recommended_search_terms()
     else:
         suggestion_keys = []
 
@@ -141,7 +142,6 @@ def fetch_bugs(request):
         data['developer_name'] = "Orrin Hatch"
         data['url'] = 'http://launchpad.net/'
 
-        # FIXME: Actually calculate / figure these out.
         data['total_bug_count'] = total_bug_count
         data['show_prev_page_link'] = start > 1
         data['show_next_page_link'] = end < (total_bug_count - 1)

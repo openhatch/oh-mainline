@@ -14,18 +14,19 @@
     <span class='separator'>&nbsp;</span>
 
     <span id='navigation'>
-        {% if show_prev_page_link %}
-        <a href='{{ prev_page_url }}' id='prev-page'>&laquo; Prev</a>
+        <style type='text/css'>
+        {% if not show_prev_page_link %}
+        #prev-page { display: none; }
         {% endif %}
+        {% if not show_next_page_link %}
+        #next-page { display: none; }
+        {% endif %}
+        </style>
 
-        {% if show_prev_page_link and show_next_page_link %}
+        <a href='{{ prev_page_url }}' id='prev-page'>&laquo; Prev</a>
         <span class='separator'>&nbsp;</span>
-        {% endif %}
-        
-        {% if show_next_page_link %}
         <a href='{{ next_page_url }}' id='next-page'>Next page &raquo;</a>
         <span class='separator'>&nbsp;</span>
-        {% endif %}
     </span>
 </div><!-- /#results-widget -->
 {# vim: set filetype=htmldjango: #}
