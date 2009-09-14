@@ -1,17 +1,27 @@
 .module > .head {
-    width: 300px;
+    width: 280px;
 }
 
 .module > .body {
-    width: 260px;
+    width: 240px;
+}
+
+#right > .module > .head {
+    width: 350px;
+}
+
+#right > .module > .body {
+    width: 320px;
+    padding: 10px;
 }
 
 .submodule {
-    width: 260px;
+    width: 320px;
 }
 
 .submodule > .head {
-    width: 220px;
+    width: 270px;
+    margin-bottom: 5px;
 }
 
 .submodule > .body {
