@@ -66,8 +66,46 @@ SearchTests = {
         return true;
     },
 
-    'hidePrevLinkWhenOnFirstPage': function () {
-        /* Test for resolution of <
+    'pageLinksAppearOnlyWhenNeeded': function () {
+        /* Test for resolution of
+         * <https://www.pivotaltracker.com/story/show/1245515>
+         * ("In /search/, don't show prev and next links when
+         * they wouldn't lead you anywhere.")
+         */
+        var data = Fixtures.jsonArray;
+
+        /* Visit first page of results. */
+
+        data.start = 0;
+        data.end = 10;
+
+        SearchResults.jsonArrayToDocument(data);
+        fireunit.ok("'Prev' link is hidden on first page of results.",
+                $('#prev-page').is(':hidden'));
+        fireunit.ok("'Next page' link is visible on first page of results.",
+                $('#next-page').is(':visible'));
+
+        /* Visit a middle page of results. */
+
+        data.start = 20;
+        data.end = 30;
+
+        SearchResults.jsonArrayToDocument(data);
+        fireunit.ok("'Prev' link is visible on a middle page of results.",
+                $('#prev-page').is(':visible'));
+        fireunit.ok("'Next page' link is visible on a middle page of results.",
+                $('#next-page').is(':visible'));
+
+        /* Visit the last page of results. */
+
+        data.start = 50;
+        data.end = 60;
+
+        SearchResults.jsonArrayToDocument(data);
+        fireunit.ok("'Prev' link is visible on last page of results.",
+                $('#prev-page').is(':visible'));
+        fireunit.ok("'Next page' link is hidden on last page of results.",
+                $('#next-page').is(':hidden'));
     }
 };
 runTests = function() {
