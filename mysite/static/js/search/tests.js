@@ -51,11 +51,11 @@ SearchTests = {
         }
     },
 
-    /* Test for resolution of https://openhatch.org/bugs/issue5:
-     * "In opp search, keyboard shortcuts are not enabled immediately
-     * because focus not on search results."
-     * */
     'blurSearchFieldWhenNewResultsAppear': function () {
+        /* Test for resolution of https://openhatch.org/bugs/issue5:
+         * "In opp search, keyboard shortcuts are not enabled immediately
+         * because focus not on search results."
+         * */
         var $searchForm = $("form#search_opps");
         $searchForm.find("input:text").focus().text("python");
         $searchForm.submit();
@@ -64,6 +64,10 @@ SearchTests = {
         };
         $searchForm.find("input").each(failIfFocused);
         return true;
+    },
+
+    'hidePrevLinkWhenOnFirstPage': function () {
+        /* Test for resolution of <
     }
 };
 runTests = function() {

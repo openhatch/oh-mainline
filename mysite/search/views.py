@@ -74,7 +74,7 @@ def fetch_bugs(request):
                 Q(description__contains=word) |
                 Q(project__name__iexact=word))
 
-        bugs = bugs.order_by('-last_touched')
+        bugs = bugs.order_by('-last_touched') # Minus sign = reverse order.
 
         # FIXME: Potential resource drain.
         total_bug_count = bugs.count()
@@ -85,7 +85,6 @@ def fetch_bugs(request):
             # b.description = b.description[:65] + "..."
             b.project.icon_url = "/static/images/icons/projects/%s.png" % \
                     b.project.name.lower()
-            # FIXME: Randomize for camera
 
         bugs = list(bugs)
 
@@ -132,7 +131,7 @@ def fetch_bugs(request):
     data['next_page_url'] = '/search/?' + next_page_query_str.urlencode()
 
     if format == 'json':
-        # FIXME: Why alert? Is that undeployable debug logic?
+        # FIXME: Why `alert`?
         return bugs_to_json_response(data, bugs, request.GET.get(
             'jsoncallback', 'alert'))
     else:
@@ -150,7 +149,10 @@ def fetch_bugs(request):
     # }}}
 
 def bugs_to_json_response(data, bunch_of_bugs, callback_function_name=''):
+    """ The search results page accesses this view via jQuery's getJSON method, 
+    and loads its results into the DOM."""
     # {{{
+    # FIXME: This looks super weird.
     json_serializer = serializers.get_serializer('python')()
     bugs = json_serializer.serialize(bunch_of_bugs)
 
@@ -161,14 +163,20 @@ def bugs_to_json_response(data, bunch_of_bugs, callback_function_name=''):
 
     data['bugs'] = bugs
 
-    jsonned = simplejson.dumps([data], default=encode_datetime)
-    return HttpResponse( callback_function_name + '(' + jsonned + ')' )
+    # JSON has to be an array of JS objects.
+    # Let's make a list of Python objects first.
+    data_list = [data]
+
+    # Convert the list to a string expressing JSON array.
+    json_array = simplejson.dumps(data_list, default=encode_datetime)
+
+    return HttpResponse( callback_function_name + '(' + json_array + ')' )
     # }}}
 
 def request_jquery_autocompletion_suggestions(request):
     """
     Wraps get_autocompletion_suggestions and
-    list_to_jquery_autocompletion_format in a
+    list_to_jquery_autocompletion_format in an
     HttpRequest -> HttpResponse loop.
     Validates GET parameters. Expected:
         ?q=[suggestion fodder]

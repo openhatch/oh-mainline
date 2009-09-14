@@ -306,7 +306,7 @@ SearchResults.PageLinks.manipulationData = {
             'end': function() {
                 // The index of the *last* result to show on the linked page.
                 return thisstart - 1;
-            },
+            }
         }
     },
     'next': {
@@ -320,7 +320,7 @@ SearchResults.PageLinks.manipulationData = {
             'end': function() {
                 var diff = thisend - thisstart;
                 return thisend + diff + 1;
-            },
+            }
         }
     }
 };
