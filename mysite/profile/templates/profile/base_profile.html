@@ -124,27 +124,27 @@
         </form>
         {% else %}
         <!-- {{{ -->
-        {% if tags_flat.understands %}
+        {% if tags.understands and tags_flat.understands %}
         <div class='tags' id='tags-understands'>
             <span class='tag-type'>understands:</span> {{ tags_flat.understands }}
         </div>
         {% endif %}
-        {% if tags.understands_not %}
+        {% if tags.understands_not and tags_flat.understands_not %}
         <div class='tags' id='tags-understands_not'>
             <span class='tag-type'>will never understand:</span> {{ tags_flat.understands_not }}
         </div>
         {% endif %}
-        {% if tags.seeking %}
+        {% if tags.seeking and tags_flat.seeking %}
         <div class='tags' id='tags-seeking'>
             <span class='tag-type'>looking for volunteering opportunities in:</span> {{ tags_flat.seeking }}
         </div>
         {% endif %}
-        {% if tags.studying %}
+        {% if tags.studying and tags_flat.studying %}
         <div class='tags' id='tags-studying'>
             <span class='tag-type'>currently learning about:</span> {{ tags_flat.studying }}
         </div>
         {% endif %}
-        {% if tags.can_mentor %}
+        {% if tags.can_mentor and tags_flat.can_mentor %}
         <div class='tags' id='tags-can_mentor'>
             <span class='tag-type'>can mentor in:</span> {{ tags_flat.can_mentor }}
         </div>
