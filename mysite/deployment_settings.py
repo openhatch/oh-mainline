@@ -3,7 +3,7 @@ from settings import *
 OHLOH_API_KEY='SXvLaGPJFaKXQC0VOocAg'
 DEBUG=False
 ADMINS=[
-    ('All OH devs', 'devel@openhatch.org'),
+    ('All OH devs', 'devel@lists.openhatch.org'),
 ]
 
 INVITE_MODE=True # Enabled on production site
