@@ -11,6 +11,8 @@ from django.template import RequestContext, loader, Context
 from django.core.urlresolvers import reverse
 import mysite.profile as profile
 from mysite.profile.views import display_person_web
+import feedparser
+import lxml.html
 
 def homepage(request, signup_form=None,
         invitation_request_form=None, initial_tab_open='request_invitation'):
@@ -58,6 +60,14 @@ def homepage(request, signup_form=None,
 def landing_page(request):
     data = profile.views.get_personal_data(request.user.get_profile())
     data['the_user'] = request.user
+
+    # Add blog data here
+    parsed = feedparser.parse('http://openhatch.org/blog/feed/atom/')
+    for entry in parsed.entries:
+        entry.unicode_text = lxml.html.fragments_fromstring(entry.summary)[0]
+
+    data['entries'] = parsed.entries
+
     return render_to_response('base/landing.html', data)
 
 def page_to_js(request):

@@ -84,11 +84,14 @@ Home
             </div>
             <div class='body'>
                 <ul>
-                <li>blog post!</li>
-                <li>blog post!</li>
-                <li>blog post!</li>
-                <li>blog post!</li>
-                <li>blog post!</li>
+		  {% for entry in entries %}
+		  <li>
+		    <a href="{{ entry.link }}">
+		      {{ entry.title }}
+		    </a> (by {{ entry.author }})
+		    {{ entry.unicode_text|truncatewords:10 }}
+		  </li>
+		  {% endfor %}
                 </ul>
             </div>
         </div>
