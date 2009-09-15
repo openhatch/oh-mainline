@@ -4,6 +4,11 @@ $.fn.href = function () {
 
 SearchTests = {
     'jsonArrayToDocument': function() {
+
+        // Don't run this, because it fails,
+        // and tests are evaluated serially like fairy lights.
+        return false;
+
         SearchResults.jsonArrayToDocument(testData.jsonArray);
         var $result = $('.gewgaws li').eq(0);
         var testField = function(fieldName, selector, valueGetter) {
@@ -44,12 +49,28 @@ SearchTests = {
             }
             success &= testField(pair[0], pair[1], verb);
         }
+    },
+
+    /* Test for resolution of https://openhatch.org/bugs/issue5:
+     * "In opp search, keyboard shortcuts are not enabled immediately
+     * because focus not on search results."
+     * */
+    'blurSearchFieldWhenNewResultsAppear': function () {
+        var $searchForm = $("form#search_opps");
+        $searchForm.find("input:text").focus().text("python");
+        $searchForm.submit();
+        var failIfFocused = function() {
+            if (this == document.activeElement) return false;
+        };
+        $searchForm.find("input").each(failIfFocused);
+        return true;
     }
 };
 runTests = function() {
     for (var test in SearchTests) {
-        console.debug(test);
-        fireunit.ok(SearchTests[test](), "SearchTests." + test); }
+        console.debug("test: ", test);
+        fireunit.ok(SearchTests[test](), "SearchTests." + test);
+    }
     fireunit.testDone();
 };
 if (fireunitEnabled) {

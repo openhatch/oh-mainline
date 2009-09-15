@@ -2,10 +2,12 @@
     font-family: Tuffy;
     src: url('/static/fonts/tuffy_regular.ttf');
 }
+/*
 @font-face {
     font-family: "Graublau Web";
-    src: url('/static/fonts/GraublauWeb.otf'); /*format("opentype");*/
+    src: url('/static/fonts/GraublauWeb.otf'); /*format("opentype");* /
 }
+*/
 body {
     font: 9pt "Graublau Web", Tuffy, Verdana,
     "Bitstream Vera Sans", Helvetica, Arial, sans-serif;
@@ -24,6 +26,10 @@ a:hover {
 
 a img {
     border-style: none;
+}
+
+abbr {
+    border-bottom: 1px dotted #999;
 }
 
 h1 a {

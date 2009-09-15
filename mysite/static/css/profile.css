@@ -1,7 +1,7 @@
 #nameplate {
     float: left;
     width: 940px;
-    margin-bottom: 10px;
+    margin-top: 50px;
     padding: 3px;
 }
 #nameplate h1 {
@@ -73,9 +73,10 @@
     padding: 8px 0;
 }
 #nameplate .another-identifier {
-    float: left;
-    padding: 8px 0;
+    float: right;
     margin-left: 20px;
+    margin-bottom: 10px;
+    clear: right;
 }
 
 #nameplate .notification {

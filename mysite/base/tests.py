@@ -59,14 +59,8 @@ class TwillTests(django.test.TestCase):
         return client
 
     def signup_with_twill(self, username, email, password):
-        tc.go(make_twill_url('http://openhatch.org/'))
-        tc.fv('create_profile', 'username',
-                username)
-        tc.fv('create_profile', 'email',
-                email)
-        tc.fv('create_profile', 'password',
-                password)
-        tc.submit()
+        """ Used by account.tests.Signup, which is omitted while we use invite codes. """
+        pass
 
     # }}}
 

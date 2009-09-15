@@ -528,8 +528,11 @@ class CeleryTests(TwillTests):
 
         self.assertEqual(decoded, [])
 
-    # FIXME: One day, test that after self.test_slow_loading_via_emulated_bgtask
-    # getting the data does not go out to Ohloh.
+        # FIXME: One day, test that, after
+        # self.test_slow_loading_via_emulated_bgtask,
+        # getting the data does not go out to Ohloh.
+
+        # }}}
 
     # }}}
 
@@ -539,6 +542,7 @@ class UserListTests(TwillTests):
             'user-barry', 'person-barry']
 
     def test_display_list_of_users_web(self):
+        # {{{
         self.login_with_twill()
         url = 'http://openhatch.org/people/'
         url = make_twill_url(url)
@@ -549,16 +553,11 @@ class UserListTests(TwillTests):
         tc.follow('paulproteus')
         tc.url('people/paulproteus') 
         tc.find('paulproteus')
+        # }}}
 
-    def test_front_page_link_to_list_of_users(self):
-        url = 'http://openhatch.org/'
-        url = make_twill_url(url)
-        tc.go(url)
-        tc.follow('Find other folks on OpenHatch')
     # }}}
 
 class ImportContributionsTests(TwillTests):
-    """ """
     # {{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
     # Don't include cchost-paulproteus, because we need paulproteus to have
@@ -714,8 +713,10 @@ class ImportContributionsTests(TwillTests):
 
 class UserCanShowEmailAddress(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
+    # {{{
     def test_show_email(self):
         """This test: (a) verifies my@ema.il does not appear on paulproteus's profile page, then goes to his account settings and opts in to showing it, and then verifies it does appear."""
+        # {{{
         self.login_with_twill()
 
         tc.go('/people/paulproteus/')
@@ -728,6 +729,8 @@ class UserCanShowEmailAddress(TwillTests):
 
         tc.go('/people/paulproteus/')
         tc.find('my@ema.il')
+        # }}}
+    # }}}
 
 class OnlyFreshDiasAreSelected(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']

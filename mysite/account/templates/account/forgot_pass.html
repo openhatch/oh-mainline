@@ -1,0 +1,37 @@
+{% extends 'base/one_column.html' %}
+
+{% block title %}
+Forgot your password - OpenHatch
+{% endblock title %}
+
+{% block css %}
+{{ block.super }}
+@import url('/static/css/account/auth.css') all;
+{% endblock css %}
+
+{% block main %}
+<div id='login' class='module'>
+    <div class='head'>
+        <h3>Forgot your password?</h3>
+    </div>
+    <div class='body'>
+      <p>
+	If you fill out this form, a new password will be
+	emailed to you.
+      </p>
+        <form name='login'
+            action='/account/forgot_pass/do' method='POST'>
+            <div class='form-row'>
+                <label for=;username'>Username</label>
+                <input type='text' id='username' name='username' />
+            </div>
+            <div class='form-row'>
+                <input type='submit' value='Recover' style='' />
+            </div>
+        </form>
+    </div>
+    <div class='foot'>
+        Don't have an account yet? Then <a style='font-weight: bold;' href='/#tab=create_profile'>sign up for one</a>.
+    </div>
+</div>
+{% endblock main %}

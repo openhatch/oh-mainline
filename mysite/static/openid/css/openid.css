@@ -20,22 +20,21 @@
 #openid_btns, #openid_btns br {
     clear: both;
 }
-#openid_highlight {
-    padding: 3px;
-    background-color: #FFFCC9;
-    float: left;
+#openid_highlight .openid_large_btn,
+#openid_highlight .openid_small_btn {
+    border-color: #ffd72d; 
 }
 .openid_large_btn {
     width: 100px;
     height: 60px;
-    border: 1px solid #DDD;
+    border: 3px solid #ddd;
     margin: 3px;
     float: left;
 }
 .openid_small_btn {
     width: 24px;
     height: 24px;
-    border: 1px solid #DDD;
+    border: 3px solid #ddd;
     margin: 3px;
     float: left;
 }

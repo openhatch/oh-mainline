@@ -1,11 +1,12 @@
 <div class='search-result-control' id='results-widget'>
     <span id='results-summary'>
-        <span id='results-summary-language'>{{ language }}</span>
+        {% comment %} The variable is called `language` but it could be a variety of other fields. FIXME: Fix the variable name. {% endcomment %}
+        You searched for <strong id='results-summary-language'>{{ language }}</strong>.
 
         {% if bunch_of_bugs %}
+        <span id='total_bug_count'>{{ total_bug_count }}</span> bugs found.
         Showing results 
-        <span id='results-summary-start'>{{ start }}</span>
-        to
+        <span id='results-summary-start'>{{ start }}</span> to
         <span id='results-summary-end'>{{ end }}</span>.
         {% endif %}
     </span>
@@ -13,10 +14,18 @@
     <span class='separator'>&nbsp;</span>
 
     <span id='navigation'>
+        {% if show_prev_page_link %}
         <a href='{{ prev_page_url }}' id='prev-page'>&laquo; Prev</a>
+        {% endif %}
+
+        {% if show_prev_page_link and show_next_page_link %}
         <span class='separator'>&nbsp;</span>
+        {% endif %}
+        
+        {% if show_next_page_link %}
         <a href='{{ next_page_url }}' id='next-page'>Next page &raquo;</a>
         <span class='separator'>&nbsp;</span>
+        {% endif %}
     </span>
 </div><!-- /#results-widget -->
 {# vim: set filetype=htmldjango: #}
