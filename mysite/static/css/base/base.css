@@ -1,12 +1,22 @@
+@font-face {
+    font-family: Tuffy;
+    src: url('/static/fonts/tuffy_regular.ttf');
+}
+/*
+@font-face {
+    font-family: "Graublau Web";
+    src: url('/static/fonts/GraublauWeb.otf'); /*format("opentype");* /
+}
+*/
 body {
-    font: 9pt Verdana, Bitstream Vera Sans, Arial, sans-serif;
-    /*background-color: #ddeeff;*/
+    font: 9pt "Graublau Web", Tuffy, Verdana,
+    "Bitstream Vera Sans", Helvetica, Arial, sans-serif;
     background: #fff url("/static/images/motif-eee.png");
     margin: 0;
     padding: 0;
 }
 a {
-    color: #ff8046; /*#ff6d3d; #ff613f; #ff7800; 00a8ff; eeb300; */
+    color: orange; /*#ff8046; #ff6d3d; #ff613f; #ff7800; 00a8ff; eeb300; */
     text-decoration: none;
 }
 
@@ -16,6 +26,10 @@ a:hover {
 
 a img {
     border-style: none;
+}
+
+abbr {
+    border-bottom: 1px dotted #999;
 }
 
 h1 a {
@@ -246,7 +260,7 @@ h3 {
     font-weight: bold;
     color: #555;
     letter-spacing: 0;
-    font: 13pt Verdana;
+    font-size: 13pt;
     margin: 0;
 }
 .module > .head h3 {

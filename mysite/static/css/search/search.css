@@ -28,6 +28,10 @@
     font-size: 120%;
     line-height: 130%;
     width: 460px;
+    float: left;
+}
+.no-opps strong {
+    background-color: #fff;
 }
 #heading {
     margin: 20px 0 10px 0;
@@ -359,11 +363,14 @@ p {
     padding: 10px;
     color: #222;
     width: 570px;
+    height: 25px;
 }
 #opps form input[type='submit'] {
     font-size: 19px;
     padding: 8px;
     color: #222;
+    width: 90px;
+    height: 50px;
 }
 .good-for-beginners {
     color: #444;

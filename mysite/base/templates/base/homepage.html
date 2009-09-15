@@ -11,24 +11,20 @@ Welcome to OpenHatch!
 
 {% block js_in_head %}
 <script>
-    // allow IE to recognize HTMl5 elements
-    document.createElement('section');
-    document.createElement('article');
-    document.createElement('aside');
-    document.createElement('footer');
-    document.createElement('header');
-    document.createElement('nav');
-    document.createElement('time');
-
+    /*<![CDATA[*/
+    // FIXME: Wrap this in an IE-only block.
+    // Allow IE to recognize HTML5 elements
+    html5tags = ['section', 'article', 'aside', 'footer', 'header', 'nav', 'time'];
+    t = html5tags.length; while (t-- > 0) { document.createElement(html5tags[t]); }
+    /*]]>*/
 </script>
-<script type="text/javascript" src="/static/js/jquery.js"></script>
-<script type="text/javascript" src="/static/openid/js/openid-jquery.js"></script>
-<script type="text/javascript">
-$(function() {
-    openid.init('id_openid_url');
-});
+<script src="/static/js/jquery.js"></script>
+<script src="/static/openid/js/openid-jquery.js"></script>
+<script>
+    $(function() {
+        openid.init('id_openid_url');
+    });
 </script>
-
 <script src='/static/js/css_if_js.js'></script>
 {% endblock js_in_head %}
 
@@ -39,40 +35,76 @@ $(function() {
 {% endblock css %}
 
 {% block content %}
-<div id='banner'>
-    <img alt='OpenHatch' src='/static/images/the-logo.png' width='300'/>
-
-    <div id='explanation'>
-        <h3>OpenHatch is an open source involvement engine.</h3>
-    </div>
-</div>
-
-<div id='entry-points'>
-    <div id='no-authorization-necessary'>
-        <ul>
-            <li>
-            <a href='/people'>Find other folks on OpenHatch</a>
-            </li>
-            <li>
-            <a href='/search'>Find the perfect opportunity to volunteer</a>
-            </li>
-        </ul>
+<div class='left'>
+    <div id='banner'>
+        <img alt='OpenHatch' src='/static/images/the-logo.png' width='300'/>
     </div>
     <div id='account-related'>
-        <ul class='tab-links'>
+        <ul class='tab-links' class='visible_iff_js'>
+            <li>
+            <a href="#request_invitation"
+                {% ifnotequal initial_tab_open 'request_invitation' %}
+                class='my-tab-is-hidden'
+                {% endifnotequal %}
+                tab_selector="#request_invitation">
+                <img src='/static/images/base/request-an-invitation.png'
+                alt='Request an invitation' />
+            </a>
+            </li>
+            {% comment %}
             <li><a href="#create_profile" class='visible_iff_js'
                 tab_selector="#create_profile">Sign up</a></li>
-            <li><a href="/account/login"
-                class='visible_iff_js my-tab-is-hidden'
-                tab_selector="#login">Log in</a></li>
-            <li><a href="/account/login"
-                class='visible_iff_js my-tab-is-hidden'
-                tab_selector="#openid">OpenID</a></li>
-            <li class='learn-more'><a href="#learn_more"
-                class='visible_iff_js my-tab-is-hidden'
-                tab_selector="#learn-more">Learn more</a></li>
+            {% endcomment %}
+            <li>
+            <a href="#login"
+                {% ifnotequal initial_tab_open 'login' %}
+                class='my-tab-is-hidden'
+                {% endifnotequal %}
+                tab_selector="#login">
+                <img src='/static/images/base/sign-in.png'
+                alt='Sign in' />
+            </a>
+            </li>
         </ul>
         <div id='tabs' class='module'>
+            <h3 class='invisible_if_js'>Request an invitation</h3>
+            <div id='request_invitation' 
+                {% ifequal initial_tab_open 'request_invitation' %}
+                class='tab'
+                {% else %}
+                class='tab invisible_if_js'
+                {% endifequal %}
+                >
+                <form name='request_invitation' method='POST'
+                    action='{% url mysite.account.views.request_invitation %}'>
+                    {% if invitation_success %}
+                    <div class='form-row' style='color: green; font-weight: bold; margin-bottom: 10px;'>
+                        Success! An invitation has been requested for {{ invitation_requested_for }}.
+                    </div>
+                    {% else %}
+                    <p>
+                    We're currently in invitation-only beta.
+                    Sign up for a sneak peek.
+                    </p>
+                    {% endif %}
+                    {% for field in invitation_request_form %}
+                    <div class='form-row'>
+                        {% if field.errors %}
+                        <div class='field-errors'>
+                            {{ field.errors }}
+                        </div>
+                        {% endif %}
+                        {{ field.label_tag }}
+                        {{ field }}
+                    </div>
+                    {% endfor %}
+                    <div class='form-row'>
+                        <input type='submit' style='float: right;' 
+                        value='Submit' />
+                    </div>
+                </form>
+            </div>
+            {% comment %}
             <h3 class='invisible_if_js'>Sign up</h3>
             <div id='create_profile' class='tab'>
                 {% if signup_notification %}
@@ -104,8 +136,15 @@ $(function() {
                     </div>
                 </form>
             </div>
+            {% endcomment %}
             <h3 class='invisible_if_js'>Log in</h3>
-            <div id='login' class='tab invisible_if_js'>
+            <div id='login' 
+                {% ifequal initial_tab_open 'request_invitation' %}
+                class='tab'
+                {% else %}
+                class='tab invisible_if_js'
+                {% endifequal %}
+                >
                 {% if login_notification %}
                 <div class='notification'>
                     {{ login_notification }}
@@ -114,7 +153,29 @@ $(function() {
                 {% if notification_id %}
                 <!-- notification_id: {{ notification_id }} -->
                 {% endif %}
-                <form id='login' name='login' action='/account/login/do' method='POST'>
+                <form id="openid_form" name="openid_form"
+                    action="{% url user_signin %}" method="post">
+                    <input type="hidden" name="action" value="verify" />
+                    <input type="hidden" name="next" value="{{ next }}" />
+                    <p>Sign in using an account on another network.</p>
+                        <div id="openid_choice">
+                            <p>Please click your account provider:</p>
+                            <div id="openid_btns"></div>
+                        </div>
+                        <div id="openid_input_area">
+                            <label for="id_openid_ul">
+                                OpenID URL:
+                            </label>
+                            {{ openid_signin_form.openid_url }}
+                            <input name="openid_submit" type="submit"
+                            value="Sign in">
+                        </div>
+                </form>
+                <a id='toggleNormalLogin' href='#'>
+                    <span class='verb'>Show</span> normal login
+                </a>
+                <form id='normal_login_form' name='login'
+                    action='/account/login/do' method='POST'>
                     <div class='form-row'>
                         <label for='login_username'>Username</label>
                         <input type='text' id='login_username' name='login_username' />
@@ -129,47 +190,70 @@ $(function() {
                     </div>
                 </form>
             </div> 
-            <h3 class='invisible_if_js'>OpenID</h3>
-            <div id='openid' class='tab invisible_if_js'>
-                <form id="openid_form" name="openid_form" action="{% url user_signin %}" method="post">
-                    <input type="hidden" name="action" value="verify" />
-                    <input type="hidden" name="next" value="{{ next }}" />
-                    <fieldset>
-                        <legend>{% trans "Sign In Using Your OpenID URL" %}</legend>
-                        <div id="openid_choice">
-                            <p>Please click your account provider:</p>
-                            <div id="openid_btns"></div>
-                        </div>
-                        <div id="openid_input_area">
-                            <label for="id_openid_ul">{% trans "OpenId URL :" %}</label>{{ form1.openid_url }}
-                            <input name="openid_submit" type="submit" value="{% trans "Sign in with OpenID" %}">
-                        </div>
-
-                    </fieldset>
-                </form>
-
-            </div>
-            <h3 class='invisible_if_js'>What is OpenHatch?</h3>
-            <div id='learn-more' class='tab invisible_if_js'>
-                <p>OpenHatch makes it easy to:</p>
-                <ul>
-                    <li>Find new ways that you can help with open source projects</li>
-                    <li>Find mentors or mentees and learn new skills</li>
-                    <li>Track and show off all your open source software experience in one place.</li>
-                </ul>
-            </div>
         </div>
     </div>
+</div>
+
+<div id='entry-points'>
+    <div class='module' id='explanation'>
+        <h5 class='interrogative_grunt'>
+            {{ interrogative_grunt|random }}
+            <!-- Affectionately filched from thesixtyone's "Huh?" -->
+        </h5>
+        <h3>
+            Want to get (more) involved in <strong>open source</strong>?
+            Proud of what you've already contributed?
+        </h3>
+        <ul>
+            <li>
+            <strong>
+                <a href='/search/' id='bug-search'>
+                    <img src='/static/images/base/homepage/opps-frontpage.png'
+                    alt='Volunteer opportunities' />
+                </a>
+            </strong> 
+            <div class='left'>
+                <h4>Find open source opportunities tailored to you</h4>
+                <p>
+                Discover new ways that you can contribute to free 
+                and open source software.
+                </p>
+            </div>
+            </li>
+            <li>
+            <div class='left'>
+                <h4>Showcase your contributions</h4>
+                <p>
+                Track and show off your involvement in
+                free and open source software. 
+                We'll find your <abbr title='version control system'>VCS</abbr> 
+                commits, and you can add other contributions: 
+                patches, bug activity, and design ideas.
+                </p>
+            </div>
+            <strong class='right'>
+                <a href='#' id='create-profile'>
+                    <img src='/static/images/base/homepage/portfolio-frontpage.png' 
+                    alt='Create a profile' />
+                </a>
+            </strong>
+            </li>
+            <li>
+            <strong class='left'>
+                <a href='/people/' id='people-search'>
+                    <img src='/static/images/base/homepage/people-frontpage.png'
+                    alt='Find collaborators and connections' />
+                </a>
+            </strong>
+            <div class='right'>
+                <h4>Find collaborators and connections</h4>
+            </div>
+        </ul>
+    </div>
+
 </div>
 {% endblock content %}
 
 {% block js %}
 <script src='/static/js/homepage.js'></script>
-<script>
-    $('#learn-more-link').click(function () {
-        var $more_info = $('#more-information');
-        var hidden = $more_info.css('display') == 'none';
-        $more_info['fade' + (hidden ? 'In' : 'Out')]('slow');
-    });
-</script>
 {% endblock js %}

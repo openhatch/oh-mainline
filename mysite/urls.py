@@ -32,6 +32,9 @@ urlpatterns = patterns('',
         (r'^account/login/do$', 'mysite.account.views.login_do'),
         (r'^account/signup/do$', 'mysite.account.views.signup_do'),
 
+        (r'^account/request_invitation/do$',
+            'mysite.account.views.request_invitation'),
+
         #Karen messes around with templates
         (r'^about/$', 
             'mysite.info.views.aboutpage'),

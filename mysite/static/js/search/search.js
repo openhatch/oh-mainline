@@ -74,39 +74,48 @@ $(function() {
                 function() { $(this).removeClass('hover'); }
                 );
 
+        /* FIXME: TEMPORARILY DISABLED. */
         /* Takes a query and updates the page. */
+        /*
         $("#button").click(function() {
-                /* Put form values into an associative array. */
+                // Put form values into an associative array.
                 return SearchResults.update($('form').serializeArray());
                 });
+        */
 
+        var pageLinkClickHandler = function() {
+            /* Take the HREF and convert to wacky serializeArray,
+             * send to update() */
 
-        $('#prev-page, #next-page').click(function() {
-                /* Take the HREF and convert to wacky serializeArray, send to update() */
-                var fruitySerialized = new Array();
-                var splitted_on_ampersands = this.href.split('?')[1].split('&');
-                for (var index in splitted_on_ampersands) {
-                var splitted = splitted_on_ampersands[index].split('=');    
+            var fruitySerialized = new Array();
+
+            var splittedOnAmpersands = this.href.split('?')[1].split('&');
+            for (var index in splittedOnAmpersands) {
+                var splitted = splittedOnAmpersands[index].split('=');    
                 var key = decodeURIComponent(splitted[0]);
                 var value = decodeURIComponent(splitted[1]);
                 var fruity_pushable = {'name': key, 'value': value};
                 /* update the thisstart and thisend globals */
                 if (key == 'start') {
-                thisstart = parseInt(value);
+                    thisstart = parseInt(value);
                 }
                 if (key == 'end') {
-                thisend = parseInt(value);
+                    thisend = parseInt(value);
                 }
                 fruitySerialized.push(fruity_pushable);
-                }
-                /*
-                console.log('FRUITYSERIALIZED:');
-                console.log(fruitySerialized);
-                console.log('SLASH FRUITYSERIALIZED:');
-                */
+            }
+            console.log('FRUITYSERIALIZED:');
+            console.log(fruitySerialized);
+            console.log('SLASH FRUITYSERIALIZED:');
 
-                return SearchResults.update(fruitySerialized);
-        });
+            return false;
+            // fixme: temporary
+            // What kind of data structure does SearchResults.update expect?
+            return SearchResults.update(fruitySerialized);
+        };
+
+        /* FIXME: TEMPORARILY DISABLED. */
+        // $('#prev-page, #next-page').click(pageLinkClickHandler);
 
         // Handle autocomplete. {{{
         $input = $("#opps form input[type='text']");
@@ -158,7 +167,7 @@ SearchResults.queryURL = "/search/?";
 
 SearchResults.$resultsDOMList = $('.gewgaws ul');
 
-SearchResults.getLitGewgawIndex = function() {
+SearchResults.getLitSearchResultIndex = function() {
     // FIXME: Remember the index of the lit gewgaw in Javascript,
     // and avoid going through CSS.
     return $('.gewgaws li').index($('.lit-up')[0]);
@@ -168,6 +177,16 @@ SearchResults.fetchSearchResultsToDOM = function (queryString) {
     url = this.queryURL + queryString + "&jsoncallback=?";
     $.getJSON(url, this.jsonArrayToDocument);
     SearchResults.lightSearchResult(0);
+
+    // Fix <https://openhatch.org/bugs/issue5>:
+    // In opp search, keyboard shortcuts are not enabled immediately
+    // because focus not on search results.
+    // Tested by function: `SearchTests.blurSearchFieldWhenNewResultsAppear`.
+    if (SearchResults.shortcutsEnabled) {
+        console.debug("opps ul: ", $("#opps ul"));
+        $("#opps ul a:first-child").focus();
+    }
+
 };
 
 SearchResults.jsonArrayToDocument = function (jsonArray) {
@@ -177,7 +196,7 @@ SearchResults.jsonArrayToDocument = function (jsonArray) {
     var noResultsList = $('#opps ul').size() == 0;
     if (noResultsList) { $("<ul>").appendTo('#opps'); }
 
-    SearchResults.setSearchControlsForTheHeartOfTheSunAlsoMakeThemVisible();
+    $('.search-result-control').show();
 
     var dataToDOM = function(i) {
         // Add data from JSON array element to DOM.
@@ -240,37 +259,128 @@ SearchResults.jsonArrayToDocument = function (jsonArray) {
             if (typeof pair[2] == "undefined") {
                 verb = "text";
             } else {
-                verb = pair[2]; //lol ok not really a pair anymore.
+                verb = pair[2];
+                //er, ok, not really a pair in this case.
+                //bad variable naming ... self-flagellations.
             }
             x = $result.find(selector)[verb](newText);
         }
     };
 
-    $(jsonArray).each( dataToDOM );
+    bugs = jsonArray[0].bugs;
+    $(bugs).each( dataToDOM );
 
     SearchResults.bindEventHandlers();
 
     SearchResults.lightSearchResult(0);
 };
 
-SearchResults.lightSearchResult = function(gewgawIndex) {
+SearchResults.lightSearchResult = function(resultIndex) {
     //console.log('lightSearchResult called');
-    if($('.gewgaws li').eq(gewgawIndex).size() == 1) {
+    if($('.gewgaws li').eq(resultIndex).size() == 1) {
         $gg = $('.gewgaws li');
         //console.debug($gg);
         $gg.removeClass('lit-up')
-        $gg.eq(gewgawIndex).addClass('lit-up').scrollIntoView();
-        // FIXME: Automatically scroll when gewgaw is expanded such that its content is off-screen.
+        $gg.eq(resultIndex).addClass('lit-up').scrollIntoView();
+        // FIXME: Automatically scroll when search result is expanded
+        // such that its content is off-screen.
     }
 };
 
+// The PageLinks are the "prev" and "next" links that
+// allow the user to browse through the list of search
+// results.
+SearchResults.PageLinks = {};
+
+// Data used for manipulating these links.
+SearchResults.PageLinks.manipulationData = {
+    'prev': {
+        '$element': $('#prev-page'), 
+
+        'getVisibility': function() {
+            // This is a function because `thisstart` changes;
+            // we need to figure out during runtime whether
+            // the element will be visible.
+            return thisstart > 0;
+        },
+        
+        'queryArrayCalculators': {
+            // These calculate numbers we'll need to compose URLs
+            // for neighboring pages.
+            'start': function() {
+                // The index of the *first* result to show on the linked page.
+                var diff = thisend - thisstart;
+                return thisstart - diff - 1;
+            },
+            'end': function() {
+                // The index of the *last* result to show on the linked page.
+                return thisstart - 1;
+            }
+        }
+    },
+    'next': {
+        // See SearchResults.PageLinks.manipulationData.prev for documentation.
+        '$element': $('#next-page'), 
+        'getVisibility': function() {
+            return thisend < (totalBugCount - 1);
+        },
+        'queryArrayCalculators': {
+            'start': function() { return thisend + 1; },
+            'end': function() {
+                var diff = thisend - thisstart;
+                return thisend + diff + 1;
+            }
+        }
+    }
+};
+
+totalBugCount = 10; // FIXME: Merely temporary.
+
+SearchResults.PageLinks.update = function() {
+
+    for (var i in SearchResults.PageLinks.manipulationData) {
+        var link = pageLinks[i];
+        if (link.getVisibility()) {
+            var showHide = link.getVisibility() ? 'show' : 'hide';
+            link.$element[showHide]();
+
+            /**************
+             * Create URL *
+             **************/
+            
+            // Begin with a query array
+            // (shortly to be converted to query string).
+            var queryArray = $('form').serializeArray(); // FIXME: 'Form' looks fishy.
+
+            // Calculate the values of query string parameters.
+            for (name in link.queryArrayCalculators) {
+                var value = link.queryArrayCalculators[name]();
+                queryArray.push( { 'name': name, 'value': value });
+            }
+            
+            // Use jQuery's array to query string converter.
+            var queryString = $.param(queryArray);
+
+            // Set HREF.
+            link.$element.attr('href', '/search/?' + queryString);
+        }
+    }
+};
+
+
 SearchResults.update = function(queryArray) {
-    queryArray.push({'name': 'format', value: 'json'});
+
+    // FIXME: Temporarily disabled.
+    return true;
+
+    queryArray.push({'name': 'format', 'value': 'json'});
 
     queryStringFormatJSON = $.param(queryArray);
 
     /* Fetch JSON and put in DOM. */
     SearchResults.fetchSearchResultsToDOM(queryStringFormatJSON);
+
+    console.debug(queryArray);
 
     /* Update navigation links */
     var language;
@@ -278,20 +388,8 @@ SearchResults.update = function(queryArray) {
             if(this.name == 'language') language = this.value;
             })
 
-    diff = thisend - thisstart;
-
-    prevPageQueryArray = $('form').serializeArray();
-    prevPageQueryArray.push( {'name': 'start', 'value': thisstart - diff - 1});
-    prevPageQueryArray.push( {'name': 'end', 'value': thisstart - 1});
-
-    nextPageQueryArray = $('form').serializeArray();
-    nextPageQueryArray.push( {'name': 'start', 'value': thisend + 1});
-    nextPageQueryArray.push( {'name': 'end', 'value': thisend + diff + 1});
-
-    /* Update navigation links to reflect new query. */
-    prefix = '/search/?';
-    $('#prev-page').attr('href', prefix + $.param(prevPageQueryArray));
-    $('#next-page').attr('href', prefix + $.param(nextPageQueryArray));
+    /* Update the links to neighboring pages: "prev" and "next". */
+    SearchResults.PageLinks.update();
 
     $('#results-summary-language').text(language);
     $('#results-summary-start').text(thisstart);
@@ -300,16 +398,14 @@ SearchResults.update = function(queryArray) {
     return false;
 };
 
+SearchResults.shortcutsEnabled = true;
+
 SearchResults.moveSearchResultFocusDown = function () {
-    SearchResults.lightSearchResult(SearchResults.getLitGewgawIndex() + 1);
+    SearchResults.lightSearchResult(SearchResults.getLitSearchResultIndex() + 1);
 };
 
 SearchResults.moveSearchResultFocusUp = function () {
-    SearchResults.lightSearchResult(SearchResults.getLitGewgawIndex() - 1);
-};
-
-SearchResults.setSearchControlsForTheHeartOfTheSunAlsoMakeThemVisible = function () {
-    $('.search-result-control').show();
+    SearchResults.lightSearchResult(SearchResults.getLitSearchResultIndex() - 1);
 };
 
 /* vim: set ai ts=4 sts=4 et sw=4: */

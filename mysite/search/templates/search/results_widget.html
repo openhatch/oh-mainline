@@ -1,11 +1,12 @@
 <div class='search-result-control' id='results-widget'>
     <span id='results-summary'>
-        <span id='results-summary-language'>{{ language }}</span>
+        {% comment %} The variable is called `language` but it could be a variety of other fields. FIXME: Fix the variable name. {% endcomment %}
+        You searched for <strong id='results-summary-language'>{{ language }}</strong>.
 
         {% if bunch_of_bugs %}
+        <span id='total_bug_count'>{{ total_bug_count }}</span> bugs found.
         Showing results 
-        <span id='results-summary-start'>{{ start }}</span>
-        to
+        <span id='results-summary-start'>{{ start }}</span> to
         <span id='results-summary-end'>{{ end }}</span>.
         {% endif %}
     </span>
@@ -13,6 +14,15 @@
     <span class='separator'>&nbsp;</span>
 
     <span id='navigation'>
+        <style type='text/css'>
+        {% if not show_prev_page_link %}
+        #prev-page { display: none; }
+        {% endif %}
+        {% if not show_next_page_link %}
+        #next-page { display: none; }
+        {% endif %}
+        </style>
+
         <a href='{{ prev_page_url }}' id='prev-page'>&laquo; Prev</a>
         <span class='separator'>&nbsp;</span>
         <a href='{{ next_page_url }}' id='next-page'>Next page &raquo;</a>

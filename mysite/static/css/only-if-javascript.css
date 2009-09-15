@@ -2,12 +2,11 @@
     display: none;
 }
 .tab-links a.my-tab-is-hidden {
-    background-color: #fff;
-    font-weight: normal;
-    color: #222;
+    background: none;
+    border: 0;
+    margin-top: 5px;
 }
 .tab-links a.my-tab-is-hidden:hover {
-    background-color: #eee;
 }
 .visible_iff_js {
     display: inline ! important; /* Overrides declaration in homepage.css */
