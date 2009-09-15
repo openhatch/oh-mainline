@@ -74,11 +74,14 @@ $(function() {
                 function() { $(this).removeClass('hover'); }
                 );
 
+        /* FIXME: TEMPORARILY DISABLED. */
         /* Takes a query and updates the page. */
+        /*
         $("#button").click(function() {
-                /* Put form values into an associative array. */
+                // Put form values into an associative array.
                 return SearchResults.update($('form').serializeArray());
                 });
+        */
 
         var pageLinkClickHandler = function() {
             /* Take the HREF and convert to wacky serializeArray,
@@ -111,7 +114,8 @@ $(function() {
             return SearchResults.update(fruitySerialized);
         };
 
-        $('#prev-page, #next-page').click(pageLinkClickHandler);
+        /* FIXME: TEMPORARILY DISABLED. */
+        // $('#prev-page, #next-page').click(pageLinkClickHandler);
 
         // Handle autocomplete. {{{
         $input = $("#opps form input[type='text']");
@@ -365,6 +369,10 @@ SearchResults.PageLinks.update = function() {
 
 
 SearchResults.update = function(queryArray) {
+
+    // FIXME: Temporarily disabled.
+    return true;
+
     queryArray.push({'name': 'format', 'value': 'json'});
 
     queryStringFormatJSON = $.param(queryArray);

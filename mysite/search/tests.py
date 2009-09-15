@@ -155,7 +155,7 @@ class TestNonJavascriptSearch(TwillTests):
         self.assert_(json_string_with_parens[-1] == ')')
         json_string = json_string_with_parens[1:-1]
         objects = simplejson.loads(json_string)
-        self.assert_('pk' in objects[0])
+        self.assert_('pk' in objects[0]['bugs'][0])
 
     def testPagination(self):
         url = 'http://openhatch.org/search/'
