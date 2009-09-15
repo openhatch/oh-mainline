@@ -168,7 +168,7 @@ def get_personal_data(person):
     try:
         photo_url = person.photo.url
     except ValueError:
-        photo_url = '/static/images/profile-photos/sufjan.jpg'
+        photo_url = '/static/images/profile-photos/penguin.png'
 
     # FIXME: Make this more readable.
     data_dict = {
