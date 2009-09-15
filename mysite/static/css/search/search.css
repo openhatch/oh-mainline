@@ -28,6 +28,10 @@
     font-size: 120%;
     line-height: 130%;
     width: 460px;
+    float: left;
+}
+.no-opps strong {
+    background-color: #fff;
 }
 #heading {
     margin: 20px 0 10px 0;

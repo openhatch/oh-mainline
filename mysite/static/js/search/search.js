@@ -80,33 +80,38 @@ $(function() {
                 return SearchResults.update($('form').serializeArray());
                 });
 
+        var pageLinkClickHandler = function() {
+            /* Take the HREF and convert to wacky serializeArray,
+             * send to update() */
 
-        $('#prev-page, #next-page').click(function() {
-                /* Take the HREF and convert to wacky serializeArray, send to update() */
-                var fruitySerialized = new Array();
-                var splitted_on_ampersands = this.href.split('?')[1].split('&');
-                for (var index in splitted_on_ampersands) {
-                var splitted = splitted_on_ampersands[index].split('=');    
+            var fruitySerialized = new Array();
+
+            var splittedOnAmpersands = this.href.split('?')[1].split('&');
+            for (var index in splittedOnAmpersands) {
+                var splitted = splittedOnAmpersands[index].split('=');    
                 var key = decodeURIComponent(splitted[0]);
                 var value = decodeURIComponent(splitted[1]);
                 var fruity_pushable = {'name': key, 'value': value};
                 /* update the thisstart and thisend globals */
                 if (key == 'start') {
-                thisstart = parseInt(value);
+                    thisstart = parseInt(value);
                 }
                 if (key == 'end') {
-                thisend = parseInt(value);
+                    thisend = parseInt(value);
                 }
                 fruitySerialized.push(fruity_pushable);
-                }
-                /*
-                console.log('FRUITYSERIALIZED:');
-                console.log(fruitySerialized);
-                console.log('SLASH FRUITYSERIALIZED:');
-                */
+            }
+            console.log('FRUITYSERIALIZED:');
+            console.log(fruitySerialized);
+            console.log('SLASH FRUITYSERIALIZED:');
 
-                return SearchResults.update(fruitySerialized);
-        });
+            return false;
+            // fixme: temporary
+            // What kind of data structure does SearchResults.update expect?
+            return SearchResults.update(fruitySerialized);
+        };
+
+        $('#prev-page, #next-page').click(pageLinkClickHandler);
 
         // Handle autocomplete. {{{
         $input = $("#opps form input[type='text']");
@@ -329,8 +334,8 @@ totalBugCount = 10; // FIXME: Merely temporary.
 
 SearchResults.PageLinks.update = function() {
 
-    for (pl in pageLinks) {
-        var link = pageLinks[pl];
+    for (var i in SearchResults.PageLinks.manipulationData) {
+        var link = pageLinks[i];
         if (link.getVisibility()) {
             var showHide = link.getVisibility() ? 'show' : 'hide';
             link.$element[showHide]();
@@ -360,7 +365,7 @@ SearchResults.PageLinks.update = function() {
 
 
 SearchResults.update = function(queryArray) {
-    queryArray.push({'name': 'format', value: 'json'});
+    queryArray.push({'name': 'format', 'value': 'json'});
 
     queryStringFormatJSON = $.param(queryArray);
 

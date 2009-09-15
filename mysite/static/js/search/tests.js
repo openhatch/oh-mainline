@@ -9,14 +9,14 @@ SearchTests = {
         // and tests are evaluated serially like fairy lights.
         return false;
 
-        SearchResults.jsonArrayToDocument(testData.jsonArray);
+        SearchResults.jsonArrayToDocument(Fixtures.jsonArray);
         var $result = $('.gewgaws li').eq(0);
         var testField = function(fieldName, selector, valueGetter) {
             var $domField = $result.find(selector);
             console.debug('test function is about to check element:', 
                     $domField);
             var domFieldValue = $domField[valueGetter]();
-            var jsonFieldValue = testData.jsonArray[0].fields[fieldName];
+            var jsonFieldValue = Fixtures.jsonArray[0].fields[fieldName];
             var success = ($.trim(domFieldValue) == $.trim(jsonFieldValue));
             fireunit.ok(success,
                     "SearchTests.jsonArrayToDocument: "
@@ -74,38 +74,45 @@ SearchTests = {
          */
         var data = Fixtures.jsonArray;
 
+
         /* Visit first page of results. */
 
         data.start = 0;
         data.end = 10;
 
         SearchResults.jsonArrayToDocument(data);
-        fireunit.ok("'Prev' link is hidden on first page of results.",
-                $('#prev-page').is(':hidden'));
-        fireunit.ok("'Next page' link is visible on first page of results.",
-                $('#next-page').is(':visible'));
+        fireunit.ok( $('#prev-page').is(':hidden'),
+                "'Prev' link is hidden on first page of results.");
+        fireunit.ok( $('#next-page').is(':visible'),
+                "'Next page' link is visible on first page of results.");
+
+
 
         /* Visit a middle page of results. */
 
-        data.start = 20;
-        data.end = 30;
+        data.start = 1;
+        data.end = 13;
 
         SearchResults.jsonArrayToDocument(data);
-        fireunit.ok("'Prev' link is visible on a middle page of results.",
-                $('#prev-page').is(':visible'));
-        fireunit.ok("'Next page' link is visible on a middle page of results.",
-                $('#next-page').is(':visible'));
+        fireunit.ok( $('#prev-page').is(':visible'),
+                "'Prev' link is visible on a middle page of results.");
+        fireunit.ok( $('#next-page').is(':visible'),
+                "'Next page' link is visible on a middle page of results.");
+
+
 
         /* Visit the last page of results. */
 
-        data.start = 50;
-        data.end = 60;
+        data.start = 1;
+        data.end = 14;
 
         SearchResults.jsonArrayToDocument(data);
-        fireunit.ok("'Prev' link is visible on last page of results.",
-                $('#prev-page').is(':visible'));
-        fireunit.ok("'Next page' link is hidden on last page of results.",
-                $('#next-page').is(':hidden'));
+        fireunit.ok( $('#prev-page').is(':visible'),
+                "'Prev' link is visible on last page of results.");
+        fireunit.ok( $('#next-page').is(':hidden'),
+                "'Next page' link is hidden on last page of results.");
+
+        return true; // This value isn't important here.
     }
 };
 runTests = function() {

@@ -90,9 +90,18 @@ Search bugs
         </ul>
         {% else %}
         {% if language %}
+
+        {% ifnotequal start 1 %}
         <p class='no-opps'>
-        No opportunities found matching your query: {{ language }}.
+        You requested results #{{ start }} to #{{ end }} for the query <strong><tt>{{ language }}</tt></strong>,
+        but there are only {{ total_bug_count }} results in total. So there are none to display here, you see.
         </p>
+        {% else %}
+        <p class='no-opps'>
+        The query <strong><tt>{{ language }}</tt></strong> returned zero results. 
+        </p>
+        {% endifnotequal %}
+
         {% else %}
         <!-- No search query -->
         {% endif %}
@@ -112,9 +121,9 @@ Search bugs
 {% include 'search/result.html' %}
 </li>
 {{ block.super }}
-<script src='/static/js/search/suggestions.js'></script>
 <script src='/static/js/search/defaultText.js'></script>
 {% comment %}
+<script src='/static/js/search/suggestions.js'></script>
 <script src='/static/js/search/testData.js'></script>
 <script src='/static/js/search/tests.js'></script>
 {% endcomment %}

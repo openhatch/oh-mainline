@@ -1,8 +1,8 @@
 // This is just like a Django fixture, i.e., data used in testing.
 
-testData = {};
+Fixtures = {};
 
-testData.json = {
+Fixtures.json = {
     'totalBugCount': 10,
     'start': 1,
     'end': 10,
@@ -185,22 +185,97 @@ testData.json = {
             "status": "Confirmed",
             "last_polled": "2009-06-05T00:00:00Z",
             "submitter_realname": "Adam Olsen",
-            "description": "When deleting files, Ubuntu doesn't physically remove them, but instead\ncreates a \".Trash-username\" folder in the drive root (\"/media/sdb1\n/.Trash-username\",
-            for instance). After s",
-                "title": "Files from deleted folders are added to collection",
-                    "importance": "Low",
-                    "people_involved": 1,
-                    "last_touched": "2008-04-09T00:00:00Z",
-                    "submitter_username": "arolsen",
-                    "project": "Exaile",
-                    "good_for_newcomers": 0,
-                    "canonical_bug_link": "https://bugs.launchpad.net/bugs/136116",
-                    "date_reported": "2007-08-30T00:00:00Z"
+            "description": "When deleting files, Ubuntu doesn't physically remove them, but instead\ncreates a \".Trash-username\" folder in the drive root (\"/media/sdb1\n/.Trash-username\", for instance). After s",
+            "title": "Files from deleted folders are added to collection",
+            "importance": "Low",
+            "people_involved": 1,
+            "last_touched": "2008-04-09T00:00:00Z",
+            "submitter_username": "arolsen",
+            "project": "Exaile",
+            "good_for_newcomers": 0,
+            "canonical_bug_link": "https://bugs.launchpad.net/bugs/136116",
+            "date_reported": "2007-08-30T00:00:00Z"
+        }
+    },
+    {
+        "pk": 11,
+        "model": "search.bug",
+        "fields": {
+            "status": "Confirmed",
+            "last_polled": "2009-06-05T00:00:00Z",
+            "submitter_realname": "Adam Olsen",
+            "description": "When deleting files, Ubuntu doesn't physically remove them, but instead\ncreates a \".Trash-username\" folder in the drive root (\"/media/sdb1\n/.Trash-username\", for instance). After s",
+            "title": "Files from deleted folders are added to collection",
+            "importance": "Low",
+            "people_involved": 1,
+            "last_touched": "2008-04-09T00:00:00Z",
+            "submitter_username": "arolsen",
+            "project": "Exaile",
+            "good_for_newcomers": 0,
+            "canonical_bug_link": "https://bugs.launchpad.net/bugs/136116",
+            "date_reported": "2007-08-30T00:00:00Z"
+        }
+    },
+    {
+        "pk": 12,
+        "model": "search.bug",
+        "fields": {
+            "status": "Confirmed",
+            "last_polled": "2009-06-05T00:00:00Z",
+            "submitter_realname": "Adam Olsen",
+            "description": "When deleting files, Ubuntu doesn't physically remove them, but instead\ncreates a \".Trash-username\" folder in the drive root (\"/media/sdb1\n/.Trash-username\", for instance). After s",
+            "title": "Files from deleted folders are added to collection",
+            "importance": "Low",
+            "people_involved": 1,
+            "last_touched": "2008-04-09T00:00:00Z",
+            "submitter_username": "arolsen",
+            "project": "Exaile",
+            "good_for_newcomers": 0,
+            "canonical_bug_link": "https://bugs.launchpad.net/bugs/136116",
+            "date_reported": "2007-08-30T00:00:00Z"
+        }
+    },
+    {
+        "pk": 13,
+        "model": "search.bug",
+        "fields": {
+            "status": "Confirmed",
+            "last_polled": "2009-06-05T00:00:00Z",
+            "submitter_realname": "Adam Olsen",
+            "description": "When deleting files, Ubuntu doesn't physically remove them, but instead\ncreates a \".Trash-username\" folder in the drive root (\"/media/sdb1\n/.Trash-username\", for instance). After s",
+            "title": "Files from deleted folders are added to collection",
+            "importance": "Low",
+            "people_involved": 1,
+            "last_touched": "2008-04-09T00:00:00Z",
+            "submitter_username": "arolsen",
+            "project": "Exaile",
+            "good_for_newcomers": 0,
+            "canonical_bug_link": "https://bugs.launchpad.net/bugs/136116",
+            "date_reported": "2007-08-30T00:00:00Z"
+        }
+    },
+    {
+        "pk": 14,
+        "model": "search.bug",
+        "fields": {
+            "status": "Confirmed",
+            "last_polled": "2009-06-05T00:00:00Z",
+            "submitter_realname": "Adam Olsen",
+            "description": "When deleting files, Ubuntu doesn't physically remove them, but instead\ncreates a \".Trash-username\" folder in the drive root (\"/media/sdb1\n/.Trash-username\", for instance). After s",
+            "title": "Files from deleted folders are added to collection",
+            "importance": "Low",
+            "people_involved": 1,
+            "last_touched": "2008-04-09T00:00:00Z",
+            "submitter_username": "arolsen",
+            "project": "Exaile",
+            "good_for_newcomers": 0,
+            "canonical_bug_link": "https://bugs.launchpad.net/bugs/136116",
+            "date_reported": "2007-08-30T00:00:00Z"
         }
     }
     ]
 };
 
-testData.jsonArray = [testData.json];
+Fixtures.jsonArray = [Fixtures.json];
 
 // vim: set nowrap:
