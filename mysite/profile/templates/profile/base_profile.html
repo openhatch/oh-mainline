@@ -64,9 +64,9 @@
           </div>
 		  {% endif %}
 
-		  {% if person.show_email and the_user.email %}
+		  {% if person.show_email and person.user.email %}
           <div class='another-identifier'>
-              email: <strong>{{ the_user.email }}</strong>
+              email: <strong>{{ person.user.email }}</strong>
           </div>
 		  {% endif %}
     {% endif %}
