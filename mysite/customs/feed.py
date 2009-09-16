@@ -1,18 +1,19 @@
 import lxml.html
 import feedparser
+from django.core.cache import cache
 
 OPENHATCH_BLOG_FEED_URL='http://openhatch.org/blog/feed/atom/'
 
 def summary2html(html_string):
     decoded = lxml.html.fragment_fromstring('<div>' + html_string + '</div>')
     text = decoded.text_content()
-    return text
+    return unicode(text)
 
 def _blog_entries():
     parsed = feedparser.parse(OPENHATCH_BLOG_FEED_URL)
-    for entry in parsed.entries:
-        entry.unicode_text = summary2html(entry.summary)
-    return parsed.entries
+    for entry in parsed['entries']:
+        entry['unicode_text'] = summary2html(entry['summary'])
+    return parsed['entries']
 
 def cached_blog_entries():
     key_name = 'blog_entries'

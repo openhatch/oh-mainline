@@ -13,7 +13,7 @@ import mysite.profile as profile
 from mysite.profile.views import display_person_web
 import feedparser
 import lxml.html
-from django.core.cache import cache
+import mysite.customs.feed
 
 def homepage(request, signup_form=None,
         invitation_request_form=None, initial_tab_open='request_invitation'):
@@ -58,27 +58,11 @@ def homepage(request, signup_form=None,
 
     return render_to_response('base/homepage.html', data, context_instance=RequestContext(request))
 
-def _blog_entries():
-    # Add blog data here
-    parsed = feedparser.parse('http://openhatch.org/blog/feed/atom/')
-    for entry in parsed.entries:
-        entry.unicode_text = lxml.html.fragments_fromstring(entry.summary)[0]
-    return parsed.entries
-
-def cached_blog_entries():
-    key_name = 'blog_entries'
-    entries = cache.get(key_name)
-    if entries is None:
-        entries = _blog_entries()
-        # cache it for 30 minutes
-        cache.set(key_name, entries, 30 * 60)
-    return entries
-
 def landing_page(request):
     data = profile.views.get_personal_data(request.user.get_profile())
     data['the_user'] = request.user
 
-    data['entries'] = cached_blog_entries()
+    data['entries'] = mysite.customs.feed.cached_blog_entries()
 
     return render_to_response('base/landing.html', data)
 

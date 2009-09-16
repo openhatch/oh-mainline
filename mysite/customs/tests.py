@@ -390,3 +390,14 @@ class TestOpenHatchBlogCrawl(django.test.TestCase):
         yo_eacute = mysite.customs.feed.summary2html('Yo &eacute;')
         self.assertEqual(yo_eacute, u'Yo \xe9')
 
+    @mock.patch("feedparser.parse")
+    def test_blog_entries(self, mock_feedparser_parse):
+        mock_feedparser_parse.return_value = {
+            'entries': [
+                {'summary': 'Yo &eacute;'}]}
+        entries = mysite.customs.feed._blog_entries()
+        self.assertEqual(entries[0]['unicode_text'],
+                         u'Yo \xe9')
+                
+            
+
