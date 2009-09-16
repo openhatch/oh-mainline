@@ -16,16 +16,12 @@ Home
             {% if person.user.first_name or person.user.last_name %}
                 <a href='/people/{{ person.user.username }}'>
                     {{ person.user.first_name }}
-                    {{ person.user.last_name }}
-                </a>
+                    {{ person.user.last_name }}</a>!
             {% else %}
                 <a href='/people/{{ person.user.username }}'>
-                    <div class='name'>
-                    {{ person.user.username }}
-                    </div>
-                </a>
+                    {{ person.user.username }}</a>!
             {% endif %}
-!</h1>
+</h1>
 
 {% endblock pagetop %}
 
