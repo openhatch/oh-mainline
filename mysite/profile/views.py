@@ -458,6 +458,7 @@ def project_icon_url(project_name, width = None, actually_fetch = True):
             fd.write(icon_data)
             fd.close()
             os.rename(tmp[1], path)
+            os.chmod(path, 0644)
 
     return path, url
     # FIXME: One day, add cache expiry.
