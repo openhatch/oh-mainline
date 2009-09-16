@@ -9,7 +9,7 @@
 }
 */
 body {
-    font: 9pt "Graublau Web", Tuffy, Verdana,
+    font: 9pt Tuffy, Verdana,
     "Bitstream Vera Sans", Helvetica, Arial, sans-serif;
     background: #fff url("/static/images/motif-eee.png");
     margin: 0;

@@ -86,7 +86,7 @@ Home
 		    <h5><a href="{{ entry.link }}">
 		      {{ entry.title }}
 		    </a></h5>
-		    <h4>(by {{ entry.author }}) &bull; {{ entry.published_parsed|timesince_terse }} ago</h4>
+		    <h4>by {{ entry.author }} &bull; {{ entry.published_parsed|timesince_terse }} ago</h4>
 		    <div class="entry">
 		     {{ entry.unicode_text|truncatewords:20 }}
 		    </div>
