@@ -80,16 +80,19 @@ Home
     <div class='body contains-submodules'>
         <div class='submodule'>
             <div class='head'>
-                <h3>OpenHatch blog</h3>
+                <h3>From the OpenHatch blog</h3>
             </div>
             <div class='body'>
                 <ul>
 		  {% for entry in entries %}
 		  <li>
-		    <a href="{{ entry.link }}">
+		    <h5><a href="{{ entry.link }}">
 		      {{ entry.title }}
-		    </a> (by {{ entry.author }})
-		    {{ entry.unicode_text|truncatewords:10 }}
+		    </a> (by {{ entry.author }})</h5>
+		    <br />
+		    <div class="entry">
+		    {{ entry.unicode_text|truncatewords:20 }}
+		    </div>
 		  </li>
 		  {% endfor %}
                 </ul>
@@ -97,10 +100,10 @@ Home
         </div>
         <div class='submodule'>
             <div class='head'>
-                <h3>Widget</h3>
+                <h3>Use our widget!</h3>
             </div>
             <div class='body'>
-                <p>Showcase your open source participation on your web things.</p>
+                <p>It's an easy way to showcase your open source participation on your web things.</p>
                 <script type='text/javascript' src='/people/{{ person.user.username }}/openhatch-widget.js'></script>
                 <div id='widget-instructions'>
                     Include this tag wherever in your page you want to put the widget:
