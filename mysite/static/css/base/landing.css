@@ -22,11 +22,11 @@
 .submodule > .head {
     width: 280px;
     margin-bottom: 10px;
-    padding-left: 10px;
+    padding-left: 15px;
 }
 
 .submodule > .body {
-    padding: 5px 10px;
+    padding: 5px 10px 10px 15px;
 }
 #landing textarea {
     width: 500px;
@@ -46,7 +46,7 @@
     margin-bottom: 0;
 }
 #landing .submodule p {
-    padding: 5px;
+    padding: 0;
     margin: 0;
 }
 
