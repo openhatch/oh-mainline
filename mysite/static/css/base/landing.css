@@ -48,3 +48,21 @@
     padding: 5px;
     margin: 0;
 }
+
+h5 {
+    font-size: 1.4em;
+    font-weight: normal;
+    margin: 0 0 -10px 0;
+    padding: 5px 5px 0 0;
+    color: #555;
+}
+
+h5 a {
+    /*color: black;*/
+    font-weight: bold;
+}
+
+.entry {
+    padding-left: 10px;
+    padding-right: 5px;
+}
