@@ -20,12 +20,13 @@
 }
 
 .submodule > .head {
-    width: 270px;
-    margin-bottom: 5px;
+    width: 280px;
+    margin-bottom: 10px;
+    padding-left: 10px;
 }
 
 .submodule > .body {
-    padding: 5px;
+    padding: 5px 10px;
 }
 #landing textarea {
     width: 500px;
@@ -64,5 +65,5 @@ h5 a {
 
 .entry {
     padding-left: 10px;
-    padding-right: 5px;
+    padding-right: 0;
 }
