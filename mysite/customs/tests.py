@@ -28,6 +28,7 @@ from django.test.client import Client
 from django.conf import settings
 from mysite.profile.tasks import FetchPersonDataFromOhloh
 import mysite.customs.miro
+import mysite.customs.feed
 # }}}
 
 # Mocked out browser.open
@@ -384,4 +385,8 @@ Keywords: Torrent unittest""")
         bug = all_bugs[0]
         self.assertEqual(bug.people_involved, 5)
 
+class TestOpenHatchBlogCrawl(django.test.TestCase):
+    def test_summary2html(self):
+        yo_eacute = mysite.customs.feed.summary2html('Yo &eacute;')
+        self.assertEqual(yo_eacute, u'Yo \xe9')
 
