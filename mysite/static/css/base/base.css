@@ -52,7 +52,6 @@ h1 a:hover {
     /*border-top: 2px solid #bfe2ff;*/
     float: left;
     border-bottom: 1px solid #eee;
-    float: left;
     background: #fdfdfe url('/static/images/module-head-bg.png') bottom repeat-x;
 }
 
@@ -88,7 +87,6 @@ h1 a:hover {
 }
 
 .submodule > .head {
-    float: left;
     background: #fdfdfe url('/static/images/module-head-bg.png') bottom repeat-x;
     float: left;
     padding: 10px 20px;
