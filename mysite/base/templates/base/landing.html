@@ -1,4 +1,5 @@
 {% extends 'base/three_columns.html' %}
+{% load filters %}
 
 {% block title %}
 Home
@@ -16,16 +17,12 @@ Home
             {% if person.user.first_name or person.user.last_name %}
                 <a href='/people/{{ person.user.username }}'>
                     {{ person.user.first_name }}
-                    {{ person.user.last_name }}
-                </a>
+                    {{ person.user.last_name }}</a>!
             {% else %}
                 <a href='/people/{{ person.user.username }}'>
-                    <div class='name'>
-                    {{ person.user.username }}
-                    </div>
-                </a>
+                    {{ person.user.username }}</a>!
             {% endif %}
-!</h1>
+</h1>
 
 {% endblock pagetop %}
 
@@ -80,24 +77,29 @@ Home
     <div class='body contains-submodules'>
         <div class='submodule'>
             <div class='head'>
-                <h3>OpenHatch blog</h3>
+                <h3>From the OpenHatch blog</h3>
             </div>
             <div class='body'>
                 <ul>
-                <li>blog post!</li>
-                <li>blog post!</li>
-                <li>blog post!</li>
-                <li>blog post!</li>
-                <li>blog post!</li>
+		  {% for entry in entries %}
+		  <li>
+		    <h5><a href="{{ entry.link }}">
+		      {{ entry.title }}
+		    </a> (by {{ entry.author }}) {{ entry.updated_parsed|timesince_terse }} ago </h5>
+		    <div class="entry">
+		    {{ entry.unicode_text|truncatewords:20 }}
+		    </div>
+		  </li>
+		  {% endfor %}
                 </ul>
             </div>
         </div>
         <div class='submodule'>
             <div class='head'>
-                <h3>Widget</h3>
+                <h3>Use our widget!</h3>
             </div>
             <div class='body'>
-                <p>Showcase your open source participation on your web things.</p>
+                <p>It's an easy way to showcase your open source participation on your web things.</p>
                 <script type='text/javascript' src='/people/{{ person.user.username }}/openhatch-widget.js'></script>
                 <div id='widget-instructions'>
                     Include this tag wherever in your page you want to put the widget:

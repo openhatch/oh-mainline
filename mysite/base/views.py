@@ -11,6 +11,9 @@ from django.template import RequestContext, loader, Context
 from django.core.urlresolvers import reverse
 import mysite.profile as profile
 from mysite.profile.views import display_person_web
+import feedparser
+import lxml.html
+import mysite.customs.feed
 
 def homepage(request, signup_form=None,
         invitation_request_form=None, initial_tab_open='request_invitation'):
@@ -58,6 +61,9 @@ def homepage(request, signup_form=None,
 def landing_page(request):
     data = profile.views.get_personal_data(request.user.get_profile())
     data['the_user'] = request.user
+
+    data['entries'] = mysite.customs.feed.cached_blog_entries()
+
     return render_to_response('base/landing.html', data)
 
 def page_to_js(request):

@@ -20,12 +20,13 @@
 }
 
 .submodule > .head {
-    width: 270px;
-    margin-bottom: 5px;
+    width: 280px;
+    margin-bottom: 10px;
+    padding-left: 15px;
 }
 
 .submodule > .body {
-    padding: 5px;
+    padding: 5px 10px 10px 15px;
 }
 #landing textarea {
     width: 500px;
@@ -45,6 +46,25 @@
     margin-bottom: 0;
 }
 #landing .submodule p {
-    padding: 5px;
+    padding: 0;
     margin: 0;
+}
+
+h5 {
+    font-size: 1.4em;
+    font-weight: normal;
+    margin: 0 0 0 0;
+    padding: 5px 5px 0 0;
+    color: #555;
+}
+
+h5 a {
+    /*color: black;*/
+    font-weight: bold;
+}
+
+.entry {
+    clear: both;
+    padding-left: 10px;
+    padding-right: 0;
 }

@@ -154,3 +154,7 @@ INVITE_MODE=False # Enable this on production site ...?
 INVITATIONS_PER_USER=5
 
 DEFAULT_FROM_EMAIL = 'all@openhatch.org'
+
+# Add Django memory-based caching (This should "obviously" be something else on the productions ite)
+CACHE_BACKEND = 'locmem:///'
+
