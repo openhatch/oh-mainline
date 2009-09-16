@@ -1,4 +1,5 @@
 {% extends 'base/three_columns.html' %}
+{% load filters %}
 
 {% block title %}
 Home
@@ -84,7 +85,7 @@ Home
 		  <li>
 		    <h5><a href="{{ entry.link }}">
 		      {{ entry.title }}
-		    </a> (by {{ entry.author }})</h5>
+		    </a> (by {{ entry.author }}) {{ entry.updated_parsed|timesince_terse }} ago </h5>
 		    <div class="entry">
 		    {{ entry.unicode_text|truncatewords:20 }}
 		    </div>
