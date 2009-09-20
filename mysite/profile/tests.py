@@ -188,9 +188,16 @@ class ProjectExpTests(TwillTests):
         """Paulproteus can login and add two projectexps."""
         # {{{
         self.login_with_twill()
+
+        # Test for basic success: All fields filled out reasonably
         self.projectexp_add('asdf', 'qwer', 'http://jkl.com/')
+        # (once more with a weird character and weirdish url)
         self.projectexp_add('asdf', 'QWER!', 'https://JKLbang.edu/')
-        self.projectexp_add('asdf', 'QWER!', 'https://JKLbang.edu/')
+
+        # Test that empty descriptions are okay
+        self.projectexp_add('asdf', '', 'https://JKLbang.edu/')
+
+        # Test that URLs are validated
         self.projectexp_add('asdf', 'QWER!', 'not a real URL, what now', tc_dot_url_should_succeed=False)
 
         # }}}
