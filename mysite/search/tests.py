@@ -4,8 +4,8 @@ from mysite.profile.models import Person
 import mysite.customs.miro
 
 import django.test
-from .models import Project, Bug
-from . import views
+from mysite.search.models import Project, Bug
+from mysite.search import views
 import lpb2json
 import datetime
 import mysite.search.launchpad_crawl
