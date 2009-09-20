@@ -54,29 +54,22 @@ import mysite.profile.forms
 
 def projectexp_add_do(request):
     # {{{
-    project_name = request.POST['project__name']
-    description = request.POST.get('project_exp__description', '')
-    url = request.POST.get('project_exp__url', '')
-    format = request.POST.get('format', 'html')
-
+    form = mysite.profile.forms.ProjectExpForm(request.POST)
     username = request.user.username
-    notification = ''
-    if project_name and description and url:
+    if form.is_valid():
         ProjectExp.create_from_text(
-                username, project_name,
-                description, url)
-        notification = "Added %s's experience with %s." % (
-                username, project_name)
-    else:
-        notification = "Unexpectedly imperfect input: {username: %s, project_name: %s}" % (
-                username, project_name)
-        if format == 'json':
-            dictionary = {'notification': notification}
-            return HttpResponse(simplejson.dumps([dictionary]))
+            username, project_name=form.cleaned_data['project_name'],
+            description=form.cleaned_data['involvement_description'],
+            url=form.cleaned_data['citation_url'])
 
-    url_that_displays_project_exp = '/people/%s/projects/%s' % (
-            urllib.quote(username), urllib.quote(project_name))
-    return HttpResponseRedirect(url_that_displays_project_exp)
+        url_that_displays_project_exp = '/people/%s/projects/%s' % (
+            urllib.quote(username), urllib.quote(form.cleaned_data[
+                'project_name']))
+        return HttpResponseRedirect(url_that_displays_project_exp)
+
+    else:
+        return projectexp_add_form(request, form)
+
     #}}}
 
 # }}}
@@ -268,14 +261,17 @@ def widget_display_js(request, user_to_display__username):
                               {'in_string': encoded_for_js},
                               mimetype='application/javascript')
 @login_required
-def projectexp_edit(request, project__name):
+def projectexp_edit(request, project__name, form = None):
     # {{{
+    if form is None:
+        form = mysite.profile.forms.ProjectExpForm()
+
     person = request.user.get_profile()
     project = get_object_or_404(Project, name=project__name)
     data = get_personal_data(person)
     data['exp_list'] = get_list_or_404(ProjectExp,
             person=person, project=project)
-    data['form'] = mysite.profile.forms.ProjectExpForm()
+    data['form'] = form
     data['edit_mode'] = True
     data['title'] = "Edit your contributions to %s" % project.name
     data['the_user'] = request.user
@@ -284,8 +280,11 @@ def projectexp_edit(request, project__name):
     # }}}
 
 @login_required
-def projectexp_add_form(request):
+def projectexp_add_form(request, form = None):
     # {{{
+    if form is None:
+        form = mysite.profile.forms.ProjectExpForm()
+
     try:
         person = request.user.get_profile()
     except AttributeError:
@@ -295,7 +294,8 @@ def projectexp_add_form(request):
     data = get_personal_data(person)
     data['the_user'] = request.user
     data['title'] = "Log a contribution in your portfolio | OpenHatch"
-    data['form'] = mysite.profile.forms.ProjectExpForm(label_suffix='')
+    data['form'] = form
+    
     return render_to_response('profile/projectexp_add.html', data)
     # }}}
 
