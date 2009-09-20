@@ -62,6 +62,7 @@ def projectexp_add_do(request):
             description=form.cleaned_data['involvement_description'],
             url=form.cleaned_data['citation_url'])
 
+        # FIXME: Use reverse() here to avoid quoting things ourself
         url_that_displays_project_exp = '/people/%s/projects/%s' % (
             urllib.quote(username), urllib.quote(form.cleaned_data[
                 'project_name']))
