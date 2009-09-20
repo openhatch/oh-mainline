@@ -47,6 +47,7 @@ from mysite.search.models import Project
 
 # This app
 import forms
+import mysite.profile.forms
 # }}}
 
 # Add a contribution {{{
@@ -274,7 +275,7 @@ def projectexp_edit(request, project__name):
     data = get_personal_data(person)
     data['exp_list'] = get_list_or_404(ProjectExp,
             person=person, project=project)
-    data['form'] = forms.ProjectExpForm()
+    data['form'] = mysite.profile.forms.ProjectExpForm()
     data['edit_mode'] = True
     data['title'] = "Edit your contributions to %s" % project.name
     data['the_user'] = request.user
@@ -294,6 +295,7 @@ def projectexp_add_form(request):
     data = get_personal_data(person)
     data['the_user'] = request.user
     data['title'] = "Log a contribution in your portfolio | OpenHatch"
+    data['form'] = mysite.profile.forms.ProjectExpForm(label_suffix='')
     return render_to_response('profile/projectexp_add.html', data)
     # }}}
 
