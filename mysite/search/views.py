@@ -152,25 +152,29 @@ def bugs_to_json_response(data, bunch_of_bugs, callback_function_name=''):
     """ The search results page accesses this view via jQuery's getJSON method, 
     and loads its results into the DOM."""
     # {{{
-    # FIXME: This looks super weird.
-    json_serializer = serializers.get_serializer('python')()
-    bugs = json_serializer.serialize(bunch_of_bugs)
+    # Purpose of this code: Serialize the list of bugs
+    # Step 1: pull the bugs out of the database, getting them back as simple Python objects
+    
+    obj_serializer = serializers.get_serializer('python')()
+    bugs = obj_serializer.serialize(bunch_of_bugs)
 
-    # Throughout the list, replace project primary keys with project names.
+    # Step 2: With a tragically large number of database calls, 
+    # loop over these objects, replacing project primary keys with project names.
     for bug in bugs:
         project = Project.objects.get(pk=int(bug['fields']['project']))
         bug['fields']['project'] = project.name
 
-    data['bugs'] = bugs
+    # Step 3: Create a JSON-happy list of key-value pairs
+    data_list = [{'bugs': bugs}]
 
-    # JSON has to be an array of JS objects.
-    # Let's make a list of Python objects first.
-    data_list = [data]
+    # Step 4: Create the string form of the JSON
+    json_as_string = simplejson.dumps(data_list, default=encode_datetime)
 
-    # Convert the list to a string expressing JSON array.
-    json_array = simplejson.dumps(data_list, default=encode_datetime)
+    # Step 5: Prefix it with the desired callback function name
+    json_string_with_callback = callback_function_name + '(' + json_as_string + ')'
 
-    return HttpResponse( callback_function_name + '(' + json_array + ')' )
+    # Step 6: Return that.
+    return HttpResponse(json_string_with_callback)
     # }}}
 
 def request_jquery_autocompletion_suggestions(request):
