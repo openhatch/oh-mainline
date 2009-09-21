@@ -208,7 +208,7 @@ def display_person_edit_web(request, info_edit_mode=False, title=''):
 def display_person_web(request, user_to_display__username=None):
     # {{{
 
-    user = User.objects.get(username=user_to_display__username)
+    user = get_object_or_404(User, username=user_to_display__username)
     person = user.get_profile()
 
     data = get_personal_data(person)
