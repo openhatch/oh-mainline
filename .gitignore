@@ -1,4 +1,5 @@
 mysite/static/project-icons/*.png
+mysite/static/project-icons/**.png
 *.pyc
 *.pyo
 .installed.cfg
