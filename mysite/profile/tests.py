@@ -148,16 +148,29 @@ class ProjectExpTests(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry',
             'person-paulproteus', 'cchost-data-imported-from-ohloh']
 
-    def projectexp_add(self, project__name, project_exp__description, project_exp__url):
+    def projectexp_add(self, project__name, project_exp__description, project_exp__url, tc_dot_url_should_succeed=True):
         """Paulproteus can login and add a projectexp to bumble."""
         # {{{
         self.login_with_twill()
 
         tc.go(make_twill_url('http://openhatch.org/form/projectexp_add'))
-        tc.fv('projectexp_add', 'project__name', project__name)
-        tc.fv('projectexp_add', 'project_exp__description', project_exp__description)
-        tc.fv('projectexp_add', 'project_exp__url', project_exp__url)
+        tc.fv('projectexp_add', 'project_name', project__name)
+        tc.fv('projectexp_add', 'involvement_description', project_exp__description)
+        tc.fv('projectexp_add', 'citation_url', project_exp__url)
         tc.submit()
+
+        tc_url_matched = None
+        try:
+            tc.url('/people/.*/projects/')
+            tc_url_matched = True
+        except twill.errors.TwillAssertionError, e:
+            tc_url_matched = False
+
+        if tc_dot_url_should_succeed:
+            assert tc_url_matched
+        else:
+            assert not tc_url_matched
+
         tc.find(project__name)
         tc.find(project_exp__description)
         tc.find(project_exp__url)
@@ -167,8 +180,26 @@ class ProjectExpTests(TwillTests):
         """Paulproteus can login and add two projectexps."""
         # {{{
         self.login_with_twill()
-        self.projectexp_add('asdf', 'qwer', 'jkl')
-        self.projectexp_add('asdf', 'QWER!', 'JKL!')
+        self.projectexp_add('asdf', 'qwer', 'http://jkl.com/')
+        self.projectexp_add('asdf', 'QWER!', 'https://JKLbang.edu/')
+        # }}}
+
+    def test_projectexp_add(self):
+        """Paulproteus can login and add two projectexps."""
+        # {{{
+        self.login_with_twill()
+
+        # Test for basic success: All fields filled out reasonably
+        self.projectexp_add('asdf', 'qwer', 'http://jkl.com/')
+        # (once more with a weird character and weirdish url)
+        self.projectexp_add('asdf', 'QWER!', 'https://JKLbang.edu/')
+
+        # Test that empty descriptions are okay
+        self.projectexp_add('asdf', '', 'https://JKLbang.edu/')
+
+        # Test that URLs are validated
+        self.projectexp_add('asdf', 'QWER!', 'not a real URL, what now', tc_dot_url_should_succeed=False)
+
         # }}}
 
     def test_projectexp_delete(self):
