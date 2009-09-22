@@ -261,23 +261,45 @@ def widget_display_js(request, user_to_display__username):
     return render_to_response('base/append_ourselves.js',
                               {'in_string': encoded_for_js},
                               mimetype='application/javascript')
-@login_required
-def projectexp_edit(request, project__name, form = None):
-    # {{{
-    if form is None:
-        form = mysite.profile.forms.ProjectExpForm()
 
-    person = request.user.get_profile()
+def prepare_p_e_forms(person, project):
+    """Input: a person and a project.
+    Output: A list of ProjectExpForms populated from that guy's relevant p_es."""
+    forms = []
+    
+    project_exps = ProjectExp.objects.filter(
+        project=project,
+        person=person)
+    
+    for n, p_e in enumerate(project_exps):
+        form_data = dict(
+            project_exp_id=p_e.id,
+            citation_url=p_e.url,
+            man_months=p_e.man_months,
+            primary_language=p_e.primary_language,
+            involvement_description=p_e.description,
+            )
+        forms.append(mysite.profile.forms.ProjectExpEditForm(initial=form_data, prefix=str(n)))
+    return forms
+
+@login_required
+def projectexp_edit(request, project__name, forms = None):
+    # {{{
     project = get_object_or_404(Project, name=project__name)
+    person = request.user.get_profile()
+
+    if forms is None:
+        forms = prepare_p_e_forms(person, project)
+        
     data = get_personal_data(person)
     data['exp_list'] = get_list_or_404(ProjectExp,
             person=person, project=project)
-    data['form'] = form
+    data['forms'] = forms
     data['edit_mode'] = True
     data['title'] = "Edit your contributions to %s" % project.name
     data['the_user'] = request.user
     data['editable'] = True
-    return render_to_response('profile/projectexp.html', data)
+    return render_to_response('profile/projectexp_edit.html', data)
     # }}}
 
 @login_required
