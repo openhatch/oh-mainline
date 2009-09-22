@@ -42,7 +42,12 @@
                 </div>
                 <a style='height: 30px;'
                     href='/people/{{ person.user.username }}/projects/{{ project.name }}' 
-                    class='name'>{{ project.name }}</a>
+                    class='name'>{{ project.name }}
+		  {% if editable %}
+		  (edit)
+		  {% endif %}
+		</a>
+
             </div>
             </li>
             {% endfor %}
