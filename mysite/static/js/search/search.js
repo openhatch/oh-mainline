@@ -43,6 +43,7 @@ $(function() {
             return false;
             });
 
+        /*
         $(document).bind('keypress',
             {combi: '\\', disableInInput: true},
             SearchResults.focusSearchInput);
@@ -73,6 +74,7 @@ $(function() {
                 function() { $(this).addClass('hover'); },
                 function() { $(this).removeClass('hover'); }
                 );
+                */
 
         /* FIXME: TEMPORARILY DISABLED. */
         /* Takes a query and updates the page. */
