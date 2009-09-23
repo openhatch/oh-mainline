@@ -16,52 +16,25 @@
     <div class='body'>
         <form name='projectexp_add' method='POST'
             action='/do/projectexp_add'>
-            <div class='section'>
-                <div class='section-heading'>
-                    <h4>
-                        <label for='project__name'>
-                            Project
-                        </label>
-                    </h4>
-                </div>
-                <div class='section-content' id='role'>
-                    <input type='text'
-                    id='project__name'
-                    name='project__name'
-                    value='{{ exp.project__name }}' />
-                </div>
-            </div>
+	  {% for field in form %}
 
-            <div class='section'>
-                <div class='section-heading'>
-                    <h4>
-                        <label for='project_exp__description'>
-                            Describe your involvement
-                        </label>
-                    </h4>
-                </div>
-                <div class='section-content' id='role'>
-                    <textarea
-                        id=  'project_exp__description'
-                        name='project_exp__description'
-                        >{{ exp.description }}</textarea>
-                </div>
+          <div class='section'>
+	    <div class='section-heading'>
+              <h4>
+                <label for='project__name'>
+                  {{ field.label }}
+                </label>
+              </h4>
             </div>
+	    
+            <div class='section-content'>
+	      {{ field.errors }}
+	      
+	      {{ field }}
+            </div>
+          </div>
+	  {% endfor %}
 
-            <div class='section'>
-                <div class='section-heading'>
-                    <h4>
-                        <label for='project_exp__url'>
-                            Cite your involvement
-                        </label>
-                    </h4>
-                </div>
-                <div class='section-content'>
-                    <input type='text' value='http://'
-                    id=  'project_exp__url' 
-                    name='project_exp__url' />
-                </div>
-            </div>
             <div class='section'>
                 <div class='section-heading'>
                     <!-- This just takes up space. -->
