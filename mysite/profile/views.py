@@ -283,6 +283,7 @@ def prepare_p_e_forms(person, project):
         forms.append(mysite.profile.forms.ProjectExpEditForm(initial=form_data, prefix=str(n)))
     return forms
 
+
 @login_required
 def projectexp_edit(request, project__name, forms = None):
     # {{{
@@ -307,11 +308,12 @@ def projectexp_edit(request, project__name, forms = None):
 @login_required
 def projectexp_edit_do(request, project__name):
     # {{{
+    project = get_object_or_404(Project, name=project__name)
     numbers = sorted(map(int, set([k.split('-')[0] for k in request.POST.keys()])))
     forms = []
     for n in numbers:
         form = mysite.profile.forms.ProjectExpEditForm(
-            request.POST, prefix=n)
+            request.POST, prefix=str(n))
         form.set_user(request.user)
         
         forms.append(form) # append it in case we
@@ -320,15 +322,31 @@ def projectexp_edit_do(request, project__name):
         if form.is_valid():
             p_e = form.cleaned_data['project_exp']
 
-            p_e.modified = True
-            p_e.description = form.cleaned_data['involvement_description']
-            p_e.url = form.cleaned_data['citation_url']
-            p_e.man_months = form.cleaned_data['man_months']
-            p_e.primary_language=form.cleaned_data['primary_language']
-            p_e.save()
+            if form.cleaned_data['delete_this']:
+                p_e.delete()
 
-    return HttpResponseRedirect(reverse(projectexp_edit, kwargs={'project__name': project__name}))
+            else:
+                p_e.modified = True
+                p_e.description = form.cleaned_data['involvement_description']
+                p_e.url = form.cleaned_data['citation_url']
+                p_e.man_months = form.cleaned_data['man_months']
+                p_e.primary_language=form.cleaned_data['primary_language']
+                p_e.save()
 
+    # Are there any left?
+    any_left = ProjectExp.objects.filter(
+        project=project, person=request.user.get_profile()
+        ).count()
+    if any_left:
+        # If so, send the user back to the
+        # projectexp edit page.
+        outta_here = reverse(projectexp_edit, kwargs={'project__name': project__name})
+    else:
+        # if not, back to profile.
+        outta_here = reverse(display_person_web, kwargs=dict(
+            user_to_display__username=request.user.username))
+
+    return HttpResponseRedirect(outta_here)
     # }}}
 
 @login_required

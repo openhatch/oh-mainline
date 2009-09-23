@@ -31,6 +31,9 @@ class ProjectExpEditForm(django.forms.Form):
     project_exp_id=django.forms.IntegerField(
         required=False,
         widget=django.forms.widgets.HiddenInput)
+    delete_this = django.forms.BooleanField(
+        required=False)
+    
     def set_user(self, user):
         self.user = user
     def clean_project_exp_id(self):
