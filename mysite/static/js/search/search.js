@@ -31,7 +31,7 @@ $.fn.scrollIntoView = function() {
 
 $(function() {
 
-        SearchResults.lightSearchResult(0);
+        //SearchResults.lightSearchResult(0);
 
         $('#expand-all-link').click(function() {
             $('.gewgaws li').addClass('expanded');
