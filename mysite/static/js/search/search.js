@@ -400,7 +400,7 @@ SearchResults.update = function(queryArray) {
     return false;
 };
 
-SearchResults.shortcutsEnabled = true;
+SearchResults.shortcutsEnabled = false;
 
 SearchResults.moveSearchResultFocusDown = function () {
     SearchResults.lightSearchResult(SearchResults.getLitSearchResultIndex() + 1);
