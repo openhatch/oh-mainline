@@ -1,27 +1,28 @@
 <style type='text/css'>
 
     #openhatch-widget {
-        font: 10pt Verdana;
+        font: 9pt Verdana, Bitstream Vera Sans, Arial, sans-serif;
         width: 292px ! important;
         float: left;
     }
     #openhatch-widget h3 {
-        font: 11pt Verdana;
+        font-size: 9pt;
+        font-weight: normal;
         margin: 0;
     }
     #openhatch-widget .module {
-        width: 292px;
+        width: 242px;
         border-bottom: 1px solid #eee;
     }
     
     #openhatch-widget .module > .head {
-        width: 290px ! important;
+        width: 240px ! important;
     }
 
     #openhatch-widget .module > .head h3,
     #openhatch-widget .module > .body,
     #openhatch-widget .module > .foot {
-        width: 260px ! important;
+        width: 220px ! important;
     }
     #openhatch-widget .foot img {
         vertical-align: middle;
@@ -41,9 +42,6 @@
 
     #openhatch-widget .project-escutcheon img {
         text-align: center;
-    }
-    #openhatch-widget .project-escutcheon .logo {
-        width: 100%;
     }
     #openhatch-widget .project-escutcheon a {
         width: 100%;
@@ -67,20 +65,23 @@
     }
 
     #openhatch-widget .module > .head {
-        border-top: 2px solid #bfe2ff;
+        border-top: 2px solid #e4e4DD;
         float: left;
         border-bottom: 1px solid #eee;
         background: #fdfdfe url('/static/images/module-head-bg.png') bottom repeat-x;
     }
 
     #openhatch-widget .module > .head h3 {
-        padding: 10px 15px ! important;
+        text-align: center;
+        margin: 10px auto;
+        padding: 0;
     }
 
     #openhatch-widget .module > .body {
         float: left;
         background-color: #fff;
-        padding: 10px 15px ! important;
+        margin: 0 5px;
+        padding: 10px 5px ! important;
     }
 
     #openhatch-widget .module > .head, 
@@ -210,25 +211,14 @@
     }
     #openhatch-widget #portfolio .module > .body ul li {
         float: left;
-        padding: 20px;
+        padding: 10px;
         width: 100px;
     }
     #openhatch-widget .project-escutcheon {
         float: left;
-        margin-right: 10px;
+        margin-right: 5px;
         width: 100px;
         margin-bottom: 20px;
-    }
-    #openhatch-widget .project-escutcheon .logo {
-        width: 64px;
-        height: 64px;
-        float: left;
-    }
-    #openhatch-widget .project-escutcheon .name {
-        width: 100px;
-        float: left;
-        padding: 20px;
-        font-size: 11pt;
     }
 
     #openhatch-widget #portfolio {
@@ -243,8 +233,6 @@
     }
 
     #openhatch-widget .project-display h3 {
-        margin: 0;
-        padding: 5px 0 8px 0;
         font-size: 11pt;
         text-align: center;
         width: 100%;
@@ -259,16 +247,9 @@
     }
 
     #openhatch-widget .project-escutcheon {
-        width: 80px;
-        height: 70px;
-        margin: 4px 3px 3px 3px;
-    }
-
-    #openhatch-widget .project-escutcheon .logo {
-        width: 70px;
+        width: 49px;
         height: 40px;
-        margin: 0 auto;
-        text-align: center;
+        margin: 4px 3px 3px 3px;
     }
 
     #openhatch-widget .project-escutcheon .name {
@@ -313,12 +294,10 @@
                 <div class='project-escutcheon'>
                     <div class='logo'>
                         <a href='/people/{{ person.user.username }}/projects/{{ project.name }}'>
-                            <img alt='logo for {{project.name}}'
+                            <img alt='logo for {{project.name}}' title='{{project.name}}'
                             src='http://{{ url_prefix }}/people/project_icon_badge/{{ project.name }}' width='40'/>
                         </a>
                     </div>
-                    <a href='/people/{{ person.user.username }}/projects/{{ project.name }}' 
-                        class='name'>{{ project.name|truncatewords:2 }}</a>
                 </div>
                 </li>
                 {% endfor %}
