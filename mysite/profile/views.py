@@ -307,10 +307,25 @@ def projectexp_edit(request, project__name, forms = None):
 @login_required
 def projectexp_edit_do(request, project__name):
     # {{{
-    numbers = sorted(set([k.split('-')[0] for k in request.POST.keys()]))
+    numbers = sorted(map(int, set([k.split('-')[0] for k in request.POST.keys()])))
+    forms = []
     for n in numbers:
-        pass
-        # do nothing
+        form = mysite.profile.forms.ProjectExpEditForm(
+            request.POST, prefix=n)
+        form.set_user(request.user)
+        
+        forms.append(form) # append it in case we
+        # will need to push it onto the edit page later
+
+        if form.is_valid():
+            p_e = form.cleaned_data['project_exp']
+
+            p_e.modified = True
+            p_e.description = form.cleaned_data['involvement_description']
+            p_e.url = form.cleaned_data['citation_url']
+            p_e.man_months = form.cleaned_data['man_months']
+            p_e.primary_language=form.cleaned_data['primary_language']
+            p_e.save()
 
     return HttpResponseRedirect(reverse(projectexp_edit, kwargs={'project__name': project__name}))
 
