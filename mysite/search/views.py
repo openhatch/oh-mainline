@@ -153,12 +153,13 @@ def bugs_to_json_response(data, bunch_of_bugs, callback_function_name=''):
     and loads its results into the DOM."""
     # {{{
     # Purpose of this code: Serialize the list of bugs
-    # Step 1: pull the bugs out of the database, getting them back as simple Python objects
+    # Step 1: Pull the bugs out of the database, getting them back
+    #   as simple Python objects
     
     obj_serializer = serializers.get_serializer('python')()
     bugs = obj_serializer.serialize(bunch_of_bugs)
 
-    # Step 2: With a tragically large number of database calls, 
+    # Step 2: With a (tragically) large number of database calls, 
     # loop over these objects, replacing project primary keys with project names.
     for bug in bugs:
         project = Project.objects.get(pk=int(bug['fields']['project']))
