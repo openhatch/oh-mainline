@@ -15,7 +15,7 @@
     </div>
     <div class='body'>
         <form name='projectexp_edit' method='POST'
-            action='/do/projectexp_edit'>
+            action='{% url profile.views.projectexp_edit_do project__name=project__name %}'>
 	  {% for form in forms %}
 	  <div class="section">
 	    <hr />

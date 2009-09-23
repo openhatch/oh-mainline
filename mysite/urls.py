@@ -133,6 +133,9 @@ urlpatterns = patterns('',
         (r'^people/projects/edit/(?P<project__name>.+)$',
                 'mysite.profile.views.projectexp_edit'),
 
+        (r'^people/projects/edit_do/(?P<project__name>.+)$',
+                'mysite.profile.views.projectexp_edit_do'),
+
         (r'^people/portfolio/import/$',
                 'mysite.profile.views.importer'),
 

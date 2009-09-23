@@ -30,6 +30,7 @@ from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.core.files.images import get_image_dimensions
 from django.contrib.sites.models import Site
+from django.core.urlresolvers import reverse
 
 # OpenHatch global
 from django.conf import settings
@@ -297,9 +298,22 @@ def projectexp_edit(request, project__name, forms = None):
     data['forms'] = forms
     data['edit_mode'] = True
     data['title'] = "Edit your contributions to %s" % project.name
+    data['project__name'] = project__name
     data['the_user'] = request.user
     data['editable'] = True
     return render_to_response('profile/projectexp_edit.html', data)
+    # }}}
+
+@login_required
+def projectexp_edit_do(request, project__name):
+    # {{{
+    numbers = sorted(set([k.split('-')[0] for k in request.POST.keys()]))
+    for n in numbers:
+        pass
+        # do nothing
+
+    return HttpResponseRedirect(reverse(projectexp_edit, kwargs={'project__name': project__name}))
+
     # }}}
 
 @login_required
