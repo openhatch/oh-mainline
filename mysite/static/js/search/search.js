@@ -28,134 +28,113 @@ $.fn.scrollIntoView = function() {
     }
 }
 
-
-$(function() {
-
-        SearchResults.lightSearchResult(0);
-
-        $('#expand-all-link').click(function() {
-            $('.gewgaws li').addClass('expanded');
-            return false;
-            });
-
-        $('#collapse-all-link').click(function() {
-            $('.gewgaws li').removeClass('expanded');
-            return false;
-            });
-
-        $(document).bind('keypress',
-            {combi: '\\', disableInInput: true},
-            SearchResults.focusSearchInput);
-
-        $(document).bind('keyup',
-            {combi: 'j', disableInInput: true},
-            SearchResults.moveSearchResultFocusDown);
-
-        $(document).bind('keyup',
-                {combi: 'n', disableInInput: true},
-                SearchResults.moveSearchResultFocusDown);
-
-        $(document).bind('keyup',
-                {combi: 'k', disableInInput: true},
-                SearchResults.moveSearchResultFocusUp);
-
-        $(document).bind('keyup',
-                {combi: 'p', disableInInput: true},
-                SearchResults.moveSearchResultFocusUp);
-
-        $(document).bind('keyup',
-                {combi: 'o', disableInInput: true}, 
-                function() {
-                $('.gewgaws .lit-up').toggleExpanded();
-                });
-
-        $('.first-line').hover(
-                function() { $(this).addClass('hover'); },
-                function() { $(this).removeClass('hover'); }
-                );
-
-        /* FIXME: TEMPORARILY DISABLED. */
-        /* Takes a query and updates the page. */
-        /*
-        $("#button").click(function() {
-                // Put form values into an associative array.
-                return SearchResults.update($('form').serializeArray());
-                });
-        */
-
-        var pageLinkClickHandler = function() {
-            /* Take the HREF and convert to wacky serializeArray,
-             * send to update() */
-
-            var fruitySerialized = new Array();
-
-            var splittedOnAmpersands = this.href.split('?')[1].split('&');
-            for (var index in splittedOnAmpersands) {
-                var splitted = splittedOnAmpersands[index].split('=');    
-                var key = decodeURIComponent(splitted[0]);
-                var value = decodeURIComponent(splitted[1]);
-                var fruity_pushable = {'name': key, 'value': value};
-                /* update the thisstart and thisend globals */
-                if (key == 'start') {
-                    thisstart = parseInt(value);
-                }
-                if (key == 'end') {
-                    thisend = parseInt(value);
-                }
-                fruitySerialized.push(fruity_pushable);
-            }
-            console.log('FRUITYSERIALIZED:');
-            console.log(fruitySerialized);
-            console.log('SLASH FRUITYSERIALIZED:');
-
-            return false;
-            // fixme: temporary
-            // What kind of data structure does SearchResults.update expect?
-            return SearchResults.update(fruitySerialized);
-        };
-
-        /* FIXME: TEMPORARILY DISABLED. */
-        // $('#prev-page, #next-page').click(pageLinkClickHandler);
-
-        // Handle autocomplete. {{{
-        $input = $("#opps form input[type='text']");
-        //console.log("input", $input);
-        url = "/search/get_suggestions";
-        acOptions = {
-            'minChars': 1,
-            /*
-               'extraParams': {
-               'partial_query': '',
-               },*/
-            'multiple': true,
-            'multipleSeparator': " ",
-            'matchContains': true
-        };
-        // $input.autocomplete(url, acOptions);
-        // }}}
-});
-
 SearchResults = {}
 
 SearchResults.bindEventHandlers = function () {
 
-        $('.title').click(function () {
-                $result = $(this.parentNode.parentNode);
-                $result.toggleExpanded();
-                return false;
-                });
+    console.log('SearchResults.bindEventHandlers');
 
-        $('.show-details').click(function () {
-                $result = $(this.parentNode.parentNode.parentNode);
-                $result.toggleExpanded();
-                return false;
-                });
+    $('.first-line').click(function () {
+            $result = $(this.parentNode);
+            $result.toggleExpanded();
+            return false;
+            });
 
-        $('.first-line a.title').click(function () {
-                $result = $(this.parentNode.parentNode.parentNode);
-                $result.toggleExpanded();
-                return false;
-                });
+    $('.show-details').click(function () {
+            $result = $(this.parentNode.parentNode.parentNode);
+            $result.toggleExpanded();
+            return false;
+            });
+
+    $('.first-line a.title').click(function () {
+            $result = $(this.parentNode.parentNode.parentNode);
+            $result.toggleExpanded();
+            return false;
+            });
+
+    $('#expand-all-link').click(function() {
+            $('.gewgaws li').addClass('expanded');
+            return false;
+            });
+
+    $('#collapse-all-link').click(function() {
+            $('.gewgaws li').removeClass('expanded');
+            return false;
+            });
+
+    $(document).bind('keypress',
+            {combi: '\\', disableInInput: true},
+            SearchResults.focusSearchInput);
+
+    $(document).bind('keyup',
+            {combi: 'j', disableInInput: true},
+            SearchResults.moveSearchResultFocusDown);
+
+    $(document).bind('keyup',
+            {combi: 'n', disableInInput: true},
+            SearchResults.moveSearchResultFocusDown);
+
+    $(document).bind('keyup',
+            {combi: 'k', disableInInput: true},
+            SearchResults.moveSearchResultFocusUp);
+
+    $(document).bind('keyup',
+            {combi: 'p', disableInInput: true},
+            SearchResults.moveSearchResultFocusUp);
+
+    $(document).bind('keyup',
+            {combi: 'o', disableInInput: true}, 
+            function() {
+            $('.gewgaws .lit-up').toggleExpanded();
+            });
+
+    $('.first-line').hover(
+            function() { $(this).addClass('hover'); },
+            function() { $(this).removeClass('hover'); }
+            );
+
+    /* FIXME: TEMPORARILY DISABLED. */
+    /* Takes a query and updates the page. */
+    /*
+       $("#button").click(function() {
+    // Put form values into an associative array.
+    return SearchResults.update($('form').serializeArray());
+    });
+    */
+
+    var pageLinkClickHandler = function() {
+        /* Take the HREF and convert to wacky serializeArray,
+         * send to update() */
+
+        var fruitySerialized = new Array();
+
+        var splittedOnAmpersands = this.href.split('?')[1].split('&');
+        for (var index in splittedOnAmpersands) {
+            var splitted = splittedOnAmpersands[index].split('=');    
+            var key = decodeURIComponent(splitted[0]);
+            var value = decodeURIComponent(splitted[1]);
+            var fruity_pushable = {'name': key, 'value': value};
+            /* update the thisstart and thisend globals */
+            if (key == 'start') {
+                thisstart = parseInt(value);
+            }
+            if (key == 'end') {
+                thisend = parseInt(value);
+            }
+            fruitySerialized.push(fruity_pushable);
+        }
+        console.log('FRUITYSERIALIZED:');
+        console.log(fruitySerialized);
+        console.log('SLASH FRUITYSERIALIZED:');
+
+        return false;
+        // fixme: temporary
+        // What kind of data structure does SearchResults.update expect?
+        return SearchResults.update(fruitySerialized);
+    };
+
+    /* FIXME: TEMPORARILY DISABLED. */
+    // $('#prev-page, #next-page').click(pageLinkClickHandler);
 }
 
 SearchResults.focusSearchInput = function () {
@@ -407,5 +386,29 @@ SearchResults.moveSearchResultFocusDown = function () {
 SearchResults.moveSearchResultFocusUp = function () {
     SearchResults.lightSearchResult(SearchResults.getLitSearchResultIndex() - 1);
 };
+
+SearchResults.initializeAutoComplete = function() {
+    $input = $("#opps form input[type='text']");
+    //console.log("input", $input);
+    url = "/search/get_suggestions";
+    acOptions = {
+        'minChars': 1,
+        /*
+           'extraParams': {
+           'partial_query': '',
+           },*/
+        'multiple': true,
+        'multipleSeparator': " ",
+        'matchContains': true
+    };
+    // $input.autocomplete(url, acOptions);
+};
+
+
+$(SearchResults.bindEventHandlers);
+
+$(function() {
+        SearchResults.lightSearchResult(0);
+        });
 
 /* vim: set ai ts=4 sts=4 et sw=4: */
