@@ -13,17 +13,15 @@
 </div>
 <div class='second-line'>
     <span class='description-container'>
-        <span class='good-for-beginners'
-            {% if bug.good_for_newcomers %}
-            style='width: 300px; '
-            {% endif %}
-            >
-            {% if bug.good_for_newcomers %}
-            Good for newcomers &bull;
-            {% endif %}
-            <span class='description'>
-                {{ bug.description }}
-            </span>
+        {% if bug.good_for_newcomers %}
+        <span class='good-for-beginners'>
+            Good for newcomers</span>
+        {% endif %}
+        {% if bug.good_for_newcomers %}
+        <span>&bull;</span>
+        {% endif %}
+        <span class='description'>
+            {{ bug.description }}
         </span>
     </span>
 </div>

@@ -158,6 +158,7 @@ p {
     padding: 5px 10px;
     width: 535px;
     overflow: hidden;
+    border-bottom: 2px solid #f4f4f4;
 }
 
 .first-line a {
@@ -373,7 +374,10 @@ p {
     height: 50px;
 }
 .good-for-beginners {
-    color: #444;
+    color: #222;
+    background-color: #acebc7;
+    width: 300px;
+    padding: 2px 5px;
 }
 .good-for-beginners img {
 }
