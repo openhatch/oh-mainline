@@ -46,19 +46,37 @@
 .project-escutcheon {
     float: left;
     margin-right: 10px;
-    width: 320px;
+    width: 300px;
     margin-bottom: 20px;
+    padding: 10px;
 }
 .project-escutcheon .logo {
     width: 64px;
     height: 64px;
     float: left;
 }
+.project-escutcheon a {
+    height: 30px;
+}
 .project-escutcheon .name {
-    width: 200px;
+    width: 150px;
     float: left;
     padding: 20px;
     font-size: 11pt;
+}
+.project-escutcheon .edit-link {
+    width: 20px;
+    float: left;
+    padding: 20px 10px;
+    visibility: hidden;
+}
+.project-escutcheon.hover {
+    background-color: #fff;
+    border: 1px dotted #ddd;
+    padding: 9px;
+}
+.project-escutcheon.hover .edit-link {
+    visibility: visible;
 }
 
 /* FIXME: Test if this code is dead. */

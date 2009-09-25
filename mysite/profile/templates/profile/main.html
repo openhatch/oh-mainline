@@ -40,14 +40,12 @@
                         src='/people/project_icon/{{ project.name }}'/>
                     </a>
                 </div>
-                <a style='height: 30px;'
-                    href='/people/{{ person.user.username }}/projects/{{ project.name }}' 
-                    class='name'>{{ project.name }}
+                <a href='/people/{{ person.user.username }}/projects/{{ project.name }}' class='name'>{{ project.name }}
 		</a>
 		{% if editable %}
-                <a style='height: 30px; display: inline; float: right;'
+                <a style='display: inline; float: right;'
                     href='/people/projects/edit/{{ project.name }}' 
-                    class='name'>(edit)
+                    class='edit-link'>edit
 		</a>
 		{% endif %}
             </div>
@@ -67,3 +65,8 @@
     </div>
 </div> <!-- /#portfolio -->
 {% endblock main %}
+
+{% block js %}
+{{ block.super }}
+<script src='/static/js/profile/portfolio.js'></script>
+{% endblock %}
