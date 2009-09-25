@@ -85,11 +85,10 @@
     width: 200px;
 }
 #avatar {
-    width: 200px;
-    padding: 0;
     border: 5px solid #fff;
 }
 #avatar img {
+    border: 1px solid #f4f4f4;
     float: left;
 }
 #avatar.edit {
@@ -99,10 +98,10 @@
 }
 
 #info textarea {
-    width: 160px;
+    width: 145px;
 }
 #info h4 {
-    width: 160px;
+    width: 145px;
     margin-top: 10px;
     float: left;
 }
@@ -110,6 +109,9 @@
     background: #f4f4f4;
     padding: 10px;
     float: left;
-    width: 180px;
-    border-top: 10px solid #fff;
+    width: 182px;
+    border-top: 5px solid #fff;
+}
+#info .save-button {
+    margin-top: 10px;
 }
