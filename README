@@ -23,5 +23,6 @@ To test customs:
 
 == To forcibly regenerate scripts in ./bin/* ==
 
+$ cd milestone-a # Make sure you're in this directory. Not sure if it will work elsewhere.
 $ python bootstrap.py
 $ ./bin/buildout -o # o is for "offline", so you don't hit the network looking for dependencies
