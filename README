@@ -5,7 +5,6 @@ $ sudo rabbitmqctl add_user rabbiter johT4qui
 $ sudo rabbitmqctl add_vhost localhost
 $ rabbitmqctl set_permissions -p localhost rabbiter "" ".*" ".*" || rabbitmqctl map_user_vhost rabbiter localhost || echo EEEP
 
-$ cd mysite
 $ python bootstrap.py
 $ ./bin/buildout
 $ ./bin/mysite runserver
