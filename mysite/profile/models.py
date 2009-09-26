@@ -142,6 +142,7 @@ class ProjectExp(models.Model):
     man_months = models.PositiveIntegerField(null=True)
     primary_language = models.CharField(max_length=200, null=True)
     source = models.CharField(max_length=100, null=True)
+    modified = models.BooleanField(default=False)
 
     # FIXME: Make this a static method or something
     def from_ohloh_contrib_info(self, ohloh_contrib_info):

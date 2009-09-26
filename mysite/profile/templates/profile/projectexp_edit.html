@@ -1,0 +1,98 @@
+{% extends 'profile/base_profile.html' %}
+
+{% block css %}
+{{ block.super }}
+@import url('/static/css/profile/projectexp.css') all;
+{% endblock css %}
+
+{% block main %}
+<div class='single-project project-display module'>
+    <div class='head'>
+        <h3>{{ title }}</h3>
+        <ul>
+            <li><a href='{% url profile.views.display_person_web user_to_display__username=the_user.username %}'>&laquo; Back to portfolio</a></li>
+        </ul>
+    </div>
+    <div class='body'>
+        <form name='projectexp_edit' method='POST'
+            action='{% url profile.views.projectexp_edit_do project__name=project__name %}'>
+	  {% for form in forms %}
+	  <div class="section">
+	    <hr />
+	    </div>
+
+	  {% for field in form %}
+
+          <div class='section'>
+
+	    <div class='section-heading'>
+	      {% if not field.is_hidden %}
+              <h4>
+                  {{ field.label }}
+              </h4>
+	      {% endif %}
+            </div>
+	    
+	    
+            <div class='section-content'>
+	      {{ field.errors }}
+	      
+	      {{ field }}
+            </div>
+          </div>
+	  {% endfor %}
+	  {% endfor %}
+	  
+	  
+            <div class='section'>
+                <div class='section-heading'>
+                    <!-- This just takes up space. -->
+                    &nbsp;
+                </div>
+                <div class='section-content help-bubble'
+                    id='help-bubble-1'>
+                    <a href='#' class='help-bubble-close'>x</a>
+                    <img src='/static/images/icons/info.png' />
+                    <p>
+                    A good citation is a link to a bug report or archived
+                    post to a mailing list that includes your patch,
+                    translation, design idea, or other contribution.
+                    (Cue some tactical Googling!)
+                    </p>
+                </div>
+            </div>
+            <div class='section'>
+                <div class='section-heading'>
+                    &nbsp;
+                </div>
+                <div class='section-content'>
+                    <input type='submit' value='Save' />
+                    <a style='padding: 6px; margin-right: 10px; float: right;' href='/people/{{ the_user.username }}/'>
+                        &laquo; Back to portfolio
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock main %}
+
+{% block js %}
+<script src='/static/js/jquery.cookie.js'></script>
+<script>
+    $(document).ready(function() {
+        if ($.cookie('bubble-closed')) {
+            $('#help-bubble-1').hide();
+        }
+        else {
+            $('#help-bubble-1 .help-bubble-close').click(function() {
+                /*url = '/people/{{person.user.username}}/' +
+                'bubbles/add-contribution/close.json'*/
+                $.cookie('bubble-closed', true);
+                $('#help-bubble-1').fadeOut('slow');
+                return false;
+            });
+        }
+    });
+</script>
+{% endblock js %}
