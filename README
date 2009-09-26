@@ -1,3 +1,5 @@
+== How to run this code ==
+
 How to run this code:
 
 $ sudo apt-get install rabbitmq-server python-apt
@@ -24,6 +26,9 @@ To run all tests, including customs:
 To run just a particular test:
 
 ./bin/mysite_with_testsettings_for_testing_with_customs test profile
+
+This is all necessary due to our need for DEBUG_PROPAGATE_EXCEPTIONS. See
+the notes in README.twill-tests to understand what's going on.
 
 == To forcibly regenerate scripts in ./bin/* ==
 
