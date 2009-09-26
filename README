@@ -10,3 +10,22 @@ $ ./bin/buildout
 $ ./bin/mysite runserver
 
 Now load http://127.0.0.1:8000/search/ in your web browser.
+
+== Testing ==
+
+To run all tests, except customs:
+
+./bin/test_with_testsettings_without_customs
+
+To run all tests, including customs:
+
+./bin/test_with_testsettings_without_customs
+
+To run just a particular test:
+
+./bin/mysite_with_testsettings_for_testing_with_customs test profile
+
+== To forcibly regenerate scripts in ./bin/* ==
+
+$ python bootstrap.py
+$ ./bin/buildout -o # o is for "offline", so you don't hit the network looking for dependencies
