@@ -33,6 +33,7 @@ class AutoCompleteTests(TwillTests):
     """
 
     def setUp(self):
+        TwillTests.setUp(self)
         self.project_chat = Project.objects.create(name='ComicChat', language='C++')
         self.project_kazaa = Project.objects.create(name='Kazaa', language='Vogon')
         self.bug_in_chat = Bug.objects.create(project=self.project_chat,
