@@ -36,6 +36,7 @@ class ProjectExpEditForm(django.forms.Form):
     
     def set_user(self, user):
         self.user = user
+
     def clean_project_exp_id(self):
         '''Note: I will explode violently if you
         have not set self.user.'''

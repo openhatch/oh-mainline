@@ -50,11 +50,6 @@ urlpatterns = patterns('',
         (r'^people/(?P<user_to_display__username>[^/]+)/openhatch-widget.js$',
                 'mysite.profile.views.widget_display_js'),
 
-        (r'^people/delete-experience/do$',
-         'mysite.profile.views.delete_experience_do'),
-
-        #(r'^people/project_exp_tag__remove$',
-        #    'mysite.profile.views.project_exp_tag__remove__web'),
         (r'^people/info/edit/do$',
             'mysite.profile.views.edit_person_info'),
 

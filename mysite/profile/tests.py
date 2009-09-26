@@ -23,8 +23,9 @@ import tasks
 import mock
 
 import django.test
-from django.core import management
 from django.test.client import Client
+from django.core import management
+from django.core.urlresolvers import reverse
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 
@@ -219,8 +220,11 @@ class ProjectExpTests(TwillTests):
 
         # POST saying we want to delete the ccHost experience...
         # luckily I read the fixture and I know its ID is 13
-        response = client.post('/people/delete-experience/do',
-                               {'id': '13'})
+        deletion_handler_url = reverse(
+                mysite.profile.views.projectexp_edit_do,
+                kwargs={'project__name': 'ccHost'})
+        response = client.post(deletion_handler_url,
+                {'0-project_exp_id': '13', '0-delete_this': 'on'})
         
         # Now re-GET the profile
         response = client.get(person_page)
@@ -246,8 +250,11 @@ class ProjectExpTests(TwillTests):
                 ProjectExp.objects.get(id=13).person.user)
 
         # What happens if he tries to delete ProjectExp #13
-        response = client.post('/people/delete-experience/do',
-                {'id': '13'})
+        deletion_handler_url = reverse(
+                mysite.profile.views.projectexp_edit_do,
+                kwargs={'project__name': 'ccHost'})
+        response = client.post(deletion_handler_url,
+                {'0-project_exp_id': '13', '0-delete_this': 'on'})
 
         # Still there, Barry. Keep on truckin'.
         self.assert_(ProjectExp.objects.get(id=13))
@@ -280,27 +287,6 @@ class ProjectExpTests(TwillTests):
 
         # Alakazam! It's gone.
         tc.notfind('ccHost')
-        # }}}
-
-    def test_cannot_delete_exps_without_id(self):
-        '''While paulproteus is logged in, he posts directly to /people/delete-experience/do without specifying the id of the projectexp you want to delete. The server returns a 500 error and a check string.'''
-        # {{{
-        
-        client = Client()
-        username='paulproteus'
-        client.login(username=username,
-                     password="paulproteus's unbreakable password")
-
-        person_page = '/people/%s/' % urllib.quote(username)
-        
-        # POST saying we want to delete the
-        # ccHost experience...
-        # But it's missing the ID!
-        post_data = {}
-        response = client.post('/people/delete-experience/do',
-                post_data)
-        
-        self.assertEquals(response.status_code, 500)
         # }}}
 
     def test_person_involvement_description(self):
@@ -828,9 +814,6 @@ class OnlyFreshDiasAreSelected(TwillTests):
 
         # Now verify it's done
         self.assert_(DataImportAttempt.objects.get().stale)
-        
-        
-
 
 
 # vim: set ai et ts=4 sw=4 nu:
