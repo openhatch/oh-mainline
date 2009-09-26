@@ -327,7 +327,7 @@ def projectexp_edit_do(request, project__name):
             request.POST, prefix=str(n))
         form.set_user(request.user)
         
-        if form.data['%d-delete_this' % n] == 'on':
+        if form.data.get('%d-delete_this' % n, None) == 'on':
             # FIXME: This is duplicate code, duplicate code.
 
             # this way, if there are no matches, we fail gently.

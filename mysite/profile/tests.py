@@ -289,6 +289,31 @@ class ProjectExpTests(TwillTests):
         tc.notfind('ccHost')
         # }}}
 
+    def test_projectexp_edit(self):
+        """Paulproteus can edit information about his project experiences."""
+        # {{{
+        self.login_with_twill()
+
+        # Let's go edit info about a project experience.
+        editor_url = reverse(mysite.profile.views.projectexp_edit,
+                kwargs={'project__name': 'ccHost'})
+        tc.go(make_twill_url(editor_url))
+        
+        # Let's fill in the text fields like pros.
+        tc.fv('1', '0-involvement_description', 'ze description')
+        tc.fv('1', '0-citation_url', 'ze-u.rl')
+        tc.fv('1', '0-man_months', '13')
+        tc.fv('1', '0-primary_language', 'tagalogue')
+        tc.fv('1', '0-delete_this', 'off')
+        tc.submit()
+
+        exp = ProjectExp.objects.get(project__name='ccHost')
+        self.assertEqual(exp.description, 'ze description')
+        self.assertEqual(exp.url, 'http://ze-u.rl/')
+        self.assertEqual(exp.man_months, 13)
+        self.assertEqual(exp.primary_language, 'tagalogue')
+        # }}}
+
     def test_person_involvement_description(self):
         # {{{
         username = 'paulproteus'
