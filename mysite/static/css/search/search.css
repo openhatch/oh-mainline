@@ -338,7 +338,7 @@ p {
 #opps li.lit-up {
     /*border-color: #777; #f85931;*/
 }
-#opps li.lit-up {
+#opps li.lit-up.DISABLE-THIS {
     border-left: 4px solid pink;
     position: relative;
     left: -4px;
