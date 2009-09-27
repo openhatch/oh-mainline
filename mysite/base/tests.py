@@ -28,10 +28,15 @@ class TwillTests(django.test.TestCase):
     '''Some basic methods needed by other testing classes.'''
     # {{{
     def setUp(self):
+        from django.conf import settings
+        self.old_dbe = settings.DEBUG_PROPAGATE_EXCEPTIONS
+        settings.DEBUG_PROPAGATE_EXCEPTIONS = True
         twill_setup()
         twill_quiet()
 
     def tearDown(self):
+        from django.conf import settings
+        settings.DEBUG_PROPAGATE_EXCEPTIONS = self.old_dbe
         twill_teardown()
 
     def login_with_twill(self):

@@ -1,13 +1,28 @@
-How to run this code:
+== How to run this code ==
 
 $ sudo apt-get install rabbitmq-server python-apt
 $ sudo rabbitmqctl add_user rabbiter johT4qui
 $ sudo rabbitmqctl add_vhost localhost
 $ rabbitmqctl set_permissions -p localhost rabbiter "" ".*" ".*" || rabbitmqctl map_user_vhost rabbiter localhost || echo EEEP
 
-$ cd mysite
 $ python bootstrap.py
 $ ./bin/buildout
 $ ./bin/mysite runserver
 
 Now load http://127.0.0.1:8000/search/ in your web browser.
+
+== Testing ==
+
+To run all tests, except customs:
+
+./bin/test
+
+To test customs:
+
+./bin/mysite test customs
+
+== To forcibly regenerate scripts in ./bin/* ==
+
+$ cd milestone-a # Make sure you're in this directory. Not sure if it will work elsewhere.
+$ python bootstrap.py
+$ ./bin/buildout -o # o is for "offline", so you don't hit the network looking for dependencies
