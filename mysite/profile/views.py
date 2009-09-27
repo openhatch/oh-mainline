@@ -30,6 +30,7 @@ from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.core.files.images import get_image_dimensions
 from django.contrib.sites.models import Site
+from django.core.urlresolvers import reverse
 
 # OpenHatch global
 from django.conf import settings
@@ -261,23 +262,120 @@ def widget_display_js(request, user_to_display__username):
     return render_to_response('base/append_ourselves.js',
                               {'in_string': encoded_for_js},
                               mimetype='application/javascript')
-@login_required
-def projectexp_edit(request, project__name, form = None):
-    # {{{
-    if form is None:
-        form = mysite.profile.forms.ProjectExpForm()
 
-    person = request.user.get_profile()
+def prepare_p_e_forms(person, project):
+    """Input: a person and a project.
+    Output: A list of ProjectExpForms populated from that guy's relevant p_es."""
+    # Let's prepare some forms
+    forms = []
+    
+    # We need a form for each of the user's experiences with a given project.
+    project_exps = ProjectExp.objects.filter(
+        project=project,
+        person=person)
+    
+    for n, p_e in enumerate(project_exps):
+        form_data = dict(
+            project_exp_id=p_e.id,
+            citation_url=p_e.url,
+            man_months=p_e.man_months,
+            primary_language=p_e.primary_language,
+            involvement_description=p_e.description,
+            )
+        forms.append(mysite.profile.forms.ProjectExpEditForm(initial=form_data, prefix=str(n)))
+    return forms
+
+@login_required
+def projectexp_edit(request, project__name, forms = None):
+    """Page that allows user to edit project experiences for a project."""
+    # {{{
+    # FIXME: Change this function's misleading name.
+
     project = get_object_or_404(Project, name=project__name)
+    person = request.user.get_profile()
+
+    if forms is None:
+        forms = prepare_p_e_forms(person, project)
+        
     data = get_personal_data(person)
     data['exp_list'] = get_list_or_404(ProjectExp,
             person=person, project=project)
-    data['form'] = form
+    data['forms'] = forms
     data['edit_mode'] = True
     data['title'] = "Edit your contributions to %s" % project.name
+    data['project__name'] = project__name
     data['the_user'] = request.user
     data['editable'] = True
-    return render_to_response('profile/projectexp.html', data)
+    return render_to_response('profile/projectexp_edit.html', data)
+    # }}}
+
+@login_required
+def projectexp_edit_do(request, project__name):
+    """Update database with new information about a user's experiences with a particular project."""
+    # FIXME: Change this function's misleading name.
+    # {{{
+    project = get_object_or_404(Project, name=project__name)
+
+    # Find all the unique strings before a hyphen and convert them to integers.
+    numbers = sorted(map(int, set([k.split('-')[0] for k in request.POST.keys()])))
+    forms = []
+
+    forms_all_valid = True
+    
+    for n in numbers:
+        form = mysite.profile.forms.ProjectExpEditForm(
+            request.POST, prefix=str(n))
+        form.set_user(request.user)
+        
+        if form.data.get('%d-delete_this' % n, None) == 'on':
+            # FIXME: This is duplicate code, duplicate code.
+
+            # this way, if there are no matches, we fail gently.
+            # Presumably a crazy-reloading user might run into that,
+            # so it's probably be best to allow ourselves to "redelete"
+            # a ProjectExp that has already been deleted.
+            exps = ProjectExp.objects.filter(
+                    id=int(form.data['%d-project_exp_id' % n]),
+                    person__user=request.user)
+
+            for exp in exps:
+                exp.delete()
+
+            continue
+
+        forms.append(form) # append it in case we
+        # will need to push it onto the edit page later
+
+        if form.is_valid():
+            p_e = form.cleaned_data['project_exp']
+            p_e.modified = True
+            p_e.description = form.cleaned_data['involvement_description']
+            p_e.url = form.cleaned_data['citation_url']
+            p_e.man_months = form.cleaned_data['man_months']
+            p_e.primary_language=form.cleaned_data['primary_language']
+            p_e.save()
+        else:
+            forms_all_valid = False
+
+    if not forms_all_valid:
+        # Return the original view, with the forms populated with
+        # the data the user entered (even though that data isn't valid).
+        return projectexp_edit(request, project__name, forms)
+
+    # Are there any left?
+    any_left = ProjectExp.objects.filter(
+        project=project, person=request.user.get_profile()
+        ).count()
+    if any_left:
+        # If so, send the user back to the
+        # projectexp edit page.
+        outta_here = reverse(projectexp_edit, kwargs={'project__name': project__name})
+    else:
+        # if not, back to profile.
+        outta_here = reverse(display_person_web, kwargs=dict(
+            user_to_display__username=request.user.username))
+
+    return HttpResponseRedirect(outta_here)
     # }}}
 
 @login_required
@@ -677,31 +775,6 @@ def import_do(request):
 
     # and then just redirect to the profile page
     return HttpResponseRedirect('/people/%s' % urllib.quote(
-            request.user.username))
-    # }}}
-
-@login_required
-def delete_experience_do(request):
-    # {{{
-    person = request.user.get_profile()
-
-    try:
-        project_exp_id = int(request.POST['id'])
-    except KeyError:
-        error_msg = "Oops, an error occurred."
-        return HttpResponseServerError(error_msg)
-    
-    exps = ProjectExp.objects.filter(id=project_exp_id,
-                                    person=person)
-
-    # this way, if there are no matches, we fail gently.
-    # Presumably a crazy-reloading user might run into that,
-    # so it's probably be best to allow ourselves to "redelete"
-    # a ProjectExp that has already been deleted.
-    for exp in exps:
-        exp.delete()
-
-    return HttpResponseRedirect('/people/%s/' % urllib.quote(
             request.user.username))
     # }}}
 
