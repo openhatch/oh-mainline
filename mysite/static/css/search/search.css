@@ -450,5 +450,8 @@ input[type='text'].default-text-active {
     margin-bottom: 5px;
 }
 
+#results li .highlight {
+    background-color: #fffcaa;
+}
 
 /* vim: set ai ts=4 sts=4 et sw=4: */

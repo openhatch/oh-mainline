@@ -107,6 +107,7 @@ def fetch_bugs(request):
 
     data = {}
     data['language'] = query
+    data['query_words'] = query_words
 
     prev_page_query_str = QueryDict('')
     prev_page_query_str = prev_page_query_str.copy()
