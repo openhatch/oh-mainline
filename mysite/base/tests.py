@@ -28,10 +28,15 @@ class TwillTests(django.test.TestCase):
     '''Some basic methods needed by other testing classes.'''
     # {{{
     def setUp(self):
+        from django.conf import settings
+        self.old_dbe = settings.DEBUG_PROPAGATE_EXCEPTIONS
+        settings.DEBUG_PROPAGATE_EXCEPTIONS = True
         twill_setup()
         twill_quiet()
 
     def tearDown(self):
+        from django.conf import settings
+        settings.DEBUG_PROPAGATE_EXCEPTIONS = self.old_dbe
         twill_teardown()
 
     def login_with_twill(self):
@@ -59,14 +64,8 @@ class TwillTests(django.test.TestCase):
         return client
 
     def signup_with_twill(self, username, email, password):
-        tc.go(make_twill_url('http://openhatch.org/'))
-        tc.fv('create_profile', 'username',
-                username)
-        tc.fv('create_profile', 'email',
-                email)
-        tc.fv('create_profile', 'password',
-                password)
-        tc.submit()
+        """ Used by account.tests.Signup, which is omitted while we use invite codes. """
+        pass
 
     # }}}
 

@@ -1,0 +1,29 @@
+{% extends 'base/one_column.html' %}
+
+{% block title %}
+Error
+{{ block.super }}
+{% endblock title %}
+
+{% block css %}
+{{ block.super }}
+@import url('/static/css/base/landing.css') all;
+{% endblock css %}
+
+{% block main %}
+<div class='module' id='landing'>
+    <div class='head'>
+        <h3>We goofed.</h3>
+    </div>
+    <div class='body'>
+        <p><strong>Error 500: Server error.</strong></p>
+        <p>You requested a page, and we really wanted to give it
+        to you. But we messed up.</p>
+
+        <p>We were automatically sent an email about it so we
+        have the error recorded. (If you want to follow up to help
+        us get it fixed, <a href="/contact/">contact us</a>.)
+        </p>
+    </div>
+</div>
+{% endblock main %}

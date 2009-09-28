@@ -1,4 +1,5 @@
-{% extends 'base/one_column.html' %}
+{% extends 'base/three_columns.html' %}
+{% load filters %}
 
 {% block title %}
 Home
@@ -10,18 +11,96 @@ Home
 @import url('/static/css/base/landing.css') all;
 {% endblock css %}
 
-{% block main %}
+{% block pagetop %}
+
+<h1>Welcome, 
+            {% if person.user.first_name or person.user.last_name %}
+                <a href='/people/{{ person.user.username }}'>
+                    {{ person.user.first_name }}
+                    {{ person.user.last_name }}</a>!
+            {% else %}
+                <a href='/people/{{ person.user.username }}'>
+                    {{ person.user.username }}</a>!
+            {% endif %}
+</h1>
+
+{% endblock pagetop %}
+
+{% block left %}
+
 <div class='module' id='landing'>
     <div class='head'>
-        <h3>Welcome</h3>
+        <h3>Intriguing people</h3>
     </div>
-    <div class='body contains-submodules two-columns'>
-        <div class='submodule fat'>
+    <div class='body'>
+    <ul>
+    <li>dude!</li>
+    <li>lady!</li>
+    <li>dude!</li>
+    <li>lady!</li>
+    <li>dude!</li>
+    <li>lady!</li>
+    </ul>
+    </div>
+</div>
+
+{% endblock left %}
+
+{% block middle %}
+
+<div class='module' id='landing'>
+    <div class='head'>
+        <h3>Interesting bugs</h3>
+    </div>
+    <div class='body'>
+    <ul>
+    <li>bug!<li>
+    <li>bug!<li>
+    <li>bug!<li>
+    <li>bug!<li>
+    <li>bug!<li>
+    <li>bug!<li>
+    <li>bug!<li>
+    <li>bug!<li>
+    <li>bug!<li>
+    <li>bug!<li>
+    <li>bug!<li>
+    <li>bug!<li>
+    </ul>
+    </div>
+</div>
+
+{% endblock middle %}
+
+{% block right %}
+<div class='module' id='landing'>
+    <div class='body contains-submodules'>
+        <div class='submodule'>
             <div class='head'>
-                <h3>Your widget</h3>
+                <h3>From the OpenHatch blog</h3>
             </div>
             <div class='body'>
-                <p>Show off your open source participation on your web things.</p>
+                <ul>
+		  {% for entry in entries %}
+		  <li>
+		    <h5><a href="{{ entry.link }}">
+		      {{ entry.title }}
+		    </a></h5>
+		    <h4>by {{ entry.author }} &bull; {{ entry.published_parsed|timesince_terse }} ago</h4>
+		    <div class="entry">
+		     {{ entry.unicode_text|truncatewords:20 }}
+		    </div>
+		  </li>
+		  {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <div class='submodule'>
+            <div class='head'>
+                <h3>Use our widget!</h3>
+            </div>
+            <div class='body'>
+                <p>It's an easy way to showcase your open source participation on your web things.</p>
                 <script type='text/javascript' src='/people/{{ person.user.username }}/openhatch-widget.js'></script>
                 <div id='widget-instructions'>
                     Include this tag wherever in your page you want to put the widget:
@@ -31,4 +110,4 @@ Home
         </div>
     </div>
 </div>
-{% endblock main %}
+{% endblock right %}

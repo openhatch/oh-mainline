@@ -4,8 +4,8 @@ from mysite.profile.models import Person
 import mysite.customs.miro
 
 import django.test
-from .models import Project, Bug
-from . import views
+from mysite.search.models import Project, Bug
+from mysite.search import views
 import lpb2json
 import datetime
 import mysite.search.launchpad_crawl
@@ -33,6 +33,7 @@ class AutoCompleteTests(TwillTests):
     """
 
     def setUp(self):
+        TwillTests.setUp(self)
         self.project_chat = Project.objects.create(name='ComicChat', language='C++')
         self.project_kazaa = Project.objects.create(name='Kazaa', language='Vogon')
         self.bug_in_chat = Bug.objects.create(project=self.project_chat,
@@ -155,7 +156,7 @@ class TestNonJavascriptSearch(TwillTests):
         self.assert_(json_string_with_parens[-1] == ')')
         json_string = json_string_with_parens[1:-1]
         objects = simplejson.loads(json_string)
-        self.assert_('pk' in objects[0])
+        self.assert_('pk' in objects[0]['bugs'][0])
 
     def testPagination(self):
         url = 'http://openhatch.org/search/'

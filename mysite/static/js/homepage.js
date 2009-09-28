@@ -25,19 +25,39 @@ var prepareTabs = function () {
     // Hide all tabbed panels except the first.
     $('.tab:not(:eq(0))').addClass('invisible_if_js');
     $('.tab-links li:not(:first-child) a').addClass('my-tab-is-hidden');
-
-    // Check if we want to enable a particular tab.
+// Check if we want to enable a particular tab.
     var hash = document.location.href.split('#')[1];
     if (hash) {
-	if (hash.substr(0, 4) == 'tab=') {
-	    tab_name = hash.substr(4);
-	    /* Find the right <a> */
-	    var link = $("a[tab_selector=#" + 
-			 tab_name + "]")[0];
-	    abstractTabLinkClickHandler(link);
-	}
+        if (hash.substr(0, 4) == 'tab=') {
+            tab_name = hash.substr(4);
+            /* Find the right <a> */
+            var link = $("a[tab_selector=#" + 
+                    tab_name + "]")[0];
+            abstractTabLinkClickHandler(link);
+        }
     }
 }
 
+// Show or hide the normal, non-OpenID login form.
+ToggleNormalLoginForm = {
+    '$toggleLink': null,
+    '$form': null,
+    '$verb': null,
+    'toggleForm': function () {
+        var isLoginFormHidden = (ToggleNormalLoginForm.$form.css('display') == 'none');
+        var methodName = isLoginFormHidden ? 'show' : 'hide';
+        ToggleNormalLoginForm.$form[methodName]();
+        ToggleNormalLoginForm.$verb.text(isLoginFormHidden ? 'Hide' : 'Show');
+        return false;
+    },
+    'initialize': function () {
+        ToggleNormalLoginForm.$toggleLink = $('#toggleNormalLogin').click(
+                ToggleNormalLoginForm.toggleForm);
+        ToggleNormalLoginForm.$form = $('#normal_login_form').hide();
+        ToggleNormalLoginForm.$verb = $('#toggleNormalLogin .verb');
+    }
+};
+
 $(bindTabEventHandlers);
 $(prepareTabs);
+$(ToggleNormalLoginForm.initialize);

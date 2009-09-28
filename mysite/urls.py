@@ -32,6 +32,9 @@ urlpatterns = patterns('',
         (r'^account/login/do$', 'mysite.account.views.login_do'),
         (r'^account/signup/do$', 'mysite.account.views.signup_do'),
 
+        (r'^account/request_invitation/do$',
+            'mysite.account.views.request_invitation'),
+
         #Karen messes around with templates
         (r'^about/$', 
             'mysite.info.views.aboutpage'),
@@ -47,11 +50,6 @@ urlpatterns = patterns('',
         (r'^people/(?P<user_to_display__username>[^/]+)/openhatch-widget.js$',
                 'mysite.profile.views.widget_display_js'),
 
-        (r'^people/delete-experience/do$',
-         'mysite.profile.views.delete_experience_do'),
-
-        #(r'^people/project_exp_tag__remove$',
-        #    'mysite.profile.views.project_exp_tag__remove__web'),
         (r'^people/info/edit/do$',
             'mysite.profile.views.edit_person_info'),
 
@@ -129,6 +127,9 @@ urlpatterns = patterns('',
 
         (r'^people/projects/edit/(?P<project__name>.+)$',
                 'mysite.profile.views.projectexp_edit'),
+
+        (r'^people/projects/edit_do/(?P<project__name>.+)$',
+                'mysite.profile.views.projectexp_edit_do'),
 
         (r'^people/portfolio/import/$',
                 'mysite.profile.views.importer'),

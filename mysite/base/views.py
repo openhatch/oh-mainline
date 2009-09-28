@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from django.http import HttpResponse, \
         HttpResponseRedirect, HttpResponseServerError
 from django.shortcuts import render_to_response
@@ -9,12 +11,17 @@ from django.template import RequestContext, loader, Context
 from django.core.urlresolvers import reverse
 import mysite.profile as profile
 from mysite.profile.views import display_person_web
+import feedparser
+import lxml.html
+import mysite.customs.feed
 
-def homepage(request, signup_form=None):
+def homepage(request, signup_form=None,
+        invitation_request_form=None, initial_tab_open='request_invitation'):
+
     if request.user.is_authenticated():
         return landing_page(request)
 
-    form1 = OpenidSigninForm()
+    openid_signin_form = OpenidSigninForm()
 
     signup_notification = login_notification = notification_id = None
     if request.GET.get('msg', None) == 'ciao':
@@ -28,17 +35,35 @@ def homepage(request, signup_form=None):
     if not signup_form:
         signup_form = mysite.account.forms.UserCreationFormWithEmail()
 
-    return render_to_response('base/homepage.html', {
-        'signup_form': signup_form,
-        'notification_id': notification_id,
-        'login_notification': login_notification,
-        'signup_notification': signup_notification,
-        'form1': form1,
-        }, context_instance=RequestContext(request))
+    if not invitation_request_form:
+        invitation_request_form = mysite.account.forms.InvitationRequestForm()
+
+    data = {
+            'notification_id': notification_id,
+            'login_notification': login_notification,
+            'signup_notification': signup_notification,
+            'openid_signin_form': openid_signin_form,
+            'signup_form': signup_form,
+            'invitation_request_form': invitation_request_form,
+            }
+
+    data['initial_tab_open'] = initial_tab_open
+    data['interrogative_grunt'] = [u'Hm?', u'Huh?', u'Quoi?', u'¿Que?', u'What‽']
+
+    invitation_requested_for = request.GET.get("invitation_requested_for", None)
+    if invitation_requested_for:
+        data['invitation_requested_for'] = invitation_requested_for
+        data['invitation_success'] = True
+        data['initial_tab_open'] = "request_invitation"
+
+    return render_to_response('base/homepage.html', data, context_instance=RequestContext(request))
 
 def landing_page(request):
     data = profile.views.get_personal_data(request.user.get_profile())
     data['the_user'] = request.user
+
+    data['entries'] = mysite.customs.feed.cached_blog_entries()
+
     return render_to_response('base/landing.html', data)
 
 def page_to_js(request):

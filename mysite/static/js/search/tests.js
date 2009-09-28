@@ -4,14 +4,19 @@ $.fn.href = function () {
 
 SearchTests = {
     'jsonArrayToDocument': function() {
-        SearchResults.jsonArrayToDocument(testData.jsonArray);
+
+        // Don't run this, because it fails,
+        // and tests are evaluated serially like fairy lights.
+        return false;
+
+        SearchResults.jsonArrayToDocument(Fixtures.jsonArray);
         var $result = $('.gewgaws li').eq(0);
         var testField = function(fieldName, selector, valueGetter) {
             var $domField = $result.find(selector);
             console.debug('test function is about to check element:', 
                     $domField);
             var domFieldValue = $domField[valueGetter]();
-            var jsonFieldValue = testData.jsonArray[0].fields[fieldName];
+            var jsonFieldValue = Fixtures.jsonArray[0].fields[fieldName];
             var success = ($.trim(domFieldValue) == $.trim(jsonFieldValue));
             fireunit.ok(success,
                     "SearchTests.jsonArrayToDocument: "
@@ -44,12 +49,77 @@ SearchTests = {
             }
             success &= testField(pair[0], pair[1], verb);
         }
+    },
+
+    'blurSearchFieldWhenNewResultsAppear': function () {
+        /* Test for resolution of https://openhatch.org/bugs/issue5:
+         * "In opp search, keyboard shortcuts are not enabled immediately
+         * because focus not on search results."
+         * */
+        var $searchForm = $("form#search_opps");
+        $searchForm.find("input:text").focus().text("python");
+        $searchForm.submit();
+        var failIfFocused = function() {
+            if (this == document.activeElement) return false;
+        };
+        $searchForm.find("input").each(failIfFocused);
+        return true;
+    },
+
+    'pageLinksAppearOnlyWhenNeeded': function () {
+        /* Test for resolution of
+         * <https://www.pivotaltracker.com/story/show/1245515>
+         * ("In /search/, don't show prev and next links when
+         * they wouldn't lead you anywhere.")
+         */
+        var data = Fixtures.jsonArray;
+
+
+        /* Visit first page of results. */
+
+        data.start = 0;
+        data.end = 10;
+
+        SearchResults.jsonArrayToDocument(data);
+        fireunit.ok( $('#prev-page').is(':hidden'),
+                "'Prev' link is hidden on first page of results.");
+        fireunit.ok( $('#next-page').is(':visible'),
+                "'Next page' link is visible on first page of results.");
+
+
+
+        /* Visit a middle page of results. */
+
+        data.start = 1;
+        data.end = 13;
+
+        SearchResults.jsonArrayToDocument(data);
+        fireunit.ok( $('#prev-page').is(':visible'),
+                "'Prev' link is visible on a middle page of results.");
+        fireunit.ok( $('#next-page').is(':visible'),
+                "'Next page' link is visible on a middle page of results.");
+
+
+
+        /* Visit the last page of results. */
+
+        data.start = 1;
+        data.end = 14;
+
+        SearchResults.jsonArrayToDocument(data);
+        fireunit.ok( $('#prev-page').is(':visible'),
+                "'Prev' link is visible on last page of results.");
+        fireunit.ok( $('#next-page').is(':hidden'),
+                "'Next page' link is hidden on last page of results.");
+
+        return true; // This value isn't important here.
     }
 };
 runTests = function() {
     for (var test in SearchTests) {
-        console.debug(test);
-        fireunit.ok(SearchTests[test](), "SearchTests." + test); }
+        console.debug("test: ", test);
+        fireunit.ok(SearchTests[test](), "SearchTests." + test);
+    }
     fireunit.testDone();
 };
 if (fireunitEnabled) {

@@ -3,6 +3,7 @@ from django.shortcuts import render_to_response
 from django.core import serializers
 from django.db.models import Q
 from django.utils.timesince import timesince
+from django.utils.html import escape
 
 from mysite.search.models import Bug, Project
 
@@ -12,21 +13,24 @@ import pytz
 import re
 import simplejson
 
-
 # Via http://www.djangosnippets.org/snippets/1435/
 def encode_datetime(obj):
+    # {{{
     if isinstance(obj, datetime.date):
         fixed = datetime.datetime(obj.year, obj.month, obj.day, tzinfo=pytz.utc)
         obj = fixed
     if isinstance(obj, datetime.datetime):
         return obj.astimezone(tz.tzutc()).strftime('%Y-%m-%dT%H:%M:%SZ')
     raise TypeError("%s" % type(obj) + repr(obj) + " is not JSON serializable")
+    # }}}
 
 def split_query_words(string):
-    # We're given some query terms "between quotes" and some glomped on with spaces
+    # We're given some query terms "between quotes"
+    # and some glomped on with spaces.
     # Strategy: Find the strings validly inside quotes, and remove them
     # from the original string. Then split the remainder (and probably trim
     # whitespace from the remaining words).
+    # {{{
     ret = []
     splitted = re.split(r'(".*?")', string)
 
@@ -39,12 +43,15 @@ def split_query_words(string):
             ret.append(word[1:-1])
 
     return ret
+    # }}}
 
 def fetch_bugs(request):
+    # {{{
     # FIXME: Give bugs some date field
 
     if request.user.is_authenticated():
-        suggestion_keys = request.user.get_profile().get_recommended_search_terms()
+        suggestion_keys = request.user.get_profile().\
+                get_recommended_search_terms()
     else:
         suggestion_keys = []
 
@@ -56,6 +63,8 @@ def fetch_bugs(request):
     start = int(request.GET.get('start', 1))
     end = int(request.GET.get('end', 10))
 
+    total_bug_count = 0
+
     if query:
         bugs = Bug.objects.all()
 
@@ -66,15 +75,15 @@ def fetch_bugs(request):
                 Q(description__contains=word) |
                 Q(project__name__iexact=word))
 
-        bugs = bugs.order_by('-last_touched')
+        bugs = bugs.order_by('-last_touched') # Minus sign = reverse order.
+
+        total_bug_count = bugs.count()
 
         bugs = bugs[start-1:end]
 
         for b in bugs:
-            # b.description = b.description[:65] + "..."
             b.project.icon_url = "/static/images/icons/projects/%s.png" % \
                     b.project.name.lower()
-            # FIXME: Randomize for camera
 
         bugs = list(bugs)
 
@@ -96,56 +105,90 @@ def fetch_bugs(request):
             except AtrributeError:
                 pass
 
+    data = {}
+    data['language'] = query
+    data['query_words'] = query_words
+
+    prev_page_query_str = QueryDict('')
+    prev_page_query_str = prev_page_query_str.copy()
+    next_page_query_str = QueryDict('')
+    next_page_query_str = next_page_query_str.copy()
+    if query:
+        prev_page_query_str['language'] = query
+        next_page_query_str['language'] = query
+    if format:
+        prev_page_query_str['format'] = format
+        next_page_query_str['format'] = format
+    diff = end - start
+    prev_page_query_str['start'] = start - diff - 1
+    prev_page_query_str['end'] = start - 1
+    next_page_query_str['start'] = end + 1
+    next_page_query_str['end'] = end + diff + 1
+
+    data['start'] = start
+    data['end'] = end
+    data['prev_page_url'] = '/search/?' + prev_page_query_str.urlencode()
+    data['next_page_url'] = '/search/?' + next_page_query_str.urlencode()
+
     if format == 'json':
-        return bugs_to_json_response(bugs, request.GET.get(
+        # FIXME: Why `alert`?
+        return bugs_to_json_response(data, bugs, request.GET.get(
             'jsoncallback', 'alert'))
     else:
-        prev_page_query_str = QueryDict('')
-        prev_page_query_str = prev_page_query_str.copy()
-        next_page_query_str = QueryDict('')
-        next_page_query_str = next_page_query_str.copy()
-        if query:
-            prev_page_query_str['language'] = query
-            next_page_query_str['language'] = query
-        if format:
-            prev_page_query_str['format'] = format
-            next_page_query_str['format'] = format
-        diff = end - start
-        prev_page_query_str['start'] = start - diff - 1
-        prev_page_query_str['end'] = start - 1
-        next_page_query_str['start'] = end + 1
-        next_page_query_str['end'] = end + diff + 1
-        return render_to_response('search/search.html', {
-            'the_user': request.user,
-            'suggestions': suggestions,
-            'bunch_of_bugs': bugs,
-            'developer_name': "Orrin Hatch",
-            'language': query,
-            'start': start, 'end': end,
-            'url': 'http://launchpad.net/',
-            'prev_page_url': '/search/?' + prev_page_query_str.urlencode(),
-            'next_page_url': '/search/?' + next_page_query_str.urlencode()
-            })
+        data['the_user'] = request.user
+        data['suggestions'] = suggestions
+        data['bunch_of_bugs'] = bugs
+        data['developer_name'] = "Orrin Hatch"
+        data['url'] = 'http://launchpad.net/'
 
-def bugs_to_json_response(bunch_of_bugs, callback_function_name=''):
-    json_serializer = serializers.get_serializer('python')()
-    data = json_serializer.serialize(bunch_of_bugs)
-    for elt in data:
-        elt['fields']['project'] = \
-                Project.objects.get(pk=int(elt['fields']['project'])).name
-    jsonned = simplejson.dumps(data, default=encode_datetime)
-    return HttpResponse( callback_function_name + '(' + jsonned + ')' )
+        data['total_bug_count'] = total_bug_count
+        data['show_prev_page_link'] = start > 1
+        data['show_next_page_link'] = end < (total_bug_count - 1)
+
+        return render_to_response('search/search.html', data)
+    # }}}
+
+def bugs_to_json_response(data, bunch_of_bugs, callback_function_name=''):
+    """ The search results page accesses this view via jQuery's getJSON method, 
+    and loads its results into the DOM."""
+    # {{{
+    # Purpose of this code: Serialize the list of bugs
+    # Step 1: Pull the bugs out of the database, getting them back
+    #   as simple Python objects
+    
+    obj_serializer = serializers.get_serializer('python')()
+    bugs = obj_serializer.serialize(bunch_of_bugs)
+
+    # Step 2: With a (tragically) large number of database calls, 
+    # loop over these objects, replacing project primary keys with project names.
+    for bug in bugs:
+        project = Project.objects.get(pk=int(bug['fields']['project']))
+        bug['fields']['project'] = project.name
+
+    # Step 3: Create a JSON-happy list of key-value pairs
+    data_list = [{'bugs': bugs}]
+
+    # Step 4: Create the string form of the JSON
+    json_as_string = simplejson.dumps(data_list, default=encode_datetime)
+
+    # Step 5: Prefix it with the desired callback function name
+    json_string_with_callback = callback_function_name + '(' + json_as_string + ')'
+
+    # Step 6: Return that.
+    return HttpResponse(json_string_with_callback)
+    # }}}
 
 def request_jquery_autocompletion_suggestions(request):
     """
     Wraps get_autocompletion_suggestions and
-    list_to_jquery_autocompletion_format in a
+    list_to_jquery_autocompletion_format in an
     HttpRequest -> HttpResponse loop.
     Validates GET parameters. Expected:
         ?q=[suggestion fodder]
     If q is absent or empty, this function
     returns an HttpResponseServerError.
     """
+    # {{{
     partial_query = request.GET.get('q', None)
     if (partial_query is None) or (partial_query == ''):
         return HttpResponseServerError("Need partial_query in GET")
@@ -157,6 +200,7 @@ def request_jquery_autocompletion_suggestions(request):
     suggestions_string = list_to_jquery_autocompletion_format(
                 suggestions_list)
     return HttpResponse(suggestions_string)
+    # }}}
 
 def list_to_jquery_autocompletion_format(list):
     """Converts a list to the format required by
@@ -183,7 +227,7 @@ def get_autocompletion_suggestions(input):
       - libraries (frameworks? toolkits?) like Django
       - search by date
     """
-
+    # {{{
     sf_project = SearchableField('project')
     sf_language = SearchableField('lang')
     sf_dependency = SearchableField('dep')
@@ -248,6 +292,7 @@ def get_autocompletion_suggestions(input):
                     for lang in langs]
 
     return suggestions
+    # }}}
 
 """
 Ways we could do autocompletion:
@@ -262,4 +307,4 @@ Ask server to give a list of projects and languages beginning with "c"
 
 Add top 100 fulltext words to the mix.
 """
-# vim: set ai ts=4 sw=4 et:
+# vim: set ai ts=4 sw=4 et nu:

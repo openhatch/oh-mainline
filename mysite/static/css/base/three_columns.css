@@ -1,13 +1,17 @@
+#left {
+    width: 280px;
+}
+
 #middle {
     float: left;
-    width: 520px;
-    margin-right: 20px;
+    width: 280px;
+    margin: 0 20px;
 }
 #right {
-    width: 220px;
+    width: 350px;
     float: left;
 }
 .right {
     float: left;
-    width: 380px;
+    width: 350px;
 }

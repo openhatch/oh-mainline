@@ -28,6 +28,10 @@
     font-size: 120%;
     line-height: 130%;
     width: 460px;
+    float: left;
+}
+.no-opps strong {
+    background-color: #fff;
 }
 #heading {
     margin: 20px 0 10px 0;
@@ -154,6 +158,7 @@ p {
     padding: 5px 10px;
     width: 535px;
     overflow: hidden;
+    border-bottom: 2px solid #f4f4f4;
 }
 
 .first-line a {
@@ -333,7 +338,7 @@ p {
 #opps li.lit-up {
     /*border-color: #777; #f85931;*/
 }
-#opps li.lit-up {
+#opps li.lit-up.DISABLE-THIS {
     border-left: 4px solid pink;
     position: relative;
     left: -4px;
@@ -359,14 +364,20 @@ p {
     padding: 10px;
     color: #222;
     width: 570px;
+    height: 25px;
 }
 #opps form input[type='submit'] {
     font-size: 19px;
     padding: 8px;
     color: #222;
+    width: 90px;
+    height: 50px;
 }
 .good-for-beginners {
-    color: #444;
+    color: #222;
+    background-color: #acebc7;
+    width: 300px;
+    padding: 2px 5px;
 }
 .good-for-beginners img {
 }
@@ -439,5 +450,8 @@ input[type='text'].default-text-active {
     margin-bottom: 5px;
 }
 
+#results li .highlight {
+    background-color: #fffcaa;
+}
 
 /* vim: set ai ts=4 sts=4 et sw=4: */

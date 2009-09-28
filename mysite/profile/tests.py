@@ -23,8 +23,9 @@ import tasks
 import mock
 
 import django.test
-from django.core import management
 from django.test.client import Client
+from django.core import management
+from django.core.urlresolvers import reverse
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 
@@ -148,16 +149,29 @@ class ProjectExpTests(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry',
             'person-paulproteus', 'cchost-data-imported-from-ohloh']
 
-    def projectexp_add(self, project__name, project_exp__description, project_exp__url):
+    def projectexp_add(self, project__name, project_exp__description, project_exp__url, tc_dot_url_should_succeed=True):
         """Paulproteus can login and add a projectexp to bumble."""
         # {{{
         self.login_with_twill()
 
         tc.go(make_twill_url('http://openhatch.org/form/projectexp_add'))
-        tc.fv('projectexp_add', 'project__name', project__name)
-        tc.fv('projectexp_add', 'project_exp__description', project_exp__description)
-        tc.fv('projectexp_add', 'project_exp__url', project_exp__url)
+        tc.fv('projectexp_add', 'project_name', project__name)
+        tc.fv('projectexp_add', 'involvement_description', project_exp__description)
+        tc.fv('projectexp_add', 'citation_url', project_exp__url)
         tc.submit()
+
+        tc_url_matched = None
+        try:
+            tc.url('/people/.*/projects/')
+            tc_url_matched = True
+        except twill.errors.TwillAssertionError, e:
+            tc_url_matched = False
+
+        if tc_dot_url_should_succeed:
+            assert tc_url_matched
+        else:
+            assert not tc_url_matched
+
         tc.find(project__name)
         tc.find(project_exp__description)
         tc.find(project_exp__url)
@@ -167,8 +181,26 @@ class ProjectExpTests(TwillTests):
         """Paulproteus can login and add two projectexps."""
         # {{{
         self.login_with_twill()
-        self.projectexp_add('asdf', 'qwer', 'jkl')
-        self.projectexp_add('asdf', 'QWER!', 'JKL!')
+        self.projectexp_add('asdf', 'qwer', 'http://jkl.com/')
+        self.projectexp_add('asdf', 'QWER!', 'https://JKLbang.edu/')
+        # }}}
+
+    def test_projectexp_add(self):
+        """Paulproteus can login and add two projectexps."""
+        # {{{
+        self.login_with_twill()
+
+        # Test for basic success: All fields filled out reasonably
+        self.projectexp_add('asdf', 'qwer', 'http://jkl.com/')
+        # (once more with a weird character and weirdish url)
+        self.projectexp_add('asdf', 'QWER!', 'https://JKLbang.edu/')
+
+        # Test that empty descriptions are okay
+        self.projectexp_add('asdf', '', 'https://JKLbang.edu/')
+
+        # Test that URLs are validated
+        self.projectexp_add('asdf', 'QWER!', 'not a real URL, what now', tc_dot_url_should_succeed=False)
+
         # }}}
 
     def test_projectexp_delete(self):
@@ -188,8 +220,11 @@ class ProjectExpTests(TwillTests):
 
         # POST saying we want to delete the ccHost experience...
         # luckily I read the fixture and I know its ID is 13
-        response = client.post('/people/delete-experience/do',
-                               {'id': '13'})
+        deletion_handler_url = reverse(
+                mysite.profile.views.projectexp_edit_do,
+                kwargs={'project__name': 'ccHost'})
+        response = client.post(deletion_handler_url,
+                {'0-project_exp_id': '13', '0-delete_this': 'on'})
         
         # Now re-GET the profile
         response = client.get(person_page)
@@ -215,8 +250,11 @@ class ProjectExpTests(TwillTests):
                 ProjectExp.objects.get(id=13).person.user)
 
         # What happens if he tries to delete ProjectExp #13
-        response = client.post('/people/delete-experience/do',
-                {'id': '13'})
+        deletion_handler_url = reverse(
+                mysite.profile.views.projectexp_edit_do,
+                kwargs={'project__name': 'ccHost'})
+        response = client.post(deletion_handler_url,
+                {'0-project_exp_id': '13', '0-delete_this': 'on'})
 
         # Still there, Barry. Keep on truckin'.
         self.assert_(ProjectExp.objects.get(id=13))
@@ -251,25 +289,29 @@ class ProjectExpTests(TwillTests):
         tc.notfind('ccHost')
         # }}}
 
-    def test_cannot_delete_exps_without_id(self):
-        '''While paulproteus is logged in, he posts directly to /people/delete-experience/do without specifying the id of the projectexp you want to delete. The server returns a 500 error and a check string.'''
+    def test_projectexp_edit(self):
+        """Paulproteus can edit information about his project experiences."""
         # {{{
-        
-        client = Client()
-        username='paulproteus'
-        client.login(username=username,
-                     password="paulproteus's unbreakable password")
+        self.login_with_twill()
 
-        person_page = '/people/%s/' % urllib.quote(username)
+        # Let's go edit info about a project experience.
+        editor_url = reverse(mysite.profile.views.projectexp_edit,
+                kwargs={'project__name': 'ccHost'})
+        tc.go(make_twill_url(editor_url))
         
-        # POST saying we want to delete the
-        # ccHost experience...
-        # But it's missing the ID!
-        post_data = {}
-        response = client.post('/people/delete-experience/do',
-                post_data)
-        
-        self.assertEquals(response.status_code, 500)
+        # Let's fill in the text fields like pros.
+        tc.fv('1', '0-involvement_description', 'ze description')
+        tc.fv('1', '0-citation_url', 'ze-u.rl')
+        tc.fv('1', '0-man_months', '13')
+        tc.fv('1', '0-primary_language', 'tagalogue')
+        tc.fv('1', '0-delete_this', 'off')
+        tc.submit()
+
+        exp = ProjectExp.objects.get(project__name='ccHost')
+        self.assertEqual(exp.description, 'ze description')
+        self.assertEqual(exp.url, 'http://ze-u.rl/')
+        self.assertEqual(exp.man_months, 13)
+        self.assertEqual(exp.primary_language, 'tagalogue')
         # }}}
 
     def test_person_involvement_description(self):
@@ -528,8 +570,11 @@ class CeleryTests(TwillTests):
 
         self.assertEqual(decoded, [])
 
-    # FIXME: One day, test that after self.test_slow_loading_via_emulated_bgtask
-    # getting the data does not go out to Ohloh.
+        # FIXME: One day, test that, after
+        # self.test_slow_loading_via_emulated_bgtask,
+        # getting the data does not go out to Ohloh.
+
+        # }}}
 
     # }}}
 
@@ -539,6 +584,7 @@ class UserListTests(TwillTests):
             'user-barry', 'person-barry']
 
     def test_display_list_of_users_web(self):
+        # {{{
         self.login_with_twill()
         url = 'http://openhatch.org/people/'
         url = make_twill_url(url)
@@ -549,16 +595,11 @@ class UserListTests(TwillTests):
         tc.follow('paulproteus')
         tc.url('people/paulproteus') 
         tc.find('paulproteus')
+        # }}}
 
-    def test_front_page_link_to_list_of_users(self):
-        url = 'http://openhatch.org/'
-        url = make_twill_url(url)
-        tc.go(url)
-        tc.follow('Find other folks on OpenHatch')
     # }}}
 
 class ImportContributionsTests(TwillTests):
-    """ """
     # {{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
     # Don't include cchost-paulproteus, because we need paulproteus to have
@@ -714,8 +755,10 @@ class ImportContributionsTests(TwillTests):
 
 class UserCanShowEmailAddress(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
+    # {{{
     def test_show_email(self):
         """This test: (a) verifies my@ema.il does not appear on paulproteus's profile page, then goes to his account settings and opts in to showing it, and then verifies it does appear."""
+        # {{{
         self.login_with_twill()
 
         tc.go('/people/paulproteus/')
@@ -728,6 +771,8 @@ class UserCanShowEmailAddress(TwillTests):
 
         tc.go('/people/paulproteus/')
         tc.find('my@ema.il')
+        # }}}
+    # }}}
 
 class OnlyFreshDiasAreSelected(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
@@ -794,9 +839,6 @@ class OnlyFreshDiasAreSelected(TwillTests):
 
         # Now verify it's done
         self.assert_(DataImportAttempt.objects.get().stale)
-        
-        
-
 
 
 # vim: set ai et ts=4 sw=4 nu:
