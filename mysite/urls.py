@@ -6,6 +6,8 @@ import django_authopenid
 from django.contrib import admin
 admin.autodiscover()
 
+import mysite.account.forms
+
 from django_authopenid import views as oid_views
 
 urlpatterns = patterns('',
@@ -64,10 +66,15 @@ urlpatterns = patterns('',
         url(r'^openid/signin/$', oid_views.signin, name='user_signin'),
 
         # OpenID URL prefix for django_authopenid.urls
-        url(r'^openid/register/$', oid_views.register, dict(send_email=False)),
+        url(r'^openid/register/$', oid_views.register,
+            kwargs=dict(register_form=mysite.account.forms.OpenidRegisterFormWithInviteCode)),
+
+        # OpenID URL prefix for django_authopenid.urls
+        url(r'^openid/register/$', oid_views.register, dict(send_email=False),
+            name='user_register'),
 
         (r'^openid/', include('django_authopenid.urls')),
-
+                       
         url(r'^account/forgot_pass_confirm/(?P<uidb36>[^/]+)/(?P<token>[^/]+)/$', 'django.contrib.auth.views.password_reset_confirm', {'template_name': 'account/password_reset_confirm.html', 'post_reset_redirect': '/account/forgot_pass_complete/'}, name='password_reset_confirm'),
 
         (r'^account/forgot_pass_done/', 'django.contrib.auth.views.password_reset_done', {'template_name': 'account/password_reset_done.html'}),

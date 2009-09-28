@@ -53,8 +53,13 @@ Associate your OpenID - OpenHatch
                             clear: left;
                         }
                     </style>
-                    <div class="form-row"><label for="id_username">{% trans "Username" %}</label><br />{{ form1.username }}</div>
-                    <div class="form-row"><label for="id_email">{% trans "Email" %}</label><br />{{ form1.email }}</div>
+                    {% for field in form1 %}
+                    <div class='form-row'>
+                        {{ field.errors }}
+                        <label>{{ field.label }}</label><br />
+                        {{ field }}
+                    </div>
+                    {% endfor %}
                 </div>
                 <div class='foot'>
                     <div class="submit-row"><input type="submit" name="bnewaccount" value="Create account"></div>
