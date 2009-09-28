@@ -3,10 +3,10 @@
 </div> -->
 <div class='first-line'>
     <div class='head'>
-        <span class='project__name'>{{ bug.project.name | safe }}</span>
+        <span class='project__name'>{{ bug.project.name | highlight:query_words }}</span>
         -
         <a class='canonical_bug_link' href='{{ bug.canonical_bug_link }}'>
-            <span class='title'>{{ bug.title | safe }}</span>
+            <span class='title'>{{ bug.title | highlight:query_words }}</span>
         </a>
         {#<div class='age'>3 days old</div>#}
     </div>
@@ -21,7 +21,7 @@
         <span>&bull;</span>
         {% endif %}
         <span class='description'>
-            {{ bug.description | safe }}
+            {{ bug.description | highlight:query_words }}
         </span>
     </span>
 </div>
