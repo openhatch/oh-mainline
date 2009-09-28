@@ -1,12 +1,14 @@
+{% load search %}
+
 <!-- <div class='project-info'>
 <img class='logo' src='{{ bug.project.icon_url }}' />
 </div> -->
 <div class='first-line'>
     <div class='head'>
-        <span class='project__name'>{{ bug.project.name }}</span>
+        <span class='project__name'>{{ bug.project.name|highlight:query_words }}</span>
         -
         <a class='canonical_bug_link' href='{{ bug.canonical_bug_link }}'>
-            <span class='title'>{{ bug.title }}</span>
+            <span class='title'>{{ bug.title|highlight:query_words }}</span>
         </a>
         {#<div class='age'>3 days old</div>#}
     </div>
@@ -21,7 +23,7 @@
         <span>&bull;</span>
         {% endif %}
         <span class='description'>
-            {{ bug.description }}
+            {{ bug.description|highlight:query_words }}
         </span>
     </span>
 </div>

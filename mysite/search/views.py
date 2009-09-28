@@ -3,6 +3,7 @@ from django.shortcuts import render_to_response
 from django.core import serializers
 from django.db.models import Q
 from django.utils.timesince import timesince
+from django.utils.html import escape
 
 from mysite.search.models import Bug, Project
 
@@ -77,13 +78,11 @@ def fetch_bugs(request):
 
         bugs = bugs.order_by('-last_touched') # Minus sign = reverse order.
 
-        # FIXME: Potential resource drain.
         total_bug_count = bugs.count()
 
         bugs = bugs[start-1:end]
 
         for b in bugs:
-            # b.description = b.description[:65] + "..."
             b.project.icon_url = "/static/images/icons/projects/%s.png" % \
                     b.project.name.lower()
 
@@ -109,6 +108,7 @@ def fetch_bugs(request):
 
     data = {}
     data['language'] = query
+    data['query_words'] = query_words
 
     prev_page_query_str = QueryDict('')
     prev_page_query_str = prev_page_query_str.copy()

@@ -338,7 +338,7 @@ p {
 #opps li.lit-up {
     /*border-color: #777; #f85931;*/
 }
-#opps li.lit-up {
+#opps li.lit-up.DISABLE-THIS {
     border-left: 4px solid pink;
     position: relative;
     left: -4px;
@@ -450,5 +450,8 @@ input[type='text'].default-text-active {
     margin-bottom: 5px;
 }
 
+#results li .highlight {
+    background-color: #fffcaa;
+}
 
 /* vim: set ai ts=4 sts=4 et sw=4: */
