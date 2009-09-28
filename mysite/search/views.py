@@ -3,6 +3,7 @@ from django.shortcuts import render_to_response
 from django.core import serializers
 from django.db.models import Q
 from django.utils.timesince import timesince
+from django.utils.html import escape
 
 from mysite.search.models import Bug, Project
 
@@ -44,6 +45,22 @@ def split_query_words(string):
     return ret
     # }}}
 
+
+def highlight(bug):
+    fields = ('description', 'title',
+            'project__name', 'project__language')
+    # Escape now, so we can add HTML tags.
+    for field in fields:
+        setattr(b, field, escape(getattr(b, field)))
+        #FIXME: Remove this if the above code works
+        for word in query_words:
+            # FIXME: Instead of word in the second parameter,
+            # backreference the replaced string. That way we handle
+            # capitalization and such.
+            highlighted_string = getattr(b, field).replace(word, "<span style='background-color: #ffe;' class='highlight'>%s</span>" % word)
+            setattr(b, field, highlighted_string)
+
+
 def fetch_bugs(request):
     # {{{
     # FIXME: Give bugs some date field
@@ -76,15 +93,25 @@ def fetch_bugs(request):
 
         bugs = bugs.order_by('-last_touched') # Minus sign = reverse order.
 
-        # FIXME: Potential resource drain.
         total_bug_count = bugs.count()
 
         bugs = bugs[start-1:end]
 
         for b in bugs:
-            # b.description = b.description[:65] + "..."
             b.project.icon_url = "/static/images/icons/projects/%s.png" % \
                     b.project.name.lower()
+
+            import pdb
+            pdb.set_trace()
+
+            # FIXME: highlighting goes here
+            
+            """
+            b.description = escape(b.description)
+            b.title = escape(b.title)
+            b.project__name = escape(b.project__name)
+            b.project__language = escape(b.project__language)
+            """
 
         bugs = list(bugs)
 
