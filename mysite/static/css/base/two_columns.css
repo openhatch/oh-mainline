@@ -1,29 +1,32 @@
 #left {
     float: left;
     margin-right: 15px;
-    width: 220px;
+    width: 222px;
 }
 #left .module {
-    width: 200px;
+    width: 202px;
 }
 #left .module > .head {
-    float: left;
-    width: 198px;
+    width: 200px;
 }
 #left .module > .body {
-    width: 158px;
-    padding: 20px;
-    border-bottom: 1px solid #f4f4f4;
+    width: 160px;
+    padding: 10px 20px;
+    border: 1px solid #f4f4f4;
 }
 #left .section {
     width: 180px;
 }
-#main,  #main .module > .head {
+#main {
+    width: 713px;
     float: left;
-    width: 723px;
+}
+#main .module > .head {
+    float: left;
+    width: 703px;
 }
 #main .module > .body {
-    width: 682px;
+    width: 663px;
     border-bottom: 1px solid #f4f4f4;
 }
 
