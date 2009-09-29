@@ -1,5 +1,11 @@
 {% extends 'profile/base_profile.html' %}
 
+{% block title %}
+{{ person.get_full_name_or_username }}'s
+contributions to {{ project.name }}
+{{ block.super }}
+{% endblock title %}
+
 {% block css %}
 {{ block.super }}
 @import url('/static/css/profile/projectexp.css') all;
@@ -8,7 +14,7 @@
 {% block main %}
     <div class='single-project project-display module'>
         <div class='head'>
-            <h3>{{ person.user.username }}'s contributions
+            <h3>{{ person.get_full_name_or_username }}'s contributions
                 to {{ project.name }}</h3>
             <ul>
                 <li>
