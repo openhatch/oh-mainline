@@ -53,27 +53,22 @@ h1 a:hover {
 .module {
     float: left;
     margin-bottom: 15px;
-    background-color: #f4f4f4;
-    border-bottom: 1px solid #f4f4f4;
-    border: 4px solid #fff;
+    padding: 4px;
+    background: url('/static/images/gray-60.png');
+    -moz-border-radius: 8px;
+    border-radius: 8px;
 }
 
 .module > .head {
-    border: 1px solid #f4f4f4;
     float: left;
-    background: #fdfdfe url('/static/images/module-head-bg.png') bottom repeat-x;
 }
 
 .module > .body {
     float: left;
     padding: 20px;
     background: #fff url('/static/images/motif.png');
-}
-
-.module > .head, 
-.module > .body {
-    border-left: 1px solid #f4f4f4;
-    border-right: 1px solid #f4f4f4;
+    -moz-border-radius: 8px;
+    border-radius: 8px;
 }
 
 .module > .foot,
@@ -374,6 +369,10 @@ abbr.foss {
     font-size: 10pt;
     color: #000;
     margin-bottom: 10px;
+}
+#notifications {
+    float: left;
+    margin-top: 10px;
 }
 .errorlist ul {
     float: left;
