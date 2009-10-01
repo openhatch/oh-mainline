@@ -83,18 +83,17 @@ h1 a:hover {
 }
 
 .submodule {
+    background-color: #fff;
     margin-bottom: 20px;
-    border: 1px solid #ddd;
-    border-top: 3px double #ddd;
-    border-bottom: 3px double #ddd;
+    border: 4px solid #f4f4f4;
+    border-radius: 8px;
+    -moz-border-radius: 8px;
     float: left;
 }
 
 .submodule > .head {
-    background: #fdfdfe url('/static/images/module-head-bg.png') bottom repeat-x;
     float: left;
     padding: 10px 20px;
-    border-bottom: 1px solid #ddd;
 }
 
 .submodule > .body {
@@ -102,7 +101,7 @@ h1 a:hover {
 }
 
 .submodule > .foot {
-    border-top: 1px solid #ddd;
+    border-top: 0;
 }
 
 ul {
