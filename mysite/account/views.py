@@ -92,6 +92,14 @@ def signup_do(request):
         return mysite.base.views.homepage(request, signup_form=signup_form)
     # }}}
 
+def signup(request, invite_code=''):
+    # {{{
+    return render_to_response('account/signup.html',
+                              {'form': mysite.account.forms.UserCreationFormWithEmail(
+                                  initial={'invite_code': invite_code})})
+    # }}}
+
+
 def logout(request):
     # {{{
     django.contrib.auth.logout(request)
