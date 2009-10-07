@@ -272,10 +272,16 @@ class SignupRequiresInvite(TwillTests):
     def test_signup_with_invite_as_if_linked_from_email(self):
         self._signup_with_invite_as_if_linked_from_email(should_work=True)
 
-    def _signup_with_invite_as_if_linked_from_email(self, should_work=True):
-        # Make a good invite code from paulproteus.
-        invite_code = InvitationKey.objects.create_invitation(
-            User.objects.get(username='paulproteus')).key
+    def test_signup_with_bad_invite_code(self):
+        self._signup_with_invite_as_if_linked_from_email(invite_code='bad',
+                                                         should_work=False)
+
+    def _signup_with_invite_as_if_linked_from_email(self, invite_code=None, 
+                                                    should_work=True):
+        # Make a good invite code from paulproteus, unless we passed one.
+        if invite_code is None:
+            invite_code = InvitationKey.objects.create_invitation(
+                User.objects.get(username='paulproteus')).key
         # Store variables for new username and password
         new_username='new_username'
         new_password='new_password'
@@ -293,7 +299,11 @@ class SignupRequiresInvite(TwillTests):
         tc.submit()
 
         # watch it succeed
-        self.assert_(User.objects.filter(username=new_username).count())
+        made_a_user = bool(User.objects.filter(username=new_username).count())
+        if should_work:
+            self.assert_(made_a_user)
+        else:
+            self.assertFalse(made_a_user)
 
     def test_invite_someone_web(self):
         target_email = 'new@ema.il'
