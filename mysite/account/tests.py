@@ -276,24 +276,21 @@ class SignupRequiresInvite(TwillTests):
         # Store variables for new username and password
         new_username='new_username'
         new_password='new_password'
+        new_email='newest@ema.il'
 
         # Go to the link the email should link us to
         tc.go(make_twill_url('http://openhatch.org/account/signup/%s ' %
                              urllib.quote(invite_code)))
 
         # Fill in new username and password
-        tc.fv('create_profile', 'username', new_username)
-        tc.fv('create_profile', 'password1', new_password)
-        tc.fv('create_profile', 'password2', new_password)
+        tc.fv('signup', 'username', new_username)
+        tc.fv('signup', 'password1', new_password)
+        tc.fv('signup', 'password2', new_password)
+        tc.fv('signup', 'email', new_email)
         tc.submit()
 
         # watch it succeed
         self.assert_(User.objects.filter(username=new_username).count())
-
-        # Now sign in with those credentials
-        self.login_with_twill(new_username, new_password)
-
-        # Gee, it worked.
 
     def test_invite_someone_web(self):
         target_email = 'new@ema.il'
