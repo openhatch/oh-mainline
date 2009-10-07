@@ -270,6 +270,9 @@ class SignupRequiresInvite(TwillTests):
         self.assert_(list(User.objects.filter(username='bob')))
 
     def test_signup_with_invite_as_if_linked_from_email(self):
+        self._signup_with_invite_as_if_linked_from_email(should_work=True)
+
+    def _signup_with_invite_as_if_linked_from_email(self, should_work=True):
         # Make a good invite code from paulproteus.
         invite_code = InvitationKey.objects.create_invitation(
             User.objects.get(username='paulproteus')).key
