@@ -45,6 +45,41 @@ def split_query_words(string):
     return ret
     # }}}
 
+def get_bugs_by_query_words(query_words):
+    """Get bugs matching any of the words in 'query_words'."""
+
+    bugs = Bug.objects.all()
+
+    # Filter
+    for word in query_words:
+        bugs = bugs.filter(
+            Q(project__language=word) |
+            Q(title__contains=word) |
+            Q(description__contains=word) |
+            Q(project__name__iexact=word))
+
+    # Sort
+    bugs = bugs.order_by('-last_touched') # Minus sign = reverse order.
+
+    return bugs
+
+def prettify_dates(bugs):
+    """Take the dates in the bugs data and say e.g. '8 days ago' rather than '10/01/2009'."""
+    for bug in bugs:
+        if bug.last_touched:
+            try:
+                bug.last_touched = timesince(bug.last_touched) + " ago"
+                bug.last_touched.split(",")[0] #FIXME: Raffi doesn't understand this line.
+            except AttributeError:
+                pass
+        if bug.last_polled:
+            try:
+                bug.last_polled = timesince(bug.last_polled) + " ago"
+                bug.last_polled.split(",")[0]
+            except AttributeError:
+                pass
+    return bugs
+
 def fetch_bugs(request):
     # {{{
 
@@ -67,16 +102,7 @@ def fetch_bugs(request):
     total_bug_count = 0
 
     if query:
-        bugs = Bug.objects.all()
-
-        for word in query_words:
-            bugs = bugs.filter(
-                Q(project__language=word) |
-                Q(title__contains=word) |
-                Q(description__contains=word) |
-                Q(project__name__iexact=word))
-
-        bugs = bugs.order_by('-last_touched') # Minus sign = reverse order.
+        bugs = get_bugs_by_query_words(query_words)
 
         total_bug_count = bugs.count()
 
@@ -86,25 +112,14 @@ def fetch_bugs(request):
             b.project.icon_url = "/static/images/icons/projects/%s.png" % \
                     b.project.name.lower()
 
+        bugs = prettify_dates(bugs)
+
         bugs = list(bugs)
+
+        bugs = prettify_dates(bugs)
 
     else:
         bugs = []
-
-    # Make some changes to how bug data is displayed.
-    for bug in bugs:
-        if bug.last_touched:
-            try:
-                bug.last_touched = timesince(bug.last_touched) + " ago"
-                bug.last_touched.split(",")[0]
-            except AtrributeError:
-                pass
-        if bug.last_polled:
-            try:
-                bug.last_polled = timesince(bug.last_polled) + " ago"
-                bug.last_polled.split(",")[0]
-            except AtrributeError:
-                pass
 
     data = {}
     data['language'] = query
