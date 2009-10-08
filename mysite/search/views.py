@@ -53,7 +53,7 @@ def get_bugs_by_query_words(query_words):
     # Filter
     for word in query_words:
         bugs = bugs.filter(
-            Q(project__language=word) |
+            Q(project__language__iexact=word) |
             Q(title__contains=word) |
             Q(description__contains=word) |
             Q(project__name__iexact=word))

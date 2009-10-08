@@ -87,23 +87,31 @@ class AutoCompleteTests(TwillTests):
         response = self.client.get( '/search/get_suggestions', {})
         self.assertEquals(response.status_code, 500)
 
-class TestNonJavascriptSearch(TwillTests):
+class SearchResults(TwillTests):
     fixtures = ['bugs-for-two-projects.json']
 
-    def testSearch(self):
-        bugs = Bug.objects.order_by('-last_touched')[:10]
-
+    def test_show_no_bugs_if_no_query(self):
+        # Call up search page with no query.
         response = self.client.get('/search/')
-        # Search shows nothing when you have no query.
+
+        # The variable 'bunch_of_bugs', passed to the template, is a blank list.
         self.assertEqual(response.context[0]['bunch_of_bugs'], [])
 
-    def testMatchingBugsFromMtoN(self):
+    def test_paginate_by_default(self):
         response = self.client.get('/search/')
         ctxt_we_care_about = [c for c in response.context if 'start' in c][0]
         self.failUnlessEqual(ctxt_we_care_about['start'], 1)
         self.failUnlessEqual(ctxt_we_care_about['end'], 10)
 
-    def testSearchWithArgs(self):
+    def test_bug_filtration_without_pagination(self):
+        """Test that get_bugs_by_query_words produces the expected results."""
+        import pdb
+        pdb.set_trace()
+        expected_bugs = { } # Get this from fixture.
+        bunch_of_bugs = mysite.search.views.get_bugs_by_query_words(['python'])
+        self.assertEqual(bunch_of_bugs,expected_bugs)
+
+    def test_results_are_what_we_expect(self):
         url = 'http://openhatch.org/search/'
         tc.go(make_twill_url(url))
         tc.fv('search_opps', 'language', 'python')
