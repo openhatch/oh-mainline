@@ -87,6 +87,49 @@ class AutoCompleteTests(TwillTests):
         response = self.client.get( '/search/get_suggestions', {})
         self.assertEquals(response.status_code, 500)
 
+class SearchResultsSpecificBugs(TwillTests):
+    fixtures = ['short_list_of_bugs.json']
+
+    def test_that_fixture_works_properly(self):
+        """If the fixture is wired correctly, when we search it for 'python', it will include bugs 0, 1, 2 and 3, and exclude bugs 400 and 401. This test checks to see if the fixture is wired correctly."""
+        self.assert_(Bug.objects.get(pk=0, project__language__iexact='PYTHON'))
+        self.assert_(Bug.objects.get(pk=1, project__name__icontains='PYTHON'))
+        self.assert_(Bug.objects.get(pk=2, title__icontains='PYTHON'))
+        self.assert_(Bug.objects.get(pk=3, description__icontains='PYTHON'))
+        non_matches = Bug.objects.exclude(project__name__icontains='PYTHON').exclude(project__language__iexact='PYTHON').exclude(title__icontains='PYTHON').exclude(description__icontains='PYTHON')
+        self.assert_([400, 401] == sorted([bug.pk for bug in non_matches]))
+
+    def test_search_single_query(self):
+        """Test that get_bugs_by_query_words produces the expected results."""
+        response = self.client.get('/search/', {'language': 'python'})
+        bugs = response.context[0]['bunch_of_bugs']
+        expected_bug_keys = [0, 1, 2, 3] 
+        retrieved_bug_keys = sorted([bug.pk for bug in bugs])
+        self.assertEqual(expected_bug_keys, retrieved_bug_keys)
+
+    def test_search_two_queries(self):
+
+        title_of_bug_to_include = 'An interesting title'
+        title_of_bug_to_exclude = "This shouldn't be in the results for [pyt*hon 'An interesting description']."
+
+        # If either of these bugs aren't there, then this test won't work properly.
+        self.assert_(len(list(Bug.objects.filter(title=title_of_bug_to_include))) == 1)
+        self.assert_(len(list(Bug.objects.filter(title=title_of_bug_to_exclude))) == 1)
+
+        response = self.client.get('/search/',
+                                   {'language': 'python "An interesting description"'})
+
+        included_the_right_bug = False
+        excluded_the_wrong_bug = True
+        for bug in response.context[0]['bunch_of_bugs']:
+            if bug.title == title_of_bug_to_include:
+                included_the_right_bug = True
+            if bug.title == title_of_bug_to_exclude:
+                excluded_the_wrong_bug = False
+
+        self.assert_(included_the_right_bug)
+        self.assert_(excluded_the_wrong_bug)
+
 class SearchResults(TwillTests):
     fixtures = ['bugs-for-two-projects.json']
 
@@ -102,58 +145,6 @@ class SearchResults(TwillTests):
         ctxt_we_care_about = [c for c in response.context if 'start' in c][0]
         self.failUnlessEqual(ctxt_we_care_about['start'], 1)
         self.failUnlessEqual(ctxt_we_care_about['end'], 10)
-
-    def test_bug_filtration_without_pagination(self):
-        """Test that get_bugs_by_query_words produces the expected results."""
-        import pdb
-        pdb.set_trace()
-        expected_bugs = { } # Get this from fixture.
-        bunch_of_bugs = mysite.search.views.get_bugs_by_query_words(['python'])
-        self.assertEqual(bunch_of_bugs,expected_bugs)
-
-    def test_results_are_what_we_expect(self):
-        url = 'http://openhatch.org/search/'
-        tc.go(make_twill_url(url))
-        tc.fv('search_opps', 'language', 'python')
-        tc.submit()
-
-        # Grab descriptions of first 10 Exaile bugs
-        bugs = Bug.objects.filter(project__name=
-                                  'Exaile').order_by('-last_touched')[:10]
-
-        for bug in bugs:
-            tc.find(bug.description)
-
-        tc.fv('search_opps', 'language', 'c#')
-        tc.submit()
-        
-        # Grab descriptions of first 10 GNOME-Do bugs
-        bugs = Bug.objects.filter(project__name=
-                                  'GNOME-Do').order_by('-last_touched')[:10]
-        for bug in bugs:
-            tc.find(bug.description)
-
-    def testSearchCombinesQueries(self):
-        response = self.client.get('/search/',
-                                   {'language': 'python "Description #10"'})
-
-        found_it = False
-        for bug in response.context[0]['bunch_of_bugs']:
-            if bug.title == 'Title #10':
-                found_it = True
-
-        self.assert_(found_it)
-
-    def testSearchProjectName(self):
-        response = self.client.get('/search/',
-                                   {'language': 'exaile #10'})
-
-        found_it = False
-        for bug in response.context[0]['bunch_of_bugs']:
-            if bug.title == 'Title #10':
-                found_it = True
-
-        self.assert_(found_it)
 
     def test_json_view(self):
         tc.go(make_twill_url('http://openhatch.org/search/?format=json&jsoncallback=callback&language=python'))
