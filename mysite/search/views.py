@@ -63,23 +63,6 @@ def get_bugs_by_query_words(query_words):
 
     return bugs
 
-def prettify_dates(bugs):
-    """Take the dates in the bugs data and say e.g. '8 days ago' rather than '10/01/2009'."""
-    for bug in bugs:
-        if bug.last_touched:
-            try:
-                bug.last_touched = timesince(bug.last_touched) + " ago"
-                bug.last_touched.split(",")[0] #FIXME: Raffi doesn't understand this line.
-            except AttributeError:
-                pass
-        if bug.last_polled:
-            try:
-                bug.last_polled = timesince(bug.last_polled) + " ago"
-                bug.last_polled.split(",")[0]
-            except AttributeError:
-                pass
-    return bugs
-
 def fetch_bugs(request):
     # {{{
 
@@ -112,11 +95,7 @@ def fetch_bugs(request):
             b.project.icon_url = "/static/images/icons/projects/%s.png" % \
                     b.project.name.lower()
 
-        bugs = prettify_dates(bugs)
-
         bugs = list(bugs)
-
-        bugs = prettify_dates(bugs)
 
     else:
         bugs = []

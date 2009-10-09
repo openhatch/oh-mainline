@@ -46,7 +46,7 @@
             <label>Last touched: </label>
             <span class='value'>
                 {% if bug.last_touched %}
-                {{ bug.last_touched }}
+                {{ bug.last_touched|timesince_terse }} ago
                 {% else %}
                 Unknown
                 {% endif %}
@@ -69,7 +69,7 @@
             <label>Last polled: </label>
             <span class='value'>
                 {% if bug.last_polled %}
-                {{ bug.last_polled }}
+                {{ bug.last_polled|timesince_terse }} ago
                 {% endif %}
             </span>
             {# <a href=''>poll now</a> #}
