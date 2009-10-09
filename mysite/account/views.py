@@ -89,8 +89,19 @@ def signup_do(request):
                 '/people/%s/' % urllib.quote(username))
 
     else:
-        return mysite.base.views.homepage(request, signup_form=signup_form)
+        return mysite.account.views.signup(request, signup_form=signup_form)
     # }}}
+
+def signup(request, signup_form=None, invite_code=''):
+    # {{{
+    if signup_form is None:
+        signup_form = mysite.account.forms.UserCreationFormWithEmail(
+            initial={'invite_code': invite_code})
+
+    return render_to_response('account/signup.html',
+                              {'form': signup_form})
+    # }}}
+
 
 def logout(request):
     # {{{

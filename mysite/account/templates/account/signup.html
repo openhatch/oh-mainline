@@ -1,0 +1,32 @@
+{% extends 'base/one_column.html' %}
+{% load i18n %}
+
+{% block title %}
+Sign up - OpenHatch
+{% endblock title %}
+
+{% block css %}
+{{ block.super }}
+@import url('/static/css/account/auth.css') all;
+{% endblock css %}
+
+{% block main %}
+<div id='login' class='module'>
+    <div class='head'>
+        <h3>Signup</h3>
+    </div>
+    <div class='body'>
+      <p>{% trans "Welcome to OpenHatch. Let us know what username and password you would like." %}</p>
+      
+      <form name="signup" action="{% url mysite.account.views.signup_do %}" method="post">
+	{{ form.as_p }}
+	<p>
+	  <input type="submit" value="{% trans 'Sign up!' %}" />
+	</p>
+      </form>
+    </div>
+    <div class='foot'>
+        Don't have an account yet? Then <a style='font-weight: bold;' href='/#tab=create_profile'>sign up for one</a>.
+    </div>
+</div>
+{% endblock main %}
