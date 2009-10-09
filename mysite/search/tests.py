@@ -25,7 +25,14 @@ from django.core.urlresolvers import reverse
 from django.conf import settings
 from StringIO import StringIO
 
-class AutoCompleteTests(TwillTests):
+class SearchTest(TwillTests):
+    def search_via_twill(self, query=None):
+        search_url = "http://openhatch.org/search/" 
+        if query:
+            search_url += '?language=%s' % query
+        tc.go(make_twill_url(search_url))
+
+class AutoCompleteTests(SearchTest):
     """
     Test whether the autocomplete can handle
      - a field-specific query
@@ -87,7 +94,7 @@ class AutoCompleteTests(TwillTests):
         response = self.client.get( '/search/get_suggestions', {})
         self.assertEquals(response.status_code, 500)
 
-class TestNonJavascriptSearch(TwillTests):
+class TestNonJavascriptSearch(SearchTest):
     fixtures = ['bugs-for-two-projects.json']
 
     def testSearch(self):
@@ -226,7 +233,7 @@ sample_launchpad_data_dump.return_value = [dict(
         date_reported=time.localtime(),
         title="Joi's Lab AFS",)]
 
-class AutoCrawlTests(TwillTests):
+class AutoCrawlTests(SearchTest):
     @mock.patch('mysite.search.launchpad_crawl.dump_data_from_project', 
                 sample_launchpad_data_dump)
     def testSearch(self):
@@ -254,7 +261,7 @@ class AutoCrawlTests(TwillTests):
         self.assertEqual(new_b.title, "Joi's Lab AFS") # bug title restored
         # thanks to fresh import
 
-class LaunchpadImporterTests(TwillTests):
+class LaunchpadImporterTests(SearchTest):
     def test_lp_update_handler(self):
         '''Test the Launchpad import handler with some fake data.'''
         some_date = datetime.datetime(2009, 4, 1, 2, 2, 2)
@@ -319,7 +326,7 @@ class LaunchpadImporterTests(TwillTests):
         del out_d['last_polled']
         self.assertEqual(sample_out_data, out_d)
 
-class Recommend(TwillTests):
+class Recommend(SearchTest):
     fixtures = ['user-paulproteus.json',
             'person-paulproteus.json',
             'cchost-data-imported-from-ohloh.json',
@@ -396,5 +403,17 @@ class TestQuerySplitter(django.test.TestCase):
         easy = 'c#'
         self.assertEqual(mysite.search.views.split_query_words(easy),
                          ['c#'])
+
+class ResultsIncludeProjectLanguage(SearchTest):
+    fixtures = ['bugs-for-two-projects.json']
+
+    def test_python_results_include_python(self):
+        self.search_via_twill('Exaile')
+
+        # It's easier to pass this test...
+        tc.find("Python")
+
+        # ...than this one.
+        tc.find("<span class='project__language'>Python</span>")
 
 # vim: set ai et ts=4 sw=4 columns=80:
