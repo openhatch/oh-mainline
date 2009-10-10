@@ -9,6 +9,21 @@ $ python bootstrap.py
 $ ./bin/buildout
 $ ./bin/mysite runserver
 
+# Set up the database.
+mysql -u root -p < "CREATE DATABASE; CREATE USER 'oh_milestone_a'@'localhost' IDENTIFIED BY 'ahmaC0Th'; GRANT ALL ON oh_milestone_a.* TO 'oh_milestona_a'@'localhost';
+# Or use 'mysql -u username', where username is a MySQL user with the appropriate privileges.
+
+../bin/mysite syncdb
+
+# You may need to migrate using this command:
+../bin/mysite migrate
+
+# Sometimes the migrations don't work, and South will give you a MySQL script. Your next challenge, wee padawan, is to fix the syntax errors in this MySQL. Run this vim command for starters.
+:%s/^ = //
+# For non-vimmers, that means "Delete the string ' = ' when it appears at the beginnings of lines."
+# Then remove those trailing square brackets.
+# Regarding dates. You may need to replace South's strange Pythonesque code for dates with proper MySQL code.
+
 Now load http://127.0.0.1:8000/search/ in your web browser.
 
 == Testing ==
