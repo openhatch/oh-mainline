@@ -35,6 +35,8 @@ class TwillTests(django.test.TestCase):
         twill_quiet()
 
     def tearDown(self):
+        # If you get an error on one of these lines,
+        # maybe you didn't run base.TwillTests.setUp?
         from django.conf import settings
         settings.DEBUG_PROPAGATE_EXCEPTIONS = self.old_dbe
         twill_teardown()

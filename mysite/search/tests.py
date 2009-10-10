@@ -17,15 +17,19 @@ import time
 import twill
 from twill import commands as tc
 from twill.shell import TwillCommandLoop
+
 from django.test import TestCase
 from django.core.servers.basehttp import AdminMediaHandler
 from django.core.handlers.wsgi import WSGIHandler
 from django.core.urlresolvers import reverse
 
+from django.db.models import Q 
+
 from django.conf import settings
 from StringIO import StringIO
 
 class SearchTest(TwillTests):
+
     def search_via_twill(self, query=None):
         search_url = "http://openhatch.org/search/" 
         if query:
@@ -40,7 +44,7 @@ class AutoCompleteTests(SearchTest):
     """
 
     def setUp(self):
-        TwillTests.setUp(self)
+        SearchTest.setUp(self)
         self.project_chat = Project.objects.create(name='ComicChat', language='C++')
         self.project_kazaa = Project.objects.create(name='Kazaa', language='Vogon')
         self.bug_in_chat = Bug.objects.create(project=self.project_chat,
@@ -94,25 +98,81 @@ class AutoCompleteTests(SearchTest):
         response = self.client.get( '/search/get_suggestions', {})
         self.assertEquals(response.status_code, 500)
 
-class SearchResultsSpecificBugs(TwillTests):
+class SearchResultsSpecificBugs(SearchTest):
     fixtures = ['short_list_of_bugs.json']
 
+    def setUp(self):
+        SearchTest.setUp(self)
+
+        query = 'PYTHON'
+
+        # The four canonical_filters by which a bug can match a query
+        self.canonical_filters = [
+                Q(project__language__iexact=query),
+                Q(project__name__icontains=query),
+                Q(title__icontains=query),
+                Q(description__icontains=query)
+                ]
+
+    def no_canonical_filters(self, except_one=Q()):
+        """Returns the complex filter, 'Matches no canonical filters except the specified one.'"""
+
+        # Create the complex filter, 'Matches no canonical filters,
+        # except perhaps the specified one.'
+        other_c_filters = Q() # Initial value
+        for cf in self.canonical_filters:
+            if cf != except_one: 
+                other_c_filters = other_c_filters | cf 
+
+        # Read this as "Just that one filter and no others."
+        return except_one & ~other_c_filters
+
     def test_that_fixture_works_properly(self):
-        """If the fixture is wired correctly, when we search it for 'python', it will include bugs 0, 1, 2 and 3, and exclude bugs 400 and 401. This test checks to see if the fixture is wired correctly."""
-        self.assert_(Bug.objects.get(pk=0, project__language__iexact='PYTHON'))
-        self.assert_(Bug.objects.get(pk=1, project__name__icontains='PYTHON'))
-        self.assert_(Bug.objects.get(pk=2, title__icontains='PYTHON'))
-        self.assert_(Bug.objects.get(pk=3, description__icontains='PYTHON'))
-        non_matches = Bug.objects.exclude(project__name__icontains='PYTHON').exclude(project__language__iexact='PYTHON').exclude(title__icontains='PYTHON').exclude(description__icontains='PYTHON')
-        self.assert_([400, 401] == sorted([bug.pk for bug in non_matches]))
+        """Is the fixture is wired correctly?
+        
+        To test the search engine, I've loaded the fixture with six
+        'canonical' bugs. Four of them are canonical matches, two
+        are canonical non-matches. A working search engine will return
+        just the matches.
+
+        There are four ways a bug can match a query:
+            - project language = the query
+            - project name contains the query
+            - project title contains the query
+            - project description contains the query
+
+        Let's call each of these a 'canonical filter'.
+
+        For each of these canonical filters, there should be a canonical bug
+        in the fixture that matches that, and only that, filter.
+
+        This test checks the fixture for the existence of these
+        canonical bugs.
+
+        If the fixture is wired correctly, when we search it for 
+        'python', it will return bugs 1, 2, 3 and 4, and exclude
+        bugs 400 and 401. """
+
+        # Remember, a canonical bug meets ONLY ONE criterion.
+        # Assert there's just one canonical bug per criterion.
+        for cf in self.canonical_filters:
+            matches = Bug.objects.filter(self.no_canonical_filters(except_one=cf))[:]
+            self.failUnlessEqual(len(matches), 1,
+                    "There are %d, not 1, canonical bug(s) for the filter %s" % (len(matches), cf))
+
+        # Assert there's at least one canonical nonmatch.
+        canonical_non_matches = Bug.objects.filter(self.no_canonical_filters())
+        self.assert_(len(canonical_non_matches) > 1)
 
     def test_search_single_query(self):
         """Test that get_bugs_by_query_words produces the expected results."""
         response = self.client.get('/search/', {'language': 'python'})
-        bugs = response.context[0]['bunch_of_bugs']
-        expected_bug_keys = [0, 1, 2, 3] 
-        retrieved_bug_keys = sorted([bug.pk for bug in bugs])
-        self.assertEqual(expected_bug_keys, retrieved_bug_keys)
+        returned_bugs = response.context[0]['bunch_of_bugs']
+        for cf in self.canonical_filters:
+            self.failUnless(Bug.objects.filter(cf)[0] in returned_bugs, "Search engine did not correctly use the filter %s" % cf)
+
+        for bug in Bug.objects.filter(self.no_canonical_filters()):
+            self.failIf(bug in returned_bugs, "Search engine returned a false positive: %s." % bug)
 
     def test_search_two_queries(self):
 
@@ -415,4 +475,4 @@ class ResultsIncludeProjectLanguage(SearchTest):
         # ...than this one.
         tc.find("<span class='project__language'>Python</span>")
 
-# vim: set ai et ts=4 sw=4 columns=80:
+# vim: set nu ai et ts=4 sw=4 columns=80:

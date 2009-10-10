@@ -157,7 +157,7 @@
 ,
 
 {
-    "pk": 0,
+    "pk": 4,
     "model": "search.bug",
     "fields": 
     {
