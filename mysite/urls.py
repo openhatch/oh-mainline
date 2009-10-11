@@ -161,6 +161,11 @@ urlpatterns = patterns('',
         (r'^people/user_selected_these_dia_checkboxes$',
                 'mysite.profile.views.user_selected_these_dia_checkboxes'),
 
+        # favicon.ico. Someday this should be handled by Apache.
+        (r'^(favicon.ico)',
+         'django.views.static.serve',
+            {'document_root': settings.MEDIA_ROOT + '/images'}),
+
         # This dangerous regex is last
         (r'^people/(?P<user_to_display__username>[^/]+)[/?]$',
                 'mysite.profile.views.display_person_web'),
