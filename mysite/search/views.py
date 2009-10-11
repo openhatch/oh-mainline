@@ -47,6 +47,7 @@ def split_query_words(string):
 
 def fetch_bugs(request):
     # {{{
+
     # FIXME: Give bugs some date field
 
     if request.user.is_authenticated():

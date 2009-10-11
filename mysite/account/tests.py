@@ -1,11 +1,13 @@
 #{{{ imports
 import os
 import Image
+import urllib
 
 from mysite.profile.models import Person
 from mysite.base.tests import make_twill_url, TwillTests
 from mysite.profile.models import Person
 import mysite.account.views
+import mysite.account.forms
 
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
@@ -268,6 +270,42 @@ class SignupRequiresInvite(TwillTests):
         # watch it succeed
         self.assert_(list(User.objects.filter(username='bob')))
 
+    def test_signup_with_invite_as_if_linked_from_email(self):
+        self._signup_with_invite_as_if_linked_from_email(should_work=True)
+
+    def test_signup_with_bad_invite_code(self):
+        self._signup_with_invite_as_if_linked_from_email(invite_code='bad',
+                                                         should_work=False)
+
+    def _signup_with_invite_as_if_linked_from_email(self, invite_code=None, 
+                                                    should_work=True):
+        # Make a good invite code from paulproteus, unless we passed one.
+        if invite_code is None:
+            invite_code = InvitationKey.objects.create_invitation(
+                User.objects.get(username='paulproteus')).key
+        # Store variables for new username and password
+        new_username='new_username'
+        new_password='new_password'
+        new_email='newest@ema.il'
+
+        # Go to the link the email should link us to
+        tc.go(make_twill_url('http://openhatch.org/account/signup/%s ' %
+                             urllib.quote(invite_code)))
+
+        # Fill in new username and password
+        tc.fv('signup', 'username', new_username)
+        tc.fv('signup', 'password1', new_password)
+        tc.fv('signup', 'password2', new_password)
+        tc.fv('signup', 'email', new_email)
+        tc.submit()
+
+        # watch it succeed
+        made_a_user = bool(User.objects.filter(username=new_username).count())
+        if should_work:
+            self.assert_(made_a_user)
+        else:
+            self.assertFalse(made_a_user)
+
     def test_invite_someone_web(self):
         target_email = 'new@ema.il'
         client = self.login_with_client()
@@ -277,5 +315,34 @@ class SignupRequiresInvite(TwillTests):
 
         self.assertEqual(django.core.mail.outbox[0].recipients(),
                          [target_email])
+
+    def _test_openid_signup_form(self, data, should_work):
+        # Make a good invite code from paulproteus.
+        form = mysite.account.forms.OpenidRegisterFormWithInviteCode(data)
+        if should_work:
+            self.assert_(form.is_valid())
+        else:
+            self.assertFalse(form.is_valid())
+
+    def test_openid_signup_fails_without_invite(self):
+        # invite code key missing
+        data = {'username': 'some_new_guy', 'email': 'you@yourmom.com'}
+        self._test_openid_signup_form(data=data, should_work=False)
+
+        # invite code key empty
+        data = {'username': 'some_new_guy', 'email': 'you@yourmom.com',
+                'invite_code': ''}
+        self._test_openid_signup_form(data=data, should_work=False)
+
+        # invite code key wrong
+        data = {'username': 'some_new_guy', 'email': 'you@yourmom.com',
+                'invite_code': 'not a valid code'}
+        self._test_openid_signup_form(data=data, should_work=False)
+
+    def test_openid_signup_succeeds_with_invite(self):
+        data = {'username': 'some_new_guy', 'email': 'you@yourmom.com',
+                'invite_code': InvitationKey.objects.create_invitation(
+                    User.objects.get(username='paulproteus')).key}
+        self._test_openid_signup_form(data=data, should_work=True)
 
 # vim: set nu:

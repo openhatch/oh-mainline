@@ -15,6 +15,7 @@
 </div>
 <div class='second-line'>
     <span class='description-container'>
+        <span class='project__language'>{{ bug.project.language|highlight:query_words }}</span> -
         {% if bug.good_for_newcomers %}
         <span class='good-for-beginners'>
             Good for newcomers</span>
