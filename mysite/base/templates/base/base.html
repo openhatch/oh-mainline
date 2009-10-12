@@ -14,10 +14,15 @@
 
         <style type='text/css'> /*<![CDATA[*/
             {% block css %}
-            @import url('/static/css/base/base.css') all;
+            @import url('/static/css/base/base.css');
             {% endblock css %}
             /*]]>*/
         </style>
+
+	<!--[if lt IE 8]>
+	<script src="http://ie7-js.googlecode.com/svn/version/2.0(beta3)/IE8.js"
+	type="text/javascript"></script>
+	<![endif]-->
 
         <script type='text/javascript' src='/static/js/base.js'></script>
         {% block js_in_head %}
