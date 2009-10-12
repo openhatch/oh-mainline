@@ -872,5 +872,8 @@ class PersonInfoLinksToSearch(TwillTests):
         # Now, click on "thing1"
         tc.follow("thing1")
 
+        # Now find ourself there
+        tc.find('Asheesh Laroia')
+
 
 # vim: set ai et ts=4 sw=4 nu:
