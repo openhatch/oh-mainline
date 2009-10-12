@@ -24,4 +24,4 @@ class Bug(models.Model):
     good_for_newcomers = models.BooleanField(default=False)
 
     def __unicode__(self):
-        return "<Bug title='%s' project='%s' description='%s...'>" % (self.title, self.project.name, self.description[:50])
+        return "<Bug title='%s' project='%s' project__language='%s' description='%s...'>" % (self.title, self.project.name, self.project.language, self.description[:50])
