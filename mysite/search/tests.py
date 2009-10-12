@@ -17,15 +17,19 @@ import time
 import twill
 from twill import commands as tc
 from twill.shell import TwillCommandLoop
+
 from django.test import TestCase
 from django.core.servers.basehttp import AdminMediaHandler
 from django.core.handlers.wsgi import WSGIHandler
 from django.core.urlresolvers import reverse
 
+from django.db.models import Q 
+
 from django.conf import settings
 from StringIO import StringIO
 
 class SearchTest(TwillTests):
+
     def search_via_twill(self, query=None):
         search_url = "http://openhatch.org/search/" 
         if query:
@@ -40,7 +44,7 @@ class AutoCompleteTests(SearchTest):
     """
 
     def setUp(self):
-        TwillTests.setUp(self)
+        SearchTest.setUp(self)
         self.project_chat = Project.objects.create(name='ComicChat', language='C++')
         self.project_kazaa = Project.objects.create(name='Kazaa', language='Vogon')
         self.bug_in_chat = Bug.objects.create(project=self.project_chat,
@@ -94,65 +98,120 @@ class AutoCompleteTests(SearchTest):
         response = self.client.get( '/search/get_suggestions', {})
         self.assertEquals(response.status_code, 500)
 
-class TestNonJavascriptSearch(SearchTest):
+class SearchResultsSpecificBugs(SearchTest):
+    fixtures = ['short_list_of_bugs.json']
+
+    def setUp(self):
+        SearchTest.setUp(self)
+
+        query = 'PYTHON'
+
+        # The four canonical_filters by which a bug can match a query
+        self.canonical_filters = [
+                Q(project__language__iexact=query),
+                Q(project__name__icontains=query),
+                Q(title__icontains=query),
+                Q(description__icontains=query)
+                ]
+
+    def no_canonical_filters(self, except_one=Q()):
+        """Returns the complex filter, 'Matches no canonical filters except the specified one.'"""
+
+        # Create the complex filter, 'Matches no canonical filters,
+        # except perhaps the specified one.'
+        other_c_filters = Q() # Initial value
+        for cf in self.canonical_filters:
+            if cf != except_one: 
+                other_c_filters = other_c_filters | cf 
+
+        # Read this as "Just that one filter and no others."
+        return except_one & ~other_c_filters
+
+    def test_that_fixture_works_properly(self):
+        """Is the fixture is wired correctly?
+        
+        To test the search engine, I've loaded the fixture with six
+        'canonical' bugs. Four of them are canonical matches, two
+        are canonical non-matches. A working search engine will return
+        just the matches.
+
+        There are four ways a bug can match a query:
+            - project language = the query
+            - project name contains the query
+            - project title contains the query
+            - project description contains the query
+
+        Let's call each of these a 'canonical filter'.
+
+        For each of these canonical filters, there should be a canonical bug
+        in the fixture that matches that, and only that, filter.
+
+        This test checks the fixture for the existence of these
+        canonical bugs.
+
+        If the fixture is wired correctly, when we search it for 
+        'python', it will return bugs 1, 2, 3 and 4, and exclude
+        bugs 400 and 401. """
+
+        # Remember, a canonical bug meets ONLY ONE criterion.
+        # Assert there's just one canonical bug per criterion.
+        for cf in self.canonical_filters:
+            matches = Bug.objects.filter(self.no_canonical_filters(except_one=cf))[:]
+            self.failUnlessEqual(len(matches), 1,
+                    "There are %d, not 1, canonical bug(s) for the filter %s" % (len(matches), cf))
+
+        # Assert there's at least one canonical nonmatch.
+        canonical_non_matches = Bug.objects.filter(self.no_canonical_filters())
+        self.assert_(len(canonical_non_matches) > 1)
+
+    def test_search_single_query(self):
+        """Test that get_bugs_by_query_words produces the expected results."""
+        response = self.client.get('/search/', {'language': 'python'})
+        returned_bugs = response.context[0]['bunch_of_bugs']
+        for cf in self.canonical_filters:
+            self.failUnless(Bug.objects.filter(cf)[0] in returned_bugs, "Search engine did not correctly use the filter %s" % cf)
+
+        for bug in Bug.objects.filter(self.no_canonical_filters()):
+            self.failIf(bug in returned_bugs, "Search engine returned a false positive: %s." % bug)
+
+    def test_search_two_queries(self):
+
+        title_of_bug_to_include = 'An interesting title'
+        title_of_bug_to_exclude = "This shouldn't be in the results for [pyt*hon 'An interesting description']."
+
+        # If either of these bugs aren't there, then this test won't work properly.
+        self.assert_(len(list(Bug.objects.filter(title=title_of_bug_to_include))) == 1)
+        self.assert_(len(list(Bug.objects.filter(title=title_of_bug_to_exclude))) == 1)
+
+        response = self.client.get('/search/',
+                                   {'language': 'python "An interesting description"'})
+
+        included_the_right_bug = False
+        excluded_the_wrong_bug = True
+        for bug in response.context[0]['bunch_of_bugs']:
+            if bug.title == title_of_bug_to_include:
+                included_the_right_bug = True
+            if bug.title == title_of_bug_to_exclude:
+                excluded_the_wrong_bug = False
+
+        self.assert_(included_the_right_bug)
+        self.assert_(excluded_the_wrong_bug)
+
+class SearchResults(TwillTests):
     fixtures = ['bugs-for-two-projects.json']
 
-    def testSearch(self):
-        bugs = Bug.objects.order_by('-last_touched')[:10]
-
+    def test_show_no_bugs_if_no_query(self):
+        # Call up search page with no query.
         response = self.client.get('/search/')
-        # Search shows nothing when you have no query.
+
+        # The variable 'bunch_of_bugs', passed to the template, is a blank list.
         self.assertEqual(response.context[0]['bunch_of_bugs'], [])
 
-    def testMatchingBugsFromMtoN(self):
+    def test_paginate_by_default(self):
         response = self.client.get('/search/')
         ctxt_we_care_about = [c for c in response.context if 'start' in c][0]
         self.failUnlessEqual(ctxt_we_care_about['start'], 1)
         self.failUnlessEqual(ctxt_we_care_about['end'], 10)
-
-    def testSearchWithArgs(self):
-        url = 'http://openhatch.org/search/'
-        tc.go(make_twill_url(url))
-        tc.fv('search_opps', 'language', 'python')
-        tc.submit()
-
-        # Grab descriptions of first 10 Exaile bugs
-        bugs = Bug.objects.filter(project__name=
-                                  'Exaile').order_by('-last_touched')[:10]
-
-        for bug in bugs:
-            tc.find(bug.description)
-
-        tc.fv('search_opps', 'language', 'c#')
-        tc.submit()
-        
-        # Grab descriptions of first 10 GNOME-Do bugs
-        bugs = Bug.objects.filter(project__name=
-                                  'GNOME-Do').order_by('-last_touched')[:10]
-        for bug in bugs:
-            tc.find(bug.description)
-
-    def testSearchCombinesQueries(self):
-        response = self.client.get('/search/',
-                                   {'language': 'python "Description #10"'})
-
-        found_it = False
-        for bug in response.context[0]['bunch_of_bugs']:
-            if bug.title == 'Title #10':
-                found_it = True
-
-        self.assert_(found_it)
-
-    def testSearchProjectName(self):
-        response = self.client.get('/search/',
-                                   {'language': 'exaile #10'})
-
-        found_it = False
-        for bug in response.context[0]['bunch_of_bugs']:
-            if bug.title == 'Title #10':
-                found_it = True
-
-        self.assert_(found_it)
 
     def test_json_view(self):
         tc.go(make_twill_url('http://openhatch.org/search/?format=json&jsoncallback=callback&language=python'))
@@ -416,4 +475,4 @@ class ResultsIncludeProjectLanguage(SearchTest):
         # ...than this one.
         tc.find("<span class='project__language'>Python</span>")
 
-# vim: set ai et ts=4 sw=4 columns=80:
+# vim: set nu ai et ts=4 sw=4 columns=80:
