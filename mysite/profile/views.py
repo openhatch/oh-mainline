@@ -943,6 +943,11 @@ def display_person_edit_name(request, name_edit_mode):
     # }}}
 
 @login_required
+def display_list_of_people_who_match_some_search(request, property, value):
+    '''Property is the "tag name", and "value" is the text in it.'''
+    return HttpResponse('')
+
+@login_required
 def display_person_edit_name_do(request):
     '''Take the new first name and last name out of the POST.
 

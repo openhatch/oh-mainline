@@ -841,5 +841,36 @@ class OnlyFreshDiasAreSelected(TwillTests):
         # Now verify it's done
         self.assert_(DataImportAttempt.objects.get().stale)
 
+class PersonInfoLinksToSearch(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+    
+    def test_whatever(self):
+        '''
+        * Have a user, say that he understands+wantstolearn+currentlylearns+canmentor something
+        * Go to his user page, and click those various links
+        * Find yourself on some search page that mentions the user.
+        '''
+        tags = {
+            'understands': ['thing1'],
+            'understands_not': ['thing2'],
+            'seeking': ['thing3'],
+            'studying': ['thing4'],
+            'can_mentor': ['thing5'],
+            }
+
+        # Log in as paulproteus
+        
+        self.login_with_twill()
+
+        # Update paulproteus's tags
+        url = 'http://openhatch.org/people/edit/info'
+        tc.go(make_twill_url(url))
+        for tag_type_name in tags:
+            tc.fv('edit-tags', 'edit-tags-' + tag_type_name, ", ".join(tags[tag_type_name]))
+        tc.submit()
+
+        # Now, click on "thing1"
+        tc.follow("thing1")
+
 
 # vim: set ai et ts=4 sw=4 nu:

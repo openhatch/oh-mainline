@@ -116,7 +116,10 @@
         {% else %}
         {% if tags.understands and tags_flat.understands %}
         <div class='tags' id='tags-understands'>
-            <span class='tag-type'>understands:</span> {{ tags_flat.understands }}
+            <span class='tag-type'>understands:</span>
+	    {% for thingamabob in tags.understands %}
+	    <a href="/people-who/understands/{{ thingamabob.text }}">{{ thingamabob.text }}</a>{% if not forloop.last %}, {% endif %}
+	    {% endfor %}
         </div>
         {% endif %}
         {% if tags.understands_not and tags_flat.understands_not %}
