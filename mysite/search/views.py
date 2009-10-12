@@ -95,8 +95,6 @@ def fetch_bugs(request):
             b.project.icon_url = "/static/images/icons/projects/%s.png" % \
                     b.project.name.lower()
 
-        bugs = list(bugs)
-
     else:
         bugs = []
 
