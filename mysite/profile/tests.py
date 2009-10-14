@@ -361,7 +361,7 @@ class ProjectExpTests(TwillTests):
         soup = BeautifulSoup.BeautifulSoup(tc.show())
         for tag_type_name in tag_dict:
             text = ''.join(soup(id='tags-%s' % tag_type_name)[0].findAll(text=True))
-            self.assert_(', '.join(tag_dict[tag_type_name]) in text)
+            self.assert_(', '.join(tag_dict[tag_type_name]) in ' '.join(text.split()))
 
         # Go back to the form and make sure some of these are there
         tc.go(make_twill_url(url))
