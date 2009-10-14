@@ -172,4 +172,6 @@ urlpatterns = patterns('',
 
         )
 
+handler404 = 'base.views.page_not_found'
+
 # vim: set ai ts=4 sts=4 et sw=4:

@@ -77,3 +77,6 @@ def page_to_js(request):
     return render_to_response('base/append_ourselves.js',
                               {'in_string': encoded_for_js},
                               mimetype='application/javascript')
+
+def page_not_found(request):
+    return render_to_response('base/404.html')
