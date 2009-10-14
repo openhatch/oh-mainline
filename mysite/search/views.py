@@ -59,7 +59,10 @@ def get_bugs_by_query_words(query_words):
             Q(project__name__icontains=word))
 
     # Sort
-    bugs = bugs.order_by('-last_touched') # Minus sign = reverse order.
+    bugs = bugs.order_by('-good_for_newcomers', '-last_touched')
+    # Minus sign: reverse order
+    # Minus good for newcomers: this means true values (like 1) appear before false values (like 0)
+    # Minus last touched: Old bugs last.
 
     return bugs
 
@@ -86,6 +89,7 @@ def fetch_bugs(request):
 
     if query:
         bugs = get_bugs_by_query_words(query_words)
+
 
         total_bug_count = bugs.count()
 
