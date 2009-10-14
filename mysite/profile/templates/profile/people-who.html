@@ -1,0 +1,9 @@
+<ul>
+{% for person in people_search_results %}
+<li>
+  <a href="/people/{{ person.username }}">
+    {{ person.user.first_name}} {{ person.user.last_name}}
+  </a>
+</li>
+{% endfor %}
+</ul>
