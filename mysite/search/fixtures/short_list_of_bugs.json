@@ -1,0 +1,203 @@
+[
+{
+    "pk": 2,
+        "model": "search.project",
+        "fields": 
+        {
+            "icon_url": "https://launchpadlibrarian.net/9017963/foo.png",
+            "name": "x",
+            "language": "pYthOn"
+        }
+
+}
+,
+
+{
+    "pk": 3,
+    "model": "search.project",
+    "fields": 
+    {
+        "icon_url": "https://launchpadlibrarian.net/9017963/foo.png",
+        "name": "!!!pYThOn!!!",
+        "language": "x"
+    }
+
+}
+,
+
+{
+    "pk": 4,
+    "model": "search.project",
+    "fields": 
+    {
+        "icon_url": "https://launchpadlibrarian.net/9017963/foo.png",
+        "name": "pYThOn",
+        "language": "x"
+    }
+
+}
+,
+
+{
+    "pk": 500,
+    "model": "search.project",
+    "fields": 
+    {
+        "icon_url": "http://google.com/",
+        "name": "xxxx",
+        "language": "x"
+    }
+
+}
+,
+
+{
+    "pk": 125,
+    "model": "search.project",
+    "fields": 
+    {
+        "icon_url": "http://google.com/",
+        "name": "xx",
+        "language": "Python"
+    }
+
+}
+,
+
+{
+    "pk": 3,
+    "model": "search.bug",
+    "fields": 
+    {
+        "status": "New",
+        "last_polled": "2009-06-08 23:04:31",
+        "submitter_realname": "Mister 8",
+        "description": "pYthOn",
+        "title": "-",
+        "importance": "Importance #8",
+        "people_involved": 26,
+        "last_touched": "2009-06-06 06:28:39",
+        "submitter_username": "username 8",
+        "project": 500,
+        "good_for_newcomers": 0,
+        "canonical_bug_link": "https://bugs.launchpad.net/",
+        "date_reported": "2009-05-31 23:02:07"
+    }
+
+}
+,
+
+{
+    "pk": 2,
+    "model": "search.bug",
+    "fields": 
+    {
+        "status": "-",
+        "last_polled": "2009-10-08 17:10:16",
+        "submitter_realname": "-",
+        "description": "-",
+        "title": "pYthOn",
+        "importance": "-",
+        "people_involved": 1,
+        "last_touched": "2009-10-08 17:10:15",
+        "submitter_username": "-",
+        "project": 500,
+        "good_for_newcomers": 0,
+        "canonical_bug_link": "http://asdf.com/",
+        "date_reported": "2009-10-08 17:10:14"
+    }
+
+}
+,
+
+{
+    "pk": 1,
+    "model": "search.bug",
+    "fields": 
+    {
+        "status": "Incomplete",
+        "last_polled": "2009-06-08 23:04:31",
+        "submitter_realname": "Miss 7",
+        "description": "-",
+        "title": "-",
+        "importance": "Importance #7",
+        "people_involved": 29,
+        "last_touched": "2009-06-06 17:45:09",
+        "submitter_username": "username 7",
+        "project": 3,
+        "good_for_newcomers": 0,
+        "canonical_bug_link": "https://bugs.launchpad.net/",
+        "date_reported": "2009-06-01 23:02:07"
+    }
+
+}
+,
+
+{
+    "pk": 400,
+    "model": "search.bug",
+    "fields": 
+    {
+        "status": "Fix Committed",
+        "last_polled": "2009-06-08 23:04:31",
+        "submitter_realname": "Mister 2",
+        "description": "-",
+        "title": "-",
+        "importance": "Importance #2",
+        "people_involved": 26,
+        "last_touched": "2009-06-07 19:58:29",
+        "submitter_username": "username 2",
+        "project": 500,
+        "good_for_newcomers": 0,
+        "canonical_bug_link": "https://bugs.launchpad.net/",
+        "date_reported": "2009-06-06 23:02:07"
+    }
+
+}
+,
+
+{
+    "pk": 4,
+    "model": "search.bug",
+    "fields": 
+    {
+        "status": "New",
+        "last_polled": "2009-06-08 23:04:31",
+        "submitter_realname": "Mister 0",
+        "description": "An interesting description",
+        "title": "An interesting title",
+        "importance": "Importance #0",
+        "people_involved": 9,
+        "last_touched": "2009-06-06 06:20:39",
+        "submitter_username": "username 0",
+        "project": 2,
+        "good_for_newcomers": 0,
+        "canonical_bug_link": "http://google.com/",
+        "date_reported": "2009-06-08 23:02:07"
+    }
+
+}
+,
+
+{
+    "pk": 401,
+    "model": "search.bug",
+    "fields": 
+    {
+        "status": "New",
+        "last_polled": "2009-06-08 23:04:31",
+        "submitter_realname": "Mister 0",
+        "description": "An interesting description",
+        "title": "This shouldn't be in the results for [pyt*hon 'An interesting description'].",
+        "importance": "Importance #0",
+        "people_involved": 9,
+        "last_touched": "2009-06-06 06:20:39",
+        "submitter_username": "username 0",
+        "project": 500,
+        "good_for_newcomers": 0,
+        "canonical_bug_link": "http://google.com/",
+        "date_reported": "2009-06-08 23:02:07"
+    }
+
+}
+]

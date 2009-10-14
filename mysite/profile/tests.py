@@ -312,6 +312,7 @@ class ProjectExpTests(TwillTests):
         self.assertEqual(exp.url, 'http://ze-u.rl/')
         self.assertEqual(exp.man_months, 13)
         self.assertEqual(exp.primary_language, 'tagalogue')
+        self.assert_(exp.modified)
         # }}}
 
     def test_person_involvement_description(self):

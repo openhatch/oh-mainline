@@ -20,7 +20,8 @@ class Migration:
         try:
             db.delete_unique('profile_projectexp', ('person', 'project'))
         except ValueError:
-            db.execute('alter table profile_projectexp drop key profile_projectexp_person_id_6fe12f6f;')
+            pass
+            #db.execute('alter table profile_projectexp drop key profile_projectexp_person_id_6fe12f6f;')
     
     
     def backwards(self, orm):
