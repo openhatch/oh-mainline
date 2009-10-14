@@ -3,14 +3,16 @@
 from django.http import HttpResponse, \
         HttpResponseRedirect, HttpResponseServerError
 from django.shortcuts import render_to_response
-import mysite.account
-import mysite.account.forms
 from django_authopenid.forms import OpenidSigninForm
 import simplejson
 from django.template import RequestContext, loader, Context
 from django.core.urlresolvers import reverse
+
 import mysite.profile as profile
+import mysite.account
+import mysite.account.forms
 from mysite.profile.views import display_person_web
+
 import feedparser
 import lxml.html
 import mysite.customs.feed
@@ -79,4 +81,4 @@ def page_to_js(request):
                               mimetype='application/javascript')
 
 def page_not_found(request):
-    return render_to_response('base/404.html')
+    return render_to_response('404.html', {'the_user': request.user })
