@@ -10,6 +10,7 @@ from django.core.urlresolvers import reverse
 
 import mysite.profile as profile
 import mysite.account
+import mysite.profile.controllers
 import mysite.account.forms
 from mysite.profile.views import display_person_web
 
@@ -65,6 +66,11 @@ def landing_page(request):
     data['the_user'] = request.user
 
     data['entries'] = mysite.customs.feed.cached_blog_entries()
+
+    suggested_searches = request.user.get_profile().get_recommended_search_terms()
+    recommended_bugs = mysite.profile.controllers.recommend_bugs(suggested_searches, n=5)
+
+    data['recommended_bugs'] = recommended_bugs
 
     return render_to_response('base/landing.html', data)
 

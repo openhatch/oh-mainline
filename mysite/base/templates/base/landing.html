@@ -53,18 +53,9 @@ Home
     </div>
     <div class='body'>
     <ul>
-    <li>bug!<li>
-    <li>bug!<li>
-    <li>bug!<li>
-    <li>bug!<li>
-    <li>bug!<li>
-    <li>bug!<li>
-    <li>bug!<li>
-    <li>bug!<li>
-    <li>bug!<li>
-    <li>bug!<li>
-    <li>bug!<li>
-    <li>bug!<li>
+      {% for bug in recommended_bugs %}
+      <li>{{ bug.title }}<li>
+      {% endfor %}
     </ul>
     </div>
 </div>
