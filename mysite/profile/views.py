@@ -205,7 +205,7 @@ def display_person_web(request, user_to_display__username=None):
     # {{{
 
     user = get_object_or_404(User, username=user_to_display__username)
-    person = user.get_profile()
+    person, was_created = Person.objects.get_or_create(user=user)
 
     data = get_personal_data(person)
 

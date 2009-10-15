@@ -6,6 +6,7 @@ from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_Person_
 
 import mysite.profile.views
 import mysite.profile.models
+import mysite.profile.controllers
 
 from mysite.profile import views
 
@@ -312,6 +313,7 @@ class ProjectExpTests(TwillTests):
         self.assertEqual(exp.url, 'http://ze-u.rl/')
         self.assertEqual(exp.man_months, 13)
         self.assertEqual(exp.primary_language, 'tagalogue')
+        self.assert_(exp.modified)
         # }}}
 
     def test_person_involvement_description(self):
@@ -773,6 +775,24 @@ class UserCanShowEmailAddress(TwillTests):
         tc.find('my@ema.il')
         # }}}
     # }}}
+
+class BugsAreRecommended(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus',
+               'bugs-for-two-projects.json']
+
+    def test_recommendations_found(self):
+        # Recommendations defined like this:
+        # the first N bugs matching the various "recommended searches" (N=5?)
+
+        # It's round-robin across the searches.
+        # So if we create two Python bugs and one C# bug, and we set N to 2,
+        # and paulproteus ought to get hits from Python and C#, we should see
+        # only one Python bug.
+        recommended = list(mysite.profile.controllers.recommend_bugs(['Python', 'C#'], n=2))
+        python_bugs = [ bug for bug in recommended if bug.project.language == 'Python']
+        self.assertEqual(len(python_bugs), 1)
+        csharp_bugs = [ bug for bug in recommended if bug.project.language == 'C#']
+        self.assertEqual(len(csharp_bugs), 1)
 
 class OnlyFreshDiasAreSelected(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']

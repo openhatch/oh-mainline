@@ -1,30 +1,11 @@
-@font-face {
-    font-family: Tuffy;
-    src: url('/static/fonts/tuffy_regular.ttf');
-}
-@font-face {
-    font-family: Tuffy;
-    font-weight: bold;
-    src: url('/static/fonts/tuffy_bold.ttf');
-}
-@font-face {
-    font-family: Tuffy;
-    font-style: italic;
-    src: url('/static/fonts/tuffy_italic.ttf');
-}
-@font-face {
-    font-family: Tuffy;
-    font-weight: bold;
-    font-style: italic;
-    src: url('/static/fonts/tuffy_bold_italic.ttf');
-}
 body {
-    font: 10pt Tuffy, "Liberation Sans", Verdana, Helvetica, Arial, sans-serif;
+    font: 10pt "Liberation Sans", Verdana, Helvetica, Arial, sans-serif;
     background: #fff url("/static/images/motif-eee.png");
     margin: 0;
     padding: 0;
     color: #224;
 }
+
 a {
     color: orange; /*#ff8046; #ff6d3d; #ff613f; #ff7800; 00a8ff; eeb300; */
     text-decoration: none;

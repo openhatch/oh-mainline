@@ -3,14 +3,17 @@
 from django.http import HttpResponse, \
         HttpResponseRedirect, HttpResponseServerError
 from django.shortcuts import render_to_response
-import mysite.account
-import mysite.account.forms
 from django_authopenid.forms import OpenidSigninForm
 import simplejson
 from django.template import RequestContext, loader, Context
 from django.core.urlresolvers import reverse
+
 import mysite.profile as profile
+import mysite.account
+import mysite.profile.controllers
+import mysite.account.forms
 from mysite.profile.views import display_person_web
+
 import feedparser
 import lxml.html
 import mysite.customs.feed
@@ -64,6 +67,11 @@ def landing_page(request):
 
     data['entries'] = mysite.customs.feed.cached_blog_entries()
 
+    suggested_searches = request.user.get_profile().get_recommended_search_terms()
+    recommended_bugs = mysite.profile.controllers.recommend_bugs(suggested_searches, n=5)
+
+    data['recommended_bugs'] = recommended_bugs
+
     return render_to_response('base/landing.html', data)
 
 def page_to_js(request):
@@ -77,3 +85,6 @@ def page_to_js(request):
     return render_to_response('base/append_ourselves.js',
                               {'in_string': encoded_for_js},
                               mimetype='application/javascript')
+
+def page_not_found(request):
+    return render_to_response('404.html', {'the_user': request.user })
