@@ -12,10 +12,13 @@ import mysite.profile as profile
 import mysite.account
 import mysite.account.forms
 from mysite.profile.views import display_person_web
+from mysite.base.decorators import view
 
 import feedparser
 import lxml.html
 import mysite.customs.feed
+
+from django.contrib.auth.decorators import login_required
 
 def homepage(request, signup_form=None,
         invitation_request_form=None, initial_tab_open='request_invitation'):
@@ -60,13 +63,14 @@ def homepage(request, signup_form=None,
 
     return render_to_response('base/homepage.html', data, context_instance=RequestContext(request))
 
+@login_required
+@view
 def landing_page(request):
-    data = profile.views.get_personal_data(request.user.get_profile())
-    data['the_user'] = request.user
 
+    data = {}
     data['entries'] = mysite.customs.feed.cached_blog_entries()
 
-    return render_to_response('base/landing.html', data)
+    return (request, 'base/landing.html', data)
 
 def page_to_js(request):
     # FIXME: In the future, use:
