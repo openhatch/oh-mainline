@@ -807,7 +807,7 @@ def display_person_edit_name(request, name_edit_mode):
     # }}}
 
 def people_matching(property, value):
-    links = Link_Person_Tag.objects.filter(tag__tag_type__name=property, tag__text=value)
+    links = Link_Person_Tag.objects.filter(tag__tag_type__name=property, tag__text__iexact=value)
     peeps = [l.person for l in links]
     sorted_peeps = sorted(set(peeps), key = lambda thing: (thing.user.first_name, thing.user.last_name))
     return sorted_peeps
@@ -821,7 +821,6 @@ def display_list_of_people_who_match_some_search(request, property, value):
     data['people'] = peeps
     data['property'] = property
     data['value'] = value
-    #return render_to_response('profile/people-who.html', data)
     return (request, 'profile/search_people.html', data)
 
 @login_required
