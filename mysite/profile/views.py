@@ -952,9 +952,10 @@ def people_matching(property, value):
 def display_list_of_people_who_match_some_search(request, property, value):
     '''Property is the "tag name", and "value" is the text in it.'''
     peeps = people_matching(property, value)
-    data = get_personal_data(request.user.get_profile())
-    data['people_search_results'] = peeps
-    return render_to_response('profile/people-who.html', data)
+    data = {}
+    data['people'] = peeps
+    #return render_to_response('profile/people-who.html', data)
+    return render_to_response('profile/search_people.html', data)
 
 @login_required
 def display_person_edit_name_do(request):
@@ -973,3 +974,6 @@ def display_person_edit_name_do(request):
 
     return HttpResponseRedirect('/people/%s' % urllib.quote(user.username))
     # }}}
+
+# vim: ai ts=3 sts=4 et sw=4 nu
+
