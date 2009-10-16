@@ -880,5 +880,19 @@ class PersonInfoLinksToSearch(TwillTests):
         # Now find ourself there
         tc.find('Asheesh Laroia')
 
+class Widget(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def test_widget_display(self):
+        widget_url = reverse(mysite.profile.views.widget_display,
+                kwargs={'user_to_display__username': 'paulproteus'})
+        client = self.login_with_client()
+        response = client.get(widget_url)
+
+    def test_widget_display_js(self):
+        widget_js_url = reverse(mysite.profile.views.widget_display_js,
+                kwargs={'user_to_display__username': 'paulproteus'})
+        client = self.login_with_client()
+        response = client.get(widget_js_url)
 
 # vim: set ai et ts=4 sw=4 nu:

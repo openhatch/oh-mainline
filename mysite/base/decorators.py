@@ -102,3 +102,5 @@ def tags_dict_for_person(person):
 
     return ret
     # }}}
+
+# vim: ai ts=3 sts=4 et sw=4 nu
