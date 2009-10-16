@@ -27,7 +27,7 @@ Home
 
 {% block left %}
 
-<div class='module' id='landing'>
+<div class='module' id='people'>
     <div class='head'>
         <h3>Intriguing people</h3>
     </div>
@@ -47,24 +47,25 @@ Home
 
 {% block middle %}
 
-<div class='module' id='landing'>
+<div class='module' id='bugs'>
     <div class='head'>
-        <h3>Interesting bugs</h3>
+        <h3>Recommended bugs</h3>
     </div>
     <div class='body'>
-        <a href='/search/'>Search for more recommended bugs.</a>
-    <ul>
-      {% for bug in recommended_bugs %}
-      <li><a href='{{ bug.url }}'>{{ bug.title }}</a><li>
-      {% endfor %}
-    </ul>
+        <p>Based on the projects you've worked on and the languages you know, we recommend you check out these bugs.</p>
+        <ul>
+            {% for bug in recommended_bugs %}
+            <li><a href='{{ bug.url }}'>{{ bug.title }}</a></li>
+            {% endfor %}
+        </ul>
+        <p><a href='/search/'>Find more opportunities <strong>&raquo;</strong></a></p>
     </div>
 </div>
 
 {% endblock middle %}
 
 {% block right %}
-<div class='module' id='landing'>
+<div class='module' id='meta'>
     <div class='body contains-submodules'>
         <div class='submodule'>
             <div class='head'>

@@ -78,3 +78,13 @@ h4 {
     padding-left: 10px;
     padding-right: 0;
 }
+
+#bugs li {
+    padding-bottom: 10px;
+    margin-left: 15px;
+    list-style: square;
+}
+
+.module p {
+    margin-top: 0;
+}
