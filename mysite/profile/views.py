@@ -813,6 +813,7 @@ def people_matching(property, value):
     return sorted_peeps
 
 @login_required
+@view
 def display_list_of_people_who_match_some_search(request, property, value):
     '''Property is the "tag name", and "value" is the text in it.'''
     peeps = people_matching(property, value)
@@ -821,7 +822,7 @@ def display_list_of_people_who_match_some_search(request, property, value):
     data['property'] = property
     data['value'] = value
     #return render_to_response('profile/people-who.html', data)
-    return render_to_response('profile/search_people.html', data)
+    return (request, 'profile/search_people.html', data)
 
 @login_required
 def display_person_edit_name_do(request):
