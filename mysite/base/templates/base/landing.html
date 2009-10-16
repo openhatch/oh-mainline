@@ -52,9 +52,10 @@ Home
         <h3>Interesting bugs</h3>
     </div>
     <div class='body'>
+        <a href='/search/'>Search for more recommended bugs.</a>
     <ul>
       {% for bug in recommended_bugs %}
-      <li>{{ bug.title }}<li>
+      <li><a href='{{ bug.url }}'>{{ bug.title }}</a><li>
       {% endfor %}
     </ul>
     </div>
