@@ -321,6 +321,7 @@ class ProjectExpTests(TwillTests):
 
     def test_person_involvement_description(self):
         # {{{
+        self.login_with_twill()
         username = 'paulproteus'
         project_name = 'ccHost'
         url = 'http://openhatch.org/people/%s/projects/%s' % (
