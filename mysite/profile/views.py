@@ -1,5 +1,3 @@
-# vim: ai ts=3 sts=4 et sw=4 nu
-
 # Imports {{{
 
 # Python

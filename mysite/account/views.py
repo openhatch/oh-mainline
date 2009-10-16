@@ -21,20 +21,13 @@ import mysite.base.controllers
 from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag, Link_Project_Tag, Link_SF_Proj_Dude_FM, Link_Person_Tag, DataImportAttempt
 from mysite.profile.views import get_personal_data
 
-from decorator import decorator
+# FIXME: We did this because this decorator used to live here
+# and lots of other modules refer to it as mysite.account.views.view.
+# Let's fix this soon.
+from mysite.base.decorators import view
 # }}}
 
 applog = logging.getLogger('applog')
-
-@decorator
-def view(func, *args, **kw):
-    """Decorator for views."""
-    request, template, view_data = func(*args, **kw)
-    data = get_personal_data(request.user.get_profile())
-    data['the_user'] = request.user
-    data['slug'] = func.__name__
-    data.update(view_data)
-    return render_to_response(template, data)
 
 def login(request):
     # {{{
