@@ -125,8 +125,9 @@ def projectexp_display(request, user_to_display__username, project__name):
     return (request, 'profile/projectexp.html', data)
     # }}}
     
-@view
-def widget_display(request, user_to_display__username, please_return_string=False):
+def widget_display_undecorated(request, user_to_display__username):
+    """We leave this function unwrapped by @view """
+    """so it can referenced by widget_display_string."""
     # {{{
     user = get_object_or_404(User, username=user_to_display__username)
     person = get_object_or_404(Person, user=user)
@@ -135,15 +136,18 @@ def widget_display(request, user_to_display__username, please_return_string=Fals
     data['projectexp_editable'] = (user == request.user)
     data['editable'] = (user == request.user)
     data['url_prefix'] = request.META['SERVER_NAME'] + ':' + request.META['SERVER_PORT']
-    if please_return_string:
-        return render_to_string('profile/widget.html', data)
-    else:
-        return (request, 'profile/widget.html', data)
+    return (request, 'profile/widget.html', data)
     # }}}
+
+widget_display = view(widget_display_undecorated)
+
+def widget_display_string(request, user_to_display__username):
+    request, template, data = widget_display_undecorated(request, user_to_display__username)
+    return render_to_string(template, data)
 
 def widget_display_js(request, user_to_display__username):
     # FIXME: In the future, use:
-    html_doc = widget_display(request, user_to_display__username, please_return_string=True)
+    html_doc = widget_display_string(request, user_to_display__username)
     # to generate html_doc
     encoded_for_js = simplejson.dumps(html_doc)
     # Note: using application/javascript as suggested by

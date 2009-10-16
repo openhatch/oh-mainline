@@ -3,6 +3,7 @@ from odict import odict
 import re
 import collections
 
+from django.template.loader import render_to_string
 from django.shortcuts import render_to_response
 
 from mysite.profile.models import ProjectExp, Link_Person_Tag, Link_Project_Tag, Link_ProjectExp_Tag
