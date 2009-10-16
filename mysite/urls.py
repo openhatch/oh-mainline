@@ -163,6 +163,9 @@ urlpatterns = patterns('',
 
         (r'^test_404$', handler404),
 
+        (r'^search/people/(?P<property>[^/]+)/(?P<value>.+)$',
+                'mysite.profile.views.display_list_of_people_who_match_some_search'),
+
         # favicon.ico. Someday this should be handled by Apache.
         (r'^(favicon.ico)',
          'django.views.static.serve',

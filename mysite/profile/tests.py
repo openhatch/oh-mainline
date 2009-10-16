@@ -55,12 +55,16 @@ class ProfileTests(TwillTests):
         found = list(ProjectExp.objects.filter(person__user__username=username))
         # Verify it shows up in the DB
         self.assert_('seeseehost' in [f.project.name for f in found])
-        # Verify it shows up in profile_data_from_username
-        data = views.profile_data_from_username('paulproteus')
-        self.assert_(data['person'].user.username == 'paulproteus')
-        projects = [thing[0].project.name for thing in
-                    data['exp_taglist_pairs']]
-        self.assert_('seeseehost' in projects)
+
+        # Verify it shows up in the data passed to the portfolio view.
+        client = self.login_with_client()
+
+        paulproteus_portfolio_url = reverse(mysite.profile.views.display_person_web, kwargs={
+            'user_to_display__username': 'paulproteus'})
+        response = client.get(paulproteus_portfolio_url)
+        projects = response.context[0]['projects']
+        self.assert_(exp.project in projects)
+
         # }}}
 
     def test__project_exp_create_from_text__unit(self):
@@ -318,6 +322,7 @@ class ProjectExpTests(TwillTests):
 
     def test_person_involvement_description(self):
         # {{{
+        self.login_with_twill()
         username = 'paulproteus'
         project_name = 'ccHost'
         url = 'http://openhatch.org/people/%s/projects/%s' % (
@@ -362,7 +367,7 @@ class ProjectExpTests(TwillTests):
         soup = BeautifulSoup.BeautifulSoup(tc.show())
         for tag_type_name in tag_dict:
             text = ''.join(soup(id='tags-%s' % tag_type_name)[0].findAll(text=True))
-            self.assert_(', '.join(tag_dict[tag_type_name]) in text)
+            self.assert_(', '.join(tag_dict[tag_type_name]) in ' '.join(text.split()))
 
         # Go back to the form and make sure some of these are there
         tc.go(make_twill_url(url))
@@ -860,5 +865,53 @@ class OnlyFreshDiasAreSelected(TwillTests):
         # Now verify it's done
         self.assert_(DataImportAttempt.objects.get().stale)
 
+class PersonInfoLinksToSearch(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+    
+    def test_whatever(self):
+        '''
+        * Have a user, say that he understands+wantstolearn+currentlylearns+canmentor something
+        * Go to his user page, and click those various links
+        * Find yourself on some search page that mentions the user.
+        '''
+        tags = {
+            'understands': ['thing1'],
+            'understands_not': ['thing2'],
+            'seeking': ['thing3'],
+            'studying': ['thing4'],
+            'can_mentor': ['thing5'],
+            }
+
+        # Log in as paulproteus
+        
+        self.login_with_twill()
+
+        # Update paulproteus's tags
+        url = 'http://openhatch.org/people/edit/info'
+        tc.go(make_twill_url(url))
+        for tag_type_name in tags:
+            tc.fv('edit-tags', 'edit-tags-' + tag_type_name, ", ".join(tags[tag_type_name]))
+        tc.submit()
+
+        # Now, click on "thing1"
+        tc.follow("thing1")
+
+        # Now find ourself there
+        tc.find('Asheesh Laroia')
+
+class Widget(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def test_widget_display(self):
+        widget_url = reverse(mysite.profile.views.widget_display,
+                kwargs={'user_to_display__username': 'paulproteus'})
+        client = self.login_with_client()
+        response = client.get(widget_url)
+
+    def test_widget_display_js(self):
+        widget_js_url = reverse(mysite.profile.views.widget_display_js,
+                kwargs={'user_to_display__username': 'paulproteus'})
+        client = self.login_with_client()
+        response = client.get(widget_js_url)
 
 # vim: set ai et ts=4 sw=4 nu:

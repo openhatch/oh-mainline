@@ -3,7 +3,7 @@
 $ sudo apt-get install rabbitmq-server python-apt
 $ sudo rabbitmqctl add_user rabbiter johT4qui
 $ sudo rabbitmqctl add_vhost localhost
-$ rabbitmqctl set_permissions -p localhost rabbiter "" ".*" ".*" || rabbitmqctl map_user_vhost rabbiter localhost || echo EEEP
+$ sudo rabbitmqctl set_permissions -p localhost rabbiter "" ".*" ".*" || sudo rabbitmqctl map_user_vhost rabbiter localhost || echo "Failed to set rabbitmq permissions. Complain to Asheesh."
 
 $ python bootstrap.py
 $ ./bin/buildout
