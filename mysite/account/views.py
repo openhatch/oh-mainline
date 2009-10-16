@@ -19,7 +19,6 @@ from mysite.account.forms import InvitationRequestForm
 import mysite.base.views
 import mysite.base.controllers
 from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag, Link_Project_Tag, Link_SF_Proj_Dude_FM, Link_Person_Tag, DataImportAttempt
-from mysite.profile.views import get_personal_data
 
 # FIXME: We did this because this decorator used to live here
 # and lots of other modules refer to it as mysite.account.views.view.
@@ -103,20 +102,17 @@ def logout(request):
     # }}}
 
 @login_required
+@view
 def edit_photo(request, form = None):
-    data = get_personal_data(
-            request.user.get_profile())
-    data['the_user'] = request.user
     if form is None:
         form = mysite.account.forms.EditPhotoForm()
     data['edit_photo_form'] = form
-    return render_to_response('account/edit_photo.html', data)
+    return (request, 'account/edit_photo.html', data)
 
 @login_required
 def edit_photo_do(request, mock=None):
-    data = get_personal_data(
-            request.user.get_profile())
     person = request.user.get_profile()
+    data = mysite.base.decorators.get_personal_data(person)
     form = mysite.account.forms.EditPhotoForm(request.POST,
                                        request.FILES,
                                        instance=person)
@@ -129,23 +125,19 @@ def catch_me(request):
     pdb.set_trace()
 
 @login_required
+@view
 def settings(request):
     # {{{
-    data = get_personal_data(
-            request.user.get_profile())
-    data['the_user'] = request.user
-
-    return render_to_response('account/settings.html', data)
+    data = {}
+    return (request, 'account/settings.html', data)
     # }}}
 
 @login_required
 @view
 def edit_contact_info(request, edit_email_form = None, show_email_form = None):
     # {{{
-    data = get_personal_data(
-            request.user.get_profile())
-    data['the_user'] = request.user
 
+    data = {}
     # Store edit_email_form in data[], even if we weren't passed one
     if edit_email_form is None:
         edit_email_form = mysite.account.forms.EditEmailForm(
@@ -194,9 +186,8 @@ def edit_contact_info_do(request):
 @view
 def change_password(request, change_password_form = None):
     # {{{
-    data = get_personal_data(
-            request.user.get_profile())
-    data['the_user'] = request.user
+
+    data = {}
     if change_password_form is None:
         data['change_password_form'] = django.contrib.auth.forms.PasswordChangeForm({})
     else:
