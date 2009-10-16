@@ -818,6 +818,8 @@ def display_list_of_people_who_match_some_search(request, property, value):
     peeps = people_matching(property, value)
     data = {}
     data['people'] = peeps
+    data['property'] = property
+    data['value'] = value
     #return render_to_response('profile/people-who.html', data)
     return render_to_response('profile/search_people.html', data)
 
