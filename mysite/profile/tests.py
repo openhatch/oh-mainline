@@ -54,12 +54,16 @@ class ProfileTests(TwillTests):
         found = list(ProjectExp.objects.filter(person__user__username=username))
         # Verify it shows up in the DB
         self.assert_('seeseehost' in [f.project.name for f in found])
-        # Verify it shows up in profile_data_from_username
-        data = views.profile_data_from_username('paulproteus')
-        self.assert_(data['person'].user.username == 'paulproteus')
-        projects = [thing[0].project.name for thing in
-                    data['exp_taglist_pairs']]
-        self.assert_('seeseehost' in projects)
+
+        # Verify it shows up in the data passed to the portfolio view.
+        client = self.login_with_client()
+
+        paulproteus_portfolio_url = reverse(mysite.profile.views.display_person_web, kwargs={
+            'user_to_display__username': 'paulproteus'})
+        response = client.get(paulproteus_portfolio_url)
+        projects = response.context[0]['projects']
+        self.assert_(exp.project in projects)
+
         # }}}
 
     def test__project_exp_create_from_text__unit(self):

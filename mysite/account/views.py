@@ -106,6 +106,7 @@ def logout(request):
 def edit_photo(request, form = None):
     if form is None:
         form = mysite.account.forms.EditPhotoForm()
+    data = {}
     data['edit_photo_form'] = form
     return (request, 'account/edit_photo.html', data)
 

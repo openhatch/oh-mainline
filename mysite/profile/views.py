@@ -198,7 +198,6 @@ def projectexp_edit(request, project__name, forms = None):
     # }}}
 
 @login_required
-@view
 def projectexp_edit_do(request, project__name):
     """Update database with new information about a user's experiences with a particular project."""
     # FIXME: Change this function's misleading name.
