@@ -798,6 +798,11 @@ class BugsAreRecommended(TwillTests):
         self.assertEqual(len(python_bugs), 1)
         csharp_bugs = [ bug for bug in recommended if bug.project.language == 'C#']
         self.assertEqual(len(csharp_bugs), 1)
+        
+    def test_recommendations_not_duplicated(self):
+        """ Run two equivalent searches in parallel, and discover that they weed out duplicates."""
+        recommended = list(mysite.profile.controllers.recommend_bugs(['Python', 'Python'], n=2))
+        self.assertNotEqual(recommended[0], recommended[1])
 
 class OnlyFreshDiasAreSelected(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
