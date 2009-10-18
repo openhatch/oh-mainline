@@ -55,7 +55,7 @@ Home
         <p>Based on the projects you've worked on and the languages you know, we recommend you check out these bugs.</p>
         <ul>
             {% for bug in recommended_bugs %}
-            <li><a href='{{ bug.canonical_bug_link }}'>{{ bug.title }}</a></li>
+            <li><span><a style='font-weight: bold;' href='{{ bug.canonical_bug_link }}'>{{ bug.title }}</a> in&nbsp;{{ bug.project.name }}</span></li>
             {% endfor %}
         </ul>
         <p><a href='/search/'>Find more opportunities <strong>&raquo;</strong></a></p>
