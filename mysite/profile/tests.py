@@ -920,11 +920,11 @@ class Widget(TwillTests):
         client = self.login_with_client()
         response = client.get(widget_js_url)
 
-class Sidebar(TwillTests):
+class PersonalData(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry',
             'person-paulproteus', 'cchost-data-imported-from-ohloh']
 
-    def test_all_views_with_a_sidebar(self):
+    def test_all_views_that_call_get_personal_data(self):
         # Views where you can look at somebody else.
         stalking_view2args = {
                 mysite.profile.views.display_person_web: {'user_to_display__username': 'paulproteus'},
