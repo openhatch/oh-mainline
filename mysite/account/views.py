@@ -113,7 +113,7 @@ def edit_photo(request, form = None):
 @login_required
 def edit_photo_do(request, mock=None):
     person = request.user.get_profile()
-    data = mysite.base.decorators.get_personal_data(person)
+    data = mysite.profile.views.get_personal_data(person)
     form = mysite.account.forms.EditPhotoForm(request.POST,
                                        request.FILES,
                                        instance=person)
