@@ -43,7 +43,7 @@ from mysite.profile.models import \
         Link_SF_Proj_Dude_FM, Link_Person_Tag, \
         DataImportAttempt
 from mysite.search.models import Project
-from mysite.base.decorators import view, get_default_template_data
+from mysite.base.decorators import view
 
 # This app
 import forms
@@ -82,7 +82,7 @@ def display_person_edit_web(request, info_edit_mode=False, title=''):
 
     person = request.user.get_profile()
 
-    data = {}
+    data = get_personal_data(person)
 
     # FIXME: Django builds this in.
     data['editable'] = True
@@ -202,7 +202,7 @@ def projectexp_display(request, user_to_display__username, project__name):
     person = get_object_or_404(Person, user=user)
     project = get_object_or_404(Project, name=project__name)
 
-    data = {}
+    data = get_personal_data(person)
     data['project'] = project
     data['exp_list'] = get_list_or_404(ProjectExp,
             person=person, project=project)
@@ -277,7 +277,7 @@ def projectexp_edit(request, project__name, forms = None):
     if forms is None:
         forms = prepare_p_e_forms(person, project)
         
-    data = {}
+    data = get_personal_data(person)
     data['exp_list'] = get_list_or_404(ProjectExp,
             person=person, project=project)
     data['forms'] = forms
@@ -363,13 +363,8 @@ def projectexp_add_form(request, form = None):
     if form is None:
         form = mysite.profile.forms.ProjectExpForm()
 
-    try:
-        person = request.user.get_profile()
-    except AttributeError:
-        return (request, 'search/index.html', {
-            'notification': "You've gotta be logged in to do that! (Coming soon: a slightly easier way to get back to where you were.)"
-            })
-    data = {}
+    person = request.user.get_profile()
+    data = get_personal_data(person)
     data['form'] = form
     
     return (request, 'profile/projectexp_add.html', data)
@@ -799,8 +794,9 @@ def importer(request):
             'index': blank_query_index,
             'checkboxes': checkboxes
             }
-    data = {}
-    data['dias'] = DataImportAttempt.objects.filter(person=request.user.get_profile(), stale=False).order_by('id')
+    person = request.user.get_profile()
+    data = get_personal_data(person)
+    data['dias'] = DataImportAttempt.objects.filter(person=person, stale=False).order_by('id')
     data['blank_query'] = blank_query
 
     return (request, 'profile/importer.html', data)
@@ -890,7 +886,7 @@ def display_person_edit_name(request, name_edit_mode):
     model already stores them separately.
     '''
     # {{{
-    data = {}
+    data = get_personal_data(request.user.get_profile())
     data['name_edit_mode'] = name_edit_mode
     data['editable'] = True
     return (request, 'profile/main.html', data)
@@ -932,4 +928,3 @@ def display_person_edit_name_do(request):
     # }}}
 
 # vim: ai ts=3 sts=4 et sw=4 nu
-
