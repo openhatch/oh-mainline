@@ -62,9 +62,10 @@ class ProfileTests(TwillTests):
         paulproteus_portfolio_url = reverse(mysite.profile.views.display_person_web, kwargs={
             'user_to_display__username': 'paulproteus'})
         response = client.get(paulproteus_portfolio_url)
+
+        # Check that the newly added project is there.
         projects = response.context[0]['projects']
         self.assert_(exp.project in projects)
-
         # }}}
 
     def test__project_exp_create_from_text__unit(self):
@@ -918,5 +919,41 @@ class Widget(TwillTests):
                 kwargs={'user_to_display__username': 'paulproteus'})
         client = self.login_with_client()
         response = client.get(widget_js_url)
+
+class Sidebar(TwillTests):
+    fixtures = ['user-paulproteus', 'user-barry', 'person-barry',
+            'person-paulproteus', 'cchost-data-imported-from-ohloh']
+
+    def test_all_views_with_a_sidebar(self):
+        # Views where you can look at somebody else.
+        stalking_view2args = {
+                mysite.profile.views.display_person_web: {'user_to_display__username': 'paulproteus'},
+                mysite.profile.views.projectexp_display: {'user_to_display__username': 'paulproteus', 'project__name': 'ccHost'},
+                }
+
+        # Views where you look only at yourself.
+        navelgazing_view2args = {
+                mysite.profile.views.display_person_edit_web: {},
+                mysite.profile.views.projectexp_add_form: {},
+                mysite.profile.views.projectexp_edit: {'project__name': 'ccHost'},
+                mysite.profile.views.importer: {},
+                mysite.profile.views.display_person_edit_name: {},
+                }
+
+        for view in stalking_view2args:
+            self.client.login(username='barry', password='parallelism')
+            kwargs = stalking_view2args[view]
+            url = reverse(view, kwargs=kwargs)
+            response = self.client.get(url)
+            self.assertEqual(response.context[0]['person'].user.username, 'paulproteus')
+            self.client.logout()
+
+        for view in navelgazing_view2args:
+            client = self.login_with_client()
+            kwargs = navelgazing_view2args[view]
+            url = reverse(view, kwargs=kwargs)
+            response = client.get(url)
+            self.assertEqual(response.context[0]['person'].user.username, 'paulproteus')
+            client.logout()
 
 # vim: set ai et ts=4 sw=4 nu:
