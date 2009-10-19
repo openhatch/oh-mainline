@@ -329,3 +329,27 @@ class Link_SF_Proj_Dude_FM(models.Model):
                                                    proj_unixname,
                                                    is_admin, position,
                                                    date_collected)
+
+class PortfolioEntry(models.Model):
+    # Constrain this so (person, project) pair uniquely finds a PortfolioEntry
+    person = models.ForeignKey(Person)
+    project = models.ForeignKey(Project)
+    project_description = models.TextField()
+    experience_description = models.TextField()
+    citations = models.OneToManyField(Citation)
+    date_created = models.DateTimeField()
+
+class DataSource(models.Model):
+    name = CharField(max_length=50, unique=True)
+    # FIXME: Initial data.
+
+class Citation(models.Model):
+    url = models.URLField()
+    distinct_months = models.IntegerField()
+    committer_identifier = models.TextField()
+    language = models.TextField()
+    source = models.ForeignKey(DataSource) 
+    is_published = models.BooleanField(default=False) # unpublished == Unread
+    is_deleted = models.BooleanField(default=False)
+    year_started = models.IntegerField()
+    date_created = models.DateTimeField()

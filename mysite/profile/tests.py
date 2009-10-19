@@ -434,13 +434,21 @@ class CeleryTests(TwillTests):
     @mock.patch('mysite.customs.ohloh.Ohloh.get_contribution_info_by_username', mock_gcibu)
     @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
     def test_ohloh_import_via_emulated_bgtask(self):
-        """1. Go to the page that has paulproteus' data.  2. Verify that the page doesn't yet know about ccHost. 3. Run the celery task ourselves, but instead of going to Ohloh, we hand-prepare data for it."""
+        "1. Go to the page that has paulproteus' data. "
+        "2. Verify that the page doesn't yet know about ccHost. "
+        "3. Prepare an object that will import data from ccHost. "
+        "The object is a DataImportAttempt. The DataImportAttempt has a method "
+        "that will create a background task using the celery package. The method "
+        "is called do_what_it_says_on_the_tin, because it will attempt to "
+        "import data. "
+        "4. Run the celery task ourselves, but instead of going to Ohloh, "
+        " we hand-prepare data for it."""
         # {{{
-        # do this work for user = paulproteus
+        # Let's run this test using a sample user, paulproteus.
         username = 'paulproteus'
         person = Person.objects.get(user__username=username)
 
-        # Store a note in the DB we're about to do a background task
+        # Store a note in the DB that we're about to do a background task
         dia = DataImportAttempt(query=username, source='rs',
                                 person=person)
         dia.person_wants_data = True
