@@ -286,7 +286,6 @@ class SourceForgeProject(models.Model):
     # FIXME: Make this unique
     unixname = models.CharField(max_length=200)
 
-
 class Link_SF_Proj_Dude_FM(models.Model):
     '''Link from SourceForge Project to Person, via FlossMOLE'''
     person  = models.ForeignKey(SourceForgePerson)
@@ -298,8 +297,6 @@ class Link_SF_Proj_Dude_FM(models.Model):
         unique_together = [
             ('person', 'project'),]
             
-    # FIXME: One day, this should
-
     @staticmethod
     def create_from_flossmole_row_data(dev_loginname, proj_unixname, is_admin,
                                        position, date_collected):
@@ -337,20 +334,19 @@ class PortfolioEntry(models.Model):
     project = models.ForeignKey(Project)
     project_description = models.TextField()
     experience_description = models.TextField()
-    citations = models.OneToManyField(Citation)
     date_created = models.DateTimeField()
 
-class DataSource(models.Model):
-    name = CharField(max_length=50, unique=True)
-    # FIXME: Initial data.
+# FIXME: Add a DataSource class to DataImportAttempt.
 
 class Citation(models.Model):
-    url = models.URLField()
+    portfolio_entry = models.ForeignKey(PortfolioEntry) # [0]
+    # FIXME: url = models.URLField()
     distinct_months = models.IntegerField()
-    committer_identifier = models.TextField()
     language = models.TextField()
-    source = models.ForeignKey(DataSource) 
+    data_import_attempt = models.ForeignKey(DataImportAttempt)
     is_published = models.BooleanField(default=False) # unpublished == Unread
     is_deleted = models.BooleanField(default=False)
     year_started = models.IntegerField()
-    date_created = models.DateTimeField()
+    # FIXME: date_created = models.DateTimeField()
+
+    # [0]: FIXME: Let's learn how to use Django's ManyToManyField etc.

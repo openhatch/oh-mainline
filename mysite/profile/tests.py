@@ -2,7 +2,7 @@
 from mysite.base.tests import make_twill_url, TwillTests
 
 from mysite.search.models import Project
-from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_Person_Tag, Link_ProjectExp_Tag, DataImportAttempt
+from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_Person_Tag, Link_ProjectExp_Tag, DataImportAttempt, PortfolioEntry, Citation
 
 import mysite.profile.views
 import mysite.profile.models
@@ -465,15 +465,13 @@ class CeleryTests(TwillTests):
         # the answer should be no.
         response_before_job_is_run = client.get(gimme_json_url)
         response_json = simplejson.loads(response_before_job_is_run.content)
-        self.assertEqual(
-            response_json[0]['pk'], dia.id)
+        self.assertEqual(response_json[0]['pk'], dia.id)
         self.assertFalse(response_json[0]['fields']['completed'])
         
-        # Ask if contribution fact has been loaded from Ohloh.
-        # We haven't loaded it, so the answer should be no.
-        project_name = 'ccHost'
-        self.assertFalse(list(ProjectExp.objects.filter(
-            project__name=project_name))) # FIXME: Change according to new models.
+        # Are there any PortfolioEntries for ccHost
+        # before we import data from Ohloh? Expected: no.
+        ccHost_portfolio_entries = PortfolioEntry.objects.filter(project__name='ccHost')
+        self.assertEqual(ccHost_portfolio_entries.count(), 0)
 
         dia.do_what_it_says_on_the_tin()
         # NB: The task is being run, but the ohloh API communication
@@ -483,9 +481,9 @@ class CeleryTests(TwillTests):
         # marked as completed.
         self.assert_(DataImportAttempt.objects.get(id=dia.id).completed)
 
-        ############
+        #######################################################
         # Let's see if the browser's method of checking agrees. 
-        ############
+        #######################################################
 
         # First, request the JSON again.
         response_after = client.get(gimme_json_url)
@@ -495,9 +493,28 @@ class CeleryTests(TwillTests):
         self.assertEquals(response_json[0]['pk'], dia.id)
         self.assert_(response_json[0]['fields']['completed'])
 
-        # Ask if involvement fact has been loaded. (Hoping for yes.)
-        self.assert_(list(ProjectExp.objects.filter(
-            project__name=project_name, person=person)))
+        # There ought now to be a PortfolioEntry for ccHost...
+        ccHost_portfolio_entry = PortfolioEntry.objects.get(person=person, project__name='ccHost')
+
+        # ...and a citation to Ohloh.
+        ccHost_citation = Citation.objects.get(portfolio_entry=ccHost_portfolio_entry)
+
+        # The citation should have a certain structure.
+        expected_attributes = {
+                'language': 'shell script',
+                'distinct_months': 1,
+                'data_import_attempt': dia,
+                'is_published': False,
+                'is_deleted': False,
+                'year_started': 2007,
+                }
+
+        for a in expected_attributes:
+            self.assertEqual(getattr(ccHost_citation, a), expected_attributes[a])
+
+        # Check that the ccHost_citation is linked with the appropriate DIA.
+
+        # Check that the language of the citation is correct.
 
         # }}}
 
