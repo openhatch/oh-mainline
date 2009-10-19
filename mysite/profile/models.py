@@ -96,7 +96,8 @@ class DataImportAttempt(models.Model):
             pe.save()
 
     def do_what_it_says_on_the_tin(self):
-        """Attempt to import data."""
+        """Attempt to import data by enqueuing a job in celery."""
+        # We need to import here to avoid vicious cyclical imports.
         from mysite.profile.tasks import FetchPersonDataFromOhloh
         FetchPersonDataFromOhloh.delay(self.id)
 

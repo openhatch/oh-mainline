@@ -390,8 +390,9 @@ class ProjectExpTests(TwillTests):
 
     # }}}
 
-# Create a mock Ohloh get_contribution_by_username
+# Create a mock Ohloh get_contribution_info_by_username
 mock_gcibu = mock.Mock()
+# This object will always return:
 mock_gcibu.return_value = [{
         'man_months': 1,
         'project': u'ccHost',
@@ -423,6 +424,7 @@ class MockFetchPersonDataFromOhloh(object):
     real_task_class = tasks.FetchPersonDataFromOhloh
     @classmethod
     def delay(*args, **kwargs):
+        "Don't enqueue a background job. Just run the job."
         args = args[1:] # FIXME: Wonder why I need this
         task = MockFetchPersonDataFromOhloh.real_task_class()
         task.run(*args, **kwargs)
@@ -441,38 +443,37 @@ class CeleryTests(TwillTests):
         "that will create a background task using the celery package. The method "
         "is called do_what_it_says_on_the_tin, because it will attempt to "
         "import data. "
-        "4. Run the celery task ourselves, but instead of going to Ohloh, "
+        "3. Run the celery task ourselves, but instead of going to Ohloh, "
         " we hand-prepare data for it."""
         # {{{
         # Let's run this test using a sample user, paulproteus.
         username = 'paulproteus'
         person = Person.objects.get(user__username=username)
 
-        # Store a note in the DB that we're about to do a background task
+        # Store a note in the DB that we're about to run a background task
         dia = DataImportAttempt(query=username, source='rs',
                                 person=person)
         dia.person_wants_data = True
         dia.save()
-        
 
-        url = '/people/gimme_json_that_says_that_commit_importer_is_done'
+        gimme_json_url = '/people/gimme_json_that_says_that_commit_importer_is_done'
         
         client = self.login_with_client()
 
         # Ask if background job has been completed.
-        # We haven't even created the background job, so it should
-        # not be!
-        response_before = client.get(url)
-        response_json = simplejson.loads(response_before.content)
-        self.assertEquals(
+        # We haven't even created the background job, so 
+        # the answer should be no.
+        response_before_job_is_run = client.get(gimme_json_url)
+        response_json = simplejson.loads(response_before_job_is_run.content)
+        self.assertEqual(
             response_json[0]['pk'], dia.id)
         self.assertFalse(response_json[0]['fields']['completed'])
         
-        # Ask if involvement fact has been loaded.
+        # Ask if contribution fact has been loaded from Ohloh.
         # We haven't loaded it, so the answer should be no.
         project_name = 'ccHost'
         self.assertFalse(list(ProjectExp.objects.filter(
-            project__name=project_name)))
+            project__name=project_name))) # FIXME: Change according to new models.
 
         dia.do_what_it_says_on_the_tin()
         # NB: The task is being run, but the ohloh API communication
@@ -482,13 +483,16 @@ class CeleryTests(TwillTests):
         # marked as completed.
         self.assert_(DataImportAttempt.objects.get(id=dia.id).completed)
 
-        # Check again
-        response_after = client.get(url)
+        ############
+        # Let's see if the browser's method of checking agrees. 
+        ############
+
+        # First, request the JSON again.
+        response_after = client.get(gimme_json_url)
 
         # Ask if background job has been completed. (Hoping for yes.)
         response_json = simplejson.loads(response_after.content)
-        self.assertEquals(
-            response_json[0]['pk'], dia.id)
+        self.assertEquals(response_json[0]['pk'], dia.id)
         self.assert_(response_json[0]['fields']['completed'])
 
         # Ask if involvement fact has been loaded. (Hoping for yes.)
