@@ -427,6 +427,7 @@ class MockFetchPersonDataFromOhloh(object):
         "Don't enqueue a background job. Just run the job."
         args = args[1:] # FIXME: Wonder why I need this
         task = MockFetchPersonDataFromOhloh.real_task_class()
+        task.debugging = True # See FetchPersonDataFromOhloh
         task.run(*args, **kwargs)
 
 class CeleryTests(TwillTests):
@@ -501,12 +502,12 @@ class CeleryTests(TwillTests):
 
         # The citation should have a certain structure.
         expected_attributes = {
-                'language': 'shell script',
+                'primary_language': 'shell script',
                 'distinct_months': 1,
                 'data_import_attempt': dia,
                 'is_published': False,
                 'is_deleted': False,
-                'year_started': 2007,
+                #'year_started': 2007,
                 }
 
         for a in expected_attributes:

@@ -78,6 +78,10 @@ class FetchPersonDataFromOhloh(Task):
             logger.info("Results: %s" % results)
 
         except Exception, e:
+            # if the task is in debugging mode, bubble-up the exception
+            if getattr(self, 'debugging', None):
+                raise
+            # else let the exception be logged but not bubble up
             dia.completed = True
             dia.failed = True
             dia.save()

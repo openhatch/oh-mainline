@@ -41,7 +41,8 @@ from mysite.profile.models import \
         Tag, TagType, \
         Link_ProjectExp_Tag, Link_Project_Tag, \
         Link_SF_Proj_Dude_FM, Link_Person_Tag, \
-        DataImportAttempt
+        DataImportAttempt, \
+        PortfolioEntry, Citation
 from mysite.search.models import Project
 from mysite.base.decorators import view
 
@@ -610,10 +611,11 @@ def import_commits_by_commit_username(request):
         result = tasks.FetchPersonDataFromOhloh.delay(dia.id)
     # }}}
 
-def ohloh_contributor_facts_to_project_exps(dia_id,
-                                     ohloh_results):
+#FIXME: These are controllers. Raffi is appalled.
+#FIXME: Contribution, not Contributor, Fact.
+def ohloh_contributor_facts_to_project_exps(dia_id, ohloh_results):
     # {{{
-    '''Input: A sequence of Ohloh ContributorInfo dicts
+    '''Input: A sequence of Ohloh ContributionFact dicts
     and the id of the DataImport they came from.
 
     Side-effect: Create matching structures in the DB
@@ -622,12 +624,15 @@ def ohloh_contributor_facts_to_project_exps(dia_id,
     person = dia.person
     for c_i in ohloh_results:
         for ohloh_contrib_info in ohloh_results:
-            exp = ProjectExp()
-            exp = exp.from_ohloh_contrib_info(ohloh_contrib_info)
-            exp.last_polled = datetime.datetime.now()
-            exp.last_touched = datetime.datetime.now()
-            exp.data_import_attempt = dia
-            exp.save()
+            (project, _) = Project.objects.get_or_create(
+                    name=ohloh_contrib_info['project'])
+            (portfolio_entry, _) = PortfolioEntry.objects.get_or_create(
+                    person=person, project=project)
+            citation = Citation.create_from_ohloh_contrib_info(ohloh_contrib_info)
+            citation.portfolio_entry = portfolio_entry
+            citation.data_import_attempt = dia 
+            citation.save()
+
     person.last_polled = datetime.datetime.now()
     dia.completed = True
     dia.save()
@@ -637,6 +642,7 @@ def ohloh_contributor_facts_to_project_exps(dia_id,
         dia.give_data_to_person()
     # }}}
 
+#FIXME: Same with this one. A-ppalled.
 def create_project_exps_from_launchpad_contributor_facts(dia_id, lp_results):
     # {{{
     '''Input: A sequence of Ohloh ContributorInfo dicts
