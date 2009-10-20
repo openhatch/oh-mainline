@@ -619,58 +619,6 @@ class ImportCitations(TwillTests):
 
     form_url = "http://openhatch.org/people/portfolio/import/"
 
-    def test_show_suggested_data_sources(self):
-        pass # FIXME: Make the new importer degrade gracefully and test it
-
-    def test_select_data_sources(self):
-        # {{{
-        client = Client()
-        username='paulproteus'
-        password="paulproteus's unbreakable password"
-        client.login(username=username,
-                     password=password)
-
-        ohloh_repo_search_dia = DataImportAttempt(
-                    query='who cares',
-                    person=Person.objects.get(user__username='paulproteus'),
-                    source='rs')
-        ohloh_repo_search_dia.save()
-
-        ohloh_account_dia = DataImportAttempt(
-                    query='who cares',
-                    person=Person.objects.get(user__username='paulproteus'),
-                    source='ou')
-        ohloh_account_dia.save()
-
-        launchpad_account_dia = DataImportAttempt(
-                    query='query',
-                    person=Person.objects.get(user__username='paulproteus'),
-                    source='lp')
-        launchpad_account_dia.save()
-
-        # The default value of person_wants_data is False
-        # and this test depends on that being so.
-        self.assertFalse(ohloh_repo_search_dia.person_wants_data)
-        self.assertFalse(ohloh_account_dia.person_wants_data)
-        self.assertFalse(launchpad_account_dia.person_wants_data)
-
-        url = "/people/user_selected_these_dia_checkboxes"
-        checkbox_ids_string = "data_import_attempt_%d" % ohloh_repo_search_dia.id
-        response = client.post(url, {'identifier_0': 'who cares',
-                                     'person_wants_0_rs': 'on'})
-
-        self.assertEqual(response.status_code, 200)
-
-        # Re-get the Ohloh Repository Search object from the DB
-        ohloh_repo_search_dia = DataImportAttempt.objects.get(
-                    query='who cares',
-                    person=Person.objects.get(user__username='paulproteus'),
-                    source='rs')
-        self.assert_(ohloh_repo_search_dia.person_wants_data)
-        self.assertFalse(ohloh_account_dia.person_wants_data)
-        self.assertFalse(launchpad_account_dia.person_wants_data)
-#}}}
-
     def test_action_via_view(self):
         """Send a Person objects and a list of usernames and email addresses to the action controller. Test that the controller really added some corresponding DIAs for that Person."""
         # {{{

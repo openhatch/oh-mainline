@@ -76,7 +76,6 @@ class DataImportAttempt(models.Model):
     source = models.CharField(max_length=2,
                               choices=SOURCE_CHOICES)
     person = models.ForeignKey(Person)
-    person_wants_data = models.BooleanField(default=False)
     query = models.CharField(max_length=200)
     stale = models.BooleanField(default=False)
 
