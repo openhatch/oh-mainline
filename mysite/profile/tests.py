@@ -611,7 +611,7 @@ class ImportContributionsTests(TwillTests):
     # {{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
     # Don't include cchost-paulproteus, because we need paulproteus to have
-    # zero projectexps at the beginning of test_person_gets_data_iff_they_want_it
+    # zero Citations at the beginning of test_person_gets_data_iff_they_want_it
 
     form_url = "http://openhatch.org/people/portfolio/import/"
 
@@ -626,26 +626,27 @@ class ImportContributionsTests(TwillTests):
         client.login(username=username,
                      password=password)
 
+        # Create some DataImportAttempts.
         ohloh_repo_search_dia = DataImportAttempt(
                     query='who cares',
                     person=Person.objects.get(user__username='paulproteus'),
                     source='rs')
-        ohloh_repo_search_dia.save()
-
         ohloh_account_dia = DataImportAttempt(
                     query='who cares',
                     person=Person.objects.get(user__username='paulproteus'),
                     source='ou')
-        ohloh_account_dia.save()
-
         launchpad_account_dia = DataImportAttempt(
                     query='query',
                     person=Person.objects.get(user__username='paulproteus'),
                     source='lp')
+
+        # Save them.
+        ohloh_repo_search_dia.save()
+        ohloh_account_dia.save()
         launchpad_account_dia.save()
 
-        # The default value of person_wants_data is False
-        # and this test depends on that being so.
+        # This test won't work unless the default value of
+        # person_wants_data is False. Let's assert that.
         self.assertFalse(ohloh_repo_search_dia.person_wants_data)
         self.assertFalse(ohloh_account_dia.person_wants_data)
         self.assertFalse(launchpad_account_dia.person_wants_data)
