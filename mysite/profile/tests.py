@@ -702,7 +702,7 @@ class Importer(TwillTests):
                 must_find_nothing=True)
     # }}}
 
-class ImporterPublish(TwillTests):
+class ImporterPublishCitation(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
 
     def test_publish_citation(self):
@@ -754,7 +754,7 @@ class ImporterPublish(TwillTests):
 
         self.assertEqual(response.content, "0")
 
-class ImportDeleteCitation(TwillTests):
+class ImporterDeleteCitation(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
 
     def test_delete_citation(self):

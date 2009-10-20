@@ -132,6 +132,9 @@ urlpatterns = patterns('',
         (r'^profile/views/publish_citation_do$',
                 'mysite.profile.views.publish_citation_do'),
 
+        (r'^profile/views/delete_citation_do$',
+                'mysite.profile.views.delete_citation_do'),
+
         (r'^people/import/do$',
             'mysite.profile.views.import_do'),
 
