@@ -611,13 +611,38 @@ class UserListTests(TwillTests):
 
     # }}}
 
-class ImportCitations(TwillTests):
+class Importer(TwillTests):
     # {{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
-    # Don't include cchost-paulproteus, because we need paulproteus to have
-    # zero projectexps at the beginning of test_person_gets_data_iff_they_want_it
 
     form_url = "http://openhatch.org/people/portfolio/import/"
+
+    def test_enqueue_a_background_job_tracked_in_the_db(self):
+        "Enqueue and track importation tasks."
+        """
+        For each data source, enqueue a background task.
+        Keep track of information about the task in an object
+        called a DataImportAttempt."""
+
+        paulproteus = Person.objects.get(user__username='paulproteus')
+        input = {'committer_identifier': 'paulproteus'}
+
+        def count_jobs_for_paulproteus():
+            return DataImportAttempt.objects.filter(person=paulproteus).count()
+
+        self.assertEqual(count_jobs_for_paulproteus(), 0,
+                "Before profile.views.start_importing, "
+                "no jobs for paulproteus.")
+
+        output = mysite.profile.views.start_importing()
+
+        self.assertEqual(output, "[{'success': 1}]",
+                "After profile.views.start_importing, "
+                "profile.views.start_importing sent a success message via JSON.")
+
+        self.assert_(count_jobs_for_paulproteus(),
+                "After profile.views.start_importing, paulproteus has "
+                "some jobs recorded in the DB.")
 
     def test_action_via_view(self):
         """Send a Person objects and a list of usernames and email addresses to the action controller. Test that the controller really added some corresponding DIAs for that Person."""
