@@ -129,6 +129,9 @@ urlpatterns = patterns('',
         (r'^people/gimme_json_that_says_that_commit_importer_is_done$',
             'mysite.profile.views.gimme_json_that_says_that_commit_importer_is_done'),
 
+        (r'^profile/views/publish_citation_do$',
+                'mysite.profile.views.publish_citation_do'),
+
         (r'^people/import/do$',
             'mysite.profile.views.import_do'),
 
