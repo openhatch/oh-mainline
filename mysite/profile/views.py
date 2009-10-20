@@ -611,15 +611,14 @@ def import_commits_by_commit_username(request):
         result = tasks.FetchPersonDataFromOhloh.delay(dia.id)
     # }}}
 
-#FIXME: These are controllers. Raffi is appalled.
-#FIXME: Contribution, not Contributor, Fact.
-def ohloh_contributor_facts_to_project_exps(dia_id, ohloh_results):
-    # {{{
+#FIXME: These ought to be controllers. Raffi is appalled.
+def create_citations_from_ohloh_contributor_facts(dia_id, ohloh_results):
     '''Input: A sequence of Ohloh ContributionFact dicts
     and the id of the DataImport they came from.
 
     Side-effect: Create matching structures in the DB
     and mark our success in the database.'''
+    # {{{
     dia = DataImportAttempt.objects.get(id=dia_id)
     person = dia.person
     for c_i in ohloh_results:
@@ -643,39 +642,39 @@ def ohloh_contributor_facts_to_project_exps(dia_id, ohloh_results):
     # }}}
 
 #FIXME: Same with this one. A-ppalled.
-def create_project_exps_from_launchpad_contributor_facts(dia_id, lp_results):
-    # {{{
-    '''Input: A sequence of Ohloh ContributorInfo dicts
-    and the id of the DataImport they came from.
+def create_citations_from_launchpad_results(dia_id, lp_results):
+    "Input: A dictionary that maps from a project name to information "
+    "about that project, e.g. "
+    """
+         {
+             'F-Spot': {
+                 'url': 'http://launchpad.net/f-spot',
+                 'involvement_types': ['Bug Management', 'Bazaar Branches'],
+                 'languages': ['python', 'ruby'],
+             }
+         }
+    and the id of the DataImportAttempt they came from.
 
     Side-effect: Create matching structures in the DB
-    and mark our success in the database.'''
+    and mark our success in the database."""
+    # {{{
     dia = DataImportAttempt.objects.get(id=dia_id)
     person = dia.person
-    # lp_results looks like this:
-    # 
-    # It returns a dictionary like this:
-    #     {
-    #         'F-Spot': {
-    #             'url': 'http://launchpad.net/f-spot',
-    #             'involvement_types': ['Bug Management', 'Bazaar Branches'],
-    #             'languages': ['python', 'ruby'],
-    #         }
-    #     }
     for project_name in lp_results:
         result = lp_results[project_name]
         for involvement_type in result['involvement_types']:
-            person_role = involvement_type
-            exp = ProjectExp()
-            if result['languages']:
-                primary_language = result['languages'][0]
-            else:
-                primary_language = None
-            exp = exp.from_launchpad_result(project_name, primary_language, person_role)
-            exp.last_polled = datetime.datetime.now()
-            exp.last_touched = datetime.datetime.now()
-            exp.data_import_attempt = dia
-            exp.save()
+
+            (project, _) = Project.objects.get_or_create(name=project_name)
+            (portfolio_entry, _) = PortfolioEntry.objects.get_or_create(
+                    person=person, project=project)
+
+            citation = Citation()
+            citation.languages = ", ".join(result['languages'])
+            citation.contributor_role = involvement_type
+            citation.portfolio_entry = portfolio_entry
+            citation.data_import_attempt = dia
+            citation.save()
+
     person.last_polled = datetime.datetime.now()
     dia.completed = True
     dia.save()

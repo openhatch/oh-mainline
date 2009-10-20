@@ -2,7 +2,8 @@ import datetime
 from mysite.customs import ohloh
 import urllib2
 from mysite.customs import lp_grabber
-from mysite.profile.views import ohloh_contributor_facts_to_project_exps, create_project_exps_from_launchpad_contributor_facts
+from mysite.profile.views import (create_citations_from_launchpad_results,
+        create_citations_from_ohloh_contributor_facts)
 from mysite.profile.models import Person, DataImportAttempt
 from celery.task import Task
 import celery.registry
@@ -56,9 +57,9 @@ source2actual_action = {
         }
 
 source2result_handler = {
-        'rs': ohloh_contributor_facts_to_project_exps,
-        'ou': ohloh_contributor_facts_to_project_exps,
-        'lp': create_project_exps_from_launchpad_contributor_facts,
+        'rs': create_citations_from_ohloh_contributor_facts,
+        'ou': create_citations_from_ohloh_contributor_facts,
+        'lp': create_citations_from_launchpad_results,
         }
 
 class FetchPersonDataFromOhloh(Task):

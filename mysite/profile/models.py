@@ -342,9 +342,10 @@ class PortfolioEntry(models.Model):
 class Citation(models.Model):
     portfolio_entry = models.ForeignKey(PortfolioEntry) # [0]
     # FIXME: For manual add: url = models.URLField()
+    contributor_role = models.CharField(max_length=200, null=True)
     data_import_attempt = models.ForeignKey(DataImportAttempt)
     distinct_months = models.IntegerField()
-    primary_language = models.TextField()
+    languages = models.TextField()
     #year_started = models.IntegerField()
     date_created = models.DateTimeField(default=datetime.datetime.now)
     is_published = models.BooleanField(default=False) # unpublished == Unread
@@ -360,25 +361,5 @@ class Citation(models.Model):
         #citation.year_started = ohloh_contrib_info['year_started']
         return citation
         # }}}
-
-"""
-    @staticmethod
-    def from_launchpad_result(self, project_name, language, person_role):
-        # {{{
-        self.project, bool_created = Project.objects.get_or_create(
-                name=project_name)
-        matches = list(ProjectExp.objects.filter(project=self.project,
-                                           person=self.person))
-        if matches:
-            return matches[0]
-        else:
-            # FIXME: Automatically populate project url here.
-            self.primary_language = language
-            self.person_role = person_role
-            self.source = "Launchpad"
-            self.time_gathered_from_source = datetime.date.today()
-            return self
-        # }}}
-        """
 
     # [0]: FIXME: Let's learn how to use Django's ManyToManyField etc.
