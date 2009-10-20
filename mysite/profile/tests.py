@@ -25,7 +25,7 @@ import mock
 
 import django.test
 from django.test.client import Client
-from django.core import management
+from django.core import management, serializers
 from django.core.urlresolvers import reverse
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
@@ -656,39 +656,38 @@ class Importer(TwillTests):
                         "paulproteus has a task recorded in the DB "
                         "for source %s." % source_key)
 
-    def test_action_via_view(self):
-        """Send a Person objects and a list of usernames and email addresses to the action controller. Test that the controller really added some corresponding DIAs for that Person."""
-        # {{{
-        client = Client()
-        username='paulproteus'
-        client.login(username=username,
-                     password="paulproteus's unbreakable password")
+    def test_get_import_status(self):
+        "Just make sure that the JSON returned by the view is "
+        "appropriate considering what's in the database."
 
-        data = {}
-        commit_usernames_and_emails = ["bilbo", "bilbo@baggin.gs"]
-        for n, cu in enumerate(commit_usernames_and_emails):
-            data["identifier_%d" % n] = cu
+        paulproteus = Person.objects.get(user__username='paulproteus')
 
-        # Not a DIA in sight.
-        self.assertFalse(list(DataImportAttempt.objects.filter(person=Person.objects.get(user__username='paulproteus'))))
+        citation = Citation(
+                portfolio_entry=PortfolioEntry.objects.get_or_create(
+                    project=Project.objects.get_or_create(name='project name')[0],
+                    person=paulproteus)[0],
+                data_import_attempt=DataImportAttempt.objects.get_or_create(
+                    source='rs', query='paulproteus', completed=True, person=paulproteus)[0]
+                )
+        citation.save()
 
-        response = client.post('/people/portfolio/import/prepare_data_import_attempts_do', data) 
+        finished_dia = citation.data_import_attempt
+        unfinished_dia = DataImportAttempt(source='rs', query='foo',
+                completed=False, person=paulproteus)
+        unfinished_dia.save()
 
-        # DIAs, nu?
-        self.assert_(list(DataImportAttempt.objects.filter(person=Person.objects.get(user__username='paulproteus'))))
-        #}}}
-
-    def test_prepare_data_import_attempts(self):
-        user = User.objects.get(username='paulproteus')
-        self.assertEqual(len(DataImportAttempt.objects.filter(person=user.get_profile())), 0)
-        post = {
-                'identifier_0': 'paulproteus',
-                'checkbox_0_rs': 'on',
-                'checkbox_0_lp': 'on',
-                'checkbox_0_ou': 'on'
-                }
-        views.prepare_data_import_attempts(post, user)
-        self.assertEqual(len(DataImportAttempt.objects.filter(person=user.get_profile())), 3)
+        response = self.login_with_client().get(
+                reverse(mysite.profile.views.gimme_json_that_says_that_commit_importer_is_done))
+        
+        response_dias_and_citations = simplejson.loads(response.content)
+        for object in response_dias_and_citations:
+            del object['fields']
+            # We don't care about fields. Checking the pk and model name is just fine.
+         
+        expected_list = serializers.serialize('python', [finished_dia, unfinished_dia, citation])
+        for object in expected_list:
+            del object['fields']
+            self.assert_(object in response_dias_and_citations)
 
     # }}}
 
