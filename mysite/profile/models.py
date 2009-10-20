@@ -83,18 +83,6 @@ class DataImportAttempt(models.Model):
     def get_formatted_source_description(self):
         return self.get_source_display() % self.query
 
-    def give_data_to_person(self):
-        """ This DataImportAttempt assigns its person to its ProjectExps. """
-
-        project_exps = ProjectExp.objects.filter(data_import_attempt=self)
-        for pe in project_exps:
-            if pe.person and pe.person != self.person:
-                raise ValueError, ("You tried to give some ProjectExps to "
-                + "a person (%s), but those ProjectExps already belonged to somebody else (%s)." % (
-                        self.person, pe.person))
-            pe.person = self.person
-            pe.save()
-
     def do_what_it_says_on_the_tin(self):
         """Attempt to import data by enqueuing a job in celery."""
         # We need to import here to avoid vicious cyclical imports.

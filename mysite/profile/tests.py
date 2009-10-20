@@ -611,7 +611,7 @@ class UserListTests(TwillTests):
 
     # }}}
 
-class ImportContributionsTests(TwillTests):
+class ImportCitations(TwillTests):
     # {{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
     # Don't include cchost-paulproteus, because we need paulproteus to have
@@ -676,58 +676,53 @@ class ImportContributionsTests(TwillTests):
     @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
     def test_person_gets_data_iff_they_want_it(self):
         # {{{
-        client = Client()
-        username='paulproteus'
-        password="paulproteus's unbreakable password"
-        client.login(username=username,
-                     password=password)
+
+        #client = Client()
+        #username='paulproteus'
+        #password="paulproteus's unbreakable password"
+        #client.login(username=username,
+        #             password=password)
 
         a_person = Person.objects.get(user__username='paulproteus')
 
-        # Make two DIAs, attach some Citations to each,
+        # Make sure paulproteus has no Citations to begin with.
+        self.assertEqual(Citation.objects.filter(portfolio_entry__person=a_person).count(), 0)
+
+        # Make three DIAs, attach some Citations to each,
         # as if user had successfully imported some Citations.
 
-        ohloh_repo_search_dia = DataImportAttempt(
-                    query='who cares',
-                    person=a_person,
-                    source='rs')
-        ohloh_repo_search_dia.person_wants_data = True
+        dias = [
+                DataImportAttempt(query='query', person=a_person, source='rs'),
+                DataImportAttempt(query='query', person=a_person, source='ou')
+                ]
 
-        ohloh_account_dia = DataImportAttempt(
-                    query='who cares',
-                    person=a_person,
-                    source='ou')
+        for dia in dias:
+            dia.save()
 
-        launchpad_account_dia = DataImportAttempt(
-                    query='query',
-                    person=Person.objects.get(user__username='paulproteus'),
-                    source='lp')
+        # By default all DIAs should have person_wants_data=False
+        for dia in dias:
+            self.assertFalse(dia.person_wants_data)
 
-        ohloh_repo_search_dia.save()
-        ohloh_account_dia.save()
-        launchpad_account_dia.save()
+        # Only mark one DIA as 'the person actually wants this Citation'.
+        dias[0].person_wants_data = True
+        dias[0].save()
 
-        # This test won't work unless the default value of
-        # person_wants_data is False. Let's assert this. 
-        self.assertFalse(ohloh_account_dia.person_wants_data)
-        self.assertFalse(launchpad_account_dia.person_wants_data)
-        
-        (a_project, _) = Project.objects.get_or_create(name='ccHost')
-        a_citation = Citation(project=a_project, description='the description')
-        a_citation.data_import_attempt = ohloh_repo_search_dia
-        a_citation.save()
+        # Activate each of the DIAs.
+        for dia in dias:
+            dia.do_what_it_says_on_the_tin()
 
-        another_project, _ = Project.objects.get_or_create(name='a project name')
-        another_exp = ProjectExp(project=another_project, description='the description')
-        another_exp.data_import_attempt = ohloh_account_dia
-        another_exp.save()
+        # At this point, both DIAs have been activated. Since we mock.patch'd
+        # the functions that communicate with the external data sources,
+        # we know that these DIAs each found one data structure of a foreign
+        # ilk and, if person_wants_data was marked as True, converted this
+        # data structure into a Citation, linked it with the requesting person
+        # and saved it into the DB. Since only one DIA was marked
+        # person_wants_data=True, there should be only one Citation in the DB
+        # associated with this person.
+        c = Citation.objects.get(portfolio_entry__person=a_person)
 
-        ohloh_repo_search_dia.do_what_it_says_on_the_tin()
-        ohloh_account_dia.do_what_it_says_on_the_tin()
-        launchpad_account_dia.do_what_it_says_on_the_tin()
-
-        x = ProjectExp.objects.get(person=a_person)
-        self.assertEqual(x.id, an_exp.id)
+        # and it's the data from the DIA marked "person_wants_data".
+        self.assertEqual(c.data_import_attempt, dias[0])
         # }}}
 
     def test_action_via_view(self):

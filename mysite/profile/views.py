@@ -636,9 +636,6 @@ def create_citations_from_ohloh_contributor_facts(dia_id, ohloh_results):
     dia.completed = True
     dia.save()
     person.save()
-
-    if dia.person_wants_data:
-        dia.give_data_to_person()
     # }}}
 
 #FIXME: Same with this one. A-ppalled.
