@@ -619,42 +619,42 @@ class Importer(TwillTests):
 
     @mock.patch('mysite.profile.models.DataImportAttempt.do_what_it_says_on_the_tin')
     def test_create_data_import_attempts(self, mock_do_what_it_says_on_the_tin):
-        "Enqueue and track importation tasks."
-        """
-        Test the following behavior: 
-        For each data source, enqueue a background task.
-        Keep track of information about the task in an object
-        called a DataImportAttempt."""
+        """Test profile.views.start_importing_do."""
 
         paulproteus = Person.objects.get(user__username='paulproteus')
-        input = {'committer_identifier': 'paulproteus'}
+        input = {
+                'identifier_0': 'paulproteus',
+                'identifier_1': 'asheesh@asheesh.org',
+                }
 
-        def count_tasks_for_paulproteus():
-            return DataImportAttempt.objects.filter(person=paulproteus).count()
-
-        self.assertEqual(count_tasks_for_paulproteus(), 0,
+        self.assertEqual(
+                DataImportAttempt.objects.filter(person=paulproteus).count(),
+                0,
                 "Pre-condition: "
                 "No tasks for paulproteus.")
 
-        response = self.client.post(reverse(mysite.profile.views.start_importing_do), input)
+        client = self.login_with_client()
+        response = client.post(
+                reverse(mysite.profile.views.prepare_data_import_attempts_do),\
+                        input)
 
         # FIXME: We should also check that we call this function
         # once for each data source.
         self.assert_(mock_do_what_it_says_on_the_tin.called)
 
-        # FIXME: Check the response qua JSON, not qua string.
-        # This means actually parse the JSON.
-        self.assertEqual(response.content, "[{'success': 1}]",
+        self.assertEqual(response.content, "1",
                 "Post-condition: "
                 "profile.views.start_importing sent a success message via JSON.")
 
-        for (source_key, _) in DataImportAttempt.SOURCE_CHOICES:
-            self.assertEqual(DataImportAttempt.objects.filter(
-                person=paulproteus, source=source_key).count(),
-                1,
-                "Post-condition: "
-                "paulproteus has a task recorded in the DB "
-                "for source %s." % source_key)
+        for identifier in input.values():
+            for (source_key, _) in DataImportAttempt.SOURCE_CHOICES:
+                self.assertEqual(
+                        DataImportAttempt.objects.filter(
+                            person=paulproteus, source=source_key, query=identifier).count(),
+                        1,
+                        "Post-condition: "
+                        "paulproteus has a task recorded in the DB "
+                        "for source %s." % source_key)
 
     def test_action_via_view(self):
         """Send a Person objects and a list of usernames and email addresses to the action controller. Test that the controller really added some corresponding DIAs for that Person."""

@@ -746,38 +746,31 @@ def prepare_data_import_attempts_do(request):
     before bothering the user, ask those networks beforehand if they even 
     have accounts named identifiers[0], etc."""
     # {{{
-    # for each commit_username_*, call some silly controller """
-    prepare_data_import_attempts(request.POST, request.user)
 
-    if request.POST.get('format', None) == 'success_code':
-        return HttpResponse('1')
-    else:
-        return HttpResponseRedirect('/people/portfolio/import/')
+    # For each commit identifier, prepare some DataImportAttempts.
+    prepare_data_import_attempts(identifiers=request.POST.values(), user=request.user)
+
+    return HttpResponse('1')
     # }}}
 
-def prepare_data_import_attempts(post, user):
-    identifiers = []
-    for key in post:
-        if key.startswith('identifier_'):
-            value = post[key].strip()
-            if not value:
-                continue # Skip blanks
-            identifiers.append(value)
+def prepare_data_import_attempts(identifiers, user):
+    "Enqueue and track importation tasks."
+    """Expected input: A list of committer identifiers, e.g.:
+    ['paulproteus', 'asheesh@asheesh.org']
+
+    For each data source, enqueue a background task.
+    Keep track of information about the task in an object
+    called a DataImportAttempt."""
 
     # Side-effects: Create DIAs that a user might want to execute.
     for identifier in identifiers:
-        if identifier:
+        if identifier: # Skip blanks
             for source_key, _ in DataImportAttempt.SOURCE_CHOICES:
-                # FIXME: "...that a user might want to execute" means,
-                # don't show the user DIAs that relate to non-existent
-                # accounts on remote networks.
-                # And what *that* means is, before bothering the user,
-                # ask those networks beforehand if they even have
-                # accounts named commit_usernames[0], etc.
-                dia = get_most_recent_data_import_attempt_or_create(
+                dia = create_data_import_attempt_if_nonexistent(
                         query=identifier,
                         source=source_key,
                         person=user.get_profile())
+                dia.do_what_it_says_on_the_tin()
 
 @login_required
 @view
@@ -812,7 +805,7 @@ def filter_by_key_prefix(dict, prefix):
             out_dict[key] = value
     return out_dict
 
-def get_most_recent_data_import_attempt_or_create(query, source, person):
+def create_data_import_attempt_if_nonexistent(query, source, person):
     """NOTE: This is a bit weird, so let me explain it.
     
     Here are three different use cases:
@@ -864,7 +857,7 @@ def user_selected_these_dia_checkboxes(request):
             if identifier:
                 # FIXME: For security, ought this filter include only dias
                 # associated with the logged-in user's profile?
-                dia = get_most_recent_data_import_attempt_or_create(
+                dia = create_data_import_attempt_if_nonexistent(
                         identifier, source_key,
                         request.user.get_profile())
 
@@ -928,13 +921,5 @@ def display_person_edit_name_do(request):
 
     return HttpResponseRedirect('/people/%s' % urllib.quote(user.username))
     # }}}
-
-@login_required
-def start_importing_do(request):
-    """Expected input:
-    {'committer_identifier': 'paulproteus'}
-    """
-    # FIXME: MAke this post handler accept a list of committer idents.
-    return render_to_response("[{'success': 1}]")
 
 # vim: ai ts=3 sts=4 et sw=4 nu
