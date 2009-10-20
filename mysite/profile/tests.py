@@ -671,60 +671,6 @@ class ImportCitations(TwillTests):
         self.assertFalse(launchpad_account_dia.person_wants_data)
 #}}}
 
-    @mock.patch('mysite.customs.ohloh.Ohloh.get_contribution_info_by_username', mock_gcibu)
-    @mock.patch('mysite.customs.ohloh.Ohloh.get_contribution_info_by_ohloh_username', mock_gcibou)
-    @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
-    def test_person_gets_data_iff_they_want_it(self):
-        # {{{
-
-        #client = Client()
-        #username='paulproteus'
-        #password="paulproteus's unbreakable password"
-        #client.login(username=username,
-        #             password=password)
-
-        a_person = Person.objects.get(user__username='paulproteus')
-
-        # Make sure paulproteus has no Citations to begin with.
-        self.assertEqual(Citation.objects.filter(portfolio_entry__person=a_person).count(), 0)
-
-        # Make three DIAs, attach some Citations to each,
-        # as if user had successfully imported some Citations.
-
-        dias = [
-                DataImportAttempt(query='query', person=a_person, source='rs'),
-                DataImportAttempt(query='query', person=a_person, source='ou')
-                ]
-
-        for dia in dias:
-            dia.save()
-
-        # By default all DIAs should have person_wants_data=False
-        for dia in dias:
-            self.assertFalse(dia.person_wants_data)
-
-        # Only mark one DIA as 'the person actually wants this Citation'.
-        dias[0].person_wants_data = True
-        dias[0].save()
-
-        # Activate each of the DIAs.
-        for dia in dias:
-            dia.do_what_it_says_on_the_tin()
-
-        # At this point, both DIAs have been activated. Since we mock.patch'd
-        # the functions that communicate with the external data sources,
-        # we know that these DIAs each found one data structure of a foreign
-        # ilk and, if person_wants_data was marked as True, converted this
-        # data structure into a Citation, linked it with the requesting person
-        # and saved it into the DB. Since only one DIA was marked
-        # person_wants_data=True, there should be only one Citation in the DB
-        # associated with this person.
-        c = Citation.objects.get(portfolio_entry__person=a_person)
-
-        # and it's the data from the DIA marked "person_wants_data".
-        self.assertEqual(c.data_import_attempt, dias[0])
-        # }}}
-
     def test_action_via_view(self):
         """Send a Person objects and a list of usernames and email addresses to the action controller. Test that the controller really added some corresponding DIAs for that Person."""
         # {{{
