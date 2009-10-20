@@ -766,7 +766,7 @@ def prepare_data_import_attempts(post, user):
     for identifier in identifiers:
         if identifier:
             for source_key, _ in DataImportAttempt.SOURCE_CHOICES:
-                # FIXME: "...that a user might want to execute" means,
+                dia = create_data_import_attempt_if_nonexistent(
                 # don't show the user DIAs that relate to non-existent
                 # accounts on remote networks.
                 # And what *that* means is, before bothering the user,
@@ -776,6 +776,8 @@ def prepare_data_import_attempts(post, user):
                         query=identifier,
                         source=source_key,
                         person=user.get_profile())
+                dia.save()
+                dia.do_what_it_says_on_the_tin()
 
 @login_required
 @view
@@ -796,7 +798,7 @@ def importer(request):
             }
     person = request.user.get_profile()
     data = get_personal_data(person)
-    data['dias'] = DataImportAttempt.objects.filter(person=person, stale=False).order_by('id')
+    data['dias'] = DataImportAttempt.objects.filter(person=person).order_by('id')
     data['blank_query'] = blank_query
 
     return (request, 'profile/importer.html', data)
@@ -810,7 +812,7 @@ def filter_by_key_prefix(dict, prefix):
             out_dict[key] = value
     return out_dict
 
-def get_most_recent_data_import_attempt_or_create(query, source, person):
+def create_data_import_attempt_if_nonexistent(query, source, person):
     """NOTE: This is a bit weird, so let me explain it.
     
     Here are three different use cases:
@@ -862,10 +864,10 @@ def user_selected_these_dia_checkboxes(request):
             if identifier:
                 # FIXME: For security, ought this filter include only dias
                 # associated with the logged-in user's profile?
-                dia = get_most_recent_data_import_attempt_or_create(
+                dia = create_data_import_attempt_if_nonexistent(
                         identifier, source_key,
                         request.user.get_profile())
-
+                dia.do_what_it_says_on_the_tin()
                 dia.person_wants_data = True
                 dia.save()
 

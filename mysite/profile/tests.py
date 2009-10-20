@@ -553,37 +553,6 @@ class CeleryTests(TwillTests):
 
         # }}}
 
-    @mock.patch('mysite.customs.ohloh.Ohloh.get_contribution_info_by_username', mock_gcibu)
-    @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
-    def test_stale_dias_are_not_shown_in_json(self):
-        """Create a DIA that is stale. Verify it is ignored by JSON."""
-        # {{{
-        # do this work for user = paulproteus
-        username = 'paulproteus'
-        person = Person.objects.get(user__username=username)
-
-        stale_dia = DataImportAttempt(
-                    stale=True,
-                    query='who cares',
-                    person=person,
-                    source='rs')
-        stale_dia.save()
-
-        # Verify the JSON gives back an empty list
-        c = self.login_with_client()
-
-        url = '/people/gimme_json_that_says_that_commit_importer_is_done'
-        response = c.get(url)
-        decoded = simplejson.loads(response.content)
-
-        self.assertEqual(decoded, [])
-
-        # FIXME: One day, test that, after
-        # self.test_slow_loading_via_emulated_bgtask,
-        # getting the data does not go out to Ohloh.
-
-        # }}}
-
     # }}}
 
 class UserListTests(TwillTests):
@@ -825,51 +794,6 @@ class OnlyFreshDiasAreSelected(TwillTests):
             query, source, person)
 
         self.assertEqual(1, DataImportAttempt.objects.count())        
-
-    @mock.patch("mysite.profile.models.DataImportAttempt.do_what_it_says_on_the_tin")
-    def test_dias_created_again_for_stale_dias(self, mock_dia_do_what_it_says):
-        query = 'query'
-        source = 'oh'
-        person = Person.objects.get(user__username='paulproteus')
-
-        self.assertEqual(0, DataImportAttempt.objects.count())
-        
-        mysite.profile.views.get_most_recent_data_import_attempt_or_create(
-            query, source, person)
-
-        self.assertEqual(1, DataImportAttempt.objects.count())
-
-        # Now, set that one to stale:
-        dia = DataImportAttempt.objects.get()
-        dia.stale = True
-        dia.save()
-
-        mysite.profile.views.get_most_recent_data_import_attempt_or_create(
-            query, source, person)
-
-        self.assertEqual(2, DataImportAttempt.objects.count())
-
-
-    def test_showing_checkbox_marks_dia_as_stale(self):
-        c = self.login_with_client()
-        
-        # First, make a DIA. Make it already completed.
-        dia_done = DataImportAttempt(
-                    query='query',
-                    completed=True,
-                    person=Person.objects.get(user__username='paulproteus'),
-                    source='lp')
-        dia_done.save()
-
-        self.assertFalse(dia_done.stale)
-
-        # Now, get the JSON
-        
-        url = '/people/gimme_json_that_says_that_commit_importer_is_done'
-        response = c.get(url)
-
-        # Now verify it's done
-        self.assert_(DataImportAttempt.objects.get().stale)
 
 class PersonInfoLinksToSearch(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
