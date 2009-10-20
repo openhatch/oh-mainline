@@ -424,7 +424,7 @@ class MockFetchPersonDataFromOhloh(object):
     real_task_class = tasks.FetchPersonDataFromOhloh
     @classmethod
     def delay(*args, **kwargs):
-        "Don't enqueue a background job. Just run the job."
+        "Don't enqueue a background task. Just run the task."
         args = args[1:] # FIXME: Wonder why I need this
         task = MockFetchPersonDataFromOhloh.real_task_class()
         task.debugging = True # See FetchPersonDataFromOhloh
@@ -461,11 +461,11 @@ class CeleryTests(TwillTests):
         
         client = self.login_with_client()
 
-        # Ask if background job has been completed.
-        # We haven't even created the background job, so 
+        # Ask if background task has been completed.
+        # We haven't even created the background task, so 
         # the answer should be no.
-        response_before_job_is_run = client.get(gimme_json_url)
-        response_json = simplejson.loads(response_before_job_is_run.content)
+        response_before_task_is_run = client.get(gimme_json_url)
+        response_json = simplejson.loads(response_before_task_is_run.content)
         self.assertEqual(response_json[0]['pk'], dia.id)
         self.assertFalse(response_json[0]['fields']['completed'])
         
@@ -489,7 +489,7 @@ class CeleryTests(TwillTests):
         # First, request the JSON again.
         response_after = client.get(gimme_json_url)
 
-        # Ask if background job has been completed. (Hoping for yes.)
+        # Ask if background task has been completed. (Hoping for yes.)
         response_json = simplejson.loads(response_after.content)
         self.assertEquals(response_json[0]['pk'], dia.id)
         self.assert_(response_json[0]['fields']['completed'])
@@ -617,9 +617,11 @@ class Importer(TwillTests):
 
     form_url = "http://openhatch.org/people/portfolio/import/"
 
-    def test_enqueue_a_background_job_tracked_in_the_db(self):
+    @mock.patch('mysite.profile.models.DataImportAttempt.do_what_it_says_on_the_tin')
+    def test_create_data_import_attempts(self, mock_do_what_it_says_on_the_tin):
         "Enqueue and track importation tasks."
         """
+        Test the following behavior: 
         For each data source, enqueue a background task.
         Keep track of information about the task in an object
         called a DataImportAttempt."""
@@ -627,22 +629,30 @@ class Importer(TwillTests):
         paulproteus = Person.objects.get(user__username='paulproteus')
         input = {'committer_identifier': 'paulproteus'}
 
-        def count_jobs_for_paulproteus():
+        def count_tasks_for_paulproteus():
             return DataImportAttempt.objects.filter(person=paulproteus).count()
 
-        self.assertEqual(count_jobs_for_paulproteus(), 0,
-                "Before profile.views.start_importing, "
-                "no jobs for paulproteus.")
+        self.assertEqual(count_tasks_for_paulproteus(), 0,
+                "Pre-condition: "
+                "No tasks for paulproteus.")
 
-        output = mysite.profile.views.start_importing()
+        response = self.client.get(reverse(mysite.profile.views.start_importing), input)
 
-        self.assertEqual(output, "[{'success': 1}]",
-                "After profile.views.start_importing, "
+        # FIXME: We should also check that we call this function
+        # once for each data source.
+        self.assert_(mock_do_what_it_says_on_the_tin.called)
+
+        self.assertEqual(response.content, "[{'success': 1}]",
+                "Post-condition: "
                 "profile.views.start_importing sent a success message via JSON.")
 
-        self.assert_(count_jobs_for_paulproteus(),
-                "After profile.views.start_importing, paulproteus has "
-                "some jobs recorded in the DB.")
+        for (source_key, _) in DataImportAttempt.SOURCE_CHOICES:
+            self.assertEqual(DataImportAttempt.objects.filter(
+                person=paulproteus, source=source_key).count(),
+                1,
+                "Post-condition: "
+                "paulproteus has a task recorded in the DB "
+                "for source %s." % source_key)
 
     def test_action_via_view(self):
         """Send a Person objects and a list of usernames and email addresses to the action controller. Test that the controller really added some corresponding DIAs for that Person."""
