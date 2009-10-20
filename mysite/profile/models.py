@@ -162,6 +162,7 @@ class ProjectExp(models.Model):
             self.time_gathered_from_source = datetime.date.today()
             return self
         # }}}
+
     # FIXME: Make this a static method or something
     def from_launchpad_result(self, project_name, language, person_role):
         # {{{

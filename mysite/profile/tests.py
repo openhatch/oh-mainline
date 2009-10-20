@@ -445,8 +445,24 @@ class CeleryTests(TwillTests):
         "is called do_what_it_says_on_the_tin, because it will attempt to "
         "import data. "
         "3. Run the celery task ourselves, but instead of going to Ohloh, "
-        " we hand-prepare data for it."""
+        "we hand-prepare data for it."""
         # {{{
+        return self._test_data_source_via_emulated_bgtask()
+        # }}}
+
+    # FIXME: One day, test that after self.test_slow_loading_via_emulated_bgtask
+    # getting the data does not go out to Ohloh.
+
+    def _test_data_source_via_emulated_bgtask(self):
+        "1. Go to the page that has paulproteus' data. "
+        "2. Verify that the page doesn't yet know about ccHost. "
+        "3. Prepare an object that will import data from ccHost. "
+        "The object is a DataImportAttempt. The DataImportAttempt has a method "
+        "that will create a background task using the celery package. The method "
+        "is called do_what_it_says_on_the_tin, because it will attempt to "
+        "import data. "
+        "3. Run the celery task ourselves, but instead of going to Ohloh, "
+        "we hand-prepare data for it."""
         # Let's run this test using a sample user, paulproteus.
         username = 'paulproteus'
         person = Person.objects.get(user__username=username)
@@ -517,16 +533,22 @@ class CeleryTests(TwillTests):
 
         # Check that the language of the citation is correct.
 
-        # }}}
-
-    # FIXME: One day, test that after self.test_slow_loading_via_emulated_bgtask
-    # getting the data does not go out to Ohloh.
 
     @mock.patch('mysite.customs.lp_grabber.get_info_for_launchpad_username', mock_giflu)
     @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
     def test_launchpad_import_via_emulated_bgtask(self):
-        """1. Go to the page that has paulproteus' data.  2. Verify that the page doesn't yet know about F-Spot. 3. Run the celery task ourselves, but instead of going to Launchpad, we hand-prepare data for it."""
+        "1. Go to the page that has paulproteus' data.  "
+        "2. Verify that the page doesn't yet know about F-Spot. "
+        "3. As with test_ohloh_import_via_emulated_bgtask, we prepare "
+        "an object that will import data from ccHost. "
+        "The object is a DataImportAttempt. The DataImportAttempt has a method "
+        "that will create a background task using the celery package. The method "
+        "is called do_what_it_says_on_the_tin, because it will attempt to "
+        "import data. "
+        "4. Run the celery task ourselves, but instead of going to Launchpad, "
+        "we hand-prepare data for it."""
         # {{{
+
         # do this work for user = paulproteus
         username='paulproteus'
         person = Person.objects.get(user__username=username)
