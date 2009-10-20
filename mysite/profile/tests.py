@@ -684,37 +684,38 @@ class ImportContributionsTests(TwillTests):
 
         a_person = Person.objects.get(user__username='paulproteus')
 
-        # Make two DIAs, attach some ProjectExps to each,
-        # as if user had successfully imported some ProjectExps.
+        # Make two DIAs, attach some Citations to each,
+        # as if user had successfully imported some Citations.
 
         ohloh_repo_search_dia = DataImportAttempt(
                     query='who cares',
                     person=a_person,
                     source='rs')
         ohloh_repo_search_dia.person_wants_data = True
-        ohloh_repo_search_dia.save()
 
         ohloh_account_dia = DataImportAttempt(
                     query='who cares',
                     person=a_person,
                     source='ou')
-        ohloh_account_dia.save()
 
         launchpad_account_dia = DataImportAttempt(
                     query='query',
                     person=Person.objects.get(user__username='paulproteus'),
                     source='lp')
+
+        ohloh_repo_search_dia.save()
+        ohloh_account_dia.save()
         launchpad_account_dia.save()
 
-        # The default value of person_wants_data is False
-        # and this test depends on that being so.
+        # This test won't work unless the default value of
+        # person_wants_data is False. Let's assert this. 
         self.assertFalse(ohloh_account_dia.person_wants_data)
         self.assertFalse(launchpad_account_dia.person_wants_data)
-
-	a_project, _ = Project.objects.get_or_create(name='ccHost')
-        an_exp = ProjectExp(project=a_project, description='the description')
-        an_exp.data_import_attempt = ohloh_repo_search_dia
-        an_exp.save()
+        
+        (a_project, _) = Project.objects.get_or_create(name='ccHost')
+        a_citation = Citation(project=a_project, description='the description')
+        a_citation.data_import_attempt = ohloh_repo_search_dia
+        a_citation.save()
 
         another_project, _ = Project.objects.get_or_create(name='a project name')
         another_exp = ProjectExp(project=another_project, description='the description')
