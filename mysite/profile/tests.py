@@ -447,13 +447,13 @@ class CeleryTests(TwillTests):
         "3. Run the celery task ourselves, but instead of going to Ohloh, "
         "we hand-prepare data for it."""
         # {{{
-        return self._test_data_source_via_emulated_bgtask()
+        return self._test_data_source_via_emulated_bgtask(source='rs')
         # }}}
 
     # FIXME: One day, test that after self.test_slow_loading_via_emulated_bgtask
     # getting the data does not go out to Ohloh.
 
-    def _test_data_source_via_emulated_bgtask(self):
+    def _test_data_source_via_emulated_bgtask(self, source):
         "1. Go to the page that has paulproteus' data. "
         "2. Verify that the page doesn't yet know about ccHost. "
         "3. Prepare an object that will import data from ccHost. "
@@ -463,13 +463,13 @@ class CeleryTests(TwillTests):
         "import data. "
         "3. Run the celery task ourselves, but instead of going to Ohloh, "
         "we hand-prepare data for it."""
+
         # Let's run this test using a sample user, paulproteus.
         username = 'paulproteus'
         person = Person.objects.get(user__username=username)
 
         # Store a note in the DB that we're about to run a background task
-        dia = DataImportAttempt(query=username, source='rs',
-                                person=person)
+        dia = DataImportAttempt(query=username, source=source, person=person)
         dia.person_wants_data = True
         dia.save()
 
