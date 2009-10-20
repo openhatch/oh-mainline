@@ -929,4 +929,12 @@ def display_person_edit_name_do(request):
     return HttpResponseRedirect('/people/%s' % urllib.quote(user.username))
     # }}}
 
+@login_required
+def start_importing_do(request):
+    """Expected input:
+    {'committer_identifier': 'paulproteus'}
+    """
+    # FIXME: MAke this post handler accept a list of committer idents.
+    return render_to_response("[{'success': 1}]")
+
 # vim: ai ts=3 sts=4 et sw=4 nu

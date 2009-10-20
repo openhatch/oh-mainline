@@ -636,12 +636,14 @@ class Importer(TwillTests):
                 "Pre-condition: "
                 "No tasks for paulproteus.")
 
-        response = self.client.get(reverse(mysite.profile.views.start_importing), input)
+        response = self.client.post(reverse(mysite.profile.views.start_importing_do), input)
 
         # FIXME: We should also check that we call this function
         # once for each data source.
         self.assert_(mock_do_what_it_says_on_the_tin.called)
 
+        # FIXME: Check the response qua JSON, not qua string.
+        # This means actually parse the JSON.
         self.assertEqual(response.content, "[{'success': 1}]",
                 "Post-condition: "
                 "profile.views.start_importing sent a success message via JSON.")

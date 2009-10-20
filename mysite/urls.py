@@ -132,6 +132,9 @@ urlpatterns = patterns('',
         (r'^people/import/do$',
             'mysite.profile.views.import_do'),
 
+        (r'^profile/views/start_importing_do$',
+                'mysite.profile.views.start_importing_do'),
+
         (r'^people/(?P<user_to_display__username>[^/]+)/projects/(?P<project__name>.+)$',
                 'mysite.profile.views.projectexp_display'),
 
