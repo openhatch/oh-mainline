@@ -437,7 +437,7 @@ class CeleryTests(TwillTests):
     # FIXME: One day, test that after self.test_slow_loading_via_emulated_bgtask
     # getting the data does not go out to Ohloh.
 
-    def _test_data_source_via_emulated_bgtask(self, source, expected_attributes):
+    def _test_data_source_via_emulated_bgtask(self, source, data_we_expect):
         "1. Go to the page that has paulproteus' data. "
         "2. Verify that the page doesn't yet know about ccHost. "
         "3. Prepare an object that will import data from ccHost. "
@@ -470,12 +470,12 @@ class CeleryTests(TwillTests):
         self.assertFalse(response_json[0]['fields']['completed'])
         
         # Are there any PortfolioEntries for ccHost
-        # before we import data from Ohloh? Expected: no.
+        # before we import data? Expected: no.
         portfolio_entries = PortfolioEntry.objects.filter(project__name='ccHost')
         self.assertEqual(portfolio_entries.count(), 0)
 
         dia.do_what_it_says_on_the_tin()
-        # NB: The task is being run, but the ohloh API communication
+        # NB: The task is being run, but the communication with the external data source
         # is mocked out.
 
         # Now that we have synchronously run the task, it should be
@@ -497,18 +497,19 @@ class CeleryTests(TwillTests):
         # There ought now to be a PortfolioEntry for ccHost...
         portfolio_entry = PortfolioEntry.objects.get(person=person, project__name='ccHost')
 
-        # ...and a citation to Ohloh.
-        citation = Citation.objects.get(portfolio_entry=portfolio_entry)
+        # ...and the expected number of citations.
+        citations = Citation.objects.filter(portfolio_entry=portfolio_entry)
 
-        # The citation should have the expected pairings of attributes and values.
-        for a in expected_attributes:
-            self.assertEqual(getattr(citation, a), expected_attributes[a])
+        self.assert_(citations.count() > 0)
 
-        self.assertEqual(citation.data_import_attempt, dia)
+        # Let's make sure we got the data we expected.
+        partial_citation_dicts = list(citations.values(*data_we_expect[0].keys()))
+        self.assertEqual(partial_citation_dicts, data_we_expect)
 
-        # Check that the citation is linked with the appropriate DIA.
-
-        # Check that the language of the citation is correct.
+        # Let's make sure that these citations are linked with the
+        # DataImportAttempt we used to import them.
+        for citation in citations:
+            self.assertEqual(citation.data_import_attempt, dia)
 
     @mock.patch('mysite.customs.ohloh.Ohloh.get_contribution_info_by_username', mock_gcibu)
     @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
@@ -518,15 +519,15 @@ class CeleryTests(TwillTests):
         "placeholder that acts like Ohloh, and make sure we respond "
         "to it correctly."
         # {{{
-        expected_attributes = {
-                'primary_language': mock_gcibu.return_value[0]['primary_language'],
+        data_we_expect = [{
+                'languages': mock_gcibu.return_value[0]['primary_language'],
                 'distinct_months': mock_gcibu.return_value[0]['man_months'],
                 'is_published': False,
                 'is_deleted': False,
                 #'year_started': 2007,
-                }
+                }]
         return self._test_data_source_via_emulated_bgtask(
-                source='rs', expected_attributes=expected_attributes)
+                source='rs', data_we_expect=data_we_expect)
         # }}}
 
     @mock.patch('mysite.customs.lp_grabber.get_info_for_launchpad_username', mock_giflu)
@@ -537,14 +538,23 @@ class CeleryTests(TwillTests):
         "placeholder that acts like Ohloh, and make sure we respond "
         "to it correctly."
         # {{{
-        expected_attributes = {
-                'primary_language': mock_giflu.return_value.values()[0]['languages'][0],
-                'is_published': False,
-                'is_deleted': False,
-                #'year_started': 2007,
-                }
+        lp_result = mock_giflu.return_value.values()[0]
+        data_we_expect = [
+                {
+                    'contributor_role': lp_result['involvement_types'][0],
+                    'languages': ", ".join(lp_result['languages']),
+                    'is_published': False,
+                    'is_deleted': False,
+                    },
+                {
+                    'contributor_role': lp_result['involvement_types'][1],
+                    'languages': ", ".join(lp_result['languages']),
+                    'is_published': False,
+                    'is_deleted': False,
+                    }
+                ]
         return self._test_data_source_via_emulated_bgtask(
-                source='lp', expected_attributes=expected_attributes)
+                source='lp', data_we_expect=data_we_expect)
         # }}}
 
     @mock.patch('mysite.customs.ohloh.Ohloh.get_contribution_info_by_username', mock_gcibu)

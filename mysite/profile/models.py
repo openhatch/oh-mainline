@@ -344,7 +344,7 @@ class Citation(models.Model):
     # FIXME: For manual add: url = models.URLField()
     contributor_role = models.CharField(max_length=200, null=True)
     data_import_attempt = models.ForeignKey(DataImportAttempt)
-    distinct_months = models.IntegerField()
+    distinct_months = models.IntegerField(null=True)
     languages = models.TextField()
     #year_started = models.IntegerField()
     date_created = models.DateTimeField(default=datetime.datetime.now)
@@ -357,7 +357,7 @@ class Citation(models.Model):
         # {{{
         citation = Citation()
         citation.distinct_months = ohloh_contrib_info['man_months']
-        citation.primary_language = ohloh_contrib_info['primary_language']
+        citation.languages = ohloh_contrib_info['primary_language']
         #citation.year_started = ohloh_contrib_info['year_started']
         return citation
         # }}}
