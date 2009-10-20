@@ -54,7 +54,10 @@ Home
     <div class='body'>
     <ul>
       {% for bug in recommended_bugs %}
-      <li>{{ bug.title }}<li>
+      <img title='{{project.name}}' src='http://linode.openhatch.org:8001/people/project_icon_badge/{{ project.name }}' width='40'/>
+      <li><span class='project__name'>{{ bug.project.name }}</span>
+        -
+        <a class='canonical_bug_link' href='{{ bug.canonical_bug_link }}'>{{ bug.title }}</a><li>
       {% endfor %}
     </ul>
     </div>

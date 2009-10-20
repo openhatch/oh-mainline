@@ -78,3 +78,12 @@ h4 {
     padding-left: 10px;
     padding-right: 0;
 }
+
+li {
+    padding-bottom: 5px;
+}
+
+li img {
+    float: left;
+    padding: 0 5px 10px 0;
+}
