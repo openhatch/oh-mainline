@@ -705,7 +705,7 @@ def gimme_json_that_says_that_commit_importer_is_done(request):
     It has no side-effects.'''
     # {{{
     person = request.user.get_profile()
-    dias = list(get_list_or_404(DataImportAttempt, person=person))
+    dias = list(DataImportAttempt.objects.filter(person=person))
     citations = list(Citation.objects.filter(portfolio_entry__person=person))
     json = serializers.serialize('json', dias + citations)
     return HttpResponse(json)

@@ -56,14 +56,16 @@ class TwillTests(django.test.TestCase):
         except:
             pass # lol fixme
 
-    def login_with_client(self):
+    def login_with_client(self, username='paulproteus',
+            password="paulproteus's unbreakable password"):
         client = Client()
-        username='paulproteus'
-        password="paulproteus's unbreakable password"
         success = client.login(username=username,
                      password=password)
         self.assert_(success)
         return client
+
+    def login_with_client_as_barry(self):
+        return self.login_with_client(username='barry', password='parallelism')
 
     def signup_with_twill(self, username, email, password):
         """ Used by account.tests.Signup, which is omitted while we use invite codes. """

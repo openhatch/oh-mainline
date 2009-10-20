@@ -613,7 +613,7 @@ class UserListTests(TwillTests):
 
 class Importer(TwillTests):
     # {{{
-    fixtures = ['user-paulproteus', 'person-paulproteus']
+    fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
 
     form_url = "http://openhatch.org/people/portfolio/import/"
 
@@ -656,7 +656,7 @@ class Importer(TwillTests):
                         "paulproteus has a task recorded in the DB "
                         "for source %s." % source_key)
 
-    def test_get_import_status(self):
+    def _test_get_import_status(self, client, must_find_nothing=False):
         "Just make sure that the JSON returned by the view is "
         "appropriate considering what's in the database."
 
@@ -676,7 +676,7 @@ class Importer(TwillTests):
                 completed=False, person=paulproteus)
         unfinished_dia.save()
 
-        response = self.login_with_client().get(
+        response = client.get(
                 reverse(mysite.profile.views.gimme_json_that_says_that_commit_importer_is_done))
         
         response_dias_and_citations = simplejson.loads(response.content)
@@ -687,7 +687,19 @@ class Importer(TwillTests):
         expected_list = serializers.serialize('python', [finished_dia, unfinished_dia, citation])
         for object in expected_list:
             del object['fields']
-            self.assert_(object in response_dias_and_citations)
+            object_found = (object in response_dias_and_citations)
+            if must_find_nothing:
+                self.assertFalse(object_found)
+            else:
+                self.assert_(object_found)
+
+    def test_paulproteus_can_get_his_import_status(self):
+        self._test_get_import_status(client=self.login_with_client(), must_find_nothing=False)
+
+    def test_barry_cannot_get_paulproteuss_import_status(self):
+        self._test_get_import_status(
+                client=self.login_with_client_as_barry(),
+                must_find_nothing=True)
 
     # }}}
 
