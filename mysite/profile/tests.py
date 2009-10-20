@@ -754,6 +754,58 @@ class ImporterPublish(TwillTests):
 
         self.assertEqual(response.content, "0")
 
+class ImportDeleteCitation(TwillTests):
+    fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
+
+    def test_delete_citation(self):
+        citation = Citation(
+                portfolio_entry=PortfolioEntry.objects.get_or_create(
+                    project=Project.objects.get_or_create(name='project name')[0],
+                    person=Person.objects.get(user__username='paulproteus'))[0],
+                data_import_attempt=DataImportAttempt.objects.get_or_create(
+                    source='rs', query='paulproteus', completed=True,
+                    person=Person.objects.get(user__username='paulproteus'))[0]
+                )
+        citation.save()
+
+        self.assertFalse(citation.is_deleted)
+
+        view = mysite.profile.views.delete_citation_do
+        response = self.login_with_client().post(reverse(view), {'pk': citation.pk})
+
+        self.assertEqual(response.content, "1")
+        self.assert_(Citation.objects.get(pk=citation.pk).is_deleted)
+
+    def test_delete_citation_fails_when_citation_doesnt_exist(self):
+        failing_pk = 0
+        self.assertEqual(Citation.objects.filter(pk=failing_pk).count(), 0)
+
+        view = mysite.profile.views.delete_citation_do
+        response = self.login_with_client().post(reverse(view), {'pk': failing_pk})
+        self.assertEqual(response.content, "0")
+
+    def test_delete_citation_fails_when_citation_not_given(self):
+        view = mysite.profile.views.delete_citation_do
+        response = self.login_with_client().post(reverse(view))
+        self.assertEqual(response.content, "0")
+
+    def test_delete_citation_fails_when_citation_not_yours(self):
+        citation = Citation(
+                portfolio_entry=PortfolioEntry.objects.get_or_create(
+                    project=Project.objects.get_or_create(name='project name')[0],
+                    person=Person.objects.get(user__username='paulproteus'))[0],
+                data_import_attempt=DataImportAttempt.objects.get_or_create(
+                    source='rs', query='paulproteus', completed=True,
+                    person=Person.objects.get(user__username='paulproteus'))[0]
+                )
+        citation.save()
+
+        self.assertFalse(citation.is_deleted)
+        view = mysite.profile.views.delete_citation_do
+        response = self.login_with_client_as_barry().post(reverse(view))
+
+        self.assertEqual(response.content, "0")
+
 class UserCanShowEmailAddress(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
     # {{{

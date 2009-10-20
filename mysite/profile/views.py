@@ -932,4 +932,21 @@ def publish_citation_do(request):
 
     return HttpResponse("1")
 
+@login_required
+def delete_citation_do(request):
+    try:
+        pk = request.POST['pk']
+    except KeyError:
+        return HttpResponse("0")
+
+    try:
+        c = Citation.objects.get(pk=pk, portfolio_entry__person__user=request.user)
+    except Citation.DoesNotExist:
+        return HttpResponse("0")
+
+    c.is_deleted = True
+    c.save()
+
+    return HttpResponse("1")
+
 # vim: ai ts=3 sts=4 et sw=4 nu
