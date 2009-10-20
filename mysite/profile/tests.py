@@ -412,8 +412,8 @@ mock_gcibou.return_value = [{
 # Create a mock Launchpad get_info_for_launchpad_username
 mock_giflu = mock.Mock()
 mock_giflu.return_value = {
-        'F-Spot': {
-            'url': 'http://launchpad.net/f-spot',
+        'ccHost': {
+            'url': 'http://launchpad.net/ccHost', # ok this url doesn't really exist
             'involvement_types': ['Bug Management', 'Bazaar Branches'],
             'languages': ['python', 'ruby'],
             }
@@ -434,26 +434,10 @@ class CeleryTests(TwillTests):
     # {{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
-    @mock.patch('mysite.customs.ohloh.Ohloh.get_contribution_info_by_username', mock_gcibu)
-    @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
-    def test_ohloh_import_via_emulated_bgtask(self):
-        "1. Go to the page that has paulproteus' data. "
-        "2. Verify that the page doesn't yet know about ccHost. "
-        "3. Prepare an object that will import data from ccHost. "
-        "The object is a DataImportAttempt. The DataImportAttempt has a method "
-        "that will create a background task using the celery package. The method "
-        "is called do_what_it_says_on_the_tin, because it will attempt to "
-        "import data. "
-        "3. Run the celery task ourselves, but instead of going to Ohloh, "
-        "we hand-prepare data for it."""
-        # {{{
-        return self._test_data_source_via_emulated_bgtask(source='rs')
-        # }}}
-
     # FIXME: One day, test that after self.test_slow_loading_via_emulated_bgtask
     # getting the data does not go out to Ohloh.
 
-    def _test_data_source_via_emulated_bgtask(self, source):
+    def _test_data_source_via_emulated_bgtask(self, source, expected_attributes):
         "1. Go to the page that has paulproteus' data. "
         "2. Verify that the page doesn't yet know about ccHost. "
         "3. Prepare an object that will import data from ccHost. "
@@ -487,8 +471,8 @@ class CeleryTests(TwillTests):
         
         # Are there any PortfolioEntries for ccHost
         # before we import data from Ohloh? Expected: no.
-        ccHost_portfolio_entries = PortfolioEntry.objects.filter(project__name='ccHost')
-        self.assertEqual(ccHost_portfolio_entries.count(), 0)
+        portfolio_entries = PortfolioEntry.objects.filter(project__name='ccHost')
+        self.assertEqual(portfolio_entries.count(), 0)
 
         dia.do_what_it_says_on_the_tin()
         # NB: The task is being run, but the ohloh API communication
@@ -511,98 +495,56 @@ class CeleryTests(TwillTests):
         self.assert_(response_json[0]['fields']['completed'])
 
         # There ought now to be a PortfolioEntry for ccHost...
-        ccHost_portfolio_entry = PortfolioEntry.objects.get(person=person, project__name='ccHost')
+        portfolio_entry = PortfolioEntry.objects.get(person=person, project__name='ccHost')
 
         # ...and a citation to Ohloh.
-        ccHost_citation = Citation.objects.get(portfolio_entry=ccHost_portfolio_entry)
+        citation = Citation.objects.get(portfolio_entry=portfolio_entry)
 
-        # The citation should have a certain structure.
+        # The citation should have the expected pairings of attributes and values.
+        for a in expected_attributes:
+            self.assertEqual(getattr(citation, a), expected_attributes[a])
+
+        self.assertEqual(citation.data_import_attempt, dia)
+
+        # Check that the citation is linked with the appropriate DIA.
+
+        # Check that the language of the citation is correct.
+
+    @mock.patch('mysite.customs.ohloh.Ohloh.get_contribution_info_by_username', mock_gcibu)
+    @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
+    def test_ohloh_import_via_emulated_bgtask(self):
+        "Test that we can import data from Ohloh, except don't test "
+        "that Ohloh actually gives data. Instead, create a little "
+        "placeholder that acts like Ohloh, and make sure we respond "
+        "to it correctly."
+        # {{{
         expected_attributes = {
-                'primary_language': 'shell script',
-                'distinct_months': 1,
-                'data_import_attempt': dia,
+                'primary_language': mock_gcibu.return_value[0]['primary_language'],
+                'distinct_months': mock_gcibu.return_value[0]['man_months'],
                 'is_published': False,
                 'is_deleted': False,
                 #'year_started': 2007,
                 }
-
-        for a in expected_attributes:
-            self.assertEqual(getattr(ccHost_citation, a), expected_attributes[a])
-
-        # Check that the ccHost_citation is linked with the appropriate DIA.
-
-        # Check that the language of the citation is correct.
-
+        return self._test_data_source_via_emulated_bgtask(
+                source='rs', expected_attributes=expected_attributes)
+        # }}}
 
     @mock.patch('mysite.customs.lp_grabber.get_info_for_launchpad_username', mock_giflu)
     @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
     def test_launchpad_import_via_emulated_bgtask(self):
-        "1. Go to the page that has paulproteus' data.  "
-        "2. Verify that the page doesn't yet know about F-Spot. "
-        "3. As with test_ohloh_import_via_emulated_bgtask, we prepare "
-        "an object that will import data from ccHost. "
-        "The object is a DataImportAttempt. The DataImportAttempt has a method "
-        "that will create a background task using the celery package. The method "
-        "is called do_what_it_says_on_the_tin, because it will attempt to "
-        "import data. "
-        "4. Run the celery task ourselves, but instead of going to Launchpad, "
-        "we hand-prepare data for it."""
+        "Test that we can import data from Ohloh, except don't test "
+        "that Ohloh actually gives data. Instead, create a little "
+        "placeholder that acts like Ohloh, and make sure we respond "
+        "to it correctly."
         # {{{
-
-        # do this work for user = paulproteus
-        username='paulproteus'
-        person = Person.objects.get(user__username=username)
-
-        # Store a note in the DB we're about to do a background task
-        dia = DataImportAttempt(query=username, source='lp',
-                                person=Person.objects.get(
-                                    user__username=username))
-        dia.person_wants_data = True
-        dia.save()
-
-        url = '/people/gimme_json_that_says_that_commit_importer_is_done'
-        
-        client = Client()
-        password="paulproteus's unbreakable password"
-        client.login(username=username,
-                     password=password)
-
-        # Ask if background job has been completed.
-        # We haven't even created the background job, so it should
-        # not be!
-        response_before = client.get(url)
-        response_json = simplejson.loads(response_before.content)
-        self.assertEquals(
-            response_json[0]['pk'], dia.id)
-        self.assertFalse(response_json[0]['fields']['completed'])
-        
-        # Ask if involvement fact has been loaded.
-        # We haven't loaded it, so the answer should be no.
-        project_name = 'F-Spot'
-        self.assertFalse(list(ProjectExp.objects.filter(
-            project__name=project_name)))
-
-        dia.do_what_it_says_on_the_tin()
-        # NB: The task is being run, but the ohloh API communication
-        # is mocked out.
-
-        # Now that we have synchronously run the task, it should be
-        # marked as completed.
-        self.assert_(DataImportAttempt.objects.get(id=dia.id).completed)
-
-        # Check again
-        response_after = client.get(url)
-
-        # Ask if background job has been completed. (Hoping for yes.)
-        response_json = simplejson.loads(response_after.content)
-        self.assertEquals(
-            response_json[0]['pk'], dia.id)
-        self.assert_(response_json[0]['fields']['completed'])
-
-        # Ask if involvement fact has been loaded. (Hoping for yes.)
-        self.assert_(list(ProjectExp.objects.filter(
-            project__name=project_name, person=person)))
-
+        expected_attributes = {
+                'primary_language': mock_giflu.return_value.values()[0]['languages'][0],
+                'is_published': False,
+                'is_deleted': False,
+                #'year_started': 2007,
+                }
+        return self._test_data_source_via_emulated_bgtask(
+                source='lp', expected_attributes=expected_attributes)
         # }}}
 
     @mock.patch('mysite.customs.ohloh.Ohloh.get_contribution_info_by_username', mock_gcibu)
