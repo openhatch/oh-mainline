@@ -234,50 +234,6 @@ $(init);
 
 $(function() { $('.hide_on_doc_ready').hide(); });
 
-HowTo = {
-    'init': function () {
-        HowTo.$element = $('#importer .howto');
-        HowTo.$hideLink = $('#importer .howto .hide-link');
-        HowTo.$showLink = $('#importer .show-howto-link');
-
-        var tests = ["HowTo.$element.size() == 1",
-                "HowTo.$hideLink.size() == 1",
-                "HowTo.$showLink.size() == 1"];
-        for (var i = 0; i < tests.length; i++) {
-            fireunit.ok(eval(tests[i]), tests[i]);
-        }
-
-        for (var e in HowTo.events) {
-            HowTo.events[e].bind();
-        }
-    },
-    '$element': null,
-    '$hideLink': null,
-    '$showLink': null,
-    'events': {
-        'hide': {
-            'go': function () {
-                HowTo.$element.fadeOut('slow');
-                HowTo.$showLink.fadeIn('slow');
-                return false;
-            },
-            'bind': function () {
-                HowTo.$hideLink.click(HowTo.events.hide.go);
-            },
-        },
-        'show': {
-            'go': function () {
-                HowTo.$element.fadeIn('slow');
-                return false;
-            },
-            'bind': function () {
-                HowTo.$showLink.click(HowTo.events.show.go);
-            },
-        }
-    }
-};
-$(HowTo.init);
-
 tests = {
     'Preparation': function () {
         $('form input[type="text"]').val('paulproteus').blur();
