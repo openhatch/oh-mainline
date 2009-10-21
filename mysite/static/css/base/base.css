@@ -107,6 +107,11 @@ ul {
 h1, h2, h3, h4 {
     margin: 0;
 }
+
+h1 {
+    font-size: 18pt;
+}
+
 #header {
     width: 920px;
     height: 80px;
@@ -123,7 +128,7 @@ h1, h2, h3, h4 {
     padding: 10px 20px 0 20px;
     float: left;
     width: 960px;
-    height: 100px;
+    height: 90px;
     border-top: 0;
 }
 #nav h2 {
@@ -205,7 +210,7 @@ ul#user-actions a {
 #content {
     float: left;
     width: 960px;
-    padding: 20px;
+    padding: 0 20px 20px 20px;
     padding-bottom: 5px;
 }
 
