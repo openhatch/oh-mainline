@@ -435,7 +435,7 @@ class CeleryTests(TwillTests):
     # FIXME: One day, test that after self.test_slow_loading_via_emulated_bgtask
     # getting the data does not go out to Ohloh.
 
-    def _test_data_source_via_emulated_bgtask(self, source, data_we_expect):
+    def _test_data_source_via_emulated_bgtask(self, source, data_we_expect, summaries_we_expect):
         "1. Go to the page that has paulproteus' data. "
         "2. Verify that the page doesn't yet know about ccHost. "
         "3. Prepare an object that will import data from ccHost. "
@@ -506,8 +506,9 @@ class CeleryTests(TwillTests):
 
         # Let's make sure that these citations are linked with the
         # DataImportAttempt we used to import them.
-        for citation in citations:
+        for n, citation in enumerate(citations):
             self.assertEqual(citation.data_import_attempt, dia)
+            self.assertEqual(citation.summary, summaries_we_expect[n])
 
     @mock.patch('mysite.customs.ohloh.Ohloh.get_contribution_info_by_username', mock_gcibu)
     @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
@@ -524,8 +525,14 @@ class CeleryTests(TwillTests):
                 'is_deleted': False,
                 #'year_started': 2007,
                 }]
+
+        summaries_we_expect = [
+                "Ohloh's repository index: Coded for 1 month(s) in shell script.",
+                ]
+
         return self._test_data_source_via_emulated_bgtask(
-                source='rs', data_we_expect=data_we_expect)
+                source='rs', data_we_expect=data_we_expect,
+                summaries_we_expect=summaries_we_expect)
         # }}}
 
     @mock.patch('mysite.customs.lp_grabber.get_info_for_launchpad_username', mock_giflu)
@@ -551,8 +558,15 @@ class CeleryTests(TwillTests):
                     'is_deleted': False,
                     }
                 ]
+
+        # FIXME: Write these properly.
+        summaries_we_expect = [
+                'Launchpad: Coded for 1 month(s) in python, ruby.',
+                ]
+
         return self._test_data_source_via_emulated_bgtask(
-                source='lp', data_we_expect=data_we_expect)
+                source='lp', data_we_expect=data_we_expect,
+                summaries_we_expect=summaries_we_expect)
         # }}}
 
     # }}}

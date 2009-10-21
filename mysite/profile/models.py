@@ -67,8 +67,8 @@ models.signals.post_save.connect(create_profile_when_user_created, User)
 class DataImportAttempt(models.Model):
     # {{{
     SOURCE_CHOICES = (
-        ('rs', "All repositories"),
-        ('ou', "Ohloh"),
+        ('rs', "Ohloh's repository index"),
+        ('ou', "Ohloh personal account"),
         ('lp', "Launchpad"),
         )
     completed = models.BooleanField(default=False)
@@ -336,6 +336,16 @@ class Citation(models.Model):
     date_created = models.DateTimeField(default=datetime.datetime.now)
     is_published = models.BooleanField(default=False) # unpublished == Unread
     is_deleted = models.BooleanField(default=False)
+
+    @property
+    def summary(self):
+        # FIXME: Pluralize correctly.
+        # FIXME: Use "since year_started"
+        return "%s: Coded for %d month(s) in %s." % (
+                self.data_import_attempt.get_source_display(),
+                self.distinct_months,
+                self.languages,
+                )
 
     @staticmethod
     def create_from_text(
