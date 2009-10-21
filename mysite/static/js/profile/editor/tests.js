@@ -29,20 +29,20 @@ test = function() {
 
             // "this" is a JSON representation of a PortfolioEntry.
             // Did we create this PortfolioEntryElement?
-            var pee = $("#portfolio_entry_element_" + this.pk);
+            var pee = $("#portfolio_entry_" + portfolio_entry.pk);
 
             fireunit.ok( pee.size() == 1,
-                "Expected a portfolio_entry_element corresponding to " + this);
+                "Expected a portfolio_entry corresponding to " + portfolio_entry);
             fireunit.ok( $('.project_name', pee).text() == "bindlestiff",
-                "Expected the new portfolio_entry_element to say its project name is bindlestiff");
+                "Expected the new portfolio_entry to say its project name is bindlestiff");
             fireunit.ok( pee.find("img.project_icon").attr('src') == 
                 "/static/images/the-logo-bluegreen-125px.png",
                 "Expected the project icon URL to properly be set.");
             fireunit.ok( $(".project_description", pee).text() == "described",
-                "Expected the new portfolio_entry_element to say " +
+                "Expected the new portfolio_entry to say " +
                 "its project description is 'described'");
             fireunit.ok( $(".experience_description", pee).text() == "i hacked things",
-                "Expected the new portfolio_entry_element to say a description of the experience");
+                "Expected the new portfolio_entry to say a description of the experience");
 
             /* 
              * Check that each citation in the response is also in the DOM.

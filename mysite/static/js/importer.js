@@ -268,8 +268,8 @@ function updatePortfolio(response) {
      * Side-effect: Update the page's DOM to display these data.
      * (FIXME: Right now we just add, not "update" :-)
      */
-    var portfolio_entry_element_html = $('#portfolio_entry_element_building_block').html();
-    var citation_element_html = $('#citation_element_building_block').html();
+    var portfolio_entry_html = $('#portfolio_entry_building_block').html();
+    var citation_html = $('#citation_building_block').html();
    
     /* Now fill in the template */
     
@@ -278,10 +278,10 @@ function updatePortfolio(response) {
 	     * (a JSONified PortfolioEntry)
 	     */
         var portfolioEntry = this;
-	    var $new_portfolio_entry_element = $(portfolio_entry_element_html);
+	    var $new_portfolio_entry = $(portfolio_entry_html);
 
-	    var new_id = 'portfolio_entry_element_' + this.pk;
-	    $new_portfolio_entry_element.attr('id', new_id);
+	    var new_id = 'portfolio_entry_' + this.pk;
+	    $new_portfolio_entry.attr('id', new_id);
 	    
         /* Find the project this PortfolioElement refers to */
 	    var project_id = this.fields.project_id;
@@ -292,29 +292,30 @@ function updatePortfolio(response) {
 		    }
 		});
 	    /* project_description */
-	    $(".project_description", $new_portfolio_entry_element).text(this.fields.project_description);
+	    $(".project_description", $new_portfolio_entry).text(this.fields.project_description);
 	    	   
 	    /* project_icon */
-	    $(".project_icon", $new_portfolio_entry_element).attr('src', response.project_icon_urls[portfolioEntry.fields.project_id]);
+	    $(".project_icon", $new_portfolio_entry).attr('src',
+                response.project_icon_urls[portfolioEntry.fields.project_id]);
 	    
 	    /* project_name */
-	    $(".project_name", $new_portfolio_entry_element).text(project_we_refer_to.fields.name);
+	    $(".project_name", $new_portfolio_entry).text(project_we_refer_to.fields.name);
 	    
 	    /* experience_description */
-	    $(".experience_description", $new_portfolio_entry_element).text(
+	    $(".experience_description", $new_portfolio_entry).text(
                 this.fields.experience_description);
 
         /* Add the appropriate citations to this portfolio entry. */
         var addMemberCitations = function() {
             // "this" is an object in response.citations
-            if ("portfolio_entry_element_"+this.fields.portfolio_entry_id == 
-                    $new_portfolio_entry_element.attr('id')) {
+            if ("portfolio_entry_"+this.fields.portfolio_entry_id == 
+                    $new_portfolio_entry.attr('id')) {
                 // Then we have a citation that we're gonna add the DOM.
-                var $new_citation_element = $(citation_element_html);
-                $new_citation_element.attr('id', 'citation_' + this.pk);
+                var $new_citation = $(citation_html);
+                $new_citation.attr('id', 'citation_' + this.pk);
                 var summary = response.summaries[this.pk]
-                $new_citation_element.find('.summary').text(summary);
-                $('.citations', $new_portfolio_entry_element).append($new_citation_element);
+                $new_citation.find('.summary').text(summary);
+                $('.citations', $new_portfolio_entry).append($new_citation);
             }
         };
         $(response.citations).each(addMemberCitations);
@@ -324,7 +325,7 @@ function updatePortfolio(response) {
 
 
 	    /* It's ready! Append it to #portfolio */
-	    $('#portfolio').append($new_portfolio_entry_element);
+	    $('#portfolio').append($new_portfolio_entry);
 	});
     
 }
