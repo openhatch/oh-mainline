@@ -643,6 +643,7 @@ def gimme_json_that_says_that_commit_importer_is_done(request):
     for c in citations:
         summaries[c.pk] = c.summary
 
+    # FIXME: Maybe we can serialize directly to Python objects.
     dias = simplejson.loads(serializers.serialize('json', dias))
     citations = simplejson.loads(serializers.serialize('json', citations))
 
