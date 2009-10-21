@@ -43,15 +43,14 @@ class ProfileTests(TwillTests):
     def testSlash(self):
         response = self.client.get('/people/')
 
-    def test__projectexp_add(self):
+    def _test__portfolio_updates_when_citation_added_to_db(self):
         # {{{
         username = 'paulproteus'
 
         project_name = 'seeseehost'
-        description = 'did some work'
-        url = 'http://example.com/'
-        citation = Citation.create_from_text(
-                username, project_name, url)
+        #description = 'did some work'
+        #url = 'http://example.com/'
+        citation = Citation.create_from_text(username, project_name)
         found = list(Citation.objects.filter(portfolio_entry__person__user__username=username))
         # Verify it shows up in the DB
         self.assert_('seeseehost' in [f.project.name for f in found])

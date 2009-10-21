@@ -673,13 +673,10 @@ def create_citations_from_launchpad_results(dia_id, lp_results):
             citation.save()
 
     person.last_polled = datetime.datetime.now()
-    dia.completed = True
-    dia.save()
     person.save()
 
-    if dia.person_wants_data:
-        dia.give_data_to_person()
-
+    dia.completed = True
+    dia.save()
     # }}}
 
 @login_required
@@ -759,10 +756,11 @@ def prepare_data_import_attempts(identifiers, user):
     for identifier in identifiers:
         if identifier: # Skip blanks
             for source_key, _ in DataImportAttempt.SOURCE_CHOICES:
-                dia = create_data_import_attempt_if_nonexistent(
+                dia = DataImportAttempt(
                         query=identifier,
                         source=source_key,
                         person=user.get_profile())
+                dia.save()
                 dia.do_what_it_says_on_the_tin()
 
 @login_required
@@ -798,37 +796,6 @@ def filter_by_key_prefix(dict, prefix):
             out_dict[key] = value
     return out_dict
 
-def create_data_import_attempt_if_nonexistent(query, source, person):
-    """NOTE: This is a bit weird, so let me explain it.
-    
-    Here are three different use cases:
-
-    1. Someone did an import of a new username. This case is
-       easy. The DIA is created the first time this function
-       is called, and it is the one reflected by the checkmarks
-       or clouds.
-
-    2. Someone did an import of a username one week ago, and
-       they are re-doing it right now. The DIA in the past
-       failed or otherwise returned nothing; that's the reason
-       to run it again.
-
-    3. ...?
-    """
-    dias = DataImportAttempt.objects.filter(
-            query=query, source=source,
-            person=person).order_by("-pk")
-    if not dias:
-        dia = DataImportAttempt(
-                query=query,
-                source=source,
-                person=person)
-        dia.save()
-        dia.do_what_it_says_on_the_tin()
-        return dia
-    else:
-        return dias[0]
-
 @login_required
 def user_selected_these_dia_checkboxes(request):
     """ Input: Request POST contains a list of checkbox IDs corresponding to DIAs.
@@ -849,12 +816,12 @@ def user_selected_these_dia_checkboxes(request):
             if identifier:
                 # FIXME: For security, ought this filter include only dias
                 # associated with the logged-in user's profile?
-                dia = create_data_import_attempt_if_nonexistent(
+                dia = DataImportAttempt(
                         identifier, source_key,
                         request.user.get_profile())
-                dia.do_what_it_says_on_the_tin()
                 dia.person_wants_data = True
                 dia.save()
+                dia.do_what_it_says_on_the_tin()
 
                 # There may be data waiting or not,
                 # but no matter; this function may

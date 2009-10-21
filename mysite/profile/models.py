@@ -329,7 +329,7 @@ class Citation(models.Model):
     portfolio_entry = models.ForeignKey(PortfolioEntry) # [0]
     # FIXME: For manual add: url = models.URLField()
     contributor_role = models.CharField(max_length=200, null=True)
-    data_import_attempt = models.ForeignKey(DataImportAttempt)
+    data_import_attempt = models.ForeignKey(DataImportAttempt, null=True)
     distinct_months = models.IntegerField(null=True)
     languages = models.TextField(null=True)
     #year_started = models.IntegerField()
@@ -341,8 +341,8 @@ class Citation(models.Model):
     def create_from_text(
             username,
             project_name,
-            description='',
-            url='',
+            #description='',
+            #url='',
             distinct_months=None,
             languages=''
             ):
@@ -353,8 +353,8 @@ class Citation(models.Model):
             distinct_months = int(distinct_months)
 
         citation = Citation(
-                url=str(url),
-                description=str(description),
+                #url=str(url),
+                #description=str(description),
                 distinct_months=distinct_months,
                 languages=languages)
 
