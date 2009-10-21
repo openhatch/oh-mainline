@@ -784,7 +784,7 @@ def importer(request):
             }
     person = request.user.get_profile()
     data = get_personal_data(person)
-    data['dias'] = DataImportAttempt.objects.filter(person=person, stale=False).order_by('id')
+    data['dias'] = DataImportAttempt.objects.filter(person=person).order_by('id')
     data['blank_query'] = blank_query
 
     return (request, 'profile/importer.html', data)
@@ -853,7 +853,7 @@ def user_selected_these_dia_checkboxes(request):
                 dia = create_data_import_attempt_if_nonexistent(
                         identifier, source_key,
                         request.user.get_profile())
-
+                dia.do_what_it_says_on_the_tin()
                 dia.person_wants_data = True
                 dia.save()
 
