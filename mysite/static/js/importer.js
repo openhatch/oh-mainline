@@ -291,14 +291,15 @@ function updatePortfolio(response) {
 		    }
 		});
 	    /* project_description */
-	   
+	    $(".project_description", new_portfolio_entry_element).text(this.fields.project_description);
+	    	   
 	    /* project_icon NOTYET */
 	    
 	    /* project_name */
-	    
 	    $(".project_name", new_portfolio_entry_element).text(project_we_refer_to.fields.name);
 	    
-	    /* involvement_description NOTYET */
+	    /* experience_description */
+	    $(".experience_description", new_portfolio_entry_element).text(this.fields.experience_description);
 
 	    /* citation_elements NOTYET */
 

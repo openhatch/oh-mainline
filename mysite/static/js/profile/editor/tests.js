@@ -4,7 +4,11 @@ response = {
     // FIXME: We might not need these models here.
     'dias': [{'pk': 0}],
     'citations': [{'pk': 0, 'fields': {'portfolio_entry_id': 0}}],
-    'portfolio_entries': [{'pk': 0, 'fields': {'project_id': 0}}],
+    'portfolio_entries': [{'pk': 0, 'fields': {
+		'project_id': 0,
+		'project_description': 'described',
+		'experience_description': 'i hacked things'
+	    }}],
     'projects': [{'pk': 0, 'fields': {'name': 'bindlestiff'}}],
     'summaries': {'0': 'garglefoot'}
 };
@@ -14,12 +18,19 @@ test = function() {
     $(response['portfolio_entries']).each( function() {
             // "this" is a JSON representation of a PortfolioEntry.
             // Did we create this PortfolioEntryElement?
+	    var created_elt = $("#portfolio_entry_element_" + this.pk);
             fireunit.ok(
-                $('#portfolio_entry_element_' + this.pk).size()==1,
-                "Expected a portfolio_entry_element corresponding to " + this);
+			created_elt.size() == 1,
+			"Expected a portfolio_entry_element corresponding to " + this);
             fireunit.ok(
-			$('#portfolio_entry_element_' + this.pk + " .project_name").text() == "bindlestiff",
+			$('.project_name', created_elt).text() == "bindlestiff",
 			"Expected the new portfolio_entry_element to say its project name is bindlestiff");
+            fireunit.ok(
+			$(".project_description", created_elt).text() == "described",
+			"Expected the new portfolio_entry_element to say its project description is 'described'");
+            fireunit.ok(
+			$(".experience_description", created_elt).text() == "i hacked things",
+			"Expected the new portfolio_entry_element to say a description of the experience");
     });
     /*
     for each object:
