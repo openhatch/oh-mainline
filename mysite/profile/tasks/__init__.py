@@ -2,13 +2,78 @@ import datetime
 from mysite.customs import ohloh
 import urllib2
 from mysite.customs import lp_grabber
-from mysite.profile.views import (create_citations_from_launchpad_results,
-        create_citations_from_ohloh_contributor_facts)
-from mysite.profile.models import Person, DataImportAttempt
+from mysite.profile.models import Person, DataImportAttempt, Citation, PortfolioEntry
+from mysite.search.models import Project
 from celery.task import Task
 import celery.registry
 import time
 import random
+
+def create_citations_from_ohloh_contributor_facts(dia_id, ohloh_results):
+    '''Input: A sequence of Ohloh ContributionFact dicts
+    and the id of the DataImport they came from.
+
+    Side-effect: Create matching structures in the DB
+    and mark our success in the database.'''
+    # {{{
+    dia = DataImportAttempt.objects.get(id=dia_id)
+    person = dia.person
+    for c_i in ohloh_results:
+        for ohloh_contrib_info in ohloh_results:
+            (project, _) = Project.objects.get_or_create(
+                    name=ohloh_contrib_info['project'])
+            (portfolio_entry, _) = PortfolioEntry.objects.get_or_create(
+                    person=person, project=project)
+            citation = Citation.create_from_ohloh_contrib_info(ohloh_contrib_info)
+            citation.portfolio_entry = portfolio_entry
+            citation.data_import_attempt = dia 
+            citation.save()
+
+    person.last_polled = datetime.datetime.now()
+    dia.completed = True
+    dia.save()
+    person.save()
+    # }}}
+
+def create_citations_from_launchpad_results(dia_id, lp_results):
+    "Input: A dictionary that maps from a project name to information "
+    "about that project, e.g. "
+    """
+         {
+             'F-Spot': {
+                 'url': 'http://launchpad.net/f-spot',
+                 'involvement_types': ['Bug Management', 'Bazaar Branches'],
+                 'languages': ['python', 'ruby'],
+             }
+         }
+    and the id of the DataImportAttempt they came from.
+
+    Side-effect: Create matching structures in the DB
+    and mark our success in the database."""
+    # {{{
+    dia = DataImportAttempt.objects.get(id=dia_id)
+    person = dia.person
+    for project_name in lp_results:
+        result = lp_results[project_name]
+        for involvement_type in result['involvement_types']:
+
+            (project, _) = Project.objects.get_or_create(name=project_name)
+            (portfolio_entry, _) = PortfolioEntry.objects.get_or_create(
+                    person=person, project=project)
+
+            citation = Citation()
+            citation.languages = ", ".join(result['languages'])
+            citation.contributor_role = involvement_type
+            citation.portfolio_entry = portfolio_entry
+            citation.data_import_attempt = dia
+            citation.save()
+
+    person.last_polled = datetime.datetime.now()
+    person.save()
+
+    dia.completed = True
+    dia.save()
+    # }}}
 
 def rs_action(dia):
     oh = ohloh.get_ohloh()
