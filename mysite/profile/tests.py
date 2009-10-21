@@ -464,8 +464,8 @@ class CeleryTests(TwillTests):
         # the answer should be no.
         response_before_task_is_run = client.get(gimme_json_url)
         response_json = simplejson.loads(response_before_task_is_run.content)
-        self.assertEqual(response_json[0]['pk'], dia.id)
-        self.assertFalse(response_json[0]['fields']['completed'])
+        self.assertEqual(response_json['dias'][0]['pk'], dia.id)
+        self.assertFalse(response_json['dias'][0]['fields']['completed'])
         
         # Are there any PortfolioEntries for ccHost
         # before we import data? Expected: no.
@@ -489,8 +489,8 @@ class CeleryTests(TwillTests):
 
         # Ask if background task has been completed. (Hoping for yes.)
         response_json = simplejson.loads(response_after.content)
-        self.assertEquals(response_json[0]['pk'], dia.id)
-        self.assert_(response_json[0]['fields']['completed'])
+        self.assertEquals(response_json['dias'][0]['pk'], dia.id)
+        self.assert_(response_json['dias'][0]['fields']['completed'])
 
         # There ought now to be a PortfolioEntry for ccHost...
         portfolio_entry = PortfolioEntry.objects.get(person=person, project__name='ccHost')
@@ -660,22 +660,45 @@ class Importer(TwillTests):
         response = client.get(
                 reverse(mysite.profile.views.gimme_json_that_says_that_commit_importer_is_done))
         
-        response_dias_and_citations = simplejson.loads(response.content)
-        for object in response_dias_and_citations:
-            if object['model'] == 'profile.Citation':
-                self.assert_(object['summary'],
-                        "Expected a nice response citation "
-                        "like you to have a summary.")
-            del object['fields']
+        # Response consists of JSON like:
+        # {'dias': ..., 'citations': ..., 'summaries': ...}
+        response = simplejson.loads(response.content)
+
+        # Check we got a summary for each Citation.
+        for citation_in_response in response['citations']:
+            self.assert_(str(citation_in_response['pk']) in response['summaries'].keys(),
+                    "Expected that this Citation's pk would have a summary.")
          
+        ###########################################################
+        # Are the DIAs and citations in the response
+        # exactly what we expected?
+        ###########################################################
+
+        # What we expect:
         expected_list = serializers.serialize('python', [finished_dia, unfinished_dia, citation])
-        for object in expected_list:
+
+        # What we got:
+        dias_and_citations_in_response = response['dias'] + response['citations']
+
+        # We don't care about the "fields" in either, just the pk and model.
+        for object in (dias_and_citations_in_response + expected_list):
             del object['fields']
-            object_found = (object in response_dias_and_citations)
+
+        # Check that each thing we got was expected.
+        for object in dias_and_citations_in_response:
+            object_is_expected = (object in expected_list)
             if must_find_nothing:
-                self.assertFalse(object_found)
+                self.assertFalse(object_is_expected)
             else:
-                self.assert_(object_found)
+                self.assert_(object_is_expected)
+
+        # Check the reverse: that each thing we expected we got.
+        for object in expected_list:
+            object_is_expected = (object in dias_and_citations_in_response)
+            if must_find_nothing:
+                self.assertFalse(object_is_expected)
+            else:
+                self.assert_(object_is_expected)
 
     def test_paulproteus_can_get_his_import_status(self):
         self._test_get_import_status(client=self.login_with_client(), must_find_nothing=False)

@@ -51,8 +51,6 @@ import forms
 import mysite.profile.forms
 # }}}
 
-# Add a contribution {{{
-
 def projectexp_add_do(request):
     # {{{
     form = mysite.profile.forms.ProjectExpForm(request.POST)
@@ -73,8 +71,6 @@ def projectexp_add_do(request):
         return projectexp_add_form(request, form)
 
     #}}}
-
-# }}}
 
 @login_required
 @view
@@ -629,23 +625,29 @@ def display_list_of_people(request):
 
 #FIXME: Change this name to gimme_json_for_import_related_objects.
 def gimme_json_that_says_that_commit_importer_is_done(request):
-    '''This web controller is called when you want JSON that tells you 
-    if the background jobs for the logged-in user have finished.
-
-    It has no side-effects.'''
+    "Get JSON used to live-update the portfolio editor."
+    """JSON includes:
+        * The person's data.
+        * DataImportAttempts."""
     # {{{
     person = request.user.get_profile()
     dias = list(DataImportAttempt.objects.filter(person=person))
-    citations = list(Citation.objects.filter(portfolio_entry__person=person))
+    #portfolio_entries = list(PortfolioEntry.objects.filter(person=person))
 
-    # Add summaries
-    citations_serializable = []
+    # Citations don't naturally serialize summaries.
+    citations = list(
+            Citation.objects.filter(portfolio_entry__person=person))
+
+    # Serialize citation summaries
+    summaries = {}
     for c in citations:
-        c_nearly_json = serializers.serialize('python', c)
-        c_nearly_json['fields']['summary'] = c.summary
-        citations_serializable.append(c_nearly_json)
+        summaries[c.pk] = c.summary
 
-    json = serializers.serialize('json', dias + citations_serializable)
+    dias = simplejson.loads(serializers.serialize('json', dias))
+    citations = simplejson.loads(serializers.serialize('json', citations))
+
+    json = simplejson.dumps({'dias': dias, 'citations': citations, 'summaries': summaries})
+
     return HttpResponse(json)
     # }}}
 
