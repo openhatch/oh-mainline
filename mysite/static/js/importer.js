@@ -1,5 +1,4 @@
 /* 
- * {{{
  * Ze importer.
  *
  * == Dependencies ==
@@ -13,96 +12,45 @@
  *
  *  2.  When the user exits the input field, we grab as much
  *      data as we can about that identifier.
+ *      (In the future.)
  *      (This code is handled in Preparation below.)
  *
- *  3.  The user selects/deselects some checkboxes.
- *
- *  4.  When the user clicks the submit button, we set the 
- *      'person_wants_data' field of their DataImportAttempts
- *      according to which checkboxes they've clicked.
+ *  3.  When the user clicks the submit button, we ask the server
+ *      to enqueue background tasks that import data from sources
+ *      'round the web. 
  *      (This code is handled in Submission below.)
  *
- *  5.  When the server responds, we show some throbbers to
+ *  4.  When the server responds, we show some progress bars to
  *      the user, to let them know we're working behind the
  *      scenes.
  *      (This code is also handled in Submission below.)
  *
- *  6.  We ping the server repeatedly, asking "Are you done yet?"
+ *  5.  We ping the server repeatedly, asking
+ *      "How's the import going? Are you done yet?"
  *
- *  7.  On each ping the server responds with a list of DIAs and
- *      their attributes.
- *
- *  8.  If all the DIAs read 'I'm done!', we encourage the user
- *      to visit his/her portfolio.
- *  }}}
+ *  6.  On each ping the server responds with a JSONified Python list comprising:
+ *      - the Citations we've found so far
+ *      - the DataImportAttempts used to find them
+ *  
+ *  7.  If all the DataImportAttempts read 'I'm done!',
+ *      we tell the user "We're done!"
  */
 
-getStrings = function(schema, dictionaries) {
+$.fn.hoverClass = function(className) {
     // {{{
-    /* Returns an array of strings.
-     * Each string is the result of the string `schema'
-     * translated according to the mappings
-     * provided by a dictionary in `dictionaries'.
-     *
-     * <example>
-     * <input>
-     *
-     *  var schema = "In $LANGUAGE, hello is '$HELLO', "
-     *      + "goodbye is '$GOODBYE', thank you is '$THANKYOU'";
-     *
-     *  var french = {
-     *      '$LANGUAGE': 'French',
-     *      '$HELLO': 'Salut',
-     *      '$GOODBYE': "A tout à l'heure",
-     *      '$THANKYOU' 'Merci beaucoup'
-     *      };
-     *
-     *  var turkish = {
-     *      '$LANGUAGE': 'Turkish',
-     *      '$HELLO': 'Merhaba',
-     *      '$GOODBYE': 'Hoscakal',
-     *      '$THANKYOU' 'Tesekkurler'
-     *      };
-     *
-     *  var yiddish = {
-     *      '$LANGUAGE': 'Yiddish',
-     *      '$HELLO': 'Sholem aleykham',
-     *      '$GOODBYE': 'Zay gesunt',
-     *      '$THANKYOU' 'A sheynem dank'
-     *      };
-     *
-     *  var dictionaries = [french, turkish, yiddish];
-     *
-     *  getStrings(dictionaries, schema);
-     *
-     * </input>
-     *
-     * <output>
-     * // Array of strings.
-     * [
-     *      "In French, hello is 'Salut', goodbye is 'A tout à l'heure', \
-     *          thank you is 'Merci beaucoup'",
-     *      "In Turkish... etc.",
-     *      "In Yiddish... etc."
-     * ]
-     *
-     * </output>
-     * </example>
-     */
-    var strings = [];
-    for (var d = 0; d < dictionaries.length; d++) {
-        var dictionary = dictionaries[d];
-        var str = schema;
-        for (var mapFrom in dictionary) {
-            var mapTo = dictionary[mapFrom];
-            mapFromRegExp = new RegExp(mapFrom.replace("$", "\\$"), "g");
-            str = str.replace(mapFromRegExp, mapTo);
-        }
-        strings.push(str);
-    }
-    return strings;
+    mouseoverHandler = function() { $(this).addClass(className); };
+    mouseoutHandler = function() { $(this).removeClass(className); };
+    return this.hover(mouseoverHandler, mouseoutHandler);
     // }}}
 };
+
+$.fn.debug = function() {
+    // {{{
+    console.debug(this);
+    return this;
+    // }}}
+};
+
 
 makeNewInput = function() {
     // {{{
@@ -111,41 +59,10 @@ makeNewInput = function() {
     var extraClass = (index % 2 == 0) ? "" : " odd";
     var html = ""
         + "<div id='query_$INDEX' class='query"+ extraClass +"'>"
+        // FIXME: Use $EXTRA_CLASS to include this in the string.
         + "   <div class='who'>"
         + "       <input type='text' name='identifier_$INDEX' />"
         + "   </div>"
-        + "   <ul class='data_sources'>"
-
-    var imgPrefix = "/static/images/icons/data-sources/";
-    var sourceDictionaries = [
-        {
-            '$ID': 'rs',
-            '$DISPLAY': "<span>All repositories</span>"
-        },
-        {
-            '$ID': 'lp',
-            '$DISPLAY': "<img src='"
-                + imgPrefix + "launchpad.png' alt='Launchpad' />"
-        },
-        {
-            '$ID': 'ou',
-            '$DISPLAY': "<img src='"
-                + imgPrefix + "ohloh.png' alt='Ohloh' />"
-        },
-    ];
-
-    var checkboxTDSchema = ""
-        + "       <li class='data_source selected'>"
-        + "            <input type='checkbox' checked "
-        + "                name='person_wants_$INDEX_$ID' "
-        + "                id='person_wants_$INDEX_$ID' />"
-        + "            <label for='person_wants_$INDEX_$ID'>"
-        + "                $DISPLAY"
-        + "            </label>"
-        + "       </li>";
-
-    html += getStrings(checkboxTDSchema, sourceDictionaries).join("\n")
-        + "    </ul>"
         + "</div>";
 
     html = html.replace(/\$INDEX/g, index);
@@ -175,34 +92,9 @@ keydownHandler = function() {
     // }}}
 };
 
-diaCheckboxChangeHandler = function() {
-    // {{{
-    var $checkbox = $(this);
-    var checked = $checkbox.is(':checked')
-    $checkbox.parent()[(checked?'add':'remove') + 'Class']('selected');
-    // }}}
-};
-
-$.fn.hoverClass = function(className) {
-    // {{{
-    mouseoverHandler = function() { $(this).addClass(className); };
-    mouseoutHandler = function() { $(this).removeClass(className); };
-    return this.hover(mouseoverHandler, mouseoutHandler);
-    // }}}
-};
-
-$.fn.debug = function() {
-    // {{{
-    console.debug(this);
-    return this;
-    // }}}
-};
-
 bindHandlers = function() {
     // {{{
     $("form input[type='text']").keydown(keydownHandler);
-    $("form input[type='checkbox']")
-        .change(diaCheckboxChangeHandler);
     $("form .data_source").hoverClass('hover');
     // }}}
 };
@@ -222,34 +114,8 @@ $.fn.setThrobberStatus = function(theStatus) {
     // }}}
 };
 
-$.fn.convertCheckboxesToThrobber = function() {
-    // {{{
-    var convert = function () {
-        var $checkbox = $(this);
-        bits = $checkbox.attr('id').split('_');
-        var query_index = bits[2];
-        var query = $('input[type="text"]').get(query_index).value;
-
-        // Skip checkboxes whose queries are blank.
-        if (query.replace(/\s/g, '') == '') return;
-
-        var source = bits[3];
-        var imageHTML = "<img class='throbber' src='/static/images/snake.gif'/>";
-        var $labelContents = $("label[for='"+$checkbox.attr('id')+"'] *");
-        var $throbber = $(imageHTML).insertBefore($labelContents);
-        $throbber.data('query', query);
-        $throbber.data('source', source);
-        $checkbox.remove();
-    };
-    return this.each(convert);
-    // }}}
-};
-
 enableThrobbersThenPollForStatusForever = function() {
     // {{{
-    var $checkboxes = $("#importer form input[type='checkbox']:checked");
-    // Enable throbbers.
-    $checkboxes.convertCheckboxesToThrobber();
 
     // Ask server for a list of dias, which will tell us
     // which importation background jobs have finished,
@@ -425,3 +291,14 @@ runTests = function () {
     }
 };
 //$(runTests);
+
+/* Probably remove this.
+diaCheckboxChangeHandler = function() {
+    // {{{
+    var $checkbox = $(this);
+    var checked = $checkbox.is(':checked')
+    $checkbox.parent()[(checked?'add':'remove') + 'Class']('selected');
+    // }}}
+};
+*/
+
