@@ -77,7 +77,6 @@ class DataImportAttempt(models.Model):
                               choices=SOURCE_CHOICES)
     person = models.ForeignKey(Person)
     query = models.CharField(max_length=200)
-    stale = models.BooleanField(default=False)
 
     def get_formatted_source_description(self):
         return self.get_source_display() % self.query
