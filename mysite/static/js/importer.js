@@ -258,3 +258,39 @@ diaCheckboxChangeHandler = function() {
 };
 */
 
+function updatePortfolio(response) {
+    /* Input: A whole bunch of (decoded) JSON data containing
+     * all of the user's Citations, PortfolioEntries, and Projects,
+     * summaries for those Citations, and DataImportAttempts.
+     
+     * Output: Nothing.
+
+     * Side-effect: Update the page's DOM to display these data.
+     * (FIXME: Right now we just add, not "update" :-)
+     */
+    var portfolio_entry_element_html = $('#portfolio_entry_element_building_block').html();
+    var citation_element_html = $('#citation_element_building_block').html();
+   
+    /* Now fill in the template */
+    
+    $(response.portfolio_entries).each( function() {
+	    /* "this" is something like: {'pk': 0, 'fields': {'project_id': 0}} 
+	     * (a JSONified PortfolioEntry)
+	     */
+	    var new_portfolio_entry_element = $(portfolio_entry_element_html);
+	    new_portfolio_entry_element.attr('id', 'portfolio_entry_element_' + this.pk);
+	    /* project_description */
+	   
+	    /* project_icon NOTYET */
+	    
+	    /* project_name NOTYET */
+	    
+	    /* involvement_description NOTYET */
+
+	    /* citation_elements NOTYET */
+
+	    /* It's ready! Append it to #portfolio */
+	    $('#portfolio').append(new_portfolio_entry_element);
+	});
+    
+}
