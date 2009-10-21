@@ -12,34 +12,11 @@ import random
 
 def rs_action(dia):
     oh = ohloh.get_ohloh()
-    if dia.query == 'paulproteus':
-        time.sleep(random.randrange(3, 8))
-        ret = [{'man_months': 1,
-                'primary_language': u'shell script',
-                'project': u'ccHost',
-                'project_homepage_url': u'http://wiki.creativecommons.org/CcHost'}]
-        return ret
-    if dia.query == 'asheesh@asheesh.org':
-        time.sleep(random.randrange(3, 8))
-        ret = [{'man_months': 1,
-                'primary_language': u'Python',
-                'project': u'playerpiano',
-                'project_homepage_url': u'http://code.google.com/p/playerpiano'}]
-        return ret
     return oh.get_contribution_info_by_username(
             dia.query)
 
 def ou_action(dia):
     oh = ohloh.get_ohloh()
-    if dia.query == 'paulproteus':
-        time.sleep(random.randrange(0, 2))
-        return [{'man_months': 1,
-                 'primary_language': u'shell script',
-                 'project': u'ccHost',
-                 'project_homepage_url': u'http://wiki.creativecommons.org/CcHost'}]
-    if dia.query == 'asheesh@asheesh.org':
-        time.sleep(random.randrange(0, 2))
-        return []
     return oh.get_contribution_info_by_ohloh_username(
             dia.query)
 
