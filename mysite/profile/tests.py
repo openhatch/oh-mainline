@@ -50,22 +50,21 @@ class ProfileTests(TwillTests):
         project_name = 'seeseehost'
         description = 'did some work'
         url = 'http://example.com/'
-        exp = ProjectExp.create_from_text(username, project_name,
-                                    description, url)
-        found = list(ProjectExp.objects.filter(person__user__username=username))
+        citation = Citation.create_from_text(
+                username, project_name, url)
+        found = list(Citation.objects.filter(portfolio_entry__person__user__username=username))
         # Verify it shows up in the DB
         self.assert_('seeseehost' in [f.project.name for f in found])
 
         # Verify it shows up in the data passed to the portfolio view.
-        client = self.login_with_client()
-
-        paulproteus_portfolio_url = reverse(mysite.profile.views.display_person_web, kwargs={
+        view = mysite.profile.views.display_person_web
+        paulproteus_portfolio_url = reverse(view, kwargs={
             'user_to_display__username': 'paulproteus'})
-        response = client.get(paulproteus_portfolio_url)
+        response = self.login_with_client().get(paulproteus_portfolio_url)
 
         # Check that the newly added project is there.
         projects = response.context[0]['projects']
-        self.assert_(exp.project in projects)
+        self.assert_(citation.portfolio_entry.project in projects)
         # }}}
 
     def test__project_exp_create_from_text__unit(self):
