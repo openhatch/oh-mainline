@@ -816,13 +816,12 @@ def create_data_import_attempt_if_nonexistent(query, source, person):
     3. ...?
     """
     dias = DataImportAttempt.objects.filter(
-            query=query, source=source, stale=False,
+            query=query, source=source,
             person=person).order_by("-pk")
     if not dias:
         dia = DataImportAttempt(
                 query=query,
                 source=source,
-                stale=False,
                 person=person)
         dia.save()
         dia.do_what_it_says_on_the_tin()
