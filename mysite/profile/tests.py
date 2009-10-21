@@ -819,27 +819,6 @@ class BugsAreRecommended(TwillTests):
         recommended = list(mysite.profile.controllers.recommend_bugs(['Python', 'Python'], n=2))
         self.assertNotEqual(recommended[0], recommended[1])
 
-class OnlyFreshDiasAreSelected(TwillTests):
-    fixtures = ['user-paulproteus', 'person-paulproteus']
-
-    @mock.patch("mysite.profile.models.DataImportAttempt.do_what_it_says_on_the_tin")
-    def test_dias_created_only_once(self, mock_dia_do_what_it_says):
-        query = 'query'
-        source = 'oh'
-        person = Person.objects.get(user__username='paulproteus')
-
-        self.assertEqual(0, DataImportAttempt.objects.count())
-        
-        mysite.profile.views.get_most_recent_data_import_attempt_or_create(
-            query, source, person)
-
-        self.assertEqual(1, DataImportAttempt.objects.count())
-
-        mysite.profile.views.get_most_recent_data_import_attempt_or_create(
-            query, source, person)
-
-        self.assertEqual(1, DataImportAttempt.objects.count())        
-
 class PersonInfoLinksToSearch(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
     
