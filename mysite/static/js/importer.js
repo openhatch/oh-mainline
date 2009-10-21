@@ -278,12 +278,25 @@ function updatePortfolio(response) {
 	     * (a JSONified PortfolioEntry)
 	     */
 	    var new_portfolio_entry_element = $(portfolio_entry_element_html);
-	    new_portfolio_entry_element.attr('id', 'portfolio_entry_element_' + this.pk);
+
+	    var new_id = 'portfolio_entry_element_' + this.pk;
+	    new_portfolio_entry_element.attr('id', new_id);
+	    
+	    /* Find the project this PortfolioElement refers to */
+	    var project_id = this.fields.project_id;
+	    var project_we_refer_to = null;
+	    $(response.projects).each( function() {
+		    if (this.pk == project_id) {
+			project_we_refer_to = this;
+		    }
+		});
 	    /* project_description */
 	   
 	    /* project_icon NOTYET */
 	    
-	    /* project_name NOTYET */
+	    /* project_name */
+	    
+	    $(".project_name", new_portfolio_entry_element).text(project_we_refer_to.fields.name);
 	    
 	    /* involvement_description NOTYET */
 

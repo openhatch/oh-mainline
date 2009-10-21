@@ -17,6 +17,9 @@ test = function() {
             fireunit.ok(
                 $('#portfolio_entry_element_' + this.pk).size()==1,
                 "Expected a portfolio_entry_element corresponding to " + this);
+            fireunit.ok(
+			$('#portfolio_entry_element_' + this.pk + " .project_name").text() == "bindlestiff",
+			"Expected the new portfolio_entry_element to say its project name is bindlestiff");
     });
     /*
     for each object:
