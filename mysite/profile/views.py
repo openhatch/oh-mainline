@@ -627,6 +627,7 @@ def display_list_of_people(request):
     return (request, 'profile/search_people.html', data)
     # }}}
 
+#FIXME: Change this name to gimme_json_for_import_related_objects.
 def gimme_json_that_says_that_commit_importer_is_done(request):
     '''This web controller is called when you want JSON that tells you 
     if the background jobs for the logged-in user have finished.
@@ -636,7 +637,15 @@ def gimme_json_that_says_that_commit_importer_is_done(request):
     person = request.user.get_profile()
     dias = list(DataImportAttempt.objects.filter(person=person))
     citations = list(Citation.objects.filter(portfolio_entry__person=person))
-    json = serializers.serialize('json', dias + citations)
+
+    # Add summaries
+    citations_serializable = []
+    for c in citations:
+        c_nearly_json = serializers.serialize('python', c)
+        c_nearly_json['fields']['summary'] = c.summary
+        citations_serializable.append(c_nearly_json)
+
+    json = serializers.serialize('json', dias + citations_serializable)
     return HttpResponse(json)
     # }}}
 

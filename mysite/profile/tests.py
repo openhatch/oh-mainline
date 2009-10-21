@@ -662,8 +662,11 @@ class Importer(TwillTests):
         
         response_dias_and_citations = simplejson.loads(response.content)
         for object in response_dias_and_citations:
+            if object['model'] == 'profile.Citation':
+                self.assert_(object['summary'],
+                        "Expected a nice response citation "
+                        "like you to have a summary.")
             del object['fields']
-            # We don't care about fields. Checking the pk and model name is just fine.
          
         expected_list = serializers.serialize('python', [finished_dia, unfinished_dia, citation])
         for object in expected_list:
