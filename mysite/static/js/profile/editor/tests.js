@@ -31,4 +31,5 @@ test = function() {
     $('staging').removeClass('staging');
     */
 };
-fireunit.ok(test(), message);
+
+test();
