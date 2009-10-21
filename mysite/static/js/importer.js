@@ -277,12 +277,13 @@ function updatePortfolio(response) {
 	    /* "this" is something like: {'pk': 0, 'fields': {'project_id': 0}} 
 	     * (a JSONified PortfolioEntry)
 	     */
-	    var new_portfolio_entry_element = $(portfolio_entry_element_html);
+        var portfolioEntry = this;
+	    var $new_portfolio_entry_element = $(portfolio_entry_element_html);
 
 	    var new_id = 'portfolio_entry_element_' + this.pk;
-	    new_portfolio_entry_element.attr('id', new_id);
+	    $new_portfolio_entry_element.attr('id', new_id);
 	    
-            /* Find the project this PortfolioElement refers to */
+        /* Find the project this PortfolioElement refers to */
 	    var project_id = this.fields.project_id;
 	    var project_we_refer_to = null;
 	    $(response.projects).each( function() {
@@ -291,34 +292,39 @@ function updatePortfolio(response) {
 		    }
 		});
 	    /* project_description */
-	    $(".project_description", new_portfolio_entry_element).text(this.fields.project_description);
+	    $(".project_description", $new_portfolio_entry_element).text(this.fields.project_description);
 	    	   
-	    /* project_icon NOTYET */
+	    /* project_icon */
+	    $(".project_icon", $new_portfolio_entry_element).attr('src', response.project_icon_urls[portfolioEntry.fields.project_id]);
 	    
 	    /* project_name */
-	    $(".project_name", new_portfolio_entry_element).text(project_we_refer_to.fields.name);
+	    $(".project_name", $new_portfolio_entry_element).text(project_we_refer_to.fields.name);
 	    
 	    /* experience_description */
-	    $(".experience_description", new_portfolio_entry_element).text(this.fields.experience_description);
+	    $(".experience_description", $new_portfolio_entry_element).text(
+                this.fields.experience_description);
 
-        /* citation_elements NOTYET */
-        var addCitation = function() {
+        /* Add the appropriate citations to this portfolio entry. */
+        var addMemberCitations = function() {
             // "this" is an object in response.citations
-            if (this.fields.portfolio_entry_id == this.pk) {
+            if ("portfolio_entry_element_"+this.fields.portfolio_entry_id == 
+                    $new_portfolio_entry_element.attr('id')) {
                 // Then we have a citation that we're gonna add the DOM.
-                var new_citation_element = $(citation_element_html);
-                new_citation_element.attr('id', 'citation_' + this.pk);
-                $('.citations', new_portfolio_entry_element).append(new_citation_element);
+                var $new_citation_element = $(citation_element_html);
+                $new_citation_element.attr('id', 'citation_' + this.pk);
+                var summary = response.summaries[this.pk]
+                $new_citation_element.find('.summary').text(summary);
+                $('.citations', $new_portfolio_entry_element).append($new_citation_element);
             }
         };
-        $(response.citations).each(addCitation);
+        $(response.citations).each(addMemberCitations);
 
         /* clone the template for citation elements /*
         /* find the relevant objects, then add them */
 
 
 	    /* It's ready! Append it to #portfolio */
-	    $('#portfolio').append(new_portfolio_entry_element);
+	    $('#portfolio').append($new_portfolio_entry_element);
 	});
     
 }
