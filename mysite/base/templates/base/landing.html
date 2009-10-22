@@ -56,9 +56,6 @@ Home
         <ul>
             {% for bug in recommended_bugs %}
             <li><span><a style='font-weight: bold;' href='{{ bug.canonical_bug_link }}'>{{ bug.title }}</a> in&nbsp;{{ bug.project.name }}</span></li>
-      <li><span class='project__name'>{{ bug.project.name }}</span>
-        -
-        <a class='canonical_bug_link' href='{{ bug.canonical_bug_link }}'>{{ bug.title }}</a><li>
             {% endfor %}
         </ul>
         <p><a href='/search/'>Find more opportunities <strong>&raquo;</strong></a></p>
