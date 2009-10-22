@@ -341,11 +341,21 @@ class Citation(models.Model):
     def summary(self):
         # FIXME: Pluralize correctly.
         # FIXME: Use "since year_started"
-        return "%s: Coded for %d month(s) in %s." % (
-                self.data_import_attempt.get_source_display(),
-                self.distinct_months,
-                self.languages,
-                )
+        if self.data_import_attempt:
+            if self.data_import_attempt.source == 'rs':
+                return "%s: Coded for %d month(s) in %s." % (
+                    self.data_import_attempt.get_source_display(),
+                    self.distinct_months,
+                    self.languages,
+                    )
+            elif self.data_import_attempt.source == 'lp':
+                return "%s: Participated in %s" % (
+                    self.data_import_attempt.get_source_display(),
+                    self.contributor_role)
+            else:
+                raise ValueError, "Do not know how to summarize this."
+        raise ValueError, "Also do not know how to summarize this."
+                    
 
     @staticmethod
     def create_from_text(
