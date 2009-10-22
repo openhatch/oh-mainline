@@ -310,12 +310,22 @@ function updatePortfolio(response) {
             // "this" is an object in response.citations
             if ("portfolio_entry_"+this.fields.portfolio_entry_id == 
                     $new_portfolio_entry.attr('id')) {
-                // Then we have a citation that we're gonna add the DOM.
-                var $new_citation = $(citation_html);
-                $new_citation.attr('id', 'citation_' + this.pk);
+                // Does this exist? If not, then create it.
+                var id = 'citation_' + this.pk;
+                var $citation_existing_or_not = $('#'+id);
+                var already_exists = ($citation_existing_or_not.size() != 0);
+                if (already_exists) {
+                    var $citation = $citation_existing_or_not;
+                }
+                else {
+                    // Then we have a citation that we're gonna add the DOM.
+                    var $citation = $(citation_html);
+                    $citation.attr('id', id);
+                    $('.citations', $new_portfolio_entry).append($citation);
+                }
+
                 var summary = response.summaries[this.pk]
-                $new_citation.find('.summary').text(summary);
-                $('.citations', $new_portfolio_entry).append($new_citation);
+                $citation.find('.summary').text(summary);
             }
         };
         $(response.citations).each(addMemberCitations);

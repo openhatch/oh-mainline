@@ -21,7 +21,7 @@ response = {
     'project_icon_urls': {'0': '/static/images/the-logo-bluegreen-125px.png'}
 };
 
-test = function() {
+testUpdatePortfolio = function() {
     updatePortfolio(response);
     $(response.portfolio_entries).each( function() {
 
@@ -85,21 +85,16 @@ test = function() {
             fireunit.ok($('.citations li')[0].id == 'citation_0', 
                     "Expected the one citation in the DOM to have id citation_0");
 
-            /*
-               for each object:
-               if model=Citation:
-               - try to find the CitationElement on the page
-               - if exists, update the CitationElement with its (possibly) new values
-               - if not, create it with class staging
-
-               for each object:
-               if model=DataImportAttempt:
-               - update the progress bar
-               $('staging').removeClass('staging');
-               */
     });
 };
 
-test();
+testUpdatePortfolio();
 
-// vim: set nu:
+testNoDuplication = function() {
+    $('#portfolio *').remove();
+    updatePortfolio(response);
+    fireunit.ok($('.citations li').size() == 1, "Assert there's one citation.");
+    updatePortfolio(response);
+    fireunit.ok($('.citations li').size() == 1, "Assert there's still one citation.");
+};
+testNoDuplication();
