@@ -343,9 +343,9 @@ class Citation(models.Model):
         # FIXME: Use "since year_started"
         if self.data_import_attempt:
             if self.data_import_attempt.source == 'rs':
-                return "%s: Coded for %d month(s) in %s." % (
+                return "%s: Coded for %s month(s) in %s." % (
                     self.data_import_attempt.get_source_display(),
-                    self.distinct_months,
+                    str(self.distinct_months) or "?",
                     self.languages,
                     )
             elif self.data_import_attempt.source == 'lp':

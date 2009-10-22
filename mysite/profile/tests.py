@@ -624,10 +624,6 @@ class Importer(TwillTests):
         # once for each data source.
         self.assert_(mock_do_what_it_says_on_the_tin.called)
 
-        # Save them.
-        ohloh_repo_search_dia.save()
-        ohloh_account_dia.save()
-
         self.assertEqual(response.content, "1",
                 "Post-condition: "
                 "profile.views.start_importing sent a success message via JSON.")
