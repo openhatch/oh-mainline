@@ -7,6 +7,7 @@ Import your contributions from around the web | OpenHatch
 {% block css %}
 {{ block.super }}
 @import url('/static/css/profile/importer.css');
+@import url('/static/css/profile/editor.css');
 {% endblock css %}
 
 {% block main %}
@@ -46,11 +47,12 @@ Import your contributions from around the web | OpenHatch
                 &laquo; Back to portfolio
             </a>
         </div>
-    </div>
-</div>
 
-<div id="portfolio">
-  <!-- empty; filled in by JavaScript -->
+        <div style='width: 800px;' id="portfolio">
+          <!-- empty; filled in by JavaScript -->
+        </div>
+
+    </div>
 </div>
 
 <div style="display: none;">
