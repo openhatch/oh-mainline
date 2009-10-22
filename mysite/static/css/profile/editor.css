@@ -30,12 +30,77 @@
     float: left;
     width: 758px;
 }
-.portfolio_entry .project-name {
-    font-size: 13pt;
+.portfolio_entry .project_icon-wrapper {
+    width: 100px;
+    margin-right: 10px;
+    float: left;
+}
+.portfolio_entry .project_icon {
+    height: 50px;
+}
+.portfolio_entry .project_name {
+    padding: 15px 0;
+    font-size: 20px;
+    width: 200px;
+    float: left;
+}
+.portfolio_entry .project_description-wrapper {
+    width: 400px;
+    float: right;
+}
+.portfolio_entry .project_description {
+    width: 390px;
 }
 .portfolio_entry .personal-stuff {
     float: left;
     width: 758px;
     background-color: #f4f4f4;
+    border-top: 2px solid #e9e9e9;
     padding: 20px;
+}
+.portfolio_entry .citations {
+    float: left;
+    width: 300px;
+}
+.portfolio_entry label {
+    font-size: 8pt;
+    text-transform: uppercase;
+    float: left;
+    width: 400px;
+    margin: 0;
+    padding: 0;
+}
+.portfolio_entry .experience_description-wrapper {
+    width: 400px;
+    float: right;
+}
+.portfolio_entry textarea {
+    font-family: "Liberation Sans", Arial;
+}
+.portfolio_entry .experience_description {
+    width: 390px;
+}
+.citations li {
+    width: 300px;
+}
+.citations li .actions {
+    float: left;
+    width: 80px;
+}
+.citations li .actions li {
+    float: left;
+    width: 30px;
+    height: 30px;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+.citations li .actions li.publish {
+    background-image: url('/static/images/icons/publish.png');
+}
+.citations li .actions li.delete {
+    background-image: url('/static/images/icons/delete.png');
+}
+.citations li .summary {
+    float: left;
+    width: 200px;
 }

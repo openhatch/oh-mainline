@@ -17,7 +17,7 @@ response = {
     }
     ],
     'projects': [{'pk': 0, 'fields': {'name': 'bindlestiff'}}],
-    'summaries': {'0': 'garglefoot'},
+    'summaries': {'0': 'Ohloh: Coded in shell script for 12 months since 2007.'},
     'project_icon_urls': {'0': '/static/images/the-logo-bluegreen-125px.png'}
 };
 
