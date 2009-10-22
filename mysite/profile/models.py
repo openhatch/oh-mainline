@@ -332,7 +332,7 @@ class Citation(models.Model):
     data_import_attempt = models.ForeignKey(DataImportAttempt, null=True)
     distinct_months = models.IntegerField(null=True)
     languages = models.TextField(null=True)
-    #year_started = models.IntegerField()
+    year_started = models.IntegerField(null=True)
     date_created = models.DateTimeField(default=datetime.datetime.now)
     is_published = models.BooleanField(default=False) # unpublished == Unread
     is_deleted = models.BooleanField(default=False)
