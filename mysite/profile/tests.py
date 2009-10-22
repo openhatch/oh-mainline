@@ -525,11 +525,10 @@ class CeleryTests(TwillTests):
                 'distinct_months': mock_gcibu.return_value[0]['man_months'],
                 'is_published': False,
                 'is_deleted': False,
-                'year_started': 2007,
                 }]
 
         summaries_we_expect = [
-                "Ohloh's repository index: Coded for 1 month(s) in shell script since 2007.",
+                "Ohloh's repository index: Coded for 1 month(s) in shell script.",
                 ]
 
         return self._test_data_source_via_emulated_bgtask(
