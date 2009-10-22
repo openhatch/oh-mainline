@@ -321,7 +321,7 @@ class PortfolioEntry(models.Model):
     project = models.ForeignKey(Project)
     project_description = models.TextField()
     experience_description = models.TextField()
-    date_created = models.DateTimeField(default=datetime.datetime.now)
+    date_created = models.DateTimeField(default=datetime.datetime.utcnow)
 
 # FIXME: Add a DataSource class to DataImportAttempt.
 
@@ -332,8 +332,8 @@ class Citation(models.Model):
     data_import_attempt = models.ForeignKey(DataImportAttempt, null=True)
     distinct_months = models.IntegerField(null=True)
     languages = models.TextField(null=True)
-    year_started = models.IntegerField(null=True)
-    date_created = models.DateTimeField(default=datetime.datetime.now)
+    first_commit_time = models.DateTimeField(null=True)
+    date_created = models.DateTimeField(default=datetime.datetime.utcnow)
     is_published = models.BooleanField(default=False) # unpublished == Unread
     is_deleted = models.BooleanField(default=False)
 

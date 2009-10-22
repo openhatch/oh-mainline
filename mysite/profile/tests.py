@@ -396,6 +396,8 @@ mock_gcibu.return_value = [{
         'project': u'ccHost',
         'project_homepage_url':
             u'http://wiki.creativecommons.org/CcHost',
+        'first_commit_time':
+            '2008-04-03T23:51:45Z',
         'primary_language': u'shell script'}]
 
 # Create a mock Ohloh get_contribution_info_by_ohloh_username
