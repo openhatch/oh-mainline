@@ -146,6 +146,16 @@ class ProjectExp(models.Model):
             self.primary_language = ohloh_contrib_info['primary_language']
             self.source = "Ohloh"
             self.time_gathered_from_source = datetime.date.today()
+            # FIXME: Handle first_commit_time from Ohloh somehow
+            #if 'first_commit_time' in ohloh_contrib_info:
+                # parse it
+                #parsed = datetime.datetime.strptime(
+                #    ohloh_contrib_info['first_commit_time'],
+                #    '%Y-%m-%dT%H:%M:%SZ')
+                # This is UTC.
+
+                # jam it into self
+                #self.date_started = parsed
             return self
         # }}}
 
@@ -321,7 +331,7 @@ class PortfolioEntry(models.Model):
     project = models.ForeignKey(Project)
     project_description = models.TextField()
     experience_description = models.TextField()
-    date_created = models.DateTimeField(default=datetime.datetime.now)
+    date_created = models.DateTimeField(default=datetime.datetime.utcnow)
 
 # FIXME: Add a DataSource class to DataImportAttempt.
 
@@ -332,8 +342,8 @@ class Citation(models.Model):
     data_import_attempt = models.ForeignKey(DataImportAttempt, null=True)
     distinct_months = models.IntegerField(null=True)
     languages = models.TextField(null=True)
-    year_started = models.IntegerField(null=True)
-    date_created = models.DateTimeField(default=datetime.datetime.now)
+    first_commit_time = models.DateTimeField(null=True)
+    date_created = models.DateTimeField(default=datetime.datetime.utcnow)
     is_published = models.BooleanField(default=False) # unpublished == Unread
     is_deleted = models.BooleanField(default=False)
 
