@@ -1,5 +1,3 @@
-# vim: ai ts=3 sts=4 et sw=4 nu
-
 # Imports {{{
 
 # Python
@@ -45,6 +43,7 @@ from mysite.profile.models import \
         Link_SF_Proj_Dude_FM, Link_Person_Tag, \
         DataImportAttempt
 from mysite.search.models import Project
+from mysite.base.decorators import view
 
 # This app
 import forms
@@ -76,39 +75,40 @@ def projectexp_add_do(request):
 
 # }}}
 
-def profile_data_from_username(username):
+@login_required
+@view
+def display_person_edit_web(request, info_edit_mode=False, title=''):
     # {{{
-    person = Person.objects.get(
-            user__username=username)
 
-    project_exps = ProjectExp.objects.filter(
-            person=person)
+    person = request.user.get_profile()
 
-    exps_to_tags = {}
-    for exp in project_exps:
-        tag_links = Link_ProjectExp_Tag.objects.filter(project_exp=exp)
-        for link in tag_links:
-            if link.favorite:
-                link.tag.prefix = 'Favorite: ' # FIXME: evil hack, will fix later
-            else:
-                link.tag.prefix = ''
-        exps_to_tags[exp] = [link.tag for link in tag_links]
+    data = get_personal_data(person)
 
-    # {
-    #   Experience1:
-    #   ["awesome", "fun", "illuminating", "helped_me_get_laid"],
-    # }
+    # FIXME: Django builds this in.
+    data['editable'] = True
+    data['info_edit_mode'] = info_edit_mode
 
-    exp_taglist_pairs = exps_to_tags.items()
-
-    interested_in_working_on_list = re.split(r', ',person.interested_in_working_on)
-
-    return {
-            'person': person,
-            'interested_in_working_on_list': interested_in_working_on_list, 
-            'exp_taglist_pairs': exp_taglist_pairs } 
+    return (request, 'profile/main.html', data)
     # }}}
 
+@login_required
+@view
+def display_person_web(request, user_to_display__username=None):
+    # {{{
+
+    user = get_object_or_404(User, username=user_to_display__username)
+    person, was_created = Person.objects.get_or_create(user=user)
+
+    data = get_personal_data(person)
+    data['edit_mode'] = False
+    data['editable'] = (request.user == user)
+    data['notifications'] = mysite.base.controllers.get_notification_from_request(request)
+
+    return (request, 'profile/main.html', data)
+
+    # }}}
+
+#FIXME: Create a separate function that just passes the data required for displaying the little user bar on the top right to the template, and leaves out all the data required for displaying the large user bar on the left.
 def get_personal_data(person):
     # {{{
     project_exps = ProjectExp.objects.filter(person=person)
@@ -184,77 +184,56 @@ def get_personal_data(person):
 
     # }}}
 
-@login_required
-def display_person_edit_web(request, info_edit_mode=False, title=''):
+def tags_dict_for_person(person):
     # {{{
+    ret = collections.defaultdict(list)
+    links = Link_Person_Tag.objects.filter(person=person).order_by('id')
+    for link in links:
+        ret[link.tag.tag_type.name].append(link.tag)
 
-    person = request.user.get_profile()
-
-    data = get_personal_data(person)
-
-    # FIXME: Django builds this in.
-    data['the_user'] = request.user
-    data['editable'] = True
-    data['info_edit_mode'] = info_edit_mode
-
-    return render_to_response('profile/main.html', data)
+    return ret
     # }}}
 
 @login_required
-def display_person_web(request, user_to_display__username=None):
-    # {{{
-
-    user = get_object_or_404(User, username=user_to_display__username)
-    person, was_created = Person.objects.get_or_create(user=user)
-
-    data = get_personal_data(person)
-
-    data['the_user'] = request.user
-    data['title'] = 'openhatch / %s' % user.username
-    data['edit_mode'] = False
-    data['editable'] = (request.user == user)
-    data['notifications'] = mysite.base.controllers.get_notification_from_request(request)
-
-    return render_to_response('profile/main.html', data)
-
-    # }}}
-
+@view
 def projectexp_display(request, user_to_display__username, project__name):
     # {{{
     user = get_object_or_404(User, username=user_to_display__username)
     person = get_object_or_404(Person, user=user)
     project = get_object_or_404(Project, name=project__name)
+
     data = get_personal_data(person)
     data['project'] = project
     data['exp_list'] = get_list_or_404(ProjectExp,
             person=person, project=project)
-    data['title'] = "%s's contributions to %s" % (
-            user.username, project.name)
-    data['the_user'] = request.user
     data['projectexp_editable'] = (user == request.user)
     data['editable'] = (user == request.user)
-    return render_to_response('profile/projectexp.html', data)
+    return (request, 'profile/projectexp.html', data)
     # }}}
     
-def widget_display(request, user_to_display__username, please_return_string=False):
+def widget_display_undecorated(request, user_to_display__username):
+    """We leave this function unwrapped by @view """
+    """so it can referenced by widget_display_string."""
     # {{{
     user = get_object_or_404(User, username=user_to_display__username)
     person = get_object_or_404(Person, user=user)
-    data = get_personal_data(person)
-    data['title'] = "Widget"
-    data['the_user'] = request.user
+
+    data = {}
     data['projectexp_editable'] = (user == request.user)
     data['editable'] = (user == request.user)
     data['url_prefix'] = request.META['SERVER_NAME'] + ':' + request.META['SERVER_PORT']
-    if please_return_string:
-        return render_to_string('profile/widget.html', data)
-    else:
-        return render_to_response('profile/widget.html', data)
+    return (request, 'profile/widget.html', data)
     # }}}
+
+widget_display = view(widget_display_undecorated)
+
+def widget_display_string(request, user_to_display__username):
+    request, template, data = widget_display_undecorated(request, user_to_display__username)
+    return render_to_string(template, data)
 
 def widget_display_js(request, user_to_display__username):
     # FIXME: In the future, use:
-    html_doc = widget_display(request, user_to_display__username, please_return_string=True)
+    html_doc = widget_display_string(request, user_to_display__username)
     # to generate html_doc
     encoded_for_js = simplejson.dumps(html_doc)
     # Note: using application/javascript as suggested by
@@ -286,6 +265,7 @@ def prepare_p_e_forms(person, project):
     return forms
 
 @login_required
+@view
 def projectexp_edit(request, project__name, forms = None):
     """Page that allows user to edit project experiences for a project."""
     # {{{
@@ -302,11 +282,9 @@ def projectexp_edit(request, project__name, forms = None):
             person=person, project=project)
     data['forms'] = forms
     data['edit_mode'] = True
-    data['title'] = "Edit your contributions to %s" % project.name
     data['project__name'] = project__name
-    data['the_user'] = request.user
     data['editable'] = True
-    return render_to_response('profile/projectexp_edit.html', data)
+    return (request, 'profile/projectexp_edit.html', data)
     # }}}
 
 @login_required
@@ -379,33 +357,17 @@ def projectexp_edit_do(request, project__name):
     # }}}
 
 @login_required
+@view
 def projectexp_add_form(request, form = None):
     # {{{
     if form is None:
         form = mysite.profile.forms.ProjectExpForm()
 
-    try:
-        person = request.user.get_profile()
-    except AttributeError:
-        return render_to_response('search/index.html', {
-            'notification': "You've gotta be logged in to do that! (Coming soon: a slightly easier way to get back to where you were.)"
-            })
+    person = request.user.get_profile()
     data = get_personal_data(person)
-    data['the_user'] = request.user
-    data['title'] = "Log a contribution in your portfolio | OpenHatch"
     data['form'] = form
     
-    return render_to_response('profile/projectexp_add.html', data)
-    # }}}
-
-def tags_dict_for_person(person):
-    # {{{
-    ret = collections.defaultdict(list)
-    links = Link_Person_Tag.objects.filter(person=person).order_by('id')
-    for link in links:
-        ret[link.tag.tag_type.name].append(link.tag)
-
-    return ret
+    return (request, 'profile/projectexp_add.html', data)
     # }}}
 
 # }}}
@@ -724,28 +686,18 @@ def ask_for_tag_input(request, username):
     return display_person_web(request, username, 'tags', edit='1')
     # }}}
 
-#def make_favorite_project_exp(exp_id_obj):
-
-#def make_favorite_project_exp_web(request):
-
-#def make_favorite_tag(exp_id_obj, tag_text):
-
-#def make_favorite_exp_tag_web(request):
-
-#def edit_exp_tag(request, exp_id):
-
 @login_required
+@view
 def display_list_of_people(request):
+    """Display a list of people."""
     # {{{
-    return render_to_response('profile/search_people.html', {
-        'the_user': request.user,
-        'title': 'List of people : OpenHatch',
-        'people': Person.objects.all().order_by('user__username')
-        })
+    data = {}
+    data['people'] = Person.objects.all().order_by('user__username')
+    return (request, 'profile/search_people.html', data)
     # }}}
 
 def gimme_json_that_says_that_commit_importer_is_done(request):
-    ''' This web controller is called when you want JSON that tells you 
+    '''This web controller is called when you want JSON that tells you 
     if the background jobs for the logged-in user have finished.
 
     It has no side-effects.'''
@@ -826,6 +778,7 @@ def prepare_data_import_attempts(post, user):
                         person=user.get_profile())
 
 @login_required
+@view
 def importer(request):
     """Get the DIAs for the logged-in user's profile. Pass them to the template."""
     # {{{
@@ -841,14 +794,12 @@ def importer(request):
             'index': blank_query_index,
             'checkboxes': checkboxes
             }
-    data = get_personal_data(request.user.get_profile())
-    data.update({
-        'the_user': request.user,
-        'dias': DataImportAttempt.objects.filter(person=request.user.get_profile(),stale=False).order_by('id'),
-        'blank_query': blank_query
-        })
+    person = request.user.get_profile()
+    data = get_personal_data(person)
+    data['dias'] = DataImportAttempt.objects.filter(person=person, stale=False).order_by('id')
+    data['blank_query'] = blank_query
 
-    return render_to_response('profile/importer.html', data)
+    return (request, 'profile/importer.html', data)
     # }}}
 
 def filter_by_key_prefix(dict, prefix):
@@ -927,6 +878,7 @@ def user_selected_these_dia_checkboxes(request):
     # }}}
 
 @login_required
+@view
 def display_person_edit_name(request, name_edit_mode):
     '''Show a little edit form for first name and last name.
 
@@ -934,13 +886,28 @@ def display_person_edit_name(request, name_edit_mode):
     model already stores them separately.
     '''
     # {{{
-    data = {}
-    data = get_personal_data(
-            request.user.get_profile())
+    data = get_personal_data(request.user.get_profile())
     data['name_edit_mode'] = name_edit_mode
     data['editable'] = True
-    return render_to_response('profile/main.html', data)
+    return (request, 'profile/main.html', data)
     # }}}
+
+def people_matching(property, value):
+    links = Link_Person_Tag.objects.filter(tag__tag_type__name=property, tag__text__iexact=value)
+    peeps = [l.person for l in links]
+    sorted_peeps = sorted(set(peeps), key = lambda thing: (thing.user.first_name, thing.user.last_name))
+    return sorted_peeps
+
+@login_required
+@view
+def display_list_of_people_who_match_some_search(request, property, value):
+    '''Property is the "tag name", and "value" is the text in it.'''
+    peeps = people_matching(property, value)
+    data = {}
+    data['people'] = peeps
+    data['property'] = property
+    data['value'] = value
+    return (request, 'profile/search_people.html', data)
 
 @login_required
 def display_person_edit_name_do(request):
@@ -959,3 +926,5 @@ def display_person_edit_name_do(request):
 
     return HttpResponseRedirect('/people/%s' % urllib.quote(user.username))
     # }}}
+
+# vim: ai ts=3 sts=4 et sw=4 nu

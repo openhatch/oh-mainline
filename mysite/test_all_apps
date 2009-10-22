@@ -1,0 +1,1 @@
+../bin/mysite test $( ls -1 */tests.py | grep -v customs | sed s,/tests.py,,)

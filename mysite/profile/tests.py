@@ -55,12 +55,17 @@ class ProfileTests(TwillTests):
         found = list(ProjectExp.objects.filter(person__user__username=username))
         # Verify it shows up in the DB
         self.assert_('seeseehost' in [f.project.name for f in found])
-        # Verify it shows up in profile_data_from_username
-        data = views.profile_data_from_username('paulproteus')
-        self.assert_(data['person'].user.username == 'paulproteus')
-        projects = [thing[0].project.name for thing in
-                    data['exp_taglist_pairs']]
-        self.assert_('seeseehost' in projects)
+
+        # Verify it shows up in the data passed to the portfolio view.
+        client = self.login_with_client()
+
+        paulproteus_portfolio_url = reverse(mysite.profile.views.display_person_web, kwargs={
+            'user_to_display__username': 'paulproteus'})
+        response = client.get(paulproteus_portfolio_url)
+
+        # Check that the newly added project is there.
+        projects = response.context[0]['projects']
+        self.assert_(exp.project in projects)
         # }}}
 
     def test__project_exp_create_from_text__unit(self):
@@ -318,6 +323,7 @@ class ProjectExpTests(TwillTests):
 
     def test_person_involvement_description(self):
         # {{{
+        self.login_with_twill()
         username = 'paulproteus'
         project_name = 'ccHost'
         url = 'http://openhatch.org/people/%s/projects/%s' % (
@@ -362,7 +368,7 @@ class ProjectExpTests(TwillTests):
         soup = BeautifulSoup.BeautifulSoup(tc.show())
         for tag_type_name in tag_dict:
             text = ''.join(soup(id='tags-%s' % tag_type_name)[0].findAll(text=True))
-            self.assert_(', '.join(tag_dict[tag_type_name]) in text)
+            self.assert_(', '.join(tag_dict[tag_type_name]) in ' '.join(text.split()))
 
         # Go back to the form and make sure some of these are there
         tc.go(make_twill_url(url))
@@ -793,6 +799,11 @@ class BugsAreRecommended(TwillTests):
         self.assertEqual(len(python_bugs), 1)
         csharp_bugs = [ bug for bug in recommended if bug.project.language == 'C#']
         self.assertEqual(len(csharp_bugs), 1)
+        
+    def test_recommendations_not_duplicated(self):
+        """ Run two equivalent searches in parallel, and discover that they weed out duplicates."""
+        recommended = list(mysite.profile.controllers.recommend_bugs(['Python', 'Python'], n=2))
+        self.assertNotEqual(recommended[0], recommended[1])
 
 class OnlyFreshDiasAreSelected(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
@@ -860,5 +871,89 @@ class OnlyFreshDiasAreSelected(TwillTests):
         # Now verify it's done
         self.assert_(DataImportAttempt.objects.get().stale)
 
+class PersonInfoLinksToSearch(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+    
+    def test_whatever(self):
+        '''
+        * Have a user, say that he understands+wantstolearn+currentlylearns+canmentor something
+        * Go to his user page, and click those various links
+        * Find yourself on some search page that mentions the user.
+        '''
+        tags = {
+            'understands': ['thing1'],
+            'understands_not': ['thing2'],
+            'seeking': ['thing3'],
+            'studying': ['thing4'],
+            'can_mentor': ['thing5'],
+            }
+
+        # Log in as paulproteus
+        
+        self.login_with_twill()
+
+        # Update paulproteus's tags
+        url = 'http://openhatch.org/people/edit/info'
+        tc.go(make_twill_url(url))
+        for tag_type_name in tags:
+            tc.fv('edit-tags', 'edit-tags-' + tag_type_name, ", ".join(tags[tag_type_name]))
+        tc.submit()
+
+        # Now, click on "thing1"
+        tc.follow("thing1")
+
+        # Now find ourself there
+        tc.find('Asheesh Laroia')
+
+class Widget(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def test_widget_display(self):
+        widget_url = reverse(mysite.profile.views.widget_display,
+                kwargs={'user_to_display__username': 'paulproteus'})
+        client = self.login_with_client()
+        response = client.get(widget_url)
+
+    def test_widget_display_js(self):
+        widget_js_url = reverse(mysite.profile.views.widget_display_js,
+                kwargs={'user_to_display__username': 'paulproteus'})
+        client = self.login_with_client()
+        response = client.get(widget_js_url)
+
+class PersonalData(TwillTests):
+    fixtures = ['user-paulproteus', 'user-barry', 'person-barry',
+            'person-paulproteus', 'cchost-data-imported-from-ohloh']
+
+    def test_all_views_that_call_get_personal_data(self):
+        # Views where you can look at somebody else.
+        stalking_view2args = {
+                mysite.profile.views.display_person_web: {'user_to_display__username': 'paulproteus'},
+                mysite.profile.views.projectexp_display: {'user_to_display__username': 'paulproteus', 'project__name': 'ccHost'},
+                }
+
+        # Views where you look only at yourself.
+        navelgazing_view2args = {
+                mysite.profile.views.display_person_edit_web: {},
+                mysite.profile.views.projectexp_add_form: {},
+                mysite.profile.views.projectexp_edit: {'project__name': 'ccHost'},
+                mysite.profile.views.importer: {},
+                mysite.profile.views.display_person_edit_name: {},
+                }
+
+        for view in stalking_view2args:
+            self.client.login(username='barry', password='parallelism')
+            kwargs = stalking_view2args[view]
+            url = reverse(view, kwargs=kwargs)
+            response = self.client.get(url)
+            self.assertEqual(response.context[0]['person'].user.username, 'paulproteus')
+            self.client.logout()
+
+        for view in navelgazing_view2args:
+            client = self.login_with_client()
+            kwargs = navelgazing_view2args[view]
+            url = reverse(view, kwargs=kwargs)
+            response = client.get(url)
+            self.assertEqual(response.context[0]['person'].user.username, 'paulproteus')
+            client.logout()
 
 # vim: set ai et ts=4 sw=4 nu:

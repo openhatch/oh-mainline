@@ -83,11 +83,17 @@ h4 {
     padding-right: 0;
 }
 
-li {
-    padding-bottom: 5px;
+#bugs li {
+    padding-bottom: 10px;
+    margin-left: 15px;
+    list-style: square;
+    color: #888;
 }
 
-li img {
-    float: left;
-    padding: 0 5px 10px 0;
+#bugs li span {
+    color: #222;
+}
+
+.module p {
+    margin-top: 0;
 }

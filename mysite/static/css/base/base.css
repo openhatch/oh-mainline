@@ -3,11 +3,11 @@ body {
     background: #fff url("/static/images/motif-eee.png");
     margin: 0;
     padding: 0;
-    color: #224;
+    color: #222;
 }
 
 a {
-    color: orange; /*#ff8046; #ff6d3d; #ff613f; #ff7800; 00a8ff; eeb300; */
+    color: #ff6d3d; /* #ff8046; #ff6d3d; #ff613f; #ff7800; 00a8ff; eeb300; */
     text-decoration: none;
 }
 
