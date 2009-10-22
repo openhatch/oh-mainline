@@ -211,6 +211,7 @@ def projectexp_display(request, user_to_display__username, project__name):
     return (request, 'profile/projectexp.html', data)
     # }}}
     
+# FIXME: Test this.
 def widget_display_undecorated(request, user_to_display__username):
     """We leave this function unwrapped by @view """
     """so it can referenced by widget_display_string."""
