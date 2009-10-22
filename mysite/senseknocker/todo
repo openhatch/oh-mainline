@@ -1,0 +1,54 @@
+Create app: senseknocker
+Create test class for senseknocker
+
+Create test method: SenseKnocker graphic appears on every view
+
+    /senseknocker/tests.py
+    Wait, screw that.
+
+Create graphic: "Something sucks"
+
+    """something sucks"""
+    /static/images/senseknocker/something-sucks.png
+    
+Make SenseKnocker.GraphicAppearance.test_appears_on_all_views test pass
+
+Create test method: SenseKnocker graphic links to a SenseKnocker feedback template.
+
+Make test_appears_on_all_views test pass.
+
+Create JavaScript test object: SenseKnocker.tests
+
+    /static/js/senseknocker/tests.js
+    SenseKnocker.tests = {};
+    SenseKnocker.tests.graphicLinksToThickbox = function() {
+        ...
+    };
+    SenseKnocker.tests.thickboxShutsClosedWithGraceAndAplomb = function() {
+        ...
+    };
+
+Make SenseKnocker.tests.graphicLinksToThickbox pass.
+
+Include thickbox (or maybe lightbox, or something).
+
+Create JS object: SenseKnocker
+    if (typeof SenseKnocker == 'undefined') {
+        SenseKnocker = {};
+    }
+
+    // Create test method:
+    // SenseKnocker graphic links to a SenseKnocker feedback template.
+    SenseKnocker.graphicLinksToThickbox = function () {
+    };
+
+
+
+Chest-off
+    Long-ass way to do "Create tests for thinger on every view":
+    Actually loop through every view.
+        Dependency:
+        Implement view decorator across all views.
+
+Later
+- Buy domain name: senseknocker.com
