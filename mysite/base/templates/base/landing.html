@@ -13,14 +13,7 @@ Home
 {% block pagetop %}
 
 <h1>Welcome, 
-            {% if person.user.first_name or person.user.last_name %}
-                <a href='/people/{{ person.user.username }}'>
-                    {{ person.user.first_name }}
-                    {{ person.user.last_name }}</a>!
-            {% else %}
-                <a href='/people/{{ person.user.username }}'>
-                    {{ person.user.username }}</a>!
-            {% endif %}
+    <a href='/people/{{ the_user.username }}'>{{ the_user.get_profile.get_full_name_or_username }}</a>!
 </h1>
 
 {% endblock pagetop %}
