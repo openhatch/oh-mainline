@@ -17,7 +17,7 @@ response = {
     }
     ],
     'projects': [{'pk': 0, 'fields': {'name': 'bindlestiff'}}],
-    'summaries': {'0': 'Ohloh: Coded in shell script for 12 months as paulproteus since 2007.'},
+    'summaries': {'0': 'Ohloh repository index: Coded in shell script for 12 months as paulproteus since 2007.'},
     'project_icon_urls': {'0': '/people/project_icon/Web%20Team%20projects/'}
 };
 
