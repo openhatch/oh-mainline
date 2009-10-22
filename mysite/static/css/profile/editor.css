@@ -1,0 +1,41 @@
+.portfolio_entry {
+    margin-top: 20px;
+    width: 910px;
+}
+.portfolio_entry > .actions {
+    float: left;
+    width: 85px;
+}
+.portfolio_entry > .actions li {
+    padding: 10px;
+    width: 55px;
+    float: left;
+    background-position: 5px;
+    background-repeat: no-repeat;
+    padding-left: 35px;
+}
+.portfolio_entry > .actions li.publish {
+    /*background-color: #b2dda2;*/
+    background-image: url('/static/images/icons/publish.png');
+}
+.portfolio_entry > .actions li.delete {
+    background-image: url('/static/images/icons/delete.png');
+}
+.portfolio_entry > .submodule {
+    width: 798px;
+    float: right;
+    margin-bottom: 0;
+}
+.portfolio_entry .project-stuff {
+    float: left;
+    width: 758px;
+}
+.portfolio_entry .project-name {
+    font-size: 13pt;
+}
+.portfolio_entry .personal-stuff {
+    float: left;
+    width: 758px;
+    background-color: #f4f4f4;
+    padding: 20px;
+}
