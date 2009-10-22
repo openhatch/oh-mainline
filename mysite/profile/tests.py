@@ -597,6 +597,8 @@ class UserListTests(TwillTests):
 class Importer(TwillTests):
     # {{{
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
+    # Don't include cchost-paulproteus, because we need paulproteus to have
+    # zero Citations at the beginning of test_person_gets_data_iff_they_want_it
 
     form_url = "http://openhatch.org/people/portfolio/import/"
 
@@ -615,12 +617,10 @@ class Importer(TwillTests):
                 0,
                 "Pre-condition: "
                 "No tasks for paulproteus.")
-
         client = self.login_with_client()
         response = client.post(
                 reverse(mysite.profile.views.prepare_data_import_attempts_do),\
                         input)
-
         # FIXME: We should also check that we call this function
         # once for each data source.
         self.assert_(mock_do_what_it_says_on_the_tin.called)

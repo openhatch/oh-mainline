@@ -17,7 +17,7 @@ response = {
     }
     ],
     'projects': [{'pk': 0, 'fields': {'name': 'bindlestiff'}}],
-    'summaries': {'0': 'garglefoot'},
+    'summaries': {'0': 'Ohloh: Coded in shell script for 12 months since 2007.'},
     'project_icon_urls': {'0': '/static/images/the-logo-bluegreen-125px.png'}
 };
 
@@ -49,13 +49,14 @@ testUpdatePortfolio = function() {
              */
 
             // List the citations in the DOM.
-            var dom_citations = $('.citations li', pee);
+            var dom_citations = $('.citations > li', pee);
 
             fireunit.ok(
                     dom_citations.size() == 1,
                     "Expected the number of citation elements in the " + 
                     "PortfolioEntryElement == 1 == the number of " +
-                    "citations in the input that belong to this PEE.");
+                    "citations in the input that belong to this PEE. Instead " +
+                    "the number of citation elements == " + dom_citations.size());
 
             // For each citation in the response, check that its data
             // is stuffed into the DOM.
@@ -81,8 +82,8 @@ testUpdatePortfolio = function() {
             // And now check the reverse: For each citation in the DOM,
             // check that its data is in the response.
 
-            fireunit.ok($('.citations li').size() == 1, "Expected just one citation in the DOM.");
-            fireunit.ok($('.citations li')[0].id == 'citation_0', 
+            fireunit.ok($('.citations > li').size() == 1, "Expected just one citation in the DOM.");
+            fireunit.ok($('.citations > li')[0].id == 'citation_0', 
                     "Expected the one citation in the DOM to have id citation_0");
 
     });
@@ -94,11 +95,11 @@ testNoDuplication = function() {
     $('#portfolio *').remove();
 
     updatePortfolio(response);
-    fireunit.ok($('.citations li').size() == 1, "Assert there's one citation.");
+    fireunit.ok($('.citations > li').size() == 1, "Assert there's one citation.");
     fireunit.ok($('.portfolio_entry:visible').size() == 1, "Assert there's one portfolio entry.");
 
     updatePortfolio(response);
-    fireunit.ok($('.citations li').size() == 1, "Assert there's still one citation.");
+    fireunit.ok($('.citations > li').size() == 1, "Assert there's still one citation.");
     fireunit.ok($('.portfolio_entry:visible').size() == 1, "Assert there's still one portfolio entry.");
 };
 testNoDuplication();

@@ -1,12 +1,9 @@
 #main {
     float: left;
-    border: 1px solid #f4f4f4;
 }
 
 #main .module > .head,
 #main .module > .body {
-    border-left: 1px solid #f4f4f4;
-    border-right: 1px solid #f4f4f4;
 }
 
 #main .module > .head {
@@ -14,10 +11,9 @@
 }
 #main .module > .body {
     width: 910px;
-    border-bottom: 1px solid #f4f4f4;
 }
 #main .contains-submodules.two-columns .submodule.skinny {
-    width: 240px;
+    width: 230px;
     margin-right: 20px;
 }
 #main .contains-submodules.two-columns .submodule.fat {

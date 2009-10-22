@@ -46,16 +46,15 @@
                                 <!-- user.is_authenticated indeed -->
                                 <li><a href='{% url mysite.account.views.logout %}'>log out</a></li>
                                 <li><a href='{% url mysite.account.views.settings %}'>settings</a></li>
+                                <li><a href='/search/'>volunteer opportunities</a></li>
+                                <li><a href='/people/'>people</a></li>
                                 <li id='username'><a href='/people/{{ the_user.username }}/'>{{ the_user.username }}</a></li>
                                 {% else %}
                                 <li><a href='{% url mysite.account.views.login %}'>log in</a></li>
                                 <li><a href='/#create_profile'>sign up</a></li>
-                                {% endif %}
-                            </ul>
-                            <!-- due to right float, bottom of list is leftmost element -->
-                            <ul style='width: 740px;' id='links'>
                                 <li><a href='/search/'>volunteer opportunities</a></li>
                                 <li><a href='/people/'>people</a></li>
+                                {% endif %}
                             </ul>
                         </div>
 
@@ -75,15 +74,15 @@
                     </div>
                 </div>
                 {% endblock nav %}
+                {% if notifications %}
                 <ul id='notifications'>
                     {% block notifications %}
-                    {% if notifications %}
                     {% for notification in notifications %}
-                    <li class='alert' id='{{ notification.id }}'>{{ notification.text }}</li>
+                    <li class='alert' id='{{ notification.id }}'><div>{{ notification.text }}</div></li>
                     {% endfor %}
-                    {% endif %}
                     {% endblock %}
                 </ul>
+                {% endif %}
                 <div id='page-top'>
                     {% block pagetop %}
                     {% endblock pagetop %}

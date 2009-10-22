@@ -1,7 +1,7 @@
 {% extends 'profile/base_profile.html' %}
 
 {% block title %}
-{{person.user.username}}'s portfolio | OpenHatch
+{{ person.get_full_name_or_username }}'s portfolio | OpenHatch
 {% endblock title %}
 
 {% block css %}

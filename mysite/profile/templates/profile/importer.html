@@ -6,47 +6,31 @@ Import your contributions from around the web | OpenHatch
 
 {% block css %}
 {{ block.super }}
-@import url('/static/css/profile/importer.css');
 @import url('/static/css/profile/editor.css');
 {% endblock css %}
 
 {% block main %}
-<div id='importer' class='module'>
+<div id='this-used-to-be-the-importer' class='module'>
     <div class='head'>
-        <h3>Import contributions from 'round the web</h3>
+        <h3>Portfolio editor</h3>
         <ul>
             <li>
             <a href='/people/{{ the_user.username }}'>
                 &laquo; Back to portfolio
             </a>
             </li>
-            <li>
-            <a class='show-howto-link' href='#'>
-                How to use this
-            </a>
-            </li>
         </ul>
     </div>
     <div class='body contains-submodules'>
-        <form class='submodule' name='import' method='POST'
+        <form id='importer' class='submodule' name='import' method='POST'
             action='{% url mysite.profile.views.user_selected_these_dia_checkboxes %}'>
-            <div class='head'>
-                <div class='who'>Username or email</div>
-            </div>
             <div class='body'>
-                <div class='loading-notification hide_on_doc_ready'>Getting ready...</div>
+                <div class='who'>Username or email</div>
             </div>
             <div class='foot'>
                 <input type='submit' value='Submit' id='submit_data_sources' />
             </div>
         </form>
-
-        <div id='jobs-are-done'>
-            Import finished!
-            <a href='{% url mysite.profile.views.display_person_web the_user.username %}'>
-                &laquo; Back to portfolio
-            </a>
-        </div>
 
         <div style='width: 800px;' id="portfolio">
           <!-- empty; filled in by JavaScript -->
@@ -58,7 +42,6 @@ Import your contributions from around the web | OpenHatch
 <div style="display: none;">
   <div id="portfolio_entry_building_block">
       {% include 'profile/editor/portfolio_entry_element.html' %}
-      lol
   </div>
   <div id="citation_building_block">
       {% include 'profile/editor/citation_element.html' %}
