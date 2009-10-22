@@ -63,6 +63,8 @@
     font-size: 20px;
     width: 200px;
     float: left;
+    position: relative;
+    left: -20px;
 }
 .portfolio_entry .project_description-wrapper {
     width: 400px;

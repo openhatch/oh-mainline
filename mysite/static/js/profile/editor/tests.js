@@ -18,7 +18,7 @@ response = {
     ],
     'projects': [{'pk': 0, 'fields': {'name': 'bindlestiff'}}],
     'summaries': {'0': 'Ohloh: Coded in shell script for 12 months since 2007.'},
-    'project_icon_urls': {'0': '/static/images/the-logo-bluegreen-125px.png'}
+    'project_icon_urls': {'0': '/people/project_icon/Web%20Team%20projects/'}
 };
 
 testUpdatePortfolio = function() {
