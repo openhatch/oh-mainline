@@ -53,26 +53,22 @@
     float: left;
     width: 758px;
 }
-.portfolio_entry .project_icon-wrapper {
-    height: 60px;
-    width: 60px;
-    padding: 10px;
-    float: left;
-}
 .portfolio_entry .project_icon {
+    float: left;
     height: 60px;
     width: 60px;
+    margin-right: 10px;
 }
 .portfolio_entry .name_and_icon_flagger {
     float: left;
     width: 300px;
     position: relative;
-    left: -20px;
+    left: -10px;
 }
 .portfolio_entry .project_name {
     padding: 15px 0;
     font-size: 20px;
-    width: 300px;
+    width: 200px;
     float: left;
 }
 .portfolio_entry .icon_flagger {
