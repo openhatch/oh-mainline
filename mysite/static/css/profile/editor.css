@@ -51,7 +51,7 @@
 .portfolio_entry .project_icon-wrapper {
     height: 60px;
     width: 60px;
-    margin-right: 10px;
+    padding: 10px;
     float: left;
 }
 .portfolio_entry .project_icon {
