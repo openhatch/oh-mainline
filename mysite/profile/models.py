@@ -146,17 +146,16 @@ class ProjectExp(models.Model):
             self.primary_language = ohloh_contrib_info['primary_language']
             self.source = "Ohloh"
             self.time_gathered_from_source = datetime.date.today()
-            if 'first_commit_time' in ohloh_contrib_info:
+            # FIXME: Handle first_commit_time from Ohloh somehow
+            #if 'first_commit_time' in ohloh_contrib_info:
                 # parse it
-                import pdb
-                pdb.set_trace()
-                parsed = datetime.datetime.strptime(
-                    ohloh_contrib_info['first_commit_time'],
-                    '%Y-%m-%dT%H:%M:%SZ')
+                #parsed = datetime.datetime.strptime(
+                #    ohloh_contrib_info['first_commit_time'],
+                #    '%Y-%m-%dT%H:%M:%SZ')
                 # This is UTC.
 
                 # jam it into self
-                self.date_started = parsed
+                #self.date_started = parsed
             return self
         # }}}
 
