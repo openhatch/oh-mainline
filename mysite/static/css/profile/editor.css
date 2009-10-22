@@ -58,13 +58,21 @@
     height: 60px;
     width: 60px;
 }
+.portfolio_entry .name_and_icon_flagger {
+    float: left;
+    width: 300px;
+    position: relative;
+    left: -20px;
+}
 .portfolio_entry .project_name {
     padding: 15px 0;
     font-size: 20px;
-    width: 200px;
+    width: 300px;
     float: left;
-    position: relative;
-    left: -20px;
+}
+.portfolio_entry .icon_flagger {
+    float: left;
+    font-size: 9pt;
 }
 .portfolio_entry .project_description-wrapper {
     width: 400px;
