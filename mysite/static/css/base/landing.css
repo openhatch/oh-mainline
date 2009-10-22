@@ -15,6 +15,10 @@
     padding: 10px;
 }
 
+#page-top {
+    padding: 20px 0 10px 20px;
+}
+
 .submodule {
     width: 320px;
 }
@@ -51,7 +55,7 @@
 }
 
 h5 {
-    font-size: 1.4em;
+    font-size: 1.2em;
     font-weight: normal;
     margin: 0 0 0 0;
     padding: 5px 5px 0 0;
@@ -67,7 +71,7 @@ h5 a {
 h4 {
     color: #555;
     font-weight: bold;
-    font-size: 1.1em;
+    font-size: 1.0em;
     padding-left: 0;
     margin-left: 0;
     width: 100%;

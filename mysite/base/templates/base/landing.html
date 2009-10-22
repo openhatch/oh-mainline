@@ -13,14 +13,7 @@ Home
 {% block pagetop %}
 
 <h1>Welcome, 
-            {% if person.user.first_name or person.user.last_name %}
-                <a href='/people/{{ person.user.username }}'>
-                    {{ person.user.first_name }}
-                    {{ person.user.last_name }}</a>!
-            {% else %}
-                <a href='/people/{{ person.user.username }}'>
-                    {{ person.user.username }}</a>!
-            {% endif %}
+    <a href='/people/{{ the_user.username }}'>{{ the_user.get_profile.get_full_name_or_username }}</a>!
 </h1>
 
 {% endblock pagetop %}
@@ -93,10 +86,10 @@ Home
             </div>
             <div class='body'>
                 <p>It's an easy way to showcase your open source participation on your web things.</p>
-                <script type='text/javascript' src='/people/{{ person.user.username }}/openhatch-widget.js'></script>
+                <script type='text/javascript' src='/people/{{ the_user.username }}/openhatch-widget.js'></script>
                 <div id='widget-instructions'>
                     Include this tag wherever in your page you want to put the widget:
-                    <xmp><script type='text/javascript' src='http://openhatch.org/people/{{ person.user.username }}/openhatch-widget.js'></script></xmp>
+                    <xmp><script type='text/javascript' src='http://openhatch.org/people/{{ the_user.username }}/openhatch-widget.js'></script></xmp>
                 </div>
             </div>
         </div>
