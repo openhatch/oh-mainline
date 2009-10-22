@@ -561,7 +561,8 @@ class CeleryTests(TwillTests):
 
         # FIXME: Write these properly.
         summaries_we_expect = [
-                'Launchpad: Coded for 1 month(s) in python, ruby.',
+                'Launchpad: Participated in Bug Management',
+                'Launchpad: Participated in Bazaar Branches',
                 ]
 
         return self._test_data_source_via_emulated_bgtask(
