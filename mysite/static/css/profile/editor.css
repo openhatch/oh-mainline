@@ -1,4 +1,8 @@
+#importer {
+    width: 905px;
+}
 .portfolio_entry {
+    float: left;
     margin-top: 20px;
     width: 910px;
 }

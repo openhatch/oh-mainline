@@ -22,7 +22,7 @@ Import your contributions from around the web | OpenHatch
         </ul>
     </div>
     <div class='body contains-submodules'>
-        <form id='importer' class='module' name='import' method='POST'
+        <form id='importer' class='submodule' name='import' method='POST'
             action='{% url mysite.profile.views.user_selected_these_dia_checkboxes %}'>
             <div class='body'>
                 <div class='who'>Username or email</div>
@@ -42,7 +42,6 @@ Import your contributions from around the web | OpenHatch
 <div style="display: none;">
   <div id="portfolio_entry_building_block">
       {% include 'profile/editor/portfolio_entry_element.html' %}
-      lol
   </div>
   <div id="citation_building_block">
       {% include 'profile/editor/citation_element.html' %}
