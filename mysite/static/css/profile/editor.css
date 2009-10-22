@@ -35,6 +35,7 @@
 }
 .portfolio_entry > .actions a:hover {
     background-color: #e9e9e9;
+    text-decoration: none;
 }
 .portfolio_entry > .actions a.publish {
     /*background-color: #b2dda2;*/
