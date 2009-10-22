@@ -75,15 +75,15 @@
                     </div>
                 </div>
                 {% endblock nav %}
+                {% if notifications %}
                 <ul id='notifications'>
                     {% block notifications %}
-                    {% if notifications %}
                     {% for notification in notifications %}
-                    <li class='alert' id='{{ notification.id }}'>{{ notification.text }}</li>
+                    <li class='alert' id='{{ notification.id }}'><div>{{ notification.text }}</div></li>
                     {% endfor %}
-                    {% endif %}
                     {% endblock %}
                 </ul>
+                {% endif %}
                 <div id='page-top'>
                     {% block pagetop %}
                     {% endblock pagetop %}
