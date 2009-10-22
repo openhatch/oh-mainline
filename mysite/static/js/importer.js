@@ -278,10 +278,14 @@ function updatePortfolio(response) {
 	     * (a JSONified PortfolioEntry)
 	     */
         var portfolioEntry = this;
-	    var $new_portfolio_entry = $(portfolio_entry_html);
+	    var id = 'portfolio_entry_' + this.pk;
 
-	    var new_id = 'portfolio_entry_' + this.pk;
-	    $new_portfolio_entry.attr('id', new_id);
+        $new_portfolio_entry = $('#' + id);
+        if ($new_portfolio_entry.size() == 0) {
+            var $new_portfolio_entry = $(portfolio_entry_html);
+            $('#portfolio').append($new_portfolio_entry);
+            $new_portfolio_entry.attr('id', id);
+        }
 	    
         /* Find the project this PortfolioElement refers to */
 	    var project_id = this.fields.project_id;
@@ -330,14 +334,7 @@ function updatePortfolio(response) {
         };
         $(response.citations).each(addMemberCitations);
 
-        /* clone the template for citation elements /*
-        /* find the relevant objects, then add them */
-
-
-	    /* It's ready! Append it to #portfolio */
-	    $('#portfolio').append($new_portfolio_entry);
 	});
-    
-}
+};
 
 // vim: set nu:

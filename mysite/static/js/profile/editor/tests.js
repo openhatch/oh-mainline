@@ -92,9 +92,13 @@ testUpdatePortfolio();
 
 testNoDuplication = function() {
     $('#portfolio *').remove();
+
     updatePortfolio(response);
     fireunit.ok($('.citations li').size() == 1, "Assert there's one citation.");
+    fireunit.ok($('.portfolio_entry:visible').size() == 1, "Assert there's one portfolio entry.");
+
     updatePortfolio(response);
     fireunit.ok($('.citations li').size() == 1, "Assert there's still one citation.");
+    fireunit.ok($('.portfolio_entry:visible').size() == 1, "Assert there's still one portfolio entry.");
 };
 testNoDuplication();
