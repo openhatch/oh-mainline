@@ -203,6 +203,11 @@ class EditPhoto(TwillTests):
             self.assert_(p.photo.read() ==
                          open(image).read())
 
+            response = self.login_with_client().get(reverse(mysite.account.views.edit_photo))
+            self.assertEqual( response.context[0]['photo_url'], p.photo.url,
+                    "Test that once you've uploaded a photo via the photo editor, "
+                    "the template's photo_url variable is correct.")
+
     def test_set_avatar_too_wide(self):
         for image in [photo('static/images/too-wide.jpg'),
                       photo('static/images/too-wide.png')]:
@@ -217,6 +222,7 @@ class EditPhoto(TwillTests):
             image_as_stored = Image.open(p.photo.file)
             w, h = image_as_stored.size
             self.assertEqual(w, 200)
+
     #}}}
 
 class EditPhotoWithOldPerson(TwillTests):
