@@ -218,7 +218,7 @@ def widget_display_undecorated(request, user_to_display__username):
     user = get_object_or_404(User, username=user_to_display__username)
     person = get_object_or_404(Person, user=user)
 
-    data = {}
+    data = get_personal_data(person)
     data['projectexp_editable'] = (user == request.user)
     data['editable'] = (user == request.user)
     data['url_prefix'] = request.META['SERVER_NAME'] + ':' + request.META['SERVER_PORT']
