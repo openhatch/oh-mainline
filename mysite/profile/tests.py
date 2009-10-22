@@ -649,6 +649,8 @@ class Importer(TwillTests):
                 portfolio_entry=PortfolioEntry.objects.get_or_create(
                     project=Project.objects.get_or_create(name='project name')[0],
                     person=paulproteus)[0],
+                distinct_months=1,
+                languages='Python',
                 data_import_attempt=DataImportAttempt.objects.get_or_create(
                     source='rs', query='paulproteus', completed=True, person=paulproteus)[0]
                 )
