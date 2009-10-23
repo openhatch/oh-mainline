@@ -946,4 +946,64 @@ class PersonalData(TwillTests):
             self.assertEqual(response.context[0]['person'].user.username, 'paulproteus')
             client.logout()
 
+class DeletePortfolioEntry(TwillTests):
+    fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
+
+    def test_delete_portfolio_entry(self):
+        portfolio_entry = PortfolioEntry.objects.get_or_create(
+                    project=Project.objects.get_or_create(name='project name')[0],
+                    person=Person.objects.get(user__username='paulproteus'))[0]
+
+        citation = Citation(
+                portfolio_entry=portfolio_entry,
+                data_import_attempt=DataImportAttempt.objects.get_or_create(
+                    source='rs', query='paulproteus', completed=True,
+                    person=Person.objects.get(user__username='paulproteus'))[0]
+                )
+        citation.save()
+
+        self.assertFalse(portfolio_entry.is_deleted)
+
+        view = mysite.profile.views.delete_portfolio_entry_do
+        response = self.login_with_client().post(reverse(view),
+                {'portfolio_entry__pk': portfolio_entry.pk})
+
+        self.assertEqual(response.content, "1")
+        self.assert_(PortfolioEntry.objects.get(pk=portfolio_entry.pk).is_deleted)
+
+    def test_delete_portfolio_entry_fails_when_portfolio_entry_doesnt_exist(self):
+        failing_pk = 0
+        self.assertEqual(PortfolioEntry.objects.filter(pk=failing_pk).count(), 0)
+
+        view = mysite.profile.views.delete_portfolio_entry_do
+        response = self.login_with_client().post(reverse(view), {'portfolio_entry__pk': failing_pk})
+        self.assertEqual(response.content, "0")
+
+    def test_delete_portfolio_entry_fails_when_portfolio_entry_not_given(self):
+        view = mysite.profile.views.delete_portfolio_entry_do
+        response = self.login_with_client().post(reverse(view))
+        self.assertEqual(response.content, "0")
+
+    def test_delete_citation_fails_when_citation_not_yours(self):
+        citation = Citation(
+                portfolio_entry=PortfolioEntry.objects.get_or_create(
+                    project=Project.objects.get_or_create(name='project name')[0],
+                    person=Person.objects.get(user__username='paulproteus'))[0],
+                data_import_attempt=DataImportAttempt.objects.get_or_create(
+                    source='rs', query='paulproteus', completed=True,
+                    person=Person.objects.get(user__username='paulproteus'))[0]
+                )
+        citation.save()
+
+        portfolio_entry_not_mine = citation.portfolio_entry;
+
+        self.assertFalse(portfolio_entry_not_mine.is_deleted)
+        view = mysite.profile.views.delete_portfolio_entry_do
+        response = self.login_with_client_as_barry().post(reverse(view))
+
+        self.assertEqual(response.content, "0")
+
+        # Still there betch.
+        self.assertFalse(portfolio_entry_not_mine.is_deleted)
+
 # vim: set ai et ts=4 sw=4 nu:
