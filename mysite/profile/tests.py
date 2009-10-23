@@ -457,7 +457,7 @@ class CeleryTests(TwillTests):
         dia.person_wants_data = True
         dia.save()
 
-        gimme_json_url = '/people/gimme_json_that_says_that_commit_importer_is_done'
+        gimme_json_url = reverse(mysite.profile.views.gimme_json_for_portfolio)
         
         client = self.login_with_client()
 
@@ -782,7 +782,7 @@ class ImporterDeleteCitation(TwillTests):
         self.assertFalse(citation.is_deleted)
 
         view = mysite.profile.views.delete_citation_do
-        response = self.login_with_client().post(reverse(view), {'pk': citation.pk})
+        response = self.login_with_client().post(reverse(view), {'citation__pk': citation.pk})
 
         self.assertEqual(response.content, "1")
         self.assert_(Citation.objects.get(pk=citation.pk).is_deleted)
