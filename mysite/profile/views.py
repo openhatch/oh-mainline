@@ -635,7 +635,7 @@ def gimme_json_that_says_that_commit_importer_is_done(request):
     person = request.user.get_profile()
 
     # Citations don't naturally serialize summaries.
-    citations = list(Citation.objects.filter(portfolio_entry__person=person))
+    citations = list(Citation.objects.filter(portfolio_entry__person=person, is_deleted=False))
     portfolio_entries_unserialized = PortfolioEntry.objects.filter(person=person)
     projects_unserialized = [p.project for p in portfolio_entries_unserialized]
     

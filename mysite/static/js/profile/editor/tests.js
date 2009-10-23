@@ -26,12 +26,12 @@ response = {
     'dias': [{'pk': 0}],
 
     'citations': [
-    {'pk': 0, 'fields': {'portfolio_entry_id': 0}}, // These belong to different
-    {'pk': 1, 'fields': {'portfolio_entry_id': 1}}, // PortfolioEntries.
+    {'pk': 0, 'fields': {'portfolio_entry': 0}}, // These belong to different
+    {'pk': 1, 'fields': {'portfolio_entry': 1}}, // PortfolioEntries.
     ],
 
     'portfolio_entries': [{'pk': 0, 'fields': {
-        'project_id': 0,
+        'project': 0,
         'project_description': 'described',
         'experience_description': 'i hacked things'
     }
