@@ -119,7 +119,8 @@ testDeleteCitation = function() {
 
     // Click the delete button for a citation.
     var citationID = 0;
-    Citation.$getDeleteLink(citationID).trigger('click');
+    var $deleteLink = Citation.$getDeleteLink(citationID);
+    $deleteLink.trigger('click');
 
     var citationElementID = '#citation_'+citationID;
     fireunit.ok($(citationElementID).size() == 1,

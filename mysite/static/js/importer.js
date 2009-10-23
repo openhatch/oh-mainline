@@ -399,6 +399,7 @@ setEventHandlers = function() {
         var $citation = $(this).closest('.citations > li');
         console.info($citation[0]);
         deleteCitation($citation);
+        return false;
     };
     $('a.delete').click(deleteCitationForThisLink);
 };
