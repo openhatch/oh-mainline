@@ -360,21 +360,6 @@ Citation.$getDeleteLink = function(id) {
     return $link;
 };
 
-publishCitation = function(citationID) {
-    Citation.$get(citationID)
-        .removeClass('deleted')
-        .removeClass('unpublished')
-        .addClass('published');
-    var callback = function (response) {
-        if (response != '1') {
-            Notifier.displayMessage('Whoops. There was an error ' +
-                    'communicating with the server.');
-        }
-    };
-    $.post('/portfolio/editor/actions/publish-citation',
-            {'citation__pk': citationID}, callback);
-};
-
 deleteCitationByID = function(id) {
     deleteCitation(Citation.$get(id));
 };
@@ -387,7 +372,7 @@ deleteCitation = function($citation) {
     var pk = $citation[0].id.split('_')[1];
     var ajaxOptions = {
         'type': 'POST',
-        'url': '/portfolio/editor/actions/delete-citation',
+        'url': '/profile/views/delete_citation_do',
         'data': {'citation__pk': pk},
         'success': deleteCitationCallback,
         'error': deleteCitationErrorCallback,

@@ -851,7 +851,7 @@ def publish_citation_do(request):
 @login_required
 def delete_citation_do(request):
     try:
-        pk = request.POST['pk']
+        pk = request.POST['citation__pk']
     except KeyError:
         return HttpResponse("0")
 
