@@ -159,6 +159,9 @@
 .citations li.unpublished .summary {
     background-color: #ffc;
 }
+.citations li.deleted .summary {
+    background-color: pink;
+}
 .citations-wrapper a.add {
     font-size: 8pt;
     background-color: #c9c9c9;

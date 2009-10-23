@@ -7,6 +7,7 @@ Import your contributions from around the web | OpenHatch
 {% block css %}
 {{ block.super }}
 @import url('/static/css/profile/editor.css');
+@import url('/static/css/base/jquery.jgrowl.css');
 {% endblock css %}
 
 {% block main %}
@@ -25,6 +26,9 @@ Import your contributions from around the web | OpenHatch
         <form id='importer' class='submodule' name='import' method='POST'
             action='{% url mysite.profile.views.user_selected_these_dia_checkboxes %}'>
             <div class='body'>
+                Please enter the usernames or email addresses you use to contribute to FLOSS:
+                We'll use this to gather information about your activity and involvement in various projects by searching an index of code repositories. <a href="javascript:alert('Just kidding');">Read more about how this works.</a>
+                You can add links to your activity by hand; just click 'Add another record.'
                 <div class='who'>Username or email</div>
             </div>
             <div class='foot'>
@@ -53,6 +57,7 @@ Import your contributions from around the web | OpenHatch
 
 {% block js %}
 <script type='text/javascript' src='/static/js/jquery.form.js'></script>
+<script type='text/javascript' src='/static/js/jquery.jgrowl.js'></script>
 <script type='text/javascript' src='/static/js/importer.js'></script>
 <script type='text/javascript' src='/static/js/profile/editor/tests.js'></script>
 {% endblock js %}

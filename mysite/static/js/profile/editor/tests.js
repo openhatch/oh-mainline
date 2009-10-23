@@ -1,3 +1,8 @@
+testImportJGrowl = function() {
+    fireunit.ok(typeof $.jGrowl != 'undefined', "jGrowl imported");
+};
+testImportJGrowl();
+
 message = 'We create PortfolioEntryElements when the event handler is responding to a list of objects from the server that includes a new PortfolioEntry.';
 // FIXME: Come up with a suitable response, matching the description above.
 response = {
@@ -105,25 +110,39 @@ testNoDuplication = function() {
 };
 testNoDuplication();
 
-testPublishCitation = function() {
-    var test = 'testPublishCitation asserts: ';
+testDeleteCitation = function() {
+    // Clear the deck.
+    $('#portfolio *').remove();
+    var test = 'testDeleteCitation asserts: ';
 
+    updatePortfolio(response);
+
+    // Click the delete button for a citation.
     var citationID = 0;
-    publishCitation(citationID);
+    Citation.$getDeleteLink(citationID).trigger('click');
+
     var citationElementID = '#citation_'+citationID;
-    fireunit.ok($(citationElementID+'.published').size() == 1,
-            test + "there's a published citation with id #" + citationElementID);
+    fireunit.ok($(citationElementID).size() == 1,
+            test + "there's a citation with id " + citationElementID);
+    fireunit.ok($(citationElementID+'.deleted').size() == 1,
+            test + "there's a DELETED citation with id " + citationElementID);
 
-    var invalidCitationID = 99;
-    fireunit.ok($('.citations').eq(invalidCitationID).size() == 0,
-            test + "there's no citation with ID = " + invalidCitationID
-            + " (requirement for the next test to work).");
-    publishCitation(invalidCitationID);
-    var message = $('.jGrowl-notification .message').text();
-    fireunit.ok(message.match(/error/) != null,
-            test + "\"" + message + "\".match(/error/)");
+    // Let's pretend the server said there was an error in deleting the citation.
+    deleteCitationCallback('0');
+    // There should be a notifier shortly. Delay the notifier check, because
+    // the notifier might take a moment to show up.
+    var checkNotifierInAMoment = function () {
+        var notifier = $('.jGrowl-notification .message');
+        console.info(notifier);
+        fireunit.ok(notifier.size() == 1, test + "there's exactly one notifier.");
+        var message = $('.jGrowl-notification .message').text();
+        fireunit.ok(message.match(/error/) != null,
+                test + "notifier message matches /error/");
+        fireunit.ok($(citationElementID+'.deleted').size() == 0,
+                test + "we took it back and now there's NO deleted citation with id " + citationElementID);
+    }
+    window.setTimeout(checkNotifierInAMoment, 500);
 };
-testPublishCitation();
-
+testDeleteCitation();
 
 // vim: set nu:

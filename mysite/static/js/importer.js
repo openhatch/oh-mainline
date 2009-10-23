@@ -335,9 +335,73 @@ function updatePortfolio(response) {
         $(response.citations).each(addMemberCitations);
 
 	});
+    setEventHandlers();
+};
+
+Citation = {};
+Citation.$get = function(id) {
+    var selector = '#citation_'+id;
+    var matching = $(selector);
+    fireunit.ok(matching.size() == 1, "Got just 1 citation with id = " + selector)
+    return matching; 
+};
+Citation.get = function(id) {
+    citation = Citation.$get(id).get(0);
+    return citation;
+};
+Citation.$getDeleteLink = function(id) {
+    $link = Citation.$get(id).find('a.delete');
+    return $link;
 };
 
 publishCitation = function(citationID) {
+    Citation.$get(citationID)
+        .removeClass('deleted')
+        .removeClass('unpublished')
+        .addClass('published');
+    var callback = function (response) {
+        if (response != '1') {
+            Notifier.displayMessage('Whoops. There was an error ' +
+                    'communicating with the server.');
+        }
+    };
+    $.post('/portfolio/editor/actions/publish-citation',
+            {'citation__pk': citationID}, callback);
 };
+
+deleteCitationByID = function(id) {
+    deleteCitation(Citation.$get(id));
+};
+deleteCitation = function($citation) {
+    $citation.removeClass('unpublished')
+        .removeClass('published')
+        .addClass('deleted');
+    var pk = $citation[0].id.split('_')[1];
+    $.post('/portfolio/editor/actions/delete-citation',
+            {'citation__pk': pk}, deleteCitationCallback);
+};
+deleteCitationCallback = function (response) {
+    if (response != '1') {
+        Notifier.displayMessage('Whoops. There was an error ' +
+                'communicating with the server. The page ' +
+                'may be out of date. Please reload.');
+    }
+};
+
+Notifier = {};
+Notifier.displayMessage = function(message) {
+    $.jGrowl(message, {'life': 10000});
+};
+
+setEventHandlers = function() {
+    var deleteCitationForThisLink = function () {
+        var deleteLink = this;
+        var $citation = $(this).closest('.citations > li');
+        console.info($citation[0]);
+        deleteCitation($citation);
+    };
+    $('a.delete').click(deleteCitationForThisLink);
+};
+$(setEventHandlers);
 
 // vim: set nu:
