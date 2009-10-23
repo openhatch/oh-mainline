@@ -138,8 +138,6 @@ testDeleteCitation = function() {
         var message = $('.jGrowl-notification .message').text();
         fireunit.ok(message.match(/error/) != null,
                 test + "notifier message matches /error/");
-        fireunit.ok($(citationElementID+'.deleted').size() == 0,
-                test + "we took it back and now there's NO deleted citation with id " + citationElementID);
     }
     window.setTimeout(checkNotifierInAMoment, 500);
 };
