@@ -63,6 +63,6 @@ class ManuallyAddACitationForm(django.forms.ModelForm):
     #FIXME: Make is_published always true
     class Meta:
         model = mysite.profile.models.Citation
-        fields = ('portfolio_entry', 'url', 'distinct_months', 'languages')
+        fields = ('portfolio_entry', 'url', )
 
 # vim: set nu:

@@ -51,6 +51,12 @@ $.fn.debug = function() {
     // }}}
 };
 
+var lastUniqueNumber = 0;
+function generateUniqueID() {
+    lastUniqueNumber++;
+    return 'element_'+lastUniqueNumber;
+}
+
 
 makeNewInput = function() {
     // {{{
@@ -408,12 +414,16 @@ drawAddCitationForm = function() {
     console.log("draw 'Add a citation' form");
 };
 
+function handleServerResponseToNewRecordSubmission(response) {
+    $form = $('#'+response['form_container_element_id']);
+    $form.html(response['form_container_content']);
+}
+
 
 Notifier = {};
 Notifier.displayMessage = function(message) {
     $.jGrowl(message, {'life': 10000});
 };
-
 
 /******************
  * Event handlers *
@@ -430,8 +440,9 @@ drawAddCitationFormNearThisButton = function () {
     var $citationForms = $(this).closest('.citations-wrapper').find('ul.citation-forms');
     fireunit.ok($citationForms.size() == 1, "there's one ul called 'citations-forms' in this wrapper");
     var buildingBlockHTML = $('#citation_form_building_block').html();
-    var $form = $(buildingBlockHTML);
-    $citationForms.append($form);
+    var $form_container = $(buildingBlockHTML);
+    $form_container.attr('id', generateUniqueID());
+    $citationForms.append($form_container);
     return false; // FIXME: Test this.
 }
 setEventHandlers = function() {
