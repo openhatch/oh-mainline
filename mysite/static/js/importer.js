@@ -344,11 +344,12 @@ function updatePortfolio(response) {
 
         /* Add the appropriate citations to this portfolio entry. */
         var addMemberCitations = function() {
+            var citation = this;
             // "this" is an object in response.citations
-            if ("portfolio_entry_"+portfolioEntry.fields.portfolio_entry_id == 
+            if ("portfolio_entry_"+citation.fields.portfolio_entry == 
                     $new_portfolio_entry.attr('id')) {
                 // Does this exist? If not, then create it.
-                var id = 'citation_' + portfolioEntry.pk;
+                var id = 'citation_' + citation.pk;
                 var $citation_existing_or_not = $('#'+id);
                 var already_exists = ($citation_existing_or_not.size() != 0);
                 if (already_exists) {
@@ -361,7 +362,7 @@ function updatePortfolio(response) {
                     $('.citations', $new_portfolio_entry).append($citation);
                 }
 
-                var summary = response.summaries[portfolioEntry.pk]
+                var summary = response.summaries[citation.pk]
                 $citation.find('.summary').text(summary);
             }
         };
