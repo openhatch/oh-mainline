@@ -3,6 +3,22 @@ testImportJGrowl = function() {
 };
 testImportJGrowl();
 
+testBuildingBlocks = function() {
+    var test = "testBuildingBlocks asserts: ";
+    var blockSelectors = [
+        '#portfolio_entry_building_block',
+        '#citation_building_block',
+        '#citation_form_building_block'
+    ];
+    for (var b = 0; b < blockSelectors.length; b++) {
+        var blockSelector = blockSelectors[b];
+        $block = $(blockSelector);
+        fireunit.ok($block.size() == 1, test + blockSelector + " appears in document once.");
+        fireunit.ok($block.filter(':hidden').size() == 1, test + blockSelector + " is hidden.");
+    }
+};
+testBuildingBlocks();
+
 message = 'We create PortfolioEntryElements when the event handler is responding to a list of objects from the server that includes a new PortfolioEntry.';
 // FIXME: Come up with a suitable response, matching the description above.
 response = {
