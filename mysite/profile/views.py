@@ -625,8 +625,7 @@ def display_list_of_people(request):
     return (request, 'profile/search_people.html', data)
     # }}}
 
-#FIXME: Change this name to gimme_json_for_import_related_objects.
-def gimme_json_that_says_that_commit_importer_is_done(request):
+def gimme_json_for_portfolio(request):
     "Get JSON used to live-update the portfolio editor."
     """JSON includes:
         * The person's data.
@@ -879,6 +878,23 @@ def delete_citation_do(request):
 
     c.is_deleted = True
     c.save()
+
+    return HttpResponse("1")
+
+@login_required
+def delete_portfolio_entry_do(request):
+    try:
+        pk = request.POST['portfolio_entry__pk']
+    except KeyError:
+        return HttpResponse("0")
+
+    try:
+        p = PortfolioEntry.objects.get(pk=pk, person__user=request.user)
+    except PortfolioEntry.DoesNotExist:
+        return HttpResponse("0")
+
+    p.is_deleted = True
+    p.save()
 
     return HttpResponse("1")
 

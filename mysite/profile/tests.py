@@ -662,7 +662,7 @@ class Importer(TwillTests):
         unfinished_dia.save()
 
         response = client.get(
-                reverse(mysite.profile.views.gimme_json_that_says_that_commit_importer_is_done))
+                reverse(mysite.profile.views.gimme_json_for_portfolio))
         
         # Response consists of JSON like:
         # {'dias': ..., 'citations': ..., 'summaries': ...}
@@ -984,7 +984,7 @@ class DeletePortfolioEntry(TwillTests):
         response = self.login_with_client().post(reverse(view))
         self.assertEqual(response.content, "0")
 
-    def test_delete_citation_fails_when_citation_not_yours(self):
+    def test_delete_portfolio_entry_fails_when_portfolio_entry_not_yours(self):
         citation = Citation(
                 portfolio_entry=PortfolioEntry.objects.get_or_create(
                     project=Project.objects.get_or_create(name='project name')[0],
