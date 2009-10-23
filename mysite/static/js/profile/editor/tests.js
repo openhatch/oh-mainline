@@ -104,3 +104,26 @@ testNoDuplication = function() {
     fireunit.ok($('.portfolio_entry:visible').size() == 1, "Assert there's still one portfolio entry.");
 };
 testNoDuplication();
+
+testPublishCitation = function() {
+    var test = 'testPublishCitation asserts: ';
+
+    var citationID = 0;
+    publishCitation(citationID);
+    var citationElementID = '#citation_'+citationID;
+    fireunit.ok($(citationElementID+'.published').size() == 1,
+            test + "there's a published citation with id #" + citationElementID);
+
+    var invalidCitationID = 99;
+    fireunit.ok($('.citations').eq(invalidCitationID).size() == 0,
+            test + "there's no citation with ID = " + invalidCitationID
+            + " (requirement for the next test to work).");
+    publishCitation(invalidCitationID);
+    var message = $('.jGrowl-notification .message').text();
+    fireunit.ok(message.match(/error/) != null,
+            test + "\"" + message + "\".match(/error/)");
+};
+testPublishCitation();
+
+
+// vim: set nu:

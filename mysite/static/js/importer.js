@@ -337,4 +337,7 @@ function updatePortfolio(response) {
 	});
 };
 
+publishCitation = function(citationID) {
+};
+
 // vim: set nu:
