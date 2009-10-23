@@ -249,6 +249,7 @@ h3 {
     letter-spacing: 0;
     font-size: 13pt;
     margin: 0;
+    text-shadow: 0 1px 0 lightblue;
 }
 .module > .head h3 {
     padding: 15px 20px;
@@ -268,6 +269,7 @@ h3 {
     line-height: 13pt;
     font-weight: bold;
     margin-right: 3px;
+    text-shadow: 0 1px 0 lightblue;
 }
 .tags {
     float: left;

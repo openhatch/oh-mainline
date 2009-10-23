@@ -36,7 +36,7 @@ testUpdatePortfolio = function() {
             fireunit.ok( $('.project_name', pee).text() == "bindlestiff",
                 "Expected the new portfolio_entry to say its project name is bindlestiff");
             fireunit.ok( pee.find("img.project_icon").attr('src') == 
-                "/static/images/the-logo-bluegreen-125px.png",
+                "/people/project_icon/Web%20Team%20projects/",
                 "Expected the project icon URL to properly be set.");
             fireunit.ok( $(".project_description", pee).text() == "described",
                 "Expected the new portfolio_entry to say " +
@@ -92,6 +92,7 @@ testUpdatePortfolio = function() {
 testUpdatePortfolio();
 
 testNoDuplication = function() {
+    // Clear the deck.
     $('#portfolio *').remove();
 
     updatePortfolio(response);

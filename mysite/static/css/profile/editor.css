@@ -113,8 +113,14 @@
 .portfolio_entry .experience_description {
     width: 390px;
 }
-.citations li {
+.citations > li {
     width: 400px;
+    float: left;
+    list-style: square;
+    margin-left: 20px;
+    color: #777;
+    position: relative;
+    top: 15px;
 }
 .citations li .actions {
     float: left;
@@ -138,11 +144,34 @@
 .citations li .summary {
     float: left;
     width: 300px;
+    color: #222;
+    position: relative;
+    top: -12px;
+}
+.citations li li {
+    position: relative;
+    top: -12px;
 }
 .citations-wrapper {
     float: left;
     width: 300px;
 }
-.citation.unpublished .summary {
+.citations li.unpublished .summary {
     background-color: #ffc;
+}
+.citations-wrapper a.add {
+    font-size: 8pt;
+    background-color: #c9c9c9;
+    float: left;
+    margin-top: 10px;
+    padding: 6px;
+    border-radius: 6px;
+    -moz-border-radius: 6px;
+    font-weight: bold;
+    color: #444;
+    background-color: lightblue;
+}
+.citations-wrapper a.add:hover {
+    color: #222;
+    text-decoration: none;
 }

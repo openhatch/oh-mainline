@@ -72,8 +72,10 @@
 }
 .project-escutcheon.hover {
     background-color: #fff;
-    border: 1px dotted #ddd;
-    padding: 9px;
+    border: 4px solid #e9e9e9;
+    padding: 6px;
+    -moz-border-radius: 8px;
+    border-radius: 8px;
 }
 .project-escutcheon.hover .edit-link {
     visibility: visible;
