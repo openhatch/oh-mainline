@@ -459,6 +459,7 @@ def _project_hash(project_name):
     return hashed.hexdigest()
     # }}}
 
+# FIXME: Store these in the project model.
 def project_icon_url(project_name, width = None, actually_fetch = True):
     # {{{
     project_hash = _project_hash(project_name)
@@ -632,12 +633,16 @@ def gimme_json_that_says_that_commit_importer_is_done(request):
         * DataImportAttempts."""
     # {{{
     person = request.user.get_profile()
-    dias = list(DataImportAttempt.objects.filter(person=person))
-    #portfolio_entries = list(PortfolioEntry.objects.filter(person=person))
 
     # Citations don't naturally serialize summaries.
-    citations = list(
-            Citation.objects.filter(portfolio_entry__person=person))
+    citations = list(Citation.objects.filter(portfolio_entry__person=person))
+    portfolio_entries_unserialized = PortfolioEntry.objects.filter(person=person)
+    projects_unserialized = [p.project for p in portfolio_entries_unserialized]
+    
+    # Serialize project icon URLs
+    project_icon_urls = {}
+    for p in projects_unserialized:
+        _, project_icon_urls[p.pk] = project_icon_url(p.name)
 
     # Serialize citation summaries
     summaries = {}
@@ -645,12 +650,24 @@ def gimme_json_that_says_that_commit_importer_is_done(request):
         summaries[c.pk] = c.summary
 
     # FIXME: Maybe we can serialize directly to Python objects.
-    dias = simplejson.loads(serializers.serialize('json', dias))
+    # FIXME: ZOMG       DON'T RECYCLE VARIABLE NAMES FOR OBJS OF DIFF TYPES SRSLY U GUYS!
+    dias = simplejson.loads(serializers.serialize('json',
+        DataImportAttempt.objects.filter(person=person)))
+    portfolio_entries = simplejson.loads(serializers.serialize('json',
+        portfolio_entries_unserialized))
+    projects = simplejson.loads(serializers.serialize('json', projects_unserialized))
+    # FIXME: Don't send like all the flippin projects down the tubes.
     citations = simplejson.loads(serializers.serialize('json', citations))
 
-    json = simplejson.dumps({'dias': dias, 'citations': citations, 'summaries': summaries})
+    json = simplejson.dumps({
+        'dias': dias,
+        'citations': citations,
+        'portfolio_entries': portfolio_entries,
+        'projects': projects,
+        'project_icon_urls': project_icon_urls,
+        'summaries': summaries})
 
-    return HttpResponse(json)
+    return HttpResponse(json, mimetype='application/javascript')
     # }}}
 
 @login_required

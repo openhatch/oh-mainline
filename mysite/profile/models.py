@@ -351,6 +351,8 @@ class Citation(models.Model):
     def summary(self):
         # FIXME: Pluralize correctly.
         # FIXME: Use "since year_started"
+        # FIXME lollerskates
+        return 'summary'
         if self.data_import_attempt:
             if self.data_import_attempt.source == 'rs':
                 if self.distinct_months is None:
@@ -366,7 +368,8 @@ class Citation(models.Model):
                     self.contributor_role)
             else:
                 raise ValueError, "Do not know how to summarize this."
-        raise ValueError, "Also do not know how to summarize this."
+        elif self.url is not None:
+            return self.url
                     
 
     @staticmethod

@@ -264,6 +264,33 @@ diaCheckboxChangeHandler = function() {
 };
 */
 
+function askServerForPortfolio() {
+    var ajaxOptions = {
+        'type': 'GET',
+        'url': '/profile/views/gimme_json_for_portfolio',
+        'dataType': 'json',
+        'success': updatePortfolio,
+        'error': errorWhileAskingForPortfolio
+    };
+    $.ajax(ajaxOptions);
+}
+
+$(askServerForPortfolio);
+
+function errorWhileAskingForPortfolio() {
+    alert('Errr0r');
+}
+
+/*
+ * Perhaps we should talk more explicitly with the server about whose portfolio we want.
+ * To reproduce:
+ *  Log in as Alice
+ *  Load portfolio
+ *  In a different window, log out; log in as Bob
+ *  Return to Alice's portfolio window
+ *  Notice the portfolio are mixed together in an unholy UNION. Yow.
+ */
+
 function updatePortfolio(response) {
     /* Input: A whole bunch of (decoded) JSON data containing
      * all of the user's Citations, PortfolioEntries, and Projects,
@@ -279,12 +306,12 @@ function updatePortfolio(response) {
    
     /* Now fill in the template */
     
-    $(response.portfolio_entries).each( function() {
-	    /* "this" is something like: {'pk': 0, 'fields': {'project_id': 0}} 
+    for (var i = 0; i < response.portfolio_entries.length; i++) {
+        var portfolioEntry = response.portfolio_entries[i];
+	    /* portfolioEntry is something like: {'pk': 0, 'fields': {'project': 0}} 
 	     * (a JSONified PortfolioEntry)
 	     */
-        var portfolioEntry = this;
-	    var id = 'portfolio_entry_' + this.pk;
+	    var id = 'portfolio_entry_' + portfolioEntry.pk;
 
         $new_portfolio_entry = $('#' + id);
         if ($new_portfolio_entry.size() == 0) {
@@ -294,7 +321,7 @@ function updatePortfolio(response) {
         }
 	    
         /* Find the project this PortfolioElement refers to */
-	    var project_id = this.fields.project_id;
+	    var project_id = portfolioEntry.fields.project;
 	    var project_we_refer_to = null;
 	    $(response.projects).each( function() {
 		    if (this.pk == project_id) {
@@ -302,26 +329,26 @@ function updatePortfolio(response) {
 		    }
 		});
 	    /* project_description */
-	    $(".project_description", $new_portfolio_entry).text(this.fields.project_description);
+	    $(".project_description", $new_portfolio_entry).text(portfolioEntry.fields.project_description);
 	    	   
 	    /* project_icon */
 	    $(".project_icon", $new_portfolio_entry).attr('src',
-                response.project_icon_urls[portfolioEntry.fields.project_id]);
+                response.project_icon_urls[portfolioEntry.fields.project]);
 	    
 	    /* project_name */
 	    $(".project_name", $new_portfolio_entry).text(project_we_refer_to.fields.name);
 	    
 	    /* experience_description */
 	    $(".experience_description", $new_portfolio_entry).text(
-                this.fields.experience_description);
+                portfolioEntry.fields.experience_description);
 
         /* Add the appropriate citations to this portfolio entry. */
         var addMemberCitations = function() {
             // "this" is an object in response.citations
-            if ("portfolio_entry_"+this.fields.portfolio_entry_id == 
+            if ("portfolio_entry_"+portfolioEntry.fields.portfolio_entry_id == 
                     $new_portfolio_entry.attr('id')) {
                 // Does this exist? If not, then create it.
-                var id = 'citation_' + this.pk;
+                var id = 'citation_' + portfolioEntry.pk;
                 var $citation_existing_or_not = $('#'+id);
                 var already_exists = ($citation_existing_or_not.size() != 0);
                 if (already_exists) {
@@ -334,13 +361,13 @@ function updatePortfolio(response) {
                     $('.citations', $new_portfolio_entry).append($citation);
                 }
 
-                var summary = response.summaries[this.pk]
+                var summary = response.summaries[portfolioEntry.pk]
                 $citation.find('.summary').text(summary);
             }
         };
         $(response.citations).each(addMemberCitations);
 
-	});
+	}
     setEventHandlers();
 };
 
