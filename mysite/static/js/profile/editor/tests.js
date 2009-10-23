@@ -160,4 +160,26 @@ testDeleteCitation = function() {
 };
 testDeleteCitation();
 
+testAddARecordButtonDrawsAForm = function() {
+    $('#portfolio *').remove();
+    var test = 'testAddARecordButtonDrawsAForm asserts: ';
+
+    updatePortfolio(response);
+
+    // Click the first 'Add another record' button. 
+    $button = $('.citations-wrapper .add').eq(0);
+    $button.trigger('click');
+
+    $form = $button.closest('.citations-wrapper').find('.citation-forms li form');
+
+    fireunit.ok($form.size() == 1, test + "the 'Add another record' button causes "
+            + "exactly one form to appear in citation-forms.");
+    fireunit.ok($form.find('input.summary').size() == 1, test + "the form has a summary field.");
+    fireunit.ok($form.find('input.url').size() == 1, test + "the form has a URL field.");
+    fireunit.ok($form.find('a.cancel').size() == 1, test + "the form has a cancel button.");
+    fireunit.ok($form.find('input:submit').size() == 1, test + "the form has a submit button.");
+
+};
+testAddARecordButtonDrawsAForm();
+
 // vim: set nu:
