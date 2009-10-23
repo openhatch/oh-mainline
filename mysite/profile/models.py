@@ -337,11 +337,11 @@ class PortfolioEntry(models.Model):
 
 class Citation(models.Model):
     portfolio_entry = models.ForeignKey(PortfolioEntry) # [0]
-    # FIXME: For manual add: url = models.URLField()
+    url = models.URLField(null=True)
     contributor_role = models.CharField(max_length=200, null=True)
     data_import_attempt = models.ForeignKey(DataImportAttempt, null=True)
     distinct_months = models.IntegerField(null=True)
-    languages = models.TextField(null=True)
+    languages = models.CharField(max_length=200, null=True)
     first_commit_time = models.DateTimeField(null=True)
     date_created = models.DateTimeField(default=datetime.datetime.utcnow)
     is_published = models.BooleanField(default=False) # unpublished == Unread

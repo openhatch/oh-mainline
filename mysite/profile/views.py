@@ -730,6 +730,11 @@ def importer(request):
     data['dias'] = DataImportAttempt.objects.filter(person=person).order_by('id')
     data['blank_query'] = blank_query
 
+    # This is used to create a blank 'Add another record' form, which is printed
+    # to the bottom of the importer page. The HTML underlying this form is used
+    # to generate forms dynamically.
+    data['citation_form'] = mysite.profile.forms.ManuallyAddACitationForm()
+
     return (request, 'profile/importer.html', data)
     # }}}
 

@@ -57,3 +57,12 @@ class ProjectExpEditForm(django.forms.Form):
         # so now we have a p_e. Jam it into cleaned_data.
         self.cleaned_data['project_exp'] = p_e
         return inputted_id
+
+class ManuallyAddACitationForm(django.forms.ModelForm):
+    portfolio_entry = django.forms.IntegerField(widget=django.forms.HiddenInput())
+    #FIXME: Make is_published always true
+    class Meta:
+        model = mysite.profile.models.Citation
+        fields = ('portfolio_entry', 'url', 'distinct_months', 'languages')
+
+# vim: set nu:
