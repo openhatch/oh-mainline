@@ -376,32 +376,67 @@ deleteCitation = function($citation) {
     $citation.removeClass('unpublished')
         .removeClass('published')
         .addClass('deleted');
+    fireunit.ok($citation.size() == 1, "deleteCitation asserts: there is a citation "
+            + "that we're about to delete.");
     var pk = $citation[0].id.split('_')[1];
-    $.post('/portfolio/editor/actions/delete-citation',
-            {'citation__pk': pk}, deleteCitationCallback);
+    var ajaxOptions = {
+        'type': 'POST',
+        'url': '/portfolio/editor/actions/delete-citation',
+        'data': {'citation__pk': pk},
+        'success': deleteCitationCallback,
+        'error': deleteCitationErrorCallback,
+    };
+    $.ajax(ajaxOptions);
 };
 deleteCitationCallback = function (response) {
     if (response != '1') {
-        Notifier.displayMessage('Whoops. There was an error ' +
+        Notifier.displayMessage('Whoops! There was an error ' +
                 'communicating with the server. The page ' +
                 'may be out of date. Please reload.');
     }
 };
+
+deleteCitationErrorCallback = function (request) {
+    Notifier.displayMessage('Whoops! There was an error ' +
+            'communicating with the server when trying to ' +
+            'delete a citation. The page may be out of date. ' +
+            'Please reload. ');
+
+};
+
+drawAddCitationForm = function() {
+    console.log("draw 'Add a citation' form");
+};
+
 
 Notifier = {};
 Notifier.displayMessage = function(message) {
     $.jGrowl(message, {'life': 10000});
 };
 
+
+/******************
+ * Event handlers *
+ ******************/ 
+
+deleteCitationForThisLink = function () {
+    var deleteLink = this;
+    var $citation = $(this).closest('.citations > li');
+    deleteCitation($citation);
+    return false; // FIXME: Test this.
+};
+drawAddCitationFormNearThisButton = function () {
+    var button = this;
+    var $citationForms = $(this).closest('.citations-wrapper').find('ul.citation-forms');
+    fireunit.ok($citationForms.size() == 1, "there's one ul called 'citations-forms' in this wrapper");
+    var buildingBlockHTML = $('#citation_form_building_block').html();
+    var $form = $(buildingBlockHTML);
+    $citationForms.append($form);
+    return false; // FIXME: Test this.
+}
 setEventHandlers = function() {
-    var deleteCitationForThisLink = function () {
-        var deleteLink = this;
-        var $citation = $(this).closest('.citations > li');
-        console.info($citation[0]);
-        deleteCitation($citation);
-        return false;
-    };
     $('a.delete').click(deleteCitationForThisLink);
+    $('.citations-wrapper .add').click(drawAddCitationFormNearThisButton);
 };
 $(setEventHandlers);
 

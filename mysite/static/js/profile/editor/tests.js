@@ -151,10 +151,10 @@ testDeleteCitation = function() {
     var checkNotifierInAMoment = function () {
         var notifier = $('.jGrowl-notification .message');
         console.info(notifier);
-        fireunit.ok(notifier.size() == 1, test + "there's exactly one notifier.");
+        fireunit.ok(notifier.size() > 0, test + "there's at least one notifier.");
         var message = $('.jGrowl-notification .message').text();
-        fireunit.ok(message.match(/error/) != null,
-                test + "notifier message matches /error/");
+        fireunit.ok(message.match(/error.*delete a citation/) != null,
+                test + "notifier message matches /error.*delete a citation/");
     }
     window.setTimeout(checkNotifierInAMoment, 500);
 };
@@ -170,14 +170,13 @@ testAddARecordButtonDrawsAForm = function() {
     $button = $('.citations-wrapper .add').eq(0);
     $button.trigger('click');
 
-    $form = $button.closest('.citations-wrapper').find('.citation-forms li form');
+    $form = $button.closest('.citations-wrapper').find('.citation-forms li form.add_a_record');
 
     fireunit.ok($form.size() == 1, test + "the 'Add another record' button causes "
             + "exactly one form to appear in citation-forms.");
-    fireunit.ok($form.find('input.summary').size() == 1, test + "the form has a summary field.");
-    fireunit.ok($form.find('input.url').size() == 1, test + "the form has a URL field.");
-    fireunit.ok($form.find('a.cancel').size() == 1, test + "the form has a cancel button.");
-    fireunit.ok($form.find('input:submit').size() == 1, test + "the form has a submit button.");
+    fireunit.ok($form.html() == $('#citation_form_building_block').find('form').html(),
+            test + "the html of the created citation form is the same as the html " +
+            "of the citation form building block.");
 
 };
 testAddARecordButtonDrawsAForm();
