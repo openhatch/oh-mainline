@@ -70,4 +70,27 @@ class ManuallyAddACitationForm(django.forms.ModelForm):
         model = mysite.profile.models.Citation
         fields = ('portfolio_entry', 'url', )
 
+    def set_user(self, user):
+        self.user = user
+
+    def clean_portfolio_entry(self):
+        '''Note: I will explode violently if you
+        have not set self.user.'''
+        # Assert that self.user is set
+        try:
+            self.user
+        except AttributeError:
+            raise forms.ValidationError("For some reason, the programmer made a mistake, "
+                    "and I will blame you, the user.")
+
+        # Check that the user owns this portfolio entry.
+        pf_entry_id = self.cleaned_data['portfolio_entry']
+        try:
+            pf_entry = mysite.profile.models.PortfolioEntry.objects.get(
+                person__user=self.user, pk=pf_entry_id)
+        except mysite.profile.models.PortfolioEntry.DoesNotExist:
+            raise django.forms.ValidationError("Somehow, you submitted "
+                    "regarding a portfolio entry that you do not own.")
+        return pf_entry_id
+
 # vim: set nu:
