@@ -183,15 +183,17 @@ testAddARecordButtonDrawsAForm = function() {
 testAddARecordButtonDrawsAForm();
 
 prefix = "test handling of server response to new record submission asserts: ";
-(function (){
+test = function (){
     // This is designed to mimic what's passed into a jQuery ajax callback
-    response = {'form_container_element_id': $form_container[0].id, 'form_container_content': 'cucumber'};
+    response = {'form_container_element_id': $form_container[0].id,
+    'form_container_content': 'cucumber'};
     $form_container = $('.citation-forms li').eq(0);
     fireunit.ok($form_container.attr('id') != "",
         prefix + "citation form_container was assigned ID = " + $form_container.attr('id'));
     handleServerResponseToNewRecordSubmission(response);
     fireunit.ok($form_container.html() == response['form_container_content'],
             prefix + "form_container HTML is the HTML in teh response.");
-})();
+};
+test();
 
 // vim: set nu:
