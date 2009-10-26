@@ -1008,17 +1008,28 @@ class DeletePortfolioEntry(TwillTests):
 
 class AddCitationManually(TwillTests):
     def test_add_citation_manually(self):
+        portfolio_entry=PortfolioEntry.objects.get_or_create(
+            project=Project.objects.get_or_create(name='project name')[0],
+            person=Person.objects.get(user__username='paulproteus'))[0],
+
         input_data = {
-                'portfolio_entry': 0,
+                'portfolio_entry': portfolio_entry.pk,
+                'form_container_element_id': 'form_container_%d' % 0,
                 'url': 'https://bl.ar/glefoot'
                 }
 
-        expected_output_data = {
-                'form_container_element_id': 'link_%d' % input_data['portfolio_entry'],
-                'form_container_content': "<a href='%s'>%s</a>" % input_data['url'],
-                }
-        response = self.login_with_client().post(reverse(mysite.profile.views.add_citation_manually), data)
+        # Send this data to the appropriate view.
+        url = reverse(mysite.profile.views.add_citation_manually)
+        response = self.login_with_client().post(url, data)
+
+        # Check the contents of the response.
         response_obj = simplejson.loads(response.content)
-        self.assertEqual(response_obj, )
+        self.assertEqual(response_obj['form_container_element_id'],
+                input_data['form_container_element_id'],
+                "Expected that profile.views.add_citation_manually would boomerang "
+                "the element id right back at us.")
+        self.assert_(input_data['url'] in response_obj['url'],
+                "Expected that profile.views.add_citation_manually would return a "
+                "string containing the URL we sent it.")
 
 # vim: set ai et ts=4 sw=4 nu:
