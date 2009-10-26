@@ -414,11 +414,8 @@ deleteCitation = function($citation) {
     $.ajax(ajaxOptions);
 };
 deleteCitationCallback = function (response) {
-    if (response != '1') {
-        Notifier.displayMessage('Whoops! There was an error ' +
-                'communicating with the server. The page ' +
-                'may be out of date. Please reload.');
-    }
+    // No need to do anything. We already marked
+    // the citation with the css class 'deleted'.
 };
 
 deleteCitationErrorCallback = function (request) {

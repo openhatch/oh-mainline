@@ -145,14 +145,15 @@ testDeleteCitation = function() {
             test + "there's a DELETED citation with id " + citationElementID);
 
     // Let's pretend the server said there was an error in deleting the citation.
-    deleteCitationCallback('0');
+    deleteCitationErrorCallback();
     // There should be a notifier shortly. Delay the notifier check, because
     // the notifier might take a moment to show up.
     var checkNotifierInAMoment = function () {
         var notifier = $('.jGrowl-notification .message');
         console.info(notifier);
         fireunit.ok(notifier.size() > 0, test + "there's at least one notifier.");
-        var message = $('.jGrowl-notification .message').text();
+        var message = $('.jGrowl-notification .message').eq(0).text();
+        console.log('notifier message: ', message);
         fireunit.ok(message.match(/error.*delete a citation/) != null,
                 test + "notifier message matches /error.*delete a citation/");
     }
