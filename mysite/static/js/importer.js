@@ -487,9 +487,9 @@ drawAddCitationFormNearThisButton = function () {
         'success': handleServerResponseToNewRecordSubmission,
         'error': handleServerErrorInResponseToNewRecordSubmission
     };
-/*    $citationForm.submit(function() {
+    $citationForm.submit(function() {
             $(this).ajaxSubmit(ajaxOptions);
-            return false;}); */
+            return false;});
 
     return false; // FIXME: Test this.
 }
