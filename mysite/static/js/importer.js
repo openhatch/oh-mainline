@@ -275,7 +275,11 @@ function askServerForPortfolio() {
     $.ajax(ajaxOptions);
 }
 
-$(askServerForPortfolio);
+if (testJS) {
+    // do nothing
+} else {
+    $(askServerForPortfolio);
+}
 
 function errorWhileAskingForPortfolio() {
     alert('Errr0r');

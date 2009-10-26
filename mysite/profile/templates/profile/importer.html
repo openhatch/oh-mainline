@@ -1,7 +1,7 @@
 {% extends 'base/one_column.html' %}
 
 {% block title %}
-Import your contributions from around the web | OpenHatch
+Portfolio / Editor
 {% endblock title %}
 
 {% block css %}
@@ -27,7 +27,10 @@ Import your contributions from around the web | OpenHatch
             action='{% url mysite.profile.views.user_selected_these_dia_checkboxes %}'>
             <div class='body'>
                 Please enter the usernames or email addresses you use to contribute to FLOSS:
-                We'll use this to gather information about your activity and involvement in various projects by searching an index of code repositories. <a href="javascript:alert('Just kidding');">Read more about how this works.</a>
+                We'll use this to gather information about your activity and involvement in
+                various projects by searching an index of code repositories.
+                <a href="javascript:alert('Just kidding. Not yet implemented.');">Read more
+                    about how this works.</a>
                 You can add links to your activity by hand; just click 'Add another record.'
                 <div class='who'>Username or email</div>
             </div>
@@ -62,5 +65,8 @@ Import your contributions from around the web | OpenHatch
 <script type='text/javascript' src='/static/js/jquery.form.js'></script>
 <script type='text/javascript' src='/static/js/jquery.jgrowl.js'></script>
 <script type='text/javascript' src='/static/js/importer.js'></script>
-<script type='text/javascript' src='/static/js/profile/editor/tests.js'></script>
 {% endblock js %}
+
+{% block js_tests %}
+<script type='text/javascript' src='/static/js/profile/editor/tests.js'></script>
+{% endblock js_tests %}

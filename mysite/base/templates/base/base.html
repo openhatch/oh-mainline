@@ -113,5 +113,10 @@
         {% block js %}
         {% endblock js %}
 
+        {% if test_js %}
+        {% block js_tests %}
+        {% endblock js_tests %}
+        {% endif %}
+
     </body>
 </html>

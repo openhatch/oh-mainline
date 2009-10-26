@@ -751,6 +751,9 @@ def importer(request):
     # to generate forms dynamically.
     data['citation_form'] = mysite.profile.forms.ManuallyAddACitationForm()
 
+    # This variable is checked in base/templates/base/base.html
+    data['test_js'] = request.GET.get('test_js', False) 
+
     return (request, 'profile/importer.html', data)
     # }}}
 
