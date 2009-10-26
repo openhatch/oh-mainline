@@ -1006,4 +1006,19 @@ class DeletePortfolioEntry(TwillTests):
         # Still there betch.
         self.assertFalse(portfolio_entry_not_mine.is_deleted)
 
+class AddCitationManually(TwillTests):
+    def test_add_citation_manually(self):
+        input_data = {
+                'portfolio_entry': 0,
+                'url': 'https://bl.ar/glefoot'
+                }
+
+        expected_output_data = {
+                'form_container_element_id': 'link_%d' % input_data['portfolio_entry'],
+                'form_container_content': "<a href='%s'>%s</a>" % input_data['url'],
+                }
+        response = self.login_with_client().post(reverse(mysite.profile.views.add_citation_manually), data)
+        response_obj = simplejson.loads(response.content)
+        self.assertEqual(response_obj, )
+
 # vim: set ai et ts=4 sw=4 nu:
