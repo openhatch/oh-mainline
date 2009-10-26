@@ -410,3 +410,5 @@ class Citation(models.Model):
         # }}}
 
     # [0]: FIXME: Let's learn how to use Django's ManyToManyField etc.
+
+# vim: set nu:

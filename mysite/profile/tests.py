@@ -1007,29 +1007,29 @@ class DeletePortfolioEntry(TwillTests):
         self.assertFalse(portfolio_entry_not_mine.is_deleted)
 
 class AddCitationManually(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
     def test_add_citation_manually(self):
-        portfolio_entry=PortfolioEntry.objects.get_or_create(
+        portfolio_entry, _ = PortfolioEntry.objects.get_or_create(
             project=Project.objects.get_or_create(name='project name')[0],
-            person=Person.objects.get(user__username='paulproteus'))[0],
+            person=Person.objects.get(user__username='paulproteus'))
 
         input_data = {
                 'portfolio_entry': portfolio_entry.pk,
                 'form_container_element_id': 'form_container_%d' % 0,
-                'url': 'https://bl.ar/glefoot'
+                'url': 'http://google.ca/' # Needs this trailing slash to work.
                 }
 
         # Send this data to the appropriate view.
-        url = reverse(mysite.profile.views.add_citation_manually)
-        response = self.login_with_client().post(url, data)
+        url = reverse(mysite.profile.views.add_citation_manually_do)
+        response = self.login_with_client().post(url, input_data)
 
-        # Check the contents of the response.
-        response_obj = simplejson.loads(response.content)
-        self.assertEqual(response_obj['form_container_element_id'],
-                input_data['form_container_element_id'],
-                "Expected that profile.views.add_citation_manually would boomerang "
-                "the element id right back at us.")
-        self.assert_(input_data['url'] in response_obj['url'],
-                "Expected that profile.views.add_citation_manually would return a "
-                "string containing the URL we sent it.")
+        # Check that a citation was created.
+        c = Citation.objects.get(url=input_data['url'])
+        self.assertEqual(c.portfolio_entry, portfolio_entry,
+                "The portfolio entry for the new citation is the exactly "
+                "the one whose id we POST'd to "
+                "profile.views.add_citation_manually.")
+
+        # FIXME: Assert that a bad request produces an error.
 
 # vim: set ai et ts=4 sw=4 nu:
