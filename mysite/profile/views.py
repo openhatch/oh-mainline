@@ -72,6 +72,24 @@ def projectexp_add_do(request):
 
     #}}}
 
+
+@login_required
+def add_citation_manually_do(request):
+    # {{{
+    form = mysite.profile.forms.ManuallyAddACitationForm(request.POST)
+    username = request.user.username
+
+    # FIXME: Validate that the user owns this pf entry.
+    if form.is_valid():
+        form.save()
+
+        return HttpResponse('it worked!') # Return with status code 200
+
+    else:
+        return HttpResponseServerError()
+
+    #}}}
+
 @login_required
 @view
 def display_person_edit_web(request, info_edit_mode=False, title=''):

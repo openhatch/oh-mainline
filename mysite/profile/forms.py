@@ -59,7 +59,9 @@ class ProjectExpEditForm(django.forms.Form):
         return inputted_id
 
 class ManuallyAddACitationForm(django.forms.ModelForm):
-    portfolio_entry = django.forms.IntegerField(widget=django.forms.HiddenInput())
+    portfolio_entry = django.forms.ModelChoiceField(
+            queryset=mysite.profile.models.PortfolioEntry.objects.all(), 
+            widget=django.forms.HiddenInput())
 
     # The ID of the element in the portfolio editor that contains this form.
     form_container_element_id = django.forms.CharField(widget=django.forms.HiddenInput())
