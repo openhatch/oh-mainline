@@ -60,6 +60,9 @@ class ProjectExpEditForm(django.forms.Form):
 
 class ManuallyAddACitationForm(django.forms.ModelForm):
     portfolio_entry = django.forms.IntegerField(widget=django.forms.HiddenInput())
+
+    # The ID of the element in the portfolio editor that contains this form.
+    form_container_element_id = django.forms.CharField(widget=django.forms.HiddenInput())
     #FIXME: Make is_published always true
     class Meta:
         model = mysite.profile.models.Citation
