@@ -181,10 +181,11 @@ testAddARecordButtonDrawsAForm = function() {
             "of the citation form building block.");
 
 };
-testAddARecordButtonDrawsAForm();
+$(testAddARecordButtonDrawsAForm);
 
-prefix = "test handling of server response to new record submission asserts: ";
-test = function (){
+
+prefix = "add a new citation: ";
+test = function () {
     // This is designed to mimic what's passed into a jQuery ajax callback
     response = {'form_container_element_id': $form_container[0].id,
     'form_container_content': 'cucumber'};
@@ -195,6 +196,6 @@ test = function (){
     fireunit.ok($form_container.html() == response['form_container_content'],
             prefix + "form_container HTML is the HTML in teh response.");
 };
-test();
+$(test);
 
 // vim: set nu:

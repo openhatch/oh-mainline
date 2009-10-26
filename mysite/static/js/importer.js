@@ -264,6 +264,7 @@ diaCheckboxChangeHandler = function() {
 };
 */
 
+askServerForPortfolio_wasCalled = false;
 function askServerForPortfolio() {
     var ajaxOptions = {
         'type': 'GET',
@@ -273,6 +274,7 @@ function askServerForPortfolio() {
         'error': errorWhileAskingForPortfolio
     };
     $.ajax(ajaxOptions);
+    askServerForPortfolio_wasCalled = true;
 }
 
 if (typeof testJS == 'undefined') { testJS = false; }
