@@ -433,11 +433,6 @@ drawAddCitationForm = function() {
     console.log("draw 'Add a citation' form");
 };
 
-function handleServerResponseToNewRecordSubmission() {
-    askServerForPortfolio();
-}
-
-
 Notifier = {};
 Notifier.displayMessage = function(message) {
     $.jGrowl(message, {'life': 10000});
@@ -484,7 +479,7 @@ drawAddCitationFormNearThisButton = function () {
     $citationForm.find('[name="form_container_element_id"]').val(formContainerElementID);
 
     var ajaxOptions = {
-        'success': handleServerResponseToNewRecordSubmission,
+        'success': askServerForPortfolio,
         'error': handleServerErrorInResponseToNewRecordSubmission
     };
     $citationForm.submit(function() {
@@ -504,6 +499,5 @@ setEventHandlers = function() {
     $('.citations-wrapper .add').click(drawAddCitationFormNearThisButton);
 };
 $(setEventHandlers);
-
 
 // vim: set nu:

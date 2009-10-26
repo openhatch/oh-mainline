@@ -169,28 +169,32 @@ testAddARecordButtonDrawsAForm = function() {
     updatePortfolio(response);
 
     // Click the first 'Add another record' button. 
-    $button = $('.citations-wrapper .add').eq(0);
+    var $button = $('.citations-wrapper .add').eq(0);
     $button.trigger('click');
 
-    $form = $button.closest('.citations-wrapper').find('.citation-forms li form.add_a_record');
+    var $form = $button.closest('.citations-wrapper').find('.citation-forms li form.add_a_record');
 
     fireunit.ok($form.size() == 1, test + "the 'Add another record' button causes "
             + "exactly one form to appear in citation-forms.");
-    fireunit.ok($form.html() == $('#citation_form_building_block').find('form').html(),
-            test + "the html of the created citation form is the same as the html " +
-            "of the citation form building block.");
+    var names = ['form_container_element_id', 'portfolio_entry', 'url'];
+    for (var i = 0; i < names.length; i++) {
+        var name = names[i];
+        fireunit.ok($form.find('[name="'+name+'"]').size() == 1,
+                test + "form as a field called" + name);
+    }
 
 };
 $(testAddARecordButtonDrawsAForm);
+
+askServerForPortfolio_wasCalled = false;
 
 prefix = "add a new citation: ";
 test = function () {
     $add_a_new_citation_form = $('.citation-forms li:eq(0) form');
     $add_a_new_citation_form.find('[name="url"]').val('http://google.ca/');
-    //$add_a_new_citation_form.find(':submit').trigger('click');
-    fireunit.ok(askServerForPortfolio_wasCalled,
-            prefix + "askServerForPortfolio was called.");
-    askServerForPortfolio_wasCalled = false;
+    $add_a_new_citation_form.trigger('submit');
+    fireunit.ok(true,
+            prefix + "Yay, the page has not reloaded synchronously since adding a new citation.");
 };
 $(test);
 
