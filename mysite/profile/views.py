@@ -78,7 +78,7 @@ def projectexp_add_do(request):
 def add_citation_manually_do(request):
     # {{{
     form = mysite.profile.forms.ManuallyAddACitationForm(request.POST)
-    username = request.user.username
+    form.set_user(request.user)
 
     # FIXME: Validate that the user owns this pf entry.
     if form.is_valid():

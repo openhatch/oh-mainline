@@ -1007,7 +1007,8 @@ class DeletePortfolioEntry(TwillTests):
         self.assertFalse(portfolio_entry_not_mine.is_deleted)
 
 class AddCitationManually(TwillTests):
-    fixtures = ['user-paulproteus', 'person-paulproteus']
+    fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
+
     def test_add_citation_manually(self):
         portfolio_entry, _ = PortfolioEntry.objects.get_or_create(
             project=Project.objects.get_or_create(name='project name')[0],
@@ -1030,6 +1031,24 @@ class AddCitationManually(TwillTests):
                 "the one whose id we POST'd to "
                 "profile.views.add_citation_manually.")
 
-        # FIXME: Assert that a bad request produces an error.
+    def test_add_citation_manually_with_bad_portfolio_entry(self):
+        not_your_portfolio_entry, _ = PortfolioEntry.objects.get_or_create(
+            project=Project.objects.get_or_create(name='project name')[0],
+            person=Person.objects.get(user__username='barry'))
+
+        input_data = {
+                'portfolio_entry': not_your_portfolio_entry.pk,
+                'form_container_element_id': 'form_container_%d' % 0,
+                'url': 'http://google.ca/' # Needs this trailing slash to work.
+                }
+
+        # Send this data to the appropriate view.
+        url = reverse(mysite.profile.views.add_citation_manually_do)
+        response = self.login_with_client().post(url, input_data)
+
+        # Check that no citation was created.
+        self.assertEqual(Citation.objects.filter(url=input_data['url']).count(), 0,
+                "Expected no citation to be created when you try "
+                "to add one for someone else.")
 
 # vim: set ai et ts=4 sw=4 nu:
