@@ -275,6 +275,8 @@ function askServerForPortfolio() {
     $.ajax(ajaxOptions);
 }
 
+if (typeof testJS == 'undefined') { testJS = false; }
+
 if (testJS) {
     // do nothing
 } else {
@@ -282,12 +284,12 @@ if (testJS) {
 }
 
 function errorWhileAskingForPortfolio() {
-    alert('Errr0r');
+    console.log('Error while asking for portfolio.');
 }
 
 /*
  * Perhaps we should talk more explicitly with the server about whose portfolio we want.
- * To reproduce:
+ * Otherwise somebody might do this:
  *  Log in as Alice
  *  Load portfolio
  *  In a different window, log out; log in as Bob

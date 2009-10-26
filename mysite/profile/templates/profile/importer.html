@@ -64,6 +64,9 @@ Portfolio / Editor
 {% block js %}
 <script type='text/javascript' src='/static/js/jquery.form.js'></script>
 <script type='text/javascript' src='/static/js/jquery.jgrowl.js'></script>
+
+{% if test_js %}<script type='text/javascript'>testJS = true;</script>{% endif %}
+
 <script type='text/javascript' src='/static/js/importer.js'></script>
 {% endblock js %}
 
