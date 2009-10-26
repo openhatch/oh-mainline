@@ -51,6 +51,7 @@ import forms
 import mysite.profile.forms
 # }}}
 
+# FIXME: Delete when this has been supplanted by add_cttaion_manually.
 def projectexp_add_do(request):
     # {{{
     form = mysite.profile.forms.ProjectExpForm(request.POST)
