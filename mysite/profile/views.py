@@ -768,7 +768,7 @@ def importer(request):
     # This is used to create a blank 'Add another record' form, which is printed
     # to the bottom of the importer page. The HTML underlying this form is used
     # to generate forms dynamically.
-    data['citation_form'] = mysite.profile.forms.ManuallyAddACitationForm()
+    data['citation_form'] = mysite.profile.forms.ManuallyAddACitationForm(auto_id=False)
 
     # This variable is checked in base/templates/base/base.html
     data['test_js'] = request.GET.get('test_js', False) 

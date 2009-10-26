@@ -326,6 +326,7 @@ function updatePortfolio(response) {
             var $new_portfolio_entry = $(portfolio_entry_html);
             $('#portfolio').append($new_portfolio_entry);
             $new_portfolio_entry.attr('id', id);
+            $new_portfolio_entry.attr('portfolio_entry__pk', portfolioEntry.pk);
         }
 	    
         /* Find the project this PortfolioElement refers to */
@@ -458,14 +459,51 @@ drawAddCitationFormNearThisButton = function () {
     fireunit.ok($citationForms.size() == 1, "there's one ul called 'citations-forms' in this wrapper");
     var buildingBlockHTML = $('#citation_form_building_block').html();
     var $form_container = $(buildingBlockHTML);
+
+    // Set element ID
     $form_container.attr('id', generateUniqueID());
+
+    $citationForm = $form_container.find('form');
+   
     $citationForms.append($form_container);
+
+    console.log($citationForm);
+
+    console.log($citationForm.parents('.portfolio_entry'));
+
+    // Set field: portfolio entry ID
+    var portfolioEntryID = $citationForm.closest('.portfolio_entry')
+        .attr('portfolio_entry__pk');
+    $citationForm.find('[name="portfolio_entry"]').attr('lang', 'your-mom');
+    $citationForm.find('[name="portfolio_entry"]').attr('value', portfolioEntryID);
+    console.log('hi');
+    console.log($citationForm.find('[name="portfolio_entry"]'));
+
+    // Set field: form container element ID
+    var formContainerElementID = $citationForm.closest('.citation-forms li').attr('id');
+    $citationForm.find('[name="form_container_element_id"]').val(formContainerElementID);
+
+    var ajaxOptions = {
+        'success': handleServerResponseToNewRecordSubmission,
+        'error': handleServerErrorInResponseToNewRecordSubmission
+    };
+/*    $citationForm.submit(function() {
+            $(this).ajaxSubmit(ajaxOptions);
+            return false;}); */
+
     return false; // FIXME: Test this.
 }
+
+handleServerErrorInResponseToNewRecordSubmission = function () {
+    alert('error');
+    // FIXME: test this.
+};
+
 setEventHandlers = function() {
     $('a.delete').click(deleteCitationForThisLink);
     $('.citations-wrapper .add').click(drawAddCitationFormNearThisButton);
 };
 $(setEventHandlers);
+
 
 // vim: set nu:
