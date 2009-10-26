@@ -1,7 +1,7 @@
 testImportJGrowl = function() {
     fireunit.ok(typeof $.jGrowl != 'undefined', "jGrowl imported");
 };
-testImportJGrowl();
+$(testImportJGrowl);
 
 testBuildingBlocks = function() {
     var test = "testBuildingBlocks asserts: ";
@@ -17,7 +17,7 @@ testBuildingBlocks = function() {
         fireunit.ok($block.filter(':hidden').size() == 1, test + blockSelector + " is hidden.");
     }
 };
-testBuildingBlocks();
+$(testBuildingBlocks);
 
 message = 'We create PortfolioEntryElements when the event handler is responding to a list of objects from the server that includes a new PortfolioEntry.';
 // FIXME: Come up with a suitable response, matching the description above.
@@ -103,14 +103,15 @@ testUpdatePortfolio = function() {
             // And now check the reverse: For each citation in the DOM,
             // check that its data is in the response.
 
-            fireunit.ok($('.citations > li').size() == 1, "Expected just one citation in the DOM.");
+            fireunit.ok($('.citations > li').size() == 1,
+                    "Expected just one citation in the DOM.");
             fireunit.ok($('.citations > li')[0].id == 'citation_0', 
                     "Expected the one citation in the DOM to have id citation_0");
 
     });
 };
 
-testUpdatePortfolio();
+$(testUpdatePortfolio);
 
 testNoDuplication = function() {
     // Clear the deck.
@@ -124,7 +125,7 @@ testNoDuplication = function() {
     fireunit.ok($('.citations > li').size() == 1, "Assert there's still one citation.");
     fireunit.ok($('.portfolio_entry:visible').size() == 1, "Assert there's still one portfolio entry.");
 };
-testNoDuplication();
+$(testNoDuplication);
 
 testDeleteCitation = function() {
     // Clear the deck.
@@ -159,7 +160,7 @@ testDeleteCitation = function() {
     }
     window.setTimeout(checkNotifierInAMoment, 500);
 };
-testDeleteCitation();
+$(testDeleteCitation);
 
 testAddARecordButtonDrawsAForm = function() {
     $('#portfolio *').remove();

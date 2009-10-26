@@ -430,9 +430,8 @@ drawAddCitationForm = function() {
     console.log("draw 'Add a citation' form");
 };
 
-function handleServerResponseToNewRecordSubmission(response) {
-    $form = $('#'+response['form_container_element_id']);
-    $form.html(response['form_container_content']);
+function handleServerResponseToNewRecordSubmission() {
+    askServerForPortfolio();
 }
 
 
