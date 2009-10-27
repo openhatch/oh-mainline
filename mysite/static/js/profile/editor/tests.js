@@ -70,6 +70,7 @@ mockedPortfolioResponse = {
     // Project icons
     'project_icons': {
         '0': {
+            'is_generic': false,
             'url': '/people/project_icon/Web%20Team%20projects/'
         },
         '1': {
@@ -263,6 +264,19 @@ test = function () {
     fireunit.ok($('#'+response.form_container_element_id).size() == 0,
             prefix + "the form container has disappeared after we handle "
             + "the server's response to the successful submission of the form therein.");
+};
+$(test);
+
+prefix = "show icon flagger only for nongeneric icons: ";
+test = function () {
+    fireunit.ok($('.portfolio_entry').eq(0).find('.icon_flagger').size() == 1,
+            prefix + "assert project with nongeneric icon bears the link "
+            + "'Flag icon as incorrect'"
+            );
+    fireunit.ok($('.portfolio_entry').eq(1).find('.icon_flagger').size() == 0,
+            prefix + "assert project with generic icon doesn't bear the link "
+            + "'Flag icon as incorrect'"
+            );
 };
 $(test);
 

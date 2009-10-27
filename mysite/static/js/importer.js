@@ -345,9 +345,13 @@ function updatePortfolio(response) {
 	    /* project_description */
 	    $(".project_description", $new_portfolio_entry).text(portfolioEntry.fields.project_description);
 	    	   
+        var icon = response.project_icons[portfolioEntry.fields.project];
 	    /* project_icon */
-	    $(".project_icon", $new_portfolio_entry).attr('src',
-                response.project_icons[portfolioEntry.fields.project].url);
+	    $(".project_icon", $new_portfolio_entry).attr('src', icon.url);
+
+        if (icon.is_generic) {
+            $new_portfolio_entry.find('.icon_flagger').remove();
+        }
 	    
 	    /* project_name */
 	    $(".project_name", $new_portfolio_entry).text(project_we_refer_to.fields.name);
