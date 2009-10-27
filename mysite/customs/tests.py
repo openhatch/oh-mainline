@@ -194,46 +194,46 @@ class OhlohIconTests(django.test.TestCase):
 
     def test_given_project_generate_internal_url(self):
         # First, delete the project icon
-        path, url = mysite.profile.views.project_icon_url('f-spot', actually_fetch=False)
+        path, url, is_generic = mysite.profile.views.project_icon_url('f-spot', actually_fetch=False)
 
         if os.path.exists(path):
             os.unlink(path)
 
         # Download the icon
-        path, url = mysite.profile.views.project_icon_url('f-spot')
+        path, url, is_generic = mysite.profile.views.project_icon_url('f-spot')
         self.assert_(os.path.exists(path))
         os.unlink(path)
 
     def test_given_project_generate_internal_url_with_width(self):
         # First, delete the project icon
-        path, url = mysite.profile.views.project_icon_url('f-spot', actually_fetch=False,
+        path, url, is_generic = mysite.profile.views.project_icon_url('f-spot', actually_fetch=False,
                                                           width=40)
 
         if os.path.exists(path):
             os.unlink(path)
 
         # Download the icon
-        path, url = mysite.profile.views.project_icon_url('f-spot')
+        path, url, is_generic = mysite.profile.views.project_icon_url('f-spot')
         self.assert_(os.path.exists(path))
         os.unlink(path)
 
     def test_given_project_generate_internal_url_for_proj_fail(self):
         # First, delete the project icon
-        path, url = mysite.profile.views.project_icon_url('lolnomatzch',
+        path, url, is_generic = mysite.profile.views.project_icon_url('lolnomatzch',
                                                           actually_fetch=False)
         path = url[1:] # strip leading '/'
         if os.path.exists(path):
             os.unlink(path)
 
         # Download the icon
-        path, url = mysite.profile.views.project_icon_url('lolnomatzch')
+        path, url, is_generic = mysite.profile.views.project_icon_url('lolnomatzch')
         self.assert_(os.path.exists(path))
         os.unlink(path)
 
 
     def test_project_image_link(self):
         # First, delete the project icon
-        path, url = mysite.profile.views.project_icon_url('f-spot',
+        path, url, is_generic = mysite.profile.views.project_icon_url('f-spot',
                                              actually_fetch=False)
 
         if os.path.exists(path):

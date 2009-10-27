@@ -492,6 +492,7 @@ def _project_hash(project_name):
     # }}}
 
 # FIXME: Store these in the project model.
+# FIXME: Make this go AWAY.
 def project_icon_url(project_name, width = None, actually_fetch = True):
     # {{{
     project_hash = _project_hash(project_name)
@@ -512,6 +513,7 @@ def project_icon_url(project_name, width = None, actually_fetch = True):
     if not os.path.exists(os.path.dirname(path)):
         os.makedirs(os.path.dirname(path))
 
+    is_generic = False
     if actually_fetch:
         # Then verify the image exists
         if not os.path.exists(path):
@@ -523,6 +525,7 @@ def project_icon_url(project_name, width = None, actually_fetch = True):
                 icon_data = open(os.path.join(
                         settings.MEDIA_ROOT,
                         'no-project-icon.png')).read()
+                is_generic = True
 
             if width is not None:
                 # scale it
@@ -554,7 +557,7 @@ def project_icon_url(project_name, width = None, actually_fetch = True):
             os.rename(tmp[1], path)
             os.chmod(path, 0644)
 
-    return path, url
+    return path, url, is_generic
     # FIXME: One day, add cache expiry.
     # }}}
 
@@ -595,7 +598,7 @@ def edit_person_info(request):
 
 def project_icon_web(request, project_name, width = None):
     # {{{
-    path, url = project_icon_url(project_name, width)
+    path, url, is_generic = project_icon_url(project_name, width)
     return HttpResponseRedirect(url)
     # }}}
 
@@ -661,7 +664,8 @@ def gimme_json_for_portfolio(request):
     "Get JSON used to live-update the portfolio editor."
     """JSON includes:
         * The person's data.
-        * DataImportAttempts."""
+        * DataImportAttempts.
+        * other stuff"""
     # {{{
     person = request.user.get_profile()
 
@@ -670,11 +674,6 @@ def gimme_json_for_portfolio(request):
     portfolio_entries_unserialized = PortfolioEntry.objects.filter(person=person)
     projects_unserialized = [p.project for p in portfolio_entries_unserialized]
     
-    # Serialize project icon URLs
-    project_icon_urls = {}
-    for p in projects_unserialized:
-        _, project_icon_urls[p.pk] = project_icon_url(p.name)
-
     # Serialize citation summaries
     summaries = {}
     for c in citations:
@@ -695,11 +694,28 @@ def gimme_json_for_portfolio(request):
         'citations': citations,
         'portfolio_entries': portfolio_entries,
         'projects': projects,
-        'project_icon_urls': project_icon_urls,
+        'project_icons': get_project_icons_dict(projects_unserialized),
         'summaries': summaries})
 
     return HttpResponse(json, mimetype='application/json')
     # }}}
+
+def get_project_icons_dict(projects):
+    """ Output:
+    {
+        0: {
+            'is_generic': True,
+            'url': '/...'
+        },
+        ...
+    }
+    """
+    dict = {}
+    for project in projects:
+        path, url, is_generic = project_icon_url(project.name)
+        dict[project.pk] = {'is_generic': is_generic, 'url': url}
+
+    return dict
 
 @login_required
 def import_do(request):
