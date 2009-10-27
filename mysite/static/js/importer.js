@@ -527,9 +527,18 @@ handleServerErrorInResponseToNewRecordSubmission = function(xhr) {
     Notifier.displayMessage(msg);
 };
 
+
+replaceMeWithSuccessReport = function () {
+    var $flaggerLink = $(this);
+
+    // the text() function will remove all children, including the link.
+    $flaggerLink.parent().text('Using default icon.');
+};
+
 setEventHandlers = function() {
     $('a.delete').click(deleteCitationForThisLink);
     $('.citations-wrapper .add').click(drawAddCitationFormNearThisButton);
+    $('.icon_flagger a').click(replaceMeWithSuccessReport);
 };
 $(setEventHandlers);
 
