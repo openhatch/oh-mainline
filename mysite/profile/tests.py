@@ -1031,6 +1031,8 @@ class AddCitationManually(TwillTests):
                 "the one whose id we POST'd to "
                 "profile.views.add_citation_manually.")
 
+        self.assert_(c.is_published, "Manually added citations are published by default.")
+
     def test_add_citation_manually_with_bad_portfolio_entry(self):
         not_your_portfolio_entry, _ = PortfolioEntry.objects.get_or_create(
             project=Project.objects.get_or_create(name='project name')[0],
@@ -1052,6 +1054,6 @@ class AddCitationManually(TwillTests):
                 "to add one for someone else.")
         
         # Check that an error is reported in the response.
-        self.assert_(len(simplejson.loads(response.content)['errors']) == 1)
+        self.assert_(len(simplejson.loads(response.content)['error_msgs']) == 1)
 
 # vim: set ai et ts=4 sw=4 nu:

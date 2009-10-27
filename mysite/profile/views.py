@@ -84,7 +84,11 @@ def add_citation_manually_do(request):
             'form_container_element_id': request.POST['form_container_element_id']
             }
     if form.is_valid():
-        form.save()
+        citation = form.save()
+
+        # Manually added citations are published automatically.
+        citation.is_published = True
+        citation.save()
         
         json = simplejson.dumps(output)
         return HttpResponse(json, mimetype='application/json') 
@@ -694,7 +698,7 @@ def gimme_json_for_portfolio(request):
         'project_icon_urls': project_icon_urls,
         'summaries': summaries})
 
-    return HttpResponse(json, mimetype='application/javascript')
+    return HttpResponse(json, mimetype='application/json')
     # }}}
 
 @login_required

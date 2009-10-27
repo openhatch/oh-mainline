@@ -264,8 +264,13 @@ diaCheckboxChangeHandler = function() {
 };
 */
 
+mockedPortfolioResponse = null;
 askServerForPortfolio_wasCalled = false;
 function askServerForPortfolio() {
+    if (testJS) {
+        updatePortfolio(mockedPortfolioResponse);
+        return;
+    }
     var ajaxOptions = {
         'type': 'GET',
         'url': '/profile/views/gimme_json_for_portfolio',
@@ -368,6 +373,9 @@ function updatePortfolio(response) {
                     // Then we have a citation that we're gonna add the DOM.
                     var $citation = $(citation_html);
                     $citation.attr('id', id);
+                    if (citation.fields.is_published == '1') {
+                        $citation.removeClass("unpublished");
+                    }
                     $('.citations', $new_portfolio_entry).append($citation);
                 }
 

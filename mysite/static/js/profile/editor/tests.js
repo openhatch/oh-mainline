@@ -21,13 +21,16 @@ $(testBuildingBlocks);
 
 message = 'We create PortfolioEntryElements when the event handler is responding to a list of objects from the server that includes a new PortfolioEntry.';
 // FIXME: Come up with a suitable response, matching the description above.
-response = {
+mockedPortfolioResponse = {
     // FIXME: We might not need these models here.
     'dias': [{'pk': 0}],
 
     'citations': [
-    {'pk': 0, 'fields': {'portfolio_entry': 0}}, // These belong to different
-    {'pk': 1, 'fields': {'portfolio_entry': 1}}, // PortfolioEntries.
+    {'pk': 0, 'fields': {'portfolio_entry': 0, 'is_published': 0}}, 
+    {'pk': 1, 'fields': {'portfolio_entry': 0, 'is_published': 1}}, // These belong to different
+    {'pk': 2, 'fields': {'portfolio_entry': 1, 'is_published': 1}}, // PortfolioEntries.
+        // ^ This last one is never painted because there is no
+        // corresponding pf entry.
     ],
 
     'portfolio_entries': [{'pk': 0, 'fields': {
@@ -38,13 +41,15 @@ response = {
     }
     ],
     'projects': [{'pk': 0, 'fields': {'name': 'bindlestiff'}}],
-    'summaries': {'0': 'Ohloh repository index: Coded in shell script for 12 months as paulproteus since 2007.'},
+    'summaries': {
+        '0': 'Ohloh repository index: Coded in shell script for 12 months as paulproteus since 2007.',
+        '1': 'Summery'},
     'project_icon_urls': {'0': '/people/project_icon/Web%20Team%20projects/'}
 };
 
 testUpdatePortfolio = function() {
-    updatePortfolio(response);
-    $(response.portfolio_entries).each( function() {
+    askServerForPortfolio(); // This will be mocked out when testJS = true
+    $(mockedPortfolioResponse.portfolio_entries).each( function() {
 
             var portfolio_entry = this;
 
@@ -73,9 +78,9 @@ testUpdatePortfolio = function() {
             var dom_citations = $('.citations > li', pee);
 
             fireunit.ok(
-                    dom_citations.size() == 1,
+                    dom_citations.size() == 2,
                     "Expected the number of citation elements in the " + 
-                    "PortfolioEntryElement == 1 == the number of " +
+                    "PortfolioEntryElement == 2 == the number of " +
                     "citations in the input that belong to this PEE. Instead " +
                     "the number of citation elements == " + dom_citations.size());
 
@@ -92,21 +97,32 @@ testUpdatePortfolio = function() {
 
                 var msg = "Assert match of citation summary.";
                 fireunit.ok($domCitation.find('.summary').text() == 
-                        response.summaries[responseCitation.pk], 
+                        mockedPortfolioResponse.summaries[responseCitation.pk], 
                         msg);
+
+                var msg = "Assert cssClass = is_published ? 'published' : 'unpublished'";
+                if (responseCitation.fields.is_published == '1') {
+                    fireunit.ok( ! $domCitation.hasClass('unpublished'), msg);
+                }
+                else {
+                    fireunit.ok($domCitation.hasClass('unpublished'), msg);
+                }
             };
 
             // Test that each of this portfolio entry's citations
             // has a corresponding DOM citation.
-            $([response.citations[0]]).each(testThatResponseCitationHasADOMCitation);
+            $(mockedPortfolioResponse.citations.slice(0,2)).each(
+                    testThatResponseCitationHasADOMCitation);
 
             // And now check the reverse: For each citation in the DOM,
             // check that its data is in the response.
 
-            fireunit.ok($('.citations > li').size() == 1,
+            fireunit.ok($('.citations > li').size() == 2,
                     "Expected just one citation in the DOM.");
             fireunit.ok($('.citations > li')[0].id == 'citation_0', 
-                    "Expected the one citation in the DOM to have id citation_0");
+                    "Expected the first citation in the DOM to have id citation_0");
+            fireunit.ok($('.citations > li')[1].id == 'citation_1', 
+                    "Expected the second citation in the DOM to have id citation_1");
 
     });
 };
@@ -114,15 +130,16 @@ testUpdatePortfolio = function() {
 $(testUpdatePortfolio);
 
 testNoDuplication = function() {
+    // Don't create duplicate citations or portfolio entries.
     // Clear the deck.
     $('#portfolio *').remove();
 
-    updatePortfolio(response);
-    fireunit.ok($('.citations > li').size() == 1, "Assert there's one citation.");
+    askServerForPortfolio();
+    fireunit.ok($('.citations > li').size() == 2, "Assert there are two citations.");
     fireunit.ok($('.portfolio_entry:visible').size() == 1, "Assert there's one portfolio entry.");
 
-    updatePortfolio(response);
-    fireunit.ok($('.citations > li').size() == 1, "Assert there's still one citation.");
+    askServerForPortfolio();
+    fireunit.ok($('.citations > li').size() == 2, "Assert there are still two citations.");
     fireunit.ok($('.portfolio_entry:visible').size() == 1, "Assert there's still one portfolio entry.");
 };
 $(testNoDuplication);
@@ -132,7 +149,7 @@ testDeleteCitation = function() {
     $('#portfolio *').remove();
     var test = 'testDeleteCitation asserts: ';
 
-    updatePortfolio(response);
+    askServerForPortfolio();
 
     // Click the delete button for a citation.
     var citationID = 0;
@@ -166,7 +183,7 @@ testAddARecordButtonDrawsAForm = function() {
     $('#portfolio *').remove();
     var test = 'testAddARecordButtonDrawsAForm asserts: ';
 
-    updatePortfolio(response);
+    askServerForPortfolio();
 
     // Click the first 'Add another record' button. 
     var $button = $('.citations-wrapper .add').eq(0);
