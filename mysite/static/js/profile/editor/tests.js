@@ -280,4 +280,18 @@ test = function () {
 };
 $(test);
 
+prefix = "flag icon as incorrect: ";
+test = function () {
+    // click a 'Flag icon as incorrect' link
+    $icon_flagger = $('.icon_flagger').eq(0);
+    fireunit.ok($icon_flagger.find('a').size() == 1,
+            prefix + "expect link to exist before clicked.");
+    $icon_flagger.find('a').trigger('click');
+    fireunit.ok($icon_flagger.find('a').size() == 0,
+            prefix + "expect link to be removed.'");
+    fireunit.ok($icon_flagger.text().match(/default icon/),
+            "expect link to be replaced with text including the phrase 'default icon'");
+};
+$(test);
+
 // vim: set nu:
