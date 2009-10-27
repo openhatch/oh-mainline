@@ -70,8 +70,6 @@ def ohloh_url2data(url, selector, params = {}, many = False, API_KEY = None):
     except xml.parsers.expat.ExpatError:
         # well, I'll be. it doesn't parse.
         return b.geturl(), None
-        #import pdb
-        #pdb.set_trace()
         
     # Did Ohloh return an error?
     root = tree.getroot()

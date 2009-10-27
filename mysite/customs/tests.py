@@ -163,7 +163,7 @@ class SlowlohTests(django.test.TestCase):
 class OhlohIconTests(django.test.TestCase):
     '''Test that we can grab icons from Ohloh.'''
     # {{{
-    def test_given_project_find_icon(self):
+    def test_ohloh_gives_us_an_icon(self):
         oh = ohloh.get_ohloh()
         icon = oh.get_icon_for_project('f-spot')
         icon_fd = StringIO(icon)
@@ -171,86 +171,42 @@ class OhlohIconTests(django.test.TestCase):
         image = Image.open(icon_fd)
         self.assertEqual(image.size, (64, 64))
 
-    def test_given_project_find_icon_failure(self):
+    def test_ohloh_errors_on_nonexistent_project(self):
         oh = ohloh.get_ohloh()
         self.assertRaises(ValueError, oh.get_icon_for_project, 'lolnomatxh')
 
-    def test_find_icon_failure_when_proj_exists_but_lacks_icon(self):
+    def test_ohloh_errors_on_project_lacking_icon(self):
         oh = ohloh.get_ohloh()
         self.assertRaises(ValueError, oh.get_icon_for_project, 'asdf')
 
-    def test_find_icon_for_mozilla_firefox(self):
-        oh = ohloh.get_ohloh()
-        icon = oh.get_icon_for_project('Mozilla Firefox')
-        icon_fd = StringIO(icon)
-        from PIL import Image
-        image = Image.open(icon_fd)
-        self.assertEqual(image.size, (64, 64))
-
-    def test_find_icon_for_proj_with_space(self):
+    def test_ohloh_errors_correctly_even_when_we_send_her_spaces(self):
         oh = ohloh.get_ohloh()
         self.assertRaises(ValueError, oh.get_icon_for_project,
                 'surely nothing is called this name')
 
-    def test_given_project_generate_internal_url(self):
-        # First, delete the project icon
-        path, url, is_generic = mysite.profile.views.project_icon_url('f-spot', actually_fetch=False)
+    def test_populate_icon_from_ohloh(self):
 
-        if os.path.exists(path):
-            os.unlink(path)
+        project = Project()
+        project.name = 'Mozilla Firefox'
+        project.populate_icon_from_ohloh()
 
-        # Download the icon
-        path, url, is_generic = mysite.profile.views.project_icon_url('f-spot')
-        self.assert_(os.path.exists(path))
-        os.unlink(path)
+        self.assert_(project.icon)
+        self.assertEqual(project.icon.width, 64)
+        self.assertNotEqual(project.date_icon_was_fetched_from_ohloh, None)
 
-    def test_given_project_generate_internal_url_with_width(self):
-        # First, delete the project icon
-        path, url, is_generic = mysite.profile.views.project_icon_url('f-spot', actually_fetch=False,
-                                                          width=40)
+    def test_populate_icon_from_ohloh_uses_none_on_no_match(self):
 
-        if os.path.exists(path):
-            os.unlink(path)
+        project = Project()
+        project.name = 'lolnomatchiawergh'
 
-        # Download the icon
-        path, url, is_generic = mysite.profile.views.project_icon_url('f-spot')
-        self.assert_(os.path.exists(path))
-        os.unlink(path)
+        project.populate_icon_from_ohloh()
 
-    def test_given_project_generate_internal_url_for_proj_fail(self):
-        # First, delete the project icon
-        path, url, is_generic = mysite.profile.views.project_icon_url('lolnomatzch',
-                                                          actually_fetch=False)
-        path = url[1:] # strip leading '/'
-        if os.path.exists(path):
-            os.unlink(path)
+        self.assertFalse(project.icon)
+        # We don't know how to compare this against None,
+        # but this seems to work.
 
-        # Download the icon
-        path, url, is_generic = mysite.profile.views.project_icon_url('lolnomatzch')
-        self.assert_(os.path.exists(path))
-        os.unlink(path)
+        self.assertNotEqual(project.date_icon_was_fetched_from_ohloh, None)
 
-
-    def test_project_image_link(self):
-        # First, delete the project icon
-        path, url, is_generic = mysite.profile.views.project_icon_url('f-spot',
-                                             actually_fetch=False)
-
-        if os.path.exists(path):
-            os.unlink(path)
-
-        # Then retrieve (slowly) this URL that redirects to the image
-        go_to_url = '/people/project_icon/f-spot'
-        
-        response = Client().get(go_to_url)
-        # Assure ourselves that we were redirected to the above URL...
-        self.assertEqual(response['Location'], 'http://testserver' + url)
-        # and that the file exists on disk
-
-        self.assert_(os.path.exists(path))
-
-        # Remove it so the test has no side-effects
-        os.unlink(path)
     # }}}
 
 class LaunchpadDataTests(django.test.TestCase):

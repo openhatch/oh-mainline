@@ -52,13 +52,12 @@ class Project(models.Model):
 
     def populate_icon_from_ohloh(self):
 
-        
         oh = ohloh.get_ohloh()
         try:
             icon_data = oh.get_icon_for_project(self.name)
-            self.date_icon_was_fetched_from_ohloh = datetime.datetime.now()
+            self.date_icon_was_fetched_from_ohloh = datetime.datetime.utcnow()
         except ValueError:
-            self.date_icon_was_fetched_from_ohloh = datetime.datetime.now()
+            self.date_icon_was_fetched_from_ohloh = datetime.datetime.utcnow()
             return None
 
         # if you want to scale, use get_image_data_scaled(icon_data)
@@ -84,3 +83,5 @@ class Bug(models.Model):
 
     def __unicode__(self):
         return "<Bug title='%s' project='%s' project__language='%s' description='%s...'>" % (self.title, self.project.name, self.project.language, self.description[:50])
+
+# vim: set ai ts=4 nu:
