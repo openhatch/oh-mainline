@@ -22,34 +22,66 @@ $(testBuildingBlocks);
 message = 'We create PortfolioEntryElements when the event handler is responding to a list of objects from the server that includes a new PortfolioEntry.';
 // FIXME: Come up with a suitable response, matching the description above.
 mockedPortfolioResponse = {
-    // FIXME: We might not need these models here.
+
+    // DataImportAttempts
     'dias': [{'pk': 0}],
 
+    // Citations
     'citations': [
     {'pk': 0, 'fields': {'portfolio_entry': 0, 'is_published': 0}}, 
     {'pk': 1, 'fields': {'portfolio_entry': 0, 'is_published': 1}}, // These belong to different
-    {'pk': 2, 'fields': {'portfolio_entry': 1, 'is_published': 1}}, // PortfolioEntries.
+    {'pk': 2, 'fields': {'portfolio_entry': 99, 'is_published': 1}}, // PortfolioEntries.
         // ^ This last one is never painted because there is no
         // corresponding pf entry.
     ],
 
-    'portfolio_entries': [{'pk': 0, 'fields': {
-        'project': 0,
-        'project_description': 'described',
-        'experience_description': 'i hacked things'
-    }
-    }
+    // Portfolio entries
+    'portfolio_entries': [
+
+    {
+        'pk': 0, 'fields': {
+            'project': 0,
+            'project_description': 'described',
+            'experience_description': 'i hacked things'
+        }
+    },
+
+    {
+        'pk': 1, 'fields': {
+            'project': 1,
+            'project_description': 'another project with a generic icon',
+            'experience_description': 'i hacked things'
+        }
+    },
+
     ],
-    'projects': [{'pk': 0, 'fields': {'name': 'bindlestiff'}}],
+
+    // Projects
+    'projects': [
+    {'pk': 0, 'fields': {'name': 'bindlestiff'}},
+    {'pk': 1, 'fields': {'name': 'a project with a generic icon'}},
+    ],
+
+    // Summaries
     'summaries': {
         '0': 'Ohloh repository index: Coded in shell script for 12 months as paulproteus since 2007.',
         '1': 'Summery'},
-    'project_icon_urls': {'0': '/people/project_icon/Web%20Team%20projects/'}
+
+    // Project icons
+    'project_icons': {
+        '0': {
+            'url': '/people/project_icon/Web%20Team%20projects/'
+        },
+        '1': {
+            'is_generic': true,
+            'url': '/people/project_icon/Web%20Team%20projects/'
+        }
+    }
 };
 
 testUpdatePortfolio = function() {
     askServerForPortfolio(); // This will be mocked out when testJS = true
-    $(mockedPortfolioResponse.portfolio_entries).each( function() {
+    $(mockedPortfolioResponse.portfolio_entries.slice(0,1)).each( function() {
 
             var portfolio_entry = this;
 
@@ -135,12 +167,16 @@ testNoDuplication = function() {
     $('#portfolio *').remove();
 
     askServerForPortfolio();
-    fireunit.ok($('.citations > li').size() == 2, "Assert there are two citations.");
-    fireunit.ok($('.portfolio_entry:visible').size() == 1, "Assert there's one portfolio entry.");
+    fireunit.ok($('.citations > li').size() == 2,
+            "Assert there are two citations.");
+    fireunit.ok($('.portfolio_entry:visible').size() == 2,
+            "Assert there are two portfolio entries.");
 
     askServerForPortfolio();
-    fireunit.ok($('.citations > li').size() == 2, "Assert there are still two citations.");
-    fireunit.ok($('.portfolio_entry:visible').size() == 1, "Assert there's still one portfolio entry.");
+    fireunit.ok($('.citations > li').size() == 2,
+            "Assert there are still two citations.");
+    fireunit.ok($('.portfolio_entry:visible').size() == 2,
+            "Assert there are still two portfolio entries.");
 };
 $(testNoDuplication);
 

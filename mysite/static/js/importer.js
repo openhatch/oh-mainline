@@ -347,7 +347,7 @@ function updatePortfolio(response) {
 	    	   
 	    /* project_icon */
 	    $(".project_icon", $new_portfolio_entry).attr('src',
-                response.project_icon_urls[portfolioEntry.fields.project]);
+                response.project_icons[portfolioEntry.fields.project].url);
 	    
 	    /* project_name */
 	    $(".project_name", $new_portfolio_entry).text(project_we_refer_to.fields.name);
