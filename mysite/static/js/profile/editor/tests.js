@@ -286,11 +286,21 @@ test = function () {
     $icon_flagger = $('.icon_flagger').eq(0);
     fireunit.ok($icon_flagger.find('a').size() == 1,
             prefix + "expect link to exist before clicked.");
+    mockedServerResponseToIconFlagging = {
+        'success': true,
+        'portfolio_entry__pk': 0,
+        'new_icon_url': '/static/bananas.png'
+    };
     $icon_flagger.find('a').trigger('click');
     fireunit.ok($icon_flagger.find('a').size() == 0,
             prefix + "expect link to be removed.'");
     fireunit.ok($icon_flagger.text().match(/default icon/),
             "expect link to be replaced with text including the phrase 'default icon'");
+    $icon = $icon_flagger.closest('.portfolio_entry').find('img.project_icon');
+    fireunit.ok($icon.size() == 1,
+            prefix + "expect there to be an icon");
+    fireunit.ok($icon.attr('src') == '/static/bananas.png',
+            "expect icon src to match mockedServerResponseToIconFlagging");
 };
 $(test);
 
