@@ -125,6 +125,9 @@ urlpatterns = patterns('',
         (r'^profile/views/add_citation_manually_do$',
             'mysite.profile.views.add_citation_manually_do'),
 
+        (r'^profile/views/replace_icon_with_default$',
+            'mysite.profile.views.replace_icon_with_default'),
+
         # Get a list of suggestions for the search input,
         # formatted the way that the jQuery autocomplete plugin wants it.
         (r'^search/get_suggestions$', 'mysite.search.views.request_jquery_autocompletion_suggestions'),

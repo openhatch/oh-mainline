@@ -717,6 +717,21 @@ def get_project_icons_dict(projects):
 
     return dict
 
+def replace_icon_with_default(request):
+    "Expected postcondition: project's icon_dict says it is generic."
+    """
+    Expected output will look something like this:
+    {
+            'success': true,
+            'portfolio_entry__pk': 0,
+            'new_icon_url': '/static/bananas.png'
+    }"""
+    data = {}
+    data['success'] = True
+    data['portfolio_entry__pk'] = int(request.POST['portfolio_entry__pk'])
+    data['new_icon_url'] = 'definitely not correct'
+    return mysite.base.views.json_response(data)
+
 @login_required
 def import_do(request):
     # {{{

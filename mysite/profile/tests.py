@@ -1084,4 +1084,43 @@ class GetProjectIcons(TwillTests):
                     "Expected that the value of is_generic for this project "
                     "matches the project with the corresponding pk in expected_output.")
 
+class ReplaceIconWithDefault(TwillTests):
+    fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
+
+    def test_view(self):
+        portfolio_entry = PortfolioEntry.objects.get_or_create(
+                    project=Project.objects.get_or_create(name='project name')[0],
+                    person=Person.objects.get(user__username='paulproteus'))[0]
+        url = reverse(mysite.profile.views.replace_icon_with_default)
+        data = {
+                'portfolio_entry__pk': portfolio_entry.pk
+                };
+
+        # Check precondition
+        def get_project_icon_dict():
+            return mysite.profile.views.get_project_icons_dict(
+                    [portfolio_entry.project]).values()[0]
+
+        self.assertFalse(get_project_icon_dict()['is_generic'],
+                "Expected precondition: project's icon_dict didn't say it was generic "
+                "before we flagged its icon.")
+
+        response = self.login_with_client().post(url, data)
+
+        # Check output
+        response_obj = simplejson.loads(response.content)
+        """response obj will look something like this:
+            'success': true,
+                'portfolio_entry__pk': 0,
+                'new_icon_url': '/static/bananas.png'
+                """
+        self.assert_(response_obj['success'])
+        self.assertEqual(response_obj['portfolio_entry__pk'], portfolio_entry.pk)
+        self.assert_('new_icon_url' in response_obj.keys())
+
+        # Check side-effect
+        self.assert_(get_project_icon_dict()['is_generic'],
+                "Expected postcondition: project's icon_dict says it is generic "
+                "after we flag its icon.")
+
 # vim: set ai et ts=4 sw=4 nu:
