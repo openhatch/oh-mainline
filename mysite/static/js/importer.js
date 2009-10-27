@@ -527,18 +527,42 @@ handleServerErrorInResponseToNewRecordSubmission = function(xhr) {
     Notifier.displayMessage(msg);
 };
 
-
-replaceMeWithSuccessReport = function () {
-    var $flaggerLink = $(this);
+FlagIcon = {};
+FlagIcon.postOptions = {
+    'url': '/profile/views/replace_icon_with_default',
+    'type': 'POST',
+    'dataType': 'json',
+};
+FlagIcon.postOptions.success = function (response) {
+    $portfolioEntry = $('#portfolio_entry_'+response['portfolio_entry__pk']);
+    $portfolioEntry.find('img.project_icon').attr('src', response['new_icon_url']);
 
     // the text() function will remove all children, including the link.
-    $flaggerLink.parent().text('Using default icon.');
+    $portfolioEntry.find('.icon_flagger').text('Using default icon.');
+};
+FlagIcon.postOptions.error = function (response) {
+    alert('error');
+};
+FlagIcon.post = function () {
+    $.ajax(FlagIcon.postOptions);
+};
+FlagIcon.flag = function () {
+    var $flaggerLink = $(this);
+
+    FlagIcon.postOptions.data = {
+        'portfolio_entry__pk': $flaggerLink.closest('.portfolio_entry')
+            .attr('portfolio_entry__pk')
+    };
+    FlagIcon.post();
+};
+FlagIcon.setEventHandlers = function() {
+    $('.icon_flagger a').click(FlagIcon.flag);
 };
 
 setEventHandlers = function() {
     $('a.delete').click(deleteCitationForThisLink);
     $('.citations-wrapper .add').click(drawAddCitationFormNearThisButton);
-    $('.icon_flagger a').click(replaceMeWithSuccessReport);
+    FlagIcon.setEventHandlers();
 };
 $(setEventHandlers);
 

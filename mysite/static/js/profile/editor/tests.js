@@ -286,11 +286,16 @@ test = function () {
     $icon_flagger = $('.icon_flagger').eq(0);
     fireunit.ok($icon_flagger.find('a').size() == 1,
             prefix + "expect link to exist before clicked.");
-    mockedServerResponseToIconFlagging = {
-        'success': true,
-        'portfolio_entry__pk': 0,
-        'new_icon_url': '/static/bananas.png'
-    };
+
+    // Mock post
+    var post_copy = FlagIcon.post;
+    FlagIcon.post = function () {
+        FlagIcon.postOptions.success({
+            'success': true,
+                'portfolio_entry__pk': 0,
+                'new_icon_url': '/static/bananas.png'
+        });
+    }
     $icon_flagger.find('a').trigger('click');
     fireunit.ok($icon_flagger.find('a').size() == 0,
             prefix + "expect link to be removed.'");
@@ -301,6 +306,8 @@ test = function () {
             prefix + "expect there to be an icon");
     fireunit.ok($icon.attr('src') == '/static/bananas.png',
             "expect icon src to match mockedServerResponseToIconFlagging");
+
+    FlagIcon.post = post_copy;
 };
 $(test);
 
