@@ -80,14 +80,23 @@ def add_citation_manually_do(request):
     form = mysite.profile.forms.ManuallyAddACitationForm(request.POST)
     form.set_user(request.user)
 
-    # FIXME: Validate that the user owns this pf entry.
+    output = {
+            'form_container_element_id': request.POST['form_container_element_id']
+            }
     if form.is_valid():
         form.save()
-
-        return HttpResponse('it worked!') # Return with status code 200
+        
+        json = simplejson.dumps(output)
+        return HttpResponse(json, mimetype='application/json') 
 
     else:
-        return HttpResponseServerError()
+        error_msgs = []
+        for error in form.errors.values():
+            error_msgs.extend(eval(error.__repr__())) # don't ask questions.
+
+        output['error_msgs'] = error_msgs
+        json = simplejson.dumps(output)
+        return HttpResponseServerError(json, mimetype='application/json')
 
     #}}}
 

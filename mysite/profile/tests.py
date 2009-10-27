@@ -1050,5 +1050,8 @@ class AddCitationManually(TwillTests):
         self.assertEqual(Citation.objects.filter(url=input_data['url']).count(), 0,
                 "Expected no citation to be created when you try "
                 "to add one for someone else.")
+        
+        # Check that an error is reported in the response.
+        self.assert_(len(simplejson.loads(response.content)['errors']) == 1)
 
 # vim: set ai et ts=4 sw=4 nu:

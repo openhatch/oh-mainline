@@ -479,19 +479,40 @@ drawAddCitationFormNearThisButton = function () {
     $citationForm.find('[name="form_container_element_id"]').val(formContainerElementID);
 
     var ajaxOptions = {
-        'success': askServerForPortfolio,
-        'error': handleServerErrorInResponseToNewRecordSubmission
+        'success': handleServerResponseToNewRecordSubmission,
+        'error': handleServerErrorInResponseToNewRecordSubmission,
+        'dataType': 'json'
     };
     $citationForm.submit(function() {
             $(this).ajaxSubmit(ajaxOptions);
+            $(this).find('input').attr('disabled','disabled');
             return false;});
 
     return false; // FIXME: Test this.
 }
 
-handleServerErrorInResponseToNewRecordSubmission = function () {
-    alert('error');
-    // FIXME: test this.
+handleServerResponseToNewRecordSubmission = function(response) {
+    askServerForPortfolio();
+    $form_container = $('#'+response.form_container_element_id);
+    $form_container.remove();
+};
+handleServerErrorInResponseToNewRecordSubmission = function(xhr) {
+    responseObj = $.secureEvalJSON(xhr.responseText);
+
+    var msg = 'There was at least one problem submitting your citation: <ul>';
+    for (var i = 0; i < responseObj.error_msgs.length; i++) {
+        msg += "<li class='error-message'>"
+            + responseObj.error_msgs[i]
+            + "</li>";
+    }
+    msg += "</ul>";
+
+    $citationFormContainer = $('#'+responseObj.form_container_element_id);
+    $citationFormContainer.find('input').removeAttr('disabled');
+
+    // FIXME: XSS vulnerability? This will work:
+    // msg += "<script>alert('injection');</script>";
+    Notifier.displayMessage(msg);
 };
 
 setEventHandlers = function() {

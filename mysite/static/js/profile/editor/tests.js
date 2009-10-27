@@ -198,4 +198,19 @@ test = function () {
 };
 $(test);
 
+prefix = "submission of a new citation: ";
+test = function () {
+    $form_container = $('.citation-forms li:eq(0)');
+    fireunit.ok($form_container.size() == 1,
+            prefix + "there's a form container eq(0)");
+    var response = {
+        'form_container_element_id': $form_container.attr('id')
+    };
+    handleServerResponseToNewRecordSubmission(response);
+    fireunit.ok($('#'+response.form_container_element_id).size() == 0,
+            prefix + "the form container has disappeared after we handle "
+            + "the server's response to the successful submission of the form therein.");
+};
+$(test);
+
 // vim: set nu:
