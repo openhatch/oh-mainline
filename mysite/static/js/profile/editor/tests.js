@@ -443,4 +443,56 @@ function checkNotifiersForText(text) {
     window.setTimeout(checkNotifiersInAMoment, 1000); // Doesn't seem to work when <= 500.
 }
 
+/* Unit-test the deletion of portfolio entries */
+testDeletePortfolioEntry = function(params) {
+    var prefix = "test of PortfolioEntry.Delete: ";
+
+    /* Reset the portfolio DOM objects */
+    $('#portfolio *').remove();
+    askServerForPortfolio();
+
+    /* Verify that there is a Portfolio Entry represented on the page
+     * and that it has a delete link
+     */
+    $pfEntry = $('.portfolio_entry:eq(0)');
+    fireunit.ok(
+            $pfEntry.size() == 1,
+            prefix + "there's at least one pf entry on the page");
+
+    $deleteLink = $pfEntry.find('a.delete');
+    fireunit.ok(
+            $deleteLink.size() == 1,
+            prefix + "there's a delete link on the first pf entry");
+
+    fireunit.ok(
+            $pfEntry.find('.citations li.unpublished').size() > 0,
+            prefix + "(precondition) there's at least one unpublished citation in this pf entry.");
+
+    // Test just the UI.
+    
+    // Mock out post to server for deleting a PortfolioEntry.
+    var post_copy = PortfolioEntry.Delete.post;
+    PortfolioEntry.Delete.post = function() {
+	// Check that the data in the post are correct.
+	var data = PortfolioEntry.Delete.postOptions.data;
+	fireunit.ok(data.portfolio_entry__pk == '0', /* This is all we submit */
+		    prefix + "Expected us to submit the primary key of the p_e we want to delete."); 
+	// Don't actually post; instead, just handle a fake response object.
+	var fakeResponse = {
+	    'portfolio_entry__pk': $pfEntry.attr('portfolio_entry__pk')
+	};
+	PortfolioEntry.Delete.postOptions.success(fakeResponse);
+
+	/* Verify that the $pfEntry is now hidden */
+	fireunit.ok($pfEntry[0].style.display == 'none', 
+		    prefix + 'Expected pfEntry to disappear.');
+    };
+    
+    $deleteLink.trigger('click');
+    
+    // Reset patching
+    PortfolioEntry.Delete.post = post_copy;
+};
+
+$(testDeletePortfolioEntry);
 // vim: set nu:

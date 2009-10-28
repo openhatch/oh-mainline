@@ -608,6 +608,7 @@ $(HowTo.init);
 PortfolioEntry = {};
 PortfolioEntry.setEventHandlers = function() {
     PortfolioEntry.Save.setEventHandlers();
+    PortfolioEntry.Delete.setEventHandlers();
 };
 
 PortfolioEntry.Save = {};
@@ -640,6 +641,39 @@ PortfolioEntry.Save.save = function () {
 PortfolioEntry.Save.setEventHandlers = function() {
     $('.portfolio_entry a.publish').click(PortfolioEntry.Save.save);
 };
+
+PortfolioEntry.Delete = {};
+PortfolioEntry.Delete.postOptions = {
+    'url': '/profile/views/delete_portfolio_entry_do',
+    'type': 'POST',
+    'dataType': 'json',
+};
+PortfolioEntry.Delete.postOptions.success = function (response) {
+    /* Find the portfolio entry section of the page, and make it disappear. */
+    var pk = response.portfolio_entry__pk;
+    $portfolioEntry = $('#portfolio_entry_'+pk);
+    $portfolioEntry[0].style.display = 'none';
+    Notifier.displayMessage('Portfolio entry deleted.');
+};
+PortfolioEntry.Delete.postOptions.error = function (response) {
+    Notifier.displayMessage('Oh snap! We failed to delete your PortfolioEntry.');
+};
+PortfolioEntry.Delete.post = function () {
+    $.ajax(PortfolioEntry.Delete.postOptions);
+};
+PortfolioEntry.Delete.delete = function () {
+    $deleteLink = $(this);
+    $pfEntry = $deleteLink.closest('.portfolio_entry');
+    PortfolioEntry.Delete.postOptions.data = {
+        'portfolio_entry__pk': $pfEntry.attr('portfolio_entry__pk'),
+    };
+    PortfolioEntry.Delete.post();
+    return false;
+}
+PortfolioEntry.Delete.setEventHandlers = function() {
+    $('.portfolio_entry .actions a.delete').click(PortfolioEntry.Delete.delete);
+};
+
 
 setEventHandlers = function() {
     $('a.delete_citation').click(deleteCitationForThisLink);
