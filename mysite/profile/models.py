@@ -353,13 +353,20 @@ class Citation(models.Model):
     def summary(self):
         # FIXME: Pluralize correctly.
         # FIXME: Use "since year_started"
+
+        if self.distinct_months != 1:
+            suffix = 's'
+        else:
+            suffix = ''
+
         if self.data_import_attempt:
             if self.data_import_attempt.source == 'rs':
                 if self.distinct_months is None:
                     raise ValueError, "Er, Ohloh always gives us a # of months."
-                return "%s: Coded for %d month(s) in %s." % (
+                return "%s: Coded for %d month%s in %s." % (
                         self.data_import_attempt.get_source_display(),
                         self.distinct_months,
+                        suffix,
                         self.languages,
                         )
             elif self.data_import_attempt.source == 'lp':
@@ -370,7 +377,12 @@ class Citation(models.Model):
                 raise ValueError, "Do not know how to summarize this."
         elif self.url is not None:
             return self.url
-                    
+        elif self.distinct_months is not None and self.languages is not None:
+            return "Coded for %d month%s in %s." % (
+                    self.distinct_months,
+                    suffix,
+                    self.languages,
+                    )
 
     @staticmethod
     def create_from_text(
