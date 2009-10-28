@@ -25,7 +25,11 @@ class Migration:
             citation.distinct_months = project_exp.man_months # gend0r
             citation.languages = project_exp.primary_language
             citation.contributor_role = project_exp.person_role
+            citation.is_published = True
             citation.save()
+            print citation.__dict__
+            print citation.data_import_attempt.__dict__
+            print Citation.objects.get(pk=citation.pk).summary
             project_exp.delete()
     
     def backwards(self, orm):

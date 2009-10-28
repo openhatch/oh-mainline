@@ -360,7 +360,7 @@ class Citation(models.Model):
             suffix = ''
 
         if self.data_import_attempt:
-            if self.data_import_attempt.source == 'rs':
+            if self.data_import_attempt.source in ['rs', 'ou']:
                 if self.distinct_months is None:
                     raise ValueError, "Er, Ohloh always gives us a # of months."
                 return "%s: Coded for %d month%s in %s." % (
@@ -374,7 +374,7 @@ class Citation(models.Model):
                     self.data_import_attempt.get_source_display(),
                     self.contributor_role)
             else:
-                raise ValueError, "Do not know how to summarize this."
+                raise ValueError, "There's a DIA of a kind I don't know how to summarize."
         elif self.url is not None:
             return self.url
         elif self.distinct_months is not None and self.languages is not None:
@@ -383,6 +383,8 @@ class Citation(models.Model):
                     suffix,
                     self.languages,
                     )
+
+        raise ValueError("There's no DIA and I don't know how to summarize this.")
 
     @staticmethod
     def create_from_text(
