@@ -641,10 +641,12 @@ class Portfolio(TwillTests):
                         "paulproteus has a task recorded in the DB "
                         "for source %s." % source_key)
 
-    def _test_get_import_status(self, client, must_find_nothing=False):
+    def _test_get_import_status(self, client, but_first=None, must_find_nothing=False):
         "Just make sure that the JSON returned by the view is "
         "appropriate considering what's in the database."
-
+        ####################################################
+        ################# LOAD DATA ########################
+        ####################################################
         paulproteus = Person.objects.get(user__username='paulproteus')
 
         citation = Citation(
@@ -662,6 +664,9 @@ class Portfolio(TwillTests):
         unfinished_dia = DataImportAttempt(source='rs', query='foo',
                 completed=False, person=paulproteus)
         unfinished_dia.save()
+
+        if but_first is not None:
+            but_first()
 
         response = client.get(
                 reverse(mysite.profile.views.gimme_json_for_portfolio))
@@ -712,6 +717,18 @@ class Portfolio(TwillTests):
     def test_barry_cannot_get_paulproteuss_import_status(self):
         self._test_get_import_status(
                 client=self.login_with_client_as_barry(),
+                must_find_nothing=True)
+
+    def test_paulproteus_gets_no_deleted_projects(self):
+        def but_first():
+            projects = Project.objects.all()
+            for project in projects:
+                project.is_deleted = True
+                project.save()
+                
+        self._test_get_import_status(
+                client=self.login_with_client(),
+                but_first=but_first,
                 must_find_nothing=True)
     # }}}
 
