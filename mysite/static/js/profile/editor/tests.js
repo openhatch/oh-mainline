@@ -311,15 +311,104 @@ test = function () {
 };
 $(test);
 
-test = function() {
-    var prefix = "save textareas: ";
+test = function(params) {
+    var mock = params.mock;
+    console.log('mock', mock);
 
-    $publishLink = $('.portfolio_entry:eq(0) a.publish');
+    var prefix = "test of PortfolioEntry.Save: ";
+
+    if (!mock) { prefix = "integration " + prefix; }
+
+    $pfEntry = $('.portfolio_entry:eq(0)');
+    fireunit.ok(
+            $pfEntry.size() == 1,
+            prefix + "there's at least one pf entry on the page");
+
+    $publishLink = $pfEntry.find('a.publish');
     fireunit.ok(
             $publishLink.size() == 1,
-            prefix + "there's a publish link on the first portfolio entry");
-    // click publish
+            prefix + "there's a publish link on the first pf entry");
+
+    $projectDescriptionField = $pfEntry.find('textarea.project_description')
+    fireunit.ok(
+            $projectDescriptionField.size() == 1,
+            prefix + "there's a textarea selectable by .project_description "
+            + "on the first portfolio entry");
+
+    $experienceDescriptionField = $pfEntry.find('textarea.experience_description')
+    fireunit.ok(
+            $experienceDescriptionField.size() == 1,
+            prefix + "there's a textarea selectable by .experience_escription "
+            + "on the first portfolio entry");
+
+    // Edit textareas 
+    $projectDescriptionField.val('new project description');
+    $experienceDescriptionField.val('new experience description');
+
+    if (mock) {
+        // Mock out post to server for saving a PortfolioEntry.
+        var post_copy = PortfolioEntry.Save.post;
+        PortfolioEntry.Save.post = function() {
+            alert('mocked post');
+            // Check that the data in the post are correct.
+            var data = PortfolioEntry.Save.postOptions.data;
+            fireunit.ok(
+                    data.project_description == 'new project description',
+                    prefix + "project_description in post matches textarea");
+            fireunit.ok(
+                    data.experience_description == 'new experience description',
+                    prefix + "experience_description in post matches textarea");
+            
+            // Don't actually post; instead, just handle a fake response object.
+            var fakeResponse = {
+                'portfolio_entry__pk': $pfEntry.attr('portfolio_entry__pk')
+            };
+            PortfolioEntry.Save.postOptions.success(fakeResponse);
+        };
+    }
+
+    $publishLink.trigger('click');
+
+    if (mock) {
+        // Reset mocking
+        PortfolioEntry.Save.post = post_copy;
+    }
+
+    function refreshAndCheckTextareas() {
+        askServerForPortfolio();
+
+        var data = PortfolioEntry.Save.postOptions.data;
+
+        // Check that the textareas are populated correctly.
+        fireunit.ok(
+                data.project_description == 'new project description',
+                prefix + "project_description in post matches textarea");
+        fireunit.ok(
+                data.experience_description == 'new experience description',
+                prefix + "experience_description in post matches textarea");
+    }
+
+    if (!mock) {
+
+        refreshAndCheckTextareas();
+
+        // Now do it again, but ruder.
+        // Edit textareas, but *don't save*.
+        $projectDescriptionField.val('unsaved project description');
+        $experienceDescriptionField.val('unsaved experience description');
+
+        // Ensure the new values have been overwritten.
+        refreshAndCheckTextareas();
+    }
+
 };
-$(test);
+testUI = function() {
+    test({mock: true}); // test just the UI
+};
+testIntegration = function() {
+    test({mock: false}); // integration test
+}
+$(testUI);
+$(testIntegration);
 
 // vim: set nu:

@@ -604,11 +604,44 @@ HowTo = {
 };
 $(HowTo.init);
 
+PortfolioEntry = {};
+PortfolioEntry.setEventHandlers = function() {
+    PortfolioEntry.Save.setEventHandlers();
+};
+
+PortfolioEntry.Save = {};
+PortfolioEntry.Save.postOptions = {
+    'url': '/profile/views/portfolio_entry/save',
+    'type': 'POST',
+    'dataType': 'json',
+};
+PortfolioEntry.Save.postOptions.success = function (response) {
+    alert('success');
+};
+PortfolioEntry.Save.postOptions.error = function (response) {
+    alert('error');
+};
+PortfolioEntry.Save.post = function () {
+    $.ajax(PortfolioEntry.Save.postOptions);
+};
+PortfolioEntry.Save.save = function () {
+    $saveLink = $(this);
+    $pfEntry = $saveLink.closest('.portfolio_entry');
+    PortfolioEntry.Save.postOptions.data = {
+        'project_description': $pfEntry.find('.project_description').val(),
+        'experience_description': $pfEntry.find('.experience_description').val()
+    };
+    PortfolioEntry.Save.post();
+}
+PortfolioEntry.Save.setEventHandlers = function() {
+    $('.portfolio_entry a.publish').click(PortfolioEntry.Save.save);
+};
 
 setEventHandlers = function() {
     $('a.delete').click(deleteCitationForThisLink);
     $('.citations-wrapper .add').click(drawAddCitationFormNearThisButton);
     FlagIcon.setEventHandlers();
+    PortfolioEntry.setEventHandlers();
 };
 $(setEventHandlers);
 
