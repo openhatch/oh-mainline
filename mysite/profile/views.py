@@ -694,28 +694,10 @@ def gimme_json_for_portfolio(request):
         'citations': citations,
         'portfolio_entries': portfolio_entries,
         'projects': projects,
-        'project_icons': get_project_icons_dict(projects_unserialized),
         'summaries': summaries})
 
     return HttpResponse(json, mimetype='application/json')
     # }}}
-
-def get_project_icons_dict(projects):
-    """ Output:
-    {
-        0: {
-            'is_generic': True,
-            'url': '/...'
-        },
-        ...
-    }
-    """
-    dict = {}
-    for project in projects:
-        path, url, is_generic = project_icon_url(project.name)
-        dict[project.pk] = {'is_generic': is_generic, 'url': url}
-
-    return dict
 
 def replace_icon_with_default(request):
     "Expected postcondition: project's icon_dict says it is generic."
@@ -726,9 +708,18 @@ def replace_icon_with_default(request):
             'portfolio_entry__pk': 0,
             'new_icon_url': '/static/bananas.png'
     }"""
+    portfolio_entry = PortfolioEntry.objects.get(
+            pk=int(request.POST['portfolio_entry__pk']),
+            person__user=request.user)
+
+    # set as default
+    portfolio_entry.project.icon = None
+    portfolio_entry.project.save()
+
+    # prepare output
     data = {}
     data['success'] = True
-    data['portfolio_entry__pk'] = int(request.POST['portfolio_entry__pk'])
+    data['portfolio_entry__pk'] = portfolio_entry.pk
     data['new_icon_url'] = 'definitely not correct'
     return mysite.base.views.json_response(data)
 

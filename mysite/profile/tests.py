@@ -1,5 +1,6 @@
 # Imports {{{
 from mysite.base.tests import make_twill_url, TwillTests
+import mysite.account.tests
 
 from mysite.search.models import Project
 from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_Person_Tag, Link_ProjectExp_Tag, DataImportAttempt, PortfolioEntry, Citation
@@ -26,6 +27,7 @@ import mock
 import django.test
 from django.test.client import Client
 from django.core import management, serializers
+from django.core.files.base import ContentFile
 from django.core.urlresolvers import reverse
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
@@ -1096,14 +1098,10 @@ class ReplaceIconWithDefault(TwillTests):
                 'portfolio_entry__pk': portfolio_entry.pk
                 };
 
-        # Check precondition
-        def get_project_icon_dict():
-            return mysite.profile.views.get_project_icons_dict(
-                    [portfolio_entry.project]).values()[0]
-
-        self.assertFalse(get_project_icon_dict()['is_generic'],
-                "Expected precondition: project's icon_dict didn't say it was generic "
-                "before we flagged its icon.")
+        image_data = open(mysite.account.tests.photo('static/sample-photo.png')).read()
+        portfolio_entry.project.icon.save('', ContentFile(image_data))
+        self.assert_(portfolio_entry.project.icon,
+                "Expected precondition: project has a nongeneric icon.")
 
         response = self.login_with_client().post(url, data)
 
@@ -1119,8 +1117,9 @@ class ReplaceIconWithDefault(TwillTests):
         self.assert_('new_icon_url' in response_obj.keys())
 
         # Check side-effect
-        self.assert_(get_project_icon_dict()['is_generic'],
-                "Expected postcondition: project's icon_dict says it is generic "
-                "after we flag its icon.")
+        portfolio_entry = PortfolioEntry.objects.get(pk=portfolio_entry.pk)
+        self.assertFalse(portfolio_entry.project.icon,
+                "Expected postcondition: portfolio entry's icon evaluates to False "
+                "because it is generic.")
 
 # vim: set ai et ts=4 sw=4 nu:
