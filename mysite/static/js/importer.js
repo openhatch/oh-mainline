@@ -447,7 +447,7 @@ drawAddCitationForm = function() {
 
 Notifier = {};
 Notifier.displayMessage = function(message) {
-    $.jGrowl(message, {'life': 10000});
+    $.jGrowl(message, {'life': 2000});
 };
 
 /******************
@@ -555,6 +555,7 @@ FlagIcon.flag = function () {
             .attr('portfolio_entry__pk')
     };
     FlagIcon.post();
+    return false;
 };
 FlagIcon.setEventHandlers = function() {
     $('.icon_flagger a').click(FlagIcon.flag);
@@ -616,10 +617,11 @@ PortfolioEntry.Save.postOptions = {
     'dataType': 'json',
 };
 PortfolioEntry.Save.postOptions.success = function (response) {
-    alert('success');
+    Notifier.displayMessage('Portfolio entry saved.');
 };
 PortfolioEntry.Save.postOptions.error = function (response) {
-    alert('error');
+    Notifier.displayMessage('Oh dear! There was an error saving this entry in your portfolio. '
+            + 'A pox on the programmers.');
 };
 PortfolioEntry.Save.post = function () {
     $.ajax(PortfolioEntry.Save.postOptions);
@@ -633,6 +635,7 @@ PortfolioEntry.Save.save = function () {
         'experience_description': $pfEntry.find('.experience_description').val()
     };
     PortfolioEntry.Save.post();
+    return false;
 }
 PortfolioEntry.Save.setEventHandlers = function() {
     $('.portfolio_entry a.publish').click(PortfolioEntry.Save.save);

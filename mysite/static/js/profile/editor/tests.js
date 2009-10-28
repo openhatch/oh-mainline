@@ -366,6 +366,8 @@ test = function(params) {
                 'portfolio_entry__pk': $pfEntry.attr('portfolio_entry__pk')
             };
             PortfolioEntry.Save.postOptions.success(fakeResponse);
+
+            checkNotifiersForText('Portfolio entry saved');
         };
 
         $publishLink.trigger('click');
@@ -378,6 +380,8 @@ test = function(params) {
         // Integration test.
 
         $publishLink.trigger('click');
+
+        checkNotifiersForText('Portfolio entry saved');
 
         function refreshAndCheckTextareas() {
             askServerForPortfolio();
@@ -397,13 +401,16 @@ test = function(params) {
         refreshAndCheckTextareas();
 
         // Now do it again, but ruder.
-        // Edit textareas, but *don't save*.
+        // Edit textareas, but *don't* click on the save button.
         $projectDescriptionField.val('unsaved project description');
         $experienceDescriptionField.val('unsaved experience description');
 
         // Ensure the new values have been overwritten.
         refreshAndCheckTextareas();
     }
+
+    PortfolioEntry.Save.postOptions.error({});
+    checkNotifiersForText('error saving portfolio entry');
 
 };
 testUI = function() {
@@ -417,5 +424,15 @@ testIntegration = function() {
     test({mock: false}); // integration test
 }
 $(testIntegration);
+
+function checkNotifiersForText(text) {
+    var checkNotifiersInAMoment = function () {
+        var $allNotifiers = $('.jGrowl-notification .message');
+        var messagesTogether = $notifier.text(); // join the text of all the messages
+        fireunit.ok(messagesTogether.match(textj) != null,
+                prefix + "one of the notifier messages includes the phrase '" + text + "'");
+    }
+    window.setTimeout(checkNotifiersInAMoment, 500);
+}
 
 // vim: set nu:
