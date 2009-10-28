@@ -720,16 +720,46 @@ class Portfolio(TwillTests):
                 must_find_nothing=True)
 
     def test_paulproteus_gets_no_deleted_projects(self):
-        def but_first():
-            projects = Project.objects.all()
-            for project in projects:
-                project.is_deleted = True
-                project.save()
-                
-        self._test_get_import_status(
-                client=self.login_with_client(),
-                but_first=but_first,
-                must_find_nothing=True)
+        ####################################################
+        ################# LOAD DATA ########################
+        ####################################################
+        paulproteus = Person.objects.get(user__username='paulproteus')
+
+        citation = Citation(
+                portfolio_entry=PortfolioEntry.objects.get_or_create(
+                    project=Project.objects.get_or_create(name='project name')[0],
+                    person=paulproteus)[0],
+                distinct_months=1,
+                languages='Python',
+                data_import_attempt=DataImportAttempt.objects.get_or_create(
+                    source='rs', query='paulproteus', completed=True, person=paulproteus)[0]
+                )
+        citation.save()
+
+        finished_dia = citation.data_import_attempt
+        unfinished_dia = DataImportAttempt(source='rs', query='foo',
+                completed=False, person=paulproteus)
+        unfinished_dia.save()
+
+        # Delete the projects
+        portfolio_entries = PortfolioEntry.objects.all()
+        for portfolio_entry in portfolio_entries:
+            portfolio_entry.is_deleted = True
+            portfolio_entry.save()
+            
+        # Get the JSON
+
+        response = self.login_with_client().get(
+                reverse(mysite.profile.views.gimme_json_for_portfolio))
+        response_decoded = simplejson.loads(response.content)
+
+        self.assertEqual(len(response_decoded['projects']), 0,
+                         "Expected no projects back.")
+        
+        self.assertEqual(len(response_decoded['citations']), 0,
+                         "Expected no citations back.")
+        # Who cares about DIAS.
+
     # }}}
 
 class ImporterPublishCitation(TwillTests):

@@ -595,8 +595,9 @@ def gimme_json_for_portfolio(request):
     person = request.user.get_profile()
 
     # Citations don't naturally serialize summaries.
-    citations = list(Citation.objects.filter(portfolio_entry__person=person, is_deleted=False))
-    portfolio_entries_unserialized = PortfolioEntry.objects.filter(person=person)
+    citations = list(Citation.objects.filter(portfolio_entry__person=person, is_deleted=False, portfolio_entry__is_deleted=False))
+    portfolio_entries_unserialized = PortfolioEntry.objects.filter(person=person,
+                                                                   is_deleted=False)
     projects_unserialized = [p.project for p in portfolio_entries_unserialized]
     
     # Serialize citation summaries
