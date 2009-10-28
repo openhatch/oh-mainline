@@ -346,10 +346,12 @@ test = function(params) {
     $experienceDescriptionField.val('new experience description');
 
     if (mock) {
+
+        // Test just the UI.
+        
         // Mock out post to server for saving a PortfolioEntry.
         var post_copy = PortfolioEntry.Save.post;
         PortfolioEntry.Save.post = function() {
-            alert('mocked post');
             // Check that the data in the post are correct.
             var data = PortfolioEntry.Save.postOptions.data;
             fireunit.ok(
@@ -365,30 +367,32 @@ test = function(params) {
             };
             PortfolioEntry.Save.postOptions.success(fakeResponse);
         };
-    }
 
-    $publishLink.trigger('click');
+        $publishLink.trigger('click');
 
-    if (mock) {
         // Reset mocking
         PortfolioEntry.Save.post = post_copy;
     }
+    else {
 
-    function refreshAndCheckTextareas() {
-        askServerForPortfolio();
+        // Integration test.
 
-        var data = PortfolioEntry.Save.postOptions.data;
+        $publishLink.trigger('click');
 
-        // Check that the textareas are populated correctly.
-        fireunit.ok(
-                data.project_description == 'new project description',
-                prefix + "project_description in post matches textarea");
-        fireunit.ok(
-                data.experience_description == 'new experience description',
-                prefix + "experience_description in post matches textarea");
-    }
+        function refreshAndCheckTextareas() {
+            askServerForPortfolio();
 
-    if (!mock) {
+            var data = PortfolioEntry.Save.postOptions.data;
+
+            // Check that the textareas are populated correctly.
+            fireunit.ok(
+                    data.project_description == 'new project description',
+                    prefix + "project_description in post matches textarea");
+            fireunit.ok(
+                    data.experience_description == 'new experience description',
+                    prefix + "experience_description in post matches textarea");
+        }
+
 
         refreshAndCheckTextareas();
 
