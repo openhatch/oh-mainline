@@ -3,6 +3,7 @@ from django.core.files.base import ContentFile
 from django.core.files.images import get_image_dimensions
 from mysite.customs import ohloh
 import datetime
+import uuid
 
 def get_image_data_scaled(image_data, width):
     # scale it
@@ -44,7 +45,7 @@ class Project(models.Model):
     # In case we need it 
     # dont_use_ohloh_icon = models.BooleanField(default=False)
     icon = models.ImageField(
-            upload_to=get_icon_path,
+            upload_to=lambda a,b: Project.get_icon_path(a, b),
             null=True,
             default=None)
 
