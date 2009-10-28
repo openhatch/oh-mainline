@@ -611,7 +611,7 @@ PortfolioEntry.setEventHandlers = function() {
 
 PortfolioEntry.Save = {};
 PortfolioEntry.Save.postOptions = {
-    'url': '/profile/views/portfolio_entry/save',
+    'url': '/profile/views/save_portfolio_entry_do',
     'type': 'POST',
     'dataType': 'json',
 };
@@ -628,6 +628,7 @@ PortfolioEntry.Save.save = function () {
     $saveLink = $(this);
     $pfEntry = $saveLink.closest('.portfolio_entry');
     PortfolioEntry.Save.postOptions.data = {
+        'portfolio_entry__pk': $pfEntry.attr('portfolio_entry__pk'),
         'project_description': $pfEntry.find('.project_description').val(),
         'experience_description': $pfEntry.find('.experience_description').val()
     };
