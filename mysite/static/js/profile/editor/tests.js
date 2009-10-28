@@ -495,4 +495,24 @@ testDeletePortfolioEntry = function(params) {
 };
 
 $(testDeletePortfolioEntry);
+
+prefix = "citation howto: ";
+testCitationHowTo = function() {
+    $howtos = $('.citations-wrapper .howto');
+    fireunit.ok($howtos.size() > 0, prefix + "Some howtos appear on the page.");
+
+    $firstHowtoHideLink = $howtos.eq(0).find('a.hide_me');
+    $firstHowtoHideLink.trigger('click');
+
+    fireunit.ok($howtos.filter(':visible').size() == 0, prefix + "No howtos are visible.");
+    $howtos.each(function () {
+            $howto = $(this);
+            $showMeLink = $howto.closest('.citations-wrapper').find('a.show_me');
+            fireunit.ok($showMeLink.size() == 1, prefix + "show me link exists for this howto.");
+            $showMeLink.trigger('click');
+            fireunit.ok($howto.is(':visible'), "how to is visible after showme clicked.");
+            });
+
+};
+$(testCitationHowTo);
 // vim: set nu:
