@@ -347,6 +347,7 @@ class Citation(models.Model):
     date_created = models.DateTimeField(default=datetime.datetime.utcnow)
     is_published = models.BooleanField(default=False) # unpublished == Unread
     is_deleted = models.BooleanField(default=False)
+    old_summary = models.TextField(null=True, default=None)
 
     @property
     def summary(self):
