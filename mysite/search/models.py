@@ -37,7 +37,7 @@ class Project(models.Model):
     @staticmethod
     def get_icon_path(instance, filename):
         # MEDIA_ROOT is prefixed automatically.
-        return 'images/icons/projects/%s' % uuid.uuid4().hex
+        return 'images/icons/projects/%s.png' % uuid.uuid4().hex
 
     name = models.CharField(max_length=200, unique = True)
     language = models.CharField(max_length=200)
