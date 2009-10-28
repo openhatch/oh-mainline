@@ -408,7 +408,7 @@ test = function(params) {
     }
 
     PortfolioEntry.Save.postOptions.error({});
-    checkNotifiersForText('error saving portfolio entry');
+    checkNotifiersForText('error saving this entry');
 
 };
 testUI = function() {
@@ -426,11 +426,12 @@ $(testIntegration);
 function checkNotifiersForText(text) {
     var checkNotifiersInAMoment = function () {
         var $allNotifiers = $('.jGrowl-notification .message');
-        var messagesTogether = $notifier.text(); // join the text of all the messages
-        fireunit.ok(messagesTogether.match(textj) != null,
-                prefix + "one of the notifier messages includes the phrase '" + text + "'");
+        var messagesTogether = $allNotifiers.text(); // join the text of all the messages
+        console.log(messagesTogether);
+        fireunit.ok(messagesTogether.match(text) != null,
+                "one of the notifier messages includes the phrase '" + text + "'");
     }
-    window.setTimeout(checkNotifiersInAMoment, 500);
+    window.setTimeout(checkNotifiersInAMoment, 1000); // Doesn't seem to work when <= 500.
 }
 
 // vim: set nu:
