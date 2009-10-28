@@ -2,6 +2,7 @@ from django.db import models
 from django.core.files.base import ContentFile
 from django.core.files.images import get_image_dimensions
 from mysite.customs import ohloh
+from django.conf import settings
 import datetime
 import StringIO
 import Image
@@ -74,6 +75,18 @@ class Project(models.Model):
         # Since we are saving an icon, also update our scaled-down version of
         # that icon for the badge.
         self.update_badge_icon_from_self_icon()
+
+    def get_url_of_icon_or_generic(self):
+        if self.icon:
+            return settings.MEDIA_URL + self.icon.url
+        else:
+            return settings.MEDIA_URL + 'no-project-icon.png'
+
+    def get_url_of_badge_size_icon_or_generic(self):
+        if self.icon_smaller_for_badge:
+            return settings.MEDIA_URL + self.icon_smaller_for_badge.url
+        else:
+            return settings.MEDIA_URL + 'no-project-icon-w=40.png'
 
     def update_badge_icon_from_self_icon(self):
         '''This method should be called when you update the Project.icon attribute.

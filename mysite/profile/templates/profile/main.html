@@ -37,7 +37,7 @@
                 <div class='logo'>
                     <a href='/people/{{ person.user.username }}/projects/{{ project.name }}'>
                         <img alt='logo for {{project.name}}'
-                        src='/people/project_icon/{{ project.name }}'/>
+                        src='{{ project.get_url_of_icon_or_generic }}'/>
                     </a>
                 </div>
                 <a href='/people/{{ person.user.username }}/projects/{{ project.name }}' class='name'>{{ project.name }}
