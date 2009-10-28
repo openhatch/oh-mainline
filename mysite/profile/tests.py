@@ -1063,29 +1063,6 @@ def mock_project_icon_url(project_name):
     return "path", "url", is_generic
 
 
-class GetProjectIcons(TwillTests):
-
-    @mock.patch('mysite.profile.views.project_icon_url', mock_project_icon_url)
-    def test_get_project_icons(self):
-        projects = {
-                # this name needs to be exactly 'generic' for this work
-                'generic': Project(name='generic'),
-                'nongeneric': Project(name='unconventional')
-                }
-        input = projects.values()
-        expected_output = {
-                projects['generic'].pk: {'is_generic': True},
-                projects['nongeneric'].pk: {'is_generic': False},
-                }
-        output = mysite.profile.views.get_project_icons_dict(input)
-        self.assertEqual(output.keys(), expected_output.keys())
-        for project__pk in output:
-            self.assertEqual(
-                    output[project__pk]['is_generic'],
-                    expected_output[project__pk]['is_generic'],
-                    "Expected that the value of is_generic for this project "
-                    "matches the project with the corresponding pk in expected_output.")
-
 class ReplaceIconWithDefault(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
 
