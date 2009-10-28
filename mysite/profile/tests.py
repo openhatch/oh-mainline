@@ -1058,11 +1058,6 @@ class AddCitationManually(TwillTests):
         # Check that an error is reported in the response.
         self.assert_(len(simplejson.loads(response.content)['error_msgs']) == 1)
 
-def mock_project_icon_url(project_name):
-    is_generic = (project_name == 'generic')
-    return "path", "url", is_generic
-
-
 class ReplaceIconWithDefault(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
 
