@@ -898,7 +898,7 @@ def save_portfolio_entry_do(request):
         c.is_published = True
         c.save()
 
-    return mysite.base.views.json_response({
+    return mysite.base.helpers.json_response({
             'success': True,
             'portfolio_entry__pk': pk
         })
