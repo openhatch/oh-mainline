@@ -430,7 +430,7 @@ $(testUI);
 testIntegration = function() {
     test({mock: false}); // integration test
 }
-$(testIntegration);
+//$(testIntegration);
 
 function checkNotifiersForText(text) {
     var checkNotifiersInAMoment = function () {
