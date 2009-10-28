@@ -411,13 +411,11 @@ testUI = function() {
 };
 $(testUI);
 
-/*
 // This should work if we test it for a PortfolioEntry that exists in the DB.
 
 testIntegration = function() {
     test({mock: false}); // integration test
 }
 $(testIntegration);
-*/
 
 // vim: set nu:
