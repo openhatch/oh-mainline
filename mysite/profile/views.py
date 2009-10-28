@@ -954,4 +954,18 @@ def delete_portfolio_entry_do(request):
 
     return HttpResponse("1")
 
+@login_required
+def save_portfolio_entry_do(request):
+    pk = request.POST['portfolio_entry__pk']
+
+    p = PortfolioEntry.objects.get(pk=pk, person__user=request.user)
+    p.project_description = request.POST['project_description']
+    p.experience_description = request.POST['experience_description']
+    p.save()
+
+    return mysite.base.views.json_response({
+            'success': True,
+            'portfolio_entry__pk': pk
+        })
+
 # vim: ai ts=3 sts=4 et sw=4 nu

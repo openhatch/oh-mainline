@@ -141,6 +141,9 @@ urlpatterns = patterns('',
         (r'^profile/views/delete_citation_do$',
                 'mysite.profile.views.delete_citation_do'),
 
+        (r'^profile/views/save_portfolio_entry_do$',
+                'mysite.profile.views.save_portfolio_entry_do'),
+
         (r'^profile/views/delete_portfolio_entry_do$',
                 'mysite.profile.views.delete_portfolio_entry_do'),
 

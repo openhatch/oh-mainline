@@ -1099,4 +1099,38 @@ class ReplaceIconWithDefault(TwillTests):
                 "Expected postcondition: portfolio entry's icon evaluates to False "
                 "because it is generic.")
 
+class SavePortfolioEntry(TwillTests):
+    fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
+
+    def test_save_portfolio_entry(self):
+        url = reverse(mysite.profile.views.save_portfolio_entry_do)
+
+        # setup
+        portfolio_entry = PortfolioEntry.objects.get_or_create(
+                    project=Project.objects.get_or_create(name='project name')[0],
+                    person=Person.objects.get(user__username='paulproteus'))[0]
+
+        input = {
+            'portfolio_entry__pk': portfolio_entry.pk,
+            'project_description': "project description",
+            'experience_description': "experience description",
+        }
+
+        expected_output = {
+            'success': True,
+            'portfolio_entry__pk': str(portfolio_entry.pk)
+        }
+
+        # call view and check output
+        self.assertEqual(
+                simplejson.loads(self.login_with_client().post(url, input).content),
+                expected_output)
+
+        # postcondition
+        portfolio_entry = PortfolioEntry.objects.get(pk=portfolio_entry.pk)
+        self.assertEqual(portfolio_entry.project_description,
+                input['project_description'])
+        self.assertEqual(portfolio_entry.experience_description,
+                input['experience_description'])
+
 # vim: set ai et ts=4 sw=4 nu:
