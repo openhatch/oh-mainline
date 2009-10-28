@@ -526,12 +526,6 @@ def edit_person_info(request):
     # FIXME: This is racey. Only one of these functions should run at once.
     # }}}
 
-def project_icon_web(request, project_name, width = None):
-    # {{{
-    path, url, is_generic = project_icon_url(project_name, width)
-    return HttpResponseRedirect(url)
-    # }}}
-
 def import_commits_by_commit_username(request):
     # {{{
 

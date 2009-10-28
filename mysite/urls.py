@@ -55,13 +55,6 @@ urlpatterns = patterns('',
         (r'^people/info/edit/do$',
             'mysite.profile.views.edit_person_info'),
 
-        (r'^people/project_icon/(?P<project_name>.*)$',
-            'mysite.profile.views.project_icon_web'),
-
-        (r'^people/project_icon_badge/(?P<project_name>.*)$',
-            'mysite.profile.views.project_icon_web',
-         {'width': 40}),
-
         # OpenID URL prefix for django_authopenid.urls
         url(r'^openid/signin/$', oid_views.signin, name='user_signin'),
 
