@@ -67,8 +67,8 @@ models.signals.post_save.connect(create_profile_when_user_created, User)
 class DataImportAttempt(models.Model):
     # {{{
     SOURCE_CHOICES = (
-        ('rs', "Ohloh's repository index"),
-        ('ou', "Ohloh personal account"),
+        ('rs', "Ohloh"),
+        ('ou', "Ohloh"),
         ('lp', "Launchpad"),
         )
     completed = models.BooleanField(default=False)
@@ -363,11 +363,11 @@ class Citation(models.Model):
             if self.data_import_attempt.source in ['rs', 'ou']:
                 if self.distinct_months is None:
                     raise ValueError, "Er, Ohloh always gives us a # of months."
-                return "%s: Coded for %d month%s in %s." % (
-                        self.data_import_attempt.get_source_display(),
+                return "Coded for %d month%s in %s (%s)" % (
                         self.distinct_months,
                         suffix,
                         self.languages,
+                        self.data_import_attempt.get_source_display(),
                         )
             elif self.data_import_attempt.source == 'lp':
                 return "%s: Participated in %s" % (
