@@ -405,7 +405,7 @@ Citation.get = function(id) {
     return citation;
 };
 Citation.$getDeleteLink = function(id) {
-    $link = Citation.$get(id).find('a.delete');
+    $link = Citation.$get(id).find('a.delete_citation');
     return $link;
 };
 
@@ -642,7 +642,7 @@ PortfolioEntry.Save.setEventHandlers = function() {
 };
 
 setEventHandlers = function() {
-    $('a.delete').click(deleteCitationForThisLink);
+    $('a.delete_citation').click(deleteCitationForThisLink);
     $('.citations-wrapper .add').click(drawAddCitationFormNearThisButton);
     FlagIcon.setEventHandlers();
     PortfolioEntry.setEventHandlers();

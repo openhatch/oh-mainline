@@ -133,7 +133,7 @@
     background-repeat: no-repeat;
     background-position: center;
 }
-.citations li .actions a.delete {
+.citations li .actions a.delete_citation {
     background-image: url('/static/images/icons/delete-citation.png');
 }
 .citations li .actions a.delete:hover {
