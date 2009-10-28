@@ -345,12 +345,12 @@ function updatePortfolio(response) {
 	    /* project_description */
 	    $(".project_description", $new_portfolio_entry).text(portfolioEntry.fields.project_description);
 	    	   
-        var icon = response.project_icons[portfolioEntry.fields.project];
 	    /* project_icon */
-	    $(".project_icon", $new_portfolio_entry).attr('src', icon.url);
-
-        if (icon.is_generic) {
+        if (project_we_refer_to.fields.icon == '') {
             $new_portfolio_entry.find('.icon_flagger').remove();
+        }
+        else {
+            $(".project_icon", $new_portfolio_entry).attr('src', "/static/"+project_we_refer_to.fields.icon);
         }
 	    
 	    /* project_name */
@@ -535,7 +535,8 @@ FlagIcon.postOptions = {
 };
 FlagIcon.postOptions.success = function (response) {
     $portfolioEntry = $('#portfolio_entry_'+response['portfolio_entry__pk']);
-    $portfolioEntry.find('img.project_icon').attr('src', response['new_icon_url']);
+    var defaultIconSrc = $('#portfolio_entry_building_block img.project_icon').attr('src');
+    $portfolioEntry.find('img.project_icon').attr('src', defaultIconSrc);
 
     // the text() function will remove all children, including the link.
     $portfolioEntry.find('.icon_flagger').text('Using default icon.');

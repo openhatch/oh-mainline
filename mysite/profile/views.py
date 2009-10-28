@@ -705,12 +705,12 @@ def replace_icon_with_default(request):
     Expected output will look something like this:
     {
             'success': true,
-            'portfolio_entry__pk': 0,
-            'new_icon_url': '/static/bananas.png'
+            'portfolio_entry__pk': 0
     }"""
     portfolio_entry = PortfolioEntry.objects.get(
             pk=int(request.POST['portfolio_entry__pk']),
             person__user=request.user)
+    # FIXME: test for naughty people trying to replace others' icons with the default!
 
     # set as default
     portfolio_entry.project.icon = None
@@ -720,7 +720,6 @@ def replace_icon_with_default(request):
     data = {}
     data['success'] = True
     data['portfolio_entry__pk'] = portfolio_entry.pk
-    data['new_icon_url'] = 'definitely not correct'
     return mysite.base.views.json_response(data)
 
 @login_required

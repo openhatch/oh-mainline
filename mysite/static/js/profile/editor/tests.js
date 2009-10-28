@@ -58,26 +58,26 @@ mockedPortfolioResponse = {
 
     // Projects
     'projects': [
-    {'pk': 0, 'fields': {'name': 'bindlestiff'}},
-    {'pk': 1, 'fields': {'name': 'a project with a generic icon'}},
+    {
+        'pk': 0,
+        'fields': {
+            'name': 'bindlestiff',
+            'icon': 'images/icons/projects/0e9a1d7ab66f407fa9e2e3caf0eeda3d',
+        }
+    },
+    {
+        'pk': 1,
+        'fields': {
+            'name': 'a project with a generic icon',
+            'icon': '',
+        }
+    },
     ],
 
     // Summaries
     'summaries': {
         '0': 'Ohloh repository index: Coded in shell script for 12 months as paulproteus since 2007.',
-        '1': 'Summery'},
-
-    // Project icons
-    'project_icons': {
-        '0': {
-            'is_generic': false,
-            'url': '/people/project_icon/Web%20Team%20projects/'
-        },
-        '1': {
-            'is_generic': true,
-            'url': '/people/project_icon/Web%20Team%20projects/'
-        }
-    }
+        '1': 'Summery'}
 };
 
 testUpdatePortfolio = function() {
@@ -95,7 +95,7 @@ testUpdatePortfolio = function() {
             fireunit.ok( $('.project_name', pee).text() == "bindlestiff",
                 "Expected the new portfolio_entry to say its project name is bindlestiff");
             fireunit.ok( pee.find("img.project_icon").attr('src') == 
-                "/people/project_icon/Web%20Team%20projects/",
+                "/static/images/icons/projects/0e9a1d7ab66f407fa9e2e3caf0eeda3d",
                 "Expected the project icon URL to properly be set.");
             fireunit.ok( $(".project_description", pee).text() == "described",
                 "Expected the new portfolio_entry to say " +
@@ -293,7 +293,6 @@ test = function () {
         FlagIcon.postOptions.success({
             'success': true,
                 'portfolio_entry__pk': 0,
-                'new_icon_url': '/static/bananas.png'
         });
     }
     $icon_flagger.find('a').trigger('click');
@@ -304,8 +303,8 @@ test = function () {
     $icon = $icon_flagger.closest('.portfolio_entry').find('img.project_icon');
     fireunit.ok($icon.size() == 1,
             prefix + "expect there to be an icon");
-    fireunit.ok($icon.attr('src') == '/static/bananas.png',
-            "expect icon src to match mockedServerResponseToIconFlagging");
+    fireunit.ok($icon.attr('src') == '/static/no-project-icon.png',
+            "expect icon src to be (HARDCODED) /static/no-project-icon.png");
 
     FlagIcon.post = post_copy;
 };
