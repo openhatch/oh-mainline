@@ -1085,13 +1085,13 @@ class ReplaceIconWithDefault(TwillTests):
         # Check output
         response_obj = simplejson.loads(response.content)
         """response obj will look something like this:
+        {
             'success': true,
                 'portfolio_entry__pk': 0,
-                'new_icon_url': '/static/bananas.png'
+            }
                 """
         self.assert_(response_obj['success'])
         self.assertEqual(response_obj['portfolio_entry__pk'], portfolio_entry.pk)
-        self.assert_('new_icon_url' in response_obj.keys())
 
         # Check side-effect
         portfolio_entry = PortfolioEntry.objects.get(pk=portfolio_entry.pk)
