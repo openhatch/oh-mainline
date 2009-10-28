@@ -386,14 +386,12 @@ test = function(params) {
         function refreshAndCheckTextareas() {
             askServerForPortfolio();
 
-            var data = PortfolioEntry.Save.postOptions.data;
-
             // Check that the textareas are populated correctly.
             fireunit.ok(
-                    data.project_description == 'new project description',
+                    $pfEntry.find('.project_description').val() == 'new project description',
                     prefix + "project_description in post matches textarea");
             fireunit.ok(
-                    data.experience_description == 'new experience description',
+                    $pfEntry.find('.experience_description').val() == 'new experience description',
                     prefix + "experience_description in post matches textarea");
         }
 
