@@ -970,7 +970,14 @@ class DeletePortfolioEntry(TwillTests):
         response = self.login_with_client().post(reverse(view),
                 {'portfolio_entry__pk': portfolio_entry.pk})
 
-        self.assertEqual(response.content, "1")
+        response_decoded = simplejson.loads(response.content)
+
+        expected_output = {
+            'success': True,
+            'portfolio_entry__pk': portfolio_entry.pk
+        }
+
+        self.assertEqual(response_decoded, expected_output)
         self.assert_(PortfolioEntry.objects.get(pk=portfolio_entry.pk).is_deleted)
 
     def test_delete_portfolio_entry_fails_when_portfolio_entry_doesnt_exist(self):
@@ -979,12 +986,14 @@ class DeletePortfolioEntry(TwillTests):
 
         view = mysite.profile.views.delete_portfolio_entry_do
         response = self.login_with_client().post(reverse(view), {'portfolio_entry__pk': failing_pk})
-        self.assertEqual(response.content, "0")
+        self.assertEqual(simplejson.loads(response.content), 
+                         {'success': False})
 
     def test_delete_portfolio_entry_fails_when_portfolio_entry_not_given(self):
         view = mysite.profile.views.delete_portfolio_entry_do
         response = self.login_with_client().post(reverse(view))
-        self.assertEqual(response.content, "0")
+        self.assertEqual(simplejson.loads(response.content), 
+                         {'success': False})
 
     def test_delete_portfolio_entry_fails_when_portfolio_entry_not_yours(self):
         citation = Citation(
@@ -1003,7 +1012,8 @@ class DeletePortfolioEntry(TwillTests):
         view = mysite.profile.views.delete_portfolio_entry_do
         response = self.login_with_client_as_barry().post(reverse(view))
 
-        self.assertEqual(response.content, "0")
+        self.assertEqual(simplejson.loads(response.content), 
+                         {'success': False})
 
         # Still there betch.
         self.assertFalse(portfolio_entry_not_mine.is_deleted)

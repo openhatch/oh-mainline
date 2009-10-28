@@ -35,6 +35,7 @@ from django.conf import settings
 
 # OpenHatch apps
 import mysite.base.controllers
+import mysite.base.helpers
 from mysite.customs import ohloh
 from mysite.profile.models import \
         Person, ProjectExp, \
@@ -644,7 +645,7 @@ def replace_icon_with_default(request):
     data = {}
     data['success'] = True
     data['portfolio_entry__pk'] = portfolio_entry.pk
-    return mysite.base.views.json_response(data)
+    return mysite.base.helpers.json_response(data)
 
 @login_required
 def import_do(request):
@@ -864,19 +865,22 @@ def delete_citation_do(request):
 @login_required
 def delete_portfolio_entry_do(request):
     try:
-        pk = request.POST['portfolio_entry__pk']
+        pk = int(request.POST['portfolio_entry__pk'])
     except KeyError:
-        return HttpResponse("0")
+        return mysite.base.helpers.json_response({'success': False})
 
     try:
         p = PortfolioEntry.objects.get(pk=pk, person__user=request.user)
     except PortfolioEntry.DoesNotExist:
-        return HttpResponse("0")
+        return mysite.base.helpers.json_response({'success': False})
 
     p.is_deleted = True
     p.save()
 
-    return HttpResponse("1")
+    return mysite.base.helpers.json_response({
+            'success': True,
+            'portfolio_entry__pk': pk})
+         
 
 @login_required
 def save_portfolio_entry_do(request):
