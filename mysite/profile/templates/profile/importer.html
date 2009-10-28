@@ -11,7 +11,7 @@ Portfolio editor
 {% endblock css %}
 
 {% block main %}
-<div id='this-used-to-be-the-importer' class='module'>
+<div id='portfolio' class='module'>
     <div class='head'>
         <h3>Portfolio editor</h3>
         <ul>
@@ -20,8 +20,41 @@ Portfolio editor
                 &laquo; Back to portfolio
             </a>
             </li>
+            <li>
+            <a class='show-howto-link' href='#'>
+                How to use this
+            </a>
+            </li>
         </ul>
     </div>
+    <div class='howto submodule'>
+        <div class='head'>
+            <h3>
+                How to use this
+                <a class='hide-link' href='#'>Hide this</a>
+            </h3>
+        </div>
+        <div class='body'>
+            <ol>
+                <li class='handle'>
+                <h4>What's your handle?</h4>
+                Enter some usernames and
+                email addresses you've used
+                in free software / open source.
+                </li>
+                <li class='hangout'>
+                <h4>Where do you hang out?</h4>
+                <p>Specify where you've used the username/email.</p>
+                <p>&ldquo;All repositories&rdquo; &rarr; Automatically
+                scan <!-- <span style='background-color: yellow;'>FIXME</span> -->
+                an index of open source repositories for your footprints.</p>
+                <p>Or import data associated with your account on another 
+                network.</p>
+                </li>
+            </ol>
+        </div>
+    </div>
+
     <div class='body contains-submodules'>
         <form id='importer' class='submodule' name='import' method='POST'
             action='{% url mysite.profile.views.user_selected_these_dia_checkboxes %}'>
@@ -40,22 +73,22 @@ Portfolio editor
         </form>
 
         <div style='width: 800px;' id="portfolio">
-          <!-- empty; filled in by JavaScript -->
+            <!-- empty; filled in by JavaScript -->
         </div>
 
     </div>
 </div>
 
 <div style="display: none;">
-  <div id="portfolio_entry_building_block">
-      {% include 'profile/editor/portfolio_entry_element.html' %}
-  </div>
-  <div id="citation_building_block">
-      {% include 'profile/editor/citation_element.html' %}
-  </div>
-  <div id="citation_form_building_block">
-      {% include 'profile/editor/citation_form.html' %}
-  </div>
+    <div id="portfolio_entry_building_block">
+        {% include 'profile/editor/portfolio_entry_element.html' %}
+    </div>
+    <div id="citation_building_block">
+        {% include 'profile/editor/citation_element.html' %}
+    </div>
+    <div id="citation_form_building_block">
+        {% include 'profile/editor/citation_form.html' %}
+    </div>
 </div>
 
 
