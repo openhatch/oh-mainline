@@ -560,6 +560,51 @@ FlagIcon.setEventHandlers = function() {
     $('.icon_flagger a').click(FlagIcon.flag);
 };
 
+HowTo = {
+    'init': function () {
+        HowTo.$element = $('#portfolio .howto');
+        HowTo.$hideLink = $('#portfolio .howto .hide-link');
+        HowTo.$showLink = $('#portfolio .show-howto-link');
+
+        var tests = ["HowTo.$element.size() == 1",
+                "HowTo.$hideLink.size() == 1",
+                "HowTo.$showLink.size() == 1"];
+        for (var i = 0; i < tests.length; i++) {
+            fireunit.ok(eval(tests[i]), tests[i]);
+        }
+
+        for (var e in HowTo.events) {
+            HowTo.events[e].bind();
+        }
+    },
+    '$element': null,
+    '$hideLink': null,
+    '$showLink': null,
+    'events': {
+        'hide': {
+            'go': function () {
+                HowTo.$element.fadeOut('slow');
+                HowTo.$showLink.fadeIn('slow');
+                return false;
+            },
+            'bind': function () {
+                HowTo.$hideLink.click(HowTo.events.hide.go);
+            },
+        },
+        'show': {
+            'go': function () {
+                HowTo.$element.fadeIn('slow');
+                return false;
+            },
+            'bind': function () {
+                HowTo.$showLink.click(HowTo.events.show.go);
+            },
+        }
+    }
+};
+$(HowTo.init);
+
+
 setEventHandlers = function() {
     $('a.delete').click(deleteCitationForThisLink);
     $('.citations-wrapper .add').click(drawAddCitationFormNearThisButton);
