@@ -181,10 +181,10 @@ testNoDuplication = function() {
 };
 $(testNoDuplication);
 
-testDeleteCitation = function() {
+test = function() {
     // Clear the deck.
     $('#portfolio *').remove();
-    var test = 'testDeleteCitation asserts: ';
+    var prefix = 'button deletes citation: ';
 
     askServerForPortfolio();
 
@@ -195,9 +195,9 @@ testDeleteCitation = function() {
 
     var citationElementID = '#citation_'+citationID;
     fireunit.ok($(citationElementID).size() == 1,
-            test + "there's a citation with id " + citationElementID);
+            prefix + "there's a citation with id " + citationElementID);
     fireunit.ok($(citationElementID+'.deleted').size() == 1,
-            test + "there's a DELETED citation with id " + citationElementID);
+            prefix + "there's a DELETED citation with id " + citationElementID);
 
     // Let's pretend the server said there was an error in deleting the citation.
     deleteCitationErrorCallback();
@@ -206,19 +206,20 @@ testDeleteCitation = function() {
     var checkNotifierInAMoment = function () {
         var notifier = $('.jGrowl-notification .message');
         console.info(notifier);
-        fireunit.ok(notifier.size() > 0, test + "there's at least one notifier.");
+        fireunit.ok(notifier.size() > 0,
+                prefix + "there's at least one notifier.");
         var message = $('.jGrowl-notification .message').eq(0).text();
         console.log('notifier message: ', message);
         fireunit.ok(message.match(/error.*delete a citation/) != null,
-                test + "notifier message matches /error.*delete a citation/");
+                prefix + "notifier message matches /error.*delete a citation/");
     }
     window.setTimeout(checkNotifierInAMoment, 500);
 };
-$(testDeleteCitation);
+$(test);
 
-testAddARecordButtonDrawsAForm = function() {
+test = function() {
     $('#portfolio *').remove();
-    var test = 'testAddARecordButtonDrawsAForm asserts: ';
+    var prefix = 'button draws citation form: ';
 
     askServerForPortfolio();
 
@@ -228,22 +229,22 @@ testAddARecordButtonDrawsAForm = function() {
 
     var $form = $button.closest('.citations-wrapper').find('.citation-forms li form.add_a_record');
 
-    fireunit.ok($form.size() == 1, test + "the 'Add another record' button causes "
+    fireunit.ok($form.size() == 1, prefix + "the 'Add another record' button causes "
             + "exactly one form to appear in citation-forms.");
     var names = ['form_container_element_id', 'portfolio_entry', 'url'];
     for (var i = 0; i < names.length; i++) {
         var name = names[i];
         fireunit.ok($form.find('[name="'+name+'"]').size() == 1,
-                test + "form as a field called" + name);
+                prefix + "form as a field called" + name);
     }
 
 };
-$(testAddARecordButtonDrawsAForm);
+$(test);
 
 askServerForPortfolio_wasCalled = false;
 
-prefix = "add a new citation: ";
 test = function () {
+    var prefix = "add a new citation: ";
     $add_a_new_citation_form = $('.citation-forms li:eq(0) form');
     $add_a_new_citation_form.find('[name="url"]').val('http://google.ca/');
     $add_a_new_citation_form.trigger('submit');
@@ -252,8 +253,8 @@ test = function () {
 };
 $(test);
 
-prefix = "submission of a new citation: ";
 test = function () {
+    var prefix = "submission of a new citation: ";
     $form_container = $('.citation-forms li:eq(0)');
     fireunit.ok($form_container.size() == 1,
             prefix + "there's a form container eq(0)");
@@ -267,8 +268,8 @@ test = function () {
 };
 $(test);
 
-prefix = "show icon flagger only for nongeneric icons: ";
 test = function () {
+    var prefix = "show icon flagger only for nongeneric icons: ";
     fireunit.ok($('.portfolio_entry').eq(0).find('.icon_flagger').size() == 1,
             prefix + "assert project with nongeneric icon bears the link "
             + "'Flag icon as incorrect'"
@@ -280,8 +281,8 @@ test = function () {
 };
 $(test);
 
-prefix = "flag icon as incorrect: ";
 test = function () {
+    var prefix = "flag icon as incorrect: ";
     // click a 'Flag icon as incorrect' link
     $icon_flagger = $('.icon_flagger').eq(0);
     fireunit.ok($icon_flagger.find('a').size() == 1,
@@ -307,6 +308,17 @@ test = function () {
             "expect icon src to be (HARDCODED) /static/no-project-icon.png");
 
     FlagIcon.post = post_copy;
+};
+$(test);
+
+test = function() {
+    var prefix = "save textareas: ";
+
+    $publishLink = $('.portfolio_entry:eq(0) a.publish');
+    fireunit.ok(
+            $publishLink.size() == 1,
+            prefix + "there's a publish link on the first portfolio entry");
+    // click publish
 };
 $(test);
 
