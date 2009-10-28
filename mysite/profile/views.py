@@ -963,6 +963,12 @@ def save_portfolio_entry_do(request):
     p.experience_description = request.POST['experience_description']
     p.save()
 
+    # Publish all attached Citations
+    citations = Citation.objects.filter(portfolio_entry=p)
+    for c in citations:
+        c.is_published = True
+        c.save()
+
     return mysite.base.views.json_response({
             'success': True,
             'portfolio_entry__pk': pk

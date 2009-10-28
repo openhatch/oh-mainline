@@ -1109,6 +1109,14 @@ class SavePortfolioEntry(TwillTests):
         portfolio_entry = PortfolioEntry.objects.get_or_create(
                     project=Project.objects.get_or_create(name='project name')[0],
                     person=Person.objects.get(user__username='paulproteus'))[0]
+        citation = Citation(
+                portfolio_entry=portfolio_entry,
+                data_import_attempt=DataImportAttempt.objects.get_or_create(
+                    source='rs', query='paulproteus', completed=True,
+                    person=Person.objects.get(user__username='paulproteus'))[0]
+                )
+        citation.is_published = False
+        citation.save()
 
         input = {
             'portfolio_entry__pk': portfolio_entry.pk,
@@ -1132,5 +1140,9 @@ class SavePortfolioEntry(TwillTests):
                 input['project_description'])
         self.assertEqual(portfolio_entry.experience_description,
                 input['experience_description'])
+
+        citations = Citation.objects.filter(portfolio_entry=portfolio_entry)
+        for c in citations:
+            self.assert_(c.is_published)
 
 # vim: set ai et ts=4 sw=4 nu:

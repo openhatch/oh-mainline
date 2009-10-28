@@ -341,6 +341,10 @@ test = function(params) {
             prefix + "there's a textarea selectable by .experience_escription "
             + "on the first portfolio entry");
 
+    fireunit.ok(
+            $pfEntry.find('.citations li.unpublished').size() > 0,
+            prefix + "(precondition) there's at least one unpublished citation in this pf entry.");
+
     // Edit textareas 
     $projectDescriptionField.val('new project description');
     $experienceDescriptionField.val('new experience description');
@@ -368,6 +372,7 @@ test = function(params) {
             PortfolioEntry.Save.postOptions.success(fakeResponse);
 
             checkNotifiersForText('Portfolio entry saved');
+
         };
 
         $publishLink.trigger('click');
@@ -382,6 +387,10 @@ test = function(params) {
         $publishLink.trigger('click');
 
         checkNotifiersForText('Portfolio entry saved');
+
+        fireunit.ok(
+                $pfEntry.find('.citations li.unpublished').size() == 0,
+                prefix + "there are no unpublished citations in this pf entry.");
 
         function refreshAndCheckTextareas() {
             askServerForPortfolio();
