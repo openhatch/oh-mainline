@@ -1,5 +1,6 @@
 from mysite.base.tests import make_twill_url, TwillTests
 
+import mysite.account.tests
 from mysite.profile.models import Person
 import mysite.customs.miro
 
@@ -22,6 +23,7 @@ from django.test import TestCase
 from django.core.servers.basehttp import AdminMediaHandler
 from django.core.handlers.wsgi import WSGIHandler
 from django.core.urlresolvers import reverse
+from django.core.files.base import ContentFile
 
 from django.db.models import Q 
 
@@ -474,5 +476,32 @@ class ResultsIncludeProjectLanguage(SearchTest):
 
         # ...than this one.
         tc.find("<span class='project__language'>Python</span>")
+
+class IconGetsScaled(SearchTest):
+    def test_project_scales_its_icon_down_for_use_in_badge(self):
+        '''This test shows that the Project class successfully stores
+        a scaled-down version of its icon in the icon_smaller_for_badge
+        field.'''
+
+        # Step 1: Create a project with an icon
+        p = mysite.search.models.Project()
+        image_data = open(mysite.account.tests.photo('static/sample-photo.png')).read()
+        p.icon.save('', ContentFile(image_data))
+        p.save()
+
+        # Assertion 1: p.icon_smaller_for_badge is false (since not scaled yet)
+        self.assertFalse(p.icon_smaller_for_badge)
+
+        # Step 2: Call the scaling method
+        p.update_badge_icon_from_self_icon()
+        p.save()
+
+        # Assertion 2: Verify that it is now a true value
+        self.assert_(p.icon_smaller_for_badge, 
+                     "Expected p.icon_smaller_for_badge to be a true value.")
+
+        # Assertion 3: Verify that it has the right width
+        self.assertEqual(p.icon_smaller_for_badge.width, 40,
+                         "Expected p.icon_smaller_for_badge to be 40 pixels wide.")
 
 # vim: set nu ai et ts=4 sw=4 columns=80:

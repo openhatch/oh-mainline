@@ -3,6 +3,8 @@ from django.core.files.base import ContentFile
 from django.core.files.images import get_image_dimensions
 from mysite.customs import ohloh
 import datetime
+import StringIO
+import Image
 import uuid
 
 def get_image_data_scaled(image_data, width):
@@ -51,6 +53,11 @@ class Project(models.Model):
 
     date_icon_was_fetched_from_ohloh = models.DateTimeField(null=True, default=None)
 
+    icon_smaller_for_badge = models.ImageField(
+        upload_to=lambda a,b: Project.get_icon_path(a,b),
+        null=True,
+        default=None)
+
     def populate_icon_from_ohloh(self):
 
         oh = ohloh.get_ohloh()
@@ -63,6 +70,23 @@ class Project(models.Model):
 
         # if you want to scale, use get_image_data_scaled(icon_data)
         self.icon.save('', ContentFile(icon_data))
+
+        # Since we are saving an icon, also update our scaled-down version of
+        # that icon for the badge.
+        self.update_badge_icon_from_self_icon()
+
+    def update_badge_icon_from_self_icon(self):
+        '''This method should be called when you update the Project.icon attribute.
+        Side-effect: Saves a scaled-down version of that icon in the
+        Project.icon_smaller_for_badge field.'''
+        # First of all, do nothing if self.icon is a false value.
+        if not self.icon:
+            return
+
+        # Okay, now we must have some icon. Scale it down to badge size, which
+        # happens to be width=40
+        scaled_down = get_image_data_scaled(self.icon.file.read(), 40)
+        self.icon_smaller_for_badge.save('', ContentFile(scaled_down))
 
     def __unicode__(self):
         return "<Project name='%s' language='%s'>" % (self.name, self.language)
