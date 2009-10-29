@@ -20,9 +20,14 @@
 #importer input[type='text'].blur {
     color: #999;
 }
+#importer .query {
+    float: right;
+}
 #importer .foot {
     width: 440px;
-    padding: 10px 0;
+    padding: 0;
+    padding-top: 10px;
+    float: right;
 }
 #importer input[type='submit'] {
     float: right;
