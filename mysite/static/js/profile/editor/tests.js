@@ -179,6 +179,7 @@ testUpdatePortfolio = function() {
 
 $(testUpdatePortfolio);
 
+
 testNoDuplication = function() {
     // Don't create duplicate citations or portfolio entries.
     // Clear the deck.
@@ -570,5 +571,18 @@ testProgressBar = function() {
     fireunit.ok($bar.progressbar('option', 'value') == 20, prefix + "progressbar's value is 20");
 };
 $(testProgressBar);
+
+testUpdateExistingCitations = function() {
+    var prefix = "the portfolio will update correctly in response to a citation being published: ";
+    updatePortfolio(mockedPortfolioResponse);
+    $firstCitation = $('.citations li').eq(0);
+    fireunit.ok( $firstCitation.hasClass('unpublished'),
+            prefix + "First citation has 'unpublished' class.");
+    mockedPortfolioResponse.citations[0].fields.is_published = '1';
+    updatePortfolio(mockedPortfolioResponse);
+    fireunit.ok( $firstCitation.hasClass('unpublished') == false,
+            prefix + "First citation now lacks 'unpublished' class.");
+};
+$(testUpdateExistingCitations);
 
 // vim: set nu:
