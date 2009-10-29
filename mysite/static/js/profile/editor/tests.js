@@ -1,8 +1,11 @@
-test = function(message, bool, timeout) {
+ok = function(message, bool, timeout) {
     if (typeof prefix != 'undefined') { message = prefix + message; }
     function run() { fireunit.ok(bool, message); }
     if (typeof timeout != 'undefined') { run(); }
     else { window.setTimeout(run, timeout); }
+};
+okey = function(js_string) {
+    fireunit.ok(eval(js_string), js_string);
 };
 
 $.fn.assertOne = function(humanName) {
@@ -397,6 +400,8 @@ test = function(params) {
                 'portfolio_entry__pk': $pfEntry.attr('portfolio_entry__pk')
             };
             PortfolioEntry.Save.postOptions.success(fakeResponse);
+            
+            okey("$pfEntry.hasClass('unpublished')");
 
             checkNotifiersForText('Portfolio entry saved');
 
@@ -511,7 +516,7 @@ testDeletePortfolioEntry = function(params) {
         };
         PortfolioEntry.Delete.postOptions.success(fakeResponse);
 
-        test('Expected $pfEntry to disappear.', $pfEntry.is(':hidden'), 1000);
+        ok('Expected $pfEntry to disappear.', $pfEntry.size() == 0, 2000);
     };
 
     $deleteLink.trigger('click');

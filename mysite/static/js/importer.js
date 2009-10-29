@@ -662,7 +662,7 @@ PortfolioEntry.Delete.postOptions.success = function (response) {
     /* Find the portfolio entry section of the page, and make it disappear. */
     var pk = response.portfolio_entry__pk;
     $portfolioEntry = $('#portfolio_entry_'+pk);
-    $portfolioEntry.slideUp('normal', function() {
+    $portfolioEntry.slideUp('fast', function() {
             $(this).remove();
             });
     Notifier.displayMessage('Portfolio entry deleted.');
