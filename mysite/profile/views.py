@@ -595,7 +595,8 @@ def gimme_json_for_portfolio(request):
     person = request.user.get_profile()
 
     # Citations don't naturally serialize summaries.
-    citations = list(Citation.objects.filter(portfolio_entry__person=person, is_deleted=False, portfolio_entry__is_deleted=False))
+    citations = list(Citation.objects.filter(portfolio_entry__person=person,
+        is_deleted=False, portfolio_entry__is_deleted=False))
     portfolio_entries_unserialized = PortfolioEntry.objects.filter(person=person,
                                                                    is_deleted=False)
     projects_unserialized = [p.project for p in portfolio_entries_unserialized]
@@ -614,9 +615,14 @@ def gimme_json_for_portfolio(request):
     projects = simplejson.loads(serializers.serialize('json', projects_unserialized))
     # FIXME: Don't send like all the flippin projects down the tubes.
     citations = simplejson.loads(serializers.serialize('json', citations))
+    import_data = {
+            'running': True,
+            'progress_percentage': 0,
+            }
 
     json = simplejson.dumps({
-        'dias': dias,
+        'dias': dias, # FIXME: remove this
+        'import': import_data,
         'citations': citations,
         'portfolio_entries': portfolio_entries,
         'projects': projects,

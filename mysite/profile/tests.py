@@ -21,6 +21,7 @@ import urllib
 import simplejson
 import BeautifulSoup
 import time
+import datetime
 import tasks 
 import mock
 
@@ -1197,4 +1198,57 @@ class SavePortfolioEntry(TwillTests):
         for c in citations:
             self.assert_(c.is_published)
 
+class GimmeJsonTellsAboutImport(TwillTests):
+    fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
+
+    def gimme_json(self):
+        url = reverse(mysite.profile.views.gimme_json_for_portfolio)
+        response = self.login_with_client().get(url)
+        return simplejson.loads(response.content)
+
+    def get_paulproteus(self):
+        return mysite.profile.models.Person.objects.get(user__username='paulproteus')
+
+    def get_barry(self):
+        return mysite.profile.models.Person.objects.get(user__username='barry')
+
+    def get_n_min_ago(self, n):
+        one_minute_ago = datetime.datetime.utcnow() - datetime.timedelta(minutes=n)
+
+    def test_import_running_false(self):
+        "When there are no dias from the past five minutes, import.running = False"
+        # Create a DIA for paulproteus that is from ten minutes ago (but curiously is still in progress)
+        old = DataImportAttempt(date_created=self.get_n_min_ago(10),
+                                                      person=self.get_paulproteus())
+
+        # Create a DIA for Barry that is in progress, but ought not be
+        # included in the calculation by gimme_json_for_portfolio
+        new_distractor = DataImportAttempt(date_created=self.get_n_min_ago(1),
+                                                                 person=self.get_barry())
+        
+        # Verify that the JSON reports import running is False
+        self.assertFalse(self.gimme_json()['import']['running'])
+                                                      
+    def test_for_running_import(self):
+        "When there are dias from the past five minutes, import.running = True "
+        "and progress percentage is accurate"
+        # Create a DIA for paulproteus that is from one minutes ago (but curiously is still in progress)
+        my_incomplete_recent_dia = DataImportAttempt(date_created=self.get_n_min_ago(1),
+                                                                  person=self.get_paulproteus(),
+                                                                  completed=False)
+
+        my_completed_recent_dia = DataImportAttempt(date_created=self.get_n_min_ago(1),
+                                                                  person=self.get_paulproteus(),
+                                                                  completed=True)
+
+        # Create a DIA that is in progress, but ought not be
+        # included in the calculation by gimme_json_for_portfolio
+        # because it doesn't belong to the logged-in user
+        not_my_dia = DataImportAttempt(date_created=self.get_n_min_ago(1), person=self.get_barry())
+        
+        self.assert_(self.gimme_json()['import']['running'],
+                "Expected that the JSON reports that an import is running")
+        self.assertEqual(self.gimme_json()['import']['progress_percentage'], 50,
+                "Expected that the JSON reports that the import is at 50% progress")
+                                                      
 # vim: set ai et ts=4 sw=4 nu:
