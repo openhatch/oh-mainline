@@ -539,4 +539,12 @@ $.fn.assertN = function(prefix, n) {
     fireunit.ok(this.size() == n, prefix + "there are " + n + " elements matching " + this.selector);
     return this;
 };
+
+testProgressBar = function() {
+    var prefix = "progress bar: ";
+    $bar = $('#importer #progressbar');
+    $bar.assertN(prefix, 1);
+    fireunit.ok($bar.progressbar('option', 'value') == 37, prefix + "progressbar's value is 37");
+};
+$(testProgressBar);
 // vim: set nu:
