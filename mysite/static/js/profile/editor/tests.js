@@ -1,4 +1,9 @@
-Tests = {};
+test = function(message, bool, timeout) {
+    if (typeof prefix != 'undefined') { message = prefix + message; }
+    function run() { fireunit.ok(bool, message); }
+    if (typeof timeout != 'undefined') { run(); }
+    else { window.setTimeout(run, timeout); }
+};
 
 $.fn.assertOne = function(humanName) {
     if (typeof prefix == 'undefined') { prefix = ""; }
@@ -506,9 +511,7 @@ testDeletePortfolioEntry = function(params) {
         };
         PortfolioEntry.Delete.postOptions.success(fakeResponse);
 
-        /* Verify that the $pfEntry is now hidden */
-        fireunit.ok($pfEntry.is(':hidden'), 
-                prefix + 'Expected pfEntry to disappear.');
+        test('Expected $pfEntry to disappear.', $pfEntry.is(':hidden'), 1000);
     };
 
     $deleteLink.trigger('click');

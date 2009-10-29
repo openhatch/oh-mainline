@@ -316,6 +316,11 @@ function updatePortfolio(response) {
             $new_portfolio_entry.attr('id', id);
             $new_portfolio_entry.attr('portfolio_entry__pk', portfolioEntry.pk);
         }
+
+        // published/unpublished status
+        if (portfolioEntry.fields.is_published == true) {
+            $new_portfolio_entry.removeClass("unpublished");
+        }
 	    
         /* Find the project this PortfolioElement refers to */
 	    var project_id = portfolioEntry.fields.project;
@@ -447,7 +452,7 @@ drawAddCitationForm = function() {
 
 Notifier = {};
 Notifier.displayMessage = function(message) {
-    $.jGrowl(message, {'life': 2000});
+    $.jGrowl(message, {'life': 5000});
 };
 
 /******************
@@ -657,7 +662,9 @@ PortfolioEntry.Delete.postOptions.success = function (response) {
     /* Find the portfolio entry section of the page, and make it disappear. */
     var pk = response.portfolio_entry__pk;
     $portfolioEntry = $('#portfolio_entry_'+pk);
-    $portfolioEntry.slideUp();
+    $portfolioEntry.slideUp('normal', function() {
+            $(this).remove();
+            });
     Notifier.displayMessage('Portfolio entry deleted.');
 };
 PortfolioEntry.Delete.postOptions.error = function (response) {
