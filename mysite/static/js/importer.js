@@ -683,4 +683,6 @@ setEventHandlers = function() {
 };
 $(setEventHandlers);
 
+Citation.HowTo = {};
+
 // vim: set nu:

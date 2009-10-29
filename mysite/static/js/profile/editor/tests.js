@@ -498,7 +498,7 @@ $(testDeletePortfolioEntry);
 
 prefix = "citation howto: ";
 testCitationHowTo = function() {
-    $howtos = $('.citations-wrapper .howto');
+    $howtos = $('#portfolio .citations-wrapper .howto');
     fireunit.ok($howtos.size() > 0, prefix + "Some howtos appear on the page.");
 
     $firstHowtoHideLink = $howtos.eq(0).find('a.hide_me');
@@ -510,7 +510,7 @@ testCitationHowTo = function() {
             $showMeLink = $howto.closest('.citations-wrapper').find('a.show_me');
             fireunit.ok($showMeLink.size() == 1, prefix + "show me link exists for this howto.");
             $showMeLink.trigger('click');
-            fireunit.ok($howto.is(':visible'), "how to is visible after showme clicked.");
+            fireunit.ok($howto.is(':visible'), prefix + "how to is visible after showme clicked.");
             });
 
 };
