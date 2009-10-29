@@ -502,6 +502,7 @@ testCitationHowTo = function() {
     fireunit.ok($howtos.size() > 0, prefix + "Some howtos appear on the page.");
 
     $firstHowtoHideLink = $howtos.eq(0).find('a.hide_me');
+    fireunit.ok($firstHowtoHideLink.size() == 1, prefix + "there is at least one howto hide link.");
     $firstHowtoHideLink.trigger('click');
 
     fireunit.ok($howtos.filter(':visible').size() == 0, prefix + "No howtos are visible.");
