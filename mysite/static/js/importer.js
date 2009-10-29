@@ -693,9 +693,17 @@ Citation.HowTo.bindEventHandlers = function () {
 
 Importer = {};
 Importer.Inputs = {};
+Importer.Inputs.getInputs = function () {
+    return $("form#importer input[type='text']");
+};
 Importer.Inputs.init = function () {
     Importer.Inputs.makeNew();
     Importer.Inputs.makeNew();
+    Importer.Inputs.getInputs().eq(0).attr('title',
+            "Type a FLOSS username here");
+    Importer.Inputs.getInputs().eq(1).attr('title',
+            "Type an email address here");
+    Importer.Inputs.getInputs().hint();
 };
 Importer.Inputs.makeNew = function () {
     var $form = $('form#importer .body');
@@ -705,13 +713,18 @@ Importer.Inputs.makeNew = function () {
         + "<div id='query_$INDEX' class='query"+ extraClass +"'>"
         // FIXME: Use $EXTRA_CLASS to include this in the string.
         + "   <div class='who'>"
-        + "       <input type='text' name='identifier_$INDEX' />"
+        + "       <input type='text' "
+        + "             name='identifier_$INDEX' />"
         + "   </div>"
         + "</div>";
 
     html = html.replace(/\$INDEX/g, index);
 
-    $(html).appendTo($form);
+    $input_container = $(html);
+    
+    $input_container.appendTo($form);
+
+    console.info("input_container", $input_container);
 
     Importer.Inputs.bindEventHandlers();
 };
@@ -721,7 +734,8 @@ Importer.Inputs.keydownHandler = function () {
         var ret = false;
         $("form#importer input[type='text']").each(function () {
                 var thisInputIsBlank = (
-                    $(this).val().replace(/\s/g,'') == '' );
+                    $(this).val().replace(/\s/g,'') == '' 
+                    || $(this).val() == $(this).attr('title'));
                 if (thisInputIsBlank) ret = true;
                 });
         return ret;

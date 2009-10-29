@@ -17,6 +17,9 @@
     font-size: 15pt;
     width: 425px;
 }
+#importer input[type='text'].blur {
+    color: #999;
+}
 #importer .foot {
     width: 440px;
     padding: 10px 0;
