@@ -618,10 +618,11 @@ def gimme_json_for_portfolio(request):
     # FIXME: Don't send like all the flippin projects down the tubes.
     citations = simplejson.loads(serializers.serialize('json', citations))
 
-    import_running = recent_dias.count() > 0
+    recent_dias_that_are_completed = recent_dias.filter(completed=True)
+    import_running = recent_dias.count() > 0 and (
+            recent_dias_that_are_completed.count() != recent_dias.count())
     progress_percentage = 0
     if import_running:
-        recent_dias_that_are_completed = recent_dias.filter(completed=True)
         progress_percentage = int(recent_dias_that_are_completed.count() * 100.0 / recent_dias.count())
     import_data = {
             'running': import_running,
@@ -708,7 +709,7 @@ def prepare_data_import_attempts(identifiers, user):
 
     # Side-effects: Create DIAs that a user might want to execute.
     for identifier in identifiers:
-        if identifier: # Skip blanks
+        if identifier.strip(): # Skip blanks or whitespace
             for source_key, _ in DataImportAttempt.SOURCE_CHOICES:
                 dia = DataImportAttempt(
                         query=identifier,

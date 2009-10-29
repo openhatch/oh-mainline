@@ -1254,5 +1254,12 @@ class GimmeJsonTellsAboutImport(TwillTests):
                 "Expected that the JSON reports that an import is running")
         self.assertEqual(self.gimme_json()['import']['progress_percentage'], 50,
                 "Expected that the JSON reports that the import is at 50% progress")
+
+        # Now let's make them all completed
+        my_incomplete_recent_dia.completed = True
+        my_incomplete_recent_dia.save()
+
+        self.assertFalse(self.gimme_json()['import']['running'],
+                "After all DIAs are completed, expected that the JSON reports that no import is running.")
                                                       
 # vim: set ai et ts=4 sw=4 nu:

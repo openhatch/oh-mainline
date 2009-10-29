@@ -570,4 +570,5 @@ testProgressBar = function() {
     fireunit.ok($bar.progressbar('option', 'value') == 20, prefix + "progressbar's value is 20");
 };
 $(testProgressBar);
+
 // vim: set nu:

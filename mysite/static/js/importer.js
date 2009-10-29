@@ -759,6 +759,27 @@ Importer.Inputs.bindEventHandlers = function () {
 
 $(Importer.Inputs.init);
 
+Importer.Submission = {
+    'init': function () {
+        Importer.Submission.$form = $('form#importer');
+        Importer.Submission.bindEventHandlers();
+    },
+    '$form': null,
+    'postOptions': {
+        'error': function () {
+            Notifier.displayMessage("Apologies&mdash;there was an error starting this import.");
+        }
+    },
+    'submitHandler': function () {
+        $(this).ajaxSubmit(Importer.Submission.postOptions);
+        return false; // Bypass the form's native submission logic.
+    },
+    'bindEventHandlers': function () {
+        Importer.Submission.$form.submit(Importer.Submission.submitHandler);
+    },
+};
+$(Importer.Submission.init);
+
 Importer.ProgressBar = {};
 Importer.ProgressBar.showWithValue = function(value) {
     $('#importer #progressbar').show().progressbar('option', 'value', value);
