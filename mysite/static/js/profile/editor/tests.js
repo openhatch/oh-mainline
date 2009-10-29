@@ -4,6 +4,11 @@ $.fn.assertOne = function(humanName) {
     return this;
 };
 
+testProgressBarInvisibleOnPageLoad = function() {
+    $('#importer #progressbar:visible').assertN('', 0);
+};
+$(testProgressBarInvisibleOnPageLoad);
+
 testImportJGrowl = function() {
     fireunit.ok(typeof $.jGrowl != 'undefined', "jGrowl imported");
 };
@@ -31,6 +36,12 @@ mockedPortfolioResponse = {
 
     // DataImportAttempts
     'dias': [{'pk': 0}],
+
+    // the progress of an import
+    'import': {
+        'running': false,
+        'progress_percentage': 20
+    },
 
     // Citations
     'citations': [
@@ -542,9 +553,21 @@ $.fn.assertN = function(prefix, n) {
 
 testProgressBar = function() {
     var prefix = "progress bar: ";
-    $bar = $('#importer #progressbar');
+
+    // update portfolio, the mocked response will say no import is running.
+    updatePortfolio(mockedPortfolioResponse);
+    $bar = $('#importer #progressbar:visible');
+    $bar.assertN(prefix, 0);
+
+    // now make the mockedPortfolioResponse will say an import is running
+    mockedPortfolioResponse.import.running = true;
+    updatePortfolio(mockedPortfolioResponse);
+    $bar = $('#importer #progressbar:visible');
+
+    // a progress bar should now appear
     $bar.assertN(prefix, 1);
-    fireunit.ok($bar.progressbar('option', 'value') == 37, prefix + "progressbar's value is 37");
+
+    fireunit.ok($bar.progressbar('option', 'value') == 20, prefix + "progressbar's value is 20");
 };
 $(testProgressBar);
 // vim: set nu:

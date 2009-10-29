@@ -373,6 +373,14 @@ function updatePortfolio(response) {
         $(response.citations).each(addMemberCitations);
 
 	}
+
+    if (response.import.running) {
+        Importer.ProgressBar.showWithValue(response.import.progress_percentage);
+    }
+    else {
+        // Don't hide the progressbar if import's not running.
+    }
+
     bindEventHandlers();
 };
 
@@ -750,5 +758,10 @@ Importer.Inputs.bindEventHandlers = function () {
 };
 
 $(Importer.Inputs.init);
+
+Importer.ProgressBar = {};
+Importer.ProgressBar.showWithValue = function(value) {
+    $('#importer #progressbar').show().progressbar('option', 'value', value);
+};
 
 // vim: set nu:
