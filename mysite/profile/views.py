@@ -905,6 +905,7 @@ def save_portfolio_entry_do(request):
     p = PortfolioEntry.objects.get(pk=pk, person__user=request.user)
     p.project_description = request.POST['project_description']
     p.experience_description = request.POST['experience_description']
+    p.is_published = True
     p.save()
 
     # Publish all attached Citations
