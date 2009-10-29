@@ -166,7 +166,7 @@ urlpatterns = patterns('',
         (r'^edit/name/do$',
                 'mysite.profile.views.display_person_edit_name_do'),
 
-        (r'^people/portfolio/import/prepare_data_import_attempts_do$',
+        (r'^profile/views/prepare_data_import_attempts_do$',
                 'mysite.profile.views.prepare_data_import_attempts_do'),
 
         (r'^people/user_selected_these_dia_checkboxes$',
