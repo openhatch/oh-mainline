@@ -607,21 +607,29 @@ def gimme_json_for_portfolio(request):
         summaries[c.pk] = c.summary
 
     # FIXME: Maybe we can serialize directly to Python objects.
-    # FIXME: ZOMG       DON'T RECYCLE VARIABLE NAMES FOR OBJS OF DIFF TYPES SRSLY U GUYS!
-    dias = simplejson.loads(serializers.serialize('json',
-        DataImportAttempt.objects.filter(person=person)))
+    # fixme: zomg       don't recycle variable names for objs of diff types srsly u guys!
+
+    five_minutes_ago = datetime.datetime.utcnow() - datetime.timedelta(minutes=5)
+    recent_dias = DataImportAttempt.objects.filter(person=person, date_created__gt=five_minutes_ago)
+    recent_dias_json = simplejson.loads(serializers.serialize('json', recent_dias))
     portfolio_entries = simplejson.loads(serializers.serialize('json',
         portfolio_entries_unserialized))
     projects = simplejson.loads(serializers.serialize('json', projects_unserialized))
     # FIXME: Don't send like all the flippin projects down the tubes.
     citations = simplejson.loads(serializers.serialize('json', citations))
+
+    import_running = recent_dias.count() > 0
+    progress_percentage = 0
+    if import_running:
+        recent_dias_that_are_completed = recent_dias.filter(completed=True)
+        progress_percentage = int(recent_dias_that_are_completed.count() * 100.0 / recent_dias.count())
     import_data = {
-            'running': True,
-            'progress_percentage': 0,
+            'running': import_running,
+            'progress_percentage': progress_percentage,
             }
 
     json = simplejson.dumps({
-        'dias': dias, # FIXME: remove this
+        'dias': recent_dias_json,
         'import': import_data,
         'citations': citations,
         'portfolio_entries': portfolio_entries,
