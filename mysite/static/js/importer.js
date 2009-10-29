@@ -680,9 +680,28 @@ setEventHandlers = function() {
     $('.citations-wrapper .add').click(drawAddCitationFormNearThisButton);
     FlagIcon.setEventHandlers();
     PortfolioEntry.setEventHandlers();
+    Citation.setEventHandlers();
 };
 $(setEventHandlers);
 
+Citation.setEventHandlers = function() {
+    Citation.HowTo.setEventHandlers();
+};
 Citation.HowTo = {};
+Citation.HowTo.hideAll = function () {
+    $('.citations-wrapper .howto').hide();
+    $('.citations-wrapper a.show_howto').show();
+    return false;
+};
+Citation.HowTo.showMyHowto = function () {
+    $showLink = $(this);
+    $showLink.parent().find('.howto').show();
+    $showLink.hide();
+    return false;
+};
+Citation.HowTo.setEventHandlers = function () {
+    $('.citations-wrapper .howto a.hide_me').click(Citation.HowTo.hideAll);
+    $('.citations-wrapper a.show_howto').click(Citation.HowTo.showMyHowto);
+};
 
 // vim: set nu:

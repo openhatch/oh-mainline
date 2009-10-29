@@ -1,3 +1,9 @@
+$.fn.assertOne = function(humanName) {
+    if (typeof prefix == 'undefined') { prefix = ""; }
+    fireunit.ok(this.size() == 1, prefix + "there's only one " + humanName);
+    return this;
+};
+
 testImportJGrowl = function() {
     fireunit.ok(typeof $.jGrowl != 'undefined', "jGrowl imported");
 };
@@ -498,6 +504,8 @@ $(testDeletePortfolioEntry);
 
 prefix = "citation howto: ";
 testCitationHowTo = function() {
+    $('#portfolio *').remove();
+    askServerForPortfolio();
     $howtos = $('#portfolio .citations-wrapper .howto');
     fireunit.ok($howtos.size() > 0, prefix + "Some howtos appear on the page.");
 
@@ -505,14 +513,17 @@ testCitationHowTo = function() {
     fireunit.ok($firstHowtoHideLink.size() == 1, prefix + "there is at least one howto hide link.");
     $firstHowtoHideLink.trigger('click');
 
-    fireunit.ok($howtos.filter(':visible').size() == 0, prefix + "No howtos are visible.");
-    $howtos.each(function () {
-            $howto = $(this);
-            $showMeLink = $howto.closest('.citations-wrapper').find('a.show_me');
-            fireunit.ok($showMeLink.size() == 1, prefix + "show me link exists for this howto.");
-            $showMeLink.trigger('click');
-            fireunit.ok($howto.is(':visible'), prefix + "how to is visible after showme clicked.");
-            });
+    fireunit.ok($howtos.filter(':visible').size() == 0, prefix + "No howtos are visible after hide link clicked");
+    for (var i = 0; i < $howtos.size(); i++) {
+        $howto = $howtos.eq(i);
+        console.info($howto);
+        $showMeLink = $howto.closest('.citations-wrapper').find('a.show_howto:visible').assertOne('hidden show_howto link for this howto');
+        console.info("showMeLink", $showMeLink);
+        $showMeLink.trigger('click');
+        fireunit.ok($howto.is(':visible'), prefix + "how to is visible after showme clicked.");
+        fireunit.ok($showMeLink.is(':hidden'), prefix + "show me link is hidden after being clicked.");
+        console.log("howtos size", $howtos.size());
+    }
 
 };
 $(testCitationHowTo);
