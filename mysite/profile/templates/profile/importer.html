@@ -8,6 +8,7 @@ Portfolio editor
 {{ block.super }}
 @import url('/static/css/profile/editor.css');
 @import url('/static/css/base/jquery.jgrowl.css');
+@import url('/static/css/jquery-ui-lightness/jquery-ui-1.7.2.custom.css');
 {% endblock css %}
 
 {% block main %}
@@ -72,6 +73,7 @@ Portfolio editor
             </div>
             <div class='foot'>
                 <input type='submit' value='Submit' id='submit_data_sources' />
+                <div id='progressbar'></div>
             </div>
         </form>
 
@@ -102,6 +104,15 @@ Portfolio editor
 <script type='text/javascript' src='/static/js/jquery.hint.js'></script>
 <script type='text/javascript' src='/static/js/jquery.form.js'></script>
 <script type='text/javascript' src='/static/js/jquery.jgrowl.js'></script>
+<script type="text/javascript" src="/static/js/jquery-ui-1.7.2.custom.min.js"></script>
+<script type="text/javascript">
+    $(function() {
+            $("#progressbar").progressbar({
+value: 80
+});
+            });
+</script>
+
 
 {% if test_js %}<script type='text/javascript'>testJS = true;</script>{% endif %}
 

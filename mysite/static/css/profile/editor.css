@@ -31,6 +31,12 @@
 }
 #importer input[type='submit'] {
     float: right;
+    height: 38px;
+}
+#progressbar {
+    display: none;
+    width: 350px;
+    height: 35px;
 }
 
 #portfolio h4 {
