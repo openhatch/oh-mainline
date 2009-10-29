@@ -621,7 +621,7 @@ def gimme_json_for_portfolio(request):
     recent_dias_that_are_completed = recent_dias.filter(completed=True)
     import_running = recent_dias.count() > 0 and (
             recent_dias_that_are_completed.count() != recent_dias.count())
-    progress_percentage = 0
+    progress_percentage = 100
     if import_running:
         progress_percentage = int(recent_dias_that_are_completed.count() * 100.0 / recent_dias.count())
     import_data = {

@@ -1,3 +1,5 @@
+Tests = {};
+
 $.fn.assertOne = function(humanName) {
     if (typeof prefix == 'undefined') { prefix = ""; }
     fireunit.ok(this.size() == 1, prefix + "there's only one " + humanName);
@@ -20,7 +22,7 @@ testBuildingBlocks = function() {
         '#portfolio_entry_building_block',
         '#citation_building_block',
         '#citation_form_building_block'
-    ];
+            ];
     for (var b = 0; b < blockSelectors.length; b++) {
         var blockSelector = blockSelectors[b];
         $block = $(blockSelector);
@@ -48,8 +50,8 @@ mockedPortfolioResponse = {
     {'pk': 0, 'fields': {'portfolio_entry': 0, 'is_published': 0}}, 
     {'pk': 1, 'fields': {'portfolio_entry': 0, 'is_published': 1}}, // These belong to different
     {'pk': 2, 'fields': {'portfolio_entry': 99, 'is_published': 1}}, // PortfolioEntries.
-        // ^ This last one is never painted because there is no
-        // corresponding pf entry.
+    // ^ This last one is never painted because there is no
+    // corresponding pf entry.
     ],
 
     // Portfolio entries
@@ -59,7 +61,8 @@ mockedPortfolioResponse = {
         'pk': 0, 'fields': {
             'project': 0,
             'project_description': 'described',
-            'experience_description': 'i hacked things'
+            'experience_description': 'i hacked things',
+            'is_published': true,
         }
     },
 
@@ -67,7 +70,8 @@ mockedPortfolioResponse = {
         'pk': 1, 'fields': {
             'project': 1,
             'project_description': 'another project with a generic icon',
-            'experience_description': 'i hacked things'
+            'experience_description': 'i hacked things',
+            'is_published': false,
         }
     },
 
@@ -310,9 +314,9 @@ test = function () {
     var post_copy = FlagIcon.post;
     FlagIcon.post = function () {
         FlagIcon.postOptions.success({
-            'success': true,
+                'success': true,
                 'portfolio_entry__pk': 0,
-        });
+                });
     }
     $icon_flagger.find('a').trigger('click');
     fireunit.ok($icon_flagger.find('a').size() == 0,
@@ -348,16 +352,16 @@ test = function(params) {
             prefix + "there's a publish link on the first pf entry");
 
     $projectDescriptionField = $pfEntry.find('textarea.project_description')
-    fireunit.ok(
-            $projectDescriptionField.size() == 1,
-            prefix + "there's a textarea selectable by .project_description "
-            + "on the first portfolio entry");
+        fireunit.ok(
+                $projectDescriptionField.size() == 1,
+                prefix + "there's a textarea selectable by .project_description "
+                + "on the first portfolio entry");
 
     $experienceDescriptionField = $pfEntry.find('textarea.experience_description')
-    fireunit.ok(
-            $experienceDescriptionField.size() == 1,
-            prefix + "there's a textarea selectable by .experience_escription "
-            + "on the first portfolio entry");
+        fireunit.ok(
+                $experienceDescriptionField.size() == 1,
+                prefix + "there's a textarea selectable by .experience_escription "
+                + "on the first portfolio entry");
 
     fireunit.ok(
             $pfEntry.find('.citations li.unpublished').size() > 0,
@@ -370,7 +374,7 @@ test = function(params) {
     if (mock) {
 
         // Test just the UI.
-        
+
         // Mock out post to server for saving a PortfolioEntry.
         var post_copy = PortfolioEntry.Save.post;
         PortfolioEntry.Save.post = function() {
@@ -382,7 +386,7 @@ test = function(params) {
             fireunit.ok(
                     data.experience_description == 'new experience description',
                     prefix + "experience_description in post matches textarea");
-            
+
             // Don't actually post; instead, just handle a fake response object.
             var fakeResponse = {
                 'portfolio_entry__pk': $pfEntry.attr('portfolio_entry__pk')
@@ -487,28 +491,28 @@ testDeletePortfolioEntry = function(params) {
             prefix + "(precondition) there's at least one unpublished citation in this pf entry.");
 
     // Test just the UI.
-    
+
     // Mock out post to server for deleting a PortfolioEntry.
     var post_copy = PortfolioEntry.Delete.post;
     PortfolioEntry.Delete.post = function() {
-	// Check that the data in the post are correct.
-	var data = PortfolioEntry.Delete.postOptions.data;
-	fireunit.ok(data.portfolio_entry__pk == '0', /* This is all we submit */
-		    prefix + "Expected us to submit the primary key of the p_e we want to delete."); 
-	// Don't actually post; instead, just handle a fake response object.
-	var fakeResponse = {
-        'success': true,
-	    'portfolio_entry__pk': $pfEntry.attr('portfolio_entry__pk')
-	};
-	PortfolioEntry.Delete.postOptions.success(fakeResponse);
+        // Check that the data in the post are correct.
+        var data = PortfolioEntry.Delete.postOptions.data;
+        fireunit.ok(data.portfolio_entry__pk == '0', /* This is all we submit */
+                prefix + "Expected us to submit the primary key of the p_e we want to delete."); 
+        // Don't actually post; instead, just handle a fake response object.
+        var fakeResponse = {
+            'success': true,
+            'portfolio_entry__pk': $pfEntry.attr('portfolio_entry__pk')
+        };
+        PortfolioEntry.Delete.postOptions.success(fakeResponse);
 
-	/* Verify that the $pfEntry is now hidden */
-	fireunit.ok($pfEntry.is(':hidden'), 
-		    prefix + 'Expected pfEntry to disappear.');
+        /* Verify that the $pfEntry is now hidden */
+        fireunit.ok($pfEntry.is(':hidden'), 
+                prefix + 'Expected pfEntry to disappear.');
     };
-    
+
     $deleteLink.trigger('click');
-    
+
     // Reset patching
     PortfolioEntry.Delete.post = post_copy;
 };
@@ -585,4 +589,24 @@ testUpdateExistingCitations = function() {
 };
 $(testUpdateExistingCitations);
 
-// vim: set nu:
+testPFEntriesHaveCSSClass = function() {
+    var prefix = "unpublished portfolio entries have the appropriate css class: ";
+    fireunit.ok(
+            mockedPortfolioResponse.portfolio_entries[0].fields.is_published,
+            prefix + "assert first pf entry in response is published");
+    console.info(mockedPortfolioResponse);
+    fireunit.ok(
+            mockedPortfolioResponse.portfolio_entries[1].fields.is_published == false,
+            prefix + "assert second pf entry in response is unpublished");
+    $firstEntry = $('.portfolio_entry:eq(0)').assertN(prefix, 1);
+    $secondEntry = $('.portfolio_entry:eq(1)').assertN(prefix, 1);
+    fireunit.ok(
+            $firstEntry.hasClass('unpublished') == false,
+            prefix + "assert first pf entry in dom lacks class unpublished");
+    fireunit.ok(
+            $secondEntry.hasClass('unpublished'),
+            prefix + "assert second pf entry in dom has class unpublished");
+};
+$(testPFEntriesHaveCSSClass);
+
+// vim: set nu ai:

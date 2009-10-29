@@ -360,10 +360,13 @@ function updatePortfolio(response) {
                     // Then we have a citation that we're gonna add the DOM.
                     var $citation = $(citation_html);
                     $citation.attr('id', id);
-                    if (citation.fields.is_published == '1') {
-                        $citation.removeClass("unpublished");
-                    }
                     $('.citations', $new_portfolio_entry).append($citation);
+                }
+
+                // Update the css class of this citation to reflect its
+                // published/unpublished status.
+                if (citation.fields.is_published == '1') {
+                    $citation.removeClass("unpublished");
                 }
 
                 var summary = response.summaries[citation.pk]
@@ -376,12 +379,18 @@ function updatePortfolio(response) {
 
     if (response.import.running) {
         Importer.ProgressBar.showWithValue(response.import.progress_percentage);
+        window.setTimeout(askServerForPortfolio, 1500);
     }
     else {
-        // Don't hide the progressbar if import's not running.
+        // If import's not running, bump to 100.
+        // If no import was running in the first place, then the progress bar will remain invisible.
+        // If there had been an import running, then the progress bar, now visible, will
+        // stand at 100%, to indicate that the import is done.
+        Importer.ProgressBar.bumpTo100();
     }
 
     bindEventHandlers();
+
 };
 
 Citation = {};
@@ -610,6 +619,7 @@ PortfolioEntry.Save.postOptions = {
 };
 PortfolioEntry.Save.postOptions.success = function (response) {
     Notifier.displayMessage('Portfolio entry saved.');
+    askServerForPortfolio();
 };
 PortfolioEntry.Save.postOptions.error = function (response) {
     Notifier.displayMessage('Oh dear! There was an error saving this entry in your portfolio. '
@@ -647,7 +657,7 @@ PortfolioEntry.Delete.postOptions.success = function (response) {
     /* Find the portfolio entry section of the page, and make it disappear. */
     var pk = response.portfolio_entry__pk;
     $portfolioEntry = $('#portfolio_entry_'+pk);
-    $portfolioEntry.hide();
+    $portfolioEntry.slideUp();
     Notifier.displayMessage('Portfolio entry deleted.');
 };
 PortfolioEntry.Delete.postOptions.error = function (response) {
@@ -766,6 +776,9 @@ Importer.Submission = {
     },
     '$form': null,
     'postOptions': {
+        'success': function () {
+            askServerForPortfolio();
+        },
         'error': function () {
             Notifier.displayMessage("Apologies&mdash;there was an error starting this import.");
         }
@@ -783,6 +796,9 @@ $(Importer.Submission.init);
 Importer.ProgressBar = {};
 Importer.ProgressBar.showWithValue = function(value) {
     $('#importer #progressbar').show().progressbar('option', 'value', value);
+};
+Importer.ProgressBar.bumpTo100 = function() {
+    $('#importer #progressbar').progressbar('option', 'value', 100);
 };
 
 // vim: set nu:
