@@ -329,7 +329,7 @@ function updatePortfolio(response) {
         $new_portfolio_entry = $('#' + id);
         if ($new_portfolio_entry.size() == 0) {
             var $new_portfolio_entry = $(portfolio_entry_html);
-            $('#portfolio').append($new_portfolio_entry);
+            $('#portfolio_entries').append($new_portfolio_entry);
             $new_portfolio_entry.attr('id', id);
             $new_portfolio_entry.attr('portfolio_entry__pk', portfolioEntry.pk);
         }
@@ -563,9 +563,9 @@ FlagIcon.setEventHandlers = function() {
 
 HowTo = {
     'init': function () {
-        HowTo.$element = $('#portfolio .howto');
-        HowTo.$hideLink = $('#portfolio .howto .hide-link');
-        HowTo.$showLink = $('#portfolio .show-howto-link');
+        HowTo.$element = $('#portfolio_entries .howto');
+        HowTo.$hideLink = $('#portfolio_entries .howto .hide-link');
+        HowTo.$showLink = $('#portfolio_entries .show-howto-link');
 
         var tests = ["HowTo.$element.size() == 1",
                 "HowTo.$hideLink.size() == 1",
@@ -656,7 +656,7 @@ PortfolioEntry.Delete.postOptions.success = function (response) {
     /* Find the portfolio entry section of the page, and make it disappear. */
     var pk = response.portfolio_entry__pk;
     $portfolioEntry = $('#portfolio_entry_'+pk);
-    $portfolioEntry[0].style.display = 'none';
+    $portfolioEntry.hide();
     Notifier.displayMessage('Portfolio entry deleted.');
 };
 PortfolioEntry.Delete.postOptions.error = function (response) {

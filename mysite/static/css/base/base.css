@@ -249,9 +249,9 @@ h3 {
     letter-spacing: 0;
     font-size: 13pt;
     margin: 0;
-    text-shadow: 0 1px 0 lightblue;
 }
 .module > .head h3 {
+    text-shadow: 0 1px 0 lightblue;
     padding: 15px 20px;
 }
 .module > .head ul {

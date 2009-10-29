@@ -1,5 +1,21 @@
 #importer {
-    width: 905px;
+    width: 865px;
+    padding: 20px;
+    /*background-color: #79d9b0;*/
+}
+#importer .head {
+    width: 865px;
+}
+#importer .howto {
+    float: left;
+    width: 400px;
+    margin-right: 20px;
+}
+#importer .who {
+    float: left;
+    width: 445px;
+}
+#portfolio h4 {
 }
 .portfolio_entry {
     float: left;

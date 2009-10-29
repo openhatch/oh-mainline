@@ -171,7 +171,7 @@ $(testUpdatePortfolio);
 testNoDuplication = function() {
     // Don't create duplicate citations or portfolio entries.
     // Clear the deck.
-    $('#portfolio *').remove();
+    $('#portfolio_entries *').remove();
 
     askServerForPortfolio();
     fireunit.ok($('.citations > li').size() == 2,
@@ -189,7 +189,7 @@ $(testNoDuplication);
 
 test = function() {
     // Clear the deck.
-    $('#portfolio *').remove();
+    $('#portfolio_entries *').remove();
     var prefix = 'button deletes citation: ';
 
     askServerForPortfolio();
@@ -224,7 +224,7 @@ test = function() {
 $(test);
 
 test = function() {
-    $('#portfolio *').remove();
+    $('#portfolio_entries *').remove();
     var prefix = 'button draws citation form: ';
 
     askServerForPortfolio();
@@ -454,7 +454,7 @@ testDeletePortfolioEntry = function(params) {
     var prefix = "test of PortfolioEntry.Delete: ";
 
     /* Reset the portfolio DOM objects */
-    $('#portfolio *').remove();
+    $('#portfolio_entries *').remove();
     askServerForPortfolio();
 
     /* Verify that there is a Portfolio Entry represented on the page
@@ -485,12 +485,13 @@ testDeletePortfolioEntry = function(params) {
 		    prefix + "Expected us to submit the primary key of the p_e we want to delete."); 
 	// Don't actually post; instead, just handle a fake response object.
 	var fakeResponse = {
+        'success': true,
 	    'portfolio_entry__pk': $pfEntry.attr('portfolio_entry__pk')
 	};
 	PortfolioEntry.Delete.postOptions.success(fakeResponse);
 
 	/* Verify that the $pfEntry is now hidden */
-	fireunit.ok($pfEntry[0].style.display == 'none', 
+	fireunit.ok($pfEntry.is(':hidden'), 
 		    prefix + 'Expected pfEntry to disappear.');
     };
     
@@ -504,9 +505,9 @@ $(testDeletePortfolioEntry);
 
 prefix = "citation howto: ";
 testCitationHowTo = function() {
-    $('#portfolio *').remove();
+    $('#portfolio_entries *').remove();
     askServerForPortfolio();
-    $howtos = $('#portfolio .citations-wrapper .howto');
+    $howtos = $('#portfolio_entries .citations-wrapper .howto');
     fireunit.ok($howtos.size() > 0, prefix + "Some howtos appear on the page.");
 
     $firstHowtoHideLink = $howtos.eq(0).find('a.hide_me');
