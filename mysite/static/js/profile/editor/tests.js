@@ -401,13 +401,13 @@ test = function(params) {
             };
             PortfolioEntry.Save.postOptions.success(fakeResponse);
             
-            okey("$pfEntry.hasClass('unpublished')");
-
             checkNotifiersForText('Portfolio entry saved');
 
         };
 
         $publishLink.trigger('click');
+
+        fireunit.ok($pfEntry.hasClass('unpublished') == false, "$pfEntry.hasClass('unpublished')");
 
         // Reset mocking
         PortfolioEntry.Save.post = post_copy;
@@ -516,7 +516,7 @@ testDeletePortfolioEntry = function(params) {
         };
         PortfolioEntry.Delete.postOptions.success(fakeResponse);
 
-        ok('Expected $pfEntry to disappear.', $pfEntry.size() == 0, 2000);
+        ok('Expected $pfEntry to disappear.', $pfEntry.is(':hidden'));
     };
 
     $deleteLink.trigger('click');
