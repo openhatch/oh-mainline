@@ -1,7 +1,9 @@
 #importer {
     width: 865px;
     padding: 20px;
+    margin-bottom: 20px;
     /*background-color: #79d9b0;*/
+    background-color: #f9f9f9;
 }
 #importer .head {
     width: 865px;
@@ -11,15 +13,36 @@
     width: 400px;
     margin-right: 20px;
 }
-#importer .who {
-    float: left;
-    width: 445px;
+#importer input[type='text'] {
+    font-size: 15pt;
+    width: 425px;
 }
+#importer .foot {
+    width: 440px;
+    padding: 10px 0;
+}
+#importer input[type='submit'] {
+    float: right;
+}
+
 #portfolio h4 {
+    width: 900px;
+    float: left;
+    font-size: 8pt;
+    text-transform: uppercase;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+#portfolio h5 {
+    margin: 0 0 10px 0;
+    font-size: 13pt;
+    font-weight: normal;
+    font-family: Georgia;
+    color: #555;
 }
 .portfolio_entry {
     float: left;
-    margin-top: 20px;
+    margin-bottom: 20px;
     width: 920px;
     position: relative;
     left: -7px;
@@ -118,6 +141,9 @@
     width: 400px;
     margin: 0;
     padding: 0;
+}
+.portfolio_entry .citation-forms label {
+    font-weight: bold;
 }
 .portfolio_entry .experience_description-wrapper {
     width: 400px;

@@ -60,22 +60,6 @@ function generateUniqueID() {
 
 makeNewInput = function() {
     // {{{
-    var $form = $('form .body');
-    var index = $form.find('.query').size();
-    var extraClass = (index % 2 == 0) ? "" : " odd";
-    var html = ""
-        + "<div id='query_$INDEX' class='query"+ extraClass +"'>"
-        // FIXME: Use $EXTRA_CLASS to include this in the string.
-        + "   <div class='who'>"
-        + "       <input type='text' name='identifier_$INDEX' />"
-        + "   </div>"
-        + "</div>";
-
-    html = html.replace(/\$INDEX/g, index);
-
-    $(html).appendTo($form);
-
-    bindHandlers();
     // }}}
 };
 
@@ -100,7 +84,6 @@ keydownHandler = function() {
 
 bindHandlers = function() {
     // {{{
-    $("form input[type='text']").keydown(keydownHandler);
     $("form .data_source").hoverClass('hover');
     // }}}
 };
@@ -390,7 +373,7 @@ function updatePortfolio(response) {
         $(response.citations).each(addMemberCitations);
 
 	}
-    setEventHandlers();
+    bindEventHandlers();
 };
 
 Citation = {};
@@ -557,7 +540,7 @@ FlagIcon.flag = function () {
     FlagIcon.post();
     return false;
 };
-FlagIcon.setEventHandlers = function() {
+FlagIcon.bindEventHandlers = function() {
     $('.icon_flagger a').click(FlagIcon.flag);
 };
 
@@ -606,9 +589,9 @@ HowTo = {
 $(HowTo.init);
 
 PortfolioEntry = {};
-PortfolioEntry.setEventHandlers = function() {
-    PortfolioEntry.Save.setEventHandlers();
-    PortfolioEntry.Delete.setEventHandlers();
+PortfolioEntry.bindEventHandlers = function() {
+    PortfolioEntry.Save.bindEventHandlers();
+    PortfolioEntry.Delete.bindEventHandlers();
 };
 
 PortfolioEntry.Save = {};
@@ -638,7 +621,7 @@ PortfolioEntry.Save.save = function () {
     PortfolioEntry.Save.post();
     return false;
 }
-PortfolioEntry.Save.setEventHandlers = function() {
+PortfolioEntry.Save.bindEventHandlers = function() {
     $('.portfolio_entry a.publish').click(PortfolioEntry.Save.save);
 };
 
@@ -674,22 +657,22 @@ PortfolioEntry.Delete.delete = function () {
     PortfolioEntry.Delete.post();
     return false;
 }
-PortfolioEntry.Delete.setEventHandlers = function() {
+PortfolioEntry.Delete.bindEventHandlers = function() {
     $('.portfolio_entry .actions a.delete').click(PortfolioEntry.Delete.delete);
 };
 
 
-setEventHandlers = function() {
+bindEventHandlers = function() {
     $('a.delete_citation').click(deleteCitationForThisLink);
     $('.citations-wrapper .add').click(drawAddCitationFormNearThisButton);
-    FlagIcon.setEventHandlers();
-    PortfolioEntry.setEventHandlers();
-    Citation.setEventHandlers();
+    FlagIcon.bindEventHandlers();
+    PortfolioEntry.bindEventHandlers();
+    Citation.bindEventHandlers();
 };
-$(setEventHandlers);
+$(bindEventHandlers);
 
-Citation.setEventHandlers = function() {
-    Citation.HowTo.setEventHandlers();
+Citation.bindEventHandlers = function() {
+    Citation.HowTo.bindEventHandlers();
 };
 Citation.HowTo = {};
 Citation.HowTo.hideAll = function () {
@@ -703,9 +686,55 @@ Citation.HowTo.showMyHowto = function () {
     $showLink.hide();
     return false;
 };
-Citation.HowTo.setEventHandlers = function () {
+Citation.HowTo.bindEventHandlers = function () {
     $('.citations-wrapper .howto a.hide_me').click(Citation.HowTo.hideAll);
     $('.citations-wrapper a.show_howto').click(Citation.HowTo.showMyHowto);
 };
+
+Importer = {};
+Importer.Inputs = {};
+Importer.Inputs.init = function () {
+    Importer.Inputs.makeNew();
+    Importer.Inputs.makeNew();
+};
+Importer.Inputs.makeNew = function () {
+    var $form = $('form#importer .body');
+    var index = $form.find('.query').size();
+    var extraClass = (index % 2 == 0) ? "" : " odd";
+    var html = ""
+        + "<div id='query_$INDEX' class='query"+ extraClass +"'>"
+        // FIXME: Use $EXTRA_CLASS to include this in the string.
+        + "   <div class='who'>"
+        + "       <input type='text' name='identifier_$INDEX' />"
+        + "   </div>"
+        + "</div>";
+
+    html = html.replace(/\$INDEX/g, index);
+
+    $(html).appendTo($form);
+
+    Importer.Inputs.bindEventHandlers();
+};
+Importer.Inputs.keydownHandler = function () {
+    $input = $(this);
+    var oneInputIsBlank = function() {
+        var ret = false;
+        $("form#importer input[type='text']").each(function () {
+                var thisInputIsBlank = (
+                    $(this).val().replace(/\s/g,'') == '' );
+                if (thisInputIsBlank) ret = true;
+                });
+        return ret;
+    }();
+    if (!oneInputIsBlank) {
+        Importer.Inputs.makeNew();
+        Importer.Inputs.bindEventHandlers();
+    }
+};
+Importer.Inputs.bindEventHandlers = function () {
+    $("form#importer input[type='text']").keydown(Importer.Inputs.keydownHandler);
+};
+
+$(Importer.Inputs.init);
 
 // vim: set nu:

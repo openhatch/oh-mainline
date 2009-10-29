@@ -11,7 +11,7 @@ Portfolio editor
 {% endblock css %}
 
 {% block main %}
-<div id='this-used-to-be-the-portfolio' class='module'>
+<div id='portfolio' class='module'>
     <div class='head'>
         <h3>Portfolio editor</h3>
         <ul>
@@ -61,14 +61,14 @@ Portfolio editor
             action='{% url mysite.profile.views.user_selected_these_dia_checkboxes %}'>
             <div class='body'>
                 <div class='howto'>
-                    Please enter the usernames or email addresses you use to contribute to FLOSS:
+                    <h5>Please enter the usernames or email addresses you use to
+                        contribute to FLOSS:</h5>
                     We'll use this to gather information about your activity and involvement in
                     various projects by searching an index of code repositories.
                     <a href="javascript:alert('Just kidding. Not yet implemented.');">Read more
                         about how this works.</a>
                     You can add links to your activity by hand; just click 'Add another record.'
                 </div>
-                <div class='who'>Username or email</div>
             </div>
             <div class='foot'>
                 <input type='submit' value='Submit' id='submit_data_sources' />

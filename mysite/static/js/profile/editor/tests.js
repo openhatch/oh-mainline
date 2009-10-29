@@ -503,8 +503,8 @@ testDeletePortfolioEntry = function(params) {
 
 $(testDeletePortfolioEntry);
 
-prefix = "citation howto: ";
 testCitationHowTo = function() {
+    var prefix = "citation howto: ";
     $('#portfolio_entries *').remove();
     askServerForPortfolio();
     $howtos = $('#portfolio_entries .citations-wrapper .howto');
@@ -528,4 +528,15 @@ testCitationHowTo = function() {
 
 };
 $(testCitationHowTo);
+
+testImporterInputs = function() {
+    var prefix = "importer inputs: ";
+    $inputs = $('#importer input:text').assertN(prefix, 2);
+};
+$(testImporterInputs);
+
+$.fn.assertN = function(prefix, n) {
+    fireunit.ok(this.size() == n, prefix + "there are " + n + " elements matching " + this.selector);
+    return this;
+};
 // vim: set nu:
