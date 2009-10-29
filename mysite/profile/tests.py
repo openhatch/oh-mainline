@@ -1193,6 +1193,7 @@ class SavePortfolioEntry(TwillTests):
                 input['project_description'])
         self.assertEqual(portfolio_entry.experience_description,
                 input['experience_description'])
+        self.assert_(portfolio_entry.is_published, "pf entry is published.")
 
         citations = Citation.objects.filter(portfolio_entry=portfolio_entry)
         for c in citations:

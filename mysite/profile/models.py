@@ -333,6 +333,7 @@ class PortfolioEntry(models.Model):
     project_description = models.TextField()
     experience_description = models.TextField()
     date_created = models.DateTimeField(default=datetime.datetime.utcnow)
+    is_published = models.BooleanField(default=False)
     is_deleted = models.BooleanField(default=False)
 
 # FIXME: Add a DataSource class to DataImportAttempt.
