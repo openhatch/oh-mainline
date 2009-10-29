@@ -649,6 +649,10 @@ PortfolioEntry.Delete.postOptions = {
     'dataType': 'json',
 };
 PortfolioEntry.Delete.postOptions.success = function (response) {
+    if (!response.success) {
+        PortfolioEntry.Delete.postOptions.error(response);
+        return;
+    }
     /* Find the portfolio entry section of the page, and make it disappear. */
     var pk = response.portfolio_entry__pk;
     $portfolioEntry = $('#portfolio_entry_'+pk);

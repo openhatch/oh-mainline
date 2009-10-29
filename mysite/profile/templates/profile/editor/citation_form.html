@@ -1,24 +1,15 @@
-{# use url(mysite.asdf) #}
 <li>
 <form class='add_a_record' method='POST'
     action='{% url mysite.profile.views.add_citation_manually_do %}'>
     {% for field in citation_form %}
-    <div class='section'>
-        <div class='section-heading'>
-            {% if not field.is_hidden %}
-            <h4>
-                <label for='project__name'>
-                    {{ field.label }}
-                </label>
-            </h4>
-            {% endif %}
-        </div>
-        <div class='section-content'>
-            {{ field.errors }}
+    {% if not field.is_hidden %}
+    <label for='project__name'>
+        {{ field.label }}
+    </label>
+    {% endif %}
+    {{ field.errors }}
 
-            {{ field }}
-        </div>
-    </div>
+    {{ field }}
     {% endfor %}
     <input type='submit' value='Save' />
 </form>

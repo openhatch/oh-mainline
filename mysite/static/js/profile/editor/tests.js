@@ -241,7 +241,7 @@ test = function() {
     for (var i = 0; i < names.length; i++) {
         var name = names[i];
         fireunit.ok($form.find('[name="'+name+'"]').size() == 1,
-                prefix + "form as a field called" + name);
+                prefix + "form has a field called" + name);
     }
 
 };

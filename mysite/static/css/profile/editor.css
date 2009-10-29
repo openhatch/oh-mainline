@@ -186,27 +186,41 @@
 }
 .citations-wrapper .howto {
     float: left;
-    background-color: #fff275;
+    background-color: #ffc;
     border-radius: 6px;
     -moz-border-radius: 6px;
-    padding: 6px;
-    color: #555;
+    padding: 12px;
+    color: #111;
     font-size: 8pt;
     font-weight: bold;
     width: 180px;
     margin-top: 10px;
+    border: 1px solid #ccc;
 }
 .citations-wrapper .howto .hide_me {
     float: right;
     padding: 5px;
 }
 .citations-wrapper .show_howto {
+    border: 1px solid #ccc;
     display: none;
-    background-color: #fff275;
+    background-color: #ffc;
     border-radius: 6px;
     -moz-border-radius: 6px;
-    padding: 6px;
+    padding: 4px 6px;
     float: left;
     margin-top: 10px;
     font-weight: bold;
+}
+.citation-forms input[type='text'] {
+    width: 270px;
+}
+.citation-forms input[type='submit'] {
+    width: 60px;
+    font-size: 11pt;
+    padding: 3px;
+}
+.citation-forms li form > div {
+    float: left;
+    width: 350px;
 }
