@@ -17,13 +17,10 @@
                 {% endif %}
                 />
                 
-                <div class='project_name'>
-                    {% if adding_mode %}
-                    <form method='POST' action=''><input type='text' value='{{ pf_entry.project.name }}' /></form>
-                    {% else %}
+                <span class='project_name'>
                     {{ pf_entry.project.name }}
-                    {% endif %}
-                </div>
+                    bbq
+                </span>
                 {% if edit_mode and not adding_mode %}
                 <div class='icon_flagger'><a href='#'>&larr; Flag icon as incorrect</a></div>
                 {% endif %}

@@ -761,8 +761,6 @@ Importer.Inputs.makeNew = function () {
     
     $input_container.appendTo($form);
 
-    console.info("input_container", $input_container);
-
     Importer.Inputs.bindEventHandlers();
 };
 Importer.Inputs.keydownHandler = function () {
@@ -824,7 +822,9 @@ PortfolioEntry.Add = {};
 PortfolioEntry.Add.$link = null;
 PortfolioEntry.Add.$projectNames = null;
 PortfolioEntry.Add.init = function () {
-    PortfolioEntry.Add.$link = $('a#add_pf_entry');
+    console.info('console me');
+    var whatever = $('a#add_pf_entry').assertN(1);
+    PortfolioEntry.Add.$link = whatever;
     PortfolioEntry.Add.bindEventHandlers();
 };
 PortfolioEntry.Add.clickHandler = function () {
@@ -839,18 +839,20 @@ PortfolioEntry.Add.clickHandler = function () {
 PortfolioEntry.Add.bindEventHandlers = function () {
     PortfolioEntry.Add.$link.click(PortfolioEntry.Add.clickHandler);
 };
+
 $(PortfolioEntry.Add.init);
 
-Portfolio.Add.saveProjectName = function(value, settings) {
+PortfolioEntry.Add.saveProjectName = function(value, settings) {
     data = {};
     data[this.id] = value;
     $.post('/+portfolio/entry/name/save', data);
     return value;
 };
 
-Portfolio.Add.ProjectName.init = function () {
-    PortfolioEntry.Add.$projectNames = $('#portfolio_entries .project_name input:text').assertN(1);
-    PortfolioEntry.Add.$projectNames.editable(
+PortfolioEntry.Add.ProjectName.init = function () {
+    alert('projectname init');
+    PortfolioEntry.Add.$projectNames = $('#portfolio_entries .project_name').assertN(1);
+    /*PortfolioEntry.Add.$projectNames.editable(
             PortfolioEntry.Add.saveProjectName,
             {'type': 'text',
             'submit': 'OK',
@@ -858,6 +860,7 @@ Portfolio.Add.ProjectName.init = function () {
             'tooltip': 'Click to edit',
             'placeholder': 'Click to edit',
             'onblur': 'submit'});
+    */
 };
 
 // vim: set nu:

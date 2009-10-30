@@ -646,22 +646,36 @@ testLinkDrawsAWidgetForAddingAPortfolioEntry = function () {
     $widget = $('#portfolio_entries .portfolio_entry.adding');
     fireunit.compare( $widget.size(), 0, "there's no widget until we click");
 
+    fireunit.ok(jQuerySaysThisObjectHasAHandler($link, 'click'),
+		"$link has an onclick handler");
     $link.trigger('click');
 
     $widget = $($widget.selector);
     fireunit.compare( $widget.size(), 1, "there's one widget after we click");
+
+    /* 
+     * Test that the project_name widget properly has a click handler set.
+     */
+    // make sure we have one
+    /* $projectName = $widget.find('.project_name').assertN(1); */
+
+    // make sure there is click handler
+    /* firebug.ok(jQuerySaysThisObjectHasAHandler($projectName, "click"),
+       prefix + "Now, the project name has a click handler."); */
+
 };
 $(testLinkDrawsAWidgetForAddingAPortfolioEntry);
 
-testBlurProjectNameToSave = function () {
-    var prefix = "testBlurProjectNameToSave" ;
-    $projectNameField = $('#portfolio_entries .portfolio_entry.adding .project_name input:text').assertN(1);
-    $projectNameField.trigger('blur');
-    PortfolioEntry.Add.saveProjectName = function() {
-        alert('you posted!!!!!!');
-    };
-};
-$(testBlurProjectNameToSave);
+var jQuerySaysThisObjectHasAHandler = function(jqueryObj, handler) {
+    var real_obj = jqueryObj[0];
+    var handler_meta_array = $.data(real_obj, "events");
+    for (var key in handler_meta_array) {
+	if (key == handler) {
+	    return handler_meta_array[key];
+	}
+    }
+    return false;
+}
 
 $(function() {
         fireunit.testDone();
