@@ -638,8 +638,8 @@ testUIResponseToPFEntryPublication = function() {
 };
 $(testUIResponseToPFEntryPublication);
 
-textLinkDrawsAWidgetForAddingAPortfolioEntry = function () {
-    prefix = "link draws a widget for adding a portfolio entry" 
+testLinkDrawsAWidgetForAddingAPortfolioEntry = function () {
+    var prefix = "link draws a widget for adding a portfolio entry" ;
     $link = $('a#add_pf_entry');
     fireunit.compare( $link.size(), 1, "there's a link");
 
@@ -651,7 +651,17 @@ textLinkDrawsAWidgetForAddingAPortfolioEntry = function () {
     $widget = $($widget.selector);
     fireunit.compare( $widget.size(), 1, "there's one widget after we click");
 };
-$(textLinkDrawsAWidgetForAddingAPortfolioEntry);
+$(testLinkDrawsAWidgetForAddingAPortfolioEntry);
+
+testBlurProjectNameToSave = function () {
+    var prefix = "testBlurProjectNameToSave" ;
+    $projectNameField = $('#portfolio_entries .portfolio_entry.adding .project_name input:text').assertN(1);
+    $projectNameField.trigger('blur');
+    PortfolioEntry.ProjectName.Save.post = function() {
+        alert('you posted!!!!!!');
+    };
+};
+$(testBlurProjectNameToSave);
 
 $(function() {
         fireunit.testDone();
