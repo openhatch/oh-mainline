@@ -737,7 +737,7 @@ Importer.Inputs.init = function () {
     Importer.Inputs.makeNew();
     Importer.Inputs.makeNew();
     Importer.Inputs.getInputs().eq(0).attr('title',
-            "Type a FLOSS username here");
+            "Type a repository username here");
     Importer.Inputs.getInputs().eq(1).attr('title',
             "Type an email address here");
     Importer.Inputs.getInputs().hint();

@@ -4,6 +4,7 @@
     margin-bottom: 20px;
     /*background-color: #79d9b0;*/
     background-color: #f9f9f9;
+    background: #798189 url('/static/images/ship.png') top right no-repeat;
 }
 #importer .head {
     width: 865px;
@@ -22,6 +23,17 @@
 }
 #importer .query {
     float: right;
+}
+#importer .query [name='identifier_0'] {
+    margin-top: 125px;
+}
+#importer p {
+    margin-top: 40px;
+    color: #f4f4ff;
+}
+#importer p a {
+    font-weight: bold;
+    color: pink;
 }
 #importer .foot {
     width: 440px;
