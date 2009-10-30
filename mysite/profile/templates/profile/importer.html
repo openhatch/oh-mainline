@@ -86,6 +86,11 @@ Portfolio editor
     <div id="portfolio_entry_building_block">
         {% include 'profile/editor/portfolio_entry_element.html' %}
     </div>
+    <div id="add_a_portfolio_entry_building_block">
+        {% with 1 as add_mode %}
+        {% include 'profile/editor/portfolio_entry_element.html' %}
+        {% endwith %}
+    </div>
     <div id="citation_building_block">
         {% include 'profile/editor/citation_element.html' %}
     </div>
@@ -104,11 +109,7 @@ Portfolio editor
 <script type='text/javascript' src='/static/js/jquery.jgrowl.js'></script>
 <script type="text/javascript" src="/static/js/jquery-ui-1.7.2.custom.min.js"></script>
 <script type="text/javascript">
-    $(function() {
-            $("#progressbar").progressbar({
-value: 37
-});
-            });
+    $(function() { $("#progressbar").progressbar(); });
 </script>
 
 
