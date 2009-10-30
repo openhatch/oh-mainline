@@ -324,7 +324,7 @@ function updatePortfolio(response) {
 
         // published/unpublished status
         if (portfolioEntry.fields.is_published == true) {
-            var $actionListItem = $('.actions li.publish_portfolio_entry');
+            var $actionListItem = $new_portfolio_entry.find('.actions li.publish_portfolio_entry');
             var $maybeSpan = $actionListItem.find('span');
 
             $new_portfolio_entry.removeClass("unpublished");
