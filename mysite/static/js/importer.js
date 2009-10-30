@@ -822,6 +822,7 @@ Importer.ProgressBar.bumpTo100 = function() {
 
 PortfolioEntry.Add = {};
 PortfolioEntry.Add.$link = null;
+PortfolioEntry.Add.$projectNames = null;
 PortfolioEntry.Add.init = function () {
     PortfolioEntry.Add.$link = $('a#add_pf_entry');
     PortfolioEntry.Add.bindEventHandlers();
@@ -832,11 +833,31 @@ PortfolioEntry.Add.clickHandler = function () {
     $add_a_pf_entry = $(html);
     $('#portfolio_entries').prepend($add_a_pf_entry);
     $add_a_pf_entry.hide().fadeIn();
+    PortfolioEntry.Add.ProjectName.init();
     return false;
 };
 PortfolioEntry.Add.bindEventHandlers = function () {
     PortfolioEntry.Add.$link.click(PortfolioEntry.Add.clickHandler);
 };
 $(PortfolioEntry.Add.init);
+
+Portfolio.Add.saveProjectName = function(value, settings) {
+    data = {};
+    data[this.id] = value;
+    $.post('/+portfolio/entry/name/save', data);
+    return value;
+};
+
+Portfolio.Add.ProjectName.init = function () {
+    PortfolioEntry.Add.$projectNames = $('#portfolio_entries .project_name input:text').assertN(1);
+    PortfolioEntry.Add.$projectNames.editable(
+            PortfolioEntry.Add.saveProjectName,
+            {'type': 'text',
+            'submit': 'OK',
+            'indicator': 'Saving...',
+            'tooltip': 'Click to edit',
+            'placeholder': 'Click to edit',
+            'onblur': 'submit'});
+};
 
 // vim: set nu:

@@ -657,7 +657,7 @@ testBlurProjectNameToSave = function () {
     var prefix = "testBlurProjectNameToSave" ;
     $projectNameField = $('#portfolio_entries .portfolio_entry.adding .project_name input:text').assertN(1);
     $projectNameField.trigger('blur');
-    PortfolioEntry.ProjectName.Save.post = function() {
+    PortfolioEntry.Add.saveProjectName = function() {
         alert('you posted!!!!!!');
     };
 };
