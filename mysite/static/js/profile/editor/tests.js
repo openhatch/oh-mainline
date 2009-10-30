@@ -621,16 +621,16 @@ testUIResponseToPFEntryPublication = function() {
     fireunit.ok(
             mockedPortfolioResponse.portfolio_entries[1].fields.is_published == false,
             prefix + "assert second pf entry in response is unpublished");
-    $firstEntry = $('.portfolio_entry:eq(0)').assertN(prefix, 1);
-    $secondEntry = $('.portfolio_entry:eq(1)').assertN(prefix, 1);
+    $firstEntry = $('.portfolio_entry:eq(0)').assertN(1);
+    $secondEntry = $('.portfolio_entry:eq(1)').assertN(1);
 
     // assertions
     fireunit.ok(
             $firstEntry.hasClass('unpublished') == false,
             prefix + "assert first pf entry in dom lacks class unpublished");
     fireunit.ok(
-            $firstEntry.find('.publish_portfolio_entry').text() == "Published",
-            prefix + "assert first actions list item of first pf entry is simply the text 'Published'");
+            $firstEntry.find('.publish_portfolio_entry span').assertN(1).text() == "Published",
+            prefix + "assert first actions list item of first pf entry is '<span>Published</span>'");
     fireunit.ok(
             $secondEntry.hasClass('unpublished'),
             prefix + "assert second pf entry in dom has class unpublished");

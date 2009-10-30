@@ -324,8 +324,16 @@ function updatePortfolio(response) {
 
         // published/unpublished status
         if (portfolioEntry.fields.is_published == true) {
+            var $actionListItem = $('.actions li.publish_portfolio_entry');
+            var $maybeSpan = $actionListItem.find('span');
+
             $new_portfolio_entry.removeClass("unpublished");
-            $new_portfolio_entry.find('.actions .publish_portfolio_entry').textSmart('Published');
+
+            // Create the span iff nonexistent
+            if ($maybeSpan.size() == 0) {
+                $actionListItem.find('a').remove();
+                $actionListItem.append($("<span>Published</span>"));
+            }
         }
 	    
         /* Find the project this PortfolioElement refers to */
