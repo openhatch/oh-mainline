@@ -8,6 +8,12 @@ okey = function(js_string) {
     fireunit.ok(eval(js_string), js_string);
 };
 
+$.fn.assertN = function(n) {
+    if (typeof prefix == 'undefined') { prefix = ""; }
+    fireunit.ok(this.size() == n, prefix + "there are " + n + " elements matching " + this.selector);
+    return this;
+};
+
 $.fn.assertOne = function(humanName) {
     if (typeof prefix == 'undefined') { prefix = ""; }
     fireunit.ok(this.size() == 1, prefix + "there's only one " + humanName);
@@ -15,7 +21,7 @@ $.fn.assertOne = function(humanName) {
 };
 
 testProgressBarInvisibleOnPageLoad = function() {
-    $('#importer #progressbar:visible').assertN('', 0);
+    $('#importer #progressbar:visible').assertN(0);
 };
 $(testProgressBarInvisibleOnPageLoad);
 
@@ -569,14 +575,9 @@ $(testCitationHowTo);
 
 testImporterInputs = function() {
     var prefix = "importer inputs: ";
-    $inputs = $('#importer input:text').assertN(prefix, 2);
+    $inputs = $('#importer input:text').assertN(2);
 };
 $(testImporterInputs);
-
-$.fn.assertN = function(prefix, n) {
-    fireunit.ok(this.size() == n, prefix + "there are " + n + " elements matching " + this.selector);
-    return this;
-};
 
 testProgressBar = function() {
     var prefix = "progress bar: ";
@@ -584,7 +585,7 @@ testProgressBar = function() {
     // update portfolio, the mocked response will say no import is running.
     updatePortfolio(mockedPortfolioResponse);
     $bar = $('#importer #progressbar:visible');
-    $bar.assertN(prefix, 0);
+    $bar.assertN(0);
 
     // now make the mockedPortfolioResponse will say an import is running
     mockedPortfolioResponse.import.running = true;
@@ -592,7 +593,7 @@ testProgressBar = function() {
     $bar = $('#importer #progressbar:visible');
 
     // a progress bar should now appear
-    $bar.assertN(prefix, 1);
+    $bar.assertN(1);
 
     fireunit.ok($bar.progressbar('option', 'value') == 20, prefix + "progressbar's value is 20");
 };
