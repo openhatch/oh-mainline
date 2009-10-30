@@ -10,7 +10,7 @@ okey = function(js_string) {
 
 $.fn.assertN = function(n) {
     if (typeof prefix == 'undefined') { prefix = ""; }
-    fireunit.ok(this.size() == n, prefix + "there are " + n + " elements matching " + this.selector);
+    fireunit.compare(this.size(), n, prefix + "there are " + n + " elements matching " + this.selector);
     return this;
 };
 
@@ -19,6 +19,12 @@ $.fn.assertOne = function(humanName) {
     fireunit.ok(this.size() == 1, prefix + "there's only one " + humanName);
     return this;
 };
+
+/* Provide a helper for resetting the portfolio entries' state */
+function redrawPortfolioEntries() {
+    $('#portfolio_entries *').remove();
+    askServerForPortfolio();    
+}
 
 testProgressBarInvisibleOnPageLoad = function() {
     $('#importer #progressbar:visible').assertN(0);
@@ -201,9 +207,8 @@ $(testUpdatePortfolio);
 testNoDuplication = function() {
     // Don't create duplicate citations or portfolio entries.
     // Clear the deck.
-    $('#portfolio_entries *').remove();
+    redrawPortfolioEntries();
 
-    askServerForPortfolio();
     fireunit.ok($('.citations > li').size() == 2,
             "Assert there are two citations.");
     fireunit.ok($('.portfolio_entry:visible').size() == 2,
@@ -615,6 +620,8 @@ $(testUpdateExistingCitations);
 testUIResponseToPFEntryPublication = function() {
     var prefix = "portfolio entry / save / ui response: ";
 
+    redrawPortfolioEntries();
+
     // preconditions
     fireunit.ok(
             mockedPortfolioResponse.portfolio_entries[0].fields.is_published,
@@ -657,11 +664,11 @@ testLinkDrawsAWidgetForAddingAPortfolioEntry = function () {
      * Test that the project_name widget properly has a click handler set.
      */
     // make sure we have one
-    /* $projectName = $widget.find('.project_name').assertN(1); */
+    $projectName = $widget.find('.project_name').assertN(1);
 
     // make sure there is click handler
-    /* firebug.ok(jQuerySaysThisObjectHasAHandler($projectName, "click"),
-       prefix + "Now, the project name has a click handler."); */
+    fireunit.ok(jQuerySaysThisObjectHasAHandler($projectName, "click"),
+       prefix + "Now, the project name has a click handler.");
 
 };
 $(testLinkDrawsAWidgetForAddingAPortfolioEntry);

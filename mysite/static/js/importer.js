@@ -832,8 +832,9 @@ PortfolioEntry.Add.clickHandler = function () {
     var html = $('#add_a_portfolio_entry_building_block').html();
     $add_a_pf_entry = $(html);
     $('#portfolio_entries').prepend($add_a_pf_entry);
-    $add_a_pf_entry.hide().fadeIn();
-    PortfolioEntry.Add.ProjectName.init();
+    $add_a_pf_entry.hide().fadeIn(function() {
+	    PortfolioEntry.Add.ProjectName.init();
+	});
     return false;
 };
 PortfolioEntry.Add.bindEventHandlers = function () {
@@ -852,7 +853,7 @@ PortfolioEntry.Add.saveProjectName = function(value, settings) {
 PortfolioEntry.Add.ProjectName = {};
 
 PortfolioEntry.Add.ProjectName.init = function () {
-    PortfolioEntry.Add.$projectNames = $('#portfolio_entries .project_name').assertN(1);
+    PortfolioEntry.Add.$projectNames = $('#portfolio_entries .adding .project_name');
     PortfolioEntry.Add.$projectNames.editable(
             PortfolioEntry.Add.saveProjectName,
             {'type': 'text',
