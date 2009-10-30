@@ -17,7 +17,7 @@ class Person(models.Model):
     # {{{
     user = models.ForeignKey(User, unique=True)
     gotten_name_from_ohloh = models.BooleanField(default=False)
-    interested_in_working_on = models.CharField(max_length=1024, default='')
+    interested_in_working_on = models.CharField(max_length=1024, default='') # FIXME: Ditch this.
     last_polled = models.DateTimeField(default=datetime.datetime(1970, 1, 1))
     show_email = models.BooleanField(default=False)
     photo = models.ImageField(upload_to=
@@ -28,6 +28,15 @@ class Person(models.Model):
     def __unicode__(self):
         return "username: %s, name: %s %s" % (self.user.username,
                 self.user.first_name, self.user.last_name)
+
+    def get_photo_url_or_default(self):
+        try:
+            return self.photo.url
+        except ValueError:
+            return '/static/images/profile-photos/penguin.png'
+
+    def get_published_portfolio_entries(self):
+        return PortfolioEntry.objects.filter(person=self, is_published=True, is_deleted=False)
 
     def get_recommended_search_terms(self):
         # {{{

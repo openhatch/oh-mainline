@@ -46,17 +46,25 @@ class ProfileTests(TwillTests):
     def testSlash(self):
         response = self.client.get('/people/')
 
-    def _test__portfolio_updates_when_citation_added_to_db(self):
+    def test__portfolio_updates_when_citation_added_to_db(self):
         # {{{
         username = 'paulproteus'
 
         project_name = 'seeseehost'
         #description = 'did some work'
         #url = 'http://example.com/'
-        citation = Citation.create_from_text(username, project_name)
-        found = list(Citation.objects.filter(portfolio_entry__person__user__username=username))
+        paulproteus = Person.objects.get(user__username='paulproteus')
+        citation = Citation(
+                portfolio_entry=PortfolioEntry.objects.get_or_create(
+                    project=Project.objects.get_or_create(name='project name')[0],
+                    person=paulproteus)[0],
+                distinct_months=1,
+                languages='Python',
+                )
+        citation.save()
+        citations = Citation.objects.filter(portfolio_entry__person__user__username=username)
         # Verify it shows up in the DB
-        self.assert_('seeseehost' in [f.project.name for f in found])
+        self.assert_('project name' in [c.portfolio_entry.project.name for c in citations])
 
         # Verify it shows up in the data passed to the portfolio view.
         view = mysite.profile.views.display_person_web
@@ -67,30 +75,6 @@ class ProfileTests(TwillTests):
         # Check that the newly added project is there.
         projects = response.context[0]['projects']
         self.assert_(citation.portfolio_entry.project in projects)
-        # }}}
-
-    def test__project_exp_create_from_text__unit(self):
-        # {{{
-
-        # Create requisite objects
-        person = Person.objects.get(user__username='paulproteus')
-        project = Project.objects.get(name='ccHost')
-
-        # Assemble text input
-        username = person.user.username
-        project_name = project.name
-        description = "sample description"
-        url = "http://sample.com"
-        man_months = "3"
-        primary_language = "perl"
-
-        ProjectExp.create_from_text(
-                person.user.username,
-                project.name,
-                description,
-                url,
-                man_months,
-                primary_language)
         # }}}
 
     def test_change_my_name(self):
