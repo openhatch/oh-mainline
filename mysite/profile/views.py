@@ -141,10 +141,11 @@ def display_person_web(request, user_to_display__username=None):
 #FIXME: Create a separate function that just passes the data required for displaying the little user bar on the top right to the template, and leaves out all the data required for displaying the large user bar on the left.
 def get_personal_data(person):
     # {{{
+
     # FIXME: Make this more readable.
     data_dict = {
             'person': person,
-            'photo_url': photo_url,
+            'photo_url': person.get_photo_url_or_default(),
             } 
 
     data_dict['tags'] = tags_dict_for_person(person)
