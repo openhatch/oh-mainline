@@ -155,6 +155,9 @@ urlpatterns = patterns('',
         (r'^people/portfolio/import/$',
                 'mysite.profile.views.importer'),
 
+        (r'^\+portfolio/editor$',
+                'mysite.profile.views.portfolio_editor'),
+
         (r'^people/edit/info$',
                 'mysite.profile.views.display_person_edit_web',
                 { 'info_edit_mode': True }),

@@ -696,6 +696,9 @@ def importer(request):
     return (request, 'profile/importer.html', data)
     # }}}
 
+#FIXME: Rename importer
+portfolio_editor = importer
+
 def filter_by_key_prefix(dict, prefix):
     """Return those and only those items in a dictionary whose keys have the given prefix."""
     out_dict = {}

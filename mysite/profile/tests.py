@@ -57,24 +57,16 @@ class ProfileTests(TwillTests):
         citation = Citation(
                 portfolio_entry=PortfolioEntry.objects.get_or_create(
                     project=Project.objects.get_or_create(name='project name')[0],
+                    is_published=True,
                     person=paulproteus)[0],
                 distinct_months=1,
                 languages='Python',
                 )
         citation.save()
-        citations = Citation.objects.filter(portfolio_entry__person__user__username=username)
-        # Verify it shows up in the DB
-        self.assert_('project name' in [c.portfolio_entry.project.name for c in citations])
 
-        # Verify it shows up in the data passed to the portfolio view.
-        view = mysite.profile.views.display_person_web
-        paulproteus_portfolio_url = reverse(view, kwargs={
-            'user_to_display__username': 'paulproteus'})
-        response = self.login_with_client().get(paulproteus_portfolio_url)
+        # Verify that get_publish_portfolio_entries() works
+        self.assert_('project name' in [pfe.project.name for pfe in paulproteus.get_published_portfolio_entries()])
 
-        # Check that the newly added project is there.
-        projects = response.context[0]['projects']
-        self.assert_(citation.portfolio_entry.project in projects)
         # }}}
 
     def test_change_my_name(self):
