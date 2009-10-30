@@ -1,22 +1,52 @@
-<div class='portfolio_entry unpublished'>
+<div class='portfolio_entry {% if not edit_mode and not pf_entry.is_published %}unpublished{% endif %}'>
     <div class='submodule'>
         <div class='head project-stuff'>
             <div class='name_and_icon_flagger'>
-                <img class='project_icon' src='/static/no-project-icon.png'/>
-                <div class='project_name'></div>
+                <img class='project_icon'
+                {% if edit_mode %}
+                src='/static/no-project-icon.png'
+                {% else %}
+                src='{{ pf_entry.project.get_url_of_icon_or_generic }}'
+                {% endif %}
+                />
+                
+                <div class='project_name'>{{ pf_entry.project.name }}</div>
+                {% if edit_mode %}
                 <div class='icon_flagger'><a href='#'>&larr; Flag icon as incorrect</a></div>
+                {% endif %}
             </div>
             <div class='project_description-wrapper'>
+                {% if pf_entry.experience_description or edit_mode %}
                 <label>project description</label>
+                {% endif %}
+                {% if edit_mode %}
                 <textarea class='project_description'></textarea>
+                {% else %}
+                <div class='project_description'>{{ pf_entry.project_description }}</div>
+                {% endif %}
             </div>
         </div>
+        {% with pf_entry.get_published_citations as citations %}
+        {% if edit_mode or citations or pf_entry.experience_description %}
         <div class='body personal-stuff'>
             <div class='citations-wrapper'>
                 <label>
+                    {% if edit_mode %}
                     Your involvement 
+                    {% else %}
+                    {% if citations %}
+                    Involvement links
+                    {% endif %}
+                    {% endif %}
                 </label>
-                <ul class='citations'></ul>
+                <ul class='citations'>
+                {% if citations %}
+                {% for citation in citations %}
+                {% include 'profile/editor/citation_element.html' %}
+                {% endfor %}
+                {% endif %}
+                </ul>
+                {% if edit_mode %}
                 <ul class='citation-forms'></ul>
                 <a class='add' href='#'>Add a<span class='nother'>nother</span> link</a>
                 <a href='#' class='show_howto'>?</a>
@@ -29,15 +59,27 @@
                         Googling!)
                     </div>
                 </div>
+                {% endif %}
             </div>
             <div class='experience_description-wrapper'>
-                <label>Describe your involvement for humans</label>
+                {% if pf_entry.experience_description or edit_mode %}
+                <label>Involvement description</label>
+                {% endif %}
+                {% if edit_mode %}
                 <textarea class='experience_description'></textarea>
+                {% else %}
+                <div class='experience_description'>{{ pf_entry.experience_description }}</div>
+                {% endif %}
             </div>
         </div>
+        {% endif %}
+        {% endwith %}
     </div>
+    {% if edit_mode %}
     <ul class='actions'>
         <li class='publish_portfolio_entry'><a href='#'>Publish</a></li>
         <li class='delete_portfolio_entry'><a href='#'>Delete</a></li>
     </ul>
+    {% endif %}
 </div>
+{# vim: set filetype=htmldjango: #}

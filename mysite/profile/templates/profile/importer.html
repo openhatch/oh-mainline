@@ -12,7 +12,8 @@ Portfolio editor
 {% endblock css %}
 
 {% block main %}
-<div id='portfolio' class='module'>
+{% with 1 as edit_mode %}
+<div id='portfolio' class='module editor'>
     <div class='head'>
         <h3>Portfolio editor</h3>
         <ul>
@@ -96,7 +97,7 @@ Portfolio editor
     </div>
 </div>
 
-
+{% endwith %}
 {% endblock main %}
 
 {% block js %}

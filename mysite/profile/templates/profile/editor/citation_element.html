@@ -1,7 +1,9 @@
-<li class='unpublished'>
-<div class='summary'></div>
+<li {% if edit_mode %} class='unpublished'{% endif %}>
+<div class='summary'>{{ citation.summary }}</div>
+{% if edit_mode %}
 <ul class='actions'>
     <li><a href="#" class='delete_citation'></a></li>
 </ul>
+{% endif %}
 </li>
 {# vim: set filetype=htmldjango: #}

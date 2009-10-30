@@ -7,10 +7,11 @@
 {% block css %}
 {{ block.super }}
 @import url('/static/css/profile/portfolio.css');
+@import url('/static/css/profile/editor.css');
 {% endblock css %}
 
 {% block main %}
-<div id='portfolio' class='module project-display'>
+<div id='portfolio' class='module project-display viewer'>
     <div class='head'>
         {% if editable %}
         <ul>
@@ -33,25 +34,7 @@
         {% if portfolio_entries %}
         <ul>
             {% for pf_entry in portfolio_entries %}
-            {% with pf_entry.project as project %}
-            <li>
-            <div class='project-escutcheon'>
-                <div class='logo'>
-                    <a href='/people/{{ person.user.username }}/projects/{{ project.name }}'>
-                        <img alt='logo for {{ project.name}}'
-                        src='{{ project.get_url_of_icon_or_generic }}'/>
-                    </a>
-                </div>
-                <a href='/people/{{ person.user.username }}/projects/{{ project.name }}' class='name'>{{ project.name }}
-                </a>
-                {% if editable %}
-                <a style='display: inline; float: right;'
-                    href='{% url mysite.profile.views.portfolio_editor %}' 
-                    class='edit-link'>edit</a>
-                {% endif %}
-            </div>
-            </li>
-            {% endwith %}
+            {% include 'profile/editor/portfolio_entry_element.html' %}
             {% endfor %}
         </ul>
         {% else %}

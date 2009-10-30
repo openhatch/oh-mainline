@@ -41,7 +41,7 @@
 #progressbar .ui-progressbar-value {
     background-image: url('/static/css/jquery-ui-lightness/images/pbar-ani.gif');
 }
-#portfolio h4 {
+#portfolio.editor h4 {
     width: 900px;
     float: left;
     font-size: 8pt;
@@ -56,12 +56,24 @@
     font-family: Georgia;
     color: #555;
 }
+#portfolio.viewer .submodule .head {
+    width: 660px;
+}
 .portfolio_entry {
     float: left;
     margin-bottom: 20px;
+}
+#portfolio.editor .portfolio_entry {
     width: 920px;
     position: relative;
     left: -7px;
+}
+#portfolio.viewer .portfolio_entry .project_description-wrapper {
+    margin-top: 10px;
+    width: 200px;
+}
+#portfolio.viewer .portfolio_entry .experience_description-wrapper {
+    width: 200px;
 }
 .portfolio_entry.unpublished .submodule, .portfolio_entry.unpublished > .actions {
     border-color: #ffa;
@@ -69,7 +81,7 @@
 .portfolio_entry.unpublished .project_name {
     font-weight: bold;
 }
-.portfolio_entry > .actions {
+#portfolio.editor .portfolio_entry > .actions {
     float: left;
     width: 100px;
     background-color: #fff;
@@ -112,7 +124,15 @@
 }
 .portfolio_entry .project-stuff {
     float: left;
+}
+#portfolio.editor .portfolio_entry .project-stuff {
     width: 758px;
+}
+#portfolio.viewer .portfolio_entry .project-stuff {
+    width: 620px;
+}
+#portfolio.viewer .portfolio_entry .personal-stuff {
+    width: 612px;
 }
 .portfolio_entry .project_icon {
     float: left;
@@ -143,7 +163,7 @@
 .portfolio_entry .project_description {
     width: 390px;
 }
-.portfolio_entry .personal-stuff {
+#portfolio .portfolio_entry .personal-stuff {
     float: left;
     width: 756px;
     background-color: #f4f4f4;

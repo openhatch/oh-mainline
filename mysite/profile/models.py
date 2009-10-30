@@ -345,6 +345,10 @@ class PortfolioEntry(models.Model):
     is_published = models.BooleanField(default=False)
     is_deleted = models.BooleanField(default=False)
 
+    def get_published_citations(self):
+        return Citation.objects.filter(portfolio_entry=self,
+                is_published=True, is_deleted=False)
+
 # FIXME: Add a DataSource class to DataImportAttempt.
 
 class Citation(models.Model):
