@@ -847,20 +847,21 @@ PortfolioEntry.Add.saveProjectName = function(value, settings) {
     data[this.id] = value;
     $.post('/+portfolio/entry/name/save', data);
     return value;
-};
+}; 
+
+PortfolioEntry.Add.ProjectName = {};
 
 PortfolioEntry.Add.ProjectName.init = function () {
-    alert('projectname init');
     PortfolioEntry.Add.$projectNames = $('#portfolio_entries .project_name').assertN(1);
-    /*PortfolioEntry.Add.$projectNames.editable(
+    PortfolioEntry.Add.$projectNames.editable(
             PortfolioEntry.Add.saveProjectName,
             {'type': 'text',
             'submit': 'OK',
             'indicator': 'Saving...',
-            'tooltip': 'Click to edit',
-            'placeholder': 'Click to edit',
+		    'tooltip': 'Click and type a project name',
+            'placeholder': 'Click and type a project name',
             'onblur': 'submit'});
-    */
+    
 };
 
 // vim: set nu:
