@@ -217,7 +217,7 @@ testNoDuplication = function() {
 };
 $(testNoDuplication);
 
-test = function() {
+testCitationDelete = function() {
     // Clear the deck.
     $('#portfolio_entries *').remove();
     var prefix = 'button deletes citation: ';
@@ -251,9 +251,9 @@ test = function() {
     }
     window.setTimeout(checkNotifierInAMoment, 500);
 };
-$(test);
+$(testCitationDelete);
 
-test = function() {
+testCitationFormCreate = function() {
     $('#portfolio_entries *').remove();
     var prefix = 'button draws citation form: ';
 
@@ -275,11 +275,11 @@ test = function() {
     }
 
 };
-$(test);
+$(testCitationFormCreate);
 
 askServerForPortfolio_wasCalled = false;
 
-test = function () {
+testCitationAdd = function () {
     var prefix = "add a new citation: ";
     $add_a_new_citation_form = $('.citation-forms li:eq(0) form');
     $add_a_new_citation_form.find('[name="url"]').val('http://google.ca/');
@@ -287,9 +287,9 @@ test = function () {
     fireunit.ok(true,
             prefix + "Yay, the page has not reloaded synchronously since adding a new citation.");
 };
-$(test);
+$(testCitationAdd);
 
-test = function () {
+testCitationSubmit = function () {
     var prefix = "submission of a new citation: ";
     $form_container = $('.citation-forms li:eq(0)');
     fireunit.ok($form_container.size() == 1,
@@ -302,9 +302,9 @@ test = function () {
             prefix + "the form container has disappeared after we handle "
             + "the server's response to the successful submission of the form therein.");
 };
-$(test);
+$(testCitationSubmit);
 
-test = function () {
+testFlagIconOnly4Nongenerics = function () {
     var prefix = "show icon flagger only for nongeneric icons: ";
     fireunit.ok($('.portfolio_entry').eq(0).find('.icon_flagger').size() == 1,
             prefix + "assert project with nongeneric icon bears the link "
@@ -315,9 +315,9 @@ test = function () {
             + "'Flag icon as incorrect'"
             );
 };
-$(test);
+$(testFlagIconOnly4Nongenerics);
 
-test = function () {
+testFlagIcon = function () {
     var prefix = "flag icon as incorrect: ";
     // click a 'Flag icon as incorrect' link
     $icon_flagger = $('.icon_flagger').eq(0);
@@ -345,7 +345,7 @@ test = function () {
 
     FlagIcon.post = post_copy;
 };
-$(test);
+$(testFlagIcon);
 
 function deepCopy(obj) {
     var copy = {};
@@ -353,7 +353,7 @@ function deepCopy(obj) {
     return copy;
 }
 
-test = function(params) {
+testPortfolioEntrySave = function(params) {
 
     $('#portfolio_entries *').remove();
 
@@ -473,14 +473,14 @@ test = function(params) {
 
 };
 testUI = function() {
-    test({mock: true}); // test just the UI
+    testPortfolioEntrySave({mock: true}); // test just the UI
 };
 $(testUI);
 
 // This should work if we test it for a PortfolioEntry that exists in the DB.
 
 testIntegration = function() {
-    test({mock: false}); // integration test
+    testPortfolioEntrySave({mock: false}); // integration test
 }
 //$(testIntegration);
 
@@ -640,6 +640,51 @@ $(testUIResponseToPFEntryPublication);
 
 $(function() {
         fireunit.testDone();
+        });
+
+$(function() { 
+        $('#footer').append($('<h1 style="margin-top: 30px;" id="qunit-header">QUnit example</h1> <h2 id="qunit-banner"></h2> <h2 id="qunit-userAgent"></h2> <ol id="qunit-tests"></ol>'));
+        });
+
+
+$(function () {
+        test("a basic test example", function() {
+            ok( true, "this test is fine" );
+            var value = "hello";
+            equals( "hello", value, "We expect value to be hello" );
+            });
+
+        module("Module A");
+
+        test("first test within module", function() {
+            ok( true, "all pass" );
+            });
+
+        test("second test within module", function() {
+            ok( true, "all pass" );
+            });
+
+        module("Module B");
+
+        test("some other test", function() {
+            expect(2);
+            equals( true, false, "failing test" );
+            equals( true, true, "passing test" );
+            });
+
+        alert('hi');
+        test("link draws a widget for adding a portfolio entry", function () {
+            $link = $('a#add_pf_entry');
+            equals( $link.size(), 1, "there's a link");
+
+            $widget = $('.portfolio_entry.adding');
+            equals( $widget.size(), 0, "there's no widget until we click");
+
+            $link.trigger('click');
+
+            $widget = $($widget.selector);
+            equals( $widget.size(), 1, "there's one widget after we click");
+            });
         });
 
 // vim: set nu ai:
