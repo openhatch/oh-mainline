@@ -10,7 +10,13 @@
                 {% endif %}
                 />
                 
-                <div class='project_name'>{{ pf_entry.project.name }}</div>
+                <div class='project_name'>
+                    {% if adding_mode %}
+                    <form method='POST' action=''><input type='text' value='{{ pf_entry.project.name }}' /></form>
+                    {% else %}
+                    {{ pf_entry.project.name }}
+                    {% endif %}
+                </div>
                 {% if edit_mode %}
                 <div class='icon_flagger'><a href='#'>&larr; Flag icon as incorrect</a></div>
                 {% endif %}
