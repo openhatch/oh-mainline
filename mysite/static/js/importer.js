@@ -277,6 +277,11 @@ function errorWhileAskingForPortfolio() {
     console.log('Error while asking for portfolio.');
 }
 
+$.fn.textSmart = function(text) {
+    // Only replace text if text is different.
+    if (this.text() != text) { this.text(text); }
+};
+
 /*
  * Perhaps we should talk more explicitly with the server about whose portfolio we want.
  * Otherwise somebody might do this:
@@ -320,6 +325,7 @@ function updatePortfolio(response) {
         // published/unpublished status
         if (portfolioEntry.fields.is_published == true) {
             $new_portfolio_entry.removeClass("unpublished");
+            $new_portfolio_entry.find('.actions .publish_portfolio_entry').textSmart('Published');
         }
 	    
         /* Find the project this PortfolioElement refers to */
@@ -331,7 +337,7 @@ function updatePortfolio(response) {
 		    }
 		});
 	    /* project_description */
-	    $(".project_description", $new_portfolio_entry).text(portfolioEntry.fields.project_description);
+	    $(".project_description", $new_portfolio_entry).textSmart(portfolioEntry.fields.project_description);
 	    	   
 	    /* project_icon */
         if (project_we_refer_to.fields.icon == '') {
@@ -342,10 +348,10 @@ function updatePortfolio(response) {
         }
 	    
 	    /* project_name */
-	    $(".project_name", $new_portfolio_entry).text(project_we_refer_to.fields.name);
+	    $(".project_name", $new_portfolio_entry).textSmart(project_we_refer_to.fields.name);
 	    
 	    /* experience_description */
-	    $(".experience_description", $new_portfolio_entry).text(
+	    $(".experience_description", $new_portfolio_entry).textSmart(
                 portfolioEntry.fields.experience_description);
 
         /* Add the appropriate citations to this portfolio entry. */
@@ -375,7 +381,7 @@ function updatePortfolio(response) {
                 }
 
                 var summary = response.summaries[citation.pk]
-                $citation.find('.summary').text(summary);
+                $citation.find('.summary').textSmart(summary);
             }
         };
         $(response.citations).each(addMemberCitations);
@@ -576,7 +582,7 @@ HowTo = {
                 "HowTo.$hideLink.size() == 1",
                 "HowTo.$showLink.size() == 1"];
         for (var i = 0; i < tests.length; i++) {
-            fireunit.ok(eval(tests[i]), tests[i]);
+            // fireunit.ok(eval(tests[i]), tests[i]);
         }
 
         for (var e in HowTo.events) {
@@ -645,7 +651,7 @@ PortfolioEntry.Save.save = function () {
     return false;
 }
 PortfolioEntry.Save.bindEventHandlers = function() {
-    $('.portfolio_entry a.publish').click(PortfolioEntry.Save.save);
+    $('.portfolio_entry li.publish_portfolio_entry a').click(PortfolioEntry.Save.save);
 };
 
 PortfolioEntry.Delete = {};
@@ -681,7 +687,7 @@ PortfolioEntry.Delete.delete = function () {
     return false;
 }
 PortfolioEntry.Delete.bindEventHandlers = function() {
-    $('.portfolio_entry .actions a.delete').click(PortfolioEntry.Delete.delete);
+    $('.portfolio_entry .actions li.delete_portfolio_entry a').click(PortfolioEntry.Delete.delete);
 };
 
 

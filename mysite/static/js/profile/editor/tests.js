@@ -341,9 +341,23 @@ test = function () {
 };
 $(test);
 
+function deepCopy(obj) {
+    var copy = {};
+    $.extend(true, copy, obj);
+    return copy;
+}
+
 test = function(params) {
+
+    $('#portfolio_entries *').remove();
+
+    // set is_published in the first citation of the second portfolio entry to false.
+    mockedPortfolioResponse2 = deepCopy(mockedPortfolioResponse);
+    mockedPortfolioResponse2.portfolio_entries[0].fields.is_published = false;
+
+    updatePortfolio(mockedPortfolioResponse2);
+
     var mock = params.mock;
-    console.log('mock', mock);
 
     var prefix = "test of PortfolioEntry.Save: ";
 
@@ -354,7 +368,7 @@ test = function(params) {
             $pfEntry.size() == 1,
             prefix + "there's at least one pf entry on the page");
 
-    $publishLink = $pfEntry.find('a.publish');
+    $publishLink = $pfEntry.find('li.publish_portfolio_entry a');
     fireunit.ok(
             $publishLink.size() == 1,
             prefix + "there's a publish link on the first pf entry");
@@ -491,7 +505,7 @@ testDeletePortfolioEntry = function(params) {
             $pfEntry.size() == 1,
             prefix + "there's at least one pf entry on the page");
 
-    $deleteLink = $pfEntry.find('a.delete');
+    $deleteLink = $pfEntry.find('li.delete_portfolio_entry a');
     fireunit.ok(
             $deleteLink.size() == 1,
             prefix + "there's a delete link on the first pf entry");
@@ -597,24 +611,34 @@ testUpdateExistingCitations = function() {
 };
 $(testUpdateExistingCitations);
 
-testPFEntriesHaveCSSClass = function() {
-    var prefix = "unpublished portfolio entries have the appropriate css class: ";
+testUIResponseToPFEntryPublication = function() {
+    var prefix = "portfolio entry / save / ui response: ";
+
+    // preconditions
     fireunit.ok(
             mockedPortfolioResponse.portfolio_entries[0].fields.is_published,
             prefix + "assert first pf entry in response is published");
-    console.info(mockedPortfolioResponse);
     fireunit.ok(
             mockedPortfolioResponse.portfolio_entries[1].fields.is_published == false,
             prefix + "assert second pf entry in response is unpublished");
     $firstEntry = $('.portfolio_entry:eq(0)').assertN(prefix, 1);
     $secondEntry = $('.portfolio_entry:eq(1)').assertN(prefix, 1);
+
+    // assertions
     fireunit.ok(
             $firstEntry.hasClass('unpublished') == false,
             prefix + "assert first pf entry in dom lacks class unpublished");
     fireunit.ok(
+            $firstEntry.find('.publish_portfolio_entry').text() == "Published",
+            prefix + "assert first actions list item of first pf entry is simply the text 'Published'");
+    fireunit.ok(
             $secondEntry.hasClass('unpublished'),
             prefix + "assert second pf entry in dom has class unpublished");
 };
-$(testPFEntriesHaveCSSClass);
+$(testUIResponseToPFEntryPublication);
+
+$(function() {
+        fireunit.testDone();
+        });
 
 // vim: set nu ai:
