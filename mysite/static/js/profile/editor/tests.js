@@ -638,53 +638,23 @@ testUIResponseToPFEntryPublication = function() {
 };
 $(testUIResponseToPFEntryPublication);
 
+textLinkDrawsAWidgetForAddingAPortfolioEntry = function () {
+    prefix = "link draws a widget for adding a portfolio entry" 
+    $link = $('a#add_pf_entry');
+    fireunit.compare( $link.size(), 1, "there's a link");
+
+    $widget = $('#portfolio_entries .portfolio_entry.adding');
+    fireunit.compare( $widget.size(), 0, "there's no widget until we click");
+
+    $link.trigger('click');
+
+    $widget = $($widget.selector);
+    fireunit.compare( $widget.size(), 1, "there's one widget after we click");
+};
+$(textLinkDrawsAWidgetForAddingAPortfolioEntry);
+
 $(function() {
         fireunit.testDone();
-        });
-
-$(function() { 
-        $('#footer').append($('<h1 style="margin-top: 30px;" id="qunit-header">QUnit example</h1> <h2 id="qunit-banner"></h2> <h2 id="qunit-userAgent"></h2> <ol id="qunit-tests"></ol>'));
-        });
-
-
-$(function () {
-        test("a basic test example", function() {
-            ok( true, "this test is fine" );
-            var value = "hello";
-            equals( "hello", value, "We expect value to be hello" );
-            });
-
-        module("Module A");
-
-        test("first test within module", function() {
-            ok( true, "all pass" );
-            });
-
-        test("second test within module", function() {
-            ok( true, "all pass" );
-            });
-
-        module("Module B");
-
-        test("some other test", function() {
-            expect(2);
-            equals( true, false, "failing test" );
-            equals( true, true, "passing test" );
-            });
-
-        alert('hi');
-        test("link draws a widget for adding a portfolio entry", function () {
-            $link = $('a#add_pf_entry');
-            equals( $link.size(), 1, "there's a link");
-
-            $widget = $('.portfolio_entry.adding');
-            equals( $widget.size(), 0, "there's no widget until we click");
-
-            $link.trigger('click');
-
-            $widget = $($widget.selector);
-            equals( $widget.size(), 1, "there's one widget after we click");
-            });
         });
 
 // vim: set nu ai:

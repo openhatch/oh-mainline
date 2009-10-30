@@ -820,4 +820,23 @@ Importer.ProgressBar.bumpTo100 = function() {
     $('#importer #progressbar').progressbar('option', 'value', 100);
 };
 
+PortfolioEntry.Add = {};
+PortfolioEntry.Add.$link = null;
+PortfolioEntry.Add.init = function () {
+    PortfolioEntry.Add.$link = $('a#add_pf_entry');
+    PortfolioEntry.Add.bindEventHandlers();
+};
+PortfolioEntry.Add.clickHandler = function () {
+    // Draw a widget for adding pf entries.
+    var html = $('#add_a_portfolio_entry_building_block').html();
+    $add_a_pf_entry = $(html);
+    $('#portfolio_entries').prepend($add_a_pf_entry);
+    $add_a_pf_entry.hide().fadeIn();
+    return false;
+};
+PortfolioEntry.Add.bindEventHandlers = function () {
+    PortfolioEntry.Add.$link.click(PortfolioEntry.Add.clickHandler);
+};
+$(PortfolioEntry.Add.init);
+
 // vim: set nu:

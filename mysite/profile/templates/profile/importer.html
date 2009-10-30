@@ -76,7 +76,7 @@ Portfolio editor
             </div>
         </form>
 
-        <h4>Edit all contributions</h4>
+        <h4>Contributions (#) &mdash; <a id='add_pf_entry' href='#'>Add one</a></h4>
         <div style='width: 800px;' id="portfolio_entries">
             <!-- empty; filled in by JavaScript -->
         </div>
@@ -88,7 +88,7 @@ Portfolio editor
         {% include 'profile/editor/portfolio_entry_element.html' %}
     </div>
     <div id="add_a_portfolio_entry_building_block">
-        {% with 1 as add_mode %}
+        {% with 1 as adding_mode %}
         {% include 'profile/editor/portfolio_entry_element.html' %}
         {% endwith %}
     </div>

@@ -1,4 +1,11 @@
-<div class='portfolio_entry {% if not edit_mode and not pf_entry.is_published %}unpublished{% endif %}'>
+<div class='portfolio_entry
+    {% if adding_mode %}
+    adding
+    {% endif %}
+    {% if not edit_mode and not pf_entry.is_published %}
+    unpublished
+    {% endif %}'
+    >
     <div class='submodule'>
         <div class='head project-stuff'>
             <div class='name_and_icon_flagger'>
@@ -17,7 +24,7 @@
                     {{ pf_entry.project.name }}
                     {% endif %}
                 </div>
-                {% if edit_mode %}
+                {% if edit_mode and not adding_mode %}
                 <div class='icon_flagger'><a href='#'>&larr; Flag icon as incorrect</a></div>
                 {% endif %}
             </div>
