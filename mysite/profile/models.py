@@ -389,33 +389,6 @@ class Citation(models.Model):
         raise ValueError("There's no DIA and I don't know how to summarize this.")
 
     @staticmethod
-    def create_from_text(
-            username,
-            project_name,
-            #description='',
-            #url='',
-            distinct_months=None,
-            languages=''
-            ):
-
-        person = Person.objects.get(user__username=username)
-        project = Project.objects.get_or_create(name=project_name)[0]
-        if distinct_months is not None:
-            distinct_months = int(distinct_months)
-
-        citation = Citation(
-                #url=str(url),
-                #description=str(description),
-                distinct_months=distinct_months,
-                languages=languages)
-
-        citation.portfolio_entry = PortfolioEntry.objects.get_or_create(
-                person=person, project=project)[0]
-
-        citation.save()
-        return citation
-
-    @staticmethod
     def create_from_ohloh_contrib_info(ohloh_contrib_info):
         """Create a new Citation from a dictionary roughly representing an Ohloh ContributionFact."""
         # {{{
