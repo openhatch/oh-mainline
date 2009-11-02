@@ -114,19 +114,6 @@ class DebTagsTests(TwillTests):
 
 # If you're looking for SourceForge and FLOSSMole stuff, look in the repository history.
 
-class PersonTabProjectExpTests(TwillTests):
-    # {{{
-    fixtures = ['user-paulproteus', 'person-paulproteus', 'cchost-data-imported-from-ohloh']
-
-    def test_project_exp_page_template_displays_project_exp(self):
-        # {{{
-        self.login_with_twill()
-        url = 'http://openhatch.org/people/paulproteus/'
-        tc.go(make_twill_url(url))
-        tc.find('ccHost')
-        # }}}
-    # }}}
-
 class ProjectExpTests(TwillTests):
     # {{{
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry',
