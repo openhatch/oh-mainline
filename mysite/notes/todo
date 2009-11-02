@@ -1,11 +1,11 @@
 ## TWO DWO
 
-== High level ==
-* ZIEGS Talk about "user intake process" -- arriving to the site for the first time.
+== Conversations ==
+* Talk about "user intake process" -- arriving to the site for the first time perhaps with Ziegs.
 
 == Python ==
 === Citation ===
-A * Don't make duplicate citations in the db when importing
+C * Don't make duplicate citations in the db when importing (enforce uniqueness of source, person, project, contributor_role, or something like that)
 === Project ===
 A * Django test for project icons being populated from ohloh and satisfy that test
 === Old stuff ===
@@ -23,9 +23,14 @@ C * ZIEGS Textareas labelled 'Project description' and 'Describe your involvemen
     Resting state: Just a paragraph of text. Pretty self explanatory. No field name needed.
     Click to edit. Reveal field name ("Project description" or "Describe your involvement").
     Onblur, save. Become a paragraph of text again.
+D * Pre-populate project descriptions from Freshmeat, Wikipedia and SourceForge.
+E * Project descriptions are pre-populated based on what users write.
 D * "You don't have any contributions yet. Go here to remedy this..." help text when portfolio editor is blank
+D * Cross browser compatibility testing
+        with qunit
 E * permit undeletion of pf entries?
 Q * when a portfolio entry is published, flash green and fade to normal
+Q * use jsmock in testing
 
 === Citations ===
 C * in citation summary, mention username
@@ -37,12 +42,15 @@ E * permit undeletion of citations?
 C * think about how to make these grab more attention (perhaps embolden them)
 
 == Portfolio viewer ==
-C * @portfolio viewer, when you click to edit a particular portfolio entry, the portfolio editor should pick up on that and use an hash/anchor to send you there.
+C * Listing of other contributors.
+C * When you click to edit a particular portfolio entry, the portfolio editor should pick up on that and use an hash/anchor to send you there.
 
 == Importer ==
 B * stop animating the progressbar when it's done
 D * add importer query to a history when the query is done
 Q * visually cue the idea that the importer will stuff new things into the "edit all contributions" section of the portfolio editor. maybe with an arrow
+  * Importing behdad gives us ValueError: {'url': 'UNKNOWN', 'code': 'UNKNOWN'}
+
 
 == Deployment ==
 E * ZIEGS Talk about making Javascript production ready within Django (minified; glomping together in one file)
@@ -55,6 +63,7 @@ F * WISH have git scream at me when i don't add a file with friendly extension.
 * stop using make_twill_url
 * go through FIXMEs
 * talk about using namespaces in Django
+* organic tabs css-tricks.com/organic-tabs
 
 = After portfolio is kaput =
 == VolOpps search engine ==
