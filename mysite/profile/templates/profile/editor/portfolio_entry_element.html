@@ -91,7 +91,11 @@
     </div>
     {% if edit_mode %}
     <ul class='actions'>
-        <li class='publish_portfolio_entry'><a href='#'>Publish</a></li>
+        <li class='portfolio_entry_is_unpublished'><span>Unpublished</span></li>
+        <li class='portfolio_entry_is_published'><span>Published</span></li>
+        <li class='publish_portfolio_entry'><a href='#'>Save and publish</a></li>
+        <li class='save_portfolio_entry'><a href='#'>Save</a></li>
+        <li class='portfolio_entry_is_saved'><span>Saved</span></li>
         <li class='delete_portfolio_entry'><a href='#'>Delete</a></li>
     </ul>
     {% endif %}

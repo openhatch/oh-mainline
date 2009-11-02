@@ -64,6 +64,7 @@ D * Cross browser compatibility testing
 E * permit undeletion of pf entries?
 Q * when a portfolio entry is published, flash green and fade to normal
 Q * use jsmock in testing
+P * profile javascript, especially the long time it takes to click 'Publish' and have the appearance of the pf entry change.
 
 === Citations ===
 C * in citation summary, mention username

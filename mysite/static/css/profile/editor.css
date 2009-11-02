@@ -316,3 +316,26 @@
     float: left;
     width: 350px;
 }
+
+/* portfolio entries do not have a publish button... */
+.portfolio_entry .actions .publish_portfolio_entry { display: none; }
+/* ...unless they're unpublished */
+.portfolio_entry.unpublished .actions .publish_portfolio_entry { display: block; }
+
+/* Don't say the pf entry is published if it isn't */
+.portfolio_entry.unpublished .actions .portfolio_entry_is_published { display: none; }
+
+/* Portfolio entries have the 'Save and publish' button only when they're unpublished */
+.portfolio_entry .actions .publish_portfolio_entry { display: none; }
+.portfolio_entry.unpublished .actions .publish_portfolio_entry { display: block; }
+
+/* Portfolio entries have the 'Save' button only when they're unsaved */
+.portfolio_entry .actions .save_portfolio_entry { display: none; }
+.portfolio_entry.unsaved .actions .save_portfolio_entry { display: block; }
+
+/* Unsaved or unpublished portfolio entries don't say 'Saved' */
+.portfolio_entry.unpublished > .actions > .portfolio_entry_is_saved,
+.portfolio_entry.unsaved > .actions > .portfolio_entry_is_saved { display: none; }
+
+.portfolio_entry .actions .portfolio_entry_is_unpublished { display: none; }
+.portfolio_entry.unpublished .actions .portfolio_entry_is_unpublished { position: relative; left: -22px; font-weight: bold; display: block; }
