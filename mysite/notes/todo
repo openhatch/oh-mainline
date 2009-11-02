@@ -8,8 +8,8 @@
 === Citation ===
 C * Don't make duplicate citations in the db when importing (enforce uniqueness of source, person, project, contributor_role, or something like that)
 === Project ===
-  * Why do project icon fail so bad?
-A * Populate all icons for projects.
+  * Why do project icon fail so bad? LOOKS DONE
+A * Populate all icons for projects. LOOKS DONE
 === Old stuff ===
 C * Remove old models
 C * Remove old tests.
