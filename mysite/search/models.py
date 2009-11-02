@@ -31,12 +31,6 @@ def get_image_data_scaled(image_data, width):
     image_data = new_image_fd.getvalue()
     return image_data
 
-def populate_icon_on_project_creation(instance, created, *args, **kwargs):
-    if created:
-        instance.populate_icon_from_ohloh()
-        
-models.signals.post_save.connect(populate_icon_on_project_creation, Project)
-
 # Create your models here.
 class Project(models.Model):
 
@@ -109,6 +103,12 @@ class Project(models.Model):
 
     def __unicode__(self):
         return "<Project name='%s' language='%s'>" % (self.name, self.language)
+
+def populate_icon_on_project_creation(instance, created, *args, **kwargs):
+    if created:
+        instance.populate_icon_from_ohloh()
+        
+models.signals.post_save.connect(populate_icon_on_project_creation, Project)
 
 class Bug(models.Model):
     project = models.ForeignKey(Project)

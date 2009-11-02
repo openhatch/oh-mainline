@@ -158,6 +158,12 @@ class SlowlohTests(django.test.TestCase):
         projects = oh.get_contribution_info_by_username('keescook')
         self.assert_(len(projects) > 1)
         # }}}
+
+    def test_find_debian(self):
+        self.assertNotEqual("debian", "ubuntu", "This is an assumption of this test.")
+        oh = ohloh.get_ohloh()
+        project_data = oh.project_name2projectdata("Debian GNU/Linux")
+        self.assertEqual(project_data['name'], 'Debian GNU/Linux', "Expected that when we ask Ohloh, what project is called 'Debian GNU/Linux', Ohloh gives a project named 'Debian GNU/Linux', not, for example, 'Ubuntu'.")
     # }}}
 
 class OhlohIconTests(django.test.TestCase):

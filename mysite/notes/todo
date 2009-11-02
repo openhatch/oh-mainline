@@ -2,16 +2,20 @@
 
 == Conversations ==
 * Talk about "user intake process" -- arriving to the site for the first time perhaps with Ziegs.
+* Go through FIXMEs and look for high-priority stuff.
 
 == Python ==
 === Citation ===
 C * Don't make duplicate citations in the db when importing (enforce uniqueness of source, person, project, contributor_role, or something like that)
 === Project ===
-A * Django test for project icons being populated from ohloh and satisfy that test
+  * Why do project icon fail so bad?
+A * Populate all icons for projects.
 === Old stuff ===
 C * Remove old models
 C * Remove old tests.
 C * Remove old views.
+=== Slowloh ===
+When querying Ohloh based on previous Ohloh queries, we should store and use Ohloh's project id where possible. for example, when we get information on someone's open source experience, that includes Ohloh ID for that experience (the "analysis"). Then when go hunting for icons, we should use the project_id in that analysis, not the project name. This will be an improvement on the proposed implementation of icon search (using project name) because that implementation depends on the correct project appearing the first n results of a full-text search.
 
 == Portfolio editor ==
 B * Add portfolio entries
@@ -47,10 +51,10 @@ C * When you click to edit a particular portfolio entry, the portfolio editor sh
 
 == Importer ==
 B * stop animating the progressbar when it's done
+B * Importing behdad gives us ValueError: {'url': 'UNKNOWN', 'code': 'UNKNOWN'}
+C * Save somewhere all the data we get from Ohloh, and the HTML we scrape from Launchpad.
 D * add importer query to a history when the query is done
 Q * visually cue the idea that the importer will stuff new things into the "edit all contributions" section of the portfolio editor. maybe with an arrow
-  * Importing behdad gives us ValueError: {'url': 'UNKNOWN', 'code': 'UNKNOWN'}
-
 
 == Deployment ==
 E * ZIEGS Talk about making Javascript production ready within Django (minified; glomping together in one file)
@@ -77,6 +81,9 @@ F * WISH have git scream at me when i don't add a file with friendly extension.
 
 == Blog posts ==
 C * Django plus FireUnit
+  * Using the Ohloh API: Stumbling blocks
+  * Tab completion for Django test class names and method names.
+  * Tab completion for manage.py when you're using Buildout.
 
 ----------------------------------------------------
 

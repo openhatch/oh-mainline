@@ -115,8 +115,18 @@ class Ohloh(object):
     def project_name2projectdata(self, project_name_query):
         url = 'http://www.ohloh.net/projects.xml?'
         args = {'query': project_name_query}
-        url, data = ohloh_url2data(url, 'result/project', args)
-        return data
+        url, data = ohloh_url2data(url, 'result/project', args, many=True)
+        # Sometimes when we search Ohloh for e.g. "Debian GNU/Linux", the project it gives
+        # us back as the top-ranking hit for full-text relevance is "Ubuntu GNU/Linux." So here
+        # we see if the project dicts have an exact match by project name.
+        exact_match_on_project_name = [ datum for datum in data
+                                        if datum.get('name', None).lower() == project_name_query.lower()]
+        if exact_match_on_project_name:
+            # If there's an exact match on the project name, return this datum
+            return exact_match_on_project_name[0]
+
+        # Otherwise, trust Ohloh's full-text relevance ranking and return the first hit
+        return data[0]
     
     @accepts(object, int)
     def analysis2projectdata(self, analysis_id):
@@ -280,6 +290,7 @@ class Ohloh(object):
             return self.get_icon_for_project_by_human_name(project)
 
     def get_icon_for_project_by_human_name(self, project):
+        """@param project: the name of a project."""
         # Do a real search to find the project
         try:
             data = self.project_name2projectdata(project)
@@ -291,6 +302,8 @@ class Ohloh(object):
             raise ValueError, "Ohloh gave us back nothing."
         except KeyError:
             raise ValueError, "The project exists, but Ohloh knows no icon."
+        # The URL is often something like s3.amazonws.com/bits.ohloh.net/...
+        # But sometimes Ohloh has a typo in their URLs.
         if '/bits.ohloh.net/' not in med_logo:
             med_logo = med_logo.replace('attachments/',
                                         'bits.ohloh.net/attachments/')
