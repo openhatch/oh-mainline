@@ -1,0 +1,80 @@
+## TWO DWO
+
+== High level ==
+* ZIEGS Talk about "user intake process" -- arriving to the site for the first time.
+
+== Python ==
+=== Citation ===
+A * Don't make duplicate citations in the db when importing
+=== Project ===
+A * Django test for project icons being populated from ohloh and satisfy that test
+
+== Portfolio editor ==
+B * Add portfolio entries
+    * Bind handlers on pf entry element creation
+B * big hello for newcomers to the portfolio editor, including information on what's a good citation.
+B * pf entries imported via importer don't seem to get the unpublished class by default.
+B * the panhandle of unpubbed pf entries is sometimes grey not yellow
+C * ZIEGS Textareas labelled 'Project description' and 'Describe your involvement':
+    Resting state: Just a paragraph of text. Pretty self explanatory. No field name needed.
+    Click to edit. Reveal field name ("Project description" or "Describe your involvement").
+    Onblur, save. Become a paragraph of text again.
+D * "You don't have any contributions yet. Go here to remedy this..." help text when portfolio editor is blank
+E * permit undeletion of pf entries?
+Q * when a portfolio entry is published, flash green and fade to normal
+
+=== Citations ===
+C * in citation summary, mention username
+Q * when a citation is published, flash green and fade to normal
+B * unpublished citations in published projects have a little green button labelled "publish"
+D * say "Add a{,nother}record" depending on whether there's already one there.
+C * remove citations from dom on delete
+E * permit undeletion of citations?
+C * think about how to make these grab more attention (perhaps embolden them)
+
+== Portfolio viewer ==
+C * @portfolio viewer, when you click to edit a particular portfolio entry, the portfolio editor should pick up on that and use an hash/anchor to send you there.
+
+== Importer ==
+B * stop animating the progressbar when it's done
+D * add importer query to a history when the query is done
+Q * visually cue the idea that the importer will stuff new things into the "edit all contributions" section of the portfolio editor. maybe with an arrow
+
+== Deployment ==
+E * ZIEGS Talk about making Javascript production ready within Django (minified; glomping together in one file)
+
+== Development tools ==
+F * WISH have git scream at me when i don't add a file with friendly extension.
+
+== Wishlist ==
+* look up how 'finally' works
+* stop using make_twill_url
+* go through FIXMEs
+* talk about using namespaces in Django
+
+= After portfolio is kaput =
+== VolOpps search engine ==
+  * Filters on the left-hand bar on the search engine page.
+    - language
+    - whether it's good for newcomers
+    - project classifiers (from debtags, and trove e.g. <http://pypi.python.org/pypi?%3Aaction=list_classifiers>)
+    - what platforms the software works in
+    - the urgency of the bug
+    - the status of the bug.
+
+== Blog posts ==
+C * Django plus FireUnit
+
+----------------------------------------------------
+
+Some difficulties arise when using John Resig's excellent JavaScript testing framework, FireUnit, in conjunction with Django. Some background first.
+
+A:Whether running in production or locally, our JS unit tests, just like our Django unit tests, use their own data structures ('fixtures'), rather than manipulate the database, local or not. 
+
+B: In fact, our JavaScript unit tests don't depend at all on the correct functioning of the server. They test the user interface exclusively. 
+
+FIXME: Flip A and B. Talk about carefully separating the testing of the user interface from the testing of the business logic. 
+
+In Django, the tests don't touch the database, but touch only testing-specific data. We recreate this environment in JavaScript by sending the tests input in the form of JavaScript objects.
+
+The problem is that our more complex pages naturally interact with the DB. The portfolio editor, for instance, asynchronously pulls portfolio data from the DB and stuffs it into the <abbr title="Document Object Model: JavaScript's representation of the HTML document.">DOM</abbr>. If we run FireUnit tests on those, then the data in the page will originate partly in the database and partly in the JS unit test fixtures.
