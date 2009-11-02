@@ -164,6 +164,11 @@ class SlowlohTests(django.test.TestCase):
         oh = ohloh.get_ohloh()
         project_data = oh.project_name2projectdata("Debian GNU/Linux")
         self.assertEqual(project_data['name'], 'Debian GNU/Linux', "Expected that when we ask Ohloh, what project is called 'Debian GNU/Linux', Ohloh gives a project named 'Debian GNU/Linux', not, for example, 'Ubuntu'.")
+
+    def test_find_empty_project_without_errors(self):
+        oh = ohloh.get_ohloh()
+        project_data = oh.project_name2projectdata("theres no PROJECT quite LIKE THIS ONE two pound curry irrelevant keywords watch me fail please if not god help us")
+        self.assertEqual(project_data, None, "We successfully return None when the project is not found.")
     # }}}
 
 class OhlohIconTests(django.test.TestCase):

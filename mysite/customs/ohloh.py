@@ -119,6 +119,10 @@ class Ohloh(object):
         # Sometimes when we search Ohloh for e.g. "Debian GNU/Linux", the project it gives
         # us back as the top-ranking hit for full-text relevance is "Ubuntu GNU/Linux." So here
         # we see if the project dicts have an exact match by project name.
+
+        if not data:
+            return None # If there is no matching project possibilit at all, get out now.
+
         exact_match_on_project_name = [ datum for datum in data
                                         if datum.get('name', None).lower() == project_name_query.lower()]
         if exact_match_on_project_name:
