@@ -20,15 +20,20 @@ send "git merge origin/master\r"
 
 while {true} {
     expect {
+        eof {
+            send_user "EOF"
+            exit 1
+        }
         "$ " {
-            send_user "There was no fast forward!"; exit 1
+            send_user "There was no fast forward\r"
+            exit 1
             }
         "Fast forward" {
-            send_user "Fast forward detected."
-            exp_continue
+            send_user "Fast forward detected\r"
+            break
         }
         "Already up-to-date." {
-            send_user "Tried to merge, but git cried, Already up-to-date"
+            send_user "Tried to merge, but git cried, Already up-to-date\r"
             exit 0
         }
     }
