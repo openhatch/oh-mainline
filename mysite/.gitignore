@@ -8,5 +8,6 @@
 *.pyc
 *.orig
 mysite/static/project-icons/*
+static/images/icons/projects/*
 .project
 .ropeproject

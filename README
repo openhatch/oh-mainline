@@ -8,7 +8,7 @@ $ sudo rabbitmqctl set_permissions -p localhost rabbiter "" ".*" ".*" || sudo ra
 FIXME: Explain how to create MySQL user oh_milestone_a and grant select permissions.
 
 $ python bootstrap.py
-$ ./bin/buildout
+$ ./bin/buildout # Make sure you're actually in this directory
 $ ./bin/mysite runserver
 
 Now load http://127.0.0.1:8000/search/ in your web browser.

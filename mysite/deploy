@@ -1,0 +1,49 @@
+# Log into linode
+spawn ssh deploy@oh
+
+#FIXME: use /bin/dash -e so the remote shell simply exits on error
+expect "$ "
+
+send "cd milestone-a\r"
+expect "$ "
+
+send "git fetch; echo $?\r"
+expect "0"
+# Expect a success exit code from 'git fetch'
+expect "$ "
+
+send "git ls-files -m\r"
+expect "$ " {exp_continue} \
+           ".*" {send_user "There were some uncommitted modifications in the remote filesystem."; exit 3}
+
+send "git merge origin/master\r"
+
+while {true} {
+    expect {
+        eof {
+            send_user "EOF"
+            exit 1
+        }
+        "$ " {
+            send_user "There was no fast forward\r"
+            exit 1
+            }
+        "Fast forward" {
+            send_user "Fast forward detected\r"
+            break
+        }
+        "Already up-to-date." {
+            send_user "Tried to merge, but git cried, Already up-to-date\r"
+            exit 0
+        }
+    }
+}
+
+# Run buildout if buildout was changed.
+expect "buildout.cfg" {send "./bin/buildout"} \
+    "$ " 
+
+send "touch bin/production.wsgi; echo $?\r"
+expect "0"
+
+#send "screen -rd"
