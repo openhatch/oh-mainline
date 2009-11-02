@@ -1,13 +1,3 @@
-ok = function(message, bool, timeout) {
-    if (typeof prefix != 'undefined') { message = prefix + message; }
-    function run() { fireunit.ok(bool, message); }
-    if (typeof timeout != 'undefined') { run(); }
-    else { window.setTimeout(run, timeout); }
-};
-okey = function(js_string) {
-    fireunit.ok(eval(js_string), js_string);
-};
-
 $.fn.assertN = function(n) {
     if (typeof prefix == 'undefined') { prefix = ""; }
     fireunit.compare(this.size(), n, prefix + "there are " + n + " elements matching " + this.selector);
@@ -125,9 +115,9 @@ testUpdatePortfolio = function() {
     askServerForPortfolio(); // This will be mocked out when testJS = true
     $(mockedPortfolioResponse.portfolio_entries.slice(0,1)).each( function() {
 
+            // "this" is a JSON representation of a PortfolioEntry.
             var portfolio_entry = this;
 
-            // "this" is a JSON representation of a PortfolioEntry.
             // Did we create this PortfolioEntryElement?
             var pee = $("#portfolio_entry_" + portfolio_entry.pk);
 
