@@ -114,6 +114,7 @@ class DebTagsTests(TwillTests):
 
 # If you're looking for SourceForge and FLOSSMole stuff, look in the repository history.
 
+# FIXME: Remove this dead code.
 class ProjectExpTests(TwillTests):
     # {{{
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry',
@@ -171,36 +172,6 @@ class ProjectExpTests(TwillTests):
         # Test that URLs are validated
         self.projectexp_add('asdf', 'QWER!', 'not a real URL, what now', tc_dot_url_should_succeed=False)
 
-        # }}}
-
-    def test_projectexp_delete(self):
-        '''The server can log in paulproteus remove the word 'ccHost' from his profile by posting to the delete controller's URL.'''
-        # {{{
-        client = Client()
-        username='paulproteus'
-        client.login(username=username,
-                     password="paulproteus's unbreakable password")
-
-        person_page = '/people/%s/' % urllib.quote(username)
-        
-        # Load up the profile page
-        response = client.get(person_page)
-        # See! It talks about ccHost!
-        self.assertContains(response, 'ccHost')
-
-        # POST saying we want to delete the ccHost experience...
-        # luckily I read the fixture and I know its ID is 13
-        deletion_handler_url = reverse(
-                mysite.profile.views.projectexp_edit_do,
-                kwargs={'project__name': 'ccHost'})
-        response = client.post(deletion_handler_url,
-                {'0-project_exp_id': '13', '0-delete_this': 'on'})
-        
-        # Now re-GET the profile
-        response = client.get(person_page)
-
-        # See! It no longer talks about ccHost!
-        self.assertNotContains(response, 'ccHost')
         # }}}
 
     def test_projectexp_delete_unauthorized(self):
@@ -494,7 +465,7 @@ class CeleryTests(TwillTests):
                 }]
 
         summaries_we_expect = [
-                "Ohloh's repository index: Coded for 1 month(s) in shell script.",
+                "Coded for 1 month in shell script (Ohloh)",
                 ]
 
         return self._test_data_source_via_emulated_bgtask(

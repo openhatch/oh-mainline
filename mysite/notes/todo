@@ -8,6 +8,10 @@
 A * Don't make duplicate citations in the db when importing
 === Project ===
 A * Django test for project icons being populated from ohloh and satisfy that test
+=== Old stuff ===
+C * Remove old models
+C * Remove old tests.
+C * Remove old views.
 
 == Portfolio editor ==
 B * Add portfolio entries
