@@ -121,7 +121,7 @@ testUpdatePortfolio = function() {
             // Did we create this PortfolioEntryElement?
             var pee = $("#portfolio_entry_" + portfolio_entry.pk);
 
-            fireunit.ok( pee.size() == 1,
+            fireunit.compare( pee.size(), 1,
                 "Expected a portfolio_entry corresponding to " + portfolio_entry);
             fireunit.ok( $('.project_name', pee).text() == "bindlestiff",
                 "Expected the new portfolio_entry to say its project name is bindlestiff");
