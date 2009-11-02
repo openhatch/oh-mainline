@@ -413,12 +413,12 @@ testPortfolioEntrySave = function(params) {
         PortfolioEntry.Save.post = function() {
             // Check that the data in the post are correct.
             var data = PortfolioEntry.Save.postOptions.data;
-            fireunit.ok(
-                    data.project_description == 'new project description',
-                    prefix + "project_description in post matches textarea");
-            fireunit.ok(
-                    data.experience_description == 'new experience description',
-                    prefix + "experience_description in post matches textarea");
+            fireunit.compare(
+                    data.project_description, 'new project description',
+                    prefix + "project_description in postOptions.data matches textarea");
+            fireunit.compare(
+                    data.experience_description,  'new experience description',
+                    prefix + "experience_description in postOptions.data matches textarea");
 
             // Don't actually post; instead, just handle a fake response object.
             var fakeResponse = {
