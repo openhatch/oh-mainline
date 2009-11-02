@@ -646,6 +646,9 @@ testUIResponseToPFEntryPublication = function() {
 $(testUIResponseToPFEntryPublication);
 
 testLinkDrawsAWidgetForAddingAPortfolioEntry = function () {
+
+    redrawPortfolioEntries();
+
     var prefix = "link draws a widget for adding a portfolio entry" ;
     $link = $('a#add_pf_entry');
     fireunit.compare( $link.size(), 1, "there's a link");
@@ -665,11 +668,12 @@ testLinkDrawsAWidgetForAddingAPortfolioEntry = function () {
     $projectDescriptionField.val('new project description');
     $experienceDescriptionField.val('new experience description');
 
-    $saveLink = $widget.find('.publish_portfolio_entry:visible').assertN(1);
+    $saveLink = $widget.find('.publish_portfolio_entry:visible a').assertN(1);
 
     // Monkeypatch function that normally posts to server for saving/publishing a PortfolioEntry.
     var post_copy = PortfolioEntry.Save.post;
     PortfolioEntry.Save.post = function() {
+        alert('hi');
         // Check that the data in the post are correct.
         var data = PortfolioEntry.Save.postOptions.data;
         fireunit.compare(

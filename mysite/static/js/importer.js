@@ -645,6 +645,7 @@ PortfolioEntry.Save.postOptions.error = function (response) {
             + 'A pox on the programmers.');
 };
 PortfolioEntry.Save.post = function () {
+    alert('post');
     $.ajax(PortfolioEntry.Save.postOptions);
 };
 PortfolioEntry.Save.save = function () {
@@ -652,6 +653,7 @@ PortfolioEntry.Save.save = function () {
     $pfEntry = $saveLink.closest('.portfolio_entry');
     PortfolioEntry.Save.postOptions.data = {
         'portfolio_entry__pk': $pfEntry.attr('portfolio_entry__pk'),
+        'project_name': $pfEntry.find('.project_name').val(),
         'project_description': $pfEntry.find('.project_description').val(),
         'experience_description': $pfEntry.find('.experience_description').val()
     };
@@ -832,6 +834,7 @@ PortfolioEntry.Add.clickHandler = function () {
     $add_a_pf_entry = $(html);
     $('#portfolio_entries').prepend($add_a_pf_entry);
     $add_a_pf_entry.hide().fadeIn();
+    PortfolioEntry.Save.bindEventHandlers();
     return false;
 };
 PortfolioEntry.Add.bindEventHandlers = function () {

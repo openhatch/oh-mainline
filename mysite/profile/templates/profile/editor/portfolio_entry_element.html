@@ -24,9 +24,14 @@
                 {% endif %}
                 />
                 
-                <span class='project_name'>{{ pf_entry.project.name }}</span>
+                {% if adding_mode %}
+                    <input class='project_name' type='text' value='' />
+                {% else %}
+                    <span class='project_name'>{{ pf_entry.project.name }}</span>
+                {% endif %}
+
                 {% if edit_mode and not adding_mode %}
-                <div class='icon_flagger'><a href='#'>&larr; Flag icon as incorrect</a></div>
+                    <div class='icon_flagger'><a href='#'>&larr; Flag icon as incorrect</a></div>
                 {% endif %}
             </div>
             <div class='project_description-wrapper'>
