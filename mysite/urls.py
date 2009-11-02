@@ -1,4 +1,5 @@
 from django.conf.urls.defaults import *
+from django.http import HttpResponse
 
 from django.conf import settings
 
@@ -174,6 +175,8 @@ urlpatterns = patterns('',
         # This dangerous regex is last
         (r'^people/(?P<user_to_display__username>[^/]+)[/?]$',
                 'mysite.profile.views.display_person_web'),
+
+        (r'^\+django_are_you_still_alive$', lambda x: HttpResponse('success')),
 
         )
 
