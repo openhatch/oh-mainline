@@ -401,7 +401,6 @@ testPortfolioEntrySave = function(params) {
             $pfEntry.find('.citations li.unpublished').size() > 0,
             prefix + "(precondition) there's at least one unpublished citation in this pf entry.");
 
-    // Edit textareas 
     $projectDescriptionField.val('new project description');
     $experienceDescriptionField.val('new experience description');
 
@@ -654,25 +653,57 @@ testLinkDrawsAWidgetForAddingAPortfolioEntry = function () {
     $widget = $('#portfolio_entries .portfolio_entry.adding');
     fireunit.compare( $widget.size(), 0, "there's no widget until we click");
 
-    fireunit.ok(jQuerySaysThisObjectHasAHandler($link, 'click'),
-		"$link has an onclick handler");
     $link.trigger('click');
 
     $widget = $($widget.selector);
     fireunit.compare( $widget.size(), 1, "there's one widget after we click");
 
-    /* 
-     * Test that the project_name widget properly has a click handler set.
-     */
     // make sure we have one
-    $projectName = $widget.find('.project_name').assertN(1);
+    $projectNameField = $widget.find('input:text.project_name').assertN(1);
 
-    // make sure there is click handler
-    fireunit.ok(jQuerySaysThisObjectHasAHandler($projectName, "click"),
-       prefix + "Now, the project name has a click handler.");
+    $projectNameField.val('new name');
+    $projectDescriptionField.val('new project description');
+    $experienceDescriptionField.val('new experience description');
+
+    $saveLink = $widget.find('.publish_portfolio_entry:visible').assertN(1);
+
+    // Monkeypatch function that normally posts to server for saving/publishing a PortfolioEntry.
+    var post_copy = PortfolioEntry.Save.post;
+    PortfolioEntry.Save.post = function() {
+        // Check that the data in the post are correct.
+        var data = PortfolioEntry.Save.postOptions.data;
+        fireunit.compare(
+                data.project_name, 'new name',
+                prefix + "project_name in postOptions.data matches input field");
+        fireunit.compare(
+                data.project_description, 'new project description',
+                prefix + "project_description in postOptions.data matches textarea");
+        fireunit.compare(
+                data.experience_description,  'new experience description',
+                prefix + "experience_description in postOptions.data matches textarea");
+
+        // Don't actually post; instead, just handle a fake response object.
+        var fakeResponse = {
+            'portfolio_entry__pk': $pfEntry.attr('portfolio_entry__pk')
+        };
+        PortfolioEntry.Save.postOptions.success(fakeResponse);
+        
+        checkNotifiersForText('Portfolio entry saved');
+
+    };
+
+    $saveLink.trigger('click');
+
+    fireunit.compare($pfEntry.hasClass('unpublished'), false, "$pfEntry.hasClass('unpublished')");
+
+    // Reset monkeypatching
+    PortfolioEntry.Save.post = post_copy;
 
 };
 $(testLinkDrawsAWidgetForAddingAPortfolioEntry);
+
+
+// FIXME: Test: Add the 'unsaved' class to a pf entry when textfields are modified.
 
 $(function() {
         fireunit.testDone();
