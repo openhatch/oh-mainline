@@ -1,3 +1,9 @@
+PAY RENT
+PAY RENT
+PAY RENT
+PAY RENT
+PAY RENT
+PAY RENT
 ## TWO DWO
 
 == Conversations ==
@@ -18,6 +24,31 @@ When querying Ohloh based on previous Ohloh queries, we should store and use Ohl
 == Portfolio editor ==
 B * Add portfolio entries
     * Bind handlers on pf entry element creation
+  
+Unpublished pf entry (obviously with unsaved changes):
+
+    *----------
+    | Unpublished 
+    | Save and publish
+    | Delete
+    *------------
+
+Published pf entry with unsaved changes:
+
+    *----------
+    | Published 
+    | Save 
+    | Delete
+    *------------
+
+Published pf entry with no unsaved changes:
+
+    *----------
+    | Published 
+    | Saved
+    | Delete
+    *------------
+
 B * big hello for newcomers to the portfolio editor, including information on what's a good citation.
 B * pf entries imported via importer don't seem to get the unpublished class by default.
 B * the panhandle of unpubbed pf entries is sometimes grey not yellow
