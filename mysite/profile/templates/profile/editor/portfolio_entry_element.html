@@ -1,11 +1,13 @@
-<div class='portfolio_entry
+<div
     {% if adding_mode %}
-    adding unpublished
-    {% endif %}
+    class='portfolio_entry adding unpublished'
+    {% else %}
     {% if not edit_mode and not pf_entry.is_published %}
-    unpublished
-    {% endif %}'
-    >
+    class='portfolio_entry unpublished'
+    {% else %}
+    class='portfolio_entry'
+    {% endif %}
+    {% endif %}>
     <div class='submodule'>
         <div class='head project-stuff'>
             <div class='name_and_icon_flagger'>
