@@ -18,11 +18,21 @@ expect "$ " {exp_continue} \
 
 send "git merge origin/master\r"
 
-# If we encounter this before we encounter 'Fast forward'
-expect \
-    "Fast forward" {exp_continue} \
-    "Already up-to-date." {send_user "Tried to merge, but git cried, Already up-to-date"; exit 0} \
-    "$ " {send_user "There was no fast forward!"; exit 1}
+while {true} {
+    expect {
+        "$ " {
+            send_user "There was no fast forward!"; exit 1
+            }
+        "Fast forward" {
+            send_user "Fast forward detected."
+            exp_continue
+        }
+        "Already up-to-date." {
+            send_user "Tried to merge, but git cried, Already up-to-date"
+            exit 0
+        }
+    }
+}
 
 # Run buildout if buildout was changed.
 expect "buildout.cfg" {send "./bin/buildout"} \
