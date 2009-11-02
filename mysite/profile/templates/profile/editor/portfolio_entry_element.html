@@ -2,11 +2,16 @@
     {% if adding_mode %}
     class='portfolio_entry adding unpublished'
     {% else %}
-    {% if not edit_mode and not pf_entry.is_published %}
-    class='portfolio_entry unpublished'
-    {% else %}
-    class='portfolio_entry'
-    {% endif %}
+        {% if edit_mode %}
+            {% if pf_entry.is_published %}
+                class='portfolio_entry published' 
+            {% else %}
+                class='portfolio_entry unpublished'
+            {% endif %}
+        {% else %}
+            {# We're in view mode, so everything is published. #}
+            class='portfolio_entry'
+        {% endif %}
     {% endif %}>
     <div class='submodule'>
         <div class='head project-stuff'>
