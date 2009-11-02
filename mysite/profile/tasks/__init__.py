@@ -9,6 +9,7 @@ from celery.task import Task
 import celery.registry
 import time
 import random
+import traceback
 
 def create_citations_from_ohloh_contributor_facts(dia_id, ohloh_results):
     '''Input: A sequence of Ohloh ContributionFact dicts
@@ -124,6 +125,9 @@ class FetchPersonDataFromOhloh(Task):
             # if the task is in debugging mode, bubble-up the exception
             if getattr(self, 'debugging', None):
                 raise
+            logger.error("Traceback: ")
+            logger.error(traceback.format_exc())
+
             # else let the exception be logged but not bubble up
             dia.completed = True
             dia.failed = True

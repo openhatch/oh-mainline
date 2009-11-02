@@ -58,6 +58,7 @@ Q * visually cue the idea that the importer will stuff new things into the "edit
 
 == Deployment ==
 E * ZIEGS Talk about making Javascript production ready within Django (minified; glomping together in one file)
+  * Populate the icons in the production db and filesystem. Do it 50 at a time so we don't exhaust our API key's limit.
 
 == Development tools ==
 F * WISH have git scream at me when i don't add a file with friendly extension.

@@ -139,7 +139,9 @@ AUTH_PROFILE_MODULE = "profile.Person"
 LOGIN_URL = '/account/login/'
 LOGIN_REDIRECT_URL = '/account/login/'
 
-OHLOH_API_KEY='JeXHeaQhjXewhdktn4nUw' # "Oman testing"
+OHLOH_API_KEY='JeXHeaQhjXewhdktn4nUw' # This key is called "Oman testing"
+                                        # at <https://www.ohloh.net/accounts/paulproteus/api_keys>
+#OHLOH_API_KEY='0cWqe4uPw7b8Q5337ybPQ' # This key is called "API testing"
 
 applog = logging.getLogger('applog')
 applog.setLevel(logging.DEBUG)
