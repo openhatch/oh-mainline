@@ -823,8 +823,7 @@ PortfolioEntry.Add.$link = null;
 PortfolioEntry.Add.$projectNames = null;
 PortfolioEntry.Add.init = function () {
     console.info('console me');
-    var whatever = $('a#add_pf_entry').assertN(1);
-    PortfolioEntry.Add.$link = whatever;
+    PortfolioEntry.Add.$link = $('a#add_pf_entry');
     PortfolioEntry.Add.bindEventHandlers();
 };
 PortfolioEntry.Add.clickHandler = function () {
