@@ -646,6 +646,34 @@ testUIResponseToPFEntryPublication = function() {
 };
 $(testUIResponseToPFEntryPublication);
 
+testLinkDrawsAWidgetForAddingAPortfolioEntry = function () {
+    var prefix = "link draws a widget for adding a portfolio entry" ;
+    $link = $('a#add_pf_entry');
+    fireunit.compare( $link.size(), 1, "there's a link");
+
+    $widget = $('#portfolio_entries .portfolio_entry.adding');
+    fireunit.compare( $widget.size(), 0, "there's no widget until we click");
+
+    fireunit.ok(jQuerySaysThisObjectHasAHandler($link, 'click'),
+		"$link has an onclick handler");
+    $link.trigger('click');
+
+    $widget = $($widget.selector);
+    fireunit.compare( $widget.size(), 1, "there's one widget after we click");
+
+    /* 
+     * Test that the project_name widget properly has a click handler set.
+     */
+    // make sure we have one
+    $projectName = $widget.find('.project_name').assertN(1);
+
+    // make sure there is click handler
+    fireunit.ok(jQuerySaysThisObjectHasAHandler($projectName, "click"),
+       prefix + "Now, the project name has a click handler.");
+
+};
+$(testLinkDrawsAWidgetForAddingAPortfolioEntry);
+
 $(function() {
         fireunit.testDone();
         });

@@ -831,9 +831,7 @@ PortfolioEntry.Add.clickHandler = function () {
     var html = $('#add_a_portfolio_entry_building_block').html();
     $add_a_pf_entry = $(html);
     $('#portfolio_entries').prepend($add_a_pf_entry);
-    $add_a_pf_entry.hide().fadeIn(function() {
-	    PortfolioEntry.Add.ProjectName.init();
-	});
+    $add_a_pf_entry.hide().fadeIn();
     return false;
 };
 PortfolioEntry.Add.bindEventHandlers = function () {
@@ -841,27 +839,5 @@ PortfolioEntry.Add.bindEventHandlers = function () {
 };
 
 $(PortfolioEntry.Add.init);
-
-PortfolioEntry.Add.saveProjectName = function(value, settings) {
-    data = {};
-    data[this.id] = value;
-    $.post('/+portfolio/entry/name/save', data);
-    return value;
-}; 
-
-PortfolioEntry.Add.ProjectName = {};
-
-PortfolioEntry.Add.ProjectName.init = function () {
-    PortfolioEntry.Add.$projectNames = $('#portfolio_entries .adding .project_name');
-    PortfolioEntry.Add.$projectNames.editable(
-            PortfolioEntry.Add.saveProjectName,
-            {'type': 'text',
-            'submit': 'OK',
-            'indicator': 'Saving...',
-		    'tooltip': 'Click and type a project name',
-            'placeholder': 'Click and type a project name',
-            'onblur': 'submit'});
-    
-};
 
 // vim: set nu:
