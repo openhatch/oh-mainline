@@ -1,3 +1,4 @@
+import sys
 import datetime
 from mysite.customs import ohloh
 import urllib2
@@ -18,16 +19,15 @@ def create_citations_from_ohloh_contributor_facts(dia_id, ohloh_results):
     # {{{
     dia = DataImportAttempt.objects.get(id=dia_id)
     person = dia.person
-    for c_i in ohloh_results:
-        for ohloh_contrib_info in ohloh_results:
-            (project, _) = Project.objects.get_or_create(
-                    name=ohloh_contrib_info['project'])
-            (portfolio_entry, _) = PortfolioEntry.objects.get_or_create(
-                    person=person, project=project)
-            citation = Citation.create_from_ohloh_contrib_info(ohloh_contrib_info)
-            citation.portfolio_entry = portfolio_entry
-            citation.data_import_attempt = dia 
-            citation.save()
+    for ohloh_contrib_info in ohloh_results:
+        (project, _) = Project.objects.get_or_create(
+                name=ohloh_contrib_info['project'])
+        (portfolio_entry, _) = PortfolioEntry.objects.get_or_create(
+                person=person, project=project)
+        citation = Citation.create_from_ohloh_contrib_info(ohloh_contrib_info)
+        citation.portfolio_entry = portfolio_entry
+        citation.data_import_attempt = dia 
+        citation.save()
 
     person.last_polled = datetime.datetime.now()
     dia.completed = True
