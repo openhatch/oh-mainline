@@ -1249,16 +1249,16 @@ class OtherContributors(TwillTests):
     def test_list_other_contributors(self):
         paulproteus = Person.objects.get(user__username='paulproteus')
         barry = Person.objects.get(user__username='barry')
-        project = Project(name='project')
+        project = Project(name='project', icon="static/no-project-icon-w=40.png")
         project.save()
         PortfolioEntry(project=project, person=paulproteus).save()
         PortfolioEntry(project=project, person=barry).save()
         self.assertEqual(
-                project.get_other_contributors_than(paulproteus),
+                project.get_n_other_contributors_than(5, paulproteus),
                 [barry]
                 )
         self.assertEqual(
-                project.get_other_contributors_than(barry),
+                project.get_n_other_contributors_than(5, barry),
                 [paulproteus]
                 )
 
