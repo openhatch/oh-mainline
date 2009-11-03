@@ -352,7 +352,12 @@ function updatePortfolio(response) {
             $new_portfolio_entry.find('.icon_flagger').remove();
         }
         else {
-            $(".project_icon", $new_portfolio_entry).attr('src', "/static/"+project_we_refer_to.fields.icon);
+            var $icon = $new_portfolio_entry.find(".project_icon");
+            var current_src = $icon.attr('src');
+            var response_src = "/static/"+project_we_refer_to.fields.icon;
+            if (current_src != response_src) {
+                $icon.attr('src', response_src);
+            }
         }
 	    
 	    /* project_name */
