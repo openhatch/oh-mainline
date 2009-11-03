@@ -643,6 +643,10 @@ PortfolioEntry.Save.postOptions.success = function (response) {
         var $new_pf_entry = $('#'+response.pf_entry_element_id);
         $new_pf_entry.attr('id', "portfolio_entry_"+response.portfolio_entry__pk);
         $new_pf_entry.attr('portfolio_entry__pk', response.portfolio_entry__pk);
+        $old_project_name_field = $new_pf_entry.find('input:text.project_name');
+        $new_project_name_span = $('<span></span>').addClass('project_name')
+            .text($old_project_name_field.val());
+        $old_project_name_field.replaceWith($new_project_name_span);
     }
     askServerForPortfolio();
 };
