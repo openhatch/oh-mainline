@@ -1242,5 +1242,24 @@ class PortfolioEntryAdd(TwillTests):
             'portfolio_entry__pk': new_pk, 
         }
         self.assertEqual(simplejson.loads(response.content), expected_response_obj)
-                                                      
+
+class OtherContributors(TwillTests):
+    fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
+
+    def test_list_other_contributors(self):
+        paulproteus = Person.objects.get(user__username='paulproteus')
+        barry = Person.objects.get(user__username='barry')
+        project = Project(name='project')
+        project.save()
+        PortfolioEntry(project=project, person=paulproteus).save()
+        PortfolioEntry(project=project, person=barry).save()
+        self.assertEqual(
+                project.get_other_contributors_than(paulproteus),
+                [barry]
+                )
+        self.assertEqual(
+                project.get_other_contributors_than(barry),
+                [paulproteus]
+                )
+
 # vim: set ai et ts=4 sw=4 nu:

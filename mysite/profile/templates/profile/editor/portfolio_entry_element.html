@@ -95,18 +95,16 @@
         {% endwith %}
         {% if not edit_mode and not adding_mode %}
             {# We're in view mode #}
-            {% with pf_entry.project.other_contributors_than the_user as contributors %}
-                {% if contributors %}
-                    <div class='body personal-stuff other-contributors'>
-                        Other contributors:
-                        <ul>
-                        {% for contributor in contributors %}
-                            <li><img src='/static/images/squid.png' />Johnny</li>
-                        {% endfor %}
-                        </ul>
-                    </div>
-                {% endif %}
-            {% endwith %}
+            {% if pf_entry.project.other_contributors_than the_user %}
+                <div class='body personal-stuff other-contributors'>
+                    Other contributors:
+                    <ul>
+                    {% for contributor in pf_entry.project.other_contributors_than the_user 5 %}
+                        <li><img src='/static/images/squid.png' />Johnny</li>
+                    {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
         {% endif %}
     </div>
     {% if edit_mode %}
