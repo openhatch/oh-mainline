@@ -207,6 +207,10 @@ class EditPhoto(TwillTests):
             self.assertEqual( response.context[0]['photo_url'], p.photo.url,
                     "Test that once you've uploaded a photo via the photo editor, "
                     "the template's photo_url variable is correct.")
+            self.assert_(p.photo_thumbnail)
+            thumbnail_as_stored = Image.open(p.photo_thumbnail.file)
+            w, h = thumbnail_as_stored.size
+            self.assertEqual(w, 100)
 
     def test_set_avatar_too_wide(self):
         for image in [photo('static/images/too-wide.jpg'),
