@@ -1,12 +1,14 @@
 from django.db import models
 from django.core.files.base import ContentFile
 from django.core.files.images import get_image_dimensions
-from mysite.customs import ohloh
 from django.conf import settings
 import datetime
 import StringIO
 import Image
 import uuid
+from django.db.models import Q
+
+from mysite.customs import ohloh
 
 def get_image_data_scaled(image_data, width):
     # scale it
@@ -101,11 +103,19 @@ class Project(models.Model):
         scaled_down = get_image_data_scaled(self.icon.file.read(), 40)
         self.icon_smaller_for_badge.save('', ContentFile(scaled_down))
 
+    def get_n_other_contributors_than(self, n, person):
+        from mysite.profile.models import PortfolioEntry
+        pf_entries = PortfolioEntry.objects.filter(Q(project=self), ~Q(person=person))
+        pf_entries = pf_entries[:n] # Slicing the pf entries has the same effect as
+                                    # slicing the list of people.
+        other_contributors = [p.person for p in pf_entries]
+        return other_contributors
+
     def __unicode__(self):
         return "<Project name='%s' language='%s'>" % (self.name, self.language)
 
 def populate_icon_on_project_creation(instance, created, *args, **kwargs):
-    if created:
+    if created and not instance.icon:
         instance.populate_icon_from_ohloh()
         
 models.signals.post_save.connect(populate_icon_on_project_creation, Project)
