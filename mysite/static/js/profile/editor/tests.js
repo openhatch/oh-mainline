@@ -717,6 +717,15 @@ testLinkDrawsAWidgetForAddingAPortfolioEntry = function () {
     // When this click handler is called it will end up using the function above, not the default.
     $saveLink.trigger('click');
 
+    $recently_added_pf_entry = $widget; // Graduated now.
+
+    $recently_added_pf_entry.find('input:text.project_name').assertN(0);
+    fireunit.compare(
+            $recently_added_pf_entry.find('span.project_name').assertN(1).text(),
+            "new name",
+            prefix + "Project name is a span containing the name."
+            );
+
     // Reset monkeypatching
     PortfolioEntry.Save.post = post_copy;
 

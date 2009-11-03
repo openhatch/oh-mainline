@@ -651,7 +651,6 @@ PortfolioEntry.Save.postOptions.error = function (response) {
             + 'A pox on the programmers.');
 };
 PortfolioEntry.Save.post = function () {
-    alert('post');
     $.ajax(PortfolioEntry.Save.postOptions);
 };
 PortfolioEntry.Save.save = function () {
