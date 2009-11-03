@@ -649,20 +649,24 @@ testLinkDrawsAWidgetForAddingAPortfolioEntry = function () {
 
     redrawPortfolioEntries();
 
-    var prefix = "link draws a widget for adding a portfolio entry" ;
+    var prefix = "link draws a widget for adding a portfolio entry: ";
     $link = $('a#add_pf_entry');
-    fireunit.compare( $link.size(), 1, "there's a link");
+    fireunit.compare( $link.size(), 1, prefix + "there's a link");
 
     $widget = $('#portfolio_entries .portfolio_entry.adding');
-    fireunit.compare( $widget.size(), 0, "there's no widget until we click");
+    fireunit.compare( $widget.size(), 0, prefix + "there's no widget until we click");
 
     $link.trigger('click');
 
     $widget = $($widget.selector);
-    fireunit.compare( $widget.size(), 1, "there's one widget after we click");
+    fireunit.compare( $widget.size(), 1, prefix + "there's one widget after we click");
+
+    fireunit.ok($widget.attr('id').match(/^element_/), prefix + "Adder widget has a unique ID.");
 
     // make sure we have one
     $projectNameField = $widget.find('input:text.project_name').assertN(1);
+    $projectDescriptionField = $widget.find('textarea.project_description').assertN(1);
+    $experienceDescriptionField = $widget.find('textarea.experience_description').assertN(1);
 
     $projectNameField.val('new name');
     $projectDescriptionField.val('new project description');
@@ -673,9 +677,11 @@ testLinkDrawsAWidgetForAddingAPortfolioEntry = function () {
     // Monkeypatch function that normally posts to server for saving/publishing a PortfolioEntry.
     var post_copy = PortfolioEntry.Save.post;
     PortfolioEntry.Save.post = function() {
-        alert('hi');
         // Check that the data in the post are correct.
         var data = PortfolioEntry.Save.postOptions.data;
+        fireunit.compare(
+                data.pf_entry_element_id, $widget.attr('id'),
+                prefix + "pf_entry_element_id in postOptions.data is the widget's ID");
         fireunit.compare(
                 data.project_name, 'new name',
                 prefix + "project_name in postOptions.data matches input field");
@@ -686,19 +692,30 @@ testLinkDrawsAWidgetForAddingAPortfolioEntry = function () {
                 data.experience_description,  'new experience description',
                 prefix + "experience_description in postOptions.data matches textarea");
 
+        var new_pf_entry_pk = 99999; // In real life this will be a new pk.
+        $('#portfolio_entry_'+new_pf_entry_pk).assertN(0); // Let's just make sure it isn't used
+        // for some reason.
+
         // Don't actually post; instead, just handle a fake response object.
         var fakeResponse = {
-            'portfolio_entry__pk': $pfEntry.attr('portfolio_entry__pk')
+            'pf_entry_element_id': $widget.attr('id'),
+            'portfolio_entry__pk': new_pf_entry_pk
         };
         PortfolioEntry.Save.postOptions.success(fakeResponse);
         
         checkNotifiersForText('Portfolio entry saved');
 
+        fireunit.compare($widget.attr('id'), 'portfolio_entry_'+new_pf_entry_pk,
+                prefix + "Widget ID updated to reflect new primary key assigned to "
+                + "corresponding record in the db.");
+        fireunit.compare($widget.attr('portfolio_entry__pk'), new_pf_entry_pk,
+                prefix + "Widget attr portfolio_entry__pk updated to reflect new "
+                + "primary key assigned to corresponding record in the db.");
+
     };
 
+    // When this click handler is called it will end up using the function above, not the default.
     $saveLink.trigger('click');
-
-    fireunit.compare($pfEntry.hasClass('unpublished'), false, "$pfEntry.hasClass('unpublished')");
 
     // Reset monkeypatching
     PortfolioEntry.Save.post = post_copy;

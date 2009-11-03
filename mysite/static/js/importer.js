@@ -638,6 +638,12 @@ PortfolioEntry.Save.postOptions = {
 };
 PortfolioEntry.Save.postOptions.success = function (response) {
     Notifier.displayMessage('Portfolio entry saved.');
+    if (typeof response.pf_entry_element_id != 'undefined') {
+        // This was an INSERT aka an "Add"
+        var $new_pf_entry = $('#'+response.pf_entry_element_id);
+        $new_pf_entry.attr('id', "portfolio_entry_"+response.portfolio_entry__pk);
+        $new_pf_entry.attr('portfolio_entry__pk', response.portfolio_entry__pk);
+    }
     askServerForPortfolio();
 };
 PortfolioEntry.Save.postOptions.error = function (response) {
@@ -655,7 +661,10 @@ PortfolioEntry.Save.save = function () {
         'portfolio_entry__pk': $pfEntry.attr('portfolio_entry__pk'),
         'project_name': $pfEntry.find('.project_name').val(),
         'project_description': $pfEntry.find('.project_description').val(),
-        'experience_description': $pfEntry.find('.experience_description').val()
+        'experience_description': $pfEntry.find('.experience_description').val(),
+
+        // Send this always, but really it's only used when the pf entry has no pk yet.
+        'pf_entry_element_id': $pfEntry.attr('id'), 
     };
     PortfolioEntry.Save.post();
     return false;
@@ -832,6 +841,7 @@ PortfolioEntry.Add.clickHandler = function () {
     // Draw a widget for adding pf entries.
     var html = $('#add_a_portfolio_entry_building_block').html();
     $add_a_pf_entry = $(html);
+    $add_a_pf_entry.attr('id', generateUniqueID());
     $('#portfolio_entries').prepend($add_a_pf_entry);
     $add_a_pf_entry.hide().fadeIn();
     PortfolioEntry.Save.bindEventHandlers();
