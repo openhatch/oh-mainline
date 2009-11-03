@@ -118,7 +118,9 @@ def edit_photo_do(request, mock=None):
                                        request.FILES,
                                        instance=person)
     if form.is_valid():
-        form.save()
+        person = form.save()
+        person.generate_thumbnail_from_photo()
+
     return HttpResponseRedirect('/account/edit/photo')
 
 def catch_me(request):

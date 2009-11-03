@@ -30,7 +30,8 @@ class Person(models.Model):
     photo_thumbnail = models.ImageField(upload_to=
                               lambda a, b: 'static/photos/profile-photos/' + 
                               generate_person_photo_path(a, b, suffix="-thumbnail"),
-                              default='')
+                              default='',
+                              null=True)
 
     def __unicode__(self):
         return "username: %s, name: %s %s" % (self.user.username,
@@ -41,6 +42,12 @@ class Person(models.Model):
             return self.photo.url
         except ValueError:
             return '/static/images/profile-photos/penguin.png'
+
+    def get_photo_thumbnail_url_or_default(self):
+        try:
+            return self.photo_thumbnail.url
+        except ValueError:
+            return '/static/images/profile-photos/penguin-40px.png'
 
     def get_published_portfolio_entries(self):
         return PortfolioEntry.objects.filter(person=self, is_published=True, is_deleted=False)
@@ -74,9 +81,12 @@ class Person(models.Model):
         return self.get_full_name() or self.user.username
 
     def generate_thumbnail_from_photo(self):
-        width = 100
-        scaled_down = get_image_data_scaled(self.photo.file.read(), width)
-        self.photo_thumbnail.save('', ContentFile(scaled_down))
+        if self.photo:
+            width = 40
+            self.photo.file.seek(0) 
+            scaled_down = get_image_data_scaled(self.photo.file.read(), width)
+            self.photo_thumbnail.save('', ContentFile(scaled_down))
+
     # }}}
 
 def create_profile_when_user_created(instance, created, *args, **kwargs):
@@ -84,16 +94,6 @@ def create_profile_when_user_created(instance, created, *args, **kwargs):
         person, p_created = Person.objects.get_or_create(user=instance)
         
 models.signals.post_save.connect(create_profile_when_user_created, User)
-
-def create_thumbnail_image_when_user_photo_modified(instance, *args, **kwargs):
-    try:
-        existing_photo = Person.objects.get(instance.pk).photo
-        if existing_photo != instance.photo:
-            instance.generate_thumbnail_from_photo()
-    except Person.DoesNotExist:
-        instance.generate_thumbnail_from_photo()
-        
-models.signals.pre_save.connect(create_thumbnail_image_when_user_photo_modified, Person)
 
 class DataImportAttempt(models.Model):
     # {{{
