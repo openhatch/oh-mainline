@@ -75,21 +75,11 @@
     float: left;
     margin-bottom: 20px;
 }
-#portfolio.editor .portfolio_entry {
-    width: 920px;
-    position: relative;
-    left: -7px;
-}
-#portfolio.viewer .portfolio_entry .project_description-wrapper {
-    margin-top: 10px;
-    width: 200px;
-}
-#portfolio.viewer .portfolio_entry .experience_description-wrapper {
-    width: 200px;
-}
-.portfolio_entry.unpublished .submodule, .portfolio_entry.unpublished > .actions {
-    border-color: #ffa;
-}
+#portfolio.editor .portfolio_entry { width: 920px; position: relative; left: -7px; }
+#portfolio.viewer .portfolio_entry .project_description-wrapper { margin-top: 10px; width: 200px; }
+#portfolio.viewer .portfolio_entry .experience_description-wrapper { width: 200px; }
+.portfolio_entry.unpublished .submodule, .portfolio_entry.unpublished > .actions, .portfolio_entry.unsaved .submodule, .portfolio_entry.unsaved > .actions { border-color: #ffa; }
+
 .portfolio_entry.unpublished .project_name {
     font-weight: bold;
 }

@@ -628,6 +628,12 @@ PortfolioEntry = {};
 PortfolioEntry.bindEventHandlers = function() {
     PortfolioEntry.Save.bindEventHandlers();
     PortfolioEntry.Delete.bindEventHandlers();
+    $('#portfolio_entries .portfolio_entry textarea').keydown(pfEntryFieldKeydownHandler);
+};
+
+pfEntryFieldKeydownHandler = function () {
+    var $textarea = $(this);
+    $textarea.closest('.portfolio_entry').not('.unsaved').addClass('unsaved');
 };
 
 PortfolioEntry.Save = {};
@@ -847,7 +853,7 @@ PortfolioEntry.Add.clickHandler = function () {
     $add_a_pf_entry.attr('id', generateUniqueID());
     $('#portfolio_entries').prepend($add_a_pf_entry);
     $add_a_pf_entry.hide().fadeIn();
-    PortfolioEntry.Save.bindEventHandlers();
+    PortfolioEntry.bindEventHandlers();
     return false;
 };
 PortfolioEntry.Add.bindEventHandlers = function () {
