@@ -105,7 +105,11 @@ class Project(models.Model):
 
     def get_n_other_contributors_than(self, n, person):
         from mysite.profile.models import PortfolioEntry
-        pf_entries = PortfolioEntry.objects.filter(Q(project=self), ~Q(person=person))
+        pf_entries = PortfolioEntry.objects.filter(Q(project=self),
+                ~Q(person=person),
+                Q(is_deleted=False),
+                Q(is_published=True),
+                )
         pf_entries = pf_entries[:n] # Slicing the pf entries has the same effect as
                                     # slicing the list of people.
         other_contributors = [p.person for p in pf_entries]
