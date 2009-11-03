@@ -734,6 +734,27 @@ $(testLinkDrawsAWidgetForAddingAPortfolioEntry);
 
 
 // FIXME: Test: Add the 'unsaved' class to a pf entry when textfields are modified.
+testAddUnsavedClassWhenTextfieldsAreModified = function() {
+    var prefix = "test add unsaved class when textfields are modified: ";
+                                                              // : " <-- little dude
+                                                              // : "; <-- asheesh sees a dude here, i do not.
+    $firstPublishedPFE = $('.portfolio_entry').not('.unpublished').eq(0);
+    fireunit.compare($firstPublishedPFE.hasClass('unsaved'), false,
+            prefix + "first published pf entry doesn't have class unsaved");
+    fireunit.compare( $firstPublishedPFE.find('textarea').size(), 2,
+            prefix + "assume first published pfe has just two textareas");
+    $firstPublishedPFE.find('textarea:eq(0)').trigger('keydown');
+    fireunit.compare($firstPublishedPFE.hasClass('unsaved'), true,
+            prefix + "after we triggered keydown on the first textarea, first published pf entry "
+            + "now has class unsaved");
+    $firstPublishedPFE.removeClass('unsaved');
+    $firstPublishedPFE.find('textarea:eq(1)').trigger('keydown');
+    fireunit.compare($firstPublishedPFE.hasClass('unsaved'), true,
+            prefix + "after we triggered keydown on the second textarea, first published pf entry "
+            + "now has class unsaved");
+};
+$(testAddUnsavedClassWhenTextfieldsAreModified);
+
 
 $(function() {
         fireunit.testDone();
