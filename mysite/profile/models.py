@@ -1,9 +1,12 @@
 # vim: set ai ts=4 sw=4 et:
 
-from django.db import models
 from mysite.search.models import Project, Bug, get_image_data_scaled
-from django.contrib.auth.models import User
 from mysite.customs import ohloh
+
+from django.db import models
+from django.contrib.auth.models import User
+from django.core.files.base import ContentFile
+
 import datetime
 import sys
 import uuid
