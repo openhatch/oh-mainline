@@ -54,19 +54,23 @@ Portfolio editor
     </div>
 
     <div class='body contains-submodules'>
-        <h4>Import contributions</h4>
-        <form id='importer' class='submodule' name='import' method='POST'
+        <style>.apologies p {margin-top: 0; }</style>
+        <div class='apologies' style='font-size: 15pt; padding: 20px 140px; width: 620px; float: left; text-align: center;'><p>Hi! This is the Portfolio Editor, where you can document your involvement with open source projects. Be proud of everything! From bug reports and translations to patches and commits to code repositories.</p><p style='font-size: 11pt;'>To find things to do in the open source community, use our <a href='/search/'>volunteer opportunity search engine.</a></p></div>
+        <h4>Import links</h4>
+        <form id='importer' style='overflow: hidden; height: 40px;' class='submodule' name='import' method='POST'
             action='{% url mysite.profile.views.prepare_data_import_attempts_do %}'>
             <div class='body'>
                 <div class='howto'>
-                    <h5>Please enter the usernames or email addresses you use to
-                        contribute to FLOSS:</h5>
+                    <h5><a href='#' onclick="$('#importer').css('height', 'auto'); return false;">Find my involvement automatically</a></h5>
+                    <p style='margin-top: 60px;'>
+                    Please enter the usernames or email addresses you use to contribute to FLOSS.
+                    We'll find links to your activity and involvement in
+                    various projects.
+                    <a href="javascript:alert('Just kidding. Not yet implemented.');">
+                        How does it work?</a>
+                    </p>
                     <p>
-                    We'll use this to gather information about your activity and involvement in
-                    various projects by searching an index of code repositories.
-                    <a href="javascript:alert('Just kidding. Not yet implemented.');">Read more
-                        about how this works.</a>
-                    You can add links to your activity by hand; just click 'Add another record.'
+                    <a href='#'>Suggest a data source</a>
                     </p>
                 </div>
             </div>
@@ -76,10 +80,9 @@ Portfolio editor
             </div>
         </form>
 
-        <h4>Contributions (#) &mdash; <a id='add_pf_entry' href='#'>Add one</a></h4>
+        <h4>Projects (none yet) &mdash; <a id='add_pf_entry' href='#'>Add a project manually</a></h4>
         <div style='width: 920px;' id="portfolio_entries">
             <div class='loading_message' style='width: 100%; float: left; text-align: center;'>Loading...</div>
-            <div class='apologies' style='font-size: 15pt; padding: 40px 140px; width: 620px; float: left; text-align: center; display: none;'><p>Hi! This is the Portfolio Editor, where you can document your involvement with open source projects. Be proud of everything! From bug reports and translations to patches and commits to code repositories.</p><p style='font-size: 11pt;'>To find things to do in the open source community, use our <a href='/search/'>volunteer opportunity search engine.</a></p></div>
             <!-- JavaScript will swoop in and replace this with useful stuff. -->
         </div>
     </div>
