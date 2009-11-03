@@ -78,7 +78,10 @@
 #portfolio.editor .portfolio_entry { width: 920px; position: relative; left: -7px; }
 #portfolio.viewer .portfolio_entry .project_description-wrapper { margin-top: 10px; width: 200px; }
 #portfolio.viewer .portfolio_entry .experience_description-wrapper { width: 200px; }
-.portfolio_entry.unpublished .submodule, .portfolio_entry.unpublished > .actions, .portfolio_entry.unsaved .submodule, .portfolio_entry.unsaved > .actions { border-color: #ffa; }
+#portfolio.editor .portfolio_entry.unpublished .submodule, 
+#portfolio.editor .portfolio_entry.unpublished > .actions,
+#portfolio.editor .portfolio_entry.unsaved .submodule,
+#portfolio.editor .portfolio_entry.unsaved > .actions { border-color: #ffa; }
 
 .portfolio_entry.unpublished .project_name {
     font-weight: bold;
@@ -112,7 +115,8 @@
 .portfolio_entry > .actions a:hover {
     background-color: #e9e9e9;
 }
-.portfolio_entry > .actions li.publish_portfolio_entry * {
+.portfolio_entry > .actions li.publish_portfolio_entry *,
+.portfolio_entry > .actions li.save_portfolio_entry * {
     /*background-color: #b2dda2;*/
     background-image: url('/static/images/icons/publish.png');
 }
@@ -322,6 +326,8 @@
 /* Portfolio entries have the 'Save' button only when they're unsaved */
 .portfolio_entry .actions .save_portfolio_entry { display: none; }
 .portfolio_entry.unsaved .actions .save_portfolio_entry { display: block; }
+/* Except if they're unpublished. */
+.portfolio_entry.unsaved.unpublished .actions .save_portfolio_entry { display: none; }
 
 /* Unsaved or unpublished portfolio entries don't say 'Saved' */
 .portfolio_entry.unpublished > .actions > .portfolio_entry_is_saved,

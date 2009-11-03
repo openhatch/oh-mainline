@@ -97,3 +97,11 @@
     float: left;
     width: 210px;
 }
+#main .submodule .body.other-contributors {
+    float: left;
+    background-color: #eee;
+}
+#main .submodule .body.other-contributors li {
+    float: left;
+    margin-right: 10px;
+}
