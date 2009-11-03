@@ -1237,10 +1237,10 @@ class PortfolioEntryAdd(TwillTests):
         # Check response
 
         expected_response_obj = {
+            'success': True,
             'pf_entry_element_id': 'element_18',
             'portfolio_entry__pk': new_pk, 
         }
-        self.assertEqual(simplejson.loads(response.content), expected_response_obj,
-                "response was as expected")
+        self.assertEqual(simplejson.loads(response.content), expected_response_obj)
                                                       
 # vim: set ai et ts=4 sw=4 nu:

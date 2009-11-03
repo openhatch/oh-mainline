@@ -850,7 +850,11 @@ def delete_portfolio_entry_do(request):
 def save_portfolio_entry_do(request):
     pk = request.POST['portfolio_entry__pk']
 
-    p = PortfolioEntry.objects.get(pk=pk, person__user=request.user)
+    if pk == 'undefined':
+        project, _ = Project.objects.get_or_create(name=request.POST['project_name'])
+        p = PortfolioEntry(project=project, person=request.user.get_profile())
+    else:
+        p = PortfolioEntry.objects.get(pk=pk, person__user=request.user)
     p.project_description = request.POST['project_description']
     p.experience_description = request.POST['experience_description']
     p.is_published = True
@@ -864,7 +868,8 @@ def save_portfolio_entry_do(request):
 
     return mysite.base.helpers.json_response({
             'success': True,
-            'portfolio_entry__pk': pk
+            'pf_entry_element_id': request.POST['pf_entry_element_id'],
+            'portfolio_entry__pk': p.pk
         })
 
 # vim: ai ts=3 sts=4 et sw=4 nu
