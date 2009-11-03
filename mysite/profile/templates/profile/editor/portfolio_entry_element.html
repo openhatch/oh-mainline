@@ -1,3 +1,4 @@
+{% load profile_extras %}
 <div
     {% if adding_mode %}
     class='portfolio_entry adding unpublished'
@@ -95,6 +96,7 @@
         {% endwith %}
         {% if not edit_mode and not adding_mode %}
             {# We're in view mode #}
+            {% show_other_contributors pf_entry.project the_user 5 %}
             {% if pf_entry.project.other_contributors_than the_user %}
                 <div class='body personal-stuff other-contributors'>
                     Other contributors:
