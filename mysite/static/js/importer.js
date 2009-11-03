@@ -304,9 +304,14 @@ function updatePortfolio(response) {
      */
     var portfolio_entry_html = $('#portfolio_entry_building_block').html();
     var citation_html = $('#citation_building_block').html();
+
+    $('#portfolio_entries .loading_message').remove();
    
     /* Now fill in the template */
     
+    if (response.portfolio_entries.length == 0) {
+        $('#portfolio_entries .apologies').show();
+    }
     for (var i = 0; i < response.portfolio_entries.length; i++) {
         var portfolioEntry = response.portfolio_entries[i];
 	    /* portfolioEntry is something like: {'pk': 0, 'fields': {'project': 0}} 
