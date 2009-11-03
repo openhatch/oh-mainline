@@ -497,7 +497,7 @@ function checkNotifiersForText(text) {
         fireunit.ok(messagesTogether.match(text) != null,
                 "one of the notifier messages includes the phrase '" + text + "'");
     }
-    window.setTimeout(checkNotifiersInAMoment, 1000); // Doesn't seem to work when <= 500.
+    window.setTimeout(checkNotifiersInAMoment, 2000); // Doesn't seem to work when <= 500.
 }
 
 /* Unit-test the deletion of portfolio entries */
@@ -755,9 +755,11 @@ testAddUnsavedClassWhenTextfieldsAreModified = function() {
 };
 $(testAddUnsavedClassWhenTextfieldsAreModified);
 
-
+testsAreDone = function() {
+    fireunit.testDone();
+};
 $(function() {
-        fireunit.testDone();
+        window.setTimeout(testsAreDone, 3000);
         });
 
 // vim: set nu ai:
