@@ -759,6 +759,7 @@ testsAreDone = function() {
     fireunit.testDone();
 };
 $(function() {
+        // FIXME: Mock out the notifier so all the tests are synchronous and we don't have to use time outs.
         window.setTimeout(testsAreDone, 3000);
         });
 

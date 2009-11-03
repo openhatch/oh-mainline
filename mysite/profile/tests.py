@@ -1196,5 +1196,51 @@ class GimmeJsonTellsAboutImport(TwillTests):
 
         self.assertFalse(self.gimme_json()['import']['running'],
                 "After all DIAs are completed, expected that the JSON reports that no import is running.")
+
+class PortfolioEntryAdd(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def test_portfolio_entry_add(self):
+        # preconditions
+        self.assertEqual(
+                Project.objects.filter(name='new project name').count(),
+                0, "expected precondition: there's no project named 'new project name'")
+        self.assertEqual(
+                PortfolioEntry.objects.filter(project__name='new project name').count(),
+                0, "expected precondition: there's no portfolio entry for a project "
+                "named 'new project name'")
+
+        # Here is what the JavaScript seems to POST.
+        post_data = {
+                'portfolio_entry__pk': 'undefined',
+                'project_name': 'new project name',
+                'project_description': 'new project description',
+                'experience_description': 'new experience description',
+                'pf_entry_element_id': 'element_18', 
+                }
+        url = reverse(mysite.profile.views.save_portfolio_entry_do)
+        response = self.login_with_client().post(url, post_data)
+        # Check side-effects
+
+        self.assertEqual(
+                Project.objects.filter(name='new project name').count(),
+                1, "expected: after POSTing to view, there's a project named 'new project name'")
+        self.assertEqual(
+                PortfolioEntry.objects.filter(person__user__username='paulproteus',
+                    project__name='new project name').count(),
+                1, "expected: after POSTing to view, there's a portfolio entry for paulproteus"
+                "for a project named 'new project name'")
+
+        new_pk = PortfolioEntry.objects.get(person__user__username='paulproteus',
+                project__name='new project name').pk
+
+        # Check response
+
+        expected_response_obj = {
+            'pf_entry_element_id': 'element_18',
+            'portfolio_entry__pk': new_pk, 
+        }
+        self.assertEqual(simplejson.loads(response.content), expected_response_obj,
+                "response was as expected")
                                                       
 # vim: set ai et ts=4 sw=4 nu:
