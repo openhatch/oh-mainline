@@ -79,12 +79,12 @@ def create_citations_from_launchpad_results(dia_id, lp_results):
 def rs_action(dia):
     oh = ohloh.get_ohloh()
     return oh.get_contribution_info_by_username(
-            dia.query)
+            dia.query, dia.person)
 
 def ou_action(dia):
     oh = ohloh.get_ohloh()
     return oh.get_contribution_info_by_ohloh_username(
-            dia.query)
+            dia.query, dia.person)
 
 def lp_action(dia):
     # NB: Don't change the way this is called, because calling it this way

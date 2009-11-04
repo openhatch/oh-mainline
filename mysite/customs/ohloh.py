@@ -3,6 +3,7 @@ import xml.parsers.expat
 import sys, urllib, hashlib
 import urllib2
 import cStringIO as StringIO
+from urlparse import urlparse
 from urllib2 import HTTPError
 from django.conf import settings
 
@@ -18,7 +19,7 @@ import re
 from typecheck import accepts, returns
 from typecheck import Any as __
 
-def mechanize_get(url, referrer=None, attempts_remaining=6):
+def mechanize_get(url, referrer=None, attempts_remaining=6, person=None):
     b = mechanize.Browser()
     b.set_handle_robots(False)
     addheaders = [('User-Agent',
@@ -33,16 +34,21 @@ def mechanize_get(url, referrer=None, attempts_remaining=6):
     except HTTPError, e:
         # FIXME: Test with mock object.
         if e.code == 504 and attempts_remaining > 0:
-            msg = "Tried to get %s, got 504, retrying %d more times..." % (
-                    url, attempts_remaining)
-            print >> sys.stderr, msg
-            return mechanize_get(url, referrer, attempts_remaining - 1)
+            message_schema = "Tried to %s, got 504, retrying %d more times..."
+
+            long_message = message_schema % (url, attempts_remaining)
+            print >> sys.stderr, long_message
+
+            if person:
+                short_message = message_schema % (urlparse(url).hostname, attempts_remaining)
+                person.user.message_set.create(message=short_message)
+            return mechanize_get(url, referrer, attempts_remaining-1, person)
         else:
             raise
 
     return b
 
-def ohloh_url2data(url, selector, params = {}, many = False, API_KEY = None):
+def ohloh_url2data(url, selector, params = {}, many = False, API_KEY = None, person=None):
     if API_KEY is None:
         API_KEY = settings.OHLOH_API_KEY
 
@@ -55,7 +61,7 @@ def ohloh_url2data(url, selector, params = {}, many = False, API_KEY = None):
     encoded = urllib.urlencode(params)
     url += encoded
     try:
-        b = mechanize_get(url)
+        b = mechanize_get(url, person)
     except urllib2.HTTPError, e:
         if str(e.code) == '404':
             if many:
@@ -141,11 +147,11 @@ class Ohloh(object):
         proj_id = data['project_id']
         return self.project_id2projectdata(int(proj_id))
         
-    def get_contribution_info_by_username(self, username):
+    def get_contribution_info_by_username(self, username, person=None):
         ret = []
         url = 'http://www.ohloh.net/contributors.xml?'
         url, c_fs = ohloh_url2data(url, 'result/contributor_fact',
-                              {'query': username}, many=True)
+                              {'query': username}, many=True, person=person)
 
         # For each contributor fact, grab the project it was for
         for c_f in c_fs:

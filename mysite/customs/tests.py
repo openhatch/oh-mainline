@@ -13,19 +13,22 @@ import twill
 import lxml
 from twill import commands as tc
 from twill.shell import TwillCommandLoop
+
 import django.test
 from django.test import TestCase
+from django.test.client import Client
+from django.conf import settings
 from django.core.servers.basehttp import AdminMediaHandler
 from django.core.handlers.wsgi import WSGIHandler
+
 from StringIO import StringIO
 import urllib
+from urllib2 import HTTPError
 import simplejson
 import datetime
 import ohloh
 import lp_grabber
 
-from django.test.client import Client
-from django.conf import settings
 from mysite.profile.tasks import FetchPersonDataFromOhloh
 import mysite.customs.miro
 import mysite.customs.feed
@@ -365,6 +368,16 @@ class TestOpenHatchBlogCrawl(django.test.TestCase):
         entries = mysite.customs.feed._blog_entries()
         self.assertEqual(entries[0]['unicode_text'],
                          u'Yo \xe9')
-                
-            
 
+mock_browser_open = mock.Mock()
+mock_browser_open.side_effect = HTTPError(url="", code=504) 
+class UserGetsMessagesDuringImport(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    @mock.patch("mechanize.Browser.open", mock_browser_open)
+    def test_user_get_messages_during_import(self):
+        self.assertRaises(mechanize_get('this string will be ignored', attempts_remaining=1, person=paulproteus), HTTPError)
+
+        self.assertEqual(len(paulproteus.get_messages_and_delete(), 1)
+                
+# vim: set nu:
