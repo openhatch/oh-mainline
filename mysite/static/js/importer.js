@@ -717,10 +717,18 @@ PortfolioEntry.Delete.post = function () {
 PortfolioEntry.Delete.deleteIt = function () {
     $deleteLink = $(this);
     $pfEntry = $deleteLink.closest('.portfolio_entry');
-    PortfolioEntry.Delete.postOptions.data = {
-        'portfolio_entry__pk': $pfEntry.attr('portfolio_entry__pk'),
-    };
-    PortfolioEntry.Delete.post();
+    if ($pfEntry.hasClass('adding')) {
+        // If this pfEntry element is in adding mode,
+        // then there is no corresponding record in the db to delete,
+        // so let's just remove the element and say no more.
+        $pfEntry.remove();
+    }
+    else {
+        PortfolioEntry.Delete.postOptions.data = {
+            'portfolio_entry__pk': $pfEntry.attr('portfolio_entry__pk'),
+        };
+        PortfolioEntry.Delete.post();
+    }
     return false;
 }
 PortfolioEntry.Delete.bindEventHandlers = function() {
@@ -845,11 +853,10 @@ Importer.ProgressBar.showWithValue = function(value) {
     if (value < 10 ) { value = 10; } // Always show a smidgen of progress.
     $bar.addClass('working');
     if (value == 100) { Importer.ProgressBar.bumpTo100(); }
-    $bar.show().progressbar('option', 'value', value);
+    else { $bar.show().progressbar('option', 'value', value); }
 };
 Importer.ProgressBar.bumpTo100 = function() {
-    $bar.removeClass('working');
-    $bar.show().progressbar('option', 'value', 100);
+    $('#importer #progressbar').removeClass('working').progressbar('option', 'value', 100);
 };
 
 PortfolioEntry.Add = {};

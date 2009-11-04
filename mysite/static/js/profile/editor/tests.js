@@ -29,8 +29,8 @@ tester = fireunit;
 //tester = QUnitRunner;
 //tester = StupidRunner;
 
-var jQuerySaysThisObjectHasAHandler = function(jqueryObj, handler) {
-    var real_obj = jqueryObj[0];
+$.fn.getHandler = function(handler) {
+    var real_obj = this[0];
     var handler_meta_array = $.data(real_obj, "events");
     for (var key in handler_meta_array) {
         if (key == handler) {
@@ -40,9 +40,14 @@ var jQuerySaysThisObjectHasAHandler = function(jqueryObj, handler) {
     return false;
 }
 
+$.fn.smartTrigger = function(handlerName) {
+    tester.ok(this.getHandler(handlerName), "the thing has expected handler");
+    this.trigger(handlerName);
+};
+
 $.fn.assertN = function(n) {
     if (typeof prefix == 'undefined') { prefix = ""; }
-    tester.compare(this.size(), n, prefix + "there are " + n + " elements matching " + this.selector);
+    tester.compare(n, this.size(), prefix + "expected there are " + n + " elements matching " + this.selector);
     return this;
 };
 
@@ -666,8 +671,7 @@ testLinkDrawsAWidgetForAddingAPortfolioEntry = function () {
 
     var prefix = "link draws a widget for adding a portfolio entry: ";
 
-    $link = $('a#add_pf_entry');
-    tester.compare( $link.size(), 1, prefix + "there's a link");
+    $link = $('a#add_pf_entry').assertN(1);
 
     $widget = $('#portfolio_entries .portfolio_entry.adding');
     tester.compare( $widget.size(), 0, prefix + "there's no widget until we click");
@@ -790,6 +794,19 @@ testShowUserMessagesDuringImport = function() {
     checkNotifiersForText("message!");
 };
 $(testShowUserMessagesDuringImport);
+
+testDeleteAdderWidget = function() {
+    prefix = "delete adder widget: ";
+    redrawPortfolioEntries();
+    $('a#add_pf_entry').assertN(1).trigger('click');
+    function momentarily() {
+        $widget = $('#portfolio_entries .portfolio_entry.adding').assertN(1);
+        $widget.find('.delete_portfolio_entry a').assertN(1).smartTrigger('click');
+        $($widget.selector).assertN(0);
+    }
+    window.setTimeout(momentarily, 2000);
+};
+$(testDeleteAdderWidget);
 
 $(function () {
         tester.testDone();
