@@ -712,7 +712,7 @@ PortfolioEntry.Delete.postOptions.error = function (response) {
 PortfolioEntry.Delete.post = function () {
     $.ajax(PortfolioEntry.Delete.postOptions);
 };
-PortfolioEntry.Delete.delete = function () {
+PortfolioEntry.Delete.deleteIt = function () {
     $deleteLink = $(this);
     $pfEntry = $deleteLink.closest('.portfolio_entry');
     PortfolioEntry.Delete.postOptions.data = {
@@ -722,7 +722,7 @@ PortfolioEntry.Delete.delete = function () {
     return false;
 }
 PortfolioEntry.Delete.bindEventHandlers = function() {
-    $('.portfolio_entry .actions li.delete_portfolio_entry a').click(PortfolioEntry.Delete.delete);
+    $('.portfolio_entry .actions li.delete_portfolio_entry a').click(PortfolioEntry.Delete.deleteIt);
 };
 
 
