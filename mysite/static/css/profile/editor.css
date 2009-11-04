@@ -166,9 +166,8 @@
     width: 400px;
     float: right;
 }
-.portfolio_entry .project_description {
-    width: 390px;
-}
+.portfolio_entry .project_description { width: 390px; }
+    #portfolio.viewer .portfolio_entry .project_description { width: 190px; }
 #portfolio .portfolio_entry .personal-stuff {
     float: left;
     width: 756px;

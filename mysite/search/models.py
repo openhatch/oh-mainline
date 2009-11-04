@@ -80,7 +80,7 @@ class Project(models.Model):
 
     def get_url_of_icon_or_generic(self):
         if self.icon:
-            return settings.MEDIA_URL + self.icon.url
+            return self.icon.url
         else:
             return settings.MEDIA_URL + 'no-project-icon.png'
 
