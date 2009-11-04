@@ -835,6 +835,7 @@ $(Importer.Submission.init);
 
 Importer.ProgressBar = {};
 Importer.ProgressBar.showWithValue = function(value) {
+    if (value < 10 ) { value = 10; } // Always show a smidgen of progress.
     $('#importer #progressbar').show().progressbar('option', 'value', value);
 };
 Importer.ProgressBar.bumpTo100 = function() {
