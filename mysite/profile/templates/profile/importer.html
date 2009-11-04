@@ -108,6 +108,15 @@ Portfolio editor
 {% endwith %}
 
 
+{% if test_js %}
+<div style='float: left;'>
+    <h1 id="qunit-header">QUnit example</h1>
+    <h2 id="qunit-banner"></h2>
+    <h2 id="qunit-userAgent"></h2>
+    <ol id="qunit-tests"></ol>
+</div>
+{% endif %}
+
 {% endblock main %}
 
 {% block js %}
@@ -128,5 +137,6 @@ Portfolio editor
 {% endblock js %}
 
 {% block js_tests %}
+<script type='text/javascript' src='/static/js/qunit.js'></script>
 <script type='text/javascript' src='/static/js/profile/editor/tests.js'></script>
 {% endblock js_tests %}

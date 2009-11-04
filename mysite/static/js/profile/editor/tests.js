@@ -1,3 +1,26 @@
+if (typeof QUnit == 'undefined') {
+    console.log('QUnit not imported.');
+}
+
+$(function() {
+        expect(106);
+        });
+
+tester = {};
+tester.ok = function(bool, message) {
+    test("messsage", function() {
+            ok(bool, message);
+            });
+};
+tester.compare = function(a, b, message) {
+    test("compare message", function() {
+            equals(a, b, message);
+            });
+};
+tester.testDone = function() {
+    // Don't think we need to do anything here.
+};
+
 var jQuerySaysThisObjectHasAHandler = function(jqueryObj, handler) {
     var real_obj = jqueryObj[0];
     var handler_meta_array = $.data(real_obj, "events");
@@ -11,13 +34,13 @@ var jQuerySaysThisObjectHasAHandler = function(jqueryObj, handler) {
 
 $.fn.assertN = function(n) {
     if (typeof prefix == 'undefined') { prefix = ""; }
-    fireunit.compare(this.size(), n, prefix + "there are " + n + " elements matching " + this.selector);
+    tester.compare(this.size(), n, prefix + "there are " + n + " elements matching " + this.selector);
     return this;
 };
 
 $.fn.assertOne = function(humanName) {
     if (typeof prefix == 'undefined') { prefix = ""; }
-    fireunit.ok(this.size() == 1, prefix + "there's only one " + humanName);
+    tester.ok(this.size() == 1, prefix + "there's only one " + humanName);
     return this;
 };
 
@@ -33,12 +56,12 @@ testProgressBarInvisibleOnPageLoad = function() {
 $(testProgressBarInvisibleOnPageLoad);
 
 testImportJGrowl = function() {
-    fireunit.ok(typeof $.jGrowl != 'undefined', "jGrowl imported");
+    tester.ok(typeof $.jGrowl != 'undefined', "jGrowl imported");
 };
 $(testImportJGrowl);
 
 testBuildingBlocks = function() {
-    var test = "testBuildingBlocks asserts: ";
+    var prefix = "testBuildingBlocks asserts: ";
     var blockSelectors = [
         '#portfolio_entry_building_block',
         '#citation_building_block',
@@ -47,8 +70,8 @@ testBuildingBlocks = function() {
     for (var b = 0; b < blockSelectors.length; b++) {
         var blockSelector = blockSelectors[b];
         $block = $(blockSelector);
-        fireunit.ok($block.size() == 1, test + blockSelector + " appears in document once.");
-        fireunit.ok($block.filter(':hidden').size() == 1, test + blockSelector + " is hidden.");
+        tester.ok($block.size() == 1, prefix + blockSelector + " appears in document once.");
+        tester.ok($block.filter(':hidden').size() == 1, prefix + blockSelector + " is hidden.");
     }
 };
 $(testBuildingBlocks);
@@ -132,17 +155,17 @@ testUpdatePortfolio = function() {
             // Did we create this PortfolioEntryElement?
             var pee = $("#portfolio_entry_" + portfolio_entry.pk);
 
-            fireunit.compare( pee.size(), 1,
+            tester.compare( pee.size(), 1,
                 "Expected a portfolio_entry corresponding to " + portfolio_entry);
-            fireunit.ok( $('.project_name', pee).text() == "bindlestiff",
+            tester.ok( $('.project_name', pee).text() == "bindlestiff",
                 "Expected the new portfolio_entry to say its project name is bindlestiff");
-            fireunit.ok( pee.find("img.project_icon").attr('src') == 
+            tester.ok( pee.find("img.project_icon").attr('src') == 
                 "/static/images/icons/projects/0e9a1d7ab66f407fa9e2e3caf0eeda3d",
                 "Expected the project icon URL to properly be set.");
-            fireunit.ok( $(".project_description", pee).text() == "described",
+            tester.ok( $(".project_description", pee).text() == "described",
                 "Expected the new portfolio_entry to say " +
                 "its project description is 'described'");
-            fireunit.ok( $(".experience_description", pee).text() == "i hacked things",
+            tester.ok( $(".experience_description", pee).text() == "i hacked things",
                 "Expected the new portfolio_entry to say a description of the experience");
 
             /* 
@@ -152,7 +175,7 @@ testUpdatePortfolio = function() {
             // List the citations in the DOM.
             var dom_citations = $('.citations > li', pee);
 
-            fireunit.ok(
+            tester.ok(
                     dom_citations.size() == 2,
                     "Expected the number of citation elements in the " + 
                     "PortfolioEntryElement == 2 == the number of " +
@@ -168,19 +191,19 @@ testUpdatePortfolio = function() {
 
                 var msg = "Find DOM citation matching this response citation.";
                 var $domCitation = $('#citation_'+responseCitation.pk);
-                fireunit.ok($domCitation.size() > 0, msg);
+                tester.ok($domCitation.size() > 0, msg);
 
                 var msg = "Assert match of citation summary.";
-                fireunit.ok($domCitation.find('.summary').text() == 
+                tester.ok($domCitation.find('.summary').text() == 
                         mockedPortfolioResponse.summaries[responseCitation.pk], 
                         msg);
 
                 var msg = "Assert cssClass = is_published ? 'published' : 'unpublished'";
                 if (responseCitation.fields.is_published == '1') {
-                    fireunit.ok( ! $domCitation.hasClass('unpublished'), msg);
+                    tester.ok( ! $domCitation.hasClass('unpublished'), msg);
                 }
                 else {
-                    fireunit.ok($domCitation.hasClass('unpublished'), msg);
+                    tester.ok($domCitation.hasClass('unpublished'), msg);
                 }
             };
 
@@ -192,11 +215,11 @@ testUpdatePortfolio = function() {
             // And now check the reverse: For each citation in the DOM,
             // check that its data is in the response.
 
-            fireunit.ok($('.citations > li').size() == 2,
+            tester.ok($('.citations > li').size() == 2,
                     "Expected just one citation in the DOM.");
-            fireunit.ok($('.citations > li')[0].id == 'citation_0', 
+            tester.ok($('.citations > li')[0].id == 'citation_0', 
                     "Expected the first citation in the DOM to have id citation_0");
-            fireunit.ok($('.citations > li')[1].id == 'citation_1', 
+            tester.ok($('.citations > li')[1].id == 'citation_1', 
                     "Expected the second citation in the DOM to have id citation_1");
 
     });
@@ -210,15 +233,15 @@ testNoDuplication = function() {
     // Clear the deck.
     redrawPortfolioEntries();
 
-    fireunit.ok($('.citations > li').size() == 2,
+    tester.ok($('.citations > li').size() == 2,
             "Assert there are two citations.");
-    fireunit.ok($('.portfolio_entry:visible').size() == 2,
+    tester.ok($('.portfolio_entry:visible').size() == 2,
             "Assert there are two portfolio entries.");
 
     askServerForPortfolio();
-    fireunit.ok($('.citations > li').size() == 2,
+    tester.ok($('.citations > li').size() == 2,
             "Assert there are still two citations.");
-    fireunit.ok($('.portfolio_entry:visible').size() == 2,
+    tester.ok($('.portfolio_entry:visible').size() == 2,
             "Assert there are still two portfolio entries.");
 };
 $(testNoDuplication);
@@ -236,9 +259,9 @@ testCitationDelete = function() {
     $deleteLink.trigger('click');
 
     var citationElementID = '#citation_'+citationID;
-    fireunit.ok($(citationElementID).size() == 1,
+    tester.ok($(citationElementID).size() == 1,
             prefix + "there's a citation with id " + citationElementID);
-    fireunit.ok($(citationElementID+'.deleted').size() == 1,
+    tester.ok($(citationElementID+'.deleted').size() == 1,
             prefix + "there's a DELETED citation with id " + citationElementID);
 
     // Let's pretend the server said there was an error in deleting the citation.
@@ -248,11 +271,11 @@ testCitationDelete = function() {
     var checkNotifierInAMoment = function () {
         var notifier = $('.jGrowl-notification .message');
         console.info(notifier);
-        fireunit.ok(notifier.size() > 0,
+        tester.ok(notifier.size() > 0,
                 prefix + "there's at least one notifier.");
         var message = $('.jGrowl-notification .message').eq(0).text();
         console.log('notifier message: ', message);
-        fireunit.ok(message.match(/error.*delete a citation/) != null,
+        tester.ok(message.match(/error.*delete a citation/) != null,
                 prefix + "notifier message matches /error.*delete a citation/");
     }
     window.setTimeout(checkNotifierInAMoment, 500);
@@ -271,12 +294,12 @@ testCitationFormCreate = function() {
 
     var $form = $button.closest('.citations-wrapper').find('.citation-forms li form.add_a_record');
 
-    fireunit.ok($form.size() == 1, prefix + "the 'Add another record' button causes "
+    tester.ok($form.size() == 1, prefix + "the 'Add another record' button causes "
             + "exactly one form to appear in citation-forms.");
     var names = ['form_container_element_id', 'portfolio_entry', 'url'];
     for (var i = 0; i < names.length; i++) {
         var name = names[i];
-        fireunit.ok($form.find('[name="'+name+'"]').size() == 1,
+        tester.ok($form.find('[name="'+name+'"]').size() == 1,
                 prefix + "form has a field called" + name);
     }
 
@@ -290,7 +313,7 @@ testCitationAdd = function () {
     $add_a_new_citation_form = $('.citation-forms li:eq(0) form');
     $add_a_new_citation_form.find('[name="url"]').val('http://google.ca/');
     $add_a_new_citation_form.trigger('submit');
-    fireunit.ok(true,
+    tester.ok(true,
             prefix + "Yay, the page has not reloaded synchronously since adding a new citation.");
 };
 $(testCitationAdd);
@@ -298,13 +321,13 @@ $(testCitationAdd);
 testCitationSubmit = function () {
     var prefix = "submission of a new citation: ";
     $form_container = $('.citation-forms li:eq(0)');
-    fireunit.ok($form_container.size() == 1,
+    tester.ok($form_container.size() == 1,
             prefix + "there's a form container eq(0)");
     var response = {
         'form_container_element_id': $form_container.attr('id')
     };
     handleServerResponseToNewRecordSubmission(response);
-    fireunit.ok($('#'+response.form_container_element_id).size() == 0,
+    tester.ok($('#'+response.form_container_element_id).size() == 0,
             prefix + "the form container has disappeared after we handle "
             + "the server's response to the successful submission of the form therein.");
 };
@@ -312,11 +335,11 @@ $(testCitationSubmit);
 
 testFlagIconOnly4Nongenerics = function () {
     var prefix = "show icon flagger only for nongeneric icons: ";
-    fireunit.ok($('.portfolio_entry').eq(0).find('.icon_flagger').size() == 1,
+    tester.ok($('.portfolio_entry').eq(0).find('.icon_flagger').size() == 1,
             prefix + "assert project with nongeneric icon bears the link "
             + "'Flag icon as incorrect'"
             );
-    fireunit.ok($('.portfolio_entry').eq(1).find('.icon_flagger:visible').size() == 0,
+    tester.ok($('.portfolio_entry').eq(1).find('.icon_flagger:visible').size() == 0,
             prefix + "assert project with generic icon doesn't bear the link "
             + "'Flag icon as incorrect'"
             );
@@ -327,7 +350,7 @@ testFlagIcon = function () {
     var prefix = "flag icon as incorrect: ";
     // click a 'Flag icon as incorrect' link
     $icon_flagger = $('.icon_flagger').eq(0);
-    fireunit.ok($icon_flagger.find('a').size() == 1,
+    tester.ok($icon_flagger.find('a').size() == 1,
             prefix + "expect link to exist before clicked.");
 
     // Mock post
@@ -339,14 +362,14 @@ testFlagIcon = function () {
                 });
     }
     $icon_flagger.find('a').trigger('click');
-    fireunit.ok($icon_flagger.find('a').size() == 0,
+    tester.ok($icon_flagger.find('a').size() == 0,
             prefix + "expect link to be removed.'");
-    fireunit.ok($icon_flagger.text().match(/default icon/),
+    tester.ok($icon_flagger.text().match(/default icon/),
             "expect link to be replaced with text including the phrase 'default icon'");
     $icon = $icon_flagger.closest('.portfolio_entry').find('img.project_icon');
-    fireunit.ok($icon.size() == 1,
+    tester.ok($icon.size() == 1,
             prefix + "expect there to be an icon");
-    fireunit.ok($icon.attr('src') == '/static/no-project-icon.png',
+    tester.ok($icon.attr('src') == '/static/no-project-icon.png',
             "expect icon src to be (HARDCODED) /static/no-project-icon.png");
 
     FlagIcon.post = post_copy;
@@ -376,25 +399,25 @@ testPortfolioEntrySave = function(params) {
     if (!mock) { prefix = "integration " + prefix; }
 
     $pfEntry = $('.portfolio_entry:eq(0)');
-    fireunit.ok(
+    tester.ok(
             $pfEntry.size() == 1,
             prefix + "there's at least one pf entry on the page");
 
     $saveAndPublishButton = $pfEntry.find('li.save_and_publish_button:visible a').assertN(1);
 
     $projectDescriptionField = $pfEntry.find('textarea.project_description')
-        fireunit.ok(
+        tester.ok(
                 $projectDescriptionField.size() == 1,
                 prefix + "there's a textarea selectable by .project_description "
                 + "on the first portfolio entry");
 
     $experienceDescriptionField = $pfEntry.find('textarea.experience_description')
-        fireunit.ok(
+        tester.ok(
                 $experienceDescriptionField.size() == 1,
                 prefix + "there's a textarea selectable by .experience_escription "
                 + "on the first portfolio entry");
 
-    fireunit.ok(
+    tester.ok(
             $pfEntry.find('.citations li.unpublished').size() > 0,
             prefix + "(precondition) there's at least one unpublished citation in this pf entry.");
 
@@ -410,10 +433,10 @@ testPortfolioEntrySave = function(params) {
         PortfolioEntry.Save.post = function() {
             // Check that the data in the post are correct.
             var data = PortfolioEntry.Save.postOptions.data;
-            fireunit.compare(
+            tester.compare(
                     data.project_description, 'new project description',
                     prefix + "project_description in postOptions.data matches textarea");
-            fireunit.compare(
+            tester.compare(
                     data.experience_description,  'new experience description',
                     prefix + "experience_description in postOptions.data matches textarea");
 
@@ -429,7 +452,7 @@ testPortfolioEntrySave = function(params) {
 
         $saveAndPublishButton.trigger('click');
 
-        fireunit.ok($pfEntry.hasClass('unpublished') == false, "$pfEntry.hasClass('unpublished')");
+        tester.ok($pfEntry.hasClass('unpublished') == false, "$pfEntry.hasClass('unpublished')");
 
         // Reset mocking
         PortfolioEntry.Save.post = post_copy;
@@ -442,7 +465,7 @@ testPortfolioEntrySave = function(params) {
 
         checkNotifiersForText('Portfolio entry saved');
 
-        fireunit.ok(
+        tester.ok(
                 $pfEntry.find('.citations li.unpublished').size() == 0,
                 prefix + "there are no unpublished citations in this pf entry.");
 
@@ -450,10 +473,10 @@ testPortfolioEntrySave = function(params) {
             askServerForPortfolio();
 
             // Check that the textareas are populated correctly.
-            fireunit.ok(
+            tester.ok(
                     $pfEntry.find('.project_description').val() == 'new project description',
                     prefix + "project_description in post matches textarea");
-            fireunit.ok(
+            tester.ok(
                     $pfEntry.find('.experience_description').val() == 'new experience description',
                     prefix + "experience_description in post matches textarea");
         }
@@ -491,7 +514,7 @@ function checkNotifiersForText(text) {
         var $allNotifiers = $('.jGrowl-notification .message');
         var messagesTogether = $allNotifiers.text(); // join the text of all the messages
         console.log(messagesTogether);
-        fireunit.ok(messagesTogether.match(text) != null,
+        tester.ok(messagesTogether.match(text) != null,
                 "one of the notifier messages includes the phrase '" + text + "'");
     }
     window.setTimeout(checkNotifiersInAMoment, 2000); // Doesn't seem to work when <= 500.
@@ -509,16 +532,16 @@ testDeletePortfolioEntry = function(params) {
      * and that it has a delete link
      */
     $pfEntry = $('.portfolio_entry:eq(0)');
-    fireunit.ok(
+    tester.ok(
             $pfEntry.size() == 1,
             prefix + "there's at least one pf entry on the page");
 
     $deleteLink = $pfEntry.find('li.delete_portfolio_entry a');
-    fireunit.ok(
+    tester.ok(
             $deleteLink.size() == 1,
             prefix + "there's a delete link on the first pf entry");
 
-    fireunit.ok(
+    tester.ok(
             $pfEntry.find('.citations li.unpublished').size() > 0,
             prefix + "(precondition) there's at least one unpublished citation in this pf entry.");
 
@@ -529,7 +552,7 @@ testDeletePortfolioEntry = function(params) {
     PortfolioEntry.Delete.post = function() {
         // Check that the data in the post are correct.
         var data = PortfolioEntry.Delete.postOptions.data;
-        fireunit.ok(data.portfolio_entry__pk == '0', /* This is all we submit */
+        tester.ok(data.portfolio_entry__pk == '0', /* This is all we submit */
                 prefix + "Expected us to submit the primary key of the p_e we want to delete."); 
         // Don't actually post; instead, just handle a fake response object.
         var fakeResponse = {
@@ -538,7 +561,7 @@ testDeletePortfolioEntry = function(params) {
         };
         PortfolioEntry.Delete.postOptions.success(fakeResponse);
 
-        fireunit.ok($pfEntry.is(':hidden'), 'Expected $pfEntry to disappear.');
+        tester.ok($pfEntry.is(':hidden'), 'Expected $pfEntry to disappear.');
     };
 
     $deleteLink.trigger('click');
@@ -554,21 +577,21 @@ testCitationHowTo = function() {
     $('#portfolio_entries *').remove();
     askServerForPortfolio();
     $howtos = $('#portfolio_entries .citations-wrapper .howto');
-    fireunit.ok($howtos.size() > 0, prefix + "Some howtos appear on the page.");
+    tester.ok($howtos.size() > 0, prefix + "Some howtos appear on the page.");
 
     $firstHowtoHideLink = $howtos.eq(0).find('a.hide_me');
-    fireunit.ok($firstHowtoHideLink.size() == 1, prefix + "there is at least one howto hide link.");
+    tester.ok($firstHowtoHideLink.size() == 1, prefix + "there is at least one howto hide link.");
     $firstHowtoHideLink.trigger('click');
 
-    fireunit.ok($howtos.filter(':visible').size() == 0, prefix + "No howtos are visible after hide link clicked");
+    tester.ok($howtos.filter(':visible').size() == 0, prefix + "No howtos are visible after hide link clicked");
     for (var i = 0; i < $howtos.size(); i++) {
         $howto = $howtos.eq(i);
         console.info($howto);
         $showMeLink = $howto.closest('.citations-wrapper').find('a.show_howto:visible').assertOne('hidden show_howto link for this howto');
         console.info("showMeLink", $showMeLink);
         $showMeLink.trigger('click');
-        fireunit.ok($howto.is(':visible'), prefix + "how to is visible after showme clicked.");
-        fireunit.ok($showMeLink.is(':hidden'), prefix + "show me link is hidden after being clicked.");
+        tester.ok($howto.is(':visible'), prefix + "how to is visible after showme clicked.");
+        tester.ok($showMeLink.is(':hidden'), prefix + "show me link is hidden after being clicked.");
         console.log("howtos size", $howtos.size());
     }
 
@@ -597,7 +620,7 @@ testProgressBar = function() {
     // a progress bar should now appear
     $bar.assertN(1);
 
-    fireunit.ok($bar.progressbar('option', 'value') == 20, prefix + "progressbar's value is 20");
+    tester.ok($bar.progressbar('option', 'value') == 20, prefix + "progressbar's value is 20");
 };
 $(testProgressBar);
 
@@ -605,11 +628,11 @@ testUpdateExistingCitations = function() {
     var prefix = "the portfolio will update correctly in response to a citation being published: ";
     updatePortfolio(mockedPortfolioResponse);
     $firstCitation = $('.citations li').eq(0);
-    fireunit.ok( $firstCitation.hasClass('unpublished'),
+    tester.ok( $firstCitation.hasClass('unpublished'),
             prefix + "First citation has 'unpublished' class.");
     mockedPortfolioResponse.citations[0].fields.is_published = '1';
     updatePortfolio(mockedPortfolioResponse);
-    fireunit.ok( $firstCitation.hasClass('unpublished') == false,
+    tester.ok( $firstCitation.hasClass('unpublished') == false,
             prefix + "First citation now lacks 'unpublished' class.");
 };
 $(testUpdateExistingCitations);
@@ -620,21 +643,21 @@ testUIResponseToPFEntryPublication = function() {
     redrawPortfolioEntries();
 
     // preconditions
-    fireunit.ok(
+    tester.ok(
             mockedPortfolioResponse.portfolio_entries[0].fields.is_published,
             prefix + "assert first pf entry in response is published");
-    fireunit.ok(
+    tester.ok(
             mockedPortfolioResponse.portfolio_entries[1].fields.is_published == false,
             prefix + "assert second pf entry in response is unpublished");
     $firstEntry = $('.portfolio_entry:eq(0)').assertN(1);
     $secondEntry = $('.portfolio_entry:eq(1)').assertN(1);
 
     // assertions
-    fireunit.compare(
+    tester.compare(
             $firstEntry.hasClass('unpublished'), false,
             prefix + "assert first pf entry in dom lacks class unpublished");
     $firstEntry.find('.portfolio_entry_is_published:visible').assertN(1);
-    fireunit.ok(
+    tester.ok(
             $secondEntry.hasClass('unpublished'),
             prefix + "assert second pf entry in dom has class unpublished");
 };
@@ -646,17 +669,17 @@ testLinkDrawsAWidgetForAddingAPortfolioEntry = function () {
 
     var prefix = "link draws a widget for adding a portfolio entry: ";
     $link = $('a#add_pf_entry');
-    fireunit.compare( $link.size(), 1, prefix + "there's a link");
+    tester.compare( $link.size(), 1, prefix + "there's a link");
 
     $widget = $('#portfolio_entries .portfolio_entry.adding');
-    fireunit.compare( $widget.size(), 0, prefix + "there's no widget until we click");
+    tester.compare( $widget.size(), 0, prefix + "there's no widget until we click");
 
     $link.trigger('click');
 
     $widget = $($widget.selector);
-    fireunit.compare( $widget.size(), 1, prefix + "there's one widget after we click");
+    tester.compare( $widget.size(), 1, prefix + "there's one widget after we click");
 
-    fireunit.ok($widget.attr('id').match(/^element_/), prefix + "Adder widget has a unique ID.");
+    tester.ok($widget.attr('id').match(/^element_/), prefix + "Adder widget has a unique ID.");
 
     // make sure we have one
     $projectNameField = $widget.find('input:text.project_name').assertN(1);
@@ -674,16 +697,16 @@ testLinkDrawsAWidgetForAddingAPortfolioEntry = function () {
     PortfolioEntry.Save.post = function() {
         // Check that the data in the post are correct.
         var data = PortfolioEntry.Save.postOptions.data;
-        fireunit.compare(
+        tester.compare(
                 data.pf_entry_element_id, $widget.attr('id'),
                 prefix + "pf_entry_element_id in postOptions.data is the widget's ID");
-        fireunit.compare(
+        tester.compare(
                 data.project_name, 'new name',
                 prefix + "project_name in postOptions.data matches input field");
-        fireunit.compare(
+        tester.compare(
                 data.project_description, 'new project description',
                 prefix + "project_description in postOptions.data matches textarea");
-        fireunit.compare(
+        tester.compare(
                 data.experience_description,  'new experience description',
                 prefix + "experience_description in postOptions.data matches textarea");
 
@@ -700,10 +723,10 @@ testLinkDrawsAWidgetForAddingAPortfolioEntry = function () {
         
         checkNotifiersForText('Portfolio entry saved');
 
-        fireunit.compare($widget.attr('id'), 'portfolio_entry_'+new_pf_entry_pk,
+        tester.compare($widget.attr('id'), 'portfolio_entry_'+new_pf_entry_pk,
                 prefix + "Widget ID updated to reflect new primary key assigned to "
                 + "corresponding record in the db.");
-        fireunit.compare($widget.attr('portfolio_entry__pk'), new_pf_entry_pk,
+        tester.compare($widget.attr('portfolio_entry__pk'), new_pf_entry_pk,
                 prefix + "Widget attr portfolio_entry__pk updated to reflect new "
                 + "primary key assigned to corresponding record in the db.");
 
@@ -715,7 +738,7 @@ testLinkDrawsAWidgetForAddingAPortfolioEntry = function () {
     $recently_added_pf_entry = $widget; // Graduated now.
 
     $recently_added_pf_entry.find('input:text.project_name').assertN(0);
-    fireunit.compare(
+    tester.compare(
             $recently_added_pf_entry.find('span.project_name').assertN(1).text(),
             "new name",
             prefix + "Project name is a span containing the name."
@@ -734,24 +757,24 @@ testAddUnsavedClassWhenTextfieldsAreModified = function() {
                                                               // : " <-- little dude
                                                               // : "; <-- asheesh sees a dude here, i do not.
     $firstPublishedPFE = $('.portfolio_entry').not('.unpublished').eq(0);
-    fireunit.compare($firstPublishedPFE.hasClass('unsaved'), false,
+    tester.compare($firstPublishedPFE.hasClass('unsaved'), false,
             prefix + "first published pf entry doesn't have class unsaved");
-    fireunit.compare( $firstPublishedPFE.find('textarea').size(), 2,
+    tester.compare( $firstPublishedPFE.find('textarea').size(), 2,
             prefix + "assume first published pfe has just two textareas");
     $firstPublishedPFE.find('textarea:eq(0)').trigger('keydown');
-    fireunit.compare($firstPublishedPFE.hasClass('unsaved'), true,
+    tester.compare($firstPublishedPFE.hasClass('unsaved'), true,
             prefix + "after we triggered keydown on the first textarea, first published pf entry "
             + "now has class unsaved");
     $firstPublishedPFE.removeClass('unsaved');
     $firstPublishedPFE.find('textarea:eq(1)').trigger('keydown');
-    fireunit.compare($firstPublishedPFE.hasClass('unsaved'), true,
+    tester.compare($firstPublishedPFE.hasClass('unsaved'), true,
             prefix + "after we triggered keydown on the second textarea, first published pf entry "
             + "now has class unsaved");
 };
 $(testAddUnsavedClassWhenTextfieldsAreModified);
 
 testsAreDone = function() {
-    fireunit.testDone();
+    tester.testDone();
 };
 $(function() {
         // FIXME: Mock out the notifier so all the tests are synchronous and we don't have to use time outs.
