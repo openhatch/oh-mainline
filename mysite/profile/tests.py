@@ -1262,4 +1262,23 @@ class OtherContributors(TwillTests):
                 [paulproteus]
                 )
 
+class UserGetsHisQueuedMessages(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+    
+    def gimme_json(self):
+        url = reverse(mysite.profile.views.gimme_json_for_portfolio)
+        response = self.login_with_client().get(url)
+        return simplejson.loads(response.content)
+
+    def test_user_gets_his_queued_messages(self):
+        paulproteus = Person.objects.get(user__username='paulproteus')
+        # Verify the first time, the gimme_json has no messages
+        self.assertEqual(self.gimme_json()['messages'], [])
+
+        # Queue a message for paulproteus
+        paulproteus.user.message_set.create(message="MSG'd!")
+
+        # Verify that the gimme_json now has that message
+        self.assertEqual(self.gimme_json()['messages'], ["MSG'd!"])
+
 # vim: set ai et ts=4 sw=4 nu:
