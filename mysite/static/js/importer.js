@@ -328,17 +328,12 @@ function updatePortfolio(response) {
         }
 
         // published/unpublished status
-        if (portfolioEntry.fields.is_published == true) {
+        if (portfolioEntry.fields.is_published) {
             var $actionListItem = $new_portfolio_entry.find('.actions li.publish_portfolio_entry');
             var $maybeSpan = $actionListItem.find('span');
 
             $new_portfolio_entry.removeClass("unpublished");
 
-            // Create the span iff nonexistent
-            if ($maybeSpan.size() == 0) {
-                $actionListItem.find('a').remove();
-                $actionListItem.append($("<span>Published</span>"));
-            }
         }
 	    
         /* Find the project this PortfolioElement refers to */
@@ -644,7 +639,7 @@ PortfolioEntry.bindEventHandlers = function() {
 
 pfEntryFieldKeydownHandler = function () {
     var $textarea = $(this);
-    $textarea.closest('.portfolio_entry').not('.unsaved').addClass('unsaved');
+    $textarea.closest('.portfolio_entry').not('.unpublished, .unsaved').addClass('unsaved');
 };
 
 PortfolioEntry.Save = {};

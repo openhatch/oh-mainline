@@ -380,10 +380,7 @@ testPortfolioEntrySave = function(params) {
             $pfEntry.size() == 1,
             prefix + "there's at least one pf entry on the page");
 
-    $publishLink = $pfEntry.find('li.publish_portfolio_entry a');
-    fireunit.ok(
-            $publishLink.size() == 1,
-            prefix + "there's a publish link on the first pf entry");
+    $saveAndPublishButton = $pfEntry.find('li.save_and_publish_button:visible a').assertN(1);
 
     $projectDescriptionField = $pfEntry.find('textarea.project_description')
         fireunit.ok(
@@ -430,7 +427,7 @@ testPortfolioEntrySave = function(params) {
 
         };
 
-        $publishLink.trigger('click');
+        $saveAndPublishButton.trigger('click');
 
         fireunit.ok($pfEntry.hasClass('unpublished') == false, "$pfEntry.hasClass('unpublished')");
 
@@ -441,7 +438,7 @@ testPortfolioEntrySave = function(params) {
 
         // Integration test.
 
-        $publishLink.trigger('click');
+        $saveAndPublishButton.trigger('click');
 
         checkNotifiersForText('Portfolio entry saved');
 
@@ -633,12 +630,10 @@ testUIResponseToPFEntryPublication = function() {
     $secondEntry = $('.portfolio_entry:eq(1)').assertN(1);
 
     // assertions
-    fireunit.ok(
-            $firstEntry.hasClass('unpublished') == false,
+    fireunit.compare(
+            $firstEntry.hasClass('unpublished'), false,
             prefix + "assert first pf entry in dom lacks class unpublished");
-    fireunit.ok(
-            $firstEntry.find('.publish_portfolio_entry span').assertN(1).text() == "Published",
-            prefix + "assert first actions list item of first pf entry is '<span>Published</span>'");
+    $firstEntry.find('.portfolio_entry_is_published:visible').assertN(1);
     fireunit.ok(
             $secondEntry.hasClass('unpublished'),
             prefix + "assert second pf entry in dom has class unpublished");
