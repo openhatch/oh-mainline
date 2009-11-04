@@ -665,7 +665,7 @@ def prepare_data_import_attempts(identifiers, user):
 
 @login_required
 @view
-def importer(request):
+def importer(request, test_js = False):
     """Get the DIAs for the logged-in user's profile. Pass them to the template."""
     # {{{
 
@@ -691,7 +691,7 @@ def importer(request):
     data['citation_form'] = mysite.profile.forms.ManuallyAddACitationForm(auto_id=False)
 
     # This variable is checked in base/templates/base/base.html
-    data['test_js'] = request.GET.get('test_js', False) 
+    data['test_js'] = test_js
 
     return (request, 'profile/importer.html', data)
     # }}}

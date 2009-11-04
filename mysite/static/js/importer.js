@@ -422,7 +422,6 @@ Citation = {};
 Citation.$get = function(id) {
     var selector = '#citation_'+id;
     var matching = $(selector);
-    fireunit.ok(matching.size() == 1, "Got just 1 citation with id = " + selector)
     return matching; 
 };
 Citation.get = function(id) {
@@ -441,8 +440,6 @@ deleteCitation = function($citation) {
     $citation.removeClass('unpublished')
         .removeClass('published')
         .addClass('deleted');
-    fireunit.ok($citation.size() == 1, "deleteCitation asserts: there is a citation "
-            + "that we're about to delete.");
     var pk = $citation[0].id.split('_')[1];
     var ajaxOptions = {
         'type': 'POST',
@@ -488,7 +485,6 @@ deleteCitationForThisLink = function () {
 drawAddCitationFormNearThisButton = function () {
     var button = this;
     var $citationForms = $(this).closest('.citations-wrapper').find('ul.citation-forms');
-    fireunit.ok($citationForms.size() == 1, "there's one ul called 'citations-forms' in this wrapper");
     var buildingBlockHTML = $('#citation_form_building_block').html();
     var $form_container = $(buildingBlockHTML);
 

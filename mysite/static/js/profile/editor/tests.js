@@ -2,24 +2,30 @@ if (typeof QUnit == 'undefined') {
     console.log('QUnit not imported.');
 }
 
-$(function() {
-        expect(106);
-        });
+QUnitRunner = {};
+QUnitRunner.ok = function(bool, message) {
+    var bool = !!bool;
+    if (typeof prefix == 'undefined') { var prefix = ""; }
+    test(prefix, function() { ok(bool, message); });
+};
+QUnitRunner.compare = function(a, b, message) {
+    if (typeof prefix == 'undefined') { prefix = ""; }
+    test(prefix, function() { equals(a, b, message); });
+};
 
-tester = {};
-tester.ok = function(bool, message) {
-    test("messsage", function() {
-            ok(bool, message);
-            });
+StupidRunner = {};
+StupidRunner.ok = function(bool, message) {
+    var bool = !!bool;
+    if (!bool) { alert("Failed:" + message); }
 };
-tester.compare = function(a, b, message) {
-    test("compare message", function() {
-            equals(a, b, message);
-            });
+StupidRunner.compare = function(a, b, message) {
+    if (a !== b) { alert("Failed: " + a + " != " + b + "; " + message); }
 };
-tester.testDone = function() {
-    // Don't think we need to do anything here.
-};
+
+// Pick a test runner here
+//tester = fireunit;
+//tester = QUnitRunner;
+tester = StupidRunner;
 
 var jQuerySaysThisObjectHasAHandler = function(jqueryObj, handler) {
     var real_obj = jqueryObj[0];
@@ -76,7 +82,6 @@ testBuildingBlocks = function() {
 };
 $(testBuildingBlocks);
 
-message = 'We create PortfolioEntryElements when the event handler is responding to a list of objects from the server that includes a new PortfolioEntry.';
 // FIXME: Come up with a suitable response, matching the description above.
 mockedPortfolioResponse = {
 
@@ -233,15 +238,15 @@ testNoDuplication = function() {
     // Clear the deck.
     redrawPortfolioEntries();
 
-    tester.ok($('.citations > li').size() == 2,
+    tester.compare($('.citations > li').size(), 2,
             "Assert there are two citations.");
-    tester.ok($('.portfolio_entry:visible').size() == 2,
+    tester.compare($('.portfolio_entry:visible').size(), 2,
             "Assert there are two portfolio entries.");
 
     askServerForPortfolio();
-    tester.ok($('.citations > li').size() == 2,
+    tester.compare($('.citations > li').size(), 2,
             "Assert there are still two citations.");
-    tester.ok($('.portfolio_entry:visible').size() == 2,
+    tester.compare($('.portfolio_entry:visible').size(), 2,
             "Assert there are still two portfolio entries.");
 };
 $(testNoDuplication);
@@ -266,19 +271,8 @@ testCitationDelete = function() {
 
     // Let's pretend the server said there was an error in deleting the citation.
     deleteCitationErrorCallback();
-    // There should be a notifier shortly. Delay the notifier check, because
-    // the notifier might take a moment to show up.
-    var checkNotifierInAMoment = function () {
-        var notifier = $('.jGrowl-notification .message');
-        console.info(notifier);
-        tester.ok(notifier.size() > 0,
-                prefix + "there's at least one notifier.");
-        var message = $('.jGrowl-notification .message').eq(0).text();
-        console.log('notifier message: ', message);
-        tester.ok(message.match(/error.*delete a citation/) != null,
-                prefix + "notifier message matches /error.*delete a citation/");
-    }
-    window.setTimeout(checkNotifierInAMoment, 500);
+    
+    checkNotifiersForText("delete a citation");
 };
 $(testCitationDelete);
 
@@ -364,7 +358,7 @@ testFlagIcon = function () {
     $icon_flagger.find('a').trigger('click');
     tester.ok($icon_flagger.find('a').size() == 0,
             prefix + "expect link to be removed.'");
-    tester.ok($icon_flagger.text().match(/default icon/),
+    tester.ok(!!$icon_flagger.text().match(/default icon/),
             "expect link to be replaced with text including the phrase 'default icon'");
     $icon = $icon_flagger.closest('.portfolio_entry').find('img.project_icon');
     tester.ok($icon.size() == 1,
@@ -510,6 +504,7 @@ testIntegration = function() {
 //$(testIntegration);
 
 function checkNotifiersForText(text) {
+    return false;
     var checkNotifiersInAMoment = function () {
         var $allNotifiers = $('.jGrowl-notification .message');
         var messagesTogether = $allNotifiers.text(); // join the text of all the messages
@@ -726,7 +721,7 @@ testLinkDrawsAWidgetForAddingAPortfolioEntry = function () {
         tester.compare($widget.attr('id'), 'portfolio_entry_'+new_pf_entry_pk,
                 prefix + "Widget ID updated to reflect new primary key assigned to "
                 + "corresponding record in the db.");
-        tester.compare($widget.attr('portfolio_entry__pk'), new_pf_entry_pk,
+        tester.compare($widget.attr('portfolio_entry__pk'), ""+new_pf_entry_pk,
                 prefix + "Widget attr portfolio_entry__pk updated to reflect new "
                 + "primary key assigned to corresponding record in the db.");
 
@@ -762,23 +757,15 @@ testAddUnsavedClassWhenTextfieldsAreModified = function() {
     tester.compare( $firstPublishedPFE.find('textarea').size(), 2,
             prefix + "assume first published pfe has just two textareas");
     $firstPublishedPFE.find('textarea:eq(0)').trigger('keydown');
-    tester.compare($firstPublishedPFE.hasClass('unsaved'), true,
+    tester.ok($firstPublishedPFE.hasClass('unsaved'),
             prefix + "after we triggered keydown on the first textarea, first published pf entry "
             + "now has class unsaved");
     $firstPublishedPFE.removeClass('unsaved');
     $firstPublishedPFE.find('textarea:eq(1)').trigger('keydown');
-    tester.compare($firstPublishedPFE.hasClass('unsaved'), true,
+    tester.ok($firstPublishedPFE.hasClass('unsaved'), 
             prefix + "after we triggered keydown on the second textarea, first published pf entry "
             + "now has class unsaved");
 };
 $(testAddUnsavedClassWhenTextfieldsAreModified);
-
-testsAreDone = function() {
-    tester.testDone();
-};
-$(function() {
-        // FIXME: Mock out the notifier so all the tests are synchronous and we don't have to use time outs.
-        window.setTimeout(testsAreDone, 3000);
-        });
 
 // vim: set nu ai:
