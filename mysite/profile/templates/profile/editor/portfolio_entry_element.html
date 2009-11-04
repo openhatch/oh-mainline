@@ -53,6 +53,9 @@
         {% with pf_entry.get_published_citations as citations %}
         {% if edit_mode or citations or pf_entry.experience_description %}
         <div class='body personal-stuff'>
+            <div class='involvement_placeholder'>
+                When you publish this project, you can add involvement links here.
+            </div>
             <div class='citations-wrapper'>
                 <label>
                     {% if edit_mode %}

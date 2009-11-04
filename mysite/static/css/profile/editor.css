@@ -168,6 +168,7 @@
 }
 .portfolio_entry .project_description { width: 390px; }
     #portfolio.viewer .portfolio_entry .project_description { width: 190px; }
+
 #portfolio .portfolio_entry .personal-stuff {
     float: left;
     width: 756px;
@@ -177,10 +178,12 @@
     padding: 20px;
     margin: 4px;
 }
-.portfolio_entry .citations {
-    float: left;
-    width: 400px;
-}
+.portfolio_entry .citations { float: left; width: 400px; }
+    .portfolio_entry.adding .citations-wrapper { display: none; }
+
+.portfolio_entry .involvement_placeholder { display: none; }
+    .portfolio_entry.adding .involvement_placeholder { display: block; }
+
 .portfolio_entry label {
     font-size: 8pt;
     text-transform: uppercase;
@@ -241,10 +244,7 @@
     position: relative;
     top: -12px;
 }
-.citations-wrapper {
-    float: left;
-    width: 350px;
-}
+.citations-wrapper, .involvement_placeholder { float: left; width: 350px; }
 .citations li.unpublished .summary {
     background-color: #ffc;
 }

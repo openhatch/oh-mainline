@@ -12,6 +12,7 @@ QUnitRunner.compare = function(a, b, message) {
     if (typeof prefix == 'undefined') { prefix = ""; }
     test(prefix, function() { equals(a, b, message); });
 };
+QUnitRunner.testDone = function() {};
 
 StupidRunner = {};
 StupidRunner.ok = function(bool, message) {
@@ -21,11 +22,12 @@ StupidRunner.ok = function(bool, message) {
 StupidRunner.compare = function(a, b, message) {
     if (a !== b) { alert("Failed: " + a + " != " + b + "; " + message); }
 };
+StupidRunner.testDone = function() {};
 
 // Pick a test runner here
-//tester = fireunit;
+tester = fireunit;
 //tester = QUnitRunner;
-tester = StupidRunner;
+//tester = StupidRunner;
 
 var jQuerySaysThisObjectHasAHandler = function(jqueryObj, handler) {
     var real_obj = jqueryObj[0];
@@ -504,7 +506,6 @@ testIntegration = function() {
 //$(testIntegration);
 
 function checkNotifiersForText(text) {
-    return false;
     var checkNotifiersInAMoment = function () {
         var $allNotifiers = $('.jGrowl-notification .message');
         var messagesTogether = $allNotifiers.text(); // join the text of all the messages
@@ -663,6 +664,7 @@ testLinkDrawsAWidgetForAddingAPortfolioEntry = function () {
     redrawPortfolioEntries();
 
     var prefix = "link draws a widget for adding a portfolio entry: ";
+
     $link = $('a#add_pf_entry');
     tester.compare( $link.size(), 1, prefix + "there's a link");
 
@@ -675,6 +677,11 @@ testLinkDrawsAWidgetForAddingAPortfolioEntry = function () {
     tester.compare( $widget.size(), 1, prefix + "there's one widget after we click");
 
     tester.ok($widget.attr('id').match(/^element_/), prefix + "Adder widget has a unique ID.");
+
+    // Before the widget has been saved/published, the 'Add another link' and howto are hidden.
+    $widget.find('.citations:visible, .citation_forms:visible').assertN(0);
+    // A placeholder is visible.
+    $widget.find('.involvement_placeholder:visible').assertN(1);
 
     // make sure we have one
     $projectNameField = $widget.find('input:text.project_name').assertN(1);
@@ -733,10 +740,16 @@ testLinkDrawsAWidgetForAddingAPortfolioEntry = function () {
     $recently_added_pf_entry = $widget; // Graduated now.
 
     $recently_added_pf_entry.find('input:text.project_name').assertN(0);
+
     tester.compare(
             $recently_added_pf_entry.find('span.project_name').assertN(1).text(),
             "new name",
             prefix + "Project name is a span containing the name."
+            );
+
+    tester.ok(
+            ! $recently_added_pf_entry.hasClass('adding'),
+            prefix + "Recently added pf entry no longer has class 'adding'."
             );
 
     // Reset monkeypatching
@@ -767,5 +780,9 @@ testAddUnsavedClassWhenTextfieldsAreModified = function() {
             + "now has class unsaved");
 };
 $(testAddUnsavedClassWhenTextfieldsAreModified);
+
+$(function () {
+        tester.testDone();
+        });
 
 // vim: set nu ai:
