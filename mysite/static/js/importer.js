@@ -664,6 +664,7 @@ PortfolioEntry.Save.postOptions.success = function (response) {
             .text($old_project_name_field.val());
         $old_project_name_field.replaceWith($new_project_name_span);
     }
+    $('#portfolio_entry_'+response.portfolio_entry__pk).removeClass('unsaved');
     askServerForPortfolio();
 };
 PortfolioEntry.Save.postOptions.error = function (response) {
