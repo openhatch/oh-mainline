@@ -354,7 +354,7 @@ function updatePortfolio(response) {
 	    	   
 	    /* project_icon */
         if (project_we_refer_to.fields.icon == '') {
-            $new_portfolio_entry.find('.icon_flagger').remove();
+            $new_portfolio_entry.find('.icon_flagger').hide();
         }
         else {
             var $icon = $new_portfolio_entry.find(".project_icon");
@@ -362,6 +362,7 @@ function updatePortfolio(response) {
             var response_src = "/static/"+project_we_refer_to.fields.icon;
             if (current_src != response_src) {
                 $icon.attr('src', response_src);
+                $new_portfolio_entry.find('.icon_flagger').show();
             }
         }
 	    

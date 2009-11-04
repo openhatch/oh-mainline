@@ -34,6 +34,10 @@
                 {% if edit_mode and not adding_mode %}
                     <div class='icon_flagger'><a href='#'>&larr; Flag icon as incorrect</a></div>
                 {% endif %}
+                {% if adding_mode %}
+                    <div class='icon_flagger' style='display: none;'>
+                        <a href='#'>&larr; Flag icon as incorrect</a></div>
+                {% endif %}
             </div>
             <div class='project_description-wrapper'>
                 {% if pf_entry.experience_description or edit_mode %}
