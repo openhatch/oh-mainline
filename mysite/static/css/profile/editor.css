@@ -188,7 +188,7 @@
     font-size: 8pt;
     text-transform: uppercase;
     float: left;
-    width: 400px;
+    width: 100%;
     margin: 0;
     padding: 0;
 }
@@ -203,7 +203,7 @@
     font-family: "Liberation Sans", Arial;
 }
 .portfolio_entry .experience_description {
-    width: 390px;
+    width: 100%;
 }
 .citations > li {
     width: 400px;
