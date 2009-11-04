@@ -316,7 +316,7 @@ testFlagIconOnly4Nongenerics = function () {
             prefix + "assert project with nongeneric icon bears the link "
             + "'Flag icon as incorrect'"
             );
-    fireunit.ok($('.portfolio_entry').eq(1).find('.icon_flagger').size() == 0,
+    fireunit.ok($('.portfolio_entry').eq(1).find('.icon_flagger:visible').size() == 0,
             prefix + "assert project with generic icon doesn't bear the link "
             + "'Flag icon as incorrect'"
             );
