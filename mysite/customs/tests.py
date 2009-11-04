@@ -370,14 +370,18 @@ class TestOpenHatchBlogCrawl(django.test.TestCase):
                          u'Yo \xe9')
 
 mock_browser_open = mock.Mock()
-mock_browser_open.side_effect = HTTPError(url="", code=504) 
-class UserGetsMessagesDuringImport(TwillTests):
+mock_browser_open.side_effect = HTTPError(url="", code=504, msg="", hdrs="", fp=open("/dev/null")) 
+class UserGetsMessagesDuringImport(django.test.TestCase):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     @mock.patch("mechanize.Browser.open", mock_browser_open)
     def test_user_get_messages_during_import(self):
-        self.assertRaises(mechanize_get('this string will be ignored', attempts_remaining=1, person=paulproteus), HTTPError)
+        paulproteus = Person.objects.get(user__username='paulproteus')
 
-        self.assertEqual(len(paulproteus.get_messages_and_delete(), 1)
+        self.assertEqual(len(paulproteus.user.get_and_delete_messages()), 0)
+
+        self.assertRaises(HTTPError, mysite.customs.ohloh.mechanize_get, 'http://ohloh.net/somewebsiteonohloh', attempts_remaining=1, person=paulproteus)
+
+        self.assertEqual(len(paulproteus.user.get_and_delete_messages()), 1)
                 
 # vim: set nu:
