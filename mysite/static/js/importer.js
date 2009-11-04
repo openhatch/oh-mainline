@@ -841,11 +841,15 @@ $(Importer.Submission.init);
 
 Importer.ProgressBar = {};
 Importer.ProgressBar.showWithValue = function(value) {
+    $bar = $('#importer #progressbar');
     if (value < 10 ) { value = 10; } // Always show a smidgen of progress.
-    $('#importer #progressbar').show().progressbar('option', 'value', value);
+    $bar.addClass('working');
+    if (value == 100) { Importer.ProgressBar.bumpTo100(); }
+    $bar.show().progressbar('option', 'value', value);
 };
 Importer.ProgressBar.bumpTo100 = function() {
-    $('#importer #progressbar').progressbar('option', 'value', 100);
+    $bar.removeClass('working');
+    $bar.show().progressbar('option', 'value', 100);
 };
 
 PortfolioEntry.Add = {};

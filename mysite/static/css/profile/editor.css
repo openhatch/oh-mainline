@@ -50,7 +50,7 @@
     width: 350px;
     height: 22px;
 }
-#progressbar .ui-progressbar-value {
+#progressbar.working .ui-progressbar-value {
     background-image: url('/static/css/jquery-ui-lightness/images/pbar-ani.gif');
 }
 #portfolio.editor h4 {
