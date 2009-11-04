@@ -150,6 +150,7 @@ mockedPortfolioResponse = {
     'summaries': {
         '0': 'Ohloh repository index: Coded in shell script for 12 months as paulproteus since 2007.',
         '1': 'Summery'}
+
 };
 
 testUpdatePortfolio = function() {
@@ -761,6 +762,7 @@ $(testLinkDrawsAWidgetForAddingAPortfolioEntry);
 
 // FIXME: Test: Add the 'unsaved' class to a pf entry when textfields are modified.
 testAddUnsavedClassWhenTextfieldsAreModified = function() {
+    redrawPortfolioEntries();
     var prefix = "test add unsaved class when textfields are modified: ";
                                                               // : " <-- little dude
                                                               // : "; <-- asheesh sees a dude here, i do not.
@@ -780,6 +782,14 @@ testAddUnsavedClassWhenTextfieldsAreModified = function() {
             + "now has class unsaved");
 };
 $(testAddUnsavedClassWhenTextfieldsAreModified);
+
+testShowUserMessagesDuringImport = function() {
+    var mockedPortfolioResponse2 = deepCopy(mockedPortfolioResponse);
+    mockedPortfolioResponse2.messages = ['message!'];
+    updatePortfolio(mockedPortfolioResponse2);
+    checkNotifiersForText("message!");
+};
+$(testShowUserMessagesDuringImport);
 
 $(function () {
         tester.testDone();
