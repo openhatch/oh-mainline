@@ -699,6 +699,9 @@ def importer(request, test_js = False):
 #FIXME: Rename importer
 portfolio_editor = importer
 
+def portfolio_editor_test(request):
+    return portfolio_editor(request, test_js=True)
+
 def filter_by_key_prefix(dict, prefix):
     """Return those and only those items in a dictionary whose keys have the given prefix."""
     out_dict = {}

@@ -160,7 +160,7 @@ urlpatterns = patterns('',
                 'mysite.profile.views.portfolio_editor'),
 
         (r'^\+portfolio/editor/test$',
-                'mysite.profile.views.portfolio_editor', {'test_js': True}),
+                'mysite.profile.views.portfolio_editor_test'),
 
         (r'^people/edit/info$',
                 'mysite.profile.views.display_person_edit_web',
