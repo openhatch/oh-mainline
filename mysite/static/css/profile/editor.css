@@ -1,329 +1,92 @@
-#importer {
-    width: 865px;
-    padding: 20px;
-    margin-bottom: 20px;
-    /*background-color: #79d9b0;*/
-    background-color: #f9f9f9;
-    background: #798189 url('/static/images/ship.png') top right no-repeat;
-}
-#importer .head {
-    width: 865px;
-}
-#importer .howto {
-    float: left;
-    width: 400px;
-    margin-right: 20px;
-}
-#importer input[type='text'] {
-    font-size: 15pt;
-    width: 425px;
-}
-#importer input[type='text'].blur {
-    color: #999;
-}
-#importer .query {
-    float: right;
-}
-#importer .query [name='identifier_0'] {
-    margin-top: 125px;
-}
-#importer p {
-    margin-top: 40px;
-    color: #f4f4ff;
-}
-#importer p a {
-    font-weight: bold;
-    color: pink;
-}
-#importer .foot {
-    width: 440px;
-    padding: 0;
-    padding-top: 10px;
-    float: right;
-}
-#importer input[type='submit'] {
-    float: right;
-    height: 25px;
-}
-#progressbar {
-    display: none;
-    width: 350px;
-    height: 22px;
-}
-#progressbar.working .ui-progressbar-value {
-    background-image: url('/static/css/jquery-ui-lightness/images/pbar-ani.gif');
-}
-#portfolio.editor h4 {
-    width: 900px;
-    float: left;
-    font-size: 8pt;
-    text-transform: uppercase;
-    font-weight: bold;
-    margin-bottom: 10px;
-}
-#portfolio h5 {
-    margin: 0 0 10px 0;
-    font-size: 13pt;
-    font-weight: normal;
-    font-family: Georgia;
-    color: #555;
-}
-#portfolio.viewer .submodule .head {
-    width: 660px;
-}
-.portfolio_entry {
-    float: left;
-    margin-bottom: 20px;
-}
-#portfolio.editor .portfolio_entry { width: 920px; position: relative; left: -7px; }
+/*--------------*
+ |   IMPORTER   |
+ *--------------*/
+#importer { background: #798189 url('/static/images/ship.png') top right no-repeat; margin-bottom: 20px; padding: 20px; width: 865px; }
+#importer .head { width: 865px; }
+#importer .howto { float: left; margin-right: 20px; width: 400px; }
+#importer input[type='text'] { font-size: 15pt; width: 425px; }
+#importer input[type='text'].blur { color: #999; }
+#importer .query { float: right; }
+#importer .query [name='identifier_0'] { margin-top: 125px; }
+#importer p { color: #f4f4ff; margin-top: 40px; }
+#importer p a { color: pink; font-weight: bold; }
+#importer .foot { float: right; padding: 0; padding-top: 10px; width: 440px; }
+#importer input[type='submit'] { float: right; height: 25px; }
+#progressbar { display: none; height: 22px; width: 350px; }
+#progressbar.working .ui-progressbar-value { background-image: url('/static/css/jquery-ui-lightness/images/pbar-ani.gif'); }
+
+/*----------------------*
+ |   PORTFOLIO ENTRIES  |
+ *----------------------*/
+#portfolio.editor h4 { float: left; font-size: 8pt; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; width: 900px; }
+#portfolio h5 { color: #555; font-family: Georgia; font-size: 13pt; font-weight: normal; margin: 0 0 10px 0; }
+#portfolio.viewer .submodule .head { width: 660px; }
+.portfolio_entry { float: left; margin-bottom: 20px; }
+#portfolio.editor .portfolio_entry { left: -7px; position: relative; width: 920px; }
 #portfolio.viewer .portfolio_entry .project_description-wrapper { margin-top: 10px; width: 200px; }
 #portfolio.viewer .portfolio_entry .experience_description-wrapper { width: 200px; }
 #portfolio.editor .portfolio_entry.unpublished .submodule, 
 #portfolio.editor .portfolio_entry.unpublished > .actions,
 #portfolio.editor .portfolio_entry.unsaved .submodule,
 #portfolio.editor .portfolio_entry.unsaved > .actions { border-color: #ffa; }
-
-.portfolio_entry.unpublished .project_name {
-    font-weight: bold;
-}
-#portfolio.editor .portfolio_entry > .actions {
-    float: left;
-    width: 100px;
-    background-color: #fff;
-    border: 4px solid #e9e9e9;
-    border-right: 0;
-    border-radius: 8px;
-    -moz-border-radius: 8px;
-    border-radius-topright: 0;
-    -moz-border-radius-topright: 0;
-    border-radius-bottomright: 0;
-    -moz-border-radius-bottomright: 0;
-    /* So it overlaps the body of the portfolio entry. */
-    position: relative;
-    left: 6px;
-}
+.portfolio_entry.unpublished .project_name { font-weight: bold; }
+#portfolio.editor .portfolio_entry > .actions { background-color: #fff; border: 4px solid #e9e9e9; border-radius: 8px; border-radius-bottomright: 0; border-radius-topright: 0; border-right: 0; float: left; left: 6px; -moz-border-radius: 8px; -moz-border-radius-bottomright: 0; -moz-border-radius-topright: 0; position: relative; width: 100px; }
 .portfolio_entry > .actions a,
-.portfolio_entry > .actions span {
-    /* <span>Published</span> sometimes replaces <a>Publish</a> */
-    padding: 10px;
-    width: 55px;
-    float: left;
-    background-position: 5px;
-    background-repeat: no-repeat;
-    padding-left: 35px;
-}
-.portfolio_entry > .actions a:hover {
-    background-color: #e9e9e9;
-}
+.portfolio_entry > .actions span { background-position: 5px; background-repeat: no-repeat; float: left; padding: 10px; padding-left: 35px; width: 55px; }
+.portfolio_entry > .actions a:hover { background-color: #e9e9e9; }
 .portfolio_entry > .actions li.save_and_publish_button *,
-.portfolio_entry > .actions li.save_button * {
-    /*background-color: #b2dda2;*/
-    background-image: url('/static/images/icons/publish.png');
-}
-.portfolio_entry > .actions li.delete_portfolio_entry a {
-    background-image: url('/static/images/icons/delete.png');
-}
-.portfolio_entry > .submodule {
-    width: 807px;
-    float: right;
-    margin-bottom: 0;
-}
-.portfolio_entry .project-stuff {
-    float: left;
-}
-#portfolio.editor .portfolio_entry .project-stuff {
-    width: 758px;
-}
-#portfolio.viewer .portfolio_entry .project-stuff {
-    width: 620px;
-}
-#portfolio.viewer .portfolio_entry .personal-stuff {
-    width: 612px;
-}
-.portfolio_entry .project_icon {
-    float: left;
-    height: 60px;
-    width: 60px;
-    margin-right: 10px;
-}
-.portfolio_entry .name_and_icon_flagger {
-    float: left;
-    width: 300px;
-    position: relative;
-    left: -10px;
-}
-.portfolio_entry .project_name {
-    padding: 15px 0;
-    font-size: 20px;
-    width: 200px;
-    float: left;
-}
-.portfolio_entry .icon_flagger {
-    float: left;
-    font-size: 9pt;
-}
-.portfolio_entry .project_description-wrapper {
-    width: 400px;
-    float: right;
-}
+.portfolio_entry > .actions li.save_button * { background-image: url('/static/images/icons/publish.png'); }
+.portfolio_entry > .actions li.delete_portfolio_entry a { background-image: url('/static/images/icons/delete.png'); }
+.portfolio_entry > .submodule { float: right; margin-bottom: 0; width: 807px; }
+.portfolio_entry .project-stuff { float: left; }
+#portfolio.editor .portfolio_entry .project-stuff { width: 758px; }
+#portfolio.viewer .portfolio_entry .project-stuff { width: 620px; }
+#portfolio.viewer .portfolio_entry .personal-stuff { width: 612px; }
+.portfolio_entry .project_icon { float: left; height: 60px; margin-right: 10px; width: 60px; }
+.portfolio_entry .name_and_icon_flagger { float: left; left: -10px; position: relative; width: 300px; }
+.portfolio_entry .project_name { float: left; font-size: 20px; padding: 15px 0; width: 200px; }
+.portfolio_entry .icon_flagger { float: left; font-size: 9pt; }
+.portfolio_entry .project_description-wrapper { float: right; width: 400px; }
 .portfolio_entry .project_description, .portfolio_entry .experience_description { width: 380px; }
-    #portfolio.viewer .portfolio_entry .project_description { width: 190px; }
-
-#portfolio .portfolio_entry .personal-stuff {
-    float: left;
-    width: 756px;
-    background-color: #f4f4f4;
-    -moz-border-radius: 4px;
-    border-radius: 4px;
-    padding: 20px;
-    margin: 4px;
-}
+#portfolio.viewer .portfolio_entry .project_description { width: 190px; }
+#portfolio .portfolio_entry .personal-stuff { background-color: #f4f4f4; border-radius: 4px; float: left; margin: 4px; -moz-border-radius: 4px; padding: 20px; width: 756px; }
 .portfolio_entry .citations { float: left; width: 400px; }
-    .portfolio_entry.adding .citations-wrapper { display: none; }
-
+.portfolio_entry.adding .citations-wrapper { display: none; }
 .portfolio_entry .involvement_placeholder { display: none; }
-    .portfolio_entry.adding .involvement_placeholder { display: block; }
-
-.portfolio_entry label {
-    font-size: 8pt;
-    text-transform: uppercase;
-    float: left;
-    width: 100%;
-    margin: 0;
-    padding: 0;
-}
-.portfolio_entry .citation-forms label {
-    font-weight: bold;
-}
-.portfolio_entry .experience_description-wrapper {
-    width: 400px;
-    float: right;
-}
-.portfolio_entry textarea {
-    font-family: "Liberation Sans", Arial;
-}
-.citations > li {
-    width: 400px;
-    float: left;
-    list-style: square;
-    margin-left: 20px;
-    color: #777;
-    position: relative;
-    top: 15px;
-}
-.citations li .actions {
-    float: left;
-    width: 30px;
-}
-.citations li .actions a {
-    float: left;
-    width: 25px;
-    height: 25px;
-    background-repeat: no-repeat;
-    background-position: center;
-}
-.citations li .actions a.delete_citation {
-    background-image: url('/static/images/icons/delete-citation.png');
-}
-.citations li .actions a.delete:hover {
-    background-color: #c9c9c9;
-    -moz-border-radius: 4px;
-    border-radius: 4px;
-}
-.citations li .summary {
-    float: left;
-    width: 300px;
-    color: #222;
-    position: relative;
-    top: -12px;
-}
-.citations li li {
-    position: relative;
-    top: -12px;
-}
+.portfolio_entry.adding .involvement_placeholder { display: block; }
+.portfolio_entry label { float: left; font-size: 8pt; margin: 0; padding: 0; text-transform: uppercase; width: 100%; }
+.portfolio_entry .citation-forms label { font-weight: bold; }
+.portfolio_entry .experience_description-wrapper { float: right; width: 400px; }
+.portfolio_entry textarea { font-family: "Liberation Sans", Arial; }
+.citations > li { color: #777; float: left; list-style: square; margin-left: 20px; position: relative; top: 15px; width: 400px; }
+.citations li .actions { float: left; width: 30px; }
+.citations li .actions a { background-position: center; background-repeat: no-repeat; float: left; height: 25px; width: 25px; }
+.citations li .actions a.delete_citation { background-image: url('/static/images/icons/delete-citation.png'); }
+.citations li .actions a.delete:hover { background-color: #c9c9c9; border-radius: 4px; -moz-border-radius: 4px; }
+.citations li .summary { color: #222; float: left; position: relative; top: -12px; width: 300px; }
+.citations li li { position: relative; top: -12px; }
 .citations-wrapper, .involvement_placeholder { float: left; width: 340px; }
 .citations li.unpublished .summary { background-color: #ffc; }
 .citations li.deleted .summary { background-color: pink; }
-.citations-wrapper a.add {
-    font-size: 8pt;
-    background-color: #c9c9c9;
-    float: left;
-    clear: left;
-    margin-top: 10px;
-    padding: 6px;
-    border-radius: 6px;
-    -moz-border-radius: 6px;
-    font-weight: bold;
-    color: #444;
-    background-color: lightblue;
-    margin-right: 10px;
-}
-.citations-wrapper a.add:hover {
-    color: #222;
-    text-decoration: none;
-}
-.error-message {
-    font-weight: bold;
-    color: pink;
-}
-.citations-wrapper .howto {
-    color: #111;
-}
-.citations-wrapper .howto, .citations-wrapper .show_howto {
-    float: left;
-    background-color: #ffa;
-    border: 1px solid yellow;
-    border-radius: 6px;
-    -moz-border-radius: 6px;
-    padding: 12px;
-    font-size: 8pt;
-    font-weight: bold;
-    width: 180px;
-    margin-top: 10px;
-}
-.citations-wrapper .howto .hide_me {
-    float: right;
-    padding: 5px;
-}
-.citations-wrapper .show_howto {
-    display: none;
-    padding: 6px;
-    width: auto;
-}
-.citation-forms input[type='text'] {
-    width: 270px;
-}
-.citation-forms input[type='submit'] {
-    width: 60px;
-    font-size: 11pt;
-    padding: 3px;
-}
-.citation-forms li form > div {
-    float: left;
-    width: 350px;
-}
-
-/* portfolio entries do not have a publish button... */
+.citations-wrapper a.add { background-color: #c9c9c9; background-color: lightblue; border-radius: 6px; clear: left; color: #444; float: left; font-size: 8pt; font-weight: bold; margin-right: 10px; margin-top: 10px; -moz-border-radius: 6px; padding: 6px; }
+.citations-wrapper a.add:hover { color: #222; text-decoration: none; }
+.error-message { color: pink; font-weight: bold; }
+.citations-wrapper .howto { color: #111; }
+.citations-wrapper .howto, .citations-wrapper .show_howto { background-color: #ffa; border: 1px solid yellow; border-radius: 6px; float: left; font-size: 8pt; font-weight: bold; margin-top: 10px; -moz-border-radius: 6px; padding: 12px; width: 180px; }
+.citations-wrapper .howto .hide_me { float: right; padding: 5px; }
+.citations-wrapper .show_howto { display: none; padding: 6px; width: auto; }
+.citation-forms input[type='text'] { width: 270px; }
+.citation-forms input[type='submit'] { font-size: 11pt; padding: 3px; width: 60px; }
+.citation-forms li form > div { float: left; width: 350px; }
 .portfolio_entry .actions .save_and_publish_button { display: none; }
-/* ...unless they're unpublished */
 .portfolio_entry.unpublished .actions .save_and_publish_button { display: block; }
-
-/* Don't say the pf entry is published if it isn't */
 .portfolio_entry.unpublished .actions .portfolio_entry_is_published { display: none; }
-
-/* Portfolio entries have the 'Save and publish' button only when they're unpublished */
 .portfolio_entry .actions .save_and_publish_button { display: none; }
 .portfolio_entry.unpublished .actions .save_and_publish_button { display: block; }
-
-/* Portfolio entries have the 'Save' button only when they're unsaved */
 .portfolio_entry .actions .save_button { display: none; }
 .portfolio_entry.unsaved .actions .save_button { display: block; }
-/* Except if they're unpublished. */
 .portfolio_entry.unsaved.unpublished .actions .save_button { display: none; }
-
-/* Unsaved or unpublished portfolio entries don't say 'Saved' */
 .portfolio_entry.unpublished > .actions > .portfolio_entry_is_saved,
 .portfolio_entry.unsaved > .actions > .portfolio_entry_is_saved { display: none; }
-
 .portfolio_entry .actions .portfolio_entry_is_unpublished { display: none; }
-.portfolio_entry.unpublished .actions .portfolio_entry_is_unpublished { position: relative; left: -22px; font-weight: bold; display: block; }
+.portfolio_entry.unpublished .actions .portfolio_entry_is_unpublished { display: block; font-weight: bold; left: -22px; position: relative; }
