@@ -6,8 +6,10 @@
 </div> -->
 <div class='first-line'>
     <div class='head'>
+        {% if project.get_url_of_badge_size_icon_or_generic %}
         <img alt='logo for {{project.name}}' title='{{project.name}}'
-                            src='{{ project.get_url_of_badge_size_icon_or_generic }}' width='40'/>
+        src='{{ project.get_url_of_badge_size_icon_or_generic }}' width='40'/>
+        {% endif %}
         <span class='project__name'>{{ bug.project.name|highlight:query_words }}</span>
         -
         <a class='canonical_bug_link' href='{{ bug.canonical_bug_link }}'>
