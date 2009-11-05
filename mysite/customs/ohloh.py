@@ -256,6 +256,9 @@ class Ohloh(object):
         return username
 
     def get_contribution_info_by_ohloh_username(self, ohloh_username):
+        # FIXME: This doesn't return any WebResponse. How sad.
+        # In branch pf2_with_webresponse_m2m, we are working on linking DIAs with multiple WebResponses,
+        # after which we intend to return a list of WebResponses, or something like that.
         if ohloh_username is None:
             return [], None
 
@@ -300,7 +303,7 @@ class Ohloh(object):
                         'primary_language_nice_name',''),
                     man_months=int(c_f.get('man_months',0)))
                 ret.append(this)
-        return ret
+        return ret, None
 
     def search_contribution_info_by_email(self, email):
         ret = []
@@ -317,7 +320,7 @@ class Ohloh(object):
             this = dict(
                 project=project_data['name'],
                 project_homepage_url=project_data.get('homepage_url', None),
-                primary_language=c_f['primary_language_nice_name'],
+                primary_language=c_f.get('primary_language_nice_name', ''),
                 man_months=int(c_f['man_months']))
             ret.append(this)
 

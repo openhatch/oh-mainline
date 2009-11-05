@@ -87,8 +87,11 @@ def rs_action(dia):
 
 def ou_action(dia):
     oh = ohloh.get_ohloh()
-    return oh.get_contribution_info_by_ohloh_username(
+    data, web_response = oh.get_contribution_info_by_ohloh_username(
             dia.query, dia.person)
+    dia.web_response = web_response
+    dia.save()
+    return data
 
 def lp_action(dia):
     # NB: Don't change the way this is called, because calling it this way

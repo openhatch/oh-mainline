@@ -330,7 +330,7 @@ mock_gcibu = mock.Mock()
 # This object will always return:
 mock_gcibu.return_value = ([{
         'man_months': 1,
-        'project': u'ccHost',
+        'project': u'MOCK ccHost',
         'project_homepage_url':
             u'http://wiki.creativecommons.org/CcHost',
         'first_commit_time':
@@ -342,17 +342,19 @@ mock_gcibu.return_value = ([{
 
 # Create a mock Ohloh get_contribution_info_by_ohloh_username
 mock_gcibou = mock.Mock()
-mock_gcibou.return_value = [{
+mock_gcibou.return_value = ([{
         'man_months': 1,
-        'project': u'who knows',
+        'project': u'MOCK ccHost',
         'project_homepage_url':
             u'http://wiki.creativecommons.org/CcHost',
-        'primary_language': u'Vala'}]
+        'primary_language': u'Vala'}],
+        None #WebResponse
+        )
 
 # Create a mock Launchpad get_info_for_launchpad_username
 mock_giflu = mock.Mock()
 mock_giflu.return_value = {
-        'ccHost': {
+        'MOCK ccHost': {
             'url': 'http://launchpad.net/ccHost', # ok this url doesn't really exist
             'involvement_types': ['Bug Management', 'Bazaar Branches'],
             'languages': ['python', 'ruby'],
@@ -394,7 +396,6 @@ class CeleryTests(TwillTests):
 
         # Store a note in the DB that we're about to run a background task
         dia = DataImportAttempt(query=username, source=source, person=person)
-        dia.person_wants_data = True
         dia.save()
 
         gimme_json_url = reverse(mysite.profile.views.gimme_json_for_portfolio)
@@ -411,7 +412,7 @@ class CeleryTests(TwillTests):
         
         # Are there any PortfolioEntries for ccHost
         # before we import data? Expected: no.
-        portfolio_entries = PortfolioEntry.objects.filter(project__name='ccHost')
+        portfolio_entries = PortfolioEntry.objects.filter(project__name='MOCK ccHost')
         self.assertEqual(portfolio_entries.count(), 0)
 
         dia.do_what_it_says_on_the_tin()
@@ -435,7 +436,7 @@ class CeleryTests(TwillTests):
         self.assert_(response_json['dias'][0]['fields']['completed'])
 
         # There ought now to be a PortfolioEntry for ccHost...
-        portfolio_entry = PortfolioEntry.objects.get(person=person, project__name='ccHost')
+        portfolio_entry = PortfolioEntry.objects.get(person=person, project__name='MOCK ccHost')
 
         # ...and the expected number of citations.
         citations = Citation.untrashed.filter(portfolio_entry=portfolio_entry)
@@ -478,21 +479,21 @@ class CeleryTests(TwillTests):
 
     @mock.patch('mysite.customs.ohloh.Ohloh.get_contribution_info_by_ohloh_username', mock_gcibou)
     @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
-    def test_ohloh_import_via_emulated_ou_bg_search(self):
+    def test_ohloh_import_via_emulated_ohloh_username_bg_search(self):
         "Test that we can import data from Ohloh via Ohloh username, except don't test "
         "that Ohloh actually gives data. Instead, create a mock object, a little "
         "placeholder that acts like Ohloh, and make sure we respond "
         "to it correctly."
         # {{{
         data_we_expect = [{
-                'languages': mock_gcibu.return_value[0][0]['primary_language'],
-                'distinct_months': mock_gcibu.return_value[0][0]['man_months'],
+                'languages': mock_gcibou.return_value[0][0]['primary_language'],
+                'distinct_months': mock_gcibou.return_value[0][0]['man_months'],
                 'is_published': False,
                 'is_deleted': False,
                 }]
 
         summaries_we_expect = [
-                "Coded for 1 month in shell script (Ohloh)",
+                "Coded for 1 month in Vala (Ohloh)",
                 ]
 
         return self._test_data_source_via_emulated_bgtask(
