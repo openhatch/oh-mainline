@@ -11,6 +11,7 @@ from django.core.files.base import ContentFile
 import datetime
 import sys
 import uuid
+import urllib
 
 def generate_person_photo_path(instance, filename, suffix=""):
     random_uuid = uuid.uuid4()
@@ -459,6 +460,15 @@ class Citation(models.Model):
                     )
 
         raise ValueError("There's no DIA and I don't know how to summarize this.")
+
+    def get_url_or_guess(self):
+        if self.url:
+            return self.url
+        else:
+            if self.data_import_attempt and (
+                    self.data_import_attempt.source in ['rs', 'ou']):
+                return "http://www.ohloh.net/search?%s" % urllib.urlencode(
+                        {'q': self.portfolio_entry.project.name})
 
     def save_and_check_for_duplicates(self):
         # FIXME: Cache summaries in the DB so this query is faster.
