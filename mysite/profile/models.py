@@ -277,9 +277,13 @@ class TagType(models.Model):
 
 class Tag(models.Model):
     # {{{
-    text = models.CharField(max_length=50)
+    text = models.CharField(null=False, max_length=50)
     tag_type = models.ForeignKey(TagType)
 
+    def save(self):
+        if text:
+            super(Tag, self).save()
+        raise ValueError
     # }}}
 
 class Link_ProjectExp_Tag(models.Model):
