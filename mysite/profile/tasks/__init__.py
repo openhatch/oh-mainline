@@ -23,6 +23,7 @@ def create_citations_from_ohloh_contributor_facts(dia_id, ohloh_results):
     for ohloh_contrib_info in ohloh_results:
         (project, _) = Project.objects.get_or_create(
                 name=ohloh_contrib_info['project'])
+        # FIXME: don't import if blacklisted
         (portfolio_entry, _) = PortfolioEntry.objects.get_or_create(
                 person=person, project=project)
         citation = Citation.create_from_ohloh_contrib_info(ohloh_contrib_info)

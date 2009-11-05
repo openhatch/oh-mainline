@@ -15,6 +15,16 @@ def generate_person_photo_path(instance, filename, suffix=""):
     random_uuid = uuid.uuid4()
     return random_uuid.hex + suffix
 
+class RepositoryCommitter(models.Model):
+    """Ok, so we need to keep track of repository committers, e.g.
+        paulproteus@fspot
+    That's because when a user says, 'oy, this data you guys imported isn't
+    mine', what she or he is typically saying is 'Don't give me any more
+    data from Ohloh pertaining to this dude named mickey.mouse@strange.ly
+    checking code into F-Spot. """
+    project = models.ForeignKey(Project)
+    data_import_attempt = models.ForeignKey(DataImportAttempt)
+
 class Person(models.Model):
     """ A human bean. """
     # {{{
@@ -32,6 +42,7 @@ class Person(models.Model):
                               generate_person_photo_path(a, b, suffix="-thumbnail"),
                               default='',
                               null=True)
+    blacklisted_repository_committers = models.ManyToManyField(RepositoryCommitter)
 
     def __unicode__(self):
         return "username: %s, name: %s %s" % (self.user.username,
