@@ -6,6 +6,7 @@ import cStringIO as StringIO
 from urlparse import urlparse
 from urllib2 import HTTPError
 from django.conf import settings
+import mysite.customs.models
 
 def uni_text(s):
     if type(s) == unicode:
@@ -20,6 +21,14 @@ from typecheck import accepts, returns
 from typecheck import Any as __
 
 def mechanize_get(url, referrer=None, attempts_remaining=6, person=None):
+    """Input: Some stuff regarding a web URL to request.
+    Output: A browser instance that just open()'d that, plus an unsaved
+    WebResponse object representing that browser's final state."""
+    web_response = mysite.customs.models.WebResponse()
+
+    import pdb
+    pdb.set_trace()
+    
     b = mechanize.Browser()
     b.set_handle_robots(False)
     addheaders = [('User-Agent',
@@ -49,33 +58,46 @@ def mechanize_get(url, referrer=None, attempts_remaining=6, person=None):
     return b
 
 def ohloh_url2data(url, selector, params = {}, many = False, API_KEY = None, person=None):
+    '''Input: A URL to get,
+    a bunch of parameters to toss onto the end url-encoded,
+    many (a boolean) indicating if we should return a list of just one datum,
+    API_KEY suggesting a key to use with Ohloh, and a
+    Person object to, if the request is slow, log messages to.
+
+    Output: A list/dictionary of Ohloh data plus a saved WebResponse instance that
+    logs information about the request.'''
+
     if API_KEY is None:
         API_KEY = settings.OHLOH_API_KEY
 
-    my_params = {'api_key': API_KEY}
-    my_params.update(params)
-    params = my_params ; del my_params
 
+    params = {'api_key': API_KEY}.update(params)
+
+    # FIXME: We return more than just "ret" these days! Rename this variable.
     ret = []
     
     encoded = urllib.urlencode(params)
     url += encoded
     try:
         b = mechanize_get(url, person)
+        web_response = mysite.customs.models.create_from_browser(b)
+        web_response.save() # Always save the WebResponse, even if we don't know
+        # that any other object will store a pointer here.
     except urllib2.HTTPError, e:
+        # FIXME: Also return a web_response for error cases
         if str(e.code) == '404':
             if many:
-                return url, []
-            return url, {}
+                return url, [], None
+            return url, {}, None
         else:
             raise
-    s = b.response()
+
     try:
-        s = b.response().read()
+        s = web_response.text
         tree = ET.parse(StringIO.StringIO(s))
     except xml.parsers.expat.ExpatError:
         # well, I'll be. it doesn't parse.
-        return b.geturl(), None
+        return web_response.url, None
         
     # Did Ohloh return an error?
     root = tree.getroot()
@@ -91,10 +113,10 @@ def ohloh_url2data(url, selector, params = {}, many = False, API_KEY = None, per
         ret.append(this)
 
     if many:
-        return b.geturl(), ret
+        return b.geturl(), ret, web_response
     if ret:
-        return b.geturl(), ret[0]
-    return b.geturl(), None
+        return b.geturl(), ret[0], web_response
+    return b.geturl(), None, web_response
 
 class Ohloh(object):
 
@@ -104,7 +126,7 @@ class Ohloh(object):
         # {{{
         url = 'https://www.ohloh.net/p/%s/analyses/latest.xml?' % urllib.quote(
                 project_name)
-        url, data = ohloh_url2data(url, 'result/analysis')
+        url, data, web_response = ohloh_url2data(url, 'result/analysis')
         return int(data['id'])
         # }}}
 
@@ -148,10 +170,19 @@ class Ohloh(object):
         return self.project_id2projectdata(int(proj_id))
         
     def get_contribution_info_by_username(self, username, person=None):
-        ret = []
+        '''Input: A username. We go out and ask Ohloh, "What repositories
+        have you indexed where that username was a committer?"
+        Optional: a Person model, which is used to log messages to the user
+        in case Ohloh is being slow.
+
+        Output: A list of ContributorFact dictionaries, plus an instance (unsaved)
+        of the WebResponse class, which stores raw information on the response
+        such as the response data and HTTP status.'''
+        data = []
         url = 'http://www.ohloh.net/contributors.xml?'
-        url, c_fs = ohloh_url2data(url, 'result/contributor_fact',
-                              {'query': username}, many=True, person=person)
+        url, c_fs, web_response = ohloh_url2data(
+            url, 'result/contributor_fact',
+            {'query': username}, many=True, person=person)
 
         # For each contributor fact, grab the project it was for
         for c_f in c_fs:
@@ -164,9 +195,9 @@ class Ohloh(object):
                 project_homepage_url=project_data.get('homepage_url', None),
                 primary_language=c_f['primary_language_nice_name'],
                 man_months=int(c_f['man_months']))
-            ret.append(this)
+            data.append(this)
 
-        return ret
+        return data, web_response
 
     def get_name_by_username(self, username):
         url = 'https://www.ohloh.net/accounts/%s.xml?' % urllib.quote(username)

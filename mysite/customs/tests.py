@@ -387,7 +387,6 @@ class UserGetsMessagesDuringImport(django.test.TestCase):
 class OhlohLogging(django.test.TestCase):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
-    @mock.patch('mechanize.Browser.open', mock_browser_open)
     def test_we_save_ohloh_data_in_failure(self):
         # Create a DIA
         # Ask it to do_what_it_says_on_the_tin
@@ -397,6 +396,7 @@ class OhlohLogging(django.test.TestCase):
         paulproteus = Person.objects.get(user__username='paulproteus')
         error_dia = mysite.profile.models.DataImportAttempt(
             source='rs', person=paulproteus, query='queree')
+        error_dia.save()
         error_dia.do_what_it_says_on_the_tin() # go out to Ohloh
         self.assertEqual(error_dia.web_response.status, 504)
         self.assertEqual(error_dia.web_response.url, 'http://theurl.com/')

@@ -1,6 +1,7 @@
 # vim: set ai ts=4 sw=4 et:
 
 from mysite.search.models import Project, Bug, get_image_data_scaled
+import mysite.customs.models
 from mysite.customs import ohloh
 
 from django.db import models
@@ -115,16 +116,6 @@ def create_profile_when_user_created(instance, created, *args, **kwargs):
         
 models.signals.post_save.connect(create_profile_when_user_created, User)
 
-class WebResponse(models.Model):
-    '''This model abuses the databases as a network log. We store here
-    successful and unsuccessful web requests so that we can refer to
-    them later.'''
-    # {{{
-    text = models.TextField()
-    url = models.TextField()
-    status = models.IntegerField()
-    # }}}
-
 class DataImportAttempt(models.Model):
     # {{{
     SOURCE_CHOICES = (
@@ -139,7 +130,8 @@ class DataImportAttempt(models.Model):
     person = models.ForeignKey(Person)
     query = models.CharField(max_length=200)
     date_created = models.DateTimeField(default=datetime.datetime.utcnow)
-    web_response = models.ForeignKey(WebResponse, null=True) # null=True for
+    web_response = models.ForeignKey(mysite.customs.models.WebResponse, 
+                                     null=True) # null=True for
     # now, so the migration doesn't cause data validation errors
 
     def get_formatted_source_description(self):
