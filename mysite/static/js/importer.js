@@ -282,6 +282,11 @@ $.fn.textSmart = function(text) {
     if (this.text() != text) { this.text(text); }
 };
 
+$.fn.htmlSmart = function(html) {
+    // Only replace html if html is different.
+    if (this.html() != html) { this.html(html); }
+};
+
 /*
  * Perhaps we should talk more explicitly with the server about whose portfolio we want.
  * Otherwise somebody might do this:
@@ -394,8 +399,9 @@ function updatePortfolio(response) {
                     $citation.removeClass("unpublished");
                 }
 
-                var summary = response.summaries[citation.pk]
-                $citation.find('.summary').textSmart(summary);
+                var summaryHTML = response.summaries[citation.pk]
+                $summary = $citation.find('.summary');
+                $summary.htmlSmart(summaryHTML);
             }
         };
         $(response.citations).each(addMemberCitations);

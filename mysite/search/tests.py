@@ -493,7 +493,7 @@ class IconGetsScaled(SearchTest):
         self.assertFalse(p.icon_smaller_for_badge)
 
         # Step 2: Call the scaling method
-        p.update_badge_icon_from_self_icon()
+        p.update_scaled_icons_from_self_icon()
         p.save()
 
         # Assertion 2: Verify that it is now a true value

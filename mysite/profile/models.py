@@ -281,9 +281,9 @@ class Tag(models.Model):
     text = models.CharField(null=False, max_length=50)
     tag_type = models.ForeignKey(TagType)
 
-    def save(self):
+    def save(self, *args, **kwargs):
         if text:
-            super(Tag, self).save()
+            super(Tag, self).save(*args, **kwargs)
         raise ValueError
     # }}}
 
