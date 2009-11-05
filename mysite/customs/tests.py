@@ -131,7 +131,7 @@ class SlowlohTests(django.test.TestCase):
     def testFindContributionsInOhlohAccountByUsername(self):
         # {{{
         oh = ohloh.get_ohloh()
-        projects = oh.get_contribution_info_by_ohloh_username('paulproteus')
+        projects, web_response = oh.get_contribution_info_by_ohloh_username('paulproteus')
         
         assert {'project': u'ccHost',
                 'project_homepage_url': 'http://wiki.creativecommons.org/CcHost',
@@ -142,7 +142,7 @@ class SlowlohTests(django.test.TestCase):
     def testFindContributionsInOhlohAccountByEmail(self):
         oh = ohloh.get_ohloh()
         username = oh.email_address_to_ohloh_username('paulproteus.ohloh@asheesh.org')
-        projects = oh.get_contribution_info_by_ohloh_username(username)
+        projects, web_response = oh.get_contribution_info_by_ohloh_username(username)
         
         assert {'project': u'ccHost',
                 'project_homepage_url': 'http://wiki.creativecommons.org/CcHost',
@@ -160,7 +160,7 @@ class SlowlohTests(django.test.TestCase):
     def testFindByUsernameNotAsheesh(self):
         # {{{
         oh = ohloh.get_ohloh()
-        projects = oh.get_contribution_info_by_username('keescook')
+        projects, web_response = oh.get_contribution_info_by_username('keescook')
         self.assert_(len(projects) > 1)
         # }}}
 

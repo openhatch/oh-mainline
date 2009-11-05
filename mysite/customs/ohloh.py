@@ -231,6 +231,7 @@ class Ohloh(object):
         return ret
 
     def get_contribution_info_by_email(self, email):
+        # FIXME: Return a WebResponse too
         ret = []
         ret.extend(self.search_contribution_info_by_email(email))
         ret.extend(self.get_contribution_info_by_ohloh_username(
