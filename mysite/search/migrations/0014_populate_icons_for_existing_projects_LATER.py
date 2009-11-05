@@ -8,7 +8,7 @@ class Migration:
     def forwards(self, orm):
         "Write your forwards migration here"
 
-         # Populate icons for all existing projects.
+        # Populate icons for all existing projects.
         for orm_project in orm['search.project'].objects.all():
             model_project = Project.objects.get(pk=orm_project.pk)
             print "Populating icon for", model_project
