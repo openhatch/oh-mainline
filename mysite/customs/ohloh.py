@@ -257,18 +257,17 @@ class Ohloh(object):
 
     def get_contribution_info_by_ohloh_username(self, ohloh_username):
         if ohloh_username is None:
-            return []
+            return [], None
 
         b = mechanize.Browser()
         b.set_handle_robots(False)
         b.addheaders = [('User-Agent',
                         'Mozilla/4.0 (compatible; MSIE 5.0; Windows 98; (compatible;))')]
         try:
-            b.open('https://www.ohloh.net/accounts/%s' % urllib.quote(
-            ohloh_username))
+            b.open('https://www.ohloh.net/accounts/%s' % urllib.quote(ohloh_username))
         except urllib2.HTTPError, e:
             if str(e.code) == '404':
-                return []
+                return [], None
             else:
                 raise
         root = lxml.html.parse(b.response()).getroot()

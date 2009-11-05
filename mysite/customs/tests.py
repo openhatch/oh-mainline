@@ -103,11 +103,11 @@ class SlowlohTests(django.test.TestCase):
     def testFindByOhlohUsername(self, should_equal = None):
         # {{{
         oh = ohloh.get_ohloh()
-        projects = oh.get_contribution_info_by_ohloh_username('paulproteus')
+        projects, web_response = oh.get_contribution_info_by_ohloh_username('paulproteus')
         if should_equal is None:
             should_equal = [{'project': u'ccHost',
                              'project_homepage_url': 'http://wiki.creativecommons.org/CcHost',
-                           'man_months': 1,
+                             'man_months': 1,
                              'primary_language': 'shell script'}]
         self.assertEqual(should_equal, projects)
         # }}}

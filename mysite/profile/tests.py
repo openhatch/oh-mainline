@@ -456,7 +456,7 @@ class CeleryTests(TwillTests):
     @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
     def test_ohloh_import_via_emulated_bgtask(self):
         "Test that we can import data from Ohloh, except don't test "
-        "that Ohloh actually gives data. Instead, create a little "
+        "that Ohloh actually gives data. Instead, create a mock object, a little "
         "placeholder that acts like Ohloh, and make sure we respond "
         "to it correctly."
         # {{{
@@ -473,6 +473,30 @@ class CeleryTests(TwillTests):
 
         return self._test_data_source_via_emulated_bgtask(
                 source='rs', data_we_expect=data_we_expect,
+                summaries_we_expect=summaries_we_expect)
+        # }}}
+
+    @mock.patch('mysite.customs.ohloh.Ohloh.get_contribution_info_by_ohloh_username', mock_gcibou)
+    @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
+    def test_ohloh_import_via_emulated_ou_bg_search(self):
+        "Test that we can import data from Ohloh via Ohloh username, except don't test "
+        "that Ohloh actually gives data. Instead, create a mock object, a little "
+        "placeholder that acts like Ohloh, and make sure we respond "
+        "to it correctly."
+        # {{{
+        data_we_expect = [{
+                'languages': mock_gcibu.return_value[0][0]['primary_language'],
+                'distinct_months': mock_gcibu.return_value[0][0]['man_months'],
+                'is_published': False,
+                'is_deleted': False,
+                }]
+
+        summaries_we_expect = [
+                "Coded for 1 month in shell script (Ohloh)",
+                ]
+
+        return self._test_data_source_via_emulated_bgtask(
+                source='ou', data_we_expect=data_we_expect,
                 summaries_we_expect=summaries_we_expect)
         # }}}
 

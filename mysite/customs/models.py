@@ -6,8 +6,6 @@ class WebResponse(models.Model):
     them later.'''
     # FIXME: It'd be nice to get the request's headers, not just the
     # server's response (despite the name of this class).
-
-    # {{{
     text = models.TextField()
     url = models.TextField()
     status = models.IntegerField()
@@ -33,7 +31,5 @@ class WebResponse(models.Model):
     @staticmethod
     def create_from_http_error(error):
         return None
-        
-    # }}}
 
 # Create your models here.
