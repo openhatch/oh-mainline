@@ -48,7 +48,8 @@
 .portfolio_entry .icon_flagger { float: left; font-size: 9pt; }
 .portfolio_entry .project_description-wrapper { float: right; width: 400px; }
 .portfolio_entry .project_description, .portfolio_entry .experience_description { width: 380px; }
-#portfolio.viewer .portfolio_entry .project_description { width: 190px; }
+#portfolio.viewer .portfolio_entry .project_description,
+#portfolio.viewer .portfolio_entry .experience_description { width: 190px; }
 #portfolio .portfolio_entry .personal-stuff { background-color: #f4f4f4; border-radius: 4px; float: left; margin: 4px; -moz-border-radius: 4px; padding: 20px; width: 756px; }
 .portfolio_entry .citations { float: left; width: 400px; }
 .portfolio_entry.adding .citations-wrapper { display: none; }
