@@ -37,7 +37,7 @@ def get_image_data_scaled(image_data, width):
 class Project(models.Model):
 
     @staticmethod
-    def get_icon_path(instance, filename):
+    def generate_random_icon_path(instance, filename):
         # MEDIA_ROOT is prefixed automatically.
         return 'images/icons/projects/%s.png' % uuid.uuid4().hex
 
@@ -50,14 +50,19 @@ class Project(models.Model):
     # In case we need it 
     # dont_use_ohloh_icon = models.BooleanField(default=False)
     icon = models.ImageField(
-            upload_to=lambda a,b: Project.get_icon_path(a, b),
+            upload_to=lambda a,b: Project.generate_random_icon_path(a, b),
             null=True,
             default=None)
 
     date_icon_was_fetched_from_ohloh = models.DateTimeField(null=True, default=None)
 
     icon_smaller_for_badge = models.ImageField(
-        upload_to=lambda a,b: Project.get_icon_path(a,b),
+        upload_to=lambda a,b: Project.generate_random_icon_path(a,b),
+        null=True,
+        default=None)
+
+    icon_for_search_result = models.ImageField(
+        upload_to=lambda a,b: Project.generate_random_icon_path(a,b),
         null=True,
         default=None)
 
@@ -76,7 +81,7 @@ class Project(models.Model):
 
         # Since we are saving an icon, also update our scaled-down version of
         # that icon for the badge.
-        self.update_badge_icon_from_self_icon()
+        self.update_scaled_icons_from_self_icon()
 
     def get_url_of_icon_or_generic(self):
         if self.icon:
@@ -86,11 +91,17 @@ class Project(models.Model):
 
     def get_url_of_badge_size_icon_or_generic(self):
         if self.icon_smaller_for_badge:
-            return settings.MEDIA_URL + self.icon_smaller_for_badge.url
+            return self.icon_smaller_for_badge.url
         else:
             return settings.MEDIA_URL + 'no-project-icon-w=40.png'
 
-    def update_badge_icon_from_self_icon(self):
+    def get_url_of_search_result_icon_or_generic(self):
+        if self.icon_for_search_result:
+            return self.icon_for_search_result.url
+        else:
+            return settings.MEDIA_URL + 'no-project-icon-w=20.png'
+
+    def update_scaled_icons_from_self_icon(self):
         '''This method should be called when you update the Project.icon attribute.
         Side-effect: Saves a scaled-down version of that icon in the
         Project.icon_smaller_for_badge field.'''
@@ -100,8 +111,13 @@ class Project(models.Model):
 
         # Okay, now we must have some icon. Scale it down to badge size, which
         # happens to be width=40
-        scaled_down = get_image_data_scaled(self.icon.file.read(), 40)
-        self.icon_smaller_for_badge.save('', ContentFile(scaled_down))
+        badge_icon_data = get_image_data_scaled(self.icon.file.read(), 40)
+        self.icon_smaller_for_badge.save('', ContentFile(badge_icon_data))
+
+        # Okay, now we must have some icon. Scale it down to a size that fits
+        # in the search results--20px by 20px
+        search_result_icon_data = get_image_data_scaled(self.icon.file.read(), 20)
+        self.icon_for_search_result.save('', ContentFile(search_result_icon_data))
 
     def get_n_other_contributors_than(self, n, person):
         from mysite.profile.models import PortfolioEntry
