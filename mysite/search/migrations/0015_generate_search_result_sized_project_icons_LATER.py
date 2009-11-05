@@ -6,9 +6,21 @@ from mysite.search.models import *
 class Migration:
     
     no_dry_run = True
+
     def forwards(self, orm):
         "Write your forwards migration here"
 
+        # Generate search-result-sized project icons for all projects.
+        for orm_project in orm['search.project'].objects.all():
+            model_project = Project.objects.get(pk=orm_project.pk)
+            print "Generating search-result-sized project icon for", model_project
+            # Ok, actually update all the scaled icons, since that's the method exposed.
+            model_project.update_scaled_icons_from_self_icon()
+            # We know this is unsafe.
+            # If this fails, it might be because
+            # update_scaled_icons_from_self_icon doesn't exist anymore.
+            model_project.save()
+    
     def backwards(self, orm):
         "Write your backwards migration here"
     
