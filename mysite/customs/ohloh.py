@@ -193,7 +193,7 @@ class Ohloh(object):
             this = dict(
                 project=project_data['name'],
                 project_homepage_url=project_data.get('homepage_url', None),
-                primary_language=c_f['primary_language_nice_name'],
+                primary_language=c_f.get('primary_language_nice_name', ''),
                 man_months=int(c_f['man_months']))
             data.append(this)
 
@@ -207,6 +207,8 @@ class Ohloh(object):
         raise ValueError
 
     def get_contribution_info_by_username_and_project(self, project, username):
+        # FIXME: this applies to a whole bunch of methods in this class. this
+        # logic is extremely duplicated. ech.
         ret = []
         url = 'http://www.ohloh.net/p/%s/contributors.xml?' % project
         c_fs, web_response = ohloh_url2data(url, 'result/contributor_fact',
@@ -222,7 +224,7 @@ class Ohloh(object):
             this = dict(
                 project=project_data['name'],
                 project_homepage_url=project_data.get('homepage_url', None),
-                primary_language=c_f['primary_language_nice_name'],
+                primary_language=c_f.get('primary_language_nice_name', ''),
                 man_months=int(c_f['man_months']))
             ret.append(this)
 
