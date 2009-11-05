@@ -83,7 +83,8 @@ class SlowlohTests(django.test.TestCase):
     def testFindByUsername(self, should_equal = None):
         # {{{
         oh = ohloh.get_ohloh()
-        projects = oh.get_contribution_info_by_username('paulproteus')
+        projects, web_response = oh.get_contribution_info_by_username('paulproteus')
+        # We test the web_response elsewhere
         if should_equal is None:
             should_equal = [{'project': u'ccHost',
                              'project_homepage_url': 'http://wiki.creativecommons.org/CcHost',
