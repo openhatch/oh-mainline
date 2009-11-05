@@ -283,7 +283,7 @@ class Tag(models.Model):
 
     def save(self, *args, **kwargs):
         if self.text:
-            super(Tag, self).save(*args, **kwargs)
+            return super(Tag, self).save(*args, **kwargs)
         raise ValueError
     # }}}
 
