@@ -26,9 +26,6 @@ def mechanize_get(url, referrer=None, attempts_remaining=6, person=None):
     WebResponse object representing that browser's final state."""
     web_response = mysite.customs.models.WebResponse()
 
-    import pdb
-    pdb.set_trace()
-    
     b = mechanize.Browser()
     b.set_handle_robots(False)
     addheaders = [('User-Agent',
@@ -71,7 +68,9 @@ def ohloh_url2data(url, selector, params = {}, many = False, API_KEY = None, per
         API_KEY = settings.OHLOH_API_KEY
 
 
-    params = {'api_key': API_KEY}.update(params)
+    my_params = {'api_key': API_KEY}
+    my_params.update(params)
+    params = my_params ; del my_params
 
     # FIXME: We return more than just "ret" these days! Rename this variable.
     ret = []
@@ -80,7 +79,7 @@ def ohloh_url2data(url, selector, params = {}, many = False, API_KEY = None, per
     url += encoded
     try:
         b = mechanize_get(url, person)
-        web_response = mysite.customs.models.create_from_browser(b)
+        web_response = mysite.customs.models.WebResponse.create_from_browser(b)
         web_response.save() # Always save the WebResponse, even if we don't know
         # that any other object will store a pointer here.
     except urllib2.HTTPError, e:
@@ -137,13 +136,14 @@ class Ohloh(object):
             project_query = str(project_name)
         url = 'http://www.ohloh.net/projects/%s.xml?' % urllib.quote(
             project_query)
-        url, data = ohloh_url2data(url, 'result/project')
+        url, data = ohloh_url2data(url=url, selector='result/project')
         return data
     
     def project_name2projectdata(self, project_name_query):
         url = 'http://www.ohloh.net/projects.xml?'
         args = {'query': project_name_query}
-        url, data = ohloh_url2data(url, 'result/project', args, many=True)
+        url, data = ohloh_url2data(url=url, selector='result/project',
+                                   params=args, many=True)
         # Sometimes when we search Ohloh for e.g. "Debian GNU/Linux", the project it gives
         # us back as the top-ranking hit for full-text relevance is "Ubuntu GNU/Linux." So here
         # we see if the project dicts have an exact match by project name.
@@ -163,7 +163,7 @@ class Ohloh(object):
     @accepts(object, int)
     def analysis2projectdata(self, analysis_id):
         url = 'http://www.ohloh.net/analyses/%d.xml?' % analysis_id
-        url, data = ohloh_url2data(url, 'result/analysis')
+        url, data = ohloh_url2data(url=url, selector='result/analysis')
 
         # Otherwise, get the project name
         proj_id = data['project_id']
@@ -181,8 +181,8 @@ class Ohloh(object):
         data = []
         url = 'http://www.ohloh.net/contributors.xml?'
         url, c_fs, web_response = ohloh_url2data(
-            url, 'result/contributor_fact',
-            {'query': username}, many=True, person=person)
+            url=url, selector='result/contributor_fact', 
+            params={'query': username}, many=True, person=person)
 
         # For each contributor fact, grab the project it was for
         for c_f in c_fs:

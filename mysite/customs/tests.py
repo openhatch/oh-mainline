@@ -5,6 +5,7 @@
 from mysite.search.models import Project, Bug
 from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag
 import mysite.profile.views
+from mysite.profile.tests import MockFetchPersonDataFromOhloh
 
 import mock
 import os
@@ -387,6 +388,7 @@ class UserGetsMessagesDuringImport(django.test.TestCase):
 class OhlohLogging(django.test.TestCase):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
+    @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
     def test_we_save_ohloh_data_in_failure(self):
         # Create a DIA
         # Ask it to do_what_it_says_on_the_tin

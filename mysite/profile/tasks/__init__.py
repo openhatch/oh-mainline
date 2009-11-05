@@ -79,8 +79,11 @@ def create_citations_from_launchpad_results(dia_id, lp_results):
 
 def rs_action(dia):
     oh = ohloh.get_ohloh()
-    return oh.get_contribution_info_by_username(
+    data, web_response = oh.get_contribution_info_by_username(
             dia.query, dia.person)
+    dia.web_response = web_response
+    dia.save()
+    return data
 
 def ou_action(dia):
     oh = ohloh.get_ohloh()

@@ -18,15 +18,15 @@ class WebResponse(models.Model):
         ret = WebResponse()
 
         # Seek to 0, just in case someone else tried to read before us
-        b.response.seek(0)
-        ret.text = b.response.read()
+        b.response().seek(0)
+        ret.text = b.response().read()
 
-        b.url = b.geturl()
+        ret.url = b.geturl()
 
-        b.status = 200 # Presumably it worked.
+        ret.status = 200 # Presumably it worked.
 
         # Use ''.join() on the response headers so we get a big ol' string
-        ret.response_headers = ''.join(b.response.headers)
+        ret.response_headers = ''.join(b.response()._headers.headers)
 
         return ret
 
