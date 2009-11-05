@@ -34,6 +34,7 @@ h3 {
     border: 0;
     padding: 0;
     float: left;
+    width: 1000px;
 }
 
 #content > .left,
@@ -226,7 +227,7 @@ input[type='submit'] {
 #tabs {
     float: left;
     width: 360px;
-    background-color: #f9f9f9; /* #f6f5fc; */
+    background: #f9f9f9; /* #f6f5fc; */
     margin: 0;
     border: 5px solid #fff;
 }
