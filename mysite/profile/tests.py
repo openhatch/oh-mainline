@@ -328,7 +328,7 @@ class ProjectExpTests(TwillTests):
 # Create a mock Ohloh get_contribution_info_by_username
 mock_gcibu = mock.Mock()
 # This object will always return:
-mock_gcibu.return_value = [{
+mock_gcibu.return_value = ([{
         'man_months': 1,
         'project': u'ccHost',
         'project_homepage_url':
@@ -336,8 +336,9 @@ mock_gcibu.return_value = [{
         'first_commit_time':
             '2008-04-03T23:51:45Z',
         'primary_language': u'shell script'},
+        ],
         None # WebResponse
-        ]
+        )
 
 # Create a mock Ohloh get_contribution_info_by_ohloh_username
 mock_gcibou = mock.Mock()
@@ -460,8 +461,8 @@ class CeleryTests(TwillTests):
         "to it correctly."
         # {{{
         data_we_expect = [{
-                'languages': mock_gcibu.return_value[0]['primary_language'],
-                'distinct_months': mock_gcibu.return_value[0]['man_months'],
+                'languages': mock_gcibu.return_value[0][0]['primary_language'],
+                'distinct_months': mock_gcibu.return_value[0][0]['man_months'],
                 'is_published': False,
                 'is_deleted': False,
                 }]
@@ -1117,7 +1118,7 @@ class SavePortfolioEntry(TwillTests):
         expected_output = {
             'success': True,
             'pf_entry_element_id': 'blargle', 
-            'portfolio_entry__pk': str(portfolio_entry.pk)
+            'portfolio_entry__pk': portfolio_entry.pk
         }
 
         # call view and check output
