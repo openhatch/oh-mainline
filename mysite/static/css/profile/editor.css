@@ -166,7 +166,7 @@
     width: 400px;
     float: right;
 }
-.portfolio_entry .project_description { width: 390px; }
+.portfolio_entry .project_description, .portfolio_entry .experience_description { width: 380px; }
     #portfolio.viewer .portfolio_entry .project_description { width: 190px; }
 
 #portfolio .portfolio_entry .personal-stuff {
@@ -201,9 +201,6 @@
 }
 .portfolio_entry textarea {
     font-family: "Liberation Sans", Arial;
-}
-.portfolio_entry .experience_description {
-    width: 100%;
 }
 .citations > li {
     width: 400px;
@@ -244,13 +241,9 @@
     position: relative;
     top: -12px;
 }
-.citations-wrapper, .involvement_placeholder { float: left; width: 350px; }
-.citations li.unpublished .summary {
-    background-color: #ffc;
-}
-.citations li.deleted .summary {
-    background-color: pink;
-}
+.citations-wrapper, .involvement_placeholder { float: left; width: 340px; }
+.citations li.unpublished .summary { background-color: #ffc; }
+.citations li.deleted .summary { background-color: pink; }
 .citations-wrapper a.add {
     font-size: 8pt;
     background-color: #c9c9c9;
