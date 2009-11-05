@@ -1,0 +1,6 @@
+{% if citation.get_url_or_guess %}
+<a href='{{ citation.get_url_or_guess }}'>{{ citation.summary }}</a>
+{% else %}
+{{ citation.summary }}
+{% endif %}
+{# vim: set filetype=htmldjango #}

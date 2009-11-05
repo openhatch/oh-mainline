@@ -282,7 +282,7 @@ class Tag(models.Model):
     tag_type = models.ForeignKey(TagType)
 
     def save(self, *args, **kwargs):
-        if text:
+        if self.text:
             super(Tag, self).save(*args, **kwargs)
         raise ValueError
     # }}}
@@ -468,7 +468,7 @@ class Citation(models.Model):
             if self.data_import_attempt and (
                     self.data_import_attempt.source in ['rs', 'ou']):
                 return "http://www.ohloh.net/search?%s" % urllib.urlencode(
-                        {'q': self.portfolio_entry.project.name})
+                        {'q': self.portfolio_entry.project.name.encode('utf-8')})
 
     def save_and_check_for_duplicates(self):
         # FIXME: Cache summaries in the DB so this query is faster.

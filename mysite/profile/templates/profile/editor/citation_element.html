@@ -1,10 +1,6 @@
 <li {% if edit_mode %} class='unpublished'{% endif %}>
 <div class='summary'>
-    {% if citation.get_url_or_guess %}
-    <a href='{{ citation.get_url_or_guess }}'>{{ citation.summary }}</a>
-    {% else %}
-    {{ citation.summary }}
-    {% endif %}
+    {% include 'profile/editor/citation_summary.html' %}
 </div>
 {% if edit_mode %}
 <ul class='actions'>

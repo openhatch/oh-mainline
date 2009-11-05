@@ -548,7 +548,9 @@ def gimme_json_for_portfolio(request):
     # Serialize citation summaries
     summaries = {}
     for c in citations:
-        summaries[c.pk] = c.summary
+        summaries[c.pk] = render_to_string(
+                "profile/editor/citation_summary.html",
+                {'citation': c})
 
     # FIXME: Maybe we can serialize directly to Python objects.
     # fixme: zomg       don't recycle variable names for objs of diff types srsly u guys!
