@@ -115,12 +115,12 @@ def create_profile_when_user_created(instance, created, *args, **kwargs):
         
 models.signals.post_save.connect(create_profile_when_user_created, User)
 
-class WebGet(models.Model):
+class WebResponse(models.Model):
     '''This model abuses the databases as a network log. We store here
     successful and unsuccessful web requests so that we can refer to
     them later.'''
     # {{{
-    response_text = models.TextField()
+    text = models.TextField()
     url = models.TextField()
     status = models.IntegerField()
     # }}}
@@ -139,7 +139,8 @@ class DataImportAttempt(models.Model):
     person = models.ForeignKey(Person)
     query = models.CharField(max_length=200)
     date_created = models.DateTimeField(default=datetime.datetime.utcnow)
-    webget = models.ForeignKey(WebGet)
+    web_response = models.ForeignKey(WebResponse, null=True) # null=True for
+    # now, so the migration doesn't cause data validation errors
 
     def get_formatted_source_description(self):
         return self.get_source_display() % self.query

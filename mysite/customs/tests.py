@@ -398,9 +398,9 @@ class OhlohLogging(django.test.TestCase):
         error_dia = mysite.profile.models.DataImportAttempt(
             source='rs', person=paulproteus, query='queree')
         error_dia.do_what_it_says_on_the_tin() # go out to Ohloh
-        self.assertEqual(error_dia.webget.status, 504)
-        self.assertEqual(error_dia.webget.url, 'http://theurl.com/')
-        self.assertEqual(error_dia.webget.response_text, 'error text')
+        self.assertEqual(error_dia.web_response.status, 504)
+        self.assertEqual(error_dia.web_response.url, 'http://theurl.com/')
+        self.assertEqual(error_dia.web_response.response_text, 'error text')
 
     @mock.patch('mechanize.Browser.open', None)
     def _test_we_save_ohloh_data_in_failure(self):
@@ -413,8 +413,8 @@ class OhlohLogging(django.test.TestCase):
         success_dia = DataImportAttempt(
             source='rs', person=paulproteus, query='queree')
         success_dia.do_what_it_says_on_the_tin() # go out to Ohloh
-        self.assertEqual(error_dia.webget.response_text, 'response text')
-        self.assertEqual(error_dia.webget.url, 'http://theurl.com/')
-        self.assertEqual(error_dia.webget.status, 200)
+        self.assertEqual(error_dia.web_response.text, 'response text')
+        self.assertEqual(error_dia.web_response.url, 'http://theurl.com/')
+        self.assertEqual(error_dia.web_response.status, 200)
                 
 # vim: set nu:
