@@ -453,5 +453,10 @@ input[type='text'].default-text-active {
 #results li .highlight {
     background-color: #fffcaa;
 }
+.bug .first-line img {
+    width: 20px;
+    height: 20px; /* If ever an image is not square this may distort the image. */
+    vertical-align: top;
+}
 
 /* vim: set ai ts=4 sts=4 et sw=4: */

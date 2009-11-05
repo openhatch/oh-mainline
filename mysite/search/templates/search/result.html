@@ -7,7 +7,7 @@
 <div class='first-line'>
     <div class='head'>
         <img alt='logo for {{bug.project.name}}' title='{{bug.project.name}}'
-        src='{{ bug.project.get_url_of_badge_size_icon_or_generic }}' width='40'/>
+        src='{{ bug.project.get_url_of_search_result_icon_or_generic }}' />
         <span class='project__name'>{{ bug.project.name|highlight:query_words }}</span>
         -
         <a class='canonical_bug_link' href='{{ bug.canonical_bug_link }}'>

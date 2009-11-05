@@ -108,15 +108,17 @@ class Project(models.Model):
         # First of all, do nothing if self.icon is a false value.
         if not self.icon:
             return
+        # Okay, now we must have some normal-sized icon. 
 
-        # Okay, now we must have some icon. Scale it down to badge size, which
+        normal_sized_icon_data = self.icon.file.read()
+
+        # Scale it down to badge size, which
         # happens to be width=40
-        badge_icon_data = get_image_data_scaled(self.icon.file.read(), 40)
+        badge_icon_data = get_image_data_scaled(normal_sized_icon_data, 40)
         self.icon_smaller_for_badge.save('', ContentFile(badge_icon_data))
 
-        # Okay, now we must have some icon. Scale it down to a size that fits
-        # in the search results--20px by 20px
-        search_result_icon_data = get_image_data_scaled(self.icon.file.read(), 20)
+        # Scale normal-sized icon down to a size that fits in the search results--20px by 20px
+        search_result_icon_data = get_image_data_scaled(normal_sized_icon_data, 20)
         self.icon_for_search_result.save('', ContentFile(search_result_icon_data))
 
     def get_n_other_contributors_than(self, n, person):
