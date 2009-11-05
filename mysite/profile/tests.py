@@ -335,7 +335,9 @@ mock_gcibu.return_value = [{
             u'http://wiki.creativecommons.org/CcHost',
         'first_commit_time':
             '2008-04-03T23:51:45Z',
-        'primary_language': u'shell script'}]
+        'primary_language': u'shell script'},
+        None # WebResponse
+        ]
 
 # Create a mock Ohloh get_contribution_info_by_ohloh_username
 mock_gcibou = mock.Mock()
@@ -1107,12 +1109,14 @@ class SavePortfolioEntry(TwillTests):
 
         input = {
             'portfolio_entry__pk': portfolio_entry.pk,
+            'pf_entry_element_id': 'blargle', # this can be whatever
             'project_description': "project description",
             'experience_description': "experience description",
         }
 
         expected_output = {
             'success': True,
+            'pf_entry_element_id': 'blargle', 
             'portfolio_entry__pk': str(portfolio_entry.pk)
         }
 
@@ -1251,8 +1255,8 @@ class OtherContributors(TwillTests):
         barry = Person.objects.get(user__username='barry')
         project = Project(name='project', icon="static/no-project-icon-w=40.png")
         project.save()
-        PortfolioEntry(project=project, person=paulproteus).save()
-        PortfolioEntry(project=project, person=barry).save()
+        PortfolioEntry(project=project, person=paulproteus, is_published=True).save()
+        PortfolioEntry(project=project, person=barry, is_published=True).save()
         self.assertEqual(
                 project.get_n_other_contributors_than(5, paulproteus),
                 [barry]
