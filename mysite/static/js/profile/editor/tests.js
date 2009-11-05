@@ -206,8 +206,8 @@ testUpdatePortfolio = function() {
                 var $domCitation = $('#citation_'+responseCitation.pk);
                 tester.ok($domCitation.size() > 0, msg);
 
-                var msg = "Assert match of citation summary.";
-                tester.ok($domCitation.find('.summary').text() == 
+                var msg = "Assert match of citation summary HTML.";
+                tester.compare($domCitation.find('.summary').html(),
                         mockedPortfolioResponse.summaries[responseCitation.pk], 
                         msg);
 
@@ -519,7 +519,7 @@ function checkNotifiersForText(text) {
         tester.ok(messagesTogether.match(text) != null,
                 "one of the notifier messages includes the phrase '" + text + "'");
     }
-    window.setTimeout(checkNotifiersInAMoment, 2000); // Doesn't seem to work when <= 500.
+    window.setTimeout(checkNotifiersInAMoment, 3000); // Doesn't seem to work when <= 500.
 }
 
 /* Unit-test the deletion of portfolio entries */
@@ -809,7 +809,7 @@ testDeleteAdderWidget = function() {
 $(testDeleteAdderWidget);
 
 $(function () {
-        tester.testDone();
+        window.setTimeout("tester.testDone();", 5000);
         });
 
 // vim: set nu ai:
