@@ -1,5 +1,11 @@
 <li {% if edit_mode %} class='unpublished'{% endif %}>
-<div class='summary'>{{ citation.summary }}</div>
+<div class='summary'>
+    {% if citation.url %}
+    <a href='{{ citation.url }}'>{{ citation.summary }}</a>
+    {% else %}
+    {{ citation.summary }}
+    {% endif %}
+</div>
 {% if edit_mode %}
 <ul class='actions'>
     <li><a href="#" class='delete_citation'></a></li>
