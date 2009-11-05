@@ -5,6 +5,8 @@ from mysite.search.models import *
 
 class Migration:
     
+    no_dry_run = True
+
     def forwards(self, orm):
         "Write your forwards migration here"
 
