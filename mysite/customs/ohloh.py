@@ -86,8 +86,8 @@ def ohloh_url2data(url, selector, params = {}, many = False, API_KEY = None, per
         # FIXME: Also return a web_response for error cases
         if str(e.code) == '404':
             if many:
-                return url, [], None
-            return url, {}, None
+                return [], None
+            return {}, None
         else:
             raise
 
@@ -96,7 +96,7 @@ def ohloh_url2data(url, selector, params = {}, many = False, API_KEY = None, per
         tree = ET.parse(StringIO.StringIO(s))
     except xml.parsers.expat.ExpatError:
         # well, I'll be. it doesn't parse.
-        return web_response.url, None
+        return None, web_response
         
     # Did Ohloh return an error?
     root = tree.getroot()
@@ -112,10 +112,10 @@ def ohloh_url2data(url, selector, params = {}, many = False, API_KEY = None, per
         ret.append(this)
 
     if many:
-        return b.geturl(), ret, web_response
+        return ret, web_response
     if ret:
-        return b.geturl(), ret[0], web_response
-    return b.geturl(), None, web_response
+        return ret[0], web_response
+    return None, web_response
 
 class Ohloh(object):
 
@@ -125,7 +125,7 @@ class Ohloh(object):
         # {{{
         url = 'https://www.ohloh.net/p/%s/analyses/latest.xml?' % urllib.quote(
                 project_name)
-        url, data, web_response = ohloh_url2data(url, 'result/analysis')
+        data, web_response = ohloh_url2data(url, 'result/analysis')
         return int(data['id'])
         # }}}
 
@@ -136,13 +136,13 @@ class Ohloh(object):
             project_query = str(project_name)
         url = 'http://www.ohloh.net/projects/%s.xml?' % urllib.quote(
             project_query)
-        url, data = ohloh_url2data(url=url, selector='result/project')
+        data, web_response = ohloh_url2data(url=url, selector='result/project')
         return data
     
     def project_name2projectdata(self, project_name_query):
         url = 'http://www.ohloh.net/projects.xml?'
         args = {'query': project_name_query}
-        url, data = ohloh_url2data(url=url, selector='result/project',
+        data, web_response = ohloh_url2data(url=url, selector='result/project',
                                    params=args, many=True)
         # Sometimes when we search Ohloh for e.g. "Debian GNU/Linux", the project it gives
         # us back as the top-ranking hit for full-text relevance is "Ubuntu GNU/Linux." So here
@@ -163,7 +163,7 @@ class Ohloh(object):
     @accepts(object, int)
     def analysis2projectdata(self, analysis_id):
         url = 'http://www.ohloh.net/analyses/%d.xml?' % analysis_id
-        url, data = ohloh_url2data(url=url, selector='result/analysis')
+        data, web_response = ohloh_url2data(url=url, selector='result/analysis')
 
         # Otherwise, get the project name
         proj_id = data['project_id']
@@ -180,7 +180,7 @@ class Ohloh(object):
         such as the response data and HTTP status.'''
         data = []
         url = 'http://www.ohloh.net/contributors.xml?'
-        url, c_fs, web_response = ohloh_url2data(
+        c_fs, web_response = ohloh_url2data(
             url=url, selector='result/contributor_fact', 
             params={'query': username}, many=True, person=person)
 
@@ -201,7 +201,7 @@ class Ohloh(object):
 
     def get_name_by_username(self, username):
         url = 'https://www.ohloh.net/accounts/%s.xml?' % urllib.quote(username)
-        url, account_info = ohloh_url2data(url, 'result/account')
+        account_info, web_response = ohloh_url2data(url, 'result/account')
         if 'name' in account_info:
             return account_info['name']
         raise ValueError
@@ -209,7 +209,7 @@ class Ohloh(object):
     def get_contribution_info_by_username_and_project(self, project, username):
         ret = []
         url = 'http://www.ohloh.net/p/%s/contributors.xml?' % project
-        url, c_fs = ohloh_url2data(url, 'result/contributor_fact',
+        c_fs, web_response = ohloh_url2data(url, 'result/contributor_fact',
                                    {'query': username}, many=True)
 
         # Filter these guys down and be sure to only return the ones
@@ -287,7 +287,7 @@ class Ohloh(object):
         for (project, contributor_id) in relevant_project_and_contributor_id_pairs:
             url = 'https://www.ohloh.net/p/%s/contributors/%d.xml?' % (
                 urllib.quote(project), contributor_id)
-            url, c_fs = ohloh_url2data(url, 'result/contributor_fact', many=True)
+            c_fs, web_response = ohloh_url2data(url, 'result/contributor_fact', many=True)
             # For each contributor fact, grab the project it was for
             for c_f in c_fs:
                 if 'analysis_id' not in c_f:
@@ -306,7 +306,7 @@ class Ohloh(object):
     def search_contribution_info_by_email(self, email):
         ret = []
         url = 'http://www.ohloh.net/contributors.xml?'
-        url, c_fs = ohloh_url2data(url, 'result/contributor_fact',
+        c_fs, web_response = ohloh_url2data(url, 'result/contributor_fact',
                               {'query': email}, many=True)
 
         # For each contributor fact, grab the project it was for
@@ -370,3 +370,5 @@ class Ohloh(object):
 _ohloh = Ohloh()
 def get_ohloh():
     return _ohloh
+
+# vim: set nu:
