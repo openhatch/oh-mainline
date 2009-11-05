@@ -29,7 +29,7 @@ def create_citations_from_ohloh_contributor_facts(dia_id, ohloh_results):
         citation = Citation.create_from_ohloh_contrib_info(ohloh_contrib_info)
         citation.portfolio_entry = portfolio_entry
         citation.data_import_attempt = dia 
-        citation.save()
+        citation.save_and_check_for_duplicates()
 
     person.last_polled = datetime.datetime.now()
     dia.completed = True
@@ -68,7 +68,7 @@ def create_citations_from_launchpad_results(dia_id, lp_results):
             citation.contributor_role = involvement_type
             citation.portfolio_entry = portfolio_entry
             citation.data_import_attempt = dia
-            citation.save()
+            citation.save_and_check_for_duplicates()
 
     person.last_polled = datetime.datetime.now()
     person.save()

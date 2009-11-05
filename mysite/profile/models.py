@@ -392,10 +392,15 @@ class PortfolioEntry(models.Model):
     is_deleted = models.BooleanField(default=False)
 
     def get_published_citations(self):
-        return Citation.objects.filter(portfolio_entry=self,
-                is_published=True, is_deleted=False)
+        return Citation.untrashed.filter(portfolio_entry=self,
+                is_published=True)
 
 # FIXME: Add a DataSource class to DataImportAttempt.
+
+class UntrashedCitationManager(models.Manager):
+    def get_query_set(self):
+        return super(UntrashedCitationManager, self).get_query_set().filter(
+                is_deleted=False, ignored_due_to_duplicate=False)
 
 class Citation(models.Model):
     portfolio_entry = models.ForeignKey(PortfolioEntry) # [0]
@@ -408,7 +413,11 @@ class Citation(models.Model):
     date_created = models.DateTimeField(default=datetime.datetime.utcnow)
     is_published = models.BooleanField(default=False) # unpublished == Unread
     is_deleted = models.BooleanField(default=False)
+    ignored_due_to_duplicate = models.BooleanField(default=False)
     old_summary = models.TextField(null=True, default=None)
+
+    objects = models.Manager()
+    untrashed = UntrashedCitationManager()
 
     @property
     def summary(self):
@@ -447,6 +456,14 @@ class Citation(models.Model):
 
         raise ValueError("There's no DIA and I don't know how to summarize this.")
 
+    def save_and_check_for_duplicates(self):
+        # FIXME: Cache summaries in the DB so this query is faster.
+        duplicates = [citation for citation in Citation.objects.all()
+                if (citation.pk != self.pk) and (citation.summary == self.summary)]
+        if duplicates:
+            self.ignored_due_to_duplicate = True
+        return self.save()
+
     @staticmethod
     def create_from_ohloh_contrib_info(ohloh_contrib_info):
         """Create a new Citation from a dictionary roughly representing an Ohloh ContributionFact."""
@@ -466,5 +483,8 @@ class Citation(models.Model):
         # }}}
 
     # [0]: FIXME: Let's learn how to use Django's ManyToManyField etc.
+
+    def __unicode__(self):
+        return "<Citation pk=%d, summary=%s>" % (self.pk, self.summary)
 
 # vim: set nu:

@@ -438,7 +438,7 @@ class CeleryTests(TwillTests):
         portfolio_entry = PortfolioEntry.objects.get(person=person, project__name='ccHost')
 
         # ...and the expected number of citations.
-        citations = Citation.objects.filter(portfolio_entry=portfolio_entry)
+        citations = Citation.untrashed.filter(portfolio_entry=portfolio_entry)
 
         self.assert_(citations.count() > 0)
 
@@ -720,11 +720,11 @@ class ImporterPublishCitation(TwillTests):
         response = self.login_with_client().post(reverse(view), {'pk': citation.pk})
 
         self.assertEqual(response.content, "1")
-        self.assert_(Citation.objects.get(pk=citation.pk).is_published)
+        self.assert_(Citation.untrashed.get(pk=citation.pk).is_published)
 
     def test_publish_citation_fails_when_citation_doesnt_exist(self):
         failing_pk = 0
-        self.assertEqual(Citation.objects.filter(pk=failing_pk).count(), 0)
+        self.assertEqual(Citation.untrashed.filter(pk=failing_pk).count(), 0)
 
         view = mysite.profile.views.publish_citation_do
         response = self.login_with_client().post(reverse(view), {'pk': failing_pk})
@@ -1022,7 +1022,7 @@ class AddCitationManually(TwillTests):
         response = self.login_with_client().post(url, input_data)
 
         # Check that a citation was created.
-        c = Citation.objects.get(url=input_data['url'])
+        c = Citation.untrashed.get(url=input_data['url'])
         self.assertEqual(c.portfolio_entry, portfolio_entry,
                 "The portfolio entry for the new citation is the exactly "
                 "the one whose id we POST'd to "
@@ -1046,7 +1046,7 @@ class AddCitationManually(TwillTests):
         response = self.login_with_client().post(url, input_data)
 
         # Check that no citation was created.
-        self.assertEqual(Citation.objects.filter(url=input_data['url']).count(), 0,
+        self.assertEqual(Citation.untrashed.filter(url=input_data['url']).count(), 0,
                 "Expected no citation to be created when you try "
                 "to add one for someone else.")
         
@@ -1134,7 +1134,7 @@ class SavePortfolioEntry(TwillTests):
                 input['experience_description'])
         self.assert_(portfolio_entry.is_published, "pf entry is published.")
 
-        citations = Citation.objects.filter(portfolio_entry=portfolio_entry)
+        citations = Citation.untrashed.filter(portfolio_entry=portfolio_entry)
         for c in citations:
             self.assert_(c.is_published)
 
@@ -1285,5 +1285,44 @@ class UserGetsHisQueuedMessages(TwillTests):
 
         # Verify that the gimme_json now has that message
         self.assertEqual(self.gimme_json()['messages'], ["MSG'd!"])
+
+class OverwriteDuplicateCitations(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def test_old_citation_is_superseded(self):
+        paulproteus = Person.objects.get(user__username='paulproteus')
+        citation = Citation(
+                portfolio_entry=PortfolioEntry.objects.get_or_create(
+                    project=Project.objects.get_or_create(name='project name')[0],
+                    is_published=True,
+                    person=paulproteus)[0],
+                distinct_months=1,
+                languages='Python',
+                data_import_attempt=DataImportAttempt.objects.get_or_create(
+                    source='rs', query='paulproteus', completed=True, person=paulproteus)[0]
+                )
+        citation.save_and_check_for_duplicates()
+
+        self.assertEqual([c.pk for c in Citation.objects.all()], [citation.pk])
+
+        # This is the only citation picked up by the manager
+        self.assertEqual([c.pk for c in Citation.untrashed.all()], [citation.pk])
+
+        # Create a second citation with all the same attributes as the first.
+        citation2 = Citation(
+                portfolio_entry=citation.portfolio_entry,
+                distinct_months=citation.distinct_months,
+                languages=citation.languages,
+                data_import_attempt=DataImportAttempt.objects.get_or_create(
+                    source='ou', query='paulproteus', completed=True, person=paulproteus)[0]
+                )
+
+        citation2.save_and_check_for_duplicates()
+
+        # Afterwards that only the first citation exists.
+        self.assert_(citation2.ignored_due_to_duplicate)
+
+        # The 'untrashed' manager picks up only the first citation.
+        self.assertEqual([c.pk for c in Citation.untrashed.all()], [citation.pk])
 
 # vim: set ai et ts=4 sw=4 nu:
