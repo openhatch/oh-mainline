@@ -19,11 +19,20 @@ class RepositoryCommitter(models.Model):
     """Ok, so we need to keep track of repository committers, e.g.
         paulproteus@fspot
     That's because when a user says, 'oy, this data you guys imported isn't
-    mine', what she or he is typically saying is 'Don't give me any more
-    data from Ohloh pertaining to this dude named mickey.mouse@strange.ly
-    checking code into F-Spot. """
+    mine', what she or he is typically saying is something like
+    'Don't give me any more data from Ohloh pertaining to this dude named
+    mickey.mouse@strange.ly checking code into F-Spot.'"""
     project = models.ForeignKey(Project)
-    data_import_attempt = models.ForeignKey(DataImportAttempt)
+    data_import_attempt = models.ForeignKey('DataImportAttempt')
+
+    def committer_identifier(self):
+        return self.data_import_attempt.committer_identifier
+
+    def source(self):
+        return self.data_import_attempt.source
+
+    class Meta:
+        unique_together = ('project', 'data_import_attempt')
 
 class Person(models.Model):
     """ A human bean. """
@@ -106,6 +115,16 @@ def create_profile_when_user_created(instance, created, *args, **kwargs):
         
 models.signals.post_save.connect(create_profile_when_user_created, User)
 
+class WebGet(models.Model):
+    '''This model abuses the databases as a network log. We store here
+    successful and unsuccessful web requests so that we can refer to
+    them later.'''
+    # {{{
+    response_text = models.TextField()
+    url = models.TextField()
+    status = models.IntegerField()
+    # }}}
+
 class DataImportAttempt(models.Model):
     # {{{
     SOURCE_CHOICES = (
@@ -120,6 +139,7 @@ class DataImportAttempt(models.Model):
     person = models.ForeignKey(Person)
     query = models.CharField(max_length=200)
     date_created = models.DateTimeField(default=datetime.datetime.utcnow)
+    webget = models.ForeignKey(WebGet)
 
     def get_formatted_source_description(self):
         return self.get_source_display() % self.query

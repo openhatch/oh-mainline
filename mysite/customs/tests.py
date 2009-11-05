@@ -370,7 +370,7 @@ class TestOpenHatchBlogCrawl(django.test.TestCase):
                          u'Yo \xe9')
 
 mock_browser_open = mock.Mock()
-mock_browser_open.side_effect = HTTPError(url="", code=504, msg="", hdrs="", fp=open("/dev/null")) 
+mock_browser_open.side_effect = HTTPError(url="http://theurl.com/", code=504, msg="", hdrs="", fp=open("/dev/null")) 
 class UserGetsMessagesDuringImport(django.test.TestCase):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -383,5 +383,38 @@ class UserGetsMessagesDuringImport(django.test.TestCase):
         self.assertRaises(HTTPError, mysite.customs.ohloh.mechanize_get, 'http://ohloh.net/somewebsiteonohloh', attempts_remaining=1, person=paulproteus)
 
         self.assertEqual(len(paulproteus.user.get_and_delete_messages()), 1)
+
+class OhlohLogging(django.test.TestCase):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    @mock.patch('mechanize.Browser.open', mock_browser_open)
+    def test_we_save_ohloh_data_in_failure(self):
+        # Create a DIA
+        # Ask it to do_what_it_says_on_the_tin
+        # That will cause it to go out to the network and download some data from Ohloh.
+        # Two cases to verify:
+        # 1. An error - verify that we save the HTTP response code
+        paulproteus = Person.objects.get(user__username='paulproteus')
+        error_dia = mysite.profile.models.DataImportAttempt(
+            source='rs', person=paulproteus, query='queree')
+        error_dia.do_what_it_says_on_the_tin() # go out to Ohloh
+        self.assertEqual(error_dia.webget.status, 504)
+        self.assertEqual(error_dia.webget.url, 'http://theurl.com/')
+        self.assertEqual(error_dia.webget.response_text, 'error text')
+
+    @mock.patch('mechanize.Browser.open', None)
+    def _test_we_save_ohloh_data_in_failure(self):
+        # Create a DIA
+        # Ask it to do_what_it_says_on_the_tin
+        # That will cause it to go out to the network and download some data from Ohloh.
+        # Two cases to verify:
+        # 2. Success - verify that we store the same data Ohloh gave us back
+        paulproteus = Person.objects.get(user__username='paulproteus')
+        success_dia = DataImportAttempt(
+            source='rs', person=paulproteus, query='queree')
+        success_dia.do_what_it_says_on_the_tin() # go out to Ohloh
+        self.assertEqual(error_dia.webget.response_text, 'response text')
+        self.assertEqual(error_dia.webget.url, 'http://theurl.com/')
+        self.assertEqual(error_dia.webget.status, 200)
                 
 # vim: set nu:
