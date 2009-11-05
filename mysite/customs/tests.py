@@ -389,20 +389,24 @@ class OhlohLogging(django.test.TestCase):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
-    def test_we_save_ohloh_data_in_failure(self):
+    def test_we_save_ohloh_data_in_success(self):
         # Create a DIA
         # Ask it to do_what_it_says_on_the_tin
         # That will cause it to go out to the network and download some data from Ohloh.
         # Two cases to verify:
         # 1. An error - verify that we save the HTTP response code
         paulproteus = Person.objects.get(user__username='paulproteus')
-        error_dia = mysite.profile.models.DataImportAttempt(
+        success_dia = mysite.profile.models.DataImportAttempt(
             source='rs', person=paulproteus, query='queree')
-        error_dia.save()
-        error_dia.do_what_it_says_on_the_tin() # go out to Ohloh
-        self.assertEqual(error_dia.web_response.status, 504)
-        self.assertEqual(error_dia.web_response.url, 'http://theurl.com/')
-        self.assertEqual(error_dia.web_response.response_text, 'error text')
+        success_dia.save()
+        success_dia.do_what_it_says_on_the_tin() # go out to Ohloh
+
+        # refresh the DIA with the data from the database
+        success_dia = mysite.profile.models.DataImportAttempt.objects.get(
+            pk=success_dia.pk)
+        self.assertEqual(success_dia.web_response.status, 200)
+        self.assert_('ohloh.net' in success_dia.web_response.url)
+        self.assert_('<?xml' in success_dia.web_response.text)
 
     @mock.patch('mechanize.Browser.open', None)
     def _test_we_save_ohloh_data_in_failure(self):
