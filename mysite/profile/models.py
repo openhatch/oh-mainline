@@ -97,9 +97,7 @@ class Person(models.Model):
         citations = Citation.untrashed.filter(portfolio_entry__person=self)
         terms = []
         for c in citations:
-            languages_list = c.languages.split(",")
-            terms.extend([lang.strip() for lang in languages_list
-                if lang.strip()])
+            terms.extend(c.get_languages_as_list())
 
         terms.extend(
                 [pfe.project.name for pfe in portfolio_entries
@@ -482,6 +480,9 @@ class Citation(models.Model):
                     )
 
         raise ValueError("There's no DIA and I don't know how to summarize this.")
+
+    def get_languages_as_list(self):
+        return [lang.strip() for lang in self.languages.split(",") if lang.strip()]
 
     def get_url_or_guess(self):
         if self.url:
