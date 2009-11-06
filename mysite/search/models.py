@@ -121,6 +121,17 @@ class Project(models.Model):
         search_result_icon_data = get_image_data_scaled(normal_sized_icon_data, 20)
         self.icon_for_search_result.save('', ContentFile(search_result_icon_data))
 
+    def get_contributors(self):
+        """Return a list of Person objects who are contributors to
+        this Project."""
+        from mysite.profile.models import PortfolioEntry
+        # What portfolio entries point to this project?
+        pf_entries = PortfolioEntry.objects.filter(
+                Q(project=self), Q(is_deleted=False),
+                Q(is_published=True) )
+        # List the owners of those portfolio entries.
+        return [pf_entry.person for pf_entry in pf_entries]
+
     def get_n_other_contributors_than(self, n, person):
         from mysite.profile.models import PortfolioEntry
         pf_entries = PortfolioEntry.objects.filter(Q(project=self),
