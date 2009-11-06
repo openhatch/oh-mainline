@@ -69,12 +69,12 @@ def homepage(request, signup_form=None,
 def landing_page(request):
 
     data = {}
-    data['entries'] = mysite.customs.feed.cached_blog_entries()
+    data['entries'] = mysite.customs.feed.cached_blog_entries()[:3]
 
     suggested_searches = request.user.get_profile().get_recommended_search_terms()
     recommended_bugs = mysite.profile.controllers.recommend_bugs(suggested_searches, n=5)
 
-    data['recommended_bugs'] = recommended_bugs
+    data['recommended_bugs'] = list(recommended_bugs) # A list so we can tell if it's empty
 
     return (request, 'base/landing.html', data)
 

@@ -1,18 +1,9 @@
-.module > .head {
-    width: 280px;
-}
-
-.module > .body {
-    width: 240px;
-}
-
-#right > .module > .head {
-    width: 350px;
-}
+#content > div, .module > .head { width: 270px; } 
+.module > .body { width: 230px; } 
+#right > .module > .head { width: 350px; }
 
 #right > .module > .body {
     width: 320px;
-    padding: 10px;
 }
 
 #page-top {
@@ -79,8 +70,9 @@ h4 {
 
 .entry {
     clear: both;
-    padding-left: 10px;
-    padding-right: 0;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #f4f4f4;
+    margin-bottom: 5px;
 }
 
 #bugs li {
