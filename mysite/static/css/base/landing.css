@@ -85,3 +85,7 @@ h4 {
     margin-bottom: 10px;
     width: 100%;
 }
+
+a.blog-feed { float: left; height: 16px; width: 16px; padding: 16px; float: right; background: transparent url('/static/images/base/landing/feed-icon-16x16-grayscale.png') no-repeat center; }
+a.blog-feed .alt-text { position: absolute; left: -999px; }
+a.blog-feed:hover { background-image: url('/static/images/base/landing/feed-icon-16x16.png'); }
