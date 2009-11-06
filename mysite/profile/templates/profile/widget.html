@@ -1,9 +1,12 @@
 <style type='text/css'>
 
     #openhatch-widget {
+        color: #222;
         font: 9pt Verdana, Bitstream Vera Sans, Arial, sans-serif;
-        width: 292px ! important;
+        width: 260px ! important;
+        background: #fff url(/static/images/motif-eee.png) repeat scroll 0 0;
         float: left;
+        border: inherit;
     }
     #openhatch-widget h3 {
         font-size: 9pt;
@@ -11,8 +14,13 @@
         margin: 0;
     }
     #openhatch-widget .module {
-        width: 242px;
-        border-bottom: 1px solid #eee;
+        background: transparent url('/static/images/gray-60.png') repeat scroll 0 0;
+        float: left;
+        width: 252px;
+        border-radius: 0;
+        -moz-border-radius: 0;
+        padding: 4px;
+        margin: 0;
     }
     
     #openhatch-widget .module > .head {
@@ -22,7 +30,16 @@
     #openhatch-widget .module > .head h3,
     #openhatch-widget .module > .body,
     #openhatch-widget .module > .foot {
-        width: 220px ! important;
+        width: 242px ! important;
+        border-radius: 0;
+        -moz-border-radius: 0;
+    }
+    #openhatch-widget .module > .foot {
+        background: #fff url('/static/images/motif.png') repeat scroll 0 0;
+    }
+    #openhatch-widget .module > .body {
+        background: none;
+        border: none;
     }
     #openhatch-widget .foot img {
         vertical-align: middle;
@@ -57,46 +74,24 @@
         text-decoration: none;
     }
 
-    #openhatch-widget .module {
-        float: left;
-        margin-bottom: 15px;
-        background-color: #f4f4f4;
-        border-bottom: 1px solid #f4f4f4;
-    }
-
-    #openhatch-widget .module > .head {
-        border-top: 2px solid #e4e4DD;
-        float: left;
-        border-bottom: 1px solid #eee;
-        background: #fdfdfe url('/static/images/module-head-bg.png') bottom repeat-x;
-    }
-
     #openhatch-widget .module > .head h3 {
         text-align: center;
         margin: 10px auto;
         padding: 0;
+        font-weight: bold;
     }
 
     #openhatch-widget .module > .body {
         float: left;
-        background-color: #fff;
-        margin: 0 5px;
         padding: 10px 5px ! important;
     }
 
-    #openhatch-widget .module > .head, 
-    #openhatch-widget .module > .body {
-        border-left: 1px solid #f4f4f4;
-        border-right: 1px solid #f4f4f4;
-    }
-
-    #openhatch-widget .module > .foot,
-    #openhatch-widget .submodule > .foot {
+    #openhatch-widget .module > .foot {
         float: left;
-        border-top: 1px solid #eee;
-        padding: 10px 15px;
+        padding: 5px;
         font-size: 8pt;
         text-align: right;
+        border: 0;
     }
     
     #openhatch-widget .module > .foot a {
@@ -113,9 +108,6 @@
 
     #openhatch-widget .submodule {
         margin-bottom: 20px;
-        border: 1px solid #ddd;
-        border-top: 3px double #ddd;
-        border-bottom: 3px double #ddd;
         float: left;
     }
 
@@ -124,15 +116,10 @@
         background: #fdfdfe url('/static/images/module-head-bg.png') bottom repeat-x;
         float: left;
         padding: 10px 20px;
-        border-bottom: 1px solid #ddd;
     }
 
     #openhatch-widget .submodule > .body {
         background-color: #fff;
-    }
-
-    #openhatch-widget .submodule > .foot {
-        border-top: 1px solid #ddd;
     }
 
     #openhatch-widget ul {
@@ -159,9 +146,6 @@
     #openhatch-widget .module > .head ul li a:hover {
         color: orange;
         text-decoration: underline;
-    }
-    #openhatch-widget .module {
-        border: 5px solid #fff;
     }
     #openhatch-widget img {
         border: 0;
@@ -264,6 +248,10 @@
         float: right;
     }
 
+    #openhatch-widget h3 {
+        text-shadow: none;
+    }
+    
     #openhatch-widget #credit h3 {
         font-size: 10pt;
         padding: 23px 0 0 0;
@@ -280,11 +268,13 @@
         width: 240px ! important;
     }
 
+    #openhatch-widget .module > .body { width: 280px; background-color: #fff; } 
+
 </style>
 <div id='openhatch-widget'>
     <div class='module'>
         <div class='head'>
-            <h3>{{ person.get_full_name_or_username }}'s FOSS communities</h3>
+            <h3>Support open source!</h3>
         </div>
         <div class='body'>
             {% if projects %}
@@ -303,11 +293,11 @@
                 {% endfor %}
             </ul>
             {% else %}
-            <div style='float: left; margin-top: 10px; width: 500px;'>No contributions listed yet.</div>
+            <div>No projects listed yet.</div>
             {% endif %}
         </div>
         <div class='foot'>
-            <a href='/people/{{ person.user.username }}/'>See my full profile at
+            <a href='{% url mysite.profile.views.display_person_web person.user.username %}'>See my full profile at
             <img src='http://{{ url_prefix }}/static/images/logo-for-widget.png' height='55' width='80'></a>
             {# FIXME: Don't hard-code our URL. #}
         </div>
