@@ -15,7 +15,7 @@
         {% endif %}
     {% endif %}>
     <div class='submodule'>
-        <div class='head project-stuff'>
+        <div class='project-stuff'>
             <div class='name_and_icon_flagger'>
                 <img class='project_icon'
                 {% if edit_mode %}
@@ -49,10 +49,14 @@
                 <div class='project_description'>{{ pf_entry.project_description }}</div>
                 {% endif %}
             </div>
+            {% if not edit_mode and not adding_mode %}
+            {# We're in view mode #}
+            {% show_other_contributors pf_entry.project person.user 6 %}
+            {% endif %}
         </div>
         {% with pf_entry.get_published_citations as citations %}
         {% if edit_mode or citations or pf_entry.experience_description %}
-        <div class='body personal-stuff'>
+        <div class='personal-stuff'>
             <div class='involvement_placeholder'>
                 When you publish this project, you can add involvement links here.
             </div>
@@ -75,7 +79,7 @@
                 </ul>
                 {% if edit_mode %}
                 <ul class='citation-forms'></ul>
-                <a class='add' href='#'>Add a<span class='nother'>nother</span> link</a>
+                <a class='add' href='#'>Add a link</a>
                 <a href='#' class='show_howto'>?</a>
                 <div class='howto'>
                     <a href='#' class='hide_me'>hide</a>
@@ -101,10 +105,6 @@
         </div>
         {% endif %}
         {% endwith %}
-        {% if not edit_mode and not adding_mode %}
-            {# We're in view mode #}
-            {% show_other_contributors pf_entry.project person.user 5 %}
-        {% endif %}
     </div>
     {% if edit_mode %}
     <ul class='actions'>
