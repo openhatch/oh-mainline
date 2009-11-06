@@ -203,17 +203,13 @@ ul#links {
 #footer-wrapper {
     position: absolute;
     width: 100%;
-    background-color: #666;
     clear: both;
     left: 0;
-    position: absolute;
-    width: 100%;
-    background: #555;
 }
 #footer {
     width: 960px;
     padding: 15px 5px;
-    margin: 30px 0 0 0;
+    margin: 0 auto;
     text-align: right;
 }
 #footer ul {

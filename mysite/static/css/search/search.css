@@ -56,7 +56,7 @@
 #results-sidebar {
     float: right;
     width: 120px;
-    padding: 40px 10px;
+    padding: 10px;
 }
 #results-sidebar img {
     float: left;
@@ -70,7 +70,7 @@
     padding: 12px;
     padding-bottom: 6px;
     float: left;
-    width: 500px;
+    width: 90%;
 }
 #sidebar {
     float: left;
@@ -110,6 +110,7 @@ p {
 }
 /* generic list code */
 #results.box {
+    background: #fff url('/static/images/motif.png');
     padding-right: 0;
 }
 #results ul {
@@ -124,9 +125,10 @@ p {
     float: left;
     list-style: none;
     width: 555px;
-    height: 56px;
+    height: 60px;
     white-space: nowrap;
-    margin: 5px 0;
+    margin: 0;
+    margin-bottom: 8px;
 }
 
 #results li .details {
@@ -135,7 +137,7 @@ p {
     padding-top: 0;
     float: left;
     font-size: 11px;
-    background-color: #eee;
+    background: transparent url('/static/images/motif.png');
     display: none;
 }
 
@@ -180,6 +182,12 @@ p {
     width: 100%;
     cursor: pointer;
     /*border-bottom: 1px dotted #ccf;*/
+    border-radius-topleft: 8px;
+    border-radius-topright: 8px;
+    -moz-border-radius-topleft: 8px;
+    -moz-border-radius-topright: 8px;
+    padding: 2px 0 0 2px;
+    background-color: #fff;
 }
 #results .tag-details {
     display: none;
@@ -280,6 +288,8 @@ p {
 /* </human list code> */
 
 /* bug list code */
+.bug {
+}
 #opps.box {
     padding-right: 0;
     padding-bottom: 0;
@@ -297,9 +307,6 @@ p {
     border-color: #ff94ad; 
 }
 
-#opps li {
-    margin: 5px 0;
-}
 #opps li .age {
     float: right;
     padding: .3em .7em;
@@ -309,8 +316,16 @@ p {
 }
 #opps li .details .fields {
 }
+#opps li.expanded .second-line {
+    border-radius: 0;
+    -moz-border-radius: 0;
+}
 #opps li.expanded .details {
     display: block;
+    border-radius-bottomleft: 8px;
+    border-radius-bottomright: 8px;
+    -moz-border-radius-bottomleft: 8px;
+    -moz-border-radius-bottomright: 8px;
 }
 #opps li.expanded .details .fields {
     display: block;
@@ -347,6 +362,13 @@ p {
 #opps li .second-line {
     display: block;
     float: left;
+    background-color: #fff;
+    padding: 2px 0 0 2px;
+    width: 100%;
+    border-radius-bottomleft: 8px;
+    border-radius-bottomright: 8px;
+    -moz-border-radius-bottomleft: 8px;
+    -moz-border-radius-bottomright: 8px;
 }
 
 #opps form {
@@ -380,10 +402,6 @@ p {
     padding: 2px 5px;
 }
 .good-for-beginners img {
-}
-
-.bug {
-    background-color: #fff;
 }
 
 /* </bug list code> */
@@ -455,7 +473,7 @@ input[type='text'].default-text-active {
 }
 .bug .first-line img {
     width: 20px;
-    height: 20px; /* If ever an image is not square this may distort the image. */
+    height: 20px; /* If ever an image is not square this rule might distort it. */
     vertical-align: top;
 }
 
