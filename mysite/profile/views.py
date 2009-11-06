@@ -461,6 +461,8 @@ def edit_person_info(request):
             link.delete()
 
         for tag_text in new_tag_texts_for_this_type:
+            if not tag_text.strip(): # Skip blanks
+                continue
             new_tag, _ = Tag.objects.get_or_create(
                     tag_type=tag_type, text=tag_text)
             new_link, _ = Link_Person_Tag.objects.get_or_create(
