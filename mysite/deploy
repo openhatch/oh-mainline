@@ -1,5 +1,5 @@
 # Log into linode
-send_user "\r*** Dialing into remote computer... ***\r"
+send_user "\r\n*** Dialing into remote computer... ***\r\n"
 spawn ssh deploy@oh
 
 #FIXME: use /bin/dash -e so the remote shell simply exits on error
@@ -8,18 +8,18 @@ expect "$ "
 send "cd milestone-a\r"
 expect "$ "
 
-send_user "\r*** Fetching changes from git's remote repository... ***\r"
+send_user "\r\n*** Fetching changes from git's remote repository... ***\r\n"
 send "git fetch; echo $?\r"
 expect "0"
 # Expect a success exit code from 'git fetch'
 expect "$ "
 
-send_user "\r*** Checking for uncommitted modification to the remote filesystem... ***\r"
+send_user "\r\n*** Checking for uncommitted modification to the remote filesystem... ***\r\n"
 send "git ls-files -m\r"
 expect "$ " {exp_continue} \
-           ".*" {send_user "\rThere were some uncommitted modifications in the remote filesystem.\r"; exit 3}
+           ".*" {send_user "\r\nThere were some uncommitted modifications in the remote filesystem.\r\n"; exit 3}
 
-send_user "\r*** Merging... ***\r"
+send_user "\r\n*** Merging... ***\r\n"
 send "git merge origin/master\r"
 
 while {true} {
@@ -29,16 +29,16 @@ while {true} {
             exit 1
         }
         "$ " {
-            send_user "There was no fast forward\r"
+            send_user "There was no fast forward. Aborting...\r\n"
             exit 1
             }
         "Fast forward" {
-            send_user "Fast forward detected\r"
+            send_user "Fast forward detected. Proceeding...\r"
             break
         }
         "Already up-to-date." {
-            send_user "Tried to merge, but git cried, Already up-to-date\r"
-            exit 0
+            send_user "Tried to merge, but git cried, 'Already up-to-date'. Proceeding anyway...\r\n"
+            break
         }
     }
 }
@@ -46,12 +46,13 @@ while {true} {
 # Run buildout if buildout was changed.
 expect {
     "buildout.cfg" {
-        send_user "\r*** Change to buildout.cfg detected. Running buildout... ***\r"
+        send_user "\r\n*** Change to buildout.cfg detected. Running buildout... ***\r\n"
         send "./bin/buildout"
     }
     "$ " 
+}
 
-send_user "\r*** Reloading the web site... ***\r"
+send_user "\r\n*** Reloading the web site... ***\r\n"
 send "touch bin/production.wsgi; echo $?\r"
 expect "0"
 
