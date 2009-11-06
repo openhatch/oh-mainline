@@ -37,15 +37,18 @@
 }
 
 #main .contains-submodules.two-columns.equal-width .submodule {
-    width: 440px;
+    width: 45%;
 }
 
 #main .contains-submodules.two-columns.equal-width .submodule .head h3,
 #main .contains-submodules.two-columns.equal-width .submodule .body {
-    width: 400px;
+    width: 90.5%;
+}
+#main .contains-submodules.two-columns.equal-width .submodule .head {
+    width: 90.5%;
 }
 #main .contains-submodules.two-columns.equal-width .submodule .foot {
-    width: 410px;
+    width: 91%;
 }
 #main .contains-submodules.two-columns .submodule.fat .head h3,
 #main .contains-submodules.two-columns .submodule.fat .body {

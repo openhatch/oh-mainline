@@ -9,7 +9,7 @@ admin.autodiscover()
 
 import mysite.account.forms
 
-from django_authopenid import views as oid_views
+from django_authopenid import views as openid_views
 
 urlpatterns = patterns('',
         # Invitation-related URLs
@@ -57,14 +57,14 @@ urlpatterns = patterns('',
             'mysite.profile.views.edit_person_info'),
 
         # OpenID URL prefix for django_authopenid.urls
-        url(r'^openid/signin/$', oid_views.signin, name='user_signin'),
+        url(r'^openid/signin/$', openid_views.signin, name='user_signin'),
 
         # OpenID URL prefix for django_authopenid.urls
-        url(r'^openid/register/$', oid_views.register,
+        url(r'^openid/register/$', openid_views.register,
             kwargs=dict(register_form=mysite.account.forms.OpenidRegisterFormWithInviteCode)),
 
         # OpenID URL prefix for django_authopenid.urls
-        url(r'^openid/register/$', oid_views.register, dict(send_email=False),
+        url(r'^openid/register/$', openid_views.register, dict(send_email=False),
             name='user_register'),
 
         (r'^openid/', include('django_authopenid.urls')),

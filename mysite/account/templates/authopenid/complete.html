@@ -8,6 +8,12 @@ Associate your OpenID - OpenHatch
 {% block main %}
 <div class='module' id='openid-associate'>
 
+    <style type='text/css'>
+        .errorlist li {
+            width: 90%;
+        }
+    </style>
+
     <div class='head'>
         <h3>{% trans "Associate your OpenID with an OpenHatch account." %}</h3>
     </div>
@@ -19,28 +25,6 @@ Associate your OpenID - OpenHatch
                 <p>If you're joining <strong>OpenHatch</strong>, tell us what username you want to use for your new account. If you're already a member, associate with your existing account.</p>
                 {% endblocktrans %}
             </div>
-
-        {% if form1.errors %}
-        <p class="errors">{% trans "Please correct errors below:" %}<br />
-        {% if form1.username.errors %} 
-        <span class="error">{{ form1.username.errors|join:", " }}</span>
-        {% endif %}
-        {% if form1.email.errors %} 
-        <span class="error">{{ form1.email.errors|join:", " }}</span>
-        {% endif %}
-        </p>
-        {% endif %}
-
-        {% if form2.errors %}
-        <p class="errors">{% trans "Please correct errors below:" %}<br />
-        {% if form2.username.errors %} 
-        <span class="error">{{ form2.username.errors|join:", " }}</span>
-        {% endif %}
-        {% if form2.password.errors %} 
-        <span class="error">{{ form2.password.errors|join:", " }}</span>
-        {% endif %}
-        </p>
-        {% endif %}
 
             <form name="fregister" action="{% url user_register %}" method="POST" class="login left submodule">
                 <div class='head'>
@@ -71,9 +55,15 @@ Associate your OpenID - OpenHatch
                     <h3>{% trans "An existing account" %}</h3>
                 </div>
                 <div class='body'>
+                    {{ form2.non_field_errors }}
                     <input type="hidden" name="next" value="{{ next }}" />
-                    <div class="form-row"><label for="id_username">{% trans "Username" %}</label><br />{{ form2.username }}</div>
-                    <div class="form-row"><label for="id_passwordl">{% trans "Password" %}</label><br />{{ form2.password }}</div>
+                    {% for field in form2 %}
+                    <div class='form-row'>
+                        {{ field.errors }}
+                        <label>{{ field.label }}</label><br />
+                        {{ field }}
+                    </div>
+                    {% endfor %}
                 </div>
                 <div class='foot'>
                     <div class="submit-row"><input type="submit" name="bverify" value="Verify"></div>

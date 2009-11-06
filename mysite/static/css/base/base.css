@@ -76,6 +76,7 @@ h1 a:hover {
 .submodule > .head {
     float: left;
     padding: 10px 20px;
+    background-color: #f4f4f4;
 }
 
 .submodule > .body {
