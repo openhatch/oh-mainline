@@ -1,3 +1,58 @@
+.project-display {
+    float: left;
+    margin-right: 0;
+    width: 705px;
+}
+.project-display h3 {
+    float: left;
+}
+.project-display p {
+    margin: 0;
+    margin-bottom: 10px;
+    float: left;
+}
+.project-display h2 {
+    font-size: 9pt;
+    margin: 0;
+    margin-bottom: 3px;
+}
+.project-display h5 {
+    font-size: 12pt;
+    margin: 0;
+    margin-bottom: 10px;
+    font-weight: normal;
+}
+
+/* Styling for django form output. */
+.project-display input[type='text'],
+.project-display textarea {
+    float: left;
+    width: 330px;
+}
+.module > .body .project-display ul {
+    float: left;
+}
+#portfolio .module > .body {
+    padding: 0;
+}
+#portfolio .module > .body ul li {
+    float: left;
+    padding: 20px;
+    width: 311px;
+}
+#portfolio .module > .body {
+    width: 703px;
+}
+
+#main .submodule .body.other-contributors {
+    float: left;
+    background-color: #eee;
+}
+#main .submodule .body.other-contributors li {
+    float: left;
+    margin-right: 10px;
+}
+
 /*--------------*
  |   IMPORTER   |
  *--------------*/
