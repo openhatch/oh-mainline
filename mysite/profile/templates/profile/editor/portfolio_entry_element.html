@@ -103,7 +103,7 @@
         {% endwith %}
         {% if not edit_mode and not adding_mode %}
             {# We're in view mode #}
-            {% show_other_contributors pf_entry.project the_user 5 %}
+            {% show_other_contributors pf_entry.project person.user 5 %}
         {% endif %}
     </div>
     {% if edit_mode %}
