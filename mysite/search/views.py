@@ -72,8 +72,8 @@ def fetch_bugs(request):
     # FIXME: Give bugs some date field
 
     if request.user.is_authenticated():
-        suggestion_keys = request.user.get_profile().\
-                get_recommended_search_terms()
+        suggestion_keys = request.user.get_profile(
+                ).get_recommended_search_terms()
     else:
         suggestion_keys = []
 
