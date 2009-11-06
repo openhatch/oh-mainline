@@ -1,4 +1,5 @@
 # Log into linode
+send_user "\r*** Dialing into remote computer... ***\r"
 spawn ssh deploy@oh
 
 #FIXME: use /bin/dash -e so the remote shell simply exits on error
@@ -7,15 +8,18 @@ expect "$ "
 send "cd milestone-a\r"
 expect "$ "
 
+send_user "\r*** Fetching changes from git's remote repository... ***\r"
 send "git fetch; echo $?\r"
 expect "0"
 # Expect a success exit code from 'git fetch'
 expect "$ "
 
+send_user "\r*** Checking for uncommitted modification to the remote filesystem... ***\r"
 send "git ls-files -m\r"
 expect "$ " {exp_continue} \
-           ".*" {send_user "There were some uncommitted modifications in the remote filesystem."; exit 3}
+           ".*" {send_user "\rThere were some uncommitted modifications in the remote filesystem.\r"; exit 3}
 
+send_user "\r*** Merging... ***\r"
 send "git merge origin/master\r"
 
 while {true} {
@@ -40,9 +44,14 @@ while {true} {
 }
 
 # Run buildout if buildout was changed.
-expect "buildout.cfg" {send "./bin/buildout"} \
+expect {
+    "buildout.cfg" {
+        send_user "\r*** Change to buildout.cfg detected. Running buildout... ***\r"
+        send "./bin/buildout"
+    }
     "$ " 
 
+send_user "\r*** Reloading the web site... ***\r"
 send "touch bin/production.wsgi; echo $?\r"
 expect "0"
 
