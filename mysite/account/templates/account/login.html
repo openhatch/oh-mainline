@@ -29,9 +29,13 @@ Log in
                 <input type='submit' value='Log in' style='' />
             </div>
         </form>
-        <div style='float: left; width: 600px;'>
-            <a style='font-weight: bold;' href='/#tab=create_profile'>Sign up for an account</a> if you haven't already!
-        </div>
+        <ul class='login-links' style='float: right; width: 300px; padding: 16px; padding-bottom: 16px; border-radius: 8px; -moz-border-radius: 8px; background-color: #f4f4f4;'>
+            <h4 style='width: 95%;'>Relatedly</h4>
+            <style>.login-links li { list-style: square; float: left; width: 95%; margin-top: 5px; margin-left: 15px; }</style>
+            <li><a style='font-weight: bold;' href='/#tab=create_profile'>Sign up for an account</a> if you haven't already!</li>
+            <li><a href='/#tab=login'>Sign in with OpenID</a></li>
+            <li><a href='/account/forgot_pass/'>Forgot your password?</a></li>
+        </ul>
     </div>
 </div>
 {% endblock main %}
