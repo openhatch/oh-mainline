@@ -549,7 +549,7 @@ def gimme_json_for_portfolio(request):
     summaries = {}
     for c in citations:
         summaries[c.pk] = render_to_string(
-                "profile/editor/citation_summary.html",
+                "profile/portfolio/citation_summary.html",
                 {'citation': c})
 
     # FIXME: Maybe we can serialize directly to Python objects.
