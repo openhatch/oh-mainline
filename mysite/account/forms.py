@@ -60,7 +60,7 @@ class UserCreationFormWithEmail(django.contrib.auth.forms.UserCreationForm):
             "A user with that email already exists.")
 
 class ShowEmailForm(django.forms.Form):
-    show_email = django.forms.BooleanField(required=False)
+    show_email = django.forms.BooleanField(required=False, label="Make email publicly visible?")
 
 class EditEmailForm(django.forms.ModelForm):
     class Meta:

@@ -1,33 +1,31 @@
 {% extends 'account/settings_tab.html' %}
 
 {% block title %}
-Invite a friend to OpenHatch. - 
+Invite a friend to OpenHatch - 
 {{ block.super }}
 {% endblock title %}
 
 {% block settings_main %}
-<form method='POST'
-      name='invite_someone'
-      action='/account/settings/invite_someone/do'
-      enctype="multipart/form-data">
-  <div class='submodule fat' id='widget-settings'>
+<form class='submodule fat' id='widget-settings'
+    method='POST' name='invite_someone'
+    action='/account/settings/invite_someone/do'
+    enctype="multipart/form-data">
     <div class='head'>
-      <h3>Invite a friend to OpenHatch</h3>
+        <h3>Invite a friend to OpenHatch</h3>
     </div>
     <div class='body'>
-      <p>You have {{ remaining_invites }} invitations available.</p>
-      {% for field in invite_someone_form %}
-      <div class='form-row'>
-        {{ field.errors }}
-	<label>Your friend's address:</label>
-        {{ field }}
-      </div>
-      {% endfor %}
+        <p>You have {{ remaining_invites }} invitations available.</p>
+        {% for field in invite_someone_form %}
+        <div class='form-row'>
+            {{ field.errors }}
+            <label>Your friend's address:</label>
+            {{ field }}
+        </div>
+        {% endfor %}
     </div>
     <div class='foot'>
-      <input type="submit" value="Save">
+        <input type="submit" value="Save">
     </div>
-  </div>
 </form>
 
 

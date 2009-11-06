@@ -1,62 +1,27 @@
-#main {
-    float: left;
-}
+#main { float: left; }
+#main .module > .head { width: 950px; }
+#main .module > .body { width: 910px; }
+#main .submodule .head h3 { font-weight: normal; font-size: 11pt; }
+#main .submodule .body { float: left; background-color: #fff; padding: 5%; }
 
-#main .module > .head,
-#main .module > .body {
-}
+/* SKINNY SUBMODULE */
+#main .submodule.skinny { width: 25%; margin-right: 20px; }
+    #main .submodule.skinny .head { width: 82.5%; }
+        #main .submodule.skinny .head h3 { width: 95%; }
+    #main .submodule.skinny .body { width: 90%; }
 
-#main .module > .head {
-    width: 950px;
-}
-#main .module > .body {
-    width: 910px;
-}
-#main .contains-submodules.two-columns .submodule.skinny {
-    width: 230px;
-    margin-right: 20px;
-}
-#main .contains-submodules.two-columns .submodule.fat {
-    width: 645px;
-}
-#main .contains-submodules.two-columns .submodule .body {
-    float: left;
-    background-color: #fff;
-    padding: 20px;
-}
-#main .contains-submodules.two-columns .submodule.skinny .head h3,
-#main .contains-submodules.two-columns .submodule.skinny .body {
-    width: 200px;
-}
-#main .contains-submodules.two-columns .submodule.fat .head h3,
-#main .contains-submodules.two-columns .submodule.fat .body {
-    width: 605px;
-}
-#main .contains-submodules.two-columns .submodule.fat .foot {
-    width: 615px;
-}
+/* FAT SUBMODULE */
+#main .submodule.fat { width: 70%; }
+    #main .submodule.fat .head { width: 93.8%; }
+        #main .submodule.fat .head h3 { width: 100%; }
+    #main .submodule.fat .body { width: 90%; }
+    #main .submodule.fat .foot { width: 615px; } 
 
-#main .contains-submodules.two-columns.equal-width .submodule {
-    width: 45%;
-}
+#main .equal-width { width: 45%; } 
+    #main .equal-width .submodule { width: 45%; } 
+        #main .equal-width .submodule .head { width: 90.5%; }
+            #main .equal-width .submodule .head h3,
+        #main .equal-width .submodule .body { width: 90.5%; }
+        #main .equal-width .submodule .foot { width: 91%; }
 
-#main .contains-submodules.two-columns.equal-width .submodule .head h3,
-#main .contains-submodules.two-columns.equal-width .submodule .body {
-    width: 90.5%;
-}
-#main .contains-submodules.two-columns.equal-width .submodule .head {
-    width: 90.5%;
-}
-#main .contains-submodules.two-columns.equal-width .submodule .foot {
-    width: 91%;
-}
-#main .contains-submodules.two-columns .submodule.fat .head h3,
-#main .contains-submodules.two-columns .submodule.fat .body {
-    width: 605px;
-}
-#main .contains-submodules.two-columns .submodule.fat .foot {
-    width: 615px;
-}
-#main .contains-submodules.two-columns .submodule.left {
-    margin-right: 20px;
-}
+#main .submodule.left { margin-right: 20px; }

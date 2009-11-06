@@ -190,13 +190,14 @@ def edit_contact_info_do(request):
 def change_password(request, change_password_form = None):
     # {{{
 
-    data = {}
     if change_password_form is None:
-        data['change_password_form'] = django.contrib.auth.forms.PasswordChangeForm({})
-    else:
-        data['change_password_form'] = change_password_form
+        change_password_form = django.contrib.auth.forms.PasswordChangeForm({})
 
-    return (request, 'account/change_password.html', data)
+    change_password_form.fields['old_password'].label = "Current password"
+    change_password_form.fields['new_password2'].label = "Type it again"
+
+    return (request, 'account/change_password.html',
+            {'change_password_form': change_password_form})
     # }}}
 
 @login_required
