@@ -13,6 +13,23 @@ import sys
 import uuid
 import urllib
 
+def url2printably_short(url, CUTOFF=50):
+    short_enough_pieces_so_far = []
+    die_next = False
+    wrappable_characters = "/"
+    for url_piece in url.split(wrappable_characters):
+        if die_next:
+            return '/'.join(short_enough_pieces_so_far)
+
+        # Logic: If this URL piece is longer than CUTOFF, then stop appending
+        # and return.
+        if len(url_piece) > CUTOFF:
+            url_piece = url_piece[:CUTOFF-3] + '...'
+            die_next = True
+        # always append
+        short_enough_pieces_so_far.append(url_piece)
+    return '/'.join(short_enough_pieces_so_far)
+
 def generate_person_photo_path(instance, filename, suffix=""):
     random_uuid = uuid.uuid4()
     return random_uuid.hex + suffix
@@ -81,7 +98,7 @@ class Person(models.Model):
         terms = []
         for c in citations:
             languages_list = (",".split(c.languages))
-            terms.extend([lang.strip() for lang in languages_list if lang.strip(0)])
+            terms.extend([lang.strip() for lang in languages_list if lang.strip()])
 
         terms.extend(
                 [pfe.project.name for pfe in portfolio_entries
@@ -455,7 +472,7 @@ class Citation(models.Model):
             else:
                 raise ValueError, "There's a DIA of a kind I don't know how to summarize."
         elif self.url is not None:
-            return self.url
+            return url2printably_short(self.url, CUTOFF=38)
         elif self.distinct_months is not None and self.languages is not None:
             return "Coded for %d month%s in %s." % (
                     self.distinct_months,
