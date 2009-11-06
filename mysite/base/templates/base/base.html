@@ -47,6 +47,8 @@
                                 <li><a href='{% url mysite.account.views.settings %}'>settings</a></li>
                                 <li><a href='{% url mysite.search.views.fetch_bugs %}'>volunteer opportunities</a></li>
                                 <li><a href='{% url mysite.profile.views.display_list_of_people %}'>people</a></li>
+                                <li><a href='{% url mysite.profile.views.display_person_web the_user.username %}'>profile</a></li>
+                                <li><a href='{% url mysite.base.views.homepage %}'>home</a></li>
                                 <li id='username'><a href='/people/{{ the_user.username }}/'>{{ the_user.username }}</a></li>
                                 {% else %}
                                 <li><a href='{% url mysite.account.views.login %}'>log in</a></li>
