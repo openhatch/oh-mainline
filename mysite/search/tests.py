@@ -394,6 +394,7 @@ class Recommend(SearchTest):
             'bugs-for-two-projects.json',
             'extra-fake-cchost-related-projectexps.json']
 
+    # FIXME: Update this test to use the new models.
     def test_get_recommended_search_terms_for_user(self):
         person = Person.objects.get(user__username='paulproteus')
         terms = person.get_recommended_search_terms()
@@ -401,6 +402,7 @@ class Recommend(SearchTest):
                 [u'Automake', u'C#', u'C++', u'Make', u'Mozilla Firefox', 
                  u'Python', u'shell script', u'XUL'])
 
+    # FIXME: Update this test to use the new models.
     def test_search_page_context_includes_recommendations(self):
         client = self.login_with_client()
         response = client.get('/search/')

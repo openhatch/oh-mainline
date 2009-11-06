@@ -97,8 +97,9 @@ class Person(models.Model):
         citations = Citation.untrashed.filter(portfolio_entry__person=self)
         terms = []
         for c in citations:
-            languages_list = (",".split(c.languages))
-            terms.extend([lang.strip() for lang in languages_list if lang.strip()])
+            languages_list = c.languages.split(",")
+            terms.extend([lang.strip() for lang in languages_list
+                if lang.strip()])
 
         terms.extend(
                 [pfe.project.name for pfe in portfolio_entries

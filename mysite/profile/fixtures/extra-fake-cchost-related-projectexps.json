@@ -1,8 +1,10 @@
 [
- {"pk": 14, "model": "profile.projectexp", "fields": {"man_months": 1, "description": "", "url": null, "primary_language": "Python", "project": 3, "person": 1, "source": "Ohloh", "person_role": ""}},
- {"pk": 15, "model": "profile.projectexp", "fields": {"man_months": 1, "description": "", "url": null, "primary_language": "C#", "project": 3, "person": 1, "source": "Ohloh", "person_role": ""}},
- {"pk": 16, "model": "profile.projectexp", "fields": {"man_months": 1, "description": "", "url": null, "primary_language": "C++", "project": 3, "person": 1, "source": "Ohloh", "person_role": ""}},
- {"pk": 17, "model": "profile.projectexp", "fields": {"man_months": 1, "description": "", "url": null, "primary_language": "XUL", "project": 3, "person": 1, "source": "Ohloh", "person_role": ""}},
- {"pk": 19, "model": "profile.projectexp", "fields": {"man_months": 1, "description": "", "url": null, "primary_language": "Automake", "project": 3, "person": 1, "source": "Ohloh", "person_role": ""}},
- {"pk": 20, "model": "profile.projectexp", "fields": {"man_months": 1, "description": "", "url": null, "primary_language": "Make", "project": 3, "person": 1, "source": "Ohloh", "person_role": ""}}
+ {"pk": 0, "model": "profile.portfolioentry", "fields": {"project": 3, "person": 1, "is_published": 1}},
+ {"pk": 14, "model": "profile.citation", "fields": {"is_published": 1, "distinct_months": 1, "url": null, "languages": "Python", "portfolio_entry": 0,  "contributor_role": ""}},
+ {"pk": 15, "model": "profile.citation", "fields": {"is_published": 1, "distinct_months": 1, "url": null, "languages": "C#", "portfolio_entry": 0,  "contributor_role": ""}},
+ {"pk": 16, "model": "profile.citation", "fields": {"is_published": 1, "distinct_months": 1, "url": null, "languages": "C++", "portfolio_entry": 0,  "contributor_role": ""}},
+ {"pk": 17, "model": "profile.citation", "fields": {"is_published": 1, "distinct_months": 1, "url": null, "languages": "XUL", "portfolio_entry": 0,  "contributor_role": ""}},
+ {"pk": 19, "model": "profile.citation", "fields": {"is_published": 1, "distinct_months": 1, "url": null, "languages": "Automake", "portfolio_entry": 0,  "contributor_role": ""}},
+ {"pk": 20, "model": "profile.citation", "fields": {"is_published": 1, "distinct_months": 1, "url": null, "languages": "Make", "portfolio_entry": 0,  "contributor_role": ""}},
+ {"pk": 21, "model": "profile.citation", "fields": {"is_published": 1, "distinct_months": 1, "url": null, "languages": "shell script", "portfolio_entry": 0,  "contributor_role": ""}}
 ]
