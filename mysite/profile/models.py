@@ -76,12 +76,16 @@ class Person(models.Model):
 
     def get_recommended_search_terms(self):
         # {{{
-        project_exps = ProjectExp.objects.filter(person=self)
-        terms = [p.primary_language for p in project_exps
-                if p.primary_language and p.primary_language.strip()]
+        portfolio_entries = self.get_published_portfolio_entries()
+        citations = Citation.untrashed.filter(portfolio_entry__person=self)
+        terms = []
+        for c in citations:
+            languages_list = (",".split(c.languages))
+            terms.extend([lang.strip() for lang in languages_list if lang.strip(0)])
+
         terms.extend(
-                [p.project.name for p in project_exps
-                    if p.project.name and p.project.name.strip()])
+                [pfe.project.name for pfe in portfolio_entries
+                    if pfe.project.name and pfe.project.name.strip()])
         terms = sorted(set(terms), key=lambda s: s.lower())
         return terms
 

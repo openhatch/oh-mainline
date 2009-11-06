@@ -1,9 +1,10 @@
 body {
-    font: 10pt "Liberation Sans", Verdana, Helvetica, Arial, sans-serif;
+    font: 9pt sans-serif;
     background: #fff url("/static/images/motif-eee.png");
-    margin: 0;
-    padding: 0;
     color: #222;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0;
 }
 
 a {
@@ -95,7 +96,6 @@ ul {
     width: 1000px;
 }
 #penoutermost {
-    float: left;
     width: 1000px;
 }
 h1, h2, h3, h4 {
@@ -103,7 +103,8 @@ h1, h2, h3, h4 {
 }
 
 h1 {
-    font-size: 18pt;
+    font-weight: normal;
+    font-size: 23pt;
 }
 
 #header {
@@ -120,7 +121,6 @@ h1 {
 
 #nav {
     padding: 10px 20px 0 20px;
-    float: left;
     width: 960px;
     height: 90px;
     border-top: 0;
@@ -156,7 +156,6 @@ h1 {
 
 #page-top {
     width: 960px;
-    float: left;
     padding: 0 20px;
 }
 
@@ -175,51 +174,54 @@ ul#links {
 }
 #account-links {
     float: right;
-    border: 5px solid #fff;
+    /*
+    background: transparent url('/static/images/gray-60.png');
+    -moz-border-radius: 8px;
+    border-radius: 8px;
+    */
 }
 #account-links li {
-    background-color: #f4f4f4;
-    padding: 5px 10px;
     margin: 0;
     font-size: 11pt;
 }
-
-ul#account-links {
-}
-
-ul#user-actions {
-    margin: 0;
-    padding: 0;
+#account-links a {
     float: left;
-    width: 300px;
+    padding: 5px 10px;
+    color: #484848;
 }
-ul#user-actions li {
-    list-style: none;
-    float: left;
-}
-ul#user-actions a {
-    font-size: 10pt;
+#account-links a:hover {
 }
 
 #content {
-    float: left;
     width: 960px;
     padding: 20px;
     padding-bottom: 5px;
+    clear: both;
+    overflow: auto;
 }
 
+#footer-wrapper {
+    position: absolute;
+    width: 100%;
+    background-color: #666;
+    clear: both;
+    left: 0;
+    position: absolute;
+    width: 100%;
+    background: #555;
+}
 #footer {
-    float: left;
     width: 960px;
     padding: 15px 5px;
     margin: 30px 0 0 0;
     text-align: right;
 }
-
 #footer ul {
     display: inline;
     list-style-type: none;
     font-size: 10pt;
+    max-width: 108em;
+    margin: 0 auto;
 }
 
 #footer li {
@@ -228,11 +230,11 @@ ul#user-actions a {
 }
 
 #footer a {
-    color: #555;
+    color: #aaa;
 }
 
 #footer a:hover {
-    color: #222;
+    color: #ccc;
 }
 
 #widgets {

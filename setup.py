@@ -32,7 +32,7 @@ setup(
 
     description = "A website",
 
-    author = 'Asheesh Laroia, Raphael Krut-Landau, Karen Rustad',
+    author = 'Asheesh Laroia, Raphael Krut-Landau',
     author_email = 'all@openhatch.org',
 
     package_dir = {'': '.'},
