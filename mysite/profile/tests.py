@@ -148,32 +148,6 @@ class ProjectExpTests(TwillTests):
         tc.find(project_exp__url)
         # }}}
 
-    def test_projectexp_add(self):
-        """Paulproteus can login and add two projectexps."""
-        # {{{
-        self.login_with_twill()
-        self.projectexp_add('asdf', 'qwer', 'http://jkl.com/')
-        self.projectexp_add('asdf', 'QWER!', 'https://JKLbang.edu/')
-        # }}}
-
-    def test_projectexp_add(self):
-        """Paulproteus can login and add two projectexps."""
-        # {{{
-        self.login_with_twill()
-
-        # Test for basic success: All fields filled out reasonably
-        self.projectexp_add('asdf', 'qwer', 'http://jkl.com/')
-        # (once more with a weird character and weirdish url)
-        self.projectexp_add('asdf', 'QWER!', 'https://JKLbang.edu/')
-
-        # Test that empty descriptions are okay
-        self.projectexp_add('asdf', '', 'https://JKLbang.edu/')
-
-        # Test that URLs are validated
-        self.projectexp_add('asdf', 'QWER!', 'not a real URL, what now', tc_dot_url_should_succeed=False)
-
-        # }}}
-
     def test_projectexp_delete_unauthorized(self):
         '''Barry tries to delete a ProjectExp he doesn't own and fails.'''
         # {{{

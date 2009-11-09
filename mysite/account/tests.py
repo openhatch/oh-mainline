@@ -32,13 +32,7 @@ class Login(TwillTests):
         self.assert_(user and user.is_active)
 
     def test_login_web(self):
-        url = 'http://openhatch.org/'
-        url = make_twill_url(url)
-        tc.go(url)
-        tc.fv('login','login_username',"paulproteus")
-        tc.fv('login','login_password',"paulproteus's unbreakable password")
-        tc.submit()
-        tc.find('paulproteus')
+        self.login_with_twill()
 
     def test_logout_web(self):
         self.test_login_web()
@@ -53,8 +47,8 @@ class Login(TwillTests):
         tc.go(make_twill_url('http://openhatch.org/account/logout'))
         url = make_twill_url(url)
         tc.go(url)
-        tc.fv('login','login_username',"paulproteus")
-        tc.fv('login','login_password',"not actually paulproteus's unbreakable password")
+        tc.fv('login','username',"paulproteus")
+        tc.fv('login','password',"not actually paulproteus's unbreakable password")
         tc.submit()
         tc.notfind('is_authenticated indeed')
     # }}}
@@ -190,9 +184,9 @@ class EditPhoto(TwillTests):
     #{{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
     def test_set_avatar(self):
+        self.login_with_twill()
         for image in [photo('static/sample-photo.png'),
                       photo('static/sample-photo.jpg')]:
-            self.login_with_twill()
             url = 'http://openhatch.org/people/paulproteus/'
             tc.go(make_twill_url(url))
             tc.follow('Change photo')
@@ -213,9 +207,9 @@ class EditPhoto(TwillTests):
             self.assertEqual(w, 40)
 
     def test_set_avatar_too_wide(self):
+        self.login_with_twill()
         for image in [photo('static/images/too-wide.jpg'),
                       photo('static/images/too-wide.png')]:
-            self.login_with_twill()
             url = 'http://openhatch.org/people/paulproteus/'
             tc.go(make_twill_url(url))
             tc.follow('Change photo')
@@ -233,9 +227,9 @@ class EditPhotoWithOldPerson(TwillTests):
     #{{{
     fixtures = ['user-paulproteus', 'person-paulproteus-with-blank-photo']
     def test_set_avatar(self):
+        self.login_with_twill()
         for image in (photo('static/sample-photo.png'),
                       photo('static/sample-photo.jpg')):
-            self.login_with_twill()
             url = 'http://openhatch.org/people/paulproteus/'
             tc.go(make_twill_url(url))
             tc.follow('Change photo')
