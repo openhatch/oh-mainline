@@ -49,12 +49,9 @@ class TwillTests(django.test.TestCase):
         # Log in
         username = "paulproteus"
         password = "paulproteus's unbreakable password"
-        try:
-            tc.fv('login', 'login_username', username)
-            tc.fv('login', 'login_password', password)
-            tc.submit()
-        except:
-            pass # lol fixme
+        tc.fv('login', 'username', username)
+        tc.fv('login', 'password', password)
+        tc.submit()
 
     def login_with_client(self, username='paulproteus',
             password="paulproteus's unbreakable password"):

@@ -7,6 +7,7 @@ from django_authopenid.forms import OpenidSigninForm
 import simplejson
 from django.template import RequestContext, loader, Context
 from django.core.urlresolvers import reverse
+from django.contrib.auth.forms import AuthenticationForm
 
 import mysite.profile as profile
 import mysite.account
@@ -29,6 +30,8 @@ def homepage(request, signup_form=None,
 
     openid_signin_form = OpenidSigninForm()
 
+    old_fashioned_authentication_form = AuthenticationForm()
+
     signup_notification = login_notification = notification_id = None
     if request.GET.get('msg', None) == 'ciao':
         login_notification = "You've been logged out. Thanks for dropping in!"
@@ -49,6 +52,7 @@ def homepage(request, signup_form=None,
             'login_notification': login_notification,
             'signup_notification': signup_notification,
             'openid_signin_form': openid_signin_form,
+            'old_fashioned_authentication_form': old_fashioned_authentication_form,
             'signup_form': signup_form,
             'invitation_request_form': invitation_request_form,
             }

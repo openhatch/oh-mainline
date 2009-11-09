@@ -373,4 +373,7 @@ abbr.foss {
     margin: 10px 0;
     -moz-border-radius: 5px;
 }
+#normal_login_form li {
+    list-style: none;
+}
 .byline { font-size: 8pt; margin-top: 2px; }
