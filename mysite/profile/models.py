@@ -482,6 +482,8 @@ class Citation(models.Model):
         raise ValueError("There's no DIA and I don't know how to summarize this.")
 
     def get_languages_as_list(self):
+        if self.languages is None:
+            return []
         return [lang.strip() for lang in self.languages.split(",") if lang.strip()]
 
     def get_url_or_guess(self):
