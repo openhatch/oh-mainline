@@ -35,7 +35,7 @@ urlpatterns = patterns('',
         (r'^account/catch-me$', 'mysite.account.views.catch_me'),
         (r'^account/logout/$', 'mysite.account.views.logout'),
 
-        (r'^account/login/do$', 'mysite.account.views.login_do'),
+        (r'^account/login/do$', 'django.contrib.auth.views.login'),
         (r'^account/signup/do$', 'mysite.account.views.signup_do'),
 
         (r'^account/request_invitation/do$',

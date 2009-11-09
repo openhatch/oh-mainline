@@ -37,7 +37,7 @@ def login(request):
                                     urllib.quote(request.user.username))
     data = {}
     data['notifications'] = get_notification_from_request(request)
-    return redirect_to_login(reverse(mysite.profile.views.display_person_web, {
+    return redirect_to_login(reverse(mysite.profile.views.display_person_web, kwargs={
         'user_to_display__username': request.user.username}))
     # }}}
 

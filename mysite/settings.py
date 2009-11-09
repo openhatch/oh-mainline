@@ -137,7 +137,7 @@ cooked_data_password = 'AXQaTjp3'
 AUTH_PROFILE_MODULE = "profile.Person"
 
 LOGIN_URL = '/account/login/'
-LOGIN_REDIRECT_URL = '/account/login/'
+LOGIN_REDIRECT_URL = '/' # Landing page
 
 OHLOH_API_KEY='JeXHeaQhjXewhdktn4nUw' # This key is called "Oman testing"
                                         # at <https://www.ohloh.net/accounts/paulproteus/api_keys>
