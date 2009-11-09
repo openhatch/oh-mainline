@@ -1,0 +1,36 @@
+{% extends 'base/two_columns.html' %}
+
+{% block css %}
+{{ block.super }}
+@import url('/static/css/profile/base.css');
+{% endblock css %}
+
+{% block pagetop %}
+{{ project.name }}
+{% endblock pagetop %}
+
+{% block left %}
+<div class='module'>
+    <div class='head'>
+        <h3>About</h3>
+    </div>
+    <div class='body'>
+        information about the project
+    </div>
+</div>
+{% endblock left %}
+
+{% block main %}
+<div class='module'>
+    <div class='head'>
+        <h3>Contributors</h3>
+    </div>
+    <div class='body'>
+        contributors
+    </div>
+</div>
+{% endblock main %}
+
+{% comment %}
+vim: set ai et ts=4 sw=4 nu:
+{% endcomment %}

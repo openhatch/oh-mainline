@@ -196,6 +196,8 @@ urlpatterns = patterns('',
         (r'^people/(?P<user_to_display__username>[^/]+)[/?]$',
                 'mysite.profile.views.display_person_web'),
 
+        (r'^\+p/', include('mysite.project.urls')),
+
         (r'^\+yo_is_django_alive$', lambda x: HttpResponse('success')),
 
         )
