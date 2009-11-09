@@ -2,7 +2,7 @@
 #main .module > .head { width: 950px; }
 #main .module > .body { width: 910px; }
 #main .submodule .head h3 { font-weight: normal; font-size: 11pt; }
-#main .submodule .body { float: left; }
+#main .submodule .body { padding: 3% 5%; float: left; }
 
 /* SKINNY SUBMODULE */
 #main .submodule.skinny { width: 25%; margin-right: 20px; }

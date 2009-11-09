@@ -109,8 +109,8 @@
 #portfolio #save_all_projects { display: none; float: right; }
 
 #main .submodule .other-contributors { float: left; margin-top: 20px; font-size: 8pt; }
-#main .submodule .other-contributors li { float: left; margin-right: 2%; margin-top: 5px; width: 48%; }
+#main .submodule .other-contributors li { float: left; margin-right: 2%; margin-top: 5px; width: 120px; }
 #main .submodule .other-contributors li a { float: left; width: 50%}
-#main .submodule .other-contributors li img { float: left; margin-right: 5px; vertical-align: middle; width: 20%; }
+#main .submodule .other-contributors li img { float: left; margin-right: 5px; vertical-align: middle; width: 40px; }
 
 /* vim: set nu nowrap: */
