@@ -17,10 +17,13 @@
 #importer input[type='text'] { font-size: 15pt; width: 425px; }
 #importer input[type='text'].blur { color: #999; }
 #importer .query { float: right; }
-#importer .query [name='identifier_0'] { margin-top: 125px; }
+#importer .query [name='identifier_0'] { margin-top: -70px; }
+#importer .query [name='identifier_1'] { margin-top: -20px; }
 #importer p { color: #f4f4ff; margin-top: 40px; }
 #importer p a { color: pink; font-weight: bold; }
-#importer .foot { float: right; padding: 0; padding-top: 10px; width: 440px; }
+#main #importer .body { padding: 20px; background-color: transparent; }
+#main #importer .foot { float: right; padding: 0; padding-top: 10px; width: 440px; }
+#main #importer .foot { float: right; padding: 0; padding-top: 10px; width: 440px; }
 #importer input[type='submit'] { float: right; height: 25px; }
 #progressbar { display: none; height: 22px; width: 350px; }
 #progressbar.working .ui-progressbar-value { background-image: url('/static/css/jquery-ui-lightness/images/pbar-ani.gif'); }
@@ -79,6 +82,7 @@
 .citations-wrapper a.add:hover { color: #222; text-decoration: none; }
 .error-message { color: pink; font-weight: bold; }
 .citations-wrapper .howto { color: #111; }
+#main .citations-wrapper .howto .body { float: none ! important; }
 .citations li a { font-weight: bold; }
 .citations-wrapper .howto, .citations-wrapper .show_howto { background-color: #ffa; border: 1px solid yellow; border-radius: 6px; float: right; font-size: 8pt; margin-top: 10px; -moz-border-radius: 6px; padding: 12px; width: 200px; }
 .citations-wrapper .howto .hide_me { float: right; margin-left: 3px; padding: 5px; }
