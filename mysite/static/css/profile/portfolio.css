@@ -21,7 +21,7 @@
 #importer .query [name='identifier_1'] { margin-top: -20px; }
 #importer p { color: #f4f4ff; margin-top: 40px; }
 #importer p a { color: pink; font-weight: bold; }
-#main #importer .body { padding: 20px; background-color: transparent; }
+#main #importer .body { padding: 10px; background-color: transparent; }
 #main #importer .foot { float: right; padding: 0; padding-top: 10px; width: 440px; }
 #main #importer .foot { float: right; padding: 0; padding-top: 10px; width: 440px; }
 #importer input[type='submit'] { float: right; height: 25px; }

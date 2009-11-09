@@ -688,9 +688,11 @@ PortfolioEntry.Save.save = function () {
 
     // Do some client-side validation.
     $projectName = $pfEntry.find('input.project_name');
-    if ($projectName.val() === $projectName.attr('title')) {
-        alert("Couldn't save a project: Don't forget to type a project name!");
-        return false;
+    if ($projectName.size() === 1) {
+        if ($projectName.val() === $projectName.attr('title')) {
+            alert("Couldn't save a project: Don't forget to type a project name!");
+            return false;
+        }
     }
     PortfolioEntry.Save.postOptions.data = {
         'portfolio_entry__pk': $pfEntry.attr('portfolio_entry__pk'),
