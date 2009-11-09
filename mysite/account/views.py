@@ -29,34 +29,6 @@ from mysite.base.decorators import view
 
 applog = logging.getLogger('applog')
 
-def login(request):
-    # {{{
-    form = django.contrib.auth.forms.AuthenticationForm()
-    if request.user.is_authenticated():
-        # always, if the user is logged in, redirect to his or her profile page
-        return HttpResponseRedirect('/people/%s/' %
-                                    urllib.quote(request.user.username))
-    data = {}
-    data['notifications'] = get_notification_from_request(request)
-    return render_to_response('account/login.html', {'form': form})
-    # }}}
-
-def login_do(request):
-    # {{{
-    try:
-        username = request.POST['login_username']
-        password = request.POST['login_password']
-    except KeyError:
-        return HttpResponseServerError("Missing username or password.")
-    user = django.contrib.auth.authenticate(
-            username=username, password=password)
-    if user is not None:
-        django.contrib.auth.login(request, user)
-        return HttpResponseRedirect('/people/%s' % urllib.quote(username))
-    else:
-        return HttpResponseRedirect('/account/login/?msg=oops')
-    # }}}
-
 def signup_do(request):
     # {{{
     post = {}

@@ -51,7 +51,7 @@
                                 <li><a href='{% url mysite.base.views.homepage %}'>home</a></li>
                                 <li id='username'><a href='/people/{{ the_user.username }}/'>{{ the_user.username }}</a></li>
                                 {% else %}
-                                <li><a href='{% url mysite.account.views.login %}'>log in</a></li>
+                                <li><a href='{% url django.contrib.auth.views.login %}'>log in</a></li>
                                 <li><a href='/#create_profile'>sign up</a></li>
                                 {% endif %}
                             </ul>
