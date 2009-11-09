@@ -295,7 +295,7 @@ Keywords: Torrent unittest""")
         mock_csv_maker.return_value = StringIO("""bug_id,useless
 1,useless""")
         mysite.customs.miro.grab_miro_bugs()
-        all_bugs = Bug.objects.all()
+        all_bugs = Bug.all_bugs.all()
         self.assertEqual(len(all_bugs), 1)
         bug = all_bugs[0]
         self.assertEqual(bug.canonical_bug_link,
@@ -312,7 +312,7 @@ Keywords: Torrent unittest""")
         mysite.customs.miro.grab_miro_bugs()
 
         # Pretend there's old data lying around:
-        bug = Bug.objects.get()
+        bug = Bug.all_bugs.get()
         bug.people_involved = 1
         bug.save()
 
@@ -323,7 +323,7 @@ Keywords: Torrent unittest""")
         mysite.customs.miro.grab_miro_bugs()
 
         # Now verify there is only one bug, and its people_involved is 5
-        bug = Bug.objects.get()
+        bug = Bug.all_bugs.get()
         self.assertEqual(bug.people_involved, 5)
 
 
@@ -352,7 +352,7 @@ Keywords: Torrent unittest""")
         # Now, do a crawl and notice that we updated the bug even though the CSV is empty
         
         mysite.customs.miro.grab_miro_bugs() # refreshes no bugs since CSV is empty!
-        all_bugs = Bug.objects.all()
+        all_bugs = Bug.all_bugs.all()
         self.assertEqual(len(all_bugs), 1)
         bug = all_bugs[0]
         self.assertEqual(bug.people_involved, 5)

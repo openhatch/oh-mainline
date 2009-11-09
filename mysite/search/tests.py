@@ -49,7 +49,7 @@ class AutoCompleteTests(SearchTest):
         SearchTest.setUp(self)
         self.project_chat = Project.objects.create(name='ComicChat', language='C++')
         self.project_kazaa = Project.objects.create(name='Kazaa', language='Vogon')
-        self.bug_in_chat = Bug.objects.create(project=self.project_chat,
+        self.bug_in_chat = Bug.all_bugs.create(project=self.project_chat,
                 people_involved=2,
                 date_reported=datetime.date(2009, 4, 1),
                 last_touched=datetime.date(2009, 4, 2),
@@ -158,12 +158,12 @@ class SearchResultsSpecificBugs(SearchTest):
         # Remember, a canonical bug meets ONLY ONE criterion.
         # Assert there's just one canonical bug per criterion.
         for cf in self.canonical_filters:
-            matches = Bug.objects.filter(self.no_canonical_filters(except_one=cf))[:]
+            matches = Bug.all_bugs.filter(self.no_canonical_filters(except_one=cf))[:]
             self.failUnlessEqual(len(matches), 1,
                     "There are %d, not 1, canonical bug(s) for the filter %s" % (len(matches), cf))
 
         # Assert there's at least one canonical nonmatch.
-        canonical_non_matches = Bug.objects.filter(self.no_canonical_filters())
+        canonical_non_matches = Bug.all_bugs.filter(self.no_canonical_filters())
         self.assert_(len(canonical_non_matches) > 1)
 
     def test_search_single_query(self):
@@ -171,9 +171,9 @@ class SearchResultsSpecificBugs(SearchTest):
         response = self.client.get('/search/', {'language': 'python'})
         returned_bugs = response.context[0]['bunch_of_bugs']
         for cf in self.canonical_filters:
-            self.failUnless(Bug.objects.filter(cf)[0] in returned_bugs, "Search engine did not correctly use the filter %s" % cf)
+            self.failUnless(Bug.all_bugs.filter(cf)[0] in returned_bugs, "Search engine did not correctly use the filter %s" % cf)
 
-        for bug in Bug.objects.filter(self.no_canonical_filters()):
+        for bug in Bug.all_bugs.filter(self.no_canonical_filters()):
             self.failIf(bug in returned_bugs, "Search engine returned a false positive: %s." % bug)
 
     def test_search_two_queries(self):
@@ -182,8 +182,8 @@ class SearchResultsSpecificBugs(SearchTest):
         title_of_bug_to_exclude = "This shouldn't be in the results for [pyt*hon 'An interesting description']."
 
         # If either of these bugs aren't there, then this test won't work properly.
-        self.assert_(len(list(Bug.objects.filter(title=title_of_bug_to_include))) == 1)
-        self.assert_(len(list(Bug.objects.filter(title=title_of_bug_to_exclude))) == 1)
+        self.assert_(len(list(Bug.all_bugs.filter(title=title_of_bug_to_include))) == 1)
+        self.assert_(len(list(Bug.all_bugs.filter(title=title_of_bug_to_exclude))) == 1)
 
         response = self.client.get('/search/',
                                    {'language': 'python "An interesting description"'})
@@ -233,7 +233,7 @@ class SearchResults(TwillTests):
         tc.submit()
 
         # Grab descriptions of first 10 Exaile bugs
-        bugs = Bug.objects.filter(project__name=
+        bugs = Bug.all_bugs.filter(project__name=
                                   'Exaile').order_by('-last_touched')[:10]
 
         for bug in bugs:
@@ -243,7 +243,7 @@ class SearchResults(TwillTests):
         tc.follow('Next')
 
         # Grab descriptions of next 10 Exaile bugs
-        bugs = Bug.objects.filter(project__name=
+        bugs = Bug.all_bugs.filter(project__name=
                                   'Exaile').order_by('-last_touched')[10:20]
 
         for bug in bugs:
@@ -257,7 +257,7 @@ class SearchResults(TwillTests):
         tc.submit()
 
         # Grab descriptions of first 10 Exaile bugs
-        bugs = Bug.objects.filter(project__name=
+        bugs = Bug.all_bugs.filter(project__name=
                                   'Exaile').order_by('-last_touched')[:10]
 
         for bug in bugs:
@@ -267,7 +267,7 @@ class SearchResults(TwillTests):
         tc.follow('Next')
 
         # Grab descriptions of next 10 Exaile bugs
-        bugs = Bug.objects.filter(project__name=
+        bugs = Bug.all_bugs.filter(project__name=
                                   'Exaile').order_by('-last_touched')[10:20]
 
         for bug in bugs:
@@ -278,7 +278,7 @@ class SearchResults(TwillTests):
         tc.submit()
 
         # Grab descriptions of first 10 GNOME-Do bugs
-        bugs = Bug.objects.filter(project__name=
+        bugs = Bug.all_bugs.filter(project__name=
                                   'GNOME-Do').order_by(
             '-last_touched')[:10]
 
@@ -300,14 +300,14 @@ class AutoCrawlTests(SearchTest):
     def testSearch(self):
         # Verify that we can't find a bug with the right description
         self.assertRaises(mysite.search.models.Bug.DoesNotExist,
-                          mysite.search.models.Bug.objects.get,
+                          mysite.search.models.Bug.all_bugs.get,
                           title="Joi's Lab AFS")
         # Now get all the bugs about rose
         mysite.search.launchpad_crawl.grab_lp_bugs(lp_project='rose',
                                             openhatch_project=
                                             'rose.makesad.us')
         # Now see, we have one!
-        b = mysite.search.models.Bug.objects.get(title="Joi's Lab AFS")
+        b = mysite.search.models.Bug.all_bugs.get(title="Joi's Lab AFS")
         self.assertEqual(b.project.name, 'rose.makesad.us')
         # Ta-da.
         return b
@@ -341,7 +341,7 @@ class LaunchpadImporterTests(SearchTest):
         # Create the bug...
         mysite.search.launchpad_crawl.handle_launchpad_bug_update(query_data, new_data)
         # Verify that the bug was stored.
-        bug = Bug.objects.get(canonical_bug_link=
+        bug = Bug.all_bugs.get(canonical_bug_link=
                                        query_data['canonical_bug_link'])
         for key in new_data:
             self.assertEqual(getattr(bug, key), new_data[key])
@@ -353,7 +353,7 @@ class LaunchpadImporterTests(SearchTest):
                                                                  new_data)
         # Do a get; this will explode if there's more than one with the
         # canonical_bug_link, so it tests duplicate finding.
-        bug = Bug.objects.get(canonical_bug_link=
+        bug = Bug.all_bugs.get(canonical_bug_link=
                                        query_data['canonical_bug_link'])
 
         for key in new_data:
