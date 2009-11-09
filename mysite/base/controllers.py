@@ -1,10 +1,15 @@
+from django.core.urlresolvers import reverse
+import django.contrib.auth.views
+
 notifications_dictionary = {
         "edit_password_done":
         "Your password has been changed.",
 
         "oops":
         """Couldn't find that pair of username and password.
-        Did you type your password correctly?""",
+        Did you type your password correctly?"""
+        "<a href='/account/forgot_pass/'>"
+        "Click here if you forgot your password</a>",
 
         "next":
         "You've got to be logged in to do that!",
