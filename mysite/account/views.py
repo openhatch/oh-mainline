@@ -4,7 +4,7 @@ from django.shortcuts import render_to_response, get_object_or_404, get_list_or_
 import django.contrib.auth 
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-import mock
+from django.contrib.auth.views import redirect_to_login
 from django_authopenid.forms import OpenidSigninForm
 from django.core.urlresolvers import reverse
 
@@ -12,12 +12,13 @@ from invitation.forms import InvitationKeyForm
 from invitation.models import InvitationKey
 
 import urllib
+import mock
 import logging
-
 
 from mysite.account.forms import InvitationRequestForm
 import mysite.base.views
 import mysite.base.controllers
+from mysite.base.controllers import get_notification_from_request
 from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag, Link_Project_Tag, Link_SF_Proj_Dude_FM, Link_Person_Tag, DataImportAttempt
 
 # FIXME: We did this because this decorator used to live here
@@ -31,13 +32,13 @@ applog = logging.getLogger('applog')
 def login(request):
     # {{{
     if request.user.is_authenticated():
-        # always, if the user is logged in, redirect to his profile page
+        # always, if the user is logged in, redirect to his or her profile page
         return HttpResponseRedirect('/people/%s/' %
                                     urllib.quote(request.user.username))
     data = {}
-    data['notifications'] = mysite.base.controllers.get_notification_from_request(
-            request)
-    return render_to_response('account/login.html', data)
+    data['notifications'] = get_notification_from_request(request)
+    return redirect_to_login(reverse(mysite.profile.views.display_person_web, {
+        'user_to_display__username': request.user.username}))
     # }}}
 
 def login_do(request):
