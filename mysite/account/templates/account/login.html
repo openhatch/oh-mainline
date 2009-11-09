@@ -16,15 +16,8 @@ Log in
     </div>
     <div class='body'>
         <form name='login'
-            action='/account/login/do' method='POST'>
-            <div class='form-row'>
-                <label for='login_username'>Username</label>
-                <input type='text' id='login_username' name='login_username' />
-            </div>
-            <div class='form-row'>
-                <label for='login_password'>Password</label>
-                <input type='password' id='login_password' name='login_password' />
-            </div>
+            action='/account/login/do?next={{ next }}' method='POST'>
+            {{ form.as_ul }}
             <div class='form-row'>
                 <input type='submit' value='Log in' style='' />
             </div>

@@ -3,9 +3,10 @@ form {
     float: left;
     width: 420px;
 }
-form p, .form-row {
+form p, .form-row, form li {
     float: left;
     width: 400px;
+    list-style: none;
 }
 label {
     float: left;

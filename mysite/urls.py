@@ -25,7 +25,6 @@ urlpatterns = patterns('',
 
         (r'^people/$', 'mysite.profile.views.display_list_of_people'),
 
-        (r'^account/login/$', 'mysite.account.views.login'),
         (r'^account/forgot_pass/$',
             'django.contrib.auth.views.password_reset', {
                 'template_name': 'account/password_reset.html',
@@ -35,7 +34,9 @@ urlpatterns = patterns('',
         (r'^account/catch-me$', 'mysite.account.views.catch_me'),
         (r'^account/logout/$', 'mysite.account.views.logout'),
 
-        (r'^account/login/do$', 'django.contrib.auth.views.login'),
+        (r'^thisdoesntmatter$', 'mysite.account.views.login'),
+        (r'^account/login/$', 'django.contrib.auth.views.login', {'template_name': 'account/login.html'}),
+        (r'^account/login/do$', 'django.contrib.auth.views.login', {'template_name': 'account/login.html'}),
         (r'^account/signup/do$', 'mysite.account.views.signup_do'),
 
         (r'^account/request_invitation/do$',

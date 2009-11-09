@@ -31,14 +31,14 @@ applog = logging.getLogger('applog')
 
 def login(request):
     # {{{
+    form = django.contrib.auth.forms.AuthenticationForm()
     if request.user.is_authenticated():
         # always, if the user is logged in, redirect to his or her profile page
         return HttpResponseRedirect('/people/%s/' %
                                     urllib.quote(request.user.username))
     data = {}
     data['notifications'] = get_notification_from_request(request)
-    return redirect_to_login(reverse(mysite.profile.views.display_person_web, kwargs={
-        'user_to_display__username': request.user.username}))
+    return render_to_response('account/login.html', {'form': form})
     # }}}
 
 def login_do(request):
@@ -94,7 +94,6 @@ def signup(request, signup_form=None, invite_code=''):
     return render_to_response('account/signup.html',
                               {'form': signup_form})
     # }}}
-
 
 def logout(request):
     # {{{
