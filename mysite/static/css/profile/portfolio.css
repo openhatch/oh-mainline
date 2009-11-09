@@ -106,6 +106,7 @@
 .portfolio_entry .actions .portfolio_entry_is_unpublished { display: none; }
 .portfolio_entry.unpublished .actions .portfolio_entry_is_unpublished { display: block; font-weight: bold; left: -22px; position: relative; }
 #portfolio.viewer .portfolio_entry .submodule { background: #fff url('/static/images/profile/portfolio/portfolio-entry-bg.png') repeat-y; }
+#portfolio #save_all_projects { display: none; float: right; }
 
 #main .submodule .other-contributors { float: left; margin-top: 20px; font-size: 8pt; }
 #main .submodule .other-contributors li { float: left; margin-right: 2%; margin-top: 5px; width: 48%; }

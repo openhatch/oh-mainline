@@ -29,17 +29,6 @@ tester = fireunit;
 //tester = QUnitRunner;
 //tester = StupidRunner;
 
-$.fn.getHandler = function(handler) {
-    var real_obj = this[0];
-    var handler_meta_array = $.data(real_obj, "events");
-    for (var key in handler_meta_array) {
-        if (key == handler) {
-            return handler_meta_array[key];
-        }
-    }
-    return false;
-}
-
 $.fn.smartTrigger = function(handlerName) {
     tester.ok(this.getHandler(handlerName), "the thing has expected handler");
     this.trigger(handlerName);

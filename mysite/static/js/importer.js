@@ -314,7 +314,7 @@ function updatePortfolio(response) {
    
     /* Now fill in the template */
     
-    if (response.portfolio_entries.length == 0) {
+    if (response.portfolio_entries.length === 0) {
         $('#portfolio_entries .apologies').show();
     }
     for (var i = 0; i < response.portfolio_entries.length; i++) {
@@ -427,6 +427,8 @@ function updatePortfolio(response) {
             Notifier.displayMessage(response.messages[m]);
         };
     }
+
+    SaveAllButton.updateDisplay();
 
 };
 
@@ -648,6 +650,7 @@ PortfolioEntry.bindEventHandlers = function() {
 pfEntryFieldKeydownHandler = function () {
     var $textarea = $(this);
     $textarea.closest('.portfolio_entry').not('.unpublished, .unsaved').addClass('unsaved');
+    SaveAllButton.updateDisplay();
 };
 
 PortfolioEntry.Save = {};
@@ -680,7 +683,15 @@ PortfolioEntry.Save.post = function () {
 };
 PortfolioEntry.Save.save = function () {
     $saveLink = $(this);
+
     $pfEntry = $saveLink.closest('.portfolio_entry');
+
+    // Do some client-side validation.
+    $projectName = $pfEntry.find('input.project_name');
+    if ($projectName.val() === $projectName.attr('title')) {
+        alert("Couldn't save a project: Don't forget to type a project name!");
+        return false;
+    }
     PortfolioEntry.Save.postOptions.data = {
         'portfolio_entry__pk': $pfEntry.attr('portfolio_entry__pk'),
         'project_name': $pfEntry.find('.project_name').val(),
@@ -713,6 +724,7 @@ PortfolioEntry.Delete.postOptions.success = function (response) {
     $portfolioEntry = $('#portfolio_entry_'+pk);
     $portfolioEntry.hide();
     Notifier.displayMessage('Portfolio entry deleted.');
+    SaveAllButton.updateDisplay();
 };
 PortfolioEntry.Delete.postOptions.error = function (response) {
     Notifier.displayMessage('Oh snap! We failed to delete your PortfolioEntry.');
@@ -879,7 +891,7 @@ PortfolioEntry.Add.clickHandler = function () {
     $add_a_pf_entry = $(html);
     $add_a_pf_entry.attr('id', generateUniqueID());
     $('#portfolio_entries').prepend($add_a_pf_entry);
-    $add_a_pf_entry.hide().fadeIn();
+    $add_a_pf_entry.hide().fadeIn(SaveAllButton.updateDisplay);
     PortfolioEntry.bindEventHandlers();
     $add_a_pf_entry.find('input[title]').hint();
     return false;
@@ -889,5 +901,45 @@ PortfolioEntry.Add.bindEventHandlers = function () {
 };
 
 $(PortfolioEntry.Add.init);
+
+$.fn.getHandler = function(handler) {
+    var real_obj = this[0];
+    var handler_meta_array = $.data(real_obj, "events");
+    for (var key in handler_meta_array) {
+        if (key == handler) {
+            return handler_meta_array[key];
+        }
+    }
+    return false;
+}
+
+
+SaveAllButton = {};
+SaveAllButton.updateDisplay = function () {
+    $saveAllButton = $('button#save_all_projects');
+    if ($('#portfolio .portfolio_entry:visible').size() === 0) {
+        $saveAllButton.hide();
+    }
+    else {
+        $saveAllButton.show();
+    }
+    if (SaveAllButton.getAllProjects().size() === 0) {
+        $saveAllButton.attr('disabled', 'disabled');
+    }
+    else {
+        $saveAllButton.removeAttr('disabled');
+    }
+    if (!$saveAllButton.getHandler('click')) {
+        $saveAllButton.click(SaveAllButton.saveAll);
+    }
+};
+SaveAllButton.getAllProjects = function() {
+    return $('#portfolio .portfolio_entry.unsaved, #portfolio .portfolio_entry.unpublished');
+    };
+SaveAllButton.saveAll = function() {
+    SaveAllButton.getAllProjects().each(function () {
+            $(this).find('.publish_portfolio_entry:visible a').trigger('click');
+            });
+};
 
 // vim: set nu:
