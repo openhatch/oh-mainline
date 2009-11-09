@@ -74,8 +74,7 @@ class ProfileTests(TwillTests):
         # {{{
         self.login_with_twill()
 
-        # Assert we're on profile page.
-        tc.url('/people/paulproteus')
+        tc.go(make_twill_url('http://openhatch.org/people/paulproteus'))
 
         # No named entered yet
         tc.notfind('Newfirst Newlast')
@@ -114,135 +113,10 @@ class DebTagsTests(TwillTests):
 
 # If you're looking for SourceForge and FLOSSMole stuff, look in the repository history.
 
-# FIXME: Remove this dead code.
-class ProjectExpTests(TwillTests):
+class Info(TwillTests):
     # {{{
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry',
             'person-paulproteus', 'cchost-data-imported-from-ohloh']
-
-    def projectexp_add(self, project__name, project_exp__description, project_exp__url, tc_dot_url_should_succeed=True):
-        """Paulproteus can login and add a projectexp to bumble."""
-        # {{{
-        self.login_with_twill()
-
-        tc.go(make_twill_url('http://openhatch.org/form/projectexp_add'))
-        tc.fv('projectexp_add', 'project_name', project__name)
-        tc.fv('projectexp_add', 'involvement_description', project_exp__description)
-        tc.fv('projectexp_add', 'citation_url', project_exp__url)
-        tc.submit()
-
-        tc_url_matched = None
-        try:
-            tc.url('/people/.*/projects/')
-            tc_url_matched = True
-        except twill.errors.TwillAssertionError, e:
-            tc_url_matched = False
-
-        if tc_dot_url_should_succeed:
-            assert tc_url_matched
-        else:
-            assert not tc_url_matched
-
-        tc.find(project__name)
-        tc.find(project_exp__description)
-        tc.find(project_exp__url)
-        # }}}
-
-    def test_projectexp_delete_unauthorized(self):
-        '''Barry tries to delete a ProjectExp he doesn't own and fails.'''
-        # {{{
-
-        # Meet Barry, a shady character.
-        barry = User.objects.get(username='barry')
-        barry_password = 'parallelism'
-        client = Client()
-        login_success = client.login( username=barry.username, 
-                password=barry_password)
-        self.assert_(login_success)
-
-        # Barry doesn't own ProjectExp #13
-        self.assertNotEqual( barry,
-                ProjectExp.objects.get(id=13).person.user)
-
-        # What happens if he tries to delete ProjectExp #13
-        deletion_handler_url = reverse(
-                mysite.profile.views.projectexp_edit_do,
-                kwargs={'project__name': 'ccHost'})
-        response = client.post(deletion_handler_url,
-                {'0-project_exp_id': '13', '0-delete_this': 'on'})
-
-        # Still there, Barry. Keep on truckin'.
-        self.assert_(ProjectExp.objects.get(id=13))
-
-        # }}}
-
-    def test_projectexp_delete_web(self):
-        '''Notorious user of OpenHatch, paulproteus, can log in and remove the word 'ccHost' from his profile by clicking the appropriate delete button.'''
-        # {{{
-
-        self.login_with_twill()
-
-        # Load up the ProjectExp edit page.
-        project_name = 'ccHost'
-        exp_url = 'http://openhatch.org/people/paulproteus/projects/%s' % (
-                urllib.quote(project_name))
-        tc.go(make_twill_url(exp_url))
-
-        # See! It talks about ccHost!
-        tc.find(project_name)
-
-        # Click the correct delete button...
-        tc.config('readonly_controls_writeable', True)
-        tc.fv('delete-projectexp-13', 'id', '13')   # Bring twill's attention
-                                                    # to the form named
-                                                    # ``delete-projectexp-13''.
-        tc.submit()
-
-        # FIXME: What page are we on now?
-
-        # Alakazam! It's gone.
-        tc.notfind('ccHost')
-        # }}}
-
-    def test_projectexp_edit(self):
-        """Paulproteus can edit information about his project experiences."""
-        # {{{
-        self.login_with_twill()
-
-        # Let's go edit info about a project experience.
-        editor_url = reverse(mysite.profile.views.projectexp_edit,
-                kwargs={'project__name': 'ccHost'})
-        tc.go(make_twill_url(editor_url))
-        
-        # Let's fill in the text fields like pros.
-        tc.fv('1', '0-involvement_description', 'ze description')
-        tc.fv('1', '0-citation_url', 'ze-u.rl')
-        tc.fv('1', '0-man_months', '13')
-        tc.fv('1', '0-primary_language', 'tagalogue')
-        tc.fv('1', '0-delete_this', 'off')
-        tc.submit()
-
-        exp = ProjectExp.objects.get(project__name='ccHost')
-        self.assertEqual(exp.description, 'ze description')
-        self.assertEqual(exp.url, 'http://ze-u.rl/')
-        self.assertEqual(exp.man_months, 13)
-        self.assertEqual(exp.primary_language, 'tagalogue')
-        self.assert_(exp.modified)
-        # }}}
-
-    def test_person_involvement_description(self):
-        # {{{
-        self.login_with_twill()
-        username = 'paulproteus'
-        project_name = 'ccHost'
-        url = 'http://openhatch.org/people/%s/projects/%s' % (
-                urllib.quote(username), urllib.quote(project_name))
-        tc.go(make_twill_url(url))
-        tc.find('1 month')
-        tc.find('shell script')
-        # }}}
-
-    # FIXME: Move these next two functions to their proper home.
 
     tags = {
             'understands': ['ack', 'b', 'c'],
