@@ -77,7 +77,7 @@
                 <ul id='notifications'>
                     {% block notifications %}
                     {% for notification in notifications %}
-                    <li class='alert' id='{{ notification.id }}'><div>{{ notification.text }}</div></li>
+                    <li class='alert' id='{{ notification.id }}'><div>{{ notification.text|safe }}</div></li>
                     {% endfor %}
                     {% endblock %}
                 </ul>

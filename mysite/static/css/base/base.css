@@ -300,17 +300,13 @@ input[type='submit'] {
     float: left;
 }
 .alert {
-    float: left;
-    width: 1000px;
-    text-align: center;
     padding: 15px 0;
 }
 .alert div {
-    display: inline;
-    background-color: #fca;
+    background-color: #ffa;
     color: #444;
     padding: 8px 15px;
-    width: 250px;
+    width: 700px;
     font-size: 11pt;
     -moz-border-radius: 5px;
 }
@@ -360,8 +356,8 @@ abbr.foss {
     margin-bottom: 10px;
 }
 #notifications {
+    text-align: center;
     float: left;
-    margin-top: 10px;
 }
 .errorlist ul {
     float: left;

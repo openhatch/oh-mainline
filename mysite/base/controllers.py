@@ -6,10 +6,9 @@ notifications_dictionary = {
         "Your password has been changed.",
 
         "oops":
-        """Couldn't find that pair of username and password.
-        Did you type your password correctly?"""
+        """Couldn't find that pair of username and password. """
         "<a href='/account/forgot_pass/'>"
-        "Click here if you forgot your password</a>",
+        "Click here if you forgot your password.</a>",
 
         "next":
         "You've got to be logged in to do that!",
