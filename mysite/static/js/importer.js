@@ -881,6 +881,7 @@ PortfolioEntry.Add.clickHandler = function () {
     $('#portfolio_entries').prepend($add_a_pf_entry);
     $add_a_pf_entry.hide().fadeIn();
     PortfolioEntry.bindEventHandlers();
+    $add_a_pf_entry.find('input[title]').hint();
     return false;
 };
 PortfolioEntry.Add.bindEventHandlers = function () {
