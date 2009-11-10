@@ -258,7 +258,7 @@ class Ohloh(object):
         username = parts[1]
         return username
 
-    def get_contribution_info_by_ohloh_username(self, ohloh_username):
+    def get_contribution_info_by_ohloh_username(self, ohloh_username, person=None):
         # FIXME: This doesn't return any WebResponse. How sad.
         # In branch pf2_with_webresponse_m2m, we are working on linking DIAs with multiple WebResponses,
         # after which we intend to return a list of WebResponses, or something like that.
