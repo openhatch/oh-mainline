@@ -300,6 +300,27 @@ Keywords: Torrent unittest""")
         bug = all_bugs[0]
         self.assertEqual(bug.canonical_bug_link,
                          'http://bugzilla.pculture.org/show_bug.cgi?id=2294')
+        self.assertFalse(bug.looks_closed)
+
+        # And the new manager doesn't find it
+        self.assertEqual(Bugs.open_ones.all().count(), 0)
+
+
+    @mock.patch("mysite.customs.miro.open_xml_url")
+    @mock.patch("mysite.customs.miro.bitesized_bugs_csv_fd")
+    def test_full_grab_resolved_miro_bug(self, mock_csv_maker, mock_xml_opener):
+        mock_xml_opener.return_value = open(os.path.join(
+            settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06-RESOLVED.xml'))
+
+        mock_csv_maker.return_value = StringIO("""bug_id,useless
+1,useless""")
+        mysite.customs.miro.grab_miro_bugs()
+        all_bugs = Bug.all_bugs.all()
+        self.assertEqual(len(all_bugs), 1)
+        bug = all_bugs[0]
+        self.assertEqual(bug.canonical_bug_link,
+                         'http://bugzilla.pculture.org/show_bug.cgi?id=2294')
+        self.assert_(bug.looks_closed)
 
     @mock.patch("mysite.customs.miro.open_xml_url")
     @mock.patch("mysite.customs.miro.bitesized_bugs_csv_fd")
