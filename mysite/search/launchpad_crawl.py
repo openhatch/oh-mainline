@@ -54,7 +54,7 @@ def handle_launchpad_bug_update(query_data, new_data):
     real_query_data.update(query_data)
     real_query_data['project'], _ = Project.objects.get_or_create(
         name=query_data['project'])
-    bug, created = Bug.objects.get_or_create(defaults=new_data,
+    bug, created = Bug.all_bugs.get_or_create(defaults=new_data,
                                              **real_query_data)
     if created:
         return bug # nothing to do!

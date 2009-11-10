@@ -48,7 +48,7 @@ def split_query_words(string):
 def get_bugs_by_query_words(query_words):
     """Get bugs matching any of the words in 'query_words'."""
 
-    bugs = Bug.objects.all()
+    bugs = Bug.open_ones.all()
 
     # Filter
     for word in query_words:

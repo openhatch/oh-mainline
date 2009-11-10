@@ -1,10 +1,10 @@
 [
- {"pk": 0, "model": "profile.portfolioentry", "fields": {"project": 3, "person": 1, "is_published": 1}},
- {"pk": 14, "model": "profile.citation", "fields": {"is_published": 1, "distinct_months": 1, "url": null, "languages": "Python", "portfolio_entry": 0,  "contributor_role": ""}},
- {"pk": 15, "model": "profile.citation", "fields": {"is_published": 1, "distinct_months": 1, "url": null, "languages": "C#", "portfolio_entry": 0,  "contributor_role": ""}},
- {"pk": 16, "model": "profile.citation", "fields": {"is_published": 1, "distinct_months": 1, "url": null, "languages": "C++", "portfolio_entry": 0,  "contributor_role": ""}},
- {"pk": 17, "model": "profile.citation", "fields": {"is_published": 1, "distinct_months": 1, "url": null, "languages": "XUL", "portfolio_entry": 0,  "contributor_role": ""}},
- {"pk": 19, "model": "profile.citation", "fields": {"is_published": 1, "distinct_months": 1, "url": null, "languages": "Automake", "portfolio_entry": 0,  "contributor_role": ""}},
- {"pk": 20, "model": "profile.citation", "fields": {"is_published": 1, "distinct_months": 1, "url": null, "languages": "Make", "portfolio_entry": 0,  "contributor_role": ""}},
- {"pk": 21, "model": "profile.citation", "fields": {"is_published": 1, "distinct_months": 1, "url": null, "languages": "shell script", "portfolio_entry": 0,  "contributor_role": ""}}
+ {"pk": 1, "model": "profile.portfolioentry", "fields": {"project": 3, "person": 1, "is_published": 1}},
+ {"pk": 14, "model": "profile.citation", "fields": {"is_published": 1, "distinct_months": 1, "url": null, "languages": "Python", "portfolio_entry": 1,  "contributor_role": ""}},
+ {"pk": 15, "model": "profile.citation", "fields": {"is_published": 1, "distinct_months": 1, "url": null, "languages": "C#", "portfolio_entry": 1,  "contributor_role": ""}},
+ {"pk": 16, "model": "profile.citation", "fields": {"is_published": 1, "distinct_months": 1, "url": null, "languages": "C++", "portfolio_entry": 1,  "contributor_role": ""}},
+ {"pk": 17, "model": "profile.citation", "fields": {"is_published": 1, "distinct_months": 1, "url": null, "languages": "XUL", "portfolio_entry": 1,  "contributor_role": ""}},
+ {"pk": 19, "model": "profile.citation", "fields": {"is_published": 1, "distinct_months": 1, "url": null, "languages": "Automake", "portfolio_entry": 1,  "contributor_role": ""}},
+ {"pk": 20, "model": "profile.citation", "fields": {"is_published": 1, "distinct_months": 1, "url": null, "languages": "Make", "portfolio_entry": 1,  "contributor_role": ""}},
+ {"pk": 21, "model": "profile.citation", "fields": {"is_published": 1, "distinct_months": 1, "url": null, "languages": "shell script", "portfolio_entry": 1,  "contributor_role": ""}}
 ]
