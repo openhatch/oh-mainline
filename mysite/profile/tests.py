@@ -74,8 +74,8 @@ class ProfileTests(TwillTests):
         # {{{
         self.login_with_twill()
 
-        # Assert we're on profile page.
-        tc.url('/people/paulproteus')
+        # Let's go to the profile page.
+        tc.go('/people/paulproteus')
 
         # No named entered yet
         tc.notfind('Newfirst Newlast')
