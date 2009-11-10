@@ -490,10 +490,13 @@ class Citation(models.Model):
         if self.url:
             return self.url
         else:
-            if self.data_import_attempt and (
-                    self.data_import_attempt.source in ['rs', 'ou']):
-                return "http://www.ohloh.net/search?%s" % urllib.urlencode(
-                        {'q': self.portfolio_entry.project.name.encode('utf-8')})
+            if self.data_import_attempt:
+                if self.data_import_attempt.source in ['rs', 'ou']:
+                    return "http://www.ohloh.net/search?%s" % urllib.urlencode(
+                            {'q': self.portfolio_entry.project.name.encode('utf-8')})
+                elif self.data_import_attempt.source == 'lp':
+                    return "https://launchpad.net/~%s" % urllib.quote(
+                            self.data_import_attempt.query)
 
     def save_and_check_for_duplicates(self):
         # FIXME: Cache summaries in the DB so this query is faster.
