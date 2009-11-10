@@ -88,7 +88,7 @@ def rs_action(dia):
 def ou_action(dia):
     oh = ohloh.get_ohloh()
     data, web_response = oh.get_contribution_info_by_ohloh_username(
-            dia.query)
+            dia.query, person=dia.person)
     dia.web_response = web_response
     dia.save()
     return data
