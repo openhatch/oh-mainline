@@ -55,7 +55,9 @@ Home
     </div>
     <div class='body'>
         {% if recommended_bugs %}
-        <p>Based on the projects you've worked on and the languages you know, we recommend you check out these bugs.</p>
+        <p>Based on the projects you've worked on
+        and the languages you know, we recommend
+        you check out these bugs.</p>
         <ul>
             {% for bug in recommended_bugs %}
             <li><span><a style='font-weight: bold;' href='{{ bug.canonical_bug_link }}'>{{ bug.title }}</a> in&nbsp;{{ bug.project.name }}</span></li>
