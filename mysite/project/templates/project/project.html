@@ -1,32 +1,45 @@
-{% extends 'base/two_columns.html' %}
+{% extends 'base/one_column.html' %}
 
 {% block css %}
 {{ block.super }}
 @import url('/static/css/profile/base.css');
 {% endblock css %}
 
-{% block pagetop %}
-{{ project.name }}
-{% endblock pagetop %}
-
-{% block left %}
-<div class='module'>
-    <div class='head'>
-        <h3>About</h3>
-    </div>
-    <div class='body'>
-        information about the project
-    </div>
-</div>
-{% endblock left %}
-
 {% block main %}
-<div class='module'>
+<style type='text/css'>
+    #contributors li a {
+        margin: 0 20px 10px 0;
+        float: left;
+        height: 51px;
+        width: 200px;
+        overflow: hidden;
+    }
+    #contributors img {
+        float: left;
+        margin-right: 15px;
+        width: 40px;
+    }
+    #contributors li a span {
+        width: 145px;
+        float: left;
+        padding-top: 15px;
+    }
+</style>
+<div class='module' id='contributors'>
     <div class='head'>
-        <h3>Contributors</h3>
+        <h3>Contributors to {{ project.name }}</h3>
     </div>
     <div class='body'>
-        contributors
+        <ul>
+            {% for person in contributors %}
+            <li>
+            <a href='{% url mysite.profile.views.display_person_web person.user.username %}'>
+                <img src='{{ person.get_photo_thumbnail_url_or_default }}'>
+                <span>{{ person.get_full_name_or_username }}</span>
+            </a>
+            </li>
+            {% endfor %}
+        </ul>
     </div>
 </div>
 {% endblock main %}

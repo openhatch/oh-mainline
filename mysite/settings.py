@@ -102,6 +102,7 @@ SESSION_ENGINE="django.contrib.sessions.backends.file"
 INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
+    'django.contrib.humanize',
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.webdesign',

@@ -5,4 +5,9 @@ from django.shortcuts import render_to_response, get_object_or_404, get_list_or_
 
 def project(request, project__name = None):
     p = Project.objects.get(name=project__name)
-    return render_to_response('project/project.html', {'project': p})
+    return render_to_response('project/project.html',
+            {
+                'project': p,
+                'contributors': p.get_contributors()
+                }
+            )

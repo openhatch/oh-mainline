@@ -1,6 +1,9 @@
+{% load profile_extras %}
+{% load humanize %}
 {% if contributors %}
 <div class='other-contributors'>
-    <label>Other contributors:</label>
+    {% with project.get_contributors|length|add:"-1" as contributor_count %}
+    <label>{{ contributor_count|apnumber|title }} other pe{{contributors|pluralize:"rson,ople"}} collaborated with {% firstof user.first_name user.username %} on this project:</label>
     <ul>
         {% for contributor in contributors %}
         <li>
@@ -11,6 +14,10 @@
         </li>
         {% endfor %}
     </ul>
+    <a class='see-all'
+        href='{% url mysite.project.views.project project.name %}'
+        >See all &raquo;</a>
+    {% endwith %}
 </div>
 {% endif %}
 {# vim: set filetype=htmldjango: #}

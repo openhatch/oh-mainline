@@ -133,6 +133,7 @@ class Project(models.Model):
         return [pf_entry.person for pf_entry in pf_entries]
 
     def get_n_other_contributors_than(self, n, person):
+        # FIXME: Use the method above.
         from mysite.profile.models import PortfolioEntry
         pf_entries = list(PortfolioEntry.objects.filter(Q(project=self),
                 ~Q(person=person),

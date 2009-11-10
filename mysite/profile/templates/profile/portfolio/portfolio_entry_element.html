@@ -51,7 +51,7 @@
             </div>
             {% if not edit_mode and not adding_mode %}
             {# We're in view mode #}
-            {% show_other_contributors pf_entry.project person.user 6 %}
+            {% show_other_contributors pf_entry.project person.user 4 %}
             {% endif %}
         </div>
         {% with pf_entry.get_published_citations as citations %}
