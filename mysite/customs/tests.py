@@ -302,8 +302,8 @@ Keywords: Torrent unittest""")
                          'http://bugzilla.pculture.org/show_bug.cgi?id=2294')
         self.assertFalse(bug.looks_closed)
 
-        # And the new manager doesn't find it
-        self.assertEqual(Bugs.open_ones.all().count(), 0)
+        # And the new manager does find it
+        self.assertEqual(Bug.open_ones.all().count(), 1)
 
 
     @mock.patch("mysite.customs.miro.open_xml_url")
