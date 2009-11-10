@@ -40,10 +40,8 @@
                 {% endif %}
             </div>
             <div class='project_description-wrapper'>
-                {% if pf_entry.experience_description or edit_mode %}
-                <label>project description</label>
-                {% endif %}
                 {% if edit_mode %}
+                <label>project description</label>
                 <textarea class='project_description'></textarea>
                 {% else %}
                 <div class='project_description'>{{ pf_entry.project_description }}</div>
