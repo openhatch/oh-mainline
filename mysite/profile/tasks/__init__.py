@@ -80,7 +80,7 @@ def create_citations_from_launchpad_results(dia_id, lp_results):
 def rs_action(dia):
     oh = ohloh.get_ohloh()
     data, web_response = oh.get_contribution_info_by_username(
-            dia.query, dia.person)
+            dia.query, person=dia.person)
     dia.web_response = web_response
     dia.save()
     return data
@@ -88,7 +88,7 @@ def rs_action(dia):
 def ou_action(dia):
     oh = ohloh.get_ohloh()
     data, web_response = oh.get_contribution_info_by_ohloh_username(
-            dia.query, person=dia.person)
+            dia.query)
     dia.web_response = web_response
     dia.save()
     return data
