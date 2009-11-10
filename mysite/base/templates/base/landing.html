@@ -60,7 +60,14 @@ Home
         you check out these bugs.</p>
         <ul>
             {% for bug in recommended_bugs %}
-            <li><span><a style='font-weight: bold;' href='{{ bug.canonical_bug_link }}'>{{ bug.title }}</a> in&nbsp;{{ bug.project.name }}</span></li>
+            <li style="list-style-image: url('{{ bug.project.get_url_of_search_result_icon_or_generic }}');">
+            <span>
+                <a style='font-weight: bold;'
+                    href='{{ bug.canonical_bug_link }}'>
+                    {{ bug.title }}
+                </a>
+                in&nbsp;{{ bug.project.name }}
+            </span></li>
             {% endfor %}
         </ul>
         <p><a href='/search/' style='float: right;'>Find more opportunities <strong>&raquo;</strong></a></p>
