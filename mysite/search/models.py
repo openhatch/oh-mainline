@@ -184,7 +184,4 @@ class Bug(models.Model):
     def __unicode__(self):
         return "<Bug title='%s' project='%s' project__language='%s' description='%s...'>" % (self.title, self.project.name, self.project.language, self.description[:50])
     
-    # on save hook for seems_closed
-    # does it 
-
 # vim: set ai ts=4 nu:
