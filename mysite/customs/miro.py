@@ -49,12 +49,14 @@ def xml2bug_object(xml_fd):
     keywords = map(lambda s: s.strip(),
                    keywords_text.split(','))
     project, _ = Project.objects.get_or_create(name='Miro')
+    status = get_tag_text_from_xml(parsed, 'bug_status')
+    looks_closed = status in ('RESOLVED', 'WONTFIX')
 
     ret = Bug(
         project = project,
         title = get_tag_text_from_xml(parsed, 'short_desc'),
         description = get_tag_text_from_xml(parsed, 'long_desc/thetext'),
-        status = get_tag_text_from_xml(parsed, 'bug_status'),
+        status = status,
         importance = get_tag_text_from_xml(parsed, 'bug_severity'),
         people_involved = count_people_involved(parsed),
         date_reported = bugzilla_date_to_datetime(date_reported_text),
@@ -63,7 +65,8 @@ def xml2bug_object(xml_fd):
         submitter_username = u,
         submitter_realname = r,
         canonical_bug_link = 'http://bugzilla.pculture.org/show_bug.cgi?id=%d' % bug_id,
-        good_for_newcomers = ('bitesized' in keywords))
+        good_for_newcomers = ('bitesized' in keywords),
+        looks_closed=looks_closed)
     return ret
 
 def bugzilla_query_to_bug_ids(csv_fd):
@@ -101,7 +104,7 @@ def grab_miro_bugs():
     stale and unchecked.'''
     csv_fd = bitesized_bugs_csv_fd()
 
-    old_bitesized_bugs = Bug.objects.filter(canonical_bug_link__startswith='http://bugzilla.pculture.org/')
+    old_bitesized_bugs = Bug.all_bugs.filter(canonical_bug_link__startswith='http://bugzilla.pculture.org/')
     old_bitesized_bug_ids = [link2bug_id(k.canonical_bug_link) for k in old_bitesized_bugs]
     
     current_bitesized_bug_ids  = bugzilla_query_to_bug_ids(csv_fd)
@@ -113,7 +116,7 @@ def grab_miro_bugs():
         xml_fd = open_xml_url(xml_url)
         bug = xml2bug_object(xml_fd)
         # If there is already a bug with this canonical_bug_link in the DB, just delete it.
-        bugs_this_one_replaces = Bug.objects.filter(canonical_bug_link=
+        bugs_this_one_replaces = Bug.all_bugs.filter(canonical_bug_link=
                                                     bug.canonical_bug_link)
         for delete_me in bugs_this_one_replaces:
             delete_me.delete()

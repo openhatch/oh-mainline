@@ -155,6 +155,13 @@ def populate_icon_on_project_creation(instance, created, *args, **kwargs):
         
 models.signals.post_save.connect(populate_icon_on_project_creation, Project)
 
+# An easy way to find 
+
+class OpenBugsManager(models.Manager):
+    def get_query_set(self):
+        return super(OpenBugsManager, self).get_query_set().filter(
+                looks_closed=False)
+
 class Bug(models.Model):
     project = models.ForeignKey(Project)
     title = models.CharField(max_length=200)
@@ -169,8 +176,12 @@ class Bug(models.Model):
     submitter_realname = models.CharField(max_length=200)
     canonical_bug_link = models.URLField(max_length=200)
     good_for_newcomers = models.BooleanField(default=False)
+    looks_closed = models.BooleanField(default=False)
+
+    all_bugs = models.Manager()
+    open_ones = OpenBugsManager()
 
     def __unicode__(self):
         return "<Bug title='%s' project='%s' project__language='%s' description='%s...'>" % (self.title, self.project.name, self.project.language, self.description[:50])
-
+    
 # vim: set ai ts=4 nu:
