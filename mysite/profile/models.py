@@ -93,17 +93,16 @@ class Person(models.Model):
 
     def get_recommended_search_terms(self):
         # {{{
-        portfolio_entries = self.get_published_portfolio_entries()
-        citations = Citation.untrashed.filter(portfolio_entry__person=self)
         terms = []
         
         # Add terms based on languages in citations
+        citations = self.get_published_citations_flat()
         for c in citations:
             terms.extend(c.get_languages_as_list())
 
         # Add terms based on projects in citations
         terms.extend(
-                [pfe.project.name for pfe in portfolio_entries
+                [pfe.project.name for pfe in self.get_published_portfolio_entries()
                     if pfe.project.name and pfe.project.name.strip()])
 
         # Add terms based on tags 
@@ -118,6 +117,10 @@ class Person(models.Model):
         # FIXME: Add support for recommended project tags.
 
         # }}}
+
+    def get_published_citations_flat(self):
+        return sum([pfe.get_published_citations()
+            for pfe in self.get_published_portfolio_entries()], [])
 
     def get_tags(self):
         """Return a list of Tags linked to this Person."""
@@ -441,7 +444,8 @@ class PortfolioEntry(models.Model):
 class UntrashedCitationManager(models.Manager):
     def get_query_set(self):
         return super(UntrashedCitationManager, self).get_query_set().filter(
-                is_deleted=False, ignored_due_to_duplicate=False)
+                is_deleted=False, ignored_due_to_duplicate=False,
+                portfolio_entry__is_deleted=False)
 
 class Citation(models.Model):
     portfolio_entry = models.ForeignKey(PortfolioEntry) # [0]
