@@ -944,4 +944,12 @@ SaveAllButton.saveAll = function() {
             });
 };
 
+$(function () {
+        $('#importer .howto h5 a').click(function() {
+            var $imp = $('#importer');
+            $imp.css('height', $imp.css('height') == 'auto' ? '40px' : 'auto');
+            return false;
+            });
+        });
+
 // vim: set nu:
