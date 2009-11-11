@@ -96,13 +96,22 @@ class Person(models.Model):
         portfolio_entries = self.get_published_portfolio_entries()
         citations = Citation.untrashed.filter(portfolio_entry__person=self)
         terms = []
+        
+        # Add terms based on languages in citations
         for c in citations:
             terms.extend(c.get_languages_as_list())
 
+        # Add terms based on projects in citations
         terms.extend(
                 [pfe.project.name for pfe in portfolio_entries
                     if pfe.project.name and pfe.project.name.strip()])
+
+        # Add terms based on tags 
+        terms.extend([tag.text for tag in self.get_tags()])
+
+        # Remove duplicates
         terms = sorted(set(terms), key=lambda s: s.lower())
+
         return terms
 
         # FIXME: Add support for recommended projects.
