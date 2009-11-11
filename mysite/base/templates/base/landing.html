@@ -64,9 +64,9 @@ Home
             <span>
                 <a style='font-weight: bold;'
                     href='{{ bug.canonical_bug_link }}'>
-                    {{ bug.title }}
-                </a>
+                    {{ bug.title }}</a>
                 in&nbsp;{{ bug.project.name }}
+                (in&nbsp;{{ bug.project.language }})
             </span></li>
             {% endfor %}
         </ul>

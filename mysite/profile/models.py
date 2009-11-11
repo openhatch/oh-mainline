@@ -106,7 +106,7 @@ class Person(models.Model):
                     if pfe.project.name and pfe.project.name.strip()])
 
         # Add terms based on tags 
-        terms.extend([tag.text for tag in self.get_tags()])
+        terms.extend([tag.text for tag in self.get_tags_for_recommendations()])
 
         # Remove duplicates
         terms = sorted(set(terms), key=lambda s: s.lower())
@@ -119,12 +119,13 @@ class Person(models.Model):
         # }}}
 
     def get_published_citations_flat(self):
-        return sum([pfe.get_published_citations()
+        return sum([list(pfe.get_published_citations())
             for pfe in self.get_published_portfolio_entries()], [])
 
-    def get_tags(self):
+    def get_tags_for_recommendations(self):
         """Return a list of Tags linked to this Person."""
-        return [link.tag for link in Link_Person_Tag.objects.filter(person=self)]
+        exclude_me = TagType.objects.filter(name='understands_not')
+        return [link.tag for link in Link_Person_Tag.objects.filter(person=self) if link.tag.tag_type not in exclude_me]
 
     def get_full_name(self):
         # {{{
@@ -309,7 +310,6 @@ class ProjectExp(models.Model):
 class TagType(models.Model):
     # {{{
     name = models.CharField(max_length=100)
-    prefix = models.CharField(max_length=20)
     # }}}
 
 class Tag(models.Model):

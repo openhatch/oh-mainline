@@ -1198,19 +1198,27 @@ class OverwriteDuplicateCitations(TwillTests):
         # The 'untrashed' manager picks up only the first citation.
         self.assertEqual([c.pk for c in Citation.untrashed.all()], [citation.pk])
 
-class PersonGetTags(TwillTests):
-    fixtures = ['user-paulproteus', 'person-paulproteus', 'tags']
+class PersonGetTagsForRecommendations(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def test_get_tags(self):
         pp = Person.objects.get(user__username='paulproteus')
 
-        expected_tags = list(Tag.objects.all())
-        self.assertEqual(len(expected_tags), 16)
+        understands_not = TagType(prefix='understands_not', name='will never understand')
+        understands_not.save()
+        understands = TagType(prefix='understands', name='understands')
+        understands.save()
+
+        tag_i_understand = Tag(tag_type=understands, text='something I understand')
+        tag_i_understand.save()
+        tag_i_dont = Tag(tag_type=understands_not, text='something I dont get')
+        tag_i_dont.save()
+        link_one = Link_Person_Tag(person=pp, tag=tag_i_understand)
+        link_one.save()
+        link_two = Link_Person_Tag(person=pp, tag=tag_i_dont)
+        link_two.save()
 
         # This is the functionality we're testing
-        output = pp.get_tags()
-
-        self.assertEqual(len(output), len(expected_tags))
-        self.assertEqual(set(output), set(expected_tags))
+        self.assertEqual([tag_i_understand], pp.get_tags_for_recommendations())
 
 # vim: set ai et ts=4 sw=4 nu:
