@@ -118,7 +118,7 @@
         <div class='tags' id='tags-understands'>
             <span class='tag-type'>understands:</span>
             {% for thingamabob in tags.understands %}
-            <a href="{% url mysite.profile.views.display_list_of_people_who_match_some_search "understands" thingamabob.text %}">{{ thingamabob.text }}</a>{% if not forloop.last %}, {% endif %}
+            <a href="{% url mysite.profile.views.display_list_of_people_who_match_some_search "understands" thingamabob.text|urlencode %}">{{ thingamabob.text }}</a>{% if not forloop.last %}, {% endif %}
             {% endfor %}
         </div>
         {% endif %}
@@ -126,7 +126,7 @@
         <div class='tags' id='tags-understands_not'>
             <span class='tag-type'>will never understand:</span> 
             {% for thingamabob in tags.understands_not %}
-            <a href="{% url mysite.profile.views.display_list_of_people_who_match_some_search "understands_not" thingamabob.text %}">{{ thingamabob.text }}</a>{% if not forloop.last %}, {% endif %}
+            <a href="{% url mysite.profile.views.display_list_of_people_who_match_some_search "understands_not" thingamabob.text|urlencode %}">{{ thingamabob.text }}</a>{% if not forloop.last %}, {% endif %}
             {% endfor %}
         </div>
         {% endif %}
@@ -134,7 +134,7 @@
         <div class='tags' id='tags-seeking'>
             <span class='tag-type'>looking for volunteering opportunities in:</span> 
             {% for thingamabob in tags.seeking %}
-            <a href="{% url mysite.profile.views.display_list_of_people_who_match_some_search "seeking" thingamabob.text %}">{{ thingamabob.text }}</a>{% if not forloop.last %}, {% endif %}
+            <a href="{% url mysite.profile.views.display_list_of_people_who_match_some_search "seeking" thingamabob.text|urlencode %}">{{ thingamabob.text }}</a>{% if not forloop.last %}, {% endif %}
             {% endfor %}
         </div>
         {% endif %}
@@ -142,7 +142,7 @@
         <div class='tags' id='tags-studying'>
             <span class='tag-type'>currently learning about:</span> 
             {% for thingamabob in tags.studying %}
-            <a href="{% url mysite.profile.views.display_list_of_people_who_match_some_search "studying" thingamabob.text %}">{{ thingamabob.text }}</a>{% if not forloop.last %}, {% endif %}
+            <a href="{% url mysite.profile.views.display_list_of_people_who_match_some_search "studying" thingamabob.text|urlencode %}">{{ thingamabob.text }}</a>{% if not forloop.last %}, {% endif %}
             {% endfor %}
         </div>
         {% endif %}
@@ -150,7 +150,7 @@
         <div class='tags' id='tags-can_mentor'>
             <span class='tag-type'>can mentor in:</span> 
             {% for thingamabob in tags.can_mentor %}
-            <a href="{% url mysite.profile.views.display_list_of_people_who_match_some_search "can_mentor" thingamabob.text %}">{{ thingamabob.text }}</a>{% if not forloop.last %}, {% endif %}
+            <a href="{% url mysite.profile.views.display_list_of_people_who_match_some_search "can_mentor" thingamabob.text|urlencode %}">{{ thingamabob.text }}</a>{% if not forloop.last %}, {% endif %}
             {% endfor %}
         </div>
         {% endif %}
