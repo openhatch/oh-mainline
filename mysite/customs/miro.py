@@ -79,12 +79,12 @@ def bugzilla_query_to_bug_ids(csv_fd):
     except StopIteration:
         return []
 
-    bugs = []
+    bug_ids = []
     
     for row in doc:
-        bugs.append(int(row[0]))
+        bug_ids.append(int(row[0]))
 
-    return bugs
+    return bug_ids
 
 def link2bug_id(url):
     first, rest = url.split('?id=')
