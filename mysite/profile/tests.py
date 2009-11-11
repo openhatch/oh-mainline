@@ -1198,4 +1198,31 @@ class OverwriteDuplicateCitations(TwillTests):
         # The 'untrashed' manager picks up only the first citation.
         self.assertEqual([c.pk for c in Citation.untrashed.all()], [citation.pk])
 
+class PersonGetTags(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def test_get_tags(self):
+        pp = Person.objects.get(user__username='paulproteus')
+        tag_strings = ['algol', 'symbolist poetry', 'rails', 'chinese chess']
+        tag_type_strings = ['understands', 'understands not', 'interested in', 'sneezes at']
+        expected_tags = []
+        # Create four tags for paulproteus of each type.
+        for type_s in tag_type_strings:
+            # Create a type
+            type = TagType(name=type_s, prefix="prefix"); type.save()
+            for s in tag_strings:
+                # Create a tag
+                tag = Tag(text=s, tag_type=type); tag.save()
+                expected_tags.append(tag)
+                # Link it to the dude
+                link = Link_Person_Tag(person=pp, tag=tag); link.save()
+
+        self.assertEqual(len(expected_tags), 16)
+
+        # This is the functionality we're testing
+        output = pp.get_tags()
+
+        self.assertEqual(len(output), len(expected_tags))
+        self.assertEqual(set(output), set(expected_tags))
+
 # vim: set ai et ts=4 sw=4 nu:
