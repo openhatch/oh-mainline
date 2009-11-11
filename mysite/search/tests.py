@@ -401,16 +401,18 @@ class Recommend(SearchTest):
         person = Person.objects.get(user__username='paulproteus')
         recommended_terms = person.get_recommended_search_terms()
 
+        # source = a source of recommendations
         source2terms = {
                 'citations': ['Automake', 'C#', 'C++', 'Make', 'Mozilla Firefox', 
                     'Python', 'shell script', 'XUL'],
                 'tags': ['algol', 'symbolist poetry', 'rails', 'chinese chess']
                 }
 
-        for source, terms in source2terms:
-            self.assert_(term in recommended_terms,
-                    "Expected %s in recommended search terms "
-                    "inspired by %s ." % (term, source))
+        for source, terms in source2terms.items():
+            for term in terms:
+                self.assert_(term in recommended_terms,
+                        "Expected %s in recommended search terms "
+                        "inspired by %s." % (term, source))
 
     # FIXME: Include recommendations from tags.
     def test_search_page_context_includes_recommendations(self):
