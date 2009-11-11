@@ -110,6 +110,10 @@ class Person(models.Model):
 
         # }}}
 
+    def get_tags(self):
+        """Return a list of Tags linked to this Person."""
+        return [link.tag for link in Link_Person_Tag.objects.filter(person=self)]
+
     def get_full_name(self):
         # {{{
         name = self.user.first_name 
@@ -305,6 +309,9 @@ class Tag(models.Model):
         if self.text:
             return super(Tag, self).save(*args, **kwargs)
         raise ValueError
+
+    def __unicode__(self):
+        return "type='%s' text='%s'" % (self.tag_type.name, self.text)
     # }}}
 
 class Link_ProjectExp_Tag(models.Model):
