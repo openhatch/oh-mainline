@@ -401,10 +401,11 @@ class Recommend(SearchTest):
         person = Person.objects.get(user__username='paulproteus')
         recommended_terms = person.get_recommended_search_terms()
 
-        # source = a source of recommendations
+        # By 'source' I mean a source of recommendations.
         source2terms = {
-                'citations': ['Automake', 'C#', 'C++', 'Make', 'Mozilla Firefox', 
+                'languages in citations': ['Automake', 'C#', 'C++', 'Make', 
                     'Python', 'shell script', 'XUL'],
+                'projects in citations': ['Mozilla Firefox'], 
                 'tags': ['algol', 'symbolist poetry', 'rails', 'chinese chess']
                 }
 
@@ -418,18 +419,28 @@ class Recommend(SearchTest):
     def test_search_page_context_includes_recommendations(self):
         client = self.login_with_client()
         response = client.get('/search/')
-        self.assertEqual(
-                response.context[0]['suggestions'],
-                [
-                    (0, 'Automake',        False),
-                    (1, 'C#',              False),
-                    (2, 'C++',             False),
-                    (3, 'Make',            False),
-                    (4, 'Mozilla Firefox', False),
-                    (5, 'Python',          False),
-                    (6, 'shell script',    False),
-                    (7, 'XUL',             False),
-                    ])
+
+        source2terms = {
+                'languages in citations': ['Automake', 'C#', 'C++', 'Make', 
+                    'Python', 'shell script', 'XUL'],
+                'projects in citations': ['Mozilla Firefox'], 
+                'tags': ['algol', 'symbolist poetry', 'rails', 'chinese chess']
+                }
+
+        tags_in_template = [tup[1] for tup in response.context[0]['suggestions']]
+
+        for source, terms in source2terms.items():
+            for term in terms:
+                self.assert_(term in tags_in_template,
+                        "Expected %s in template"
+                        "inspired by %s." % (term, source))
+
+        def compare_lists(one, two):
+            self.assertEqual(len(one), len(two))
+            self.assertEqual(set(one), set(two))
+
+        expected_tags = sum(source2terms.values(), [])
+        compare_lists(expected_tags, tags_in_template)
 
 # We're not doing this one because at the moment suggestions only work in JS.
 #    def test_recommendations_with_twill(self):
