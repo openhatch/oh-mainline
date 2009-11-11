@@ -392,17 +392,27 @@ class Recommend(SearchTest):
             'person-paulproteus.json',
             'cchost-data-imported-from-ohloh.json',
             'bugs-for-two-projects.json',
-            'extra-fake-cchost-related-projectexps.json']
+            'extra-fake-cchost-related-projectexps.json',
+            'tags']
 
-    # FIXME: Update this test to use the new models.
+    # FIXME: Add a 'recommend_these_in_bug_search' field to TagType
+    # Use that to exclude 'will never understand' tags from recommended search terms.
     def test_get_recommended_search_terms_for_user(self):
         person = Person.objects.get(user__username='paulproteus')
-        terms = person.get_recommended_search_terms()
-        self.assertEqual(terms,
-                [u'Automake', u'C#', u'C++', u'Make', u'Mozilla Firefox', 
-                 u'Python', u'shell script', u'XUL'])
+        recommended_terms = person.get_recommended_search_terms()
 
-    # FIXME: Update this test to use the new models.
+        source2terms = {
+                'citations': ['Automake', 'C#', 'C++', 'Make', 'Mozilla Firefox', 
+                    'Python', 'shell script', 'XUL'],
+                'tags': ['algol', 'symbolist poetry', 'rails', 'chinese chess']
+                }
+
+        for source, terms in source2terms:
+            self.assert_(term in recommended_terms,
+                    "Expected %s in recommended search terms "
+                    "inspired by %s ." % (term, source))
+
+    # FIXME: Include recommendations from tags.
     def test_search_page_context_includes_recommendations(self):
         client = self.login_with_client()
         response = client.get('/search/')
