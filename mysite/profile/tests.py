@@ -1204,9 +1204,9 @@ class PersonGetTagsForRecommendations(TwillTests):
     def test_get_tags(self):
         pp = Person.objects.get(user__username='paulproteus')
 
-        understands_not = TagType(prefix='understands_not', name='will never understand')
+        understands_not = TagType(name='understands_not')
         understands_not.save()
-        understands = TagType(prefix='understands', name='understands')
+        understands = TagType(name='understands')
         understands.save()
 
         tag_i_understand = Tag(tag_type=understands, text='something I understand')
