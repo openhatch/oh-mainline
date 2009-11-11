@@ -93,7 +93,11 @@ def edit_photo_do(request, mock=None):
         person = form.save()
         person.generate_thumbnail_from_photo()
 
-    return HttpResponseRedirect('/account/edit/photo')
+        return HttpResponseRedirect(reverse(mysite.profile.views.display_person_web, kwargs={
+            'user_to_display__username': request.user.username
+            }))
+    else:
+        return edit_photo(request, form)
 
 def catch_me(request):
     import pdb
