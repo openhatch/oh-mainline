@@ -169,7 +169,7 @@ class Bug(models.Model):
     description = models.TextField()
     status = models.CharField(max_length=200)
     importance = models.CharField(max_length=200)
-    people_involved = models.IntegerField()
+    people_involved = models.IntegerField(null=True)
     date_reported = models.DateTimeField()
     last_touched = models.DateTimeField()
     last_polled = models.DateTimeField()
