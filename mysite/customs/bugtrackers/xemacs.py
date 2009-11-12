@@ -129,3 +129,5 @@ def grab():
         # With the coast clear, we save the bug we just extracted from the Miro tracker.
         bug.save()
 
+# for testing
+grab()
