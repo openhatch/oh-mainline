@@ -14,6 +14,7 @@
 
 # <Triskelios> paulproteus: try emailing tools-discuss, or William.Rushmore@Sun, who seems to have been the bite-size list maintainer
 
+# FIXME: The OpenSolaris project page on OpenHatch should have information on how to contribute.
 
 import urllib2
 import re
@@ -26,7 +27,7 @@ from mysite.customs.models import flatten
 
 def view_bug_table2dict(tree):
     # Find the big table that contains the bug data
-    metadata_table = tree.cssselect('table.NoBorder [cellspacing="0"]')[0]
+    metadata_table = tree.cssselect('table.NoBorder[cellspacing="0"]')[0]
 
     ret = {}
     
