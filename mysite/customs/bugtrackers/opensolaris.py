@@ -12,6 +12,8 @@
 # <paulproteus> And it seems the Bugster stuff can't be commented-on by non-Sun-engineers.
 # <Triskelios> right. ON commits normally require a Sun sponsor to sign off, so communication is usually over email, and the sponsoring engineer may update the bug
 
+# <Triskelios> paulproteus: try emailing tools-discuss, or William.Rushmore@Sun, who seems to have been the bite-size list maintainer
+
 
 import urllib2
 import re
