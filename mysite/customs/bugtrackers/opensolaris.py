@@ -22,7 +22,7 @@ from itertools import chain
 import csv
 from mysite.search.models import Bug, Project
 import datetime
-from mysite.customs.bugtrackers.python import flatten
+from mysite.customs.models import flatten
 
 def view_bug_table2dict(tree):
     # Find the big table that contains the bug data
