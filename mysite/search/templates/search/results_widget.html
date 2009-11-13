@@ -1,4 +1,3 @@
-{% load profile_extras %}
 <div class='search-result-control' id='results-widget'>
     <span id='results-summary'>
         {% comment %} The variable is called `language` but it could be a variety of other fields. FIXME: Fix the variable name. {% endcomment %}
@@ -6,28 +5,29 @@
 
         {% if bunch_of_bugs %}
         <span id='total_bug_count'>{{ total_bug_count }}</span> bug{{ bunch_of_bugs|pluralize }} found.
+        {% ifnotequal start end %}
+        {% comment %}When there's only one bug on the page, no need to mention the obvious.{% endcomment %}
         Showing results 
         <span id='results-summary-start'>{{ start }}</span> to
         <span id='results-summary-end'>{{ end }}</span>.
+        {% endifnotequal %}
         {% endif %}
     </span>
 
+    {% if show_prev_page_link or show_next_page_link %}
     <span class='separator'>&nbsp;</span>
 
     <span id='navigation'>
-        <style type='text/css'>
-        {% if not show_prev_page_link %}
-        #prev-page { display: none; }
-        {% endif %}
-        {% if not show_next_page_link %}
-        #next-page { display: none; }
-        {% endif %}
-        </style>
-
+        {% if show_prev_page_link %}
         <a href='{{ prev_page_url }}' id='prev-page'>&laquo; Prev</a>
         <span class='separator'>&nbsp;</span>
+        {% endif %}
+
+        {% if show_next_page_link %}
         <a href='{{ next_page_url }}' id='next-page'>Next page &raquo;</a>
-        <span class='separator'>&nbsp;</span>
+        {% endif %}
     </span>
+    {% endif %}
+
 </div><!-- /#results-widget -->
 {# vim: set filetype=htmldjango: #}
