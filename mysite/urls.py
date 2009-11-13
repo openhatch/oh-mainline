@@ -166,9 +166,7 @@ urlpatterns = patterns('',
         (r'^\+portfolio/editor/test$',
                 'mysite.profile.views.portfolio_editor_test'),
 
-        (r'^people/edit/info$',
-                'mysite.profile.views.display_person_edit_web',
-                { 'info_edit_mode': True }),
+        (r'^\+info/edit$', 'mysite.profile.views.edit_info',),
 
         (r'^edit/name$',
                 'mysite.profile.views.display_person_edit_name',
