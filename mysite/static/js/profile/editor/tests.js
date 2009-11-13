@@ -788,14 +788,43 @@ testDeleteAdderWidget = function() {
     prefix = "delete adder widget: ";
     redrawPortfolioEntries();
     $('a#add_pf_entry').assertN(1).trigger('click');
-    function momentarily() {
-        $widget = $('#portfolio_entries .portfolio_entry.adding').assertN(1);
+
+    // Monkeypatch the callback that runs when the adder widget is done animating
+    // so that when it arrives we can immediately nuke it.
+    var callback = PortfolioEntry.Add.whenDoneAnimating;
+    PortfolioEntry.Add.whenDoneAnimating = function() {
+        callback();
+        var $widget = $('#portfolio_entries .portfolio_entry.adding').assertN(1);
         $widget.find('.delete_portfolio_entry a').assertN(1).smartTrigger('click');
         $($widget.selector).assertN(0);
-    }
-    window.setTimeout(momentarily, 2000);
+        PortfolioEntry.Add.whenDoneAnimating = callback;
+    };
 };
 $(testDeleteAdderWidget);
+
+testNewUnpublishedCitationsMakePFEntryUnsaved = function() {
+
+    redrawPortfolioEntries();
+
+    var mockedPortfolioResponse2 = deepCopy(mockedPortfolioResponse);
+    mockedPortfolioResponse2.citations = [];
+    updatePortfolio(mockedPortfolioResponse2);
+
+    tester.ok(mockedPortfolioResponse2.portfolio_entries[0].fields.is_published,
+            "precondition: pf entry 0 is published");
+    
+    // Bring in a new citation for entry 0.
+    var newUnpublishedCitation = {'pk': 88, 'fields': {'portfolio_entry': 0, 'is_published': 0}}
+    mockedPortfolioResponse2.summaries[88] = "summary of an unpublished citation";
+    mockedPortfolioResponse2.citations.push(newUnpublishedCitation);
+    updatePortfolio(mockedPortfolioResponse2);
+
+    tester.ok($('#portfolio_entry_0').assertN(1).hasClass('unsaved'),
+            "portfolio_entry_0 has class unsaved after new citation is added");
+
+    // Test that entry 0 is unsaved.
+};
+$(testNewUnpublishedCitationsMakePFEntryUnsaved);
 
 $(function () {
         window.setTimeout("tester.testDone();", 5000);

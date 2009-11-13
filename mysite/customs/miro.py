@@ -12,6 +12,8 @@ from ..search.models import Project, Bug
 import codecs
 
 def get_tag_text_from_xml(xml_doc, tag_name, index = 0):
+    """Given an object representing <bug><tag>text</tag></bug>,
+    and tag_name = 'tag', returns 'text'."""
     tags = xml_doc.xpath('//' + tag_name)
     try:
         return tags[index].text
@@ -20,9 +22,9 @@ def get_tag_text_from_xml(xml_doc, tag_name, index = 0):
     assert False, "You should not get here."
 
 def count_people_involved(xml_doc):
-    # Strategy: Create a set of all the listed text values
-    # inside a <who ...>(text)</who> tag
-    # Return the length of said set.
+    """Strategy: Create a set of all the listed text values
+    inside a <who ...>(text)</who> tag
+    Return the length of said set."""
     everyone = [tag.text for tag in xml_doc.xpath('//who')]
     return len(set(everyone))
 
@@ -40,6 +42,7 @@ def who_tag_to_username_and_realname(who_tag):
     return username, realname
 
 def xml2bug_object(xml_fd):
+    """xml fd: xml file descriptor 'containing' information about one bug"""
     parsed = lxml.etree.parse(xml_fd)
     date_reported_text = get_tag_text_from_xml(parsed, 'creation_ts')
     last_touched_text = get_tag_text_from_xml(parsed, 'delta_ts')
@@ -76,12 +79,12 @@ def bugzilla_query_to_bug_ids(csv_fd):
     except StopIteration:
         return []
 
-    bugs = []
+    bug_ids = []
     
     for row in doc:
-        bugs.append(int(row[0]))
+        bug_ids.append(int(row[0]))
 
-    return bugs
+    return bug_ids
 
 def link2bug_id(url):
     first, rest = url.split('?id=')
@@ -98,10 +101,7 @@ def open_xml_url(xml_url):
 def grab_miro_bugs():
     '''Input: Nothing.
 
-    Side-effect: Loops over the Miro bitesized bugs and refreshes them into the DB.
-
-    FIXME: Old bugs that do not get listed in this round of updates will be left
-    stale and unchecked.'''
+    Side-effect: Loops over the Miro bitesized bugs (in the Miro bug tracker) and stores/updates them in our DB.'''
     csv_fd = bitesized_bugs_csv_fd()
 
     old_bitesized_bugs = Bug.all_bugs.filter(canonical_bug_link__startswith='http://bugzilla.pculture.org/')
@@ -115,6 +115,7 @@ def grab_miro_bugs():
         xml_url = 'http://bugzilla.pculture.org/show_bug.cgi?ctype=xml&id=%d' % bug_id
         xml_fd = open_xml_url(xml_url)
         bug = xml2bug_object(xml_fd)
+
         # If there is already a bug with this canonical_bug_link in the DB, just delete it.
         bugs_this_one_replaces = Bug.all_bugs.filter(canonical_bug_link=
                                                     bug.canonical_bug_link)
@@ -123,4 +124,3 @@ def grab_miro_bugs():
 
         # With the coast clear, we save the bug we just extracted from the Miro tracker.
         bug.save()
-

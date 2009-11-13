@@ -12,6 +12,7 @@ import mysite.account.forms
 from django_authopenid import views as oid_views
 
 urlpatterns = patterns('',
+
         # Invitation-related URLs
         (r'^invitation/', include('invitation.urls')),
 
@@ -165,9 +166,7 @@ urlpatterns = patterns('',
         (r'^\+portfolio/editor/test$',
                 'mysite.profile.views.portfolio_editor_test'),
 
-        (r'^people/edit/info$',
-                'mysite.profile.views.display_person_edit_web',
-                { 'info_edit_mode': True }),
+        (r'^profile/views/edit_info$', 'mysite.profile.views.edit_info'),
 
         (r'^edit/name$',
                 'mysite.profile.views.display_person_edit_name',

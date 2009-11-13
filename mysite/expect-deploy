@@ -14,7 +14,7 @@ expect "0"
 # Expect a success exit code from 'git fetch'
 expect "$ "
 
-send_user "\r\n*** Checking for uncommitted modification to the remote filesystem... ***\r\n"
+send_user "\r\n*** Checking for uncommitted modifications to the remote filesystem... ***\r\n"
 send "git ls-files -m\r"
 expect "$ " {exp_continue} \
            ".*" {send_user "\r\nThere were some uncommitted modifications in the remote filesystem.\r\n"; exit 3}
@@ -28,10 +28,6 @@ while {true} {
             send_user "EOF"
             exit 1
         }
-        "$ " {
-            send_user "There was no fast forward. Aborting...\r\n"
-            exit 1
-            }
         "Fast forward" {
             send_user "Fast forward detected. Proceeding...\r"
             break
@@ -40,6 +36,10 @@ while {true} {
             send_user "Tried to merge, but git cried, 'Already up-to-date'. Proceeding anyway...\r\n"
             break
         }
+        "$ " {
+            send_user "There was no fast forward. Aborting...\r\n"
+            exit 1
+            }
     }
 }
 
@@ -51,6 +51,9 @@ expect {
     }
     "$ " 
 }
+
+send_user "\r\n*** Atempting to run migrations... ***\r\n"
+send "./bin/production migrate\r"
 
 send_user "\r\n*** Reloading the web site... ***\r\n"
 send "touch bin/production.wsgi; echo $?\r"

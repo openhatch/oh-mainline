@@ -385,8 +385,7 @@ function updatePortfolio(response) {
                 var already_exists = ($citation_existing_or_not.size() != 0);
                 if (already_exists) {
                     var $citation = $citation_existing_or_not;
-                }
-                else {
+                } else {
                     // Then we have a citation that we're gonna add the DOM.
                     var $citation = $(citation_html);
                     $citation.attr('id', id);
@@ -397,6 +396,9 @@ function updatePortfolio(response) {
                 // published/unpublished status.
                 if (citation.fields.is_published == '1') {
                     $citation.removeClass("unpublished");
+                } else {
+                    // Citation is unpublished
+                    $new_portfolio_entry.addClass('unsaved');
                 }
 
                 var summaryHTML = response.summaries[citation.pk]
@@ -660,7 +662,6 @@ PortfolioEntry.Save.postOptions = {
     'dataType': 'json',
 };
 PortfolioEntry.Save.postOptions.success = function (response) {
-    Notifier.displayMessage('Portfolio entry saved.');
     if (typeof response.pf_entry_element_id != 'undefined') {
         // This was an INSERT aka an "Add"
         var $new_pf_entry = $('#'+response.pf_entry_element_id);
@@ -671,7 +672,10 @@ PortfolioEntry.Save.postOptions.success = function (response) {
             .text($old_project_name_field.val());
         $old_project_name_field.replaceWith($new_project_name_span);
     }
-    $('#portfolio_entry_'+response.portfolio_entry__pk).removeClass('unsaved').removeClass('adding');
+    var $entry = $('#portfolio_entry_'+response.portfolio_entry__pk);
+    $entry.removeClass('unsaved').removeClass('adding');
+    var project_name = $entry.find('.project_name').text();
+    Notifier.displayMessage('Saved entry for '+project_name+'.');
     askServerForPortfolio();
 };
 PortfolioEntry.Save.postOptions.error = function (response) {
@@ -724,8 +728,9 @@ PortfolioEntry.Delete.postOptions.success = function (response) {
     /* Find the portfolio entry section of the page, and make it disappear. */
     var pk = response.portfolio_entry__pk;
     $portfolioEntry = $('#portfolio_entry_'+pk);
+    project_name = $portfolioEntry.find('.project_name').text();
     $portfolioEntry.hide();
-    Notifier.displayMessage('Portfolio entry deleted.');
+    Notifier.displayMessage('Deleted entry for '+project_name+'.');
     SaveAllButton.updateDisplay();
 };
 PortfolioEntry.Delete.postOptions.error = function (response) {
@@ -887,17 +892,21 @@ PortfolioEntry.Add.init = function () {
     PortfolioEntry.Add.$link = $('a#add_pf_entry');
     PortfolioEntry.Add.bindEventHandlers();
 };
+// We do this so that this particular method can be monkeypatched in testDeleteAdderWidget.
+PortfolioEntry.Add.whenDoneAnimating = function () { SaveAllButton.updateDisplay(); };
+
 PortfolioEntry.Add.clickHandler = function () {
     // Draw a widget for adding pf entries.
     var html = $('#add_a_portfolio_entry_building_block').html();
     $add_a_pf_entry = $(html);
     $add_a_pf_entry.attr('id', generateUniqueID());
     $('#portfolio_entries').prepend($add_a_pf_entry);
-    $add_a_pf_entry.hide().fadeIn(SaveAllButton.updateDisplay);
+    $add_a_pf_entry.hide().fadeIn(PortfolioEntry.Add.whenDoneAnimating);
     PortfolioEntry.bindEventHandlers();
     $add_a_pf_entry.find('input[title]').hint();
     return false;
 };
+
 PortfolioEntry.Add.bindEventHandlers = function () {
     PortfolioEntry.Add.$link.click(PortfolioEntry.Add.clickHandler);
 };

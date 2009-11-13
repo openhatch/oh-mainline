@@ -107,22 +107,6 @@ def add_citation_manually_do(request):
 
 @login_required
 @view
-def display_person_edit_web(request, info_edit_mode=False, title=''):
-    # {{{
-
-    person = request.user.get_profile()
-
-    data = get_personal_data(person)
-
-    # FIXME: Django builds this in.
-    data['editable'] = True
-    data['info_edit_mode'] = info_edit_mode
-
-    return (request, 'profile/main.html', data)
-    # }}}
-
-@login_required
-@view
 def display_person_web(request, user_to_display__username=None):
     # {{{
 
@@ -879,5 +863,12 @@ def save_portfolio_entry_do(request):
             'pf_entry_element_id': request.POST['pf_entry_element_id'],
             'portfolio_entry__pk': p.pk
         })
+
+@login_required
+@view
+def edit_info(request):
+    data = get_personal_data(request.user.get_profile())
+    data['info_edit_mode'] = True
+    return request, 'profile/info_wrapper.html', data
 
 # vim: ai ts=3 sts=4 et sw=4 nu

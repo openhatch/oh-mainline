@@ -7,8 +7,7 @@ import StringIO
 import Image
 import uuid
 from django.db.models import Q
-
-from mysite.customs import ohloh
+import mysite.customs 
 
 def get_image_data_scaled(image_data, width):
     # scale it
@@ -68,7 +67,7 @@ class Project(models.Model):
 
     def populate_icon_from_ohloh(self):
 
-        oh = ohloh.get_ohloh()
+        oh = mysite.customs.ohloh.get_ohloh()
         try:
             icon_data = oh.get_icon_for_project(self.name)
             self.date_icon_was_fetched_from_ohloh = datetime.datetime.utcnow()
@@ -169,15 +168,16 @@ class Bug(models.Model):
     description = models.TextField()
     status = models.CharField(max_length=200)
     importance = models.CharField(max_length=200)
-    people_involved = models.IntegerField()
+    people_involved = models.IntegerField(null=True)
     date_reported = models.DateTimeField()
     last_touched = models.DateTimeField()
     last_polled = models.DateTimeField()
     submitter_username = models.CharField(max_length=200)
-    submitter_realname = models.CharField(max_length=200)
+    submitter_realname = models.CharField(max_length=200, null=True)
     canonical_bug_link = models.URLField(max_length=200)
     good_for_newcomers = models.BooleanField(default=False)
     looks_closed = models.BooleanField(default=False)
+    bize_size_tag_name = models.CharField(max_length=50) 
 
     all_bugs = models.Manager()
     open_ones = OpenBugsManager()

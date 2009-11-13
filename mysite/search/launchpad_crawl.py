@@ -19,7 +19,10 @@ import codecs
 # Look, ma, a hard-coded table that maps to
 # OpenHatch project names from Launchpad.net project names.
 # TimBL would be proud.
-lpproj2ohproj = { 'do': 'GNOME-do' }
+lpproj2ohproj = { 'lxml': 'lxml', 'do': 'GNOME-do', }
+#FIXME: Add only those of the following that actually use Launchpad for development.
+#u'apache-mod-digest' : u'apache-mod-digest' , u'bws-upload' : u'BWS-Upload' , u'pyjunitxml' : u'pyjunitxml' , u'bzr-search' : u'bzr search plugin' , u'bzr-email' : u'bzr email commit hook' , u'check' : u'check' , u'libsyncml' : u'libsyncml' , u'config-manager' : u'config-manager' , u'testscenarios' : u'testscenarios' , u'liburl' : u'liburl' , u'liblockdir' : u'lockdir' , u'bzr-guess' : u'bzr-guess' , u'etap' : u'etap' , u'gforth' : u'Gforth' , u'bitten' : u'Bitten' , u'sqlobject' : u'SQLObject' , u'bzr-ping' : u'Ping plugin for Bazaar' , u'unittest-ext' : u'unittest-ext' , u'pytz' : u'pytz' , u'funkload' : u'FunkLoad' , u'slony-i' : u'Slony-I' , u'zoneinfo' : u'The tz Database' , u'py-radius' : u'py-radius' , u'pypi' : u'Python Package Index' , u'pybabel' : u'Python Babel' , u'feedvalidator' : u'Feed Validator' , u'sphinx' : u'Sphinx' , u'mammoth-replicator' : u'Mammoth Replicator' , u'dbapi-compliance' : u'Python DBAPI Compliance Tests' , u'wget' : u'wget' , u'redhatcluster' : u'Red Hat Cluster' , u'bugzilla' : u'Bugzilla' , u'grepmap' : u'grepmap' , u'live-f1' : u'Live F1' , u'libnih' : u'libnih' , u'hct' : u'HCT' , u'upstart' : u'upstart ' , u'module-init-tools' : u'module-init-tools' , u'ubuntu-seeds' : u'Ubuntu Seeds' , u'usplash' : u'usplash' , u'merge-o-matic' : u'Merge-o-Matic' , u'uds-intrepid' : u'UDS Intrepid' , u'watershed' : u'watershed' , u'udev-extras' : u'Udev extras' , u'sreadahead' : u'sreadahead' , u'pybootchartgui' : u'pybootchartgui' , u'bootchart-collector' : u'bootchart-collector' , u'bootchart' : u'bootchart' , u'ubiquity' : u'ubiquity' , u'man-db' : u'man-db'}
+
 
 TextBugList = ConnectBugList("text")
 TextBug = ConnectBug("text")
@@ -82,7 +85,7 @@ def clean_lp_data_dict(lp_data_dict):
     # these are the "value",
     new_data = {}
     new_data['title'] = lp_data_dict['title']
-    new_data['description'] = lp_data_dict['text'][:180]
+    new_data['description'] = lp_data_dict['text']
     new_data['status'] = lp_data_dict['status']
     new_data['importance'] = lp_data_dict['importance']
     if new_data['importance'] is None:
