@@ -202,3 +202,6 @@ class RoundupBugTracker(models.Model):
             print bug
             # With the coast clear, we save the bug we just extracted from the Miro tracker.
             bug.save()
+
+    def __unicode__(self):
+        return "<Roundup bug tracker for %s>" % self.roundup_root_url
