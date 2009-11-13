@@ -52,12 +52,11 @@ class RoundupBugTracker(models.Model):
     csv_url = models.CharField(max_length=255)
     include_these_roundup_bug_statuses = models.CharField(max_length=255, default="-1,1,2,3,4,5,6")
     my_bugs_are_always_good_for_newcomers = models.BooleanField(default=False)
+    keyword = models.CharField(max_length=50, null=True, default=None)
 
     @property
     def csv_url(self):
-        return "%s/issue?%s" % (
-                self.roundup_root_url,
-                urllib.urlencode({
+        csv_GET_dict = {
                     "@action": "export_csv",
                     "@columns": "id", 
                     "@sort": "activity",
@@ -65,7 +64,11 @@ class RoundupBugTracker(models.Model):
                     "@filter" : "status",
                     "@startwith": 0,
                     "status": self.include_these_roundup_bug_statuses
-                    }))
+                    }
+        if self.csv_keyword: csv_GET_dict['keyword'] = self.csv_keyword
+        return "%s/issue?%s" % (
+                self.roundup_root_url,
+                urllib.urlencode(csv_GET_dict))
 
     @staticmethod
     def roundup_tree2metadata_dict(tree):
