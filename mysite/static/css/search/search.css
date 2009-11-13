@@ -217,6 +217,10 @@ p {
 #results li .description-container * {
     display: inline;
 }
+#results li.expanded .description {
+    white-space: pre;
+    font-family: monospace;
+}
 
 /* </generic list code> */
 
