@@ -1,10 +1,11 @@
+{% load profile_extras %}
 <div class='search-result-control' id='results-widget'>
     <span id='results-summary'>
         {% comment %} The variable is called `language` but it could be a variety of other fields. FIXME: Fix the variable name. {% endcomment %}
         You searched for <strong id='results-summary-language'>{{ language }}</strong>.
 
         {% if bunch_of_bugs %}
-        <span id='total_bug_count'>{{ total_bug_count }}</span> bugs found.
+        <span id='total_bug_count'>{{ total_bug_count }}</span> bug{{ bunch_of_bugs|pluralize }} found.
         Showing results 
         <span id='results-summary-start'>{{ start }}</span> to
         <span id='results-summary-end'>{{ end }}</span>.
