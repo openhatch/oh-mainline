@@ -9,7 +9,7 @@ ADMINS=[
 INVITE_MODE=True # Enabled on production site
 INVITATIONS_PER_USER=20
 
-TEMPLTE_DEBUG=False
+TEMPLATE_DEBUG=False
 
 EMAIL_SUBJECT_PREFIX='[Kaboom@OH] '
 
