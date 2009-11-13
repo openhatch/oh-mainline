@@ -1,0 +1,81 @@
+{% extends 'base/one_column.html' %}
+{% block main %}
+<style type='text/css'>
+    .fat {
+        width: 236px !important;
+    }
+    form  {
+        float: left;
+        width: 100%;
+    }
+    form div {
+        float: left;
+        width: 90%;
+        margin-bottom: 20px;
+    }
+    h4 {
+        width: 90%;
+    }
+    .skinny {
+        background: none;
+        border: 0;
+    }
+    blockquote {
+        margin: .5em 20px;
+    }
+    label { float: left; font-size: 8pt; margin: 0; padding: 0; text-transform: uppercase; width: 100%; }
+</style>
+<div class='module'>
+    <div class='head'>
+        <ul>
+            <li>
+            <a href='{% url mysite.profile.views.display_person_web the_user.username %}'>&laquo; Back to profile</a>
+            </li>
+        </ul>
+        <h3>Edit your info</h3>
+    </div>
+    <div class='body contains-submodules two-columns'>
+        <div class='submodule skinny'>
+            <div class='body'>
+                <p>Punch in some keywords, e.g.,</p>
+                <p><blockquote><tt>c++, lambda calculus, juggling</tt></blockquote></p>
+            </div>
+        </div>
+        <div class='submodule fat'>
+            <div class='body'>
+                <form name='edit-tags'
+                    action='/people/info/edit/do'
+                    method='POST'>
+
+                    <div class='form-row'>
+                        <label>understands:</label>
+                        <textarea name='edit-tags-understands'>{{ tags_flat.understands }}</textarea>
+                    </div>
+
+                    <div class='form-row'>
+                        <label>will never understand:</label>
+                        <textarea name='edit-tags-understands_not'>{{ tags_flat.understands_not }}</textarea>
+                    </div>
+
+                    <div class='form-row'>
+                        <label>looking for volunteering opportunities tagged with:</label>
+                        <textarea name='edit-tags-seeking'>{{ tags_flat.seeking }}</textarea>
+                    </div>
+
+                    <div class='form-row'>
+                        <label>currently studying:</label>
+                        <textarea name='edit-tags-studying'>{{ tags_flat.studying }}</textarea>
+                    </div>
+
+                    <div class='form-row'>
+                        <label>can mentor in:</label>
+                        <textarea name='edit-tags-can_mentor'>{{ tags_flat.can_mentor }}</textarea>
+                    </div>
+
+                    <input class='save-button' type='submit' value='Save' />
+                </form>
+            </div>      
+        </div> 
+    </div>      
+</div> 
+{% endblock %}
