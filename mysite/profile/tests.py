@@ -137,7 +137,7 @@ class Info(TwillTests):
     # FIXME: Write a unit test for this.
     def update_tags(self, tag_dict):
         # {{{
-        url = 'http://openhatch.org/people/edit/info'
+        url = reverse(mysite.profile.views.edit_info)
         tc.go(make_twill_url(url))
         for tag_type_name in tag_dict:
             tc.fv('edit-tags', 'edit-tags-' + tag_type_name, ", ".join(tag_dict[tag_type_name]))
@@ -743,8 +743,7 @@ class PersonInfoLinksToSearch(TwillTests):
         self.login_with_twill()
 
         # Update paulproteus's tags
-        url = 'http://openhatch.org/people/edit/info'
-        tc.go(make_twill_url(url))
+        tc.go(reverse(mysite.profile.views.edit_info))
         for tag_type_name in tags:
             tc.fv('edit-tags', 'edit-tags-' + tag_type_name, ", ".join(tags[tag_type_name]))
         tc.submit()
