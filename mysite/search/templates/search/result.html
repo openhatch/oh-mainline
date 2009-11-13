@@ -1,9 +1,6 @@
 {% load search %}
 {% load base_extras %}
 
-<!-- <div class='project-info'>
-<img class='logo' src='{{ bug.project.icon_url }}' />
-</div> -->
 <div class='first-line'>
     <div class='head'>
         <img alt='logo for {{bug.project.name}}' title='{{bug.project.name}}'
@@ -18,17 +15,14 @@
 </div>
 <div class='second-line'>
     <span class='description-container'>
+        {% if bug.project.language %}
         <span class='project__language'>{{ bug.project.language|highlight:query_words }}</span> -
-        {% if bug.good_for_newcomers %}
-        <span class='good-for-beginners'>
-            Good for newcomers</span>
         {% endif %}
         {% if bug.good_for_newcomers %}
-        <span>&bull;</span>
+        <span class='good-for-beginners'>Good for newcomers</span> -
         {% endif %}
         <span class='description'>
-            {{ bug.description|highlight:query_words }}
-        </span>
+{{ bug.description|highlight:query_words }}</span>
     </span>
 </div>
 <div class='details'>
