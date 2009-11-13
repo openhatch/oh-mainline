@@ -889,17 +889,21 @@ PortfolioEntry.Add.init = function () {
     PortfolioEntry.Add.$link = $('a#add_pf_entry');
     PortfolioEntry.Add.bindEventHandlers();
 };
+// We do this so that this particular method can be monkeypatched in testDeleteAdderWidget.
+PortfolioEntry.Add.whenDoneAnimating = function () { SaveAllButton.updateDisplay(); };
+
 PortfolioEntry.Add.clickHandler = function () {
     // Draw a widget for adding pf entries.
     var html = $('#add_a_portfolio_entry_building_block').html();
     $add_a_pf_entry = $(html);
     $add_a_pf_entry.attr('id', generateUniqueID());
     $('#portfolio_entries').prepend($add_a_pf_entry);
-    $add_a_pf_entry.hide().fadeIn(SaveAllButton.updateDisplay);
+    $add_a_pf_entry.hide().fadeIn(PortfolioEntry.Add.whenDoneAnimating);
     PortfolioEntry.bindEventHandlers();
     $add_a_pf_entry.find('input[title]').hint();
     return false;
 };
+
 PortfolioEntry.Add.bindEventHandlers = function () {
     PortfolioEntry.Add.$link.click(PortfolioEntry.Add.clickHandler);
 };
