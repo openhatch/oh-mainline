@@ -124,5 +124,3 @@ def grab_miro_bugs():
 
         # With the coast clear, we save the bug we just extracted from the Miro tracker.
         bug.save()
-
-grab = grab_miro_bugs # It's an aPI!
