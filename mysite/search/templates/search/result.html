@@ -27,7 +27,7 @@
         <span>&bull;</span>
         {% endif %}
         <span class='description'>
-            {{ bug.description }}
+            {{ bug.description|highlight:query_words }}
         </span>
     </span>
 </div>
