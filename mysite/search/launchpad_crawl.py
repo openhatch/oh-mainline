@@ -85,7 +85,7 @@ def clean_lp_data_dict(lp_data_dict):
     # these are the "value",
     new_data = {}
     new_data['title'] = lp_data_dict['title']
-    new_data['description'] = lp_data_dict['text'][:180]
+    new_data['description'] = lp_data_dict['text']
     new_data['status'] = lp_data_dict['status']
     new_data['importance'] = lp_data_dict['importance']
     if new_data['importance'] is None:

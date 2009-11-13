@@ -217,6 +217,10 @@ p {
 #results li .description-container * {
     display: inline;
 }
+#results li.expanded .description {
+    white-space: pre;
+    font-family: monospace;
+}
 
 /* </generic list code> */
 
@@ -396,10 +400,10 @@ p {
     height: 50px;
 }
 .good-for-beginners {
-    color: #222;
+    color: #555;
     background-color: #acebc7;
     width: 300px;
-    padding: 2px 5px;
+    padding: 1px;
 }
 .good-for-beginners img {
 }
