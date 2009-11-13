@@ -485,9 +485,10 @@ class Citation(models.Model):
                         self.data_import_attempt.get_source_display(),
                         )
             elif self.data_import_attempt.source == 'lp':
-                return "%s: Participated in %s" % (
-                    self.data_import_attempt.get_source_display(),
-                    self.contributor_role)
+                return "Participated in %s (%s)" % (
+                    self.contributor_role,
+                    self.data_import_attempt.get_source_display()
+                    )
             else:
                 raise ValueError, "There's a DIA of a kind I don't know how to summarize."
         elif self.url is not None:
