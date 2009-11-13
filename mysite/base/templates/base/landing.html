@@ -21,14 +21,6 @@ Home
 
 {% block left %}
 
-<div class='module' id='people'>
-    <div class='head'>
-        <h3>Intriguing people</h3>
-    </div>
-    <div class='body'>
-        Coming soon&hellip;
-    </div>
-</div>
 <div class='module'>
     <div class='head'>
         <h3>Your widget</h3>
@@ -74,6 +66,15 @@ Home
         {% else %}
         To receive recommendations, <a href='{% url mysite.profile.views.portfolio_editor %}'>start your open source portfolio</a>.
         {% endif %}
+    </div>
+</div>
+
+<div class='module' id='people'>
+    <div class='head'>
+        <h3>Intriguing people</h3>
+    </div>
+    <div class='body'>
+        Coming soon&hellip;
     </div>
 </div>
 
