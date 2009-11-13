@@ -27,9 +27,7 @@
         <span>&bull;</span>
         {% endif %}
         <span class='description'>
-            {% filter force_escape %}
-            {{ bug.description|highlight:query_words }}
-            {% endfilter %}
+            {{ bug.description }}
         </span>
     </span>
 </div>
