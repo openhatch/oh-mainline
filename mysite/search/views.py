@@ -123,6 +123,8 @@ def fetch_bugs(request):
     next_page_query_str['end'] = end + diff + 1
 
     data['start'] = start
+    if end > len(bugs):
+        end = len(bugs)
     data['end'] = end
     data['prev_page_url'] = '/search/?' + prev_page_query_str.urlencode()
     data['next_page_url'] = '/search/?' + next_page_query_str.urlencode()
