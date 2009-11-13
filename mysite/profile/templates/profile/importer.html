@@ -1,7 +1,7 @@
 {% extends 'base/one_column.html' %}
 
 {% block title %}
-Portfolio editor
+Manage projects
 {% endblock title %}
 
 {% block css %}
@@ -16,11 +16,11 @@ Portfolio editor
 {% with 1 as edit_mode %}
 <div id='portfolio' class='module editor'>
     <div class='head'>
-        <h3>Portfolio editor</h3>
+        <h3>Manage projects</h3>
         <ul>
             <li>
             <a href='{% url mysite.profile.views.display_person_web person.user.username %}'>
-                &laquo; Back to portfolio
+                &laquo; Back to profile
             </a>
             </li>
         </ul>
@@ -55,7 +55,7 @@ Portfolio editor
 
     <div class='body contains-submodules'>
         <style>.apologies p {margin-top: 0; }</style>
-        <div class='apologies' style='font-size: 15pt; padding: 20px 115px; width: 670px; float: left; text-align: center;'><p>Hi! This is the Portfolio Editor, where you can document your involvement with open source projects. Be proud of everything! From bug reports and translations to patches and commits to code repositories.</p><p style='font-size: 11pt;'>To find things to do in the open source community, use our <a href='/search/'>volunteer opportunity search engine.</a></p></div>
+        <div class='apologies' style='font-size: 15pt; padding: 20px 115px; width: 670px; float: left; text-align: center;'><p>Hi! Here you can document your involvement with open source projects. Be proud of everything! From bug reports and translations to patches and commits to code repositories.</p><p style='font-size: 11pt;'>To find things to do in the open source community, use our <a href='/search/'>volunteer opportunity search engine.</a></p></div>
         <h4>Import links</h4>
         <form id='importer' style='overflow: hidden; height: 40px;' class='submodule' name='import' method='POST'
             action='{% url mysite.profile.views.prepare_data_import_attempts_do %}'>
@@ -89,7 +89,7 @@ Portfolio editor
         <button id='save_all_projects'>Save all projects</button>
         <a style='padding: 5px; margin-right: 30px; float: right;'
             href='{% url mysite.profile.views.display_person_web person.user.username %}'>
-            &laquo; Back to portfolio
+            &laquo; Back to profile
         </a>
     </div>
 </div>

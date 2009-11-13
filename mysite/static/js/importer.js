@@ -662,7 +662,6 @@ PortfolioEntry.Save.postOptions = {
     'dataType': 'json',
 };
 PortfolioEntry.Save.postOptions.success = function (response) {
-    Notifier.displayMessage('Portfolio entry saved.');
     if (typeof response.pf_entry_element_id != 'undefined') {
         // This was an INSERT aka an "Add"
         var $new_pf_entry = $('#'+response.pf_entry_element_id);
@@ -673,7 +672,10 @@ PortfolioEntry.Save.postOptions.success = function (response) {
             .text($old_project_name_field.val());
         $old_project_name_field.replaceWith($new_project_name_span);
     }
-    $('#portfolio_entry_'+response.portfolio_entry__pk).removeClass('unsaved').removeClass('adding');
+    var $entry = $('#portfolio_entry_'+response.portfolio_entry__pk);
+    $entry.removeClass('unsaved').removeClass('adding');
+    var project_name = $entry.find('.project_name').text();
+    Notifier.displayMessage('Saved entry for '+project_name+'.');
     askServerForPortfolio();
 };
 PortfolioEntry.Save.postOptions.error = function (response) {
@@ -726,8 +728,9 @@ PortfolioEntry.Delete.postOptions.success = function (response) {
     /* Find the portfolio entry section of the page, and make it disappear. */
     var pk = response.portfolio_entry__pk;
     $portfolioEntry = $('#portfolio_entry_'+pk);
+    project_name = $portfolioEntry.find('.project_name').text();
     $portfolioEntry.hide();
-    Notifier.displayMessage('Portfolio entry deleted.');
+    Notifier.displayMessage('Deleted entry for '+project_name+'.');
     SaveAllButton.updateDisplay();
 };
 PortfolioEntry.Delete.postOptions.error = function (response) {
