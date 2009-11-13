@@ -1,15 +1,16 @@
-#left {
+#left, #middle, #right {
     float: left;
     width: 288px;
+}
+#left, #middle {
     margin-right: 10px;
 }
-
+#left, #right {
+    width: 288px;
+}
 #middle {
-    float: left;
-    width: 288px;
-    margin-right: 10px;
+    width: 350px;
 }
-#right {
-    width: 360px;
-    float: left;
+#middle .body {
+    width: 302px;
 }

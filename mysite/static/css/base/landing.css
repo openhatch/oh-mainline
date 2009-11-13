@@ -1,7 +1,5 @@
 .module > .head { width: 280px; }
 .module > .body { width: 240px; }
-#right > .module > .head { width: 350px; }
-#right > .module > .body { width: 312px; }
 #page-top { padding: 20px 0 10px 20px; }
 #landing textarea { font: 8pt monospace; height: 300px; width: 500px; }
 #landing #widget-instructions { background-color: #ffc; float: left; margin-left: 30px; margin-top: 10px; padding: 21px; width: 240px; }
