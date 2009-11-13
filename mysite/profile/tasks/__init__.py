@@ -60,8 +60,15 @@ def create_citations_from_launchpad_results(dia_id, lp_results):
         for involvement_type in result['involvement_types']:
 
             (project, _) = Project.objects.get_or_create(name=project_name)
-            (portfolio_entry, _) = PortfolioEntry.objects.get_or_create(
-                    person=person, project=project)
+
+            # This works like a 'get_first_or_create'.
+            # Sometimes there are more than one existing PortfolioEntry
+            # with the details in question.
+            # FIXME: This is untested.
+            if PortfolioEntry.objects.filter(person=person, project=project).count() == 0:
+                portfolio_entry = PortfolioEntry(person=person, project=project)
+                portfolio_entry.save()
+            portfolio_entry = PortfolioEntry.objects.filter(person=person, project=project)[0]
 
             citation = Citation()
             citation.languages = ", ".join(result['languages'])
