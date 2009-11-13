@@ -385,8 +385,7 @@ function updatePortfolio(response) {
                 var already_exists = ($citation_existing_or_not.size() != 0);
                 if (already_exists) {
                     var $citation = $citation_existing_or_not;
-                }
-                else {
+                } else {
                     // Then we have a citation that we're gonna add the DOM.
                     var $citation = $(citation_html);
                     $citation.attr('id', id);
@@ -397,6 +396,9 @@ function updatePortfolio(response) {
                 // published/unpublished status.
                 if (citation.fields.is_published == '1') {
                     $citation.removeClass("unpublished");
+                } else {
+                    // Citation is unpublished
+                    $new_portfolio_entry.addClass('unsaved');
                 }
 
                 var summaryHTML = response.summaries[citation.pk]
