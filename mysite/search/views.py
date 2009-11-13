@@ -124,9 +124,8 @@ def fetch_bugs(request):
 
     if end > len(bugs):
         data['showing_all_results'] = True
-    else:
-        data['start'] = start
-        data['end'] = end
+    data['start'] = start
+    data['end'] = end
     data['prev_page_url'] = '/search/?' + prev_page_query_str.urlencode()
     data['next_page_url'] = '/search/?' + next_page_query_str.urlencode()
 
