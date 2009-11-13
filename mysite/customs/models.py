@@ -52,7 +52,7 @@ class RoundupBugTracker(models.Model):
     csv_url = models.CharField(max_length=255)
     include_these_roundup_bug_statuses = models.CharField(max_length=255, default="-1,1,2,3,4,5,6")
     my_bugs_are_always_good_for_newcomers = models.BooleanField(default=False)
-    keyword = models.CharField(max_length=50, null=True, default=None)
+    csv_keyword = models.CharField(max_length=50, null=True, default=None)
 
     @property
     def csv_url(self):
