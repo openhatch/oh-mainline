@@ -178,6 +178,7 @@ class Bug(models.Model):
     canonical_bug_link = models.URLField(max_length=200)
     good_for_newcomers = models.BooleanField(default=False)
     looks_closed = models.BooleanField(default=False)
+    bize_size_tag_name = models.CharField(max_length=50) 
 
     all_bugs = models.Manager()
     open_ones = OpenBugsManager()
