@@ -12,6 +12,7 @@ import mysite.account.forms
 from django_authopenid import views as oid_views
 
 urlpatterns = patterns('',
+
         # Invitation-related URLs
         (r'^invitation/', include('invitation.urls')),
 

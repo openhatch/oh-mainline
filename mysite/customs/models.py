@@ -43,7 +43,7 @@ class WebResponse(models.Model):
 
 # From http://docs.python.org/library/itertools.html
 def flatten(listOfLists):
-    return list(chain.from_iterable(listOfLists))
+    return list(chain(*listOfLists))
 
 class RoundupBugTracker(models.Model):
 
