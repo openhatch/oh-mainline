@@ -1,16 +1,25 @@
 <div class='search-result-control' id='results-widget'>
     <span id='results-summary'>
-        {% comment %} The variable is called `language` but it could be a variety of other fields. FIXME: Fix the variable name. {% endcomment %}
-        You searched for <strong id='results-summary-language'>{{ language }}</strong>.
 
-        {% if bunch_of_bugs %}
-        <span id='total_bug_count'>{{ total_bug_count }}</span> bug{{ bunch_of_bugs|pluralize }} found.
-        {% ifnotequal start end %}
-        {% comment %}When there's only one bug on the page, no need to mention the obvious.{% endcomment %}
-        Showing results 
-        <span id='results-summary-start'>{{ start }}</span> to
-        <span id='results-summary-end'>{{ end }}</span>.
-        {% endifnotequal %}
+        {% if showing_all_results %}
+        <span id='total_bug_count'>
+            Showing {{ bunch_of_bugs|pluralize:"the only,all"}}
+            <span id='total_bug_count'>{{ total_bug_count }}</span>
+            result{{ bunch_of_bugs|pluralize }} for
+            <strong id='results-summary-language'>{{ language }}</strong>.
+        {% else %}
+            {% comment %} The variable is called `language` but it could represent a
+            variety of other fields. FIXME: Fix the variable name. {% endcomment %}
+            You searched for <strong id='results-summary-language'>{{ language }}</strong>.
+            {% if bunch_of_bugs %}
+            <span id='total_bug_count'>{{ total_bug_count }}</span> bug{{ bunch_of_bugs|pluralize }} found.
+            {% ifnotequal start end %}
+            {% comment %}When there's only one bug on the page, no need to mention the obvious.{% endcomment %}
+            Showing results 
+            <span id='results-summary-start'>{{ start }}</span> to
+            <span id='results-summary-end'>{{ end }}</span>.
+            {% endifnotequal %}
+            {% endif %}
         {% endif %}
     </span>
 
