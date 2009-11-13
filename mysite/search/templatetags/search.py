@@ -27,6 +27,8 @@ from django.utils.safestring import mark_safe
 from django.utils.datastructures import SortedDict
 from itertools import ifilter, takewhile
 import re
+from django.utils.html import escape
+
 
 register = template.Library()
 
@@ -175,7 +177,10 @@ def highlight(text, phrases, ignore_case=None, word_boundary=None, class_name=No
         matches.append(match)
         return template % match.group(0)
 
-    highlighted = mark_safe(expr.sub(replace, text))
+    # Brian Beck's code reads:
+    #highlighted = mark_safe(expr.sub(replace, text))
+    # We changed this to:
+    highlighted = mark_safe(expr.sub(replace, escape(text)))
     count = len(matches)
     return dict(original=text, highlighted=highlighted, hits=count)
 
