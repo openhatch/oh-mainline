@@ -4,9 +4,9 @@ import re
 import lxml.html # scraper library
 from itertools import chain
 import csv
-from mysite.search.models import Bug, Project
 import datetime
 from django.db import models
+import mysite.search.models
 
 class WebResponse(models.Model):
     '''This model abuses the databases as a network log. We store here
@@ -48,7 +48,7 @@ def flatten(listOfLists):
 class RoundupBugTracker(models.Model):
 
     roundup_root_url = models.CharField(max_length=255)
-    project = models.ForeignKey(Project)
+    project = models.ForeignKey(mysite.search.models.Project)
     include_these_roundup_bug_statuses = models.CharField(max_length=255, default="-1,1,2,3,4,5,6")
     my_bugs_are_always_good_for_newcomers = models.BooleanField(default=False)
     csv_keyword = models.CharField(max_length=50, null=True, default=None)
@@ -149,7 +149,7 @@ class RoundupBugTracker(models.Model):
         remote_bug_url = self.roundup_root_url + "/issue%d" % remote_bug_id
         tree = lxml.html.document_fromstring(urllib2.urlopen(remote_bug_url).read())
 
-        bug = Bug()
+        bug = mysite.search.models.Bug()
 
         metadata_dict = RoundupBugTracker.roundup_tree2metadata_dict(tree)
 
@@ -194,7 +194,7 @@ class RoundupBugTracker(models.Model):
             bug = self.create_bug_object_for_remote_bug_id(bug_id)
 
             # If there is already a bug with this canonical_bug_link in the DB, just delete it.
-            bugs_this_one_replaces = Bug.all_bugs.filter(canonical_bug_link=
+            bugs_this_one_replaces = mysite.search.models.Bug.all_bugs.filter(canonical_bug_link=
                                                         bug.canonical_bug_link)
             for delete_me in bugs_this_one_replaces:
                 delete_me.delete()

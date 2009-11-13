@@ -7,8 +7,7 @@ import StringIO
 import Image
 import uuid
 from django.db.models import Q
-
-from mysite.customs import ohloh
+import mysite.customs 
 
 def get_image_data_scaled(image_data, width):
     # scale it
@@ -68,7 +67,7 @@ class Project(models.Model):
 
     def populate_icon_from_ohloh(self):
 
-        oh = ohloh.get_ohloh()
+        oh = mysite.customs.ohloh.get_ohloh()
         try:
             icon_data = oh.get_icon_for_project(self.name)
             self.date_icon_was_fetched_from_ohloh = datetime.datetime.utcnow()
