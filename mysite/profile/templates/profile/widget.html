@@ -274,12 +274,12 @@
 <div id='openhatch-widget'>
     <div class='module'>
         <div class='head'>
-            <h3>Support open source!</h3>
+            <h3>I contribute to open source</h3>
         </div>
         <div class='body'>
-            {% if projects %}
+            {% for entry in person.get_published_portfolio_entries %}
+            {% with entry.project as project %}
             <ul>
-                {% for project, more_project_attributes in projects.items %}
                 <li>
                 <div class='project-escutcheon'>
                     <div class='logo'>
@@ -290,11 +290,11 @@
                     </div>
                 </div>
                 </li>
-                {% endfor %}
             </ul>
-            {% else %}
+            {% endwith %}
+            {% empty %}
             <div>No projects listed yet.</div>
-            {% endif %}
+            {% endfor %}
         </div>
         <div class='foot'>
             <a href='{% url mysite.profile.views.display_person_web person.user.username %}'>See my full profile at

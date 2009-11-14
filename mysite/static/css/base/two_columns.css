@@ -53,3 +53,25 @@
     width: 620px;
     background-color: #fff;
 }
+
+
+/* SKINNY SUBMODULE */
+#main .submodule.skinny { width: 25%; margin-right: 10px; }
+    #main .submodule.skinny .head { width: 82.5%; }
+        #main .submodule.skinny .head h3 { width: 95%; }
+    #main .submodule.skinny .body { width: 90%; }
+
+/* FAT SUBMODULE */
+#main .submodule.fat { width: 70%; }
+    #main .submodule.fat .head { width: 93.8%; }
+        #main .submodule.fat .head h3 { width: 100%; }
+    #main .submodule.fat .body { width: 90%; }
+    #main .submodule.fat .foot { width: 90%; } 
+
+#main .equal-width { width: 45%; } 
+    #main .equal-width .submodule { width: 45%; } 
+        #main .equal-width .submodule .head { width: 90.5%; }
+            #main .equal-width .submodule .head h3,
+        #main .equal-width .submodule .body { width: 90.5%; }
+        #main .equal-width .submodule .foot { width: 91%; }
+

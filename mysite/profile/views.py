@@ -179,8 +179,7 @@ def widget_display_undecorated(request, user_to_display__username):
     person = get_object_or_404(Person, user=user)
 
     data = get_personal_data(person)
-    data['projectexp_editable'] = (user == request.user)
-    data['editable'] = (user == request.user)
+    data['portfolio_ezntries'] = person.get_published_portfolio_entries()
     data['url_prefix'] = request.META['SERVER_NAME'] + ':' + request.META['SERVER_PORT']
     return (request, 'profile/widget.html', data)
     # }}}

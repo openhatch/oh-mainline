@@ -1,5 +1,6 @@
-{% extends 'base/three_columns.html' %}
+{% extends 'base/two_columns_fat_skinny.html' %}
 {% load base_extras %}
+{% load profile_extras %}
 
 {% block title %}
 Home
@@ -8,6 +9,8 @@ Home
 {% block css %}
 {{ block.super }}
 @import url('/static/css/base/landing.css');
+#main { margin-right: 20px; }
+#left { margin-right: 0; }
 {% endblock css %}
 
 {% block pagetop %}
@@ -19,27 +22,7 @@ Home
 
 {% endblock pagetop %}
 
-{% block left %}
-
-<div class='module'>
-    <div class='head'>
-        <h3>Your widget</h3>
-    </div>
-    <div class='body'>
-        <p>Showcase your open source participation on your web things.</p>
-        <div class='widget-wrapper'>
-        <script type='text/javascript' src='/people/{{ the_user.username }}/openhatch-widget.js'></script>
-        </div>
-        <div id='widget-instructions'>
-            Include this tag wherever in your page you want to put the widget:
-            <xmp style='white-space: normal;'><script type='text/javascript' src='http://openhatch.org/people/{{ the_user.username }}/openhatch-widget.js'></script></xmp>
-        </div>
-    </div>
-</div>
-
-{% endblock left %}
-
-{% block middle %}
+{% block main %}
 
 <div class='module' id='bugs'>
     <div class='head'>
@@ -64,28 +47,59 @@ Home
         </ul>
         <p><a href='/search/' style='float: right;'>Find more opportunities <strong>&raquo;</strong></a></p>
         {% else %}
-        To receive recommendations, <a href='{% url mysite.profile.views.portfolio_editor %}'>start your open source portfolio</a>.
+        To receive recommendations, start your profile:
+        <ul>
+            <li>
+            <a href='{% url mysite.profile.views.portfolio_editor %}'>Add projects</a></ul>
+            </li>
+            <li>
+            <a href='{% url mysite.profile.views.edit_info %}'>Tell us a little bit about you</a></ul>
+            </li>
         {% endif %}
     </div>
 </div>
 
 <div class='module' id='people'>
     <div class='head'>
-        <h3>Intriguing people</h3>
+        <h3>Collaborators</h3>
     </div>
     <div class='body'>
-        Coming soon&hellip;
+        {% for pf_entry in the_user.get_profile.get_published_portfolio_entries %}
+        {% show_other_contributors pf_entry.project the_user 4 %}
+        {% empty %}
+        Empty.
+        {% endfor %}
     </div>
 </div>
 
-{% endblock middle %}
+<div class='module'>
+    <div class='head'>
+        <h3>Your widget</h3>
+    </div>
+    <div class='body contains-submodules'>
+        <div class='submodule' style='width: 50%; margin-right: 20px;'>
+            <div class='body' style='width: 85%;'>
+                <p>Showcase your open source participation on your web things.</p>
+                <div id='widget-instructions'>
+                    Include this tag wherever in your page you want to put the widget:
+                    <xmp style='white-space: normal;'><script type='text/javascript' src='http://openhatch.org/people/{{ the_user.username }}/openhatch-widget.js'></script></xmp>
+                </div>
+            </div>
+        </div>
+        <div class='submodule widget-wrapper' style='width: 40%; border: 0; background: none;'>
+            <script type='text/javascript' src='{% url mysite.profile.views.widget_display_js the_user.username %}'></script>
+        </div>
+    </div>
+</div>
 
-{% block right %}
+{% endblock main %}
+
+{% block left %}
 <div class='module' id='meta'>
     <div class='head'>
         <h3>
             <a style='color: inherit;' href='/blog/'>
-                From the OpenHatch blog
+                OpenHatch news
             </a>
         </h3> 
         <a class='blog-feed' title='RSS feed' href='/blog/feed/'>
@@ -107,4 +121,4 @@ Home
         <a style='float: right;' href='/blog/'>Get the whole blog &raquo;</a>
     </div>
 </div>
-{% endblock right %}
+{% endblock left %}
