@@ -154,9 +154,10 @@ Welcome to OpenHatch!
                     action="{% url user_signin %}" method="post">
                     <input type="hidden" name="action" value="verify" />
                     <input type="hidden" name="next" value="{{ next }}" />
-                    <p>Sign in using an account on another network.</p>
+		    <p>No need to sign up! Just
+		      <strong>click your OpenID account provider</strong>.</p>
+		    <p>You can sign in with an account you already have.</p>
                         <div id="openid_choice">
-                            <p>Please click your account provider:</p>
                             <div id="openid_btns"></div>
                         </div>
                         <div id="openid_input_area">
