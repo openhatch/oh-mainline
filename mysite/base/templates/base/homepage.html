@@ -42,61 +42,13 @@ Welcome to OpenHatch!
     <div id='account-related'>
         <ul class='tab-links' class='visible_iff_js'>
             <li>
-            <a href="#sign_up"
-                {% ifnotequal initial_tab_open 'sign_up' %}
-                class='my-tab-is-hidden'
-                {% endifnotequal %}
-                tab_selector="#sign_up">
-              Sign up
-            </a>
-            </li>
-            <li>
             <a href="#login"
-                {% ifnotequal initial_tab_open 'login' %}
-                class='my-tab-is-hidden'
-                {% endifnotequal %}
                 tab_selector="#login">
 	      Sign in
             </a>
             </li>
         </ul>
         <div id='tabs' class='module'>
-            <h3 class='invisible_if_js'>Request an invitation</h3>
-            <div id='sign_up' 
-                {% ifequal initial_tab_open 'sign_up' %}
-                class='tab'
-                {% else %}
-                class='tab invisible_if_js'
-                {% endifequal %}
-                >
-                <form name='request_invitation' method='POST'
-                    action='{% url mysite.account.views.request_invitation %}'>
-                    {% if invitation_success %}
-                    <div class='form-row' style='color: green; font-weight: bold; margin-bottom: 10px;'>
-                        Success! An invitation has been requested for {{ invitation_requested_for }}.
-                    </div>
-                    {% else %}
-                    <p>
-                    We're not quite ready for prime time, so you'll need an invitation to use OpenHatch. Sign up for a sneak peek!
-                    </p>
-                    {% endif %}
-                    {% for field in invitation_request_form %}
-                    <div class='form-row'>
-                        {% if field.errors %}
-                        <div class='field-errors'>
-                            {{ field.errors }}
-                        </div>
-                        {% endif %}
-                        {{ field.label_tag }}
-                        {{ field }}
-                    </div>
-                    {% endfor %}
-                    <div class='form-row'>
-                        <input type='submit' style='float: right;' 
-                        value='Submit' />
-                    </div>
-                </form>
-            </div>
             {% comment %}
             <h3 class='invisible_if_js'>Sign up</h3>
             <div id='create_profile' class='tab'>
@@ -132,10 +84,10 @@ Welcome to OpenHatch!
             {% endcomment %}
             <h3 class='invisible_if_js'>Log in</h3>
             <div id='login' 
-                {% ifequal initial_tab_open 'sign_up' %}
+                {% ifequal initial_tab_open 'login' %}
                 class='tab'
                 {% else %}
-                class='tab invisible_if_js'
+                class='tab'
                 {% endifequal %}
                 >
                 {% if login_notification %}
