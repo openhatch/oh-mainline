@@ -42,11 +42,11 @@ Welcome to OpenHatch!
     <div id='account-related'>
         <ul class='tab-links' class='visible_iff_js'>
             <li>
-            <a href="#request_invitation"
-                {% ifnotequal initial_tab_open 'request_invitation' %}
+            <a href="#sign_up"
+                {% ifnotequal initial_tab_open 'sign_up' %}
                 class='my-tab-is-hidden'
                 {% endifnotequal %}
-                tab_selector="#request_invitation">
+                tab_selector="#sign_up">
               Sign up
             </a>
             </li>
@@ -66,8 +66,8 @@ Welcome to OpenHatch!
         </ul>
         <div id='tabs' class='module'>
             <h3 class='invisible_if_js'>Request an invitation</h3>
-            <div id='request_invitation' 
-                {% ifequal initial_tab_open 'request_invitation' %}
+            <div id='sign_up' 
+                {% ifequal initial_tab_open 'sign_up' %}
                 class='tab'
                 {% else %}
                 class='tab invisible_if_js'
@@ -136,7 +136,7 @@ Welcome to OpenHatch!
             {% endcomment %}
             <h3 class='invisible_if_js'>Log in</h3>
             <div id='login' 
-                {% ifequal initial_tab_open 'request_invitation' %}
+                {% ifequal initial_tab_open 'sign_up' %}
                 class='tab'
                 {% else %}
                 class='tab invisible_if_js'
