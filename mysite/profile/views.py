@@ -105,7 +105,6 @@ def add_citation_manually_do(request):
 
     #}}}
 
-@login_required
 @view
 def display_person_web(request, user_to_display__username=None):
     # {{{
@@ -153,7 +152,6 @@ def tags_dict_for_person(person):
     return ret
     # }}}
 
-@login_required
 @view
 def projectexp_display(request, user_to_display__username, project__name):
     # {{{
@@ -506,7 +504,6 @@ def ask_for_tag_input(request, username):
     return display_person_web(request, username, 'tags', edit='1')
     # }}}
 
-@login_required
 @view
 def display_list_of_people(request):
     """Display a list of people."""
