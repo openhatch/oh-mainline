@@ -48,6 +48,8 @@ def get_current_bug_id2bug_objs():
             gen_project=project_finder_plugin
             )
         bug_id = bug_url2bug_id(bug_obj.canonical_bug_link)
+        bug_obj.good_for_newcomers = True
+        bug_obj.bite_size_tag_name = 'GNOME-Love'
         ret[bug_id] = bug_obj
         
     return ret
