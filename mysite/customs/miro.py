@@ -69,7 +69,7 @@ def bug_elt2bug_object(parsed, canonical_bug_link_format_string,
         project = project,
         title = get_tag_text_from_xml(parsed, 'short_desc'),
         description = (get_tag_text_from_xml(parsed, 'long_desc/thetext') or
-                       get_tag_text_from_xml(parsed, 'short_desc')),
+                       '(Empty description)'),
         status = status,
         importance = get_tag_text_from_xml(parsed, 'bug_severity'),
         people_involved = count_people_involved(parsed),
