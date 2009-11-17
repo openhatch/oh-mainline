@@ -24,5 +24,14 @@ class GrabMiroBugs(PeriodicTask):
         logger.info("Started to grab Miro bitesized bugs")
         mysite.customs.miro.grab_miro_bugs()
 
+class GrabGnomeLoveBugs(PeriodicTask):
+    run_every = timedelta(days=1)
+    def run(self, **kwargs):
+        logger = self.get_logger(**kwargs)
+        logger.info("Started to grab GNOME Love bugs")
+        mysite.customs.bugtrackers.gnome_love.grab()
+
+
 tasks.register(GrabMiroBugs)
+tasks.register(GrabGnomeLoveBugs)
 tasks.register(GrabLaunchpadBugs)
