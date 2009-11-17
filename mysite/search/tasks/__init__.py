@@ -4,6 +4,7 @@ from celery.task import PeriodicTask
 from celery.registry import tasks
 from mysite.search.launchpad_crawl import grab_lp_bugs, lpproj2ohproj
 import mysite.customs.miro
+import mysite.customs.bugtrackers.gnome_love
 
 class GrabLaunchpadBugs(PeriodicTask):
     run_every = timedelta(days=1)
