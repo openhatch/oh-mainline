@@ -25,7 +25,7 @@ def count_people_involved(xml_doc):
     """Strategy: Create a set of all the listed text values
     inside a <who ...>(text)</who> tag
     Return the length of said set."""
-    everyone = [tag.text for tag in xml_doc.xpath('who')]
+    everyone = [tag.text for tag in xml_doc.xpath('.//who')]
     return len(set(everyone))
 
 def bugzilla_date_to_datetime(date_string):
