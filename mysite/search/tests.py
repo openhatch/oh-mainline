@@ -35,7 +35,7 @@ class SearchTest(TwillTests):
     def search_via_twill(self, query=None):
         search_url = "http://openhatch.org/search/" 
         if query:
-            search_url += '?language=%s' % query
+            search_url += '?q=%s' % query
         tc.go(make_twill_url(search_url))
 
 class AutoCompleteTests(SearchTest):
@@ -168,7 +168,7 @@ class SearchResultsSpecificBugs(SearchTest):
 
     def test_search_single_query(self):
         """Test that get_bugs_by_query_words produces the expected results."""
-        response = self.client.get('/search/', {'language': 'python'})
+        response = self.client.get('/search/', {'q': 'python'})
         returned_bugs = response.context[0]['bunch_of_bugs']
         for cf in self.canonical_filters:
             self.failUnless(Bug.all_bugs.filter(cf)[0] in returned_bugs, "Search engine did not correctly use the filter %s" % cf)
@@ -186,7 +186,7 @@ class SearchResultsSpecificBugs(SearchTest):
         self.assert_(len(list(Bug.all_bugs.filter(title=title_of_bug_to_exclude))) == 1)
 
         response = self.client.get('/search/',
-                                   {'language': 'python "An interesting description"'})
+                                   {'q': 'python "An interesting description"'})
 
         included_the_right_bug = False
         excluded_the_wrong_bug = True
@@ -216,7 +216,7 @@ class SearchResults(TwillTests):
         self.failUnlessEqual(ctxt_we_care_about['end'], 10)
 
     def test_json_view(self):
-        tc.go(make_twill_url('http://openhatch.org/search/?format=json&jsoncallback=callback&language=python'))
+        tc.go(make_twill_url('http://openhatch.org/search/?format=json&jsoncallback=callback&q=python'))
         response = tc.show()
         self.assert_(response.startswith('callback'))
         json_string_with_parens = response.split('callback', 1)[1]
@@ -229,7 +229,7 @@ class SearchResults(TwillTests):
     def testPagination(self):
         url = 'http://openhatch.org/search/'
         tc.go(make_twill_url(url))
-        tc.fv('search_opps', 'language', 'python')
+        tc.fv('search_opps', 'q', 'python')
         tc.submit()
 
         # Grab descriptions of first 10 Exaile bugs
@@ -253,7 +253,7 @@ class SearchResults(TwillTests):
 
         url = 'http://openhatch.org/search/'
         tc.go(make_twill_url(url))
-        tc.fv('search_opps', 'language', 'python')
+        tc.fv('search_opps', 'q', 'python')
         tc.submit()
 
         # Grab descriptions of first 10 Exaile bugs
@@ -274,7 +274,7 @@ class SearchResults(TwillTests):
             tc.find(bug.description)
 
         # Now, change the query - do we stay that paginated?
-        tc.fv('search_opps', 'language', 'c#')
+        tc.fv('search_opps', 'q', 'c#')
         tc.submit()
 
         # Grab descriptions of first 10 GNOME-Do bugs

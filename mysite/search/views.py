@@ -79,7 +79,7 @@ def fetch_bugs(request):
 
     suggestions = [(i, k, False) for i, k in enumerate(suggestion_keys)]
 
-    query = request.GET.get('language', '')
+    query = request.GET.get('q', '')
     query_words = split_query_words(query)
     format = request.GET.get('format', None)
     start = int(request.GET.get('start', 1))
@@ -103,7 +103,7 @@ def fetch_bugs(request):
         bugs = []
 
     data = {}
-    data['language'] = query
+    data['q'] = query
     data['query_words'] = query_words
 
     prev_page_query_str = QueryDict('')
@@ -111,8 +111,8 @@ def fetch_bugs(request):
     next_page_query_str = QueryDict('')
     next_page_query_str = next_page_query_str.copy()
     if query:
-        prev_page_query_str['language'] = query
-        next_page_query_str['language'] = query
+        prev_page_query_str['q'] = query
+        next_page_query_str['q'] = query
     if format:
         prev_page_query_str['format'] = format
         next_page_query_str['format'] = format
