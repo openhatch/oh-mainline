@@ -782,7 +782,6 @@ class PersonalData(TwillTests):
 
         # Views where you look only at yourself.
         navelgazing_view2args = {
-                mysite.profile.views.display_person_edit_web: {},
                 mysite.profile.views.projectexp_add_form: {},
                 mysite.profile.views.projectexp_edit: {'project__name': 'ccHost'},
                 mysite.profile.views.importer: {},
