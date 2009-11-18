@@ -13,6 +13,7 @@ def _blog_entries():
     parsed = feedparser.parse(OPENHATCH_BLOG_FEED_URL)
     for entry in parsed['entries']:
         entry['unicode_text'] = summary2html(entry['summary'])
+        entry['title'] = summary2html(entry['title'])
     return parsed['entries']
 
 def cached_blog_entries():
