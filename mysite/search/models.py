@@ -184,5 +184,20 @@ class Bug(models.Model):
 
     def __unicode__(self):
         return "<Bug title='%s' project='%s' project__language='%s' description='%s...'>" % (self.title, self.project.name, self.project.language, self.description[:50])
-    
+
+    @staticmethod
+    def create_testing_bug(**kwargs):
+        now = datetime.datetime.utcnow()
+        data = dict(title='', project=Project.objects.all()[0], 
+                date_reported=now,
+                last_touched=now,
+                last_polled=now,
+                canonical_bug_link="http://asdf.com",
+                submitter_username='dude',
+                description='')
+        data.update(kwargs)
+        ret = Bug(**data)
+        ret.save()
+        return ret
+
 # vim: set ai ts=4 nu:

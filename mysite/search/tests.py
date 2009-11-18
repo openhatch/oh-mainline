@@ -532,8 +532,9 @@ class IconGetsScaled(SearchTest):
 class SearchOnFullWords(SearchTest):
     def test_find_perl_not_properly(self):
         project = Project(name='A project')
-        properly_bug = Bug(title='A bug', description='properly')
-        perl_bug = Bug(title='A bug', description='perl')
+        project.save()
+        properly_bug = Bug.create_testing_bug(description='properly')
+        perl_bug = Bug.create_testing_bug(description='perl')
         results = mysite.search.views.get_bugs_by_query_words(['perl'])
         self.assertEqual(results, [perl_bug])
 
