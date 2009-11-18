@@ -58,11 +58,10 @@ Welcome to OpenHatch!
             <!-- notification_id: {{ notification_id }} -->
             {% endif %}
             <h3 style='width: 100%; text-align: left; margin: 0; margin-bottom: 10px;'>Sign in</h3>
-            <p>No need to sign up! Sign in with an account you already have.</p>
             {% with openid_signin_form as form %}
             {% include 'account/login_openid.html' %}
             {% endwith %}
-            <a id='toggleNormalLogin' href='#'>
+            <a href='/account/login/old'>
                 Sign in with a password
             </a>
             <form id='normal_login_form' name='login'

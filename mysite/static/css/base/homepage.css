@@ -68,6 +68,9 @@ h3 {
     -moz-border-radius: 10px;
     background: #fff;
 }
+#explanation a {
+    color: #555;
+}
 #explanation h5 {
     font-weight: bold;
     color: #555;
@@ -102,6 +105,9 @@ h3 {
     float: left;
     width: 220px;
     padding: 5px;
+}
+#explanation li h4 a {
+    padding: 0;
 }
 #explanation .left {
     margin-right: 10px;
