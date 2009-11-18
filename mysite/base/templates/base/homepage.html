@@ -2,9 +2,9 @@
 
 {% load i18n %}
 
-{% block title %}
-Welcome to OpenHatch!
-{% endblock title %}
+{% block whole_title %}
+Welcome to OpenHatch! 
+{% endblock whole_title %}
 
 {% block nav %}
 {% endblock nav %}
@@ -30,103 +30,49 @@ Welcome to OpenHatch!
 
 {% block css %}
 {{ block.super }}
+@import url('/static/css/account/auth.css');
 @import url('/static/css/base/homepage.css');
 @import url('/static/openid/css/openid.css');
 {% endblock css %}
 
 {% block content %}
+<style type='text/css'>
+    form { width: 100%; }
+    form p { width: 100%; }
+    form label { width: 92px; }
+    #account-related { float: left; width: 350px; }
+    #account-related .body { background: transparent url('/static/images/white-sidebar.png'); border: 1px solid #f4f4f4; width: 308px; }
+</style>
 <div class='left'>
     <div id='banner'>
         <img alt='OpenHatch' src='/static/images/the-logo.png' width='300'/>
     </div>
-    <div id='account-related'>
-        <ul class='tab-links' class='visible_iff_js'>
-            <li>
-            <a href="#login"
-                tab_selector="#login">
-	      Sign in
-            </a>
-            </li>
-        </ul>
-        <div id='tabs' class='module'>
-            {% comment %}
-            <h3 class='invisible_if_js'>Sign up</h3>
-            <div id='create_profile' class='tab'>
-                {% if signup_notification %}
-                <div class='notification'>
-                    {{ signup_notification }}
-                </div>
-                {% endif %}
-                {% if notification_id %}
-                <!-- notification_id: {{ notification_id }} -->
-                {% endif %}
-                <form id='create_profile' name='create_profile'
-                    action='/account/signup/do' method='POST'>
-                    {% for field in signup_form %}
-                    {% ifnotequal field.html_name "password2" %}
-                    <div class='form-row'>
-                        {% if field.errors %}
-                        <div class='field-errors'>
-                            {{ field.errors }}
-                        </div>
-                        {% endif %}
-                        {{ field.label_tag }}
-                        {{ field }}
-                    </div>
-                    {% endifnotequal %}
-                    {% endfor %}
-                    <div class='form-row'>
-                        <input type='submit' style='float: right;' 
-                        value='begin!' />
-                    </div>
-                </form>
+    <div id='account-related' class='module'>
+        <div class='body'>
+            {% if login_notification %}
+            <div class='notification'>
+                {{ login_notification }}
             </div>
-            {% endcomment %}
-            <h3 class='invisible_if_js'>Log in</h3>
-            <div id='login' 
-                {% ifequal initial_tab_open 'login' %}
-                class='tab'
-                {% else %}
-                class='tab'
-                {% endifequal %}
-                >
-                {% if login_notification %}
-                <div class='notification'>
-                    {{ login_notification }}
-                </div>
-                {% endif %}
-                {% if notification_id %}
-                <!-- notification_id: {{ notification_id }} -->
-                {% endif %}
-                <form id="openid_form" name="openid_form"
-                    action="{% url user_signin %}" method="post">
-                    <input type="hidden" name="action" value="verify" />
-                    <input type="hidden" name="next" value="{{ next }}" />
-		    <p>No need to sign up! Just
-		      <strong>click your OpenID account provider</strong>.</p>
-		    <p>You can sign in with an account you already have.</p>
-                        <div id="openid_choice">
-                            <div id="openid_btns"></div>
-                        </div>
-                        <div id="openid_input_area">
-                            <label for="id_openid_ul">
-                                OpenID URL:
-                            </label>
-                            {{ openid_signin_form.openid_url }}
-                            <input name="openid_submit" type="submit"
-                            value="Sign in">
-                        </div>
-                </form>
-                <a id='toggleNormalLogin' href='#'>
-                    <span class='verb'>Show</span> normal login
-                </a>
-                <form id='normal_login_form' name='login'
-                    action='/account/login/do' method='POST'>
-                    {{ old_fashioned_authentication_form.as_ul }}
-                        <input type='submit' value='log in!' style='' />
-			<a href="/account/forgot_pass/">Forgot your password?</a>
-                </form>
-            </div> 
+            {% endif %}
+            {% if notification_id %}
+            <!-- notification_id: {{ notification_id }} -->
+            {% endif %}
+            <h3 style='width: 100%; text-align: left; margin: 0; margin-bottom: 10px;'>Sign in</h3>
+            <p>No need to sign up! Sign in with an account you already have.</p>
+            {% with openid_signin_form as form %}
+            {% include 'account/login_openid.html' %}
+            {% endwith %}
+            <a id='toggleNormalLogin' href='#'>
+                <span class='verb'>Use</span> normal login
+            </a>
+            <form id='normal_login_form' name='login'
+                action='/account/login/do' method='POST'>
+                {{ old_fashioned_authentication_form.as_p }}
+                <p>
+                    <input type='submit' value='Go' style='' />
+                    <a href="/account/forgot_pass/">Forgot your password?</a>
+                </p>
+            </form>
         </div>
     </div>
 </div>
@@ -186,7 +132,6 @@ Welcome to OpenHatch!
             </div>
         </ul>
     </div>
-
 </div>
 {% endblock content %}
 
