@@ -66,7 +66,9 @@ Home
                     href='{{ bug.canonical_bug_link }}'>
                     {{ bug.title }}</a>
                 in&nbsp;{{ bug.project.name }}
+                {% if bug.project.language %}
                 (in&nbsp;{{ bug.project.language }})
+                {% endif %}
             </span></li>
             {% endfor %}
         </ul>
