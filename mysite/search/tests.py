@@ -529,4 +529,12 @@ class IconGetsScaled(SearchTest):
         self.assertEqual(p.icon_smaller_for_badge.width, 40,
                          "Expected p.icon_smaller_for_badge to be 40 pixels wide.")
 
+class SearchOnFullWords(SearchTest):
+    def test_find_perl_not_properly(self):
+        project = Project(name='A project')
+        properly_bug = Bug(title='A bug', description='properly')
+        perl_bug = Bug(title='A bug', description='perl')
+        results = mysite.search.views.get_bugs_by_query_words(['perl'])
+        self.assertEqual(results, [perl_bug])
+
 # vim: set nu ai et ts=4 sw=4 columns=80:
