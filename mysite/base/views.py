@@ -23,7 +23,7 @@ import mysite.customs.feed
 from django.contrib.auth.decorators import login_required
 
 def homepage(request, signup_form=None,
-        invitation_request_form=None, initial_tab_open='request_invitation'):
+        invitation_request_form=None, initial_tab_open='login'):
 
     if request.user.is_authenticated():
         return landing_page(request)

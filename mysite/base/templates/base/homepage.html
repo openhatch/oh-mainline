@@ -42,67 +42,13 @@ Welcome to OpenHatch!
     <div id='account-related'>
         <ul class='tab-links' class='visible_iff_js'>
             <li>
-            <a href="#request_invitation"
-                {% ifnotequal initial_tab_open 'request_invitation' %}
-                class='my-tab-is-hidden'
-                {% endifnotequal %}
-                tab_selector="#request_invitation">
-                <img src='/static/images/base/request-an-invitation.png'
-                alt='Request an invitation' />
-            </a>
-            </li>
-            {% comment %}
-            <li><a href="#create_profile" class='visible_iff_js'
-                tab_selector="#create_profile">Sign up</a></li>
-            {% endcomment %}
-            <li>
             <a href="#login"
-                {% ifnotequal initial_tab_open 'login' %}
-                class='my-tab-is-hidden'
-                {% endifnotequal %}
                 tab_selector="#login">
-                <img src='/static/images/base/sign-in.png'
-                alt='Sign in' />
+	      Sign in
             </a>
             </li>
         </ul>
         <div id='tabs' class='module'>
-            <h3 class='invisible_if_js'>Request an invitation</h3>
-            <div id='request_invitation' 
-                {% ifequal initial_tab_open 'request_invitation' %}
-                class='tab'
-                {% else %}
-                class='tab invisible_if_js'
-                {% endifequal %}
-                >
-                <form name='request_invitation' method='POST'
-                    action='{% url mysite.account.views.request_invitation %}'>
-                    {% if invitation_success %}
-                    <div class='form-row' style='color: green; font-weight: bold; margin-bottom: 10px;'>
-                        Success! An invitation has been requested for {{ invitation_requested_for }}.
-                    </div>
-                    {% else %}
-                    <p>
-                    We're not quite ready for prime time, so you'll need an invitation to use OpenHatch. Sign up for a sneak peek!
-                    </p>
-                    {% endif %}
-                    {% for field in invitation_request_form %}
-                    <div class='form-row'>
-                        {% if field.errors %}
-                        <div class='field-errors'>
-                            {{ field.errors }}
-                        </div>
-                        {% endif %}
-                        {{ field.label_tag }}
-                        {{ field }}
-                    </div>
-                    {% endfor %}
-                    <div class='form-row'>
-                        <input type='submit' style='float: right;' 
-                        value='Submit' />
-                    </div>
-                </form>
-            </div>
             {% comment %}
             <h3 class='invisible_if_js'>Sign up</h3>
             <div id='create_profile' class='tab'>
@@ -138,10 +84,10 @@ Welcome to OpenHatch!
             {% endcomment %}
             <h3 class='invisible_if_js'>Log in</h3>
             <div id='login' 
-                {% ifequal initial_tab_open 'request_invitation' %}
+                {% ifequal initial_tab_open 'login' %}
                 class='tab'
                 {% else %}
-                class='tab invisible_if_js'
+                class='tab'
                 {% endifequal %}
                 >
                 {% if login_notification %}
@@ -156,9 +102,10 @@ Welcome to OpenHatch!
                     action="{% url user_signin %}" method="post">
                     <input type="hidden" name="action" value="verify" />
                     <input type="hidden" name="next" value="{{ next }}" />
-                    <p>Sign in using an account on another network.</p>
+		    <p>No need to sign up! Just
+		      <strong>click your OpenID account provider</strong>.</p>
+		    <p>You can sign in with an account you already have.</p>
                         <div id="openid_choice">
-                            <p>Please click your account provider:</p>
                             <div id="openid_btns"></div>
                         </div>
                         <div id="openid_input_area">

@@ -6,7 +6,7 @@ ADMINS=[
     ('All OH devs', 'devel@lists.openhatch.org'),
 ]
 
-INVITE_MODE=True # Enabled on production site
+INVITE_MODE=False # Suckas, invite codes are disabled everywarez
 INVITATIONS_PER_USER=20
 
 TEMPLATE_DEBUG=False

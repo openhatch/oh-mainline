@@ -46,7 +46,7 @@ class TwillTests(django.test.TestCase):
         login_url = 'http://openhatch.org/'
         tc.go(make_twill_url(login_url))
 
-        if 'prime' not in tc.show():
+        if 'homepage.js' not in tc.show():
             print "Tried to login, but we're not on homepage!"
             import pdb
             pdb.set_trace()

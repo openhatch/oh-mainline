@@ -410,8 +410,8 @@ function updatePortfolio(response) {
 
 	}
 
-    if (response.import.running) {
-        Importer.ProgressBar.showWithValue(response.import.progress_percentage);
+    if (response['import'].running) {
+        Importer.ProgressBar.showWithValue(response['import'].progress_percentage);
         window.setTimeout(askServerForPortfolio, 1500);
     }
     else {
