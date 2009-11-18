@@ -531,11 +531,10 @@ class IconGetsScaled(SearchTest):
 
 class SearchOnFullWords(SearchTest):
     def test_find_perl_not_properly(self):
-        project = Project(name='A project')
-        project.save()
-        properly_bug = Bug.create_testing_bug(description='properly')
-        perl_bug = Bug.create_testing_bug(description='perl')
+        project = Project.create_dummy()
+        properly_bug = Bug.create_dummy(description='properly')
+        perl_bug = Bug.create_dummy(description='perl')
         results = mysite.search.views.get_bugs_by_query_words(['perl'])
-        self.assertEqual(results, [perl_bug])
+        self.assertEqual(list(results), [perl_bug])
 
 # vim: set nu ai et ts=4 sw=4 columns=80:
