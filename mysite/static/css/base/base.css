@@ -205,23 +205,16 @@ ul#links {
     width: 100%;
     clear: both;
     left: 0;
-    background-color: #555;
-    width: 10000px;
-    position: relative;
-    left: -5000px;
 }
 #footer {
     width: 950px;
     padding: 15px 5px;
     margin: 0 auto;
     text-align: right;
-    position: relative;
-    left: 495px;
 }
 #footer ul {
     display: inline;
     list-style-type: none;
-    font-size: 10pt;
     max-width: 108em;
     margin: 0 auto;
 }
@@ -232,7 +225,7 @@ ul#links {
 }
 
 #footer a {
-    color: #fff;
+    color: #555;
 }
 
 #footer a:hover {
