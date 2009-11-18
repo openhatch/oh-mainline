@@ -7,28 +7,32 @@ Log in
 {% block css %}
 {{ block.super }}
 @import url('/static/css/account/auth.css');
+@import url('/static/openid/css/openid.css');
+form {
+    width: 500px;
+}
 {% endblock css %}
 
 {% block main %}
 <div id='login' class='module'>
     <div class='head'>
-        <h3>Please log in</h3>
+        <h3>Log in with OpenID</h3>
     </div>
     <div class='body'>
-        <form name='login'
-            action='/account/login/do?next={{ next }}' method='POST'>
-            {{ form.as_ul }}
-            <div class='form-row'>
-                <input type='submit' value='Log in' style='' />
-            </div>
-        </form>
+        <div style='float: left; width: 500px;'>
+            <p >Sign in with an account you already have:</p>
+            {% include 'account/login_openid.html' %}
+        </div>
         <ul class='login-links' style='float: right; width: 300px; padding: 16px; padding-bottom: 16px; border-radius: 8px; -moz-border-radius: 8px; background-color: #f4f4f4;'>
             <h4 style='width: 95%;'>Relatedly</h4>
             <style>.login-links li { list-style: square; float: left; width: 95%; margin-top: 5px; margin-left: 15px; }</style>
-            <li><a style='font-weight: bold;' href='/#tab=create_profile'>Sign up for an account</a> if you haven't already!</li>
-            <li><a href='/#tab=login'>Sign in with OpenID</a></li>
-            <li><a href='/account/forgot_pass/'>Forgot your password?</a></li>
+            <li><a style='font-weight: bold;' href='/blog/2009/why-we-support-openid'>What is OpenID?</a></li>
         </ul>
     </div>
 </div>
 {% endblock main %}
+
+{% block js %}
+<script src="/static/openid/js/openid-jquery.js"></script>
+<script> $(function() { openid.init('id_openid_url'); }); </script>
+{% endblock %}
