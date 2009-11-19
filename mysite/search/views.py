@@ -102,7 +102,6 @@ def fetch_bugs(request):
         bugs = get_bugs_by_query_words(query_words, 
                 facets=data['active_facets'])
 
-
         total_bug_count = bugs.count()
 
         bugs = bugs[start-1:end]
@@ -118,7 +117,7 @@ def fetch_bugs(request):
     data['query_words'] = query_words
 
     # Handle facets
-    data['all_facets'] = mysite.search.controllers.discover_available_facets()
+    data['all_facets'] = mysite.search.controllers.discover_available_facets(query_words=query_words)
 
     prev_page_query_str = QueryDict('')
     prev_page_query_str = prev_page_query_str.copy()
@@ -130,16 +129,17 @@ def fetch_bugs(request):
     if format:
         prev_page_query_str['format'] = format
         next_page_query_str['format'] = format
+    for facet_name, value in data['active_facets'].items():
+        prev_page_query_str[facet_name] = value
+        next_page_query_str[facet_name] = value
     diff = end - start
     prev_page_query_str['start'] = start - diff - 1
     prev_page_query_str['end'] = start - 1
     next_page_query_str['start'] = end + 1
     next_page_query_str['end'] = end + diff + 1
 
-    if end > len(bugs):
-        data['showing_all_results'] = True
     data['start'] = start
-    data['end'] = end
+    data['end'] = min(end, total_bug_count)
     data['prev_page_url'] = '/search/?' + prev_page_query_str.urlencode()
     data['next_page_url'] = '/search/?' + next_page_query_str.urlencode()
 

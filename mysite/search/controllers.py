@@ -1,11 +1,12 @@
 import mysite.search.models
+import mysite.search.views
 import collections
 
-def discover_available_facets():
+def discover_available_facets(query_words=[]):
     """
     Returns facet2value2count
     """
-    bugs = mysite.search.models.Bug.open_ones.all()
+    bugs = mysite.search.views.get_bugs_by_query_words(query_words)
     # The languages facet is based on the project languages, "for now"
     ret = {}
     ret['Language'] = collections.defaultdict(int)
