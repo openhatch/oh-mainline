@@ -43,13 +43,8 @@ class TwillTests(django.test.TestCase):
 
     def login_with_twill(self):
         # Visit login page
-        login_url = 'http://openhatch.org/'
+        login_url = 'http://openhatch.org/account/login/old'
         tc.go(make_twill_url(login_url))
-
-        if 'homepage.js' not in tc.show():
-            print "Tried to login, but we're not on homepage!"
-            import pdb
-            pdb.set_trace()
 
         # Log in
         username = "paulproteus"
