@@ -3,6 +3,7 @@ from mysite.base.tests import make_twill_url, TwillTests
 import mysite.account.tests
 from mysite.profile.models import Person
 import mysite.customs.miro
+import mysite.search.controllers
 
 import django.test
 from mysite.search.models import Project, Bug
@@ -528,5 +529,15 @@ class IconGetsScaled(SearchTest):
         # Assertion 3: Verify that it has the right width
         self.assertEqual(p.icon_smaller_for_badge.width, 40,
                          "Expected p.icon_smaller_for_badge to be 40 pixels wide.")
+
+class DiscoverFacets(SearchTest):
+    def test_discover_available_facets(self):
+        p = mysite.search.models.Project()
+        p.icon = ''
+        p.language = 'Python'
+        p.save()
+
+        facets = mysite.search.controllers.discover_available_facets()
+        self.assertEqual(facets, {'Language': set(['Python'])})
 
 # vim: set nu ai et ts=4 sw=4 columns=80:
