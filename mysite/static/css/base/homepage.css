@@ -52,8 +52,7 @@ h3 {
     width: 220px;
     float: left;
     margin-right: 50px;
-    padding: 40px 0;
-    padding-right: 80px;
+    padding: 40px 80px 10px 30px;
 }
 #account-related {
     width: 350px;
@@ -66,7 +65,11 @@ h3 {
     border: 5px solid #f9f9f9;
     border-radius: 10px;
     -moz-border-radius: 10px;
+    border-radius: 10px;
     background: #fff;
+}
+#explanation a {
+    color: #555;
 }
 #explanation h5 {
     font-weight: bold;
@@ -102,6 +105,9 @@ h3 {
     float: left;
     width: 220px;
     padding: 5px;
+}
+#explanation li h4 a {
+    padding: 0;
 }
 #explanation .left {
     margin-right: 10px;
