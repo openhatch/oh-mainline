@@ -46,10 +46,13 @@ def split_query_words(string):
     return ret
     # }}}
 
-def get_bugs_by_query_words(query_words):
+def get_bugs_by_query_words(query_words, facets={}):
     """Get bugs matching any of the words in 'query_words'."""
 
     bugs = Bug.open_ones.all()
+
+    if 'Language' in facets:
+        bugs = bugs.filter(project__language__iexact=facets['Language'])
 
     # Filter
     for word in query_words:
@@ -88,8 +91,16 @@ def fetch_bugs(request):
 
     total_bug_count = 0
 
-    if query:
-        bugs = get_bugs_by_query_words(query_words)
+    data = {}
+    data['active_facets'] = {}
+    possible_facets = ['Language']
+    for facet in possible_facets:
+        if request.GET.get(facet):
+            data['active_facets'][facet] = request.GET.get(facet)
+
+    if query or data['active_facets']:
+        bugs = get_bugs_by_query_words(query_words, 
+                facets=data['active_facets'])
 
 
         total_bug_count = bugs.count()
@@ -103,17 +114,11 @@ def fetch_bugs(request):
     else:
         bugs = []
 
-    data = {}
     data['q'] = query
     data['query_words'] = query_words
 
     # Handle facets
     data['all_facets'] = mysite.search.controllers.discover_available_facets()
-    possible_facets = ['Language']
-    data['active_facets'] = {}
-    for facet in possible_facets:
-        if request.GET.get(facet):
-            data['active_facets'][facet] = request.GET.get(facet)
 
     prev_page_query_str = QueryDict('')
     prev_page_query_str = prev_page_query_str.copy()

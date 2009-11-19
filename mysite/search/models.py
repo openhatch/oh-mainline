@@ -42,7 +42,8 @@ class Project(models.Model):
     @staticmethod
     def create_dummy(**kwargs):
         now = datetime.datetime.utcnow()
-        data = dict(name='', icon='/static/no-project-icon.png')
+        data = dict(name=uuid.uuid4().hex,
+                icon='/static/no-project-icon.png')
         data.update(kwargs)
         ret = Project(**data)
         ret.save()

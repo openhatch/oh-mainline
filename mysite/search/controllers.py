@@ -10,7 +10,7 @@ def discover_available_facets():
     ret = {}
     ret['Language'] = collections.defaultdict(int)
     projects = set([bug.project for bug in bugs])
-    for project in projects:
-        ret['Language'][project.language] += 1
+    for bug in bugs:
+        ret['Language'][bug.project.language] += 1
     ret['Language'] = dict(ret['Language'])
     return ret

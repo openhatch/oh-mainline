@@ -4,7 +4,9 @@
         {% if showing_all_results %}
         <span id='total_bug_count'>
             Showing {{ bunch_of_bugs|pluralize:"the only,all"}}
+            {% ifnotequal total_bug_count 1 %}
             <span id='total_bug_count'>{{ total_bug_count }}</span>
+            {% endifnotequal %}
             result{{ bunch_of_bugs|pluralize }} for
             <strong id='results-summary-language'>{{ q }}</strong>.
         {% else %}

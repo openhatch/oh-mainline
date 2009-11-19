@@ -99,6 +99,7 @@ Search bugs
                 <ul>
                     {% for facet, value in active_facets.items %}
                     <li>{{facet}}: {{value}}</li>
+                    <input type='hidden' name='{{facet}}' value='{{value}}' />
                     {% endfor %}
                 </ul>
             </div>

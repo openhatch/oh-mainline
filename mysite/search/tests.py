@@ -551,4 +551,20 @@ class SearchTemplateDecodesQueryString(SearchTest):
         expected_facets = { 'Language': 'Python' }
         self.assertEqual(response.context['active_facets'], expected_facets)
 
+class FacetsFilterResults(SearchTest):
+    def test_facets_filter_results(self):
+        facets = {'Language': 'Python'}
+
+        # Those facets should pick up this bug:
+        python_project = Project.create_dummy(language='Python')
+        python_bug = Bug.create_dummy(project=python_project)
+
+        # But not this bug
+        not_python_project = Project.create_dummy(language='Nohtyp')
+        not_python_bug = Bug.create_dummy(project=not_python_project)
+
+        results = mysite.search.views.get_bugs_by_query_words([], 
+                facets=facets)
+        self.assertEqual(list(results), [python_bug])
+
 # vim: set nu ai et ts=4 sw=4 columns=80:
