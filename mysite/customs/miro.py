@@ -50,6 +50,7 @@ def xml2bug_object(xml_fd,
     """xml fd: xml file descriptor 'containing' information about one bug"""
     parsed = lxml.etree.parse(xml_fd)
     gen_miro_project = lambda x: Project.objects.get_or_create(name='Miro')[0]
+    bug_elt, = parsed.xpath('bug') # The comma asserts that the xpath() returns a list of length 1
     return bug_elt2bug_object(bug_elt, canonical_bug_link_format_string, gen_miro_project)
 
 def bug_elt2bug_object(parsed, canonical_bug_link_format_string,

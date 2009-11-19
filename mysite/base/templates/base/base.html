@@ -2,9 +2,9 @@
 <html>
     <head>
         <title>
-            OpenHatch -
-            {% block title %}
-            {% endblock title %}
+            {% block whole_title %}
+            OpenHatch - {% block title %}{% endblock %}
+            {% endblock whole_title %}
         </title>
 
         <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
@@ -51,8 +51,7 @@
                                 <li><a href='{% url mysite.base.views.homepage %}'>home</a></li>
                                 <li id='username'><a href='/people/{{ the_user.username }}/'>{{ the_user.username }}</a></li>
                                 {% else %}
-                                <li><a href='{% url django.contrib.auth.views.login %}'>log in</a></li>
-                                <li><a href='/#create_profile'>sign up</a></li>
+                                <li><a href='/account/login'>log in / sign up</a></li>
                                 {% endif %}
                             </ul>
                         </div>
@@ -119,6 +118,22 @@
         {% block js_tests %}
         {% endblock js_tests %}
         {% endif %}
+        {% block piwik_js %}
+<script type="text/javascript">
+if (document.location.hostname == 'openhatch.org') {
+var pkBaseURL = (("https:" == document.location.protocol) ? "https://openhatch.org/piwik/" : "http://openhatch.org/piwik/");
+document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
+}
+</script><script type="text/javascript">
+  if (document.location.hostname == 'openhatch.org') {
+  try {
+  var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", 1);
+  piwikTracker.trackPageView();
+  piwikTracker.enableLinkTracking();
+  } catch( err ) {}
+}
+</script><noscript><p><img src="http://openhatch.org/piwik/piwik.php?idsite=1" style="border:0" alt=""/></p></noscript>
+        {% endblock %}
 
     </body>
 </html>

@@ -105,14 +105,14 @@ var openid = {
     // add box for each provider
     for (id in providers_large) {
 
-      openid_btns.append(this.getBoxHTML(providers_large[id], 'large', '.gif'));
+      openid_btns.find('.large').append(this.getBoxHTML(providers_large[id], 'large', '.gif'));
     }
     if (providers_small) {
-      openid_btns.append('<br/>');
+      //openid_btns.append('<br/>');
 
       for (id in providers_small) {
 
-        openid_btns.append(this.getBoxHTML(providers_small[id], 'small', '.ico'));
+        openid_btns.find('.small').append(this.getBoxHTML(providers_small[id], 'small', '.ico'));
       }
     }
 
@@ -134,7 +134,7 @@ var openid = {
 
     var box_id = provider["name"].toLowerCase();
     return '<a title="'+provider["name"]+'" href="#" id="' + box_id + '"' +
-    ' style="background: #FFF url(' + this.img_path + box_id + image_ext+') no-repeat center center" ' + 
+    ' style="-moz-border-radius: 8px; background: #fff url(' + this.img_path + box_id + image_ext+') no-repeat center center" ' + 
     'class="openidProvider ' + box_id + ' openid_' + box_size + '_btn"></a>';    
 
   },

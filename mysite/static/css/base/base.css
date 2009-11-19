@@ -1,10 +1,11 @@
 body {
     font: 9pt sans-serif;
-    background: #fff url("/static/images/motif-eee.png");
+    background: #fff url("/static/images/motif-eee.png") fixed;
     color: #222;
     max-width: 1000px;
     margin: 0 auto;
     padding: 0;
+    overflow-x: hidden;
 }
 
 a {
@@ -198,28 +199,22 @@ ul#links {
     padding: 20px;
     padding-bottom: 5px;
     clear: both;
-    overflow: auto;
 }
 
 #footer-wrapper {
     width: 100%;
     clear: both;
     left: 0;
-    /*background-color: #555;*/
-    position: absolute;
 }
 #footer {
     width: 950px;
     padding: 15px 5px;
     margin: 0 auto;
     text-align: right;
-    position: relative;
-    left: -10px;
 }
 #footer ul {
     display: inline;
     list-style-type: none;
-    font-size: 10pt;
     max-width: 108em;
     margin: 0 auto;
 }
@@ -346,12 +341,10 @@ abbr.foss {
 }
 .notification {
     float: left;
-    width: 130px;
-    background-color: #ffc; /* "Fresh Food Café!"-- Asheesh */
-    border-top: 2px solid #ff7;
+    width: 95%;
+    background-color: #FFD72D;
+    -moz-border-radius: 8px;
     padding: 10px;
-    margin: 0 15px;
-    font-size: 10pt;
     color: #000;
     margin-bottom: 10px;
 }
