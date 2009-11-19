@@ -6,6 +6,7 @@ from django.utils.timesince import timesince
 from django.utils.html import escape
 
 from mysite.search.models import Bug, Project
+import mysite.search.controllers 
 
 import datetime
 from dateutil import tz
@@ -105,6 +106,14 @@ def fetch_bugs(request):
     data = {}
     data['q'] = query
     data['query_words'] = query_words
+
+    # Handle facets
+    data['all_facets'] = mysite.search.controllers.discover_available_facets()
+    possible_facets = ['Language']
+    data['active_facets'] = {}
+    for facet in possible_facets:
+        if request.GET.get(facet):
+            data['active_facets'][facet] = request.GET.get(facet)
 
     prev_page_query_str = QueryDict('')
     prev_page_query_str = prev_page_query_str.copy()

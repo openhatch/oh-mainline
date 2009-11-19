@@ -23,6 +23,26 @@ Search bugs
     <h4 style='margin-bottom: 10px;'>
         <img alt='Recommended searches' src='/static/images/recommended-searches.png' />
     </h4>
+    <ul>
+        {% for facet_name, value2count in all_facets.items %}
+        {% comment %}
+        facets = e.g. {
+        'Language': {
+        'Python': 1,
+        'Java': 8,
+        }
+        }
+        {% endcomment %}
+        <li>
+        <h5>{{ facet_name }}</h5>
+        <ul>
+            {% for value, count in value2count.items %}
+            <li>{{ value }} ({{ count }})</li>
+            {% endfor %}
+        </ul>
+        </li>
+        {% endfor %}
+    </ul>
     {% if the_user.is_authenticated %}
     {% if suggestions %}
     <form name='suggested_searches'
@@ -67,7 +87,22 @@ Search bugs
 {% block main %}
 <div id='results' class='gewgaws module box results'>
     <div id='opps'>
+        {% comment %}
+        {
+            'Language': 'Python',
+        }
+        {% endcomment %}
         <form name='search_opps' method='get'> 
+            {% if active_facets %}
+            <div class='active_facets'>
+                Filtering by 
+                <ul>
+                    {% for facet, value in active_facets.items %}
+                    <li>{{facet}}: {{value}}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
             <input type='text'
             name='q' id='q'
             class='default-text'

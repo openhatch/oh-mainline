@@ -534,9 +534,8 @@ class DiscoverFacets(SearchTest):
     def test_discover_available_facets(self):
         python_project = Project.create_dummy(language='Python')
         python_bug = Bug.create_dummy(project=python_project)
-
         facets = mysite.search.controllers.discover_available_facets()
-        self.assertEqual(facets, {'Language': set(['Python'])})
+        self.assertEqual(facets, {'Language': {'Python': 1}})
 
 class SearchOnFullWords(SearchTest):
     def test_find_perl_not_properly(self):
@@ -545,5 +544,11 @@ class SearchOnFullWords(SearchTest):
         perl_bug = Bug.create_dummy(description='perl')
         results = mysite.search.views.get_bugs_by_query_words(['perl'])
         self.assertEqual(list(results), [perl_bug])
+
+class SearchTemplateDecodesQueryString(SearchTest):
+    def test_facets_appear_in_search_template_context(self):
+        response = self.client.get('/search/', {'Language': 'Python'})
+        expected_facets = { 'Language': 'Python' }
+        self.assertEqual(response.context['active_facets'], expected_facets)
 
 # vim: set nu ai et ts=4 sw=4 columns=80:
