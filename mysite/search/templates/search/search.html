@@ -37,7 +37,9 @@ Search bugs
         <h5>{{ facet_name }}</h5>
         <ul>
             {% for value, count in value2count.items %}
-            <li>{{ value }} ({{ count }})</li>
+            <li><a href='?q={{ q|urlencode }}&{{facet_name|urlencode}}={{value|urlencode}}'>
+                {{ value }} ({{ count }})
+            </a></li>
             {% endfor %}
         </ul>
         </li>
@@ -93,17 +95,6 @@ Search bugs
         }
         {% endcomment %}
         <form name='search_opps' method='get'> 
-            {% if active_facets %}
-            <div class='active_facets'>
-                Filtering by 
-                <ul>
-                    {% for facet, value in active_facets.items %}
-                    <li>{{facet}}: {{value}}</li>
-                    <input type='hidden' name='{{facet}}' value='{{value}}' />
-                    {% endfor %}
-                </ul>
-            </div>
-            {% endif %}
             <input type='text'
             name='q' id='q'
             class='default-text'

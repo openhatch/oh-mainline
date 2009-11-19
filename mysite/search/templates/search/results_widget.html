@@ -8,7 +8,20 @@
             <span id='total_bug_count'>{{ total_bug_count }}</span>
             {% endifnotequal %}
             result{{ bunch_of_bugs|pluralize }} for
-            <strong id='results-summary-language'>{{ q }}</strong>.
+            <strong id='results-summary-language'>{{ q }}</strong>
+            {% comment %} FIXME Use django filter to remove whitespace {% endcomment %}
+            {% if active_facets %}
+            {% for facet, value in active_facets.items %}
+            in 
+            <style type='text/css'>.active_facet_value {background-color: #dfd; padding: 0 2px; }</style>
+            <span class='active_facet_value'>projects primarily coded in
+                <strong>{{value}}</strong>
+                <a href='?q={{q}}'>[x]</a></span>
+            </li>
+            <input type='hidden' name='{{facet}}' value='{{value}}' />
+            {% endfor %}
+            {% endif %}
+            .
         {% else %}
             {% comment %} The variable is called `language` but it could represent a
             variety of other fields. FIXME: Fix the variable name. {% endcomment %}
