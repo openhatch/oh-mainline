@@ -1,0 +1,24 @@
+<form id="openid_form" name="openid_form"
+    action="{% url user_signin %}" method="post">
+    <p>No need to sign up! Sign in with an account you already have.</p>
+    <p>Just <strong>click your account provider</strong>:</p>
+    <input type="hidden" name="action" value="verify" />
+    <input type="hidden" name="next" value="{{ next }}" />
+    <div id="openid_choice">
+        <div id="openid_btns">
+        <div class="large">
+        </div>
+        <div class="small">
+        </div>
+        </div>
+    </div>
+    <div id="openid_input_area">
+        <label for="id_openid_ul">
+            OpenID URL:
+        </label>
+        {{ form.openid_url }}
+        <input name="openid_submit" type="submit"
+        value="Sign in">
+    </div>
+</form>
+

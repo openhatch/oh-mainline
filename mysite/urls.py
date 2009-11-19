@@ -37,6 +37,7 @@ urlpatterns = patterns('',
 
         (r'^account/login/$', 'django.contrib.auth.views.login', {'template_name': 'account/login.html'}),
         (r'^account/login/do$', 'django.contrib.auth.views.login', {'template_name': 'account/login.html'}),
+        (r'^account/login/old$', 'django.contrib.auth.views.login', {'template_name': 'account/login_old.html'}),
         (r'^account/signup/do$', 'mysite.account.views.signup_do'),
 
         (r'^account/request_invitation/do$',
