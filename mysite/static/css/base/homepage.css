@@ -66,6 +66,7 @@ h3 {
     border: 5px solid #f9f9f9;
     border-radius: 10px;
     -moz-border-radius: 10px;
+    border-radius: 10px;
     background: #fff;
 }
 #explanation a {

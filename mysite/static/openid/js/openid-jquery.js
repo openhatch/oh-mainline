@@ -134,7 +134,7 @@ var openid = {
 
     var box_id = provider["name"].toLowerCase();
     return '<a title="'+provider["name"]+'" href="#" id="' + box_id + '"' +
-    ' style="-moz-border-radius: 8px; background: #fff url(' + this.img_path + box_id + image_ext+') no-repeat center center" ' + 
+    ' style="-moz-border-radius: 8px; border-radius: 8px; background: #fff url(' + this.img_path + box_id + image_ext+') no-repeat center center" ' + 
     'class="openidProvider ' + box_id + ' openid_' + box_size + '_btn"></a>';    
 
   },

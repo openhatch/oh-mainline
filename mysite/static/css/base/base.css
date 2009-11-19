@@ -304,6 +304,7 @@ input[type='submit'] {
     width: 700px;
     font-size: 11pt;
     -moz-border-radius: 5px;
+    border-radius: 5px;
 }
 img {
     border: 0;
@@ -344,6 +345,7 @@ abbr.foss {
     width: 95%;
     background-color: #FFD72D;
     -moz-border-radius: 8px;
+    border-radius: 8px;
     padding: 10px;
     color: #000;
     margin-bottom: 10px;
@@ -365,6 +367,7 @@ abbr.foss {
     background-color: #ffe4e4;
     margin: 10px 0;
     -moz-border-radius: 5px;
+    border-radius: 5px;
 }
 #normal_login_form li {
     list-style: none;
