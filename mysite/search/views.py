@@ -54,13 +54,15 @@ def get_bugs_by_query_words(query_words, facets={}):
     if 'Language' in facets:
         bugs = bugs.filter(project__language__iexact=facets['Language'])
 
+    whole_word = "[[:<:]]%s[[:>:]]" % word
+
     # Filter
     for word in query_words:
         bugs = bugs.filter(
             Q(project__language__iexact=word) |
-            Q(title__icontains=word) |
-            Q(description__iregex="[[:<:]]%s[[:>:]]" % word) |
-            Q(project__name__icontains=word)) # 'firefox' grabs 'mozilla fx'.
+            Q(title__iregex=whole_word) |
+            Q(description__iregex=whole_word) |
+            Q(project__name__iregex=whole_word)) # 'firefox' grabs 'mozilla fx'.
 
     # Sort
     bugs = bugs.order_by('-good_for_newcomers', '-last_touched')

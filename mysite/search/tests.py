@@ -542,6 +542,7 @@ class SearchOnFullWords(SearchTest):
         project = Project.create_dummy()
         properly_bug = Bug.create_dummy(description='properly')
         perl_bug = Bug.create_dummy(description='perl')
+        self.assertEqual(Bug.all_bugs.all().count(), 2)
         results = mysite.search.views.get_bugs_by_query_words(['perl'])
         self.assertEqual(list(results), [perl_bug])
 
