@@ -40,6 +40,15 @@ class Project(models.Model):
         # MEDIA_ROOT is prefixed automatically.
         return 'images/icons/projects/%s.png' % uuid.uuid4().hex
 
+    @staticmethod
+    def create_dummy(**kwargs):
+        now = datetime.datetime.utcnow()
+        data = dict(name='', icon='/static/no-project-icon.png')
+        data.update(kwargs)
+        ret = Project(**data)
+        ret.save()
+        return ret
+
     name = models.CharField(max_length=200, unique = True)
     language = models.CharField(max_length=200)
 
@@ -184,5 +193,20 @@ class Bug(models.Model):
 
     def __unicode__(self):
         return "<Bug title='%s' project='%s' project__language='%s' description='%s...'>" % (self.title, self.project.name, self.project.language, self.description[:50])
-    
+
+    @staticmethod
+    def create_dummy(**kwargs):
+        now = datetime.datetime.utcnow()
+        data = dict(title='', project=Project.objects.all()[0], 
+                date_reported=now,
+                last_touched=now,
+                last_polled=now,
+                canonical_bug_link="http://asdf.com",
+                submitter_username='dude',
+                description='')
+        data.update(kwargs)
+        ret = Bug(**data)
+        ret.save()
+        return ret
+
 # vim: set ai ts=4 nu:

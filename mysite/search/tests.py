@@ -540,4 +540,12 @@ class DiscoverFacets(SearchTest):
         facets = mysite.search.controllers.discover_available_facets()
         self.assertEqual(facets, {'Language': set(['Python'])})
 
+class SearchOnFullWords(SearchTest):
+    def test_find_perl_not_properly(self):
+        project = Project.create_dummy()
+        properly_bug = Bug.create_dummy(description='properly')
+        perl_bug = Bug.create_dummy(description='perl')
+        results = mysite.search.views.get_bugs_by_query_words(['perl'])
+        self.assertEqual(list(results), [perl_bug])
+
 # vim: set nu ai et ts=4 sw=4 columns=80:
