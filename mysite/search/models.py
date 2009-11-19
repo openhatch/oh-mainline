@@ -32,7 +32,6 @@ def get_image_data_scaled(image_data, width):
     image_data = new_image_fd.getvalue()
     return image_data
 
-# Create your models here.
 class Project(models.Model):
 
     @staticmethod

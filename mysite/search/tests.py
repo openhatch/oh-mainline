@@ -532,10 +532,8 @@ class IconGetsScaled(SearchTest):
 
 class DiscoverFacets(SearchTest):
     def test_discover_available_facets(self):
-        p = mysite.search.models.Project()
-        p.icon = ''
-        p.language = 'Python'
-        p.save()
+        python_project = Project.create_dummy(language='Python')
+        python_bug = Bug.create_dummy(project=python_project)
 
         facets = mysite.search.controllers.discover_available_facets()
         self.assertEqual(facets, {'Language': set(['Python'])})
