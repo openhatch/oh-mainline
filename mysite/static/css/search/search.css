@@ -11,13 +11,15 @@
     padding-top: 0;
 }
 #page-top img#volunteer-opportunities {
+    position: relative;
+    top: 1px;
 }
 #page-top {
     float: left;
     width: 1000px;
     font-size: 19pt;
 }
-#suggested-searches h4 {
+#filters h4 {
     width: 95%;
     font-size: 10pt;
     font-weight: normal;
@@ -71,6 +73,7 @@
     padding-bottom: 6px;
     float: left;
     width: 90%;
+    font-size: 8.5pt;
 }
 #sidebar {
     float: left;
@@ -86,12 +89,12 @@
     width: 700px;
     float: left;
 }
-#suggested-searches {
+#filters {
     padding: 10px;
 }
-#suggested-searches ul {
+#filters ul {
 }
-#suggested-searches li {
+#filters li {
     list-style: none;
     margin: 0;
     margin-bottom: 10px;
@@ -431,12 +434,12 @@ a.title:focus {
     width: 95%;
     margin-bottom: 10px;
 }
-#suggested-searches input[type='checkbox'],
-#suggested-searches label {
+#filters input[type='checkbox'],
+#filters label {
     cursor: pointer;
     cursor: hand;
 }
-#suggested-searches label.on {
+#filters label.on {
     font-weight: bold;
 }
 input[type='text'].default-text-active {
@@ -480,5 +483,15 @@ input[type='text'].default-text-active {
     height: 20px; /* If ever an image is not square this rule might distort it. */
     vertical-align: top;
 }
+
+#filters h4 { margin-bottom: 5px; }
+ul#facets { margin-left: 17px; margin-bottom: 20px; }
+ul#facets ul { margin-left: 10px; }
+#facets li li { list-style: square; }
+#facets ul li { margin-top: 10px; margin-left: 20px; }
+#facets ul li { color: #777; }
+
+#results-summary { width: 70%; float: left; margin-right: 10px; }
+#navigation { float: right; }
 
 /* vim: set ai ts=4 sts=4 et sw=4: */

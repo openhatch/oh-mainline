@@ -19,9 +19,38 @@ Search bugs
 {% endblock pagetop %}
 
 {% block sidebar %}
-<div id='suggested-searches' class='box module'>
+<div id='filters' class='box module'>
     <h4 style='margin-bottom: 10px;'>
-        <img alt='Recommended searches' src='/static/images/recommended-searches.png' />
+        Browse by&hellip;
+    </h4>
+    <ul id='facets'>
+        {% for facet_name, value2count in all_facets.items %}
+        {% comment %}
+        facets = e.g. {
+        'Language': {
+        'Python': 1,
+        'Java': 8,
+        }
+        }
+        {% endcomment %}
+        <li>
+        {% ifequal facet_name 'Language' %}
+        Main project language 
+        {% else %}
+        {{ facet_name }}
+        {% endifequal %}
+        <ul>
+            {% for value, count in value2count.items %}
+            <li><a href='?q={{ q|urlencode }}&{{facet_name|urlencode}}={{value|urlencode}}'>
+                {% firstof value 'Unknown' %} ({{ count }})
+            </a></li>
+            {% endfor %}
+        </ul>
+        </li>
+        {% endfor %}
+    </ul>
+    <h4>
+        Recommended searches
     </h4>
     {% if the_user.is_authenticated %}
     {% if suggestions %}
@@ -67,12 +96,21 @@ Search bugs
 {% block main %}
 <div id='results' class='gewgaws module box results'>
     <div id='opps'>
+        {% comment %}
+        {
+            'Language': 'Python',
+        }
+        {% endcomment %}
         <form name='search_opps' method='get'> 
             <input type='text'
             name='q' id='q'
             class='default-text'
             title='Search bugs by language, project or description'
             value='{{ q }}' />
+
+            {% for facet, value in active_facets.items %}
+            <input type='hidden' name='{{facet}}' value='{{value}}' />
+            {% endfor %}
             <input type='submit' id='button' value='Search' />
         </form>
 

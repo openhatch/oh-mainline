@@ -32,13 +32,22 @@ def get_image_data_scaled(image_data, width):
     image_data = new_image_fd.getvalue()
     return image_data
 
-# Create your models here.
 class Project(models.Model):
 
     @staticmethod
     def generate_random_icon_path(instance, filename):
         # MEDIA_ROOT is prefixed automatically.
         return 'images/icons/projects/%s.png' % uuid.uuid4().hex
+
+    @staticmethod
+    def create_dummy(**kwargs):
+        now = datetime.datetime.utcnow()
+        data = dict(name=uuid.uuid4().hex,
+                icon='/static/no-project-icon.png')
+        data.update(kwargs)
+        ret = Project(**data)
+        ret.save()
+        return ret
 
     name = models.CharField(max_length=200, unique = True)
     language = models.CharField(max_length=200)
@@ -184,5 +193,20 @@ class Bug(models.Model):
 
     def __unicode__(self):
         return "<Bug title='%s' project='%s' project__language='%s' description='%s...'>" % (self.title, self.project.name, self.project.language, self.description[:50])
-    
+
+    @staticmethod
+    def create_dummy(**kwargs):
+        now = datetime.datetime.utcnow()
+        data = dict(title='', project=Project.objects.all()[0], 
+                date_reported=now,
+                last_touched=now,
+                last_polled=now,
+                canonical_bug_link="http://asdf.com",
+                submitter_username='dude',
+                description='')
+        data.update(kwargs)
+        ret = Bug(**data)
+        ret.save()
+        return ret
+
 # vim: set ai ts=4 nu:

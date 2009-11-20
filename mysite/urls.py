@@ -37,6 +37,7 @@ urlpatterns = patterns('',
 
         (r'^account/login/$', 'django.contrib.auth.views.login', {'template_name': 'account/login.html'}),
         (r'^account/login/do$', 'django.contrib.auth.views.login', {'template_name': 'account/login.html'}),
+        (r'^account/login/old$', 'django.contrib.auth.views.login', {'template_name': 'account/login_old.html'}),
         (r'^account/signup/do$', 'mysite.account.views.signup_do'),
 
         (r'^account/request_invitation/do$',
@@ -47,10 +48,6 @@ urlpatterns = patterns('',
             'mysite.info.views.aboutpage'),
         (r'^contact/$', 
             'mysite.info.views.contactpage'),
-        (r'^jobs/$', 
-            'mysite.consulting.views.search'),
-        (r'^jobs/(?P<query>.*)/$',
-            'mysite.consulting.views.list'),
         (r'^people/(?P<user_to_display__username>[^/]+)/widget/$',
                 'mysite.profile.views.widget_display'),
 

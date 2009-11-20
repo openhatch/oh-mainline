@@ -2,9 +2,9 @@
 <html>
     <head>
         <title>
-            OpenHatch -
-            {% block title %}
-            {% endblock title %}
+            {% block whole_title %}
+            OpenHatch - {% block title %}{% endblock %}
+            {% endblock whole_title %}
         </title>
 
         <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
@@ -51,8 +51,7 @@
                                 <li><a href='{% url mysite.base.views.homepage %}'>home</a></li>
                                 <li id='username'><a href='/people/{{ the_user.username }}/'>{{ the_user.username }}</a></li>
                                 {% else %}
-                                <li><a href='{% url django.contrib.auth.views.login %}'>log in</a></li>
-                                <li><a href='/#create_profile'>sign up</a></li>
+                                <li><a href='/account/login'>log in / sign up</a></li>
                                 {% endif %}
                             </ul>
                         </div>
@@ -119,7 +118,6 @@
         {% block js_tests %}
         {% endblock js_tests %}
         {% endif %}
-
         {% block piwik_js %}
 <script type="text/javascript">
 if (document.location.hostname == 'openhatch.org') {

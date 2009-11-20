@@ -2,7 +2,7 @@
 {% load i18n %}
 
 {% block title %}
-Sign up - OpenHatch
+Sign up 
 {% endblock title %}
 
 {% block css %}
@@ -13,20 +13,18 @@ Sign up - OpenHatch
 {% block main %}
 <div id='login' class='module'>
     <div class='head'>
-        <h3>Signup</h3>
+        <h3>Sign up</h3>
     </div>
     <div class='body'>
-      <p>{% trans "Welcome to OpenHatch. Let us know what username and password you would like." %}</p>
-      
       <form name="signup" action="{% url mysite.account.views.signup_do %}" method="post">
 	{{ form.as_p }}
 	<p>
-	  <input type="submit" value="{% trans 'Sign up!' %}" />
+	  <input type="submit" value="Hit it" />
 	</p>
       </form>
     </div>
     <div class='foot'>
-        Don't have an account yet? Then <a style='font-weight: bold;' href='/#tab=create_profile'>sign up for one</a>.
+        Already have an account? <a style='font-weight: bold;' href='/'>Log in here</a>.
     </div>
 </div>
 {% endblock main %}

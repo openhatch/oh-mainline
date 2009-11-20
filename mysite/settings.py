@@ -117,7 +117,6 @@ INSTALLED_APPS = (
     'mysite.search',
     'mysite.profile',
     'mysite.customs',
-    'mysite.consulting',
     'mysite.account',
     'mysite.base',
     'mysite.info',
