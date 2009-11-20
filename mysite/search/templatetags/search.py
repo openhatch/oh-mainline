@@ -28,7 +28,8 @@ from django.utils.datastructures import SortedDict
 from itertools import ifilter, takewhile
 import re
 from django.utils.html import escape
-
+import lxml.html
+import lxml.html.builder
 
 register = template.Library()
 
@@ -180,7 +181,15 @@ def highlight(text, phrases, ignore_case=None, word_boundary=None, class_name=No
     # Brian Beck's code reads:
     #highlighted = mark_safe(expr.sub(replace, text))
     # We changed this to:
-    highlighted = mark_safe(expr.sub(replace, escape(text)))
+    def make_text_safe(s):
+        span_tag = lxml.html.builder.SPAN(s)
+        span_serialized = lxml.html.tostring(span_tag)
+        span_serialized_without_leading_span_tag = span_serialized[len('<span>'):]
+        span_serialized_without_either_span_tag = span_serialized_without_leading_span_tag[:-len('</span>')]
+        return span_serialized_without_either_span_tag
+
+    safe_text = make_text_safe(text)
+    highlighted = mark_safe(expr.sub(replace, safe_text))
     count = len(matches)
     return dict(original=text, highlighted=highlighted, hits=count)
 
