@@ -41,16 +41,6 @@ class Login(TwillTests):
         tc.go(url)
         tc.follow('log out')
         tc.find('ciao')
-
-    def test_login_bad_password_web(self):
-        url = 'http://openhatch.org/'
-        tc.go(make_twill_url('http://openhatch.org/account/logout'))
-        url = make_twill_url(url)
-        tc.go(url)
-        tc.fv('login','username',"paulproteus")
-        tc.fv('login','password',"not actually paulproteus's unbreakable password")
-        tc.submit()
-        tc.notfind('is_authenticated indeed')
     # }}}
 
 class LoginWithOpenID(TwillTests):

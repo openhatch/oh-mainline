@@ -39,6 +39,10 @@ class SearchTest(TwillTests):
             search_url += '?q=%s' % query
         tc.go(make_twill_url(search_url))
 
+    def search_via_client(self, query=None):
+        search_url = "/search/" 
+        return self.client.get(search_url, {'q': query})
+
 class AutoCompleteTests(SearchTest):
     """
     Test whether the autocomplete can handle
@@ -110,11 +114,12 @@ class SearchResultsSpecificBugs(SearchTest):
         query = 'PYTHON'
 
         # The four canonical_filters by which a bug can match a query
+        whole_word = "[[:<:]]%s[[:>:]]" % query
         self.canonical_filters = [
                 Q(project__language__iexact=query),
-                Q(project__name__icontains=query),
-                Q(title__icontains=query),
-                Q(description__icontains=query)
+                Q(title__iregex=whole_word),
+                Q(project__name__iregex=whole_word),
+                Q(description__iregex=whole_word)
                 ]
 
     def no_canonical_filters(self, except_one=Q()):
@@ -490,18 +495,6 @@ class TestQuerySplitter(django.test.TestCase):
         easy = 'c#'
         self.assertEqual(mysite.search.views.split_query_words(easy),
                          ['c#'])
-
-class ResultsIncludeProjectLanguage(SearchTest):
-    fixtures = ['bugs-for-two-projects.json']
-
-    def test_python_results_include_python(self):
-        self.search_via_twill('Exaile')
-
-        # It's easier to pass this test...
-        tc.find("Python")
-
-        # ...than this one.
-        tc.find("<span class='project__language'>Python</span>")
 
 class IconGetsScaled(SearchTest):
     def test_project_scales_its_icon_down_for_use_in_badge(self):
