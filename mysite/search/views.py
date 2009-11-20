@@ -152,7 +152,6 @@ def fetch_bugs(request):
         data['the_user'] = request.user
         data['suggestions'] = suggestions
         data['bunch_of_bugs'] = bugs
-        data['developer_name'] = "Orrin Hatch"
         data['url'] = 'http://launchpad.net/'
 
         data['total_bug_count'] = total_bug_count
