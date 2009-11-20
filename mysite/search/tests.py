@@ -214,7 +214,7 @@ class SearchResults(TwillTests):
         response = self.client.get('/search/')
         ctxt_we_care_about = [c for c in response.context if 'start' in c][0]
         self.failUnlessEqual(ctxt_we_care_about['start'], 1)
-        self.failUnlessEqual(ctxt_we_care_about['end'], 10)
+        self.failUnlessEqual(ctxt_we_care_about['end'], 0)
 
     def test_json_view(self):
         tc.go(make_twill_url('http://openhatch.org/search/?format=json&jsoncallback=callback&q=python'))
