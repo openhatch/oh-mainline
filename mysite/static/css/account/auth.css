@@ -10,10 +10,8 @@ form p, .form-row, form li {
 }
 label {
     float: left;
-    width: 80px;
-    padding: 12px 12px 12px 0;
-    margin-right: 10px;
-    text-align: right;
+    width: 95%;
+    padding-bottom: 5px;
 }
 input[type='text'], input[type='file'], input[type='password'] {
     padding: 10px;
