@@ -157,6 +157,16 @@ def searchexcerpt_filter(value, arg):
     return searchexcerpt(value, arg)['excerpt']
 searchexcerpt_filter.is_safe = True
 
+def make_text_safe(s):
+    '''>>> make_text_safe('<scr')
+    "&lt;scr"
+    '''
+    span_tag = lxml.html.builder.SPAN(s)
+    span_serialized = lxml.html.tostring(span_tag)
+    span_serialized_without_leading_span_tag = span_serialized[len('<span>'):]
+    span_serialized_without_either_span_tag = span_serialized_without_leading_span_tag[:-len('</span>')]
+    return span_serialized_without_either_span_tag
+
 def highlight(text, phrases, ignore_case=None, word_boundary=None, class_name=None):
     if isinstance(phrases, basestring):
         phrases = [phrases]
@@ -181,13 +191,6 @@ def highlight(text, phrases, ignore_case=None, word_boundary=None, class_name=No
     # Brian Beck's code reads:
     #highlighted = mark_safe(expr.sub(replace, text))
     # We changed this to:
-    def make_text_safe(s):
-        span_tag = lxml.html.builder.SPAN(s)
-        span_serialized = lxml.html.tostring(span_tag)
-        span_serialized_without_leading_span_tag = span_serialized[len('<span>'):]
-        span_serialized_without_either_span_tag = span_serialized_without_leading_span_tag[:-len('</span>')]
-        return span_serialized_without_either_span_tag
-
     safe_text = make_text_safe(text)
     highlighted = mark_safe(expr.sub(replace, safe_text))
     count = len(matches)
