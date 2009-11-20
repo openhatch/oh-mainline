@@ -54,10 +54,9 @@ def get_bugs_by_query_words(query_words, facets={}):
     if 'Language' in facets:
         bugs = bugs.filter(project__language__iexact=facets['Language'])
 
-    whole_word = "[[:<:]]%s[[:>:]]" % word
-
     # Filter
     for word in query_words:
+        whole_word = "[[:<:]]%s[[:>:]]" % word
         bugs = bugs.filter(
             Q(project__language__iexact=word) |
             Q(title__iregex=whole_word) |

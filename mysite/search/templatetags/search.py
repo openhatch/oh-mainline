@@ -36,7 +36,7 @@ SETTINGS_PREFIX = 'SEARCH_'
 SETTINGS_DEFAULTS = {
         'CONTEXT_WORDS': 10,
         'IGNORE_CASE': True,
-        'WORD_BOUNDARY': False,
+        'WORD_BOUNDARY': True,
         'HIGHLIGHT_CLASS': "highlight"
         }
 
@@ -262,3 +262,7 @@ def hits_tag(parser, token):
 def hits_filter(value, arg):
     return hits(value, arg)
 hits.is_safe = True
+
+@register.filter
+def in_list(value,arg):
+    return value in arg

@@ -16,7 +16,13 @@
 <div class='second-line'>
     <span class='description-container'>
         {% if bug.project.language %}
-        <span class='project__language'>{{ bug.project.language|highlight:query_words }}</span> -
+
+        {% if bug.project.language.lower|in_list:query_words %}
+        <span class='project__language highlight'>{{ bug.project.language }}</span> -
+        {% else %}
+        <span class='project__language'>{{ bug.project.language }}</span> -
+        {% endif %}
+
         {% endif %}
         {% if bug.good_for_newcomers %}
         <span class='good-for-beginners'>Bite-sized</span> -
