@@ -523,6 +523,37 @@ class IconGetsScaled(SearchTest):
         self.assertEqual(p.icon_smaller_for_badge.width, 40,
                          "Expected p.icon_smaller_for_badge to be 40 pixels wide.")
 
+    def test_short_icon_is_scaled_correctly(self):
+        '''Sometimes icons are rectangular and more wide than long. These icons shouldn't be trammeled into a square, but scaled respectfully of their original ratios.'''
+        # Step 1: Create a project with an icon
+        p = mysite.search.models.Project()
+
+        # account.tests.photo finds the right path.
+        image_data = open(mysite.account.tests.photo(
+            'static/images/icons/test-project-icon-64px-by-18px.png')).read()
+        p.icon.save('', ContentFile(image_data))
+        p.save()
+
+        # Assertion 1: p.icon_smaller_for_badge is false (since not scaled yet)
+        self.assertFalse(p.icon_smaller_for_badge)
+
+        # Step 2: Call the scaling method
+        p.update_scaled_icons_from_self_icon()
+        p.save()
+
+        # Assertion 2: Verify that it is now a true value
+        self.assert_(p.icon_smaller_for_badge, 
+                     "Expected p.icon_smaller_for_badge to be a true value.")
+
+        # Assertion 3: Verify that it has the right width
+        self.assertEqual(p.icon_smaller_for_badge.width, 40,
+                         "Expected p.icon_smaller_for_badge to be 40 pixels wide.")
+
+        # Assertion 3: Verify that it has the right height
+        # If we want to scale exactly we'll get 11.25 pixels, which rounds to 11.
+        self.assertEqual(p.icon_smaller_for_badge.width, 11,
+                         "Expected p.icon_smaller_for_badge to be 11 pixels high.")
+
 class DiscoverFacets(SearchTest):
     def test_discover_available_facets(self):
         python_project = Project.create_dummy(language='Python')
