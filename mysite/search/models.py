@@ -90,8 +90,10 @@ class Project(models.Model):
         self.update_scaled_icons_from_self_icon()
 
     def get_url_of_icon_or_generic(self):
-        if self.icon_raw:
-            return self.icon_raw.url
+        # Recycle icon_smaller_for_badge since it's the same size as
+        # the icon for most other uses (profiles, etc.).
+        if self.icon_smaller_for_badge:
+            return self.icon_smaller_for_badge.url
         else:
             return settings.MEDIA_URL + 'no-project-icon.png'
 
