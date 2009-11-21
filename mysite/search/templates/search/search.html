@@ -49,11 +49,11 @@ Search bugs
         </li>
         {% endfor %}
     </ul>
+    {% if the_user.is_authenticated %}
+    {% if suggestions %}
     <h4>
         Recommended searches
     </h4>
-    {% if the_user.is_authenticated %}
-    {% if suggestions %}
     <form name='suggested_searches'
         id='suggested_searches'
         method='GET' action=''>
@@ -73,19 +73,14 @@ Search bugs
     </form>
     {% else %}
         <a href='{% url mysite.profile.views.portfolio_editor %}'>
-            <strong>Log your contributions</strong> to receive recommendations.
+            <strong>List some projects in your portfolio</strong> to receive recommendations.
         </a>
     {% endif %}
     {% else %}
     <ul>
         <li>
         <a href='{% url django.contrib.auth.views.login %}'>
-            <strong>Log in </strong>to receive recommendations.
-        </a>
-        </li>
-        <li>
-        <a href='{% url mysite.base.views.homepage %}'>
-            Or <strong>sign up</strong> in 10,000 milliseconds (we support OpenID!)
+            <strong>Log in / sign up</strong> to see recommendations.
         </a>
         </li>
     </ul>
