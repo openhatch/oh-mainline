@@ -60,11 +60,6 @@ class Project(models.Model):
             null=True,
             default=None)
 
-    icon_for_profile = models.ImageField(
-            upload_to=lambda a,b: Project.generate_random_icon_path(a, b),
-            null=True,
-            default=None)
-
     date_icon_was_fetched_from_ohloh = models.DateTimeField(null=True, default=None)
 
     icon_smaller_for_badge = models.ImageField(
