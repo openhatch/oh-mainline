@@ -52,7 +52,7 @@ class Project(models.Model):
     name = models.CharField(max_length=200, unique = True)
     language = models.CharField(max_length=200)
 
-    # FIXME: Replace this with 'icon'
+    # FIXME: Remove this field and update fixtures.
     icon_url = models.URLField(max_length=200)
 
     icon_raw = models.ImageField(
