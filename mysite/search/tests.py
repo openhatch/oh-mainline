@@ -551,8 +551,7 @@ class IconGetsScaled(SearchTest):
 
         # Assertion 3: Verify that it has the right height
         # If we want to scale exactly we'll get 11.25 pixels, which rounds to 11.
-        self.assertEqual(p.icon_smaller_for_badge.width, 11,
-                         "Expected p.icon_smaller_for_badge to be 11 pixels high.")
+        self.assertEqual(p.icon_smaller_for_badge.width, 11)
 
 class DiscoverFacets(SearchTest):
     def test_discover_available_facets(self):
