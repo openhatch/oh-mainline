@@ -62,6 +62,11 @@ class Project(models.Model):
 
     date_icon_was_fetched_from_ohloh = models.DateTimeField(null=True, default=None)
 
+    icon_for_profile = models.ImageField(
+        upload_to=lambda a,b: Project.generate_random_icon_path(a,b),
+        null=True,
+        default=None)
+
     icon_smaller_for_badge = models.ImageField(
         upload_to=lambda a,b: Project.generate_random_icon_path(a,b),
         null=True,
@@ -92,8 +97,8 @@ class Project(models.Model):
     def get_url_of_icon_or_generic(self):
         # Recycle icon_smaller_for_badge since it's the same size as
         # the icon for most other uses (profiles, etc.).
-        if self.icon_smaller_for_badge:
-            return self.icon_smaller_for_badge.url
+        if self.icon_for_profile:
+            return self.icon_for_profile.url
         else:
             return settings.MEDIA_URL + 'no-project-icon.png'
 
@@ -118,15 +123,19 @@ class Project(models.Model):
             return
         # Okay, now we must have some normal-sized icon. 
 
-        normal_sized_icon_data = self.icon_raw.file.read()
+        raw_icon_data = self.icon_raw.file.read()
+
+        # Scale raw icon to a size for the profile.
+        profile_icon_data = get_image_data_scaled(raw_icon_data, 64)
+        self.icon_for_profile.save('', ContentFile(profile_icon_data))
 
         # Scale it down to badge size, which
         # happens to be width=40
-        badge_icon_data = get_image_data_scaled(normal_sized_icon_data, 40)
+        badge_icon_data = get_image_data_scaled(raw_icon_data, 40)
         self.icon_smaller_for_badge.save('', ContentFile(badge_icon_data))
 
         # Scale normal-sized icon down to a size that fits in the search results--20px by 20px
-        search_result_icon_data = get_image_data_scaled(normal_sized_icon_data, 20)
+        search_result_icon_data = get_image_data_scaled(raw_icon_data, 20)
         self.icon_for_search_result.save('', ContentFile(search_result_icon_data))
 
     def get_contributors(self):
