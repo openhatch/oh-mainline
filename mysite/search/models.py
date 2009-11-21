@@ -55,13 +55,6 @@ class Project(models.Model):
     # FIXME: Replace this with 'icon'
     icon_url = models.URLField(max_length=200)
 
-    # In case we need it 
-    # dont_use_ohloh_icon = models.BooleanField(default=False)
-    icon = models.ImageField(
-            upload_to=lambda a,b: Project.generate_random_icon_path(a, b),
-            null=True,
-            default=None)
-
     icon_raw = models.ImageField(
             upload_to=lambda a,b: Project.generate_random_icon_path(a, b),
             null=True,
