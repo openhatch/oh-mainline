@@ -43,7 +43,7 @@ class Project(models.Model):
     def create_dummy(**kwargs):
         now = datetime.datetime.utcnow()
         data = dict(name=uuid.uuid4().hex,
-                icon='/static/no-project-icon.png')
+                icon_raw='/static/no-project-icon.png')
         data.update(kwargs)
         ret = Project(**data)
         ret.save()
@@ -88,15 +88,15 @@ class Project(models.Model):
             return None
 
         # if you want to scale, use get_image_data_scaled(icon_data)
-        self.icon.save('', ContentFile(icon_data))
+        self.icon_raw.save('', ContentFile(icon_data))
 
         # Since we are saving an icon, also update our scaled-down version of
         # that icon for the badge.
         self.update_scaled_icons_from_self_icon()
 
     def get_url_of_icon_or_generic(self):
-        if self.icon:
-            return self.icon.url
+        if self.icon_raw:
+            return self.icon_raw.url
         else:
             return settings.MEDIA_URL + 'no-project-icon.png'
 
@@ -113,15 +113,15 @@ class Project(models.Model):
             return settings.MEDIA_URL + 'no-project-icon-w=20.png'
 
     def update_scaled_icons_from_self_icon(self):
-        '''This method should be called when you update the Project.icon attribute.
+        '''This method should be called when you update the Project.icon_raw attribute.
         Side-effect: Saves a scaled-down version of that icon in the
         Project.icon_smaller_for_badge field.'''
-        # First of all, do nothing if self.icon is a false value.
-        if not self.icon:
+        # First of all, do nothing if self.icon_raw is a false value.
+        if not self.icon_raw:
             return
         # Okay, now we must have some normal-sized icon. 
 
-        normal_sized_icon_data = self.icon.file.read()
+        normal_sized_icon_data = self.icon_raw.file.read()
 
         # Scale it down to badge size, which
         # happens to be width=40
@@ -162,7 +162,7 @@ class Project(models.Model):
         return "name='%s' language='%s'" % (self.name, self.language)
 
 def populate_icon_on_project_creation(instance, created, *args, **kwargs):
-    if created and not instance.icon:
+    if created and not instance.icon_raw:
         instance.populate_icon_from_ohloh()
         
 models.signals.post_save.connect(populate_icon_on_project_creation, Project)

@@ -505,7 +505,7 @@ class IconGetsScaled(SearchTest):
         # Step 1: Create a project with an icon
         p = mysite.search.models.Project()
         image_data = open(mysite.account.tests.photo('static/sample-photo.png')).read()
-        p.icon.save('', ContentFile(image_data))
+        p.icon_raw.save('', ContentFile(image_data))
         p.save()
 
         # Assertion 1: p.icon_smaller_for_badge is false (since not scaled yet)
@@ -531,7 +531,7 @@ class IconGetsScaled(SearchTest):
         # account.tests.photo finds the right path.
         image_data = open(mysite.account.tests.photo(
             'static/images/icons/test-project-icon-64px-by-18px.png')).read()
-        p.icon.save('', ContentFile(image_data))
+        p.icon_raw.save('', ContentFile(image_data))
         p.save()
 
         # Assertion 1: p.icon_smaller_for_badge is false (since not scaled yet)

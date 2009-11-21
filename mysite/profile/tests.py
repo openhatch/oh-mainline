@@ -937,8 +937,8 @@ class ReplaceIconWithDefault(TwillTests):
                 };
 
         image_data = open(mysite.account.tests.photo('static/sample-photo.png')).read()
-        portfolio_entry.project.icon.save('', ContentFile(image_data))
-        self.assert_(portfolio_entry.project.icon,
+        portfolio_entry.project.icon_raw.save('', ContentFile(image_data))
+        self.assert_(portfolio_entry.project.icon_raw,
                 "Expected precondition: project has a nongeneric icon.")
 
         response = self.login_with_client().post(url, data)
@@ -956,7 +956,7 @@ class ReplaceIconWithDefault(TwillTests):
 
         # Check side-effect
         portfolio_entry = PortfolioEntry.objects.get(pk=portfolio_entry.pk)
-        self.assertFalse(portfolio_entry.project.icon,
+        self.assertFalse(portfolio_entry.project.icon_raw,
                 "Expected postcondition: portfolio entry's icon evaluates to False "
                 "because it is generic.")
 
@@ -1125,7 +1125,7 @@ class OtherContributors(TwillTests):
     def test_list_other_contributors(self):
         paulproteus = Person.objects.get(user__username='paulproteus')
         barry = Person.objects.get(user__username='barry')
-        project = Project(name='project', icon="static/no-project-icon-w=40.png")
+        project = Project(name='project', icon_raw="static/no-project-icon-w=40.png")
         project.save()
         PortfolioEntry(project=project, person=paulproteus, is_published=True).save()
         PortfolioEntry(project=project, person=barry, is_published=True).save()

@@ -206,8 +206,8 @@ class OhlohIconTests(django.test.TestCase):
         project.name = 'Mozilla Firefox'
         project.populate_icon_from_ohloh()
 
-        self.assert_(project.icon)
-        self.assertEqual(project.icon.width, 64)
+        self.assert_(project.icon_raw)
+        self.assertEqual(project.icon_raw.width, 64)
         self.assertNotEqual(project.date_icon_was_fetched_from_ohloh, None)
 
     def test_populate_icon_from_ohloh_uses_none_on_no_match(self):
@@ -217,7 +217,7 @@ class OhlohIconTests(django.test.TestCase):
 
         project.populate_icon_from_ohloh()
 
-        self.assertFalse(project.icon)
+        self.assertFalse(project.icon_raw)
         # We don't know how to compare this against None,
         # but this seems to work.
 
