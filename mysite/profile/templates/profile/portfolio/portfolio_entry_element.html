@@ -21,9 +21,9 @@
                 {% if edit_mode %}
                 style="background-image: url('/static/no-project-icon.png')"
                 {% else %}
-                style='background-image: url('{{ pf_entry.project.get_url_of_icon_or_generic }}')"
+                style="background-image: url('{{ pf_entry.project.get_url_of_icon_or_generic }}')"
                 {% endif %}
-                />(icon)</div>
+                ><span class='alt-text'>(icon)</span></div>
                 
                 {% if adding_mode %}
                     <input class='project_name' type='text' title="Type a project name" value='' />
