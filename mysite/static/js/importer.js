@@ -353,14 +353,14 @@ function updatePortfolio(response) {
 	    $(".project_description", $new_portfolio_entry).textSmart(portfolioEntry.fields.project_description);
 	    	   
 	    /* project_icon */
-        if (project_we_refer_to.fields.icon_for_profile == '') {
+        if (project_we_refer_to.fields.icon_smaller_for_badge == '') {
             $new_portfolio_entry.find('.icon_flagger').hide();
         }
         else {
             var $icon = $new_portfolio_entry.find(".project_icon");
             var current_src = $icon.attr('src');
             var response_src = ("/static/" +
-                    project_we_refer_to.fields.icon_for_profile);
+                    project_we_refer_to.fields.icon_smaller_for_badge);
             if (current_src != response_src) {
                 $icon.attr('src', response_src);
                 $new_portfolio_entry.find('.icon_flagger').show();
