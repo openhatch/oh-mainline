@@ -2,6 +2,7 @@
 from south.db import db
 from django.db import models
 from mysite.search.models import *
+import MySQLdb
 
 class Migration:
     
@@ -9,8 +10,14 @@ class Migration:
 
     def forwards(self, orm):
         
-        # Adding field 'Bug.bize_size_tag_name'
-        db.add_column('search_bug', 'bize_size_tag_name', orm['search.bug:bize_size_tag_name'])
+        try:
+            # Adding field 'Bug.bize_size_tag_name'
+            db.add_column('search_bug', 'bize_size_tag_name', orm['search.bug:bize_size_tag_name'])
+        except MySQLdb.OperationalError, args:
+            if args[0] == 1060:
+                pass
+            else:
+                raise
         
         # Adding field 'Project.icon_raw'
         db.add_column('search_project', 'icon_raw', orm['search.project:icon_raw'])
