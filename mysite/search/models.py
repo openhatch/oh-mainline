@@ -156,7 +156,7 @@ class Project(models.Model):
         return other_contributors
 
     def __unicode__(self):
-        return "<Project name='%s' language='%s'>" % (self.name, self.language)
+        return "name='%s' language='%s'" % (self.name, self.language)
 
 def populate_icon_on_project_creation(instance, created, *args, **kwargs):
     if created and not instance.icon:
@@ -192,7 +192,7 @@ class Bug(models.Model):
     open_ones = OpenBugsManager()
 
     def __unicode__(self):
-        return "<Bug title='%s' project='%s' project__language='%s' description='%s...'>" % (self.title, self.project.name, self.project.language, self.description[:50])
+        return "title='%s' project='%s' project__language='%s' description='%s...'" % (self.title, self.project.name, self.project.language, self.description[:50])
 
     @staticmethod
     def create_dummy(**kwargs):
