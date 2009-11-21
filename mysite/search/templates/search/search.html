@@ -41,9 +41,11 @@ Search bugs
         {% endifequal %}
         <ul>
             {% for value, count in value2count.items %}
+            {% if value %}
             <li><a href='?q={{ q|urlencode }}&{{facet_name|urlencode}}={{value|urlencode}}'>
-                {% firstof value 'Unknown' %} ({{ count }})
+                {{ value }} ({{ count }})
             </a></li>
+            {% endif %}
             {% endfor %}
         </ul>
         </li>
