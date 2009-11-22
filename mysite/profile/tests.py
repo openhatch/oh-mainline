@@ -1,11 +1,13 @@
 # Imports {{{
 from mysite.base.tests import make_twill_url, TwillTests
+import mysite.account.tests
 
 from mysite.search.models import Project
-from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_Person_Tag, Link_ProjectExp_Tag, DataImportAttempt
+from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_Person_Tag, Link_ProjectExp_Tag, DataImportAttempt, PortfolioEntry, Citation
 
 import mysite.profile.views
 import mysite.profile.models
+import mysite.profile.controllers
 
 from mysite.profile import views
 
@@ -19,12 +21,14 @@ import urllib
 import simplejson
 import BeautifulSoup
 import time
+import datetime
 import tasks 
 import mock
 
 import django.test
 from django.test.client import Client
-from django.core import management
+from django.core import management, serializers
+from django.core.files.base import ContentFile
 from django.core.urlresolvers import reverse
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
@@ -42,48 +46,27 @@ class ProfileTests(TwillTests):
     def testSlash(self):
         response = self.client.get('/people/')
 
-    def test__projectexp_add(self):
+    def test__portfolio_updates_when_citation_added_to_db(self):
         # {{{
         username = 'paulproteus'
 
         project_name = 'seeseehost'
-        description = 'did some work'
-        url = 'http://example.com/'
-        exp = ProjectExp.create_from_text(username, project_name,
-                                    description, url)
-        found = list(ProjectExp.objects.filter(person__user__username=username))
-        # Verify it shows up in the DB
-        self.assert_('seeseehost' in [f.project.name for f in found])
-        # Verify it shows up in profile_data_from_username
-        data = views.profile_data_from_username('paulproteus')
-        self.assert_(data['person'].user.username == 'paulproteus')
-        projects = [thing[0].project.name for thing in
-                    data['exp_taglist_pairs']]
-        self.assert_('seeseehost' in projects)
-        # }}}
+        #description = 'did some work'
+        #url = 'http://example.com/'
+        paulproteus = Person.objects.get(user__username='paulproteus')
+        citation = Citation(
+                portfolio_entry=PortfolioEntry.objects.get_or_create(
+                    project=Project.objects.get_or_create(name='project name')[0],
+                    is_published=True,
+                    person=paulproteus)[0],
+                distinct_months=1,
+                languages='Python',
+                )
+        citation.save()
 
-    def test__project_exp_create_from_text__unit(self):
-        # {{{
+        # Verify that get_publish_portfolio_entries() works
+        self.assert_('project name' in [pfe.project.name for pfe in paulproteus.get_published_portfolio_entries()])
 
-        # Create requisite objects
-        person = Person.objects.get(user__username='paulproteus')
-        project = Project.objects.get(name='ccHost')
-
-        # Assemble text input
-        username = person.user.username
-        project_name = project.name
-        description = "sample description"
-        url = "http://sample.com"
-        man_months = "3"
-        primary_language = "perl"
-
-        ProjectExp.create_from_text(
-                person.user.username,
-                project.name,
-                description,
-                url,
-                man_months,
-                primary_language)
         # }}}
 
     def test_change_my_name(self):
@@ -91,8 +74,7 @@ class ProfileTests(TwillTests):
         # {{{
         self.login_with_twill()
 
-        # Assert we're on profile page.
-        tc.url('/people/paulproteus')
+        tc.go(make_twill_url('http://openhatch.org/people/paulproteus'))
 
         # No named entered yet
         tc.notfind('Newfirst Newlast')
@@ -131,202 +113,10 @@ class DebTagsTests(TwillTests):
 
 # If you're looking for SourceForge and FLOSSMole stuff, look in the repository history.
 
-class PersonTabProjectExpTests(TwillTests):
-    # {{{
-    fixtures = ['user-paulproteus', 'person-paulproteus', 'cchost-data-imported-from-ohloh']
-
-    def test_project_exp_page_template_displays_project_exp(self):
-        # {{{
-        self.login_with_twill()
-        url = 'http://openhatch.org/people/paulproteus/'
-        tc.go(make_twill_url(url))
-        tc.find('ccHost')
-        # }}}
-    # }}}
-
-class ProjectExpTests(TwillTests):
+class Info(TwillTests):
     # {{{
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry',
             'person-paulproteus', 'cchost-data-imported-from-ohloh']
-
-    def projectexp_add(self, project__name, project_exp__description, project_exp__url, tc_dot_url_should_succeed=True):
-        """Paulproteus can login and add a projectexp to bumble."""
-        # {{{
-        self.login_with_twill()
-
-        tc.go(make_twill_url('http://openhatch.org/form/projectexp_add'))
-        tc.fv('projectexp_add', 'project_name', project__name)
-        tc.fv('projectexp_add', 'involvement_description', project_exp__description)
-        tc.fv('projectexp_add', 'citation_url', project_exp__url)
-        tc.submit()
-
-        tc_url_matched = None
-        try:
-            tc.url('/people/.*/projects/')
-            tc_url_matched = True
-        except twill.errors.TwillAssertionError, e:
-            tc_url_matched = False
-
-        if tc_dot_url_should_succeed:
-            assert tc_url_matched
-        else:
-            assert not tc_url_matched
-
-        tc.find(project__name)
-        tc.find(project_exp__description)
-        tc.find(project_exp__url)
-        # }}}
-
-    def test_projectexp_add(self):
-        """Paulproteus can login and add two projectexps."""
-        # {{{
-        self.login_with_twill()
-        self.projectexp_add('asdf', 'qwer', 'http://jkl.com/')
-        self.projectexp_add('asdf', 'QWER!', 'https://JKLbang.edu/')
-        # }}}
-
-    def test_projectexp_add(self):
-        """Paulproteus can login and add two projectexps."""
-        # {{{
-        self.login_with_twill()
-
-        # Test for basic success: All fields filled out reasonably
-        self.projectexp_add('asdf', 'qwer', 'http://jkl.com/')
-        # (once more with a weird character and weirdish url)
-        self.projectexp_add('asdf', 'QWER!', 'https://JKLbang.edu/')
-
-        # Test that empty descriptions are okay
-        self.projectexp_add('asdf', '', 'https://JKLbang.edu/')
-
-        # Test that URLs are validated
-        self.projectexp_add('asdf', 'QWER!', 'not a real URL, what now', tc_dot_url_should_succeed=False)
-
-        # }}}
-
-    def test_projectexp_delete(self):
-        '''The server can log in paulproteus remove the word 'ccHost' from his profile by posting to the delete controller's URL.'''
-        # {{{
-        client = Client()
-        username='paulproteus'
-        client.login(username=username,
-                     password="paulproteus's unbreakable password")
-
-        person_page = '/people/%s/' % urllib.quote(username)
-        
-        # Load up the profile page
-        response = client.get(person_page)
-        # See! It talks about ccHost!
-        self.assertContains(response, 'ccHost')
-
-        # POST saying we want to delete the ccHost experience...
-        # luckily I read the fixture and I know its ID is 13
-        deletion_handler_url = reverse(
-                mysite.profile.views.projectexp_edit_do,
-                kwargs={'project__name': 'ccHost'})
-        response = client.post(deletion_handler_url,
-                {'0-project_exp_id': '13', '0-delete_this': 'on'})
-        
-        # Now re-GET the profile
-        response = client.get(person_page)
-
-        # See! It no longer talks about ccHost!
-        self.assertNotContains(response, 'ccHost')
-        # }}}
-
-    def test_projectexp_delete_unauthorized(self):
-        '''Barry tries to delete a ProjectExp he doesn't own and fails.'''
-        # {{{
-
-        # Meet Barry, a shady character.
-        barry = User.objects.get(username='barry')
-        barry_password = 'parallelism'
-        client = Client()
-        login_success = client.login( username=barry.username, 
-                password=barry_password)
-        self.assert_(login_success)
-
-        # Barry doesn't own ProjectExp #13
-        self.assertNotEqual( barry,
-                ProjectExp.objects.get(id=13).person.user)
-
-        # What happens if he tries to delete ProjectExp #13
-        deletion_handler_url = reverse(
-                mysite.profile.views.projectexp_edit_do,
-                kwargs={'project__name': 'ccHost'})
-        response = client.post(deletion_handler_url,
-                {'0-project_exp_id': '13', '0-delete_this': 'on'})
-
-        # Still there, Barry. Keep on truckin'.
-        self.assert_(ProjectExp.objects.get(id=13))
-
-        # }}}
-
-    def test_projectexp_delete_web(self):
-        '''Notorious user of OpenHatch, paulproteus, can log in and remove the word 'ccHost' from his profile by clicking the appropriate delete button.'''
-        # {{{
-
-        self.login_with_twill()
-
-        # Load up the ProjectExp edit page.
-        project_name = 'ccHost'
-        exp_url = 'http://openhatch.org/people/paulproteus/projects/%s' % (
-                urllib.quote(project_name))
-        tc.go(make_twill_url(exp_url))
-
-        # See! It talks about ccHost!
-        tc.find(project_name)
-
-        # Click the correct delete button...
-        tc.config('readonly_controls_writeable', True)
-        tc.fv('delete-projectexp-13', 'id', '13')   # Bring twill's attention
-                                                    # to the form named
-                                                    # ``delete-projectexp-13''.
-        tc.submit()
-
-        # FIXME: What page are we on now?
-
-        # Alakazam! It's gone.
-        tc.notfind('ccHost')
-        # }}}
-
-    def test_projectexp_edit(self):
-        """Paulproteus can edit information about his project experiences."""
-        # {{{
-        self.login_with_twill()
-
-        # Let's go edit info about a project experience.
-        editor_url = reverse(mysite.profile.views.projectexp_edit,
-                kwargs={'project__name': 'ccHost'})
-        tc.go(make_twill_url(editor_url))
-        
-        # Let's fill in the text fields like pros.
-        tc.fv('1', '0-involvement_description', 'ze description')
-        tc.fv('1', '0-citation_url', 'ze-u.rl')
-        tc.fv('1', '0-man_months', '13')
-        tc.fv('1', '0-primary_language', 'tagalogue')
-        tc.fv('1', '0-delete_this', 'off')
-        tc.submit()
-
-        exp = ProjectExp.objects.get(project__name='ccHost')
-        self.assertEqual(exp.description, 'ze description')
-        self.assertEqual(exp.url, 'http://ze-u.rl/')
-        self.assertEqual(exp.man_months, 13)
-        self.assertEqual(exp.primary_language, 'tagalogue')
-        self.assert_(exp.modified)
-        # }}}
-
-    def test_person_involvement_description(self):
-        # {{{
-        username = 'paulproteus'
-        project_name = 'ccHost'
-        url = 'http://openhatch.org/people/%s/projects/%s' % (
-                urllib.quote(username), urllib.quote(project_name))
-        tc.go(make_twill_url(url))
-        tc.find('1 month')
-        tc.find('shell script')
-        # }}}
-
-    # FIXME: Move these next two functions to their proper home.
 
     tags = {
             'understands': ['ack', 'b', 'c'],
@@ -347,7 +137,7 @@ class ProjectExpTests(TwillTests):
     # FIXME: Write a unit test for this.
     def update_tags(self, tag_dict):
         # {{{
-        url = 'http://openhatch.org/people/edit/info'
+        url = reverse(mysite.profile.views.edit_info)
         tc.go(make_twill_url(url))
         for tag_type_name in tag_dict:
             tc.fv('edit-tags', 'edit-tags-' + tag_type_name, ", ".join(tag_dict[tag_type_name]))
@@ -361,7 +151,7 @@ class ProjectExpTests(TwillTests):
         soup = BeautifulSoup.BeautifulSoup(tc.show())
         for tag_type_name in tag_dict:
             text = ''.join(soup(id='tags-%s' % tag_type_name)[0].findAll(text=True))
-            self.assert_(', '.join(tag_dict[tag_type_name]) in text)
+            self.assert_(', '.join(tag_dict[tag_type_name]) in ' '.join(text.split()))
 
         # Go back to the form and make sure some of these are there
         tc.go(make_twill_url(url))
@@ -383,29 +173,37 @@ class ProjectExpTests(TwillTests):
 
     # }}}
 
-# Create a mock Ohloh get_contribution_by_username
+# Create a mock Ohloh get_contribution_info_by_username
 mock_gcibu = mock.Mock()
-mock_gcibu.return_value = [{
+# This object will always return:
+mock_gcibu.return_value = ([{
         'man_months': 1,
-        'project': u'ccHost',
+        'project': u'MOCK ccHost',
         'project_homepage_url':
             u'http://wiki.creativecommons.org/CcHost',
-        'primary_language': u'shell script'}]
+        'first_commit_time':
+            '2008-04-03T23:51:45Z',
+        'primary_language': u'shell script'},
+        ],
+        None # WebResponse
+        )
 
 # Create a mock Ohloh get_contribution_info_by_ohloh_username
 mock_gcibou = mock.Mock()
-mock_gcibou.return_value = [{
+mock_gcibou.return_value = ([{
         'man_months': 1,
-        'project': u'who knows',
+        'project': u'MOCK ccHost',
         'project_homepage_url':
             u'http://wiki.creativecommons.org/CcHost',
-        'primary_language': u'Vala'}]
+        'primary_language': u'Vala'}],
+        None #WebResponse
+        )
 
 # Create a mock Launchpad get_info_for_launchpad_username
 mock_giflu = mock.Mock()
 mock_giflu.return_value = {
-        'F-Spot': {
-            'url': 'http://launchpad.net/f-spot',
+        'MOCK ccHost': {
+            'url': 'http://launchpad.net/ccHost', # ok this url doesn't really exist
             'involvement_types': ['Bug Management', 'Bazaar Branches'],
             'languages': ['python', 'ruby'],
             }
@@ -416,165 +214,174 @@ class MockFetchPersonDataFromOhloh(object):
     real_task_class = tasks.FetchPersonDataFromOhloh
     @classmethod
     def delay(*args, **kwargs):
+        "Don't enqueue a background task. Just run the task."
         args = args[1:] # FIXME: Wonder why I need this
         task = MockFetchPersonDataFromOhloh.real_task_class()
+        task.debugging = True # See FetchPersonDataFromOhloh
         task.run(*args, **kwargs)
 
 class CeleryTests(TwillTests):
     # {{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
-    @mock.patch('mysite.customs.ohloh.Ohloh.get_contribution_info_by_username', mock_gcibu)
-    @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
-    def test_ohloh_import_via_emulated_bgtask(self):
-        """1. Go to the page that has paulproteus' data.  2. Verify that the page doesn't yet know about ccHost. 3. Run the celery task ourselves, but instead of going to Ohloh, we hand-prepare data for it."""
-        # {{{
-        # do this work for user = paulproteus
+    # FIXME: One day, test that after self.test_slow_loading_via_emulated_bgtask
+    # getting the data does not go out to Ohloh.
+
+    def _test_data_source_via_emulated_bgtask(self, source, data_we_expect, summaries_we_expect):
+        "1. Go to the page that has paulproteus' data. "
+        "2. Verify that the page doesn't yet know about ccHost. "
+        "3. Prepare an object that will import data from ccHost. "
+        "The object is a DataImportAttempt. The DataImportAttempt has a method "
+        "that will create a background task using the celery package. The method "
+        "is called do_what_it_says_on_the_tin, because it will attempt to "
+        "import data. "
+        "3. Run the celery task ourselves, but instead of going to Ohloh, "
+        "we hand-prepare data for it."""
+
+        # Let's run this test using a sample user, paulproteus.
         username = 'paulproteus'
         person = Person.objects.get(user__username=username)
 
-        # Store a note in the DB we're about to do a background task
-        dia = DataImportAttempt(query=username, source='rs',
-                                person=person)
-        dia.person_wants_data = True
+        # Store a note in the DB that we're about to run a background task
+        dia = DataImportAttempt(query=username, source=source, person=person)
         dia.save()
-        
 
-        url = '/people/gimme_json_that_says_that_commit_importer_is_done'
+        gimme_json_url = reverse(mysite.profile.views.gimme_json_for_portfolio)
         
         client = self.login_with_client()
 
-        # Ask if background job has been completed.
-        # We haven't even created the background job, so it should
-        # not be!
-        response_before = client.get(url)
-        response_json = simplejson.loads(response_before.content)
-        self.assertEquals(
-            response_json[0]['pk'], dia.id)
-        self.assertFalse(response_json[0]['fields']['completed'])
+        # Ask if background task has been completed.
+        # We haven't even created the background task, so 
+        # the answer should be no.
+        response_before_task_is_run = client.get(gimme_json_url)
+        response_json = simplejson.loads(response_before_task_is_run.content)
+        self.assertEqual(response_json['dias'][0]['pk'], dia.id)
+        self.assertFalse(response_json['dias'][0]['fields']['completed'])
         
-        # Ask if involvement fact has been loaded.
-        # We haven't loaded it, so the answer should be no.
-        project_name = 'ccHost'
-        self.assertFalse(list(ProjectExp.objects.filter(
-            project__name=project_name)))
+        # Are there any PortfolioEntries for ccHost
+        # before we import data? Expected: no.
+        portfolio_entries = PortfolioEntry.objects.filter(project__name='MOCK ccHost')
+        self.assertEqual(portfolio_entries.count(), 0)
 
         dia.do_what_it_says_on_the_tin()
-        # NB: The task is being run, but the ohloh API communication
+        # NB: The task is being run, but the communication with the external data source
         # is mocked out.
 
         # Now that we have synchronously run the task, it should be
         # marked as completed.
         self.assert_(DataImportAttempt.objects.get(id=dia.id).completed)
 
-        # Check again
-        response_after = client.get(url)
+        #######################################################
+        # Let's see if the browser's method of checking agrees. 
+        #######################################################
 
-        # Ask if background job has been completed. (Hoping for yes.)
+        # First, request the JSON again.
+        response_after = client.get(gimme_json_url)
+
+        # Ask if background task has been completed. (Hoping for yes.)
         response_json = simplejson.loads(response_after.content)
-        self.assertEquals(
-            response_json[0]['pk'], dia.id)
-        self.assert_(response_json[0]['fields']['completed'])
+        self.assertEquals(response_json['dias'][0]['pk'], dia.id)
+        self.assert_(response_json['dias'][0]['fields']['completed'])
 
-        # Ask if involvement fact has been loaded. (Hoping for yes.)
-        self.assert_(list(ProjectExp.objects.filter(
-            project__name=project_name, person=person)))
+        # There ought now to be a PortfolioEntry for ccHost...
+        portfolio_entry = PortfolioEntry.objects.get(person=person, project__name='MOCK ccHost')
 
+        # ...and the expected number of citations.
+        citations = Citation.untrashed.filter(portfolio_entry=portfolio_entry)
+
+        self.assert_(citations.count() > 0)
+
+        # Let's make sure we got the data we expected.
+        partial_citation_dicts = list(citations.values(*data_we_expect[0].keys()))
+        self.assertEqual(partial_citation_dicts, data_we_expect)
+
+        # Let's make sure that these citations are linked with the
+        # DataImportAttempt we used to import them.
+        for n, citation in enumerate(citations):
+            self.assertEqual(citation.data_import_attempt, dia)
+            self.assertEqual(citation.summary, summaries_we_expect[n])
+
+    @mock.patch('mysite.customs.ohloh.Ohloh.get_contribution_info_by_username', mock_gcibu)
+    @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
+    def test_ohloh_import_via_emulated_bgtask(self):
+        "Test that we can import data from Ohloh, except don't test "
+        "that Ohloh actually gives data. Instead, create a mock object, a little "
+        "placeholder that acts like Ohloh, and make sure we respond "
+        "to it correctly."
+        # {{{
+        data_we_expect = [{
+                'languages': mock_gcibu.return_value[0][0]['primary_language'],
+                'distinct_months': mock_gcibu.return_value[0][0]['man_months'],
+                'is_published': False,
+                'is_deleted': False,
+                }]
+
+        summaries_we_expect = [
+                "Coded for 1 month in shell script (Ohloh)",
+                ]
+
+        return self._test_data_source_via_emulated_bgtask(
+                source='rs', data_we_expect=data_we_expect,
+                summaries_we_expect=summaries_we_expect)
         # }}}
 
-    # FIXME: One day, test that after self.test_slow_loading_via_emulated_bgtask
-    # getting the data does not go out to Ohloh.
+    @mock.patch('mysite.customs.ohloh.Ohloh.get_contribution_info_by_ohloh_username', mock_gcibou)
+    @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
+    def test_ohloh_import_via_emulated_ohloh_username_bg_search(self):
+        "Test that we can import data from Ohloh via Ohloh username, except don't test "
+        "that Ohloh actually gives data. Instead, create a mock object, a little "
+        "placeholder that acts like Ohloh, and make sure we respond "
+        "to it correctly."
+        # {{{
+        data_we_expect = [{
+                'languages': mock_gcibou.return_value[0][0]['primary_language'],
+                'distinct_months': mock_gcibou.return_value[0][0]['man_months'],
+                'is_published': False,
+                'is_deleted': False,
+                }]
+
+        summaries_we_expect = [
+                "Coded for 1 month in Vala (Ohloh)",
+                ]
+
+        return self._test_data_source_via_emulated_bgtask(
+                source='ou', data_we_expect=data_we_expect,
+                summaries_we_expect=summaries_we_expect)
+        # }}}
 
     @mock.patch('mysite.customs.lp_grabber.get_info_for_launchpad_username', mock_giflu)
     @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
     def test_launchpad_import_via_emulated_bgtask(self):
-        """1. Go to the page that has paulproteus' data.  2. Verify that the page doesn't yet know about F-Spot. 3. Run the celery task ourselves, but instead of going to Launchpad, we hand-prepare data for it."""
+        "Test that we can import data from Ohloh, except don't test "
+        "that Ohloh actually gives data. Instead, create a little "
+        "placeholder that acts like Ohloh, and make sure we respond "
+        "to it correctly."
         # {{{
-        # do this work for user = paulproteus
-        username='paulproteus'
-        person = Person.objects.get(user__username=username)
+        lp_result = mock_giflu.return_value.values()[0]
+        data_we_expect = [
+                {
+                    'contributor_role': lp_result['involvement_types'][0],
+                    'languages': ", ".join(lp_result['languages']),
+                    'is_published': False,
+                    'is_deleted': False,
+                    },
+                {
+                    'contributor_role': lp_result['involvement_types'][1],
+                    'languages': ", ".join(lp_result['languages']),
+                    'is_published': False,
+                    'is_deleted': False,
+                    }
+                ]
 
-        # Store a note in the DB we're about to do a background task
-        dia = DataImportAttempt(query=username, source='lp',
-                                person=Person.objects.get(
-                                    user__username=username))
-        dia.person_wants_data = True
-        dia.save()
+        # FIXME: Write these properly.
+        summaries_we_expect = [
+                'Participated in Bug Management (Launchpad)',
+                'Participated in Bazaar Branches (Launchpad)',
+                ]
 
-        url = '/people/gimme_json_that_says_that_commit_importer_is_done'
-        
-        client = Client()
-        password="paulproteus's unbreakable password"
-        client.login(username=username,
-                     password=password)
-
-        # Ask if background job has been completed.
-        # We haven't even created the background job, so it should
-        # not be!
-        response_before = client.get(url)
-        response_json = simplejson.loads(response_before.content)
-        self.assertEquals(
-            response_json[0]['pk'], dia.id)
-        self.assertFalse(response_json[0]['fields']['completed'])
-        
-        # Ask if involvement fact has been loaded.
-        # We haven't loaded it, so the answer should be no.
-        project_name = 'F-Spot'
-        self.assertFalse(list(ProjectExp.objects.filter(
-            project__name=project_name)))
-
-        dia.do_what_it_says_on_the_tin()
-        # NB: The task is being run, but the ohloh API communication
-        # is mocked out.
-
-        # Now that we have synchronously run the task, it should be
-        # marked as completed.
-        self.assert_(DataImportAttempt.objects.get(id=dia.id).completed)
-
-        # Check again
-        response_after = client.get(url)
-
-        # Ask if background job has been completed. (Hoping for yes.)
-        response_json = simplejson.loads(response_after.content)
-        self.assertEquals(
-            response_json[0]['pk'], dia.id)
-        self.assert_(response_json[0]['fields']['completed'])
-
-        # Ask if involvement fact has been loaded. (Hoping for yes.)
-        self.assert_(list(ProjectExp.objects.filter(
-            project__name=project_name, person=person)))
-
-        # }}}
-
-    @mock.patch('mysite.customs.ohloh.Ohloh.get_contribution_info_by_username', mock_gcibu)
-    @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
-    def test_stale_dias_are_not_shown_in_json(self):
-        """Create a DIA that is stale. Verify it is ignored by JSON."""
-        # {{{
-        # do this work for user = paulproteus
-        username = 'paulproteus'
-        person = Person.objects.get(user__username=username)
-
-        stale_dia = DataImportAttempt(
-                    stale=True,
-                    query='who cares',
-                    person=person,
-                    source='rs')
-        stale_dia.save()
-
-        # Verify the JSON gives back an empty list
-        c = self.login_with_client()
-
-        url = '/people/gimme_json_that_says_that_commit_importer_is_done'
-        response = c.get(url)
-        decoded = simplejson.loads(response.content)
-
-        self.assertEqual(decoded, [])
-
-        # FIXME: One day, test that, after
-        # self.test_slow_loading_via_emulated_bgtask,
-        # getting the data does not go out to Ohloh.
-
+        return self._test_data_source_via_emulated_bgtask(
+                source='lp', data_we_expect=data_we_expect,
+                summaries_we_expect=summaries_we_expect)
         # }}}
 
     # }}}
@@ -600,159 +407,275 @@ class UserListTests(TwillTests):
 
     # }}}
 
-class ImportContributionsTests(TwillTests):
+class Portfolio(TwillTests):
     # {{{
-    fixtures = ['user-paulproteus', 'person-paulproteus']
+    fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
     # Don't include cchost-paulproteus, because we need paulproteus to have
-    # zero projectexps at the beginning of test_person_gets_data_iff_they_want_it
+    # zero Citations at the beginning of test_person_gets_data_iff_they_want_it
 
     form_url = "http://openhatch.org/people/portfolio/import/"
 
-    def test_show_suggested_data_sources(self):
-        pass # FIXME: Make the new importer degrade gracefully and test it
+    @mock.patch('mysite.profile.models.DataImportAttempt.do_what_it_says_on_the_tin')
+    def test_create_data_import_attempts(self, mock_do_what_it_says_on_the_tin):
+        """Test profile.views.start_importing_do."""
 
-    def test_select_data_sources(self):
-        # {{{
-        client = Client()
-        username='paulproteus'
-        password="paulproteus's unbreakable password"
-        client.login(username=username,
-                     password=password)
-
-        ohloh_repo_search_dia = DataImportAttempt(
-                    query='who cares',
-                    person=Person.objects.get(user__username='paulproteus'),
-                    source='rs')
-        ohloh_repo_search_dia.save()
-
-        ohloh_account_dia = DataImportAttempt(
-                    query='who cares',
-                    person=Person.objects.get(user__username='paulproteus'),
-                    source='ou')
-        ohloh_account_dia.save()
-
-        launchpad_account_dia = DataImportAttempt(
-                    query='query',
-                    person=Person.objects.get(user__username='paulproteus'),
-                    source='lp')
-        launchpad_account_dia.save()
-
-        # The default value of person_wants_data is False
-        # and this test depends on that being so.
-        self.assertFalse(ohloh_repo_search_dia.person_wants_data)
-        self.assertFalse(ohloh_account_dia.person_wants_data)
-        self.assertFalse(launchpad_account_dia.person_wants_data)
-
-        url = "/people/user_selected_these_dia_checkboxes"
-        checkbox_ids_string = "data_import_attempt_%d" % ohloh_repo_search_dia.id
-        response = client.post(url, {'identifier_0': 'who cares',
-                                     'person_wants_0_rs': 'on'})
-
-        self.assertEqual(response.status_code, 200)
-
-        # Re-get the Ohloh Repository Search object from the DB
-        ohloh_repo_search_dia = DataImportAttempt.objects.get(
-                    query='who cares',
-                    person=Person.objects.get(user__username='paulproteus'),
-                    source='rs')
-        self.assert_(ohloh_repo_search_dia.person_wants_data)
-        self.assertFalse(ohloh_account_dia.person_wants_data)
-        self.assertFalse(launchpad_account_dia.person_wants_data)
-#}}}
-
-    @mock.patch('mysite.customs.ohloh.Ohloh.get_contribution_info_by_username', mock_gcibu)
-    @mock.patch('mysite.customs.ohloh.Ohloh.get_contribution_info_by_ohloh_username', mock_gcibou)
-    @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
-    def test_person_gets_data_iff_they_want_it(self):
-        # {{{
-        client = Client()
-        username='paulproteus'
-        password="paulproteus's unbreakable password"
-        client.login(username=username,
-                     password=password)
-
-        a_person = Person.objects.get(user__username='paulproteus')
-
-        # Make two DIAs, attach some ProjectExps to each,
-        # as if user had successfully imported some ProjectExps.
-
-        ohloh_repo_search_dia = DataImportAttempt(
-                    query='who cares',
-                    person=a_person,
-                    source='rs')
-        ohloh_repo_search_dia.person_wants_data = True
-        ohloh_repo_search_dia.save()
-
-        ohloh_account_dia = DataImportAttempt(
-                    query='who cares',
-                    person=a_person,
-                    source='ou')
-        ohloh_account_dia.save()
-
-        launchpad_account_dia = DataImportAttempt(
-                    query='query',
-                    person=Person.objects.get(user__username='paulproteus'),
-                    source='lp')
-        launchpad_account_dia.save()
-
-        # The default value of person_wants_data is False
-        # and this test depends on that being so.
-        self.assertFalse(ohloh_account_dia.person_wants_data)
-        self.assertFalse(launchpad_account_dia.person_wants_data)
-
-	a_project, _ = Project.objects.get_or_create(name='ccHost')
-        an_exp = ProjectExp(project=a_project, description='the description')
-        an_exp.data_import_attempt = ohloh_repo_search_dia
-        an_exp.save()
-
-        another_project, _ = Project.objects.get_or_create(name='a project name')
-        another_exp = ProjectExp(project=another_project, description='the description')
-        another_exp.data_import_attempt = ohloh_account_dia
-        another_exp.save()
-
-        ohloh_repo_search_dia.do_what_it_says_on_the_tin()
-        ohloh_account_dia.do_what_it_says_on_the_tin()
-        launchpad_account_dia.do_what_it_says_on_the_tin()
-
-        x = ProjectExp.objects.get(person=a_person)
-        self.assertEqual(x.id, an_exp.id)
-        # }}}
-
-    def test_action_via_view(self):
-        """Send a Person objects and a list of usernames and email addresses to the action controller. Test that the controller really added some corresponding DIAs for that Person."""
-        # {{{
-        client = Client()
-        username='paulproteus'
-        client.login(username=username,
-                     password="paulproteus's unbreakable password")
-
-        data = {}
-        commit_usernames_and_emails = ["bilbo", "bilbo@baggin.gs"]
-        for n, cu in enumerate(commit_usernames_and_emails):
-            data["identifier_%d" % n] = cu
-
-        # Not a DIA in sight.
-        self.assertFalse(list(DataImportAttempt.objects.filter(person=Person.objects.get(user__username='paulproteus'))))
-
-        response = client.post('/people/portfolio/import/prepare_data_import_attempts_do', data) 
-
-        # DIAs, nu?
-        self.assert_(list(DataImportAttempt.objects.filter(person=Person.objects.get(user__username='paulproteus'))))
-        #}}}
-
-    def test_prepare_data_import_attempts(self):
-        user = User.objects.get(username='paulproteus')
-        self.assertEqual(len(DataImportAttempt.objects.filter(person=user.get_profile())), 0)
-        post = {
+        paulproteus = Person.objects.get(user__username='paulproteus')
+        input = {
                 'identifier_0': 'paulproteus',
-                'checkbox_0_rs': 'on',
-                'checkbox_0_lp': 'on',
-                'checkbox_0_ou': 'on'
+                'identifier_1': 'asheesh@asheesh.org',
                 }
-        views.prepare_data_import_attempts(post, user)
-        self.assertEqual(len(DataImportAttempt.objects.filter(person=user.get_profile())), 3)
+
+        self.assertEqual(
+                DataImportAttempt.objects.filter(person=paulproteus).count(),
+                0,
+                "Pre-condition: "
+                "No tasks for paulproteus.")
+        client = self.login_with_client()
+        response = client.post(
+                reverse(mysite.profile.views.prepare_data_import_attempts_do),\
+                        input)
+        # FIXME: We should also check that we call this function
+        # once for each data source.
+        self.assert_(mock_do_what_it_says_on_the_tin.called)
+
+        self.assertEqual(response.content, "1",
+                "Post-condition: "
+                "profile.views.start_importing sent a success message via JSON.")
+
+        for identifier in input.values():
+            for (source_key, _) in DataImportAttempt.SOURCE_CHOICES:
+                self.assertEqual(
+                        DataImportAttempt.objects.filter(
+                            person=paulproteus, source=source_key, query=identifier).count(),
+                        1,
+                        "Post-condition: "
+                        "paulproteus has a task recorded in the DB "
+                        "for source %s." % source_key)
+
+    def _test_get_import_status(self, client, but_first=None, must_find_nothing=False):
+        "Just make sure that the JSON returned by the view is "
+        "appropriate considering what's in the database."
+        ####################################################
+        ################# LOAD DATA ########################
+        ####################################################
+        paulproteus = Person.objects.get(user__username='paulproteus')
+
+        citation = Citation(
+                portfolio_entry=PortfolioEntry.objects.get_or_create(
+                    project=Project.objects.get_or_create(name='project name')[0],
+                    person=paulproteus)[0],
+                distinct_months=1,
+                languages='Python',
+                data_import_attempt=DataImportAttempt.objects.get_or_create(
+                    source='rs', query='paulproteus', completed=True, person=paulproteus)[0]
+                )
+        citation.save()
+
+        finished_dia = citation.data_import_attempt
+        unfinished_dia = DataImportAttempt(source='rs', query='foo',
+                completed=False, person=paulproteus)
+        unfinished_dia.save()
+
+        if but_first is not None:
+            but_first()
+
+        response = client.get(
+                reverse(mysite.profile.views.gimme_json_for_portfolio))
+        
+        # Response consists of JSON like:
+        # {'dias': ..., 'citations': ..., 'summaries': ...}
+        response = simplejson.loads(response.content)
+
+        # Check we got a summary for each Citation.
+        for citation_in_response in response['citations']:
+            self.assert_(str(citation_in_response['pk']) in response['summaries'].keys(),
+                    "Expected that this Citation's pk would have a summary.")
+         
+        ###########################################################
+        # Are the DIAs and citations in the response
+        # exactly what we expected?
+        ###########################################################
+
+        # What we expect:
+        expected_list = serializers.serialize('python', [finished_dia, unfinished_dia, citation])
+
+        # What we got:
+        dias_and_citations_in_response = response['dias'] + response['citations']
+
+        # We don't care about the "fields" in either, just the pk and model.
+        for object in (dias_and_citations_in_response + expected_list):
+            del object['fields']
+
+        # Check that each thing we got was expected.
+        for object in dias_and_citations_in_response:
+            object_is_expected = (object in expected_list)
+            if must_find_nothing:
+                self.assertFalse(object_is_expected)
+            else:
+                self.assert_(object_is_expected)
+
+        # Check the reverse: that each thing we expected we got.
+        for object in expected_list:
+            object_is_expected = (object in dias_and_citations_in_response)
+            if must_find_nothing:
+                self.assertFalse(object_is_expected)
+            else:
+                self.assert_(object_is_expected)
+
+    def test_paulproteus_can_get_his_import_status(self):
+        self._test_get_import_status(client=self.login_with_client(), must_find_nothing=False)
+
+    def test_barry_cannot_get_paulproteuss_import_status(self):
+        self._test_get_import_status(
+                client=self.login_with_client_as_barry(),
+                must_find_nothing=True)
+
+    def test_paulproteus_gets_no_deleted_projects(self):
+        ####################################################
+        ################# LOAD DATA ########################
+        ####################################################
+        paulproteus = Person.objects.get(user__username='paulproteus')
+
+        citation = Citation(
+                portfolio_entry=PortfolioEntry.objects.get_or_create(
+                    project=Project.objects.get_or_create(name='project name')[0],
+                    person=paulproteus)[0],
+                distinct_months=1,
+                languages='Python',
+                data_import_attempt=DataImportAttempt.objects.get_or_create(
+                    source='rs', query='paulproteus', completed=True, person=paulproteus)[0]
+                )
+        citation.save()
+
+        finished_dia = citation.data_import_attempt
+        unfinished_dia = DataImportAttempt(source='rs', query='foo',
+                completed=False, person=paulproteus)
+        unfinished_dia.save()
+
+        # Delete the projects
+        portfolio_entries = PortfolioEntry.objects.all()
+        for portfolio_entry in portfolio_entries:
+            portfolio_entry.is_deleted = True
+            portfolio_entry.save()
+            
+        # Get the JSON
+
+        response = self.login_with_client().get(
+                reverse(mysite.profile.views.gimme_json_for_portfolio))
+        response_decoded = simplejson.loads(response.content)
+
+        self.assertEqual(len(response_decoded['projects']), 0,
+                         "Expected no projects back.")
+        
+        self.assertEqual(len(response_decoded['citations']), 0,
+                         "Expected no citations back.")
+        # Who cares about DIAS.
 
     # }}}
+
+class ImporterPublishCitation(TwillTests):
+    fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
+
+    def test_publish_citation(self):
+        citation = Citation(
+                portfolio_entry=PortfolioEntry.objects.get_or_create(
+                    project=Project.objects.get_or_create(name='project name')[0],
+                    person=Person.objects.get(user__username='paulproteus'))[0],
+                data_import_attempt=DataImportAttempt.objects.get_or_create(
+                    source='rs', query='paulproteus', completed=True,
+                    person=Person.objects.get(user__username='paulproteus'))[0]
+                )
+        citation.save()
+
+        self.assertFalse(citation.is_published)
+
+        view = mysite.profile.views.publish_citation_do
+        response = self.login_with_client().post(reverse(view), {'pk': citation.pk})
+
+        self.assertEqual(response.content, "1")
+        self.assert_(Citation.untrashed.get(pk=citation.pk).is_published)
+
+    def test_publish_citation_fails_when_citation_doesnt_exist(self):
+        failing_pk = 0
+        self.assertEqual(Citation.untrashed.filter(pk=failing_pk).count(), 0)
+
+        view = mysite.profile.views.publish_citation_do
+        response = self.login_with_client().post(reverse(view), {'pk': failing_pk})
+        self.assertEqual(response.content, "0")
+
+    def test_publish_citation_fails_when_citation_not_given(self):
+        view = mysite.profile.views.publish_citation_do
+        response = self.login_with_client().post(reverse(view))
+        self.assertEqual(response.content, "0")
+
+    def test_publish_citation_fails_when_citation_not_yours(self):
+        citation = Citation(
+                portfolio_entry=PortfolioEntry.objects.get_or_create(
+                    project=Project.objects.get_or_create(name='project name')[0],
+                    person=Person.objects.get(user__username='paulproteus'))[0],
+                data_import_attempt=DataImportAttempt.objects.get_or_create(
+                    source='rs', query='paulproteus', completed=True,
+                    person=Person.objects.get(user__username='paulproteus'))[0]
+                )
+        citation.save()
+
+        self.assertFalse(citation.is_published)
+        view = mysite.profile.views.publish_citation_do
+        response = self.login_with_client_as_barry().post(reverse(view))
+
+        self.assertEqual(response.content, "0")
+
+class ImporterDeleteCitation(TwillTests):
+    fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
+
+    def test_delete_citation(self):
+        citation = Citation(
+                portfolio_entry=PortfolioEntry.objects.get_or_create(
+                    project=Project.objects.get_or_create(name='project name')[0],
+                    person=Person.objects.get(user__username='paulproteus'))[0],
+                data_import_attempt=DataImportAttempt.objects.get_or_create(
+                    source='rs', query='paulproteus', completed=True,
+                    person=Person.objects.get(user__username='paulproteus'))[0]
+                )
+        citation.save()
+
+        self.assertFalse(citation.is_deleted)
+
+        view = mysite.profile.views.delete_citation_do
+        response = self.login_with_client().post(reverse(view), {'citation__pk': citation.pk})
+
+        self.assertEqual(response.content, "1")
+        self.assert_(Citation.objects.get(pk=citation.pk).is_deleted)
+
+    def test_delete_citation_fails_when_citation_doesnt_exist(self):
+        failing_pk = 0
+        self.assertEqual(Citation.objects.filter(pk=failing_pk).count(), 0)
+
+        view = mysite.profile.views.delete_citation_do
+        response = self.login_with_client().post(reverse(view), {'pk': failing_pk})
+        self.assertEqual(response.content, "0")
+
+    def test_delete_citation_fails_when_citation_not_given(self):
+        view = mysite.profile.views.delete_citation_do
+        response = self.login_with_client().post(reverse(view))
+        self.assertEqual(response.content, "0")
+
+    def test_delete_citation_fails_when_citation_not_yours(self):
+        citation = Citation(
+                portfolio_entry=PortfolioEntry.objects.get_or_create(
+                    project=Project.objects.get_or_create(name='project name')[0],
+                    person=Person.objects.get(user__username='paulproteus'))[0],
+                data_import_attempt=DataImportAttempt.objects.get_or_create(
+                    source='rs', query='paulproteus', completed=True,
+                    person=Person.objects.get(user__username='paulproteus'))[0]
+                )
+        citation.save()
+
+        self.assertFalse(citation.is_deleted)
+        view = mysite.profile.views.delete_citation_do
+        response = self.login_with_client_as_barry().post(reverse(view))
+
+        self.assertEqual(response.content, "0")
 
 class UserCanShowEmailAddress(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
@@ -775,71 +698,525 @@ class UserCanShowEmailAddress(TwillTests):
         # }}}
     # }}}
 
-class OnlyFreshDiasAreSelected(TwillTests):
+class BugsAreRecommended(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus',
+               'bugs-for-two-projects.json']
+
+    def test_recommendations_found(self):
+        # Recommendations defined like this:
+        # the first N bugs matching the various "recommended searches" (N=5?)
+
+        # It's round-robin across the searches.
+        # So if we create two Python bugs and one C# bug, and we set N to 2,
+        # and paulproteus ought to get hits from Python and C#, we should see
+        # only one Python bug.
+        recommended = list(mysite.profile.controllers.recommend_bugs(['Python', 'C#'], n=2))
+        python_bugs = [ bug for bug in recommended if bug.project.language == 'Python']
+        self.assertEqual(len(python_bugs), 1)
+        csharp_bugs = [ bug for bug in recommended if bug.project.language == 'C#']
+        self.assertEqual(len(csharp_bugs), 1)
+        
+    def test_recommendations_not_duplicated(self):
+        """ Run two equivalent searches in parallel, and discover that they weed out duplicates."""
+        recommended = list(mysite.profile.controllers.recommend_bugs(['Python', 'Python'], n=2))
+        self.assertNotEqual(recommended[0], recommended[1])
+
+class PersonInfoLinksToSearch(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+    
+    def test_whatever(self):
+        '''
+        * Have a user, say that he understands+wantstolearn+currentlylearns+canmentor something
+        * Go to his user page, and click those various links
+        * Find yourself on some search page that mentions the user.
+        '''
+        tags = {
+            'understands': ['thing1'],
+            'understands_not': ['thing2'],
+            'seeking': ['thing3'],
+            'studying': ['thing4'],
+            'can_mentor': ['thing5'],
+            }
+
+        # Log in as paulproteus
+        
+        self.login_with_twill()
+
+        # Update paulproteus's tags
+        tc.go(reverse(mysite.profile.views.edit_info))
+        for tag_type_name in tags:
+            tc.fv('edit-tags', 'edit-tags-' + tag_type_name, ", ".join(tags[tag_type_name]))
+        tc.submit()
+
+        # Now, click on "thing1"
+        tc.follow("thing1")
+
+        # Now find ourself there
+        tc.find('Asheesh Laroia')
+
+class Widget(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
-    @mock.patch("mysite.profile.models.DataImportAttempt.do_what_it_says_on_the_tin")
-    def test_dias_created_only_once(self, mock_dia_do_what_it_says):
-        query = 'query'
-        source = 'oh'
-        person = Person.objects.get(user__username='paulproteus')
+    def test_widget_display(self):
+        widget_url = reverse(mysite.profile.views.widget_display,
+                kwargs={'user_to_display__username': 'paulproteus'})
+        client = self.login_with_client()
+        response = client.get(widget_url)
 
-        self.assertEqual(0, DataImportAttempt.objects.count())
+    def test_widget_display_js(self):
+        widget_js_url = reverse(mysite.profile.views.widget_display_js,
+                kwargs={'user_to_display__username': 'paulproteus'})
+        client = self.login_with_client()
+        response = client.get(widget_js_url)
+
+class PersonalData(TwillTests):
+    fixtures = ['user-paulproteus', 'user-barry', 'person-barry',
+            'person-paulproteus', 'cchost-data-imported-from-ohloh']
+
+    def test_all_views_that_call_get_personal_data(self):
+        # Views where you can look at somebody else.
+        stalking_view2args = {
+                mysite.profile.views.display_person_web: {'user_to_display__username': 'paulproteus'},
+                mysite.profile.views.projectexp_display: {'user_to_display__username': 'paulproteus', 'project__name': 'ccHost'},
+                }
+
+        # Views where you look only at yourself.
+        navelgazing_view2args = {
+                mysite.profile.views.projectexp_add_form: {},
+                mysite.profile.views.projectexp_edit: {'project__name': 'ccHost'},
+                mysite.profile.views.importer: {},
+                mysite.profile.views.display_person_edit_name: {},
+                }
+
+        for view in stalking_view2args:
+            self.client.login(username='barry', password='parallelism')
+            kwargs = stalking_view2args[view]
+            url = reverse(view, kwargs=kwargs)
+            response = self.client.get(url)
+            self.assertEqual(response.context[0]['person'].user.username, 'paulproteus')
+            self.client.logout()
+
+        for view in navelgazing_view2args:
+            client = self.login_with_client()
+            kwargs = navelgazing_view2args[view]
+            url = reverse(view, kwargs=kwargs)
+            response = client.get(url)
+            self.assertEqual(response.context[0]['person'].user.username, 'paulproteus')
+            client.logout()
+
+class DeletePortfolioEntry(TwillTests):
+    fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
+
+    def test_delete_portfolio_entry(self):
+        portfolio_entry = PortfolioEntry.objects.get_or_create(
+                    project=Project.objects.get_or_create(name='project name')[0],
+                    person=Person.objects.get(user__username='paulproteus'))[0]
+
+        citation = Citation(
+                portfolio_entry=portfolio_entry,
+                data_import_attempt=DataImportAttempt.objects.get_or_create(
+                    source='rs', query='paulproteus', completed=True,
+                    person=Person.objects.get(user__username='paulproteus'))[0]
+                )
+        citation.save()
+
+        self.assertFalse(portfolio_entry.is_deleted)
+
+        view = mysite.profile.views.delete_portfolio_entry_do
+        response = self.login_with_client().post(reverse(view),
+                {'portfolio_entry__pk': portfolio_entry.pk})
+
+        response_decoded = simplejson.loads(response.content)
+
+        expected_output = {
+            'success': True,
+            'portfolio_entry__pk': portfolio_entry.pk
+        }
+
+        self.assertEqual(response_decoded, expected_output)
+        self.assert_(PortfolioEntry.objects.get(pk=portfolio_entry.pk).is_deleted)
+
+    def test_delete_portfolio_entry_fails_when_portfolio_entry_doesnt_exist(self):
+        failing_pk = 0
+        self.assertEqual(PortfolioEntry.objects.filter(pk=failing_pk).count(), 0)
+
+        view = mysite.profile.views.delete_portfolio_entry_do
+        response = self.login_with_client().post(reverse(view), {'portfolio_entry__pk': failing_pk})
+        self.assertEqual(simplejson.loads(response.content), 
+                         {'success': False})
+
+    def test_delete_portfolio_entry_fails_when_portfolio_entry_not_given(self):
+        view = mysite.profile.views.delete_portfolio_entry_do
+        response = self.login_with_client().post(reverse(view))
+        self.assertEqual(simplejson.loads(response.content), 
+                         {'success': False})
+
+    def test_delete_portfolio_entry_fails_when_portfolio_entry_not_yours(self):
+        citation = Citation(
+                portfolio_entry=PortfolioEntry.objects.get_or_create(
+                    project=Project.objects.get_or_create(name='project name')[0],
+                    person=Person.objects.get(user__username='paulproteus'))[0],
+                data_import_attempt=DataImportAttempt.objects.get_or_create(
+                    source='rs', query='paulproteus', completed=True,
+                    person=Person.objects.get(user__username='paulproteus'))[0]
+                )
+        citation.save()
+
+        portfolio_entry_not_mine = citation.portfolio_entry;
+
+        self.assertFalse(portfolio_entry_not_mine.is_deleted)
+        view = mysite.profile.views.delete_portfolio_entry_do
+        response = self.login_with_client_as_barry().post(reverse(view))
+
+        self.assertEqual(simplejson.loads(response.content), 
+                         {'success': False})
+
+        # Still there betch.
+        self.assertFalse(portfolio_entry_not_mine.is_deleted)
+
+class AddCitationManually(TwillTests):
+    fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
+
+    def test_add_citation_manually(self):
+        portfolio_entry, _ = PortfolioEntry.objects.get_or_create(
+            project=Project.objects.get_or_create(name='project name')[0],
+            person=Person.objects.get(user__username='paulproteus'))
+
+        input_data = {
+                'portfolio_entry': portfolio_entry.pk,
+                'form_container_element_id': 'form_container_%d' % 0,
+                'url': 'http://google.ca/' # Needs this trailing slash to work.
+                }
+
+        # Send this data to the appropriate view.
+        url = reverse(mysite.profile.views.add_citation_manually_do)
+        response = self.login_with_client().post(url, input_data)
+
+        # Check that a citation was created.
+        c = Citation.untrashed.get(url=input_data['url'])
+        self.assertEqual(c.portfolio_entry, portfolio_entry,
+                "The portfolio entry for the new citation is the exactly "
+                "the one whose id we POST'd to "
+                "profile.views.add_citation_manually.")
+
+        self.assert_(c.is_published, "Manually added citations are published by default.")
+
+    def test_add_citation_manually_with_bad_portfolio_entry(self):
+        not_your_portfolio_entry, _ = PortfolioEntry.objects.get_or_create(
+            project=Project.objects.get_or_create(name='project name')[0],
+            person=Person.objects.get(user__username='barry'))
+
+        input_data = {
+                'portfolio_entry': not_your_portfolio_entry.pk,
+                'form_container_element_id': 'form_container_%d' % 0,
+                'url': 'http://google.ca/' # Needs this trailing slash to work.
+                }
+
+        # Send this data to the appropriate view.
+        url = reverse(mysite.profile.views.add_citation_manually_do)
+        response = self.login_with_client().post(url, input_data)
+
+        # Check that no citation was created.
+        self.assertEqual(Citation.untrashed.filter(url=input_data['url']).count(), 0,
+                "Expected no citation to be created when you try "
+                "to add one for someone else.")
         
-        mysite.profile.views.get_most_recent_data_import_attempt_or_create(
-            query, source, person)
+        # Check that an error is reported in the response.
+        self.assert_(len(simplejson.loads(response.content)['error_msgs']) == 1)
 
-        self.assertEqual(1, DataImportAttempt.objects.count())
+class ReplaceIconWithDefault(TwillTests):
+    fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
 
-        mysite.profile.views.get_most_recent_data_import_attempt_or_create(
-            query, source, person)
+    def test_view(self):
+        portfolio_entry = PortfolioEntry.objects.get_or_create(
+                    project=Project.objects.get_or_create(name='project name')[0],
+                    person=Person.objects.get(user__username='paulproteus'))[0]
+        url = reverse(mysite.profile.views.replace_icon_with_default)
+        data = {
+                'portfolio_entry__pk': portfolio_entry.pk
+                };
 
-        self.assertEqual(1, DataImportAttempt.objects.count())        
+        image_data = open(mysite.account.tests.photo('static/sample-photo.png')).read()
+        portfolio_entry.project.icon_raw.save('', ContentFile(image_data))
+        self.assert_(portfolio_entry.project.icon_raw,
+                "Expected precondition: project has a nongeneric icon.")
 
-    @mock.patch("mysite.profile.models.DataImportAttempt.do_what_it_says_on_the_tin")
-    def test_dias_created_again_for_stale_dias(self, mock_dia_do_what_it_says):
-        query = 'query'
-        source = 'oh'
-        person = Person.objects.get(user__username='paulproteus')
+        response = self.login_with_client().post(url, data)
 
-        self.assertEqual(0, DataImportAttempt.objects.count())
+        # Check output
+        response_obj = simplejson.loads(response.content)
+        """response obj will look something like this:
+        {
+            'success': true,
+                'portfolio_entry__pk': 0,
+            }
+                """
+        self.assert_(response_obj['success'])
+        self.assertEqual(response_obj['portfolio_entry__pk'], portfolio_entry.pk)
+
+        # Check side-effect
+        portfolio_entry = PortfolioEntry.objects.get(pk=portfolio_entry.pk)
+        self.assertFalse(portfolio_entry.project.icon_raw,
+                "Expected postcondition: portfolio entry's icon evaluates to False "
+                "because it is generic.")
+
+class SavePortfolioEntry(TwillTests):
+    fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
+
+    def test_save_portfolio_entry(self):
+        url = reverse(mysite.profile.views.save_portfolio_entry_do)
+
+        # setup
+        portfolio_entry = PortfolioEntry.objects.get_or_create(
+                    project=Project.objects.get_or_create(name='project name')[0],
+                    person=Person.objects.get(user__username='paulproteus'))[0]
+        citation = Citation(
+                portfolio_entry=portfolio_entry,
+                data_import_attempt=DataImportAttempt.objects.get_or_create(
+                    source='rs', query='paulproteus', completed=True,
+                    person=Person.objects.get(user__username='paulproteus'))[0]
+                )
+        citation.is_published = False
+        citation.save()
+
+        input = {
+            'portfolio_entry__pk': portfolio_entry.pk,
+            'pf_entry_element_id': 'blargle', # this can be whatever
+            'project_description': "project description",
+            'experience_description': "experience description",
+        }
+
+        expected_output = {
+            'success': True,
+            'pf_entry_element_id': 'blargle', 
+            'portfolio_entry__pk': portfolio_entry.pk
+        }
+
+        # call view and check output
+        self.assertEqual(
+                simplejson.loads(self.login_with_client().post(url, input).content),
+                expected_output)
+
+        # postcondition
+        portfolio_entry = PortfolioEntry.objects.get(pk=portfolio_entry.pk)
+        self.assertEqual(portfolio_entry.project_description,
+                input['project_description'])
+        self.assertEqual(portfolio_entry.experience_description,
+                input['experience_description'])
+        self.assert_(portfolio_entry.is_published, "pf entry is published.")
+
+        citations = Citation.untrashed.filter(portfolio_entry=portfolio_entry)
+        for c in citations:
+            self.assert_(c.is_published)
+
+class GimmeJsonTellsAboutImport(TwillTests):
+    fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
+
+    def gimme_json(self):
+        url = reverse(mysite.profile.views.gimme_json_for_portfolio)
+        response = self.login_with_client().get(url)
+        return simplejson.loads(response.content)
+
+    def get_paulproteus(self):
+        return mysite.profile.models.Person.objects.get(user__username='paulproteus')
+
+    def get_barry(self):
+        return mysite.profile.models.Person.objects.get(user__username='barry')
+
+    def get_n_min_ago(self, n):
+        return datetime.datetime.utcnow() - datetime.timedelta(minutes=n)
+
+    def test_import_running_false(self):
+        "When there are no dias from the past five minutes, import.running = False"
+        # Create a DIA for paulproteus that is from ten minutes ago (but curiously is still in progress)
+        my_dia_but_not_recent = DataImportAttempt(date_created=self.get_n_min_ago(10),
+                query="bananas", person=self.get_paulproteus())
+        my_dia_but_not_recent.save()
+
+        # Create a DIA for Barry that is in progress, but ought not be
+        # included in the calculation by gimme_json_for_portfolio
+        not_my_dia = DataImportAttempt(date_created=self.get_n_min_ago(1),
+                                query="banans", person=self.get_barry())
+        not_my_dia.save()
         
-        mysite.profile.views.get_most_recent_data_import_attempt_or_create(
-            query, source, person)
+        # Verify that the JSON reports import running is False
+        self.assertFalse(self.gimme_json()['import']['running'])
+                                                      
+    def test_for_running_import(self):
+        "When there are dias from the past five minutes, import.running = True "
+        "and progress percentage is accurate"
+        # Create a DIA for paulproteus that is from one minutes ago (but curiously is still in progress)
+        my_incomplete_recent_dia = DataImportAttempt(date_created=self.get_n_min_ago(1),
+                query="bananas", person=self.get_paulproteus(), completed=False)
+        my_incomplete_recent_dia.save()
 
-        self.assertEqual(1, DataImportAttempt.objects.count())
+        my_completed_recent_dia = DataImportAttempt(date_created=self.get_n_min_ago(1),
+                query="bananas", person=self.get_paulproteus(), completed=True)
+        my_completed_recent_dia.save()
 
-        # Now, set that one to stale:
-        dia = DataImportAttempt.objects.get()
-        dia.stale = True
-        dia.save()
-
-        mysite.profile.views.get_most_recent_data_import_attempt_or_create(
-            query, source, person)
-
-        self.assertEqual(2, DataImportAttempt.objects.count())
-
-
-    def test_showing_checkbox_marks_dia_as_stale(self):
-        c = self.login_with_client()
+        # Create a DIA that is in progress, but ought not be
+        # included in the calculation by gimme_json_for_portfolio
+        # because it doesn't belong to the logged-in user
+        not_my_dia = DataImportAttempt(date_created=self.get_n_min_ago(1), person=self.get_barry(),
+                query="bananas")
+        not_my_dia.save()
         
-        # First, make a DIA. Make it already completed.
-        dia_done = DataImportAttempt(
-                    query='query',
-                    completed=True,
-                    person=Person.objects.get(user__username='paulproteus'),
-                    source='lp')
-        dia_done.save()
+        self.assert_(self.gimme_json()['import']['running'],
+                "Expected that the JSON reports that an import is running")
+        self.assertEqual(self.gimme_json()['import']['progress_percentage'], 50,
+                "Expected that the JSON reports that the import is at 50% progress")
 
-        self.assertFalse(dia_done.stale)
+        # Now let's make them all completed
+        my_incomplete_recent_dia.completed = True
+        my_incomplete_recent_dia.save()
 
-        # Now, get the JSON
-        
-        url = '/people/gimme_json_that_says_that_commit_importer_is_done'
-        response = c.get(url)
+        self.assertFalse(self.gimme_json()['import']['running'],
+                "After all DIAs are completed, expected that the JSON reports that no import is running.")
 
-        # Now verify it's done
-        self.assert_(DataImportAttempt.objects.get().stale)
+class PortfolioEntryAdd(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
 
+    def test_portfolio_entry_add(self):
+        # preconditions
+        self.assertEqual(
+                Project.objects.filter(name='new project name').count(),
+                0, "expected precondition: there's no project named 'new project name'")
+        self.assertEqual(
+                PortfolioEntry.objects.filter(project__name='new project name').count(),
+                0, "expected precondition: there's no portfolio entry for a project "
+                "named 'new project name'")
+
+        # Here is what the JavaScript seems to POST.
+        post_data = {
+                'portfolio_entry__pk': 'undefined',
+                'project_name': 'new project name',
+                'project_description': 'new project description',
+                'experience_description': 'new experience description',
+                'pf_entry_element_id': 'element_18', 
+                }
+        url = reverse(mysite.profile.views.save_portfolio_entry_do)
+        response = self.login_with_client().post(url, post_data)
+        # Check side-effects
+
+        self.assertEqual(
+                Project.objects.filter(name='new project name').count(),
+                1, "expected: after POSTing to view, there's a project named 'new project name'")
+        self.assertEqual(
+                PortfolioEntry.objects.filter(person__user__username='paulproteus',
+                    project__name='new project name').count(),
+                1, "expected: after POSTing to view, there's a portfolio entry for paulproteus"
+                "for a project named 'new project name'")
+
+        new_pk = PortfolioEntry.objects.get(person__user__username='paulproteus',
+                project__name='new project name').pk
+
+        # Check response
+
+        expected_response_obj = {
+            'success': True,
+            'pf_entry_element_id': 'element_18',
+            'portfolio_entry__pk': new_pk, 
+        }
+        self.assertEqual(simplejson.loads(response.content), expected_response_obj)
+
+class OtherContributors(TwillTests):
+    fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
+
+    def test_list_other_contributors(self):
+        paulproteus = Person.objects.get(user__username='paulproteus')
+        barry = Person.objects.get(user__username='barry')
+        project = Project(name='project', icon_raw="static/no-project-icon-w=40.png")
+        project.save()
+        PortfolioEntry(project=project, person=paulproteus, is_published=True).save()
+        PortfolioEntry(project=project, person=barry, is_published=True).save()
+        self.assertEqual(
+                project.get_n_other_contributors_than(5, paulproteus),
+                [barry]
+                )
+        self.assertEqual(
+                project.get_n_other_contributors_than(5, barry),
+                [paulproteus]
+                )
+
+class UserGetsHisQueuedMessages(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+    
+    def gimme_json(self):
+        url = reverse(mysite.profile.views.gimme_json_for_portfolio)
+        response = self.login_with_client().get(url)
+        return simplejson.loads(response.content)
+
+    def test_user_gets_his_queued_messages(self):
+        paulproteus = Person.objects.get(user__username='paulproteus')
+        # Verify the first time, the gimme_json has no messages
+        self.assertEqual(self.gimme_json()['messages'], [])
+
+        # Queue a message for paulproteus
+        paulproteus.user.message_set.create(message="MSG'd!")
+
+        # Verify that the gimme_json now has that message
+        self.assertEqual(self.gimme_json()['messages'], ["MSG'd!"])
+
+class OverwriteDuplicateCitations(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def test_old_citation_is_superseded(self):
+        paulproteus = Person.objects.get(user__username='paulproteus')
+        citation = Citation(
+                portfolio_entry=PortfolioEntry.objects.get_or_create(
+                    project=Project.objects.get_or_create(name='project name')[0],
+                    is_published=True,
+                    person=paulproteus)[0],
+                distinct_months=1,
+                languages='Python',
+                data_import_attempt=DataImportAttempt.objects.get_or_create(
+                    source='rs', query='paulproteus', completed=True, person=paulproteus)[0]
+                )
+        citation.save_and_check_for_duplicates()
+
+        self.assertEqual([c.pk for c in Citation.objects.all()], [citation.pk])
+
+        # This is the only citation picked up by the manager
+        self.assertEqual([c.pk for c in Citation.untrashed.all()], [citation.pk])
+
+        # Create a second citation with all the same attributes as the first.
+        citation2 = Citation(
+                portfolio_entry=citation.portfolio_entry,
+                distinct_months=citation.distinct_months,
+                languages=citation.languages,
+                data_import_attempt=DataImportAttempt.objects.get_or_create(
+                    source='ou', query='paulproteus', completed=True, person=paulproteus)[0]
+                )
+
+        citation2.save_and_check_for_duplicates()
+
+        # Afterwards that only the first citation exists.
+        self.assert_(citation2.ignored_due_to_duplicate)
+
+        # The 'untrashed' manager picks up only the first citation.
+        self.assertEqual([c.pk for c in Citation.untrashed.all()], [citation.pk])
+
+class PersonGetTagsForRecommendations(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def test_get_tags(self):
+        pp = Person.objects.get(user__username='paulproteus')
+
+        understands_not = TagType(name='understands_not')
+        understands_not.save()
+        understands = TagType(name='understands')
+        understands.save()
+
+        tag_i_understand = Tag(tag_type=understands, text='something I understand')
+        tag_i_understand.save()
+        tag_i_dont = Tag(tag_type=understands_not, text='something I dont get')
+        tag_i_dont.save()
+        link_one = Link_Person_Tag(person=pp, tag=tag_i_understand)
+        link_one.save()
+        link_two = Link_Person_Tag(person=pp, tag=tag_i_dont)
+        link_two.save()
+
+        # This is the functionality we're testing
+        self.assertEqual([tag_i_understand], pp.get_tags_for_recommendations())
 
 # vim: set ai et ts=4 sw=4 nu:

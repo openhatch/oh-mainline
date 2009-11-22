@@ -2,7 +2,6 @@
 
 {% block title %}
 Error 404: Page not found
-{{ block.super }}
 {% endblock title %}
 
 {% block css %}
@@ -13,21 +12,14 @@ Error 404: Page not found
 {% block main %}
 <div class='module' id='landing'>
     <div class='head'>
-        <h3>Error 404: Page not found</h3>
+        <h3>Page not found</h3>
     </div>
-    <div class='body contains-submodules two-columns'>
-        <div class='submodule fat'>
-            <div class='head'>
-                <h3>The page you requested...</h3>
-            </div>
-            <div class='body'>
-                <p>This page was here a minute ago, I swear! It was RIGHT HERE!</p>
-                <p>(If you got here from a link within the site, our system
-                    automatically emailed us. Otherwise, please 
-                        <a href="/contact/">contact us</a>.)
-                </p>
-            </div>
-        </div>
+    <div class='body'>
+        <p>This page was here a minute ago, I swear! It was RIGHT HERE!</p>
+        <p>(If you got here from a link within the site, our system
+        automatically emailed us. Otherwise, please 
+        <a href="/contact/">contact us</a>.)
+        </p>
     </div>
 </div>
 {% endblock main %}

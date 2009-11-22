@@ -3,8 +3,10 @@ import xml.parsers.expat
 import sys, urllib, hashlib
 import urllib2
 import cStringIO as StringIO
+from urlparse import urlparse
 from urllib2 import HTTPError
 from django.conf import settings
+import mysite.customs.models
 
 def uni_text(s):
     if type(s) == unicode:
@@ -18,7 +20,12 @@ import re
 from typecheck import accepts, returns
 from typecheck import Any as __
 
-def mechanize_get(url, referrer=None, attempts_remaining=6):
+def mechanize_get(url, referrer=None, attempts_remaining=6, person=None):
+    """Input: Some stuff regarding a web URL to request.
+    Output: A browser instance that just open()'d that, plus an unsaved
+    WebResponse object representing that browser's final state."""
+    web_response = mysite.customs.models.WebResponse()
+
     b = mechanize.Browser()
     b.set_handle_robots(False)
     addheaders = [('User-Agent',
@@ -33,45 +40,63 @@ def mechanize_get(url, referrer=None, attempts_remaining=6):
     except HTTPError, e:
         # FIXME: Test with mock object.
         if e.code == 504 and attempts_remaining > 0:
-            msg = "Tried to get %s, got 504, retrying %d more times..." % (
-                    url, attempts_remaining)
-            print >> sys.stderr, msg
-            return mechanize_get(url, referrer, attempts_remaining - 1)
+            message_schema = "Tried to talk to %s, got 504, retrying %d more times..."
+
+            long_message = message_schema % (url, attempts_remaining)
+            print >> sys.stderr, long_message
+
+            if person:
+                short_message = message_schema % (urlparse(url).hostname, attempts_remaining)
+                person.user.message_set.create(message=short_message)
+            return mechanize_get(url, referrer, attempts_remaining-1, person)
         else:
             raise
 
     return b
 
-def ohloh_url2data(url, selector, params = {}, many = False, API_KEY = None):
+def ohloh_url2data(url, selector, params = {}, many = False, API_KEY = None, person=None):
+    '''Input: A URL to get,
+    a bunch of parameters to toss onto the end url-encoded,
+    many (a boolean) indicating if we should return a list of just one datum,
+    API_KEY suggesting a key to use with Ohloh, and a
+    Person object to, if the request is slow, log messages to.
+
+    Output: A list/dictionary of Ohloh data plus a saved WebResponse instance that
+    logs information about the request.'''
+
     if API_KEY is None:
         API_KEY = settings.OHLOH_API_KEY
+
 
     my_params = {'api_key': API_KEY}
     my_params.update(params)
     params = my_params ; del my_params
 
+    # FIXME: We return more than just "ret" these days! Rename this variable.
     ret = []
     
     encoded = urllib.urlencode(params)
     url += encoded
     try:
-        b = mechanize_get(url)
+        b = mechanize_get(url, person)
+        web_response = mysite.customs.models.WebResponse.create_from_browser(b)
+        web_response.save() # Always save the WebResponse, even if we don't know
+        # that any other object will store a pointer here.
     except urllib2.HTTPError, e:
+        # FIXME: Also return a web_response for error cases
         if str(e.code) == '404':
             if many:
-                return url, []
-            return url, {}
+                return [], None
+            return {}, None
         else:
             raise
-    s = b.response()
+
     try:
-        s = b.response().read()
+        s = web_response.text
         tree = ET.parse(StringIO.StringIO(s))
     except xml.parsers.expat.ExpatError:
         # well, I'll be. it doesn't parse.
-        return b.geturl(), None
-        #import pdb
-        #pdb.set_trace()
+        return None, web_response
         
     # Did Ohloh return an error?
     root = tree.getroot()
@@ -87,10 +112,10 @@ def ohloh_url2data(url, selector, params = {}, many = False, API_KEY = None):
         ret.append(this)
 
     if many:
-        return b.geturl(), ret
+        return ret, web_response
     if ret:
-        return b.geturl(), ret[0]
-    return b.geturl(), None
+        return ret[0], web_response
+    return None, web_response
 
 class Ohloh(object):
 
@@ -100,7 +125,7 @@ class Ohloh(object):
         # {{{
         url = 'https://www.ohloh.net/p/%s/analyses/latest.xml?' % urllib.quote(
                 project_name)
-        url, data = ohloh_url2data(url, 'result/analysis')
+        data, web_response = ohloh_url2data(url, 'result/analysis')
         return int(data['id'])
         # }}}
 
@@ -111,29 +136,53 @@ class Ohloh(object):
             project_query = str(project_name)
         url = 'http://www.ohloh.net/projects/%s.xml?' % urllib.quote(
             project_query)
-        url, data = ohloh_url2data(url, 'result/project')
+        data, web_response = ohloh_url2data(url=url, selector='result/project')
         return data
     
     def project_name2projectdata(self, project_name_query):
         url = 'http://www.ohloh.net/projects.xml?'
         args = {'query': project_name_query}
-        url, data = ohloh_url2data(url, 'result/project', args)
-        return data
+        data, web_response = ohloh_url2data(url=url, selector='result/project',
+                                   params=args, many=True)
+        # Sometimes when we search Ohloh for e.g. "Debian GNU/Linux", the project it gives
+        # us back as the top-ranking hit for full-text relevance is "Ubuntu GNU/Linux." So here
+        # we see if the project dicts have an exact match by project name.
+
+        if not data:
+            return None # If there is no matching project possibilit at all, get out now.
+
+        exact_match_on_project_name = [ datum for datum in data
+                                        if datum.get('name', None).lower() == project_name_query.lower()]
+        if exact_match_on_project_name:
+            # If there's an exact match on the project name, return this datum
+            return exact_match_on_project_name[0]
+
+        # Otherwise, trust Ohloh's full-text relevance ranking and return the first hit
+        return data[0]
     
     @accepts(object, int)
     def analysis2projectdata(self, analysis_id):
         url = 'http://www.ohloh.net/analyses/%d.xml?' % analysis_id
-        url, data = ohloh_url2data(url, 'result/analysis')
+        data, web_response = ohloh_url2data(url=url, selector='result/analysis')
 
         # Otherwise, get the project name
         proj_id = data['project_id']
         return self.project_id2projectdata(int(proj_id))
         
-    def get_contribution_info_by_username(self, username):
-        ret = []
+    def get_contribution_info_by_username(self, username, person=None):
+        '''Input: A username. We go out and ask Ohloh, "What repositories
+        have you indexed where that username was a committer?"
+        Optional: a Person model, which is used to log messages to the user
+        in case Ohloh is being slow.
+
+        Output: A list of ContributorFact dictionaries, plus an instance (unsaved)
+        of the WebResponse class, which stores raw information on the response
+        such as the response data and HTTP status.'''
+        data = []
         url = 'http://www.ohloh.net/contributors.xml?'
-        url, c_fs = ohloh_url2data(url, 'result/contributor_fact',
-                              {'query': username}, many=True)
+        c_fs, web_response = ohloh_url2data(
+            url=url, selector='result/contributor_fact', 
+            params={'query': username}, many=True, person=person)
 
         # For each contributor fact, grab the project it was for
         for c_f in c_fs:
@@ -144,23 +193,25 @@ class Ohloh(object):
             this = dict(
                 project=project_data['name'],
                 project_homepage_url=project_data.get('homepage_url', None),
-                primary_language=c_f['primary_language_nice_name'],
+                primary_language=c_f.get('primary_language_nice_name', ''),
                 man_months=int(c_f['man_months']))
-            ret.append(this)
+            data.append(this)
 
-        return ret
+        return data, web_response
 
     def get_name_by_username(self, username):
         url = 'https://www.ohloh.net/accounts/%s.xml?' % urllib.quote(username)
-        url, account_info = ohloh_url2data(url, 'result/account')
+        account_info, web_response = ohloh_url2data(url, 'result/account')
         if 'name' in account_info:
             return account_info['name']
         raise ValueError
 
     def get_contribution_info_by_username_and_project(self, project, username):
+        # FIXME: this applies to a whole bunch of methods in this class. this
+        # logic is extremely duplicated. ech.
         ret = []
         url = 'http://www.ohloh.net/p/%s/contributors.xml?' % project
-        url, c_fs = ohloh_url2data(url, 'result/contributor_fact',
+        c_fs, web_response = ohloh_url2data(url, 'result/contributor_fact',
                                    {'query': username}, many=True)
 
         # Filter these guys down and be sure to only return the ones
@@ -173,13 +224,14 @@ class Ohloh(object):
             this = dict(
                 project=project_data['name'],
                 project_homepage_url=project_data.get('homepage_url', None),
-                primary_language=c_f['primary_language_nice_name'],
+                primary_language=c_f.get('primary_language_nice_name', ''),
                 man_months=int(c_f['man_months']))
             ret.append(this)
 
         return ret
 
     def get_contribution_info_by_email(self, email):
+        # FIXME: Return a WebResponse too
         ret = []
         ret.extend(self.search_contribution_info_by_email(email))
         ret.extend(self.get_contribution_info_by_ohloh_username(
@@ -206,20 +258,22 @@ class Ohloh(object):
         username = parts[1]
         return username
 
-    def get_contribution_info_by_ohloh_username(self, ohloh_username):
+    def get_contribution_info_by_ohloh_username(self, ohloh_username, person=None):
+        # FIXME: This doesn't return any WebResponse. How sad.
+        # In branch pf2_with_webresponse_m2m, we are working on linking DIAs with multiple WebResponses,
+        # after which we intend to return a list of WebResponses, or something like that.
         if ohloh_username is None:
-            return []
+            return [], None
 
         b = mechanize.Browser()
         b.set_handle_robots(False)
         b.addheaders = [('User-Agent',
                         'Mozilla/4.0 (compatible; MSIE 5.0; Windows 98; (compatible;))')]
         try:
-            b.open('https://www.ohloh.net/accounts/%s' % urllib.quote(
-            ohloh_username))
+            b.open('https://www.ohloh.net/accounts/%s' % urllib.quote(ohloh_username))
         except urllib2.HTTPError, e:
             if str(e.code) == '404':
-                return []
+                return [], None
             else:
                 raise
         root = lxml.html.parse(b.response()).getroot()
@@ -238,7 +292,7 @@ class Ohloh(object):
         for (project, contributor_id) in relevant_project_and_contributor_id_pairs:
             url = 'https://www.ohloh.net/p/%s/contributors/%d.xml?' % (
                 urllib.quote(project), contributor_id)
-            url, c_fs = ohloh_url2data(url, 'result/contributor_fact', many=True)
+            c_fs, web_response = ohloh_url2data(url, 'result/contributor_fact', many=True)
             # For each contributor fact, grab the project it was for
             for c_f in c_fs:
                 if 'analysis_id' not in c_f:
@@ -252,12 +306,12 @@ class Ohloh(object):
                         'primary_language_nice_name',''),
                     man_months=int(c_f.get('man_months',0)))
                 ret.append(this)
-        return ret
+        return ret, None
 
     def search_contribution_info_by_email(self, email):
         ret = []
         url = 'http://www.ohloh.net/contributors.xml?'
-        url, c_fs = ohloh_url2data(url, 'result/contributor_fact',
+        c_fs, web_response = ohloh_url2data(url, 'result/contributor_fact',
                               {'query': email}, many=True)
 
         # For each contributor fact, grab the project it was for
@@ -269,7 +323,7 @@ class Ohloh(object):
             this = dict(
                 project=project_data['name'],
                 project_homepage_url=project_data.get('homepage_url', None),
-                primary_language=c_f['primary_language_nice_name'],
+                primary_language=c_f.get('primary_language_nice_name', ''),
                 man_months=int(c_f['man_months']))
             ret.append(this)
 
@@ -282,6 +336,7 @@ class Ohloh(object):
             return self.get_icon_for_project_by_human_name(project)
 
     def get_icon_for_project_by_human_name(self, project):
+        """@param project: the name of a project."""
         # Do a real search to find the project
         try:
             data = self.project_name2projectdata(project)
@@ -293,6 +348,8 @@ class Ohloh(object):
             raise ValueError, "Ohloh gave us back nothing."
         except KeyError:
             raise ValueError, "The project exists, but Ohloh knows no icon."
+        # The URL is often something like s3.amazonws.com/bits.ohloh.net/...
+        # But sometimes Ohloh has a typo in their URLs.
         if '/bits.ohloh.net/' not in med_logo:
             med_logo = med_logo.replace('attachments/',
                                         'bits.ohloh.net/attachments/')
@@ -318,3 +375,5 @@ class Ohloh(object):
 _ohloh = Ohloh()
 def get_ohloh():
     return _ohloh
+
+# vim: set nu:

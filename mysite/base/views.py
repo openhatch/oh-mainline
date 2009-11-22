@@ -3,25 +3,34 @@
 from django.http import HttpResponse, \
         HttpResponseRedirect, HttpResponseServerError
 from django.shortcuts import render_to_response
-import mysite.account
-import mysite.account.forms
 from django_authopenid.forms import OpenidSigninForm
 import simplejson
 from django.template import RequestContext, loader, Context
 from django.core.urlresolvers import reverse
+from django.contrib.auth.forms import AuthenticationForm
+
 import mysite.profile as profile
+import mysite.account
+import mysite.profile.controllers
+import mysite.account.forms
 from mysite.profile.views import display_person_web
+from mysite.base.decorators import view
+
 import feedparser
 import lxml.html
 import mysite.customs.feed
 
+from django.contrib.auth.decorators import login_required
+
 def homepage(request, signup_form=None,
-        invitation_request_form=None, initial_tab_open='request_invitation'):
+        invitation_request_form=None, initial_tab_open='login'):
 
     if request.user.is_authenticated():
         return landing_page(request)
 
     openid_signin_form = OpenidSigninForm()
+
+    old_fashioned_authentication_form = AuthenticationForm()
 
     signup_notification = login_notification = notification_id = None
     if request.GET.get('msg', None) == 'ciao':
@@ -43,6 +52,7 @@ def homepage(request, signup_form=None,
             'login_notification': login_notification,
             'signup_notification': signup_notification,
             'openid_signin_form': openid_signin_form,
+            'old_fashioned_authentication_form': old_fashioned_authentication_form,
             'signup_form': signup_form,
             'invitation_request_form': invitation_request_form,
             }
@@ -58,13 +68,19 @@ def homepage(request, signup_form=None,
 
     return render_to_response('base/homepage.html', data, context_instance=RequestContext(request))
 
+@login_required
+@view
 def landing_page(request):
-    data = profile.views.get_personal_data(request.user.get_profile())
-    data['the_user'] = request.user
 
-    data['entries'] = mysite.customs.feed.cached_blog_entries()
+    data = {}
+    data['entries'] = mysite.customs.feed.cached_blog_entries()[:3]
 
-    return render_to_response('base/landing.html', data)
+    suggested_searches = request.user.get_profile().get_recommended_search_terms()
+    recommended_bugs = mysite.profile.controllers.recommend_bugs(suggested_searches, n=5)
+
+    data['recommended_bugs'] = list(recommended_bugs) # A list so we can tell if it's empty
+
+    return (request, 'base/landing.html', data)
 
 def page_to_js(request):
     # FIXME: In the future, use:
@@ -77,3 +93,7 @@ def page_to_js(request):
     return render_to_response('base/append_ourselves.js',
                               {'in_string': encoded_for_js},
                               mimetype='application/javascript')
+
+def page_not_found(request):
+    return render_to_response('404.html', {'the_user': request.user })
+

@@ -1,49 +1,151 @@
 # vim: set ai ts=4 sw=4 et:
 
-from django.db import models
-from mysite.search.models import Project, Bug
-from django.contrib.auth.models import User
+from mysite.search.models import Project, Bug, get_image_data_scaled
+import mysite.customs.models
 from mysite.customs import ohloh
+
+from django.db import models
+from django.contrib.auth.models import User
+from django.core.files.base import ContentFile
+from django.conf import settings
+from django.contrib.auth import SESSION_KEY, BACKEND_SESSION_KEY, load_backend
+from django.core.urlresolvers import reverse
+
 import datetime
 import sys
 import uuid
+import urllib
 
-def generate_person_photo_path(instance, filename):
+def url2printably_short(url, CUTOFF=50):
+    short_enough_pieces_so_far = []
+    die_next = False
+    wrappable_characters = "/"
+    for url_piece in url.split(wrappable_characters):
+        if die_next:
+            return '/'.join(short_enough_pieces_so_far)
+
+        # Logic: If this URL piece is longer than CUTOFF, then stop appending
+        # and return.
+        if len(url_piece) > CUTOFF:
+            url_piece = url_piece[:CUTOFF-3] + '...'
+            die_next = True
+        # always append
+        short_enough_pieces_so_far.append(url_piece)
+    return '/'.join(short_enough_pieces_so_far)
+
+def generate_person_photo_path(instance, filename, suffix=""):
     random_uuid = uuid.uuid4()
-    return random_uuid.hex
+    return random_uuid.hex + suffix
+
+class RepositoryCommitter(models.Model):
+    """Ok, so we need to keep track of repository committers, e.g.
+        paulproteus@fspot
+    That's because when a user says, 'oy, this data you guys imported isn't
+    mine', what she or he is typically saying is something like
+    'Don't give me any more data from Ohloh pertaining to this dude named
+    mickey.mouse@strange.ly checking code into F-Spot.'"""
+    project = models.ForeignKey(Project)
+    data_import_attempt = models.ForeignKey('DataImportAttempt')
+
+    def committer_identifier(self):
+        return self.data_import_attempt.committer_identifier
+
+    def source(self):
+        return self.data_import_attempt.source
+
+    class Meta:
+        unique_together = ('project', 'data_import_attempt')
 
 class Person(models.Model):
     """ A human bean. """
     # {{{
     user = models.ForeignKey(User, unique=True)
     gotten_name_from_ohloh = models.BooleanField(default=False)
-    interested_in_working_on = models.CharField(max_length=1024, default='')
+    interested_in_working_on = models.CharField(max_length=1024, default='') # FIXME: Ditch this.
     last_polled = models.DateTimeField(default=datetime.datetime(1970, 1, 1))
     show_email = models.BooleanField(default=False)
     photo = models.ImageField(upload_to=
                               lambda a, b: 'static/photos/profile-photos/' + 
                               generate_person_photo_path(a, b),
                               default='')
+    photo_thumbnail = models.ImageField(upload_to=
+                              lambda a, b: 'static/photos/profile-photos/' + 
+                              generate_person_photo_path(a, b, suffix="-thumbnail"),
+                              default='',
+                              null=True)
+    blacklisted_repository_committers = models.ManyToManyField(RepositoryCommitter)
 
     def __unicode__(self):
         return "username: %s, name: %s %s" % (self.user.username,
                 self.user.first_name, self.user.last_name)
 
+    def get_photo_url_or_default(self):
+        try:
+            return self.photo.url
+        except ValueError:
+            return '/static/images/profile-photos/penguin.png'
+
+    @staticmethod
+    def get_from_session_key(session_key):
+        '''Based almost entirely on
+        http://www.djangosnippets.org/snippets/1276/
+        Thanks jdunck!'''
+
+        session_engine = __import__(settings.SESSION_ENGINE, {}, {}, [''])
+        session_wrapper = session_engine.SessionStore(session_key)
+        user_id = session_wrapper.get(SESSION_KEY)
+        auth_backend = load_backend(
+                session_wrapper.get(BACKEND_SESSION_KEY))
+
+        if user_id and auth_backend:
+            return Person.objects.get(user=auth_backend.get_user(user_id))
+        else:
+            return None
+
+    def get_photo_thumbnail_url_or_default(self):
+        try:
+            return self.photo_thumbnail.url
+        except ValueError:
+            return '/static/images/profile-photos/penguin-40px.png'
+
+    def get_published_portfolio_entries(self):
+        return PortfolioEntry.objects.filter(person=self, is_published=True, is_deleted=False)
+
     def get_recommended_search_terms(self):
         # {{{
-        project_exps = ProjectExp.objects.filter(person=self)
-        terms = [p.primary_language for p in project_exps
-                if p.primary_language and p.primary_language.strip()]
+        terms = []
+        
+        # Add terms based on languages in citations
+        citations = self.get_published_citations_flat()
+        for c in citations:
+            terms.extend(c.get_languages_as_list())
+
+        # Add terms based on projects in citations
         terms.extend(
-                [p.project.name for p in project_exps
-                    if p.project.name and p.project.name.strip()])
+                [pfe.project.name for pfe in self.get_published_portfolio_entries()
+                    if pfe.project.name and pfe.project.name.strip()])
+
+        # Add terms based on tags 
+        terms.extend([tag.text for tag in self.get_tags_for_recommendations()])
+
+        # Remove duplicates
         terms = sorted(set(terms), key=lambda s: s.lower())
+
         return terms
 
         # FIXME: Add support for recommended projects.
         # FIXME: Add support for recommended project tags.
 
         # }}}
+
+    def get_published_citations_flat(self):
+        return sum([list(pfe.get_published_citations())
+            for pfe in self.get_published_portfolio_entries()], [])
+
+    def get_tags_for_recommendations(self):
+        """Return a list of Tags linked to this Person."""
+        exclude_me = TagType.objects.filter(name='understands_not')
+        return [link.tag for link in Link_Person_Tag.objects.filter(person=self) if link.tag.tag_type not in exclude_me]
 
     def get_full_name(self):
         # {{{
@@ -56,6 +158,19 @@ class Person(models.Model):
 
     def get_full_name_or_username(self):
         return self.get_full_name() or self.user.username
+
+    def generate_thumbnail_from_photo(self):
+        if self.photo:
+            width = 40
+            self.photo.file.seek(0) 
+            scaled_down = get_image_data_scaled(self.photo.file.read(), width)
+            self.photo_thumbnail.save('', ContentFile(scaled_down))
+
+    @property
+    def profile_url(self):
+        return reverse(mysite.profile.views.display_person_web,
+                kwargs={'user_to_display__username': self.user.username})
+
     # }}}
 
 def create_profile_when_user_created(instance, created, *args, **kwargs):
@@ -67,7 +182,7 @@ models.signals.post_save.connect(create_profile_when_user_created, User)
 class DataImportAttempt(models.Model):
     # {{{
     SOURCE_CHOICES = (
-        ('rs', "All repositories"),
+        ('rs', "Ohloh"),
         ('ou', "Ohloh"),
         ('lp', "Launchpad"),
         )
@@ -76,27 +191,18 @@ class DataImportAttempt(models.Model):
     source = models.CharField(max_length=2,
                               choices=SOURCE_CHOICES)
     person = models.ForeignKey(Person)
-    person_wants_data = models.BooleanField(default=False)
     query = models.CharField(max_length=200)
-    stale = models.BooleanField(default=False)
+    date_created = models.DateTimeField(default=datetime.datetime.utcnow)
+    web_response = models.ForeignKey(mysite.customs.models.WebResponse, 
+                                     null=True) # null=True for
+    # now, so the migration doesn't cause data validation errors
 
     def get_formatted_source_description(self):
         return self.get_source_display() % self.query
 
-    def give_data_to_person(self):
-        """ This DataImportAttempt assigns its person to its ProjectExps. """
-
-        project_exps = ProjectExp.objects.filter(data_import_attempt=self)
-        for pe in project_exps:
-            if pe.person and pe.person != self.person:
-                raise ValueError, ("You tried to give some ProjectExps to "
-                + "a person (%s), but those ProjectExps already belonged to somebody else (%s)." % (
-                        self.person, pe.person))
-            pe.person = self.person
-            pe.save()
-
     def do_what_it_says_on_the_tin(self):
-        """Attempt to import data."""
+        """Attempt to import data by enqueuing a job in celery."""
+        # We need to import here to avoid vicious cyclical imports.
         from mysite.profile.tasks import FetchPersonDataFromOhloh
         FetchPersonDataFromOhloh.delay(self.id)
 
@@ -159,8 +265,19 @@ class ProjectExp(models.Model):
             self.primary_language = ohloh_contrib_info['primary_language']
             self.source = "Ohloh"
             self.time_gathered_from_source = datetime.date.today()
+            # FIXME: Handle first_commit_time from Ohloh somehow
+            #if 'first_commit_time' in ohloh_contrib_info:
+                # parse it
+                #parsed = datetime.datetime.strptime(
+                #    ohloh_contrib_info['first_commit_time'],
+                #    '%Y-%m-%dT%H:%M:%SZ')
+                # This is UTC.
+
+                # jam it into self
+                #self.date_started = parsed
             return self
         # }}}
+
     # FIXME: Make this a static method or something
     def from_launchpad_result(self, project_name, language, person_role):
         # {{{
@@ -218,14 +335,23 @@ class ProjectExp(models.Model):
 class TagType(models.Model):
     # {{{
     name = models.CharField(max_length=100)
-    prefix = models.CharField(max_length=20)
+
+    def __unicode__(self):
+        return self.name
     # }}}
 
 class Tag(models.Model):
     # {{{
-    text = models.CharField(max_length=50)
+    text = models.CharField(null=False, max_length=50)
     tag_type = models.ForeignKey(TagType)
 
+    def save(self, *args, **kwargs):
+        if self.text:
+            return super(Tag, self).save(*args, **kwargs)
+        raise ValueError
+
+    def __unicode__(self):
+        return "%s: %s" % (self.tag_type.name, self.text)
     # }}}
 
 class Link_ProjectExp_Tag(models.Model):
@@ -285,7 +411,6 @@ class SourceForgeProject(models.Model):
     # FIXME: Make this unique
     unixname = models.CharField(max_length=200)
 
-
 class Link_SF_Proj_Dude_FM(models.Model):
     '''Link from SourceForge Project to Person, via FlossMOLE'''
     person  = models.ForeignKey(SourceForgePerson)
@@ -297,8 +422,6 @@ class Link_SF_Proj_Dude_FM(models.Model):
         unique_together = [
             ('person', 'project'),]
             
-    # FIXME: One day, this should
-
     @staticmethod
     def create_from_flossmole_row_data(dev_loginname, proj_unixname, is_admin,
                                        position, date_collected):
@@ -329,3 +452,130 @@ class Link_SF_Proj_Dude_FM(models.Model):
                                                    proj_unixname,
                                                    is_admin, position,
                                                    date_collected)
+
+class PortfolioEntry(models.Model):
+    # Constrain this so (person, project) pair uniquely finds a PortfolioEntry
+    person = models.ForeignKey(Person)
+    project = models.ForeignKey(Project)
+    project_description = models.TextField()
+    experience_description = models.TextField()
+    date_created = models.DateTimeField(default=datetime.datetime.utcnow)
+    is_published = models.BooleanField(default=False)
+    is_deleted = models.BooleanField(default=False)
+
+    def get_published_citations(self):
+        return Citation.untrashed.filter(portfolio_entry=self,
+                is_published=True)
+
+# FIXME: Add a DataSource class to DataImportAttempt.
+
+class UntrashedCitationManager(models.Manager):
+    def get_query_set(self):
+        return super(UntrashedCitationManager, self).get_query_set().filter(
+                is_deleted=False, ignored_due_to_duplicate=False,
+                portfolio_entry__is_deleted=False)
+
+class Citation(models.Model):
+    portfolio_entry = models.ForeignKey(PortfolioEntry) # [0]
+    url = models.URLField(null=True)
+    contributor_role = models.CharField(max_length=200, null=True)
+    data_import_attempt = models.ForeignKey(DataImportAttempt, null=True)
+    distinct_months = models.IntegerField(null=True)
+    languages = models.CharField(max_length=200, null=True)
+    first_commit_time = models.DateTimeField(null=True)
+    date_created = models.DateTimeField(default=datetime.datetime.utcnow)
+    is_published = models.BooleanField(default=False) # unpublished == Unread
+    is_deleted = models.BooleanField(default=False)
+    ignored_due_to_duplicate = models.BooleanField(default=False)
+    old_summary = models.TextField(null=True, default=None)
+
+    objects = models.Manager()
+    untrashed = UntrashedCitationManager()
+
+    @property
+    def summary(self):
+        # FIXME: Pluralize correctly.
+        # FIXME: Use "since year_started"
+
+        if self.distinct_months != 1:
+            suffix = 's'
+        else:
+            suffix = ''
+
+        if self.data_import_attempt:
+            if self.data_import_attempt.source in ['rs', 'ou']:
+                if self.distinct_months is None:
+                    raise ValueError, "Er, Ohloh always gives us a # of months."
+                return "Coded for %d month%s in %s (%s)" % (
+                        self.distinct_months,
+                        suffix,
+                        self.languages,
+                        self.data_import_attempt.get_source_display(),
+                        )
+            elif self.data_import_attempt.source == 'lp':
+                return "Participated in %s (%s)" % (
+                    self.contributor_role,
+                    self.data_import_attempt.get_source_display()
+                    )
+            else:
+                raise ValueError, "There's a DIA of a kind I don't know how to summarize."
+        elif self.url is not None:
+            return url2printably_short(self.url, CUTOFF=38)
+        elif self.distinct_months is not None and self.languages is not None:
+            return "Coded for %d month%s in %s." % (
+                    self.distinct_months,
+                    suffix,
+                    self.languages,
+                    )
+
+        raise ValueError("There's no DIA and I don't know how to summarize this.")
+
+    def get_languages_as_list(self):
+        if self.languages is None:
+            return []
+        return [lang.strip() for lang in self.languages.split(",") if lang.strip()]
+
+    def get_url_or_guess(self):
+        if self.url:
+            return self.url
+        else:
+            if self.data_import_attempt:
+                if self.data_import_attempt.source in ['rs', 'ou']:
+                    return "http://www.ohloh.net/search?%s" % urllib.urlencode(
+                            {'q': self.portfolio_entry.project.name.encode('utf-8')})
+                elif self.data_import_attempt.source == 'lp':
+                    return "https://launchpad.net/~%s" % urllib.quote(
+                            self.data_import_attempt.query)
+
+    def save_and_check_for_duplicates(self):
+        # FIXME: Cache summaries in the DB so this query is faster.
+        duplicates = [citation for citation in Citation.objects.all()
+                if (citation.pk != self.pk) and (citation.summary == self.summary)]
+        if duplicates:
+            self.ignored_due_to_duplicate = True
+        return self.save()
+
+    @staticmethod
+    def create_from_ohloh_contrib_info(ohloh_contrib_info):
+        """Create a new Citation from a dictionary roughly representing an Ohloh ContributionFact."""
+        # {{{
+        # FIXME: Enforce uniqueness on (source, vcs_committer_identifier, project)
+        # Which is to say, overwrite the previous citation with the same source,
+        # vcs_committer_identifier and project.
+        # FIXME: Also store ohloh_contrib_info somewhere so we can parse it later.
+        # FIXME: Also store the launchpad HttpResponse object somewhere so we can parse it l8r.
+        # "We'll just pickle the sucker and throw it into a database column. This is going to be
+        # very exciting. just Hhhomphf." -- Asheesh.
+        citation = Citation()
+        citation.distinct_months = ohloh_contrib_info['man_months']
+        citation.languages = ohloh_contrib_info['primary_language']
+        #citation.year_started = ohloh_contrib_info['year_started']
+        return citation
+        # }}}
+
+    # [0]: FIXME: Let's learn how to use Django's ManyToManyField etc.
+
+    def __unicode__(self):
+        return "<Citation pk=%d, summary=%s>" % (self.pk, self.summary)
+
+# vim: set nu:

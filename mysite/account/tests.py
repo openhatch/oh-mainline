@@ -32,13 +32,7 @@ class Login(TwillTests):
         self.assert_(user and user.is_active)
 
     def test_login_web(self):
-        url = 'http://openhatch.org/'
-        url = make_twill_url(url)
-        tc.go(url)
-        tc.fv('login','login_username',"paulproteus")
-        tc.fv('login','login_password',"paulproteus's unbreakable password")
-        tc.submit()
-        tc.find('paulproteus')
+        self.login_with_twill()
 
     def test_logout_web(self):
         self.test_login_web()
@@ -47,16 +41,6 @@ class Login(TwillTests):
         tc.go(url)
         tc.follow('log out')
         tc.find('ciao')
-
-    def test_login_bad_password_web(self):
-        url = 'http://openhatch.org/'
-        tc.go(make_twill_url('http://openhatch.org/account/logout'))
-        url = make_twill_url(url)
-        tc.go(url)
-        tc.fv('login','login_username',"paulproteus")
-        tc.fv('login','login_password',"not actually paulproteus's unbreakable password")
-        tc.submit()
-        tc.notfind('is_authenticated indeed')
     # }}}
 
 class LoginWithOpenID(TwillTests):
@@ -190,9 +174,9 @@ class EditPhoto(TwillTests):
     #{{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
     def test_set_avatar(self):
+        self.login_with_twill()
         for image in [photo('static/sample-photo.png'),
                       photo('static/sample-photo.jpg')]:
-            self.login_with_twill()
             url = 'http://openhatch.org/people/paulproteus/'
             tc.go(make_twill_url(url))
             tc.follow('Change photo')
@@ -203,10 +187,19 @@ class EditPhoto(TwillTests):
             self.assert_(p.photo.read() ==
                          open(image).read())
 
+            response = self.login_with_client().get(reverse(mysite.account.views.edit_photo))
+            self.assertEqual( response.context[0]['photo_url'], p.photo.url,
+                    "Test that once you've uploaded a photo via the photo editor, "
+                    "the template's photo_url variable is correct.")
+            self.assert_(p.photo_thumbnail)
+            thumbnail_as_stored = Image.open(p.photo_thumbnail.file)
+            w, h = thumbnail_as_stored.size
+            self.assertEqual(w, 40)
+
     def test_set_avatar_too_wide(self):
+        self.login_with_twill()
         for image in [photo('static/images/too-wide.jpg'),
                       photo('static/images/too-wide.png')]:
-            self.login_with_twill()
             url = 'http://openhatch.org/people/paulproteus/'
             tc.go(make_twill_url(url))
             tc.follow('Change photo')
@@ -217,15 +210,16 @@ class EditPhoto(TwillTests):
             image_as_stored = Image.open(p.photo.file)
             w, h = image_as_stored.size
             self.assertEqual(w, 200)
+
     #}}}
 
 class EditPhotoWithOldPerson(TwillTests):
     #{{{
     fixtures = ['user-paulproteus', 'person-paulproteus-with-blank-photo']
     def test_set_avatar(self):
+        self.login_with_twill()
         for image in (photo('static/sample-photo.png'),
                       photo('static/sample-photo.jpg')):
-            self.login_with_twill()
             url = 'http://openhatch.org/people/paulproteus/'
             tc.go(make_twill_url(url))
             tc.follow('Change photo')
@@ -236,113 +230,5 @@ class EditPhotoWithOldPerson(TwillTests):
             self.assert_(p.photo.read() ==
                     open(image).read())
     #}}}
-
-class SignupRequiresInvite(TwillTests):
-    fixtures = ['user-paulproteus', 'person-paulproteus']
-
-    def setUp(self, *args, **kwargs):
-        TwillTests.setUp(self)
-        settings.INVITE_MODE = True
-
-    def tearDown(self, *args, **kwargs):
-        TwillTests.tearDown(self)
-        settings.INVITE_MODE = False
-
-    def test_signup_without_invite(self):
-        client = Client()
-        r = client.post(reverse(mysite.account.views.signup_do),
-                        {'username': 'bob',
-                         'email': 'new@ema.il',
-                         'password1': 'newpassword'})
-        # watch it fail
-        self.assertFalse(list(User.objects.filter(username='bob')))
-
-    def test_signup_with_invite(self):
-        # Make a good invite code from paulproteus.
-        invite_code = InvitationKey.objects.create_invitation(
-            User.objects.get(username='paulproteus')).key
-        client = Client()
-        r = client.post(reverse(mysite.account.views.signup_do),
-                        {'username': 'bob',
-                         'email': 'new@ema.il',
-                         'password1': 'newpassword',
-                         'invite_code': invite_code})
-        # watch it succeed
-        self.assert_(list(User.objects.filter(username='bob')))
-
-    def test_signup_with_invite_as_if_linked_from_email(self):
-        self._signup_with_invite_as_if_linked_from_email(should_work=True)
-
-    def test_signup_with_bad_invite_code(self):
-        self._signup_with_invite_as_if_linked_from_email(invite_code='bad',
-                                                         should_work=False)
-
-    def _signup_with_invite_as_if_linked_from_email(self, invite_code=None, 
-                                                    should_work=True):
-        # Make a good invite code from paulproteus, unless we passed one.
-        if invite_code is None:
-            invite_code = InvitationKey.objects.create_invitation(
-                User.objects.get(username='paulproteus')).key
-        # Store variables for new username and password
-        new_username='new_username'
-        new_password='new_password'
-        new_email='newest@ema.il'
-
-        # Go to the link the email should link us to
-        tc.go(make_twill_url('http://openhatch.org/account/signup/%s ' %
-                             urllib.quote(invite_code)))
-
-        # Fill in new username and password
-        tc.fv('signup', 'username', new_username)
-        tc.fv('signup', 'password1', new_password)
-        tc.fv('signup', 'password2', new_password)
-        tc.fv('signup', 'email', new_email)
-        tc.submit()
-
-        # watch it succeed
-        made_a_user = bool(User.objects.filter(username=new_username).count())
-        if should_work:
-            self.assert_(made_a_user)
-        else:
-            self.assertFalse(made_a_user)
-
-    def test_invite_someone_web(self):
-        target_email = 'new@ema.il'
-        client = self.login_with_client()
-        
-        r = client.post(reverse(mysite.account.views.invite_someone_do),
-                        {'email': target_email})
-
-        self.assertEqual(django.core.mail.outbox[0].recipients(),
-                         [target_email])
-
-    def _test_openid_signup_form(self, data, should_work):
-        # Make a good invite code from paulproteus.
-        form = mysite.account.forms.OpenidRegisterFormWithInviteCode(data)
-        if should_work:
-            self.assert_(form.is_valid())
-        else:
-            self.assertFalse(form.is_valid())
-
-    def test_openid_signup_fails_without_invite(self):
-        # invite code key missing
-        data = {'username': 'some_new_guy', 'email': 'you@yourmom.com'}
-        self._test_openid_signup_form(data=data, should_work=False)
-
-        # invite code key empty
-        data = {'username': 'some_new_guy', 'email': 'you@yourmom.com',
-                'invite_code': ''}
-        self._test_openid_signup_form(data=data, should_work=False)
-
-        # invite code key wrong
-        data = {'username': 'some_new_guy', 'email': 'you@yourmom.com',
-                'invite_code': 'not a valid code'}
-        self._test_openid_signup_form(data=data, should_work=False)
-
-    def test_openid_signup_succeeds_with_invite(self):
-        data = {'username': 'some_new_guy', 'email': 'you@yourmom.com',
-                'invite_code': InvitationKey.objects.create_invitation(
-                    User.objects.get(username='paulproteus')).key}
-        self._test_openid_signup_form(data=data, should_work=True)
 
 # vim: set nu:

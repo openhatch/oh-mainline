@@ -1,11 +1,10 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
-"http://www.w3.org/TR/1999/REC-html401-19991224/strict.dtd">
+<!doctype html>
 <html>
     <head>
         <title>
-            OpenHatch -
-            {% block title %}
-            {% endblock title %}
+            {% block whole_title %}
+            OpenHatch - {% block title %}{% endblock %}
+            {% endblock whole_title %}
         </title>
 
         <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
@@ -46,16 +45,14 @@
                                 <!-- user.is_authenticated indeed -->
                                 <li><a href='{% url mysite.account.views.logout %}'>log out</a></li>
                                 <li><a href='{% url mysite.account.views.settings %}'>settings</a></li>
+                                <li><a href='{% url mysite.search.views.fetch_bugs %}'>volunteer opportunities</a></li>
+                                <li><a href='{% url mysite.profile.views.display_list_of_people %}'>people</a></li>
+                                <li><a href='{% url mysite.profile.views.display_person_web the_user.username %}'>profile</a></li>
+                                <li><a href='{% url mysite.base.views.homepage %}'>home</a></li>
                                 <li id='username'><a href='/people/{{ the_user.username }}/'>{{ the_user.username }}</a></li>
                                 {% else %}
-                                <li><a href='{% url mysite.account.views.login %}'>log in</a></li>
-                                <li><a href='/#create_profile'>sign up</a></li>
+                                <li><a href='/account/login'>log in / sign up</a></li>
                                 {% endif %}
-                            </ul>
-                            <!-- due to right float, bottom of list is leftmost element -->
-                            <ul style='width: 740px;' id='links'>
-                                <li><a href='/search/'>volunteer opportunities</a></li>
-                                <li><a href='/people/'>people</a></li>
                             </ul>
                         </div>
 
@@ -75,15 +72,15 @@
                     </div>
                 </div>
                 {% endblock nav %}
+                {% if notifications %}
                 <ul id='notifications'>
                     {% block notifications %}
-                    {% if notifications %}
                     {% for notification in notifications %}
-                    <li class='alert' id='{{ notification.id }}'>{{ notification.text }}</li>
+                    <li class='alert' id='{{ notification.id }}'><div>{{ notification.text|safe }}</div></li>
                     {% endfor %}
-                    {% endif %}
                     {% endblock %}
                 </ul>
+                {% endif %}
                 <div id='page-top'>
                     {% block pagetop %}
                     {% endblock pagetop %}
@@ -92,19 +89,22 @@
                     {% block content %}
                     {% endblock content %}
                 </div><!-- /#content -->
-                <div id='footer'>
-                    {% block footer %}
-                    <ul>
-                        <li><a href='/'>home</a></li>
-                        <li><a href="/about/">about</a></li>
-                        <li><a href="/people/">people</a></li>
-                        <li><a href="/search/">volunteer opportunities</a></li>
-                        <li><a href="/contact/">contact</a></li>
-                    </ul>
-                    {% endblock footer %}
-                </div>
             </div><!-- /#penoutermost -->
         </div><!-- /#outermost -->
+        <div id='footer-wrapper'>
+            <div id='footer'>
+                {% block footer %}
+                <ul>
+                    <li><a href='/'>home</a></li>
+                    <li><a href="/blog/">blog</a></li>
+                    <li><a href="/about/">about</a></li>
+                    <li><a href="/people/">people</a></li>
+                    <li><a href="/search/">volunteer opportunities</a></li>
+                    <li><a href="/contact/">contact</a></li>
+                </ul>
+                {% endblock footer %}
+            </div>
+        </div>
 
         {% block jquery %}
         <script type='text/javascript' src='/static/js/jquery.js'></script>
@@ -113,6 +113,27 @@
 
         {% block js %}
         {% endblock js %}
+
+        {% if test_js %}
+        {% block js_tests %}
+        {% endblock js_tests %}
+        {% endif %}
+        {% block piwik_js %}
+<script type="text/javascript">
+if (document.location.hostname == 'openhatch.org') {
+var pkBaseURL = (("https:" == document.location.protocol) ? "https://openhatch.org/piwik/" : "http://openhatch.org/piwik/");
+document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
+}
+</script><script type="text/javascript">
+  if (document.location.hostname == 'openhatch.org') {
+  try {
+  var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", 1);
+  piwikTracker.trackPageView();
+  piwikTracker.enableLinkTracking();
+  } catch( err ) {}
+}
+</script><noscript><p><img src="http://openhatch.org/piwik/piwik.php?idsite=1" style="border:0" alt=""/></p></noscript>
+        {% endblock %}
 
     </body>
 </html>

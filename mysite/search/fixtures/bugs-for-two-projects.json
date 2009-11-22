@@ -1,12 +1,12 @@
 [
 {"pk": 1, "model": "search.project", "fields": 
-{"icon_url": "https://launchpadlibrarian.net/20269415/do.png", "name": "GNOME-Do", "language": "C#"}}, 
+{"icon_raw": "/static/no-project-icon.png", "name": "GNOME-Do", "language": "C#"}}, 
 {"pk": 2, "model": "search.project", "fields": 
-{"icon_url": "https://launchpadlibrarian.net/9017963/foo.png", "name": "Exaile", "language": "Python"}}, 
+{"icon_raw": "/static/no-project-icon.png", "name": "Exaile", "language": "Python"}}, 
 {"pk": 3, "model": "search.project", "fields": 
-{"icon_url": "https://launchpadlibrarian.net/9017963/foo.png", "name": "Mozilla Firefox", "language": "XUL"}}, 
+{"icon_raw": "/static/no-project-icon.png", "name": "Mozilla Firefox", "language": "XUL"}}, 
 {"pk": 4, "model": "search.project", "fields": 
-{"icon_url": "https://launchpadlibrarian.net/9017963/foo.png", "name": "Iceweasel", "language": "XUL"}}, 
+{"icon_raw": "/static/no-project-icon.png", "name": "Iceweasel", "language": "XUL"}}, 
 {"pk": 0, "model": "search.bug", "fields": 
 {"status": "New", "last_polled": "2009-06-08 23:04:31", "submitter_realname": "Mister 0", "description": "Description #0", "title": "Title #0", "importance": "Importance #0", "people_involved": 9, "last_touched": "2009-06-06 06:20:39", "submitter_username": "username 0", "project": 2, "canonical_bug_link": "https://bugs.launchpad.net/+bug/projname/0", "date_reported": "2009-06-08 23:02:07"}}, 
 {"pk": 1, "model": "search.bug", "fields": 

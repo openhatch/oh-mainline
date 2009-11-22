@@ -13,6 +13,7 @@ class ProjectExpForm(django.forms.Form):
         max_length=200,
         label='Cite your involvement')
     
+#FIXME: Delete this.
 class ProjectExpEditForm(django.forms.Form):
     # FIXME: Make this a ModelForm I guess.
     # FIXME: Align the attribute names with the model.
@@ -44,7 +45,7 @@ class ProjectExpEditForm(django.forms.Form):
         try:
             self.user
         except AttributeError:
-            raise forms.ValidationError("For some reason, the programmer made a mistake, and I will blame you, the user.")
+            raise django.forms.ValidationError("For some reason, the programmer made a mistake, and I will blame you, the user.")
         # Now, check that there is a project_exp that is
         # owned by the user.
         inputted_id = self.cleaned_data['project_exp_id']
@@ -57,3 +58,38 @@ class ProjectExpEditForm(django.forms.Form):
         # so now we have a p_e. Jam it into cleaned_data.
         self.cleaned_data['project_exp'] = p_e
         return inputted_id
+
+class ManuallyAddACitationForm(django.forms.ModelForm):
+    portfolio_entry = django.forms.ModelChoiceField(
+            queryset=mysite.profile.models.PortfolioEntry.objects.all(), 
+            widget=django.forms.HiddenInput())
+
+    # The ID of the element in the portfolio editor that contains this form.
+    form_container_element_id = django.forms.CharField(widget=django.forms.HiddenInput())
+    #FIXME: Make is_published always true
+    class Meta:
+        model = mysite.profile.models.Citation
+        fields = ('portfolio_entry', 'url', )
+
+    def set_user(self, user):
+        self.user = user
+
+    def clean_portfolio_entry(self):
+        '''Note: I will explode violently if you
+        have not set self.user.'''
+        # Assert that self.user is set
+        try:
+            self.user
+        except AttributeError:
+            raise django.forms.ValidationError("For some reason, the programmer made a mistake, "
+                    "and I will blame you, the user.")
+
+        # Check that the user owns this portfolio entry.
+        pf_entry = self.cleaned_data['portfolio_entry'] # By now this is an object, not an ID.
+        if pf_entry.person.user == self.user:
+            return pf_entry
+        else:
+            raise django.forms.ValidationError("Somehow, you submitted "
+                    "regarding a portfolio entry that you do not own.")
+
+# vim: set nu:

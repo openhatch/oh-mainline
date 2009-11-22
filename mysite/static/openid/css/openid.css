@@ -17,8 +17,21 @@
     clear: both;
     padding: 10px;
 }
-#openid_btns, #openid_btns br {
-    clear: both;
+#openid_btns a { float: left; }
+#openid_btns a:hover { background-color: #ffc; }
+#openid_btns { clear: both; }
+#openid_btns .small {
+    float: right;
+    width: 90px;
+}
+#openid_btns .large {
+    width: 215px;
+    float: left;
+}
+#openid_btns .large a {
+    float: left;
+    margin-right: 6px;
+    margin-bottom: 6px;
 }
 #openid_highlight .openid_large_btn,
 #openid_highlight .openid_small_btn {
@@ -27,14 +40,12 @@
 .openid_large_btn {
     width: 100px;
     height: 60px;
-    border: 3px solid #ddd;
-    margin: 3px;
+    margin: 0 6px px 0;
     float: left;
 }
 .openid_small_btn {
     width: 24px;
     height: 24px;
-    border: 3px solid #ddd;
     margin: 3px;
     float: left;
 }

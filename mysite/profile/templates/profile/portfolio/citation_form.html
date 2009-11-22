@@ -1,0 +1,16 @@
+<li>
+<form class='add_a_record' method='POST'
+    action='{% url mysite.profile.views.add_citation_manually_do %}'>
+    {% for field in citation_form %}
+    {% if not field.is_hidden %}
+    <label for='project__name'>
+        {{ field.label }}
+    </label>
+    {% endif %}
+    {{ field.errors }}
+    {{ field }}
+    {% endfor %}
+    <input type='submit' value='Save' />
+</form>
+</li>
+{# vim: set filetype=htmldjango: #}

@@ -14,7 +14,7 @@ NB: All forms in pages that descend from this have the same name.
         {% block submodule_body %}{% endblock %}
     </div>
     <div class='foot'>
-        <input type='submit' value='Save' />
+        <input type='submit' value='{% block submit_button_text %}Save{% endblock %}' />
     </div>
 </form>
 {% endblock settings_main %}

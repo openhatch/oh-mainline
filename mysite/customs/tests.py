@@ -5,6 +5,7 @@
 from mysite.search.models import Project, Bug
 from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag
 import mysite.profile.views
+from mysite.profile.tests import MockFetchPersonDataFromOhloh
 
 import mock
 import os
@@ -13,19 +14,22 @@ import twill
 import lxml
 from twill import commands as tc
 from twill.shell import TwillCommandLoop
+
 import django.test
 from django.test import TestCase
+from django.test.client import Client
+from django.conf import settings
 from django.core.servers.basehttp import AdminMediaHandler
 from django.core.handlers.wsgi import WSGIHandler
+
 from StringIO import StringIO
 import urllib
+from urllib2 import HTTPError
 import simplejson
 import datetime
 import ohloh
 import lp_grabber
 
-from django.test.client import Client
-from django.conf import settings
 from mysite.profile.tasks import FetchPersonDataFromOhloh
 import mysite.customs.miro
 import mysite.customs.feed
@@ -79,7 +83,8 @@ class SlowlohTests(django.test.TestCase):
     def testFindByUsername(self, should_equal = None):
         # {{{
         oh = ohloh.get_ohloh()
-        projects = oh.get_contribution_info_by_username('paulproteus')
+        projects, web_response = oh.get_contribution_info_by_username('paulproteus')
+        # We test the web_response elsewhere
         if should_equal is None:
             should_equal = [{'project': u'ccHost',
                              'project_homepage_url': 'http://wiki.creativecommons.org/CcHost',
@@ -98,11 +103,11 @@ class SlowlohTests(django.test.TestCase):
     def testFindByOhlohUsername(self, should_equal = None):
         # {{{
         oh = ohloh.get_ohloh()
-        projects = oh.get_contribution_info_by_ohloh_username('paulproteus')
+        projects, web_response = oh.get_contribution_info_by_ohloh_username('paulproteus')
         if should_equal is None:
             should_equal = [{'project': u'ccHost',
                              'project_homepage_url': 'http://wiki.creativecommons.org/CcHost',
-                           'man_months': 1,
+                             'man_months': 1,
                              'primary_language': 'shell script'}]
         self.assertEqual(should_equal, projects)
         # }}}
@@ -126,7 +131,7 @@ class SlowlohTests(django.test.TestCase):
     def testFindContributionsInOhlohAccountByUsername(self):
         # {{{
         oh = ohloh.get_ohloh()
-        projects = oh.get_contribution_info_by_ohloh_username('paulproteus')
+        projects, web_response = oh.get_contribution_info_by_ohloh_username('paulproteus')
         
         assert {'project': u'ccHost',
                 'project_homepage_url': 'http://wiki.creativecommons.org/CcHost',
@@ -137,7 +142,7 @@ class SlowlohTests(django.test.TestCase):
     def testFindContributionsInOhlohAccountByEmail(self):
         oh = ohloh.get_ohloh()
         username = oh.email_address_to_ohloh_username('paulproteus.ohloh@asheesh.org')
-        projects = oh.get_contribution_info_by_ohloh_username(username)
+        projects, web_response = oh.get_contribution_info_by_ohloh_username(username)
         
         assert {'project': u'ccHost',
                 'project_homepage_url': 'http://wiki.creativecommons.org/CcHost',
@@ -155,15 +160,26 @@ class SlowlohTests(django.test.TestCase):
     def testFindByUsernameNotAsheesh(self):
         # {{{
         oh = ohloh.get_ohloh()
-        projects = oh.get_contribution_info_by_username('keescook')
+        projects, web_response = oh.get_contribution_info_by_username('keescook')
         self.assert_(len(projects) > 1)
         # }}}
+
+    def test_find_debian(self):
+        self.assertNotEqual("debian", "ubuntu", "This is an assumption of this test.")
+        oh = ohloh.get_ohloh()
+        project_data = oh.project_name2projectdata("Debian GNU/Linux")
+        self.assertEqual(project_data['name'], 'Debian GNU/Linux', "Expected that when we ask Ohloh, what project is called 'Debian GNU/Linux', Ohloh gives a project named 'Debian GNU/Linux', not, for example, 'Ubuntu'.")
+
+    def test_find_empty_project_without_errors(self):
+        oh = ohloh.get_ohloh()
+        project_data = oh.project_name2projectdata("theres no PROJECT quite LIKE THIS ONE two pound curry irrelevant keywords watch me fail please if not god help us")
+        self.assertEqual(project_data, None, "We successfully return None when the project is not found.")
     # }}}
 
 class OhlohIconTests(django.test.TestCase):
     '''Test that we can grab icons from Ohloh.'''
     # {{{
-    def test_given_project_find_icon(self):
+    def test_ohloh_gives_us_an_icon(self):
         oh = ohloh.get_ohloh()
         icon = oh.get_icon_for_project('f-spot')
         icon_fd = StringIO(icon)
@@ -171,86 +187,42 @@ class OhlohIconTests(django.test.TestCase):
         image = Image.open(icon_fd)
         self.assertEqual(image.size, (64, 64))
 
-    def test_given_project_find_icon_failure(self):
+    def test_ohloh_errors_on_nonexistent_project(self):
         oh = ohloh.get_ohloh()
         self.assertRaises(ValueError, oh.get_icon_for_project, 'lolnomatxh')
 
-    def test_find_icon_failure_when_proj_exists_but_lacks_icon(self):
+    def test_ohloh_errors_on_project_lacking_icon(self):
         oh = ohloh.get_ohloh()
         self.assertRaises(ValueError, oh.get_icon_for_project, 'asdf')
 
-    def test_find_icon_for_mozilla_firefox(self):
-        oh = ohloh.get_ohloh()
-        icon = oh.get_icon_for_project('Mozilla Firefox')
-        icon_fd = StringIO(icon)
-        from PIL import Image
-        image = Image.open(icon_fd)
-        self.assertEqual(image.size, (64, 64))
-
-    def test_find_icon_for_proj_with_space(self):
+    def test_ohloh_errors_correctly_even_when_we_send_her_spaces(self):
         oh = ohloh.get_ohloh()
         self.assertRaises(ValueError, oh.get_icon_for_project,
                 'surely nothing is called this name')
 
-    def test_given_project_generate_internal_url(self):
-        # First, delete the project icon
-        path, url = mysite.profile.views.project_icon_url('f-spot', actually_fetch=False)
+    def test_populate_icon_from_ohloh(self):
 
-        if os.path.exists(path):
-            os.unlink(path)
+        project = Project()
+        project.name = 'Mozilla Firefox'
+        project.populate_icon_from_ohloh()
 
-        # Download the icon
-        path, url = mysite.profile.views.project_icon_url('f-spot')
-        self.assert_(os.path.exists(path))
-        os.unlink(path)
+        self.assert_(project.icon_raw)
+        self.assertEqual(project.icon_raw.width, 64)
+        self.assertNotEqual(project.date_icon_was_fetched_from_ohloh, None)
 
-    def test_given_project_generate_internal_url_with_width(self):
-        # First, delete the project icon
-        path, url = mysite.profile.views.project_icon_url('f-spot', actually_fetch=False,
-                                                          width=40)
+    def test_populate_icon_from_ohloh_uses_none_on_no_match(self):
 
-        if os.path.exists(path):
-            os.unlink(path)
+        project = Project()
+        project.name = 'lolnomatchiawergh'
 
-        # Download the icon
-        path, url = mysite.profile.views.project_icon_url('f-spot')
-        self.assert_(os.path.exists(path))
-        os.unlink(path)
+        project.populate_icon_from_ohloh()
 
-    def test_given_project_generate_internal_url_for_proj_fail(self):
-        # First, delete the project icon
-        path, url = mysite.profile.views.project_icon_url('lolnomatzch',
-                                                          actually_fetch=False)
-        path = url[1:] # strip leading '/'
-        if os.path.exists(path):
-            os.unlink(path)
+        self.assertFalse(project.icon_raw)
+        # We don't know how to compare this against None,
+        # but this seems to work.
 
-        # Download the icon
-        path, url = mysite.profile.views.project_icon_url('lolnomatzch')
-        self.assert_(os.path.exists(path))
-        os.unlink(path)
+        self.assertNotEqual(project.date_icon_was_fetched_from_ohloh, None)
 
-
-    def test_project_image_link(self):
-        # First, delete the project icon
-        path, url = mysite.profile.views.project_icon_url('f-spot',
-                                             actually_fetch=False)
-
-        if os.path.exists(path):
-            os.unlink(path)
-
-        # Then retrieve (slowly) this URL that redirects to the image
-        go_to_url = '/people/project_icon/f-spot'
-        
-        response = Client().get(go_to_url)
-        # Assure ourselves that we were redirected to the above URL...
-        self.assertEqual(response['Location'], 'http://testserver' + url)
-        # and that the file exists on disk
-
-        self.assert_(os.path.exists(path))
-
-        # Remove it so the test has no side-effects
-        os.unlink(path)
     # }}}
 
 class LaunchpadDataTests(django.test.TestCase):
@@ -323,11 +295,32 @@ Keywords: Torrent unittest""")
         mock_csv_maker.return_value = StringIO("""bug_id,useless
 1,useless""")
         mysite.customs.miro.grab_miro_bugs()
-        all_bugs = Bug.objects.all()
+        all_bugs = Bug.all_bugs.all()
         self.assertEqual(len(all_bugs), 1)
         bug = all_bugs[0]
         self.assertEqual(bug.canonical_bug_link,
                          'http://bugzilla.pculture.org/show_bug.cgi?id=2294')
+        self.assertFalse(bug.looks_closed)
+
+        # And the new manager does find it
+        self.assertEqual(Bug.open_ones.all().count(), 1)
+
+
+    @mock.patch("mysite.customs.miro.open_xml_url")
+    @mock.patch("mysite.customs.miro.bitesized_bugs_csv_fd")
+    def test_full_grab_resolved_miro_bug(self, mock_csv_maker, mock_xml_opener):
+        mock_xml_opener.return_value = open(os.path.join(
+            settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06-RESOLVED.xml'))
+
+        mock_csv_maker.return_value = StringIO("""bug_id,useless
+1,useless""")
+        mysite.customs.miro.grab_miro_bugs()
+        all_bugs = Bug.all_bugs.all()
+        self.assertEqual(len(all_bugs), 1)
+        bug = all_bugs[0]
+        self.assertEqual(bug.canonical_bug_link,
+                         'http://bugzilla.pculture.org/show_bug.cgi?id=2294')
+        self.assert_(bug.looks_closed)
 
     @mock.patch("mysite.customs.miro.open_xml_url")
     @mock.patch("mysite.customs.miro.bitesized_bugs_csv_fd")
@@ -340,7 +333,7 @@ Keywords: Torrent unittest""")
         mysite.customs.miro.grab_miro_bugs()
 
         # Pretend there's old data lying around:
-        bug = Bug.objects.get()
+        bug = Bug.all_bugs.get()
         bug.people_involved = 1
         bug.save()
 
@@ -351,7 +344,7 @@ Keywords: Torrent unittest""")
         mysite.customs.miro.grab_miro_bugs()
 
         # Now verify there is only one bug, and its people_involved is 5
-        bug = Bug.objects.get()
+        bug = Bug.all_bugs.get()
         self.assertEqual(bug.people_involved, 5)
 
 
@@ -380,12 +373,12 @@ Keywords: Torrent unittest""")
         # Now, do a crawl and notice that we updated the bug even though the CSV is empty
         
         mysite.customs.miro.grab_miro_bugs() # refreshes no bugs since CSV is empty!
-        all_bugs = Bug.objects.all()
+        all_bugs = Bug.all_bugs.all()
         self.assertEqual(len(all_bugs), 1)
         bug = all_bugs[0]
         self.assertEqual(bug.people_involved, 5)
 
-class TestOpenHatchBlogCrawl(django.test.TestCase):
+class BlogCrawl(django.test.TestCase):
     def test_summary2html(self):
         yo_eacute = mysite.customs.feed.summary2html('Yo &eacute;')
         self.assertEqual(yo_eacute, u'Yo \xe9')
@@ -394,10 +387,67 @@ class TestOpenHatchBlogCrawl(django.test.TestCase):
     def test_blog_entries(self, mock_feedparser_parse):
         mock_feedparser_parse.return_value = {
             'entries': [
-                {'summary': 'Yo &eacute;'}]}
+                {
+                    'title': 'Yo &eacute;',
+                    'summary': 'Yo &eacute;'
+                    }]}
         entries = mysite.customs.feed._blog_entries()
+        self.assertEqual(entries[0]['title'],
+                         u'Yo \xe9')
         self.assertEqual(entries[0]['unicode_text'],
                          u'Yo \xe9')
-                
-            
 
+mock_browser_open = mock.Mock()
+mock_browser_open.side_effect = HTTPError(url="http://theurl.com/", code=504, msg="", hdrs="", fp=open("/dev/null")) 
+class UserGetsMessagesDuringImport(django.test.TestCase):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    @mock.patch("mechanize.Browser.open", mock_browser_open)
+    def test_user_get_messages_during_import(self):
+        paulproteus = Person.objects.get(user__username='paulproteus')
+
+        self.assertEqual(len(paulproteus.user.get_and_delete_messages()), 0)
+
+        self.assertRaises(HTTPError, mysite.customs.ohloh.mechanize_get, 'http://ohloh.net/somewebsiteonohloh', attempts_remaining=1, person=paulproteus)
+
+        self.assertEqual(len(paulproteus.user.get_and_delete_messages()), 1)
+
+class OhlohLogging(django.test.TestCase):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
+    def test_we_save_ohloh_data_in_success(self):
+        # Create a DIA
+        # Ask it to do_what_it_says_on_the_tin
+        # That will cause it to go out to the network and download some data from Ohloh.
+        # Two cases to verify:
+        # 1. An error - verify that we save the HTTP response code
+        paulproteus = Person.objects.get(user__username='paulproteus')
+        success_dia = mysite.profile.models.DataImportAttempt(
+            source='rs', person=paulproteus, query='queree')
+        success_dia.save()
+        success_dia.do_what_it_says_on_the_tin() # go out to Ohloh
+
+        # refresh the DIA with the data from the database
+        success_dia = mysite.profile.models.DataImportAttempt.objects.get(
+            pk=success_dia.pk)
+        self.assertEqual(success_dia.web_response.status, 200)
+        self.assert_('ohloh.net' in success_dia.web_response.url)
+        self.assert_('<?xml' in success_dia.web_response.text)
+
+    @mock.patch('mechanize.Browser.open', None)
+    def _test_we_save_ohloh_data_in_failure(self):
+        # Create a DIA
+        # Ask it to do_what_it_says_on_the_tin
+        # That will cause it to go out to the network and download some data from Ohloh.
+        # Two cases to verify:
+        # 2. Success - verify that we store the same data Ohloh gave us back
+        paulproteus = Person.objects.get(user__username='paulproteus')
+        success_dia = DataImportAttempt(
+            source='rs', person=paulproteus, query='queree')
+        success_dia.do_what_it_says_on_the_tin() # go out to Ohloh
+        self.assertEqual(error_dia.web_response.text, 'response text')
+        self.assertEqual(error_dia.web_response.url, 'http://theurl.com/')
+        self.assertEqual(error_dia.web_response.status, 200)
+                
+# vim: set nu:

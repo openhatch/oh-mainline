@@ -13,7 +13,7 @@ Suggns = {
         Suggns.$toggleLink = $('#toggle-more-suggestions');
         Suggns.$submitButton = $('form#suggested_searches input:submit');
         Suggns.$terms = $('form#suggested_searches li');
-        Suggns.$queryField = $('#language');
+        Suggns.$queryField = $('#q');
 
         Suggns.updateSuggestionsToHide();
         Suggns.toggler();

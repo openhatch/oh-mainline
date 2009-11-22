@@ -102,6 +102,7 @@ SESSION_ENGINE="django.contrib.sessions.backends.file"
 INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
+    'django.contrib.humanize',
     'django.contrib.sessions',
     'django.contrib.sites',
     'django.contrib.webdesign',
@@ -116,10 +117,10 @@ INSTALLED_APPS = (
     'mysite.search',
     'mysite.profile',
     'mysite.customs',
-    'mysite.consulting',
     'mysite.account',
     'mysite.base',
     'mysite.info',
+    'mysite.project',
 )
 
 # file: settings.py #
@@ -137,9 +138,11 @@ cooked_data_password = 'AXQaTjp3'
 AUTH_PROFILE_MODULE = "profile.Person"
 
 LOGIN_URL = '/account/login/'
-LOGIN_REDIRECT_URL = '/account/login/'
+LOGIN_REDIRECT_URL = '/' # Landing page
 
-OHLOH_API_KEY='JeXHeaQhjXewhdktn4nUw' # "Oman testing"
+OHLOH_API_KEY='JeXHeaQhjXewhdktn4nUw' # This key is called "Oman testing"
+                                        # at <https://www.ohloh.net/accounts/paulproteus/api_keys>
+#OHLOH_API_KEY='0cWqe4uPw7b8Q5337ybPQ' # This key is called "API testing"
 
 applog = logging.getLogger('applog')
 applog.setLevel(logging.DEBUG)
@@ -155,6 +158,6 @@ INVITATIONS_PER_USER=5
 
 DEFAULT_FROM_EMAIL = 'all@openhatch.org'
 
-# Add Django memory-based caching (This should "obviously" be something else on the productions ite)
+# Add Django memory-based caching (This should "obviously" be something else on the production site)
 CACHE_BACKEND = 'locmem:///'
 

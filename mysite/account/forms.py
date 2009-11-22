@@ -14,10 +14,6 @@ class UserCreationFormWithEmail(django.contrib.auth.forms.UserCreationForm):
     username = django.forms.RegexField(label="Username", max_length=30, regex=r'^\w+$',
         help_text = "Please pick a username, of 30 characters or fewer. Stick to letters, digits and underscores.",
         error_messages = {'invalid': "Stick to letters, digits and underscores.", 'required': "Gotta pick a username!"})
-    invite_code = django.forms.CharField(required=False,
-                                         label='Invite code',
-                                         error_messages={
-            'invalid': 'You must enter a valid invite code.'})
     email = django.forms.EmailField(error_messages={
         'required': "Your email address is required. We promise to use it respectfully.",
         'invalid': "This email address looks fishy. Real, or malarkey?"})
@@ -40,15 +36,6 @@ class UserCreationFormWithEmail(django.contrib.auth.forms.UserCreationForm):
                 uet = unicode(error_text)
                 self.errors[fieldname][index] = custom_error_messages_dict.get(uet, uet)
 
-    def clean_invite_code(self):
-        if settings.INVITE_MODE:
-            if InvitationKey.objects.is_key_valid(self.cleaned_data['invite_code']):
-                return self.cleaned_data['invite_code']
-            raise django.forms.ValidationError(
-                'You need a valid invite code for now.')
-        else:
-            return self.cleaned_data['invite_code']
-
     def clean_email(self):
         """Verify that their email is unique."""
         email = self.cleaned_data["email"]
@@ -60,7 +47,7 @@ class UserCreationFormWithEmail(django.contrib.auth.forms.UserCreationForm):
             "A user with that email already exists.")
 
 class ShowEmailForm(django.forms.Form):
-    show_email = django.forms.BooleanField(required=False)
+    show_email = django.forms.BooleanField(required=False, label="Make email publicly visible?")
 
 class EditEmailForm(django.forms.ModelForm):
     class Meta:
@@ -133,18 +120,4 @@ import django.forms
 from django.conf import settings
 from invitation.models import InvitationKey
 
-class OpenidRegisterFormWithInviteCode(OpenidRegisterForm):
-    invite_code = django.forms.CharField(required=False,
-                                         label='Invite code',
-                                         error_messages={
-            'invalid': 'You must enter a valid invite code.'})
-
-    def clean_invite_code(self):
-        if settings.INVITE_MODE:
-            if InvitationKey.objects.is_key_valid(self.cleaned_data['invite_code']):
-                return self.cleaned_data['invite_code']
-            raise django.forms.ValidationError(
-                'You need a valid invite code for now.')
-        else:
-            return self.cleaned_data['invite_code']
-
+OpenidRegisterFormWithInviteCode = OpenidRegisterForm

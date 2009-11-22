@@ -6,12 +6,3 @@ $.fn.hoverClass = function(c) {
             );
         });
     };
-
-Portfolio = {};
-
-Portfolio.initialize = function() {
-    console.log('Portfolio.initialize');
-    $('.project-escutcheon').hoverClass('hover');
-};
-
-$(Portfolio.initialize);

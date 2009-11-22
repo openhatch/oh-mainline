@@ -1,10 +1,14 @@
+from django.core.urlresolvers import reverse
+import django.contrib.auth.views
+
 notifications_dictionary = {
         "edit_password_done":
         "Your password has been changed.",
 
         "oops":
-        """Couldn't find that pair of username and password.
-        Did you type your password correctly?""",
+        """Couldn't find that pair of username and password. """
+        "<a href='/account/forgot_pass/'>"
+        "Click here if you forgot your password.</a>",
 
         "next":
         "You've got to be logged in to do that!",
@@ -24,3 +28,12 @@ def get_notification_from_request(request):
             } ]
     else:
         return []
+
+def mysql_regex_escape(s):
+    ret = ''
+    for letter in s:
+        if letter == ']':
+            ret += letter
+        else:
+            ret += '[' + letter + ']'
+    return ret

@@ -11,3 +11,5 @@
     margin-bottom: 10px;
     font-size: 11pt;
 }
+
+#main .submodule .body { background-color: #fff; padding: 3% 5%; }

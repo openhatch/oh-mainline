@@ -1,5 +1,3 @@
-# vim: ai ts=3 sts=4 et sw=4 nu
-
 # Imports {{{
 
 # Python
@@ -37,22 +35,24 @@ from django.conf import settings
 
 # OpenHatch apps
 import mysite.base.controllers
+import mysite.base.helpers
 from mysite.customs import ohloh
 from mysite.profile.models import \
         Person, ProjectExp, \
         Tag, TagType, \
         Link_ProjectExp_Tag, Link_Project_Tag, \
         Link_SF_Proj_Dude_FM, Link_Person_Tag, \
-        DataImportAttempt
+        DataImportAttempt, \
+        PortfolioEntry, Citation
 from mysite.search.models import Project
+from mysite.base.decorators import view
 
 # This app
 import forms
 import mysite.profile.forms
 # }}}
 
-# Add a contribution {{{
-
+# FIXME: Delete when this has been supplanted by add_cttaion_manually.
 def projectexp_add_do(request):
     # {{{
     form = mysite.profile.forms.ProjectExpForm(request.POST)
@@ -74,105 +74,63 @@ def projectexp_add_do(request):
 
     #}}}
 
-# }}}
 
-def profile_data_from_username(username):
+@login_required
+def add_citation_manually_do(request):
     # {{{
-    person = Person.objects.get(
-            user__username=username)
+    form = mysite.profile.forms.ManuallyAddACitationForm(request.POST)
+    form.set_user(request.user)
 
-    project_exps = ProjectExp.objects.filter(
-            person=person)
+    output = {
+            'form_container_element_id': request.POST['form_container_element_id']
+            }
+    if form.is_valid():
+        citation = form.save()
 
-    exps_to_tags = {}
-    for exp in project_exps:
-        tag_links = Link_ProjectExp_Tag.objects.filter(project_exp=exp)
-        for link in tag_links:
-            if link.favorite:
-                link.tag.prefix = 'Favorite: ' # FIXME: evil hack, will fix later
-            else:
-                link.tag.prefix = ''
-        exps_to_tags[exp] = [link.tag for link in tag_links]
+        # Manually added citations are published automatically.
+        citation.is_published = True
+        citation.save()
+        
+        json = simplejson.dumps(output)
+        return HttpResponse(json, mimetype='application/json') 
 
-    # {
-    #   Experience1:
-    #   ["awesome", "fun", "illuminating", "helped_me_get_laid"],
-    # }
+    else:
+        error_msgs = []
+        for error in form.errors.values():
+            error_msgs.extend(eval(error.__repr__())) # don't ask questions.
 
-    exp_taglist_pairs = exps_to_tags.items()
+        output['error_msgs'] = error_msgs
+        json = simplejson.dumps(output)
+        return HttpResponseServerError(json, mimetype='application/json')
 
-    interested_in_working_on_list = re.split(r', ',person.interested_in_working_on)
+    #}}}
 
-    return {
-            'person': person,
-            'interested_in_working_on_list': interested_in_working_on_list, 
-            'exp_taglist_pairs': exp_taglist_pairs } 
+@view
+def display_person_web(request, user_to_display__username=None):
+    # {{{
+
+    user = get_object_or_404(User, username=user_to_display__username)
+    person, was_created = Person.objects.get_or_create(user=user)
+
+    data = get_personal_data(person)
+    data['edit_mode'] = False
+    data['editable'] = (request.user == user)
+    data['notifications'] = mysite.base.controllers.get_notification_from_request(request)
+
+    return (request, 'profile/main.html', data)
+
     # }}}
 
+#FIXME: Create a separate function that just passes the data required for displaying the little user bar on the top right to the template, and leaves out all the data required for displaying the large user bar on the left.
 def get_personal_data(person):
     # {{{
-    project_exps = ProjectExp.objects.filter(person=person)
-    projects = [project_exp.project for project_exp in project_exps]
-    projects_extended = odict({})
-
-    for project in projects:
-        exps_with_this_project = ProjectExp.objects.filter(
-                person=person, project=project)
-        exps_with_this_project_extended = {}
-        for exp in exps_with_this_project:
-            tag_links = Link_ProjectExp_Tag.objects.filter(project_exp=exp)
-            tags_for_this_exp = [link.tag for link in tag_links]
-            exps_with_this_project_extended[exp] = {
-                    'tags': tags_for_this_exp}
-            tags_for_this_project = Link_Project_Tag.objects.filter(
-                    project=project)
-            projects_extended[project] = {
-                    'tags': tags_for_this_project,
-                    'experiences': exps_with_this_project_extended}
-
-            # projects_extended now looks like this:
-    # {
-    #   Project: {
-    #       'tags': [Tag, Tag, ...],
-    #       'experiences': {
-    #               ProjectExp: [Tag, Tag, ...],
-    #               ProjectExp: [Tag, Tag, ...],
-    #               ...
-    #           }
-    #   },
-    #   Project: {
-    #       'tags': [Tag, Tag, ...],
-    #       'experiences': {
-    #               ProjectExp: [Tag, Tag, ...],
-    #               ProjectExp: [Tag, Tag, ...],
-    #               ...
-    #           }
-    #   }
-    # }
-
-    # Asheesh's evil hack
-    for exp in project_exps:
-        links = Link_ProjectExp_Tag.objects.filter(project_exp=exp)
-        for link in links:
-            if link.favorite:
-                link.tag.prefix = 'Favorite: ' # FIXME: evil hack, will fix later
-            else:
-                link.tag.prefix = ''
-
-    interested_in_working_on_list = re.split(r', ', person.interested_in_working_on)
-
-    try:
-        photo_url = person.photo.url
-    except ValueError:
-        photo_url = '/static/images/profile-photos/penguin.png'
 
     # FIXME: Make this more readable.
     data_dict = {
             'person': person,
-            'photo_url': photo_url,
-            'interested_in_working_on_list': interested_in_working_on_list, 
-            'projects': projects_extended,
+            'photo_url': person.get_photo_url_or_default(),
             } 
+
     data_dict['tags'] = tags_dict_for_person(person)
     data_dict['tags_flat'] = dict(
         [ (key, ', '.join([k.text for k in data_dict['tags'][key]]))
@@ -184,77 +142,56 @@ def get_personal_data(person):
 
     # }}}
 
-@login_required
-def display_person_edit_web(request, info_edit_mode=False, title=''):
+def tags_dict_for_person(person):
     # {{{
+    ret = collections.defaultdict(list)
+    links = Link_Person_Tag.objects.filter(person=person).order_by('id')
+    for link in links:
+        ret[link.tag.tag_type.name].append(link.tag)
 
-    person = request.user.get_profile()
-
-    data = get_personal_data(person)
-
-    # FIXME: Django builds this in.
-    data['the_user'] = request.user
-    data['editable'] = True
-    data['info_edit_mode'] = info_edit_mode
-
-    return render_to_response('profile/main.html', data)
+    return ret
     # }}}
 
-@login_required
-def display_person_web(request, user_to_display__username=None):
-    # {{{
-
-    user = get_object_or_404(User, username=user_to_display__username)
-    person = user.get_profile()
-
-    data = get_personal_data(person)
-
-    data['the_user'] = request.user
-    data['title'] = 'openhatch / %s' % user.username
-    data['edit_mode'] = False
-    data['editable'] = (request.user == user)
-    data['notifications'] = mysite.base.controllers.get_notification_from_request(request)
-
-    return render_to_response('profile/main.html', data)
-
-    # }}}
-
+@view
 def projectexp_display(request, user_to_display__username, project__name):
     # {{{
     user = get_object_or_404(User, username=user_to_display__username)
     person = get_object_or_404(Person, user=user)
     project = get_object_or_404(Project, name=project__name)
+
     data = get_personal_data(person)
     data['project'] = project
     data['exp_list'] = get_list_or_404(ProjectExp,
             person=person, project=project)
-    data['title'] = "%s's contributions to %s" % (
-            user.username, project.name)
-    data['the_user'] = request.user
     data['projectexp_editable'] = (user == request.user)
     data['editable'] = (user == request.user)
-    return render_to_response('profile/projectexp.html', data)
+    return (request, 'profile/projectexp.html', data)
     # }}}
     
-def widget_display(request, user_to_display__username, please_return_string=False):
+# FIXME: Test this.
+def widget_display_undecorated(request, user_to_display__username):
+    """We leave this function unwrapped by @view """
+    """so it can referenced by widget_display_string."""
     # {{{
     user = get_object_or_404(User, username=user_to_display__username)
     person = get_object_or_404(Person, user=user)
+
     data = get_personal_data(person)
-    data['title'] = "Widget"
-    data['the_user'] = request.user
     data['projectexp_editable'] = (user == request.user)
     data['editable'] = (user == request.user)
     data['url_prefix'] = request.META['SERVER_NAME'] + ':' + request.META['SERVER_PORT']
-    if please_return_string:
-        return render_to_string('profile/widget.html', data)
-    else:
-        return render_to_response('profile/widget.html', data)
+    return (request, 'profile/widget.html', data)
     # }}}
+
+widget_display = view(widget_display_undecorated)
+
+def widget_display_string(request, user_to_display__username):
+    request, template, data = widget_display_undecorated(request, user_to_display__username)
+    return render_to_string(template, data)
 
 def widget_display_js(request, user_to_display__username):
     # FIXME: In the future, use:
-    html_doc = widget_display(request, user_to_display__username, please_return_string=True)
+    html_doc = widget_display_string(request, user_to_display__username)
     # to generate html_doc
     encoded_for_js = simplejson.dumps(html_doc)
     # Note: using application/javascript as suggested by
@@ -286,6 +223,7 @@ def prepare_p_e_forms(person, project):
     return forms
 
 @login_required
+@view
 def projectexp_edit(request, project__name, forms = None):
     """Page that allows user to edit project experiences for a project."""
     # {{{
@@ -302,11 +240,9 @@ def projectexp_edit(request, project__name, forms = None):
             person=person, project=project)
     data['forms'] = forms
     data['edit_mode'] = True
-    data['title'] = "Edit your contributions to %s" % project.name
     data['project__name'] = project__name
-    data['the_user'] = request.user
     data['editable'] = True
-    return render_to_response('profile/projectexp_edit.html', data)
+    return (request, 'profile/projectexp_edit.html', data)
     # }}}
 
 @login_required
@@ -379,33 +315,17 @@ def projectexp_edit_do(request, project__name):
     # }}}
 
 @login_required
+@view
 def projectexp_add_form(request, form = None):
     # {{{
     if form is None:
         form = mysite.profile.forms.ProjectExpForm()
 
-    try:
-        person = request.user.get_profile()
-    except AttributeError:
-        return render_to_response('search/index.html', {
-            'notification': "You've gotta be logged in to do that! (Coming soon: a slightly easier way to get back to where you were.)"
-            })
+    person = request.user.get_profile()
     data = get_personal_data(person)
-    data['the_user'] = request.user
-    data['title'] = "Log a contribution in your portfolio | OpenHatch"
     data['form'] = form
     
-    return render_to_response('profile/projectexp_add.html', data)
-    # }}}
-
-def tags_dict_for_person(person):
-    # {{{
-    ret = collections.defaultdict(list)
-    links = Link_Person_Tag.objects.filter(person=person).order_by('id')
-    for link in links:
-        ret[link.tag.tag_type.name].append(link.tag)
-
-    return ret
+    return (request, 'profile/projectexp_add.html', data)
     # }}}
 
 # }}}
@@ -499,72 +419,6 @@ def _project_hash(project_name):
     return hashed.hexdigest()
     # }}}
 
-def project_icon_url(project_name, width = None, actually_fetch = True):
-    # {{{
-    project_hash = _project_hash(project_name)
-
-    # First, do it all with relative links.
-    relative_root ='project-icons'
-    # If we specify a width, put that into the path too.
-    if width is not None:
-        relative_root = os.path.join(relative_root, 'w=%d' % width)
-
-    # where should the image exist?
-    relative_path = os.path.join(relative_root, project_hash + '.png')
-
-
-    path = os.path.join(settings.MEDIA_ROOT, relative_path)
-    url  = urlparse.urljoin(settings.MEDIA_URL, relative_path)
-
-    if not os.path.exists(os.path.dirname(path)):
-        os.makedirs(os.path.dirname(path))
-
-    if actually_fetch:
-        # Then verify the image exists
-        if not os.path.exists(path):
-            # See if Ohloh will give us an icon
-            oh = ohloh.get_ohloh()
-            try:
-                icon_data = oh.get_icon_for_project(project_name)
-            except ValueError:
-                icon_data = open(os.path.join(
-                        settings.MEDIA_ROOT,
-                        'no-project-icon.png')).read()
-
-            if width is not None:
-                # scale it
-                icon_fd = StringIO.StringIO(icon_data)
-                im = Image.open(icon_fd)
-                icon_fd.seek(0)
-
-                w, h = get_image_dimensions(icon_fd)
-
-                new_w = width
-                new_h = (h * 1.0 / w) * width
-
-                smaller = im.resize((new_w, new_h),
-                                    Image.ANTIALIAS)
-
-                # "Save" it to memory
-                new_image_fd = StringIO.StringIO()
-                smaller.save(new_image_fd, format='PNG')
-                new_image_fd.seek(0)
-
-                # pull data out
-                icon_data = new_image_fd.getvalue()
-        
-            # then mktemp and save the Ohloh icon there, and rename it in
-            tmp = tempfile.mkstemp(dir=os.path.dirname(path))
-            fd = open(tmp[1], 'w')
-            fd.write(icon_data)
-            fd.close()
-            os.rename(tmp[1], path)
-            os.chmod(path, 0644)
-
-    return path, url
-    # FIXME: One day, add cache expiry.
-    # }}}
-
 @login_required
 def edit_person_info(request):
     # {{{
@@ -589,21 +443,20 @@ def edit_person_info(request):
             link.delete()
 
         for tag_text in new_tag_texts_for_this_type:
-            new_tag, _ = Tag.objects.get_or_create(
-                    tag_type=tag_type, text=tag_text)
+            if not tag_text.strip(): # Don't save blank tags.
+                continue
+
+            tag_text_case_sensitive_regex = r"^%s$" % re.escape(tag_text)
+            tag, _ = Tag.objects.get_or_create(
+                    text__regex=tag_text_case_sensitive_regex,
+                    tag_type=tag_type,
+                    defaults={'text': tag_text})
             new_link, _ = Link_Person_Tag.objects.get_or_create(
-                    tag=new_tag, person=person)
+                    tag=tag, person=person)
             
-    return HttpResponseRedirect('/people/%s/' %
-                                urllib.quote(request.user.username))
+    return HttpResponseRedirect(person.profile_url)
 
     # FIXME: This is racey. Only one of these functions should run at once.
-    # }}}
-
-def project_icon_web(request, project_name, width = None):
-    # {{{
-    path, url = project_icon_url(project_name, width)
-    return HttpResponseRedirect(url)
     # }}}
 
 def import_commits_by_commit_username(request):
@@ -648,121 +501,101 @@ def import_commits_by_commit_username(request):
         result = tasks.FetchPersonDataFromOhloh.delay(dia.id)
     # }}}
 
-def ohloh_contributor_facts_to_project_exps(dia_id,
-                                     ohloh_results):
-    # {{{
-    '''Input: A sequence of Ohloh ContributorInfo dicts
-    and the id of the DataImport they came from.
-
-    Side-effect: Create matching structures in the DB
-    and mark our success in the database.'''
-    dia = DataImportAttempt.objects.get(id=dia_id)
-    person = dia.person
-    for c_i in ohloh_results:
-        for ohloh_contrib_info in ohloh_results:
-            exp = ProjectExp()
-            exp = exp.from_ohloh_contrib_info(ohloh_contrib_info)
-            exp.last_polled = datetime.datetime.now()
-            exp.last_touched = datetime.datetime.now()
-            exp.data_import_attempt = dia
-            exp.save()
-    person.last_polled = datetime.datetime.now()
-    dia.completed = True
-    dia.save()
-    person.save()
-
-    if dia.person_wants_data:
-        dia.give_data_to_person()
-    # }}}
-
-def create_project_exps_from_launchpad_contributor_facts(dia_id, lp_results):
-    # {{{
-    '''Input: A sequence of Ohloh ContributorInfo dicts
-    and the id of the DataImport they came from.
-
-    Side-effect: Create matching structures in the DB
-    and mark our success in the database.'''
-    dia = DataImportAttempt.objects.get(id=dia_id)
-    person = dia.person
-    # lp_results looks like this:
-    # 
-    # It returns a dictionary like this:
-    #     {
-    #         'F-Spot': {
-    #             'url': 'http://launchpad.net/f-spot',
-    #             'involvement_types': ['Bug Management', 'Bazaar Branches'],
-    #             'languages': ['python', 'ruby'],
-    #         }
-    #     }
-    for project_name in lp_results:
-        result = lp_results[project_name]
-        for involvement_type in result['involvement_types']:
-            person_role = involvement_type
-            exp = ProjectExp()
-            if result['languages']:
-                primary_language = result['languages'][0]
-            else:
-                primary_language = None
-            exp = exp.from_launchpad_result(project_name, primary_language, person_role)
-            exp.last_polled = datetime.datetime.now()
-            exp.last_touched = datetime.datetime.now()
-            exp.data_import_attempt = dia
-            exp.save()
-    person.last_polled = datetime.datetime.now()
-    dia.completed = True
-    dia.save()
-    person.save()
-
-    if dia.person_wants_data:
-        dia.give_data_to_person()
-
-    # }}}
-
 @login_required
 def ask_for_tag_input(request, username):
     # {{{
     return display_person_web(request, username, 'tags', edit='1')
     # }}}
 
-#def make_favorite_project_exp(exp_id_obj):
-
-#def make_favorite_project_exp_web(request):
-
-#def make_favorite_tag(exp_id_obj, tag_text):
-
-#def make_favorite_exp_tag_web(request):
-
-#def edit_exp_tag(request, exp_id):
-
-@login_required
+@view
 def display_list_of_people(request):
+    """Display a list of people."""
     # {{{
-    return render_to_response('profile/search_people.html', {
-        'the_user': request.user,
-        'title': 'List of people : OpenHatch',
-        'people': Person.objects.all().order_by('user__username')
-        })
+    data = {}
+    data['people'] = Person.objects.all().order_by('user__username')
+    return (request, 'profile/search_people.html', data)
     # }}}
 
-def gimme_json_that_says_that_commit_importer_is_done(request):
-    ''' This web controller is called when you want JSON that tells you 
-    if the background jobs for the logged-in user have finished.
-
-    It has no side-effects.'''
+def gimme_json_for_portfolio(request):
+    "Get JSON used to live-update the portfolio editor."
+    """JSON includes:
+        * The person's data.
+        * DataImportAttempts.
+        * other stuff"""
     # {{{
     person = request.user.get_profile()
-    dias = get_list_or_404(DataImportAttempt, person=person)
-    non_stale_dias =  [ d for d in dias if not d.stale]
-    json = serializers.serialize('json', non_stale_dias)
 
-    # look at me, evil side effect
-    if all([d.completed for d in non_stale_dias]):
-        for dia in non_stale_dias:
-            dia.stale = True
-            dia.save()
+    # Citations don't naturally serialize summaries.
+    citations = list(Citation.objects.filter(portfolio_entry__person=person,
+        is_deleted=False, portfolio_entry__is_deleted=False))
+    portfolio_entries_unserialized = PortfolioEntry.objects.filter(person=person, is_deleted=False).order_by('-pk')
+    projects_unserialized = [p.project for p in portfolio_entries_unserialized]
     
-    return HttpResponse(json)
+    # Serialize citation summaries
+    summaries = {}
+    for c in citations:
+        summaries[c.pk] = render_to_string(
+                "profile/portfolio/citation_summary.html",
+                {'citation': c})
+
+    # FIXME: Maybe we can serialize directly to Python objects.
+    # fixme: zomg       don't recycle variable names for objs of diff types srsly u guys!
+
+    five_minutes_ago = datetime.datetime.utcnow() - datetime.timedelta(minutes=5)
+    recent_dias = DataImportAttempt.objects.filter(person=person, date_created__gt=five_minutes_ago)
+    recent_dias_json = simplejson.loads(serializers.serialize('json', recent_dias))
+    portfolio_entries = simplejson.loads(serializers.serialize('json',
+        portfolio_entries_unserialized))
+    projects = simplejson.loads(serializers.serialize('json', projects_unserialized))
+    # FIXME: Don't send like all the flippin projects down the tubes.
+    citations = simplejson.loads(serializers.serialize('json', citations))
+
+    recent_dias_that_are_completed = recent_dias.filter(completed=True)
+    import_running = recent_dias.count() > 0 and (
+            recent_dias_that_are_completed.count() != recent_dias.count())
+    progress_percentage = 100
+    if import_running:
+        progress_percentage = int(recent_dias_that_are_completed.count() * 100.0 / recent_dias.count())
+    import_data = {
+            'running': import_running,
+            'progress_percentage': progress_percentage,
+            }
+
+    json = simplejson.dumps({
+        'dias': recent_dias_json,
+        'import': import_data,
+        'citations': citations,
+        'portfolio_entries': portfolio_entries,
+        'projects': projects,
+        'summaries': summaries,
+        'messages': request.user.get_and_delete_messages(),
+        })
+
+    return HttpResponse(json, mimetype='application/json')
     # }}}
+
+def replace_icon_with_default(request):
+    "Expected postcondition: project's icon_dict says it is generic."
+    """
+    Expected output will look something like this:
+    {
+            'success': true,
+            'portfolio_entry__pk': 0
+    }"""
+    portfolio_entry = PortfolioEntry.objects.get(
+            pk=int(request.POST['portfolio_entry__pk']),
+            person__user=request.user)
+    # FIXME: test for naughty people trying to replace others' icons with the default!
+
+    # set as default
+    portfolio_entry.project.icon_raw = None
+    portfolio_entry.project.save()
+
+    # prepare output
+    data = {}
+    data['success'] = True
+    data['portfolio_entry__pk'] = portfolio_entry.pk
+    return mysite.base.helpers.json_response(data)
 
 @login_required
 def import_do(request):
@@ -792,41 +625,36 @@ def prepare_data_import_attempts_do(request):
     before bothering the user, ask those networks beforehand if they even 
     have accounts named identifiers[0], etc."""
     # {{{
-    # for each commit_username_*, call some silly controller """
-    prepare_data_import_attempts(request.POST, request.user)
 
-    if request.POST.get('format', None) == 'success_code':
-        return HttpResponse('1')
-    else:
-        return HttpResponseRedirect('/people/portfolio/import/')
+    # For each commit identifier, prepare some DataImportAttempts.
+    prepare_data_import_attempts(identifiers=request.POST.values(), user=request.user)
+
+    return HttpResponse('1')
     # }}}
 
-def prepare_data_import_attempts(post, user):
-    identifiers = []
-    for key in post:
-        if key.startswith('identifier_'):
-            value = post[key].strip()
-            if not value:
-                continue # Skip blanks
-            identifiers.append(value)
+def prepare_data_import_attempts(identifiers, user):
+    "Enqueue and track importation tasks."
+    """Expected input: A list of committer identifiers, e.g.:
+    ['paulproteus', 'asheesh@asheesh.org']
+
+    For each data source, enqueue a background task.
+    Keep track of information about the task in an object
+    called a DataImportAttempt."""
 
     # Side-effects: Create DIAs that a user might want to execute.
     for identifier in identifiers:
-        if identifier:
+        if identifier.strip(): # Skip blanks or whitespace
             for source_key, _ in DataImportAttempt.SOURCE_CHOICES:
-                # FIXME: "...that a user might want to execute" means,
-                # don't show the user DIAs that relate to non-existent
-                # accounts on remote networks.
-                # And what *that* means is, before bothering the user,
-                # ask those networks beforehand if they even have
-                # accounts named commit_usernames[0], etc.
-                dia = get_most_recent_data_import_attempt_or_create(
+                dia = DataImportAttempt(
                         query=identifier,
                         source=source_key,
                         person=user.get_profile())
+                dia.save()
+                dia.do_what_it_says_on_the_tin()
 
 @login_required
-def importer(request):
+@view
+def importer(request, test_js = False):
     """Get the DIAs for the logged-in user's profile. Pass them to the template."""
     # {{{
 
@@ -841,15 +669,27 @@ def importer(request):
             'index': blank_query_index,
             'checkboxes': checkboxes
             }
-    data = get_personal_data(request.user.get_profile())
-    data.update({
-        'the_user': request.user,
-        'dias': DataImportAttempt.objects.filter(person=request.user.get_profile(),stale=False).order_by('id'),
-        'blank_query': blank_query
-        })
+    person = request.user.get_profile()
+    data = get_personal_data(person)
+    data['dias'] = DataImportAttempt.objects.filter(person=person).order_by('id')
+    data['blank_query'] = blank_query
 
-    return render_to_response('profile/importer.html', data)
+    # This is used to create a blank 'Add another record' form, which is printed
+    # to the bottom of the importer page. The HTML underlying this form is used
+    # to generate forms dynamically.
+    data['citation_form'] = mysite.profile.forms.ManuallyAddACitationForm(auto_id=False)
+
+    # This variable is checked in base/templates/base/base.html
+    data['test_js'] = test_js
+
+    return (request, 'profile/importer.html', data)
     # }}}
+
+#FIXME: Rename importer
+portfolio_editor = importer
+
+def portfolio_editor_test(request):
+    return portfolio_editor(request, test_js=True)
 
 def filter_by_key_prefix(dict, prefix):
     """Return those and only those items in a dictionary whose keys have the given prefix."""
@@ -858,38 +698,6 @@ def filter_by_key_prefix(dict, prefix):
         if key.startswith(prefix):
             out_dict[key] = value
     return out_dict
-
-def get_most_recent_data_import_attempt_or_create(query, source, person):
-    """NOTE: This is a bit weird, so let me explain it.
-    
-    Here are three different use cases:
-
-    1. Someone did an import of a new username. This case is
-       easy. The DIA is created the first time this function
-       is called, and it is the one reflected by the checkmarks
-       or clouds.
-
-    2. Someone did an import of a username one week ago, and
-       they are re-doing it right now. The DIA in the past
-       failed or otherwise returned nothing; that's the reason
-       to run it again.
-
-    3. ...?
-    """
-    dias = DataImportAttempt.objects.filter(
-            query=query, source=source, stale=False,
-            person=person).order_by("-pk")
-    if not dias:
-        dia = DataImportAttempt(
-                query=query,
-                source=source,
-                stale=False,
-                person=person)
-        dia.save()
-        dia.do_what_it_says_on_the_tin()
-        return dia
-    else:
-        return dias[0]
 
 @login_required
 def user_selected_these_dia_checkboxes(request):
@@ -911,12 +719,12 @@ def user_selected_these_dia_checkboxes(request):
             if identifier:
                 # FIXME: For security, ought this filter include only dias
                 # associated with the logged-in user's profile?
-                dia = get_most_recent_data_import_attempt_or_create(
+                dia = DataImportAttempt(
                         identifier, source_key,
                         request.user.get_profile())
-
                 dia.person_wants_data = True
                 dia.save()
+                dia.do_what_it_says_on_the_tin()
 
                 # There may be data waiting or not,
                 # but no matter; this function may
@@ -927,6 +735,7 @@ def user_selected_these_dia_checkboxes(request):
     # }}}
 
 @login_required
+@view
 def display_person_edit_name(request, name_edit_mode):
     '''Show a little edit form for first name and last name.
 
@@ -934,13 +743,28 @@ def display_person_edit_name(request, name_edit_mode):
     model already stores them separately.
     '''
     # {{{
-    data = {}
-    data = get_personal_data(
-            request.user.get_profile())
+    data = get_personal_data(request.user.get_profile())
     data['name_edit_mode'] = name_edit_mode
     data['editable'] = True
-    return render_to_response('profile/main.html', data)
+    return (request, 'profile/main.html', data)
     # }}}
+
+def people_matching(property, value):
+    links = Link_Person_Tag.objects.filter(tag__tag_type__name=property, tag__text__iexact=value)
+    peeps = [l.person for l in links]
+    sorted_peeps = sorted(set(peeps), key = lambda thing: (thing.user.first_name, thing.user.last_name))
+    return sorted_peeps
+
+@login_required
+@view
+def display_list_of_people_who_match_some_search(request, property, value):
+    '''Property is the "tag name", and "value" is the text in it.'''
+    peeps = people_matching(property, value)
+    data = {}
+    data['people'] = peeps
+    data['property'] = property
+    data['value'] = value
+    return (request, 'profile/search_people.html', data)
 
 @login_required
 def display_person_edit_name_do(request):
@@ -959,3 +783,92 @@ def display_person_edit_name_do(request):
 
     return HttpResponseRedirect('/people/%s' % urllib.quote(user.username))
     # }}}
+
+@login_required
+def publish_citation_do(request):
+    try:
+        pk = request.POST['pk']
+    except KeyError:
+        return HttpResponse("0")
+
+    try:
+        c = Citation.objects.get(pk=pk, portfolio_entry__person__user=request.user)
+    except Citation.DoesNotExist:
+        return HttpResponse("0")
+
+    c.is_published = True
+    c.save()
+
+    return HttpResponse("1")
+
+@login_required
+def delete_citation_do(request):
+    try:
+        pk = request.POST['citation__pk']
+    except KeyError:
+        return HttpResponse("0")
+
+    try:
+        c = Citation.objects.get(pk=pk, portfolio_entry__person__user=request.user)
+    except Citation.DoesNotExist:
+        return HttpResponse("0")
+
+    c.is_deleted = True
+    c.save()
+
+    return HttpResponse("1")
+
+@login_required
+def delete_portfolio_entry_do(request):
+    try:
+        pk = int(request.POST['portfolio_entry__pk'])
+    except KeyError:
+        return mysite.base.helpers.json_response({'success': False})
+
+    try:
+        p = PortfolioEntry.objects.get(pk=pk, person__user=request.user)
+    except PortfolioEntry.DoesNotExist:
+        return mysite.base.helpers.json_response({'success': False})
+
+    p.is_deleted = True
+    p.save()
+
+    return mysite.base.helpers.json_response({
+            'success': True,
+            'portfolio_entry__pk': pk})
+         
+
+@login_required
+def save_portfolio_entry_do(request):
+    pk = request.POST['portfolio_entry__pk']
+
+    if pk == 'undefined':
+        project, _ = Project.objects.get_or_create(name=request.POST['project_name'])
+        p = PortfolioEntry(project=project, person=request.user.get_profile())
+    else:
+        p = PortfolioEntry.objects.get(pk=pk, person__user=request.user)
+    p.project_description = request.POST['project_description']
+    p.experience_description = request.POST['experience_description']
+    p.is_published = True
+    p.save()
+
+    # Publish all attached Citations
+    citations = Citation.objects.filter(portfolio_entry=p)
+    for c in citations:
+        c.is_published = True
+        c.save()
+
+    return mysite.base.helpers.json_response({
+            'success': True,
+            'pf_entry_element_id': request.POST['pf_entry_element_id'],
+            'portfolio_entry__pk': p.pk
+        })
+
+@login_required
+@view
+def edit_info(request):
+    data = get_personal_data(request.user.get_profile())
+    data['info_edit_mode'] = True
+    return request, 'profile/info_wrapper.html', data
+
+# vim: ai ts=3 sts=4 et sw=4 nu

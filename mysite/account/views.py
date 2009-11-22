@@ -4,7 +4,7 @@ from django.shortcuts import render_to_response, get_object_or_404, get_list_or_
 import django.contrib.auth 
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-import mock
+from django.contrib.auth.views import redirect_to_login
 from django_authopenid.forms import OpenidSigninForm
 from django.core.urlresolvers import reverse
 
@@ -12,57 +12,22 @@ from invitation.forms import InvitationKeyForm
 from invitation.models import InvitationKey
 
 import urllib
+import mock
 import logging
-
 
 from mysite.account.forms import InvitationRequestForm
 import mysite.base.views
 import mysite.base.controllers
+from mysite.base.controllers import get_notification_from_request
 from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag, Link_Project_Tag, Link_SF_Proj_Dude_FM, Link_Person_Tag, DataImportAttempt
-from mysite.profile.views import get_personal_data
 
-from decorator import decorator
+# FIXME: We did this because this decorator used to live here
+# and lots of other modules refer to it as mysite.account.views.view.
+# Let's fix this soon.
+from mysite.base.decorators import view
 # }}}
 
 applog = logging.getLogger('applog')
-
-@decorator
-def view(func, *args, **kw):
-    """Decorator for views."""
-    request, template, view_data = func(*args, **kw)
-    data = get_personal_data(request.user.get_profile())
-    data['the_user'] = request.user
-    data['slug'] = func.__name__
-    data.update(view_data)
-    return render_to_response(template, data)
-
-def login(request):
-    # {{{
-    if request.user.is_authenticated():
-        # always, if the user is logged in, redirect to his profile page
-        return HttpResponseRedirect('/people/%s/' %
-                                    urllib.quote(request.user.username))
-    data = {}
-    data['notifications'] = mysite.base.controllers.get_notification_from_request(
-            request)
-    return render_to_response('account/login.html', data)
-    # }}}
-
-def login_do(request):
-    # {{{
-    try:
-        username = request.POST['login_username']
-        password = request.POST['login_password']
-    except KeyError:
-        return HttpResponseServerError("Missing username or password.")
-    user = django.contrib.auth.authenticate(
-            username=username, password=password)
-    if user is not None:
-        django.contrib.auth.login(request, user)
-        return HttpResponseRedirect('/people/%s' % urllib.quote(username))
-    else:
-        return HttpResponseRedirect('/account/login/?msg=oops')
-    # }}}
 
 def signup_do(request):
     # {{{
@@ -102,7 +67,6 @@ def signup(request, signup_form=None, invite_code=''):
                               {'form': signup_form})
     # }}}
 
-
 def logout(request):
     # {{{
     django.contrib.auth.logout(request)
@@ -110,49 +74,49 @@ def logout(request):
     # }}}
 
 @login_required
+@view
 def edit_photo(request, form = None):
-    data = get_personal_data(
-            request.user.get_profile())
-    data['the_user'] = request.user
     if form is None:
         form = mysite.account.forms.EditPhotoForm()
+    data = mysite.profile.views.get_personal_data(request.user.get_profile())
     data['edit_photo_form'] = form
-    return render_to_response('account/edit_photo.html', data)
+    return (request, 'account/edit_photo.html', data)
 
 @login_required
 def edit_photo_do(request, mock=None):
-    data = get_personal_data(
-            request.user.get_profile())
     person = request.user.get_profile()
+    data = mysite.profile.views.get_personal_data(person)
     form = mysite.account.forms.EditPhotoForm(request.POST,
                                        request.FILES,
                                        instance=person)
     if form.is_valid():
-        form.save()
-    return HttpResponseRedirect('/account/edit/photo')
+        person = form.save()
+        person.generate_thumbnail_from_photo()
+
+        return HttpResponseRedirect(reverse(mysite.profile.views.display_person_web, kwargs={
+            'user_to_display__username': request.user.username
+            }))
+    else:
+        return edit_photo(request, form)
 
 def catch_me(request):
     import pdb
     pdb.set_trace()
 
 @login_required
+@view
 def settings(request):
     # {{{
-    data = get_personal_data(
-            request.user.get_profile())
-    data['the_user'] = request.user
-
-    return render_to_response('account/settings.html', data)
+    data = {}
+    return (request, 'account/settings.html', data)
     # }}}
 
 @login_required
 @view
 def edit_contact_info(request, edit_email_form = None, show_email_form = None):
     # {{{
-    data = get_personal_data(
-            request.user.get_profile())
-    data['the_user'] = request.user
 
+    data = {}
     # Store edit_email_form in data[], even if we weren't passed one
     if edit_email_form is None:
         edit_email_form = mysite.account.forms.EditEmailForm(
@@ -201,15 +165,15 @@ def edit_contact_info_do(request):
 @view
 def change_password(request, change_password_form = None):
     # {{{
-    data = get_personal_data(
-            request.user.get_profile())
-    data['the_user'] = request.user
-    if change_password_form is None:
-        data['change_password_form'] = django.contrib.auth.forms.PasswordChangeForm({})
-    else:
-        data['change_password_form'] = change_password_form
 
-    return (request, 'account/change_password.html', data)
+    if change_password_form is None:
+        change_password_form = django.contrib.auth.forms.PasswordChangeForm({})
+
+    change_password_form.fields['old_password'].label = "Current password"
+    change_password_form.fields['new_password2'].label = "Type it again"
+
+    return (request, 'account/change_password.html',
+            {'change_password_form': change_password_form})
     # }}}
 
 @login_required

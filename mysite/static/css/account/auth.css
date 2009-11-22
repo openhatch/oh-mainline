@@ -3,16 +3,15 @@ form {
     float: left;
     width: 420px;
 }
-form p, .form-row {
+form p, .form-row, form li {
     float: left;
     width: 400px;
+    list-style: none;
 }
 label {
     float: left;
-    width: 130px;
-    padding: 12px 12px 12px 0;
-    margin-right: 10px;
-    font-size: 12pt;
+    width: 95%;
+    padding-bottom: 5px;
 }
 input[type='text'], input[type='file'], input[type='password'] {
     padding: 10px;
@@ -40,6 +39,5 @@ input[type='submit'] {
 }
 input[type='checkbox'] {
     position: relative;
-    top: 13px;
-    left: -20px;
+    top: 10px;
 }

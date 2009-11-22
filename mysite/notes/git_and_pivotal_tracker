@@ -1,0 +1,6 @@
+If git branches are user stories, then it would cool if git could keep track of Pivotal-style meta data about stories. Where two people are involved, the notation is verb/subject/object.
+ * Coding started .... started/prev_next_buttons_only_appear_when_needed
+ * Coding finished ... finished/prev_next_buttons_only_appear_when_needed
+ * Review ............ reviewing/asheesh/raffi/prev_next_buttons_only_appear_when_needed
+ * Accepted .......... accepted/karen/raffi/prev_next_buttons_only_appear_when_needed
+ * Deployed .......... deployed/asheesh/raffi/prev_next_buttons_only_appear_when_needed

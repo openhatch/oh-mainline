@@ -1,7 +1,9 @@
 from mysite.base.tests import make_twill_url, TwillTests
 
+import mysite.account.tests
 from mysite.profile.models import Person
 import mysite.customs.miro
+import mysite.search.controllers
 
 import django.test
 from mysite.search.models import Project, Bug
@@ -22,6 +24,7 @@ from django.test import TestCase
 from django.core.servers.basehttp import AdminMediaHandler
 from django.core.handlers.wsgi import WSGIHandler
 from django.core.urlresolvers import reverse
+from django.core.files.base import ContentFile
 
 from django.db.models import Q 
 
@@ -33,8 +36,12 @@ class SearchTest(TwillTests):
     def search_via_twill(self, query=None):
         search_url = "http://openhatch.org/search/" 
         if query:
-            search_url += '?language=%s' % query
+            search_url += '?q=%s' % query
         tc.go(make_twill_url(search_url))
+
+    def search_via_client(self, query=None):
+        search_url = "/search/" 
+        return self.client.get(search_url, {'q': query})
 
 class AutoCompleteTests(SearchTest):
     """
@@ -47,7 +54,7 @@ class AutoCompleteTests(SearchTest):
         SearchTest.setUp(self)
         self.project_chat = Project.objects.create(name='ComicChat', language='C++')
         self.project_kazaa = Project.objects.create(name='Kazaa', language='Vogon')
-        self.bug_in_chat = Bug.objects.create(project=self.project_chat,
+        self.bug_in_chat = Bug.all_bugs.create(project=self.project_chat,
                 people_involved=2,
                 date_reported=datetime.date(2009, 4, 1),
                 last_touched=datetime.date(2009, 4, 2),
@@ -107,11 +114,12 @@ class SearchResultsSpecificBugs(SearchTest):
         query = 'PYTHON'
 
         # The four canonical_filters by which a bug can match a query
+        whole_word = "[[:<:]]%s[[:>:]]" % query
         self.canonical_filters = [
                 Q(project__language__iexact=query),
-                Q(project__name__icontains=query),
-                Q(title__icontains=query),
-                Q(description__icontains=query)
+                Q(title__iregex=whole_word),
+                Q(project__name__iregex=whole_word),
+                Q(description__iregex=whole_word)
                 ]
 
     def no_canonical_filters(self, except_one=Q()):
@@ -156,22 +164,22 @@ class SearchResultsSpecificBugs(SearchTest):
         # Remember, a canonical bug meets ONLY ONE criterion.
         # Assert there's just one canonical bug per criterion.
         for cf in self.canonical_filters:
-            matches = Bug.objects.filter(self.no_canonical_filters(except_one=cf))[:]
+            matches = Bug.all_bugs.filter(self.no_canonical_filters(except_one=cf))[:]
             self.failUnlessEqual(len(matches), 1,
                     "There are %d, not 1, canonical bug(s) for the filter %s" % (len(matches), cf))
 
         # Assert there's at least one canonical nonmatch.
-        canonical_non_matches = Bug.objects.filter(self.no_canonical_filters())
+        canonical_non_matches = Bug.all_bugs.filter(self.no_canonical_filters())
         self.assert_(len(canonical_non_matches) > 1)
 
     def test_search_single_query(self):
         """Test that get_bugs_by_query_words produces the expected results."""
-        response = self.client.get('/search/', {'language': 'python'})
+        response = self.client.get('/search/', {'q': 'python'})
         returned_bugs = response.context[0]['bunch_of_bugs']
         for cf in self.canonical_filters:
-            self.failUnless(Bug.objects.filter(cf)[0] in returned_bugs, "Search engine did not correctly use the filter %s" % cf)
+            self.failUnless(Bug.all_bugs.filter(cf)[0] in returned_bugs, "Search engine did not correctly use the filter %s" % cf)
 
-        for bug in Bug.objects.filter(self.no_canonical_filters()):
+        for bug in Bug.all_bugs.filter(self.no_canonical_filters()):
             self.failIf(bug in returned_bugs, "Search engine returned a false positive: %s." % bug)
 
     def test_search_two_queries(self):
@@ -180,11 +188,11 @@ class SearchResultsSpecificBugs(SearchTest):
         title_of_bug_to_exclude = "This shouldn't be in the results for [pyt*hon 'An interesting description']."
 
         # If either of these bugs aren't there, then this test won't work properly.
-        self.assert_(len(list(Bug.objects.filter(title=title_of_bug_to_include))) == 1)
-        self.assert_(len(list(Bug.objects.filter(title=title_of_bug_to_exclude))) == 1)
+        self.assert_(len(list(Bug.all_bugs.filter(title=title_of_bug_to_include))) == 1)
+        self.assert_(len(list(Bug.all_bugs.filter(title=title_of_bug_to_exclude))) == 1)
 
         response = self.client.get('/search/',
-                                   {'language': 'python "An interesting description"'})
+                                   {'q': 'python "An interesting description"'})
 
         included_the_right_bug = False
         excluded_the_wrong_bug = True
@@ -211,10 +219,10 @@ class SearchResults(TwillTests):
         response = self.client.get('/search/')
         ctxt_we_care_about = [c for c in response.context if 'start' in c][0]
         self.failUnlessEqual(ctxt_we_care_about['start'], 1)
-        self.failUnlessEqual(ctxt_we_care_about['end'], 10)
+        self.failUnlessEqual(ctxt_we_care_about['end'], 0)
 
     def test_json_view(self):
-        tc.go(make_twill_url('http://openhatch.org/search/?format=json&jsoncallback=callback&language=python'))
+        tc.go(make_twill_url('http://openhatch.org/search/?format=json&jsoncallback=callback&q=python'))
         response = tc.show()
         self.assert_(response.startswith('callback'))
         json_string_with_parens = response.split('callback', 1)[1]
@@ -227,11 +235,11 @@ class SearchResults(TwillTests):
     def testPagination(self):
         url = 'http://openhatch.org/search/'
         tc.go(make_twill_url(url))
-        tc.fv('search_opps', 'language', 'python')
+        tc.fv('search_opps', 'q', 'python')
         tc.submit()
 
         # Grab descriptions of first 10 Exaile bugs
-        bugs = Bug.objects.filter(project__name=
+        bugs = Bug.all_bugs.filter(project__name=
                                   'Exaile').order_by('-last_touched')[:10]
 
         for bug in bugs:
@@ -241,7 +249,7 @@ class SearchResults(TwillTests):
         tc.follow('Next')
 
         # Grab descriptions of next 10 Exaile bugs
-        bugs = Bug.objects.filter(project__name=
+        bugs = Bug.all_bugs.filter(project__name=
                                   'Exaile').order_by('-last_touched')[10:20]
 
         for bug in bugs:
@@ -251,11 +259,11 @@ class SearchResults(TwillTests):
 
         url = 'http://openhatch.org/search/'
         tc.go(make_twill_url(url))
-        tc.fv('search_opps', 'language', 'python')
+        tc.fv('search_opps', 'q', 'python')
         tc.submit()
 
         # Grab descriptions of first 10 Exaile bugs
-        bugs = Bug.objects.filter(project__name=
+        bugs = Bug.all_bugs.filter(project__name=
                                   'Exaile').order_by('-last_touched')[:10]
 
         for bug in bugs:
@@ -265,18 +273,18 @@ class SearchResults(TwillTests):
         tc.follow('Next')
 
         # Grab descriptions of next 10 Exaile bugs
-        bugs = Bug.objects.filter(project__name=
+        bugs = Bug.all_bugs.filter(project__name=
                                   'Exaile').order_by('-last_touched')[10:20]
 
         for bug in bugs:
             tc.find(bug.description)
 
         # Now, change the query - do we stay that paginated?
-        tc.fv('search_opps', 'language', 'c#')
+        tc.fv('search_opps', 'q', 'c#')
         tc.submit()
 
         # Grab descriptions of first 10 GNOME-Do bugs
-        bugs = Bug.objects.filter(project__name=
+        bugs = Bug.all_bugs.filter(project__name=
                                   'GNOME-Do').order_by(
             '-last_touched')[:10]
 
@@ -298,14 +306,14 @@ class AutoCrawlTests(SearchTest):
     def testSearch(self):
         # Verify that we can't find a bug with the right description
         self.assertRaises(mysite.search.models.Bug.DoesNotExist,
-                          mysite.search.models.Bug.objects.get,
+                          mysite.search.models.Bug.all_bugs.get,
                           title="Joi's Lab AFS")
         # Now get all the bugs about rose
         mysite.search.launchpad_crawl.grab_lp_bugs(lp_project='rose',
                                             openhatch_project=
                                             'rose.makesad.us')
         # Now see, we have one!
-        b = mysite.search.models.Bug.objects.get(title="Joi's Lab AFS")
+        b = mysite.search.models.Bug.all_bugs.get(title="Joi's Lab AFS")
         self.assertEqual(b.project.name, 'rose.makesad.us')
         # Ta-da.
         return b
@@ -339,7 +347,7 @@ class LaunchpadImporterTests(SearchTest):
         # Create the bug...
         mysite.search.launchpad_crawl.handle_launchpad_bug_update(query_data, new_data)
         # Verify that the bug was stored.
-        bug = Bug.objects.get(canonical_bug_link=
+        bug = Bug.all_bugs.get(canonical_bug_link=
                                        query_data['canonical_bug_link'])
         for key in new_data:
             self.assertEqual(getattr(bug, key), new_data[key])
@@ -351,7 +359,7 @@ class LaunchpadImporterTests(SearchTest):
                                                                  new_data)
         # Do a get; this will explode if there's more than one with the
         # canonical_bug_link, so it tests duplicate finding.
-        bug = Bug.objects.get(canonical_bug_link=
+        bug = Bug.all_bugs.get(canonical_bug_link=
                                        query_data['canonical_bug_link'])
 
         for key in new_data:
@@ -390,30 +398,55 @@ class Recommend(SearchTest):
             'person-paulproteus.json',
             'cchost-data-imported-from-ohloh.json',
             'bugs-for-two-projects.json',
-            'extra-fake-cchost-related-projectexps.json']
+            'extra-fake-cchost-related-projectexps.json',
+            'tags']
 
+    # FIXME: Add a 'recommend_these_in_bug_search' field to TagType
+    # Use that to exclude 'will never understand' tags from recommended search terms.
     def test_get_recommended_search_terms_for_user(self):
         person = Person.objects.get(user__username='paulproteus')
-        terms = person.get_recommended_search_terms()
-        self.assertEqual(terms,
-                [u'Automake', u'C#', u'C++', u'Make', u'Mozilla Firefox', 
-                 u'Python', u'shell script', u'XUL'])
+        recommended_terms = person.get_recommended_search_terms()
 
+        # By 'source' I mean a source of recommendations.
+        source2terms = {
+                'languages in citations': ['Automake', 'C#', 'C++', 'Make', 
+                    'Python', 'shell script', 'XUL'],
+                'projects in citations': ['Mozilla Firefox'], 
+                'tags': ['algol', 'symbolist poetry', 'rails', 'chinese chess']
+                }
+
+        for source, terms in source2terms.items():
+            for term in terms:
+                self.assert_(term in recommended_terms,
+                        "Expected %s in recommended search terms "
+                        "inspired by %s." % (term, source))
+
+    # FIXME: Include recommendations from tags.
     def test_search_page_context_includes_recommendations(self):
         client = self.login_with_client()
         response = client.get('/search/')
-        self.assertEqual(
-                response.context[0]['suggestions'],
-                [
-                    (0, 'Automake',        False),
-                    (1, 'C#',              False),
-                    (2, 'C++',             False),
-                    (3, 'Make',            False),
-                    (4, 'Mozilla Firefox', False),
-                    (5, 'Python',          False),
-                    (6, 'shell script',    False),
-                    (7, 'XUL',             False),
-                    ])
+
+        source2terms = {
+                'languages in citations': ['Automake', 'C#', 'C++', 'Make', 
+                    'Python', 'shell script', 'XUL'],
+                'projects in citations': ['Mozilla Firefox'], 
+                'tags': ['algol', 'symbolist poetry', 'rails', 'chinese chess']
+                }
+
+        tags_in_template = [tup[1] for tup in response.context[0]['suggestions']]
+
+        for source, terms in source2terms.items():
+            for term in terms:
+                self.assert_(term in tags_in_template,
+                        "Expected %s in template"
+                        "inspired by %s." % (term, source))
+
+        def compare_lists(one, two):
+            self.assertEqual(len(one), len(two))
+            self.assertEqual(set(one), set(two))
+
+        expected_tags = sum(source2terms.values(), [])
+        compare_lists(expected_tags, tags_in_template)
 
 # We're not doing this one because at the moment suggestions only work in JS.
 #    def test_recommendations_with_twill(self):
@@ -463,16 +496,99 @@ class TestQuerySplitter(django.test.TestCase):
         self.assertEqual(mysite.search.views.split_query_words(easy),
                          ['c#'])
 
-class ResultsIncludeProjectLanguage(SearchTest):
-    fixtures = ['bugs-for-two-projects.json']
+class IconGetsScaled(SearchTest):
+    def test_project_scales_its_icon_down_for_use_in_badge(self):
+        '''This test shows that the Project class successfully stores
+        a scaled-down version of its icon in the icon_smaller_for_badge
+        field.'''
 
-    def test_python_results_include_python(self):
-        self.search_via_twill('Exaile')
+        # Step 1: Create a project with an icon
+        p = mysite.search.models.Project()
+        image_data = open(mysite.account.tests.photo('static/sample-photo.png')).read()
+        p.icon_raw.save('', ContentFile(image_data))
+        p.save()
 
-        # It's easier to pass this test...
-        tc.find("Python")
+        # Assertion 1: p.icon_smaller_for_badge is false (since not scaled yet)
+        self.assertFalse(p.icon_smaller_for_badge)
 
-        # ...than this one.
-        tc.find("<span class='project__language'>Python</span>")
+        # Step 2: Call the scaling method
+        p.update_scaled_icons_from_self_icon()
+        p.save()
+
+        # Assertion 2: Verify that it is now a true value
+        self.assert_(p.icon_smaller_for_badge, 
+                     "Expected p.icon_smaller_for_badge to be a true value.")
+
+        # Assertion 3: Verify that it has the right width
+        self.assertEqual(p.icon_smaller_for_badge.width, 40,
+                         "Expected p.icon_smaller_for_badge to be 40 pixels wide.")
+
+    def test_short_icon_is_scaled_correctly(self):
+        '''Sometimes icons are rectangular and more wide than long. These icons shouldn't be trammeled into a square, but scaled respectfully of their original ratios.'''
+        # Step 1: Create a project with an icon
+        p = mysite.search.models.Project()
+
+        # account.tests.photo finds the right path.
+        image_data = open(mysite.account.tests.photo(
+            'static/images/icons/test-project-icon-64px-by-18px.png')).read()
+        p.icon_raw.save('', ContentFile(image_data))
+        p.save()
+
+        # Assertion 1: p.icon_smaller_for_badge is false (since not scaled yet)
+        self.assertFalse(p.icon_smaller_for_badge)
+
+        # Step 2: Call the scaling method
+        p.update_scaled_icons_from_self_icon()
+        p.save()
+
+        # Assertion 2: Verify that it is now a true value
+        self.assert_(p.icon_smaller_for_badge, 
+                     "Expected p.icon_smaller_for_badge to be a true value.")
+
+        # Assertion 3: Verify that it has the right width
+        self.assertEqual(p.icon_smaller_for_badge.width, 40,
+                         "Expected p.icon_smaller_for_badge to be 40 pixels wide.")
+
+        # Assertion 3: Verify that it has the right height
+        # If we want to scale exactly we'll get 11.25 pixels, which rounds to 11.
+        self.assertEqual(p.icon_smaller_for_badge.height, 11)
+
+class DiscoverFacets(SearchTest):
+    def test_discover_available_facets(self):
+        python_project = Project.create_dummy(language='Python')
+        python_bug = Bug.create_dummy(project=python_project)
+        facets = mysite.search.controllers.discover_available_facets()
+        self.assertEqual(facets, {'Language': {'Python': 1}})
+
+class SearchOnFullWords(SearchTest):
+    def test_find_perl_not_properly(self):
+        project = Project.create_dummy()
+        properly_bug = Bug.create_dummy(description='properly')
+        perl_bug = Bug.create_dummy(description='perl')
+        self.assertEqual(Bug.all_bugs.all().count(), 2)
+        results = mysite.search.views.get_bugs_by_query_words(['perl'])
+        self.assertEqual(list(results), [perl_bug])
+
+class SearchTemplateDecodesQueryString(SearchTest):
+    def test_facets_appear_in_search_template_context(self):
+        response = self.client.get('/search/', {'Language': 'Python'})
+        expected_facets = { 'Language': 'Python' }
+        self.assertEqual(response.context['active_facets'], expected_facets)
+
+class FacetsFilterResults(SearchTest):
+    def test_facets_filter_results(self):
+        facets = {'Language': 'Python'}
+
+        # Those facets should pick up this bug:
+        python_project = Project.create_dummy(language='Python')
+        python_bug = Bug.create_dummy(project=python_project)
+
+        # But not this bug
+        not_python_project = Project.create_dummy(language='Nohtyp')
+        not_python_bug = Bug.create_dummy(project=not_python_project)
+
+        results = mysite.search.views.get_bugs_by_query_words([], 
+                facets=facets)
+        self.assertEqual(list(results), [python_bug])
 
 # vim: set nu ai et ts=4 sw=4 columns=80:

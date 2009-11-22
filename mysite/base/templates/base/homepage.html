@@ -2,9 +2,9 @@
 
 {% load i18n %}
 
-{% block title %}
-Welcome to OpenHatch!
-{% endblock title %}
+{% block whole_title %}
+Welcome to OpenHatch! 
+{% endblock whole_title %}
 
 {% block nav %}
 {% endblock nav %}
@@ -30,176 +30,46 @@ Welcome to OpenHatch!
 
 {% block css %}
 {{ block.super }}
+@import url('/static/css/account/auth.css');
 @import url('/static/css/base/homepage.css');
 @import url('/static/openid/css/openid.css');
 {% endblock css %}
 
 {% block content %}
+<style type='text/css'>
+    form { width: 100%; }
+    form p { width: 100%; }
+    form label { width: 92px; }
+    #account-related { float: left; width: 350px; }
+    #account-related .body { background: transparent url('/static/images/white-sidebar.png'); border: 1px solid #f4f4f4; width: 308px; }
+</style>
 <div class='left'>
     <div id='banner'>
         <img alt='OpenHatch' src='/static/images/the-logo.png' width='300'/>
     </div>
-    <div id='account-related'>
-        <ul class='tab-links' class='visible_iff_js'>
-            <li>
-            <a href="#request_invitation"
-                {% ifnotequal initial_tab_open 'request_invitation' %}
-                class='my-tab-is-hidden'
-                {% endifnotequal %}
-                tab_selector="#request_invitation">
-                <img src='/static/images/base/request-an-invitation.png'
-                alt='Request an invitation' />
-            </a>
-            </li>
-            {% comment %}
-            <li><a href="#create_profile" class='visible_iff_js'
-                tab_selector="#create_profile">Sign up</a></li>
-            {% endcomment %}
-            <li>
-            <a href="#login"
-                {% ifnotequal initial_tab_open 'login' %}
-                class='my-tab-is-hidden'
-                {% endifnotequal %}
-                tab_selector="#login">
-                <img src='/static/images/base/sign-in.png'
-                alt='Sign in' />
-            </a>
-            </li>
-        </ul>
-        <div id='tabs' class='module'>
-            <h3 class='invisible_if_js'>Request an invitation</h3>
-            <div id='request_invitation' 
-                {% ifequal initial_tab_open 'request_invitation' %}
-                class='tab'
-                {% else %}
-                class='tab invisible_if_js'
-                {% endifequal %}
-                >
-                <form name='request_invitation' method='POST'
-                    action='{% url mysite.account.views.request_invitation %}'>
-                    {% if invitation_success %}
-                    <div class='form-row' style='color: green; font-weight: bold; margin-bottom: 10px;'>
-                        Success! An invitation has been requested for {{ invitation_requested_for }}.
-                    </div>
-                    {% else %}
-                    <p>
-                    We're currently in invitation-only beta.
-                    Sign up for a sneak peek.
-                    </p>
-                    {% endif %}
-                    {% for field in invitation_request_form %}
-                    <div class='form-row'>
-                        {% if field.errors %}
-                        <div class='field-errors'>
-                            {{ field.errors }}
-                        </div>
-                        {% endif %}
-                        {{ field.label_tag }}
-                        {{ field }}
-                    </div>
-                    {% endfor %}
-                    <div class='form-row'>
-                        <input type='submit' style='float: right;' 
-                        value='Submit' />
-                    </div>
-                </form>
+    <div id='account-related' class='module'>
+        <div class='body'>
+            {% if login_notification %}
+            <div class='notification'>
+                {{ login_notification }}
             </div>
-            {% comment %}
-            <h3 class='invisible_if_js'>Sign up</h3>
-            <div id='create_profile' class='tab'>
-                {% if signup_notification %}
-                <div class='notification'>
-                    {{ signup_notification }}
-                </div>
-                {% endif %}
-                {% if notification_id %}
-                <!-- notification_id: {{ notification_id }} -->
-                {% endif %}
-                <form id='create_profile' name='create_profile'
-                    action='/account/signup/do' method='POST'>
-                    {% for field in signup_form %}
-                    {% ifnotequal field.html_name "password2" %}
-                    <div class='form-row'>
-                        {% if field.errors %}
-                        <div class='field-errors'>
-                            {{ field.errors }}
-                        </div>
-                        {% endif %}
-                        {{ field.label_tag }}
-                        {{ field }}
-                    </div>
-                    {% endifnotequal %}
-                    {% endfor %}
-                    <div class='form-row'>
-                        <input type='submit' style='float: right;' 
-                        value='begin!' />
-                    </div>
-                </form>
-            </div>
-            {% endcomment %}
-            <h3 class='invisible_if_js'>Log in</h3>
-            <div id='login' 
-                {% ifequal initial_tab_open 'request_invitation' %}
-                class='tab'
-                {% else %}
-                class='tab invisible_if_js'
-                {% endifequal %}
-                >
-                {% if login_notification %}
-                <div class='notification'>
-                    {{ login_notification }}
-                </div>
-                {% endif %}
-                {% if notification_id %}
-                <!-- notification_id: {{ notification_id }} -->
-                {% endif %}
-                <form id="openid_form" name="openid_form"
-                    action="{% url user_signin %}" method="post">
-                    <input type="hidden" name="action" value="verify" />
-                    <input type="hidden" name="next" value="{{ next }}" />
-                    <p>Sign in using an account on another network.</p>
-                        <div id="openid_choice">
-                            <p>Please click your account provider:</p>
-                            <div id="openid_btns"></div>
-                        </div>
-                        <div id="openid_input_area">
-                            <label for="id_openid_ul">
-                                OpenID URL:
-                            </label>
-                            {{ openid_signin_form.openid_url }}
-                            <input name="openid_submit" type="submit"
-                            value="Sign in">
-                        </div>
-                </form>
-                <a id='toggleNormalLogin' href='#'>
-                    <span class='verb'>Show</span> normal login
-                </a>
-                <form id='normal_login_form' name='login'
-                    action='/account/login/do' method='POST'>
-                    <div class='form-row'>
-                        <label for='login_username'>Username</label>
-                        <input type='text' id='login_username' name='login_username' />
-                    </div>
-                    <div class='form-row'>
-                        <label for='login_password'>Password</label>
-                        <input type='password' id='login_password' name='login_password' />
-                    </div>
-                    <div class='form-row'>
-                        <input type='submit' value='log in!' style='' />
-			<a href="/account/forgot_pass/">Forgot your password?</a>
-                    </div>
-                </form>
-            </div> 
+            {% endif %}
+            {% if notification_id %}
+            <!-- notification_id: {{ notification_id }} -->
+            {% endif %}
+            <h3 style='width: 100%; text-align: left; margin: 0; margin-bottom: 10px;'>Sign in</h3>
+            {% with openid_signin_form as form %}
+            {% include 'account/login_openid.html' %}
+            {% endwith %}
+            <a href='/account/login/old'>
+                Sign in with a password
+            </a>
         </div>
     </div>
 </div>
 
 <div id='entry-points'>
     <div class='module' id='explanation'>
-        <h5 class='interrogative_grunt'>
-            {{ interrogative_grunt|random }}
-            <!-- Affectionately filched from thesixtyone's "Huh?" -->
-        </h5>
         <h3>
             Want to get (more) involved in <strong>open source</strong>?
             Proud of what you've already contributed?
@@ -213,7 +83,8 @@ Welcome to OpenHatch!
                 </a>
             </strong> 
             <div class='left'>
-                <h4>Find open source opportunities tailored to you</h4>
+                <h4><a href='{% url mysite.search.views.fetch_bugs %}'>
+                        Find open source opportunities tailored to you</a></h4>
                 <p>
                 Discover new ways that you can contribute to free 
                 and open source software.
@@ -222,7 +93,8 @@ Welcome to OpenHatch!
             </li>
             <li>
             <div class='left'>
-                <h4>Showcase your contributions</h4>
+                <h4><a href='{% url mysite.profile.views.portfolio_editor %}'>
+                        Showcase your contributions</a></h4>
                 <p>
                 Track and show off your involvement in
                 free and open source software. 
@@ -246,11 +118,14 @@ Welcome to OpenHatch!
                 </a>
             </strong>
             <div class='right'>
-                <h4>Find collaborators and connections</h4>
+                <h4><a href='{% url mysite.profile.views.display_list_of_people %}'>
+                        Find collaborators and connections</a></h4>
+                <p>
+                Find people who work on the same projects or have similar interests as yourself. Or, if you don't yet grok something but want to learn, look up people in open source who have expertise to share.
+                </p>
             </div>
         </ul>
     </div>
-
 </div>
 {% endblock content %}
 

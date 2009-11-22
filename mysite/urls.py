@@ -1,4 +1,5 @@
 from django.conf.urls.defaults import *
+from django.http import HttpResponse
 
 from django.conf import settings
 
@@ -11,6 +12,7 @@ import mysite.account.forms
 from django_authopenid import views as oid_views
 
 urlpatterns = patterns('',
+
         # Invitation-related URLs
         (r'^invitation/', include('invitation.urls')),
 
@@ -24,14 +26,18 @@ urlpatterns = patterns('',
 
         (r'^people/$', 'mysite.profile.views.display_list_of_people'),
 
-        (r'^account/login/$', 'mysite.account.views.login'),
-        (r'^account/forgot_pass/$', 'django.contrib.auth.views.password_reset', {'template_name': 'account/password_reset.html',
-                                                                                 'email_template_name': 'account/password_reset_email.html'}),
+        (r'^account/forgot_pass/$',
+            'django.contrib.auth.views.password_reset', {
+                'template_name': 'account/password_reset.html',
+                'email_template_name': 'account/password_reset_email.html'
+                }),
 
         (r'^account/catch-me$', 'mysite.account.views.catch_me'),
         (r'^account/logout/$', 'mysite.account.views.logout'),
 
-        (r'^account/login/do$', 'mysite.account.views.login_do'),
+        (r'^account/login/$', 'django.contrib.auth.views.login', {'template_name': 'account/login.html'}),
+        (r'^account/login/do$', 'django.contrib.auth.views.login', {'template_name': 'account/login.html'}),
+        (r'^account/login/old$', 'django.contrib.auth.views.login', {'template_name': 'account/login_old.html'}),
         (r'^account/signup/do$', 'mysite.account.views.signup_do'),
 
         (r'^account/request_invitation/do$',
@@ -42,10 +48,6 @@ urlpatterns = patterns('',
             'mysite.info.views.aboutpage'),
         (r'^contact/$', 
             'mysite.info.views.contactpage'),
-        (r'^jobs/$', 
-            'mysite.consulting.views.search'),
-        (r'^jobs/(?P<query>.*)/$',
-            'mysite.consulting.views.list'),
         (r'^people/(?P<user_to_display__username>[^/]+)/widget/$',
                 'mysite.profile.views.widget_display'),
 
@@ -54,13 +56,6 @@ urlpatterns = patterns('',
 
         (r'^people/info/edit/do$',
             'mysite.profile.views.edit_person_info'),
-
-        (r'^people/project_icon/(?P<project_name>.*)$',
-            'mysite.profile.views.project_icon_web'),
-
-        (r'^people/project_icon_badge/(?P<project_name>.*)$',
-            'mysite.profile.views.project_icon_web',
-         {'width': 40}),
 
         # OpenID URL prefix for django_authopenid.urls
         url(r'^openid/signin/$', oid_views.signin, name='user_signin'),
@@ -122,12 +117,30 @@ urlpatterns = patterns('',
         (r'^do/projectexp_add$',
             'mysite.profile.views.projectexp_add_do'),
 
+        (r'^profile/views/add_citation_manually_do$',
+            'mysite.profile.views.add_citation_manually_do'),
+
+        (r'^profile/views/replace_icon_with_default$',
+            'mysite.profile.views.replace_icon_with_default'),
+
         # Get a list of suggestions for the search input,
         # formatted the way that the jQuery autocomplete plugin wants it.
         (r'^search/get_suggestions$', 'mysite.search.views.request_jquery_autocompletion_suggestions'),
 
-        (r'^people/gimme_json_that_says_that_commit_importer_is_done$',
-            'mysite.profile.views.gimme_json_that_says_that_commit_importer_is_done'),
+        (r'^profile/views/gimme_json_for_portfolio$',
+            'mysite.profile.views.gimme_json_for_portfolio'),
+
+        (r'^profile/views/publish_citation_do$',
+                'mysite.profile.views.publish_citation_do'),
+
+        (r'^profile/views/delete_citation_do$',
+                'mysite.profile.views.delete_citation_do'),
+
+        (r'^profile/views/save_portfolio_entry_do$',
+                'mysite.profile.views.save_portfolio_entry_do'),
+
+        (r'^profile/views/delete_portfolio_entry_do$',
+                'mysite.profile.views.delete_portfolio_entry_do'),
 
         (r'^people/import/do$',
             'mysite.profile.views.import_do'),
@@ -144,9 +157,13 @@ urlpatterns = patterns('',
         (r'^people/portfolio/import/$',
                 'mysite.profile.views.importer'),
 
-        (r'^people/edit/info$',
-                'mysite.profile.views.display_person_edit_web',
-                { 'info_edit_mode': True }),
+        (r'^\+portfolio/editor$',
+                'mysite.profile.views.portfolio_editor'),
+
+        (r'^\+portfolio/editor/test$',
+                'mysite.profile.views.portfolio_editor_test'),
+
+        (r'^profile/views/edit_info$', 'mysite.profile.views.edit_info'),
 
         (r'^edit/name$',
                 'mysite.profile.views.display_person_edit_name',
@@ -155,11 +172,16 @@ urlpatterns = patterns('',
         (r'^edit/name/do$',
                 'mysite.profile.views.display_person_edit_name_do'),
 
-        (r'^people/portfolio/import/prepare_data_import_attempts_do$',
+        (r'^profile/views/prepare_data_import_attempts_do$',
                 'mysite.profile.views.prepare_data_import_attempts_do'),
 
         (r'^people/user_selected_these_dia_checkboxes$',
                 'mysite.profile.views.user_selected_these_dia_checkboxes'),
+
+        (r'^test_404$', handler404),
+
+        (r'^search/people/(?P<property>[^/]+)/(?P<value>.+)$',
+                'mysite.profile.views.display_list_of_people_who_match_some_search'),
 
         # favicon.ico. Someday this should be handled by Apache.
         (r'^(favicon.ico)',
@@ -170,6 +192,12 @@ urlpatterns = patterns('',
         (r'^people/(?P<user_to_display__username>[^/]+)[/?]$',
                 'mysite.profile.views.display_person_web'),
 
+        (r'^\+project/', include('mysite.project.urls')),
+
+        (r'^\+yo_is_django_alive$', lambda x: HttpResponse('success')),
+
         )
+
+handler404 = 'mysite.base.views.page_not_found'
 
 # vim: set ai ts=4 sts=4 et sw=4:

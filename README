@@ -3,10 +3,12 @@
 $ sudo apt-get install rabbitmq-server python-apt
 $ sudo rabbitmqctl add_user rabbiter johT4qui
 $ sudo rabbitmqctl add_vhost localhost
-$ rabbitmqctl set_permissions -p localhost rabbiter "" ".*" ".*" || rabbitmqctl map_user_vhost rabbiter localhost || echo EEEP
+$ sudo rabbitmqctl set_permissions -p localhost rabbiter "" ".*" ".*" || sudo rabbitmqctl map_user_vhost rabbiter localhost || echo "Failed to set rabbitmq permissions. Complain to Asheesh."
+
+FIXME: Explain how to create MySQL user oh_milestone_a and grant select permissions.
 
 $ python bootstrap.py
-$ ./bin/buildout
+$ ./bin/buildout # Make sure you're actually in this directory
 $ ./bin/mysite runserver
 
 # Set up the database.
@@ -41,3 +43,10 @@ To test customs:
 $ cd milestone-a # Make sure you're in this directory. Not sure if it will work elsewhere.
 $ python bootstrap.py
 $ ./bin/buildout -o # o is for "offline", so you don't hit the network looking for dependencies
+
+== Thanks to ==
+
+* jQuery
+* jGrowl
+* Lots of other people who definitely need to be thanked here
+* Some other people who don't
