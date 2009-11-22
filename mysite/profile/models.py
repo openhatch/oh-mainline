@@ -168,7 +168,7 @@ class Person(models.Model):
     @property
     def profile_url(self):
         return reverse(mysite.profile.views.display_person_web,
-                kwargs={'user_to_display__username': self.user.username)
+                kwargs={'user_to_display__username': self.user.username})
 
     # }}}
 
