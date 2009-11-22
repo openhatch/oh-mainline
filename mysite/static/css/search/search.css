@@ -173,9 +173,7 @@ p {
     text-decoration: none;
 }
 
-#results li .description-container p {
-    margin-top: 5px;
-}
+#results li .description-container p { margin-top: 5px; }
 
 #results li .first-line {
     float: left;
@@ -319,7 +317,6 @@ p {
     color: #888;
 }
 #opps li .second-line .description p { display: inline; }
-#opps li.expanded .second-line .description p { display: inherit; white-space: normal; }
 #opps li.expanded .second-line { border-radius: 0; -moz-border-radius: 0; overflow: visible; }
 #opps li.expanded .details { display: block; border-radius-bottomleft: 8px; border-radius-bottomright: 8px; -moz-border-radius-bottomleft: 8px; -moz-border-radius-bottomright: 8px; }
 #opps li.expanded .details .fields {
