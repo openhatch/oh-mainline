@@ -165,6 +165,9 @@ class Person(models.Model):
             scaled_down = get_image_data_scaled(self.photo.file.read(), width)
             self.photo_thumbnail.save('', ContentFile(scaled_down))
 
+    @staticmethod
+    def get_by_username(self, username):
+        return Person.objects.get(user__username=username)
     # }}}
 
 def create_profile_when_user_created(instance, created, *args, **kwargs):
