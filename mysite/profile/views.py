@@ -446,18 +446,13 @@ def edit_person_info(request):
             if not tag_text.strip(): # Skip blanks
                 continue
 
-            # We used to employ Tag.objects.get_or_create here,
-            # but that is case-insensitive, which means that
-            # the person will be assigned tags with a potentially wrong
-            # case. So we have to use a "try, get, except, create" sequence.
-            tag_fields = dict(tag_type=tag_type, text=tag_text)
-            try:
-                tag = Tag.objects.get(**tag_fields)
-            except Tag.DoesNotExist:
-                tag = Tag(**tag_fields)
-                tag.save()
+            tag_text_case_sensitive_regex = "^%s$" % re.escape(tag_text)
+            tag = Tag.objects.get_or_create(
+                    tag_text__regex=tag_text_case_sensitive_regex,
+                    tag_type=tag_type,
+                    defaults={'tag_text': tag_text})
             new_link, _ = Link_Person_Tag.objects.get_or_create(
-                    tag=new_tag, person=person)
+                    tag=tag, person=person)
             
             return HttpResponseRedirect(person.profile_url)
 

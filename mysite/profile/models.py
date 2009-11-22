@@ -9,6 +9,7 @@ from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
 from django.conf import settings
 from django.contrib.auth import SESSION_KEY, BACKEND_SESSION_KEY, load_backend
+from django.core.urlresolvers import reverse
 
 import datetime
 import sys
