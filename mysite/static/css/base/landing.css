@@ -14,7 +14,8 @@ h4 { color: #555; font-size: 1.0em; font-weight: bold; margin-left: 0; padding-l
 	#bugs li span { color: #222; position: relative; top: -7px; }
 .module p { margin-top: 0; }
 .widget-wrapper { float: left; margin-bottom: 10px; width: 100%; }
-a.blog-feed { background: transparent url('/static/images/base/landing/feed-icon-16x16-grayscale.png') no-repeat center; float: left; float: right; height: 16px; padding: 16px; width: 16px; }
+a.blog-feed { background: transparent url('/static/images/base/landing/feed-icon-16x16-grayscale.png') no-repeat center; float: left; float: right; height: 16px; padding: 16px 8px; width: 8%; margin-right: 8px; }
 	a.blog-feed .alt-text { left: -999px; position: absolute; }
 	a.blog-feed:hover { background-image: url('/static/images/base/landing/feed-icon-16x16.png'); }
 .byline { font-size: 8pt; margin-top: 2px; }
+#meta h3 { font-size: 11pt; width: 65%; padding-right: 8px; }
