@@ -318,18 +318,10 @@ p {
     text-align: right;
     color: #888;
 }
-#opps li .details .fields {
-}
 #opps li .second-line .description p { display: inline; }
 #opps li.expanded .second-line .description p { display: inherit; white-space: normal; }
 #opps li.expanded .second-line { border-radius: 0; -moz-border-radius: 0; overflow: visible; }
-#opps li.expanded .details {
-    display: block;
-    border-radius-bottomleft: 8px;
-    border-radius-bottomright: 8px;
-    -moz-border-radius-bottomleft: 8px;
-    -moz-border-radius-bottomright: 8px;
-}
+#opps li.expanded .details { display: block; border-radius-bottomleft: 8px; border-radius-bottomright: 8px; -moz-border-radius-bottomleft: 8px; -moz-border-radius-bottomright: 8px; }
 #opps li.expanded .details .fields {
     display: block;
 }
@@ -352,11 +344,15 @@ p {
 #opps li.lit-up {
     /*border-color: #777; #f85931;*/
 }
-#opps li.lit-up.DISABLE-THIS {
+/*
+ * Pink highlighting of selected bugs.
+ * We don't do this anymore.
+#opps li.lit-up {
     border-left: 4px solid pink;
     position: relative;
     left: -4px;
 }
+    */
 
 #opps li .second-line {
     display: block;
