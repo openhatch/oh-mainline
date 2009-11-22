@@ -82,6 +82,24 @@ class Person(models.Model):
         except ValueError:
             return '/static/images/profile-photos/penguin.png'
 
+    @staticmethod
+    def get_from_session_key(sesion_key):
+        '''Based almost entirely on http://www.djangosnippets.org/snippets/1276/
+        Thanks jdunck!'''
+        from django.conf import settings
+        from django.contrib.auth import SESSION_KEY, BACKEND_SESSION_KEY, load_backend
+        from django.contrib.auth.models import AnonymousUser
+
+        session_engine = __import__(settings.SESSION_ENGINE, {}, {}, [''])
+        session_wrapper = session_engine.SessionStore(session_key)
+        user_id = session_wrapper.get(SESSION_KEY)
+        auth_backend = load_backend(session_wrapper.get(BACKEND_SESSION_KEY))
+
+        if user_id and auth_backend:
+          return Person.objects.get(user=auth_backend.get_user(user_id))
+        else:
+          return None
+
     def get_photo_thumbnail_url_or_default(self):
         try:
             return self.photo_thumbnail.url
