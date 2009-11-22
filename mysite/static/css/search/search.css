@@ -122,13 +122,11 @@ p {
     float: left;
 }
 #results li {
-    overflow: hidden;
     letter-spacing: 0px;
     font-size: 100%;
     float: left;
     list-style: none;
     width: 555px;
-    height: 60px;
     white-space: nowrap;
     margin: 0;
     margin-bottom: 8px;
@@ -158,7 +156,7 @@ p {
 }
 
 #results li .head {
-    font-size: 17px;
+    font-size: 14px;
     float: left;
     padding: 5px 10px;
     width: 535px;
@@ -212,17 +210,17 @@ p {
 #results li .description-container {
     width: 525px;
     padding: .3em .7em;
-    color: #888;
+    color: #555;
     float: left;
     overflow: hidden;
     white-space: nowrap;
 }
-#results li .description-container * {
-    display: inline;
-}
-#results li.expanded .description {
-    font-family: monospace;
-}
+#results li .description-container * { display: inline; }
+#results li .description-container br { display: none; }
+#results li .description { font-family: monospace; }
+#results li.expanded { white-space: normal; }
+#results li.expanded .description-container p { float: left; width: 100%; margin-bottom: .3em; }
+#results li.expanded .description-container br { display: inherit; }
 
 /* </generic list code> */
 
@@ -322,10 +320,9 @@ p {
 }
 #opps li .details .fields {
 }
-#opps li.expanded .second-line {
-    border-radius: 0;
-    -moz-border-radius: 0;
-}
+#opps li .second-line .description p { display: inline; white-space: pre; }
+#opps li.expanded .second-line .description p { display: inherit; white-space: normal; }
+#opps li.expanded .second-line { border-radius: 0; -moz-border-radius: 0; overflow: visible; }
 #opps li.expanded .details {
     display: block;
     border-radius-bottomleft: 8px;
@@ -342,10 +339,6 @@ p {
 }
 #opps li .field {
     width: 33%;
-}
-#opps li.expanded {
-    height: auto;
-    white-space: normal;
 }
 #opps li .tags {
     float: left;
