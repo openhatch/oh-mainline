@@ -3,6 +3,7 @@ from mysite.base.tests import make_twill_url, TwillTests
 import mysite.account.tests
 from mysite.profile.models import Person
 import mysite.customs.miro
+import mysite.search.controllers
 
 import django.test
 from mysite.search.models import Project, Bug
@@ -37,6 +38,10 @@ class SearchTest(TwillTests):
         if query:
             search_url += '?q=%s' % query
         tc.go(make_twill_url(search_url))
+
+    def search_via_client(self, query=None):
+        search_url = "/search/" 
+        return self.client.get(search_url, {'q': query})
 
 class AutoCompleteTests(SearchTest):
     """
@@ -109,11 +114,12 @@ class SearchResultsSpecificBugs(SearchTest):
         query = 'PYTHON'
 
         # The four canonical_filters by which a bug can match a query
+        whole_word = "[[:<:]]%s[[:>:]]" % query
         self.canonical_filters = [
                 Q(project__language__iexact=query),
-                Q(project__name__icontains=query),
-                Q(title__icontains=query),
-                Q(description__icontains=query)
+                Q(title__iregex=whole_word),
+                Q(project__name__iregex=whole_word),
+                Q(description__iregex=whole_word)
                 ]
 
     def no_canonical_filters(self, except_one=Q()):
@@ -213,7 +219,7 @@ class SearchResults(TwillTests):
         response = self.client.get('/search/')
         ctxt_we_care_about = [c for c in response.context if 'start' in c][0]
         self.failUnlessEqual(ctxt_we_care_about['start'], 1)
-        self.failUnlessEqual(ctxt_we_care_about['end'], 10)
+        self.failUnlessEqual(ctxt_we_care_about['end'], 0)
 
     def test_json_view(self):
         tc.go(make_twill_url('http://openhatch.org/search/?format=json&jsoncallback=callback&q=python'))
@@ -490,18 +496,6 @@ class TestQuerySplitter(django.test.TestCase):
         self.assertEqual(mysite.search.views.split_query_words(easy),
                          ['c#'])
 
-class ResultsIncludeProjectLanguage(SearchTest):
-    fixtures = ['bugs-for-two-projects.json']
-
-    def test_python_results_include_python(self):
-        self.search_via_twill('Exaile')
-
-        # It's easier to pass this test...
-        tc.find("Python")
-
-        # ...than this one.
-        tc.find("<span class='project__language'>Python</span>")
-
 class IconGetsScaled(SearchTest):
     def test_project_scales_its_icon_down_for_use_in_badge(self):
         '''This test shows that the Project class successfully stores
@@ -511,7 +505,7 @@ class IconGetsScaled(SearchTest):
         # Step 1: Create a project with an icon
         p = mysite.search.models.Project()
         image_data = open(mysite.account.tests.photo('static/sample-photo.png')).read()
-        p.icon.save('', ContentFile(image_data))
+        p.icon_raw.save('', ContentFile(image_data))
         p.save()
 
         # Assertion 1: p.icon_smaller_for_badge is false (since not scaled yet)
@@ -528,5 +522,73 @@ class IconGetsScaled(SearchTest):
         # Assertion 3: Verify that it has the right width
         self.assertEqual(p.icon_smaller_for_badge.width, 40,
                          "Expected p.icon_smaller_for_badge to be 40 pixels wide.")
+
+    def test_short_icon_is_scaled_correctly(self):
+        '''Sometimes icons are rectangular and more wide than long. These icons shouldn't be trammeled into a square, but scaled respectfully of their original ratios.'''
+        # Step 1: Create a project with an icon
+        p = mysite.search.models.Project()
+
+        # account.tests.photo finds the right path.
+        image_data = open(mysite.account.tests.photo(
+            'static/images/icons/test-project-icon-64px-by-18px.png')).read()
+        p.icon_raw.save('', ContentFile(image_data))
+        p.save()
+
+        # Assertion 1: p.icon_smaller_for_badge is false (since not scaled yet)
+        self.assertFalse(p.icon_smaller_for_badge)
+
+        # Step 2: Call the scaling method
+        p.update_scaled_icons_from_self_icon()
+        p.save()
+
+        # Assertion 2: Verify that it is now a true value
+        self.assert_(p.icon_smaller_for_badge, 
+                     "Expected p.icon_smaller_for_badge to be a true value.")
+
+        # Assertion 3: Verify that it has the right width
+        self.assertEqual(p.icon_smaller_for_badge.width, 40,
+                         "Expected p.icon_smaller_for_badge to be 40 pixels wide.")
+
+        # Assertion 3: Verify that it has the right height
+        # If we want to scale exactly we'll get 11.25 pixels, which rounds to 11.
+        self.assertEqual(p.icon_smaller_for_badge.height, 11)
+
+class DiscoverFacets(SearchTest):
+    def test_discover_available_facets(self):
+        python_project = Project.create_dummy(language='Python')
+        python_bug = Bug.create_dummy(project=python_project)
+        facets = mysite.search.controllers.discover_available_facets()
+        self.assertEqual(facets, {'Language': {'Python': 1}})
+
+class SearchOnFullWords(SearchTest):
+    def test_find_perl_not_properly(self):
+        project = Project.create_dummy()
+        properly_bug = Bug.create_dummy(description='properly')
+        perl_bug = Bug.create_dummy(description='perl')
+        self.assertEqual(Bug.all_bugs.all().count(), 2)
+        results = mysite.search.views.get_bugs_by_query_words(['perl'])
+        self.assertEqual(list(results), [perl_bug])
+
+class SearchTemplateDecodesQueryString(SearchTest):
+    def test_facets_appear_in_search_template_context(self):
+        response = self.client.get('/search/', {'Language': 'Python'})
+        expected_facets = { 'Language': 'Python' }
+        self.assertEqual(response.context['active_facets'], expected_facets)
+
+class FacetsFilterResults(SearchTest):
+    def test_facets_filter_results(self):
+        facets = {'Language': 'Python'}
+
+        # Those facets should pick up this bug:
+        python_project = Project.create_dummy(language='Python')
+        python_bug = Bug.create_dummy(project=python_project)
+
+        # But not this bug
+        not_python_project = Project.create_dummy(language='Nohtyp')
+        not_python_bug = Bug.create_dummy(project=not_python_project)
+
+        results = mysite.search.views.get_bugs_by_query_words([], 
+                facets=facets)
+        self.assertEqual(list(results), [python_bug])
 
 # vim: set nu ai et ts=4 sw=4 columns=80:

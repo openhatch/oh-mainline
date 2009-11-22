@@ -16,7 +16,7 @@ QUnitRunner.testDone = function() {};
 
 StupidRunner = {};
 StupidRunner.ok = function(bool, message) {
-    var bool = !!bool;
+    var bool = !!bool; //FIXME: Doesn't work in constructive logic.
     if (!bool) { alert("Failed:" + message); }
 };
 StupidRunner.compare = function(a, b, message) {

@@ -584,7 +584,7 @@ def replace_icon_with_default(request):
     # FIXME: test for naughty people trying to replace others' icons with the default!
 
     # set as default
-    portfolio_entry.project.icon = None
+    portfolio_entry.project.icon_raw = None
     portfolio_entry.project.save()
 
     # prepare output

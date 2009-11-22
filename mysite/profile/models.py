@@ -7,6 +7,8 @@ from mysite.customs import ohloh
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
+from django.conf import settings
+from django.contrib.auth import SESSION_KEY, BACKEND_SESSION_KEY, load_backend
 
 import datetime
 import sys
@@ -81,6 +83,23 @@ class Person(models.Model):
             return self.photo.url
         except ValueError:
             return '/static/images/profile-photos/penguin.png'
+
+    @staticmethod
+    def get_from_session_key(session_key):
+        '''Based almost entirely on
+        http://www.djangosnippets.org/snippets/1276/
+        Thanks jdunck!'''
+
+        session_engine = __import__(settings.SESSION_ENGINE, {}, {}, [''])
+        session_wrapper = session_engine.SessionStore(session_key)
+        user_id = session_wrapper.get(SESSION_KEY)
+        auth_backend = load_backend(
+                session_wrapper.get(BACKEND_SESSION_KEY))
+
+        if user_id and auth_backend:
+            return Person.objects.get(user=auth_backend.get_user(user_id))
+        else:
+            return None
 
     def get_photo_thumbnail_url_or_default(self):
         try:

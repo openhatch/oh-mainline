@@ -353,13 +353,14 @@ function updatePortfolio(response) {
 	    $(".project_description", $new_portfolio_entry).textSmart(portfolioEntry.fields.project_description);
 	    	   
 	    /* project_icon */
-        if (project_we_refer_to.fields.icon == '') {
+        if (project_we_refer_to.fields.icon_for_profile == '') {
             $new_portfolio_entry.find('.icon_flagger').hide();
         }
         else {
             var $icon = $new_portfolio_entry.find(".project_icon");
             var current_src = $icon.attr('src');
-            var response_src = "/static/"+project_we_refer_to.fields.icon;
+            var response_src = ("/static/" +
+                    project_we_refer_to.fields.icon_for_profile);
             if (current_src != response_src) {
                 $icon.attr('src', response_src);
                 $new_portfolio_entry.find('.icon_flagger').show();
@@ -367,7 +368,8 @@ function updatePortfolio(response) {
         }
 	    
 	    /* project_name */
-	    $(".project_name", $new_portfolio_entry).textSmart(project_we_refer_to.fields.name);
+	    $(".project_name", $new_portfolio_entry).textSmart(
+                project_we_refer_to.fields.name);
 	    
 	    /* experience_description */
 	    $(".experience_description", $new_portfolio_entry).textSmart(

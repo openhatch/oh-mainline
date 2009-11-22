@@ -1,25 +1,31 @@
 <div class='search-result-control' id='results-widget'>
     <span id='results-summary'>
 
-        {% if showing_all_results %}
-        <span id='total_bug_count'>
-            Showing {{ bunch_of_bugs|pluralize:"the only,all"}}
-            <span id='total_bug_count'>{{ total_bug_count }}</span>
-            result{{ bunch_of_bugs|pluralize }} for
-            <strong id='results-summary-language'>{{ q }}</strong>.
+        You searched for
+        {% if q %}
+        <strong id='results-summary-language'>{{ q }}</strong>
         {% else %}
-            {% comment %} The variable is called `language` but it could represent a
-            variety of other fields. FIXME: Fix the variable name. {% endcomment %}
-            You searched for <strong id='results-summary-language'>{{ q }}</strong>.
-            {% if bunch_of_bugs %}
-            <span id='total_bug_count'>{{ total_bug_count }}</span> bug{{ bunch_of_bugs|pluralize }} found.
-            {% ifnotequal start end %}
-            {% comment %}When there's only one bug on the page, no need to mention the obvious.{% endcomment %}
-            Showing results 
-            <span id='results-summary-start'>{{ start }}</span> to
-            <span id='results-summary-end'>{{ end }}</span>.
-            {% endifnotequal %}
-            {% endif %}
+        bugs
+        {% endif %}
+
+        {% comment %} FIXME Use django filter to remove whitespace {% endcomment %}
+        {% if active_facets %}
+        {% for facet, value in active_facets.items %}
+        in 
+        <style type='text/css'>.active_facet_value {background-color: #dfd; padding: 0 2px; }</style>
+        <span class='active_facet_value'>projects primarily coded in
+            <strong>{{value}}</strong>
+            <a href='?q={{q}}'>[x]</a></span>
+        </li>
+        .
+        {% endfor %}
+        {% endif %}
+
+        {% if bunch_of_bugs %}
+        Showing results 
+        <span id='results-summary-start'>{{ start }}</span> to
+        <span id='results-summary-end'>{{ end }}</span> of 
+        {{ total_bug_count }}.
         {% endif %}
     </span>
 
@@ -33,7 +39,7 @@
         {% endif %}
 
         {% if show_next_page_link %}
-        <a href='{{ next_page_url }}' id='next-page'>Next page &raquo;</a>
+        <a href='{{ next_page_url }}' id='next-page'>Next&nbsp;page &raquo;</a>
         {% endif %}
     </span>
     {% endif %}

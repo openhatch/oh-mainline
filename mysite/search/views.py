@@ -6,6 +6,8 @@ from django.utils.timesince import timesince
 from django.utils.html import escape
 
 from mysite.search.models import Bug, Project
+import mysite.search.controllers 
+import mysite.base.controllers
 
 import datetime
 from dateutil import tz
@@ -45,18 +47,23 @@ def split_query_words(string):
     return ret
     # }}}
 
-def get_bugs_by_query_words(query_words):
+def get_bugs_by_query_words(query_words, facets={}):
     """Get bugs matching any of the words in 'query_words'."""
 
     bugs = Bug.open_ones.all()
 
+    if 'Language' in facets:
+        bugs = bugs.filter(project__language__iexact=facets['Language'])
+
     # Filter
     for word in query_words:
+        whole_word = "[[:<:]]%s[[:>:]]" % (
+                mysite.base.controllers.mysql_regex_escape(word))
         bugs = bugs.filter(
             Q(project__language__iexact=word) |
-            Q(title__icontains=word) |
-            Q(description__icontains=word) |
-            Q(project__name__icontains=word))
+            Q(title__iregex=whole_word) |
+            Q(description__iregex=whole_word) |
+            Q(project__name__iregex=whole_word)) # 'firefox' grabs 'mozilla fx'.
 
     # Sort
     bugs = bugs.order_by('-good_for_newcomers', '-last_touched')
@@ -87,9 +94,16 @@ def fetch_bugs(request):
 
     total_bug_count = 0
 
-    if query:
-        bugs = get_bugs_by_query_words(query_words)
+    data = {}
+    data['active_facets'] = {}
+    possible_facets = ['Language']
+    for facet in possible_facets:
+        if request.GET.get(facet):
+            data['active_facets'][facet] = request.GET.get(facet)
 
+    if query or data['active_facets']:
+        bugs = get_bugs_by_query_words(query_words, 
+                facets=data['active_facets'])
 
         total_bug_count = bugs.count()
 
@@ -102,9 +116,11 @@ def fetch_bugs(request):
     else:
         bugs = []
 
-    data = {}
     data['q'] = query
     data['query_words'] = query_words
+
+    # Handle facets
+    data['all_facets'] = mysite.search.controllers.discover_available_facets(query_words=query_words)
 
     prev_page_query_str = QueryDict('')
     prev_page_query_str = prev_page_query_str.copy()
@@ -116,16 +132,17 @@ def fetch_bugs(request):
     if format:
         prev_page_query_str['format'] = format
         next_page_query_str['format'] = format
+    for facet_name, value in data['active_facets'].items():
+        prev_page_query_str[facet_name] = value
+        next_page_query_str[facet_name] = value
     diff = end - start
     prev_page_query_str['start'] = start - diff - 1
     prev_page_query_str['end'] = start - 1
     next_page_query_str['start'] = end + 1
     next_page_query_str['end'] = end + diff + 1
 
-    if end > len(bugs):
-        data['showing_all_results'] = True
     data['start'] = start
-    data['end'] = end
+    data['end'] = min(end, total_bug_count)
     data['prev_page_url'] = '/search/?' + prev_page_query_str.urlencode()
     data['next_page_url'] = '/search/?' + next_page_query_str.urlencode()
 
@@ -137,7 +154,6 @@ def fetch_bugs(request):
         data['the_user'] = request.user
         data['suggestions'] = suggestions
         data['bunch_of_bugs'] = bugs
-        data['developer_name'] = "Orrin Hatch"
         data['url'] = 'http://launchpad.net/'
 
         data['total_bug_count'] = total_bug_count

@@ -206,8 +206,8 @@ class OhlohIconTests(django.test.TestCase):
         project.name = 'Mozilla Firefox'
         project.populate_icon_from_ohloh()
 
-        self.assert_(project.icon)
-        self.assertEqual(project.icon.width, 64)
+        self.assert_(project.icon_raw)
+        self.assertEqual(project.icon_raw.width, 64)
         self.assertNotEqual(project.date_icon_was_fetched_from_ohloh, None)
 
     def test_populate_icon_from_ohloh_uses_none_on_no_match(self):
@@ -217,7 +217,7 @@ class OhlohIconTests(django.test.TestCase):
 
         project.populate_icon_from_ohloh()
 
-        self.assertFalse(project.icon)
+        self.assertFalse(project.icon_raw)
         # We don't know how to compare this against None,
         # but this seems to work.
 
@@ -378,7 +378,7 @@ Keywords: Torrent unittest""")
         bug = all_bugs[0]
         self.assertEqual(bug.people_involved, 5)
 
-class TestOpenHatchBlogCrawl(django.test.TestCase):
+class BlogCrawl(django.test.TestCase):
     def test_summary2html(self):
         yo_eacute = mysite.customs.feed.summary2html('Yo &eacute;')
         self.assertEqual(yo_eacute, u'Yo \xe9')
@@ -387,8 +387,13 @@ class TestOpenHatchBlogCrawl(django.test.TestCase):
     def test_blog_entries(self, mock_feedparser_parse):
         mock_feedparser_parse.return_value = {
             'entries': [
-                {'summary': 'Yo &eacute;'}]}
+                {
+                    'title': 'Yo &eacute;',
+                    'summary': 'Yo &eacute;'
+                    }]}
         entries = mysite.customs.feed._blog_entries()
+        self.assertEqual(entries[0]['title'],
+                         u'Yo \xe9')
         self.assertEqual(entries[0]['unicode_text'],
                          u'Yo \xe9')
 

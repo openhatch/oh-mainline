@@ -20,8 +20,9 @@ form {
     </div>
     <div class='body'>
         <div style='float: left; width: 500px;'>
-            <form method='POST' action='{% url django.contrib.auth.views.login %}'>
+            <form method='POST' name='login' action='{% url django.contrib.auth.views.login %}'>
                 {{ form.as_p }}
+                <input type='hidden' name='next' value='{{ next }}' />
                 <p><input type='submit' value='Go' /></p>
             </form>
         </div>

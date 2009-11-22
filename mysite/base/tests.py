@@ -5,6 +5,7 @@ from django.core.handlers.wsgi import WSGIHandler
 from django.core.servers.basehttp import AdminMediaHandler 
 from StringIO import StringIO
 from django.test.client import Client
+import mysite.base.controllers
 
 def twill_setup():
     app = AdminMediaHandler(WSGIHandler())
@@ -43,13 +44,8 @@ class TwillTests(django.test.TestCase):
 
     def login_with_twill(self):
         # Visit login page
-        login_url = 'http://openhatch.org/'
+        login_url = 'http://openhatch.org/account/login/old'
         tc.go(make_twill_url(login_url))
-
-        if 'homepage.js' not in tc.show():
-            print "Tried to login, but we're not on homepage!"
-            import pdb
-            pdb.set_trace()
 
         # Log in
         username = "paulproteus"
@@ -90,5 +86,17 @@ class LandingPage(TwillTests):
         # }}}
 
     # }}}
+
+class MySQLRegex(TwillTests):
+    def test_escape(self):
+        before2after = {
+                'n': '[n]',
+                ']': ']',
+                '[n': '[[][n]'
+                }
+        for before, after in before2after.items():
+            self.assertEqual(
+                    mysite.base.controllers.mysql_regex_escape(before), 
+                    after)
 
 # vim: set ai et ts=4 sw=4 nu:
