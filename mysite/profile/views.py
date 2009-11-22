@@ -443,12 +443,12 @@ def edit_person_info(request):
             link.delete()
 
         for tag_text in new_tag_texts_for_this_type:
-            if not tag_text.strip(): # Skip blanks
+            if not tag_text.strip(): # Don't save blank tags.
                 continue
 
             tag_text_case_sensitive_regex = "^%s$" % re.escape(tag_text)
             tag = Tag.objects.get_or_create(
-                    tag_text__regex=tag_text_case_sensitive_regex,
+                    text__regex=tag_text_case_sensitive_regex,
                     tag_type=tag_type,
                     defaults={'tag_text': tag_text})
             new_link, _ = Link_Person_Tag.objects.get_or_create(
