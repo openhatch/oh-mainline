@@ -7,6 +7,7 @@ from django.utils.html import escape
 
 from mysite.search.models import Bug, Project
 import mysite.search.controllers 
+import mysite.base.controllers
 
 import datetime
 from dateutil import tz

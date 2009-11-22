@@ -95,6 +95,8 @@ class MySQLRegex(TwillTests):
                 '[n': '[[][n]'
                 }
         for before, after in before2after.items():
-            self.assertEqual(mysite.base.controllers.mysql_regex_escape(before), after)
+            self.assertEqual(
+                    mysite.base.controllers.mysql_regex_escape(before), 
+                    after)
 
 # vim: set ai et ts=4 sw=4 nu:
