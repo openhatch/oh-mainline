@@ -433,7 +433,7 @@ def edit_person_info(request):
         # Set the tags to this thing
         new_tag_texts_for_this_type_raw = text.split(',')
         new_tag_texts_for_this_type = [tag.strip()
-                for tag in new_tag_texts_for_this_type_raw]
+                for tag in new_tag_texts_for_this_type_raw]; del tag
         # Now figure out what tags are in the DB
         old_tag_links = Link_Person_Tag.objects.filter(
                 tag__tag_type=tag_type, person=person)
@@ -446,6 +446,7 @@ def edit_person_info(request):
             if not tag_text.strip(): # Don't save blank tags.
                 continue
 
+            import pdb; pdb.set_trace()
             tag_text_case_sensitive_regex = r"^%s$" % re.escape(tag_text)
             tag, _ = Tag.objects.get_or_create(
                     text__regex=tag_text_case_sensitive_regex,
