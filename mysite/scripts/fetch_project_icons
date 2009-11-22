@@ -1,0 +1,2 @@
+#!/bin/bash
+rsync -avuz oh:~deploy/milestone-a/mysite/static/images/icons/projects/. static/images/icons/projects/.
