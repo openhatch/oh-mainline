@@ -43,7 +43,7 @@ class Project(models.Model):
     def create_dummy(**kwargs):
         now = datetime.datetime.utcnow()
         data = dict(name=uuid.uuid4().hex,
-                icon='/static/no-project-icon.png')
+                icon_raw='/static/no-project-icon.png')
         data.update(kwargs)
         ret = Project(**data)
         ret.save()
@@ -52,17 +52,20 @@ class Project(models.Model):
     name = models.CharField(max_length=200, unique = True)
     language = models.CharField(max_length=200)
 
-    # FIXME: Replace this with 'icon'
+    # FIXME: Remove this field and update fixtures.
     icon_url = models.URLField(max_length=200)
 
-    # In case we need it 
-    # dont_use_ohloh_icon = models.BooleanField(default=False)
-    icon = models.ImageField(
+    icon_raw = models.ImageField(
             upload_to=lambda a,b: Project.generate_random_icon_path(a, b),
             null=True,
             default=None)
 
     date_icon_was_fetched_from_ohloh = models.DateTimeField(null=True, default=None)
+
+    icon_for_profile = models.ImageField(
+        upload_to=lambda a,b: Project.generate_random_icon_path(a,b),
+        null=True,
+        default=None)
 
     icon_smaller_for_badge = models.ImageField(
         upload_to=lambda a,b: Project.generate_random_icon_path(a,b),
@@ -85,15 +88,17 @@ class Project(models.Model):
             return None
 
         # if you want to scale, use get_image_data_scaled(icon_data)
-        self.icon.save('', ContentFile(icon_data))
+        self.icon_raw.save('', ContentFile(icon_data))
 
         # Since we are saving an icon, also update our scaled-down version of
         # that icon for the badge.
         self.update_scaled_icons_from_self_icon()
 
     def get_url_of_icon_or_generic(self):
-        if self.icon:
-            return self.icon.url
+        # Recycle icon_smaller_for_badge since it's the same size as
+        # the icon for most other uses (profiles, etc.).
+        if self.icon_for_profile:
+            return self.icon_for_profile.url
         else:
             return settings.MEDIA_URL + 'no-project-icon.png'
 
@@ -110,23 +115,27 @@ class Project(models.Model):
             return settings.MEDIA_URL + 'no-project-icon-w=20.png'
 
     def update_scaled_icons_from_self_icon(self):
-        '''This method should be called when you update the Project.icon attribute.
+        '''This method should be called when you update the Project.icon_raw attribute.
         Side-effect: Saves a scaled-down version of that icon in the
         Project.icon_smaller_for_badge field.'''
-        # First of all, do nothing if self.icon is a false value.
-        if not self.icon:
+        # First of all, do nothing if self.icon_raw is a false value.
+        if not self.icon_raw:
             return
         # Okay, now we must have some normal-sized icon. 
 
-        normal_sized_icon_data = self.icon.file.read()
+        raw_icon_data = self.icon_raw.file.read()
+
+        # Scale raw icon to a size for the profile.
+        profile_icon_data = get_image_data_scaled(raw_icon_data, 64)
+        self.icon_for_profile.save('', ContentFile(profile_icon_data))
 
         # Scale it down to badge size, which
         # happens to be width=40
-        badge_icon_data = get_image_data_scaled(normal_sized_icon_data, 40)
+        badge_icon_data = get_image_data_scaled(raw_icon_data, 40)
         self.icon_smaller_for_badge.save('', ContentFile(badge_icon_data))
 
         # Scale normal-sized icon down to a size that fits in the search results--20px by 20px
-        search_result_icon_data = get_image_data_scaled(normal_sized_icon_data, 20)
+        search_result_icon_data = get_image_data_scaled(raw_icon_data, 20)
         self.icon_for_search_result.save('', ContentFile(search_result_icon_data))
 
     def get_contributors(self):
@@ -159,7 +168,7 @@ class Project(models.Model):
         return "name='%s' language='%s'" % (self.name, self.language)
 
 def populate_icon_on_project_creation(instance, created, *args, **kwargs):
-    if created and not instance.icon:
+    if created and not instance.icon_raw:
         instance.populate_icon_from_ohloh()
         
 models.signals.post_save.connect(populate_icon_on_project_creation, Project)
