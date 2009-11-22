@@ -345,7 +345,7 @@ class Tag(models.Model):
         raise ValueError
 
     def __unicode__(self):
-        return "type='%s' text='%s'" % (self.tag_type.name, self.text)
+        return "%s: %s" % (self.tag_type.name, self.text)
     # }}}
 
 class Link_ProjectExp_Tag(models.Model):
