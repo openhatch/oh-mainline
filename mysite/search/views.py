@@ -56,7 +56,7 @@ def get_bugs_by_query_words(query_words, facets={}):
 
     # Filter
     for word in query_words:
-        whole_word = "[[:<:]]%s[[:>:]]" % word
+        whole_word = "[[:<:]]%s[[:>:]]" % mysite.base.controllers.mysql_regexp_escape(word)
         bugs = bugs.filter(
             Q(project__language__iexact=word) |
             Q(title__iregex=whole_word) |

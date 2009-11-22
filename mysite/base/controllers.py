@@ -28,3 +28,12 @@ def get_notification_from_request(request):
             } ]
     else:
         return []
+
+def mysql_regex_escape(s):
+    ret = ''
+    for letter in s:
+        if letter == ']':
+            ret += letter
+        else:
+            ret += '[' + letter + ']'
+    return ret
