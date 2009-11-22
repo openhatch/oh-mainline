@@ -1,2 +1,0 @@
-#!/bin/bash
-../bin/sqlite_mysite test $( ls -1 */tests.py | sed s,/tests.py,,)
