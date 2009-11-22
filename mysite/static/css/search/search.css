@@ -320,7 +320,7 @@ p {
 }
 #opps li .details .fields {
 }
-#opps li .second-line .description p { display: inline; white-space: pre; }
+#opps li .second-line .description p { display: inline; }
 #opps li.expanded .second-line .description p { display: inherit; white-space: normal; }
 #opps li.expanded .second-line { border-radius: 0; -moz-border-radius: 0; overflow: visible; }
 #opps li.expanded .details {
