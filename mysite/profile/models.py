@@ -9,6 +9,7 @@ from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
 from django.conf import settings
 from django.contrib.auth import SESSION_KEY, BACKEND_SESSION_KEY, load_backend
+from django.core.urlresolvers import reverse
 
 import datetime
 import sys
@@ -164,6 +165,11 @@ class Person(models.Model):
             self.photo.file.seek(0) 
             scaled_down = get_image_data_scaled(self.photo.file.read(), width)
             self.photo_thumbnail.save('', ContentFile(scaled_down))
+
+    @property
+    def profile_url(self):
+        return reverse(mysite.profile.views.display_person_web,
+                kwargs={'user_to_display__username': self.user.username})
 
     @staticmethod
     def get_by_username(self, username):
