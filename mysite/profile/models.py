@@ -171,6 +171,9 @@ class Person(models.Model):
         return reverse(mysite.profile.views.display_person_web,
                 kwargs={'user_to_display__username': self.user.username})
 
+    @staticmethod
+    def get_by_username(self, username):
+        return Person.objects.get(user__username=username)
     # }}}
 
 def create_profile_when_user_created(instance, created, *args, **kwargs):
