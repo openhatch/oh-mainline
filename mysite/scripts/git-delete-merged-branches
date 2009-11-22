@@ -1,0 +1,2 @@
+#!/bin/bash
+for branch in `git branch --merge`; do git branch -d $branch; done
