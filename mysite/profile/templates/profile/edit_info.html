@@ -1,6 +1,6 @@
         {% if info_edit_mode %}
         <form name='edit-tags'
-            action='/people/info/edit/do'
+            action='{% url mysite.profile.views.edit_person_info %}'
             method='POST'>
             <h4>(e.g., c++, lambda calculus, juggling)</h4>
             <h4>understands:</h4>
@@ -58,3 +58,4 @@
         {% endif %}
         {% endif %}
 
+{# vim: set filetype=htmldjango: #}

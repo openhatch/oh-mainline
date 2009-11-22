@@ -445,13 +445,21 @@ def edit_person_info(request):
         for tag_text in new_tag_texts_for_this_type:
             if not tag_text.strip(): # Skip blanks
                 continue
-            new_tag, _ = Tag.objects.get_or_create(
-                    tag_type=tag_type, text=tag_text)
+
+            # We used to employ Tag.objects.get_or_create here,
+            # but that is case-insensitive, which means that
+            # the person will be assigned tags with a potentially wrong
+            # case. So we have to use a "try, get, except, create" sequence.
+            tag_fields = dict(tag_type=tag_type, text=tag_text)
+            try:
+                tag = Tag.objects.get(**tag_fields)
+            except Tag.DoesNotExist:
+                tag = Tag(**tag_fields)
+                tag.save()
             new_link, _ = Link_Person_Tag.objects.get_or_create(
                     tag=new_tag, person=person)
             
-    return HttpResponseRedirect('/people/%s/' %
-                                urllib.quote(request.user.username))
+            return HttpResponseRedirect(person.profile_url)
 
     # FIXME: This is racey. Only one of these functions should run at once.
     # }}}

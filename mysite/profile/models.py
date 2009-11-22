@@ -165,6 +165,11 @@ class Person(models.Model):
             scaled_down = get_image_data_scaled(self.photo.file.read(), width)
             self.photo_thumbnail.save('', ContentFile(scaled_down))
 
+    @property
+    def profile_url(self):
+        return reverse(mysite.profile.views.display_person_web,
+                kwargs={'user_to_display__username': self.user.username)
+
     # }}}
 
 def create_profile_when_user_created(instance, created, *args, **kwargs):
