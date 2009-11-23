@@ -65,13 +65,8 @@ def get_bugs_by_query_words(query_words, facets={}):
             Q(description__iregex=whole_word) |
             Q(project__name__iregex=whole_word)) # 'firefox' grabs 'mozilla fx'.
 
-    # Sort
-    bugs = bugs.order_by('-good_for_newcomers', '-last_touched')
-    # Minus sign: reverse order
-    # Minus good for newcomers: this means true values (like 1) appear before false values (like 0)
-    # Minus last touched: Old bugs last.
-
     return bugs
+
 
 def fetch_bugs(request):
     # {{{
@@ -102,8 +97,14 @@ def fetch_bugs(request):
             data['active_facets'][facet] = request.GET.get(facet)
 
     if query or data['active_facets']:
-        bugs = get_bugs_by_query_words(query_words, 
-                facets=data['active_facets'])
+        bugs = get_bugs_by_query_words(query_words, facets=data['active_facets'])
+
+        # Sort
+        bugs = bugs.order_by('-good_for_newcomers', '-last_touched')
+        # Minus sign: reverse order
+        # Minus good for newcomers: this means true values
+        # (like 1) appear before false values (like 0)
+        # Minus last touched: Old bugs last.
 
         total_bug_count = bugs.count()
 

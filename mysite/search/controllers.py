@@ -15,9 +15,8 @@ def discover_available_facets(query_words=[]):
     ret = {}
     ret['Language'] = dict()
 
-    language_columns = mysite.search.models.Project.objects.all().only('language')
-    distinct_language_columns = language_columns.distinct().values('language')
-    languages = [x['language'] for x in distinct_language_columns]
+    distinct_language_columns = bugs.values('project__language').distinct()
+    languages = [x['project__language'] for x in distinct_language_columns]
     for lang in languages:
         ret['Language'][lang] = bugs.filter(project__language=lang).count()
 
