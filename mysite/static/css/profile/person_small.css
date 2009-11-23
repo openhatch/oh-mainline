@@ -1,0 +1,19 @@
+
+    li.person_small a {
+        margin: 0 20px 10px 0;
+        float: left;
+        height: 51px;
+        width: 200px;
+        overflow: hidden;
+    }
+    li.person_small img {
+        float: left;
+        margin-right: 15px;
+        width: 40px;
+    }
+    li.person_small li a span {
+        width: 145px;
+        float: left;
+        padding-top: 15px;
+    }
+
