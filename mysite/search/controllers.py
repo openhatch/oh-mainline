@@ -13,15 +13,12 @@ def discover_available_facets(query_words=[]):
 
     # The languages facet is based on the project languages, "for now"
     ret = {}
-    ret['Language'] = collections.defaultdict(int)
-    bugs = bugs.only('project').distinct()
-    for b in bugs:
-        ret['Language'][b.project.language] = 0 # This is to be used for the count. A a a.
+    ret['Language'] = dict()
 
-    #for bug in bugs:
-    #   ret['Language'][bug.project.language] += 1
-
-    # convert from defaultdict so items will work in dj templates.
-    ret['Language'] = dict(ret['Language']) 
+    language_columns = mysite.search.models.Project.objects.all().only('language')
+    distinct_language_columns = language_columns.distinct().values('language')
+    languages = [x['language'] for x in distinct_language_columns]
+    for lang in languages:
+        ret['Language'][lang] = bugs.filter(project__language=lang).count()
 
     return ret
