@@ -49,7 +49,7 @@ class Project(models.Model):
         ret.save()
         return ret
 
-    name = models.CharField(max_length=200, unique = True)
+    name = models.CharField(max_length=200, unique=True)
     language = models.CharField(max_length=200)
 
     # FIXME: Remove this field and update fixtures.
