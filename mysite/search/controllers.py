@@ -14,9 +14,9 @@ def discover_available_facets(query_words=[]):
     # The languages facet is based on the project languages, "for now"
     ret = {}
     ret['Language'] = collections.defaultdict(int)
-    projects = bugs.only('project').distinct()
-    for p in projects:
-        ret['Language'][p.language] = 0 # This is to be used for the count. A a a.
+    bugs = bugs.only('project').distinct()
+    for b in bugs:
+        ret['Language'][b.project.language] = 0 # This is to be used for the count. A a a.
 
     #for bug in bugs:
     #   ret['Language'][bug.project.language] += 1
