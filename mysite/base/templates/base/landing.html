@@ -66,10 +66,9 @@ Home
         <h3>Collaborators</h3>
     </div>
     <div class='body'>
-        {% for pf_entry in the_user.get_profile.get_published_portfolio_entries %}
-        {% show_other_contributors pf_entry.project the_user 4 %}
-        {% empty %}
-        Empty.
+        {{ the_user.get_profile.collaborators|pprint }}
+        {% for person in the_user.get_profile.collaborators %}
+        !
         {% endfor %}
     </div>
 </div>

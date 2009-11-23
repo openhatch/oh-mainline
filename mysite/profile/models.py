@@ -172,12 +172,22 @@ class Person(models.Model):
             self.photo_thumbnail.save('', ContentFile(scaled_down))
 
     @property
+    def collaborators(self):
+        projects = set([e.project for e in self.get_published_portfolio_entries()]); del e
+        infinity = 10000
+        collaborator_lists = [
+                p.get_n_other_contributors_than(n=infinity, person=self)
+                for p in projects]; del p
+        collaborators = set(mysite.customs.models.flatten(collaborator_lists))
+        return collaborators
+
+    @property
     def profile_url(self):
         return reverse(mysite.profile.views.display_person_web,
                 kwargs={'user_to_display__username': self.user.username})
 
     @staticmethod
-    def get_by_username(self, username):
+    def get_by_username(username):
         return Person.objects.get(user__username=username)
     # }}}
 
