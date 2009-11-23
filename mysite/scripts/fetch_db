@@ -1,1 +1,1 @@
-ssh oh /home/deploy/milestone-a/mysite/oh_mysqldump | pv | oh_mysql
+ssh oh /home/deploy/milestone-a/mysite/scripts/oh_mysqldump | pv | $(dirname $0)/oh_mysql

@@ -192,7 +192,10 @@ def highlight(text, phrases, ignore_case=None, word_boundary=None, class_name=No
     #highlighted = mark_safe(expr.sub(replace, text))
     # We changed this to:
     safe_text = make_text_safe(text)
-    highlighted = mark_safe(expr.sub(replace, safe_text))
+    if phrases:
+        highlighted = mark_safe(expr.sub(replace, safe_text))
+    else:
+        highlighted = mark_safe(safe_text)
     count = len(matches)
     return dict(original=text, highlighted=highlighted, hits=count)
 
