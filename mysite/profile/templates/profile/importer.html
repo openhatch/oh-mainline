@@ -57,7 +57,7 @@ Manage projects
         <style>.apologies p {margin-top: 0; }</style>
         <div class='apologies' style='font-size: 15pt; padding: 20px 115px; width: 670px; float: left; text-align: center;'><p>Hi! Here you can document your involvement with open source projects. Be proud of everything! From bug reports and translations to patches and commits to code repositories.</p><p style='font-size: 11pt;'>To find things to do in the open source community, use our <a href='/search/'>volunteer opportunity search engine.</a></p></div>
         <h4>Import links</h4>
-        <form id='importer' style='overflow: hidden; height: 40px;' class='submodule' name='import' method='POST'
+        <form id='importer' class='submodule' name='import' method='POST'
             action='{% url mysite.profile.views.prepare_data_import_attempts_do %}'>
             <div class='body'>
                 <div class='howto'>
@@ -66,7 +66,7 @@ Manage projects
                     Please enter the usernames or email addresses you use to contribute to FLOSS.
                     We'll find links to your activity and involvement in
                     various projects.
-                    <a taget="_blank" href="http://openhatch.org/blog/about-the-project-importer/">
+                    <a target="_blank" href="http://openhatch.org/blog/about-the-project-importer/">
                         How does it work?</a>
                     </p>
                     <p>
@@ -74,10 +74,10 @@ Manage projects
                         Suggest a data source</a>
                     </p>
                 </div>
-            </div>
-            <div class='foot'>
-                <input type='submit' value='Submit' id='submit_data_sources' />
-                <div id='progressbar'></div>
+                <div id='importer-form-footer'>
+                    <input type='submit' value='Submit' id='submit_data_sources' />
+                    <div id='progressbar'></div>
+                </div>
             </div>
         </form>
 
