@@ -449,5 +449,26 @@ class OhlohLogging(django.test.TestCase):
         self.assertEqual(error_dia.web_response.text, 'response text')
         self.assertEqual(error_dia.web_response.url, 'http://theurl.com/')
         self.assertEqual(error_dia.web_response.status, 200)
-                
+
+class RoundupBugTracker(django.test.TestCase):
+
+    # When we query for bugs, we'll get the empty list, as if they'd all
+    # magically been closed overnight.
+    @mock.patch('mysite.customs.models.RoundupBugTracker.get_remote_bug_ids_to_read',
+            mock.Mock(return_value=[]))
+    def test_delete_closed_bugs(self):
+        tracker = RoundupBugTracker(roundup_root_url = "http://bugs.python.org")
+        tracker.save()
+        old_bug = Bug.create_dummy(canonical_bug_link = "http://bugs.python.org/issue1")
+
+        # Before the grab, we've stored just one bug, with ID 1, in the DB. 
+        self.assertEqual(tracker.get_remote_bug_ids_already_stored, [1])
+
+        # This grab will use the patched out get_remote_bug_ids_to_read
+        tracker.grab()
+
+        # After a grab that returned zarro boogz,
+        # there are indeed zarro boogz in the DB.
+        self.assertFalse(Bug.all_bugs.all())
+        
 # vim: set nu:
