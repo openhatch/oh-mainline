@@ -442,15 +442,18 @@ def edit_person_info(request):
             link.delete()
 
         for tag_text in new_tag_texts_for_this_type:
-            if not tag_text.strip(): # Skip blanks
+            if not tag_text.strip(): # Don't save blank tags.
                 continue
-            new_tag, _ = Tag.objects.get_or_create(
-                    tag_type=tag_type, text=tag_text)
+
+            tag_text_case_sensitive_regex = r"^%s$" % re.escape(tag_text)
+            tag, _ = Tag.objects.get_or_create(
+                    text__regex=tag_text_case_sensitive_regex,
+                    tag_type=tag_type,
+                    defaults={'text': tag_text})
             new_link, _ = Link_Person_Tag.objects.get_or_create(
-                    tag=new_tag, person=person)
+                    tag=tag, person=person)
             
-    return HttpResponseRedirect('/people/%s/' %
-                                urllib.quote(request.user.username))
+    return HttpResponseRedirect(person.profile_url)
 
     # FIXME: This is racey. Only one of these functions should run at once.
     # }}}

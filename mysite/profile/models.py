@@ -9,6 +9,7 @@ from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
 from django.conf import settings
 from django.contrib.auth import SESSION_KEY, BACKEND_SESSION_KEY, load_backend
+from django.core.urlresolvers import reverse
 
 import datetime
 import sys
@@ -165,6 +166,14 @@ class Person(models.Model):
             scaled_down = get_image_data_scaled(self.photo.file.read(), width)
             self.photo_thumbnail.save('', ContentFile(scaled_down))
 
+    @property
+    def profile_url(self):
+        return reverse(mysite.profile.views.display_person_web,
+                kwargs={'user_to_display__username': self.user.username})
+
+    @staticmethod
+    def get_by_username(self, username):
+        return Person.objects.get(user__username=username)
     # }}}
 
 def create_profile_when_user_created(instance, created, *args, **kwargs):
@@ -329,6 +338,9 @@ class ProjectExp(models.Model):
 class TagType(models.Model):
     # {{{
     name = models.CharField(max_length=100)
+
+    def __unicode__(self):
+        return self.name
     # }}}
 
 class Tag(models.Model):
@@ -342,7 +354,7 @@ class Tag(models.Model):
         raise ValueError
 
     def __unicode__(self):
-        return "type='%s' text='%s'" % (self.tag_type.name, self.text)
+        return "%s: %s" % (self.tag_type.name, self.text)
     # }}}
 
 class Link_ProjectExp_Tag(models.Model):

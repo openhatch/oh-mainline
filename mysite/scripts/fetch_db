@@ -1,0 +1,1 @@
+ssh oh /home/deploy/milestone-a/mysite/oh_mysqldump | pv | oh_mysql
