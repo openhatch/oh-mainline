@@ -1,0 +1,2 @@
+#!/bin/bash
+rsync -avuz oh:~deploy/milestone-a/mysite/static/static/photos/profile-photos/. static/static/photos/profile-photos/.
