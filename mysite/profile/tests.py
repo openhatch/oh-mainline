@@ -777,7 +777,6 @@ class PersonalData(TwillTests):
         # Views where you can look at somebody else.
         stalking_view2args = {
                 mysite.profile.views.display_person_web: {'user_to_display__username': 'paulproteus'},
-                mysite.profile.views.projectexp_display: {'user_to_display__username': 'paulproteus', 'project__name': 'ccHost'},
                 }
 
         # Views where you look only at yourself.
