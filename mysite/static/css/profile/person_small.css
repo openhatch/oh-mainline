@@ -11,7 +11,7 @@
         margin-right: 15px;
         width: 40px;
     }
-    li.person_small li a span {
+    li.person_small a span {
         width: 145px;
         float: left;
         padding-top: 15px;

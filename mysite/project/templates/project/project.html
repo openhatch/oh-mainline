@@ -1,30 +1,16 @@
 {% extends 'base/one_column.html' %}
 
+{% block title %}
+{{ project.name }} - Contributors
+{% endblock title %}
+
 {% block css %}
 {{ block.super }}
 @import url('/static/css/profile/base.css');
+@import url('/static/css/profile/person_small.css');
 {% endblock css %}
 
 {% block main %}
-<style type='text/css'>
-    #contributors li a {
-        margin: 0 20px 10px 0;
-        float: left;
-        height: 51px;
-        width: 200px;
-        overflow: hidden;
-    }
-    #contributors img {
-        float: left;
-        margin-right: 15px;
-        width: 40px;
-    }
-    #contributors li a span {
-        width: 145px;
-        float: left;
-        padding-top: 15px;
-    }
-</style>
 <div class='module' id='contributors'>
     <div class='head'>
         <h3>Contributors to {{ project.name }}</h3>
@@ -32,12 +18,7 @@
     <div class='body'>
         <ul>
             {% for person in contributors %}
-            <li>
-            <a href='{% url mysite.profile.views.display_person_web person.user.username %}'>
-                <img src='{{ person.get_photo_thumbnail_url_or_default }}'>
-                <span>{{ person.get_full_name_or_username }}</span>
-            </a>
-            </li>
+            {% include 'profile/person_small.html' %}
             {% endfor %}
         </ul>
     </div>

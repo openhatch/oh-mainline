@@ -173,7 +173,7 @@ class Person(models.Model):
             scaled_down = get_image_data_scaled(self.photo.file.read(), width)
             self.photo_thumbnail.save('', ContentFile(scaled_down))
 
-    def get_collaborators_for_landing_page(self, n=16):
+    def get_collaborators_for_landing_page(self, n=9):
         projects = set([e.project for e in self.get_published_portfolio_entries()]); del e
         infinity = 10000
         collaborator_lists = [
