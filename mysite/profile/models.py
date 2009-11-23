@@ -176,9 +176,12 @@ class Person(models.Model):
     def get_collaborators_for_landing_page(self, n=9):
         projects = set([e.project for e in self.get_published_portfolio_entries()]); del e
         infinity = 10000
-        collaborator_lists = [
-                random.sample(p.get_n_other_contributors_than(n=infinity, person=self), n)
-                for p in projects]; del p
+        collaborator_lists = []
+        for project in projects:
+            people = project.get_n_other_contributors_than(n=infinity, person=self)
+            people = random.sample(people, min(n, len(people)))
+            collaborator_lists.append(people)
+        del project
         round_robin = mysite.profile.controllers.roundrobin(*collaborator_lists)
         collaborators = set() 
         while len(collaborators) < n:
