@@ -66,9 +66,8 @@ Home
         <h3>Collaborators</h3>
     </div>
     <div class='body'>
-        {{ the_user.get_profile.collaborators|pprint }}
-        {% for person in the_user.get_profile.collaborators %}
-        !
+        {% for person in the_user.get_profile.get_collaborators_for_landing_page %}
+        <li><a href=''>{{ person.get_full_name_or_username }}</a></li>
         {% endfor %}
     </div>
 </div>

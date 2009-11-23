@@ -3,6 +3,7 @@
 from mysite.search.models import Project, Bug, get_image_data_scaled
 import mysite.customs.models
 from mysite.customs import ohloh
+import mysite.profile.controllers
 
 from django.db import models
 from django.contrib.auth.models import User
@@ -15,6 +16,7 @@ import datetime
 import sys
 import uuid
 import urllib
+import random
 
 def url2printably_short(url, CUTOFF=50):
     short_enough_pieces_so_far = []
@@ -171,14 +173,18 @@ class Person(models.Model):
             scaled_down = get_image_data_scaled(self.photo.file.read(), width)
             self.photo_thumbnail.save('', ContentFile(scaled_down))
 
-    @property
-    def collaborators(self):
+    def get_collaborators_for_landing_page(self, n=16):
         projects = set([e.project for e in self.get_published_portfolio_entries()]); del e
         infinity = 10000
         collaborator_lists = [
-                p.get_n_other_contributors_than(n=infinity, person=self)
+                random.sample(p.get_n_other_contributors_than(n=infinity, person=self), n)
                 for p in projects]; del p
-        collaborators = set(mysite.customs.models.flatten(collaborator_lists))
+        round_robin = mysite.profile.controllers.roundrobin(*collaborator_lists)
+        collaborators = set() 
+        while len(collaborators) < n:
+            collaborators.add(round_robin.next())
+        collaborators = list(collaborators)
+        random.shuffle(collaborators) # don't forget, this has a side effect and returns None
         return collaborators
 
     @property
