@@ -124,7 +124,10 @@ class RoundupBugTracker(models.Model):
                 yield int(row[0])
 
     def get_remote_bug_ids_already_stored(self):
-        return [] #FIX. ME.
+        bugs = mysite.search.models.Bug.all_bugs.filter(
+                canonical_bug_link__contains=self.roundup_root_url)
+        bug_ids = [self.get_remote_bug_id(bug) for bug in bugs]
+        return bug_ids
 
     def get_all_submitter_realname_pairs(self, tree):
         '''Input: the tree
@@ -144,6 +147,9 @@ class RoundupBugTracker(models.Model):
         except KeyError:
             return None
 
+    def get_remote_bug_id(self, bug):
+        return int(bug.canonical_bug_link.split(self.roundup_root_url + "/issue")[1])
+
     def create_bug_object_for_remote_bug_id(self, remote_bug_id):
         '''Create but don't save a bug.'''
         remote_bug_url = self.roundup_root_url + "/issue%d" % remote_bug_id
@@ -161,8 +167,8 @@ class RoundupBugTracker(models.Model):
         bug.last_touched = self.str2datetime_obj(last_touched)
         bug.canonical_bug_link = remote_bug_url
         bug.good_for_newcomers = self.my_bugs_are_always_good_for_newcomers 
-        bug.status = 'open' # True based on its being in the CSV!
-        bug.looks_closed = False # False, same reason as above.
+        bug.status = metadata_dict['Status'] 
+        bug.looks_closed = (metadata_dict['Status'] == 'closed')
         bug.title = metadata_dict['Title'] 
         bug.importance = metadata_dict['Priority']
 
@@ -187,7 +193,8 @@ class RoundupBugTracker(models.Model):
         """Loops over the Python bug tracker's easy bugs and stores/updates them in our DB.
         For now, just grab the easy bugs to be kind to their servers."""
 
-        bug_ids = flatten([self.get_remote_bug_ids_to_read(), self.get_remote_bug_ids_already_stored()])
+        bug_ids = flatten([self.get_remote_bug_ids_to_read(),
+                self.get_remote_bug_ids_already_stored()])
 
         for bug_id in bug_ids:
             print bug_id

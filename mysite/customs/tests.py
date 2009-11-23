@@ -33,6 +33,8 @@ import lp_grabber
 from mysite.profile.tasks import FetchPersonDataFromOhloh
 import mysite.customs.miro
 import mysite.customs.feed
+
+import mysite.customs.models
 # }}}
 
 # Mocked out browser.open
@@ -449,5 +451,25 @@ class OhlohLogging(django.test.TestCase):
         self.assertEqual(error_dia.web_response.text, 'response text')
         self.assertEqual(error_dia.web_response.url, 'http://theurl.com/')
         self.assertEqual(error_dia.web_response.status, 200)
-                
+
+class RoundupGrab(django.test.TestCase):
+
+    closed_bug_filename = os.path.join(settings.MEDIA_ROOT, 'sample-data',
+            "closed-python-bug.html")
+
+    # When we query for bugs, we'll always get bugs with Status=closed.
+    # That's because we're patching out the method that returns a dictionary
+    # of the bug's metadata. That dictionary will always contain 'closed' at 'Status'.
+    @mock.patch('urllib2.urlopen',
+            mock.Mock(return_value=open(closed_bug_filename)))
+    def test_scrape_bug_status_and_mark_as_closed(self):
+        roundup_project = Project.create_dummy()
+        tracker = mysite.customs.models.RoundupBugTracker(
+                project=roundup_project,
+                roundup_root_url="http://example.org")
+        tracker.save()
+
+        bug = tracker.create_bug_object_for_remote_bug_id(1)
+        self.assert_(bug.looks_closed)
+
 # vim: set nu:
