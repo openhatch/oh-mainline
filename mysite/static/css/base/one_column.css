@@ -21,7 +21,6 @@
     #main .equal-width .submodule { width: 45%; } 
         #main .equal-width .submodule .head { width: 90.5%; }
             #main .equal-width .submodule .head h3,
-        #main .equal-width .submodule .body { width: 90.5%; }
-        #main .equal-width .submodule .foot { width: 91%; }
+        #main .equal-width .submodule .body, #main .equal-width .submodule .foot { width: 90.5%; }
 
 #main .submodule.left { margin-right: 20px; }

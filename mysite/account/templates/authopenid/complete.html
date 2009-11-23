@@ -5,14 +5,14 @@
 Associate your OpenID 
 {% endblock title %}
 
+{% block css %}
+{{ block.super }}
+@import url('/static/css/account/auth.css');
+.errorlist li { width: 90%; }
+{% endblock css %}
+
 {% block main %}
 <div class='module' id='openid-associate'>
-
-    <style type='text/css'>
-        .errorlist li {
-            width: 90%;
-        }
-    </style>
 
     <div class='head'>
         <h3>{% trans "Associate your OpenID with an OpenHatch account." %}</h3>
@@ -20,55 +20,38 @@ Associate your OpenID
 
     <div class='body contains-submodules two-columns equal-width'>
 
-            <div class='body'>
-                {% blocktrans %}
-                <p>If you're joining <strong>OpenHatch</strong>, tell us what username you want to use for your new account. If you're already a member, associate with your existing account.</p>
-                {% endblocktrans %}
+        <div class='body'>
+            {% blocktrans %}
+            <p>If you're joining <strong>OpenHatch</strong>, tell us what username you want to use for your new account. If you're already a member, associate with your existing account.</p>
+            {% endblocktrans %}
+        </div>
+
+        <div class='left submodule'>
+            <div class='head'>
+                <h3>{% trans "A new account" %}</h3>
             </div>
-
-            <form name="fregister" action="{% url user_register %}" method="POST" class="login left submodule">
-                <div class='head'>
-                    <h3>{% trans "A new account" %}</h3>
-                </div>
-                <div class='body'>
+            <div class='body'>
+                <form name="fregister" action="{% url user_register %}"
+                    method="POST" class="login">
                     <input type="hidden" name="next" value="{{ next }}" />
-                    <style>
-                        .form-row {
-                            clear: left;
-                        }
-                    </style>
-                    {% for field in form1 %}
-                    <div class='form-row'>
-                        {{ field.errors }}
-                        <label>{{ field.label }}</label><br />
-                        {{ field }}
-                    </div>
-                    {% endfor %}
-                </div>
-                <div class='foot'>
-                    <div class="submit-row"><input type="submit" name="bnewaccount" value="Create account"></div>
-                </div>
-            </form>
-
-            <form name="fverify" action="{% url user_register %}" method="POST" class='login right submodule'>
-                <div class='head'>
-                    <h3>{% trans "An existing account" %}</h3>
-                </div>
-                <div class='body'>
+                    {{ form1.as_p }}
+                    <p><input type="submit" name="bnewaccount" value="Create a new account"></p>
+                </form>
+            </div>
+        </div>
+        <div class='right submodule'>
+            <div class='head'>
+                <h3>{% trans "An existing account" %}</h3>
+            </div>
+            <div class='body'>
+                <form name="fverify" action="{% url user_register %}" method="POST" class='login '>
                     {{ form2.non_field_errors }}
                     <input type="hidden" name="next" value="{{ next }}" />
-                    {% for field in form2 %}
-                    <div class='form-row'>
-                        {{ field.errors }}
-                        <label>{{ field.label }}</label><br />
-                        {{ field }}
-                    </div>
-                    {% endfor %}
-                </div>
-                <div class='foot'>
-                    <div class="submit-row"><input type="submit" name="bverify" value="Verify"></div>
-                </div>
-            </form>
+                    {{ form2.as_p }}
+                    <p><input type="submit" name="bverify" value="Associate"></p>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock main %}
