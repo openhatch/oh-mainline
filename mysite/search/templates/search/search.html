@@ -43,7 +43,7 @@ Search bugs
             {% for value, count in value2count.items %}
             {% if value %}
             <li><a href='?q={{ q|urlencode }}&{{facet_name|urlencode}}={{value|urlencode}}'>
-                {{ value }} ({{ count }})
+                {{ value }} 
             </a></li>
             {% endif %}
             {% endfor %}
