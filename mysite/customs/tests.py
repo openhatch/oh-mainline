@@ -457,9 +457,9 @@ class RoundupBugTracker(django.test.TestCase):
     @mock.patch('mysite.customs.models.RoundupBugTracker.get_remote_bug_ids_to_read',
             mock.Mock(return_value=[]))
     def test_delete_closed_bugs(self):
-        tracker = RoundupBugTracker(roundup_root_url = "http://bugs.python.org")
+        tracker = RoundupBugTracker(roundup_root_url = "http://example.org")
         tracker.save()
-        old_bug = Bug.create_dummy(canonical_bug_link = "http://bugs.python.org/issue1")
+        old_bug = Bug.create_dummy(canonical_bug_link = "http://example.org/issue1")
 
         # Before the grab, we've stored just one bug, with ID 1, in the DB. 
         self.assertEqual(tracker.get_remote_bug_ids_already_stored, [1])
