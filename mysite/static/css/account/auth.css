@@ -1,43 +1,9 @@
-form {
-    margin-bottom: 10px;
-    float: left;
-    width: 420px;
-}
-form p, .form-row, form li {
-    float: left;
-    width: 400px;
-    list-style: none;
-}
-label {
-    float: left;
-    width: 95%;
-    padding-bottom: 5px;
-}
-input[type='text'], input[type='file'], input[type='password'] {
-    padding: 10px;
-    float: left;
-    width: 220px;
-}
-input[type='file'] {
-    margin: 10px 0;
-    width: 200px;
-}
-input[type='submit'] {
-    padding: 7px;
-    font-size: 12pt;
-    float: right;
-}
-#login .text, #signup .text {
-    font-size: .7em;
-    width: 100px;
-    margin-right: 6px;
-}
-
-#login .button, #signup .button {
-    font-size: .7em;
-    margin: -17px 6px 0 0;
-}
-input[type='checkbox'] {
-    position: relative;
-    top: 10px;
-}
+form { float: left; }
+form p, .form-row, form li { float: left; width: 90%; list-style: none; }
+label { float: left; text-align: right; width: 30%; margin-right: 10px; padding-top: 13px; }
+input[type='text'], input[type='file'], input[type='password'] { padding: 8px; float: left; width: 60%; }
+input[type='file'] { margin: 10px 0; width: 200px; }
+input[type='submit'] { padding: 7px; font-size: 12pt; float: right; }
+#login .text, #signup .text { font-size: .7em; width: 100px; margin-right: 6px; }
+#login .button, #signup .button { font-size: .7em; margin: -17px 6px 0 0; }
+input[type='checkbox'] { position: relative; top: 10px; }

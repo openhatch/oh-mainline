@@ -8,9 +8,8 @@ Log in
 {{ block.super }}
 @import url('/static/css/account/auth.css');
 @import url('/static/openid/css/openid.css');
-form {
-    width: 500px;
-}
+form { width: 500px; }
+.login-links li { list-style: square; float: left; width: 95%; margin-top: 5px; margin-left: 15px; }
 {% endblock css %}
 
 {% block main %}
@@ -24,12 +23,11 @@ form {
         </div>
         <ul class='login-links' style='float: right; width: 300px; padding: 16px; padding-bottom: 16px; border-radius: 8px; -moz-border-radius: 8px; background-color: #f4f4f4;'>
             <h4 style='width: 95%;'>Relatedly</h4>
-            <style>.login-links li { list-style: square; float: left; width: 95%; margin-top: 5px; margin-left: 15px; }</style>
             <li><a style='font-weight: bold;'
                 href='/blog/2009/why-we-support-openid'>
                 What is OpenID?
             </a></li>
-            <li><a href='{% url login_pwd %}?next={{ next | urlencode }}'>
+            <li><a href='{% url oh_login_pwd %}?next={{ next|urlencode }}'>
                 Sign in with a password
             </a></li>
         </ul>
