@@ -6,27 +6,9 @@ $.fn.toggleText = function(text1, text2) {
 $.fn.toggleExpanded = function() {
     //console.log(this, 'toggleExpanded');
     this.toggleClass('expanded');
-    this.scrollIntoView(); 
     return this;
 };
 // Return the available content height space in browser window
-
-// FIXME: This doesn't handle a bottom scrollbar well.
-$.viewportHeight = function() { var h = 0; if (typeof(window.innerHeight) == "number") { h = window.innerHeight; } else { if (document.documentElement && document.documentElement.clientHeight) { h = document.documentElement.clientHeight; } else { if (document.body && document.body.clientHeight) { h = document.body.clientHeight; } } } return h; }
-
-$.fn.scrollIntoView = function() {
-    elemTop = this.offset().top;
-    elemBottom = elemTop + this.height();
-    scrollTop = $(document).scrollTop();
-    viewportHeight = $.viewportHeight();
-    scrollBottom = scrollTop + viewportHeight;
-    if (elemTop < scrollTop)  {
-        $.scrollTo(this, 0, {offset: -5});
-    }
-    if (elemBottom > scrollBottom) {
-        $.scrollTo(elemBottom - viewportHeight + 10);
-    }
-}
 
 SearchResults = {}
 
@@ -262,9 +244,7 @@ SearchResults.lightSearchResult = function(resultIndex) {
         $gg = $('.gewgaws li');
         //console.debug($gg);
         $gg.removeClass('lit-up')
-        $gg.eq(resultIndex).addClass('lit-up').scrollIntoView();
-        // FIXME: Automatically scroll when search result is expanded
-        // such that its content is off-screen.
+        $gg.eq(resultIndex).addClass('lit-up');
     }
 };
 
