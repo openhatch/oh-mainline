@@ -167,8 +167,8 @@ class RoundupBugTracker(models.Model):
         bug.last_touched = self.str2datetime_obj(last_touched)
         bug.canonical_bug_link = remote_bug_url
         bug.good_for_newcomers = self.my_bugs_are_always_good_for_newcomers 
-        bug.status = 'open' # True based on its being in the CSV!
-        bug.looks_closed = False # False, same reason as above.
+        bug.status = metadata_dict['Status'] 
+        bug.looks_closed = (metadata_dict['Status'] == 'closed')
         bug.title = metadata_dict['Title'] 
         bug.importance = metadata_dict['Priority']
 
