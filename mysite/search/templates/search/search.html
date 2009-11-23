@@ -21,7 +21,11 @@ Search bugs
 {% block sidebar %}
 <div id='filters' class='box module'>
     <h4 style='margin-bottom: 10px;'>
+        {% if q %}
+        Filter results for <strong>{{ q }}</strong>:
+        {% else %}
         Browse by&hellip;
+        {% endif %}
     </h4>
     <ul id='facets'>
         {% for facet_name, value2count in all_facets.items %}
@@ -35,7 +39,7 @@ Search bugs
         {% endcomment %}
         <li>
         {% ifequal facet_name 'Language' %}
-        Main project language 
+        by main project language 
         {% else %}
         {{ facet_name }}
         {% endifequal %}
@@ -51,6 +55,9 @@ Search bugs
         </li>
         {% endfor %}
     </ul>
+    {% if q %}
+    <a href='./' style='display: block; margin-bottom: 10px;'>&laquo; Back to browsing</a>
+    {% endif %}
     {% if the_user.is_authenticated %}
     {% if suggestions %}
     <h4>
