@@ -53,16 +53,14 @@ h1 a:hover {
     border-radius: 8px;
 }
 
-.module > .foot,
-.submodule > .foot {
+.module > .foot, .submodule > .foot {
     float: left;
-    border-top: 1px solid #eee;
+    border-top: 1px solid #e4e4e4;
     padding: 15px;
+    background-color: #f4f4f4; 
 }
 
-.module > .body.contains-submodules {
-    background: #fff url('/static/images/motif.png');
-}
+.module > .body.contains-submodules { background: #fff url('/static/images/motif.png'); }
 
 .submodule {
     background-color: #fff;
@@ -77,14 +75,11 @@ h1 a:hover {
     float: left;
     padding: 10px 20px;
     background-color: #f4f4f4;
+    border-bottom: 1px solid #e4e4e4;
 }
 
 .submodule > .body {
     background-color: #fff;
-}
-
-.submodule > .foot {
-    border-top: 0;
 }
 
 ul {
