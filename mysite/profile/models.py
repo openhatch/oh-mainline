@@ -184,7 +184,10 @@ class Person(models.Model):
         round_robin = mysite.profile.controllers.roundrobin(*collaborator_lists)
         collaborators = set() 
         while len(collaborators) < n:
-            collaborators.add(round_robin.next())
+            try:
+                collaborators.add(round_robin.next())
+            except StopIteration:
+                break
         collaborators = list(collaborators)
         random.shuffle(collaborators) # don't forget, this has a side effect and returns None
         return collaborators
