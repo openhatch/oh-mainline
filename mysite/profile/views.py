@@ -755,7 +755,6 @@ def people_matching(property, value):
     sorted_peeps = sorted(set(peeps), key = lambda thing: (thing.user.first_name, thing.user.last_name))
     return sorted_peeps
 
-@login_required
 @view
 def display_list_of_people_who_match_some_search(request, property, value):
     '''Property is the "tag name", and "value" is the text in it.'''
