@@ -20,25 +20,16 @@
 #openid_btns a { float: left; }
 #openid_btns a:hover { background-color: #ffc; }
 #openid_btns { clear: both; }
-#openid_btns .small {
-    float: right;
-    width: 90px;
-}
-#openid_btns .large {
-    width: 215px;
-    float: left;
-}
-#openid_btns .large a {
-    float: left;
-    margin-right: 6px;
-    margin-bottom: 6px;
-}
+#openid_btns .small { float: right; width: 102px; }
+#openid_btns .large { width: 206px; float: left; }
+#openid_btns a { border: 2px solid #fff; }
+#openid_btns .large a { float: left; margin-right: 6px; margin-bottom: 6px; }
 #openid_highlight .openid_large_btn,
 #openid_highlight .openid_small_btn {
     border-color: #ffd72d; 
 }
 .openid_large_btn {
-    width: 100px;
+    width: 93px;
     height: 60px;
     margin: 0 6px px 0;
     float: left;
@@ -67,4 +58,6 @@ fieldset {
 legend {
     font-size: 13pt;
 }
+
+#openid_submit { margin-left: 0; }
 

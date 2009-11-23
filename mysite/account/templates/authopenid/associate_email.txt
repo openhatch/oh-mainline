@@ -1,16 +1,26 @@
-Hello!
+Welcome. Welcome to OpenHatch.
 
-You've just joined OpenHatch, a community of open source
-programmers talking about what they know and finding opportunities
-to make a difference with their skills.
+We're an online community of contributors to free and open source software.
 
-We appreciate you signing up while the site is still in alpha. Reply
-to this mail with any feedback.
+Be sure to check out our tools:
+
+Start a profile to keep track of (and show off) your FOSS contributions:
+<http://openhatch.org/+portfolio/editor>
+
+Search across open source land for the bug with your name on it: <http://openhatch.org/search/>
+
+Who else is in the community? <http://openhatch.org/people/>
 
 Keep in touch!
 
-The OpenHatch team - Asheesh, Raphael, and Karen.
+The OpenHatch team 
 
+--
+OpenHatch, the open source involvement engine
+Get involved: <http://openhatch.org>
+We blog: <http://openhatch.org/blog>
+We feed you: <http://openhatch.org/blog/feed>
+Dents: <http://identi.ca/openhatchery>
+Tweets: <http://twitter.com/openhatchery>
 -- 
 The grass is always greener on the other side of your sunglasses.
-

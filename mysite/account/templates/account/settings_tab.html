@@ -4,17 +4,16 @@
 {% comment %}
 NB: All forms in pages that descend from this have the same name.
 {% endcomment %}
-<form name='a_settings_tab_form'
-    class='submodule fat' method='POST'
-    action={% block form_action %}{% endblock %}>
+<div class='submodule fat'>
     <div class='head'>
         <h3>{% block submodule_head %}{% endblock %}</h3>
     </div>
     <div class='body'>
-        {% block submodule_body %}{% endblock %}
+        <form name='a_settings_tab_form' method='POST'
+            action={% block form_action %}{% endblock %}>
+            {% block submodule_body %}{% endblock %}
+            <p> <input type='submit' value='{% block submit_button_text %}Save{% endblock %}' /> </p>
+        </form>
     </div>
-    <div class='foot'>
-        <input type='submit' value='{% block submit_button_text %}Save{% endblock %}' />
-    </div>
-</form>
+</div>
 {% endblock settings_main %}
