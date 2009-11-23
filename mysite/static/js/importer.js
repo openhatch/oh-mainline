@@ -807,8 +807,12 @@ Importer.Inputs.init = function () {
     Importer.Inputs.getInputs().hint();
 };
 Importer.Inputs.makeNew = function () {
-    var $form = $('form#importer .body');
-    var index = $form.find('.query').size();
+
+    // Don't make more than three. FIXME: Make this work for n > 3.
+    //if ($('#importer .query').size() > 2) return; 
+
+    var $inputs_go_here = $('form#importer .body');
+    var index = $inputs_go_here.find('.query').size();
     var extraClass = (index % 2 == 0) ? "" : " odd";
     var html = ""
         + "<div id='query_$INDEX' class='query"+ extraClass +"'>"
@@ -823,9 +827,11 @@ Importer.Inputs.makeNew = function () {
 
     $input_container = $(html);
     
-    $input_container.appendTo($form);
+    $('#importer-form-footer').before($input_container);
 
     Importer.Inputs.bindEventHandlers();
+
+    return false;
 };
 Importer.Inputs.keydownHandler = function () {
     $input = $(this);
@@ -958,7 +964,7 @@ SaveAllButton.saveAll = function() {
 $(function () {
         $('#importer .howto h5 a').click(function() {
             var $imp = $('#importer');
-            $imp.css('height', $imp.css('height') == 'auto' ? '40px' : 'auto');
+            $imp.toggleClass('expanded');
             return false;
             });
         });

@@ -11,21 +11,21 @@
 /*--------------*
  |   IMPORTER   |
  *--------------*/
-#importer { background: #798189 url('/static/images/ship.png') top right no-repeat; margin-bottom: 20px; padding: 20px; width: 865px; }
+#importer { overflow: hidden; height: 40px; background: #798189 url('/static/images/ship.png') top right no-repeat; margin-bottom: 20px; padding: 20px; width: 865px; }
+#importer.expanded { overflow: visible; height: auto; }
 #importer .head { width: 865px; }
-#importer .howto { float: left; margin-right: 20px; width: 400px; }
+#importer .howto { float: left; margin-right: 20px; width: 350px; }
 #importer input[type='text'] { font-size: 15pt; width: 425px; }
-#importer input[type='text'].blur { color: #999; }
-#importer .query { float: right; }
-#importer .query [name='identifier_0'] { margin-top: -70px; }
-#importer .query [name='identifier_1'] { margin-top: -20px; }
-#importer p { color: #f4f4ff; margin-top: 40px; }
-#importer p a { color: pink; font-weight: bold; }
+    #importer input[type='text'].blur { color: #999; }
+#importer .query { float: right; margin-bottom: 5px; }
+    #importer #query_0 { margin-top: 130px; }
+#importer p { float: left; color: #f4f4ff; margin-top: 40px; }
+    #importer p a { color: pink; font-weight: bold; }
 #main #importer .body { padding: 10px; background-color: transparent; }
-#main #importer .foot { float: right; padding: 0; padding-top: 10px; width: 440px; }
-#main #importer .foot { float: right; padding: 0; padding-top: 10px; width: 440px; }
-#importer input[type='submit'] { float: right; height: 25px; }
-#progressbar { display: none; height: 22px; width: 350px; }
+#importer input[type='submit'] { display: none; float: left; padding: 4px 8px; }
+    #importer.expanded input[type='submit'] { display: block; }
+#importer-form-footer { margin-top: 0; float: right; width: 441px; } 
+#progressbar { display: none; float: right; margin-top: 4px; margin-left: 12px; height: 22px; width: 300px; }
 #progressbar.working .ui-progressbar-value { background-image: url('/static/css/jquery-ui-lightness/images/pbar-ani.gif'); }
 
 /*----------------------*
