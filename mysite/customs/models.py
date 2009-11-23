@@ -124,7 +124,10 @@ class RoundupBugTracker(models.Model):
                 yield int(row[0])
 
     def get_remote_bug_ids_already_stored(self):
-        return [] #FIX. ME.
+        bugs = mysite.search.models.Bug.all_bugs.filter(
+                canonical_bug_link__contains=self.roundup_root_url)
+        bug_ids = [self.get_remote_bug_id(bug) for bug in bugs]
+        return bug_ids
 
     def get_all_submitter_realname_pairs(self, tree):
         '''Input: the tree
@@ -143,6 +146,9 @@ class RoundupBugTracker(models.Model):
             return self.get_all_submitter_realname_pairs(tree)[submitter_username]
         except KeyError:
             return None
+
+    def get_remote_bug_id(self, bug):
+        return int(bug.canonical_bug_link.split(self.roundup_root_url + "/issue")[1])
 
     def create_bug_object_for_remote_bug_id(self, remote_bug_id):
         '''Create but don't save a bug.'''
@@ -187,7 +193,8 @@ class RoundupBugTracker(models.Model):
         """Loops over the Python bug tracker's easy bugs and stores/updates them in our DB.
         For now, just grab the easy bugs to be kind to their servers."""
 
-        bug_ids = flatten([self.get_remote_bug_ids_to_read(), self.get_remote_bug_ids_already_stored()])
+        bug_ids = flatten([self.get_remote_bug_ids_to_read(),
+                self.get_remote_bug_ids_already_stored()])
 
         for bug_id in bug_ids:
             print bug_id
