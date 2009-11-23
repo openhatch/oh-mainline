@@ -181,7 +181,6 @@ class Person(models.Model):
             people = project.get_n_other_contributors_than(n=infinity, person=self)
             people = random.sample(people, min(n, len(people)))
             collaborator_lists.append(people)
-        del project
         round_robin = mysite.profile.controllers.roundrobin(*collaborator_lists)
         collaborators = set() 
         while len(collaborators) < n:
