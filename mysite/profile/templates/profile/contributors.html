@@ -1,5 +1,6 @@
 {% load profile_extras %}
 {% load humanize %}
+
 {% if contributors %}
 <div class='other-contributors'>
     {% with project.get_contributors|length|add:"-1" as contributor_count %}
@@ -7,13 +8,8 @@
         pe{{contributors|pluralize:"rson's,ople've"}} collaborated with
         {% firstof user.first_name user.username %} on this project:</label>
     <ul>
-        {% for contributor in contributors %}
-        <li>
-        <a href='{% url mysite.profile.views.display_person_web contributor.user.username %}'>
-            <img src='{{ contributor.get_photo_thumbnail_url_or_default }}' />
-            {{ contributor.get_full_name_or_username }}
-        </a>
-        </li>
+        {% for person in contributors %}
+        {% include 'profile/person_small.html' %}
         {% endfor %}
     </ul>
     <a class='see-all'

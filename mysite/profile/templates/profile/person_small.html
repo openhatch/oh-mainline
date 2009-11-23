@@ -1,0 +1,6 @@
+        <li class='person_small'>
+            <a href='{{ person.profile_url }}'>
+                <img src='{{ person.get_photo_thumbnail_url_or_default }}' />
+                <span>{{ person.get_full_name_or_username }}</span>
+            </a>
+        </li>

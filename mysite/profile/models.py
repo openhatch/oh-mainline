@@ -3,6 +3,7 @@
 from mysite.search.models import Project, Bug, get_image_data_scaled
 import mysite.customs.models
 from mysite.customs import ohloh
+import mysite.profile.controllers
 
 from django.db import models
 from django.contrib.auth.models import User
@@ -15,6 +16,7 @@ import datetime
 import sys
 import uuid
 import urllib
+import random
 
 def url2printably_short(url, CUTOFF=50):
     short_enough_pieces_so_far = []
@@ -102,6 +104,11 @@ class Person(models.Model):
         else:
             return None
 
+    @models.permalink
+    def get_profile_url(self):
+        return reverse(mysite.profile.views.display_person_web,
+                {'user_to_display__username': self.user.username})
+
     def get_photo_thumbnail_url_or_default(self):
         try:
             return self.photo_thumbnail.url
@@ -166,13 +173,32 @@ class Person(models.Model):
             scaled_down = get_image_data_scaled(self.photo.file.read(), width)
             self.photo_thumbnail.save('', ContentFile(scaled_down))
 
+    def get_collaborators_for_landing_page(self, n=9):
+        projects = set([e.project for e in self.get_published_portfolio_entries()])
+        infinity = 10000
+        collaborator_lists = []
+        for project in projects:
+            people = project.get_n_other_contributors_than(n=infinity, person=self)
+            people = random.sample(people, min(n, len(people)))
+            collaborator_lists.append(people)
+        round_robin = mysite.profile.controllers.roundrobin(*collaborator_lists)
+        collaborators = set() 
+        while len(collaborators) < n:
+            try:
+                collaborators.add(round_robin.next())
+            except StopIteration:
+                break
+        collaborators = list(collaborators)
+        random.shuffle(collaborators) # don't forget, this has a side effect and returns None
+        return collaborators
+
     @property
     def profile_url(self):
         return reverse(mysite.profile.views.display_person_web,
                 kwargs={'user_to_display__username': self.user.username})
 
     @staticmethod
-    def get_by_username(self, username):
+    def get_by_username(username):
         return Person.objects.get(user__username=username)
     # }}}
 
