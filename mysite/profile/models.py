@@ -174,7 +174,7 @@ class Person(models.Model):
             self.photo_thumbnail.save('', ContentFile(scaled_down))
 
     def get_collaborators_for_landing_page(self, n=9):
-        projects = set([e.project for e in self.get_published_portfolio_entries()]); del e
+        projects = set([e.project for e in self.get_published_portfolio_entries()])
         infinity = 10000
         collaborator_lists = []
         for project in projects:
