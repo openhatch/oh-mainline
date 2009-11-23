@@ -22,9 +22,11 @@ Search bugs
 <div id='filters' class='box module'>
     <h4 style='margin-bottom: 10px;'>
         {% if q %}
+        {% if bunch_of_bugs %}
         Filter results for <strong>{{ q }}</strong>:
+        {% endif %}
         {% else %}
-        Browse by&hellip;
+        Browse&hellip;
         {% endif %}
     </h4>
     <ul id='facets'>
