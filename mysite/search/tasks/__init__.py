@@ -32,7 +32,22 @@ class GrabGnomeLoveBugs(PeriodicTask):
         logger.info("Started to grab GNOME Love bugs")
         mysite.customs.bugtrackers.gnome_love.grab()
 
+class GrabPythonBugs(PeriodicTask):
+    run_every = timedelta(days=1)
+    def run(self, **kwargs):
+        logger = self.get_logger(**kwargs)
+        logger.info("Started to grab GNOME Love bugs")
+        python_core, _ = Project.objects.get_or_create(name='Python', language='Python')
+        p, _ = RoundupBugTracker.objects.get_or_create(project=python_core)
+        p.include_these_roundup_bug_statuses = '1,3'
+        p.roundup_root_url = 'http://bugs.python.org'
+        p.csv_keyword = '6' # Only grab bugs marked "easy"
+        p.my_bugs_are_always_good_for_newcomers = True
+        p.save()
+        p.grab()
+
 
 tasks.register(GrabMiroBugs)
 tasks.register(GrabGnomeLoveBugs)
 tasks.register(GrabLaunchpadBugs)
+tasks.register(GrabPythonBugs)
