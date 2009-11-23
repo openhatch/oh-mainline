@@ -10,15 +10,16 @@
 
         {% comment %} FIXME Use django filter to remove whitespace {% endcomment %}
         {% if active_facets %}
-        {% for facet, value in active_facets.items %}
-        in 
-        <style type='text/css'>.active_facet_value {background-color: #dfd; padding: 0 2px; }</style>
-        <span class='active_facet_value'>projects primarily coded in
-            <strong>{{value}}</strong>
-            <a href='?q={{q}}'>[x]</a></span>
-        </li>
-        .
-        {% endfor %}
+            {% for facet, value in active_facets.items %}
+            in 
+            <style type='text/css'>.active_facet_value
+                {background-color: #dfd; padding: 0 2px; }</style>
+            <span class='active_facet_value'>projects primarily coded in
+                <strong>{{value}}</strong>
+                <a href='?q={{q}}'>[x]</a></span>
+            </li>
+            .
+            {% endfor %}
         {% endif %}
 
         {% if bunch_of_bugs %}
@@ -26,6 +27,29 @@
         <span id='results-summary-start'>{{ start }}</span> to
         <span id='results-summary-end'>{{ end }}</span> of 
         {{ total_bug_count }}.
+        {% else %}
+        {% if q %}
+
+        {% ifnotequal start 1 %}
+        <p class='no-opps'>
+        You requested results #{{ start }} to #{{ end }} for the query
+        <strong><tt>{{ q }}</tt></strong>, but there are only
+        {{ total_bug_count }} results in total. So there are none
+        to display here, you see.
+        </p>
+        {% else %}
+        <p style='font-size: 10pt; margin-top: 10px;'>
+        No results.
+        {% if active_facets %}
+        <a href='?q={{q|urlencode}}'>See all results matching <strong>{{ q }}</strong>.</a>
+        {% endif %}
+        </p>
+        {% endifnotequal %}
+
+        {% else %}
+        <!-- No search query -->
+        {% endif %}
+
         {% endif %}
     </span>
 

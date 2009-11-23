@@ -8,7 +8,7 @@ Search bugs
 {% block css %}
 {{ block.super }}
 {% if not bunch_of_bugs %}
-.search-result-control {
+#results-sidebar {
     display: none;
 }
 {% endif %}
@@ -124,22 +124,7 @@ Search bugs
             {% endfor %}
         </ul>
         {% else %}
-        {% if q %}
 
-        {% ifnotequal start 1 %}
-        <p class='no-opps'>
-        You requested results #{{ start }} to #{{ end }} for the query <strong><tt>{{ q }}</tt></strong>,
-        but there are only {{ total_bug_count }} results in total. So there are none to display here, you see.
-        </p>
-        {% else %}
-        <p class='no-opps'>
-        The query <strong><tt>{{ q }}</tt></strong> returned zero results. 
-        </p>
-        {% endifnotequal %}
-
-        {% else %}
-        <!-- No search query -->
-        {% endif %}
         {% endif %}
 
     </div> <!-- /#results -->
