@@ -1,4 +1,4 @@
-form { float: left; }
+form { width: 100%; float: left; }
 form p, .form-row, form li { float: left; width: 90%; margin: 5px 0 10px 0; list-style: none; }
 label { float: left; text-align: right; width: 30%; padding-right: 10px; padding-top: 13px; }
 input[type='text'], input[type='file'], input[type='password'] { padding: 8px; float: left; width: 60%; }
