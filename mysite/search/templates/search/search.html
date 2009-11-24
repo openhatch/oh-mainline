@@ -7,6 +7,7 @@ Search bugs
 
 {% block css %}
 {{ block.super }}
+@import url('/static/css/base/jquery.jgrowl.css');
 {% if not bunch_of_bugs %}
 #results-sidebar {
     display: none;
@@ -30,34 +31,46 @@ Search bugs
         {% endif %}
     </h4>
     <ul id='facets'>
+        <li>
+            by tag
+            <ul>
+                <li>
+                    {% if q %}
+                        {# comment #} Pick a friendlier URL. {# endcomment #}
+                        <a href='?q={{ q|urlencode }}&amp;toughness=bitesize'>Bite-size</a>
+                    {% else %}
+                        <a href='?toughness=bitesize'>Bite-size</a>
+                    {% endif %}
+                    <small> (<a id='define-bite-size' href="#">what's this?</a>) </small>
+                </li>
+            </ul>
+        </li>
         {% for facet_name, value2count in all_facets.items %}
-        {% comment %}
-        facets = e.g. {
-        'Language': {
-        'Python': 1,
-        'Java': 8,
-        }
-        }
-        {% endcomment %}
-        <li>
-        {% ifequal facet_name 'Language' %}
-        by main project language 
-        {% else %}
-        {{ facet_name }}
-        {% endifequal %}
-        <ul>
-            {% for value, count in value2count.items %}
-            {% if value %}
-            <li><a href='?q={{ q|urlencode }}&amp;{{facet_name|urlencode}}={{value|urlencode}}'>
-                {{ value }} ({{ count }})
-            </a></li>
-            {% endif %}
-            {% endfor %}
-        </ul>
-        </li>
+            {% comment %}
+            facets = e.g. {
+                'Language': {
+                    'Python': 1,
+                    'Java': 8,
+                }
+            }
+            {% endcomment %}
+            <li>
+                {% ifequal facet_name 'Language' %}
+                    by main project language 
+                {% else %}
+                    {{ facet_name }}
+                {% endifequal %}
+                <ul>
+                    {% for value, count in value2count.items %}
+                    {% if value %}
+                    <li><a href='?q={{ q|urlencode }}&amp;{{facet_name|urlencode}}={{value|urlencode}}'>
+                        {{ value }} ({{ count }})
+                    </a></li>
+                    {% endif %}
+                    {% endfor %}
+                </ul>
+            </li>
         {% endfor %}
-        <li>
-        </li>
     </ul>
     {% if q %}
     <a href='./' style='display: block; margin-bottom: 10px;'>&laquo; Back to browsing</a>
@@ -156,8 +169,20 @@ Search bugs
 {{ block.super }}
 <script src='/static/js/search/defaultText.js'></script>
 <script src='/static/js/search/suggestions.js'></script>
+<script src='/static/js/jquery.jgrowl.js'></script>
 {% comment %}
 <script src='/static/js/search/testData.js'></script>
 <script src='/static/js/search/tests.js'></script>
 {% endcomment %}
+<script type='text/javascript'>
+    $(function () {
+            $('#define-bite-size').click(function () {
+                var definition = (
+                    '<dt><strong>Bite-size</strong> [\ˈbaɪtˌsaɪz\], adj.</dt>' + 
+                    '<dd>Good for newcomers; ' +
+                    'relatively easy and rewarding to fix.</dd>');
+                $.jGrowl(definition, { life: 10000 });
+                });
+            });
+</script>
 {% endblock js %}
