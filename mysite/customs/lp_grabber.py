@@ -38,27 +38,6 @@ def get_info_for_launchpad_username(username):
         }
     }
     """
-    if username == 'paulproteus':
-        time.sleep(random.randrange(0, 2))
-        return {'CtrlProxy': {'involvement_types': set(['Bug Management']),
-                              'languages': ['C'],
-                              'url': 'https://launchpad.net/ctrlproxy'},
-                'Makesad networks runs rose.makesad.us and perhaps other things': {'involvement_types': set(['Bug Management']),
-                                                                                   'languages': [],
-                                                                                   'url': 'https://launchpad.net/rose'},
-                'Ubuntu': {'involvement_types': set(['Bug Management', 'Soyuz']),
-                           'languages': [],
-                           'url': 'https://launchpad.net/ubuntu'},
-                'Web Team projects': {'involvement_types': set(['Bug Management']),
-                                      'languages': [],
-                                      'url': 'https://launchpad.net/web'},
-                'django-openid-auth': {'involvement_types': set(['Bazaar Branches']),
-                                       'languages': ['Python'],
-                                       'url': 'https://launchpad.net/django-openid-auth'}}
-    if username == 'asheesh@asheesh.org':
-        time.sleep(random.randrange(0, 2))
-        return {}
-
     try:
         b = mechanize_get('https://launchpad.net/~%s' % 
                           urllib.quote(username))
