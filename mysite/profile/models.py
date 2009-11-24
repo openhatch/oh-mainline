@@ -501,7 +501,14 @@ class PortfolioEntry(models.Model):
 class UntrashedCitationManager(models.Manager):
     def get_query_set(self):
         return super(UntrashedCitationManager, self).get_query_set().filter(
-                is_deleted=False, ignored_due_to_duplicate=False,
+
+                # Was the citation superseded by a previously imported equivalent?
+                ignored_due_to_duplicate=False, 
+
+                # Was the citation deleted?
+                is_deleted=False,
+
+                # Was its portfolio entry deleted?
                 portfolio_entry__is_deleted=False)
 
 class Citation(models.Model):
@@ -582,7 +589,8 @@ class Citation(models.Model):
 
     def save_and_check_for_duplicates(self):
         # FIXME: Cache summaries in the DB so this query is faster.
-        duplicates = [citation for citation in Citation.objects.all()
+        duplicates = [citation for citation in
+                Citation.objects.filter(portfolio_entry=self.portfolio_entry)
                 if (citation.pk != self.pk) and (citation.summary == self.summary)]
 
         if duplicates:
@@ -610,6 +618,10 @@ class Citation(models.Model):
     # [0]: FIXME: Let's learn how to use Django's ManyToManyField etc.
 
     def __unicode__(self):
-        return "<Citation pk=%d, summary=%s>" % (self.pk, self.summary)
+        if self.pk is not None:
+            pk = self.pk
+        else:
+            pk = 'unassigned'
+        return "pk=%s, summary=%s" % (pk, self.summary)
 
 # vim: set nu:

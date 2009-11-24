@@ -35,6 +35,7 @@ import mysite.customs.miro
 import mysite.customs.feed
 
 import mysite.customs.models
+import mysite.customs.lp_grabber
 # }}}
 
 # Mocked out browser.open
@@ -471,5 +472,11 @@ class RoundupGrab(django.test.TestCase):
 
         bug = tracker.create_bug_object_for_remote_bug_id(1)
         self.assert_(bug.looks_closed)
+
+class LaunchpadImportByEmail(django.test.TestCase):
+
+    def test_get_asheesh(self):
+        u = mysite.customs.lp_grabber.get_launchpad_username_by_email('asheesh@asheesh.org')
+        self.assertEqual(u, "paulproteus")
 
 # vim: set nu:

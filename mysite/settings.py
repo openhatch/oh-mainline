@@ -162,3 +162,5 @@ DEFAULT_FROM_EMAIL = 'all@openhatch.org'
 # Add Django memory-based caching (This should "obviously" be something else on the production site)
 CACHE_BACKEND = 'locmem:///'
 
+# Launchpad credentials
+LP_CREDS_BASE64_ENCODED='WzFdCmNvbnN1bWVyX3NlY3JldCA9IAphY2Nlc3NfdG9rZW4gPSBqTlZYem04S1NrREtoWGhIV25XNApjb25zdW1lcl9rZXkgPSBvcGVuaGF0Y2gKYWNjZXNzX3NlY3JldCA9IFJ0MVN0alAxclBjbGg4aldQU0I1QnRGMU10cWxNZjIzbDJubnYwTnBkeFRqWnZHa1NKZlFrQ2Z3dmhsUkpMWDFkQ2pkVnAyeFJDaGw4WGpoCgo='

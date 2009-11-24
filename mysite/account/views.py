@@ -100,8 +100,7 @@ def edit_photo_do(request, mock=None):
         return edit_photo(request, form)
 
 def catch_me(request):
-    import pdb
-    pdb.set_trace()
+    failboat # NameError
 
 @login_required
 @view
