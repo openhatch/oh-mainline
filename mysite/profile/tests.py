@@ -1161,8 +1161,8 @@ class IgnoreNewDuplicateCitations(TwillTests):
 
     def test_old_citations_supersede_their_new_duplicates(self):
         paulproteus = Person.objects.get(user__username='paulproteus')
-        project1 = Project.create_dummy(title='1')
-        project2 = Project.create_dummy(title='2') 
+        project1 = Project.create_dummy(name='1')
+        project2 = Project.create_dummy(name='2') 
         repo_search = DataImportAttempt.objects.get_or_create(
                     source='rs', query='paulproteus', completed=True, person=paulproteus)[0]
         citation = Citation(

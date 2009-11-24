@@ -116,8 +116,8 @@ def get_info_for_launchpad_username(identifier):
         ret[project_name] = {
                 'involvement_types': set([k for k in involvement_types if k]),
                 'url': project_url,
-                'languages': languages
-                'citation_url': "https://launchpad.net/~" + username
+                'languages': languages,
+                'citation_url': "https://launchpad.net/~" + username,
                 }
     return ret
 
