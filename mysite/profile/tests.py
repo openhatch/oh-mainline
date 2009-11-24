@@ -1156,10 +1156,10 @@ class UserGetsHisQueuedMessages(TwillTests):
         # Verify that the gimme_json now has that message
         self.assertEqual(self.gimme_json()['messages'], ["MSG'd!"])
 
-class OverwriteDuplicateCitations(TwillTests):
+class IgnoreNewDuplicateCitations(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
-    def test_old_citation_is_superseded(self):
+    def test_old_citations_supersede_their_new_duplicates(self):
         paulproteus = Person.objects.get(user__username='paulproteus')
         citation = Citation(
                 portfolio_entry=PortfolioEntry.objects.get_or_create(
@@ -1189,7 +1189,7 @@ class OverwriteDuplicateCitations(TwillTests):
 
         citation2.save_and_check_for_duplicates()
 
-        # Afterwards that only the first citation exists.
+        # Afterwards assert that the second citation is ignored.
         self.assert_(citation2.ignored_due_to_duplicate)
 
         # The 'untrashed' manager picks up only the first citation.

@@ -577,8 +577,10 @@ class Citation(models.Model):
                             self.data_import_attempt.query)
 
     def save_and_check_for_duplicates(self):
+        import pdb; pdb.set_trace()
         # FIXME: Cache summaries in the DB so this query is faster.
-        duplicates = [citation for citation in Citation.objects.all()
+        duplicates = [citation for citation in
+                Citation.objects.filter(portfolio_entry=self.portfolio_entry)
                 if (citation.pk != self.pk) and (citation.summary == self.summary)]
         if duplicates:
             self.ignored_due_to_duplicate = True
