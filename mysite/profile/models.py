@@ -501,7 +501,15 @@ class PortfolioEntry(models.Model):
 class UntrashedCitationManager(models.Manager):
     def get_query_set(self):
         return super(UntrashedCitationManager, self).get_query_set().filter(
-                is_deleted=False, portfolio_entry__is_deleted=False)
+
+                # Was the citation superseded by a previously imported equivalent?
+                ignored_due_to_duplicate=False, 
+
+                # Was the citation deleted?
+                is_deleted=False,
+
+                # Was its portfolio entry deleted?
+                portfolio_entry__is_deleted=False)
 
 class Citation(models.Model):
     portfolio_entry = models.ForeignKey(PortfolioEntry) # [0]
