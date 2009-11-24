@@ -48,14 +48,14 @@ Search bugs
         {% for facet_name, value2count in all_facets.items %}
             {% comment %}
             facets = e.g. {
-                'Language': {
+                'language': {
                     'Python': 1,
                     'Java': 8,
                 }
             }
             {% endcomment %}
             <li>
-                {% ifequal facet_name 'Language' %}
+                {% ifequal facet_name 'language' %}
                     by main project language 
                 {% else %}
                     {{ facet_name }}
@@ -117,11 +117,6 @@ Search bugs
 {% block main %}
 <div id='results' class='gewgaws module box results'>
     <div id='opps'>
-        {% comment %}
-        {
-            'Language': 'Python',
-        }
-        {% endcomment %}
         <form name='search_opps' method='get'> 
             <input type='text'
             name='q' id='q'

@@ -558,7 +558,7 @@ class DiscoverFacets(SearchTest):
         python_project = Project.create_dummy(language='Python')
         python_bug = Bug.create_dummy(project=python_project)
         facets = mysite.search.controllers.discover_available_facets()
-        self.assertEqual(facets, {'Language': {'Python': 1}})
+        self.assertEqual(facets, {'language': {'Python': 1}})
 
 class SearchOnFullWords(SearchTest):
     def test_find_perl_not_properly(self):
@@ -571,13 +571,13 @@ class SearchOnFullWords(SearchTest):
 
 class SearchTemplateDecodesQueryString(SearchTest):
     def test_facets_appear_in_search_template_context(self):
-        response = self.client.get('/search/', {'Language': 'Python'})
-        expected_facets = { 'Language': 'Python' }
+        response = self.client.get('/search/', {'language': 'Python'})
+        expected_facets = { 'language': 'Python' }
         self.assertEqual(response.context['active_facets'], expected_facets)
 
 class FacetsFilterResults(SearchTest):
     def test_facets_filter_results(self):
-        facets = {'Language': 'Python'}
+        facets = {'language': 'Python'}
 
         # Those facets should pick up this bug:
         python_project = Project.create_dummy(language='Python')

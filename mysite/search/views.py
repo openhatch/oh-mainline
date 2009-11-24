@@ -52,6 +52,9 @@ def get_bugs_by_query_words(query_words, facets={}):
 
     bugs = Bug.open_ones.all()
 
+    if 'Bite-size' in facets:
+        bugs = bugs.filter(good_for_newcomers=True)
+
     if 'Language' in facets:
         bugs = bugs.filter(project__language__iexact=facets['Language'])
 
@@ -91,20 +94,13 @@ def fetch_bugs(request):
 
     data = {}
     data['active_facets'] = {}
-    possible_facets = ['Language']
+    possible_facets = ['language', 'toughness']
     for facet in possible_facets:
         if request.GET.get(facet):
             data['active_facets'][facet] = request.GET.get(facet)
 
-    # Reward some guessing around.
-    bite_size = (request.GET.get('toughness', None) in ['bitesize', 'bite-size'])
-    bite_size = bite_size or (request.GET.get('bitesize', None) in ['1', 'true', 'True'])
-
-    if query or data['active_facets'] or bite_size:
+    if query or data['active_facets']:
         bugs = get_bugs_by_query_words(query_words, facets=data['active_facets'])
-
-        if bite_size:
-            bugs = bugs.filter(good_for_newcomers=True)
 
         # Sort
         bugs = bugs.order_by('-good_for_newcomers', '-last_touched')
