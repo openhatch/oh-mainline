@@ -1,10 +1,14 @@
 #senseknocker-thing a {
     position: fixed;
-    left: 0;
-    top: 220px;
-    height: 170px;
+    bottom: 0;
+    right: 0;
+    z-index: 999999;
+    height: 90px;
     width: 29px;
     background: #fff url('/static/images/senseknocker/something-sucks.png') no-repeat;
+}
+#senseknocker-thing a .alt-text {
+
 }
 
 #senseknocker {

@@ -121,6 +121,7 @@ INSTALLED_APPS = (
     'mysite.base',
     'mysite.info',
     'mysite.project',
+    'mysite.senseknocker',
 )
 
 # file: settings.py #

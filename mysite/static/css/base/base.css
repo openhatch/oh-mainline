@@ -12,6 +12,9 @@ a {
     text-decoration: none;
 }
 
+/* display: none would hide this from screenreaders. */
+.alt-text { left: -9999px; position: absolute; }
+
 a:hover {
     text-decoration: underline;
 }
