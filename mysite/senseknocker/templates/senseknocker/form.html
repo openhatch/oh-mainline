@@ -1,0 +1,38 @@
+<div id='senseknocker'>
+<form method='POST' action='/senseknocker/handle_form'>
+    <h3>Report a bug</h3>
+    {% for field in form %}
+    <div>
+        {{ field.label_tag }}
+        {{ field }}
+    </div>
+    {% endfor %}
+    <div>
+        <input type='submit' value='Post' />
+        <span id='status'></span>
+    </div>
+</form>
+</div>
+<script>
+    /*
+    $(function () {
+        $submitButton = $('#senseknocker input[type="submit"]');
+        options = {};
+        options.beforeSend = function() {
+            $submitButton.data('originalValue', $submitButton.val());
+            $submitButton.val('Working...');
+            $submitButton.attr('disabled', 'disabled');
+        };
+        options.success = function() {
+            $('#status').text('Posted!');
+            $submitButton.val($submitButton.data('originalValue'));
+            $submitButton.removeAttr('disabled');
+        };
+        options.error = function() {
+            alert('error!');
+        };
+        $('#senseknocker form').ajaxForm(options);
+    });
+    */
+</script>
+{# vim: set filetype=htmldjango #}
