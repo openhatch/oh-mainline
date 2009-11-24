@@ -1,24 +1,23 @@
 <div class='search-result-control' id='results-widget'>
     <span id='results-summary'>
 
-        You searched for
         {% if q %}
-        <strong id='results-summary-language'>{{ q }}</strong>
-        {% else %}
-        bugs
+        You searched bugs for
+        <strong id='results-summary-language'>{{ q }}</strong>{% if not active_facets %}.{% endif %}
         {% endif %}
 
         {% comment %} FIXME Use django filter to remove whitespace {% endcomment %}
         {% if active_facets %}
+            {% if not q %}
+            You are browsing bugs
+            {% endif %}
             {% for facet, value in active_facets.items %}
             in 
             <style type='text/css'>.active_facet_value
                 {background-color: #dfd; padding: 0 2px; }</style>
             <span class='active_facet_value'>projects primarily coded in
                 <strong>{{value}}</strong>
-                <a href='?q={{q}}'>[x]</a></span>
-            </li>
-            .
+                <a href='?q={{q}}'>[x]</a></span>.
             {% endfor %}
         {% endif %}
 
