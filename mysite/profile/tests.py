@@ -1161,9 +1161,24 @@ class IgnoreNewDuplicateCitations(TwillTests):
 
     def test_old_citations_supersede_their_new_duplicates(self):
         paulproteus = Person.objects.get(user__username='paulproteus')
+        project1 = Project.create_dummy(title='1')
+        project2 = Project.create_dummy(title='2') 
+        repo_search = DataImportAttempt.objects.get_or_create(
+                    source='rs', query='paulproteus', completed=True, person=paulproteus)[0]
         citation = Citation(
                 portfolio_entry=PortfolioEntry.objects.get_or_create(
-                    project=Project.objects.get_or_create(name='project name')[0],
+                    project=project1,
+                    is_published=True,
+                    person=paulproteus)[0],
+                distinct_months=1,
+                languages='Python',
+                data_import_attempt=repo_search
+                )
+        citation.save_and_check_for_duplicates()
+
+        citation_of_different_project = Citation(
+                portfolio_entry=PortfolioEntry.objects.get_or_create(
+                    project=project2,
                     is_published=True,
                     person=paulproteus)[0],
                 distinct_months=1,
@@ -1171,29 +1186,36 @@ class IgnoreNewDuplicateCitations(TwillTests):
                 data_import_attempt=DataImportAttempt.objects.get_or_create(
                     source='rs', query='paulproteus', completed=True, person=paulproteus)[0]
                 )
-        citation.save_and_check_for_duplicates()
+        citation_of_different_project.save_and_check_for_duplicates() 
 
-        self.assertEqual([c.pk for c in Citation.objects.all()], [citation.pk])
-
-        # This is the only citation picked up by the manager
-        self.assertEqual([c.pk for c in Citation.untrashed.all()], [citation.pk])
+        # This is the normal case: citations of different projects
+        # do not supersede one another.
+        self.assertEqual(
+                list(Citation.untrashed.all().order_by('pk')), 
+                [citation, citation_of_different_project])
 
         # Create a second citation with all the same attributes as the first.
+        # We will test that this one is superseded by its predecessor.
+        username_search = DataImportAttempt.objects.get_or_create(
+                    source='ou', query='paulproteus', completed=True, person=paulproteus)[0]
+        # As is realistic, this citation comes from an
+        # Ohloh username search with the same results.
         citation2 = Citation(
                 portfolio_entry=citation.portfolio_entry,
                 distinct_months=citation.distinct_months,
                 languages=citation.languages,
-                data_import_attempt=DataImportAttempt.objects.get_or_create(
-                    source='ou', query='paulproteus', completed=True, person=paulproteus)[0]
+                data_import_attempt=username_search
                 )
-
         citation2.save_and_check_for_duplicates()
 
-        # Afterwards assert that the second citation is ignored.
+        # The second citation is ignored.
         self.assert_(citation2.ignored_due_to_duplicate)
 
-        # The 'untrashed' manager picks up only the first citation.
-        self.assertEqual([c.pk for c in Citation.untrashed.all()], [citation.pk])
+        # The 'untrashed' manager picks up only the first two distinct citations,
+        # not the third (duplicate) citation
+        self.assertEqual(
+                list(Citation.untrashed.all().order_by('pk')),
+                [citation, citation_of_different_project])
 
 class PersonGetTagsForRecommendations(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
