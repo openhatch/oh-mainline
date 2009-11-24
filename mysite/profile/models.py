@@ -533,6 +533,10 @@ class Citation(models.Model):
 
         if self.data_import_attempt:
             if self.data_import_attempt.source in ['rs', 'ou']:
+                if not self.languages:
+                    return "Committed to codebase (%s)" % (
+                            self.data_import_attempt.get_source_display(),
+                            )
                 if self.distinct_months is None:
                     raise ValueError, "Er, Ohloh always gives us a # of months."
                 return "Coded for %d month%s in %s (%s)" % (
@@ -580,6 +584,7 @@ class Citation(models.Model):
         # FIXME: Cache summaries in the DB so this query is faster.
         duplicates = [citation for citation in Citation.objects.all()
                 if (citation.pk != self.pk) and (citation.summary == self.summary)]
+
         if duplicates:
             self.ignored_due_to_duplicate = True
         return self.save()
