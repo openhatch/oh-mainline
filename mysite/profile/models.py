@@ -609,6 +609,10 @@ class Citation(models.Model):
     # [0]: FIXME: Let's learn how to use Django's ManyToManyField etc.
 
     def __unicode__(self):
-        return "<Citation pk=%d, summary=%s>" % (self.pk, self.summary)
+        if self.pk is not None:
+            pk = self.pk
+        else:
+            pk = 'unassigned'
+        return "pk=%s, summary=%s" % (pk, self.summary)
 
 # vim: set nu:
