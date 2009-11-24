@@ -206,6 +206,7 @@ mock_giflu.return_value = {
             'url': 'http://launchpad.net/ccHost', # ok this url doesn't really exist
             'involvement_types': ['Bug Management', 'Bazaar Branches'],
             'languages': ['python', 'ruby'],
+            'citation_url': 'https://launchpad.net/~paulproteus',
             }
         }
 
