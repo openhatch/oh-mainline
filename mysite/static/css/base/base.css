@@ -369,3 +369,6 @@ abbr.foss {
 #normal_login_form li {
     list-style: none;
 }
+
+dt { font-size: 120%; }
+dd { margin-top: .5em; margin-left: 1.2em; }
