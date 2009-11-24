@@ -76,8 +76,6 @@ def create_citations_from_launchpad_results(dia_id, lp_results):
             citation.portfolio_entry = portfolio_entry
             citation.data_import_attempt = dia
             citation.save_and_check_for_duplicates()
-            import sys
-            print >> sys.stderr, "making a LP citation: ", citation
 
     person.last_polled = datetime.datetime.now()
     person.save()

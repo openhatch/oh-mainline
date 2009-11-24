@@ -580,10 +580,6 @@ class Citation(models.Model):
         duplicates = [citation for citation in
                 Citation.objects.filter(portfolio_entry=self.portfolio_entry)
                 if (citation.pk != self.pk) and (citation.summary == self.summary)]
-        import sys
-        print >> sys.stderr, duplicates
-        print >> sys.stderr, self.summary
-        print >> sys.stderr, [k.summary for k in duplicates]
         if duplicates:
             self.ignored_due_to_duplicate = True
         return self.save()
