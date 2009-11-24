@@ -46,6 +46,7 @@ def create_citations_from_launchpad_results(dia_id, lp_results):
                  'url': 'http://launchpad.net/f-spot',
                  'involvement_types': ['Bug Management', 'Bazaar Branches'],
                  'languages': ['python', 'ruby'],
+                 'citation_url': "https://launchpad.net/~paulproteus",
              }
          }
     and the id of the DataImportAttempt they came from.
@@ -75,6 +76,7 @@ def create_citations_from_launchpad_results(dia_id, lp_results):
             citation.contributor_role = involvement_type
             citation.portfolio_entry = portfolio_entry
             citation.data_import_attempt = dia
+            citation.url = result['citation_url']
             citation.save_and_check_for_duplicates()
 
     person.last_polled = datetime.datetime.now()
