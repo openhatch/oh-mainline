@@ -1,10 +1,16 @@
-import lxml.html # scraper library
 from ohloh import mechanize_get
+import base64
+import django.conf
+import lxml.html # scraper library
+from launchpadlib.launchpad import Launchpad, STAGING_SERVICE_ROOT, Credentials
+import time
+import tempfile
 import urllib
 import urllib2
 import urlparse
-import time
 import random
+import shutil
+import StringIO
 
 def project2languages(project_name):
     """Find the Launchpad URL for the given project. Scrape launchpad page for languages."""
@@ -27,7 +33,34 @@ def project2languages(project_name):
     except IndexError:
         return []
 
-def get_info_for_launchpad_username(username):
+def get_launchpad_username_by_email(maybe_email_address):
+
+    # Login to Launchpad using the credentials in our settings file.
+    lp_credentials = base64.b64decode(django.conf.settings.LP_CREDS_BASE64_ENCODED)
+    fake_launchpad_creds_file = StringIO.StringIO(lp_credentials)
+    creds = Credentials()
+    creds.load(fake_launchpad_creds_file)
+
+    # Cache directory is not thread safe,
+    # so let's create a unique, disposable one. 
+    cache_dir = tempfile.mkdtemp()
+
+    launchpad = Launchpad(creds, STAGING_SERVICE_ROOT, cache_dir)
+    user = launchpad.people.getByEmail(email=maybe_email_address)
+
+    # Sometimes Launchpad identifiers will look like email addresses.
+    # In which case, person will equal None.
+    if user is not None:
+        username = user.name
+    else:
+        username = None
+
+    # Remove the cache directory
+    shutil.rmtree(cache_dir)
+
+    return username
+
+def get_info_for_launchpad_username(identifier):
     """This figures out what the named person has been involved with.
     It returns a dictionary like this:
     {
@@ -38,9 +71,25 @@ def get_info_for_launchpad_username(username):
         }
     }
     """
+
+    # Maybe identifier is an email address? ...
+
+    username = None
+
+    # If the OpenHatch user entered an email address,
+    # try to find the corresponding Launchpad username first.
+    if '@' in identifier: 
+        maybe_email_address = identifier
+        username = get_launchpad_username_by_email(maybe_email_address) 
+        #               ^ This method returns None
+        #               if we couldn't find anybody by that email address.
+
+    # Maybe it's not an email address...
+    if username is None:
+        username = identifier
+
     try:
-        b = mechanize_get('https://launchpad.net/~%s' % 
-                          urllib.quote(username))
+        b = mechanize_get('https://launchpad.net/~%s' % urllib.quote(username))
     except urllib2.HTTPError, e:
         if str(e.code) == '404':
             return {}
@@ -70,6 +119,7 @@ def get_info_for_launchpad_username(username):
                 'languages': languages
                 }
     return ret
+
 
 def person_to_bazaar_branch_languages(username):
     user_info = get_info_for_launchpad_username(username)
