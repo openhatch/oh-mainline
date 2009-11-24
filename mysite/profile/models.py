@@ -501,8 +501,7 @@ class PortfolioEntry(models.Model):
 class UntrashedCitationManager(models.Manager):
     def get_query_set(self):
         return super(UntrashedCitationManager, self).get_query_set().filter(
-                is_deleted=False, ignored_due_to_duplicate=False,
-                portfolio_entry__is_deleted=False)
+                is_deleted=False, portfolio_entry__is_deleted=False)
 
 class Citation(models.Model):
     portfolio_entry = models.ForeignKey(PortfolioEntry) # [0]
@@ -577,11 +576,14 @@ class Citation(models.Model):
                             self.data_import_attempt.query)
 
     def save_and_check_for_duplicates(self):
-        import pdb; pdb.set_trace()
         # FIXME: Cache summaries in the DB so this query is faster.
         duplicates = [citation for citation in
                 Citation.objects.filter(portfolio_entry=self.portfolio_entry)
                 if (citation.pk != self.pk) and (citation.summary == self.summary)]
+        import sys
+        print >> sys.stderr, duplicates
+        print >> sys.stderr, self.summary
+        print >> sys.stderr, [k.summary for k in duplicates]
         if duplicates:
             self.ignored_due_to_duplicate = True
         return self.save()
