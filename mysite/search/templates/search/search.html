@@ -48,7 +48,7 @@ Search bugs
         <ul>
             {% for value, count in value2count.items %}
             {% if value %}
-            <li><a href='?q={{ q|urlencode }}&{{facet_name|urlencode}}={{value|urlencode}}'>
+            <li><a href='?q={{ q|urlencode }}&amp;{{facet_name|urlencode}}={{value|urlencode}}'>
                 {{ value }} ({{ count }})
             </a></li>
             {% endif %}
@@ -56,6 +56,8 @@ Search bugs
         </ul>
         </li>
         {% endfor %}
+        <li>
+        </li>
     </ul>
     {% if q %}
     <a href='./' style='display: block; margin-bottom: 10px;'>&laquo; Back to browsing</a>
