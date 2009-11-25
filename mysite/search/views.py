@@ -47,30 +47,6 @@ def split_query_words(string):
     return ret
     # }}}
 
-def get_bugs_by_query_words(query_words, facets={}):
-    """Get bugs matching any of the words in 'query_words'."""
-
-    bugs = Bug.open_ones.all()
-
-    if 'Bite-size' in facets:
-        bugs = bugs.filter(good_for_newcomers=True)
-
-    if 'Language' in facets:
-        bugs = bugs.filter(project__language__iexact=facets['Language'])
-
-    # Filter
-    for word in query_words:
-        whole_word = "[[:<:]]%s[[:>:]]" % (
-                mysite.base.controllers.mysql_regex_escape(word))
-        bugs = bugs.filter(
-            Q(project__language__iexact=word) |
-            Q(title__iregex=whole_word) |
-            Q(description__iregex=whole_word) |
-            Q(project__name__iregex=whole_word)) # 'firefox' grabs 'mozilla fx'.
-
-    return bugs
-
-
 def fetch_bugs(request):
     # {{{
 
@@ -84,23 +60,16 @@ def fetch_bugs(request):
 
     suggestions = [(i, k, False) for i, k in enumerate(suggestion_keys)]
 
-    query = request.GET.get('q', '')
-    query_words = split_query_words(query)
     format = request.GET.get('format', None)
     start = int(request.GET.get('start', 1))
     end = int(request.GET.get('end', 10))
 
     total_bug_count = 0
 
-    data = {}
-    data['active_facets'] = {}
-    possible_facets = ['language', 'toughness']
-    for facet in possible_facets:
-        if request.GET.get(facet):
-            data['active_facets'][facet] = request.GET.get(facet)
+    query = Query.create_from_GET(request.GET)
 
-    if query or data['active_facets']:
-        bugs = get_bugs_by_query_words(query_words, facets=data['active_facets'])
+    if query:
+        bugs = Bugs.open_ones.filter(query.get_Q())
 
         # Sort
         bugs = bugs.order_by('-good_for_newcomers', '-last_touched')
@@ -116,15 +85,13 @@ def fetch_bugs(request):
         for b in bugs:
             b.project.icon_url = "/static/images/icons/projects/%s.png" % \
                     b.project.name.lower()
-
     else:
         bugs = []
 
-    data['q'] = query
-    data['query_words'] = query_words
+    data['query'] = query
 
     # Handle facets
-    data['all_facets'] = mysite.search.controllers.discover_available_facets(query_words=query_words)
+    data['all_facets'] = Facet.get_all(relative_to_query=query)
 
     prev_page_query_str = QueryDict('')
     prev_page_query_str = prev_page_query_str.copy()
