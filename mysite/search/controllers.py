@@ -1,6 +1,7 @@
 import mysite.search.models
 import mysite.search.views
 import collections
+import urllib
 import re
 from django.db.models import Q
 
@@ -64,7 +65,7 @@ class Query:
         # Begin constructing a conjunction of Q objects (filters)
         q = Q()
 
-        if self.facets.get('toughness', None) in ['bitesize', 'bite-size']:
+        if self.facets.get('toughness', None) in ['bitesize']:
             q &= Q(good_for_newcomers=True)
 
         if 'language' in self.facets:
@@ -91,6 +92,15 @@ class Query:
         if not bugs:
             return []
 
+        
+        bitesize_get_parameters = dict(self.facets)
+        bitesize_get_parameters.update({
+            'q': self.terms_string,
+            'toughness': 'bitesize',
+            })
+        bitesize_query_string = urllib.urlencode(bitesize_get_parameters)
+
+
         facets = { 
                 # The languages facet is based on the project languages, "for now"
                 'language': {
@@ -105,9 +115,9 @@ class Query:
                     'description_above_results': "where toughness = %s",
                     'values': [
                         {
-                            'name': "bite-size",
+                            'name': "bitesize",
                             'count': 0,
-                            'link': 'a link!'
+                            'query_string': bitesize_query_string
                             }
                         ]
                     }
@@ -116,9 +126,18 @@ class Query:
         distinct_language_columns = bugs.values('project__language').distinct()
         languages = [x['project__language'] for x in distinct_language_columns]
         for lang in sorted(languages):
+
+            lang_get_parameters = dict(self.facets)
+            lang_get_parameters.update({
+                'q': self.terms_string,
+                'language': lang,
+                })
+            lang_query_string = urllib.urlencode(lang_get_parameters)
+
             facets['language']['values'].append({
-                    'name': lang,
-                    'count': bugs.filter(project__language=lang).count(),
-                    })
+                'name': lang,
+                'count': bugs.filter(project__language=lang).count(),
+                'query_string': lang_query_string
+                })
 
         return facets

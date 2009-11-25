@@ -59,7 +59,7 @@ Search bugs
                 <ul>
                     {% for value in facet.values %}
                     {% if value.name %}
-                    <li><a href='?q={{ query.terms_string|urlencode }}&amp;{{facet.name_in_GET|urlencode}}={{value|urlencode}}'>
+                    <li><a href='?{{ value.query_string }}'>
                         {{ value.name }} ({{ value.count }})
                     </a></li>
                     {% endif %}
