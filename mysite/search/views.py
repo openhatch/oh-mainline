@@ -26,27 +26,6 @@ def encode_datetime(obj):
     raise TypeError("%s" % type(obj) + repr(obj) + " is not JSON serializable")
     # }}}
 
-def split_query_words(string):
-    # We're given some query terms "between quotes"
-    # and some glomped on with spaces.
-    # Strategy: Find the strings validly inside quotes, and remove them
-    # from the original string. Then split the remainder (and probably trim
-    # whitespace from the remaining words).
-    # {{{
-    ret = []
-    splitted = re.split(r'(".*?")', string)
-
-    for (index, word) in enumerate(splitted):
-        if (index % 2) == 0:
-            ret.extend(word.split())
-        else:
-            assert word[0] == '"'
-            assert word[-1] == '"'
-            ret.append(word[1:-1])
-
-    return ret
-    # }}}
-
 def fetch_bugs(request):
     # {{{
 
@@ -66,7 +45,7 @@ def fetch_bugs(request):
 
     total_bug_count = 0
 
-    query = Query.create_from_GET(request.GET)
+    query = mysite.search.controllers.Query.create_from_GET(request.GET)
 
     if query:
         bugs = Bugs.open_ones.filter(query.get_Q())

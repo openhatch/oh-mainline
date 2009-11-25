@@ -484,19 +484,22 @@ class Recommend(SearchTest):
 #        tc.notfind("Yo! This is a bug in XUL but not Firefox")
 #        tc.find("Oy! This is a bug in XUL and Firefox")
 
-class TestQuerySplitter(django.test.TestCase):
-    def test_split_query_words(self):
+class SplitIntoTerms(django.test.TestCase):
+    def test_split_into_terms(self):
         easy = '1 2 3'
-        self.assertEqual(mysite.search.views.split_query_words(easy),
-                         ['1', '2', '3'])
+        self.assertEqual(
+                mysite.search.controllers.Query.split_into_terms(easy),
+                ['1', '2', '3'])
 
         easy = '"1"'
-        self.assertEqual(mysite.search.views.split_query_words(easy),
-                         ['1'])
+        self.assertEqual(
+                mysite.search.controllers.Query.split_into_terms(easy),
+                ['1'])
 
         easy = 'c#'
-        self.assertEqual(mysite.search.views.split_query_words(easy),
-                         ['c#'])
+        self.assertEqual(
+                mysite.search.controllers.Query.split_into_terms(easy),
+                ['c#'])
 
 class IconGetsScaled(SearchTest):
     def test_project_scales_its_icon_down_for_use_in_badge(self):
@@ -568,7 +571,7 @@ class SearchOnFullWords(SearchTest):
         properly_bug = Bug.create_dummy(description='properly')
         perl_bug = Bug.create_dummy(description='perl')
         self.assertEqual(Bug.all_bugs.all().count(), 2)
-        results = Query(words=['perl']).get_bugs_unordered()
+        results = Query(terms=['perl']).get_bugs_unordered()
         self.assertEqual(list(results), [perl_bug])
 
 class SearchTemplateDecodesQueryString(SearchTest):
@@ -589,7 +592,7 @@ class FacetsFilterResults(SearchTest):
         not_python_project = Project.create_dummy(language='Nohtyp')
         not_python_bug = Bug.create_dummy(project=not_python_project)
 
-        results = Query(words=[], facets=facets).get_bugs_unordered()
+        results = Query(terms=[], facets=facets).get_bugs_unordered()
         self.assertEqual(list(results), [python_bug])
 
 # vim: set nu ai et ts=4 sw=4 columns=80:
