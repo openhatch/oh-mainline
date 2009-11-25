@@ -558,13 +558,6 @@ class IconGetsScaled(SearchTest):
         # If we want to scale exactly we'll get 11.25 pixels, which rounds to 11.
         self.assertEqual(p.icon_smaller_for_badge.height, 11)
 
-class DiscoverFacets(SearchTest):
-    def test_discover_available_facets(self):
-        python_project = Project.create_dummy(language='Python')
-        python_bug = Bug.create_dummy(project=python_project)
-        facets = mysite.search.controllers.Facet.get_all()
-        self.assertEqual(facets, {'language': {'Python': 1}})
-
 class SearchOnFullWords(SearchTest):
     def test_find_perl_not_properly(self):
         project = Project.create_dummy()
@@ -579,7 +572,7 @@ class SearchTemplateDecodesQueryString(SearchTest):
     def test_facets_appear_in_search_template_context(self):
         response = self.client.get('/search/', {'language': 'Python'})
         expected_facets = { 'language': 'Python' }
-        self.assertEqual(response.context['active_facets'], expected_facets)
+        self.assertEqual(response.context['query'].facets, expected_facets)
 
 class FacetsFilterResults(SearchTest):
     def test_facets_filter_results(self):
