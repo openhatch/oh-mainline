@@ -22,6 +22,9 @@ class Query:
         else:
             return None
 
+    def get_bugs_unordered(self):
+        return Bug.open_ones.filter(self.get_Q())
+
     def get_Q(self):
         """Get a Q object which can be passed to Bug.open_ones.filter()"""
 

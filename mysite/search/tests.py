@@ -173,11 +173,13 @@ class SearchResultsSpecificBugs(SearchTest):
         self.assert_(len(canonical_non_matches) > 1)
 
     def test_search_single_query(self):
-        """Test that get_bugs_by_query_words produces the expected results."""
+        """Test that Query.get_bugs_unordered()
+        produces the expected results."""
         response = self.client.get('/search/', {'q': 'python'})
         returned_bugs = response.context[0]['bunch_of_bugs']
         for cf in self.canonical_filters:
-            self.failUnless(Bug.all_bugs.filter(cf)[0] in returned_bugs, "Search engine did not correctly use the filter %s" % cf)
+            self.failUnless(Bug.all_bugs.filter(cf)[0] in returned_bugs,
+                    "Search engine did not correctly use the filter %s" % cf)
 
         for bug in Bug.all_bugs.filter(self.no_canonical_filters()):
             self.failIf(bug in returned_bugs, "Search engine returned a false positive: %s." % bug)
@@ -566,7 +568,7 @@ class SearchOnFullWords(SearchTest):
         properly_bug = Bug.create_dummy(description='properly')
         perl_bug = Bug.create_dummy(description='perl')
         self.assertEqual(Bug.all_bugs.all().count(), 2)
-        results = mysite.search.views.get_bugs_by_query_words(['perl'])
+        results = Query(words=['perl']).get_bugs_unordered()
         self.assertEqual(list(results), [perl_bug])
 
 class SearchTemplateDecodesQueryString(SearchTest):
@@ -587,8 +589,7 @@ class FacetsFilterResults(SearchTest):
         not_python_project = Project.create_dummy(language='Nohtyp')
         not_python_bug = Bug.create_dummy(project=not_python_project)
 
-        results = mysite.search.views.get_bugs_by_query_words([], 
-                facets=facets)
+        results = Query(words=[], facets=facets).get_bugs_unordered()
         self.assertEqual(list(results), [python_bug])
 
 # vim: set nu ai et ts=4 sw=4 columns=80:
