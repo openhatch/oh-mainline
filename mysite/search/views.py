@@ -29,11 +29,9 @@ def encode_datetime(obj):
 def fetch_bugs(request):
     # {{{
 
-    # FIXME: Give bugs some date field
-
     if request.user.is_authenticated():
-        suggestion_keys = request.user.get_profile(
-                ).get_recommended_search_terms()
+        person = request.user.get_profile()
+        suggestion_keys = person.get_recommended_search_terms()
     else:
         suggestion_keys = []
 
@@ -48,7 +46,7 @@ def fetch_bugs(request):
     query = mysite.search.controllers.Query.create_from_GET(request.GET)
 
     if query:
-        bugs = Bugs.open_ones.filter(query.get_Q())
+        bugs = Bug.open_ones.filter(query.get_Q())
 
         # Sort
         bugs = bugs.order_by('-good_for_newcomers', '-last_touched')
@@ -67,11 +65,11 @@ def fetch_bugs(request):
     else:
         bugs = []
 
+    data = {}
     data['query'] = query
 
     # Handle facets
-    data['all_facets'] = Facet.get_all(relative_to_query=query)
-
+    data['all_facets'] = query.get_possible_facets()
     prev_page_query_str = QueryDict('')
     prev_page_query_str = prev_page_query_str.copy()
     next_page_query_str = QueryDict('')
@@ -82,7 +80,7 @@ def fetch_bugs(request):
     if format:
         prev_page_query_str['format'] = format
         next_page_query_str['format'] = format
-    for facet_name, value in data['active_facets'].items():
+    for facet_name, value in query.facets.items():
         prev_page_query_str[facet_name] = value
         next_page_query_str[facet_name] = value
     diff = end - start

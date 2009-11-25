@@ -22,9 +22,9 @@ Search bugs
 {% block sidebar %}
 <div id='filters' class='box module'>
     <h4 style='margin-bottom: 10px;'>
-        {% if q %}
+        {% if query.terms %}
         {% if bunch_of_bugs %}
-        Filter results for <strong>{{ q }}</strong>:
+        Filter results for <strong>{{ query.terms }}</strong>:
         {% endif %}
         {% else %}
         Browse&hellip;
@@ -35,8 +35,8 @@ Search bugs
             by tag
             <ul>
                 <li>
-                    {% if q %}
-                        {# comment #} Pick a friendlier URL. {# endcomment #}
+                    {% if query.terms %}
+                        {# Pick a friendlier URL. #}
                         <a href='?q={{ q|urlencode }}&amp;toughness=bitesize'>Bite-size</a>
                     {% else %}
                         <a href='?toughness=bitesize'>Bite-size</a>
@@ -45,7 +45,7 @@ Search bugs
                 </li>
             </ul>
         </li>
-        {% for facet_name, value2count in all_facets.items %}
+        {% for facet_name, facet in query.get_possible_facets.items %}
             {% comment %}
             facets = e.g. {
                 'language': {
@@ -55,16 +55,12 @@ Search bugs
             }
             {% endcomment %}
             <li>
-                {% ifequal facet_name 'language' %}
-                    by main project language 
-                {% else %}
-                    {{ facet_name }}
-                {% endifequal %}
+                {{ facet.sidebar_name }}
                 <ul>
-                    {% for value, count in value2count.items %}
-                    {% if value %}
-                    <li><a href='?q={{ q|urlencode }}&amp;{{facet_name|urlencode}}={{value|urlencode}}'>
-                        {{ value }} ({{ count }})
+                    {% for value in facet.values %}
+                    {% if value.name %}
+                    <li><a href='?q={{ query.terms_string|urlencode }}&amp;{{facet.name_in_GET|urlencode}}={{value|urlencode}}'>
+                        {{ value.name }} ({{ value.count }})
                     </a></li>
                     {% endif %}
                     {% endfor %}
@@ -72,8 +68,8 @@ Search bugs
             </li>
         {% endfor %}
     </ul>
-    {% if q %}
-    <a href='./' style='display: block; margin-bottom: 10px;'>&laquo; Back to browsing</a>
+    {% if query.terms %}
+        <a href='./' style='display: block; margin-bottom: 10px;'>&laquo; Back to browsing</a>
     {% endif %}
     {% if the_user.is_authenticated %}
     {% if suggestions %}

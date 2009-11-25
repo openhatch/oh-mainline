@@ -1,11 +1,21 @@
 import mysite.search.models
 import mysite.search.views
 import collections
+import re
+from django.db.models import Q
 
 class Query:
-    def __init__(self, terms, facets): 
+    
+    def __init__(self, terms, facets, terms_string=None): 
         self.terms = terms
         self.facets = facets
+        self._terms_string = terms_string
+
+    @property
+    def terms_string(self):
+        if self._terms_string is None:
+            raise ValueError
+        return self._terms_string 
 
     @staticmethod
     def split_into_terms(string):
@@ -32,17 +42,18 @@ class Query:
     @staticmethod
     def create_from_GET(GET):
         possible_facets = ['language', 'toughness']
-        active_facets = []
+
+        active_facets = {}
         for facet in possible_facets:
             if GET.get(facet):
                 active_facets[facet] = GET.get(facet)
         terms_string = GET.get('q', '')
-        terms = Query.split_into_terms(query)
+        terms = Query.split_into_terms(terms_string)
 
-        return Query(terms=terms, facets=active_facets)
+        return Query(terms=terms, facets=active_facets, terms_string=terms_string)
 
     def get_bugs_unordered(self):
-        return Bug.open_ones.filter(self.get_Q())
+        return mysite.search.models.Bug.open_ones.filter(self.get_Q())
 
     def __bool__(self):
         return self.terms or self.active_facets
@@ -50,14 +61,14 @@ class Query:
     def get_Q(self):
         """Get a Q object which can be passed to Bug.open_ones.filter()"""
 
-        # Begin constructing a filter
-        q = Q(True)
+        # Begin constructing a conjunction of Q objects (filters)
+        q = Q()
 
-        if 'toughness' in self.facets and facets['toughness'] in ['bitesize', 'bite-size']:
+        if self.facets.get('toughness', None) in ['bitesize', 'bite-size']:
             q &= Q(good_for_newcomers=True)
 
-        if 'language' in facets:
-            q &= Q(project__language__iexact=facets['language'])
+        if 'language' in self.facets:
+            q &= Q(project__language__iexact=self.facets['language'])
 
         for word in self.terms:
             whole_word = "[[:<:]]%s[[:>:]]" % (
@@ -66,48 +77,48 @@ class Query:
                     Q(project__language__iexact=word) |
                     Q(title__iregex=whole_word) |
                     Q(description__iregex=whole_word) |
-                    Q(project__name__iregex=whole_word) # 'firefox' grabs 'mozilla fx'.
+
+                    # 'firefox' grabs 'mozilla fx'.
+                    Q(project__name__iregex=whole_word)
                     )
             q &= terms_disjunction
 
         return q
 
-class Facet:
-    def __init__(self, name_in_GET, sidebar_name, description_above_results, values):
-        self.name_in_GET = name_in_GET
-        self.sidebar_name = sidebar_name
-        self.description_above_results = description_above_results
-        self.values = values
-
-    @staticmethod
-    def get_all(relative_to_query=None):
-        if relative_to_query:
-            bugs = Bugs.open_ones.filter(query.get_Q)
-        else:
-            bugs = Bugs.open_ones.all()
+    def get_possible_facets(self):
+        bugs = mysite.search.models.Bug.open_ones.filter(self.get_Q())
 
         if not bugs:
             return []
 
+        facets = { 
+                # The languages facet is based on the project languages, "for now"
+                'language': {
+                    'name_in_GET': "language",
+                    'sidebar_name': "by main project language",
+                    'description_above_results': "projects primarily coded in %s",
+                    'values': [], # populated below
+                    },
+                'toughness': {
+                    'name_in_GET': "toughness",
+                    'sidebar_name': "by toughness",
+                    'description_above_results': "where toughness = %s",
+                    'values': [
+                        {
+                            'name': "bite-size",
+                            'count': 0,
+                            'link': 'a link!'
+                            }
+                        ]
+                    }
+                }
+
         distinct_language_columns = bugs.values('project__language').distinct()
         languages = [x['project__language'] for x in distinct_language_columns]
-        values = []
-        for lang in languages:
-            values.append((lang, bugs.filter(project__language=lang).count()))
-
-        # The languages facet is based on the project languages, "for now"
-        facet_language = Facet(
-                name_in_GET="language",
-                sidebar_name="by main project language",
-                description_above_results="projects primarily coded in %s",
-                values=languages)
-        facets.append(facet_language)
-
-        facet_toughness = Facet(
-                name_in_GET="toughness",
-                sidebar_name="by toughness",
-                description_above_results="where toughness = %s",
-                values="bite-size")
-        facets.append(facet_toughness)
+        for lang in sorted(languages):
+            facets['language']['values'].append({
+                    'name': lang,
+                    'count': bugs.filter(project__language=lang).count(),
+                    })
 
         return facets

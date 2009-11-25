@@ -562,7 +562,7 @@ class DiscoverFacets(SearchTest):
     def test_discover_available_facets(self):
         python_project = Project.create_dummy(language='Python')
         python_bug = Bug.create_dummy(project=python_project)
-        facets = mysite.search.controllers.discover_available_facets()
+        facets = mysite.search.controllers.Facet.get_all()
         self.assertEqual(facets, {'language': {'Python': 1}})
 
 class SearchOnFullWords(SearchTest):
@@ -571,7 +571,8 @@ class SearchOnFullWords(SearchTest):
         properly_bug = Bug.create_dummy(description='properly')
         perl_bug = Bug.create_dummy(description='perl')
         self.assertEqual(Bug.all_bugs.all().count(), 2)
-        results = Query(terms=['perl']).get_bugs_unordered()
+        results = mysite.search.controllers.Query(
+                terms=['perl']).get_bugs_unordered()
         self.assertEqual(list(results), [perl_bug])
 
 class SearchTemplateDecodesQueryString(SearchTest):
@@ -592,7 +593,32 @@ class FacetsFilterResults(SearchTest):
         not_python_project = Project.create_dummy(language='Nohtyp')
         not_python_bug = Bug.create_dummy(project=not_python_project)
 
-        results = Query(terms=[], facets=facets).get_bugs_unordered()
+        results = mysite.search.controllers.Query(
+                terms=[], facets=facets).get_bugs_unordered()
         self.assertEqual(list(results), [python_bug])
+
+class QueryGetPossibleFacets(SearchTest):
+    """Ask a query, what facets are you going to show on the left?
+    E.g., search for gtk, it says C, 541."""
+
+    def test_get_possible_facets(self):
+        project1 = Project.create_dummy(language='c')
+        project2 = Project.create_dummy(language='d')
+        project3 = Project.create_dummy(language='e')
+        Bug.create_dummy(project=project1, description='bug')
+        Bug.create_dummy(project=project2, description='bug')
+        Bug.create_dummy(project=project3, description='bAg')
+        query = mysite.search.controllers.Query(
+                terms=['bug'],
+                facets={'language': 'c'}) # active facets
+        possible_facets = query.get_possible_facets()
+        self.assert_(
+                possible_facets['language']['values'],
+                [
+                    { 'name': 'c', 'count': 1 },
+                    { 'name': 'd', 'count': 1 },
+                    # not e
+                    ]
+                    )
 
 # vim: set nu ai et ts=4 sw=4 columns=80:
