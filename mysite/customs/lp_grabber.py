@@ -2,7 +2,7 @@ from ohloh import mechanize_get
 import base64
 import django.conf
 import lxml.html # scraper library
-from launchpadlib.launchpad import Launchpad, STAGING_SERVICE_ROOT, Credentials
+from launchpadlib.launchpad import Launchpad, EDGE_SERVICE_ROOT, Credentials
 import time
 import tempfile
 import urllib
@@ -45,7 +45,7 @@ def get_launchpad_username_by_email(maybe_email_address):
     # so let's create a unique, disposable one. 
     cache_dir = tempfile.mkdtemp()
 
-    launchpad = Launchpad(creds, STAGING_SERVICE_ROOT, cache_dir)
+    launchpad = Launchpad(creds, EDGE_SERVICE_ROOT, cache_dir)
     user = launchpad.people.getByEmail(email=maybe_email_address)
 
     # Sometimes Launchpad identifiers will look like email addresses.
