@@ -39,10 +39,10 @@ def mechanize_get(url, referrer=None, attempts_remaining=6, person=None):
         b.open(url)
     except HTTPError, e:
         # FIXME: Test with mock object.
-        if e.code == 504 and attempts_remaining > 0:
-            message_schema = "Tried to talk to %s, got 504, retrying %d more times..."
+        if (e.code == 504 or e.code == 502) and attempts_remaining > 0:
+            message_schema = "Tried to talk to %s, got %d, retrying %d more times..."
 
-            long_message = message_schema % (url, attempts_remaining)
+            long_message = message_schema % (url, e.code, attempts_remaining)
             print >> sys.stderr, long_message
 
             if person:
