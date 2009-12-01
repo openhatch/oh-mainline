@@ -65,7 +65,7 @@ class Query:
         # Begin constructing a conjunction of Q objects (filters)
         q = Q()
 
-        if self.facets.get('toughness', None) in ['bitesize']:
+        if self.facets.get('toughness', None) == 'bitesize':
             q &= Q(good_for_newcomers=True)
 
         if 'language' in self.facets:
