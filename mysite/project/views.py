@@ -7,6 +7,7 @@ def project(request, project__name = None):
     p = Project.objects.get(name=project__name)
     return render_to_response('project/project.html',
             {
+                'the_user': request.user,
                 'project': p,
                 'contributors': p.get_contributors()
                 }
