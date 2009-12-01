@@ -7,9 +7,9 @@ from django.db.models import Q
 
 class Query:
     
-    def __init__(self, terms, facets, terms_string=None): 
+    def __init__(self, terms, facets=None, terms_string=None): 
         self.terms = terms
-        self.facets = facets
+        self.facets = facets or {}
         self._terms_string = terms_string
 
     @property
