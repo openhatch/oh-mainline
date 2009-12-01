@@ -217,12 +217,6 @@ class SearchResults(TwillTests):
         # The variable 'bunch_of_bugs', passed to the template, is a blank list.
         self.assertEqual(response.context[0]['bunch_of_bugs'], [])
 
-    def test_paginate_by_default(self):
-        response = self.client.get('/search/')
-        ctxt_we_care_about = [c for c in response.context if 'start' in c][0]
-        self.failUnlessEqual(ctxt_we_care_about['start'], 1)
-        self.failUnlessEqual(ctxt_we_care_about['end'], 0)
-
     def test_json_view(self):
         tc.go(make_twill_url('http://openhatch.org/search/?format=json&jsoncallback=callback&q=python'))
         response = tc.show()
