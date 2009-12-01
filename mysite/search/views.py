@@ -70,13 +70,14 @@ def fetch_bugs(request):
 
     # Handle facets
     data['all_facets'] = query.get_possible_facets()
+
     prev_page_query_str = QueryDict('')
     prev_page_query_str = prev_page_query_str.copy()
     next_page_query_str = QueryDict('')
     next_page_query_str = next_page_query_str.copy()
     if query:
-        prev_page_query_str['q'] = query
-        next_page_query_str['q'] = query
+        prev_page_query_str['q'] = query.terms_string
+        next_page_query_str['q'] = query.terms_string
     if format:
         prev_page_query_str['format'] = format
         next_page_query_str['format'] = format
