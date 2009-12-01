@@ -90,8 +90,7 @@ class Query:
         bugs = mysite.search.models.Bug.open_ones.filter(self.get_Q())
 
         if not bugs:
-            return []
-
+            return {}
         
         bitesize_get_parameters = dict(self.facets)
         bitesize_get_parameters.update({
