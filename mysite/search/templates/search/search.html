@@ -57,10 +57,10 @@ Search bugs
             <li>
                 {{ facet.sidebar_name }}
                 <ul>
-                    {% for value in facet.values %}
-                    {% if value.name %}
-                    <li><a href='?{{ value.query_string }}'>
-                        {{ value.name }} ({{ value.count }})
+                    {% for option in facet.options %}
+                    {% if option.name %}
+                    <li><a href='?{{ option.query_string }}'>
+                        {{ option.name }} ({{ option.count }})
                     </a></li>
                     {% endif %}
                     {% endfor %}

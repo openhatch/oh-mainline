@@ -605,7 +605,7 @@ class QueryGetPossibleFacets(SearchTest):
                 facets={'language': 'c'}) # active facets
         possible_facets = query.get_possible_facets()
         self.assertEqual(
-                possible_facets['language']['values'],
+                possible_facets['language']['options'],
                 [
                     { 'name': 'all', 'query_string': 'q=bug', 'count': 2 },
                     { 'name': 'c', 'query_string': 'q=bug&language=c', 'count': 1 },
@@ -614,7 +614,7 @@ class QueryGetPossibleFacets(SearchTest):
                     ]
                     )
         self.assertEqual(
-                possible_facets['toughness']['values'],
+                possible_facets['toughness']['options'],
                 [
                     { 'name': 'all', 'count': 2 },
                     { 'name': 'bitesize', 'count': 1 },
@@ -625,6 +625,7 @@ class SingleTerm(SearchTest):
     """Search for just a single term."""
 
     def setUp(self):
+        SearchTest.setUp(self)
         python_project = Project.create_dummy(language='Python')
         perl_project = Project.create_dummy(language='Perl')
         c_project = Project.create_dummy(language='C')
@@ -654,7 +655,7 @@ class SingleTerm(SearchTest):
         self.assertEqual(query.terms, ['screensaver'])
         self.assertFalse(query.active_facets) # No facets
 
-        output_possible_facets = query.get_possible_facets()
+        self.output_possible_facets = query.get_possible_facets()
 
     def test_toughness_facet(self):
         # What options do we expect?
@@ -665,7 +666,7 @@ class SingleTerm(SearchTest):
         expected_toughness_facet_options = [toughness_option_bitesize, toughness_option_any]
 
         self.assertEqual(
-                output_possible_facets['toughness']['options'],
+                self.output_possible_facets['toughness']['options'],
                 expected_toughness_facet_options 
                 )
 
@@ -683,7 +684,7 @@ class SingleTerm(SearchTest):
                 ]
 
         self.assertEqual(
-                output_possible_facets['languages']['options'],
+                self.output_possible_facets['language']['options'],
                 expected_languages_facet_options 
                 )
 

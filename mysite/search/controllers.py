@@ -120,13 +120,13 @@ class Query:
                     'name_in_GET': "language",
                     'sidebar_name': "by main project language",
                     'description_above_results': "projects primarily coded in %s",
-                    'values': [all_languages],
+                    'options': [all_languages],
                     },
                 'toughness': {
                     'name_in_GET': "toughness",
                     'sidebar_name': "by toughness",
                     'description_above_results': "where toughness = %s",
-                    'values': [bitesize_option]
+                    'options': [bitesize_option]
                     }
                 }
 
@@ -142,7 +142,7 @@ class Query:
                 })
             lang_query_string = urllib.urlencode(lang_get_parameters)
 
-            possible_facets['language']['values'].append({
+            possible_facets['language']['options'].append({
                 'name': lang,
                 'count': bugs.filter(project__language=lang).count(),
                 'query_string': lang_query_string
