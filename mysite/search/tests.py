@@ -43,6 +43,17 @@ class SearchTest(TwillTests):
         search_url = "/search/" 
         return self.client.get(search_url, {'q': query})
 
+    def compare_lists(self, one, two):
+        self.assertEqual(len(one), len(two))
+        self.assertEqual(set(one), set(two))
+
+    def compare_lists_of_dicts (self, one, two):
+        sorted_one = sorted(one)
+        sorted_two = sorted(two)
+        self.assertEqual(len(sorted_one), len(sorted_two))
+        for k in range(len(sorted_one)):
+            self.assertEqual(sorted_one[k], sorted_two[k])
+
 class AutoCompleteTests(SearchTest):
     """
     Test whether the autocomplete can handle
@@ -441,12 +452,8 @@ class Recommend(SearchTest):
                         "Expected %s in template"
                         "inspired by %s." % (term, source))
 
-        def compare_lists(one, two):
-            self.assertEqual(len(one), len(two))
-            self.assertEqual(set(one), set(two))
-
         expected_tags = sum(source2terms.values(), [])
-        compare_lists(expected_tags, tags_in_template)
+        self.compare_lists(expected_tags, tags_in_template)
 
 # We're not doing this one because at the moment suggestions only work in JS.
 #    def test_recommendations_with_twill(self):
@@ -661,7 +668,7 @@ class SingleTerm(SearchTest):
         # What options do we expect?
         toughness_option_bitesize = {'name': 'bitesize', 'count': 1,
                 'query_string': 'q=screensaver&toughness=bitesize'}
-        toughness_option_any = {'name': 'any', 'count': 1,
+        toughness_option_any = {'name': 'any', 'count': 3,
                 'query_string': 'q=screensaver'}
         expected_toughness_facet_options = [toughness_option_bitesize, toughness_option_any]
 
@@ -672,17 +679,22 @@ class SingleTerm(SearchTest):
 
     def test_languages_facet(self):
         # What options do we expect?
-        languages_option_python = {'name': 'python', 'count': 2,
-                'query_string': 'q=screensaver&language=python'}
-        languages_option_perl = {'name': 'perl', 'count': 1,
-                'query_string': 'q=screensaver&language=perl'}
+        languages_option_python = {'name': 'Python', 'count': 2,
+                'query_string': 'q=screensaver&language=Python'}
+        languages_option_perl = {'name': 'Perl', 'count': 1,
+                'query_string': 'q=screensaver&language=Perl'}
         languages_option_any = {'name': 'any', 'count': 3,
                 'query_string': 'q=screensaver'}
-        expected_languages_facet_options  = [
+        expected_languages_facet_options = [
                 languages_option_python, 
                 languages_option_perl,
+                languages_option_any 
                 ]
 
+        self.compare_lists_of_dicts(
+                self.output_possible_facets['language']['options'],
+                expected_languages_facet_options 
+                )
         self.assertEqual(
                 self.output_possible_facets['language']['options'],
                 expected_languages_facet_options 

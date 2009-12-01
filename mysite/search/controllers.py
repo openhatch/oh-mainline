@@ -103,9 +103,15 @@ class Query:
             'toughness': 'bitesize',
             })
         bitesize_query_string = urllib.urlencode(bitesize_get_parameters)
-        bitesize_count = 0
+        bitesize_count = bugs.filter(good_for_newcomers=True).count()
         bitesize_option = {'name': 'bitesize', 'count': bitesize_count,
                 'query_string': bitesize_query_string}
+        any_toughness = {
+                'name': 'any',
+                'count': bugs.count(),
+                # FIXME: we'll need more constraints when # of active_facets > 1.
+                'query_string': urllib.urlencode({'q': self.terms_string})
+                }
 
         any_language = {
                 'name': 'any',
@@ -126,10 +132,9 @@ class Query:
                     'name_in_GET': "toughness",
                     'sidebar_name': "by toughness",
                     'description_above_results': "where toughness = %s",
-                    'options': [bitesize_option]
+                    'options': [bitesize_option, any_toughness]
                     }
                 }
-
 
         distinct_language_columns = bugs.values('project__language').distinct()
         languages = [x['project__language'] for x in distinct_language_columns]
