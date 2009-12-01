@@ -210,6 +210,10 @@ class SearchResultsSpecificBugs(SearchTest):
 class SearchResults(TwillTests):
     fixtures = ['bugs-for-two-projects.json']
 
+    def test_query_object_is_false_when_no_terms_or_facets(self):
+        query = mysite.search.controllers.Query.create_from_GET({})
+        self.assertFalse(query)
+
     def test_show_no_bugs_if_no_query(self):
         # Call up search page with no query.
         response = self.client.get('/search/')
