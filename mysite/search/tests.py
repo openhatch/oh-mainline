@@ -660,7 +660,7 @@ class SingleTerm(SearchTest):
         GET = { 'q': 'screensaver' }
         query = mysite.search.controllers.Query.create_from_GET(GET)
         self.assertEqual(query.terms, ['screensaver'])
-        self.assertFalse(query.active_facets) # No facets
+        self.assertFalse(query.active_facet_options) # No facets
 
         self.output_possible_facets = query.get_possible_facets()
 
@@ -695,7 +695,74 @@ class SingleTerm(SearchTest):
                 self.output_possible_facets['language']['options'],
                 expected_languages_facet_options 
                 )
-        self.assertEqual(
+
+class SingleFacetOption(SearchTest):
+    """Browse bugs matching a single facet option."""
+
+    def setUp(self):
+        SearchTest.setUp(self)
+        python_project = Project.create_dummy(language='Python')
+        perl_project = Project.create_dummy(language='Perl')
+        c_project = Project.create_dummy(language='C')
+
+        bitesize_matching_bug_in_python = Bug.create_dummy(
+                project=python_project,
+                good_for_newcomers=True, 
+                description='screensaver')
+
+        nonbitesize_matching_bug_in_python = Bug.create_dummy(
+                project=python_project,
+                good_for_newcomers=False, 
+                description='screensaver')
+
+        nonbitesize_matching_bug_in_perl = Bug.create_dummy(
+                project=perl_project,
+                good_for_newcomers=False, 
+                description='screensaver')
+
+        nonbitesize_nonmatching_bug_in_c = Bug.create_dummy(
+                project=c_project,
+                good_for_newcomers=False, 
+                description='toast')
+
+        GET = { 'language': 'python' }
+        query = mysite.search.controllers.Query.create_from_GET(GET)
+        self.assertFalse(query.terms) # No terms
+        self.assertEqual(query.active_facet_options, {'language': 'python'}) 
+
+        self.output_possible_facets = query.get_possible_facets()
+
+    def test_toughness_facet(self):
+        # What options do we expect?
+        toughness_option_bitesize = {'name': 'bitesize', 'count': 1,
+                'query_string': 'language=python&toughness=bitesize'}
+        toughness_option_any = {'name': 'any', 'count': 2,
+                'query_string': 'language=python'}
+        expected_toughness_facet_options = [toughness_option_bitesize, toughness_option_any]
+
+        self.compare_lists_of_dicts(
+                self.output_possible_facets['toughness']['options'],
+                expected_toughness_facet_options 
+                )
+
+    def test_languages_facet(self):
+        # What options do we expect?
+        languages_option_python = {'name': 'python', 'count': 2,
+                'query_string': 'language=python'}
+        languages_option_perl = {'name': 'perl', 'count': 1,
+                'query_string': 'language=perl'}
+        languages_option_c = {'name': 'c', 'count': 1,
+                'query_string': 'language=c'}
+        languages_option_any = {'name': 'any', 'count': 4,
+                'query_string': ''}
+        expected_languages_facet_options = [
+                languages_option_python, 
+                languages_option_perl,
+                languages_option_c,
+                languages_option_any 
+                ]
+
+        self.compare_lists_of_dicts(
                 self.output_possible_facets['language']['options'],
                 expected_languages_facet_options 
                 )
