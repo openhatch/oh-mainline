@@ -107,8 +107,8 @@ class Query:
         bitesize_option = {'name': 'bitesize', 'count': bitesize_count,
                 'query_string': bitesize_query_string}
 
-        all_languages = {
-                'name': 'all',
+        any_language = {
+                'name': 'any',
                 'count': bugs.count(),
                 # FIXME: we'll need more constraints when # of active_facets > 1.
                 'query_string': urllib.urlencode({'q': self.terms_string})
@@ -120,7 +120,7 @@ class Query:
                     'name_in_GET': "language",
                     'sidebar_name': "by main project language",
                     'description_above_results': "projects primarily coded in %s",
-                    'options': [all_languages],
+                    'options': [any_language],
                     },
                 'toughness': {
                     'name_in_GET': "toughness",

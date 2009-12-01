@@ -661,7 +661,7 @@ class SingleTerm(SearchTest):
         # What options do we expect?
         toughness_option_bitesize = {'name': 'bitesize', 'count': 1,
                 'query_string': 'q=screensaver&toughness=bitesize'}
-        toughness_option_any = {'name': 'bitesize', 'count': 1,
+        toughness_option_any = {'name': 'any', 'count': 1,
                 'query_string': 'q=screensaver'}
         expected_toughness_facet_options = [toughness_option_bitesize, toughness_option_any]
 
