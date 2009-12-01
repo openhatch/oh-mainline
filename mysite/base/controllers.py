@@ -37,3 +37,11 @@ def mysql_regex_escape(s):
         else:
             ret += '[' + letter + ']'
     return ret
+
+# Thanks to zalun's comment at  
+# http://stackoverflow.com/questions/41547/always-including-the-user-in-the-django-template-context
+def add_user_variable_to_template_context(request):
+    if hasattr(request, 'user'):
+        return {'the_user': request.user}
+    return {}
+
