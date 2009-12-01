@@ -777,13 +777,14 @@ class PersonalData(TwillTests):
     def test_all_views_that_call_get_personal_data(self):
         # Views where you can look at somebody else.
         stalking_view2args = {
-                mysite.profile.views.display_person_web: {'user_to_display__username': 'paulproteus'},
+                mysite.profile.views.display_person_web: {
+                    'user_to_display__username': 'paulproteus'},
+                mysite.project.views.project: {
+                    'project__name': 'ccHost'},
                 }
 
         # Views where you look only at yourself.
         navelgazing_view2args = {
-                mysite.profile.views.projectexp_add_form: {},
-                mysite.profile.views.projectexp_edit: {'project__name': 'ccHost'},
                 mysite.profile.views.importer: {},
                 mysite.profile.views.display_person_edit_name: {},
                 }
