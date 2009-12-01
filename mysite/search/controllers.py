@@ -7,10 +7,10 @@ from django.db.models import Q
 
 class Query:
     
-    def __init__(self, terms, facets=None, terms_string=None): 
+    def __init__(self, terms, active_facets=None, terms_string=None): 
         self.terms = terms
         # FIXME: Change the name to "active facets".
-        self.facets = facets or {}
+        self.active_facets = active_facets or {}
         self._terms_string = terms_string
 
     @property
@@ -52,13 +52,13 @@ class Query:
         terms_string = GET.get('q', '')
         terms = Query.split_into_terms(terms_string)
 
-        return Query(terms=terms, facets=active_facets, terms_string=terms_string)
+        return Query(terms=terms, active_facets=active_facets, terms_string=terms_string)
 
     def get_bugs_unordered(self):
         return mysite.search.models.Bug.open_ones.filter(self.get_Q())
 
     def __nonzero__(self):
-        if self.terms or self.facets:
+        if self.terms or self.active_facets:
             return 1
         return 0
 
@@ -68,11 +68,11 @@ class Query:
         # Begin constructing a conjunction of Q objects (filters)
         q = Q()
 
-        if self.facets.get('toughness', None) == 'bitesize':
+        if self.active_facets.get('toughness', None) == 'bitesize':
             q &= Q(good_for_newcomers=True)
 
-        if 'language' in self.facets and 'language' not in exclude_these_facets:
-            q &= Q(project__language__iexact=self.facets['language'])
+        if 'language' in self.active_facets and 'language' not in exclude_these_facets:
+            q &= Q(project__language__iexact=self.active_facets['language'])
 
         for word in self.terms:
             whole_word = "[[:<:]]%s[[:>:]]" % (
@@ -97,21 +97,24 @@ class Query:
         if not bugs:
             return {}
         
-        bitesize_get_parameters = dict(self.facets)
+        bitesize_get_parameters = dict(self.active_facets)
         bitesize_get_parameters.update({
             'q': self.terms_string,
             'toughness': 'bitesize',
             })
         bitesize_query_string = urllib.urlencode(bitesize_get_parameters)
+        bitesize_count = 0
+        bitesize_option = {'name': 'bitesize', 'count': bitesize_count,
+                'query_string': bitesize_query_string}
 
         all_languages = {
                 'name': 'all',
                 'count': bugs.count(),
-                # FIXME: we'll need more constraints when # of facets > 1.
+                # FIXME: we'll need more constraints when # of active_facets > 1.
                 'query_string': urllib.urlencode({'q': self.terms_string})
                 }
 
-        facets = { 
+        possible_facets = { 
                 # The languages facet is based on the project languages, "for now"
                 'language': {
                     'name_in_GET': "language",
@@ -123,13 +126,7 @@ class Query:
                     'name_in_GET': "toughness",
                     'sidebar_name': "by toughness",
                     'description_above_results': "where toughness = %s",
-                    'values': [
-                        {
-                            'name': "bitesize",
-                            'count': 0,
-                            'query_string': bitesize_query_string
-                            }
-                        ]
+                    'values': [bitesize_option]
                     }
                 }
 
@@ -138,17 +135,17 @@ class Query:
         languages = [x['project__language'] for x in distinct_language_columns]
         for lang in sorted(languages):
 
-            lang_get_parameters = dict(self.facets)
+            lang_get_parameters = dict(self.active_facets)
             lang_get_parameters.update({
                 'q': self.terms_string,
                 'language': lang,
                 })
             lang_query_string = urllib.urlencode(lang_get_parameters)
 
-            facets['language']['values'].append({
+            possible_facets['language']['values'].append({
                 'name': lang,
                 'count': bugs.filter(project__language=lang).count(),
                 'query_string': lang_query_string
                 })
 
-        return facets
+        return possible_facets
