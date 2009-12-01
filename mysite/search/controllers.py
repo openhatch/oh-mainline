@@ -9,6 +9,7 @@ class Query:
     
     def __init__(self, terms, facets=None, terms_string=None): 
         self.terms = terms
+        # FIXME: Change the name to "active facets".
         self.facets = facets or {}
         self._terms_string = terms_string
 
@@ -56,8 +57,10 @@ class Query:
     def get_bugs_unordered(self):
         return mysite.search.models.Bug.open_ones.filter(self.get_Q())
 
-    def __bool__(self):
-        return self.terms or self.active_facets
+    def __nonzero__(self):
+        if self.terms or self.facets:
+            return 1
+        return 0
 
     def get_Q(self):
         """Get a Q object which can be passed to Bug.open_ones.filter()"""
