@@ -598,20 +598,31 @@ class QueryGetPossibleFacets(SearchTest):
         project1 = Project.create_dummy(language='c')
         project2 = Project.create_dummy(language='d')
         project3 = Project.create_dummy(language='e')
-        Bug.create_dummy(project=project1, description='bug')
+        Bug.create_dummy(project=project1, description='bug', good_for_newcomers=True)
         Bug.create_dummy(project=project2, description='bug')
         Bug.create_dummy(project=project3, description='bAg')
         query = mysite.search.controllers.Query(
                 terms=['bug'],
+                terms_string='bug',
                 facets={'language': 'c'}) # active facets
         possible_facets = query.get_possible_facets()
         self.assert_(
                 possible_facets['language']['values'],
                 [
+                    { 'name': 'all', 'count': 2 },
                     { 'name': 'c', 'count': 1 },
                     { 'name': 'd', 'count': 1 },
                     # not e
                     ]
                     )
+        self.assert_(
+                possible_facets['toughness']['values'],
+                [
+                    { 'name': 'all', 'count': 2 },
+                    { 'name': 'bitesize', 'count': 1 },
+                    ]
+                    )
 
-# vim: set nu ai et ts=4 sw=4 columns=80:
+#class OneFacetDoesntLimitAnother
+
+# vim: set nu ai et ts=4 sw=4 columns=100:
