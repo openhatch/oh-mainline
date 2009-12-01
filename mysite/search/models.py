@@ -207,7 +207,7 @@ class Bug(models.Model):
     def create_dummy(**kwargs):
         now = datetime.datetime.utcnow()
         n = str(Bug.all_bugs.count())
-        data = dict(title="Bug "+n, project=Project.objects.all()[0], 
+        data = dict(title=n, project=Project.objects.all()[0], 
                 date_reported=now,
                 last_touched=now,
                 last_polled=now,

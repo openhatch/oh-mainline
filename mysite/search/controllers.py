@@ -62,7 +62,7 @@ class Query:
             return 1
         return 0
 
-    def get_Q(self):
+    def get_Q(self, exclude_these_facets=()):
         """Get a Q object which can be passed to Bug.open_ones.filter()"""
 
         # Begin constructing a conjunction of Q objects (filters)
@@ -71,7 +71,7 @@ class Query:
         if self.facets.get('toughness', None) == 'bitesize':
             q &= Q(good_for_newcomers=True)
 
-        if 'language' in self.facets:
+        if 'language' in self.facets and 'language' not in exclude_these_facets:
             q &= Q(project__language__iexact=self.facets['language'])
 
         for word in self.terms:
@@ -90,7 +90,9 @@ class Query:
         return q
 
     def get_possible_facets(self):
-        bugs = mysite.search.models.Bug.open_ones.filter(self.get_Q())
+
+        filter_just_on_terms = self.get_Q(exclude_these_facets=('language',))
+        bugs = mysite.search.models.Bug.open_ones.filter(filter_just_on_terms)
 
         if not bugs:
             return {}
@@ -102,6 +104,12 @@ class Query:
             })
         bitesize_query_string = urllib.urlencode(bitesize_get_parameters)
 
+        all_languages = {
+                'name': 'all',
+                'count': bugs.count(),
+                # FIXME: we'll need more constraints when # of facets > 1.
+                'query_string': urllib.urlencode({'q': self.terms_string})
+                }
 
         facets = { 
                 # The languages facet is based on the project languages, "for now"
@@ -109,7 +117,7 @@ class Query:
                     'name_in_GET': "language",
                     'sidebar_name': "by main project language",
                     'description_above_results': "projects primarily coded in %s",
-                    'values': [], # populated below
+                    'values': [all_languages],
                     },
                 'toughness': {
                     'name_in_GET': "toughness",
@@ -124,6 +132,7 @@ class Query:
                         ]
                     }
                 }
+
 
         distinct_language_columns = bugs.values('project__language').distinct()
         languages = [x['project__language'] for x in distinct_language_columns]

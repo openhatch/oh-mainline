@@ -604,16 +604,16 @@ class QueryGetPossibleFacets(SearchTest):
                 terms_string='bug',
                 facets={'language': 'c'}) # active facets
         possible_facets = query.get_possible_facets()
-        self.assert_(
+        self.assertEqual(
                 possible_facets['language']['values'],
                 [
-                    { 'name': 'all', 'count': 2 },
-                    { 'name': 'c', 'count': 1 },
-                    { 'name': 'd', 'count': 1 },
-                    # not e
+                    { 'name': 'all', 'query_string': 'q=bug', 'count': 2 },
+                    { 'name': 'c', 'query_string': 'q=bug&language=c', 'count': 1 },
+                    { 'name': 'd', 'query_string': 'q=bug&language=d', 'count': 1 },
+                    # e is excluded because its bug ('bAg') doesn't match the term 'bug'
                     ]
                     )
-        self.assert_(
+        self.assertEqual(
                 possible_facets['toughness']['values'],
                 [
                     { 'name': 'all', 'count': 2 },
