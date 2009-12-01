@@ -24,7 +24,7 @@ Search bugs
     <h4 style='margin-bottom: 10px;'>
         {% if query.terms %}
         {% if bunch_of_bugs %}
-        Filter results for <strong>{{ query.terms }}</strong>:
+        Filter results for <strong>{{ query.terms_string }}</strong>:
         {% endif %}
         {% else %}
         Browse&hellip;
@@ -37,7 +37,7 @@ Search bugs
                 <li>
                     {% if query.terms %}
                         {# Pick a friendlier URL. #}
-                        <a href='?q={{ q|urlencode }}&amp;toughness=bitesize'>Bite-size</a>
+                        <a href='?q={{ query.terms_string|urlencode }}&amp;toughness=bitesize'>Bite-size</a>
                     {% else %}
                         <a href='?toughness=bitesize'>Bite-size</a>
                     {% endif %}
@@ -118,7 +118,7 @@ Search bugs
             name='q' id='q'
             class='default-text'
             title='Search {% if active_facets %}within results{% else %}bugs{% endif %} by language, project or full text'
-            value='{{ q }}' />
+            value='{{ query.terms_string }}' />
 
             {% for facet, value in active_facets.items %}
             <input type='hidden' name='{{facet}}' value='{{value}}' />
@@ -126,7 +126,7 @@ Search bugs
             <input type='submit' id='button' value='Search' />
         </form>
 
-        {% if q or active_facets or bunch_of_bugs %}
+        {% if query.terms_string or active_facets or bunch_of_bugs %}
         {% include 'search/results_widget.html' %}
         {% endif %}
 
