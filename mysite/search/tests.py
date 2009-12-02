@@ -671,7 +671,7 @@ class SingleTerm(SearchTest):
         toughness_option_bitesize = {'name': 'bitesize', 'count': 1,
                 'query_string': 'q=screensaver&toughness=bitesize'}
         toughness_option_any = {'name': 'any', 'count': 3,
-                'query_string': 'q=screensaver'}
+                'query_string': 'q=screensaver&toughness='}
         expected_toughness_facet_options = [toughness_option_bitesize, toughness_option_any]
 
         self.assertEqual(
@@ -686,7 +686,7 @@ class SingleTerm(SearchTest):
         languages_option_perl = {'name': 'Perl', 'count': 1,
                 'query_string': 'q=screensaver&language=Perl'}
         languages_option_any = {'name': 'any', 'count': 3,
-                'query_string': 'q=screensaver'}
+                'query_string': 'q=screensaver&language='}
         expected_languages_facet_options = [
                 languages_option_python,
                 languages_option_perl,
