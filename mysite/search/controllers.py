@@ -155,8 +155,6 @@ class Query:
                     }
                 }
 
-        distinct_language_columns = bugs.values('project__language').distinct()
-        languages = [x['project__language'] for x in distinct_language_columns]
         for lang in sorted(languages):
 
             lang_GET_data = dict(self.active_facet_options)
@@ -174,3 +172,20 @@ class Query:
                 })
 
         return possible_facets
+
+    def get_GET_data(self):
+        GET_data = {'q': self.terms_string}
+        GET_data.update(self.active_facet_options)
+        return GET_data
+
+    def get_language_names(self):
+
+        GET_data = self.get_GET_data()
+        if 'language' in GET_data:
+            del GET_data['language']
+        query_without_language_facet = Query.create_from_GET_data(GET_data)
+
+        bugs = query_without_language_facet.get_bugs_unordered()
+        distinct_language_columns = bugs.values('project__language').distinct()
+        languages = [x['project__language'] for x in distinct_language_columns]
+        return languages

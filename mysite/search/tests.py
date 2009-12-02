@@ -795,4 +795,63 @@ class QueryGetToughnessFacetOptions(SearchTest):
         self.assertEqual(bitesize_dict['count'], 1)
         self.assertEqual(all_dict['count'], 2)
 
+    def test_get_toughness_facet_options_with_terms(self):
+
+        python_project = Project.create_dummy(language='Python')
+        perl_project = Project.create_dummy(language='Perl')
+
+        bitesize_bug_that_matches = Bug.create_dummy(
+                project=python_project,
+                good_for_newcomers=True,
+                description='a')
+
+        nonbitesize_bug_that_matches = Bug.create_dummy(
+                project=python_project,
+                good_for_newcomers=False,
+                description='a')
+
+        bitesize_bug_that_doesnt_match = Bug.create_dummy(
+                project=perl_project,
+                good_for_newcomers=True,
+                description='b')
+
+        GET_data = {'q': 'a'}
+        query = mysite.search.controllers.Query.create_from_GET_data(GET_data)
+        output = query.get_facet_options('toughness', ['bitesize', ''])
+        bitesize_dict = [d for d in output if d['name'] == 'bitesize'][0]
+        all_dict = [d for d in output if d['name'] == 'any'][0]
+        self.assertEqual(bitesize_dict['count'], 1)
+        self.assertEqual(all_dict['count'], 2)
+
+class QueryGetPossibleLanguageFacetOptionNames(SearchTest):
+
+    def setUp(self):
+        SearchTest.setUp(self)
+        python_project = Project.create_dummy(language='Python')
+        perl_project = Project.create_dummy(language='Perl')
+        c_project = Project.create_dummy(language='C')
+
+        python_bug = Bug.create_dummy(project=python_project, title='a')
+        perl_bug = Bug.create_dummy(project=perl_project, title='a') 
+        c_bug = Bug.create_dummy(project=c_project, title='b') 
+
+    def test_with_term(self):
+        GET_data = {'q': 'a'}
+
+        query = mysite.search.controllers.Query.create_from_GET_data(GET_data)
+        language_names = query.get_language_names()
+        self.assertEqual(
+                sorted(language_names),
+                sorted(['Python', 'Perl']))
+
+    def test_with_active_language_facet(self):
+
+        GET_data = {'language': 'Python'}
+
+        query = mysite.search.controllers.Query.create_from_GET_data(GET_data)
+        language_names = query.get_language_names()
+        self.assertEqual(
+                sorted(language_names),
+                sorted(['Python', 'Perl', 'C']))
+
 # vim: set nu ai et ts=4 sw=4 columns=100:
