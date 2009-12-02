@@ -593,7 +593,7 @@ class FacetsFilterResults(SearchTest):
         not_python_bug = Bug.create_dummy(project=not_python_project)
 
         results = mysite.search.controllers.Query(
-                terms=[], facets=facets).get_bugs_unordered()
+                terms=[], active_facet_options=facets).get_bugs_unordered()
         self.assertEqual(list(results), [python_bug])
 
 class QueryGetPossibleFacets(SearchTest):
@@ -610,7 +610,7 @@ class QueryGetPossibleFacets(SearchTest):
         query = mysite.search.controllers.Query(
                 terms=['bug'],
                 terms_string='bug',
-                facets={'language': 'c'}) # active facets
+                active_facet_options={'language': 'c'})
         possible_facets = query.get_possible_facets()
         self.assertEqual(
                 possible_facets['language']['options'],
