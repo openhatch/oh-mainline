@@ -18,6 +18,7 @@ setup(
                         'celery==0.6.0',
                         'south==0.6-rc1',
                         'multiprocessing==2.6.2.1-oh',
+                        'launchpadlib==1.5.3',
                        ],
 
     dependency_links = ['http://linode.openhatch.org/~paulproteus/',

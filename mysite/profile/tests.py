@@ -4,6 +4,7 @@ import mysite.account.tests
 
 from mysite.search.models import Project
 from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_Person_Tag, Link_ProjectExp_Tag, DataImportAttempt, PortfolioEntry, Citation
+import mysite.project.views
 
 import mysite.profile.views
 import mysite.profile.models
@@ -777,13 +778,12 @@ class PersonalData(TwillTests):
     def test_all_views_that_call_get_personal_data(self):
         # Views where you can look at somebody else.
         stalking_view2args = {
-                mysite.profile.views.display_person_web: {'user_to_display__username': 'paulproteus'},
+                mysite.profile.views.display_person_web: {
+                    'user_to_display__username': 'paulproteus'},
                 }
 
         # Views where you look only at yourself.
         navelgazing_view2args = {
-                mysite.profile.views.projectexp_add_form: {},
-                mysite.profile.views.projectexp_edit: {'project__name': 'ccHost'},
                 mysite.profile.views.importer: {},
                 mysite.profile.views.display_person_edit_name: {},
                 }
