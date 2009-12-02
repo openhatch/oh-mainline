@@ -7,8 +7,8 @@ from django.db.models import Q
 
 class Query:
     
-    def __init__(self, terms, active_facet_options=None, terms_string=None): 
-        self.terms = terms
+    def __init__(self, terms=None, active_facet_options=None, terms_string=None): 
+        self.terms = terms or []
         # FIXME: Change the name to "active facets".
         self.active_facet_options = active_facet_options or {}
         self._terms_string = terms_string
@@ -94,6 +94,29 @@ class Query:
 
         return q
 
+    def get_facet_options(self, facet_name, option_names):
+
+        def get_facet_option_data(option_name):
+            # Create a Query for this option. 
+
+            # This Query is sensitive to the currently active facet options...
+            GET_data = dict(self.active_facet_options)
+
+            # ...except the toughness facet option in question.
+            GET_data.update({
+                'q': self.terms_string,
+                facet_name: option_name,
+                })
+            query_string = urllib.urlencode(GET_data)
+            query = Query.create_from_GET_data(GET_data)
+            return {
+                    'name': option_name or 'any',
+                    'count': query.get_bugs_unordered().count(),
+                    'query_string': query_string
+                    }
+
+        return [get_facet_option_data(n) for n in option_names]
+
     def get_possible_facets(self):
 
         bugs = mysite.search.models.Bug.open_ones.filter(self.get_Q())
@@ -101,33 +124,6 @@ class Query:
         if not bugs:
             return {}
         
-        bitesize_GET_data = dict(self.active_facet_options)
-        bitesize_GET_data.update({
-            'q': self.terms_string,
-            'toughness': 'bitesize',
-            })
-        bitesize_query_string = urllib.urlencode(bitesize_GET_data)
-        bitesize_query = Query.create_from_GET_data(bitesize_GET_data)
-        bitesize_option = {
-                'name': 'bitesize',
-                'count': bitesize_query.get_bugs_unordered().count(),
-                'query_string': bitesize_query_string}
-
-        any_toughness_GET_data = {'q': self.terms_string}
-        # Add all the active facet options
-        any_toughness_GET_data.update(dict(self.active_facet_options))
-        # Remove the toughness option
-        if 'toughness' in any_toughness_GET_data:
-            del any_toughness_GET_data['toughness']
-        any_toughness_query = Query.create_from_GET_data(any_toughness_GET_data)
-        any_toughness = {
-                'name': 'any',
-                'count': any_toughness_query.get_bugs_unordered().count(),
-                'query_string': urllib.urlencode(any_toughness_GET_data)
-                }
-
-        import pdb; pdb.set_trace()
-
         # Figure out the query string for the facet option "any language"
         # Begin with the term
         any_language_GET_data = {'q': self.terms_string}
@@ -155,7 +151,7 @@ class Query:
                     'name_in_GET': "toughness",
                     'sidebar_name': "by toughness",
                     'description_above_results': "where toughness = %s",
-                    'options': [bitesize_option, any_toughness]
+                    'options': get_toughness_facet_options()
                     }
                 }
 

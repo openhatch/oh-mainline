@@ -768,4 +768,31 @@ class SingleFacetOption(SearchTest):
                 expected_languages_facet_options 
                 )
 
+class QueryGetToughnessFacetOptions(SearchTest):
+    def test_get_toughness_facet_options(self):
+
+        python_project = Project.create_dummy(language='Python')
+        perl_project = Project.create_dummy(language='Perl')
+
+        bitesize_bug_in_python = Bug.create_dummy(
+                project=python_project,
+                good_for_newcomers=True, )
+
+        nonbitesize_bug_in_python = Bug.create_dummy(
+                project=python_project,
+                good_for_newcomers=False, )
+
+        bitesize_bug_in_perl = Bug.create_dummy(
+                project=perl_project,
+                good_for_newcomers=True, )
+
+        query = mysite.search.controllers.Query(
+                active_facet_options={'language': 'Python'},
+                terms_string='')
+        output = query.get_facet_options('toughness', ['bitesize', ''])
+        bitesize_dict = [d for d in output if d['name'] == 'bitesize'][0]
+        all_dict = [d for d in output if d['name'] == 'any'][0]
+        self.assertEqual(bitesize_dict['count'], 1)
+        self.assertEqual(all_dict['count'], 2)
+
 # vim: set nu ai et ts=4 sw=4 columns=100:
