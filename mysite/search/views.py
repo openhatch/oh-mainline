@@ -68,9 +68,6 @@ def fetch_bugs(request):
     data = {}
     data['query'] = query
 
-    # Handle facets
-    data['all_facets'] = query.get_possible_facets()
-
     prev_page_query_str = QueryDict('')
     prev_page_query_str = prev_page_query_str.copy()
     next_page_query_str = QueryDict('')
