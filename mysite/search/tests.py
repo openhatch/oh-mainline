@@ -578,7 +578,8 @@ class SearchTemplateDecodesQueryString(SearchTest):
     def test_facets_appear_in_search_template_context(self):
         response = self.client.get('/search/', {'language': 'Python'})
         expected_facets = { 'language': 'Python' }
-        self.assertEqual(response.context['query'].facets, expected_facets)
+        self.assertEqual(response.context['query'].active_facet_options,
+                         expected_facets)
 
 class FacetsFilterResults(SearchTest):
     def test_facets_filter_results(self):
