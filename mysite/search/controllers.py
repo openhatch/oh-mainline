@@ -121,23 +121,9 @@ class Query:
 
         bugs = mysite.search.models.Bug.open_ones.filter(self.get_Q())
 
-        if not bugs:
-            return {}
-        
-        # Figure out the query string for the facet option "any language"
-        # Begin with the term
-        any_language_GET_data = {'q': self.terms_string}
-        # Add all the active facet options
-        any_language_GET_data.update(dict(self.active_facet_options))
-        # Remove the language option
-        if 'language' in any_language_GET_data:
-            del any_language_GET_data['language']
-        any_language_query = Query.create_from_GET_data(any_language_GET_data)
-        any_language = {
-                'name': 'any',
-                'count': any_language_query.get_bugs_unordered().count(),
-                'query_string': urllib.urlencode(any_language_GET_data)
-                }
+        toughness_options = self.get_facet_options('toughness', ['bitesize', ''])
+
+        language_options = self.get_facet_options('language', self.get_language_names() + [''])
 
         possible_facets = { 
                 # The languages facet is based on the project languages, "for now"
@@ -145,31 +131,15 @@ class Query:
                     'name_in_GET': "language",
                     'sidebar_name': "by main project language",
                     'description_above_results': "projects primarily coded in %s",
-                    'options': [any_language],
+                    'options': language_options,
                     },
                 'toughness': {
                     'name_in_GET': "toughness",
                     'sidebar_name': "by toughness",
                     'description_above_results': "where toughness = %s",
-                    'options': get_toughness_facet_options()
+                    'options': toughness_options,
                     }
                 }
-
-        for lang in sorted(languages):
-
-            lang_GET_data = dict(self.active_facet_options)
-
-            lang_GET_data.update({
-                'q': self.terms_string,
-                'language': lang,
-                })
-            lang_query = Query.create_from_GET_data(lang_GET_data)
-            lang_query_string = urllib.urlencode(lang_GET_data)
-            possible_facets['language']['options'].append({
-                'name': lang,
-                'count': lang_query.get_bugs_unordered().count(),
-                'query_string': lang_query_string
-                })
 
         return possible_facets
 
@@ -188,4 +158,5 @@ class Query:
         bugs = query_without_language_facet.get_bugs_unordered()
         distinct_language_columns = bugs.values('project__language').distinct()
         languages = [x['project__language'] for x in distinct_language_columns]
+        languages = [l for l in languages if l]
         return languages

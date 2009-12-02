@@ -43,7 +43,7 @@ def fetch_bugs(request):
 
     total_bug_count = 0
 
-    query = mysite.search.controllers.Query.create_from_GET(request.GET)
+    query = mysite.search.controllers.Query.create_from_GET_data(request.GET)
 
     if query:
         bugs = Bug.open_ones.filter(query.get_Q())
@@ -81,9 +81,9 @@ def fetch_bugs(request):
     if format:
         prev_page_query_str['format'] = format
         next_page_query_str['format'] = format
-    for facet_name, value in query.facets.items():
-        prev_page_query_str[facet_name] = value
-        next_page_query_str[facet_name] = value
+    for facet_name, selected_option in query.active_facet_options.items():
+        prev_page_query_str[facet_name] = selected_option
+        next_page_query_str[facet_name] = selected_option
     diff = end - start
     prev_page_query_str['start'] = start - diff - 1
     prev_page_query_str['end'] = start - 1
