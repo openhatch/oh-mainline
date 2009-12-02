@@ -9,7 +9,6 @@ class Query:
     
     def __init__(self, terms=None, active_facet_options=None, terms_string=None): 
         self.terms = terms or []
-        # FIXME: Change the name to "active facets".
         self.active_facet_options = active_facet_options or {}
         self._terms_string = terms_string
 
