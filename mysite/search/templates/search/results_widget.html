@@ -1,23 +1,28 @@
+<style type='text/css'>.active_facet_value
+  {background-color: #dfd; padding: 0 2px; }</style>
+
 <div class='search-result-control' id='results-widget'>
     <span id='results-summary'>
 
-        {% if q %}
+        {% if query.terms %}
         You searched bugs for
-        <strong id='results-summary-language'>{{ q }}</strong>{% if not active_facet_options %}.{% endif %}
+        <strong id='results-summary-language'>{{ query.terms_string }}</strong>{% if not active_facet_options %}.{% endif %}
         {% endif %}
 
         {% comment %} FIXME Use django filter to remove whitespace {% endcomment %}
-        {% if active_facet_options %}
+        {% if query.active_facet_options %}
             {% if not q %}
             You are browsing bugs
             {% endif %}
-            {% for facet, value in active_facet_options.items %}
-            in 
-            <style type='text/css'>.active_facet_value
-                {background-color: #dfd; padding: 0 2px; }</style>
-            <span class='active_facet_value'>projects primarily coded in
+            {% for facet, value in query.active_facet_options.items %}
+            <span class='active_facet_value'>{%ifequal facet "language"%} in projects primarily coded in {%endifequal%}{%ifequal facet "toughness"%} whose toughness is {%endifequal%}
                 <strong>{{value}}</strong>
-                <a href='?q={{q}}'>[x]</a></span>.
+                <a href='?{%ifequal facet "language"%}{{facet2any_query_string.language}}{%endifequal%}{%ifequal facet "toughness"%}{{facet2any_query_string.toughness}}{%endifequal%}'>[x]</a></span>
+	    {% if forloop.last %}
+	    .
+	    {% else %}
+	    and
+	    {% endif %}
             {% endfor %}
         {% endif %}
 

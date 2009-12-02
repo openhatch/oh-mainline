@@ -31,20 +31,6 @@ Search bugs
         {% endif %}
     </h4>
     <ul id='facets'>
-        <li>
-            by tag
-            <ul>
-                <li>
-                    {% if query.terms %}
-                        {# Pick a friendlier URL. #}
-                        <a href='?q={{ query.terms_string|urlencode }}&amp;toughness=bitesize'>Bite-size</a>
-                    {% else %}
-                        <a href='?toughness=bitesize'>Bite-size</a>
-                    {% endif %}
-                    <small> (<a id='define-bite-size' href="#">what's this?</a>) </small>
-                </li>
-            </ul>
-        </li>
         {% for facet_name, facet in query.get_possible_facets.items %}
             {% comment %}
             facets = e.g. {
@@ -61,7 +47,12 @@ Search bugs
                     {% if option.name %}
                     <li><a href='?{{ option.query_string }}'>
                         {{ option.name }} ({{ option.count }})
-                    </a></li>
+                    </a>
+		      {%ifequal option.name 'bitesize'%}
+		      <small> (<a id='define-bite-size' href="#">what's this?</a>) </small>
+		      {%endifequal%}
+
+</li>
                     {% endif %}
                     {% endfor %}
                 </ul>

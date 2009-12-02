@@ -92,6 +92,15 @@ def fetch_bugs(request):
     data['prev_page_url'] = '/search/?' + prev_page_query_str.urlencode()
     data['next_page_url'] = '/search/?' + next_page_query_str.urlencode()
 
+    # FIXME
+    # The template has no way of grabbing what URLs to put in the [x]
+    # So we help it out here by hacking around our fruity list-of-dicts
+    # data structure.
+    facet2any_query_string = {}
+    for facet in query.active_facet_options:
+        facet2any_query_string[facet] = query.get_facet_options(
+            facet, [''])[0]['query_string']
+
     if format == 'json':
         # FIXME: Why `alert`?
         return bugs_to_json_response(data, bugs, request.GET.get(
@@ -105,6 +114,7 @@ def fetch_bugs(request):
         data['total_bug_count'] = total_bug_count
         data['show_prev_page_link'] = start > 1
         data['show_next_page_link'] = end < (total_bug_count - 1)
+        data['facet2any_query_string'] = facet2any_query_string
 
         return render_to_response('search/search.html', data)
     # }}}
