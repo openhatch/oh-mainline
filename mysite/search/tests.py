@@ -756,7 +756,7 @@ class SingleFacetOption(SearchTest):
         languages_option_c = {'name': 'C', 'count': 1,
                 'query_string': 'q=&language=C'}
         languages_option_any = {'name': 'any', 'count': 4,
-                'query_string': 'q='}
+                'query_string': 'q=&language='}
         expected_languages_facet_options = [
                 languages_option_python, 
                 languages_option_perl,
