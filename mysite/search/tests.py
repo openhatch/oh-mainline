@@ -613,20 +613,21 @@ class QueryGetPossibleFacets(SearchTest):
                 terms_string='bug',
                 active_facet_options={'language': 'c'})
         possible_facets = query.get_possible_facets()
-        self.assertEqual(
+        self.compare_lists_of_dicts(
                 possible_facets['language']['options'],
                 [
-                    { 'name': 'all', 'query_string': 'q=bug', 'count': 2 },
+                    { 'name': 'any', 'query_string': 'q=bug&language=', 'count': 2 },
                     { 'name': 'c', 'query_string': 'q=bug&language=c', 'count': 1 },
                     { 'name': 'd', 'query_string': 'q=bug&language=d', 'count': 1 },
                     # e is excluded because its bug ('bAg') doesn't match the term 'bug'
                     ]
                     )
-        self.assertEqual(
+
+        self.compare_lists_of_dicts(
                 possible_facets['toughness']['options'],
                 [
-                    { 'name': 'all', 'count': 2 },
-                    { 'name': 'bitesize', 'count': 1 },
+                    { 'name': 'any', 'query_string': 'q=bug&toughness=&language=c', 'count': 1 },
+                    { 'name': 'bitesize', 'query_string': 'q=bug&toughness=bitesize&language=c', 'count': 1 },
                     ]
                     )
 
@@ -739,7 +740,7 @@ class SingleFacetOption(SearchTest):
         toughness_option_bitesize = {'name': 'bitesize', 'count': 1,
                 'query_string': 'q=&toughness=bitesize&language=Python'}
         toughness_option_any = {'name': 'any', 'count': 2,
-                'query_string': 'q=&language=Python'}
+                'query_string': 'q=&toughness=&language=Python'}
         expected_toughness_facet_options = [toughness_option_bitesize, toughness_option_any]
 
         self.compare_lists_of_dicts(
