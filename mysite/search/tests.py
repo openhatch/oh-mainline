@@ -47,11 +47,12 @@ class SearchTest(TwillTests):
         self.assertEqual(len(one), len(two))
         self.assertEqual(set(one), set(two))
 
-    def compare_lists_of_dicts (self, one, two):
+    def compare_lists_of_dicts(self, one, two):
         sorted_one = sorted(one)
         sorted_two = sorted(two)
-        self.assertEqual(len(sorted_one), len(sorted_two))
         for k in range(len(sorted_one)):
+            self.assertEqual(sorted_one[k], sorted_two[k])
+        for k in range(len(sorted_two)):
             self.assertEqual(sorted_one[k], sorted_two[k])
 
 class AutoCompleteTests(SearchTest):
@@ -222,7 +223,7 @@ class SearchResults(TwillTests):
     fixtures = ['bugs-for-two-projects.json']
 
     def test_query_object_is_false_when_no_terms_or_facets(self):
-        query = mysite.search.controllers.Query.create_from_GET({})
+        query = mysite.search.controllers.Query.create_from_GET_data({})
         self.assertFalse(query)
 
     def test_show_no_bugs_if_no_query(self):
@@ -657,8 +658,8 @@ class SingleTerm(SearchTest):
                 good_for_newcomers=False, 
                 description='toast')
 
-        GET = { 'q': 'screensaver' }
-        query = mysite.search.controllers.Query.create_from_GET(GET)
+        GET_data = { 'q': 'screensaver' }
+        query = mysite.search.controllers.Query.create_from_GET_data(GET_data)
         self.assertEqual(query.terms, ['screensaver'])
         self.assertFalse(query.active_facet_options) # No facets
 
@@ -686,7 +687,7 @@ class SingleTerm(SearchTest):
         languages_option_any = {'name': 'any', 'count': 3,
                 'query_string': 'q=screensaver'}
         expected_languages_facet_options = [
-                languages_option_python, 
+                languages_option_python,
                 languages_option_perl,
                 languages_option_any 
                 ]
@@ -725,19 +726,19 @@ class SingleFacetOption(SearchTest):
                 good_for_newcomers=False, 
                 description='toast')
 
-        GET = { 'language': 'python' }
-        query = mysite.search.controllers.Query.create_from_GET(GET)
+        GET_data = { 'language': 'Python' }
+        query = mysite.search.controllers.Query.create_from_GET_data(GET_data)
         self.assertFalse(query.terms) # No terms
-        self.assertEqual(query.active_facet_options, {'language': 'python'}) 
+        self.assertEqual(query.active_facet_options, {'language': 'Python'}) 
 
         self.output_possible_facets = query.get_possible_facets()
 
     def test_toughness_facet(self):
         # What options do we expect?
         toughness_option_bitesize = {'name': 'bitesize', 'count': 1,
-                'query_string': 'language=python&toughness=bitesize'}
+                'query_string': 'q=&toughness=bitesize&language=Python'}
         toughness_option_any = {'name': 'any', 'count': 2,
-                'query_string': 'language=python'}
+                'query_string': 'q=&language=Python'}
         expected_toughness_facet_options = [toughness_option_bitesize, toughness_option_any]
 
         self.compare_lists_of_dicts(
@@ -747,14 +748,14 @@ class SingleFacetOption(SearchTest):
 
     def test_languages_facet(self):
         # What options do we expect?
-        languages_option_python = {'name': 'python', 'count': 2,
-                'query_string': 'language=python'}
-        languages_option_perl = {'name': 'perl', 'count': 1,
-                'query_string': 'language=perl'}
-        languages_option_c = {'name': 'c', 'count': 1,
-                'query_string': 'language=c'}
+        languages_option_python = {'name': 'Python', 'count': 2,
+                'query_string': 'q=&language=Python'}
+        languages_option_perl = {'name': 'Perl', 'count': 1,
+                'query_string': 'q=&language=Perl'}
+        languages_option_c = {'name': 'C', 'count': 1,
+                'query_string': 'q=&language=C'}
         languages_option_any = {'name': 'any', 'count': 4,
-                'query_string': ''}
+                'query_string': 'q='}
         expected_languages_facet_options = [
                 languages_option_python, 
                 languages_option_perl,

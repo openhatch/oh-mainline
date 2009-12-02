@@ -3,15 +3,15 @@
 
         {% if q %}
         You searched bugs for
-        <strong id='results-summary-language'>{{ q }}</strong>{% if not active_facets %}.{% endif %}
+        <strong id='results-summary-language'>{{ q }}</strong>{% if not active_facet_options %}.{% endif %}
         {% endif %}
 
         {% comment %} FIXME Use django filter to remove whitespace {% endcomment %}
-        {% if active_facets %}
+        {% if active_facet_options %}
             {% if not q %}
             You are browsing bugs
             {% endif %}
-            {% for facet, value in active_facets.items %}
+            {% for facet, value in active_facet_options.items %}
             in 
             <style type='text/css'>.active_facet_value
                 {background-color: #dfd; padding: 0 2px; }</style>
@@ -28,7 +28,7 @@
             {{ total_bug_count }}.
         {% else %}
 
-            {% if q or active_facets %}
+            {% if q or active_facet_options %}
 
                 {% ifnotequal start 1 %}
                     <p class='no-opps'>
@@ -40,7 +40,7 @@
                 {% else %}
                     <p style='font-size: 10pt; margin-top: 10px;'>
                         No results.
-                        {% if q and active_facets %}
+                        {% if q and active_facet_options %}
                             <a href='?q={{q|urlencode}}'>
                                 See all results matching <strong>{{ q }}</strong>.
                             </a>
