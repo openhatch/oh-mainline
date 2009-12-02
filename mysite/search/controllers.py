@@ -5,6 +5,13 @@ import urllib
 import re
 from django.db.models import Q
 
+def order_bugs(query):
+    # Minus sign: reverse order
+    # Minus good for newcomers: this means true values
+    # (like 1) appear before false values (like 0)
+    # Minus last touched: Old bugs last.
+    return query.order_by('-good_for_newcomers', '-last_touched')
+
 class Query:
     
     def __init__(self, terms=None, active_facet_options=None, terms_string=None): 

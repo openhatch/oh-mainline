@@ -46,14 +46,10 @@ def fetch_bugs(request):
     query = mysite.search.controllers.Query.create_from_GET_data(request.GET)
 
     if query:
-        bugs = Bug.open_ones.filter(query.get_Q())
+        bugs = query.get_bugs_unordered()
 
         # Sort
-        bugs = bugs.order_by('-good_for_newcomers', '-last_touched')
-        # Minus sign: reverse order
-        # Minus good for newcomers: this means true values
-        # (like 1) appear before false values (like 0)
-        # Minus last touched: Old bugs last.
+        bugs = mysite.search.controllers.order_bugs(bugs)
 
         total_bug_count = bugs.count()
 

@@ -26,8 +26,9 @@ def recommend_bugs(terms, n):
     distinct_ids = set()
 
     lists_of_bugs = [
-            mysite.search.controllers.Query(terms=[t]).get_bugs()
-            for t in terms]
+        mysite.search.controllers.order_bugs(
+            mysite.search.controllers.Query(terms=[t]).get_bugs_unordered())
+        for t in terms]
     number_emitted = 0
         
     for bug in roundrobin(*lists_of_bugs):
