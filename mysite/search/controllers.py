@@ -128,13 +128,13 @@ class Query:
                 # The languages facet is based on the project languages, "for now"
                 'language': {
                     'name_in_GET': "language",
-                    'sidebar_name': "by main project language",
+                    'sidebar_name': "main project language",
                     'description_above_results': "projects primarily coded in %s",
                     'options': language_options,
                     },
                 'toughness': {
                     'name_in_GET': "toughness",
-                    'sidebar_name': "by toughness",
+                    'sidebar_name': "toughness",
                     'description_above_results': "where toughness = %s",
                     'options': toughness_options,
                     }

@@ -1,5 +1,7 @@
 {% extends 'search/base.html' %}
 
+{% load search %}
+
 {% block title %}
 Search bugs 
 {{ block.super }}
@@ -41,6 +43,11 @@ Search bugs
             }
             {% endcomment %}
             <li>
+              {% if facet_name|in_list:query.active_facet_options %}
+	      Change
+	      {% else %}
+	      by
+	      {% endif %}
                 {{ facet.sidebar_name }}
                 <ul>
                     {% for option in facet.options %}
