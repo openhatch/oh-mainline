@@ -770,7 +770,12 @@ class SingleFacetOption(SearchTest):
 
 class QueryGetToughnessFacetOptions(SearchTest):
     def test_get_toughness_facet_options(self):
+        # We create three "bitesize" bugs, but constrain the Query so
+        # that we're only looking at bugs in Python.
 
+        # Since only two of the bitesize bugs are in Python (one is 
+        # in a project whose language is Perl), we expect only 1 bitesize
+        # bug to show up, and 2 total bugs.
         python_project = Project.create_dummy(language='Python')
         perl_project = Project.create_dummy(language='Perl')
 
@@ -836,6 +841,9 @@ class QueryGetPossibleLanguageFacetOptionNames(SearchTest):
         c_bug = Bug.create_dummy(project=c_project, title='b') 
 
     def test_with_term(self):
+        # In the setUp we create three bugs, but only two of them would match
+        # a search for 'a'. They are in two different languages, so let's make
+        # sure that we show only those two languages.
         GET_data = {'q': 'a'}
 
         query = mysite.search.controllers.Query.create_from_GET_data(GET_data)
@@ -845,6 +853,10 @@ class QueryGetPossibleLanguageFacetOptionNames(SearchTest):
                 sorted(['Python', 'Perl']))
 
     def test_with_active_language_facet(self):
+        # In the setUp we create bugs in three languages.
+        # Here, we verify that the get_language_names() method correctly returns
+        # all three languages, even though the GET data shows that we are
+        # browsing by language.
 
         GET_data = {'language': 'Python'}
 
