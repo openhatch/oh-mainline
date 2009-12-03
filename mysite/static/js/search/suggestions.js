@@ -113,6 +113,7 @@ Suggns = {
     },
     'bindCheckboxUpdater': function() {
         Suggns.$queryField.keyup(Suggns.checkboxUpdater);
+        $(Suggns.checkboxUpdater);
     },
     'checkboxLabelEmphasisToggler': function() {
         var isChecked = $(this).is(':checked');
