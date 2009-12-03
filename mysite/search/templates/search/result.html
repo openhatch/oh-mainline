@@ -67,11 +67,11 @@
                 {{ bug.importance }}
             </span>
         </span>
-        <span class='field last_polled'>
-            <label>Last polled: </label>
+        <span class='field date_reported'>
+            <label>First reported: </label>
             <span class='value'>
-                {% if bug.last_polled %}
-                {{ bug.last_polled|timesince_terse }} ago
+                {% if bug.date_reported %}
+                {{ bug.date_reported|timesince_terse }} ago
                 {% endif %}
             </span>
             {# <a href=''>poll now</a> #}
