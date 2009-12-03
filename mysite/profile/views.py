@@ -178,6 +178,10 @@ def widget_display_undecorated(request, user_to_display__username):
 
     data = get_personal_data(person)
     data['url_prefix'] = request.META['SERVER_NAME'] + ':' + request.META['SERVER_PORT']
+    uri_scheme = 'http'
+    if request.is_secure():
+        uri_scheme = 'https'
+    data['uri_scheme'] = uri_scheme
     return (request, 'profile/widget.html', data)
     # }}}
 
