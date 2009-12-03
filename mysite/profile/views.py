@@ -861,6 +861,12 @@ def save_portfolio_entry_do(request):
         })
 
 @login_required
+def dollar_username(request):
+    return HttpResponseRedirect(reverse(display_person_web,
+		kwargs={'user_to_display__username': 
+                request.user.username}))
+
+@login_required
 @view
 def edit_info(request):
     data = get_personal_data(request.user.get_profile())
