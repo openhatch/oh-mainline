@@ -194,8 +194,7 @@ urlpatterns = patterns('',
          'django.views.static.serve',
             {'document_root': settings.MEDIA_ROOT + '/images'}),
 
-        (r'^people/[$]username$', 'mysite.profile.views.dollar_username'),
-        (r'^people/[$]username/$', 'mysite.profile.views.dollar_username'),
+        (r'^people/[$]username[/]*$', 'mysite.profile.views.dollar_username'),
 
         # This dangerous regex is last
         (r'^people/(?P<user_to_display__username>[^/]+)[/?]$',
