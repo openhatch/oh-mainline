@@ -17,9 +17,7 @@
             {% for facet, value in query.active_facet_options.items %}
             <span class='active_facet_value'>{%ifequal facet "language"%} in projects primarily coded in {%endifequal%}{%ifequal facet "toughness"%} whose toughness is {%endifequal%}
                 <strong>{{value}}</strong>
-                <a href='?{%ifequal facet "language"%}{{facet2any_query_string.language}}{%endifequal%}{%ifequal facet "toughness"%}{{facet2any_query_string.toughness}}{%endifequal%}'>[x]</a></span>
-	    {% if forloop.last %}
-	    .
+                <a href='?{%ifequal facet "language"%}{{facet2any_query_string.language}}{%endifequal%}{%ifequal facet "toughness"%}{{facet2any_query_string.toughness}}{%endifequal%}'>[x]</a></span>{% if forloop.last %}.
 	    {% else %}
 	    and
 	    {% endif %}
