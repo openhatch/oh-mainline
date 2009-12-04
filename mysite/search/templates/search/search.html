@@ -52,15 +52,23 @@ Search bugs
                 <ul>
                     {% for option in facet.options %}
                         {% if option.name %}
-                        <li>
-                            <a href='?{{ option.query_string }}'>
-                                {{ option.name }} ({{ option.count }})</a>
-                              {% ifequal option.name 'bitesize' %}
-                                  <small>
-                                      (<a id='define-bite-size' href="#">what's this?</a>)
-                                  </small>
-                              {% endifequal %}
-                        </li>
+                            <li
+                            {% for facet_name, active_option in query.active_facet_options.items %}
+                                {% ifequal facet_name facet.name_in_GET %}
+                                    {% ifequal active_option option.name %}
+                                        class='active'
+                                    {% endifequal %}
+                                {% endifequal %}
+                            {% endfor %}
+                            >
+                                <a href='?{{ option.query_string }}'>
+                                    {{ option.name }} ({{ option.count }})</a>
+                                {% ifequal option.name 'bitesize' %}
+                                    <small>
+                                        (<a id='define-bite-size' href="#">what's this?</a>)
+                                    </small>
+                                {% endifequal %}
+                            </li>
                         {% endif %}
                     {% endfor %}
                 </ul>

@@ -479,4 +479,6 @@ ul#facets ul { margin-left: 10px; }
 #results-summary { width: 70%; float: left; margin-right: 10px; }
 #navigation { float: right; }
 
+#facets li.active { font-weight: bold; }
+
 /* vim: set ai ts=4 sts=4 et sw=4: */
