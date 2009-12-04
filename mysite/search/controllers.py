@@ -103,6 +103,10 @@ class Query:
     def get_facet_options(self, facet_name, option_names):
 
         def get_facet_option_data(option_name):
+
+            caller_query = self
+            # ^^^ NB: The value of 'self' is determined by the caller environment.
+
             # Create a Query for this option. 
 
             # This Query is sensitive to the currently active facet options...
@@ -115,10 +119,28 @@ class Query:
                 })
             query_string = urllib.urlencode(GET_data)
             query = Query.create_from_GET_data(GET_data)
+            name = option_name or 'any'
+
+            active_option_name = caller_query.active_facet_options.get(facet_name, None)
+
+            # This facet isn't active...
+            is_active = False
+
+            # ...unless there's an item in active_facet_options mapping the
+            # current facet_name to the option whose data we're creating...
+            if active_option_name == option_name:
+                is_active = True
+
+            # ...or if this is the 'any' option and there is no active option
+            # for this facet.
+            if name == 'any' and active_option_name is None:
+                is_active = True
+
             return {
-                    'name': option_name or 'any',
+                    'name': name,
                     'count': query.get_bugs_unordered().count(),
-                    'query_string': query_string
+                    'query_string': query_string,
+                    'is_active': is_active
                     }
 
         return [get_facet_option_data(n) for n in option_names]
