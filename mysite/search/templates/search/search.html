@@ -43,11 +43,11 @@ Search bugs
             }
             {% endcomment %}
             <li>
-              {% if facet_name|in_list:query.active_facet_options %}
-	      Change
-	      {% else %}
-	      by
-	      {% endif %}
+                {% if facet_name|in_list:query.active_facet_options %}
+                    Change
+                {% else %}
+                    by
+                {% endif %}
                 {{ facet.sidebar_name }}
                 <ul>
                     {% for option in facet.options %}
@@ -55,11 +55,11 @@ Search bugs
                         <li>
                             <a href='?{{ option.query_string }}'>
                                 {{ option.name }} ({{ option.count }})</a>
-                              {%ifequal option.name 'bitesize'%}
+                              {% ifequal option.name 'bitesize' %}
                                   <small>
                                       (<a id='define-bite-size' href="#">what's this?</a>)
                                   </small>
-                              {%endifequal%}
+                              {% endifequal %}
                         </li>
                         {% endif %}
                     {% endfor %}
