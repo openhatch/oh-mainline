@@ -111,6 +111,7 @@ def fetch_bugs(request):
         data['show_prev_page_link'] = start > 1
         data['show_next_page_link'] = end < (total_bug_count - 1)
         data['facet2any_query_string'] = facet2any_query_string
+        data['bug_tracker_count'] = mysite.search.controllers.get_bug_tracker_count()
 
         return render_to_response('search/search.html', data)
     # }}}

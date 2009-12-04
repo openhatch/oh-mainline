@@ -19,7 +19,7 @@
     width: 1000px;
     font-size: 19pt;
 }
-#filters h4 {
+#sidebar .module h4 {
     width: 95%;
     font-size: 10pt;
     font-weight: normal;
@@ -478,5 +478,12 @@ ul#facets ul { margin-left: 10px; }
 
 #results-summary { width: 70%; float: left; margin-right: 10px; }
 #navigation { float: right; }
+
+#about_bug_trackers { margin-top: 0; padding: 10px; }
+    #about_bug_trackers h4 { margin-bottom: 10px; }
+    #about_bug_trackers div { float: left; margin-bottom: 10px; width: 100%; }
+        #how_many_bug_trackers { text-align: center; font-size: 140%; vertical-align: middle; }
+        #bug_tracker_count { background-color: #747474; -moz-border-radius: 8px; padding: 3px 4px; border-radius: 8px; color: #fff; }
+    #about_bug_trackers #learn_more { margin-bottom: 0; text-align: right; }
 
 /* vim: set ai ts=4 sts=4 et sw=4: */

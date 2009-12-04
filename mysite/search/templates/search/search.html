@@ -51,16 +51,17 @@ Search bugs
                 {{ facet.sidebar_name }}
                 <ul>
                     {% for option in facet.options %}
-                    {% if option.name %}
-                    <li><a href='?{{ option.query_string }}'>
-                        {{ option.name }} ({{ option.count }})
-                    </a>
-		      {%ifequal option.name 'bitesize'%}
-		      <small> (<a id='define-bite-size' href="#">what's this?</a>) </small>
-		      {%endifequal%}
-
-</li>
-                    {% endif %}
+                        {% if option.name %}
+                        <li>
+                            <a href='?{{ option.query_string }}'>
+                                {{ option.name }} ({{ option.count }})</a>
+                              {%ifequal option.name 'bitesize'%}
+                                  <small>
+                                      (<a id='define-bite-size' href="#">what's this?</a>)
+                                  </small>
+                              {%endifequal%}
+                        </li>
+                        {% endif %}
                     {% endfor %}
                 </ul>
             </li>
@@ -105,6 +106,17 @@ Search bugs
         </li>
     </ul>
     {% endif %}
+</div>
+<div id='about_bug_trackers' class='box module'>
+    <h4>
+        Currently crawling
+    </h4>
+    <div id='how_many_bug_trackers'>
+        <span id='bug_tracker_count'>{{ bug_tracker_count }}</span> bug trackers
+    </div>
+    <div id='learn_more'>
+        <a href='https://openhatch.org/wiki/Bug_trackers'>See all / Get involved</a>
+    </div>
 </div>
 {% endblock sidebar %}
 

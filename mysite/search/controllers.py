@@ -166,3 +166,8 @@ class Query:
         languages = [x['project__language'] for x in distinct_language_columns]
         languages = [l for l in languages if l]
         return languages
+
+def get_bug_tracker_count():
+    """Retrieve the number of bug trackers currently indexed."""
+    # FIXME: Calculate this automatically.
+    return 49

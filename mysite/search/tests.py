@@ -868,4 +868,16 @@ class QueryGetPossibleLanguageFacetOptionNames(SearchTest):
                 sorted(language_names),
                 sorted(['Python', 'Perl', 'C']))
 
+class PublicizeBugTrackerIndex(SearchTest):
+
+    def setUp(self):
+        SearchTest.setUp(self)
+        self.search_page_response = self.client.get(reverse(mysite.search.views.fetch_bugs))
+        self.bug_tracker_count = mysite.search.controllers.get_bug_tracker_count()
+
+    def test_search_template_contains_bug_tracker_count(self):
+        self.assertEqual(
+                self.search_page_response.context[0]['bug_tracker_count'],
+                self.bug_tracker_count)
+
 # vim: set nu ai et ts=4 sw=4 columns=100:
