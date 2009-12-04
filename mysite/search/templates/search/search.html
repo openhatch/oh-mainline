@@ -55,9 +55,9 @@ Search bugs
                     <li><a href='?{{ option.query_string }}'>
                         {{ option.name }} ({{ option.count }})
                     </a>
-		      {%ifequal option.name 'bitesize'%}
+		      {% ifequal option.name 'bitesize' %}
 		      <small> (<a id='define-bite-size' href="#">what's this?</a>) </small>
-		      {%endifequal%}
+		      {% endifequal %}
 
 </li>
                     {% endif %}
@@ -119,7 +119,7 @@ Search bugs
             value='{{ query.terms_string }}' />
 
             {% for facet, value in active_facet_options.items %}
-            <input type='hidden' name='{{facet}}' value='{{value}}' />
+            <input type='hidden' name='{{ facet }}' value='{{ value }}' />
             {% endfor %}
             <input type='submit' id='button' value='Search' />
         </form>
