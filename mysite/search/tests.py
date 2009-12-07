@@ -942,4 +942,27 @@ class QueryGrabHitCount(SearchTest):
         hcc = HitCountCache.objects.get(hashed_query=query.get_sha1())
         self.assertEqual(hcc.hit_count, expected_hit_count)
 
+class ClearCacheWhenBugsChange(SearchTest):
+
+    def test_cached_cleared_after_bug_save_or_delete(self):
+        data = {'language': 'shoutNOW'}
+        query = mysite.search.controllers.Query.create_from_GET_data(data)
+
+        # Cache entry created after hit count retrieval
+        query.get_or_create_cached_hit_count()
+        self.assert_(HitCountCache.objects.all())
+
+        # Cache cleared after bug save
+        project = Project.create_dummy(language='shoutNOW')
+        bug = Bug.create_dummy(project=project)
+        self.assertFalse(HitCountCache.objects.all())
+
+        # Cache entry created after hit count retrieval
+        query.get_or_create_cached_hit_count()
+        self.assert_(HitCountCache.objects.all())
+
+        # Cache cleared after bug deletion
+        bug.delete()
+        self.assertFalse(HitCountCache.objects.all())
+
 # vim: set nu ai et ts=4 sw=4 columns=100:

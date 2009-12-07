@@ -224,7 +224,12 @@ class HitCountCache(models.Model):
     hit_count = models.IntegerField()
 
     @staticmethod
-    def clear_cache():
+    def clear_cache(*args, **kwargs):
+        # Ignore arguments passed here by Django signals.
         HitCountCache.objects.all().delete()
+
+# Clear the cache whenever Bugs are added or removed.
+models.signals.post_save.connect(HitCountCache.clear_cache, Bug)
+models.signals.post_delete.connect(HitCountCache.clear_cache, Bug)
 
 # vim: set ai ts=4 nu:
