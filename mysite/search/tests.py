@@ -6,7 +6,7 @@ import mysite.customs.miro
 import mysite.search.controllers
 
 import django.test
-from mysite.search.models import Project, Bug
+from mysite.search.models import Project, Bug, HitCountCache
 from mysite.search import views
 import lpb2json
 import datetime
@@ -915,5 +915,31 @@ class HashQueryData(SearchTest):
         self.assertNotEqual(one.get_sha1(), two.get_sha1())
 
     # How on earth do we test for collisions?
+
+class QueryGrabHitCount(SearchTest):
+
+    def test_eventhive_grab_hitcount_once_stored(self):
+
+        data = {'q': 'eventhive', 'language': 'shoutNOW'}
+        query = mysite.search.controllers.Query.create_from_GET_data(data)
+        stored_hit_count = 10
+        HitCountCache.objects.create(
+                hashed_query=query.get_sha1(),
+                hit_count=stored_hit_count)
+        self.assertEqual(query.get_hit_count(), stored_hit_count)
+
+    def test_shoutnow_cache_hitcount_on_grab(self):
+
+        project = Project.create_dummy(language='shoutNOW')
+
+        bug = Bug.create_dummy(project=project)
+        data = {'language': 'shoutNOW'}
+        query = mysite.search.controllers.Query.create_from_GET_data(data)
+
+        expected_hit_count = 1
+        self.assertEqual(query.get_hit_count(), expected_hit_count)
+
+        hcc = HitCountCache.objects.get(hashed_query=query.get_sha1())
+        self.assertEqual(hcc.hit_count, expected_hit_count)
 
 # vim: set nu ai et ts=4 sw=4 columns=100:

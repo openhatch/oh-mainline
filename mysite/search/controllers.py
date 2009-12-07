@@ -204,3 +204,15 @@ class Query:
         stringified = str(sorted(simple_dictionary.items()))
         # then return a hash of our sorted items self.
         return sha.sha(stringified).hexdigest() # sadly we cause a 2x space blowup here
+    
+    def get_hit_count(self):
+
+        existing_hccs = mysite.search.models.HitCountCache.objects.filter(hashed_query=self.get_sha1())
+        if existing_hccs:
+            hcc = existing_hccs[0]
+        else:
+            count = self.get_bugs_unordered().count()
+            hcc = mysite.search.models.HitCountCache.objects.create(
+                    hashed_query=self.get_sha1(),
+                    hit_count=count)
+        return hcc.hit_count
