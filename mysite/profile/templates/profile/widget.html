@@ -284,8 +284,9 @@
                 <div class='project-escutcheon'>
                     <div class='logo'>
                         <a href='/people/{{ person.user.username }}/projects/{{ project.name }}'>
-                            <img alt='logo for {{project.name}}' title='{{project.name}}'
+                            <img alt='logo' title='{{project.name}}'
                             src='{{ project.get_url_of_badge_size_icon_or_generic }}' width='40'/>
+                            {{ project.name }}
                         </a>
                     </div>
                 </div>

@@ -613,7 +613,7 @@ class QueryGetPossibleFacets(SearchTest):
                 terms_string='bug',
                 active_facet_options={'language': 'c'})
         possible_facets = query.get_possible_facets()
-        import pdb; pdb.set_trace()
+
         self.compare_lists_of_dicts(
                 possible_facets['language']['options'],
                 [
@@ -630,8 +630,10 @@ class QueryGetPossibleFacets(SearchTest):
         self.compare_lists_of_dicts(
                 possible_facets['toughness']['options'],
                 [
-                    { 'name': 'any', 'query_string': 'q=bug&toughness=&language=c', 'count': 1 },
-                    { 'name': 'bitesize', 'query_string': 'q=bug&toughness=bitesize&language=c', 'count': 1 },
+                    { 'name': 'any', 'is_active': True,
+                         'query_string': 'q=bug&toughness=&language=c', 'count': 1 },
+                    { 'name': 'bitesize', 'is_active': False,
+                        'query_string': 'q=bug&toughness=bitesize&language=c', 'count': 1 },
                     ]
                     )
 
@@ -964,5 +966,14 @@ class ClearCacheWhenBugsChange(SearchTest):
         # Cache cleared after bug deletion
         bug.delete()
         self.assertFalse(HitCountCache.objects.all())
+
+class DontRecommendFutileSearchTerms(TwillTests):
+
+    def test_removal_of_futile_terms(self):
+        bug = mysite.search.models.Bug.create_dummy_with_project(description='useful')
+        self.assertEqual(
+                Person.only_terms_with_results(['useful', 'futile']),
+                ['useful'])
+
 
 # vim: set nu ai et ts=4 sw=4 columns=100:
