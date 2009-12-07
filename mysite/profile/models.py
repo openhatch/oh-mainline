@@ -149,7 +149,7 @@ class Person(models.Model):
         # Remove duplicates
         terms = sorted(set(terms), key=lambda s: s.lower())
 
-        return only_terms_with_results(terms)
+        return Person.only_terms_with_results(terms)
 
         # FIXME: Add support for recommended projects.
         # FIXME: Add support for recommended project tags.

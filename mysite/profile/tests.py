@@ -1241,4 +1241,12 @@ class PersonGetTagsForRecommendations(TwillTests):
         # This is the functionality we're testing
         self.assertEqual([tag_i_understand], pp.get_tags_for_recommendations())
 
+class DontRecommendFutileSearchTerms(TwillTests):
+
+    def test_removal_of_futile_terms(self, mock_tag_getter):
+        bug = Bug.create_dummy_with_project(description='useful')
+        self.assertEqual(
+                Person.only_terms_with_results(['useful', 'futile']),
+                ['useful'])
+
 # vim: set ai et ts=4 sw=4 nu:

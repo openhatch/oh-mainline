@@ -965,12 +965,4 @@ class ClearCacheWhenBugsChange(SearchTest):
         bug.delete()
         self.assertFalse(HitCountCache.objects.all())
 
-class DontRecommendFutileSearchTerms(SearchTest):
-
-    def test_removal_of_futile_terms(self, mock_tag_getter):
-        bug = Bug.create_dummy_with_project(description='useful')
-        self.assertEqual(
-                Person.only_terms_with_results(['useful', 'futile']),
-                ['useful'])
-
 # vim: set nu ai et ts=4 sw=4 columns=100:
