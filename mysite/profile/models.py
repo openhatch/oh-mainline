@@ -119,7 +119,7 @@ class Person(models.Model):
         return PortfolioEntry.objects.filter(person=self, is_published=True, is_deleted=False)
 
     @staticmethod
-    def only_terms_with_results(terms)
+    def only_terms_with_results(terms):
         # Remove terms whose hit counts are zero.
         terms_with_results = [] 
         for term in terms:
