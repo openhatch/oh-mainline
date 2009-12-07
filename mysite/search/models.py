@@ -219,4 +219,12 @@ class Bug(models.Model):
         ret.save()
         return ret
 
+class HitCountCache(models.Model):
+    hashed_query = models.CharField(max_length=40, primary_key=True) # stores a sha1 
+    hit_count = models.IntegerField()
+
+    @staticmethod
+    def clear_cache():
+        HitCountCache.objects.all().delete()
+
 # vim: set ai ts=4 nu:

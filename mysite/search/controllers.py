@@ -3,6 +3,7 @@ import mysite.search.views
 import collections
 import urllib
 import re
+import sha
 from django.db.models import Q
 
 def order_bugs(query):
@@ -188,3 +189,18 @@ class Query:
         languages = [x['project__language'] for x in distinct_language_columns]
         languages = [l for l in languages if l]
         return languages
+
+    def get_sha1(self):
+
+        # first, make a dictionary mapping strings to strings
+        simple_dictionary = {}
+
+        # add terms_string
+        simple_dictionary['terms'] = str(sorted(self.terms))
+
+        # add active_facet_options
+        simple_dictionary['active_facet_options'] = str(sorted(self.active_facet_options.items()))
+
+        stringified = str(sorted(simple_dictionary.items()))
+        # then return a hash of our sorted items self.
+        return sha.sha(stringified).hexdigest() # sadly we cause a 2x space blowup here

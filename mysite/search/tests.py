@@ -892,4 +892,28 @@ class QueryStringCaseInsensitive(SearchTest):
                 {'LANguaGE': 'pytHon'}, follow=True).redirect_chain
         self.assertEqual(redirects, [('http://testserver/search/?language=pytHon', 302)])
 
+class HashQueryData(SearchTest):
+
+    def test_queries_with_identical_data_hash_alike(self):
+        GET_data = {'q': 'socialguides', 'language': 'looxii'}
+        one = mysite.search.controllers.Query.create_from_GET_data(GET_data)
+        two = mysite.search.controllers.Query.create_from_GET_data(GET_data)
+        self.assertEqual(one.get_sha1(), two.get_sha1())
+
+    def test_queries_with_equiv_data_expressed_differently_hash_alike(self):
+        GET_data_1 = {'q': 'socialguides zetapage', 'language': 'looxii'}
+        GET_data_2 = {'q': 'zetapage socialguides', 'language': 'looxii'}
+        one = mysite.search.controllers.Query.create_from_GET_data(GET_data_1)
+        two = mysite.search.controllers.Query.create_from_GET_data(GET_data_2)
+        self.assertEqual(one.get_sha1(), two.get_sha1())
+
+    def test_queries_with_different_data_hash_differently(self):
+        GET_data_1 = {'q': 'socialguides zetapage', 'language': 'looxii'}
+        GET_data_2 = {'q': 'socialguides ninjapost', 'language': 'looxii'}
+        one = mysite.search.controllers.Query.create_from_GET_data(GET_data_1)
+        two = mysite.search.controllers.Query.create_from_GET_data(GET_data_2)
+        self.assertNotEqual(one.get_sha1(), two.get_sha1())
+
+    # How on earth do we test for collisions?
+
 # vim: set nu ai et ts=4 sw=4 columns=100:
