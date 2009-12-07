@@ -88,13 +88,13 @@ class SlowlohTests(django.test.TestCase):
         oh = ohloh.get_ohloh()
         projects, web_response = oh.get_contribution_info_by_username('paulproteus')
         # We test the web_response elsewhere
-        if should_equal is None:
-            should_equal = [{'project': u'ccHost',
+        if should_have is None:
+            should_have = {'project': u'ccHost',
                              'project_homepage_url': 'http://wiki.creativecommons.org/CcHost',
                              'man_months': 1,
-                             'primary_language': 'shell script'}]
+                             'primary_language': 'shell script'}
 
-        self.assertEqual(projects, should_equal)
+        self.assert_(should_have in projects)
         # }}}
 
     @mock.patch('mechanize.Browser.open', open_causes_404)
