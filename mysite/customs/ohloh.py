@@ -46,7 +46,8 @@ def mechanize_get(url, referrer=None, attempts_remaining=6, person=None):
             print >> sys.stderr, long_message
 
             if person:
-                short_message = message_schema % (urlparse(url).hostname, attempts_remaining)
+                short_message = message_schema % (urlparse(url).hostname,
+                        e.code, attempts_remaining)
                 person.user.message_set.create(message=short_message)
             return mechanize_get(url, referrer, attempts_remaining-1, person)
         else:
