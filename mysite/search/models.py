@@ -219,6 +219,11 @@ class Bug(models.Model):
         ret.save()
         return ret
 
+    @staticmethod
+    def create_dummy_with_project(**kwargs):
+        kwargs['project'] = Project.create_dummy()
+        return Bug.create_dummy(**kwargs)
+
 class HitCountCache(models.Model):
     hashed_query = models.CharField(max_length=40, primary_key=True) # stores a sha1 
     hit_count = models.IntegerField()

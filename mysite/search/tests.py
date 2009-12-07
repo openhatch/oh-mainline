@@ -47,19 +47,37 @@ class SearchTest(TwillTests):
         self.assertEqual(len(one), len(two))
         self.assertEqual(set(one), set(two))
 
-    def compare_lists_of_dicts(self, one, two):
-        sorted_one = sorted(one)
-        sorted_two = sorted(two)
+    def compare_lists_of_dicts(self, one, two, sort_key=None):
+
+        if sort_key is not None:
+            sort_fn = lambda thing: thing[sort_key]
+        else:
+            sort_fn = None
+
+        sorted_one = sorted(one, key=sort_fn)
+        sorted_two = sorted(two, key=sort_fn)
         for k in range(len(sorted_one)):
-            self.assertEqual(sorted_one[k], sorted_two[k])
+            try:
+                self.assertEqual(sorted_one[k], sorted_two[k])
+            except AssertionError:
+                import sys
+                print >> sys.stderr, sorted_one
+                print >> sys.stderr, sorted_two
+                raise
         for k in range(len(sorted_two)):
-            self.assertEqual(sorted_one[k], sorted_two[k])
+            try:
+                self.assertEqual(sorted_one[k], sorted_two[k])
+            except AssertionError:
+                import sys
+                print >> sys.stderr, sorted_one
+                print >> sys.stderr, sorted_two
+                raise
 
 class AutoCompleteTests(SearchTest):
     """
     Test whether the autocomplete can handle
      - a field-specific query
-     - a non-field-specific (fulltext) query
+     -l a non-field-specific (fulltext) query
     """
 
     def setUp(self):
@@ -415,7 +433,16 @@ class Recommend(SearchTest):
 
     # FIXME: Add a 'recommend_these_in_bug_search' field to TagType
     # Use that to exclude 'will never understand' tags from recommended search terms.
-    def test_get_recommended_search_terms_for_user(self):
+    @mock.patch('mysite.search.controllers.Query.get_or_create_cached_hit_count')
+    def test_get_recommended_search_terms_for_user(self, mocked_hit_counter):
+
+        # Make all the search terms appear to return results, so
+        # that none are excluded when we try to trim away
+        # the terms that don't return results.
+        # We test this functionality separately in
+        # search.tests.DontRecommendFutileSearchTerms.
+        mocked_hit_counter.return_value = 1
+
         person = Person.objects.get(user__username='paulproteus')
         recommended_terms = person.get_recommended_search_terms()
 
@@ -434,7 +461,17 @@ class Recommend(SearchTest):
                         "inspired by %s." % (term, source))
 
     # FIXME: Include recommendations from tags.
-    def test_search_page_context_includes_recommendations(self):
+
+    @mock.patch('mysite.search.controllers.Query.get_or_create_cached_hit_count')
+    def test_search_page_context_includes_recommendations(self, mocked_hit_counter):
+
+        # Make all the search terms appear to return results, so
+        # that none are excluded when we try to trim away
+        # the terms that don't return results.
+        # We test this functionality separately in
+        # search.tests.DontRecommendFutileSearchTerms.
+        mocked_hit_counter.return_value = 1
+
         client = self.login_with_client()
         response = client.get('/search/')
 
@@ -619,20 +656,24 @@ class QueryGetPossibleFacets(SearchTest):
                     { 'name': 'any', 'query_string': 'q=bug&language=',
                         'is_active': False, 'count': 2 },
                     { 'name': 'c', 'query_string': 'q=bug&language=c', 
-                        'is_active': False, 'count': 1 },
+                        'is_active': True, 'count': 1 },
                     { 'name': 'd', 'query_string': 'q=bug&language=d',
                         'is_active': False, 'count': 1 },
                     # e is excluded because its bug ('bAg') doesn't match the term 'bug'
-                    ]
-                    )
+                    ],
+                sort_key='name'
+                )
 
         self.compare_lists_of_dicts(
                 possible_facets['toughness']['options'],
                 [
-                    { 'name': 'any', 'query_string': 'q=bug&toughness=&language=c', 'count': 1 },
-                    { 'name': 'bitesize', 'query_string': 'q=bug&toughness=bitesize&language=c', 'count': 1 },
-                    ]
-                    )
+                    { 'name': 'any', 'is_active': True,
+                         'query_string': 'q=bug&toughness=&language=c', 'count': 1 },
+                    { 'name': 'bitesize', 'is_active': False,
+                        'query_string': 'q=bug&toughness=bitesize&language=c', 'count': 1 },
+                    ],
+                sort_key='name'
+                )
 
 class SingleTerm(SearchTest):
     """Search for just a single term."""
@@ -963,5 +1004,14 @@ class ClearCacheWhenBugsChange(SearchTest):
         # Cache cleared after bug deletion
         bug.delete()
         self.assertFalse(HitCountCache.objects.all())
+
+class DontRecommendFutileSearchTerms(TwillTests):
+
+    def test_removal_of_futile_terms(self):
+        bug = mysite.search.models.Bug.create_dummy_with_project(description='useful')
+        self.assertEqual(
+                Person.only_terms_with_results(['useful', 'futile']),
+                ['useful'])
+
 
 # vim: set nu ai et ts=4 sw=4 columns=100:

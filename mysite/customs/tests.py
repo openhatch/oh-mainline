@@ -83,7 +83,7 @@ class SlowlohTests(django.test.TestCase):
         self.assertEqual(project_name, oh.analysis2projectdata(analysis_id)['name'])
         # }}}
 
-    def testFindByUsername(self, should_equal = None):
+    def testFindByUsername(self, should_have = None):
         # {{{
         oh = ohloh.get_ohloh()
         projects, web_response = oh.get_contribution_info_by_username('paulproteus')
@@ -103,16 +103,16 @@ class SlowlohTests(django.test.TestCase):
         self.testFindByUsername([])
         # }}}
 
-    def testFindByOhlohUsername(self, should_equal = None):
+    def testFindByOhlohUsername(self, should_have = None):
         # {{{
         oh = ohloh.get_ohloh()
         projects, web_response = oh.get_contribution_info_by_ohloh_username('paulproteus')
-        if should_equal is None:
-            should_equal = [{'project': u'ccHost',
+        if should_have is None:
+            should_have = [{'project': u'ccHost',
                              'project_homepage_url': 'http://wiki.creativecommons.org/CcHost',
                              'man_months': 1,
                              'primary_language': 'shell script'}]
-        self.assertEqual(should_equal, projects)
+        self.assertEqual(should_have, projects)
         # }}}
 
     @mock.patch('mechanize.Browser.open', open_causes_404)
