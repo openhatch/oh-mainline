@@ -77,7 +77,7 @@ class AutoCompleteTests(SearchTest):
     """
     Test whether the autocomplete can handle
      - a field-specific query
-     - a non-field-specific (fulltext) query
+     -l a non-field-specific (fulltext) query
     """
 
     def setUp(self):
