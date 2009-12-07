@@ -883,4 +883,13 @@ class QueryGetPossibleLanguageFacetOptionNames(SearchTest):
                 sorted(language_names),
                 sorted(['Python', 'Perl', 'C']))
 
+class QueryStringCaseInsensitive(SearchTest):
+
+    def test_Language(self):
+        """Do we redirect queries that use non-lowercase facet keys to pages
+        that use lowercase facet keys?"""
+        redirects = self.client.get('/search/',
+                {'LANguaGE': 'pytHon'}, follow=True).redirect_chain
+        self.assertEqual(redirects, [('http://testserver/search/?language=pytHon', 302)])
+
 # vim: set nu ai et ts=4 sw=4 columns=100:
