@@ -613,7 +613,6 @@ class QueryGetPossibleFacets(SearchTest):
                 terms_string='bug',
                 active_facet_options={'language': 'c'})
         possible_facets = query.get_possible_facets()
-        import pdb; pdb.set_trace()
         self.compare_lists_of_dicts(
                 possible_facets['language']['options'],
                 [
