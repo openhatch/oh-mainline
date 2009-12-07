@@ -613,12 +613,16 @@ class QueryGetPossibleFacets(SearchTest):
                 terms_string='bug',
                 active_facet_options={'language': 'c'})
         possible_facets = query.get_possible_facets()
+        import pdb; pdb.set_trace()
         self.compare_lists_of_dicts(
                 possible_facets['language']['options'],
                 [
-                    { 'name': 'any', 'query_string': 'q=bug&language=', 'count': 2 },
-                    { 'name': 'c', 'query_string': 'q=bug&language=c', 'count': 1 },
-                    { 'name': 'd', 'query_string': 'q=bug&language=d', 'count': 1 },
+                    { 'name': 'any', 'query_string': 'q=bug&language=',
+                        'is_active': False, 'count': 2 },
+                    { 'name': 'c', 'query_string': 'q=bug&language=c', 
+                        'is_active': False, 'count': 1 },
+                    { 'name': 'd', 'query_string': 'q=bug&language=d',
+                        'is_active': False, 'count': 1 },
                     # e is excluded because its bug ('bAg') doesn't match the term 'bug'
                     ]
                     )
@@ -670,8 +674,10 @@ class SingleTerm(SearchTest):
     def test_toughness_facet(self):
         # What options do we expect?
         toughness_option_bitesize = {'name': 'bitesize', 'count': 1,
+                'is_active': False,
                 'query_string': 'q=screensaver&toughness=bitesize'}
         toughness_option_any = {'name': 'any', 'count': 3,
+                'is_active': True,
                 'query_string': 'q=screensaver&toughness='}
         expected_toughness_facet_options = [toughness_option_bitesize, toughness_option_any]
 
@@ -683,10 +689,13 @@ class SingleTerm(SearchTest):
     def test_languages_facet(self):
         # What options do we expect?
         languages_option_python = {'name': 'Python', 'count': 2,
+                'is_active': False,
                 'query_string': 'q=screensaver&language=Python'}
         languages_option_perl = {'name': 'Perl', 'count': 1,
+                'is_active': False,
                 'query_string': 'q=screensaver&language=Perl'}
         languages_option_any = {'name': 'any', 'count': 3,
+                'is_active': True,
                 'query_string': 'q=screensaver&language='}
         expected_languages_facet_options = [
                 languages_option_python,
@@ -738,8 +747,10 @@ class SingleFacetOption(SearchTest):
     def test_toughness_facet(self):
         # What options do we expect?
         toughness_option_bitesize = {'name': 'bitesize', 'count': 1,
+                'is_active': False,
                 'query_string': 'q=&toughness=bitesize&language=Python'}
         toughness_option_any = {'name': 'any', 'count': 2,
+                'is_active': True,
                 'query_string': 'q=&toughness=&language=Python'}
         expected_toughness_facet_options = [toughness_option_bitesize, toughness_option_any]
 
@@ -751,12 +762,16 @@ class SingleFacetOption(SearchTest):
     def test_languages_facet(self):
         # What options do we expect?
         languages_option_python = {'name': 'Python', 'count': 2,
+                'is_active': True,
                 'query_string': 'q=&language=Python'}
         languages_option_perl = {'name': 'Perl', 'count': 1,
+                'is_active': False,
                 'query_string': 'q=&language=Perl'}
         languages_option_c = {'name': 'C', 'count': 1,
+                'is_active': False,
                 'query_string': 'q=&language=C'}
         languages_option_any = {'name': 'any', 'count': 4,
+                'is_active': False,
                 'query_string': 'q=&language='}
         expected_languages_facet_options = [
                 languages_option_python, 
