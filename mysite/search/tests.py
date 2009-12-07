@@ -926,7 +926,7 @@ class QueryGrabHitCount(SearchTest):
         HitCountCache.objects.create(
                 hashed_query=query.get_sha1(),
                 hit_count=stored_hit_count)
-        self.assertEqual(query.get_hit_count(), stored_hit_count)
+        self.assertEqual(query.get_or_create_cached_hit_count(), stored_hit_count)
 
     def test_shoutnow_cache_hitcount_on_grab(self):
 
@@ -937,7 +937,7 @@ class QueryGrabHitCount(SearchTest):
         query = mysite.search.controllers.Query.create_from_GET_data(data)
 
         expected_hit_count = 1
-        self.assertEqual(query.get_hit_count(), expected_hit_count)
+        self.assertEqual(query.get_or_create_cached_hit_count(), expected_hit_count)
 
         hcc = HitCountCache.objects.get(hashed_query=query.get_sha1())
         self.assertEqual(hcc.hit_count, expected_hit_count)

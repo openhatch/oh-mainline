@@ -139,7 +139,7 @@ class Query:
 
             return {
                     'name': name,
-                    'count': query.get_bugs_unordered().count(),
+                    'count': query.get_or_create_cached_hit_count(),
                     'query_string': query_string,
                     'is_active': is_active
                     }
@@ -205,7 +205,7 @@ class Query:
         # then return a hash of our sorted items self.
         return sha.sha(stringified).hexdigest() # sadly we cause a 2x space blowup here
     
-    def get_hit_count(self):
+    def get_or_create_cached_hit_count(self):
 
         existing_hccs = mysite.search.models.HitCountCache.objects.filter(hashed_query=self.get_sha1())
         if existing_hccs:
