@@ -4,60 +4,52 @@
 <div class='search-result-control' id='results-widget'>
     <span id='results-summary'>
 
+        {% if bunch_of_bugs %}
+            Showing 
+            <span id='results-summary-start'>{{ start }}</span> to
+            <span id='results-summary-end'>{{ end }}</span> of 
+            {{ total_bug_count }} bugs
+        {% else %}
+            {% if query.terms or query.active_facet_options %}
+
+                {% ifnotequal start 1 %}
+                    No bugs on this page
+                {% else %}
+                    <strong>No bugs found</strong>
+                {% endifnotequal %}
+
+                {% else %}
+                <!-- No search query -->
+            {% endif %}
+        {% endif %}
+
         {% if query.terms %}
-        You searched bugs for
-        <strong id='results-summary-language'>{{ query.terms_string }}</strong>{% if not active_facet_options %}.{% endif %}
+        matching
+        <strong id='results-summary-language'>{{ query.terms_string }}</strong>{% if not query.active_facet_options %}.{% endif %}
         {% endif %}
 
         {% comment %} FIXME Use django filter to remove whitespace {% endcomment %}
-        {% if query.active_facet_options %}
-            {% if not q %}
-            You are browsing bugs
+        {% spaceless %}
+            {% if query.active_facet_options %}
+                {% for facet, value in query.active_facet_options.items reversed %}
+                    <span class='active_facet_value'>
+                        {% ifequal facet "language" %}
+                        whose main project language is
+                        {% endifequal %}
+                        {% ifequal facet "toughness" %}
+                        whose toughness is
+                        {% endifequal %}
+                        <strong>{{ value }}</strong>&nbsp;<a href='?{% ifequal facet "language" %}{{ facet2any_query_string.language }}{% endifequal %}{% ifequal facet "toughness"%}{{ facet2any_query_string.toughness }}{% endifequal %}'>[x]</a>
+                    </span>
+                    {% if forloop.last %}
+                        .
+                    {% else %}
+                        and
+                    {% endif %}
+                {% endfor %}
             {% endif %}
-            {% for facet, value in query.active_facet_options.items %}
-            <span class='active_facet_value'>{%ifequal facet "language"%} in projects primarily coded in {%endifequal%}{%ifequal facet "toughness"%} whose toughness is {%endifequal%}
-                <strong>{{value}}</strong>
-                <a href='?{%ifequal facet "language"%}{{facet2any_query_string.language}}{%endifequal%}{%ifequal facet "toughness"%}{{facet2any_query_string.toughness}}{%endifequal%}'>[x]</a></span>
-	    {% if forloop.last %}
-	    .
-	    {% else %}
-	    and
-	    {% endif %}
-            {% endfor %}
-        {% endif %}
+        {% endspaceless %}
 
-        {% if bunch_of_bugs %}
-            Showing results 
-            <span id='results-summary-start'>{{ start }}</span> to
-            <span id='results-summary-end'>{{ end }}</span> of 
-            {{ total_bug_count }}.
-        {% else %}
-
-            {% if q or active_facet_options %}
-
-                {% ifnotequal start 1 %}
-                    <p class='no-opps'>
-                        You requested results #{{ start }} to #{{ end }} for the query
-                        <strong><tt>{{ q }}</tt></strong>, but there are only
-                        {{ total_bug_count }} results in total. So there are none
-                        to display here, you see.
-                    </p>
-                {% else %}
-                    <p style='font-size: 10pt; margin-top: 10px;'>
-                        No results.
-                        {% if q and active_facet_options %}
-                            <a href='?q={{q|urlencode}}'>
-                                See all results matching <strong>{{ q }}</strong>.
-                            </a>
-                        {% endif %}
-                    </p>
-                {% endifnotequal %}
-
-            {% else %}
-                <!-- No search query -->
-            {% endif %}
-
-        {% endif %}
     </span>
 
     {% if show_prev_page_link or show_next_page_link %}

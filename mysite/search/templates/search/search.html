@@ -116,16 +116,16 @@ Search bugs
             <input type='text'
             name='q' id='q'
             class='default-text'
-            title='Search {% if active_facet_options %}within results{% else %}bugs{% endif %} by language, project or full text'
+            title='Search {% if query.active_facet_options %}within results{% else %}bugs{% endif %} by language, project or full text'
             value='{{ query.terms_string }}' />
 
-            {% for facet, value in active_facet_options.items %}
+            {% for facet, value in query.active_facet_options.items %}
             <input type='hidden' name='{{facet}}' value='{{value}}' />
             {% endfor %}
             <input type='submit' id='button' value='Search' />
         </form>
 
-        {% if query.terms_string or active_facet_options or bunch_of_bugs %}
+        {% if query.terms_string or query.active_facet_options or bunch_of_bugs %}
         {% include 'search/results_widget.html' %}
         {% endif %}
 
