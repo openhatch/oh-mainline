@@ -1,0 +1,26 @@
+{% extends 'base/one_column.html' %}
+
+{% block title %}
+Currently indexing {{ projects_with_bugs.count }} projects
+{% endblock title %}
+
+{% block css %}
+{{ block.super }}
+@import url('/static/css/profile/search_people.css');
+{% endblock css %}
+
+{% block main %}
+<div id='big-people-list' class='module'>
+    <div class='module-content body'>
+        <ul>
+            {% for project_name in projects_with_bugs %}
+            <li>
+            <a href='/+project/{{ project_name }}'>
+                {{ project_name }}
+            </a>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock main %}
