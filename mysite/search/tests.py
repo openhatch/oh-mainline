@@ -676,6 +676,19 @@ class QueryGetPossibleFacets(SearchTest):
                 sort_key='name'
                 )
 
+    def test_possible_facets_always_includes_active_facet(self):
+        # even when active facet has no results.
+        c = Project.create_dummy(language='c')
+        d = Project.create_dummy(language='d')
+        e = Project.create_dummy(language='e')
+        Bug.create_dummy(project=c, description='bug')
+        query = mysite.search.controllers.Query.create_from_GET_data(
+                {'q': 'nothing matches this', 'language': 'c'})
+
+        language_options = query.get_possible_facets()['language']['options']
+        language_options_named_c = [opt for opt in language_options if opt['name'] == 'c']
+        self.assertEqual(len(language_options_named_c), 1)
+
 class SingleTerm(SearchTest):
     """Search for just a single term."""
 
