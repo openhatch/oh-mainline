@@ -11,8 +11,8 @@
 {% endblock css %}
 
 {% block pagetop %}
-<h3><a href='{% url mysite.project.views.projects %}'>Projects</a> &raquo;</h3>
-<h1 style='float: left; clear: left; margin-top: 20px;'>{{ project.name }}</h1>
+<h3 class='supertitle'><a href='{% url mysite.project.views.projects %}'>&laquo; Projects</a></h3>
+<h1>{{ project.name }}</h1>
 {% endblock pagetop %}
 
 {% block left %}

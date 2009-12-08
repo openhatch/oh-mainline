@@ -12,7 +12,7 @@ Currently indexing {{ projects_with_bugs|length }} projects
 {% endblock css %}
 
 {% block main %}
-{% cache 1 projects_page %}{# cache for one day 86400 #}
+{% cache 86400 projects_page %}{# cache for one day 86400 #}
 <div id='big-project-list' class='module'>
     <div class='head'>
         <h3>Projects on OpenHatch ({{ projects_with_bugs|length }}) </h3>
