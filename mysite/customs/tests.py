@@ -83,24 +83,26 @@ class SlowlohTests(django.test.TestCase):
         self.assertEqual(project_name, oh.analysis2projectdata(analysis_id)['name'])
         # }}}
 
-    def testFindByUsername(self, should_have = None):
+    def testFindByUsername(self, do_contents_check=True):
         # {{{
         oh = ohloh.get_ohloh()
         projects, web_response = oh.get_contribution_info_by_username('paulproteus')
         # We test the web_response elsewhere
-        if should_have is None:
-            should_have = {'project': u'ccHost',
-                             'project_homepage_url': 'http://wiki.creativecommons.org/CcHost',
-                             'man_months': 1,
-                             'primary_language': 'shell script'}
+        should_have = {'project': u'ccHost',
+                       'project_homepage_url': 'http://wiki.creativecommons.org/CcHost',
+                       'man_months': 1,
+                       'primary_language': 'shell script'}
 
-        self.assert_(should_have in projects)
+        if do_contents_check:
+            self.assert_(should_have in projects)
+
+        return projects
         # }}}
 
     @mock.patch('mechanize.Browser.open', open_causes_404)
     def testFindByUsernameWith404(self):
         # {{{
-        self.testFindByUsername([])
+        self.assertEqual([], self.testFindByUsername(do_contents_check=False))
         # }}}
 
     def testFindByOhlohUsername(self, should_have = None):
