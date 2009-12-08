@@ -47,7 +47,7 @@ def length_lte(value, arg):
     "Returns a boolean of whether the value's length is less than or equal to the argument"
     return len(value) <= int(arg)
 
-def break_anywhere(value):
+def break_long_words(value):
     assert type(value) == unicode
     re_too_many_letters_in_a_row = re.compile(r'([\w]{8}|[\_^/])', re.UNICODE)
 
@@ -62,4 +62,4 @@ register.filter('length_gt', length_gt)
 register.filter('length_lt', length_lt)
 register.filter('length_gte', length_gte)
 register.filter('length_lte', length_lte)
-register.filter('break_anywhere', break_anywhere)
+register.filter('break_long_words', break_long_words)

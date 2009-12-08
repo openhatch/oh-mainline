@@ -288,7 +288,7 @@
                         <a href='/people/{{ person.user.username }}/projects/{{ project.name }}'>
                             <img alt='logo' title='{{project.name}}'
                             src='{{ project.get_url_of_badge_size_icon_or_generic }}' width='40'/>
-                            <div class='project-name'>{{ project.name|break_anywhere|safe }}</div>
+                            <div class='project-name'>{{ project.name|break_long_words|safe }}</div>
                         </a>
                     </div>
                 </div>
