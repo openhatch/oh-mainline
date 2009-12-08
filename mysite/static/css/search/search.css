@@ -414,16 +414,6 @@ a.title:focus {
 #opps li.expanded .description-container {
     white-space: normal;
 }
-#toggle-more-suggestions {
-    float: left;
-    width: 95%;
-    margin-bottom: 10px;
-}
-#filters input[type='checkbox'],
-#filters label {
-    cursor: pointer;
-    cursor: hand;
-}
 #filters label.on {
     font-weight: bold;
 }
@@ -473,7 +463,6 @@ input[type='text'].default-text-active {
 ul#facets { margin-left: 17px; margin-bottom: 20px; }
 ul#facets ul { margin-left: 10px; }
 ul#facets ul li, #suggested_searches li { list-style: square; margin-top: 10px; margin-left: 20px; color: #777; }
-#suggested_searches input[type='checkbox'] { display: none; }
 
 #results-summary { width: 70%; float: left; margin-right: 10px; }
 #navigation { float: right; }
