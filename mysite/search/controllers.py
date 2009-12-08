@@ -188,6 +188,13 @@ class Query:
         distinct_language_columns = bugs.values('project__language').distinct()
         languages = [x['project__language'] for x in distinct_language_columns]
         languages = [l for l in languages if l]
+
+        # Add the active language facet, if there is one
+        if 'language' in self.active_facet_options:
+            active_language = self.active_facet_options['language']
+            if active_language not in languages:
+                languages.append(active_language)
+
         return languages
 
     def get_sha1(self):
