@@ -118,6 +118,17 @@ class Person(models.Model):
     def get_published_portfolio_entries(self):
         return PortfolioEntry.objects.filter(person=self, is_published=True, is_deleted=False)
 
+    @staticmethod
+    def only_terms_with_results(terms):
+        # Remove terms whose hit counts are zero.
+        terms_with_results = [] 
+        for term in terms:
+            query = mysite.search.controllers.Query(terms=[term])
+            hit_count = query.get_or_create_cached_hit_count()
+            if hit_count != 0:
+                terms_with_results.append(term)
+        return terms_with_results
+
     def get_recommended_search_terms(self):
         # {{{
         terms = []
@@ -138,7 +149,7 @@ class Person(models.Model):
         # Remove duplicates
         terms = sorted(set(terms), key=lambda s: s.lower())
 
-        return terms
+        return Person.only_terms_with_results(terms)
 
         # FIXME: Add support for recommended projects.
         # FIXME: Add support for recommended project tags.

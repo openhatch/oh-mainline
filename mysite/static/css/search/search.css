@@ -414,16 +414,6 @@ a.title:focus {
 #opps li.expanded .description-container {
     white-space: normal;
 }
-#toggle-more-suggestions {
-    float: left;
-    width: 95%;
-    margin-bottom: 10px;
-}
-#filters input[type='checkbox'],
-#filters label {
-    cursor: pointer;
-    cursor: hand;
-}
 #filters label.on {
     font-weight: bold;
 }
@@ -472,18 +462,16 @@ input[type='text'].default-text-active {
 #filters h4 { margin-bottom: 5px; }
 ul#facets { margin-left: 17px; margin-bottom: 20px; }
 ul#facets ul { margin-left: 10px; }
-#facets li li { list-style: square; }
-#facets ul li { margin-top: 10px; margin-left: 20px; }
-#facets ul li { color: #777; }
+ul#facets ul li, #suggested_searches li { list-style: square; margin-top: 10px; margin-left: 20px; color: #777; }
+#facets li.active { font-weight: bold; }
 
 #results-summary { width: 70%; float: left; margin-right: 10px; }
 #navigation { float: right; }
 
 #about_bug_trackers { margin-top: 0; padding: 10px; }
-    #about_bug_trackers h4 { margin-bottom: 10px; }
     #about_bug_trackers div { float: left; margin-bottom: 10px; width: 100%; }
         #how_many_bug_trackers { text-align: center; font-size: 140%; vertical-align: middle; }
         #bug_tracker_count { background-color: #747474; -moz-border-radius: 8px; padding: 3px 4px; border-radius: 8px; color: #fff; }
     #about_bug_trackers #learn_more { margin-bottom: 0; text-align: right; }
 
-/* vim: set ai ts=4 sts=4 et sw=4: */
+    /* vim: set ai ts=4 sts=4 et sw=4: */

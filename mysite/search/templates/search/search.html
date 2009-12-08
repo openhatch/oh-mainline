@@ -25,9 +25,7 @@ Search bugs
 <div id='filters' class='box module'>
     <h4 style='margin-bottom: 10px;'>
         {% if query.terms %}
-        {% if bunch_of_bugs %}
         Filter results for <strong>{{ query.terms_string }}</strong>:
-        {% endif %}
         {% else %}
         Browse&hellip;
         {% endif %}
@@ -43,24 +41,24 @@ Search bugs
             }
             {% endcomment %}
             <li>
-              {% if facet_name|in_list:query.active_facet_options %}
-	      Change
-	      {% else %}
-	      by
-	      {% endif %}
+                {% if facet_name|in_list:query.active_facet_options %}
+                    Change
+                {% else %}
+                    by
+                {% endif %}
                 {{ facet.sidebar_name }}
                 <ul>
                     {% for option in facet.options %}
                         {% if option.name %}
-                        <li>
-                            <a href='?{{ option.query_string }}'>
-                                {{ option.name }} ({{ option.count }})</a>
-                              {%ifequal option.name 'bitesize'%}
-                                  <small>
-                                      (<a id='define-bite-size' href="#">what's this?</a>)
-                                  </small>
-                              {%endifequal%}
-                        </li>
+                            <li {% if option.is_active %}class='active'{% endif %}>
+                                <a href='?{{ option.query_string }}'>
+                                    {{ option.name }} ({{ option.count }})</a>
+                                {% ifequal option.name 'bitesize' %}
+                                    <small>
+                                        (<a id='define-bite-size' href="#">what's this?</a>)
+                                    </small>
+                                {% endifequal %}
+                            </li>
                         {% endif %}
                     {% endfor %}
                 </ul>
@@ -81,16 +79,14 @@ Search bugs
         <ul>
             {% for index, term, czeched in suggestions %}
             <li>
-            <input id='term_{{ index }}' name='term_{{ index }}' type='checkbox'
-            {% if czeched %}checked='on'{% endif %} %} />
-            <label for='term_{{ index }}'>{{ term }}</label>
+            <a 
+                {% ifequal term.lower query.terms_string.lower %}
+                style='font-weight: bold;'
+                {% endifequal %}
+                href='?q={{ term|urlencode }}'>{{ term }}</a>
             </li>
             {% endfor %}
         </ul>
-        <a id='toggle-more-suggestions' href='#'>
-            Show <span>more</span> suggestions
-        </a>
-        <input type='submit' value='Find bugs'/>
     </form>
     {% else %}
         <a href='{% url mysite.profile.views.portfolio_editor %}'>
@@ -127,16 +123,16 @@ Search bugs
             <input type='text'
             name='q' id='q'
             class='default-text'
-            title='Search {% if active_facet_options %}within results{% else %}bugs{% endif %} by language, project or full text'
+            title='Search {% if query.active_facet_options %}within results{% else %}bugs{% endif %} by language, project or full text'
             value='{{ query.terms_string }}' />
 
-            {% for facet, value in active_facet_options.items %}
+            {% for facet, value in query.active_facet_options.items %}
             <input type='hidden' name='{{facet}}' value='{{value}}' />
             {% endfor %}
             <input type='submit' id='button' value='Search' />
         </form>
 
-        {% if query.terms_string or active_facet_options or bunch_of_bugs %}
+        {% if query.terms_string or query.active_facet_options or bunch_of_bugs %}
         {% include 'search/results_widget.html' %}
         {% endif %}
 
@@ -169,7 +165,6 @@ Search bugs
 </li>
 {{ block.super }}
 <script src='/static/js/search/defaultText.js'></script>
-<script src='/static/js/search/suggestions.js'></script>
 <script src='/static/js/jquery.jgrowl.js'></script>
 {% comment %}
 <script src='/static/js/search/testData.js'></script>

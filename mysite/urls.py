@@ -1,5 +1,5 @@
 from django.conf.urls.defaults import *
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 
 from django.conf import settings
 
@@ -203,6 +203,8 @@ urlpatterns = patterns('',
         (r'^\+project/', include('mysite.project.urls')),
 
         (r'^\+yo_is_django_alive$', lambda x: HttpResponse('success')),
+
+        (r'^\+bitesize$', lambda x: HttpResponseRedirect('/search/?q=&toughness=bitesize')),
 
         )
 

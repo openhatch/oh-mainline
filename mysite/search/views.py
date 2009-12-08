@@ -1,9 +1,11 @@
-from django.http import HttpResponse, QueryDict, HttpResponseServerError
+from django.http import HttpResponse, QueryDict, HttpResponseServerError, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.core import serializers
 from django.db.models import Q
 from django.utils.timesince import timesince
 from django.utils.html import escape
+from django.core.urlresolvers import reverse
+import urllib
 
 from mysite.search.models import Bug, Project
 import mysite.search.controllers 
@@ -28,6 +30,13 @@ def encode_datetime(obj):
 
 def fetch_bugs(request):
     # {{{
+
+    # Make the query string keys lowercase using a redirect.
+    if any([k.lower() != k for k in request.GET.keys()]):
+        new_GET = {}
+        for key in request.GET.keys():
+            new_GET[key.lower()] = request.GET[key]
+        return HttpResponseRedirect(reverse(fetch_bugs) + '?' + urllib.urlencode(new_GET))
 
     if request.user.is_authenticated():
         person = request.user.get_profile()

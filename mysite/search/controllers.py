@@ -3,6 +3,7 @@ import mysite.search.views
 import collections
 import urllib
 import re
+import sha
 from django.db.models import Q
 
 def order_bugs(query):
@@ -103,6 +104,10 @@ class Query:
     def get_facet_options(self, facet_name, option_names):
 
         def get_facet_option_data(option_name):
+
+            caller_query = self
+            # ^^^ NB: The value of 'self' is determined by the caller environment.
+
             # Create a Query for this option. 
 
             # This Query is sensitive to the currently active facet options...
@@ -115,10 +120,28 @@ class Query:
                 })
             query_string = urllib.urlencode(GET_data)
             query = Query.create_from_GET_data(GET_data)
+            name = option_name or 'any'
+
+            active_option_name = caller_query.active_facet_options.get(facet_name, None)
+
+            # This facet isn't active...
+            is_active = False
+
+            # ...unless there's an item in active_facet_options mapping the
+            # current facet_name to the option whose data we're creating...
+            if active_option_name == option_name:
+                is_active = True
+
+            # ...or if this is the 'any' option and there is no active option
+            # for this facet.
+            if name == 'any' and active_option_name is None:
+                is_active = True
+
             return {
-                    'name': option_name or 'any',
-                    'count': query.get_bugs_unordered().count(),
-                    'query_string': query_string
+                    'name': name,
+                    'count': query.get_or_create_cached_hit_count(),
+                    'query_string': query_string,
+                    'is_active': is_active
                     }
 
         return [get_facet_option_data(n) for n in option_names]
@@ -165,8 +188,43 @@ class Query:
         distinct_language_columns = bugs.values('project__language').distinct()
         languages = [x['project__language'] for x in distinct_language_columns]
         languages = [l for l in languages if l]
-        return languages
 
+        # Add the active language facet, if there is one
+        if 'language' in self.active_facet_options:
+            active_language = self.active_facet_options['language']
+            if active_language not in languages:
+                languages.append(active_language)
+
+        return languages
+  
+    def get_sha1(self):
+
+        # first, make a dictionary mapping strings to strings
+        simple_dictionary = {}
+
+        # add terms_string
+        simple_dictionary['terms'] = str(sorted(self.terms))
+
+        # add active_facet_options
+        simple_dictionary['active_facet_options'] = str(sorted(self.active_facet_options.items()))
+
+        stringified = str(sorted(simple_dictionary.items()))
+        # then return a hash of our sorted items self.
+        return sha.sha(stringified).hexdigest() # sadly we cause a 2x space blowup here
+    
+    def get_or_create_cached_hit_count(self):
+
+        existing_hccs = mysite.search.models.HitCountCache.objects.filter(hashed_query=self.get_sha1())
+        if existing_hccs:
+            hcc = existing_hccs[0]
+        else:
+            count = self.get_bugs_unordered().count()
+            hcc = mysite.search.models.HitCountCache.objects.create(
+                    hashed_query=self.get_sha1(),
+                    hit_count=count)
+        return hcc.hit_count
+
+       
 def get_bug_tracker_count():
     """Retrieve the number of bug trackers currently indexed."""
     # FIXME: Calculate this automatically.

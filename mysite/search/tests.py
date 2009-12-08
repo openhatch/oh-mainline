@@ -6,7 +6,7 @@ import mysite.customs.miro
 import mysite.search.controllers
 
 import django.test
-from mysite.search.models import Project, Bug
+from mysite.search.models import Project, Bug, HitCountCache
 from mysite.search import views
 import lpb2json
 import datetime
@@ -47,19 +47,37 @@ class SearchTest(TwillTests):
         self.assertEqual(len(one), len(two))
         self.assertEqual(set(one), set(two))
 
-    def compare_lists_of_dicts(self, one, two):
-        sorted_one = sorted(one)
-        sorted_two = sorted(two)
+    def compare_lists_of_dicts(self, one, two, sort_key=None):
+
+        if sort_key is not None:
+            sort_fn = lambda thing: thing[sort_key]
+        else:
+            sort_fn = None
+
+        sorted_one = sorted(one, key=sort_fn)
+        sorted_two = sorted(two, key=sort_fn)
         for k in range(len(sorted_one)):
-            self.assertEqual(sorted_one[k], sorted_two[k])
+            try:
+                self.assertEqual(sorted_one[k], sorted_two[k])
+            except AssertionError:
+                import sys
+                print >> sys.stderr, sorted_one
+                print >> sys.stderr, sorted_two
+                raise
         for k in range(len(sorted_two)):
-            self.assertEqual(sorted_one[k], sorted_two[k])
+            try:
+                self.assertEqual(sorted_one[k], sorted_two[k])
+            except AssertionError:
+                import sys
+                print >> sys.stderr, sorted_one
+                print >> sys.stderr, sorted_two
+                raise
 
 class AutoCompleteTests(SearchTest):
     """
     Test whether the autocomplete can handle
      - a field-specific query
-     - a non-field-specific (fulltext) query
+     -l a non-field-specific (fulltext) query
     """
 
     def setUp(self):
@@ -415,7 +433,16 @@ class Recommend(SearchTest):
 
     # FIXME: Add a 'recommend_these_in_bug_search' field to TagType
     # Use that to exclude 'will never understand' tags from recommended search terms.
-    def test_get_recommended_search_terms_for_user(self):
+    @mock.patch('mysite.search.controllers.Query.get_or_create_cached_hit_count')
+    def test_get_recommended_search_terms_for_user(self, mocked_hit_counter):
+
+        # Make all the search terms appear to return results, so
+        # that none are excluded when we try to trim away
+        # the terms that don't return results.
+        # We test this functionality separately in
+        # search.tests.DontRecommendFutileSearchTerms.
+        mocked_hit_counter.return_value = 1
+
         person = Person.objects.get(user__username='paulproteus')
         recommended_terms = person.get_recommended_search_terms()
 
@@ -434,7 +461,17 @@ class Recommend(SearchTest):
                         "inspired by %s." % (term, source))
 
     # FIXME: Include recommendations from tags.
-    def test_search_page_context_includes_recommendations(self):
+
+    @mock.patch('mysite.search.controllers.Query.get_or_create_cached_hit_count')
+    def test_search_page_context_includes_recommendations(self, mocked_hit_counter):
+
+        # Make all the search terms appear to return results, so
+        # that none are excluded when we try to trim away
+        # the terms that don't return results.
+        # We test this functionality separately in
+        # search.tests.DontRecommendFutileSearchTerms.
+        mocked_hit_counter.return_value = 1
+
         client = self.login_with_client()
         response = client.get('/search/')
 
@@ -616,20 +653,40 @@ class QueryGetPossibleFacets(SearchTest):
         self.compare_lists_of_dicts(
                 possible_facets['language']['options'],
                 [
-                    { 'name': 'any', 'query_string': 'q=bug&language=', 'count': 2 },
-                    { 'name': 'c', 'query_string': 'q=bug&language=c', 'count': 1 },
-                    { 'name': 'd', 'query_string': 'q=bug&language=d', 'count': 1 },
+                    { 'name': 'any', 'query_string': 'q=bug&language=',
+                        'is_active': False, 'count': 2 },
+                    { 'name': 'c', 'query_string': 'q=bug&language=c', 
+                        'is_active': True, 'count': 1 },
+                    { 'name': 'd', 'query_string': 'q=bug&language=d',
+                        'is_active': False, 'count': 1 },
                     # e is excluded because its bug ('bAg') doesn't match the term 'bug'
-                    ]
-                    )
+                    ],
+                sort_key='name'
+                )
 
         self.compare_lists_of_dicts(
                 possible_facets['toughness']['options'],
                 [
-                    { 'name': 'any', 'query_string': 'q=bug&toughness=&language=c', 'count': 1 },
-                    { 'name': 'bitesize', 'query_string': 'q=bug&toughness=bitesize&language=c', 'count': 1 },
-                    ]
-                    )
+                    { 'name': 'any', 'is_active': True,
+                         'query_string': 'q=bug&toughness=&language=c', 'count': 1 },
+                    { 'name': 'bitesize', 'is_active': False,
+                        'query_string': 'q=bug&toughness=bitesize&language=c', 'count': 1 },
+                    ],
+                sort_key='name'
+                )
+
+    def test_possible_facets_always_includes_active_facet(self):
+        # even when active facet has no results.
+        c = Project.create_dummy(language='c')
+        d = Project.create_dummy(language='d')
+        e = Project.create_dummy(language='e')
+        Bug.create_dummy(project=c, description='bug')
+        query = mysite.search.controllers.Query.create_from_GET_data(
+                {'q': 'nothing matches this', 'language': 'c'})
+
+        language_options = query.get_possible_facets()['language']['options']
+        language_options_named_c = [opt for opt in language_options if opt['name'] == 'c']
+        self.assertEqual(len(language_options_named_c), 1)
 
 class SingleTerm(SearchTest):
     """Search for just a single term."""
@@ -670,8 +727,10 @@ class SingleTerm(SearchTest):
     def test_toughness_facet(self):
         # What options do we expect?
         toughness_option_bitesize = {'name': 'bitesize', 'count': 1,
+                'is_active': False,
                 'query_string': 'q=screensaver&toughness=bitesize'}
         toughness_option_any = {'name': 'any', 'count': 3,
+                'is_active': True,
                 'query_string': 'q=screensaver&toughness='}
         expected_toughness_facet_options = [toughness_option_bitesize, toughness_option_any]
 
@@ -683,10 +742,13 @@ class SingleTerm(SearchTest):
     def test_languages_facet(self):
         # What options do we expect?
         languages_option_python = {'name': 'Python', 'count': 2,
+                'is_active': False,
                 'query_string': 'q=screensaver&language=Python'}
         languages_option_perl = {'name': 'Perl', 'count': 1,
+                'is_active': False,
                 'query_string': 'q=screensaver&language=Perl'}
         languages_option_any = {'name': 'any', 'count': 3,
+                'is_active': True,
                 'query_string': 'q=screensaver&language='}
         expected_languages_facet_options = [
                 languages_option_python,
@@ -738,8 +800,10 @@ class SingleFacetOption(SearchTest):
     def test_toughness_facet(self):
         # What options do we expect?
         toughness_option_bitesize = {'name': 'bitesize', 'count': 1,
+                'is_active': False,
                 'query_string': 'q=&toughness=bitesize&language=Python'}
         toughness_option_any = {'name': 'any', 'count': 2,
+                'is_active': True,
                 'query_string': 'q=&toughness=&language=Python'}
         expected_toughness_facet_options = [toughness_option_bitesize, toughness_option_any]
 
@@ -751,12 +815,16 @@ class SingleFacetOption(SearchTest):
     def test_languages_facet(self):
         # What options do we expect?
         languages_option_python = {'name': 'Python', 'count': 2,
+                'is_active': True,
                 'query_string': 'q=&language=Python'}
         languages_option_perl = {'name': 'Perl', 'count': 1,
+                'is_active': False,
                 'query_string': 'q=&language=Perl'}
         languages_option_c = {'name': 'C', 'count': 1,
+                'is_active': False,
                 'query_string': 'q=&language=C'}
         languages_option_any = {'name': 'any', 'count': 4,
+                'is_active': False,
                 'query_string': 'q=&language='}
         expected_languages_facet_options = [
                 languages_option_python, 
@@ -867,6 +935,97 @@ class QueryGetPossibleLanguageFacetOptionNames(SearchTest):
         self.assertEqual(
                 sorted(language_names),
                 sorted(['Python', 'Perl', 'C']))
+
+class QueryStringCaseInsensitive(SearchTest):
+
+    def test_Language(self):
+        """Do we redirect queries that use non-lowercase facet keys to pages
+        that use lowercase facet keys?"""
+        redirects = self.client.get('/search/',
+                {'LANguaGE': 'pytHon'}, follow=True).redirect_chain
+        self.assertEqual(redirects, [('http://testserver/search/?language=pytHon', 302)])
+
+class HashQueryData(SearchTest):
+
+    def test_queries_with_identical_data_hash_alike(self):
+        GET_data = {'q': 'socialguides', 'language': 'looxii'}
+        one = mysite.search.controllers.Query.create_from_GET_data(GET_data)
+        two = mysite.search.controllers.Query.create_from_GET_data(GET_data)
+        self.assertEqual(one.get_sha1(), two.get_sha1())
+
+    def test_queries_with_equiv_data_expressed_differently_hash_alike(self):
+        GET_data_1 = {'q': 'socialguides zetapage', 'language': 'looxii'}
+        GET_data_2 = {'q': 'zetapage socialguides', 'language': 'looxii'}
+        one = mysite.search.controllers.Query.create_from_GET_data(GET_data_1)
+        two = mysite.search.controllers.Query.create_from_GET_data(GET_data_2)
+        self.assertEqual(one.get_sha1(), two.get_sha1())
+
+    def test_queries_with_different_data_hash_differently(self):
+        GET_data_1 = {'q': 'socialguides zetapage', 'language': 'looxii'}
+        GET_data_2 = {'q': 'socialguides ninjapost', 'language': 'looxii'}
+        one = mysite.search.controllers.Query.create_from_GET_data(GET_data_1)
+        two = mysite.search.controllers.Query.create_from_GET_data(GET_data_2)
+        self.assertNotEqual(one.get_sha1(), two.get_sha1())
+
+    # How on earth do we test for collisions?
+
+class QueryGrabHitCount(SearchTest):
+
+    def test_eventhive_grab_hitcount_once_stored(self):
+
+        data = {'q': 'eventhive', 'language': 'shoutNOW'}
+        query = mysite.search.controllers.Query.create_from_GET_data(data)
+        stored_hit_count = 10
+        HitCountCache.objects.create(
+                hashed_query=query.get_sha1(),
+                hit_count=stored_hit_count)
+        self.assertEqual(query.get_or_create_cached_hit_count(), stored_hit_count)
+
+    def test_shoutnow_cache_hitcount_on_grab(self):
+
+        project = Project.create_dummy(language='shoutNOW')
+
+        bug = Bug.create_dummy(project=project)
+        data = {'language': 'shoutNOW'}
+        query = mysite.search.controllers.Query.create_from_GET_data(data)
+
+        expected_hit_count = 1
+        self.assertEqual(query.get_or_create_cached_hit_count(), expected_hit_count)
+
+        hcc = HitCountCache.objects.get(hashed_query=query.get_sha1())
+        self.assertEqual(hcc.hit_count, expected_hit_count)
+
+class ClearCacheWhenBugsChange(SearchTest):
+
+    def test_cached_cleared_after_bug_save_or_delete(self):
+        data = {'language': 'shoutNOW'}
+        query = mysite.search.controllers.Query.create_from_GET_data(data)
+
+        # Cache entry created after hit count retrieval
+        query.get_or_create_cached_hit_count()
+        self.assert_(HitCountCache.objects.all())
+
+        # Cache cleared after bug save
+        project = Project.create_dummy(language='shoutNOW')
+        bug = Bug.create_dummy(project=project)
+        self.assertFalse(HitCountCache.objects.all())
+
+        # Cache entry created after hit count retrieval
+        query.get_or_create_cached_hit_count()
+        self.assert_(HitCountCache.objects.all())
+
+        # Cache cleared after bug deletion
+        bug.delete()
+        self.assertFalse(HitCountCache.objects.all())
+
+class DontRecommendFutileSearchTerms(TwillTests):
+
+    def test_removal_of_futile_terms(self):
+        bug = mysite.search.models.Bug.create_dummy_with_project(description='useful')
+        self.assertEqual(
+                Person.only_terms_with_results(['useful', 'futile']),
+                ['useful'])
+
 
 class PublicizeBugTrackerIndex(SearchTest):
 
