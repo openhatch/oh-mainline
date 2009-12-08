@@ -104,14 +104,17 @@ Search bugs
     {% endif %}
 </div>
 <div id='about_projects' class='box module'>
-    <h4>
-        Currently indexing
+    <h4 id='how_many_projects'>
+        <a href='{% url mysite.project.views.projects %}'>
+            Tracking 
+            <strong style='color: #FF6D3D;'>{{ project_count }}</strong>
+            projects
+        </a>
     </h4>
-    <div id='how_many_projects'>
-        <span id='project_count'>{{ project_count }}</span> projects
-    </div>
     <div id='learn_more'>
-        <a href='https://openhatch.org/wiki/Bug_trackers'>Learn more / Add a bug tracker</a>
+        <a href='{% url mysite.project.views.projects %}'>See all</a>
+        <span style='color: #999;'>&bull;</span>
+        <a href='{% url mysite.project.views.projects %}'>Add a bug tracker</a>
     </div>
 </div>
 {% endblock sidebar %}
@@ -154,11 +157,6 @@ Search bugs
 </div> <!-- /#opps -->
 {% endblock main %}
 {% block js %}
-<style>
-    #result-template {
-        display: none;
-    }
-</style>
 {{ block.super }}
 <script src='/static/js/search/defaultText.js'></script>
 <script src='/static/js/jquery.jgrowl.js'></script>
