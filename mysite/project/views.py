@@ -9,7 +9,7 @@ from django.core.urlresolvers import reverse
 
 @mysite.base.decorators.view
 def project(request, project__name = None):
-    p = Project.objects.get(name=project__name)
+    p = get_object_or_404(Project, name=project__name)
     return (request,
             'project/project.html',
             {

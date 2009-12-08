@@ -19,7 +19,7 @@
 {% with project.get_open_bugs_randomly_ordered as bugs %}
 <div class='module' id='bugs'>
     <div class='head'>
-        <h3>Bugs we index from {{ project.name }} ({% firstof bugs.count "none yet" %})</h3>
+        <h3>Bugs indexed ({% firstof bugs.count "none yet" %})</h3>
     </div>
     <div class='body'>
         <ul>
@@ -48,20 +48,21 @@
 {% block main %}
 <div class='module' id='contributors'>
     <div class='head'>
-        <h3>Contributors to {{ project.name }} ({% firstof contributors|length "none yet" %})</h3>
+        <h3>Registered contributors ({% firstof contributors|length "none yet" %})</h3>
     </div>
     <div class='body'>
         <ul>
             {% for person in contributors %}
             {% include 'profile/person_small.html' %}
             {% empty %}
-            No registered contributors yet. To be listed here,
+            No registered contributors yet.             {% endfor %}
+        </ul>
+        <div style='width: 100%; float: left; text-align: right; margin-top: 20px; font-size: 8pt;'>
+        To be listed here,
             <a href='{% url mysite.profile.views.portfolio_editor %}'>
                 add {{ project.name }} to your
                 profile</a>.
-
-            {% endfor %}
-        </ul>
+        </div>
     </div>
 </div>
 {% endblock main %}
