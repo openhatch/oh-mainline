@@ -13,10 +13,10 @@ Currently indexing {{ projects_with_bugs.count }} projects
 <div id='big-people-list' class='module'>
     <div class='module-content body'>
         <ul>
-            {% for project_name in projects_with_bugs %}
+            {% for project in projects_with_bugs %}
             <li>
-            <a href='/+project/{{ project_name }}'>
-                {{ project_name }}
+            <a href='{{ project.get_url }}'>
+                {{ project.name }}
             </a>
             </li>
             {% endfor %}

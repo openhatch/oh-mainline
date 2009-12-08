@@ -8,6 +8,7 @@ import Image
 import uuid
 from django.db.models import Q
 import mysite.customs 
+from django.core.urlresolvers import reverse
 
 def get_image_data_scaled(image_data, width):
     # scale it
@@ -166,6 +167,9 @@ class Project(models.Model):
 
     def __unicode__(self):
         return "name='%s' language='%s'" % (self.name, self.language)
+    
+    def get_url(self):
+        return reverse(mysite.project.views.project, kwargs={'project__name': self.name})
 
 def populate_icon_on_project_creation(instance, created, *args, **kwargs):
     if created and not instance.icon_raw:
