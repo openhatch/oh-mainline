@@ -225,7 +225,17 @@ class Query:
         return hcc.hit_count
 
        
-def get_bug_tracker_count():
-    """Retrieve the number of bug trackers currently indexed."""
-    # FIXME: Calculate this automatically.
-    return 49
+def get_project_count():
+    """Retrieve the number of projects currently indexed."""
+    bugs = mysite.search.models.Bug.all_bugs.all()
+    return bugs.values('project').distinct().count()
+
+def get_names_of_projects_with_bugs():
+    bugs = mysite.search.models.Bug.all_bugs.all()
+    one_bug_dict_per_project = bugs.values('project').distinct().order_by('project__name')
+    #project_names = [b['project__name'] for b in one_bug_dict_per_project]
+    projects = []
+    for bug_dict in one_bug_dict_per_project:
+        pk = bug_dict['project']
+        projects.append(mysite.search.models.Project.objects.get(pk=pk))
+    return projects

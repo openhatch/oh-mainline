@@ -5,6 +5,7 @@ from django.db.models import Q
 from django.utils.timesince import timesince
 from django.utils.html import escape
 from django.core.urlresolvers import reverse
+import mysite.base.decorators 
 import urllib
 
 from mysite.search.models import Bug, Project
@@ -120,7 +121,7 @@ def fetch_bugs(request):
         data['show_prev_page_link'] = start > 1
         data['show_next_page_link'] = end < (total_bug_count - 1)
         data['facet2any_query_string'] = facet2any_query_string
-        data['bug_tracker_count'] = mysite.search.controllers.get_bug_tracker_count()
+        data['project_count'] = mysite.search.controllers.get_project_count()
 
         return render_to_response('search/search.html', data)
     # }}}
@@ -270,6 +271,13 @@ def get_autocompletion_suggestions(input):
 
     return suggestions
     # }}}
+
+@mysite.base.decorators.view
+def projects(request):
+    template = "search/projects_with_bugs.html"
+    projects_with_bugs = mysite.search.controllers.get_names_of_projects_with_bugs()
+    data = {'projects_with_bugs': projects_with_bugs}
+    return (request, template, data)
 
 """
 Ways we could do autocompletion:

@@ -468,10 +468,10 @@ ul#facets ul li, #suggested_searches li { list-style: square; margin-top: 10px; 
 #results-summary { width: 70%; float: left; margin-right: 10px; }
 #navigation { float: right; }
 
-#about_bug_trackers { margin-top: 0; padding: 10px; }
-    #about_bug_trackers div { float: left; margin-bottom: 10px; width: 100%; }
-        #how_many_bug_trackers { text-align: center; font-size: 140%; vertical-align: middle; }
-        #bug_tracker_count { background-color: #747474; -moz-border-radius: 8px; padding: 3px 4px; border-radius: 8px; color: #fff; }
-    #about_bug_trackers #learn_more { margin-bottom: 0; text-align: right; }
+#about_projects { text-align: center; margin-top: 0; padding: 10px; }
+    #about_projects div { float: left; margin-bottom: 10px; width: 100%; }
+        #how_many_projects { text-align: center; font-size: 140%; margin-top: 7px; vertical-align: middle; }
+        #project_count { background-color: #747474; -moz-border-radius: 8px; padding: 3px 4px; border-radius: 8px; color: #fff; }
+    #about_projects #learn_more { margin-bottom: 0; }
 
     /* vim: set ai ts=4 sts=4 et sw=4: */

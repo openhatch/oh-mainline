@@ -206,6 +206,8 @@ urlpatterns = patterns('',
 
         (r'^\+bitesize$', lambda x: HttpResponseRedirect('/search/?q=&toughness=bitesize')),
 
+        (r'^search/\+projects$', 'mysite.search.views.projects'),
+
         )
 
 handler404 = 'mysite.base.views.page_not_found'
