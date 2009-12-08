@@ -472,9 +472,8 @@ input[type='text'].default-text-active {
 #filters h4 { margin-bottom: 5px; }
 ul#facets { margin-left: 17px; margin-bottom: 20px; }
 ul#facets ul { margin-left: 10px; }
-#facets li li { list-style: square; }
-#facets ul li { margin-top: 10px; margin-left: 20px; }
-#facets ul li { color: #777; }
+ul#facets ul li, #suggested_searches li { list-style: square; margin-top: 10px; margin-left: 20px; color: #777; }
+#suggested_searches input[type='checkbox'] { display: none; }
 
 #results-summary { width: 70%; float: left; margin-right: 10px; }
 #navigation { float: right; }

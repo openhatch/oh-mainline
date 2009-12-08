@@ -25,9 +25,7 @@ Search bugs
 <div id='filters' class='box module'>
     <h4 style='margin-bottom: 10px;'>
         {% if query.terms %}
-        {% if bunch_of_bugs %}
         Filter results for <strong>{{ query.terms_string }}</strong>:
-        {% endif %}
         {% else %}
         Browse&hellip;
         {% endif %}
@@ -81,16 +79,14 @@ Search bugs
         <ul>
             {% for index, term, czeched in suggestions %}
             <li>
-            <input id='term_{{ index }}' name='term_{{ index }}' type='checkbox'
-            {% if czeched %}checked='on'{% endif %} %} />
-            <label for='term_{{ index }}'>{{ term }}</label>
+            <a 
+                {% ifequal term.lower query.terms_string.lower %}
+                style='font-weight: bold;'
+                {% endifequal %}
+                href='?q={{ term|urlencode }}'>{{ term }}</a>
             </li>
             {% endfor %}
         </ul>
-        <a id='toggle-more-suggestions' href='#'>
-            Show <span>more</span> suggestions
-        </a>
-        <input type='submit' value='Find bugs'/>
     </form>
     {% else %}
         <a href='{% url mysite.profile.views.portfolio_editor %}'>
