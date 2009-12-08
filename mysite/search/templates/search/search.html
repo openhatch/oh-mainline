@@ -159,10 +159,6 @@ Search bugs
         display: none;
     }
 </style>
-<li class='bug' id='result-template'>
-{# Javascript uses this HTML to regenerate the results list. #}
-{% include 'search/result.html' %}
-</li>
 {{ block.super }}
 <script src='/static/js/search/defaultText.js'></script>
 <script src='/static/js/jquery.jgrowl.js'></script>

@@ -23,7 +23,7 @@
     </div>
     <div class='body'>
         <ul>
-            {% for bug in bugs|slice:":5" %}
+            {% for bug in bugs|slice:":10" %}
             <li>
             <a href='{{ bug.canonical_bug_link }}'>
                 {{ bug.title }}
@@ -38,7 +38,7 @@
             {% endfor %}
         </ul>
         {% if bugs %}
-        <a href='/search/?q={{ project.name|urlencode }}'>See all {{ bugs.count }}</a>
+        <strong><a href='/search/?q={{ project.name|urlencode }}'>See all {{ bugs.count }}</a></strong>
         {% endif %}
     </div>
 </div>
