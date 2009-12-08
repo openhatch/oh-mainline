@@ -1,3 +1,4 @@
+{% load profile_extras %}
 <style type='text/css'>
 
     #openhatch-widget {
@@ -231,8 +232,7 @@
     }
 
     #openhatch-widget .project-escutcheon {
-        width: 49px;
-        height: 40px;
+        width: 70px;
         margin: 4px 3px 3px 3px;
     }
 
@@ -270,6 +270,8 @@
 
     #openhatch-widget .module > .body { width: 280px; background-color: #fff; } 
 
+    #openhatch-widget .project-name{ font-size: 8pt; } 
+
 </style>
 <div id='openhatch-widget'>
     <div class='module'>
@@ -286,7 +288,7 @@
                         <a href='/people/{{ person.user.username }}/projects/{{ project.name }}'>
                             <img alt='logo' title='{{project.name}}'
                             src='{{ project.get_url_of_badge_size_icon_or_generic }}' width='40'/>
-                            {{ project.name }}
+                            <div class='project-name'>{{ project.name|break_long_words|safe }}</div>
                         </a>
                     </div>
                 </div>
