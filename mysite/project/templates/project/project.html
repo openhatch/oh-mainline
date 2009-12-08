@@ -1,4 +1,4 @@
-{% extends 'base/one_column.html' %}
+{% extends 'base/two_columns.html' %}
 
 {% block title %}
 {{ project.name }} - Contributors
@@ -6,19 +6,60 @@
 
 {% block css %}
 {{ block.super }}
-@import url('/static/css/profile/base.css');
+@import url('/static/css/project/project.css');
 @import url('/static/css/profile/person_small.css');
 {% endblock css %}
+
+{% block pagetop %}
+<h3><a href='{% url mysite.project.views.projects %}'>Projects</a> &raquo;</h3>
+<h1 style='float: left; clear: left; margin-top: 20px;'>{{ project.name }}</h1>
+{% endblock pagetop %}
+
+{% block left %}
+{% with project.get_open_bugs_randomly_ordered as bugs %}
+<div class='module' id='bugs'>
+    <div class='head'>
+        <h3>Bugs we index from {{ project.name }} ({% firstof bugs.count "none yet" %})</h3>
+    </div>
+    <div class='body'>
+        <ul>
+            {% for bug in bugs|slice:":5" %}
+            <li>
+            <a href='{{ bug.canonical_bug_link }}'>
+                {{ bug.title }}
+            </a>
+            </li>
+            {% empty %}
+            No {{ project.name }} bugs indexed here yet. 
+            <a href='/wiki/Bug_trackers'>
+                To add a bug tracker, 
+                visit our wiki</a>.
+
+            {% endfor %}
+        </ul>
+        {% if bugs %}
+        <a href='/search/?q={{ project.name|urlencode }}'>See all {{ bugs.count }}</a>
+        {% endif %}
+    </div>
+</div>
+{% endwith %}
+{% endblock left %}
 
 {% block main %}
 <div class='module' id='contributors'>
     <div class='head'>
-        <h3>Contributors to {{ project.name }}</h3>
+        <h3>Contributors to {{ project.name }} ({% firstof contributors|length "none yet" %})</h3>
     </div>
     <div class='body'>
         <ul>
             {% for person in contributors %}
             {% include 'profile/person_small.html' %}
+            {% empty %}
+            No registered contributors yet. To be listed here,
+            <a href='{% url mysite.profile.views.portfolio_editor %}'>
+                add {{ project.name }} to your
+                profile</a>.
+
             {% endfor %}
         </ul>
     </div>

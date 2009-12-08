@@ -1,7 +1,7 @@
 {% extends 'base/one_column.html' %}
 
 {% block title %}
-Currently indexing {{ projects_with_bugs.count }} projects
+Currently indexing {{ projects_with_bugs|length }} projects
 {% endblock title %}
 
 {% block css %}
@@ -10,17 +10,41 @@ Currently indexing {{ projects_with_bugs.count }} projects
 {% endblock css %}
 
 {% block main %}
-<div id='big-people-list' class='module'>
+<div id='big-project-list' class='module'>
+    <div class='head'>
+        <h3>Projects on OpenHatch ({{ projects_with_bugs|length }}) </h3>
+        <span class='note'>Numbers below refer to bugs and contributors in our network</li>
+    </div>
     <div class='module-content body'>
         <ul>
             {% for project in projects_with_bugs %}
-            <li>
+            <li
+            {% if forloop.counter0|divisibleby:"4" %}
+            class='first-in-row'
+            {% endif %}
+            >
             <a href='{{ project.get_url }}'>
-                {{ project.name }}
+                {{ project.name }} 
             </a>
+            <div class='summary'>
+                {% if project.get_open_bugs %}
+                {{ project.get_open_bugs.count }} bug{{ project.get_open_bugs.count|pluralize }}<!--
+                -->{% endif %}<!--
+                -->{% if project.get_open_bugs and project.get_contributors %},{% endif %}
+                {% if project.get_contributors %}
+                {{ project.get_contributors|length }} contributor{{ project.get_contributors.count|pluralize }}
+                {% endif %}
+            </div>
             </li>
             {% endfor %}
         </ul>
     </div>
 </div>
+<style>
+    #big-project-list li { width: 160px; float: left; margin: 0 50px 20px 0; }
+    #big-project-list li a { font-size: 120%; }
+    .summary { color: #444; margin-top: 5px; }
+    .first-in-row { clear: left; }
+    .note { float: right; color: #777; padding: 18px; }
+</style>
 {% endblock main %}

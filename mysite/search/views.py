@@ -272,13 +272,6 @@ def get_autocompletion_suggestions(input):
     return suggestions
     # }}}
 
-@mysite.base.decorators.view
-def projects(request):
-    template = "search/projects_with_bugs.html"
-    projects_with_bugs = mysite.search.controllers.get_names_of_projects_with_bugs()
-    data = {'projects_with_bugs': projects_with_bugs}
-    return (request, template, data)
-
 """
 Ways we could do autocompletion:
 

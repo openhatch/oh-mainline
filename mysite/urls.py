@@ -200,13 +200,13 @@ urlpatterns = patterns('',
         (r'^people/(?P<user_to_display__username>[^/]+)[/?]$',
                 'mysite.profile.views.display_person_web'),
 
-        (r'^\+project/', include('mysite.project.urls')),
+        (r'^\+projects/', include('mysite.project.urls')),
+
+        (r'^\+project/(?P<project__name>.+)', 'mysite.project.views.redirect_project_to_projects'),
 
         (r'^\+yo_is_django_alive$', lambda x: HttpResponse('success')),
 
         (r'^\+bitesize$', lambda x: HttpResponseRedirect('/search/?q=&toughness=bitesize')),
-
-        (r'^search/\+projects$', 'mysite.search.views.projects'),
 
         )
 

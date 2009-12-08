@@ -171,6 +171,12 @@ class Project(models.Model):
     def get_url(self):
         return reverse(mysite.project.views.project, kwargs={'project__name': self.name})
 
+    def get_open_bugs(self):
+        return Bug.open_ones.filter(project=self)
+
+    def get_open_bugs_randomly_ordered(self):
+        return self.get_open_bugs().order_by('?')
+    
 def populate_icon_on_project_creation(instance, created, *args, **kwargs):
     if created and not instance.icon_raw:
         instance.populate_icon_from_ohloh()
