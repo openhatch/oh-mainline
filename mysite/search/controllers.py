@@ -230,7 +230,7 @@ def get_project_count():
     bugs = mysite.search.models.Bug.all_bugs.all()
     return bugs.values('project').distinct().count()
 
-def get_names_of_projects_with_bugs():
+def get_projects_with_bugs():
     bugs = mysite.search.models.Bug.all_bugs.all()
     one_bug_dict_per_project = bugs.values('project').distinct().order_by('project__name')
     #project_names = [b['project__name'] for b in one_bug_dict_per_project]
@@ -239,3 +239,17 @@ def get_names_of_projects_with_bugs():
         pk = bug_dict['project']
         projects.append(mysite.search.models.Project.objects.get(pk=pk))
     return projects
+
+def get_projects_having_contributors_but_no_bugs():
+    portfolio_entries = mysite.profile.models.PortfolioEntry.objects.filter(
+            is_published=True, is_deleted=False)
+    # Make this a manager
+    one_pfe_dict_per_project = portfolio_entries.values('project').distinct().order_by('project__name')
+
+    projects_with_contributors = []
+    for pfe_dict in one_pfe_dict_per_project:
+        pk = pfe_dict['project']
+        projects_with_contributors.append(mysite.search.models.Project.objects.get(pk=pk))
+
+    projects_with_bugs = get_projects_with_bugs()
+    return [p for p in projects_with_contributors if p not in projects_with_bugs]

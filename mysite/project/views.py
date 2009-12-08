@@ -21,8 +21,13 @@ def project(request, project__name = None):
 @mysite.base.decorators.view
 def projects(request):
     template = "search/projects_with_bugs.html"
-    projects_with_bugs = mysite.search.controllers.get_names_of_projects_with_bugs()
-    data = {'projects_with_bugs': projects_with_bugs}
+    projects_with_bugs = mysite.search.controllers.get_projects_with_bugs()
+    projects_having_contributors_but_no_bugs = (mysite.search.controllers.
+            get_projects_having_contributors_but_no_bugs())
+    data = {
+            'projects_with_bugs': projects_with_bugs,
+            'projects_having_contributors_but_no_bugs': projects_having_contributors_but_no_bugs,
+            }
     return (request, template, data)
 
 
