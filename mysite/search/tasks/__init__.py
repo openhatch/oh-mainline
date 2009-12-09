@@ -49,6 +49,25 @@ class GrabPythonBugs(PeriodicTask):
         p.save()
         p.grab()
 
+@tasks.register
+class GrabPythonDocumentationBugs(PeriodicTask):
+    run_every = timedelta(days=1)
+    def run(self, **kwargs):
+        logger = self.get_logger(**kwargs)
+        logger.info("Started to grab Python documentation bugs")
+        python_core, _ = Project.objects.get_or_create(name='Python', language='Python')
+        [x.delete() for x in RoundupBugTracker.objects.filter(project=python_core)]
+        p, _ = RoundupBugTracker.objects.get_or_create(project=python_core)
+        p.include_these_roundup_bug_statuses = '1,3'
+        p.roundup_root_url = 'http://bugs.python.org'
+        p.components = '4'
+        p.save()
+        p.grab()
+        """e.g.,
+        http://bugs.python.org/issue?@action=export_csv&@columns=title,id,activity,status
+        &@sort=activity&@group=priority&@filter=components,status
+        &@pagesize=50&@startwith=0&status=1&components=4"""
+
 tasks.register(GrabMiroBugs)
 tasks.register(GrabGnomeLoveBugs)
 tasks.register(GrabLaunchpadBugs)

@@ -52,6 +52,7 @@ class RoundupBugTracker(models.Model):
     include_these_roundup_bug_statuses = models.CharField(max_length=255, default="-1,1,2,3,4,5,6")
     my_bugs_are_always_good_for_newcomers = models.BooleanField(default=False)
     csv_keyword = models.CharField(max_length=50, null=True, default=None)
+    components = models.CharField(max_length=50, null=True, default=None)
 
     @property
     def csv_url(self):
@@ -62,13 +63,18 @@ class RoundupBugTracker(models.Model):
                     "@group": "priority",
                     "@filter" : "status",
                     "@startwith": 0,
-                    "status": self.include_these_roundup_bug_statuses
+                    "status": self.include_these_roundup_bug_statuses,
                     }
         # As of time of writing, keywords is just used to specify keywords=6
         # for bugs.python.org, which gives us python's "easy" bugs.
         if self.csv_keyword:
             csv_GET_dict['keywords'] = self.csv_keyword
             csv_GET_dict['@filter'] += ",keywords"
+
+        if self.components: # components is a string, so this tests for its emptiness 
+            csv_GET_dict['components'] += str(self.components)
+            csv_GET_dict['filter'] += ",components"
+
         return "%s/issue?%s" % (
                 self.roundup_root_url,
                 urllib.urlencode(csv_GET_dict))
