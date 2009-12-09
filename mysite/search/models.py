@@ -206,6 +206,7 @@ class Bug(models.Model):
     good_for_newcomers = models.BooleanField(default=False)
     looks_closed = models.BooleanField(default=False)
     bize_size_tag_name = models.CharField(max_length=50) 
+    concerns_just_documentation = models.BooleanField(default=False)
 
     all_bugs = models.Manager()
     open_ones = OpenBugsManager()
