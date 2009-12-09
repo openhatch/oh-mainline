@@ -30,7 +30,9 @@
 
     </head>
     <body>
+
         <div id='outermost'>
+
             <div id='penoutermost'>
                 {% block nav %}
                 <div class='section' id='nav'>
@@ -72,6 +74,13 @@
 
                     </div>
                 </div>
+
+                <div id='senseknocker-thing'>
+                    <a href='https://openhatch.org/bugs/'>
+                        <span class='alt-text'>Feedback</span>
+                    </a>
+                </div>
+
                 {% endblock nav %}
                 {% if notifications %}
                 <ul id='notifications'>
@@ -135,12 +144,6 @@ document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/ja
 }
 </script><noscript><p><img src="http://openhatch.org/piwik/piwik.php?idsite=1" style="border:0" alt=""/></p></noscript>
         {% endblock %}
-
-        <div id='senseknocker-thing'>
-            <a href='https://openhatch.org/bugs/'>
-                <span class='alt-text'>Feedback</span>
-            </a>
-        </div>
 
     </body>
 </html>
