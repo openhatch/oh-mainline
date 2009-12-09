@@ -40,13 +40,13 @@ class WebResponse(models.Model):
     def create_from_http_error(error):
         return None
 
-
 # From http://docs.python.org/library/itertools.html
 def flatten(listOfLists):
     return list(chain(*listOfLists))
 
 class RoundupBugTracker(models.Model):
 
+    name = models.CharField(max_length=255)
     roundup_root_url = models.CharField(max_length=255)
     project = models.ForeignKey(mysite.search.models.Project)
     include_these_roundup_bug_statuses = models.CharField(max_length=255, default="-1,1,2,3,4,5,6")
