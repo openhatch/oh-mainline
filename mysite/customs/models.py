@@ -40,18 +40,20 @@ class WebResponse(models.Model):
     def create_from_http_error(error):
         return None
 
-
 # From http://docs.python.org/library/itertools.html
 def flatten(listOfLists):
     return list(chain(*listOfLists))
 
 class RoundupBugTracker(models.Model):
 
+    name = models.CharField(max_length=255)
     roundup_root_url = models.CharField(max_length=255)
     project = models.ForeignKey(mysite.search.models.Project)
     include_these_roundup_bug_statuses = models.CharField(max_length=255, default="-1,1,2,3,4,5,6")
     my_bugs_are_always_good_for_newcomers = models.BooleanField(default=False)
+    my_bugs_concern_just_documentation = models.BooleanField(default=False)
     csv_keyword = models.CharField(max_length=50, null=True, default=None)
+    components = models.CharField(max_length=50, null=True, default=None)
 
     @property
     def csv_url(self):
@@ -62,13 +64,18 @@ class RoundupBugTracker(models.Model):
                     "@group": "priority",
                     "@filter" : "status",
                     "@startwith": 0,
-                    "status": self.include_these_roundup_bug_statuses
+                    "status": self.include_these_roundup_bug_statuses,
                     }
         # As of time of writing, keywords is just used to specify keywords=6
         # for bugs.python.org, which gives us python's "easy" bugs.
         if self.csv_keyword:
             csv_GET_dict['keywords'] = self.csv_keyword
             csv_GET_dict['@filter'] += ",keywords"
+
+        if self.components: # components is a string, so this tests for its emptiness 
+            csv_GET_dict['components'] = str(self.components)
+            csv_GET_dict['@filter'] += ",components"
+
         return "%s/issue?%s" % (
                 self.roundup_root_url,
                 urllib.urlencode(csv_GET_dict))
@@ -167,6 +174,7 @@ class RoundupBugTracker(models.Model):
         bug.last_touched = self.str2datetime_obj(last_touched)
         bug.canonical_bug_link = remote_bug_url
         bug.good_for_newcomers = self.my_bugs_are_always_good_for_newcomers 
+        bug.concerns_just_documentation = self.my_bugs_concern_just_documentation 
         bug.status = metadata_dict['Status'] 
         bug.looks_closed = (metadata_dict['Status'] == 'closed')
         bug.title = metadata_dict['Title'] 

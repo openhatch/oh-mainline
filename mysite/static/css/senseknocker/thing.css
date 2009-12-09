@@ -1,7 +1,7 @@
 #senseknocker-thing a {
     position: fixed;
     bottom: 0;
-    right: 0;
+    left: 0;
     z-index: 999999;
     height: 90px;
     width: 29px;

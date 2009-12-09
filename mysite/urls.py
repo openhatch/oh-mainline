@@ -195,6 +195,8 @@ urlpatterns = patterns('',
             {'document_root': settings.MEDIA_ROOT + '/images'}),
 
         (r'^people/[$]username[/]*$', 'mysite.profile.views.dollar_username'),
+        (r'^\+me$', 'mysite.profile.views.dollar_username', {}, 
+                'oh_my_profile_redirect'),
 
         # This dangerous regex is last
         (r'^people/(?P<user_to_display__username>[^/]+)[/?]$',
