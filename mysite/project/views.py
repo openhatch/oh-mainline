@@ -22,11 +22,11 @@ def project(request, project__name = None):
 def projects(request):
     template = "project/projects.html"
     projects_with_bugs = mysite.search.controllers.get_projects_with_bugs()
-    projects_having_contributors_but_no_bugs = (mysite.search.controllers.
-            get_projects_having_contributors_but_no_bugs())
+    cited_projects_lacking_bugs = (mysite.search.controllers.
+            get_cited_projects_lacking_bugs())
     data = {
             'projects_with_bugs': projects_with_bugs,
-            'projects_having_contributors_but_no_bugs': projects_having_contributors_but_no_bugs,
+            'cited_projects_lacking_bugs': cited_projects_lacking_bugs,
             }
     return (request, template, data)
 
