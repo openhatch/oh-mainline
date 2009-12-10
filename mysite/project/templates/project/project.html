@@ -16,41 +16,22 @@ about our members who support {{ project.name }}
 {% endblock %}
 
 {% block pagetop %}
-<h3 class='supertitle'><a href='{% url mysite.project.views.projects %}'>Projects</a></h3>
-<h1>{{ project.name }}</h1>
+
+    {% if not the_user.is_authenticated %}
+    <div id='greeting'>
+        <div id='about-openhatch'>
+            Hi! OpenHatch is a community of free/open source
+            software supporters. 
+        </div>
+    </div>
+    {% endif %}
+
+    <h3 class='supertitle'><a href='{% url mysite.project.views.projects %}'>Projects</a></h3>
+    <h1>{{ project.name }}</h1>
+
 {% endblock pagetop %}
 
 {% block left %}
-{% with project.get_open_bugs_randomly_ordered as bugs %}
-<div class='module' id='bugs'>
-    <div class='head'>
-        <h3>Bugs indexed ({% firstof bugs.count "none yet" %})</h3>
-    </div>
-    <div class='body'>
-        <ul>
-            {% for bug in bugs|slice:":10" %}
-            <li>
-            <a href='{{ bug.canonical_bug_link }}'>
-                {{ bug.title }}
-            </a>
-            </li>
-            {% empty %}
-            No {{ project.name }} bugs indexed here yet. 
-            <a href='/wiki/Bug_trackers'>
-                To add a bug tracker, 
-                visit our wiki</a>.
-
-            {% endfor %}
-        </ul>
-        {% if bugs %}
-        <strong><a href='/search/?q={{ project.name|urlencode }}'>See all {{ bugs.count }}</a></strong>
-        {% endif %}
-    </div>
-</div>
-{% endwith %}
-{% endblock left %}
-
-{% block main %}
 <div class='module' id='contributors'>
     <div class='head'>
         <h3>Registered contributors ({% firstof contributors|length "none yet" %})</h3>
@@ -70,8 +51,35 @@ about our members who support {{ project.name }}
         </div>
     </div>
 </div>
+{% endblock left %}
+
+{% block main %}
+{% with project.get_open_bugs_randomly_ordered as bugs %}
+<div class='module' id='bugs'>
+    <div class='head'>
+        <h3>Relatedly</h3>
+    </div>
+    <div class='body'>
+            {% if project.get_open_bugs %}
+            <a href='/search/?q={{ project.name|urlencode }}'>
+                Browse {{ project.get_open_bugs|length }}+
+                volunteer opportunit{{ project.get_open_bugs|pluralize:"y,ies"}}
+                matching
+                <strong>{{ project.name }}</strong>.
+            </a>
+            {% else %}
+            No volunteer opportunities in {{project.name}} indexed here yet. 
+            <a href='/wiki/Bug_trackers'>
+                To add a bug tracker, 
+                visit our wiki</a>.
+
+            {% endif %}
+    </div>
+</div>
+{% endwith %}
 {% endblock main %}
 
 {% comment %}
 vim: set ai et ts=4 sw=4 nu:
 {% endcomment %}
+
