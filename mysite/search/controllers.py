@@ -152,6 +152,8 @@ class Query:
 
         toughness_options = self.get_facet_options('toughness', ['bitesize', ''])
 
+        contrib_type_options = {} # self.get_facet_options('', ['bitesize', ''])
+
         language_options = self.get_facet_options('language', self.get_language_names() + [''])
 
         possible_facets = { 
@@ -166,6 +168,12 @@ class Query:
                     'name_in_GET': "toughness",
                     'sidebar_name': "toughness",
                     'description_above_results': "where toughness = %s",
+                    'options': toughness_options,
+                    },
+                'Contribution type': {
+                    'name_in_GET': "contribution_type",
+                    'sidebar_name': "Contribution type",
+                    'description_above_results': "where contribution_type = %s",
                     'options': toughness_options,
                     }
                 }

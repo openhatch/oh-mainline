@@ -936,6 +936,25 @@ class QueryGetPossibleLanguageFacetOptionNames(SearchTest):
                 sorted(language_names),
                 sorted(['Python', 'Perl', 'C']))
 
+class QueryContributionType(SearchTest):
+
+    def setUp(self):
+        SearchTest.setUp(self)
+        python_project = Project.create_dummy(language='Python')
+        perl_project = Project.create_dummy(language='Perl')
+        c_project = Project.create_dummy(language='C')
+
+        python_bug = Bug.create_dummy(project=python_project, title='a')
+        perl_bug = Bug.create_dummy(project=perl_project, title='a',
+                                    concerns_just_documentation=True) 
+        c_bug = Bug.create_dummy(project=c_project, title='b')
+
+    def test_contribution_type_is_an_available_facet(self):
+        GET_data = {}
+        starting_query = mysite.search.controllers.Query.create_from_GET_data(
+            GET_data)
+        self.assert_('Contribution type' in starting_query.get_possible_facets())
+
 class QueryStringCaseInsensitive(SearchTest):
 
     def test_Language(self):
