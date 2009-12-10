@@ -96,7 +96,7 @@
                 <div id='page-top'>
 
                     {% block greeting %}
-                    {% if not the_user.is_authenticated %}
+                    {% if explain_to_anonymous_users and not the_user.is_authenticated %}
                     <div id='greeting'>
                         <div id='about-openhatch'>
                             Hi! OpenHatch is a community of free/open source

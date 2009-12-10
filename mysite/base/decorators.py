@@ -10,7 +10,7 @@ from django.shortcuts import render_to_response
 def view(func, *args, **kw):
     """Decorator for views."""
     request, template, view_data = func(*args, **kw)
-    data = {} 
+    data = {}
     data['the_user'] = request.user
     data['slug'] = func.__name__ # Account settings uses this.
     data.update(view_data)
