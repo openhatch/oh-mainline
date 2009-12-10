@@ -68,11 +68,17 @@ Search bugs
     {% if query.terms %}
         <a href='./' style='display: block; margin-bottom: 10px;'>&laquo; Back to browsing</a>
     {% endif %}
+</div>
+
+<div id='recommendations' class='box module'>
+    <h4>What is this?</h4>
+    You can use this page to find ways to contribute to free and open source software projects.
+</div>
+
+<div id='recommendations' class='box module'>
+    <h4>Recommended searches</h4>
     {% if the_user.is_authenticated %}
     {% if suggestions %}
-    <h4>
-        Recommended searches
-    </h4>
     <form name='suggested_searches'
         id='suggested_searches'
         method='GET' action=''>
@@ -97,12 +103,13 @@ Search bugs
     <ul>
         <li>
         <a href='/account/login'>
-            <strong>Log in / sign up</strong> to see recommendations.
+            <strong>Log in / sign up</strong> to get recommendations.
         </a>
         </li>
     </ul>
     {% endif %}
 </div>
+
 <div id='about_projects' class='box module'>
     <h4 id='how_many_projects'>
         <a href='{% url mysite.project.views.projects %}'>

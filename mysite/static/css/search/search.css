@@ -7,7 +7,7 @@
 }
 #content {
     position: relative;
-    top: -14px;
+    top: -4px;
     padding-top: 0;
 }
 #page-top img#volunteer-opportunities {
@@ -23,6 +23,7 @@
     width: 95%;
     font-size: 10pt;
     font-weight: normal;
+    margin-bottom: 10px;
 }
 .no-opps {
     color: #222;
@@ -38,10 +39,8 @@
 #heading {
     margin: 20px 0 10px 0;
 }
-.box {
-    float: left;
-    margin-top: 10px;
-}
+.box { float: left; margin-bottom: 10px; }
+#sidebar .box { padding: 10px; }
 .box h2 {
     font-size: 130%;
     color: #3d2f25; 
@@ -88,11 +87,6 @@
     padding: 10px;
     width: 700px;
     float: left;
-}
-#filters {
-    padding: 10px;
-}
-#filters ul {
 }
 #filters li {
     list-style: none;
@@ -460,7 +454,7 @@ input[type='text'].default-text-active {
 }
 
 #filters h4 { margin-bottom: 5px; }
-ul#facets { margin-left: 17px; margin-bottom: 20px; }
+ul#facets { margin-left: 17px; }
 ul#facets ul { margin-left: 10px; }
 ul#facets ul li, #suggested_searches li { list-style: square; margin-top: 10px; margin-left: 20px; color: #777; }
 #facets li.active { font-weight: bold; }
@@ -468,13 +462,13 @@ ul#facets ul li, #suggested_searches li { list-style: square; margin-top: 10px; 
 #results-summary { width: 70%; float: left; margin-right: 10px; }
 #navigation { float: right; }
 
-#about_projects, #about_bug_trackers { margin-top: 0; padding: 10px; }
+#about_projects, #about_bug_trackers { margin-top: 0; }
     #about_projects div { float: left; margin-bottom: 10px; width: 100%; }
     #sidebar #about_projects h4 { text-align: center; font-size: 140%; margin-top: 7px; width: 100% ! important; }
         #how_many_projects a { color: #555; }
         #how_many_projects a:hover { color: #111; text-decoration: none; }
         #how_many_projects a:hover strong { background-color: #555; }
         #how_many_projects strong { background-color: #747474; -moz-border-radius: 8px; padding: 3px 4px; border-radius: 8px; color: #fff ! important; }
-    #about_projects #learn_more { text-align: center; margin-top: 10px; margin-bottom: 0; }
+    #about_projects #learn_more { text-align: center; margin-bottom: 0; }
 
     /* vim: set ai ts=4 sts=4 et sw=4: */
