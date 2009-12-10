@@ -260,7 +260,7 @@ def get_projects_with_bugs():
         projects.append(mysite.search.models.Project.objects.get(pk=pk))
     return projects
 
-def get_projects_having_contributors_but_no_bugs():
+def get_cited_projects_lacking_bugs():
     portfolio_entries = mysite.profile.models.PortfolioEntry.objects.filter(
             is_published=True, is_deleted=False)
     # Make this a manager

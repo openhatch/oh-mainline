@@ -94,6 +94,74 @@
                 </ul>
                 {% endif %}
                 <div id='page-top'>
+
+                    {% block greeting %}
+                    {% if explain_to_anonymous_users and not the_user.is_authenticated %}
+                    <div id='greeting'>
+                        <div id='about-openhatch'>
+                            Hi! OpenHatch is a community of free/open source
+                            software supporters.
+                            Some things you can do right now: 
+                        </div>
+                        <div id='next-steps'>
+                            <ul>
+                                <li>
+                                    {% block description_for_anonymous_users %}
+                                    {% endblock %}
+                                </li>
+
+                                <li>
+                                <a href='{% url mysite.search.views.fetch_bugs %}?q=&amp;toughness=bitesize'>
+                                    <strong>
+                                    Find projects
+                                    </strong>
+                                    looking for new contributors 
+                                </a>
+                                </li>
+
+                                <li>
+                                <a href='{% url oh_my_profile_redirect %}'>
+                                    <strong>
+                                        List 
+                                    </strong>
+                                    your interests and involvement
+                                </a>
+                                </li>
+
+                                <li>
+                                <a href='{% url mysite.profile.views.display_list_of_people %}'>
+                                    <strong>
+                                        Browse 
+                                    </strong>
+                                    our directory of supporters
+                                </a>
+                                </li>
+
+                                {% comment %}
+                                <li>
+                                <a href=''>
+                                    <strong>
+                                        List yourself
+                                    </strong>
+                                    in our directory of mentors
+                                </a>
+                                </li>
+
+                                <li>
+                                <a href=''>
+                                    <strong>
+                                        Find nearby
+                                    </strong>
+                                    supporters who share your interests.
+                                </a>
+                                </li>
+                                {% endcomment %}
+                            </ul>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endblock greeting %}
+
                     {% block pagetop %}
                     {% endblock pagetop %}
                 </div>

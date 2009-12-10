@@ -1,7 +1,7 @@
 {% extends 'base/two_columns.html' %}
 
 {% block title %}
-{{ project.name }} - Contributors
+Projects - {{ project.name }} 
 {% endblock title %}
 
 {% block css %}
@@ -10,16 +10,12 @@
 @import url('/static/css/profile/person_small.css');
 {% endblock css %}
 
-{% block pagetop %}
+{% block description_for_anonymous_users %}
+<strong>Learn below</strong>
+about our members who support {{ project.name }}
+{% endblock %}
 
-    {% if not the_user.is_authenticated %}
-    <div id='greeting'>
-        <div id='about-openhatch'>
-            Hi! OpenHatch is a community of free/open source
-            software supporters. 
-        </div>
-    </div>
-    {% endif %}
+{% block pagetop %}
 
     <h3 class='supertitle'><a href='{% url mysite.project.views.projects %}'>Projects</a></h3>
     <h1>{{ project.name }}</h1>
