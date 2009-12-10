@@ -55,7 +55,18 @@ Manage projects
 
     <div class='body contains-submodules'>
         <style>.apologies p {margin-top: 0; }</style>
-        <div class='apologies' style='font-size: 15pt; padding: 20px 115px; width: 670px; float: left; text-align: center;'><p>Hi! Here you can document your involvement with open source projects. Be proud of everything! From bug reports and translations to patches and commits to code repositories.</p><p style='font-size: 11pt;'>To find things to do in the open source community, use our <a href='/search/'>volunteer opportunity search engine.</a></p></div>
+        <div class='apologies' style='font-size: 15pt; padding: 20px 115px; width: 670px; float: left; text-align: center;'>
+            <p>Hi! Here you can document your involvement with open source projects.
+            Be proud of everything! Add your bug reports, translations, patches,
+            and code commits.
+            </p>
+            
+            <p style='font-size: 11pt;'>To find things to do in the open source
+            community, use our
+            <a href='{% url mysite.search.views.fetch_bugs %}'>
+                volunteer opportunity finder.
+            </a>
+            </p></div>
         <h4>Import links</h4>
         <form id='importer' class='submodule' name='import' method='POST'
             action='{% url mysite.profile.views.prepare_data_import_attempts_do %}'>
@@ -81,7 +92,7 @@ Manage projects
             </div>
         </form>
 
-        <h4>Projects &mdash; <a id='add_pf_entry' href='#'>Add a project manually</a></h4>
+        <h4>Projects &mdash; <a id='add_pf_entry' href='#'>Add a project</a></h4>
         <div style='width: 920px;' id="portfolio_entries">
             <div class='loading_message' style='width: 100%; float: left; text-align: center;'>Loading...</div>
             <!-- JavaScript will swoop in and replace this with useful stuff. -->
