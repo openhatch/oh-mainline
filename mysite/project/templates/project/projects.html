@@ -3,7 +3,7 @@
 {% load profile_extras %}
 
 {% block title %}
-Currently indexing {{ projects_with_bugs|length }} projects
+Projects
 {% endblock title %}
 
 {% block css %}
@@ -12,14 +12,14 @@ Currently indexing {{ projects_with_bugs|length }} projects
 {% endblock css %}
 
 {% block main %}
-{% cache 86400 projects_page %}{# cache for one day 86400 #}
+{% cache 1 projects %}{# cache for one day 86400 #}
 <div id='big-project-list' class='module'>
     <div class='head'>
-        <h3>Projects on OpenHatch ({{ projects_with_bugs|length }}) </h3>
+        <h3>Projects on OpenHatch </h3>
         <span class='note'>Numbers below include only bugs and contributors in our network</li>
     </div>
     <div class='module-content body'>
-        <h4>Projects with indexed bugs</h4>
+        <h4>Projects with indexed bugs ({{ projects_with_bugs|length }})</h4>
         <ul>
             {% for project in projects_with_bugs %}
             <li

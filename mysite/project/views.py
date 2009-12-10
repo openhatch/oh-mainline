@@ -20,7 +20,7 @@ def project(request, project__name = None):
 
 @mysite.base.decorators.view
 def projects(request):
-    template = "search/projects_with_bugs.html"
+    template = "project/projects.html"
     projects_with_bugs = mysite.search.controllers.get_projects_with_bugs()
     projects_having_contributors_but_no_bugs = (mysite.search.controllers.
             get_projects_having_contributors_but_no_bugs())
