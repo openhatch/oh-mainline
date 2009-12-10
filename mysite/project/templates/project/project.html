@@ -1,7 +1,7 @@
 {% extends 'base/two_columns.html' %}
 
 {% block title %}
-{{ project.name }} - Contributors
+Projects - {{ project.name }} 
 {% endblock title %}
 
 {% block css %}
@@ -9,6 +9,11 @@
 @import url('/static/css/project/project.css');
 @import url('/static/css/profile/person_small.css');
 {% endblock css %}
+
+{% block description_for_anonymous_users %}
+<strong>Learn below</strong>
+about our members who support {{ project.name }}
+{% endblock %}
 
 {% block pagetop %}
 

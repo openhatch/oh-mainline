@@ -14,7 +14,8 @@ def project(request, project__name = None):
             'project/project.html',
             {
                 'project': p,
-                'contributors': p.get_contributors()
+                'contributors': p.get_contributors(),
+                'explain_to_anonymous_users': True
                 },
             )
 
@@ -22,11 +23,12 @@ def project(request, project__name = None):
 def projects(request):
     template = "project/projects.html"
     projects_with_bugs = mysite.search.controllers.get_projects_with_bugs()
-    projects_having_contributors_but_no_bugs = (mysite.search.controllers.
-            get_projects_having_contributors_but_no_bugs())
+    cited_projects_lacking_bugs = (mysite.search.controllers.
+            get_cited_projects_lacking_bugs())
     data = {
             'projects_with_bugs': projects_with_bugs,
-            'projects_having_contributors_but_no_bugs': projects_having_contributors_but_no_bugs,
+            'cited_projects_lacking_bugs': cited_projects_lacking_bugs,
+            'explain_to_anonymous_users': True
             }
     return (request, template, data)
 

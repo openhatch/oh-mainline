@@ -11,12 +11,17 @@ Projects
 @import url('/static/css/profile/search_people.css');
 {% endblock css %}
 
+{% block description_for_anonymous_users %}
+<strong>Learn below</strong>
+about the projects we index
+{% endblock %}
+
 {% block main %}
-{% cache 1 projects %}{# cache for one day 86400 #}
+{% cache 86400 projects %}{# cache for one day 86400 #}
 <div id='big-project-list' class='module'>
     <div class='head'>
-        <h3>Projects on OpenHatch </h3>
-        <span class='note'>Numbers below include only bugs and contributors in our network</li>
+        <h3>Projects on OpenHatch</h3>
+        <span class='note'>These numbers just include bugs and contributors in our network.</li>
     </div>
     <div class='module-content body'>
         <h4>Projects with indexed bugs ({{ projects_with_bugs|length }})</h4>
@@ -44,7 +49,7 @@ Projects
         </ul>
         <h4>Projects without bugs</h4>
         <ul>
-            {% for project in projects_having_contributors_but_no_bugs %}
+            {% for project in cited_projects_lacking_bugs %}
             <li
             {% if forloop.counter0|divisibleby:"4" %}
             class='first-in-row'

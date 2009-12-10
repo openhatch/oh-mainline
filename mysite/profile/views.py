@@ -116,6 +116,7 @@ def display_person_web(request, user_to_display__username=None):
     data['edit_mode'] = False
     data['editable'] = (request.user == user)
     data['notifications'] = mysite.base.controllers.get_notification_from_request(request)
+    data['explain_to_anonymous_users'] = True
 
     return (request, 'profile/main.html', data)
 

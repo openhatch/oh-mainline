@@ -22,6 +22,20 @@ Search bugs
 {% endblock pagetop %}
 
 {% block sidebar %}
+
+{% if not the_user.is_authenticated %}
+<div id='hwat-is-this' class='box module notification'
+    style='background-image: none;'>
+    <h4>What is this?</h4>
+    <p>Find ways to contribute to free and open source software projects. Sample searches:
+    <ul>
+        <li><a href='?q=command+line'>Bugs matching "command line"</a></li>
+        <li><a href='?q=&amp;toughness=bitesize&amp;language=C%23'>Bitesize bugs in C#</a></li>
+    </ul>
+    </p>
+</div>
+{% endif %}
+
 <div id='filters' class='box module'>
     <h4 style='margin-bottom: 10px;'>
         {% if query.terms %}
@@ -68,11 +82,12 @@ Search bugs
     {% if query.terms %}
         <a href='./' style='display: block; margin-bottom: 10px;'>&laquo; Back to browsing</a>
     {% endif %}
+</div>
+
+<div id='recommendations' class='box module'>
+    <h4>Recommended searches</h4>
     {% if the_user.is_authenticated %}
     {% if suggestions %}
-    <h4>
-        Recommended searches
-    </h4>
     <form name='suggested_searches'
         id='suggested_searches'
         method='GET' action=''>
@@ -96,13 +111,14 @@ Search bugs
     {% else %}
     <ul>
         <li>
-        <a href='/account/login'>
-            <strong>Log in / sign up</strong> to see recommendations.
+        <a href='/+me'>
+            <strong>List your interests and experience</strong> to get personalized recommendations.
         </a>
         </li>
     </ul>
     {% endif %}
 </div>
+
 <div id='about_projects' class='box module'>
     <h4 id='how_many_projects'>
         <a href='{% url mysite.project.views.projects %}'>
