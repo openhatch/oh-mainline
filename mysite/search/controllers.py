@@ -50,7 +50,7 @@ class Query:
 
     @staticmethod
     def create_from_GET_data(GET):
-        possible_facets = ['language', 'toughness']
+        possible_facets = ['language', 'toughness', 'contribution_type']
 
         active_facet_options = {}
         for facet in possible_facets:
@@ -75,16 +75,27 @@ class Query:
         # Begin constructing a conjunction of Q objects (filters)
         q = Q()
 
+        # toughness facet
         toughness_is_active = ('toughness' in self.active_facet_options.keys())
         exclude_toughness = exclude_active_facets and toughness_is_active
         if (self.active_facet_options.get('toughness', None) == 'bitesize'
                 and not exclude_toughness):
             q &= Q(good_for_newcomers=True)
 
+        # language facet
         language_is_active = ('language' in self.active_facet_options.keys())
         exclude_language = exclude_active_facets and language_is_active
         if 'language' in self.active_facet_options and not exclude_language: 
             q &= Q(project__language__iexact=self.active_facet_options['language'])
+
+        # contribution type facet
+        contribution_type_is_active = ('contribution_type' in
+                                       self.active_facet_options.keys())
+        exclude_contribution_type = exclude_active_facets and contribution_type_is_active
+        if (self.active_facet_options.get('contribution_type', None) == 'documentation'
+                and not exclude_contribution_type):
+            q &= Q(concerns_just_documentation=True)
+
 
         for word in self.terms:
             whole_word = "[[:<:]]%s[[:>:]]" % (
@@ -152,7 +163,8 @@ class Query:
 
         toughness_options = self.get_facet_options('toughness', ['bitesize', ''])
 
-        contrib_type_options = {} # self.get_facet_options('', ['bitesize', ''])
+        contribution_type_options = self.get_facet_options(
+            'contribution_type', ['documentation', ''])
 
         language_options = self.get_facet_options('language', self.get_language_names() + [''])
 
@@ -172,9 +184,9 @@ class Query:
                     },
                 'Contribution type': {
                     'name_in_GET': "contribution_type",
-                    'sidebar_name': "Contribution type",
+                    'sidebar_name': "contribution type",
                     'description_above_results': "where contribution_type = %s",
-                    'options': toughness_options,
+                    'options': contribution_type_options,
                     }
                 }
 

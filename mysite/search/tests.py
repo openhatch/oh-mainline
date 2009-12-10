@@ -955,6 +955,17 @@ class QueryContributionType(SearchTest):
             GET_data)
         self.assert_('Contribution type' in starting_query.get_possible_facets())
 
+    def test_contribution_type_options_are_reasonable(self):
+        GET_data = {}
+        starting_query = mysite.search.controllers.Query.create_from_GET_data(
+            GET_data)
+        cto = starting_query.get_facet_options('contribution_type',
+                                               ['documentation', ''])
+        documentation_one, = [k for k in cto if k['name'] == 'documentation']
+        any_one, = [k for k in cto if k['name'] == 'any']
+        self.assertEqual(documentation_one['count'], 1)
+        self.assertEqual(any_one['count'], 3)
+
 class QueryStringCaseInsensitive(SearchTest):
 
     def test_Language(self):
