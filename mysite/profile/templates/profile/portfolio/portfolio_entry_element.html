@@ -47,7 +47,7 @@
             </div>
             <div class='project_description-wrapper'>
                 {% if edit_mode %}
-                <label>project description</label>
+                <label>Describe this project</label>
                 <textarea class='project_description'></textarea>
                 {% else %}
                 <div class='project_description'>{{ pf_entry.project_description }}</div>
@@ -98,7 +98,7 @@
             </div>
             <div class='experience_description-wrapper'>
                 {% if pf_entry.experience_description or edit_mode %}
-                <label>Involvement description</label>
+                <label>Describe your involvement</label>
                 {% endif %}
                 {% if edit_mode %}
                 <textarea class='experience_description'></textarea>
