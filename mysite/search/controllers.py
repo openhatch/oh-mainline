@@ -96,7 +96,6 @@ class Query:
                 and not exclude_contribution_type):
             q &= Q(concerns_just_documentation=True)
 
-
         for word in self.terms:
             whole_word = "[[:<:]]%s[[:>:]]" % (
                     mysite.base.controllers.mysql_regex_escape(word))
@@ -182,10 +181,10 @@ class Query:
                     'description_above_results': "where toughness = %s",
                     'options': toughness_options,
                     },
-                'Contribution type': {
+                'contribution type': {
                     'name_in_GET': "contribution_type",
-                    'sidebar_name': "contribution type",
-                    'description_above_results': "where contribution_type = %s",
+                    'sidebar_name': "kind of help needed",
+                    'description_above_results': "which need %s",
                     'options': contribution_type_options,
                     }
                 }

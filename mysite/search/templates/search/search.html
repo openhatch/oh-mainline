@@ -55,17 +55,20 @@ Search bugs
             }
             {% endcomment %}
             <li>
-                {% if facet_name|in_list:query.active_facet_options %}
-                    Change
-                {% else %}
                     by
-                {% endif %}
                 {{ facet.sidebar_name }}
                 <ul>
                     {% for option in facet.options %}
                         {% if option.name %}
                             <li {% if option.is_active %}class='active'{% endif %}>
                                 <a href='?{{ option.query_string }}'>
+                                    {% if facet_name|in_list:query.active_facet_options %}
+                                        {% if not option.is_active %}
+                                            {% ifnotequal option.name "any" %}
+                                            Switch to
+                                            {% endifnotequal %}
+                                        {% endif %}
+                                    {% endif %}
                                     {{ option.name }} ({{ option.count }})</a>
                                 {% ifequal option.name 'bitesize' %}
                                     <small>

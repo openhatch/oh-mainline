@@ -39,7 +39,10 @@
                         {% ifequal facet "toughness" %}
                         whose toughness is
                         {% endifequal %}
-                        <strong>{{ value }}</strong>&nbsp;<a href='?{% ifequal facet "language" %}{{ facet2any_query_string.language }}{% endifequal %}{% ifequal facet "toughness"%}{{ facet2any_query_string.toughness }}{% endifequal %}'>[x]</a>
+                        {% ifequal facet "contribution_type" %}
+                        which need
+                        {% endifequal %}
+                        <strong>{{ value }}</strong>&nbsp;<a href='?{% ifequal facet "language" %}{{ facet2any_query_string.language }}{% endifequal %}{% ifequal facet "toughness"%}{{ facet2any_query_string.toughness }}{% endifequal %}{% ifequal facet "contribution_type"%}{{ facet2any_query_string.contribution_type }}{% endifequal %}'>[x]</a>
                     </span>
                     {% if forloop.last %}
                         .
