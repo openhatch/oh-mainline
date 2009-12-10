@@ -209,7 +209,7 @@ p {
 }
 #results li .description-container * { display: inline; }
 #results li .description-container br { display: none; }
-#results li .description { font-family: monospace; }
+#results li .description { font-family: Inconsolata, monospace; }
 #results li.expanded { white-space: normal; }
 #results li.expanded .description-container p { float: left; width: 100%; margin-bottom: .3em; }
 #results li.expanded .description-container br { display: inherit; }
@@ -218,28 +218,15 @@ p {
 
 /* human list code */
 
-#humans li {
-    height: 56px;
-}
+#humans li { height: 56px; }
 
-#humans li .title {
-    float: left;
-    clear: none;
-}
+#humans li .title { float: left; clear: none; }
 
-#humans li .details {
-    float: left;
-    margin: 0;
-    width: 490px;
-}
+#humans li .details { float: left; margin: 0; width: 490px; }
 
-#humans li .details a {
-    color: #66AA33;
-}
+#humans li .details a { color: #66AA33; }
 
-#humans li .details a:hover {
-    color: #338800;
-}
+#humans li .details a:hover { color: #338800; }
 
 #humans li .details .contact {
     float: right;
@@ -470,5 +457,7 @@ ul#facets ul li, #suggested_searches li { list-style: square; margin-top: 10px; 
         #how_many_projects a:hover strong { background-color: #555; }
         #how_many_projects strong { background-color: #747474; -moz-border-radius: 8px; padding: 3px 4px; border-radius: 8px; color: #fff ! important; }
     #about_projects #learn_more { text-align: center; margin-bottom: 0; }
+
+#hwat-is-this ul li { list-style: square; margin: 5px 0 0 20px; }
 
     /* vim: set ai ts=4 sts=4 et sw=4: */
