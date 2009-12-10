@@ -1,11 +1,11 @@
 h1 { float: left; clear: left; margin-top: 10px; }
 h3.supertitle { font-size: 10pt; margin-top: 20px; }
 .head { width: 98% ! important; }
-#left { width: 403px; margin-right: 20px; }
+#left { width: 515px; margin-right: 20px; }
 #left .module { width: 390px; }
-#left .module > .body { width: 361px; }
-#main { width: 515px; }
+#left .module > .body { width: 474px; }
+#main { width: 403px; }
 .module { width: 100% ! important; }
-#main .module > .body { width: 474px; }
+#main .module > .body { width: 361px; }
 
 #bugs ul li { margin: 5px 0 5px 10px; color: #777; margin-bottom: 10px; list-style: square; }

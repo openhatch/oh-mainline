@@ -48,13 +48,15 @@
                                 <!-- user.is_authenticated indeed -->
                                 <li><a href='{% url mysite.account.views.logout %}'>log out</a></li>
                                 <li><a href='{% url mysite.account.views.settings %}'>settings</a></li>
+                                {% else %}
+                                <li><a href='/account/login'>log in / sign up</a></li>
+                                {% endif %}
                                 <li><a href='{% url mysite.search.views.fetch_bugs %}'>volunteer opportunities</a></li>
                                 <li><a href='{% url mysite.project.views.projects %}'>projects</a></li>
                                 <li><a href='{% url mysite.profile.views.display_list_of_people %}'>people</a></li>
+                                {% if the_user.is_authenticated %}
                                 <li><a href='{% url mysite.base.views.homepage %}'>dashboard</a></li>
                                 <li><a href='{% url mysite.profile.views.display_person_web the_user.username %}'><strong>{{ the_user.username }}'s profile</strong></a></li>
-                                {% else %}
-                                <li><a href='/account/login'>log in / sign up</a></li>
                                 {% endif %}
                             </ul>
                         </div>
