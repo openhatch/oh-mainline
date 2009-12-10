@@ -43,7 +43,7 @@ class GrabPythonBugs(PeriodicTask):
         python_core, _ = Project.objects.get_or_create(name='Python', language='Python')
         # FIXME: Do we need this line?
         RoundupBugTracker.objects.filter(name=bug_tracker_name).delete()
-        p, _ = RoundupBugTracker.objects.get_or_create(project=python_core)
+        p, _ = RoundupBugTracker.objects.get_or_create(name=bug_tracker_name, project=python_core)
         p.include_these_roundup_bug_statuses = '1,3'
         p.roundup_root_url = 'http://bugs.python.org'
         p.csv_keyword = '6' # Only grab bugs marked "easy"
