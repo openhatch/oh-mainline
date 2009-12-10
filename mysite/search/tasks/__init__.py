@@ -63,6 +63,7 @@ class GrabPythonBugsInDocumentation(PeriodicTask):
         p, _ = RoundupBugTracker.objects.get_or_create(name=bug_tracker_name, project=python_core)
         p.include_these_roundup_bug_statuses = '1,3'
         p.roundup_root_url = 'http://bugs.python.org'
+        p.my_bugs_concern_just_documentation = True
         p.components = '4'
         p.save()
         p.grab()
