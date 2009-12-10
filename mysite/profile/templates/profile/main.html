@@ -16,7 +16,7 @@
         <ul>
             <li>
             <a href='{% url mysite.profile.views.portfolio_editor %}'>
-                Manage &raquo;
+                Add/edit projects &raquo;
             </a>
             </li>
         </ul>
@@ -35,7 +35,7 @@
         {% if editable %}
         <div id='add_contribs_notification' class='notification'>
             <div class='body'>
-                If you've contributed to open source, click 'Manage &raquo;' to start your contribution portfolio. If you're a new contributor, go forth and <a href='{% url mysite.search.views.fetch_bugs %}'>find a bug to work on</a>! 
+                If you've contributed to open source, click 'Add/edit projects &raquo;' to start your contribution portfolio. If you're a new contributor, go forth and <a href='{% url mysite.search.views.fetch_bugs %}'>find a bug to work on</a>! 
             </div>
         </div>
         {% endif %}
