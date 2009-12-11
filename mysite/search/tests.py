@@ -953,7 +953,7 @@ class QueryContributionType(SearchTest):
         GET_data = {}
         starting_query = mysite.search.controllers.Query.create_from_GET_data(
             GET_data)
-        self.assert_('Contribution type' in starting_query.get_possible_facets())
+        self.assert_('contribution type' in starting_query.get_possible_facets())
 
     def test_contribution_type_options_are_reasonable(self):
         GET_data = {}

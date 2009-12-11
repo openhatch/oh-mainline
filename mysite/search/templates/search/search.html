@@ -45,7 +45,7 @@ Search bugs
         {% endif %}
     </h4>
     <ul id='facets'>
-        {% for facet_name, facet in query.get_possible_facets.items %}
+        {% for facet_name, facet in query.get_possible_facets.items reversed %}
             {% comment %}
             facets = e.g. {
                 'language': {
