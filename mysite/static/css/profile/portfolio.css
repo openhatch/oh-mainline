@@ -82,7 +82,7 @@
 .citations li.unpublished .summary { background-color: #ffc; }
 .citations li.deleted .summary { background-color: pink; }
 .citations-wrapper a.add { background-color: #c9c9c9; background-color: lightblue; border-radius: 6px; clear: left; color: #444; float: left; font-size: 8pt; font-weight: bold; margin-right: 10px; margin-top: 10px; -moz-border-radius: 6px; padding: 6px; }
-.citations-wrapper a.add:hover { color: #222; text-decoration: none; }
+.citations-wrapper a.add:hover { color: #000; text-decoration: none; }
 .error-message { color: pink; font-weight: bold; }
 .citations-wrapper .howto { color: #111; }
 #main .citations-wrapper .howto .body { float: none ! important; }

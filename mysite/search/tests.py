@@ -936,6 +936,36 @@ class QueryGetPossibleLanguageFacetOptionNames(SearchTest):
                 sorted(language_names),
                 sorted(['Python', 'Perl', 'C']))
 
+class QueryContributionType(SearchTest):
+
+    def setUp(self):
+        SearchTest.setUp(self)
+        python_project = Project.create_dummy(language='Python')
+        perl_project = Project.create_dummy(language='Perl')
+        c_project = Project.create_dummy(language='C')
+
+        python_bug = Bug.create_dummy(project=python_project, title='a')
+        perl_bug = Bug.create_dummy(project=perl_project, title='a',
+                                    concerns_just_documentation=True) 
+        c_bug = Bug.create_dummy(project=c_project, title='b')
+
+    def test_contribution_type_is_an_available_facet(self):
+        GET_data = {}
+        starting_query = mysite.search.controllers.Query.create_from_GET_data(
+            GET_data)
+        self.assert_('contribution type' in starting_query.get_possible_facets())
+
+    def test_contribution_type_options_are_reasonable(self):
+        GET_data = {}
+        starting_query = mysite.search.controllers.Query.create_from_GET_data(
+            GET_data)
+        cto = starting_query.get_facet_options('contribution_type',
+                                               ['documentation', ''])
+        documentation_one, = [k for k in cto if k['name'] == 'documentation']
+        any_one, = [k for k in cto if k['name'] == 'any']
+        self.assertEqual(documentation_one['count'], 1)
+        self.assertEqual(any_one['count'], 3)
+
 class QueryStringCaseInsensitive(SearchTest):
 
     def test_Language(self):
