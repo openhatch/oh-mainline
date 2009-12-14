@@ -5,11 +5,12 @@
     <div class='head'>
         <img alt='logo for {{bug.project.name}}' title='{{bug.project.name}}'
         src='{{ bug.project.get_url_of_search_result_icon_or_generic }}' />
-        <span class='project__name'>{{ bug.project.name|highlight:query.terms }}</span>
-        -
-        <a class='canonical_bug_link' href='{{ bug.canonical_bug_link }}'>
-            <span class='title'>{{ bug.title|highlight:query.terms }}</span>
-        </a>
+        <span class='project__name'>{{ bug.project.name|highlight:query.terms }}</span>:
+        <span class='title'>{{ bug.title|highlight:query.terms }}</span>
+        |
+        <span class='expand'><a href=''>expand</a></span>
+        |
+        <span class='link'><a href='{{ bug.canonical_bug_link }}'>link</a></span>
         {#<div class='age'>3 days old</div>#}
     </div>
 </div>

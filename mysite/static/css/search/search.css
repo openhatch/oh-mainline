@@ -54,19 +54,6 @@
     width: 550px;
 }
 
-#results-sidebar {
-    float: right;
-    width: 120px;
-    padding: 10px;
-}
-#results-sidebar img {
-    float: left;
-    margin-right: 5px;
-}
-#results-sidebar a {
-    float: left;
-    margin-bottom: 10px;
-}
 #results-widget {
     padding: 12px;
     padding-bottom: 6px;
@@ -460,4 +447,7 @@ ul#facets ul li, #suggested_searches li { list-style: square; margin-top: 10px; 
 
 #hwat-is-this ul li { list-style: square; margin: 5px 0 0 20px; }
 
-    /* vim: set ai ts=4 sts=4 et sw=4: */
+#expand-collapse-all { float: right; }
+#expand-collapse-all img { float: left; margin-right: 5px; }
+#expand-collapse-all a { float: left; padding: 5px; }
+/* vim: set ai ts=4 sts=4 et sw=4: */
