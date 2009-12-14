@@ -1,22 +1,5 @@
 {% extends 'base/base.html' %}
 
-{% block js_in_head %}
-<script src='/static/js/jquery.js'></script>
-<script src='/static/js/jquery.query.js'></script>
-<script src='/static/js/jquery.hotkey.js'></script>
-<script src='/static/js/jquery.scrollTo.js'></script>
-<script src='/static/js/jquery.autocomplete.js'></script>
-<script>
-    thisstart = {{ start }};
-    thisend = {{ end }};
-</script>
-<script src='/static/js/search/search.js'></script>
-{% endblock js_in_head %}
-
-{% block jquery %}
-<!-- jquery loaded in head instead -->
-{% endblock jquery %}
-
 {% block css %}
 {{ block.super }}
 @import url('/static/css/search/search.css');
@@ -40,4 +23,8 @@
 {% endblock content %}
 
 {% block js %}
+<script src='/static/js/jquery.query.js'></script>
+<script src='/static/js/jquery.hotkey.js'></script>
+<script src='/static/js/jquery.scrollTo.js'></script>
+<script src='/static/js/search/search.js'></script>
 {% endblock js %}
