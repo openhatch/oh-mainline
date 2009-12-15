@@ -17,6 +17,10 @@ mysql -u root -p < "CREATE DATABASE; CREATE USER 'oh_milestone_a'@'localhost' ID
 
 ../bin/mysite syncdb
 
+Note that you must answer "No" to the question, "Do you want to create a superuser?"
+
+That is because you have not run the migrations for the "Profile" app yet.
+
 # You may need to migrate using this command:
 ../bin/mysite migrate
 
