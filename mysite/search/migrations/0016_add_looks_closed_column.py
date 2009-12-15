@@ -9,6 +9,7 @@ class Migration:
         
         # Adding field 'Bug.looks_closed'
         db.add_column('search_bug', 'looks_closed', orm['search.bug:looks_closed'])
+        db.add_column('search_bug', 'canonical_bug_link', orm['search.bug:canonical_bug_link'])
         
     
     
@@ -16,6 +17,7 @@ class Migration:
         
         # Deleting field 'Bug.looks_closed'
         db.delete_column('search_bug', 'looks_closed')
+        db.delete_column('search_bug', 'canonical_bug_link')
         
     
     
