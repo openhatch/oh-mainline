@@ -94,7 +94,7 @@ p {
 }
 /* generic list code */
 #results.box {
-    background: #fff url('/static/images/motif.png');
+    background: #fff;
     padding-right: 0;
 }
 #results ul {
@@ -356,9 +356,6 @@ p {
     height: 50px;
 }
 .good-for-beginners {
-    color: #555;
-    background-color: #acebc7;
-    width: 300px;
     padding: 1px;
 }
 .good-for-beginners img {
@@ -446,6 +443,13 @@ ul#facets ul li, #suggested_searches li { list-style: square; margin-top: 10px; 
     #about_projects #learn_more { text-align: center; margin-bottom: 0; }
 
 #hwat-is-this ul li { list-style: square; margin: 5px 0 0 20px; }
+
+.green-bullet {
+    font-size: 90%;
+    position: relative;
+    top: -2px; 
+    color: green;
+}
 
 #expand-collapse-all { float: right; }
 #expand-collapse-all img { float: left; margin-right: 5px; }

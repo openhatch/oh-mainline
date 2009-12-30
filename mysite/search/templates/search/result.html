@@ -16,18 +16,22 @@
 </div>
 <div class='second-line'>
     <span class='description-container'>
+        {% if bug.good_for_newcomers %}
+        <span class='good-for-beginners'><span class="green-bullet">&#9679;</span> Bite-size</span> -
+        {% endif %}
+
         {% if bug.project.language %}
 
         {% if bug.project.language.lower|in_list:query.terms %}
-        <span class='project__language highlight'>{{ bug.project.language }}</span> -
+        <span class='project__language highlight'>{{ bug.project.language }}</span>
         {% else %}
-        <span class='project__language'>{{ bug.project.language }}</span> -
+        <span class='project__language'>{{ bug.project.language }}</span>
         {% endif %}
 
         {% endif %}
-        {% if bug.good_for_newcomers %}
-        <span class='good-for-beginners'>Bite-size</span> -
-        {% endif %}
+	<span class="helpers" style="color: black;">
+	  - 5 potential mentors -
+	</span>
         <span class='description'>{{ bug.description|highlight:query.terms|linebreaks }}</span>
     </span>
 </div>
