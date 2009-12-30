@@ -32,6 +32,10 @@ That is because you have not run the migrations for the "Profile" app yet.
 
 Now load http://127.0.0.1:8000/search/ in your web browser.
 
+== Frequently Asked Questions ==
+
+Q. Why is the Django project called 'mysite'?
+
 == Testing ==
 
 To run all tests, except customs:
