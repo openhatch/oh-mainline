@@ -171,8 +171,14 @@ def change_password(request, change_password_form = None):
     change_password_form.fields['old_password'].label = "Current password"
     change_password_form.fields['new_password2'].label = "Type it again"
 
+    if request.GET.get('notification_id', None) == 'success':
+        account_notification = 'Your password has been changed.'
+    else:
+        account_notification = ''
+
     return (request, 'account/change_password.html',
-            {'change_password_form': change_password_form})
+            {'change_password_form': change_password_form,
+             'account_notification': account_notification})
     # }}}
 
 @login_required
@@ -182,7 +188,8 @@ def change_password_do(request):
             request.user, request.POST)
     if form.is_valid():
         form.save() 
-        return HttpResponseRedirect(reverse(change_password))
+        return HttpResponseRedirect(
+            reverse(change_password) + '?notification_id=success')
     else:
         return change_password(request, change_password_form=form)
     # }}}

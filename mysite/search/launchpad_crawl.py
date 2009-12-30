@@ -87,6 +87,10 @@ def clean_lp_data_dict(lp_data_dict):
     new_data['title'] = lp_data_dict['title']
     new_data['description'] = lp_data_dict['text']
     new_data['status'] = lp_data_dict['status']
+    if new_data['status'].lower() in ('fix released', 'fix committed'):
+        new_data['looks_closed'] = True
+    # else looks_closed will be False due to the Bug default
+
     new_data['importance'] = lp_data_dict['importance']
     if new_data['importance'] is None:
         new_data['importance'] =  'Unknown'

@@ -17,6 +17,10 @@ mysql -u root -p < "CREATE DATABASE; CREATE USER 'oh_milestone_a'@'localhost' ID
 
 ../bin/mysite syncdb
 
+Note that you must answer "No" to the question, "Do you want to create a superuser?"
+
+That is because you have not run the migrations for the "Profile" app yet.
+
 # You may need to migrate using this command:
 ../bin/mysite migrate
 
@@ -27,6 +31,10 @@ mysql -u root -p < "CREATE DATABASE; CREATE USER 'oh_milestone_a'@'localhost' ID
 # Regarding dates. You may need to replace South's strange Pythonesque code for dates with proper MySQL code.
 
 Now load http://127.0.0.1:8000/search/ in your web browser.
+
+== Frequently Asked Questions ==
+
+Q. Why is the Django project called 'mysite'?
 
 == Testing ==
 
