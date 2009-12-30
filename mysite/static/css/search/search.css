@@ -107,7 +107,7 @@ p {
     font-size: 100%;
     float: left;
     list-style: none;
-    width: 555px;
+    width: 100%;
     white-space: nowrap;
     margin: 0;
     margin-bottom: 8px;
@@ -140,7 +140,7 @@ p {
     font-size: 14px;
     float: left;
     padding: 5px 10px;
-    width: 535px;
+    width: 100%;
     overflow: hidden;
     border-bottom: 2px solid #f4f4f4;
 }
@@ -268,7 +268,7 @@ p {
     margin: 0;
     padding: 0;
     float: left;
-    width: 560px;
+    width: 99%;
 }
 #opps li {
     overflow: hidden;
