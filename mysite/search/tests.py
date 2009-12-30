@@ -1069,4 +1069,26 @@ class PublicizeBugTrackerIndex(SearchTest):
                 self.search_page_response.context[0]['project_count'],
                 self.bug_tracker_count)
 
+class LaunchpadImporterMarksFixedBugsAsClosed(TwillTests):
+    def test(self):
+        '''Start with a bug that is "Fix Released"
+
+        Verify that we set looks_closed to True'''
+        # retry this with committed->released
+        lp_data_dict = {'project': '',
+                        'url': '',
+                        'title': '',
+                        'text': '',
+                        'status': 'Fix Committed',
+                        'importance': '',
+                        'reporter': {'lplogin': '', 'realname': ''},
+                        'comments': '',
+                        'date_updated': datetime.datetime.now().timetuple(),
+                        'date_reported': datetime.datetime.now().timetuple()}
+        # maybe I could have done this with a defaultdict of str with
+        # just the non-str exceptions
+        query_data, new_data = mysite.search.launchpad_crawl.clean_lp_data_dict(
+            lp_data_dict)
+        self.assertTrue(new_data['looks_closed'])
+
 # vim: set nu ai et ts=4 sw=4 columns=100:
