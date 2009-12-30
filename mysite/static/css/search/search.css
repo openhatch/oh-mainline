@@ -443,7 +443,7 @@ input[type='text'].default-text-active {
 #filters h4 { margin-bottom: 5px; }
 ul#facets { margin-left: 17px; }
 ul#facets ul { margin-left: 10px; }
-ul#facets ul li, #suggested_searches li { list-style: square; margin-top: 10px; margin-left: 20px; color: #777; }
+ul#facets ul li, #suggested_searches li { list-style: square; margin-top: 10px; margin-left: 20px; color: #777; clear: left;}
 #facets li.active { font-weight: bold; }
 
 #results-summary { width: 70%; float: left; margin-right: 10px; }
