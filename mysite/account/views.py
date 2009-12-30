@@ -172,13 +172,13 @@ def change_password(request, change_password_form = None):
     change_password_form.fields['new_password2'].label = "Type it again"
 
     if request.GET.get('notification_id', None) == 'success':
-        notification = 'Your password has been changed.'
+        account_notification = 'Your password has been changed.'
     else:
-        notification = ''
+        account_notification = ''
 
     return (request, 'account/change_password.html',
             {'change_password_form': change_password_form,
-             'notification': notification})
+             'account_notification': account_notification})
     # }}}
 
 @login_required

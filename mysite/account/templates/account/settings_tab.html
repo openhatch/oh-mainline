@@ -9,9 +9,9 @@ NB: All forms in pages that descend from this have the same name.
         <h3>{% block submodule_head %}{% endblock %}</h3>
     </div>
     <div class='body'>
-      {% if notification %}
+      {% if account_notification %}
       <div class='notification'>
-	{{ notification }}
+	{{ account_notification }}
 	<div style="float: right; display: inline;">
 	  <a href=".">(clear this message)</a>
 	</div>
