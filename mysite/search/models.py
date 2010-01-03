@@ -46,12 +46,8 @@ class Project(models.Model):
         import mysite.profile.controllers
         mentor_set = set(mysite.profile.controllers.people_matching(
             'can_mentor', self.name))
-        import sys
-        print >> sys.stdout, mentor_set
         mentor_set.update(mysite.profile.controllers.people_matching(
                 'can_mentor', self.language))
-        print >> sys.stdout, mysite.profile.controllers.people_matching(
-                'can_mentor', self.language)
         return mentor_set
 
     @staticmethod
