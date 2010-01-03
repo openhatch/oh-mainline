@@ -40,6 +40,10 @@ class Project(models.Model):
         # MEDIA_ROOT is prefixed automatically.
         return 'images/icons/projects/%s.png' % uuid.uuid4().hex
 
+    def potential_mentors(self):
+        import mysite.profile.views
+        return mysite.profile.views.people_matching('can_mentor', self.name)
+
     @staticmethod
     def create_dummy(**kwargs):
         now = datetime.datetime.utcnow()

@@ -29,9 +29,14 @@
         {% endif %}
 
         {% endif %}
+
+	{% if bug.project.potential_mentors %}
 	<span class="helpers" style="color: black;">
-	  - 5 potential mentors -
+	  - {{bug.project.potential_mentors|length}} potential
+	  {{bug.project.potential_mentors|length|pluralize:"mentor"}}
 	</span>
+	{% endif %}
+	-
         <span class='description'>{{ bug.description|highlight:query.terms|linebreaks }}</span>
     </span>
 </div>
