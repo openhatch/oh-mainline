@@ -32,8 +32,8 @@
 
 	{% if bug.project.potential_mentors %}
 	<span class="helpers" style="color: black;">
-	  - {{bug.project.potential_mentors|length}} potential
-	  mentor{{bug.project.potential_mentors|length|pluralize}}
+	  - <a href="{{ bug.project.get_url }}">{{bug.project.potential_mentors|length}} potential
+	  mentor{{bug.project.potential_mentors|length|pluralize}}</a>
 	</span>
 	{% endif %}
 	-
