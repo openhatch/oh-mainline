@@ -35,6 +35,7 @@ from django.conf import settings
 
 # OpenHatch apps
 import mysite.base.controllers
+import mysite.profile.controllers
 import mysite.base.helpers
 from mysite.customs import ohloh
 from mysite.profile.models import \
@@ -751,16 +752,10 @@ def display_person_edit_name(request, name_edit_mode):
     return (request, 'profile/main.html', data)
     # }}}
 
-def people_matching(property, value):
-    links = Link_Person_Tag.objects.filter(tag__tag_type__name=property, tag__text__iexact=value)
-    peeps = [l.person for l in links]
-    sorted_peeps = sorted(set(peeps), key = lambda thing: (thing.user.first_name, thing.user.last_name))
-    return sorted_peeps
-
 @view
 def display_list_of_people_who_match_some_search(request, property, value):
     '''Property is the "tag name", and "value" is the text in it.'''
-    peeps = people_matching(property, value)
+    peeps = mysite.profile.controllers.people_matching(property, value)
     data = {}
     data['people'] = peeps
     data['property'] = property

@@ -1,4 +1,5 @@
-import mysite.search.controllers 
+import mysite.search.controllers
+import mysite.profile.models
 from itertools import izip, cycle, islice
 
 ## roundrobin() taken from http://docs.python.org/library/itertools.html
@@ -38,3 +39,10 @@ def recommend_bugs(terms, n):
             number_emitted += 1
             distinct_ids.add(bug.id)
             yield bug
+
+def people_matching(property, value):
+    links = mysite.profile.models.Link_Person_Tag.objects.filter(
+        tag__tag_type__name=property, tag__text__iexact=value)
+    peeps = [l.person for l in links]
+    sorted_peeps = sorted(set(peeps), key = lambda thing: (thing.user.first_name, thing.user.last_name))
+    return sorted_peeps

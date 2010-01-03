@@ -2,6 +2,7 @@ from mysite.base.tests import make_twill_url, TwillTests
 
 import mysite.account.tests
 from mysite.profile.models import Person
+import mysite.profile.models
 import mysite.customs.miro
 import mysite.search.controllers
 
@@ -1090,5 +1091,42 @@ class LaunchpadImporterMarksFixedBugsAsClosed(TwillTests):
         query_data, new_data = mysite.search.launchpad_crawl.clean_lp_data_dict(
             lp_data_dict)
         self.assertTrue(new_data['looks_closed'])
+
+class TestPotentialMentors(TwillTests):
+    fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
+
+    def test(self):
+        '''Create a Banshee mentor who can do C#
+        and a separate C# mentor, and verify that Banshee thinks it has
+        two potential mentors.'''
+
+        banshee = Project.create_dummy(name='Banshee', language='C#')
+        can_mentor, _ = mysite.profile.models.TagType.objects.get_or_create(name='can_mentor')
+        
+        willing_to_mentor_banshee, _ = mysite.profile.models.Tag.objects.get_or_create(
+            tag_type=can_mentor,
+            text='Banshee')
+
+        willing_to_mentor_c_sharp, _ = mysite.profile.models.Tag.objects.get_or_create(
+            tag_type=can_mentor,
+            text='C#')
+
+        link = mysite.profile.models.Link_Person_Tag(
+            person=Person.objects.get(user__username='paulproteus'),
+            tag=willing_to_mentor_banshee)
+        link.save()
+
+        link = mysite.profile.models.Link_Person_Tag(
+            person=Person.objects.get(user__username='paulproteus'),
+            tag=willing_to_mentor_c_sharp)
+        link.save()
+
+        link = mysite.profile.models.Link_Person_Tag(
+            person=Person.objects.get(user__username='barry'),
+            tag=willing_to_mentor_c_sharp)
+        link.save()
+
+        banshee_mentors = banshee.potential_mentors()
+        self.assertEqual(len(banshee_mentors), 2)
 
 # vim: set nu ai et ts=4 sw=4 columns=100:
