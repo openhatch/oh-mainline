@@ -82,6 +82,19 @@ about our members who support {{ project.name }}
             {% endif %}
       </p>
 
+      <p>
+            {% if language_mentors %}
+            {{ project.name}} is written primiarily in
+	    {{ project.language }}, and there 
+	    {{ language_mentors|length|pluralize:"is,are" }}
+are
+            <a href='{% url mysite.profile.views.display_list_of_people_who_match_some_search "can_mentor" project.language|urlencode %}'>
+                {{ language_mentors|length}}
+                {{ language_mentors|length|pluralize:"person,people" }}
+	      who can mentor in that</a>.
+            {% endif %}
+      </p>
+
     </div>
 </div>
 {% endwith %}

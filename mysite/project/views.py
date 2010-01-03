@@ -16,8 +16,10 @@ def project(request, project__name = None):
             {
                 'project': p,
                 'contributors': p.get_contributors(),
-                'mentors': mysite.profile.views.people_matching('can_mentor',
-                                                                project__name),
+                'mentors': (mysite.profile.controllers.people_matching(
+                    'can_mentor', project__name)),
+                'language_mentors': (mysite.profile.controllers.people_matching(
+                        'can_mentor', p.language)),
                 'explain_to_anonymous_users': True
                 },
             )
