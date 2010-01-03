@@ -1241,4 +1241,26 @@ class PersonGetTagsForRecommendations(TwillTests):
         # This is the functionality we're testing
         self.assertEqual([tag_i_understand], pp.get_tags_for_recommendations())
 
+class ProjectGetMentors(TwillTests):
+    fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
+
+    def test(self):
+        '''This test creates:
+        * one person who is listed as able to mentor in Banshee
+        * one person who is not
+        and asks the Banshee project to list its available mentors.'''
+        banshee = Project.create_dummy(name='Banshee')
+        can_mentor, _ = TagType.objects.get_or_create(name='can_mentor')
+        
+        willing_to_mentor_banshee, _ = Tag.objects.get_or_create(
+            tag_type=can_mentor,
+            text='Banshee')
+        link = Link_Person_Tag(person=Person.objects.get(user__username='paulproteus'),
+                               tag=willing_to_mentor_banshee)
+        link.save()
+
+        banshee_mentors = mysite.profile.views.people_matching('can_mentor',
+                                                               'Banshee')
+        self.assertEqual(list(banshee_mentors), [Person.objects.get(user__username='paulproteus')])
+
 # vim: set ai et ts=4 sw=4 nu:
