@@ -1263,4 +1263,27 @@ class ProjectGetMentors(TwillTests):
                                                                'Banshee')
         self.assertEqual(list(banshee_mentors), [Person.objects.get(user__username='paulproteus')])
 
+class EditLocation(TwillTests):
+    fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
+
+    def test(self):
+        '''
+        * Goes to paulproteus's profile
+        * checks that he is not in Timbuktu
+        * clicks "edit or hide"
+        * sets the location to Timbuktu
+        * saves
+        * checks his location is Timbuktu'''
+        self.login_with_twill()
+        tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
+        # not in Timbuktu!
+        tc.notfind('Timbuktu')
+        # click..
+        tc.follow('(edit or hide)')
+        # set the location in ze form
+        tc.fv('edit_location', 'location_display_name', 'Timbuktu')
+        tc.submit()
+        # Timbuktu!
+        tc.find('Timbuktu')
+
 # vim: set ai et ts=4 sw=4 nu:
