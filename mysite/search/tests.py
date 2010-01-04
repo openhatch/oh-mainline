@@ -906,10 +906,12 @@ class QueryGetPossibleLanguageFacetOptionNames(SearchTest):
         python_project = Project.create_dummy(language='Python')
         perl_project = Project.create_dummy(language='Perl')
         c_project = Project.create_dummy(language='C')
+        unknown_project = Project.create_dummy(language='')
 
         python_bug = Bug.create_dummy(project=python_project, title='a')
         perl_bug = Bug.create_dummy(project=perl_project, title='a') 
         c_bug = Bug.create_dummy(project=c_project, title='b') 
+        unknowable_bug = Bug.create_dummy(project=unknown_project, title='unknowable') 
 
     def test_with_term(self):
         # In the setUp we create three bugs, but only two of them would match
@@ -935,7 +937,34 @@ class QueryGetPossibleLanguageFacetOptionNames(SearchTest):
         language_names = query.get_language_names()
         self.assertEqual(
                 sorted(language_names),
-                sorted(['Python', 'Perl', 'C']))
+                sorted(['Python', 'Perl', 'C', 'Unknown']))
+
+    def test_with_language_as_unknown(self):
+        # In the setUp we create bugs in three languages.
+        # Here, we verify that the get_language_names() method correctly returns
+        # all three languages, even though the GET data shows that we are
+        # browsing by language.
+
+        GET_data = {'language': 'Unknown'}
+
+        query = mysite.search.controllers.Query.create_from_GET_data(GET_data)
+        language_names = query.get_language_names()
+        self.assertEqual(
+                sorted(language_names),
+                sorted(['Python', 'Perl', 'C', 'Unknown']))
+
+    def test_with_language_as_unknown_and_query(self):
+        # In the setUp we create bugs in three languages.
+        # Here, we verify that the get_language_names() method correctly returns
+        # all three languages, even though the GET data shows that we are
+        # browsing by language.
+
+        GET_data = {'language': 'Unknown', 'q': 'unknowable'}
+
+        query = mysite.search.controllers.Query.create_from_GET_data(GET_data)
+        match_count = query.get_bugs_unordered().count()
+
+        self.assertEqual(match_count, 1)
 
 class QueryContributionType(SearchTest):
 

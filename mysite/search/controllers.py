@@ -86,7 +86,10 @@ class Query:
         language_is_active = ('language' in self.active_facet_options.keys())
         exclude_language = exclude_active_facets and language_is_active
         if 'language' in self.active_facet_options and not exclude_language: 
-            q &= Q(project__language__iexact=self.active_facet_options['language'])
+            language_value = self.active_facet_options['language']
+            if language_value == 'Unknown':
+                language_value=''
+            q &= Q(project__language__iexact=language_value)
 
         # contribution type facet
         contribution_type_is_active = ('contribution_type' in
@@ -206,7 +209,7 @@ class Query:
         bugs = query_without_language_facet.get_bugs_unordered()
         distinct_language_columns = bugs.values('project__language').distinct()
         languages = [x['project__language'] for x in distinct_language_columns]
-        languages = [l for l in languages if l]
+        languages = [l or 'Unknown' for l in languages]
 
         # Add the active language facet, if there is one
         if 'language' in self.active_facet_options:
