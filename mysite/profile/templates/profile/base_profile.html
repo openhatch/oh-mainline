@@ -70,9 +70,9 @@
             {% endif %}
 
 	    <div style="clear: left; float: left;">
-	      {% if location %}
-	      {{ location }}
-	      <a href="#">(edit or hide)</a>
+	      {% if person.location_display_name %}
+	      {{ person.location_display_name }}
+	      <a href="{% url mysite.account.views.edit_contact_info %}">(edit or hide)</a>
 	      {% endif %}
 
 	      {% if person.show_email and person.user.email %}

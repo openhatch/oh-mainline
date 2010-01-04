@@ -1278,12 +1278,14 @@ class EditLocation(TwillTests):
         tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
         # not in Timbuktu!
         tc.notfind('Timbuktu')
-        # click..
-        tc.follow('(edit or hide)')
+
+        # Now go edit my "contact info"
+        tc.go(make_twill_url('http://openhatch.org/account/settings/contact-info/'))
         # set the location in ze form
-        tc.fv('edit_location', 'location_display_name', 'Timbuktu')
+        tc.fv(1, 'location_display_name', 'Timbuktu')
         tc.submit()
         # Timbuktu!
+        tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
         tc.find('Timbuktu')
 
 # vim: set ai et ts=4 sw=4 nu:

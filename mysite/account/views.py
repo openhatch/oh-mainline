@@ -112,10 +112,18 @@ def settings(request):
 
 @login_required
 @view
-def edit_contact_info(request, edit_email_form = None, show_email_form = None):
+def edit_contact_info(request, edit_email_form = None, show_email_form = None,
+                      edit_location_form = None):
     # {{{
 
     data = {}
+
+    # Initialize edit location form
+    if edit_location_form is None:
+        edit_location_form = mysite.account.forms.EditLocationForm(
+            instance=request.user.get_profile(), prefix='edit_location')
+    data['edit_location_form'] = edit_location_form
+
     # Store edit_email_form in data[], even if we weren't passed one
     if edit_email_form is None:
         edit_email_form = mysite.account.forms.EditEmailForm(
@@ -136,7 +144,6 @@ def edit_contact_info(request, edit_email_form = None, show_email_form = None):
 @login_required
 def edit_contact_info_do(request):
     # {{{
-
     # Handle "Edit email"
     edit_email_form = mysite.account.forms.EditEmailForm(
             request.POST, prefix='edit_email', instance=request.user)
@@ -144,7 +151,17 @@ def edit_contact_info_do(request):
     show_email_form = mysite.account.forms.ShowEmailForm(
             request.POST, prefix='show_email')
 
-    if edit_email_form.is_valid() and show_email_form.is_valid():
+    edit_location_form = mysite.account.forms.EditLocationForm(
+        request.POST,
+        instance=request.user.get_profile(), prefix='edit_location')
+
+    # Email saving functionality requires two forms to both be
+    # valid. This really ought to be the same form, anyway.
+    if (edit_email_form.is_valid() and show_email_form.is_valid()
+        and edit_location_form.is_valid()):
+        # In that case, always save the edit_location_form
+        edit_location_form.save()
+
         p = request.user.get_profile()
         p.show_email = show_email_form.cleaned_data['show_email']
         p.save()
@@ -157,7 +174,8 @@ def edit_contact_info_do(request):
     else:
         return edit_contact_info(request,
                 edit_email_form=edit_email_form,
-                show_email_form=show_email_form)
+                show_email_form=show_email_form,
+                edit_location_form=edit_location_form)
     # }}}
 
 @login_required

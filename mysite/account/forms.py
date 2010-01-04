@@ -66,6 +66,11 @@ class EditEmailForm(django.forms.ModelForm):
             raise django.forms.ValidationError(
                 "A user with that email already exists.")
 
+class EditLocationForm(django.forms.ModelForm):
+    class Meta:
+        model = Person
+        fields = ('location_display_name',)
+
 class EditPhotoForm(django.forms.ModelForm):
     class Meta:
         model = Person

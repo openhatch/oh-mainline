@@ -76,6 +76,7 @@ class Person(models.Model):
                               default='',
                               null=True)
     blacklisted_repository_committers = models.ManyToManyField(RepositoryCommitter)
+    location_display_name = models.CharField(max_length=255)
 
     def __unicode__(self):
         return "username: %s, name: %s %s" % (self.user.username,
