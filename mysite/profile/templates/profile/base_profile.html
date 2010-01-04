@@ -57,6 +57,8 @@
                 </div>
             </a>
             </h1>
+
+
             {% if editable %}
             <a class='name-edit-link' href='/edit/name'>
                 <img src='/static/images/icons/pencil.png'
@@ -67,17 +69,20 @@
             {% endif %}
             {% endif %}
 
-		  {% if person.user.first_name or person.user.last_name %}
-          <div class='another-identifier'>
-              username: <strong>{{ person.user.username }}</strong>
-          </div>
-		  {% endif %}
+	    <div style="clear: left; float: left;">
+	      {% if location %}
+	      {{ location }}
+	      {% endif %}
 
-		  {% if person.show_email and person.user.email %}
-          <div class='another-identifier'>
-              email: <strong>{{ person.user.email }}</strong>
-          </div>
-		  {% endif %}
+	      {% if person.show_email and person.user.email %}
+              <div>
+		<a href="mailto:{{ person.user.email }}">{{ person.user.email }}</a>
+              </div>
+	      {% endif %}
+	      
+	    </div>
+			
+
     {% endif %}
     </div>
 
