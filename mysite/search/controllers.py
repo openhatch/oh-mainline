@@ -205,8 +205,6 @@ class Query:
 
         bugs = query_without_language_facet.get_bugs_unordered()
         distinct_language_columns = bugs.values('project__language').distinct()
-        import pdb
-        pdb.set_trace()
         languages = [x['project__language'] for x in distinct_language_columns]
         languages = [l or 'Unknown' for l in languages]
 
