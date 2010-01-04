@@ -118,6 +118,11 @@ def edit_contact_info(request, edit_email_form = None, show_email_form = None,
 
     data = {}
 
+    if request.GET.get('notification_id', None) == 'success':
+        data['account_notification'] = 'Settings saved.'
+    else:
+        data['account_notification'] = ''
+
     # Initialize edit location form
     if edit_location_form is None:
         edit_location_form = mysite.account.forms.EditLocationForm(
@@ -170,7 +175,8 @@ def edit_contact_info_do(request):
                 request.user, edit_email_form.cleaned_data['email']))
         edit_email_form.save()
 
-        return HttpResponseRedirect(reverse(edit_contact_info))
+        return HttpResponseRedirect(reverse(edit_contact_info) +
+                                    '?notification_id=success')
     else:
         return edit_contact_info(request,
                 edit_email_form=edit_email_form,
