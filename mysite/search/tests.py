@@ -947,7 +947,7 @@ class QueryGetPossibleLanguageFacetOptionNames(SearchTest):
         GET_data = {'language': 'Unknown'}
 
         query = mysite.search.controllers.Query.create_from_GET_data(GET_data)
-        language_names = query.get_q().get_language_names()
+        language_names = query.get_language_names()
         self.assertEqual(
                 sorted(language_names),
                 sorted(['Python', 'Perl', 'C', 'Unknown']))
