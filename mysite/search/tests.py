@@ -1129,4 +1129,25 @@ class TestPotentialMentors(TwillTests):
         banshee_mentors = banshee.potential_mentors()
         self.assertEqual(len(banshee_mentors), 2)
 
+
+    def test_with_status_missing(self):
+        '''Verify we do not explode if Launchpad gives us a bug with no Status
+
+        Verify that we set looks_closed to True'''
+        # retry this with committed->released
+        lp_data_dict = {'project': '',
+                        'url': '',
+                        'title': '',
+                        'text': '',
+                        'importance': '',
+                        'reporter': {'lplogin': '', 'realname': ''},
+                        'comments': '',
+                        'date_updated': datetime.datetime.now().timetuple(),
+                        'date_reported': datetime.datetime.now().timetuple()}
+        # maybe I could have done this with a defaultdict of str with
+        # just the non-str exceptions
+        query_data, new_data = mysite.search.launchpad_crawl.clean_lp_data_dict(
+            lp_data_dict)
+        self.assertEqual(new_data['status'], 'Unknown')
+
 # vim: set nu ai et ts=4 sw=4 columns=100:
