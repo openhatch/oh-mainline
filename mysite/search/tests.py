@@ -952,6 +952,19 @@ class QueryGetPossibleLanguageFacetOptionNames(SearchTest):
                 sorted(language_names),
                 sorted(['Python', 'Perl', 'C', 'Unknown']))
 
+    def test_with_language_as_unknown_and_query(self):
+        # In the setUp we create bugs in three languages.
+        # Here, we verify that the get_language_names() method correctly returns
+        # all three languages, even though the GET data shows that we are
+        # browsing by language.
+
+        GET_data = {'language': 'Unknown', 'q': 'unknowable'}
+
+        query = mysite.search.controllers.Query.create_from_GET_data(GET_data)
+        match_count = query.get_bugs_unordered().count()
+
+        self.assertEqual(match_count, 1)
+
 class QueryContributionType(SearchTest):
 
     def setUp(self):
