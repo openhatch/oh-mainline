@@ -1,0 +1,42 @@
+<script type="text/javascript" src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAY70wuSo0zF3ZtJVp5bDm1BS1Y2ErAqCHV5rDhHSzgjy23KqwdRRaoSBuZk72oDzzAYxVBjtsLqSmTw"></script>
+<script type="text/javascript" src="/static/js/jquery.js"></script>
+<script type="text/javascript" src="/static/html/mapstraction/source/mxn.js?(google)"></script>
+<script type="text/javascript">
+    function OpenHatchMap() {
+        this.provider = "google";
+        this.canvas = new mxn.Mapstraction('map_canvas', this.provider);
+        this.canvas.setCenterAndZoom(new mxn.LatLonPoint(37.75,-122.44), 8);
+        this.canvas.addControls({ pan: true, zoom: 'small', map_type: true });
+    }
+$(function () {
+        var map = new OpenHatchMap();
+        var point = new mxn.LatLonPoint(47.4004,153.1435))
+        map.canvas.setCenterAndZoom(point);
+        var marker = new mxn.Marker(point);
+        var data = {
+             infoBubble : "Advanced Marker",
+             label : "tooltip",
+             date : "new Date()",
+             marker : 4,
+             iconShadow: "http://mapufacture.com/images/providers/blank.png",
+             iconShadowSize : [0,0],
+             icon : "http://assets1.mapufacture.com/images/markers/usgs_marker.png",
+             iconSize : [20,20],
+             draggable : false,
+             hover : true
+        };
+        map.canvas.addMarkerWithData(marker, data);
+});
+//$(function () { map.geocoder.geocode($('#address').text()); });
+</script>
+<style>
+    #map_canvas {
+        float: left;
+        width: 500px;
+        height: 500px;
+    }
+</style>
+<div id='map_canvas'>
+</div>
+<input type='text' id='address' />
+<button id='go'>Go</button>
