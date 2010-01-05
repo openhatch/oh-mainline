@@ -518,8 +518,9 @@ def display_list_of_people(request):
     # {{{
     data = {}
     data['people'] = Person.objects.all().order_by('user__username')
-    data['people2location_name_as_json'] = simplejson.dumps(dict([
-            (person.get_full_name_or_username(), person.location_display_name)
+    data['person_id2data_as_json'] = simplejson.dumps(dict([
+                (person.pk, {'name': person.get_full_name_or_username(),
+                             'location': person.location_display_name})
             for person in Person.objects.all()
             if person.location_display_name]))
     return (request, 'profile/search_people.html', data)
