@@ -16,8 +16,8 @@ People
         {% if property and value %}
         where {{ property }} = {{ value }}
         {% endif %}
-	<div id="map_canvas" style="width:100%; height:450px"></div>
-        <ul>
+        <div id="map_canvas" style="float: left; margin-right: 10px; width:70%; height:450px"></div>
+        <ul style='float: left; width: 20%;'>
             {% for person in people %}
             {% if person.user.username %}
             <li>
@@ -69,6 +69,7 @@ var update_all_markers;
 	    var marker = new google.maps.Marker({
 	      map: map, 
 		  title: person_name,
+		  person_id: person_id,
 		  position: results[0].geometry.location
 		  });
 	    google.maps.event.addListener(marker,
@@ -87,10 +88,10 @@ var update_all_markers;
 
     function generate_update_all_markers(map) {
       return function() {
-	console.log('your mom');
 	for (var i = 0; i < all_markers.length; i++) {
 	  var marker = all_markers[i];
 	  if (map.getBounds().contains(marker.position)) {
+	    alert(marker.bob);
 	    alert(marker.title + 'is visible');
 	  }
 	}
