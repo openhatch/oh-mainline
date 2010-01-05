@@ -42,9 +42,14 @@ People
 
   var people2location_name = {{ people2location_name_as_json|safe}};
 
-  function initialize() {
+var update_all_markers;
 
-  var geocoder =  new google.maps.Geocoder();
+  function initialize() {
+ 
+
+    var all_markers = [];
+
+    var geocoder =  new google.maps.Geocoder();
 
     var latlng = new google.maps.LatLng(-34.397, 150.644);
     var myOptions = {
@@ -66,6 +71,13 @@ People
 		  title: person_name,
 		  position: results[0].geometry.location
 		  });
+	    google.maps.event.addListener(marker,
+					  'visible_changed',
+					  function() { 	alert('hi'); });
+	    google.maps.event.addListener(marker,
+					  'click',
+					  function() { 	alert('hi'); });
+	    all_markers.push(marker);
 	  } else {
 	    console.log("Geocode was not successful for the following reason: " + status);
 	  }
@@ -75,6 +87,17 @@ People
       geocoder.geocode( { 'address': location_name}, create_a_callback(person_name));
     
     }
+    update_all_markers = function() {
+      for (var i = 0; i < all_markers.length; all_markers++) {
+	var marker = all_markers[i];
+	if (map.getBounds().contains(marker.position)) {
+	    alert(marker.title + 'is visible');
+	  }
+      }
+    }
+	    
+
+
 }
 </script>
 {% endblock js_in_head %}
