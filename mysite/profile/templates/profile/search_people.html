@@ -72,9 +72,6 @@ var update_all_markers;
 		  position: results[0].geometry.location
 		  });
 	    google.maps.event.addListener(marker,
-					  'visible_changed',
-					  function() { 	alert('hi'); });
-	    google.maps.event.addListener(marker,
 					  'click',
 					  function() { 	alert('hi'); });
 	    all_markers.push(marker);
@@ -87,16 +84,21 @@ var update_all_markers;
       geocoder.geocode( { 'address': location_name}, create_a_callback(person_name));
     
     }
-    update_all_markers = function() {
-      for (var i = 0; i < all_markers.length; all_markers++) {
-	var marker = all_markers[i];
-	if (map.getBounds().contains(marker.position)) {
+
+    function generate_update_all_markers(map) {
+      return function() {
+	console.log('your mom');
+	for (var i = 0; i < all_markers.length; i++) {
+	  var marker = all_markers[i];
+	  if (map.getBounds().contains(marker.position)) {
 	    alert(marker.title + 'is visible');
 	  }
+	}
       }
-    }
-	    
-
+    };
+    google.maps.event.addListener(map,
+				  'dragend',
+				  generate_update_all_markers(map));
 
 }
 </script>
