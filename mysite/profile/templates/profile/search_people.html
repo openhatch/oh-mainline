@@ -40,15 +40,7 @@ People
 <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
 <script type="text/javascript">
 
-  var people2latlong = {
-  'Asheesh Laroia': "Philadelphia, PA",
-  'Asheesh Laroia1': "Philadelphia, PA",
-  'Asheesh Laroia2': "Philadelphia, PA",
-  'Asheesh Laroia3': "Cambridge, England",
-  'Asheesh Laroia4': "Boston, MA",
-  'Asheesh Laroia5': "Philadelphia, PA",
-  'Asheesh Laroia6': "Philadelphia, PA",
-  };
+  var people2location_name = {{ people2location_name_as_json|safe}};
 
   function initialize() {
 
@@ -62,8 +54,8 @@ People
     };
     var map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
 
-    for (var person_name in people2latlong) {
-      var location_string = people2latlong[person_name];
+    for (var person_name in people2location_name) {
+      var location_name = people2location_name[person_name];
       
       function create_a_callback(person_name) {
 	return function(results, status) {
@@ -80,7 +72,7 @@ People
 	}
       };
 
-      geocoder.geocode( { 'address': location_string}, create_a_callback(person_name));
+      geocoder.geocode( { 'address': location_name}, create_a_callback(person_name));
     
     }
 }
