@@ -113,7 +113,7 @@ def settings(request):
 @login_required
 @view
 def edit_contact_info(request, edit_email_form = None, show_email_form = None,
-                      edit_location_form = None):
+                      ):
     # {{{
 
     data = {}
@@ -122,12 +122,6 @@ def edit_contact_info(request, edit_email_form = None, show_email_form = None,
         data['account_notification'] = 'Settings saved.'
     else:
         data['account_notification'] = ''
-
-    # Initialize edit location form
-    if edit_location_form is None:
-        edit_location_form = mysite.account.forms.EditLocationForm(
-            instance=request.user.get_profile(), prefix='edit_location')
-    data['edit_location_form'] = edit_location_form
 
     # Store edit_email_form in data[], even if we weren't passed one
     if edit_email_form is None:
@@ -155,10 +149,6 @@ def edit_contact_info_do(request):
 
     show_email_form = mysite.account.forms.ShowEmailForm(
             request.POST, prefix='show_email')
-
-    edit_location_form = mysite.account.forms.EditLocationForm(
-        request.POST,
-        instance=request.user.get_profile(), prefix='edit_location')
 
     # Email saving functionality requires two forms to both be
     # valid. This really ought to be the same form, anyway.
@@ -204,6 +194,43 @@ def change_password(request, change_password_form = None):
             {'change_password_form': change_password_form,
              'account_notification': account_notification})
     # }}}
+
+@login_required
+@view
+def set_location(request, edit_location_form = None):
+    # {{{
+    data = {}
+    data['geoip_has_suggestion'] = True
+    data['geoip_guess'] = 'Timbuktu'
+
+    # Initialize edit location form
+    if edit_location_form is None:
+        edit_location_form = mysite.account.forms.EditLocationForm(
+            instance=request.user.get_profile(), prefix='edit_location')
+    data['edit_location_form'] = edit_location_form
+
+    if request.GET.get('notification_id', None) == 'success':
+        data['account_notification'] = 'Location saved.'
+    else:
+        data['account_notification'] = ''
+
+    return (request, 'account/set_location.html', data)
+    # }}}
+
+@login_required
+def set_location_do(request):
+    edit_location_form = mysite.account.forms.EditLocationForm(
+        request.POST,
+        instance=request.user.get_profile(), prefix='edit_location')
+    if edit_location_form.is_valid():
+        edit_location_form.save()
+        return HttpResponseRedirect(reverse(set_location) +
+                                    '?notification_id=success')
+    else:
+        return set_location(request,
+                edit_location_form=edit_location_form)
+       
+
 
 @login_required
 def change_password_do(request):

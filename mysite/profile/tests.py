@@ -1280,7 +1280,7 @@ class EditLocation(TwillTests):
         tc.notfind('Timbuktu')
 
         # Now go edit my "contact info"
-        tc.go(make_twill_url('http://openhatch.org/account/settings/contact-info/'))
+        tc.go(make_twill_url('http://openhatch.org/account/settings/location/'))
         # set the location in ze form
         tc.fv(1, 'location_display_name', 'Timbuktu')
         tc.submit()

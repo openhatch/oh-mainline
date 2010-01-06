@@ -1,0 +1,26 @@
+{% extends 'account/settings_tab.html' %}
+
+{% block title %}
+Location - 
+{{ block.super }}
+{% endblock title %}
+
+{% block form_action %}
+'{% url mysite.account.views.set_location_do %}'
+{% endblock form_action %}
+
+{% block submodule_head %}
+Location
+{% endblock submodule_head %}
+
+{% block submodule_body %}
+<p>To appear on <a href="{%url mysite.profile.views.display_list_of_people %}">the map</a>,
+  set a location.</p>
+{% if geoip_has_suggestion and not the_user.get_profile.location_display_name %}
+<p>
+  <label></label>
+  <span class="notification" style="width: 311px; margin-bottom: 0;">Suggested location: <strong>{{geoip_guess}}</strong>. <a href="#">Use this location</a>. </span>
+</p>
+{% endif %}
+{{ edit_location_form.as_p }}
+{% endblock submodule_body %}
