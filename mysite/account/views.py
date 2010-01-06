@@ -200,7 +200,7 @@ def change_password(request, change_password_form = None):
 def set_location(request, edit_location_form = None):
     # {{{
     data = {}
-    data['geoip_has_suggestion'], data['geoip_guess'] = mysite.profile.controllers.get_geoip_guess_for_user()
+    data['geoip_has_suggestion'], data['geoip_guess'] = mysite.profile.controllers.get_geoip_guess_for_ip(request.META['REMOTE_ADDR'])
 
     # Initialize edit location form
     if edit_location_form is None:

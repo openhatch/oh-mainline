@@ -3,6 +3,7 @@ import mysite.profile.models
 from itertools import izip, cycle, islice
 import pygeoip
 from django.conf import settings
+import os.path
 
 ## roundrobin() taken from http://docs.python.org/library/itertools.html
 
@@ -50,7 +51,7 @@ def people_matching(property, value):
     return sorted_peeps
 
 geoip_database = None
-def get_geoip_guess_for_user():
+def get_geoip_guess_for_ip(ip_as_string):
     # initialize database
     global geoip_database
     if geoip_database is None:
@@ -58,10 +59,10 @@ def get_geoip_guess_for_user():
         geoip_database = pygeoip.GeoIP(os.path.join(settings.MEDIA_ROOT,
                                                     '../../downloads/GeoLiteCity.dat'))
     
-    # get IP address
-    ip_as_string = request.META['REMOTE_ADDR']
-    
     all_data_about_this_ip = geoip_database.record_by_addr(ip_as_string)
+
+    if all_data_about_this_ip is None:
+        return False, ''
 
     things_we_like = all_data_about_this_ip.get('city', ''), all_data_about_this_ip.get('region_name', ''), all_data_about_this_ip.get('country_name', '')
 
