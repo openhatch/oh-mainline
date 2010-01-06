@@ -72,8 +72,10 @@
 	    <div style="clear: left; float: left;">
 	      {% if person.location_display_name %}
 	      {{ person.location_display_name }}
-	      <a href="{% url mysite.account.views.set_location %}">(edit or hide)</a>
 	      {% endif %}
+              {% if editable %}
+	      <a href="{% url mysite.account.views.set_location %}">(edit location)</a>
+              {% endif %}
 
 	      {% if person.show_email and person.user.email %}
               <div>
