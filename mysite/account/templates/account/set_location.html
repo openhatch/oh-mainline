@@ -19,7 +19,7 @@ Location
 {% if geoip_has_suggestion and not the_user.get_profile.location_display_name %}
 <p>
   <label></label>
-  <span class="notification" style="width: 311px; margin-bottom: 0;">Suggested location: <strong>{{geoip_guess}}</strong>. <a href="#">Use this location</a>. </span>
+  <span class="notification" style="width: 311px; margin-bottom: 0;">We've tried to guess your location.</span>
 </p>
 {% endif %}
 {{ edit_location_form.as_p }}
