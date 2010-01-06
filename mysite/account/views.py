@@ -217,7 +217,7 @@ def set_location(request, edit_location_form = None):
 
 
     if request.GET.get('notification_id', None) == 'success':
-        data['account_notification'] = 'Location saved.'
+        data['account_notification'] = 'Saved.'
     else:
         data['account_notification'] = ''
 

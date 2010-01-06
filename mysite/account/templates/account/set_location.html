@@ -14,8 +14,12 @@ Location
 {% endblock submodule_head %}
 
 {% block submodule_body %}
-<p>To appear on <a href="{%url mysite.profile.views.display_list_of_people %}">the map</a>,
+{% if the_user.get_profile.location_display_name %}
+<p>Your location is visible on <a href="{%url mysite.profile.views.display_list_of_people %}">the global map</a>.</p>
+{% else %}
+<p>To appear on <a href="{%url mysite.profile.views.display_list_of_people %}">the global map</a>,
   set a location.</p>
+{% endif %}
 {% if geoip_has_suggestion and not the_user.get_profile.location_display_name %}
 <p>
   <label></label>
