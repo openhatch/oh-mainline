@@ -24,6 +24,7 @@ function initialize() {
 						    'position': results[0].geometry.location
 						});
 	    $('#geocode_description').css('visibility', 'visible');
+	    $('#success_message').css('visibility', 'visible');
 	}
 	else {
 	    $('#map_canvas').text("Could not find coordinates for that location. Try being more specific.");
