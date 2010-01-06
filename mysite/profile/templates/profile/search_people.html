@@ -41,6 +41,8 @@ People
 <script type="text/javascript">
 
 var person_id2data = {{ person_id2data_as_json|safe}};
+var num_of_persons_with_locations = {{ num_of_persons_with_locations}};
+var number_of_people_geocoded = 0;
 
 var update_all_markers;
 
@@ -63,12 +65,13 @@ function initialize() {
         var location_name = data['location'];
         var name = data['name'];
 
-        function create_a_callback(person_name) {
+        function create_a_callback(person_name, person_id) {
             return function(results, status) {
+	      number_of_people_geocoded += 1;
                 if (status == google.maps.GeocoderStatus.OK) {
                     var marker = new google.maps.Marker({
                         'map': map, 
-                        'title': name,
+                        'title': person_name,
                         'person_id': person_id,
                         'position': results[0].geometry.location
                     });
@@ -77,14 +80,18 @@ function initialize() {
                         function() { 	alert('hi'); }
                         );
                     all_markers.push(marker);
-                }
+		    }
                 else {
                     console.log("Geocode was not successful for the following reason: " + status);
                 }
-            }
+		/* if this is the last one, call update_all_markers() */
+		if (num_of_persons_with_locations == number_of_people_geocoded) {
+		  update_all_markers();
+		}
+	    }
         }
 
-        geocoder.geocode( { 'address': location_name}, create_a_callback(name));
+        geocoder.geocode( { 'address': location_name}, create_a_callback(name, person_id));
     }
 
     function generate_update_all_markers(map) {
@@ -110,6 +117,9 @@ function initialize() {
     update_all_markers = generate_update_all_markers(map);
     google.maps.event.addListener(map,
             'idle',
+            update_all_markers);
+    google.maps.event.addListener(map,
+            'bound_changed',
             update_all_markers);
 }
 </script>

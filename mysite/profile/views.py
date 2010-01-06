@@ -523,6 +523,9 @@ def display_list_of_people(request):
                              'location': person.location_display_name})
             for person in Person.objects.all()
             if person.location_display_name]))
+    data['num_of_persons_with_locations'] = len([p for p in Person.objects.all()
+                                                 if p.location_display_name])
+            
     return (request, 'profile/search_people.html', data)
     # }}}
 
