@@ -50,9 +50,9 @@ function initialize() {
 
     var geocoder =  new google.maps.Geocoder();
 
-    var latlng = new google.maps.LatLng(-34.397, 150.644);
+    var latlng = new google.maps.LatLng(0, 0);
     var myOptions = {
-        'zoom': 8,
+        'zoom': 1,
         'center': latlng,
         'mapTypeId': google.maps.MapTypeId.ROADMAP
     };
@@ -66,7 +66,6 @@ function initialize() {
         function create_a_callback(person_name) {
             return function(results, status) {
                 if (status == google.maps.GeocoderStatus.OK) {
-                    map.setCenter(results[0].geometry.location);
                     var marker = new google.maps.Marker({
                         'map': map, 
                         'title': name,
