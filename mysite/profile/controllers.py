@@ -56,8 +56,11 @@ def get_geoip_guess_for_ip(ip_as_string):
     global geoip_database
     if geoip_database is None:
         # FIXME come up with reliable path place
-        geoip_database = pygeoip.GeoIP(os.path.join(settings.MEDIA_ROOT,
-                                                    '../../downloads/GeoLiteCity.dat'))
+        try:
+            geoip_database = pygeoip.GeoIP(os.path.join(settings.MEDIA_ROOT,
+                                                        '../../downloads/GeoLiteCity.dat'))
+        except IOError:
+            return False, '' # maybe log this?
     
     all_data_about_this_ip = geoip_database.record_by_addr(ip_as_string)
 
