@@ -12,7 +12,7 @@ function initialize() {
     var thing_to_call_once_geocode_happens = function(results, status) {
 	if (status == google.maps.GeocoderStatus.OK) {
 	    var myOptions = {
-		'zoom': 5,
+		'zoom': 6,
 		'center': results[0].geometry.location,
 		'mapTypeId': google.maps.MapTypeId.ROADMAP
 	    };
@@ -23,6 +23,7 @@ function initialize() {
 						    'title': 'You',
 						    'position': results[0].geometry.location
 						});
+	    $('#geocode_description').css('visibility', 'visible');
 	}
 	else {
 	    $('#map_canvas').text("Could not find coordinates for that location. Try being more specific.");

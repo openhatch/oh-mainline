@@ -25,8 +25,11 @@ Location
 {{ edit_location_form.as_p }}
 
 {% if the_user.get_profile.location_display_name %}
-<div id="map_canvas" style="float: left; position: relative; left: 30%; width: 311px; height: 250px;">Loading map&hellip;</div>
-
+<div style="position: relative; left: -16px;">
+  <label style="visibility: hidden;" id="geocode_description">You on a map! <br /><br />(If we got it wrong, try being more specific.)
+</label>
+<div id="map_canvas" style="float: left; width: 311px; height: 250px;">Loading map&hellip;</div>
+</div>
 {% endif %}
 
 {% endblock submodule_body %}
