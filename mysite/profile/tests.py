@@ -1263,6 +1263,15 @@ class ProjectGetMentors(TwillTests):
                                                                'Banshee')
         self.assertEqual(list(banshee_mentors), [Person.objects.get(user__username='paulproteus')])
 
+class SuggestLocation(TwillTests):
+    fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
+
+    def test(self):
+        data = {}
+        data['geoip_has_suggestion'], data['geoip_guess'] = mysite.profile.controllers.get_geoip_guess_for_ip("128.151.2.1")
+        self.assertEqual(data['geoip_has_suggestion'], True)
+        self.assertEqual(data['geoip_guess'], "Rochester, NY, United States")
+
 class EditLocation(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
 
