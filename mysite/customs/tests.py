@@ -32,6 +32,7 @@ import lp_grabber
 
 from mysite.profile.tasks import FetchPersonDataFromOhloh
 import mysite.customs.miro
+import mysite.customs.cia
 import mysite.customs.feed
 
 import mysite.customs.models
@@ -481,4 +482,17 @@ class LaunchpadImportByEmail(django.test.TestCase):
         u = mysite.customs.lp_grabber.get_launchpad_username_by_email('asheesh@asheesh.org')
         self.assertEqual(u, "paulproteus")
 
+class ParseCiaMessage(django.test.TestCase):
+    def test(self):
+        message = '''GRASS: martinl * r40307 /grass/branches/develbranch_6/gui/wxpython/gui_modules/menuform.py:
+GRASS: wxGUI: command console is optional
+GRASS:  (merge r40306 from trunk)'''
+        parsed = {'project': 'GRASS',
+                  'identifier': 'martinl',
+                  'revision': 'r40307',
+                  'path': '/grass/branches/develbranch_6/gui/wxpython/gui_modules/menuform.py',
+                  'message': ('wxGUI: command console is optional\n' +
+                              ' (merge r40306 from trunk)')}
+        self.assertEqual(mysite.customs.cia.parse_cia_message(message),
+                         parsed)
 # vim: set nu:
