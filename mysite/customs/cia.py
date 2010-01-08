@@ -40,12 +40,32 @@ def parse_cia_tokens(tokens):
     # Remove final colon from project name
     assert parsed['project'].endswith(':')
     parsed['project'] = parsed['project'][:-1]
-    
+
     message_lines = []
-    if len(rest) > 1:
+    message_lines.append(rest.pop().lstrip())
+
+    # Now look for metadata
+    if rest:
         # then verify that the second to last token is a colon
         # that's what always happens for first lines.
-        assert rest[-2] == ':'
+        assert rest[-1] == ':'
+
+        # Pop off the colon
+        colon = rest.pop()
+        assert colon == ':'
+
+        # then steal the path off the end
+        parsed['path'] = rest.pop()
+        assert parsed['path'].startswith('/')
+
+        #parsed['path'] = parsed['path'][1:] # everything after that slash
+
+        # Subproject reliably at the end
+        space_or_subproject = rest.pop()
+        if space_or_subproject != ' ':
+            parsed['subproject'] = space_or_subproject.lstrip()
+
+        # Username reliably at the start
         parsed['identifier'] = rest.pop(0).lstrip()
 
         # revision_junk always has a '*" in it.
@@ -73,18 +93,6 @@ def parse_cia_tokens(tokens):
             else:
                 rest.insert(0, revision_subparts[1])
             
-        space_or_subproject = rest.pop(0)
-        if space_or_subproject != ' ':
-            parsed['subproject'] = space_or_subproject.lstrip()
-            
-        parsed['path'] = rest.pop(0)
-        colon = rest.pop(0)
-        assert colon == ':'
-        message = rest.pop(0)
-        message_lines.append(message.lstrip())
-    else:
-        message_lines.append(rest[0].lstrip())
-        
     parsed['message'] = '\n'.join(message_lines)
     return parsed
 

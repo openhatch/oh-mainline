@@ -531,6 +531,18 @@ class ParseCiaMessage(django.test.TestCase):
         self.assertEqual(mysite.customs.cia.parse_cia_tokens(tokens),
                          expected)
 
+    def test_find_subproject_in_moin(self):
+        tokens = ['moin:', ' Thomas Waldmann <tw AT waldmann-edv DOT de>', ' default', ' * ', '5405:a1a1ce8894cb', ' 1.9', '/MoinMoin/util/SubProcess.py', ':', ' merged moin/1.8']
+        expected = {'project': 'moin',
+                    'identifier': 'Thomas Waldmann <tw AT waldmann-edv DOT de>',
+                    'branch': 'default',
+                    'revision': '5405:a1a1ce8894cb',
+                    'subproject': '1.9',
+                    'path': '/MoinMoin/util/SubProcess.py',
+                    'message':  'merged moin/1.8'}
+        self.assertEqual(mysite.customs.cia.parse_cia_tokens(tokens),
+                         expected)
+
 class LineAcceptorTest(django.test.TestCase):
     def test(self):
 
