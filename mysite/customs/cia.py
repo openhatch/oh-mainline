@@ -154,7 +154,7 @@ class CiaIrcWatcher(SingleServerIRCBot):
 def callback_that_adds_a_row(data_dict):
     obj = mysite.customs.models.RecentMessageFromCIA(**data_dict)
     obj.save()
-    print data_dict
+    print obj.pk, data_dict
 
 def main():
     import sys
