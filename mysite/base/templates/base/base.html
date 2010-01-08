@@ -60,11 +60,11 @@
                             </ul>
                         {% if not the_user.get_profile.location_confirmed and the_user.get_profile.location_display_name and not the_user.get_profile.dont_guess_my_location and not dont_suggest_location %}
                         <div id="location-suggestion-notification">
-                            You appear to be in {{ the_user.get_profile.location_display_name }}.  Is this correct?
+                            Hi! We'd like to add you to a global map of FLOSS contributors. You seem to be in <strong>{{ the_user.get_profile.location_display_name }}</strong>.  Is this correct?
                         <ul>
-                            <li><a id="location_confirm_suggestion" href="#">Yes!</a></li>
-                            <li><a href="{% url mysite.account.views.set_location %}?dont_suggest_location=1">No, but let me tell you where I am</a></li>
-                            <li><a id="location_dont_track" href="#">Maybe. Don't keep track of where I am.<a href=""></li>
+                            <li><button id="location_confirm_suggestion">Yes!</button></li>
+                            <li><button onclick="window.location.href='{% url mysite.account.views.set_location %}?dont_suggest_location=1'">No, but let me tell you where I am.</button></li>
+                            <li><button id="location_dont_track">Maybe. Don't keep track of where I am.</button></li>
                         </ul>
                         </div>
                         {% endif %}
