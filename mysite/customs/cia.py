@@ -1,11 +1,73 @@
 from ircbot import SingleServerIRCBot
+import re
+
+def ansi2tokens(line):
+    tokens = []
+    current_token_chars = []
+
+    def end_token():
+        if tokens or current_token_chars:
+            tokens.append(''.join(current_token_chars))
+        current_token_chars[:] = []
+
+    i = 0
+    while i < len(line):
+        byte = line[i]
+        if byte == '\x02': # change color with no args
+            end_token()
+        elif byte == '\x03': # change color with 2 byte args
+            i += 2 # skip those two bytes
+        elif byte == '\x0f':
+            end_token()
+        else:
+            current_token_chars.append(line[i])
+            
+        i += 1
+    end_token()
+    
+    return tokens
+
+def parse_ansi_cia_message(line):
+    tokens = ansi2tokens(line)
+    return parse_cia_tokens(tokens)
+
+def parse_cia_tokens(tokens):
+    parsed = {}
+    parsed['project'], rest = tokens[0], tokens[1:]
+
+    # Remove final colon from project name
+    assert parsed['project'].endswith(':')
+    parsed['project'] = parsed['project'][:-1]
+    
+    message_lines = []
+    if len(rest) > 1:
+        # then verify that the second to last token is a colon
+        # that's what always happens for first lines.
+        assert rest[-2] == ':'
+        parsed['identifier'] = rest.pop(0).lstrip()
+        revision_junk = rest.pop(0)
+        parsed['revision'] = rest.pop(0)
+        if revision_junk == ' * r':
+            parsed['revision'] = 'r' + parsed['revision']
+        space = rest.pop(0)
+        assert space == ' '
+        parsed['path'] = rest.pop(0)
+        colon = rest.pop(0)
+        assert colon == ':'
+        message = rest.pop(0)
+        message_lines.append(message.lstrip())
+
+    parsed['message'] = '\n'.join(message_lines)
+    return parsed
 
 def parse_cia_message(msg):
     ret = {}
 
     message_lines = []
+
     
     for line in msg.split('\n'):
+        tokens = re.split(r'[\x02](.*?)[\x0f]', line)
         project, rest = line.split(':', 1)
         
         # Initialize project in ret if it's not there
@@ -43,7 +105,7 @@ class LineAcceptingAgent(object):
     def __init__(self):
         self.unhandled_messages = []
     def handle_message(self, message):
-        print message
+        print repr(message)
 
 class CiaIrcWatcher(SingleServerIRCBot):
     def __init__(self):
@@ -62,7 +124,7 @@ class CiaIrcWatcher(SingleServerIRCBot):
         text = e.arguments()[0]
         source_nick = e._source
         if source_nick.startswith('CIA-'):
-            lia.handle_message(text)
+            self.lia.handle_message(text)
 
 def main():
     import sys

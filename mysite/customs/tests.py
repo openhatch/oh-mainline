@@ -495,4 +495,18 @@ GRASS:  (merge r40306 from trunk)'''
                               ' (merge r40306 from trunk)')}
         self.assertEqual(mysite.customs.cia.parse_cia_message(message),
                          parsed)
+
+    def test_with_ansi_codes(self):
+        message = '\x02XBMC:\x0f \x0303jmarshallnz\x0f * r\x0226531\x0f \x0310\x0f/trunk/guilib/ (GUIWindow.h GUIWindow.cpp)\x02:\x0f cleanup: eliminate some duplicate code.'
+        parsed = {'project': 'XBMC',
+                  'identifier': 'jmarshallnz',
+                  'revision': 'r26531',
+                  'path': '/trunk/guilib/ (GUIWindow.h GUIWindow.cpp)',
+                  'message': 'cleanup: eliminate some duplicate code.'}
+        self.assertEqual(mysite.customs.cia.parse_ansi_cia_message(message),
+                         parsed)
+
+class LineAcceptorTest(django.test.TestCase):
+    def test(self):
+        pass # Goal: Pass in on
 # vim: set nu:
