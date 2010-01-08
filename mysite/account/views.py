@@ -218,10 +218,13 @@ def set_location(request, edit_location_form = None):
 
 @login_required
 def set_location_do(request):
+    user_profile = request.user.get_profile()
     edit_location_form = mysite.account.forms.EditLocationForm(
         request.POST,
-        instance=request.user.get_profile(), prefix='edit_location')
+        instance=user_profile, prefix='edit_location')
     if edit_location_form.is_valid():
+        user_profile.location_confirmed = True
+        user_profile.save()
         edit_location_form.save()
         return HttpResponseRedirect(reverse(set_location) +
                                     '?notification_id=success')
