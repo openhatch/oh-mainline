@@ -240,7 +240,7 @@ class GuessLocationOnLogin(TwillTests):
         self.assertFalse(person.location_display_name)
         
         self.login_with_client().get('/people')
-        self.asserEqual(person.location_display_name, "Rochest, New York, United States")
+        self.assertEqual(person.location_display_name, "Rochest, New York, United States")
 
 
         
