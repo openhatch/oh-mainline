@@ -58,14 +58,16 @@
                                 <li><a href='{% url mysite.profile.views.display_person_web the_user.username %}'><strong>{{ the_user.username }}'s profile</strong></a></li>
                                 {% endif %}
                             </ul>
+                        {% if not the_user.get_profile.location_confirmed and the_user.get_profile.location_display_name %}
                         <div id="location-suggestion-notification">
-                        You appear to be in Location.  Is this correct?
+                            You appear to be in {{ the_user.get_profile.location_display_name }}.  Is this correct?
                         <ul>
-                            <li><a href="">Yes!</a>
-                            <li><a href="">No, but let me tell you where I am</a>
-                            <li><a href="">Maybe. Don't keep track of where I am.<a href="">
+                            <li><a href="">Yes!</a></li>
+                            <li><a href="">No, but let me tell you where I am</a></li>
+                            <li><a href="">Maybe. Don't keep track of where I am.<a href=""></li>
                         </ul>
                         </div>
+                        {% endif %}
                         </div>
                         {% if notification_id %}
                         <!-- notification_id: {{ notification_id }} -->
