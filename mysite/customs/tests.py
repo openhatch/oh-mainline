@@ -580,8 +580,6 @@ class LineAcceptorTest(django.test.TestCase):
         lia.handle_message(lines[3])
         wanted = {'project_name': 'FreeBSD', 'path': '/head/sys/ (4 files in 4 dirs)', 'message': "Replace several instances of 'if (!a & b)' with 'if (!(a &b))' in order\nto silence newer GCC versions.", 'committer_identifier': 'trasz', 'version': 'r201794'}
         got = got_response[0]
-        import pdb
-        pdb.set_trace()
         self.assertEqual(got, wanted)
         got_response[:] = []
 
