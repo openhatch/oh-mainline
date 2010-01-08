@@ -152,9 +152,13 @@ class CiaIrcWatcher(SingleServerIRCBot):
         if source_nick.startswith('CIA-'):
             self.lia.handle_message(text)
 
+def callback_that_adds_a_row(data_dict):
+    obj = mysite.customs.models.RecentMessageFromCIA(**data_dict)
+    obj.save()
+
 def main():
     import sys
     def callback(obj):
         print obj
-    bot = CiaIrcWatcher(callback)
+    bot = CiaIrcWatcher(callback_that_adds_a_row)
     bot.start()
