@@ -231,4 +231,19 @@ class EditPhotoWithOldPerson(TwillTests):
                     open(image).read())
     #}}}
 
+class GuessLocationOnLogin(TwillTests):
+    #{{{
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+    def test_guess_location_on_login(self):
+        person = Person.objects.get(user__username="paulproteus")
+        self.assertFalse(person.location_confirmed)
+        self.assertFalse(person.location_display_name)
+        
+        self.login_with_client().get('/people')
+        self.asserEqual(person.location_display_name, "Rochest, New York, United States")
+
+
+        
+    #}}}
+
 # vim: set nu:

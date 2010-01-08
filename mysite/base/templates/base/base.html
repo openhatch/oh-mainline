@@ -58,8 +58,15 @@
                                 <li><a href='{% url mysite.profile.views.display_person_web the_user.username %}'><strong>{{ the_user.username }}'s profile</strong></a></li>
                                 {% endif %}
                             </ul>
+                        <div id="location-suggestion-notification">
+                        You appear to be in Location.  Is this correct?
+                        <ul>
+                            <li><a href="">Yes!</a>
+                            <li><a href="">No, but let me tell you where I am</a>
+                            <li><a href="">Maybe. Don't keep track of where I am.<a href="">
+                        </ul>
                         </div>
-
+                        </div>
                         {% if notification_id %}
                         <!-- notification_id: {{ notification_id }} -->
                         {% endif %}
@@ -70,9 +77,8 @@
                                     {{ notification }}
                                 </div>
                             </div>
-                        </div>
                         {% endif %}
-
+                        </div>
                     </div>
                 </div>
 
@@ -92,6 +98,9 @@
                     {% endblock %}
                 </ul>
                 {% endif %}
+
+
+                
                 <div id='page-top'>
 
                     {% block greeting %}

@@ -153,9 +153,34 @@ h1 {
     color: #222;
 }
 
+#location-suggestion-notification {
+    margin-right: 272px;
+    width: 400px;
+    font-size: 1.2em; 
+    text-align: center;
+    float: right;
+    background-color: #FFFFAA;
+    padding: 8px;
+    
+
+} 
+#location-suggestion-notification ul {
+    margin-top: 3px;
+    float: none;
+    font-size: .8em;
+}
+
+#location-suggestion-notification li {
+    display: block;
+    float: none;
+    margin-top: 0px;
+    text-align: left;
+}
+
 #page-top {
     width: 960px;
     padding: 0 20px;
+    clear: both;
 }
 
 ul#links {
