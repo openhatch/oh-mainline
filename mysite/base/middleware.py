@@ -1,7 +1,11 @@
 import mysite.profile.controllers
 
 def get_user_ip(request):
-    return request.META['REMOTE_ADDR']
+#    return request.META['REMOTE_ADDR']
+    if request.META['REMOTE_ADDR'] == '127.0.0.1':
+        return "98.140.110.121"
+    else:
+        return request.META['REMOTE_ADDR'] 
 
 class LocationMiddleware(object):
     # called every time a page is queried
