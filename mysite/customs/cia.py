@@ -68,25 +68,36 @@ def parse_cia_tokens(tokens):
 
         # The subproject is reliably at the end.
         space_or_subproject = rest.pop()
-        if '*' in space_or_subproject:
-            _, space_or_subproject = space_or_subproject.split(' ', 1)
-            rest.insert(0, _)
+        assert space_or_subproject.startswith(' ')
+        subproject = space_or_subproject[1:]
+        if subproject:
+            parsed['subproject'] = subproject
 
         # The branch is reliably after the identifier, if it's there
         if rest[0] != '*' and rest[0].strip():
-            parsed['branchname'] = rest.pop(0).strip()
+            parsed['branch'] = rest.pop(0).strip()
+
+        # If the last token has text and begins with ' ', then it's the subproject
+        if rest[-1].startswith(' '):
+            space_or_subproject = rest.pop()
+            subproject = space_or_subproject[1:]
+            if subproject:
+                parsed['subproject'] = subproject
+
+        # eat space tokens
+        while rest[0] == ' ':
+            rest = rest[1:]
 
         # if there is a star token, eat it
         if rest[0] == '*':
             rest.pop(0)
 
-        # If the last token has text and begins with ' ', then it's the subproject
-        if rest[-1].startswith(' ') and rest[-1][1:]:
-            parsed['subproject'] = rest.pop()
+        if '*' in rest:
+            import pdb
+            pdb.set_trace()
 
         if rest: # Rest is revision
-            revision = ' '.join([tok for tok in rest if (tok != '*' and
-                                                         tok.strip())])
+            revision = ''.join([tok for tok in rest if tok.strip()]).lstrip()
             if revision:
                 parsed['revision'] = revision
             

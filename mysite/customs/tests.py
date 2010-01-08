@@ -484,7 +484,7 @@ class LaunchpadImportByEmail(django.test.TestCase):
 
 class ParseCiaMessage(django.test.TestCase):
     def test_with_ansi_codes(self):
-        message = '\x02XBMC:\x0f \x0303jmarshallnz\x0f ', '*', ' r\x0226531\x0f \x0310\x0f/trunk/guilib/ (GUIWindow.h GUIWindow.cpp)\x02:\x0f cleanup: eliminate some duplicate code.'
+        message = '\x02XBMC:\x0f \x0303jmarshallnz\x0f * r\x0226531\x0f \x0310\x0f/trunk/guilib/ (GUIWindow.h GUIWindow.cpp)\x02:\x0f cleanup: eliminate some duplicate code.'
         parsed = {'project': 'XBMC',
                   'identifier': 'jmarshallnz',
                   'revision': 'r26531',
