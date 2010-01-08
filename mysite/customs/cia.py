@@ -20,6 +20,9 @@ def ansi2tokens(line):
             i += 2 # skip those two bytes
         elif byte == '\x0f':
             end_token()
+        elif byte == '*':
+            end_token()
+            tokens.append('*')
         else:
             current_token_chars.append(line[i])
             
@@ -60,38 +63,32 @@ def parse_cia_tokens(tokens):
 
         #parsed['path'] = parsed['path'][1:] # everything after that slash
 
-        # Subproject reliably at the end
-        space_or_subproject = rest.pop()
-        if space_or_subproject != ' ':
-            parsed['subproject'] = space_or_subproject.lstrip()
-
-        # Username reliably at the start
+        # The username is reliably at the start.
         parsed['identifier'] = rest.pop(0).lstrip()
 
-        # revision_junk always has a '*" in it.
-        # if that's not next, accept this as "branchname"
-        # if not, eat the next token as the
+        # The subproject is reliably at the end.
+        space_or_subproject = rest.pop()
+        if '*' in space_or_subproject:
+            _, space_or_subproject = space_or_subproject.split(' ', 1)
+            rest.insert(0, _)
 
-        if '*' not in rest[0]:
-            parsed['branchname'] = rest.pop(0)
-            
-        revision_junk = rest.pop(0)
-        assert '*' in revision_junk
+        # The branch is reliably after the identifier, if it's there
+        if rest[0] != '*' and rest[0].strip():
+            parsed['branchname'] = rest.pop(0).strip()
 
-        # Special case: Mercurial
-        if (revision_junk and re.match(r'[0-9a-f]{12}', rest[0]) and
-            rest[1] == ' r'):
-            parsed['revision'] = rest[0] + rest[1] + rest[2]
-            rest = rest[3:]
-        else: # everyone else
-            revision_subparts = revision_junk.lstrip().split(' ', 1)
-            if len(revision_subparts) > 1:
-                assert revision_subparts[0] == '*'
-            if revision_subparts[1] == 'r':
-                parsed['revision'] = rest.pop(0)
-                parsed['revision'] = 'r' + parsed['revision']
-            else:
-                rest.insert(0, revision_subparts[1])
+        # if there is a star token, eat it
+        if rest[0] == '*':
+            rest.pop(0)
+
+        # If the last token has text and begins with ' ', then it's the subproject
+        if rest[-1].startswith(' ') and rest[-1][1:]:
+            parsed['subproject'] = rest.pop()
+
+        if rest: # Rest is revision
+            revision = ' '.join([tok for tok in rest if (tok != '*' and
+                                                         tok.strip())])
+            if revision:
+                parsed['revision'] = revision
             
     parsed['message'] = '\n'.join(message_lines)
     return parsed

@@ -484,7 +484,7 @@ class LaunchpadImportByEmail(django.test.TestCase):
 
 class ParseCiaMessage(django.test.TestCase):
     def test_with_ansi_codes(self):
-        message = '\x02XBMC:\x0f \x0303jmarshallnz\x0f * r\x0226531\x0f \x0310\x0f/trunk/guilib/ (GUIWindow.h GUIWindow.cpp)\x02:\x0f cleanup: eliminate some duplicate code.'
+        message = '\x02XBMC:\x0f \x0303jmarshallnz\x0f ', '*', ' r\x0226531\x0f \x0310\x0f/trunk/guilib/ (GUIWindow.h GUIWindow.cpp)\x02:\x0f cleanup: eliminate some duplicate code.'
         parsed = {'project': 'XBMC',
                   'identifier': 'jmarshallnz',
                   'revision': 'r26531',
@@ -501,7 +501,7 @@ class ParseCiaMessage(django.test.TestCase):
                          parsed)
 
     def test_find_subproject(self):
-        tokens = ['KDE:', ' crissi', ' * r', '1071733', ' kvpnc', '/trunk/playground/network/kvpnc/ (6 files in 2 dirs)', ':', ' ']
+        tokens = ['KDE:', ' crissi', ' ', '*', ' r', '1071733', ' kvpnc', '/trunk/playground/network/kvpnc/ (6 files in 2 dirs)', ':', ' ']
         expected = {'project': 'KDE',
                     'identifier': 'crissi',
                     'revision': 'r1071733',
@@ -512,7 +512,7 @@ class ParseCiaMessage(django.test.TestCase):
                          expected)
 
     def test_complicated_mercurial_revision(self):
-        tokens = ['Sphinx:', ' birkenfeld', ' * ', '88e880fe9101', ' r', '1756', ' ', '/EXAMPLES', ':', ' Regroup examples list by theme used.']
+        tokens = ['Sphinx:', ' birkenfeld', ' ', '*', ' ', '88e880fe9101', ' r', '1756', ' ', '/EXAMPLES', ':', ' Regroup examples list by theme used.']
         expected = {'project': 'Sphinx',
                     'identifier': 'birkenfeld',
                     'revision': '88e880fe9101 r1756',
@@ -522,7 +522,7 @@ class ParseCiaMessage(django.test.TestCase):
                          expected)
 
     def test_find_subproject_with_no_revision(self):
-        tokens = ['FreeBSD:', ' glarkin', ' * ports', '/lang/gcc42/ (Makefile distinfo files/patch-contrib__download_ecj)', ':', ' (log message trimmed)']
+        tokens = ['FreeBSD:', ' glarkin', ' ', '*', ' ports', '/lang/gcc42/ (Makefile distinfo files/patch-contrib__download_ecj)', ':', ' (log message trimmed)']
         expected = {'project': 'FreeBSD',
                     'identifier': 'glarkin',
                     'path': '/lang/gcc42/ (Makefile distinfo files/patch-contrib__download_ecj)',
@@ -532,7 +532,7 @@ class ParseCiaMessage(django.test.TestCase):
                          expected)
 
     def test_find_subproject_in_moin(self):
-        tokens = ['moin:', ' Thomas Waldmann <tw AT waldmann-edv DOT de>', ' default', ' * ', '5405:a1a1ce8894cb', ' 1.9', '/MoinMoin/util/SubProcess.py', ':', ' merged moin/1.8']
+        tokens = ['moin:', ' Thomas Waldmann <tw AT waldmann-edv DOT de>', ' default', ' ', '*', ' ', '5405:a1a1ce8894cb', ' 1.9', '/MoinMoin/util/SubProcess.py', ':', ' merged moin/1.8']
         expected = {'project': 'moin',
                     'identifier': 'Thomas Waldmann <tw AT waldmann-edv DOT de>',
                     'branch': 'default',
