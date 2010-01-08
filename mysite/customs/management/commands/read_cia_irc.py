@@ -4,4 +4,5 @@ import mysite.customs.cia
 
 class Command(NoArgsCommand):
     def handle(self, **options):
-         mysite.customs.cia.main()
+        print 'Starting bot...'
+        mysite.customs.cia.main()
