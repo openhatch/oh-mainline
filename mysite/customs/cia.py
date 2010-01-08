@@ -1,3 +1,5 @@
+from ircbot import SingleServerIRCBot
+
 def parse_cia_message(msg):
     ret = {}
 
@@ -36,3 +38,33 @@ def parse_cia_message(msg):
 
     ret['message'] = '\n'.join(message_lines)
     return ret
+
+class LineAcceptingAgent(object):
+    def __init__(self):
+        self.unhandled_messages = []
+    def handle_message(self, message):
+        print message
+
+class CiaIrcWatcher(SingleServerIRCBot):
+    def __init__(self):
+        SingleServerIRCBot.__init__(self, [('chat.freenode.net', 6667)],
+                                    'oh_listener', 'oh_listener')
+        self.channel = '#commits'
+        self.lia = LineAcceptingAgent()
+        
+    def on_nicknameinuse(self, c, e):
+        c.nick(c.get_nickname() + '_')
+
+    def on_welcome(self, c, e):
+        c.join(self.channel)
+
+    def on_pubmsg(self, c, e):
+        text = e.arguments()[0]
+        source_nick = e._source
+        if source_nick.startswith('CIA-'):
+            lia.handle_message(text)
+
+def main():
+    import sys
+    bot = CiaIrcWatcher()
+    bot.start()
