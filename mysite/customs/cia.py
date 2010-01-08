@@ -1,6 +1,7 @@
 from ircbot import SingleServerIRCBot
 import re
 import uuid
+import mysite.customs.models
 
 def ansi2tokens(line):
     is_metadata_line = ('\x03' in line)
@@ -45,11 +46,11 @@ def parse_ansi_cia_message(line):
 
 def parse_cia_tokens(tokens):
     parsed = {}
-    parsed['project'], rest = tokens[0], tokens[1:]
+    parsed['project_name'], rest = tokens[0], tokens[1:]
 
     # Remove final colon from project name
-    assert parsed['project'].endswith(':')
-    parsed['project'] = parsed['project'][:-1]
+    assert parsed['project_name'].endswith(':')
+    parsed['project_name'] = parsed['project_name'][:-1]
 
     message_lines = []
     message_lines.append(rest.pop().lstrip())
@@ -71,7 +72,7 @@ def parse_cia_tokens(tokens):
         #parsed['path'] = parsed['path'][1:] # everything after that slash
 
         # The username is reliably at the start.
-        parsed['identifier'] = rest.pop(0).lstrip()
+        parsed['committer_identifier'] = rest.pop(0).lstrip()
 
         # The module is reliably at the end.
         space_or_module = rest.pop()
@@ -80,7 +81,7 @@ def parse_cia_tokens(tokens):
         if module:
             parsed['module'] = module
 
-        # The branch is reliably after the identifier, if it's there
+        # The branch is reliably after the committer_identifier, if it's there
         if rest[0] != '*' and rest[0].strip():
             parsed['branch'] = rest.pop(0).strip()
 
@@ -124,7 +125,7 @@ class LineAcceptingAgent(object):
         
     def handle_message(self, message):
         #return
-        # In the case the project changes, send the object to the callback
+        # In the case the project_name changes, send the object to the callback
         parsed = parse_ansi_cia_message(message)
         if 'path' in parsed:
             self.flush_object()

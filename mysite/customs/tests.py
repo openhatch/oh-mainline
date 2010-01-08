@@ -485,8 +485,8 @@ class LaunchpadImportByEmail(django.test.TestCase):
 class ParseCiaMessage(django.test.TestCase):
     def test_with_ansi_codes(self):
         message = '\x02XBMC:\x0f \x0303jmarshallnz\x0f * r\x0226531\x0f \x0310\x0f/trunk/guilib/ (GUIWindow.h GUIWindow.cpp)\x02:\x0f cleanup: eliminate some duplicate code.'
-        parsed = {'project': 'XBMC',
-                  'identifier': 'jmarshallnz',
+        parsed = {'project_name': 'XBMC',
+                  'committer_identifier': 'jmarshallnz',
                   'revision': 'r26531',
                   'path': '/trunk/guilib/ (GUIWindow.h GUIWindow.cpp)',
                   'message': 'cleanup: eliminate some duplicate code.'}
@@ -495,22 +495,22 @@ class ParseCiaMessage(django.test.TestCase):
 
     def test_parse_a_middle_line(self):
         message = "\x02FreeBSD:\x0f Replace several instances of 'if (!a & b)' with 'if (!(a &b))' in order"
-        parsed = {'project': 'FreeBSD',
+        parsed = {'project_name': 'FreeBSD',
                   'message': "Replace several instances of 'if (!a & b)' with 'if (!(a &b))' in order"}
         self.assertEqual(mysite.customs.cia.parse_ansi_cia_message(message),
                          parsed)
 
     def test_parse_a_middle_line_with_asterisk(self):
         message = "\x02FreeBSD:\x0f * Replace several instances of 'if (!a & b)' with 'if (!(a &b))' in order"
-        parsed = {'project': 'FreeBSD',
+        parsed = {'project_name': 'FreeBSD',
                   'message': "* Replace several instances of 'if (!a & b)' with 'if (!(a &b))' in order"}
         self.assertEqual(mysite.customs.cia.parse_ansi_cia_message(message),
                          parsed)
 
     def test_find_module(self):
         tokens = ['KDE:', ' crissi', ' ', '*', ' r', '1071733', ' kvpnc', '/trunk/playground/network/kvpnc/ (6 files in 2 dirs)', ':', ' ']
-        expected = {'project': 'KDE',
-                    'identifier': 'crissi',
+        expected = {'project_name': 'KDE',
+                    'committer_identifier': 'crissi',
                     'revision': 'r1071733',
                     'path': '/trunk/playground/network/kvpnc/ (6 files in 2 dirs)',
                     'module': 'kvpnc',
@@ -520,8 +520,8 @@ class ParseCiaMessage(django.test.TestCase):
 
     def test_complicated_mercurial_revision(self):
         tokens = ['Sphinx:', ' birkenfeld', ' ', '*', ' ', '88e880fe9101', ' r', '1756', ' ', '/EXAMPLES', ':', ' Regroup examples list by theme used.']
-        expected = {'project': 'Sphinx',
-                    'identifier': 'birkenfeld',
+        expected = {'project_name': 'Sphinx',
+                    'committer_identifier': 'birkenfeld',
                     'revision': '88e880fe9101 r1756',
                     'path': '/EXAMPLES',
                     'message': 'Regroup examples list by theme used.'}
@@ -530,8 +530,8 @@ class ParseCiaMessage(django.test.TestCase):
 
     def test_find_module_with_no_revision(self):
         tokens = ['FreeBSD:', ' glarkin', ' ', '*', ' ports', '/lang/gcc42/ (Makefile distinfo files/patch-contrib__download_ecj)', ':', ' (log message trimmed)']
-        expected = {'project': 'FreeBSD',
-                    'identifier': 'glarkin',
+        expected = {'project_name': 'FreeBSD',
+                    'committer_identifier': 'glarkin',
                     'path': '/lang/gcc42/ (Makefile distinfo files/patch-contrib__download_ecj)',
                     'module': 'ports',
                     'message':  '(log message trimmed)'}
@@ -540,8 +540,8 @@ class ParseCiaMessage(django.test.TestCase):
 
     def test_find_module_in_moin(self):
         tokens = ['moin:', ' Thomas Waldmann <tw AT waldmann-edv DOT de>', ' default', ' ', '*', ' ', '5405:a1a1ce8894cb', ' 1.9', '/MoinMoin/util/SubProcess.py', ':', ' merged moin/1.8']
-        expected = {'project': 'moin',
-                    'identifier': 'Thomas Waldmann <tw AT waldmann-edv DOT de>',
+        expected = {'project_name': 'moin',
+                    'committer_identifier': 'Thomas Waldmann <tw AT waldmann-edv DOT de>',
                     'branch': 'default',
                     'revision': '5405:a1a1ce8894cb',
                     'module': '1.9',
@@ -578,18 +578,18 @@ class LineAcceptorTest(django.test.TestCase):
 
         # but now we expect something!
         lia.handle_message(lines[3])
-        wanted = {'project': 'FreeBSD', 'path': '/head/sys/ (4 files in 4 dirs)', 'message': "Replace several instances of 'if (!a & b)' with 'if (!(a &b))' in order\nto silence newer GCC versions.", 'identifier': 'trasz', 'revision': 'r201794'}
+        wanted = {'project_name': 'FreeBSD', 'path': '/head/sys/ (4 files in 4 dirs)', 'message': "Replace several instances of 'if (!a & b)' with 'if (!(a &b))' in order\nto silence newer GCC versions.", 'committer_identifier': 'trasz', 'revision': 'r201794'}
         got = got_response[0]
         import pdb
         pdb.set_trace()
         self.assertEqual(got, wanted)
         got_response[:] = []
 
-        # FIXME use (project, revision) pair instead I guess
+        # FIXME use (project_name, revision) pair instead I guess
 
         # and again, but differently
         lia.handle_message(lines[4])
-        wanted = {'project': 'KDE', 'path': '/branches/work/doc/kget/', 'message': "kget doc was moved back to trunk", 'identifier': 'lueck', 'revision': 'r1071711'}
+        wanted = {'project_name': 'KDE', 'path': '/branches/work/doc/kget/', 'message': "kget doc was moved back to trunk", 'committer_identifier': 'lueck', 'revision': 'r1071711'}
         self.assertEqual(got_response[0], wanted)
         got_response[:] = []        
         pass # Goal: Pass in on
