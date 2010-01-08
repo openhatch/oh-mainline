@@ -70,7 +70,7 @@
             {% endif %}
 
 	    <div style="clear: left; float: left;">
-	      {% if person.location_display_name %}
+	      {% if person.location_display_name and person.location_confirmed %}
 	      {{ person.location_display_name }}
 	      {% endif %}
               {% if editable %}

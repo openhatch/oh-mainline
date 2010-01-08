@@ -58,13 +58,13 @@
                                 <li><a href='{% url mysite.profile.views.display_person_web the_user.username %}'><strong>{{ the_user.username }}'s profile</strong></a></li>
                                 {% endif %}
                             </ul>
-                        {% if not the_user.get_profile.location_confirmed and the_user.get_profile.location_display_name and not dont_suggest_location %}
+                        {% if not the_user.get_profile.location_confirmed and the_user.get_profile.location_display_name and not the_user.get_profile.dont_guess_my_location and not dont_suggest_location %}
                         <div id="location-suggestion-notification">
                             You appear to be in {{ the_user.get_profile.location_display_name }}.  Is this correct?
                         <ul>
-                            <li><a href="">Yes!</a></li>
+                            <li><a id="location_confirm_suggestion" href="#">Yes!</a></li>
                             <li><a href="{% url mysite.account.views.set_location %}?dont_suggest_location=1">No, but let me tell you where I am</a></li>
-                            <li><a href="">Maybe. Don't keep track of where I am.<a href=""></li>
+                            <li><a id="location_dont_track" href="#">Maybe. Don't keep track of where I am.<a href=""></li>
                         </ul>
                         </div>
                         {% endif %}
@@ -201,6 +201,9 @@
         <script type='text/javascript' src='/static/js/jquery.js'></script>
         <script type='text/javascript' src='/static/js/jquery.query.js'></script>
         {% endblock jquery %}
+        {% if not the_user.get_profile.location_confirmed and the_user.get_profile.location_display_name and not dont_suggest_location %}
+        <script type='text/javascript' src='/static/js/base/locationDialog.js'></script>
+        {% endif %}
 
         <script type='text/javascript' src='/static/js/base.js'></script>
         {% block js %}

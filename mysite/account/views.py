@@ -204,7 +204,7 @@ def set_location(request, edit_location_form = None):
     # Initialize edit location form
     if edit_location_form is None:
         edit_location_form = mysite.account.forms.EditLocationForm(
-                instance=request.user.get_profile(), initial = initial)
+                prefix='edit_location', instance=request.user.get_profile(), initial = initial)
 
     data['edit_location_form'] = edit_location_form
 
@@ -234,14 +234,17 @@ def set_location_do(request):
        
 @login_required
 def confirm_location_suggestion_do(request):
-    request.user.get_profile().location_confirmed = True
-    request.user.get_profile().save()
+    person = request.user.get_profile()
+    person.location_confirmed = True
+    person.save()
     return HttpResponse()
 
 @login_required
 def dont_guess_location_do(request):
-    request.user.get_profile().dont_guess_my_location = True
-    request.user.get_profile().save()
+    person = request.user.get_profile()
+    person.dont_guess_my_location = True
+    person.location_display_name = ''
+    person.save()
     return HttpResponse()
 
 @login_required

@@ -20,7 +20,7 @@ Location
 <p>To appear on <a href="{%url mysite.profile.views.display_list_of_people %}">the global map</a>,
   set a location.</p>
 {% endif %}
-{% if not the_user.get_profile.location_confirmed and the_user.get_profile.location_display_name and not dont_suggest_location %}
+{% if not the_user.get_profile.location_confirmed and the_user.get_profile.location_display_name and not the_user.get_profile.dont_guess_my_location  and not dont_suggest_location %}
 <p>
   <label></label>
   <span class="notification" style="width: 311px; margin-bottom: 0;">We've tried to guess your location.</span>
