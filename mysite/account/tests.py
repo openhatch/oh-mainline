@@ -2,6 +2,7 @@
 import os
 import Image
 import urllib
+import mock
 
 from mysite.profile.models import Person
 from mysite.base.tests import make_twill_url, TwillTests
@@ -234,13 +235,18 @@ class EditPhotoWithOldPerson(TwillTests):
 class GuessLocationOnLogin(TwillTests):
     #{{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
+    mock_ip = mock.Mock()
+    mock_ip.return_value = "128.151.2.1"
+    @mock.patch("mysite.base.middleware.get_user_ip", mock_ip)
     def test_guess_location_on_login(self):
         person = Person.objects.get(user__username="paulproteus")
         self.assertFalse(person.location_confirmed)
         self.assertFalse(person.location_display_name)
         
-        self.login_with_client().get('/people')
-        self.assertEqual(person.location_display_name, "Rochest, New York, United States")
+        response = self.login_with_client().get(reverse(mysite.profile.views.display_list_of_people))
+        self.assertContains(response, "OpenHatch")
+        person = Person.objects.get(user__username="paulproteus")
+        self.assertEqual(person.location_display_name, "Rochester, NY, United States")
 
 
         
