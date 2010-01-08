@@ -152,6 +152,8 @@ class CiaIrcWatcher(SingleServerIRCBot):
             self.lia.handle_message(text)
 
 def callback_that_adds_a_row(data_dict):
+    # intentionally throw away data when it's too long
+    data_dict['message'] = data_dict['message'][:256]
     obj = mysite.customs.models.RecentMessageFromCIA(**data_dict)
     obj.save()
     print obj.pk, data_dict
