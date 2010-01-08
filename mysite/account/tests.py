@@ -257,8 +257,33 @@ class GuessLocationOnLogin(TwillTests):
         # sending http request to correct page for "yes" response
         response = client.post(reverse(mysite.account.views.confirm_location_suggestion_do))
         #asserting that we get back an http status code of 200
+        person = Person.objects.get(user__username="paulproteus")
         self.assertEqual(response.status_code, 200)
+        #asserting that database was updated
         self.assertTrue(person.location_confirmed)
+
+    def test_dont_guess_response(self):
+        person = Person.objects.get(user__username="paulproteus")
+        #logging in
+        client = self.login_with_client()
+        # sending http request to correct page for "don't guess" response
+        response = client.post(reverse(mysite.account.views.dont_guess_location_do))
+        #asserting that we get back an http status code of 200
+        person = Person.objects.get(user__username="paulproteus")
+        self.assertEqual(response.status_code, 200)
+        #asserting that database was updated
+        self.assertTrue(person.dont_guess_my_location)
+
+    @mock.patch("mysite.base.middleware.get_user_ip", mock_ip)
+    def test_no_response(self):
+        person = Person.objects.get(user__username="paulproteus")
+        #logging in
+        client = self.login_with_client()
+        # sending http request to correct page for "no" response
+        response = client.get(reverse(mysite.account.views.set_location), {'dont_suggest_location': 1})
+        person = Person.objects.get(user__username="paulproteus")
+        self.assert_(person.location_display_name)
+        self.assertNotContains(response, person.location_display_name)
 
         
         
