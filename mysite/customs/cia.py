@@ -58,14 +58,20 @@ def parse_cia_tokens(tokens):
         revision_junk = rest.pop(0)
         assert '*' in revision_junk
 
-        revision_subparts = revision_junk.lstrip().split(' ', 1)
-        if len(revision_subparts) > 1:
-            assert revision_subparts[0] == '*'
-        if revision_subparts[1] == 'r':
-            parsed['revision'] = rest.pop(0)
-            parsed['revision'] = 'r' + parsed['revision']
-        else:
-            rest.insert(0, revision_subparts[1])
+        # Special case: Mercurial
+        if (revision_junk and re.match(r'[0-9a-f]{12}', rest[0]) and
+            rest[1] == ' r'):
+            parsed['revision'] = rest[0] + rest[1] + rest[2]
+            rest = rest[3:]
+        else: # everyone else
+            revision_subparts = revision_junk.lstrip().split(' ', 1)
+            if len(revision_subparts) > 1:
+                assert revision_subparts[0] == '*'
+            if revision_subparts[1] == 'r':
+                parsed['revision'] = rest.pop(0)
+                parsed['revision'] = 'r' + parsed['revision']
+            else:
+                rest.insert(0, revision_subparts[1])
             
         space_or_subproject = rest.pop(0)
         if space_or_subproject != ' ':

@@ -511,6 +511,16 @@ class ParseCiaMessage(django.test.TestCase):
         self.assertEqual(mysite.customs.cia.parse_cia_tokens(tokens),
                          expected)
 
+    def test_complicated_mercurial_revision(self):
+        tokens = ['Sphinx:', ' birkenfeld', ' * ', '88e880fe9101', ' r', '1756', ' ', '/EXAMPLES', ':', ' Regroup examples list by theme used.']
+        expected = {'project': 'Sphinx',
+                    'identifier': 'birkenfeld',
+                    'revision': '88e880fe9101 r1756',
+                    'path': '/EXAMPLES',
+                    'message': 'Regroup examples list by theme used.'}
+        self.assertEqual(mysite.customs.cia.parse_cia_tokens(tokens),
+                         expected)
+
     def test_find_subproject_with_no_revision(self):
         tokens = ['FreeBSD:', ' glarkin', ' * ports', '/lang/gcc42/ (Makefile distinfo files/patch-contrib__download_ecj)', ':', ' (log message trimmed)']
         expected = {'project': 'FreeBSD',
