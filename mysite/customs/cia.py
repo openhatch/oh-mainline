@@ -3,7 +3,7 @@ import re
 import uuid
 
 def ansi2tokens(line):
-    is_metadata_line = ('\x02' in line or '\x03' in line)
+    is_metadata_line = ('\x03' in line)
     have_tokenized_one_star = False
     
     tokens = []

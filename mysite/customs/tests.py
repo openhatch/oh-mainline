@@ -500,6 +500,13 @@ class ParseCiaMessage(django.test.TestCase):
         self.assertEqual(mysite.customs.cia.parse_ansi_cia_message(message),
                          parsed)
 
+    def test_parse_a_middle_line_with_asterisk(self):
+        message = "\x02FreeBSD:\x0f * Replace several instances of 'if (!a & b)' with 'if (!(a &b))' in order"
+        parsed = {'project': 'FreeBSD',
+                  'message': "* Replace several instances of 'if (!a & b)' with 'if (!(a &b))' in order"}
+        self.assertEqual(mysite.customs.cia.parse_ansi_cia_message(message),
+                         parsed)
+
     def test_find_subproject(self):
         tokens = ['KDE:', ' crissi', ' ', '*', ' r', '1071733', ' kvpnc', '/trunk/playground/network/kvpnc/ (6 files in 2 dirs)', ':', ' ']
         expected = {'project': 'KDE',
