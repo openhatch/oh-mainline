@@ -41,7 +41,6 @@ def ansi2tokens(line):
 
 def parse_ansi_cia_message(line):
     tokens = ansi2tokens(line)
-    print tokens
     return parse_cia_tokens(tokens)
 
 def parse_cia_tokens(tokens):
@@ -155,10 +154,9 @@ class CiaIrcWatcher(SingleServerIRCBot):
 def callback_that_adds_a_row(data_dict):
     obj = mysite.customs.models.RecentMessageFromCIA(**data_dict)
     obj.save()
+    print data_dict
 
 def main():
     import sys
-    def callback(obj):
-        print obj
     bot = CiaIrcWatcher(callback_that_adds_a_row)
     bot.start()
