@@ -251,12 +251,14 @@ class GuessLocationOnLogin(TwillTests):
         self.assertContains(response, person.location_display_name)
 
     def test_yes_response(self):
+        person = Person.objects.get(user__username="paulproteus")
         #logging in
         client = self.login_with_client()
         # sending http request to correct page for "yes" response
         response = client.post(reverse(mysite.account.views.confirm_location_suggestion_do))
         #asserting that we get back an http status code of 200
         self.assertEqual(response.status_code, 200)
+        self.assertTrue(person.location_confirmed)
 
         
         
