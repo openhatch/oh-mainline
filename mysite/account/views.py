@@ -195,21 +195,18 @@ def change_password(request, change_password_form = None):
 def set_location(request, edit_location_form = None):
     # {{{
     data = {}
-    data['geoip_has_suggestion'], data['geoip_guess'] = mysite.profile.controllers.get_geoip_guess_for_ip(request.META['REMOTE_ADDR'])
+    initial = {}
+
+    if request.GET.get('dont_suggest_location', None) == '1':
+        data['dont_suggest_location'] = True
+        initial['location_display_name'] = ''
 
     # Initialize edit location form
     if edit_location_form is None:
-        initial = {}
-        # unless the person has no value, in which case...
-        if not request.user.get_profile().location_display_name:
-            initial = {'location_display_name': data['geoip_guess']}
-
         edit_location_form = mysite.account.forms.EditLocationForm(
-            instance=request.user.get_profile(), prefix='edit_location',
-            initial=initial)
+                instance=request.user.get_profile(), initial = initial)
 
     data['edit_location_form'] = edit_location_form
-
 
     if request.GET.get('notification_id', None) == 'success':
         data['account_notification'] = 'Saved.'
