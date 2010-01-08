@@ -104,10 +104,10 @@ def parse_cia_tokens(tokens):
             import pdb
             pdb.set_trace()
 
-        if rest: # Rest is revision
-            revision = ''.join([tok for tok in rest if tok.strip()]).lstrip()
-            if revision:
-                parsed['revision'] = revision
+        if rest: # Rest is version
+            version = ''.join([tok for tok in rest if tok.strip()]).lstrip()
+            if version:
+                parsed['version'] = version
             
     parsed['message'] = '\n'.join(message_lines)
     return parsed

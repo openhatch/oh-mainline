@@ -487,7 +487,7 @@ class ParseCiaMessage(django.test.TestCase):
         message = '\x02XBMC:\x0f \x0303jmarshallnz\x0f * r\x0226531\x0f \x0310\x0f/trunk/guilib/ (GUIWindow.h GUIWindow.cpp)\x02:\x0f cleanup: eliminate some duplicate code.'
         parsed = {'project_name': 'XBMC',
                   'committer_identifier': 'jmarshallnz',
-                  'revision': 'r26531',
+                  'version': 'r26531',
                   'path': '/trunk/guilib/ (GUIWindow.h GUIWindow.cpp)',
                   'message': 'cleanup: eliminate some duplicate code.'}
         self.assertEqual(mysite.customs.cia.parse_ansi_cia_message(message),
@@ -511,24 +511,24 @@ class ParseCiaMessage(django.test.TestCase):
         tokens = ['KDE:', ' crissi', ' ', '*', ' r', '1071733', ' kvpnc', '/trunk/playground/network/kvpnc/ (6 files in 2 dirs)', ':', ' ']
         expected = {'project_name': 'KDE',
                     'committer_identifier': 'crissi',
-                    'revision': 'r1071733',
+                    'version': 'r1071733',
                     'path': '/trunk/playground/network/kvpnc/ (6 files in 2 dirs)',
                     'module': 'kvpnc',
                     'message': ''}
         self.assertEqual(mysite.customs.cia.parse_cia_tokens(tokens),
                          expected)
 
-    def test_complicated_mercurial_revision(self):
+    def test_complicated_mercurial_version(self):
         tokens = ['Sphinx:', ' birkenfeld', ' ', '*', ' ', '88e880fe9101', ' r', '1756', ' ', '/EXAMPLES', ':', ' Regroup examples list by theme used.']
         expected = {'project_name': 'Sphinx',
                     'committer_identifier': 'birkenfeld',
-                    'revision': '88e880fe9101 r1756',
+                    'version': '88e880fe9101 r1756',
                     'path': '/EXAMPLES',
                     'message': 'Regroup examples list by theme used.'}
         self.assertEqual(mysite.customs.cia.parse_cia_tokens(tokens),
                          expected)
 
-    def test_find_module_with_no_revision(self):
+    def test_find_module_with_no_version(self):
         tokens = ['FreeBSD:', ' glarkin', ' ', '*', ' ports', '/lang/gcc42/ (Makefile distinfo files/patch-contrib__download_ecj)', ':', ' (log message trimmed)']
         expected = {'project_name': 'FreeBSD',
                     'committer_identifier': 'glarkin',
@@ -543,7 +543,7 @@ class ParseCiaMessage(django.test.TestCase):
         expected = {'project_name': 'moin',
                     'committer_identifier': 'Thomas Waldmann <tw AT waldmann-edv DOT de>',
                     'branch': 'default',
-                    'revision': '5405:a1a1ce8894cb',
+                    'version': '5405:a1a1ce8894cb',
                     'module': '1.9',
                     'path': '/MoinMoin/util/SubProcess.py',
                     'message':  'merged moin/1.8'}
@@ -578,18 +578,18 @@ class LineAcceptorTest(django.test.TestCase):
 
         # but now we expect something!
         lia.handle_message(lines[3])
-        wanted = {'project_name': 'FreeBSD', 'path': '/head/sys/ (4 files in 4 dirs)', 'message': "Replace several instances of 'if (!a & b)' with 'if (!(a &b))' in order\nto silence newer GCC versions.", 'committer_identifier': 'trasz', 'revision': 'r201794'}
+        wanted = {'project_name': 'FreeBSD', 'path': '/head/sys/ (4 files in 4 dirs)', 'message': "Replace several instances of 'if (!a & b)' with 'if (!(a &b))' in order\nto silence newer GCC versions.", 'committer_identifier': 'trasz', 'version': 'r201794'}
         got = got_response[0]
         import pdb
         pdb.set_trace()
         self.assertEqual(got, wanted)
         got_response[:] = []
 
-        # FIXME use (project_name, revision) pair instead I guess
+        # FIXME use (project_name, version) pair instead I guess
 
         # and again, but differently
         lia.handle_message(lines[4])
-        wanted = {'project_name': 'KDE', 'path': '/branches/work/doc/kget/', 'message': "kget doc was moved back to trunk", 'committer_identifier': 'lueck', 'revision': 'r1071711'}
+        wanted = {'project_name': 'KDE', 'path': '/branches/work/doc/kget/', 'message': "kget doc was moved back to trunk", 'committer_identifier': 'lueck', 'version': 'r1071711'}
         self.assertEqual(got_response[0], wanted)
         got_response[:] = []        
         pass # Goal: Pass in on
