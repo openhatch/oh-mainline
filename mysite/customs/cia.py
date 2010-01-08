@@ -1,5 +1,6 @@
 from ircbot import SingleServerIRCBot
 import re
+import uuid
 
 def ansi2tokens(line):
     tokens = []
@@ -56,10 +57,16 @@ def parse_cia_tokens(tokens):
             
         revision_junk = rest.pop(0)
         assert '*' in revision_junk
-        
-        parsed['revision'] = rest.pop(0)
-        if revision_junk == ' * r':
+
+        revision_subparts = revision_junk.lstrip().split(' ', 1)
+        if len(revision_subparts) > 1:
+            assert revision_subparts[0] == '*'
+        if revision_subparts[1] == 'r':
+            parsed['revision'] = rest.pop(0)
             parsed['revision'] = 'r' + parsed['revision']
+        else:
+            rest.insert(0, revision_subparts[1])
+            
         space_or_subproject = rest.pop(0)
         if space_or_subproject != ' ':
             parsed['subproject'] = space_or_subproject.lstrip()
@@ -90,11 +97,11 @@ class LineAcceptingAgent(object):
         #return
         # In the case the project changes, send the object to the callback
         parsed = parse_ansi_cia_message(message)
-        if parsed['project'] == self.dict_so_far.get('project', None):
-            self.dict_so_far['message'] += '\n' + parsed['message']
-        else:
+        if 'path' in parsed:
             self.flush_object()
             self.dict_so_far = parsed
+        else:
+            self.dict_so_far['message'] += '\n' + parsed['message']
 
 class CiaIrcWatcher(SingleServerIRCBot):
     def __init__(self, callback):
@@ -117,7 +124,7 @@ class CiaIrcWatcher(SingleServerIRCBot):
 
 def main():
     import sys
-    def callback(s):
-        pass
+    def callback(obj):
+        print obj
     bot = CiaIrcWatcher(callback)
     bot.start()

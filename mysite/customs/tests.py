@@ -511,6 +511,15 @@ class ParseCiaMessage(django.test.TestCase):
         self.assertEqual(mysite.customs.cia.parse_cia_tokens(tokens),
                          expected)
 
+    def test_find_subproject_with_no_revision(self):
+        tokens = ['FreeBSD:', ' glarkin', ' * ports', '/lang/gcc42/ (Makefile distinfo files/patch-contrib__download_ecj)', ':', ' (log message trimmed)']
+        expected = {'project': 'FreeBSD',
+                    'identifier': 'glarkin',
+                    'path': '/lang/gcc42/ (Makefile distinfo files/patch-contrib__download_ecj)',
+                    'subproject': 'ports',
+                    'message':  '(log message trimmed)'}
+        self.assertEqual(mysite.customs.cia.parse_cia_tokens(tokens),
+                         expected)
 
 class LineAcceptorTest(django.test.TestCase):
     def test(self):
