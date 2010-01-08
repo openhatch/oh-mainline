@@ -232,7 +232,17 @@ def set_location_do(request):
         return set_location(request,
                 edit_location_form=edit_location_form)
        
+@login_required
+def confirm_location_suggestion_do(request):
+    request.user.get_profile().location_confirmed = True
+    request.user.get_profile().save()
+    return HttpResponse()
 
+@login_required
+def dont_guess_location_do(request):
+    request.user.get_profile().dont_guess_my_location = True
+    request.user.get_profile().save()
+    return HttpResponse()
 
 @login_required
 def change_password_do(request):
