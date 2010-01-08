@@ -115,11 +115,12 @@ var openid = {
         openid_btns.find('.small').append(this.getBoxHTML(providers_small[id], 'small', '.png'));
       }
     }
-
     $('#openid_form').submit(this.submit);
 
     var self = this;
     $('.openidProvider').bind("click", function(e) {
+      $('#please_click').html('<p><strong>Please wait while your account provider logs you in&hellip;</strong></p>');
+      $('#openid_btns').html('<img style="text-align: center;" src="/static/images/throbber.gif" />');
       self.signin(e.target.id);
       return false;
     });
