@@ -507,13 +507,13 @@ class ParseCiaMessage(django.test.TestCase):
         self.assertEqual(mysite.customs.cia.parse_ansi_cia_message(message),
                          parsed)
 
-    def test_find_subproject(self):
+    def test_find_module(self):
         tokens = ['KDE:', ' crissi', ' ', '*', ' r', '1071733', ' kvpnc', '/trunk/playground/network/kvpnc/ (6 files in 2 dirs)', ':', ' ']
         expected = {'project': 'KDE',
                     'identifier': 'crissi',
                     'revision': 'r1071733',
                     'path': '/trunk/playground/network/kvpnc/ (6 files in 2 dirs)',
-                    'subproject': 'kvpnc',
+                    'module': 'kvpnc',
                     'message': ''}
         self.assertEqual(mysite.customs.cia.parse_cia_tokens(tokens),
                          expected)
@@ -528,23 +528,23 @@ class ParseCiaMessage(django.test.TestCase):
         self.assertEqual(mysite.customs.cia.parse_cia_tokens(tokens),
                          expected)
 
-    def test_find_subproject_with_no_revision(self):
+    def test_find_module_with_no_revision(self):
         tokens = ['FreeBSD:', ' glarkin', ' ', '*', ' ports', '/lang/gcc42/ (Makefile distinfo files/patch-contrib__download_ecj)', ':', ' (log message trimmed)']
         expected = {'project': 'FreeBSD',
                     'identifier': 'glarkin',
                     'path': '/lang/gcc42/ (Makefile distinfo files/patch-contrib__download_ecj)',
-                    'subproject': 'ports',
+                    'module': 'ports',
                     'message':  '(log message trimmed)'}
         self.assertEqual(mysite.customs.cia.parse_cia_tokens(tokens),
                          expected)
 
-    def test_find_subproject_in_moin(self):
+    def test_find_module_in_moin(self):
         tokens = ['moin:', ' Thomas Waldmann <tw AT waldmann-edv DOT de>', ' default', ' ', '*', ' ', '5405:a1a1ce8894cb', ' 1.9', '/MoinMoin/util/SubProcess.py', ':', ' merged moin/1.8']
         expected = {'project': 'moin',
                     'identifier': 'Thomas Waldmann <tw AT waldmann-edv DOT de>',
                     'branch': 'default',
                     'revision': '5405:a1a1ce8894cb',
-                    'subproject': '1.9',
+                    'module': '1.9',
                     'path': '/MoinMoin/util/SubProcess.py',
                     'message':  'merged moin/1.8'}
         self.assertEqual(mysite.customs.cia.parse_cia_tokens(tokens),

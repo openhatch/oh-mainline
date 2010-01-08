@@ -73,23 +73,23 @@ def parse_cia_tokens(tokens):
         # The username is reliably at the start.
         parsed['identifier'] = rest.pop(0).lstrip()
 
-        # The subproject is reliably at the end.
-        space_or_subproject = rest.pop()
-        assert space_or_subproject.startswith(' ')
-        subproject = space_or_subproject[1:]
-        if subproject:
-            parsed['subproject'] = subproject
+        # The module is reliably at the end.
+        space_or_module = rest.pop()
+        assert space_or_module.startswith(' ')
+        module = space_or_module[1:]
+        if module:
+            parsed['module'] = module
 
         # The branch is reliably after the identifier, if it's there
         if rest[0] != '*' and rest[0].strip():
             parsed['branch'] = rest.pop(0).strip()
 
-        # If the last token has text and begins with ' ', then it's the subproject
+        # If the last token has text and begins with ' ', then it's the module
         if rest[-1].startswith(' '):
-            space_or_subproject = rest.pop()
-            subproject = space_or_subproject[1:]
-            if subproject:
-                parsed['subproject'] = subproject
+            space_or_module = rest.pop()
+            module = space_or_module[1:]
+            if module:
+                parsed['module'] = module
 
         # eat space tokens
         while rest[0] == ' ':
