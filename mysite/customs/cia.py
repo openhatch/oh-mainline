@@ -3,6 +3,9 @@ import re
 import uuid
 
 def ansi2tokens(line):
+    is_metadata_line = ('\x02' in line or '\x03' in line)
+    have_tokenized_one_star = False
+    
     tokens = []
     current_token_chars = []
 
@@ -20,9 +23,13 @@ def ansi2tokens(line):
             i += 2 # skip those two bytes
         elif byte == '\x0f':
             end_token()
-        elif byte == '*':
+        elif byte == '*' and is_metadata_line and not have_tokenized_one_star:
+            # The first star, on a metadata line, is tokenized.
+            # This code is such trash.
             end_token()
             tokens.append('*')
+            have_tokenized_one_star = True
+            
         else:
             current_token_chars.append(line[i])
             
