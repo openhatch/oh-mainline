@@ -29,6 +29,7 @@ def ansi2tokens(line):
 
 def parse_ansi_cia_message(line):
     tokens = ansi2tokens(line)
+    print tokens
     return parse_cia_tokens(tokens)
 
 def parse_cia_tokens(tokens):
@@ -45,74 +46,62 @@ def parse_cia_tokens(tokens):
         # that's what always happens for first lines.
         assert rest[-2] == ':'
         parsed['identifier'] = rest.pop(0).lstrip()
+
+        # revision_junk always has a '*" in it.
+        # if that's not next, accept this as "branchname"
+        # if not, eat the next token as the
+
+        if '*' not in rest[0]:
+            parsed['branchname'] = rest.pop(0)
+            
         revision_junk = rest.pop(0)
+        assert '*' in revision_junk
+        
         parsed['revision'] = rest.pop(0)
         if revision_junk == ' * r':
             parsed['revision'] = 'r' + parsed['revision']
-        space = rest.pop(0)
-        assert space == ' '
+        space_or_subproject = rest.pop(0)
+        if space_or_subproject != ' ':
+            parsed['subproject'] = space_or_subproject.lstrip()
+            
         parsed['path'] = rest.pop(0)
         colon = rest.pop(0)
         assert colon == ':'
         message = rest.pop(0)
         message_lines.append(message.lstrip())
-
+    else:
+        message_lines.append(rest[0].lstrip())
+        
     parsed['message'] = '\n'.join(message_lines)
     return parsed
 
-def parse_cia_message(msg):
-    ret = {}
-
-    message_lines = []
-
-    
-    for line in msg.split('\n'):
-        tokens = re.split(r'[\x02](.*?)[\x0f]', line)
-        project, rest = line.split(':', 1)
-        
-        # Initialize project in ret if it's not there
-        if 'project' not in ret:
-            ret['project'] = project
-        # otherwise, verify it hasn't changed
-        assert project == ret['project']
-
-        # Initialize identifier in ret if it's not there
-        if 'identifier' not in ret:
-            ret['identifier'], rest = rest.split('*', 1)
-            ret['identifier'] = ret['identifier'].strip()
-
-        # Initialize revision in ret if it's not there
-        if 'revision' not in ret:
-            blank, ret['revision'], rest = rest.split(' ', 2)
-            assert blank == ''
-            ret['revision'] = ret['revision'].strip()
-
-        # Initialize path if it's not there
-        if 'path' not in ret:
-            ret['path'], rest = rest.split(':', 1)
-            ret['path'] = ret['path'].strip()
-
-        # append the rest to message_lines
-        if rest:
-            blank, rest = rest.split(' ', 1)
-            assert blank == ''
-            message_lines.append(rest)
-
-    ret['message'] = '\n'.join(message_lines)
-    return ret
-
 class LineAcceptingAgent(object):
-    def __init__(self):
+    def __init__(self, callback):
+        self.dict_so_far = {}
         self.unhandled_messages = []
+        self.callback = callback
+
+    def flush_object(self):
+        if self.dict_so_far:
+            self.dict_so_far['message'] = self.dict_so_far['message'].lstrip()
+            self.callback(self.dict_so_far)
+        
     def handle_message(self, message):
-        print repr(message)
+        #return
+        # In the case the project changes, send the object to the callback
+        parsed = parse_ansi_cia_message(message)
+        if parsed['project'] == self.dict_so_far.get('project', None):
+            self.dict_so_far['message'] += '\n' + parsed['message']
+        else:
+            self.flush_object()
+            self.dict_so_far = parsed
 
 class CiaIrcWatcher(SingleServerIRCBot):
-    def __init__(self):
+    def __init__(self, callback):
         SingleServerIRCBot.__init__(self, [('chat.freenode.net', 6667)],
                                     'oh_listener', 'oh_listener')
         self.channel = '#commits'
-        self.lia = LineAcceptingAgent()
+        self.lia = LineAcceptingAgent(callback)
         
     def on_nicknameinuse(self, c, e):
         c.nick(c.get_nickname() + '_')
@@ -128,5 +117,7 @@ class CiaIrcWatcher(SingleServerIRCBot):
 
 def main():
     import sys
-    bot = CiaIrcWatcher()
+    def callback(s):
+        pass
+    bot = CiaIrcWatcher(callback)
     bot.start()
