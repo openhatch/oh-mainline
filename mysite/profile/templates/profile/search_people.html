@@ -1,18 +1,10 @@
-{% extends 'base/one_column.html' %}
+{% extends 'profile/people.html' %}
 
 {% block title %}
-People
+List of People
 {% endblock title %}
 
-{% block css %}
-{{ block.super }}
-@import url('/static/css/profile/search_people.css');
-{% endblock css %}
-
-{% block main %}
-<img alt='People on OpenHatch' id='people-search' alt='People on OpenHatch' src='/static/images/people-search.png' />
-<div id='big-people-list' class='module'>
-    <div class='module-content body'>
+{% block people_main %}
         {% if property and value %}
         where {{ property }} = {{ value }}
         {% endif %}
@@ -31,6 +23,4 @@ People
             {% endif %}
             {% endfor %}
         </ul>
-    </div>
-</div>
-{% endblock main %}
+{% endblock people_main %}

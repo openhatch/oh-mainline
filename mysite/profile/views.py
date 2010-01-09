@@ -518,6 +518,13 @@ def display_list_of_people(request):
     # {{{
     data = {}
     data['people'] = Person.objects.all().order_by('user__username')
+    return (request, 'profile/search_people.html', data)
+    # }}}
+
+@view
+def people_map(request):
+    data = {}
+    data['people'] = Person.objects.all().order_by('user__username')
     data['person_id2data_as_json'] = simplejson.dumps(dict([
                 (person.pk, {'name': person.get_full_name_or_username(),
                              'location': person.location_display_name})
@@ -525,9 +532,8 @@ def display_list_of_people(request):
             if person.location_display_name]))
     data['num_of_persons_with_locations'] = len([p for p in Person.objects.all()
                                                  if p.location_display_name])
-            
-    return (request, 'profile/search_people.html', data)
-    # }}}
+    return (request, 'profile/map.html', data)
+
 
 def gimme_json_for_portfolio(request):
     "Get JSON used to live-update the portfolio editor."

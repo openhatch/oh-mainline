@@ -1,18 +1,10 @@
-{% extends 'base/one_column.html' %}
+{% extends 'profile/people.html' %}
 
 {% block title %}
-People
+Map of People
 {% endblock title %}
 
-{% block css %}
-{{ block.super }}
-@import url('/static/css/profile/search_people.css');
-{% endblock css %}
-
-{% block main %}
-<img alt='People on OpenHatch' id='people-search' alt='People on OpenHatch' src='/static/images/people-search.png' />
-<div id='big-people-list' class='module'>
-    <div class='module-content body'>
+{% block people_main %}
         {% if property and value %}
         where {{ property }} = {{ value }}
         {% endif %}
@@ -32,9 +24,7 @@ People
             {% endif %}
             {% endfor %}
         </ul>
-    </div>
-</div>
-{% endblock main %}
+{% endblock people_main %}
 
 {% block js_in_head %}
 <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
