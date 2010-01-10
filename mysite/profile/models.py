@@ -225,7 +225,7 @@ class DataImportAttempt(models.Model):
         ('rs', "Ohloh"),
         ('ou', "Ohloh"),
         ('lp', "Launchpad"),
-        ('github', "Github"),
+        ('gh', "Github"),
         )
     completed = models.BooleanField(default=False)
     failed = models.BooleanField(default=False)

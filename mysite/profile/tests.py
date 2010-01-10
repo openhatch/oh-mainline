@@ -1350,7 +1350,7 @@ class MockGithubImport(BaseCeleryTest):
                 ]
 
         return self._test_data_source_via_emulated_bgtask(
-                source='github', data_we_expect=data_we_expect,
+                source='gh', data_we_expect=data_we_expect,
                 summaries_we_expect=summaries_we_expect)
         # }}}
 

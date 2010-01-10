@@ -122,14 +122,14 @@ def lp_action(dia):
 source2actual_action = {
         'rs': rs_action,
         'ou': ou_action,
-        'github': github_action,
+        'gh': github_action,
         'lp': lp_action
         }
 
 source2result_handler = {
         'rs': create_citations_from_ohloh_contributor_facts,
         'ou': create_citations_from_ohloh_contributor_facts,
-        'github': create_citations_from_github_contributor_facts,
+        'gh': create_citations_from_github_contributor_facts,
         'lp': create_citations_from_launchpad_results,
         }
 
