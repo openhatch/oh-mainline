@@ -1312,10 +1312,14 @@ class GithubProfileImporting(TwillTests):
     def test_github_importer_saves_project_homepage(self):
         pass
 
+def do_nothing(*args, **kwargs):
+    return ''
+
 class MockGithubImport(BaseCeleryTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
-    @mock.patch('mysite.customs.github.info_by_username')
+    @mock.patch('mysite.customs.github.repos_by_username')
+    @mock.patch('mysite.customs.github.find_primary_language_of_repo', do_nothing)
     @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
     def test_github_import_via_emulated_bgtask(self, mock_github_projects):
         "Test that we can import data from Github. Use a mock list of "
@@ -1324,8 +1328,10 @@ class MockGithubImport(BaseCeleryTest):
         # {{{
         mock_github_projects.return_value = [ObjectFromDict({
             'name': 'project_we_forked',
+            'owner': 'paulproteus', # github repo owner
             'fork': True}),
             ObjectFromDict({'name': 'project_we_did_not_fork',
+                            'owner': 'paulproteus', # github repo owner
                             'fork': False})]
             
         data_we_expect = [

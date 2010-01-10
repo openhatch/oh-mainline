@@ -87,7 +87,8 @@ def create_citations_from_launchpad_results(dia_id, lp_results):
     dia.save()
     # }}}
 
-def create_citations_from_github_contributor_facts(dia_id, results):
+def create_citations_from_github_results(dia_id, results):
+    repos, dict_mapping_repos_to_languages = results
     pass
 
 def rs_action(dia):
@@ -106,14 +107,23 @@ def ou_action(dia):
     dia.save()
     return data
 
-def github_action(dia):
+def gh_action(dia):
     # FIXME: We should add a person parameter so that, in the
     # case of "You should retry soon..." messages from the Github
     # API, we notify the user.
 
     # FIXME: Make web_response objects have a DIA attribute.
     # The way we're doing it now is basically backwards.
-    data, web_response = mysite.customs.github.info_by_username(dia.query)
+    repos = mysite.customs.github.repos_by_username(dia.query)
+    dict_mapping_repos_to_languages = {}
+    for repo in repos:
+        key = (repo.owner, repo.name)
+        dict_mapping_repos_to_languages[
+            key] = mysite.customs.github.find_primary_language_of_repo(
+            github_username=repo.owner,
+            github_reponame=repo.name)
+        
+    return (repos, dict_mapping_repos_to_languages)
     
 def lp_action(dia):
     # NB: Don't change the way this is called, because calling it this way
@@ -123,14 +133,14 @@ def lp_action(dia):
 source2actual_action = {
         'rs': rs_action,
         'ou': ou_action,
-        'gh': github_action,
+        'gh': gh_action,
         'lp': lp_action
         }
 
 source2result_handler = {
         'rs': create_citations_from_ohloh_contributor_facts,
         'ou': create_citations_from_ohloh_contributor_facts,
-        'gh': create_citations_from_github_contributor_facts,
+        'gh': create_citations_from_github_results,
         'lp': create_citations_from_launchpad_results,
         }
 
@@ -148,7 +158,7 @@ class FetchPersonDataFromOhloh(Task):
                 return
             results = source2actual_action[dia.source](dia)
             source2result_handler[dia.source](dia.id, results)
-            logger.info("Results: %s" % results)
+            logger.info("Results: %s" % repr(results))
 
         except Exception, e:
             # if the task is in debugging mode, bubble-up the exception
