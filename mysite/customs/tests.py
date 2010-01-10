@@ -3,7 +3,7 @@
 
 # Imports {{{
 from mysite.search.models import Project, Bug
-from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag
+from mysite.profile.models import Person, Tag, TagType
 import mysite.profile.views
 from mysite.profile.tests import MockFetchPersonDataFromOhloh
 

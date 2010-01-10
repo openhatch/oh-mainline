@@ -117,12 +117,6 @@ urlpatterns = patterns('',
         (r'^account/edit/photo/do$',
             'mysite.account.views.edit_photo_do'),
 
-        (r'^form/projectexp_add$',
-            'mysite.profile.views.projectexp_add_form'),
-
-        (r'^do/projectexp_add$',
-            'mysite.profile.views.projectexp_add_do'),
-
         (r'^profile/views/add_citation_manually_do$',
             'mysite.profile.views.add_citation_manually_do'),
 
@@ -150,15 +144,6 @@ urlpatterns = patterns('',
 
         (r'^people/import/do$',
             'mysite.profile.views.import_do'),
-
-        (r'^people/(?P<user_to_display__username>[^/]+)/projects/(?P<project__name>.+)$',
-                'mysite.profile.views.projectexp_display'),
-
-        (r'^people/projects/edit/(?P<project__name>.+)$',
-                'mysite.profile.views.projectexp_edit'),
-
-        (r'^people/projects/edit_do/(?P<project__name>.+)$',
-                'mysite.profile.views.projectexp_edit_do'),
 
         (r'^people/portfolio/import/$',
                 'mysite.profile.views.importer'),

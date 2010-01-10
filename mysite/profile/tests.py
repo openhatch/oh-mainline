@@ -3,7 +3,7 @@ from mysite.base.tests import make_twill_url, TwillTests, ObjectFromDict
 import mysite.account.tests
 
 from mysite.search.models import Project
-from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_Person_Tag, Link_ProjectExp_Tag, DataImportAttempt, PortfolioEntry, Citation
+from mysite.profile.models import Person, Tag, TagType, Link_Person_Tag, DataImportAttempt, PortfolioEntry, Citation
 import mysite.project.views
 
 import mysite.profile.views

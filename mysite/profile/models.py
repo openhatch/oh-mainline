@@ -275,103 +275,6 @@ def reject_when_query_is_only_whitespace(sender, instance, **kwargs):
 
 models.signals.pre_save.connect(reject_when_query_is_only_whitespace, sender=DataImportAttempt)
 
-class ProjectExp(models.Model):
-    "Many-to-one relation between projects and people."
-    # {{{
-    person = models.ForeignKey(Person, null=True)
-    should_show_this = models.BooleanField(default=False)
-    data_import_attempt = models.ForeignKey(DataImportAttempt, null=True)
-    project = models.ForeignKey(Project)
-    person_role = models.CharField(max_length=200)
-    description = models.TextField()
-    url = models.URLField(max_length=200, null=True)
-    man_months = models.PositiveIntegerField(null=True)
-    primary_language = models.CharField(max_length=200, null=True)
-    source = models.CharField(max_length=100, null=True)
-    modified = models.BooleanField(default=False)
-
-    # FIXME: Make this a static method or something
-    def from_ohloh_contrib_info(self, ohloh_contrib_info):
-        # {{{
-        self.project, bool_created = Project.objects.get_or_create(
-                name=ohloh_contrib_info['project'])
-        matches = list(ProjectExp.objects.filter(project=self.project,
-                                           person=self.person))
-        if matches:
-            return matches[0]
-        else:
-            # FIXME: Automatically populate project url here.
-            self.man_months = ohloh_contrib_info['man_months']
-            self.primary_language = ohloh_contrib_info['primary_language']
-            self.source = "Ohloh"
-            self.time_gathered_from_source = datetime.date.today()
-            # FIXME: Handle first_commit_time from Ohloh somehow
-            #if 'first_commit_time' in ohloh_contrib_info:
-                # parse it
-                #parsed = datetime.datetime.strptime(
-                #    ohloh_contrib_info['first_commit_time'],
-                #    '%Y-%m-%dT%H:%M:%SZ')
-                # This is UTC.
-
-                # jam it into self
-                #self.date_started = parsed
-            return self
-        # }}}
-
-    # FIXME: Make this a static method or something
-    def from_launchpad_result(self, project_name, language, person_role):
-        # {{{
-        self.project, bool_created = Project.objects.get_or_create(
-                name=project_name)
-        matches = list(ProjectExp.objects.filter(project=self.project,
-                                           person=self.person))
-        if matches:
-            return matches[0]
-        else:
-            # FIXME: Automatically populate project url here.
-            self.primary_language = language
-            self.person_role = person_role
-            self.source = "Launchpad"
-            self.time_gathered_from_source = datetime.date.today()
-            return self
-        # }}}
-
-    @staticmethod
-    def create_from_text(
-            username,
-            project_name,
-            description='',
-            url='',
-            man_months=None,
-            primary_language=''
-            ):
-
-        person = Person.objects.get(user__username=username)
-        project, created = Project.objects.get_or_create(name=project_name)
-        if man_months is not None:
-            man_months = int(man_months)
-
-        exp = ProjectExp(
-                person=person,
-                project=project,
-                url=str(url),
-                description=str(description),
-                man_months=man_months,
-                primary_language=primary_language)
-
-        exp.save()
-        return exp
-
-    @staticmethod
-    def get_from_text(username, project_name):
-        return ProjectExp.objects.get(
-                person=Person.objects.get(user__username=username),
-                project=Project.objects.get(name=project_name),
-                )
-    get_from_strings = get_from_text
-
-    # }}}
-
 class TagType(models.Model):
     # {{{
     name = models.CharField(max_length=100)
@@ -394,39 +297,8 @@ class Tag(models.Model):
         return "%s: %s" % (self.tag_type.name, self.text)
     # }}}
 
-class Link_ProjectExp_Tag(models.Model):
-    "Many-to-many relation between ProjectExps and Tags."
-    # {{{
-    tag = models.ForeignKey(Tag)
-    favorite = models.BooleanField(default=False)
-    project_exp = models.ForeignKey(ProjectExp)
-    source = models.CharField(max_length=200)
-
-    class Meta:
-        unique_together = [ ('tag', 'project_exp', 'source'),
-                            ]
-    @staticmethod
-    def get_from_strings(username, project_name, tag_text, tag_type=None):
-        # {{{
-        # FIXME: Add support for tag-type-specific grabbing of Link_ProjectExp_Tags
-
-        exp = ProjectExp.get_from_text(username, project_name)
-
-        if tag_type is not None:
-            tag_type_obj = TagType.objects.get(name=tag_type)
-            tag = Tag.objects.get(text=tag_text, tag_type=tag_type_obj)
-        else:
-            tag = Tag.objects.get(text=tag_text)
-
-        new_link = Link_ProjectExp_Tag.objects.get(project_exp=exp, tag=tag)
-
-        return new_link
-        # }}}
-
-    # }}}
-
 class Link_Project_Tag(models.Model):
-    "Many-to-many relation between ProjectExps and Tags."
+    "Many-to-many relation between Projects and Tags."
     # {{{
     tag = models.ForeignKey(Tag)
     project = models.ForeignKey(Project)
