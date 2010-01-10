@@ -155,6 +155,10 @@ h1 {
 
 #location-suggestion-notification { width: 729px; margin-right: 10px; font-size: 1.2em; text-align: left; float: right; background-color: #FFFFAA; padding: 8px 12px; -moz-border-radius: 8px; border-radius: 8px; }
 
+#location-suggestion-notification p { margin: 0;}
+
+#location-suggestion-notification p strong.suggested_location { white-space: nowrap; }
+
 #location-suggestion-notification h2 { text-align: left; width: 100%; }
 
 #location-suggestion-notification ul { margin-top: 3px; float: none; text-align: center; float: left; }
