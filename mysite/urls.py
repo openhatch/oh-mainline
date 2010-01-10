@@ -24,7 +24,10 @@ urlpatterns = patterns('',
         (r'^static/(?P<path>.*)$', 'django.views.static.serve',
             {'document_root': settings.MEDIA_ROOT}),
 
-        (r'^people/$', 'mysite.profile.views.display_list_of_people'),
+        (r'^people/$',
+                'mysite.profile.views.people_map'),
+
+        (r'^\+people/list/$', 'mysite.profile.views.display_list_of_people'),
 
         (r'^account/forgot_pass/$',
             'django.contrib.auth.views.password_reset', {
@@ -201,8 +204,6 @@ urlpatterns = patterns('',
         (r'^search/people/(?P<property>[^/]+)/(?P<value>.+)$',
                 'mysite.profile.views.display_list_of_people_who_match_some_search'),
 
-        (r'^\+map/people/$',
-                'mysite.profile.views.people_map'),
 
         # favicon.ico. Someday this should be handled by Apache.
         (r'^(favicon.ico)',

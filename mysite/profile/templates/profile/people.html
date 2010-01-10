@@ -17,17 +17,17 @@ People
         <div class="view-links">
             <ul>
                 <li>
-        {% ifequal slug "people_map" %}
-        <a href="{% url mysite.profile.views.display_list_of_people %}">List View</a>
+        {% ifequal slug "display_list_of_people" %}
+        <a href="{% url mysite.profile.views.people_map %}">Map</a>
         {% else %}
-        List View
+        <strong>Map</strong>
         {% endifequal %}
                 </li>
                 <li>
-        {% ifequal slug "display_list_of_people" %}
-        <a href="{% url mysite.profile.views.people_map %}">Map View</a>
+        {% ifequal slug "people_map" %}
+        <a href="{% url mysite.profile.views.display_list_of_people %}">List</a>
         {% else %}
-            Map View
+        <strong>List</strong>
         {% endifequal %}
                 </li>
         </ul>

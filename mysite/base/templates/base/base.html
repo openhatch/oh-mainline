@@ -52,7 +52,7 @@
                                 {% endif %}
                                 <li><a href='{% url mysite.search.views.fetch_bugs %}'>volunteer opportunities</a></li>
                                 <li><a href='{% url mysite.project.views.projects %}'>projects</a></li>
-                                <li><a href='{% url mysite.profile.views.display_list_of_people %}'>people</a></li>
+                                <li><a href='{% url mysite.profile.views.people_map%}'>people</a></li>
                                 {% if the_user.is_authenticated %}
                                 <li><a href='{% url mysite.base.views.homepage %}'>dashboard</a></li>
                                 <li><a href='{% url mysite.profile.views.display_person_web the_user.username %}'><strong>{{ the_user.username }}'s profile</strong></a></li>
@@ -139,7 +139,7 @@
                                 </li>
 
                                 <li>
-                                <a href='{% url mysite.profile.views.display_list_of_people %}'>
+                                <a href='{% url mysite.profile.views.peopl_map%}'>
                                     <strong>
                                         Browse 
                                     </strong>

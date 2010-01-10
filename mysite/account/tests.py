@@ -69,7 +69,7 @@ class EditPassword(TwillTests):
             should_succeed = True):
         tc.go(make_twill_url('http://openhatch.org/people/paulproteus'))
         tc.follow('settings')
-        tc.follow('Change your password')
+        tc.follow('Password')
         tc.url('/account/settings/password')
 
         tc.fv('a_settings_tab_form', 'old_password', old_pass)
@@ -108,8 +108,6 @@ class EditContactInfo(TwillTests):
     def test_edit_email_address(self):
         self.login_with_twill()
         
-        import pdb
-        pdb.set_trace()
 
         _url = 'http://openhatch.org/account/settings/contact-info/'
         url = make_twill_url(_url)
@@ -125,9 +123,9 @@ class EditContactInfo(TwillTests):
         tc.notfind(email)
 
         # Edit email
-        tc.fv(1, 'edit_email-email', email)
+        tc.fv("a_settings_tab_form", 'edit_email-email', email)
         # Show email
-        tc.fv(1, 'show_email-show_email', '1') # [1]
+        tc.fv("a_settings_tab_form", 'show_email-show_email', '1') # [1]
         tc.submit()
 
         # Form submission ought to redirect us back to the form.
@@ -150,7 +148,7 @@ class EditContactInfo(TwillTests):
         tc.go(url)
 
         # 2.2. Don't show email
-        tc.fv(1, 'show_email-show_email', '0') # [1]
+        tc.fv("a_settings_tab_form", 'show_email-show_email', '0') # [1]
         tc.submit()
 
         # 2.3. Verify it's not on profile anymore

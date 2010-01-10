@@ -691,8 +691,8 @@ class UserCanShowEmailAddress(TwillTests):
         tc.notfind('my@ema.il')
 
         tc.follow('settings')
-        tc.follow('contact info')
-        tc.fv(1, 'show_email', '1')
+        tc.follow('Contact')
+        tc.fv("a_settings_tab_form", 'show_email', '1')
         tc.submit()
 
         tc.go('/people/paulproteus/')
@@ -1259,7 +1259,7 @@ class ProjectGetMentors(TwillTests):
                                tag=willing_to_mentor_banshee)
         link.save()
 
-        banshee_mentors = mysite.profile.views.people_matching('can_mentor',
+        banshee_mentors = mysite.profile.controllers.people_matching('can_mentor',
                                                                'Banshee')
         self.assertEqual(list(banshee_mentors), [Person.objects.get(user__username='paulproteus')])
 
@@ -1292,7 +1292,7 @@ class EditLocation(TwillTests):
         # Now go edit my "contact info"
         tc.go(make_twill_url('http://openhatch.org/account/settings/location/'))
         # set the location in ze form
-        tc.fv(1, 'location_display_name', 'Timbuktu')
+        tc.fv("a_settings_tab_form", 'location_display_name', 'Timbuktu')
         tc.submit()
         # Timbuktu!
         tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
