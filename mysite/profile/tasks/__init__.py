@@ -3,6 +3,7 @@ import datetime
 from mysite.customs import ohloh
 import urllib2
 from mysite.customs import lp_grabber
+import mysite.customs.github
 from mysite.profile.models import Person, DataImportAttempt, Citation, PortfolioEntry
 from mysite.search.models import Project
 from celery.task import Task
