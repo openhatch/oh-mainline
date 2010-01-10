@@ -153,7 +153,7 @@ h1 {
     color: #222;
 }
 
-#location-suggestion-notification { width: 729px; margin-right: 10px; font-size: 1.2em; text-align: left; float: right; background-color: #FFFFAA; padding: 8px 12px; -moz-border-radius: 8px; border-radius: 8px; }
+#location-suggestion-notification { width: 40em; margin-right: 10px; font-size: 1.2em; text-align: left; float: right; background-color: #FFFFAA; padding: 8px 12px; -moz-border-radius: 8px; border-radius: 8px; }
 
 #location-suggestion-notification p { margin: 0;}
 
