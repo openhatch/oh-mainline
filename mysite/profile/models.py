@@ -251,7 +251,7 @@ class DataImportAttempt(models.Model):
 
     # }}}
 
-"""
+'''
 Scenario A.
 * Dia creates background job.
 * User marks Dia "I want it"
@@ -267,7 +267,7 @@ Scenario B.
 * Background job realizes, "Nobody has claimed this yet. I'll just sit tight."
 * User marks Dia "I want it"
 * The marking method attaches the projects to the user
-"""
+'''
 
 def reject_when_query_is_only_whitespace(sender, instance, **kwargs):
     if not instance.query.strip():

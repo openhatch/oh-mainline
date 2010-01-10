@@ -33,6 +33,7 @@ import lp_grabber
 from mysite.profile.tasks import FetchPersonDataFromOhloh
 import mysite.customs.miro
 import mysite.customs.feed
+import mysite.customs.github
 
 import mysite.customs.models
 import mysite.customs.lp_grabber
@@ -239,7 +240,6 @@ class LaunchpadDataTests(django.test.TestCase):
         # have a language assigned to it.
         no_langs = lp_grabber.project2languages('lazr')
         self.assertEqual(no_langs, [])
-
 
     @mock.patch('mechanize.Browser.open', open_causes_404)
     def test_person_who_404s(self):
@@ -480,5 +480,12 @@ class LaunchpadImportByEmail(django.test.TestCase):
     def test_get_asheesh(self):
         u = mysite.customs.lp_grabber.get_launchpad_username_by_email('asheesh@asheesh.org')
         self.assertEqual(u, "paulproteus")
+
+class SlowGithubTest(django.test.TestCase):
+    def test_get_language(self):
+        top_lang = mysite.customs.github.find_primary_language_of_repo(
+            github_username='phinze',
+            github_reponame='tircd')
+        self.assertEqual(top_lang, 'Perl')
 
 # vim: set nu:
