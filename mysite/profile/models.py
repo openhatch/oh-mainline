@@ -523,7 +523,7 @@ class Citation(models.Model):
         #                                       source=SOURCE))
         matches = []
         if matches:
-            project_exp = matches[0]
+            citation = matches[0]
         else:
             # Calculate the string for contributor_role
             if github_repo_object.fork:
