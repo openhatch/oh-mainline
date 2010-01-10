@@ -1259,8 +1259,9 @@ class ProjectGetMentors(TwillTests):
                                tag=willing_to_mentor_banshee)
         link.save()
 
-        banshee_mentors = mysite.profile.views.people_matching('can_mentor',
-                                                               'Banshee')
+        banshee_mentors = mysite.profile.controllers.people_matching(
+            'can_mentor',
+            'Banshee')
         self.assertEqual(list(banshee_mentors), [Person.objects.get(user__username='paulproteus')])
 
 class GithubProfileImporting(TwillTests):
