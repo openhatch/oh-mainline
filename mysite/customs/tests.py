@@ -481,11 +481,20 @@ class LaunchpadImportByEmail(django.test.TestCase):
         u = mysite.customs.lp_grabber.get_launchpad_username_by_email('asheesh@asheesh.org')
         self.assertEqual(u, "paulproteus")
 
-class SlowGithubTest(django.test.TestCase):
+class OnlineGithub(django.test.TestCase):
     def test_get_language(self):
         top_lang = mysite.customs.github.find_primary_language_of_repo(
             github_username='phinze',
             github_reponame='tircd')
         self.assertEqual(top_lang, 'Perl')
+
+    def test_find_tircd_for_phinze(self):
+        '''This test gives our github info_by_username a shot.'''
+        repos = mysite.customs.github.info_by_username('phinze')
+        found_tircd_yet = False
+        for repo in repos:
+            if repo.name == 'tircd':
+                found_tircd_yet = True
+        self.assertTrue(found_tircd_yet)
 
 # vim: set nu:
