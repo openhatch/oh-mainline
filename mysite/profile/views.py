@@ -35,6 +35,7 @@ from django.conf import settings
 
 # OpenHatch apps
 import mysite.base.controllers
+import mysite.profile.controllers
 import mysite.base.helpers
 from mysite.customs import ohloh
 from mysite.profile.models import \
@@ -117,6 +118,7 @@ def display_person_web(request, user_to_display__username=None):
     data['editable'] = (request.user == user)
     data['notifications'] = mysite.base.controllers.get_notification_from_request(request)
     data['explain_to_anonymous_users'] = True
+    data['location'] = 'Philadelphia, PA'
 
     return (request, 'profile/main.html', data)
 
@@ -519,6 +521,20 @@ def display_list_of_people(request):
     return (request, 'profile/search_people.html', data)
     # }}}
 
+@view
+def people_map(request):
+    data = {}
+    data['people'] = Person.objects.all().order_by('user__username')
+    data['person_id2data_as_json'] = simplejson.dumps(dict([
+                (person.pk, {'name': person.get_full_name_or_username(),
+                             'location': person.location_display_name})
+            for person in Person.objects.all()
+            if person.location_display_name]))
+    data['num_of_persons_with_locations'] = len([p for p in Person.objects.all()
+                                                 if p.location_display_name])
+    return (request, 'profile/map.html', data)
+
+
 def gimme_json_for_portfolio(request):
     "Get JSON used to live-update the portfolio editor."
     """JSON includes:
@@ -751,16 +767,10 @@ def display_person_edit_name(request, name_edit_mode):
     return (request, 'profile/main.html', data)
     # }}}
 
-def people_matching(property, value):
-    links = Link_Person_Tag.objects.filter(tag__tag_type__name=property, tag__text__iexact=value)
-    peeps = [l.person for l in links]
-    sorted_peeps = sorted(set(peeps), key = lambda thing: (thing.user.first_name, thing.user.last_name))
-    return sorted_peeps
-
 @view
 def display_list_of_people_who_match_some_search(request, property, value):
     '''Property is the "tag name", and "value" is the text in it.'''
-    peeps = people_matching(property, value)
+    peeps = mysite.profile.controllers.people_matching(property, value)
     data = {}
     data['people'] = peeps
     data['property'] = property

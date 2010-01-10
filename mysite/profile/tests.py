@@ -691,8 +691,8 @@ class UserCanShowEmailAddress(TwillTests):
         tc.notfind('my@ema.il')
 
         tc.follow('settings')
-        tc.follow('contact info')
-        tc.fv(1, 'show_email', '1')
+        tc.follow('Contact')
+        tc.fv("a_settings_tab_form", 'show_email', '1')
         tc.submit()
 
         tc.go('/people/paulproteus/')
@@ -1240,5 +1240,62 @@ class PersonGetTagsForRecommendations(TwillTests):
 
         # This is the functionality we're testing
         self.assertEqual([tag_i_understand], pp.get_tags_for_recommendations())
+
+class ProjectGetMentors(TwillTests):
+    fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
+
+    def test(self):
+        '''This test creates:
+        * one person who is listed as able to mentor in Banshee
+        * one person who is not
+        and asks the Banshee project to list its available mentors.'''
+        banshee = Project.create_dummy(name='Banshee')
+        can_mentor, _ = TagType.objects.get_or_create(name='can_mentor')
+        
+        willing_to_mentor_banshee, _ = Tag.objects.get_or_create(
+            tag_type=can_mentor,
+            text='Banshee')
+        link = Link_Person_Tag(person=Person.objects.get(user__username='paulproteus'),
+                               tag=willing_to_mentor_banshee)
+        link.save()
+
+        banshee_mentors = mysite.profile.controllers.people_matching('can_mentor',
+                                                               'Banshee')
+        self.assertEqual(list(banshee_mentors), [Person.objects.get(user__username='paulproteus')])
+
+class SuggestLocation(TwillTests):
+    fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
+
+    def test(self):
+        data = {}
+        data['geoip_has_suggestion'], data['geoip_guess'] = mysite.profile.controllers.get_geoip_guess_for_ip("128.151.2.1")
+        self.assertEqual(data['geoip_has_suggestion'], True)
+        self.assertEqual(data['geoip_guess'], "Rochester, NY, United States")
+
+
+class EditLocation(TwillTests):
+    fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
+
+    def test(self):
+        '''
+        * Goes to paulproteus's profile
+        * checks that he is not in Timbuktu
+        * clicks "edit or hide"
+        * sets the location to Timbuktu
+        * saves
+        * checks his location is Timbuktu'''
+        self.login_with_twill()
+        tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
+        # not in Timbuktu!
+        tc.notfind('Timbuktu')
+
+        # Now go edit my "contact info"
+        tc.go(make_twill_url('http://openhatch.org/account/settings/location/'))
+        # set the location in ze form
+        tc.fv("a_settings_tab_form", 'location_display_name', 'Timbuktu')
+        tc.submit()
+        # Timbuktu!
+        tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
+        tc.find('Timbuktu')
 
 # vim: set ai et ts=4 sw=4 nu:

@@ -112,10 +112,17 @@ def settings(request):
 
 @login_required
 @view
-def edit_contact_info(request, edit_email_form = None, show_email_form = None):
+def edit_contact_info(request, edit_email_form = None, show_email_form = None,
+                      ):
     # {{{
 
     data = {}
+
+    if request.GET.get('notification_id', None) == 'success':
+        data['account_notification'] = 'Settings saved.'
+    else:
+        data['account_notification'] = ''
+
     # Store edit_email_form in data[], even if we weren't passed one
     if edit_email_form is None:
         edit_email_form = mysite.account.forms.EditEmailForm(
@@ -136,7 +143,6 @@ def edit_contact_info(request, edit_email_form = None, show_email_form = None):
 @login_required
 def edit_contact_info_do(request):
     # {{{
-
     # Handle "Edit email"
     edit_email_form = mysite.account.forms.EditEmailForm(
             request.POST, prefix='edit_email', instance=request.user)
@@ -144,7 +150,9 @@ def edit_contact_info_do(request):
     show_email_form = mysite.account.forms.ShowEmailForm(
             request.POST, prefix='show_email')
 
-    if edit_email_form.is_valid() and show_email_form.is_valid():
+    # Email saving functionality requires two forms to both be
+    # valid. This really ought to be the same form, anyway.
+    if (edit_email_form.is_valid() and show_email_form.is_valid()):
         p = request.user.get_profile()
         p.show_email = show_email_form.cleaned_data['show_email']
         p.save()
@@ -153,7 +161,8 @@ def edit_contact_info_do(request):
                 request.user, edit_email_form.cleaned_data['email']))
         edit_email_form.save()
 
-        return HttpResponseRedirect(reverse(edit_contact_info))
+        return HttpResponseRedirect(reverse(edit_contact_info) +
+                                    '?notification_id=success')
     else:
         return edit_contact_info(request,
                 edit_email_form=edit_email_form,
@@ -171,9 +180,72 @@ def change_password(request, change_password_form = None):
     change_password_form.fields['old_password'].label = "Current password"
     change_password_form.fields['new_password2'].label = "Type it again"
 
+    if request.GET.get('notification_id', None) == 'success':
+        account_notification = 'Your password has been changed.'
+    else:
+        account_notification = ''
+
     return (request, 'account/change_password.html',
-            {'change_password_form': change_password_form})
+            {'change_password_form': change_password_form,
+             'account_notification': account_notification})
     # }}}
+
+@login_required
+@view
+def set_location(request, edit_location_form = None):
+    # {{{
+    data = {}
+    initial = {}
+
+    if request.GET.get('dont_suggest_location', None) == '1':
+        data['dont_suggest_location'] = True
+        initial['location_display_name'] = ''
+
+    # Initialize edit location form
+    if edit_location_form is None:
+        edit_location_form = mysite.account.forms.EditLocationForm(
+                prefix='edit_location', instance=request.user.get_profile(), initial = initial)
+
+    data['edit_location_form'] = edit_location_form
+
+    if request.GET.get('notification_id', None) == 'success':
+        data['account_notification'] = 'Saved.'
+    else:
+        data['account_notification'] = ''
+
+    return (request, 'account/set_location.html', data)
+    # }}}
+
+@login_required
+def set_location_do(request):
+    user_profile = request.user.get_profile()
+    edit_location_form = mysite.account.forms.EditLocationForm(
+        request.POST,
+        instance=user_profile, prefix='edit_location')
+    if edit_location_form.is_valid():
+        user_profile.location_confirmed = True
+        user_profile.save()
+        edit_location_form.save()
+        return HttpResponseRedirect(reverse(set_location) +
+                                    '?notification_id=success')
+    else:
+        return set_location(request,
+                edit_location_form=edit_location_form)
+       
+@login_required
+def confirm_location_suggestion_do(request):
+    person = request.user.get_profile()
+    person.location_confirmed = True
+    person.save()
+    return HttpResponse()
+
+@login_required
+def dont_guess_location_do(request):
+    person = request.user.get_profile()
+    person.dont_guess_my_location = True
+    person.location_display_name = ''
+    person.save()
+    return HttpResponse()
 
 @login_required
 def change_password_do(request):
@@ -182,7 +254,8 @@ def change_password_do(request):
             request.user, request.POST)
     if form.is_valid():
         form.save() 
-        return HttpResponseRedirect(reverse(change_password))
+        return HttpResponseRedirect(
+            reverse(change_password) + '?notification_id=success')
     else:
         return change_password(request, change_password_form=form)
     # }}}

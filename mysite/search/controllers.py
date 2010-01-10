@@ -86,7 +86,10 @@ class Query:
         language_is_active = ('language' in self.active_facet_options.keys())
         exclude_language = exclude_active_facets and language_is_active
         if 'language' in self.active_facet_options and not exclude_language: 
-            q &= Q(project__language__iexact=self.active_facet_options['language'])
+            language_value = self.active_facet_options['language']
+            if language_value == 'Unknown':
+                language_value=''
+            q &= Q(project__language__iexact=language_value)
 
         # contribution type facet
         contribution_type_is_active = ('contribution_type' in
@@ -206,7 +209,7 @@ class Query:
         bugs = query_without_language_facet.get_bugs_unordered()
         distinct_language_columns = bugs.values('project__language').distinct()
         languages = [x['project__language'] for x in distinct_language_columns]
-        languages = [l for l in languages if l]
+        languages = [l or 'Unknown' for l in languages]
 
         # Add the active language facet, if there is one
         if 'language' in self.active_facet_options:
@@ -232,15 +235,16 @@ class Query:
         return sha.sha(stringified).hexdigest() # sadly we cause a 2x space blowup here
     
     def get_or_create_cached_hit_count(self):
+        hashed_query = self.get_sha1()
 
-        existing_hccs = mysite.search.models.HitCountCache.objects.filter(hashed_query=self.get_sha1())
+        existing_hccs = mysite.search.models.HitCountCache.objects.filter(hashed_query=hashed_query)
         if existing_hccs:
             hcc = existing_hccs[0]
         else:
             count = self.get_bugs_unordered().count()
-            hcc = mysite.search.models.HitCountCache.objects.create(
-                    hashed_query=self.get_sha1(),
-                    hit_count=count)
+            hcc, _ = mysite.search.models.HitCountCache.objects.get_or_create(
+                    hashed_query=hashed_query,
+                    defaults={'hit_count': count})
         return hcc.hit_count
 
        

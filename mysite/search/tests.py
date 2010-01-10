@@ -2,6 +2,7 @@ from mysite.base.tests import make_twill_url, TwillTests
 
 import mysite.account.tests
 from mysite.profile.models import Person
+import mysite.profile.models
 import mysite.customs.miro
 import mysite.search.controllers
 
@@ -905,10 +906,12 @@ class QueryGetPossibleLanguageFacetOptionNames(SearchTest):
         python_project = Project.create_dummy(language='Python')
         perl_project = Project.create_dummy(language='Perl')
         c_project = Project.create_dummy(language='C')
+        unknown_project = Project.create_dummy(language='')
 
         python_bug = Bug.create_dummy(project=python_project, title='a')
         perl_bug = Bug.create_dummy(project=perl_project, title='a') 
         c_bug = Bug.create_dummy(project=c_project, title='b') 
+        unknowable_bug = Bug.create_dummy(project=unknown_project, title='unknowable') 
 
     def test_with_term(self):
         # In the setUp we create three bugs, but only two of them would match
@@ -934,7 +937,34 @@ class QueryGetPossibleLanguageFacetOptionNames(SearchTest):
         language_names = query.get_language_names()
         self.assertEqual(
                 sorted(language_names),
-                sorted(['Python', 'Perl', 'C']))
+                sorted(['Python', 'Perl', 'C', 'Unknown']))
+
+    def test_with_language_as_unknown(self):
+        # In the setUp we create bugs in three languages.
+        # Here, we verify that the get_language_names() method correctly returns
+        # all three languages, even though the GET data shows that we are
+        # browsing by language.
+
+        GET_data = {'language': 'Unknown'}
+
+        query = mysite.search.controllers.Query.create_from_GET_data(GET_data)
+        language_names = query.get_language_names()
+        self.assertEqual(
+                sorted(language_names),
+                sorted(['Python', 'Perl', 'C', 'Unknown']))
+
+    def test_with_language_as_unknown_and_query(self):
+        # In the setUp we create bugs in three languages.
+        # Here, we verify that the get_language_names() method correctly returns
+        # all three languages, even though the GET data shows that we are
+        # browsing by language.
+
+        GET_data = {'language': 'Unknown', 'q': 'unknowable'}
+
+        query = mysite.search.controllers.Query.create_from_GET_data(GET_data)
+        match_count = query.get_bugs_unordered().count()
+
+        self.assertEqual(match_count, 1)
 
 class QueryContributionType(SearchTest):
 
@@ -1068,5 +1098,85 @@ class PublicizeBugTrackerIndex(SearchTest):
         self.assertEqual(
                 self.search_page_response.context[0]['project_count'],
                 self.bug_tracker_count)
+
+class LaunchpadImporterMarksFixedBugsAsClosed(TwillTests):
+    def test(self):
+        '''Start with a bug that is "Fix Released"
+
+        Verify that we set looks_closed to True'''
+        # retry this with committed->released
+        lp_data_dict = {'project': '',
+                        'url': '',
+                        'title': '',
+                        'text': '',
+                        'status': 'Fix Committed',
+                        'importance': '',
+                        'reporter': {'lplogin': '', 'realname': ''},
+                        'comments': '',
+                        'date_updated': datetime.datetime.now().timetuple(),
+                        'date_reported': datetime.datetime.now().timetuple()}
+        # maybe I could have done this with a defaultdict of str with
+        # just the non-str exceptions
+        query_data, new_data = mysite.search.launchpad_crawl.clean_lp_data_dict(
+            lp_data_dict)
+        self.assertTrue(new_data['looks_closed'])
+
+    def test_with_status_missing(self):
+        '''Verify we do not explode if Launchpad gives us a bug with no Status
+
+        Verify that we set looks_closed to True'''
+        # retry this with committed->released
+        lp_data_dict = {'project': '',
+                        'url': '',
+                        'title': '',
+                        'text': '',
+                        'importance': '',
+                        'reporter': {'lplogin': '', 'realname': ''},
+                        'comments': '',
+                        'date_updated': datetime.datetime.now().timetuple(),
+                        'date_reported': datetime.datetime.now().timetuple()}
+        # maybe I could have done this with a defaultdict of str with
+        # just the non-str exceptions
+        query_data, new_data = mysite.search.launchpad_crawl.clean_lp_data_dict(
+            lp_data_dict)
+        self.assertEqual(new_data['status'], 'Unknown')
+
+class TestPotentialMentors(TwillTests):
+    fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
+
+    def test(self):
+        '''Create a Banshee mentor who can do C#
+        and a separate C# mentor, and verify that Banshee thinks it has
+        two potential mentors.'''
+
+        banshee = Project.create_dummy(name='Banshee', language='C#')
+        can_mentor, _ = mysite.profile.models.TagType.objects.get_or_create(name='can_mentor')
+        
+        willing_to_mentor_banshee, _ = mysite.profile.models.Tag.objects.get_or_create(
+            tag_type=can_mentor,
+            text='Banshee')
+
+        willing_to_mentor_c_sharp, _ = mysite.profile.models.Tag.objects.get_or_create(
+            tag_type=can_mentor,
+            text='C#')
+
+        link = mysite.profile.models.Link_Person_Tag(
+            person=Person.objects.get(user__username='paulproteus'),
+            tag=willing_to_mentor_banshee)
+        link.save()
+
+        link = mysite.profile.models.Link_Person_Tag(
+            person=Person.objects.get(user__username='paulproteus'),
+            tag=willing_to_mentor_c_sharp)
+        link.save()
+
+        link = mysite.profile.models.Link_Person_Tag(
+            person=Person.objects.get(user__username='barry'),
+            tag=willing_to_mentor_c_sharp)
+        link.save()
+
+        banshee_mentors = banshee.potential_mentors()
+        self.assertEqual(len(banshee_mentors), 2)
+
 
 # vim: set nu ai et ts=4 sw=4 columns=100:

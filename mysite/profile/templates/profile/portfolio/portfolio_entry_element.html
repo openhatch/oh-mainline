@@ -99,8 +99,12 @@
                 {% endif %}
             </div>
             <div class='experience_description-wrapper'>
-                {% if pf_entry.experience_description or edit_mode %}
+                {% if pf_entry.experience_description %}
+                {% if edit_mode %}
                 <label>Describe your involvement</label>
+                {% else %}
+                <label style='margin-bottom: 5px;'>Involvement description</label>
+                {% endif %}
                 {% endif %}
                 {% if edit_mode %}
                 <textarea class='experience_description'></textarea>

@@ -54,19 +54,6 @@
     width: 550px;
 }
 
-#results-sidebar {
-    float: right;
-    width: 120px;
-    padding: 10px;
-}
-#results-sidebar img {
-    float: left;
-    margin-right: 5px;
-}
-#results-sidebar a {
-    float: left;
-    margin-bottom: 10px;
-}
 #results-widget {
     padding: 12px;
     padding-bottom: 6px;
@@ -107,7 +94,7 @@ p {
 }
 /* generic list code */
 #results.box {
-    background: #fff url('/static/images/motif.png');
+    background: #fff;
     padding-right: 0;
 }
 #results ul {
@@ -120,7 +107,7 @@ p {
     font-size: 100%;
     float: left;
     list-style: none;
-    width: 555px;
+    width: 100%;
     white-space: nowrap;
     margin: 0;
     margin-bottom: 8px;
@@ -153,7 +140,7 @@ p {
     font-size: 14px;
     float: left;
     padding: 5px 10px;
-    width: 535px;
+    width: 100%;
     overflow: hidden;
     border-bottom: 2px solid #f4f4f4;
 }
@@ -281,7 +268,7 @@ p {
     margin: 0;
     padding: 0;
     float: left;
-    width: 560px;
+    width: 99%;
 }
 #opps li {
     overflow: hidden;
@@ -369,9 +356,6 @@ p {
     height: 50px;
 }
 .good-for-beginners {
-    color: #555;
-    background-color: #acebc7;
-    width: 300px;
     padding: 1px;
 }
 .good-for-beginners img {
@@ -443,7 +427,7 @@ input[type='text'].default-text-active {
 #filters h4 { margin-bottom: 5px; }
 ul#facets { margin-left: 17px; }
 ul#facets ul { margin-left: 10px; }
-ul#facets ul li, #suggested_searches li { list-style: square; margin-top: 10px; margin-left: 20px; color: #777; }
+ul#facets ul li, #suggested_searches li { list-style: square; margin-top: 10px; margin-left: 20px; color: #777; clear: left;}
 #facets li.active { font-weight: bold; }
 
 #results-summary { width: 70%; float: left; margin-right: 10px; }
@@ -460,4 +444,14 @@ ul#facets ul li, #suggested_searches li { list-style: square; margin-top: 10px; 
 
 #hwat-is-this ul li { list-style: square; margin: 5px 0 0 20px; }
 
-    /* vim: set ai ts=4 sts=4 et sw=4: */
+.green-bullet {
+    font-size: 90%;
+    position: relative;
+    top: -2px; 
+    color: green;
+}
+
+#expand-collapse-all { float: right; }
+#expand-collapse-all img { float: left; margin-right: 5px; }
+#expand-collapse-all a { float: left; padding: 5px; }
+/* vim: set ai ts=4 sts=4 et sw=4: */

@@ -2,6 +2,7 @@
 import os
 import Image
 import urllib
+import mock
 
 from mysite.profile.models import Person
 from mysite.base.tests import make_twill_url, TwillTests
@@ -68,7 +69,7 @@ class EditPassword(TwillTests):
             should_succeed = True):
         tc.go(make_twill_url('http://openhatch.org/people/paulproteus'))
         tc.follow('settings')
-        tc.follow('Change your password')
+        tc.follow('Password')
         tc.url('/account/settings/password')
 
         tc.fv('a_settings_tab_form', 'old_password', old_pass)
@@ -107,6 +108,7 @@ class EditContactInfo(TwillTests):
     def test_edit_email_address(self):
         self.login_with_twill()
         
+
         _url = 'http://openhatch.org/account/settings/contact-info/'
         url = make_twill_url(_url)
 
@@ -115,13 +117,15 @@ class EditContactInfo(TwillTests):
         # Go to contact info form
         tc.go(url)
 
+        # Let's first ensure that "new@ema.il" doesn't appear on the page.
+        # (We're about to add it.)
         tc.notfind('checked="checked"')
         tc.notfind(email)
 
         # Edit email
-        tc.fv(1, 'edit_email-email', email)
+        tc.fv("a_settings_tab_form", 'edit_email-email', email)
         # Show email
-        tc.fv(1, 'show_email-show_email', '1') # [1]
+        tc.fv("a_settings_tab_form", 'show_email-show_email', '1') # [1]
         tc.submit()
 
         # Form submission ought to redirect us back to the form.
@@ -144,7 +148,7 @@ class EditContactInfo(TwillTests):
         tc.go(url)
 
         # 2.2. Don't show email
-        tc.fv(1, 'show_email-show_email', '0') # [1]
+        tc.fv("a_settings_tab_form", 'show_email-show_email', '0') # [1]
         tc.submit()
 
         # 2.3. Verify it's not on profile anymore
@@ -229,6 +233,68 @@ class EditPhotoWithOldPerson(TwillTests):
             p = Person.objects.get(user__username='paulproteus')
             self.assert_(p.photo.read() ==
                     open(image).read())
+    #}}}
+
+class GuessLocationOnLogin(TwillTests):
+    #{{{
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+    mock_ip = mock.Mock()
+    mock_ip.return_value = "128.151.2.1"
+    @mock.patch("mysite.base.middleware.get_user_ip", mock_ip)
+    def test_guess_location_on_login(self):
+        person = Person.objects.get(user__username="paulproteus")
+        self.assertFalse(person.location_confirmed)
+        self.assertFalse(person.location_display_name)
+        
+        client = self.login_with_client()
+        response = client.get(reverse(mysite.profile.views.display_list_of_people))
+        self.assertContains(response, "OpenHatch")
+        person = Person.objects.get(user__username="paulproteus")
+        self.assertEqual(person.location_display_name, "Rochester, NY, United States")
+        self.assertContains(response, person.location_display_name)
+
+    def test_yes_response(self):
+        person = Person.objects.get(user__username="paulproteus")
+        #logging in
+        client = self.login_with_client()
+        # sending http request to correct page for "yes" response
+        response = client.post(reverse(mysite.account.views.confirm_location_suggestion_do))
+        #asserting that we get back an http status code of 200
+        person = Person.objects.get(user__username="paulproteus")
+        self.assertEqual(response.status_code, 200)
+        #asserting that database was updated
+        self.assertTrue(person.location_confirmed)
+
+    def test_dont_guess_response(self):
+        person = Person.objects.get(user__username="paulproteus")
+        #logging in
+        client = self.login_with_client()
+        # sending http request to correct page for "don't guess" response
+        response = client.post(reverse(mysite.account.views.dont_guess_location_do))
+        #asserting that we get back an http status code of 200
+        person = Person.objects.get(user__username="paulproteus")
+        self.assertEqual(response.status_code, 200)
+        #asserting that database was updated
+        self.assertTrue(person.dont_guess_my_location)
+
+    @mock.patch("mysite.base.middleware.get_user_ip", mock_ip)
+    def test_no_response(self):
+        person = Person.objects.get(user__username="paulproteus")
+        #logging in
+        client = self.login_with_client()
+        # sending http request to correct page for "no" response
+        response = client.get(reverse(mysite.account.views.set_location), {'dont_suggest_location': 1})
+        person = Person.objects.get(user__username="paulproteus")
+        self.assert_(person.location_display_name)
+        self.assertNotContains(response, person.location_display_name)
+
+        
+        
+
+
+
+
+        
     #}}}
 
 # vim: set nu:

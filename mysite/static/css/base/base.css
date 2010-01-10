@@ -153,9 +153,45 @@ h1 {
     color: #222;
 }
 
+#location-suggestion-notification {
+    width: 729px;
+    margin-right: 10px;
+    font-size: 1.2em; 
+    text-align: left;
+    float: right;
+    background-color: #FFFFAA;
+    padding: 8px 12px;
+    -moz-border-radius: 8px; 
+    border-radius: 8px;
+    
+
+} 
+#location-suggestion-notification h2 {
+    text-align: left;
+    width: 100%;
+}
+#location-suggestion-notification ul {
+    margin-top: 3px;
+    float: none;
+    text-align: center;
+    float: left;
+}
+
+#location-suggestion-notification li {
+    display: block;
+    float: none;
+    margin-top: 0px;
+    text-align: left;
+    margin-left: 0px;
+    margin-right: 5px;
+    float: left;
+}
+
+
 #page-top {
     width: 960px;
     padding: 0 20px;
+    clear: both;
 }
 
 ul#links {
