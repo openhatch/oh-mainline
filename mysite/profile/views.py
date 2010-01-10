@@ -232,18 +232,6 @@ def import_debtags(cooked_string = None):
 
 # Project experience tags {{{
 
-# FIXME: rename to project_exp_tag__add__web
-#def add_tag_to_project_exp_web(request):
-
-# FIXME: rename to project_exp_tag__add
-#def add_tag_to_project_exp(username, project_name,
-#        tag_text, tag_type_name='user_generated'):
-
-#def project_exp_tag__remove(username, project_name,
-#        tag_text, tag_type_name='user_generated'):
-
-#def project_exp_tag__remove__web(request):
-
 # }}}
 
 def _project_hash(project_name):
