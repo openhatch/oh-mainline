@@ -15,9 +15,9 @@ Location
 
 {% block submodule_body %}
 {% if the_user.get_profile.location_display_name %}
-<p style="visibility: hidden;" id="success_message">Your location is visible on <a href="{%url mysite.profile.views.display_list_of_people %}">the global map</a>.</p>
+<p style="visibility: hidden;" id="success_message">Your location is visible on <a href="{%url mysite.profile.views.people_map %}">the global map</a>.</p>
 {% else %}
-<p>To appear on <a href="{%url mysite.profile.views.display_list_of_people %}">the global map</a>,
+<p>To appear on <a href="{%url mysite.profile.views.people_map %}">the global map</a>,
   set a location.</p>
 {% endif %}
 {% if not the_user.get_profile.location_confirmed and the_user.get_profile.location_display_name and not the_user.get_profile.dont_guess_my_location  and not dont_suggest_location %}
