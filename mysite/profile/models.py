@@ -337,6 +337,35 @@ class ProjectExp(models.Model):
         # }}}
 
     @staticmethod
+    # Note: This returns a ProjectExp object that is not necessarily
+    # saved. That's up to the caller.
+    def create_from_github_result(github_repo_object, person,
+                                  repo_primary_language):
+        SOURCE="Github"
+        # {{{
+        # FIXME: Take language argument into account
+        project, bool_created = Project.objects.get_or_create(
+                name=github_repo_object.name)
+        matches = list(ProjectExp.objects.filter(project=project,
+                                                 person=person,
+                                                 source=SOURCE))
+        if matches:
+            project_exp = matches[0]
+        else:
+            # Calculate the string for person_role
+            if github_repo_object.fork:
+                person_role='Forked'
+            else:
+                person_role='Started'
+
+            project_exp = ProjectExp(person=person, project=project,
+                                     source=SOURCE, person_role=person_role,
+                                     primary_language=repo_primary_language)
+                                     
+        return project_exp
+        # }}}
+
+    @staticmethod
     def create_from_text(
             username,
             project_name,
