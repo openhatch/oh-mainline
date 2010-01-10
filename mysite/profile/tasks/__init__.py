@@ -105,8 +105,6 @@ def ou_action(dia):
 def lp_action(dia):
     # NB: Don't change the way this is called, because calling it this way
     # permits this function to be mocked when we test it.
-    # FIXME: Is that true?
-
     return lp_grabber.get_info_for_launchpad_username(dia.query)
 
 source2actual_action = {
