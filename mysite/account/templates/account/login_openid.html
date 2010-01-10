@@ -1,7 +1,7 @@
 <form id="openid_form" name="openid_form"
     action="{% url user_signin %}" method="post">
     <p>No need to sign up! Sign in with an account you already have.</p>
-    <p>Just <strong>click your account provider</strong>:</p>
+    <p id="please_click">Just <strong>click your account provider</strong>:</p>
     <input type="hidden" name="action" value="verify" />
     <input type="hidden" name="next" value="{{ next }}" />
     <div id="openid_choice">
