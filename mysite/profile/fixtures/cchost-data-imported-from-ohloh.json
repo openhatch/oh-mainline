@@ -1,4 +1,3 @@
 [
  {"pk": 3, "model": "search.project", "fields": {"icon_raw": "/static/no-project-icon.png", "name": "ccHost", "language": ""}},
- {"pk": 13, "model": "profile.projectexp", "fields": {"man_months": 1, "description": "", "url": null, "primary_language": "shell script", "project": 3, "person": 1, "source": "Ohloh", "person_role": ""}}
 ]
