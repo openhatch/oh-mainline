@@ -1,6 +1,6 @@
 # Log into linode
 send_user "\r\n*** Dialing into remote computer... ***\r\n"
-spawn ssh deploy@oh
+spawn ssh deploy@linode.openhatch.org
 
 #FIXME: use /bin/dash -e so the remote shell simply exits on error
 expect "$ "
