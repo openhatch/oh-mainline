@@ -8,7 +8,7 @@ List of People
         {% if property and value %}
         where {{ property }} = {{ value }}
         {% endif %}
-        <ul>
+        <ul id="people-list">
             {% for person in people %}
             {% if person.user.username %}
             <li>

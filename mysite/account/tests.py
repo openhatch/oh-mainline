@@ -108,6 +108,9 @@ class EditContactInfo(TwillTests):
     def test_edit_email_address(self):
         self.login_with_twill()
         
+        import pdb
+        pdb.set_trace()
+
         _url = 'http://openhatch.org/account/settings/contact-info/'
         url = make_twill_url(_url)
 
@@ -116,6 +119,8 @@ class EditContactInfo(TwillTests):
         # Go to contact info form
         tc.go(url)
 
+        # Let's first ensure that "new@ema.il" doesn't appear on the page.
+        # (We're about to add it.)
         tc.notfind('checked="checked"')
         tc.notfind(email)
 

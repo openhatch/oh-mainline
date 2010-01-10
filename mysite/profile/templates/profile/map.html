@@ -9,7 +9,7 @@ Map of People
         where {{ property }} = {{ value }}
         {% endif %}
         <div id="map_canvas" style="float: left; margin-right: 10px; width:70%; height:450px"></div>
-        <ul style='float: left; width: 20%;'>
+        <ul id="people-list" style='float: left; width: 20%;'>
             {% for person in people %}
             {% if person.user.username %}
 	    <li id="person_bullet_{{person.pk}}" style="display: none;">

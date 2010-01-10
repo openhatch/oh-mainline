@@ -1,0 +1,41 @@
+{% extends 'base/one_column.html' %}
+
+{% block title %}
+People
+{% endblock title %}
+
+{% block css %}
+{{ block.super }}
+@import url('/static/css/profile/search_people.css');
+{% endblock css %}
+
+{% block main %}
+<img alt='People on OpenHatch' id='people-search' alt='People on OpenHatch' src='/static/images/people-search.png' />
+<div id='big-people-list' class='module'>
+    <div class='module-content body'>
+        {% ifnotequal slug "display_list_of_people_who_match_some_search" %}
+        <div class="view-links">
+            <ul>
+                <li>
+        {% ifequal slug "people_map" %}
+        <a href="{% url mysite.profile.views.display_list_of_people %}">List View</a>
+        {% else %}
+        List View
+        {% endifequal %}
+                </li>
+                <li>
+        {% ifequal slug "display_list_of_people" %}
+        <a href="{% url mysite.profile.views.people_map %}">Map View</a>
+        {% else %}
+            Map View
+        {% endifequal %}
+                </li>
+        </ul>
+        </div>
+        {% endifnotequal %}
+    {% block people_main %}
+    {% endblock people_main %}
+    </div>
+</div>
+
+{% endblock main %}
