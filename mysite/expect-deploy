@@ -47,7 +47,7 @@ while {true} {
 expect {
     "buildout.cfg" {
         send_user "\r\n*** Change to buildout.cfg detected. Running buildout... ***\r\n"
-        send "./bin/buildout"
+        send "./bin/buildout\r"
     }
     "$ " 
 }
