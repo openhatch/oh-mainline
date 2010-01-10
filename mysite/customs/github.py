@@ -7,7 +7,9 @@ _github = None
 
 # Always initialize this at module import time
 # If this web app ran on an OLPC laptop, we'd be making
-# children sad.
+# children sad by running unnecessary code at module
+# import time. But this seems just fine to me for a long-
+# running server process.
 _github = github2.client.Github(username=settings.GITHUB_USERNAME,
                                api_token=settings.GITHUB_API_TOKEN)
 

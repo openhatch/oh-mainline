@@ -222,13 +222,7 @@ class MockFetchPersonDataFromOhloh(object):
         task.debugging = True # See FetchPersonDataFromOhloh
         task.run(*args, **kwargs)
 
-class CeleryTests(TwillTests):
-    # {{{
-    fixtures = ['user-paulproteus', 'person-paulproteus']
-
-    # FIXME: One day, test that after self.test_slow_loading_via_emulated_bgtask
-    # getting the data does not go out to Ohloh.
-
+class BaseCeleryTest(TwillTests):
     def _test_data_source_via_emulated_bgtask(self, source, data_we_expect, summaries_we_expect):
         "1. Go to the page that has paulproteus' data. "
         "2. Verify that the page doesn't yet know about ccHost. "
@@ -302,6 +296,13 @@ class CeleryTests(TwillTests):
         for n, citation in enumerate(citations):
             self.assertEqual(citation.data_import_attempt, dia)
             self.assertEqual(citation.summary, summaries_we_expect[n])
+
+class CeleryTests(BaseCeleryTest):
+    # {{{
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    # FIXME: One day, test that after self.test_slow_loading_via_emulated_bgtask
+    # getting the data does not go out to Ohloh.
 
     @mock.patch('mysite.customs.ohloh.Ohloh.get_contribution_info_by_username', mock_gcibu)
     @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
@@ -1310,6 +1311,47 @@ class GithubProfileImporting(TwillTests):
 
     def test_github_importer_saves_project_homepage(self):
         pass
-        
+
+class MockGithubImport(BaseCeleryTest):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    @mock.patch('mysite.customs.github.info_by_username')
+    @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
+    def test_github_import_via_emulated_bgtask(self, mock_github_projects):
+        "Test that we can import data from Github. Use a mock list of "
+        "fake Github projects so we don't bother the Github API (or waste "
+        "time waiting for it."
+        # {{{
+        mock_github_projects.return_value = [ObjectFromDict({
+            'name': 'project_we_forked',
+            'fork': True}),
+            ObjectFromDict({'name': 'project_we_did_not_fork',
+                            'fork': False})]
+            
+        data_we_expect = [
+                {
+                    'contributor_role': 'Forked',
+                    'languages': "", # FIXME
+                    'is_published': False,
+                    'is_deleted': False,
+                    },
+                {
+                    'contributor_role': 'Started',
+                    'languages': "", # FIXME
+                    'is_published': False,
+                    'is_deleted': False,
+                    }
+                ]
+
+        # FIXME: Write these properly.
+        summaries_we_expect = [
+                'Forked a repository on Github',
+                'Started a repository on Github',
+                ]
+
+        return self._test_data_source_via_emulated_bgtask(
+                source='github', data_we_expect=data_we_expect,
+                summaries_we_expect=summaries_we_expect)
+        # }}}
 
 # vim: set ai et ts=4 sw=4 nu:

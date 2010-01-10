@@ -86,6 +86,9 @@ def create_citations_from_launchpad_results(dia_id, lp_results):
     dia.save()
     # }}}
 
+def create_citations_from_github_contributor_facts(dia_id, results):
+    pass
+
 def rs_action(dia):
     oh = ohloh.get_ohloh()
     data, web_response = oh.get_contribution_info_by_username(
@@ -102,6 +105,15 @@ def ou_action(dia):
     dia.save()
     return data
 
+def github_action(dia):
+    # FIXME: We should add a person parameter so that, in the
+    # case of "You should retry soon..." messages from the Github
+    # API, we notify the user.
+
+    # FIXME: Make web_response objects have a DIA attribute.
+    # The way we're doing it now is basically backwards.
+    data, web_response = mysite.customs.github.info_by_username(dia.query)
+    
 def lp_action(dia):
     # NB: Don't change the way this is called, because calling it this way
     # permits this function to be mocked when we test it.
@@ -110,12 +122,14 @@ def lp_action(dia):
 source2actual_action = {
         'rs': rs_action,
         'ou': ou_action,
+        'github': github_action,
         'lp': lp_action
         }
 
 source2result_handler = {
         'rs': create_citations_from_ohloh_contributor_facts,
         'ou': create_citations_from_ohloh_contributor_facts,
+        'github': create_citations_from_github_contributor_facts,
         'lp': create_citations_from_launchpad_results,
         }
 
