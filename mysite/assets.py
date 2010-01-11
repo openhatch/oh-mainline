@@ -10,31 +10,37 @@ ASSETS_AUTO_CREATE=True
 # See documentation at <http://elsdoerfer.name/docs/django-assets/settings.html#assets-expire>
 ASSETS_EXPIRE='filename'
 
-# Bundle all of our JavaScripts into what Cal Henderson calls a "monolith".
+# Below, we bundle all of our JavaScripts into what Cal Henderson calls a "monolith".
 # (See <http://carsonified.com/blog/dev/serving-javascript-fast/>.)
+
+# NB: "Note that...all filenames and paths are considered to be
+# relative to Django’s MEDIA_ROOT settings, and generated urls will be based on MEDIA_URL."
+# <http://elsdoerfer.name/docs/django-assets/bundles.html>
+
 js_monolith = django_assets.Bundle(
 
         # JavaScripts kindly provided by other folks
-        'static/js/jquery.js',
-        'static/js/jquery.query.js',
-        'static/js/jquery.json.js',
-        'static/js/jquery.hint.js',
-        'static/js/jquery.form.js',
-        'static/js/jquery.jgrowl.js',
-        'static/js/jquery-ui-1.7.2.custom.min.js',
-        'static/js/jquery.cookie.js',
-        'static/js/piwik.js',
+#        'js/jquery.js',
+        
+#        'js/jquery.query.js',
+#        'js/jquery.json.js',
+#        'js/jquery.hint.js',
+#        'js/jquery.form.js',
+#        'js/jquery.jgrowl.js',
+#        'js/jquery-ui-1.7.2.custom.min.js',
+#        'js/jquery.cookie.js',
+#        'js/piwik.js',
+#
+#        # Stuff we wrote
+#        'js/base/locationDialog.js',
+#        'js/base/base.js',
+#        'js/search/defaultText.js',
+#        'js/account/set_location.js',
+#        'js/profile/portfolio.js',
+#        'js/importer.js',  # ~32KB at time of writing (commit 391939b7)
+        #'js/css_if_js.js', # I don't think we need this
 
-        # Stuff we wrote
-        'static/js/base/locationDialog.js',
-        'static/js/base/base.js',
-        'static/js/search/defaultText.js',
-        'static/js/account/set_location.js',
-        'static/js/profile/portfolio.js',
-        'static/js/importer.js',  # ~32KB at time of writing (commit 391939b7)
-        #'static/js/css_if_js.js', # I don't think we need this
-
-        filters='jsmin',
-        output='static/js/bundle.js')
+        #filters='jsmin',
+        output='bundle.js')
 
 django_assets.register('big_bundle_of_javascripts', js_monolith)
