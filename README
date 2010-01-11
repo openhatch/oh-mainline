@@ -18,6 +18,10 @@ echo "GRANT ALL PRIVILEGES ON oh_milestone_a.* TO 'oh_milestone_a'@'localhost' I
 
 ../bin/mysite syncdb
 
+Note that you must answer "No" to the question, "Do you want to create a superuser?"
+
+That is because you have not run the migrations for the "Profile" app yet.
+
 # You may need to migrate using this command:
 ../bin/mysite migrate
 
@@ -28,6 +32,10 @@ echo "GRANT ALL PRIVILEGES ON oh_milestone_a.* TO 'oh_milestone_a'@'localhost' I
 # Regarding dates. You may need to replace South's strange Pythonesque code for dates with proper MySQL code.
 
 Now load http://127.0.0.1:8000/search/ in your web browser.
+
+== Frequently Asked Questions ==
+
+Q. Why is the Django project called 'mysite'?
 
 == Testing ==
 
@@ -51,3 +59,17 @@ $ ./bin/buildout -o # o is for "offline", so you don't hit the network looking f
 * jGrowl
 * Lots of other people who definitely need to be thanked here
 * Some other people who don't
+
+== MaxMind GeoIP City Lite database ==
+
+This product includes GeoLite data created by MaxMind, available from http://www.maxmind.com/.
+
+To use it:
+
+Start from milestone-a. Run these commands:
+
+	cd downloads
+	wget http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz
+	gunzip GeoLiteCity.dat.gz
+
+Ta-da. In theory we/you should do that every month, when MaxMind does a refresh.

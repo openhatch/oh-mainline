@@ -51,9 +51,10 @@ about our members who support {{ project.name }}
         <h3>Relatedly</h3>
     </div>
     <div class='body'>
+      <p>
             {% if project.get_open_bugs %}
+            Browse {{ project.get_open_bugs|length }}+
             <a href='/search/?q={{ project.name|urlencode }}'>
-                Browse {{ project.get_open_bugs|length }}+
                 volunteer opportunit{{ project.get_open_bugs|pluralize:"y,ies"}}
                 matching
                 <strong>{{ project.name }}</strong>.
@@ -65,6 +66,35 @@ about our members who support {{ project.name }}
                 visit our wiki</a>.
 
             {% endif %}
+      </p>
+      
+      <p>
+            {% if mentors %}
+            There are {{ mentors|length }}
+            <a href='{% url mysite.profile.views.display_list_of_people_who_match_some_search "can_mentor" project.name|urlencode %}'>
+                {{ mentors|length|pluralize:"person,people" }}
+	      who can mentor in
+              <strong>{{ project.name }}</strong></a>.
+            {% else %}
+            No one on OpenHatch has signed up as a mentor for {{project.name}}.
+	    Can you?
+	    <a href="{% url mysite.profile.views.edit_info %}">Edit your info</a>.
+            {% endif %}
+      </p>
+
+      <p>
+            {% if language_mentors %}
+            There
+	    {{ language_mentors|length|pluralize:"is,are" }}
+            <a href='{% url mysite.profile.views.display_list_of_people_who_match_some_search "can_mentor" project.language|urlencode %}'>
+                {{ language_mentors|length}}
+                {{ language_mentors|length|pluralize:"person,people" }}
+	      who can mentor in
+	    <strong>{{ project.language }}</strong></a>,
+            {{ project.name}}'s primary language.
+            {% endif %}
+      </p>
+
     </div>
 </div>
 {% endwith %}

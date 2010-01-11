@@ -5,28 +5,38 @@
     <div class='head'>
         <img alt='logo for {{bug.project.name}}' title='{{bug.project.name}}'
         src='{{ bug.project.get_url_of_search_result_icon_or_generic }}' />
-        <span class='project__name'>{{ bug.project.name|highlight:query.terms }}</span>
-        -
-        <a class='canonical_bug_link' href='{{ bug.canonical_bug_link }}'>
-            <span class='title'>{{ bug.title|highlight:query.terms }}</span>
-        </a>
+        <span class='project__name'>{{ bug.project.name|highlight:query.terms }}</span>:
+        <span class='title'>{{ bug.title|highlight:query.terms }}</span>
+        |
+        <span class='expand'><a href=''>expand</a></span>
+        |
+        <span class='link'><a href='{{ bug.canonical_bug_link }}'>link</a></span>
         {#<div class='age'>3 days old</div>#}
     </div>
 </div>
 <div class='second-line'>
     <span class='description-container'>
+        {% if bug.good_for_newcomers %}
+        <span class='good-for-beginners'><span class="green-bullet">&#9679;</span> Bite-size</span> -
+        {% endif %}
+
         {% if bug.project.language %}
 
         {% if bug.project.language.lower|in_list:query.terms %}
-        <span class='project__language highlight'>{{ bug.project.language }}</span> -
+        <span class='project__language highlight'>{{ bug.project.language }}</span>
         {% else %}
-        <span class='project__language'>{{ bug.project.language }}</span> -
+        <span class='project__language'>{{ bug.project.language }}</span>
         {% endif %}
 
         {% endif %}
-        {% if bug.good_for_newcomers %}
-        <span class='good-for-beginners'>Bite-size</span> -
-        {% endif %}
+
+	{% if bug.project.potential_mentors %}
+	<span class="helpers" style="color: black;">
+	  - <a href="{{ bug.project.get_url }}">{{bug.project.potential_mentors|length}} potential
+	  mentor{{bug.project.potential_mentors|length|pluralize}}</a>
+	</span>
+	{% endif %}
+	-
         <span class='description'>{{ bug.description|highlight:query.terms|linebreaks }}</span>
     </span>
 </div>

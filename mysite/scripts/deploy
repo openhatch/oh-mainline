@@ -1,2 +1,4 @@
+#!/bin/bash
+set -x
 git push origin HEAD:master
 expect expect-deploy
