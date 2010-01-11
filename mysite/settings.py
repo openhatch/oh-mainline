@@ -1,7 +1,6 @@
-# Django settings for mysite project.
-
 import os
 import logging
+# Django settings for mysite project.
 
 # Django Assets <http://github.com/miracle2k/django-assets>
 # helps us bundle our assets, i.e., JavaScript and CSS,
