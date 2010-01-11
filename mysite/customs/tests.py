@@ -563,21 +563,21 @@ class LineAcceptorTest(django.test.TestCase):
             '\x02FreeBSD:\x0f to silence newer GCC versions.',
             '\x02KDE:\x0f \x0303lueck\x0f * r\x021071711\x0f \x0310\x0f/branches/work/doc/kget/\x02:\x0f kget doc was moved back to trunk',
             '\x02SHR:\x0f \x0303mok\x0f \x0307libphone-ui-shr\x0f * r\x027cad6cdc76f9\x0f \x0310\x0f/po/ru.po\x02:\x0f po: updated russian translation from Vladimir Berezenko']
-        lia = mysite.customs.cia.LineAcceptingAgent(callback)
+        agent = mysite.customs.cia.LineAcceptingAgent(callback)
 
         expecting_response = None
         # expecting no full message for the first THREE lines
-        lia.handle_message(lines[0])
+        agent.handle_message(lines[0])
         self.assertFalse(got_response)
         
-        lia.handle_message(lines[1])
+        agent.handle_message(lines[1])
         self.assertFalse(got_response)
 
-        lia.handle_message(lines[2])
+        agent.handle_message(lines[2])
         self.assertFalse(got_response)
 
         # but now we expect something!
-        lia.handle_message(lines[3])
+        agent.handle_message(lines[3])
         wanted = {'project_name': 'FreeBSD', 'path': '/head/sys/ (4 files in 4 dirs)', 'message': "Replace several instances of 'if (!a & b)' with 'if (!(a &b))' in order\nto silence newer GCC versions.", 'committer_identifier': 'trasz', 'version': 'r201794'}
         got = got_response[0]
         self.assertEqual(got, wanted)
@@ -586,9 +586,8 @@ class LineAcceptorTest(django.test.TestCase):
         # FIXME use (project_name, version) pair instead I guess
 
         # and again, but differently
-        lia.handle_message(lines[4])
+        agent.handle_message(lines[4])
         wanted = {'project_name': 'KDE', 'path': '/branches/work/doc/kget/', 'message': "kget doc was moved back to trunk", 'committer_identifier': 'lueck', 'version': 'r1071711'}
         self.assertEqual(got_response[0], wanted)
         got_response[:] = []        
-        pass # Goal: Pass in on
 # vim: set nu:
