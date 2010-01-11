@@ -153,146 +153,55 @@ h1 {
     color: #222;
 }
 
-#location-suggestion-notification {
-    width: 729px;
-    margin-right: 10px;
-    font-size: 1.2em; 
-    text-align: left;
-    float: right;
-    background-color: #FFFFAA;
-    padding: 8px 12px;
-    -moz-border-radius: 8px; 
-    border-radius: 8px;
-    
+#location-suggestion-notification { width: 40em; margin-right: 10px; font-size: 1.2em; text-align: left; float: right; background-color: #FFFFAA; padding: 8px 12px; -moz-border-radius: 8px; border-radius: 8px; }
 
-} 
-#location-suggestion-notification h2 {
-    text-align: left;
-    width: 100%;
-}
-#location-suggestion-notification ul {
-    margin-top: 3px;
-    float: none;
-    text-align: center;
-    float: left;
-}
+#location-suggestion-notification p { margin: 0;}
 
-#location-suggestion-notification li {
-    display: block;
-    float: none;
-    margin-top: 0px;
-    text-align: left;
-    margin-left: 0px;
-    margin-right: 5px;
-    float: left;
-}
+#location-suggestion-notification p strong.suggested_location { white-space: nowrap; }
 
+#location-suggestion-notification h2 { text-align: left; width: 100%; }
 
-#page-top {
-    width: 960px;
-    padding: 0 20px;
-    clear: both;
-}
+#location-suggestion-notification ul { margin-top: 3px; float: none; text-align: center; float: left; }
 
-ul#links {
-    margin-left: 20px;
-}
+#location-suggestion-notification li { display: block; float: none; margin-top: 0px; text-align: left; margin-left: 0px; margin-right: 5px; float: left; }
 
-#links li {
-    display: inline;
-    font-size: 12pt;
-    margin-top: 20px;
-}
+#page-top { width: 960px; padding: 0 20px; clear: both; }
 
-#account-links #username {
-    font-weight: bold;
-}
-#account-links {
-    float: right;
-    /*
-    background: transparent url('/static/images/gray-60.png');
-    -moz-border-radius: 8px;
-    border-radius: 8px;
-    */
-}
-#account-links li {
-    margin: 0;
-    font-size: 11pt;
-}
-#account-links a {
-    float: left;
-    padding: 5px 10px;
-    color: #484848;
-}
-#account-links a:hover {
-}
+ul#links { margin-left: 20px; }
 
-#content {
-    width: 960px;
-    padding: 20px;
-    padding-bottom: 5px;
-    clear: both;
-}
+#links li { display: inline; font-size: 12pt; margin-top: 20px; }
 
-#footer-wrapper {
-    width: 100%;
-    clear: both;
-    left: 0;
-}
-#footer {
-    width: 950px;
-    padding: 15px 5px;
-    margin: 0 auto;
-    text-align: right;
-}
-#footer ul {
-    display: inline;
-    list-style-type: none;
-    max-width: 108em;
-    margin: 0 auto;
-}
+#account-links #username { font-weight: bold; }
 
-#footer li {
-    padding: 0 0 0 20px;
-    display: inline;
-}
+#account-links { float: right; }
 
-#footer a {
-    color: #555;
-}
+#account-links li { margin: 0; font-size: 11pt; }
 
-#footer a:hover {
-    color: #1e1e1e;
-}
+#account-links a { float: left; padding: 5px 10px; color: #484848; }
 
-#widgets {
-    float: left;
-    width: 960px;
-}
-h3 {
-    margin-bottom: 0px;
-    float: left;
-    clear: left;
-    font-size: 10pt;
-    font-weight: normal;
-    color: #555;
-    letter-spacing: 0;
-    font-size: 13pt;
-    margin: 0;
-}
-.module > .head h3 {
-    text-shadow: 0 1px 0 lightblue;
-    padding: 15px 20px;
-}
-.module > .head ul {
-    float: right;
-    padding: 0;
-    margin: 0;
-}
-.module > .head ul li {
-    float: left;
-    margin: 0;
-}
+#content { width: 960px; padding: 20px; padding-bottom: 5px; clear: both; }
+
+#footer-wrapper { width: 100%; clear: both; left: 0; }
+
+#footer { width: 950px; padding: 15px 5px; margin: 0 auto; text-align: right; }
+
+#footer ul { display: inline; list-style-type: none; max-width: 108em; margin: 0 auto; }
+
+#footer li { padding: 0 0 0 20px; display: inline; }
+
+#footer a { color: #555; } 
+
+#footer a:hover { color: #1e1e1e; }
+
+#widgets { float: left; width: 960px; }
+
+h3 { margin-bottom: 0px; float: left; clear: left; font-size: 10pt; font-weight: normal; color: #555; letter-spacing: 0; font-size: 13pt; margin: 0; }
+
+.module > .head h3 { text-shadow: 0 1px 0 lightblue; padding: 15px 20px; }
+
+.module > .head ul { float: right; padding: 0; margin: 0; }
+
+.module > .head ul li { float: left; margin: 0; }
 .module > .head ul li a {
     float: right;
     padding: 17px 20px;

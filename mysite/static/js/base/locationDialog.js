@@ -8,7 +8,7 @@ function addHandlersToLocationDialogLinks(){
     var confirmOptions = {
         'url': "/account/settings/location/confirm_suggestion/do",
         'success': function() {
-            $("#location-suggestion-notification").html('Thank you! Check yourself out on the <a href="/people/">Map!</a> You can change your location at any time by clicking <a href="/account/settings/location/">Location</a> in your <a href="/account/settings/">Settings</a>.');
+            $("#location-suggestion-notification").html('Thank you! Check yourself out on the <strong><a href="/people/">Map of People</a></strong>. You can change your location at any time by clicking <a href="/account/settings/location/">Location</a> in your <a href="/account/settings/">Settings</a>.');
             //if your location is the location page, reload this page
             reload_if_location_page()
         },
