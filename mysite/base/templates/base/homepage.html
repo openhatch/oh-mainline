@@ -12,24 +12,13 @@ Welcome to OpenHatch!
 {% block greeting %}
 {% endblock %}
 
-{% block js_in_head %}
-<script type='text/javascript'>
-    /*<![CDATA[*/
-    // FIXME: Wrap this in an IE-only block.
-    // Allow IE to recognize HTML5 elements
-    html5tags = ['section', 'article', 'aside', 'footer', 'header', 'nav', 'time'];
-    t = html5tags.length; while (t-- > 0) { document.createElement(html5tags[t]); }
-    /*]]>*/
-</script>
-<script src="/static/js/jquery.js" type='text/javascript'></script>
-<script src="/static/openid/js/openid-jquery.js" type='text/javascript'></script>
+{% block js %}
 <script type='text/javascript'>
     $(function() {
         openid.init('id_openid_url');
     });
 </script>
-<script src='/static/js/css_if_js.js' type='text/javascript'></script>
-{% endblock js_in_head %}
+{% endblock js %}
 
 {% block css %}
 {{ block.super }}
