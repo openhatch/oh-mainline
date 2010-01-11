@@ -2,6 +2,7 @@ import sys
 import datetime
 from mysite.customs import ohloh
 import urllib2
+import urllib
 from mysite.customs import lp_grabber
 import mysite.customs.github
 from mysite.profile.models import Person, DataImportAttempt, Citation, PortfolioEntry
@@ -87,9 +88,68 @@ def create_citations_from_launchpad_results(dia_id, lp_results):
     dia.save()
     # }}}
 
+    @staticmethod
+    # Note: This returns a Citation object that is not necessarily
+    # saved. That's up to the caller. And it has no portfolio_entry
+    # attached.
+    def create_from_github_result(github_repo_object, person,
+                                  repo_primary_language):
+        SOURCE="Github"
+        # {{{
+        # FIXME: Take language argument into account
+        project, bool_created = Project.objects.get_or_create(
+                name=github_repo_object.name)
+        #matches = list(Citation.objects.filter(project=project,
+        #                                       person=person,
+        #                                       source=SOURCE))
+        matches = []
+        if matches:
+            citation = matches[0]
+        else:
+            # Calculate the string for contributor_role
+            if github_repo_object.fork:
+                contributor_role='Forked'
+            else:
+                contributor_role='Started'
+
+            # FIXME: Use DIA and use that to store source...
+            citation = Citation(contributor_role=contributor_role)
+            return citation
+        # }}}
+
+
 def create_citations_from_github_results(dia_id, results):
     repos, dict_mapping_repos_to_languages = results
-    pass
+    dia = DataImportAttempt.objects.get(id=dia_id)
+    person = dia.person
+    
+    for repo in repos:
+        (project, _) = Project.objects.get_or_create(name=repo.name)
+
+        # FIXME: Populate project description, name, etc.
+
+        if PortfolioEntry.objects.filter(person=person, project=project).count() == 0:
+            portfolio_entry = PortfolioEntry(person=person, project=project)
+            portfolio_entry.save()
+        portfolio_entry = PortfolioEntry.objects.filter(person=person, project=project)[0]
+            
+        citation = Citation()
+        citation.languages = "" # FIXME ", ".join(result['languages'])
+        if repo.fork:
+            citation.contributor_role = 'Forked'
+        else:
+            citation.contributor_role = 'Started'
+        citation.portfolio_entry = portfolio_entry
+        citation.data_import_attempt = dia
+        citation.url = 'http://github.com/%s/%s/' % (urllib.quote_plus(repo.owner),
+                                                     urllib.quote_plus(repo.name))
+        citation.save_and_check_for_duplicates()
+
+    person.last_polled = datetime.datetime.now()
+    person.save()
+
+    dia.completed = True
+    dia.save()
 
 def rs_action(dia):
     oh = ohloh.get_ohloh()

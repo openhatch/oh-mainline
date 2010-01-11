@@ -423,6 +423,8 @@ class Citation(models.Model):
             suffix = ''
 
         if self.data_import_attempt:
+            if self.data_import_attempt.source == 'gh':
+                return '%s a repository on Github.' % self.contributor_role
             if self.data_import_attempt.source in ['rs', 'ou']:
                 if not self.languages:
                     return "Committed to codebase (%s)" % (
@@ -507,34 +509,5 @@ class Citation(models.Model):
         else:
             pk = 'unassigned'
         return "pk=%s, summary=%s" % (pk, self.summary)
-
-    @staticmethod
-    # Note: This returns a Citation object that is not necessarily
-    # saved. That's up to the caller. And it has no portfolio_entry
-    # attached.
-    def create_from_github_result(github_repo_object, person,
-                                  repo_primary_language):
-        SOURCE="Github"
-        # {{{
-        # FIXME: Take language argument into account
-        project, bool_created = Project.objects.get_or_create(
-                name=github_repo_object.name)
-        #matches = list(Citation.objects.filter(project=project,
-        #                                       person=person,
-        #                                       source=SOURCE))
-        matches = []
-        if matches:
-            citation = matches[0]
-        else:
-            # Calculate the string for contributor_role
-            if github_repo_object.fork:
-                contributor_role='Forked'
-            else:
-                contributor_role='Started'
-
-            # FIXME: Use DIA and use that to store source...
-            citation = Citation(contributor_role=contributor_role)
-            return citation
-        # }}}
 
 # vim: set nu:
