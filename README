@@ -58,3 +58,17 @@ $ ./bin/buildout -o # o is for "offline", so you don't hit the network looking f
 * jGrowl
 * Lots of other people who definitely need to be thanked here
 * Some other people who don't
+
+== MaxMind GeoIP City Lite database ==
+
+This product includes GeoLite data created by MaxMind, available from http://www.maxmind.com/.
+
+To use it:
+
+Start from milestone-a. Run these commands:
+
+	cd downloads
+	wget http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz
+	gunzip GeoLiteCity.dat.gz
+
+Ta-da. In theory we/you should do that every month, when MaxMind does a refresh.

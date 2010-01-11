@@ -76,6 +76,10 @@ class Person(models.Model):
                               default='',
                               null=True)
     blacklisted_repository_committers = models.ManyToManyField(RepositoryCommitter)
+    dont_guess_my_location = models.BooleanField(default=False)
+    location_confirmed = models.BooleanField(default=False)
+    location_display_name = models.CharField(max_length=255, blank=True,
+                                             verbose_name='Location')
 
     def __unicode__(self):
         return "username: %s, name: %s %s" % (self.user.username,

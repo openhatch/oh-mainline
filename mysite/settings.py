@@ -85,6 +85,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django_authopenid.middleware.OpenIDMiddleware',
+    'mysite.base.middleware.LocationMiddleware',
 )
 
 ROOT_URLCONF = 'mysite.urls'
