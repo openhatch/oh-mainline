@@ -127,6 +127,12 @@ Manage projects
 
 {% endblock main %}
 
+{% block js_before_bundle %}
+<script type="text/javascript">
+var want_importer = true;
+</script>
+{% endblock js_before_bundle %}
+
 {% block js %}
 <script type="text/javascript">
     $(function() { $("#progressbar").progressbar(); });
