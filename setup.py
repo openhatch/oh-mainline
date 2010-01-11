@@ -12,7 +12,7 @@ setup(
     version = "3",
     packages = ['mysite',],
     url = 'http://openhatch.org/',
-    license = 'Proprietary',
+    license = 'AGPLv3',
 
     install_requires = ['setuptools',
                         'python-distutils-extra',
@@ -40,7 +40,7 @@ setup(
 
     description = "A website",
 
-    author = 'Asheesh Laroia, Raphael Krut-Landau',
+    author = 'The OpenHatch team <https://openhatch.org/about/',
     author_email = 'all@openhatch.org',
 
     package_dir = {'': '.'},
