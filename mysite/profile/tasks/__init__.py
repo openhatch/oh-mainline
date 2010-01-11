@@ -179,9 +179,9 @@ def gh_action(dia):
     for repo in repos:
         key = (repo.owner, repo.name)
         dict_mapping_repos_to_languages[
-            key] = mysite.customs.github.find_primary_language_of_repo(
-            github_username=repo.owner,
-            github_reponame=repo.name)
+            key] = '' # mysite.customs.github.find_primary_language_of_repo(
+            #github_username=repo.owner,
+            #github_reponame=repo.name)
         
     return (repos, dict_mapping_repos_to_languages)
     
