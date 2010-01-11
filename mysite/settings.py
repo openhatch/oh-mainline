@@ -129,7 +129,7 @@ INSTALLED_APPS = (
 
 # file: settings.py #
 TEST_RUNNER = 'mysite._profiling.profile_tests'
-TEST_PROFILE = '/tmp/openhatch-profiling-data.%s' % os.environ['USER']
+TEST_PROFILE = '/tmp/openhatch-profiling-data.%s' % os.environ.get('USER', 'unknown')
 
 ## AMQP, Rabbit Queue, Celery
 AMQP_SERVER = "localhost"
