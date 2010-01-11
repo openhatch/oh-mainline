@@ -216,6 +216,11 @@
         {% endif %}
         {% block piwik_js %}
 <script type="text/javascript">
+if (document.location.hostname == 'openhatch.org') {
+var pkBaseURL = (("https:" == document.location.protocol) ? "https://openhatch.org/piwik/" : "http://openhatch.org/piwik/");
+document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
+}
+</script><script type="text/javascript">
   if (document.location.hostname == 'openhatch.org') {
   try {
   var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", 1);
