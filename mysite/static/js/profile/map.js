@@ -18,7 +18,11 @@ PeopleMap.prototype.initialize = function(options) {
         'center': latlng,
         'mapTypeId': google.maps.MapTypeId.ROADMAP
     };
-    var map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
+    var $canvas = $('#map_canvas');
+    var map = new google.maps.Map($canvas.get(0), myOptions);
+
+    var hideBGImage = function () { $canvas.css('background-image', ''); }
+    window.setTimeout(hideBGImage, 2500);
 
     for (var person_id in person_id2data) {
         var data = person_id2data[person_id];
