@@ -1,7 +1,5 @@
 {% extends 'base/base.html' %}
 
-{% load assets %}
-
 {% block css %}
 {{ block.super }}
 @import url('/static/css/search/search.css');
@@ -21,11 +19,6 @@
     {% block main %}
     {% endblock main %}
 </div>
-
-{% assets filter="jsmin", output="js/search/search-base.min.js", "js/search/search.js" %}
-<script type="text/javascript" src="{{ ASSET_URL }}"></script>
-{% endassets %}
-
 
 {% endblock content %}
 

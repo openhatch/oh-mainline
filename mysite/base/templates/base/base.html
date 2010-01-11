@@ -200,9 +200,15 @@
             </div>
         </div>
 
-        {% assets "big_bundle_of_javascripts" %}
-        {# All the JavaScript for pretty much the entire site is bundled into one file.
-        This way, we avoid unnecessary TCP/IP connections. #}
+        {# 
+        {% !as sets "big_bundle_of_javascripts" %}
+        { # All the JavaScript for pretty much the entire site is bundled into one file.
+        This way, we avoid unnecessary TCP/IP connections. # }
+        <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+        {% endassets %}
+        #}
+
+        {% assets output="bundle.js", "js/jquery.js" %}
         <script type="text/javascript" src="{{ ASSET_URL }}"></script>
         {% endassets %}
 
