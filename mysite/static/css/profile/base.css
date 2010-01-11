@@ -1,3 +1,11 @@
+#bio {
+    margin: 0;
+    padding: 0 0 10px 0;
+}
+#tags-links li{
+    list-style: square outside;
+    margin: 0 0 0 15px;
+}
 #nameplate {
     float: left;
     width: 940px;

@@ -1298,4 +1298,33 @@ class EditLocation(TwillTests):
         tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
         tc.find('Timbuktu')
 
+class EditBio(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def test(self):
+        '''
+        * Goes to paulproteus's profile
+        * checks that they don't already have a bio that says "lookatme!"
+        * clicks edit on the Info area
+        * enters a string as bio
+        * checks that his bio now contains string
+        '''
+        self.login_with_twill()
+        tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
+        #not so vain.. yet
+        tc.notfind('lookatme!')
+        tc.go(make_twill_url('http://openhatch.org/profile/views/edit_info'))
+        #make sure our bio is not already on the form
+        tc.notfind('lookatme!')
+        # set the bio in ze form
+        tc.fv("edit-tags", 'edit-tags-bio', 'lookatme!')
+        tc.submit()
+        #find the string we just submitted as our bio
+        tc.find('lookatme!')
+        self.assertEqual(Person.get_by_username('paulproteus').bio, "lookatme!")
+        #now we should see our bio in the edit form
+        tc.go(make_twill_url('http://openhatch.org/profile/views/edit_info'))
+        tc.find('lookatme!')
+    
+
 # vim: set ai et ts=4 sw=4 nu:

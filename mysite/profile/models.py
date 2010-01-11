@@ -66,6 +66,7 @@ class Person(models.Model):
     interested_in_working_on = models.CharField(max_length=1024, default='') # FIXME: Ditch this.
     last_polled = models.DateTimeField(default=datetime.datetime(1970, 1, 1))
     show_email = models.BooleanField(default=False)
+    bio = models.TextField(blank=True) 
     photo = models.ImageField(upload_to=
                               lambda a, b: 'static/photos/profile-photos/' + 
                               generate_person_photo_path(a, b),
@@ -80,6 +81,7 @@ class Person(models.Model):
     location_confirmed = models.BooleanField(default=False)
     location_display_name = models.CharField(max_length=255, blank=True,
                                              verbose_name='Location')
+    
 
     def __unicode__(self):
         return "username: %s, name: %s %s" % (self.user.username,
