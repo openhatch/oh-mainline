@@ -6,6 +6,31 @@
         {% endifequal %}
         {% endif %}
 
+        {% if person.bio %}
+        <p id="bio">
+            {{person.bio}}
+        </p>
+        {% endif %}
+        {% comment %} 
+        <div class="tags" id="tags-links"
+            <span class="tag-type">links:</span>
+            <ul>
+                <li>
+            <a href="#">My website</a>
+            </li>
+            <li>
+            <a href="#">My Facebook</a>
+            </li>
+            <li>
+            <a href="#">indenti.ca</a>
+            </li>
+            <li>
+            <a href="#">openhatch</a>
+                </li>
+            </ul>
+        </div>
+        {% endcomment %} 
+
         {% if tags.understands and tags_flat.understands %}
         <div class='tags' id='tags-understands'>
             <span class='tag-type'>understands:</span>

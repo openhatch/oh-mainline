@@ -429,6 +429,11 @@ def edit_person_info(request):
     # {{{
     person = request.user.get_profile()
 
+    #grab their submitted bio
+    bio = request.POST.get('edit-tags-bio', '')
+    person.bio = bio
+    person.save()
+
     # We can map from some strings to some TagTypes
     for known_tag_type_name in ('understands', 'understands_not',
                            'studying', 'seeking', 'can_mentor'):
