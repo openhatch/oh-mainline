@@ -41,4 +41,3 @@ function initialize() {
                 thing_to_call_once_geocode_happens);
     }
 }
-$(initialize);
