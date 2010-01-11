@@ -1,6 +1,7 @@
+# Django settings for mysite project.
+
 import os
 import logging
-# Django settings for mysite project.
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
