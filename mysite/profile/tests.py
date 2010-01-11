@@ -1,9 +1,9 @@
 # Imports {{{
-from mysite.base.tests import make_twill_url, TwillTests
+from mysite.base.tests import make_twill_url, TwillTests, ObjectFromDict
 import mysite.account.tests
 
 from mysite.search.models import Project
-from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_Person_Tag, Link_ProjectExp_Tag, DataImportAttempt, PortfolioEntry, Citation
+from mysite.profile.models import Person, Tag, TagType, Link_Person_Tag, DataImportAttempt, PortfolioEntry, Citation
 import mysite.project.views
 
 import mysite.profile.views
@@ -1259,9 +1259,52 @@ class ProjectGetMentors(TwillTests):
                                tag=willing_to_mentor_banshee)
         link.save()
 
-        banshee_mentors = mysite.profile.controllers.people_matching('can_mentor',
-                                                               'Banshee')
-        self.assertEqual(list(banshee_mentors), [Person.objects.get(user__username='paulproteus')])
+class GithubProfileImporting(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def test_create_citation_from_github_data(self):
+        # This is a fake copy of the data we get from Github
+        github_repo_object=ObjectFromDict({'name': 'project_name',
+                                           'fork': True})
+
+        # So there's no such project in the DB yet...
+        self.assertEqual(Project.objects.filter(name='project_name').count(),
+                         0)
+
+        p_e = mysite.profile.models.Citation.create_from_github_result(
+            github_repo_object=github_repo_object,
+            person=Person.get_by_username('paulproteus'),
+            repo_primary_language='')
+
+        # But getting data back from Github shows that we create it.
+        self.assertEqual(Project.objects.filter(name='project_name').count(),
+                         1)
+
+    def test_create_citation_from_github_data_on_nonfork(self):
+        nonfork = ObjectFromDict({'name': 'project_i_started',
+                                  'fork': False})
+        fork = ObjectFromDict({'name': 'project_i_forked',
+                               'fork': True})
+        fork_p_e = mysite.profile.models.Citation.create_from_github_result(
+            github_repo_object=fork,
+            person=Person.get_by_username('paulproteus'),
+            repo_primary_language='')
+        self.assertEqual(fork_p_e.contributor_role, 'Forked')
+
+        nonfork_p_e = mysite.profile.models.Citation.create_from_github_result(
+            github_repo_object=nonfork,
+            person=Person.get_by_username('paulproteus'),
+            repo_primary_language='')
+        self.assertEqual(nonfork_p_e.contributor_role, 'Started')
+
+    def test_create_citation_from_github_data_the_second_time(self):
+        pass
+
+    def test_github_importer_fills_in_project_langauge(self):
+        pass
+
+    def test_github_importer_saves_project_homepage(self):
+        pass
 
 class SuggestLocation(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']

@@ -429,7 +429,7 @@ class Recommend(SearchTest):
             'person-paulproteus.json',
             'cchost-data-imported-from-ohloh.json',
             'bugs-for-two-projects.json',
-            'extra-fake-cchost-related-projectexps.json',
+            'extra-fake-cchost-related-citations.json',
             'tags']
 
     # FIXME: Add a 'recommend_these_in_bug_search' field to TagType

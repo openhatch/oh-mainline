@@ -23,6 +23,7 @@ setup(
                         'multiprocessing==2.6.2.1-oh',
                         'launchpadlib==1.5.3',
                         'django-assets',
+                        'python-github2==0.1.1',
                         'pygeoip==0.1.3',
                        ],
 
@@ -32,6 +33,7 @@ setup(
                         dependency_path + 'multiprocessing-2.6.2.1-oh.tar.gz#egg=multiprocessing',
                         dependency_path + 'django-assets-0.2.tar.gz#egg=django-assets',
                         dependency_path + 'South-0.6_pre-py2.6.egg#egg=south',
+                        'http://linode.openhatch.org/~paulproteus/python-github2-0.1.1.tar.gz#egg=python-github2',
                         'http://pygeoip.googlecode.com/files/pygeoip-0.1.3.zip#egg=pygeoip',
                        ],
 
