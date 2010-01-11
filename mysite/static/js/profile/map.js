@@ -1,11 +1,12 @@
-PeopleMap = function () {
-    var person_id2data = {{ person_id2data_as_json|safe}};
-    var num_of_persons_with_locations = {{ num_of_persons_with_locations}};
+PeopleMap = function () { }
+
+PeopleMap.prototype.initialize = function(options) {
+
     var number_of_people_geocoded = 0;
     var update_all_markers;
-}
 
-PeopleMap.prototype.initialize = function() {
+    var person_id2data = options['person_id2data'];
+    var num_of_persons_with_locations = options['num_of_persons_with_locations'];
 
     var all_markers = [];
 
