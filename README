@@ -12,7 +12,8 @@ $ ./bin/buildout # Make sure you're actually in this directory
 $ ./bin/mysite runserver
 
 # Set up the database.
-mysql -u root -p < "CREATE DATABASE; CREATE USER 'oh_milestone_a'@'localhost' IDENTIFIED BY 'ahmaC0Th'; GRANT ALL ON oh_milestone_a.* TO 'oh_milestona_a'@'localhost';
+echo "CREATE DATABASE oh_milestone_a" | mysql -uroot -p
+echo "GRANT ALL PRIVILEGES ON oh_milestone_a.* TO 'oh_milestone_a'@'localhost' IDENTIFIED BY 'ahmaC0Th'" | mysql -uroot -p
 # Or use 'mysql -u username', where username is a MySQL user with the appropriate privileges.
 
 ../bin/mysite syncdb
