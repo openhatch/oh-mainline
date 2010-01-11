@@ -3,7 +3,7 @@
 
 # Imports {{{
 from mysite.search.models import Project, Bug
-from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag
+from mysite.profile.models import Person, Tag, TagType
 import mysite.profile.views
 from mysite.profile.tests import MockFetchPersonDataFromOhloh
 
@@ -34,6 +34,7 @@ from mysite.profile.tasks import FetchPersonDataFromOhloh
 import mysite.customs.miro
 import mysite.customs.cia
 import mysite.customs.feed
+import mysite.customs.github
 
 import mysite.customs.models
 import mysite.customs.lp_grabber
@@ -240,7 +241,6 @@ class LaunchpadDataTests(django.test.TestCase):
         # have a language assigned to it.
         no_langs = lp_grabber.project2languages('lazr')
         self.assertEqual(no_langs, [])
-
 
     @mock.patch('mechanize.Browser.open', open_causes_404)
     def test_person_who_404s(self):
@@ -481,6 +481,22 @@ class LaunchpadImportByEmail(django.test.TestCase):
     def test_get_asheesh(self):
         u = mysite.customs.lp_grabber.get_launchpad_username_by_email('asheesh@asheesh.org')
         self.assertEqual(u, "paulproteus")
+
+class OnlineGithub(django.test.TestCase):
+    def test_get_language(self):
+        top_lang = mysite.customs.github.find_primary_language_of_repo(
+            github_username='phinze',
+            github_reponame='tircd')
+        self.assertEqual(top_lang, 'Perl')
+
+    def test_find_tircd_for_phinze(self):
+        '''This test gives our github info_by_username a shot.'''
+        repos = mysite.customs.github.info_by_username('phinze')
+        found_tircd_yet = False
+        for repo in repos:
+            if repo.name == 'tircd':
+                found_tircd_yet = True
+        self.assertTrue(found_tircd_yet)
 
 class ParseCiaMessage(django.test.TestCase):
     def test_with_ansi_codes(self):
