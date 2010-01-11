@@ -1,3 +1,5 @@
+{% load assets %}
+
 <!doctype html>
 <html>
     <head>
@@ -9,7 +11,7 @@
 
         <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
         <meta http-equiv='Content-Language' content='en-us' />
-        <meta name='Description' content=''>
+        <meta name='Description' content='OpenHatch, the open source involvement engine.'>
 
         <style type='text/css'> /*<![CDATA[*/
             {% block css %}
@@ -19,10 +21,10 @@
             /*]]>*/
         </style>
 
-	<!--[if lt IE 8]>
-	<script src="http://ie7-js.googlecode.com/svn/version/2.0(beta3)/IE8.js"
-	type="text/javascript"></script>
-	<![endif]-->
+        <!--[if lt IE 8]>
+        <script src="http://ie7-js.googlecode.com/svn/version/2.0(beta3)/IE8.js"
+        type="text/javascript"></script>
+        <![endif]-->
 
         {% block js_in_head %}
         {% endblock js_in_head %}
@@ -52,14 +54,24 @@
                                 {% endif %}
                                 <li><a href='{% url mysite.search.views.fetch_bugs %}'>volunteer opportunities</a></li>
                                 <li><a href='{% url mysite.project.views.projects %}'>projects</a></li>
-                                <li><a href='{% url mysite.profile.views.display_list_of_people %}'>people</a></li>
+                                <li><a href='{% url mysite.profile.views.people_map%}'>people</a></li>
                                 {% if the_user.is_authenticated %}
                                 <li><a href='{% url mysite.base.views.homepage %}'>dashboard</a></li>
                                 <li><a href='{% url mysite.profile.views.display_person_web the_user.username %}'><strong>{{ the_user.username }}'s profile</strong></a></li>
                                 {% endif %}
                             </ul>
+                        {% if not the_user.get_profile.location_confirmed and the_user.get_profile.location_display_name and not the_user.get_profile.dont_guess_my_location and not dont_suggest_location %}
+                        <div id="location-suggestion-notification">
+                            <p> Hi! We'd like to add you to a global map of FLOSS contributors. You seem to be in <strong class='suggested_location'>{{ the_user.get_profile.location_display_name }}</strong>.  Is this correct?
+                            </p>
+                        <ul>
+                            <li><button id="location_confirm_suggestion">Yes!</button></li>
+                            <li><button onclick="window.location.href='{% url mysite.account.views.set_location %}?dont_suggest_location=1'">No, but let me tell you where I am.</button></li>
+                            <li><button id="location_dont_track">Maybe. Don't keep track of where I am.</button></li>
+                        </ul>
                         </div>
-
+                        {% endif %}
+                        </div>
                         {% if notification_id %}
                         <!-- notification_id: {{ notification_id }} -->
                         {% endif %}
@@ -70,9 +82,8 @@
                                     {{ notification }}
                                 </div>
                             </div>
-                        </div>
                         {% endif %}
-
+                        </div>
                     </div>
                 </div>
 
@@ -92,6 +103,9 @@
                     {% endblock %}
                 </ul>
                 {% endif %}
+
+
+                
                 <div id='page-top'>
 
                     {% block greeting %}
@@ -128,7 +142,7 @@
                                 </li>
 
                                 <li>
-                                <a href='{% url mysite.profile.views.display_list_of_people %}'>
+                                <a href='{% url mysite.profile.views.people_map%}'>
                                     <strong>
                                         Browse 
                                     </strong>
@@ -186,12 +200,13 @@
             </div>
         </div>
 
-        {% block jquery %}
-        <script type='text/javascript' src='/static/js/jquery.js'></script>
-        <script type='text/javascript' src='/static/js/jquery.query.js'></script>
-        {% endblock jquery %}
+        {% block js_before_bundle %}
+        {% endblock js_before_bundle %}
 
-        <script type='text/javascript' src='/static/js/base.js'></script>
+        {% assets output="js/everything.js", "js/jquery.js", "js/jquery.query.js", "js/jquery.json.js", "js/jquery.hint.js", "js/jquery.form.js", "js/jquery.jgrowl.js", "js/jquery-ui-1.7.2.custom.min.js", "js/jquery.cookie.js", "piwik.js", "js/base/locationDialog.js", "js/base.js", "js/search/defaultText.js", "js/profile/portfolio.js", "js/profile/map.js", "openid/js/openid-jquery.js", "js/importer.js", "js/account/set_location.js", "js/search/search.js" %}
+        <script type="text/javascript" src="{{ ASSET_URL }}"></script>
+        {% endassets %}
+
         {% block js %}
         {% endblock js %}
 

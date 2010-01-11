@@ -36,6 +36,10 @@
  *      we tell the user "We're done!"
  */
 
+if (typeof want_importer == 'undefined') {
+    /* do nothing. */
+} else {
+
 $.fn.hoverClass = function(className) {
     // {{{
     mouseoverHandler = function() { $(this).addClass(className); };
@@ -968,5 +972,5 @@ $(function () {
             return false;
             });
         });
-
+}
 // vim: set nu:

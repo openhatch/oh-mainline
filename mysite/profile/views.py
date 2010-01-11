@@ -95,6 +95,7 @@ def display_person_web(request, user_to_display__username=None):
     data['editable'] = (request.user == user)
     data['notifications'] = mysite.base.controllers.get_notification_from_request(request)
     data['explain_to_anonymous_users'] = True
+    data['location'] = 'Philadelphia, PA'
 
     return (request, 'profile/main.html', data)
 
@@ -249,6 +250,11 @@ def edit_person_info(request):
     # {{{
     person = request.user.get_profile()
 
+    #grab their submitted bio
+    bio = request.POST.get('edit-tags-bio', '')
+    person.bio = bio
+    person.save()
+
     # We can map from some strings to some TagTypes
     for known_tag_type_name in ('understands', 'understands_not',
                            'studying', 'seeking', 'can_mentor'):
@@ -298,6 +304,20 @@ def display_list_of_people(request):
     data['people'] = Person.objects.all().order_by('user__username')
     return (request, 'profile/search_people.html', data)
     # }}}
+
+@view
+def people_map(request):
+    data = {}
+    data['people'] = Person.objects.all().order_by('user__username')
+    data['person_id2data_as_json'] = simplejson.dumps(dict([
+                (person.pk, {'name': person.get_full_name_or_username(),
+                             'location': person.location_display_name})
+            for person in Person.objects.all()
+            if person.location_display_name]))
+    data['num_of_persons_with_locations'] = len([p for p in Person.objects.all()
+                                                 if p.location_display_name])
+    return (request, 'profile/map.html', data)
+
 
 def gimme_json_for_portfolio(request):
     "Get JSON used to live-update the portfolio editor."

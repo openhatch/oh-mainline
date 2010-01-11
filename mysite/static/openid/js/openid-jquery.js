@@ -115,14 +115,54 @@ var openid = {
         openid_btns.find('.small').append(this.getBoxHTML(providers_small[id], 'small', '.png'));
       }
     }
-
     $('#openid_form').submit(this.submit);
 
     var self = this;
     $('.openidProvider').bind("click", function(e) {
-      self.signin(e.target.id);
-      return false;
-    });
+
+            /*
+             * If the user clicked 'Google' or 'Yahoo',
+             * we're about to redirect them to a Google or Yahoo page.
+             * In at least Firefox, this means that the user will be
+             * waiting around on our site for a few seconds while the
+             * external page loads. It's not always terribly clear the
+             * browser is actually doing something during these few seconds,
+             * and users might get the idea that our website is a
+             * load of crap.
+             *
+             * To avoid this situation, let's indicate explicitly
+             * that we are contacting Google/Yahoo.
+             */
+
+            var provider_id = e.target.id;
+            if (provider_id == 'google' || provider_id == 'yahoo') {
+
+                // Display explanatory message.
+                $('#please_click').html(
+                    '<div id="openid_while_u_wait">' +
+                    'Requesting credentials from ' +
+                    providers_large[provider_id].name +
+                    '&hellip;</div>');
+
+                // Remove the other buttons.
+                $('#openid_btns').remove();
+
+                // If the user has recently clicked another provider,
+                // a textfield, labelled, for example, "Enter your Flickr username",
+                // will be visible. Let's remove that.
+                $('#openid_input_area').remove();
+
+                // Remove the "Sign in with a password" link.
+                $('a#sign-in-with-a-password').remove();
+
+                /*
+                 * Note that removing the form itself seems to cause problems.
+                 */
+            }
+
+            self.signin(e.target.id);
+            return false;
+            });
 
     var box_id = this.readCookie();
     if (box_id) {

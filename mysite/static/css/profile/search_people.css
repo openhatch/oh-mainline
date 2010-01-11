@@ -11,8 +11,31 @@
     width: 910px;
     float: left;
 }
-#big-people-list li {
+#people-list {
+    list-style: square;
+
+}
+#people-list li {
     padding-top: 10px;
     margin-left: 15px;
     list-style: square;
+}
+
+#map_canvas { }
+
+.view-links {
+    float: left;
+}
+
+.view-links ul li {
+    display: inline;
+    margin-right: 10px;
+    margin-bottom: 10px;
+    float: left;
+    font-size: 1.3em;
+}
+
+.view-links ul {
+   margin: 0;
+  padding: 0; 
 }

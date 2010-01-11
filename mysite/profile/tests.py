@@ -692,8 +692,8 @@ class UserCanShowEmailAddress(TwillTests):
         tc.notfind('my@ema.il')
 
         tc.follow('settings')
-        tc.follow('contact info')
-        tc.fv(1, 'show_email', '1')
+        tc.follow('Contact')
+        tc.fv("a_settings_tab_form", 'show_email', '1')
         tc.submit()
 
         tc.go('/people/paulproteus/')
@@ -1260,11 +1260,6 @@ class ProjectGetMentors(TwillTests):
                                tag=willing_to_mentor_banshee)
         link.save()
 
-        banshee_mentors = mysite.profile.controllers.people_matching(
-            'can_mentor',
-            'Banshee')
-        self.assertEqual(list(banshee_mentors), [Person.objects.get(user__username='paulproteus')])
-
 class GithubProfileImporting(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -1315,6 +1310,69 @@ class GithubProfileImporting(TwillTests):
 def do_nothing(*args, **kwargs):
     return ''
 
+class SuggestLocation(TwillTests):
+    fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
+
+    def test(self):
+        data = {}
+        data['geoip_has_suggestion'], data['geoip_guess'] = mysite.profile.controllers.get_geoip_guess_for_ip("128.151.2.1")
+        self.assertEqual(data['geoip_has_suggestion'], True)
+        self.assertEqual(data['geoip_guess'], "Rochester, NY, United States")
+
+
+class EditLocation(TwillTests):
+    fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
+
+    def test(self):
+        '''
+        * Goes to paulproteus's profile
+        * checks that he is not in Timbuktu
+        * clicks "edit or hide"
+        * sets the location to Timbuktu
+        * saves
+        * checks his location is Timbuktu'''
+        self.login_with_twill()
+        tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
+        # not in Timbuktu!
+        tc.notfind('Timbuktu')
+
+        # Now go edit my "contact info"
+        tc.go(make_twill_url('http://openhatch.org/account/settings/location/'))
+        # set the location in ze form
+        tc.fv("a_settings_tab_form", 'location_display_name', 'Timbuktu')
+        tc.submit()
+        # Timbuktu!
+        tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
+        tc.find('Timbuktu')
+
+class EditBio(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def test(self):
+        '''
+        * Goes to paulproteus's profile
+        * checks that they don't already have a bio that says "lookatme!"
+        * clicks edit on the Info area
+        * enters a string as bio
+        * checks that his bio now contains string
+        '''
+        self.login_with_twill()
+        tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
+        #not so vain.. yet
+        tc.notfind('lookatme!')
+        tc.go(make_twill_url('http://openhatch.org/profile/views/edit_info'))
+        #make sure our bio is not already on the form
+        tc.notfind('lookatme!')
+        # set the bio in ze form
+        tc.fv("edit-tags", 'edit-tags-bio', 'lookatme!')
+        tc.submit()
+        #find the string we just submitted as our bio
+        tc.find('lookatme!')
+        self.assertEqual(Person.get_by_username('paulproteus').bio, "lookatme!")
+        #now we should see our bio in the edit form
+        tc.go(make_twill_url('http://openhatch.org/profile/views/edit_info'))
+        tc.find('lookatme!')
+    
 class MockGithubImport(BaseCeleryTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 

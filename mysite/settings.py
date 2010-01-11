@@ -1,6 +1,7 @@
+# Django settings for mysite project.
+
 import os
 import logging
-# Django settings for mysite project.
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -84,6 +85,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django_authopenid.middleware.OpenIDMiddleware',
+    'mysite.base.middleware.LocationMiddleware',
 )
 
 ROOT_URLCONF = 'mysite.urls'
@@ -112,6 +114,7 @@ INSTALLED_APPS = (
     'django_extensions',
     'windmill',
     'south',
+    'django_assets',
     'celery',
     'invitation',
     'mysite.search',
@@ -126,7 +129,7 @@ INSTALLED_APPS = (
 
 # file: settings.py #
 TEST_RUNNER = 'mysite._profiling.profile_tests'
-TEST_PROFILE = '/tmp/profile'
+TEST_PROFILE = '/tmp/openhatch-profiling-data.%s' % os.environ.get('USER', 'unknown')
 
 ## AMQP, Rabbit Queue, Celery
 AMQP_SERVER = "localhost"
@@ -167,3 +170,8 @@ LP_CREDS_BASE64_ENCODED='WzFdCmNvbnN1bWVyX3NlY3JldCA9IAphY2Nlc3NfdG9rZW4gPSBHV0t
 
 GITHUB_USERNAME='openhatched'
 GITHUB_API_TOKEN='6f2b15214757ff724155654c97f4ce92'
+
+# Actually bundle files, even if not in production.
+ASSETS_DEBUG = False
+
+ASSETS_EXPIRE = 'querystring'

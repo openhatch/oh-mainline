@@ -8,6 +8,19 @@ import datetime
 from django.db import models
 import mysite.search.models
 
+class RecentMessageFromCIA(models.Model):
+    '''This model logs all messages from CIA.vc.
+    At some point, we should examine how and when we want to flush this.'''
+    # See http://cia.vc/stats/project/moin/.xml
+    committer_identifier = models.CharField(max_length=255) # author, to cia.vc
+    project_name = models.CharField(max_length=255) # project, to cia.vc
+    path = models.CharField(max_length=255) # files, to cia.vc
+    version = models.CharField(max_length=255) # version, to cia.vc
+    message = models.CharField(max_length=255) # log, to cia.vc
+    module = models.CharField(max_length=255) # module, to cia.vc
+    branch = models.CharField(max_length=255) # branch, to cia.vc
+    time_received = models.DateTimeField(auto_now_add=True)
+
 class WebResponse(models.Model):
     '''This model abuses the databases as a network log. We store here
     successful and unsuccessful web requests so that we can refer to
@@ -220,3 +233,4 @@ class RoundupBugTracker(models.Model):
 
     def __unicode__(self):
         return "<Roundup bug tracker for %s>" % self.roundup_root_url
+

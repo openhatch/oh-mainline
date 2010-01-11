@@ -276,4 +276,11 @@ p {
     width: 174px;
 }
 
+#openid_while_u_wait { font-size: 12pt; padding: 8px 12px; border-radius: 8px; -moz-border-radius: 8px; background-color: #fff; }
+
+form { width: 100%; }
+form p { width: 100%; }
+form label { width: 92px; }
+#account-related { float: left; width: 350px; }
+#account-related .body { background: transparent url('/static/images/white-sidebar.png'); border: 1px solid #f4f4f4; width: 308px; }
 /* vim: set ai ts=4 sts=4 et sw=4: */
