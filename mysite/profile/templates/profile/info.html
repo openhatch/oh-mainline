@@ -11,8 +11,8 @@
             {{person.bio}}
         </p>
         {% endif %}
-
-        <div class="tags" id="tags-links">
+        {% comment %} 
+        <div class="tags" id="tags-links"
             <span class="tag-type">links:</span>
             <ul>
                 <li>
@@ -29,6 +29,7 @@
                 </li>
             </ul>
         </div>
+        {% endcomment %} 
 
         {% if tags.understands and tags_flat.understands %}
         <div class='tags' id='tags-understands'>
