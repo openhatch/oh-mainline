@@ -1,6 +1,7 @@
+# Django settings for mysite project.
+
 import os
 import logging
-# Django settings for mysite project.
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -128,7 +129,7 @@ INSTALLED_APPS = (
 
 # file: settings.py #
 TEST_RUNNER = 'mysite._profiling.profile_tests'
-TEST_PROFILE = '/tmp/profile'
+TEST_PROFILE = '/tmp/openhatch-profiling-data.%s' % os.environ['USER']
 
 ## AMQP, Rabbit Queue, Celery
 AMQP_SERVER = "localhost"
