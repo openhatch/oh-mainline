@@ -1,0 +1,47 @@
+{% extends 'account/settings_tab.html' %}
+
+{% block title %}
+Location - 
+{{ block.super }}
+{% endblock title %}
+
+{% block form_action %}
+'{% url mysite.account.views.set_location_do %}'
+{% endblock form_action %}
+
+{% block submodule_head %}
+Location
+{% endblock submodule_head %}
+
+{% block submodule_body %}
+{% if the_user.get_profile.location_display_name %}
+<p style="visibility: hidden;" id="success_message">Your location is visible on <a href="{%url mysite.profile.views.people_map %}">the global map</a>.</p>
+{% else %}
+<p>To appear on <a href="{%url mysite.profile.views.people_map %}">the global map</a>,
+  set a location.</p>
+{% endif %}
+{% if not the_user.get_profile.location_confirmed and the_user.get_profile.location_display_name and not the_user.get_profile.dont_guess_my_location  and not dont_suggest_location %}
+<p>
+  <label></label>
+  <span class="notification" style="width: 311px; margin-bottom: 0;">We've tried to guess your location.</span>
+</p>
+{% endif %}
+{{ edit_location_form.as_p }}
+
+{% if the_user.get_profile.location_display_name %}
+<div style="position: relative; left: -16px;">
+  <label style="visibility: hidden;" id="geocode_description">You on a map! <br /><br />(If we got it wrong, try being more specific.)
+</label>
+<div id="map_canvas" style="float: left; width: 311px; height: 250px;">Loading map&hellip;</div>
+</div>
+{% endif %}
+
+{% endblock submodule_body %}
+
+{% block js_in_head %}
+<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+{% endblock js_in_head %}
+
+{% block js %}
+<script type="text/javascript" src="/static/js/account/set_location.js"></script>
+{% endblock js %}

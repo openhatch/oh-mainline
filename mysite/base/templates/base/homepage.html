@@ -13,7 +13,7 @@ Welcome to OpenHatch!
 {% endblock %}
 
 {% block js_in_head %}
-<script>
+<script type='text/javascript'>
     /*<![CDATA[*/
     // FIXME: Wrap this in an IE-only block.
     // Allow IE to recognize HTML5 elements
@@ -21,14 +21,14 @@ Welcome to OpenHatch!
     t = html5tags.length; while (t-- > 0) { document.createElement(html5tags[t]); }
     /*]]>*/
 </script>
-<script src="/static/js/jquery.js"></script>
-<script src="/static/openid/js/openid-jquery.js"></script>
-<script>
+<script src="/static/js/jquery.js" type='text/javascript'></script>
+<script src="/static/openid/js/openid-jquery.js" type='text/javascript'></script>
+<script type='text/javascript'>
     $(function() {
         openid.init('id_openid_url');
     });
 </script>
-<script src='/static/js/css_if_js.js'></script>
+<script src='/static/js/css_if_js.js' type='text/javascript'></script>
 {% endblock js_in_head %}
 
 {% block css %}
@@ -39,13 +39,6 @@ Welcome to OpenHatch!
 {% endblock css %}
 
 {% block content %}
-<style type='text/css'>
-    form { width: 100%; }
-    form p { width: 100%; }
-    form label { width: 92px; }
-    #account-related { float: left; width: 350px; }
-    #account-related .body { background: transparent url('/static/images/white-sidebar.png'); border: 1px solid #f4f4f4; width: 308px; }
-</style>
 <div class='left'>
     <div id='banner'>
         <img alt='OpenHatch' src='/static/images/the-logo.png' width='300'/>
@@ -64,7 +57,7 @@ Welcome to OpenHatch!
             {% with openid_signin_form as form %}
             {% include 'account/login_openid.html' %}
             {% endwith %}
-            <a href='/account/login/old'>
+            <a id='sign-in-with-a-password' href='/account/login/old'>
                 Sign in with a password
             </a>
         </div>
@@ -131,7 +124,3 @@ Welcome to OpenHatch!
     </div>
 </div>
 {% endblock content %}
-
-{% block js %}
-<script src='/static/js/homepage.js'></script>
-{% endblock js %}

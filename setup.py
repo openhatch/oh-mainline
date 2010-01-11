@@ -20,6 +20,7 @@ setup(
                         'multiprocessing==2.6.2.1-oh',
                         'launchpadlib==1.5.3',
                         'python-github2==0.1.1',
+                        'pygeoip==0.1.3',
                        ],
 
     dependency_links = ['http://linode.openhatch.org/~paulproteus/',
@@ -28,6 +29,7 @@ setup(
                         'http://linode.openhatch.org/~paulproteus/multiprocessing-2.6.2.1-oh.tar.gz#egg=multiprocessing',
                         'http://linode.openhatch.org/~paulproteus/South-0.6_pre-py2.6.egg#egg=south',
                         'http://linode.openhatch.org/~paulproteus/python-github2-0.1.1.tar.gz#egg=python-github2',
+                        'http://pygeoip.googlecode.com/files/pygeoip-0.1.3.zip#egg=pygeoip',
                        ],
 
     zip_safe = False,
