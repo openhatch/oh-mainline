@@ -129,7 +129,9 @@ def create_citations_from_github_results(dia_id, results):
         # FIXME: Populate project description, name, etc.
 
         if PortfolioEntry.objects.filter(person=person, project=project).count() == 0:
-            portfolio_entry = PortfolioEntry(person=person, project=project)
+            portfolio_entry = PortfolioEntry(person=person,
+                                             project=project,
+                                             project_description=repo.description)
             portfolio_entry.save()
         portfolio_entry = PortfolioEntry.objects.filter(person=person, project=project)[0]
             

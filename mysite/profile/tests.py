@@ -1400,7 +1400,7 @@ class MockGithubImport(BaseCeleryTest):
         "fake Github projects so we don't bother the Github API (or waste "
         "time waiting for it."
         # {{{
-        description = u'See-\u0938aw Hosting'
+        description = u'S\u00E9e-Saw Hosting'
         mock_github_projects.return_value = [ObjectFromDict({
             'name': 'MOCK ccHost',
             'description': description,
