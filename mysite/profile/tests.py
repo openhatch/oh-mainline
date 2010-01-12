@@ -1341,6 +1341,7 @@ class MockGithubImport(BaseCeleryTest):
         mock_github_projects.return_value = [ObjectFromDict({
             'name': 'MOCK ccHost',
             'owner': 'paulproteus', # github repo owner
+            'description': '',
             'fork': True})]
 
         data_we_expect = [{
@@ -1369,6 +1370,7 @@ class MockGithubImport(BaseCeleryTest):
         mock_github_projects.return_value = [ObjectFromDict({
             'name': 'MOCK ccHost',
             'owner': 'paulproteus', # github repo owner
+            'description': '',
             'fork': False})]
             
         data_we_expect = [
@@ -1388,5 +1390,44 @@ class MockGithubImport(BaseCeleryTest):
                 source='gh', data_we_expect=data_we_expect,
                 summaries_we_expect=summaries_we_expect)
         # }}}
+
+    @mock.patch('mysite.customs.github.repos_by_username')
+    @mock.patch('mysite.customs.github.find_primary_language_of_repo', do_nothing)
+    @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
+    def test_github_import_brings_in_project_description(self,
+                                                         mock_github_projects):
+        "Test that we can import data from Github. Use a mock list of "
+        "fake Github projects so we don't bother the Github API (or waste "
+        "time waiting for it."
+        # {{{
+        description = u'See-\u0938aw Hosting'
+        mock_github_projects.return_value = [ObjectFromDict({
+            'name': 'MOCK ccHost',
+            'description': description,
+            'owner': 'paulproteus', # github repo owner
+            'fork': True})]
+
+        data_we_expect = [{
+            'contributor_role': 'Forked',
+            'languages': "", # FIXME
+            'is_published': False,
+            'is_deleted': False}]
+
+        summaries_we_expect = [
+                'Forked a repository on Github.',
+                ]
+
+        self._test_data_source_via_emulated_bgtask(
+                source='gh', data_we_expect=data_we_expect,
+                summaries_we_expect=summaries_we_expect)
+
+        # PLUS test that the PFE has a description!
+        self.assertEqual(PortfolioEntry.objects.all().count(),
+                         1) # just the one we added
+        self.assertEqual(PortfolioEntry.objects.get().project_description,
+                         description)
+        # }}}
+
+
 
 # vim: set ai et ts=4 sw=4 nu:
