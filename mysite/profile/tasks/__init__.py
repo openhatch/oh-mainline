@@ -174,7 +174,7 @@ def gh_action(dia):
 
     # FIXME: Make web_response objects have a DIA attribute.
     # The way we're doing it now is basically backwards.
-    repos = mysite.customs.github.repos_by_username(dia.query)
+    repos = list(mysite.customs.github.repos_by_username(dia.query))
     dict_mapping_repos_to_languages = {}
     for repo in repos:
         key = (repo.owner, repo.name)
