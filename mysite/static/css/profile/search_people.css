@@ -15,9 +15,24 @@
     list-style: square;
 
 }
+
+#big-people-list .people-list-map {
+    float: left;
+    width: 20%;
+}
+
+#people-list .people-list-column{
+    width: 32%;
+    float: left;
+    border-left: 1px dashed #CCC;
+    padding-left: 15px;
+}
+#people-list .people-list-column:first-child {
+    border-left: none;
+    padding-left: 0;
+}
 #people-list li {
     padding-top: 10px;
-    margin-left: 15px;
     list-style: square;
     padding: 0px;
     margin-bottom: 20px;
@@ -25,6 +40,9 @@
     display: block;
     float: left;
     width: 251px;
+}
+#people-list.people-list-map li{
+    display: none;
 }
 #people-list li img{
     font-size: 51px;

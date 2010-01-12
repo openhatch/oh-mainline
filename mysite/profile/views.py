@@ -296,12 +296,29 @@ def ask_for_tag_input(request, username):
     return display_person_web(request, username, 'tags', edit='1')
     # }}}
 
+def cut_list_of_people_in_to_columns(people):
+    third = people.count()/3
+    return [people[0:third], people[third:(third*2)], people[(third*2):]]
+
+
+    
+
+@view
+def display_list_of_people_who_match_some_search(request, property, value):
+    '''Property is the "tag name", and "value" is the text in it.'''
+    peeps = mysite.profile.controllers.people_matching(property, value)
+    data = {}
+    data['people_columns'] = cut_list_of_people_in_to_columns(peeps)
+    data['property'] = property
+    data['value'] = value
+    return (request, 'profile/search_people.html', data)
+
 @view
 def display_list_of_people(request):
     """Display a list of people."""
     # {{{
     data = {}
-    data['people'] = Person.objects.all().order_by('user__username')
+    data['people_columns'] = cut_list_of_people_in_to_columns(Person.objects.all().order_by('user__username'))
     return (request, 'profile/search_people.html', data)
     # }}}
 
@@ -551,15 +568,6 @@ def display_person_edit_name(request, name_edit_mode):
     return (request, 'profile/main.html', data)
     # }}}
 
-@view
-def display_list_of_people_who_match_some_search(request, property, value):
-    '''Property is the "tag name", and "value" is the text in it.'''
-    peeps = mysite.profile.controllers.people_matching(property, value)
-    data = {}
-    data['people'] = peeps
-    data['property'] = property
-    data['value'] = value
-    return (request, 'profile/search_people.html', data)
 
 @login_required
 def display_person_edit_name_do(request):

@@ -9,18 +9,14 @@ List of People
         where {{ property }} = {{ value }}
         {% endif %}
         <ul id="people-list">
-            {% for person in people %}
+            {% for column in people_columns %}
+            <div class="people-list-column">
+            {% for person in column %}
             {% if person.user.username %}
-            <li>
-            <a href='/people/{{person.user.username}}'>
-                {% if person.user.first_name or person.user.last_name %}
-                {{ person.user.first_name }} {{ person.user.last_name }} ({{ person.user.username }})
-                {% else %}
-                {{ person.user.username }}
-                {% endif %}
-            </a>
-            </li>
+            {% include 'profile/person-summary-li.html' %}
             {% endif %}
+        {% endfor %}
+        </div>
             {% endfor %}
         </ul>
 {% endblock people_main %}
