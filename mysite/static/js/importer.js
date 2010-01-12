@@ -361,12 +361,19 @@ function updatePortfolio(response) {
             $new_portfolio_entry.find('.icon_flagger').hide();
         }
         else {
+            /* So, the object we select is a DIV whose CSS background-image
+             * is what causes the browser to display the icon. We store a
+             * copy of the URL JavaScript gave us in a totally made-up "src"
+             * attribute of the DIV to make life easier for us.
+             */
             var $icon = $new_portfolio_entry.find(".project_icon");
             var current_src = $icon.attr('src');
             var response_src = ("/static/" +
                     project_we_refer_to.fields.icon_for_profile);
+            var response_src_for_css = 'url(' + response_src + ')';
             if (current_src != response_src) {
-                $icon.attr('src', response_src);
+                $icon.attr('src', response_src); /* just for us */
+                $icon.css('background-image', response_src_for_css);
                 $new_portfolio_entry.find('.icon_flagger').show();
             }
         }
