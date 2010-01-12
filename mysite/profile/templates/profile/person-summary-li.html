@@ -3,7 +3,7 @@
                             <img src="{{ person.get_photo_thumbnail_url_or_default }}" />
                         </a>
                             <div class="people-view-info">
-                            <a class="name">
+                            <a href='/people/{{person.user.username}}' class="name">
                             {% if person.user.first_name or person.user.last_name %}
                                 {{ person.user.first_name }} {{ person.user.last_name }}
                                 ({{ person.user.username }})
