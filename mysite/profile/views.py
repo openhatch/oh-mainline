@@ -297,7 +297,7 @@ def ask_for_tag_input(request, username):
     # }}}
 
 def cut_list_of_people_in_to_columns(people):
-    third = people.count()/3
+    third = len(people)/3
     return [people[0:third], people[third:(third*2)], people[(third*2):]]
 
 

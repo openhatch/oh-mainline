@@ -397,11 +397,11 @@ class UserListTests(TwillTests):
     def test_display_list_of_users_web(self):
         # {{{
         self.login_with_twill()
-        url = 'http://openhatch.org/people/'
+        url = 'http://openhatch.org/%2Bpeople/list/'
         url = make_twill_url(url)
         tc.go(url)
         tc.find(r'paulproteus')
-        tc.find(r'Barry Spinoza \(barry\)')
+        tc.find(r'Barry Spinoza')
 
         tc.follow('paulproteus')
         tc.url('people/paulproteus') 
@@ -1260,52 +1260,6 @@ class ProjectGetMentors(TwillTests):
                                tag=willing_to_mentor_banshee)
         link.save()
 
-class GithubProfileImporting(TwillTests):
-    fixtures = ['user-paulproteus', 'person-paulproteus']
-
-    def test_create_citation_from_github_data(self):
-        # This is a fake copy of the data we get from Github
-        github_repo_object=ObjectFromDict({'name': 'project_name',
-                                           'fork': True})
-
-        # So there's no such project in the DB yet...
-        self.assertEqual(Project.objects.filter(name='project_name').count(),
-                         0)
-
-        p_e = mysite.profile.models.Citation.create_from_github_result(
-            github_repo_object=github_repo_object,
-            person=Person.get_by_username('paulproteus'),
-            repo_primary_language='')
-
-        # But getting data back from Github shows that we create it.
-        self.assertEqual(Project.objects.filter(name='project_name').count(),
-                         1)
-
-    def test_create_citation_from_github_data_on_nonfork(self):
-        nonfork = ObjectFromDict({'name': 'project_i_started',
-                                  'fork': False})
-        fork = ObjectFromDict({'name': 'project_i_forked',
-                               'fork': True})
-        fork_p_e = mysite.profile.models.Citation.create_from_github_result(
-            github_repo_object=fork,
-            person=Person.get_by_username('paulproteus'),
-            repo_primary_language='')
-        self.assertEqual(fork_p_e.contributor_role, 'Forked')
-
-        nonfork_p_e = mysite.profile.models.Citation.create_from_github_result(
-            github_repo_object=nonfork,
-            person=Person.get_by_username('paulproteus'),
-            repo_primary_language='')
-        self.assertEqual(nonfork_p_e.contributor_role, 'Started')
-
-    def test_create_citation_from_github_data_the_second_time(self):
-        pass
-
-    def test_github_importer_fills_in_project_langauge(self):
-        pass
-
-    def test_github_importer_saves_project_homepage(self):
-        pass
 
 def do_nothing(*args, **kwargs):
     return ''
