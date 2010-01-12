@@ -355,7 +355,7 @@ function updatePortfolio(response) {
 		});
 	    /* project_description */
 	    $(".project_description", $new_portfolio_entry).textSmart(portfolioEntry.fields.project_description);
-	    	   
+
 	    /* project_icon */
         if (project_we_refer_to.fields.icon_for_profile == '') {
             $new_portfolio_entry.find('.icon_flagger').hide();
@@ -585,8 +585,11 @@ FlagIcon.postOptions = {
 };
 FlagIcon.postOptions.success = function (response) {
     $portfolioEntry = $('#portfolio_entry_'+response['portfolio_entry__pk']);
-    var defaultIconSrc = $('#portfolio_entry_building_block img.project_icon').attr('src');
-    $portfolioEntry.find('img.project_icon').attr('src', defaultIconSrc);
+    var defaultIconCssAttr = $('#portfolio_entry_building_block .project_icon').css('background-image');
+    var defaultIconUrl = defaultIconCssAttr.replace(/^url[(]/, '').replace(/[)]$/, ''); /* remove url() */
+    var relative_path = defaultIconUrl.replace(/^.*?:[/][/].*?[/]/, '/'); /* remove http://domain or https://domain */
+    $portfolioEntry.find('.project_icon').attr('src', relative_path);
+    $portfolioEntry.find('.project_icon').css('background-image', defaultIconCssAttr);
 
     // the text() function will remove all children, including the link.
     $portfolioEntry.find('.icon_flagger').text('Using default icon.');
