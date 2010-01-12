@@ -124,6 +124,9 @@ class Person(models.Model):
     def get_published_portfolio_entries(self):
         return PortfolioEntry.objects.filter(person=self, is_published=True, is_deleted=False)
 
+    def get_list_of_project_names(self):
+        return self.get_published_portfolio_entries().values_list('project__name', flat=True)
+
     @staticmethod
     def only_terms_with_results(terms):
         # Remove terms whose hit counts are zero.
@@ -166,8 +169,15 @@ class Person(models.Model):
         return sum([list(pfe.get_published_citations())
             for pfe in self.get_published_portfolio_entries()], [])
 
+    def get_tag_texts_for_map(self):
+        """Return a list of Tags linked to this Person.  Tags that would be useful from the map view of the people list"""
+        exclude_me = TagType.objects.filter(name__in=['understands_not', 'studying'])
+        my_tag_texts = [link.tag.text for link in Link_Person_Tag.objects.filter(person=self) if link.tag.tag_type not in exclude_me]
+        #eliminate duplicates, then return
+        return list(set(my_tag_texts))
+
     def get_tags_for_recommendations(self):
-        """Return a list of Tags linked to this Person."""
+        """Return a list of Tags linked to this Person.  For use with bug recommendations."""
         exclude_me = TagType.objects.filter(name='understands_not')
         return [link.tag for link in Link_Person_Tag.objects.filter(person=self) if link.tag.tag_type not in exclude_me]
 
