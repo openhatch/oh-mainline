@@ -1,34 +1,37 @@
 == How to run this code ==
 
-$ sudo apt-get install rabbitmq-server python2.5-dev python-apt
-$ sudo rabbitmqctl add_user rabbiter johT4qui
-$ sudo rabbitmqctl add_vhost localhost
-$ sudo rabbitmqctl set_permissions -p localhost rabbiter "" ".*" ".*" || sudo rabbitmqctl map_user_vhost rabbiter localhost || echo "Failed to set rabbitmq permissions. Complain to Asheesh."
+    sudo apt-get install rabbitmq-server python2.5-dev python-apt
+    sudo rabbitmqctl add_user rabbiter johT4qui
+    sudo rabbitmqctl add_vhost localhost
+    sudo rabbitmqctl set_permissions -p localhost rabbiter "" ".*" ".*" || sudo rabbitmqctl map_user_vhost rabbiter localhost || echo "Failed to set rabbitmq permissions. Complain to Asheesh."
 
 FIXME: Explain how to create MySQL user oh_milestone_a and grant select permissions.
 
-$ python2.5 bootstrap.py
-$ ./bin/buildout # Make sure you're actually in this directory
-$ ./bin/mysite runserver
+    python2.5 bootstrap.py
+    ./bin/buildout # Make sure you're actually in this directory
+    ./bin/mysite runserver
 
-# Set up the database.
-mysql -u root -p < "CREATE DATABASE; CREATE USER 'oh_milestone_a'@'localhost' IDENTIFIED BY 'ahmaC0Th'; GRANT ALL ON oh_milestone_a.* TO 'oh_milestona_a'@'localhost';
-# Or use 'mysql -u username', where username is a MySQL user with the appropriate privileges.
+Set up the database.
 
-../bin/mysite syncdb
+    mysql -u root -p < "CREATE DATABASE; CREATE USER 'oh_milestone_a'@'localhost' IDENTIFIED BY 'ahmaC0Th'; GRANT ALL ON oh_milestone_a.* TO 'oh_milestona_a'@'localhost';
+
+Or use 'mysql -u username', where username is a MySQL user with the appropriate privileges.
+
+    ../bin/mysite syncdb
 
 Note that you must answer "No" to the question, "Do you want to create a superuser?"
 
 That is because you have not run the migrations for the "Profile" app yet.
 
-# You may need to migrate using this command:
-../bin/mysite migrate
+You may need to migrate using this command:
 
-# Sometimes the migrations don't work, and South will give you a MySQL script. Your next challenge, wee padawan, is to fix the syntax errors in this MySQL. Run this vim command for starters.
+    ../bin/mysite migrate
+
+Sometimes the migrations don't work, and South will give you a MySQL script. Your next challenge, wee padawan, is to fix the syntax errors in this MySQL. Run this vim command for starters.
 :%s/^ = //
-# For non-vimmers, that means "Delete the string ' = ' when it appears at the beginnings of lines."
-# Then remove those trailing square brackets.
-# Regarding dates. You may need to replace South's strange Pythonesque code for dates with proper MySQL code.
+For non-vimmers, that means "Delete the string ' = ' when it appears at the beginnings of lines."
+Then remove those trailing square brackets.
+Regarding dates. You may need to replace South's strange Pythonesque code for dates with proper MySQL code.
 
 Now load http://127.0.0.1:8000/search/ in your web browser.
 
@@ -44,13 +47,21 @@ To run all tests, except customs:
 
 To test customs:
 
-./bin/mysite test customs
+    ./bin/mysite test customs
+
+== To make the importer work ==
+
+Run a Celery daemon with the following command
+
+    ./bin/mysite celeryd -c 8
 
 == To forcibly regenerate scripts in ./bin/* ==
 
-$ cd milestone-a # Make sure you're in this directory. Not sure if it will work elsewhere.
-$ python bootstrap.py
-$ ./bin/buildout -o # o is for "offline", so you don't hit the network looking for dependencies
+Run these commands:
+
+    cd milestone-a # Make sure you're in this directory. Not sure if it will work elsewhere.
+    python bootstrap.py
+    ./bin/buildout -o # o is for "offline", so you don't hit the network looking for dependencies
 
 == Thanks to ==
 
