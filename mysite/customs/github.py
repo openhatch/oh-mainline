@@ -33,7 +33,7 @@ def find_primary_language_of_repo(github_username, github_reponame):
     if 'languages' in data:
         language_name_count_tuples = data['languages'].items()
         sorted_by_count = sorted(language_name_count_tuples,
-                                   lambda (lang, count): count)
+                                   lambda x: x[1])
         winning_lang_name, winning_lang_count = sorted_by_count[0]
         return winning_lang_name
     else:
