@@ -72,8 +72,23 @@ PeopleMap.prototype.initialize = function(options) {
                 }
                 else {
                     $person_bullet.hide();
-                }
+                } 
             }
+            var people_shown_string = "" 
+            if(shown_this_many == 1){
+                people_shown_string = "1 person in this area:" ;
+            }
+            else if(shown_this_many == 0){
+                people_shown_string = "Nobody in this area.";
+            }
+            else if(shown_this_many == num_of_persons_with_locations){
+                people_shown_string = num_of_persons_with_locations + " people have entered their location:";
+            }
+            else{
+                people_shown_string = shown_this_many + " people in this area:" ;
+
+            }
+            $('#people-count').text(people_shown_string);
         }
     }
     update_all_markers = generate_update_all_markers(map);
