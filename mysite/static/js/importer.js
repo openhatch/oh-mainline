@@ -355,18 +355,25 @@ function updatePortfolio(response) {
 		});
 	    /* project_description */
 	    $(".project_description", $new_portfolio_entry).textSmart(portfolioEntry.fields.project_description);
-	    	   
+
 	    /* project_icon */
         if (project_we_refer_to.fields.icon_for_profile == '') {
             $new_portfolio_entry.find('.icon_flagger').hide();
         }
         else {
+            /* So, the object we select is a DIV whose CSS background-image
+             * is what causes the browser to display the icon. We store a
+             * copy of the URL JavaScript gave us in a totally made-up "src"
+             * attribute of the DIV to make life easier for us.
+             */
             var $icon = $new_portfolio_entry.find(".project_icon");
             var current_src = $icon.attr('src');
             var response_src = ("/static/" +
                     project_we_refer_to.fields.icon_for_profile);
+            var response_src_for_css = 'url(' + response_src + ')';
             if (current_src != response_src) {
-                $icon.attr('src', response_src);
+                $icon.attr('src', response_src); /* just for us */
+                $icon.css('background-image', response_src_for_css);
                 $new_portfolio_entry.find('.icon_flagger').show();
             }
         }
@@ -578,8 +585,11 @@ FlagIcon.postOptions = {
 };
 FlagIcon.postOptions.success = function (response) {
     $portfolioEntry = $('#portfolio_entry_'+response['portfolio_entry__pk']);
-    var defaultIconSrc = $('#portfolio_entry_building_block img.project_icon').attr('src');
-    $portfolioEntry.find('img.project_icon').attr('src', defaultIconSrc);
+    var defaultIconCssAttr = $('#portfolio_entry_building_block .project_icon').css('background-image');
+    var defaultIconUrl = defaultIconCssAttr.replace(/^url[(]/, '').replace(/[)]$/, ''); /* remove url() */
+    var relative_path = defaultIconUrl.replace(/^.*?:[/][/].*?[/]/, '/'); /* remove http://domain or https://domain */
+    $portfolioEntry.find('.project_icon').attr('src', relative_path);
+    $portfolioEntry.find('.project_icon').css('background-image', defaultIconCssAttr);
 
     // the text() function will remove all children, including the link.
     $portfolioEntry.find('.icon_flagger').text('Using default icon.');
