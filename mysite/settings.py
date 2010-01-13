@@ -171,7 +171,7 @@ LP_CREDS_BASE64_ENCODED='WzFdCmNvbnN1bWVyX3NlY3JldCA9IAphY2Nlc3NfdG9rZW4gPSBHV0t
 GITHUB_USERNAME='openhatched'
 GITHUB_API_TOKEN='6f2b15214757ff724155654c97f4ce92'
 
-# Actually bundle files, even if not in production.
+# Set this to false to bundle files even if not in production.
 # ASSETS_DEBUG = False
 
 ASSETS_EXPIRE = 'querystring'
