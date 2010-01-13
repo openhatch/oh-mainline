@@ -1429,82 +1429,65 @@ class MockGithubImport(BaseCeleryTest):
                          description)
         # }}}
 
-class ImportFromGithubActivityFeed(BaseCeleryTest):
+def mock_list_of_collaborators(repo_name):
+    if 'cchost' in repo_name.lower():
+        return ['paulproteus', 'someone']
+    else:
+        return ['someone']
+
+class ImportGithubCollaborators(BaseCeleryTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
-    @mock.patch('mysite.customs.github._pull_data_from_user_activity_feed')
+    @mock.patch('mysite.customs.github._github.repos.list_collaborators', mock_list_of_collaborators)
+    @mock.patch('mysite.customs.github._get_repositories_user_watches')
     @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
-    def test_github_activity_feed_import_via_emulated_bgtask(self, mock_results):
-        "Test that we can import data from a user's Github activity feed. This is "
-        "needed because if e.g. Asheesh pushes to a repository owned by e.g. "
-        "Raffi, it was participation in a repo owned by someone other than Asheesh "
-        "so it won't be reflected in the list of repos owned by Asheesh. So this "
-        "is one way to clean that up a little."
-        # {{{
+    def test_github_collaboration_via_emulated_bgtask(self, mock_results):
         description = 'the world in /bin/nutsh'
-        # one repo owned by paulproteus, and one not.
-        # only record the non-paulproteus one.
-        mock_results.return_value = [{
-            'actor': 'paulproteus',
-            'created_at': '2010/01/09 21:15:43 -0800',
-            'id': 122355189,
-            'payload': {'head': '62ca8bc2d29c4108e367f5fb36d75bec8e7c3042',
-                        'push_id': 9373814,
-                        'ref': 'refs/heads/master',
-                        'shas': [['62ca8bc2d29c4108e367f5fb36d75bec8e7c3042',
-                                  'somebody@ema.il',
-                                  'commit log message',
-                                  'Miss Git Committer']],
-                        'size': 1},
-            'public': True,
-            'repository': {'description': description,
-                           'fork': False,
-                           'forks': 1,
-                           'homepage': 'sethirl.com',
-                           'name': 'MOCK ccHost',
-                           'open_issues': 0,
-                           'owner': 'someone_random',
-                           'private': False,
-                           'url': 'http://github.com/someone_random/cchost',
-                           'watchers': 3},
-            'sha': None,
-            'times': 0,
-            'type': 'PushEvent'}, {
-            'actor': 'paulproteus',
-            'created_at': '2010/01/09 21:15:43 -0800',
-            'id': 122355189,
-            'payload': {'head': '62ca8bc2d29c4108e367f5fb36d75bec8e7c3042',
-                        'push_id': 9373814,
-                        'ref': 'refs/heads/master',
-                        'shas': [['62ca8bc2d29c4108e367f5fb36d75bec8e7c3042',
-                                  'somebody@ema.il',
-                                  'commit log message',
-                                  'Miss Git Committer']],
-                        'size': 1},
-            'public': True,
-            'repository': {'description': description,
-                           'fork': False,
-                           'forks': 1,
-                           'homepage': 'sethirl.com',
-                           'name': 'something ELSE ZOMG',
-                           'open_issues': 0,
-                           'owner': 'paulproteus',
-                           'private': False,
-                           'url': 'http://github.com/paulproteus/something_else',
-                           'watchers': 3},
-            'sha': None,
-            'times': 0,
-            'type': 'PushEvent'},
-        ]
+        # three repos: one owned by paulproteus; that should be ignored.
+        # the other two: one where paulproteus is a collaborator, and one
+        # where he isn't.
+        mock_results.return_value = [
+            {'description': description,
+             'fork': False,
+             'forks': 1,
+             'homepage': 'sethirl.com',
+             'name': 'MOCK ccHost',     # paulproteus is a collaborator
+             'open_issues': 0,
+             'owner': 'someone_random', # this should be imported!
+             'private': False,
+             'url': 'http://github.com/someone_random/cchost',
+             'watchers': 3},
+
+            {'description': description,
+             'fork': False,
+             'forks': 1,
+             'homepage': 'example.com',
+             'name': 'ruby-on-rails',     # paulproteus is not a collaborator
+             'open_issues': 0,
+             'owner': 'someone_random',   # so won't be imported
+             'private': False,
+             'url': 'http://github.com/someone_random/ruby-on-rails',
+             'watchers': 3},
+
+            {'description': description,
+             'fork': False,
+             'forks': 1,
+             'homepage': 'example.com',
+             'name': 'asheesh personal repo',
+             'open_issues': 0,
+             'owner': 'paulproteus', # this should be skipped
+             'private': False,
+             'url': 'http://github.com/someone_random/cchost',
+             'watchers': 3}]
 
         data_we_expect = [{
-            'contributor_role': 'Pushed to',
+            'contributor_role': 'Collaborated on',
             'languages': "",
             'is_published': False,
             'is_deleted': False}]
 
         summaries_we_expect = [
-                'Pushed to a repository on Github.',
+                'Collaborated on a repository on Github.',
                 ]
 
         return self._test_data_source_via_emulated_bgtask(

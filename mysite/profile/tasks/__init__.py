@@ -119,7 +119,7 @@ def create_citations_from_launchpad_results(dia_id, lp_results):
 
 def create_citations_from_github_activity_feed_results(dia_id, results):
     return create_citations_from_github_results(dia_id, results,
-                                                override_contrib='Pushed to')
+                                                override_contrib='Collaborated on')
 
 def create_citations_from_github_results(dia_id, results,
                                          override_contrib=None):
@@ -200,8 +200,8 @@ def ga_action(dia):
 
     # FIXME: Make web_response objects have a DIA attribute.
     # The way we're doing it now is basically backwards.
-    repos = list(mysite.customs.github.repos_by_username_from_activity_feed(
-        github_username=dia.query))
+    repos = list(mysite.customs.github.repos_user_collaborates_on(
+                 github_username=dia.query))
     return (repos, {})
     
 def lp_action(dia):

@@ -47,6 +47,26 @@ def _pull_data_from_user_activity_feed(github_username):
     data = simplejson.load(response)
     return data
 
+def _get_repositories_user_watches(github_username):
+    '''Returns a list of repo objects.'''
+    json_url = 'http://github.com/api/v2/json/repos/watched/%s' % (
+        github_username)
+    response = mysite.customs.ohloh.mechanize_get(json_url).response()
+    data = simplejson.load(response)
+    return data['repositories']
+
+def repos_user_collaborates_on(github_username):
+    # First, make a big set of candidates: all the repos the user watches
+    watched = _get_repositories_user_watches(github_username)
+    # Now filter that down to just the ones not owned by the user
+    not_owned = [r for r in watched if r['owner'] != github_username]
+    # Now ask github.com if, for each repo, github_username is a collaborator
+    for repo in not_owned:
+        collaborators = _github.repos.list_collaborators('%s/%s' % (
+                repo['owner'], repo['name']))
+        if github_username in collaborators:
+            yield mysite.base.helpers.ObjectFromDict(repo)
+
 def repos_by_username_from_activity_feed(github_username):
     repo_urls_emitted = set()
     for event in _pull_data_from_user_activity_feed(github_username):
