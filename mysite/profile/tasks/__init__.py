@@ -88,35 +88,6 @@ def create_citations_from_launchpad_results(dia_id, lp_results):
     dia.save()
     # }}}
 
-    @staticmethod
-    # Note: This returns a Citation object that is not necessarily
-    # saved. That's up to the caller. And it has no portfolio_entry
-    # attached.
-    def create_from_github_result(github_repo_object, person,
-                                  repo_primary_language):
-        SOURCE="Github"
-        # {{{
-        # FIXME: Take language argument into account
-        project, bool_created = Project.objects.get_or_create(
-                name=github_repo_object.name)
-        #matches = list(Citation.objects.filter(project=project,
-        #                                       person=person,
-        #                                       source=SOURCE))
-        matches = []
-        if matches:
-            citation = matches[0]
-        else:
-            # Calculate the string for contributor_role
-            if github_repo_object.fork:
-                contributor_role='Forked'
-            else:
-                contributor_role='Started'
-
-            # FIXME: Use DIA and use that to store source...
-            citation = Citation(contributor_role=contributor_role)
-            return citation
-        # }}}
-
 def create_citations_from_github_activity_feed_results(dia_id, results):
     return create_citations_from_github_results(dia_id, results,
                                                 override_contrib='Collaborated on')
