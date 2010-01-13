@@ -1442,6 +1442,8 @@ class ImportFromGithubActivityFeed(BaseCeleryTest):
         "is one way to clean that up a little."
         # {{{
         description = 'the world in /bin/nutsh'
+        # one repo owned by paulproteus, and one not.
+        # only record the non-paulproteus one.
         mock_results.return_value = [{
             'actor': 'paulproteus',
             'created_at': '2010/01/09 21:15:43 -0800',
@@ -1467,6 +1469,31 @@ class ImportFromGithubActivityFeed(BaseCeleryTest):
                            'watchers': 3},
             'sha': None,
             'times': 0,
+            'type': 'PushEvent'}, {
+            'actor': 'paulproteus',
+            'created_at': '2010/01/09 21:15:43 -0800',
+            'id': 122355189,
+            'payload': {'head': '62ca8bc2d29c4108e367f5fb36d75bec8e7c3042',
+                        'push_id': 9373814,
+                        'ref': 'refs/heads/master',
+                        'shas': [['62ca8bc2d29c4108e367f5fb36d75bec8e7c3042',
+                                  'somebody@ema.il',
+                                  'commit log message',
+                                  'Miss Git Committer']],
+                        'size': 1},
+            'public': True,
+            'repository': {'description': description,
+                           'fork': False,
+                           'forks': 1,
+                           'homepage': 'sethirl.com',
+                           'name': 'something ELSE ZOMG',
+                           'open_issues': 0,
+                           'owner': 'paulproteus',
+                           'private': False,
+                           'url': 'http://github.com/paulproteus/something_else',
+                           'watchers': 3},
+            'sha': None,
+            'times': 0,
             'type': 'PushEvent'},
         ]
 
@@ -1487,7 +1514,7 @@ class ImportFromGithubActivityFeed(BaseCeleryTest):
 
         # PLUS test that the PFE has a description!
         self.assertEqual(PortfolioEntry.objects.all().count(),
-                         1) # just the one we added
+                         1) # just the one we want
         self.assertEqual(PortfolioEntry.objects.get().project_description,
                          description)
         # }}}

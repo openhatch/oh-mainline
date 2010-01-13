@@ -3,6 +3,7 @@ from django.conf import settings
 import mysite.customs.ohloh
 import simplejson
 import mysite.base.helpers
+import urllib
 
 _github = None
 
@@ -52,6 +53,8 @@ def repos_by_username_from_activity_feed(github_username):
         if event['type'] == 'PushEvent':
             repo = event['repository']
             if repo['url'] not in repo_urls_emitted:
+                if repo['owner'] == github_username:
+                    continue # skip the ones owned by this user
                 repo_urls_emitted.add(repo['url']) # avoid sending out duplicates
                 yield mysite.base.helpers.ObjectFromDict(repo)
     

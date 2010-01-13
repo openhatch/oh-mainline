@@ -259,7 +259,7 @@ class FetchPersonDataFromOhloh(Task):
             if hasattr(e, 'geturl'):
                 url = str(e.geturl())
             else:
-                url = 'UNKNOWN'
+                raise
             logger.error('Dying: ' + code + ' getting ' + url)
             raise ValueError, {'code': code, 'url': url}
 
