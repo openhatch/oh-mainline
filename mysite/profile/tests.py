@@ -1,5 +1,6 @@
 # Imports {{{
-from mysite.base.tests import make_twill_url, TwillTests, ObjectFromDict
+from mysite.base.tests import make_twill_url, TwillTests
+from mysite.base.helpers import ObjectFromDict
 import mysite.account.tests
 
 from mysite.search.models import Project
@@ -1420,6 +1421,69 @@ class MockGithubImport(BaseCeleryTest):
         self._test_data_source_via_emulated_bgtask(
                 source='gh', data_we_expect=data_we_expect,
                 summaries_we_expect=summaries_we_expect)
+
+        # PLUS test that the PFE has a description!
+        self.assertEqual(PortfolioEntry.objects.all().count(),
+                         1) # just the one we added
+        self.assertEqual(PortfolioEntry.objects.get().project_description,
+                         description)
+        # }}}
+
+class ImportFromGithubActivityFeed(BaseCeleryTest):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    @mock.patch('mysite.customs.github._pull_data_from_user_activity_feed')
+    @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
+    def test_github_activity_feed_import_via_emulated_bgtask(self, mock_results):
+        "Test that we can import data from a user's Github activity feed. This is "
+        "needed because if e.g. Asheesh pushes to a repository owned by e.g. "
+        "Raffi, it was participation in a repo owned by someone other than Asheesh "
+        "so it won't be reflected in the list of repos owned by Asheesh. So this "
+        "is one way to clean that up a little."
+        # {{{
+        description = 'the world in /bin/nutsh'
+        mock_results.return_value = [{
+            'actor': 'paulproteus',
+            'created_at': '2010/01/09 21:15:43 -0800',
+            'id': 122355189,
+            'payload': {'head': '62ca8bc2d29c4108e367f5fb36d75bec8e7c3042',
+                        'push_id': 9373814,
+                        'ref': 'refs/heads/master',
+                        'shas': [['62ca8bc2d29c4108e367f5fb36d75bec8e7c3042',
+                                  'somebody@ema.il',
+                                  'commit log message',
+                                  'Miss Git Committer']],
+                        'size': 1},
+            'public': True,
+            'repository': {'description': description,
+                           'fork': False,
+                           'forks': 1,
+                           'homepage': 'sethirl.com',
+                           'name': 'MOCK ccHost',
+                           'open_issues': 0,
+                           'owner': 'someone_random',
+                           'private': False,
+                           'url': 'http://github.com/someone_random/cchost',
+                           'watchers': 3},
+            'sha': None,
+            'times': 0,
+            'type': 'PushEvent'},
+        ]
+
+        data_we_expect = [{
+            'contributor_role': 'Pushed to',
+            'languages': "",
+            'is_published': False,
+            'is_deleted': False}]
+
+        summaries_we_expect = [
+                'Pushed to a repository on Github.',
+                ]
+
+        return self._test_data_source_via_emulated_bgtask(
+                source='ga', data_we_expect=data_we_expect,
+                summaries_we_expect=summaries_we_expect)
+        # }}}
 
         # PLUS test that the PFE has a description!
         self.assertEqual(PortfolioEntry.objects.all().count(),

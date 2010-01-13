@@ -117,8 +117,12 @@ def create_citations_from_launchpad_results(dia_id, lp_results):
             return citation
         # }}}
 
+def create_citations_from_github_activity_feed_results(dia_id, results):
+    return create_citations_from_github_results(dia_id, results,
+                                                override_contrib='Pushed to')
 
-def create_citations_from_github_results(dia_id, results):
+def create_citations_from_github_results(dia_id, results,
+                                         override_contrib=None):
     repos, dict_mapping_repos_to_languages = results
     dia = DataImportAttempt.objects.get(id=dia_id)
     person = dia.person
@@ -141,6 +145,8 @@ def create_citations_from_github_results(dia_id, results):
             citation.contributor_role = 'Forked'
         else:
             citation.contributor_role = 'Started'
+        if override_contrib:
+            citation.contributor_role = override_contrib
         citation.portfolio_entry = portfolio_entry
         citation.data_import_attempt = dia
         citation.url = 'http://github.com/%s/%s/' % (urllib.quote_plus(repo.owner),
@@ -186,6 +192,17 @@ def gh_action(dia):
             #github_reponame=repo.name)
         
     return (repos, dict_mapping_repos_to_languages)
+
+def ga_action(dia):
+    # FIXME: We should add a person parameter so that, in the
+    # case of "You should retry soon..." messages from the Github
+    # API, we notify the user.
+
+    # FIXME: Make web_response objects have a DIA attribute.
+    # The way we're doing it now is basically backwards.
+    repos = list(mysite.customs.github.repos_by_username_from_activity_feed(
+        github_username=dia.query))
+    return (repos, {})
     
 def lp_action(dia):
     # NB: Don't change the way this is called, because calling it this way
@@ -196,6 +213,7 @@ source2actual_action = {
         'rs': rs_action,
         'ou': ou_action,
         'gh': gh_action,
+        'ga': ga_action,
         'lp': lp_action
         }
 
@@ -203,6 +221,7 @@ source2result_handler = {
         'rs': create_citations_from_ohloh_contributor_facts,
         'ou': create_citations_from_ohloh_contributor_facts,
         'gh': create_citations_from_github_results,
+        'ga': create_citations_from_github_activity_feed_results,
         'lp': create_citations_from_launchpad_results,
         }
 

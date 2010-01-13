@@ -2,6 +2,7 @@ import github2.client
 from django.conf import settings
 import mysite.customs.ohloh
 import simplejson
+import mysite.base.helpers
 
 _github = None
 
@@ -38,3 +39,20 @@ def find_primary_language_of_repo(github_username, github_reponame):
         return winning_lang_name
     else:
         return '' # No best guess for primary language.
+
+def _pull_data_from_user_activity_feed(github_username):
+    json_url = 'http://github.com/%s.json' % urllib.quote(github_username)
+    response = mysite.customs.ohloh.mechanize_get(json_url).response()
+    data = simplejson.load(response)
+    return data
+
+def repos_by_username_from_activity_feed(github_username):
+    repo_urls_emitted = set()
+    for event in _pull_data_from_user_activity_feed(github_username):
+        if event['type'] == 'PushEvent':
+            repo = event['repository']
+            if repo['url'] not in repo_urls_emitted:
+                repo_urls_emitted.add(repo['url']) # avoid sending out duplicates
+                yield mysite.base.helpers.ObjectFromDict(repo)
+    
+        
