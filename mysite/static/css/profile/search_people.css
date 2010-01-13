@@ -16,6 +16,10 @@
 
 }
 
+#people-list li.highlighted{
+    background-color: #ffa;
+}
+
 #big-people-list .people-list-map {
     float: left;
     width: 20%;

@@ -1,6 +1,8 @@
-PeopleMap = function () { }
+PeopleMapController = function () { }
 
-PeopleMap.prototype.initialize = function(options) {
+PeopleMapController.prototype.initialize = function(options) {
+    var me = this;
+    this.person_locations = {};
 
     var number_of_people_geocoded = 0;
     var update_all_markers;
@@ -19,7 +21,9 @@ PeopleMap.prototype.initialize = function(options) {
         'mapTypeId': google.maps.MapTypeId.ROADMAP
     };
     var $canvas = $('#map_canvas');
-    var map = new google.maps.Map($canvas.get(0), myOptions);
+    //this allows you to access the map globally, on this object
+    this.map = new google.maps.Map($canvas.get(0), myOptions);
+
 
     var hideBGImage = function () { $canvas.css('background-image', ''); }
     window.setTimeout(hideBGImage, 2500);
@@ -32,15 +36,17 @@ PeopleMap.prototype.initialize = function(options) {
         function create_a_callback(person_name, person_id) {
             return function(results, status) {
                 number_of_people_geocoded += 1;
+                var person_location = results[0].geometry.location;
                 if (status == google.maps.GeocoderStatus.OK) {
                     var marker = new google.maps.Marker({
-                            'map': map, 
-                            'title': person_name,
-                            'person_id': person_id,
-                            'position': results[0].geometry.location
+                        'map': me.map, 
+                        'title': person_name,
+                        'person_id': person_id,
+                        'position': person_location
                     });
+                    me.person_locations[person_id] = person_location;
                     google.maps.event.addListener(marker,
-                            'click', function() { highlightPerson(marker.person_id); });
+                            'click', function() { me.highlightPerson(marker.person_id); });
                     all_markers.push(marker);
                 }
                 else {
@@ -65,6 +71,7 @@ PeopleMap.prototype.initialize = function(options) {
             for (var i = 0; i < all_markers.length; i++) {
                 var marker = all_markers[i];
                 var $person_bullet = $('#person_bullet_' + marker.person_id);
+                console.debug(map);
                 if (map.getBounds().contains(marker.position) && 
                         shown_this_many < MAX_TO_SHOW) {
                     $person_bullet.show();
@@ -91,11 +98,50 @@ PeopleMap.prototype.initialize = function(options) {
             $('#people-count').text(people_shown_string);
         }
     }
-    update_all_markers = generate_update_all_markers(map);
-    google.maps.event.addListener(map,
+    update_all_markers = generate_update_all_markers(this.map);
+    google.maps.event.addListener(this.map,
             'idle',
             update_all_markers);
-    google.maps.event.addListener(map,
+    google.maps.event.addListener(this.map,
             'bound_changed',
             update_all_markers);
+}
+
+//this gets called when you click a marker on the map
+PeopleMapController.prototype.highlightPerson = function(personId) {
+    // Unhighlight everyone
+    $('#people-list li').removeClass("highlighted");
+    //highlight the right person
+    $('#person_bullet_' + personId).addClass("highlighted");
+}
+
+
+//binds the clickhandlers to people list items
+PeopleMapController.prototype.bindClickHandlersToPeopleListItems = function() {
+    //grab google's map object
+    var map = this.map;
+    //grab list of person locations
+    var person_locations = this.person_locations;
+    //click handler for people list items
+    handler = function(event) {
+        thePersonLi = this;
+
+        // Unhighlight everyone
+        $('#people-list li').removeClass("highlighted");
+
+        // Highlight this person.
+        $(thePersonLi).addClass("highlighted");
+
+        console.debug(map);
+        //grab the person's database id from her dom id
+        var thePersonId = thePersonLi.id.split("_")[2];
+        // Center the map on it
+        map.setCenter(person_locations[thePersonId]);
+
+
+        
+        // Center the map on their marker.
+
+    };
+    $('#people-list li').click(handler);
 }

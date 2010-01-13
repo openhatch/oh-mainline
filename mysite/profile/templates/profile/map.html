@@ -34,16 +34,17 @@ Map of People
 {% block js %}
 {{ block.super }}
 <script type="text/javascript">
+    map = new PeopleMapController(); 
     $(function () {
-        var map = new PeopleMap(); 
         map.initialize({
                 'person_id2data': {{ person_id2data_as_json|safe}},
                 'num_of_persons_with_locations': {{ num_of_persons_with_locations }}
         });
+        map.bindClickHandlersToPeopleListItems();
     });
 </script>
 {% endblock js %}
 
 {% block js_tests %}
-<script type='text/javascript src="/static/js/profile/map-tests.js"></script>
+<script type='text/javascript' src="/static/js/profile/map-tests.js"></script>
 {% endblock js_tests %}
