@@ -331,6 +331,7 @@ def people_map(request):
                              'location': person.location_display_name})
             for person in Person.objects.all()
             if person.location_display_name]))
+    data['test_js'] = request.GET.get('test', None)
     data['num_of_persons_with_locations'] = len([p for p in Person.objects.all()
                                                  if p.location_display_name])
     return (request, 'profile/map.html', data)

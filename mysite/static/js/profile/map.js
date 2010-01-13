@@ -39,8 +39,8 @@ PeopleMap.prototype.initialize = function(options) {
                             'person_id': person_id,
                             'position': results[0].geometry.location
                     });
-                    /*google.maps.event.addListener(marker,
-                     'click', function() { 	alert('hi'); }); */
+                    google.maps.event.addListener(marker,
+                            'click', function() { highlightPerson(marker.person_id); });
                     all_markers.push(marker);
                 }
                 else {

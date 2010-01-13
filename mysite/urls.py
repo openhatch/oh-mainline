@@ -25,7 +25,7 @@ urlpatterns = patterns('',
             {'document_root': settings.MEDIA_ROOT}),
 
         (r'^people/$',
-                'mysite.profile.views.people_map'),
+            'mysite.profile.views.people_map'),
 
         (r'^\+people/list/$', 'mysite.profile.views.display_list_of_people'),
 
