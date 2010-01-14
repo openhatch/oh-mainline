@@ -242,6 +242,7 @@ class DataImportAttempt(models.Model):
         ('ou', "Ohloh"),
         ('lp', "Launchpad"),
         ('gh', "Github"),
+        ('ga', "Github"),
         )
     completed = models.BooleanField(default=False)
     failed = models.BooleanField(default=False)
@@ -439,7 +440,7 @@ class Citation(models.Model):
             suffix = ''
 
         if self.data_import_attempt:
-            if self.data_import_attempt.source == 'gh':
+            if self.data_import_attempt.source in ('gh', 'ga'):
                 return '%s a repository on Github.' % self.contributor_role
             if self.data_import_attempt.source in ['rs', 'ou']:
                 if not self.languages:

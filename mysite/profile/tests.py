@@ -1,5 +1,6 @@
 # Imports {{{
-from mysite.base.tests import make_twill_url, TwillTests, ObjectFromDict
+from mysite.base.tests import make_twill_url, TwillTests
+from mysite.base.helpers import ObjectFromDict
 import mysite.account.tests
 
 from mysite.search.models import Project
@@ -1341,6 +1342,7 @@ class MockGithubImport(BaseCeleryTest):
         mock_github_projects.return_value = [ObjectFromDict({
             'name': 'MOCK ccHost',
             'owner': 'paulproteus', # github repo owner
+            'description': '',
             'fork': True})]
 
         data_we_expect = [{
@@ -1369,6 +1371,7 @@ class MockGithubImport(BaseCeleryTest):
         mock_github_projects.return_value = [ObjectFromDict({
             'name': 'MOCK ccHost',
             'owner': 'paulproteus', # github repo owner
+            'description': '',
             'fork': False})]
             
         data_we_expect = [
@@ -1388,5 +1391,117 @@ class MockGithubImport(BaseCeleryTest):
                 source='gh', data_we_expect=data_we_expect,
                 summaries_we_expect=summaries_we_expect)
         # }}}
+
+    @mock.patch('mysite.customs.github.repos_by_username')
+    @mock.patch('mysite.customs.github.find_primary_language_of_repo', do_nothing)
+    @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
+    def test_github_import_brings_in_project_description(self,
+                                                         mock_github_projects):
+        "Test that we can import data from Github. Use a mock list of "
+        "fake Github projects so we don't bother the Github API (or waste "
+        "time waiting for it."
+        # {{{
+        description = u'S\u00E9e-Saw Hosting'
+        mock_github_projects.return_value = [ObjectFromDict({
+            'name': 'MOCK ccHost',
+            'description': description,
+            'owner': 'paulproteus', # github repo owner
+            'fork': True})]
+
+        data_we_expect = [{
+            'contributor_role': 'Forked',
+            'languages': "", # FIXME
+            'is_published': False,
+            'is_deleted': False}]
+
+        summaries_we_expect = [
+                'Forked a repository on Github.',
+                ]
+
+        self._test_data_source_via_emulated_bgtask(
+                source='gh', data_we_expect=data_we_expect,
+                summaries_we_expect=summaries_we_expect)
+
+        # PLUS test that the PFE has a description!
+        self.assertEqual(PortfolioEntry.objects.all().count(),
+                         1) # just the one we added
+        self.assertEqual(PortfolioEntry.objects.get().project_description,
+                         description)
+        # }}}
+
+def mock_list_of_collaborators(repo_name):
+    if 'cchost' in repo_name.lower():
+        return ['paulproteus', 'someone']
+    else:
+        return ['someone']
+
+class ImportGithubCollaborators(BaseCeleryTest):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    @mock.patch('mysite.customs.github._github.repos.list_collaborators', mock_list_of_collaborators)
+    @mock.patch('mysite.customs.github._get_repositories_user_watches')
+    @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
+    def test_github_collaboration_via_emulated_bgtask(self, mock_results):
+        description = 'the world in /bin/nutsh'
+        # three repos: one owned by paulproteus; that should be ignored.
+        # the other two: one where paulproteus is a collaborator, and one
+        # where he isn't.
+        mock_results.return_value = [
+            {'description': description,
+             'fork': False,
+             'forks': 1,
+             'homepage': 'sethirl.com',
+             'name': 'MOCK ccHost',     # paulproteus is a collaborator
+             'open_issues': 0,
+             'owner': 'someone_random', # this should be imported!
+             'private': False,
+             'url': 'http://github.com/someone_random/cchost',
+             'watchers': 3},
+
+            {'description': description,
+             'fork': False,
+             'forks': 1,
+             'homepage': 'example.com',
+             'name': 'ruby-on-rails',     # paulproteus is not a collaborator
+             'open_issues': 0,
+             'owner': 'someone_random',   # so won't be imported
+             'private': False,
+             'url': 'http://github.com/someone_random/ruby-on-rails',
+             'watchers': 3},
+
+            {'description': description,
+             'fork': False,
+             'forks': 1,
+             'homepage': 'example.com',
+             'name': 'asheesh personal repo',
+             'open_issues': 0,
+             'owner': 'paulproteus', # this should be skipped
+             'private': False,
+             'url': 'http://github.com/someone_random/cchost',
+             'watchers': 3}]
+
+        data_we_expect = [{
+            'contributor_role': 'Collaborated on',
+            'languages': "",
+            'is_published': False,
+            'is_deleted': False}]
+
+        summaries_we_expect = [
+                'Collaborated on a repository on Github.',
+                ]
+
+        return self._test_data_source_via_emulated_bgtask(
+                source='ga', data_we_expect=data_we_expect,
+                summaries_we_expect=summaries_we_expect)
+        # }}}
+
+        # PLUS test that the PFE has a description!
+        self.assertEqual(PortfolioEntry.objects.all().count(),
+                         1) # just the one we want
+        self.assertEqual(PortfolioEntry.objects.get().project_description,
+                         description)
+        # }}}
+
+
 
 # vim: set ai et ts=4 sw=4 nu:
