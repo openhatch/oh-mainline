@@ -1,99 +1,99 @@
-.module { border: 5px solid #fff; }
-#page-top img#hatchers { float: right; border: 0; }
-#content { position: relative; top: -4px; padding-top: 0; }
-#page-top img#volunteer-opportunities { position: relative; top: 1px; }
-#page-top { float: left; width: 1000px; font-size: 19pt; }
-#sidebar .module h4 { width: 95%; font-size: 12pt; font-weight: normal; margin-bottom: 5px; }
-.no-results { color: #222; padding: 10px; font-size: 120%; line-height: 130%; width: 460px; float: left; }
-	.no-results strong { background-color: #fff; }
-#heading { margin: 20px 0 10px 0; }
-.box { float: left; margin-bottom: 10px; }
-#sidebar .box { padding: 10px; }
-.box h2 { font-size: 130%; color: #3d2f25; margin-bottom: 5px; }
-.search-terms { font-size: 20px; background: white; padding: 5px; width: 550px; }
-#results-widget { padding: 12px; padding-bottom: 6px; float: left; width: 90%; font-size: 8.5pt; }
-#sidebar { float: left; width: 220px; margin-right: 20px; }
-#main { width: 715px; float: left; }
-	#main .box { padding: 10px; width: 700px; float: left; }
-#filters li { list-style: none; margin: 0; margin-bottom: 10px; }
-#add-another-bug-tracker {  }
-#sidebar .box { width: 200px; }
-p { margin: 0; }
+#search .module { border: 5px solid #fff; }
+#search #page-top img#hatchers { float: right; border: 0; }
+#search #content { position: relative; top: -4px; padding-top: 0; }
+#search #page-top img#volunteer-opportunities { position: relative; top: 1px; }
+#search #page-top { float: left; width: 1000px; font-size: 19pt; }
+#search #sidebar .module h4 { width: 95%; font-size: 10pt; font-weight: normal; margin-bottom: 5px; }
+#search .no-results { color: #222; padding: 10px; font-size: 120%; line-height: 130%; width: 460px; float: left; }
+	#search .no-results strong { background-color: #fff; }
+#search #heading { margin: 20px 0 10px 0; }
+#search .box { float: left; margin-bottom: 10px; }
+#search #sidebar .box { padding: 10px; }
+#search .box h2 { font-size: 130%; color: #3d2f25; margin-bottom: 5px; }
+#search .search-terms { font-size: 20px; background: white; padding: 5px; width: 550px; }
+#search #results-widget { padding: 12px; padding-bottom: 6px; float: left; width: 90%; font-size: 8.5pt; }
+#search #sidebar { float: left; width: 220px; margin-right: 20px; }
+#search #main { width: 715px; float: left; }
+	#search #main .box { padding: 10px; width: 700px; float: left; }
+#search #filters li { list-style: none; margin: 0; margin-bottom: 10px; }
+#search #add-another-bug-tracker {  }
+#search #sidebar .box { width: 200px; }
+#search p { margin: 0; }
 
 /* --------------
  * Search results
  * -------------- */
-#results.box { background: #fff; padding-right: 0; padding-bottom: 0; }
-#results ul { margin: 0; padding: 0; float: left; width: 99%; }
-    #results li { overflow: hidden; letter-spacing: 0px; font-size: 100%; float: left; list-style: none; width: 100%; white-space: nowrap; margin: 0; margin-bottom: 8px; }
-        #results li.odd { border-color: #ff94ad; }
-        #results li .details { padding: .3em .7em; /*border-top: 1px solid #ccf;*/ padding-top: 0; float: left; font-size: 11px; background: transparent url('/static/images/motif.png'); display: none; }
-        #results li label { color: #777; }
-        #results li .field { width: 33%; float: left; margin-top: .3em; }
-        #results li .tags { float: left; width: 80px; }
-        #results li .head { font-size: 14px; float: left; padding: 5px 10px; width: 100%; overflow: hidden; border-bottom: 2px solid #f4f4f4; }
+#search #results.box { background: #fff; padding-right: 0; padding-bottom: 10px; }
+#search #results ul { margin: 0; padding: 0; float: left; width: 99%; }
+    #search #results li { overflow: hidden; letter-spacing: 0px; font-size: 100%; float: left; list-style: none; width: 100%; white-space: nowrap; margin: 0; margin-bottom: 8px; }
+        #search #results li.odd { border-color: #ff94ad; }
+        #search #results li .details { padding: .3em .7em; /*border-top: 1px solid #ccf;*/ padding-top: 0; float: left; font-size: 11px; background: transparent url('/static/images/motif.png'); display: none; }
+        #search #results li label { color: #777; }
+        #search #results li .field { width: 33%; float: left; margin-top: .3em; }
+        #search #results li .tags { float: left; width: 80px; }
+        #search #results li .head { font-size: 14px; float: left; padding: 5px 10px; width: 100%; overflow: hidden; border-bottom: 2px solid #f4f4f4; }
 
-        /* First line, e.g.: "Tomboy: SSH synchronisation: does not create the remote directory | expand | link" */
-        #results li .first-line { float: left; cursor: hand; width: 100%; cursor: pointer; border-radius-topleft: 8px; /*border-bottom: 1px dotted #ccf;*/ border-radius-topright: 8px; -moz-border-radius-topleft: 8px; -moz-border-radius-topright: 8px; padding: 2px 0 0 2px; background-color: #fff; }
-            #results li .first-line a { color: #2288BB; }
-                #results li .first-line a:hover { color: #223366; text-decoration: none; }
+        #search /* First line, e.g.: "Tomboy: SSH synchronisation: does not create the remote directory | expand | link" */
+        #search #results li .first-line { float: left; cursor: hand; width: 100%; cursor: pointer; border-radius-topleft: 8px; /*border-bottom: 1px dotted #ccf;*/ border-radius-topright: 8px; -moz-border-radius-topleft: 8px; -moz-border-radius-topright: 8px; padding: 2px 0 0 2px; background-color: #fff; }
+            #search #results li .first-line a { color: #2288BB; }
+                #search #results li .first-line a:hover { color: #223366; text-decoration: none; }
 
-        #results li .first-line img { vertical-align: middle; width: 20px; height: 20px; /* If ever an image is not square this rule might distort it. */ }
+        #search #results li .first-line img { vertical-align: middle; width: 20px; height: 20px; /* If ever an image is not square this rule might distort it. */ }
 
-        /* Second line, e.g.:   ● Bite-size - C# - 3 potential mentors - I am using the "local folder" option for synchronizati... */
-        #results li .second-line { display: block; float: left; background-color: #fff; padding: 2px 0 0 2px; width: 100%; border-radius-bottomleft: 8px; border-radius-bottomright: 8px; -moz-border-radius-bottomleft: 8px; -moz-border-radius-bottomright: 8px; }
-        #results li .second-line .description p { display: inline; }
-        #results li .good-for-beginners { padding: 1px; }
+        #search /* Second line, e.g.:   ● Bite-size - C# - 3 potential mentors - I am using the "local folder" option for synchronizati... */
+        #search #results li .second-line { display: block; float: left; background-color: #fff; padding: 2px 0 0 2px; width: 100%; border-radius-bottomleft: 8px; border-radius-bottomright: 8px; -moz-border-radius-bottomleft: 8px; -moz-border-radius-bottomright: 8px; }
+        #search #results li .second-line .description p { display: inline; }
+        #search #results li .good-for-beginners { padding: 1px; }
 
-        #results li .description-container p { margin-top: 5px; }
-        #results .tag-details { display: none; }
-        #results li .show-details { padding: .3em .7em; float: left; width: 71px; text-align: right; }
-        #results li .left { white-space: nowrap; float: left; width: 460px; overflow: hidden; }
-        #results li .description-container { width: 525px; padding: .3em .7em; color: #555; float: left; overflow: hidden; white-space: nowrap; }
-            #results li .description-container * { display: inline; }
-            #results li .description-container br { display: none; }
-        #results li .description { font-family: monospace; }
+        #search #results li .description-container p { margin-top: 5px; }
+        #search #results .tag-details { display: none; }
+        #search #results li .show-details { padding: .3em .7em; float: left; width: 71px; text-align: right; }
+        #search #results li .left { white-space: nowrap; float: left; width: 460px; overflow: hidden; }
+        #search #results li .description-container { width: 525px; padding: .3em .7em; color: #555; float: left; overflow: hidden; white-space: nowrap; }
+            #search #results li .description-container * { display: inline; }
+            #search #results li .description-container br { display: none; }
+        #search #results li .description { font-family: monospace; }
 
-        #results li.expanded { white-space: normal; }
-            #results li.expanded .description-container { white-space: normal; }
-                #results li.expanded .description-container p { float: left; width: 100%; margin-bottom: .3em; }
-                #results li.expanded .description-container br { display: inherit; }
-            #results li.expanded .second-line { border-radius: 0; -moz-border-radius: 0; overflow: visible; }
-            #results li.expanded .details { display: block; border-radius-bottomleft: 8px; border-radius-bottomright: 8px; -moz-border-radius-bottomleft: 8px; -moz-border-radius-bottomright: 8px; }
-                #results li.expanded .details .fields { display: block; }
+        #search #results li.expanded { white-space: normal; }
+            #search #results li.expanded .description-container { white-space: normal; }
+                #search #results li.expanded .description-container p { float: left; width: 100%; margin-bottom: .3em; }
+                #search #results li.expanded .description-container br { display: inherit; }
+            #search #results li.expanded .second-line { border-radius: 0; -moz-border-radius: 0; overflow: visible; }
+            #search #results li.expanded .details { display: block; border-radius-bottomleft: 8px; border-radius-bottomright: 8px; -moz-border-radius-bottomleft: 8px; -moz-border-radius-bottomright: 8px; }
+                #search #results li.expanded .details .fields { display: block; }
 
-        #results li .age { float: right; padding: .3em .7em; width: 65px; text-align: right; color: #888; }
-            #results li .tags .project { padding: .3em .7em; float: left; }
+        #search #results li .age { float: right; padding: .3em .7em; width: 65px; text-align: right; color: #888; }
+            #search #results li .tags .project { padding: .3em .7em; float: left; }
 
-        #results form { float: left; width: 690px; }
-            #results form label { float: left; font-size: 19px; font-family: Arial; padding: 14px 14px 0 0; }
-            #results form input[type='text'] { font-size: 19px; padding: 10px; color: #222; width: 570px; height: 25px; }
-            #results form input[type='submit'] { font-size: 19px; padding: 8px; color: #222; width: 90px; height: 50px; }
+        #search #results form { float: left; width: 690px; }
+            #search #results form label { float: left; font-size: 19px; font-family: Arial; padding: 14px 14px 0 0; }
+            #search #results form input[type='text'] { font-size: 19px; padding: 10px; color: #222; width: 570px; height: 25px; }
+            #search #results form input[type='submit'] { font-size: 19px; padding: 8px; color: #222; width: 90px; height: 50px; }
 
-a.title:focus { -moz-outline-style: none; outline: none; }
-.separator { color: #aaa; }
-.project-info { float: left; padding: .3em .7em; }
-#filters label.on { font-weight: bold; }
-input[type='text'].default-text-active { color: #999 ! important; }
-#filters h4 { margin-bottom: 5px; }
-ul#facets { margin-left: 17px; }
-	ul#facets ul { margin-left: 10px; }
-		ul#facets ul li, #suggested_searches li { list-style: square; margin-top: 10px; margin-left: 20px; color: #777; clear: left; }
-#facets li.active { font-weight: bold; }
-#results-summary { width: 70%; float: left; margin-right: 10px; }
-#navigation { float: right; }
-#about_projects, #about_bug_trackers { margin-top: 0; }
-#about_projects div { float: left; margin-bottom: 10px; width: 100%; }
-#sidebar #about_projects h4 { text-align: center; font-size: 140%; margin-top: 7px; width: 100% ! important; }
-#how_many_projects a { color: #555; }
-	#how_many_projects a:hover { color: #111; text-decoration: none; }
-		#how_many_projects a:hover strong { background-color: #555; }
-#how_many_projects strong { background-color: #747474; -moz-border-radius: 8px; padding: 3px 4px; border-radius: 8px; color: #fff ! important; }
-#about_projects #learn_more { text-align: center; margin-bottom: 0; }
-#hwat-is-this ul li { list-style: square; margin: 5px 0 0 20px; }
-.green-bullet { font-size: 90%; position: relative; top: -2px; color: green; }
-#expand-collapse-all { float: right; }
-	#expand-collapse-all img { float: left; margin-right: 5px; }
-	#expand-collapse-all a { float: left; padding: 5px; }
+#search a.title:focus { -moz-outline-style: none; outline: none; }
+#search .separator { color: #aaa; }
+#search .project-info { float: left; padding: .3em .7em; }
+#search #filters label.on { font-weight: bold; }
+#search input[type='text'].default-text-active { color: #999 ! important; }
+#search #filters h4 { margin-bottom: 5px; }
+#search ul#facets { margin-left: 17px; }
+	#search ul#facets ul { margin-left: 10px; }
+		#search ul#facets ul li, #suggested_searches li { list-style: square; margin-top: 10px; margin-left: 20px; color: #777; clear: left; }
+#search #facets li.active { font-weight: bold; }
+#search #results-summary { width: 70%; float: left; margin-right: 10px; }
+#search #navigation { float: right; }
+#search #about_projects, #about_bug_trackers { margin-top: 0; }
+#search #about_projects div { float: left; margin-bottom: 10px; width: 100%; }
+#search #sidebar #about_projects h4 { text-align: center; font-size: 140%; margin-top: 7px; width: 100% ! important; }
+#search #how_many_projects a { color: #555; }
+	#search #how_many_projects a:hover { color: #111; text-decoration: none; }
+		#search #how_many_projects a:hover strong { background-color: #555; }
+#search #how_many_projects strong { background-color: #747474; -moz-border-radius: 8px; padding: 3px 4px; border-radius: 8px; color: #fff ! important; }
+#search #about_projects #learn_more { text-align: center; margin-bottom: 0; }
+#search #hwat-is-this ul li { list-style: square; margin: 5px 0 0 20px; }
+#search .green-bullet { font-size: 90%; position: relative; top: -2px; color: green; }
+#search #expand-collapse-all { float: right; }
+	#search #expand-collapse-all img { float: left; margin-right: 5px; }
+	#search #expand-collapse-all a { float: left; padding: 5px; }
 
-/* vim: set ai ts=4 sts=4 et sw=4 nowrap: */
+#search /* vim: set ai ts=4 sts=4 et sw=4 nowrap: */

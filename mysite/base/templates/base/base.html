@@ -30,7 +30,9 @@
         {% endblock js_in_head %}
 
     </head>
-    <body>
+
+    {% comment %} body_id is used by CSS to know what page we're on{% endcomment %}
+    <body id='{% block body_id %}body{% endblock %}'>
 
         <div id='outermost'>
 
