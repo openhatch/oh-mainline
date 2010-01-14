@@ -1,6 +1,14 @@
 function MapTests(){
+
+    var $mappablePeople = [];
+    for (var person_id in mapController.get_person_id2data()) {
+        $mappablePeople.push($('#person_bullet_'+person_id));
+    }
+
+    tester.ok($mappablePeople.length >= 3, "There are at least three visible LIs inside #people-list.");
+
     //first we highlight person 3
-    var $dontClickMyMarker = $('#people-list li:eq(2)');
+    var $dontClickMyMarker = $mappablePeople[2];
     $dontClickMyMarker.addClass("highlighted");
 
     //make sure there are at least three people
@@ -9,7 +17,7 @@ function MapTests(){
     /*
      * Test that clicking on a marker highlights the correlated list item.
      */
-    var $clickMyMarker = $('#people-list li:eq(0)');
+    var $clickMyMarker = $mappablePeople[0];
 
     tester.compare($clickMyMarker.size(), 1, "there is at least one person");
 
@@ -20,7 +28,7 @@ function MapTests(){
     
     // Emulate the click of a marker.
     var personID = $clickMyMarker.get(0).id.split("_")[2];
-    map.highlightPerson(personID);
+    mapController.highlightPerson(personID);
 
     tester.ok($clickMyMarker.hasClass("highlighted"), "Highlight person after marker onclick function was fired");
 
@@ -30,7 +38,7 @@ function MapTests(){
     /*
      * Test that clicking on a list item highlights the person.
      */
-    var $clickMe = $('#people-list li:eq(1)');
+    var $clickMe = $mappablePeople[1];
     
     tester.compare($clickMe.size(), 1, "there are at least two people in the list");
 
@@ -43,8 +51,16 @@ function MapTests(){
 
     tester.ok(!$clickMyMarker.hasClass("highlighted"), "previously highlighted person is not highlighted after we click someone else");
 
-    tester.testDone();
+    // Test that person_location object has all the right person_ids
+    var mappableID2data = mapController.get_person_id2data();
+    for (var person_id in mappableID2data) {
+        tester.compare(typeof mapController.person_locations[""+person_id], "undefined",
+                "The mapping of Django-side Person IDs to " +
+                "Google Map-style location objects contains the ID " +
+                person_id);
+    }
 
+    tester.testDone();
 
 }
 

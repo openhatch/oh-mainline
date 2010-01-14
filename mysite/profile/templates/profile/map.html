@@ -34,13 +34,13 @@ Map of People
 {% block js %}
 {{ block.super }}
 <script type="text/javascript">
-    map = new PeopleMapController(); 
+    mapController = new PeopleMapController(); 
     $(function () {
-        map.initialize({
+        mapController.initialize({
                 'person_id2data': {{ person_id2data_as_json|safe}},
                 'num_of_persons_with_locations': {{ num_of_persons_with_locations }}
         });
-        map.bindClickHandlersToPeopleListItems();
+        mapController.bindClickHandlersToPeopleListItems();
     });
 </script>
 {% endblock js %}
