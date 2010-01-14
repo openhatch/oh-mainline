@@ -2,9 +2,6 @@
 <li id="person_bullet_{{person.pk}}">
     <div class='left'>
         <img src="{{ person.get_photo_thumbnail_url_or_default }}" />
-        <a class='highlight-on-map person-summary-button'>
-            Click to show on map
-        </a>
     </div>
     <div class="people-view-info">
         <a class='profile-link person-summary-button' href='{{ person.get_profile_url }}' 

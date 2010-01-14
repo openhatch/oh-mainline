@@ -16,7 +16,7 @@
 
 }
 
-#people-list li.hover { background: #ffd; }
+#people-list li.hover { background: #ffc; }
 #people-list li.highlighted { background: #ffa ! important; }
 #people-list li.highlighted .name { font-weight: bold; }
 
@@ -36,6 +36,8 @@
     padding-left: 0;
 }
 #people-list li {
+    cursor: pointer;
+    cursor: hand;
     list-style: square;
     padding: 8px;
     border-radius: 8px;
@@ -107,8 +109,6 @@
 
 /* On people map, a link to a particular person's profile. */
 .person-summary-button { padding: 4px 8px; border-radius: 8px; -moz-border-radius: 8px; background-color: #ddd; font-weight: bold; color: #555; }
-.person-summary-button:hover { text-decoration: none; background-color: #aaa; color: #222; }
+.person-summary-button:hover { text-decoration: none; color: #000; }
 
 .profile-link { float: right; margin-left: 4px; }
-.highlight-on-map { font-weight: normal; display: none; float: left; padding-left: 20px; position: relative; top: 10px; height: 80px; left: -40px; width: 80px; font-size: 8pt; background: url('/static/images/profile/map/map-yellow-arrow.png') left center no-repeat;}
-.hover .highlight-on-map { display: block; }
