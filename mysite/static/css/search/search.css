@@ -3,7 +3,7 @@
 #content { position: relative; top: -4px; padding-top: 0; }
 #page-top img#volunteer-opportunities { position: relative; top: 1px; }
 #page-top { float: left; width: 1000px; font-size: 19pt; }
-#sidebar .module h4 { width: 95%; font-size: 10pt; font-weight: normal; margin-bottom: 10px; }
+#sidebar .module h4 { width: 95%; font-size: 12pt; font-weight: normal; margin-bottom: 5px; }
 .no-results { color: #222; padding: 10px; font-size: 120%; line-height: 130%; width: 460px; float: left; }
 	.no-results strong { background-color: #fff; }
 #heading { margin: 20px 0 10px 0; }
@@ -19,7 +19,6 @@
 #add-another-bug-tracker {  }
 #sidebar .box { width: 200px; }
 p { margin: 0; }
-/*.yes img { width: 15px; vertical-align: -10%; }*/
 
 /* --------------
  * Search results
@@ -61,10 +60,11 @@ p { margin: 0; }
 
         #results li .age { float: right; padding: .3em .7em; width: 65px; text-align: right; color: #888; }
             #results li .tags .project { padding: .3em .7em; float: left; }
-#results form { float: left; width: 690px; }
-#results form label { float: left; font-size: 19px; font-family: Arial; padding: 14px 14px 0 0; }
-#results form input[type='text'] { font-size: 19px; padding: 10px; color: #222; width: 570px; height: 25px; }
-#results form input[type='submit'] { font-size: 19px; padding: 8px; color: #222; width: 90px; height: 50px; }
+
+        #results form { float: left; width: 690px; }
+            #results form label { float: left; font-size: 19px; font-family: Arial; padding: 14px 14px 0 0; }
+            #results form input[type='text'] { font-size: 19px; padding: 10px; color: #222; width: 570px; height: 25px; }
+            #results form input[type='submit'] { font-size: 19px; padding: 8px; color: #222; width: 90px; height: 50px; }
 .good-for-beginners { padding: 1px; }
 	.good-for-beginners img {  }
 /* </bug list code> */
