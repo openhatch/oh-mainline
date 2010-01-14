@@ -27,7 +27,7 @@ PeopleMapController.prototype.initialize = function(options) {
     this.map = new google.maps.Map($canvas.get(0), myOptions);
 
     // Hide the background image after 2.5 seconds.
-    var hideBGImage = function () { $canvas.css('background-image', ''); };
+    var hideBGImage = function () { $canvas.css('background', ''); };
     window.setTimeout(hideBGImage, 2500);
 
     /*

@@ -8,12 +8,21 @@ Map of People
         {% if property and value %}
         where {{ property }} = {{ value }}
         {% endif %}
-        <div id="map_canvas">
+
+        {% comment %}
+            Google loads a map here -- replacing #map_loading_msg, among other things.
+            The background image will hide, as intended, a few seconds after page load.
+            However, this doesn't seem to work properly when the image is specified
+            via an external stylesheet.
+        {% endcomment %}
+        <div id="map_canvas" style='background: url("/static/images/profile/map_for_loading.png") top no-repeat;'>
             <div id='map_loading_msg'>
-                <img src='/static/images/icons/throbber.png' style='height: 2.5em;'/>
-                <span style='font-size: 2.5em; margin-left: 10px; '>Loading map&hellip;</span>
+                <img src='/static/images/icons/throbber.png' />
+                <span>Loading map&hellip;</span>
             </div>
         </div>
+
+        {# JavaScript edits this text. #}
         <p id="people-count">Loading...</p>
         
         <ul id="people-list" class="people-list-map">
@@ -44,5 +53,11 @@ Map of People
 {% endblock js %}
 
 {% block js_tests %}
+{% comment %}
+    This block only shows up if this page has a query string with ?test=1.
+    These are JavaScript unit tests. Unless /static/js/tester.js has changed,
+    they will run with FireUnit <http://fireunit.org>, which is an extension for
+    Firebug <http://getfirebug.com>.
+{% endcomment %}
 <script type='text/javascript' src="/static/js/profile/map-tests.js"></script>
 {% endblock js_tests %}
