@@ -14,10 +14,10 @@ PeopleMapController.prototype.initialize = function(options) {
 
     var geocoder =  new google.maps.Geocoder();
 
-    var latlng = new google.maps.LatLng(0, 0);
+    this.mapOrigin = new google.maps.LatLng(0, 0);
     var myOptions = {
         'zoom': 1,
-        'center': latlng,
+        'center': this.mapOrigin,
         'mapTypeId': google.maps.MapTypeId.ROADMAP
     };
 
@@ -46,7 +46,7 @@ PeopleMapController.prototype.initialize = function(options) {
         var location_name = data['location'];
         var name = data['name'];
 
-        function create_a_callback(map_controller, person_name, person_id) {
+        function create_a_callback(mapController, person_name, person_id) {
 
             // As specified after the "create_a_callback" function,
             // the following callback will be executed when the
@@ -57,15 +57,17 @@ PeopleMapController.prototype.initialize = function(options) {
 
                 if (status == google.maps.GeocoderStatus.OK) {
                     var marker = new google.maps.Marker({
-                        'map': map_controller.map, 
+                        'map': mapController.map, 
                         'title': person_name,
                         'person_id': person_id,
                         'position': person_location
                     });
-                    map_controller.person_locations['' + person_id] = person_location;
-                    map_controller.map.setCenter(person_location);
+                    mapController.person_locations['' + person_id] = person_location;
+                    mapController.map.setCenter(mapController.mapOrigin);
                     google.maps.event.addListener(marker,
-                            'click', function() { map_controller.highlightPerson(marker.person_id); });
+                            'click', function() {
+                            mapController.highlightPerson(marker.person_id);
+                            });
                     all_markers.push(marker);
                 }
                 else {
