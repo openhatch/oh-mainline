@@ -4,10 +4,10 @@
 Log in 
 {% endblock title %}
 
+{% block body_class %}{{ block.super }} auth{% endblock %}
+
 {% block css %}
 {{ block.super }}
-@import url('/static/css/account/auth.css');
-@import url('/static/openid/css/openid.css');
 form {
     width: 500px;
 }
