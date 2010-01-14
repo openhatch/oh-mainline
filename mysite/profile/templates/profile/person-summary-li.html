@@ -25,7 +25,7 @@
                 {{ person.location_display_name }}
             </span>
         {% endif %}
-        {% with person.get_list_of_project_names as project_names%}
+        {% with person.get_list_of_project_names as project_names %}
         {% if project_names %}
             <span class="people-view-projects">
                 projects: 
@@ -33,7 +33,7 @@
                 Sorry that this is all on one line. Couldn't figure out
                 how to get rid of the space before the comma otherwise.
                 {% endcomment %}
-                {% for project in project_names %}{% ifequal forloop.counter0 3 %}<span class='ellipsis'>&hellip;</span><span class='collapsible'>{% endifequal %}{% if not forloop.first %}, {% endif %} {{ project }}{% comment %} Close collapsible span if we made one.  {% endcomment %}{% if forloop.last and forloop.counter0|gt:"2" %}</span>{% endif %}{% endfor %}
+                {% for project in project_names %}{% if not forloop.counter0|gt:"8" %}{% ifequal forloop.counter0 3 %}<span class='ellipsis'>&hellip;</span><span class='collapsible'>{% endifequal %}{% if not forloop.first %}, {% endif %} {{ project }}{% comment %} Close collapsible span if we made one.  {% endcomment %}{% if forloop.last and forloop.counter0|gt:"2" %}</span>{% endif %}{% endif %}{% endfor %}
             </span>
         {% endif %}
     {% endwith %}

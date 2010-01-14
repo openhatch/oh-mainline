@@ -56,11 +56,38 @@ PeopleMapController.prototype.initialize = function(options) {
                 var person_location = results[0].geometry.location;
 
                 if (status == google.maps.GeocoderStatus.OK) {
+                    /*
+                    var icon = new GIcon();
+                    icon.image = '/static/images/profile/map/image.png';
+                    icon.printImage = '/static/images/profile/map/printImage.gif';
+                    icon.mozPrintImage = '/static/images/profile/map/mozPrintImage.gif';
+                    icon.iconSize = new GSize(20,24);
+                    icon.shadow = '/static/images/profile/map/shadow.png';
+                    icon.transparent = '/static/images/profile/map/transparent.png';
+                    icon.shadowSize = new GSize(32,24);
+                    icon.printShadow = '/static/images/profile/map/printShadow.gif';
+                    icon.iconAnchor = new GPoint(10,24);
+                    icon.infoWindowAnchor = new GPoint(10,0);
+                    icon.imageMap = 
+                    */
+
                     var marker = new google.maps.Marker({
                         'map': mapController.map, 
                         'title': person_name,
                         'person_id': person_id,
-                        'position': person_location
+                        'position': person_location,
+                        'icon': new google.maps.MarkerImage(
+                            '/static/images/profile/map/markers/image.png',
+                            new google.maps.Size(35,39)),
+                        'shadow': new google.maps.MarkerImage(
+                            '/static/images/profile/map/markers/drop-shadow.png',
+                             new google.maps.Size(70,78),
+                             new google.maps.Point(-5,-25)
+                         ),
+                        'shape': {
+                            'coord': [19, 0, 19, 23, 0, 23, 0, 0],
+                            'type': 'poly'
+                        }
                     });
                     mapController.person_locations['' + person_id] = person_location;
                     mapController.map.setCenter(mapController.mapOrigin);
