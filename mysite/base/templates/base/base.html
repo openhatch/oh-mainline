@@ -16,7 +16,7 @@
         <style type='text/css'> /*<![CDATA[*/
             {% spaceless %}
             {% block css %}
-            {% assets output="css/ay.css", "css/base/base.css", "css/base/jquery.jgrowl.css", "css/senseknocker/thing.css", "css/search/search.css", "css/base/landing.css", "css/profile/person_small.css", "css/project/project.css", "css/base/one_column.css", "css/base/two_columns.css", "css/account/auth.css", "css/account/settings.css", "css/account/widget.css" %}
+            {% assets output="packed/css/everything.css", "css/base/base.css", "css/base/jquery.jgrowl.css", "css/senseknocker/thing.css", "css/search/search.css", "css/base/landing.css", "css/profile/person_small.css", "css/project/project.css", "css/base/one_column.css", "css/base/two_columns.css", "css/account/auth.css", "css/account/settings.css", "css/account/widget.css" %}
             @import url({{ ASSET_URL }});
             {% endassets %}
             {% endblock css %}
@@ -208,7 +208,7 @@
         {% block js_before_bundle %}
         {% endblock js_before_bundle %}
 
-        {% assets output="js/everything.js", "js/jquery.js", "js/jquery.query.js", "js/jquery.json.js", "js/jquery.hint.js", "js/jquery.form.js", "js/jquery.jgrowl.js", "js/jquery-ui-1.7.2.custom.min.js", "js/jquery.cookie.js", "piwik.js", "js/base/locationDialog.js", "js/base.js", "js/search/defaultText.js", "js/profile/portfolio.js", "js/profile/map.js", "openid/js/openid-jquery.js", "js/importer.js", "js/account/set_location.js", "js/search/search.js" %}
+        {% assets output="packed/js/everything.js", "js/jquery.js", "js/jquery.query.js", "js/jquery.json.js", "js/jquery.hint.js", "js/jquery.form.js", "js/jquery.jgrowl.js", "js/jquery-ui-1.7.2.custom.min.js", "js/jquery.cookie.js", "piwik.js", "js/base/locationDialog.js", "js/base.js", "js/search/defaultText.js", "js/profile/portfolio.js", "js/profile/map.js", "openid/js/openid-jquery.js", "js/importer.js", "js/account/set_location.js", "js/search/search.js" %}
         <script type="text/javascript" src="{{ ASSET_URL }}"></script>
         {% endassets %}
 
