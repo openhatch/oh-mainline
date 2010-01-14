@@ -165,4 +165,5 @@ PeopleMapController.prototype.bindClickHandlersToPeopleListItems = function() {
 
     };
     $('#people-list li').click(handler);
+    $('#people-list li').hoverClass('hover');
 }
