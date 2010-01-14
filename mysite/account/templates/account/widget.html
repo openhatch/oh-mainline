@@ -5,13 +5,10 @@ Widgetize yourself -
 {{ block.super }}
 {% endblock title %}
 
-{% block css %}
-{{ block.super }}
-@import url('/static/css/account/widget.css');
-{% endblock css %}
+{% block body_id %}widget-settings{% endblock %}
 
 {% block settings_main %}
-<div class='submodule fat' id='widget-settings'>
+<div class='submodule fat'>
     <div class='head'>
         <h3>Widgetize yourself</h3>
     </div>

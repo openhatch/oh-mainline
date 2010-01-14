@@ -1,4 +1,4 @@
-body#settings .submodule.skinny { padding: 0 ! important; border: 0; background-color: transparent ! important; }
-body#settings .submodule.skinny .body { padding: 10px ! important; background-color: transparent ! important; }
-body#settings .submodule.skinny ul li { margin-bottom: 10px; font-size: 11pt; }
-body#settings #main .submodule .body { background-color: #fff; padding: 3% 5%; }
+body.settings .submodule.skinny { padding: 0 ! important; border: 0; background-color: transparent ! important; }
+body.settings .submodule.skinny .body { padding: 10px ! important; background-color: transparent ! important; }
+body.settings .submodule.skinny ul li { margin-bottom: 10px; font-size: 11pt; }
+body.settings #main .submodule .body { background-color: #fff; padding: 3% 5%; }
