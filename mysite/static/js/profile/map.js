@@ -94,20 +94,22 @@ PeopleMapController.prototype.initialize = function(options) {
 
             for (var i = 0; i < all_markers.length; i++) {
                 var marker = all_markers[i];
-                var $person_bullet = $('#person_bullet_' + marker.person_id);
+                var $person_summary = $('#person_summary_' + marker.person_id);
                 if (map.getBounds().contains(marker.position) && 
                         shown_this_many < MAX_TO_SHOW) {
 
-                    // If the person bullet is hidden, display it at the bottom of the list.
-                    if($person_bullet.is(':visible') === false) {
-                        console.log($person_bullet.get(0).id);
-                        $person_bullet.appendTo('#people-list');
-                        $person_bullet.show();
+                    // If the person bullet is hidden,
+                    if($person_summary.is(':visible') === false) {
+
+                        // display it at the bottom of the list.
+                        $person_summary.appendTo('#people-list');
+
+                        $person_summary.show();
                     }
                     shown_this_many += 1;
                 }
                 else {
-                    $person_bullet.hide();
+                    $person_summary.hide();
                 } 
             }
             var people_shown_string = "" 
@@ -141,7 +143,7 @@ PeopleMapController.prototype.highlightPerson = function(personId) {
     // Unhighlight everyone
     $('#people-list li').removeClass("highlighted");
     //highlight the right person
-    $('#person_bullet_' + personId).addClass("highlighted");
+    $('#person_summary_' + personId).addClass("highlighted");
 }
 
 

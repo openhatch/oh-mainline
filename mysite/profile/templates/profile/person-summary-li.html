@@ -1,5 +1,6 @@
+{% load profile_extras %}
 {# Used, at time of writing, in profile/map.html and profile/search_people.html #}
-<li id="person_bullet_{{person.pk}}">
+<li id="person_summary_{{person.pk}}">
     <div class='left'>
         <img src="{{ person.get_photo_thumbnail_url_or_default }}" />
     </div>
@@ -25,9 +26,11 @@
         {% if project_names %}
             <span class="people-view-projects">
                 projects: 
-                {% for project in project_names %}
-                    {{ project }}{% if not forloop.last %}, {% endif %}
-                {% endfor %}
+                {% comment %}
+                Sorry that this is all on one line. Couldn't figure out
+                how to get rid of the space before the comma otherwise.
+                {% endcomment %}
+                {% for project in project_names %}{% ifequal forloop.counter0 3 %}<span class='ellipsis'>&hellip;</span><span class='collapsible'>{% endifequal %}{% if not forloop.first %}, {% endif %} {{ project }}{% comment %} Close collapsible span if we made one.  {% endcomment %}{% if forloop.last and forloop.counter0|gt:"2" %}</span>{% endif %}{% endfor %}
             </span>
         {% endif %}
     {% endwith %}
