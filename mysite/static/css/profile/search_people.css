@@ -86,7 +86,8 @@
     width: 200px; 
 }
 
-#map_canvas { }
+#map_canvas { float: left; margin-right: 10px; width:70%; height:450px; background-image: url('/static/images/profile/map_for_loading.png'); text-align: center;}
+#map_loading_msg { margin-left: 20%; padding: 8px; margin-top: 150px; width: 60%; background-color: #fff; }
 
 .view-links {
     float: left;

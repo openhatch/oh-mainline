@@ -8,11 +8,9 @@ Map of People
         {% if property and value %}
         where {{ property }} = {{ value }}
         {% endif %}
-        <div id="map_canvas" style="float: left; margin-right: 10px; width:70%; height:450px;
-                background-image: url('/static/images/profile/map_for_loading.png');
-                text-align: center;">
-            <div class='map_loading_msg' style='margin-left: 20%; padding: 8px; margin-top: 150px; width: 60%; background-color: #fff;'>
-                <img src='/static/images/icons/throbber.png' style=' height: 2.5em;'/>
+        <div id="map_canvas">
+            <div id='map_loading_msg'>
+                <img src='/static/images/icons/throbber.png' style='height: 2.5em;'/>
                 <span style='font-size: 2.5em; margin-left: 10px; '>Loading map&hellip;</span>
             </div>
         </div>
