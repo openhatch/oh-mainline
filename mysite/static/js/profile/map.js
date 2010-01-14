@@ -97,7 +97,13 @@ PeopleMapController.prototype.initialize = function(options) {
                 var $person_bullet = $('#person_bullet_' + marker.person_id);
                 if (map.getBounds().contains(marker.position) && 
                         shown_this_many < MAX_TO_SHOW) {
-                    $person_bullet.show();
+
+                    // If the person bullet is hidden, display it at the bottom of the list.
+                    if($person_bullet.is(':visible') === false) {
+                        console.log($person_bullet.get(0).id);
+                        $person_bullet.appendTo('#people-list');
+                        $person_bullet.show();
+                    }
                     shown_this_many += 1;
                 }
                 else {
