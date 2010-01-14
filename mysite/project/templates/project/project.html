@@ -4,11 +4,7 @@
 Projects - {{ project.name }} 
 {% endblock title %}
 
-{% block css %}
-{{ block.super }}
-@import url('/static/css/project/project.css');
-@import url('/static/css/profile/person_small.css');
-{% endblock css %}
+{% block body_id %}project{% endblock body_id %}
 
 {% block description_for_anonymous_users %}
 <strong>Learn below</strong>

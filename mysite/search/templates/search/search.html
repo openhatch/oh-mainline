@@ -4,12 +4,10 @@
 
 {% block title %}
 Search bugs 
-{{ block.super }}
 {% endblock title %}
 
 {% block css %}
 {{ block.super }}
-@import url('/static/css/base/jquery.jgrowl.css');
 {% if not bunch_of_bugs %}
 #results-sidebar {
     display: none;

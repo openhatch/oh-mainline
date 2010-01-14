@@ -1,77 +1,33 @@
-#left {
-    float: left;
-    margin-right: 15px;
-    width: 222px;
-}
-#left .module {
-    width: 202px;
-}
-#left .module > .head {
-    width: 200px;
-}
-#left .module > .body {
-    width: 160px;
-    padding: 10px 20px;
-    border: 1px solid #f4f4f4;
-}
-#left .section {
-    width: 180px;
-}
-#main {
-    width: 713px;
-    float: left;
-}
-#main .module > .head {
-    float: left;
-    width: 703px;
-}
-#main .module > .body {
-    width: 663px;
-    border-bottom: 1px solid #f4f4f4;
-}
+body.two_columns #left { float: left; margin-right: 15px; width: 222px; }
+	body.two_columns #left .module { width: 202px; }
+		body.two_columns #left .module > .head { width: 200px; }
+		body.two_columns #left .module > .body { width: 160px; padding: 10px 20px; border: 1px solid #f4f4f4; }
+	body.two_columns #left .section { width: 180px; }
+body.two_columns #main { width: 713px; float: left; }
+	body.two_columns #main .module > .head { float: left; width: 703px; }
+	body.two_columns #main .module > .body { width: 663px; border-bottom: 1px solid #f4f4f4; }
+body.two_columns #left .notification { padding: 10px 20px; width: 120px; margin: 0; }
+body.two_columns #main .notification { padding: 10px 20px; width: 590px; margin-top: 10px; }
+body.two_columns #main .submodule { width: 660px; }
+	body.two_columns #main .submodule .head h3 { width: 620px; }
+	body.two_columns #main .submodule .body { float: left; padding: 20px; width: 620px; background-color: #fff; }
 
-#left .notification {
-    padding: 10px 20px;
-    width: 120px;
-    margin: 0;
-}
-#main .notification {
-    padding: 10px 20px;
-    width: 590px;
-    margin-top: 10px;
-}
+body.two_columns /* SKINNY SUBMODULE */
+body.two_columns #main .submodule.skinny { width: 25%; margin-right: 10px; }
+		body.two_columns #main .submodule.skinny .head { width: 82.5%; }
+			body.two_columns #main .submodule.skinny .head h3 { width: 95%; }
+		body.two_columns #main .submodule.skinny .body { width: 90%; }
 
-#main .submodule {
-    width: 660px;
-}
-#main .submodule .head h3 {
-    width: 620px;
-}
-#main .submodule .body {
-    float: left;
-    padding: 20px;
-    width: 620px;
-    background-color: #fff;
-}
-
-
-/* SKINNY SUBMODULE */
-#main .submodule.skinny { width: 25%; margin-right: 10px; }
-    #main .submodule.skinny .head { width: 82.5%; }
-        #main .submodule.skinny .head h3 { width: 95%; }
-    #main .submodule.skinny .body { width: 90%; }
-
-/* FAT SUBMODULE */
-#main .submodule.fat { width: 70%; }
-    #main .submodule.fat .head { width: 93.8%; }
-        #main .submodule.fat .head h3 { width: 100%; }
-    #main .submodule.fat .body { width: 90%; }
-    #main .submodule.fat .foot { width: 90%; } 
-
-#main .equal-width { width: 45%; } 
-    #main .equal-width .submodule { width: 45%; } 
-        #main .equal-width .submodule .head { width: 90.5%; }
-            #main .equal-width .submodule .head h3,
-        #main .equal-width .submodule .body { width: 90.5%; }
-        #main .equal-width .submodule .foot { width: 91%; }
-
+body.two_columns /* FAT SUBMODULE */
+body.two_columns #main .submodule.fat { width: 70%; }
+		body.two_columns #main .submodule.fat .head { width: 93.8%; }
+			body.two_columns #main .submodule.fat .head h3 { width: 100%; }
+		body.two_columns #main .submodule.fat .body { width: 90%; }
+		body.two_columns #main .submodule.fat .foot { width: 90%; }
+body.two_columns #main .equal-width { width: 45%; }
+	body.two_columns #main .equal-width .submodule { width: 45%; }
+		body.two_columns #main .equal-width .submodule .head { width: 90.5%; }
+			body.two_columns #main .equal-width .submodule .head h3,
+        body.two_columns #main .equal-width .submodule .body { width: 90.5%; }
+		body.two_columns #main .equal-width .submodule .foot { width: 91%; }
+ 

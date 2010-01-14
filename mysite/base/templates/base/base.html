@@ -14,11 +14,13 @@
         <meta name='Description' content='OpenHatch, the open source involvement engine.'>
 
         <style type='text/css'> /*<![CDATA[*/
+            {% spaceless %}
             {% block css %}
-            {% assets output="css/bundle.css", "css/base/base.css", "css/senseknocker/thing.css", "css/search/search.css", "css/base/landing.css", "css/profile/person_small.css" %}
+            {% assets output="css/yo.css", "css/base/base.css", "css/base/jquery.jgrowl.css", "css/senseknocker/thing.css", "css/search/search.css", "css/base/landing.css", "css/profile/person_small.css", "css/project/project.css", "css/base/one_column.css", "css/base/two_columns.css", "css/account/auth.css", "css/account/settings.css"  %}
             @import url({{ ASSET_URL }});
             {% endassets %}
             {% endblock css %}
+            {% endspaceless %}
             /*]]>*/
         </style>
 
@@ -33,7 +35,7 @@
     </head>
 
     {% comment %} body_id is used by CSS to know what page we're on{% endcomment %}
-    <body id='{% block body_id %}body{% endblock %}'>
+    <body id='{% block body_id %}body{% endblock %}' class='{% block body_class %}{% endblock %}'>
 
         <div id='outermost'>
 
