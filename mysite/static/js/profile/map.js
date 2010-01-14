@@ -89,7 +89,7 @@ PeopleMapController.prototype.initialize = function(options) {
     function generate_update_all_markers(map) {
         return function() {
             /* This only makes up to 10 people show on the right. */
-            var MAX_TO_SHOW = 10;
+            var MAX_TO_SHOW = 5;
             var shown_this_many = 0;
 
             for (var i = 0; i < all_markers.length; i++) {

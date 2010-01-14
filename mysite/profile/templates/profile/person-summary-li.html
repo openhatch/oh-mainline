@@ -12,13 +12,16 @@
         <div class="name">
             {% if person.user.first_name or person.user.last_name %}
                 {{ person.user.first_name }} {{ person.user.last_name }}
-                ({{ person.user.username }})
             {% else %}
                 {{ person.user.username }}
             {% endif %}
         </div>
         {% if person.location_display_name %}
             <span class="location">
+                {% if person.user.first_name and person.user.last_name %}
+                    {{ person.user.username }}
+                    &bull;
+                {% endif %}
                 {{ person.location_display_name }}
             </span>
         {% endif %}
