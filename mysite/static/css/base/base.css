@@ -323,3 +323,8 @@ dd { margin-top: .5em; margin-left: 1.2em; }
     #greeting #invitation { font-size: 120%; margin-top: 10px; text-align: center; float: left; width: 100%; }
     #greeting #next-steps { float: left; width: 100%; }
     #greeting #next-steps li { font-size: 120%; float: left; width: 210px; margin: 10px 20px 0 0; }
+
+#error #content { padding: 0 300px; }
+    #error #content .module { width: 400px; }
+    #error #content .module .head { width: 96%; color: #aaa; padding: 2%; text-align: center; font-weight: bold; font-size: 96pt; }
+    #error #content .module .body { width: 90%; }
