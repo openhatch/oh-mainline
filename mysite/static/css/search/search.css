@@ -38,9 +38,12 @@ p { margin: 0; }
             #results li .first-line a { color: #2288BB; }
                 #results li .first-line a:hover { color: #223366; text-decoration: none; }
 
+        #results li .first-line img { vertical-align: middle; width: 20px; height: 20px; /* If ever an image is not square this rule might distort it. */ }
+
         /* Second line, e.g.:   ● Bite-size - C# - 3 potential mentors - I am using the "local folder" option for synchronizati... */
         #results li .second-line { display: block; float: left; background-color: #fff; padding: 2px 0 0 2px; width: 100%; border-radius-bottomleft: 8px; border-radius-bottomright: 8px; -moz-border-radius-bottomleft: 8px; -moz-border-radius-bottomright: 8px; }
         #results li .second-line .description p { display: inline; }
+        #results li .good-for-beginners { padding: 1px; }
 
         #results li .description-container p { margin-top: 5px; }
         #results .tag-details { display: none; }
@@ -49,11 +52,12 @@ p { margin: 0; }
         #results li .description-container { width: 525px; padding: .3em .7em; color: #555; float: left; overflow: hidden; white-space: nowrap; }
             #results li .description-container * { display: inline; }
             #results li .description-container br { display: none; }
-        #results li .description { font-family: Inconsolata, monospace; }
+        #results li .description { font-family: monospace; }
 
         #results li.expanded { white-space: normal; }
-            #results li.expanded .description-container p { float: left; width: 100%; margin-bottom: .3em; }
-            #results li.expanded .description-container br { display: inherit; }
+            #results li.expanded .description-container { white-space: normal; }
+                #results li.expanded .description-container p { float: left; width: 100%; margin-bottom: .3em; }
+                #results li.expanded .description-container br { display: inherit; }
             #results li.expanded .second-line { border-radius: 0; -moz-border-radius: 0; overflow: visible; }
             #results li.expanded .details { display: block; border-radius-bottomleft: 8px; border-radius-bottomright: 8px; -moz-border-radius-bottomleft: 8px; -moz-border-radius-bottomright: 8px; }
                 #results li.expanded .details .fields { display: block; }
@@ -65,24 +69,12 @@ p { margin: 0; }
             #results form label { float: left; font-size: 19px; font-family: Arial; padding: 14px 14px 0 0; }
             #results form input[type='text'] { font-size: 19px; padding: 10px; color: #222; width: 570px; height: 25px; }
             #results form input[type='submit'] { font-size: 19px; padding: 8px; color: #222; width: 90px; height: 50px; }
-.good-for-beginners { padding: 1px; }
-	.good-for-beginners img {  }
-/* </bug list code> */
+
 a.title:focus { -moz-outline-style: none; outline: none; }
 .separator { color: #aaa; }
 .project-info { float: left; padding: .3em .7em; }
-#results li.expanded .description-container { white-space: normal; }
 #filters label.on { font-weight: bold; }
 input[type='text'].default-text-active { color: #999 ! important; }
-#shortcuts-legend { float: left; font-size: 8pt; }
-	#shortcuts-legend h5 { font-size: 9pt; font-weight: normal; margin-bottom: 10px; }
-	#shortcuts-legend dt { float: left; width: 40px; text-align: right; clear: left; }
-		#shortcuts-legend dt strong { font-family: monospace; background-color: #f9f9f9; padding: 0 1px; }
-	#shortcuts-legend dd { float: left; width: 60px; margin: 0; }
-	#shortcuts-legend dt,
-#shortcuts-legend dd { margin-bottom: 5px; }
-#results li .highlight { background-color: #fffcaa; }
-.bug .first-line img { width: 20px; height: 20px; /* If ever an image is not square this rule might distort it. */ vertical-align: top; }
 #filters h4 { margin-bottom: 5px; }
 ul#facets { margin-left: 17px; }
 	ul#facets ul { margin-left: 10px; }
