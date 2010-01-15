@@ -51,7 +51,8 @@ body#profile .portfolio_entry > .actions a:hover { background-color: #e9e9e9; }
 body#profile .portfolio_entry > .actions li.save_and_publish_button *,
 body#profile .portfolio_entry > .actions li.save_button * { background-image: url('/static/images/icons/publish.png'); }
 body#profile .portfolio_entry > .actions li.delete_portfolio_entry a { background-image: url('/static/images/icons/delete.png'); }
-body#profile .portfolio_entry > .submodule { float: right; margin-bottom: 0; width: 807px; }
+body#profile .portfolio_entry > .submodule { float: right; margin-bottom: 0;  }
+body#profile #portfolio.editor .portfolio_entry > .submodule { float: right; margin-bottom: 0; width: 807px; }
 body#profile .portfolio_entry .project-stuff { padding: 2%; float: left; width: 39%; }
 body#profile .portfolio_entry .personal-stuff { background-color: #f4f4f4; float: left; border-left: 1px solid #eee; padding: 20px; float: right; width: 50%; }
 body#profile .portfolio_entry .project_icon { float: left; height: 64px; margin-right: 10px; width: 64px; background-position: center; background-repeat: no-repeat; }

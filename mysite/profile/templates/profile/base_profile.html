@@ -1,9 +1,6 @@
 {% extends 'base/two_columns.html' %}
 
-{% block css %}
-{{ block.super }}
-@import url('/static/css/profile/base.css');
-{% endblock css %}
+{% block body_id %}profile{% endblock %}
 
 {% block description_for_anonymous_users %}
     <strong>

@@ -172,6 +172,6 @@ GITHUB_USERNAME='openhatched'
 GITHUB_API_TOKEN='6f2b15214757ff724155654c97f4ce92'
 
 # Actually bundle files, even if not in production.
-ASSETS_DEBUG = False
+#ASSETS_DEBUG = False
 
 ASSETS_EXPIRE = 'querystring'

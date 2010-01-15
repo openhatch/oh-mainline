@@ -4,11 +4,6 @@
 {{ person.get_full_name_or_username }}
 {% endblock title %}
 
-{% block css %}
-{{ block.super }}
-@import url('/static/css/profile/portfolio.css');
-{% endblock css %}
-
 {% block main %}
 <div id='portfolio' class='module project-display viewer'>
     <div class='head'>
