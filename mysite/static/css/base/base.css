@@ -8,11 +8,11 @@ body {
 }
 
 a {
-    color: #ff6d3d; /* #ff8046; #ff6d3d; #ff613f; #ff7800; 00a8ff; eeb300; */
+    color: #ff6d3d; 
     text-decoration: none;
 }
 
-/* display: none would hide this from screenreaders. */
+/* display: none would hide this from screenreaders. Let's hide this off stage left instead. */
 .alt-text { left: -9999px; position: absolute; }
 
 a:hover {
