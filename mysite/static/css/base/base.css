@@ -15,9 +15,7 @@ a {
 /* display: none would hide this from screenreaders. Let's hide this off stage left instead. */
 .alt-text { left: -9999px; position: absolute; }
 
-a:hover {
-    text-decoration: underline;
-}
+a:hover { text-decoration: underline; }
 
 a img {
     border-style: none;
