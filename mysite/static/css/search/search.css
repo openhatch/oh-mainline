@@ -78,7 +78,8 @@
 #search #filters h4 { margin-bottom: 5px; }
 #search ul#facets { margin-left: 17px; }
 	#search ul#facets ul { margin-left: 10px; }
-		#search ul#facets ul li, #suggested_searches li { list-style: square; margin-top: 10px; margin-left: 20px; color: #777; clear: left; }
+        #search ul#facets li { margin-top: 10px; }
+		#search ul#facets ul li, #suggested_searches li { list-style: square; margin-left: 20px; color: #777; clear: left; }
 #search #facets li.active { font-weight: bold; }
 #search #results-summary { width: 70%; float: left; margin-right: 10px; }
 #search #navigation { float: right; }
