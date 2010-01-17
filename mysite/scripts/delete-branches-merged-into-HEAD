@@ -1,5 +1,6 @@
 #!/bin/bash
 # Get all merged branches except the current one, which is starred.
+set -x
 branches=$(git branch --merge | sed 's/\*.*$//')
 for branch in $branches; do
     git branch -d "$branch"
