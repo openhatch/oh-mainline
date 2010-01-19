@@ -8,12 +8,15 @@
 }
 
 #big-people-list ul {
-    width: 910px;
     float: left;
 }
-#people-list {
+#people-count {
+}
+#people-list.people-list-map{
     list-style: square;
-
+    overflow: auto;
+    height: 400px;
+    width: 33%;
 }
 
 #people-list li.highlighted{
@@ -22,7 +25,6 @@
 
 #big-people-list .people-list-map {
     float: left;
-    width: 20%;
 }
 
 #people-list .people-list-column{
@@ -37,9 +39,8 @@
 }
 #people-list li {
     padding-top: 10px;
-    list-style: square;
     padding: 0px;
-    margin-bottom: 20px;
+    margin: 0 0 20px 0;
     list-style: none;
     display: block;
     float: left;
@@ -87,6 +88,7 @@
 
 .view-links {
     float: left;
+    width: 33%;
 }
 
 .view-links ul li {

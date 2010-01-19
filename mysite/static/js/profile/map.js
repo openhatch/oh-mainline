@@ -164,4 +164,27 @@ PeopleMapController.prototype.bindClickHandlersToPeopleListItems = function() {
 
     };
     $('#people-list li').click(handler);
+
 }
+
+function resizeDivs(id1, id2) {
+	var div1 = $('#'+id1).get[0];
+	var div2 = $('#'+id2).get[0];
+	var height = 0;
+	var heightMinus = 132;
+	
+	// get height of window
+	if (window.innerHeight) {
+		height = window.innerHeight - 18;
+	} else if (document.documentElement && document.documentElement.clientHeight) {
+		height = document.documentElement.clientHeight;
+		heightMinus = 187;
+	} else if (document.body && document.body.clientHeight) {
+		height = document.body.clientHeight;
+	}
+	
+	div1.style.height = Math.round(height - heightMinus) + "px";
+	div2.style.height = Math.round(height - heightMinus) + "px";
+}
+	window.onresize = function() { resizeDivs('people-list', 'map_canvas'); }
+
