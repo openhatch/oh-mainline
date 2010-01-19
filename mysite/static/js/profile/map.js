@@ -59,16 +59,14 @@ PeopleMap.prototype.initialize = function(options) {
     function generate_update_all_markers(map) {
         return function() {
             /* This only makes up to 10 people show on the right. */
-            var MAX_TO_SHOW = 10;
             var shown_this_many = 0;
 
             for (var i = 0; i < all_markers.length; i++) {
                 var marker = all_markers[i];
                 var $person_bullet = $('#person_bullet_' + marker.person_id);
-                if (map.getBounds().contains(marker.position) && 
-                        shown_this_many < MAX_TO_SHOW) {
-                    $person_bullet.show();
+                if (map.getBounds().contains(marker.position)) {
                     shown_this_many += 1;
+                    $person_bullet.show();
                 }
                 else {
                     $person_bullet.hide();
