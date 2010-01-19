@@ -64,7 +64,7 @@ PeopleMap.prototype.initialize = function(options) {
                 case 1: str = "1 person in this area:"; break;
                 case 0: str = "Nobody in this area."; break;
                 case num_of_persons_with_locations:
-                        str = num_of_persons_with_locations + " people have entered their location:";
+                        str = num_of_persons_with_locations + " people have entered their locations:";
                         break;
                 default: str = count + " people in this area:" ;
             }
