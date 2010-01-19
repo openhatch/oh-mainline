@@ -1,4 +1,3 @@
-
 #auth_form {
     display: block;
     width: 250px;
@@ -49,15 +48,5 @@ a.openid_large_btn:focus {
 .openid_selected {
     border: 4px solid #DDD;
 }
-fieldset {
-    padding: 0;
-    border: 0;
-    float: left;
-    width: 250px;
-}
-legend {
-    font-size: 13pt;
-}
 
 #openid_submit { margin-left: 0; }
-

@@ -2,6 +2,8 @@ import github2.client
 from django.conf import settings
 import mysite.customs.ohloh
 import simplejson
+import mysite.base.helpers
+import urllib
 
 _github = None
 
@@ -38,3 +40,42 @@ def find_primary_language_of_repo(github_username, github_reponame):
         return winning_lang_name
     else:
         return '' # No best guess for primary language.
+
+def _pull_data_from_user_activity_feed(github_username):
+    json_url = 'http://github.com/%s.json' % urllib.quote(github_username)
+    response = mysite.customs.ohloh.mechanize_get(json_url).response()
+    data = simplejson.load(response)
+    return data
+
+def _get_repositories_user_watches(github_username):
+    '''Returns a list of repo objects.'''
+    json_url = 'http://github.com/api/v2/json/repos/watched/%s' % (
+        github_username)
+    response = mysite.customs.ohloh.mechanize_get(json_url).response()
+    data = simplejson.load(response)
+    return data['repositories']
+
+def repos_user_collaborates_on(github_username):
+    # First, make a big set of candidates: all the repos the user watches
+    watched = _get_repositories_user_watches(github_username)
+    # Now filter that down to just the ones not owned by the user
+    not_owned = [r for r in watched if r['owner'] != github_username]
+    # Now ask github.com if, for each repo, github_username is a collaborator
+    for repo in not_owned:
+        collaborators = _github.repos.list_collaborators('%s/%s' % (
+                repo['owner'], repo['name']))
+        if github_username in collaborators:
+            yield mysite.base.helpers.ObjectFromDict(repo)
+
+def repos_by_username_from_activity_feed(github_username):
+    repo_urls_emitted = set()
+    for event in _pull_data_from_user_activity_feed(github_username):
+        if event['type'] == 'PushEvent':
+            repo = event['repository']
+            if repo['url'] not in repo_urls_emitted:
+                if repo['owner'] == github_username:
+                    continue # skip the ones owned by this user
+                repo_urls_emitted.add(repo['url']) # avoid sending out duplicates
+                yield mysite.base.helpers.ObjectFromDict(repo)
+    
+        

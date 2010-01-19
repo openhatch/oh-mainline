@@ -6,12 +6,12 @@
 Home
 {% endblock title %}
 
+{% block body_id %}landing{% endblock body_id %}
+
 {% block css %}
 {{ block.super }}
-@import url('/static/css/base/landing.css');
-@import url('/static/css/profile/person_small.css');
-#main { margin-right: 20px; }
-#left { margin-right: 0; }
+body.two_columns #main { margin-right: 20px; }
+body.two_columns #left { margin-right: 0; }
 {% endblock css %}
 
 {% block pagetop %}

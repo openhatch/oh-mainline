@@ -1,26 +1,26 @@
-#main { float: left; }
-#main .module > .head { width: 950px; }
-#main .module > .body { width: 910px; }
-#main .submodule .head h3 { font-weight: normal; font-size: 11pt; }
-#main .submodule .body, #main .submodule .foot { padding: 3% 5%; float: left; }
+body.one_column #main { float: left; }
+body.one_column #main .module > .head { width: 950px; }
+body.one_column #main .module > .body { width: 910px; }
+body.one_column #main .submodule .head h3 { font-weight: normal; font-size: 11pt; }
+body.one_column #main .submodule .body, #main .submodule .foot { padding: 3% 5%; float: left; }
 
 /* SKINNY SUBMODULE */
-#main .submodule.skinny { width: 25%; margin-right: 20px; }
-    #main .submodule.skinny .head { width: 82.5%; }
-        #main .submodule.skinny .head h3 { width: 95%; }
-    #main .submodule.skinny .body { width: 90%; }
+body.one_column #main .submodule.skinny { width: 25%; margin-right: 20px; }
+    body.one_column #main .submodule.skinny .head { width: 82.5%; }
+        body.one_column #main .submodule.skinny .head h3 { width: 95%; }
+    body.one_column #main .submodule.skinny .body { width: 90%; }
 
 /* FAT SUBMODULE */
-#main .submodule.fat { width: 70%; }
-    #main .submodule.fat .head { width: 93.8%; }
-        #main .submodule.fat .head h3 { width: 100%; }
-    #main .submodule.fat .body { width: 90%; }
-    #main .submodule.fat .foot { width: 90%; } 
+body.one_column #main .submodule.fat { width: 70%; }
+    body.one_column #main .submodule.fat .head { width: 93.8%; }
+        body.one_column #main .submodule.fat .head h3 { width: 100%; }
+    body.one_column #main .submodule.fat .body { width: 90%; }
+    body.one_column #main .submodule.fat .foot { width: 90%; } 
 
-#main .equal-width { width: 45%; } 
-    #main .equal-width .submodule { width: 45%; } 
-        #main .equal-width .submodule .head { width: 90.5%; }
-            #main .equal-width .submodule .head h3,
-        #main .equal-width .submodule .body, #main .equal-width .submodule .foot { width: 90.5%; }
+body.one_column #main .equal-width { width: 45%; } 
+    body.one_column #main .equal-width .submodule { width: 45%; } 
+        body.one_column #main .equal-width .submodule .head { width: 90.5%; }
+            body.one_column #main .equal-width .submodule .head h3,
+        body.one_column #main .equal-width .submodule .body, #main .equal-width .submodule .foot { width: 90.5%; }
 
-#main .submodule.left { margin-right: 20px; }
+body.one_column #main .submodule.left { margin-right: 20px; }

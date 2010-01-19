@@ -9,7 +9,12 @@
         {% firstof user.first_name user.username %} on this project:</label>
     <ul>
         {% for person in contributors %}
-        {% include 'profile/person_small.html' %}
+        <li>
+            <a href='{{ person.profile_url }}'>
+                <img src='{{ person.get_photo_thumbnail_url_or_default }}' />
+                <span>{{ person.get_full_name_or_username }}</span>
+            </a>
+        </li>
         {% endfor %}
     </ul>
     <a class='see-all'

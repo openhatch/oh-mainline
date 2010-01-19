@@ -96,4 +96,3 @@ def page_to_js(request):
 
 def page_not_found(request):
     return render_to_response('404.html', {'the_user': request.user })
-

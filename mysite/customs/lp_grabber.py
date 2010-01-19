@@ -107,6 +107,10 @@ def get_info_for_launchpad_username(identifier):
     for row in tree.cssselect('.contributions tr'):
         project_link = row.cssselect('a')[0]
         project_name = project_link.text_content().strip()
+
+        if project_name == 'Launchpad itself':
+            project_name = 'Launchpad'
+
         project_url_relative = project_link.attrib['href']
         project_url = urlparse.urljoin(b.geturl(), project_url_relative)
         

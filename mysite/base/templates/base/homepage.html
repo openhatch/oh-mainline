@@ -6,25 +6,23 @@
 Welcome to OpenHatch! 
 {% endblock whole_title %}
 
-{% block nav %}
-{% endblock nav %}
+{% block body_id %}homepage{% endblock %}
 
-{% block greeting %}
-{% endblock %}
+{% block body_class %}{{ block.super }} auth{% endblock %}
+
+{% block nav %}{% endblock %}
+
+{% block greeting %}{% endblock %}
 
 {% block js %}
 <script type='text/javascript'>
-    $(function() {
-        openid.init('id_openid_url');
-    });
+    $(function() { openid.init('id_openid_url'); });
 </script>
 {% endblock js %}
 
 {% block css %}
 {{ block.super }}
-@import url('/static/css/account/auth.css');
 @import url('/static/css/base/homepage.css');
-@import url('/static/openid/css/openid.css');
 {% endblock css %}
 
 {% block content %}

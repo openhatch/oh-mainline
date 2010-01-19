@@ -87,11 +87,6 @@ class LandingPage(TwillTests):
 
     # }}}
 
-class ObjectFromDict(object):
-    def __init__(self, data):
-        for key in data:
-            setattr(self, key, data[key])
-
 class MySQLRegex(TwillTests):
     def test_escape(self):
         before2after = {

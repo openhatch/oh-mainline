@@ -76,6 +76,7 @@ PeopleMapController.prototype.initialize = function(options) {
                 /* if this is the last one, call update_all_markers() */
                 if (num_of_persons_with_locations == number_of_people_geocoded) {
                     update_all_markers();
+                    update_people_count(num_of_persons_with_locations);
                 }
             }
         }
@@ -86,39 +87,37 @@ PeopleMapController.prototype.initialize = function(options) {
                 create_a_callback(this, name, person_id));
     }
 
+    function update_people_count(count) {
+            var people_shown_string = "" ;
+            var str;
+            switch (count) {
+                case 1: str = "1 person in this area:"; break;
+                case 0: str = "Nobody in this area."; break;
+                case num_of_persons_with_locations:
+                        str = num_of_persons_with_locations + " people have entered their locations:";
+                        break;
+                default: str = count + " people in this area:" ;
+            }
+            $('#people-count').text(str);
+    }
+
     function generate_update_all_markers(map) {
         return function() {
             /* This only makes up to 10 people show on the right. */
-            var MAX_TO_SHOW = 10;
             var shown_this_many = 0;
 
             for (var i = 0; i < all_markers.length; i++) {
                 var marker = all_markers[i];
                 var $person_bullet = $('#person_bullet_' + marker.person_id);
-                if (map.getBounds().contains(marker.position) && 
-                        shown_this_many < MAX_TO_SHOW) {
-                    $person_bullet.show();
+                if (map.getBounds().contains(marker.position)) {
                     shown_this_many += 1;
+                    $person_bullet.show();
                 }
                 else {
                     $person_bullet.hide();
                 } 
             }
-            var people_shown_string = "" 
-            if(shown_this_many == 1){
-                people_shown_string = "1 person in this area:" ;
-            }
-            else if(shown_this_many == 0){
-                people_shown_string = "Nobody in this area.";
-            }
-            else if(shown_this_many == num_of_persons_with_locations){
-                people_shown_string = num_of_persons_with_locations + " people have entered their location:";
-            }
-            else{
-                people_shown_string = shown_this_many + " people in this area:" ;
-
-            }
-            $('#people-count').text(people_shown_string);
+            update_people_count(shown_this_many);
         }
     }
     update_all_markers = generate_update_all_markers(this.map);

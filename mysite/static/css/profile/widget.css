@@ -1,553 +1,104 @@
-#openhatch-widget body {
-    font: 9pt Verdana, Bitstream Vera Sans, Arial, sans-serif;
-    background-color: #ddeeff; 
-    margin: 0;
-    padding: 0;
-}
-
-#openhatch-widget a {
-    color: darkorange; 
-    text-decoration: none;
-}
-
-#openhatch-widget a:hover {
-    color: orange; 
-    text-decoration: underline;
-}
-
-#openhatch-widget a img {
-    border-style: none;
-}
-
-#openhatch-widget h1 a {
-    color: #2288BB;
-    text-decoration: none;
-}
-
-#openhatch-widget h1 a:hover {
-    color: #223366;
-    text-decoration: none;
-}
-
-#openhatch-widget .module {
-    float: left;
-    margin-bottom: 15px;
-    background-color: #f4f4f4;
-    border-bottom: 1px solid #f4f4f4;
-}
-
-#openhatch-widget .module > .head {
-    border-top: 2px solid #bfe2ff;
-    float: left;
-    border-bottom: 1px solid #eee;
-    background: #fff url('/static/images/module-head-bg.png') bottom repeat-x;
-}
-
-#openhatch-widget .module > .head h3 {
-    padding: 15px 20px;
-}
-
-#openhatch-widget .module > .body {
-    float: left;
-    background-color: #fff;
-    padding: 20px;
-}
-
-#openhatch-widget .module > .head, 
-#openhatch-widget .module > .body {
-    border-left: 1px solid #f4f4f4;
-    border-right: 1px solid #f4f4f4;
-}
-
-#openhatch-widget .module > .foot,
-#openhatch-widget .submodule > .foot {
-    float: left;
-    border-top: 1px solid #eee;
-    padding: 15px;
-}
-
-#openhatch-widget .module > .body.contains-submodules {
-    background: #fff url('/static/images/motif.png');
-}
-
-#openhatch-widget .submodule {
-    margin-bottom: 20px;
-    border: 1px solid #ddd;
-    border-top: 3px double #ddd;
-    border-bottom: 3px double #ddd;
-    float: left;
-}
-
-#openhatch-widget .submodule > .head {
-    float: left;
-    background: #fdfdfe url('/static/images/module-head-bg.png') bottom repeat-x;
-    float: left;
-    padding: 10px 20px;
-    border-bottom: 1px solid #ddd;
-}
-
-#openhatch-widget .submodule > .body {
-    background-color: #fff;
-}
-
-#openhatch-widget .submodule > .foot {
-    border-top: 1px solid #ddd;
-}
-
-#openhatch-widget ul {
-    padding: 0;
-    margin: 0;
-    list-style: none;
-}
-#openhatch-widget #outermost {
-    margin: 0 auto;
-    width: 1000px;
-}
-#openhatch-widget #penoutermost {
-    float: left;
-    width: 1000px;
-}
-#openhatch-widget h1,
-#openhatch-widget h2,
-#openhatch-widget h3,
-#openhatch-widget h4 {
-    margin: 0;
-}
-#openhatch-widget #header {
-    width: 920px;
-    height: 80px;
-    color: #555;
-    margin-top: 15px;
-    padding: 5px 20px;
-    padding: 5px 65px 5px 5px;
-	}
-#openhatch-widget #headerlogo {
-    float: left;
-}
-
-#openhatch-widget #nav {
-    padding: 10px 20px 0 20px;
-    float: left;
-    width: 960px;
-    height: 100px;
-    border-top: 0;
-}
-#openhatch-widget #nav h2 {
-    width: 200px;
-    text-align: center;
-    float: left;
-}
-#openhatch-widget #nav h2 a {
-}
-#openhatch-widget #nav ul {
-    list-style: none;
-    margin: 0;
-    float: right;
-}
-#openhatch-widget #nav li {
-    float: right;
-    margin-left: 20px;
-    margin-top: 10px;
-}
-#openhatch-widget #links li a {
-    color: #76746b;
-    padding: 3px 10px 5px 10px;
-    background-color: #fff; 
-    border-top: 2px solid #ded8be;
-    float: left;
-    text-decoration: none;
-}
-
-#openhatch-widget #links li a:hover {
-    color: #222;
-}
-
-#openhatch-widget #page-top {
-    width: 1000px;
-}
-
-#openhatch-widget ul#links {
-    margin-left: 20px;
-}
-
-#openhatch-widget #links li {
-    display: inline;
-    font-size: 12pt;
-    margin-top: 20px;
-}
-
-#openhatch-widget #account-links li {
-    background-color: #F4F4F4;
-    border-top: 2px solid #CCDDFF;
-    padding: 5px 10px;
-    margin: 0;
-    font-size: 9pt;
-}
-
-#openhatch-widget #account-links li a {
-    color: #2288BB;
-}
-
-#openhatch-widget #account-links li a:hover {
-    color: #223366;
-}
-
-#openhatch-widget ul#account-links {
-    margin-left: 20px;
-}
-
-#openhatch-widget ul#user-actions {
-    margin: 0;
-    padding: 0;
-    float: left;
-    width: 300px;
-}
-#openhatch-widget ul#user-actions li {
-    list-style: none;
-    float: left;
-}
-#openhatch-widget ul#user-actions a {
-    font-size: 10pt;
-}
-
-#openhatch-widget #content {
-    float: left;
-    width: 960px;
-    padding: 20px;
-    padding-bottom: 5px;
-    background: url("/static/images/motif-eee.png");
-}
-
-#openhatch-widget #footer {
-    float: left;
-    width: 1000px;
-    height: 60px;
-    padding: 5px;
-    margin: 0;
-    text-align: center;
-}
-
-#openhatch-widget #footer ul {
-    display: inline;
-    list-style-type: none;
-    font-size: 1.2em;
-    display: none;
-}
-
-#openhatch-widget #footer li {
-    padding: 0 0 0 20px;
-    display: inline;
-}
-
-#openhatch-widget #footer a {
-    color: #333;
-}
-
-#openhatch-widget #footer a:hover {
-    color: black;
-}
-
-#openhatch-widget #widgets {
-    float: left;
-    width: 960px;
-}
-#openhatch-widget h3 {
-    margin-bottom: 0px;
-    float: left;
-    clear: left;
-    font-size: 12pt;
-    font-weight: bold;
-    color: #555;
-    letter-spacing: 0;
-}
-#openhatch-widget .module > .head ul {
-    float: right;
-    padding: 0;
-    margin: 0;
-}
-#openhatch-widget .module > .head ul li {
-    float: left;
-    margin: 0;
-}
-#openhatch-widget .module > .head ul li a {
-    float: right;
-    padding: 17px 20px;
-    line-height: 13pt;
-    font-weight: bold;
-    margin-right: 3px;
-}
-#openhatch-widget .module > .head ul li a:hover {
-    color: orange;
-    text-decoration: underline;
-}
-#openhatch-widget .tags {
-    float: left;
-    width: 200px;
-    margin-bottom: 10px;
-}
-#openhatch-widget img.show-more-link {
-    float: right;
-    position: relative;
-    top: 1px;
-}
-#openhatch-widget .module {
-    border: 5px solid #fff;
-}
-#openhatch-widget .widget {
-    float: left;
-    width: 400px;
-    margin-bottom: 20px;
-}
-#openhatch-widget input[type='text'],
-#openhatch-widget input[type='password'],
-#openhatch-widget input[type='file'],
-#openhatch-widget textarea { 
-    padding: 5px;
-    font-size: 11pt;
-    float: left;
-}
-#openhatch-widget input[type='submit'] {
-    padding: 1px 8px;
-    color: #222;
-    font-weight: bold;
-    float: left;
-}
-#openhatch-widget .alert {
-    float: left;
-    width: 1000px;
-    text-align: center;
-    padding: 15px 0;
-}
-#openhatch-widget .alert div {
-    display: inline;
-    background-color: #fca;
-    color: #444;
-    padding: 8px 15px;
-    width: 250px;
-    font-size: 11pt;
-    -moz-border-radius: 5px;
-}
-#openhatch-widget img {
-    border: 0;
-}
-#openhatch-widget .usernames {
-    font-size: 10pt;
-}
-#openhatch-widget #info .tag-type {
-    font-weight: normal;
-    display: block;
-    font-size: 8pt;
-}
-#openhatch-widget .aka {
-}
-#openhatch-widget .column {
-    float: left;
-    margin-right: 10px;
-}
-#openhatch-widget h3 {
-    font: 13pt Verdana;
-    margin: 0;
-}
-#openhatch-widget h4,
-#openhatch-widget .cute-header {
-    width: 900px; /* infinity */
-    font-size: 9pt;
-    color: #666;
-    float: left;
-    margin: 0;
-    padding: 1px;
-    width: 100px;
-}
-#openhatch-widget input[type='submit'] {
-    color: #333;
-    float: right;
-}
-#openhatch-widget abbr.foss {
-    border: 0;
-    font-variant: small-caps;
-}
-#openhatch-widget .notification {
-    float: left;
-    width: 130px;
-    background-color: #ffc; /* "Fresh Food Café!"-- Asheesh */
-    border-top: 2px solid #ff7;
-    padding: 10px;
-    margin: 0 15px;
-    font-size: 10pt;
-    color: #000;
-    margin-bottom: 10px;
-}
-#openhatch-widget .errorlist ul {
-    float: left;
-    margin: 0;
-    padding: 0;
-}
-#openhatch-widget .errorlist li {
-    float: left;
-    padding: 5px 10px;
-    width: 410px;
-    color: #522;
-    background-color: #ffe4e4;
-    margin: 10px 0;
-    -moz-border-radius: 5px;
-}
-
-
-#openhatch-widget .project-display {
-    float: left;
-    margin-right: 0;
-    width: 705px;
-}
-#openhatch-widget .project-display h3 {
-    float: left;
-}
-#openhatch-widget .project-display p {
-    margin: 0;
-    margin-bottom: 10px;
-    float: left;
-}
-#openhatch-widget .project-display h2 {
-    font-size: 9pt;
-    margin: 0;
-    margin-bottom: 3px;
-}
-#openhatch-widget .project-display h5 {
-    font-size: 12pt;
-    margin: 0;
-    margin-bottom: 10px;
-    font-weight: normal;
-}
-#openhatch-widget .project-display a {
-    text-decoration: none;
-}
-
+#openhatch-widget body { font: 9pt Verdana, Bitstream Vera Sans, Arial, sans-serif; background-color: #ddeeff; margin: 0; padding: 0; }
+#openhatch-widget a { color: darkorange; text-decoration: none; }
+#openhatch-widget a:hover { color: orange; text-decoration: underline; }
+#openhatch-widget a img { border-style: none; }
+#openhatch-widget h1 a { color: #2288BB; text-decoration: none; }
+#openhatch-widget h1 a:hover { color: #223366; text-decoration: none; }
+#openhatch-widget .module { float: left; margin-bottom: 15px; background-color: #f4f4f4; border-bottom: 1px solid #f4f4f4; }
+#openhatch-widget .module > .head { border-top: 2px solid #bfe2ff; float: left; border-bottom: 1px solid #eee; background: #fff url('/static/images/module-head-bg.png') bottom repeat-x; }
+#openhatch-widget .module > .head h3 { padding: 15px 20px; }
+#openhatch-widget .module > .body { float: left; background-color: #fff; padding: 20px; }
+#openhatch-widget .module > .head, #openhatch-widget .module > .body { border-left: 1px solid #f4f4f4; border-right: 1px solid #f4f4f4; }
+#openhatch-widget .module > .foot, #openhatch-widget .submodule > .foot { float: left; border-top: 1px solid #eee; padding: 15px; }
+#openhatch-widget .module > .body.contains-submodules { background: #fff url('/static/images/motif.png'); }
+#openhatch-widget .submodule { margin-bottom: 20px; border: 1px solid #ddd; border-top: 3px double #ddd; border-bottom: 3px double #ddd; float: left; }
+#openhatch-widget .submodule > .head { float: left; background: #fdfdfe url('/static/images/module-head-bg.png') bottom repeat-x; float: left; padding: 10px 20px; border-bottom: 1px solid #ddd; }
+#openhatch-widget .submodule > .body { background-color: #fff; }
+#openhatch-widget .submodule > .foot { border-top: 1px solid #ddd; }
+#openhatch-widget ul { padding: 0; margin: 0; list-style: none; }
+#openhatch-widget #outermost { margin: 0 auto; width: 1000px; }
+#openhatch-widget #penoutermost { float: left; width: 1000px; }
+#openhatch-widget h1, #openhatch-widget h2, #openhatch-widget h3, #openhatch-widget h4 { margin: 0; }
+#openhatch-widget #header { width: 920px; height: 80px; color: #555; margin-top: 15px; padding: 5px 20px; padding: 5px 65px 5px 5px; }
+#openhatch-widget #headerlogo { float: left; } 
+#openhatch-widget #nav { padding: 10px 20px 0 20px; float: left; width: 960px; height: 100px; border-top: 0; }
+#openhatch-widget #nav h2 { width: 200px; text-align: center; float: left; }
+#openhatch-widget #nav h2 a { }
+#openhatch-widget #nav ul { list-style: none; margin: 0; float: right; }
+#openhatch-widget #nav li { float: right; margin-left: 20px; margin-top: 10px; }
+#openhatch-widget #links li a { color: #76746b; padding: 3px 10px 5px 10px; background-color: #fff; border-top: 2px solid #ded8be; float: left; text-decoration: none; }
+#openhatch-widget #links li a:hover { color: #222; }
+#openhatch-widget #page-top { width: 1000px; }
+#openhatch-widget ul#links { margin-left: 20px; }
+#openhatch-widget #links li { display: inline; font-size: 12pt; margin-top: 20px; }
+#openhatch-widget #account-links li { background-color: #F4F4F4; border-top: 2px solid #CCDDFF; padding: 5px 10px; margin: 0; font-size: 9pt; }
+#openhatch-widget #account-links li a { color: #2288BB; }
+#openhatch-widget #account-links li a:hover { color: #223366; }
+#openhatch-widget ul#account-links { margin-left: 20px; }
+#openhatch-widget ul#user-actions { margin: 0; padding: 0; float: left; width: 300px; }
+#openhatch-widget ul#user-actions li { list-style: none; float: left; }
+#openhatch-widget ul#user-actions a { font-size: 10pt; }
+#openhatch-widget #content { float: left; width: 960px; padding: 20px; padding-bottom: 5px; background: url("/static/images/motif-eee.png"); }
+#openhatch-widget #footer { float: left; width: 1000px; height: 60px; padding: 5px; margin: 0; text-align: center; }
+#openhatch-widget #footer ul { display: inline; list-style-type: none; font-size: 1.2em; display: none; }
+#openhatch-widget #footer li { padding: 0 0 0 20px; display: inline; }
+#openhatch-widget #footer a { color: #333; }
+#openhatch-widget #footer a:hover { color: black; }
+#openhatch-widget #widgets { float: left; width: 960px; }
+#openhatch-widget h3 { margin-bottom: 0px; float: left; clear: left; font-size: 12pt; font-weight: bold; color: #555; letter-spacing: 0; }
+#openhatch-widget .module > .head ul { float: right; padding: 0; margin: 0; }
+#openhatch-widget .module > .head ul li { float: left; margin: 0; }
+#openhatch-widget .module > .head ul li a { float: right; padding: 17px 20px; line-height: 13pt; font-weight: bold; margin-right: 3px; }
+#openhatch-widget .module > .head ul li a:hover { color: orange; text-decoration: underline; }
+#openhatch-widget .tags { float: left; width: 200px; margin-bottom: 10px; }
+#openhatch-widget img.show-more-link { float: right; position: relative; top: 1px; }
+#openhatch-widget .module { border: 5px solid #fff; }
+#openhatch-widget .widget { float: left; width: 400px; margin-bottom: 20px; }
+#openhatch-widget input[type='text'], #openhatch-widget input[type='password'], #openhatch-widget input[type='file'], #openhatch-widget textarea { padding: 5px; font-size: 11pt; float: left; }
+#openhatch-widget input[type='submit'] { padding: 1px 8px; color: #222; font-weight: bold; float: left; }
+#openhatch-widget .alert { float: left; width: 1000px; text-align: center; padding: 15px 0; }
+#openhatch-widget .alert div { display: inline; background-color: #fca; color: #444; padding: 8px 15px; width: 250px; font-size: 11pt; -moz-border-radius: 5px; }
+#openhatch-widget img { border: 0; }
+#openhatch-widget .usernames { font-size: 10pt; }
+#openhatch-widget #info .tag-type { font-weight: normal; display: block; font-size: 8pt; }
+#openhatch-widget .aka { }
+#openhatch-widget .column { float: left; margin-right: 10px; }
+#openhatch-widget h3 { font: 13pt Verdana; margin: 0; }
+#openhatch-widget h4, #openhatch-widget .cute-header { width: 900px; /* infinity */ font-size: 9pt;
+    color: #666; float: left; margin: 0; padding: 1px; width: 100px; }
+#openhatch-widget input[type='submit'] { color: #333; float: right; }
+#openhatch-widget abbr.foss { border: 0; font-variant: small-caps; }
+#openhatch-widget .notification { float: left; width: 130px; background-color: #ffc; /* "Fresh Food Café!"-- Asheesh */ border-top: 2px solid #ff7; padding: 10px; margin: 0 15px; font-size: 10pt; color: #000; margin-bottom: 10px; }
+#openhatch-widget .errorlist ul { float: left; margin: 0; padding: 0; }
+#openhatch-widget .errorlist li { float: left; padding: 5px 10px; width: 410px; color: #522; background-color: #ffe4e4; margin: 10px 0; -moz-border-radius: 5px; }
+#openhatch-widget .project-display { float: left; margin-right: 0; width: 705px; }
+#openhatch-widget .project-display h3 { float: left; }
+#openhatch-widget .project-display p { margin: 0; margin-bottom: 10px; float: left; }
+#openhatch-widget .project-display h2 { font-size: 9pt; margin: 0; margin-bottom: 3px; }
+#openhatch-widget .project-display h5 { font-size: 12pt; margin: 0; margin-bottom: 10px; font-weight: normal; }
+#openhatch-widget .project-display a { text-decoration: none; }
 /* Styling for django form output. */
-#openhatch-widget .project-display input[type='text'],
-#openhatch-widget .project-display textarea {
-    float: left;
-    width: 330px;
-}
-#openhatch-widget .module > .body .project-display ul {
-    float: left;
-}
-#openhatch-widget #portfolio .module > .body {
-    padding: 0;
-}
-#openhatch-widget #portfolio .module > .body ul li {
-    float: left;
-    padding: 20px;
-    width: 311px;
-}
-#openhatch-widget #portfolio .module > .body {
-    width: 703px;
-}
-#openhatch-widget .project-escutcheon {
-    float: left;
-    margin-right: 10px;
-    width: 320px;
-    margin-bottom: 20px;
-}
-#openhatch-widget .project-escutcheon .logo {
-    width: 64px;
-    height: 64px;
-    float: left;
-}
-#openhatch-widget .project-escutcheon .name {
-    width: 200px;
-    float: left;
-    padding: 20px;
-    font-size: 11pt;
-}
-
+#openhatch-widget .project-display input[type='text'], #openhatch-widget .project-display textarea { float: left; width: 330px; }
+#openhatch-widget .module > .body .project-display ul { float: left; }
+#openhatch-widget #portfolio .module > .body { padding: 0; }
+#openhatch-widget #portfolio .module > .body ul li { float: left; padding: 20px; width: 311px; }
+#openhatch-widget #portfolio .module > .body { width: 703px; }
+#openhatch-widget .project-escutcheon { float: left; margin-right: 10px; width: 320px; margin-bottom: 20px; }
+#openhatch-widget .project-escutcheon .logo { width: 64px; height: 64px; float: left; }
+#openhatch-widget .project-escutcheon .name { width: 200px; float: left; padding: 20px; font-size: 11pt; }
 /* FIXME: Test if this code is dead. */
-#openhatch-widget .contrib-descriptions {
-    float: left;
-    width: 268px;
-}
-#openhatch-widget .contrib-descriptions > li {
-    list-style: square;
-    margin-left: 25px;
-    margin-top: 10px;
-    padding: 8px 10px;
-    padding-bottom: 6px;
-    font-size: 10pt;
-    /*background-color: #f4f4ff; f4f4bc; c9dc59; d2e6df;*/
-    float: left;
-    width: 210px;
-}
-
-
-#openhatch-widget #portfolio {
-    width: 260px;
-    padding: 0 5px 3px 5px;
-    margin: 0;
-}
-
-#openhatch-widget .project-display {
-    width: 260px;
-    margin: 0 auto 2px auto;
-}
-
-#openhatch-widget .project-display h3 {
-    margin: 0;
-    padding: 5px 0 8px 0;
-    font-size: 11pt;
-    text-align: center;
-    width: 100%;
-}
-
-#openhatch-widget .project-display li {
-    float: left;
-    display: inline;
-    background-color: white;
-    margin: 0;
-    padding: 0;
-}
-
-#openhatch-widget .project-escutcheon {
-    width: 80px;
-    height: 70px;
-    margin: 4px 3px 3px 3px;
-}
-
-#openhatch-widget .project-escutcheon .logo {
-    width: 40px;
-    height: 40px;
-    margin: 0 auto;
-    text-align: center;
-}
-
-#openhatch-widget .project-escutcheon .name {
-    font-size: 8pt;
-    padding: 4px;
-    width: 72px;
-    clear: left;
-}
-
-#openhatch-widget #credit {
-    float: right;
-    padding-right: 5px;
-}
-
-#openhatch-widget #credit h3 {
-    font-size: 10pt;
-    padding: 23px 0 0 0;
-}
-
-#openhatch-widget #credit-logo {
-    float: right;
-    padding: 5px 0 0 0;
-}
-
-#openhatch-widget #widget {
-    float: left;
-    width: 300px ! important;
-}
-#openhatch-widget #widget .head,
-#openhatch-widget #widget .body {
-    float: left;
-    width: 260px ! important;
-}
-#openhatch-widget #widget .head h3 {
-    width: 240px ! important;
-}
+#openhatch-widget .contrib-descriptions { float: left; width: 268px; }
+#openhatch-widget .contrib-descriptions > li { list-style: square; margin-left: 25px; margin-top: 10px; padding: 8px 10px; padding-bottom: 6px; font-size: 10pt; /*background-color: #f4f4ff; f4f4bc; c9dc59; d2e6df;*/ float: left; width: 210px; }
+#openhatch-widget #portfolio { width: 260px; padding: 0 5px 3px 5px; margin: 0; }
+#openhatch-widget .project-display { width: 260px; margin: 0 auto 2px auto; }
+#openhatch-widget .project-display h3 { margin: 0; padding: 5px 0 8px 0; font-size: 11pt; text-align: center; width: 100%; }
+#openhatch-widget .project-display li { float: left; display: inline; background-color: white; margin: 0; padding: 0; }
+#openhatch-widget .project-escutcheon { width: 80px; height: 70px; margin: 4px 3px 3px 3px; }
+#openhatch-widget .project-escutcheon .logo { width: 40px; height: 40px; margin: 0 auto; text-align: center; }
+#openhatch-widget .project-escutcheon .name { font-size: 8pt; padding: 4px; width: 72px; clear: left; }
+#openhatch-widget #credit { float: right; padding-right: 5px; }
+#openhatch-widget #credit h3 { font-size: 10pt; padding: 23px 0 0 0; }
+#openhatch-widget #credit-logo { float: right; padding: 5px 0 0 0; }
+#openhatch-widget #widget { float: left; width: 300px ! important; }
+#openhatch-widget #widget .head, #openhatch-widget #widget .body { float: left; width: 260px ! important; }
+#openhatch-widget #widget .head h3 { width: 240px ! important; }

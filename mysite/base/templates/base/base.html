@@ -14,10 +14,13 @@
         <meta name='Description' content='OpenHatch, the open source involvement engine.'>
 
         <style type='text/css'> /*<![CDATA[*/
+            {% spaceless %}
             {% block css %}
-            @import url('/static/css/base/base.css');
-            @import url('/static/css/senseknocker/thing.css');
+            {% assets output="packed/openhatch2.css", "css/base/base.css", "css/jquery.autocomplete.css", "css/jquery-ui-lightness/jquery-ui-1.7.2.custom.css", "openid/css/openid.css", "css/base/jquery.jgrowl.css", "css/senseknocker/thing.css", "css/search/search.css", "css/base/landing.css", "css/profile/person_small.css", "css/project/project.css", "css/base/one_column.css", "css/base/two_columns.css", "css/account/auth.css", "css/account/settings.css", "css/account/widget.css", "css/qunit.css", "css/profile/base.css", "css/profile/portfolio.css" %}
+            @import url({{ ASSET_URL }});
+            {% endassets %}
             {% endblock css %}
+            {% endspaceless %}
             /*]]>*/
         </style>
 
@@ -30,7 +33,9 @@
         {% endblock js_in_head %}
 
     </head>
-    <body>
+
+    {% comment %} body_id is used by CSS to know what page we're on{% endcomment %}
+    <body id='{% block body_id %}body{% endblock %}' class='{% block body_class %}{% endblock %}'>
 
         <div id='outermost'>
 
@@ -203,7 +208,7 @@
         {% block js_before_bundle %}
         {% endblock js_before_bundle %}
 
-        {% assets output="js/everything.js", "js/jquery.js", "js/jquery.query.js", "js/jquery.json.js", "js/jquery.hint.js", "js/jquery.form.js", "js/jquery.jgrowl.js", "js/jquery-ui-1.7.2.custom.min.js", "js/jquery.cookie.js", "piwik.js", "js/base/locationDialog.js", "js/base.js", "js/search/defaultText.js", "js/profile/portfolio.js", "js/profile/map.js", "openid/js/openid-jquery.js", "js/importer.js", "js/account/set_location.js", "js/search/search.js", "js/tester.js" %}
+        {% assets output="packed/openhatch.js", "js/jquery.js", "js/jquery.query.js", "js/jquery.json.js", "js/jquery.hint.js", "js/jquery.form.js", "js/jquery.jgrowl.js", "js/jquery-ui-1.7.2.custom.min.js", "js/jquery.cookie.js", "piwik.js", "js/base/locationDialog.js", "js/base.js", "js/search/defaultText.js", "js/profile/portfolio.js", "js/profile/map.js", "openid/js/openid-jquery.js", "js/importer.js", "js/account/set_location.js", "js/search/search.js" %}
         <script type="text/javascript" src="{{ ASSET_URL }}"></script>
         {% endassets %}
 

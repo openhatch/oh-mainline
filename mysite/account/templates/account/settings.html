@@ -4,11 +4,7 @@
 Settings
 {% endblock title %}
 
-{% block css %}
-{{ block.super }}
-@import url('/static/css/account/auth.css');
-@import url('/static/css/account/settings.css');
-{% endblock css %}
+{% block body_class %}{{ block.super }} auth settings{% endblock %}
 
 {% block main %}
 <div class='module'>

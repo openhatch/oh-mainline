@@ -4,13 +4,7 @@
 Manage projects
 {% endblock title %}
 
-{% block css %}
-{{ block.super }}
-@import url('/static/css/profile/portfolio.css');
-@import url('/static/css/qunit.css');
-@import url('/static/css/base/jquery.jgrowl.css');
-@import url('/static/css/jquery-ui-lightness/jquery-ui-1.7.2.custom.css');
-{% endblock css %}
+{% block body_id %}profile{% endblock %}
 
 {% block main %}
 {% with 1 as edit_mode %}
