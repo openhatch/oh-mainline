@@ -49,11 +49,26 @@ PeopleMap.prototype.initialize = function(options) {
                 /* if this is the last one, call update_all_markers() */
                 if (num_of_persons_with_locations == number_of_people_geocoded) {
                     update_all_markers();
+                    update_people_count(num_of_persons_with_locations);
                 }
             }
         }
 
         geocoder.geocode( { 'address': location_name}, create_a_callback(name, person_id));
+    }
+
+    function update_people_count(count) {
+            var people_shown_string = "" ;
+            var str;
+            switch (count) {
+                case 1: str = "1 person in this area:"; break;
+                case 0: str = "Nobody in this area."; break;
+                case num_of_persons_with_locations:
+                        str = num_of_persons_with_locations + " people have entered their location:";
+                        break;
+                default: str = count + " people in this area:" ;
+            }
+            $('#people-count').text(str);
     }
 
     function generate_update_all_markers(map) {
@@ -72,21 +87,7 @@ PeopleMap.prototype.initialize = function(options) {
                     $person_bullet.hide();
                 } 
             }
-            var people_shown_string = "" 
-            if(shown_this_many == 1){
-                people_shown_string = "1 person in this area:" ;
-            }
-            else if(shown_this_many == 0){
-                people_shown_string = "Nobody in this area.";
-            }
-            else if(shown_this_many == num_of_persons_with_locations){
-                people_shown_string = num_of_persons_with_locations + " people have entered their location:";
-            }
-            else{
-                people_shown_string = shown_this_many + " people in this area:" ;
-
-            }
-            $('#people-count').text(people_shown_string);
+            update_people_count(shown_this_many);
         }
     }
     update_all_markers = generate_update_all_markers(map);
