@@ -53,9 +53,9 @@ PeopleMapController.prototype.initialize = function(options) {
             // Google Maps API responds to our request for geographic data.
             return function(results, status) {
                 number_of_people_geocoded += 1;
-                var person_location = results[0].geometry.location;
 
                 if (status == google.maps.GeocoderStatus.OK) {
+                    var person_location = results[0].geometry.location;
                     var marker = new google.maps.Marker({
                         'map': mapController.map, 
                         'title': person_name,
