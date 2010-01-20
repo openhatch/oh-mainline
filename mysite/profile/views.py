@@ -255,6 +255,13 @@ def edit_person_info(request):
     person.bio = bio
     person.save()
 
+    # Grab the submitted homepage URL.
+    # FIXME: One day, validate that this is a valid URL, and
+    # use Django forms for this whole thing, while we're at it.
+    bio = request.POST.get('edit-tags-homepage_url', '')
+    person.homepage_url = bio
+    person.save()
+
     # We can map from some strings to some TagTypes
     for known_tag_type_name in ('understands', 'understands_not',
                            'studying', 'seeking', 'can_mentor'):

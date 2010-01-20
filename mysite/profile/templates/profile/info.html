@@ -11,6 +11,13 @@
             {{person.bio}}
         </p>
         {% endif %}
+
+        {% if person.homepage_url %}
+        <p id="homepage" style="margin-bottom: 2px;">
+          <a href="{{person.homepage_url|urlencode}}">Home page</a>
+        </p>
+        {% endif %}
+
         {% comment %} 
         <div class="tags" id="tags-links"
             <span class="tag-type">links:</span>

@@ -1320,6 +1320,35 @@ class SuggestLocation(TwillTests):
         self.assertEqual(data['geoip_guess'], "Rochester, NY, United States")
 
 
+class EditBio(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def test(self):
+        '''
+        * Goes to paulproteus's profile
+        * checks that there is no link to asheesh.org
+        * clicks edit on the Info area
+        * enters a link as Info
+        * checks that his bio now contains "asheesh.org"
+        '''
+        self.login_with_twill()
+        tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
+        #not so vain.. yet
+        tc.notfind('asheesh.org')
+        tc.go(make_twill_url('http://openhatch.org/profile/views/edit_info'))
+        #make sure our bio is not already on the form
+        tc.notfind('asheesh.org')
+        # set the bio in ze form
+        tc.fv("edit-tags", 'edit-tags-homepage_url', 'http://www.asheesh.org/')
+        tc.submit()
+        #find the string we just submitted as our bio
+        tc.find('asheesh.org')
+        self.assertEqual(Person.get_by_username('paulproteus').homepage_url,
+        "http://www.asheesh.org/")
+        #now we should see our bio in the edit form
+        tc.go(make_twill_url('http://openhatch.org/profile/views/edit_info'))
+        tc.find('asheesh.org')
+    
 class EditLocation(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
 
