@@ -4,11 +4,15 @@ PeopleMapController.prototype.initialize = function(options) {
     this.person_locations = {};
 
     var number_of_people_geocoded = 0;
+    this.get_number_of_people_geocoded = function() { return number_of_people_geocoded; };
     var update_all_markers;
 
     var person_id2data = options['person_id2data'];
     this.get_person_id2data = function() { return person_id2data; };
-    var num_of_persons_with_locations = options['num_of_persons_with_locations'];
+    
+    //these two might not be the same because we store location strings even if we can't geocode them
+    var num_of_persons_with_locations_in_db = options['num_of_persons_with_locations'];
+    var num_of_persons_who_can_be_geocoded = num_of_persons_with_locations_in_db;
 
     var all_markers = [];
 
@@ -42,6 +46,7 @@ PeopleMapController.prototype.initialize = function(options) {
      * located at profile/templates/profile/map.html .)
      */
     for (var person_id in person_id2data) {
+        console.log(person_id2data.length);
         var data = person_id2data[person_id];
         var location_name = data['location'];
         var name = data['name'];
@@ -52,9 +57,8 @@ PeopleMapController.prototype.initialize = function(options) {
             // the following callback will be executed when the
             // Google Maps API responds to our request for geographic data.
             return function(results, status) {
-                number_of_people_geocoded += 1;
-
                 if (status == google.maps.GeocoderStatus.OK) {
+                    number_of_people_geocoded += 1;
                     var person_location = results[0].geometry.location;
 
                     var marker = new google.maps.Marker({
@@ -68,16 +72,19 @@ PeopleMapController.prototype.initialize = function(options) {
                     google.maps.event.addListener(marker,
                             'click', function() {
                             mapController.highlightPerson(marker.person_id);
+                            window.location.hash=('person_summary_' + marker.person_id);
                             });
                     all_markers.push(marker);
+                }
+                else if(status == google.maps.GeocoderStatus.ZERO_RESULTS){
+                    num_of_persons_who_can_be_geocoded -=1;
                 }
                 else {
                     console.log("Geocode was not successful for the following reason: " + status);
                 }
                 /* if this is the last one, call update_all_markers() */
-                if (num_of_persons_with_locations == number_of_people_geocoded) {
+                if (num_of_persons_who_can_be_geocoded == number_of_people_geocoded) {
                     update_all_markers();
-                    update_people_count(num_of_persons_with_locations);
                 }
             }
         }
@@ -88,14 +95,16 @@ PeopleMapController.prototype.initialize = function(options) {
                 create_a_callback(this, name, person_id));
     }
 
-    function update_people_count(count) {
+    function update_people_count() {
+            //when you can see everyone, this text should be different
             var people_shown_string = "" ;
             var str;
+            var count = $("#people-list li:visible").size();
             switch (count) {
                 case 1: str = "1 person in this area:"; break;
                 case 0: str = "Nobody in this area."; break;
-                case num_of_persons_with_locations:
-                        str = num_of_persons_with_locations + " people have entered their locations:";
+                case num_of_persons_who_can_be_geocoded:
+                        str = num_of_persons_who_can_be_geocoded + " people have entered their locations:";
                         break;
                 default: str = count + " people in this area:" ;
             }
@@ -126,7 +135,7 @@ PeopleMapController.prototype.initialize = function(options) {
                     $person_summary.hide();
                 } 
             }
-            update_people_count(shown_this_many);
+            update_people_count();
         }
     }
     update_all_markers = generate_update_all_markers(this.map);
@@ -136,6 +145,9 @@ PeopleMapController.prototype.initialize = function(options) {
     google.maps.event.addListener(this.map,
             'bound_changed',
             update_all_markers);
+
+    // Change the bounds trivially so as to trigger bound_changed
+    this.map.setCenter(new google.maps.LatLng(1, 1));
 }
 
 //this gets called when you click a marker on the map
@@ -176,6 +188,7 @@ PeopleMapController.prototype.bindClickHandlersToPeopleListItems = function() {
     $('#people-list li').hoverClass('hover');
 }
 
+/*
 function resizeDivs(id1, id2) {
 	var div1 = $('#'+id1).get[0];
 	var div2 = $('#'+id2).get[0];
@@ -196,4 +209,4 @@ function resizeDivs(id1, id2) {
 	div2.style.height = Math.round(height - heightMinus) + "px";
 }
 	window.onresize = function() { resizeDivs('people-list', 'map_canvas'); }
-
+*/

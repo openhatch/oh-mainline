@@ -1,14 +1,19 @@
 {% load profile_extras %}
 {# Used, at time of writing, in profile/map.html and profile/search_people.html #}
 <li id="person_summary_{{person.pk}}">
+    {% ifnotequal slug "people_map" %}<a href="{{ person.profile_url }}">{% endifnotequal %}
     <div class='left'>
         <img src="{{ person.get_photo_thumbnail_url_or_default }}" />
     </div>
+    {% ifnotequal slug "people_map" %}</a>{% endifnotequal %}
     <div class="people-view-info">
-        <a class='profile-link person-summary-button' href='{{ person.get_profile_url }}' 
+        {% ifequal slug "people_map" %}
+        <a class='profile-link person-summary-button' href='{{ person.profile_url }}' 
                 title="Visit {% firstof person.user.first_name person.user.username %}'s profile">
-            profile &rarr;
-        </a>
+            profile
+        </a>{% endifequal %}
+
+        {% ifnotequal slug "people_map" %}<a href="{{ person.profile_url }}">{% endifnotequal %}
         <div class="name">
             {% if person.user.first_name or person.user.last_name %}
                 {{ person.user.first_name }} {{ person.user.last_name }}
@@ -16,15 +21,18 @@
                 {{ person.user.username }}
             {% endif %}
         </div>
-        {% if person.location_display_name %}
+        {% ifnotequal slug "people_map" %}</a>{% endifnotequal %}
             <span class="location">
                 {% if person.user.first_name and person.user.last_name %}
                     {{ person.user.username }}
-                    &bull;
                 {% endif %}
+                {% if person.user.first_name and person.user.last_name and person.location_display_name %}
+                    &middot;
+                {% endif %}
+                {% if person.location_display_name %}
                 {{ person.location_display_name }}
+                {% endif %}
             </span>
-        {% endif %}
         {% with person.get_list_of_project_names as project_names %}
         {% if project_names %}
             <span class="people-view-projects">

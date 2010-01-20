@@ -11,12 +11,17 @@
     float: left;
 }
 #people-count {
+    float: left;
 }
 #people-list.people-list-map{
     list-style: square;
     overflow: auto;
     height: 400px;
     width: 33%;
+}
+#people-list.people-list-map li{
+    cursor: pointer;
+    cursor: hand;
 }
 
 #people-list li.hover { background: #ffc; }
@@ -38,8 +43,6 @@
     padding-left: 0;
 }
 #people-list li {
-    cursor: pointer;
-    cursor: hand;
     padding: 8px;
     border-radius: 8px;
     -moz-border-radius: 8px;
