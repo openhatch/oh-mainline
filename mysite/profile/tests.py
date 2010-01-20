@@ -411,12 +411,12 @@ class UserListTests(TwillTests):
 
     # }}}
 
-class ImportGithubCollaborators(BaseCeleryTest):
+class ImportDebianMaintenance(BaseCeleryTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     @mock.patch('mysite.customs.debianqa.source_packages_maintained_by', mock)
     @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
-    def test_github_collaboration_via_emulated_bgtask(self, mock):
+    def test_debian_maintenance_via_emulated_bgtask(self, mock):
         description = 'the world in /bin/nutsh'
         # three repos: one owned by paulproteus; that should be ignored.
         # the other two: one where paulproteus is a collaborator, and one
@@ -434,7 +434,7 @@ class ImportGithubCollaborators(BaseCeleryTest):
                 ]
 
         return self._test_data_source_via_emulated_bgtask(
-                source='ga', data_we_expect=data_we_expect,
+                source='db', data_we_expect=data_we_expect,
                 summaries_we_expect=summaries_we_expect)
         # }}}
 

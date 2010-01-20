@@ -243,6 +243,7 @@ class DataImportAttempt(models.Model):
         ('lp', "Launchpad"),
         ('gh', "Github"),
         ('ga', "Github"),
+        ('db', "Debian"),
         )
     completed = models.BooleanField(default=False)
     failed = models.BooleanField(default=False)
