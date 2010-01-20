@@ -32,6 +32,7 @@ import lp_grabber
 
 from mysite.profile.tasks import FetchPersonDataFromOhloh
 import mysite.customs.miro
+import mysite.customs.debianqa
 import mysite.customs.cia
 import mysite.customs.feed
 import mysite.customs.github
