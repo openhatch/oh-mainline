@@ -5,6 +5,7 @@ import mysite.customs.models
 from mysite.customs import ohloh
 import mysite.profile.controllers
 
+import django
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
