@@ -127,9 +127,6 @@ PeopleMapController.prototype.initialize = function(options) {
                     // If the person bullet is hidden,
                     if($person_summary.is(':visible') === false) {
 
-                        // display it at the bottom of the list.
-                        $person_summary.appendTo('#people-list');
-
                         $person_summary.show();
                     }
                     shown_this_many += 1;
