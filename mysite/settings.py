@@ -174,4 +174,7 @@ GITHUB_API_TOKEN='6f2b15214757ff724155654c97f4ce92'
 # Set this to false to bundle files even if not in production.
 ASSETS_DEBUG = False
 
+# The setting below adds a querystring to assets, e.g. bundle.css?1264015076
+# This querystring changes whenever we change the asset. This prevents the
+# client's cached version of an asset from overriding our new asset.
 ASSETS_EXPIRE = 'querystring'
