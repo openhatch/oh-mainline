@@ -85,6 +85,9 @@ PeopleMapController.prototype.initialize = function(options) {
                 /* if this is the last one, call update_all_markers() */
                 if (num_of_persons_who_can_be_geocoded == number_of_people_geocoded) {
                     update_all_markers();
+                    google.maps.event.addListener(mapController.map,
+                            'idle',
+                            update_all_markers);
                 }
             }
         }
@@ -140,14 +143,8 @@ PeopleMapController.prototype.initialize = function(options) {
     }
     update_all_markers = generate_update_all_markers(this.map);
     google.maps.event.addListener(this.map,
-            'idle',
-            update_all_markers);
-    google.maps.event.addListener(this.map,
             'bound_changed',
             update_all_markers);
-
-    // Change the bounds trivially so as to trigger bound_changed
-    this.map.setCenter(new google.maps.LatLng(1, 1));
 }
 
 //this gets called when you click a marker on the map
