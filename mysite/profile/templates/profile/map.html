@@ -8,14 +8,13 @@ Map of People
         {% if property and value %}
         where {{ property }} = {{ value }}
         {% endif %}
-        <div id="map_canvas" style="float: right; margin-right: 10px; width:65%; height:468px;
         {% comment %}
             Google loads a map here -- replacing #map_loading_msg, among other things.
             The background image will hide, as intended, a few seconds after page load.
             However, this doesn't seem to work properly when the image is specified
             via an external stylesheet.
         {% endcomment %}
-        <div id="map_canvas" style='background: url("/static/images/profile/map_for_loading.png") top no-repeat;'>
+        <div id="map_canvas" style='float: right; margin-top: 18px; margin-right: 10px; width:65%; height:450px;background: url("/static/images/profile/map_for_loading.png") top no-repeat;'>
             <div id='map_loading_msg'>
                 <img src='/static/images/icons/throbber.png' />
                 <span>Loading map&hellip;</span>
