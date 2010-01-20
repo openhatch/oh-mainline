@@ -232,6 +232,13 @@ class OhlohIconTests(django.test.TestCase):
 
     # }}}
 
+class ImportFromDebianQAReally(django.test.TestCase):
+    def test_asheesh(self):
+        source_package_names = mysite.customs.debianqa.source_packages_maintained_by('asheesh@asheesh.org')
+        self.assertEqual(set(source_package_names),
+                         set(['alpine', 'ccd2iso', 'cue2toc', 'exempi',
+                              'liblicense']))
+
 class LaunchpadDataTests(django.test.TestCase):
     def test_project2language(self):
         langs = lp_grabber.project2languages('gwibber')
