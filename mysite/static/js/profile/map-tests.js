@@ -2,7 +2,7 @@ function MapTests(){
 
     var $mappablePeople = [];
     for (var person_id in mapController.get_person_id2data()) {
-        $mappablePeople.push($('#person_bullet_'+person_id));
+        $mappablePeople.push($('#person_summary_'+person_id));
     }
 
     tester.ok($mappablePeople.length >= 3, "There are at least three visible LIs inside #people-list.");
