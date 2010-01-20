@@ -39,8 +39,9 @@ def source_packages_maintained_by(email_address):
 
         for package_bold_name in table.cssselect('tr b'):
             package_name = package_bold_name.text_content()
+            package_description = package_bold_name.cssselect('span')[0].attrib['title']
             num_added += 1
-            package_names.append(package_name)
+            package_names.append( (package_name, package_description) )
 
         assert num_added == int(number_of_packages)
 

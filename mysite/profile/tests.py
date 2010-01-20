@@ -411,6 +411,41 @@ class UserListTests(TwillTests):
 
     # }}}
 
+class ImportGithubCollaborators(BaseCeleryTest):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    @mock.patch('mysite.customs.debianqa.source_packages_maintained_by', mock)
+    @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
+    def test_github_collaboration_via_emulated_bgtask(self, mock):
+        description = 'the world in /bin/nutsh'
+        # three repos: one owned by paulproteus; that should be ignored.
+        # the other two: one where paulproteus is a collaborator, and one
+        # where he isn't.
+        mock.return_value = [('MOCK ccHost', description)]
+
+        data_we_expect = [{
+            'contributor_role': 'Maintainer',
+            'languages': "",
+            'is_published': False,
+            'is_deleted': False}]
+
+        summaries_we_expect = [
+                'Maintain a package in Debian.',
+                ]
+
+        return self._test_data_source_via_emulated_bgtask(
+                source='ga', data_we_expect=data_we_expect,
+                summaries_we_expect=summaries_we_expect)
+        # }}}
+
+        # PLUS test that there is a has a description!
+        self.assertEqual(PortfolioEntry.objects.all().count(),
+                         1) # just the one we want
+        self.assertEqual(PortfolioEntry.objects.get().project_description,
+                         description)
+        # }}}
+
+
 class Portfolio(TwillTests):
     # {{{
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']

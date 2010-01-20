@@ -237,8 +237,7 @@ class ImportFromDebianQAReally(django.test.TestCase):
     def test_asheesh(self):
         source_package_names = mysite.customs.debianqa.source_packages_maintained_by('asheesh@asheesh.org')
         self.assertEqual(set(source_package_names),
-                         set(['alpine', 'ccd2iso', 'cue2toc', 'exempi',
-                              'liblicense']))
+                         set([('ccd2iso', 'Converter from CloneCD disc image format to standard ISO'), ('alpine', 'Text-based email client, friendly for novices but powerful'), ('cue2toc', "converts CUE files to cdrdao's TOC format"), ('liblicense', 'Stores and retrieves license information in media files'), ('exempi', 'library to parse XMP metadata (Library)')]))
 
 class LaunchpadDataTests(django.test.TestCase):
     def test_project2language(self):
