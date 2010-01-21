@@ -451,7 +451,7 @@ class ImportDebianMaintenance(BaseCeleryTest):
                          description)
 
         # PLUS test that we create a Debian PortfolioEntry
-        debian_pfe = PortfolioEntry.objects.get(project__name='Debian')
+        debian_pfe = PortfolioEntry.objects.get(project__name='Debian GNU/Linux')
         debian_citations = Citation.objects.filter(portfolio_entry=debian_pfe)
         debian_citation = debian_citations[0]
         self.assertEqual(debian_citation.summary,

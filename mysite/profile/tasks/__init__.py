@@ -157,7 +157,7 @@ def create_citations_from_debianqa_results(dia_id, results):
         citation.save_and_check_for_duplicates()
 
         # And add a citation to the Debian portfolio entry
-        (project, _) = Project.objects.get_or_create(name='Debian')
+        (project, _) = Project.objects.get_or_create(name='Debian GNU/Linux')
         if PortfolioEntry.objects.filter(person=person, project=project).count() == 0:
             portfolio_entry = PortfolioEntry(person=person,
                                              project=project,
