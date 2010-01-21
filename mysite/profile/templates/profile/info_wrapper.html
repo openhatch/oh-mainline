@@ -46,10 +46,6 @@ Edit your info
     </div>
     <div class='body contains-submodules two-columns'>
         <div class='submodule skinny'>
-            <div class='body'>
-                <p>Punch in some keywords, e.g.,</p>
-                <p><blockquote><tt>c++, lambda calculus, juggling</tt></blockquote></p>
-            </div>
         </div>
         <div class='submodule fat'>
             <div class='body'>
@@ -57,11 +53,25 @@ Edit your info
                     action='/people/info/edit/do'
                     method='POST'>
 
+		    <div>
+                      <p>A bit about you</p>
+		    </div>
+		    
                     <div class='form-row'>
                         <label>bio:</label>
                         <textarea name='edit-tags-bio'>{{ person.bio }}</textarea>
                     </div>
 
+                    <div class='form-row'>
+                        <label>homepage url:</label>
+                        <input type='text' name='edit-tags-homepage_url'>{{ person.homepage_url }}</textarea>
+                    </div>
+
+		    <div>
+                      <p>Now, punch in some keywords, e.g.,</p>
+                      <p><blockquote><tt>c++, lambda calculus, juggling</tt></blockquote></p>
+		    </div>
+		    
                     <div class='form-row'>
                         <label>understands:</label>
                         <textarea name='edit-tags-understands'>{{ tags_flat.understands }}</textarea>
