@@ -5,6 +5,7 @@ import urllib2
 import urllib
 from mysite.customs import lp_grabber
 import mysite.customs.github
+import mysite.customs.debianqa
 from mysite.profile.models import Person, DataImportAttempt, Citation, PortfolioEntry
 from mysite.search.models import Project
 from celery.task import Task
@@ -130,6 +131,35 @@ def create_citations_from_github_results(dia_id, results,
     dia.completed = True
     dia.save()
 
+def create_citations_from_debianqa_results(dia_id, results):
+    dia = DataImportAttempt.objects.get(id=dia_id)
+    person = dia.person
+
+    for package_name, package_description in results:
+        (project, _) = Project.objects.get_or_create(name=package_name)
+
+        if PortfolioEntry.objects.filter(person=person, project=project).count() == 0:
+            portfolio_entry = PortfolioEntry(person=person,
+                                             project=project,
+                                             project_description=package_description)
+            portfolio_entry.save()
+        portfolio_entry = PortfolioEntry.objects.filter(person=person, project=project)[0]
+            
+        citation = Citation()
+        citation.languages = "" # FIXME ", ".join(result['languages'])
+        citation.contributor_role='Maintainer'
+        citation.portfolio_entry = portfolio_entry
+        citation.data_import_attempt = dia
+        citation.url = 'http://packages.debian.org/src:' + urllib.quote(
+            package_name)
+        citation.save_and_check_for_duplicates()
+
+    person.last_polled = datetime.datetime.now()
+    person.save()
+
+    dia.completed = True
+    dia.save()
+
 def rs_action(dia):
     oh = ohloh.get_ohloh()
     data, web_response = oh.get_contribution_info_by_username(
@@ -164,6 +194,12 @@ def gh_action(dia):
         
     return (repos, dict_mapping_repos_to_languages)
 
+def db_action(dia):
+    # Given a dia with a username, check if there are any source packages
+    # maintained by that person.
+    return list(mysite.customs.debianqa.source_packages_maintained_by(
+        dia.query))
+
 def ga_action(dia):
     # FIXME: We should add a person parameter so that, in the
     # case of "You should retry soon..." messages from the Github
@@ -185,6 +221,7 @@ source2actual_action = {
         'ou': ou_action,
         'gh': gh_action,
         'ga': ga_action,
+        'db': db_action,
         'lp': lp_action
         }
 
@@ -193,6 +230,7 @@ source2result_handler = {
         'ou': create_citations_from_ohloh_contributor_facts,
         'gh': create_citations_from_github_results,
         'ga': create_citations_from_github_activity_feed_results,
+        'db': create_citations_from_debianqa_results,
         'lp': create_citations_from_launchpad_results,
         }
 

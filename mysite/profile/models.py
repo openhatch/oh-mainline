@@ -441,6 +441,9 @@ class Citation(models.Model):
             suffix = ''
 
         if self.data_import_attempt:
+            if self.data_import_attempt.source == 'db' and (
+                self.contributor_role == 'Maintainer'):
+                return 'Maintain a package in Debian.'
             if self.data_import_attempt.source in ('gh', 'ga'):
                 return '%s a repository on Github.' % self.contributor_role
             if self.data_import_attempt.source in ['rs', 'ou']:

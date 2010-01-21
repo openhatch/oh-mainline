@@ -40,6 +40,9 @@ from twill import commands as tc
 from twill.shell import TwillCommandLoop
 # }}}
 
+def do_nothing(*args, **kwargs):
+    return ''
+
 class ProfileTests(TwillTests):
     # {{{
     fixtures = ['user-paulproteus', 'person-paulproteus',
@@ -414,7 +417,9 @@ class UserListTests(TwillTests):
 class ImportDebianMaintenance(BaseCeleryTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
-    @mock.patch('mysite.customs.debianqa.source_packages_maintained_by', mock)
+    @mock.patch('mysite.search.models.Project.populate_icon_from_ohloh',
+                do_nothing)
+    @mock.patch('mysite.customs.debianqa.source_packages_maintained_by')
     @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
     def test_debian_maintenance_via_emulated_bgtask(self, mock):
         description = 'the world in /bin/nutsh'
@@ -443,6 +448,7 @@ class ImportDebianMaintenance(BaseCeleryTest):
                          1) # just the one we want
         self.assertEqual(PortfolioEntry.objects.get().project_description,
                          description)
+        # FIXME: Verify we create a Debian box...
         # }}}
 
 
@@ -1296,9 +1302,6 @@ class ProjectGetMentors(TwillTests):
                                tag=willing_to_mentor_banshee)
         link.save()
 
-
-def do_nothing(*args, **kwargs):
-    return ''
 
 class SuggestLocation(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
