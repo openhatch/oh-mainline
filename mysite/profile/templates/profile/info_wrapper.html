@@ -7,7 +7,7 @@ Edit your info
 {% block main %}
 <style type='text/css'>
     .fat {
-        width: 236px !important;
+        width: 436px !important;
     }
     form  {
         float: left;
@@ -28,9 +28,12 @@ Edit your info
     blockquote {
         margin: .5em 20px;
     }
-    label { float: left; font-size: 8pt; margin: 0; padding: 0; text-transform: uppercase; width: 100%; }
+    label { float: left; margin: 0; padding: 0; width: 100%; }
     textarea {
         height: 4em;
+    }
+    input[type="text"], textarea {
+        width: 100%;
     }
 </style>
 <div class='module'>
@@ -53,33 +56,31 @@ Edit your info
                     action='/people/info/edit/do'
                     method='POST'>
 
-		    <div>
-                      <p>A bit about you</p>
-		    </div>
+                      <h3>You, in a nutshell</h3>
 		    
                     <div class='form-row'>
                         <label>bio:</label>
-                        <textarea name='edit-tags-bio'>{{ person.bio }}</textarea>
+                        <textarea title="A bit about you" name='edit-tags-bio'>{{ person.bio }}</textarea>
+                        <p style="color: #888;">Example: I like traffic lights. On weekends, I like to make websites, destroy Twitter, and eat breakfast.</p>
                     </div>
 
                     <div class='form-row'>
                         <label>homepage url:</label>
-                        <input type='text' name='edit-tags-homepage_url'>{{ person.homepage_url }}</textarea>
+                        <input title='http://you.com/' type='text' name='edit-tags-homepage_url'>{{ person.homepage_url }}</textarea>
+                        <p style="color: #888;">Example: http://you.name/</p>
                     </div>
 
-		    <div>
-                      <p>Now, punch in some keywords, e.g.,</p>
-                      <p><blockquote><tt>c++, lambda calculus, juggling</tt></blockquote></p>
-		    </div>
+                      <h3>Your personality, split on commas</h3>
+                      <p style="clear: both;">Examples: <tt>c++, lambda calculus, juggling</tt></p>
 		    
                     <div class='form-row'>
-                        <label>understands:</label>
-                        <textarea name='edit-tags-understands'>{{ tags_flat.understands }}</textarea>
+                        <label>understand:</label>
+                        <textarea title="e.g., python, regular expressions" name='edit-tags-understands'>{{ tags_flat.understands }}</textarea>
                     </div>
 
                     <div class='form-row'>
                         <label>will never understand:</label>
-                        <textarea name='edit-tags-understands_not'>{{ tags_flat.understands_not }}</textarea>
+                        <textarea title="linear algebra, strawberry shortcake" name='edit-tags-understands_not'>{{ tags_flat.understands_not }}</textarea>
                     </div>
 
                     <div class='form-row'>
