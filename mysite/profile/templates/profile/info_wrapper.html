@@ -1,119 +1,117 @@
-{% extends 'base/one_column.html' %}
+{% extends 'base/base.html' %}
 
 {% block title %}
-Edit your info
+    Edit your info
 {% endblock %}
 
-{% block main %}
-<style type='text/css'>
-    .fat {
-        width: 436px !important;
-    }
-    form  {
-        float: left;
-        width: 100%;
-    }
-    form div {
-        float: left;
-        width: 90%;
-        margin-bottom: 20px;
-    }
-    h4 {
-        width: 90%;
-    }
-    .skinny {
-        background: none;
-        border: 0;
-    }
-    blockquote {
-        margin: .5em 20px;
-    }
-    label { float: left; margin: 0; padding: 0; width: 100%; font-size: 10pt; }
-    textarea { height: 2.5em; }
-    input[type="text"], textarea {
-        width: 100%;
-    }
-    p.example { color: #888; font-size: 8pt; }
-    p.why { color: #555; font-size: 10pt; margin-bottom: 0;}
-</style>
-<div class='module'>
-    <div class='head'>
-        <ul>
-            <li>
-            <a href='{% url mysite.profile.views.display_person_web the_user.username %}'>
-                &laquo; Back to profile
-            </a>
-            </li>
-        </ul>
-        <h3>Edit your info</h3>
-    </div>
-    <div class='body contains-submodules two-columns'>
-        <div class='submodule skinny'>
+{% block content %}
+    <style type='text/css'>
+        .fat {
+            width: 436px !important;
+        }
+        form  {
+            float: left;
+            width: 100%;
+        }
+        form div {
+            float: left;
+            width: 90%;
+            margin-bottom: 20px;
+        }
+        h4 {
+            width: 90%;
+        }
+        .skinny {
+            background: none;
+            border: 0;
+        }
+        blockquote {
+            margin: .5em 20px;
+        }
+        label { float: left; margin: 0; padding: 0; width: 100%; font-size: 10pt; }
+        textarea { height: 2.5em; }
+        input[type="text"], textarea {
+            width: 100%;
+        }
+        p.example { color: #888; font-size: 8pt; }
+        p.why { color: #555; font-size: 10pt; margin-bottom: 0;}
+        #edit_info { margin: 0 230px; width: 500px; }
+        #edit_info .head { width: 500px; }
+        #edit_info .body { width: 460px; }
+    </style>
+    <div id='edit_info' class='module'>
+        <div class='head'>
+            <ul>
+                <li>
+                    <a href='{% url mysite.profile.views.display_person_web the_user.username %}'>
+                        &laquo; Back to profile
+                    </a>
+                </li>
+            </ul>
+            <h3>Edit your info</h3>
         </div>
-        <div class='submodule fat'>
+        <div class='body contains-submodules two-columns'>
             <div class='body'>
                 <form name='edit-tags'
-                    action='/people/info/edit/do'
-                    method='POST'>
+                        action='/people/info/edit/do'
+                        method='POST'>
 
-                      <h3>You, in a nutshell</h3>
-		    
-                    <div class='form-row'>
-                        <label>bio:</label>
-                        <textarea name='edit-tags-bio'>{{ person.bio }}</textarea>
-                        <p class='example'>Example: I like traffic lights. On weekends, I like to make websites, destroy Twitter, and eat breakfast.</p>
-                    </div>
+                        <h3>You, in a nutshell</h3>
 
-                    <div class='form-row'>
-                        <label>homepage url:</label>
-                        <input type='text' name='edit-tags-homepage_url' value='{{ person.homepage_url }}'>
-                        <p class='example'>Example: http://geociti.es/Heartland/2042/</p>
-                    </div>
+                        <div class='form-row'>
+                            <label>bio:</label>
+                            <textarea name='edit-tags-bio'>{{ person.bio }}</textarea>
+                            <p class='example'>Example: I like traffic lights. On weekends, I like to make websites, destroy Twitter, and eat breakfast.</p>
+                        </div>
 
-                    <div class='form-row'>
-                        <h3 style='float: left; width: 95%; margin-bottom: 3px;'>Tag yourself</h3>
-                        <p class='why'>This information will help people find you in the <a href='/people/'>People Search</a>. It'll also appear on your profile.</p>
-                    </div>
+                        <div class='form-row'>
+                            <label>web site:</label>
+                            <input type='text' name='edit-tags-homepage_url' value='{{ person.homepage_url }}'>
+                            <p class='example'>Example: http://geociti.es/Heartland/2042/</p>
+                        </div>
 
-                    <div class='form-row'>
-                        <label>I understand:</label>
-                        <textarea name='edit-tags-understands'>{{ tags_flat.understands }}</textarea>
-                        <p class='example'>Example: ruby, wordpress, regular expressions, classical guitar</p>
-                    </div>
+                        <div class='form-row'>
+                            <h3 style='float: left; width: 95%; margin-bottom: 3px;'>Tag yourself</h3>
+                            <p class='why'>After you save, these tags will appear on your profile. Click them to find similar people. {# In the near future, this information will help people find you in the <a href='/people/'>People Search</a>.#} </p>
+                        </div>
 
-                    <div class='form-row'>
-                        <label>I will never understand:</label>
-                        <textarea name='edit-tags-understands_not'>{{ tags_flat.understands_not }}</textarea>
-                        <p class='example'>Example: Swing, Star Trek, the transcendental deduction, why kids love Cinnamon Toast Crunch</p>
-                    </div>
+                        <div class='form-row'>
+                            <label>I understand:</label>
+                            <textarea name='edit-tags-understands'>{{ tags_flat.understands }}</textarea>
+                            <p class='example'>Example: ruby, wordpress, regular expressions, classical guitar</p>
+                        </div>
 
-                    <div class='form-row'>
-                        <label>I'm currently studying:</label>
-                        <textarea name='edit-tags-studying'>{{ tags_flat.studying }}</textarea>
-                        <p class='example'>Example: Qt, DVD DRM circumvention, 合気道, Bayesian inference, neural networks</p>
-                    </div>
+                        <div class='form-row'>
+                            <label>I will never understand:</label>
+                            <textarea name='edit-tags-understands_not'>{{ tags_flat.understands_not }}</textarea>
+                            <p class='example'>Example: Swing, Star Trek, the transcendental deduction, why kids love Cinnamon Toast Crunch</p>
+                        </div>
 
-                    <div class='form-row'>
-                        <h3 style='float: left; width: 95%; margin-bottom: 3px;'>Volunteering</h3>
-                        <p class='why'>These tags help us match you with interesting people and projects.</p>
-                    </div>
+                        <div class='form-row'>
+                            <label>I'm currently studying:</label>
+                            <textarea name='edit-tags-studying'>{{ tags_flat.studying }}</textarea>
+                            <p class='example'>Example: Qt, DVD DRM circumvention, 合気道, Bayesian inference, neural networks</p>
+                        </div>
 
-                    <div class='form-row'>
-                        <label>When projects need help, I'm willing to pitch in with:</label>
-                        <textarea name='edit-tags-seeking'>{{ tags_flat.seeking }}</textarea>
-                        <p class='example'>Example: c++, documentation, testing, mac compatibility</p>
-                    </div>
+                        <div class='form-row'>
+                            <h3 style='float: left; width: 95%; margin-bottom: 3px;'>Volunteering</h3>
+                            <p class='why'>These tags help us match you with interesting people and projects.</p>
+                        </div>
 
-                    <div class='form-row'>
-                        <label>I can mentor in:</label>
-                        <textarea name='edit-tags-can_mentor'>{{ tags_flat.can_mentor }}</textarea>
-                        <p class='example'>Example: python, unicode, git, GTK+</p>
-                    </div>
+                        <div class='form-row'>
+                            <label>When projects need help, I'm willing to pitch in with:</label>
+                            <textarea name='edit-tags-seeking'>{{ tags_flat.seeking }}</textarea>
+                            <p class='example'>Example: c++, documentation, testing, mac compatibility</p>
+                        </div>
 
-                    <input class='save-button' type='submit' style='float: left;' value='Save' />
-                </form>
-            </div>      
-        </div> 
-    </div>      
-</div> 
-{% endblock %}
+                        <div class='form-row'>
+                            <label>I can mentor in:</label>
+                            <textarea name='edit-tags-can_mentor'>{{ tags_flat.can_mentor }}</textarea>
+                            <p class='example'>Example: python, unicode, git, GTK+</p>
+                        </div>
+
+                        <input class='save-button' type='submit' style='float: left;' value='Save' />
+                    </form>
+                </div>      
+            </div> 
+        {% endblock %}
