@@ -438,17 +438,24 @@ class ImportDebianMaintenance(BaseCeleryTest):
                 'Maintain a package in Debian.',
                 ]
 
-        return self._test_data_source_via_emulated_bgtask(
-                source='db', data_we_expect=data_we_expect,
-                summaries_we_expect=summaries_we_expect)
+        self._test_data_source_via_emulated_bgtask(
+            source='db', data_we_expect=data_we_expect,
+            summaries_we_expect=summaries_we_expect)
         # }}}
 
         # PLUS test that there is a has a description!
         self.assertEqual(PortfolioEntry.objects.all().count(),
-                         1) # just the one we want
-        self.assertEqual(PortfolioEntry.objects.get().project_description,
+                         2) # mock ccHost + Debian
+        self.assertEqual(PortfolioEntry.objects.get(project__name='MOCK ccHost'
+                                                    ).project_description,
                          description)
-        # FIXME: Verify we create a Debian box...
+
+        # PLUS test that we create a Debian PortfolioEntry
+        debian_pfe = PortfolioEntry.objects.get(project__name='Debian')
+        debian_citations = Citation.objects.filter(portfolio_entry=debian_pfe)
+        debian_citation = debian_citations[0]
+        self.assertEqual(debian_citation.summary,
+                         "Maintainer of MOCK ccHost")
         # }}}
 
 
@@ -1528,9 +1535,9 @@ class ImportGithubCollaborators(BaseCeleryTest):
                 'Collaborated on a repository on Github.',
                 ]
 
-        return self._test_data_source_via_emulated_bgtask(
-                source='ga', data_we_expect=data_we_expect,
-                summaries_we_expect=summaries_we_expect)
+        self._test_data_source_via_emulated_bgtask(
+            source='ga', data_we_expect=data_we_expect,
+            summaries_we_expect=summaries_we_expect)
         # }}}
 
         # PLUS test that the PFE has a description!

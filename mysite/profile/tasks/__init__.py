@@ -138,6 +138,9 @@ def create_citations_from_debianqa_results(dia_id, results):
     for package_name, package_description in results:
         (project, _) = Project.objects.get_or_create(name=package_name)
 
+        package_link = 'http://packages.debian.org/src:' + urllib.quote(
+            package_name)
+
         if PortfolioEntry.objects.filter(person=person, project=project).count() == 0:
             portfolio_entry = PortfolioEntry(person=person,
                                              project=project,
@@ -150,8 +153,24 @@ def create_citations_from_debianqa_results(dia_id, results):
         citation.contributor_role='Maintainer'
         citation.portfolio_entry = portfolio_entry
         citation.data_import_attempt = dia
-        citation.url = 'http://packages.debian.org/src:' + urllib.quote(
-            package_name)
+        citation.url = package_link
+        citation.save_and_check_for_duplicates()
+
+        # And add a citation to the Debian portfolio entry
+        (project, _) = Project.objects.get_or_create(name='Debian')
+        if PortfolioEntry.objects.filter(person=person, project=project).count() == 0:
+            portfolio_entry = PortfolioEntry(person=person,
+                                             project=project,
+                                             project_description=
+                                             'The universal operating system')
+            portfolio_entry.save()
+        portfolio_entry = PortfolioEntry.objects.filter(person=person, project=project)[0]
+        citation = Citation()
+        citation.languages = '' # FIXME: ?
+        citation.contributor_role='Maintainer of %s' % package_name
+        citation.portfolio_entry = portfolio_entry
+        citation.data_import_attempt = dia
+        citation.url = package_link
         citation.save_and_check_for_duplicates()
 
     person.last_polled = datetime.datetime.now()
