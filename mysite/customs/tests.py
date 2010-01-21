@@ -498,7 +498,7 @@ class OnlineGithub(django.test.TestCase):
 
     def test_find_tircd_for_phinze(self):
         '''This test gives our github info_by_username a shot.'''
-        repos = mysite.customs.github.info_by_username('phinze')
+        repos = mysite.customs.github.repos_by_username('phinze')
         found_tircd_yet = False
         for repo in repos:
             if repo.name == 'tircd':
