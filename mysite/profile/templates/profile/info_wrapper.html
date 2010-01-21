@@ -28,13 +28,13 @@ Edit your info
     blockquote {
         margin: .5em 20px;
     }
-    label { float: left; margin: 0; padding: 0; width: 100%; }
-    textarea {
-        height: 4em;
-    }
+    label { float: left; margin: 0; padding: 0; width: 100%; font-size: 10pt; }
+    textarea { height: 2.5em; }
     input[type="text"], textarea {
         width: 100%;
     }
+    p.example { color: #888; font-size: 8pt; }
+    p.why { color: #555; font-size: 10pt; margin-bottom: 0;}
 </style>
 <div class='module'>
     <div class='head'>
@@ -60,45 +60,57 @@ Edit your info
 		    
                     <div class='form-row'>
                         <label>bio:</label>
-                        <textarea title="A bit about you" name='edit-tags-bio'>{{ person.bio }}</textarea>
-                        <p style="color: #888;">Example: I like traffic lights. On weekends, I like to make websites, destroy Twitter, and eat breakfast.</p>
+                        <textarea name='edit-tags-bio'>{{ person.bio }}</textarea>
+                        <p class='example'>Example: I like traffic lights. On weekends, I like to make websites, destroy Twitter, and eat breakfast.</p>
                     </div>
 
                     <div class='form-row'>
                         <label>homepage url:</label>
-                        <input title='http://you.com/' type='text' name='edit-tags-homepage_url'>{{ person.homepage_url }}</textarea>
-                        <p style="color: #888;">Example: http://you.name/</p>
-                    </div>
-
-                      <h3>Your personality, split on commas</h3>
-                      <p style="clear: both;">Examples: <tt>c++, lambda calculus, juggling</tt></p>
-		    
-                    <div class='form-row'>
-                        <label>understand:</label>
-                        <textarea title="e.g., python, regular expressions" name='edit-tags-understands'>{{ tags_flat.understands }}</textarea>
+                        <input type='text' name='edit-tags-homepage_url' value='{{ person.homepage_url }}'>
+                        <p class='example'>Example: http://geociti.es/Heartland/2042/</p>
                     </div>
 
                     <div class='form-row'>
-                        <label>will never understand:</label>
-                        <textarea title="linear algebra, strawberry shortcake" name='edit-tags-understands_not'>{{ tags_flat.understands_not }}</textarea>
+                        <h3 style='float: left; width: 95%; margin-bottom: 3px;'>Tag yourself</h3>
+                        <p class='why'>This information will help people find you in the <a href='/people/'>People Search</a>. It'll also appear on your profile.</p>
                     </div>
 
                     <div class='form-row'>
-                        <label>looking for volunteering opportunities tagged with:</label>
-                        <textarea name='edit-tags-seeking'>{{ tags_flat.seeking }}</textarea>
+                        <label>I understand:</label>
+                        <textarea name='edit-tags-understands'>{{ tags_flat.understands }}</textarea>
+                        <p class='example'>Example: ruby, wordpress, regular expressions, classical guitar</p>
                     </div>
 
                     <div class='form-row'>
-                        <label>currently studying:</label>
+                        <label>I will never understand:</label>
+                        <textarea name='edit-tags-understands_not'>{{ tags_flat.understands_not }}</textarea>
+                        <p class='example'>Example: Swing, Star Trek, the transcendental deduction, why kids love Cinnamon Toast Crunch</p>
+                    </div>
+
+                    <div class='form-row'>
+                        <label>I'm currently studying:</label>
                         <textarea name='edit-tags-studying'>{{ tags_flat.studying }}</textarea>
+                        <p class='example'>Example: Qt, DVD DRM circumvention, 合気道, Bayesian inference, neural networks</p>
                     </div>
 
                     <div class='form-row'>
-                        <label>can mentor in:</label>
-                        <textarea name='edit-tags-can_mentor'>{{ tags_flat.can_mentor }}</textarea>
+                        <h3 style='float: left; width: 95%; margin-bottom: 3px;'>Volunteering</h3>
+                        <p class='why'>These tags help us match you with interesting people and projects.</p>
                     </div>
 
-                    <input class='save-button' type='submit' value='Save' />
+                    <div class='form-row'>
+                        <label>When projects need help, I'm willing to pitch in with:</label>
+                        <textarea name='edit-tags-seeking'>{{ tags_flat.seeking }}</textarea>
+                        <p class='example'>Example: c++, documentation, testing, mac compatibility</p>
+                    </div>
+
+                    <div class='form-row'>
+                        <label>I can mentor in:</label>
+                        <textarea name='edit-tags-can_mentor'>{{ tags_flat.can_mentor }}</textarea>
+                        <p class='example'>Example: python, unicode, git, GTK+</p>
+                    </div>
+
+                    <input class='save-button' type='submit' style='float: left;' value='Save' />
                 </form>
             </div>      
         </div> 
