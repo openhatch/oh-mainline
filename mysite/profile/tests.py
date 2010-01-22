@@ -1317,7 +1317,8 @@ class MapTagsRemoveDuplicates(TwillTests):
         link_three = Link_Person_Tag(person=pp, tag=tag_seeking)
         link_three.save()
 
-        self.assertEqual(pp.get_tag_texts_for_map(), [])
+        self.assertEqual(map(lambda x: x.lower(), pp.get_tag_texts_for_map()),
+                         map(lambda x: x.lower(), ['something I understand']))
 
 class ProjectGetMentors(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
