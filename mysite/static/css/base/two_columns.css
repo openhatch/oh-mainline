@@ -8,6 +8,8 @@ body.two_columns #main { width: 713px; float: left; }
 	body.two_columns #main .module > .body { width: 663px; border-bottom: 1px solid #f4f4f4; }
 body.two_columns #left .notification { padding: 10px 20px; width: 120px; margin: 0; }
 body.two_columns #main .notification { padding: 10px 20px; width: 590px; margin-top: 10px; }
+body.two_columns .notification .little{ font-size: .9em; }
+body.two_columns .notification a{ font-weight: bold }
 body.two_columns #main .submodule { width: 660px; }
 	body.two_columns #main .submodule .head h3 { width: 620px; }
 	body.two_columns #main .submodule .body { float: left; padding: 20px; width: 620px; background-color: #fff; }
