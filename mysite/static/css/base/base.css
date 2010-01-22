@@ -123,6 +123,11 @@ h1 {
     height: 90px;
     border-top: 0;
 }
+#homepage #nav {
+    /* On the homepage, we let the top nav be as non-tall as possible. */
+    height: auto;
+}
+
 #nav h2 {
     width: 128px;
     text-align: center;
