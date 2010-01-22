@@ -128,6 +128,14 @@ h1 {
     height: auto;
 }
 
+#homepage #account-links {
+    padding-right: 8px;
+}
+
+#homepage #nav ul#topnavlinks {
+    padding-left: 0px;
+}
+
 #nav h2 {
     width: 128px;
     text-align: center;
