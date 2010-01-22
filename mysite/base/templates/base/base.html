@@ -44,11 +44,13 @@
                 <div class='section' id='nav'>
                     <div class='center'>
                         <div class='float'>
+                            {% block nav_logo %}
                             <h2>
                                 <a href='/'>
-                                    {% block nav_logo %}<img src='/static/images/the-logo-bluegreen-125px.png' alt='openhatch' />{% endblock nav_logo %}
+                                    <img src='/static/images/the-logo-bluegreen-125px.png' alt='openhatch' />
                                 </a>
                             </h2>
+                            {% endblock nav_logo %}
                             <ul id='topnavlinks'>
                                 <li><a href='{% url mysite.search.views.fetch_bugs %}'><strong>volunteer opportunities</strong></a></li>
                                 <li><a href='{% url mysite.project.views.projects %}'><strong>all projects</strong></a></li>
