@@ -28,25 +28,54 @@
                 </ul>
             {% else %}
                 {% if editable %}
-                <div id='add_contribs_notification' class='notification'>
-                    <div class='body'>
-                        <p>
-                        <a href='{% url mysite.profile.views.portfolio_editor %}'>
-                            <strong style="font-size: 1.7em; width: 100%; display: block">Add Projects &raquo;</strong>
-                        </a>
-                        </p>
-                        <p>
-                        <strong>Nothing to show off yet?</strong>
-                        No problem! Let us help you <a href='{% url mysite.search.views.fetch_bugs %}'>find a bug to work on &raquo;</a>
-                        </p>
-
-                    </div>
+                {# YOUR profile lacks projects. #}
+                <style>
+                    body.two_columns #portfolio.module > .body { width: 97%; padding: 10px; }
+                    body.two_columns #portfolio .notification { width: 94%; margin: 0; }
+                    body.two_columns #portfolio a .notification .arrow { float: right; font-size: 6.0em; line-height: 50%; color: orange; }
+                    body.two_columns #portfolio a:hover strong { text-decoration: underline;  }
+                    body.two_columns #portfolio a:hover .notification .arrow { color: #ff6d3d;  }
+                    body.two_columns #portfolio .get-involved { background-color: #666; padding: 8px; color: #fff; float: left; }
+                    body.two_columns #portfolio strong { color: #ff6d3d; font-size: 1.7em; text-shadow: 0 1px 0 rgb(200, 200, 200, .5); width: 100%; display: block; }
+                    body.two_columns #portfolio .smaller strong { font-size: 1.2em; }
+                    body.two_columns #portfolio a .notification.smaller .arrow { font-size: 4em; }
+                </style>
+                <a href='{% url mysite.profile.views.portfolio_editor %}'>
+                <div class='notification'>
+                        <div class='arrow' style=''>&rarr; <!--&#9654;--></div>
+                        <strong style="color: #ff6d3d; font-size: 1.7em; text-shadow: 0 1px 0 rgb(200, 200, 200, .5); width: 100%; display: block; ">
+                            Aggregate your open source involvement 
+                            </strong>
+                        <span style='font-size: 1.2em;'>
+                            Add projects automagically by providing your usernames.
+                            We'll find your bug reports, translations, patches, and code commits.
+                        </span>
                 </div>
+                </a>
+
+                <h4 style='width: 100%; font-size: 1.2em; margin-top: 20px;'>Or join a project:</h4>
+                <a href='{% url mysite.profile.views.portfolio_editor %}'>
+                <div class='notification smaller' style='margin-top: 10px;'>
+                        <div class='arrow' style=''>&rarr; <!--&#9654;--></div>
+                        <strong>
+                            Find a bug to work on
+                        </strong>
+                </div>
+                </a>
+
+                <a href='{% url mysite.profile.views.portfolio_editor %}'>
+                <div class='notification smaller' style='margin-top: 10px;'>
+                        <div class='arrow' style=''>&rarr; <!--&#9654;--></div>
+                        <strong>
+                            Find someone near you to work with
+                        </strong>
+                </div>
+                </a>
+
                 {% else %}
                 {# Someone else's profile lacks projects. #}
                 <small style='color: #777;'>Nothing listed yet.</small>
                 {% endif %}
-
             {% endif %}
         {% endwith %}
 
