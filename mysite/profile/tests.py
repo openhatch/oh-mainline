@@ -1291,6 +1291,35 @@ class PersonGetTagsForRecommendations(TwillTests):
         # This is the functionality we're testing
         self.assertEqual([tag_i_understand], pp.get_tags_for_recommendations())
 
+class MapTagsRemoveDuplicates(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def test(self):
+        pp = Person.objects.get(user__username='paulproteus')
+
+        understands_not = TagType(name='understands_not')
+        understands_not.save()
+        understands = TagType(name='understands')
+        understands.save()
+        seeking = TagType(name='seeking')
+        seeking.save()
+
+        tag_i_understand = Tag(tag_type=understands, text='something I understand')
+        tag_i_understand.save()
+        tag_i_dont = Tag(tag_type=understands_not, text='something I dont get')
+        tag_i_dont.save()
+        tag_seeking = Tag(tag_type=seeking, text='something I UNDERSTAND')
+        tag_seeking.save()
+        link_one = Link_Person_Tag(person=pp, tag=tag_i_understand)
+        link_one.save()
+        link_two = Link_Person_Tag(person=pp, tag=tag_i_dont)
+        link_two.save()
+        link_three = Link_Person_Tag(person=pp, tag=tag_seeking)
+        link_three.save()
+
+        self.assertEqual(map(lambda x: x.lower(), pp.get_tag_texts_for_map()),
+                         map(lambda x: x.lower(), ['something I understand']))
+
 class ProjectGetMentors(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
 
@@ -1319,6 +1348,15 @@ class SuggestLocation(TwillTests):
         self.assertEqual(data['geoip_has_suggestion'], True)
         self.assertEqual(data['geoip_guess'], "Rochester, NY, United States")
 
+    def test_iceland(self):
+        """We wrote this test because MaxMind gives us back a city in Iceland. That city
+        has a name not in ASCII. MaxMind's database seems to store those values in Latin-1,
+        so we verify here that we properly decode that to pure beautiful Python Unicode."""
+        data = {}
+        data['geoip_has_suggestion'], data['geoip_guess'] = mysite.profile.controllers.get_geoip_guess_for_ip("89.160.147.41")
+        self.assertEqual(data['geoip_has_suggestion'], True)
+        self.assertEqual(type(data['geoip_guess']), unicode)
+        self.assertEqual(data['geoip_guess'], u'Reykjav\xedk, 10, Iceland')
 
 class EditBio(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
