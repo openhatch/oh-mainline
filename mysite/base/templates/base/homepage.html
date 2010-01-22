@@ -10,7 +10,9 @@ Welcome to OpenHatch!
 
 {% block body_class %}{{ block.super }} auth{% endblock %}
 
-{% block nav %}{% endblock %}
+{% block nav_logo %}{% comment %}
+We replace the nav_logo with the empty string on the front page, since there is a ginormous logo there already. %}
+{% endcomment %}{% endblock nav_logo %}
 
 {% block greeting %}{% endblock %}
 
