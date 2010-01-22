@@ -1326,6 +1326,7 @@ class SuggestLocation(TwillTests):
         data = {}
         data['geoip_has_suggestion'], data['geoip_guess'] = mysite.profile.controllers.get_geoip_guess_for_ip("89.160.147.41")
         self.assertEqual(data['geoip_has_suggestion'], True)
+        self.assertEqual(type(data['geoip_guess']), unicode)
         self.assertEqual(data['geoip_guess'], u'Reykjav\xedk, 10, Iceland')
 
 class EditBio(TwillTests):
