@@ -1319,6 +1319,15 @@ class SuggestLocation(TwillTests):
         self.assertEqual(data['geoip_has_suggestion'], True)
         self.assertEqual(data['geoip_guess'], "Rochester, NY, United States")
 
+    def test_iceland(self):
+        """We wrote this test because MaxMind gives us back a city in Iceland. That city
+        has a name not in ASCII. MaxMind's database seems to store those values in Latin-1,
+        so we verify here that we properly decode that to pure beautiful Python Unicode."""
+        data = {}
+        data['geoip_has_suggestion'], data['geoip_guess'] = mysite.profile.controllers.get_geoip_guess_for_ip("89.160.147.41")
+        self.assertEqual(data['geoip_has_suggestion'], True)
+        self.assertEqual(type(data['geoip_guess']), unicode)
+        self.assertEqual(data['geoip_guess'], u'Reykjav\xedk, 10, Iceland')
 
 class EditBio(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
