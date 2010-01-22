@@ -2,6 +2,7 @@ body {
     font: 9pt sans-serif;
     background: #fff url("/static/images/motif-eee.png") fixed;
     color: #222;
+    /* color: rgb(55,84,105); dark blue */
     max-width: 1000px;
     margin: 0 auto;
     padding: 0;
@@ -284,7 +285,7 @@ abbr.foss {
 .notification {
     float: left;
     width: 95%;
-    background-color: #ffa;
+    background-color: #f5fdc1; /*#edec7f; #ffa;*/
     -moz-border-radius: 8px;
     border-radius: 8px;
     padding: 10px;

@@ -20,32 +20,36 @@
     </div>
     <div class='body'>
         {% with person.get_published_portfolio_entries as portfolio_entries %} 
-        {% if portfolio_entries %}
-        <ul>
-            {% for pf_entry in portfolio_entries %}
-            {% include 'profile/portfolio/portfolio_entry_element.html' %}
-            {% endfor %}
-        </ul>
-        {% else %}
-        {% if editable %}
-        <div id='add_contribs_notification' class='notification'>
-            <div class='body'>
-            <p>
-            <a href='{% url mysite.profile.views.portfolio_editor %}'>
-                <strong style="font-size: 1.7em; width: 100%; display: block">Add Projects &raquo;</strong>
-            </a>
-            </p>
-            <p>
-            <strong>Nothing to show off yet?</strong>
-                No problem! Let us help you <a href='{% url mysite.search.views.fetch_bugs %}'>find a bug to work on &raquo;</a>
-                </p>
+            {% if portfolio_entries %}
+                <ul>
+                    {% for pf_entry in portfolio_entries %}
+                    {% include 'profile/portfolio/portfolio_entry_element.html' %}
+                    {% endfor %}
+                </ul>
+            {% else %}
+                {% if editable %}
+                <div id='add_contribs_notification' class='notification'>
+                    <div class='body'>
+                        <p>
+                        <a href='{% url mysite.profile.views.portfolio_editor %}'>
+                            <strong style="font-size: 1.7em; width: 100%; display: block">Add Projects &raquo;</strong>
+                        </a>
+                        </p>
+                        <p>
+                        <strong>Nothing to show off yet?</strong>
+                        No problem! Let us help you <a href='{% url mysite.search.views.fetch_bugs %}'>find a bug to work on &raquo;</a>
+                        </p>
 
-            </div>
-        </div>
-        {% endif %}
-        <div style='float: left; font-size: 10pt; padding: 10px 20px; width: 500px;'>This person hasn't listed any contributions yet.</div>
-        {% endif %}
+                    </div>
+                </div>
+                {% else %}
+                {# Someone else's profile lacks projects. #}
+                <small style='color: #777;'>Nothing listed yet.</small>
+                {% endif %}
+
+            {% endif %}
         {% endwith %}
+
     </div>
 </div> <!-- /#portfolio -->
 {% endblock main %}

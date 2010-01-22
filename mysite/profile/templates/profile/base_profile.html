@@ -91,9 +91,23 @@
 
 {% block left %}
 <div id='avatar' class='module'>
-    <img src='{{ photo_url }}' />
     {% if editable %}
+    {% if person.photo %}
+    <img src='{{ photo_url }}' />
     <div class='change-photo-link'><a href="/account/edit/photo/">Change photo</a></div>
+    {% else %}
+    {# Haven't uploaded a photo yet #}
+    <style>
+        #avatar .notification { color: inherit; font-size: 1.2em; text-align: center; margin: 0; font-weight: bold; padding: 16px 8px ! important; margin-left: 45px; width: 100px; background-color: rgba(245, 253, 193, .8); }
+        #avatar a:hover { text-decoration: none; }
+        #avatar a:hover .notification {  background-color: rgba(245, 253, 193, 1) ! important; }
+
+        #avatar .default_image { float: left; width: 200px; height: 257px; background: url('{{ photo_url }}') no-repeat; }
+    </style>
+    <a href="/account/edit/photo/" class='default_image'>
+        <div class='notification' >Upload a photo</div>
+    </a>
+    {% endif %}
     {% endif %}
 </div>
 
@@ -110,14 +124,25 @@
 
     </div>
 
+        {% if editable and not person.bio and not person.homepage_url and not tags_flat %}
+    <div class='body has_notification'>
+        {% else %}
     <div class='body'>
-<style>
-    h4 { padding: 0;}
-</style>
-        {% if not person.bio and not person.homepage_url %}
+        {% endif %}
+        <style>
+            h4 { padding: 0;}
+        </style>
+
+        {% if not editable and not person.bio and not person.homepage_url and not tags_flat %}
+        {# When someone else's info box is empty #}
+        <small style='color: #777;'>Nothing here yet.</small>
+        {% endif %}
+
+        {% if not person.bio and not person.homepage_url and not tags_flat %}
         {% ifequal the_user.get_profile person %}
         <div class='notification' style='width: '>
-            <strong style="font-size: 1.2em; display: block; width: 100%;"><a href='{% url mysite.profile.views.edit_info %}'>Tell us about you &raquo;</a></strong>
+            <strong style="font-size: 1.2em; display: block; width: 100%;"><a href='{% url mysite.profile.views.edit_info %}'>Add info &raquo;</a></strong>
+            <p>We'll use it to connect you to interesting people and projects.</p>
         </div>
         {% endifequal %}
         {% endif %}
@@ -145,30 +170,8 @@
             </ul>
         </div>
         {% endcomment %} 
-    </div>
-</div>
-<div id='info' class='module'>
-    <div class='head'>
-        {% if editable and not info_edit_mode %}
-        <ul>
-            <li><a class='edit' href='{% url mysite.profile.views.edit_info %}'>Edit</a></li>
-        </ul>
-        {% endif %}
 
-        <h3>Tags</h3>
 
-    </div>
-    <div class='body'>
-        {% if not tags_flat %}
-        {% ifequal the_user.get_profile person %}
-        <div class='notification' style='width: '>
-            <strong style="font-size: 1.2em; display: block; width: 100%;"><a href='{% url mysite.profile.views.edit_info %}'>Add Tags &raquo;</a></strong>
-            <p class="little">
-            Tags help us connect you to people with similar interests.
-            </p>
-        </div>
-        {% endifequal %}
-        {% endif %}
 
         {% if tags.understands and tags_flat.understands %}
         <div class='tags' id='tags-understands'>
