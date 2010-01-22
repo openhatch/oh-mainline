@@ -39,38 +39,45 @@
                     body.two_columns #portfolio strong { color: #ff6d3d; font-size: 1.7em; text-shadow: 0 1px 0 rgb(200, 200, 200, .5); width: 100%; display: block; }
                     body.two_columns #portfolio .smaller strong { font-size: 1.2em; }
                     body.two_columns #portfolio a .notification.smaller .arrow { font-size: 4em; }
+                    body.two_columns #portfolio a .notification.smaller strong { font-size: 1.2em; }
+                    body.two_columns #portfolio .body li { float: left; width: 100%;  }
+                    body.two_columns #portfolio .body li:first-child { margin-bottom: 5px; }
+                    body.two_columns #portfolio .body { background: #fff; }
                 </style>
-                <a href='{% url mysite.profile.views.portfolio_editor %}'>
-                <div class='notification'>
-                        <div class='arrow' style=''>&rarr; <!--&#9654;--></div>
-                        <strong style="color: #ff6d3d; font-size: 1.7em; text-shadow: 0 1px 0 rgb(200, 200, 200, .5); width: 100%; display: block; ">
-                            Aggregate your open source involvement 
+
+                <ul>
+                    <li>
+                    <a href='{% url mysite.profile.views.portfolio_editor %}'>
+                        <div class='notification'>
+                            <div class='arrow' style=''>&rarr; <!--&#9654;--></div>
+                            <strong>
+                                Aggregate your open source involvement 
                             </strong>
-                        <span style='font-size: 1.2em;'>
-                            Add projects automagically by providing your usernames.
-                            We'll find your bug reports, translations, patches, and code commits.
-                        </span>
-                </div>
-                </a>
+                            <span style='font-size: 1.2em;'>
+                                Add projects automagically by providing your usernames.
+                                We'll find your bug reports, translations, patches, and code commits.
+                            </span>
+                        </div>
+                    </a>
+                    </li>
 
-                <h4 style='width: 100%; font-size: 1.2em; margin-top: 20px;'>Or join a project:</h4>
-                <a href='{% url mysite.profile.views.portfolio_editor %}'>
-                <div class='notification smaller' style='margin-top: 10px;'>
-                        <div class='arrow' style=''>&rarr; <!--&#9654;--></div>
-                        <strong>
-                            Find a bug to work on
-                        </strong>
-                </div>
-                </a>
+                    <li>
+                    <a href='{% url mysite.profile.views.portfolio_editor %}'>
+                        <div class='notification smaller'>
+                            <div class='arrow' style=''>&rarr; <!--&#9654;--></div>
+                            <span>
+                                Want something to put here?
+                            </span>
+                            <strong>
+                                Find a bug or other volunteering opportunity
+                            </strong>
+                        </div>
+                    </a>
+                    </li>
+                </ul>
 
-                <a href='{% url mysite.profile.views.portfolio_editor %}'>
-                <div class='notification smaller' style='margin-top: 10px;'>
-                        <div class='arrow' style=''>&rarr; <!--&#9654;--></div>
-                        <strong>
-                            Find someone near you to work with
-                        </strong>
-                </div>
-                </a>
+                {# To find things to do in the open source community, use our volunteer opportunity finder.   #}
+                {# <a href='{% url mysite.search.views.fetch_bugs %}'>find a bug to work on</a>. <a href='{% url mysite.search.views.fetch_bugs %}'>find someone near you to work with</a>#}
 
                 {% else %}
                 {# Someone else's profile lacks projects. #}
