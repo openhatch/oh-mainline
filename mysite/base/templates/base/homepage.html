@@ -10,9 +10,9 @@ Welcome to OpenHatch!
 
 {% block body_class %}{{ block.super }} auth{% endblock %}
 
-{% block nav_logo %}{% comment %}
-We replace the nav_logo with the empty string on the front page, since there is a ginormous logo there already. %}
-{% endcomment %}{% endblock nav_logo %}
+{% block nav %}{% comment %}
+Empty nav block; we include nav.html ourselves, thank you very much.
+{% endcomment %}{% endblock nav %}
 
 {% block greeting %}{% endblock %}
 
@@ -54,6 +54,9 @@ We replace the nav_logo with the empty string on the front page, since there is 
 </div>
 
 <div id='entry-points'>
+    {% with 1 as dont_display_nav_logo %}
+    {% include 'base/nav.html' %}
+    {% endwith %}
     <div class='module' id='explanation'>
         <h3>
             Want to get (more) involved in <strong>open source</strong>?
