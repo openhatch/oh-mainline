@@ -10,8 +10,8 @@
                             {% endif %}
                             <ul id='topnavlinks'>
                                 <li><a href='{% url mysite.search.views.fetch_bugs %}'><strong>volunteer opportunities</strong></a></li>
-                                <li><a href='{% url mysite.project.views.projects %}'><strong>all projects</strong></a></li>
-                                <li><a href='{% url mysite.profile.views.people_map%}'><strong>all people</strong></a></li>
+                                <li><a href='{% url mysite.project.views.projects %}'><strong>{% if the_user.is_authenticated %} all {% endif %} projects</strong></a></li>
+                                <li><a href='{% url mysite.profile.views.people_map%}'><strong>{% if the_user.is_authenticated %} all {% endif %} people</strong></a></li>
                                 {% if the_user.is_authenticated %}
                                 <li><a href='{% url mysite.profile.views.display_person_web the_user.username %}'><strong>profile</strong></a></li>
                                 <li><a href='{% url mysite.base.views.homepage %}'><strong>home</strong></a></li>
