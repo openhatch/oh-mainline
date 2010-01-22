@@ -174,9 +174,11 @@ ul#links { margin-left: 20px; }
 
 #account-links { float: right; }
 
-#account-links li { margin: 0; font-size: 11pt; }
+#nav ul#topnavlinks { float: left; padding-left: 10px; }
 
-#account-links a { float: left; padding: 5px 10px; color: #484848; }
+#topnavlinks li, #account-links li { margin: 0; font-size: 11pt; }
+
+#topnavlinks a, #account-links a { float: left; padding: 5px 10px; color: #484848; }
 
 #content { width: 960px; padding: 20px; padding-bottom: 5px; clear: both; }
 
