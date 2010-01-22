@@ -49,20 +49,23 @@
                                     <img src='/static/images/the-logo-bluegreen-125px.png' alt='openhatch' />
                                 </a>
                             </h2>
+                            <ul id='topnavlinks'>
+                                <li><a href='{% url mysite.search.views.fetch_bugs %}'><strong>volunteer opportunities</strong></a></li>
+                                <li><a href='{% url mysite.project.views.projects %}'><strong>all projects</strong></a></li>
+                                <li><a href='{% url mysite.profile.views.people_map%}'><strong>all people</strong></a></li>
+                                {% if the_user.is_authenticated %}
+                                <li><a href='{% url mysite.profile.views.display_person_web the_user.username %}'><strong>profile</strong></a></li>
+                                <li><a href='{% url mysite.base.views.homepage %}'><strong>home</strong></a></li>
+                                {% endif %}
+                            </ul>
                             <ul id='account-links'>
                                 {% if the_user.is_authenticated %}
                                 <!-- user.is_authenticated indeed -->
                                 <li><a href='{% url mysite.account.views.logout %}'>log out</a></li>
                                 <li><a href='{% url mysite.account.views.settings %}'>settings</a></li>
+                                <li><a href='{% url mysite.profile.views.display_person_web the_user.username %}'>{{ the_user.get_profile.get_full_name_or_username }}</a></li>
                                 {% else %}
                                 <li><a href='/account/login'>log in / sign up</a></li>
-                                {% endif %}
-                                <li><a href='{% url mysite.search.views.fetch_bugs %}'>volunteer opportunities</a></li>
-                                <li><a href='{% url mysite.project.views.projects %}'>projects</a></li>
-                                <li><a href='{% url mysite.profile.views.people_map%}'>people</a></li>
-                                {% if the_user.is_authenticated %}
-                                <li><a href='{% url mysite.base.views.homepage %}'>dashboard</a></li>
-                                <li><a href='{% url mysite.profile.views.display_person_web the_user.username %}'><strong>{{ the_user.username }}'s profile</strong></a></li>
                                 {% endif %}
                             </ul>
                         {% if not the_user.get_profile.location_confirmed and the_user.get_profile.location_display_name and not the_user.get_profile.dont_guess_my_location and not dont_suggest_location %}
@@ -193,11 +196,9 @@
             <div id='footer'>
                 {% block footer %}
                 <ul>
-                    <li><a href='/'>home</a></li>
+                    <li><a href='/about/'>about openhatch</a></li>
+                    <li><a href="/bugs/">feedback</a></li>
                     <li><a href="/blog/">blog</a></li>
-                    <li><a href="/about/">about</a></li>
-                    <li><a href="/people/">people</a></li>
-                    <li><a href="/search/">volunteer opportunities</a></li>
                     <li><a href="/contact/">contact</a></li>
                     <li><a href="/source-code-etc/">source code, etc.</a></li>
                 </ul>
