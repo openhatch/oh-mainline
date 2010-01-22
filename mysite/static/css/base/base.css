@@ -190,7 +190,7 @@ ul#links { margin-left: 20px; }
 
 #nav ul#topnavlinks { float: left; padding-left: 10px; }
 
-#topnavlinks li, #account-links li { margin: 0; font-size: 11pt; }
+#topnavlinks li, #account-links li { margin: 0; font-size: .95em; }
 
 #topnavlinks a, #account-links a { float: left; padding: 5px 10px; color: #484848; }
 
