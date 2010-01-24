@@ -15,11 +15,13 @@ Map of People
             via an external stylesheet.
         {% endcomment %}
         <div id="search" style="float: right; width: 65%; margin-right: 10px;">
+	  <form action=".">
             <ul>
-                <li style="display: inline;">Center the map at:</li>
-                <li><input id="location_for_map_centering" type="text" style="float: right; display: inline; " value="{{ center_name }}"/></li>
-                <li><input id="center_the_map" type="button" style="float: right; display: inline;"/></li>
+                <li style="display: inline; float: left; margin-right: 10px;">Center the map at:</li>
+                <li style="display: inline; margin-right: 10px;" ><input id="location_for_map_centering" name="center" type="text" value="{{ center_name }}"/></li>
+                <li style="display: inline; float: left;"><input id="center_the_map" type="submit" style="float: right; display: inline;" value="Center and zoom!"/></li>
             </ul>
+	  </form>
         </div>
         <div id="map_canvas" style='float: right; margin-top: 18px; margin-right: 10px; width:65%; height:450px;'>
             <div id='map_loading_msg'>
