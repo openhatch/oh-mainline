@@ -9,7 +9,7 @@ SECTION_NAME_AND_NUMBER_SPLITTER = re.compile(r'(.*?) [(](\d+)[)]$')
 def source_packages_maintained_by(email_address):
     htmler = lxml.etree.HTMLParser(encoding='utf-8')
     url = 'http://qa.debian.org/developer.php?' + urllib.urlencode(dict(
-            login='asheesh@asheesh.org'))
+            login=email_address))
     response = mysite.customs.ohloh.mechanize_get(url).response()
     parsed = lxml.html.parse(response).getroot()
 
