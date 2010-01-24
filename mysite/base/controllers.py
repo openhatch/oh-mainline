@@ -62,9 +62,11 @@ def _geocode(address):
     # and then returns them as a string.
     try:
         coordinates = urllib.urlopen(mapsUrl + query_string).read().split(',')
-        status, suggested_zoom_level, latitude, longitude = map(float, coordinates)
+        status, accuracy, latitude, longitude = map(float, coordinates)
+        # For more info on status,
+        # http://code.google.com/apis/maps/documentation/geocoding/#GeocodingAccuracy
         if status == 200:
-            return {'suggested_zoom_level': suggested_zoom_level,
+            return {'suggested_zoom_level': max(6, int(accuracy)),
                     'latitude': latitude,
                     'longitude': longitude}
         return None
