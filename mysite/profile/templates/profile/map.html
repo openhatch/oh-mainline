@@ -75,6 +75,7 @@ Map of People
             var geocoder = new google.maps.Geocoder();
             geocoder.geocode( {'address': location},
                               callback_to_geocode_then_center_and_zoom);
+            return false;
         }
         $('#center_the_map').click(center_and_zoom_the_map);
     });
