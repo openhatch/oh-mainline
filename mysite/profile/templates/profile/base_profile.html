@@ -69,6 +69,7 @@
 	    <div style="clear: left; float: left;">
 	      {% if person.location_display_name and person.location_confirmed %}
 	      {{ person.location_display_name }}
+	      <a href="/people/?center={{ person.location_display_name }}">(see others nearby)</a>
 	      {% endif %}
               {% if editable %}
 	      <a href="{% url mysite.account.views.set_location %}">(edit location)</a>
