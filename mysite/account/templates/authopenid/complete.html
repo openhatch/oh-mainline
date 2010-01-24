@@ -1,60 +1,61 @@
-{% extends 'base/one_column.html' %}
+{% extends 'base/base.html' %}
 {% load i18n %}
 
 {% block title %}Associate your OpenID{% endblock %}
 
 {% block body_id %}associate-openid{% endblock %}
 
-{% block body_class %}{{ block.super }} auth{% endblock %}
+{% block body_class %}{{ block.super }} {% endblock %}
 
 {% block css %}
 {{ block.super }}
 body#associate-openid .errorlist li { width: 90%; }
+#openid-associate { margin: 0 380px; width: 200px; }
+#openid-associate .head { width: 200px; }
+#openid-associate .body { width: 160px; }
+#expand-second-form { margin-top: 20px; }
+#associate-with-existing-account { margin-top: 10px; display: none; }
+form p { float: none; display: block; }
+form label { float: none; display: block; }
+body#associate-openid form input { float: none; display: block; }
+body#associate-openid .body { background: #fff;} 
 {% endblock css %}
 
-{% block main %}
-<div class='module' id='openid-associate'>
+{% block content %}
+    <div class='module' id='openid-associate'>
 
-    <div class='head'>
-        <h3>{% trans "Associate your OpenID with an OpenHatch account." %}</h3>
-    </div>
-
-    <div class='body contains-submodules two-columns equal-width'>
+        <div class='head'>
+            <h3>Sign up</h3>
+        </div>
 
         <div class='body'>
-            {% blocktrans %}
-            <p>If you're joining <strong>OpenHatch</strong>, tell us what
-                username you want to use for your new account. If you're
-                already a member, associate with your existing account.</p>
-            {% endblocktrans %}
-        </div>
 
-        <div class='left submodule'>
-            <div class='head'>
-                <h3>{% trans "A new account" %}</h3>
-            </div>
-            <div class='body'>
-                <form name="fregister" action="{% url user_register %}"
+            <form name="fregister" action="{% url user_register %}"
                     method="POST" class="login">
-                    <input type="hidden" name="next" value="{{ next }}" />
-                    {{ form1.as_p }}
-                    <p><input type="submit" name="bnewaccount" value="Create a new account"></p>
-                </form>
-            </div>
-        </div>
-        <div class='right submodule'>
-            <div class='head'>
-                <h3>{% trans "An existing account" %}</h3>
-            </div>
-            <div class='body'>
-                <form name="fverify" action="{% url user_register %}" method="POST" class='login '>
-                    {{ form2.non_field_errors }}
-                    <input type="hidden" name="next" value="{{ next }}" />
-                    {{ form2.as_p }}
-                    <p><input type="submit" name="bverify" value="Associate"></p>
-                </form>
-            </div>
+                <input type="hidden" name="next" value="{{ next }}" />
+                {{ form1.as_p }}
+                <p><input type="submit" name="bnewaccount" value="Sign up"></p>
+            </form>
+            
+            <a href='#' id='expand-second-form' style='display: block; '>
+                Or associate this OpenID with an existing account.
+            </a>
+
+            <form id='associate-with-existing-account' name="fverify" action="{% url user_register %}" method="POST" class='login '>
+                {{ form2.non_field_errors }}
+                <input type="hidden" name="next" value="{{ next }}" />
+                {{ form2.as_p }}
+                <p><input type="submit" name="bverify" value="Associate"></p>
+            </form>
         </div>
     </div>
-</div>
-{% endblock main %}
+{% endblock content %}
+
+{% block js %}
+{{ block.super }}
+<script type='text/javascript'>
+$(function () {
+$('#expand-second-form').click(function () { $('#associate-with-existing-account').show(); });
+});
+</script>
+{% endblock js %}
