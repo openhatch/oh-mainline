@@ -1,4 +1,4 @@
-{% extends 'base/two_columns_fat_skinny.html' %}
+{% extends 'base/base.html' %}
 {% load base_extras %}
 {% load profile_extras %}
 
@@ -10,52 +10,15 @@ Home
 
 {% block css %}
 {{ block.super }}
-body.two_columns #main { margin-right: 20px; }
-body.two_columns #left { margin-right: 0; }
+body#landing .column { float: left; width: 31%; margin-right: 20px; }
+body#landing .module .body { background: #fff; padding: 3%; width: 94%; }
+body#landing .module .head { width: 94%; }
+body#landing .module { width: 100%; }
 {% endblock css %}
 
-{% block main %}
+{% block content %}
 
-<div class='module' id='bugs'>
-    <div class='head'>
-        <h3>Recommended bugs</h3>
-    </div>
-    <div class='body'>
-        {% if recommended_bugs %}
-        <p>Based on the projects you've worked on
-        and the languages you know, we recommend
-        you check out these bugs.</p>
-        <ul>
-            {% for bug in recommended_bugs %}
-            <li style="list-style-image: url('{{ bug.project.get_url_of_search_result_icon_or_generic }}');">
-            <span>
-                <a style='font-weight: bold;'
-                    href='{{ bug.canonical_bug_link }}'>
-                    {{ bug.title }}</a>
-                in&nbsp;{{ bug.project.name }}
-                {% if bug.project.language %}
-                (project&nbsp;language:&nbsp;{{ bug.project.language }})
-                {% endif %}
-            </span></li>
-            {% endfor %}
-        </ul>
-        <p><a href='/search/' style='float: right;'>Find more opportunities <strong>&raquo;</strong></a></p>
-        {% else %}
-        To receive recommendations, start your profile:
-        <ul>
-            <li>
-                <a href='{% url mysite.profile.views.portfolio_editor %}'>Add projects</a>
-            </li>
-            <li>
-                <a href='{% url mysite.profile.views.edit_info %}'>
-                    Tell us a little bit about you
-                </a>
-            </li>
-        </ul>
-        {% endif %}
-    </div>
-</div>
-
+<div id='left' class='column'>
 {% with the_user.get_profile.get_collaborators_for_landing_page as collaborators %}
 <div class='module' id='people'>
     <div class='head'>
@@ -80,58 +43,93 @@ body.two_columns #left { margin-right: 0; }
     </div>
 </div>
 {% endwith %}
+</div>
 
-<div class='module'>
-    <div class='head'>
-        <h3>Your widget</h3>
-    </div>
-    <div class='body contains-submodules'>
-        <div class='submodule' style='width: 50%; margin-right: 20px;'>
-            <div class='body' style='width: 85%;'>
-                <p>Showcase your open source participation on your web things.</p>
-                <div id='widget-instructions'>
-                    Include this tag wherever in your page you want to put the widget:
-                    <p style='margin-top: 10px;'>
-                    <tt>
-                        &lt;script type='text/javascript'
-                        src='https://openhatch.org/people/{{ the_user.username }}/<wbr/>openhatch-widget.js'&gt;&lt;/script&gt; </tt>
-                    </p>
-                </div>
-            </div>
+<div id='middle' class='column'>
+
+    <div class='module' id='todo'>
+        <div class='head'>
+            <h3>Things to do around here</h3>
         </div>
-        <div class='submodule widget-wrapper' style='width: 40%; border: 0; background: none;'>
-            <script type='text/javascript' src='{% url mysite.profile.views.widget_display_js the_user.username %}'></script>
+        <div class='body'>
+        </div>
+    </div>
+
+    <div class='module' id='bugs'>
+        <div class='head'>
+            <h3>Recommended bugs</h3>
+        </div>
+        <div class='body'>
+            {% if recommended_bugs %}
+            <p>Based on the projects you've worked on
+            and the languages you know, we recommend
+            you check out these bugs.</p>
+            <ul>
+                {% for bug in recommended_bugs %}
+                <li style="list-style-image: url('{{ bug.project.get_url_of_search_result_icon_or_generic }}');">
+                <span>
+                    <a style='font-weight: bold;'
+                        href='{{ bug.canonical_bug_link }}'>
+                        {{ bug.title }}</a>
+                    in&nbsp;{{ bug.project.name }}
+                    {% if bug.project.language %}
+                    (project&nbsp;language:&nbsp;{{ bug.project.language }})
+                    {% endif %}
+                </span></li>
+                {% endfor %}
+            </ul>
+            <p><a href='/search/' style='float: right;'>Find more opportunities <strong>&raquo;</strong></a></p>
+            {% else %}
+            To receive recommendations, start your profile:
+            <ul>
+                <li>
+                    <a href='{% url mysite.profile.views.portfolio_editor %}'>Add projects</a>
+                </li>
+                <li>
+                    <a href='{% url mysite.profile.views.edit_info %}'>
+                        Tell us a little bit about you
+                    </a>
+                </li>
+            </ul>
+            {% endif %}
         </div>
     </div>
 </div>
 
-{% endblock main %}
+<div id='right' class='column'>
 
-{% block left %}
-<div class='module' id='meta'>
-    <div class='head'>
-        <h3>
-            <a style='color: inherit;' href='/blog/'>
-                OpenHatch news
+    <div class='module' id='meta'>
+        <div class='head'>
+            <h3>
+                <a style='color: inherit;' href='/blog/'>
+                    OpenHatch news
+                </a>
+            </h3> 
+            <a class='blog-feed' title='RSS feed' href='/blog/feed/'>
+                <span class='alt-text'>RSS feed</span>
             </a>
-        </h3> 
-        <a class='blog-feed' title='RSS feed' href='/blog/feed/'>
-            <span class='alt-text'>RSS feed</span>
-        </a>
+        </div>
+        <div class='body'>
+            <ul>
+                {% for entry in entries %}
+                <li>
+                <a style='font-weight: bold;' href="{{ entry.link }}">{{ entry.title }}</a>
+                <div class='byline'>by {{ entry.author }} &bull; {{ entry.published_parsed|timesince_terse }} ago</div>
+                <div class="entry">
+                    {{ entry.unicode_text|truncatewords:15 }}
+                </div>
+                </li>
+                {% endfor %}
+            </ul>
+            <a style='float: right;' href='/blog/'>Get the whole blog &raquo;</a>
+        </div>
     </div>
-    <div class='body'>
-        <ul>
-            {% for entry in entries %}
-            <li>
-            <a style='font-weight: bold;' href="{{ entry.link }}">{{ entry.title }}</a>
-            <div class='byline'>by {{ entry.author }} &bull; {{ entry.published_parsed|timesince_terse }} ago</div>
-            <div class="entry">
-                {{ entry.unicode_text|truncatewords:15 }}
-            </div>
-            </li>
-            {% endfor %}
-        </ul>
-        <a style='float: right;' href='/blog/'>Get the whole blog &raquo;</a>
+
+    <div class='module'>
+        <div class='head'>
+            <h3><a href='/account/settings/widget/'>Widget yourself &rarr;</a></h3>
+        </div>
     </div>
+
 </div>
-{% endblock left %}
+{% endblock content %}
