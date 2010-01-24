@@ -343,3 +343,17 @@ dd { margin-top: .5em; margin-left: 1.2em; }
     #error #content .module { width: 400px; }
     #error #content .module .head { width: 96%; color: #aaa; padding: 2%; text-align: center; font-weight: bold; font-size: 96pt; }
     #error #content .module .body { width: 90%; }
+
+body.two_columns #portfolio .notification { width: 94%; margin: 0; padding: 10px 20px; }
+body.two_columns #portfolio .get-involved { background-color: #666; padding: 8px; color: #fff; float: left; }
+body.two_columns #portfolio .body { background: #fff; }
+
+ul.nudgebuttons li { float: left; width: 100%;  }
+ul.nudgebuttons li:first-child { margin-bottom: 5px; }
+ul.nudgebuttons a .notification .arrow { float: right; font-size: 6.0em; line-height: 50%; color: orange; }
+ul.nudgebuttons a:hover strong { text-decoration: underline;  }
+ul.nudgebuttons a:hover .notification .arrow { color: #ff6d3d;  }
+ul.nudgebuttons strong { color: #ff6d3d; font-size: 1.7em; text-shadow: 0 1px 0 rgb(200, 200, 200, .5); width: 100%; display: block; }
+ul.nudgebuttons .smaller strong { font-size: 1.2em; }
+ul.nudgebuttons a .notification.smaller .arrow { font-size: 4em; }
+ul.nudgebuttons a .notification.smaller strong { font-size: 1.2em; }
