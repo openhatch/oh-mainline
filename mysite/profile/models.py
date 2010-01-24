@@ -316,7 +316,7 @@ class TagType(models.Model):
 
 class Tag(models.Model):
     # {{{
-    text = models.CharField(null=False, max_length=50)
+    text = models.CharField(null=False, max_length=255)
     tag_type = models.ForeignKey(TagType)
 
     def save(self, *args, **kwargs):

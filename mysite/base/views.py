@@ -80,6 +80,8 @@ def landing_page(request):
 
     data['recommended_bugs'] = list(recommended_bugs) # A list so we can tell if it's empty
 
+    data['random_profiles'] = mysite.profile.models.Person.objects.exclude(photo='')[10:16]
+
     return (request, 'base/landing.html', data)
 
 def page_to_js(request):

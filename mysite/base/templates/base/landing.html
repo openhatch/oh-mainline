@@ -14,15 +14,6 @@ body.two_columns #main { margin-right: 20px; }
 body.two_columns #left { margin-right: 0; }
 {% endblock css %}
 
-{% block pagetop %}
-
-<h1>Welcome, 
-    <a href='{% url mysite.profile.views.display_person_web the_user.username %}'
-        >{% firstof the_user.first_name the_user.username %}</a>!
-</h1>
-
-{% endblock pagetop %}
-
 {% block main %}
 
 <div class='module' id='bugs'>
@@ -65,18 +56,30 @@ body.two_columns #left { margin-right: 0; }
     </div>
 </div>
 
+{% with the_user.get_profile.get_collaborators_for_landing_page as collaborators %}
 <div class='module' id='people'>
     <div class='head'>
+        {% if collaborators %}
         <h3>Assorted collaborators</h3>
+        {% else %}
+        <h3>Five random profiles</h3>
+        {% endif %}
     </div>
     <div class='body'>
-        <ul>
-            {% for person in the_user.get_profile.get_collaborators_for_landing_page %}
-            {% include 'profile/person_small.html' %}
-            {% endfor %}
+        <ul id='people-list'>
+            {% if collaborators %}
+                {% for person in collaborators %}
+                    {% include 'profile/person_small.html' %}
+                {% endfor %}
+            {% else %}
+                {% for person in random_profiles %}
+                    {% include 'profile/person-summary-li.html' %}
+                {% endfor %}
+            {% endif %}
         </ul>
     </div>
 </div>
+{% endwith %}
 
 <div class='module'>
     <div class='head'>
