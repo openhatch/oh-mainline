@@ -10,7 +10,8 @@ Home
 
 {% block css %}
 {{ block.super }}
-body#landing .column { float: left; width: 31%; margin-right: 20px; }
+body#landing .column { float: left; width: 32%; margin-right: 0; margin-left: 2%; }
+body#landing .column:first-child { margin-left: 0; }
 body#landing .module .body { background: #fff; padding: 3%; width: 94%; }
 body#landing .module .head { width: 94%; }
 body#landing .module { width: 100%; }
@@ -23,7 +24,7 @@ body#landing .module { width: 100%; }
 <div class='module' id='people'>
     <div class='head'>
         {% if collaborators %}
-        <h3>Assorted collaborators</h3>
+        <h3>Collaborators</h3>
         {% else %}
         <h3>Five random profiles</h3>
         {% endif %}
@@ -32,7 +33,7 @@ body#landing .module { width: 100%; }
         <ul id='people-list'>
             {% if collaborators %}
                 {% for person in collaborators %}
-                    {% include 'profile/person_small.html' %}
+                    {% include 'profile/person-summary-li.html' %}
                 {% endfor %}
             {% else %}
                 {% for person in random_profiles %}
@@ -127,7 +128,7 @@ body#landing .module { width: 100%; }
 
     <div class='module'>
         <div class='head'>
-            <h3><a href='/account/settings/widget/'>Widget yourself &rarr;</a></h3>
+            <h3><a href='/account/settings/widget/'>Widgetize yourself &rarr;</a></h3>
         </div>
     </div>
 
