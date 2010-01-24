@@ -34,3 +34,5 @@ body#profile #info h4 { width: 100%; margin-top: 10px; float: left; }
 body#profile .change-photo-link { background: #f4f4f4; padding: 10px; float: left; width: 182px; border-top: 5px solid #fff; }
 body#profile #info .save-button { margin-top: 10px; }
 
+body#profile.two_columns .module > .body { width: 97%; padding: 10px; }
+

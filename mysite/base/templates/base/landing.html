@@ -18,7 +18,6 @@ body#landing .module { width: 100%; }
 {% endblock css %}
 
 {% block content %}
-
 <div id='left' class='column'>
 {% with the_user.get_profile.get_collaborators_for_landing_page as collaborators %}
 <div class='module' id='people'>
@@ -45,9 +44,7 @@ body#landing .module { width: 100%; }
 </div>
 {% endwith %}
 </div>
-
 <div id='middle' class='column'>
-
     <div class='module' id='todo'>
         <div class='head'>
             <h3>Things to do around here</h3>
@@ -73,9 +70,14 @@ body#landing .module { width: 100%; }
 
     <div class='module' id='bugs'>
         <div class='head'>
-            <h3>Recommended bugs</h3>
+        {% if recommended_bugs %}
+            <h3>Recommended bug categories</h3>
+        {% else %}
+            <h3>Popular bug categories</h3>
+        {% endif %}
         </div>
         <div class='body'>
+        Discover new ways that you can contribute to free and open source software.
             {% if recommended_bugs %}
             <p>Based on the projects you've worked on
             and the languages you know, we recommend
@@ -96,16 +98,19 @@ body#landing .module { width: 100%; }
             </ul>
             <p><a href='/search/' style='float: right;'>Find more opportunities <strong>&raquo;</strong></a></p>
             {% else %}
-            To receive recommendations, start your profile:
+        {# If no recommended bugs: #}
+        <style type='text/css'>
+            #bugs ul { list-style: none; }
+            #bugs li { }
+        </style>
             <ul>
-                <li>
-                    <a href='{% url mysite.profile.views.portfolio_editor %}'>Add projects</a>
-                </li>
-                <li>
-                    <a href='{% url mysite.profile.views.edit_info %}'>
-                        Tell us a little bit about you
-                    </a>
-                </li>
+            {% comment %}
+            {% for category in popular_bug_categories %}
+                <li><a href='{{ category.url }}'>{{ category.name }}</a></li>
+            {% endfor %}
+            {% endcomment %}
+            <li><a href='#'><strong> Bitesize </strong> bugs whose main project language is <strong> Python </strong> (137)</a></li>
+            <li><a href='#'><strong> Bitesize </strong> bugs matching <strong> music player </strong> (22)</a></li> <li><a href='#'>Requests for <strong> documentation writing/editing</strong> (318)</a></li>
             </ul>
             {% endif %}
         </div>
