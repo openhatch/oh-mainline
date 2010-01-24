@@ -47,9 +47,9 @@ Map of People
 {% block js %}
 {{ block.super }}
 <script type="text/javascript">
-    {% if center %}
-    var center = {{ center|safe}}; /* This comes from Python geocoding the ?center= . */
-    var center_name = {{ center_name|safe}}; /* This is the string form of the above. */
+    {% if center_json %}
+    var center = {{ center_json|safe}}; /* This comes from Python geocoding the ?center= . */
+    var center_name = {{ center_name_json|safe}}; /* This is the string form of the above. */
     {% else  %}
     var center = {'latitude': 0, 'longitude': 0, 'suggested_zoom_level': 1};
     var center_name = '';

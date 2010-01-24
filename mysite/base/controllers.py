@@ -3,6 +3,8 @@ import simplejson
 from django.core.urlresolvers import reverse
 import django.contrib.auth.views
 from django.core.cache import cache
+from django.conf import settings
+import pprint
 
 notifications_dictionary = {
         "edit_password_done":
@@ -67,8 +69,8 @@ def _geocode(address):
                     'longitude': longitude}
         return None
     except Exception, e:
-        # FIXME: Log this!
-        pass # ...
+        traceback.extract_stack()
+        settings.applog.debug('An error occorred: %s' % stack)
 
 def cached_geocoding_in_json(address):
     key_name = simplejson.dumps(['function_call', 'cached_geocoding', address])

@@ -342,8 +342,10 @@ def people_map(request):
     data['num_of_persons_with_locations'] = len([p for p in Person.objects.all()
                                                  if p.location_display_name])
     if 'center' in request.GET:
-        data['center'] = mysite.base.controllers.cached_geocoding_in_json(request.GET.get('center', ''))
-        data['center_name'] = simplejson.dumps(request.GET.get('center', ''))
+        data['center_json'] = mysite.base.controllers.cached_geocoding_in_json(
+            request.GET.get('center', ''))
+        data['center_name'] = request.GET.get('center', '')
+        data['center_name_json'] = simplejson.dumps(request.GET.get('center', ''))
     return (request, 'profile/map.html', data)
 
 
