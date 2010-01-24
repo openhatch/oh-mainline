@@ -17,11 +17,11 @@ Map of People
         <div id="search" style="float: right; width: 65%; margin-right: 10px;">
             <ul>
                 <li style="display: inline;">Center the map at:</li>
-                <li><input id="location_for_map_centering" type="text" style="float: right; display: inline; "/></li>
+                <li><input id="location_for_map_centering" type="text" style="float: right; display: inline; " value="{{ center_name }}"/></li>
                 <li><input id="center_the_map" type="button" style="float: right; display: inline;"/></li>
             </ul>
         </div>
-        <div id="map_canvas" style='float: right; margin-top: 18px; margin-right: 10px; width:65%; height:450px;background: url("/static/images/profile/map_for_loading.png") top no-repeat;'>
+        <div id="map_canvas" style='float: right; margin-top: 18px; margin-right: 10px; width:65%; height:450px;'>
             <div id='map_loading_msg'>
                 <img src='/static/images/icons/throbber.png' />
                 <span>Loading map&hellip;</span>
@@ -47,11 +47,19 @@ Map of People
 {% block js %}
 {{ block.super }}
 <script type="text/javascript">
+    {% if center %}
+    var center = {{ center|safe}}; /* This comes from Python geocoding the ?center= . */
+    var center_name = {{ center_name|safe}}; /* This is the string form of the above. */
+    {% else  %}
+    var center = {'latitude': 0, 'longitude': 0, 'suggested_zoom_level': 1};
+    var center_name = '';
+    {% endif %}
     mapController = new PeopleMapController(); 
     $(function () {
         mapController.initialize({
                 'person_id2data': {{ person_id2data_as_json|safe}},
-                'num_of_persons_with_locations': {{ num_of_persons_with_locations }}
+                'num_of_persons_with_locations': {{ num_of_persons_with_locations }},
+                'center': center
         });
         mapController.bindClickHandlersToPeopleListItems();
         var center_and_zoom_the_map = function () {
