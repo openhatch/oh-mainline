@@ -9,7 +9,7 @@ body {
 }
 
 a {
-    color: #ff6d3d; 
+    color: #f33;
     text-decoration: none;
 }
 
@@ -356,7 +356,7 @@ ul.nudgebuttons a { width: 93%; }
 ul.nudgebuttons a .notification .arrow { float: right; font-size: 6.0em; padding-left: 10px; line-height: 50%; color: orange; }
 ul.nudgebuttons a:hover .notification .arrow { color: #ff6d3d;  }
 ul.nudgebuttons a:hover strong { text-decoration: underline;  }
-ul.nudgebuttons strong { color: #ff6d3d; font-size: 1.7em; text-shadow: 0 1px 0 rgb(200, 200, 200, .5); width: 100%; display: block; }
+ul.nudgebuttons strong { color: #f66; font-size: 1.7em; text-shadow: 0 1px 0 rgb(200, 200, 200, .5); width: 100%; display: block; }
 ul.nudgebuttons .smaller strong { font-size: 1.2em; }
 ul.nudgebuttons a .notification.smaller .arrow { font-size: 4em; }
 body#landing ul.nudgebuttons a .notification.smaller .arrow { font-size: 3em; }

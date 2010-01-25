@@ -11,6 +11,13 @@ Home
 {% block css %}
 {{ block.super }}
 body#landing #welcome { float: left; width: 100%; }
+body#landing #welcome .body { padding: 1%; width: 98%;}
+body#landing #welcome h2 { padding: 1%; }
+body#landing #welcome .nudgebuttons li { float: left; width: 33%; margin-bottom: 0; }
+body#landing #welcome .nudgebuttons li strong { font-size: 1.8em; margin-bottom: 3px;}
+body#landing #welcome .nudgebuttons li .arrow { font-size: 3em; }
+body#landing #welcome li .notification { color: #555; }
+
 body#landing .column { float: left; width: 44%; margin-right: 0; margin-left: 2%; }
 body#landing .column:first-child { width: 32%; margin-left: 0; }
 body#landing .column:last-child { width: 20%; }
@@ -25,10 +32,36 @@ body#landing #bugs li { margin-top: 10px; }
 {% block pagetop %}
 <div class='module' id='welcome'>
     <div class='body'>
-        <ul id='people-list'>
-            {% with the_user.get_profile as person %}
-                {% include 'profile/person-summary-li.html' %}
-            {% endwith %}
+        <ul class='nudgebuttons'>
+            <h2>OpenHatch makes open source more fun.</h2>
+            <li>
+                <a href='/search/'>
+                    <div class='notification'>
+                        <span class='arrow'>&rarr;</span>
+                        <strong>Find an open source volunteering opportunity</strong>
+                        Compose death-defying code, translations and docs, and secure your immortality here
+                    </div>
+                </a>
+            </li>
+            <li>
+                <a href='/+me'>
+                    <div class='notification'>
+                        <span class='arrow'>&rarr;</span>
+                        <strong>Build your profile and start getting recommendations</strong>
+                        Figure out where you'll have the biggest impact
+                    </div>
+                </a>
+            </li>
+            <li>
+                <a href='/people/' style='background-image: url('');'>
+                    <div class='notification'>
+                        <span class='arrow'>&rarr;</span>
+                        <strong>Learn more about the projects and people on this funky website</strong>
+                        Figure out where you'll have the biggest impact
+
+                    </div>
+                </a>
+            </li>
         </ul>
     </div>
 </div>
