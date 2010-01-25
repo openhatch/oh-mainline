@@ -10,6 +10,7 @@ Home
 
 {% block css %}
 {{ block.super }}
+body#landing #welcome { float: left; width: 100%; }
 body#landing .column { float: left; width: 44%; margin-right: 0; margin-left: 2%; }
 body#landing .column:first-child { width: 32%; margin-left: 0; }
 body#landing .column:last-child { width: 20%; }
@@ -21,9 +22,23 @@ body#landing #right .body { width: 90%; }
 body#landing #bugs li { margin-top: 10px; }
 {% endblock css %}
 
+{% block pagetop %}
+<div class='module' id='welcome'>
+    <div class='body'>
+        <ul id='people-list'>
+            {% with the_user.get_profile as person %}
+                {% include 'profile/person-summary-li.html' %}
+            {% endwith %}
+        </ul>
+    </div>
+</div>
+{% endblock %}
+
 {% block content %}
+
 <div id='left' class='column'>
 
+{% if the_user.is_authenticated %}
 <div class='module' id='me'>
     <div class='head'>
         <h3>You</h3>
@@ -61,7 +76,24 @@ body#landing #bugs li { margin-top: 10px; }
     </div>
 </div>
 {% endwith %}
+
+{% else %}
+<div class='module' id='people'>
+    <div class='head'>
+        <h3>People on OpenHatch</h3>
+    </div>
+    <div class='body'>
+        <ul id='people-list'>
+            {% for person in random_profiles %}
+                {% include 'profile/person-summary-li.html' %}
+            {% endfor %}
+        </ul>
+    </div>
 </div>
+{% endif %}
+
+</div>
+
 <div id='middle' class='column'>
     <div class='module' id='todo'>
         <div class='head'>
@@ -189,11 +221,13 @@ body#landing #bugs li { margin-top: 10px; }
         </div>
     </div>
 
+    {% if the_user.is_authenticated %}
     <div class='module'>
         <div class='head'>
             <h3><a href='/account/settings/widget/'>Widgetize yourself &rarr;</a></h3>
         </div>
     </div>
+    {% endif %}
 
 </div>
 {% endblock content %}

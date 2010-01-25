@@ -16,12 +16,6 @@ Empty nav block; we include nav.html ourselves, thank you very much.
 
 {% block greeting %}{% endblock %}
 
-{% block js %}
-<script type='text/javascript'>
-    $(function() { openid.init('id_openid_url'); });
-</script>
-{% endblock js %}
-
 {% block css %}
 {{ block.super }}
 @import url('/static/css/base/homepage.css');

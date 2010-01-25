@@ -26,8 +26,8 @@ from django.contrib.auth.decorators import login_required
 def homepage(request, signup_form=None,
         invitation_request_form=None, initial_tab_open='login'):
 
-    if request.user.is_authenticated():
-        return landing_page(request)
+    #if request.user.is_authenticated():
+    return landing_page(request)
 
     openid_signin_form = OpenidSigninForm()
 
@@ -69,15 +69,17 @@ def homepage(request, signup_form=None,
 
     return render_to_response('base/homepage.html', data, context_instance=RequestContext(request))
 
-@login_required
 @view
 def landing_page(request):
 
     data = {}
     data['entries'] = mysite.customs.feed.cached_blog_entries()[:3]
 
-    suggested_searches = request.user.get_profile().get_recommended_search_terms()
-    recommended_bugs = mysite.profile.controllers.recommend_bugs(suggested_searches, n=5)
+    suggested_searches = []
+    recommended_bugs = []
+    if request.user.is_authenticated():
+        request.user.get_profile().get_recommended_search_terms()
+        recommended_bugs = mysite.profile.controllers.recommend_bugs(suggested_searches, n=5)
 
     data['recommended_bugs'] = list(recommended_bugs) # A list so we can tell if it's empty
 

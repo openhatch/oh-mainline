@@ -24,9 +24,33 @@
                                 <li><a href='{% url mysite.account.views.settings %}'>settings</a></li>
                                 <li><a href='{% url mysite.profile.views.display_person_web the_user.username %}'>{{ the_user.get_profile.get_full_name_or_username }}</a></li>
                                 {% else %}
-                                <li><a href='/account/login'>log in / sign up</a></li>
+                                <li><a id='login' href='/account/login'>log in / sign up</a></li>
                                 {% endif %}
                             </ul>
+                            <div id='login_form' class='module' style='margin: 10px; padding: 10px; display: none; position: absolute; top: 0; right: 0px;'>
+                                <div class='head'>
+                                    <h3 style='width: 100%; text-align: left; margin: 0; margin-bottom: 10px;'>Sign in</h3>
+                                </div>
+                                <div class='body'>
+                                    <form id="openid_form" name="openid_form" action="{% url user_signin %}" method="post">
+                                        <input type="hidden" name="action" value="verify" />
+                                        <input type="hidden" name="next" value="{{ next }}" />
+                                        <fieldset>
+                                            <legend>Sign In Using Your OpenID URL</legend>
+                                            <div id="openid_choice">
+                                                <p>Please click your account provider:</p>
+                                                <div id="openid_btns"></div>
+                                            </div>
+                                            <div id="openid_input_area">
+                                                <label for="id_openid_url">OpenId URL :</label>{{ form1.openid_url }}
+                                                <input name="openid_submit" type="submit" value="Sign in with OpenID">
+                                            </div>
+
+                                        </fieldset>
+                                    </form> 
+                                </div>
+                            </div>
+
                         {% if not the_user.get_profile.location_confirmed and the_user.get_profile.location_display_name and not the_user.get_profile.dont_guess_my_location and not dont_suggest_location %}
                         <div id="location-suggestion-notification">
                             <p> Hi! We'd like to add you to a global map of FLOSS contributors. You seem to be in <strong class='suggested_location'>{{ the_user.get_profile.location_display_name }}</strong>.  Is this correct?
