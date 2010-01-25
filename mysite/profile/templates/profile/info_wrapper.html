@@ -41,13 +41,6 @@
     </style>
     <div id='edit_info' class='module'>
         <div class='head'>
-            <ul>
-                <li>
-                    <a href='{% url mysite.profile.views.display_person_web the_user.username %}'>
-                        &laquo; Back to profile
-                    </a>
-                </li>
-            </ul>
             <h3>Edit your info</h3>
         </div>
         <div class='body contains-submodules two-columns'>
@@ -56,7 +49,9 @@
                         action='/people/info/edit/do'
                         method='POST'>
 
+                        <div class='form-row'>
                         <h3>You, in a nutshell</h3>
+                    </div>
 
                         <div class='form-row'>
                             <label>bio:</label>
@@ -111,6 +106,7 @@
                         </div>
 
                         <input class='save-button' type='submit' style='float: left;' value='Save' />
+                        <a style="float: left; font-size: 1.1em; margin: 5px 0 0 10px" href="{{ the_user.get_profile.profile_url }} ">Cancel</a>
                     </form>
                 </div>      
             </div> 

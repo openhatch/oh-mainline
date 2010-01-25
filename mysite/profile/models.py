@@ -62,7 +62,7 @@ class RepositoryCommitter(models.Model):
 class Person(models.Model):
     """ A human bean. """
     # {{{
-    homepage_url = models.URLField(blank=True)
+    homepage_url = models.URLField(default="", blank=True)
     user = models.ForeignKey(User, unique=True)
     gotten_name_from_ohloh = models.BooleanField(default=False)
     interested_in_working_on = models.CharField(max_length=1024, default='') # FIXME: Ditch this.

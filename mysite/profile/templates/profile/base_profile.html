@@ -1,4 +1,5 @@
 {% extends 'base/two_columns.html' %}
+{% load profile_extras %}
 
 {% block body_id %}profile{% endblock %}
 
@@ -91,9 +92,26 @@
 
 {% block left %}
 <div id='avatar' class='module'>
-    <img src='{{ photo_url }}' />
     {% if editable %}
+    {% if person.photo %}
+    <img src='{{ photo_url }}' />
     <div class='change-photo-link'><a href="/account/edit/photo/">Change photo</a></div>
+    {% else %}
+    {# Haven't uploaded a photo yet #}
+    <style>
+        #avatar .notification { color: inherit; font-size: 1.2em; text-align: center; margin: 0; font-weight: bold; padding: 16px 8px ! important; margin-left: 45px; width: 100px; background-color: rgba(245, 253, 193, .8); }
+        #avatar a:hover { text-decoration: none; }
+        #avatar a:hover .notification {  background-color: rgba(245, 253, 193, 1) ! important; }
+
+        #avatar .default_image { float: left; width: 200px; height: 257px; background: url('{{ photo_url }}') no-repeat; }
+    </style>
+    <a href="/account/edit/photo/" class='default_image'>
+        <div class='notification' >Upload a photo</div>
+    </a>
+    {% endif %}
+    {% else %}
+<img src='{{ photo_url }}' />
+
     {% endif %}
 </div>
 
@@ -110,8 +128,98 @@
 
     </div>
 
+        {% if editable and not person.bio and not person.homepage_url and not tags_flat %}
+    <div class='body has_notification'>
+        {% else %}
     <div class='body'>
-        {% include 'profile/info.html' %}
+        {% endif %}
+        <style>
+            h4 { padding: 0;}
+        </style>
+
+        {% if not editable and not person.bio and not person.homepage_url and not tags_flat %}
+        {# When someone else's info box is empty #}
+        <small style='color: #777;'>Nothing here yet.</small>
+        {% endif %}
+
+        {% if not person.bio and not person.homepage_url and not tags_flat %}
+        {% ifequal the_user.get_profile person %}
+        <div class='notification' style='width: '>
+            <strong style="font-size: 1.2em; display: block; width: 100%;"><a href='{% url mysite.profile.views.edit_info %}'>Add info &raquo;</a></strong>
+            <p>We'll use it to connect you to interesting people and projects.</p>
+        </div>
+        {% endifequal %}
+        {% endif %}
+
+        {% if person.bio %}
+        <h4>bio</h4>
+        <p id="bio" style='clear: both;'>
+            {{person.bio}}
+        </p>
+        {% endif %}
+
+        {% if person.homepage_url %}
+        <h4>web site</h4>
+        <a href="{{ person.homepage_url }}">{{ person.homepage_url|break_long_words|safe }}</a>
+        {% endif %}
+
+        {% comment %} 
+        <div class="tags" id="tags-links"
+            <span class="tag-type">links:</span>
+            <ul>
+                <li> <a href="#">My website</a> </li>
+                <li> <a href="#">My Facebook</a> </li>
+                <li> <a href="#">indenti.ca</a> </li>
+                <li> <a href="#">openhatch</a> </li>
+            </ul>
+        </div>
+        {% endcomment %} 
+
+
+
+        {% if tags.understands and tags_flat.understands %}
+        <div class='tags' id='tags-understands'>
+            <h4>understands</h4>
+
+            {% for thingamabob in tags.understands %}
+            <a href="{% url mysite.profile.views.display_list_of_people_who_match_some_search "understands" thingamabob.text|urlencode %}">{{ thingamabob.text }}</a>{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% if tags.understands_not and tags_flat.understands_not %}
+        <div class='tags' id='tags-understands_not'>
+            <h4>will never understand</h4>
+            {% for thingamabob in tags.understands_not %}
+            <a href="{% url mysite.profile.views.display_list_of_people_who_match_some_search "understands_not" thingamabob.text|urlencode %}">{{ thingamabob.text }}</a>{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% if tags.seeking and tags_flat.seeking %}
+        <div class='tags' id='tags-seeking'>
+            <h4>can pitch in with</h4>
+            {% for thingamabob in tags.seeking %}
+            <a href="{% url mysite.profile.views.display_list_of_people_who_match_some_search "seeking" thingamabob.text|urlencode %}">{{ thingamabob.text }}</a>{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% if tags.studying and tags_flat.studying %}
+        <div class='tags' id='tags-studying'>
+            <h4>currently studying</h4>
+            {% for thingamabob in tags.studying %}
+            <a href="{% url mysite.profile.views.display_list_of_people_who_match_some_search "studying" thingamabob.text|urlencode %}">{{ thingamabob.text }}</a>{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% if tags.can_mentor and tags_flat.can_mentor %}
+        <div class='tags' id='tags-can_mentor'>
+            <h4>can mentor in</h4>
+            {% for thingamabob in tags.can_mentor %}
+            <a href="{% url mysite.profile.views.display_list_of_people_who_match_some_search "can_mentor" thingamabob.text|urlencode %}">{{ thingamabob.text }}</a>{% if not forloop.last %}, {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+
+{# vim: set filetype=htmldjango: #}
     </div>
 </div>
 {% endblock left %}

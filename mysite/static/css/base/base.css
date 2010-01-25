@@ -2,6 +2,7 @@ body {
     font: 9pt sans-serif;
     background: #fff url("/static/images/motif-eee.png") fixed;
     color: #222;
+    /* color: rgb(55,84,105); dark blue */
     max-width: 1000px;
     margin: 0 auto;
     padding: 0;
@@ -189,7 +190,7 @@ ul#links { margin-left: 20px; }
 
 #nav ul#topnavlinks { float: left; padding-left: 10px; }
 
-#topnavlinks li, #account-links li { margin: 0; font-size: 11pt; }
+#topnavlinks li, #account-links li { margin: 0; font-size: .95em; }
 
 #topnavlinks a, #account-links a { float: left; padding: 5px 10px; color: #484848; }
 
@@ -299,7 +300,7 @@ abbr.foss {
 .notification {
     float: left;
     width: 95%;
-    background-color: #ffa;
+    background-color: #f5fdc1; /*#edec7f; #ffa;*/
     -moz-border-radius: 8px;
     border-radius: 8px;
     padding: 10px;
