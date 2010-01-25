@@ -340,11 +340,12 @@ def people_map(request):
     data['test_js'] = request.GET.get('test', None)
     data['num_of_persons_with_locations'] = len([p for p in Person.objects.all()
                                                  if p.location_display_name])
-    if 'center' in request.GET:
+    if request.GET.get('center', False):
         data['center_json'] = mysite.base.controllers.cached_geocoding_in_json(
             request.GET.get('center', ''))
-        if data['center_json'] == 'null' or not data['center_json']:
-            data['center_json'] = False
+        # the below is true when we fail to geocode the center that we got from GET
+        if data['center_json'] == 'null':
+            data['geocode_failed'] = True;
         data['center_name'] = request.GET.get('center', '')
         data['center_name_json'] = simplejson.dumps(request.GET.get('center', ''))
     return (request, 'profile/map.html', data)
