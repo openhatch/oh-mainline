@@ -5,6 +5,9 @@ import django.contrib.auth.views
 from django.core.cache import cache
 from django.conf import settings
 import pprint
+import sha
+import traceback
+import logging
 
 notifications_dictionary = {
         "edit_password_done":
@@ -71,11 +74,16 @@ def _geocode(address):
                     'longitude': longitude}
         return None
     except Exception, e:
-        traceback.extract_stack()
-        settings.applog.debug('An error occorred: %s' % stack)
+        stack = traceback.extract_stack()
+        logging.debug('An error occorred: %s' % stack)
+        raise
+
+def object_to_key(python_thing):
+    as_string = simplejson.dumps(python_thing)
+    return sha.sha(as_string).hexdigest()
 
 def cached_geocoding_in_json(address):
-    key_name = simplejson.dumps(['function_call', 'cached_geocoding', address])
+    key_name = object_to_key(['function_call', 'cached_geocoding', address])
     geocoded = None
     geocoded_in_json = cache.get(key_name)
     if geocoded_in_json is None:
