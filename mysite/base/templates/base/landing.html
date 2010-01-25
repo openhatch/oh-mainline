@@ -134,7 +134,7 @@ body#landing #bugs li { margin-top: 10px; }
             <ul class='nudgebuttons'></strong></strong></strong>
                 {% if the_user.is_authenticated %}
                     <li>
-                        <a href=''>
+                        <a href='/account/settings/location/'>
                             <div class='notification smaller'>
                                 <span class='arrow'>&rarr;</span>
                                 <strong>Add a location</strong>
@@ -143,7 +143,7 @@ body#landing #bugs li { margin-top: 10px; }
                         </a>
                     </li>
                     <li>
-                        <a href=''>
+                        <a href='{% url mysite.profile.views.portfolio_editor %}'>
                             <div class='notification smaller'>
                                 <span class='arrow'>&rarr;</span>
                                 <strong>Build your portfolio</strong>
@@ -152,7 +152,7 @@ body#landing #bugs li { margin-top: 10px; }
                         </a>
                     </li>
                     <li>
-                        <a href=''>
+                        <a href='/profile/views/edit_info'>
                             <div class='notification smaller'>
                                 <span class='arrow'>&rarr;</span>
                                 <strong>Add interests</strong>
@@ -163,7 +163,7 @@ body#landing #bugs li { margin-top: 10px; }
                 {% else %}
                 {# User is browsing anonymously #}
                 <li>
-                    <a href=''>
+                    <a href='/+me'>
                         <div class='notification smaller'>
                             <span class='arrow'>&rarr;</span>
                             <strong>Create a profile</strong>

@@ -158,7 +158,7 @@ urlpatterns = patterns('',
         (r'^people/portfolio/import/$',
                 'mysite.profile.views.importer'),
 
-        (r'^\+portfolio/editor$',
+        (r'^\+portfolio/editor/$',
                 'mysite.profile.views.portfolio_editor'),
 
         (r'^\+portfolio/editor/test$',
