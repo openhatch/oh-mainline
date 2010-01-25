@@ -299,7 +299,7 @@ abbr.foss {
 .notification {
     float: left;
     width: 95%;
-    background-color: #f5fdc1; /*#edec7f; #ffa;*/
+    background-color: #ffc; #f5fdc1; /*#edec7f; #ffa;*/
     -moz-border-radius: 8px;
     border-radius: 8px;
     padding: 10px;
@@ -347,12 +347,23 @@ body.two_columns #portfolio .notification { width: 94%; margin: 0; padding: 10px
 body.two_columns #portfolio .get-involved { background-color: #666; padding: 8px; color: #fff; float: left; }
 body.two_columns #portfolio .body { background: #fff; }
 
-ul.nudgebuttons li { float: left; width: 100%;  }
-ul.nudgebuttons li:first-child { margin-bottom: 5px; }
-ul.nudgebuttons a .notification .arrow { float: right; font-size: 6.0em; line-height: 50%; color: orange; }
-ul.nudgebuttons a:hover strong { text-decoration: underline;  }
+ul.nudgebuttons li { float: left; width: 100%; margin-bottom: 5px;  }
+ul.nudgebuttons li:last-child { margin-bottom: 0; }
+ul.nudgebuttons a .notification { width: 100%; }
+ul.nudgebuttons a:hover .notification { background: #ffc;}
+ul.nudgebuttons a .notification { background: none; }
+ul.nudgebuttons a { width: 93%; }
+ul.nudgebuttons a .notification .arrow { float: right; font-size: 6.0em; padding-left: 10px; line-height: 50%; color: orange; }
 ul.nudgebuttons a:hover .notification .arrow { color: #ff6d3d;  }
+ul.nudgebuttons a:hover strong { text-decoration: underline;  }
 ul.nudgebuttons strong { color: #ff6d3d; font-size: 1.7em; text-shadow: 0 1px 0 rgb(200, 200, 200, .5); width: 100%; display: block; }
 ul.nudgebuttons .smaller strong { font-size: 1.2em; }
 ul.nudgebuttons a .notification.smaller .arrow { font-size: 4em; }
+body#landing ul.nudgebuttons a .notification.smaller .arrow { font-size: 3em; }
+body#landing ul.nudgebuttons a { float: left; }
+body#landing ul.nudgebuttons a:hover { text-decoration: none; }
+body#landing ul.nudgebuttons a .notification { margin: 0; }
 ul.nudgebuttons a .notification.smaller strong { font-size: 1.2em; }
+
+
+.head .note { float: right; color: #777; padding: 3px; }

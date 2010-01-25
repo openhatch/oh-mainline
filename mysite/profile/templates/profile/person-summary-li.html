@@ -13,15 +13,24 @@
             profile
         </a>{% endifequal %}
 
-        {% ifnotequal slug "people_map" %}<a href="{{ person.profile_url }}">{% endifnotequal %}
+        {% ifnotequal slug "people_map" %}
+            <a class='name' href="{{ person.profile_url }}">
+        {% else %}
         <div class="name">
+        {% endifnotequal %}
+
             {% if person.user.first_name or person.user.last_name %}
                 {{ person.user.first_name }} {{ person.user.last_name }}
             {% else %}
                 {{ person.user.username }}
             {% endif %}
+
+        {% ifnotequal slug "people_map" %}
+        </a>
+        {% else %}
         </div>
-        {% ifnotequal slug "people_map" %}</a>{% endifnotequal %}
+        {% endifnotequal %}
+
             <span class="location">
                 {% if person.user.first_name and person.user.last_name %}
                     {{ person.user.username }}

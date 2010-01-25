@@ -10,15 +10,33 @@ Home
 
 {% block css %}
 {{ block.super }}
-body#landing .column { float: left; width: 32%; margin-right: 0; margin-left: 2%; }
-body#landing .column:first-child { margin-left: 0; }
+body#landing .column { float: left; width: 44%; margin-right: 0; margin-left: 2%; }
+body#landing .column:first-child { width: 32%; margin-left: 0; }
+body#landing .column:last-child { width: 20%; }
 body#landing .module .body { background: #fff; padding: 3%; width: 94%; }
-body#landing .module .head { width: 94%; }
+body#landing .module .head { width: 98%; }
 body#landing .module { width: 100%; }
+body#landing #right .body { padding: 5%; }
+body#landing #right .body { width: 90%; }
+body#landing #bugs li { margin-top: 10px; }
 {% endblock css %}
 
 {% block content %}
 <div id='left' class='column'>
+
+<div class='module' id='me'>
+    <div class='head'>
+        <h3>You</h3>
+    </div>
+    <div class='body'>
+        <ul id='people-list'>
+            {% with the_user.get_profile as person %}
+                {% include 'profile/person-summary-li.html' %}
+            {% endwith %}
+        </ul>
+    </div>
+</div>
+
 {% with the_user.get_profile.get_collaborators_for_landing_page as collaborators %}
 <div class='module' id='people'>
     <div class='head'>
@@ -50,20 +68,47 @@ body#landing .module { width: 100%; }
             <h3>Things to do around here</h3>
         </div>
         <div class='body'>
-            <ul class='nudgebuttons'>
-                <li>Create a profile</li>
-                <li>Save some bugs</li>
-                <li>Find similar people</li>
-                <li>Find nearby people</li>
-                <li>Find a mentor</li>
-
-                (logged-in users see:)
-                <li>Add projects (list your open source contributions)</li>
-                    and we'll find interesting people and projects to check out
-                <li>Add interests</li>
-                    and we'll recommend cool things to do
-                <li>Add a location</li>
-                    and find FLOSS supporters near you
+            <ul class='nudgebuttons'></strong></strong></strong>
+                {% if the_user.is_authenticated %}
+                    <li>
+                        <a href=''>
+                            <div class='notification smaller'>
+                                <span class='arrow'>&rarr;</span>
+                                <strong>Add a location</strong>
+                                and find FLOSS supporters near you
+                            </div>
+                        </a>
+                    </li>
+                    <li>
+                        <a href=''>
+                            <div class='notification smaller'>
+                                <span class='arrow'>&rarr;</span>
+                                <strong>Build your portfolio</strong>
+                                using our mind-bending data-slurping tool
+                            </div>
+                        </a>
+                    </li>
+                    <li>
+                        <a href=''>
+                            <div class='notification smaller'>
+                                <span class='arrow'>&rarr;</span>
+                                <strong>Add interests</strong>
+                                and we'll recommend cool projects and people to check out
+                            </div>
+                        </a>
+                    </li>
+                {% else %}
+                {# User is browsing anonymously #}
+                <li>
+                    <a href=''>
+                        <div class='notification smaller'>
+                            <span class='arrow'>&rarr;</span>
+                            <strong>Create a profile</strong>
+                            Tell us what you hack on, and what you're all about. Then we can recommend interesting projects and volunteering opportunities for you.
+                        </div>
+                    </a>
+                </li>
+                {% endif %}
             </ul>
         </div>
     </div>
@@ -71,17 +116,14 @@ body#landing .module { width: 100%; }
     <div class='module' id='bugs'>
         <div class='head'>
         {% if recommended_bugs %}
-            <h3>Recommended bug categories</h3>
+            <h3>Recommended bugs</h3>
+            <span class='note'>based on your profile</span>
         {% else %}
             <h3>Popular bug categories</h3>
         {% endif %}
         </div>
         <div class='body'>
-        Discover new ways that you can contribute to free and open source software.
             {% if recommended_bugs %}
-            <p>Based on the projects you've worked on
-            and the languages you know, we recommend
-            you check out these bugs.</p>
             <ul>
                 {% for bug in recommended_bugs %}
                 <li style="list-style-image: url('{{ bug.project.get_url_of_search_result_icon_or_generic }}');">
@@ -98,6 +140,7 @@ body#landing .module { width: 100%; }
             </ul>
             <p><a href='/search/' style='float: right;'>Find more opportunities <strong>&raquo;</strong></a></p>
             {% else %}
+            Discover new ways that you can contribute to free and open source software.
         {# If no recommended bugs: #}
         <style type='text/css'>
             #bugs ul { list-style: none; }

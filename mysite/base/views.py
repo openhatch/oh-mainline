@@ -15,10 +15,11 @@ import mysite.profile.controllers
 import mysite.account.forms
 from mysite.profile.views import display_person_web
 from mysite.base.decorators import view
+import mysite.customs.feed
 
 import feedparser
 import lxml.html
-import mysite.customs.feed
+import random
 
 from django.contrib.auth.decorators import login_required
 
@@ -80,7 +81,9 @@ def landing_page(request):
 
     data['recommended_bugs'] = list(recommended_bugs) # A list so we can tell if it's empty
 
-    data['random_profiles'] = mysite.profile.models.Person.objects.exclude(photo='')[10:16]
+    everybody = list(mysite.profile.models.Person.objects.exclude(photo=''))
+    random.shuffle(everybody)
+    data['random_profiles'] = everybody[0:5]
 
     return (request, 'base/landing.html', data)
 

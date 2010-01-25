@@ -63,10 +63,8 @@
                 {# To find things to do in the open source community, use our volunteer opportunity finder.   #}
                 {# <a href='{% url mysite.search.views.fetch_bugs %}'>find a bug to work on</a>. <a href='{% url mysite.search.views.fetch_bugs %}'>find someone near you to work with</a>#}
 
-                {% else %}
-                {# Someone else's profile lacks projects. #}
-                <small style='color: #777;'>Nothing listed yet.</small>
                 {% endif %}
+                <small style='color: #777; float: left; width: 100%; margin-top: 10px; padding-top: 10px; border-top: 2px dashed #ccc;'>Nothing listed yet.</small>
             {% endif %}
         {% endwith %}
 
