@@ -99,10 +99,10 @@
                 {% endif %}
             </div>
             <div class='experience_description-wrapper'>
-                {% if pf_entry.experience_description %}
                 {% if edit_mode %}
                 <label>Describe your involvement</label>
                 {% else %}
+                {% if pf_entry.experience_description %}
                 <label style='margin-bottom: 5px;'>Involvement description</label>
                 {% endif %}
                 {% endif %}
