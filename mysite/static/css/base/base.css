@@ -9,7 +9,7 @@ body {
 }
 
 a {
-    color: #f33;
+    color: #f66;
     text-decoration: none;
 }
 
@@ -367,3 +367,4 @@ ul.nudgebuttons a .notification.smaller strong { font-size: 1.2em; }
 
 
 .head .note { float: right; color: #777; padding: 3px; }
+.head .more { float: right; padding: 3px; }

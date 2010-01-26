@@ -13,10 +13,12 @@ Home
 body#landing #welcome { float: left; width: 100%; }
 body#landing #welcome .body { padding: 1%; width: 98%;}
 body#landing #welcome h2 { padding: 1%; }
+body#landing #welcome p { padding: 0 1%; }
 body#landing #welcome .nudgebuttons li { float: left; width: 33%; margin-bottom: 0; }
 body#landing #welcome .nudgebuttons li strong { font-size: 1.8em; margin-bottom: 3px;}
 body#landing #welcome .nudgebuttons li .arrow { font-size: 3em; }
 body#landing #welcome li .notification { color: #555; }
+body#landing #welcome {color: #555; }
 
 body#landing .column { float: left; width: 44%; margin-right: 0; margin-left: 2%; }
 body#landing .column:first-child { width: 32%; margin-left: 0; }
@@ -30,6 +32,7 @@ body#landing #bugs li { margin-top: 10px; }
 {% endblock css %}
 
 {% block pagetop %}
+{% if not the_user.is_authenticated %}
 <div class='module' id='welcome'>
     <div class='body'>
         <ul class='nudgebuttons'>
@@ -61,8 +64,17 @@ body#landing #bugs li { margin-top: 10px; }
                 </a>
             </li>
         </ul>
+        <h2>OpenHatch is an open source involvement engine.</h2>
+            <p>
+            On OpenHatch, you can build a profile that <strong>consolidates</strong> and <strong>aggregates</strong> all of your <strong>open source contributions</strong> in one place. We'll help you <strong>connect</strong> with <strong>people</strong> and <strong>projects</strong> that are <strong>relevant to your interests</strong>.
+            </p>
+            <!--
+            <p>Whether you're looking for projects that need help with documentation or just hoping to find other Python hackers in your area, we'll do our best to make your open source experience more friendly and fun.
+            </p>
+            -->
     </div>
 </div>
+{% endif %}
 {% endblock %}
 
 {% block content %}
@@ -112,6 +124,9 @@ body#landing #bugs li { margin-top: 10px; }
 <div class='module' id='people'>
     <div class='head'>
         <h3>People on OpenHatch</h3>
+        <a href="/people/" class="more">
+            All people &raquo;
+        </a>
     </div>
     <div class='body'>
         <ul id='people-list'>
@@ -127,9 +142,11 @@ body#landing #bugs li { margin-top: 10px; }
 
 <div id='middle' class='column'>
     <div class='module' id='todo'>
+        {% if the_user.is_authenticated %}
         <div class='head'>
             <h3>Things to do around here</h3>
         </div>
+        {% endif %}
         <div class='body'>
             <ul class='nudgebuttons'></strong></strong></strong>
                 {% if the_user.is_authenticated %}
@@ -183,6 +200,7 @@ body#landing #bugs li { margin-top: 10px; }
             <span class='note'>based on your profile</span>
         {% else %}
             <h3>Popular bug categories</h3>
+            <a class='more'>All bugs &raquo;</a>
         {% endif %}
         </div>
         <div class='body'>
