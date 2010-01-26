@@ -29,7 +29,7 @@
             {% else %}
                 {% if editable %}
                 {# YOUR profile lacks projects. #}
-                <ul class='nudgebuttons'>
+                <ul class='nudgebuttons' style="float: left; padding-bottom: 10px;border-bottom: 2px dashed #ccc; margin-bottom: 10px;">
                     <li>
                     <a href='{% url mysite.profile.views.portfolio_editor %}'>
                         <div class='notification'>
@@ -64,7 +64,7 @@
                 {# <a href='{% url mysite.search.views.fetch_bugs %}'>find a bug to work on</a>. <a href='{% url mysite.search.views.fetch_bugs %}'>find someone near you to work with</a>#}
 
                 {% endif %}
-                <small style='color: #777; float: left; width: 100%; margin-top: 10px; padding-top: 10px; border-top: 2px dashed #ccc;'>Nothing listed yet.</small>
+                <small style='color: #777; float: left; width: 100%;'>Nothing listed yet.</small>
             {% endif %}
         {% endwith %}
 

@@ -33,18 +33,20 @@ body#landing #bugs li { margin-top: 10px; }
 
 {% block pagetop %}
 {% if not the_user.is_authenticated %}
+<!--
 <div class='module' id='welcome'>
     <div class='body'>
         <h2>OpenHatch is an open source involvement engine.</h2>
+        <div id="blurb" style="display: none;">
             <p>
-            <!--On OpenHatch, you can build a profile that <strong>consolidates</strong> and <strong>aggregates</strong> all of your <strong>open source contributions</strong> in one place. We'll help you <strong>connect</strong> with <strong>people</strong> and <strong>projects</strong> that are <strong>relevant to your interests</strong>.-->
+            On OpenHatch, you can build a profile that <strong>consolidates</strong> and <strong>aggregates</strong> all of your <strong>open source contributions</strong> in one place. We'll help you <strong>connect</strong> with <strong>people</strong> and <strong>projects</strong> that are <strong>relevant to your interests</strong>.
             </p>
-            <!--
             <p>Whether you're looking for projects that need help with documentation or just hoping to find other Python hackers in your area, we'll do our best to make your open source experience more friendly and fun.
             </p>
-            -->
+        </div>
     </div>
 </div>
+-->
 {% endif %}
 {% endblock %}
 
@@ -113,11 +115,16 @@ body#landing #bugs li { margin-top: 10px; }
 
 <div id='middle' class='column'>
     <div class='module' id='todo'>
-        <div class='head'>
+        <div class="head">
+        {% if the_user.is_authenticated %}
             <h3>Things to do around here</h3>
+        {% endif %}
         </div>
         <div class='body'>
-            <ul class='nudgebuttons'></strong></strong></strong>
+        {% if not the_user.is_authenticated %}
+        <h2>OpenHatch is an open source involvement engine. Here you can:</h2>
+        {% endif %}
+            <ul class='nudgebuttons'>
                 {% if the_user.is_authenticated %}
                     <li>
                         <a href='/account/settings/location/'>
@@ -152,8 +159,7 @@ body#landing #bugs li { margin-top: 10px; }
                 <a href='/search/'>
                     <div class='notification smaller'>
                         <span class='arrow'>&rarr;</span>
-                        <strong>Find an open source volunteering opportunity</strong>
-                        Give us a language or keyword. Find bugs across open source.
+                        <strong>Browse volunteering opportunities across over 100 open source projects</strong>
                     </div>
                 </a>
             </li>
@@ -162,7 +168,7 @@ body#landing #bugs li { margin-top: 10px; }
                     <div class='notification smaller'>
                         <span class='arrow'>&rarr;</span>
                         <strong>Aggregate your open source contribution data </strong>
-                        It's easy. Just tell us your usernames. We'll find your open source contributions automagically.
+                        It's easy to get started. Just tell us your usernames and we'll try to find your open source contributions automagically. 
                     </div>
                 </a>
             </li>

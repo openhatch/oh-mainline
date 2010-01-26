@@ -1,5 +1,6 @@
 #landing .module > .head { width: 280px; }
 #landing .module > .body { width: 240px; }
+#landing .module > .body h2 { color: #555; padding: 0 10px 10px}
 #landing #page-top { padding: 20px 0 10px 20px; }
 #landing #error textarea { font: 8pt monospace; height: 300px; width: 500px; }
 #landing #error #widget-instructions { background-color: #ffc; float: left; margin-left: 30px; margin-top: 10px; padding: 21px; width: 240px; }
