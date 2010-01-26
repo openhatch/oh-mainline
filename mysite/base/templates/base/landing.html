@@ -35,38 +35,9 @@ body#landing #bugs li { margin-top: 10px; }
 {% if not the_user.is_authenticated %}
 <div class='module' id='welcome'>
     <div class='body'>
-        <ul class='nudgebuttons'>
-            <h2>OpenHatch makes open source more fun.</h2>
-            <li>
-                <a href='/search/'>
-                    <div class='notification'>
-                        <span class='arrow'>&rarr;</span>
-                        <strong>Find an open source volunteering opportunity</strong>
-                        Compose death-defying code, translations and docs, and secure your immortality here
-                    </div>
-                </a>
-            </li>
-            <li>
-                <a href='/+me'>
-                    <div class='notification'>
-                        <span class='arrow'>&rarr;</span>
-                        <strong>Build your profile and start getting recommendations</strong>
-                        Find cool things to hack on
-                    </div>
-                </a>
-            </li>
-            <li>
-                <a href='/people/' style='background-image: url('');'>
-                    <div class='notification'>
-                        <span class='arrow'>&rarr;</span>
-                        <strong>Learn more about the projects and people on this funky website</strong>
-                    </div>
-                </a>
-            </li>
-        </ul>
         <h2>OpenHatch is an open source involvement engine.</h2>
             <p>
-            On OpenHatch, you can build a profile that <strong>consolidates</strong> and <strong>aggregates</strong> all of your <strong>open source contributions</strong> in one place. We'll help you <strong>connect</strong> with <strong>people</strong> and <strong>projects</strong> that are <strong>relevant to your interests</strong>.
+            <!--On OpenHatch, you can build a profile that <strong>consolidates</strong> and <strong>aggregates</strong> all of your <strong>open source contributions</strong> in one place. We'll help you <strong>connect</strong> with <strong>people</strong> and <strong>projects</strong> that are <strong>relevant to your interests</strong>.-->
             </p>
             <!--
             <p>Whether you're looking for projects that need help with documentation or just hoping to find other Python hackers in your area, we'll do our best to make your open source experience more friendly and fun.
@@ -142,11 +113,9 @@ body#landing #bugs li { margin-top: 10px; }
 
 <div id='middle' class='column'>
     <div class='module' id='todo'>
-        {% if the_user.is_authenticated %}
         <div class='head'>
             <h3>Things to do around here</h3>
         </div>
-        {% endif %}
         <div class='body'>
             <ul class='nudgebuttons'></strong></strong></strong>
                 {% if the_user.is_authenticated %}
@@ -179,15 +148,32 @@ body#landing #bugs li { margin-top: 10px; }
                     </li>
                 {% else %}
                 {# User is browsing anonymously #}
-                <li>
-                    <a href='/+me'>
-                        <div class='notification smaller'>
-                            <span class='arrow'>&rarr;</span>
-                            <strong>Create a profile</strong>
-                            Tell us what you hack on, and what you're all about. Then we can recommend interesting projects and volunteering opportunities for you.
-                        </div>
-                    </a>
-                </li>
+            <li>
+                <a href='/search/'>
+                    <div class='notification smaller'>
+                        <span class='arrow'>&rarr;</span>
+                        <strong>Find an open source volunteering opportunity</strong>
+                        Give us a language or keyword. Find bugs across open source.
+                    </div>
+                </a>
+            </li>
+            <li>
+                <a href='/+me'>
+                    <div class='notification smaller'>
+                        <span class='arrow'>&rarr;</span>
+                        <strong>Aggregate your open source contribution data </strong>
+                        It's easy. Just tell us your usernames. We'll find your open source contributions automagically.
+                    </div>
+                </a>
+            </li>
+            <li>
+                <a href='/people/' style='background-image: url('');'>
+                    <div class='notification smaller'>
+                        <span class='arrow'>&rarr;</span>
+                        <strong>Find contributors near you</strong>
+                    </div>
+                </a>
+            </li>
                 {% endif %}
             </ul>
         </div>
