@@ -16,6 +16,7 @@ import mysite.account.forms
 from mysite.profile.views import display_person_web
 from mysite.base.decorators import view
 import mysite.customs.feed
+import mysite.search.controllers
 
 import feedparser
 import lxml.html
@@ -86,6 +87,28 @@ def landing_page(request):
     everybody = list(mysite.profile.models.Person.objects.exclude(photo=''))
     random.shuffle(everybody)
     data['random_profiles'] = everybody[0:5]
+
+    #get globally recommended bug search stuff (for anonymous users)
+    if not request.user.is_authenticated():
+        # a dict pairing two things:
+        # * GET data dicts (to be passed to Query's create_from_GET_data)
+        # * strings of HTML representing the bug classification
+        recommended_bug_string2GET_data_dicts = {
+        "<strong>Bitesize</strong> bugs whose main project language is <strong>C</strong>":
+            {'language':'C', 'toughness':'bitesize'},
+        "<strong>Bitesize</strong> bugs matching &lsquo;<strong>audio</strong>&rsquo;":
+            {'q':'audio', 'toughness':'bitesize'},
+        "Bugs matching <strong>unicode</strong>":
+            {'q':'unicode'},
+        #"Requests for <strong>documentation writing/editing</strong>":
+        #    {'contribution_type':'documentation'},
+        }
+        recommended_bug_string2Query_objects = {}
+        for (string, GET_data_dict) in recommended_bug_string2GET_data_dicts.items():
+            query = mysite.search.controllers.Query.create_from_GET_data(GET_data_dict)
+            recommended_bug_string2Query_objects[string] = query
+
+        data['recommended_bug_string2Query_objects'] = recommended_bug_string2Query_objects
 
     return (request, 'base/landing.html', data)
 

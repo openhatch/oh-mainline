@@ -191,8 +191,8 @@ body#landing #bugs li { margin-top: 10px; }
             <h3>Recommended bugs</h3>
             <span class='note'>based on your profile</span>
         {% else %}
-            <h3>Popular bug categories</h3>
-            <a class='more'>All bugs &raquo;</a>
+            <h3>Volunteer opportunities</h3>
+            <a href="/search" class='more'>All bugs &raquo;</a>
         {% endif %}
         </div>
         <div class='body'>
@@ -213,8 +213,14 @@ body#landing #bugs li { margin-top: 10px; }
             </ul>
             <p><a href='/search/' style='float: right;'>Find more opportunities <strong>&raquo;</strong></a></p>
             {% else %}
-            Discover new ways that you can contribute to free and open source software.
+            Discover new ways that you can contribute to free and open source software. For example:
         {# If no recommended bugs: #}
+        {% for string, query in recommended_bug_string2Query_objects.items %}
+        <li><a href='/search?{{query.get_query_string}}'>{{string|safe}} ({{query.get_or_create_cached_hit_count}})</a></li>
+
+        {% endfor %}
+
+
         <style type='text/css'>
             #bugs ul { list-style: none; }
             #bugs li { }
@@ -225,9 +231,6 @@ body#landing #bugs li { margin-top: 10px; }
                 <li><a href='{{ category.url }}'>{{ category.name }}</a></li>
             {% endfor %}
             {% endcomment %}
-            <li><a href='#'><strong> Bitesize </strong> bugs whose main project language is <strong> Python </strong> (137)</a></li>
-            <li><a href='#'><strong> Bitesize </strong> bugs matching <strong> music player </strong> (22)</a></li> <li><a href='#'>Requests for <strong> documentation writing/editing</strong> (318)</a></li>
-            </ul>
             {% endif %}
         </div>
     </div>
