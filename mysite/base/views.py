@@ -88,7 +88,18 @@ def landing_page(request):
     data['random_profiles'] = everybody[0:5]
 
     #get globally recommended bug search stuff (for anonymous users)
-    if not request.user.is_authenticated():
+    if request.user.is_authenticated():
+        # for logged-in users:
+        # figure oout which nudges we want to show them
+        data['nudge_location'] = not request.user.get_profile().location_display_name
+        data['nudge_projects'] = not request.user.get_profile().dataimportattempt_set.all()
+        data['nudge_tags'] = not request.user.get_profile().get_tags_for_recommendations()
+
+        data['show_nudge_box'] = (data['nudge_location'] or 
+                data['nudge_projects'] or data['nudge_tags'])
+    else:
+
+        data['show_nudge_box'] = True
         # a dict pairing two things:
         # * GET data dicts (to be passed to Query's create_from_GET_data)
         # * strings of HTML representing the bug classification
@@ -99,6 +110,8 @@ def landing_page(request):
             {'q':'audio', 'toughness':'bitesize'},
         "Bugs matching <strong>unicode</strong>":
             {'q':'unicode'},
+        "Requests for <strong>documentation writing/editing</strong>":
+            {'contribution_type':'documentation'},
         #"Requests for <strong>documentation writing/editing</strong>":
         #    {'contribution_type':'documentation'},
         }
@@ -108,16 +121,6 @@ def landing_page(request):
             recommended_bug_string2Query_objects[string] = query
 
         data['recommended_bug_string2Query_objects'] = recommended_bug_string2Query_objects
-    else:
-        # for logged-in users:
-        # figure oout which nudges we want to show them
-        data['nudge_location'] = not request.user.get_profile().location_display_name
-        data['nudge_projects'] = not request.user.get_profile().dataimportattempt_set.all()
-        data['nudge_tags'] = not request.user.get_profile().get_tags_for_recommendations()
-
-        data['show_nudge_box'] = (data['nudge_location'] or 
-                data['nudge_projects'] or data['nudge_tags'])
-
 
     return (request, 'base/landing.html', data)
 

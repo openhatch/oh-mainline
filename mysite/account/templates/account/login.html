@@ -37,5 +37,7 @@ form { width: 350px; }
 {% endblock main %}
 
 {% block js %}
-<script> $(function() { openid.init('id_openid_url'); }); </script>
+<script type='text/javascript'>
+    $(function() { openid.init('id_openid_url'); });
+</script>
 {% endblock %}

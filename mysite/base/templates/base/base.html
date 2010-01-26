@@ -157,15 +157,6 @@
 
         {% block js %}
         {% endblock js %}
-        <script type='text/javascript'>
-            $(function () {
-                $('#login').click(function(){
-                    $('#login_form').show();
-                    return false;
-                });
-            });
-            $(function() { openid.init('id_openid_url'); });
-        </script>
 
 
         {% if test_js %}
