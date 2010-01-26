@@ -70,6 +70,8 @@ class EditLocationForm(django.forms.ModelForm):
     class Meta:
         model = Person
         fields = ('location_display_name',)
+    def clean_location_display_name(self):
+        return self.cleaned_data['location_display_name'].strip()
 
 class EditPhotoForm(django.forms.ModelForm):
     class Meta:

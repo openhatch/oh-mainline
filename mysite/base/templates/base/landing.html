@@ -89,6 +89,7 @@ body#landing #bugs li { margin-top: 10px; }
                 {% endfor %}
             {% endif %}
         </ul>
+        <p><a href='/people/' style='float: right;'>Everybody <strong>&raquo;</strong></a></p>
     </div>
 </div>
 {% endwith %}
@@ -114,6 +115,7 @@ body#landing #bugs li { margin-top: 10px; }
 </div>
 
 <div id='middle' class='column'>
+    {% if show_nudge_box %}
     <div class='module' id='todo'>
         <div class="head">
         {% if the_user.is_authenticated %}
@@ -126,33 +128,39 @@ body#landing #bugs li { margin-top: 10px; }
         {% endif %}
             <ul class='nudgebuttons'>
                 {% if the_user.is_authenticated %}
-                    <li>
-                        <a href='/account/settings/location/'>
-                            <div class='notification smaller'>
-                                <span class='arrow'>&rarr;</span>
-                                <strong>Add a location</strong>
-                                and find FLOSS supporters near you
-                            </div>
-                        </a>
-                    </li>
-                    <li>
-                        <a href='{% url mysite.profile.views.portfolio_editor %}'>
-                            <div class='notification smaller'>
-                                <span class='arrow'>&rarr;</span>
-                                <strong>Build your portfolio</strong>
-                                using our mind-bending data-slurping tool
-                            </div>
-                        </a>
-                    </li>
-                    <li>
-                        <a href='/profile/views/edit_info'>
-                            <div class='notification smaller'>
-                                <span class='arrow'>&rarr;</span>
-                                <strong>Add interests</strong>
-                                and we'll recommend cool projects and people to check out
-                            </div>
-                        </a>
-                    </li>
+                    {% if nudge_location %}
+                        <li>
+                            <a href='/account/settings/location/'>
+                                <div class='notification smaller'>
+                                    <span class='arrow'>&rarr;</span>
+                                    <strong>Add a location</strong>
+                                    and find FLOSS supporters near you
+                                </div>
+                            </a>
+                        </li>
+                    {% endif %}
+                    {% if nudge_projects %}
+                        <li>
+                            <a href='{% url mysite.profile.views.portfolio_editor %}'>
+                                <div class='notification smaller'>
+                                    <span class='arrow'>&rarr;</span>
+                                    <strong>Build your portfolio</strong>
+                                    using our mind-bending data-slurping tool
+                                </div>
+                            </a>
+                        </li>
+                    {% endif %}
+                    {% if nudge_tags %}
+                        <li>
+                            <a href='/profile/views/edit_info'>
+                                <div class='notification smaller'>
+                                    <span class='arrow'>&rarr;</span>
+                                    <strong>Add interests</strong>
+                                    and we'll recommend cool projects and people to check out
+                                </div>
+                            </a>
+                        </li>
+                    {% endif %}
                 {% else %}
                 {# User is browsing anonymously #}
             <li>
@@ -184,6 +192,7 @@ body#landing #bugs li { margin-top: 10px; }
             </ul>
         </div>
     </div>
+    {% endif %}
 
     <div class='module' id='bugs'>
         <div class='head'>
