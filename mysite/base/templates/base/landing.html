@@ -65,7 +65,6 @@ body#landing #right .entry { font-size: .9em; margin-top: 3px; }
                 {% with the_user.get_profile as person %}
                     {% include 'profile/person-summary-li.html' %}
                 {% endwith %}
-
             </ul>
         </div>
     </div>
@@ -139,26 +138,15 @@ body#landing #right .entry { font-size: .9em; margin-top: 3px; }
         {% endif %}
             <ul class='nudgebuttons'>
                 {% if the_user.is_authenticated %}
-                    {% if nudge_location %}
-                        <li>
-                            <a href='/account/settings/location/'>
-                                <div class='notification smaller'>
-                                    <span class='arrow'>&rarr;</span>
-                                    <strong>Add a location</strong>
-                                        <span class='more-text'>and find FLOSS supporters near you</span>
-                                    </div>
-                            </a>
-                        </li>
-                    {% endif %}
                     {% if nudge_projects %}
                         <li>
                             <a href='{% url mysite.profile.views.portfolio_editor %}'>
                                 <div class='notification smaller'>
                                     <span class='arrow'>&rarr;</span>
-                                    <strong>Build your portfolio</strong>
-                                    <span class='more-text'>
-                                        <span class='more-text'>using our mind-bending data-slurping tool</span>
-                                    </span>
+                                    <strong>Document your open source contributions</strong>
+                 <span class='more-text'>
+Put your story together automagically, using our mind-bending contribution aggregator. Be proud of everything &mdash; bug reports, code, translations, documentation, and design ideas.
+</span>
                                 </div>
                             </a>
                         </li>
@@ -168,11 +156,22 @@ body#landing #right .entry { font-size: .9em; margin-top: 3px; }
                             <a href='/profile/views/edit_info'>
                                 <div class='notification smaller'>
                                     <span class='arrow'>&rarr;</span>
-                                    <strong>Add tags</strong>
+                                    <strong>Describe yourself</strong>
                                     <span class='more-text'>
-                                        <span class='more-text'>and we'll recommend cool projects for you to check out</span>
+                                        Add tags to your profile and get recommendations for nifty stuff to hack on.
                                     </span>
                                 </div>
+                            </a>
+                        </li>
+                    {% endif %}
+                    {% if nudge_location %}
+                        <li>
+                            <a href='/account/settings/location/'>
+                                <div class='notification smaller'>
+                                    <span class='arrow'>&rarr;</span>
+                                    <strong>Put yourself on the map</strong>
+                                        <span class='more-text'>We have this giant map of open source contributors.</span>
+                                    </div>
                             </a>
                         </li>
                     {% endif %}
