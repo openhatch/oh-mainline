@@ -26,7 +26,7 @@ about our members who support {{ project.name }}
     <div class='body'>
         <ul id='people-list'>
             {% for person in contributors %}
-                {% include 'profile/person-summary-li.html' %}
+                {% include 'profile/person_small.html' %}
             {% empty %}
                 No registered contributors yet.  
             {% endfor %}
@@ -73,6 +73,7 @@ about our members who support {{ project.name }}
       {% endwith %}
       {% endwith %}
 
+      {% if project.language %}
       {% with language_mentors as mentors %}
       {% with project.language as topic %}
       {% with 1 as explain_language %}
@@ -80,6 +81,7 @@ about our members who support {{ project.name }}
       {% endwith %}
       {% endwith %}
       {% endwith %}
+      {% endif %}
 
     </div>
 </div>
