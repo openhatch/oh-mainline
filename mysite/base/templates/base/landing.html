@@ -65,6 +65,7 @@ body#landing #right .entry { font-size: .9em; margin-top: 3px; }
                 {% with the_user.get_profile as person %}
                     {% include 'profile/person-summary-li.html' %}
                 {% endwith %}
+
             </ul>
         </div>
     </div>
@@ -301,3 +302,12 @@ body#landing #right .entry { font-size: .9em; margin-top: 3px; }
 
 </div>
 {% endblock content %}
+
+{% block js %}
+{{ block.super }}
+<script type='text/javascript'>
+$(function(){
+$('#people-list li').hoverClass('hover');
+});
+</script>
+{% endblock js %}

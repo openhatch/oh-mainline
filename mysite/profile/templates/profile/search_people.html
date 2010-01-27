@@ -22,3 +22,12 @@ List of People
             {% endfor %}
         </ul>
 {% endblock people_main %}
+
+{% block js %}
+{{ block.super }}
+<script type='text/javascript'>
+$(function(){
+$('#people-list li').hoverClass('hover');
+});
+</script>
+{% endblock js %}
