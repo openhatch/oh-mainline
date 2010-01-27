@@ -299,9 +299,19 @@ Put your story together automagically, using our mind-bending contribution aggre
     </div>
 
     {% if the_user.is_authenticated %}
-    <div class='module'>
+    <div id='syndicate' class='module'>
         <div class='head'>
-            <h3><a href='/account/settings/widget/'>Widgetize yourself &rarr;</a></h3>
+            <h3>Syndicate your profile</h3>
+        </div>
+        <div class='body'>
+            <style type='text/css'>
+                #syndicate ul { margin: 0; }
+                #syndicate li { list-style: square; color: #888; margin-left: 1.2em; }
+                #syndicate p { margin: 0 0 5px 0; }
+                #syndicate p:last-child { margin: 0; }
+            </style>
+            <p>Put your project list on your other web things.</p>
+            <p style='float: right;'><a href='{% url mysite.account.views.widget %}'>Get your widget &raquo;</a></p>
         </div>
     </div>
     {% endif %}
