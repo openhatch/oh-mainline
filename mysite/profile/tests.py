@@ -750,6 +750,47 @@ class UserCanShowEmailAddress(TwillTests):
         # }}}
     # }}}
 
+
+# Create a mock Launchpad get_info_for_launchpad_username
+mock_launchpad_debian_response = mock.Mock()
+mock_launchpad_debian_response.return_value = {
+        'Debian': {
+            'url': 'http://launchpad.net/debian', # ok this url doesn't really exist
+            'involvement_types': ['Bug Management', 'Bazaar Branches'],
+            'citation_url': 'https://launchpad.net/~paulproteus',
+            'languages': '',
+            }
+        }
+
+class LaunchpadCallsDebianDGL(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    @mock.patch('mysite.search.models.Project.populate_icon_from_ohloh',
+                do_nothing)
+    @mock.patch('mysite.customs.lp_grabber.get_info_for_launchpad_username',
+                mock_launchpad_debian_response)
+    @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
+    def test(self):
+        # at start, no portfolio entries
+        # Let's run this test using a sample user, paulproteus.
+        username = 'paulproteus'
+        person = Person.objects.get(user__username=username)
+
+        # Store a note in the DB that we're about to run a background task
+        dia = DataImportAttempt(query=username, source='lp', person=person)
+        dia.save()
+        dia.do_what_it_says_on_the_tin()
+        self.assert_(DataImportAttempt.objects.get(id=dia.id).completed)
+
+        # There ought now to be a PortfolioEntry for Debian
+        portfolio_entry = PortfolioEntry.objects.get()
+
+        # Project is called...?
+        name = portfolio_entry.project.name
+
+        self.assertEqual(name, "Debian GNU/Linux")
+        
+
 class BugsAreRecommended(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus',
                'bugs-for-two-projects.json']
