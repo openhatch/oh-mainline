@@ -91,9 +91,11 @@ def landing_page(request):
     if request.user.is_authenticated():
         # for logged-in users:
         # figure oout which nudges we want to show them
-        data['nudge_location'] = not request.user.get_profile().location_display_name
-        data['nudge_projects'] = not request.user.get_profile().dataimportattempt_set.all()
-        data['nudge_tags'] = not request.user.get_profile().get_tags_for_recommendations()
+        person = request.user.get_profile()
+
+        data['nudge_location'] = not person.location_display_name or not person.location_confirmed
+        data['nudge_projects'] = not person.dataimportattempt_set.all()
+        data['nudge_tags'] = not person.get_tags_for_recommendations()
 
         data['show_nudge_box'] = (data['nudge_location'] or 
                 data['nudge_projects'] or data['nudge_tags'])
