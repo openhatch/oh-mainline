@@ -24,17 +24,29 @@
                         {% else %}
                         style="background-image: url('{{ pf_entry.project.get_url_of_icon_or_generic }}')"
                         {% endif %}
-                        ><span class='alt-text'>(icon)</span></div>
+                        ><span class='alt-text'>
+                            {% if edit_mode or adding_mode or not pf_entry.project.logo_contains_name %}
+                            (icon)
+                            {% else %}
+                            pf_entry.project.name
+                            {% endif %}
+                        </span></div>
                 </a>
                 
                 {% if adding_mode %}
                     <input class='project_name' type='text' title="Type a project name" value='' />
                 {% else %}
+
+                {% comment %}   Only show the project's name if the name isn't
+                                already contained in the icon.      {% endcomment %}
+                {% if edit_mode or not pf_entry.project.logo_contains_name %}
                 <span class='project_name'>
                     <a href='{{ pf_entry.project.get_url }}'>
                         {{ pf_entry.project.name }}
                     </a>
                 </span>
+                {% endif %}
+
                 {% endif %}
 
                 {% if edit_mode and not adding_mode %}
