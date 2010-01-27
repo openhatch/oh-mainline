@@ -1,0 +1,20 @@
+{% if mentors %}
+          <p>
+              There {{ mentors|length|pluralize:"is,are" }}
+              <a href='{% url mysite.profile.views.display_list_of_people_who_match_some_search "can_mentor" topic|urlencode %}'>
+                  <strong>{{ mentors|length}}</strong>
+                  {{ mentors|length|pluralize:"person,people" }}
+                  who can mentor in
+                  <strong>{{ topic }}</strong></a>{% if explain_language %},
+              {{ project.name }}'s primary language{% endif %}.
+          </p>
+{% else %}
+
+          </p>
+              No one on OpenHatch has signed up as a mentor
+              for {{ topic }}. Can you?
+              <a href="{% url mysite.profile.views.edit_info %}">Add the tag</a>.
+          </p>
+
+{% endif %}
+{# vim: set filetype=htmldjango: #}

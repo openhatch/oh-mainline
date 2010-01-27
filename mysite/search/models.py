@@ -88,6 +88,8 @@ class Project(models.Model):
         null=True,
         default=None)
 
+    logo_contains_name = models.BooleanField(default=False)
+
     def populate_icon_from_ohloh(self):
 
         oh = mysite.customs.ohloh.get_ohloh()
