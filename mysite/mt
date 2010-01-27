@@ -1,0 +1,1 @@
+../bin/sqlite_mysite test "$@"
