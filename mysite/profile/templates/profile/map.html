@@ -46,6 +46,13 @@ Map of People
                 {% endif %}
             {% endfor %}
         </ul>
+
+        {% if center_json and not geocode_failed %}
+        <style type='text/css'>
+        #people-list li { display: none; }
+        </style>
+        {% endif %}
+
         {% endblock people_main %}
 
 {% block js_before_bundle %}
