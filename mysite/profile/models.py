@@ -239,10 +239,12 @@ class Person(models.Model):
     @staticmethod
     def get_by_username(username):
         return Person.objects.get(user__username=username)
-    # }}}
 
     def should_be_nudged_about_location(self):
         return not self.location_confirmed and not self.dont_guess_my_location
+
+    # }}}
+
 
 def create_profile_when_user_created(instance, created, *args, **kwargs):
     if created:
