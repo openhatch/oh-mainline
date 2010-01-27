@@ -29,6 +29,7 @@ from django.conf import settings
 from django.core.files.images import get_image_dimensions
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
+from django.db.models import Q
 
 # OpenHatch global
 from django.conf import settings
@@ -331,7 +332,10 @@ def display_list_of_people(request):
 @view
 def people_map(request):
     data = {}
-    data['people'] = Person.objects.all().order_by('user__username')
+
+    everybody = Person.objects.all()
+    mappable = ( ~Q(location_display_name='') & Q(location_confirmed=True) )
+    data['people'] = everybody.filter(mappable).order_by('user__username')
     data['person_id2data_as_json'] = simplejson.dumps(dict([
                 (person.pk, {'name': person.get_full_name_or_username(),
                              'location': person.location_display_name})
