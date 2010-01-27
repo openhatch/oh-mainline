@@ -21,3 +21,4 @@ body#landing #bugs .body li { margin-top: 10px; }
 #landing .byline { font-size: 8pt; margin-top: 2px; }
 
 body#landing ul.nudgebuttons a { width: 95%; }
+body#landing .module > .head ul li a { font-weight: normal; }
