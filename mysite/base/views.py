@@ -97,8 +97,7 @@ def landing_page(request):
 
         data['show_nudge_box'] = (data['nudge_location'] or 
                 data['nudge_projects'] or data['nudge_tags'])
-    else:
-
+    if not data['recommended_bugs']:
         data['show_nudge_box'] = True
         # a dict pairing two things:
         # * GET data dicts (to be passed to Query's create_from_GET_data)

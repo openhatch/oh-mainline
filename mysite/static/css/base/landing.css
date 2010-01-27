@@ -10,12 +10,14 @@
 #landing h5 { color: #555; font-size: 1.2em; font-weight: normal; line-height: 110%; margin: 0 0 0 0; padding: 5px 5px 0 0; }
 	#landing h5 a { font-weight: bold; /*color: black;*/ }
 #landing h4 { color: #555; font-size: 1.0em; font-weight: bold; margin-left: 0; padding-left: 0; width: 100%; }
-#landing .entry { border-bottom: 1px solid #f4f4f4; clear: both; margin-bottom: 5px; padding-bottom: 5px; }
-#landing #bugs li { color: #888; list-style: square; margin-left: 30px; padding-bottom: 10px; padding: 0; }
+#landing .entry { clear: both; margin-bottom: 5px; padding-bottom: 5px; }
+#landing #bugs .body li { color: #888; list-style: square; margin-left: 30px; padding-bottom: 10px; padding: 0; }
+body#landing #bugs .body li { margin-top: 10px; }
 	#landing #bugs li span { color: #222; position: relative; top: -7px; }
 #landing .module p { margin-top: 0; }
 #landing .widget-wrapper { float: left; margin-bottom: 10px; width: 100%; }
 #landing a.blog-feed { background: transparent url('/static/images/base/landing/feed-icon-16x16-grayscale.png') no-repeat center; float: left; float: right; height: 16px; padding: 3px 0px 5px 8px; width: 8%; }
 	#landing a.blog-feed:hover { background-image: url('/static/images/base/landing/feed-icon-16x16.png'); }
 #landing .byline { font-size: 8pt; margin-top: 2px; }
-#landing #meta h3 { width: 65%; padding-right: 8px; }
+
+body#landing ul.nudgebuttons a { width: 95%; }

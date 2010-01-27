@@ -26,9 +26,8 @@ body#landing .column:last-child { width: 20%; }
 body#landing .module .body { background: #fff; padding: 3%; width: 94%; }
 body#landing .module .head { width: 98%; }
 body#landing .module { width: 100%; }
-body#landing #right .body { padding: 5%; }
-body#landing #right .body { width: 90%; }
-body#landing #bugs li { margin-top: 10px; }
+body#landing #right .body { padding: 5%; font-size: .9em; width: 90%; }
+body#landing #right .entry { font-size: .9em; margin-top: 3px; }
 {% endblock css %}
 
 {% block pagetop %}
@@ -55,61 +54,72 @@ body#landing #bugs li { margin-top: 10px; }
 <div id='left' class='column'>
 
 {% if the_user.is_authenticated %}
-<div class='module' id='me'>
-    <div class='head'>
-        <h3>You</h3>
-    </div>
-    <div class='body'>
-        <ul id='people-list'>
-            {% with the_user.get_profile as person %}
-                {% include 'profile/person-summary-li.html' %}
-            {% endwith %}
-        </ul>
-    </div>
-</div>
 
-{% with the_user.get_profile.get_collaborators_for_landing_page as collaborators %}
-<div class='module' id='people'>
-    <div class='head'>
-        {% if collaborators %}
-        <h3>Collaborators</h3>
-        {% else %}
-        <h3>Five random profiles</h3>
-        {% endif %}
-    </div>
-    <div class='body'>
-        <ul id='people-list'>
-            {% if collaborators %}
-                {% for person in collaborators %}
+    <div class='module' id='me'>
+        <div class='head'>
+            <h3><a style='color: inherit;' href='{{ the_user.get_profile.profile_url }}'>
+                    You</a></h3>
+        </div>
+        <div class='body'>
+            <ul id='people-list'>
+                {% with the_user.get_profile as person %}
                     {% include 'profile/person-summary-li.html' %}
-                {% endfor %}
+                {% endwith %}
+            </ul>
+        </div>
+    </div>
+
+    {% with the_user.get_profile.get_collaborators_for_landing_page as collaborators %}
+    <div class='module' id='people'>
+        <div class='head'>
+            {% if collaborators %}
+            <h3>Collaborators</h3>
             {% else %}
+            <h3>People on OpenHatch</h3>
+            {% endif %}
+            <ul>
+                <li>
+            <a href='/people/' style='float: right;'>See all <strong>&raquo;</strong></a></p>
+                </li>
+            </ul>
+        </div>
+        <div class='body'>
+            <ul id='people-list'>
+                {% if collaborators %}
+                    {% for person in collaborators %}
+                        {% include 'profile/person-summary-li.html' %}
+                    {% endfor %}
+                {% else %}
+                    {% for person in random_profiles %}
+                        {% include 'profile/person-summary-li.html' %}
+                    {% endfor %}
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+    {% endwith %}
+
+{% else %}
+
+    {# if anonymous #}
+    <div class='module' id='people'>
+        <div class='head'>
+            <h3>People on OpenHatch</h3>
+             <ul>
+                <li>
+            <a href='/people/' style='float: right;'>See all <strong>&raquo;</strong></a></p>
+                </li>
+            </ul>
+        </div>
+        <div class='body'>
+            <ul id='people-list'>
                 {% for person in random_profiles %}
                     {% include 'profile/person-summary-li.html' %}
                 {% endfor %}
-            {% endif %}
-        </ul>
-        <p><a href='/people/' style='float: right;'>Everybody <strong>&raquo;</strong></a></p>
+            </ul>
+        </div>
     </div>
-</div>
-{% endwith %}
 
-{% else %}
-<div class='module' id='people'>
-    <div class='head'>
-        <h3>People on OpenHatch</h3>
-        <a href="/people/" class="more">
-            All people &raquo;
-        </a>
-    </div>
-    <div class='body'>
-        <ul id='people-list'>
-            {% for person in random_profiles %}
-                {% include 'profile/person-summary-li.html' %}
-            {% endfor %}
-        </ul>
-    </div>
-</div>
 {% endif %}
 
 </div>
@@ -201,7 +211,11 @@ body#landing #bugs li { margin-top: 10px; }
             <span class='note'>based on your profile</span>
         {% else %}
             <h3>Volunteer opportunities</h3>
-            <a href="/search" class='more'>All bugs &raquo;</a>
+            <ul>
+                <li>
+            <a href="/search" >See all &raquo;</a>
+                </li>
+            </ul>
         {% endif %}
         </div>
         <div class='body'>
@@ -225,14 +239,17 @@ body#landing #bugs li { margin-top: 10px; }
             Discover new ways that you can contribute to free and open source software. For example:
         {# If no recommended bugs: #}
         {% for string, query in recommended_bug_string2Query_objects.items %}
-        <li><a href='/search?{{query.get_query_string}}'>{{string|safe}} ({{query.get_or_create_cached_hit_count}})</a></li>
-
+            {% with query.get_or_create_cached_hit_count as count %}
+            {% if count %}
+            {# Don't show an example if no volunteer opportunities match it. #}
+            <li><a href='/search?{{query.get_query_string}}'>{{string|safe}} ({{query.get_or_create_cached_hit_count}})</a></li>
+            {% endif %}
+            {% endwith %}
         {% endfor %}
 
 
         <style type='text/css'>
             #bugs ul { list-style: none; }
-            #bugs li { }
         </style>
             <ul>
             {% comment %}
