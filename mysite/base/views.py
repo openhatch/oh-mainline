@@ -96,7 +96,7 @@ def landing_page(request):
         # figure oout which nudges we want to show them
         person = request.user.get_profile()
 
-        data['nudge_location'] = not person.location_display_name or not person.location_confirmed
+        data['nudge_location'] = person.should_be_nudged_about_location()
         data['nudge_projects'] = not person.dataimportattempt_set.all()
         data['nudge_tags'] = not person.get_tags_for_recommendations()
 

@@ -1,5 +1,24 @@
 {% extends 'profile/people.html' %}
 {% load search %}
+{% block nav %}
+{{ block.super }}
+    {% if the_user.get_profile.should_be_nudged_about_location %}
+    <div id="location-suggestion-notification">
+        <p> Hi! We'd like to add you to this map .
+        {% if the_user.get_profile.location_display_name %}
+        You seem to be in <strong class='suggested_location'>{{ the_user.get_profile.location_display_name }}</strong>.  Is this correct?
+        </p>
+        <ul>
+            <li><button id="location_confirm_suggestion">Yes!</button></li>
+            <li><button onclick="window.location.href='{% url mysite.account.views.set_location %}?dont_suggest_location=1'">No, but let me tell you where I am.</button></li>
+            <li><button id="location_dont_track">Maybe. Don't keep track of where I am.</button></li>
+        </ul>
+        {% else %}
+        <a href="{% url mysite.account.views.set_location %}">Set my location &raquo;</a>
+        {% endif %}
+    </div>
+    {% endif %}
+{% endblock nav %}
 
 {% block body_id %}people-map{% endblock body_id %}
 {% block title %}
