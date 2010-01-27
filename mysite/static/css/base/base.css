@@ -120,7 +120,6 @@ h1 {
 #nav {
     padding: 10px 20px 0 20px;
     width: 960px;
-    height: 90px;
     border-top: 0;
 }
 #homepage #nav {
@@ -189,11 +188,11 @@ ul#links { margin-left: 20px; }
 
 #nav ul#topnavlinks { float: left; padding-left: 10px; }
 
-#topnavlinks li, #account-links li { margin: 0; font-size: .95em; }
+#topnavlinks li, #account-links li { margin: 15px 0; font-size: .95em; }
 
 #topnavlinks a, #account-links a { float: left; padding: 5px 10px; color: #484848; }
 
-#content { width: 960px; padding: 20px; padding-bottom: 5px; clear: both; }
+#content { width: 960px; padding: 10px 20px; padding-bottom: 5px; clear: both; }
 
 #footer-wrapper { width: 100%; clear: both; left: 0; }
 
