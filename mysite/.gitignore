@@ -7,8 +7,18 @@
 .*.swp
 *.pyc
 *.orig
-mysite/static/project-icons/*
-static/images/icons/projects/*
 .project
 .ropeproject
+
+# Little notes we make while developing.
 notes/*
+
+# Project icons
+static/images/icons/projects/*
+mysite/static/project-icons/*
+
+# Profile photos
+static/static/photos/*
+
+# User analysis tool
+static/piwik
