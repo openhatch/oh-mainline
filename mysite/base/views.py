@@ -112,7 +112,7 @@ def landing_page(request):
             {'language':'C', 'toughness':'bitesize'},
         "<strong>Bitesize</strong> bugs matching &lsquo;<strong>audio</strong>&rsquo;":
             {'q':'audio', 'toughness':'bitesize'},
-        "Bugs matching <strong>unicode</strong>":
+        "Bugs matching &lsquo;<strong>unicode</strong>&rsquo;":
             {'q':'unicode'},
         "Requests for <strong>documentation writing/editing</strong>":
             {'contribution_type':'documentation'},
