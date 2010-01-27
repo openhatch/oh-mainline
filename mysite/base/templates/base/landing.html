@@ -141,18 +141,18 @@ body#landing #right .entry { font-size: .9em; margin-top: 3px; }
                 {% if nudge_projects %}
                     <li>
                         <a href='{% url mysite.profile.views.portfolio_editor %}'>
-                            <div class='notification smaller'>
+                            <span class='notification smaller'>
                                 <img src='/static/images/base/homepage/importer-100px.png' />
                                 <span class='arrow'>&rarr;</span>
                                 <strong>Document your open source contributions</strong>
-                                 <span class='more-text'>
+                                <span class='more-text'>
                                      Put your story together automagically,
                                      using our mind-bending contribution importer
                                      (<em>at left</em>).
                                      Be proud of everything &mdash; bug reports, code, 
                                      translations, documentation, and design ideas.
                                 </span>
-                            </div>
+                            </span>
                         </a>
                     </li>
                 {% endif %}
@@ -160,51 +160,53 @@ body#landing #right .entry { font-size: .9em; margin-top: 3px; }
                     {% if nudge_tags %}
                         <li>
                             <a href='/profile/views/edit_info'>
-                                <div class='notification smaller'>
+                                <span class='notification smaller'>
                                     <span class='arrow'>&rarr;</span>
                                     <strong>Describe yourself</strong>
                                     <span class='more-text'>
                                         Add tags to your profile and get recommendations for nifty stuff to hack on.
                                     </span>
-                                </div>
+                                </span>
                             </a>
                         </li>
                     {% endif %}
                     {% if nudge_location %}
                         <li>
                             <a href='/account/settings/location/'>
-                                <div class='notification smaller'>
+                                <span class='notification smaller'>
                                     <span class='arrow'>&rarr;</span>
                                     <strong>Put yourself on the map</strong>
-                                        <span class='more-text'>Check out our map of open source supporters.</span>
-                                    </div>
-                            </a>
+                                    <span class='more-text'>
+                                        Check out our map of open source supporters.
+                                    </span>
+                                </span>
+                                </a>
                         </li>
                     {% endif %}
                 {% else %}
                 {# User is browsing anonymously #}
             <li>
                 <a href='/search/'>
-                    <div class='notification smaller'>
+                    <span class='notification smaller'>
                         <img src='/static/images/base/homepage/home-opps.png' />
                         <span class='arrow'>&rarr;</span>
                         <strong>Browse volunteering opportunities </strong>
                         <span class='more-text'>
                             We index thousands of bugs from over 100 open source projects, and growing.
                         </span>
-                    </div>
+                    </span>
                 </a>
             </li>
             <li>
                 <a href='/people/'>
-                    <div class='notification smaller'>
+                    <span class='notification smaller'>
                         <img src='/static/images/base/homepage/people-100px.png' />
                         <span class='arrow'>&rarr;</span>
                         <strong>Find contributors near you</strong>
                         <span class='more-text'>
                             Use our awesome map.
                         </span>
-                    </div>
+                    </span>
                 </a>
             </li>
                 {% endif %}
