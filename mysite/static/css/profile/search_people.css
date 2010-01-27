@@ -13,9 +13,8 @@ body#people-map #map_loading_msg span{font-size:2.5em; margin-left:10px; }
 body#people-map .view-links{float:left; width:33%; }
 body#people-map .view-links ul li{display:inline; margin-right:10px; margin-bottom:10px; float:left; font-size:1.3em; }
 body#people-map .left{float:left; width:51px; }
-body#people-map .person-summary-button{border-radius:8px; -moz-border-radius:8px; background-color:#ddd; font-weight:700; color:#555; padding:4px 8px; }
-body#people-map .person-summary-button:hover {text-decoration:none; color:#000; }
-body#people-map .profile-link{border:2px solid #fff; float:right; margin-left:4px; }
+body#people-map .profile-link:hover {text-decoration:none; color:#000; }
+body#people-map .profile-link{ position: relative; top: -5px; border-radius:8px; -moz-border-radius:8px; background-color:#ddf; color:#555; padding:4px 8px; border:2px solid #fff; font-size: .85em; float:right; margin-left:4px; }
 #big-people-list,#big-people-list ul,#people-count,#big-people-list .people-list-map{float:left; }
 #people-list li.hover{background:#ffc; }
 #people-list li.highlighted{background:#ffa !important; }
