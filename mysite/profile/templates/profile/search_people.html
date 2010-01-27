@@ -1,6 +1,10 @@
 {% extends 'profile/people.html' %}
 
 {% block body_id %}people-map{% endblock body_id %}
+{% block body_class %}
+{{ block.super }}
+people-list-page
+{% endblock body_class %}
 
 {% block title %}
 List of People
