@@ -24,11 +24,12 @@ about our members who support {{ project.name }}
         <h3>Registered contributors ({% firstof contributors|length "none yet" %})</h3>
     </div>
     <div class='body'>
-        <ul>
+        <ul id='people-list'>
             {% for person in contributors %}
-            {% include 'profile/person_small.html' %}
+                {% include 'profile/person-summary-li.html' %}
             {% empty %}
-            No registered contributors yet.             {% endfor %}
+                No registered contributors yet.  
+            {% endfor %}
         </ul>
         <div style='width: 100%; float: left; text-align: right; margin-top: 20px; font-size: 8pt;'>
         To be listed here,
@@ -64,32 +65,21 @@ about our members who support {{ project.name }}
             {% endif %}
       </p>
       
-      <p>
-            {% if mentors %}
-            There are {{ mentors|length }}
-            <a href='{% url mysite.profile.views.display_list_of_people_who_match_some_search "can_mentor" project.name|urlencode %}'>
-                {{ mentors|length|pluralize:"person,people" }}
-	      who can mentor in
-              <strong>{{ project.name }}</strong></a>.
-            {% else %}
-            No one on OpenHatch has signed up as a mentor for {{project.name}}.
-	    Can you?
-	    <a href="{% url mysite.profile.views.edit_info %}">Edit your info</a>.
-            {% endif %}
-      </p>
+      {% with mentors as mentors %}
+      {% with project.name as topic %}
+      {% with 0 as explain_language %}
+      {% include 'project/mentor_summary.html' %}
+      {% endwith %}
+      {% endwith %}
+      {% endwith %}
 
-      <p>
-            {% if language_mentors %}
-            There
-	    {{ language_mentors|length|pluralize:"is,are" }}
-            <a href='{% url mysite.profile.views.display_list_of_people_who_match_some_search "can_mentor" project.language|urlencode %}'>
-                {{ language_mentors|length}}
-                {{ language_mentors|length|pluralize:"person,people" }}
-	      who can mentor in
-	    <strong>{{ project.language }}</strong></a>,
-            {{ project.name}}'s primary language.
-            {% endif %}
-      </p>
+      {% with language_mentors as mentors %}
+      {% with project.language as topic %}
+      {% with 1 as explain_language %}
+      {% include 'project/mentor_summary.html' %}
+      {% endwith %}
+      {% endwith %}
+      {% endwith %}
 
     </div>
 </div>
