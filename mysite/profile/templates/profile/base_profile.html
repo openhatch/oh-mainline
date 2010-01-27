@@ -134,10 +134,11 @@
     </div>
 
         {% if editable and not person.bio and not person.homepage_url and not tags_flat %}
-    <div class='body has_notification'>
+            <div class='body has_notification'>
         {% else %}
-    <div class='body'>
+            <div class='body'>
         {% endif %}
+
         <style>
             h4 { padding: 0;}
         </style>
@@ -165,7 +166,9 @@
 
         {% if person.homepage_url %}
         <h4>web site</h4>
-        <a href="{{ person.homepage_url }}">{{ person.homepage_url|break_long_words|safe }}</a>
+        <p>
+            <a href="{{ person.homepage_url }}">{{ person.homepage_url|break_long_words|safe }}</a>
+        </p>
         {% endif %}
 
         {% comment %} 

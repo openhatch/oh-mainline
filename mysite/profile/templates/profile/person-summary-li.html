@@ -26,10 +26,10 @@
                 {% if person.user.first_name and person.user.last_name %}
                     {{ person.user.username }}
                 {% endif %}
-                {% if person.user.first_name and person.user.last_name and person.location_display_name %}
+                {% if person.user.first_name and person.user.last_name and person.location_display_name and person.location_confirmed %}
                     &middot;
                 {% endif %}
-                {% if person.location_display_name %}
+                {% if person.location_display_name and person.location_confirmed %}
                 {{ person.location_display_name }}
                 {% endif %}
             </span>

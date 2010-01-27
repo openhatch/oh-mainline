@@ -125,6 +125,10 @@ class Project(models.Model):
         else:
             return settings.MEDIA_URL + 'no-project-icon-w=20.png'
 
+    @models.permalink
+    def url(self):
+        return ('mysite.project.views.project', [self.name])
+
     def update_scaled_icons_from_self_icon(self):
         '''This method should be called when you update the Project.icon_raw attribute.
         Side-effect: Saves a scaled-down version of that icon in the
