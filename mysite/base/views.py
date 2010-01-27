@@ -87,6 +87,9 @@ def landing_page(request):
     random.shuffle(everybody)
     data['random_profiles'] = everybody[0:5]
 
+
+    data['nudge_projects'] = True # This value might be overwritten below.
+    
     #get globally recommended bug search stuff (for anonymous users)
     if request.user.is_authenticated():
         # for logged-in users:

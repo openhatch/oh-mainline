@@ -22,3 +22,4 @@ body#landing #bugs .body li { margin-top: 10px; }
 
 body#landing ul.nudgebuttons a { width: 95%; }
 body#landing .module > .head ul li a { font-weight: normal; }
+body#landing .nudgebuttons img { float: left; margin-right: 15px; }
