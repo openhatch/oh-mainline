@@ -31,6 +31,6 @@ body#people-map .profile-link{border:2px solid #fff; float:right; margin-left:4p
 #people-list li .people-view-info{float:left; width:200px; }
 #people-list li.highlighted .collapsible{display:inline; }
 #people-list li .collapsible,#people-list li.highlighted .ellipsis{display:none; }
-#people-list.people-list-map{list-style:square; overflow:auto; height:400px; width:33%; }
-#people-list.people-list-map li{cursor:hand; cursor: pointer; display:none; }
+#people-list.people-list-map{list-style:square; overflow:auto; height:428px; width:33%; }
+#people-list.people-list-map li{cursor:hand; cursor: pointer; }
 body#people-map #map-zoom,.view-links ul{margin:0; padding:0; }
