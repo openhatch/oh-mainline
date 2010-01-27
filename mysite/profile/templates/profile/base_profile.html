@@ -150,10 +150,17 @@
 
         {% if not person.bio and not person.homepage_url and not tags_flat %}
         {% ifequal the_user.get_profile person %}
-        <div class='notification' style='width: '>
-            <strong style="font-size: 1.2em; display: block; width: 100%;"><a href='{% url mysite.profile.views.edit_info %}'>Add info &raquo;</a></strong>
-            <p>We'll use it to connect you to interesting people and projects.</p>
-        </div>
+        <ul class='nudgebuttons'>
+            <li>
+            <a href='{% url mysite.profile.views.edit_info %}'>
+                <div class='notification smaller'>
+                    <span class='arrow'>&rarr;</span>
+                    <strong>Add info</strong>
+                    <p>We'll use it to suggest interesting projects.</p>
+                </div>
+            </a>
+            </li>
+        </ul>
         {% endifequal %}
         {% endif %}
 
