@@ -767,7 +767,7 @@ class LaunchpadCallsDebianDGL(TwillTests):
 
     @mock.patch('mysite.search.models.Project.populate_icon_from_ohloh',
                 do_nothing)
-    @mock.patch('mysite.customs.lp_grabber.get_info_for_launchpad_username',
+    @mock.patch('mysite.customs.lp_grabber._get_info_for_launchpad_username',
                 mock_launchpad_debian_response)
     @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
     def test(self):
