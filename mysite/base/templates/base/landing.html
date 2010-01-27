@@ -129,7 +129,7 @@ body#landing #right .entry { font-size: .9em; margin-top: 3px; }
     <div class='module' id='todo'>
         <div class="head">
         {% if the_user.is_authenticated %}
-            <h3>Things to do around here</h3>
+            <h3>How to get started on OpenHatch</h3>
         {% endif %}
         </div>
         <div class='body'>
@@ -241,7 +241,7 @@ Put your story together automagically, using our mind-bending contribution aggre
                 </span></li>
                 {% endfor %}
             </ul>
-            <p><a href='/search/' style='float: right;'>Find more opportunities <strong>&raquo;</strong></a></p>
+            <p><a href='/search/' style='float: right; text-align: right;'>Find more recommendations and other opportunities <strong>&raquo;</strong></a></p>
             {% else %}
             Discover new ways that you can contribute to free and open source software. For example:
         {# If no recommended bugs: #}
