@@ -50,7 +50,7 @@
                 <label>Describe this project</label>
                 <textarea class='project_description'></textarea>
                 {% else %}
-                <div class='project_description'>{{ pf_entry.project_description }}</div>
+                <div class='project_description'>{{ pf_entry.project_description|urlize }}</div>
                 {% endif %}
             </div>
             {% if not edit_mode and not adding_mode %}
@@ -122,7 +122,7 @@
                 {% if edit_mode %}
                 <textarea class='experience_description'></textarea>
                 {% else %}
-                <div class='experience_description'>{{ pf_entry.experience_description }}</div>
+                <div class='experience_description'>{{ pf_entry.experience_description|urlize }}</div>
                 {% endif %}
             </div>
         </div>
