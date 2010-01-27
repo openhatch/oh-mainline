@@ -1,5 +1,7 @@
 {% extends 'profile/people.html' %}
+{% load search %}
 
+{% block body_id %}people-map{% endblock body_id %}
 {% block title %}
 Map of People
 {% endblock title %}
@@ -14,7 +16,20 @@ Map of People
             However, this doesn't seem to work properly when the image is specified
             via an external stylesheet.
         {% endcomment %}
-        <div id="map_canvas" style='float: right; margin-top: 18px; margin-right: 10px; width:65%; height:450px;background: url("/static/images/profile/map_for_loading.png") top no-repeat;'>
+        <div id="search" style="float: right; width: 65%; margin-right: 10px;">
+	  <form action="." id="map-zoom">
+          <div class="input-and-labels">
+            <input id="location_for_map_centering" name="center" type="text" value="{{ center_name }}"/>
+            <label for="location_for_map_centering">Find people near a specific location.</label>
+        </div>
+            <input id="center_the_map" type="submit" style="" value="Go"/>
+	  </form>
+      <p class="map-error">
+      We couldn't find that location.
+      </p>
+
+        </div>
+        <div id="map_canvas" style='float: right; margin-top: 18px; margin-right: 10px; width:65%; height:450px;'>
             <div id='map_loading_msg'>
                 <img src='/static/images/icons/throbber.png' />
                 <span>Loading map&hellip;</span>
@@ -40,13 +55,45 @@ Map of People
 {% block js %}
 {{ block.super }}
 <script type="text/javascript">
+    {% if center_json and not geocode_failed %}
+        var center = {{ center_json|safe}}; /* This comes from Python geocoding the ?center= . */
+        var center_name = {{ center_name_json|safe}}; /* This is the string form of the above. */
+    {% else %}
+        var center = {'latitude': 0, 'longitude': 0, 'suggested_zoom_level': 1};
+        var center_name = '';
+    {% endif %}
+
+    {% if geocode_failed %}
+        $('.map-error').show();
+    {% endif %}
+
     mapController = new PeopleMapController(); 
     $(function () {
         mapController.initialize({
                 'person_id2data': {{ person_id2data_as_json|safe}},
-                'num_of_persons_with_locations': {{ num_of_persons_with_locations }}
+                'num_of_persons_with_locations': {{ num_of_persons_with_locations }},
+                'center': center
+
         });
         mapController.bindClickHandlersToPeopleListItems();
+        var center_and_zoom_the_map = function () {
+            $('.map-error').hide();
+            var location = $('#location_for_map_centering').val();
+            var callback_to_geocode_then_center_and_zoom = function(results, status) {
+                if (status == google.maps.GeocoderStatus.OK) {
+                    mapController.map.setCenter(results[0].geometry.location);
+                    mapController.map.setZoom(5);
+                }
+                else{
+                    $('.map-error').show();
+                }
+            };
+            var geocoder = new google.maps.Geocoder();
+            geocoder.geocode( {'address': location},
+                              callback_to_geocode_then_center_and_zoom);
+            return false;
+        }
+        $('#center_the_map').click(center_and_zoom_the_map);
     });
 </script>
 {% endblock js %}

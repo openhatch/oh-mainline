@@ -89,6 +89,9 @@ body#profile .citations-wrapper .howto { color: #111; }
 body#profile #main .citations-wrapper .howto .body { float: none ! important; }
 body#profile .citations li a { font-weight: bold; }
 body#profile .citations-wrapper .howto, .citations-wrapper .show_howto { background-color: #ffa; border: 1px solid yellow; border-radius: 6px; float: right; font-size: 8pt; margin-top: 10px; -moz-border-radius: 6px; padding: 12px; width: 200px; }
+body#profile .citations-wrapper .howto ul { list-style: square; margin-bottom: .5em; }
+body#profile .citations-wrapper .howto li { margin-left: 1.5em; }
+body#profile .citations-wrapper .howto p { margin-top: 0; margin-bottom: .5em; }
 body#profile .citations-wrapper .howto .hide_me { float: right; margin-left: 3px; padding: 5px; }
 body#profile .citations-wrapper .show_howto { display: none; padding: 6px; width: auto; }
 body#profile .citation-forms label { margin-top: 10px; }

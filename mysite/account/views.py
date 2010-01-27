@@ -27,8 +27,6 @@ from mysite.profile.models import Person, Tag, TagType, Link_Project_Tag, Link_S
 from mysite.base.decorators import view
 # }}}
 
-applog = logging.getLogger('applog')
-
 def signup_do(request):
     # {{{
     post = {}
@@ -157,7 +155,7 @@ def edit_contact_info_do(request):
         p.show_email = show_email_form.cleaned_data['show_email']
         p.save()
 
-        applog.debug('Changing email of user <%s> to <%s>' % (
+        logging.debug('Changing email of user <%s> to <%s>' % (
                 request.user, edit_email_form.cleaned_data['email']))
         edit_email_form.save()
 

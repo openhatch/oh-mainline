@@ -17,10 +17,11 @@ PeopleMapController.prototype.initialize = function(options) {
     var all_markers = [];
 
     var geocoder =  new google.maps.Geocoder();
-
-    this.mapOrigin = new google.maps.LatLng(0, 0);
+    
+    this.mapOrigin = new google.maps.LatLng(options.center.latitude,
+					    options.center.longitude);
     var myOptions = {
-        'zoom': 1,
+        'zoom': options.center.suggested_zoom_level,
         'center': this.mapOrigin,
         'mapTypeId': google.maps.MapTypeId.ROADMAP
     };

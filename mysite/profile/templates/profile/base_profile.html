@@ -69,17 +69,23 @@
 
 	    <div style="clear: left; float: left;">
 	      {% if person.location_display_name and person.location_confirmed %}
-	      {{ person.location_display_name }}
+          <a href="/people/?center={{ person.location_display_name }}">
+              {{ person.location_display_name }}
+          </a>
 	      {% endif %}
-              {% if editable %}
-	      <a href="{% url mysite.account.views.set_location %}">(edit location)</a>
-              {% endif %}
+          {% if editable %}
+          {% if person.location_display_name and person.location_confirmed %}
+          (<a href="{% url mysite.account.views.set_location %}">edit</a>)
+          {% else %}
+          (<a href="{% url mysite.account.views.set_location %}">edit location</a>)
+          {% endif %}
+          {% endif %}
 
-	      {% if person.show_email and person.user.email %}
-              <div>
-		<a href="mailto:{{ person.user.email }}">{{ person.user.email }}</a>
-              </div>
-	      {% endif %}
+          {% if person.show_email and person.user.email %}
+          <div>
+              <a href="mailto:{{ person.user.email }}">{{ person.user.email }}</a>
+          </div>
+          {% endif %}
 	      
 	    </div>
 			
