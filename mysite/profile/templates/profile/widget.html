@@ -286,7 +286,7 @@
                 <div class='project-escutcheon'>
                     <div class='logo'>
                         <a href='{% url mysite.project.views.project project.name %}'>
-                            <img alt='logo' title='{{ project.url }}'
+                            <img alt='logo' title='https://openhatch.org{{ project.url }}'
                             src='{{ project.get_url_of_badge_size_icon_or_generic }}' width='40'/>
                             <div class='project-name'>{{ project.name|break_long_words|safe }}</div>
                         </a>
