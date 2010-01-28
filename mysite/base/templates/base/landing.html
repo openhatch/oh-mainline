@@ -139,7 +139,7 @@ body#landing #right .entry { font-size: .9em; margin-top: 3px; }
         <p style='font-size: .9em; color: #555; margin: 0 0 5px 10px;'>Here you can:</p>
         {% endif %}
             <ul class='nudgebuttons'>
-                {% if nudge_projects %}
+                {% if nudge_importer_when_user_has_no_projects %}
                     <li>
                         <a href='{% url mysite.profile.views.portfolio_editor %}'>
                             <span class='notification smaller'>
@@ -152,6 +152,26 @@ body#landing #right .entry { font-size: .9em; margin-top: 3px; }
                                      (<em>at left</em>).
                                      Be proud of everything &mdash; bug reports, code, 
                                      translations, documentation, and design ideas.
+                                </span>
+                            </span>
+                        </a>
+                    </li>
+                {% endif %}
+                {% if nudge_importer_when_user_has_some_projects %}
+                    <li>
+                        <a href='{% url mysite.profile.views.portfolio_editor %}'>
+                            <span class='notification smaller'>
+                                <img src='/static/images/base/homepage/importer-100px.png' />
+                                <span class='arrow'>&rarr;</span>
+                                <strong>Use our importer to find your contributions</strong>
+                                <span class='more-text'>
+                                     You've added some projects using our editor. Now try our
+				     mind-bending contribution importer
+                                     (<em>at left</em>).
+				     Tell us the email addresses and usernames you use in open source.
+				     We'll search for your contributions:
+				     commits, bug participation, packaging, and more.
+
                                 </span>
                             </span>
                         </a>
