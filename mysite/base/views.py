@@ -88,8 +88,6 @@ def landing_page(request):
     data['random_profiles'] = everybody[0:5]
 
 
-    data['nudge_projects'] = True # This value might be overwritten below.
-    
     #get globally recommended bug search stuff (for anonymous users)
     if request.user.is_authenticated():
         # for logged-in users:
@@ -116,7 +114,11 @@ def landing_page(request):
                      ] = True # give the general project editing nudge
 
         data['show_nudge_box'] = (data['nudge_location'] or 
-                data['nudge_projects'] or data['nudge_tags'])
+                'nudge_importer_when_user_has_no_projects' in data or data['nudge_tags'] or
+                                  'nudge_importer_when_user_has_some_projects' in data)
+    else: # no user logged in. Show front-page importer nudge.
+        data['nudge_importer_when_user_has_no_projects'] = True
+
     if not data['recommended_bugs']:
         data['show_nudge_box'] = True
         # a dict pairing two things:
