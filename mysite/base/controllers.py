@@ -91,3 +91,13 @@ def cached_geocoding_in_json(address):
         geocoded_in_json = simplejson.dumps(geocoded)
         cache.set(key_name, geocoded_in_json, 60 * 60 * 24 * 7) # cache for a week, which should be plenty
     return geocoded_in_json
+
+def get_uri_metadata_for_generating_absolute_links(request):
+    data = {}
+    data['url_prefix'] = request.META['SERVER_NAME'] + ':' + request.META['SERVER_PORT']
+    uri_scheme = 'http'
+    if request.is_secure():
+        uri_scheme = 'https'
+    data['uri_scheme'] = uri_scheme
+    return data
+
