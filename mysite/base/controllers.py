@@ -105,8 +105,9 @@ def get_uri_metadata_for_generating_absolute_links(request):
         'http': ':80',
         'https': ':443'}
 
-    url_prefix = uri_scheme + '://' + host_name
-    if colon_and_port_number not in uri_scheme2colon_number_to_drop:
+    url_prefix = host_name
+    if colon_and_port_number not in uri_scheme2colon_number_to_drop[
+        uri_scheme]:
         url_prefix += colon_and_port_number
 
     data['url_prefix'] = url_prefix
