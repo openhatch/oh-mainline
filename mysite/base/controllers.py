@@ -94,10 +94,22 @@ def cached_geocoding_in_json(address):
 
 def get_uri_metadata_for_generating_absolute_links(request):
     data = {}
-    data['url_prefix'] = request.META['SERVER_NAME'] + ':' + request.META['SERVER_PORT']
+    colon_and_port_number = ':' + request.META['SERVER_PORT']
+    host_name = request.META['SERVER_NAME']
+
     uri_scheme = 'http'
     if request.is_secure():
         uri_scheme = 'https'
+
+    uri_scheme2colon_number_to_drop = {
+        'http': ':80',
+        'https': ':443'}
+
+    url_prefix = uri_scheme + '://' + host_name
+    if colon_and_port_number not in uri_scheme2colon_number_to_drop:
+        url_prefix += colon_and_port_number
+
+    data['url_prefix'] = url_prefix
     data['uri_scheme'] = uri_scheme
     return data
 
