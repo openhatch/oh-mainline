@@ -88,8 +88,6 @@ def landing_page(request):
     data['random_profiles'] = everybody[0:5]
 
 
-    data['nudge_projects'] = True # This value might be overwritten below.
-    
     #get globally recommended bug search stuff (for anonymous users)
     if request.user.is_authenticated():
         # for logged-in users:
@@ -97,11 +95,30 @@ def landing_page(request):
         person = request.user.get_profile()
 
         data['nudge_location'] = person.should_be_nudged_about_location()
-        data['nudge_projects'] = not person.dataimportattempt_set.all()
         data['nudge_tags'] = not person.get_tags_for_recommendations()
 
+        # Project editor nudging. Note:
+        # If the person has some dias, then no nudge!
+        if person.dataimportattempt_set.all():
+            pass # whee, no nudge. the user has already seen the project editor.
+        else:
+            # So, either the person has some projects listed publicly, in which case,
+            # we should remind the person just to use the importer...
+            if person.get_published_portfolio_entries():
+                data['nudge_importer_when_user_has_some_projects'
+                     ] = True # just nudge about the importer...
+            else:
+                # the person has entered zero projects and hasn't touched the importer
+                # so introduce him or her to use the importer!
+                data['nudge_importer_when_user_has_no_projects'
+                     ] = True # give the general project editing nudge
+
         data['show_nudge_box'] = (data['nudge_location'] or 
-                data['nudge_projects'] or data['nudge_tags'])
+                'nudge_importer_when_user_has_no_projects' in data or data['nudge_tags'] or
+                                  'nudge_importer_when_user_has_some_projects' in data)
+    else: # no user logged in. Show front-page importer nudge.
+        data['nudge_importer_when_user_has_no_projects'] = True
+
     if not data['recommended_bugs']:
         data['show_nudge_box'] = True
         # a dict pairing two things:
