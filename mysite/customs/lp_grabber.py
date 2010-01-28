@@ -60,7 +60,11 @@ def get_launchpad_username_by_email(maybe_email_address):
 
     return username
 
-def get_info_for_launchpad_username(identifier):
+launchpad_project_name_fixups = {
+    'Launchpad itself': 'Launchpad',
+    'Debian': 'Debian GNU/Linux'}
+
+def _get_info_for_launchpad_username(identifier):
     """This figures out what the named person has been involved with.
     It returns a dictionary like this:
     {
@@ -108,9 +112,6 @@ def get_info_for_launchpad_username(identifier):
         project_link = row.cssselect('a')[0]
         project_name = project_link.text_content().strip()
 
-        if project_name == 'Launchpad itself':
-            project_name = 'Launchpad'
-
         project_url_relative = project_link.attrib['href']
         project_url = urlparse.urljoin(b.geturl(), project_url_relative)
         
@@ -125,6 +126,22 @@ def get_info_for_launchpad_username(identifier):
                 }
     return ret
 
+def get_info_for_launchpad_username(identifier):
+    # call private function
+    data = _get_info_for_launchpad_username(identifier)
+    # apply project name fixups
+    ret = {}
+    for old_key in data:
+        # fix the key...
+        if old_key in launchpad_project_name_fixups:
+            project_name = launchpad_project_name_fixups[
+                old_key]
+        else:
+            project_name = old_key
+            
+        # copy the value in
+        ret[project_name] = data[old_key]
+    return ret
 
 def person_to_bazaar_branch_languages(username):
     user_info = get_info_for_launchpad_username(username)
