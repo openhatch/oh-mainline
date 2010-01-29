@@ -126,10 +126,6 @@ class Person(models.Model):
     def get_published_portfolio_entries(self):
         return PortfolioEntry.objects.filter(person=self, is_published=True, is_deleted=False)
 
-#    def get_published_portfolio_entries_in_sets_of_three(self):
-#        return_list = []
-#        uncut = get_published_portfolio_entries(self)
-
     def get_list_of_project_names(self):
         return self.get_published_portfolio_entries().values_list('project__name', flat=True)
 
