@@ -6,6 +6,7 @@ from django.core.servers.basehttp import AdminMediaHandler
 from StringIO import StringIO
 from django.test.client import Client
 import mysite.base.controllers
+import mysite.base.helpers
 
 def twill_setup():
     app = AdminMediaHandler(WSGIHandler())
@@ -98,5 +99,15 @@ class MySQLRegex(TwillTests):
             self.assertEqual(
                     mysite.base.controllers.mysql_regex_escape(before), 
                     after)
+
+class TestUriDataHelper(TwillTests):
+    def test(self):
+        request = mysite.base.helpers.ObjectFromDict({
+            'is_secure': lambda : True,
+            'META': {'SERVER_PORT': '443',
+                     'SERVER_NAME': 'name'}})
+        data = mysite.base.controllers.get_uri_metadata_for_generating_absolute_links(request)
+        self.assertEqual(data, {'uri_scheme': 'https',
+                                'url_prefix': 'name'})
 
 # vim: set ai et ts=4 sw=4 nu:
