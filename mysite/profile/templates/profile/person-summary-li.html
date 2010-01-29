@@ -20,19 +20,25 @@
                 {{ person.user.username }}
             {% endif %}
 
+            {% if person.user.first_name and person.user.last_name %}
+                <span class='username'>
+                    {{ person.user.username }}
+                </span>
+            {% endif %}
         </div>
 
-            <span class="location">
-                {% if person.user.first_name and person.user.last_name %}
-                    {{ person.user.username }}
-                {% endif %}
-                {% if person.user.first_name and person.user.last_name and person.location_display_name and person.location_confirmed %}
-                    &middot;
-                {% endif %}
-                {% if person.location_display_name and person.location_confirmed %}
-                {{ person.location_display_name }}
-                {% endif %}
-            </span>
+        <span class="what_matched_the_search">
+            understands and can pitch in with Python
+        </span>
+
+        <span class="location">
+            {% if person.user.first_name and person.user.last_name and person.location_display_name and person.location_confirmed %}
+                &middot;
+            {% endif %}
+            {% if person.location_display_name and person.location_confirmed %}
+            {{ person.location_display_name }}
+            {% endif %}
+        </span>
         {% with person.get_list_of_project_names as project_names %}
         {% if project_names %}
             <span class="people-view-projects">

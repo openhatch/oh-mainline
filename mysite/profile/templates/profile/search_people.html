@@ -18,7 +18,7 @@ List of People
 
     <div id='search'>
         <div class='field'>
-            <label for='search_profiles'>Projects, interests, etc.</label>
+            <label for='search_profiles'>Search for</label>
             <input id='search_profiles' type='text'>
             <ul class='suggestions'>
                 {% for what_kind_of_thing, list_of_things in suggestions.items %}
@@ -34,49 +34,52 @@ List of People
             </ul>
         </div>
         <div class='field'>
-            <label for='search_locations'>Location</label>
+            <label for='search_locations'>Near</label>
             <input id='search_locations' type='text'>
         </div>
     </div>
-    <div id='search_explanation'>
-        Showing 34 profiles matching &lsquo;<strong>Python</strong>&rsquo;. [<a href=''>Make this search more precise.</a>]
+    <div id='search_summary'>Showing <strong>100</strong> people who have listed &lsquo;<strong>Python</strong>&rsquo; and &lsquo;<strong>Java packaging</strong>&rsquo; on their profiles.
+        
+    </div>
+    <div id='search_modules'>
         <div id='refine_search'>
             <ul class='filter_conjunction'>
                 <li>
-                    This list includes people who&hellip;
+                    <span class='term'>Looking for a mentor?</span>
                     <ul class='filter_disjunction'>
-                        <li><strong>understand</strong> Python (3) [<a href=''>hide</a>]</li>
-                        <li><span class='logical-operator'>or</span> <strong>will never understand</strong> Python (3) [<a href=''>hide</a>]</li>
-                        <li><span class='logical-operator'>or</span> <strong>can pitch in with</strong> Python (3) [<a href=''>hide</a>]</li>
-                        <li><span class='logical-operator'>or</span> <strong>are currently studying</strong> Python (3) [<a href=''>hide</a>]</li>
-                        <li><span class='logical-operator'>or</span> <strong>can mentor in</strong> Python (3) [<a href=''>hide</a>]</li>
+                        <li><a href=''>Find mentors in <strong>Python</strong></small></a> (5)</li>
+                        <li><a href=''>Find mentors in <strong>Java packaging</strong></a> (3)</li>
                     </ul>
                 </li>
                 <li>
-                    <span class='logical-operator'>and</span> who
+                    <span class='term'>Looking for help with your project?</span>
                     <ul class='filter_disjunction'>
-                        <li><strong>understand</strong> Java packaging (3) [<a href=''>hide</a>]</li>
-                        <li><span class='logical-operator'>or</span> <strong>will never understand</strong> Java packaging (3) [<a href=''>hide</a>]</li>
-                        <li><span class='logical-operator'>or</span> <strong>can pitch in with</strong> Java packaging (3) [<a href=''>hide</a>]</li>
-                        <li><span class='logical-operator'>or</span> <strong>are currently studying</strong> Java packaging (3) [<a href=''>hide</a>]</li>
-                        <li><span class='logical-operator'>or</span> <strong>can mentor in</strong> Java packaging (3) [<a href=''>hide</a>]</li>
+                        <li><a href=''>Find people who can pitch in with
+                                <strong>Python</strong></a></li>
+                        <li><a href=''>Find people who can pitch in with
+                                <strong>Java packaging</strong></a></li>
+                    </ul>
+                </li>
+                <li>
+                    <span class='term'>Related groups:</span>
+                    <ul>
+                        <li><a href=''>Python (the project)</a></li>
+                        <li><a href=''>Debian Python packaging</a></li>
                     </ul>
                 </li>
             </ul>
         </div>
     </div>
     <ul id="people-list">
-        {% cache 86400 results %}
-            {% for column in people_columns %}
-            <div class="people-list-column">
-                {% for person in column %}
-                    {% if person.user.username %}
-                        {% include 'profile/person-summary-li.html' %}
-                    {% endif %}
-                {% endfor %}
-            </div>
+        {% for column in people_columns %}
+        <div class="people-list-column">
+            {% for person in column %}
+                {% if person.user.username %}
+                    {% include 'profile/person-summary-li.html' %}
+                {% endif %}
             {% endfor %}
-        {% endcache %}
+        </div>
+        {% endfor %}
     </ul>
 {% endblock people_main %}
 

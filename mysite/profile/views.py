@@ -303,11 +303,13 @@ def ask_for_tag_input(request, username):
     return display_person_web(request, username, 'tags', edit='1')
     # }}}
 
-def cut_list_of_people_in_to_columns(people):
+def cut_list_of_people_in_three_columns(people):
     third = len(people)/3
     return [people[0:third], people[third:(third*2)], people[(third*2):]]
 
-
+def cut_list_of_people_in_two_columns(people):
+    half = len(people)/2
+    return [people[0:half], people[half:]]
     
 
 @view
@@ -315,7 +317,7 @@ def display_list_of_people_who_match_some_search(request, property, value):
     '''Property is the "tag name", and "value" is the text in it.'''
     peeps = mysite.profile.controllers.people_matching(property, value)
     data = {}
-    data['people_columns'] = cut_list_of_people_in_to_columns(peeps)
+    data['people_columns'] = cut_list_of_people_in_three_columns(peeps)
     data['property'] = property
     data['value'] = value
     return (request, 'profile/search_people.html', data)
@@ -325,7 +327,7 @@ def display_list_of_people(request):
     """Display a list of people."""
     # {{{
     data = {}
-    data['people_columns'] = cut_list_of_people_in_to_columns(
+    data['people_columns'] = cut_list_of_people_in_two_columns(
             Person.objects.all().order_by('user__username'))
     suggestion_count = 10
     data['suggestions'] = {

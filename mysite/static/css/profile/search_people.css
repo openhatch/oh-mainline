@@ -16,11 +16,10 @@ body#people-map .left{float:left; width:51px; }
 body#people-map .profile-link:hover {text-decoration:none; color:#000; }
 body#people-map .profile-link{ position: relative; top: -5px; border-radius:8px; -moz-border-radius:8px; background-color:#ddf; color:#555; padding:4px 8px; border:2px solid #fff; font-size: .85em; float:right; margin-left:4px; }
 #big-people-list,#big-people-list ul,#people-count,#big-people-list .people-list-map{float:left; }
-.people-list-page #big-people-list ul#people-list {width: 100% }
 #people-list li.hover{background:#ffc; }
 #people-list li.highlighted{background:#ffa !important; }
 #people-list li.highlighted .name{text-shadow:0 1px 0 #fff; }
-#people-list .people-list-column{width:32%; float:left; border-left:1px dashed #CCC; padding-left:15px; }
+#people-list .people-list-column{width:32%; float:left; border-left:1px dashed #dfdfdf; padding-left:15px; }
 #people-list .people-list-column:first-child {border-left:none; padding-left:0; }
 #people-list li{border-radius:8px; -moz-border-radius:8px; margin-bottom:3px; list-style:none; display:block; float:left; width:94%; padding:8px; }
 #people-list li img{font-size:51px; vertical-align:top; float:left; margin-right:10px; margin-bottom:5px; }
@@ -44,7 +43,25 @@ body#people-map #search input[type='text'] { width: 97%; }
 body#people-map #search a { }
 body#people-map #search .suggestions { margin-bottom: 10px; }
 body#people-map #search .introduce_suggestions {  }
-body#people-map #search_explanation { float: left; width: 100%; }
-body#people-map #refine_search { color: #333; float: left; padding: 10px; border: 1px solid #ddd; background-color: #eee; -moz-border-radius: 8px; border-radius: 8px; width: 40%; }
-body#people-map #refine_search li { float: left; width: 96%; margin-left: 1.2em; list-style: disc; }
+body#people-map #search_summary, body#people-map #search_modules > div { padding: 8px 0;  float: left; margin-top: 10px; }
+body#people-map #search_summary { padding: 10px 0; font-size: 1.1em; width: 96%; border-bottom: 1px dashed #dfdfdf; }
+body#people-map #search_modules { float: left; width: 20%; border-right: 1px dashed #dfdfdf; }
+body#people-map #search_modules > div { width: 90%; }
+body#people-map #refine_search { padding: 8px;  }
+body#people-map #refine_search h3 { padding: 5px 0; margin-bottom: 10px; }
+ 
+body#people-map #refine_search .filter_conjunction > li { list-style: none; margin-left: 0; float: left; margin-bottom: 10px; }
+body#people-map #refine_search .filter_conjunction > li:last-child { margin-bottom: 0; }
+body#people-map #refine_search ul.filter_disjunction { float: left; }
+body#people-map #search_modules li { list-style: disc; margin-left: 22px;float: left; width: 87%; padding: 2px 0; color: #555; }
+body#people-map #related_queries { padding: 15px 0; }
+body#people-map #refine_search .filter_disjunction > li.initially_hidden { display: none; }
+body#people-map #refine_search .term { float: left; font-size: .85em; padding: 3px 0; font-weight: bold; }
 body#people-map .logical-operator { font-variant: small-caps; }
+body#people-map #people-list { width: 75%; }
+body#people-map #people-list .people-list-column { padding: 10px; width:45%; }
+body#people-map #people-list li .what_matched_the_search { float: left; font-size: .9em; font-weight: normal; color: #333; }
+body#people-map #people-list li .username { font-size: .9em; color: #333; font-weight: normal; }
+
+small { font-size: 1em; color: #888; }
+a:hover small { color: inherit; }
