@@ -169,7 +169,7 @@ class Query:
             'contribution_type', ['documentation', ''])
 
         language_options = self.get_facet_options('language', self.get_language_names() + [''])
-        # sort language_options so that unkown is second-to-last and any is last
+        # sort language_options so that unknown is second-to-last and any is last
         language_options_name_is_unknown = filter((lambda language_option_set: language_option_set['name'] == 'Unknown'), language_options)
         language_options_name_is_any = filter((lambda language_option_set: language_option_set['name'] == 'any'), language_options)
         language_options_name_is_neither_of_the_above = filter((lambda language_option_set: language_option_set['name']  not in ['Unknown', 'any'] ), language_options)
