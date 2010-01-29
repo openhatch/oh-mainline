@@ -1,4 +1,5 @@
 {% extends 'profile/people.html' %}
+{% load cache %}
 
 {% block body_id %}people-map{% endblock body_id %}
 {% block body_class %}
@@ -11,20 +12,72 @@ List of People
 {% endblock title %}
 
 {% block people_main %}
-        {% if property and value %}
-        where {{ property }} = {{ value }}
-        {% endif %}
-        <ul id="people-list">
+    {% if property and value %}
+    where {{ property }} = {{ value }}
+    {% endif %}
+
+    <div id='search'>
+        <div class='field'>
+            <label for='search_profiles'>Projects, interests, etc.</label>
+            <input id='search_profiles' type='text'>
+            <ul class='suggestions'>
+                {% for what_kind_of_thing, list_of_things in suggestions.items %}
+                    <li>
+                        <span class='introduce_suggestions'>Browse people by
+                            {{ what_kind_of_thing }}:</span>
+                        {% for thing in list_of_things %}
+                            <a href='{{ thing.url }}'>
+                                {{ thing.name }}</a>{% if not forloop.last %},{% endif %}
+                        {% endfor %}
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class='field'>
+            <label for='search_locations'>Location</label>
+            <input id='search_locations' type='text'>
+        </div>
+    </div>
+    <div id='search_explanation'>
+        Showing 34 profiles matching &lsquo;<strong>Python</strong>&rsquo;. [<a href=''>Make this search more precise.</a>]
+        <div id='refine_search'>
+            <ul class='filter_conjunction'>
+                <li>
+                    This list includes people who&hellip;
+                    <ul class='filter_disjunction'>
+                        <li><strong>understand</strong> Python (3) [<a href=''>hide</a>]</li>
+                        <li><span class='logical-operator'>or</span> <strong>will never understand</strong> Python (3) [<a href=''>hide</a>]</li>
+                        <li><span class='logical-operator'>or</span> <strong>can pitch in with</strong> Python (3) [<a href=''>hide</a>]</li>
+                        <li><span class='logical-operator'>or</span> <strong>are currently studying</strong> Python (3) [<a href=''>hide</a>]</li>
+                        <li><span class='logical-operator'>or</span> <strong>can mentor in</strong> Python (3) [<a href=''>hide</a>]</li>
+                    </ul>
+                </li>
+                <li>
+                    <span class='logical-operator'>and</span> who
+                    <ul class='filter_disjunction'>
+                        <li><strong>understand</strong> Java packaging (3) [<a href=''>hide</a>]</li>
+                        <li><span class='logical-operator'>or</span> <strong>will never understand</strong> Java packaging (3) [<a href=''>hide</a>]</li>
+                        <li><span class='logical-operator'>or</span> <strong>can pitch in with</strong> Java packaging (3) [<a href=''>hide</a>]</li>
+                        <li><span class='logical-operator'>or</span> <strong>are currently studying</strong> Java packaging (3) [<a href=''>hide</a>]</li>
+                        <li><span class='logical-operator'>or</span> <strong>can mentor in</strong> Java packaging (3) [<a href=''>hide</a>]</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <ul id="people-list">
+        {% cache 86400 results %}
             {% for column in people_columns %}
             <div class="people-list-column">
-            {% for person in column %}
-            {% if person.user.username %}
-            {% include 'profile/person-summary-li.html' %}
-            {% endif %}
-        {% endfor %}
-        </div>
+                {% for person in column %}
+                    {% if person.user.username %}
+                        {% include 'profile/person-summary-li.html' %}
+                    {% endif %}
+                {% endfor %}
+            </div>
             {% endfor %}
-        </ul>
+        {% endcache %}
+    </ul>
 {% endblock people_main %}
 
 {% block js %}

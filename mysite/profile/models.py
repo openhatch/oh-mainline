@@ -324,6 +324,10 @@ class Tag(models.Model):
     text = models.CharField(null=False, max_length=255)
     tag_type = models.ForeignKey(TagType)
 
+    @property
+    def name(self):
+        return self.text
+
     def save(self, *args, **kwargs):
         if self.text:
             return super(Tag, self).save(*args, **kwargs)

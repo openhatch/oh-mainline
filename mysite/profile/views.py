@@ -325,7 +325,14 @@ def display_list_of_people(request):
     """Display a list of people."""
     # {{{
     data = {}
-    data['people_columns'] = cut_list_of_people_in_to_columns(Person.objects.all().order_by('user__username'))
+    data['people_columns'] = cut_list_of_people_in_to_columns(
+            Person.objects.all().order_by('user__username'))
+    suggestion_count = 10
+    data['suggestions'] = {
+            'project': Project.objects.all()[:suggestion_count],
+            'tag': Tag.objects.all()[:suggestion_count]
+            }
+
     return (request, 'profile/search_people.html', data)
     # }}}
 
