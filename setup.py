@@ -22,7 +22,7 @@ setup(
                         'south==0.6-rc1',
                         'multiprocessing==2.6.2.1-oh',
                         'launchpadlib==1.5.3',
-                        'django-assets',
+                        'django-assets==0.2',
                         'python-github2==0.1.1',
                         'pygeoip==0.1.3',
                        ],
