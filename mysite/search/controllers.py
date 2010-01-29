@@ -169,6 +169,15 @@ class Query:
             'contribution_type', ['documentation', ''])
 
         language_options = self.get_facet_options('language', self.get_language_names() + [''])
+        # sort language_options so that unkown is second-to-last and any is last
+        language_options_name_is_unknown = filter((lambda language_option_set: language_option_set['name'] == 'Unknown'), language_options)
+        language_options_name_is_any = filter((lambda language_option_set: language_option_set['name'] == 'any'), language_options)
+        language_options_name_is_neither_of_the_above = filter((lambda language_option_set: language_option_set['name']  not in ['Unknown', 'any'] ), language_options)
+        language_options = language_options_name_is_neither_of_the_above + language_options_name_is_unknown + language_options_name_is_any
+
+
+        # looks something like:
+        # [{'count': 1180L, 'query_string': 'q=&language=Python', 'is_active': False, 'name': u'Python'}, {'count': 478L, 'query_string': 'q=&language=C%23', 'is_active': False, 'name': u'C#'}, {'count': 184L, 'query_string': 'q=&language=Unknown', 'is_active': False, 'name': 'Unknown'}, {'count': 532L, 'query_string': 'q=&language=C', 'is_active': False, 'name': u'C'}, {'count': 2374L, 'query_string': 'q=&language=', 'is_active': True, 'name': 'any'}]
 
         possible_facets = { 
                 # The languages facet is based on the project languages, "for now"
