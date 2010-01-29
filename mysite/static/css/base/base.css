@@ -1,23 +1,22 @@
 body {
-    font: 9pt sans-serif;
+    font: 10pt sans-serif;
     background: #fff url("/static/images/motif-eee.png") fixed;
     color: #222;
+    /* color: rgb(55,84,105); dark blue */
     max-width: 1000px;
     margin: 0 auto;
     padding: 0;
 }
 
 a {
-    color: #ff6d3d; /* #ff8046; #ff6d3d; #ff613f; #ff7800; 00a8ff; eeb300; */
+    color: #FF6D3D;
     text-decoration: none;
 }
 
-/* display: none would hide this from screenreaders. */
+/* display: none would hide this from screenreaders. Let's hide this off stage left instead. */
 .alt-text { left: -9999px; position: absolute; }
 
-a:hover {
-    text-decoration: underline;
-}
+a:hover { text-decoration: underline; }
 
 a img {
     border-style: none;
@@ -121,9 +120,21 @@ h1 {
 #nav {
     padding: 10px 20px 0 20px;
     width: 960px;
-    height: 90px;
     border-top: 0;
 }
+#homepage #nav {
+    /* On the homepage, we let the top nav be as non-tall as possible. */
+    height: auto;
+}
+
+#homepage #account-links {
+    padding-right: 8px;
+}
+
+#homepage #nav ul#topnavlinks {
+    padding-left: 0px;
+}
+
 #nav h2 {
     width: 128px;
     text-align: center;
@@ -175,11 +186,13 @@ ul#links { margin-left: 20px; }
 
 #account-links { float: right; }
 
-#account-links li { margin: 0; font-size: 11pt; }
+#nav ul#topnavlinks { float: left; padding-left: 10px; }
 
-#account-links a { float: left; padding: 5px 10px; color: #484848; }
+#topnavlinks li, #account-links li { margin: 15px 0; font-size: .95em; }
 
-#content { width: 960px; padding: 20px; padding-bottom: 5px; clear: both; }
+#topnavlinks a, #account-links a { float: left; padding: 5px 10px; color: #484848; }
+
+#content { width: 960px; padding: 10px 20px; padding-bottom: 5px; clear: both; }
 
 #footer-wrapper { width: 100%; clear: both; left: 0; }
 
@@ -195,25 +208,20 @@ ul#links { margin-left: 20px; }
 
 #widgets { float: left; width: 960px; }
 
-h3 { margin-bottom: 0px; float: left; clear: left; font-size: 10pt; font-weight: normal; color: #555; letter-spacing: 0; font-size: 13pt; margin: 0; }
+h3 { margin-bottom: 0px; float: left; clear: left; font-size: 10pt; font-weight: bold; color: #555; letter-spacing: 0; font-size: 10pt; margin: 0; }
 
-.module > .head h3 { text-shadow: 0 1px 0 lightblue; padding: 15px 20px; }
+.module > .head h3 { text-shadow: 0 1px 0 lightblue; padding: 4px 10px 7px 10px; }
 
 .module > .head ul { float: right; padding: 0; margin: 0; }
 
 .module > .head ul li { float: left; margin: 0; }
 .module > .head ul li a {
     float: right;
-    padding: 17px 20px;
+    padding: 3px 5px;
     line-height: 13pt;
     font-weight: bold;
-    margin-right: 3px;
+    margin-left: 3px;
     text-shadow: 0 1px 0 lightblue;
-}
-.tags {
-    float: left;
-    width: 158px;
-    margin-bottom: 10px;
 }
 img.show-more-link {
     float: right;
@@ -285,7 +293,7 @@ abbr.foss {
 .notification {
     float: left;
     width: 95%;
-    background-color: #ffa;
+    background-color: #ffc; #f5fdc1; /*#edec7f; #ffa;*/
     -moz-border-radius: 8px;
     border-radius: 8px;
     padding: 10px;
@@ -323,3 +331,35 @@ dd { margin-top: .5em; margin-left: 1.2em; }
     #greeting #invitation { font-size: 120%; margin-top: 10px; text-align: center; float: left; width: 100%; }
     #greeting #next-steps { float: left; width: 100%; }
     #greeting #next-steps li { font-size: 120%; float: left; width: 210px; margin: 10px 20px 0 0; }
+
+#error #content { padding: 0 300px; }
+    #error #content .module { width: 400px; }
+    #error #content .module .head { width: 96%; color: #aaa; padding: 2%; text-align: center; font-weight: bold; font-size: 96pt; }
+    #error #content .module .body { width: 90%; }
+
+body.two_columns #portfolio .notification { width: 94%; margin: 0; padding: 10px 20px; }
+body.two_columns #portfolio .get-involved { background-color: #666; padding: 8px; color: #fff; float: left; }
+body.two_columns #portfolio .body { background: #fff; }
+
+ul.nudgebuttons li { float: left; width: 100%; margin-bottom: 5px;  }
+ul.nudgebuttons li:last-child { margin-bottom: 0; }
+ul.nudgebuttons a .notification { width: 100%; }
+ul.nudgebuttons a:hover .notification { background: #ffc;}
+ul.nudgebuttons a .notification { background: none; }
+ul.nudgebuttons a { width: 93%; }
+ul.nudgebuttons a .notification .arrow { float: right; font-size: 6.0em; padding-left: 10px; line-height: 50%; color: orange; }
+ul.nudgebuttons a:hover .notification .arrow { color: #ff6d3d;  }
+ul.nudgebuttons a:hover strong { text-decoration: underline;  }
+ul.nudgebuttons strong { color: #f66; font-size: 1.7em; text-shadow: 0 1px 0 rgb(200, 200, 200, .5); width: 100%; display: block; }
+ul.nudgebuttons .smaller strong { font-size: 1.2em; }
+ul.nudgebuttons a .notification.smaller {  color: #333; }
+ul.nudgebuttons a .notification.smaller .more-text { font-size: .95em; }
+ul.nudgebuttons a .notification.smaller .arrow { font-size: 4em; }
+body#landing ul.nudgebuttons a .notification.smaller .arrow { font-size: 3em; }
+body#landing ul.nudgebuttons a { float: left; }
+body#landing ul.nudgebuttons a:hover { text-decoration: none; }
+body#landing ul.nudgebuttons a .notification { margin: 0; }
+ul.nudgebuttons a .notification.smaller strong { font-size: 1.2em; }
+
+.head .note { float: right; color: #777; font-size: .9em; padding: 6px; }
+.head .more { float: right; padding: 3px; }

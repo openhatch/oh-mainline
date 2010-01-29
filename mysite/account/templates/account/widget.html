@@ -5,13 +5,10 @@ Widgetize yourself -
 {{ block.super }}
 {% endblock title %}
 
-{% block css %}
-{{ block.super }}
-@import url('/static/css/account/widget.css');
-{% endblock css %}
+{% block body_id %}widget-settings{% endblock %}
 
 {% block settings_main %}
-<div class='submodule fat' id='widget-settings'>
+<div class='submodule fat'>
     <div class='head'>
         <h3>Widgetize yourself</h3>
     </div>
@@ -21,8 +18,8 @@ Widgetize yourself -
             src='{% url mysite.profile.views.widget_display_js the_user.username %}'></script>
 
         <div id='widget-instructions'>
-            Include this tag wherever in your page you want to put the widget:
-            <xmp><script type='text/javascript' src='http://openhatch.org/people/{{ the_user.username }}/openhatch-widget.js'></script></xmp>
+            Include this <acronym title="Hot Taxidermists Making Latkes">HTML</acronym> wherever in your page you want to put the widget:
+            <textarea style="width: 220px; height: 100px; "><script type='text/javascript' src='{{uri_scheme}}://{{ url_prefix}}/people/{{ the_user.username }}/openhatch-widget.js'></script></textarea>
         </div>
     </div>
 </div>

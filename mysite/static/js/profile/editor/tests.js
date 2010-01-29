@@ -1,34 +1,3 @@
-if (typeof QUnit == 'undefined') {
-    console.log('QUnit not imported.');
-}
-
-QUnitRunner = {};
-QUnitRunner.ok = function(bool, message) {
-    var bool = !!bool;
-    if (typeof prefix == 'undefined') { var prefix = ""; }
-    test(prefix, function() { ok(bool, message); });
-};
-QUnitRunner.compare = function(a, b, message) {
-    if (typeof prefix == 'undefined') { prefix = ""; }
-    test(prefix, function() { equals(a, b, message); });
-};
-QUnitRunner.testDone = function() {};
-
-StupidRunner = {};
-StupidRunner.ok = function(bool, message) {
-    var bool = !!bool; //FIXME: Doesn't work in constructive logic.
-    if (!bool) { alert("Failed:" + message); }
-};
-StupidRunner.compare = function(a, b, message) {
-    if (a !== b) { alert("Failed: " + a + " != " + b + "; " + message); }
-};
-StupidRunner.testDone = function() {};
-
-// Pick a test runner here
-tester = fireunit;
-//tester = QUnitRunner;
-//tester = StupidRunner;
-
 $.fn.smartTrigger = function(handlerName) {
     tester.ok(this.getHandler(handlerName), "the thing has expected handler");
     this.trigger(handlerName);
@@ -128,14 +97,14 @@ mockedPortfolioResponse = {
         'pk': 0,
         'fields': {
             'name': 'bindlestiff',
-            'icon': 'images/icons/projects/0e9a1d7ab66f407fa9e2e3caf0eeda3d',
+            'icon_for_profile': 'images/icons/projects/0e9a1d7ab66f407fa9e2e3caf0eeda3d',
         }
     },
     {
         'pk': 1,
         'fields': {
             'name': 'a project with a generic icon',
-            'icon': '',
+            'icon_for_profile': '',
         }
     },
     ],
@@ -161,7 +130,7 @@ testUpdatePortfolio = function() {
                 "Expected a portfolio_entry corresponding to " + portfolio_entry);
             tester.ok( $('.project_name', pee).text() == "bindlestiff",
                 "Expected the new portfolio_entry to say its project name is bindlestiff");
-            tester.ok( pee.find("img.project_icon").attr('src') == 
+            tester.ok( pee.find(".project_icon").attr('src') == 
                 "/static/images/icons/projects/0e9a1d7ab66f407fa9e2e3caf0eeda3d",
                 "Expected the project icon URL to properly be set.");
             tester.ok( $(".project_description", pee).text() == "described",
@@ -357,7 +326,7 @@ testFlagIcon = function () {
             prefix + "expect link to be removed.'");
     tester.ok(!!$icon_flagger.text().match(/default icon/),
             "expect link to be replaced with text including the phrase 'default icon'");
-    $icon = $icon_flagger.closest('.portfolio_entry').find('img.project_icon');
+    $icon = $icon_flagger.closest('.portfolio_entry').find('.project_icon');
     tester.ok($icon.size() == 1,
             prefix + "expect there to be an icon");
     tester.ok($icon.attr('src') == '/static/no-project-icon.png',

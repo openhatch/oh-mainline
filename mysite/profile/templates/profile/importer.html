@@ -4,13 +4,7 @@
 Manage projects
 {% endblock title %}
 
-{% block css %}
-{{ block.super }}
-@import url('/static/css/profile/portfolio.css');
-@import url('/static/css/qunit.css');
-@import url('/static/css/base/jquery.jgrowl.css');
-@import url('/static/css/jquery-ui-lightness/jquery-ui-1.7.2.custom.css');
-{% endblock css %}
+{% block body_id %}profile{% endblock %}
 
 {% block main %}
 {% with 1 as edit_mode %}
@@ -127,21 +121,19 @@ Manage projects
 
 {% endblock main %}
 
+{% block js_before_bundle %}
+<script type="text/javascript">
+var want_importer = true;
+</script>
+{% endblock js_before_bundle %}
+
 {% block js %}
-<script type='text/javascript' src='/static/js/jquery.json.js'></script>
-<script type='text/javascript' src='/static/js/jquery.jeditable.js'></script>
-<script type='text/javascript' src='/static/js/jquery.hint.js'></script>
-<script type='text/javascript' src='/static/js/jquery.form.js'></script>
-<script type='text/javascript' src='/static/js/jquery.jgrowl.js'></script>
-<script type="text/javascript" src="/static/js/jquery-ui-1.7.2.custom.min.js"></script>
 <script type="text/javascript">
     $(function() { $("#progressbar").progressbar(); });
 </script>
 
 
 {% if test_js %}<script type='text/javascript'>testJS = true;</script>{% endif %}
-
-<script type='text/javascript' src='/static/js/importer.js'></script>
 {% endblock js %}
 
 {% block js_tests %}

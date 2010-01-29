@@ -1,14 +1,11 @@
 {% extends 'base/one_column.html' %}
 {% load i18n %}
 
-{% block title %}
-Sign up 
-{% endblock title %}
+{% block title %}Sign up{% endblock %}
 
-{% block css %}
-{{ block.super }}
-@import url('/static/css/account/auth.css');
-{% endblock css %}
+{% block body_id %}signup{% endblock %}
+
+{% block body_class %}{{ block.super }} auth{% endblock %}
 
 {% block main %}
 <div id='login' class='module'>

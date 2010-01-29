@@ -1,1 +1,9 @@
-ssh oh /home/deploy/milestone-a/mysite/scripts/oh_mysqldump | pv | $(dirname $0)/oh_mysql
+#!/bin/bash
+# To make this work, add this text to $HOME/.ssh/config
+# Host oh
+# 	Hostname openhatch.org
+# 	User yourusernamehere
+# 	Compression yes
+# 	ServerAliveInterval 120
+
+ssh -C oh /home/deploy/milestone-a/mysite/scripts/oh_mysqldump | pv | $(dirname $0)/oh_mysql

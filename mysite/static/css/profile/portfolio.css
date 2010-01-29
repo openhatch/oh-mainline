@@ -1,119 +1,123 @@
-.project-display { float: left; margin-right: 0; width: 705px; }
-.project-display h3 { float: left; }
-.project-display p { margin: 0; margin-bottom: 10px; float: left; }
-.project-display h2 { font-size: 9pt; margin: 0; margin-bottom: 3px; }
-.project-display h5 { font-size: 12pt; margin: 0; margin-bottom: 10px; font-weight: normal; }
+body#profile .project-display { float: left; margin-right: 0; width: 705px; }
+body#profile .project-display h3 { float: left; }
+body#profile .project-display p { margin: 0; margin-bottom: 10px; float: left; }
+body#profile .project-display h2 { font-size: 9pt; margin: 0; margin-bottom: 3px; }
+body#profile .project-display h5 { font-size: 12pt; margin: 0; margin-bottom: 10px; font-weight: normal; }
 
 /* Styling for django form output. */
-.project-display input[type='text'], .project-display textarea { float: left; width: 330px; }
-.module > .body .project-display ul { float: left; }
+body#profile .project-display input[type='text'], .project-display textarea { float: left; width: 330px; }
+body#profile .module > .body .project-display ul { float: left; }
 
 /*--------------*
  |   IMPORTER   |
  *--------------*/
-#importer { overflow: hidden; height: 40px; background: #798189 url('/static/images/ship.png') top right no-repeat; margin-bottom: 20px; padding: 20px; width: 865px; }
-#importer.expanded { overflow: visible; height: auto; }
-#importer .head { width: 865px; }
-#importer .howto { float: left; margin-right: 20px; width: 350px; }
-#importer input[type='text'] { font-size: 15pt; width: 425px; }
-    #importer input[type='text'].blur { color: #999; }
-#importer .query { float: right; margin-bottom: 5px; }
-    #importer #query_0 { margin-top: 130px; }
-#importer p { float: left; color: #f4f4ff; margin-top: 40px; }
-    #importer p a { color: pink; font-weight: bold; }
-#main #importer .body { padding: 10px; background-color: transparent; }
-#importer input[type='submit'] { display: none; float: left; padding: 4px 8px; }
-    #importer.expanded input[type='submit'] { display: block; }
-#importer-form-footer { margin-top: 0; float: right; width: 441px; } 
-#progressbar { display: none; float: right; margin-top: 4px; margin-left: 12px; height: 22px; width: 300px; }
-#progressbar.working .ui-progressbar-value { background-image: url('/static/css/jquery-ui-lightness/images/pbar-ani.gif'); }
+body#profile #importer { overflow: hidden; height: 40px; background: #798189 url('/static/images/ship.png') top right no-repeat; margin-bottom: 20px; padding: 20px; width: 865px; }
+body#profile #importer.expanded { overflow: visible; height: auto; }
+body#profile #importer .head { width: 865px; }
+body#profile #importer .howto { float: left; margin-right: 20px; width: 350px; }
+body#profile #importer input[type='text'] { font-size: 15pt; width: 425px; }
+    body#profile #importer input[type='text'].blur { color: #999; }
+body#profile #importer .query { float: right; margin-bottom: 5px; }
+    body#profile #importer #query_0 { margin-top: 130px; }
+body#profile #importer p { float: left; color: #f4f4ff; margin-top: 40px; }
+    body#profile #importer p a { color: pink; font-weight: bold; }
+body#profile #main #importer .body { padding: 10px; background-color: transparent; }
+body#profile #importer input[type='submit'] { display: none; float: left; padding: 4px 8px; }
+    body#profile #importer.expanded input[type='submit'] { display: block; }
+body#profile #importer-form-footer { margin-top: 0; float: right; width: 441px; } 
+body#profile #progressbar { display: none; float: right; margin-top: 4px; margin-left: 12px; height: 22px; width: 300px; }
+body#profile #progressbar.working .ui-progressbar-value { background-image: url('/static/css/jquery-ui-lightness/images/pbar-ani.gif'); }
 
 /*----------------------*
  |   PORTFOLIO ENTRIES  |
  *----------------------*/
-#portfolio.editor h4 { float: left; font-size: 8pt; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; width: 900px; }
-#portfolio h5 { color: #555; font-size: 13pt; font-weight: normal; margin: 0 0 10px 0; }
-.portfolio_entry { float: left; margin-bottom: 20px; }
-#portfolio.editor .portfolio_entry { left: -7px; position: relative; width: 100%; }
-#portfolio.editor .portfolio_entry.unpublished .submodule, 
-    #portfolio.editor .portfolio_entry.unpublished > .actions,
-    #portfolio.editor .portfolio_entry.unsaved .submodule,
-    #portfolio.editor .portfolio_entry.unsaved > .actions { border-color: #fcff88; } /* Yellow border around unpubbed and unsaved pf entries.*/
-        .portfolio_entry.unpublished .project_name { font-weight: bold; }
-        .portfolio_entry .project-stuff input.project_name { width: 218px; }
-        .portfolio_entry .project-stuff input.project_name.blur { color: #777; }
-#portfolio.editor .portfolio_entry > .actions{ font-size: 8pt; background-color: #fff; border: 4px solid #e9e9e9; border-radius: 8px; border-radius-bottomright: 0; border-radius-topright: 0; border-right: 0; float: left; left: 6px; -moz-border-radius: 8px; -moz-border-radius-bottomright: 0; -moz-border-radius-topright: 0; position: relative; width: 100px; }
-.portfolio_entry > .actions a { color: #242424; }
-.portfolio_entry > .actions span { color: #747474; }
-.portfolio_entry > .actions a,
-    .portfolio_entry > .actions span { background-position: 5px; background-repeat: no-repeat; float: left; padding: 10%; padding-left: 35%; width: 55%; }
-.portfolio_entry > .actions a:hover { background-color: #e9e9e9; }
-.portfolio_entry > .actions li.save_and_publish_button *,
-.portfolio_entry > .actions li.save_button * { background-image: url('/static/images/icons/publish.png'); }
-.portfolio_entry > .actions li.delete_portfolio_entry a { background-image: url('/static/images/icons/delete.png'); }
-.portfolio_entry > .submodule { float: right; margin-bottom: 0; width: 807px; }
-.portfolio_entry .project-stuff { padding: 2%; float: left; width: 39%; }
-.portfolio_entry .personal-stuff { background-color: #f4f4f4; float: left; border-left: 1px solid #eee; padding: 20px; float: right; width: 50%; }
-.portfolio_entry .project_icon { float: left; height: 64px; margin-right: 10px; width: 64px; background-position: center; background-repeat: no-repeat; }
-.portfolio_entry .project_icon .alt-text { position: absolute; left: -999px; } /* So that screen readers will read this. */
-.portfolio_entry .name_and_icon_flagger { float: left; width: 100%; }
-#portfolio.editor .portfolio_entry .name_and_icon_flagger { left: -10px; position: relative; }
-.portfolio_entry .project_name { float: left; font-size: 20px; padding: 15px 0; width: 60%; }
-.portfolio_entry .icon_flagger { float: left; font-size: 9pt; }
-.portfolio_entry .project_description-wrapper { float: left; width: 96%; margin-top: 30px; }
-.portfolio_entry .project_description { width: 100%; }
-.portfolio_entry .experience_description { width: 96%; }
-.portfolio_entry .citations { float: left; width: 100%; }
-.portfolio_entry.adding .citations-wrapper { display: none; }
-.portfolio_entry .involvement_placeholder { display: none; }
-.portfolio_entry.adding .involvement_placeholder { display: block; }
-.portfolio_entry label { float: left; font-size: 8pt; margin: 0; padding: 0; text-transform: uppercase; width: 100%; }
-.portfolio_entry .citation-forms label { font-weight: bold; }
-.portfolio_entry .experience_description-wrapper { float: left; margin-top: 20px; width: 100%; }
-.portfolio_entry textarea { height: 100px; font-size: 9pt; font-family: sans-serif; }
-.citations > li { color: #777; float: left; list-style: square; margin-left: 20px; margin-top: 5px; position: relative; top: 15px; width: 90%; }
-.citations li .actions { float: left; width: 30px; }
-.citations li .actions a { background-position: center; background-repeat: no-repeat; float: left; height: 15px; width: 15px; }
-.citations li .actions a.delete_citation { background-image: url('/static/images/icons/delete-citation.png'); }
-.citations li .actions a.delete:hover { background-color: #c9c9c9; border-radius: 4px; -moz-border-radius: 4px; }
-.citations li .summary { color: #222; float: left; position: relative; top: -12px; width: 300px; }
-.citations li li { position: relative; top: -12px; }
-.citations-wrapper, .involvement_placeholder { float: left; width: 100%; }
-.citations li.unpublished .summary { background-color: #ffc; }
-.citations li.deleted .summary { background-color: pink; }
-.citations-wrapper a.add { background-color: #c9c9c9; background-color: lightblue; border-radius: 6px; clear: left; color: #444; float: left; font-size: 8pt; font-weight: bold; margin-right: 10px; margin-top: 10px; -moz-border-radius: 6px; padding: 6px; }
-.citations-wrapper a.add:hover { color: #000; text-decoration: none; }
-.error-message { color: pink; font-weight: bold; }
-.citations-wrapper .howto { color: #111; }
-#main .citations-wrapper .howto .body { float: none ! important; }
-.citations li a { font-weight: bold; }
-.citations-wrapper .howto, .citations-wrapper .show_howto { background-color: #ffa; border: 1px solid yellow; border-radius: 6px; float: right; font-size: 8pt; margin-top: 10px; -moz-border-radius: 6px; padding: 12px; width: 200px; }
-.citations-wrapper .howto .hide_me { float: right; margin-left: 3px; padding: 5px; }
-.citations-wrapper .show_howto { display: none; padding: 6px; width: auto; }
-.citation-forms label { margin-top: 10px; }
-.citation-forms input[type='text'] { width: 270px; }
-.citation-forms input[type='submit'] { font-size: 11pt; padding: 3px; width: 60px; }
-.citation-forms li form > div { float: left; width: 350px; }
-.portfolio_entry .actions .save_and_publish_button { display: none; }
-.portfolio_entry.unpublished .actions .save_and_publish_button { display: block; }
-.portfolio_entry.unpublished .actions .portfolio_entry_is_published { display: none; }
-.portfolio_entry .actions .save_and_publish_button { display: none; }
-.portfolio_entry.unpublished .actions .save_and_publish_button { display: block; }
-.portfolio_entry .actions .save_button { display: none; }
-.portfolio_entry.unsaved .actions .save_button { display: block; }
-.portfolio_entry.unsaved.unpublished .actions .save_button { display: none; }
-.portfolio_entry.unpublished > .actions > .portfolio_entry_is_saved,
-.portfolio_entry.unsaved > .actions > .portfolio_entry_is_saved { display: none; }
-.portfolio_entry .actions .portfolio_entry_is_unpublished { display: none; }
-.portfolio_entry.unpublished .actions .portfolio_entry_is_unpublished { display: block; font-weight: bold; left: -22px; position: relative; }
-#portfolio.viewer .portfolio_entry .submodule { background: #fff url('/static/images/profile/portfolio/portfolio-entry-bg.png') repeat-y; }
-#portfolio #save_all_projects { display: none; float: right; }
+body#profile #portfolio.editor h4 { float: left; font-size: 8pt; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; width: 900px; }
+body#profile #portfolio h5 { color: #555; font-size: 13pt; font-weight: normal; margin: 0 0 10px 0; }
+body#profile .portfolio_entry { float: left; margin-bottom: 20px; }
+body#profile #portfolio.editor .portfolio_entry { left: -7px; position: relative; width: 100%; }
+body#profile #portfolio.editor .portfolio_entry.unpublished .submodule, 
+    body#profile #portfolio.editor .portfolio_entry.unpublished > .actions,
+    body#profile #portfolio.editor .portfolio_entry.unsaved .submodule,
+    body#profile #portfolio.editor .portfolio_entry.unsaved > .actions { border-color: #fcff88; } /* Yellow border around unpubbed and unsaved pf entries.*/
+        body#profile .portfolio_entry.unpublished .project_name { font-weight: bold; }
+        body#profile .portfolio_entry .project-stuff input.project_name { width: 218px; }
+        body#profile .portfolio_entry .project-stuff input.project_name.blur { color: #777; }
+body#profile #portfolio.editor .portfolio_entry > .actions{ font-size: 8pt; background-color: #fff; border: 4px solid #e9e9e9; border-radius: 8px; border-radius-bottomright: 0; border-radius-topright: 0; border-right: 0; float: left; left: 6px; -moz-border-radius: 8px; -moz-border-radius-bottomright: 0; -moz-border-radius-topright: 0; position: relative; width: 100px; }
+body#profile .portfolio_entry > .actions a { color: #242424; }
+body#profile .portfolio_entry > .actions span { color: #747474; }
+body#profile .portfolio_entry > .actions a,
+    body#profile .portfolio_entry > .actions span { background-position: 5px; background-repeat: no-repeat; float: left; padding: 10%; padding-left: 35%; width: 55%; }
+body#profile .portfolio_entry > .actions a:hover { background-color: #e9e9e9; }
+body#profile .portfolio_entry > .actions li.save_and_publish_button *,
+body#profile .portfolio_entry > .actions li.save_button * { background-image: url('/static/images/icons/publish.png'); }
+body#profile .portfolio_entry > .actions li.delete_portfolio_entry a { background-image: url('/static/images/icons/delete.png'); }
+body#profile .portfolio_entry > .submodule { float: right; margin-bottom: 0;  }
+body#profile #portfolio.editor .portfolio_entry > .submodule { float: right; margin-bottom: 0; width: 807px; }
+body#profile .portfolio_entry .project-stuff { padding: 2%; float: left; width: 39%; }
+body#profile .portfolio_entry .personal-stuff { background-color: #f4f4f4; float: left; border-left: 1px solid #eee; padding: 20px; float: right; width: 50%; }
+body#profile .portfolio_entry .project_icon { float: left; height: 64px; margin-right: 10px; width: 64px; background-position: center; background-repeat: no-repeat; }
+body#profile .portfolio_entry .project_icon .alt-text { position: absolute; left: -999px; } /* So that screen readers will read this. */
+body#profile .portfolio_entry .name_and_icon_flagger { float: left; width: 100%; }
+body#profile #portfolio.editor .portfolio_entry .name_and_icon_flagger { left: -10px; position: relative; }
+body#profile .portfolio_entry .project_name { float: left; font-size: 20px; padding: 15px 0; width: 60%; }
+body#profile .portfolio_entry .icon_flagger { float: left; font-size: 9pt; }
+body#profile .portfolio_entry .project_description-wrapper { float: left; width: 96%; margin-top: 30px; }
+body#profile .portfolio_entry .project_description { width: 100%; }
+body#profile .portfolio_entry .experience_description { width: 96%; }
+body#profile .portfolio_entry .citations { float: left; width: 100%; }
+body#profile .portfolio_entry.adding .citations-wrapper { display: none; }
+body#profile .portfolio_entry .involvement_placeholder { display: none; }
+body#profile .portfolio_entry.adding .involvement_placeholder { display: block; }
+body#profile .portfolio_entry label { float: left; font-size: 8pt; margin: 0; padding: 0; text-transform: uppercase; width: 100%; }
+body#profile .portfolio_entry .citation-forms label { font-weight: bold; }
+body#profile .portfolio_entry .experience_description-wrapper { float: left; margin-top: 20px; width: 100%; }
+body#profile .portfolio_entry textarea { height: 100px; font-size: 9pt; font-family: sans-serif; }
+body#profile .citations > li { color: #777; float: left; list-style: square; margin-left: 20px; margin-top: 5px; position: relative; top: 15px; width: 90%; }
+body#profile .citations li .actions { float: left; width: 30px; }
+body#profile .citations li .actions a { background-position: center; background-repeat: no-repeat; float: left; height: 15px; width: 15px; }
+body#profile .citations li .actions a.delete_citation { background-image: url('/static/images/icons/delete-citation.png'); }
+body#profile .citations li .actions a.delete:hover { background-color: #c9c9c9; border-radius: 4px; -moz-border-radius: 4px; }
+body#profile .citations li .summary { color: #222; float: left; position: relative; top: -12px; width: 300px; }
+body#profile .citations li li { position: relative; top: -12px; }
+body#profile .citations-wrapper, .involvement_placeholder { float: left; width: 100%; }
+body#profile .citations li.unpublished .summary { background-color: #ffc; }
+body#profile .citations li.deleted .summary { background-color: pink; }
+body#profile .citations-wrapper a.add { background-color: #c9c9c9; background-color: lightblue; border-radius: 6px; clear: left; color: #444; float: left; font-size: 8pt; font-weight: bold; margin-right: 10px; margin-top: 10px; -moz-border-radius: 6px; padding: 6px; }
+body#profile .citations-wrapper a.add:hover { color: #000; text-decoration: none; }
+body#profile .error-message { color: pink; font-weight: bold; }
+body#profile .citations-wrapper .howto { color: #111; }
+body#profile #main .citations-wrapper .howto .body { float: none ! important; }
+body#profile .citations li a { font-weight: bold; }
+body#profile .citations-wrapper .howto, .citations-wrapper .show_howto { background-color: #ffa; border: 1px solid yellow; border-radius: 6px; float: right; font-size: 8pt; margin-top: 10px; -moz-border-radius: 6px; padding: 12px; width: 200px; }
+body#profile .citations-wrapper .howto ul { list-style: square; margin-bottom: .5em; }
+body#profile .citations-wrapper .howto li { margin-left: 1.5em; }
+body#profile .citations-wrapper .howto p { margin-top: 0; margin-bottom: .5em; }
+body#profile .citations-wrapper .howto .hide_me { float: right; margin-left: 3px; padding: 5px; }
+body#profile .citations-wrapper .show_howto { display: none; padding: 6px; width: auto; }
+body#profile .citation-forms label { margin-top: 10px; }
+body#profile .citation-forms input[type='text'] { width: 270px; }
+body#profile .citation-forms input[type='submit'] { font-size: 11pt; padding: 3px; width: 60px; }
+body#profile .citation-forms li form > div { float: left; width: 350px; }
+body#profile .portfolio_entry .actions .save_and_publish_button { display: none; }
+body#profile .portfolio_entry.unpublished .actions .save_and_publish_button { display: block; }
+body#profile .portfolio_entry.unpublished .actions .portfolio_entry_is_published { display: none; }
+body#profile .portfolio_entry .actions .save_and_publish_button { display: none; }
+body#profile .portfolio_entry.unpublished .actions .save_and_publish_button { display: block; }
+body#profile .portfolio_entry .actions .save_button { display: none; }
+body#profile .portfolio_entry.unsaved .actions .save_button { display: block; }
+body#profile .portfolio_entry.unsaved.unpublished .actions .save_button { display: none; }
+body#profile .portfolio_entry.unpublished > .actions > .portfolio_entry_is_saved,
+body#profile .portfolio_entry.unsaved > .actions > .portfolio_entry_is_saved { display: none; }
+body#profile .portfolio_entry .actions .portfolio_entry_is_unpublished { display: none; }
+body#profile .portfolio_entry.unpublished .actions .portfolio_entry_is_unpublished { display: block; font-weight: bold; left: -22px; position: relative; }
+body#profile #portfolio.viewer .portfolio_entry .submodule { background: #fff url('/static/images/profile/portfolio/portfolio-entry-bg.png') repeat-y; }
+body#profile #portfolio #save_all_projects { display: none; float: right; }
 
-#main .submodule .other-contributors { float: left; margin-top: 20px; font-size: 8pt; }
-#main .submodule .other-contributors label { text-transform: none; }
-#main .submodule .other-contributors li { float: left; margin-right: 2%; margin-top: 5px; width: 120px; }
-#main .submodule .other-contributors li a { float: left; width: 120px; height: 51px; overflow: hidden; }
-#main .submodule .other-contributors li img { float: left; margin-right: 5px; vertical-align: middle; width: 40px; }
-#main .submodule .other-contributors .see-all { clear: left; margin-top: 5px; float: right; }
+body#profile #main .submodule .other-contributors { float: left; margin-top: 20px; font-size: 8pt; }
+body#profile #main .submodule .other-contributors label { text-transform: none; }
+body#profile #main .submodule .other-contributors li { float: left; margin-right: 2%; margin-top: 5px; width: 120px; }
+body#profile #main .submodule .other-contributors li a { float: left; width: 120px; height: 51px; overflow: hidden; }
+body#profile #main .submodule .other-contributors li img { float: left; margin-right: 5px; vertical-align: middle; width: 40px; }
+body#profile #main .submodule .other-contributors .see-all { clear: left; margin-top: 5px; float: right; }
 
 /* vim: set nu nowrap: */

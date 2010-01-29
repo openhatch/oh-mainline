@@ -52,14 +52,14 @@ h3 {
     width: 220px;
     float: left;
     margin-right: 50px;
-    padding: 40px 80px 10px 30px;
+    padding: 10px 80px 10px 30px;
 }
 #account-related {
     width: 350px;
     float: left;
 }
 #explanation {
-    margin-top: 50px;
+    margin-top: 20px;
     width: 550px;
     font-size: 10pt;
     border: 5px solid #f9f9f9;

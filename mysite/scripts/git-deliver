@@ -1,0 +1,7 @@
+#!/bin/bash
+set -x
+git push origin HEAD:master
+expect ~/oh/milestone-a/mysite/expect-deploy
+git home
+git fetch
+git merge origin/master

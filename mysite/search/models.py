@@ -88,6 +88,8 @@ class Project(models.Model):
         null=True,
         default=None)
 
+    logo_contains_name = models.BooleanField(default=False)
+
     def populate_icon_from_ohloh(self):
 
         oh = mysite.customs.ohloh.get_ohloh()
@@ -124,6 +126,10 @@ class Project(models.Model):
             return self.icon_for_search_result.url
         else:
             return settings.MEDIA_URL + 'no-project-icon-w=20.png'
+
+    @models.permalink
+    def url(self):
+        return ('mysite.project.views.project', [self.name])
 
     def update_scaled_icons_from_self_icon(self):
         '''This method should be called when you update the Project.icon_raw attribute.

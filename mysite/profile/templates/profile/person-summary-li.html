@@ -1,0 +1,62 @@
+{% load profile_extras %}
+{# Used, at time of writing, in profile/map.html and profile/search_people.html #}
+<li id="person_summary_{{person.pk}}">
+    {% ifnotequal slug "people_map" %}<a href="{{ person.profile_url }}">{% endifnotequal %}
+    <div class='left'>
+        <img src="{{ person.get_photo_thumbnail_url_or_default }}" />
+    </div>
+    <div class="people-view-info">
+        {% ifequal slug "people_map" %}
+        <a class='profile-link person-summary-button' href='{{ person.profile_url }}' 
+                title="Visit {% firstof person.user.first_name person.user.username %}'s profile">
+            profile
+        </a>{% endifequal %}
+
+        <div class="name">
+
+            {% if person.user.first_name or person.user.last_name %}
+                {{ person.user.first_name }} {{ person.user.last_name }}
+            {% else %}
+                {{ person.user.username }}
+            {% endif %}
+
+        </div>
+
+            <span class="location">
+                {% if person.user.first_name and person.user.last_name %}
+                    {{ person.user.username }}
+                {% endif %}
+                {% if person.user.first_name and person.user.last_name and person.location_display_name and person.location_confirmed %}
+                    &middot;
+                {% endif %}
+                {% if person.location_display_name and person.location_confirmed %}
+                {{ person.location_display_name }}
+                {% endif %}
+            </span>
+        {% with person.get_list_of_project_names as project_names %}
+        {% if project_names %}
+            <span class="people-view-projects">
+                projects: 
+                {% comment %}
+                Sorry that this is all on one line. Couldn't figure out
+                how to get rid of the space before the comma otherwise.
+                {% endcomment %}
+                {% for project in project_names %}{% if not forloop.first %}, {% endif %} {{ project }}{% endfor %}
+            </span>
+        {% endif %}
+    {% endwith %}
+    {% with person.get_tag_texts_for_map as tags %}
+        {% if tags %}
+            <span class="people-view-tags">
+                tags: 
+                {% for tag in tags %}
+                    {{ tag }}{% if not forloop.last %}, {% endif %}
+
+                {% endfor %}
+            </span>
+        {% endif %}
+    {% endwith %}
+    </div>
+    {% ifnotequal slug "people_map" %}</a>{% endifnotequal %}
+</li>
+{# vim: set filetype=htmldjango: #}

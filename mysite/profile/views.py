@@ -29,6 +29,7 @@ from django.conf import settings
 from django.core.files.images import get_image_dimensions
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
+from django.db.models import Q
 
 # OpenHatch global
 from django.conf import settings
@@ -39,9 +40,9 @@ import mysite.profile.controllers
 import mysite.base.helpers
 from mysite.customs import ohloh
 from mysite.profile.models import \
-        Person, ProjectExp, \
+        Person, \
         Tag, TagType, \
-        Link_ProjectExp_Tag, Link_Project_Tag, \
+        Link_Project_Tag, \
         Link_SF_Proj_Dude_FM, Link_Person_Tag, \
         DataImportAttempt, \
         PortfolioEntry, Citation
@@ -52,29 +53,6 @@ from mysite.base.decorators import view
 import forms
 import mysite.profile.forms
 # }}}
-
-# FIXME: Delete when this has been supplanted by add_cttaion_manually.
-def projectexp_add_do(request):
-    # {{{
-    form = mysite.profile.forms.ProjectExpForm(request.POST)
-    username = request.user.username
-    if form.is_valid():
-        ProjectExp.create_from_text(
-            username, project_name=form.cleaned_data['project_name'],
-            description=form.cleaned_data['involvement_description'],
-            url=form.cleaned_data['citation_url'])
-
-        # FIXME: Use reverse() here to avoid quoting things ourself
-        url_that_displays_project_exp = '/people/%s/projects/%s' % (
-            urllib.quote(username), urllib.quote(form.cleaned_data[
-                'project_name']))
-        return HttpResponseRedirect(url_that_displays_project_exp)
-
-    else:
-        return projectexp_add_form(request, form)
-
-    #}}}
-
 
 @login_required
 def add_citation_manually_do(request):
@@ -118,7 +96,6 @@ def display_person_web(request, user_to_display__username=None):
     data['editable'] = (request.user == user)
     data['notifications'] = mysite.base.controllers.get_notification_from_request(request)
     data['explain_to_anonymous_users'] = True
-    data['location'] = 'Philadelphia, PA'
 
     return (request, 'profile/main.html', data)
 
@@ -155,22 +132,6 @@ def tags_dict_for_person(person):
     return ret
     # }}}
 
-@view
-def projectexp_display(request, user_to_display__username, project__name):
-    # {{{
-    user = get_object_or_404(User, username=user_to_display__username)
-    person = get_object_or_404(Person, user=user)
-    project = get_object_or_404(Project, name=project__name)
-
-    data = get_personal_data(person)
-    data['project'] = project
-    data['exp_list'] = get_list_or_404(ProjectExp,
-            person=person, project=project)
-    data['projectexp_editable'] = (user == request.user)
-    data['editable'] = (user == request.user)
-    return (request, 'profile/projectexp.html', data)
-    # }}}
-    
 # FIXME: Test this.
 def widget_display_undecorated(request, user_to_display__username):
     """We leave this function unwrapped by @view """
@@ -180,11 +141,8 @@ def widget_display_undecorated(request, user_to_display__username):
     person = get_object_or_404(Person, user=user)
 
     data = get_personal_data(person)
-    data['url_prefix'] = request.META['SERVER_NAME'] + ':' + request.META['SERVER_PORT']
-    uri_scheme = 'http'
-    if request.is_secure():
-        uri_scheme = 'https'
-    data['uri_scheme'] = uri_scheme
+    data.update(mysite.base.controllers.get_uri_metadata_for_generating_absolute_links(
+        request))
     return (request, 'profile/widget.html', data)
     # }}}
 
@@ -204,134 +162,6 @@ def widget_display_js(request, user_to_display__username):
     return render_to_response('base/append_ourselves.js',
                               {'in_string': encoded_for_js},
                               mimetype='application/javascript')
-
-def prepare_p_e_forms(person, project):
-    """Input: a person and a project.
-    Output: A list of ProjectExpForms populated from that guy's relevant p_es."""
-    # Let's prepare some forms
-    forms = []
-    
-    # We need a form for each of the user's experiences with a given project.
-    project_exps = ProjectExp.objects.filter(
-        project=project,
-        person=person)
-    
-    for n, p_e in enumerate(project_exps):
-        form_data = dict(
-            project_exp_id=p_e.id,
-            citation_url=p_e.url,
-            man_months=p_e.man_months,
-            primary_language=p_e.primary_language,
-            involvement_description=p_e.description,
-            )
-        forms.append(mysite.profile.forms.ProjectExpEditForm(initial=form_data, prefix=str(n)))
-    return forms
-
-@login_required
-@view
-def projectexp_edit(request, project__name, forms = None):
-    """Page that allows user to edit project experiences for a project."""
-    # {{{
-    # FIXME: Change this function's misleading name.
-
-    project = get_object_or_404(Project, name=project__name)
-    person = request.user.get_profile()
-
-    if forms is None:
-        forms = prepare_p_e_forms(person, project)
-        
-    data = get_personal_data(person)
-    data['exp_list'] = get_list_or_404(ProjectExp,
-            person=person, project=project)
-    data['forms'] = forms
-    data['edit_mode'] = True
-    data['project__name'] = project__name
-    data['editable'] = True
-    return (request, 'profile/projectexp_edit.html', data)
-    # }}}
-
-@login_required
-def projectexp_edit_do(request, project__name):
-    """Update database with new information about a user's experiences with a particular project."""
-    # FIXME: Change this function's misleading name.
-    # {{{
-    project = get_object_or_404(Project, name=project__name)
-
-    # Find all the unique strings before a hyphen and convert them to integers.
-    numbers = sorted(map(int, set([k.split('-')[0] for k in request.POST.keys()])))
-    forms = []
-
-    forms_all_valid = True
-    
-    for n in numbers:
-        form = mysite.profile.forms.ProjectExpEditForm(
-            request.POST, prefix=str(n))
-        form.set_user(request.user)
-        
-        if form.data.get('%d-delete_this' % n, None) == 'on':
-            # FIXME: This is duplicate code, duplicate code.
-
-            # this way, if there are no matches, we fail gently.
-            # Presumably a crazy-reloading user might run into that,
-            # so it's probably be best to allow ourselves to "redelete"
-            # a ProjectExp that has already been deleted.
-            exps = ProjectExp.objects.filter(
-                    id=int(form.data['%d-project_exp_id' % n]),
-                    person__user=request.user)
-
-            for exp in exps:
-                exp.delete()
-
-            continue
-
-        forms.append(form) # append it in case we
-        # will need to push it onto the edit page later
-
-        if form.is_valid():
-            p_e = form.cleaned_data['project_exp']
-            p_e.modified = True
-            p_e.description = form.cleaned_data['involvement_description']
-            p_e.url = form.cleaned_data['citation_url']
-            p_e.man_months = form.cleaned_data['man_months']
-            p_e.primary_language=form.cleaned_data['primary_language']
-            p_e.save()
-        else:
-            forms_all_valid = False
-
-    if not forms_all_valid:
-        # Return the original view, with the forms populated with
-        # the data the user entered (even though that data isn't valid).
-        return projectexp_edit(request, project__name, forms)
-
-    # Are there any left?
-    any_left = ProjectExp.objects.filter(
-        project=project, person=request.user.get_profile()
-        ).count()
-    if any_left:
-        # If so, send the user back to the
-        # projectexp edit page.
-        outta_here = reverse(projectexp_edit, kwargs={'project__name': project__name})
-    else:
-        # if not, back to profile.
-        outta_here = reverse(display_person_web, kwargs=dict(
-            user_to_display__username=request.user.username))
-
-    return HttpResponseRedirect(outta_here)
-    # }}}
-
-@login_required
-@view
-def projectexp_add_form(request, form = None):
-    # {{{
-    if form is None:
-        form = mysite.profile.forms.ProjectExpForm()
-
-    person = request.user.get_profile()
-    data = get_personal_data(person)
-    data['form'] = form
-    
-    return (request, 'profile/projectexp_add.html', data)
-    # }}}
 
 # }}}
 
@@ -400,18 +230,6 @@ def import_debtags(cooked_string = None):
 
 # Project experience tags {{{
 
-# FIXME: rename to project_exp_tag__add__web
-#def add_tag_to_project_exp_web(request):
-
-# FIXME: rename to project_exp_tag__add
-#def add_tag_to_project_exp(username, project_name,
-#        tag_text, tag_type_name='user_generated'):
-
-#def project_exp_tag__remove(username, project_name,
-#        tag_text, tag_type_name='user_generated'):
-
-#def project_exp_tag__remove__web(request):
-
 # }}}
 
 def _project_hash(project_name):
@@ -428,6 +246,18 @@ def _project_hash(project_name):
 def edit_person_info(request):
     # {{{
     person = request.user.get_profile()
+
+    #grab their submitted bio
+    bio = request.POST.get('edit-tags-bio', '')
+    person.bio = bio
+    person.save()
+
+    # Grab the submitted homepage URL.
+    # FIXME: One day, validate that this is a valid URL, and
+    # use Django forms for this whole thing, while we're at it.
+    bio = request.POST.get('edit-tags-homepage_url', '')
+    person.homepage_url = bio
+    person.save()
 
     # We can map from some strings to some TagTypes
     for known_tag_type_name in ('understands', 'understands_not',
@@ -464,74 +294,61 @@ def edit_person_info(request):
     # FIXME: This is racey. Only one of these functions should run at once.
     # }}}
 
-def import_commits_by_commit_username(request):
-    # {{{
-
-    commit_username = request.POST.get('commit_username', None)
-
-    if not commit_username:
-        fail
-
-    nobgtask_s = request.GET.get('nobgtask', False)
-
-    involved_projects = []
-    
-    try:
-        nobgtask = bool(nobgtask_s)
-    except ValueError:
-        nobgtask = False
-    
-    # get the person
-    person = request.user.get_profile()
-
-    # Find the existing ProjectExps
-    project_exps = ProjectExp.objects.filter(person=person)
-    involved_projects.extend([exp.project.name for exp in project_exps])
-
-    # if we are allowed to make bgtasks, create background tasks
-    # to pull in this user's data (just the one huge one)
-    do_it = True # unless...
-
-    if nobgtask:
-        do_it = False
-
-    if do_it:
-        username= request.user.username
-        import tasks 
-        # say we're trying
-        dia = DataImportAttempt(source='rs', person=person,
-                                query=commit_username)
-        dia.save()
-
-        result = tasks.FetchPersonDataFromOhloh.delay(dia.id)
-    # }}}
-
 @login_required
 def ask_for_tag_input(request, username):
     # {{{
     return display_person_web(request, username, 'tags', edit='1')
     # }}}
 
+def cut_list_of_people_in_to_columns(people):
+    third = len(people)/3
+    return [people[0:third], people[third:(third*2)], people[(third*2):]]
+
+
+    
+
+@view
+def display_list_of_people_who_match_some_search(request, property, value):
+    '''Property is the "tag name", and "value" is the text in it.'''
+    peeps = mysite.profile.controllers.people_matching(property, value)
+    data = {}
+    data['people_columns'] = cut_list_of_people_in_to_columns(peeps)
+    data['property'] = property
+    data['value'] = value
+    return (request, 'profile/search_people.html', data)
+
 @view
 def display_list_of_people(request):
     """Display a list of people."""
     # {{{
     data = {}
-    data['people'] = Person.objects.all().order_by('user__username')
+    data['people_columns'] = cut_list_of_people_in_to_columns(Person.objects.all().order_by('user__username'))
     return (request, 'profile/search_people.html', data)
     # }}}
 
 @view
 def people_map(request):
     data = {}
-    data['people'] = Person.objects.all().order_by('user__username')
+
+    everybody = Person.objects.all()
+    mappable = ( ~Q(location_display_name='') & Q(location_confirmed=True) )
+    data['people'] = everybody.filter(mappable).order_by('user__username')
     data['person_id2data_as_json'] = simplejson.dumps(dict([
                 (person.pk, {'name': person.get_full_name_or_username(),
                              'location': person.location_display_name})
             for person in Person.objects.all()
             if person.location_display_name]))
+    data['test_js'] = request.GET.get('test', None)
     data['num_of_persons_with_locations'] = len([p for p in Person.objects.all()
                                                  if p.location_display_name])
+    if request.GET.get('center', False):
+        data['center_json'] = mysite.base.controllers.cached_geocoding_in_json(
+            request.GET.get('center', ''))
+        # the below is true when we fail to geocode the center that we got from GET
+        if data['center_json'] == 'null':
+            data['geocode_failed'] = True;
+        data['center_name'] = request.GET.get('center', '')
+        data['center_name_json'] = simplejson.dumps(request.GET.get('center', ''))
     return (request, 'profile/map.html', data)
 
 
@@ -767,15 +584,6 @@ def display_person_edit_name(request, name_edit_mode):
     return (request, 'profile/main.html', data)
     # }}}
 
-@view
-def display_list_of_people_who_match_some_search(request, property, value):
-    '''Property is the "tag name", and "value" is the text in it.'''
-    peeps = mysite.profile.controllers.people_matching(property, value)
-    data = {}
-    data['people'] = peeps
-    data['property'] = property
-    data['value'] = value
-    return (request, 'profile/search_people.html', data)
 
 @login_required
 def display_person_edit_name_do(request):

@@ -4,10 +4,10 @@
 Log in 
 {% endblock title %}
 
+{% block body_class %}{{ block.super }} auth{% endblock %}
+
 {% block css %}
 {{ block.super }}
-@import url('/static/css/account/auth.css');
-@import url('/static/openid/css/openid.css');
 form {
     width: 500px;
 }
@@ -38,6 +38,5 @@ form {
 {% endblock main %}
 
 {% block js %}
-<script src="/static/openid/js/openid-jquery.js"></script>
 <script> $(function() { openid.init('id_openid_url'); }); </script>
 {% endblock %}

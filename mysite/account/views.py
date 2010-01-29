@@ -19,15 +19,13 @@ from mysite.account.forms import InvitationRequestForm
 import mysite.base.views
 import mysite.base.controllers
 from mysite.base.controllers import get_notification_from_request
-from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag, Link_Project_Tag, Link_SF_Proj_Dude_FM, Link_Person_Tag, DataImportAttempt
+from mysite.profile.models import Person, Tag, TagType, Link_Project_Tag, Link_SF_Proj_Dude_FM, Link_Person_Tag, DataImportAttempt
 
 # FIXME: We did this because this decorator used to live here
 # and lots of other modules refer to it as mysite.account.views.view.
 # Let's fix this soon.
 from mysite.base.decorators import view
 # }}}
-
-applog = logging.getLogger('applog')
 
 def signup_do(request):
     # {{{
@@ -157,7 +155,7 @@ def edit_contact_info_do(request):
         p.show_email = show_email_form.cleaned_data['show_email']
         p.save()
 
-        applog.debug('Changing email of user <%s> to <%s>' % (
+        logging.debug('Changing email of user <%s> to <%s>' % (
                 request.user, edit_email_form.cleaned_data['email']))
         edit_email_form.save()
 
@@ -260,9 +258,13 @@ def change_password_do(request):
         return change_password(request, change_password_form=form)
     # }}}
 
+@login_required
 @view
 def widget(request):
-    return (request, 'account/widget.html', {})
+    data = {}
+    data.update(mysite.base.controllers.get_uri_metadata_for_generating_absolute_links(
+        request))
+    return (request, 'account/widget.html', data)
 
 @login_required
 @view

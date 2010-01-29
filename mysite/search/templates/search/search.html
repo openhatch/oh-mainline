@@ -4,12 +4,10 @@
 
 {% block title %}
 Search bugs 
-{{ block.super }}
 {% endblock title %}
 
 {% block css %}
 {{ block.super }}
-@import url('/static/css/base/jquery.jgrowl.css');
 {% if not bunch_of_bugs %}
 #results-sidebar {
     display: none;
@@ -140,7 +138,6 @@ Search bugs
 
 {% block main %}
 <div id='results' class='gewgaws module box results'>
-    <div id='opps'>
         <form name='search_opps' method='get'> 
             <input type='text'
             name='q' id='q'
@@ -170,13 +167,10 @@ Search bugs
 
         {% endif %}
 
-    </div> <!-- /#results -->
-</div> <!-- /#opps -->
+</div> <!-- /#results -->
 {% endblock main %}
 {% block js %}
 {{ block.super }}
-<script src='/static/js/search/defaultText.js'></script>
-<script src='/static/js/jquery.jgrowl.js'></script>
 {% comment %}
 <script src='/static/js/search/testData.js'></script>
 <script src='/static/js/search/tests.js'></script>

@@ -247,6 +247,11 @@ class Query:
                     defaults={'hit_count': count})
         return hcc.hit_count
 
+    def get_query_string(self):
+        GET_data = self.get_GET_data()
+        query_string = urllib.urlencode(GET_data)
+        return query_string
+
        
 def get_project_count():
     """Retrieve the number of projects currently indexed."""

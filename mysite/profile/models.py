@@ -5,6 +5,7 @@ import mysite.customs.models
 from mysite.customs import ohloh
 import mysite.profile.controllers
 
+import django
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
@@ -61,11 +62,13 @@ class RepositoryCommitter(models.Model):
 class Person(models.Model):
     """ A human bean. """
     # {{{
+    homepage_url = models.URLField(default="", blank=True)
     user = models.ForeignKey(User, unique=True)
     gotten_name_from_ohloh = models.BooleanField(default=False)
     interested_in_working_on = models.CharField(max_length=1024, default='') # FIXME: Ditch this.
     last_polled = models.DateTimeField(default=datetime.datetime(1970, 1, 1))
     show_email = models.BooleanField(default=False)
+    bio = models.TextField(blank=True) 
     photo = models.ImageField(upload_to=
                               lambda a, b: 'static/photos/profile-photos/' + 
                               generate_person_photo_path(a, b),
@@ -80,6 +83,7 @@ class Person(models.Model):
     location_confirmed = models.BooleanField(default=False)
     location_display_name = models.CharField(max_length=255, blank=True,
                                              verbose_name='Location')
+    
 
     def __unicode__(self):
         return "username: %s, name: %s %s" % (self.user.username,
@@ -121,6 +125,9 @@ class Person(models.Model):
 
     def get_published_portfolio_entries(self):
         return PortfolioEntry.objects.filter(person=self, is_published=True, is_deleted=False)
+
+    def get_list_of_project_names(self):
+        return self.get_published_portfolio_entries().values_list('project__name', flat=True)
 
     @staticmethod
     def only_terms_with_results(terms):
@@ -164,8 +171,25 @@ class Person(models.Model):
         return sum([list(pfe.get_published_citations())
             for pfe in self.get_published_portfolio_entries()], [])
 
+    def get_tag_texts_for_map(self):
+        """Return a list of Tags linked to this Person.  Tags that would be useful from the map view of the people list"""
+        exclude_me = TagType.objects.filter(name__in=['understands_not', 'studying'])
+        my_tag_texts = (link.tag.text for link in Link_Person_Tag.objects.filter(person=self) if link.tag.tag_type not in exclude_me)
+        #eliminate duplicates, case-sensitively, then return
+        already_added = set()
+        to_return = []
+        for tag_text in my_tag_texts:
+            lowered = tag_text.lower()
+            if lowered in already_added:
+                continue # skip if already added this
+            else:
+                to_return.append(tag_text)
+                already_added.add(lowered)
+        to_return.sort() # side-effect-y sort()
+        return to_return
+
     def get_tags_for_recommendations(self):
-        """Return a list of Tags linked to this Person."""
+        """Return a list of Tags linked to this Person.  For use with bug recommendations."""
         exclude_me = TagType.objects.filter(name='understands_not')
         return [link.tag for link in Link_Person_Tag.objects.filter(person=self) if link.tag.tag_type not in exclude_me]
 
@@ -215,7 +239,12 @@ class Person(models.Model):
     @staticmethod
     def get_by_username(username):
         return Person.objects.get(user__username=username)
+
+    def should_be_nudged_about_location(self):
+        return not self.location_confirmed and not self.dont_guess_my_location
+
     # }}}
+
 
 def create_profile_when_user_created(instance, created, *args, **kwargs):
     if created:
@@ -229,6 +258,9 @@ class DataImportAttempt(models.Model):
         ('rs', "Ohloh"),
         ('ou', "Ohloh"),
         ('lp', "Launchpad"),
+        ('gh', "Github"),
+        ('ga', "Github"),
+        ('db', "Debian"),
         )
     completed = models.BooleanField(default=False)
     failed = models.BooleanField(default=False)
@@ -255,7 +287,7 @@ class DataImportAttempt(models.Model):
 
     # }}}
 
-"""
+'''
 Scenario A.
 * Dia creates background job.
 * User marks Dia "I want it"
@@ -271,110 +303,13 @@ Scenario B.
 * Background job realizes, "Nobody has claimed this yet. I'll just sit tight."
 * User marks Dia "I want it"
 * The marking method attaches the projects to the user
-"""
+'''
 
 def reject_when_query_is_only_whitespace(sender, instance, **kwargs):
     if not instance.query.strip():
         raise ValueError, "You tried to save a DataImportAttempt whose query was only whitespace, and we rejected it."
 
 models.signals.pre_save.connect(reject_when_query_is_only_whitespace, sender=DataImportAttempt)
-
-class ProjectExp(models.Model):
-    "Many-to-one relation between projects and people."
-    # {{{
-    person = models.ForeignKey(Person, null=True)
-    should_show_this = models.BooleanField(default=False)
-    data_import_attempt = models.ForeignKey(DataImportAttempt, null=True)
-    project = models.ForeignKey(Project)
-    person_role = models.CharField(max_length=200)
-    description = models.TextField()
-    url = models.URLField(max_length=200, null=True)
-    man_months = models.PositiveIntegerField(null=True)
-    primary_language = models.CharField(max_length=200, null=True)
-    source = models.CharField(max_length=100, null=True)
-    modified = models.BooleanField(default=False)
-
-    # FIXME: Make this a static method or something
-    def from_ohloh_contrib_info(self, ohloh_contrib_info):
-        # {{{
-        self.project, bool_created = Project.objects.get_or_create(
-                name=ohloh_contrib_info['project'])
-        matches = list(ProjectExp.objects.filter(project=self.project,
-                                           person=self.person))
-        if matches:
-            return matches[0]
-        else:
-            # FIXME: Automatically populate project url here.
-            self.man_months = ohloh_contrib_info['man_months']
-            self.primary_language = ohloh_contrib_info['primary_language']
-            self.source = "Ohloh"
-            self.time_gathered_from_source = datetime.date.today()
-            # FIXME: Handle first_commit_time from Ohloh somehow
-            #if 'first_commit_time' in ohloh_contrib_info:
-                # parse it
-                #parsed = datetime.datetime.strptime(
-                #    ohloh_contrib_info['first_commit_time'],
-                #    '%Y-%m-%dT%H:%M:%SZ')
-                # This is UTC.
-
-                # jam it into self
-                #self.date_started = parsed
-            return self
-        # }}}
-
-    # FIXME: Make this a static method or something
-    def from_launchpad_result(self, project_name, language, person_role):
-        # {{{
-        self.project, bool_created = Project.objects.get_or_create(
-                name=project_name)
-        matches = list(ProjectExp.objects.filter(project=self.project,
-                                           person=self.person))
-        if matches:
-            return matches[0]
-        else:
-            # FIXME: Automatically populate project url here.
-            self.primary_language = language
-            self.person_role = person_role
-            self.source = "Launchpad"
-            self.time_gathered_from_source = datetime.date.today()
-            return self
-        # }}}
-
-    @staticmethod
-    def create_from_text(
-            username,
-            project_name,
-            description='',
-            url='',
-            man_months=None,
-            primary_language=''
-            ):
-
-        person = Person.objects.get(user__username=username)
-        project, created = Project.objects.get_or_create(name=project_name)
-        if man_months is not None:
-            man_months = int(man_months)
-
-        exp = ProjectExp(
-                person=person,
-                project=project,
-                url=str(url),
-                description=str(description),
-                man_months=man_months,
-                primary_language=primary_language)
-
-        exp.save()
-        return exp
-
-    @staticmethod
-    def get_from_text(username, project_name):
-        return ProjectExp.objects.get(
-                person=Person.objects.get(user__username=username),
-                project=Project.objects.get(name=project_name),
-                )
-    get_from_strings = get_from_text
-
-    # }}}
 
 class TagType(models.Model):
     # {{{
@@ -386,7 +321,7 @@ class TagType(models.Model):
 
 class Tag(models.Model):
     # {{{
-    text = models.CharField(null=False, max_length=50)
+    text = models.CharField(null=False, max_length=255)
     tag_type = models.ForeignKey(TagType)
 
     def save(self, *args, **kwargs):
@@ -398,39 +333,8 @@ class Tag(models.Model):
         return "%s: %s" % (self.tag_type.name, self.text)
     # }}}
 
-class Link_ProjectExp_Tag(models.Model):
-    "Many-to-many relation between ProjectExps and Tags."
-    # {{{
-    tag = models.ForeignKey(Tag)
-    favorite = models.BooleanField(default=False)
-    project_exp = models.ForeignKey(ProjectExp)
-    source = models.CharField(max_length=200)
-
-    class Meta:
-        unique_together = [ ('tag', 'project_exp', 'source'),
-                            ]
-    @staticmethod
-    def get_from_strings(username, project_name, tag_text, tag_type=None):
-        # {{{
-        # FIXME: Add support for tag-type-specific grabbing of Link_ProjectExp_Tags
-
-        exp = ProjectExp.get_from_text(username, project_name)
-
-        if tag_type is not None:
-            tag_type_obj = TagType.objects.get(name=tag_type)
-            tag = Tag.objects.get(text=tag_text, tag_type=tag_type_obj)
-        else:
-            tag = Tag.objects.get(text=tag_text)
-
-        new_link = Link_ProjectExp_Tag.objects.get(project_exp=exp, tag=tag)
-
-        return new_link
-        # }}}
-
-    # }}}
-
 class Link_Project_Tag(models.Model):
-    "Many-to-many relation between ProjectExps and Tags."
+    "Many-to-many relation between Projects and Tags."
     # {{{
     tag = models.ForeignKey(Tag)
     project = models.ForeignKey(Project)
@@ -554,6 +458,14 @@ class Citation(models.Model):
             suffix = ''
 
         if self.data_import_attempt:
+            if self.data_import_attempt.source == 'db' and (
+                self.contributor_role == 'Maintainer'):
+                return 'Maintain a package in Debian.'
+            if self.data_import_attempt.source == 'db' and (
+                self.contributor_role.startswith('Maintainer of')):
+                return self.contributor_role
+            if self.data_import_attempt.source in ('gh', 'ga'):
+                return '%s a repository on Github.' % self.contributor_role
             if self.data_import_attempt.source in ['rs', 'ou']:
                 if not self.languages:
                     return "Committed to codebase (%s)" % (

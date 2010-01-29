@@ -5,13 +5,10 @@ Error
 {{ block.super }}
 {% endblock title %}
 
-{% block css %}
-{{ block.super }}
-@import url('/static/css/base/landing.css');
-{% endblock css %}
+{% block body_id %}error{% endblock body_id %}
 
 {% block main %}
-<div class='module' id='landing'>
+<div class='module'>
     <div class='head'>
         <h3>We goofed.</h3>
     </div>

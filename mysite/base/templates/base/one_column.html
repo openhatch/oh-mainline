@@ -1,9 +1,6 @@
 {% extends 'base/base.html' %}
 
-{% block css %}
-{{ block.super }}
-@import url('/static/css/base/one_column.css');
-{% endblock css %}
+{% block body_class %}one_column{% endblock body_class %}
 
 {% block content %}
 <div id='one_column'>

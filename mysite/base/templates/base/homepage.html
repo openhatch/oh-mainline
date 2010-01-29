@@ -6,36 +6,19 @@
 Welcome to OpenHatch! 
 {% endblock whole_title %}
 
-{% block nav %}
-{% endblock nav %}
+{% block body_id %}homepage{% endblock %}
 
-{% block greeting %}
-{% endblock %}
+{% block body_class %}{{ block.super }} auth{% endblock %}
 
-{% block js_in_head %}
-<script type='text/javascript'>
-    /*<![CDATA[*/
-    // FIXME: Wrap this in an IE-only block.
-    // Allow IE to recognize HTML5 elements
-    html5tags = ['section', 'article', 'aside', 'footer', 'header', 'nav', 'time'];
-    t = html5tags.length; while (t-- > 0) { document.createElement(html5tags[t]); }
-    /*]]>*/
-</script>
-<script src="/static/js/jquery.js" type='text/javascript'></script>
-<script src="/static/openid/js/openid-jquery.js" type='text/javascript'></script>
-<script type='text/javascript'>
-    $(function() {
-        openid.init('id_openid_url');
-    });
-</script>
-<script src='/static/js/css_if_js.js' type='text/javascript'></script>
-{% endblock js_in_head %}
+{% block nav %}{% comment %}
+Empty nav block; we include nav.html ourselves, thank you very much.
+{% endcomment %}{% endblock nav %}
+
+{% block greeting %}{% endblock %}
 
 {% block css %}
 {{ block.super }}
-@import url('/static/css/account/auth.css');
 @import url('/static/css/base/homepage.css');
-@import url('/static/openid/css/openid.css');
 {% endblock css %}
 
 {% block content %}
@@ -65,6 +48,9 @@ Welcome to OpenHatch!
 </div>
 
 <div id='entry-points'>
+    {% with 1 as dont_display_nav_logo %}
+    {% include 'base/nav.html' %}
+    {% endwith %}
     <div class='module' id='explanation'>
         <h3>
             Want to get (more) involved in <strong>open source</strong>?
@@ -100,7 +86,7 @@ Welcome to OpenHatch!
                 </p>
             </div>
             <strong class='right'>
-                <a href='#' id='create-profile'>
+                <a href='{% url mysite.profile.views.portfolio_editor %}' id='create-profile'>
                     <img src='/static/images/base/homepage/portfolio-frontpage.png' 
                     alt='Create a profile' />
                 </a>

@@ -1,0 +1,4 @@
+#!/bin/bash
+# This is useful when switching users on Raffi's computer.
+set -x
+sudo chown -Rv $USER ~rafpaf/oh/milestone-a

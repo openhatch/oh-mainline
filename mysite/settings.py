@@ -1,6 +1,7 @@
+# Django settings for mysite project.
+
 import os
 import logging
-# Django settings for mysite project.
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -113,6 +114,7 @@ INSTALLED_APPS = (
     'django_extensions',
     'windmill',
     'south',
+    'django_assets',
     'celery',
     'invitation',
     'mysite.search',
@@ -127,7 +129,7 @@ INSTALLED_APPS = (
 
 # file: settings.py #
 TEST_RUNNER = 'mysite._profiling.profile_tests'
-TEST_PROFILE = '/tmp/profile'
+TEST_PROFILE = '/tmp/openhatch-profiling-data.%s' % os.environ.get('USER', 'unknown')
 
 ## AMQP, Rabbit Queue, Celery
 AMQP_SERVER = "localhost"
@@ -146,12 +148,10 @@ OHLOH_API_KEY='JeXHeaQhjXewhdktn4nUw' # This key is called "Oman testing"
                                         # at <https://www.ohloh.net/accounts/paulproteus/api_keys>
 #OHLOH_API_KEY='0cWqe4uPw7b8Q5337ybPQ' # This key is called "API testing"
 
-applog = logging.getLogger('applog')
-applog.setLevel(logging.DEBUG)
-_handler = logging.StreamHandler()
-_formatter = logging.Formatter('%(asctime)s %(funcName)s:%(lineno)d %(levelname)-8s %(message)s')
-_handler.setFormatter(_formatter)
-applog.addHandler(_handler)
+logging.basicConfig(
+    level = logging.DEBUG,
+    format = '%(asctime)s %(funcName)s:%(lineno)d %(levelname)-8s %(message)s',
+)
 
 # Invite codes last seven days
 ACCOUNT_INVITATION_DAYS=7
@@ -161,7 +161,18 @@ INVITATIONS_PER_USER=5
 DEFAULT_FROM_EMAIL = 'all@openhatch.org'
 
 # Don't cache on dev server
-CACHE_BACKEND = 'dummy://'
+CACHE_BACKEND = 'file:///tmp'
 
 # Launchpad credentials
 LP_CREDS_BASE64_ENCODED='WzFdCmNvbnN1bWVyX3NlY3JldCA9IAphY2Nlc3NfdG9rZW4gPSBHV0tKMGtwYmNQTkJXOHRQMWR2Ygpjb25zdW1lcl9rZXkgPSBvcGVuaGF0Y2ggbGl2ZSBzaXRlCmFjY2Vzc19zZWNyZXQgPSBSNWtrcXBmUERiUjRiWFFQWGJIMkdoc3ZQamw2SjlOc1ZwMzViN0g2d3RjME56Q3R2Z3JKeGhNOVc5a2swU25CSnRHV1hYckdrOFFaMHZwSgoK'
+
+GITHUB_USERNAME='openhatched'
+GITHUB_API_TOKEN='6f2b15214757ff724155654c97f4ce92'
+
+# Set this to false to bundle files even if not in production.
+ASSETS_DEBUG = True
+
+# The setting below adds a querystring to assets, e.g. bundle.css?1264015076
+# This querystring changes whenever we change the asset. This prevents the
+# client's cached version of an asset from overriding our new asset.
+ASSETS_EXPIRE = 'querystring'

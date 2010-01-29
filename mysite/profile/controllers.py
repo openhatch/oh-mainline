@@ -60,7 +60,7 @@ def get_geoip_guess_for_ip(ip_as_string):
             geoip_database = pygeoip.GeoIP(os.path.join(settings.MEDIA_ROOT,
                                                         '../../downloads/GeoLiteCity.dat'))
         except IOError:
-            return False, '' # maybe log this?
+            return False, u'' # maybe log this?
     
     all_data_about_this_ip = geoip_database.record_by_addr(ip_as_string)
 
@@ -70,7 +70,8 @@ def get_geoip_guess_for_ip(ip_as_string):
     things_we_like = all_data_about_this_ip.get('city', ''), all_data_about_this_ip.get('region_name', ''), all_data_about_this_ip.get('country_name', '')
 
     as_string = ', '.join([portion for portion in things_we_like if portion])
+    as_unicode = unicode(as_string, 'Latin-1')
 
-    if as_string:
-        return True, as_string
-    return False, ''
+    if as_unicode:
+        return True, as_unicode
+    return False, u''

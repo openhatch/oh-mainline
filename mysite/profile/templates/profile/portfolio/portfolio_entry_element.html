@@ -24,17 +24,29 @@
                         {% else %}
                         style="background-image: url('{{ pf_entry.project.get_url_of_icon_or_generic }}')"
                         {% endif %}
-                        ><span class='alt-text'>(icon)</span></div>
+                        ><span class='alt-text'>
+                            {% if edit_mode or adding_mode or not pf_entry.project.logo_contains_name %}
+                            (icon)
+                            {% else %}
+                            pf_entry.project.name
+                            {% endif %}
+                        </span></div>
                 </a>
                 
                 {% if adding_mode %}
                     <input class='project_name' type='text' title="Type a project name" value='' />
                 {% else %}
+
+                {% comment %}   Only show the project's name if the name isn't
+                                already contained in the icon.      {% endcomment %}
+                {% if edit_mode or not pf_entry.project.logo_contains_name %}
                 <span class='project_name'>
                     <a href='{{ pf_entry.project.get_url }}'>
                         {{ pf_entry.project.name }}
                     </a>
                 </span>
+                {% endif %}
+
                 {% endif %}
 
                 {% if edit_mode and not adding_mode %}
@@ -50,7 +62,7 @@
                 <label>Describe this project</label>
                 <textarea class='project_description'></textarea>
                 {% else %}
-                <div class='project_description'>{{ pf_entry.project_description }}</div>
+                <div class='project_description'>{{ pf_entry.project_description|urlize }}</div>
                 {% endif %}
             </div>
             {% if not edit_mode and not adding_mode %}
@@ -90,26 +102,39 @@
                 <div class='howto'>
                     <a href='#' class='hide_me'>hide</a>
                     <div class='body'>
-                        Link to a page about your involvement, e.g., 
-                        a bug report or archived post to a mailing list that explains your patch,
-                        translation, design idea or other contribution. (Cue some tactical
-                        Googling!)
+                        <p>
+                        Link to a page about your involvement, e.g.,
+                        patches, translations, design ideas,
+                        leadership roles, or any other kind of contribution.
+                        </p>
+                        <p>
+                        Example pages:
+                        <ul>
+                            <li>bug report</li>
+                            <li>archived post to a mailing list</li>
+                            <li>staff page</li>
+                            <li>WebSVN</li>
+                        </ul>
+                        </p>
+                        <p>
+                        (Cue some tactical Googling!)
+                        </p>
                     </div>
                 </div>
                 {% endif %}
             </div>
             <div class='experience_description-wrapper'>
-                {% if pf_entry.experience_description %}
                 {% if edit_mode %}
                 <label>Describe your involvement</label>
                 {% else %}
+                {% if pf_entry.experience_description %}
                 <label style='margin-bottom: 5px;'>Involvement description</label>
                 {% endif %}
                 {% endif %}
                 {% if edit_mode %}
                 <textarea class='experience_description'></textarea>
                 {% else %}
-                <div class='experience_description'>{{ pf_entry.experience_description }}</div>
+                <div class='experience_description'>{{ pf_entry.experience_description|urlize }}</div>
                 {% endif %}
             </div>
         </div>

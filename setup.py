@@ -1,15 +1,18 @@
 import os
-from setuptools import setup, find_packages
+from setuptools import setup
 
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
+
+
+dependency_path = 'http://linode.openhatch.org/~paulproteus/'
 
 setup(
     name = "mysite",
     version = "3",
     packages = ['mysite',],
     url = 'http://openhatch.org/',
-    license = 'Proprietary',
+    license = 'AGPLv3',
 
     install_requires = ['setuptools',
                         'python-distutils-extra',
@@ -19,14 +22,18 @@ setup(
                         'south==0.6-rc1',
                         'multiprocessing==2.6.2.1-oh',
                         'launchpadlib==1.5.3',
+                        'django-assets',
+                        'python-github2==0.1.1',
                         'pygeoip==0.1.3',
                        ],
 
-    dependency_links = ['http://linode.openhatch.org/~paulproteus/',
-                        'http://linode.openhatch.org/~paulproteus/python_apt-0.6.17-py2.6-linux-i686.egg#egg=python-apt',
-                        'http://linode.openhatch.org/~paulproteus/invitation-1.0.tar.gz#egg=invitation',
-                        'http://linode.openhatch.org/~paulproteus/multiprocessing-2.6.2.1-oh.tar.gz#egg=multiprocessing',
-                        'http://linode.openhatch.org/~paulproteus/South-0.6_pre-py2.6.egg#egg=south',
+    dependency_links = [dependency_path,
+                        dependency_path + 'python_apt-0.6.17-py2.6-linux-i686.egg#egg=python-apt',
+                        dependency_path + 'invitation-1.0.tar.gz#egg=invitation',
+                        dependency_path + 'multiprocessing-2.6.2.1-oh.tar.gz#egg=multiprocessing',
+                        dependency_path + 'django-assets-0.2.tar.gz#egg=django-assets',
+                        dependency_path + 'South-0.6_pre-py2.6.egg#egg=south',
+                        'http://linode.openhatch.org/~paulproteus/python-github2-0.1.1.tar.gz#egg=python-github2',
                         'http://pygeoip.googlecode.com/files/pygeoip-0.1.3.zip#egg=pygeoip',
                        ],
 
@@ -35,7 +42,7 @@ setup(
 
     description = "A website",
 
-    author = 'Asheesh Laroia, Raphael Krut-Landau',
+    author = 'The OpenHatch team <https://openhatch.org/about/',
     author_email = 'all@openhatch.org',
 
     package_dir = {'': '.'},

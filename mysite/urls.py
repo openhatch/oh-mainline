@@ -25,7 +25,7 @@ urlpatterns = patterns('',
             {'document_root': settings.MEDIA_ROOT}),
 
         (r'^people/$',
-                'mysite.profile.views.people_map'),
+            'mysite.profile.views.people_map'),
 
         (r'^\+people/list/$', 'mysite.profile.views.display_list_of_people'),
 
@@ -52,11 +52,6 @@ urlpatterns = patterns('',
         (r'^account/request_invitation/do$',
             'mysite.account.views.request_invitation'),
 
-        #Karen messes around with templates
-        (r'^about/$', 
-            'mysite.info.views.aboutpage'),
-        (r'^contact/$', 
-            'mysite.info.views.contactpage'),
         (r'^people/(?P<user_to_display__username>[^/]+)/widget/$',
                 'mysite.profile.views.widget_display'),
 
@@ -132,12 +127,6 @@ urlpatterns = patterns('',
         (r'^account/edit/photo/do$',
             'mysite.account.views.edit_photo_do'),
 
-        (r'^form/projectexp_add$',
-            'mysite.profile.views.projectexp_add_form'),
-
-        (r'^do/projectexp_add$',
-            'mysite.profile.views.projectexp_add_do'),
-
         (r'^profile/views/add_citation_manually_do$',
             'mysite.profile.views.add_citation_manually_do'),
 
@@ -166,19 +155,10 @@ urlpatterns = patterns('',
         (r'^people/import/do$',
             'mysite.profile.views.import_do'),
 
-        (r'^people/(?P<user_to_display__username>[^/]+)/projects/(?P<project__name>.+)$',
-                'mysite.profile.views.projectexp_display'),
-
-        (r'^people/projects/edit/(?P<project__name>.+)$',
-                'mysite.profile.views.projectexp_edit'),
-
-        (r'^people/projects/edit_do/(?P<project__name>.+)$',
-                'mysite.profile.views.projectexp_edit_do'),
-
         (r'^people/portfolio/import/$',
                 'mysite.profile.views.importer'),
 
-        (r'^\+portfolio/editor$',
+        (r'^\+portfolio/editor/$',
                 'mysite.profile.views.portfolio_editor'),
 
         (r'^\+portfolio/editor/test$',
@@ -214,10 +194,6 @@ urlpatterns = patterns('',
         (r'^\+me$', 'mysite.profile.views.dollar_username', {}, 
                 'oh_my_profile_redirect'),
 
-        # This dangerous regex is last
-        (r'^people/(?P<user_to_display__username>[^/]+)[/?]$',
-                'mysite.profile.views.display_person_web'),
-
         (r'^\+projects/', include('mysite.project.urls')),
 
         (r'^\+project/(?P<project__name>.+)', 'mysite.project.views.redirect_project_to_projects'),
@@ -225,6 +201,10 @@ urlpatterns = patterns('',
         (r'^\+yo_is_django_alive$', lambda x: HttpResponse('success')),
 
         (r'^\+bitesize$', lambda x: HttpResponseRedirect('/search/?q=&toughness=bitesize')),
+
+        # This dangerous regex is last
+        (r'^people/(?P<user_to_display__username>[^/]+)[/?]$',
+                'mysite.profile.views.display_person_web'),
 
         )
 

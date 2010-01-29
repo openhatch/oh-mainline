@@ -1,11 +1,11 @@
-h1 { float: left; clear: left; margin-top: 10px; }
-h3.supertitle { font-size: 10pt; margin-top: 20px; }
-.head { width: 98% ! important; }
-#left { width: 515px; margin-right: 20px; }
-#left .module { width: 390px; }
-#left .module > .body { width: 474px; }
-#main { width: 403px; }
-.module { width: 100% ! important; }
-#main .module > .body { width: 361px; }
+#project h1 { float: left; clear: left; margin-top: 10px; }
+#project h3.supertitle { font-size: 10pt; margin-top: 20px; }
+#project .head { width: 98% ! important; }
+#project #left { width: 515px; margin-right: 20px; }
+#project #left .module { width: 390px; }
+#project #left .module > .body { width: 474px; }
+#project #main { width: 403px; }
+#project .module { width: 100% ! important; }
+#project #main .module > .body { width: 361px; }
 
-#bugs ul li { margin: 5px 0 5px 10px; color: #777; margin-bottom: 10px; list-style: square; }
+#project #bugs ul li { margin: 5px 0 5px 10px; color: #777; margin-bottom: 10px; list-style: square; }

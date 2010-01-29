@@ -4,22 +4,17 @@
 Error 404: Page not found
 {% endblock title %}
 
-{% block css %}
-{{ block.super }}
-@import url('/static/css/base/landing.css');
-{% endblock css %}
+{% block body_id %}error{% endblock body_id %}
 
 {% block main %}
-<div class='module' id='landing'>
+<div class='module'>
     <div class='head'>
-        <h3>Page not found</h3>
+        404
     </div>
     <div class='body'>
-        <p>This page was here a minute ago, I swear! It was RIGHT HERE!</p>
-        <p>(If you got here from a link within the site, our system
-        automatically emailed us. Otherwise, please 
-        <a href="/contact/">contact us</a>.)
-        </p>
+        That page couldn't be found.
+        If you got here from a link within the site, our system
+        automatically emailed us. Otherwise, please <a href="/contact/">contact us</a>.
     </div>
 </div>
 {% endblock main %}

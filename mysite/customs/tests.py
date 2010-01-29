@@ -3,7 +3,7 @@
 
 # Imports {{{
 from mysite.search.models import Project, Bug
-from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_ProjectExp_Tag
+from mysite.profile.models import Person, Tag, TagType
 import mysite.profile.views
 from mysite.profile.tests import MockFetchPersonDataFromOhloh
 
@@ -32,7 +32,10 @@ import lp_grabber
 
 from mysite.profile.tasks import FetchPersonDataFromOhloh
 import mysite.customs.miro
+import mysite.customs.debianqa
+import mysite.customs.cia
 import mysite.customs.feed
+import mysite.customs.github
 
 import mysite.customs.models
 import mysite.customs.lp_grabber
@@ -230,6 +233,12 @@ class OhlohIconTests(django.test.TestCase):
 
     # }}}
 
+class ImportFromDebianQAReally(django.test.TestCase):
+    def test_asheesh(self):
+        source_package_names = mysite.customs.debianqa.source_packages_maintained_by('asheesh@asheesh.org')
+        self.assertEqual(set(source_package_names),
+                         set([('ccd2iso', 'Converter from CloneCD disc image format to standard ISO'), ('alpine', 'Text-based email client, friendly for novices but powerful'), ('cue2toc', "converts CUE files to cdrdao's TOC format"), ('liblicense', 'Stores and retrieves license information in media files'), ('exempi', 'library to parse XMP metadata (Library)')]))
+
 class LaunchpadDataTests(django.test.TestCase):
     def test_project2language(self):
         langs = lp_grabber.project2languages('gwibber')
@@ -239,7 +248,6 @@ class LaunchpadDataTests(django.test.TestCase):
         # have a language assigned to it.
         no_langs = lp_grabber.project2languages('lazr')
         self.assertEqual(no_langs, [])
-
 
     @mock.patch('mechanize.Browser.open', open_causes_404)
     def test_person_who_404s(self):
@@ -481,4 +489,128 @@ class LaunchpadImportByEmail(django.test.TestCase):
         u = mysite.customs.lp_grabber.get_launchpad_username_by_email('asheesh@asheesh.org')
         self.assertEqual(u, "paulproteus")
 
+class OnlineGithub(django.test.TestCase):
+    def test_get_language(self):
+        top_lang = mysite.customs.github.find_primary_language_of_repo(
+            github_username='phinze',
+            github_reponame='tircd')
+        self.assertEqual(top_lang, 'Perl')
+
+    def test_find_tircd_for_phinze(self):
+        '''This test gives our github info_by_username a shot.'''
+        repos = mysite.customs.github.repos_by_username('phinze')
+        found_tircd_yet = False
+        for repo in repos:
+            if repo.name == 'tircd':
+                found_tircd_yet = True
+        self.assertTrue(found_tircd_yet)
+
+class ParseCiaMessage(django.test.TestCase):
+    def test_with_ansi_codes(self):
+        message = '\x02XBMC:\x0f \x0303jmarshallnz\x0f * r\x0226531\x0f \x0310\x0f/trunk/guilib/ (GUIWindow.h GUIWindow.cpp)\x02:\x0f cleanup: eliminate some duplicate code.'
+        parsed = {'project_name': 'XBMC',
+                  'committer_identifier': 'jmarshallnz',
+                  'version': 'r26531',
+                  'path': '/trunk/guilib/ (GUIWindow.h GUIWindow.cpp)',
+                  'message': 'cleanup: eliminate some duplicate code.'}
+        self.assertEqual(mysite.customs.cia.parse_ansi_cia_message(message),
+                         parsed)
+
+    def test_parse_a_middle_line(self):
+        message = "\x02FreeBSD:\x0f Replace several instances of 'if (!a & b)' with 'if (!(a &b))' in order"
+        parsed = {'project_name': 'FreeBSD',
+                  'message': "Replace several instances of 'if (!a & b)' with 'if (!(a &b))' in order"}
+        self.assertEqual(mysite.customs.cia.parse_ansi_cia_message(message),
+                         parsed)
+
+    def test_parse_a_middle_line_with_asterisk(self):
+        message = "\x02FreeBSD:\x0f * Replace several instances of 'if (!a & b)' with 'if (!(a &b))' in order"
+        parsed = {'project_name': 'FreeBSD',
+                  'message': "* Replace several instances of 'if (!a & b)' with 'if (!(a &b))' in order"}
+        self.assertEqual(mysite.customs.cia.parse_ansi_cia_message(message),
+                         parsed)
+
+    def test_find_module(self):
+        tokens = ['KDE:', ' crissi', ' ', '*', ' r', '1071733', ' kvpnc', '/trunk/playground/network/kvpnc/ (6 files in 2 dirs)', ':', ' ']
+        expected = {'project_name': 'KDE',
+                    'committer_identifier': 'crissi',
+                    'version': 'r1071733',
+                    'path': '/trunk/playground/network/kvpnc/ (6 files in 2 dirs)',
+                    'module': 'kvpnc',
+                    'message': ''}
+        self.assertEqual(mysite.customs.cia.parse_cia_tokens(tokens),
+                         expected)
+
+    def test_complicated_mercurial_version(self):
+        tokens = ['Sphinx:', ' birkenfeld', ' ', '*', ' ', '88e880fe9101', ' r', '1756', ' ', '/EXAMPLES', ':', ' Regroup examples list by theme used.']
+        expected = {'project_name': 'Sphinx',
+                    'committer_identifier': 'birkenfeld',
+                    'version': '88e880fe9101 r1756',
+                    'path': '/EXAMPLES',
+                    'message': 'Regroup examples list by theme used.'}
+        self.assertEqual(mysite.customs.cia.parse_cia_tokens(tokens),
+                         expected)
+
+    def test_find_module_with_no_version(self):
+        tokens = ['FreeBSD:', ' glarkin', ' ', '*', ' ports', '/lang/gcc42/ (Makefile distinfo files/patch-contrib__download_ecj)', ':', ' (log message trimmed)']
+        expected = {'project_name': 'FreeBSD',
+                    'committer_identifier': 'glarkin',
+                    'path': '/lang/gcc42/ (Makefile distinfo files/patch-contrib__download_ecj)',
+                    'module': 'ports',
+                    'message':  '(log message trimmed)'}
+        self.assertEqual(mysite.customs.cia.parse_cia_tokens(tokens),
+                         expected)
+
+    def test_find_module_in_moin(self):
+        tokens = ['moin:', ' Thomas Waldmann <tw AT waldmann-edv DOT de>', ' default', ' ', '*', ' ', '5405:a1a1ce8894cb', ' 1.9', '/MoinMoin/util/SubProcess.py', ':', ' merged moin/1.8']
+        expected = {'project_name': 'moin',
+                    'committer_identifier': 'Thomas Waldmann <tw AT waldmann-edv DOT de>',
+                    'branch': 'default',
+                    'version': '5405:a1a1ce8894cb',
+                    'module': '1.9',
+                    'path': '/MoinMoin/util/SubProcess.py',
+                    'message':  'merged moin/1.8'}
+        self.assertEqual(mysite.customs.cia.parse_cia_tokens(tokens),
+                         expected)
+
+class LineAcceptorTest(django.test.TestCase):
+    def test(self):
+
+        got_response = []
+        def callback(obj, got_response=got_response):
+            got_response.append(obj)
+            
+        lines = [
+            '\x02FreeBSD:\x0f \x0303trasz\x0f * r\x02201794\x0f \x0310\x0f/head/sys/ (4 files in 4 dirs)\x02:\x0f ',
+            "\x02FreeBSD:\x0f Replace several instances of 'if (!a & b)' with 'if (!(a &b))' in order",
+            '\x02FreeBSD:\x0f to silence newer GCC versions.',
+            '\x02KDE:\x0f \x0303lueck\x0f * r\x021071711\x0f \x0310\x0f/branches/work/doc/kget/\x02:\x0f kget doc was moved back to trunk',
+            '\x02SHR:\x0f \x0303mok\x0f \x0307libphone-ui-shr\x0f * r\x027cad6cdc76f9\x0f \x0310\x0f/po/ru.po\x02:\x0f po: updated russian translation from Vladimir Berezenko']
+        agent = mysite.customs.cia.LineAcceptingAgent(callback)
+
+        expecting_response = None
+        # expecting no full message for the first THREE lines
+        agent.handle_message(lines[0])
+        self.assertFalse(got_response)
+        
+        agent.handle_message(lines[1])
+        self.assertFalse(got_response)
+
+        agent.handle_message(lines[2])
+        self.assertFalse(got_response)
+
+        # but now we expect something!
+        agent.handle_message(lines[3])
+        wanted = {'project_name': 'FreeBSD', 'path': '/head/sys/ (4 files in 4 dirs)', 'message': "Replace several instances of 'if (!a & b)' with 'if (!(a &b))' in order\nto silence newer GCC versions.", 'committer_identifier': 'trasz', 'version': 'r201794'}
+        got = got_response[0]
+        self.assertEqual(got, wanted)
+        got_response[:] = []
+
+        # FIXME use (project_name, version) pair instead I guess
+
+        # and again, but differently
+        agent.handle_message(lines[4])
+        wanted = {'project_name': 'KDE', 'path': '/branches/work/doc/kget/', 'message': "kget doc was moved back to trunk", 'committer_identifier': 'lueck', 'version': 'r1071711'}
+        self.assertEqual(got_response[0], wanted)
+        got_response[:] = []        
 # vim: set nu:

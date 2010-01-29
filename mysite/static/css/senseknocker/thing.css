@@ -1,6 +1,6 @@
 #senseknocker-thing a {
     position: fixed;
-    bottom: 0;
+    top: 50%;
     left: 0;
     z-index: 999999;
     height: 90px;

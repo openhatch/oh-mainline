@@ -1,118 +1,42 @@
-#nameplate {
-    float: left;
-    width: 940px;
-    margin-top: 20px;
-    padding: 3px;
-}
-#nameplate h1 {
-    font-weight: bold;
-    font-size: 15pt;
-}
-#nameplate h1 a {
-    color: #000;
-}
-#nameplate h1, #nameplate #sep, #nameplate h2 {
-    font-size: 19pt;
-    font-weight: normal;
-    margin-right: 10px;
-}
-#nameplate #sep {
-    font-weight: bold;
-    color: #ddd;
-    display: none;
-}
-#nameplate h2 {
-    font-size: 13pt;
-    font-weight: normal;
-    color: #777;
-}
-#nameplate ul {
-    margin: 0;
-    padding: 0;
-}
-#nameplate li {
-    list-style: none;
-    float: left;
-    margin-left: 25px;
-}
-#nameplate li a {
-    font-size: 13pt;
-    text-decoration: none;
-    color: #999;
-}
-#nameplate li a:hover {
-    color: #666;
-    text-decoration: underline;
-}
-#nameplate .name {
-    float: left;
-}
+body#profile #bio { margin: 0; padding: 0 0 10px 0; }
+body#profile #tags-links li { list-style: square outside; margin: 0 0 0 15px; }
+body#profile #nameplate { float: left; width: 940px; margin-top: 20px; padding: 3px; }
+	body#profile #nameplate h1 { font-weight: bold; font-size: 15pt; }
+		body#profile #nameplate h1 a { color: #000; }
+	body#profile #nameplate h1, #nameplate #sep, #nameplate h2 { font-size: 19pt; font-weight: normal; margin-right: 10px; }
+	body#profile #nameplate #sep { font-weight: bold; color: #ddd; display: none; }
+	body#profile #nameplate h2 { font-size: 13pt; font-weight: normal; color: #777; }
+	body#profile #nameplate ul { margin: 0; padding: 0; }
+	body#profile #nameplate li { list-style: none; float: left; margin-left: 25px; }
+		body#profile #nameplate li a { font-size: 13pt; text-decoration: none; color: #999; }
+			body#profile #nameplate li a:hover { color: #666; text-decoration: underline; }
+	body#profile #nameplate .name { float: left; }
+	body#profile #nameplate .edit { float: left; width: 20px; margin-left: 5px; }
+	body#profile #nameplate .name-edit-link { float: left; padding: 10px 0; margin-right: 10px; }
+	body#profile #nameplate input[type='text'] { width: 160px; float: left; }
+	body#profile #nameplate form,
+body#profile #nameplate form .section,
+body#profile #nameplate form h3 { width: 280px; }
+	body#profile #nameplate form h3 {  }
+	body#profile #nameplate form h4 { padding: 8px 0; }
+	body#profile #nameplate .another-identifier { float: right; margin-left: 20px; margin-bottom: 10px; clear: right; }
+	body#profile #nameplate .notification { margin: 0; float: left; width: 200px; }
+	body#profile #left .notification p {font-size: .9em; padding-top: 0; margin-top: 5px}
+	body#profile #left .notification {padding: 0px;}
+body#profile #left .notification a{ font-weight: bold;  }
+body#profile #left .notification { width: 82%; padding: 8px; padding-bottom: 0; margin: 10px;}
+body#profile #left .module .body.has_notification { border: 0; padding: 0; width: 99% }
+body#profile #avatar { border: 4px solid #fff; padding: 0; background: #fff; }
+	body#profile #avatar img { float: left; }
+	body#profile #avatar.edit { width: 180px; padding: 10px; background-color: #f5f5f5; }
+body#profile #info textarea { width: 145px; }
+body#profile #info .body { width: 89%; }
+body#profile #info h4 { width: 100%; float: left; }
+body#profile .change-photo-link { background: #f4f4f4; padding: 10px; float: left; width: 182px; border-top: 5px solid #fff; }
+body#profile #info .save-button { margin-top: 10px; }
 
-#nameplate .edit {
-    float: left;
-    width: 20px;
-    margin-left: 5px;
-}
-#nameplate .name-edit-link {
-    float: left;
-    padding: 10px 0;
-    margin-right: 10px;
-}
-#nameplate input[type='text'] {
-    width: 160px;
-    float: left;
-}
-#nameplate form,
-#nameplate form .section,
-#nameplate form h3 {
-    width: 280px;
-}
-#nameplate form h3 {
-}
-#nameplate form h4 {
-    padding: 8px 0;
-}
-#nameplate .another-identifier {
-    float: right;
-    margin-left: 20px;
-    margin-bottom: 10px;
-    clear: right;
-}
+body#profile.two_columns .module > .body { width: 97%; padding: 10px; }
 
-#nameplate .notification {
-    margin: 0;
-    float: left;
-    width: 200px;
-}
-#avatar {
-    border: 4px solid #fff;
-    padding: 0;
-    background: #fff;
-}
-#avatar img {
-    float: left;
-}
-#avatar.edit {
-    width: 180px;
-    padding: 10px;
-    background-color: #f5f5f5;
-}
 
-#info textarea {
-    width: 145px;
-}
-#info h4 {
-    width: 145px;
-    margin-top: 10px;
-    float: left;
-}
-.change-photo-link {
-    background: #f4f4f4;
-    padding: 10px;
-    float: left;
-    width: 182px;
-    border-top: 5px solid #fff;
-}
-#info .save-button {
-    margin-top: 10px;
-}
+body#profile #info .tags { float: left; width: 158px; margin-bottom: 15px; }
+body#profile #info .tags:last-child { margin-bottom: 0; }

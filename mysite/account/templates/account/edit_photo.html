@@ -1,48 +1,43 @@
 {% extends 'base/one_column.html' %}
 
-{% block title %}
-Change your photo 
-{% endblock title %}
+{% block title %}Change your photo{% endblock %}
 
-{% block css %}
-{{ block.super }}
-@import url('/static/css/account/auth.css');
-{% endblock css %}
+{% block body_class%}{{ block.super }} auth{% endblock %}
 
 {% block main %}
-<div class='module'>
-    <div class='head'>
-        <ul>
-            <li>
-            <a href='{% url mysite.profile.views.display_person_web the_user.username %}'>&laquo; Back to portfolio</a>
-            </li>
-        </ul>
-        <h3>Profile photo settings</h3>
-    </div>
-    <div class='body contains-submodules two-columns'>
-        <div class='submodule skinny'>
-            <div class='head'>
-                <h3>Current profile photo</h3>
-            </div>
-            <div class='body'>
-                <img src="{{ photo_url }}" />
-            </div>
+    <div class='module'>
+        <div class='head'>
+            <ul>
+                <li>
+                    <a href='{% url mysite.profile.views.display_person_web the_user.username %}'>&laquo; Back to portfolio</a>
+                </li>
+            </ul>
+            <h3>Profile photo settings</h3>
         </div>
-        <form method='POST'
-            name='edit_photo'
-            action='/account/edit/photo/do'
-            enctype="multipart/form-data"
-            class='submodule fat'>
+        <div class='body contains-submodules two-columns'>
+            <div class='submodule skinny'>
+                <div class='head'>
+                    <h3>Current profile photo</h3>
+                </div>
+                <div class='body'>
+                    <img src="{{ photo_url }}" />
+                </div>
+            </div>
+            <form method='POST'
+                    name='edit_photo'
+                    action='/account/edit/photo/do'
+                    enctype="multipart/form-data"
+                    class='submodule fat'>
                 <div class='head'>
                     <h3>Change your profile photo</h3>
                 </div>
                 <div class='body'>
                     {% for field in edit_photo_form %}
-                    <div class='form-row'>
-                        {{ field.errors }}
-                        <label>Choose a photo</label>
-                        {{ field }}
-                    </div>
+                        <div class='form-row'>
+                            {{ field.errors }}
+                            <label>Choose a photo</label>
+                            {{ field }}
+                        </div>
                     {% endfor %}
                 </div>
                 <div class='foot'>

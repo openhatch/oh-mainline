@@ -1,9 +1,10 @@
 # Imports {{{
 from mysite.base.tests import make_twill_url, TwillTests
+from mysite.base.helpers import ObjectFromDict
 import mysite.account.tests
 
 from mysite.search.models import Project
-from mysite.profile.models import Person, ProjectExp, Tag, TagType, Link_Person_Tag, Link_ProjectExp_Tag, DataImportAttempt, PortfolioEntry, Citation
+from mysite.profile.models import Person, Tag, TagType, Link_Person_Tag, DataImportAttempt, PortfolioEntry, Citation
 import mysite.project.views
 
 import mysite.profile.views
@@ -38,6 +39,9 @@ import twill
 from twill import commands as tc
 from twill.shell import TwillCommandLoop
 # }}}
+
+def do_nothing(*args, **kwargs):
+    return ''
 
 class ProfileTests(TwillTests):
     # {{{
@@ -222,13 +226,7 @@ class MockFetchPersonDataFromOhloh(object):
         task.debugging = True # See FetchPersonDataFromOhloh
         task.run(*args, **kwargs)
 
-class CeleryTests(TwillTests):
-    # {{{
-    fixtures = ['user-paulproteus', 'person-paulproteus']
-
-    # FIXME: One day, test that after self.test_slow_loading_via_emulated_bgtask
-    # getting the data does not go out to Ohloh.
-
+class BaseCeleryTest(TwillTests):
     def _test_data_source_via_emulated_bgtask(self, source, data_we_expect, summaries_we_expect):
         "1. Go to the page that has paulproteus' data. "
         "2. Verify that the page doesn't yet know about ccHost. "
@@ -302,6 +300,13 @@ class CeleryTests(TwillTests):
         for n, citation in enumerate(citations):
             self.assertEqual(citation.data_import_attempt, dia)
             self.assertEqual(citation.summary, summaries_we_expect[n])
+
+class CeleryTests(BaseCeleryTest):
+    # {{{
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    # FIXME: One day, test that after self.test_slow_loading_via_emulated_bgtask
+    # getting the data does not go out to Ohloh.
 
     @mock.patch('mysite.customs.ohloh.Ohloh.get_contribution_info_by_username', mock_gcibu)
     @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
@@ -396,11 +401,11 @@ class UserListTests(TwillTests):
     def test_display_list_of_users_web(self):
         # {{{
         self.login_with_twill()
-        url = 'http://openhatch.org/people/'
+        url = 'http://openhatch.org/%2Bpeople/list/'
         url = make_twill_url(url)
         tc.go(url)
         tc.find(r'paulproteus')
-        tc.find(r'Barry Spinoza \(barry\)')
+        tc.find(r'Barry Spinoza')
 
         tc.follow('paulproteus')
         tc.url('people/paulproteus') 
@@ -408,6 +413,51 @@ class UserListTests(TwillTests):
         # }}}
 
     # }}}
+
+class ImportDebianMaintenance(BaseCeleryTest):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    @mock.patch('mysite.search.models.Project.populate_icon_from_ohloh',
+                do_nothing)
+    @mock.patch('mysite.customs.debianqa.source_packages_maintained_by')
+    @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
+    def test_debian_maintenance_via_emulated_bgtask(self, mock):
+        description = 'the world in /bin/nutsh'
+        # three repos: one owned by paulproteus; that should be ignored.
+        # the other two: one where paulproteus is a collaborator, and one
+        # where he isn't.
+        mock.return_value = [('MOCK ccHost', description)]
+
+        data_we_expect = [{
+            'contributor_role': 'Maintainer',
+            'languages': "",
+            'is_published': False,
+            'is_deleted': False}]
+
+        summaries_we_expect = [
+                'Maintain a package in Debian.',
+                ]
+
+        self._test_data_source_via_emulated_bgtask(
+            source='db', data_we_expect=data_we_expect,
+            summaries_we_expect=summaries_we_expect)
+        # }}}
+
+        # PLUS test that there is a has a description!
+        self.assertEqual(PortfolioEntry.objects.all().count(),
+                         2) # mock ccHost + Debian
+        self.assertEqual(PortfolioEntry.objects.get(project__name='MOCK ccHost'
+                                                    ).project_description,
+                         description)
+
+        # PLUS test that we create a Debian PortfolioEntry
+        debian_pfe = PortfolioEntry.objects.get(project__name='Debian GNU/Linux')
+        debian_citations = Citation.objects.filter(portfolio_entry=debian_pfe)
+        debian_citation = debian_citations[0]
+        self.assertEqual(debian_citation.summary,
+                         "Maintainer of MOCK ccHost")
+        # }}}
+
 
 class Portfolio(TwillTests):
     # {{{
@@ -699,6 +749,47 @@ class UserCanShowEmailAddress(TwillTests):
         tc.find('my@ema.il')
         # }}}
     # }}}
+
+
+# Create a mock Launchpad get_info_for_launchpad_username
+mock_launchpad_debian_response = mock.Mock()
+mock_launchpad_debian_response.return_value = {
+        'Debian': {
+            'url': 'http://launchpad.net/debian', # ok this url doesn't really exist
+            'involvement_types': ['Bug Management', 'Bazaar Branches'],
+            'citation_url': 'https://launchpad.net/~paulproteus',
+            'languages': '',
+            }
+        }
+
+class LaunchpadCallsDebianDGL(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    @mock.patch('mysite.search.models.Project.populate_icon_from_ohloh',
+                do_nothing)
+    @mock.patch('mysite.customs.lp_grabber._get_info_for_launchpad_username',
+                mock_launchpad_debian_response)
+    @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
+    def test(self):
+        # at start, no portfolio entries
+        # Let's run this test using a sample user, paulproteus.
+        username = 'paulproteus'
+        person = Person.objects.get(user__username=username)
+
+        # Store a note in the DB that we're about to run a background task
+        dia = DataImportAttempt(query=username, source='lp', person=person)
+        dia.save()
+        dia.do_what_it_says_on_the_tin()
+        self.assert_(DataImportAttempt.objects.get(id=dia.id).completed)
+
+        # There ought now to be a PortfolioEntry for Debian
+        portfolio_entry = PortfolioEntry.objects.get()
+
+        # Project is called...?
+        name = portfolio_entry.project.name
+
+        self.assertEqual(name, "Debian GNU/Linux")
+        
 
 class BugsAreRecommended(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus',
@@ -1241,6 +1332,35 @@ class PersonGetTagsForRecommendations(TwillTests):
         # This is the functionality we're testing
         self.assertEqual([tag_i_understand], pp.get_tags_for_recommendations())
 
+class MapTagsRemoveDuplicates(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def test(self):
+        pp = Person.objects.get(user__username='paulproteus')
+
+        understands_not = TagType(name='understands_not')
+        understands_not.save()
+        understands = TagType(name='understands')
+        understands.save()
+        seeking = TagType(name='seeking')
+        seeking.save()
+
+        tag_i_understand = Tag(tag_type=understands, text='something I understand')
+        tag_i_understand.save()
+        tag_i_dont = Tag(tag_type=understands_not, text='something I dont get')
+        tag_i_dont.save()
+        tag_seeking = Tag(tag_type=seeking, text='something I UNDERSTAND')
+        tag_seeking.save()
+        link_one = Link_Person_Tag(person=pp, tag=tag_i_understand)
+        link_one.save()
+        link_two = Link_Person_Tag(person=pp, tag=tag_i_dont)
+        link_two.save()
+        link_three = Link_Person_Tag(person=pp, tag=tag_seeking)
+        link_three.save()
+
+        self.assertEqual(map(lambda x: x.lower(), pp.get_tag_texts_for_map()),
+                         map(lambda x: x.lower(), ['something I understand']))
+
 class ProjectGetMentors(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
 
@@ -1259,9 +1379,6 @@ class ProjectGetMentors(TwillTests):
                                tag=willing_to_mentor_banshee)
         link.save()
 
-        banshee_mentors = mysite.profile.controllers.people_matching('can_mentor',
-                                                               'Banshee')
-        self.assertEqual(list(banshee_mentors), [Person.objects.get(user__username='paulproteus')])
 
 class SuggestLocation(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
@@ -1272,7 +1389,45 @@ class SuggestLocation(TwillTests):
         self.assertEqual(data['geoip_has_suggestion'], True)
         self.assertEqual(data['geoip_guess'], "Rochester, NY, United States")
 
+    def test_iceland(self):
+        """We wrote this test because MaxMind gives us back a city in Iceland. That city
+        has a name not in ASCII. MaxMind's database seems to store those values in Latin-1,
+        so we verify here that we properly decode that to pure beautiful Python Unicode."""
+        data = {}
+        data['geoip_has_suggestion'], data['geoip_guess'] = mysite.profile.controllers.get_geoip_guess_for_ip("89.160.147.41")
+        self.assertEqual(data['geoip_has_suggestion'], True)
+        self.assertEqual(type(data['geoip_guess']), unicode)
+        self.assertEqual(data['geoip_guess'], u'Reykjav\xedk, 10, Iceland')
 
+class EditBio(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def test(self):
+        '''
+        * Goes to paulproteus's profile
+        * checks that there is no link to asheesh.org
+        * clicks edit on the Info area
+        * enters a link as Info
+        * checks that his bio now contains "asheesh.org"
+        '''
+        self.login_with_twill()
+        tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
+        #not so vain.. yet
+        tc.notfind('asheesh.org')
+        tc.go(make_twill_url('http://openhatch.org/profile/views/edit_info'))
+        #make sure our bio is not already on the form
+        tc.notfind('asheesh.org')
+        # set the bio in ze form
+        tc.fv("edit-tags", 'edit-tags-homepage_url', 'http://www.asheesh.org/')
+        tc.submit()
+        #find the string we just submitted as our bio
+        tc.find('asheesh.org')
+        self.assertEqual(Person.get_by_username('paulproteus').homepage_url,
+        "http://www.asheesh.org/")
+        #now we should see our bio in the edit form
+        tc.go(make_twill_url('http://openhatch.org/profile/views/edit_info'))
+        tc.find('asheesh.org')
+    
 class EditLocation(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
 
@@ -1297,5 +1452,209 @@ class EditLocation(TwillTests):
         # Timbuktu!
         tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
         tc.find('Timbuktu')
+
+class EditBio(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def test(self):
+        '''
+        * Goes to paulproteus's profile
+        * checks that they don't already have a bio that says "lookatme!"
+        * clicks edit on the Info area
+        * enters a string as bio
+        * checks that his bio now contains string
+        '''
+        self.login_with_twill()
+        tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
+        #not so vain.. yet
+        tc.notfind('lookatme!')
+        tc.go(make_twill_url('http://openhatch.org/profile/views/edit_info'))
+        #make sure our bio is not already on the form
+        tc.notfind('lookatme!')
+        # set the bio in ze form
+        tc.fv("edit-tags", 'edit-tags-bio', 'lookatme!')
+        tc.submit()
+        #find the string we just submitted as our bio
+        tc.find('lookatme!')
+        self.assertEqual(Person.get_by_username('paulproteus').bio, "lookatme!")
+        #now we should see our bio in the edit form
+        tc.go(make_twill_url('http://openhatch.org/profile/views/edit_info'))
+        tc.find('lookatme!')
+    
+class MockGithubImport(BaseCeleryTest):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    @mock.patch('mysite.customs.github.repos_by_username')
+    @mock.patch('mysite.customs.github.find_primary_language_of_repo', do_nothing)
+    @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
+    def test_github_import_via_emulated_bgtask_fork(self, mock_github_projects):
+        "Test that we can import data from Github. Use a mock list of "
+        "fake Github projects so we don't bother the Github API (or waste "
+        "time waiting for it."
+        # {{{
+        mock_github_projects.return_value = [ObjectFromDict({
+            'name': 'MOCK ccHost',
+            'owner': 'paulproteus', # github repo owner
+            'description': '',
+            'fork': True})]
+
+        data_we_expect = [{
+            'contributor_role': 'Forked',
+            'languages': "", # FIXME
+            'is_published': False,
+            'is_deleted': False}]
+
+        summaries_we_expect = [
+                'Forked a repository on Github.',
+                ]
+
+        return self._test_data_source_via_emulated_bgtask(
+                source='gh', data_we_expect=data_we_expect,
+                summaries_we_expect=summaries_we_expect)
+        # }}}
+
+    @mock.patch('mysite.customs.github.repos_by_username')
+    @mock.patch('mysite.customs.github.find_primary_language_of_repo', do_nothing)
+    @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
+    def test_github_import_via_emulated_bgtask_nonfork(self, mock_github_projects):
+        "Test that we can import data from Github. Use a mock list of "
+        "fake Github projects so we don't bother the Github API (or waste "
+        "time waiting for it."
+        # {{{
+        mock_github_projects.return_value = [ObjectFromDict({
+            'name': 'MOCK ccHost',
+            'owner': 'paulproteus', # github repo owner
+            'description': '',
+            'fork': False})]
+            
+        data_we_expect = [
+                {
+                    'contributor_role': 'Started',
+                    'languages': "", # FIXME
+                    'is_published': False,
+                    'is_deleted': False,
+                    }
+                ]
+
+        summaries_we_expect = [
+                'Started a repository on Github.',
+                ]
+
+        return self._test_data_source_via_emulated_bgtask(
+                source='gh', data_we_expect=data_we_expect,
+                summaries_we_expect=summaries_we_expect)
+        # }}}
+
+    @mock.patch('mysite.customs.github.repos_by_username')
+    @mock.patch('mysite.customs.github.find_primary_language_of_repo', do_nothing)
+    @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
+    def test_github_import_brings_in_project_description(self,
+                                                         mock_github_projects):
+        "Test that we can import data from Github. Use a mock list of "
+        "fake Github projects so we don't bother the Github API (or waste "
+        "time waiting for it."
+        # {{{
+        description = u'S\u00E9e-Saw Hosting'
+        mock_github_projects.return_value = [ObjectFromDict({
+            'name': 'MOCK ccHost',
+            'description': description,
+            'owner': 'paulproteus', # github repo owner
+            'fork': True})]
+
+        data_we_expect = [{
+            'contributor_role': 'Forked',
+            'languages': "", # FIXME
+            'is_published': False,
+            'is_deleted': False}]
+
+        summaries_we_expect = [
+                'Forked a repository on Github.',
+                ]
+
+        self._test_data_source_via_emulated_bgtask(
+                source='gh', data_we_expect=data_we_expect,
+                summaries_we_expect=summaries_we_expect)
+
+        # PLUS test that the PFE has a description!
+        self.assertEqual(PortfolioEntry.objects.all().count(),
+                         1) # just the one we added
+        self.assertEqual(PortfolioEntry.objects.get().project_description,
+                         description)
+        # }}}
+
+def mock_list_of_collaborators(repo_name):
+    if 'cchost' in repo_name.lower():
+        return ['paulproteus', 'someone']
+    else:
+        return ['someone']
+
+class ImportGithubCollaborators(BaseCeleryTest):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    @mock.patch('mysite.customs.github._github.repos.list_collaborators', mock_list_of_collaborators)
+    @mock.patch('mysite.customs.github._get_repositories_user_watches')
+    @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
+    def test_github_collaboration_via_emulated_bgtask(self, mock_results):
+        description = 'the world in /bin/nutsh'
+        # three repos: one owned by paulproteus; that should be ignored.
+        # the other two: one where paulproteus is a collaborator, and one
+        # where he isn't.
+        mock_results.return_value = [
+            {'description': description,
+             'fork': False,
+             'forks': 1,
+             'homepage': 'sethirl.com',
+             'name': 'MOCK ccHost',     # paulproteus is a collaborator
+             'open_issues': 0,
+             'owner': 'someone_random', # this should be imported!
+             'private': False,
+             'url': 'http://github.com/someone_random/cchost',
+             'watchers': 3},
+
+            {'description': description,
+             'fork': False,
+             'forks': 1,
+             'homepage': 'example.com',
+             'name': 'ruby-on-rails',     # paulproteus is not a collaborator
+             'open_issues': 0,
+             'owner': 'someone_random',   # so won't be imported
+             'private': False,
+             'url': 'http://github.com/someone_random/ruby-on-rails',
+             'watchers': 3},
+
+            {'description': description,
+             'fork': False,
+             'forks': 1,
+             'homepage': 'example.com',
+             'name': 'asheesh personal repo',
+             'open_issues': 0,
+             'owner': 'paulproteus', # this should be skipped
+             'private': False,
+             'url': 'http://github.com/someone_random/cchost',
+             'watchers': 3}]
+
+        data_we_expect = [{
+            'contributor_role': 'Collaborated on',
+            'languages': "",
+            'is_published': False,
+            'is_deleted': False}]
+
+        summaries_we_expect = [
+                'Collaborated on a repository on Github.',
+                ]
+
+        self._test_data_source_via_emulated_bgtask(
+            source='ga', data_we_expect=data_we_expect,
+            summaries_we_expect=summaries_we_expect)
+        # }}}
+
+        # PLUS test that the PFE has a description!
+        self.assertEqual(PortfolioEntry.objects.all().count(),
+                         1) # just the one we want
+        self.assertEqual(PortfolioEntry.objects.get().project_description,
+                         description)
+        # }}}
+
+
 
 # vim: set ai et ts=4 sw=4 nu:
