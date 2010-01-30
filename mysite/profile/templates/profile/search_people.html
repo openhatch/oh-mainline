@@ -17,7 +17,7 @@ List of People
     {% endif %}
 
     <div id='search'>
-        <div class='field'>
+        <div class='keyword field'>
             <label for='search_profiles'>Search for</label>
             <input id='search_profiles' type='text'>
             <ul class='suggestions'>
@@ -33,12 +33,12 @@ List of People
                 {% endfor %}
             </ul>
         </div>
-        <div class='field'>
+        <div class='location field'>
             <label for='search_locations'>Near</label>
             <input id='search_locations' type='text'>
         </div>
     </div>
-    <div id='search_summary'>Showing <strong>100</strong> people who have listed &lsquo;<strong>Python</strong>&rsquo; and &lsquo;<strong>Java packaging</strong>&rsquo; on their profiles.
+    <div id='search_summary'>Showing <strong>100</strong> people who have listed &lsquo;<strong>Cairo</strong>&rsquo; on their profiles.
         
     </div>
     <div id='search_modules'>
@@ -63,14 +63,17 @@ List of People
                 <li>
                     <span class='term'>Related groups:</span>
                     <ul>
-                        <li><a href=''>Python (the project)</a></li>
-                        <li><a href=''>Debian Python packaging</a></li>
+                        <li><a href=''>Python (the project) contributors</a></li>
+                        <li><a href=''>Debian Python packaging contributors</a></li>
                     </ul>
                 </li>
             </ul>
         </div>
     </div>
     <ul id="people-list">
+        <div class='project-yeller'>
+            &lsquo;Cairo&rsquo; also refers to <a href='#'>a project with 3 contributors.</a>
+        </div>
         {% for column in people_columns %}
         <div class="people-list-column">
             {% for person in column %}
