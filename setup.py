@@ -11,7 +11,7 @@ setup(
     name = "mysite",
     version = "3",
     packages = ['mysite',],
-    url = 'http://openhatch.org/',
+    url = 'https://openhatch.org/',
     license = 'AGPLv3',
 
     install_requires = ['setuptools',
@@ -25,6 +25,7 @@ setup(
                         'django-assets==0.2',
                         'python-github2==0.1.1',
                         'pygeoip==0.1.3',
+                        'django-debug-toolbar==0.8.1',
                        ],
 
     dependency_links = [dependency_path,
@@ -35,6 +36,7 @@ setup(
                         dependency_path + 'South-0.6_pre-py2.6.egg#egg=south',
                         'http://linode.openhatch.org/~paulproteus/python-github2-0.1.1.tar.gz#egg=python-github2',
                         'http://pygeoip.googlecode.com/files/pygeoip-0.1.3.zip#egg=pygeoip',
+                        'http://linode.openhatch.org/~rafpaf/django-debug-toolbar-0.8.1.tar.gz#egg=django-debug-toolbar',
                        ],
 
     zip_safe = False,
@@ -42,7 +44,7 @@ setup(
 
     description = "A website",
 
-    author = 'The OpenHatch team <https://openhatch.org/about/',
+    author = 'The OpenHatch team <https://openhatch.org/about/>',
     author_email = 'all@openhatch.org',
 
     package_dir = {'': '.'},
