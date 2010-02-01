@@ -86,6 +86,9 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django_authopenid.middleware.OpenIDMiddleware',
     'mysite.base.middleware.LocationMiddleware',
+
+    # Django debug toolbar
+    #'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
 ROOT_URLCONF = 'mysite.urls'
@@ -122,9 +125,9 @@ INSTALLED_APPS = (
     'mysite.customs',
     'mysite.account',
     'mysite.base',
-    'mysite.info',
     'mysite.project',
     'mysite.senseknocker',
+    #'debug_toolbar',
 )
 
 # file: settings.py #
@@ -176,3 +179,5 @@ ASSETS_DEBUG = True
 # This querystring changes whenever we change the asset. This prevents the
 # client's cached version of an asset from overriding our new asset.
 ASSETS_EXPIRE = 'querystring'
+
+INTERNAL_IPS = ('127.0.0.1',)

@@ -40,6 +40,14 @@ class Project(models.Model):
         # MEDIA_ROOT is prefixed automatically.
         return 'images/icons/projects/%s.png' % uuid.uuid4().hex
 
+    def name_with_quotes_if_necessary(self):
+        if '"' in self.name:
+            # GIVE UP NOW, it will not tokenize properly
+            return self.name
+        elif ' ' in self.name:
+            return '"%s"' % self.name
+        return self.name
+
     def potential_mentors(self):
         '''Return the union of the people who can mentor in this project,
         or who can mentor in the project's language.'''

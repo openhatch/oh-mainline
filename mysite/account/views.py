@@ -258,9 +258,13 @@ def change_password_do(request):
         return change_password(request, change_password_form=form)
     # }}}
 
+@login_required
 @view
 def widget(request):
-    return (request, 'account/widget.html', {})
+    data = {}
+    data.update(mysite.base.controllers.get_uri_metadata_for_generating_absolute_links(
+        request))
+    return (request, 'account/widget.html', data)
 
 @login_required
 @view

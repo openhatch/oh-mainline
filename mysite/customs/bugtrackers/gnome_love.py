@@ -38,6 +38,12 @@ def get_current_bug_id2bug_objs():
     def project_finder_plugin(bug_elt):
         import mysite.search.models
         project_name = bug_elt.xpath('product')[0].text
+
+        ### Special-case a few GNOME-y project names
+        gnome2openhatch = {'general': 'GNOME (general)'}
+        if project_name in gnome2openhatch:
+            project_name=gnome2openhatch[project_name]
+        
         project, _ = mysite.search.models.Project.objects.get_or_create(
             name=project_name)
         return project

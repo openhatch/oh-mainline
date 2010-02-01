@@ -279,9 +279,15 @@
             <h3>My <abbr title='Free and Open Source Software'>FOSS</abbr> contributions</h3>
         </div>
         <div class='body'>
-            {% for entry in person.get_published_portfolio_entries %}
-            {% with entry.project as project %}
             <ul>
+            {% for entry in person.get_published_portfolio_entries %}
+            {% if forloop.counter0|divisibleby:3 and not forloop.first %}
+                </div>
+            {% endif %}
+            {% if forloop.counter0|divisibleby:3 %}
+                <div class="row" style="float: left; width: 100%">
+            {% endif %}
+            {% with entry.project as project %}
                 <li>
                 <div class='project-escutcheon'>
                     <div class='logo'>
@@ -293,11 +299,14 @@
                     </div>
                 </div>
                 </li>
-            </ul>
             {% endwith %}
+            {% if forloop.last %}
+                </div>
+            {% endif %}
             {% empty %}
             <div>No projects listed yet.</div>
             {% endfor %}
+            </ul>
         </div>
         <div class='foot'>
             <a href='{% url mysite.profile.views.display_person_web person.user.username %}'>See my full profile at

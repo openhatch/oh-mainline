@@ -141,11 +141,8 @@ def widget_display_undecorated(request, user_to_display__username):
     person = get_object_or_404(Person, user=user)
 
     data = get_personal_data(person)
-    data['url_prefix'] = request.META['SERVER_NAME'] + ':' + request.META['SERVER_PORT']
-    uri_scheme = 'http'
-    if request.is_secure():
-        uri_scheme = 'https'
-    data['uri_scheme'] = uri_scheme
+    data.update(mysite.base.controllers.get_uri_metadata_for_generating_absolute_links(
+        request))
     return (request, 'profile/widget.html', data)
     # }}}
 

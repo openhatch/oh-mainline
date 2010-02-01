@@ -11,8 +11,7 @@ FIXME: Explain how to create MySQL user oh_milestone_a and grant select permissi
     ./bin/buildout # Make sure you're actually in this directory
     ./bin/mysite runserver
 
-Set up the database.
-
+== Set up the database. ==
     mysql -u root -p < "CREATE DATABASE; CREATE USER 'oh_milestone_a'@'localhost' IDENTIFIED BY 'ahmaC0Th'; GRANT ALL ON oh_milestone_a.* TO 'oh_milestona_a'@'localhost';
 
 Or use 'mysql -u username', where username is a MySQL user with the appropriate privileges.

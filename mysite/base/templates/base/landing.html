@@ -66,7 +66,7 @@ body#landing #right .entry { font-size: .9em; margin-top: 3px; }
                     {% include 'profile/person-summary-li.html' %}
                 {% endwith %}
             </ul>
-            <p style='float: right; margin: 0; font-size: .9em'><a href='{% url mysite.profile.views.people_map %}?center={{the_user.get_profile.location_display_name}}'>Find people near you &raquo;</a></p>
+            <p class='rabbit_hole'><a href='{% url mysite.profile.views.people_map %}?center={{the_user.get_profile.location_display_name}}'>Find people near you &raquo;</a></p>
         </div>
     </div>
 
@@ -268,16 +268,17 @@ body#landing #right .entry { font-size: .9em; margin-top: 3px; }
             </ul>
             <p><a href='/search/' style='float: right; text-align: right;'>Find more recommendations and other opportunities <strong>&raquo;</strong></a></p>
             {% else %}
-            Discover new ways that you can contribute to free and open source software. For example:
-        {# If no recommended bugs: #}
-        {% for string, query in recommended_bug_string2Query_objects.items %}
-            {% with query.get_or_create_cached_hit_count as count %}
-            {% if count %}
-            {# Don't show an example if no volunteer opportunities match it. #}
-            <li><a href='/search?{{query.get_query_string}}'>{{string|safe}} ({{query.get_or_create_cached_hit_count}})</a></li>
-            {% endif %}
-            {% endwith %}
-        {% endfor %}
+            Discover new ways that you can contribute to
+            free and open source software. For example:
+            {# If no recommended bugs: #}
+            {% for string, query in recommended_bug_string2Query_objects.items %}
+                {% with query.get_or_create_cached_hit_count as count %}
+                {% if count %}
+                {# Don't show an example if no volunteer opportunities match it. #}
+                <li><a href='/search?{{query.get_query_string}}'>{{string|safe}} ({{query.get_or_create_cached_hit_count}})</a></li>
+                {% endif %}
+                {% endwith %}
+            {% endfor %}
 
 
         <style type='text/css'>
@@ -289,6 +290,7 @@ body#landing #right .entry { font-size: .9em; margin-top: 3px; }
             {% endfor %}
             {% endcomment %}
             {% endif %}
+            <p style='margin-top: 10px;' class='rabbit_hole'><a href='{% url mysite.search.views.fetch_bugs %}'>See all volunteering opportunities &raquo;</a></p>
         </div>
     </div>
 </div>
