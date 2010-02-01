@@ -88,7 +88,7 @@ MIDDLEWARE_CLASSES = (
     'mysite.base.middleware.LocationMiddleware',
 
     # Django debug toolbar
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    #'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
 ROOT_URLCONF = 'mysite.urls'
@@ -127,7 +127,7 @@ INSTALLED_APPS = (
     'mysite.base',
     'mysite.project',
     'mysite.senseknocker',
-    'debug_toolbar',
+    #'debug_toolbar',
 )
 
 # file: settings.py #
