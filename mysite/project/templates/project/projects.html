@@ -41,7 +41,7 @@ about the projects we index
                 -->{% endif %}<!--
                 -->{% if project.get_open_bugs and project.get_contributors %},{% endif %}
                 {% if project.get_contributors %}
-                {{ project.get_contributors|length }} contributor{{ project.get_contributors.count|pluralize }}
+                {{ project.get_contributors|length }} contributor{{ project.get_contributors|length|pluralize }}
                 {% endif %}
             </div>
             </li>
@@ -64,7 +64,7 @@ about the projects we index
                 -->{% endif %}<!--
                 -->{% if project.get_open_bugs and project.get_contributors %},{% endif %}
                 {% if project.get_contributors %}
-                {{ project.get_contributors|length }} contributor{{ project.get_contributors.count|pluralize }}
+                {{ project.get_contributors|length }} contributor{{ project.get_contributors|length|pluralize }}
                 {% endif %}
             </div>
             </li>
