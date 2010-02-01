@@ -12,13 +12,13 @@ body.two_columns #main .submodule { width: 660px; }
 	body.two_columns #main .submodule .head h3 { width: 620px; }
 	body.two_columns #main .submodule .body { float: left; padding: 20px; width: 620px; background-color: #fff; }
 
-body.two_columns /* SKINNY SUBMODULE */
+/* SKINNY SUBMODULE */
 body.two_columns #main .submodule.skinny { width: 25%; margin-right: 10px; }
 		body.two_columns #main .submodule.skinny .head { width: 82.5%; }
 			body.two_columns #main .submodule.skinny .head h3 { width: 95%; }
 		body.two_columns #main .submodule.skinny .body { width: 90%; }
 
-body.two_columns /* FAT SUBMODULE */
+/* FAT SUBMODULE */
 body.two_columns #main .submodule.fat { width: 70%; }
 		body.two_columns #main .submodule.fat .head { width: 93.8%; }
 			body.two_columns #main .submodule.fat .head h3 { width: 100%; }
