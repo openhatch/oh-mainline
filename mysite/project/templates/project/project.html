@@ -51,7 +51,7 @@ about our members who support {{ project.name }}
       <p>
             {% if project.get_open_bugs %}
             Browse {{ project.get_open_bugs|length }}+
-            <a href='/search/?q={{ project.name|urlencode }}'>
+            <a href='/search/?q={{ project.name_with_quotes_if_necessary|urlencode }}'>
                 volunteer opportunit{{ project.get_open_bugs|pluralize:"y,ies"}}
                 matching
                 <strong>{{ project.name }}</strong>.
