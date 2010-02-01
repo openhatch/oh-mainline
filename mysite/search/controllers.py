@@ -100,7 +100,7 @@ class Query:
             q &= Q(concerns_just_documentation=True)
 
         for word in self.terms:
-            whole_word = "[[:<:]]%s[[:>:]]" % (
+            whole_word = "[[:<:]]%s($|[[:>:]])" % (
                     mysite.base.controllers.mysql_regex_escape(word))
             terms_disjunction = (
                     Q(project__language__iexact=word) |

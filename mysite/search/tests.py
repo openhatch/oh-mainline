@@ -238,6 +238,18 @@ class SearchResultsSpecificBugs(SearchTest):
         self.assert_(included_the_right_bug)
         self.assert_(excluded_the_wrong_bug)
 
+class TestThatQueryTokenizesRespectingQuotationMarks(TwillTests):
+    def test(self):
+        difficult = "With spaces (and parens)"
+        query = mysite.search.controllers.Query.create_from_GET_data({'q': '"%s"' % difficult})
+        self.assertEqual(query.terms, [difficult])
+        # Make there be a bug to find
+        project = Project.create_dummy(name=difficult)
+        bug = Bug.create_dummy(project=project)
+        # How many bugs?
+        num_bugs = query.get_bugs_unordered().count()
+        self.assertEqual(num_bugs, 1)
+
 class SearchResults(TwillTests):
     fixtures = ['bugs-for-two-projects.json']
 
