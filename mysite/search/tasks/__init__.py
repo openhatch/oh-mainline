@@ -40,7 +40,7 @@ class GrabPythonBugs(PeriodicTask):
         logger = self.get_logger(**kwargs)
         logger.info("Started to grab Python 'easy' bugs")
         bug_tracker_name = self.__class__.__name__
-        python_core, _ = Project.objects.get_or_create(name='Python', language='Python')
+        python_core, _ = Project.objects.get_or_create(name='Python (project)', language='Python')
         # FIXME: Do we need this line?
         RoundupBugTracker.objects.filter(name=bug_tracker_name).delete()
         p, _ = RoundupBugTracker.objects.get_or_create(name=bug_tracker_name, project=python_core)
@@ -57,7 +57,7 @@ class GrabPythonBugsInDocumentation(PeriodicTask):
         logger = self.get_logger(**kwargs)
         logger.info("Started to grab Python documentation bugs")
         bug_tracker_name = self.__class__.__name__
-        python_core, _ = Project.objects.get_or_create(name='Python', language='Python')
+        python_core, _ = Project.objects.get_or_create(name='Python (project)', language='Python')
         # FIXME: Do we need this line?
         RoundupBugTracker.objects.filter(name=bug_tracker_name).delete()
         p, _ = RoundupBugTracker.objects.get_or_create(name=bug_tracker_name, project=python_core)
