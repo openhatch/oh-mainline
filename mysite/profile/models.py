@@ -333,6 +333,13 @@ class Tag(models.Model):
             return super(Tag, self).save(*args, **kwargs)
         raise ValueError
 
+    @staticmethod
+    def get_people_by_tag_name(tag_name):
+        peeps = []
+        for tag_type in TagType.objects.all():
+            peeps.extend(mysite.profile.controllers.people_matching(tag_type.name, tag_name))
+        return peeps
+
     def __unicode__(self):
         return "%s: %s" % (self.tag_type.name, self.text)
     # }}}

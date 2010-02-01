@@ -26,8 +26,8 @@ List of People
                         <span class='introduce_suggestions'>Browse people by
                             {{ what_kind_of_thing }}:</span>
                         {% for thing in list_of_things %}
-                            <a href='{{ thing.url }}'>
-                                {{ thing.name }}</a>{% if not forloop.last %},{% endif %}
+                            <a href='#'>
+                                {{ thing }}</a>{% if not forloop.last %},{% endif %}
                         {% endfor %}
                     </li>
                 {% endfor %}

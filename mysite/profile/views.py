@@ -30,6 +30,7 @@ from django.core.files.images import get_image_dimensions
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.db.models import Q
+from django.core.cache import cache
 
 # OpenHatch global
 from django.conf import settings
@@ -319,6 +320,15 @@ def display_list_of_people_who_match_some_search(request, property, value):
     data['value'] = value
     return (request, 'profile/search_people.html', data)
 
+def cached_blog_entries():
+    key_name = 'blog_entries'
+    entries = cache.get(key_name)
+    if entries is None:
+        entries = _blog_entries()
+        # cache it for 30 minutes
+        cache.set(key_name, entries, 30 * 60)
+    return entries
+
 @view
 def display_list_of_people(request):
     """Display a list of people."""
@@ -327,9 +337,35 @@ def display_list_of_people(request):
     data['people_columns'] = cut_list_of_people_in_two_columns(
             Person.objects.all().order_by('user__username'))
     suggestion_count = 10
+
+    key_name = 'most_popular_projects_1'
+    popular_projects = cache.get(key_name)
+    if popular_projects is None:
+        projects = Project.objects.all()
+        popular_projects = sorted(projects, key=lambda proj: len(proj.get_contributors())*(-1))[:suggestion_count]
+        #extract just the names from the projects
+        popular_projects = [project.name for project in popular_projects]
+        # cache it for a week
+        cache.set(key_name, popular_projects, 86400 * 7)
+
+    key_name = 'most_popular_tags_1'
+    popular_tags = cache.get(key_name)
+    if popular_tags is None:
+        # to get the most popular tags:
+            # get all tags
+            # order them by the number of people that list them
+            # remove duplicates
+        tags = Tag.objects.all()
+        #lowercase them all and then remove duplicates
+        tags_with_no_duplicates = list(set(map(lambda tag: tag.name.lower(), tags)))
+        #take the popular ones
+        popular_tags = sorted(tags_with_no_duplicates, key=lambda tag_name: len(Tag.get_people_by_tag_name(tag_name))*(-1))[:suggestion_count]
+        # cache it for a week
+        cache.set(key_name, popular_tags, 86400 * 7)
+
     data['suggestions'] = {
-            'project': Project.objects.all()[:suggestion_count],
-            'tag': Tag.objects.all()[:suggestion_count]
+            'project': popular_projects,
+            'tag': popular_tags
             }
 
     return (request, 'profile/search_people.html', data)
