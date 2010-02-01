@@ -125,7 +125,6 @@ INSTALLED_APPS = (
     'mysite.customs',
     'mysite.account',
     'mysite.base',
-    'mysite.info',
     'mysite.project',
     'mysite.senseknocker',
     'debug_toolbar',
