@@ -16,6 +16,7 @@ People
     where {{ property }} = {{ value }}
     {% endif %}
 
+<form action="." id="map-zoom">
     <div id='search'>
         <div class='keyword field'>
             <label for='search_profiles'>Search for</label>
@@ -38,10 +39,19 @@ People
             </ul>
         </div>
         <div class='location field'>
+          <div class="input-and-labels">
             <label for='search_locations'>Near</label>
-            <input id='search_locations' type='text'>
+            <label for="location_for_map_centering">
+                    Find people near a specific location.
+                </label>
+            <p class="map-error">We couldn't find that location.</p>
+            <input id="location_for_map_centering" name="center"
+                   type="text" value="{{ center_name }}"/>
+            <input id="center_the_map" type="submit" style="" value="Go"/>
+	  </div>
         </div>
     </div>
+</form>
     <div id='refine_search'>
         <h3>Related searches</h3>
         <ul class='filter_conjunction'>
@@ -76,22 +86,6 @@ People
         The background image will hide, as intended, a few seconds after page load.
         However, this doesn't seem to work properly when the image is specified
         via an external stylesheet.
-    {% endcomment %}
-    {% comment %}
-        This needs to be merged with "Near".
-    <div id="search" style="float: right; width: 65%; margin-right: 10px;">
-        <form action="." id="map-zoom">
-            <div class="input-and-labels">
-                <input id="location_for_map_centering" name="center"
-                        type="text" value="{{ center_name }}"/>
-                <label for="location_for_map_centering">
-                    Find people near a specific location.
-                </label>
-            </div>
-            <input id="center_the_map" type="submit" style="" value="Go"/>
-        </form>
-        <p class="map-error">We couldn't find that location.</p>
-    </div>
     {% endcomment %}
 
     <div id="map_canvas" style='float: right; margin-top: 18px; margin-right: 10px; width:65%; height:450px;'>
