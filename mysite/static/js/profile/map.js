@@ -1,4 +1,4 @@
-PeopleMapController = function () { }
+PeopleMapController = function () { };
 
 PeopleMapController.prototype.initialize = function(options) {
     this.person_locations = {};
