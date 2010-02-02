@@ -105,14 +105,14 @@ PeopleMapController.prototype.initialize = function(options) {
             var str;
             var count = $("#people-list li:visible").size();
             switch (count) {
-                case 1: str = "1 person in this area:"; break;
-                case 0: str = "Nobody in this area."; break;
+                case 1: str = "<strong>1</strong> person in this area:"; break;
+                case 0: str = "<strong>Nobody</strong> in this area."; break;
                 case num_of_persons_who_can_be_geocoded:
-                        str = num_of_persons_who_can_be_geocoded + " people have entered their locations:";
+                        str = "<strong>" + num_of_persons_who_can_be_geocoded + "</strong> people have entered their locations:";
                         break;
                 default: str = count + " people in this area:" ;
             }
-            $('#people-count').text(str);
+            $('#people-count').html(str);
     }
 
     function generate_update_all_markers(map) {
