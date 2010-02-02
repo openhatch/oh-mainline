@@ -335,8 +335,7 @@ def people(request):
             for person in mappable_people])
     data['person_id2data_as_json'] = simplejson.dumps(person_id2data)
     data['test_js'] = request.GET.get('test', None)
-    data['num_of_persons_with_locations'] = len([p for p in Person.objects.all()
-                                                 if p.location_display_name])
+    data['num_of_persons_with_locations'] = len(person_id2data)
     if request.GET.get('center', False):
         data['center_json'] = mysite.base.controllers.cached_geocoding_in_json(
             request.GET.get('center', ''))
