@@ -90,7 +90,7 @@ PeopleMapController.prototype.initialize = function(options) {
                             'idle',
                             update_all_markers);
                 }
-            }
+            };
         }
 
         // Ask the Google Maps API for some geographic data, concerning a particular
@@ -137,13 +137,13 @@ PeopleMapController.prototype.initialize = function(options) {
                 } 
             }
             update_people_count();
-        }
+        };
     }
     update_all_markers = generate_update_all_markers(this.map);
     google.maps.event.addListener(this.map,
             'bound_changed',
             update_all_markers);
-}
+};
 
 //this gets called when you click a marker on the map
 PeopleMapController.prototype.highlightPerson = function(personId) {
@@ -151,7 +151,7 @@ PeopleMapController.prototype.highlightPerson = function(personId) {
     $('#people-list li').removeClass("highlighted");
     //highlight the right person
     $('#person_summary_' + personId).addClass("highlighted");
-}
+};
 
 
 //binds the clickhandlers to people list items
@@ -181,7 +181,7 @@ PeopleMapController.prototype.bindClickHandlersToPeopleListItems = function() {
     };
     $('#people-list li').click(handler);
     $('#people-list li').hoverClass('hover');
-}
+};
 
 /*
 function resizeDivs(id1, id2) {
