@@ -46,18 +46,24 @@ body#people-map #search .field:last-child { margin-right: 0; }
 body#people-map #search label { float: left; width: 100%; margin-bottom: 3px; }
 body#people-map #search input[type='text'] { width: 97%; }
 body#people-map #search a { }
-body#people-map #search .suggestions { margin-bottom: 10px; }
+
+/* Suggestions */
+body#people-map #search .suggestions { width: 100%; margin-top: 10px; font-size: 1.3em; margin-bottom: 10px; }
+body#people-map #search .suggestions > li { float: left; width: 45%;  }
+body#people-map #search .suggestions > li ul { float: none; display: block; }
+body#people-map #search .suggestions > li li { list-style: circle; font-weight: bold; margin-left: 10%; }
 body#people-map #search .introduce_suggestions {  }
+
 body#people-map #search_summary, body#people-map #search_modules > div { padding: 8px 0;  float: left; margin-top: 10px; }
 body#people-map #search_summary { padding: 10px 0; font-size: 1.1em; width: 96%; border-bottom: 1px dashed #dfdfdf; }
-body#people-map #search_modules { float: left; width: 20%; border-right: 1px dashed #dfdfdf; }
-body#people-map #search_modules > div { width: 90%; }
-body#people-map #refine_search { padding: 8px;  }
-body#people-map #refine_search h3 { padding: 5px 0; margin-bottom: 10px; }
- 
-body#people-map #refine_search .filter_conjunction > li { list-style: none; margin-left: 0; float: left; margin-bottom: 10px; }
+
+/* Refine your search */
+body#people-map #refine_search { padding: 1.5%; float: left; width: 97%; background-color: #ececec; -moz-border-radius: 1.5%; border-radius: 1.5%; }
+body#people-map #refine_search h3 { padding: 0; margin-bottom: 10px; }
+body#people-map #refine_search .filter_conjunction > li { list-style: none; float: left; width: 33%; }
 body#people-map #refine_search .filter_conjunction > li:last-child { margin-bottom: 0; }
-body#people-map #refine_search ul.filter_disjunction { float: left; }
+body#people-map #refine_search .filter_conjunction li li { list-style: circle; margin-left: 20px; float: left; }
+
 body#people-map #search_modules li { list-style: disc; margin-left: 22px;float: left; width: 87%; padding: 2px 0; color: #555; }
 body#people-map #related_queries { padding: 15px 0; }
 body#people-map #refine_search .filter_disjunction > li.initially_hidden { display: none; }
@@ -69,5 +75,5 @@ body#people-map #people-list li .what_matched_the_search { float: left; font-siz
 body#people-map #people-list li .username { font-size: .9em; color: #333; font-weight: normal; }
 body#people-map .project-yeller { padding: 20px; }
 
-small { font-size: 1em; color: #888; }
-a:hover small { color: inherit; }
+small { font-size: .8em; color: #888; }
+a:hover small { text-decoration: none; }

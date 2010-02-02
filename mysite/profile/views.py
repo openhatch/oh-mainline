@@ -32,9 +32,6 @@ from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.core.cache import cache
 
-# OpenHatch global
-from django.conf import settings
-
 # OpenHatch apps
 import mysite.base.controllers
 import mysite.profile.controllers
@@ -320,25 +317,42 @@ def display_list_of_people_who_match_some_search(request, property, value):
     data['value'] = value
     return (request, 'profile/search_people.html', data)
 
-def cached_blog_entries():
-    key_name = 'blog_entries'
-    entries = cache.get(key_name)
-    if entries is None:
-        entries = _blog_entries()
-        # cache it for 30 minutes
-        cache.set(key_name, entries, 30 * 60)
-    return entries
-
 @view
 def display_list_of_people(request):
     """Display a list of people."""
     # {{{
     data = {}
-    data['people_columns'] = cut_list_of_people_in_two_columns(
-            Person.objects.all().order_by('user__username'))
-    suggestion_count = 10
 
-    key_name = 'most_popular_projects_1'
+    # Get the list of people to display.
+    everybody = Person.objects.all()
+    mappable_filter = ( ~Q(location_display_name='') & Q(location_confirmed=True) )
+    mappable_people = everybody.filter(mappable_filter).order_by('user__username')
+    data['people'] = mappable_people
+    get_relevant_person_data = lambda p: (
+            {'name': p.get_full_name_or_username(),
+            'location': p.location_display_name})
+    person_id2data = dict([(person.pk, get_relevant_person_data(person))
+            for person in mappable_people])
+    data['person_id2data_as_json'] = simplejson.dumps(person_id2data)
+    data['test_js'] = request.GET.get('test', None)
+    data['num_of_persons_with_locations'] = len([p for p in Person.objects.all()
+                                                 if p.location_display_name])
+    if request.GET.get('center', False):
+        data['center_json'] = mysite.base.controllers.cached_geocoding_in_json(
+            request.GET.get('center', ''))
+        # the below is true when we fail to geocode the center that we got from GET
+        if data['center_json'] == 'null':
+            data['geocode_failed'] = True;
+        data['center_name'] = request.GET.get('center', '')
+        data['center_name_json'] = simplejson.dumps(request.GET.get('center', ''))
+
+    suggestion_count = 5
+
+    cache_timespan = 86400 * 7
+    #if settings.DEBUG:
+    #    cache_timespan = 0
+
+    key_name = 'most_popular_projects'
     popular_projects = cache.get(key_name)
     if popular_projects is None:
         projects = Project.objects.all()
@@ -346,9 +360,9 @@ def display_list_of_people(request):
         #extract just the names from the projects
         popular_projects = [project.name for project in popular_projects]
         # cache it for a week
-        cache.set(key_name, popular_projects, 86400 * 7)
+        cache.set(key_name, popular_projects, cache_timespan)
 
-    key_name = 'most_popular_tags_1'
+    key_name = 'most_popular_tags'
     popular_tags = cache.get(key_name)
     if popular_tags is None:
         # to get the most popular tags:
@@ -361,11 +375,11 @@ def display_list_of_people(request):
         #take the popular ones
         popular_tags = sorted(tags_with_no_duplicates, key=lambda tag_name: len(Tag.get_people_by_tag_name(tag_name))*(-1))[:suggestion_count]
         # cache it for a week
-        cache.set(key_name, popular_tags, 86400 * 7)
+        cache.set(key_name, popular_tags, cache_timespan)
 
     data['suggestions'] = {
-            'project': popular_projects,
-            'tag': popular_tags
+            'projects': popular_projects,
+            'tags': popular_tags
             }
 
     return (request, 'profile/search_people.html', data)

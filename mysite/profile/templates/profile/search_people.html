@@ -8,7 +8,7 @@ people-list-page
 {% endblock body_class %}
 
 {% block title %}
-List of People
+People
 {% endblock title %}
 
 {% block people_main %}
@@ -23,12 +23,16 @@ List of People
             <ul class='suggestions'>
                 {% for what_kind_of_thing, list_of_things in suggestions.items %}
                     <li>
-                        <span class='introduce_suggestions'>Browse people by
+                        <span class='introduce_suggestions'>Popular
                             {{ what_kind_of_thing }}:</span>
-                        {% for thing in list_of_things %}
-                        <a href='?q={{ what_kind_of_thing|urlencode }}:{{ thing|urlencode }}'>
-                                {{ thing }}</a>{% if not forloop.last %},{% endif %}
-                        {% endfor %}
+                        <ul>
+                            {% for thing in list_of_things %}
+                                <li>
+                                    <a href='?q={{ what_kind_of_thing|urlencode }}:{{ thing|urlencode }}'>
+                                        {{ thing }}<small> (8)</small></a>{#% if not forloop.last %},{% endif %#}
+                                </li>
+                            {% endfor %}
+                        </ul>
                     </li>
                 {% endfor %}
             </ul>
@@ -38,59 +42,144 @@ List of People
             <input id='search_locations' type='text'>
         </div>
     </div>
-    <div id='search_summary'>Showing <strong>100</strong> people who have listed &lsquo;<strong>Cairo</strong>&rsquo; on their profiles.
-        
+    <div id='refine_search'>
+        <h3>Related searches</h3>
+        <ul class='filter_conjunction'>
+            <li>
+                <span class='term'>Looking for a mentor?</span>
+                <ul class='filter_disjunction'>
+                    <li><a href=''>Find mentors in <strong>Python</strong></a> (5)</li>
+                    <li><a href=''>Find mentors in <strong>Java packaging</strong></a> (3)</li>
+                </ul>
+            </li>
+            <li>
+                <span class='term'>Looking for help with your project?</span>
+                <ul class='filter_disjunction'>
+                    <li><a href=''>Find people who can pitch in with
+                            <strong>Python</strong></a></li>
+                    <li><a href=''>Find people who can pitch in with
+                            <strong>Java packaging</strong></a></li>
+                </ul>
+            </li>
+            <li>
+                <span class='term'>Related groups:</span>
+                <ul>
+                    <li><a href=''>Python (the project) contributors</a></li>
+                    <li><a href=''>Debian Python packaging contributors</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div><!-- /#refine_search -->
+
+    {% comment %}
+        Google loads a map here -- replacing #map_loading_msg, among other things.
+        The background image will hide, as intended, a few seconds after page load.
+        However, this doesn't seem to work properly when the image is specified
+        via an external stylesheet.
+    {% endcomment %}
+    {% comment %}
+        This needs to be merged with "Near".
+    <div id="search" style="float: right; width: 65%; margin-right: 10px;">
+        <form action="." id="map-zoom">
+            <div class="input-and-labels">
+                <input id="location_for_map_centering" name="center"
+                        type="text" value="{{ center_name }}"/>
+                <label for="location_for_map_centering">
+                    Find people near a specific location.
+                </label>
+            </div>
+            <input id="center_the_map" type="submit" style="" value="Go"/>
+        </form>
+        <p class="map-error">We couldn't find that location.</p>
     </div>
-    <div id='search_modules'>
-        <div id='refine_search'>
-            <ul class='filter_conjunction'>
-                <li>
-                    <span class='term'>Looking for a mentor?</span>
-                    <ul class='filter_disjunction'>
-                        <li><a href=''>Find mentors in <strong>Python</strong></small></a> (5)</li>
-                        <li><a href=''>Find mentors in <strong>Java packaging</strong></a> (3)</li>
-                    </ul>
-                </li>
-                <li>
-                    <span class='term'>Looking for help with your project?</span>
-                    <ul class='filter_disjunction'>
-                        <li><a href=''>Find people who can pitch in with
-                                <strong>Python</strong></a></li>
-                        <li><a href=''>Find people who can pitch in with
-                                <strong>Java packaging</strong></a></li>
-                    </ul>
-                </li>
-                <li>
-                    <span class='term'>Related groups:</span>
-                    <ul>
-                        <li><a href=''>Python (the project) contributors</a></li>
-                        <li><a href=''>Debian Python packaging contributors</a></li>
-                    </ul>
-                </li>
-            </ul>
+    {% endcomment %}
+
+    <div id="map_canvas" style='float: right; margin-top: 18px; margin-right: 10px; width:65%; height:450px;'>
+        <div id='map_loading_msg'>
+            <img src='/static/images/icons/throbber.png' />
+            <span>Loading map&hellip;</span>
         </div>
     </div>
-    <ul id="people-list">
+
+    {# JavaScript edits this text. #}
+    <p id="people-count">Loading...</p>
+    <div id='search_summary'>Showing <strong>100</strong> people who have listed &lsquo;<strong>Cairo</strong>&rsquo; on their profiles.</div>
+    
+    <ul id="people-list" class="people-list-map">
         <div class='project-yeller'>
             &lsquo;Cairo&rsquo; also refers to <a href='#'>a project with 3 contributors.</a>
         </div>
-        {% for column in people_columns %}
-        <div class="people-list-column">
-            {% for person in column %}
-                {% if person.user.username %}
-                    {% include 'profile/person-summary-li.html' %}
-                {% endif %}
-            {% endfor %}
-        </div>
+        {% for person in people %}
+            {% if person.user.username %}
+                {% include 'profile/person-summary-li.html' %}
+            {% endif %}
         {% endfor %}
     </ul>
+
+    {% if center_json and not geocode_failed %}
+    <style type='text/css'>
+    #people-list li { display: none; }
+    </style>
+    {% endif %}
+
 {% endblock people_main %}
+
+{% block js_before_bundle %}
+<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+{% endblock js_before_bundle %}
 
 {% block js %}
 {{ block.super }}
-<script type='text/javascript'>
-$(function(){
-$('#people-list li').hoverClass('hover');
-});
+<script type="text/javascript">
+    {% if center_json and not geocode_failed %}
+        var center = {{ center_json|safe}}; /* This comes from Python geocoding the ?center= . */
+        var center_name = {{ center_name_json|safe}}; /* This is the string form of the above. */
+    {% else %}
+        var center = {'latitude': 0, 'longitude': 0, 'suggested_zoom_level': 1};
+        var center_name = '';
+    {% endif %}
+
+    {% if geocode_failed %}
+        $('.map-error').show();
+    {% endif %}
+
+    mapController = new PeopleMapController(); 
+    $(function () {
+        mapController.initialize({
+                'person_id2data': {{ person_id2data_as_json|safe}},
+                'num_of_persons_with_locations': {{ num_of_persons_with_locations }},
+                'center': center
+
+        });
+        mapController.bindClickHandlersToPeopleListItems();
+        var center_and_zoom_the_map = function () {
+            $('.map-error').hide();
+            var location = $('#location_for_map_centering').val();
+            var callback_to_geocode_then_center_and_zoom = function(results, status) {
+                if (status == google.maps.GeocoderStatus.OK) {
+                    mapController.map.setCenter(results[0].geometry.location);
+                    mapController.map.setZoom(5);
+                }
+                else{
+                    $('.map-error').show();
+                }
+            };
+            var geocoder = new google.maps.Geocoder();
+            geocoder.geocode( {'address': location},
+                              callback_to_geocode_then_center_and_zoom);
+            return false;
+        }
+        $('#center_the_map').click(center_and_zoom_the_map);
+    });
 </script>
 {% endblock js %}
+
+{% block js_tests %}
+{% comment %}
+    This block only shows up if this page has a query string with ?test=1.
+    These are JavaScript unit tests. Unless /static/js/tester.js has changed,
+    they will run with FireUnit <http://fireunit.org>, which is an extension for
+    Firebug <http://getfirebug.com>.
+{% endcomment %}
+<script type='text/javascript' src="/static/js/profile/map-tests.js"></script>
+{% endblock js_tests %}
