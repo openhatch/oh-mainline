@@ -1,12 +1,12 @@
 {% load profile_extras %}
 {# Used, at time of writing, in profile/map.html and profile/search_people.html #}
 <li id="person_summary_{{person.pk}}">
-    {% ifnotequal slug "people_map" %}<a href="{{ person.profile_url }}">{% endifnotequal %}
+    {% ifnotequal slug "people" %}<a href="{{ person.profile_url }}">{% endifnotequal %}
     <div class='left'>
         <img src="{{ person.get_photo_thumbnail_url_or_default }}" />
     </div>
     <div class="people-view-info">
-        {% ifequal slug "people_map" %}
+        {% ifequal slug "people" %}
         <a class='profile-link person-summary-button' href='{{ person.profile_url }}' 
                 title="Visit {% firstof person.user.first_name person.user.username %}'s profile">
             profile
@@ -63,6 +63,6 @@
         {% endif %}
     {% endwith %}
     </div>
-    {% ifnotequal slug "people_map" %}</a>{% endifnotequal %}
+    {% ifnotequal slug "people" %}</a>{% endifnotequal %}
 </li>
 {# vim: set filetype=htmldjango: #}

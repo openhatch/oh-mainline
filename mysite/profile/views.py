@@ -318,7 +318,7 @@ def display_list_of_people_who_match_some_search(request, property, value):
     return (request, 'profile/search_people.html', data)
 
 @view
-def display_list_of_people(request):
+def people(request):
     """Display a list of people."""
     # {{{
     data = {}
@@ -384,32 +384,6 @@ def display_list_of_people(request):
 
     return (request, 'profile/search_people.html', data)
     # }}}
-
-@view
-def people_map(request):
-    data = {}
-
-    everybody = Person.objects.all()
-    mappable = ( ~Q(location_display_name='') & Q(location_confirmed=True) )
-    data['people'] = everybody.filter(mappable).order_by('user__username')
-    data['person_id2data_as_json'] = simplejson.dumps(dict([
-                (person.pk, {'name': person.get_full_name_or_username(),
-                             'location': person.location_display_name})
-            for person in Person.objects.all()
-            if person.location_display_name]))
-    data['test_js'] = request.GET.get('test', None)
-    data['num_of_persons_with_locations'] = len([p for p in Person.objects.all()
-                                                 if p.location_display_name])
-    if request.GET.get('center', False):
-        data['center_json'] = mysite.base.controllers.cached_geocoding_in_json(
-            request.GET.get('center', ''))
-        # the below is true when we fail to geocode the center that we got from GET
-        if data['center_json'] == 'null':
-            data['geocode_failed'] = True;
-        data['center_name'] = request.GET.get('center', '')
-        data['center_name_json'] = simplejson.dumps(request.GET.get('center', ''))
-    return (request, 'profile/map.html', data)
-
 
 def gimme_json_for_portfolio(request):
     "Get JSON used to live-update the portfolio editor."

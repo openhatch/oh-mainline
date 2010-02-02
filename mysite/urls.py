@@ -1,5 +1,5 @@
 from django.conf.urls.defaults import *
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponsePermanentRedirect
 
 from django.conf import settings
 
@@ -25,9 +25,10 @@ urlpatterns = patterns('',
             {'document_root': settings.MEDIA_ROOT}),
 
         (r'^people/$',
-            'mysite.profile.views.people_map'),
+            'mysite.profile.views.people'),
 
-        (r'^\+people/list/$', 'mysite.profile.views.display_list_of_people'),
+        (r'^\+people/list/$', lambda x: HttpResponsePermanentRedirect('/people/')),
+
 
         (r'^account/forgot_pass/$',
             'django.contrib.auth.views.password_reset', {
