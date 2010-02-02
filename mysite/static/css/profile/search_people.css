@@ -1,10 +1,5 @@
 body#people-map #main img{margin:0 0 -3px; padding:0; }
-body#people-map #map-zoom label{float:left; font-size:.9em; }
-body#people-map #map-zoom input[type="submit"]{float:left; margin-left:5px; padding:4px 4px 5px; }
-body#people-map #map-zoom .example{float:right; color:#888; }
-body#people-map #map-zoom input[type="text"]{width:95%; }
-body#people-map #map-zoom .input-and-labels{width:300px; float:left; }
-body#people-map #map-zoom {width: 60%; float:left; }
+body#people-map input[type="submit"]{float:left; margin-left:5px; padding:4px 4px 5px; }
 body#people-map .map-error{background: #ffc; float: left; padding: 9px 2%; width: 36%; display: none}
 body#people-map #map_canvas{float:left; margin-right:10px; width:70%; height:450px; text-align:center; }
 body#people-map #map_loading_msg{margin-left:20%; margin-top:150px; width:60%; background-color:#fff; padding:8px; }
@@ -38,11 +33,11 @@ body#people-map #people-list li { width: 90%; }
 body#people-map #search { float: left; width: 100%; }
 
 /* Field */
-body#people-map #search .field { float: left; margin-right: 5%; }
+body#people-map #search .field { float: left; }
 body#people-map #search .field.keyword { width: 60%; }
-body#people-map #search .field.location { width: 30%; }
+body#people-map #search .field.location { width: 27%; }
+body#people-map #search .field.location input { width: 94%; }
 
-body#people-map #search .field:last-child { margin-right: 0; }
 body#people-map #search label { float: left; width: 100%; margin-bottom: 3px; }
 body#people-map #search input[type='text'] { width: 97%; }
 body#people-map #search a { }
@@ -71,7 +66,7 @@ body#people-map #refine_search .term { float: left; font-size: .85em; padding: 3
 body#people-map .logical-operator { font-variant: small-caps; }
 body#people-map #people-list { width: 33%; }
 body#people-map #people-list .people-list-column { padding: 10px; width:45%; }
-body#people-map #people-list li .what_matched_the_search { float: left; font-size: .9em; font-weight: normal; color: #333; }
+body#people-map #people-list li .what_matched_the_search { font-size: .9em; font-weight: normal; color: #333; }
 body#people-map #people-list li .username { font-size: .9em; color: #333; font-weight: normal; }
 body#people-map .project-yeller { padding: 20px; }
 

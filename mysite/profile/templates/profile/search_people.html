@@ -16,7 +16,7 @@ People
     where {{ property }} = {{ value }}
     {% endif %}
 
-<form action="." id="map-zoom">
+<form action=".">
     <div id='search'>
         <div class='keyword field'>
             <label for='search_profiles'>Search for</label>
@@ -41,15 +41,18 @@ People
         <div class='location field'>
           <div class="input-and-labels">
             <label for='search_locations'>Near</label>
-            <label for="location_for_map_centering">
-                    Find people near a specific location.
-                </label>
             <p class="map-error">We couldn't find that location.</p>
             <input id="location_for_map_centering" name="center"
                    type="text" value="{{ center_name }}"/>
-            <input id="center_the_map" type="submit" style="" value="Go"/>
 	  </div>
         </div>
+        <div class='stubmit field'>
+          <div class="input-and-labels">
+            <label for='search_locations'>&nbsp;</label>
+            <input id="center_the_map" type="submit" value="Go"/>
+	  </div>
+        </div>
+	    
     </div>
 </form>
     <div id='refine_search'>
@@ -145,24 +148,6 @@ People
 
         });
         mapController.bindClickHandlersToPeopleListItems();
-        var center_and_zoom_the_map = function () {
-            $('.map-error').hide();
-            var location = $('#location_for_map_centering').val();
-            var callback_to_geocode_then_center_and_zoom = function(results, status) {
-                if (status == google.maps.GeocoderStatus.OK) {
-                    mapController.map.setCenter(results[0].geometry.location);
-                    mapController.map.setZoom(5);
-                }
-                else{
-                    $('.map-error').show();
-                }
-            };
-            var geocoder = new google.maps.Geocoder();
-            geocoder.geocode( {'address': location},
-                              callback_to_geocode_then_center_and_zoom);
-            return false;
-        }
-        $('#center_the_map').click(center_and_zoom_the_map);
     });
 </script>
 {% endblock js %}
