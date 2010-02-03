@@ -40,9 +40,11 @@ People
     </div>
 </form>
     <div id='search_summary'>Showing <span id="people-count">(loading...)</span> who have listed &lsquo;<strong>{{q}}</strong>&rsquo; on their profiles.
+      {% for valid_project_name in valid_project_names %}
       <div class='project-yeller'>
-      &lsquo;{{q}}&rsquo; also refers to <a href='#'>a project with 3 contributors.</a>
+      &lsquo;{{valid_project_names}}&rsquo; also refers to <a href='#'>a project with 3 contributors.</a>
       </div>
+      {% endfor %}
     </div>
     <ul class='suggestions'>
                 {% for what_kind_of_thing, list_of_things in suggestions.items %}
