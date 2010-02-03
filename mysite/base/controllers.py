@@ -83,6 +83,7 @@ def object_to_key(python_thing):
     return sha.sha(as_string).hexdigest()
 
 def cached_geocoding_in_json(address):
+    address = address.encode('utf-8')
     key_name = object_to_key(['function_call', 'cached_geocoding', address])
     geocoded = None
     geocoded_in_json = cache.get(key_name)
