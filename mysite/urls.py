@@ -202,6 +202,8 @@ urlpatterns = patterns('',
 
         (r'^\+bitesize$', lambda x: HttpResponseRedirect('/search/?q=&toughness=bitesize')),
 
+        (r'^\+geocode$', 'mysite.base.views.geocode'),
+
         # This dangerous regex is last
         (r'^people/(?P<user_to_display__username>[^/]+)[/?]$',
                 'mysite.profile.views.display_person_web'),
