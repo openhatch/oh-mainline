@@ -323,6 +323,9 @@ def people(request):
     # {{{
     data = {}
 
+    # pull in q from GET
+    data['q'] = request.GET.get('q', '')
+
     # Get the list of people to display.
     everybody = Person.objects.all()
     mappable_filter = ( ~Q(location_display_name='') & Q(location_confirmed=True) )
