@@ -44,10 +44,10 @@ body#people-map #search a { }
 
 /* Suggestions */
 body#people-map .suggestions { width: 100%; margin-top: 10px; font-size: 1.3em; margin-bottom: 10px; }
-body#people-map .suggestions > li { float: left; width: 45%;  }
-body#people-map .suggestions > li ul { float: none; display: block; }
-body#people-map .suggestions > li li { list-style: circle; font-weight: bold; margin-left: 10%; }
-body#people-map #search .introduce_suggestions {  }
+body#people-map .suggestions > li { float: left;   }
+body#people-map .suggestions > li ul { float: left; width: 50%;}
+body#people-map .suggestions > li li { list-style: circle; font-weight: bold; margin-left: 1em;}
+body#people-map .introduce_suggestions { float: left; width: 100%;}
 
 body#people-map #search_summary, body#people-map #search_modules > div { padding: 8px 0;  float: left; margin-top: 10px; }
 body#people-map #search_summary { padding: 10px 0; font-size: 1.1em; border-bottom: 1px dashed #dfdfdf; }

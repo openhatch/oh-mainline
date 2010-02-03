@@ -390,10 +390,9 @@ def people(request):
         # cache it for a week
         cache.set(key_name, popular_tags, cache_timespan)
 
-    data['suggestions'] = {
-            'projects': popular_projects,
-            'tags': popular_tags
-            }
+    data['suggestions'] = [
+        ('projects', popular_projects),
+        ('profile tags', popular_tags)]
 
     return (request, 'profile/search_people.html', data)
     # }}}
