@@ -7,6 +7,7 @@ from StringIO import StringIO
 from django.test.client import Client
 import mysite.base.controllers
 import mysite.base.helpers
+import mock
 
 def twill_setup():
     app = AdminMediaHandler(WSGIHandler())
@@ -111,10 +112,30 @@ class TestUriDataHelper(TwillTests):
                                 'url_prefix': 'name'})
 
 class Geocoder(TwillTests):
-    def test_unicode_string(self):
+
+    def get_geocoding_in_json_for_unicode_string(self):
         unicode_str = u'Bark\xe5ker, T\xf8nsberg, Vestfold, Norway'
 
         # Just exercise the geocoder and ensure it doesn't blow up.
-        mysite.base.controllers.cached_geocoding_in_json(unicode_str)
+        return mysite.base.controllers.cached_geocoding_in_json(unicode_str)
+
+    def test_unicode_string(self):
+        self.get_geocoding_in_json_for_unicode_string()
+
+    mock_geocoder = mock.Mock()
+    @mock.patch("mysite.base.controllers._geocode", mock_geocoder)
+    def test_unicode_strings_get_cached(self):
+        # When the geocoder's results are being cached properly, 
+        # the base controller named '_geocode' will not run more than once.
+        original_json = "{'key': 'original value'}"
+        different_json = "{'key': 'if caching works we should never get this value'}"
+        self.mock_geocoder.return_value = original_json 
+        self.assert_('original value' in self.get_geocoding_in_json_for_unicode_string()) 
+        self.mock_geocoder.return_value = different_json
+        try:
+            json = self.get_geocoding_in_json_for_unicode_string()
+            self.assert_('original value' in json) 
+        except AssertionError:
+            raise AssertionError, "Geocoded location in json was not cached; it now equals " + json
 
 # vim: set ai et ts=4 sw=4 nu:
