@@ -85,7 +85,7 @@
 #search #navigation { float: right; }
 #search #about_projects, #about_bug_trackers { margin-top: 0; }
 #search #about_projects div { float: left; margin-bottom: 10px; width: 100%; }
-#search #sidebar #about_projects h4 { text-align: center; font-size: 140%; margin-top: 7px; width: 100% ! important; }
+#search #sidebar .module #how_many_projects { text-align: center; font-size: 140%; width: 100% ! important; }
 #search #how_many_projects a { color: #555; }
 	#search #how_many_projects a:hover { color: #111; text-decoration: none; }
 		#search #how_many_projects a:hover strong { background-color: #555; }
