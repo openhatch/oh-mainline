@@ -1,3 +1,19 @@
+function geocode(data, callback) {
+    var ajaxOptions = {
+	'url': '/+geocode',
+	'type': 'GET',
+	'data': data,
+	'dataType': 'json',
+	'success': function(data) {
+	    callback(data, true);
+	    },
+	'error': function() {
+	    callback(null, false);
+	    }
+    };
+    $.ajax(ajaxOptions);
+}
+
 PeopleMapController = function () { };
 
 PeopleMapController.prototype.initialize = function(options) {
@@ -57,32 +73,35 @@ PeopleMapController.prototype.initialize = function(options) {
             // As specified after the "create_a_callback" function,
             // the following callback will be executed when the
             // Google Maps API responds to our request for geographic data.
-            return function(results, status) {
-                if (status == google.maps.GeocoderStatus.OK) {
-                    number_of_people_geocoded += 1;
-                    var person_location = results[0].geometry.location;
+            return function(json_data, it_worked) {
+                number_of_people_geocoded += 1;
 
-                    var marker = new google.maps.Marker({
+		if (! it_worked) {
+		    console.log('boom');
+		    num_of_persons_who_can_be_geocoded -=1;
+		    return;
+		}
+		console.log('onwards');
+		console.log(json_data);
+		var person_location = new google.maps.LatLng(json_data['latitude'],
+							     json_data['longitude']);
+		
+                var marker = new google.maps.Marker(
+		    {
                         'map': mapController.map, 
                         'title': person_name,
                         'person_id': person_id,     
                         'position': person_location
                     });
-                    mapController.person_locations['' + person_id] = person_location;
-                    mapController.map.setCenter(mapController.mapOrigin);
-                    google.maps.event.addListener(marker,
-                            'click', function() {
-                            mapController.highlightPerson(marker.person_id);
-                            window.location.hash=('person_summary_' + marker.person_id);
-                            });
-                    all_markers.push(marker);
-                }
-                else if(status == google.maps.GeocoderStatus.ZERO_RESULTS){
-                    num_of_persons_who_can_be_geocoded -=1;
-                }
-                else {
-                    console.log("Geocode was not successful for the following reason: " + status);
-                }
+                mapController.person_locations['' + person_id] = person_location;
+                mapController.map.setCenter(mapController.mapOrigin);
+                google.maps.event.addListener(
+		    marker,
+		    'click', function() {
+			mapController.highlightPerson(marker.person_id);
+                        window.location.hash=('person_summary_' + marker.person_id);
+                    });
+                all_markers.push(marker);
                 /* if this is the last one, call update_all_markers() */
                 if (num_of_persons_who_can_be_geocoded == number_of_people_geocoded) {
                     update_all_markers();
@@ -93,9 +112,9 @@ PeopleMapController.prototype.initialize = function(options) {
             };
         }
 
-        // Ask the Google Maps API for some geographic data, concerning a particular
+        // Ask the OpenHatch Geocoder API ;-) for some geographic data, concerning a particular
         // location.
-        geocoder.geocode( { 'address': location_name},
+        geocode( { 'address': location_name},
                 create_a_callback(this, name, person_id));
     }
 

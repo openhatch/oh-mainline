@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django.http import HttpResponse, \
-        HttpResponseRedirect, HttpResponseServerError
+        HttpResponseRedirect, HttpResponseServerError, HttpResponseBadRequest
 from django.shortcuts import render_to_response
 from django_authopenid.forms import OpenidSigninForm
 import simplejson
@@ -159,3 +159,12 @@ def page_to_js(request):
 
 def page_not_found(request):
     return render_to_response('404.html', {'the_user': request.user })
+
+def geocode(request):
+    address = request.GET.get('address', None)
+    if not address:
+        return HttpResponseBadRequest() # no address :-(
+    # try to geocode
+    coordinates_as_json = mysite.base.controllers.cached_geocoding_in_json(address)
+    return HttpResponse(coordinates_as_json, 
+                        mimetype='application/json')
