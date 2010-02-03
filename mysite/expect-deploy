@@ -54,6 +54,7 @@ expect {
 
 send_user "\r\n*** Atempting to run migrations... ***\r\n"
 send "./bin/production migrate\r"
+expect "$ "
 
 send_user "\r\n*** Reloading the web site... ***\r\n"
 send "touch bin/production.wsgi; echo $?\r"
