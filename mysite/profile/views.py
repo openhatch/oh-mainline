@@ -326,6 +326,14 @@ def people(request):
     # pull in q from GET
     data['q'] = request.GET.get('q', '')
 
+    # Figure out which projects happen to match that
+    
+    projects_that_match_q = []
+    for word in data['q'].split(): # FIXME: Tokenize smarter, one day
+        name_matches = Project.objects.filter(name__iexact=word)
+        projects_that_match_q.extend(name_matches) # always ok to extend by []
+    data['projects_that_match_q'] = projects_that_match_q
+
     # Get the list of people to display.
     everybody = Person.objects.all()
     mappable_filter = ( ~Q(location_display_name='') & Q(location_confirmed=True) )
