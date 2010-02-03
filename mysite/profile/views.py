@@ -359,7 +359,7 @@ def people(request):
         data['center_name'] = request.GET.get('center', '')
         data['center_name_json'] = simplejson.dumps(request.GET.get('center', ''))
 
-    suggestion_count = 5
+    suggestion_count = 6
 
     cache_timespan = 86400 * 7
     #if settings.DEBUG:
