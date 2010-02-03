@@ -110,4 +110,11 @@ class TestUriDataHelper(TwillTests):
         self.assertEqual(data, {'uri_scheme': 'https',
                                 'url_prefix': 'name'})
 
+class Geocoder(TwillTests):
+    def test_unicode_string(self):
+        unicode_str = u'Bark\xe5ker, T\xf8nsberg, Vestfold, Norway'
+
+        # Just exercise the geocoder and ensure it doesn't blow up.
+        mysite.base.controllers.cached_geocoding_in_json(unicode_str)
+
 # vim: set ai et ts=4 sw=4 nu:
