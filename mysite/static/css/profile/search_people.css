@@ -1,3 +1,4 @@
+
 body#people-map #main img{margin:0 0 -3px; padding:0; }
 body#people-map input[type="submit"]{float:left; margin-left:5px; padding:4px 4px 5px; }
 body#people-map .map-error{background: #ffc; float: left; padding: 9px 2%; width: 36%; display: none}
@@ -47,9 +48,10 @@ body#people-map .suggestions { width: 100%; margin-top: 10px; margin-bottom: 10p
 body#people-map .suggestions > li { float: left;  width: 47%; }
 body#people-map .suggestions > li:first-child { margin-right: 3%; }
 body#people-map .suggestions > li ul { float: left; width: 50%;}
-body#people-map .suggestions > li li { list-style: circle; font-weight: bold; margin-left: 1em; font-size: 1.2em;}
+body#people-map .suggestions > li li { list-style: disc; font-weight: bold; margin-left: 1em; font-size: 1.2em; color: #ccc;}
 body#people-map .suggestions > li li a { text-decoration: none; }
 body#people-map .suggestions > li li a:hover .this_part_gets_underlined { text-decoration: underline; }
+body#people-map .suggestions > li li small { font-weight: normal; font-size: .8em; color: #888; }
 body#people-map .introduce_suggestions { float: left; width: 100%; }
 
 body#people-map #search_summary, body#people-map #search_modules > div { padding: 8px 0;  float: left; margin-top: 10px; }
@@ -73,5 +75,3 @@ body#people-map #people-list li .what_matched_the_search { font-size: .9em; font
 body#people-map #people-list li .username { font-size: .9em; color: #333; font-weight: normal; }
 body#people-map .project-yeller { padding-top: 10px; }
 
-small { font-size: .8em; color: #888; }
-a:hover small { text-decoration: none; }
