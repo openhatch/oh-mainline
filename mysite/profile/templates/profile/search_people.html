@@ -40,9 +40,9 @@ People
     </div>
 </form>
     <div id='search_summary'>Showing <span id="people-count">(loading...)</span> who have listed &lsquo;<strong>{{q}}</strong>&rsquo; on their profiles.
-      {% for valid_project_name in valid_project_names %}
+      {% for project in projects_that_match_q %}
       <div class='project-yeller'>
-      &lsquo;{{valid_project_names}}&rsquo; also refers to <a href='#'>a project with 3 contributors.</a>
+      &lsquo;{{project.name}}&rsquo; also refers to <a href='#'>a project with {{ project.get_contributors}} contributors.</a>
       </div>
       {% endfor %}
     </div>

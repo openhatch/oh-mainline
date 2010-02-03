@@ -1656,7 +1656,9 @@ class ImportGithubCollaborators(BaseCeleryTest):
         # }}}
 
 class PeopleSearchProperlyIdentifiesQueriesThatFindProjects(TwillTests):
-    def test_one_valid_project(self):
+    @mock.patch('mysite.search.models.Project.get_contributors')
+    def test_one_valid_project(self, mock_get_contribs):
+        mock_get_contribs.return_value = ['one dude']
         # make a project called Banana
         # query for that, but spelled bANANA
         # look in the template and see that projects_that_match_q == ['Banana']
@@ -1666,7 +1668,9 @@ class PeopleSearchProperlyIdentifiesQueriesThatFindProjects(TwillTests):
         self.assertEqual(response.context[0]['projects_that_match_q'],
                          [Project.objects.get(name='Banana')])
         
-    def test_two_valid_projects(self):
+    @mock.patch('mysite.search.models.Project.get_contributors')
+    def test_two_valid_projects(self, mock_get_contribs):
+        mock_get_contribs.return_value = ['one dude']
         # make a project called Banana and Cucumber
         # query for that, but spelled bANANA and cucumBer
         # look in the template and see that set(projects_that_match_q) == set(['Banana', 'Cucumber'])
@@ -1679,4 +1683,15 @@ class PeopleSearchProperlyIdentifiesQueriesThatFindProjects(TwillTests):
                          set([Project.objects.get(name='Banana'),
                               Project.objects.get(name='Cucumber')]))
 
+    @mock.patch('mysite.search.models.Project.get_contributors')
+    def test_one_empty_project(self, mock_get_contribs):
+        mock_get_contribs.return_value = [] # nobody!
+        # make a project called Banana
+        # query for that, but spelled bANANA
+        # look in the template and see that projects_that_match_q == ['Banana']
+        mysite.search.models.Project.create_dummy(name='Banana')
+        url = reverse(mysite.profile.views.people)
+        response = self.client.get(url, {'q': 'bANANA'})
+        self.assertEqual(response.context[0]['projects_that_match_q'],
+                         [])
 # vim: set ai et ts=4 sw=4 nu:

@@ -331,7 +331,10 @@ def people(request):
     projects_that_match_q = []
     for word in data['q'].split(): # FIXME: Tokenize smarter, one day
         name_matches = Project.objects.filter(name__iexact=word)
-        projects_that_match_q.extend(name_matches) # always ok to extend by []
+        for project in name_matches:
+            if project.get_contributors():
+                # only add those projects that have people in them
+                projects_that_match_q.append(project)
     data['projects_that_match_q'] = projects_that_match_q
 
     # Get the list of people to display.
