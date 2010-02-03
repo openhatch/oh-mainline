@@ -127,9 +127,9 @@ PeopleMapController.prototype.initialize = function(options) {
                 case 1: str = "<strong>1</strong> person in this area"; break;
                 case 0: str = "<strong>nobody</strong> in this area"; break;
                 case num_of_persons_who_can_be_geocoded:
-                        str = "<strong>" + num_of_persons_who_can_be_geocoded + "</strong> people have entered their locations";
+                        str = "<strong>" + num_of_persons_who_can_be_geocoded + "</strong> people";
                         break;
-                default: str = count + " people in this area" ;
+                default: str = "<strong>" + count + "</strong> people in this area" ;
             }
             $('#people-count').html(str);
     }

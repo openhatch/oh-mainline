@@ -26,7 +26,7 @@ body#people-map .profile-link{ position: relative; top: -5px; border-radius:8px;
 #people-list li .people-view-info{float:left; width:200px; }
 #people-list li.highlighted .collapsible{display:inline; }
 #people-list li .collapsible,#people-list li.highlighted .ellipsis{display:none; }
-#people-list.people-list-map{list-style:square; overflow:auto; height:428px; width:33%; }
+#people-list.people-list-map{list-style:square; overflow:auto; height:450px; width:33%; }
 #people-list.people-list-map li{cursor:hand; cursor: pointer; }
 body#people-map #map-zoom,.view-links ul{margin:0; padding:0; }
 
@@ -55,7 +55,7 @@ body#people-map .suggestions > li li small { font-weight: normal; font-size: .8e
 body#people-map .introduce_suggestions { float: left; width: 100%; }
 
 body#people-map #search_summary, body#people-map #search_modules > div { padding: 8px 0;  float: left; margin-top: 10px; }
-body#people-map #search_summary { padding: 10px 0; font-size: 1.1em; border-bottom: 1px dashed #dfdfdf; }
+body#people-map #search_summary { padding: 10px 0; font-size: 1.1em; } 
 
 /* Refine your search */
 body#people-map #refine_search { padding: 1.5%; float: left; width: 97%; background-color: #ececec; -moz-border-radius: 1.5%; border-radius: 1.5%; }
