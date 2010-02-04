@@ -8,6 +8,7 @@ import pprint
 import sha
 import traceback
 import logging
+import mysite.base.decorators
 
 notifications_dictionary = {
         "edit_password_done":
@@ -49,6 +50,7 @@ def mysql_regex_escape(s):
 ## source: http://code.google.com/apis/kml/articles/geocodingforkml.html
 import urllib
 
+@mysite.base.decorators.unicodify_strings_when_inputted
 def _geocode(address):
     # This function queries the Google Maps API geocoder with an
     # address. It gets back a csv file, which it then parses and
@@ -59,7 +61,7 @@ def _geocode(address):
     mapsUrl = 'http://maps.google.com/maps/geo?q='
      
     # This joins the parts of the URL together into one string.
-    query_string = urllib.urlencode({'q': address, 'output': 'csv'})
+    query_string = urllib.urlencode({'q': address.encode('utf-8'), 'output': 'csv'})
     
     # This retrieves the URL from Google, parses out the longitude and latitude,
     # and then returns them as a string.
@@ -82,8 +84,8 @@ def object_to_key(python_thing):
     as_string = simplejson.dumps(python_thing)
     return sha.sha(as_string).hexdigest()
 
+@mysite.base.decorators.unicodify_strings_when_inputted
 def cached_geocoding_in_json(address):
-    address = address.encode('utf-8')
     key_name = object_to_key(['function_call', 'cached_geocoding', address])
     geocoded = None
     geocoded_in_json = cache.get(key_name)

@@ -121,4 +121,14 @@ class Geocoder(TwillTests):
         except AssertionError:
             raise AssertionError, "Geocoded location in json was not cached; it now equals " + json
 
+class TestUnicodifyDecorator(TwillTests):
+    def test(self):
+        utf8_data = u'\xc3\xa9'.encode('utf-8') # &eacute;
+
+        @mysite.base.decorators.unicodify_strings_when_inputted
+        def sample_thing(arg):
+            self.assertEqual(type(arg), unicode)
+
+        sample_thing(utf8_data)
+
 # vim: set ai et ts=4 sw=4 nu:
