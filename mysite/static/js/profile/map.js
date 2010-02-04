@@ -1,4 +1,6 @@
-function geocode(data, callback) {
+PeopleMapController = function () { };
+
+PeopleMapController.prototype.geocode = function(data, callback) {
     var ajaxOptions = {
 	'url': '/+geocode',
 	'type': 'GET',
@@ -12,9 +14,8 @@ function geocode(data, callback) {
 	    }
     };
     $.ajax(ajaxOptions);
-}
+};
 
-PeopleMapController = function () { };
 
 PeopleMapController.prototype.initialize = function(options) {
     this.person_locations = {};
@@ -32,8 +33,6 @@ PeopleMapController.prototype.initialize = function(options) {
 
     var all_markers = [];
 
-    var geocoder =  new google.maps.Geocoder();
-    
     this.mapOrigin = new google.maps.LatLng(options.center.latitude,
 					    options.center.longitude);
     var myOptions = {
@@ -114,7 +113,7 @@ PeopleMapController.prototype.initialize = function(options) {
 
         // Ask the OpenHatch Geocoder API ;-) for some geographic data, concerning a particular
         // location.
-        geocode( { 'address': location_name},
+        this.geocode( { 'address': location_name},
                 create_a_callback(this, name, person_id));
     }
 
