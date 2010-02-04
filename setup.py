@@ -28,6 +28,7 @@ setup(
                         'django-debug-toolbar==0.8.1',
                         'pysolr',
                         'django-haystack',
+                        'hexagonit.recipe.download',
                        ],
 
     dependency_links = [dependency_path,
