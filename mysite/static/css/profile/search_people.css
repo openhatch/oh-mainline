@@ -1,6 +1,6 @@
 
 body#people-map #main img{margin:0 0 -3px; padding:0; }
-body#people-map input[type="submit"]{float:left; margin-left:5px; padding:4px 4px 5px; }
+body#people-map input[type="submit"]{ float:left; padding: 5px; position: relative; top: -1px; }
 body#people-map .map-error{background: #ffc; float: left; padding: 9px 2%; width: 36%; display: none}
 body#people-map #map_canvas{float:left; margin-right:10px; width:70%; height:450px; text-align:center; }
 body#people-map #map_loading_msg{margin-left:20%; margin-top:150px; width:60%; background-color:#fff; padding:8px; }
@@ -34,7 +34,7 @@ body#people-map #people-list li { width: 90%; }
 body#people-map #search { float: left; width: 100%; }
 
 /* Field */
-body#people-map #search .field { float: left; }
+body#people-map #search .field { float: left; margin-right: 5px; }
 body#people-map #search .field.keyword { width: 60%; }
 body#people-map #search .field.location { width: 27%; }
 body#people-map #search .field.location input { width: 94%; }
