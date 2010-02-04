@@ -41,7 +41,7 @@ class Login(TwillTests):
         url = make_twill_url(url)
         tc.go(url)
         tc.follow('log out')
-        tc.find('ciao')
+        tc.notfind('settings')
     # }}}
 
 class LoginWithOpenID(TwillTests):
@@ -183,7 +183,7 @@ class EditPhoto(TwillTests):
                       photo('static/sample-photo.jpg')]:
             url = 'http://openhatch.org/people/paulproteus/'
             tc.go(make_twill_url(url))
-            tc.follow('Change photo')
+            tc.follow('photo')
             tc.formfile('edit_photo', 'photo', image)
             tc.submit()
             # Now check that the photo == what we uploaded
