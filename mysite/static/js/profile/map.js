@@ -115,7 +115,7 @@ PeopleMapController.prototype.initialize = function(options) {
         // location.
         this.geocode( { 'address': location_name},
                 create_a_callback(this, name, person_id));
-    }
+    } // end for loop
 
     function update_people_count() {
             //when you can see everyone, this text should be different
@@ -131,7 +131,7 @@ PeopleMapController.prototype.initialize = function(options) {
                 default: str = "<strong>" + count + "</strong> people in this area" ;
             }
             $('#people-count').html(str);
-    }
+    } // end function update_people_count
 
     function generate_update_all_markers(map) {
         return function() {
@@ -156,7 +156,8 @@ PeopleMapController.prototype.initialize = function(options) {
             }
             update_people_count();
         };
-    }
+    } // end function generate_update_all_markers
+
     update_all_markers = generate_update_all_markers(this.map);
     google.maps.event.addListener(this.map,
             'bound_changed',
@@ -196,30 +197,7 @@ PeopleMapController.prototype.bindClickHandlersToPeopleListItems = function() {
         
         // Center the map on their marker.
 
-    };
+    }; // end function "handler"
     $('#people-list li').click(handler);
     $('#people-list li').hoverClass('hover');
 };
-
-/*
-function resizeDivs(id1, id2) {
-	var div1 = $('#'+id1).get[0];
-	var div2 = $('#'+id2).get[0];
-	var height = 0;
-	var heightMinus = 132;
-	
-	// get height of window
-	if (window.innerHeight) {
-		height = window.innerHeight - 18;
-	} else if (document.documentElement && document.documentElement.clientHeight) {
-		height = document.documentElement.clientHeight;
-		heightMinus = 187;
-	} else if (document.body && document.body.clientHeight) {
-		height = document.body.clientHeight;
-	}
-	
-	div1.style.height = Math.round(height - heightMinus) + "px";
-	div2.style.height = Math.round(height - heightMinus) + "px";
-}
-	window.onresize = function() { resizeDivs('people-list', 'map_canvas'); }
-*/
