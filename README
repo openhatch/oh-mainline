@@ -89,6 +89,15 @@ People search uses Solr. We use Haystack for managing Solr.
 
 === Create its schema ===
 
-=== Load its index ===
+./bin/mysite  build_solr_schema > parts/download_solr/example/solr/conf/schema.xml 
 
+=== Run the server ===
+
+( cd parts/download_solr/example ; java -jar start.jar) &
+
+=== Initialize its index ===
+
+./bin/mysite rebuild_index
+
+(say yes)
 
