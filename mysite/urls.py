@@ -49,9 +49,6 @@ urlpatterns = patterns('',
             'oh_login_pwd'),
         (r'^account/signup/do$', 'mysite.account.views.signup_do'),
 
-        (r'^account/request_invitation/do$',
-            'mysite.account.views.request_invitation'),
-
         (r'^people/(?P<user_to_display__username>[^/]+)/widget/$',
                 'mysite.profile.views.widget_display'),
 
