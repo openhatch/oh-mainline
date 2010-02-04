@@ -353,7 +353,10 @@ def people(request):
     else:
         everybody = Person.objects.all()
         mappable_filter = ( ~Q(location_display_name='') & Q(location_confirmed=True) )
-        mappable_people = everybody.filter(mappable_filter).order_by('user__username')
+        mappable_people = everybody.filter(mappable_filter)
+
+    # always order by username
+    mappable_filter = mappable_filter.order_by('user__username')
 
     # filter by query, if it is set
     data['people'] = mappable_people
