@@ -120,5 +120,8 @@ def geocode(request):
         return HttpResponseBadRequest() # no address :-(
     # try to geocode
     coordinates_as_json = mysite.base.controllers.cached_geocoding_in_json(address)
+    if coordinates_as_json == 'null':
+        # We couldn't geocode that.
+        return HttpResponseBadRequest() # no address :-(
     return HttpResponse(coordinates_as_json, 
                         mimetype='application/json')
