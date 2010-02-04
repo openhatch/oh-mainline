@@ -97,12 +97,18 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+    
 )
 
 STATIC_DOC_ROOT = 'static/'
 
 # Sessions in /tmp
 SESSION_ENGINE="django.contrib.sessions.backends.file"
+
+## Django search via Haystack
+HAYSTACK_SITECONF='mysite.haystack_configuration'
+HAYSTACK_SEARCH_ENGINE='solr'
+HAYSTACK_SOLR_URL='http://127.0.0.1:8983/solr'
 
 INSTALLED_APPS = (
     'django.contrib.auth',
@@ -127,6 +133,7 @@ INSTALLED_APPS = (
     'mysite.base',
     'mysite.project',
     'mysite.senseknocker',
+    'haystack',
     #'debug_toolbar',
 )
 
@@ -181,3 +188,6 @@ ASSETS_DEBUG = True
 ASSETS_EXPIRE = 'querystring'
 
 INTERNAL_IPS = ('127.0.0.1',)
+
+
+
