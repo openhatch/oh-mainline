@@ -206,7 +206,7 @@ class EditPhoto(TwillTests):
                       photo('static/images/too-wide.png')]:
             url = 'http://openhatch.org/people/paulproteus/'
             tc.go(make_twill_url(url))
-            tc.follow('Change photo')
+            tc.follow('photo')
             tc.formfile('edit_photo', 'photo', image)
             tc.submit()
             # Now check that the photo is 200px wide
@@ -226,7 +226,7 @@ class EditPhotoWithOldPerson(TwillTests):
                       photo('static/sample-photo.jpg')):
             url = 'http://openhatch.org/people/paulproteus/'
             tc.go(make_twill_url(url))
-            tc.follow('Change photo')
+            tc.follow('photo')
             tc.formfile('edit_photo', 'photo', image)
             tc.submit()
             # Now check that the photo == what we uploaded
