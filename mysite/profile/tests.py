@@ -1694,4 +1694,17 @@ class PeopleSearchProperlyIdentifiesQueriesThatFindProjects(TwillTests):
         response = self.client.get(url, {'q': 'bANANA'})
         self.assertEqual(response.context[0]['projects_that_match_q'],
                          [])
+
+class PeopleSearch(TwillTests):
+    def test_project_queries_are_distinct_from_tag_queries(self):
+        # input "project:Exaile" into the search controller, ensure that it outputs
+        # {'q': 'Exaile', 'query_type': 'project'}
+        data = mysite.profile.controllers.parse_string_query("project:a_project_name")
+        self.assertEqual(data['q'], 'a_project_name')
+        self.assertEqual(data['query_type'], 'project')
+
+        data = mysite.profile.controllers.parse_string_query("a_tag_name_or_whatever")
+        self.assertEqual(data['q'], 'a_tag_name_or_whatever')
+        self.assertEqual(data['query_type'], 'all_tags')
+
 # vim: set ai et ts=4 sw=4 nu:
