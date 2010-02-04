@@ -24,54 +24,8 @@ import random
 
 from django.contrib.auth.decorators import login_required
 
-def homepage(request, signup_form=None,
-        invitation_request_form=None, initial_tab_open='login'):
-
-    #if request.user.is_authenticated():
-    return landing_page(request)
-
-    openid_signin_form = OpenidSigninForm()
-
-    old_fashioned_authentication_form = AuthenticationForm()
-
-    signup_notification = login_notification = notification_id = None
-    if request.GET.get('msg', None) == 'ciao':
-        login_notification = "You've been logged out. Thanks for dropping in!"
-        notification_id = 'ciao'
-    # FIXME: I think the control block below is dead.
-    elif request.GET.get('msg', None) == 'username_taken':
-        signup_notification = "Your chosen username is already taken. Try another one."
-        notification_id = 'username_taken'
-
-    if not signup_form:
-        signup_form = mysite.account.forms.UserCreationFormWithEmail()
-
-    if not invitation_request_form:
-        invitation_request_form = mysite.account.forms.InvitationRequestForm()
-
-    data = {
-            'notification_id': notification_id,
-            'login_notification': login_notification,
-            'signup_notification': signup_notification,
-            'openid_signin_form': openid_signin_form,
-            'old_fashioned_authentication_form': old_fashioned_authentication_form,
-            'signup_form': signup_form,
-            'invitation_request_form': invitation_request_form,
-            }
-
-    data['initial_tab_open'] = initial_tab_open
-    data['interrogative_grunt'] = [u'Hm?', u'Huh?', u'Quoi?', u'¿Que?', u'What‽']
-
-    invitation_requested_for = request.GET.get("invitation_requested_for", None)
-    if invitation_requested_for:
-        data['invitation_requested_for'] = invitation_requested_for
-        data['invitation_success'] = True
-        data['initial_tab_open'] = "request_invitation"
-
-    return render_to_response('base/homepage.html', data, context_instance=RequestContext(request))
-
 @view
-def landing_page(request):
+def home(request):
 
     data = {}
     data['entries'] = mysite.customs.feed.cached_blog_entries()[:3]

@@ -18,7 +18,7 @@ urlpatterns = patterns('',
 
         # FIXME: Automatically remove trailing slashes from input URLs,
         # and remove trailing slashes from the urls below.
-        (r'^$', 'mysite.base.views.homepage'),
+        (r'^$', 'mysite.base.views.home'),
         (r'^search/$', 'mysite.search.views.fetch_bugs'),
         (r'^admin/(.*)', admin.site.root),
         (r'^static/(?P<path>.*)$', 'django.views.static.serve',
@@ -49,9 +49,6 @@ urlpatterns = patterns('',
             {'template_name': 'account/login_old.html'},
             'oh_login_pwd'),
         (r'^account/signup/do$', 'mysite.account.views.signup_do'),
-
-        (r'^account/request_invitation/do$',
-            'mysite.account.views.request_invitation'),
 
         (r'^people/(?P<user_to_display__username>[^/]+)/widget/$',
                 'mysite.profile.views.widget_display'),

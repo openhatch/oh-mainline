@@ -13,7 +13,7 @@
         <li><a href='{% url mysite.profile.views.people%}'>{% if the_user.is_authenticated %} all {% endif %} people</a></li>
         {% if the_user.is_authenticated %}
         <li><a href='{% url mysite.profile.views.display_person_web the_user.username %}'>profile</a></li>
-        <li><a href='{% url mysite.base.views.homepage %}'>home</a></li>
+        <li><a href='{% url mysite.base.views.home %}'>home</a></li>
         {% endif %}
     </ul>
     <ul id='account-links'>

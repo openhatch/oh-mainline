@@ -41,7 +41,7 @@ class Login(TwillTests):
         url = make_twill_url(url)
         tc.go(url)
         tc.follow('log out')
-        tc.find('ciao')
+        tc.notfind('settings')
     # }}}
 
 class LoginWithOpenID(TwillTests):
@@ -183,7 +183,7 @@ class EditPhoto(TwillTests):
                       photo('static/sample-photo.jpg')]:
             url = 'http://openhatch.org/people/paulproteus/'
             tc.go(make_twill_url(url))
-            tc.follow('Change photo')
+            tc.follow('photo')
             tc.formfile('edit_photo', 'photo', image)
             tc.submit()
             # Now check that the photo == what we uploaded
@@ -206,7 +206,7 @@ class EditPhoto(TwillTests):
                       photo('static/images/too-wide.png')]:
             url = 'http://openhatch.org/people/paulproteus/'
             tc.go(make_twill_url(url))
-            tc.follow('Change photo')
+            tc.follow('photo')
             tc.formfile('edit_photo', 'photo', image)
             tc.submit()
             # Now check that the photo is 200px wide
@@ -226,7 +226,7 @@ class EditPhotoWithOldPerson(TwillTests):
                       photo('static/sample-photo.jpg')):
             url = 'http://openhatch.org/people/paulproteus/'
             tc.go(make_twill_url(url))
-            tc.follow('Change photo')
+            tc.follow('photo')
             tc.formfile('edit_photo', 'photo', image)
             tc.submit()
             # Now check that the photo == what we uploaded
@@ -239,7 +239,7 @@ class GuessLocationOnLogin(TwillTests):
     #{{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
     mock_ip = mock.Mock()
-    mock_ip.return_value = "128.151.2.1"
+    mock_ip.return_value = "128.151.2.1" # Located in Rochester, New York, U.S.A.
     @mock.patch("mysite.base.middleware.get_user_ip", mock_ip)
     def test_guess_location_on_login(self):
         person = Person.objects.get(user__username="paulproteus")
@@ -251,7 +251,6 @@ class GuessLocationOnLogin(TwillTests):
         self.assertContains(response, "OpenHatch")
         person = Person.objects.get(user__username="paulproteus")
         self.assertEqual(person.location_display_name, "Rochester, NY, United States")
-        self.assertContains(response, person.location_display_name)
 
     def test_yes_response(self):
         person = Person.objects.get(user__username="paulproteus")
