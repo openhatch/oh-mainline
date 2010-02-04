@@ -117,26 +117,22 @@ PeopleMapController.prototype.initialize = function(options) {
                 create_a_callback(this, name, person_id));
     } // end for loop
 
-    function update_people_count() {
-        alert('yo');
-        //when you can see everyone, this text should be different
-        var people_shown_string = "" ;
+    update_people_count = function () {
+        $('#map-loading').hide();
         var mappedPeople_count = $("#people-list li:visible").size();
 
         var str = mappedPeople_count;
-        console.log('mappedPeople_count', mappedPeople_count);
         if (mappedPeople_count == num_of_persons_who_can_be_geocoded) {
             str = "Everybody";
-            $('#how_many_people_are_visible_label').hide();
-            $('#how_many_people_are_visible').text(mappedPeople_count);
-            return;
         }
         if (mappedPeople_count == 0) {
             str = "Nobody";
         }
         $('#how_many_people_are_visible_label').show();
-        $('#how_many_people_are_visible').text(mappedPeople_count);
+        $('#how_many_people_are_visible').text(str);
     } // end function update_people_count
+
+    this.updatePeopleCount = update_people_count;
 
     function generate_update_all_markers(map) {
         return function() {
@@ -150,7 +146,6 @@ PeopleMapController.prototype.initialize = function(options) {
 
                     // If the person bullet is hidden,
                     if($person_summary.is(':visible') === false) {
-
                         $person_summary.show();
                     }
                     shown_this_many += 1;
