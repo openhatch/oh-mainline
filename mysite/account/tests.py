@@ -239,7 +239,7 @@ class GuessLocationOnLogin(TwillTests):
     #{{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
     mock_ip = mock.Mock()
-    mock_ip.return_value = "128.151.2.1"
+    mock_ip.return_value = "128.151.2.1" # Located in Rochester, New York, U.S.A.
     @mock.patch("mysite.base.middleware.get_user_ip", mock_ip)
     def test_guess_location_on_login(self):
         person = Person.objects.get(user__username="paulproteus")
@@ -251,7 +251,6 @@ class GuessLocationOnLogin(TwillTests):
         self.assertContains(response, "OpenHatch")
         person = Person.objects.get(user__username="paulproteus")
         self.assertEqual(person.location_display_name, "Rochester, NY, United States")
-        self.assertContains(response, person.location_display_name)
 
     def test_yes_response(self):
         person = Person.objects.get(user__username="paulproteus")
