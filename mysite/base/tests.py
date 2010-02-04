@@ -5,8 +5,8 @@ from django.core.handlers.wsgi import WSGIHandler
 from django.core.servers.basehttp import AdminMediaHandler 
 from StringIO import StringIO
 from django.test.client import Client
-import mysite.base.controllers
 import mysite.base.helpers
+import mysite.base.controllers
 
 def twill_setup():
     app = AdminMediaHandler(WSGIHandler())
@@ -69,24 +69,6 @@ class TwillTests(django.test.TestCase):
     def signup_with_twill(self, username, email, password):
         """ Used by account.tests.Signup, which is omitted while we use invite codes. """
         pass
-
-    # }}}
-
-class LandingPage(TwillTests):
-    # {{{
-    fixtures = ['user-paulproteus', 'person-paulproteus']
-    def test_show_landing_page_iff_logged_in(self):
-        # {{{
-        client = Client()
-        response = client.get('/')
-        self.assertTemplateUsed(response, 'base/homepage.html')
-
-        client2 = self.login_with_client()
-        response2 = client2.get('/')
-        self.assertTemplateUsed(response2, 'base/landing.html')
-        # }}}
-
-    # }}}
 
 class MySQLRegex(TwillTests):
     def test_escape(self):
