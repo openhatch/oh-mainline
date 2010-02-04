@@ -32,6 +32,9 @@ from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.core.cache import cache
 
+# Haystack
+import haystack.query
+
 # OpenHatch apps
 import mysite.base.controllers
 import mysite.profile.controllers
@@ -338,9 +341,17 @@ def people(request):
     data['projects_that_match_q'] = projects_that_match_q
 
     # Get the list of people to display.
-    everybody = Person.objects.all()
-    mappable_filter = ( ~Q(location_display_name='') & Q(location_confirmed=True) )
-    mappable_people = everybody.filter(mappable_filter).order_by('user__username')
+    mappable_people_from_haystack = haystack.query.SearchQuerySet().all()
+
+    if data['q'].strip():
+        mappable_people_from_haystack = mappable_people_from_haystack.filter(
+            all_tag_texts=data['q'])
+
+    mappable_people_from_haystack.load_all()
+
+    mappable_people = [x.object for x in mappable_people_from_haystack]
+
+    # filter by query, if it is set
     data['people'] = mappable_people
     get_relevant_person_data = lambda p: (
             {'name': p.get_full_name_or_username(),
