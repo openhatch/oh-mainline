@@ -26,6 +26,7 @@ setup(
                         'python-github2==0.1.1',
                         'pygeoip==0.1.3',
                         'django-debug-toolbar==0.8.1',
+                        'django-haystack',
                        ],
 
     dependency_links = [dependency_path,
