@@ -39,37 +39,62 @@ People
 	    
     </div>
 </form>
-    <div id='search_summary'>Showing <span id="people-count">(loading...)</span>{% if q %}who have listed &lsquo;<strong>{{q}}</strong>&rsquo; on their profiles{% endif %}.
-      {% for project in projects_that_match_q %}
-      <div class='project-yeller'>
-      &lsquo;{{project.name}}&rsquo; also refers to <a href='?q=project:{{project.name|urlencode}}'>a project with {{ project.get_contributors|length}} contributor{{ project.get_contributors|length|pluralize}}.</a>
-      </div>
-      {% endfor %}
-    </div>
+    <div id='search_summary'>
+        {% if q %}
+            {# If there's a query, tell us the people who match it. #}
+            {% ifequal query_type 'tag' %}
+                People tagged with &lsquo;<strong>{{ q }}</strong>&rsquo;.
+            {% endifequal %}
+            {% ifequal query_type 'project' %}
+                People who have contributed to &lsquo;<strong>{{ q }}</strong>&rsquo;.
+            {% endifequal %}
+        {% else %}
+            {% comment %}
+                If there's *no query*, we list *everybody* in the DB on this page.
+            {% endcomment %}
+            People on OpenHatch: <strong id='people-count'>{{ people|length }}</strong>.
+        {% endif %}
+
+        {% comment %}
+            Javascript fills these in when the map changes.
+        {% endcomment %}
+        <span id='map-loading'>Loading map...</span>
+        <span id='how_many_people_are_visible_label'>
+            Currently visible on the map:
+        </span>
+        <strong id='how_many_people_are_visible'></strong>
+        <a href='' {# refresh the page #} id='show_everybody'>(Show everybody.)</a>
+
+        {% for project in projects_that_match_q %}
+            <div class='project-yeller'>
+                &lsquo;{{ project.name }}&rsquo; also refers to <a href='?q=project:{{project.name|urlencode}}'>a project with {{ project.get_contributors|length}} contributor{{ project.get_contributors|length|pluralize}}.</a>
+            </div><!-- /.project-yeller -->
+        {% endfor %}
+    </div><!-- /#search_summary -->
     <ul class='suggestions'>
-                {% for what_kind_of_thing, list_of_things in suggestions %}
-                    <li>
-                        <span class='introduce_suggestions'>Popular
-                            {{ what_kind_of_thing }}:</span>
-                        <ul>
-                            {% for thing in list_of_things|slice:":3" %}
-                                <li>
-                                    <a href='?q={{ what_kind_of_thing|urlencode }}:{{ thing|urlencode }}'>
-                                      <span class="this_part_gets_underlined">{{ thing }}</span><small> (8)</small></a>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                        <ul>
-                            {% for thing in list_of_things|slice:"3:" %}
-                                <li>
-                                    <a href='?q={{ what_kind_of_thing|urlencode }}:{{ thing|urlencode }}'>
-                                        <span class="this_part_gets_underlined">{{ thing }}</span><small> (8)</small></a>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </li>
-                {% endfor %}
-            </ul>
+        {% for what_kind_of_thing, list_of_things in suggestions %}
+            <li>
+                <span class='introduce_suggestions'>Popular
+                    {{ what_kind_of_thing }}:</span>
+                <ul>
+                    {% for thing in list_of_things|slice:":3" %}
+                        <li>
+                            <a href='?q={{ what_kind_of_thing|urlencode }}:{{ thing|urlencode }}'>
+                                <span class="this_part_gets_underlined">{{ thing }}</span><small> (8)</small></a>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <ul>
+                    {% for thing in list_of_things|slice:"3:" %}
+                        <li>
+                            <a href='?q={{ what_kind_of_thing|urlencode }}:{{ thing|urlencode }}'>
+                                <span class="this_part_gets_underlined">{{ thing }}</span><small> (8)</small></a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endfor %}
+    </ul><!-- /.suggestions -->
     {% if q %}
     <div id='refine_search'>
         <h3>Related searches</h3>
