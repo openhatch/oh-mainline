@@ -24,11 +24,8 @@ import random
 
 from django.contrib.auth.decorators import login_required
 
-def homepage(request):
-    return landing_page(request)
-
 @view
-def landing_page(request):
+def home(request):
 
     data = {}
     data['entries'] = mysite.customs.feed.cached_blog_entries()[:3]
