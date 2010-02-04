@@ -75,41 +75,41 @@ PeopleMapController.prototype.initialize = function(options) {
             return function(json_data, it_worked) {
                 number_of_people_geocoded += 1;
 
-		if (! it_worked) {
-		    console.log('boom');
-		    num_of_persons_who_can_be_geocoded -=1;
-		    return;
-		}
-		console.log('onwards');
-		console.log(json_data);
-		var person_location = new google.maps.LatLng(json_data['latitude'],
-							     json_data['longitude']);
-		
+                if (! it_worked) {
+                    console.log('boom');
+                    num_of_persons_who_can_be_geocoded -=1;
+                    return;
+                }
+                console.log('onwards');
+                console.log(json_data);
+                var person_location = new google.maps.LatLng(json_data['latitude'],
+                    json_data['longitude']);
+
                 var marker = new google.maps.Marker(
-		    {
+                    {
                         'map': mapController.map, 
                         'title': person_name,
                         'person_id': person_id,     
                         'position': person_location
-                    });
+                });
                 mapController.person_locations['' + person_id] = person_location;
                 mapController.map.setCenter(mapController.mapOrigin);
                 google.maps.event.addListener(
-		    marker,
-		    'click', function() {
-			mapController.highlightPerson(marker.person_id);
+                    marker,
+                    'click', function() {
+                        mapController.highlightPerson(marker.person_id);
                         window.location.hash=('person_summary_' + marker.person_id);
-                    });
+                });
                 all_markers.push(marker);
                 /* if this is the last one, call update_all_markers() */
                 if (num_of_persons_who_can_be_geocoded == number_of_people_geocoded) {
                     update_all_markers();
                     google.maps.event.addListener(mapController.map,
-                            'idle',
-                            update_all_markers);
+                        'idle',
+                        update_all_markers);
                 }
             };
-        }
+        } // end function create_a_callback
 
         // Ask the OpenHatch Geocoder API ;-) for some geographic data, concerning a particular
         // location.
