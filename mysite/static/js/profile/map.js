@@ -1,4 +1,6 @@
-function geocode(data, callback) {
+PeopleMapController = function () { };
+
+PeopleMapController.prototype.geocode = function(data, callback) {
     var ajaxOptions = {
 	'url': '/+geocode',
 	'type': 'GET',
@@ -12,9 +14,8 @@ function geocode(data, callback) {
 	    }
     };
     $.ajax(ajaxOptions);
-}
+};
 
-PeopleMapController = function () { };
 
 PeopleMapController.prototype.initialize = function(options) {
     this.person_locations = {};
@@ -32,8 +33,6 @@ PeopleMapController.prototype.initialize = function(options) {
 
     var all_markers = [];
 
-    var geocoder =  new google.maps.Geocoder();
-    
     this.mapOrigin = new google.maps.LatLng(options.center.latitude,
 					    options.center.longitude);
     var myOptions = {
@@ -76,63 +75,65 @@ PeopleMapController.prototype.initialize = function(options) {
             return function(json_data, it_worked) {
                 number_of_people_geocoded += 1;
 
-		if (! it_worked) {
-		    console.log('boom');
-		    num_of_persons_who_can_be_geocoded -=1;
-		    return;
-		}
-		console.log('onwards');
-		console.log(json_data);
-		var person_location = new google.maps.LatLng(json_data['latitude'],
-							     json_data['longitude']);
-		
+                if (! it_worked) {
+                    console.log('boom');
+                    num_of_persons_who_can_be_geocoded -=1;
+                    return;
+                }
+                console.log('onwards');
+                console.log(json_data);
+                var person_location = new google.maps.LatLng(json_data['latitude'],
+                    json_data['longitude']);
+
                 var marker = new google.maps.Marker(
-		    {
+                    {
                         'map': mapController.map, 
                         'title': person_name,
                         'person_id': person_id,     
                         'position': person_location
-                    });
+                });
                 mapController.person_locations['' + person_id] = person_location;
                 mapController.map.setCenter(mapController.mapOrigin);
                 google.maps.event.addListener(
-		    marker,
-		    'click', function() {
-			mapController.highlightPerson(marker.person_id);
+                    marker,
+                    'click', function() {
+                        mapController.highlightPerson(marker.person_id);
                         window.location.hash=('person_summary_' + marker.person_id);
-                    });
+                });
                 all_markers.push(marker);
                 /* if this is the last one, call update_all_markers() */
                 if (num_of_persons_who_can_be_geocoded == number_of_people_geocoded) {
                     update_all_markers();
                     google.maps.event.addListener(mapController.map,
-                            'idle',
-                            update_all_markers);
+                        'idle',
+                        update_all_markers);
                 }
             };
-        }
+        } // end function create_a_callback
 
         // Ask the OpenHatch Geocoder API ;-) for some geographic data, concerning a particular
         // location.
-        geocode( { 'address': location_name},
+        this.geocode( { 'address': location_name},
                 create_a_callback(this, name, person_id));
-    }
+    } // end for loop
 
-    function update_people_count() {
-            //when you can see everyone, this text should be different
-            var people_shown_string = "" ;
-            var str;
-            var count = $("#people-list li:visible").size();
-            switch (count) {
-                case 1: str = "<strong>1</strong> person in this area"; break;
-                case 0: str = "<strong>nobody</strong> in this area"; break;
-                case num_of_persons_who_can_be_geocoded:
-                        str = "<strong>" + num_of_persons_who_can_be_geocoded + "</strong> people";
-                        break;
-                default: str = "<strong>" + count + "</strong> people in this area" ;
-            }
-            $('#people-count').html(str);
-    }
+    update_people_count = function () {
+        $('.hide_once_map_loads').hide();
+        $('.dont_show_until_map_loads').show();
+        var mappedPeople_count = $("#people-list li:visible").size();
+
+        var str = mappedPeople_count;
+        if (mappedPeople_count == num_of_persons_who_can_be_geocoded) {
+            str = "Everybody";
+        }
+        if (mappedPeople_count == 0) {
+            str = "Nobody";
+        }
+        $('#how_many_people_are_visible_label').show();
+        $('#how_many_people_are_visible').text(str);
+    } // end function update_people_count
+
+    this.updatePeopleCount = update_people_count;
 
     function generate_update_all_markers(map) {
         return function() {
@@ -146,7 +147,6 @@ PeopleMapController.prototype.initialize = function(options) {
 
                     // If the person bullet is hidden,
                     if($person_summary.is(':visible') === false) {
-
                         $person_summary.show();
                     }
                     shown_this_many += 1;
@@ -157,7 +157,8 @@ PeopleMapController.prototype.initialize = function(options) {
             }
             update_people_count();
         };
-    }
+    } // end function generate_update_all_markers
+
     update_all_markers = generate_update_all_markers(this.map);
     google.maps.event.addListener(this.map,
             'bound_changed',
@@ -197,30 +198,7 @@ PeopleMapController.prototype.bindClickHandlersToPeopleListItems = function() {
         
         // Center the map on their marker.
 
-    };
+    }; // end function "handler"
     $('#people-list li').click(handler);
     $('#people-list li').hoverClass('hover');
 };
-
-/*
-function resizeDivs(id1, id2) {
-	var div1 = $('#'+id1).get[0];
-	var div2 = $('#'+id2).get[0];
-	var height = 0;
-	var heightMinus = 132;
-	
-	// get height of window
-	if (window.innerHeight) {
-		height = window.innerHeight - 18;
-	} else if (document.documentElement && document.documentElement.clientHeight) {
-		height = document.documentElement.clientHeight;
-		heightMinus = 187;
-	} else if (document.body && document.body.clientHeight) {
-		height = document.body.clientHeight;
-	}
-	
-	div1.style.height = Math.round(height - heightMinus) + "px";
-	div2.style.height = Math.round(height - heightMinus) + "px";
-}
-	window.onresize = function() { resizeDivs('people-list', 'map_canvas'); }
-*/

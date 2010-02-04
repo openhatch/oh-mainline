@@ -20,7 +20,7 @@ People
     <div id='search'>
         <div class='keyword field'>
             <label for='search_profiles'>Search for</label>
-            <input id='search_profiles' type='text' value="{{q}}" name="q">
+            <input id='search_profiles' type='text' value="{{ q }}" name="q">
         </div>
         <div class='location field'>
           <div class="input-and-labels">
@@ -33,43 +33,73 @@ People
         <div class='stubmit field'>
           <div class="input-and-labels">
             <label for='search_locations'>&nbsp;</label>
-            <input id="center_the_map" type="submit" value="Go"/>
+            <input id="center_the_map" type="submit" value="Search"/>
 	  </div>
         </div>
 	    
     </div>
 </form>
-    <div id='search_summary'>Showing <span id="people-count">(loading...)</span>{% if q %}who have listed &lsquo;<strong>{{q}}</strong>&rsquo; on their profiles{% endif %}.
-      {% for project in projects_that_match_q %}
-      <div class='project-yeller'>
-      &lsquo;{{project.name}}&rsquo; also refers to <a href='?q=project:{{project.name|urlencode}}'>a project with {{ project.get_contributors|length}} contributor{{ project.get_contributors|length|pluralize}}.</a>
-      </div>
-      {% endfor %}
-    </div>
+    <div id='search_summary'>
+        People 
+        {% if q %}
+            {# If there's a query, tell us the people who match it. #}
+            {% ifequal query_type 'tag' %}
+                tagged with 
+            {% endifequal %}
+            {% ifequal query_type 'project' %}
+                who have contributed to 
+            {% endifequal %}
+            &lsquo;<strong>{{ q }}</strong>&rsquo;:
+        {% else %}
+            {% comment %}
+                If there's *no query*, we list *everybody* in the DB on this page.
+            {% endcomment %}
+            on OpenHatch: 
+        {% endif %}
+        <strong id='people-count'>{{ people|length }}</strong>.
+
+        {% comment %}
+            Javascript fills these in when the map changes.
+        {% endcomment %}
+        <span class='hide_once_map_loads'>Loading map...</span>
+        <span class='dont_show_until_map_loads'>
+            <span id='how_many_people_are_visible_label'>
+                Currently visible on the map:
+            </span>
+            <strong id='how_many_people_are_visible'></strong>.
+            <a href='' {# refresh the page #} id='show_everybody'>(Show everybody.)</a>
+        </span>
+
+        {% for project in projects_that_match_q %}
+            <div class='project-yeller'>
+                &lsquo;{{ project.name }}&rsquo; also refers to <a href='?q=project:{{project.name|urlencode}}'>a project with {{ project.get_contributors|length}} contributor{{ project.get_contributors|length|pluralize}}.</a>
+            </div><!-- /.project-yeller -->
+        {% endfor %}
+    </div><!-- /#search_summary -->
     <ul class='suggestions'>
-                {% for what_kind_of_thing, list_of_things in suggestions %}
-                    <li>
-                        <span class='introduce_suggestions'>Popular
-                            {{ what_kind_of_thing }}:</span>
-                        <ul>
-                            {% for thing in list_of_things|slice:":3" %}
-                                <li>
-                                    <a href='?q={{ what_kind_of_thing|urlencode }}:{{ thing|urlencode }}'>
-                                      <span class="this_part_gets_underlined">{{ thing }}</span><small> (8)</small></a>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                        <ul>
-                            {% for thing in list_of_things|slice:"3:" %}
-                                <li>
-                                    <a href='?q={{ what_kind_of_thing|urlencode }}:{{ thing|urlencode }}'>
-                                        <span class="this_part_gets_underlined">{{ thing }}</span><small> (8)</small></a>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </li>
-                {% endfor %}
-            </ul>
+        {% for what_kind_of_thing, list_of_things in suggestions %}
+            <li>
+                <span class='introduce_suggestions'>Popular
+                    {{ what_kind_of_thing }}:</span>
+                <ul>
+                    {% for thing in list_of_things|slice:":3" %}
+                        <li>
+                            <a href='?q={{ what_kind_of_thing|urlencode }}:{{ thing|urlencode }}'>
+                                <span class="this_part_gets_underlined">{{ thing }}</span><small> (8)</small></a>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <ul>
+                    {% for thing in list_of_things|slice:"3:" %}
+                        <li>
+                            <a href='?q={{ what_kind_of_thing|urlencode }}:{{ thing|urlencode }}'>
+                                <span class="this_part_gets_underlined">{{ thing }}</span><small> (8)</small></a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endfor %}
+    </ul><!-- /.suggestions -->
     {% if q %}
     <div id='refine_search'>
         <h3>Related searches</h3>

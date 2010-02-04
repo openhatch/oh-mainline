@@ -5,10 +5,10 @@ from django.core.handlers.wsgi import WSGIHandler
 from django.core.servers.basehttp import AdminMediaHandler 
 from StringIO import StringIO
 from django.test.client import Client
+import mysite.base.helpers
 import mock
 
 import mysite.base.controllers
-import mysite.base.helpers
 
 def twill_setup():
     app = AdminMediaHandler(WSGIHandler())

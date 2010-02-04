@@ -6,14 +6,7 @@ import datetime
 import urllib
 import simplejson
 import re
-from odict import odict
 import collections
-import difflib
-import os
-import tempfile
-import random
-import Image
-import urlparse
 
 # Django
 from django.template.loader import render_to_string
@@ -21,13 +14,10 @@ from django.core import serializers
 from django.http import \
         HttpResponse, HttpResponseRedirect, HttpResponseServerError
 from django.shortcuts import \
-        render_to_response, get_object_or_404, get_list_or_404
+        render_to_response, get_object_or_404
 import django.contrib.auth 
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from django.conf import settings
-from django.core.files.images import get_image_dimensions
-from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.core.cache import cache
@@ -39,19 +29,12 @@ import haystack.query
 import mysite.base.controllers
 import mysite.profile.controllers
 import mysite.base.helpers
-from mysite.customs import ohloh
 from mysite.profile.models import \
-        Person, \
-        Tag, TagType, \
-        Link_Project_Tag, \
-        Link_SF_Proj_Dude_FM, Link_Person_Tag, \
-        DataImportAttempt, \
-        PortfolioEntry, Citation
+        Person, Tag, TagType, \
+        Link_Project_Tag, Link_Person_Tag, \
+        DataImportAttempt, PortfolioEntry, Citation
 from mysite.search.models import Project
 from mysite.base.decorators import view
-
-# This app
-import forms
 import mysite.profile.forms
 # }}}
 
@@ -329,6 +312,9 @@ def people(request):
     # pull in q from GET
     data['q'] = request.GET.get('q', '')
 
+    # this will probably be replaced once we throw in solr
+    data['query_type'] = 'tag'
+
     # Figure out which projects happen to match that
     
     projects_that_match_q = []
@@ -493,20 +479,6 @@ def replace_icon_with_default(request):
     data['success'] = True
     data['portfolio_entry__pk'] = portfolio_entry.pk
     return mysite.base.helpers.json_response(data)
-
-@login_required
-def import_do(request):
-    # {{{
-    # This is POSTed to when you want to start
-    # a background job that gets some data from Ohloh.
-
-    # So naturally we should create that job:
-    import_commits_by_commit_username(request)
-
-    # and then just redirect to the profile page
-    return HttpResponseRedirect('/people/%s' % urllib.quote(
-            request.user.username))
-    # }}}
 
 @login_required
 def prepare_data_import_attempts_do(request):
