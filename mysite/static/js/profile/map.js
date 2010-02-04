@@ -118,19 +118,24 @@ PeopleMapController.prototype.initialize = function(options) {
     } // end for loop
 
     function update_people_count() {
-            //when you can see everyone, this text should be different
-            var people_shown_string = "" ;
-            var str;
-            var count = $("#people-list li:visible").size();
-            switch (count) {
-                case 1: str = "<strong>1</strong> person in this area"; break;
-                case 0: str = "<strong>nobody</strong> in this area"; break;
-                case num_of_persons_who_can_be_geocoded:
-                        str = "<strong>" + num_of_persons_who_can_be_geocoded + "</strong> people";
-                        break;
-                default: str = "<strong>" + count + "</strong> people in this area" ;
-            }
-            $('#people-count').html(str);
+        alert('yo');
+        //when you can see everyone, this text should be different
+        var people_shown_string = "" ;
+        var mappedPeople_count = $("#people-list li:visible").size();
+
+        var str = mappedPeople_count;
+        console.log('mappedPeople_count', mappedPeople_count);
+        if (mappedPeople_count == num_of_persons_who_can_be_geocoded) {
+            str = "Everybody";
+            $('#how_many_people_are_visible_label').hide();
+            $('#how_many_people_are_visible').text(mappedPeople_count);
+            return;
+        }
+        if (mappedPeople_count == 0) {
+            str = "Nobody";
+        }
+        $('#how_many_people_are_visible_label').show();
+        $('#how_many_people_are_visible').text(mappedPeople_count);
     } // end function update_people_count
 
     function generate_update_all_markers(map) {
