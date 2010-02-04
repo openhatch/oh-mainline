@@ -326,6 +326,9 @@ def people(request):
     # pull in q from GET
     data['q'] = request.GET.get('q', '')
 
+    # this will probably be replaced once we throw in solr
+    data['query_type'] = 'tag'
+
     # Figure out which projects happen to match that
     
     projects_that_match_q = []
