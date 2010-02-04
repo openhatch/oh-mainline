@@ -201,6 +201,10 @@ urlpatterns = patterns('',
 
         (r'^\+geocode$', 'mysite.base.views.geocode'),
 
+                       (r'^hearch/', include('haystack.urls')),
+
+
+
         # This dangerous regex is last
         (r'^people/(?P<user_to_display__username>[^/]+)[/?]$',
                 'mysite.profile.views.display_person_web'),
