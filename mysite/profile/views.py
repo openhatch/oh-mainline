@@ -349,14 +349,13 @@ def people(request):
 
         mappable_people_from_haystack.load_all()
     
-        mappable_people = [x.object for x in mappable_people_from_haystack]
+        mappable_people = sorted([x.object for x in mappable_people_from_haystack],
+                                 key=lambda x: x.user.username)
     else:
         everybody = Person.objects.all()
         mappable_filter = ( ~Q(location_display_name='') & Q(location_confirmed=True) )
-        mappable_people = everybody.filter(mappable_filter)
-
-    # always order by username
-    mappable_filter = mappable_filter.order_by('user__username')
+        mappable_people = everybody.filter(mappable_filter).order_by(
+            'user__username')
 
     # filter by query, if it is set
     data['people'] = mappable_people
