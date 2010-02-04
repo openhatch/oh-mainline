@@ -118,7 +118,8 @@ PeopleMapController.prototype.initialize = function(options) {
     } // end for loop
 
     update_people_count = function () {
-        $('#map-loading').hide();
+        $('.hide_once_map_loads').hide();
+        $('.dont_show_until_map_loads').show();
         var mappedPeople_count = $("#people-list li:visible").size();
 
         var str = mappedPeople_count;

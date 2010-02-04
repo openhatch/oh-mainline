@@ -74,4 +74,4 @@ body#people-map #people-list .people-list-column { padding: 10px; width:45%; }
 body#people-map #people-list li .what_matched_the_search { font-size: .9em; font-weight: normal; color: #333; }
 body#people-map #people-list li .username { font-size: .9em; color: #333; font-weight: normal; }
 body#people-map .project-yeller { padding-top: 10px; }
-
+body#people-map .dont_show_until_map_loads{ display: none; }

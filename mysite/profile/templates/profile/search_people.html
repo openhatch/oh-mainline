@@ -40,30 +40,35 @@ People
     </div>
 </form>
     <div id='search_summary'>
+        People 
         {% if q %}
             {# If there's a query, tell us the people who match it. #}
             {% ifequal query_type 'tag' %}
-                People tagged with &lsquo;<strong>{{ q }}</strong>&rsquo;.
+                tagged with 
             {% endifequal %}
             {% ifequal query_type 'project' %}
-                People who have contributed to &lsquo;<strong>{{ q }}</strong>&rsquo;.
+                who have contributed to 
             {% endifequal %}
+            &lsquo;<strong>{{ q }}</strong>&rsquo;:
         {% else %}
             {% comment %}
                 If there's *no query*, we list *everybody* in the DB on this page.
             {% endcomment %}
-            People on OpenHatch: <strong id='people-count'>{{ people|length }}</strong>.
+            on OpenHatch: 
         {% endif %}
+        <strong id='people-count'>{{ people|length }}</strong>.
 
         {% comment %}
             Javascript fills these in when the map changes.
         {% endcomment %}
-        <span id='map-loading'>Loading map...</span>
-        <span id='how_many_people_are_visible_label'>
-            Currently visible on the map:
+        <span class='hide_once_map_loads'>Loading map...</span>
+        <span class='dont_show_until_map_loads'>
+            <span id='how_many_people_are_visible_label'>
+                Currently visible on the map:
+            </span>
+            <strong id='how_many_people_are_visible'></strong>.
+            <a href='' {# refresh the page #} id='show_everybody'>(Show everybody.)</a>
         </span>
-        <strong id='how_many_people_are_visible'></strong>.
-        <a href='' {# refresh the page #} id='show_everybody'>(Show everybody.)</a>
 
         {% for project in projects_that_match_q %}
             <div class='project-yeller'>
