@@ -86,8 +86,7 @@ PeopleMapController.prototype.initialize = function(options) {
 		var person_location = new google.maps.LatLng(json_data['latitude'],
 							     json_data['longitude']);
 		
-                var marker = new google.maps.Marker(
-		    {
+                var marker = new google.maps.Marker({
                         'map': mapController.map, 
                         'title': person_name,
                         'person_id': person_id,     
