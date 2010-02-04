@@ -10,7 +10,7 @@
     <ul id='topnavlinks'>
         <li><a href='{% url mysite.search.views.fetch_bugs %}'>volunteer opportunities</a></li>
         <li><a href='{% url mysite.project.views.projects %}'>{% if the_user.is_authenticated %} all {% endif %} projects</a></li>
-        <li><a href='{% url mysite.profile.views.people_map%}'>{% if the_user.is_authenticated %} all {% endif %} people</a></li>
+        <li><a href='{% url mysite.profile.views.people%}'>{% if the_user.is_authenticated %} all {% endif %} people</a></li>
         {% if the_user.is_authenticated %}
         <li><a href='{% url mysite.profile.views.display_person_web the_user.username %}'>profile</a></li>
         <li><a href='{% url mysite.base.views.home %}'>home</a></li>

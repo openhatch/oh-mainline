@@ -30,9 +30,7 @@ from django.core.files.images import get_image_dimensions
 from django.contrib.sites.models import Site
 from django.core.urlresolvers import reverse
 from django.db.models import Q
-
-# OpenHatch global
-from django.conf import settings
+from django.core.cache import cache
 
 # OpenHatch apps
 import mysite.base.controllers
@@ -300,11 +298,13 @@ def ask_for_tag_input(request, username):
     return display_person_web(request, username, 'tags', edit='1')
     # }}}
 
-def cut_list_of_people_in_to_columns(people):
+def cut_list_of_people_in_three_columns(people):
     third = len(people)/3
     return [people[0:third], people[third:(third*2)], people[(third*2):]]
 
-
+def cut_list_of_people_in_two_columns(people):
+    half = len(people)/2
+    return [people[0:half], people[half:]]
     
 
 @view
@@ -312,35 +312,44 @@ def display_list_of_people_who_match_some_search(request, property, value):
     '''Property is the "tag name", and "value" is the text in it.'''
     peeps = mysite.profile.controllers.people_matching(property, value)
     data = {}
-    data['people_columns'] = cut_list_of_people_in_to_columns(peeps)
+    data['people_columns'] = cut_list_of_people_in_three_columns(peeps)
     data['property'] = property
     data['value'] = value
     return (request, 'profile/search_people.html', data)
 
 @view
-def display_list_of_people(request):
+def people(request):
     """Display a list of people."""
     # {{{
     data = {}
-    data['people_columns'] = cut_list_of_people_in_to_columns(Person.objects.all().order_by('user__username'))
-    return (request, 'profile/search_people.html', data)
-    # }}}
 
-@view
-def people_map(request):
-    data = {}
+    # pull in q from GET
+    data['q'] = request.GET.get('q', '')
 
+    # Figure out which projects happen to match that
+    
+    projects_that_match_q = []
+    for word in data['q'].split(): # FIXME: Tokenize smarter, one day
+        name_matches = Project.objects.filter(name__iexact=word)
+        for project in name_matches:
+            if project.get_contributors():
+                # only add those projects that have people in them
+                projects_that_match_q.append(project)
+    data['projects_that_match_q'] = projects_that_match_q
+
+    # Get the list of people to display.
     everybody = Person.objects.all()
-    mappable = ( ~Q(location_display_name='') & Q(location_confirmed=True) )
-    data['people'] = everybody.filter(mappable).order_by('user__username')
-    data['person_id2data_as_json'] = simplejson.dumps(dict([
-                (person.pk, {'name': person.get_full_name_or_username(),
-                             'location': person.location_display_name})
-            for person in Person.objects.all()
-            if person.location_display_name]))
+    mappable_filter = ( ~Q(location_display_name='') & Q(location_confirmed=True) )
+    mappable_people = everybody.filter(mappable_filter).order_by('user__username')
+    data['people'] = mappable_people
+    get_relevant_person_data = lambda p: (
+            {'name': p.get_full_name_or_username(),
+            'location': p.location_display_name})
+    person_id2data = dict([(person.pk, get_relevant_person_data(person))
+            for person in mappable_people])
+    data['person_id2data_as_json'] = simplejson.dumps(person_id2data)
     data['test_js'] = request.GET.get('test', None)
-    data['num_of_persons_with_locations'] = len([p for p in Person.objects.all()
-                                                 if p.location_display_name])
+    data['num_of_persons_with_locations'] = len(person_id2data)
     if request.GET.get('center', False):
         data['center_json'] = mysite.base.controllers.cached_geocoding_in_json(
             request.GET.get('center', ''))
@@ -349,8 +358,44 @@ def people_map(request):
             data['geocode_failed'] = True;
         data['center_name'] = request.GET.get('center', '')
         data['center_name_json'] = simplejson.dumps(request.GET.get('center', ''))
-    return (request, 'profile/map.html', data)
 
+    suggestion_count = 6
+
+    cache_timespan = 86400 * 7
+    #if settings.DEBUG:
+    #    cache_timespan = 0
+
+    key_name = 'most_popular_projects'
+    popular_projects = cache.get(key_name)
+    if popular_projects is None:
+        projects = Project.objects.all()
+        popular_projects = sorted(projects, key=lambda proj: len(proj.get_contributors())*(-1))[:suggestion_count]
+        #extract just the names from the projects
+        popular_projects = [project.name for project in popular_projects]
+        # cache it for a week
+        cache.set(key_name, popular_projects, cache_timespan)
+
+    key_name = 'most_popular_tags'
+    popular_tags = cache.get(key_name)
+    if popular_tags is None:
+        # to get the most popular tags:
+            # get all tags
+            # order them by the number of people that list them
+            # remove duplicates
+        tags = Tag.objects.all()
+        #lowercase them all and then remove duplicates
+        tags_with_no_duplicates = list(set(map(lambda tag: tag.name.lower(), tags)))
+        #take the popular ones
+        popular_tags = sorted(tags_with_no_duplicates, key=lambda tag_name: len(Tag.get_people_by_tag_name(tag_name))*(-1))[:suggestion_count]
+        # cache it for a week
+        cache.set(key_name, popular_tags, cache_timespan)
+
+    data['suggestions'] = [
+        ('projects', popular_projects),
+        ('profile tags', popular_tags)]
+
+    return (request, 'profile/search_people.html', data)
+    # }}}
 
 def gimme_json_for_portfolio(request):
     "Get JSON used to live-update the portfolio editor."
