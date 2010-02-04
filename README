@@ -82,3 +82,13 @@ Start from milestone-a. Run these commands:
 	gunzip GeoLiteCity.dat.gz
 
 Ta-da. In theory we/you should do that every month, when MaxMind does a refresh.
+
+== People search ==
+
+People search uses Solr. We use Haystack for managing Solr.
+
+=== Create its schema ===
+
+=== Load its index ===
+
+
