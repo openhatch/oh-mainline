@@ -150,9 +150,6 @@ urlpatterns = patterns('',
         (r'^profile/views/delete_portfolio_entry_do$',
                 'mysite.profile.views.delete_portfolio_entry_do'),
 
-        (r'^people/import/do$',
-            'mysite.profile.views.import_do'),
-
         (r'^people/portfolio/import/$',
                 'mysite.profile.views.importer'),
 
