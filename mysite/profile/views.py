@@ -303,6 +303,73 @@ def display_list_of_people_who_match_some_search(request, property, value):
     data['value'] = value
     return (request, 'profile/search_people.html', data)
 
+def tag_type_query2mappable_orm_people(tag_type_short_name, data):
+    lollerskates
+
+def all_tags_query2mappable_orm_people(parsed_query):
+    # do three queries...
+    # the values are set()s containing ID numbers of Django ORM Person objects
+    queries_in_order = ['can_mentor_lowercase_exact',
+                        'seeking_lowercase_exact',
+                        'understands_lowercase_exact']
+    query2results = {queries_in_order[0]: set(),
+                     queries_in_order[1]: set(),
+                     queries_in_order[2]: set()}
+    for query in query2results:
+        # ask haystack...
+        mappable_people_from_haystack = haystack.query.SearchQuerySet().all()
+        mappable_people_from_haystack = mappable_people_from_haystack.filter(**{query: parsed_query['q']})
+        
+        mappable_people_from_haystack.load_all()
+                
+        results = [x.object for x in mappable_people_from_haystack]
+        query2results[query] = results
+
+        ### mappable_people
+        mappable_people_set = set()
+        for result_set in query2results.values():
+            mappable_people_set.update(result_set)
+
+        ### and sort it the way everyone expects
+        mappable_people = sorted(mappable_people_set, key=lambda p: p.user.username.lower())
+
+        ### Justify your existence time: Why is each person a valid match?
+        for person in mappable_people:
+            person.reasons = [query for query in queries_in_order
+                              if person in query2results[query]]
+
+            # now we have to clean this up. First, remove teh _lowercase_exact from the end
+            person.reasons = [ s.replace('_lowercase_exact', '') for s in person.reasons]
+            # then make it the human readable form as said by the TagType dict
+            person.reasons = [TagType.short_name2long_name[s] for s in person.reasons]
+
+    return mappable_people
+
+def query2results(parsed_query):
+    query_type2executor = {
+        'project': project_query2mappable_orm_people,
+        'all_tags': all_tags_query2mappable_orm_people}
+    
+    # Now add to that the TagType-based queries
+    for short_name in mysite.profile.models.TagType.short_name2long_name:
+        query_type2executor[short_name] = lambda parsed_query: tag_type_query2mappable_orm_people(short_name, parsed_query)
+
+    desired_query_type = parsed_query['query_type']
+    return query_type2executor[desired_query_type](parsed_query)
+
+def project_query2mappable_orm_people(parsed_query):
+    assert parsed_query['query_type'] == 'project'
+    mappable_people_from_haystack = haystack.query.SearchQuerySet().all()
+    haystack_field_name = 'all_public_projects_lowercase_exact'
+    mappable_people_from_haystack = mappable_people_from_haystack.filter(
+        **{haystack_field_name: parsed_query['q'].lower()})
+    
+    mappable_people_from_haystack.load_all()
+    
+    mappable_people = sorted([x.object for x in mappable_people_from_haystack],
+                             key=lambda x: x.user.username)
+    return mappable_people
+
 @view
 def people(request):
     """Display a list of people."""
@@ -313,12 +380,13 @@ def people(request):
     query = request.GET.get('q', '')
 
     data['raw_query'] = query
-    data.update(mysite.profile.controllers.parse_string_query(query))
+    parsed_query = mysite.profile.controllers.parse_string_query(query)
+    data.update(parsed_query)
 
-    if data['query_type'] != 'project':
+    if parsed_query['query_type'] != 'project':
         # Figure out which projects happen to match that
         projects_that_match_q_exactly = []
-        for word in [data['q']]: # This is now tokenized smartly.
+        for word in [parsed_query['q']]: # This is now tokenized smartly.
             name_matches = Project.objects.filter(name__iexact=word)
             for project in name_matches:
                 if project.cached_contributor_count:
@@ -328,56 +396,9 @@ def people(request):
 
     # Get the list of people to display.
 
-    if data['q'].strip():
-        mappable_people_from_haystack = haystack.query.SearchQuerySet().all()
-        
-        if data['query_type'] == 'project':
-            haystack_field_name = 'all_public_projects_lowercase_exact'
-            mappable_people_from_haystack = mappable_people_from_haystack.filter(
-                **{haystack_field_name: data['q'].lower()})
+    if parsed_query['q'].strip():
 
-            mappable_people_from_haystack.load_all()
-    
-            mappable_people = sorted([x.object for x in mappable_people_from_haystack],
-                                     key=lambda x: x.user.username)
-        else:
-            assert data['query_type'] == 'all_tags'
-
-            # do three queries...
-            # the values are set()s containing ID numbers of Django ORM Person objects
-            queries_in_order = ['can_mentor_lowercase_exact',
-                                'seeking_lowercase_exact',
-                                'understands_lowercase_exact']
-            query2results = {queries_in_order[0]: set(),
-                             queries_in_order[1]: set(),
-                             queries_in_order[2]: set()}
-            for query in query2results:
-                # ask haystack...
-                mappable_people_from_haystack = haystack.query.SearchQuerySet().all()
-                mappable_people_from_haystack = mappable_people_from_haystack.filter(**{query: data['q']})
-                
-                mappable_people_from_haystack.load_all()
-
-                results = [x.object for x in mappable_people_from_haystack]
-                query2results[query] = results
-
-            ### mappable_people
-            mappable_people_set = set()
-            for result_set in query2results.values():
-                mappable_people_set.update(result_set)
-
-            ### and sort it the way everyone expects
-            mappable_people = sorted(mappable_people_set, key=lambda p: p.user.username.lower())
-
-            ### Justify your existence time: Why is each person a valid match?
-            for person in mappable_people:
-                person.reasons = [query for query in queries_in_order
-                                  if person in query2results[query]]
-
-                # now we have to clean this up. First, remove teh _lowercase_exact from the end
-                person.reasons = [ s.replace('_lowercase_exact', '') for s in person.reasons]
-                # then make it the human readable form as said by the TagType dict
-                person.reasons = [TagType.short_name2long_name[s] for s in person.reasons]
+        mappable_people = query2results(parsed_query)
 
     else:
         everybody = Person.objects.all()
