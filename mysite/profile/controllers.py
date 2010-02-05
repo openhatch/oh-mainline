@@ -75,3 +75,13 @@ def get_geoip_guess_for_ip(ip_as_string):
     if as_unicode:
         return True, as_unicode
     return False, u''
+
+def parse_string_query(s):
+    parsed = {}
+    if s.startswith('project:'):
+        parsed['query_type'] = 'project'
+        parsed['q'] = s.split(':',1)[1]
+    else:
+        parsed['query_type'] = 'all_tags'
+        parsed['q'] = s
+    return parsed

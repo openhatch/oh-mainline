@@ -20,7 +20,7 @@ People
     <div id='search'>
         <div class='keyword field'>
             <label for='search_profiles'>Search for</label>
-            <input id='search_profiles' type='text' value="{{ q }}" name="q">
+            <input id='search_profiles' type='text' value="{{ raw_query }}" name="q">
         </div>
         <div class='location field'>
           <div class="input-and-labels">
@@ -43,11 +43,11 @@ People
         People 
         {% if q %}
             {# If there's a query, tell us the people who match it. #}
-            {% ifequal query_type 'tag' %}
+            {% ifequal query_type 'all_tags' %}
                 tagged with 
             {% endifequal %}
             {% ifequal query_type 'project' %}
-                who have contributed to 
+                who have contributed to projects matching
             {% endifequal %}
             &lsquo;<strong>{{ q }}</strong>&rsquo;:
         {% else %}
