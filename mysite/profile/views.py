@@ -330,16 +330,55 @@ def people(request):
 
     if data['q'].strip():
         mappable_people_from_haystack = haystack.query.SearchQuerySet().all()
-        query_type2haystack_field_name = {'all_tags': 'all_tag_texts', 
-                'project': 'all_public_projects_exact'}
-        haystack_field_name = query_type2haystack_field_name[data['query_type']]
-        mappable_people_from_haystack = mappable_people_from_haystack.filter(
+        
+        if data['query_type'] == 'project':
+            haystack_field_name = 'all_public_projects_lowercase_exact'
+            mappable_people_from_haystack = mappable_people_from_haystack.filter(
                 **{haystack_field_name: data['q'].lower()})
 
-        mappable_people_from_haystack.load_all()
+            mappable_people_from_haystack.load_all()
     
-        mappable_people = sorted([x.object for x in mappable_people_from_haystack],
-                                 key=lambda x: x.user.username)
+            mappable_people = sorted([x.object for x in mappable_people_from_haystack],
+                                     key=lambda x: x.user.username)
+        else:
+            assert data['query_type'] == 'all_tags'
+
+            # do three queries...
+            # the values are set()s containing ID numbers of Django ORM Person objects
+            queries_in_order = ['can_mentor_lowercase_exact',
+                                'seeking_lowercase_exact',
+                                'understands_lowercase_exact']
+            query2results = {queries_in_order[0]: set(),
+                             queries_in_order[1]: set(),
+                             queries_in_order[2]: set()}
+            for query in query2results:
+                # ask haystack...
+                mappable_people_from_haystack = haystack.query.SearchQuerySet().all()
+                mappable_people_from_haystack = mappable_people_from_haystack.filter(**{query: data['q']})
+                
+                mappable_people_from_haystack.load_all()
+
+                results = [x.object for x in mappable_people_from_haystack]
+                query2results[query] = results
+
+            ### mappable_people
+            mappable_people_set = set()
+            for result_set in query2results.values():
+                mappable_people_set.update(result_set)
+
+            ### and sort it the way everyone expects
+            mappable_people = sorted(mappable_people_set, key=lambda p: p.user.username.lower())
+
+            ### Justify your existence time: Why is each person a valid match?
+            for person in mappable_people:
+                person.reasons = [query for query in queries_in_order
+                                  if person in query2results[query]]
+
+                # now we have to clean this up. First, remove teh _lowercase_exact from the end
+                person.reasons = [ s.replace('_lowercase_exact', '') for s in person.reasons]
+                # then make it the human readable form as said by the TagType dict
+                person.reasons = [TagType.short_name2long_name[s] for s in person.reasons]
+
     else:
         everybody = Person.objects.all()
         mappable_filter = ( ~Q(location_display_name='') & Q(location_confirmed=True) )

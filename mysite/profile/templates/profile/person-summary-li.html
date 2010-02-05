@@ -27,9 +27,11 @@
             {% endif %}
         </div>
 
+	{% if q %}
         <div class="what_matched_the_search">
-            understands and can pitch in with Python
+          {{ person.reasons|join:" and " }} {{ q }}
         </div>
+	{% endif %}
 
         {% if person.location_display_name and person.location_confirmed %}
         <div class="location">

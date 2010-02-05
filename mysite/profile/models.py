@@ -18,6 +18,7 @@ import sys
 import uuid
 import urllib
 import random
+import collections
 
 def url2printably_short(url, CUTOFF=50):
     short_enough_pieces_so_far = []
@@ -171,6 +172,9 @@ class Person(models.Model):
         return sum([list(pfe.get_published_citations())
             for pfe in self.get_published_portfolio_entries()], [])
 
+    def calculate_summary(self, tag_text):
+        return ''
+
     def get_tag_texts_for_map(self):
         """Return a list of Tags linked to this Person.  Tags that would be useful from the map view of the people list"""
         exclude_me = TagType.objects.filter(name__in=['understands_not', 'studying'])
@@ -187,6 +191,18 @@ class Person(models.Model):
                 already_added.add(lowered)
         to_return.sort() # side-effect-y sort()
         return to_return
+
+    def get_tags_as_dict(self):
+        ret = collections.defaultdict(set)
+        for link in Link_Person_Tag.objects.filter(person=self):
+            ret[link.tag.tag_type.name].add(link.tag.text.lower())
+        return ret
+
+    def get_tag_descriptions_for_keyword(self, keyword):
+        keyword = keyword.lower()
+        d = self.get_tags_as_dict()
+        return sorted([TagType.short_name2long_name[short]
+                       for short in [key for key in d if (keyword in d[key])]])
 
     def get_tags_for_recommendations(self):
         """Return a list of Tags linked to this Person.  For use with bug recommendations."""
@@ -316,6 +332,9 @@ models.signals.pre_save.connect(reject_when_query_is_only_whitespace, sender=Dat
 
 class TagType(models.Model):
     # {{{
+    short_name2long_name = {'understands': 'understands',
+                            'can_mentor': 'can mentor in',
+                            'seeking': 'can pitch in with'}
     name = models.CharField(max_length=100)
 
     def __unicode__(self):

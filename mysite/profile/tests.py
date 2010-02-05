@@ -1361,6 +1361,31 @@ class MapTagsRemoveDuplicates(TwillTests):
         self.assertEqual(map(lambda x: x.lower(), pp.get_tag_texts_for_map()),
                          map(lambda x: x.lower(), ['something I understand']))
 
+class PersonCanExplainTagSummary(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def test(self):
+        pp = Person.objects.get(user__username='paulproteus')
+
+        understands = TagType(name='understands')
+        understands.save()
+        seeking = TagType(name='seeking')
+        seeking.save()
+
+        tag_i_understand = Tag(tag_type=understands, text='python')
+        tag_i_understand.save()
+        tag_seeking = Tag(tag_type=seeking, text='something I UNDERSTAND')
+        tag_seeking.save()
+        link_one = Link_Person_Tag(person=pp, tag=tag_i_understand)
+        link_one.save()
+        link_two = Link_Person_Tag(person=pp, tag=tag_i_dont)
+        link_two.save()
+        link_three = Link_Person_Tag(person=pp, tag=tag_seeking)
+        link_three.save()
+
+        self.assertEqual(map(lambda x: x.lower(), pp.get_tag_texts_for_map()),
+                         map(lambda x: x.lower(), ['something I understand']))
+
 class ProjectGetMentors(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
 

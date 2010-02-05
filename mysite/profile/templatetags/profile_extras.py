@@ -14,6 +14,10 @@ def show_other_contributors(project, user, count, **args):
             'contributors': project.get_n_other_contributors_than(count, user.get_profile()),
             }
 
+def person_tag_descriptions_for_tag_text(person, tag_text):
+    "Returns a boolean of whether the value is greater than the argument"
+    return person.get_tag_descriptions_for_keyword(tag_text)
+
 # From <http://code.djangoproject.com/wiki/BasicComparisonFilters>
 def gt(value, arg):
     "Returns a boolean of whether the value is greater than the argument"
@@ -63,3 +67,4 @@ register.filter('length_lt', length_lt)
 register.filter('length_gte', length_gte)
 register.filter('length_lte', length_lte)
 register.filter('break_long_words', break_long_words)
+register.filter('person_tag_descriptions_for_tag_text', person_tag_descriptions_for_tag_text)
