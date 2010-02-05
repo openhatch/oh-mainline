@@ -329,30 +329,29 @@ def people(request):
     # Get the list of people to display.
 
     if data['q'].strip():
-        mappable_people_from_haystack = haystack.query.SearchQuerySet().all()
+        people_from_haystack = haystack.query.SearchQuerySet().all()
         query_type2haystack_field_name = {'all_tags': 'all_tag_texts', 
                 'project': 'all_public_projects_exact'}
         haystack_field_name = query_type2haystack_field_name[data['query_type']]
-        mappable_people_from_haystack = mappable_people_from_haystack.filter(
+        people_from_haystack = people_from_haystack.filter(
                 **{haystack_field_name: data['q']})
 
-        mappable_people_from_haystack.load_all()
+        people_from_haystack.load_all()
     
-        mappable_people = sorted([x.object for x in mappable_people_from_haystack],
+        people = sorted([x.object for x in people_from_haystack],
                                  key=lambda x: x.user.username)
     else:
-        everybody = Person.objects.all()
-        mappable_filter = ( ~Q(location_display_name='') & Q(location_confirmed=True) )
-        mappable_people = everybody.filter(mappable_filter).order_by(
-            'user__username')
-
-    # filter by query, if it is set
-    data['people'] = mappable_people
+        people = Person.objects.all().order_by('user__username')
+        
+    data['people'] = people
+    DEFAULT_LOCATION = 'Inaccessible Island'
     get_relevant_person_data = lambda p: (
-            {'name': p.get_full_name_or_username(),
-            'location': p.location_display_name})
+        {'name': person.get_full_name_or_username(), 'location': location or DEFAULT_LOCATION})
     person_id2data = dict([(person.pk, get_relevant_person_data(person))
-            for person in mappable_people])
+            for person in people])
+
+    data['person_id2data_as_json'] = simplejson.dumps(person_id2data)
+
     data['person_id2data_as_json'] = simplejson.dumps(person_id2data)
     data['test_js'] = request.GET.get('test', None)
     data['num_of_persons_with_locations'] = len(person_id2data)
