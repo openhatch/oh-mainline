@@ -303,8 +303,21 @@ def display_list_of_people_who_match_some_search(request, property, value):
     data['value'] = value
     return (request, 'profile/search_people.html', data)
 
-def tag_type_query2mappable_orm_people(tag_type_short_name, data):
-    lollerskates
+def tag_type_query2mappable_orm_people(tag_type_short_name, parsed_query):
+    # ask haystack...
+    tag_type_according_to_haystack = tag_type_short_name + "_lowercase_exact"
+    mappable_people_from_haystack = haystack.query.SearchQuerySet().all()
+    mappable_people_from_haystack = mappable_people_from_haystack.filter(**{
+            tag_type_according_to_haystack: parsed_query['q']})
+
+    mappable_people_from_haystack.load_all()
+
+    mappable_people = [x.object for x in mappable_people_from_haystack]
+
+    ### and sort it the way everyone expects
+    mappable_people = sorted(mappable_people, key=lambda p: p.user.username.lower())
+
+    return mappable_people
 
 def all_tags_query2mappable_orm_people(parsed_query):
     # do three queries...
