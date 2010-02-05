@@ -345,8 +345,8 @@ def people(request):
         
     data['people'] = people
     DEFAULT_LOCATION = 'Inaccessible Island'
-    get_relevant_person_data = lambda p: (
-        {'name': person.get_full_name_or_username(), 'location': location or DEFAULT_LOCATION})
+    get_relevant_person_data = lambda p: ( {'name': p.get_full_name_or_username(), 
+        'location': p.location_display_name or DEFAULT_LOCATION})
     person_id2data = dict([(person.pk, get_relevant_person_data(person))
             for person in people])
 
