@@ -63,7 +63,6 @@ PeopleMapController.prototype.initialize = function(options) {
      * located at profile/templates/profile/map.html .)
      */
     for (var person_id in person_id2data) {
-        console.log(person_id2data.length);
         var data = person_id2data[person_id];
         var location_name = data['location'];
         var name = data['name'];
@@ -81,8 +80,6 @@ PeopleMapController.prototype.initialize = function(options) {
 		    num_of_persons_who_can_be_geocoded -=1;
 		    return;
 		}
-		console.log('onwards');
-		console.log(json_data);
 		var person_location = new google.maps.LatLng(json_data['latitude'],
 							     json_data['longitude']);
 		
@@ -141,8 +138,6 @@ PeopleMapController.prototype.initialize = function(options) {
             for (var i = 0; i < all_markers.length; i++) {
                 var marker = all_markers[i];
                 var $person_summary = $('#person_summary_' + marker.person_id);
-                console.debug("map", map);
-                console.debug("map.getBounds()", map.getBounds());
                 if (map.getBounds().contains(marker.position)) {
 
                     // If the person bullet is hidden,
