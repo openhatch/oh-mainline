@@ -11,10 +11,6 @@ class PersonIndex(indexes.SearchIndex):
     def prepare_null_document(self, person_instance):
         return '' # lollerskates
 
-    all_tag_texts = indexes.MultiValueField()
-    def prepare_all_tag_texts(self, person_instance):
-        return person_instance.get_tag_texts_for_map()
-
     studying_lowercase_exact = indexes.MultiValueField() 
     def prepare_studying_lowercase_exact(self, person_instance):
         return self._pull_lowercase_tag_texts('currently_studying', person_instance)

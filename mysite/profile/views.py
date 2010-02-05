@@ -365,7 +365,9 @@ def query2results(parsed_query):
     
     # Now add to that the TagType-based queries
     for short_name in mysite.profile.models.TagType.short_name2long_name:
-        query_type2executor[short_name] = lambda parsed_query: tag_type_query2mappable_orm_people(short_name, parsed_query)
+        def thingamabob(parsed_query, short_name=short_name):
+            return tag_type_query2mappable_orm_people(short_name, parsed_query)
+        query_type2executor[short_name] = thingamabob
 
     desired_query_type = parsed_query['query_type']
     return query_type2executor[desired_query_type](parsed_query)
