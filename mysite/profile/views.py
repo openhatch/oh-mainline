@@ -321,13 +321,15 @@ def people(request):
         for word in data['q'].split(): # FIXME: Tokenize smarter, one day
             name_matches = Project.objects.filter(name__iexact=word)
             for project in name_matches:
-                if project.get_contributors():
+                if project.cached_contributor_count:
                     # only add those projects that have people in them
                     projects_that_match_q_exactly.append(project)
         data['projects_that_match_q_exactly'] = projects_that_match_q_exactly
 
     # Populate matching_project_suggestions
-    data['matching_project_suggestions'] = 'lol'
+    data['matching_project_suggestions'] = Project.objects.filter(cached_contributor_count__gt=0,
+                                                                  name__icontains=data['q']
+                                                                  ).order_by('-cached_contributor_count')
 
     # Get the list of people to display.
 
@@ -337,7 +339,7 @@ def people(request):
                 'project': 'all_public_projects_exact'}
         haystack_field_name = query_type2haystack_field_name[data['query_type']]
         mappable_people_from_haystack = mappable_people_from_haystack.filter(
-                **{haystack_field_name: data['q']})
+                **{haystack_field_name: data['q'].lower()})
 
         mappable_people_from_haystack.load_all()
     

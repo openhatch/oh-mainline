@@ -132,8 +132,9 @@ People
             <li>
                 <span class='term'>Matching projects:</span>
                 <ul>
-                    <li><a href=''>Python (the project) contributors</a></li>
-                    <li><a href=''>Debian Python packaging contributors</a></li>
+		  {% for project in matching_project_suggestions %}
+                  <li style="clear: both;"><a href='?q=project:{{project.name_with_quotes_if_necessary}}'>{{project.name}}</a></li>
+		  {% endfor %}
                 </ul>
             </li>
 	    {% endif %}

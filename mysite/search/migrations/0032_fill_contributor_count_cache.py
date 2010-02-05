@@ -10,7 +10,9 @@ class Migration:
         "Write your forwards migration here"
         for project in orm.Project.objects.all():
             print 'Processing', project, '...'
-            Project.objects.get(id=project.id).update_cached_contributor_count()
+            p = Project.objects.get(id=project.id) # this time with access to methods in our model
+            p.update_cached_contributor_count()
+            p.save()
         print 'egad, done.'
     
     def backwards(self, orm):

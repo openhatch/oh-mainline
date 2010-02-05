@@ -166,7 +166,7 @@ class Project(models.Model):
         search_result_icon_data = get_image_data_scaled(raw_icon_data, 20)
         self.icon_for_search_result.save('', ContentFile(search_result_icon_data))
 
-    def update_cached_contributor_count(self):
+    def get_contributors(self):
         """Return a list of Person objects who are contributors to
         this Project."""
         from mysite.profile.models import PortfolioEntry
@@ -175,7 +175,11 @@ class Project(models.Model):
                 Q(project=self), Q(is_deleted=False),
                 Q(is_published=True) )
         # List the owners of those portfolio entries.
-        self.cached_contributor_count = len([pf_entry.person for pf_entry in pf_entries])
+        return [pf_entry.person for pf_entry in pf_entries]
+
+    def update_cached_contributor_count(self):
+        contributors = self.get_contributors()
+        self.cached_contributor_count = len(contributors)
 
     def get_n_other_contributors_than(self, n, person):
         # FIXME: Use the method above.
