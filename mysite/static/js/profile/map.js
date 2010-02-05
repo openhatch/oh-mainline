@@ -62,7 +62,6 @@ PeopleMapController.prototype.initialize = function(options) {
      * located at profile/templates/profile/map.html .)
      */
     for (var person_id in person_id2data) {
-        console.log(person_id2data.length);
         var data = person_id2data[person_id];
         var location_name = data['location'];
         var name = data['name'];
@@ -80,13 +79,10 @@ PeopleMapController.prototype.initialize = function(options) {
                     num_of_persons_who_can_be_geocoded -=1;
                     return;
                 }
-                console.log('onwards');
-                console.log(json_data);
                 var person_location = new google.maps.LatLng(json_data['latitude'],
                     json_data['longitude']);
 
-                var marker = new google.maps.Marker(
-                    {
+                var marker = new google.maps.Marker({
                         'map': mapController.map, 
                         'title': person_name,
                         'person_id': person_id,     
