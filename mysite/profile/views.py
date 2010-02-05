@@ -326,12 +326,6 @@ def people(request):
                     projects_that_match_q_exactly.append(project)
         data['projects_that_match_q_exactly'] = projects_that_match_q_exactly
 
-    # Populate matching_project_suggestions
-    data['matching_project_suggestions'] = Project.objects.filter(
-        cached_contributor_count__gt=0, name__icontains=data['q']).filter(
-        ~Q(name__iexact=data['q'])).order_by(
-        '-cached_contributor_count')
-
     # Get the list of people to display.
 
     if data['q'].strip():
@@ -401,6 +395,16 @@ def people(request):
         popular_tags = sorted(tags_with_no_duplicates, key=lambda tag_name: len(Tag.get_people_by_tag_name(tag_name))*(-1))[:suggestion_count]
         # cache it for a week
         cache.set(key_name, popular_tags, cache_timespan)
+
+    # Populate matching_project_suggestions
+    data['matching_project_suggestions'] = Project.objects.filter(
+        cached_contributor_count__gt=0, name__icontains=data['q']).filter(
+        ~Q(name__iexact=data['q'])).order_by(
+        '-cached_contributor_count')
+
+    # limit this if we found people
+    if data['people']:
+        data['matching_project_suggestions'] = data['matching_project_suggestions'][:5]
 
     data['suggestions'] = [
         ('projects', popular_projects),
