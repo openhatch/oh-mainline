@@ -309,6 +309,9 @@ def reject_when_query_is_only_whitespace(sender, instance, **kwargs):
     if not instance.query.strip():
         raise ValueError, "You tried to save a DataImportAttempt whose query was only whitespace, and we rejected it."
 
+def update_the_project_cached_contributor_count(sender, instance, **kwargs):
+    instance.project.update_cached_contributor_count()
+
 models.signals.pre_save.connect(reject_when_query_is_only_whitespace, sender=DataImportAttempt)
 
 class TagType(models.Model):
@@ -561,5 +564,7 @@ class Citation(models.Model):
         else:
             pk = 'unassigned'
         return "pk=%s, summary=%s" % (pk, self.summary)
+
+models.signals.post_save.connect(update_the_project_cached_contributor_count, sender=PortfolioEntry)
 
 # vim: set nu:

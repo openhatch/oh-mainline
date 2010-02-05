@@ -98,6 +98,9 @@ class Project(models.Model):
 
     logo_contains_name = models.BooleanField(default=False)
 
+    # Cache the number of OpenHatch members who have contributed to this project.
+    cached_contributor_count = models.IntegerField()
+
     def populate_icon_from_ohloh(self):
 
         oh = mysite.customs.ohloh.get_ohloh()
@@ -163,7 +166,7 @@ class Project(models.Model):
         search_result_icon_data = get_image_data_scaled(raw_icon_data, 20)
         self.icon_for_search_result.save('', ContentFile(search_result_icon_data))
 
-    def get_contributors(self):
+    def update_cached_contributor_count(self):
         """Return a list of Person objects who are contributors to
         this Project."""
         from mysite.profile.models import PortfolioEntry
@@ -172,7 +175,7 @@ class Project(models.Model):
                 Q(project=self), Q(is_deleted=False),
                 Q(is_published=True) )
         # List the owners of those portfolio entries.
-        return [pf_entry.person for pf_entry in pf_entries]
+        self.cached_contributor_count = len([pf_entry.person for pf_entry in pf_entries])
 
     def get_n_other_contributors_than(self, n, person):
         # FIXME: Use the method above.
