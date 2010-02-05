@@ -318,7 +318,7 @@ def people(request):
     if data['query_type'] != 'project':
         # Figure out which projects happen to match that
         projects_that_match_q_exactly = []
-        for word in data['q'].split(): # FIXME: Tokenize smarter, one day
+        for word in [data['q']]: # This is now tokenized smartly.
             name_matches = Project.objects.filter(name__iexact=word)
             for project in name_matches:
                 if project.cached_contributor_count:
@@ -327,9 +327,10 @@ def people(request):
         data['projects_that_match_q_exactly'] = projects_that_match_q_exactly
 
     # Populate matching_project_suggestions
-    data['matching_project_suggestions'] = Project.objects.filter(cached_contributor_count__gt=0,
-                                                                  name__icontains=data['q']
-                                                                  ).order_by('-cached_contributor_count')
+    data['matching_project_suggestions'] = Project.objects.filter(
+        cached_contributor_count__gt=0, name__icontains=data['q']).filter(
+        ~Q(name__iexact=data['q'])).order_by(
+        '-cached_contributor_count')
 
     # Get the list of people to display.
 

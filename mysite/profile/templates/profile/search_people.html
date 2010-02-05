@@ -47,7 +47,7 @@ People
                 tagged with 
             {% endifequal %}
             {% ifequal query_type 'project' %}
-                who have contributed to projects matching
+                who have contributed to a project named
             {% endifequal %}
             &lsquo;<strong>{{ q }}</strong>&rsquo;:
         {% else %}
@@ -74,7 +74,7 @@ People
 
         {% for project in projects_that_match_q_exactly %}
             <div class='project-yeller'>
-                &lsquo;{{ project.name }}&rsquo; also refers to <a href='?q=project:{{project.name|urlencode}}'>a project with {{ project.get_contributors|length}} contributor{{ project.get_contributors|length|pluralize}}.</a>
+                &lsquo;{{ project.name }}&rsquo; also refers to <a href='?q=project:{{project.name_with_quotes_if_necessary|urlencode}}'>a project with {{ project.get_contributors|length}} contributor{{ project.get_contributors|length|pluralize}}.</a>
             </div><!-- /.project-yeller -->
         {% endfor %}
     </div><!-- /#search_summary -->
