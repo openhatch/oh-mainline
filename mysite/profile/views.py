@@ -331,13 +331,16 @@ def people_map(request):
     data = {}
 
     everybody = Person.objects.all()
-    mappable = ( ~Q(location_display_name='') & Q(location_confirmed=True) )
-    data['people'] = everybody.filter(mappable).order_by('user__username')
-    data['person_id2data_as_json'] = simplejson.dumps(dict([
-                (person.pk, {'name': person.get_full_name_or_username(),
-                             'location': person.location_display_name})
-            for person in Person.objects.all()
-            if person.location_display_name]))
+    data['people'] = everybody.order_by('user__username')
+    def get_relevant_person_data(person):
+        location = person.location_display_name
+        if not location:
+            location = 'Inaccessible Island'
+        return {'name': person.get_full_name_or_username(), 'location': location}
+    person_id2data = dict([(person.pk, get_relevant_person_data(person))
+            for person in everybody])
+
+    data['person_id2data_as_json'] = simplejson.dumps(person_id2data)
     data['test_js'] = request.GET.get('test', None)
     data['num_of_persons_with_locations'] = len([p for p in Person.objects.all()
                                                  if p.location_display_name])
