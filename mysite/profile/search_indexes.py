@@ -4,31 +4,38 @@ import mysite.profile.models
 from django.db.models import Q
 
 class PersonIndex(indexes.SearchIndex):
-    null_document = indexes.CharField(document=True)
-    all_tag_texts = indexes.MultiValueField()
-    understands_lowercase_exact = indexes.MultiValueField()
-    can_mentor_lowercase_exact = indexes.MultiValueField()
-    seeking_lowercase_exact = indexes.MultiValueField()
-    all_public_projects_lowercase_exact = indexes.MultiValueField() # NOTE: Hack the xml to make type="string"
-
     def _pull_lowercase_tag_texts(self, tag_type_name, person_instance):
         return person_instance.get_tags_as_dict().get(tag_type_name, [])
 
+    null_document = indexes.CharField(document=True)
     def prepare_null_document(self, person_instance):
         return '' # lollerskates
 
+    all_tag_texts = indexes.MultiValueField()
     def prepare_all_tag_texts(self, person_instance):
         return person_instance.get_tag_texts_for_map()
 
-    def prepare_can_mentor_with_lowercase_exact(self, person_instance):
+    studying_lowercase_exact = indexes.MultiValueField() 
+    def prepare_studying_lowercase_exact(self, person_instance):
+        return self._pull_lowercase_tag_texts('currently_studying', person_instance)
+
+    understands_not_lowercase_exact = indexes.MultiValueField()
+    def prepare_understands_not_lowercase_exact(self, person_instance):
+        return self._pull_lowercase_tag_texts('understands_not', person_instance)
+
+    can_mentor_lowercase_exact = indexes.MultiValueField()
+    def prepare_can_mentor_lowercase_exact(self, person_instance):
         return self._pull_lowercase_tag_texts('can_mentor', person_instance)
 
+    seeking_lowercase_exact = indexes.MultiValueField()
     def prepare_seeking_lowercase_exact(self, person_instance):
         return self._pull_lowercase_tag_texts('seeking', person_instance)
 
+    understands_lowercase_exact = indexes.MultiValueField()
     def prepare_understands_lowercase_exact(self, person_instance):
         return self._pull_lowercase_tag_texts('understands', person_instance)
 
+    all_public_projects_lowercase_exact = indexes.MultiValueField() # NOTE: Hack the xml to make type="string"
     def prepare_all_public_projects_lowercase_exact(self, person_instance):
         return list(map(lambda x: x.lower(),
                         person_instance.get_list_of_project_names()))

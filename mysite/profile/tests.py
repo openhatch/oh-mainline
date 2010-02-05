@@ -1378,13 +1378,10 @@ class PersonCanExplainTagSummary(TwillTests):
         tag_seeking.save()
         link_one = Link_Person_Tag(person=pp, tag=tag_i_understand)
         link_one.save()
-        link_two = Link_Person_Tag(person=pp, tag=tag_i_dont)
+        link_two = Link_Person_Tag(person=pp, tag=tag_seeking)
         link_two.save()
-        link_three = Link_Person_Tag(person=pp, tag=tag_seeking)
-        link_three.save()
-
-        self.assertEqual(map(lambda x: x.lower(), pp.get_tag_texts_for_map()),
-                         map(lambda x: x.lower(), ['something I understand']))
+        
+        self.assertEqual(pp.calculate_summary('python'))
 
 class ProjectGetMentors(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
@@ -1740,6 +1737,18 @@ class PeopleSearch(TwillTests):
         data = mysite.profile.controllers.parse_string_query('project:Debian GNU/Linux')
         self.assertEqual(data['q'], 'Debian GNU/Linux')
         self.assertEqual(data['query_type'], 'project')
-        
 
-# vim: set ai et ts=4 sw=4 nu:
+    def test_tokenizer_picks_up_on_tag_type_queries(self):
+        for tag_type_short_name in mysite.profile.models.TagType.short_name2long_name:
+            query = "%s:yourmom" % tag_type_short_name
+            data = mysite.profile.controllers.parse_string_query(query)
+            self.assertEqual(data['q'], 'yourmom')
+            self.assertEqual(data['query_type'], tag_type_short_name)
+
+    def test_tokenizer_ignores_most_colon_things(self):
+        query = "barbie://queue"
+        data = mysite.profile.controllers.parse_string_query(query)
+        self.assertEqual(data['q'], query)
+        self.assertEqual(data['query_type'], 'all_tags')
+
+ # vim: set ai et ts=4 sw=4 nu:
