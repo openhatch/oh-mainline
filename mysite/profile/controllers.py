@@ -78,9 +78,14 @@ def get_geoip_guess_for_ip(ip_as_string):
 
 def parse_string_query(s):
     parsed = {}
-    if s.startswith('project:'):
-        parsed['query_type'] = 'project'
-        parsed['q'] = s.split(':',1)[1]
+    valid_prefixes = ['project']
+    valid_prefixes.extend(mysite.profile.models.TagType.short_name2long_name.keys())
+
+    pieces_from_splitting_on_first_colon = s.split(':', 1)
+    if (len(pieces_from_splitting_on_first_colon) > 1 and
+        pieces_from_splitting_on_first_colon[0] in valid_prefixes):
+        first, rest = pieces_from_splitting_on_first_colon
+        parsed['query_type'], parsed['q'] = first, rest
     else:
         parsed['query_type'] = 'all_tags'
         parsed['q'] = s
