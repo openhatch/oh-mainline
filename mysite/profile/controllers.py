@@ -84,4 +84,11 @@ def parse_string_query(s):
     else:
         parsed['query_type'] = 'all_tags'
         parsed['q'] = s
+
+    # Now, clean up the q to parse out qutiation marks
+    parsed['q'] = parsed['q'].strip() # trim whitespace
+    if len(parsed['q']) >= 2 and (
+        parsed['q'][0] == '"' == parsed['q'][-1]):
+        parsed['q'] = parsed['q'][1:-1]
+
     return parsed

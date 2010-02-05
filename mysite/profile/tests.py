@@ -1707,4 +1707,14 @@ class PeopleSearch(TwillTests):
         self.assertEqual(data['q'], 'a_tag_name_or_whatever')
         self.assertEqual(data['query_type'], 'all_tags')
 
+    def test_tokenizer_parses_quotation_marks_correctly_but_if_they_are_missing_greedily_assumes_they_were_there(self):
+        data = mysite.profile.controllers.parse_string_query('project:"Debian GNU/Linux"')
+        self.assertEqual(data['q'], 'Debian GNU/Linux')
+        self.assertEqual(data['query_type'], 'project')
+
+        data = mysite.profile.controllers.parse_string_query('project:Debian GNU/Linux')
+        self.assertEqual(data['q'], 'Debian GNU/Linux')
+        self.assertEqual(data['query_type'], 'project')
+        
+
 # vim: set ai et ts=4 sw=4 nu:
