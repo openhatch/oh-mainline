@@ -6,7 +6,7 @@ from django.db.models import Q
 class PersonIndex(indexes.SearchIndex):
     null_document = indexes.CharField(document=True)
     all_tag_texts = indexes.MultiValueField()
-    all_public_projects_exact = indexes.MultiValueField()
+    all_public_projects_exact = indexes.MultiValueField(indexed=False)
 
     def prepare_null_document(self, person_instance):
         return '' # lollerskates
