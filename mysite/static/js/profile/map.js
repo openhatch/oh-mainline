@@ -120,8 +120,12 @@ PeopleMapController.prototype.initialize = function(options) {
 
         var str = mappedPeople_count;
         if (mappedPeople_count == num_of_persons_who_can_be_geocoded) {
+	    $('#show_everybody').hide();
             str = "Everybody";
         }
+	else {
+	    $('#show_everybody').show();
+	}
         if (mappedPeople_count == 0) {
             str = "Nobody";
         }

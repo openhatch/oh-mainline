@@ -28,9 +28,11 @@
         </div>
 
 	{% if q %}
+	{% ifequal query_type "all_tags" %}
         <div class="what_matched_the_search">
           {{ person.reasons|join:" and " }} {{ q }}
         </div>
+	{% endifequal %}
 	{% endif %}
 
         {% if person.location_display_name and person.location_confirmed %}

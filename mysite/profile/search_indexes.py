@@ -9,7 +9,7 @@ class PersonIndex(indexes.SearchIndex):
     understands_lowercase_exact = indexes.MultiValueField()
     can_mentor_lowercase_exact = indexes.MultiValueField()
     seeking_lowercase_exact = indexes.MultiValueField()
-    all_public_projects_lowercase_exact = indexes.MultiValueField(indexed=False)
+    all_public_projects_lowercase_exact = indexes.MultiValueField() # NOTE: Hack the xml to make type="string"
 
     def _pull_lowercase_tag_texts(self, tag_type_name, person_instance):
         return person_instance.get_tags_as_dict().get(tag_type_name, [])

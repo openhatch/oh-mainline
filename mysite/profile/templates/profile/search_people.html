@@ -47,7 +47,7 @@ People
                 tagged with 
             {% endifequal %}
             {% ifequal query_type 'project' %}
-                who have contributed to a project named
+                who have contributed to
             {% endifequal %}
             &lsquo;<strong>{{ q }}</strong>&rsquo;:
         {% else %}
@@ -130,7 +130,7 @@ People
 	    {% endif %}
 	    {% if matching_project_suggestions %}
             <li>
-                <span class='term'>Matching projects:</span>
+                <span class='term'>Projects matching &lsquo;{{q}}&rsquo;:</span>
                 <ul>
 		  {% for project in matching_project_suggestions %}
                   <li style="clear: both;"><a href='?q=project:{{project.name_with_quotes_if_necessary}}'>{{project.name}}</a></li>
