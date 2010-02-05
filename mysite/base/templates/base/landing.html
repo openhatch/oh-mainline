@@ -289,8 +289,8 @@ body#landing #right .entry { font-size: .9em; margin-top: 3px; }
                 <li><a href='{{ category.url }}'>{{ category.name }}</a></li>
             {% endfor %}
             {% endcomment %}
-            {% endif %}
             <p style='margin-top: 10px;' class='rabbit_hole'><a href='{% url mysite.search.views.fetch_bugs %}'>See all volunteering opportunities &raquo;</a></p>
+            {% endif %}
         </div>
     </div>
 </div>
