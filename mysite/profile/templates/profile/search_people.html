@@ -61,7 +61,9 @@ People
         {% comment %}
             Javascript fills these in when the map changes.
         {% endcomment %}
+	{% if people %}
         <span class='hide_once_map_loads'>Loading map...</span>
+	{% endif %}
         <span class='dont_show_until_map_loads'>
             <span id='how_many_people_are_visible_label'>
                 Currently visible on the map:
@@ -70,12 +72,13 @@ People
             <a href='' {# refresh the page #} id='show_everybody'>(Show everybody.)</a>
         </span>
 
-        {% for project in projects_that_match_q %}
+        {% for project in projects_that_match_q_exactly %}
             <div class='project-yeller'>
                 &lsquo;{{ project.name }}&rsquo; also refers to <a href='?q=project:{{project.name|urlencode}}'>a project with {{ project.get_contributors|length}} contributor{{ project.get_contributors|length|pluralize}}.</a>
             </div><!-- /.project-yeller -->
         {% endfor %}
     </div><!-- /#search_summary -->
+    {% if not q %}
     <ul class='suggestions'>
         {% for what_kind_of_thing, list_of_things in suggestions %}
             <li>
@@ -100,10 +103,12 @@ People
             </li>
         {% endfor %}
     </ul><!-- /.suggestions -->
+    {% endif %}
     {% if q %}
     <div id='refine_search'>
         <h3>Related searches</h3>
         <ul class='filter_conjunction'>
+	  {% if mentor_suggestions %}
             <li>
                 <span class='term'>Looking for a mentor?</span>
                 <ul class='filter_disjunction'>
@@ -111,6 +116,8 @@ People
                     <li><a href=''>Find mentors in <strong>Java packaging</strong></a> (3)</li>
                 </ul>
             </li>
+	    {% endif %}
+	    {% if can_pitch_in_with_suggestions %}
             <li>
                 <span class='term'>Looking for help with your project?</span>
                 <ul class='filter_disjunction'>
@@ -120,6 +127,8 @@ People
                             <strong>Java packaging</strong></a></li>
                 </ul>
             </li>
+	    {% endif %}
+	    {% if matching_project_suggestions %}
             <li>
                 <span class='term'>Matching projects:</span>
                 <ul>
@@ -127,9 +136,12 @@ People
                     <li><a href=''>Debian Python packaging contributors</a></li>
                 </ul>
             </li>
+	    {% endif %}
         </ul>
     </div><!-- /#refine_search -->
     {% endif %}
+
+    {% if people %}
 
     {% comment %}
         Google loads a map here -- replacing #map_loading_msg, among other things.
@@ -155,6 +167,8 @@ People
         {% endfor %}
     </ul>
 
+    {% endif %}
+
     {% if center_json and not geocode_failed %}
     <style type='text/css'>
     #people-list li { display: none; }
@@ -169,6 +183,7 @@ People
 
 {% block js %}
 {{ block.super }}
+{% if people %}
 <script type="text/javascript">
     {% if center_json and not geocode_failed %}
         var center = {{ center_json|safe}}; /* This comes from Python geocoding the ?center= . */
@@ -193,6 +208,7 @@ People
         mapController.bindClickHandlersToPeopleListItems();
     });
 </script>
+{% endif %}
 {% endblock js %}
 
 {% block js_tests %}

@@ -317,14 +317,17 @@ def people(request):
 
     if data['query_type'] != 'project':
         # Figure out which projects happen to match that
-        projects_that_match_q = []
+        projects_that_match_q_exactly = []
         for word in data['q'].split(): # FIXME: Tokenize smarter, one day
             name_matches = Project.objects.filter(name__iexact=word)
             for project in name_matches:
                 if project.get_contributors():
                     # only add those projects that have people in them
-                    projects_that_match_q.append(project)
-        data['projects_that_match_q'] = projects_that_match_q
+                    projects_that_match_q_exactly.append(project)
+        data['projects_that_match_q_exactly'] = projects_that_match_q_exactly
+
+    # Populate matching_project_suggestions
+    data['matching_project_suggestions'] = 'lol'
 
     # Get the list of people to display.
 

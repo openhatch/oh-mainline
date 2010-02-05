@@ -1661,11 +1661,11 @@ class PeopleSearchProperlyIdentifiesQueriesThatFindProjects(TwillTests):
         mock_get_contribs.return_value = ['one dude']
         # make a project called Banana
         # query for that, but spelled bANANA
-        # look in the template and see that projects_that_match_q == ['Banana']
+        # look in the template and see that projects_that_match_q_exactly == ['Banana']
         mysite.search.models.Project.create_dummy(name='Banana')
         url = reverse(mysite.profile.views.people)
         response = self.client.get(url, {'q': 'bANANA'})
-        self.assertEqual(response.context[0]['projects_that_match_q'],
+        self.assertEqual(response.context[0]['projects_that_match_q_exactly'],
                          [Project.objects.get(name='Banana')])
         
     @mock.patch('mysite.search.models.Project.get_contributors')
@@ -1673,13 +1673,13 @@ class PeopleSearchProperlyIdentifiesQueriesThatFindProjects(TwillTests):
         mock_get_contribs.return_value = ['one dude']
         # make a project called Banana and Cucumber
         # query for that, but spelled bANANA and cucumBer
-        # look in the template and see that set(projects_that_match_q) == set(['Banana', 'Cucumber'])
+        # look in the template and see that set(projects_that_match_q_exactly) == set(['Banana', 'Cucumber'])
         mysite.search.models.Project.create_dummy(name='Banana')
         mysite.search.models.Project.create_dummy(name='Cucumber')
         mysite.search.models.Project.create_dummy(name='Mister Decoy')
         url = reverse(mysite.profile.views.people)
         response = self.client.get(url, {'q': 'bANANA cuCUMBer'})
-        self.assertEqual(set(response.context[0]['projects_that_match_q']),
+        self.assertEqual(set(response.context[0]['projects_that_match_q_exactly']),
                          set([Project.objects.get(name='Banana'),
                               Project.objects.get(name='Cucumber')]))
 
@@ -1688,11 +1688,11 @@ class PeopleSearchProperlyIdentifiesQueriesThatFindProjects(TwillTests):
         mock_get_contribs.return_value = [] # nobody!
         # make a project called Banana
         # query for that, but spelled bANANA
-        # look in the template and see that projects_that_match_q == ['Banana']
+        # look in the template and see that projects_that_match_q_exactly == ['Banana']
         mysite.search.models.Project.create_dummy(name='Banana')
         url = reverse(mysite.profile.views.people)
         response = self.client.get(url, {'q': 'bANANA'})
-        self.assertEqual(response.context[0]['projects_that_match_q'],
+        self.assertEqual(response.context[0]['projects_that_match_q_exactly'],
                          [])
 
 class PeopleSearch(TwillTests):
