@@ -310,28 +310,31 @@ def people(request):
     data = {}
 
     # pull in q from GET
-    data['q'] = request.GET.get('q', '')
+    query = request.GET.get('q', '')
 
-    # this will probably be replaced once we throw in solr
-    data['query_type'] = 'tag'
+    data['raw_query'] = query
+    data.update(mysite.profile.controllers.parse_string_query(query))
 
-    # Figure out which projects happen to match that
-    
-    projects_that_match_q = []
-    for word in data['q'].split(): # FIXME: Tokenize smarter, one day
-        name_matches = Project.objects.filter(name__iexact=word)
-        for project in name_matches:
-            if project.get_contributors():
-                # only add those projects that have people in them
-                projects_that_match_q.append(project)
-    data['projects_that_match_q'] = projects_that_match_q
+    if data['query_type'] != 'project':
+        # Figure out which projects happen to match that
+        projects_that_match_q = []
+        for word in data['q'].split(): # FIXME: Tokenize smarter, one day
+            name_matches = Project.objects.filter(name__iexact=word)
+            for project in name_matches:
+                if project.get_contributors():
+                    # only add those projects that have people in them
+                    projects_that_match_q.append(project)
+        data['projects_that_match_q'] = projects_that_match_q
 
     # Get the list of people to display.
 
     if data['q'].strip():
         mappable_people_from_haystack = haystack.query.SearchQuerySet().all()
+        query_type2haystack_field_name = {'all_tags': 'all_tag_texts', 
+                'project': 'all_public_projects_exact'}
+        haystack_field_name = query_type2haystack_field_name[data['query_type']]
         mappable_people_from_haystack = mappable_people_from_haystack.filter(
-            all_tag_texts=data['q'])
+                **{haystack_field_name: data['q']})
 
         mappable_people_from_haystack.load_all()
     
