@@ -319,7 +319,7 @@ def tag_type_query2mappable_orm_people(tag_type_short_name, parsed_query):
     ### and sort it the way everyone expects
     mappable_people = sorted(mappable_people, key=lambda p: p.user.username.lower())
 
-    return mappable_people
+    return mappable_people, {}
 
 def all_tags_query2mappable_orm_people(parsed_query):
     # do three queries...
@@ -358,7 +358,11 @@ def all_tags_query2mappable_orm_people(parsed_query):
             # then make it the human readable form as said by the TagType dict
             person.reasons = [TagType.short_name2long_name[s] for s in person.reasons]
 
-    return mappable_people
+    ## How many possible
+    extra_data = dict(
+        mentor_count=len(query2results['can_mentor_lowercase_exact']))
+
+    return mappable_people, extra_data
 
 def query2results(parsed_query):
     query_type2executor = {
@@ -385,7 +389,7 @@ def project_query2mappable_orm_people(parsed_query):
     
     mappable_people = sorted([x.object for x in mappable_people_from_haystack],
                              key=lambda x: x.user.username)
-    return mappable_people
+    return mappable_people, {}
 
 @view
 def people(request):
@@ -415,7 +419,8 @@ def people(request):
 
     if parsed_query['q'].strip():
 
-        mappable_people = query2results(parsed_query)
+        mappable_people, extra_data = query2results(parsed_query)
+        data.update(extra_data)
 
     else:
         everybody = Person.objects.all()

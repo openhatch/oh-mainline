@@ -95,18 +95,17 @@ People
     {% endif %}
     {% if q %}
     <div id='refine_search'>
-        <h3>Related searches</h3>
+        <h3>Filters and other goodies </h3> <a id="toggle_related_searches" href="#">(show)</a>
         <ul class='filter_conjunction'>
-	  {% if mentor_suggestions %}
+	  {% if mentor_count %}
             <li>
                 <span class='term'>Looking for a mentor?</span>
                 <ul class='filter_disjunction'>
-                    <li><a href=''>Find mentors in <strong>Python</strong></a> (5)</li>
-                    <li><a href=''>Find mentors in <strong>Java packaging</strong></a> (3)</li>
+                    <li><a href='?q=can_mentor:"{{q|urlencode}}"'>Find mentors in {{ q }}</a> ({{ mentor_count }})</li>
                 </ul>
             </li>
 	    {% endif %}
-	    {% if can_pitch_in_with_suggestions %}
+	    {% if 1 or can_pitch_in_with_suggestions %}
             <li>
                 <span class='term'>Looking for help with your project?</span>
                 <ul class='filter_disjunction'>
@@ -198,6 +197,20 @@ People
         });
         mapController.bindClickHandlersToPeopleListItems();
     });
+
+var related_searches_toggler = function () {
+    var thing_to_show_or_hide = $('.filter_conjunction');
+    if (thing_to_show_or_hide.is(":visible")) {
+	thing_to_show_or_hide.hide();
+    } else { 
+	thing_to_show_or_hide.show();
+    }
+    return false;
+};
+
+$(function() {
+	$('#toggle_related_searches').click(related_searches_toggler); });
+    
 </script>
 {% endif %}
 {% endblock js %}

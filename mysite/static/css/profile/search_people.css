@@ -60,7 +60,7 @@ body#people-map #search_summary { padding: 10px 0; font-size: 1.1em; }
 /* Refine your search */
 body#people-map #refine_search { padding: 1.5%; float: left; width: 97%; background-color: #ececec; -moz-border-radius: 1.5%; border-radius: 1.5%; }
 body#people-map #refine_search h3 { padding: 0; margin-bottom: 10px; }
-body#people-map #refine_search .filter_conjunction { width: 100%; }
+body#people-map #refine_search .filter_conjunction { width: 100%; display: none; }
 body#people-map #refine_search .filter_conjunction > li { list-style: none; float: left; width: 33%; }
 body#people-map #refine_search .filter_conjunction > li:last-child { margin-bottom: 0; }
 body#people-map #refine_search .filter_conjunction li li { list-style: circle; margin-left: 20px; float: left; }
@@ -76,3 +76,6 @@ body#people-map #people-list li .what_matched_the_search { font-size: .9em; font
 body#people-map #people-list li .username { font-size: .9em; color: #333; font-weight: normal; }
 body#people-map .project-yeller { padding-top: 10px; }
 body#people-map .dont_show_until_map_loads{ display: none; }
+
+/* Toggle */
+#toggle_related_searches { margin-left: 10px; }
