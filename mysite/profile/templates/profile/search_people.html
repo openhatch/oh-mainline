@@ -75,24 +75,18 @@ People
     </div><!-- /#search_summary -->
     {% if not q %}
     <ul class='suggestions'>
-        {% for what_kind_of_thing, list_of_things in suggestions %}
+        {% for suggestion in suggestions %}
             <li>
                 <span class='introduce_suggestions'>Popular
-                    {{ what_kind_of_thing }}:</span>
+                    {{ suggestion.display_name}}:</span>
                 <ul>
-                    {% for thing in list_of_things|slice:":3" %}
-                        <li>
-                            <a href='?q={{ what_kind_of_thing|urlencode }}:{{ thing|urlencode }}'>
-                                <span class="this_part_gets_underlined">{{ thing }}</span><small> (8)</small></a>
-                        </li>
+                    {% for thing in suggestion.values|slice:":3" %}
+		    {% include 'profile/suggestion_li.html' %}
                     {% endfor %}
                 </ul>
                 <ul>
-                    {% for thing in list_of_things|slice:"3:" %}
-                        <li>
-                            <a href='?q={{ what_kind_of_thing|urlencode }}:{{ thing|urlencode }}'>
-                                <span class="this_part_gets_underlined">{{ thing }}</span><small> (8)</small></a>
-                        </li>
+                    {% for thing in suggestion.values|slice:"3:" %}
+		    {% include 'profile/suggestion_li.html' %}
                     {% endfor %}
                 </ul>
             </li>

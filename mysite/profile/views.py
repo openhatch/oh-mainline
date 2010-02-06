@@ -500,8 +500,12 @@ def people(request):
             data['this_query_summary'] = 'who ' + long_name
 
     data['suggestions'] = [
-        ('projects', popular_projects),
-        ('profile tags', popular_tags)]
+        dict(display_name='projects',
+             values=popular_projects,
+             query_prefix='project:'),
+        dict(display_name='profile tags',
+             values=popular_tags,
+             query_prefix='')]
 
     return (request, 'profile/search_people.html', data)
     # }}}

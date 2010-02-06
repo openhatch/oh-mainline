@@ -43,14 +43,14 @@
         {% with person.get_list_of_project_names as project_names %}
         {% if project_names %}
             <span class="people-view-projects">
-                projects: {{ project_names|join:", "}}
+                <span style="color: #999;">projects:</span> {{ project_names|join:", "}}
             </span>
         {% endif %}
     {% endwith %}
     {% with person.get_tag_texts_for_map as tags %}
         {% if tags %}
             <span class="people-view-tags">
-                tags: {{ tags|join:", "}}
+                <span style="color: #999;">tags:</span> {{ tags|join:", "}}
             </span>
         {% endif %}
     {% endwith %}

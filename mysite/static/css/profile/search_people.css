@@ -21,7 +21,7 @@ body#people-map .profile-link{ position: relative; top: -5px; border-radius:8px;
 #people-list li img{font-size:51px; vertical-align:top; float:left; margin-right:10px; margin-bottom:5px; }
 #people-list li .name{display:block; font-size:1.1em; margin-bottom:2px; font-weight:700; }
 #people-list li .people-view-tags{display:block; font-size:.9em; color:#666; }
-#people-list li .location{display:block; color:#333; font-size:.9em; margin-bottom:3px; }
+#people-list li .location{display:block; color:#666; font-size:.9em; margin-bottom:3px; }
 #people-list li .people-view-projects{display:block; color:#666; font-size:.9em; margin-bottom:3px; }
 #people-list li .people-view-info{float:left; width:200px; }
 #people-list li.highlighted .collapsible{display:inline; }
