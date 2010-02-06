@@ -12,7 +12,7 @@ import collections
 from django.template.loader import render_to_string
 from django.core import serializers
 from django.http import \
-        HttpResponse, HttpResponseRedirect, HttpResponseServerError
+        HttpResponse, HttpResponseRedirect, HttpResponseServerError, HttpResponsePermanentRedirect
 from django.shortcuts import \
         render_to_response, get_object_or_404
 import django.contrib.auth 
@@ -292,16 +292,18 @@ def cut_list_of_people_in_two_columns(people):
     half = len(people)/2
     return [people[0:half], people[half:]]
     
-
-@view
-def display_list_of_people_who_match_some_search(request, property, value):
-    '''Property is the "tag name", and "value" is the text in it.'''
-    peeps = mysite.profile.controllers.people_matching(property, value)
-    data = {}
-    data['people_columns'] = cut_list_of_people_in_three_columns(peeps)
-    data['property'] = property
-    data['value'] = value
-    return (request, 'profile/search_people.html', data)
+def permanent_redirect_to_people_search(request, property, value):
+    '''Property is the "tag name", and "value" is the text in it.''' 
+    if ' ' in value:
+        escaped_value = '"' + value + '"'
+    else:
+        escaped_value = value
+    
+    q = '%s:%s' % (property, escaped_value)
+    get_args = {'q': q}
+    destination_url = (reverse('mysite.profile.views.people') + '?' + 
+                       urllib.urlencode(get_args))
+    return HttpResponsePermanentRedirect(destination_url)
 
 def tag_type_query2mappable_orm_people(tag_type_short_name, parsed_query):
     # ask haystack...
@@ -480,6 +482,22 @@ def people(request):
     # limit this if we found people
     if data['people']:
         data['matching_project_suggestions'] = data['matching_project_suggestions'][:5]
+
+    # What kind of people are these?
+    if data['q']:
+        if data['query_type'] == 'project':
+            data['this_query_summary'] = 'who have contributed to'
+        elif data['query_type'] == 'all_tags':
+            data['this_query_summary'] = 'tagged with'
+        elif data['query_type'] == 'understands_not':
+            data['this_query_summary'] = 'tagged with understands_not = '
+        elif data['query_type'] == 'understands':
+            data['this_query_summary'] = 'who understand '
+        elif data['query_type'] == 'studying':
+            data['this_query_summary'] = 'who are currently studying '
+        else:
+            long_name = mysite.profile.models.TagType.short_name2long_name[data['query_type']]
+            data['this_query_summary'] = 'who ' + long_name
 
     data['suggestions'] = [
         ('projects', popular_projects),

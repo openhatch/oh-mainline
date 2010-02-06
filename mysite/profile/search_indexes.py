@@ -13,7 +13,7 @@ class PersonIndex(indexes.SearchIndex):
 
     studying_lowercase_exact = indexes.MultiValueField() 
     def prepare_studying_lowercase_exact(self, person_instance):
-        return self._pull_lowercase_tag_texts('currently_studying', person_instance)
+        return self._pull_lowercase_tag_texts('studying', person_instance)
 
     understands_not_lowercase_exact = indexes.MultiValueField()
     def prepare_understands_not_lowercase_exact(self, person_instance):

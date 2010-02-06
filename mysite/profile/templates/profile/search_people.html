@@ -43,12 +43,7 @@ People
         People 
         {% if q %}
             {# If there's a query, tell us the people who match it. #}
-            {% ifequal query_type 'all_tags' %}
-                tagged with 
-            {% endifequal %}
-            {% ifequal query_type 'project' %}
-                who have contributed to
-            {% endifequal %}
+	{{ this_query_summary }}
             &lsquo;<strong>{{ q }}</strong>&rsquo;:
         {% else %}
             {% comment %}
