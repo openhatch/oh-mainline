@@ -358,9 +358,14 @@ def all_tags_query2mappable_orm_people(parsed_query):
             # then make it the human readable form as said by the TagType dict
             person.reasons = [TagType.short_name2long_name[s] for s in person.reasons]
 
-    ## How many possible
-    extra_data = dict(
-        mentor_count=len(query2results['can_mentor_lowercase_exact']))
+    extra_data = {}
+    ## How many possible mentors
+    extra_data['suggestions_for_searches_regarding_people_who_can_mentor'] = []
+    mentor_people = query2results['can_mentor_lowercase_exact']
+    if mentor_people:
+        extra_data['suggestions_for_searches_regarding_people_who_can_mentor'].append(
+            {'query': parsed_query['q'],
+             'count': len(mentor_people)})
 
     extra_data['suggestions_for_searches_regarding_people_who_can_pitch_in'] = []
     ## Does this relate to people who can pitch in?
