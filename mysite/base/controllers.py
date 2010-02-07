@@ -86,11 +86,16 @@ def object_to_key(python_thing):
 
 @mysite.base.decorators.unicodify_strings_when_inputted
 def cached_geocoding_in_json(address):
+    if address == 'Inaccessible Island':
+        is_inaccessible = True
+    else:
+        is_inaccessible = False
     key_name = object_to_key(['function_call', 'cached_geocoding', address])
     geocoded = None
     geocoded_in_json = cache.get(key_name)
     if geocoded_in_json is None:
         geocoded = _geocode(address)
+        geocoded.update({'is_inaccessible': is_inaccessible})
         geocoded_in_json = simplejson.dumps(geocoded)
         cache.set(key_name, geocoded_in_json, 60 * 60 * 24 * 7) # cache for a week, which should be plenty
     return geocoded_in_json

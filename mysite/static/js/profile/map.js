@@ -67,13 +67,17 @@ PeopleMapController.prototype.initialize = function(options) {
     var hideBGImage = function () { $canvas.css('background', ''); };
     window.setTimeout(hideBGImage, 2500);
 
-    function generate_update_all_markers(map) {
+    function generate_update_all_markers(mapController) {
         return function() {
+	    var map = mapController.map;
             /* This only makes up to 10 people show on the right. */
             var shown_this_many = 0;
 
             for (var i = 0; i < all_markers.length; i++) {
                 var marker = all_markers[i];
+		/* If that marker is the Inaccessible Island marker, then we should 
+		 * hide all the inaccessible people.
+		 */
                 var $person_summary = $('#person_summary_' + marker.person_id);
                 var bounds = map.getBounds();
                 if (typeof bounds != 'undefined' &&
@@ -81,19 +85,34 @@ PeopleMapController.prototype.initialize = function(options) {
 
                     // If the person bullet is hidden,
                     if($person_summary.is(':visible') === false) {
-                        $person_summary.show();
+			/* If the marker we found is for inaccessible people, show them all */
+			if (marker === mapController.the_marker_for_inaccessible_island) {
+			    $('.inaccessible_islander').show();
+			}
+			else { /* just the one guy or gal */
+                            $person_summary.show();
+			}
                     }
                     shown_this_many += 1;
                 }
                 else {
-                    $person_summary.hide();
+		    /* If the marker we found is for inaccessible people, hide them all */
+		    if (marker === mapController.the_marker_for_inaccessible_island) {
+			$('.inaccessible_islander').hide();
+		    }
+		    else {
+			/* otherwise hide just that one person */
+			$person_summary.hide();
+		    }
                 } 
             }
             update_people_count();
         };
     } // end function generate_update_all_markers
 
-    update_all_markers = generate_update_all_markers(this.map);
+    update_all_markers = generate_update_all_markers(this);
+
+    this.the_marker_for_inaccessible_island = null;
 
     /*
      * This function is called with an option named "person_id2data".
@@ -120,27 +139,51 @@ PeopleMapController.prototype.initialize = function(options) {
                 number_of_people_geocoded += 1;
 
                 if (! it_worked) {
-                    console.log('boom');
                     num_of_persons_who_can_be_geocoded -=1;
                     return;
                 }
+
+		var is_inaccessible = json_data['is_inaccessible'];
                 var person_location = new google.maps.LatLng(json_data['latitude'],
                     json_data['longitude']);
 
-                var marker = new google.maps.Marker({
+		var marker = null;
+
+		if (is_inaccessible) {
+		    person_name = '';
+		    /* Grab the_marker_for_inaccessible_island, if we have already made it */
+		    if (mapController.the_marker_for_inaccessible_island !== null) {
+			marker = mapController.the_marker_for_inaccessible_island;
+		    }
+		}
+		
+		if (marker === null) {
+                    marker = new google.maps.Marker({
                         'map': mapController.map, 
                         'title': person_name,
                         'person_id': person_id,     
-                        'position': person_location
-                });
+			'position': person_location
+						    });
+		}
+		
+		if (is_inaccessible && 
+		    mapController.the_marker_for_inaccessible_island === null) {
+		    /* Then cache it */
+		    mapController.the_marker_for_inaccessible_island = marker;
+		}
                 mapController.person_locations['' + person_id] = person_location;
+
                 mapController.map.setCenter(mapController.mapOrigin);
-                google.maps.event.addListener(
-                    marker,
-                    'click', function() {
-                        mapController.highlightPerson(marker.person_id);
-                        window.location.hash=('person_summary_' + marker.person_id);
-                });
+
+		if (! is_inaccessible) {
+                    google.maps.event.addListener(
+			marker,
+			'click', function() {
+                            mapController.highlightPerson(marker.person_id);
+                            window.location.hash=('person_summary_' + marker.person_id);
+			});		    
+		}
+
                 all_markers.push(marker);
                 /* if this is the last one, call update_all_markers() */
                 if (num_of_persons_who_can_be_geocoded == number_of_people_geocoded) {

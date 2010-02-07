@@ -87,8 +87,11 @@ class Person(models.Model):
     location_display_name = models.CharField(max_length=255, blank=True,
                                              verbose_name='Location')
 
+    def location_is_public(self):
+        return self.location_confirmed and self.location_display_name
+
     def get_public_location_or_default(self):
-        if self.location_confirmed and self.location_display_name:
+        if self.location_is_public():
             return self.location_display_name
         else:
             return DEFAULT_LOCATION
