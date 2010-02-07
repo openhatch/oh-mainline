@@ -2,7 +2,7 @@
 body#people-map #main img{margin:0 0 -3px; padding:0; }
 body#people-map input[type="submit"]{ float:left; padding: 5px; position: relative; top: -1px; }
 body#people-map .map-error{background: #ffc; float: left; padding: 9px 2%; width: 36%; display: none}
-body#people-map #map_canvas{float:left; margin-right:10px; width:70%; height:450px; text-align:center; }
+body#people-map #map_canvas{ text-align:center; float: right; width:68%; height:450px; }
 body#people-map #map_loading_msg{margin-left:20%; margin-top:150px; width:60%; background-color:#fff; padding:8px; }
 body#people-map #map_loading_msg img{height:2.5em; }
 body#people-map #map_loading_msg span{font-size:2.5em; margin-left:10px; }
@@ -23,10 +23,10 @@ body#people-map .profile-link{ position: relative; top: -5px; border-radius:8px;
 #people-list li .people-view-tags{display:block; font-size:.9em; color:#666; }
 #people-list li .location{display:block; color:#666; font-size:.9em; margin-bottom:3px; }
 #people-list li .people-view-projects{display:block; color:#666; font-size:.9em; margin-bottom:3px; }
-#people-list li .people-view-info{float:left; width:200px; }
+#people-list li .people-view-info{float:left; width:190px; }
 #people-list li.highlighted .collapsible{display:inline; }
 #people-list li .collapsible,#people-list li.highlighted .ellipsis{display:none; }
-#people-list.people-list-map{list-style:square; overflow:auto; height:450px; width:33%; }
+body#people-map #people-list.people-list-map {list-style:square; overflow:auto; height:450px; width:31.5%; }
 #people-list.people-list-map li{cursor:hand; cursor: pointer; }
 body#people-map #map-zoom,.view-links ul{margin:0; padding:0; }
 
