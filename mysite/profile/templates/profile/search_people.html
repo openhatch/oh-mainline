@@ -39,40 +39,6 @@ People
 	    
     </div>
 </form>
-    <div id='search_summary'>
-        People 
-        {% if q %}
-            {# If there's a query, tell us the people who match it. #}
-	{{ this_query_summary }}
-            &lsquo;<strong>{{ q }}</strong>&rsquo;:
-        {% else %}
-            {% comment %}
-                If there's *no query*, we list *everybody* in the DB on this page.
-            {% endcomment %}
-            on OpenHatch: 
-        {% endif %}
-        <strong id='people-count'>{{ people|length }}</strong>.
-
-        {% comment %}
-            Javascript fills these in when the map changes.
-        {% endcomment %}
-	{% if people %}
-        <span class='hide_once_map_loads'>Loading map...</span>
-	{% endif %}
-        <span class='dont_show_until_map_loads'>
-            <span id='how_many_people_are_visible_label'>
-                Currently visible on the map:
-            </span>
-            <strong id='how_many_people_are_visible'></strong>.
-            <a href='' {# refresh the page #} id='show_everybody'>(Show everybody.)</a>
-        </span>
-
-        {% for project in projects_that_match_q_exactly %}
-            <div class='project-yeller'>
-                &lsquo;{{ project.name }}&rsquo; also refers to <a href='?q=project:{{project.name_with_quotes_if_necessary|urlencode}}'>a project with {{ project.get_contributors|length}} contributor{{ project.get_contributors|length|pluralize}}.</a>
-            </div><!-- /.project-yeller -->
-        {% endfor %}
-    </div><!-- /#search_summary -->
     {% if not q %}
     <ul class='suggestions'>
         {% for suggestion in suggestions %}
@@ -130,6 +96,41 @@ People
         </ul>
     </div><!-- /#refine_search -->
     {% endif %}
+
+    <div id='search_summary'>
+        People 
+        {% if q %}
+            {# If there's a query, tell us the people who match it. #}
+	{{ this_query_summary }}
+            &lsquo;<strong>{{ q }}</strong>&rsquo;:
+        {% else %}
+            {% comment %}
+                If there's *no query*, we list *everybody* in the DB on this page.
+            {% endcomment %}
+            on OpenHatch: 
+        {% endif %}
+        <strong id='people-count'>{{ people|length }}</strong>.
+
+        {% comment %}
+            Javascript fills these in when the map changes.
+        {% endcomment %}
+	{% if people %}
+        <span class='hide_once_map_loads'>Loading map...</span>
+	{% endif %}
+        <span class='dont_show_until_map_loads'>
+            <span id='how_many_people_are_visible_label'>
+                Currently visible on the map:
+            </span>
+            <strong id='how_many_people_are_visible'></strong>.
+            <a href='' {# refresh the page #} id='show_everybody'>(Show everybody.)</a>
+        </span>
+
+        {% for project in projects_that_match_q_exactly %}
+            <div class='project-yeller'>
+                &lsquo;{{ project.name }}&rsquo; also refers to <a href='?q=project:{{project.name_with_quotes_if_necessary|urlencode}}'>a project with {{ project.get_contributors|length}} contributor{{ project.get_contributors|length|pluralize}}.</a>
+            </div><!-- /.project-yeller -->
+        {% endfor %}
+    </div><!-- /#search_summary -->
 
     {% if people %}
 
