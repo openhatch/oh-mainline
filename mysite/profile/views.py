@@ -417,8 +417,23 @@ def project_query2mappable_orm_people(parsed_query):
                  'count': len(people_who_can_pitch_in_with_project_language),
                  'summary_addendum': ", %s's primary language" % orm_project.name})
 
+
+    # Suggestions for possible mentors
+    suggestions_for_searches_regarding_people_who_can_mentor = []
+    for orm_project in orm_projects:
+        people_who_could_mentor_in_the_project_language = haystack.query.SearchQuerySet(
+            ).all().filter(can_mentor_lowercase_exact=orm_project.language)
+        if people_who_could_mentor_in_the_project_language:
+            suggestions_for_searches_regarding_people_who_can_mentor.append(
+                {'query': orm_project.language,
+                 'count': len(people_who_could_mentor_in_the_project_language),
+                 'summary_addendum': ", %s's primary language" % orm_project.name})
+
     extra_data['suggestions_for_searches_regarding_people_who_can_pitch_in'
                ] = suggestions_for_searches_regarding_people_who_can_pitch_in
+
+    extra_data['suggestions_for_searches_regarding_people_who_can_mentor'
+               ] = suggestions_for_searches_regarding_people_who_can_mentor
     
     return mappable_people, extra_data
 
