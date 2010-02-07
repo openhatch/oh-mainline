@@ -310,7 +310,7 @@ def tag_type_query2mappable_orm_people(tag_type_short_name, parsed_query):
     tag_type_according_to_haystack = tag_type_short_name + "_lowercase_exact"
     mappable_people_from_haystack = haystack.query.SearchQuerySet().all()
     mappable_people_from_haystack = mappable_people_from_haystack.filter(**{
-            tag_type_according_to_haystack: parsed_query['q']})
+            tag_type_according_to_haystack: parsed_query['q'].lower()})
 
     mappable_people_from_haystack.load_all()
 
@@ -333,7 +333,7 @@ def all_tags_query2mappable_orm_people(parsed_query):
     for query in query2results:
         # ask haystack...
         mappable_people_from_haystack = haystack.query.SearchQuerySet().all()
-        mappable_people_from_haystack = mappable_people_from_haystack.filter(**{query: parsed_query['q']})
+        mappable_people_from_haystack = mappable_people_from_haystack.filter(**{query: parsed_query['q'].lower()})
         
         mappable_people_from_haystack.load_all()
                 
@@ -364,7 +364,7 @@ def all_tags_query2mappable_orm_people(parsed_query):
     mentor_people = query2results['can_mentor_lowercase_exact']
     if mentor_people:
         extra_data['suggestions_for_searches_regarding_people_who_can_mentor'].append(
-            {'query': parsed_query['q'],
+            {'query': parsed_query['q'].lower(),
              'count': len(mentor_people)})
 
     extra_data['suggestions_for_searches_regarding_people_who_can_pitch_in'] = []
@@ -372,7 +372,7 @@ def all_tags_query2mappable_orm_people(parsed_query):
     can_pitch_in_people = query2results['seeking_lowercase_exact']
     if can_pitch_in_people:
         extra_data['suggestions_for_searches_regarding_people_who_can_pitch_in'].append(
-            {'query': parsed_query['q'], 'count': len(can_pitch_in_people)})
+            {'query': parsed_query['q'].lower(), 'count': len(can_pitch_in_people)})
 
     return mappable_people, extra_data
 
@@ -410,7 +410,7 @@ def project_query2mappable_orm_people(parsed_query):
     orm_projects = Project.objects.filter(name__iexact=parsed_query['q'])
     for orm_project in orm_projects:
         people_who_can_pitch_in_with_project_language = haystack.query.SearchQuerySet(
-            ).all().filter(seeking_lowercase_exact=orm_project.language)
+            ).all().filter(seeking_lowercase_exact=orm_project.language.lower())
         if people_who_can_pitch_in_with_project_language:
             suggestions_for_searches_regarding_people_who_can_pitch_in.append(
                 {'query': orm_project.language,
@@ -422,7 +422,7 @@ def project_query2mappable_orm_people(parsed_query):
     suggestions_for_searches_regarding_people_who_can_mentor = []
     for orm_project in orm_projects:
         people_who_could_mentor_in_the_project_language = haystack.query.SearchQuerySet(
-            ).all().filter(can_mentor_lowercase_exact=orm_project.language)
+            ).all().filter(can_mentor_lowercase_exact=orm_project.language.lower())
         if people_who_could_mentor_in_the_project_language:
             suggestions_for_searches_regarding_people_who_can_mentor.append(
                 {'query': orm_project.language,
