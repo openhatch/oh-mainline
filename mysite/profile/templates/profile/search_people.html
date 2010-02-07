@@ -77,7 +77,7 @@ People
                 <ul class='filter_disjunction'>
 		  {% for suggestion in suggestions_for_searches_regarding_people_who_can_pitch_in %}
                   <li><a href='?q=seeking:{{suggestion.query|urlencode}}'>Find people who can pitch in with
-                      {{ suggestion.query }}</a> ({{suggestion.count}})</li>
+                      {{ suggestion.query }}{{suggestion.summary_addendum}}</a> ({{suggestion.count}})</li>
 		  {% endfor %}
                 </ul>
             </li>

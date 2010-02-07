@@ -396,7 +396,26 @@ def project_query2mappable_orm_people(parsed_query):
     
     mappable_people = sorted([x.object for x in mappable_people_from_haystack],
                              key=lambda x: x.user.username)
-    return mappable_people, {}
+
+    extra_data = {}
+
+    ## populate suggestions_for_searches_regarding_people_who_can_pitch_in
+    ## that expects a {'query': X, 'count': Y} dict
+    suggestions_for_searches_regarding_people_who_can_pitch_in = []
+    orm_projects = Project.objects.filter(name__iexact=parsed_query['q'])
+    for orm_project in orm_projects:
+        people_who_can_pitch_in_with_project_language = haystack.query.SearchQuerySet(
+            ).all().filter(seeking_lowercase_exact=orm_project.language)
+        if people_who_can_pitch_in_with_project_language:
+            suggestions_for_searches_regarding_people_who_can_pitch_in.append(
+                {'query': orm_project.language,
+                 'count': len(people_who_can_pitch_in_with_project_language),
+                 'summary_addendum': ", %s's primary language" % orm_project.name})
+
+    extra_data['suggestions_for_searches_regarding_people_who_can_pitch_in'
+               ] = suggestions_for_searches_regarding_people_who_can_pitch_in
+    
+    return mappable_people, extra_data
 
 @view
 def people(request):
