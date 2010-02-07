@@ -54,19 +54,20 @@ body#people-map .suggestions > li li a:hover .this_part_gets_underlined { text-d
 body#people-map .suggestions > li li small { font-weight: normal; font-size: .8em; color: #888; }
 body#people-map .introduce_suggestions { float: left; width: 100%; }
 
-body#people-map #search_summary, body#people-map #search_modules > div { padding: 8px 0;  float: left; margin-top: 10px; }
+body#people-map #search_summary, body#people-map #search_modules > div { padding: 8px 0;  float: left; margin-top: 5px; }
 body#people-map #search_summary { padding: 10px 0; font-size: 1.1em; } 
 
 /* Refine your search */
-body#people-map #refine_search { padding: 1.5%; float: left; width: 97%; background-color: #ececec; -moz-border-radius: 1.5%; border-radius: 1.5%; }
+body#people-map #refine_search { margin-top: 10px; padding: 1.5%; float: left; width: 97%; background-color: #ececec; -moz-border-radius: 1.5%; border-radius: 1.5%; }
 body#people-map #refine_search h3 { padding: 0; margin-bottom: 10px; }
-body#people-map #refine_search .filter_conjunction { width: 100%; display: none; }
+body#people-map #refine_search .filter_conjunction { width: 100%;  }
 body#people-map #refine_search .filter_conjunction > li { list-style: none; float: left; width: 33%; }
 body#people-map #refine_search .filter_conjunction > li:last-child { margin-bottom: 0; }
 body#people-map #refine_search .filter_conjunction li li { list-style: circle; margin-left: 20px; float: left; }
 
 body#people-map #search_modules li { list-style: disc; margin-left: 22px;float: left; width: 87%; padding: 2px 0; color: #555; }
 body#people-map #related_queries { padding: 15px 0; }
+body#people-map #refine_search .filter_disjunction > li { width: 90%; }
 body#people-map #refine_search .filter_disjunction > li.initially_hidden { display: none; }
 body#people-map #refine_search .term { float: left; font-size: .85em; padding: 3px 0; font-weight: bold; }
 body#people-map .logical-operator { font-variant: small-caps; }
