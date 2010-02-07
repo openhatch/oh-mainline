@@ -491,9 +491,10 @@ def people(request):
         ~Q(name__iexact=data['q'])).order_by(
         '-cached_contributor_count')
 
+    MATCHING_PROJECT_SUGGESTIONS_COUNT = 3
     # limit this if we found people
     if data['people']:
-        data['matching_project_suggestions'] = data['matching_project_suggestions'][:5]
+        data['matching_project_suggestions'] = data['matching_project_suggestions'][:MATCHING_PROJECT_SUGGESTIONS_COUNT]
 
     # What kind of people are these?
     if data['q']:
