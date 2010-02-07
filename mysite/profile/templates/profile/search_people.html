@@ -60,6 +60,7 @@ People
     </ul><!-- /.suggestions -->
     {% endif %}
     {% if q %}
+    {% if mentor_count or suggestions_for_searches_regarding_people_who_can_pitch_in or matching_project_suggestions %}
     <div id='refine_search'>
         <ul class='filter_conjunction'>
 	  {% if mentor_count %}
@@ -94,6 +95,7 @@ People
 	    {% endif %}
         </ul>
     </div><!-- /#refine_search -->
+    {% endif %}
     {% endif %}
 
     <div id='search_summary'>
