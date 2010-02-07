@@ -20,6 +20,8 @@ import urllib
 import random
 import collections
 
+DEFAULT_LOCATION='Inaccessible Island'
+
 def url2printably_short(url, CUTOFF=50):
     short_enough_pieces_so_far = []
     die_next = False
@@ -84,8 +86,13 @@ class Person(models.Model):
     location_confirmed = models.BooleanField(default=False)
     location_display_name = models.CharField(max_length=255, blank=True,
                                              verbose_name='Location')
-    
 
+    def get_public_location_or_default(self):
+        if self.location_confirmed and self.location_display_name:
+            return self.location_display_name
+        else:
+            return DEFAULT_LOCATION
+    
     def __unicode__(self):
         return "username: %s, name: %s %s" % (self.user.username,
                 self.user.first_name, self.user.last_name)

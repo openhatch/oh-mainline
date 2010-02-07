@@ -464,21 +464,18 @@ def people(request):
     # Get the list of people to display.
 
     if parsed_query['q'].strip():
-
         mappable_people, extra_data = query2results(parsed_query)
         data.update(extra_data)
 
     else:
         everybody = Person.objects.all()
-        mappable_filter = ( ~Q(location_display_name='') & Q(location_confirmed=True) )
-        mappable_people = everybody.filter(mappable_filter).order_by(
-            'user__username')
+        mappable_people = everybody
 
     # filter by query, if it is set
     data['people'] = mappable_people
     get_relevant_person_data = lambda p: (
             {'name': p.get_full_name_or_username(),
-            'location': p.location_display_name})
+            'location': p.get_public_location_or_default()})
     person_id2data = dict([(person.pk, get_relevant_person_data(person))
             for person in mappable_people])
     data['person_id2data_as_json'] = simplejson.dumps(person_id2data)

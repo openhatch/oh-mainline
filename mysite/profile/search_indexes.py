@@ -38,8 +38,6 @@ class PersonIndex(indexes.SearchIndex):
 
     def get_queryset(self):
         everybody = mysite.profile.models.Person.objects.all()
-        mappable_filter = ( ~Q(location_display_name='') &
-                            Q(location_confirmed=True) )
-        return everybody.filter(mappable_filter)
+        return everybody
 
 site.register(mysite.profile.models.Person, PersonIndex)
