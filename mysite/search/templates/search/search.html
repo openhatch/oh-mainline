@@ -1,27 +1,191 @@
-    <h2>Search</h2>
+{% extends 'search/base.html' %}
 
-    <form method="get" action=".">
-        <table>
-            {{ form.as_table }}
-            <tr>
-                <td>&nbsp;</td>
-                <td>
-                    <input type="submit" value="Search">
-                </td>
-            </tr>
-        </table>
+{% load search %}
 
-        {% if query %}
-            <h3>Results</h3>
+{% block title %}
+Search bugs 
+{% endblock title %}
 
-            {% for result in page.object_list %}
-                <p>
-                    <a href="{{ result.object.get_absolute_url }}">{{ result.object.title }}</a>
-                </p>
-            {% empty %}
-                <p>No results found.</p>
-            {% endfor %}
+{% block css %}
+{{ block.super }}
+{% if not bunch_of_bugs %}
+#results-sidebar {
+    display: none;
+}
+{% endif %}
+{% endblock css %}
+
+{% block pagetop %}
+<h3><img alt='Volunteer opportunities' id='volunteer-opportunities' alt='Volunteer opportunities' src='/static/images/volunteer-opportunities-full.png' /></h3>
+{% endblock pagetop %}
+
+{% block sidebar %}
+
+{% if not the_user.is_authenticated %}
+<div id='hwat-is-this' class='box module notification'
+    style='background-image: none;'>
+    <h4>What is this?</h4>
+    <p>Find ways to contribute to free and open source software projects. Sample searches:
+    <ul>
+        <li><a href='?q=command+line'>Bugs matching "command line"</a></li>
+        <li><a href='?q=&amp;toughness=bitesize&amp;language=C%23'>Bitesize bugs in C#</a></li>
+    </ul>
+    </p>
+</div>
+{% endif %}
+
+<div id='filters' class='box module'>
+    <h4 style='margin-bottom: 10px;'>
+        {% if query.terms %}
+        Filter results for <strong>{{ query.terms_string }}</strong>:
         {% else %}
-            {# Show some example queries to run, maybe query syntax, something else? #}
+        Browse&hellip;
         {% endif %}
+    </h4>
+    <ul id='facets'>
+        {% for facet_name, facet in query.get_possible_facets.items reversed %}
+            {% comment %}
+            facets = e.g. {
+                'language': {
+                    'Python': 1,
+                    'Java': 8,
+                }
+            }
+            {% endcomment %}
+            <li>
+                    by
+                {{ facet.sidebar_name }}
+                <ul>
+                    {% for option in facet.options %}
+                        {% if option.name %}
+                            <li {% if option.is_active %}class='active'{% endif %}>
+                                <a href='?{{ option.query_string }}'>
+                                    {% if facet_name|in_list:query.active_facet_options %}
+                                        {% if not option.is_active %}
+                                            {% ifnotequal option.name "any" %}
+                                            Switch to
+                                            {% endifnotequal %}
+                                        {% endif %}
+                                    {% endif %}
+                                    {{ option.name }} ({{ option.count }})</a>
+                                {% ifequal option.name 'bitesize' %}
+                                    <small>
+                                        (<a id='define-bite-size' href="#">what's this?</a>)
+                                    </small>
+                                {% endifequal %}
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endfor %}
+    </ul>
+    {% if query.terms %}
+        <a href='./' style='display: block; margin-bottom: 10px;'>&laquo; Back to browsing</a>
+    {% endif %}
+</div>
+
+<div id='recommendations' class='box module'>
+    <h4>Recommended searches</h4>
+    {% if the_user.is_authenticated %}
+    {% if suggestions %}
+    <form name='suggested_searches'
+        id='suggested_searches'
+        method='GET' action=''>
+        <ul>
+            {% for index, term, czeched in suggestions %}
+            <li>
+            <a 
+                {% ifequal term.lower query.terms_string.lower %}
+                style='font-weight: bold;'
+                {% endifequal %}
+                href='?q={{ term|urlencode }}'>{{ term }}</a>
+            </li>
+            {% endfor %}
+        </ul>
     </form>
+    {% else %}
+        <a href='{% url mysite.profile.views.portfolio_editor %}'>
+            <strong>List some projects in your portfolio</strong> to receive recommendations.
+        </a>
+    {% endif %}
+    {% else %}
+    <ul>
+        <li>
+        <a href='/+me'>
+            <strong>List your interests and experience</strong> to get personalized recommendations.
+        </a>
+        </li>
+    </ul>
+    {% endif %}
+</div>
+
+<div id='about_projects' class='box module'>
+    <h4>
+      Tracking opportunities in
+      </h4>
+    <h4 id='how_many_projects'>
+        <a href='{% url mysite.project.views.projects %}'>
+          <strong style='color: #FF6D3D;'>{{ project_count }}</strong>
+          projects
+        </a>
+    </h4>
+    <div id='learn_more'>
+        <a href='{% url mysite.project.views.projects %}'>See all</a>
+        <span style='color: #999;'>&bull;</span>
+        <a href='https://openhatch.org/wiki/Bug_trackers'>Add a bug tracker</a>
+    </div>
+</div>
+{% endblock sidebar %}
+
+{% block main %}
+<div id='results' class='gewgaws module box results'>
+        <form name='search_opps' method='get'> 
+            <input type='text'
+            name='q' id='q'
+            class='default-text'
+            title='Search {% if query.active_facet_options %}within results{% else %}bugs{% endif %} by language, project or full text'
+            value='{{ query.terms_string }}' />
+
+            {% for facet, value in query.active_facet_options.items %}
+            <input type='hidden' name='{{facet}}' value='{{value}}' />
+            {% endfor %}
+            <input type='submit' id='button' value='Search' />
+        </form>
+
+        {% if query.terms_string or query.active_facet_options or bunch_of_bugs %}
+        {% include 'search/results_widget.html' %}
+        {% endif %}
+
+        {% if bunch_of_bugs %}
+        <ul>
+            {% for bug in bunch_of_bugs %}
+            <li class='bug {% cycle "even" "odd"%}'>
+            {% include 'search/result.html' %}
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+
+        {% endif %}
+
+</div> <!-- /#results -->
+{% endblock main %}
+{% block js %}
+{{ block.super }}
+{% comment %}
+<script src='/static/js/search/testData.js'></script>
+<script src='/static/js/search/tests.js'></script>
+{% endcomment %}
+<script type='text/javascript'>
+    $(function () {
+            $('#define-bite-size').click(function () {
+                var definition = (
+                    '<dt><strong>Bite-size</strong> [\ˈbaɪtˌsaɪz\], adj.</dt>' + 
+                    '<dd>Good for newcomers; ' +
+                    'relatively easy and rewarding to fix.</dd>');
+                $.jGrowl(definition, { life: 10000 });
+                });
+            });
+</script>
+{% endblock js %}
