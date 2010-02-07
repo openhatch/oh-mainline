@@ -362,11 +362,12 @@ def all_tags_query2mappable_orm_people(parsed_query):
     extra_data = dict(
         mentor_count=len(query2results['can_mentor_lowercase_exact']))
 
+    extra_data['suggestions_for_searches_regarding_people_who_can_pitch_in'] = []
     ## Does this relate to people who can pitch in?
     can_pitch_in_people = query2results['seeking_lowercase_exact']
     if can_pitch_in_people:
-        extra_data['suggestions_for_searches_regarding_people_who_can_pitch_in'
-                   ] = [parsed_query['q']]
+        extra_data['suggestions_for_searches_regarding_people_who_can_pitch_in'].append(
+            {'query': parsed_query['q'], 'count': len(can_pitch_in_people)})
 
     return mappable_people, extra_data
 

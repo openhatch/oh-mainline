@@ -110,8 +110,8 @@ People
                 <span class='term'>Looking for help with your project?</span>
                 <ul class='filter_disjunction'>
 		  {% for suggestion in suggestions_for_searches_regarding_people_who_can_pitch_in %}
-                  <li><a href='?q=seeking:{{suggestion|urlencode}}'>Find people who can pitch in with
-                      <strong>{{ suggestion }}</strong></a></li>
+                  <li><a href='?q=seeking:{{suggestion.query|urlencode}}'>Find people who can pitch in with
+                      {{ suggestion.query }}</a> ({{suggestion.count}})</li>
 		  {% endfor %}
                 </ul>
             </li>
