@@ -1,19 +1,14 @@
 PeopleMapController = function () { };
 
 PeopleMapController.prototype.geocode = function(data, callback) {
-    var ajaxOptions = {
-	'url': '/+geocode',
-	'type': 'GET',
-	'data': data,
-	'dataType': 'json',
-	'success': function(data) {
-	    callback(data, true);
-	    },
-	'error': function() {
-	    callback(null, false);
-	    }
-    };
-    $.ajax(ajaxOptions);
+    var location_object = geocode_person_id(data['person_id']);
+    var success;
+    if (typeof data == 'undefined') {
+	success = false;
+    } else {
+	success = true;
+    }
+    callback(location_object, success);
 };
 
 
@@ -109,7 +104,7 @@ PeopleMapController.prototype.initialize = function(options) {
 
         // Ask the OpenHatch Geocoder API ;-) for some geographic data, concerning a particular
         // location.
-        this.geocode( { 'address': location_name},
+        this.geocode( { 'person_id': person_id},
                 create_a_callback(this, name, person_id));
     } // end for loop
 
