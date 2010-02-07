@@ -105,14 +105,14 @@ People
                 </ul>
             </li>
 	    {% endif %}
-	    {% if 1 or can_pitch_in_with_suggestions %}
+	    {% if suggestions_for_searches_regarding_people_who_can_pitch_in %}
             <li>
                 <span class='term'>Looking for help with your project?</span>
                 <ul class='filter_disjunction'>
-                    <li><a href=''>Find people who can pitch in with
-                            <strong>Python</strong></a></li>
-                    <li><a href=''>Find people who can pitch in with
-                            <strong>Java packaging</strong></a></li>
+		  {% for suggestion in suggestions_for_searches_regarding_people_who_can_pitch_in %}
+                  <li><a href='?q=seeking:{{suggestion|urlencode}}'>Find people who can pitch in with
+                      <strong>{{ suggestion }}</strong></a></li>
+		  {% endfor %}
                 </ul>
             </li>
 	    {% endif %}
