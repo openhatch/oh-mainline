@@ -98,7 +98,9 @@ PeopleMapController.prototype.initialize = function(options) {
                 else {
 		    /* If the marker we found is for inaccessible people, hide them all */
 		    if (marker === mapController.the_marker_for_inaccessible_island) {
-			$('.inaccessible_islander').hide();
+			if ($person_summary.is(':visible')) {
+			    $('.inaccessible_islander').hide();
+			}
 		    }
 		    else {
 			/* otherwise hide just that one person */
