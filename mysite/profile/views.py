@@ -493,6 +493,10 @@ def people(request):
         data['center_name'] = request.GET.get('center', '')
         data['center_name_json'] = simplejson.dumps(request.GET.get('center', ''))
 
+    data['person_id2lat_long_as_json'] = simplejson.dumps(
+        dict( (person_id, simplejson.loads(mysite.base.controllers.cached_geocoding_in_json(person_id2data[person_id]['location'])))
+              for person_id in person_id2data))
+
     suggestion_count = 6
 
     cache_timespan = 86400 * 7

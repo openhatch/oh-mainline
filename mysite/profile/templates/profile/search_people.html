@@ -213,6 +213,11 @@ var related_searches_toggler = function () {
     return false;
 };
 
+function geocode_person_id(person_id) {
+    var data = {{ person_id2lat_long_as_json|safe}};
+    return data[person_id];
+}
+
 $(function() {
 	$('#toggle_related_searches').click(related_searches_toggler); });
     
