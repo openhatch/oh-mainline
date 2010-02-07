@@ -143,7 +143,9 @@ PeopleMapController.prototype.initialize = function(options) {
             for (var i = 0; i < all_markers.length; i++) {
                 var marker = all_markers[i];
                 var $person_summary = $('#person_summary_' + marker.person_id);
-                if (map.getBounds().contains(marker.position)) {
+                var bounds = map.getBounds();
+                if (typeof bounds != 'undefined' &&
+                    bounds.contains(marker.position)) {
 
                     // If the person bullet is hidden,
                     if($person_summary.is(':visible') === false) {
