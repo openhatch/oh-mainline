@@ -38,12 +38,62 @@ PeopleMapController.prototype.initialize = function(options) {
 
     var $canvas = $('#map_canvas');
 
+    update_people_count = function () {
+        $('.hide_once_map_loads').hide();
+        $('.dont_show_until_map_loads').show();
+        var mappedPeople_count = $("#people-list li:visible").size();
+
+        var str = mappedPeople_count;
+        if (mappedPeople_count == num_of_persons_who_can_be_geocoded) {
+	    $('#show_everybody').hide();
+            str = "Everybody";
+        }
+	else {
+	    $('#show_everybody').show();
+	}
+        if (mappedPeople_count == 0) {
+            str = "Nobody";
+        }
+        $('#how_many_people_are_visible_label').show();
+        $('#how_many_people_are_visible').text(str);
+    }; // end function update_people_count
+
+    this.updatePeopleCount = update_people_count;
+
     // This allows you to access the map globally, on this object
     this.map = new google.maps.Map($canvas.get(0), myOptions);
 
     // Hide the background image after 2.5 seconds.
     var hideBGImage = function () { $canvas.css('background', ''); };
     window.setTimeout(hideBGImage, 2500);
+
+    function generate_update_all_markers(map) {
+        return function() {
+            /* This only makes up to 10 people show on the right. */
+            var shown_this_many = 0;
+
+            for (var i = 0; i < all_markers.length; i++) {
+                var marker = all_markers[i];
+                var $person_summary = $('#person_summary_' + marker.person_id);
+                var bounds = map.getBounds();
+                if (typeof bounds != 'undefined' &&
+                    bounds.contains(marker.position)) {
+
+                    // If the person bullet is hidden,
+                    if($person_summary.is(':visible') === false) {
+                        $person_summary.show();
+                    }
+                    shown_this_many += 1;
+                }
+                else {
+                    $person_summary.hide();
+                } 
+            }
+            update_people_count();
+        };
+    } // end function generate_update_all_markers
+
+    update_all_markers = generate_update_all_markers(this.map);
 
     /*
      * This function is called with an option named "person_id2data".
@@ -108,55 +158,6 @@ PeopleMapController.prototype.initialize = function(options) {
                 create_a_callback(this, name, person_id));
     } // end for loop
 
-    update_people_count = function () {
-        $('.hide_once_map_loads').hide();
-        $('.dont_show_until_map_loads').show();
-        var mappedPeople_count = $("#people-list li:visible").size();
-
-        var str = mappedPeople_count;
-        if (mappedPeople_count == num_of_persons_who_can_be_geocoded) {
-	    $('#show_everybody').hide();
-            str = "Everybody";
-        }
-	else {
-	    $('#show_everybody').show();
-	}
-        if (mappedPeople_count == 0) {
-            str = "Nobody";
-        }
-        $('#how_many_people_are_visible_label').show();
-        $('#how_many_people_are_visible').text(str);
-    } // end function update_people_count
-
-    this.updatePeopleCount = update_people_count;
-
-    function generate_update_all_markers(map) {
-        return function() {
-            /* This only makes up to 10 people show on the right. */
-            var shown_this_many = 0;
-
-            for (var i = 0; i < all_markers.length; i++) {
-                var marker = all_markers[i];
-                var $person_summary = $('#person_summary_' + marker.person_id);
-                var bounds = map.getBounds();
-                if (typeof bounds != 'undefined' &&
-                    bounds.contains(marker.position)) {
-
-                    // If the person bullet is hidden,
-                    if($person_summary.is(':visible') === false) {
-                        $person_summary.show();
-                    }
-                    shown_this_many += 1;
-                }
-                else {
-                    $person_summary.hide();
-                } 
-            }
-            update_people_count();
-        };
-    } // end function generate_update_all_markers
-
-    update_all_markers = generate_update_all_markers(this.map);
     google.maps.event.addListener(this.map,
             'bound_changed',
             update_all_markers);
@@ -169,6 +170,8 @@ PeopleMapController.prototype.highlightPerson = function(personId) {
     //highlight the right person
     $('#person_summary_' + personId).addClass("highlighted");
 };
+
+
 
 
 //binds the clickhandlers to people list items
