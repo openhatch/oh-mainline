@@ -10,7 +10,7 @@ body#people-map .view-links{float:left; width:33%; }
 body#people-map .view-links ul li{display:inline; margin-right:10px; margin-bottom:10px; float:left; font-size:1.3em; }
 body#people-map .left{float:left; width:51px; }
 body#people-map .profile-link:hover {text-decoration:none; color:#000; }
-body#people-map .profile-link{ position: relative; top: -5px; border-radius:8px; -moz-border-radius:8px; background-color:#ddf; color:#555; padding:4px 8px; border:2px solid #fff; font-size: .85em; float:right; margin-left:4px; }
+body#people-map .profile-link{ border-radius:8px; -moz-border-radius:8px; background-color:#ddf; color:#555; padding:4px 8px; border:2px solid #fff; font-size: .85em; float:right; margin-left:4px; }
 #big-people-list,#big-people-list ul,#big-people-list .people-list-map{float:left; }
 #people-list li.hover{background:#ffc; }
 #people-list li.highlighted{background:#ffa !important; }
@@ -23,7 +23,7 @@ body#people-map .profile-link{ position: relative; top: -5px; border-radius:8px;
 #people-list li .people-view-tags{display:block; font-size:.9em; color:#666; }
 #people-list li .location{display:block; color:#666; font-size:.9em; margin-bottom:3px; }
 #people-list li .people-view-projects{display:block; color:#666; font-size:.9em; margin-bottom:3px; }
-#people-list li .people-view-info{float:left; width:190px; }
+#people-list li .people-view-info{float:left; width:190px; overflow-x: hidden; }
 #people-list li.highlighted .collapsible{display:inline; }
 #people-list li .collapsible,#people-list li.highlighted .ellipsis{display:none; }
 body#people-map #people-list.people-list-map {list-style:square; overflow:auto; height:450px; width:31.5%; }

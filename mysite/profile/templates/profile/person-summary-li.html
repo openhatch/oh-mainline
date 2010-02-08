@@ -43,7 +43,7 @@
         {% with person.get_list_of_project_names as project_names %}
         {% if project_names %}
             <span class="people-view-projects">
-                <span style="color: #999;">projects:</span> {{ project_names|join:", "}}
+                <span style="color: #999;">projects:</span> {{ project_names|join:", " }}
             </span>
         {% endif %}
     {% endwith %}
