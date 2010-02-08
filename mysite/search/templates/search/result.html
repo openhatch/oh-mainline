@@ -32,7 +32,7 @@
 
 	{% if bug.project.potential_mentors %}
 	<span class="helpers" style="color: black;">
-	  - <a href="{{ bug.project.get_url }}">{{bug.project.potential_mentors|length}} potential
+	  - <a href="{{ bug.project.get_mentors_search_url }}">{{bug.project.potential_mentors|length}} potential
 	  mentor{{bug.project.potential_mentors|length|pluralize}}</a>
 	</span>
 	{% endif %}
