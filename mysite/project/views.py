@@ -15,7 +15,7 @@ def project(request, project__name = None):
             'project/project.html',
             {
                 'project': p,
-                'contributors': p.get_contributors(),
+                'contributors': p.get_contributors()[:3],
                 'mentors': (mysite.profile.controllers.people_matching(
                     'can_mentor', project__name)),
                 'language_mentors': (mysite.profile.controllers.people_matching(
