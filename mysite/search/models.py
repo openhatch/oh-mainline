@@ -100,7 +100,7 @@ class Project(models.Model):
     logo_contains_name = models.BooleanField(default=False)
 
     # Cache the number of OpenHatch members who have contributed to this project.
-    cached_contributor_count = models.IntegerField()
+    cached_contributor_count = models.IntegerField(default=0, null=True)
 
     def populate_icon_from_ohloh(self):
 
