@@ -201,6 +201,11 @@ class Project(models.Model):
                                          self.name_with_quotes_if_necessary()})
         return reverse(mysite.profile.views.people) + '?' + query_string
 
+    def get_mentors_search_url(self):
+        query_string = urllib.urlencode({'q': 'can_mentor:"%s"' %
+                                         self.language})
+        return reverse(mysite.profile.views.people) + '?' + query_string
+
     def get_open_bugs(self):
         return Bug.open_ones.filter(project=self)
 
