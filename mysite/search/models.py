@@ -6,6 +6,7 @@ import datetime
 import StringIO
 import Image
 import uuid
+import urllib
 from django.db.models import Q
 import mysite.customs 
 from django.core.urlresolvers import reverse
@@ -138,10 +139,6 @@ class Project(models.Model):
         else:
             return settings.MEDIA_URL + 'no-project-icon-w=20.png'
 
-    @models.permalink
-    def url(self):
-        return ('mysite.project.views.project', [self.name])
-
     def update_scaled_icons_from_self_icon(self):
         '''This method should be called when you update the Project.icon_raw attribute.
         Side-effect: Saves a scaled-down version of that icon in the
@@ -200,7 +197,9 @@ class Project(models.Model):
         return "name='%s' language='%s'" % (self.name, self.language)
     
     def get_url(self):
-        return reverse(mysite.project.views.project, kwargs={'project__name': self.name})
+        query_string = urllib.urlencode({'q': 'project:' +
+                                         self.name_with_quotes_if_necessary()})
+        return reverse(mysite.profile.views.people) + '?' + query_string
 
     def get_open_bugs(self):
         return Bug.open_ones.filter(project=self)
