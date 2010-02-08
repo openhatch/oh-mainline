@@ -13,6 +13,7 @@ body#people-map .profile-link:hover {text-decoration:none; color:#000; }
 body#people-map .profile-link{ border-radius:8px; -moz-border-radius:8px; background-color:#ddf; color:#555; padding:4px 8px; border:2px solid #fff; font-size: .85em; float:right; margin-left:4px; }
 #big-people-list,#big-people-list ul,#big-people-list .people-list-map{float:left; }
 #people-list li.hover{background:#ffc; }
+#people-list a:hover{text-decoration: none; }
 #people-list li.highlighted{background:#ffa !important; }
 #people-list li.highlighted .name{text-shadow:0 1px 0 #fff; }
 #people-list .people-list-column{width:32%; float:left; border-left:1px dashed #dfdfdf; padding-left:15px; }
@@ -69,7 +70,7 @@ body#people-map #search_modules li { list-style: disc; margin-left: 22px;float: 
 body#people-map #related_queries { padding: 15px 0; }
 body#people-map #refine_search .filter_disjunction > li { width: 90%; }
 body#people-map #refine_search .filter_disjunction > li.initially_hidden { display: none; }
-body#people-map #refine_search .term { float: left; font-size: .85em; padding: 3px 0; font-weight: bold; }
+body#people-map #refine_search .term { float: left; font-size: .85em; padding: 3px 0; font-weight: bold; width: 90%;}
 body#people-map .logical-operator { font-variant: small-caps; }
 body#people-map #people-list { width: 33%; }
 body#people-map #people-list .people-list-column { padding: 10px; width:45%; }
