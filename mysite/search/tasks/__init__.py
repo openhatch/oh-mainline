@@ -1,7 +1,7 @@
 from datetime import timedelta
 from mysite.search.models import Project
 from mysite.customs.models import RoundupBugTracker
-from celery.task import PeriodicTask
+from celery.task import Task, PeriodicTask
 from celery.registry import tasks
 from mysite.search.launchpad_crawl import grab_lp_bugs, lpproj2ohproj
 import mysite.customs.miro
@@ -34,6 +34,65 @@ class GrabGnomeLoveBugs(PeriodicTask):
         logger.info("Started to grab GNOME Love bugs")
         mysite.customs.bugtrackers.gnome_love.grab()
 
+class LearnAboutNewPythonDocumentationBugs(PeriodicTask):
+    run_every = timedelta(days=1)
+    def run(self, **kwargs):
+        logger = self.get_logger(**kwargs)
+        logger.info("Started to grab the list of Python documentation bugs.")
+        url = 'http://bugs.python.org/issue?status=1%2C3&%40sort=activity&%40columns=id&%40startwith=0&%40group=priority&%40filter=status%2Ccomponents&components=4&%40action=export_csv'
+        for bug_id in RoundupBugTracker.csv_url2bugs(url):
+            # enqueue a task to examine this bug
+            task = LookAtOneBugInPython()
+            task.delay(bug_id=bug_id)
+        logger.info("Finished grabbing the list of Python documentation bugs.")
+
+class LearnAboutNewEasyPythonBugs(PeriodicTask):
+    run_every = timedelta(days=1)
+    def run(self, **kwargs):
+        logger = self.get_logger(**kwargs)
+        logger.info("Started to grab the list of Python easy bugs.")
+        url = 'http://bugs.python.org/issue?status=1%2C3&%40sort=activity&%40columns=id&%40startwith=0&%40group=priority&%40filter=status%2Ckeywords&keywords=6&%40action=export_csv'
+        for bug_id in RoundupBugTracker.csv_url2bugs(url):
+            # enqueue a task to examine this bug
+            task = LookAtOneBugInPython()
+            task.delay(bug_id=bug_id)
+        logger.info("Finished grabbing the list of Python easy bugs.")
+
+class LookAtOneBugInPython(Task):
+    def run(self, bug_id, **kwargs):
+        logger = self.get_logger(**kwargs)
+        logger.info("Was asked to look at bug %d in Python" % bug_id)
+        # If the bug is already in our database, just skip the
+        # request.
+        url = 'http://bugs.python.org/issue%d' % bug_id
+        matching_bugs = mysite.search.models.Bug.all_bugs.filter(
+            canonical_bug_link=url)
+        if matching_bugs:
+            logger.info("We already know about %d in Python." % bug_id)
+            return
+        # Okay, so we must create it.
+        # Note that creating it here is enough for the other background
+        # refreshing daemon to pick up on it when it next
+        # calls self.grab(). However, we do an eager refresh here.
+
+        # FIXME: We should pay attention to the last time we refreshed it
+        # to avoid hammering remote servers.
+
+        try:
+            rpt = RoundupBugTracker.objects.get(name='GrabPythonBugs')
+        except RoundupBugTracker.DoesNotExist:
+            logger.info("Could not find a matching Python bug tracker. Bailing.")
+            return
+
+        bug = rpt.create_bug_object_for_remote_bug_id(bug_id)
+
+        # If there is already a bug with this canonical_bug_link in the DB, just delete it.
+        bugs_this_one_replaces = mysite.search.models.Bug.all_bugs.filter(canonical_bug_link=bug.canonical_bug_link)
+        for delete_me in bugs_this_one_replaces:
+            delete_me.delete()
+        bug.save()
+        logger.info("Successfully loaded %d in as a Python bug." % bug_id)
+
 class GrabPythonBugs(PeriodicTask):
     run_every = timedelta(days=1)
     def run(self, **kwargs):
@@ -41,39 +100,22 @@ class GrabPythonBugs(PeriodicTask):
         logger.info("Started to grab Python 'easy' bugs")
         bug_tracker_name = self.__class__.__name__
         python_core, _ = Project.objects.get_or_create(name='Python', language='Python')
-        # FIXME: Do we need this line?
-        RoundupBugTracker.objects.filter(name=bug_tracker_name).delete()
-        p, _ = RoundupBugTracker.objects.get_or_create(name=bug_tracker_name, project=python_core)
-        p.include_these_roundup_bug_statuses = '1,3'
-        p.roundup_root_url = 'http://bugs.python.org'
-        p.csv_keyword = '6' # Only grab bugs marked "easy"
-        p.my_bugs_are_always_good_for_newcomers = True
-        p.save()
-        p.grab()
 
-class GrabPythonBugsInDocumentation(PeriodicTask):
-    run_every = timedelta(days=1)
-    def run(self, **kwargs):
-        logger = self.get_logger(**kwargs)
-        logger.info("Started to grab Python documentation bugs")
-        bug_tracker_name = self.__class__.__name__
-        python_core, _ = Project.objects.get_or_create(name='Python', language='Python')
-        # FIXME: Do we need this line?
-        RoundupBugTracker.objects.filter(name=bug_tracker_name).delete()
+        roundup_root_url = 'http://bugs.python.org'
+        # Delete all other RoundupBugTracker objects using the same root
+        rpts = RoundupBugTracker.objects.filter(roundup_root_url=roundup_root_url)
+        for rpt in rpts:
+            if rpt.name != bug_tracker_name:
+                rpt.delete()
+
         p, _ = RoundupBugTracker.objects.get_or_create(name=bug_tracker_name, project=python_core)
-        p.include_these_roundup_bug_statuses = '1,3'
-        p.roundup_root_url = 'http://bugs.python.org'
-        p.my_bugs_concern_just_documentation = True
-        p.components = '4'
         p.save()
         p.grab()
-        """e.g.,
-        http://bugs.python.org/issue?@action=export_csv&@columns=title,id,activity,status
-        &@sort=activity&@group=priority&@filter=components,status
-        &@pagesize=50&@startwith=0&status=1&components=4"""
 
 tasks.register(GrabMiroBugs)
 tasks.register(GrabGnomeLoveBugs)
 tasks.register(GrabLaunchpadBugs)
+tasks.register(LearnAboutNewEasyPythonBugs)
+tasks.register(LearnAboutNewPythonDocumentationBugs)
+tasks.register(LookAtOneBugInPython)
 tasks.register(GrabPythonBugs)
-tasks.register(GrabPythonBugsInDocumentation)
