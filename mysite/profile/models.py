@@ -351,7 +351,7 @@ class TagType(models.Model):
     # {{{
     short_name2long_name = {'understands': 'understands',
                             'can_mentor': 'can mentor in',
-                            'seeking': 'can pitch in with',
+                            'can_pitch_in': 'can pitch in with',
                             'understands_not': 'will never understand',
                             'studying': 'currently studying'}
     name = models.CharField(max_length=100)

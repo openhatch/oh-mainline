@@ -23,9 +23,9 @@ class PersonIndex(indexes.SearchIndex):
     def prepare_can_mentor_lowercase_exact(self, person_instance):
         return self._pull_lowercase_tag_texts('can_mentor', person_instance)
 
-    seeking_lowercase_exact = indexes.MultiValueField()
-    def prepare_seeking_lowercase_exact(self, person_instance):
-        return self._pull_lowercase_tag_texts('seeking', person_instance)
+    can_pitch_in_lowercase_exact = indexes.MultiValueField()
+    def prepare_can_pitch_in_lowercase_exact(self, person_instance):
+        return self._pull_lowercase_tag_texts('can_pitch_in', person_instance)
 
     understands_lowercase_exact = indexes.MultiValueField()
     def prepare_understands_lowercase_exact(self, person_instance):

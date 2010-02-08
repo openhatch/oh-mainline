@@ -126,14 +126,14 @@ class Info(TwillTests):
     tags = {
             'understands': ['ack', 'b', 'c'],
             'understands_not': ['dad', 'e', 'f'],
-            'seeking': ['gone', 'h', 'i'],
+            'can_pitch_in': ['gone', 'h', 'i'],
             'studying': ['jam', 'k', 'l'],
             'can_mentor': ['mop', 'n', 'o'],
             }
     tags_2 = {
             'understands': ['Ack!', 'B!', 'C!'],
             'understands_not': ['dad', 'e', 'f'],
-            'seeking': ['gone', 'h', 'i'],
+            'can_pitch_in': ['gone', 'h', 'i'],
             'studying': ['Jam?', 'K?', 'L?'],
             'can_mentor': ['mop', 'n', 'o'],
             }
@@ -826,7 +826,7 @@ class PersonInfoLinksToSearch(TwillTests):
         tags = {
             'understands': ['thing1'],
             'understands_not': ['thing2'],
-            'seeking': ['thing3'],
+            'can_pitch_in': ['thing3'],
             'studying': ['thing4'],
             'can_mentor': ['thing5'],
             }
@@ -1342,20 +1342,20 @@ class MapTagsRemoveDuplicates(TwillTests):
         understands_not.save()
         understands = TagType(name='understands')
         understands.save()
-        seeking = TagType(name='seeking')
-        seeking.save()
+        can_pitch_in = TagType(name='can_pitch_in')
+        can_pitch_in.save()
 
         tag_i_understand = Tag(tag_type=understands, text='something I understand')
         tag_i_understand.save()
         tag_i_dont = Tag(tag_type=understands_not, text='something I dont get')
         tag_i_dont.save()
-        tag_seeking = Tag(tag_type=seeking, text='something I UNDERSTAND')
-        tag_seeking.save()
+        tag_can_pitch_in = Tag(tag_type=can_pitch_in, text='something I UNDERSTAND')
+        tag_can_pitch_in.save()
         link_one = Link_Person_Tag(person=pp, tag=tag_i_understand)
         link_one.save()
         link_two = Link_Person_Tag(person=pp, tag=tag_i_dont)
         link_two.save()
-        link_three = Link_Person_Tag(person=pp, tag=tag_seeking)
+        link_three = Link_Person_Tag(person=pp, tag=tag_can_pitch_in)
         link_three.save()
 
         self.assertEqual(map(lambda x: x.lower(), pp.get_tag_texts_for_map()),
@@ -1369,16 +1369,16 @@ class PersonCanExplainTagSummary(TwillTests):
 
         understands = TagType(name='understands')
         understands.save()
-        seeking = TagType(name='seeking')
-        seeking.save()
+        can_pitch_in = TagType(name='can_pitch_in')
+        can_pitch_in.save()
 
         tag_i_understand = Tag(tag_type=understands, text='python')
         tag_i_understand.save()
-        tag_seeking = Tag(tag_type=seeking, text='something I UNDERSTAND')
-        tag_seeking.save()
+        tag_can_pitch_in = Tag(tag_type=can_pitch_in, text='something I UNDERSTAND')
+        tag_can_pitch_in.save()
         link_one = Link_Person_Tag(person=pp, tag=tag_i_understand)
         link_one.save()
-        link_two = Link_Person_Tag(person=pp, tag=tag_seeking)
+        link_two = Link_Person_Tag(person=pp, tag=tag_can_pitch_in)
         link_two.save()
         
         self.assertEqual(pp.calculate_summary('python'))

@@ -246,7 +246,7 @@ def edit_person_info(request):
 
     # We can map from some strings to some TagTypes
     for known_tag_type_name in ('understands', 'understands_not',
-                           'studying', 'seeking', 'can_mentor'):
+                           'studying', 'can_pitch_in', 'can_mentor'):
         tag_type, _ = TagType.objects.get_or_create(name=known_tag_type_name)
 
         text = request.POST.get('edit-tags-' + known_tag_type_name, '')
@@ -329,7 +329,7 @@ def all_tags_query2mappable_orm_people(parsed_query):
     # do three queries...
     # the values are set()s containing ID numbers of Django ORM Person objects
     queries_in_order = ['can_mentor_lowercase_exact',
-                        'seeking_lowercase_exact',
+                        'can_pitch_in_lowercase_exact',
                         'understands_lowercase_exact']
     query2results = {queries_in_order[0]: set(),
                      queries_in_order[1]: set(),
@@ -373,7 +373,7 @@ def all_tags_query2mappable_orm_people(parsed_query):
 
     extra_data['suggestions_for_searches_regarding_people_who_can_pitch_in'] = []
     ## Does this relate to people who can pitch in?
-    can_pitch_in_people = query2results['seeking_lowercase_exact']
+    can_pitch_in_people = query2results['can_pitch_in_lowercase_exact']
     if can_pitch_in_people:
         extra_data['suggestions_for_searches_regarding_people_who_can_pitch_in'].append(
             {'query': parsed_query['q'].lower(), 'count': len(can_pitch_in_people)})
@@ -414,7 +414,7 @@ def project_query2mappable_orm_people(parsed_query):
     orm_projects = Project.objects.filter(name__iexact=parsed_query['q'])
     for orm_project in orm_projects:
         people_who_can_pitch_in_with_project_language = haystack.query.SearchQuerySet(
-            ).all().filter(seeking_lowercase_exact=orm_project.language.lower())
+            ).all().filter(can_pitch_in_lowercase_exact=orm_project.language.lower())
         if people_who_can_pitch_in_with_project_language:
             suggestions_for_searches_regarding_people_who_can_pitch_in.append(
                 {'query': orm_project.language,

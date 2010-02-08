@@ -210,11 +210,11 @@
             {% endfor %}
         </div>
         {% endif %}
-        {% if tags.seeking and tags_flat.seeking %}
-        <div class='tags' id='tags-seeking'>
+        {% if tags.can_pitch_in and tags_flat.can_pitch_in %}
+        <div class='tags' id='tags-can_pitch_in'>
             <h4>can pitch in with</h4>
-            {% for thingamabob in tags.seeking %}
-            <a href="{% url mysite.profile.views.people %}?q=seeking:&quot;{{thingamabob.text|urlencode}}&quot;">
+            {% for thingamabob in tags.can_pitch_in %}
+            <a href="{% url mysite.profile.views.people %}?q=can_pitch_in:&quot;{{thingamabob.text|urlencode}}&quot;">
             {{ thingamabob.text }}</a>{% if not forloop.last %}, {% endif %}
             {% endfor %}
         </div>
