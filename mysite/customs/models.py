@@ -159,8 +159,6 @@ class RoundupBugTracker(models.Model):
         bug = mysite.search.models.Bug()
 
         metadata_dict = RoundupBugTracker.roundup_tree2metadata_dict(tree)
-        import pdb
-        pdb.set_trace()
 
         date_reported, bug.submitter_username, last_touched, last_toucher = [
                 x.text_content() for x in tree.cssselect(

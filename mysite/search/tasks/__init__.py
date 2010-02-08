@@ -42,8 +42,8 @@ class LearnAboutNewPythonDocumentationBugs(PeriodicTask):
         url = 'http://bugs.python.org/issue?status=1%2C3&%40sort=activity&%40columns=id&%40startwith=0&%40group=priority&%40filter=status%2Ccomponents&components=4&%40action=export_csv'
         for bug_id in RoundupBugTracker.csv_url2bugs(url):
             # enqueue a task to examine this bug
-            task = LookAtOneBugInPython(bug_id=bug_id)
-            task.delay()
+            task = LookAtOneBugInPython()
+            task.delay(bug_id=bug_id)
         logger.info("Finished grabbing the list of Python documentation bugs.")
 
 class LearnAboutNewEasyPythonBugs(PeriodicTask):
@@ -52,10 +52,10 @@ class LearnAboutNewEasyPythonBugs(PeriodicTask):
         logger = self.get_logger(**kwargs)
         logger.info("Started to grab the list of Python easy bugs.")
         url = 'http://bugs.python.org/issue?status=1%2C3&%40sort=activity&%40columns=id&%40startwith=0&%40group=priority&%40filter=status%2Ckeywords&keywords=6&%40action=export_csv'
-        for bug_id in mysite.customs.bugtrackers.python.csv_url2bugs(url):
+        for bug_id in RoundupBugTracker.csv_url2bugs(url):
             # enqueue a task to examine this bug
-            task = LookAtOneBugInPython(bug_id=bug_id)
-            task.delay()
+            task = LookAtOneBugInPython()
+            task.delay(bug_id=bug_id)
         logger.info("Finished grabbing the list of Python easy bugs.")
 
 class LookAtOneBugInPython(Task):
@@ -65,7 +65,8 @@ class LookAtOneBugInPython(Task):
         # If the bug is already in our database, just skip the
         # request.
         url = 'http://bugs.python.org/issue%d' % bug_id
-        matching_bugs = Bug.objects.filter(canonical_bug_link=url)
+        matching_bugs = mysite.search.models.Bug.all_bugs.filter(
+            canonical_bug_link=url)
         if matching_bugs:
             logger.info("We already know about %d in Python." % bug_id)
             return
