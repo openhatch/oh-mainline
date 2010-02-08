@@ -125,7 +125,7 @@ People
             <span id='how_many_people_are_visible_label'>
                 Currently visible on the map:
             </span>
-            <strong id='how_many_people_are_visible'></strong><span style="display: none;" id="people_without_locations">, including people who have not set a location</span>.
+            <strong id='how_many_people_are_visible'></strong><span style="display: none;" id="people_without_locations">, including people who have not set a location <a id='about_uninhabited_island' href='#'>(?)</a></span>.
             <a href='' {# refresh the page #} id='show_everybody'>(Show everybody.)</a>
         </span>
 
@@ -203,23 +203,21 @@ People
         mapController.bindClickHandlersToPeopleListItems();
     });
 
-var related_searches_toggler = function () {
-    var thing_to_show_or_hide = $('.filter_conjunction');
-    if (thing_to_show_or_hide.is(":visible")) {
-	thing_to_show_or_hide.hide();
-    } else { 
-	thing_to_show_or_hide.show();
-    }
-    return false;
-};
-
 function geocode_person_id(person_id) {
     var data = {{ person_id2lat_long_as_json|safe}};
     return data[person_id];
 }
 
 $(function() {
-	$('#toggle_related_searches').click(related_searches_toggler); });
+
+
+        $('#about_uninhabited_island').click(function () {
+            var message = "People who haven't set their locations appear on an uninhabited island in the South Atlantic.";
+            $.jGrowl(message, { position: "center", life: 10000 });
+            return false;
+            });
+        });
+
     
 </script>
 {% endif %}
