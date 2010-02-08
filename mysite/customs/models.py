@@ -7,6 +7,7 @@ import csv
 import datetime
 from django.db import models
 import mysite.search.models
+import mysite.customs.ohloh
 
 class RecentMessageFromCIA(models.Model):
     '''This model logs all messages from CIA.vc.
@@ -68,30 +69,20 @@ class RoundupBugTracker(models.Model):
     csv_keyword = models.CharField(max_length=50, null=True, default=None)
     components = models.CharField(max_length=50, null=True, default=None)
 
-    @property
-    def csv_url(self):
-        csv_GET_dict = {
-                    "@action": "export_csv",
-                    "@columns": "id", 
-                    "@sort": "activity",
-                    "@group": "priority",
-                    "@filter" : "status",
-                    "@startwith": 0,
-                    "status": self.include_these_roundup_bug_statuses,
-                    }
-        # As of time of writing, keywords is just used to specify keywords=6
-        # for bugs.python.org, which gives us python's "easy" bugs.
-        if self.csv_keyword:
-            csv_GET_dict['keywords'] = self.csv_keyword
-            csv_GET_dict['@filter'] += ",keywords"
+    @staticmethod
+    def csv_url2bugs(csv_url):
+        csv_fd = mysite.customs.ohloh.mechanize_get(
+            csv_url).response()
 
-        if self.components: # components is a string, so this tests for its emptiness 
-            csv_GET_dict['components'] = str(self.components)
-            csv_GET_dict['@filter'] += ",components"
+        doc = csv.reader(csv_fd)
+        try:
+            doc.next()
+        except StopIteration:
+            raise ValueError, "The CSV was empty."
 
-        return "%s/issue?%s" % (
-                self.roundup_root_url,
-                urllib.urlencode(csv_GET_dict))
+        for row in doc:
+            if row:
+                yield int(row[0])
 
     @staticmethod
     def roundup_tree2metadata_dict(tree):
@@ -131,17 +122,7 @@ class RoundupBugTracker(models.Model):
             return self.str2datetime_obj(date_string, possibility_index=possibility_index+1)
 
     def get_remote_bug_ids_to_read(self):
-        csv_fd = urllib2.urlopen(self.csv_url)
-
-        doc = csv.reader(csv_fd)
-        try:
-            doc.next()
-        except StopIteration:
-            raise ValueError, "The CSV was empty."
-
-        for row in doc:
-            if row:
-                yield int(row[0])
+        return [] # A separate task fills this in for us.
 
     def get_remote_bug_ids_already_stored(self):
         bugs = mysite.search.models.Bug.all_bugs.filter(
@@ -178,6 +159,8 @@ class RoundupBugTracker(models.Model):
         bug = mysite.search.models.Bug()
 
         metadata_dict = RoundupBugTracker.roundup_tree2metadata_dict(tree)
+        import pdb
+        pdb.set_trace()
 
         date_reported, bug.submitter_username, last_touched, last_toucher = [
                 x.text_content() for x in tree.cssselect(
@@ -186,8 +169,11 @@ class RoundupBugTracker(models.Model):
         bug.date_reported = self.str2datetime_obj(date_reported)
         bug.last_touched = self.str2datetime_obj(last_touched)
         bug.canonical_bug_link = remote_bug_url
-        bug.good_for_newcomers = self.my_bugs_are_always_good_for_newcomers 
-        bug.concerns_just_documentation = self.my_bugs_concern_just_documentation 
+
+        # FIXME: here is special-case data for python.org
+        bug.good_for_newcomers = ('easy' in metadata_dict['Keywords'])
+        bug.concerns_just_documentation = ('Documentation' 
+                                           in metadata_dict['Components'])
         bug.status = metadata_dict['Status'] 
         bug.looks_closed = (metadata_dict['Status'] == 'closed')
         bug.title = metadata_dict['Title'] 
