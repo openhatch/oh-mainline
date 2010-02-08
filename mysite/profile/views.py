@@ -297,7 +297,10 @@ def cut_list_of_people_in_two_columns(people):
     return [people[0:half], people[half:]]
     
 def permanent_redirect_to_people_search(request, property, value):
-    '''Property is the "tag name", and "value" is the text in it.''' 
+    '''Property is the "tag name", and "value" is the text in it.'''
+    if property == 'seeking':
+        property = 'can_pitch_in'
+    
     if ' ' in value:
         escaped_value = '"' + value + '"'
     else:
