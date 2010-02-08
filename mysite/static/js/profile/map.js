@@ -39,6 +39,14 @@ PeopleMapController.prototype.initialize = function(options) {
     var $canvas = $('#map_canvas');
 
     update_people_count = function () {
+	function update_inaccessible_island_help() {
+	    if ($('.inaccessible_islander:eq(0)').is(':hidden')) {
+		$('#people_without_locations').hide();
+	    } else {
+		$('#people_without_locations').show();
+	    }
+	}
+
         $('.hide_once_map_loads').hide();
         $('.dont_show_until_map_loads').show();
         var mappedPeople_count = $("#people-list li:visible").size();
@@ -56,6 +64,8 @@ PeopleMapController.prototype.initialize = function(options) {
         }
         $('#how_many_people_are_visible_label').show();
         $('#how_many_people_are_visible').text(str);
+
+	update_inaccessible_island_help();
     }; // end function update_people_count
 
     this.updatePeopleCount = update_people_count;
