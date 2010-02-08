@@ -13,6 +13,7 @@ import celery.registry
 import time
 import random
 import traceback
+import mysite.profile.search_indexes
 
 def create_citations_from_ohloh_contributor_facts(dia_id, ohloh_results):
     '''Input: A sequence of Ohloh ContributionFact dicts
@@ -253,6 +254,12 @@ source2result_handler = {
         'lp': create_citations_from_launchpad_results,
         }
 
+class ReindexPerson(Task):
+    def run(self, person_id, **kwargs):
+        person = Person.objects.get(id=person_id)
+        pi = mysite.profile.search_indexes.PersonIndex(person)
+        pi.update_object(person)
+
 class FetchPersonDataFromOhloh(Task):
     name = "profile.FetchPersonDataFromOhloh"
 
@@ -293,5 +300,6 @@ class FetchPersonDataFromOhloh(Task):
 
 try:
     celery.registry.tasks.register(FetchPersonDataFromOhloh)
+    celery.registry.tasks.register(ReindexPerson)
 except celery.registry.AlreadyRegistered:
     pass

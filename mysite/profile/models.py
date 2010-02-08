@@ -338,6 +338,13 @@ def reject_when_query_is_only_whitespace(sender, instance, **kwargs):
 def update_the_project_cached_contributor_count(sender, instance, **kwargs):
     instance.project.update_cached_contributor_count()
 
+def update_the_person_index(sender, instance, **kwargs):
+    person = instance.person
+    # Enqueue a background task to re-index the person
+    import mysite.profile.tasks
+    task = mysite.profile.tasks.ReindexPerson()
+    task.delay(person_id=person.id)
+
 models.signals.pre_save.connect(reject_when_query_is_only_whitespace, sender=DataImportAttempt)
 
 class TagType(models.Model):
@@ -597,5 +604,6 @@ class Citation(models.Model):
         return "pk=%s, summary=%s" % (pk, self.summary)
 
 models.signals.post_save.connect(update_the_project_cached_contributor_count, sender=PortfolioEntry)
+models.signals.post_save.connect(update_the_person_index, sender=PortfolioEntry)
 
 # vim: set nu:

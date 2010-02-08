@@ -36,6 +36,7 @@ from mysite.profile.models import \
 from mysite.search.models import Project
 from mysite.base.decorators import view
 import mysite.profile.forms
+import mysite.profile.tasks
 # }}}
 
 @login_required
@@ -272,7 +273,10 @@ def edit_person_info(request):
                     defaults={'text': tag_text})
             new_link, _ = Link_Person_Tag.objects.get_or_create(
                     tag=tag, person=person)
-            
+
+    # Enqueue a background task to re-index the person
+    task = mysite.profile.tasks.ReindexPerson()
+    task.delay(person_id=person.id)
     return HttpResponseRedirect(person.profile_url)
 
     # FIXME: This is racey. Only one of these functions should run at once.
