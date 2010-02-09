@@ -40,3 +40,6 @@ body#profile.two_columns .module > .body { width: 97%; padding: 10px; }
 
 body#profile #info .tags { float: left; width: 158px; margin-bottom: 15px; }
 body#profile #info .tags:last-child { margin-bottom: 0; }
+
+#edit_info ul.example li {float: none}
+#edit_info .form-row ul.example li { color:#888888; font-size:8pt; list-style: circle; margin: 5px 0 0 20px; }

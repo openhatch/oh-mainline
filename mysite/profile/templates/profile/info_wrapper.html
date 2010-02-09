@@ -54,21 +54,17 @@
                     </div>
 
                         <div class='form-row'>
-                            <label>bio:</label>
+                            <label>Bio:</label>
                             <textarea name='edit-tags-bio'>{{ person.bio }}</textarea>
                             <p class='example'>Example: I like traffic lights. On weekends, I like to make websites, destroy Twitter, and eat breakfast.</p>
                         </div>
 
                         <div class='form-row'>
-                            <label>web site:</label>
+                            <label>Web site:</label>
                             <input type='text' name='edit-tags-homepage_url' value='{{ person.homepage_url }}'>
                             <p class='example'>Example: http://geociti.es/Heartland/2042/</p>
                         </div>
 
-                        <div class='form-row'>
-                            <label>how to contact me:</label>
-                            <input type='text' name='edit-tags-contact_blurb' value='{{ person.contact_blurb }}'>
-                        </div>
 
                         <div class='form-row'>
                             <h3 style='float: left; width: 95%; margin-bottom: 3px;'>Tag yourself</h3>
@@ -108,6 +104,36 @@
                             <label>I can mentor in:</label>
                             <textarea name='edit-tags-can_mentor'>{{ tags_flat.can_mentor }}</textarea>
                             <p class='example'>Example: python, unicode, git, GTK+</p>
+                        </div>
+                        <div class='form-row'>
+                            <label>How to contact me:</label>
+                            <textarea name='edit-tags-contact_blurb'>{{ person.contact_blurb }}</textarea>
+                            <p class='example'>Example: "The best way to reach me is by private message at http://twitter.com/rafpaf."</p>
+                                
+                            <p class='example'>
+                            Certain accounts require special syntax:
+                            </p>
+                            <ul class="example">
+                                <li>
+                                goaim:dithyramble
+                                </li>
+                                <li>
+                                irc://irc.freenode.net/paulproteus,isnick
+                                </li>
+                            </ul>
+
+                            <p class='example'>
+                            We also provide a Craigslist-style email forwarding service. Just write something like "Email me at $fwd." and we'll convert that to "Email me at rafpaf.248y578gh57@ephemeral.openhatch.org.".
+                            </p>
+                            <p class='example'>
+                            Note that this email forwarding address will change every so often to thwart spammers.
+                            </p>
+                            <p class='example'>
+                            We'll convert newlines to &lt;br/&gt;.
+                            </p>
+                            <p class='example'>
+                            Note that this information will be public and crawlable by search engines.
+                            </p>
                         </div>
 
                         <input class='save-button' type='submit' style='float: left;' value='Save' />
