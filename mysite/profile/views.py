@@ -475,10 +475,10 @@ def people(request):
         data.update(extra_data)
 
     else:
-        everybody = Person.objects.all()
+        everybody = Person.objects.all().order_by('user__username')
 
     # filter by query, if it is set
-    data['people'] = everybody.order_by('user__username')
+    data['people'] = everybody
     get_relevant_person_data = lambda p: (
             {'name': p.get_full_name_or_username(),
             'location': p.get_public_location_or_default()})
