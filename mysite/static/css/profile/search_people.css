@@ -12,13 +12,13 @@ body#people-map .left{float:left; width:51px; }
 body#people-map .profile-link:hover {text-decoration:none; color:#000; }
 body#people-map .profile-link{ border-radius:8px; -moz-border-radius:8px; background-color:#ddf; color:#555; padding:4px 8px; border:2px solid #fff; font-size: .85em; float:right; margin-left:4px; }
 #big-people-list,#big-people-list ul,#big-people-list .people-list-map{float:left; }
-#people-list li.hover{background:#ffc; }
-#people-list a:hover{text-decoration: none; }
-#people-list li.highlighted{background:#ffa !important; }
+#people-list a:hover {background:#ffc;text-decoration: none; }
+#people-list a{float: left; width: 100%; border-radius:8px; -moz-border-radius:8px; margin-bottom:3px; width:94%; padding:8px; }
+#people-list li.highlighted a{background:#ffa !important; }
 #people-list li.highlighted .name{text-shadow:0 1px 0 #fff; }
 #people-list .people-list-column{width:32%; float:left; border-left:1px dashed #dfdfdf; padding-left:15px; }
 #people-list .people-list-column:first-child {border-left:none; padding-left:0; }
-#people-list li{border-radius:8px; -moz-border-radius:8px; margin-bottom:3px; list-style:none; display:block; float:left; width:94%; padding:8px; }
+#people-list li{ width: 100%; list-style:none; display:block; float:left; }
 #people-list li img{font-size:51px; vertical-align:top; float:left; margin-right:10px; margin-bottom:5px; }
 #people-list li .name{display:block; font-size:1.1em; margin-bottom:2px; font-weight:700; }
 #people-list li .people-view-tags{display:block; font-size:.9em; color:#666; }
