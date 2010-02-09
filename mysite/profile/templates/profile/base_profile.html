@@ -238,6 +238,13 @@
         </div>
         {% endif %}
 
+        {% if person.contact_blurb %}
+        <h4>contact info</h4>
+        <p id="contact_blurb" style='clear: both;'>
+            {{person.contact_blurb}}
+        </p>
+        {% endif %}
+
 {# vim: set filetype=htmldjango: #}
     </div>
 </div>
