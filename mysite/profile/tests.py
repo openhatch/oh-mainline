@@ -1421,34 +1421,6 @@ class SuggestLocation(TwillTests):
         self.assertEqual(type(data['geoip_guess']), unicode)
         self.assertEqual(data['geoip_guess'], u'Reykjav\xedk, 10, Iceland')
 
-class EditBio(TwillTests):
-    fixtures = ['user-paulproteus', 'person-paulproteus']
-
-    def test(self):
-        '''
-        * Goes to paulproteus's profile
-        * checks that there is no link to asheesh.org
-        * clicks edit on the Info area
-        * enters a link as Info
-        * checks that his bio now contains "asheesh.org"
-        '''
-        self.login_with_twill()
-        tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
-        #not so vain.. yet
-        tc.notfind('asheesh.org')
-        tc.go(make_twill_url('http://openhatch.org/profile/views/edit_info'))
-        #make sure our bio is not already on the form
-        tc.notfind('asheesh.org')
-        # set the bio in ze form
-        tc.fv("edit-tags", 'edit-tags-homepage_url', 'http://www.asheesh.org/')
-        tc.submit()
-        #find the string we just submitted as our bio
-        tc.find('asheesh.org')
-        self.assertEqual(Person.get_by_username('paulproteus').homepage_url,
-        "http://www.asheesh.org/")
-        #now we should see our bio in the edit form
-        tc.go(make_twill_url('http://openhatch.org/profile/views/edit_info'))
-        tc.find('asheesh.org')
     
 class EditLocation(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
@@ -1502,6 +1474,68 @@ class EditBio(TwillTests):
         #now we should see our bio in the edit form
         tc.go(make_twill_url('http://openhatch.org/profile/views/edit_info'))
         tc.find('lookatme!')
+
+class EditHomepage(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def test(self):
+        '''
+        * Goes to paulproteus's profile
+        * checks that there is no link to asheesh.org
+        * clicks edit on the Info area
+        * enters a link as Info
+        * checks that his bio now contains "asheesh.org"
+        '''
+        self.login_with_twill()
+        tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
+        #not so vain.. yet
+        tc.notfind('asheesh.org')
+        tc.go(make_twill_url('http://openhatch.org/profile/views/edit_info'))
+        #make sure our bio is not already on the form
+        tc.notfind('asheesh.org')
+        # set the bio in ze form
+        tc.fv("edit-tags", 'edit-tags-homepage_url', 'http://www.asheesh.org/')
+        tc.submit()
+        #find the string we just submitted as our bio
+        tc.find('asheesh.org')
+        self.assertEqual(Person.get_by_username('paulproteus').homepage_url,
+        "http://www.asheesh.org/")
+        #now we should see our bio in the edit form
+        tc.go(make_twill_url('http://openhatch.org/profile/views/edit_info'))
+        tc.find('asheesh.org')
+
+class EditContactBlurb(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def test(self):
+        '''
+        * Goes to paulproteus' profile
+        * checks that it doesn't say "bananas"
+        * clicks edit in the info area
+        * checks that the input field for "how to contact me" doesn't say bananas
+        * enters bananas under the "how to contact me" section
+        * submits
+        * checks that his profile now says "bananas"
+        * clicks edit in the info area again
+        * checks that the input field for "how to contact me" now says bananas
+        '''
+        self.login_with_twill()
+        tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
+        # make sure our contact info isn't already on the profile page
+        tc.notfind('bananas')
+        tc.go(make_twill_url('http://openhatch.org/profile/views/edit_info'))
+        #make sure our contact info is not already on the form
+        tc.notfind('bananas')
+        # set the contact info in ze form
+        tc.fv("edit-tags", 'edit-tags-contact_blurb', 'bananas')
+        tc.submit()
+        #find the string we just submitted as our contact info
+        tc.find('bananas')
+        self.assertEqual(Person.get_by_username('paulproteus').contact_blurb,
+        "bananas")
+        #now we should see our contact info in the edit form
+        tc.go(make_twill_url('http://openhatch.org/profile/views/edit_info'))
+        tc.find('bananas')
     
 class MockGithubImport(BaseCeleryTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']

@@ -235,13 +235,11 @@ def edit_person_info(request):
     #grab their submitted bio
     bio = request.POST.get('edit-tags-bio', '')
     person.bio = bio
-    person.save()
 
     # Grab the submitted homepage URL.
     # FIXME: One day, validate that this is a valid URL, and
     # use Django forms for this whole thing, while we're at it.
-    bio = request.POST.get('edit-tags-homepage_url', '')
-    person.homepage_url = bio
+    person.homepage_url = request.POST.get('edit-tags-homepage_url', '')
     person.save()
 
     # We can map from some strings to some TagTypes
