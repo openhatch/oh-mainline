@@ -103,6 +103,8 @@ def get_personal_data(person):
 
     data_dict['has_set_info'] = any(data_dict['tags_flat'].values())
 
+    data_dict['contact_blurb'] = mysite.base.controllers.put_forwarder_in_contact_blurb_if_they_want(person.contact_blurb)
+
     return data_dict
 
     # }}}
