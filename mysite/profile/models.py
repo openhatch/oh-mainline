@@ -609,8 +609,10 @@ class Forwarder(models.Model):
     expires_on = models.DateTimeField(default=datetime.datetime(1970, 1, 1))
     user = models.ForeignKey(User)
 
+    def get_email_address(self): 
+        return self.address + "@" + settings.FORWARDER_DOMAIN
+
 models.signals.post_save.connect(update_the_project_cached_contributor_count, sender=PortfolioEntry)
 models.signals.post_save.connect(update_the_person_index, sender=PortfolioEntry)
-
 
 # vim: set nu:

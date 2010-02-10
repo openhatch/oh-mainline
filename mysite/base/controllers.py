@@ -34,10 +34,10 @@ def put_forwarder_in_contact_blurb_if_they_want(str, user):
 def generate_forwarder(user):
     #TODO: make this work
     Forwarder = mysite.profile.models.Forwarder
-    random_str = base64.b64encode(os.urandom(9), altchars='_.')
+    random_str = "%s.%s" % (user.username, base64.b64encode(os.urandom(6), altchars='_.'))
     our_new_forwarder = Forwarder(address=random_str, user=user, expires_on=datetime.datetime.utcnow() + settings.FORWARDER_LIFETIME_TIMEDELTA)
     our_new_forwarder.save()
-    return random_str + "@" + settings.FORWARDER_DOMAIN
+    return our_new_forwarder.get_email_address()
 
 def get_notification_from_request(request):
     notification_id = request.GET.get('msg', None)
