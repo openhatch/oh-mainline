@@ -471,20 +471,19 @@ def people(request):
     # Get the list of people to display.
 
     if parsed_query['q'].strip():
-        mappable_people, extra_data = query2results(parsed_query)
+        everybody, extra_data = query2results(parsed_query)
         data.update(extra_data)
 
     else:
-        everybody = Person.objects.all()
-        mappable_people = everybody
+        everybody = Person.objects.all().order_by('user__username')
 
     # filter by query, if it is set
-    data['people'] = mappable_people
+    data['people'] = everybody
     get_relevant_person_data = lambda p: (
             {'name': p.get_full_name_or_username(),
             'location': p.get_public_location_or_default()})
     person_id2data = dict([(person.pk, get_relevant_person_data(person))
-            for person in mappable_people])
+            for person in everybody])
     data['person_id2data_as_json'] = simplejson.dumps(person_id2data)
     data['test_js'] = request.GET.get('test', None)
     data['num_of_persons_with_locations'] = len(person_id2data)

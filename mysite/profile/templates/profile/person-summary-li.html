@@ -2,17 +2,15 @@
 {# Used, at time of writing, in profile/map.html and profile/search_people.html #}
 <li id="person_summary_{{person.pk}}" {% if not person.location_is_public %} class="inaccessible_islander" {% endif %} >
     {% ifnotequal slug "people" %}<a href="{{ person.profile_url }}">{% endifnotequal %}
-    <div class='left'>
-        <img src="{{ person.get_photo_thumbnail_url_or_default }}" />
-    </div>
-    <div class="people-view-info">
+    <img src="{{ person.get_photo_thumbnail_url_or_default }}" />
+    <span class="people-view-info">
         {% ifequal slug "people" %}
         <a class='profile-link person-summary-button' href='{{ person.profile_url }}' 
                 title="Visit {% firstof person.user.first_name person.user.username %}'s profile">
             profile
         </a>{% endifequal %}
 
-        <div class="name">
+        <span class="name">
 
             {% if person.user.first_name or person.user.last_name %}
                 {{ person.user.first_name }} {{ person.user.last_name }}
@@ -25,20 +23,20 @@
                     {{ person.user.username }}
                 </span>
             {% endif %}
-        </div>
+        </span>
 
 	{% if q %}
 	{% ifequal query_type "all_tags" %}
-        <div class="what_matched_the_search">
+        <span class="what_matched_the_search">
           {{ person.reasons|join:" and " }} {{ q }}
-        </div>
+        </span>
 	{% endifequal %}
 	{% endif %}
 
         {% if person.location_display_name and person.location_confirmed %}
-        <div class="location">
+        <span class="location">
             {{ person.location_display_name }}
-        </div>
+        </span>
         {% endif %}
         {% with person.get_list_of_project_names as project_names %}
         {% if project_names %}
@@ -54,7 +52,7 @@
             </span>
         {% endif %}
     {% endwith %}
-    </div>
+    </span>
     {% ifnotequal slug "people" %}</a>{% endifnotequal %}
 </li>
 {# vim: set filetype=htmldjango: #}
