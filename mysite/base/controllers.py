@@ -23,6 +23,15 @@ notifications_dictionary = {
         "You've got to be logged in to do that!",
         }
 
+def put_forwarder_in_contact_blurb_if_they_want(str):
+    forwarder = generate_forwarder()
+    str = str.replace('$fwd', forwarder)
+    return str
+
+def generate_forwarder():
+    #TODO: make this work
+    return "i"
+
 def get_notification_from_request(request):
     notification_id = request.GET.get('msg', None)
     if notification_id:

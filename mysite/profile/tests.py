@@ -1504,6 +1504,28 @@ class EditHomepage(TwillTests):
         tc.go(make_twill_url('http://openhatch.org/profile/views/edit_info'))
         tc.find('asheesh.org')
 
+give_me_a_forwarder = mock.Mock()
+give_me_a_forwarder.return_value = 'myfancyforwarder@smellme.com'
+
+class EditContactBlurbForwarderification(TwillTests):
+    @mock.patch('mysite.base.controllers.generate_forwarder', give_me_a_forwarder)
+    def test(self):
+        '''
+        there is a function which we call a controller
+        this controller takes a string which is what someone inputs as their contact info blurb
+        it also takes said person's username or person object or something
+        we're testing this:
+            the controller returns a string which is the same as the one that it received, except $fwd is replaced with the output of generate_forwarder
+        '''
+        # we have a string that contains the substr $fwd
+        mystr = "email me here: $fwd.  it'll be great"
+        output = "email me here: myfancyforwarder@smellme.com.  it'll be great"
+        # we run this string through a controller called forwarderify
+        mystr_forwarderified = mysite.base.controllers.put_forwarder_in_contact_blurb_if_they_want(mystr)
+        # we test that the result contains, as a substr, the output of a call to generate_forwarder
+        self.assertEqual(mystr_forwarderified, output);
+        # that's it
+
 class EditContactBlurb(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
