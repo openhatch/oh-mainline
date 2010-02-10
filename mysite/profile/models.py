@@ -607,7 +607,7 @@ class Citation(models.Model):
 class Forwarder(models.Model):
     address = models.TextField()
     expires_on = models.DateTimeField(default=datetime.datetime(1970, 1, 1))
-    user = models.ForeignKey(User, unique=True)
+    user = models.ForeignKey(User)
 
 models.signals.post_save.connect(update_the_project_cached_contributor_count, sender=PortfolioEntry)
 models.signals.post_save.connect(update_the_person_index, sender=PortfolioEntry)

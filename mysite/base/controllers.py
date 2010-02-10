@@ -9,6 +9,7 @@ import sha
 import traceback
 import logging
 import mysite.base.decorators
+import datetime
 
 notifications_dictionary = {
         "edit_password_done":
@@ -132,4 +133,12 @@ def get_uri_metadata_for_generating_absolute_links(request):
     return data
 
 def get_email_address_from_forwarder_address(forwarder_address):
-    return 'email'
+    Forwarder = mysite.profile.models.Forwarder
+# look in Forwarder model
+# see if the forwarder address that they gave us is expired
+# if it isn't return the user's real email address
+# if it is expired, or if it's not in the table at all, return None
+    try:
+        return Forwarder.objects.get(address=forwarder_address, expires_on__gt=datetime.datetime.utcnow()).user.email
+    except Forwarder.DoesNotExist:
+        return None

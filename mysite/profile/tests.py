@@ -1825,11 +1825,13 @@ class EmailForwarderDecryptor(TwillTests):
     def test(self):
         def test_possible_forwarder_address(address, future, actually_create, should_work):
             future_number = future and 1 or -1
-            expiry_date = datetime.datetime.utcnow() + future_number*datetime.timedelta(minutes=10)
-            user = User.objects.get(username="paulproteus")
-            new_mapping = mysite.profile.models.Forwarder(address=address,
-                    expires_on=expiry_date, user=user)
-            new_mapping.save()
+            if actually_create:
+                expiry_date = datetime.datetime.utcnow() + future_number*datetime.timedelta(minutes=10)
+                user = User.objects.get(username="paulproteus")
+                new_mapping = mysite.profile.models.Forwarder(address=address,
+                        expires_on=expiry_date, user=user)
+                new_mapping.save()
+
             output = mysite.base.controllers.get_email_address_from_forwarder_address(address)
             if should_work:
                 self.assertEqual(output, user.email)
