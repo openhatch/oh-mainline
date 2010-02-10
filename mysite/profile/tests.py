@@ -1807,4 +1807,42 @@ class PeopleSearch(TwillTests):
         self.assertEqual(data['q'], query)
         self.assertEqual(data['query_type'], 'all_tags')
 
+
+class EmailForwarderDecryptor(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+    '''
+    * put some mappings of forwarder addresses to dates and user objects in the Forwarder table
+    * one of these will be expired
+    * one of these will not
+    * run tests of this data with get_email_address_from_forwarder_address
+    * try 
+        * email forwarder address that's not in the database at all
+        * email forwarder that's in the db but is expired
+        * email forwarder that's in the db and is not expired
+    '''
+
+
+    def test(self):
+        def test_possible_forwarder_address(address, future, actually_create, should_work):
+            future_number = future and 1 or -1
+            expiry_date = datetime.datetime.utcnow() + future_number*datetime.timedelta(minutes=10)
+            user = User.objects.get(username="paulproteus")
+            new_mapping = mysite.profile.models.Forwarder(address=address,
+                    expires_on=expiry_date, user=user)
+            new_mapping.save()
+            output = mysite.base.controllers.get_email_address_from_forwarder_address(address)
+            if should_work:
+                self.assertEqual(output, user.email)
+            else:
+                self.assertEqual(output, None)
+
+        # this one hasn't expired yet
+        test_possible_forwarder_address("apples", True, True, True)
+
+        # this one has already expired
+        test_possible_forwarder_address("bananas", False, True, False)
+
+        # this one isn't in the table at all
+        test_possible_forwarder_address("oranges", True, False, False)
+
  # vim: set ai et ts=4 sw=4 nu:

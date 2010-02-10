@@ -604,7 +604,13 @@ class Citation(models.Model):
             pk = 'unassigned'
         return "pk=%s, summary=%s" % (pk, self.summary)
 
+class Forwarder(models.Model):
+    address = models.TextField()
+    expires_on = models.DateTimeField(default=datetime.datetime(1970, 1, 1))
+    user = models.ForeignKey(User, unique=True)
+
 models.signals.post_save.connect(update_the_project_cached_contributor_count, sender=PortfolioEntry)
 models.signals.post_save.connect(update_the_person_index, sender=PortfolioEntry)
+
 
 # vim: set nu:

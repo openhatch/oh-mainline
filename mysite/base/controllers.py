@@ -131,3 +131,5 @@ def get_uri_metadata_for_generating_absolute_links(request):
     data['uri_scheme'] = uri_scheme
     return data
 
+def get_email_address_from_forwarder_address(forwarder_address):
+    return 'email'
