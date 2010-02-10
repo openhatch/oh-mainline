@@ -10,6 +10,8 @@ import traceback
 import logging
 import mysite.base.decorators
 import datetime
+import base64
+import os
 
 notifications_dictionary = {
         "edit_password_done":
@@ -24,14 +26,18 @@ notifications_dictionary = {
         "You've got to be logged in to do that!",
         }
 
-def put_forwarder_in_contact_blurb_if_they_want(str):
-    forwarder = generate_forwarder()
+def put_forwarder_in_contact_blurb_if_they_want(str, user):
+    forwarder = generate_forwarder(user)
     str = str.replace('$fwd', forwarder)
     return str
 
-def generate_forwarder():
+def generate_forwarder(user):
     #TODO: make this work
-    return "i"
+    Forwarder = mysite.profile.models.Forwarder
+    random_str = base64.b64encode(os.urandom(9), altchars='_.')
+    our_new_forwarder = Forwarder(address=random_str, user=user, expires_on=datetime.datetime.utcnow() + settings.FORWARDER_LIFETIME_TIMEDELTA)
+    our_new_forwarder.save()
+    return random_str + "@" + settings.FORWARDER_DOMAIN
 
 def get_notification_from_request(request):
     notification_id = request.GET.get('msg', None)

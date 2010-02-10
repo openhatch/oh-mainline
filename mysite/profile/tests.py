@@ -1504,24 +1504,27 @@ class EditHomepage(TwillTests):
         tc.go(make_twill_url('http://openhatch.org/profile/views/edit_info'))
         tc.find('asheesh.org')
 
-give_me_a_forwarder = mock.Mock()
-give_me_a_forwarder.return_value = 'myfancyforwarder@smellme.com'
 
 class EditContactBlurbForwarderification(TwillTests):
-    @mock.patch('mysite.base.controllers.generate_forwarder', give_me_a_forwarder)
+    fixtures = ['user-paulproteus', 'person-paulproteus']
     def test(self):
         '''
-        there is a function which we call a controller
-        this controller takes a string which is what someone inputs as their contact info blurb
+        a controller called put_forwarder_in_contact_blurb_if_they_want() takes a string which is what someone inputs as their contact info blurb
         it also takes said person's username or person object or something
         we're testing this:
             the controller returns a string which is the same as the one that it received, except $fwd is replaced with the output of generate_forwarder
+            the Forwarder db table contains a row for our new forwarder
         '''
         # we have a string that contains the substr $fwd
         mystr = "email me here: $fwd.  it'll be great"
-        output = "email me here: myfancyforwarder@smellme.com.  it'll be great"
+        user_to_forward_to = User.objects.get(username='paulproteus')
         # we run this string through a controller called forwarderify
-        mystr_forwarderified = mysite.base.controllers.put_forwarder_in_contact_blurb_if_they_want(mystr)
+        mystr_forwarderified = (mysite.base.controllers.
+                put_forwarder_in_contact_blurb_if_they_want(mystr, user_to_forward_to))
+        our_forwarder = mysite.profile.models.Forwarder.objects.get(user=user_to_forward_to)
+        output = "email me here: %s@%s.  it'll be great" % (our_forwarder.address, settings.FORWARDER_DOMAIN)
+        # make sure our forwarder that we just made hasn't expired
+        self.assert_(our_forwarder.expires_on > datetime.datetime.utcnow())
         # we test that the result contains, as a substr, the output of a call to generate_forwarder
         self.assertEqual(mystr_forwarderified, output);
         # that's it
@@ -1808,7 +1811,8 @@ class PeopleSearch(TwillTests):
         self.assertEqual(data['query_type'], 'all_tags')
 
 
-class EmailForwarderDecryptor(TwillTests):
+
+class EmailForwarderResolver(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
     '''
     * put some mappings of forwarder addresses to dates and user objects in the Forwarder table
