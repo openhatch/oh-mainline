@@ -47,7 +47,6 @@ about our members who support {{ project.name }}
 {% endblock left %}
 
 {% block main %}
-{% with project.get_open_bugs_randomly_ordered as bugs %}
 <div class='module' id='bugs'>
     <div class='head'>
         <h3>Relatedly</h3>
@@ -90,7 +89,7 @@ about our members who support {{ project.name }}
 
     </div>
 </div>
-{% endwith %}
+
 {% endblock main %}
 
 {% comment %}
