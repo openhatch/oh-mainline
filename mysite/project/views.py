@@ -1,4 +1,5 @@
 from mysite.search.models import Project
+from mysite.profile.models import Person
 import django.template
 import mysite.base.decorators
 import mysite.profile.views
@@ -20,7 +21,22 @@ def project(request, project__name = None):
                     'can_mentor', project__name)),
                 'language_mentors': (mysite.profile.controllers.people_matching(
                         'can_mentor', p.language)),
-                'explain_to_anonymous_users': True
+                'explain_to_anonymous_users': True,
+                'questions': {
+                    'I want to join this project. Where do I begin?': [
+                        (   """If you're interested in development, you can contribute
+                            by writing new software, packaging additional software, or
+                            fixing bugs in existing software.""",
+                            Person.objects.all()[20]),
+                        (   """Join the Bug Squad! Help make Ubuntu even better by working
+                        with bug reports to ensure they're complete, understandable and if 
+                        possible, reproducable. Anyone can help!""",
+                        Person.objects.all()[80]),
+                        ( """Help produce official documentation, share the solution to a
+                            problem, or check, proof and test other documents for accuracy.""",
+                            Person.objects.all()[100]),
+                        ]
+                    }
                 },
             )
 

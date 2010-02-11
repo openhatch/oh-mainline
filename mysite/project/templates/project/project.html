@@ -88,9 +88,54 @@ about our members who support {{ project.name }}
       {% endif %}
 
     </div>
-</div>
+</div><!-- /.module #bugs -->
 
+<div class='module' id='questions'>
+    <div class='head'>
+        <h3>How to join {{ project.name }}</h3>
+    </div>
+    <div class='body'>
+        {% for q, answers in questions.items %}
+            <h3><strong>Q</strong>: {{ q }}</h3>
+            <ul class='answers'>
+                {% for answer, person in answers %}
+                    <li>{{ answer }}
+                        &mdash; <a href='{{ person.get_profile_url }}'>{{ person.get_full_name_or_username }}</a></li>
+                {% endfor  %}
+                <li>
+                    <form name=''>
+                        <textarea class='add_an_answer'
+                                id='answer-question{{ forloop.counter0 }}'
+                                title='Add an answer'></textarea>
+                        <input type='submit' value='Submit'>
+                    </form>
+                </li>
+            </ul>
+        {% endfor  %}
+    </div>
+</div><!-- /.module #questions -->
 {% endblock main %}
+
+{% block js %}
+    <script type='text/javascript'>
+        $(function() {
+            $('.add_an_answer').hint();
+            /*
+            $('.add_an_answer').focus(function() {
+                // Show the submit button
+                $(this).parent().find('input:submit').show();
+            });
+            $('.add_an_answer').blur(function() {
+                // Hide the submit button if the user didn't write anything
+                if ($(this).text() == '' or $(this).text() == this.title) {
+                    $(this).parent().find('input:submit').hide();
+                }
+            });
+            */
+        })
+    </script>
+
+{% endblock js %}
 
 {% comment %}
 vim: set ai et ts=4 sw=4 nu:

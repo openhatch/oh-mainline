@@ -9,3 +9,7 @@
 #project #main .module > .body { width: 361px; }
 
 #project #bugs ul li { margin: 5px 0 5px 10px; color: #777; margin-bottom: 10px; list-style: square; }
+#project #questions h3 { float: none; margin-bottom: 10px; }
+#project ul.answers li { margin-left: 15px; display: list-item; margin-bottom: 5px; }
+#project ul.answers textarea { height: 60px; width: 96%; font-size: 1em; }
+#project ul.answers textarea.blur { height: 1em; color: #888; }
