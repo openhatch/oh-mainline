@@ -37,7 +37,7 @@
 	</span>
 	{% endif %}
     <span class='separator_betw_tags_and_desc'>-</span>
-        <span class='description'><p>{{ bug.description|urlize }}</p></span>
+        <span class='description'><p>{{ bug.description|highlight:query.terms }}</p></span>
     </span>
 </div>
 <div class='details'>
