@@ -53,22 +53,22 @@ about our members who support {{ project.name }}
         <h3>Relatedly</h3>
     </div>
     <div class='body'>
-      <p>
-            {% if project.get_open_bugs %}
-            Browse {{ project.get_open_bugs|length }}+
-            <a href='/search/?q={{ project.name_with_quotes_if_necessary|urlencode }}'>
-                volunteer opportunit{{ project.get_open_bugs|pluralize:"y,ies"}}
-                matching
-                <strong>{{ project.name }}</strong>.
-            </a>
+        {% if project.get_open_bugs %}
+            <p>
+                Browse {{ project.get_open_bugs|length }}+
+                    <a href='/search/?q={{ project.name_with_quotes_if_necessary|urlencode }}'>
+                        volunteer opportunit{{ project.get_open_bugs|pluralize:"y,ies"}}
+                        matching
+                        <strong>{{ project.name }}</strong>.
+                    </a>
             {% else %}
-            No volunteer opportunities in {{project.name}} indexed here yet. 
-            <a href='/wiki/Bug_trackers'>
-                To add a bug tracker, 
-                visit our wiki</a>.
+                No volunteer opportunities in {{project.name}} indexed here yet. 
+                <a href='/wiki/Bug_trackers'>
+                    To add a bug tracker, 
+                    visit our wiki</a>.
 
-            {% endif %}
-      </p>
+            </p>
+        {% endif %}
       
       {% with mentors as mentors %}
       {% with project.name as topic %}
