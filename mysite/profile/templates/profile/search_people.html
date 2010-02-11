@@ -8,7 +8,7 @@ people-list-page
 {% endblock body_class %}
 
 {% block title %}
-People
+People Search
 {% endblock title %}
 
 {% block people_main %}
@@ -212,7 +212,7 @@ $(function() {
 
 
         $('#about_uninhabited_island').click(function () {
-            var message = "People who haven't set their locations appear on an uninhabited island in the South Atlantic.";
+            var message = "People who haven't set their locations appear on an uninhabited island in the South Atlantic.<br><br>To set your location, click 'settings' in the top-right corner of your screen.";
             $.jGrowl(message, { position: "center", life: 10000 });
             return false;
             });
