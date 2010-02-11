@@ -3,6 +3,7 @@
 {% block title %}
     Edit your info
 {% endblock %}
+{% block body_id %}edit_profile_info_form{% endblock %}
 
 {% block content %}
     <style type='text/css'>
@@ -45,6 +46,16 @@
         </div>
         <div class='body contains-submodules two-columns'>
             <div class='body'>
+                {% if contact_blurb_error %}
+                <!--contact_blurb_error-->
+                <ul id="error_msg" class="errorlist">
+                    <li>
+                        We've saved nearly all of your information, but there was one error.  Please see below.
+                    </li>
+                </ul>
+                {% endif %}
+
+
                 <form name='edit-tags'
                         action='/people/info/edit/do'
                         method='POST'>
@@ -54,16 +65,17 @@
                     </div>
 
                         <div class='form-row'>
-                            <label>bio:</label>
+                            <label>Bio:</label>
                             <textarea name='edit-tags-bio'>{{ person.bio }}</textarea>
                             <p class='example'>Example: I like traffic lights. On weekends, I like to make websites, destroy Twitter, and eat breakfast.</p>
                         </div>
 
                         <div class='form-row'>
-                            <label>web site:</label>
+                            <label>Web site:</label>
                             <input type='text' name='edit-tags-homepage_url' value='{{ person.homepage_url }}'>
                             <p class='example'>Example: http://geociti.es/Heartland/2042/</p>
                         </div>
+
 
                         <div class='form-row'>
                             <h3 style='float: left; width: 95%; margin-bottom: 3px;'>Tag yourself</h3>
@@ -103,6 +115,35 @@
                             <label>I can mentor in:</label>
                             <textarea name='edit-tags-can_mentor'>{{ tags_flat.can_mentor }}</textarea>
                             <p class='example'>Example: python, unicode, git, GTK+</p>
+                        </div>
+                        <div class='form-row' id='contact_blurb'>
+                            <label>How to contact me:</label>
+                            {% if contact_blurb_error %}
+                            <ul id="error_msg" class="errorlist">
+                                <li>
+                                To use our forwarding service, please <a href="{% url mysite.account.views.edit_contact_info %}">tell us your email address</a>!
+                                </li>
+                            </ul>
+                            {% endif %}
+                            <textarea name='edit-tags-contact_blurb'>{{ contact_blurb }}</textarea>
+                            <p class='example'>Example: "The best way to reach me is by private message at http://twitter.com/rafpaf."</p>
+                            <p class='example'>
+                                We preserve linebreaks, and turn URLs into links.
+                            </p>
+                            <p class='example'>
+                                We provide a Craigslist-style email forwarding service.
+                                To use it, include the string <tt>$fwd</tt> in the text area above.
+                                Write something like &ldquo;<tt>Email me at $fwd</tt>&rdquo;
+                                and your text will appear on your profile as "Email me at
+                                {{ person.user.username}}.248y5a7@forwarder.openhatch.org.".
+                            </p>
+                            <p class='example'>
+                            Note that this email forwarding address will change every few days
+                            to thwart spammers.
+                            </p>
+                            <p class='example'>
+                            Note that this information will be public and crawlable by search engines.
+                            </p>
                         </div>
 
                         <input class='save-button' type='submit' style='float: left;' value='Save' />

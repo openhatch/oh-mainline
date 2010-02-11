@@ -9,6 +9,9 @@ import sha
 import traceback
 import logging
 import mysite.base.decorators
+import datetime
+import base64
+import os
 
 notifications_dictionary = {
         "edit_password_done":
@@ -22,6 +25,18 @@ notifications_dictionary = {
         "next":
         "You've got to be logged in to do that!",
         }
+
+def put_forwarder_in_contact_blurb_if_they_want(str, user):
+    forwarder = generate_forwarder(user)
+    str = str.replace('$fwd', forwarder)
+    return str
+
+def generate_forwarder(user):
+    Forwarder = mysite.profile.models.Forwarder
+    random_str = "%s.%s" % (user.username, base64.b64encode(os.urandom(6), altchars='_.'))
+    our_new_forwarder = Forwarder(address=random_str, user=user, expires_on=datetime.datetime.utcnow() + settings.FORWARDER_LIFETIME_TIMEDELTA)
+    our_new_forwarder.save()
+    return our_new_forwarder.get_email_address()
 
 def get_notification_from_request(request):
     notification_id = request.GET.get('msg', None)
@@ -122,3 +137,13 @@ def get_uri_metadata_for_generating_absolute_links(request):
     data['uri_scheme'] = uri_scheme
     return data
 
+def get_email_address_from_forwarder_address(forwarder_address):
+    Forwarder = mysite.profile.models.Forwarder
+# look in Forwarder model
+# see if the forwarder address that they gave us is expired
+# if it isn't return the user's real email address
+# if it is expired, or if it's not in the table at all, return None
+    try:
+        return Forwarder.objects.get(address=forwarder_address, expires_on__gt=datetime.datetime.utcnow()).user.email
+    except Forwarder.DoesNotExist:
+        return None

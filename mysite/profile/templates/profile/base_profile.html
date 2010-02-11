@@ -237,10 +237,34 @@
             {% endfor %}
         </div>
         {% endif %}
+    </div>
+</div> <!-- end of person info module -->
+
+{% if person.contact_blurb %}
+<div id='contact_blurb' class='module'>
+
+    <div class='head'>
+        {% if editable and not info_edit_mode %}
+        <ul>
+            <li><a class='edit' href='{% url mysite.profile.views.edit_info %}#contact_blurb'>Edit</a></li>
+        </ul>
+        {% endif %}
+
+        <h3>How to contact me</h3>
+
+    </div>
+
+    <div class='body' style='font-size: .95em;'>
+        {{contact_blurb|urlizetrunc:"23"|linebreaks}}
+    </div>
+</div> <!-- end of contact blub module -->
+{% endif %}
+
 
 {# vim: set filetype=htmldjango: #}
     </div>
 </div>
+
 {% endblock left %}
 
 {% comment %}
