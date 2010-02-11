@@ -608,9 +608,23 @@ class Forwarder(models.Model):
     address = models.TextField()
     expires_on = models.DateTimeField(default=datetime.datetime(1970, 1, 1))
     user = models.ForeignKey(User)
+    def generate_table_line(self):
+        line = '%s %s' % (self.get_email_address(), self.user.email)
+        return line
 
     def get_email_address(self): 
         return self.address + "@" + settings.FORWARDER_DOMAIN
+
+    @staticmethod
+    def generate_list_of_lines_for_postfix_table():
+        lines = []
+        for live_forwarder in Forwarder.objects.all():
+            if live_forwarder.user.email:
+                line = live_forwarder.generate_table_line()
+                lines.append(line)
+        return lines
+        
+
 
 def make_forwarder_actually_work(sender, instance, **kwargs):
     from mysite.profile.tasks import RegeneratePostfixAliasesForForwarder

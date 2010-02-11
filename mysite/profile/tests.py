@@ -1836,6 +1836,30 @@ class PeopleSearch(TwillTests):
         self.assertEqual(data['query_type'], 'all_tags')
 
 
+class PostFixGeneratorList(TwillTests):
+    fixtures = ['user-paulproteus', 'user-barry', 'person-barry',
+            'person-paulproteus']
+
+
+    def test(self):
+        # create two people
+        #  one who has an email address list in our database
+        asheesh = User.objects.get(username='paulproteus')
+        #  one who does not
+        barry = User.objects.get(username='barry')
+        barry.email = ''
+        barry.save()
+        # make a row in the forwarder table for each of these people
+        mysite.base.controllers.generate_forwarder(barry)
+        mysite.base.controllers.generate_forwarder(asheesh)
+        # run the function in Forwarder which creates/updates the list of user/forwarder pairs for postfix to generate forwarders for
+        what_we_get = mysite.profile.models.Forwarder.generate_list_of_lines_for_postfix_table()
+
+        what_we_want = [mysite.profile.models.Forwarder.objects.filter(user__username='paulproteus')[0].generate_table_line()]
+        # make sure that the list of strings that we get back contains an item for the user with an email address and no item for the user without
+        self.assertEqual(what_we_get, what_we_want)
+        
+        
 
 class EmailForwarderResolver(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
@@ -1843,7 +1867,6 @@ class EmailForwarderResolver(TwillTests):
     * put some mappings of forwarder addresses to dates and user objects in the Forwarder table
     * one of these will be expired
     * one of these will not
-    * run tests of this data with get_email_address_from_forwarder_address
     * try 
         * email forwarder address that's not in the database at all
         * email forwarder that's in the db but is expired

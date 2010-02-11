@@ -267,11 +267,7 @@ class ReindexPerson(Task):
 class RegeneratePostfixAliasesForForwarder(Task):
     def run(self, **kwargs):
         # Generate the table...
-        lines = []
-        for live_forwarder in mysite.profile.models.Forwarder.objects.all():
-            line = '%s %s' % (live_forwarder.get_email_address(),
-                              live_forwarder.user.email)
-            lines.append(line)
+        lines = mysite.profile.models.Forwarder.generate_list_of_lines_for_postfix_table()
         # Save it where Postfix expects it...
         fd = open(settings.POSTFIX_FORWARDER_TABLE_PATH, 'w')
         fd.write('\n'.join(lines))
