@@ -1,15 +1,36 @@
-#project h1 { float: left; clear: left; margin-top: 10px; }
-#project h3.supertitle { font-size: 10pt; margin-top: 20px; }
-#project .head { width: 98% ! important; }
-#project #left { width: 515px; margin-right: 20px; }
-#project #left .module { width: 390px; }
-#project #left .module > .body { width: 474px; }
-#project #main { width: 403px; }
-#project .module { width: 100% ! important; }
-#project #main .module > .body { width: 361px; }
+body#project .module.contains_questions li { float: none; display: list-item; }
+body#project input[type='text'], body#project textarea { padding: 4px;  }
+body#project input, body#project textarea { font-size: 10pt;   }
+body#project textarea { width: 96%;  }
+body#project input[type='text'] { width: 86%; }
+body#project input[type='submit'], body#project textarea {  }
+body#project input {  }
+body#project input[type='submit'] { padding: 4px 8px; }
 
-#project #bugs ul li { margin: 5px 0 5px 10px; color: #777; margin-bottom: 10px; list-style: square; }
-#project #questions h3 { float: none; margin-bottom: 10px; }
-#project ul.answers li { margin-left: 15px; display: list-item; margin-bottom: 5px; }
-#project ul.answers textarea { height: 60px; width: 96%; font-size: 1em; }
-#project ul.answers textarea.blur { height: 1em; color: #888; }
+
+body#project h1 { float: left; clear: left; margin-top: 10px; }
+body#project h3.supertitle { font-size: 10pt; margin-top: 20px; }
+body#project .head { width: 98% ! important; }
+body#project #left { width: 515px; margin-right: 20px; }
+body#project #left .module { width: 390px; }
+body#project #left .module > .body { width: 474px; }
+body#project #main { width: 403px; }
+body#project .module { width: 100% ! important; }
+body#project #main .module > .body { width: 361px; }
+body#project #bugs ul li { margin: 5px 0 5px 10px; color: #777; margin-bottom: 10px; list-style: square; }
+
+/* Questions and answers */
+body#project input, body#project textarea, body#project input[type='submit'] { display: block; float: none; }
+body#project .contains_questions .body h3 { float: none; margin-bottom: 10px; }
+body#project ul.answers li { margin-left: 15px; display: list-item; margin-bottom: 5px; }
+body#project ul.answers .show_when_editing { display: none; }
+body#project .blur { color: #888; }
+body#project ul.answers textarea { font-family: sans-serif; height: 60px; }
+body#project ul.answers textarea.blur { height: 1em; }
+body#project #questions > li { display: block; margin: 10px 0 20px; }
+body#project p.input-note { margin: 3px 0; color: #555; font-size: .9em; }
+body#project label { margin: 6px 0 3px 0; display: block; }
+
+body#project #requests input[type='text'] { font-weight: bold; font-size: 1.2em; }
+
+

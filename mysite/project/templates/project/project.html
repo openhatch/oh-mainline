@@ -19,31 +19,70 @@ about our members who support {{ project.name }}
 {% endblock pagetop %}
 
 {% block left %}
-<div class='module' id='contributors'>
+<div class='module contains_questions' id='about-joining'>
     <div class='head'>
-        <h3>Registered contributors ({% firstof project.cached_contributor_count "none yet" %})</h3>
-            <ul>
-                <li>
-                <a href='{% url mysite.profile.views.people %}?q=project:"{{project.name|urlencode}}"' style='float: right; font-weight: normal;'>See all <strong>&raquo;</strong></a>
-                </li>
-            </ul>
+        <h3>About joining {{ project.name }}</h3>
     </div>
     <div class='body'>
-        <ul id='people-list'>
-            {% for person in contributors %}
-                {% include 'profile/person-summary-li.html' %}
-            {% empty %}
-                No registered contributors yet.  
+        <ul id='questions'>
+            {% for text, question in questions.items %}
+                <li>
+                    <h3><strong>Q</strong>: {{ text }}</h3>
+                    <ul class='answers'>
+                        {% for answer, person in question.answers %}
+                            <li>{{ answer }}
+                                <br/>
+                                <small>&nbsp;&nbsp;&nbsp;&mdash; <a style='font-weight: bold;' href='{{ person.get_profile_url }}'>{{ person.get_full_name_or_username }}</a></small></li>
+                        {% endfor  %}
+                        <li>
+                            <form name=''>
+                                <textarea class='add_an_answer'
+                                        id='answer-question{{ forloop.counter0 }}'
+                                        title='Add an answer'></textarea>
+                                <p class='input-note show_when_editing'>
+                                    {{ question.input_note }}
+                                </p>
+                                <input type='submit' class='show_when_editing' value='Submit'>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
             {% endfor %}
         </ul>
-        <div style='width: 100%; float: left; text-align: right; margin-top: 20px; font-size: 8pt;'>
-        To be listed here,
-            <a href='{% url mysite.profile.views.portfolio_editor %}'>
-                add {{ project.name }} to your
-                profile</a>.
-        </div>
     </div>
-</div>
+</div><!-- /.module #about-joining -->
+
+<div class='module contains_questions' id='requests'>
+    <div class='head'>
+        <h3>Questions for project maintainers</h3>
+    </div>
+    <div class='body'>
+        <form>
+            <ul id='questions'>
+                <li>
+                    <h3> What is a bug or issue reported in your project that stresses you out?  </h3>
+                    <label>Issue URL <small style='color: #888'>(optional)</small></label>
+                    <input type='text'>
+                    <label>Issue title</label>
+                    <input type='text'>
+                    <label>What makes this issue stressful?</label>
+                    <textarea></textarea>
+                </li>
+                <li>
+                    <h3> What is a specific way that a new contributor can get involved?  </h3>
+                    <label>Issue URL (optional)</label>
+                    <input type='text'>
+                    <label>Issue title</label>
+                    <input type='text'>
+                    <label>Details</label>
+                    <textarea></textarea>
+                </li>
+            </ul>
+            <input type='submit' value='Submit'>
+        </form>
+    </div>
+</div><!-- /.module #requests -->
+
 {% endblock left %}
 
 {% block main %}
@@ -90,48 +129,47 @@ about our members who support {{ project.name }}
     </div>
 </div><!-- /.module #bugs -->
 
-<div class='module' id='questions'>
+<div class='module' id='contributors'>
     <div class='head'>
-        <h3>How to join {{ project.name }}</h3>
-    </div>
-    <div class='body'>
-        {% for q, answers in questions.items %}
-            <h3><strong>Q</strong>: {{ q }}</h3>
-            <ul class='answers'>
-                {% for answer, person in answers %}
-                    <li>{{ answer }}
-                        &mdash; <a href='{{ person.get_profile_url }}'>{{ person.get_full_name_or_username }}</a></li>
-                {% endfor  %}
+        <h3>Registered contributors ({% firstof project.cached_contributor_count "none yet" %})</h3>
+            <ul>
                 <li>
-                    <form name=''>
-                        <textarea class='add_an_answer'
-                                id='answer-question{{ forloop.counter0 }}'
-                                title='Add an answer'></textarea>
-                        <input type='submit' value='Submit'>
-                    </form>
+                <a href='{% url mysite.profile.views.people %}?q=project:"{{project.name|urlencode}}"' style='float: right; font-weight: normal;'>See all <strong>&raquo;</strong></a>
                 </li>
             </ul>
-        {% endfor  %}
     </div>
-</div><!-- /.module #questions -->
+    <div class='body'>
+        <ul id='people-list'>
+            {% for person in contributors %}
+                {% include 'profile/person-summary-li.html' %}
+            {% empty %}
+                No registered contributors yet.  
+            {% endfor %}
+        </ul>
+        <div style='width: 100%; float: left; text-align: right; margin-top: 20px; font-size: 8pt;'>
+        To be listed here,
+            <a href='{% url mysite.profile.views.portfolio_editor %}'>
+                add {{ project.name }} to your
+                profile</a>.
+        </div>
+    </div>
+</div>
+
 {% endblock main %}
 
 {% block js %}
     <script type='text/javascript'>
+        $.fn.getNearbyEditorElements = function() {
+            return this.parent().find('.show_when_editing');
+        }
         $(function() {
-            $('.add_an_answer').hint();
-            /*
-            $('.add_an_answer').focus(function() {
-                // Show the submit button
-                $(this).parent().find('input:submit').show();
-            });
-            $('.add_an_answer').blur(function() {
-                // Hide the submit button if the user didn't write anything
-                if ($(this).text() == '' or $(this).text() == this.title) {
-                    $(this).parent().find('input:submit').hide();
-                }
-            });
-            */
+            $('.add_an_answer')
+                .focus(function() {
+                    $(this).getNearbyEditorElements().show();
+                });
+
+            $('input:text, textarea').hint();
+
         })
     </script>
 
