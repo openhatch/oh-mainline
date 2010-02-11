@@ -45,6 +45,16 @@
         </div>
         <div class='body contains-submodules two-columns'>
             <div class='body'>
+                {% if contact_blurb_error %}
+                <!--contact_blurb_error-->
+                <ul id="error_msg" class="errorlist">
+                    <li>
+                        We've saved nearly all of your information, but there was one error.  Please see below.
+                    </li>
+                </ul>
+                {% endif %}
+
+
                 <form name='edit-tags'
                         action='/people/info/edit/do'
                         method='POST'>
@@ -107,7 +117,14 @@
                         </div>
                         <div class='form-row'>
                             <label>How to contact me:</label>
-                            <textarea name='edit-tags-contact_blurb'>{{ person.contact_blurb }}</textarea>
+                            {% if contact_blurb_error %}
+                            <ul id="error_msg" class="errorlist">
+                                <li>
+                                To use our forwarding service, please <a href="{% url mysite.account.views.edit_contact_info %}">tell us your email address</a>!
+                                </li>
+                            </ul>
+                            {% endif %}
+                            <textarea name='edit-tags-contact_blurb'>{{ contact_blurb }}</textarea>
                             <p class='example'>Example: "The best way to reach me is by private message at http://twitter.com/rafpaf."</p>
 
                             <p class='example'>

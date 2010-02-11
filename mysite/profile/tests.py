@@ -1527,7 +1527,7 @@ class EditContactBlurbForwarderification(TwillTests):
         self.assert_(our_forwarder.expires_on > datetime.datetime.utcnow())
         # we test that the result contains, as a substr, the output of a call to generate_forwarder
         self.assertEqual(mystr_forwarderified, output);
-        # that's it
+
 
 class EditContactBlurb(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
@@ -1543,6 +1543,9 @@ class EditContactBlurb(TwillTests):
         * checks that his profile now says "bananas"
         * clicks edit in the info area again
         * checks that the input field for "how to contact me" now says bananas
+        * removes email address from user
+        * enters contact blurb containing $fwd
+        * makes sure that the user gets an error message
         '''
         self.login_with_twill()
         tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
@@ -1556,11 +1559,33 @@ class EditContactBlurb(TwillTests):
         tc.submit()
         #find the string we just submitted as our contact info
         tc.find('bananas')
-        self.assertEqual(Person.get_by_username('paulproteus').contact_blurb,
-        "bananas")
+        asheesh = Person.get_by_username('paulproteus')
+        self.assertEqual(asheesh.contact_blurb, "bananas")
         #now we should see our contact info in the edit form
         tc.go(make_twill_url('http://openhatch.org/profile/views/edit_info'))
         tc.find('bananas')
+        #delete asheesh's email
+        asheesh_user = asheesh.user
+        asheesh_user.email = ''
+        asheesh_user.save()
+        contact_blurb = 'email me here: $fwd'
+        contact_blurb_escaped = 'email me here: \$fwd'
+        homepage_url = 'http://mysite.com'
+        tc.fv("edit-tags", 'edit-tags-contact_blurb', contact_blurb)
+        # also enter a homepage so that we can make sure that this gets saved despite our error with the forwarder stuff
+        tc.fv("edit-tags", 'edit-tags-homepage_url', homepage_url)
+        tc.submit()
+        # make sure that they got an error message
+        tc.find('contact_blurb_error')
+        # make sure that the form remembered the contact blurb that they posted
+        tc.find(contact_blurb_escaped)
+        # make sure that their homepage was saved to the database
+        asheesh = Person.get_by_username('paulproteus')
+        self.assertEqual(asheesh.homepage_url, homepage_url)
+
+
+
+
     
 class MockGithubImport(BaseCeleryTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']

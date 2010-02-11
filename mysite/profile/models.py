@@ -612,7 +612,12 @@ class Forwarder(models.Model):
     def get_email_address(self): 
         return self.address + "@" + settings.FORWARDER_DOMAIN
 
+def make_forwarder_actually_work(sender, instance, **kwargs):
+    from mysite.profile.tasks import RegeneratePostfixAliasesForForwarder
+    RegeneratePostfixAliasesForForwarder.delay()
+
 models.signals.post_save.connect(update_the_project_cached_contributor_count, sender=PortfolioEntry)
 models.signals.post_save.connect(update_the_person_index, sender=PortfolioEntry)
+models.signals.post_save.connect(make_forwarder_actually_work, sender=Forwarder)
 
 # vim: set nu:

@@ -193,4 +193,4 @@ INTERNAL_IPS = ('127.0.0.1',)
 FORWARDER_DOMAIN = "forwarder.openhatch.org"
 FORWARDER_LIFETIME_TIMEDELTA = datetime.timedelta(days=3)
 
-
+POSTFIX_FORWARDER_TABLE_PATH = '/tmp/email_forwarders'

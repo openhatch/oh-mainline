@@ -273,8 +273,8 @@ class RegeneratePostfixAliasesForForwarder(Task):
                               live_forwarder.user.email)
             lines.append(line)
         # Save it where Postfix expects it...
-        fd = open(django.conf.settings.postfix_forwarder_table_path, 'w')
-        fd.write('\n'.join(string))
+        fd = open(settings.POSTFIX_FORWARDER_TABLE_PATH, 'w')
+        fd.write('\n'.join(lines))
         fd.close()
         # Update the Postfix forwarder database. Note that we do not need
         # to ask Postfix to reload. Yay!

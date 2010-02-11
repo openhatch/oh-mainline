@@ -32,7 +32,6 @@ def put_forwarder_in_contact_blurb_if_they_want(str, user):
     return str
 
 def generate_forwarder(user):
-    #TODO: make this work
     Forwarder = mysite.profile.models.Forwarder
     random_str = "%s.%s" % (user.username, base64.b64encode(os.urandom(6), altchars='_.'))
     our_new_forwarder = Forwarder(address=random_str, user=user, expires_on=datetime.datetime.utcnow() + settings.FORWARDER_LIFETIME_TIMEDELTA)

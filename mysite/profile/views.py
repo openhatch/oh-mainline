@@ -230,6 +230,7 @@ def _project_hash(project_name):
     # }}}
 
 @login_required
+# this is a post handler
 def edit_person_info(request):
     # {{{
     person = request.user.get_profile()
@@ -241,10 +242,6 @@ def edit_person_info(request):
     # FIXME: One day, validate that this is a valid URL, and
     # use Django forms for this whole thing, while we're at it.
     person.homepage_url = request.POST.get('edit-tags-homepage_url', '')
-
-    person.contact_blurb = request.POST.get('edit-tags-contact_blurb', '')
-
-    person.save()
 
     # We can map from some strings to some TagTypes
     for known_tag_type_name in ('understands', 'understands_not',
@@ -275,6 +272,17 @@ def edit_person_info(request):
                     defaults={'text': tag_text})
             new_link, _ = Link_Person_Tag.objects.get_or_create(
                     tag=tag, person=person)
+
+    posted_contact_blurb = request.POST.get('edit-tags-contact_blurb', '')
+    # if their new contact blurb contains $fwd,
+    # make sure that they have an email address in our database
+    # if not, give them an error
+    if '$fwd' in posted_contact_blurb and not person.user.email:
+        person.save()
+        return edit_info(request, contact_blurb_error=True, contact_blurb_thus_far=posted_contact_blurb)
+
+    person.contact_blurb = posted_contact_blurb
+    person.save()
 
     # Enqueue a background task to re-index the person
     task = mysite.profile.tasks.ReindexPerson()
@@ -897,9 +905,15 @@ def dollar_username(request):
 
 @login_required
 @view
-def edit_info(request):
-    data = get_personal_data(request.user.get_profile())
+def edit_info(request, contact_blurb_error=False, contact_blurb_thus_far=''):
+    person = request.user.get_profile()
+    data = get_personal_data(person)
     data['info_edit_mode'] = True
+    data['contact_blurb_error'] = contact_blurb_error
+    if contact_blurb_error:
+        data['contact_blurb'] = contact_blurb_thus_far
+    else:
+        data['contact_blurb'] = person.contact_blurb
     return request, 'profile/info_wrapper.html', data
 
 # vim: ai ts=3 sts=4 et sw=4 nu
