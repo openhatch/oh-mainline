@@ -8,7 +8,8 @@ import Image
 import uuid
 import urllib
 from django.db.models import Q
-import mysite.customs 
+import mysite.customs
+import mysite.base.unicode_sanity
 from django.core.urlresolvers import reverse
 
 def get_image_data_scaled(image_data, width):
@@ -197,12 +198,12 @@ class Project(models.Model):
         return "name='%s' language='%s'" % (self.name, self.language)
     
     def get_url(self):
-        query_string = urllib.urlencode({'q': 'project:' +
+        query_string = mysite.base.unicode_sanity.urlencode({u'q': u'project:' +
                                          self.name_with_quotes_if_necessary()})
         return reverse(mysite.profile.views.people) + '?' + query_string
 
     def get_mentors_search_url(self):
-        query_string = urllib.urlencode({'q': 'can_mentor:"%s"' %
+        query_string = mysite.base.unicode_sanity.urlencode({u'q': u'can_mentor:"%s"' %
                                          self.language})
         return reverse(mysite.profile.views.people) + '?' + query_string
 

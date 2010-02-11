@@ -37,4 +37,9 @@ def unicodify_strings_when_inputted(func, *args, **kwargs):
             kwargs[key] = unicode(arg, 'utf-8')
     return func(*args_as_list, **kwargs)
 
-    
+def no_str_in_the_dict(d):
+    for key in d:
+        value = d[key]
+        assert type(key) != str
+        assert type(value) != str
+    return d

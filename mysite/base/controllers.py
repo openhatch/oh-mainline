@@ -1,4 +1,4 @@
-import urllib
+import mysite.base.unicode_sanity
 import simplejson
 from django.core.urlresolvers import reverse
 import django.contrib.auth.views
@@ -76,7 +76,7 @@ def _geocode(address):
     mapsUrl = 'http://maps.google.com/maps/geo?q='
      
     # This joins the parts of the URL together into one string.
-    query_string = urllib.urlencode({'q': address.encode('utf-8'), 'output': 'csv'})
+    query_string = mysite.base.unicode_sanity.urlencode({'q': address.encode('utf-8'), 'output': 'csv'})
     
     # This retrieves the URL from Google, parses out the longitude and latitude,
     # and then returns them as a string.

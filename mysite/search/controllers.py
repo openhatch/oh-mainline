@@ -1,5 +1,6 @@
 import mysite.search.models
 import mysite.search.views
+import mysite.base.unicode_sanity
 import collections
 import urllib
 import re
@@ -131,7 +132,7 @@ class Query:
                 'q': self.terms_string,
                 facet_name: option_name,
                 })
-            query_string = urllib.urlencode(GET_data)
+            query_string = mysite.base.unicode_sanity.urlencode(GET_data)
             query = Query.create_from_GET_data(GET_data)
             name = option_name or 'any'
 
@@ -258,7 +259,7 @@ class Query:
 
     def get_query_string(self):
         GET_data = self.get_GET_data()
-        query_string = urllib.urlencode(GET_data)
+        query_string = mysite.base.unicode_sanity.urlencode(GET_data)
         return query_string
 
        

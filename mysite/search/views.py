@@ -5,12 +5,13 @@ from django.db.models import Q
 from django.utils.timesince import timesince
 from django.utils.html import escape
 from django.core.urlresolvers import reverse
-import mysite.base.decorators 
+import mysite.base.decorators
 import urllib
 
 from mysite.search.models import Bug, Project
 import mysite.search.controllers 
 import mysite.base.controllers
+import mysite.base.unicode_sanity
 
 import datetime
 from dateutil import tz
@@ -37,7 +38,7 @@ def fetch_bugs(request):
         new_GET = {}
         for key in request.GET.keys():
             new_GET[key.lower()] = request.GET[key]
-        return HttpResponseRedirect(reverse(fetch_bugs) + '?' + urllib.urlencode(new_GET))
+        return HttpResponseRedirect(reverse(fetch_bugs) + '?' + mysite.base.unicode_sanity.urlencode(new_GET))
 
     if request.user.is_authenticated():
         person = request.user.get_profile()

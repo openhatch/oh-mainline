@@ -1,3 +1,4 @@
+import mysite.base.unicode_sanity
 import xml.etree.ElementTree as ET
 import xml.parsers.expat
 import sys, urllib, hashlib
@@ -69,14 +70,14 @@ def ohloh_url2data(url, selector, params = {}, many = False, API_KEY = None, per
         API_KEY = settings.OHLOH_API_KEY
 
 
-    my_params = {'api_key': API_KEY}
+    my_params = {u'api_key': unicode(API_KEY)}
     my_params.update(params)
     params = my_params ; del my_params
 
     # FIXME: We return more than just "ret" these days! Rename this variable.
     ret = []
     
-    encoded = urllib.urlencode(params)
+    encoded = mysite.base.unicode_sanity.urlencode(params)
     url += encoded
     try:
         b = mechanize_get(url, person)
@@ -143,8 +144,10 @@ class Ohloh(object):
     def project_name2projectdata(self, project_name_query):
         url = 'http://www.ohloh.net/projects.xml?'
         args = {'query': project_name_query}
-        data, web_response = ohloh_url2data(url=url, selector='result/project',
-                                   params=args, many=True)
+        data, web_response = ohloh_url2data({u'url': unicode(url),
+                                             u'selector': u'result/project',
+                                             u'params': args},
+                                            many=True)
         # Sometimes when we search Ohloh for e.g. "Debian GNU/Linux", the project it gives
         # us back as the top-ranking hit for full-text relevance is "Ubuntu GNU/Linux." So here
         # we see if the project dicts have an exact match by project name.
