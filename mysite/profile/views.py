@@ -558,7 +558,8 @@ def people(request):
         if data['query_type'] == 'project':
             data['this_query_summary'] = 'who have contributed to'
         elif data['query_type'] == 'all_tags':
-            data['this_query_summary'] = 'tagged with'
+            data['this_query_summary'] = 'who have listed'
+            data['this_query_post_summary'] = ' on their profiles'
         elif data['query_type'] == 'understands_not':
             data['this_query_summary'] = 'tagged with understands_not = '
         elif data['query_type'] == 'understands':
