@@ -32,6 +32,7 @@ body#profile #avatar { border: 4px solid #fff; padding: 0; background: #fff; }
 body#profile #info textarea { width: 145px; }
 body#profile #info .body, body#profile #contact_blurb .body { width: 89%; }
 body#profile #contact_blurb p { margin: 0 0 10px 0; }
+body#profile #contact_blurb p:last-child { margin: 0; }
 body#profile #info h4 { width: 100%; float: left; }
 body#profile .change-photo-link { background: #f4f4f4; padding: 10px; float: left; width: 182px; border-top: 5px solid #fff; }
 body#profile #info .save-button { margin-top: 10px; }
