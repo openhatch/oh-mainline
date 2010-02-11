@@ -129,10 +129,15 @@
                             <p class='example'>Example: "The best way to reach me is by private message at http://twitter.com/rafpaf."</p>
 
                             <p class='example'>
-                            We provide a Craigslist-style email forwarding service. Just write something like "Email me at $fwd." and we'll convert that to "Email me at rafpaf.248y578gh57@ephemeral.openhatch.org.".
+                                We provide a Craigslist-style email forwarding service.
+                                To use it, include the string <tt>$fwd</tt> in the text area above.
+                                Write something like &ldquo;<tt>Email me at $fwd</tt>&rdquo;
+                                and your text will appear on your profile as "Email me at
+                                {{ person.user.username}}.248y5a7@forwarder.openhatch.org.".
                             </p>
                             <p class='example'>
-                            Note that this email forwarding address will change every so often to thwart spammers.
+                            Note that this email forwarding address will change every few days
+                            to thwart spammers.
                             </p>
                             <p class='example'>
                             We'll convert newlines to &lt;br/&gt;.
