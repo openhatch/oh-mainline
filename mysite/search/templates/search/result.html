@@ -36,8 +36,8 @@
 	  mentor{{bug.project.potential_mentors|length|pluralize}}</a>
 	</span>
 	{% endif %}
-	-
-        <span class='description'>{{ bug.description|highlight:query.terms|linebreaks }}</span>
+    <span class='separator_betw_tags_and_desc'>-</span>
+        <span class='description'><p>{{ bug.description|urlize }}</p></span>
     </span>
 </div>
 <div class='details'>
