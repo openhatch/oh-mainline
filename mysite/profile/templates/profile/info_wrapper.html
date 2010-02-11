@@ -127,7 +127,9 @@
                             {% endif %}
                             <textarea name='edit-tags-contact_blurb'>{{ contact_blurb }}</textarea>
                             <p class='example'>Example: "The best way to reach me is by private message at http://twitter.com/rafpaf."</p>
-
+                            <p class='example'>
+                                We preserve linebreaks, and turn URLs into links.
+                            </p>
                             <p class='example'>
                                 We provide a Craigslist-style email forwarding service.
                                 To use it, include the string <tt>$fwd</tt> in the text area above.
@@ -138,9 +140,6 @@
                             <p class='example'>
                             Note that this email forwarding address will change every few days
                             to thwart spammers.
-                            </p>
-                            <p class='example'>
-                            We'll convert newlines to &lt;br/&gt;.
                             </p>
                             <p class='example'>
                             Note that this information will be public and crawlable by search engines.
