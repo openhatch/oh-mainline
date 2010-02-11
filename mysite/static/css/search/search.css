@@ -49,18 +49,18 @@
         #search #results .tag-details { display: none; }
         #search #results li .show-details { padding: .3em .7em; float: left; width: 71px; text-align: right; }
         #search #results li .left { white-space: nowrap; float: left; width: 460px; overflow: hidden; }
-        #search #results li .description-container { width: 525px; padding: .3em .7em; color: #555; float: left; overflow: hidden; white-space: nowrap; }
+        #search #results li .description-container { width: 90%; padding: .3em .7em; font-size: .9em; color: #555; float: left; overflow: hidden; white-space: nowrap; }
             #search #results li .description-container * { display: inline; }
             #search #results li .description-container br { display: none; }
         #search #results li .description { font-family: monospace; }
 
         #search #results li.expanded { white-space: normal; }
             #search #results li.expanded .description-container { white-space: normal; }
-                #search #results li.expanded .description-container p { float: left; width: 100%; margin-bottom: .3em; }
+                #search #results li.expanded .description-container p { white-space: pre-wrap; word-wrap: break-word; float: left; width: 100%; margin-bottom: .3em; }
                 #search #results li.expanded .description-container br { display: inherit; }
             #search #results li.expanded .second-line { border-radius: 0; -moz-border-radius: 0; overflow: visible; }
-            #search #results li.expanded .details { display: block; border-radius-bottomleft: 8px; border-radius-bottomright: 8px; -moz-border-radius-bottomleft: 8px; -moz-border-radius-bottomright: 8px; }
-                #search #results li.expanded .details .fields { display: block; }
+            #search #results li.expanded .details { display: block; float: left; width: 100%; border-radius-bottomleft: 8px; border-radius-bottomright: 8px; -moz-border-radius-bottomleft: 8px; -moz-border-radius-bottomright: 8px; }
+                #search #results li.expanded .details .fields { float: left; width: 100%; }
 
         #search #results li .age { float: right; padding: .3em .7em; width: 65px; text-align: right; color: #888; }
             #search #results li .tags .project { padding: .3em .7em; float: left; }
@@ -96,5 +96,8 @@
 #search #expand-collapse-all { float: right; }
 	#search #expand-collapse-all img { float: left; margin-right: 5px; }
 	#search #expand-collapse-all a { float: left; padding: 5px; }
+#search .expanded .separator_betw_tags_and_desc { display: none ! important; }
 
-#search /* vim: set ai ts=4 sts=4 et sw=4 nowrap: */
+#search .highlight { background-color: #ffa; }
+
+/* vim: set ai ts=4 sts=4 et sw=4 nowrap: */
