@@ -1,4 +1,5 @@
 import sys
+import os
 import datetime
 from mysite.customs import ohloh
 import urllib2
@@ -6,7 +7,7 @@ import urllib
 from mysite.customs import lp_grabber
 import mysite.customs.github
 import mysite.customs.debianqa
-from mysite.profile.models import Person, DataImportAttempt, Citation, PortfolioEntry
+import mysite.profile.models
 from mysite.search.models import Project
 from celery.task import Task
 import celery.registry
@@ -15,6 +16,9 @@ import random
 import traceback
 import mysite.profile.search_indexes
 
+## django
+from django.conf import settings
+
 def create_citations_from_ohloh_contributor_facts(dia_id, ohloh_results):
     '''Input: A sequence of Ohloh ContributionFact dicts
     and the id of the DataImport they came from.
@@ -22,15 +26,15 @@ def create_citations_from_ohloh_contributor_facts(dia_id, ohloh_results):
     Side-effect: Create matching structures in the DB
     and mark our success in the database.'''
     # {{{
-    dia = DataImportAttempt.objects.get(id=dia_id)
+    dia = mysite.profile.models.DataImportAttempt.objects.get(id=dia_id)
     person = dia.person
     for ohloh_contrib_info in ohloh_results:
         (project, _) = Project.objects.get_or_create(
                 name=ohloh_contrib_info['project'])
         # FIXME: don't import if blacklisted
-        (portfolio_entry, _) = PortfolioEntry.objects.get_or_create(
+        (portfolio_entry, _) = mysite.profile.models.PortfolioEntry.objects.get_or_create(
                 person=person, project=project)
-        citation = Citation.create_from_ohloh_contrib_info(ohloh_contrib_info)
+        citation = mysite.profile.models.Citation.create_from_ohloh_contrib_info(ohloh_contrib_info)
         citation.portfolio_entry = portfolio_entry
         citation.data_import_attempt = dia 
         citation.save_and_check_for_duplicates()
@@ -58,7 +62,7 @@ def create_citations_from_launchpad_results(dia_id, lp_results):
     Side-effect: Create matching structures in the DB
     and mark our success in the database."""
     # {{{
-    dia = DataImportAttempt.objects.get(id=dia_id)
+    dia = mysite.profile.models.DataImportAttempt.objects.get(id=dia_id)
     person = dia.person
     for project_name in lp_results:
         result = lp_results[project_name]
@@ -70,12 +74,12 @@ def create_citations_from_launchpad_results(dia_id, lp_results):
             # Sometimes there are more than one existing PortfolioEntry
             # with the details in question.
             # FIXME: This is untested.
-            if PortfolioEntry.objects.filter(person=person, project=project).count() == 0:
-                portfolio_entry = PortfolioEntry(person=person, project=project)
+            if mysite.profile.models.PortfolioEntry.objects.filter(person=person, project=project).count() == 0:
+                portfolio_entry = mysite.profile.models.PortfolioEntry(person=person, project=project)
                 portfolio_entry.save()
-            portfolio_entry = PortfolioEntry.objects.filter(person=person, project=project)[0]
+            portfolio_entry = mysite.profile.models.PortfolioEntry.objects.filter(person=person, project=project)[0]
 
-            citation = Citation()
+            citation = mysite.profile.models.Citation()
             citation.languages = ", ".join(result['languages'])
             citation.contributor_role = involvement_type
             citation.portfolio_entry = portfolio_entry
@@ -97,7 +101,7 @@ def create_citations_from_github_activity_feed_results(dia_id, results):
 def create_citations_from_github_results(dia_id, results,
                                          override_contrib=None):
     repos, dict_mapping_repos_to_languages = results
-    dia = DataImportAttempt.objects.get(id=dia_id)
+    dia = mysite.profile.models.DataImportAttempt.objects.get(id=dia_id)
     person = dia.person
     
     for repo in repos:
@@ -105,14 +109,14 @@ def create_citations_from_github_results(dia_id, results,
 
         # FIXME: Populate project description, name, etc.
 
-        if PortfolioEntry.objects.filter(person=person, project=project).count() == 0:
-            portfolio_entry = PortfolioEntry(person=person,
+        if mysite.profile.models.PortfolioEntry.objects.filter(person=person, project=project).count() == 0:
+            portfolio_entry = mysite.profile.models.PortfolioEntry(person=person,
                                              project=project,
                                              project_description=repo.description)
             portfolio_entry.save()
-        portfolio_entry = PortfolioEntry.objects.filter(person=person, project=project)[0]
+        portfolio_entry = mysite.profile.models.PortfolioEntry.objects.filter(person=person, project=project)[0]
             
-        citation = Citation()
+        citation = mysite.profile.models.Citation()
         citation.languages = "" # FIXME ", ".join(result['languages'])
         if repo.fork:
             citation.contributor_role = 'Forked'
@@ -133,7 +137,7 @@ def create_citations_from_github_results(dia_id, results,
     dia.save()
 
 def create_citations_from_debianqa_results(dia_id, results):
-    dia = DataImportAttempt.objects.get(id=dia_id)
+    dia = mysite.profile.models.DataImportAttempt.objects.get(id=dia_id)
     person = dia.person
 
     for package_name, package_description in results:
@@ -142,14 +146,14 @@ def create_citations_from_debianqa_results(dia_id, results):
         package_link = 'http://packages.debian.org/src:' + urllib.quote(
             package_name)
 
-        if PortfolioEntry.objects.filter(person=person, project=project).count() == 0:
-            portfolio_entry = PortfolioEntry(person=person,
+        if mysite.profile.models.PortfolioEntry.objects.filter(person=person, project=project).count() == 0:
+            portfolio_entry = mysite.profile.models.PortfolioEntry(person=person,
                                              project=project,
                                              project_description=package_description)
             portfolio_entry.save()
-        portfolio_entry = PortfolioEntry.objects.filter(person=person, project=project)[0]
+        portfolio_entry = mysite.profile.models.PortfolioEntry.objects.filter(person=person, project=project)[0]
             
-        citation = Citation()
+        citation = mysite.profile.models.Citation()
         citation.languages = "" # FIXME ", ".join(result['languages'])
         citation.contributor_role='Maintainer'
         citation.portfolio_entry = portfolio_entry
@@ -159,14 +163,14 @@ def create_citations_from_debianqa_results(dia_id, results):
 
         # And add a citation to the Debian portfolio entry
         (project, _) = Project.objects.get_or_create(name='Debian GNU/Linux')
-        if PortfolioEntry.objects.filter(person=person, project=project).count() == 0:
-            portfolio_entry = PortfolioEntry(person=person,
+        if mysite.profile.models.PortfolioEntry.objects.filter(person=person, project=project).count() == 0:
+            portfolio_entry = mysite.profile.models.PortfolioEntry(person=person,
                                              project=project,
                                              project_description=
                                              'The universal operating system')
             portfolio_entry.save()
-        portfolio_entry = PortfolioEntry.objects.filter(person=person, project=project)[0]
-        citation = Citation()
+        portfolio_entry = mysite.profile.models.PortfolioEntry.objects.filter(person=person, project=project)[0]
+        citation = mysite.profile.models.Citation()
         citation.languages = '' # FIXME: ?
         citation.contributor_role='Maintainer of %s' % package_name
         citation.portfolio_entry = portfolio_entry
@@ -256,16 +260,29 @@ source2result_handler = {
 
 class ReindexPerson(Task):
     def run(self, person_id, **kwargs):
-        person = Person.objects.get(id=person_id)
+        person = mysite.profile.models.Person.objects.get(id=person_id)
         pi = mysite.profile.search_indexes.PersonIndex(person)
         pi.update_object(person)
+
+class RegeneratePostfixAliasesForForwarder(Task):
+    def run(self, **kwargs):
+        # Generate the table...
+        lines = mysite.profile.models.Forwarder.generate_list_of_lines_for_postfix_table()
+        # Save it where Postfix expects it...
+        fd = open(settings.POSTFIX_FORWARDER_TABLE_PATH, 'w')
+        fd.write('\n'.join(lines))
+        fd.close()
+        # Update the Postfix forwarder database. Note that we do not need
+        # to ask Postfix to reload. Yay!
+        # FIXME stop using os.system()
+        os.system('/usr/sbin/postmap /etc/postfix/virtual_alias_maps') 
 
 class FetchPersonDataFromOhloh(Task):
     name = "profile.FetchPersonDataFromOhloh"
 
     def run(self, dia_id, **kwargs):
         """"""
-        dia = DataImportAttempt.objects.get(id=dia_id)
+        dia = mysite.profile.models.DataImportAttempt.objects.get(id=dia_id)
         try:
             logger = self.get_logger(**kwargs)
             logger.info("Starting job for <%s>" % dia)
@@ -299,6 +316,7 @@ class FetchPersonDataFromOhloh(Task):
             raise ValueError, {'code': code, 'url': url}
 
 try:
+    celery.registry.tasks.register(RegeneratePostfixAliasesForForwarder)
     celery.registry.tasks.register(FetchPersonDataFromOhloh)
     celery.registry.tasks.register(ReindexPerson)
 except celery.registry.AlreadyRegistered:

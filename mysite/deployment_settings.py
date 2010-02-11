@@ -18,3 +18,5 @@ MANAGERS=ADMINS
 SERVER_EMAIL='mr_website@linode.openhatch.org'
 
 CACHE_BACKEND = "memcached://127.0.0.1:11211/?timeout=1"
+
+POSTFIX_FORWARDER_TABLE_PATH = '/etc/postfix/virtual_alias_maps'
