@@ -5,7 +5,7 @@ body#project textarea { width: 96%;  }
 body#project input[type='text'] { width: 86%; }
 body#project input[type='submit'], body#project textarea {  }
 body#project input {  }
-body#project input[type='submit'] { padding: 4px 8px; }
+body#project input[type='submit'] { padding: 2px 8px; }
 
 
 body#project h1 { float: left; clear: left; margin-top: 10px; }
@@ -26,11 +26,9 @@ body#project ul.answers li { margin-left: 15px; display: list-item; margin-botto
 body#project ul.answers .show_when_editing { display: none; }
 body#project .blur { color: #888; }
 body#project ul.answers textarea { font-family: sans-serif; height: 60px; }
-body#project ul.answers textarea.blur { height: 1em; }
+body#project ul.answers textarea.blur { height: 1.2em; }
 body#project #questions > li { display: block; margin: 10px 0 20px; }
 body#project p.input-note { margin: 3px 0; color: #555; font-size: .9em; }
 body#project label { margin: 6px 0 3px 0; display: block; }
 
 body#project #requests input[type='text'] { font-weight: bold; font-size: 1.2em; }
-
-
