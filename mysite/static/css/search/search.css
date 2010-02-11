@@ -59,8 +59,8 @@
                 #search #results li.expanded .description-container p { white-space: pre-wrap; word-wrap: break-word; float: left; width: 100%; margin-bottom: .3em; }
                 #search #results li.expanded .description-container br { display: inherit; }
             #search #results li.expanded .second-line { border-radius: 0; -moz-border-radius: 0; overflow: visible; }
-            #search #results li.expanded .details { display: block; border-radius-bottomleft: 8px; border-radius-bottomright: 8px; -moz-border-radius-bottomleft: 8px; -moz-border-radius-bottomright: 8px; }
-                #search #results li.expanded .details .fields { display: block; }
+            #search #results li.expanded .details { display: block; float: left; width: 100%; border-radius-bottomleft: 8px; border-radius-bottomright: 8px; -moz-border-radius-bottomleft: 8px; -moz-border-radius-bottomright: 8px; }
+                #search #results li.expanded .details .fields { float: left; width: 100%; }
 
         #search #results li .age { float: right; padding: .3em .7em; width: 65px; text-align: right; color: #888; }
             #search #results li .tags .project { padding: .3em .7em; float: left; }
