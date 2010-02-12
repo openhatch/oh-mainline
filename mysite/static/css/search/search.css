@@ -57,6 +57,7 @@
         #search #results li .description { font-family: monospace; }
 
         #search #results li.expanded { background: #ffffb4; white-space: normal; }
+            #search #results li.expanded .title { text-shadow: 0 1px 0 #fff; }
             #search #results li.expanded .description-container { white-space: normal; }
                 #search #results li.expanded .description-container p { font-family: monospace; color: #000; white-space: pre-wrap; word-wrap: break-word; float: left; width: 100%; margin-bottom: .3em; }
                 #search #results li.expanded .description-container br { display: inherit; }
@@ -71,7 +72,6 @@
             #search #results form input[type='text'] { font-size: 19px; padding: 10px; color: #222; width: 570px; height: 25px; }
             #search #results form input[type='submit'] { font-size: 19px; padding: 8px; color: #222; width: 90px; height: 50px; }
 
-#search a.title:focus { -moz-outline-style: none; outline: none; }
 #search .separator { color: #aaa; }
 #search .project-info { float: left; padding: .3em .7em; }
 #search #filters label.on { font-weight: bold; }
@@ -99,7 +99,7 @@
 	#search #expand-collapse-all a { float: left; padding: 5px; }
 #search .expanded .separator_betw_tags_and_desc { display: none ! important; }
 
-#search .highlight { background-color: #ffa; }
+#search .highlight { background-color: #ff7; font-weight: bold; }
 #search .sep { color: #b4b4b4; }
 
 #search .top_left { float: left; width: 83%; overflow: hidden; }

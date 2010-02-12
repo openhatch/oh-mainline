@@ -1,7 +1,7 @@
 {% extends 'base/base.html' %}
 {% load i18n %}
 
-{% block title %}Associate your OpenID{% endblock %}
+{% block title %}Pick a username{% endblock %}
 
 {% block body_id %}associate-openid{% endblock %}
 
@@ -15,7 +15,7 @@ body#associate-openid .errorlist li { width: 90%; }
 #openid-associate .body { width: 210px; }
 #expand-second-form { margin-top: 20px; }
 #associate-with-existing-account { margin-top: 10px; display: none; }
-form p { float: none; display: block; }
+form p { float: none; display: block; margin: 0 0 10px 0; }
 form label { float: none; display: block; }
 body#associate-openid form input { float: none; display: block; }
 body#associate-openid .body { background: #fff;} 
@@ -25,7 +25,7 @@ body#associate-openid .body { background: #fff;}
     <div class='module' id='openid-associate'>
 
         <div class='head'>
-            <h3>Sign up</h3>
+            <h3>Pick a hip username</h3>
         </div>
 
         <div class='body'>
@@ -34,7 +34,7 @@ body#associate-openid .body { background: #fff;}
                     method="POST" class="login">
                 <input type="hidden" name="next" value="{{ next }}" />
                 {{ form1.as_p }}
-                <p><input type="submit" name="bnewaccount" value="Sign up"></p>
+                <p><input type="submit" name="bnewaccount" value="ok"></p>
             </form>
             
             <a href='#' id='expand-second-form' style='display: block; '>

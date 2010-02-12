@@ -53,27 +53,22 @@ var providers_small = {
   },
   blogger: {
     name: 'Blogger',
-    label: 'Your Blogger account',
+    label: 'Enter your Blogger username.',
     url: 'http://{username}.blogspot.com/'
   },
   verisign: {
     name: 'Verisign',
-    label: 'Your Verisign username',
+    label: 'Enter your Verisign username.',
     url: 'http://{username}.pip.verisignlabs.com/'
   },
   vidoop: {
     name: 'Vidoop',
-    label: 'Your Vidoop username',
+    label: 'Enter your Vidoop username.',
     url: 'http://{username}.myvidoop.com/'
-  },
-  verisign: {
-    name: 'Verisign',
-    label: 'Your Verisign username',
-    url: 'http://{username}.pip.verisignlabs.com/'
   },
   claimid: {
     name: 'ClaimID',
-    label: 'Your ClaimID username',
+    label: 'Enter your ClaimID username.',
     url: 'http://claimid.com/{username}'
   }
 };
