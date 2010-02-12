@@ -201,23 +201,17 @@ People Search
 
         });
         mapController.bindClickHandlersToPeopleListItems();
+
+        $('#about_uninhabited_island').click(function () {
+            mapController.explainUninhabitedIsland();
+            return false;
+        });
     });
 
 function geocode_person_id(person_id) {
     var data = {{ person_id2lat_long_as_json|safe}};
     return data[person_id];
 }
-
-$(function() {
-
-
-        $('#about_uninhabited_island').click(function () {
-            var message = "People who haven't set their locations appear on an uninhabited island in the South Atlantic.<br><br>To set your location, click 'settings' in the top-right corner of your screen.";
-            $.jGrowl(message, { position: "center", life: 10000 });
-            return false;
-            });
-        });
-
     
 </script>
 {% endif %}
