@@ -156,8 +156,8 @@ PeopleMapController.prototype.initialize = function(options) {
                 }
 
                 var is_inaccessible = json_data['is_inaccessible'];
-                        var person_location = new google.maps.LatLng(json_data['latitude'],
-                            json_data['longitude']);
+                var person_location = new google.maps.LatLng(json_data['latitude'],
+                    json_data['longitude']);
 
                 var marker = null;
 
@@ -165,7 +165,7 @@ PeopleMapController.prototype.initialize = function(options) {
                     person_name = '';
                     /* Grab the_marker_for_inaccessible_island, if we have already made it */
                     if (mapController.the_marker_for_inaccessible_island !== null) {
-                    marker = mapController.the_marker_for_inaccessible_island;
+                        marker = mapController.the_marker_for_inaccessible_island;
                     }
                 }
                 
