@@ -8,6 +8,7 @@ Log in
 {{ block.super }}
 form { width: 350px; }
 .login-links li { list-style: square; float: left; width: 95%; margin-top: 5px; margin-left: 15px; }
+p { margin: 0 0 10px 0; }
 {% endblock css %}
 
 {% block body_class %}{{ block.super }} auth{% endblock %}
@@ -15,11 +16,14 @@ form { width: 350px; }
 {% block main %}
 <div id='login' class='module'>
     <div class='head'>
-        <h3>Log in with OpenID</h3>
+        <h3>Log in rather quickly with OpenID</h3>
     </div>
     <div class='body'>
 
         <div style='float: left; width: 500px;'>
+            {% if next %}
+                <p>Please log in to proceed.</p>
+            {% endif %}
             {% include 'account/login_openid.html' %}
         </div>
         <ul class='login-links' style='float: right; width: 300px; padding: 16px; padding-bottom: 16px; border-radius: 8px; -moz-border-radius: 8px; background-color: #f4f4f4;'>
