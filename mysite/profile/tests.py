@@ -1421,34 +1421,6 @@ class SuggestLocation(TwillTests):
         self.assertEqual(type(data['geoip_guess']), unicode)
         self.assertEqual(data['geoip_guess'], u'Reykjav\xedk, 10, Iceland')
 
-class EditBio(TwillTests):
-    fixtures = ['user-paulproteus', 'person-paulproteus']
-
-    def test(self):
-        '''
-        * Goes to paulproteus's profile
-        * checks that there is no link to asheesh.org
-        * clicks edit on the Info area
-        * enters a link as Info
-        * checks that his bio now contains "asheesh.org"
-        '''
-        self.login_with_twill()
-        tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
-        #not so vain.. yet
-        tc.notfind('asheesh.org')
-        tc.go(make_twill_url('http://openhatch.org/profile/views/edit_info'))
-        #make sure our bio is not already on the form
-        tc.notfind('asheesh.org')
-        # set the bio in ze form
-        tc.fv("edit-tags", 'edit-tags-homepage_url', 'http://www.asheesh.org/')
-        tc.submit()
-        #find the string we just submitted as our bio
-        tc.find('asheesh.org')
-        self.assertEqual(Person.get_by_username('paulproteus').homepage_url,
-        "http://www.asheesh.org/")
-        #now we should see our bio in the edit form
-        tc.go(make_twill_url('http://openhatch.org/profile/views/edit_info'))
-        tc.find('asheesh.org')
     
 class EditLocation(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
@@ -1502,6 +1474,118 @@ class EditBio(TwillTests):
         #now we should see our bio in the edit form
         tc.go(make_twill_url('http://openhatch.org/profile/views/edit_info'))
         tc.find('lookatme!')
+
+class EditHomepage(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def test(self):
+        '''
+        * Goes to paulproteus's profile
+        * checks that there is no link to asheesh.org
+        * clicks edit on the Info area
+        * enters a link as Info
+        * checks that his bio now contains "asheesh.org"
+        '''
+        self.login_with_twill()
+        tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
+        #not so vain.. yet
+        tc.notfind('asheesh.org')
+        tc.go(make_twill_url('http://openhatch.org/profile/views/edit_info'))
+        #make sure our bio is not already on the form
+        tc.notfind('asheesh.org')
+        # set the bio in ze form
+        tc.fv("edit-tags", 'edit-tags-homepage_url', 'http://www.asheesh.org/')
+        tc.submit()
+        #find the string we just submitted as our bio
+        tc.find('asheesh.org')
+        self.assertEqual(Person.get_by_username('paulproteus').homepage_url,
+        "http://www.asheesh.org/")
+        #now we should see our bio in the edit form
+        tc.go(make_twill_url('http://openhatch.org/profile/views/edit_info'))
+        tc.find('asheesh.org')
+
+
+class EditContactBlurbForwarderification(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+    def test(self):
+        '''
+        a controller called put_forwarder_in_contact_blurb_if_they_want() takes a string which is what someone inputs as their contact info blurb
+        it also takes said person's username or person object or something
+        we're testing this:
+            the controller returns a string which is the same as the one that it received, except $fwd is replaced with the output of generate_forwarder
+            the Forwarder db table contains a row for our new forwarder
+        '''
+        # we have a string that contains the substr $fwd
+        mystr = "email me here: $fwd.  it'll be great"
+        user_to_forward_to = User.objects.get(username='paulproteus')
+        # we run this string through a controller called forwarderify
+        mystr_forwarderified = (mysite.base.controllers.
+                put_forwarder_in_contact_blurb_if_they_want(mystr, user_to_forward_to))
+        our_forwarder = mysite.profile.models.Forwarder.objects.get(user=user_to_forward_to)
+        output = "email me here: %s@%s.  it'll be great" % (our_forwarder.address, settings.FORWARDER_DOMAIN)
+        # make sure our forwarder that we just made hasn't expired
+        self.assert_(our_forwarder.expires_on > datetime.datetime.utcnow())
+        # we test that the result contains, as a substr, the output of a call to generate_forwarder
+        self.assertEqual(mystr_forwarderified, output);
+
+
+class EditContactBlurb(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def test(self):
+        '''
+        * Goes to paulproteus' profile
+        * checks that it doesn't say "bananas"
+        * clicks edit in the info area
+        * checks that the input field for "how to contact me" doesn't say bananas
+        * enters bananas under the "how to contact me" section
+        * submits
+        * checks that his profile now says "bananas"
+        * clicks edit in the info area again
+        * checks that the input field for "how to contact me" now says bananas
+        * removes email address from user
+        * enters contact blurb containing $fwd
+        * makes sure that the user gets an error message
+        '''
+        self.login_with_twill()
+        tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
+        # make sure our contact info isn't already on the profile page
+        tc.notfind('bananas')
+        tc.go(make_twill_url('http://openhatch.org/profile/views/edit_info'))
+        #make sure our contact info is not already on the form
+        tc.notfind('bananas')
+        # set the contact info in ze form
+        tc.fv("edit-tags", 'edit-tags-contact_blurb', 'bananas')
+        tc.submit()
+        #find the string we just submitted as our contact info
+        tc.find('bananas')
+        asheesh = Person.get_by_username('paulproteus')
+        self.assertEqual(asheesh.contact_blurb, "bananas")
+        #now we should see our contact info in the edit form
+        tc.go(make_twill_url('http://openhatch.org/profile/views/edit_info'))
+        tc.find('bananas')
+        #delete asheesh's email
+        asheesh_user = asheesh.user
+        asheesh_user.email = ''
+        asheesh_user.save()
+        contact_blurb = 'email me here: $fwd'
+        contact_blurb_escaped = 'email me here: \$fwd'
+        homepage_url = 'http://mysite.com'
+        tc.fv("edit-tags", 'edit-tags-contact_blurb', contact_blurb)
+        # also enter a homepage so that we can make sure that this gets saved despite our error with the forwarder stuff
+        tc.fv("edit-tags", 'edit-tags-homepage_url', homepage_url)
+        tc.submit()
+        # make sure that they got an error message
+        tc.find('contact_blurb_error')
+        # make sure that the form remembered the contact blurb that they posted
+        tc.find(contact_blurb_escaped)
+        # make sure that their homepage was saved to the database
+        asheesh = Person.get_by_username('paulproteus')
+        self.assertEqual(asheesh.homepage_url, homepage_url)
+
+
+
+
     
 class MockGithubImport(BaseCeleryTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
@@ -1750,5 +1834,69 @@ class PeopleSearch(TwillTests):
         data = mysite.profile.controllers.parse_string_query(query)
         self.assertEqual(data['q'], query)
         self.assertEqual(data['query_type'], 'all_tags')
+
+
+class PostFixGeneratorList(TwillTests):
+    fixtures = ['user-paulproteus', 'user-barry', 'person-barry',
+            'person-paulproteus']
+
+
+    def test(self):
+        # create two people
+        #  one who has an email address list in our database
+        asheesh = User.objects.get(username='paulproteus')
+        #  one who does not
+        barry = User.objects.get(username='barry')
+        barry.email = ''
+        barry.save()
+        # make a row in the forwarder table for each of these people
+        mysite.base.controllers.generate_forwarder(barry)
+        mysite.base.controllers.generate_forwarder(asheesh)
+        # run the function in Forwarder which creates/updates the list of user/forwarder pairs for postfix to generate forwarders for
+        what_we_get = mysite.profile.models.Forwarder.generate_list_of_lines_for_postfix_table()
+
+        what_we_want = [mysite.profile.models.Forwarder.objects.filter(user__username='paulproteus')[0].generate_table_line()]
+        # make sure that the list of strings that we get back contains an item for the user with an email address and no item for the user without
+        self.assertEqual(what_we_get, what_we_want)
+        
+        
+
+class EmailForwarderResolver(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+    '''
+    * put some mappings of forwarder addresses to dates and user objects in the Forwarder table
+    * one of these will be expired
+    * one of these will not
+    * try 
+        * email forwarder address that's not in the database at all
+        * email forwarder that's in the db but is expired
+        * email forwarder that's in the db and is not expired
+    '''
+
+
+    def test(self):
+        def test_possible_forwarder_address(address, future, actually_create, should_work):
+            future_number = future and 1 or -1
+            if actually_create:
+                expiry_date = datetime.datetime.utcnow() + future_number*datetime.timedelta(minutes=10)
+                user = User.objects.get(username="paulproteus")
+                new_mapping = mysite.profile.models.Forwarder(address=address,
+                        expires_on=expiry_date, user=user)
+                new_mapping.save()
+
+            output = mysite.base.controllers.get_email_address_from_forwarder_address(address)
+            if should_work:
+                self.assertEqual(output, user.email)
+            else:
+                self.assertEqual(output, None)
+
+        # this one hasn't expired yet
+        test_possible_forwarder_address("apples", True, True, True)
+
+        # this one has already expired
+        test_possible_forwarder_address("bananas", False, True, False)
+
+        # this one isn't in the table at all
+        test_possible_forwarder_address("oranges", True, False, False)
 
  # vim: set ai et ts=4 sw=4 nu:

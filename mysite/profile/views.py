@@ -103,6 +103,8 @@ def get_personal_data(person):
 
     data_dict['has_set_info'] = any(data_dict['tags_flat'].values())
 
+    data_dict['contact_blurb'] = mysite.base.controllers.put_forwarder_in_contact_blurb_if_they_want(person.contact_blurb, person.user)
+
     return data_dict
 
     # }}}
@@ -228,21 +230,18 @@ def _project_hash(project_name):
     # }}}
 
 @login_required
+# this is a post handler
 def edit_person_info(request):
     # {{{
     person = request.user.get_profile()
 
     #grab their submitted bio
-    bio = request.POST.get('edit-tags-bio', '')
-    person.bio = bio
-    person.save()
+    person.bio = request.POST.get('edit-tags-bio', '')
 
     # Grab the submitted homepage URL.
     # FIXME: One day, validate that this is a valid URL, and
     # use Django forms for this whole thing, while we're at it.
-    bio = request.POST.get('edit-tags-homepage_url', '')
-    person.homepage_url = bio
-    person.save()
+    person.homepage_url = request.POST.get('edit-tags-homepage_url', '')
 
     # We can map from some strings to some TagTypes
     for known_tag_type_name in ('understands', 'understands_not',
@@ -273,6 +272,17 @@ def edit_person_info(request):
                     defaults={'text': tag_text})
             new_link, _ = Link_Person_Tag.objects.get_or_create(
                     tag=tag, person=person)
+
+    posted_contact_blurb = request.POST.get('edit-tags-contact_blurb', '')
+    # if their new contact blurb contains $fwd,
+    # make sure that they have an email address in our database
+    # if not, give them an error
+    if '$fwd' in posted_contact_blurb and not person.user.email:
+        person.save()
+        return edit_info(request, contact_blurb_error=True, contact_blurb_thus_far=posted_contact_blurb)
+
+    person.contact_blurb = posted_contact_blurb
+    person.save()
 
     # Enqueue a background task to re-index the person
     task = mysite.profile.tasks.ReindexPerson()
@@ -471,20 +481,19 @@ def people(request):
     # Get the list of people to display.
 
     if parsed_query['q'].strip():
-        mappable_people, extra_data = query2results(parsed_query)
+        everybody, extra_data = query2results(parsed_query)
         data.update(extra_data)
 
     else:
-        everybody = Person.objects.all()
-        mappable_people = everybody
+        everybody = Person.objects.all().order_by('user__username')
 
     # filter by query, if it is set
-    data['people'] = mappable_people
+    data['people'] = everybody
     get_relevant_person_data = lambda p: (
             {'name': p.get_full_name_or_username(),
             'location': p.get_public_location_or_default()})
     person_id2data = dict([(person.pk, get_relevant_person_data(person))
-            for person in mappable_people])
+            for person in everybody])
     data['person_id2data_as_json'] = simplejson.dumps(person_id2data)
     data['test_js'] = request.GET.get('test', None)
     data['num_of_persons_with_locations'] = len(person_id2data)
@@ -548,7 +557,8 @@ def people(request):
         if data['query_type'] == 'project':
             data['this_query_summary'] = 'who have contributed to'
         elif data['query_type'] == 'all_tags':
-            data['this_query_summary'] = 'tagged with'
+            data['this_query_summary'] = 'who have listed'
+            data['this_query_post_summary'] = ' on their profiles'
         elif data['query_type'] == 'understands_not':
             data['this_query_summary'] = 'tagged with understands_not = '
         elif data['query_type'] == 'understands':
@@ -895,9 +905,15 @@ def dollar_username(request):
 
 @login_required
 @view
-def edit_info(request):
-    data = get_personal_data(request.user.get_profile())
+def edit_info(request, contact_blurb_error=False, contact_blurb_thus_far=''):
+    person = request.user.get_profile()
+    data = get_personal_data(person)
     data['info_edit_mode'] = True
+    data['contact_blurb_error'] = contact_blurb_error
+    if contact_blurb_error:
+        data['contact_blurb'] = contact_blurb_thus_far
+    else:
+        data['contact_blurb'] = person.contact_blurb
     return request, 'profile/info_wrapper.html', data
 
 # vim: ai ts=3 sts=4 et sw=4 nu

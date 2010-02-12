@@ -1,5 +1,5 @@
 
-body#people-map #main img{margin:0 0 -3px; padding:0; }
+body#people-map img#people-search {margin:0 0 -3px; padding:0; }
 body#people-map input[type="submit"]{ float:left; padding: 5px; position: relative; top: -1px; }
 body#people-map .map-error{background: #ffc; float: left; padding: 9px 2%; width: 36%; display: none}
 body#people-map #map_canvas{ text-align:center; float: right; width:68%; height:450px; }
@@ -12,19 +12,25 @@ body#people-map .left{float:left; width:51px; }
 body#people-map .profile-link:hover {text-decoration:none; color:#000; }
 body#people-map .profile-link{ border-radius:8px; -moz-border-radius:8px; background-color:#ddf; color:#555; padding:4px 8px; border:2px solid #fff; font-size: .85em; float:right; margin-left:4px; }
 #big-people-list,#big-people-list ul,#big-people-list .people-list-map{float:left; }
-#people-list li.hover{background:#ffc; }
-#people-list a:hover{text-decoration: none; }
-#people-list li.highlighted{background:#ffa !important; }
+#people-list a:hover {text-decoration: none; }
+#people-list li > a{float: left; width: 100%; border-radius:8px; -moz-border-radius:8px; margin-bottom:3px; width:94%; padding:8px; }
+
+/* Special functionality for people map. */
+body#people-map #people-list li { float: left; width: 100%; border-radius:8px; -moz-border-radius:8px; margin-bottom:3px; width:94%; padding:8px; }
+body#people-map #people-list li:hover { background:#ffc; }
+
+#people-list li > a:hover { background:#ffc; }
+#people-list li.highlighted {background:#ffa !important; }
 #people-list li.highlighted .name{text-shadow:0 1px 0 #fff; }
 #people-list .people-list-column{width:32%; float:left; border-left:1px dashed #dfdfdf; padding-left:15px; }
 #people-list .people-list-column:first-child {border-left:none; padding-left:0; }
-#people-list li{border-radius:8px; -moz-border-radius:8px; margin-bottom:3px; list-style:none; display:block; float:left; width:94%; padding:8px; }
+#people-list li{ width: 100%; list-style:none; display:block; float:left; }
 #people-list li img{font-size:51px; vertical-align:top; float:left; margin-right:10px; margin-bottom:5px; }
 #people-list li .name{display:block; font-size:1.1em; margin-bottom:2px; font-weight:700; }
 #people-list li .people-view-tags{display:block; font-size:.9em; color:#666; }
 #people-list li .location{display:block; color:#666; font-size:.9em; margin-bottom:3px; }
 #people-list li .people-view-projects{display:block; color:#666; font-size:.9em; margin-bottom:3px; }
-#people-list li .people-view-info{float:left; width:190px; overflow-x: hidden; }
+#people-list li .people-view-info{float:left; width:185px; overflow-x: hidden; }
 #people-list li.highlighted .collapsible{display:inline; }
 #people-list li .collapsible,#people-list li.highlighted .ellipsis{display:none; }
 body#people-map #people-list.people-list-map {list-style:square; overflow:auto; height:450px; width:31.5%; }

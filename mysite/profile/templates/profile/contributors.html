@@ -18,7 +18,7 @@
         {% endfor %}
     </ul>
     <a class='see-all'
-        href='{% url mysite.project.views.project project.name %}'
+            href='{% url mysite.profile.views.people %}?q=project:{{ project.name|urlencode }}'
         >See all &raquo;</a>
     {% endwith %}
 </div>
