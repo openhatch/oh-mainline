@@ -155,46 +155,46 @@ PeopleMapController.prototype.initialize = function(options) {
                     return;
                 }
 
-		var is_inaccessible = json_data['is_inaccessible'];
-                var person_location = new google.maps.LatLng(json_data['latitude'],
-                    json_data['longitude']);
+                var is_inaccessible = json_data['is_inaccessible'];
+                        var person_location = new google.maps.LatLng(json_data['latitude'],
+                            json_data['longitude']);
 
-		var marker = null;
+                var marker = null;
 
-		if (is_inaccessible) {
-		    person_name = '';
-		    /* Grab the_marker_for_inaccessible_island, if we have already made it */
-		    if (mapController.the_marker_for_inaccessible_island !== null) {
-			marker = mapController.the_marker_for_inaccessible_island;
-		    }
-		}
-		
-		if (marker === null) {
-                    marker = new google.maps.Marker({
-                        'map': mapController.map, 
-                        'title': person_name,
-                        'person_id': person_id,     
-			'position': person_location
-						    });
-		}
-		
-		if (is_inaccessible && 
-		    mapController.the_marker_for_inaccessible_island === null) {
-		    /* Then cache it */
-		    mapController.the_marker_for_inaccessible_island = marker;
-		}
-        mapController.person_locations['' + person_id] = person_location;
+                if (is_inaccessible) {
+                    person_name = '';
+                    /* Grab the_marker_for_inaccessible_island, if we have already made it */
+                    if (mapController.the_marker_for_inaccessible_island !== null) {
+                    marker = mapController.the_marker_for_inaccessible_island;
+                    }
+                }
+                
+                if (marker === null) {
+                            marker = new google.maps.Marker({
+                                'map': mapController.map, 
+                                'title': person_name,
+                                'person_id': person_id,     
+                    'position': person_location
+                                    });
+                }
+                
+                if (is_inaccessible && 
+                    mapController.the_marker_for_inaccessible_island === null) {
+                    /* Then cache it */
+                    mapController.the_marker_for_inaccessible_island = marker;
+                }
+                mapController.person_locations['' + person_id] = person_location;
 
-        mapController.map.setCenter(mapController.mapOrigin);
+                mapController.map.setCenter(mapController.mapOrigin);
 
-		if (! is_inaccessible) {
-                    google.maps.event.addListener(
-			marker,
-			'click', function() {
-                            mapController.highlightPerson(marker.person_id);
-                            window.location.hash=('person_summary_' + marker.person_id);
-			});		    
-		}
+                if (! is_inaccessible) {
+                            google.maps.event.addListener(
+                    marker,
+                    'click', function() {
+                                    mapController.highlightPerson(marker.person_id);
+                                    window.location.hash=('person_summary_' + marker.person_id);
+                    });		    
+                }
 
                 all_markers.push(marker);
                 /* if this is the last one, call update_all_markers() */
