@@ -197,7 +197,8 @@ class Project(models.Model):
         return "name='%s' language='%s'" % (self.name, self.language)
     
     def get_url(self):
-        return reverse(mysite.project.views.project, kwargs={'project__name': self.name}) 
+        return reverse(mysite.project.views.project,
+                kwargs={'project__name': urllib.quote(self.name)}) 
 
     def get_mentors_search_url(self):
         query_string = urllib.urlencode({'q': 'can_mentor:"%s"' %
