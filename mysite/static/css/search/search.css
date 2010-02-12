@@ -25,44 +25,45 @@
  * -------------- */
 #search #results.box { background: #fff; padding-right: 0; padding-bottom: 10px; }
 #search #results ul { margin: 0; padding: 0; float: left; width: 99%; }
-    #search #results li { overflow: hidden; letter-spacing: 0px; font-size: 100%; float: left; list-style: none; width: 100%; white-space: nowrap; margin: 0; margin-bottom: 8px; }
-        #search #results li.odd { border-color: #ff94ad; }
-        #search #results li .details { padding: .3em .7em; /*border-top: 1px solid #ccf;*/ padding-top: 0; float: left; font-size: 11px; background: transparent url('/static/images/motif.png'); display: none; }
+    #search #results li { overflow: hidden; -moz-border-radius: 8px; border-radius: 8px; padding: 5px 8px; font-size: 100%; float: left; list-style: none; width: 96%; white-space: nowrap; margin: 0; margin-bottom: 3px; }
+        #search #results li .details { padding: .3em .7em; padding-top: 0; float: left; font-size: 11px; display: none; }
         #search #results li label { color: #777; }
         #search #results li .field { width: 33%; float: left; margin-top: .3em; }
         #search #results li .tags { float: left; width: 80px; }
-        #search #results li .head { font-size: 14px; float: left; padding: 5px 10px; width: 100%; overflow: hidden; border-bottom: 2px solid #f4f4f4; }
+        #search #results li .head { font-size: 1em; float: left; padding: 5px 10px; width: 99%; overflow: hidden; }
 
-        #search /* First line, e.g.: "Tomboy: SSH synchronisation: does not create the remote directory | expand | link" */
-        #search #results li .first-line { float: left; cursor: hand; width: 100%; cursor: pointer; border-radius-topleft: 8px; /*border-bottom: 1px dotted #ccf;*/ border-radius-topright: 8px; -moz-border-radius-topleft: 8px; -moz-border-radius-topright: 8px; padding: 2px 0 0 2px; background-color: #fff; }
+        /* First line, e.g.: "Tomboy: SSH synchronisation: does not create the remote directory | expand | link" */
+        #search #results li .first-line { float: left; cursor: hand; width: 100%; cursor: pointer; border-radius-topleft: 8px; border-radius-topright: 8px; -moz-border-radius-topleft: 8px; -moz-border-radius-topright: 8px; padding: 2px 0 0 2px; }
+        #search #results li:hover { background-color: #ffffd4; }
             #search #results li .first-line a { color: #2288BB; }
                 #search #results li .first-line a:hover { color: #223366; text-decoration: none; }
 
         #search #results li .first-line img { vertical-align: middle; width: 20px; height: 20px; /* If ever an image is not square this rule might distort it. */ }
 
         #search /* Second line, e.g.:   ● Bite-size - C# - 3 potential mentors - I am using the "local folder" option for synchronizati... */
-        #search #results li .second-line { display: block; float: left; background-color: #fff; padding: 2px 0 0 2px; width: 100%; border-radius-bottomleft: 8px; border-radius-bottomright: 8px; -moz-border-radius-bottomleft: 8px; -moz-border-radius-bottomright: 8px; }
-        #search #results li .second-line .description p { display: inline; }
+        #search #results li .second-line { display: block; float: left; padding: 2px 0 0 2px; width: 100%; border-radius-bottomleft: 8px; border-radius-bottomright: 8px; -moz-border-radius-bottomleft: 8px; -moz-border-radius-bottomright: 8px; }
+        #search #results li .second-line .description p { font-family: sans-serif; display: inline; }
         #search #results li .good-for-beginners { padding: 1px; }
+
+        #search .title { font-weight: bold; }
 
         #search #results li .description-container p { margin-top: 5px; }
         #search #results .tag-details { display: none; }
         #search #results li .show-details { padding: .3em .7em; float: left; width: 71px; text-align: right; }
         #search #results li .left { white-space: nowrap; float: left; width: 460px; overflow: hidden; }
-        #search #results li .description-container { width: 90%; padding: .3em .7em; font-size: .9em; color: #555; float: left; overflow: hidden; white-space: nowrap; }
+        #search #results li .description-container { width: 97%; padding: .3em .7em; font-size: .9em; color: #555; float: left; overflow: hidden; white-space: nowrap; }
             #search #results li .description-container * { display: inline; }
             #search #results li .description-container br { display: none; }
         #search #results li .description { font-family: monospace; }
 
-        #search #results li.expanded { white-space: normal; }
+        #search #results li.expanded { background: #ffffb4; white-space: normal; }
             #search #results li.expanded .description-container { white-space: normal; }
-                #search #results li.expanded .description-container p { white-space: pre-wrap; word-wrap: break-word; float: left; width: 100%; margin-bottom: .3em; }
+                #search #results li.expanded .description-container p { font-family: monospace; color: #000; white-space: pre-wrap; word-wrap: break-word; float: left; width: 100%; margin-bottom: .3em; }
                 #search #results li.expanded .description-container br { display: inherit; }
             #search #results li.expanded .second-line { border-radius: 0; -moz-border-radius: 0; overflow: visible; }
-            #search #results li.expanded .details { display: block; float: left; width: 100%; border-radius-bottomleft: 8px; border-radius-bottomright: 8px; -moz-border-radius-bottomleft: 8px; -moz-border-radius-bottomright: 8px; }
+            #search #results li.expanded .details { display: block; float: left; width: 90%; border-radius-bottomleft: 8px; border-radius-bottomright: 8px; -moz-border-radius-bottomleft: 8px; -moz-border-radius-bottomright: 8px; padding: 5px 10px; }
                 #search #results li.expanded .details .fields { float: left; width: 100%; }
 
-        #search #results li .age { float: right; padding: .3em .7em; width: 65px; text-align: right; color: #888; }
             #search #results li .tags .project { padding: .3em .7em; float: left; }
 
         #search #results form { float: left; width: 690px; }
@@ -99,5 +100,10 @@
 #search .expanded .separator_betw_tags_and_desc { display: none ! important; }
 
 #search .highlight { background-color: #ffa; }
+#search .sep { color: #b4b4b4; }
+
+#search .top_left { float: left; width: 83%; overflow: hidden; }
+#search .top_right { white-space: nowrap; float: right; width: 12%; padding: 3px 10px; text-align: right; font-size: .9em; }
+
 
 /* vim: set ai ts=4 sts=4 et sw=4 nowrap: */

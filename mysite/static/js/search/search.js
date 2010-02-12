@@ -19,16 +19,10 @@ SearchResults.bindEventHandlers = function () {
     $('.first-line').click(function () {
             $result = $(this.parentNode);
             $result.toggleExpanded();
-            return false;
+            // don't use this, so that links work return false;
             });
 
     $('.show-details').click(function () {
-            $result = $(this.parentNode.parentNode.parentNode);
-            $result.toggleExpanded();
-            return false;
-            });
-
-    $('.first-line a.title').click(function () {
             $result = $(this.parentNode.parentNode.parentNode);
             $result.toggleExpanded();
             return false;

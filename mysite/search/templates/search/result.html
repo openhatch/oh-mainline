@@ -3,21 +3,29 @@
 
 <div class='first-line'>
     <div class='head'>
+        <div class='top_left'>
         <img alt='logo for {{bug.project.name}}' title='{{bug.project.name}}'
         src='{{ bug.project.get_url_of_search_result_icon_or_generic }}' />
-        <span class='project__name'>{{ bug.project.name|highlight:query.terms }}</span>:
-        <span class='title'>{{ bug.title|highlight:query.terms }}</span>
-        |
-        <span class='expand'><a href=''>expand</a></span>
-        |
-        <span class='link'><a href='{{ bug.canonical_bug_link }}'>link</a></span>
-        {#<div class='age'>3 days old</div>#}
+        <span class='project__name'>
+            {{ bug.project.name|highlight:query.terms }} 
+        </span>
+        <span class='sep'>&middot;</span>
+        <span class='title'>
+            {{ bug.title|highlight:query.terms }}
+        </span>
+        </div>
+        <div class='top_right'>
+            <span class='expand'><a href=''>expand</a></span>
+            <span class='sep'>&middot;</span>
+            <span class='link'><a target='_new' href='{{ bug.canonical_bug_link }}'>link</a></span>
+        </div>
     </div>
 </div>
 <div class='second-line'>
     <span class='description-container'>
         {% if bug.good_for_newcomers %}
-        <span class='good-for-beginners'><span class="green-bullet">&#9679;</span> Bite-size</span> -
+        <span class='good-for-beginners'><span class="green-bullet">&#9679;</span> Bite-size</span>
+        <span class='sep'>&middot;</span>
         {% endif %}
 
         {% if bug.project.language %}
@@ -30,13 +38,20 @@
 
         {% endif %}
 
+        {% if bug.last_touched %}
+            <span class='sep'>&middot;</span>
+            <span class='age'>upd {{ bug.last_touched|timesince_terse }} ago</span>
+        {% endif %}
+
+
 	{% if bug.project.potential_mentors %}
 	<span class="helpers" style="color: black;">
-	  - <a href="{{ bug.project.get_mentors_search_url }}">{{bug.project.potential_mentors|length}} potential
-	  mentor{{bug.project.potential_mentors|length|pluralize}}</a>
-	</span>
+        <span class='sep'>&middot;</span>
+        <a href="{{ bug.project.get_mentors_search_url }}">{{bug.project.potential_mentors|length}} potential
+            mentor{{bug.project.potential_mentors|length|pluralize}}</a>
+    </span>
 	{% endif %}
-    <span class='separator_betw_tags_and_desc'>-</span>
+    <span class='sep separator_betw_tags_and_desc'>&middot;</span>
         <span class='description'><p>{{ bug.description|highlight:query.terms }}</p></span>
     </span>
 </div>
@@ -68,7 +83,7 @@
             <label>Link: </label>
             <span class='value'>
                 <a class='canonical_bug_link'
-                    href='{{ bug.canonical_bug_link }}'>Upstream issue</a>
+                        href='{{ bug.canonical_bug_link }}'>{{ bug.canonical_bug_link|urlizetrunc:"30"}}</a>
             </span>
         </span>
         <span class='field importance'>

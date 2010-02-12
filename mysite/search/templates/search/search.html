@@ -160,7 +160,7 @@ Search bugs
         {% if bunch_of_bugs %}
         <ul>
             {% for bug in bunch_of_bugs %}
-            <li class='bug {% cycle "even" "odd"%}'>
+            <li class='bug'>
             {% include 'search/result.html' %}
             </li>
             {% endfor %}
