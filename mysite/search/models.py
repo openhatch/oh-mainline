@@ -197,9 +197,7 @@ class Project(models.Model):
         return "name='%s' language='%s'" % (self.name, self.language)
     
     def get_url(self):
-        query_string = urllib.urlencode({'q': 'project:' +
-                                         self.name_with_quotes_if_necessary()})
-        return reverse(mysite.profile.views.people) + '?' + query_string
+        return reverse(mysite.project.views.project, kwargs={'project__name': self.name}) 
 
     def get_mentors_search_url(self):
         query_string = urllib.urlencode({'q': 'can_mentor:"%s"' %
@@ -217,8 +215,6 @@ def populate_icon_on_project_creation(instance, created, *args, **kwargs):
         instance.populate_icon_from_ohloh()
         
 models.signals.post_save.connect(populate_icon_on_project_creation, Project)
-
-# An easy way to find 
 
 class OpenBugsManager(models.Manager):
     def get_query_set(self):
