@@ -1190,5 +1190,72 @@ class TestPotentialMentors(TwillTests):
         banshee_mentors = banshee.potential_mentors()
         self.assertEqual(len(banshee_mentors), 2)
 
+class SuggestAlertOnLastResultsPage(TwillTests):
+    filters = ['user-paulproteus']
+
+    def exercise_alert(anonymous=True):
+        """The 'anonymous' parameter allows the alert functionality to be
+        tested for anonymous and logged-in users."""
+
+        if not anonymous:
+            self.login_with_twill()
+
+        # Visit the last page of a vol. opp. search results page.
+        opps_view = mysite.search.views.fetch_bugs
+        query = 'ruby'
+        # FIXME: Ensure that the query string will put us on the
+        # last page of results.
+        opps_query_string = { 'q': }
+        opps_url = make_twill_url('http://openhatch.org'+reverse(opps_view))
+        tc.go(opps_url)
+
+        how_many_bugs_at_time_of_request = 
+        
+        # Make sure it contains an HTML comment instructing the developer about the
+        # content of the page
+        tc.find("there should be a suggestion regarding email alerts on this page")
+
+        if anonymous:
+            # If the user is not logged in, fill in the input field 'alert-email' with 
+            # the email address 'my@ema.il'.
+            email_address = 'yetanother@ema.il'
+            tc.fv('alert-email', email_address)
+
+        # Submit the 'alert' form.
+        tc.submit()
+        
+        # Make sure the resulting page contains an HTML comment instructing the
+        # developer that "this page should confirm that an email alert has been
+        # registered"
+        tc.find("this page should confirm that an email alert has been registered")
+
+        # At this point, the logged-in case, make sure that the DB contains a record of
+        #     * What the query was.
+        #     * When the request was made.
+        #     * How many bugs were returned by the query at the time of request.
+        #     * How many bugs are required to trigger the alert.
+
+        alert_record = Alert.objects.get(created_date=output_of_utcnow)
+        self.assert_(alert_record)
+
+        assert_that_record_has_this_data = {
+                'query': query,
+                'created_date': output_of_utcnow,
+                'how_many_bugs_at_time_of_request':
+                    how_many_bugs_at_time_of_request,
+                'how_many_bugs_required_to_trigger_alert':
+                    how_many_bugs_required_to_trigger_alert * 20
+                }
+
+        # For the logged-in user, also check that the record contains the
+        # identity of the user who made the alert request.
+
+        # For the anonymous user, also check that the record contains
+        # 'my@ema.il', rather than a User object.
+
+        if anonymous:
+            assert_that_record_has_this_data['email'] = email_address 
+        else:
+            assert_that_record_has_this_data['user__username'] = 'paulproteus'
 
 # vim: set nu ai et ts=4 sw=4 columns=100:
