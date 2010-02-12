@@ -129,8 +129,8 @@ class Query:
 
             # ...except the toughness facet option in question.
             GET_data.update({
-                'q': self.terms_string,
-                facet_name: option_name,
+                u'q': unicode(self.terms_string),
+                unicode(facet_name): unicode(option_name),
                 })
             query_string = mysite.base.unicode_sanity.urlencode(GET_data)
             query = Query.create_from_GET_data(GET_data)

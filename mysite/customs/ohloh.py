@@ -143,10 +143,10 @@ class Ohloh(object):
     
     def project_name2projectdata(self, project_name_query):
         url = 'http://www.ohloh.net/projects.xml?'
-        args = {'query': project_name_query}
-        data, web_response = ohloh_url2data({u'url': unicode(url),
-                                             u'selector': u'result/project',
-                                             u'params': args},
+        args = {u'query': unicode(project_name_query)}
+        data, web_response = ohloh_url2data(url=unicode(url),
+                                            selector='result/project',
+                                            params= args,
                                             many=True)
         # Sometimes when we search Ohloh for e.g. "Debian GNU/Linux", the project it gives
         # us back as the top-ranking hit for full-text relevance is "Ubuntu GNU/Linux." So here
