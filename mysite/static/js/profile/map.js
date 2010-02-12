@@ -183,9 +183,9 @@ PeopleMapController.prototype.initialize = function(options) {
 		    /* Then cache it */
 		    mapController.the_marker_for_inaccessible_island = marker;
 		}
-                mapController.person_locations['' + person_id] = person_location;
+        mapController.person_locations['' + person_id] = person_location;
 
-                mapController.map.setCenter(mapController.mapOrigin);
+        mapController.map.setCenter(mapController.mapOrigin);
 
 		if (! is_inaccessible) {
                     google.maps.event.addListener(
