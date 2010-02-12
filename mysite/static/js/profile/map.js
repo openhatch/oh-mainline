@@ -1,10 +1,17 @@
 PeopleMapController = function () {
-    this.explainUninhabitedIsland = function () {
+    this.explainUninhabitedIsland = function (originatingLink) {
         var message = "People who haven't set their locations appear " + 
             "on an uninhabited island in the South Atlantic.<br><br>" + 
             "To set your location, click 'settings' in the top-right " +
             "corner of your screen.";
-        $.jGrowl(message, { position: "center", life: 10000 });
+
+        var cssClass = 'uninhabited_island_message_triggered_by_' + originatingLink;
+        var aMessageIsAlreadyVisible = ($('.jGrowl-notification.' + cssClass).size() > 0);
+
+        if(!aMessageIsAlreadyVisible) {
+            // "theme" sets an arbitrary css class
+            $.jGrowl(message, { position: "center", theme: cssClass, life: 10000 });
+        }
     };
 };
 
@@ -186,34 +193,36 @@ if (mapController.the_marker_for_inaccessible_island !== null) {
                     });
                 }
 
-                if (is_inaccessible && 
-                    mapController.the_marker_for_inaccessible_island === null) {
+                shouldMakeAMarkerForInaccessibleIsland = (is_inaccessible && 
+                    (mapController.the_marker_for_inaccessible_island === null));
+
+                if (shouldMakeAMarkerForInaccessibleIsland) {
                     /* Then cache it */
-mapController.the_marker_for_inaccessible_island = marker;
-                    }
-                    mapController.person_locations['' + person_id] = person_location;
+                    mapController.the_marker_for_inaccessible_island = marker;
 
-                    mapController.map.setCenter(mapController.mapOrigin);
+                    // Set event handler just once.
+                    google.maps.event.addListener(
+                        marker,
+                        'click', function() {
+                            mapController.explainUninhabitedIsland('marker');
+                        }
+                    );		    
+                }
+                mapController.person_locations['' + person_id] = person_location;
 
-                    if (is_inaccessible) {
-                        google.maps.event.addListener(
-                            marker,
-                            'click', function() {
-                                PeopleMapController.explainUninhabitedIsland();
-                            }
-                        );		    
-                    }
-                    else {
-                        google.maps.event.addListener(
-                            marker,
-                            'click', function() {
-                                mapController.highlightPerson(marker.person_id);
-                                window.location.hash=('person_summary_' + marker.person_id);
-                        });		    
-                    }
+                mapController.map.setCenter(mapController.mapOrigin);
 
-                    all_markers.push(marker);
-                    /* if this is the last one, call update_all_markers() */
+                if (!is_inaccessible) {
+                    google.maps.event.addListener(
+                        marker,
+                        'click', function() {
+                            mapController.highlightPerson(marker.person_id);
+                            window.location.hash=('person_summary_' + marker.person_id);
+                    });		    
+                }
+
+                all_markers.push(marker);
+                /* if this is the last one, call update_all_markers() */
 if (num_of_persons_who_can_be_geocoded == number_of_people_geocoded) {
     update_all_markers();
     google.maps.event.addListener(mapController.map,
