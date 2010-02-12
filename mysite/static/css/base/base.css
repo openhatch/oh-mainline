@@ -326,7 +326,7 @@ abbr.foss {
 dt { font-size: 120%; }
 dd { margin-top: .5em; margin-left: 1.2em; }
 
-#greeting { background-color: #ffa; -moz-border-radius: 8px; border-radius: 8px; padding: 2%; width: 96%; margin-top: 10px; float: left; }
+#greeting { background-color: rgba(255, 255, 200, 0.5); -moz-border-radius: 8px; border-radius: 8px; padding: 2%; width: 96%; margin-top: 10px; border: 4px solid #fff; float: left; }
     #greeting #about-openhatch { font-size: 140%; float: left; width: 100%; margin-right: 20px; }
     #greeting #invitation { font-size: 120%; margin-top: 10px; text-align: center; float: left; width: 100%; }
     #greeting #next-steps { float: left; width: 100%; }
