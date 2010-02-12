@@ -99,7 +99,7 @@
 	#search #expand-collapse-all a { float: left; padding: 5px; }
 #search .expanded .separator_betw_tags_and_desc { display: none ! important; }
 
-#search .highlight { background-color: #ffa; }
+#search .highlight { background-color: #ff7; font-weight: bold; }
 #search .sep { color: #b4b4b4; }
 
 #search .top_left { float: left; width: 83%; overflow: hidden; }
