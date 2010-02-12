@@ -242,9 +242,6 @@ PeopleMapController.prototype.highlightPerson = function(personId) {
     $('#person_summary_' + personId).addClass("highlighted");
 };
 
-
-
-
 //binds the clickhandlers to people list items
 PeopleMapController.prototype.bindClickHandlersToPeopleListItems = function() {
     //grab google's map object
