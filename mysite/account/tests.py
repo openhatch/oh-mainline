@@ -247,7 +247,7 @@ class GuessLocationOnLogin(TwillTests):
         self.assertFalse(person.location_display_name)
         
         client = self.login_with_client()
-        response = client.get(reverse(mysite.profile.views.display_list_of_people))
+        response = client.get(reverse(mysite.profile.views.people))
         self.assertContains(response, "OpenHatch")
         person = Person.objects.get(user__username="paulproteus")
         self.assertEqual(person.location_display_name, "Rochester, NY, United States")
