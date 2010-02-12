@@ -22,14 +22,18 @@ TEST_DATABASE_OPTIONS = {
     'read_default_file': './my.cnf',
 }
 
-DATABASE_CHARSET = 'utf8' # omg I hate you MySQL
-DATABASE_ENGINE = 'mysql'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-DATABASE_NAME = 'oh_milestone_a'             # Or path to database file if using sqlite3.
-DATABASE_USER = 'oh_milestone_a'             # Not used with sqlite3.
-DATABASE_PASSWORD = 'ahmaC0Th'         # Not used with sqlite3.
-DATABASE_HOST = 'renaissance.local'             # Set to empty string for localhost. Not used with sqlite3.
-DATABASE_HOST = 'localhost'             # Set to empty string for localhost. Not used with sqlite3.
-DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
+DATABASE_CHARSET = 'utf8'           # omg I hate you MySQL
+DATABASE_ENGINE = 'mysql'           # Other options:
+                                    # 'postgresql_psycopg2', 'postgresql', 'mysql',
+                                    # 'sqlite3' or 'oracle'.
+DATABASE_NAME = 'oh_milestone_a'    # Or path to database file if using sqlite3.
+
+# NB: None of the following DATABASE_ options are used with sqlite3.
+DATABASE_USER = 'oh_milestone_a'    
+DATABASE_PASSWORD = 'ahmaC0Th'      
+DATABASE_HOST = 'renaissance.local' # Set to empty string for localhost. 
+DATABASE_HOST = 'localhost'         # Set to empty string for localhost. 
+DATABASE_PORT = ''                  # Set to empty string for default. 
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
