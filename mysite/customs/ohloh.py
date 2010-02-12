@@ -186,7 +186,7 @@ class Ohloh(object):
         url = 'http://www.ohloh.net/contributors.xml?'
         c_fs, web_response = ohloh_url2data(
             url=url, selector='result/contributor_fact', 
-            params={'query': username}, many=True, person=person)
+            params={u'query': unicode(username)}, many=True, person=person)
 
         # For each contributor fact, grab the project it was for
         for c_f in c_fs:
