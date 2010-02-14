@@ -1,14 +1,15 @@
-from mysite.base.tests import TwillTests
-import mysite
+from mysite.base.tests import make_twill_url, TwillTests
+from mysite.search.models import Project, ProjectInvolvementQuestion, Answer
+from mysite.profile.models import Person
+from django.core.urlresolvers import reverse
 
-class Answer(TwillTests):
+class CreateAnswer(TwillTests):
+    fixtures = ['user-paulproteus']
 
-    def test_add_answer(self):
+    def test_create_answer(self):
 
         p = Project.create_dummy()
         q = ProjectInvolvementQuestion.create_dummy(project=p)
-
-        self.login_with_client()
 
         # POST some text to the answer creation post handler
         POST_data = {
@@ -17,13 +18,19 @@ class Answer(TwillTests):
                     solution to a problem, or check, proof and test other
                     documents for accuracy.""",
                     }
-        self.client.post(reverse(mysite.project.views.create_answer_do), POST_data)
+        response = self.login_with_client().post(reverse(mysite.project.views.create_answer_do), POST_data)
+        self.assertEqual(response.content, '1')
 
         # check that the db contains a record with this text
-        record = Answer.objects.filter(text=POST_data['text'])
-        self.assertEqual(record.user, User.objects.get(username='paulproteus'))
+        try:
+            record = Answer.objects.get(text=POST_data['text'])
+        except Answer.DoesNotExist:
+            print "All Answers:", Answer.objects.all()
+            raise Answer.DoesNotExist 
+        self.assertEqual(record.author, Person.get_by_username('paulproteus'))
 
         # check that the project page now includes this text
-        self.assertContains(self.client.get(project.get_url(), POST_data['text']), 
+        project_page = self.client.get(q.project.get_url())
+        self.assertContains(project_page, POST_data['text'])
 
 # vim: set nu ai et ts=4 sw=4 columns=100:

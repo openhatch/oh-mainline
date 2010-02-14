@@ -25,9 +25,9 @@ about our members who support {{ project.name }}
     </div>
     <div class='body'>
         <ul id='questions'>
-            {% for text, question in questions.items %}
+            {% for question in questions %}
                 <li>
-                    <h3><strong>Q</strong>: {{ text }}</h3>
+                    <h3><strong>Q</strong>: {{ question.text }}</h3>
                     <ul class='answers'>
                         {% for answer, person in question.answers %}
                             <li>{{ answer }}

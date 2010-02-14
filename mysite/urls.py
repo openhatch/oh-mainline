@@ -188,6 +188,8 @@ urlpatterns = patterns('',
         (r'^\+me$', 'mysite.profile.views.dollar_username', {}, 
                 'oh_my_profile_redirect'),
 
+        (r'^\+do/project.views.create_answer_do$', 'mysite.project.views.create_answer_do'),
+
         (r'^\+projects/', include('mysite.project.urls')),
 
         (r'^\+project/(?P<project__name>.+)', 'mysite.project.views.redirect_project_to_projects'),

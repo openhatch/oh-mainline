@@ -5,13 +5,12 @@ from mysite.profile.models import Person
 import mysite.profile.models
 import mysite.customs.miro
 import mysite.search.controllers
-
-import django.test
-from mysite.search.models import Project, Bug, HitCountCache
+from mysite.search.models import Project, Bug, HitCountCache, ProjectInvolvementQuestion, Answer
 from mysite.search import views
 import lpb2json
 import datetime
 import mysite.search.launchpad_crawl
+import mysite.project.views
 
 import simplejson
 import os
@@ -26,6 +25,7 @@ from django.core.servers.basehttp import AdminMediaHandler
 from django.core.handlers.wsgi import WSGIHandler
 from django.core.urlresolvers import reverse
 from django.core.files.base import ContentFile
+from django.contrib.auth.models import User
 
 from django.db.models import Q 
 
@@ -540,7 +540,7 @@ class Recommend(SearchTest):
 #        tc.notfind("Yo! This is a bug in XUL but not Firefox")
 #        tc.find("Oy! This is a bug in XUL and Firefox")
 
-class SplitIntoTerms(django.test.TestCase):
+class SplitIntoTerms(TestCase):
     def test_split_into_terms(self):
         easy = '1 2 3'
         self.assertEqual(
@@ -1190,5 +1190,36 @@ class TestPotentialMentors(TwillTests):
         banshee_mentors = banshee.potential_mentors()
         self.assertEqual(len(banshee_mentors), 2)
 
+
+class CreateAnswer(TwillTests):
+    fixtures = ['user-paulproteus']
+
+    def test_create_answer(self):
+
+        p = Project.create_dummy()
+        q = ProjectInvolvementQuestion.create_dummy()
+        p.questions.add(q)
+
+        # POST some text to the answer creation post handler
+        POST_data = {
+                'question__pk': q.pk,
+                'text': """Help produce official documentation, share the
+                    solution to a problem, or check, proof and test other
+                    documents for accuracy.""",
+                    }
+        response = self.login_with_client().post(reverse(mysite.project.views.create_answer_do), POST_data)
+        self.assertEqual(response.content, '1')
+
+        # check that the db contains a record with this text
+        try:
+            record = Answer.objects.get(text=POST_data['text'])
+        except Answer.DoesNotExist:
+            print "All Answers:", Answer.objects.all()
+            raise Answer.DoesNotExist 
+        self.assertEqual(record.author, User.objects.get(username='paulproteus'))
+
+        # check that the project page now includes this text
+        project_page = self.client.get(p.get_url())
+        self.assertContains(project_page, POST_data['text'])
 
 # vim: set nu ai et ts=4 sw=4 columns=100:
