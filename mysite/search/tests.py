@@ -1190,6 +1190,31 @@ class TestPotentialMentors(TwillTests):
         banshee_mentors = banshee.potential_mentors()
         self.assertEqual(len(banshee_mentors), 2)
 
+class CreateBugAnswer(TwillTests):
+    def test_create_bug_answer(self):
+        # go to the project page
+        p = Project.create_dummy(name='Ubuntu')
+        project_url = "http://openhatch.org/+projects/Ubuntu" 
+        # select the form for a question which takes a bug-style answer
+        # enter some data into the form.  submit it.
+        tc.go(make_twill_url(project_url))
+        response = tc.show()
+        print response
+        url = 'http://mysite.com'
+        title = 'omfg i wish this bug would go away'
+        details = 'kthxbai'
+        question_id = 0
+        question_form_name = 'question-long-' + str(question_id)
+        tc.fv(question_form_name, 'issue_url', url)
+        tc.fv(question_form_name, 'issue_title', title)
+        tc.fv(question_form_name, 'issue_details', details)
+        tc.submit()
+        tc.find(url)
+        tc.find(title)
+        tc.find(details)
+        # make sure that our data shows up on the page
+
+
 class CreateAnswer(TwillTests):
     fixtures = ['user-paulproteus']
 
