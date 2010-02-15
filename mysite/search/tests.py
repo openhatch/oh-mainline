@@ -1197,8 +1197,7 @@ class CreateAnswer(TwillTests):
     def test_create_answer(self):
 
         p = Project.create_dummy()
-        q = ProjectInvolvementQuestion.create_dummy()
-        p.questions.add(q)
+        q = ProjectInvolvementQuestion.create_dummy(project=p)
 
         # POST some text to the answer creation post handler
         POST_data = {

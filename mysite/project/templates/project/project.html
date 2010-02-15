@@ -25,31 +25,30 @@ about our members who support {{ project.name }}
     </div>
     <div class='body'>
         <ul id='questions'>
-            {% with project.questions.all as questions %}
-                {% for question in questions %}
-                    <li>
-                        <h3><strong>Q</strong>: {{ question.text }}</h3>
-                        <ul class='answers'>
-                            {% for answer, person in question.answers %}
-                                <li>{{ answer }}
-                                    <br/>
-                                    <small>&nbsp;&nbsp;&nbsp;&mdash; <a style='font-weight: bold;' href='{{ person.get_profile_url }}'>{{ person.get_full_name_or_username }}</a></small></li>
-                            {% endfor  %}
-                            <li>
-                                <form name=''>
-                                    <textarea class='add_an_answer'
-                                            id='answer-question{{ forloop.counter0 }}'
-                                            title='Add an answer'></textarea>
-                                    <p class='input-note show_when_editing'>
-                                        {{ question.input_note }}
-                                    </p>
-                                    <input type='submit' class='show_when_editing' value='Submit'>
-                                </form>
-                            </li>
-                        </ul>
-                    </li>
-                {% endfor %}
-            {% endwith %}
+            {% for question in questions %}
+                <li>
+                    <h3><strong>Q</strong>: {{ question.text }}</h3>
+                    <ul class='answers'>
+                        {% for answer in question.answers.all %}
+                            <li>{{ answer.text }}
+                                <br/>
+                                <small>&nbsp;&nbsp;&nbsp;&mdash; <a style='font-weight: bold;' href='{{ answer.author.get_profile.get_profile_url }}'>{{ answer.author.get_profile.get_full_name_or_username }}</a></small></li>
+                        {% endfor  %}
+                        <li>
+                        <form name='' method='post' action='{% url mysite.project.views.create_answer_do %}'>
+                            <input type="hidden" name="question__pk" value="{{question.pk}}" />
+                                <textarea class='add_an_answer'
+                                        id='answer-question{{ forloop.counter0 }}'
+                                        title='Add an answer' name='text'></textarea>
+                                <p class='input-note show_when_editing'>
+                                    {{ question.input_note }}
+                                </p>
+                                <input type='submit' class='show_when_editing' value='Submit'>
+                            </form>
+                        </li>
+                    </ul>
+                </li>
+            {% endfor %}
         </ul>
     </div>
 </div><!-- /.module #about-joining -->

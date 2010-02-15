@@ -35,24 +35,10 @@ def get_image_data_scaled(image_data, width):
     image_data = new_image_fd.getvalue()
     return image_data
 
-class Answer(models.Model):
-    text = models.TextField(blank=False)
-    author = models.ForeignKey(User, null=True)
-
-class ProjectInvolvementQuestion(models.Model):
-    text = models.TextField()
-    answers = models.ManyToManyField(Answer)
-
-    @staticmethod
-    def create_dummy(**kwargs):
-        data = dict()
-        data.update(kwargs)
-        ret = ProjectInvolvementQuestion(**data)
-        ret.save()
-        return ret
-
-
 class Project(models.Model):
+
+    def get_questions(self):
+        return self.questions.all()
 
     @staticmethod
     def generate_random_icon_path(instance, filename):
@@ -116,8 +102,6 @@ class Project(models.Model):
         default=None)
 
     logo_contains_name = models.BooleanField(default=False)
-
-    questions = models.ManyToManyField(ProjectInvolvementQuestion)
 
     # Cache the number of OpenHatch members who have contributed to this project.
     cached_contributor_count = models.IntegerField(default=0, null=True)
@@ -236,6 +220,28 @@ def populate_icon_on_project_creation(instance, created, *args, **kwargs):
         instance.populate_icon_from_ohloh()
         
 models.signals.post_save.connect(populate_icon_on_project_creation, Project)
+
+class ProjectInvolvementQuestion(models.Model):
+    text = models.TextField()
+    project = models.ForeignKey(Project, related_name='questions')
+    # By default, the ForeignKey field is awesome such that,
+    # e.g., the questions for a given project can be accessed at
+    #   project.projectinvolvementquestion_set.all()
+    # The related_name kwarg (used above) allows us to shorten that to
+    #   project.questions.all() 
+
+    @staticmethod
+    def create_dummy(**kwargs):
+        data = dict()
+        data.update(kwargs)
+        ret = ProjectInvolvementQuestion(**data)
+        ret.save()
+        return ret
+
+class Answer(models.Model):
+    text = models.TextField(blank=False)
+    author = models.ForeignKey(User, null=True)
+    question = models.ForeignKey(ProjectInvolvementQuestion, related_name='answers')
 
 class OpenBugsManager(models.Manager):
     def get_query_set(self):

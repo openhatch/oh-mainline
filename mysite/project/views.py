@@ -18,6 +18,7 @@ def project(request, project__name = None):
             'project/project.html',
             {
                 'project': p,
+                'questions': p.get_questions(),
                 'contributors': p.get_contributors()[:3],
                 'mentors': (mysite.profile.controllers.people_matching(
                     'can_mentor', project__name)),
@@ -111,4 +112,4 @@ def create_answer_do(request):
 
     answer.save()
     
-    return HttpResponse('1')
+    return HttpResponseRedirect(reverse(project, kwargs={'project__name': question.project.name}))
