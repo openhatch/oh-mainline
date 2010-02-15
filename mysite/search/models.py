@@ -35,6 +35,23 @@ def get_image_data_scaled(image_data, width):
     image_data = new_image_fd.getvalue()
     return image_data
 
+class Answer(models.Model):
+    text = models.TextField(blank=False)
+    author = models.ForeignKey(User, null=True)
+
+class ProjectInvolvementQuestion(models.Model):
+    text = models.TextField()
+    answers = models.ManyToManyField(Answer)
+
+    @staticmethod
+    def create_dummy(**kwargs):
+        data = dict()
+        data.update(kwargs)
+        ret = ProjectInvolvementQuestion(**data)
+        ret.save()
+        return ret
+
+
 class Project(models.Model):
 
     @staticmethod
@@ -100,7 +117,7 @@ class Project(models.Model):
 
     logo_contains_name = models.BooleanField(default=False)
 
-    questions = models.ManyToManyField('ProjectInvolvementQuestion')
+    questions = models.ManyToManyField(ProjectInvolvementQuestion)
 
     # Cache the number of OpenHatch members who have contributed to this project.
     cached_contributor_count = models.IntegerField(default=0, null=True)
@@ -282,21 +299,5 @@ class HitCountCache(models.Model):
 # Clear the cache whenever Bugs are added or removed.
 models.signals.post_save.connect(HitCountCache.clear_cache, Bug)
 models.signals.post_delete.connect(HitCountCache.clear_cache, Bug)
-
-class ProjectInvolvementQuestion(models.Model):
-    text = models.TextField()
-    answers = models.ManyToManyField('Answer')
-
-    @staticmethod
-    def create_dummy(**kwargs):
-        data = dict()
-        data.update(kwargs)
-        ret = ProjectInvolvementQuestion(**data)
-        ret.save()
-        return ret
-
-class Answer(models.Model):
-    text = models.TextField(blank=False)
-    author = models.ForeignKey(User, null=True)
 
 # vim: set ai ts=4 nu:

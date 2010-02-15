@@ -14,7 +14,6 @@ from django.contrib.auth.decorators import login_required
 def project(request, project__name = None):
     p = get_object_or_404(Project, name=project__name)
 
-    questions = [q for q in p.questions.all()]
     return (request,
             'project/project.html',
             {
@@ -25,7 +24,6 @@ def project(request, project__name = None):
                 'language_mentors': (mysite.profile.controllers.people_matching(
                         'can_mentor', p.language)),
                 'explain_to_anonymous_users': True,
-                'questions': questions,
                 'old_questions': {
                     'I want to join this project. Where do I begin?': 
                         {
