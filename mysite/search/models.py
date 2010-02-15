@@ -37,9 +37,6 @@ def get_image_data_scaled(image_data, width):
 
 class Project(models.Model):
 
-    def get_questions(self):
-        return self.questions.all()
-
     @staticmethod
     def generate_random_icon_path(instance, filename):
         # MEDIA_ROOT is prefixed automatically.
@@ -223,12 +220,8 @@ models.signals.post_save.connect(populate_icon_on_project_creation, Project)
 
 class ProjectInvolvementQuestion(models.Model):
     text = models.TextField()
-    project = models.ForeignKey(Project, related_name='questions')
-    # By default, the ForeignKey field is awesome such that,
-    # e.g., the questions for a given project can be accessed at
-    #   project.projectinvolvementquestion_set.all()
-    # The related_name kwarg (used above) allows us to shorten that to
-    #   project.questions.all() 
+    def get_answers_for_project(self, a_project):
+        return self.answers.filter(project=a_project)
 
     @staticmethod
     def create_dummy(**kwargs):
@@ -242,6 +235,7 @@ class Answer(models.Model):
     text = models.TextField(blank=False)
     author = models.ForeignKey(User, null=True)
     question = models.ForeignKey(ProjectInvolvementQuestion, related_name='answers')
+    project = models.ForeignKey(Project)
 
 class OpenBugsManager(models.Manager):
     def get_query_set(self):

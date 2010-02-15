@@ -14,11 +14,19 @@ from django.contrib.auth.decorators import login_required
 def project(request, project__name = None):
     p = get_object_or_404(Project, name=project__name)
 
+    question_answer_mappings = []
+    questions = ProjectInvolvementQuestion.objects.all()
+    for question in questions:
+        question_answer_mappings.append((question, question.get_answers_for_project(p)))
+
+
+    
+
     return (request,
             'project/project.html',
             {
                 'project': p,
-                'questions': p.get_questions(),
+                'question_answer_mappings': question_answer_mappings,
                 'contributors': p.get_contributors()[:3],
                 'mentors': (mysite.profile.controllers.people_matching(
                     'can_mentor', project__name)),
@@ -106,10 +114,12 @@ def create_answer_do(request):
     question.save()
     answer.question = question
 
-    answer.text = request.POST['text']
+    answer.text = request.POST['answer__text']
 
     answer.author = request.user
+    
+    answer.project_id = request.POST['project__pk']
 
     answer.save()
     
-    return HttpResponseRedirect(reverse(project, kwargs={'project__name': question.project.name}))
+    return HttpResponseRedirect(reverse(project, kwargs={'project__name': answer.project.name}))

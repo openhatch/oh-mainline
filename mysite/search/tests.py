@@ -1190,35 +1190,39 @@ class TestPotentialMentors(TwillTests):
         banshee_mentors = banshee.potential_mentors()
         self.assertEqual(len(banshee_mentors), 2)
 
-
 class CreateAnswer(TwillTests):
     fixtures = ['user-paulproteus']
 
     def test_create_answer(self):
 
         p = Project.create_dummy()
-        q = ProjectInvolvementQuestion.create_dummy(project=p)
+        q = ProjectInvolvementQuestion.create_dummy()
 
         # POST some text to the answer creation post handler
         POST_data = {
+                'project__pk': p.pk,
                 'question__pk': q.pk,
-                'text': """Help produce official documentation, share the
+                'answer__text': """Help produce official documentation, share the
                     solution to a problem, or check, proof and test other
                     documents for accuracy.""",
                     }
         response = self.login_with_client().post(reverse(mysite.project.views.create_answer_do), POST_data)
-        self.assertEqual(response.content, '1')
+        # If this were an Ajaxy post handler, we might assert something about
+        # the response, like 
+        #   self.assertEqual(response.content, '1')
 
         # check that the db contains a record with this text
         try:
-            record = Answer.objects.get(text=POST_data['text'])
+            record = Answer.objects.get(text=POST_data['answer__text'])
         except Answer.DoesNotExist:
             print "All Answers:", Answer.objects.all()
             raise Answer.DoesNotExist 
         self.assertEqual(record.author, User.objects.get(username='paulproteus'))
+        self.assertEqual(record.project, p)
+        self.assertEqual(record.question, q)
 
         # check that the project page now includes this text
         project_page = self.client.get(p.get_url())
-        self.assertContains(project_page, POST_data['text'])
+        self.assertContains(project_page, POST_data['answer__text'])
 
 # vim: set nu ai et ts=4 sw=4 columns=100:
