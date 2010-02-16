@@ -76,6 +76,9 @@ def redirect_project_to_projects(request, project__name):
 
 @login_required
 def create_bug_answer_do(request):
+
+@login_required
+def create_bug_answer_do(request):
     answer = BugAnswer()
 
     question = ProjectInvolvementQuestion.objects.get(pk=int(request.POST['question__pk']))

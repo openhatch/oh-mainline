@@ -233,7 +233,7 @@ class ProjectInvolvementQuestion(models.Model):
 
     @staticmethod
     def create_dummy(**kwargs):
-        data = dict()
+        data = {'text': 'how are you doing?'}
         data.update(kwargs)
         ret = ProjectInvolvementQuestion(**data)
         ret.save()
@@ -252,6 +252,14 @@ class Answer(models.Model):
     author = models.ForeignKey(User)
     question = models.ForeignKey(ProjectInvolvementQuestion, related_name='answers')
     project = models.ForeignKey(Project)
+
+    @staticmethod
+    def create_dummy(**kwargs):
+        data = {'text': 'i am doing well'}
+        data.update(kwargs)
+        ret = Answer(**data)
+        ret.save()
+        return ret
 
 class OpenBugsManager(models.Manager):
     def get_query_set(self):

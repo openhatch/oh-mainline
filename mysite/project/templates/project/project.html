@@ -24,7 +24,7 @@ about our members who support {{ project.name }}
         <h3>About joining {{ project.name }}</h3>
     </div>
     <div class='body'>
-        <ul id='questions'>
+        <ul id='paragraph_questions' class='questions'>
             {% for question, answers in question_answer_mappings_non_bug %}
                 <li>
                     <h3><strong>Q</strong>: {{ question.text }}</h3>
@@ -58,17 +58,33 @@ about our members who support {{ project.name }}
     <div class='head'>
         <h3>Questions for {{ project.name }} contributors</h3>
     </div>
+                    <style type="text/css">
+                        body#project #bug_questions li {
+                            display: block;
+                            margin-top: 10px;
+                        }
+                        body#project #bug_questions li .canonical_bug_link{
+                            font-size: .8em;
+                            padding-left: 5px;
+                        }
+                    </style>
     <div class='body'>
-        <ul id='questions'>
+        <ul id='bug_questions' class='questions'>
             {% for question, bug_answers in question_answer_mappings_bug %}
+            <li>
+            <ul class='answers'>
+                {{ question.text }}
+                {% for bug_answer in bug_answers %}
+                <li><div class="bug_answer_title">
+                    <strong>{{bug_answer.title}}</strong>
+                </div>
+                {{bug_answer.details}}<a href="{{bug_answer.url}}" class="canonical_bug_link">Read the bug report &raquo;</a>
+                <br/>
+                <small>&nbsp;&nbsp;&nbsp;&mdash; <a style='font-weight: bold;' href='{{ bug_answer.author.get_profile.get_profile_url }}'>{{ bug_answer.author.get_profile.get_full_name_or_username }}</a></small></li>
+                {% endfor  %}
                 <li>
-                    {{ question.text }}
-                    {% for bug_answer in bug_answers %}
-                        {% include 'search/result.html' %}
-                    {% endfor %}
-                </li>
                 <form name='question-long-{{question.pk}}' method='POST'
-                        action='{% url mysite.project.views.create_bug_answer_do %}'>
+                    action='{% url mysite.project.views.create_bug_answer_do %}'>
                     <input type='hidden' name='project__pk' value='{{ project.pk }}'>
                     <input type='hidden' name='question__pk' value='{{ question.pk }}'>
                     <label>Issue URL <small style='color: #888'>(optional)</small></label>
@@ -79,6 +95,10 @@ about our members who support {{ project.name }}
                     <textarea name='bug__details'></textarea>
                     <input type='submit' value='Submit'>
                 </form>
+                </li>
+
+            </ul>
+                </li>
             {% endfor %}
         </ul>
     </div>

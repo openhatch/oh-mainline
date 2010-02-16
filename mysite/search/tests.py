@@ -1191,12 +1191,39 @@ class TestPotentialMentors(TwillTests):
         banshee_mentors = banshee.potential_mentors()
         self.assertEqual(len(banshee_mentors), 2)
 
+class DeleteAnswer(TwillTests):
+    fixtures = ['user-paulproteus']
+    def test_delete_paragraph_answer(self):
+        # create dummy question
+        p = Project.create_dummy(name='Ubuntu')
+        q = ProjectInvolvementQuestion.create_dummy(is_bug_style=False)
+        # create our dummy answer
+        a = Answer.create_dummy(text='i am saying thigns', question=q, project=p, author=User.objects.get(username='paulproteus'))
+        # delete our answer
+        POST_data = {
+                'answer__pk': a.pk,
+                }
+        POST_handler = reverse(mysite.project.views.delete_paragraph_answer_do)
+        response = self.login_with_client().post(POST_handler, POST_data)
+        # go back to the project page and make sure that our answer isn't there anymore
+        project_url = p.get_url()
+        self.assertRedirects(response, project_url)
+        project_page = self.login_with_client().get(project_url)
+
+        self.assertNotContains(project_page, a.text)
+
+        # and make sure our answer isn't in the db anymore
+        self.assertEqual(Answer.objects.filter(pk=a.pk).count(), 0)
+
+
+
+
 class CreateBugAnswer(TwillTests):
     fixtures = ['user-paulproteus']
     def test_create_bug_answer(self):
         # go to the project page
         p = Project.create_dummy(name='Ubuntu')
-        question = ProjectInvolvementQuestion.create_dummy(pk=0)
+        question = ProjectInvolvementQuestion.create_dummy(pk=0, is_bug_style=True)
         question.save()
         question__pk = 0
         url = 'http://mysite.com'
@@ -1224,7 +1251,7 @@ class CreateBugAnswer(TwillTests):
         project_url = p.get_url()
         self.assertRedirects(response, project_url)
 
-        project_page = self.client.get(project_url)
+        project_page = self.login_with_client().get(project_url)
 
         # make sure that our data shows up on the page
         self.assertContains(project_page, url)
