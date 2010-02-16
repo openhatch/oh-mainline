@@ -190,6 +190,8 @@ urlpatterns = patterns('',
 
         (r'^\+do/project.views.create_answer_do$', 'mysite.project.views.create_answer_do'),
         (r'^\+do/project.views.create_bug_answer_do$', 'mysite.project.views.create_bug_answer_do'),
+        (r'^\+do/project.views.delete_paragraph_answer_do$', 'mysite.project.views.delete_paragraph_answer_do'),
+        (r'^\+do/project.views.delete_bug_answer_do$', 'mysite.project.views.delete_bug_answer_do'),
 
         (r'^\+projects/', include('mysite.project.urls')),
 
