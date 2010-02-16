@@ -260,7 +260,7 @@ class Query:
             count = self.get_bugs_unordered().count()
             hcc, _ = mysite.search.models.HitCountCache.objects.get_or_create(
                     hashed_query=hashed_query,
-                    defaults={u'hit_count': count})
+                    defaults={'hit_count': count})
         return hcc.hit_count
 
     def get_query_string(self):
