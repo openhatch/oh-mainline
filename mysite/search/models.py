@@ -242,7 +242,6 @@ class ProjectInvolvementQuestion(models.Model):
         return ret
 
 class BugAnswer(models.Model):
-    url = models.URLField()
     title = models.CharField(blank=False, max_length=255)
     details = models.TextField()
     author = models.ForeignKey(User)

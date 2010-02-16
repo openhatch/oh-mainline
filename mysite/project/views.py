@@ -104,7 +104,6 @@ def create_bug_answer_do(request):
     question.save()
     answer.question = question
 
-    answer.url = request.POST['bug__url']
     answer.title = request.POST['bug__title']
     answer.details = request.POST['bug__details']
 

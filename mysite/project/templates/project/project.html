@@ -165,11 +165,6 @@ about our members who support {{ project.name }}
                     <strong>{{bug_answer.title}}</strong>
                 </div>
                 {{bug_answer.details}}
-                {% if bug_answer.url%}
-                <span class="canonical_bug_link">
-                Issue URL: {{bug_answer.url|urlizetrunc:'10'}}
-            </span>
-                {% endif %}
                 <br/>
                 <small>&nbsp;&nbsp;&nbsp;&mdash; <a style='font-weight: bold;' href='{{ bug_answer.author.get_profile.get_profile_url }}'>{{ bug_answer.author.get_profile.get_full_name_or_username }}</a></small></li>
                 {% endfor  %}
@@ -191,8 +186,6 @@ about our members who support {{ project.name }}
                     <label>Further info</label>
                     {% endifequal %}
                     <textarea name='bug__details'></textarea>
-                    <label>Issue URL <small style='color: #888'>(optional)</small></label>
-                    <input type='text' name='bug__url'>
                     <div class='input-note'>
                         {% ifequal question.pk 2 %}
 

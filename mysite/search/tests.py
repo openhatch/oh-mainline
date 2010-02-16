@@ -1193,10 +1193,12 @@ class TestPotentialMentors(TwillTests):
 
 class DeleteAnswer(TwillTests):
     fixtures = ['user-paulproteus']
+    
     def test_delete_paragraph_answer(self):
         # create dummy question
         p = Project.create_dummy(name='Ubuntu')
-        q = ProjectInvolvementQuestion.create_dummy(is_bug_style=False)
+        question__pk = 0
+        q = ProjectInvolvementQuestion.create_dummy(pk=question__pk, is_bug_style=False)
         # create our dummy answer
         a = Answer.create_dummy(text='i am saying thigns', question=q, project=p, author=User.objects.get(username='paulproteus'))
         # delete our answer
@@ -1218,9 +1220,12 @@ class DeleteAnswer(TwillTests):
     def test_delete_bug_answer(self):
         # create dummy question
         p = Project.create_dummy(name='Ubuntu')
-        q = ProjectInvolvementQuestion.create_dummy(is_bug_style=True)
+        # it's important that this pk correspond to the pk of an actual bug_style question, as specified in our view
+        # otherwise, we'll get_or_create will try to create, but it won't be able to because of a unique key error
+        question__pk = 2
+        q = ProjectInvolvementQuestion.create_dummy(pk=question__pk, is_bug_style=True)
         # create our dummy answer
-        a = BugAnswer.create_dummy(title='i want this bug fixed', details='for these reasons', url='http://mybugreport.com', question=q, project=p, author=User.objects.get(username='paulproteus'))
+        a = BugAnswer.create_dummy(title='i want this bug fixed', details='for these reasons',question=q, project=p, author=User.objects.get(username='paulproteus'))
         # delete our answer
         POST_data = {
                 'answer__pk': a.pk,
@@ -1234,7 +1239,6 @@ class DeleteAnswer(TwillTests):
 
         self.assertNotContains(project_page, a.title)
         self.assertNotContains(project_page, a.details)
-        self.assertNotContains(project_page, a.url)
 
         # and make sure our answer isn't in the db anymore
         self.assertEqual(BugAnswer.objects.filter(pk=a.pk).count(), 0)
@@ -1246,16 +1250,14 @@ class CreateBugAnswer(TwillTests):
     def test_create_bug_answer(self):
         # go to the project page
         p = Project.create_dummy(name='Ubuntu')
-        question = ProjectInvolvementQuestion.create_dummy(pk=0, is_bug_style=True)
+        question__pk = 1
+        question = ProjectInvolvementQuestion.create_dummy(pk=question__pk, is_bug_style=True)
         question.save()
-        question__pk = 0
-        url = 'http://mysite.com'
         title = 'omfg i wish this bug would go away'
         details = 'kthxbai'
         POST_data = {
                 'project__pk': p.pk,
                 'question__pk': str(question__pk),
-                'bug__url': url,
                 'bug__title': title,
                 'bug__details': details
                 }
@@ -1266,7 +1268,6 @@ class CreateBugAnswer(TwillTests):
         our_bug_answer = BugAnswer.objects.get(title=title)
 
         # make sure it has the right attributes
-        self.assertEqual(our_bug_answer.url, url)
         self.assertEqual(our_bug_answer.details, details)
         self.assertEqual(our_bug_answer.question.pk, question__pk)
         self.assertEqual(our_bug_answer.project.pk, p.pk)
@@ -1277,7 +1278,6 @@ class CreateBugAnswer(TwillTests):
         project_page = self.login_with_client().get(project_url)
 
         # make sure that our data shows up on the page
-        self.assertContains(project_page, url)
         self.assertContains(project_page, title)
         self.assertContains(project_page, details)
 
