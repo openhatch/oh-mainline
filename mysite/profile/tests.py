@@ -1361,28 +1361,6 @@ class MapTagsRemoveDuplicates(TwillTests):
         self.assertEqual(map(lambda x: x.lower(), pp.get_tag_texts_for_map()),
                          map(lambda x: x.lower(), ['something I understand']))
 
-class PersonCanExplainTagSummary(TwillTests):
-    fixtures = ['user-paulproteus', 'person-paulproteus']
-
-    def test(self):
-        pp = Person.objects.get(user__username='paulproteus')
-
-        understands = TagType(name='understands')
-        understands.save()
-        can_pitch_in = TagType(name='can_pitch_in')
-        can_pitch_in.save()
-
-        tag_i_understand = Tag(tag_type=understands, text='python')
-        tag_i_understand.save()
-        tag_can_pitch_in = Tag(tag_type=can_pitch_in, text='something I UNDERSTAND')
-        tag_can_pitch_in.save()
-        link_one = Link_Person_Tag(person=pp, tag=tag_i_understand)
-        link_one.save()
-        link_two = Link_Person_Tag(person=pp, tag=tag_can_pitch_in)
-        link_two.save()
-        
-        self.assertEqual(pp.calculate_summary('python'))
-
 class ProjectGetMentors(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
 
@@ -1773,25 +1751,6 @@ class PeopleSearchProperlyIdentifiesQueriesThatFindProjects(TwillTests):
         response = self.client.get(url, {'q': 'bANANA'})
         self.assertEqual(response.context[0]['projects_that_match_q_exactly'],
                          [Project.objects.get(name='Banana')])
-        
-    def test_two_valid_projects(self):
-        # make a project called Banana and Cucumber
-        # query for that, but spelled bANANA and cucumBer
-        # look in the template and see that set(projects_that_match_q_exactly) == set(['Banana', 'Cucumber'])
-        mysite.search.models.Project.create_dummy(
-            name='Banana',
-            cached_contributor_count=1)
-        mysite.search.models.Project.create_dummy(
-            name='Cucumber',
-            cached_contributor_count=1)
-        mysite.search.models.Project.create_dummy(
-            name='Mister Decoy',
-            cached_contributor_count=1)
-        url = reverse(mysite.profile.views.people)
-        response = self.client.get(url, {'q': 'bANANA cuCUMBer'})
-        self.assertEqual(set(response.context[0]['projects_that_match_q_exactly']),
-                         set([Project.objects.get(name='Banana'),
-                              Project.objects.get(name='Cucumber')]))
 
     def test_one_empty_project(self):
         # make a project called Banana

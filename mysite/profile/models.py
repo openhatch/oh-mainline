@@ -184,9 +184,6 @@ class Person(models.Model):
         return sum([list(pfe.get_published_citations())
             for pfe in self.get_published_portfolio_entries()], [])
 
-    def calculate_summary(self, tag_text):
-        return ''
-
     def get_tag_texts_for_map(self):
         """Return a list of Tags linked to this Person.  Tags that would be useful from the map view of the people list"""
         exclude_me = TagType.objects.filter(name__in=['understands_not', 'studying'])
