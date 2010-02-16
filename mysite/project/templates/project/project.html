@@ -28,7 +28,7 @@ about our members who support {{ project.name }}
             {% for question, answers in question_answer_mappings_non_bug %}
                 <li>
                     <style type="text/css">
-                        body#project #paragraph_questions li form.delete input[type='submit']{
+                        body#project .questions li form.delete input[type='submit']{
                             float: right;
                             font-size: .8em;
                             padding: 0px;
@@ -90,6 +90,12 @@ about our members who support {{ project.name }}
                 {{ question.text }}
                 {% for bug_answer in bug_answers %}
                 <li><div class="bug_answer_title">
+                        {% ifequal the_user bug_answer.author %}
+                        <form name='' method='post' action='{% url mysite.project.views.delete_bug_answer_do %}' class='delete'>
+                            <input type="hidden" name="answer__pk" value="{{bug_answer.pk}}" />
+                            <input type="submit" value="X" />
+                        </form>
+                        {% endifequal %}
                     <strong>{{bug_answer.title}}</strong>
                 </div>
                 {{bug_answer.details}}<a href="{{bug_answer.url}}" class="canonical_bug_link">Read the bug report &raquo;</a>
