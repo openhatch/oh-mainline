@@ -33,12 +33,30 @@ about our members who support {{ project.name }}
                             font-size: .8em;
                             padding: 0px;
                         }
+                        body#project .questions li .input-note{
+                            font-size: .8em;
+                            color: gray;
+                        }
+                        body#project .questions .input-note li {
+                            list-style: circle;
+                            margin-left: 20px; 
+                        }
                     </style>
-                    <h3><strong>Q</strong>: {{ question.text }}</h3>
+                    <h3><strong>Q</strong>:
+                        {% ifequal question.pk 0 %}
+                        Other than writing code, how can people participate in your project?
+                        {% endifequal %}
+
+                        {% ifequal question.pk 1 %}
+                        I'm interested in getting involved in
+                        {{ project.name }}. Where do I start?
+                        {% endifequal %}
+                    </h3>
                     <ul class='answers'>
                         {% for answer in answers %}
                         <li>
                         {% ifequal the_user answer.author %}
+                        {# deletion form #}
                         <form name='' method='post' action='{% url mysite.project.views.delete_paragraph_answer_do %}' class='delete'>
                             <input type="hidden" name="answer__pk" value="{{answer.pk}}" />
                             <input type="submit" value="X" />
@@ -49,17 +67,57 @@ about our members who support {{ project.name }}
                                 <small>&nbsp;&nbsp;&nbsp;&mdash; <a style='font-weight: bold;' href='{{ answer.author.get_profile.get_profile_url }}'>{{ answer.author.get_profile.get_full_name_or_username }}</a></small></li>
                         {% endfor  %}
                         <li>
-                        <form name='question-short-{{question.pk}}' method='post' action='{% url mysite.project.views.create_answer_do %}'>
+                        <form class="answer_question" name='question-short-{{question.pk}}' method='post' action='{% url mysite.project.views.create_answer_do %}'>
+                    <a href="" class='collapse_answer_form show_when_editing'>close</a>
                             <input type="hidden" name="question__pk" value="{{question.pk}}" />
                             <input type="hidden" name="project__pk" value="{{project.pk}}" />
                                 <textarea class='add_an_answer'
                                         id='answer-question{{ forloop.counter0 }}'
-                                        title='Add an answer' name='answer__text'></textarea>
-                                <p class='input-note show_when_editing'>
-                                    {{ question.input_note }}
-                                </p>
-                                <input type='submit' class='show_when_editing' value='Submit'>
-                            </form>
+                                        title='Add an answer'
+                                        name='answer__text'></textarea>
+                                    <div class='input-note show_when_editing'>
+                                        {% ifequal question.pk 0 %}
+                                        Projects often need all sorts of help
+                                        -- some forms are documentation,
+                                        website management, marketing, and
+                                        testing. Be specific, for example:
+                                        <ul>
+                                            <li>
+                                            We need people to download version
+                                            0.4.5 and make sure the frobulator
+                                            still frobulates correctly.
+                                            </li>
+                                        </ul>
+                                        {% endifequal %}
+
+                                        {% ifequal question.pk 1 %} 
+                                        If the answer varies based on the kind
+                                        of contribution they want to make, talk
+                                        about all types! Some examples:
+                                        <ul>
+                                            <li>
+                                            &ldquo;Be sure to bone up on your
+                                            urllib; you're gonna need
+                                            it.&rdquo;
+                                            </li>
+                                            <li>
+                                            &ldquo;Drop me a line at
+                                            &lt;hello@example.com&gt; if you
+                                            want to get involved.&rdquo;
+                                            </li>
+                                            <li>
+                                            &ldquo;Visit our welcome page to learn
+                                            about our mailing lists, forums,
+                                            chat rooms (irc), planet&rdquo;
+                                            </li>
+                                            <li>
+                                            &ldquo;Read the community guidelines here.&rdquo;
+                                            </li>
+                                        </ul>
+                                        {% endifequal %}
+                                    </div>
+                                    <input type='submit' class='show_when_editing' value='Submit'>
+                                </form>
                         </li>
                     </ul>
                 </li>
@@ -73,21 +131,29 @@ about our members who support {{ project.name }}
         <h3>Questions for {{ project.name }} contributors</h3>
     </div>
                     <style type="text/css">
-                        body#project #bug_questions li {
+                        body#project .questions li {
                             display: block;
                             margin-top: 10px;
                         }
                         body#project #bug_questions li .canonical_bug_link{
                             font-size: .8em;
                             padding-left: 5px;
+                            float: right;
                         }
+
                     </style>
     <div class='body'>
         <ul id='bug_questions' class='questions'>
             {% for question, bug_answers in question_answer_mappings_bug %}
             <li>
             <ul class='answers'>
-                {{ question.text }}
+                {% ifequal question.pk 2 %}
+                What is a bug or issue with the project that stresses you out?
+                {% endifequal %}
+                {% ifequal question.pk 3 %}
+                What is a good issue for a newcomer to start out with?
+                {% endifequal %}
+
                 {% for bug_answer in bug_answers %}
                 <li><div class="bug_answer_title">
                         {% ifequal the_user bug_answer.author %}
@@ -98,22 +164,83 @@ about our members who support {{ project.name }}
                         {% endifequal %}
                     <strong>{{bug_answer.title}}</strong>
                 </div>
-                {{bug_answer.details}}<a href="{{bug_answer.url}}" class="canonical_bug_link">Read the bug report &raquo;</a>
+                {{bug_answer.details}}
+                {% if bug_answer.url%}
+                <span class="canonical_bug_link">
+                Issue URL: {{bug_answer.url|urlizetrunc:'10'}}
+            </span>
+                {% endif %}
                 <br/>
                 <small>&nbsp;&nbsp;&nbsp;&mdash; <a style='font-weight: bold;' href='{{ bug_answer.author.get_profile.get_profile_url }}'>{{ bug_answer.author.get_profile.get_full_name_or_username }}</a></small></li>
                 {% endfor  %}
                 <li>
-                <form name='question-long-{{question.pk}}' method='POST'
-                    action='{% url mysite.project.views.create_bug_answer_do %}'>
+                    <form class="answer_question" name='question-long-{{question.pk}}' method='POST'
+                        action='{% url mysite.project.views.create_bug_answer_do %}'>
+                    <a href="" class='collapse_answer_form show_when_editing'>close</a>
                     <input type='hidden' name='project__pk' value='{{ project.pk }}'>
                     <input type='hidden' name='question__pk' value='{{ question.pk }}'>
+                    <div class="show_when_editing">
+                    <label>Describe an issue</label>
+                    </div>
+                    <input type='text' name='bug__title' title='Describe an issue' class='add_an_answer'>
+                    <div class="show_when_editing">
+                    {% ifequal question.pk 2 %}
+                    <label>What makes this issue stressful?</label>
+                    {% endifequal %}
+                    {% ifequal question.pk 3 %}
+                    <label>Further info</label>
+                    {% endifequal %}
+                    <textarea name='bug__details'></textarea>
                     <label>Issue URL <small style='color: #888'>(optional)</small></label>
                     <input type='text' name='bug__url'>
-                    <label>Issue title</label>
-                    <input type='text' name='bug__title'>
-                    <label>What makes this issue stressful?</label>
-                    <textarea name='bug__details'></textarea>
+                    <div class='input-note'>
+                        {% ifequal question.pk 2 %}
+
+                                    <p>
+                                    Maybe there's something you just are afraid
+                                    to look at. Someone friendly could help you
+                                    out.
+                                    </p>
+                                    
+                                    <p>
+                                    For example:
+                                    </p>
+                                    <ul>
+                                        <li>
+                                        I don't know how to get started with
+                                        internationalizing my app.
+                                        </li>
+                                        <li>
+                                        Bug 392 about printing was filed five
+                                        years ago, and I don't even know if
+                                        printing still works.
+                                        </li>
+                                        <li>
+                                        I want help from a C coder writing a
+                                        Maildir patch for Alpine.
+                                        </li>
+                                    </ul>
+                        {% endifequal %}
+
+                        {% ifequal question.pk 3 %} 
+                                    <p>
+                                        Many projects have good small tasks
+                                        that can teach newcomers how the
+                                        project works. Now's your chance to
+                                        share one of them!
+                                    </p>
+                                        
+                                    <p>
+                                        For example: &ldquo;Someone could improve the
+                                        photo upload dialog box so that it lets
+                                        you resize the photo before sending it
+                                        to the web.&rdquo;
+                                    </p>
+                        {% endifequal %}
+                                </div>
+
                     <input type='submit' value='Submit'>
+                    </div>
                 </form>
                 </li>
 
@@ -200,16 +327,22 @@ about our members who support {{ project.name }}
 
 {% block js %}
     <script type='text/javascript'>
-        $.fn.getNearbyEditorElements = function() {
-            return this.parent().find('.show_when_editing');
-        }
         $(function() {
             $('.add_an_answer')
                 .focus(function() {
-                    $(this).getNearbyEditorElements().show();
+                    $form = $(this).parent();
+                    $form.addClass('active');
+                    $form.find('input:text, textarea').unbind('blur');
                 });
 
             $('input:text, textarea').hint();
+            //bind a function to the 'x' on input forms.  this function collapses the form
+            $('.collapse_answer_form').click(function(){
+                    $form = $(this).parent();
+                    $form.removeClass('active');
+                    $form.find('input:text, textarea').hint();
+                    return false;
+            });
 
         })
     </script>
