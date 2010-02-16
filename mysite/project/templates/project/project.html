@@ -27,12 +27,19 @@ about our members who support {{ project.name }}
         <ul id='paragraph_questions' class='questions'>
             {% for question, answers in question_answer_mappings_non_bug %}
                 <li>
+                    <style type="text/css">
+                        body#project #paragraph_questions li form.delete input[type='submit']{
+                            float: right;
+                            font-size: .8em;
+                            padding: 0px;
+                        }
+                    </style>
                     <h3><strong>Q</strong>: {{ question.text }}</h3>
                     <ul class='answers'>
                         {% for answer in answers %}
                         <li>
                         {% ifequal the_user answer.author %}
-                        <form name='' method='post' action='{% url mysite.project.views.delete_paragraph_answer_do %}'>
+                        <form name='' method='post' action='{% url mysite.project.views.delete_paragraph_answer_do %}' class='delete'>
                             <input type="hidden" name="answer__pk" value="{{answer.pk}}" />
                             <input type="submit" value="X" />
                         </form>
