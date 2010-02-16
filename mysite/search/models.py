@@ -201,7 +201,7 @@ class Project(models.Model):
     
     def get_url(self):
         return reverse(mysite.project.views.project,
-                kwargs={'project__name': mysite.base.unicode_sanity.urlencode(self.name)}) 
+                kwargs={'project__name': mysite.base.unicode_sanity.quote(self.name)}) 
 
     def get_mentors_search_url(self):
         query_string = mysite.base.unicode_sanity.urlencode({u'q': u'can_mentor:"%s"' %

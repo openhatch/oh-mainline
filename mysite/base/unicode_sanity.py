@@ -6,6 +6,8 @@
 ### Sadly our dependencies use them, so I can't.
 import urllib
 
+import mysite.base.decorators
+
 _urlencode = urllib.urlencode
 
 def urlencode(unicode_dict):
@@ -24,3 +26,6 @@ def urlencode(unicode_dict):
         pdb.set_trace()
     return _urlencode(utf8_dict)
     
+@mysite.base.decorators.unicodify_strings_when_inputted
+def quote(str):
+    return urllib.quote(str.encode('utf-8'))
