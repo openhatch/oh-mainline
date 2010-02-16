@@ -4,6 +4,7 @@ from mysite.search.models import Project, Bug, get_image_data_scaled
 import mysite.customs.models
 from mysite.customs import ohloh
 import mysite.profile.controllers
+import mysite.base.unicode_sanity
 
 import django
 from django.db import models
@@ -182,9 +183,6 @@ class Person(models.Model):
     def get_published_citations_flat(self):
         return sum([list(pfe.get_published_citations())
             for pfe in self.get_published_portfolio_entries()], [])
-
-    def calculate_summary(self, tag_text):
-        return ''
 
     def get_tag_texts_for_map(self):
         """Return a list of Tags linked to this Person.  Tags that would be useful from the map view of the people list"""
@@ -561,8 +559,8 @@ class Citation(models.Model):
         else:
             if self.data_import_attempt:
                 if self.data_import_attempt.source in ['rs', 'ou']:
-                    return "http://www.ohloh.net/search?%s" % urllib.urlencode(
-                            {'q': self.portfolio_entry.project.name.encode('utf-8')})
+                    return "http://www.ohloh.net/search?%s" % mysite.base.unicode_sanity.urlencode(
+                            {u'q': self.portfolio_entry.project.name})
                 elif self.data_import_attempt.source == 'lp':
                     return "https://launchpad.net/~%s" % urllib.quote(
                             self.data_import_attempt.query)

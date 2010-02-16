@@ -43,7 +43,7 @@ class SearchTest(TwillTests):
 
     def search_via_client(self, query=None):
         search_url = "/search/" 
-        return self.client.get(search_url, {'q': query})
+        return self.client.get(search_url, {u'q': query})
 
     def compare_lists(self, one, two):
         self.assertEqual(len(one), len(two))
@@ -84,8 +84,8 @@ class AutoCompleteTests(SearchTest):
 
     def setUp(self):
         SearchTest.setUp(self)
-        self.project_chat = Project.create_dummy(name='ComicChat', language='C++')
-        self.project_kazaa = Project.create_dummy(name='Kazaa', language='Vogon')
+        self.project_chat = Project.create_dummy(name=u'ComicChat', language=u'C++')
+        self.project_kazaa = Project.create_dummy(name=u'Kazaa', language=u'Vogon')
         self.bug_in_chat = Bug.all_bugs.create(project=self.project_chat,
                 people_involved=2,
                 date_reported=datetime.date(2009, 4, 1),
@@ -97,27 +97,27 @@ class AutoCompleteTests(SearchTest):
                 )
 
     def testSuggestionsMinimallyWorks(self):
-        suggestions = views.get_autocompletion_suggestions('')
+        suggestions = views.get_autocompletion_suggestions(u'')
         self.assert_("lang:Vogon" in suggestions)
 
     def testSuggestForAllFields(self):
-        c_suggestions = views.get_autocompletion_suggestions('C')
-        self.assert_('lang:C++' in c_suggestions)
-        self.assert_('project:ComicChat' in c_suggestions)
+        c_suggestions = views.get_autocompletion_suggestions(u'C')
+        self.assert_(u'lang:C++' in c_suggestions)
+        self.assert_(u'project:ComicChat' in c_suggestions)
 
     def testQueryNotFieldSpecificFindProject(self):
-        c_suggestions = views.get_autocompletion_suggestions('Comi')
-        self.assert_('project:ComicChat' in c_suggestions)
+        c_suggestions = views.get_autocompletion_suggestions(u'Comi')
+        self.assert_(u'project:ComicChat' in c_suggestions)
 
     def testQueryFieldSpecific(self):
         lang_C_suggestions = views.get_autocompletion_suggestions(
-                'lang:C')
-        self.assert_('lang:C++' in lang_C_suggestions)
-        self.assert_('lang:Python' not in lang_C_suggestions)
-        self.assert_('project:ComicChat' not in lang_C_suggestions)
+                u'lang:C')
+        self.assert_(u'lang:C++' in lang_C_suggestions)
+        self.assert_(u'lang:Python' not in lang_C_suggestions)
+        self.assert_(u'project:ComicChat' not in lang_C_suggestions)
 
     def testSuggestsCorrectStringsFormattedForJQueryAutocompletePlugin(self):
-        suggestions_list = views.get_autocompletion_suggestions('')
+        suggestions_list = views.get_autocompletion_suggestions(u'')
         suggestions_string = views.list_to_jquery_autocompletion_format(
                 suggestions_list)
         suggestions_list_reconstructed = suggestions_string.split("\n")
@@ -126,15 +126,15 @@ class AutoCompleteTests(SearchTest):
         self.assert_("lang:C++" in suggestions_list_reconstructed)
 
     def testSuggestsSomethingOverHttp(self):
-        response = self.client.get( '/search/get_suggestions', {'q': 'C'})
+        response = self.client.get( u'/search/get_suggestions', {u'q': u'C'})
         self.assertContains(response, "project:ComicChat\nlang:C++")
 
     def testSuggesterFailsOnEmptyString(self):
-        response = self.client.get( '/search/get_suggestions', {'q': ''})
+        response = self.client.get( u'/search/get_suggestions', {u'q': u''})
         self.assertEquals(response.status_code, 500)
 
     def testSuggesterFailsWithImproperQueryString(self):
-        response = self.client.get( '/search/get_suggestions', {})
+        response = self.client.get( u'/search/get_suggestions', {})
         self.assertEquals(response.status_code, 500)
 
 class SearchResultsSpecificBugs(SearchTest):
@@ -143,7 +143,7 @@ class SearchResultsSpecificBugs(SearchTest):
     def setUp(self):
         SearchTest.setUp(self)
 
-        query = 'PYTHON'
+        query = u'PYTHON'
 
         # The four canonical_filters by which a bug can match a query
         whole_word = "[[:<:]]%s[[:>:]]" % query
@@ -207,8 +207,8 @@ class SearchResultsSpecificBugs(SearchTest):
     def test_search_single_query(self):
         """Test that Query.get_bugs_unordered()
         produces the expected results."""
-        response = self.client.get('/search/', {'q': 'python'})
-        returned_bugs = response.context[0]['bunch_of_bugs']
+        response = self.client.get(u'/search/', {u'q': u'python'})
+        returned_bugs = response.context[0][u'bunch_of_bugs']
         for cf in self.canonical_filters:
             self.failUnless(Bug.all_bugs.filter(cf)[0] in returned_bugs,
                     "Search engine did not correctly use the filter %s" % cf)
@@ -218,19 +218,19 @@ class SearchResultsSpecificBugs(SearchTest):
 
     def test_search_two_queries(self):
 
-        title_of_bug_to_include = 'An interesting title'
+        title_of_bug_to_include = u'An interesting title'
         title_of_bug_to_exclude = "This shouldn't be in the results for [pyt*hon 'An interesting description']."
 
         # If either of these bugs aren't there, then this test won't work properly.
         self.assert_(len(list(Bug.all_bugs.filter(title=title_of_bug_to_include))) == 1)
         self.assert_(len(list(Bug.all_bugs.filter(title=title_of_bug_to_exclude))) == 1)
 
-        response = self.client.get('/search/',
-                                   {'q': 'python "An interesting description"'})
+        response = self.client.get(u'/search/',
+                                   {u'q': u'python "An interesting description"'})
 
         included_the_right_bug = False
         excluded_the_wrong_bug = True
-        for bug in response.context[0]['bunch_of_bugs']:
+        for bug in response.context[0][u'bunch_of_bugs']:
             if bug.title == title_of_bug_to_include:
                 included_the_right_bug = True
             if bug.title == title_of_bug_to_exclude:
@@ -242,7 +242,7 @@ class SearchResultsSpecificBugs(SearchTest):
 class TestThatQueryTokenizesRespectingQuotationMarks(TwillTests):
     def test(self):
         difficult = "With spaces (and parens)"
-        query = mysite.search.controllers.Query.create_from_GET_data({'q': '"%s"' % difficult})
+        query = mysite.search.controllers.Query.create_from_GET_data({u'q': u'"%s"' % difficult})
         self.assertEqual(query.terms, [difficult])
         # Make there be a bug to find
         project = Project.create_dummy(name=difficult)
@@ -252,7 +252,7 @@ class TestThatQueryTokenizesRespectingQuotationMarks(TwillTests):
         self.assertEqual(num_bugs, 1)
 
 class SearchResults(TwillTests):
-    fixtures = ['bugs-for-two-projects.json']
+    fixtures = [u'bugs-for-two-projects.json']
 
     def test_query_object_is_false_when_no_terms_or_facets(self):
         query = mysite.search.controllers.Query.create_from_GET_data({})
@@ -260,85 +260,85 @@ class SearchResults(TwillTests):
 
     def test_show_no_bugs_if_no_query(self):
         # Call up search page with no query.
-        response = self.client.get('/search/')
+        response = self.client.get(u'/search/')
 
-        # The variable 'bunch_of_bugs', passed to the template, is a blank list.
-        self.assertEqual(response.context[0]['bunch_of_bugs'], [])
+        # The variable u'bunch_of_bugs', passed to the template, is a blank list.
+        self.assertEqual(response.context[0][u'bunch_of_bugs'], [])
 
     def test_json_view(self):
-        tc.go(make_twill_url('http://openhatch.org/search/?format=json&jsoncallback=callback&q=python'))
+        tc.go(make_twill_url(u'http://openhatch.org/search/?format=json&jsoncallback=callback&q=python'))
         response = tc.show()
-        self.assert_(response.startswith('callback'))
-        json_string_with_parens = response.split('callback', 1)[1]
-        self.assert_(json_string_with_parens[0] == '(')
-        self.assert_(json_string_with_parens[-1] == ')')
+        self.assert_(response.startswith(u'callback'))
+        json_string_with_parens = response.split(u'callback', 1)[1]
+        self.assert_(json_string_with_parens[0] == u'(')
+        self.assert_(json_string_with_parens[-1] == u')')
         json_string = json_string_with_parens[1:-1]
         objects = simplejson.loads(json_string)
-        self.assert_('pk' in objects[0]['bugs'][0])
+        self.assert_(u'pk' in objects[0][u'bugs'][0])
 
     def testPagination(self):
-        url = 'http://openhatch.org/search/'
+        url = u'http://openhatch.org/search/'
         tc.go(make_twill_url(url))
-        tc.fv('search_opps', 'q', 'python')
+        tc.fv(u'search_opps', u'q', u'python')
         tc.submit()
 
         # Grab descriptions of first 10 Exaile bugs
         bugs = Bug.all_bugs.filter(project__name=
-                                  'Exaile').order_by('-last_touched')[:10]
+                                  u'Exaile').order_by(u'-last_touched')[:10]
 
         for bug in bugs:
             tc.find(bug.description)
 
         # Hit the next button
-        tc.follow('Next')
+        tc.follow(u'Next')
 
         # Grab descriptions of next 10 Exaile bugs
         bugs = Bug.all_bugs.filter(project__name=
-                                  'Exaile').order_by('-last_touched')[10:20]
+                                  u'Exaile').order_by(u'-last_touched')[10:20]
 
         for bug in bugs:
             tc.find(bug.description)
 
     def testPaginationAndChangingSearchQuery(self):
 
-        url = 'http://openhatch.org/search/'
+        url = u'http://openhatch.org/search/'
         tc.go(make_twill_url(url))
-        tc.fv('search_opps', 'q', 'python')
+        tc.fv(u'search_opps', u'q', u'python')
         tc.submit()
 
         # Grab descriptions of first 10 Exaile bugs
         bugs = Bug.all_bugs.filter(project__name=
-                                  'Exaile').order_by('-last_touched')[:10]
+                                  u'Exaile').order_by(u'-last_touched')[:10]
 
         for bug in bugs:
             tc.find(bug.description)
 
         # Hit the next button
-        tc.follow('Next')
+        tc.follow(u'Next')
 
         # Grab descriptions of next 10 Exaile bugs
         bugs = Bug.all_bugs.filter(project__name=
-                                  'Exaile').order_by('-last_touched')[10:20]
+                                  u'Exaile').order_by(u'-last_touched')[10:20]
 
         for bug in bugs:
             tc.find(bug.description)
 
         # Now, change the query - do we stay that paginated?
-        tc.fv('search_opps', 'q', 'c#')
+        tc.fv(u'search_opps', u'q', u'c#')
         tc.submit()
 
         # Grab descriptions of first 10 GNOME-Do bugs
         bugs = Bug.all_bugs.filter(project__name=
-                                  'GNOME-Do').order_by(
-            '-last_touched')[:10]
+                                  u'GNOME-Do').order_by(
+            u'-last_touched')[:10]
 
         for bug in bugs:
             tc.find(bug.description)
 
 sample_launchpad_data_dump = mock.Mock()
 sample_launchpad_data_dump.return_value = [dict(
-        url='', project='rose.makesad.us', text='', status='',
-        importance='low', reporter={'lplogin': 'a',
+        url=u'', project=u'rose.makesad.us', text=u'', status=u'',
+        importance=u'low', reporter={u'lplogin': 'a',
                                     'realname': 'b'},
         comments=[], date_updated=time.localtime(),
         date_reported=time.localtime(),
@@ -355,17 +355,17 @@ class AutoCrawlTests(SearchTest):
         # Now get all the bugs about rose
         mysite.search.launchpad_crawl.grab_lp_bugs(lp_project='rose',
                                             openhatch_project=
-                                            'rose.makesad.us')
+                                            u'rose.makesad.us')
         # Now see, we have one!
         b = mysite.search.models.Bug.all_bugs.get(title="Joi's Lab AFS")
-        self.assertEqual(b.project.name, 'rose.makesad.us')
+        self.assertEqual(b.project.name, u'rose.makesad.us')
         # Ta-da.
         return b
 
     def test_running_job_twice_does_update(self):
         b = self.testSearch()
-        b.description = 'Eat more potato starch'
-        b.title = 'Yummy potato paste'
+        b.description = u'Eat more potato starch'
+        b.title = u'Yummy potato paste'
         b.save()
 
         new_b = self.testSearch()
@@ -404,7 +404,7 @@ class LaunchpadImporterTests(SearchTest):
         # Do a get; this will explode if there's more than one with the
         # canonical_bug_link, so it tests duplicate finding.
         bug = Bug.all_bugs.get(canonical_bug_link=
-                                       query_data['canonical_bug_link'])
+                                       query_data[u'canonical_bug_link'])
 
         for key in new_data:
             self.assertEqual(getattr(bug, key), new_data[key])
@@ -634,7 +634,7 @@ class SearchTemplateDecodesQueryString(SearchTest):
 
 class FacetsFilterResults(SearchTest):
     def test_facets_filter_results(self):
-        facets = {'language': 'Python'}
+        facets = {u'language': u'Python'}
 
         # Those facets should pick up this bug:
         python_project = Project.create_dummy(language='Python')
@@ -653,50 +653,50 @@ class QueryGetPossibleFacets(SearchTest):
     E.g., search for gtk, it says C, 541."""
 
     def test_get_possible_facets(self):
-        project1 = Project.create_dummy(language='c')
-        project2 = Project.create_dummy(language='d')
-        project3 = Project.create_dummy(language='e')
-        Bug.create_dummy(project=project1, description='bug', good_for_newcomers=True)
-        Bug.create_dummy(project=project2, description='bug')
-        Bug.create_dummy(project=project3, description='bAg')
+        project1 = Project.create_dummy(language=u'c')
+        project2 = Project.create_dummy(language=u'd')
+        project3 = Project.create_dummy(language=u'e')
+        Bug.create_dummy(project=project1, description=u'bug', good_for_newcomers=True)
+        Bug.create_dummy(project=project2, description=u'bug')
+        Bug.create_dummy(project=project3, description=u'bAg')
         query = mysite.search.controllers.Query(
-                terms=['bug'],
-                terms_string='bug',
-                active_facet_options={'language': 'c'})
+                terms=[u'bug'],
+                terms_string=u'bug',
+                active_facet_options={u'language': u'c'})
         possible_facets = query.get_possible_facets()
         self.compare_lists_of_dicts(
-                possible_facets['language']['options'],
+                possible_facets[u'language'][u'options'],
                 [
-                    { 'name': 'any', 'query_string': 'q=bug&language=',
-                        'is_active': False, 'count': 2 },
-                    { 'name': 'c', 'query_string': 'q=bug&language=c', 
-                        'is_active': True, 'count': 1 },
-                    { 'name': 'd', 'query_string': 'q=bug&language=d',
-                        'is_active': False, 'count': 1 },
-                    # e is excluded because its bug ('bAg') doesn't match the term 'bug'
+                    { u'name': u'any', u'query_string': u'q=bug&language=',
+                        u'is_active': False, u'count': 2 },
+                    { u'name': u'c', u'query_string': u'q=bug&language=c', 
+                        u'is_active': True, u'count': 1 },
+                    { u'name': u'd', u'query_string': u'q=bug&language=d',
+                        u'is_active': False, u'count': 1 },
+                    # e is excluded because its bug (u'bAg') doesn't match the term 'bug'
                     ],
-                sort_key='name'
+                sort_key=u'name'
                 )
 
         self.compare_lists_of_dicts(
-                possible_facets['toughness']['options'],
+                possible_facets[u'toughness'][u'options'],
                 [
-                    { 'name': 'any', 'is_active': True,
-                         'query_string': 'q=bug&toughness=&language=c', 'count': 1 },
-                    { 'name': 'bitesize', 'is_active': False,
-                        'query_string': 'q=bug&toughness=bitesize&language=c', 'count': 1 },
+                    { u'name': u'any', u'is_active': True,
+                         u'query_string': u'q=bug&toughness=&language=c', u'count': 1 },
+                    { u'name': u'bitesize', u'is_active': False,
+                        u'query_string': u'q=bug&toughness=bitesize&language=c', u'count': 1 },
                     ],
-                sort_key='name'
+                sort_key=u'name'
                 )
 
     def test_possible_facets_always_includes_active_facet(self):
         # even when active facet has no results.
-        c = Project.create_dummy(language='c')
-        d = Project.create_dummy(language='d')
-        e = Project.create_dummy(language='e')
-        Bug.create_dummy(project=c, description='bug')
+        c = Project.create_dummy(language=u'c')
+        d = Project.create_dummy(language=u'd')
+        e = Project.create_dummy(language=u'e')
+        Bug.create_dummy(project=c, description=u'bug')
         query = mysite.search.controllers.Query.create_from_GET_data(
-                {'q': 'nothing matches this', 'language': 'c'})
+                {u'q': u'nothing matches this', u'language': u'c'})
 
         language_options = query.get_possible_facets()['language']['options']
         language_options_named_c = [opt for opt in language_options if opt['name'] == 'c']
@@ -804,42 +804,42 @@ class SingleFacetOption(SearchTest):
                 good_for_newcomers=False, 
                 description='toast')
 
-        GET_data = { 'language': 'Python' }
+        GET_data = { u'language': u'Python' }
         query = mysite.search.controllers.Query.create_from_GET_data(GET_data)
         self.assertFalse(query.terms) # No terms
-        self.assertEqual(query.active_facet_options, {'language': 'Python'}) 
+        self.assertEqual(query.active_facet_options, {u'language': u'Python'}) 
 
         self.output_possible_facets = query.get_possible_facets()
 
     def test_toughness_facet(self):
         # What options do we expect?
-        toughness_option_bitesize = {'name': 'bitesize', 'count': 1,
-                'is_active': False,
-                'query_string': 'q=&toughness=bitesize&language=Python'}
-        toughness_option_any = {'name': 'any', 'count': 2,
-                'is_active': True,
-                'query_string': 'q=&toughness=&language=Python'}
+        toughness_option_bitesize = {u'name': u'bitesize', u'count': 1,
+                u'is_active': False,
+                u'query_string': u'q=&toughness=bitesize&language=Python'}
+        toughness_option_any = {u'name': u'any', u'count': 2,
+                u'is_active': True,
+                u'query_string': u'q=&toughness=&language=Python'}
         expected_toughness_facet_options = [toughness_option_bitesize, toughness_option_any]
 
         self.compare_lists_of_dicts(
-                self.output_possible_facets['toughness']['options'],
+                self.output_possible_facets[u'toughness'][u'options'],
                 expected_toughness_facet_options 
                 )
 
     def test_languages_facet(self):
         # What options do we expect?
-        languages_option_python = {'name': 'Python', 'count': 2,
-                'is_active': True,
-                'query_string': 'q=&language=Python'}
-        languages_option_perl = {'name': 'Perl', 'count': 1,
-                'is_active': False,
-                'query_string': 'q=&language=Perl'}
-        languages_option_c = {'name': 'C', 'count': 1,
-                'is_active': False,
-                'query_string': 'q=&language=C'}
-        languages_option_any = {'name': 'any', 'count': 4,
-                'is_active': False,
-                'query_string': 'q=&language='}
+        languages_option_python = {u'name': u'Python', u'count': 2,
+                u'is_active': True,
+                u'query_string': u'q=&language=Python'}
+        languages_option_perl = {u'name': u'Perl', u'count': 1,
+                u'is_active': False,
+                u'query_string': u'q=&language=Perl'}
+        languages_option_c = {u'name': u'C', u'count': 1,
+                u'is_active': False,
+                u'query_string': u'q=&language=C'}
+        languages_option_any = {u'name': u'any', u'count': 4,
+                u'is_active': False,
+                u'query_string': u'q=&language='}
         expected_languages_facet_options = [
                 languages_option_python, 
                 languages_option_perl,
@@ -848,7 +848,7 @@ class SingleFacetOption(SearchTest):
                 ]
 
         self.compare_lists_of_dicts(
-                self.output_possible_facets['language']['options'],
+                self.output_possible_facets[u'language'][u'options'],
                 expected_languages_facet_options 
                 )
 
@@ -860,8 +860,8 @@ class QueryGetToughnessFacetOptions(SearchTest):
         # Since only two of the bitesize bugs are in Python (one is 
         # in a project whose language is Perl), we expect only 1 bitesize
         # bug to show up, and 2 total bugs.
-        python_project = Project.create_dummy(language='Python')
-        perl_project = Project.create_dummy(language='Perl')
+        python_project = Project.create_dummy(language=u'Python')
+        perl_project = Project.create_dummy(language=u'Perl')
 
         bitesize_bug_in_python = Bug.create_dummy(
                 project=python_project,
@@ -876,67 +876,67 @@ class QueryGetToughnessFacetOptions(SearchTest):
                 good_for_newcomers=True, )
 
         query = mysite.search.controllers.Query(
-                active_facet_options={'language': 'Python'},
-                terms_string='')
-        output = query.get_facet_options('toughness', ['bitesize', ''])
-        bitesize_dict = [d for d in output if d['name'] == 'bitesize'][0]
-        all_dict = [d for d in output if d['name'] == 'any'][0]
-        self.assertEqual(bitesize_dict['count'], 1)
-        self.assertEqual(all_dict['count'], 2)
+                active_facet_options={u'language': u'Python'},
+                terms_string=u'')
+        output = query.get_facet_options(u'toughness', [u'bitesize', u''])
+        bitesize_dict = [d for d in output if d[u'name'] == u'bitesize'][0]
+        all_dict = [d for d in output if d[u'name'] == u'any'][0]
+        self.assertEqual(bitesize_dict[u'count'], 1)
+        self.assertEqual(all_dict[u'count'], 2)
 
     def test_get_toughness_facet_options_with_terms(self):
 
-        python_project = Project.create_dummy(language='Python')
-        perl_project = Project.create_dummy(language='Perl')
+        python_project = Project.create_dummy(language=u'Python')
+        perl_project = Project.create_dummy(language=u'Perl')
 
         bitesize_bug_that_matches = Bug.create_dummy(
                 project=python_project,
                 good_for_newcomers=True,
-                description='a')
+                description=u'a')
 
         nonbitesize_bug_that_matches = Bug.create_dummy(
                 project=python_project,
                 good_for_newcomers=False,
-                description='a')
+                description=u'a')
 
         bitesize_bug_that_doesnt_match = Bug.create_dummy(
                 project=perl_project,
                 good_for_newcomers=True,
-                description='b')
+                description=u'b')
 
-        GET_data = {'q': 'a'}
+        GET_data = {u'q': u'a'}
         query = mysite.search.controllers.Query.create_from_GET_data(GET_data)
-        output = query.get_facet_options('toughness', ['bitesize', ''])
-        bitesize_dict = [d for d in output if d['name'] == 'bitesize'][0]
-        all_dict = [d for d in output if d['name'] == 'any'][0]
-        self.assertEqual(bitesize_dict['count'], 1)
-        self.assertEqual(all_dict['count'], 2)
+        output = query.get_facet_options(u'toughness', [u'bitesize', u''])
+        bitesize_dict = [d for d in output if d[u'name'] == u'bitesize'][0]
+        all_dict = [d for d in output if d[u'name'] == u'any'][0]
+        self.assertEqual(bitesize_dict[u'count'], 1)
+        self.assertEqual(all_dict[u'count'], 2)
 
 class QueryGetPossibleLanguageFacetOptionNames(SearchTest):
 
     def setUp(self):
         SearchTest.setUp(self)
-        python_project = Project.create_dummy(language='Python')
-        perl_project = Project.create_dummy(language='Perl')
-        c_project = Project.create_dummy(language='C')
-        unknown_project = Project.create_dummy(language='')
+        python_project = Project.create_dummy(language=u'Python')
+        perl_project = Project.create_dummy(language=u'Perl')
+        c_project = Project.create_dummy(language=u'C')
+        unknown_project = Project.create_dummy(language=u'')
 
-        python_bug = Bug.create_dummy(project=python_project, title='a')
-        perl_bug = Bug.create_dummy(project=perl_project, title='a') 
-        c_bug = Bug.create_dummy(project=c_project, title='b') 
-        unknowable_bug = Bug.create_dummy(project=unknown_project, title='unknowable') 
+        python_bug = Bug.create_dummy(project=python_project, title=u'a')
+        perl_bug = Bug.create_dummy(project=perl_project, title=u'a') 
+        c_bug = Bug.create_dummy(project=c_project, title=u'b') 
+        unknowable_bug = Bug.create_dummy(project=unknown_project, title=u'unknowable') 
 
     def test_with_term(self):
         # In the setUp we create three bugs, but only two of them would match
         # a search for 'a'. They are in two different languages, so let's make
         # sure that we show only those two languages.
-        GET_data = {'q': 'a'}
+        GET_data = {u'q': u'a'}
 
         query = mysite.search.controllers.Query.create_from_GET_data(GET_data)
         language_names = query.get_language_names()
         self.assertEqual(
                 sorted(language_names),
-                sorted(['Python', 'Perl']))
+                sorted([u'Python', u'Perl']))
 
     def test_with_active_language_facet(self):
         # In the setUp we create bugs in three languages.
@@ -944,13 +944,13 @@ class QueryGetPossibleLanguageFacetOptionNames(SearchTest):
         # all three languages, even though the GET data shows that we are
         # browsing by language.
 
-        GET_data = {'language': 'Python'}
+        GET_data = {u'language': u'Python'}
 
         query = mysite.search.controllers.Query.create_from_GET_data(GET_data)
         language_names = query.get_language_names()
         self.assertEqual(
                 sorted(language_names),
-                sorted(['Python', 'Perl', 'C', 'Unknown']))
+                sorted([u'Python', u'Perl', u'C', u'Unknown']))
 
     def test_with_language_as_unknown(self):
         # In the setUp we create bugs in three languages.
@@ -958,13 +958,13 @@ class QueryGetPossibleLanguageFacetOptionNames(SearchTest):
         # all three languages, even though the GET data shows that we are
         # browsing by language.
 
-        GET_data = {'language': 'Unknown'}
+        GET_data = {u'language': u'Unknown'}
 
         query = mysite.search.controllers.Query.create_from_GET_data(GET_data)
         language_names = query.get_language_names()
         self.assertEqual(
                 sorted(language_names),
-                sorted(['Python', 'Perl', 'C', 'Unknown']))
+                sorted([u'Python', u'Perl', u'C', u'Unknown']))
 
     def test_with_language_as_unknown_and_query(self):
         # In the setUp we create bugs in three languages.
@@ -972,7 +972,7 @@ class QueryGetPossibleLanguageFacetOptionNames(SearchTest):
         # all three languages, even though the GET data shows that we are
         # browsing by language.
 
-        GET_data = {'language': 'Unknown', 'q': 'unknowable'}
+        GET_data = {u'language': u'Unknown', u'q': u'unknowable'}
 
         query = mysite.search.controllers.Query.create_from_GET_data(GET_data)
         match_count = query.get_bugs_unordered().count()
@@ -983,59 +983,59 @@ class QueryContributionType(SearchTest):
 
     def setUp(self):
         SearchTest.setUp(self)
-        python_project = Project.create_dummy(language='Python')
-        perl_project = Project.create_dummy(language='Perl')
-        c_project = Project.create_dummy(language='C')
+        python_project = Project.create_dummy(language=u'Python')
+        perl_project = Project.create_dummy(language=u'Perl')
+        c_project = Project.create_dummy(language=u'C')
 
-        python_bug = Bug.create_dummy(project=python_project, title='a')
-        perl_bug = Bug.create_dummy(project=perl_project, title='a',
+        python_bug = Bug.create_dummy(project=python_project, title=u'a')
+        perl_bug = Bug.create_dummy(project=perl_project, title=u'a',
                                     concerns_just_documentation=True) 
-        c_bug = Bug.create_dummy(project=c_project, title='b')
+        c_bug = Bug.create_dummy(project=c_project, title=u'b')
 
     def test_contribution_type_is_an_available_facet(self):
         GET_data = {}
         starting_query = mysite.search.controllers.Query.create_from_GET_data(
             GET_data)
-        self.assert_('contribution type' in starting_query.get_possible_facets())
+        self.assert_(u'contribution type' in starting_query.get_possible_facets())
 
     def test_contribution_type_options_are_reasonable(self):
         GET_data = {}
         starting_query = mysite.search.controllers.Query.create_from_GET_data(
             GET_data)
-        cto = starting_query.get_facet_options('contribution_type',
-                                               ['documentation', ''])
-        documentation_one, = [k for k in cto if k['name'] == 'documentation']
-        any_one, = [k for k in cto if k['name'] == 'any']
-        self.assertEqual(documentation_one['count'], 1)
-        self.assertEqual(any_one['count'], 3)
+        cto = starting_query.get_facet_options(u'contribution_type',
+                                               [u'documentation', u''])
+        documentation_one, = [k for k in cto if k[u'name'] == u'documentation']
+        any_one, = [k for k in cto if k[u'name'] == u'any']
+        self.assertEqual(documentation_one[u'count'], 1)
+        self.assertEqual(any_one[u'count'], 3)
 
 class QueryStringCaseInsensitive(SearchTest):
 
     def test_Language(self):
         """Do we redirect queries that use non-lowercase facet keys to pages
         that use lowercase facet keys?"""
-        redirects = self.client.get('/search/',
-                {'LANguaGE': 'pytHon'}, follow=True).redirect_chain
-        self.assertEqual(redirects, [('http://testserver/search/?language=pytHon', 302)])
+        redirects = self.client.get(u'/search/',
+                {u'LANguaGE': u'pytHon'}, follow=True).redirect_chain
+        self.assertEqual(redirects, [(u'http://testserver/search/?language=pytHon', 302)])
 
 class HashQueryData(SearchTest):
 
     def test_queries_with_identical_data_hash_alike(self):
-        GET_data = {'q': 'socialguides', 'language': 'looxii'}
+        GET_data = {u'q': u'socialguides', u'language': u'looxii'}
         one = mysite.search.controllers.Query.create_from_GET_data(GET_data)
         two = mysite.search.controllers.Query.create_from_GET_data(GET_data)
         self.assertEqual(one.get_sha1(), two.get_sha1())
 
     def test_queries_with_equiv_data_expressed_differently_hash_alike(self):
-        GET_data_1 = {'q': 'socialguides zetapage', 'language': 'looxii'}
-        GET_data_2 = {'q': 'zetapage socialguides', 'language': 'looxii'}
+        GET_data_1 = {u'q': u'socialguides zetapage', u'language': u'looxii'}
+        GET_data_2 = {u'q': u'zetapage socialguides', u'language': u'looxii'}
         one = mysite.search.controllers.Query.create_from_GET_data(GET_data_1)
         two = mysite.search.controllers.Query.create_from_GET_data(GET_data_2)
         self.assertEqual(one.get_sha1(), two.get_sha1())
 
     def test_queries_with_different_data_hash_differently(self):
-        GET_data_1 = {'q': 'socialguides zetapage', 'language': 'looxii'}
-        GET_data_2 = {'q': 'socialguides ninjapost', 'language': 'looxii'}
+        GET_data_1 = {u'q': u'socialguides zetapage', u'language': u'looxii'}
+        GET_data_2 = {u'q': u'socialguides ninjapost', u'language': u'looxii'}
         one = mysite.search.controllers.Query.create_from_GET_data(GET_data_1)
         two = mysite.search.controllers.Query.create_from_GET_data(GET_data_2)
         self.assertNotEqual(one.get_sha1(), two.get_sha1())
@@ -1046,7 +1046,7 @@ class QueryGrabHitCount(SearchTest):
 
     def test_eventhive_grab_hitcount_once_stored(self):
 
-        data = {'q': 'eventhive', 'language': 'shoutNOW'}
+        data = {u'q': u'eventhive', u'language': u'shoutNOW'}
         query = mysite.search.controllers.Query.create_from_GET_data(data)
         stored_hit_count = 10
         HitCountCache.objects.create(
@@ -1056,10 +1056,10 @@ class QueryGrabHitCount(SearchTest):
 
     def test_shoutnow_cache_hitcount_on_grab(self):
 
-        project = Project.create_dummy(language='shoutNOW')
+        project = Project.create_dummy(language=u'shoutNOW')
 
         bug = Bug.create_dummy(project=project)
-        data = {'language': 'shoutNOW'}
+        data = {u'language': u'shoutNOW'}
         query = mysite.search.controllers.Query.create_from_GET_data(data)
 
         expected_hit_count = 1
@@ -1071,7 +1071,7 @@ class QueryGrabHitCount(SearchTest):
 class ClearCacheWhenBugsChange(SearchTest):
 
     def test_cached_cleared_after_bug_save_or_delete(self):
-        data = {'language': 'shoutNOW'}
+        data = {u'language': u'shoutNOW'}
         query = mysite.search.controllers.Query.create_from_GET_data(data)
 
         # Cache entry created after hit count retrieval
@@ -1079,7 +1079,7 @@ class ClearCacheWhenBugsChange(SearchTest):
         self.assert_(HitCountCache.objects.all())
 
         # Cache cleared after bug save
-        project = Project.create_dummy(language='shoutNOW')
+        project = Project.create_dummy(language=u'shoutNOW')
         bug = Bug.create_dummy(project=project)
         self.assertFalse(HitCountCache.objects.all())
 
@@ -1094,10 +1094,10 @@ class ClearCacheWhenBugsChange(SearchTest):
 class DontRecommendFutileSearchTerms(TwillTests):
 
     def test_removal_of_futile_terms(self):
-        bug = mysite.search.models.Bug.create_dummy_with_project(description='useful')
+        bug = mysite.search.models.Bug.create_dummy_with_project(description=u'useful')
         self.assertEqual(
-                Person.only_terms_with_results(['useful', 'futile']),
-                ['useful'])
+                Person.only_terms_with_results([u'useful', u'futile']),
+                [u'useful'])
 
 
 class PublicizeBugTrackerIndex(SearchTest):
@@ -1109,7 +1109,7 @@ class PublicizeBugTrackerIndex(SearchTest):
 
     def test_search_template_contains_bug_tracker_count(self):
         self.assertEqual(
-                self.search_page_response.context[0]['project_count'],
+                self.search_page_response.context[0][u'project_count'],
                 self.bug_tracker_count)
 
 class LaunchpadImporterMarksFixedBugsAsClosed(TwillTests):
@@ -1163,28 +1163,28 @@ class TestPotentialMentors(TwillTests):
         two potential mentors.'''
 
         banshee = Project.create_dummy(name='Banshee', language='C#')
-        can_mentor, _ = mysite.profile.models.TagType.objects.get_or_create(name='can_mentor')
+        can_mentor, _ = mysite.profile.models.TagType.objects.get_or_create(name=u'can_mentor')
         
         willing_to_mentor_banshee, _ = mysite.profile.models.Tag.objects.get_or_create(
             tag_type=can_mentor,
-            text='Banshee')
+            text=u'Banshee')
 
         willing_to_mentor_c_sharp, _ = mysite.profile.models.Tag.objects.get_or_create(
             tag_type=can_mentor,
-            text='C#')
+            text=u'C#')
 
         link = mysite.profile.models.Link_Person_Tag(
-            person=Person.objects.get(user__username='paulproteus'),
+            person=Person.objects.get(user__username=u'paulproteus'),
             tag=willing_to_mentor_banshee)
         link.save()
 
         link = mysite.profile.models.Link_Person_Tag(
-            person=Person.objects.get(user__username='paulproteus'),
+            person=Person.objects.get(user__username=u'paulproteus'),
             tag=willing_to_mentor_c_sharp)
         link.save()
 
         link = mysite.profile.models.Link_Person_Tag(
-            person=Person.objects.get(user__username='barry'),
+            person=Person.objects.get(user__username=u'barry'),
             tag=willing_to_mentor_c_sharp)
         link.save()
 
