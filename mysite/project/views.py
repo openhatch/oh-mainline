@@ -14,14 +14,20 @@ from django.contrib.auth.decorators import login_required
 def project(request, project__name = None):
     p = get_object_or_404(Project, name=project__name)
 
+    # Get or create two paragraph-y questions.
     question_answer_mappings_non_bug = []
-    questions = ProjectInvolvementQuestion.objects.filter(is_bug_style=False)
+    questions = []
+    questions.append(ProjectInvolvementQuestion.objects.get_or_create(pk=0, is_bug_style=False)[0])
+    questions.append(ProjectInvolvementQuestion.objects.get_or_create(pk=1, is_bug_style=False)[0])
     for question in questions:
         question_answer_mappings_non_bug.append((question, question.get_answers_for_project(p)))
 
+    # Get or create two buggy questions.
     question_answer_mappings_bug = []
-    questions = ProjectInvolvementQuestion.objects.filter(is_bug_style=True)
-    for question in questions:
+    bug_questions = []
+    bug_questions.append(ProjectInvolvementQuestion.objects.get_or_create(pk=2, is_bug_style=True)[0])
+    bug_questions.append(ProjectInvolvementQuestion.objects.get_or_create(pk=3, is_bug_style=True)[0])
+    for question in bug_questions:
         question_answer_mappings_bug.append((question, question.get_answers_for_project(p)))
 
     return (request,
