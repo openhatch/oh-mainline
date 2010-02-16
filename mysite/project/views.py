@@ -76,7 +76,11 @@ def redirect_project_to_projects(request, project__name):
 
 @login_required
 def delete_bug_answer_do(request):
-    pass
+    answer__pk = request.POST['answer__pk']
+    # grab the answer from the database.  delete it.  done.
+    our_answer = BugAnswer.objects.get(pk=answer__pk, author=request.user)
+    our_answer.delete()
+    return HttpResponseRedirect(reverse(project, kwargs={'project__name': our_answer.project.name}))
 
 @login_required
 def delete_paragraph_answer_do(request):

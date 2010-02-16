@@ -247,6 +247,14 @@ class BugAnswer(models.Model):
     question = models.ForeignKey(ProjectInvolvementQuestion, related_name='bug_answers')
     project = models.ForeignKey(Project)
 
+    @staticmethod
+    def create_dummy(**kwargs):
+        data = {'title': 'i want my bug fixed'}
+        data.update(kwargs)
+        ret = BugAnswer(**data)
+        ret.save()
+        return ret
+
 class Answer(models.Model):
     text = models.TextField(blank=False)
     author = models.ForeignKey(User)

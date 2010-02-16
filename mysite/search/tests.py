@@ -1215,6 +1215,29 @@ class DeleteAnswer(TwillTests):
         # and make sure our answer isn't in the db anymore
         self.assertEqual(Answer.objects.filter(pk=a.pk).count(), 0)
 
+    def test_delete_bug_answer(self):
+        # create dummy question
+        p = Project.create_dummy(name='Ubuntu')
+        q = ProjectInvolvementQuestion.create_dummy(is_bug_style=True)
+        # create our dummy answer
+        a = BugAnswer.create_dummy(title='i want this bug fixed', details='for these reasons', url='http://mybugreport.com', question=q, project=p, author=User.objects.get(username='paulproteus'))
+        # delete our answer
+        POST_data = {
+                'answer__pk': a.pk,
+                }
+        POST_handler = reverse(mysite.project.views.delete_bug_answer_do)
+        response = self.login_with_client().post(POST_handler, POST_data)
+        # go back to the project page and make sure that our answer isn't there anymore
+        project_url = p.get_url()
+        self.assertRedirects(response, project_url)
+        project_page = self.login_with_client().get(project_url)
+
+        self.assertNotContains(project_page, a.title)
+        self.assertNotContains(project_page, a.details)
+        self.assertNotContains(project_page, a.url)
+
+        # and make sure our answer isn't in the db anymore
+        self.assertEqual(BugAnswer.objects.filter(pk=a.pk).count(), 0)
 
 
 
