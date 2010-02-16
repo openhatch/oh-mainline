@@ -5,7 +5,8 @@ from mysite.profile.models import Person
 import mysite.profile.models
 import mysite.customs.miro
 import mysite.search.controllers
-from mysite.search.models import Project, Bug, HitCountCache, ProjectInvolvementQuestion, Answer
+from mysite.search.models import Project, Bug, HitCountCache, \
+        ProjectInvolvementQuestion, Answer, BugAnswer
 from mysite.search import views
 import lpb2json
 import datetime
@@ -1191,29 +1192,44 @@ class TestPotentialMentors(TwillTests):
         self.assertEqual(len(banshee_mentors), 2)
 
 class CreateBugAnswer(TwillTests):
+    fixtures = ['user-paulproteus']
     def test_create_bug_answer(self):
         # go to the project page
         p = Project.create_dummy(name='Ubuntu')
-        project_url = "http://openhatch.org/+projects/Ubuntu" 
-        # select the form for a question which takes a bug-style answer
-        # enter some data into the form.  submit it.
-        tc.go(make_twill_url(project_url))
-        response = tc.show()
-        print response
+        question = ProjectInvolvementQuestion.create_dummy(pk=0)
+        question.save()
+        question__pk = 0
         url = 'http://mysite.com'
         title = 'omfg i wish this bug would go away'
         details = 'kthxbai'
-        question_id = 0
-        question_form_name = 'question-long-' + str(question_id)
-        tc.fv(question_form_name, 'issue_url', url)
-        tc.fv(question_form_name, 'issue_title', title)
-        tc.fv(question_form_name, 'issue_details', details)
-        tc.submit()
-        tc.find(url)
-        tc.find(title)
-        tc.find(details)
-        # make sure that our data shows up on the page
+        POST_data = {
+                'project__pk': p.pk,
+                'question__pk': str(question__pk),
+                'bug__url': url,
+                'bug__title': title,
+                'bug__details': details
+                }
+        POST_handler = reverse(mysite.project.views.create_bug_answer_do)
+        response = self.login_with_client().post(POST_handler, POST_data)
 
+        # try to get the BugAnswer which we just submitted from the database
+        our_bug_answer = BugAnswer.objects.get(title=title)
+
+        # make sure it has the right attributes
+        self.assertEqual(our_bug_answer.url, url)
+        self.assertEqual(our_bug_answer.details, details)
+        self.assertEqual(our_bug_answer.question.pk, question__pk)
+        self.assertEqual(our_bug_answer.project.pk, p.pk)
+
+        project_url = p.get_url()
+        self.assertRedirects(response, project_url)
+
+        project_page = self.client.get(project_url)
+
+        # make sure that our data shows up on the page
+        self.assertContains(project_page, url)
+        self.assertContains(project_page, title)
+        self.assertContains(project_page, details)
 
 class CreateAnswer(TwillTests):
     fixtures = ['user-paulproteus']
@@ -1250,4 +1266,4 @@ class CreateAnswer(TwillTests):
         project_page = self.client.get(p.get_url())
         self.assertContains(project_page, POST_data['answer__text'])
 
-# vim: set nu ai et ts=4 sw=4 columns=100:
+# vim: set nu ai et ts=4 sw=4:

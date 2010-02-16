@@ -220,8 +220,16 @@ models.signals.post_save.connect(populate_icon_on_project_creation, Project)
 
 class ProjectInvolvementQuestion(models.Model):
     text = models.TextField()
+    is_bug_style = models.BooleanField(default=False)
+
     def get_answers_for_project(self, a_project):
-        return self.answers.filter(project=a_project)
+        # Which manager we use depends on whether this is a Bug-accepting
+        # question:
+        return (
+                ({True: self.bug_answers, False: self.answers}
+                [self.is_bug_style])
+                .filter(project=a_project)
+                )
 
     @staticmethod
     def create_dummy(**kwargs):
@@ -231,9 +239,17 @@ class ProjectInvolvementQuestion(models.Model):
         ret.save()
         return ret
 
+class BugAnswer(models.Model):
+    url = models.URLField()
+    title = models.CharField(blank=False, max_length=255)
+    details = models.TextField()
+    author = models.ForeignKey(User)
+    question = models.ForeignKey(ProjectInvolvementQuestion, related_name='bug_answers')
+    project = models.ForeignKey(Project)
+
 class Answer(models.Model):
     text = models.TextField(blank=False)
-    author = models.ForeignKey(User, null=True)
+    author = models.ForeignKey(User)
     question = models.ForeignKey(ProjectInvolvementQuestion, related_name='answers')
     project = models.ForeignKey(Project)
 

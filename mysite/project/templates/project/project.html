@@ -25,7 +25,7 @@ about our members who support {{ project.name }}
     </div>
     <div class='body'>
         <ul id='questions'>
-            {% for question, answers in question_answer_mappings %}
+            {% for question, answers in question_answer_mappings_non_bug %}
                 <li>
                     <h3><strong>Q</strong>: {{ question.text }}</h3>
                     <ul class='answers'>
@@ -59,29 +59,28 @@ about our members who support {{ project.name }}
         <h3>Questions for {{ project.name }} contributors</h3>
     </div>
     <div class='body'>
-        <form name='question-long-{{question.pk}}' method='post' action='{% url mysite.project.views.create_answer_do %}'>
-            <ul id='questions'>
+        <ul id='questions'>
+            {% for question, bug_answers in question_answer_mappings_bug %}
                 <li>
-                    <h3> What is a bug or issue reported in your project that stresses you out, and that you want help with?  </h3>
+                    {{ question.text }}
+                    {% for bug_answer in bug_answers %}
+                        {% include 'search/result.html' %}
+                    {% endfor %}
+                </li>
+                <form name='question-long-{{question.pk}}' method='POST'
+                        action='{% url mysite.project.views.create_bug_answer_do %}'>
+                    <input type='hidden' name='project__pk' value='{{ project.pk }}'>
+                    <input type='hidden' name='question__pk' value='{{ question.pk }}'>
                     <label>Issue URL <small style='color: #888'>(optional)</small></label>
-                    <input type='text' name='issue_url'>
+                    <input type='text' name='bug__url'>
                     <label>Issue title</label>
-                    <input type='text' name='issue_title'>
+                    <input type='text' name='bug__title'>
                     <label>What makes this issue stressful?</label>
-                    <textarea name='issue_details'></textarea>
-                </li>
-                <li>
-                    <h3> What is a specific way that a new contributor can get involved?  </h3>
-                    <label>Issue URL (optional)</label>
-                    <input type='text'>
-                    <label>Issue title</label>
-                    <input type='text'>
-                    <label>Details</label>
-                    <textarea></textarea>
-                </li>
-            </ul>
-            <input type='submit' value='Submit'>
-        </form>
+                    <textarea name='bug__details'></textarea>
+                    <input type='submit' value='Submit'>
+                </form>
+            {% endfor %}
+        </ul>
     </div>
 </div><!-- /.module #requests -->
 
