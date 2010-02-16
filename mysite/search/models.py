@@ -243,6 +243,7 @@ class Bug(models.Model):
     looks_closed = models.BooleanField(default=False)
     bize_size_tag_name = models.CharField(max_length=50) 
     concerns_just_documentation = models.BooleanField(default=False)
+    as_appears_in_distribution = models.CharField(max_length=200, default='')
 
     all_bugs = models.Manager()
     open_ones = OpenBugsManager()
