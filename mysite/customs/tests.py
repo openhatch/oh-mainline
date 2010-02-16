@@ -410,8 +410,10 @@ class BlogCrawl(django.test.TestCase):
         self.assertEqual(entries[0]['unicode_text'],
                          u'Yo \xe9')
 
+def raise_504(*args, **kwargs):
+    raise HTTPError(url="http://theurl.com/", code=504, msg="", hdrs="", fp=open("/dev/null")) 
 mock_browser_open = mock.Mock()
-mock_browser_open.side_effect = HTTPError(url="http://theurl.com/", code=504, msg="", hdrs="", fp=open("/dev/null")) 
+mock_browser_open.side_effect = raise_504
 class UserGetsMessagesDuringImport(django.test.TestCase):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
