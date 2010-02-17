@@ -39,3 +39,12 @@ def reload_bug_obj(bug_obj):
     # is good for newcomers.
     bug_obj.good_for_newcomers=True
     return bug_obj
+
+def current_fit_and_finish_bug_ids():
+    # This returns a list of bug IDs we should look at
+    # that's all the dependencies of this tracking bug. So:
+    b = mysite.customs.ohloh.mechanize_get(FIT_AND_FINISH_TRACKING_BUG)
+    xml = lxml.etree.XML(b.response().read())
+    depends = xml.findall('bug/dependson')
+    depends_bug_ids = [int(depend.text) for depend in depends]
+    return depends_bug_ids
