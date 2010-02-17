@@ -157,7 +157,7 @@ class RefreshAllFedoraFitAndFinishBugs(PeriodicTask):
         logger = self.get_logger(**kwargs)
         logger.info("Starting refreshing all Fedora bugs.")
         for bug in mysite.search.models.Bug.all_bugs.filter(
-            canonical_bug_link__starts_with=
+            canonical_bug_link__contains=
             mysite.customs.bugtrackers.fedora_fitfinish.BUG_URL_PREFIX):
             bug_id = mysite.customs.bugtrackers.bugzilla_general.bug_url2bug_id(bug.canonical_bug_link,
                                                                                 BUG_URL_PREFIX=mysite.customs.bugtrackers.fedora_fitfinish.BUG_URL_PREFIX)
