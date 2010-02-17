@@ -32,7 +32,8 @@ body#project ul.answers textarea.blur { height: 1.2em; }
 body#project .questions > li { display: block; margin: 10px 0 20px; }
 
 body#project .bug_answer_title { font-size: .9em; border-bottom: 1px solid #e4e4e4; padding-bottom: 3px; margin-bottom: 3px; }
-body#project form.active { float: left; background-color: #ffc; padding: 4px 12px; -moz-border-radius: 8px; border-radius: 8px; margin-bottom: 20px; }
+body#project form.answer_question { padding: 4px 12px; }
+body#project form.active { float: left; background-color: #ffc;  -moz-border-radius: 8px; border-radius: 8px; margin-bottom: 20px; }
 body#project form.active .show_when_editing { display: block; }
 body#project form.active a.collapse_answer_form { padding: 4px; margin-left: 10px; display: inline; font-size: .8em;}
 
@@ -51,3 +52,4 @@ body#project label { margin: 6px 0 3px 0; display: block; }
 
 
 body#project .questions li form.delete input[type='submit']{ float: right; font-size: .8em; padding: 0px; }
+
