@@ -19,17 +19,14 @@ about our members who support {{ project.name }}
 {% endblock pagetop %}
 
 {% block left %}
-<div class='module contains_questions' id='about-joining'>
-    <div class='head'>
-        <h3>About joining {{ project.name }}</h3>
-    </div>
+{% for question, answers in question_answer_mappings_non_bug %}
+<div class='module contains_questions'>
     <div class='body'>
         <ul id='paragraph_questions' class='questions'>
-            {% for question, answers in question_answer_mappings_non_bug %}
                 <li>
                     <style type="text/css">
                     </style>
-                    <h3><strong>Q</strong>:
+                    <h3><strong>Q:</strong>
                         {% ifequal question.key_string 'non_code_participation' %}
                             Other than writing code, how can people participate
                             in {{ project.name }}?
@@ -55,77 +52,90 @@ about our members who support {{ project.name }}
                                 <small>&nbsp;&nbsp;&nbsp;&mdash; <a style='font-weight: bold;' href='{{ answer.author.get_profile.get_profile_url }}'>{{ answer.author.get_profile.get_full_name_or_username }}</a></small></li>
                         {% endfor  %}
                         <li>
-                        <form class="answer_question" name='question-short-{{question.pk}}' method='post' action='{% url mysite.project.views.create_answer_do %}'>
-                    <a href="" class='collapse_answer_form show_when_editing'>close</a>
-                            <input type="hidden" name="question__pk" value="{{question.pk}}" />
-                            <input type="hidden" name="project__pk" value="{{project.pk}}" />
+                            <form class="answer_question" name='question-short-{{question.pk}}' method='post' action='{% url mysite.project.views.create_answer_do %}'>
+                                <input type="hidden" name="question__pk"
+                                        value="{{question.pk}}" />
+                                <input type="hidden" name="project__pk"
+                                        value="{{project.pk}}" />
                                 <textarea class='add_an_answer'
                                         id='answer-question{{ forloop.counter0 }}'
                                         title='Add an answer'
                                         name='answer__text'></textarea>
-                                    <div class='input-note show_when_editing'>
+                                <div class='show_when_editing'>
+                                    <div class='input-note'>
                                         {% ifequal question.key_string 'non_code_participation' %}
-                                            <p>
-                                                <strong>Tip</strong>: Projects
-                                                often need documentation,
-                                                website management, marketing,
-                                                and/or testing. Be specific, for
-                                                example:
-                                            </p>
-                                            <ul>
+                                            <ul class='sections'>
                                                 <li>
-                                                    We need people to download version
-                                                    0.4.5 and make sure the frobulator
-                                                    still frobulates correctly.
+                                                    <p>
+                                                        <strong>Tip</strong>:
+                                                    </p>
+                                                    <p>
+                                                        Discuss documentation,
+                                                        testing, webmastering,
+                                                        and/or publicity.
+                                                    </p>
+                                                    <p>Include URLs if relevant (we'll
+                                                        automatically linkify them). </p>
+                                                </li>
+                                                <li>
+                                                    <p>
+                                                        <strong>Example</strong>:
+                                                    </p>
+                                                    <p class='example'>
+                                                        We need people to download version
+                                                        0.4.5 and make sure the frobulator
+                                                        still frobulates correctly.
+                                                    </p>
                                                 </li>
                                             </ul>
-                                            <p>Include URLs if relevant (we'll
-                                                automatically linkify them). </p>
                                         {% endifequal %}
 
                                         {% ifequal question.key_string 'where_to_start' %}
-                                            <p>
-                                                <strong>Tip</strong>: Talk
-                                                about diverse kinds of
-                                                contributions.  Include URLs if
-                                                relevant (we'll automatically
-                                                linkify them).
-                                            </p>
-
-                                            <p>
-                                                For example:
-                                            </p>
-                                            <ul>
+                                            <ul class='sections'>
                                                 <li>
-                                                &ldquo;Drop me a line at
-                                                &lt;hello@example.com&gt; if you
-                                                want to get involved.&rdquo;
+                                                    <p>
+                                                        <strong>Tip</strong>:
+                                                    </p>
+                                                    <p>
+                                                        Talk about diverse
+                                                        kinds of contributions.
+                                                        Include URLs if
+                                                        relevant (we'll
+                                                        automatically linkify
+                                                        them).
+                                                    </p>
                                                 </li>
                                                 <li>
-                                                &ldquo;Visit our welcome page to learn
-                                                about our mailing lists, forums,
-                                                irc channel, and planet.&rdquo;
-                                                </li>
-                                                <li>
-                                                &ldquo;Read the community guidelines here.&rdquo;
-                                                </li>
-                                                <li>
-                                                &ldquo;Be sure to bone up on your
-                                                urllib; you're gonna need
-                                                it.&rdquo;
+                                                    <p>
+                                                        <strong>Examples</strong>:
+                                                    </p>
+                                                    <p class='example'>
+                                                        Drop me a line at
+                                                        &lt;hello@example.com&gt;
+                                                        if you want to get
+                                                        involved.
+                                                    </p>
+                                                    <p class='example'>
+                                                        Visit our welcome page
+                                                        (example.com/hi) to learn
+                                                        about our mailing
+                                                        lists, forums, irc
+                                                        channel, and planet.
+                                                    </p>
                                                 </li>
                                             </ul>
                                         {% endifequal %}
                                     </div>
-                                    <input type='submit' class='show_when_editing' value='Submit'>
-                                </form>
+                                    <input type='submit' value='Submit'>
+                                </div><!-- /.show_when_editing -->
+                            </form>
                         </li>
                     </ul>
                 </li>
-            {% endfor %}
         </ul>
     </div>
 </div><!-- /.module #about-joining -->
+{% endfor %}
 
 <div class='module contains_questions' id='requests'>
     <div class='head'>
@@ -149,15 +159,17 @@ about our members who support {{ project.name }}
             <li>
             <ul class='answers'>
                 {% ifequal question.key_string 'stress' %}
-                    <p> What is a bug or issue with {{ project.name }} that you
-                        have tried to solve but would like further assistance
-                        with?  </p>
-
-                    <p> What is a bug or issue with {{ project.name }} that
-                        you've been putting off that is stressing you out? </p>
+                    <h3>
+                        <strong>Q:</strong>
+                        What is a bug or issue with {{ project.name }} that
+                        you've been putting off that is stressing you out?
+                    </h3>
                 {% endifequal %}
                 {% ifequal question.key_string 'newcomers' %}
-                    What is a good issue for a newcomer to start out with?
+                    <h3>
+                        <strong>Q:</strong>
+                        What is a good issue for a newcomer to start out with?
+                    </h3>
                 {% endifequal %}
 
                 {% for bug_answer in bug_answers %}
@@ -176,90 +188,115 @@ about our members who support {{ project.name }}
                 {% endfor  %}
                 <li>
                     <form class="answer_question" name='question-long-{{question.pk}}' method='POST'
-                        action='{% url mysite.project.views.create_bug_answer_do %}'>
-                    <a href="" class='collapse_answer_form show_when_editing'>close</a>
-                    <input type='hidden' name='project__pk' value='{{ project.pk }}'>
-                    <input type='hidden' name='question__pk' value='{{ question.pk }}'>
-                    <div class="show_when_editing">
-                    <label>Describe an issue</label>
-                    </div>
-                    <input type='text' name='bug__title' title='Describe an issue' class='add_an_answer'>
-                    <div class="show_when_editing">
-                    {% ifequal question.key_string 'stress' %}
-                    <label>What makes this issue stressful?</label>
-                    {% endifequal %}
-                    {% ifequal question.key_string 'newcomers' %}
-                    <label>Further info</label>
-                    {% endifequal %}
-                    <textarea name='bug__details'></textarea>
-                    <div class='input-note'>
-                        {% ifequal question.key_string 'stress' %}
-
-                                    <p>
-                                        For example:
-                                    </p>
-                                    <ul>
+                            action='{% url mysite.project.views.create_bug_answer_do %}'>
+                        <input type='hidden' name='project__pk' value='{{ project.pk }}'>
+                        <input type='hidden' name='question__pk' value='{{ question.pk }}'>
+                        <div class="show_when_editing">
+                            <label for='q{{ question.pk }}-bug__title'>
+                                Describe an issue</label>
+                        </div>
+                        <input type='text' name='bug__title' title='Describe an issue' 
+                                id='q{{ question.pk }}-bug__title' 
+                                class='add_an_answer' />
+                        <div class="show_when_editing">
+                            {% ifequal question.key_string 'stress' %}
+                                <label for='q{{ question.pk }}-bug__details'>
+                                    What makes this issue stressful?</label>
+                            {% endifequal %}
+                            {% ifequal question.key_string 'newcomers' %}
+                                <label for='q{{ question.pk }}-bug__details'>
+                                    Further info</label>
+                            {% endifequal %}
+                            <textarea id='q{{ question.pk }}-bug__details' 
+                                    name='bug__details'></textarea>
+                            <div class='input-note'>
+                                {% ifequal question.key_string 'stress' %}
+                                    <ul class='sections'>
                                         <li>
-                                        I don't know how to get started with
-                                        internationalizing my app.
+                                            <p>
+                                                <strong>Examples</strong>:
+                                            </p>
+                                            <p class='example'>
+                                                I don't know how to get started with
+                                                internationalizing my app.
+                                            </p>
+                                            <p class='example'>
+                                                Bug 392 about printing was filed five
+                                                years ago, and I don't even know if
+                                                printing still works.
+                                            </p>
+                                            <p class='example'>
+                                                I want help from a C coder writing a
+                                                Maildir patch for Alpine.
+                                            </p>
                                         </li>
                                         <li>
-                                        Bug 392 about printing was filed five
-                                        years ago, and I don't even know if
-                                        printing still works.
-                                        </li>
-                                        <li>
-                                        I want help from a C coder writing a
-                                        Maildir patch for Alpine.
+                                            <p>
+                                                <strong>Note</strong>:
+                                            </p>
+                                            <p>
+                                                If this issue was formally
+                                                filed on the web, be sure to
+                                                include the URL.
+                                            </p>
                                         </li>
                                     </ul>
-                                    <p>Include URLs if relevant (we'll
-                                        automatically linkify them). </p>
-                        {% endifequal %}
+                                {% endifequal %}
 
-                        {% ifequal question.key_string 'newcomers' %}
-                                    <p>
-                                        <strong>Tip</strong>: Many projects have good small tasks
-                                        that can teach newcomers how the
-                                        project works. Now's your chance to
-                                        share one of them!
-                                    </p>
-                                        
-                                    <p>
-                                        For example: &ldquo;Someone could improve the
-                                        photo upload dialog box so that it lets
-                                        you resize the photo before sending it
-                                        to the web.&rdquo;
-                                    </p>
-                                    <p>
-                                        Include URLs if relevant (we'll
-                                        automatically linkify them). </p>
-                        {% endifequal %}
-                                </div>
+                                {% ifequal question.key_string 'newcomers' %}
+                                    <ul class='sections'>
+                                        <li>
+                                            <p>
+                                                <strong>Tip</strong>:
+                                            </p>
+                                            <p>
+                                                Many projects have
+                                                good small tasks that can teach newcomers
+                                                how the project works. Now's your chance to
+                                                share one of them!
+                                            </p>
+                                            <p>
+                                                Include URLs if relevant (we'll
+                                                automatically linkify them). </p>
+                                        </li>
+                                        <li>
+                                            <p>
+                                                <strong>Example</strong>:
+                                            </p>
+                                            <p class='example'>
+                                                Someone could improve the
+                                                photo upload dialog box so that it lets
+                                                you resize the photo before sending it
+                                                to the web.
+                                            </p>
+                                        </li>
+                                    </ul>
+                                {% endifequal %}
+                            </div>
 
-                    <input type='submit' value='Submit'>
-                    </div>
+                            <input type='submit' value='Submit'>
+                        </div>
                 </form>
                 </li>
 
             </ul>
-                </li>
-            {% endfor %}
-        </ul>
+        </li>
+    {% endfor %}
+</ul>
     </div>
 </div><!-- /.module #requests -->
 
 {% endblock left %}
 
 {% block main %}
-<div class='module' id='bugs'>
-    <div class='head'>
-        <h3>Relatedly</h3>
-    </div>
-    <div class='body'>
-        {% if project.get_open_bugs %}
-            <p>
-                Browse {{ project.get_open_bugs|length }}+
+    <div class='module' id='bugs'>
+        <div class='head'>
+            <h3>Relatedly</h3>
+        </div>
+        <div class='body'>
+            {% if project.get_open_bugs %}
+                <p>
+                    Browse {{ project.get_open_bugs|length }}+
                     <a href='/search/?q={{ project.name_with_quotes_if_necessary|urlencode }}'>
                         volunteer opportunit{{ project.get_open_bugs|pluralize:"y,ies"}}
                         matching
@@ -334,12 +371,12 @@ about our members who support {{ project.name }}
                 });
 
             $('input:text, textarea').hint();
-            //bind a function to the 'x' on input forms.  this function collapses the form
+            // Bind a function to the 'x' on input forms.  this function collapses the form
             $('.collapse_answer_form').click(function(){
-                    $form = $(this).parent();
-                    $form.removeClass('active');
-                    $form.find('input:text, textarea').hint();
-                    return false;
+                $form = $(this).parent().parent();
+                $form.removeClass('active');
+                $form.find('input:text, textarea').hint();
+                return false;
             });
 
         })
