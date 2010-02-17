@@ -111,6 +111,7 @@ class Query:
                     Q(project__language__iexact=word) |
                     Q(title__iregex=whole_word) |
                     Q(description__iregex=whole_word) |
+                    Q(as_appears_in_distribution__iregex=whole_word) |
 
                     # 'firefox' grabs 'mozilla firefox'.
                     Q(project__name__iregex=whole_word)
