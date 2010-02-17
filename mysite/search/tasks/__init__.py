@@ -132,7 +132,8 @@ class LookAtOneFedoraBug(Task):
             bug_objs = mysite.search.models.Bug.all_bugs.filter(
                 canonical_bug_link=bug_url)
             bug_obj = bug_objs[0]
-            bug_objs[1:].delete()
+            for stupid_dup in bug_objs[1:]:
+                stupid_dup.delete()
 
         except mysite.search.models.Bug.DoesNotExist:
             bug_obj = mysite.search.models.Bug(
