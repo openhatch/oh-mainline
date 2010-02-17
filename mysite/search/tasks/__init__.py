@@ -114,16 +114,6 @@ class GrabPythonBugs(PeriodicTask):
         p.save()
         p.grab()
 
-class LearnAboutNewFedoraFitAndFinishBugs(PeriodicTask):
-    run_every = timedelta(days=1)
-    def run(self, **kwargs):
-        logger = self.get_logger(**kwargs)
-        logger.info('Started to learn about new Fedora fit and finish bugs.')
-        for bug_id in mysite.customs.bugtrackers.fedora_fitfinish.current_fit_and_finish_bug_ids():
-            task = LookAtOneFedoraBug()
-            task.delay(bug_id=bug_id)
-        logger.info('Finished grabbing the list of Fedora fit and finish bugs.')
-
 class LookAtOneFedoraBug(Task):
     def run(self, bug_id, **kwargs):
         logger = self.get_logger(**kwargs)
@@ -150,6 +140,16 @@ class LookAtOneFedoraBug(Task):
             mysite.customs.bugtrackers.fedora_fitfinish.reload_bug_obj(bug_obj)
             bug_obj.save()
         logging.info("Finished with %d from Fedora." % bug_id)
+
+class LearnAboutNewFedoraFitAndFinishBugs(PeriodicTask):
+    run_every = timedelta(days=1)
+    def run(self, **kwargs):
+        logger = self.get_logger(**kwargs)
+        logger.info('Started to learn about new Fedora fit and finish bugs.')
+        for bug_id in mysite.customs.bugtrackers.fedora_fitfinish.current_fit_and_finish_bug_ids():
+            task = LookAtOneFedoraBug()
+            task.delay(bug_id=bug_id)
+        logger.info('Finished grabbing the list of Fedora fit and finish bugs.')
 
 class RefreshAllFedoraFitAndFinishBugs(PeriodicTask):
     run_every = timedelta(days=1)
@@ -199,5 +199,6 @@ tasks.register(LearnAboutNewPythonDocumentationBugs)
 tasks.register(LookAtOneBugInPython)
 tasks.register(GrabPythonBugs)
 tasks.register(LookAtOneFedoraBug)
+tasks.register(LearnAboutNewFedoraFitAndFinishBugs)
 tasks.register(RefreshAllFedoraFitAndFinishBugs)
 tasks.register(PopulateProjectLanguageFromOhloh)
