@@ -30,12 +30,12 @@ about our members who support {{ project.name }}
                     <style type="text/css">
                     </style>
                     <h3><strong>Q</strong>:
-                        {% ifequal question.pk 0 %}
+                        {% ifequal question.key_string 'non_code_participation' %}
                             Other than writing code, how can people participate
                             in {{ project.name }}?
                         {% endifequal %}
 
-                        {% ifequal question.pk 1 %}
+                        {% ifequal question.key_string 'where_to_start' %}
                         I'm interested in getting involved in
                         {{ project.name }}. Where do I start?
                         {% endifequal %}
@@ -64,7 +64,7 @@ about our members who support {{ project.name }}
                                         title='Add an answer'
                                         name='answer__text'></textarea>
                                     <div class='input-note show_when_editing'>
-                                        {% ifequal question.pk 0 %}
+                                        {% ifequal question.key_string 'non_code_participation' %}
                                             <p>
                                                 <strong>Tip</strong>: Projects
                                                 often need documentation,
@@ -83,7 +83,7 @@ about our members who support {{ project.name }}
                                                 automatically linkify them). </p>
                                         {% endifequal %}
 
-                                        {% ifequal question.pk 1 %} 
+                                        {% ifequal question.key_string 'where_to_start' %}
                                             <p>
                                                 <strong>Tip</strong>: Talk
                                                 about diverse kinds of
@@ -148,7 +148,7 @@ about our members who support {{ project.name }}
             {% for question, bug_answers in question_answer_mappings_bug %}
             <li>
             <ul class='answers'>
-                {% ifequal question.pk 2 %}
+                {% ifequal question.key_string 'stress' %}
                     <p> What is a bug or issue with {{ project.name }} that you
                         have tried to solve but would like further assistance
                         with?  </p>
@@ -156,7 +156,7 @@ about our members who support {{ project.name }}
                     <p> What is a bug or issue with {{ project.name }} that
                         you've been putting off that is stressing you out? </p>
                 {% endifequal %}
-                {% ifequal question.pk 3 %}
+                {% ifequal question.key_string 'newcomers' %}
                     What is a good issue for a newcomer to start out with?
                 {% endifequal %}
 
@@ -185,15 +185,15 @@ about our members who support {{ project.name }}
                     </div>
                     <input type='text' name='bug__title' title='Describe an issue' class='add_an_answer'>
                     <div class="show_when_editing">
-                    {% ifequal question.pk 2 %}
+                    {% ifequal question.key_string 'stress' %}
                     <label>What makes this issue stressful?</label>
                     {% endifequal %}
-                    {% ifequal question.pk 3 %}
+                    {% ifequal question.key_string 'newcomers' %}
                     <label>Further info</label>
                     {% endifequal %}
                     <textarea name='bug__details'></textarea>
                     <div class='input-note'>
-                        {% ifequal question.pk 2 %}
+                        {% ifequal question.key_string 'stress' %}
 
                                     <p>
                                         For example:
@@ -217,7 +217,7 @@ about our members who support {{ project.name }}
                                         automatically linkify them). </p>
                         {% endifequal %}
 
-                        {% ifequal question.pk 3 %} 
+                        {% ifequal question.key_string 'newcomers' %}
                                     <p>
                                         <strong>Tip</strong>: Many projects have good small tasks
                                         that can teach newcomers how the

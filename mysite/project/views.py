@@ -17,16 +17,18 @@ def project(request, project__name = None):
     # Get or create two paragraph-y questions.
     question_answer_mappings_non_bug = []
     questions = []
-    questions.append(ProjectInvolvementQuestion.objects.get_or_create(pk=0, is_bug_style=False)[0])
-    questions.append(ProjectInvolvementQuestion.objects.get_or_create(pk=1, is_bug_style=False)[0])
+    questions.append(ProjectInvolvementQuestion.objects.get_or_create(
+        key_string='non_code_participation', is_bug_style=False)[0])
+    questions.append(ProjectInvolvementQuestion.objects.get_or_create(
+        key_string='where_to_start', is_bug_style=False)[0])
     for question in questions:
         question_answer_mappings_non_bug.append((question, question.get_answers_for_project(p)))
 
     # Get or create two buggy questions.
     question_answer_mappings_bug = []
     bug_questions = []
-    bug_questions.append(ProjectInvolvementQuestion.objects.get_or_create(pk=2, is_bug_style=True)[0])
-    bug_questions.append(ProjectInvolvementQuestion.objects.get_or_create(pk=3, is_bug_style=True)[0])
+    bug_questions.append(ProjectInvolvementQuestion.objects.get_or_create(key_string='stress', is_bug_style=True)[0])
+    bug_questions.append(ProjectInvolvementQuestion.objects.get_or_create(key_string='newcomers', is_bug_style=True)[0])
     for question in bug_questions:
         question_answer_mappings_bug.append((question, question.get_answers_for_project(p)))
 

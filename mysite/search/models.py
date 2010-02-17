@@ -221,6 +221,7 @@ def populate_icon_on_project_creation(instance, created, *args, **kwargs):
 models.signals.post_save.connect(populate_icon_on_project_creation, Project)
 
 class ProjectInvolvementQuestion(models.Model):
+    key_string = models.CharField(max_length=255)
     text = models.TextField()
     is_bug_style = models.BooleanField(default=False)
 
