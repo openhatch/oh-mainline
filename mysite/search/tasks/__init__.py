@@ -127,6 +127,14 @@ class LookAtOneFedoraBug(Task):
         try:
             bug_obj = mysite.search.models.Bug.all_bugs.get(
                 canonical_bug_link=bug_url)
+        except mysite.search.models.Bug.MultipleObjectsReturned:
+            # delete all but the first
+            bug_objs = mysite.search.models.Bug.all_bugs.filter(
+                canonical_bug_link=bug_url)
+            bug_obj = bug_objs[0]
+            for stupid_dup in bug_objs[1:]:
+                stupid_dup.delete()
+
         except mysite.search.models.Bug.DoesNotExist:
             bug_obj = mysite.search.models.Bug(
                 canonical_bug_link=bug_url)
