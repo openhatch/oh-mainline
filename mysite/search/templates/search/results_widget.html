@@ -55,25 +55,26 @@
 
     </span>
 
+
+    <div id='expand-collapse-all'>
+        <a href='#' id='expand-all-link'><img src='/static/images/icons/zoom-in.png' />Expand all</a>
+        <a href='#' id='collapse-all-link'><img src='/static/images/icons/zoom-out.png' />Collapse all</a>
+    </div>
+
     {% if show_prev_page_link or show_next_page_link %}
     <span class='separator'>&nbsp;</span>
 
-    <span id='navigation'>
+    <span id='navigation' style="clear: both;">
         {% if show_prev_page_link %}
         <a href='{{ prev_page_url }}' id='prev-page'>&laquo; Prev</a>
         <span class='separator'>&nbsp;</span>
         {% endif %}
 
         {% if show_next_page_link %}
-        <a href='{{ next_page_url }}' id='next-page'>Next&nbsp;page &raquo;</a>
+        <a href='{{ next_page_url }}' id='next-page'>Next&nbsp;&raquo;</a>
         {% endif %}
     </span>
     {% endif %}
-
-    <div id='expand-collapse-all'>
-        <a href='#' id='expand-all-link'><img src='/static/images/icons/zoom-in.png' />Expand all</a>
-        <a href='#' id='collapse-all-link'><img src='/static/images/icons/zoom-out.png' />Collapse all</a>
-    </div>
 
 </div><!-- /#results-widget -->
 {# vim: set filetype=htmldjango: #}
