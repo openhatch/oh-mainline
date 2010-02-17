@@ -51,5 +51,5 @@ body#project .input-note p.example { color: #555; -moz-border-radius: 4px; borde
 body#project label { margin: 6px 0 3px 0; display: block; }
 
 
-body#project .questions li form.delete input[type='submit']{ float: right; font-size: .8em; padding: 0px; }
+body#project .questions li form.delete input[type='submit']{ float: right; font-size: .8em; margin-left: 5px; padding: 0px; }
 
