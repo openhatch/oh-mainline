@@ -128,7 +128,6 @@ about our members who support {{ project.name }}
                                                             channel, and planet.
                                                         </p>
                                                     </li>
-
                                                 </ul>
                                             {% endifequal %}
                                         </div>
@@ -137,7 +136,7 @@ about our members who support {{ project.name }}
                                 </form>
                                 {% else %}
                                 {# if they aren't logged in#}
-                                <a href="{% url oh_login %}?next={{ project.get_url }}" style="">Log in to add an answer</a>
+                                <a href="{% url oh_login %}?next={{ project.get_url|urlencode}}" style="">Log in to add an answer</a>
                                 {% endif %}
                                 </li>
                             </ul>
@@ -177,6 +176,9 @@ about our members who support {{ project.name }}
                 <small>&nbsp;&nbsp;&nbsp;&mdash; <a style='font-weight: bold;' href='{{ bug_answer.author.get_profile.get_profile_url }}'>{{ bug_answer.author.get_profile.get_full_name_or_username }}</a></small></li>
                 {% endfor  %}
                 <li>
+
+                
+                            {% if the_user.is_authenticated %}
                     <form class="answer_question" name='question-long-{{question.pk}}' method='POST'
                             action='{% url mysite.project.views.create_bug_answer_do %}'>
                         <input type='hidden' name='project__pk' value='{{ project.pk }}'>
@@ -267,6 +269,10 @@ about our members who support {{ project.name }}
                             <input type='submit' value='Submit'>
                         </div>
                 </form>
+                                {% else %}
+                                {# if they aren't logged in#}
+                                <a href="{% url oh_login %}?next={{ project.get_url|urlencode}}" style="">Log in to add an answer</a>
+                                {% endif %}
                 </li>
 
             </ul>
