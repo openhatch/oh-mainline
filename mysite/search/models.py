@@ -216,8 +216,15 @@ class Project(models.Model):
 def populate_icon_on_project_creation(instance, created, *args, **kwargs):
     if created and not instance.icon_raw:
         instance.populate_icon_from_ohloh()
-        
+
+def grab_project_language_from_ohloh(instance, created, *args,
+                                     **kwargs):
+    if created and not instance.language:
+        task = mysite.search.tasks.PopulateProjectLanguageFromOhloh()
+        task.delay(project_id=instance.id)
+
 models.signals.post_save.connect(populate_icon_on_project_creation, Project)
+models.signals.post_save.connect(grab_project_language_from_ohloh, Project)
 
 # An easy way to find 
 

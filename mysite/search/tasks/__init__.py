@@ -1,4 +1,6 @@
 from datetime import timedelta
+import datetime
+import logging
 from mysite.search.models import Project
 from mysite.customs.models import RoundupBugTracker
 from celery.task import Task, PeriodicTask
@@ -132,8 +134,12 @@ class LookAtOneFedoraBug(Task):
             bug_id=bug_id,
             BUG_URL_PREFIX=mysite.customs.bugtrackers.fedora_fitfinish.BUG_URL_PREFIX)
 
-        bug_obj, _ = mysite.search.models.Bug.all_bugs.get_or_create(
-            canonical_bug_link=bug_url)
+        try:
+            bug_obj = mysite.search.models.Bug.all_bugs.get(
+                canonical_bug_link=bug_url)
+        except mysite.search.models.Bug.DoesNotExist:
+            bug_obj = mysite.search.models.Bug(
+                canonical_bug_link=bug_url)
 
         # Is that bug fresh enough?
         if (datetime.datetime.now() - bug_obj.last_polled
@@ -158,6 +164,33 @@ class RefreshAllFedoraFitAndFinishBugs(PeriodicTask):
             task = LookAtOneFedoraBug()
             task.delay(bug_id=bug_id)
 
+class PopulateProjectLanguageFromOhloh(Task):
+    def run(self, project_id, **kwargs):
+        logger = self.get_logger(**kwargs)
+        p = Project.objects.get(id=project_id)
+        if not p.language:
+            oh = mysite.customs.ohloh.get_ohloh()
+            try:
+                analysis_id = oh.get_latest_project_analysis_id(p.name)
+            except KeyError:
+                logger.info("No Ohloh analysis found -- early %s" %
+                            p.name)
+                return
+            try:
+                data, _ = oh.analysis_id2analysis_data(analysis_id)
+            except KeyError:
+                logger.info("No Ohloh analysis found for %s" % 
+                            p.name)
+                return
+            if ('main_language_name' in data and
+                data['main_language_name']):
+                # re-get to minimize race condition time
+                p = Project.objects.get(id=project_id)
+                p.language = data['main_language_name']
+                p.save()
+                logger.info("Set %s.language to %s" %
+                            (p.name, p.language))
+
 tasks.register(GrabMiroBugs)
 tasks.register(GrabGnomeLoveBugs)
 tasks.register(GrabLaunchpadBugs)
@@ -165,3 +198,6 @@ tasks.register(LearnAboutNewEasyPythonBugs)
 tasks.register(LearnAboutNewPythonDocumentationBugs)
 tasks.register(LookAtOneBugInPython)
 tasks.register(GrabPythonBugs)
+tasks.register(LookAtOneFedoraBug)
+tasks.register(RefreshAllFedoraFitAndFinishBugs)
+tasks.register(PopulateProjectLanguageFromOhloh)

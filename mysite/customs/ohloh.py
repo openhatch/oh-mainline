@@ -166,13 +166,16 @@ class Ohloh(object):
     
     @accepts(object, int)
     def analysis2projectdata(self, analysis_id):
-        url = 'http://www.ohloh.net/analyses/%d.xml?' % analysis_id
-        data, web_response = ohloh_url2data(url=url, selector='result/analysis')
-
-        # Otherwise, get the project name
+        data, web_response = self.analysis_id2analysis_data(analysis_id)
         proj_id = data['project_id']
         return self.project_id2projectdata(int(proj_id))
         
+    @accepts(object, int)
+    def analysis_id2analysis_data(self, analysis_id):
+        url = 'http://www.ohloh.net/analyses/%d.xml?' % analysis_id
+        data, web_response = ohloh_url2data(url=url, selector='result/analysis')
+        return data, web_response
+
     def get_contribution_info_by_username(self, username, person=None):
         '''Input: A username. We go out and ask Ohloh, "What repositories
         have you indexed where that username was a committer?"

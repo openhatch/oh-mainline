@@ -21,18 +21,24 @@ def reload_bug_obj(bug_obj):
     bug_id = mysite.customs.bugtrackers.bugzilla_general.bug_url2bug_id(
         bug_obj.canonical_bug_link,
         BUG_URL_PREFIX=BUG_URL_PREFIX)
-
+    b = mysite.customs.ohloh.mechanize_get(BUG_URL_PREFIX + '%d&ctype=xml' % bug_id)
     # Grab the bug_elt for this bug...
-    bug_elt = lxml.etree.XML(b.open(BUG_URL_PREFIX + '%d&ctype=xml' % bug_id).read()).find('bug')
-        
+    bug_elt = lxml.etree.XML(
+        b.response().read()).find('bug')
+    
     # FIXME: Move bug_elt2bug_object into bugzilla_general
-    bug_obj = mysite.customs.miro.bug_elt2bug_object(
+    data = mysite.customs.miro.bug_elt2bug_dict(
         bug_elt,
         canonical_bug_link_format_string=BUG_URL_PREFIX + '%d',
         gen_project=project_finder_plugin)
 
+    data['title'] = '(in Fedora) ' + data['title']
+
+    for key in data:
+        setattr(bug_obj, key, data[key])
+
     # Bug is from Fedora
-    bug.as_appears_in_distribution = 'Fedora'
+    bug_obj.as_appears_in_distribution = 'Fedora'
 
     # NOTE this makes it bitesized
     # NOTE also that this is a bad place to determine something
