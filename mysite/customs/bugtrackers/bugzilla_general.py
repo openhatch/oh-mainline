@@ -2,6 +2,9 @@ def bug_url2bug_id(url, BUG_URL_PREFIX):
     before, after = url.split(BUG_URL_PREFIX)
     return int(after)
 
+def bug_id2bug_url(bug_id, BUG_URL_PREFIX):
+    return BUG_URL_PREFIX + str(bug_id)
+
 def get_remote_bug_ids_already_stored(BUG_URL_PREFIX):
     for bug in mysite.search.models.Bug.all_bugs.filter(
         canonical_bug_link__contains=BUG_URL_PREFIX):

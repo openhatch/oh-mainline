@@ -235,7 +235,7 @@ class Bug(models.Model):
     people_involved = models.IntegerField(null=True)
     date_reported = models.DateTimeField()
     last_touched = models.DateTimeField()
-    last_polled = models.DateTimeField()
+    last_polled = models.DateTimeField(default=datetime.datetime(1970, 1, 1))
     submitter_username = models.CharField(max_length=200)
     submitter_realname = models.CharField(max_length=200, null=True)
     canonical_bug_link = models.URLField(max_length=200)
