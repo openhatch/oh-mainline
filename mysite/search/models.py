@@ -217,8 +217,15 @@ class Project(models.Model):
 def populate_icon_on_project_creation(instance, created, *args, **kwargs):
     if created and not instance.icon_raw:
         instance.populate_icon_from_ohloh()
-        
+
+def grab_project_language_from_ohloh(instance, created, *args,
+                                     **kwargs):
+    if created and not instance.language:
+        task = mysite.search.tasks.PopulateProjectLanguageFromOhloh()
+        task.delay(project_id=instance.id)
+
 models.signals.post_save.connect(populate_icon_on_project_creation, Project)
+models.signals.post_save.connect(grab_project_language_from_ohloh, Project)
 
 class ProjectInvolvementQuestion(models.Model):
     key_string = models.CharField(max_length=255)
@@ -285,7 +292,7 @@ class Bug(models.Model):
     people_involved = models.IntegerField(null=True)
     date_reported = models.DateTimeField()
     last_touched = models.DateTimeField()
-    last_polled = models.DateTimeField()
+    last_polled = models.DateTimeField(default=datetime.datetime(1970, 1, 1))
     submitter_username = models.CharField(max_length=200)
     submitter_realname = models.CharField(max_length=200, null=True)
     canonical_bug_link = models.URLField(max_length=200)
@@ -293,6 +300,7 @@ class Bug(models.Model):
     looks_closed = models.BooleanField(default=False)
     bize_size_tag_name = models.CharField(max_length=50) 
     concerns_just_documentation = models.BooleanField(default=False)
+    as_appears_in_distribution = models.CharField(max_length=200, default='')
 
     all_bugs = models.Manager()
     open_ones = OpenBugsManager()

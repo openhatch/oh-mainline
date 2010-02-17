@@ -5,26 +5,17 @@ import mysite.customs.ohloh
 import lxml.etree
 import mysite.customs.models
 import mysite.search.models
+import mysite.customs.bugtrackers.bugzilla_general
 
 GNOME_LOVE_QUERY='https://bugzilla.gnome.org/buglist.cgi?columnlist=id&keywords=gnome-love&query_format=advanced&resolution=---'
 BUG_URL_PREFIX = 'https://bugzilla.gnome.org/show_bug.cgi?id='
-
-def find_ctype_xml_form_number(forms):
-    for n, form in enumerate(forms):
-        try:
-            value = form.get_value('ctype')
-            if value == 'xml':
-                return n
-        except:
-            pass
-    raise ValueError, "Could not find the right form."
-    
 
 def get_current_bug_id2bug_objs():
     b = mysite.customs.ohloh.mechanize_get(GNOME_LOVE_QUERY)
 
     # find the one form with ctype XML
-    ctype_xml_form_no = find_ctype_xml_form_number(b.forms())
+    ctype_xml_form_no = mysite.customs.bugtrackers.bugzilla_general.find_ctype_xml_form_number(
+        b.forms())
 
     # Click ze button
     b.select_form(nr=ctype_xml_form_no)
@@ -54,21 +45,13 @@ def get_current_bug_id2bug_objs():
             bug, canonical_bug_link_format_string=BUG_URL_PREFIX + '%d',
             gen_project=project_finder_plugin
             )
-        bug_id = bug_url2bug_id(bug_obj.canonical_bug_link)
+        bug_id = mysite.customs.bugtrackers.bugzilla_general.bug_url2bug_id(
+            bug_obj.canonical_bug_link, BUG_URL_PREFIX=BUG_URL_PREFIX)
         bug_obj.good_for_newcomers = True
         bug_obj.bite_size_tag_name = 'GNOME-Love'
         ret[bug_id] = bug_obj
         
     return ret
-
-def bug_url2bug_id(url):
-    before, after = url.split(BUG_URL_PREFIX)
-    return int(after)
-
-def get_remote_bug_ids_already_stored():
-    for bug in mysite.search.models.Bug.all_bugs.filter(
-        canonical_bug_link__contains=BUG_URL_PREFIX):
-        yield bug_url2bug_id(bug.canonical_bug_link)
 
 def grab():
     """Loops over GNOME Bugzilla's list of gnome-love bugs and stores/updates
@@ -79,7 +62,9 @@ def grab():
     current_bug_id2bug_objs = get_current_bug_id2bug_objs()
 
     bug_ids = mysite.customs.models.flatten(
-        [current_bug_id2bug_objs.keys(), get_remote_bug_ids_already_stored()])
+        [current_bug_id2bug_objs.keys(),
+         mysite.customs.bugtrackers.bugzilla_general.get_remote_bug_ids_already_stored(
+             BUG_URL_PREFIX)])
 
     for bug_id in set(bug_ids):
         # Sometimes create_bug_object_for_remote_bug_id will fail to create
