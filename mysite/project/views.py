@@ -100,7 +100,10 @@ def delete_paragraph_answer_do(request):
 
 @login_required
 def create_bug_answer_do(request):
-    answer = BugAnswer()
+    if 'is_edit' in request.POST:
+        answer = BugAnswer.objects.get(pk=request.POST['answer__pk'])
+    else:
+        answer = BugAnswer()
 
     question = ProjectInvolvementQuestion.objects.get(pk=int(request.POST['question__pk']))
     question.save()
@@ -119,7 +122,10 @@ def create_bug_answer_do(request):
 
 @login_required
 def create_answer_do(request):
-    answer = Answer()
+    if 'is_edit' in request.POST:
+        answer = Answer.objects.get(pk=request.POST['answer__pk'])
+    else:
+        answer = Answer()
 
     question = ProjectInvolvementQuestion.objects.get(pk=request.POST['question__pk'])
     question.save()

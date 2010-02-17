@@ -2,7 +2,7 @@ body#project .module.contains_questions li { float: none; display: list-item; }
 body#project input[type='text'], body#project textarea { padding: 4px;  }
 body#project input, body#project textarea { font-size: 10pt;   }
 body#project textarea { width: 96%;  }
-body#project input[type='text'] { width: 86%; }
+body#project input[type='text'] { width: 96%; }
 body#project input[type='submit'], body#project textarea {  }
 body#project input {  }
 body#project input[type='submit'] { padding: 2px 8px; }
@@ -52,4 +52,5 @@ body#project label { margin: 6px 0 3px 0; display: block; }
 
 
 body#project .questions li form.delete input[type='submit']{ float: right; font-size: .8em; margin-left: 5px; padding: 0px; }
-
+body#project .questions li a.edit_link{ float: right; font-size: .9em; margin-left: 5px; padding: 0px; }
+/*body#project .questions li .answer{float: left; width: 100%;}*/
