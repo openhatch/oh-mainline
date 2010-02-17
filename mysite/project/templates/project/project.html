@@ -28,23 +28,11 @@ about our members who support {{ project.name }}
             {% for question, answers in question_answer_mappings_non_bug %}
                 <li>
                     <style type="text/css">
-                        body#project .questions li form.delete input[type='submit']{
-                            float: right;
-                            font-size: .8em;
-                            padding: 0px;
-                        }
-                        body#project .questions li .input-note{
-                            font-size: .8em;
-                            color: gray;
-                        }
-                        body#project .questions .input-note li {
-                            list-style: circle;
-                            margin-left: 20px; 
-                        }
                     </style>
                     <h3><strong>Q</strong>:
                         {% ifequal question.pk 0 %}
-                        Other than writing code, how can people participate in your project?
+                            Other than writing code, how can people participate
+                            in {{ project.name }}?
                         {% endifequal %}
 
                         {% ifequal question.pk 1 %}
@@ -77,43 +65,56 @@ about our members who support {{ project.name }}
                                         name='answer__text'></textarea>
                                     <div class='input-note show_when_editing'>
                                         {% ifequal question.pk 0 %}
-                                        Projects often need all sorts of help
-                                        -- some forms are documentation,
-                                        website management, marketing, and
-                                        testing. Be specific, for example:
-                                        <ul>
-                                            <li>
-                                            We need people to download version
-                                            0.4.5 and make sure the frobulator
-                                            still frobulates correctly.
-                                            </li>
-                                        </ul>
+                                            <p>
+                                                <strong>Tip</strong>: Projects
+                                                often need documentation,
+                                                website management, marketing,
+                                                and/or testing. Be specific, for
+                                                example:
+                                            </p>
+                                            <ul>
+                                                <li>
+                                                    We need people to download version
+                                                    0.4.5 and make sure the frobulator
+                                                    still frobulates correctly.
+                                                </li>
+                                            </ul>
+                                            <p>Include URLs if relevant (we'll
+                                                automatically linkify them). </p>
                                         {% endifequal %}
 
                                         {% ifequal question.pk 1 %} 
-                                        If the answer varies based on the kind
-                                        of contribution they want to make, talk
-                                        about all types! Some examples:
-                                        <ul>
-                                            <li>
-                                            &ldquo;Be sure to bone up on your
-                                            urllib; you're gonna need
-                                            it.&rdquo;
-                                            </li>
-                                            <li>
-                                            &ldquo;Drop me a line at
-                                            &lt;hello@example.com&gt; if you
-                                            want to get involved.&rdquo;
-                                            </li>
-                                            <li>
-                                            &ldquo;Visit our welcome page to learn
-                                            about our mailing lists, forums,
-                                            chat rooms (irc), planet&rdquo;
-                                            </li>
-                                            <li>
-                                            &ldquo;Read the community guidelines here.&rdquo;
-                                            </li>
-                                        </ul>
+                                            <p>
+                                                <strong>Tip</strong>: Talk
+                                                about diverse kinds of
+                                                contributions.  Include URLs if
+                                                relevant (we'll automatically
+                                                linkify them).
+                                            </p>
+
+                                            <p>
+                                                For example:
+                                            </p>
+                                            <ul>
+                                                <li>
+                                                &ldquo;Drop me a line at
+                                                &lt;hello@example.com&gt; if you
+                                                want to get involved.&rdquo;
+                                                </li>
+                                                <li>
+                                                &ldquo;Visit our welcome page to learn
+                                                about our mailing lists, forums,
+                                                irc channel, and planet.&rdquo;
+                                                </li>
+                                                <li>
+                                                &ldquo;Read the community guidelines here.&rdquo;
+                                                </li>
+                                                <li>
+                                                &ldquo;Be sure to bone up on your
+                                                urllib; you're gonna need
+                                                it.&rdquo;
+                                                </li>
+                                            </ul>
                                         {% endifequal %}
                                     </div>
                                     <input type='submit' class='show_when_editing' value='Submit'>
@@ -148,10 +149,15 @@ about our members who support {{ project.name }}
             <li>
             <ul class='answers'>
                 {% ifequal question.pk 2 %}
-                What is a bug or issue with the project that stresses you out?
+                    <p> What is a bug or issue with {{ project.name }} that you
+                        have tried to solve but would like further assistance
+                        with?  </p>
+
+                    <p> What is a bug or issue with {{ project.name }} that
+                        you've been putting off that is stressing you out? </p>
                 {% endifequal %}
                 {% ifequal question.pk 3 %}
-                What is a good issue for a newcomer to start out with?
+                    What is a good issue for a newcomer to start out with?
                 {% endifequal %}
 
                 {% for bug_answer in bug_answers %}
@@ -190,13 +196,7 @@ about our members who support {{ project.name }}
                         {% ifequal question.pk 2 %}
 
                                     <p>
-                                    Maybe there's something you just are afraid
-                                    to look at. Someone friendly could help you
-                                    out.
-                                    </p>
-                                    
-                                    <p>
-                                    For example:
+                                        For example:
                                     </p>
                                     <ul>
                                         <li>
@@ -213,11 +213,13 @@ about our members who support {{ project.name }}
                                         Maildir patch for Alpine.
                                         </li>
                                     </ul>
+                                    <p>Include URLs if relevant (we'll
+                                        automatically linkify them). </p>
                         {% endifequal %}
 
                         {% ifequal question.pk 3 %} 
                                     <p>
-                                        Many projects have good small tasks
+                                        <strong>Tip</strong>: Many projects have good small tasks
                                         that can teach newcomers how the
                                         project works. Now's your chance to
                                         share one of them!
@@ -229,6 +231,9 @@ about our members who support {{ project.name }}
                                         you resize the photo before sending it
                                         to the web.&rdquo;
                                     </p>
+                                    <p>
+                                        Include URLs if relevant (we'll
+                                        automatically linkify them). </p>
                         {% endifequal %}
                                 </div>
 
