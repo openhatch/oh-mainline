@@ -50,7 +50,7 @@ about our members who support {{ project.name }}
                             <input type="submit" value="X" />
                         </form>
                         {% endifequal %}
-                        {{ answer.text }}
+                        {{ answer.text|urlize }}
                                 <br/>
                                 <small>&nbsp;&nbsp;&nbsp;&mdash; <a style='font-weight: bold;' href='{{ answer.author.get_profile.get_profile_url }}'>{{ answer.author.get_profile.get_full_name_or_username }}</a></small></li>
                         {% endfor  %}
@@ -170,7 +170,7 @@ about our members who support {{ project.name }}
                         {% endifequal %}
                     <strong>{{bug_answer.title}}</strong>
                 </div>
-                {{bug_answer.details}}
+                {{bug_answer.details|urlize}}
                 <br/>
                 <small>&nbsp;&nbsp;&nbsp;&mdash; <a style='font-weight: bold;' href='{{ bug_answer.author.get_profile.get_profile_url }}'>{{ bug_answer.author.get_profile.get_full_name_or_username }}</a></small></li>
                 {% endfor  %}
