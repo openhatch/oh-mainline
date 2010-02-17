@@ -14,6 +14,10 @@ import mysite.customs
 import mysite.base.unicode_sanity
 from django.core.urlresolvers import reverse
 
+class OpenHatchModel(models.Model):
+    created_date = models.DateTimeField(auto_now_add=True)
+    modified_date = models.DateTimeField(auto_now=True)
+
 def get_image_data_scaled(image_data, width):
     # scale it
     image_fd = StringIO.StringIO(image_data)
@@ -37,7 +41,7 @@ def get_image_data_scaled(image_data, width):
     image_data = new_image_fd.getvalue()
     return image_data
 
-class Project(models.Model):
+class Project(OpenHatchModel):
 
     @staticmethod
     def generate_random_icon_path(instance, filename):
@@ -227,7 +231,7 @@ def grab_project_language_from_ohloh(instance, created, *args,
 models.signals.post_save.connect(populate_icon_on_project_creation, Project)
 models.signals.post_save.connect(grab_project_language_from_ohloh, Project)
 
-class ProjectInvolvementQuestion(models.Model):
+class ProjectInvolvementQuestion(OpenHatchModel):
     key_string = models.CharField(max_length=255)
     text = models.TextField()
     is_bug_style = models.BooleanField(default=False)
@@ -249,7 +253,7 @@ class ProjectInvolvementQuestion(models.Model):
         ret.save()
         return ret
 
-class BugAnswer(models.Model):
+class BugAnswer(OpenHatchModel):
     title = models.CharField(blank=False, max_length=255)
     details = models.TextField()
     author = models.ForeignKey(User)
@@ -264,7 +268,7 @@ class BugAnswer(models.Model):
         ret.save()
         return ret
 
-class Answer(models.Model):
+class Answer(OpenHatchModel):
     text = models.TextField(blank=False)
     author = models.ForeignKey(User)
     question = models.ForeignKey(ProjectInvolvementQuestion, related_name='answers')
@@ -283,7 +287,7 @@ class OpenBugsManager(models.Manager):
         return super(OpenBugsManager, self).get_query_set().filter(
                 looks_closed=False)
 
-class Bug(models.Model):
+class Bug(OpenHatchModel):
     project = models.ForeignKey(Project)
     title = models.CharField(max_length=200)
     description = models.TextField()
@@ -329,7 +333,7 @@ class Bug(models.Model):
         kwargs['project'] = Project.create_dummy()
         return Bug.create_dummy(**kwargs)
 
-class HitCountCache(models.Model):
+class HitCountCache(OpenHatchModel):
     hashed_query = models.CharField(max_length=40, primary_key=True) # stores a sha1 
     hit_count = models.IntegerField()
 
