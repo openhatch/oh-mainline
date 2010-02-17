@@ -11,7 +11,7 @@
 #search #sidebar .box { padding: 10px; }
 #search .box h2 { font-size: 130%; color: #3d2f25; margin-bottom: 5px; }
 #search .search-terms { font-size: 20px; background: white; padding: 5px; width: 550px; }
-#search #results-widget { padding: 12px; padding-bottom: 6px; float: left; width: 90%; font-size: 8.5pt; }
+#search #results-widget { padding: 12px; padding-bottom: 6px; float: left; width: 94.5%; font-size: 8.5pt; }
 #search #sidebar { float: left; width: 220px; margin-right: 20px; }
 #search #main { width: 715px; float: left; }
 	#search #main .box { padding: 10px; width: 700px; float: left; }
@@ -82,8 +82,8 @@
         #search ul#facets li { margin-top: 10px; }
 		#search ul#facets ul li, #suggested_searches li { list-style: square; margin-left: 20px; color: #777; clear: left; }
 #search #facets li.active { font-weight: bold; }
-#search #results-summary { width: 70%; float: left; margin-right: 10px; }
-#search #navigation { float: right; }
+#search #results-summary { width: 67%; float: left; margin-right: 10px; }
+#search #navigation { float: right; font-size: 9.5pt}
 #search #about_projects, #about_bug_trackers { margin-top: 0; }
 #search #about_projects div { float: left; margin-bottom: 10px; width: 100%; }
 #search #sidebar .module #how_many_projects { text-align: center; font-size: 140%; width: 100% ! important; }
