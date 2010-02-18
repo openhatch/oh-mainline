@@ -255,6 +255,7 @@ about our members who support {{ project.name }}
                 $delete_form = $("#delete_form_"  + $type + "_" + $answer_id);
                 $delete_form.hide();
                 $(this).hide();
+                $form.find('input:text, textarea').focus();
                 return false;
             });
         })
