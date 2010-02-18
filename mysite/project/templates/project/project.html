@@ -70,11 +70,13 @@ about our members who support {{ project.name }}
                                     <span class="answer" id="answer_paragraph_{{answer.pk}}">
                                         {{ answer.text|urlize }}
                                     </span>
+                                    <br/>
+                                    {% include 'project/byline.html' %}
 
                             {% else %}
 
                                 <span class="answer" id="answer_bug_{{answer.pk}}">
-                                    <div class="answer_title">
+                                    <div class="bug_answer_title">
                                         {% ifequal the_user answer.author %}
                                         {# delete form #}
                                         <form name='' method='post' action='{% url mysite.project.views.delete_paragraph_answer_do %}' class='delete' id="delete_form_bug_{{answer.pk}}">
@@ -89,6 +91,8 @@ about our members who support {{ project.name }}
                                         <strong>{{answer.title}}</strong>
                                     </div>
                                     {{answer.text|urlize}}
+                                    <br/>
+                                    {% include 'project/byline.html' %}
                                 </span>
                                 {% with 1 as edit_form %}
                                 {% include 'project/forms/bug.html' %}
@@ -96,8 +100,6 @@ about our members who support {{ project.name }}
 
                             {% endif %}
 
-                            <br/>
-                            {% include 'project/byline.html' %}
                         </span>
                         {% endfor %}
 
