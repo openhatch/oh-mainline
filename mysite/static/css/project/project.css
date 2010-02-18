@@ -35,9 +35,9 @@ body#project .bug_answer_title { font-size: .9em; border-bottom: 1px solid #e4e4
 body#project form.answer_question { padding: 4px 12px; }
 body#project form.active { float: left; background-color: #ffc;  -moz-border-radius: 8px; border-radius: 8px; margin-bottom: 20px; }
 body#project form.active .show_when_editing { display: block; }
-body#project form.active a.collapse_answer_form { padding: 4px; margin-left: 10px; display: inline; font-size: .8em;}
+body#project form.active a.collapse_answer_form { padding: 10px; margin: 0 0 0 10px; font-size: .9em;}
 
-body#project form.active input[type='submit'] { display: inline; }
+body#project form.active input[type='submit'] { display: inline; margin-bottom: 5px;}
 
 body#project .input-note { float: right; width: 80%; font-size: .9em; color: #686868; }
 body#project .input-note .tips { float: right; width: 70%; font-size: .9em; color: #686868; }

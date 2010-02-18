@@ -11,7 +11,15 @@ import mysite.account.forms
 
 from django_authopenid import views as oid_views
 
+from voting.views import vote_on_object
+
 urlpatterns = patterns('',
+        # Generic view to vote on Link objects
+        (r'^links/(?P<object_id>\d+)/(?P<direction>up|down|clear)vote/?$',
+            vote_on_object, dict(model=, template_object_name='link',
+                template_name='kb/link_confirm_vote.html',
+                allow_xmlhttprequest=True)),
+
 
         # Invitation-related URLs
         (r'^invitation/', include('invitation.urls')),

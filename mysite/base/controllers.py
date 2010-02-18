@@ -92,7 +92,7 @@ def _geocode(address):
         return None
     except Exception, e:
         stack = traceback.extract_stack()
-        logging.debug('An error occorred: %s' % stack)
+        logging.debug('An error occurred: %s' % stack)
         raise
 
 def object_to_key(python_thing):
