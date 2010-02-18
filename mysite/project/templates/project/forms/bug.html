@@ -2,7 +2,7 @@
     class="answer_question"
     name='question-long-{{question.pk}}'
     method='POST'
-    action='{% url mysite.project.views.create_bug_answer_do %}'
+    action='{% url mysite.project.views.create_answer_do %}'
     {% ifequal edit_form 1%}
     id="edit_form_bug_{{answer.pk}}"
     {% endifequal %}
@@ -11,7 +11,7 @@
                         <input type='hidden' name='project__pk' value='{{ project.pk }}'>
                         <input type='hidden' name='question__pk' value='{{ question.pk }}'>
                         <div class="show_when_editing">
-                            <label for='q{{ question.pk }}-bug__title'>
+                            <label for='q{{ question.pk }}-answer__title'>
                                 Describe an issue</label>
                         </div>
                                             {% ifequal edit_form 1%}
@@ -21,23 +21,23 @@
                                     value="{{answer.pk}}" />
                                     <div class='show_when_editing'>
                                             {% endifequal %}
-                        <input type='text' name='bug__title' title='Describe an issue' 
-                                id='q{{ question.pk }}-bug__title' 
+                        <input type='text' name='answer__title' title='Describe an issue' 
+                                id='q{{ question.pk }}-answer__title' 
                                 class='add_an_answer'{% ifequal edit_form 1%} value="{{answer.title}}"{% endifequal %}/>
                                 {% ifequal edit_form 1%}
                             </div>
                             {% endifequal %}
                         <div class="show_when_editing">
                             {% ifequal question.key_string 'stress' %}
-                                <label for='q{{ question.pk }}-bug__details'>
+                                <label for='q{{ question.pk }}-answer__text'>
                                     What makes this issue stressful?</label>
                             {% endifequal %}
                             {% ifequal question.key_string 'newcomers' %}
-                                <label for='q{{ question.pk }}-bug__details'>
+                                <label for='q{{ question.pk }}-answer__text'>
                                     Further info</label>
                             {% endifequal %}
-                            <textarea id='q{{ question.pk }}-bug__details' 
-                                    name='bug__details'>{% ifequal edit_form 1%}{{answer.details}}{% endifequal %}</textarea>
+                            <textarea id='q{{ question.pk }}-answer__text' 
+                                    name='answer__text'>{% ifequal edit_form 1%}{{answer.text}}{% endifequal %}</textarea>
                             <div class='input-note'>
                                 {% ifequal question.key_string 'stress' %}
                                     <ul class='sections'>

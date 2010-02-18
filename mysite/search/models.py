@@ -241,11 +241,7 @@ class ProjectInvolvementQuestion(OpenHatchModel):
     def get_answers_for_project(self, a_project):
         # Which manager we use depends on whether this is a Bug-accepting
         # question:
-        return (
-                ({True: self.bug_answers, False: self.answers}
-                [self.is_bug_style])
-                .filter(project=a_project)
-                )
+        return self.answers.filter(project=a_project)
 
     @staticmethod
     def create_dummy(**kwargs):
@@ -256,7 +252,7 @@ class ProjectInvolvementQuestion(OpenHatchModel):
         return ret
 
 class Answer(OpenHatchModel):
-    title = models.CharField(blank=True, max_length=255)
+    title = models.CharField(null=True, max_length=255)
     text = models.TextField(blank=False)
     author = models.ForeignKey(User)
     question = models.ForeignKey(ProjectInvolvementQuestion, related_name='answers')

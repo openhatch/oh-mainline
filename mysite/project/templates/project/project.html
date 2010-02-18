@@ -48,6 +48,7 @@ about our members who support {{ project.name }}
                         <ul class='answers'>
                             {% for answer in answers %}
                             <li>
+                            {% if not question.is_bug_style %}
                                     {% ifequal the_user answer.author %}
                                         {# deletion form #}
                                         <form name='' method='post' action='{% url mysite.project.views.delete_paragraph_answer_do %}' class='delete' id="delete_form_paragraph_{{answer.pk}}">
@@ -67,14 +68,46 @@ about our members who support {{ project.name }}
                                         {% endwith %}
                                     {% endifequal %}
                                     <span class="answer" id="answer_paragraph_{{answer.pk}}">
-                                    {{ answer.text|urlize }}
-                                    <br/>
-                                    {% include 'project/byline.html' %}
+                                        {{ answer.text|urlize }}
                                     </span>
-                            {% endfor  %}
+
+                            {% else %}
+
+                                <span class="answer" id="answer_bug_{{answer.pk}}">
+                                    <div class="answer_title">
+                                        {% ifequal the_user answer.author %}
+                                        {# delete form #}
+                                        <form name='' method='post' action='{% url mysite.project.views.delete_paragraph_answer_do %}' class='delete' id="delete_form_bug_{{answer.pk}}">
+                                            <input type="hidden" name="answer__pk" value="{{answer.pk}}" />
+                                            <input type="submit" value="X" />
+                                        </form>
+                                        {# edit link #}
+                                        <a href="#" class="edit_link for_bug" id="edit_link_bug_{{answer.pk}}">
+                                            <img src='/static/images/icons/pencil.png' alt='Edit name' />
+                                        </a>
+                                        {% endifequal %}
+                                        <strong>{{answer.title}}</strong>
+                                    </div>
+                                    {{answer.text|urlize}}
+                                </span>
+                                {% with 1 as edit_form %}
+                                {% include 'project/forms/bug.html' %}
+                                {% endwith %}
+
+                            {% endif %}
+
+                            <br/>
+                            {% include 'project/byline.html' %}
+                        </span>
+                        {% endfor %}
+
                             <li>
                             {% if the_user.is_authenticated %}
+                            {% if question.is_bug_style %}
+                            {% include 'project/forms/bug.html' %}
+                            {% else %}
                             {% include 'project/forms/paragraph.html' %}
+                            {% endif %}
                             {% else %}
                             {# if they aren't logged in#}
                             <a href="{% url oh_login %}?next={{ project.get_url|urlencode}}" style="">Log in to add an answer</a>

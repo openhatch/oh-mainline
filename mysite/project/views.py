@@ -1,4 +1,4 @@
-from mysite.search.models import Project, ProjectInvolvementQuestion, Answer, BugAnswer
+from mysite.search.models import Project, ProjectInvolvementQuestion, Answer
 from mysite.profile.models import Person
 import django.template
 import mysite.base.decorators
@@ -78,42 +78,12 @@ def redirect_project_to_projects(request, project__name):
     return HttpResponsePermanentRedirect(new_url)
 
 @login_required
-def delete_bug_answer_do(request):
-    answer__pk = request.POST['answer__pk']
-    # grab the answer from the database.  delete it.  done.
-    our_answer = BugAnswer.objects.get(pk=answer__pk, author=request.user)
-    our_answer.delete()
-    return HttpResponseRedirect(reverse(project, kwargs={'project__name': our_answer.project.name}))
-
-@login_required
 def delete_paragraph_answer_do(request):
     answer__pk = request.POST['answer__pk']
     # grab the answer from the database.  delete it.  done.
     our_answer = Answer.objects.get(pk=answer__pk, author=request.user)
     our_answer.delete()
     return HttpResponseRedirect(reverse(project, kwargs={'project__name': our_answer.project.name}))
-
-@login_required
-def create_bug_answer_do(request):
-    if 'is_edit' in request.POST:
-        answer = BugAnswer.objects.get(pk=request.POST['answer__pk'])
-    else:
-        answer = BugAnswer()
-
-    question = ProjectInvolvementQuestion.objects.get(pk=int(request.POST['question__pk']))
-    question.save()
-    answer.question = question
-
-    answer.title = request.POST['bug__title']
-    answer.details = request.POST['bug__details']
-
-    answer.author = request.user
-    
-    answer.project_id = int(request.POST['project__pk'])
-
-    answer.save()
-    
-    return HttpResponseRedirect(reverse(project, kwargs={'project__name': answer.project.name}))
 
 @login_required
 def create_answer_do(request):
@@ -127,6 +97,8 @@ def create_answer_do(request):
     answer.question = question
 
     answer.text = request.POST['answer__text']
+
+    answer.title = request.POST.get('answer__title', None)
 
     answer.author = request.user
     
