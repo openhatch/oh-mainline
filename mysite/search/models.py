@@ -13,6 +13,7 @@ import mysite
 import mysite.customs
 import mysite.base.unicode_sanity
 from django.core.urlresolvers import reverse
+import voting
 
 class OpenHatchModel(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
@@ -239,9 +240,11 @@ class ProjectInvolvementQuestion(OpenHatchModel):
     is_bug_style = models.BooleanField(default=False)
 
     def get_answers_for_project(self, a_project):
-        # Which manager we use depends on whether this is a Bug-accepting
-        # question:
-        return self.answers.filter(project=a_project)
+        the_answers = self.answers.filter(project=a_project)
+        # TODO: sort them
+        #the_answers.sort(key=voting.models.Vote.objects.get_score)
+        return the_answers
+        
 
     @staticmethod
     def create_dummy(**kwargs):

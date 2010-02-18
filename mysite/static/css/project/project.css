@@ -51,7 +51,8 @@ body#project label { margin: 6px 0 3px 0; display: block; }
 
 
 body#project .questions li form.delete { display: inline; }
-body#project .questions li form.delete input[type='submit'] { padding: 0; background: none; font: inherit; border: 0; font-size: 1em; display: inline; color: inherit; }
+body#project .questions li form.delete input[type='submit'] { padding: 0; background: none; font: inherit; border: 0; font-size: 1em; display: inline; color: #FF6D3D;}
+body#project .questions li form.delete input[type='submit']:hover { cursor:hand; cursor:pointer; text-decoration: underline;}
 body#project .questions li a.edit_link { }
 body#project .questions li .answer{float: left; width: 84%;}
 body#project .voting { float: right; width: 3%; margin-right: 2%; text-align: center; }
