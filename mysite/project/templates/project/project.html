@@ -249,10 +249,9 @@ VoteHijacker.prototype =
                 'error': function(){
                     alert("Error voting: " + response.error_message);
                 },
-                'success': function createCallback(answer__pk, action, form) {
+                'success': function createCallback(answer__pk, form) {
                     return function callback(response) {
                         var action = /(up|down|clear)vote/.exec(form.action)[1];
-                        alert(action);
                         var upArrowType = "grey";
                         var upFormAction = "up";
                         var downArrowType = "grey";
@@ -260,13 +259,11 @@ VoteHijacker.prototype =
 
                         if (action == "up")
                         {
-                            alert('i think the action was up');
                             var upArrowType = "mod";
                             var upFormAction = "clear";
                         }
                         else if (action == "down")
                         {
-                            alert('i think the action was down');
                             var downArrowType = "mod";
                             var downFormAction = "clear";
                         }
@@ -277,7 +274,7 @@ VoteHijacker.prototype =
                         VoteHijacker.updateFormAction("down", prefix, answer__pk, downFormAction);
                         VoteHijacker.updateScore(prefix, answer__pk, response.score);
                     };
-                }(answer__pk, action)
+                }(answer__pk, form)
             };
             $(this).ajaxForm(options);
         });
@@ -294,11 +291,7 @@ VoteHijacker.updateArrow = function(arrowType, prefix, id, state)
 VoteHijacker.updateFormAction = function(formType, prefix, id, action)
 {
     var form = $('#' + prefix + formType + id).get(0);
-    console.debug(formType, ' before:', form);
     form.action = form.action.replace(/(?:up|down|clear)vote/, action + "vote");
-    console.debug(formType, ' after:', form);
-    //form.action = '/+answer/vote/' + id + '/' + action + 'vote/';
-
 };
 
 VoteHijacker.updateScore = function(prefix, id, score)
