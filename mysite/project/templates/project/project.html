@@ -50,7 +50,9 @@ about our members who support {{ project.name }}
                                             <input type="submit" value="X" />
                                         </form>
                                         {# edit link #}
-                                        <a href="#" class="edit_link for_paragraph" id="edit_link_paragraph_{{answer.pk}}">Edit</a>
+                                        <a href="#" class="edit_link for_paragraph" id="edit_link_paragraph_{{answer.pk}}">
+                                        <img src='/static/images/icons/pencil.png' alt='Edit name' />
+                                        </a>
                                         {% with 1 as edit_form %}
                                             {% include 'project/forms/paragraph.html' %}
                                         {% endwith %}
@@ -103,7 +105,9 @@ about our members who support {{ project.name }}
                         <input type="submit" value="X" />
                     </form>
                     {# edit link #}
-                    <a href="#" class="edit_link for_bug" id="edit_link_bug_{{bug_answer.pk}}">Edit</a>
+                    <a href="#" class="edit_link for_bug" id="edit_link_bug_{{bug_answer.pk}}">
+                    <img src='/static/images/icons/pencil.png' alt='Edit name' />
+                    </a>
                     {% endifequal %}
                         <strong>{{bug_answer.title}}</strong>
                 </div>
