@@ -6,7 +6,7 @@ import mysite.profile.models
 import mysite.customs.miro
 import mysite.search.controllers
 from mysite.search.models import Project, Bug, HitCountCache, \
-        ProjectInvolvementQuestion, Answer, BugAnswer
+        ProjectInvolvementQuestion, Answer
 from mysite.search import views
 import lpb2json
 import datetime

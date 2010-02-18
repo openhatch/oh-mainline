@@ -1,4 +1,7 @@
 {% extends 'base/two_columns.html' %}
+{% load voting_tags %}
+{% votes_by_user the_user on link_list as vote_dict %}
+{% scores_for_objects link_list as score_dict %}
 
 {% block title %}
 Projects - {{ project.name }} 
@@ -47,46 +50,47 @@ about our members who support {{ project.name }}
                         </h3>
                         <ul class='answers'>
                             {% for answer in answers %}
+                            {% dict_entry_for_item answer from vote_dict as vote %}
+                            {% vote_by_user the_user on answer as vote %}
+                            {% score_for_object answer as score %}
                             <li>
+                            <span class="voting">
+                                <form class="answervote" id="answerup{{ answer.pk }}" action="/+answer/vote/{{ answer.id }}/{% if vote and vote.is_upvote %}clear{% else %}up{% endif %}vote/" method="POST">
+                                    <input type="image" id="answeruparrow{{ answer.id }}" src="/static/images/go-up{% if vote and vote.is_upvote %}{% else %}-off{% endif %}.png" >
+                                    <input type="hidden" name="next" value="{{project.get_url}}">
+                                </form>
+                                <div class='score'>{{ score.score|default:0 }}</div>
+
+                                <form class="answervote" id="answerdown{{ answer.id }}" action="/+answer/vote/{{ answer.id }}/{% if vote and vote.is_downvote %}clear{% else %}down{% endif %}vote/" method="POST">
+                                    <input type="image" id="answerdownarrow{{ answer.id }}" src="/static/images/go-down{% if vote and vote.is_downvote %}{% else %}-off{% endif %}.png">
+                                    <input type="hidden" name="next" value="{{project.get_url}}">
+                                </form>
+                            </span>
                             {% if not question.is_bug_style %}
-                                    {% ifequal the_user answer.author %}
-                                        {# deletion form #}
-                                        <form name='' method='post' action='{% url mysite.project.views.delete_paragraph_answer_do %}' class='delete' id="delete_form_paragraph_{{answer.pk}}">
-                                            <input type="hidden" name="answer__pk" value="{{answer.pk}}" />
-                                            <input type="submit" value="X" />
-                                        </form>
-                                        {# edit link #}
-                                        <a href="#" class="edit_link for_paragraph" id="edit_link_paragraph_{{answer.pk}}">
-                                        <img src='/static/images/icons/pencil.png' alt='Edit name' />
-                                        </a>
-                                        {% with 1 as edit_form %}
-                                        {% if question.is_bug_style %}
-                                        {% include 'project/forms/bug.html' %}
-                                        {% else %}
-                                        {% include 'project/forms/paragraph.html' %}
-                                        {% endif %}
-                                        {% endwith %}
-                                    {% endifequal %}
-                                    <span class="answer" id="answer_paragraph_{{answer.pk}}">
-                                        {{ answer.text|urlize }}
-                                    </span>
+
+                                {% ifequal the_user answer.author %}
+                                {% with 1 as edit_form %}
+                                {% include 'project/forms/paragraph.html' %}
+                                {% endwith %}
+                                {% endifequal %}
+
+                                <span class="answer" id="answer_{{answer.pk}}">
+                                    {{ answer.text|urlize }}
                                     <br/>
                                     {% include 'project/byline.html' %}
+                                </span>
 
                             {% else %}
 
-                                <span class="answer" id="answer_bug_{{answer.pk}}">
+                                {% ifequal the_user answer.author %}
+                                {% with 1 as edit_form %}
+                                {% include 'project/forms/bug.html' %}
+                                {% endwith %}
+                                {% endifequal %}
+                                <span class="answer" id="answer_{{answer.pk}}">
+                        
                                     <div class="bug_answer_title">
                                         {% ifequal the_user answer.author %}
-                                        {# delete form #}
-                                        <form name='' method='post' action='{% url mysite.project.views.delete_paragraph_answer_do %}' class='delete' id="delete_form_bug_{{answer.pk}}">
-                                            <input type="hidden" name="answer__pk" value="{{answer.pk}}" />
-                                            <input type="submit" value="X" />
-                                        </form>
-                                        {# edit link #}
-                                        <a href="#" class="edit_link for_bug" id="edit_link_bug_{{answer.pk}}">
-                                            <img src='/static/images/icons/pencil.png' alt='Edit name' />
-                                        </a>
                                         {% endifequal %}
                                         <strong>{{answer.title}}</strong>
                                     </div>
@@ -94,9 +98,6 @@ about our members who support {{ project.name }}
                                     <br/>
                                     {% include 'project/byline.html' %}
                                 </span>
-                                {% with 1 as edit_form %}
-                                {% include 'project/forms/bug.html' %}
-                                {% endwith %}
 
                             {% endif %}
 
@@ -213,28 +214,26 @@ about our members who support {{ project.name }}
                 $form = $(this).parent().parent();
                 $form.removeClass('active');
                 $form.find('input:text, textarea').hint();
-                $form.find('input:text, textarea').unbind('blur');
-                if($(this).hasClass('is_edit_form')){
-                    $answer_id = $(this).attr('id').split('_')[4];
-                    $type = $(this).attr('id').split('_')[3];
-                    $answer = $("#answer_" + $type + "_" + $answer_id);
+                if($form.hasClass('is_edit_form')){
+                    answer_id = $(this).attr('id').split('_')[3];
+                    console.debug(answer_id);
+                    $answer = $("#answer_" + answer_id);
                     $answer.show();
-                    $delete_form = $("#delete_form_" + $type + "_" + $answer_id);
+                    $delete_form = $("#delete_form_" + answer_id);
                     $delete_form.show();
-                    $edit_link = $("#edit_link_"  + $type + "_" + $answer_id);
+                    $edit_link = $("#edit_link_"  + answer_id);
                     $edit_link.show();
                 }
                 return false;
             });
             $('.edit_link').click(function(){
-                $answer_id = $(this).attr('id').split('_')[3];
-                $type = $(this).attr('id').split('_')[2];
-                $form = $("#edit_form_"  + $type + "_" + $answer_id);
+                answer_id = this.id.split('_')[2];
+                $form = $("#edit_form_"  + answer_id);
                 $form.addClass('active');
                 $form.find('input:text, textarea').unbind('blur');
-                $answer = $("#answer_"  + $type + "_" + $answer_id);
+                $answer = $("#answer_"  + answer_id);
                 $answer.hide();
-                $delete_form = $("#delete_form_"  + $type + "_" + $answer_id);
+                $delete_form = $("#delete_form_"  + answer_id);
                 $delete_form.hide();
                 $(this).hide();
                 $form.find('input:text, textarea').focus();
@@ -248,4 +247,3 @@ about our members who support {{ project.name }}
 {% comment %}
 vim: set ai et ts=4 sw=4 nu:
 {% endcomment %}
-

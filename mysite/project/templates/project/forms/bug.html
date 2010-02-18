@@ -4,7 +4,7 @@
     method='POST'
     action='{% url mysite.project.views.create_answer_do %}'
     {% ifequal edit_form 1%}
-    id="edit_form_bug_{{answer.pk}}"
+    id="edit_form_{{answer.pk}}"
     {% endifequal %}
     >
 
@@ -104,6 +104,6 @@
                             </div>
 
                             <input type='submit' value='Submit'>
-                                        <a href="#" class="collapse_answer_form {% ifequal edit_form 1%}is_edit_form{% endifequal %}" id="collapse_answer_form_bug_{{answer.pk}}">Cancel</a>
+                                        <a href="#" class="collapse_answer_form {% ifequal edit_form 1%}is_edit_form{% endifequal %}" id="collapse_answer_form_{{answer.pk}}">Cancel</a>
                         </div>
                 </form>

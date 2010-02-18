@@ -1,2 +1,17 @@
 {% load base_extras %}
-<small>&nbsp;&nbsp;&nbsp;&mdash; <a style='font-weight: bold;' href='{{ answer.author.get_profile.get_profile_url }}'>{{ answer.author.get_profile.get_full_name_or_username }}</a> <span style='color: #888;'>({{ answer.created_date|timesince_terse }} ago)</span> </small></li>
+<small style='color: #888;'>&nbsp;&nbsp;&nbsp;&mdash; <a style='font-weight: bold;' href='{{ answer.author.get_profile.get_profile_url }}'>{{ answer.author.get_profile.get_full_name_or_username }}</a> &middot; {{ answer.created_date|timesince_terse }} ago
+    {% ifequal the_user answer.author %}
+    &middot;
+    <a href="#" class="edit_link" id="edit_link_{{answer.pk}}">edit</a>
+    &middot;{% spaceless %}
+    <form method='post'
+        action='{% url mysite.project.views.delete_paragraph_answer_do %}'
+        class='delete' id="delete_form_{{answer.pk}}">
+        <input type="hidden" name="answer__pk" value="{{answer.pk}}" />
+        <input type="submit" value="delete" />
+    </form>
+    {% endspaceless %}
+    {% endifequal %}
+</small> 
+</li>
+{# vim: set filetype=htmldjango: #}

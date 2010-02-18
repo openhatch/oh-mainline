@@ -1,8 +1,8 @@
 <form
-    {% ifequal edit_form 1%}
-    id="edit_form_paragraph_{{answer.pk}}"
-    {% endifequal %}
-    class="answer_question" 
+    {% if edit_form %}
+    id="edit_form_{{answer.pk}}"
+    {% endif %}
+    class="answer_question{% if edit_form %} is_edit_form{% endif %}" 
     name='question-short-{{question.pk}}' 
     method='post' 
     action='{% url mysite.project.views.create_answer_do %}'>
@@ -19,7 +19,7 @@
                                             {% endifequal %}
                                     <textarea class='add_an_answer'
                                             id='answer-question{{ forloop.counter0 }}'
-                                            title='Add an answer'
+                                            title='Post an answer'
                                             name='answer__text'
                                             >{% ifequal edit_form 1%}{{answer.text}}{% endifequal %}</textarea>
                                             {% ifequal edit_form 1%}
@@ -91,6 +91,6 @@
                                             {% endifequal %}
                                         </div>
                                         <input type='submit' value='Submit'>
-                                        <a href="#" class="collapse_answer_form {% ifequal edit_form 1%}is_edit_form{% endifequal %}" id="collapse_answer_form_paragraph_{{answer.pk}}">Cancel</a>
+                                        <a href="#" class="collapse_answer_form {% ifequal edit_form 1%}is_edit_form{% endifequal %}" id="collapse_answer_form_{{answer.pk}}">Cancel</a>
                                     </div><!-- /.show_when_editing -->
                                 </form>
