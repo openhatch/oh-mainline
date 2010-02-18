@@ -1,0 +1,18 @@
+{% load voting_tags %}
+{% votes_by_user the_user on link_list as vote_dict %}
+{% scores_for_objects link_list as score_dict %}
+{% dict_entry_for_item answer from vote_dict as vote %}
+{% vote_by_user the_user on answer as vote %}
+{% score_for_object answer as score %}
+<span class="voting">
+    <form class="answervote" id="answerup{{ answer.id }}" action="/+answer/vote/{{ answer.id }}/{% if vote and vote.is_upvote %}clear{% else %}up{% endif %}vote/" method="POST">
+        <input type="image" id="answeruparrow{{ answer.id }}" src="/static/images/up{% if vote and vote.is_upvote %}mod{% else %}grey{% endif %}.png" >
+        <input type="hidden" name="next" value="{{project.get_url}}">
+    </form>
+    <div class='score' id="answerscore{{answer.pk}}">{{ score.score|default:0 }}</div>
+
+    <form class="answervote" id="answerdown{{ answer.id }}" action="/+answer/vote/{{ answer.id }}/{% if vote and vote.is_downvote %}clear{% else %}down{% endif %}vote/" method="POST">
+        <input type="image" id="answerdownarrow{{ answer.id }}" src="/static/images/down{% if vote and vote.is_downvote %}mod{% else %}grey{% endif %}.png">
+        <input type="hidden" name="next" value="{{project.get_url}}">
+    </form>
+</span>

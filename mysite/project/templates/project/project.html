@@ -1,7 +1,4 @@
 {% extends 'base/two_columns.html' %}
-{% load voting_tags %}
-{% votes_by_user the_user on link_list as vote_dict %}
-{% scores_for_objects link_list as score_dict %}
 
 {% block title %}
 Projects - {{ project.name }} 
@@ -50,22 +47,8 @@ about our members who support {{ project.name }}
                         </h3>
                         <ul class='answers'>
                             {% for answer in answers %}
-                            {% dict_entry_for_item answer from vote_dict as vote %}
-                            {% vote_by_user the_user on answer as vote %}
-                            {% score_for_object answer as score %}
                             <li>
-                            <span class="voting">
-                                <form class="answervote" id="answerup{{ answer.pk }}" action="/+answer/vote/{{ answer.id }}/{% if vote and vote.is_upvote %}clear{% else %}up{% endif %}vote/" method="POST">
-                                    <input type="image" id="answeruparrow{{ answer.id }}" src="/static/images/go-up{% if vote and vote.is_upvote %}{% else %}-off{% endif %}.png" >
-                                    <input type="hidden" name="next" value="{{project.get_url}}">
-                                </form>
-                                <div class='score'>{{ score.score|default:0 }}</div>
-
-                                <form class="answervote" id="answerdown{{ answer.id }}" action="/+answer/vote/{{ answer.id }}/{% if vote and vote.is_downvote %}clear{% else %}down{% endif %}vote/" method="POST">
-                                    <input type="image" id="answerdownarrow{{ answer.id }}" src="/static/images/go-down{% if vote and vote.is_downvote %}{% else %}-off{% endif %}.png">
-                                    <input type="hidden" name="next" value="{{project.get_url}}">
-                                </form>
-                            </span>
+                            {% include 'project/voting_controls.html' %}
                             {% if not question.is_bug_style %}
 
                                 {% ifequal the_user answer.author %}
@@ -239,7 +222,100 @@ about our members who support {{ project.name }}
                 $form.find('input:text, textarea').focus();
                 return false;
             });
-        })
+            ourJacker = new VoteHijacker();
+            ourJacker.initialize();
+            
+        });
+
+
+var VoteHijacker = function() {};
+
+VoteHijacker.prototype =
+{
+    initialize: function()
+    {
+        this.registerEventHandlers();
+    },
+
+    registerEventHandlers: function()
+    {
+        $('form.answervote').each(function() {
+            var form = this;
+            var answer__pk = /(\d+)$/.exec(form.id)[1];
+            var action = /(up|down|clear)vote/.exec(form.action)[1];
+            var prefix = 'answer';
+            var options = {
+                'dataType': 'json',
+                'error': function(){
+                    alert("Error voting: " + response.error_message);
+                },
+                'success': function createCallback(answer__pk, action, form) {
+                    return function callback(response) {
+                        var action = /(up|down|clear)vote/.exec(form.action)[1];
+                        alert(action);
+                        var upArrowType = "grey";
+                        var upFormAction = "up";
+                        var downArrowType = "grey";
+                        var downFormAction = "down";
+
+                        if (action == "up")
+                        {
+                            alert('i think the action was up');
+                            var upArrowType = "mod";
+                            var upFormAction = "clear";
+                        }
+                        else if (action == "down")
+                        {
+                            alert('i think the action was down');
+                            var downArrowType = "mod";
+                            var downFormAction = "clear";
+                        }
+
+                        VoteHijacker.updateArrow("up", prefix, answer__pk, upArrowType);
+                        VoteHijacker.updateArrow("down", prefix, answer__pk, downArrowType);
+                        VoteHijacker.updateFormAction("up", prefix, answer__pk, upFormAction);
+                        VoteHijacker.updateFormAction("down", prefix, answer__pk, downFormAction);
+                        VoteHijacker.updateScore(prefix, answer__pk, response.score);
+                    };
+                }(answer__pk, action)
+            };
+            $(this).ajaxForm(options);
+        });
+    }
+};
+
+VoteHijacker.updateArrow = function(arrowType, prefix, id, state)
+{
+    var img = $('#' + prefix + arrowType + "arrow" + id).get(0);
+    var re = new RegExp(arrowType + "(?:mod|grey)\\.png");
+    img.src = img.src.replace(re, arrowType + state + ".png");
+};
+
+VoteHijacker.updateFormAction = function(formType, prefix, id, action)
+{
+    var form = $('#' + prefix + formType + id).get(0);
+    console.debug(formType, ' before:', form);
+    form.action = form.action.replace(/(?:up|down|clear)vote/, action + "vote");
+    console.debug(formType, ' after:', form);
+    //form.action = '/+answer/vote/' + id + '/' + action + 'vote/';
+
+};
+
+VoteHijacker.updateScore = function(prefix, id, score)
+{
+    var scoreElement = $('#' + prefix + "score" + id).get(0);
+    scoreElement.innerHTML = score.score;
+    scoreElement.title = "after " + score.num_votes + " vote" + VoteHijacker.pluralize(score.num_votes);
+};
+
+VoteHijacker.pluralize = function(value)
+{
+    if (value != 1)
+    {
+        return "s";
+    }
+    return "";
+};
     </script>
 
 {% endblock js %}
