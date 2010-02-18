@@ -240,9 +240,11 @@ class ProjectInvolvementQuestion(OpenHatchModel):
     is_bug_style = models.BooleanField(default=False)
 
     def get_answers_for_project(self, a_project):
-        the_answers = self.answers.filter(project=a_project)
+        def get_score(obj):
+            return (-1)* voting.models.Vote.objects.get_score(obj)['score']
+        the_answers = list(self.answers.filter(project=a_project))
         # TODO: sort them
-        #the_answers.sort(key=voting.models.Vote.objects.get_score)
+        the_answers.sort(key=get_score)
         return the_answers
         
 
