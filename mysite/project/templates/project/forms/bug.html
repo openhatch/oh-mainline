@@ -1,0 +1,109 @@
+<form
+    class="answer_question"
+    name='question-long-{{question.pk}}'
+    method='POST'
+    action='{% url mysite.project.views.create_bug_answer_do %}'
+    {% ifequal edit_form 1%}
+    id="edit_form_bug_{{answer.pk}}"
+    {% endifequal %}
+    >
+
+                        <input type='hidden' name='project__pk' value='{{ project.pk }}'>
+                        <input type='hidden' name='question__pk' value='{{ question.pk }}'>
+                        <div class="show_when_editing">
+                            <label for='q{{ question.pk }}-bug__title'>
+                                Describe an issue</label>
+                        </div>
+                                            {% ifequal edit_form 1%}
+                                    <input type="hidden" name="is_edit"
+                                            value="1" />
+                                    <input type="hidden" name="answer__pk"
+                                    value="{{answer.pk}}" />
+                                    <div class='show_when_editing'>
+                                            {% endifequal %}
+                        <input type='text' name='bug__title' title='Describe an issue' 
+                                id='q{{ question.pk }}-bug__title' 
+                                class='add_an_answer'{% ifequal edit_form 1%} value="{{answer.title}}"{% endifequal %}/>
+                                {% ifequal edit_form 1%}
+                            </div>
+                            {% endifequal %}
+                        <div class="show_when_editing">
+                            {% ifequal question.key_string 'stress' %}
+                                <label for='q{{ question.pk }}-bug__details'>
+                                    What makes this issue stressful?</label>
+                            {% endifequal %}
+                            {% ifequal question.key_string 'newcomers' %}
+                                <label for='q{{ question.pk }}-bug__details'>
+                                    Further info</label>
+                            {% endifequal %}
+                            <textarea id='q{{ question.pk }}-bug__details' 
+                                    name='bug__details'>{% ifequal edit_form 1%}{{answer.details}}{% endifequal %}</textarea>
+                            <div class='input-note'>
+                                {% ifequal question.key_string 'stress' %}
+                                    <ul class='sections'>
+                                        <li>
+                                            <p>
+                                                <strong>Examples</strong>:
+                                            </p>
+                                            <p class='example'>
+                                                I don't know how to get started with
+                                                internationalizing my app.
+                                            </p>
+                                            <p class='example'>
+                                                Bug 392 about printing was filed five
+                                                years ago, and I don't even know if
+                                                printing still works.
+                                            </p>
+                                            <p class='example'>
+                                                I want help from a C coder writing a
+                                                Maildir patch for Alpine.
+                                            </p>
+                                        </li>
+                                        <li>
+                                            <p>
+                                                <strong>Note</strong>:
+                                            </p>
+                                            <p>
+                                                If this issue was formally
+                                                filed on the web, be sure to
+                                                include the URL.
+                                            </p>
+                                        </li>
+                                    </ul>
+                                {% endifequal %}
+
+                                {% ifequal question.key_string 'newcomers' %}
+                                    <ul class='sections'>
+                                        <li>
+                                            <p>
+                                                <strong>Tip</strong>:
+                                            </p>
+                                            <p>
+                                                Many projects have
+                                                good small tasks that can teach newcomers
+                                                how the project works. Now's your chance to
+                                                share one of them!
+                                            </p>
+                                            <p>
+                                                Include URLs if relevant (we'll
+                                                automatically linkify them). </p>
+                                        </li>
+                                        <li>
+                                            <p>
+                                                <strong>Example</strong>:
+                                            </p>
+                                            <p class='example'>
+                                                Someone could improve the
+                                                photo upload dialog box so that it lets
+                                                you resize the photo before sending it
+                                                to the web.
+                                            </p>
+                                        </li>
+                                    </ul>
+                                {% endifequal %}
+                            </div>
+
+                            <input type='submit' value='Submit'>
+                                        <a href="#" class="collapse_answer_form {% ifequal edit_form 1%}is_edit_form{% endifequal %}" id="collapse_answer_form_bug_{{answer.pk}}">Cancel</a>
+                        </div>
+                </form>

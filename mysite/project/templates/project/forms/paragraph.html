@@ -1,0 +1,96 @@
+<form
+    {% ifequal edit_form 1%}
+    id="edit_form_paragraph_{{answer.pk}}"
+    {% endifequal %}
+    class="answer_question" 
+    name='question-short-{{question.pk}}' 
+    method='post' 
+    action='{% url mysite.project.views.create_answer_do %}'>
+                                    <input type="hidden" name="question__pk"
+                                            value="{{question.pk}}" />
+                                    <input type="hidden" name="project__pk"
+                                            value="{{project.pk}}" />
+                                            {% ifequal edit_form 1%}
+                                    <input type="hidden" name="is_edit"
+                                            value="1" />
+                                    <input type="hidden" name="answer__pk"
+                                    value="{{answer.pk}}" />
+                                    <div class='show_when_editing'>
+                                            {% endifequal %}
+                                    <textarea class='add_an_answer'
+                                            id='answer-question{{ forloop.counter0 }}'
+                                            title='Add an answer'
+                                            name='answer__text'
+                                            >{% ifequal edit_form 1%}{{answer.text}}{% endifequal %}</textarea>
+                                            {% ifequal edit_form 1%}
+                                    </div>
+                                            {% endifequal %}
+                                    <div class='show_when_editing'>
+                                        <div class='input-note'>
+                                            {% ifequal question.key_string 'non_code_participation' %}
+                                                <ul class='sections'>
+                                                    <li>
+                                                        <p>
+                                                            <strong>Tip</strong>:
+                                                        </p>
+                                                        <p>
+                                                            Discuss documentation,
+                                                            testing, webmastering,
+                                                            and/or publicity.
+                                                        </p>
+                                                        <p>Include URLs if relevant (we'll
+                                                            automatically linkify them). </p>
+                                                    </li>
+                                                    <li>
+                                                        <p>
+                                                            <strong>Example</strong>:
+                                                        </p>
+                                                        <p class='example'>
+                                                            We need people to download version
+                                                            0.4.5 and make sure the frobulator
+                                                            still frobulates correctly.
+                                                        </p>
+                                                    </li>
+                                                </ul>
+                                            {% endifequal %}
+
+                                            {% ifequal question.key_string 'where_to_start' %}
+                                                <ul class='sections'>
+                                                    <li>
+                                                        <p>
+                                                            <strong>Tip</strong>:
+                                                        </p>
+                                                        <p>
+                                                            Talk about diverse
+                                                            kinds of contributions.
+                                                            Include URLs if
+                                                            relevant (we'll
+                                                            automatically linkify
+                                                            them).
+                                                        </p>
+                                                    </li>
+                                                    <li>
+                                                        <p>
+                                                            <strong>Examples</strong>:
+                                                        </p>
+                                                        <p class='example'>
+                                                            Drop me a line at
+                                                            &lt;hello@example.com&gt;
+                                                            if you want to get
+                                                            involved.
+                                                        </p>
+                                                        <p class='example'>
+                                                            Visit our welcome page
+                                                            (example.com/hi) to learn
+                                                            about our mailing
+                                                            lists, forums, irc
+                                                            channel, and planet.
+                                                        </p>
+                                                    </li>
+                                                </ul>
+                                            {% endifequal %}
+                                        </div>
+                                        <input type='submit' value='Submit'>
+                                        <a href="#" class="collapse_answer_form {% ifequal edit_form 1%}is_edit_form{% endifequal %}" id="collapse_answer_form_paragraph_{{answer.pk}}">Cancel</a>
+                                    </div><!-- /.show_when_editing -->
+                                </form>

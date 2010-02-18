@@ -255,22 +255,8 @@ class ProjectInvolvementQuestion(OpenHatchModel):
         ret.save()
         return ret
 
-class BugAnswer(OpenHatchModel):
-    title = models.CharField(blank=False, max_length=255)
-    details = models.TextField()
-    author = models.ForeignKey(User)
-    question = models.ForeignKey(ProjectInvolvementQuestion, related_name='bug_answers')
-    project = models.ForeignKey(Project)
-
-    @staticmethod
-    def create_dummy(**kwargs):
-        data = {'title': 'i want my bug fixed'}
-        data.update(kwargs)
-        ret = BugAnswer(**data)
-        ret.save()
-        return ret
-
 class Answer(OpenHatchModel):
+    title = models.CharField(blank=True, max_length=255)
     text = models.TextField(blank=False)
     author = models.ForeignKey(User)
     question = models.ForeignKey(ProjectInvolvementQuestion, related_name='answers')

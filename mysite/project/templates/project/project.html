@@ -25,10 +25,8 @@ about our members who support {{ project.name }}
         </div>
         <div class='body'>
             <ul id='paragraph_questions' class='questions'>
-                {% for question, answers in question_answer_mappings_non_bug %}
+                {% for question, answers in question2answer %}
                     <li>
-                        <style type="text/css">
-                        </style>
                         <h3><strong>Q:</strong>
                             {% ifequal question.key_string 'non_code_participation' %}
                                 Other than writing code, how can people participate
@@ -38,6 +36,13 @@ about our members who support {{ project.name }}
                             {% ifequal question.key_string 'where_to_start' %}
                                 I'm interested in getting involved in
                                 {{ project.name }}. Where do I start?
+                            {% endifequal %}
+                            {% ifequal question.key_string 'stress' %}
+                                What is a bug or issue with {{ project.name }} that
+                                you've been putting off that is stressing you out?
+                            {% endifequal %}
+                            {% ifequal question.key_string 'newcomers' %}
+                                What is a good issue for a newcomer to start out with?
                             {% endifequal %}
                         </h3>
                         <ul class='answers'>
@@ -54,7 +59,11 @@ about our members who support {{ project.name }}
                                         <img src='/static/images/icons/pencil.png' alt='Edit name' />
                                         </a>
                                         {% with 1 as edit_form %}
-                                            {% include 'project/forms/paragraph.html' %}
+                                        {% if question.is_bug_style %}
+                                        {% include 'project/forms/bug.html' %}
+                                        {% else %}
+                                        {% include 'project/forms/paragraph.html' %}
+                                        {% endif %}
                                         {% endwith %}
                                     {% endifequal %}
                                     <span class="answer" id="answer_paragraph_{{answer.pk}}">
@@ -66,78 +75,16 @@ about our members who support {{ project.name }}
                             <li>
                             {% if the_user.is_authenticated %}
                             {% include 'project/forms/paragraph.html' %}
-                                {% else %}
-                                {# if they aren't logged in#}
-                                <a href="{% url oh_login %}?next={{ project.get_url|urlencode}}" style="">Log in to add an answer</a>
-                                {% endif %}
+                            {% else %}
+                            {# if they aren't logged in#}
+                            <a href="{% url oh_login %}?next={{ project.get_url|urlencode}}" style="">Log in to add an answer</a>
+                            {% endif %}
 
-                                </li>
+                            </li>
                             </ul>
                             </li>
                             {% endfor %}
                         </ul>
-        <ul id='bug_questions' class='questions'>
-            {% for question, bug_answers in question_answer_mappings_bug %}
-            <li>
-            <ul class='answers'>
-                {% ifequal question.key_string 'stress' %}
-                    <h3>
-                        <strong>Q:</strong>
-                        What is a bug or issue with {{ project.name }} that
-                        you've been putting off that is stressing you out?
-                    </h3>
-                {% endifequal %}
-                {% ifequal question.key_string 'newcomers' %}
-                    <h3>
-                        <strong>Q:</strong>
-                        What is a good issue for a newcomer to start out with?
-                    </h3>
-                {% endifequal %}
-
-                {% for bug_answer in bug_answers %}
-                <li>
-                    <span class="answer" id="answer_bug_{{bug_answer.pk}}">
-                <div class="bug_answer_title">
-                    {% ifequal the_user bug_answer.author %}
-                    {# delete form #}
-                    <form name='' method='post' action='{% url mysite.project.views.delete_bug_answer_do %}' class='delete' id="delete_form_bug_{{bug_answer.pk}}">
-                        <input type="hidden" name="answer__pk" value="{{bug_answer.pk}}" />
-                        <input type="submit" value="X" />
-                    </form>
-                    {# edit link #}
-                    <a href="#" class="edit_link for_bug" id="edit_link_bug_{{bug_answer.pk}}">
-                    <img src='/static/images/icons/pencil.png' alt='Edit name' />
-                    </a>
-                    {% endifequal %}
-                        <strong>{{bug_answer.title}}</strong>
-                </div>
-                    {{bug_answer.details|urlize}}
-                    <br/>
-                    {% with bug_answer as answer %}
-                    {% include 'project/byline.html' %}
-                    {% endwith %}
-                </span>
-                {% with 1 as edit_form %}
-                {% with bug_answer as answer %}
-                {% include 'project/forms/bug.html' %}
-                {% endwith %}
-                {% endwith %}
-                {% endfor  %}
-                <li>
-
-
-                {% if the_user.is_authenticated %}
-                    {% include 'project/forms/bug.html' %}
-                {% else %}
-                    {# if they aren't logged in#}
-                    <a href="{% url oh_login %}?next={{ project.get_url|urlencode}}" style="">Log in to add an answer</a>
-                {% endif %}
-                </li>
-
-            </ul>
-            </li>
-    {% endfor %}
-</ul>
     </div>
 </div><!-- /.module #requests -->
 

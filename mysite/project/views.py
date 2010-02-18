@@ -15,29 +15,24 @@ def project(request, project__name = None):
     p = get_object_or_404(Project, name=project__name)
 
     # Get or create two paragraph-y questions.
-    question_answer_mappings_non_bug = []
-    questions = []
-    questions.append(ProjectInvolvementQuestion.objects.get_or_create(
-        key_string='non_code_participation', is_bug_style=False)[0])
-    questions.append(ProjectInvolvementQuestion.objects.get_or_create(
-        key_string='where_to_start', is_bug_style=False)[0])
-    for question in questions:
-        question_answer_mappings_non_bug.append((question, question.get_answers_for_project(p)))
-
-    # Get or create two buggy questions.
-    question_answer_mappings_bug = []
-    bug_questions = []
-    bug_questions.append(ProjectInvolvementQuestion.objects.get_or_create(key_string='stress', is_bug_style=True)[0])
-    bug_questions.append(ProjectInvolvementQuestion.objects.get_or_create(key_string='newcomers', is_bug_style=True)[0])
-    for question in bug_questions:
-        question_answer_mappings_bug.append((question, question.get_answers_for_project(p)))
+    questions = [
+            ProjectInvolvementQuestion.objects.get_or_create(
+                    key_string='non_code_participation', is_bug_style=False)[0],
+            ProjectInvolvementQuestion.objects.get_or_create(
+                    key_string='where_to_start', is_bug_style=False)[0],
+            ProjectInvolvementQuestion.objects.get_or_create(
+                    key_string='stress', is_bug_style=True)[0],
+            ProjectInvolvementQuestion.objects.get_or_create(
+                    key_string='newcomers', is_bug_style=True)[0]
+    ]
+    question2answer = [(question, question.get_answers_for_project(p))
+        for question in questions]
 
     return (request,
             'project/project.html',
             {
                 'project': p,
-                'question_answer_mappings_non_bug': question_answer_mappings_non_bug,
-                'question_answer_mappings_bug': question_answer_mappings_bug,
+                'question2answer': question2answer,
                 'contributors': p.get_contributors()[:3],
                 'mentors': (mysite.profile.controllers.people_matching(
                     'can_mentor', project__name)),
