@@ -2,7 +2,7 @@
     {% if edit_form %}
     id="edit_form_{{answer.pk}}"
     {% endif %}
-    class="answer_question{% if edit_form %} is_edit_form{% endif %}" 
+    class="answer_question{% if edit_form %} is_edit_form active{% endif %}" 
     name='question-short-{{question.pk}}' 
     method='post' 
     action='{% url mysite.project.views.create_answer_do %}'>
@@ -91,6 +91,6 @@
                                             {% endifequal %}
                                         </div>
                                         <input type='submit' value='Submit'>
-                                        <a href="#" class="collapse_answer_form {% ifequal edit_form 1%}is_edit_form{% endifequal %}" id="collapse_answer_form_{{answer.pk}}">Cancel</a>
+                                        <a href="#" class="collapse_answer_form" id="collapse_answer_form_{{answer.pk}}">Cancel</a>
                                     </div><!-- /.show_when_editing -->
                                 </form>

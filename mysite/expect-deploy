@@ -52,8 +52,12 @@ expect {
     "$ " 
 }
 
-send_user "\r\n*** Atempting to run migrations... ***\r\n"
+send_user "\r\n*** Attempting to run migrations... ***\r\n"
 send "./bin/production migrate\r"
+expect "$ "
+
+send_user "\r\n*** Syncing the un-migrated models... ***\r\n"
+send "./bin/production syncdb\r"
 expect "$ "
 
 send_user "\r\n*** Reloading the web site... ***\r\n"

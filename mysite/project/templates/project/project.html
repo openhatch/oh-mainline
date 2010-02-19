@@ -195,7 +195,7 @@ about our members who support {{ project.name }}
             // Bind a function to the 'x' on input forms.  this function collapses the form
             $('.collapse_answer_form').click(function(){
                 $form = $(this).parent().parent();
-                $form.removeClass('active');
+                $form.hide();
                 $form.find('input:text, textarea').hint();
                 if($form.hasClass('is_edit_form')){
                     answer_id = $(this).attr('id').split('_')[3];
@@ -212,7 +212,7 @@ about our members who support {{ project.name }}
             $('.edit_link').click(function(){
                 answer_id = this.id.split('_')[2];
                 $form = $("#edit_form_"  + answer_id);
-                $form.addClass('active');
+                $form.show();
                 $form.find('input:text, textarea').unbind('blur');
                 $answer = $("#answer_"  + answer_id);
                 $answer.hide();

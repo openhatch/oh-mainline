@@ -1,11 +1,11 @@
 <form
-    class="answer_question"
+    {% if edit_form %}
+    id="edit_form_{{answer.pk}}"
+    {% endif %}
+    class="answer_question{% if edit_form %} is_edit_form active{% endif %}" 
     name='question-long-{{question.pk}}'
     method='POST'
     action='{% url mysite.project.views.create_answer_do %}'
-    {% ifequal edit_form 1%}
-    id="edit_form_{{answer.pk}}"
-    {% endifequal %}
     >
 
                         <input type='hidden' name='project__pk' value='{{ project.pk }}'>

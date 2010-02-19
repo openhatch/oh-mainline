@@ -22,7 +22,9 @@ body#project #bugs ul li { margin: 5px 0 5px 10px; color: #777; margin-bottom: 1
 body#project input, body#project textarea, body#project input[type='submit'] { float: none; }
 body#project .contains_questions .body h3 { font-size: 1.2em; font-weight: normal; float: none; margin-bottom: 10px; }
 body#project .contains_questions .body h3 strong { font-weight: normal; color: #949494; }
-body#project ul.answers li { float: left; width: 100%;  margin-bottom: 5px; }
+body#project ul.answers li { float: left; width: 100%; border-bottom: 1px dashed #d7d7d7; padding: 10px 0; }
+body#project ul.answers li:last-child { border: 0; }
+
 body#project .show_when_editing { display: none; }
 body#project .blur { color: #888; }
 body#project textarea { height: 60px; }
@@ -30,8 +32,8 @@ body#project textarea, body#project input[type='text'] { font-family: sans-serif
 body#project ul.answers textarea.blur { height: 1.2em; }
 body#project .questions > li { float: left; width: 100%; margin: 10px 0 30px; }
 
-body#project .bug_answer_title { font-size: .9em; border-bottom: 1px solid #e4e4e4; padding-bottom: 3px; margin-bottom: 3px; }
-body#project form.answer_question { width: 90%; padding: 4px 12px; }
+body#project .bug_answer_title { font-size: 1.1em; padding-bottom: 3px; margin-bottom: 3px; }
+body#project form.answer_question { width: 85%; padding: 4px 12px; }
 body#project form.active { float: left; background-color: #ffc;  -moz-border-radius: 8px; border-radius: 8px; margin-bottom: 20px; }
 body#project form.active .show_when_editing { display: block; }
 body#project form.active a.collapse_answer_form { padding: 10px; margin: 0 0 0 10px; font-size: .9em;}
@@ -54,6 +56,7 @@ body#project .questions li form.delete { display: inline; }
 body#project .questions li form.delete input[type='submit'] { padding: 0; background: none; font: inherit; border: 0; font-size: 1em; display: inline; color: #FF6D3D;}
 body#project .questions li form.delete input[type='submit']:hover { cursor:hand; cursor:pointer; text-decoration: underline;}
 body#project .questions li a.edit_link { }
-body#project .questions li .answer{float: left; width: 84%;}
-body#project .voting { float: right; width: 3%; margin-right: 2%; text-align: center; }
+body#project .questions li .answer{float: left; width: 75%;}
+body#project .voting { float: right; width: 8%; margin-right: 2%; text-align: center; }
 body#project .voting .score { color: #444; font-size: .8em; margin-bottom: 3px; width: 100%;  }
+body#project form.is_edit_form { display: none; }
