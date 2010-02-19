@@ -1,4 +1,5 @@
 {% extends 'base/two_columns.html' %}
+{% load profile_extras %}
 
 {% block title %}
 Projects - {{ project.name }} 
@@ -110,6 +111,40 @@ about our members who support {{ project.name }}
 {% endblock left %}
 
 {% block main %}
+    {% if random_pfentry %}
+    <div class='module' id='bugs'>
+        <div class='head'>
+            <h3>Description</h3>
+        </div>
+        <div class='body'>
+            <h2 style='font-size: 1.3em; font-weight: normal;'>
+                {% spaceless %}
+                <span class='quotemark'>&ldquo;</span>
+                <span>{{ random_pfentry.project_description|urlize|linebreaksbr}}</span>
+                <span class='quotemark'>&rdquo;</span>
+                {% endspaceless %}
+            </h2>
+            <p style='font-size: .9em; margin: 5px 0 0 0;'>
+                &mdash; from
+                {% for p in people %}
+                <a href='{{ p.profile_url }}'>
+                    {% if forloop.last %}
+                        and
+                    {% endif %}
+                    {{ p.get_full_name_or_username }}'s
+                    {% spaceless %}
+                    <span>profile</span>
+                    {% if not forloop.last %}
+                        <span>, </span>
+                    {% endif %}
+                    {% endspaceless %}
+                </a>
+                {% endfor %}
+            </p>
+        </div>
+    </div>
+    {% endif %}
+
     <div class='module' id='bugs'>
         <div class='head'>
             <h3>Relatedly</h3>

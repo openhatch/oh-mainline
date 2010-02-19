@@ -60,3 +60,5 @@ body#project .questions li .answer{float: left; width: 75%;}
 body#project .voting { float: right; width: 8%; margin-right: 2%; text-align: center; }
 body#project .voting .score { color: #444; font-size: .8em; margin-bottom: 3px; width: 100%;  }
 body#project form.is_edit_form { display: none; }
+
+body#project .quotemark { color: #555; }

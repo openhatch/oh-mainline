@@ -10,9 +10,21 @@ from django.shortcuts import render_to_response, get_object_or_404, get_list_or_
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 
+import random
+
 @mysite.base.decorators.view
 def project(request, project__name = None):
     p = get_object_or_404(Project, name=project__name)
+
+    pfentries = p.portfolioentry_set.exclude(project_description='')
+    only_good_pfentries = lambda pfe: pfe.project_description.strip()
+    pfentries = filter(only_good_pfentries, pfentries)
+
+    context = {}
+    if pfentries:
+        context['random_pfentry'] = random.choice(pfentries)
+
+    context['people'] = [pfe.person for pfe in pfentries]
 
     # Get or create two paragraph-y questions.
     questions = [
@@ -25,38 +37,21 @@ def project(request, project__name = None):
             ProjectInvolvementQuestion.objects.get_or_create(
                     key_string='newcomers', is_bug_style=True)[0]
     ]
-    question2answer = [(question, question.get_answers_for_project(p))
+    context['question2answer'] = [(question, question.get_answers_for_project(p))
         for question in questions]
 
+    context.update({
+        'project': p,
+        'contributors': p.get_contributors()[:3],
+        'mentors': (mysite.profile.controllers.people_matching(
+            'can_mentor', project__name)),
+        'language_mentors': (mysite.profile.controllers.people_matching(
+            'can_mentor', p.language)),
+        'explain_to_anonymous_users': True,
+        })
     return (request,
             'project/project.html',
-            {
-                'project': p,
-                'question2answer': question2answer,
-                'contributors': p.get_contributors()[:3],
-                'mentors': (mysite.profile.controllers.people_matching(
-                    'can_mentor', project__name)),
-                'language_mentors': (mysite.profile.controllers.people_matching(
-                        'can_mentor', p.language)),
-                'explain_to_anonymous_users': True,
-                'query': {'terms': []}, # hack to make the bug result template inclusion work
-                'old_questions': {
-                    'I want to join this project. Where do I begin?': 
-                        {
-
-                            'input_note': 'Be sure to discuss coders and non-coders alike.'
-
-                        },
-
-                    "What sort of skills is this project looking for?":
-                    
-                        {
-
-
-                        }
-
-                    }
-                },
+            context
             )
 
 @mysite.base.decorators.view

@@ -1,5 +1,5 @@
 {% load base_extras %}
-<small style='color: #888;'>&nbsp;&nbsp;&nbsp;&mdash; <a style='font-weight: bold;' href='{{ answer.author.get_profile.get_profile_url }}'>{{ answer.author.get_profile.get_full_name_or_username }}</a> &middot; {{ answer.created_date|timesince_terse }} ago
+<small style='color: #888;'>&nbsp;&nbsp;&nbsp;&mdash; <a style='font-weight: bold;' href='{{ answer.author.get_profile.profile_url }}'>{{ answer.author.get_profile.get_full_name_or_username }}</a> &middot; {{ answer.created_date|timesince_terse }} ago
     {% ifequal the_user answer.author %}
     &middot;
     <a href="#" class="edit_link" id="edit_link_{{answer.pk}}">edit</a>
