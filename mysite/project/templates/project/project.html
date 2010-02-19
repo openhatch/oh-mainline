@@ -114,6 +114,7 @@ about our members who support {{ project.name }}
 {% endblock left %}
 
 {% block main %}
+    {% comment %}
     {% if random_pfentry %}
     <div class='module' id='bugs'>
         <div class='head'>
@@ -139,6 +140,7 @@ about our members who support {{ project.name }}
         </div>
     </div>
     {% endif %}
+    {% endcomment %}
 
     <div class='module' id='bugs'>
         <div class='head'>
