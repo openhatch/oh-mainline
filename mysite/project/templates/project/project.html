@@ -15,6 +15,13 @@ about our members who support {{ project.name }}
 {% block pagetop %}
 
     <h3 class='supertitle'><a href='{% url mysite.project.views.projects %}'>Projects</a></h3>
+    <a href='{{ project.get_url }}'>
+        <div class='project_icon'
+            style="background-image: url('{{ project.get_url_of_icon_or_generic }}')"
+            ><span class='alt-text'>
+                {{ project.name}}
+            </span></div>
+    </a>
     <h1>{{ project.name }}</h1>
 
 {% endblock pagetop %}
