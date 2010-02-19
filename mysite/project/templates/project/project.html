@@ -33,10 +33,6 @@ about our members who support {{ project.name }}
                                 I'd like to participate. How do I start?
                             {% endifequal %}
 
-                            {% ifequal question.key_string 'non_code_participation' %}
-                                Other than writing code, how can I contribute?
-                            {% endifequal %}
-
                             {% ifequal question.key_string 'stress' %}
                                 What is a bug or issue with {{ project.name }}
                                 that you've been putting off, neglecting, or
@@ -44,7 +40,12 @@ about our members who support {{ project.name }}
                             {% endifequal %}
 
                             {% ifequal question.key_string 'newcomers' %}
-                                What's a good issue for a newcomer to start out with?
+                                What's a good bug for a newcomer to tackle?
+                            {% endifequal %}
+                            
+                            {% ifequal question.key_string 'non_code_participation' %}
+                                Other than writing code, how can I contribute?
+
                             {% endifequal %}
                         </h3>
                         <ul class='answers'>
@@ -106,6 +107,7 @@ about our members who support {{ project.name }}
                             </li>
                             {% endfor %}
                         </ul>
+                        <div id="disclaimer" style="font-size: .9em;">Thanks for trying out this new feature.  The questions may change&mdash;we're still working out the details.  Feel free to <a href="/contact">drop us a line</a> with suggestions!</div>
     </div>
 </div><!-- /.module #requests -->
 
@@ -283,6 +285,15 @@ VoteHijacker.prototype =
                 },
                 'success': function createCallback(answer__pk, form) {
                     return function callback(response) {
+                        if(!response.success){
+                            if(response.error_message == "Not authenticated."){
+                                alert("Please log in to vote.");
+                            }
+                            else{
+                                alert("Error voting: " + response.error_message);
+                            }
+                            return;
+                        }
                         var action = /(up|down|clear)vote/.exec(form.action)[1];
                         var upArrowType = "grey";
                         var upFormAction = "up";

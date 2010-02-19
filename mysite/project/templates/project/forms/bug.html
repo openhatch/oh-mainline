@@ -36,9 +36,39 @@
                                 <label for='q{{ question.pk }}-answer__text'>
                                     Further info</label>
                             {% endifequal %}
+                            {% ifequal question.key_string 'non_code_participation' %}
+                                <label for='q{{ question.pk }}-answer__text'>
+                                    Further info</label>
+                            {% endifequal %}
                             <textarea id='q{{ question.pk }}-answer__text' 
                                     name='answer__text'>{% ifequal edit_form 1%}{{answer.text}}{% endifequal %}</textarea>
                             <div class='input-note'>
+                                            {% ifequal question.key_string 'non_code_participation' %}
+                                                <ul class='sections'>
+                                                    <li>
+                                                        <p>
+                                                            <strong>Tip</strong>:
+                                                        </p>
+                                                        <p>
+                                                            Discuss documentation,
+                                                            testing, webmastering,
+                                                            and/or publicity.
+                                                        </p>
+                                                        <p>Include URLs if relevant (we'll
+                                                            automatically linkify them). </p>
+                                                    </li>
+                                                    <li>
+                                                        <p>
+                                                            <strong>Example</strong>:
+                                                        </p>
+                                                        <p class='example'>
+                                                            We need people to download version
+                                                            0.4.5 and make sure the frobulator
+                                                            still frobulates correctly.
+                                                        </p>
+                                                    </li>
+                                                </ul>
+                                            {% endifequal %}
                                 {% ifequal question.key_string 'stress' %}
                                     <ul class='sections'>
                                         <li>

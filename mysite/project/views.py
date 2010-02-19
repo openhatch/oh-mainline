@@ -36,11 +36,11 @@ def project(request, project__name = None):
             ProjectInvolvementQuestion.objects.get_or_create(
                     key_string='where_to_start', is_bug_style=False)[0],
             ProjectInvolvementQuestion.objects.get_or_create(
-                    key_string='non_code_participation', is_bug_style=False)[0],
+                    key_string='non_code_participation', is_bug_style=True)[0],
+            ProjectInvolvementQuestion.objects.get_or_create(
+                    key_string='newcomers', is_bug_style=True)[0],
             ProjectInvolvementQuestion.objects.get_or_create(
                     key_string='stress', is_bug_style=True)[0],
-            ProjectInvolvementQuestion.objects.get_or_create(
-                    key_string='newcomers', is_bug_style=True)[0]
     ]
     context['question2answer'] = [(question, question.get_answers_for_project(p))
         for question in questions]
