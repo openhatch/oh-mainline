@@ -126,20 +126,12 @@ about our members who support {{ project.name }}
             </h2>
             <p style='font-size: .9em; margin: 5px 0 0 0;'>
                 &mdash; from
-                {% for p in people %}
-                <a href='{{ p.profile_url }}'>
-                    {% if forloop.last %}
-                        and
-                    {% endif %}
-                    {{ p.get_full_name_or_username }}'s
+                <a href='{{ random_pfentry.person.profile_url }}'>
+                    {{ random_pfentry.person.get_full_name_or_username }}'s
                     {% spaceless %}
                     <span>profile</span>
-                    {% if not forloop.last %}
-                        <span>, </span>
-                    {% endif %}
                     {% endspaceless %}
                 </a>
-                {% endfor %}
             </p>
         </div>
     </div>

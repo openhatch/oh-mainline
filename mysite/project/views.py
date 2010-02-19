@@ -24,6 +24,11 @@ def project(request, project__name = None):
     if pfentries:
         context['random_pfentry'] = random.choice(pfentries)
 
+    # If description is too popular, and there are alternatives,
+    # don't use the popular description. (This avoids a feeling of
+    # 'Oh, everybody wrote the same thing.')
+    # Calculate popularity case-insensitively.
+
     context['people'] = [pfe.person for pfe in pfentries]
 
     # Get or create two paragraph-y questions.
