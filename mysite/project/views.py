@@ -34,9 +34,9 @@ def project(request, project__name = None):
     # Get or create two paragraph-y questions.
     questions = [
             ProjectInvolvementQuestion.objects.get_or_create(
-                    key_string='non_code_participation', is_bug_style=False)[0],
-            ProjectInvolvementQuestion.objects.get_or_create(
                     key_string='where_to_start', is_bug_style=False)[0],
+            ProjectInvolvementQuestion.objects.get_or_create(
+                    key_string='non_code_participation', is_bug_style=False)[0],
             ProjectInvolvementQuestion.objects.get_or_create(
                     key_string='stress', is_bug_style=True)[0],
             ProjectInvolvementQuestion.objects.get_or_create(

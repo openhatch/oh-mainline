@@ -29,15 +29,14 @@ about our members who support {{ project.name }}
                 {% for question, answers in question2answer %}
                     <li>
                         <h3><strong>Q:</strong>
-                            {% ifequal question.key_string 'non_code_participation' %}
-                                Other than writing code, how can people participate
-                                in {{ project.name }}?
+                            {% ifequal question.key_string 'where_to_start' %}
+                                I'd like to participate. How do I start?
                             {% endifequal %}
 
-                            {% ifequal question.key_string 'where_to_start' %}
-                                I'm interested in getting involved in
-                                {{ project.name }}. How do I start?
+                            {% ifequal question.key_string 'non_code_participation' %}
+                                Other than writing code, how can I contribute?
                             {% endifequal %}
+
                             {% ifequal question.key_string 'stress' %}
                                 What is a bug or issue with {{ project.name }} that
                                 you've been putting off that is stressing you out?
