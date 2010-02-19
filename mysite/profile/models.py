@@ -125,11 +125,6 @@ class Person(models.Model):
         else:
             return None
 
-    @models.permalink
-    def get_profile_url(self):
-        return reverse(mysite.profile.views.display_person_web,
-                {'user_to_display__username': self.user.username})
-
     def get_photo_thumbnail_url_or_default(self):
         try:
             return self.photo_thumbnail.url
