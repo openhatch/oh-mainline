@@ -22,7 +22,7 @@ about our members who support {{ project.name }}
 {% block left %}
     <div class='module contains_questions'>
         <div class='head'>
-            <h3>Discuss {{ project.name }}</h3>
+            <h3>How can people make {{ project.name }} better?</h3>
         </div>
         <div class='body'>
             <ul id='paragraph_questions' class='questions'>
@@ -36,14 +36,14 @@ about our members who support {{ project.name }}
 
                             {% ifequal question.key_string 'where_to_start' %}
                                 I'm interested in getting involved in
-                                {{ project.name }}. Where do I start?
+                                {{ project.name }}. How do I start?
                             {% endifequal %}
                             {% ifequal question.key_string 'stress' %}
                                 What is a bug or issue with {{ project.name }} that
                                 you've been putting off that is stressing you out?
                             {% endifequal %}
                             {% ifequal question.key_string 'newcomers' %}
-                                What is a good issue for a newcomer to start out with?
+                                What's a good issue for a newcomer to start out with?
                             {% endifequal %}
                         </h3>
                         <ul class='answers'>
