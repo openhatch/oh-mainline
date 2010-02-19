@@ -222,9 +222,10 @@ about our members who support {{ project.name }}
             // Bind a function to the 'x' on input forms.  this function collapses the form
             $('.collapse_answer_form').click(function(){
                 $form = $(this).parent().parent();
-                $form.hide();
+                $form.removeClass('active');
                 $form.find('input:text, textarea').hint();
                 if($form.hasClass('is_edit_form')){
+                    $form.hide();
                     answer_id = $(this).attr('id').split('_')[3];
                     console.debug(answer_id);
                     $answer = $("#answer_" + answer_id);
