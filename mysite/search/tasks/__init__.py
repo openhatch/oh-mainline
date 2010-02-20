@@ -2,7 +2,7 @@ from datetime import timedelta
 import datetime
 import logging
 import mysite.search.models.Project
-from mysite.customs.models import RoundupBugTracker
+import mysite.customs.models.RoundupBugTracker
 from celery.task import Task, PeriodicTask
 from celery.registry import tasks
 from mysite.search.launchpad_crawl import grab_lp_bugs, lpproj2ohproj
@@ -42,7 +42,7 @@ class LearnAboutNewPythonDocumentationBugs(PeriodicTask):
         logger = self.get_logger(**kwargs)
         logger.info("Started to grab the list of Python documentation bugs.")
         url = 'http://bugs.python.org/issue?status=1%2C3&%40sort=activity&%40columns=id&%40startwith=0&%40group=priority&%40filter=status%2Ccomponents&components=4&%40action=export_csv'
-        for bug_id in RoundupBugTracker.csv_url2bugs(url):
+        for bug_id in mysite.customs.models.RoundupBugTracker.csv_url2bugs(url):
             # enqueue a task to examine this bug
             task = LookAtOneBugInPython()
             task.delay(bug_id=bug_id)
@@ -54,7 +54,7 @@ class LearnAboutNewEasyPythonBugs(PeriodicTask):
         logger = self.get_logger(**kwargs)
         logger.info("Started to grab the list of Python easy bugs.")
         url = 'http://bugs.python.org/issue?status=1%2C3&%40sort=activity&%40columns=id&%40startwith=0&%40group=priority&%40filter=status%2Ckeywords&keywords=6&%40action=export_csv'
-        for bug_id in RoundupBugTracker.csv_url2bugs(url):
+        for bug_id in mysite.customs.models.RoundupBugTracker.csv_url2bugs(url):
             # enqueue a task to examine this bug
             task = LookAtOneBugInPython()
             task.delay(bug_id=bug_id)
@@ -81,8 +81,8 @@ class LookAtOneBugInPython(Task):
         # to avoid hammering remote servers.
 
         try:
-            rpt = RoundupBugTracker.objects.get(name='GrabPythonBugs')
-        except RoundupBugTracker.DoesNotExist:
+            rpt = mysite.customs.models.RoundupBugTracker.objects.get(name='GrabPythonBugs')
+        except mysite.customs.models.RoundupBugTracker.DoesNotExist:
             logger.info("Could not find a matching Python bug tracker. Bailing.")
             return
 
@@ -104,13 +104,13 @@ class GrabPythonBugs(PeriodicTask):
         python_core, _ = mysite.search.models.Project.objects.get_or_create(name='Python', language='Python')
 
         roundup_root_url = 'http://bugs.python.org'
-        # Delete all other RoundupBugTracker objects using the same root
-        rpts = RoundupBugTracker.objects.filter(roundup_root_url=roundup_root_url)
+        # Delete all other mysite.customs.models.RoundupBugTracker objects using the same root
+        rpts = mysite.customs.models.RoundupBugTracker.objects.filter(roundup_root_url=roundup_root_url)
         for rpt in rpts:
             if rpt.name != bug_tracker_name:
                 rpt.delete()
 
-        p, _ = RoundupBugTracker.objects.get_or_create(name=bug_tracker_name, project=python_core)
+        p, _ = mysite.customs.models.RoundupBugTracker.objects.get_or_create(name=bug_tracker_name, project=python_core)
         p.save()
         p.grab()
 
