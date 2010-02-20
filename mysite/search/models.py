@@ -15,7 +15,7 @@ from django.core.urlresolvers import reverse
 import voting
 
 class OpenHatchModel(models.Model):
-    created_date = models.DateTimeField(auto_now_add=True)
+    created_date = models.DateTimeField(null=True, auto_now_add=True)
     modified_date = models.DateTimeField(auto_now=True)
     class Meta:
         abstract = True
