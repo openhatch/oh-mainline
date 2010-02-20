@@ -1,7 +1,7 @@
 from datetime import timedelta
 import datetime
 import logging
-from mysite.search.models import Project
+import mysite.search.models.Project
 from mysite.customs.models import RoundupBugTracker
 from celery.task import Task, PeriodicTask
 from celery.registry import tasks
@@ -101,7 +101,7 @@ class GrabPythonBugs(PeriodicTask):
         logger = self.get_logger(**kwargs)
         logger.info("Started to grab Python 'easy' bugs")
         bug_tracker_name = self.__class__.__name__
-        python_core, _ = Project.objects.get_or_create(name='Python', language='Python')
+        python_core, _ = mysite.search.models.Project.objects.get_or_create(name='Python', language='Python')
 
         roundup_root_url = 'http://bugs.python.org'
         # Delete all other RoundupBugTracker objects using the same root
@@ -175,7 +175,7 @@ class RefreshAllFedoraFitAndFinishBugs(PeriodicTask):
 class PopulateProjectLanguageFromOhloh(Task):
     def run(self, project_id, **kwargs):
         logger = self.get_logger(**kwargs)
-        p = Project.objects.get(id=project_id)
+        p = mysite.search.models.Project.objects.get(id=project_id)
         if not p.language:
             oh = mysite.customs.ohloh.get_ohloh()
             try:
@@ -193,7 +193,7 @@ class PopulateProjectLanguageFromOhloh(Task):
             if ('main_language_name' in data and
                 data['main_language_name']):
                 # re-get to minimize race condition time
-                p = Project.objects.get(id=project_id)
+                p = mysite.search.models.Project.objects.get(id=project_id)
                 p.language = data['main_language_name']
                 p.save()
                 logger.info("Set %s.language to %s" %

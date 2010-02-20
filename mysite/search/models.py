@@ -9,7 +9,6 @@ import Image
 import uuid
 import urllib
 from django.db.models import Q
-import mysite
 import mysite.customs
 import mysite.base.unicode_sanity
 from django.core.urlresolvers import reverse
