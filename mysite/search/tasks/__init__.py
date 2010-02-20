@@ -1,8 +1,8 @@
 from datetime import timedelta
 import datetime
 import logging
-import mysite.search.models.Project
-import mysite.customs.models.RoundupBugTracker
+import mysite.search.models
+import mysite.customs.models
 from celery.task import Task, PeriodicTask
 from celery.registry import tasks
 from mysite.search.launchpad_crawl import grab_lp_bugs, lpproj2ohproj

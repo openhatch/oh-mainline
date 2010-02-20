@@ -226,6 +226,7 @@ def populate_icon_on_project_creation(instance, created, *args, **kwargs):
 
 def grab_project_language_from_ohloh(instance, created, *args,
                                      **kwargs):
+    import mysite.search.tasks
     if created and not instance.language:
         task = mysite.search.tasks.PopulateProjectLanguageFromOhloh()
         task.delay(project_id=instance.id)
