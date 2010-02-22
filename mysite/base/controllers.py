@@ -110,6 +110,8 @@ def cached_geocoding_in_json(address):
     geocoded_in_json = cache.get(key_name)
     if geocoded_in_json is None:
         geocoded = _geocode(address)
+        if not geocoded:
+            return "{}"
         geocoded.update({'is_inaccessible': is_inaccessible})
         geocoded_in_json = simplejson.dumps(geocoded)
         cache.set(key_name, geocoded_in_json, 60 * 60 * 24 * 7) # cache for a week, which should be plenty

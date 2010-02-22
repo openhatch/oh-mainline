@@ -5,7 +5,7 @@ import mysite.base.decorators
 import mysite.profile.views
 
 from django.http import HttpResponse, HttpResponseRedirect, \
-        HttpResponsePermanentRedirect, HttpResponseServerError
+        HttpResponsePermanentRedirect, HttpResponseServerError, HttpResponseBadRequest
 from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
@@ -85,12 +85,18 @@ def delete_paragraph_answer_do(request):
     our_answer.delete()
     return HttpResponseRedirect(reverse(project, kwargs={'project__name': our_answer.project.name}))
 
-@login_required
 def create_answer_do(request):
     if 'is_edit' in request.POST:
         answer = Answer.objects.get(pk=request.POST['answer__pk'])
     else:
         answer = Answer()
+    if request.user.is_authenticated():
+        answer.author = request.user
+    elif request.POST.get('author_name', None):
+        answer.author_name = request.POST['author_name']
+    else:
+        return HttpResponseBadRequest('You need to be either be logged in or give us a name to attach to your answer.')
+    
 
     question = ProjectInvolvementQuestion.objects.get(pk=request.POST['question__pk'])
     question.save()
@@ -100,8 +106,6 @@ def create_answer_do(request):
 
     answer.title = request.POST.get('answer__title', None)
 
-    answer.author = request.user
-    
     answer.project_id = request.POST['project__pk']
 
     answer.save()
