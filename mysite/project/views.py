@@ -1,4 +1,5 @@
 from django.core.mail import send_mail
+import socket
 from mysite.search.models import Project, ProjectInvolvementQuestion, Answer
 from mysite.profile.models import Person
 import django.template
@@ -58,6 +59,21 @@ def project(request, project__name = None):
     return (request,
             'project/project.html',
             context
+    question_suggestion_response = request.GET.get('question_suggestion_response', None)
+    data['notifications'] = []
+    if question_suggestion_response == 'success':
+        data['notifications'].append({
+            'id': 'question_suggestion_response',
+            'text': 'Thanks for submitting a questions suggestion.'
+            })
+    elif question_suggestion_response == 'failure':
+        data['notifications'].append({
+            'id': 'question_suggestion_response',
+            'text': "Oops, there was an error submitting your suggested question--we probably couldn't connect to our outgoing mailserver. Try just sending an email to <a href='hello@openhatch.org'>hello@openhatch.org</a>"
+            })
+    return (request,
+            'project/project.html',
+            data
             )
 
 @mysite.base.decorators.view
@@ -89,7 +105,7 @@ def delete_paragraph_answer_do(request):
 def create_answer_do(request):
     if 'is_edit' in request.POST:
         answer = Answer.objects.get(pk=request.POST['answer__pk'])
-
+    else:
         answer = Answer()
     if request.user.is_authenticated():
         answer.author = request.user
@@ -128,10 +144,16 @@ def suggest_question_do(request):
     user = request.user
     body = request.POST['suggested_question']
     body += "\nproject name: " + project.name
-    body += "\nproject pk: " + project.pk
+    body += "\nproject pk: " + str(project.pk)
     body += "\nuser name: " + user.username
-    body += "\nuser pk: " + user.pk
-    send_mail('Project Page Question Suggestion: ', body, 'all@openhatch.org', ['all@openhatch.org'], fail_silently=False)
-    pass
-    
-    #return HttpResponseRedirect(reverse(project, kwargs={'project__name': answer.project.name}))
+    body += "\nuser pk: " + str(user.pk)
+    question_suggestion_response = ""
+    #TODO: Asheesh would really rather this be enqueued as a background job
+    try:
+        send_mail('Project Page Question Suggestion: ', body, 'all@openhatch.org', ['all@openhatch.org'], fail_silently=False)
+        question_suggestion_response = "success"
+    except socket.error:
+        #NOTE: this will probably only happen on a local server (not on the live site)
+        question_suggestion_response = "failure"
+    template = "project/project.html"
+    return HttpResponseRedirect(reverse(mysite.project.views.project, kwargs={'project__name': project.name}) + '?question_suggestion_response=' + question_suggestion_response)
