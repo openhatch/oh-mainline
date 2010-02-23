@@ -1,5 +1,5 @@
 function my_visible($obj) {
-    return $obj.hasClass('should_be_hidden');
+    return $obj.hasClass('should_be_visible');
 }
 
 function my_hide($obj) {
@@ -66,7 +66,7 @@ PeopleMapController = function () {
 };
 
 PeopleMapController.prototype.geocode = function(data, callback) {
-    var location_object = geocode_person_id(data['person_id']);
+    var location_object = geocode_person_id_data[data['person_id']];
     var success;
     if (typeof data == 'undefined') {
         success = false;
@@ -173,9 +173,7 @@ PeopleMapController.prototype.initialize = function(options) {
 		else {
 		    /* If the marker we found is for inaccessible people, hide them all */
 		    if (marker === mapController.the_marker_for_inaccessible_island) {
-			if (my_visible($person_summary)){ 
-			    my_hide($('.inaccessible_islander'));
-			}
+			my_hide($('.inaccessible_islander'));
 		    }
 		    else {
 			/* otherwise hide just that one person */
