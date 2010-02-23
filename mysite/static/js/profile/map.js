@@ -1,3 +1,53 @@
+function my_visible($obj) {
+    return $obj.hasClass('should_be_hidden');
+}
+
+function my_hide($obj) {
+    /* Assert that $obj has exactly one of the following:
+     * .should_be_hidden, or
+     * .should_be_visible
+     */
+    var hidden = $obj.hasClass('should_be_hidden');
+    var visible = $obj.hasClass('should_be_visible');
+
+    if (!hidden && !visible) {
+	console.info($obj);
+	return 0/0;
+    }
+    if (hidden && visible) {
+	console.info($obj);
+	return 0/0;
+    }
+
+    if (visible) {
+	$obj.removeClass('should_be_visible');
+	$obj.addClass('should_be_hidden');
+    }
+}
+
+function my_show($obj) {
+    /* Assert that $obj has exactly one of the following:
+     * .should_be_hidden, or
+     * .should_be_visible
+     */
+    var hidden = $obj.hasClass('should_be_hidden');
+    var visible = $obj.hasClass('should_be_visible');
+
+    if (!hidden && !visible) {
+	console.info($obj);
+	return 0/0;
+    }
+    if (hidden && visible) {
+	console.info($obj);
+	return 0/0;
+    }
+
+    if (hidden) {
+	$obj.addClass('should_be_visible');
+	$obj.removeClass('should_be_hidden');
+    }
+}
+
 PeopleMapController = function () {
     this.explainUninhabitedIsland = function (originatingLink) {
         var message = "People who haven't set their locations appear " + 
@@ -55,16 +105,16 @@ PeopleMapController.prototype.initialize = function(options) {
 
     update_people_count = function () {
         function update_inaccessible_island_help() {
-            if ($('.inaccessible_islander:eq(0)').is(':hidden')) {
+            if (! my_visible($('.inaccessible_islander:eq(0)'))) {
                 $('#people_without_locations').hide();
             } else {
-                $('#people_without_locations').show();
+		$('#people_without_locations').show();
             }
         }
 
         $('.hide_once_map_loads').hide();
         $('.dont_show_until_map_loads').show();
-        var mappedPeople_count = $("#people-list li:visible").size();
+        var mappedPeople_count = $("#people-list li.should_be_visible").size();
 
         var str = mappedPeople_count;
         if (mappedPeople_count == num_of_persons_who_can_be_geocoded) {
@@ -109,13 +159,13 @@ PeopleMapController.prototype.initialize = function(options) {
 		    bounds.contains(marker.position)) {
 		    
 		    // If the person bullet is hidden,
-		    if($person_summary.is(':visible') === false) {
+		    if(! my_visible($person_summary)) {
 			/* If the marker we found is for inaccessible people, show them all */
 			if (marker === mapController.the_marker_for_inaccessible_island) {
-			    $('.inaccessible_islander').show();
+			    my_show($('.inaccessible_islander'));
 			}
 			else { /* just the one guy or gal */
-			    $person_summary.show();
+			    my_show($person_summary);
 			}
 		    }
 		    shown_this_many += 1;
@@ -123,13 +173,13 @@ PeopleMapController.prototype.initialize = function(options) {
 		else {
 		    /* If the marker we found is for inaccessible people, hide them all */
 		    if (marker === mapController.the_marker_for_inaccessible_island) {
-			if ($person_summary.is(':visible')) {
-			    $('.inaccessible_islander').hide();
+			if (my_visible($person_summary)){ 
+			    my_hide($('.inaccessible_islander'));
 			}
 		    }
 		    else {
 			/* otherwise hide just that one person */
-			$person_summary.hide();
+			my_hide($person_summary);
 		    }
 		} 
 	    }
