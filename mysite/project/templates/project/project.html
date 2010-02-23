@@ -110,6 +110,12 @@ about our members who support {{ project.name }}
                             {% endfor %}
                         </ul>
                         <div id="disclaimer" style="font-size: .9em;">Thanks for trying out this new feature.  The questions may change&mdash;we're still working out the details.  Feel free to <a href="/contact">drop us a line</a> with suggestions!</div>
+                        <span id="other-questions">
+                            <a href="{% url mysite.project.views.suggest_question %}?project__pk={{project.pk}}">
+                                What else should we ask you?
+                            </a>
+
+                        </span>
     </div>
 </div><!-- /.module #requests -->
 

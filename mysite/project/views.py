@@ -1,3 +1,4 @@
+from django.core.mail import send_mail
 from mysite.search.models import Project, ProjectInvolvementQuestion, Answer
 from mysite.profile.models import Person
 import django.template
@@ -88,7 +89,7 @@ def delete_paragraph_answer_do(request):
 def create_answer_do(request):
     if 'is_edit' in request.POST:
         answer = Answer.objects.get(pk=request.POST['answer__pk'])
-    else:
+
         answer = Answer()
     if request.user.is_authenticated():
         answer.author = request.user
@@ -111,3 +112,26 @@ def create_answer_do(request):
     answer.save()
     
     return HttpResponseRedirect(reverse(project, kwargs={'project__name': answer.project.name}))
+
+@login_required
+@mysite.base.decorators.view
+def suggest_question(request):
+    template = "project/suggest_question.html"
+    data = {
+            'project__pk': request.GET['project__pk']
+            }
+    return (request, template, data)
+
+@login_required
+def suggest_question_do(request):
+    project = mysite.search.models.Project.objects.get(pk=request.POST['project__pk'])
+    user = request.user
+    body = request.POST['suggested_question']
+    body += "\nproject name: " + project.name
+    body += "\nproject pk: " + project.pk
+    body += "\nuser name: " + user.username
+    body += "\nuser pk: " + user.pk
+    send_mail('Project Page Question Suggestion: ', body, 'all@openhatch.org', ['all@openhatch.org'], fail_silently=False)
+    pass
+    
+    #return HttpResponseRedirect(reverse(project, kwargs={'project__name': answer.project.name}))
