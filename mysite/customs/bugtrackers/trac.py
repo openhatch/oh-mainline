@@ -2,6 +2,7 @@ import csv
 import datetime
 import mysite.customs.ohloh
 import lxml.html
+import lxml.html.clean
 import urlparse
 
 def twisted_csv_of_easy_bugs():
@@ -24,6 +25,12 @@ class TracBug:
             ret[key.strip()] = value.strip()
         return ret
     
+    @staticmethod
+    def page2description_div(doc):
+        div = doc.cssselect('.description .searchable')[0]
+        cleaner = lxml.html.clean.Cleaner(javascript=True, scripts=True, meta=True, page_structure=True, embedded=True, frames=True, forms=True, remove_unknown_tags=True, safe_attrs_only=True, add_nofollow=True)
+        return cleaner.clean_html(lxml.html.tostring(div))
+
     @staticmethod
     def page2date_opened(doc):
         span = doc.cssselect ('.date p:contains("Opened") span')[0]
@@ -108,11 +115,18 @@ class TracBug:
                 self.get_bug_html_page())
         return self._parsed_bug_html_page
 
+    @staticmethod
+    def string_un_csv(s):
+        s = s.replace("'", '\\' + "'")
+        s = eval("'''" + s + "'''")
+        return s
+
     def as_data_dict_for_bug_object(self):
         trac_data = self.as_bug_specific_csv_data()
         html_data = self.get_parsed_bug_html_page()
+
         ret = {'title': trac_data['summary'],
-               'description': trac_data['description'],
+               'description': TracBug.string_un_csv(trac_data['description']),
                'status': trac_data['status'],
                'importance': trac_data['priority'],
                'submitter_username': trac_data['reporter'],
@@ -133,7 +147,7 @@ class TracBug:
             map(lambda x: x.strip(),
                 page_metadata.get('Cc', '').split(',')))
         all_people.add(page_metadata['Assigned to:'])
-        ret['people_involved'] = 6
+        ret['people_involved'] = len(all_people)
 
         # FIXME: Need time zone
         ret['date_reported'] = TracBug.page2date_opened(html_data)

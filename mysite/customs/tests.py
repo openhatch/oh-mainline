@@ -576,6 +576,14 @@ class ParseCiaMessage(django.test.TestCase):
                          expected)
 
 class TracBug(django.test.TestCase):
+    def test_eval_in_description(self):
+        four_chars = r'\r\n'
+        self.assertEqual(len(four_chars), 4)
+        two_chars = mysite.customs.bugtrackers.trac.TracBug.string_un_csv(
+            four_chars)
+        self.assertEqual(len(two_chars), 2)
+        self.assertEqual(two_chars, '\r\n')
+
     @mock.patch('mysite.customs.bugtrackers.trac.TracBug.as_bug_specific_csv_data')
     def test_create_bug_object_data_dict(self, m):
         m.return_value = {
@@ -607,7 +615,7 @@ class TracBug(django.test.TestCase):
                   'description': "This package hasn't been touched in 4 years which either means it's stable or not being used at all. Let's deprecate it (also see #4111).",
                   'status': 'new',
                   'importance': 'normal',
-                  'people_involved': 6,
+                  'people_involved': 5,
                   # FIXME: Need time zone
                   'date_reported': datetime.datetime(2010, 2, 22, 19, 46, 30),
                   'last_touched': datetime.datetime(2010, 2, 24, 0, 8, 47),

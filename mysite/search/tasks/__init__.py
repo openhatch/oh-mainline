@@ -238,7 +238,7 @@ class RefreshAllTwistedEasyBugs(PeriodicTask):
         for bug in mysite.search.models.Bug.all_bugs.filter(
             canonical_bug_link__contains=
             'http://twistedmatrix.com/trac/'):
-            tb = mysite.customs.bugtrackers.TracBug.from_url(
+            tb = mysite.customs.bugtrackers.trac.TracBug.from_url(
                 bug.canonical_bug_link)
             task = LookAtOneTwistedBug()
             task.delay(bug_id=tb.bug_id)
