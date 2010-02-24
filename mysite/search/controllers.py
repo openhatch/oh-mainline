@@ -1,5 +1,7 @@
 import mysite.search.models
 import mysite.search.views
+import mysite.base.unicode_sanity
+import mysite.base.decorators
 import collections
 import urllib
 import re
@@ -17,7 +19,10 @@ class Query:
     
     def __init__(self, terms=None, active_facet_options=None, terms_string=None): 
         self.terms = terms or []
-        self.active_facet_options = active_facet_options or {}
+        self.active_facet_options = (mysite.base.decorators.no_str_in_the_dict(active_facet_options)
+                                     or {})
+        if type(terms_string) == str:
+            terms_string = unicode(terms_string, 'utf-8')
         self._terms_string = terms_string
 
     @property
@@ -50,13 +55,13 @@ class Query:
 
     @staticmethod
     def create_from_GET_data(GET):
-        possible_facets = ['language', 'toughness', 'contribution_type']
+        possible_facets = [u'language', u'toughness', u'contribution_type']
 
         active_facet_options = {}
         for facet in possible_facets:
             if GET.get(facet):
                 active_facet_options[facet] = GET.get(facet)
-        terms_string = GET.get('q', '')
+        terms_string = GET.get('q', u'')
         terms = Query.split_into_terms(terms_string)
 
         return Query(terms=terms, active_facet_options=active_facet_options, terms_string=terms_string)
@@ -83,10 +88,10 @@ class Query:
             q &= Q(good_for_newcomers=True)
 
         # language facet
-        language_is_active = ('language' in self.active_facet_options.keys())
+        language_is_active = (u'language' in self.active_facet_options.keys())
         exclude_language = exclude_active_facets and language_is_active
-        if 'language' in self.active_facet_options and not exclude_language: 
-            language_value = self.active_facet_options['language']
+        if u'language' in self.active_facet_options and not exclude_language: 
+            language_value = self.active_facet_options[u'language']
             if language_value == 'Unknown':
                 language_value=''
             q &= Q(project__language__iexact=language_value)
@@ -106,6 +111,7 @@ class Query:
                     Q(project__language__iexact=word) |
                     Q(title__iregex=whole_word) |
                     Q(description__iregex=whole_word) |
+                    Q(as_appears_in_distribution__iregex=whole_word) |
 
                     # 'firefox' grabs 'mozilla firefox'.
                     Q(project__name__iregex=whole_word)
@@ -114,7 +120,9 @@ class Query:
 
         return q
 
+    
     def get_facet_options(self, facet_name, option_names):
+        option_names = mysite.base.decorators.no_str_in_the_list(option_names)
 
         def get_facet_option_data(option_name):
 
@@ -128,12 +136,12 @@ class Query:
 
             # ...except the toughness facet option in question.
             GET_data.update({
-                'q': self.terms_string,
-                facet_name: option_name,
+                u'q': unicode(self.terms_string),
+                unicode(facet_name): unicode(option_name),
                 })
-            query_string = urllib.urlencode(GET_data)
+            query_string = mysite.base.unicode_sanity.urlencode(GET_data)
             query = Query.create_from_GET_data(GET_data)
-            name = option_name or 'any'
+            name = option_name or u'any'
 
             active_option_name = caller_query.active_facet_options.get(facet_name, None)
 
@@ -163,16 +171,16 @@ class Query:
 
         bugs = mysite.search.models.Bug.open_ones.filter(self.get_Q())
 
-        toughness_options = self.get_facet_options('toughness', ['bitesize', ''])
+        toughness_options = self.get_facet_options(u'toughness', [u'bitesize', u''])
 
         contribution_type_options = self.get_facet_options(
-            'contribution_type', ['documentation', ''])
+            u'contribution_type', [u'documentation', u''])
 
-        language_options = self.get_facet_options('language', self.get_language_names() + [''])
+        language_options = self.get_facet_options(u'language', self.get_language_names() + [u''])
         # sort language_options so that unknown is second-to-last and any is last
-        language_options_name_is_unknown = filter((lambda language_option_set: language_option_set['name'] == 'Unknown'), language_options)
-        language_options_name_is_any = filter((lambda language_option_set: language_option_set['name'] == 'any'), language_options)
-        language_options_name_is_neither_of_the_above = filter((lambda language_option_set: language_option_set['name']  not in ['Unknown', 'any'] ), language_options)
+        language_options_name_is_unknown = filter((lambda language_option_set: language_option_set[u'name'] == u'Unknown'), language_options)
+        language_options_name_is_any = filter((lambda language_option_set: language_option_set[u'name'] == u'any'), language_options)
+        language_options_name_is_neither_of_the_above = filter((lambda language_option_set: language_option_set[u'name']  not in [u'Unknown', u'any'] ), language_options)
         language_options = language_options_name_is_neither_of_the_above + language_options_name_is_unknown + language_options_name_is_any
 
 
@@ -181,48 +189,48 @@ class Query:
 
         possible_facets = { 
                 # The languages facet is based on the project languages, "for now"
-                'language': {
-                    'name_in_GET': "language",
-                    'sidebar_name': "main project language",
-                    'description_above_results': "projects primarily coded in %s",
-                    'options': language_options,
+                u'language': {
+                    u'name_in_GET': u"language",
+                    u'sidebar_name': u"main project language",
+                    u'description_above_results': u"projects primarily coded in %s",
+                    u'options': language_options,
                     },
-                'toughness': {
-                    'name_in_GET': "toughness",
-                    'sidebar_name': "toughness",
-                    'description_above_results': "where toughness = %s",
-                    'options': toughness_options,
+                u'toughness': {
+                    u'name_in_GET': u"toughness",
+                    u'sidebar_name': u"toughness",
+                    u'description_above_results': u"where toughness = %s",
+                    u'options': toughness_options,
                     },
-                'contribution type': {
-                    'name_in_GET': "contribution_type",
-                    'sidebar_name': "kind of help needed",
-                    'description_above_results': "which need %s",
-                    'options': contribution_type_options,
+                u'contribution type': {
+                    u'name_in_GET': u"contribution_type",
+                    u'sidebar_name': u"kind of help needed",
+                    u'description_above_results': u"which need %s",
+                    u'options': contribution_type_options,
                     }
                 }
 
         return possible_facets
 
     def get_GET_data(self):
-        GET_data = {'q': self.terms_string}
+        GET_data = {u'q': unicode(self.terms_string)}
         GET_data.update(self.active_facet_options)
         return GET_data
 
     def get_language_names(self):
 
         GET_data = self.get_GET_data()
-        if 'language' in GET_data:
-            del GET_data['language']
+        if u'language' in GET_data:
+            del GET_data[u'language']
         query_without_language_facet = Query.create_from_GET_data(GET_data)
 
         bugs = query_without_language_facet.get_bugs_unordered()
-        distinct_language_columns = bugs.values('project__language').distinct()
-        languages = [x['project__language'] for x in distinct_language_columns]
-        languages = [l or 'Unknown' for l in languages]
+        distinct_language_columns = bugs.values(u'project__language').distinct()
+        languages = [x[u'project__language'] for x in distinct_language_columns]
+        languages = [l or u'Unknown' for l in languages]
 
         # Add the active language facet, if there is one
-        if 'language' in self.active_facet_options:
-            active_language = self.active_facet_options['language']
+        if u'language' in self.active_facet_options:
+            active_language = self.active_facet_options[u'language']
             if active_language not in languages:
                 languages.append(active_language)
 
@@ -234,10 +242,10 @@ class Query:
         simple_dictionary = {}
 
         # add terms_string
-        simple_dictionary['terms'] = str(sorted(self.terms))
+        simple_dictionary[u'terms'] = str(sorted(self.terms))
 
         # add active_facet_options
-        simple_dictionary['active_facet_options'] = str(sorted(self.active_facet_options.items()))
+        simple_dictionary[u'active_facet_options'] = str(sorted(self.active_facet_options.items()))
 
         stringified = str(sorted(simple_dictionary.items()))
         # then return a hash of our sorted items self.
@@ -258,22 +266,22 @@ class Query:
 
     def get_query_string(self):
         GET_data = self.get_GET_data()
-        query_string = urllib.urlencode(GET_data)
+        query_string = mysite.base.unicode_sanity.urlencode(GET_data)
         return query_string
 
        
 def get_project_count():
     """Retrieve the number of projects currently indexed."""
     bugs = mysite.search.models.Bug.all_bugs.all()
-    return bugs.values('project').distinct().count()
+    return bugs.values(u'project').distinct().count()
 
 def get_projects_with_bugs():
     bugs = mysite.search.models.Bug.all_bugs.all()
-    one_bug_dict_per_project = bugs.values('project').distinct().order_by('project__name')
-    #project_names = [b['project__name'] for b in one_bug_dict_per_project]
+    one_bug_dict_per_project = bugs.values(u'project').distinct().order_by(u'project__name')
+    #project_names = [b[u'project__name'] for b in one_bug_dict_per_project]
     projects = []
     for bug_dict in one_bug_dict_per_project:
-        pk = bug_dict['project']
+        pk = bug_dict[u'project']
         projects.append(mysite.search.models.Project.objects.get(pk=pk))
     return projects
 
@@ -281,11 +289,11 @@ def get_cited_projects_lacking_bugs():
     portfolio_entries = mysite.profile.models.PortfolioEntry.objects.filter(
             is_published=True, is_deleted=False)
     # Make this a manager
-    one_pfe_dict_per_project = portfolio_entries.values('project').distinct().order_by('project__name')
+    one_pfe_dict_per_project = portfolio_entries.values(u'project').distinct().order_by(u'project__name')
 
     projects_with_contributors = []
     for pfe_dict in one_pfe_dict_per_project:
-        pk = pfe_dict['project']
+        pk = pfe_dict[u'project']
         projects_with_contributors.append(mysite.search.models.Project.objects.get(pk=pk))
 
     projects_with_bugs = get_projects_with_bugs()

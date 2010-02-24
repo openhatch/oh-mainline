@@ -9,6 +9,14 @@
         <span class='project__name'>
             {{ bug.project.name|highlight:query.terms }} 
         </span>
+
+        {% if bug.as_appears_in_distribution %}
+            <span class='sep'>&middot;</span>
+            <span>
+                in {{ bug.as_appears_in_distribution|highlight:query.terms }}
+            </span>
+        {% endif %}
+
         <span class='sep'>&middot;</span>
         <span class='title'>
             {{ bug.title|highlight:query.terms }}

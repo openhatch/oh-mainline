@@ -37,7 +37,7 @@ def home(request):
 
     data['recommended_bugs'] = list(recommended_bugs) # A list so we can tell if it's empty
 
-    everybody = list(mysite.profile.models.Person.objects.exclude(photo=''))
+    everybody = list(mysite.profile.models.Person.objects.exclude(link_person_tag=None))
     random.shuffle(everybody)
     data['random_profiles'] = everybody[0:5]
 
@@ -80,22 +80,22 @@ def home(request):
         # * strings of HTML representing the bug classification
         recommended_bug_string2GET_data_dicts = {
         "<strong>Bitesize</strong> bugs whose main project language is <strong>C</strong>":
-            {'language':'C', 'toughness':'bitesize'},
+            {u'language':u'C', u'toughness':u'bitesize'},
         "<strong>Bitesize</strong> bugs matching &lsquo;<strong>audio</strong>&rsquo;":
-            {'q':'audio', 'toughness':'bitesize'},
+            {u'q':u'audio', u'toughness':u'bitesize'},
         "Bugs matching &lsquo;<strong>unicode</strong>&rsquo;":
-            {'q':'unicode'},
+            {u'q':u'unicode'},
         "Requests for <strong>documentation writing/editing</strong>":
-            {'contribution_type':'documentation'},
+            {u'contribution_type':u'documentation'},
         #"Requests for <strong>documentation writing/editing</strong>":
-        #    {'contribution_type':'documentation'},
+        #    {u'contribution_type':u'documentation'},
         }
         recommended_bug_string2Query_objects = {}
         for (string, GET_data_dict) in recommended_bug_string2GET_data_dicts.items():
             query = mysite.search.controllers.Query.create_from_GET_data(GET_data_dict)
             recommended_bug_string2Query_objects[string] = query
 
-        data['recommended_bug_string2Query_objects'] = recommended_bug_string2Query_objects
+        data[u'recommended_bug_string2Query_objects'] = recommended_bug_string2Query_objects
 
     return (request, 'base/landing.html', data)
 

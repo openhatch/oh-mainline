@@ -1,4 +1,5 @@
 {% extends 'base/two_columns.html' %}
+{% load profile_extras %}
 
 {% block title %}
 Projects - {{ project.name }} 
@@ -19,6 +20,171 @@ about our members who support {{ project.name }}
 {% endblock pagetop %}
 
 {% block left %}
+    <div class='module contains_questions'>
+        <div class='head'>
+            <h3>How can people make {{ project.name }} better?</h3>
+        </div>
+        <div class='body'>
+            <ul id='paragraph_questions' class='questions'>
+                {% for question, answers in question2answer %}
+                    <li>
+                        <h3><strong>Q:</strong>
+                            {% ifequal question.key_string 'where_to_start' %}
+                                I'd like to participate. How do I begin?
+                            {% endifequal %}
+
+                            {% ifequal question.key_string 'stress' %}
+                                What is a bug or issue with {{ project.name }}
+                                that you've been putting off, neglecting, or
+                                just plain avoiding?
+                            {% endifequal %}
+
+                            {% ifequal question.key_string 'newcomers' %}
+                                What's a good bug for a newcomer to tackle?
+                            {% endifequal %}
+                            
+                            {% ifequal question.key_string 'non_code_participation' %}
+                                Other than writing code, how can I contribute?
+
+                            {% endifequal %}
+                        </h3>
+                        <ul class='answers'>
+                            {% for answer in answers %}
+                            <li>
+                            {% include 'project/voting_controls.html' %}
+                            {% if not question.is_bug_style %}
+
+                                {% ifequal the_user answer.author %}
+                                {% with 1 as edit_form %}
+                                {% include 'project/forms/paragraph.html' %}
+                                {% endwith %}
+                                {% endifequal %}
+
+                                <span class="answer" id="answer_{{answer.pk}}">
+                                    {{ answer.text|urlize }}
+                                    <br/>
+                                    {% include 'project/byline.html' %}
+                                </span>
+
+                            {% else %}
+
+                                {% ifequal the_user answer.author %}
+                                {% with 1 as edit_form %}
+                                {% include 'project/forms/bug.html' %}
+                                {% endwith %}
+                                {% endifequal %}
+                                <span class="answer" id="answer_{{answer.pk}}">
+                        
+                                    <div class="bug_answer_title">
+                                        {% ifequal the_user answer.author %}
+                                        {% endifequal %}
+                                        <strong>{{answer.title}}</strong>
+                                    </div>
+                                    {{answer.text|urlize}}
+                                    <br/>
+                                    {% include 'project/byline.html' %}
+                                </span>
+
+                            {% endif %}
+
+                        </span>
+                        {% endfor %}
+
+                            <li>
+                            {% if the_user.is_authenticated %}
+                            {% if question.is_bug_style %}
+                            {% include 'project/forms/bug.html' %}
+                            {% else %}
+                            {% include 'project/forms/paragraph.html' %}
+                            {% endif %}
+                            {% else %}
+                            {# if they aren't logged in#}
+                            <a href="{% url oh_login %}?next={{ project.get_url|urlencode}}" style="">Log in to add an answer</a>
+                            {% endif %}
+
+                            </li>
+                            </ul>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        <div id="disclaimer" style="font-size: .9em;">Thanks for trying out this new feature.  The questions may change&mdash;we're still working out the details.  Feel free to <a href="/contact">drop us a line</a> with suggestions!</div>
+    </div>
+</div><!-- /.module #requests -->
+
+{% endblock left %}
+
+{% block main %}
+    {% comment %}
+    {% if random_pfentry %}
+    <div class='module' id='bugs'>
+        <div class='head'>
+            <h3>Description</h3>
+        </div>
+        <div class='body'>
+            <h2 style='font-size: 1.3em; font-weight: normal;'>
+                {% spaceless %}
+                <span class='quotemark'>&ldquo;</span>
+                <span>{{ random_pfentry.project_description|urlize|linebreaksbr}}</span>
+                <span class='quotemark'>&rdquo;</span>
+                {% endspaceless %}
+            </h2>
+            <p style='font-size: .9em; margin: 5px 0 0 0;'>
+                &mdash; from
+                <a href='{{ random_pfentry.person.profile_url }}'>
+                    {{ random_pfentry.person.get_full_name_or_username }}'s
+                    {% spaceless %}
+                    <span>profile</span>
+                    {% endspaceless %}
+                </a>
+            </p>
+        </div>
+    </div>
+    {% endif %}
+    {% endcomment %}
+
+    <div class='module' id='bugs'>
+        <div class='head'>
+            <h3>Relatedly</h3>
+        </div>
+        <div class='body'>
+            {% if project.get_open_bugs %}
+                <p>
+                    Browse {{ project.get_open_bugs|length }}+
+                    <a href='/search/?q={{ project.name_with_quotes_if_necessary|urlencode }}'>
+                        volunteer opportunit{{ project.get_open_bugs|pluralize:"y,ies"}}
+                        matching
+                        <strong>{{ project.name }}</strong>.
+                    </a>
+            {% else %}
+                No volunteer opportunities in {{project.name}} indexed here yet. 
+                <a href='/wiki/Bug_trackers'>
+                    To add a bug tracker, 
+                    visit our wiki</a>.
+
+            </p>
+        {% endif %}
+      
+      {% with mentors as mentors %}
+      {% with project.name as topic %}
+      {% with 0 as explain_language %}
+      {% include 'project/mentor_summary.html' %}
+      {% endwith %}
+      {% endwith %}
+      {% endwith %}
+
+      {% if project.language %}
+      {% with language_mentors as mentors %}
+      {% with project.language as topic %}
+      {% with 1 as explain_language %}
+      {% include 'project/mentor_summary.html' %}
+      {% endwith %}
+      {% endwith %}
+      {% endwith %}
+      {% endif %}
+
+    </div>
+</div><!-- /.module #bugs -->
+
 <div class='module' id='contributors'>
     <div class='head'>
         <h3>Registered contributors ({% firstof project.cached_contributor_count "none yet" %})</h3>
@@ -44,56 +210,154 @@ about our members who support {{ project.name }}
         </div>
     </div>
 </div>
-{% endblock left %}
 
-{% block main %}
-{% with project.get_open_bugs_randomly_ordered as bugs %}
-<div class='module' id='bugs'>
-    <div class='head'>
-        <h3>Relatedly</h3>
-    </div>
-    <div class='body'>
-      <p>
-            {% if project.get_open_bugs %}
-            Browse {{ project.get_open_bugs|length }}+
-            <a href='/search/?q={{ project.name_with_quotes_if_necessary|urlencode }}'>
-                volunteer opportunit{{ project.get_open_bugs|pluralize:"y,ies"}}
-                matching
-                <strong>{{ project.name }}</strong>.
-            </a>
-            {% else %}
-            No volunteer opportunities in {{project.name}} indexed here yet. 
-            <a href='/wiki/Bug_trackers'>
-                To add a bug tracker, 
-                visit our wiki</a>.
-
-            {% endif %}
-      </p>
-      
-      {% with mentors as mentors %}
-      {% with project.name as topic %}
-      {% with 0 as explain_language %}
-      {% include 'project/mentor_summary.html' %}
-      {% endwith %}
-      {% endwith %}
-      {% endwith %}
-
-      {% if project.language %}
-      {% with language_mentors as mentors %}
-      {% with project.language as topic %}
-      {% with 1 as explain_language %}
-      {% include 'project/mentor_summary.html' %}
-      {% endwith %}
-      {% endwith %}
-      {% endwith %}
-      {% endif %}
-
-    </div>
-</div>
-{% endwith %}
 {% endblock main %}
+
+{% block js %}
+    <script type='text/javascript'>
+        $(function() {
+            $('.add_an_answer')
+                .focus(function() {
+                    $form = $(this).parent();
+                    $form.addClass('active');
+                    $form.find('input:text, textarea').unbind('blur');
+                });
+
+            $('input:text, textarea').hint();
+            // Bind a function to the 'x' on input forms.  this function collapses the form
+            $('.collapse_answer_form').click(function(){
+                $form = $(this).parent().parent();
+                $form.removeClass('active');
+                $form.find('input:text, textarea').hint();
+                if($form.hasClass('is_edit_form')){
+                    $form.hide();
+                    answer_id = $(this).attr('id').split('_')[3];
+                    console.debug(answer_id);
+                    $answer = $("#answer_" + answer_id);
+                    $answer.show();
+                    $delete_form = $("#delete_form_" + answer_id);
+                    $delete_form.show();
+                    $edit_link = $("#edit_link_"  + answer_id);
+                    $edit_link.show();
+                }
+                return false;
+            });
+            $('.edit_link').click(function(){
+                answer_id = this.id.split('_')[2];
+                $form = $("#edit_form_"  + answer_id);
+                $form.show();
+                $form.find('input:text, textarea').unbind('blur');
+                $answer = $("#answer_"  + answer_id);
+                $answer.hide();
+                $delete_form = $("#delete_form_"  + answer_id);
+                $delete_form.hide();
+                $(this).hide();
+                $form.find('input:text, textarea').focus();
+                return false;
+            });
+            $("form.delete input").click(function(){
+                return confirm('are you sure?');
+            });
+            ourJacker = new VoteHijacker();
+            ourJacker.initialize();
+            
+        });
+
+
+var VoteHijacker = function() {};
+
+VoteHijacker.prototype =
+{
+    initialize: function()
+    {
+        this.registerEventHandlers();
+    },
+
+    registerEventHandlers: function()
+    {
+        $('form.answervote').each(function() {
+            var form = this;
+            var answer__pk = /(\d+)$/.exec(form.id)[1];
+            var action = /(up|down|clear)vote/.exec(form.action)[1];
+            var prefix = 'answer';
+            var options = {
+                'dataType': 'json',
+                'error': function(){
+                    alert("Error voting: " + response.error_message);
+                },
+                'success': function createCallback(answer__pk, form) {
+                    return function callback(response) {
+                        if(!response.success){
+                            if(response.error_message == "Not authenticated."){
+                                alert("Please log in to vote.");
+                            }
+                            else{
+                                alert("Error voting: " + response.error_message);
+                            }
+                            return;
+                        }
+                        var action = /(up|down|clear)vote/.exec(form.action)[1];
+                        var upArrowType = "grey";
+                        var upFormAction = "up";
+                        var downArrowType = "grey";
+                        var downFormAction = "down";
+
+                        if (action == "up")
+                        {
+                            var upArrowType = "mod";
+                            var upFormAction = "clear";
+                        }
+                        else if (action == "down")
+                        {
+                            var downArrowType = "mod";
+                            var downFormAction = "clear";
+                        }
+
+                        VoteHijacker.updateArrow("up", prefix, answer__pk, upArrowType);
+                        VoteHijacker.updateArrow("down", prefix, answer__pk, downArrowType);
+                        VoteHijacker.updateFormAction("up", prefix, answer__pk, upFormAction);
+                        VoteHijacker.updateFormAction("down", prefix, answer__pk, downFormAction);
+                        VoteHijacker.updateScore(prefix, answer__pk, response.score);
+                    };
+                }(answer__pk, form)
+            };
+            $(this).ajaxForm(options);
+        });
+    }
+};
+
+VoteHijacker.updateArrow = function(arrowType, prefix, id, state)
+{
+    var img = $('#' + prefix + arrowType + "arrow" + id).get(0);
+    var re = new RegExp(arrowType + "(?:mod|grey)\\.png");
+    img.src = img.src.replace(re, arrowType + state + ".png");
+};
+
+VoteHijacker.updateFormAction = function(formType, prefix, id, action)
+{
+    var form = $('#' + prefix + formType + id).get(0);
+    form.action = form.action.replace(/(?:up|down|clear)vote/, action + "vote");
+};
+
+VoteHijacker.updateScore = function(prefix, id, score)
+{
+    var scoreElement = $('#' + prefix + "score" + id).get(0);
+    scoreElement.innerHTML = score.score;
+    scoreElement.title = "after " + score.num_votes + " vote" + VoteHijacker.pluralize(score.num_votes);
+};
+
+VoteHijacker.pluralize = function(value)
+{
+    if (value != 1)
+    {
+        return "s";
+    }
+    return "";
+};
+    </script>
+
+{% endblock js %}
 
 {% comment %}
 vim: set ai et ts=4 sw=4 nu:
 {% endcomment %}
-

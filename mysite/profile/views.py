@@ -27,6 +27,7 @@ import haystack.query
 
 # OpenHatch apps
 import mysite.base.controllers
+import mysite.base.unicode_sanity
 import mysite.profile.controllers
 import mysite.base.helpers
 from mysite.profile.models import \
@@ -317,9 +318,9 @@ def permanent_redirect_to_people_search(request, property, value):
         escaped_value = value
     
     q = '%s:%s' % (property, escaped_value)
-    get_args = {'q': q}
+    get_args = {u'q': q}
     destination_url = (reverse('mysite.profile.views.people') + '?' + 
-                       urllib.urlencode(get_args))
+                       mysite.base.unicode_sanity.urlencode(get_args))
     return HttpResponsePermanentRedirect(destination_url)
 
 def tag_type_query2mappable_orm_people(tag_type_short_name, parsed_query):
@@ -331,7 +332,7 @@ def tag_type_query2mappable_orm_people(tag_type_short_name, parsed_query):
 
     mappable_people_from_haystack.load_all()
 
-    mappable_people = [x.object for x in mappable_people_from_haystack]
+    mappable_people = [x.object for x in mappable_people_from_haystack if x.object]
 
     ### and sort it the way everyone expects
     mappable_people = sorted(mappable_people, key=lambda p: p.user.username.lower())

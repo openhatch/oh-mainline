@@ -11,7 +11,15 @@ import mysite.account.forms
 
 from django_authopenid import views as oid_views
 
+from voting.views import vote_on_object
+
 urlpatterns = patterns('',
+        # Generic view to vote on Link objects
+        (r'^\+answer/vote/(?P<object_id>\d+)/(?P<direction>up|down|clear)vote/?$',
+            vote_on_object, dict(model=mysite.search.models.Answer,
+                #template_object_name='answer',
+                #template_name='kb/link_confirm_vote.html',
+                allow_xmlhttprequest=True)),
 
         # Invitation-related URLs
         (r'^invitation/', include('invitation.urls')),
@@ -187,6 +195,9 @@ urlpatterns = patterns('',
         (r'^people/[$]username[/]*$', 'mysite.profile.views.dollar_username'),
         (r'^\+me$', 'mysite.profile.views.dollar_username', {}, 
                 'oh_my_profile_redirect'),
+
+        (r'^\+do/project.views.create_answer_do$', 'mysite.project.views.create_answer_do'),
+        (r'^\+do/project.views.delete_paragraph_answer_do$', 'mysite.project.views.delete_paragraph_answer_do'),
 
         (r'^\+projects/', include('mysite.project.urls')),
 

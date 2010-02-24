@@ -1,4 +1,4 @@
-import urllib
+import mysite.base.unicode_sanity
 import simplejson
 from django.core.urlresolvers import reverse
 import django.contrib.auth.views
@@ -76,7 +76,7 @@ def _geocode(address):
     mapsUrl = 'http://maps.google.com/maps/geo?q='
      
     # This joins the parts of the URL together into one string.
-    query_string = urllib.urlencode({'q': address.encode('utf-8'), 'output': 'csv'})
+    query_string = mysite.base.unicode_sanity.urlencode({u'q': address, u'output': u'csv'})
     
     # This retrieves the URL from Google, parses out the longitude and latitude,
     # and then returns them as a string.
@@ -92,7 +92,7 @@ def _geocode(address):
         return None
     except Exception, e:
         stack = traceback.extract_stack()
-        logging.debug('An error occorred: %s' % stack)
+        logging.debug('An error occurred: %s' % stack)
         raise
 
 def object_to_key(python_thing):
@@ -109,10 +109,12 @@ def cached_geocoding_in_json(address):
     geocoded = None
     geocoded_in_json = cache.get(key_name)
     if geocoded_in_json is None:
-        geocoded = _geocode(address)
-        geocoded.update({'is_inaccessible': is_inaccessible})
-        geocoded_in_json = simplejson.dumps(geocoded)
-        cache.set(key_name, geocoded_in_json, 60 * 60 * 24 * 7) # cache for a week, which should be plenty
+        geocoded = _geocode(address) or {}
+        geocoded_and_inaccessible = {'is_inaccessible': is_inaccessible}
+        geocoded_and_inaccessible.update(geocoded)
+        geocoded_in_json = simplejson.dumps(geocoded_and_inaccessible)
+        if geocoded:
+            cache.set(key_name, geocoded_in_json, 60 * 60 * 24 * 7) # cache for a week, which should be plenty
     return geocoded_in_json
 
 def get_uri_metadata_for_generating_absolute_links(request):

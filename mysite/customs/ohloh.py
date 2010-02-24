@@ -1,3 +1,4 @@
+import mysite.base.unicode_sanity
 import xml.etree.ElementTree as ET
 import xml.parsers.expat
 import sys, urllib, hashlib
@@ -69,14 +70,14 @@ def ohloh_url2data(url, selector, params = {}, many = False, API_KEY = None, per
         API_KEY = settings.OHLOH_API_KEY
 
 
-    my_params = {'api_key': API_KEY}
+    my_params = {u'api_key': unicode(API_KEY)}
     my_params.update(params)
     params = my_params ; del my_params
 
     # FIXME: We return more than just "ret" these days! Rename this variable.
     ret = []
     
-    encoded = urllib.urlencode(params)
+    encoded = mysite.base.unicode_sanity.urlencode(params)
     url += encoded
     try:
         b = mechanize_get(url, person)
@@ -142,9 +143,11 @@ class Ohloh(object):
     
     def project_name2projectdata(self, project_name_query):
         url = 'http://www.ohloh.net/projects.xml?'
-        args = {'query': project_name_query}
-        data, web_response = ohloh_url2data(url=url, selector='result/project',
-                                   params=args, many=True)
+        args = {u'query': unicode(project_name_query)}
+        data, web_response = ohloh_url2data(url=unicode(url),
+                                            selector='result/project',
+                                            params= args,
+                                            many=True)
         # Sometimes when we search Ohloh for e.g. "Debian GNU/Linux", the project it gives
         # us back as the top-ranking hit for full-text relevance is "Ubuntu GNU/Linux." So here
         # we see if the project dicts have an exact match by project name.
@@ -163,13 +166,16 @@ class Ohloh(object):
     
     @accepts(object, int)
     def analysis2projectdata(self, analysis_id):
-        url = 'http://www.ohloh.net/analyses/%d.xml?' % analysis_id
-        data, web_response = ohloh_url2data(url=url, selector='result/analysis')
-
-        # Otherwise, get the project name
+        data, web_response = self.analysis_id2analysis_data(analysis_id)
         proj_id = data['project_id']
         return self.project_id2projectdata(int(proj_id))
         
+    @accepts(object, int)
+    def analysis_id2analysis_data(self, analysis_id):
+        url = 'http://www.ohloh.net/analyses/%d.xml?' % analysis_id
+        data, web_response = ohloh_url2data(url=url, selector='result/analysis')
+        return data, web_response
+
     def get_contribution_info_by_username(self, username, person=None):
         '''Input: A username. We go out and ask Ohloh, "What repositories
         have you indexed where that username was a committer?"
@@ -183,7 +189,7 @@ class Ohloh(object):
         url = 'http://www.ohloh.net/contributors.xml?'
         c_fs, web_response = ohloh_url2data(
             url=url, selector='result/contributor_fact', 
-            params={'query': username}, many=True, person=person)
+            params={u'query': unicode(username)}, many=True, person=person)
 
         # For each contributor fact, grab the project it was for
         for c_f in c_fs:
@@ -313,7 +319,7 @@ class Ohloh(object):
         ret = []
         url = 'http://www.ohloh.net/contributors.xml?'
         c_fs, web_response = ohloh_url2data(url, 'result/contributor_fact',
-                              {'query': email}, many=True)
+                              {u'query': unicode(email)}, many=True)
 
         # For each contributor fact, grab the project it was for
         for c_f in c_fs:

@@ -168,6 +168,17 @@ Search bugs
         {% else %}
 
         {% endif %}
+        <div style="float: right; padding-right: 30px; font-size: 9.5pt;">
+        {% if show_prev_page_link %}
+        <a href='{{ prev_page_url }}' id='prev-page'>&laquo;&nbsp;Prev</a>
+        <span class='separator'>&nbsp;</span>
+        {% endif %}
+
+
+        {% if show_next_page_link %}
+        <a href='{{ next_page_url }}' id='next-page'>Next&nbsp;&raquo;</a>
+        {% endif %}
+    </div>
 
 </div> <!-- /#results -->
 {% endblock main %}

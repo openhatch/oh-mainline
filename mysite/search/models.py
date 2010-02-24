@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.files.base import ContentFile
 from django.core.files.images import get_image_dimensions
+from django.contrib.auth.models import User
 from django.conf import settings
 import datetime
 import StringIO
@@ -8,8 +9,16 @@ import Image
 import uuid
 import urllib
 from django.db.models import Q
-import mysite.customs 
+import mysite.customs
+import mysite.base.unicode_sanity
 from django.core.urlresolvers import reverse
+import voting
+
+class OpenHatchModel(models.Model):
+    created_date = models.DateTimeField(null=True, auto_now_add=True)
+    modified_date = models.DateTimeField(auto_now=True)
+    class Meta:
+        abstract = True
 
 def get_image_data_scaled(image_data, width):
     # scale it
@@ -34,7 +43,7 @@ def get_image_data_scaled(image_data, width):
     image_data = new_image_fd.getvalue()
     return image_data
 
-class Project(models.Model):
+class Project(OpenHatchModel):
 
     @staticmethod
     def generate_random_icon_path(instance, filename):
@@ -197,12 +206,11 @@ class Project(models.Model):
         return "name='%s' language='%s'" % (self.name, self.language)
     
     def get_url(self):
-        query_string = urllib.urlencode({'q': 'project:' +
-                                         self.name_with_quotes_if_necessary()})
-        return reverse(mysite.profile.views.people) + '?' + query_string
+        return reverse(mysite.project.views.project,
+                kwargs={'project__name': mysite.base.unicode_sanity.quote(self.name)}) 
 
     def get_mentors_search_url(self):
-        query_string = urllib.urlencode({'q': 'can_mentor:"%s"' %
+        query_string = mysite.base.unicode_sanity.urlencode({u'q': u'can_mentor:"%s"' %
                                          self.language})
         return reverse(mysite.profile.views.people) + '?' + query_string
 
@@ -215,17 +223,60 @@ class Project(models.Model):
 def populate_icon_on_project_creation(instance, created, *args, **kwargs):
     if created and not instance.icon_raw:
         instance.populate_icon_from_ohloh()
-        
-models.signals.post_save.connect(populate_icon_on_project_creation, Project)
 
-# An easy way to find 
+def grab_project_language_from_ohloh(instance, created, *args,
+                                     **kwargs):
+    import mysite.search.tasks
+    if created and not instance.language:
+        task = mysite.search.tasks.PopulateProjectLanguageFromOhloh()
+        task.delay(project_id=instance.id)
+
+models.signals.post_save.connect(populate_icon_on_project_creation, Project)
+models.signals.post_save.connect(grab_project_language_from_ohloh, Project)
+
+class ProjectInvolvementQuestion(OpenHatchModel):
+    key_string = models.CharField(max_length=255)
+    text = models.TextField()
+    is_bug_style = models.BooleanField(default=False)
+
+    def get_answers_for_project(self, a_project):
+        def get_score(obj):
+            return (-1)* voting.models.Vote.objects.get_score(obj)['score']
+        the_answers = list(self.answers.filter(project=a_project))
+        # TODO: sort them
+        the_answers.sort(key=get_score)
+        return the_answers
+        
+
+    @staticmethod
+    def create_dummy(**kwargs):
+        data = {'text': 'how are you doing?'}
+        data.update(kwargs)
+        ret = ProjectInvolvementQuestion(**data)
+        ret.save()
+        return ret
+
+class Answer(OpenHatchModel):
+    title = models.CharField(null=True, max_length=255)
+    text = models.TextField(blank=False)
+    author = models.ForeignKey(User)
+    question = models.ForeignKey(ProjectInvolvementQuestion, related_name='answers')
+    project = models.ForeignKey(Project)
+
+    @staticmethod
+    def create_dummy(**kwargs):
+        data = {'text': 'i am doing well'}
+        data.update(kwargs)
+        ret = Answer(**data)
+        ret.save()
+        return ret
 
 class OpenBugsManager(models.Manager):
     def get_query_set(self):
         return super(OpenBugsManager, self).get_query_set().filter(
                 looks_closed=False)
 
-class Bug(models.Model):
+class Bug(OpenHatchModel):
     project = models.ForeignKey(Project)
     title = models.CharField(max_length=200)
     description = models.TextField()
@@ -234,7 +285,7 @@ class Bug(models.Model):
     people_involved = models.IntegerField(null=True)
     date_reported = models.DateTimeField()
     last_touched = models.DateTimeField()
-    last_polled = models.DateTimeField()
+    last_polled = models.DateTimeField(default=datetime.datetime(1970, 1, 1))
     submitter_username = models.CharField(max_length=200)
     submitter_realname = models.CharField(max_length=200, null=True)
     canonical_bug_link = models.URLField(max_length=200)
@@ -242,6 +293,7 @@ class Bug(models.Model):
     looks_closed = models.BooleanField(default=False)
     bize_size_tag_name = models.CharField(max_length=50) 
     concerns_just_documentation = models.BooleanField(default=False)
+    as_appears_in_distribution = models.CharField(max_length=200, default='')
 
     all_bugs = models.Manager()
     open_ones = OpenBugsManager()
@@ -270,7 +322,7 @@ class Bug(models.Model):
         kwargs['project'] = Project.create_dummy()
         return Bug.create_dummy(**kwargs)
 
-class HitCountCache(models.Model):
+class HitCountCache(OpenHatchModel):
     hashed_query = models.CharField(max_length=40, primary_key=True) # stores a sha1 
     hit_count = models.IntegerField()
 

@@ -1,3 +1,4 @@
+import mysite.base.unicode_sanity
 import lxml.html
 import urllib
 import mysite.customs.ohloh
@@ -8,8 +9,8 @@ SECTION_NAME_AND_NUMBER_SPLITTER = re.compile(r'(.*?) [(](\d+)[)]$')
 
 def source_packages_maintained_by(email_address):
     htmler = lxml.etree.HTMLParser(encoding='utf-8')
-    url = 'http://qa.debian.org/developer.php?' + urllib.urlencode(dict(
-            login=email_address))
+    url = 'http://qa.debian.org/developer.php?' + mysite.base.unicode_sanity.urlencode({
+        u'login': unicode(email_address)})
     response = mysite.customs.ohloh.mechanize_get(url).response()
     parsed = lxml.html.parse(response).getroot()
 

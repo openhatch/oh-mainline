@@ -36,7 +36,16 @@ def bugzilla_date_to_datetime(date_string):
         try:
             ret = datetime.datetime.strptime(date_string, '%Y-%m-%d %H:%M:%S')
         except ValueError:
-            ret = datetime.datetime.strptime(date_string, '%Y-%m-%d %H:%M:%S +0000') # UTC-only, baby
+            try:
+                ret = datetime.datetime.strptime(date_string, '%Y-%m-%d %H:%M:%S +0000') # UTC-only, baby
+            except ValueError:
+                try:
+                    ret = datetime.datetime.strptime(date_string, '%Y-%m-%d %H:%M:%S -0400')
+                    ret -= datetime.timedelta(hours=4)
+                except ValueError:
+                    ret = datetime.datetime.strptime(date_string, '%Y-%m-%d %H:%M:%S -0500')
+                    ret -= datetime.timedelta(hours=5)
+                    
     return ret
 
 def who_tag_to_username_and_realname(who_tag):
@@ -53,7 +62,7 @@ def xml2bug_object(xml_fd,
     bug_elt, = parsed.xpath('bug') # The comma asserts that the xpath() returns a list of length 1
     return bug_elt2bug_object(bug_elt, canonical_bug_link_format_string, gen_miro_project)
 
-def bug_elt2bug_object(parsed, canonical_bug_link_format_string,
+def bug_elt2bug_dict(parsed, canonical_bug_link_format_string,
                        gen_project):
     date_reported_text = get_tag_text_from_xml(parsed, 'creation_ts')
     last_touched_text = get_tag_text_from_xml(parsed, 'delta_ts')
@@ -66,7 +75,7 @@ def bug_elt2bug_object(parsed, canonical_bug_link_format_string,
     status = get_tag_text_from_xml(parsed, 'bug_status')
     looks_closed = status in ('RESOLVED', 'WONTFIX')
 
-    ret = Bug(
+    ret = dict(
         project = project,
         title = get_tag_text_from_xml(parsed, 'short_desc'),
         description = (get_tag_text_from_xml(parsed, 'long_desc/thetext') or
@@ -82,6 +91,14 @@ def bug_elt2bug_object(parsed, canonical_bug_link_format_string,
         canonical_bug_link = canonical_bug_link_format_string % bug_id,
         good_for_newcomers = ('bitesized' in keywords),
         looks_closed=looks_closed)
+    return ret
+
+def bug_elt2bug_object(parsed, canonical_bug_link_format_string,
+                       gen_project):
+    ret = Bug()
+    data = bug_elt2bug_dict(parsed, canonical_bug_link_format_string, gen_project)
+    for key in data:
+        setattr(ret, key, data[key])
     return ret
 
 def bugzilla_query_to_bug_ids(csv_fd):

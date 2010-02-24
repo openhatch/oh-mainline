@@ -2,6 +2,7 @@ from decorator import decorator
 from odict import odict
 import re
 import collections
+import mysite.base.helpers
 
 from django.template.loader import render_to_string
 from django.shortcuts import render_to_response
@@ -37,4 +38,20 @@ def unicodify_strings_when_inputted(func, *args, **kwargs):
             kwargs[key] = unicode(arg, 'utf-8')
     return func(*args_as_list, **kwargs)
 
+def no_str_in_the_dict(d):
+    if not d:
+        return d
     
+    for key in d:
+        value = d[key]
+        mysite.base.helpers.assert_or_pdb(type(key) != str)
+        mysite.base.helpers.assert_or_pdb(type(value) != str)
+    return d
+
+def no_str_in_the_list(l):
+    if not l:
+        return l
+    
+    for elt in l:
+        mysite.base.helpers.assert_or_pdb(type(l) != str)
+    return l

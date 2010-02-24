@@ -17,7 +17,7 @@ about the projects we index
 {% endblock %}
 
 {% block main %}
-{% cache 86400 projects %}{# cache for one day 86400 #}
+{% cache 86400 projects2 %}{# cache for one day 86400 #}
 <div id='big-project-list' class='module'>
     <div class='head'>
         <h3>Projects on OpenHatch</h3>
@@ -39,10 +39,12 @@ about the projects we index
                 {% if project.get_open_bugs %}
                 {{ project.get_open_bugs.count }} bug{{ project.get_open_bugs.count|pluralize }}<!--
                 -->{% endif %}<!--
-                -->{% if project.get_open_bugs and project.get_contributors %},{% endif %}
-                {% if project.get_contributors %}
-                {{ project.get_contributors|length }} contributor{{ project.get_contributors|length|pluralize }}
+                -->{% if project.get_open_bugs and project.cached_contributor_count %},{% endif %}
+                {% with project.cached_contributor_count as count %}
+                {% if count %}
+                {{ count }} contributor{{ count|pluralize }}
                 {% endif %}
+                {% endwith %}
             </div>
             </li>
             {% endfor %}
@@ -62,10 +64,12 @@ about the projects we index
                 {% if project.get_open_bugs %}
                 {{ project.get_open_bugs.count }} bug{{ project.get_open_bugs.count|pluralize }}<!--
                 -->{% endif %}<!--
-                -->{% if project.get_open_bugs and project.get_contributors %},{% endif %}
-                {% if project.get_contributors %}
-                {{ project.get_contributors|length }} contributor{{ project.get_contributors|length|pluralize }}
+                -->{% if project.get_open_bugs and project.cached_contributor_count %},{% endif %}
+                {% with project.cached_contributor_count as count %}
+                {% if count %}
+                {{ count }} contributor{{ count|pluralize }}
                 {% endif %}
+                {% endwith %}
             </div>
             </li>
             {% endfor %}
