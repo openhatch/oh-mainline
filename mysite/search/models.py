@@ -322,6 +322,12 @@ class Bug(OpenHatchModel):
         kwargs['project'] = Project.create_dummy()
         return Bug.create_dummy(**kwargs)
 
+class BugAlert(OpenHatchModel):
+    user = models.ForeignKey(User, null=True)
+    query = models.CharField(max_length=255)
+    how_many_bugs_at_time_of_request = models.IntegerField()
+    email = models.EmailField(max_length=255)
+
 class HitCountCache(OpenHatchModel):
     hashed_query = models.CharField(max_length=40, primary_key=True) # stores a sha1 
     hit_count = models.IntegerField()

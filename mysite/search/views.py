@@ -18,6 +18,8 @@ from dateutil import tz
 import pytz
 import re
 import simplejson
+import mysite.search.forms
+
 
 # Via http://www.djangosnippets.org/snippets/1435/
 def encode_datetime(obj):
@@ -30,7 +32,7 @@ def encode_datetime(obj):
     raise TypeError("%s" % type(obj) + repr(obj) + " is not JSON serializable")
     # }}}
 
-def fetch_bugs(request):
+def fetch_bugs(request, invalid_subscribe_to_alert_form=None):
     # {{{
 
     # Make the query string keys lowercase using a redirect.
@@ -99,8 +101,29 @@ def fetch_bugs(request):
     data['prev_page_url'] = '/search/?' + prev_page_query_str.urlencode()
     data['next_page_url'] = '/search/?' + next_page_query_str.urlencode()
     data['this_page_query_str'] = mysite.base.unicode_sanity.urlencode(request.GET)
+
+    data['show_prev_page_link'] = start > 1
+    data['show_next_page_link'] = end < (total_bug_count - 1)
+
+    this_is_last_page = not data['show_prev_page_link']
+
     if request.GET.get('confirm_email_alert_signup', ''):
         data['confirm_email_alert_signup'] = 1
+
+    # If this the last page of results, display a form allowing user to
+    # subscribe to a Volunteer Opportunity search alert
+    if query and this_is_last_page:
+        if invalid_subscribe_to_alert_form:
+            form = invalid_subscribe_to_alert_form
+        else:
+            initial = {
+                    'query': request.GET.get('q', ''), 
+                    'how_many_bugs_at_time_of_request': len(bugs)
+                    }
+            if request.user.is_authenticated():
+                initial['email'] = request.user.email
+            form = mysite.search.forms.BugAlertSubscriptionForm(initial=initial)
+        data['subscribe_to_alert_form'] = form
 
     # FIXME
     # The template has no way of grabbing what URLs to put in the [x]
@@ -120,10 +143,7 @@ def fetch_bugs(request):
         data['suggestions'] = suggestions
         data['bunch_of_bugs'] = bugs
         data['url'] = 'http://launchpad.net/'
-
         data['total_bug_count'] = total_bug_count
-        data['show_prev_page_link'] = start > 1
-        data['show_next_page_link'] = end < (total_bug_count - 1)
         data['facet2any_query_string'] = facet2any_query_string
         data['project_count'] = mysite.search.controllers.get_project_count()
 
@@ -277,9 +297,17 @@ def get_autocompletion_suggestions(input):
     # }}}
 
 def subscribe_to_bug_alert_do(request):
-    querystr = request.POST.get('this_page_query_str', '')
-    next = reverse(fetch_bugs) + '?' + querystr + "&confirm_email_alert_signup=1"
-    return HttpResponseRedirect(next)
+    alert_form = mysite.search.forms.BugAlertSubscriptionForm(request.POST)
+    if alert_form.is_valid():
+        if request.user.is_authenticated():
+            alert_form.user = request.user
+        alert_form.save()
+        querystr = request.POST.get('this_page_query_str', '')
+        next = reverse(fetch_bugs) + '?' + querystr + "&confirm_email_alert_signup=1"
+        return HttpResponseRedirect(next)
+    else:
+        return fetch_bugs(request, alert_form)
+
 
 """
 Ways we could do autocompletion:
