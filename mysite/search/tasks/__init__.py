@@ -7,6 +7,7 @@ from celery.task import Task, PeriodicTask
 from celery.registry import tasks
 from mysite.search.launchpad_crawl import grab_lp_bugs, lpproj2ohproj
 import mysite.customs.miro
+import mysite.customs.bugtrackers.trac
 import mysite.customs.bugtrackers.gnome_love
 import mysite.customs.bugtrackers.fedora_fitfinish
 
@@ -176,12 +177,14 @@ class LookAtOneTwistedBug(Task):
     def run(self, bug_id, **kwargs):
         logger = self.get_logger(**kwargs)
         logger.info("Was asked to look at bug %d in Twisted" % bug_id)
+        tb = mysite.customs.bugtrackers.trac.TracBug(
+            bug_id=bug_id,
+            BASE_URL='http://twistedmatrix.com/trac/')
+
+        bug_url = tb.as_bug_specific_url()
+
         # If bug is already in our database, and we looked at
         # it within the past day, skip the request.
-        bug_url = mysite.customs.bugtrackers.bugzilla_general.bug_id2bug_url(
-            bug_id=bug_id,
-            BUG_URL_PREFIX=mysite.customs.bugtrackers.fedora_fitfinish.BUG_URL_PREFIX)
-
         try:
             bug_obj = mysite.search.models.Bug.all_bugs.get(
                 canonical_bug_link=bug_url)
@@ -200,12 +203,19 @@ class LookAtOneTwistedBug(Task):
         # Is that bug fresh enough?
         if (datetime.datetime.now() - bug_obj.last_polled
             ) > datetime.timedelta(days=1):
-            logging.info("Refreshing bug %d from Fedora." %
+            logging.info("Refreshing bug %d from Twisted." %
                          bug_id)
             # if the delta is greater than a day, refresh it.
-            mysite.customs.bugtrackers.fedora_fitfinish.reload_bug_obj(bug_obj)
+            data = tb.as_data_dict_for_bug_object()
+            for key in data:
+                value = data[key]
+                setattr(bug_obj, key, value)
+            # And the project...
+            if not bug_obj.project_id:
+                project, _ = mysite.search.models.Project.objects.get_or_create(name='Twisted')
+                bug_obj.project = project
             bug_obj.save()
-        logging.info("Finished with %d from Fedora." % bug_id)
+        logging.info("Finished with %d from Twisted." % bug_id)
 
 class RefreshAllFedoraFitAndFinishBugs(PeriodicTask):
     run_every = timedelta(days=1)
@@ -219,6 +229,19 @@ class RefreshAllFedoraFitAndFinishBugs(PeriodicTask):
                                                                                 BUG_URL_PREFIX=mysite.customs.bugtrackers.fedora_fitfinish.BUG_URL_PREFIX)
             task = LookAtOneFedoraBug()
             task.delay(bug_id=bug_id)
+
+class RefreshAllTwistedEasyBugs(PeriodicTask):
+    run_every = timedelta(days=1)
+    def run(self, **kwargs):
+        logger = self.get_logger(**kwargs)
+        logger.info("Starting refreshing all easy Twisted bugs.")
+        for bug in mysite.search.models.Bug.all_bugs.filter(
+            canonical_bug_link__contains=
+            'http://twistedmatrix.com/trac/'):
+            tb = mysite.customs.bugtrackers.TracBug.from_url(
+                bug.canonical_bug_link)
+            task = LookAtOneTwistedBug()
+            task.delay(bug_id=tb.bug_id)
 
 class PopulateProjectLanguageFromOhloh(Task):
     def run(self, project_id, **kwargs):
@@ -255,6 +278,9 @@ tasks.register(LearnAboutNewPythonDocumentationBugs)
 tasks.register(LookAtOneBugInPython)
 tasks.register(GrabPythonBugs)
 tasks.register(LookAtOneFedoraBug)
+tasks.register(LearnAboutNewEasyTwistedBugs)
+tasks.register(LookAtOneTwistedBug)
+tasks.register(RefreshAllTwistedEasyBugs)
 tasks.register(LearnAboutNewFedoraFitAndFinishBugs)
 tasks.register(RefreshAllFedoraFitAndFinishBugs)
 tasks.register(PopulateProjectLanguageFromOhloh)

@@ -74,13 +74,20 @@ class TracBug:
             BASE_URL += '/'
         self.BASE_URL = BASE_URL
 
+    @staticmethod
+    def from_url(url):
+        base, ticket, num = url.rsplit('/', 2)
+        bug_id = int(num)
+        assert ticket == 'ticket'
+        return TracBug(bug_id=bug_id,
+                       BASE_URL=base + '/')
+
     def as_bug_specific_url(self):
         return urlparse.urljoin(self.BASE_URL,
                                 "ticket/%d" % self.bug_id)
 
     def as_bug_specific_csv_url(self):
-        return (self.as_bug_specific_url() +
-                "?format=csv" % self.bug_id)
+        return self.as_bug_specific_url() +"?format=csv"
 
     def as_bug_specific_csv_data(self):
         b = mysite.customs.ohloh.mechanize_get(
