@@ -159,6 +159,19 @@ class LearnAboutNewFedoraFitAndFinishBugs(PeriodicTask):
             task.delay(bug_id=bug_id)
         logger.info('Finished grabbing the list of Fedora fit and finish bugs.')
 
+
+class LearnAboutNewEasyTwistedBugs(PeriodicTask):
+    run_every = timedelta(days=1)
+    def run(self, **kwargs):
+        logger = self.get_logger(**kwargs)
+        
+        logger.info('Started to learn about new Twisted easy bugs.')
+        for bug_id in mysite.customs.bugtrackers.trac.csv_url2list_of_bug_ids(
+            mysite.customs.bugtrackers.trac.twisted_csv_of_easy_bugs()):
+            task = LookAtOneTwistedBug()
+            task.delay(bug_id=bug_id)
+        logger.info('Finished grabbing the list of Twisted easy bugs.')
+
 class RefreshAllFedoraFitAndFinishBugs(PeriodicTask):
     run_every = timedelta(days=1)
     def run(self, **kwargs):
