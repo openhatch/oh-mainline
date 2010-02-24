@@ -2,8 +2,4 @@
     <span class='full_name'>{{ user.first_name }} {{ user.last_name }}</span>
     {# opening paren #}
     <span class='username_parenthesized'>
-    ({% endif %}<span class='username'>
-    {{ user.username }}
-</span>{% if user.first_name or user.last_name %}){# closing paren #}
-</span>
-{% endif %}
+    ({% endif %}<span class='username'>{{ user.username }}</span>{% if user.first_name or user.last_name %}){# closing paren #}</span>{% endif %}

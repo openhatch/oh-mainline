@@ -1,9 +1,12 @@
 {% load base_extras %}
 <small style='color: #888;'>&nbsp;&nbsp;&nbsp;&mdash; <a style='font-weight: bold;' href='{{ answer.author.get_profile.profile_url }}'>
+    {% spaceless %}
     {% with answer.author as user %}
         {% include 'name.html' %}
     {% endwith %}
-    </a> &middot; {{ answer.created_date|timesince_terse }} ago
+    </a>
+    {% endspaceless %}
+    &middot; {{ answer.created_date|timesince_terse }} ago
     {% ifequal the_user answer.author %}
     &middot;
     <a href="#" style='text-decoration: none ! important;' class="edit_link" id="edit_link_{{answer.pk}}">edit</a>
