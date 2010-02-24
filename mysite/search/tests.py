@@ -7,7 +7,7 @@ import mysite.profile.models
 import mysite.customs.miro
 import mysite.search.controllers
 from mysite.search.models import Project, Bug, HitCountCache, \
-        ProjectInvolvementQuestion, Answer
+        ProjectInvolvementQuestion, Answer, BugAlert
 from mysite.search import views
 import lpb2json
 import datetime
@@ -1216,8 +1216,8 @@ class SuggestAlertOnLastResultsPage(TwillTests):
         opps_query_string = { u'q': query, u'start': 1, u'end': 10}
         opps_url = make_twill_url('http://openhatch.org'+reverse(opps_view) + '?' + mysite.base.unicode_sanity.urlencode(opps_query_string))
         tc.go(opps_url)
+
         # Make sure we *don't* have the comment that flags this as a page that offers an email alert subscription button
-        import pdb; pdb.set_trace()
         tc.notfind("this page should offer a link to sign up for an email alert")
 
         # Visit the last page of results
@@ -1235,39 +1235,60 @@ class SuggestAlertOnLastResultsPage(TwillTests):
 
         # Submit the 'alert' form.
         email_address = 'yetanother@ema.il'
-        tc.fv('alert', 'alert-email', email_address)
+        tc.fv('alert', 'email', email_address)
         tc.submit()
         
-        # Make sure the resulting page contains an HTML comment instructing the
-        # developer that "this page should confirm that an email alert has been
-        # registered"
-        import pdb; pdb.set_trace()
-        tc.find("this page should confirm that an email alert has been registered")
+        if anonymous:
+            client = self.client
+        else:
+            client = self.login_with_client()
+
+
+        alert_data_in_form = {
+                'query': query,
+                'how_many_bugs_at_time_of_request': Bug.open_ones.filter(project=p).count(),
+                'email': email_address,
+                'this_page_query_str': '?q=old_query_string'
+                }
+        # Twill fails here for some reason, so let's continue the journey with
+        # Django's built-in testing sweeeet
+        response = client.post(reverse(mysite.search.views.subscribe_to_bug_alert_do), alert_data_in_form)
+
+        # This response should be a HTTP redirect instruction 
+        self.assertEqual(response.status_code, 302)
+        redirect_target_url = response._headers['location'][1]
+        self.assert_(alert_data_in_form['this_page_query_str'] in redirect_target_url)
+
+        # The page redirects to the old kk
+        response = client.get(redirect_target_url)
+        self.assertContains(response, "this page should confirm that an email alert has been registered")
 
         # At this point, make sure that the DB contains a record of
         #     * What the query was.
         #     * When the request was made.
         #     * How many bugs were returned by the query at the time of request.
 
-        alert_record = Alert.objects.get(created_date=output_of_utcnow)
+        # There should be only one alert
+        all_alerts = BugAlert.objects.all()
+        self.assertEqual(all_alerts.count(), 1)
+        alert_record = all_alerts[0]
         self.assert_(alert_record)
 
-        assert_that_record_has_this_data = {
-                'query': query,
-                'created_date': output_of_utcnow,
-                'how_many_bugs_at_time_of_request':
-                    Bug.objects.filter(project=myproj).count(),
-                'email': email_address 
-                }
-
+        assert_that_record_has_this_data = alert_data_in_form
+        
         # For the logged-in user, also check that the record contains the
         # identity of the user who made the alert request.
 
         if not anonymous:
             assert_that_record_has_this_data['user'] = User.objects.get(username='paulproteus')
 
-        for key, value in assert_that_record_has_this_data.items():
-            self.assertEqual(alert_record.__getattribute__(key), value, 'we were looking for ' + key + ', hoping it would be ' + value)
+        # At this point, assert_that_record_has_this_data has all and only the data that the record should have.
+        # Except one key/value pair. Let's get rid of it.
+        del assert_that_record_has_this_data['this_page_query_str']
+
+        for key, expected_value in assert_that_record_has_this_data.items():
+            self.assertEqual(alert_record.__getattribute__(key), expected_value,
+                    'alert.%s = %s not (expected) %s' % (key, alert_record.__getattribute__(key), expected_value))
 
     # run the above test for our two use cases: logged in and not
     def test_alert_anon(self):

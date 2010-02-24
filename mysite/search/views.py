@@ -301,9 +301,10 @@ def subscribe_to_bug_alert_do(request):
     alert_form = mysite.search.forms.BugAlertSubscriptionForm(request.POST)
     querystr = request.POST.get('this_page_query_str', '')
     if alert_form.is_valid():
+        alert = alert_form.save()
         if request.user.is_authenticated():
-            alert_form.user = request.user
-        alert_form.save()
+            alert.user = request.user
+            alert.save()
         next = reverse(fetch_bugs) + '?' + querystr + "&confirm_email_alert_signup=1"
         return HttpResponseRedirect(next)
     else:
