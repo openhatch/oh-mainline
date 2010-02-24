@@ -1302,8 +1302,10 @@ class DeleteAnswer(TwillTests):
     def test_delete_bug_answer(self):
         # create dummy question
         p = Project.create_dummy(name='Ubuntu')
-        # it's important that this pk correspond to the pk of an actual bug_style question, as specified in our view
-        # otherwise, we'll get_or_create will try to create, but it won't be able to because of a unique key error
+        # it's important that this pk correspond to the pk of an actual
+        # bug_style question, as specified in our view otherwise, we'll
+        # get_or_create will try to create, but it won't be able to because of
+        # a unique key error
         question__pk = 2
         q = ProjectInvolvementQuestion.create_dummy(pk=question__pk, is_bug_style=True)
         # create our dummy answer
