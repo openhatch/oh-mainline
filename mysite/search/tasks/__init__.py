@@ -172,6 +172,41 @@ class LearnAboutNewEasyTwistedBugs(PeriodicTask):
             task.delay(bug_id=bug_id)
         logger.info('Finished grabbing the list of Twisted easy bugs.')
 
+class LookAtOneTwistedBug(Task):
+    def run(self, bug_id, **kwargs):
+        logger = self.get_logger(**kwargs)
+        logger.info("Was asked to look at bug %d in Twisted" % bug_id)
+        # If bug is already in our database, and we looked at
+        # it within the past day, skip the request.
+        bug_url = mysite.customs.bugtrackers.bugzilla_general.bug_id2bug_url(
+            bug_id=bug_id,
+            BUG_URL_PREFIX=mysite.customs.bugtrackers.fedora_fitfinish.BUG_URL_PREFIX)
+
+        try:
+            bug_obj = mysite.search.models.Bug.all_bugs.get(
+                canonical_bug_link=bug_url)
+        except mysite.search.models.Bug.MultipleObjectsReturned:
+            # delete all but the first
+            bug_objs = mysite.search.models.Bug.all_bugs.filter(
+                canonical_bug_link=bug_url)
+            bug_obj = bug_objs[0]
+            for stupid_dup in bug_objs[1:]:
+                stupid_dup.delete()
+
+        except mysite.search.models.Bug.DoesNotExist:
+            bug_obj = mysite.search.models.Bug(
+                canonical_bug_link=bug_url)
+
+        # Is that bug fresh enough?
+        if (datetime.datetime.now() - bug_obj.last_polled
+            ) > datetime.timedelta(days=1):
+            logging.info("Refreshing bug %d from Fedora." %
+                         bug_id)
+            # if the delta is greater than a day, refresh it.
+            mysite.customs.bugtrackers.fedora_fitfinish.reload_bug_obj(bug_obj)
+            bug_obj.save()
+        logging.info("Finished with %d from Fedora." % bug_id)
+
 class RefreshAllFedoraFitAndFinishBugs(PeriodicTask):
     run_every = timedelta(days=1)
     def run(self, **kwargs):
