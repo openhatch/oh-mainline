@@ -114,7 +114,6 @@ about our members who support {{ project.name }}
 {% endblock left %}
 
 {% block main %}
-    {% comment %}
     {% if random_pfentry %}
     <div class='module' id='bugs'>
         <div class='head'>
@@ -123,13 +122,11 @@ about our members who support {{ project.name }}
         <div class='body'>
             <h2 style='font-size: 1.3em; font-weight: normal;'>
                 {% spaceless %}
-                <span class='quotemark'>&ldquo;</span>
                 <span>{{ random_pfentry.project_description|urlize|linebreaksbr}}</span>
-                <span class='quotemark'>&rdquo;</span>
                 {% endspaceless %}
             </h2>
-            <p style='font-size: .9em; margin: 5px 0 0 0;'>
-                &mdash; from
+            <p style='float: right; font-size: .9em; margin: 5px 0 0 0;'>
+                from
                 <a href='{{ random_pfentry.person.profile_url }}'>
                     {{ random_pfentry.person.get_full_name_or_username }}'s
                     {% spaceless %}
@@ -140,7 +137,6 @@ about our members who support {{ project.name }}
         </div>
     </div>
     {% endif %}
-    {% endcomment %}
 
     <div class='module' id='bugs'>
         <div class='head'>
