@@ -179,8 +179,19 @@ Search bugs
         <a href='{{ next_page_url }}' id='next-page'>Next&nbsp;&raquo;</a>
         {% endif %}
         {% if not show_next_page_link %}
-this page should offer a link to sign up for an email alert
+        this page should offer a link to sign up for an email alert
+        <form name='alert' method='post' action='{% url mysite.search.views.subscribe_to_bug_alert_do %}'>
+            <input type="hidden" name="this_page_query_str" value="{{this_page_query_str}}">
+            <input name='alert-email'
+            {% if the_user.is_authenticated %}
+            value='{{ the_user.email|urlencode }}'
+            {% endif %}
+            >
+        </form>
         {% endif %}
+        {% ifequal confirm_email_alert_signup 1 %}
+        this page should confirm that an email alert has been registered
+        {% endifequal %}
     </div>
 </div> <!-- /#results -->
 {% endblock main %}

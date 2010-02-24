@@ -98,6 +98,9 @@ def fetch_bugs(request):
     data['end'] = min(end, total_bug_count)
     data['prev_page_url'] = '/search/?' + prev_page_query_str.urlencode()
     data['next_page_url'] = '/search/?' + next_page_query_str.urlencode()
+    data['this_page_query_str'] = mysite.base.unicode_sanity.urlencode(request.GET)
+    if request.GET.get('confirm_email_alert_signup', ''):
+        data['confirm_email_alert_signup'] = 1
 
     # FIXME
     # The template has no way of grabbing what URLs to put in the [x]
@@ -272,6 +275,11 @@ def get_autocompletion_suggestions(input):
 
     return suggestions
     # }}}
+
+def subscribe_to_bug_alert_do(request):
+    querystr = request.POST.get('this_page_query_str', '')
+    next = reverse(fetch_bugs) + '?' + querystr + "&confirm_email_alert_signup=1"
+    return HttpResponseRedirect(next)
 
 """
 Ways we could do autocompletion:

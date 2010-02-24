@@ -1193,7 +1193,7 @@ class TestPotentialMentors(TwillTests):
         self.assertEqual(len(banshee_mentors), 2)
 
 class SuggestAlertOnLastResultsPage(TwillTests):
-    filters = ['user-paulproteus']
+    fixtures = ['user-paulproteus']
 
     def exercise_alert(self, anonymous=True):
         """The 'anonymous' parameter allows the alert functionality to be
@@ -1224,16 +1224,13 @@ class SuggestAlertOnLastResultsPage(TwillTests):
         # make sure we /do/ have the comment that flags this as a page that offers an email alert subscription button
         tc.find("this page should offer a link to sign up for an email alert")
 
-        if anonymous:
-            # If the user is not logged in, fill in the input field 'alert-email' with 
-            # the email address 'my@ema.il'.
-            email_address = 'yetanother@ema.il'
-            tc.fv('alert', 'alert-email', email_address)
-        else:
+        if not anonymous:
             # if the user is logged in, make sure that we have autopopulated the form with her email address
             tc.find(User.objects.get(username='paulproteus').email)
 
         # Submit the 'alert' form.
+        email_address = 'yetanother@ema.il'
+        tc.fv('alert', 'alert-email', email_address)
         tc.submit()
         
         # Make sure the resulting page contains an HTML comment instructing the
@@ -1254,6 +1251,7 @@ class SuggestAlertOnLastResultsPage(TwillTests):
                 'created_date': output_of_utcnow,
                 'how_many_bugs_at_time_of_request':
                     Bug.objects.filter(project=myproj).count(),
+                'email': email_address 
                 }
 
         # For the logged-in user, also check that the record contains the
@@ -1262,11 +1260,8 @@ class SuggestAlertOnLastResultsPage(TwillTests):
         # For the anonymous user, also check that the record contains
         # 'my@ema.il', rather than a User object.
 
-        if anonymous:
-            assert_that_record_has_this_data['email'] = email_address 
-        else:
+        if not anonymous:
             assert_that_record_has_this_data['user'] = User.objects.get(username='paulproteus')
-            assert_that_record_has_this_data['email'] = User.objects.get(username='paulproteus').email
 
         for key, value in assert_that_record_has_this_data.items():
             self.assertEqual(alert_record.__getattribute__(key), value, 'we were looking for ' + key + ', hoping it would be ' + value)
