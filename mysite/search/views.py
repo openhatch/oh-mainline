@@ -7,6 +7,7 @@ from django.utils.html import escape
 from django.core.urlresolvers import reverse
 import mysite.base.decorators
 import urllib
+import urlparse
 
 from mysite.search.models import Bug, Project
 import mysite.search.controllers 
@@ -105,7 +106,7 @@ def fetch_bugs(request, invalid_subscribe_to_alert_form=None):
     data['show_prev_page_link'] = start > 1
     data['show_next_page_link'] = end < (total_bug_count - 1)
 
-    this_is_last_page = not data['show_prev_page_link']
+    this_is_last_page = not data['show_next_page_link']
 
     if request.GET.get('confirm_email_alert_signup', ''):
         data['confirm_email_alert_signup'] = 1
@@ -298,14 +299,19 @@ def get_autocompletion_suggestions(input):
 
 def subscribe_to_bug_alert_do(request):
     alert_form = mysite.search.forms.BugAlertSubscriptionForm(request.POST)
+    querystr = request.POST.get('this_page_query_str', '')
     if alert_form.is_valid():
         if request.user.is_authenticated():
             alert_form.user = request.user
         alert_form.save()
-        querystr = request.POST.get('this_page_query_str', '')
         next = reverse(fetch_bugs) + '?' + querystr + "&confirm_email_alert_signup=1"
         return HttpResponseRedirect(next)
     else:
+        # We want fetch_bugs to get the right query string but we can't exactly
+        # do that. What we *can* do is fiddle with the request obj we're about
+        # to pass to fetch_bugs.
+        # Commence fiddling.
+        request.GET = dict(urlparse.parse_qsl(querystr))
         return fetch_bugs(request, alert_form)
 
 

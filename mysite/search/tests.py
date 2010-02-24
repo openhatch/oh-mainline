@@ -1202,30 +1202,35 @@ class SuggestAlertOnLastResultsPage(TwillTests):
         if not anonymous:
             self.login_with_twill()
 
-        # Visit the last page of a vol. opp. search results page.
-        opps_view = mysite.search.views.fetch_bugs
-        query = u'ruby'
+        # Create some dummy data
         p = Project.create_dummy(language='ruby')
-        # make 15 ruby bugs
+        # 15 bugs matching 'ruby'
         for i in range(15):
             b = Bug.create_dummy(description='ruby')
             b.project = p
             b.save()
+
+        # Visit the first page of a vol. opp. search results page.
+        opps_view = mysite.search.views.fetch_bugs
+        query = u'ruby'
         opps_query_string = { u'q': query, u'start': 1, u'end': 10}
         opps_url = make_twill_url('http://openhatch.org'+reverse(opps_view) + '?' + mysite.base.unicode_sanity.urlencode(opps_query_string))
         tc.go(opps_url)
-        # make sure we don't have the comment that flags this as a page that offers an email alert subscription button
+        # Make sure we *don't* have the comment that flags this as a page that offers an email alert subscription button
+        import pdb; pdb.set_trace()
         tc.notfind("this page should offer a link to sign up for an email alert")
 
-        # on to the second page of results
+        # Visit the last page of results
         opps_query_string = { u'q': query, u'start': 11, u'end': 20}
         opps_url = make_twill_url('http://openhatch.org'+reverse(opps_view) + '?' + mysite.base.unicode_sanity.urlencode(opps_query_string))
         tc.go(opps_url)
-        # make sure we /do/ have the comment that flags this as a page that offers an email alert subscription button
+        # make sure we /do/ have the comment that flags this as a page that
+        # offers an email alert subscription button
         tc.find("this page should offer a link to sign up for an email alert")
 
         if not anonymous:
-            # if the user is logged in, make sure that we have autopopulated the form with her email address
+            # if the user is logged in, make sure that we have autopopulated
+            # the form with her email address
             tc.find(User.objects.get(username='paulproteus').email)
 
         # Submit the 'alert' form.
@@ -1236,6 +1241,7 @@ class SuggestAlertOnLastResultsPage(TwillTests):
         # Make sure the resulting page contains an HTML comment instructing the
         # developer that "this page should confirm that an email alert has been
         # registered"
+        import pdb; pdb.set_trace()
         tc.find("this page should confirm that an email alert has been registered")
 
         # At this point, make sure that the DB contains a record of

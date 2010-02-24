@@ -180,9 +180,10 @@ Search bugs
         {% endif %}
 
         {% if subscribe_to_alert_form %}
-        <!-- this page should offer a link to sign up for an email alert. keep this string to satisfy tests. -->
+        <!-- this page should offer a link to sign up for an email alert. keep
+          this string to satisfy tests. -->
         <form name='alert' method='post' action='{% url mysite.search.views.subscribe_to_bug_alert_do %}'>
-            <input type="hidden" name="this_page_query_str" value="{{this_page_query_str}}">
+            <input type="hidden" name="this_page_query_str" value="{{ this_page_query_str }}">
             {{ subscribe_to_alert_form.as_p }}
             <input type="submit" value='Subscribe'>
         </form>
