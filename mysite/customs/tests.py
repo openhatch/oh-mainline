@@ -584,12 +584,11 @@ class TracBug(django.test.TestCase):
         self.assertEqual(len(two_chars), 2)
         self.assertEqual(two_chars, '\r\n')
 
-    def test_unicodify(self):
-        weird_chars = r'\x01'
+    def test_unicodify_in_the_face_of_junk(self):
+        weird_chars = u'\x01'
         unicoded = mysite.customs.bugtrackers.trac.TracBug.string_un_csv(
             weird_chars)
-        import pdb
-        pdb.set_trace()
+        self.assertEqual(unicoded, '')
         
 
     @mock.patch('mysite.customs.bugtrackers.trac.TracBug.as_bug_specific_csv_data')

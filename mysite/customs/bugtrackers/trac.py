@@ -4,6 +4,7 @@ import mysite.customs.ohloh
 import lxml.html
 import lxml.html.clean
 import urlparse
+import mysite.search.templatetags.search
 
 def twisted_csv_of_easy_bugs():
     b = mysite.customs.ohloh.mechanize_get(
@@ -116,7 +117,15 @@ class TracBug:
         return self._parsed_bug_html_page
 
     @staticmethod
+    @mysite.base.decorators.unicodify_strings_when_inputted
     def string_un_csv(s):
+        s = s.replace(u'\x01', '') # seriously, wtf
+
+        try:
+            safe = mysite.search.templatetags.search.make_text_safe(s)
+        except ValueError:
+            raise
+        
         s = s.replace("'", '\\' + "'")
         s = eval("'''" + s + "'''")
         return unicode(s, 'utf-8')
