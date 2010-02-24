@@ -1263,9 +1263,6 @@ class SuggestAlertOnLastResultsPage(TwillTests):
         # For the logged-in user, also check that the record contains the
         # identity of the user who made the alert request.
 
-        # For the anonymous user, also check that the record contains
-        # 'my@ema.il', rather than a User object.
-
         if not anonymous:
             assert_that_record_has_this_data['user'] = User.objects.get(username='paulproteus')
 
