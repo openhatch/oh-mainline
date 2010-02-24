@@ -178,8 +178,10 @@ Search bugs
         {% if show_next_page_link %}
         <a href='{{ next_page_url }}' id='next-page'>Next&nbsp;&raquo;</a>
         {% endif %}
+        {% if not show_next_page_link %}
+this page should offer a link to sign up for an email alert
+        {% endif %}
     </div>
-
 </div> <!-- /#results -->
 {% endblock main %}
 {% block js %}

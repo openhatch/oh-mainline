@@ -1,4 +1,5 @@
 from mysite.base.tests import make_twill_url, TwillTests
+import mysite.base.unicode_sanity
 
 import mysite.account.tests
 from mysite.profile.models import Person
@@ -1194,7 +1195,7 @@ class TestPotentialMentors(TwillTests):
 class SuggestAlertOnLastResultsPage(TwillTests):
     filters = ['user-paulproteus']
 
-    def exercise_alert(anonymous=True):
+    def exercise_alert(self, anonymous=True):
         """The 'anonymous' parameter allows the alert functionality to be
         tested for anonymous and logged-in users."""
 
@@ -1203,24 +1204,34 @@ class SuggestAlertOnLastResultsPage(TwillTests):
 
         # Visit the last page of a vol. opp. search results page.
         opps_view = mysite.search.views.fetch_bugs
-        query = 'ruby'
-        # FIXME: Ensure that the query string will put us on the
-        # last page of results.
-        opps_query_string = { 'q': }
-        opps_url = make_twill_url('http://openhatch.org'+reverse(opps_view))
+        query = u'ruby'
+        p = Project.create_dummy(language='ruby')
+        # make 15 ruby bugs
+        for i in range(15):
+            b = Bug.create_dummy(description='ruby')
+            b.project = p
+            b.save()
+        opps_query_string = { u'q': query, u'start': 1, u'end': 10}
+        opps_url = make_twill_url('http://openhatch.org'+reverse(opps_view) + '?' + mysite.base.unicode_sanity.urlencode(opps_query_string))
         tc.go(opps_url)
+        # make sure we don't have the comment that flags this as a page that offers an email alert subscription button
+        tc.notfind("this page should offer a link to sign up for an email alert")
 
-        how_many_bugs_at_time_of_request = 
-        
-        # Make sure it contains an HTML comment instructing the developer about the
-        # content of the page
-        tc.find("there should be a suggestion regarding email alerts on this page")
+        # on to the second page of results
+        opps_query_string = { u'q': query, u'start': 11, u'end': 20}
+        opps_url = make_twill_url('http://openhatch.org'+reverse(opps_view) + '?' + mysite.base.unicode_sanity.urlencode(opps_query_string))
+        tc.go(opps_url)
+        # make sure we /do/ have the comment that flags this as a page that offers an email alert subscription button
+        tc.find("this page should offer a link to sign up for an email alert")
 
         if anonymous:
             # If the user is not logged in, fill in the input field 'alert-email' with 
             # the email address 'my@ema.il'.
             email_address = 'yetanother@ema.il'
-            tc.fv('alert-email', email_address)
+            tc.fv('alert', 'alert-email', email_address)
+        else:
+            # if the user is logged in, make sure that we have autopopulated the form with her email address
+            tc.find(User.objects.get(username='paulproteus').email)
 
         # Submit the 'alert' form.
         tc.submit()
@@ -1230,11 +1241,10 @@ class SuggestAlertOnLastResultsPage(TwillTests):
         # registered"
         tc.find("this page should confirm that an email alert has been registered")
 
-        # At this point, the logged-in case, make sure that the DB contains a record of
+        # At this point, make sure that the DB contains a record of
         #     * What the query was.
         #     * When the request was made.
         #     * How many bugs were returned by the query at the time of request.
-        #     * How many bugs are required to trigger the alert.
 
         alert_record = Alert.objects.get(created_date=output_of_utcnow)
         self.assert_(alert_record)
@@ -1243,9 +1253,7 @@ class SuggestAlertOnLastResultsPage(TwillTests):
                 'query': query,
                 'created_date': output_of_utcnow,
                 'how_many_bugs_at_time_of_request':
-                    how_many_bugs_at_time_of_request,
-                'how_many_bugs_required_to_trigger_alert':
-                    how_many_bugs_required_to_trigger_alert * 20
+                    Bug.objects.filter(project=myproj).count(),
                 }
 
         # For the logged-in user, also check that the record contains the
@@ -1257,7 +1265,18 @@ class SuggestAlertOnLastResultsPage(TwillTests):
         if anonymous:
             assert_that_record_has_this_data['email'] = email_address 
         else:
-            assert_that_record_has_this_data['user__username'] = 'paulproteus'
+            assert_that_record_has_this_data['user'] = User.objects.get(username='paulproteus')
+            assert_that_record_has_this_data['email'] = User.objects.get(username='paulproteus').email
+
+        for key, value in assert_that_record_has_this_data.items():
+            self.assertEqual(alert_record.__getattribute__(key), value, 'we were looking for ' + key + ', hoping it would be ' + value)
+
+    # run the above test for our two use cases: logged in and not
+    def test_alert_anon(self):
+        self.exercise_alert(anonymous=True)
+    def test_alert_logged_in(self):
+        self.exercise_alert(anonymous=False)
+
             
 class DeleteAnswer(TwillTests):
     fixtures = ['user-paulproteus']
