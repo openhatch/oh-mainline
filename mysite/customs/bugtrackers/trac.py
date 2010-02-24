@@ -119,7 +119,7 @@ class TracBug:
     def string_un_csv(s):
         s = s.replace("'", '\\' + "'")
         s = eval("'''" + s + "'''")
-        return s
+        return unicode(s, 'utf-8')
 
     def as_data_dict_for_bug_object(self):
         trac_data = self.as_bug_specific_csv_data()
