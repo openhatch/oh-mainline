@@ -16,9 +16,9 @@ class TracBug:
         self.BASE_URL = BASE_URL
     def as_bug_specific_csv_url(self):
         return self.BASE_URL + "%d?format=csv" % self.bug_id
-
-def base_and_bug_id2csv_fd(bug_id, BASE_URL):
-    
-
-def csv_fd2bug_data_dict(csv_fd):
-    
+    def as_bug_specific_csv_data(self):
+        return {}
+    def as_data_dict_for_bug_object(self):
+        trac_data = self.as_bug_specific_csv_data()
+        
+        

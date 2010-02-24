@@ -575,6 +575,33 @@ class ParseCiaMessage(django.test.TestCase):
         self.assertEqual(mysite.customs.cia.parse_cia_tokens(tokens),
                          expected)
 
+class TestTracBug(django.test.TestCase):
+    @mock.patch('mysite.customs.bugtrackers.trac.TracBug.as_bug_specific_csv_data')
+    def test_create_bug_object_data_dict(self, m):
+        m.return_value = {
+            'branch': '',
+            'branch_author': '',
+            'cc': 'thijs_ exarkun',
+            'component': 'core',
+            'description': "This package hasn't been touched in 4 years which either means it's stable or not being used at all. Let's deprecate it (also see #4111).",
+            'id': '4298',
+            'keywords': 'easy',
+            'launchpad_bug': '',
+            'milestone': '',
+            'owner': 'djfroofy',
+            'priority': 'normal',
+            'reporter': 'thijs',
+            'resolution': '',
+            'status': 'new',
+            'summary': 'Deprecate twisted.persisted.journal',
+            'type': 'task'}
+        
+
+        
+        
+        
+
+
 class LineAcceptorTest(django.test.TestCase):
     def test(self):
 
