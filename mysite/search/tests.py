@@ -1221,8 +1221,9 @@ class SuggestAlertOnLastResultsPage(TwillTests):
         tc.notfind("this page should offer a link to sign up for an email alert")
 
         # Visit the last page of results
-        opps_query_string = { u'q': query, u'start': 11, u'end': 20}
-        opps_url = make_twill_url('http://openhatch.org'+reverse(opps_view) + '?' + mysite.base.unicode_sanity.urlencode(opps_query_string))
+        GET = { u'q': query, u'start': 11, u'end': 20}
+        query_string = mysite.base.unicode_sanity.urlencode(GET)
+        opps_url = make_twill_url('http://openhatch.org'+reverse(opps_view) + '?' + query_string)
         tc.go(opps_url)
         # make sure we /do/ have the comment that flags this as a page that
         # offers an email alert subscription button
@@ -1245,10 +1246,9 @@ class SuggestAlertOnLastResultsPage(TwillTests):
 
 
         alert_data_in_form = {
-                'query': query,
+                'query_string': query_string,
                 'how_many_bugs_at_time_of_request': Bug.open_ones.filter(project=p).count(),
                 'email': email_address,
-                'this_page_query_str': '?q=old_query_string'
                 }
         # Twill fails here for some reason, so let's continue the journey with
         # Django's built-in testing sweeeet
@@ -1257,7 +1257,7 @@ class SuggestAlertOnLastResultsPage(TwillTests):
         # This response should be a HTTP redirect instruction 
         self.assertEqual(response.status_code, 302)
         redirect_target_url = response._headers['location'][1]
-        self.assert_(alert_data_in_form['this_page_query_str'] in redirect_target_url)
+        self.assert_(query_string in redirect_target_url)
 
         # The page redirects to the old kk
         response = client.get(redirect_target_url)
@@ -1281,10 +1281,6 @@ class SuggestAlertOnLastResultsPage(TwillTests):
 
         if not anonymous:
             assert_that_record_has_this_data['user'] = User.objects.get(username='paulproteus')
-
-        # At this point, assert_that_record_has_this_data has all and only the data that the record should have.
-        # Except one key/value pair. Let's get rid of it.
-        del assert_that_record_has_this_data['this_page_query_str']
 
         for key, expected_value in assert_that_record_has_this_data.items():
             self.assertEqual(alert_record.__getattribute__(key), expected_value,
