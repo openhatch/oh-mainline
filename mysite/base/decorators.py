@@ -13,6 +13,7 @@ from functools import partial
 from django.template.loader import render_to_string
 import django.db.models.query
 from mysite.base.helpers import render_response
+from django.core.urlresolvers import reverse
 
 def as_view(request, template, data, slug):
     if request.user.is_authenticated() or 'cookies_work' in request.session:
@@ -34,6 +35,13 @@ def view(func, *args, **kw):
     request, template, view_data = func(*args, **kw)
     slug = func.__name__ # Used by account settings
     return as_view(request, template, view_data, slug)
+
+
+    # Where should the user be sent if she clicks 'logout'?
+    # For now, just silence errors, since this is a pretty crucial area in the
+    # codebase, and this is a pretty non-crucial thing.
+    data['logout_next_page'] = request.get_full_path()
+
 
 # vim: ai ts=3 sts=4 et sw=4 nu
 

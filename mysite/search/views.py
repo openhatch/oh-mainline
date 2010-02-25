@@ -19,6 +19,7 @@ from dateutil import tz
 import pytz
 import simplejson
 import mysite.search.forms
+import mysite.base.decorators
 
 # Via http://www.djangosnippets.org/snippets/1435/
 def encode_datetime(obj):

@@ -19,7 +19,7 @@
         </ul>
         <ul id='account-links'>
             {% if the_user.is_authenticated %}
-                <li><a href='{% url oh_logout %}'>log out</a></li>
+                <li><a href='{% url oh_logout %}{% if logout_next_page %}?next={{ logout_next_page|urlencode}}{% endif %}'>log out</a></li>
                 <li><a href='{% url mysite.account.views.set_location %}'>settings</a></li>
                 <li><a href='{% url mysite.profile.views.display_person_web the_user.username %}'>
                 {% with the_user.get_profile as person %}
