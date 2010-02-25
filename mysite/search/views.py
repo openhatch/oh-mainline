@@ -93,7 +93,7 @@ def fetch_bugs(request, invalid_subscribe_to_alert_form=None):
     data['this_page_query_str'] = mysite.base.unicode_sanity.urlencode(request.GET)
 
     is_this_page_1 = (start <= 1)
-    is_this_the_last_page = end >= (total_bug_count - 1)
+    is_this_the_last_page = ( end >= (total_bug_count - 1) )
     data['show_prev_page_link'] = not is_this_page_1
     data['show_next_page_link'] = not is_this_the_last_page
 
@@ -104,16 +104,16 @@ def fetch_bugs(request, invalid_subscribe_to_alert_form=None):
     # subscribe to a Volunteer Opportunity search alert
     if query and is_this_the_last_page:
         if invalid_subscribe_to_alert_form:
-            form = invalid_subscribe_to_alert_form
+            alert_form = invalid_subscribe_to_alert_form
         else:
             initial = {
-                    'query_string': request.META.QUERY_STRING,
+                    'query_string': request.META['QUERY_STRING'],
                     'how_many_bugs_at_time_of_request': len(bugs)
                     }
             if request.user.is_authenticated():
                 initial['email'] = request.user.email
-            form = mysite.search.forms.BugAlertSubscriptionForm(initial=initial)
-        data['subscribe_to_alert_form'] = form
+            alert_form = mysite.search.forms.BugAlertSubscriptionForm(initial=initial)
+        data['subscribe_to_alert_form'] = alert_form
 
     # FIXME
     # The template has no way of grabbing what URLs to put in the [x]
@@ -281,23 +281,23 @@ def get_autocompletion_suggestions(input):
 
 def subscribe_to_bug_alert_do(request):
     alert_form = mysite.search.forms.BugAlertSubscriptionForm(request.POST)
-    query_string = request.META.QUERY_STRING # Lacks initial '?'
+    query_string = request.POST.get('query_string', None) # Lacks initial '?'
     if alert_form.is_valid():
         alert = alert_form.save()
-        alert.query = query_string
         if request.user.is_authenticated():
             alert.user = request.user
             alert.save()
         next = reverse(fetch_bugs) + '?' + query_string + "&confirm_email_alert_signup=1"
         return HttpResponseRedirect(next)
-    else:
+    elif query_string:
         # We want fetch_bugs to get the right query string but we can't exactly
         # do that. What we *can* do is fiddle with the request obj we're about
         # to pass to fetch_bugs.
         # Commence fiddling.
         request.GET = dict(urlparse.parse_qsl(query_string))
         return fetch_bugs(request, alert_form)
-
+    else:
+        failboat
 
 """
 Ways we could do autocompletion:

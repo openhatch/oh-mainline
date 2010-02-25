@@ -3,9 +3,11 @@ import mysite.search.models
 
 class BugAlertSubscriptionForm(django.forms.ModelForm):
 
-    # Make these hidden inputs
-    query_string = django.forms.CharField(widget=django.forms.HiddenInput())
-    how_many_bugs_at_time_of_request = django.forms.CharField(widget=django.forms.HiddenInput())
+    hidden_char_field = lambda: \
+            django.forms.CharField(widget=django.forms.HiddenInput())
+
+    query_string = hidden_char_field()
+    how_many_bugs_at_time_of_request = hidden_char_field()
 
     class Meta:
         model = mysite.search.models.BugAlert
