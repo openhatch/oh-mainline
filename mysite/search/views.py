@@ -280,14 +280,16 @@ def get_autocompletion_suggestions(input):
     return suggestions
 
 def subscribe_to_bug_alert_do(request):
+    confirmation_query_string_fragment = "&confirm_email_alert_signup=1"
     alert_form = mysite.search.forms.BugAlertSubscriptionForm(request.POST)
     query_string = request.POST.get('query_string', None) # Lacks initial '?'
+    query_string = query_string.replace(confirmation_query_string_fragment, '')
     if alert_form.is_valid():
         alert = alert_form.save()
         if request.user.is_authenticated():
             alert.user = request.user
             alert.save()
-        next = reverse(fetch_bugs) + '?' + query_string + "&confirm_email_alert_signup=1"
+        next = reverse(fetch_bugs) + '?' + query_string + confirmation_query_string_fragment
         return HttpResponseRedirect(next)
     elif query_string:
         # We want fetch_bugs to get the right query string but we can't exactly

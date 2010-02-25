@@ -180,19 +180,34 @@ Search bugs
             {% endif %}
         </div>
 
+</div> <!-- /#results -->
+
+<div class='module' id='create_bug_alert'>
+
+    {% ifequal confirm_email_alert_signup 1 %}
+    <div class='success'>
+        <strong>We have memorized your request!</strong>
+        Thanks for letting us know. 
+        {# Keep this HTML comment to satisfy tests. #}
+        <!-- this page should confirm that an email alert has been registered -->
+    </div>
+    {% endifequal %}
+
     {% if subscribe_to_alert_form %}
-    <!-- this page should offer a link to sign up for an email alert. keep
-      this string to satisfy tests. -->
-    <form name='alert' method='post' action='{% url mysite.search.views.subscribe_to_bug_alert_do %}'>
+    {# Keep this HTML comment to satisfy tests. #}
+    <!-- this page should offer a link to sign up for an email alert. -->
+
+    <p>
+        If you didn't find what you were looking for, you can sign up to
+        receive an email when we begin indexing more opportunities that match this query.
+    </p>
+    <form name='alert' method='POST' 
+            action='{% url mysite.search.views.subscribe_to_bug_alert_do %}'>
         {{ subscribe_to_alert_form.as_p }}
-        <input type="submit" value='Subscribe'>
+        <input type="submit" value="Email me when you're less pathetic">
     </form>
     {% endif %}
-    {% ifequal confirm_email_alert_signup 1 %}
-        <!-- this page should confirm that an email alert has been registered -->
-        Thanks for letting us know. We'll send you an email when we add more bugs for that query.
-    {% endifequal %}
-</div> <!-- /#results -->
+</div>
 {% endblock main %}
 {% block js %}
 {{ block.super }}
