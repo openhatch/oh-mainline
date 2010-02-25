@@ -140,7 +140,7 @@ Search bugs
 
 {% block main %}
 <div id='results' class='gewgaws module box results'>
-        <form name='search_opps' id='search_fulltext' method='GET'> 
+        <form name='search_opps' method='GET' id='search_fulltext' action='{% url mysite.search.views.fetch_bugs %}'> 
             <input type='text'
             name='q' id='q'
             class='default-text'
