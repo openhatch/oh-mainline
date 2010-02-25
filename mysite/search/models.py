@@ -183,9 +183,10 @@ class Project(OpenHatchModel):
         # List the owners of those portfolio entries.
         return [pf_entry.person for pf_entry in pf_entries]
 
-    def update_cached_contributor_count(self):
+    def update_cached_contributor_count_and_save(self):
         contributors = self.get_contributors()
         self.cached_contributor_count = len(contributors)
+        self.save()
 
     def get_n_other_contributors_than(self, n, person):
         # FIXME: Use the method above.
