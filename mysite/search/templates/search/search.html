@@ -182,6 +182,7 @@ Search bugs
 
 </div> <!-- /#results -->
 
+{% if subscribe_to_alert_form or confirm_email_alert_signup %}
 <div class='module' id='create_bug_alert'>
 
     {% ifequal confirm_email_alert_signup 1 %}
@@ -208,6 +209,8 @@ Search bugs
     </form>
     {% endif %}
 </div>
+{% endif %}
+
 {% endblock main %}
 {% block js %}
 {{ block.super }}
