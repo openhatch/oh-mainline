@@ -183,13 +183,13 @@ Search bugs
         <!-- this page should offer a link to sign up for an email alert. keep
           this string to satisfy tests. -->
         <form name='alert' method='post' action='{% url mysite.search.views.subscribe_to_bug_alert_do %}'>
-            <input type="hidden" name="this_page_query_str" value="{{ this_page_query_str }}">
             {{ subscribe_to_alert_form.as_p }}
             <input type="submit" value='Subscribe'>
         </form>
         {% endif %}
         {% ifequal confirm_email_alert_signup 1 %}
-        this page should confirm that an email alert has been registered
+            <!-- this page should confirm that an email alert has been registered -->
+            Thanks for letting us know. We'll send you an email when we add more bugs for that query.
         {% endifequal %}
     </div>
 </div> <!-- /#results -->

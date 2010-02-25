@@ -324,7 +324,7 @@ class Bug(OpenHatchModel):
 
 class BugAlert(OpenHatchModel):
     user = models.ForeignKey(User, null=True)
-    query = models.CharField(max_length=255)
+    query_string = models.CharField(max_length=255)
     how_many_bugs_at_time_of_request = models.IntegerField()
     email = models.EmailField(max_length=255)
 
