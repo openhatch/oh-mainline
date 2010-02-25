@@ -9,6 +9,8 @@ class BugAlertSubscriptionForm(django.forms.ModelForm):
     query_string = hidden_char_field()
     how_many_bugs_at_time_of_request = hidden_char_field()
 
+    email = django.forms.EmailField(error_messages={'invalid': 'This email address looks fishy. Real or malarkey?'})
+
     class Meta:
         model = mysite.search.models.BugAlert
         fields = ('query_string', 'email', 'how_many_bugs_at_time_of_request')
