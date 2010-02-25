@@ -65,12 +65,6 @@ def signup(request, signup_form=None):
 
     return render_response(request, 'account/signup.html', {'form': signup_form})
 
-def logout(request):
-    # {{{
-    django.contrib.auth.logout(request)
-    return HttpResponseRedirect("/?msg=ciao#tab=login")
-    # }}}
-
 @login_required
 @view
 def edit_photo(request, form = None):
