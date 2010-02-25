@@ -68,9 +68,8 @@
             #search #results li .tags .project { padding: .3em .7em; float: left; }
 
         #search #results form { float: left; width: 690px; }
-            #search #results form label { float: left; font-size: 19px; font-family: Arial; padding: 14px 14px 0 0; }
-            #search #results form input[type='text'] { font-size: 19px; padding: 10px; color: #222; width: 570px; height: 25px; }
-            #search #results form input[type='submit'] { font-size: 19px; padding: 8px; color: #222; width: 90px; height: 50px; }
+            #search #results form#search_fulltext input[type='text'] { font-size: 19px; padding: 10px; color: #222; width: 570px; height: 25px; }
+            #search #results form#search_fulltext input[type='submit'] { font-size: 19px; padding: 8px; color: #222; width: 90px; height: 50px; }
 
 #search .separator { color: #aaa; }
 #search .project-info { float: left; padding: .3em .7em; }

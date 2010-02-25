@@ -140,7 +140,7 @@ Search bugs
 
 {% block main %}
 <div id='results' class='gewgaws module box results'>
-        <form name='search_opps' method='get'> 
+        <form name='search_opps' id='search_fulltext' method='GET'> 
             <input type='text'
             name='q' id='q'
             class='default-text'
@@ -168,30 +168,30 @@ Search bugs
         {% else %}
 
         {% endif %}
+
         <div style="float: right; padding-right: 30px; font-size: 9.5pt;">
-        {% if show_prev_page_link %}
-        <a href='{{ prev_page_url }}' id='prev-page'>&laquo;&nbsp;Prev</a>
-        <span class='separator'>&nbsp;</span>
-        {% endif %}
+            {% if show_prev_page_link %}
+            <a href='{{ prev_page_url }}' id='prev-page'>&laquo;&nbsp;Prev</a>
+            <span class='separator'>&nbsp;</span>
+            {% endif %}
 
+            {% if show_next_page_link %}
+            <a href='{{ next_page_url }}' id='next-page'>Next&nbsp;&raquo;</a>
+            {% endif %}
+        </div>
 
-        {% if show_next_page_link %}
-        <a href='{{ next_page_url }}' id='next-page'>Next&nbsp;&raquo;</a>
-        {% endif %}
-
-        {% if subscribe_to_alert_form %}
-        <!-- this page should offer a link to sign up for an email alert. keep
-          this string to satisfy tests. -->
-        <form name='alert' method='post' action='{% url mysite.search.views.subscribe_to_bug_alert_do %}'>
-            {{ subscribe_to_alert_form.as_p }}
-            <input type="submit" value='Subscribe'>
-        </form>
-        {% endif %}
-        {% ifequal confirm_email_alert_signup 1 %}
-            <!-- this page should confirm that an email alert has been registered -->
-            Thanks for letting us know. We'll send you an email when we add more bugs for that query.
-        {% endifequal %}
-    </div>
+    {% if subscribe_to_alert_form %}
+    <!-- this page should offer a link to sign up for an email alert. keep
+      this string to satisfy tests. -->
+    <form name='alert' method='post' action='{% url mysite.search.views.subscribe_to_bug_alert_do %}'>
+        {{ subscribe_to_alert_form.as_p }}
+        <input type="submit" value='Subscribe'>
+    </form>
+    {% endif %}
+    {% ifequal confirm_email_alert_signup 1 %}
+        <!-- this page should confirm that an email alert has been registered -->
+        Thanks for letting us know. We'll send you an email when we add more bugs for that query.
+    {% endifequal %}
 </div> <!-- /#results -->
 {% endblock main %}
 {% block js %}
