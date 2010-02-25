@@ -188,7 +188,7 @@ Search bugs
     {% ifequal confirm_email_alert_signup 1 %}
     <div class='success'>
         <strong>We have memorized your request!</strong>
-        Thanks for letting us know. 
+        We'll be in touch.
         {# Keep this HTML comment to satisfy tests. #}
         <!-- this page should confirm that an email alert has been registered -->
     </div>
@@ -199,13 +199,27 @@ Search bugs
     <!-- this page should offer a link to sign up for an email alert. -->
 
     <p>
-        If you didn't find what you were looking for, you can sign up below
-        and we'll email you when we add more opportunities that match this query.
+        <strong>
+        {% if bunch_of_bugs %}
+            {% if show_prev_page_link %}
+                It's the last page of results!
+            {% else %}
+                It's the only page of results!
+            {% endif %}
+        {% else %}
+            Not a boog in sight.
+        {% endif %}
+        </strong>
+    </p>
+    <p>
+        If you didn't find what you were looking for, don't fret. We add
+        new opportunities to this index pretty frequently. We'd be happy to send you an email
+        when we add more opportunities matching this query. Sign up right here:
     </p>
     <form name='alert' method='POST' 
             action='{% url mysite.search.views.subscribe_to_bug_alert_do %}'>
         {{ subscribe_to_alert_form.as_p }}
-        <input type="submit" value="Email me when you're less pathetic">
+        <input type="submit" value="Email me when this is less lame">
     </form>
     {% endif %}
 </div>
