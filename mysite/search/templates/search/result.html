@@ -33,11 +33,10 @@
     <span class='description-container'>
         {% if bug.good_for_newcomers %}
         <span class='good-for-beginners'><span class="green-bullet">&#9679;</span> Bite-size</span>
-        <span class='sep'>&middot;</span>
         {% endif %}
 
         {% if bug.project.language %}
-
+        <span class='sep'>&middot;</span>
         {% if bug.project.language.lower|in_list:query.terms %}
         <span class='project__language highlight'>{{ bug.project.language }}</span>
         {% else %}
