@@ -1,11 +1,16 @@
 {% load base_extras %}
-<small style='color: #888;'>&nbsp;&nbsp;&nbsp;&mdash; <a style='font-weight: bold;' href='{{ answer.author.get_profile.profile_url }}'>
+<small style='color: #888;'>&nbsp;&nbsp;&nbsp;&mdash;
+{% if answer.author %}
+    <a style='font-weight: bold;' href='{{ answer.author.get_profile.profile_url }}'>
     {% spaceless %}
     {% with answer.author as user %}
         {% include 'name.html' %}
     {% endwith %}
     </a>
     {% endspaceless %}
+{% else %}
+    {{ answer.author_name }}
+{% endif %}
     &middot; {{ answer.created_date|timesince_terse }} ago
     {% ifequal the_user answer.author %}
     &middot;

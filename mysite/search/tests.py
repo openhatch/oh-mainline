@@ -1,4 +1,4 @@
-from mysite.base.tests import make_twill_url, TwillTests
+from mysite.base.tests import make_twill_url, better_make_twill_url, TwillTests
 import mysite.base.unicode_sanity
 
 import mysite.account.tests
@@ -21,6 +21,7 @@ import time
 import twill
 from twill import commands as tc
 from twill.shell import TwillCommandLoop
+import twill
 
 from django.test import TestCase
 from django.core.servers.basehttp import AdminMediaHandler
@@ -1355,24 +1356,25 @@ class CreateBugAnswer(TwillTests):
         # go to the project page
         p = Project.create_dummy(name='Ubuntu')
         question__pk = 1
-        question = ProjectInvolvementQuestion.create_dummy(pk=question__pk, is_bug_style=True)
+        question = ProjectInvolvementQuestion.create_dummy(
+                key_string='non_code_participation', is_bug_style=True)
         question.save()
         title = 'omfg i wish this bug would go away'
-        details = 'kthxbai'
+        text = 'kthxbai'
         POST_data = {
                 'project__pk': p.pk,
                 'question__pk': str(question__pk),
-                'bug__title': title,
-                'bug__details': details
+                'answer__title': title,
+                'answer__text': text
                 }
-        POST_handler = reverse(mysite.project.views.create_bug_answer_do)
+        POST_handler = reverse(mysite.project.views.create_answer_do)
         response = self.login_with_client().post(POST_handler, POST_data)
 
         # try to get the BugAnswer which we just submitted from the database
-        our_bug_answer = BugAnswer.objects.get(title=title)
+        our_bug_answer = Answer.objects.get(title=title)
 
         # make sure it has the right attributes
-        self.assertEqual(our_bug_answer.details, details)
+        self.assertEqual(our_bug_answer.text, text)
         self.assertEqual(our_bug_answer.question.pk, question__pk)
         self.assertEqual(our_bug_answer.project.pk, p.pk)
 
@@ -1383,7 +1385,75 @@ class CreateBugAnswer(TwillTests):
 
         # make sure that our data shows up on the page
         self.assertContains(project_page, title)
-        self.assertContains(project_page, details)
+        self.assertContains(project_page, text)
+
+class CreateAnonymousAnswer(TwillTests):
+    fixtures = ['user-paulproteus']
+
+    def exercise_answer_form(self, form_name, anonymous=True):
+        # This test just ensures that the form exists on the page with an
+        # author_name field.  It doesn't assert that the field does anything.
+        if not anonymous:
+            self.login_with_twill()
+
+        p = Project.create_dummy()
+        p.save()
+        url = "http://openhatch.org" + p.get_url()
+        url = better_make_twill_url(url)
+        tc.go(url)
+        def try_author_name_field():
+            tc.fv(form_name,'author_name','Barry Spinoza')
+
+        if anonymous:
+            try_author_name_field()
+        else:
+            self.assertRaises(twill.errors.TwillException, try_author_name_field)
+
+    def test_paragraph_style_answer_form_anonymously(self):
+        self.exercise_answer_form('question-short-1', anonymous=True)
+
+    def test_bug_style_answer_form_anonymously(self):
+        self.exercise_answer_form('question-long-3', anonymous=True)
+
+    def test_paragraph_style_answer_form_authd(self):
+        self.exercise_answer_form('question-short-1', anonymous=False)
+
+    def test_bug_style_answer_form_authd(self):
+        self.exercise_answer_form('question-long-3', anonymous=False)
+
+    def test_create_answer(self):
+
+        p = Project.create_dummy()
+        q = ProjectInvolvementQuestion.create_dummy(
+                key_string='where_to_start', is_bug_style=False)
+
+        # POST some text to the answer creation post handler
+        POST_data = {
+                'project__pk': p.pk,
+                'author_name': 'anonymous coward',
+                'question__pk': q.pk,
+                'answer__text': """Help produce official documentation, share the solution to a problem, or check, proof and test other documents for accuracy.""",
+                    }
+        response = self.client.post(reverse(mysite.project.views.create_answer_do), POST_data)
+        self.assertEqual(response.status_code, 302)
+        # If this were an Ajaxy post handler, we might assert something about
+        # the response, like 
+        #   self.assertEqual(response.content, '1')
+
+        # check that the db contains a record with this text
+        try:
+            record = Answer.objects.get(text=POST_data['answer__text'])
+        except Answer.DoesNotExist:
+            print "All Answers:", Answer.objects.all()
+            raise Answer.DoesNotExist 
+        self.assertEqual(record.author_name, POST_data['author_name'])
+        self.assertEqual(record.project, p)
+        self.assertEqual(record.question, q)
+
+        # check that the project page now includes this text
+        project_page = self.client.get(p.get_url())
+        self.assertContains(project_page, POST_data['answer__text'])
+        self.assertContains(project_page, POST_data['author_name'])
 
 class CreateAnswer(TwillTests):
     fixtures = ['user-paulproteus']
@@ -1391,7 +1461,8 @@ class CreateAnswer(TwillTests):
     def test_create_answer(self):
 
         p = Project.create_dummy()
-        q = ProjectInvolvementQuestion.create_dummy()
+        q = ProjectInvolvementQuestion.create_dummy(
+                key_string='where_to_start', is_bug_style=False)
 
         # POST some text to the answer creation post handler
         POST_data = {
@@ -1416,8 +1487,18 @@ class CreateAnswer(TwillTests):
         self.assertEqual(record.project, p)
         self.assertEqual(record.question, q)
 
+        # As a sort of side-test, let's # make sure that even if an
+        # 'author_name' was stored in this object, it doesn't get printed if
+        # there's a genuine User object there too
+        record.author_name = 'don\'t print this name'
+        record.save()
+
         # check that the project page now includes this text
         project_page = self.client.get(p.get_url())
         self.assertContains(project_page, POST_data['answer__text'])
+        self.assertContains(project_page, record.author.username)
+
+        # now for the side-test assertion
+        self.assertNotContains(project_page, record.author_name)
 
 # vim: set nu ai et ts=4 sw=4:

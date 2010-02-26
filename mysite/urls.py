@@ -14,6 +14,10 @@ from django_authopenid import views as oid_views
 from voting.views import vote_on_object
 
 urlpatterns = patterns('',
+        (r'^\+projects/suggest_question/',
+            'mysite.project.views.suggest_question'),
+        (r'^\+projects/suggest_question_do/',
+            'mysite.project.views.suggest_question_do'),
         # Generic view to vote on Link objects
         (r'^\+answer/vote/(?P<object_id>\d+)/(?P<direction>up|down|clear)vote/?$',
             vote_on_object, dict(model=mysite.search.models.Answer,
