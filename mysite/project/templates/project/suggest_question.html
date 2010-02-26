@@ -1,30 +1,42 @@
-{% extends 'base/one_column.html' %}
+{% extends 'base/base.html' %}
 
 {% block title %}
-Suggest a Project Survey Question
+Help make the project discussion page better
 {% endblock title %}
 {% block body_id %}survey_question_suggestion_form{% endblock body_id %}
 
 {% block css %}
 {{ block.super }}
-label { margin: 6px 0 3px 0; display: block; }
-#survey_question_suggestion_form .module { width: 30%; margin: auto; text-align: left;display: inline-block}
+#survey_question_suggestion_form label { margin: 6px 0 3px 0; display: block; }
+#survey_question_suggestion_form .module { width: 50%; margin: auto; }
 #survey_question_suggestion_form #main {width: 100%; text-align: center; float: none;}
 #survey_question_suggestion_form #main .module > .body{width: 100%; padding: 0px; }
 
-form{padding: 10px;}
-form input[type="submit"]{display: block; float: none;}
-form textarea{width: 95%;}
+#survey_question_suggestion_form form input[type="submit"]{display: block; float: none;}
+#survey_question_suggestion_form form textarea{width: 95%;}
+
+#survey_question_suggestion_form p { margin-top: 0; }
 
 {% endblock css %}
 
-{% block main %}
-<div id='big-project-list' class='module'>
+{% block content %}
+<div class='module'>
     <div class='head'>
-        <h3>Suggest a Project Survey Question</h3>
+        <h3>Help make the project discussion page better</h3>
     </div>
-    <div class='module-content body'>
-{% include 'project/forms/suggest_questions.html' %}
+    <div class='body'>
+        <p>
+            Yo. 
+        </p>
+        <p>
+            We want project members to explain how to get involved in their
+            projects. Do you have any suggestions as to what we should ask?
+        </p>
+        <p>
+            Let us know in the textarea below. Be sure to specify a project
+            name if it's relevant.
+            {% include 'project/forms/suggest_questions.html' %}
+        </p>
     </div>
 </div>
-{% endblock main %}
+{% endblock content %}
