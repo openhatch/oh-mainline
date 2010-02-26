@@ -149,7 +149,7 @@ class Feed(TwillTests):
         for x in range(4):
             mysite.search.models.Answer.create_dummy()
 
-        recent_answers = mysite.search.models.Answer.objects.all().order_by('-created_date')
+        recent_answers = mysite.search.models.Answer.objects.all().order_by('-modified_date')
 
         # Visit the homepage, assert that the feed item data is on the page,
         # ordered by date descending.
