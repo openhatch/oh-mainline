@@ -1,0 +1,30 @@
+{% extends 'base/one_column.html' %}
+
+{% block title %}
+Suggest a Project Survey Question
+{% endblock title %}
+{% block body_id %}survey_question_suggestion_form{% endblock body_id %}
+
+{% block css %}
+{{ block.super }}
+label { margin: 6px 0 3px 0; display: block; }
+#survey_question_suggestion_form .module { width: 30%; margin: auto; text-align: left;display: inline-block}
+#survey_question_suggestion_form #main {width: 100%; text-align: center; float: none;}
+#survey_question_suggestion_form #main .module > .body{width: 100%; padding: 0px; }
+
+form{padding: 10px;}
+form input[type="submit"]{display: block; float: none;}
+form textarea{width: 95%;}
+
+{% endblock css %}
+
+{% block main %}
+<div id='big-project-list' class='module'>
+    <div class='head'>
+        <h3>Suggest a Project Survey Question</h3>
+    </div>
+    <div class='module-content body'>
+{% include 'project/forms/suggest_questions.html' %}
+    </div>
+</div>
+{% endblock main %}
