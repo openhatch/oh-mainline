@@ -1356,24 +1356,25 @@ class CreateBugAnswer(TwillTests):
         # go to the project page
         p = Project.create_dummy(name='Ubuntu')
         question__pk = 1
-        question = ProjectInvolvementQuestion.create_dummy(pk=question__pk, is_bug_style=True)
+        question = ProjectInvolvementQuestion.create_dummy(
+                key_string='non_code_participation', is_bug_style=True)
         question.save()
         title = 'omfg i wish this bug would go away'
-        details = 'kthxbai'
+        text = 'kthxbai'
         POST_data = {
                 'project__pk': p.pk,
                 'question__pk': str(question__pk),
-                'bug__title': title,
-                'bug__details': details
+                'answer__title': title,
+                'answer__text': text
                 }
-        POST_handler = reverse(mysite.project.views.create_bug_answer_do)
+        POST_handler = reverse(mysite.project.views.create_answer_do)
         response = self.login_with_client().post(POST_handler, POST_data)
 
         # try to get the BugAnswer which we just submitted from the database
-        our_bug_answer = BugAnswer.objects.get(title=title)
+        our_bug_answer = Answer.objects.get(title=title)
 
         # make sure it has the right attributes
-        self.assertEqual(our_bug_answer.details, details)
+        self.assertEqual(our_bug_answer.text, text)
         self.assertEqual(our_bug_answer.question.pk, question__pk)
         self.assertEqual(our_bug_answer.project.pk, p.pk)
 
@@ -1384,7 +1385,7 @@ class CreateBugAnswer(TwillTests):
 
         # make sure that our data shows up on the page
         self.assertContains(project_page, title)
-        self.assertContains(project_page, details)
+        self.assertContains(project_page, text)
 
 class CreateAnonymousAnswer(TwillTests):
     fixtures = ['user-paulproteus']
