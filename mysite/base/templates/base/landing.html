@@ -52,6 +52,80 @@ body#landing #right .entry { font-size: .9em; margin-top: 3px; }
 {% block content %}
 
 <div id='left' class='column'>
+
+{% if the_user.is_authenticated %}
+
+    <div class='module' id='me'>
+        <div class='head'>
+            <h3><a style='color: inherit;' href='{{ the_user.get_profile.profile_url }}'>
+                    You</a></h3>
+        </div>
+        <div class='body'>
+            <ul id='people-list'>
+                {% with the_user.get_profile as person %}
+                    {% include 'profile/person-summary-li.html' %}
+                {% endwith %}
+            </ul>
+            <p class='rabbit_hole'><a href='{% url mysite.profile.views.people %}?center={{the_user.get_profile.location_display_name}}'>Find people near you &raquo;</a></p>
+        </div>
+    </div>
+
+    {% with the_user.get_profile.get_collaborators_for_landing_page as collaborators %}
+    <div class='module' id='people'>
+        <div class='head'>
+            {% if collaborators %}
+            <h3>Collaborators</h3>
+            {% else %}
+            <h3>People on OpenHatch</h3>
+            {% endif %}
+            <ul>
+                <li>
+                    <a href='/people/' style='float: right;'>See all <strong>&raquo;</strong></a>
+                </li>
+            </ul>
+        </div>
+        <div class='body'>
+            <ul id='people-list'>
+                {% if collaborators %}
+                    {% for person in collaborators %}
+                        {% include 'profile/person-summary-li.html' %}
+                    {% endfor %}
+                {% else %}
+                    {% for person in random_profiles %}
+                        {% include 'profile/person-summary-li.html' %}
+                    {% endfor %}
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+    {% endwith %}
+
+{% else %}
+
+    {# if anonymous #}
+    <div class='module' id='people'>
+        <div class='head'>
+            <h3>People on OpenHatch</h3>
+             <ul>
+                <li>
+            <a href='/people/' style='float: right;'>See all <strong>&raquo;</strong></a>
+                </li>
+            </ul>
+        </div>
+        <div class='body'>
+            <ul id='people-list'>
+                {% for person in random_profiles %}
+                    {% include 'profile/person-summary-li.html' %}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+{% endif %}
+
+</div>
+
+<div id='middle' class='column'>
     {% if show_nudge_box %}
     <div class='module' id='todo'>
         <div class="head">
@@ -162,109 +236,6 @@ body#landing #right .entry { font-size: .9em; margin-top: 3px; }
     </div>
     {% endif %}
 
-    <div class='module' id='recent_activity_feed'>
-        <div class='head'>
-            <h3>Recent activity</h3>
-        </div>
-        <div class='body'>
-            <ul>
-                <li>
-                    <div>
-                        &ldquo;This is a small project right now, but if you want
-                        to help out we'd be super stoked&hellip;&rdquo;
-                        <small style='margin-top: 5px; display: block;'>
-                            <img style='width: 30px; float: left; margin-right: 10px;' src='http://localhost:8000/static/static/photos/profile-photos/a3e31abaa7a0476d9dc7d3c332a1e115-thumbnail' />
-                            <strong><a href='/asdf'>Parker Phinney</a></strong>, on the
-                            <strong><a href=''> collect-phil-cdc </a></strong> project discussion
-                            page.  </small>
-                        <br/>
-                    </div>
-                </li>
-                <li>
-                    <div>
-                        <img style='width: 30px; float: left; margin-right: 10px;' src='http://localhost:8000/static/static/photos/profile-photos/82f0de04e3ce46388a401b6cd6ce61ae-thumbnail' />
-                        <strong><a href=''> Steven Sproat </a></strong> is a listed contributor to 
-                        <strong><a href=''> whyteboard </a></strong> 
-                    </div>
-                </li>
-            </ul>
-        </div>
-    </div>
-
-
-</div>
-
-<div id='middle' class='column'>
-
-{% if the_user.is_authenticated %}
-
-    <div class='module' id='me'>
-        <div class='head'>
-            <h3><a style='color: inherit;' href='{{ the_user.get_profile.profile_url }}'>
-                    You</a></h3>
-        </div>
-        <div class='body'>
-            <ul id='people-list'>
-                {% with the_user.get_profile as person %}
-                    {% include 'profile/person-summary-li.html' %}
-                {% endwith %}
-            </ul>
-            <p class='rabbit_hole'><a href='{% url mysite.profile.views.people %}?center={{the_user.get_profile.location_display_name}}'>Find people near you &raquo;</a></p>
-        </div>
-    </div>
-
-    {% with the_user.get_profile.get_collaborators_for_landing_page as collaborators %}
-    <div class='module' id='people'>
-        <div class='head'>
-            {% if collaborators %}
-            <h3>Collaborators</h3>
-            {% else %}
-            <h3>People on OpenHatch</h3>
-            {% endif %}
-            <ul>
-                <li>
-            <a href='/people/' style='float: right;'>See all <strong>&raquo;</strong></a>
-                </li>
-            </ul>
-        </div>
-        <div class='body'>
-            <ul id='people-list'>
-                {% if collaborators %}
-                    {% for person in collaborators %}
-                        {% include 'profile/person-summary-li.html' %}
-                    {% endfor %}
-                {% else %}
-                    {% for person in random_profiles %}
-                        {% include 'profile/person-summary-li.html' %}
-                    {% endfor %}
-                {% endif %}
-            </ul>
-        </div>
-    </div>
-    {% endwith %}
-
-{% else %}
-
-    {# if anonymous #}
-    <div class='module' id='people'>
-        <div class='head'>
-            <h3>People on OpenHatch</h3>
-             <ul>
-                <li>
-            <a href='/people/' style='float: right;'>See all <strong>&raquo;</strong></a>
-                </li>
-            </ul>
-        </div>
-        <div class='body'>
-            <ul id='people-list'>
-                {% for person in random_profiles %}
-                    {% include 'profile/person-summary-li.html' %}
-                {% endfor %}
-            </ul>
-        </div>
-    </div>
-
-{% endif %}
     <div class='module' id='bugs'>
         <div class='head'>
         {% if recommended_bugs %}
@@ -325,6 +296,35 @@ body#landing #right .entry { font-size: .9em; margin-top: 3px; }
 </div>
 
 <div id='right' class='column'>
+
+    <div class='module' id='recent_activity_feed'>
+        <div class='head'>
+            <h3>Recent activity</h3>
+        </div>
+        <div class='body'>
+            <ul>
+                <li>
+                    <div>
+                        &ldquo;This is a small project right now, but if you want
+                        to help out we'd be super stoked&hellip;&rdquo;
+                        <small style='margin-top: 5px; display: block;'>
+                            <img style='width: 30px; float: left; margin-right: 10px;' src='http://localhost:8000/static/static/photos/profile-photos/a3e31abaa7a0476d9dc7d3c332a1e115-thumbnail' />
+                            <strong><a href='/asdf'>Parker Phinney</a></strong>, on the
+                            <strong><a href=''> collect-phil-cdc </a></strong> project discussion
+                            page.  </small>
+                        <br/>
+                    </div>
+                </li>
+                <li>
+                    <div>
+                        <img style='width: 30px; float: left; margin-right: 10px;' src='http://localhost:8000/static/static/photos/profile-photos/82f0de04e3ce46388a401b6cd6ce61ae-thumbnail' />
+                        <strong><a href=''> Steven Sproat </a></strong> is a listed contributor to 
+                        <strong><a href=''> whyteboard </a></strong> 
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
 
     <div class='module' id='meta'>
         <div class='head'>
