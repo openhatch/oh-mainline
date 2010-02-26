@@ -304,26 +304,37 @@ body#landing #right .entry { font-size: .9em; margin-top: 3px; }
         </div>
         <div class='body'>
             <ul>
-                <li>
-                    <div>
-                        &ldquo;This is a small project right now, but if you want
-                        to help out we'd be super stoked&hellip;&rdquo;
-                        <small style='margin-top: 5px; display: block;'>
-                            <img style='width: 30px; float: left; margin-right: 10px;' src='http://localhost:8000/static/static/photos/profile-photos/a3e31abaa7a0476d9dc7d3c332a1e115-thumbnail' />
-                            wrote <strong><a href='/asdf'>Parker Phinney (pyrak)</a></strong>
-                            on the
-                            <strong><a href=''> collect-phil-cdc </a></strong> project page.
-                        </small>
-                        <br/>
-                    </div>
-                </li>
-                <li>
-                    <div>
-                        <img style='width: 30px; float: left; margin-right: 10px;' src='http://localhost:8000/static/static/photos/profile-photos/82f0de04e3ce46388a401b6cd6ce61ae-thumbnail' />
-                        <strong><a href=''> Steven Sproat </a></strong> is a listed contributor to 
-                        <strong><a href=''> whyteboard </a></strong> 
-                    </div>
-                </li>
+                {% for answer in recent_answers %}
+                    <li style='font-size: .9em; float: left; width: 100%; margin-bottom: 15px;'>
+                        <img style='width: 30px; float: left; margin-right: 10px;' src='{{ answer.author.get_profile.get_photo_thumbnail_url_or_default }}' />
+                        <div style='float: left; width: 70%;'>
+                            <div style='float: left; width: 100%;'>
+                                {% with answer.author as user %}
+                                <strong>
+                                    <a href='{{ user.get_profile.profile_url }}'>
+                                        {% include 'name.html' %}
+                                    </a>
+                                </strong>
+                                answered the question 
+                                {% endwith %}
+                            </div>
+                            {% spaceless %}
+                                {% with answer.question as question %}
+                                {% with answer.project as project %}
+                                <a href='{{ answer.project.get_url }}'>
+                                    <span>&ldquo;</span>
+                                    {% with 1 as mention_project_name %}
+                                    {% include 'question_text.html' %}
+                                    {% endwith %}
+                                    <span>&rdquo;</span>
+                                </a>
+                                {% endwith %}
+                                {% endwith %}
+                            {% endspaceless %}
+                            <br/>
+                        </div>
+                    </li>
+                {% endfor %}
             </ul>
         </div>
     </div>

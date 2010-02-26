@@ -56,8 +56,7 @@ def project(request, project__name = None):
         })
     return (request,
             'project/project.html',
-            context
-            )
+            context)
 
 @mysite.base.decorators.view
 def projects(request):

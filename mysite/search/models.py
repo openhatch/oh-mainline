@@ -246,7 +246,6 @@ class ProjectInvolvementQuestion(OpenHatchModel):
         # TODO: sort them
         the_answers.sort(key=get_score)
         return the_answers
-        
 
     @staticmethod
     def create_dummy(**kwargs):

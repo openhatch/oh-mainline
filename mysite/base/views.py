@@ -44,7 +44,6 @@ def home(request):
 
     data['recent_answers'] = mysite.search.models.Answer.objects.all().order_by('-created_date')[:5]
 
-
     #get globally recommended bug search stuff (for anonymous users)
     if request.user.is_authenticated():
         # for logged-in users:
