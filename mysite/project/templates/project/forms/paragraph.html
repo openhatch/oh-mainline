@@ -10,14 +10,23 @@
     <input type="hidden" name="answer__pk" value="{{answer.pk}}" />
     <div class='show_when_editing'>
         {% endifequal %}
+        <div class="show_when_editing">
+            <a href="#" style='float: right; font-weight: bold; position: relative; top: -5px;' class="collapse_answer_form" id="collapse_answer_form_{{answer.pk}}">[X]</a>
+            <label style='float: left;' for='answer-question{{ forloop.counter0 }}'>
+                Add an answer
+            </label>
+        </div>
         <textarea class='add_an_answer'
             id='answer-question{{ forloop.counter0 }}'
             title='Add an answer'
             name='answer__text'
             >{% ifequal edit_form 1%}{{answer.text}}{% endifequal %}</textarea>
-        {% if not the_user.is_authenticated %}
-            <input type='text' name='author_name' />
-        {% endif %}
+        <div class='show_when_editing'>
+            {% if not the_user.is_authenticated %}
+                <label for='author_name'>Your name</label>
+                <input type='text' name='author_name' />
+            {% endif %}
+        </div>
         {% ifequal edit_form 1%}
     </div>
     {% endifequal %}
@@ -51,6 +60,5 @@
             {% endifequal %}
         </div>
         <input type='submit' value='Submit'>
-        <a href="#" class="collapse_answer_form" id="collapse_answer_form_{{answer.pk}}">Cancel</a>
     </div><!-- /.show_when_editing -->
 </form>
