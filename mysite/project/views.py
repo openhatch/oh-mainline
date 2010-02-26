@@ -56,25 +56,23 @@ def project(request, project__name = None):
             'can_mentor', p.language)),
         'explain_to_anonymous_users': True,
         })
-    return (request,
-            'project/project.html',
-            context
+
     question_suggestion_response = request.GET.get('question_suggestion_response', None)
-    data['notifications'] = []
+    context['notifications'] = []
     if question_suggestion_response == 'success':
-        data['notifications'].append({
+        context['notifications'].append({
             'id': 'question_suggestion_response',
             'text': 'Thanks for submitting a questions suggestion.'
             })
     elif question_suggestion_response == 'failure':
-        data['notifications'].append({
+        context['notifications'].append({
             'id': 'question_suggestion_response',
             'text': "Oops, there was an error submitting your suggested question--we probably couldn't connect to our outgoing mailserver. Try just sending an email to <a href='hello@openhatch.org'>hello@openhatch.org</a>"
             })
+
     return (request,
             'project/project.html',
-            data
-            )
+            context)
 
 @mysite.base.decorators.view
 def projects(request):
