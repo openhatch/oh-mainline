@@ -21,6 +21,7 @@ import time
 import twill
 from twill import commands as tc
 from twill.shell import TwillCommandLoop
+import twill
 
 from django.test import TestCase
 from django.core.servers.basehttp import AdminMediaHandler
@@ -1388,11 +1389,37 @@ class CreateBugAnswer(TwillTests):
 class CreateAnonymousAnswer(TwillTests):
     fixtures = ['user-paulproteus']
 
+    def exercise_answer_form(self, form_name, anonymous=True):
+        p = Project.create_dummy()
+        url = "http://openhatch.org" + p.get_url()
+        tc.go(url)
+        def try_author_name_field():
+            tc.fv('question-short-1','author_name','Barry Spinoza')
+
+        if anonymous:
+            try_author_name_field()
+            tc.submit()
+            tc.find('Barry Spinoza')
+        else:
+            self.assertRaises(twill.errors.TwillAssertionError, try_author_name_field)
+
+    def test_paragraph_style_answer_form_anonymously(self):
+        self.exercise_answer_form('question-short-1', anonymous=True)
+
+    def test_bug_style_answer_form_anonymously(self):
+        self.exercise_answer_form('question-long-3', anonymous=True)
+
+    def test_paragraph_style_answer_form_authd(self):
+        self.exercise_answer_form('question-short-1', anonymous=False)
+
+    def test_bug_style_answer_form_authd(self):
+        self.exercise_answer_form('question-long-3', anonymous=False)
+
     def test_create_answer(self):
 
         p = Project.create_dummy()
-        q = ProjectInvolvementQuestion.create_dummy()
-
+        q = ProjectInvolvementQuestion.create_dummy(
+                key_string='where_to_start', is_bug_style=False)
 
         # POST some text to the answer creation post handler
         POST_data = {
@@ -1419,8 +1446,6 @@ class CreateAnonymousAnswer(TwillTests):
 
         # check that the project page now includes this text
         project_page = self.client.get(p.get_url())
-        import pdb
-        pdb.set_trace()
         self.assertContains(project_page, POST_data['answer__text'])
         self.assertContains(project_page, POST_data['author_name'])
 
@@ -1430,7 +1455,8 @@ class CreateAnswer(TwillTests):
     def test_create_answer(self):
 
         p = Project.create_dummy()
-        q = ProjectInvolvementQuestion.create_dummy()
+        q = ProjectInvolvementQuestion.create_dummy(
+                key_string='where_to_start', is_bug_style=False)
 
         # POST some text to the answer creation post handler
         POST_data = {
