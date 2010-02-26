@@ -233,7 +233,7 @@ img.show-more-link {
     width: 400px;
     margin-bottom: 20px;
 }
-input[type='text'], input[type='password'], iinput[type='file'], textarea {
+input[type='text'], input[type='password'], input[type='file'], textarea {
     padding: 5px;
     font-size: 11pt;
     float: left;
@@ -365,3 +365,4 @@ body#edit_profile_info_form #contact_blurb:target label { background-color: #ffc
 
 .head .note { float: right; color: #777; font-size: .9em; padding: 6px; }
 .head .more { float: right; padding: 3px; }
+

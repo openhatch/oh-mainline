@@ -332,7 +332,7 @@ def tag_type_query2mappable_orm_people(tag_type_short_name, parsed_query):
 
     mappable_people_from_haystack.load_all()
 
-    mappable_people = [x.object for x in mappable_people_from_haystack]
+    mappable_people = [x.object for x in mappable_people_from_haystack if x.object]
 
     ### and sort it the way everyone expects
     mappable_people = sorted(mappable_people, key=lambda p: p.user.username.lower())

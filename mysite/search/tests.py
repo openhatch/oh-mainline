@@ -1,4 +1,5 @@
 from mysite.base.tests import make_twill_url, TwillTests
+import mysite.base.unicode_sanity
 
 import mysite.account.tests
 from mysite.profile.models import Person
@@ -6,7 +7,7 @@ import mysite.profile.models
 import mysite.customs.miro
 import mysite.search.controllers
 from mysite.search.models import Project, Bug, HitCountCache, \
-        ProjectInvolvementQuestion, Answer
+        ProjectInvolvementQuestion, Answer, BugAlert
 from mysite.search import views
 import lpb2json
 import datetime
@@ -1191,9 +1192,110 @@ class TestPotentialMentors(TwillTests):
         banshee_mentors = banshee.potential_mentors()
         self.assertEqual(len(banshee_mentors), 2)
 
+class SuggestAlertOnLastResultsPage(TwillTests):
+    fixtures = ['user-paulproteus']
+
+    def exercise_alert(self, anonymous=True):
+        """The 'anonymous' parameter allows the alert functionality to be
+        tested for anonymous and logged-in users."""
+
+        if not anonymous:
+            self.login_with_twill()
+
+        # Create some dummy data
+        p = Project.create_dummy(language='ruby')
+        # 15 bugs matching 'ruby'
+        for i in range(15):
+            b = Bug.create_dummy(description='ruby')
+            b.project = p
+            b.save()
+
+        # Visit the first page of a vol. opp. search results page.
+        opps_view = mysite.search.views.fetch_bugs
+        query = u'ruby'
+        opps_query_string = { u'q': query, u'start': 1, u'end': 10}
+        opps_url = make_twill_url('http://openhatch.org'+reverse(opps_view) + '?' + mysite.base.unicode_sanity.urlencode(opps_query_string))
+        tc.go(opps_url)
+
+        # Make sure we *don't* have the comment that flags this as a page that offers an email alert subscription button
+        tc.notfind("this page should offer a link to sign up for an email alert")
+
+        # Visit the last page of results
+        GET = { u'q': query, u'start': 11, u'end': 20}
+        query_string = mysite.base.unicode_sanity.urlencode(GET)
+        opps_url = make_twill_url('http://openhatch.org'+reverse(opps_view) + '?' + query_string)
+        tc.go(opps_url)
+        # make sure we /do/ have the comment that flags this as a page that
+        # offers an email alert subscription button
+        tc.find("this page should offer a link to sign up for an email alert")
+
+        if not anonymous:
+            # if the user is logged in, make sure that we have autopopulated
+            # the form with her email address
+            tc.find(User.objects.get(username='paulproteus').email)
+
+        # Submit the 'alert' form.
+        email_address = 'yetanother@ema.il'
+        tc.fv('alert', 'email', email_address)
+        tc.submit()
+        
+        if anonymous:
+            client = self.client
+        else:
+            client = self.login_with_client()
+
+
+        alert_data_in_form = {
+                'query_string': query_string,
+                'how_many_bugs_at_time_of_request': Bug.open_ones.filter(project=p).count(),
+                'email': email_address,
+                }
+        # Twill fails here for some reason, so let's continue the journey with
+        # Django's built-in testing sweeeet
+        response = client.post(reverse(mysite.search.views.subscribe_to_bug_alert_do), alert_data_in_form)
+
+        # This response should be a HTTP redirect instruction 
+        self.assertEqual(response.status_code, 302)
+        redirect_target_url = response._headers['location'][1]
+        self.assert_(query_string in redirect_target_url)
+
+        # The page redirects to the old kk
+        response = client.get(redirect_target_url)
+        self.assertContains(response, "this page should confirm that an email alert has been registered")
+
+        # At this point, make sure that the DB contains a record of
+        #     * What the query was.
+        #     * When the request was made.
+        #     * How many bugs were returned by the query at the time of request.
+
+        # There should be only one alert
+        all_alerts = BugAlert.objects.all()
+        self.assertEqual(all_alerts.count(), 1)
+        alert_record = all_alerts[0]
+        self.assert_(alert_record)
+
+        assert_that_record_has_this_data = alert_data_in_form
+        
+        # For the logged-in user, also check that the record contains the
+        # identity of the user who made the alert request.
+
+        if not anonymous:
+            assert_that_record_has_this_data['user'] = User.objects.get(username='paulproteus')
+
+        for key, expected_value in assert_that_record_has_this_data.items():
+            self.assertEqual(alert_record.__getattribute__(key), expected_value,
+                    'alert.%s = %s not (expected) %s' % (key, alert_record.__getattribute__(key), expected_value))
+
+    # run the above test for our two use cases: logged in and not
+    def test_alert_anon(self):
+        self.exercise_alert(anonymous=True)
+    def test_alert_logged_in(self):
+        self.exercise_alert(anonymous=False)
+
+            
 class DeleteAnswer(TwillTests):
     fixtures = ['user-paulproteus']
-    
+
     def test_delete_paragraph_answer(self):
         # create dummy question
         p = Project.create_dummy(name='Ubuntu')
@@ -1220,8 +1322,10 @@ class DeleteAnswer(TwillTests):
     def test_delete_bug_answer(self):
         # create dummy question
         p = Project.create_dummy(name='Ubuntu')
-        # it's important that this pk correspond to the pk of an actual bug_style question, as specified in our view
-        # otherwise, we'll get_or_create will try to create, but it won't be able to because of a unique key error
+        # it's important that this pk correspond to the pk of an actual
+        # bug_style question, as specified in our view otherwise, we'll
+        # get_or_create will try to create, but it won't be able to because of
+        # a unique key error
         question__pk = 2
         q = ProjectInvolvementQuestion.create_dummy(pk=question__pk, is_bug_style=True)
         # create our dummy answer

@@ -1,7 +1,13 @@
 {% load base_extras %}
-<small style='color: #888;'>&nbsp;&nbsp;&nbsp;&mdash; 
-{%if answer.author %}
-    <a style='font-weight: bold;' href='{{ answer.author.get_profile.profile_url }}'>{{ answer.author.get_profile.get_full_name_or_username }}</a>
+<small style='color: #888;'>&nbsp;&nbsp;&nbsp;&mdash;
+{% if answer.author %}
+    <a style='font-weight: bold;' href='{{ answer.author.get_profile.profile_url }}'>
+    {% spaceless %}
+    {% with answer.author as user %}
+        {% include 'name.html' %}
+    {% endwith %}
+    </a>
+    {% endspaceless %}
 {% else %}
     {{ answer.author_name }}
 {% endif %}

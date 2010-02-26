@@ -87,3 +87,6 @@ body#people-map .dont_show_until_map_loads{ display: none; }
 
 /* Toggle */
 #toggle_related_searches { margin-left: 10px; }
+
+/* should_be_hidden */
+body#people-map .should_be_hidden { display: none; }

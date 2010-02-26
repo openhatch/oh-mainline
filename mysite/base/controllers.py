@@ -109,12 +109,12 @@ def cached_geocoding_in_json(address):
     geocoded = None
     geocoded_in_json = cache.get(key_name)
     if geocoded_in_json is None:
-        geocoded = _geocode(address)
-        if not geocoded:
-            return "{}"
-        geocoded.update({'is_inaccessible': is_inaccessible})
-        geocoded_in_json = simplejson.dumps(geocoded)
-        cache.set(key_name, geocoded_in_json, 60 * 60 * 24 * 7) # cache for a week, which should be plenty
+        geocoded = _geocode(address) or {}
+        geocoded_and_inaccessible = {'is_inaccessible': is_inaccessible}
+        geocoded_and_inaccessible.update(geocoded)
+        geocoded_in_json = simplejson.dumps(geocoded_and_inaccessible)
+        if geocoded:
+            cache.set(key_name, geocoded_in_json, 60 * 60 * 24 * 7) # cache for a week, which should be plenty
     return geocoded_in_json
 
 def get_uri_metadata_for_generating_absolute_links(request):

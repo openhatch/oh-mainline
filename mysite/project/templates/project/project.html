@@ -80,7 +80,7 @@ about our members who support {{ project.name }}
                                         {% endifequal %}
                                         <strong>{{answer.title}}</strong>
                                     </div>
-                                    {{answer.text|urlize}}
+                                    {{answer.text|urlize|linebreaksbr}}
                                     <br/>
                                     {% include 'project/byline.html' %}
                                 </span>
