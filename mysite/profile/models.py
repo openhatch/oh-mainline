@@ -137,6 +137,12 @@ class Person(models.Model):
         except ValueError:
             return '/static/images/profile-photos/penguin-40px.png'
 
+    def get_photo_thumbnail_30px_wide_url_or_default(self):
+        try:
+            return self.photo_thumbnail_30px_wide.url
+        except ValueError:
+            return '/static/images/profile-photos/penguin-30px.png'
+
     def get_published_portfolio_entries(self):
         return PortfolioEntry.objects.filter(person=self, is_published=True, is_deleted=False)
 

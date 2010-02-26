@@ -1,0 +1,23 @@
+{% ifequal question.key_string 'where_to_start' %}
+    <span>I'd like to participate{% if mention_project_name %} in
+            <strong>{{ project.name }}</strong>{% endif %}. How do I begin?</span>
+{% endifequal %}
+
+{% ifequal question.key_string 'stress' %}
+    <span>What is a bug or issue with <strong>{{ project.name }}</strong>
+    that you've been putting off, neglecting, or
+    just plain avoiding?</span>
+{% endifequal %}
+
+{% ifequal question.key_string 'newcomers' %}
+    <span>What's a good bug
+        {% if mention_project_name %}
+        in <strong>{{ project.name }}</strong>
+        {% endif %}
+        for a newcomer to tackle?</span>
+{% endifequal %}
+
+{% ifequal question.key_string 'non_code_participation' %}
+    <span>Other than writing code, how can I contribute{% if mention_project_name %}
+        to <strong>{{ project.name }}</strong>{% endif %}?</span>
+{% endifequal %}
