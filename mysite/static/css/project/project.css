@@ -1,10 +1,8 @@
 body#project input[type='text'], body#project textarea { padding: 4px;  }
 body#project input, body#project textarea { font-size: 10pt;   }
 body#project textarea { width: 96%;  }
-body#project input[type='text'] { width: 96%; }
-body#project input[type='submit'], body#project textarea {  }
-body#project input {  }
-body#project input[type='submit'] { padding: 2px 8px; }
+body#project input[type='text'] { width: 96%; display: block; }
+body#project input[type='submit'] { padding: 2px 8px; display: block; }
 
 
 body#project h1 { float: left; clear: left; margin-top: 10px; }
@@ -38,7 +36,7 @@ body#project form.active { float: left; background-color: #ffc;  -moz-border-rad
 body#project form.active .show_when_editing { display: block; }
 body#project form.active a.collapse_answer_form { padding: 3px; margin: 10px 0 0 0; font-size: .9em;}
 
-body#project form.active input[type='submit'] { display: inline; margin-bottom: 5px;}
+body#project form.active input[type='submit'] { margin-bottom: 5px;}
 
 body#project .input-note { float: right; width: 80%; font-size: .9em; color: #686868; }
 body#project .input-note .tips { float: right; width: 70%; font-size: .9em; color: #686868; }
@@ -62,3 +60,5 @@ body#project .voting .score { color: #444; font-size: .8em; margin-bottom: 3px; 
 body#project form.is_edit_form { display: none; }
 
 body#project .quotemark { color: #555; }
+
+body#project input[name='author_name'] { width: 60%; margin-bottom: 5px; }

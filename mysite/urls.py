@@ -37,7 +37,6 @@ urlpatterns = patterns('',
 
         (r'^\+people/list/$', lambda x: HttpResponsePermanentRedirect('/people/')),
 
-
         (r'^account/forgot_pass/$',
             'django.contrib.auth.views.password_reset', {
                 'template_name': 'account/password_reset.html',
@@ -198,6 +197,8 @@ urlpatterns = patterns('',
 
         (r'^\+do/project.views.create_answer_do$', 'mysite.project.views.create_answer_do'),
         (r'^\+do/project.views.delete_paragraph_answer_do$', 'mysite.project.views.delete_paragraph_answer_do'),
+
+        (r'^\+do/search.views.subscribe_to_bug_alert_do$', 'mysite.search.views.subscribe_to_bug_alert_do'),
 
         (r'^\+projects/', include('mysite.project.urls')),
 

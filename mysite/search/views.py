@@ -1,14 +1,10 @@
 from django.http import HttpResponse, QueryDict, HttpResponseServerError, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.core import serializers
-from django.db.models import Q
-from django.utils.timesince import timesince
-from django.utils.html import escape
 from django.core.urlresolvers import reverse
-import mysite.base.decorators
-import urllib
+import urlparse
 
-from mysite.search.models import Bug, Project
+from mysite.search.models import Project
 import mysite.search.controllers 
 import mysite.base.controllers
 import mysite.base.unicode_sanity
@@ -16,23 +12,19 @@ import mysite.base.unicode_sanity
 import datetime
 from dateutil import tz
 import pytz
-import re
 import simplejson
+import mysite.search.forms
 
 # Via http://www.djangosnippets.org/snippets/1435/
 def encode_datetime(obj):
-    # {{{
     if isinstance(obj, datetime.date):
         fixed = datetime.datetime(obj.year, obj.month, obj.day, tzinfo=pytz.utc)
         obj = fixed
     if isinstance(obj, datetime.datetime):
         return obj.astimezone(tz.tzutc()).strftime('%Y-%m-%dT%H:%M:%SZ')
     raise TypeError("%s" % type(obj) + repr(obj) + " is not JSON serializable")
-    # }}}
 
-def fetch_bugs(request):
-    # {{{
-
+def fetch_bugs(request, invalid_subscribe_to_alert_form=None):
     # Make the query string keys lowercase using a redirect.
     if any([k.lower() != k for k in request.GET.keys()]):
         new_GET = {}
@@ -98,6 +90,30 @@ def fetch_bugs(request):
     data['end'] = min(end, total_bug_count)
     data['prev_page_url'] = '/search/?' + prev_page_query_str.urlencode()
     data['next_page_url'] = '/search/?' + next_page_query_str.urlencode()
+    data['this_page_query_str'] = mysite.base.unicode_sanity.urlencode(request.GET)
+
+    is_this_page_1 = (start <= 1)
+    is_this_the_last_page = ( end >= (total_bug_count - 1) )
+    data['show_prev_page_link'] = not is_this_page_1
+    data['show_next_page_link'] = not is_this_the_last_page
+
+    if request.GET.get('confirm_email_alert_signup', ''):
+        data['confirm_email_alert_signup'] = 1
+
+    # If this the last page of results, display a form allowing user to
+    # subscribe to a Volunteer Opportunity search alert
+    if query and is_this_the_last_page:
+        if invalid_subscribe_to_alert_form:
+            alert_form = invalid_subscribe_to_alert_form
+        else:
+            initial = {
+                    'query_string': request.META['QUERY_STRING'],
+                    'how_many_bugs_at_time_of_request': len(bugs)
+                    }
+            if request.user.is_authenticated():
+                initial['email'] = request.user.email
+            alert_form = mysite.search.forms.BugAlertSubscriptionForm(initial=initial)
+        data['subscribe_to_alert_form'] = alert_form
 
     # FIXME
     # The template has no way of grabbing what URLs to put in the [x]
@@ -117,20 +133,15 @@ def fetch_bugs(request):
         data['suggestions'] = suggestions
         data['bunch_of_bugs'] = bugs
         data['url'] = 'http://launchpad.net/'
-
         data['total_bug_count'] = total_bug_count
-        data['show_prev_page_link'] = start > 1
-        data['show_next_page_link'] = end < (total_bug_count - 1)
         data['facet2any_query_string'] = facet2any_query_string
         data['project_count'] = mysite.search.controllers.get_project_count()
 
         return render_to_response('search/search.html', data)
-    # }}}
 
 def bugs_to_json_response(data, bunch_of_bugs, callback_function_name=''):
     """ The search results page accesses this view via jQuery's getJSON method, 
     and loads its results into the DOM."""
-    # {{{
     # Purpose of this code: Serialize the list of bugs
     # Step 1: Pull the bugs out of the database, getting them back
     #   as simple Python objects
@@ -155,7 +166,6 @@ def bugs_to_json_response(data, bunch_of_bugs, callback_function_name=''):
 
     # Step 6: Return that.
     return HttpResponse(json_string_with_callback)
-    # }}}
 
 def request_jquery_autocompletion_suggestions(request):
     """
@@ -167,7 +177,6 @@ def request_jquery_autocompletion_suggestions(request):
     If q is absent or empty, this function
     returns an HttpResponseServerError.
     """
-    # {{{
     partial_query = request.GET.get('q', None)
     if (partial_query is None) or (partial_query == ''):
         return HttpResponseServerError("Need partial_query in GET")
@@ -179,7 +188,6 @@ def request_jquery_autocompletion_suggestions(request):
     suggestions_string = list_to_jquery_autocompletion_format(
                 suggestions_list)
     return HttpResponse(suggestions_string)
-    # }}}
 
 def list_to_jquery_autocompletion_format(list):
     """Converts a list to the format required by
@@ -206,7 +214,6 @@ def get_autocompletion_suggestions(input):
       - libraries (frameworks? toolkits?) like Django
       - search by date
     """
-    # {{{
     sf_project = SearchableField('project')
     sf_language = SearchableField('lang')
     sf_dependency = SearchableField('dep')
@@ -271,7 +278,30 @@ def get_autocompletion_suggestions(input):
                     for lang in langs]
 
     return suggestions
-    # }}}
+
+def subscribe_to_bug_alert_do(request):
+    confirmation_query_string_fragment = "&confirm_email_alert_signup=1"
+    alert_form = mysite.search.forms.BugAlertSubscriptionForm(request.POST)
+    query_string = request.POST.get('query_string', '') # Lacks initial '?'
+    query_string = query_string.replace(confirmation_query_string_fragment, '')
+    next = reverse(fetch_bugs) + '?' + query_string
+    if alert_form.is_valid():
+        alert = alert_form.save()
+        if request.user.is_authenticated():
+            alert.user = request.user
+            alert.save()
+        next += confirmation_query_string_fragment
+        return HttpResponseRedirect(next)
+    elif query_string:
+        # We want fetch_bugs to get the right query string but we can't exactly
+        # do that. What we *can* do is fiddle with the request obj we're about
+        # to pass to fetch_bugs.
+        # Commence fiddling.
+        request.GET = dict(urlparse.parse_qsl(query_string))
+        return fetch_bugs(request, alert_form)
+    else:
+        # If user tries to do a different bug search after invalid form input
+        return HttpResponseRedirect(next + request.META['QUERY_STRING'])
 
 """
 Ways we could do autocompletion:

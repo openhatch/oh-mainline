@@ -80,7 +80,7 @@ about our members who support {{ project.name }}
                                         {% endifequal %}
                                         <strong>{{answer.title}}</strong>
                                     </div>
-                                    {{answer.text|urlize}}
+                                    {{answer.text|urlize|linebreaksbr}}
                                     <br/>
                                     {% include 'project/byline.html' %}
                                 </span>
@@ -91,15 +91,10 @@ about our members who support {{ project.name }}
                         {% endfor %}
 
                             <li>
-                            {% if the_user.is_authenticated %}
                             {% if question.is_bug_style %}
                             {% include 'project/forms/bug.html' %}
                             {% else %}
                             {% include 'project/forms/paragraph.html' %}
-                            {% endif %}
-                            {% else %}
-                            {# if they aren't logged in#}
-                            <a href="{% url oh_login %}?next={{ project.get_url|urlencode}}" style="">Log in to add an answer</a>
                             {% endif %}
 
                             </li>

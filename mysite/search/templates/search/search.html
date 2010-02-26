@@ -31,6 +31,9 @@ Search bugs
         <li><a href='?q=&amp;toughness=bitesize&amp;language=C%23'>Bitesize bugs in C#</a></li>
     </ul>
     </p>
+    <p style="text-align: right; padding-top: 10px;">
+    <a href="https://openhatch.org/blog/how-can-openhatch-help-me-contribute-to-free-software/">Read more...</a>
+    </p>
 </div>
 {% endif %}
 
@@ -140,7 +143,7 @@ Search bugs
 
 {% block main %}
 <div id='results' class='gewgaws module box results'>
-        <form name='search_opps' method='get'> 
+        <form name='search_opps' method='GET' id='search_fulltext' action='{% url mysite.search.views.fetch_bugs %}'> 
             <input type='text'
             name='q' id='q'
             class='default-text'
@@ -168,19 +171,63 @@ Search bugs
         {% else %}
 
         {% endif %}
+
         <div style="float: right; padding-right: 30px; font-size: 9.5pt;">
-        {% if show_prev_page_link %}
-        <a href='{{ prev_page_url }}' id='prev-page'>&laquo;&nbsp;Prev</a>
-        <span class='separator'>&nbsp;</span>
-        {% endif %}
+            {% if show_prev_page_link %}
+            <a href='{{ prev_page_url }}' id='prev-page'>&laquo;&nbsp;Prev</a>
+            <span class='separator'>&nbsp;</span>
+            {% endif %}
 
-
-        {% if show_next_page_link %}
-        <a href='{{ next_page_url }}' id='next-page'>Next&nbsp;&raquo;</a>
-        {% endif %}
-    </div>
+            {% if show_next_page_link %}
+            <a href='{{ next_page_url }}' id='next-page'>Next&nbsp;&raquo;</a>
+            {% endif %}
+        </div>
 
 </div> <!-- /#results -->
+
+{% if subscribe_to_alert_form or confirm_email_alert_signup %}
+<div class='module' id='create_bug_alert'>
+
+    {% ifequal confirm_email_alert_signup 1 %}
+    <div class='success'>
+        <strong>We have memorized your request!</strong>
+        We'll be in touch.
+        {# Keep this HTML comment to satisfy tests. #}
+        <!-- this page should confirm that an email alert has been registered -->
+    </div>
+    {% endifequal %}
+
+    {% if subscribe_to_alert_form %}
+    {# Keep this HTML comment to satisfy tests. #}
+    <!-- this page should offer a link to sign up for an email alert. -->
+
+    <p>
+        <strong>
+        {% if bunch_of_bugs %}
+            {% if show_prev_page_link %}
+                It's the last page of results!
+            {% else %}
+                It's the only page of results!
+            {% endif %}
+        {% else %}
+            Not a boog in sight.
+        {% endif %}
+        </strong>
+    </p>
+    <p>
+        If you didn't find what you were looking for, don't fret. We add
+        new opportunities to this index pretty frequently. We'd be happy to send you an email
+        when we add more opportunities matching this query. Sign up right here:
+    </p>
+    <form name='alert' method='POST' 
+            action='{% url mysite.search.views.subscribe_to_bug_alert_do %}'>
+        {{ subscribe_to_alert_form.as_p }}
+        <input type="submit" value="Email me when this is less lame">
+    </form>
+    {% endif %}
+</div>
+{% endif %}
+
 {% endblock main %}
 {% block js %}
 {{ block.super }}

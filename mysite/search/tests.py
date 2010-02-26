@@ -1,4 +1,5 @@
-from mysite.base.tests import make_twill_url, TwillTests
+from mysite.base.tests import make_twill_url, better_make_twill_url, TwillTests
+import mysite.base.unicode_sanity
 
 import mysite.account.tests
 from mysite.profile.models import Person
@@ -6,7 +7,7 @@ import mysite.profile.models
 import mysite.customs.miro
 import mysite.search.controllers
 from mysite.search.models import Project, Bug, HitCountCache, \
-        ProjectInvolvementQuestion, Answer
+        ProjectInvolvementQuestion, Answer, BugAlert
 from mysite.search import views
 import lpb2json
 import datetime
@@ -20,6 +21,7 @@ import time
 import twill
 from twill import commands as tc
 from twill.shell import TwillCommandLoop
+import twill
 
 from django.test import TestCase
 from django.core.servers.basehttp import AdminMediaHandler
@@ -1191,9 +1193,110 @@ class TestPotentialMentors(TwillTests):
         banshee_mentors = banshee.potential_mentors()
         self.assertEqual(len(banshee_mentors), 2)
 
+class SuggestAlertOnLastResultsPage(TwillTests):
+    fixtures = ['user-paulproteus']
+
+    def exercise_alert(self, anonymous=True):
+        """The 'anonymous' parameter allows the alert functionality to be
+        tested for anonymous and logged-in users."""
+
+        if not anonymous:
+            self.login_with_twill()
+
+        # Create some dummy data
+        p = Project.create_dummy(language='ruby')
+        # 15 bugs matching 'ruby'
+        for i in range(15):
+            b = Bug.create_dummy(description='ruby')
+            b.project = p
+            b.save()
+
+        # Visit the first page of a vol. opp. search results page.
+        opps_view = mysite.search.views.fetch_bugs
+        query = u'ruby'
+        opps_query_string = { u'q': query, u'start': 1, u'end': 10}
+        opps_url = make_twill_url('http://openhatch.org'+reverse(opps_view) + '?' + mysite.base.unicode_sanity.urlencode(opps_query_string))
+        tc.go(opps_url)
+
+        # Make sure we *don't* have the comment that flags this as a page that offers an email alert subscription button
+        tc.notfind("this page should offer a link to sign up for an email alert")
+
+        # Visit the last page of results
+        GET = { u'q': query, u'start': 11, u'end': 20}
+        query_string = mysite.base.unicode_sanity.urlencode(GET)
+        opps_url = make_twill_url('http://openhatch.org'+reverse(opps_view) + '?' + query_string)
+        tc.go(opps_url)
+        # make sure we /do/ have the comment that flags this as a page that
+        # offers an email alert subscription button
+        tc.find("this page should offer a link to sign up for an email alert")
+
+        if not anonymous:
+            # if the user is logged in, make sure that we have autopopulated
+            # the form with her email address
+            tc.find(User.objects.get(username='paulproteus').email)
+
+        # Submit the 'alert' form.
+        email_address = 'yetanother@ema.il'
+        tc.fv('alert', 'email', email_address)
+        tc.submit()
+        
+        if anonymous:
+            client = self.client
+        else:
+            client = self.login_with_client()
+
+
+        alert_data_in_form = {
+                'query_string': query_string,
+                'how_many_bugs_at_time_of_request': Bug.open_ones.filter(project=p).count(),
+                'email': email_address,
+                }
+        # Twill fails here for some reason, so let's continue the journey with
+        # Django's built-in testing sweeeet
+        response = client.post(reverse(mysite.search.views.subscribe_to_bug_alert_do), alert_data_in_form)
+
+        # This response should be a HTTP redirect instruction 
+        self.assertEqual(response.status_code, 302)
+        redirect_target_url = response._headers['location'][1]
+        self.assert_(query_string in redirect_target_url)
+
+        # The page redirects to the old kk
+        response = client.get(redirect_target_url)
+        self.assertContains(response, "this page should confirm that an email alert has been registered")
+
+        # At this point, make sure that the DB contains a record of
+        #     * What the query was.
+        #     * When the request was made.
+        #     * How many bugs were returned by the query at the time of request.
+
+        # There should be only one alert
+        all_alerts = BugAlert.objects.all()
+        self.assertEqual(all_alerts.count(), 1)
+        alert_record = all_alerts[0]
+        self.assert_(alert_record)
+
+        assert_that_record_has_this_data = alert_data_in_form
+        
+        # For the logged-in user, also check that the record contains the
+        # identity of the user who made the alert request.
+
+        if not anonymous:
+            assert_that_record_has_this_data['user'] = User.objects.get(username='paulproteus')
+
+        for key, expected_value in assert_that_record_has_this_data.items():
+            self.assertEqual(alert_record.__getattribute__(key), expected_value,
+                    'alert.%s = %s not (expected) %s' % (key, alert_record.__getattribute__(key), expected_value))
+
+    # run the above test for our two use cases: logged in and not
+    def test_alert_anon(self):
+        self.exercise_alert(anonymous=True)
+    def test_alert_logged_in(self):
+        self.exercise_alert(anonymous=False)
+
+            
 class DeleteAnswer(TwillTests):
     fixtures = ['user-paulproteus']
-    
+
     def test_delete_paragraph_answer(self):
         # create dummy question
         p = Project.create_dummy(name='Ubuntu')
@@ -1220,8 +1323,10 @@ class DeleteAnswer(TwillTests):
     def test_delete_bug_answer(self):
         # create dummy question
         p = Project.create_dummy(name='Ubuntu')
-        # it's important that this pk correspond to the pk of an actual bug_style question, as specified in our view
-        # otherwise, we'll get_or_create will try to create, but it won't be able to because of a unique key error
+        # it's important that this pk correspond to the pk of an actual
+        # bug_style question, as specified in our view otherwise, we'll
+        # get_or_create will try to create, but it won't be able to because of
+        # a unique key error
         question__pk = 2
         q = ProjectInvolvementQuestion.create_dummy(pk=question__pk, is_bug_style=True)
         # create our dummy answer
@@ -1281,13 +1386,82 @@ class CreateBugAnswer(TwillTests):
         self.assertContains(project_page, title)
         self.assertContains(project_page, details)
 
+class CreateAnonymousAnswer(TwillTests):
+    fixtures = ['user-paulproteus']
+
+    def exercise_answer_form(self, form_name, anonymous=True):
+        # This test just ensures that the form exists on the page with an
+        # author_name field.  It doesn't assert that the field does anything.
+        if not anonymous:
+            self.login_with_twill()
+
+        p = Project.create_dummy()
+        p.save()
+        url = "http://openhatch.org" + p.get_url()
+        url = better_make_twill_url(url)
+        tc.go(url)
+        def try_author_name_field():
+            tc.fv(form_name,'author_name','Barry Spinoza')
+
+        if anonymous:
+            try_author_name_field()
+        else:
+            self.assertRaises(twill.errors.TwillException, try_author_name_field)
+
+    def test_paragraph_style_answer_form_anonymously(self):
+        self.exercise_answer_form('question-short-1', anonymous=True)
+
+    def test_bug_style_answer_form_anonymously(self):
+        self.exercise_answer_form('question-long-3', anonymous=True)
+
+    def test_paragraph_style_answer_form_authd(self):
+        self.exercise_answer_form('question-short-1', anonymous=False)
+
+    def test_bug_style_answer_form_authd(self):
+        self.exercise_answer_form('question-long-3', anonymous=False)
+
+    def test_create_answer(self):
+
+        p = Project.create_dummy()
+        q = ProjectInvolvementQuestion.create_dummy(
+                key_string='where_to_start', is_bug_style=False)
+
+        # POST some text to the answer creation post handler
+        POST_data = {
+                'project__pk': p.pk,
+                'author_name': 'anonymous coward',
+                'question__pk': q.pk,
+                'answer__text': """Help produce official documentation, share the solution to a problem, or check, proof and test other documents for accuracy.""",
+                    }
+        response = self.client.post(reverse(mysite.project.views.create_answer_do), POST_data)
+        self.assertEqual(response.status_code, 302)
+        # If this were an Ajaxy post handler, we might assert something about
+        # the response, like 
+        #   self.assertEqual(response.content, '1')
+
+        # check that the db contains a record with this text
+        try:
+            record = Answer.objects.get(text=POST_data['answer__text'])
+        except Answer.DoesNotExist:
+            print "All Answers:", Answer.objects.all()
+            raise Answer.DoesNotExist 
+        self.assertEqual(record.author_name, POST_data['author_name'])
+        self.assertEqual(record.project, p)
+        self.assertEqual(record.question, q)
+
+        # check that the project page now includes this text
+        project_page = self.client.get(p.get_url())
+        self.assertContains(project_page, POST_data['answer__text'])
+        self.assertContains(project_page, POST_data['author_name'])
+
 class CreateAnswer(TwillTests):
     fixtures = ['user-paulproteus']
 
     def test_create_answer(self):
 
         p = Project.create_dummy()
-        q = ProjectInvolvementQuestion.create_dummy()
+        q = ProjectInvolvementQuestion.create_dummy(
+                key_string='where_to_start', is_bug_style=False)
 
         # POST some text to the answer creation post handler
         POST_data = {
@@ -1312,8 +1486,18 @@ class CreateAnswer(TwillTests):
         self.assertEqual(record.project, p)
         self.assertEqual(record.question, q)
 
+        # As a sort of side-test, let's # make sure that even if an
+        # 'author_name' was stored in this object, it doesn't get printed if
+        # there's a genuine User object there too
+        record.author_name = 'don\'t print this name'
+        record.save()
+
         # check that the project page now includes this text
         project_page = self.client.get(p.get_url())
         self.assertContains(project_page, POST_data['answer__text'])
+        self.assertContains(project_page, record.author.username)
+
+        # now for the side-test assertion
+        self.assertNotContains(project_page, record.author_name)
 
 # vim: set nu ai et ts=4 sw=4:
