@@ -83,6 +83,12 @@ class Person(models.Model):
                               generate_person_photo_path(a, b, suffix="-thumbnail"),
                               default='',
                               null=True)
+
+    photo_thumbnail_30px_wide = models.ImageField(upload_to=
+                              lambda a, b: 'static/photos/profile-photos/' + 
+                              generate_person_photo_path(a, b, suffix="-thumbnail-30px-wide"),
+                              default='', null=True)
+
     blacklisted_repository_committers = models.ManyToManyField(RepositoryCommitter)
     dont_guess_my_location = models.BooleanField(default=False)
     location_confirmed = models.BooleanField(default=False)
@@ -231,6 +237,11 @@ class Person(models.Model):
             self.photo.file.seek(0) 
             scaled_down = get_image_data_scaled(self.photo.file.read(), width)
             self.photo_thumbnail.save('', ContentFile(scaled_down))
+
+            width = 30
+            self.photo.file.seek(0) 
+            scaled_down = get_image_data_scaled(self.photo.file.read(), width)
+            self.photo_thumbnail_30px_wide.save('', ContentFile(scaled_down))
 
     def get_collaborators_for_landing_page(self, n=9):
         projects = set([e.project for e in self.get_published_portfolio_entries()])
