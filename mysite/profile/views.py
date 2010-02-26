@@ -232,7 +232,7 @@ def _project_hash(project_name):
 
 @login_required
 # this is a post handler
-def edit_person_info(request):
+def edit_person_info_do(request):
     # {{{
     person = request.user.get_profile()
 
@@ -281,6 +281,9 @@ def edit_person_info(request):
     if '$fwd' in posted_contact_blurb and not person.user.email:
         person.save()
         return edit_info(request, contact_blurb_error=True, contact_blurb_thus_far=posted_contact_blurb)
+    # if their new contact blurb contains $fwd and their old one didn't, then make them a new forwarder
+    if '$fwd' in posted_contact_blurb and not '$fwd' in person.contact_blurb:
+        forwarder = mysite.base.controllers.generate_forwarder(user)
 
     person.contact_blurb = posted_contact_blurb
     person.save()

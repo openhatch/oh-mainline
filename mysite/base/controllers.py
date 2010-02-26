@@ -28,16 +28,24 @@ notifications_dictionary = {
         }
 
 def put_forwarder_in_contact_blurb_if_they_want(str, user):
-    forwarder_magic_string = '$fwd'
+    forwarder_magic_string = u'$fwd'
+    # if they want a forwarder
     if not string.count(str, forwarder_magic_string) == 0:
-        forwarder = generate_forwarder(user)
+        visible_forwarders_matching_user = mysite.profile.models.Forwarder.objects.filter(user=user, stops_being_listed_on__gt=datetime.datetime.utcnow())
+        # if we already have one for them, just display it
+        if visible_forwarders_matching_user.count() > 0:
+            # we'd hope that this list only contains one element, but if not oh well
+            forwarder = visible_forwarders_matching_user[0].address
+        else:
+            # if we don't have one for them yet, make one
+            forwarder = generate_forwarder(user)
         str = str.replace(forwarder_magic_string, forwarder)
     return str
 
 def generate_forwarder(user):
     Forwarder = mysite.profile.models.Forwarder
     random_str = "%s.%s" % (user.username, base64.b64encode(os.urandom(6), altchars='_.'))
-    our_new_forwarder = Forwarder(address=random_str, user=user, expires_on=datetime.datetime.utcnow() + settings.FORWARDER_LIFETIME_TIMEDELTA)
+    our_new_forwarder = Forwarder(address=random_str, user=user, expires_on=datetime.datetime.utcnow() + settings.FORWARDER_LIFETIME_TIMEDELTA, stops_being_listed_on=datetime.datetime.utcnow() + settings.FORWARDER_LISTINGTIME_TIMEDELTA)
     our_new_forwarder.save()
     return our_new_forwarder.get_email_address()
 
@@ -142,13 +150,3 @@ def get_uri_metadata_for_generating_absolute_links(request):
     data['uri_scheme'] = uri_scheme
     return data
 
-def get_email_address_from_forwarder_address(forwarder_address):
-    Forwarder = mysite.profile.models.Forwarder
-# look in Forwarder model
-# see if the forwarder address that they gave us is expired
-# if it isn't return the user's real email address
-# if it is expired, or if it's not in the table at all, return None
-    try:
-        return Forwarder.objects.get(address=forwarder_address, expires_on__gt=datetime.datetime.utcnow()).user.email
-    except Forwarder.DoesNotExist:
-        return None

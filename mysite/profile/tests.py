@@ -1823,6 +1823,47 @@ class PostFixGeneratorList(TwillTests):
         self.assertEqual(what_we_get, what_we_want)
         
         
+class EmailForwarderGarbageCollection(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+    # create a bunch of forwarders
+        # all possibilitied given the options: "expired," "should no longer be displayed"
+            # except if it's expired we it definitely should no longer be displayed
+    # run garbage collection
+    # make sure that whatever should have happened has happened
+
+    def test(self):
+        # args:
+            # valid = True iff we want a forwarder whose expires_on is in the future
+            # new_enough_for_dispay = True iff we want a forwarder whose stops_being_listed_on date is in the future
+        def create_forwarder(address, valid, new_enough_for_display):
+            expires_on_future_number = valid and 1 or -1
+            stops_being_listed_on_future_number = new_enough_for_display and 1 or -1
+            expires_on = datetime.datetime.utcnow() + expires_on_future_number*datetime.timedelta(minutes=10)
+            stops_being_listed_on = datetime.datetime.utcnow() + stops_being_listed_on_future_number*datetime.timedelta(minutes=10)
+            user = User.objects.get(username="paulproteus")
+            new_mapping = mysite.profile.models.Forwarder(address=address,
+                    expires_on=expires_on, user=user, stops_being_listed_on=stops_being_listed_on)
+            new_mapping.save()
+            return new_mapping
+        # asheesh wants a forwarder in his profile.  oh yes he does.
+        sheesh = mysite.profile.models.Person.get_by_username('paulproteus')
+        sheesh.contact_blurb = u'$fwd'
+        sheesh.save()
+        valid_new = create_forwarder('orange@domain.com', 1, 1)
+        valid_old = create_forwarder('red@domain.com', 1, 0)
+        invalid = create_forwarder('purple@domain.com', 0, 0)
+        mysite.profile.models.Forwarder.garbage_collect()
+# valid_new should still be in the database
+# there should be no other forwarders for the address that valid_new has
+        self.assertEqual(1, mysite.profile.models.Forwarder.objects.filter(pk=valid_new.pk).count())
+        self.assertEqual(1, mysite.profile.models.Forwarder.objects.filter(address=valid_new.address).count())
+# valid_old should still be in the database
+        self.assertEqual(1, mysite.profile.models.Forwarder.objects.filter(pk=valid_old.pk).count())
+# invalid should not be in the database
+        self.assertEqual(0, mysite.profile.models.Forwarder.objects.filter(pk=invalid.pk).count())
+# there should be 3 forwarders in total: we gained one and we lost one
+        forwarders = mysite.profile.models.Forwarder.objects.all()
+        self.assertEqual(3, forwarders.count())
 
 class EmailForwarderResolver(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
@@ -1838,6 +1879,17 @@ class EmailForwarderResolver(TwillTests):
 
 
     def test(self):
+        # this function was only being used by this test--so i moved it here. it was in base/controllers --parker
+        def get_email_address_from_forwarder_address(forwarder_address):
+            Forwarder = mysite.profile.models.Forwarder
+            # look in Forwarder model
+            # see if the forwarder address that they gave us is expired
+            # if it isn't return the user's real email address
+            # if it is expired, or if it's not in the table at all, return None
+            try:
+                return Forwarder.objects.get(address=forwarder_address, expires_on__gt=datetime.datetime.utcnow()).user.email
+            except Forwarder.DoesNotExist:
+                return None
         def test_possible_forwarder_address(address, future, actually_create, should_work):
             future_number = future and 1 or -1
             if actually_create:
@@ -1847,7 +1899,7 @@ class EmailForwarderResolver(TwillTests):
                         expires_on=expiry_date, user=user)
                 new_mapping.save()
 
-            output = mysite.base.controllers.get_email_address_from_forwarder_address(address)
+            output = get_email_address_from_forwarder_address(address)
             if should_work:
                 self.assertEqual(output, user.email)
             else:
