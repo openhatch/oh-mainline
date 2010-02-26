@@ -1852,7 +1852,8 @@ class EmailForwarderGarbageCollection(TwillTests):
         valid_new = create_forwarder('orange@domain.com', 1, 1)
         valid_old = create_forwarder('red@domain.com', 1, 0)
         invalid = create_forwarder('purple@domain.com', 0, 0)
-        mysite.profile.models.Forwarder.garbage_collect()
+        # with any luck, the below will call this: mysite.profile.models.Forwarder.garbage_collect()
+        mysite.profile.tasks.GarbageCollectForwarders.apply()
 # valid_new should still be in the database
 # there should be no other forwarders for the address that valid_new has
         self.assertEqual(1, mysite.profile.models.Forwarder.objects.filter(pk=valid_new.pk).count())

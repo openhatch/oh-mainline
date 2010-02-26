@@ -270,6 +270,7 @@ class GarbageCollectForwarders(PeriodicTask):
     def run(self, **kwargs):
         logger = self.get_logger(**kwargs)
         logger.info("Started garbage collecting profile email forwarders")
+        mysite.profile.models.Forwarder.garbage_collect()
 
 
 class RegeneratePostfixAliasesForForwarder(Task):
