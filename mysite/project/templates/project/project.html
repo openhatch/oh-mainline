@@ -44,7 +44,7 @@ about our members who support {{ project.name }}
                             {% ifequal question.key_string 'newcomers' %}
                                 What's a good bug for a newcomer to tackle?
                             {% endifequal %}
-                            
+
                             {% ifequal question.key_string 'non_code_participation' %}
                                 Other than writing code, how can I contribute?
 
@@ -52,31 +52,31 @@ about our members who support {{ project.name }}
                         </h3>
                         <ul class='answers'>
                             {% for answer in answers %}
-                            <li>
-                            {% include 'project/voting_controls.html' %}
-                            {% if not question.is_bug_style %}
+                                <li>
+                                    {% include 'project/voting_controls.html' %}
+                                    {% if not question.is_bug_style %}
 
-                                {% ifequal the_user answer.author %}
-                                {% with 1 as edit_form %}
-                                {% include 'project/forms/paragraph.html' %}
-                                {% endwith %}
+                                        {% ifequal the_user answer.author %}
+                                            {% with 1 as edit_form %}
+                                            {% include 'project/forms/paragraph.html' %}
+                                        {% endwith %}
+                                    {% endifequal %}
+
+                                    <span class="answer" id="answer_{{answer.pk}}">
+                                        {{ answer.text|urlize }}
+                                        <br/>
+                                        {% include 'project/byline.html' %}
+                                    </span>
+
+                                {% else %}
+
+                                    {% ifequal the_user answer.author %}
+                                        {% with 1 as edit_form %}
+                                        {% include 'project/forms/bug.html' %}
+                                    {% endwith %}
                                 {% endifequal %}
-
                                 <span class="answer" id="answer_{{answer.pk}}">
-                                    {{ answer.text|urlize }}
-                                    <br/>
-                                    {% include 'project/byline.html' %}
-                                </span>
 
-                            {% else %}
-
-                                {% ifequal the_user answer.author %}
-                                {% with 1 as edit_form %}
-                                {% include 'project/forms/bug.html' %}
-                                {% endwith %}
-                                {% endifequal %}
-                                <span class="answer" id="answer_{{answer.pk}}">
-                        
                                     <div class="bug_answer_title">
                                         {% ifequal the_user answer.author %}
                                         {% endifequal %}
@@ -90,27 +90,25 @@ about our members who support {{ project.name }}
                             {% endif %}
 
                         </span>
-                        {% endfor %}
+                    {% endfor %}
 
-                            <li>
-                            {% if question.is_bug_style %}
+                    <li>
+                        {% if question.is_bug_style %}
                             {% include 'project/forms/bug.html' %}
-                            {% else %}
+                        {% else %}
                             {% include 'project/forms/paragraph.html' %}
-                            {% endif %}
+                        {% endif %}
 
-                            </li>
-                            </ul>
-                            </li>
-                            {% endfor %}
-                        </ul>
-                        <div id="disclaimer" style="font-size: .9em;">Thanks for trying out this new feature.  The questions may change&mdash;we're still working out the details.  Feel free to <a href="/contact">drop us a line</a> with suggestions!</div>
-                        <span id="other-questions">
-                            <a href="{% url mysite.project.views.suggest_question %}?project__pk={{project.pk}}">
-                                What else should we ask you?
-                            </a>
-
-                        </span>
+                    </li>
+                </ul>
+            </li>
+        {% endfor %}
+    </ul>
+    <strong id="other-questions">
+        <a href="{% url mysite.project.views.suggest_question %}?project__pk={{project.pk}}">
+            What else do you want to talk about?
+        </a>
+    </strong>
     </div>
 </div><!-- /.module #requests -->
 

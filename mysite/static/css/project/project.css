@@ -63,7 +63,7 @@ body#project form.is_edit_form { display: none; }
 body#project .project_icon { float: left; height: 64px; margin-right: 10px; width: 64px; background-position: center; background-repeat: no-repeat; }
 body#project .project_icon .alt-text { position: absolute; left: -999px; } /* So that screen readers will read this. */
 
-body#project #other-questions { display: block; text-align: right; }
+body#project #other-questions { display: block; margin-bottom: 10px; }
 body#project .quotemark { color: #555; }
 
 body#project input[name='author_name'] { width: 60%; margin-bottom: 5px; }
