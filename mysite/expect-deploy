@@ -53,7 +53,7 @@ expect {
 }
 
 send_user "\r\n*** Attempting to run migrations... ***\r\n"
-send "./bin/production migrate\r"
+send "./bin/production migrate --merge\r"
 expect "$ "
 
 send_user "\r\n*** Syncing the un-migrated models... ***\r\n"
