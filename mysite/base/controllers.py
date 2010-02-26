@@ -12,6 +12,7 @@ import mysite.base.decorators
 import datetime
 import base64
 import os
+import string
 
 notifications_dictionary = {
         "edit_password_done":
@@ -27,8 +28,10 @@ notifications_dictionary = {
         }
 
 def put_forwarder_in_contact_blurb_if_they_want(str, user):
-    forwarder = generate_forwarder(user)
-    str = str.replace('$fwd', forwarder)
+    forwarder_magic_string = '$fwd'
+    if not string.count(str, forwarder_magic_string) == 0:
+        forwarder = generate_forwarder(user)
+        str = str.replace(forwarder_magic_string, forwarder)
     return str
 
 def generate_forwarder(user):
