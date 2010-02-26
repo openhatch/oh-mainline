@@ -9,6 +9,7 @@ import mysite.base.helpers
 import mock
 
 import mysite.base.controllers
+import mysite.search.models
 
 def twill_setup():
     app = AdminMediaHandler(WSGIHandler())
@@ -146,12 +147,14 @@ class Feed(TwillTests):
 
         # Create a few answers on the project discussion page.
         for x in range(4):
-            Answer.create_dummy()
+            mysite.search.models.Answer.create_dummy()
 
-        recent_answers = Answer.objects.all().order_by('-created_date')
+        recent_answers = mysite.search.models.Answer.objects.all().order_by('-created_date')
 
         # Visit the homepage, assert that the feed item data is on the page,
         # ordered by date descending.
-        self.assertEqual(get_answers_from_homepage(), recent_answers)
+        actual_answer_pks = list(get_answers_from_homepage().values_list('pk', flat=True))
+        expected_answer_pks = list(recent_answers.values_list('pk', flat=True))
+        self.assertEqual(actual_answer_pks, expected_answer_pks)
 
 # vim: set ai et ts=4 sw=4 nu:

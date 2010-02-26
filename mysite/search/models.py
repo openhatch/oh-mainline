@@ -265,7 +265,13 @@ class Answer(OpenHatchModel):
 
     @staticmethod
     def create_dummy(**kwargs):
-        data = {'text': 'i am doing well'}
+        data = {
+                'text': 'i am doing well',
+                'author': User.objects.get_or_create(username='yooz0r')[0],
+                'question': ProjectInvolvementQuestion.objects.get_or_create(
+                    key_string='where_to_start', is_bug_style=False)[0],
+                'project': Project.create_dummy()
+                }
         data.update(kwargs)
         ret = Answer(**data)
         ret.save()

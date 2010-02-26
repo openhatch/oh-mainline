@@ -17,6 +17,7 @@ from mysite.profile.views import display_person_web
 from mysite.base.decorators import view
 import mysite.customs.feed
 import mysite.search.controllers
+import mysite.search.models
 
 import feedparser
 import lxml.html
@@ -40,6 +41,8 @@ def home(request):
     everybody = list(mysite.profile.models.Person.objects.exclude(photo=''))
     random.shuffle(everybody)
     data['random_profiles'] = everybody[0:5]
+
+    data['recent_answers'] = mysite.search.models.Answer.objects.all().order_by('-created_date')[:5]
 
 
     #get globally recommended bug search stuff (for anonymous users)
