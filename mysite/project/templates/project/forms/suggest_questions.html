@@ -1,0 +1,12 @@
+<form id="suggest_question" class="suggest_question" name='suggest_question'
+        method='post' action='{% url mysite.project.views.suggest_question_do%}'>
+        <input type="hidden" name="project__pk"
+            value="{{project__pk}}" />
+
+        <textarea style='display: block; float: none;' class='add_an_answer'
+                title='Suggest a question'
+                id='suggested_question'
+                name='suggested_question'
+                ></textarea>
+        <input style='display: block; float: none; ' type='submit' value='Submit'>
+    </form>
