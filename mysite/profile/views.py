@@ -283,7 +283,7 @@ def edit_person_info_do(request):
         return edit_info(request, contact_blurb_error=True, contact_blurb_thus_far=posted_contact_blurb)
     # if their new contact blurb contains $fwd and their old one didn't, then make them a new forwarder
     if '$fwd' in posted_contact_blurb and not '$fwd' in person.contact_blurb:
-        forwarder = mysite.base.controllers.generate_forwarder(user)
+        forwarder = mysite.base.controllers.generate_forwarder(person.user)
 
     person.contact_blurb = posted_contact_blurb
     person.save()

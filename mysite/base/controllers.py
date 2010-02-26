@@ -32,13 +32,9 @@ def put_forwarder_in_contact_blurb_if_they_want(str, user):
     # if they want a forwarder
     if not string.count(str, forwarder_magic_string) == 0:
         visible_forwarders_matching_user = mysite.profile.models.Forwarder.objects.filter(user=user, stops_being_listed_on__gt=datetime.datetime.utcnow())
-        # if we already have one for them, just display it
-        if visible_forwarders_matching_user.count() > 0:
-            # we'd hope that this list only contains one element, but if not oh well
-            forwarder = visible_forwarders_matching_user[0].address
-        else:
-            # if we don't have one for them yet, make one
-            forwarder = generate_forwarder(user)
+        # "we can trust that" they already have a forwarder created if they want one (we make it at edit-time and then at garbage collection time (nightly), if necessary)
+        # we'd hope that this list only contains one element, but if not oh well
+        forwarder = visible_forwarders_matching_user[0].address
         str = str.replace(forwarder_magic_string, forwarder)
     return str
 
