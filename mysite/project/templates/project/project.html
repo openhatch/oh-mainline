@@ -35,7 +35,7 @@ about our members who support {{ project.name }}
                         </h3>
                         <ul class='answers'>
                             {% for answer in answers %}
-                                <li>
+                                <li id='answer_whose_pk_is_{{ answer.pk }}'>
                                     {% include 'project/voting_controls.html' %}
                                     {% if not question.is_bug_style %}
 
