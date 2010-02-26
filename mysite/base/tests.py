@@ -131,4 +131,27 @@ class TestUnicodifyDecorator(TwillTests):
 
         sample_thing(utf8_data)
 
+class Feed(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def test_feed_shows_recent_answers(self):
+
+        # Visit the homepage, notice that there are no answers in the context.
+
+        def get_answers_from_homepage():
+            homepage_response = self.client.get('/')
+            return homepage_response.context[0]['recent_answers']
+        
+        self.assertFalse(get_answers_from_homepage())
+
+        # Create a few answers on the project discussion page.
+        for x in range(4):
+            Answer.create_dummy()
+
+        recent_answers = Answer.objects.all().order_by('-created_date')
+
+        # Visit the homepage, assert that the feed item data is on the page,
+        # ordered by date descending.
+        self.assertEqual(get_answers_from_homepage(), recent_answers)
+
 # vim: set ai et ts=4 sw=4 nu:
