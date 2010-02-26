@@ -54,6 +54,7 @@
         <textarea id='q{{ question.pk }}-answer__text' 
             name='answer__text'>{% ifequal edit_form 1%}{{answer.text}}{% endifequal %}</textarea>
         {% if not the_user.is_authenticated %}
+            <label for='author_name'>Your name</label>
             <input type='text' name='author_name' />
         {% endif %}
         <div class='input-note'>
