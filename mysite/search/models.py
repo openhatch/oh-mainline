@@ -2,6 +2,7 @@ from django.db import models
 from django.core.files.base import ContentFile
 from django.core.files.images import get_image_dimensions
 from django.contrib.auth.models import User
+from django.core.cache import cache
 from django.conf import settings
 import datetime
 import StringIO
@@ -277,6 +278,12 @@ class Answer(OpenHatchModel):
         ret = Answer(**data)
         ret.save()
         return ret
+
+def clear_homepage_activity_feed_cache(*args, **kwargs):
+    cache.delete('recent_activity_feed')
+
+models.signals.post_save.connect(clear_homepage_activity_feed_cache, Answer)
+models.signals.post_save.connect(clear_homepage_activity_feed_cache, ProjectInvolvementQuestion)
 
 class OpenBugsManager(models.Manager):
     def get_query_set(self):

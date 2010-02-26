@@ -1,4 +1,5 @@
 {% extends 'base/base.html' %}
+{% load cache %}
 {% load base_extras %}
 {% load profile_extras %}
 
@@ -304,6 +305,7 @@ body#landing #right .entry { font-size: .9em; margin-top: 3px; }
         </div>
         <div class='body'>
             <ul>
+                {% cache 86400 recent_activity_feed %}
                 {% for answer in recent_answers %}
                     <li style='font-size: .9em; float: left; width: 100%; margin-bottom: 15px;'>
                         <a href='{{ answer.author.get_profile.profile_url }}'>
@@ -313,11 +315,13 @@ body#landing #right .entry { font-size: .9em; margin-top: 3px; }
                             <div style='float: left; width: 100%;'>
                                 {% with answer.author as user %}
                                 <strong>
+                                    {% spaceless %}
                                     <a href='{{ user.get_profile.profile_url }}'>
                                         {% include 'name.html' %}
                                     </a>
+                                    {% endspaceless %}
                                 </strong>
-                                answered the question 
+                                added an answer to the question 
                                 {% endwith %}
                             </div>
                             {% spaceless %}
@@ -341,6 +345,7 @@ body#landing #right .entry { font-size: .9em; margin-top: 3px; }
                         </div>
                     </li>
                 {% endfor %}
+                {% endcache %}
             </ul>
         </div>
     </div>

@@ -15,4 +15,7 @@ def timesince_terse(value, **args):
             secs_since_epoch)
 
     string = timesince(value, **args)
-    return string.split(", ")[0]
+    ret = string.split(", ")[0]
+    if ret == '0 minutes':
+        return 'just moments'
+    return ret 
