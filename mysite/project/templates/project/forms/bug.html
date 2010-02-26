@@ -11,7 +11,8 @@
     <input type='hidden' name='project__pk' value='{{ project.pk }}'>
     <input type='hidden' name='question__pk' value='{{ question.pk }}'>
     <div class="show_when_editing">
-        <label for='q{{ question.pk }}-answer__title'>
+        <a href="#" style='float: right; font-weight: bold; position: relative; top: -5px;' class="collapse_answer_form" id="collapse_answer_form_{{answer.pk}}">[X]</a>
+        <label style='float: left;' for='q{{ question.pk }}-answer__title'>
             {% ifequal question.key_string 'non_code_participation' %}
             Describe a task 
             {% else %}
@@ -52,6 +53,10 @@
         {% endifequal %}
         <textarea id='q{{ question.pk }}-answer__text' 
             name='answer__text'>{% ifequal edit_form 1%}{{answer.text}}{% endifequal %}</textarea>
+        {% if not the_user.is_authenticated %}
+            <label for='author_name'>Your name</label>
+            <input type='text' name='author_name' />
+        {% endif %}
         <div class='input-note'>
             {% ifequal question.key_string 'non_code_participation' %}
             <ul class='sections'>
@@ -144,6 +149,5 @@
         </div>
 
         <input type='submit' value='Submit'>
-        <a href="#" class="collapse_answer_form {% ifequal edit_form 1%}is_edit_form{% endifequal %}" id="collapse_answer_form_{{answer.pk}}">Cancel</a>
                         </div>
                 </form>

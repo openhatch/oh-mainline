@@ -7,6 +7,7 @@ from StringIO import StringIO
 from django.test.client import Client
 import mysite.base.helpers
 import mock
+import urllib
 
 import mysite.base.controllers
 import mysite.search.models
@@ -23,6 +24,9 @@ def make_twill_url(url):
     # modify this
     return url.replace("http://openhatch.org/",
             "http://127.0.0.1:8080/")
+
+def better_make_twill_url(url):
+    return make_twill_url(url.replace('+','%2B'))
 
 def twill_quiet():
     # suppress normal output of twill.. You don't want to

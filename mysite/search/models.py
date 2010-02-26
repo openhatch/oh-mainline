@@ -183,9 +183,10 @@ class Project(OpenHatchModel):
         # List the owners of those portfolio entries.
         return [pf_entry.person for pf_entry in pf_entries]
 
-    def update_cached_contributor_count(self):
+    def update_cached_contributor_count_and_save(self):
         contributors = self.get_contributors()
         self.cached_contributor_count = len(contributors)
+        self.save()
 
     def get_n_other_contributors_than(self, n, person):
         # FIXME: Use the method above.
@@ -256,9 +257,10 @@ class ProjectInvolvementQuestion(OpenHatchModel):
         return ret
 
 class Answer(OpenHatchModel):
+    author_name = models.CharField(null=True, max_length=255)
     title = models.CharField(null=True, max_length=255)
     text = models.TextField(blank=False)
-    author = models.ForeignKey(User)
+    author = models.ForeignKey(User, null=True)
     question = models.ForeignKey(ProjectInvolvementQuestion, related_name='answers')
     project = models.ForeignKey(Project)
 
@@ -326,6 +328,12 @@ class Bug(OpenHatchModel):
     def create_dummy_with_project(**kwargs):
         kwargs['project'] = Project.create_dummy()
         return Bug.create_dummy(**kwargs)
+
+class BugAlert(OpenHatchModel):
+    user = models.ForeignKey(User, null=True)
+    query_string = models.CharField(max_length=255)
+    how_many_bugs_at_time_of_request = models.IntegerField()
+    email = models.EmailField(max_length=255)
 
 class HitCountCache(OpenHatchModel):
     hashed_query = models.CharField(max_length=40, primary_key=True) # stores a sha1 

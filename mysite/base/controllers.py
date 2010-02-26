@@ -12,6 +12,7 @@ import mysite.base.decorators
 import datetime
 import base64
 import os
+import string
 
 notifications_dictionary = {
         "edit_password_done":
@@ -27,8 +28,10 @@ notifications_dictionary = {
         }
 
 def put_forwarder_in_contact_blurb_if_they_want(str, user):
-    forwarder = generate_forwarder(user)
-    str = str.replace('$fwd', forwarder)
+    forwarder_magic_string = '$fwd'
+    if not string.count(str, forwarder_magic_string) == 0:
+        forwarder = generate_forwarder(user)
+        str = str.replace(forwarder_magic_string, forwarder)
     return str
 
 def generate_forwarder(user):
@@ -109,10 +112,12 @@ def cached_geocoding_in_json(address):
     geocoded = None
     geocoded_in_json = cache.get(key_name)
     if geocoded_in_json is None:
-        geocoded = _geocode(address)
-        geocoded.update({'is_inaccessible': is_inaccessible})
-        geocoded_in_json = simplejson.dumps(geocoded)
-        cache.set(key_name, geocoded_in_json, 60 * 60 * 24 * 7) # cache for a week, which should be plenty
+        geocoded = _geocode(address) or {}
+        geocoded_and_inaccessible = {'is_inaccessible': is_inaccessible}
+        geocoded_and_inaccessible.update(geocoded)
+        geocoded_in_json = simplejson.dumps(geocoded_and_inaccessible)
+        if geocoded:
+            cache.set(key_name, geocoded_in_json, 60 * 60 * 24 * 7) # cache for a week, which should be plenty
     return geocoded_in_json
 
 def get_uri_metadata_for_generating_absolute_links(request):

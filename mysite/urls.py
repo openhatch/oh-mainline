@@ -14,6 +14,10 @@ from django_authopenid import views as oid_views
 from voting.views import vote_on_object
 
 urlpatterns = patterns('',
+        (r'^\+projects/suggest_question/',
+            'mysite.project.views.suggest_question'),
+        (r'^\+projects/suggest_question_do/',
+            'mysite.project.views.suggest_question_do'),
         # Generic view to vote on Link objects
         (r'^\+answer/vote/(?P<object_id>\d+)/(?P<direction>up|down|clear)vote/?$',
             vote_on_object, dict(model=mysite.search.models.Answer,
@@ -36,7 +40,6 @@ urlpatterns = patterns('',
             'mysite.profile.views.people'),
 
         (r'^\+people/list/$', lambda x: HttpResponsePermanentRedirect('/people/')),
-
 
         (r'^account/forgot_pass/$',
             'django.contrib.auth.views.password_reset', {
@@ -198,6 +201,8 @@ urlpatterns = patterns('',
 
         (r'^\+do/project.views.create_answer_do$', 'mysite.project.views.create_answer_do'),
         (r'^\+do/project.views.delete_paragraph_answer_do$', 'mysite.project.views.delete_paragraph_answer_do'),
+
+        (r'^\+do/search.views.subscribe_to_bug_alert_do$', 'mysite.search.views.subscribe_to_bug_alert_do'),
 
         (r'^\+projects/', include('mysite.project.urls')),
 

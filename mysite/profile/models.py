@@ -341,7 +341,7 @@ def reject_when_query_is_only_whitespace(sender, instance, **kwargs):
         raise ValueError, "You tried to save a DataImportAttempt whose query was only whitespace, and we rejected it."
 
 def update_the_project_cached_contributor_count(sender, instance, **kwargs):
-    instance.project.update_cached_contributor_count()
+    instance.project.update_cached_contributor_count_and_save()
 
 def update_the_person_index(sender, instance, **kwargs):
     person = instance.person

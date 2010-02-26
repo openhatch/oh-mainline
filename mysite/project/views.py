@@ -1,3 +1,5 @@
+from django.core.mail import send_mail
+import socket
 from mysite.search.models import Project, ProjectInvolvementQuestion, Answer
 from mysite.profile.models import Person
 import django.template
@@ -5,7 +7,7 @@ import mysite.base.decorators
 import mysite.profile.views
 
 from django.http import HttpResponse, HttpResponseRedirect, \
-        HttpResponsePermanentRedirect, HttpResponseServerError
+        HttpResponsePermanentRedirect, HttpResponseServerError, HttpResponseBadRequest
 from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
@@ -54,6 +56,20 @@ def project(request, project__name = None):
             'can_mentor', p.language)),
         'explain_to_anonymous_users': True,
         })
+
+    question_suggestion_response = request.GET.get('question_suggestion_response', None)
+    context['notifications'] = []
+    if question_suggestion_response == 'success':
+        context['notifications'].append({
+            'id': 'question_suggestion_response',
+            'text': 'Thanks for your suggestion!'
+            })
+    elif question_suggestion_response == 'failure':
+        context['notifications'].append({
+            'id': 'question_suggestion_response',
+            'text': "Oops, there was an error submitting your suggested question--we probably couldn't connect to our outgoing mailserver. Try just sending an email to <a href='hello@openhatch.org'>hello@openhatch.org</a>"
+            })
+
     return (request,
             'project/project.html',
             context)
@@ -84,12 +100,18 @@ def delete_paragraph_answer_do(request):
     our_answer.delete()
     return HttpResponseRedirect(reverse(project, kwargs={'project__name': our_answer.project.name}))
 
-@login_required
 def create_answer_do(request):
     if 'is_edit' in request.POST:
         answer = Answer.objects.get(pk=request.POST['answer__pk'])
     else:
         answer = Answer()
+    if request.user.is_authenticated():
+        answer.author = request.user
+    elif request.POST.get('author_name', None):
+        answer.author_name = request.POST['author_name']
+    else:
+        return HttpResponseBadRequest('You need to be either be logged in or give us a name to attach to your answer.')
+    
 
     question = ProjectInvolvementQuestion.objects.get(pk=request.POST['question__pk'])
     question.save()
@@ -99,10 +121,37 @@ def create_answer_do(request):
 
     answer.title = request.POST.get('answer__title', None)
 
-    answer.author = request.user
-    
     answer.project_id = request.POST['project__pk']
 
     answer.save()
     
     return HttpResponseRedirect(reverse(project, kwargs={'project__name': answer.project.name}))
+
+@login_required
+@mysite.base.decorators.view
+def suggest_question(request):
+    template = "project/suggest_question.html"
+    data = {
+            'project__pk': request.GET['project__pk']
+            }
+    return (request, template, data)
+
+@login_required
+def suggest_question_do(request):
+    project = mysite.search.models.Project.objects.get(pk=request.POST['project__pk'])
+    user = request.user
+    body = request.POST['suggested_question']
+    body += "\nproject name: " + project.name
+    body += "\nproject pk: " + str(project.pk)
+    body += "\nuser name: " + user.username
+    body += "\nuser pk: " + str(user.pk)
+    question_suggestion_response = ""
+    #TODO: Asheesh would really rather this be enqueued as a background job
+    try:
+        send_mail('Project Page Question Suggestion: ', body, 'all@openhatch.org', ['all@openhatch.org'], fail_silently=False)
+        question_suggestion_response = "success"
+    except socket.error:
+        #NOTE: this will probably only happen on a local server (not on the live site)
+        question_suggestion_response = "failure"
+    template = "project/project.html"
+    return HttpResponseRedirect(reverse(mysite.project.views.project, kwargs={'project__name': project.name}) + '?question_suggestion_response=' + question_suggestion_response)

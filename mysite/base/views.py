@@ -38,7 +38,7 @@ def home(request):
 
     data['recommended_bugs'] = list(recommended_bugs) # A list so we can tell if it's empty
 
-    everybody = list(mysite.profile.models.Person.objects.exclude(photo=''))
+    everybody = list(mysite.profile.models.Person.objects.exclude(link_person_tag=None))
     random.shuffle(everybody)
     data['random_profiles'] = everybody[0:5]
 
