@@ -1,4 +1,4 @@
-from mysite.base.tests import make_twill_url, TwillTests
+from mysite.base.tests import make_twill_url, better_make_twill_url, TwillTests
 import mysite.base.unicode_sanity
 
 import mysite.account.tests
@@ -1390,18 +1390,23 @@ class CreateAnonymousAnswer(TwillTests):
     fixtures = ['user-paulproteus']
 
     def exercise_answer_form(self, form_name, anonymous=True):
+        # This test just ensures that the form exists on the page with an
+        # author_name field.  It doesn't assert that the field does anything.
+        if not anonymous:
+            self.login_with_twill()
+
         p = Project.create_dummy()
+        p.save()
         url = "http://openhatch.org" + p.get_url()
+        url = better_make_twill_url(url)
         tc.go(url)
         def try_author_name_field():
-            tc.fv('question-short-1','author_name','Barry Spinoza')
+            tc.fv(form_name,'author_name','Barry Spinoza')
 
         if anonymous:
             try_author_name_field()
-            tc.submit()
-            tc.find('Barry Spinoza')
         else:
-            self.assertRaises(twill.errors.TwillAssertionError, try_author_name_field)
+            self.assertRaises(twill.errors.TwillException, try_author_name_field)
 
     def test_paragraph_style_answer_form_anonymously(self):
         self.exercise_answer_form('question-short-1', anonymous=True)
@@ -1481,8 +1486,18 @@ class CreateAnswer(TwillTests):
         self.assertEqual(record.project, p)
         self.assertEqual(record.question, q)
 
+        # As a sort of side-test, let's # make sure that even if an
+        # 'author_name' was stored in this object, it doesn't get printed if
+        # there's a genuine User object there too
+        record.author_name = 'don\'t print this name'
+        record.save()
+
         # check that the project page now includes this text
         project_page = self.client.get(p.get_url())
         self.assertContains(project_page, POST_data['answer__text'])
+        self.assertContains(project_page, record.author.username)
+
+        # now for the side-test assertion
+        self.assertNotContains(project_page, record.author_name)
 
 # vim: set nu ai et ts=4 sw=4:
