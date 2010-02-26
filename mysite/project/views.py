@@ -62,7 +62,7 @@ def project(request, project__name = None):
     if question_suggestion_response == 'success':
         context['notifications'].append({
             'id': 'question_suggestion_response',
-            'text': 'Thanks for submitting a questions suggestion.'
+            'text': 'Thanks for your suggestion!'
             })
     elif question_suggestion_response == 'failure':
         context['notifications'].append({
