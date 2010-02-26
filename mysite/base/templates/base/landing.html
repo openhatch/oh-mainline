@@ -305,7 +305,7 @@ body#landing #right .entry { font-size: .9em; margin-top: 3px; }
         </div>
         <div class='body'>
             <ul>
-                {% cache 86400 recent_activity_feed %}
+                {#{% cache 86400 recent_activity_feed %}#}
                 {% for answer in recent_answers %}
                     <li style='font-size: .9em; float: left; width: 100%; margin-bottom: 15px;'>
                         <a href='{{ answer.author.get_profile.profile_url }}'>
@@ -345,7 +345,7 @@ body#landing #right .entry { font-size: .9em; margin-top: 3px; }
                         </div>
                     </li>
                 {% endfor %}
-                {% endcache %}
+                {#{% endcache %}#}
             </ul>
         </div>
     </div>
