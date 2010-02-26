@@ -28,7 +28,7 @@ from django.contrib.auth.decorators import login_required
 def home(request):
 
     data = {}
-    data['entries'] = mysite.customs.feed.cached_blog_entries()[:3]
+    data['entries'] = mysite.customs.feed.cached_blog_entries()[:1]
 
     recommended_bugs = []
     if request.user.is_authenticated():
