@@ -161,7 +161,7 @@ class Person(models.Model):
         return PortfolioEntry.objects.filter(person=self, is_published=True, is_deleted=False)
 
     def get_cache_key_for_projects(self):
-        return 'projects_for_person_with_pk_%d' % self.pk
+        return 'projects_for_person_with_pk_%d_v2' % self.pk
 
     @mysite.base.decorators.cache_method('get_cache_key_for_projects')
     def get_list_of_project_names(self):
@@ -210,7 +210,7 @@ class Person(models.Model):
             for pfe in self.get_published_portfolio_entries()], [])
 
     def get_tag_texts_cache_key(self):
-        return 'tag_texts_for_person_with_pk_%d' % self.pk
+        return 'tag_texts_for_person_with_pk_%d_v2' % self.pk
 
     @mysite.base.decorators.cache_method('get_tag_texts_cache_key')
     def get_tag_texts_for_map(self):
@@ -668,6 +668,6 @@ models.signals.post_save.connect(update_the_project_cached_contributor_count, se
 models.signals.post_save.connect(update_the_person_index, sender=PortfolioEntry)
 models.signals.post_save.connect(make_forwarder_actually_work, sender=Forwarder)
 models.signals.post_save.connect(update_link_person_tag_cache, sender=Link_Person_Tag)
-models.signals.pre_delete.connect(update_link_person_tag_cache, sender=Link_Person_Tag)
+models.signals.post_delete.connect(update_link_person_tag_cache, sender=Link_Person_Tag)
 
 # vim: set nu:

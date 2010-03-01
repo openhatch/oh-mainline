@@ -72,11 +72,11 @@ def cache_method(cache_key_getter_name, func, *args, **kwargs):
 
     if cached_json is None:
         value = func(*args, **kwargs)
-        cached_json = simplejson.dumps(value)
+        cached_json = simplejson.dumps({'value': value})
         import logging
         cache.set(cache_key, cached_json, 864000)
         logging.info('cached output of func.__name__: %s' % cached_json)
     else:
-        value = simplejson.loads(cached_json)
+        value = simplejson.loads(cached_json)['value']
 
     return value
