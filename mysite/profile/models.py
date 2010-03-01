@@ -160,6 +160,10 @@ class Person(models.Model):
     def get_published_portfolio_entries(self):
         return PortfolioEntry.objects.filter(person=self, is_published=True, is_deleted=False)
 
+    def get_cache_key_for_projects(self):
+        return 'projects_for_person_with_pk_%d' % self.pk
+
+    @mysite.base.decorators.cache_method('get_cache_key_for_projects')
     def get_list_of_project_names(self):
         return self.get_published_portfolio_entries().values_list('project__name', flat=True)
 
@@ -208,23 +212,8 @@ class Person(models.Model):
     def get_tag_texts_cache_key(self):
         return 'tag_texts_for_person_with_pk_%d' % self.pk
 
+    @mysite.base.decorators.cache_method('get_tag_texts_cache_key')
     def get_tag_texts_for_map(self):
-
-        cache_key = self.get_tag_texts_cache_key()
-        
-        # Let's check to see whether we can avoid all this expensive DB jiggery after all
-        cached_tag_texts_string = cache.get(cache_key)
-
-        if cached_tag_texts_string is None:
-            tag_texts = self._get_tag_texts_for_map_without_cache()
-            cached_tag_texts_string = simplejson.dumps(tag_texts)
-            cache.set(cache_key, cached_tag_texts_string, 864000)
-        else:
-            tag_texts = simplejson.loads(cached_tag_texts_string)
-
-        return tag_texts
-
-    def _get_tag_texts_for_map_without_cache(self):
         """Return a list of Tags linked to this Person.  Tags that would be useful from the map view of the people list"""
         exclude_me = TagType.objects.filter(name__in=['understands_not', 'studying'])
         my_tag_texts = (link.tag.text for link in Link_Person_Tag.objects.filter(person=self) if link.tag.tag_type not in exclude_me)
