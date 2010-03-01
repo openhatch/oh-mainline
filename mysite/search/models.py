@@ -14,6 +14,7 @@ import mysite.customs
 import mysite.base.unicode_sanity
 from django.core.urlresolvers import reverse
 import voting
+import hashlib
 
 class OpenHatchModel(models.Model):
     created_date = models.DateTimeField(null=True, auto_now_add=True)
@@ -280,7 +281,7 @@ class Answer(OpenHatchModel):
         return ret
 
 def clear_homepage_activity_feed_cache(*args, **kwargs):
-    cache.delete('recent_activity_feed')
+    cache.delete('template.cache.recent_activity_feed.%s' % hashlib.md5('').hexdigest())
 
 models.signals.post_save.connect(clear_homepage_activity_feed_cache, Answer)
 models.signals.post_save.connect(clear_homepage_activity_feed_cache, ProjectInvolvementQuestion)
