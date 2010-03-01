@@ -1,4 +1,5 @@
 {% extends 'base/base.html' %}
+{% load cache %}
 {% load base_extras %}
 {% load profile_extras %}
 
@@ -20,13 +21,14 @@ body#landing #welcome .nudgebuttons li .arrow { font-size: 3em; }
 body#landing #welcome li .notification { color: #555; }
 body#landing #welcome {color: #555; }
 
-body#landing .column { float: left; width: 44%; margin-right: 0; margin-left: 2%; }
-body#landing .column:first-child { width: 32%; margin-left: 0; }
-body#landing .column:last-child { width: 20%; }
+body#landing .column { float: left; width: 35%; margin-right: 0; margin-left: 2%; }
+body#landing .column:first-child { width: 30%; margin-left: 0; }
+body#landing .column:last-child { width: 30%; }
 body#landing .module .body { background: #fff; padding: 3%; width: 94%; }
 body#landing .module .head { width: 98%; }
 body#landing .module { width: 100%; }
 body#landing #right .body { padding: 5%; font-size: .9em; width: 90%; }
+body#landing #right #recent_activity_feed .body { font-size: 1em; }
 body#landing #right .entry { font-size: .9em; margin-top: 3px; }
 {% endblock css %}
 
@@ -296,6 +298,57 @@ body#landing #right .entry { font-size: .9em; margin-top: 3px; }
 </div>
 
 <div id='right' class='column'>
+
+    <div class='module' id='recent_activity_feed'>
+        <div class='head'>
+            <h3>Recent activity</h3>
+        </div>
+        <div class='body'>
+            <ul>
+                {% cache 86400 recent_activity_feed %}
+                {% for answer in recent_answers %}
+                    <li style='font-size: .9em; float: left; width: 100%; margin-bottom: 15px;'>
+                        <a href='{{ answer.author.get_profile.profile_url }}'>
+                            <img style='width: 30px; float: left; margin-right: 10px;' src='{{ answer.author.get_profile.get_photo_thumbnail_30px_wide_url_or_default }}' />
+                        </a>
+                        <div style='float: left; width: 80%;'>
+                            <div style='float: left; width: 100%;'>
+                                {% with answer.author as user %}
+                                <strong>
+                                    {% spaceless %}
+                                    <a href='{{ user.get_profile.profile_url }}'>
+                                        {% include 'name.html' %}
+                                    </a>
+                                    {% endspaceless %}
+                                </strong>
+                                added an answer to the question 
+                                {% endwith %}
+                            </div>
+                            {% spaceless %}
+                                {% with answer.question as question %}
+                                {% with answer.project as project %}
+                                <a href='{{ answer.project.get_url }}#answer_whose_pk_is_{{ answer.pk }}'>
+                                    <span>&ldquo;</span>
+                                    {% with 1 as mention_project_name %}
+                                    {% include 'question_text.html' %}
+                                    {% endwith %}
+                                    <span>&rdquo;</span>
+                                </a>
+                                {% endwith %}
+                                {% endwith %}
+                            {% endspaceless %}
+                            <span style='color: #aaa;'>
+                                &middot;
+                                {{ answer.modified_date|timesince_terse }} ago
+                            </span>
+                            <br/>
+                        </div>
+                    </li>
+                {% endfor %}
+                {% endcache %}
+            </ul>
+        </div>
+    </div>
 
     <div class='module' id='meta'>
         <div class='head'>

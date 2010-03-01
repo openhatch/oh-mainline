@@ -32,8 +32,6 @@ def reload_bug_obj(bug_obj):
         canonical_bug_link_format_string=BUG_URL_PREFIX + '%d',
         gen_project=project_finder_plugin)
 
-    data['title'] = '(in Fedora) ' + data['title']
-
     for key in data:
         setattr(bug_obj, key, data[key])
 

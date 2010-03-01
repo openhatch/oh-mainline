@@ -2,6 +2,7 @@ from django.db import models
 from django.core.files.base import ContentFile
 from django.core.files.images import get_image_dimensions
 from django.contrib.auth.models import User
+from django.core.cache import cache
 from django.conf import settings
 import datetime
 import StringIO
@@ -13,6 +14,7 @@ import mysite.customs
 import mysite.base.unicode_sanity
 from django.core.urlresolvers import reverse
 import voting
+import hashlib
 
 class OpenHatchModel(models.Model):
     created_date = models.DateTimeField(null=True, auto_now_add=True)
@@ -247,7 +249,6 @@ class ProjectInvolvementQuestion(OpenHatchModel):
         # TODO: sort them
         the_answers.sort(key=get_score)
         return the_answers
-        
 
     @staticmethod
     def create_dummy(**kwargs):
@@ -267,11 +268,23 @@ class Answer(OpenHatchModel):
 
     @staticmethod
     def create_dummy(**kwargs):
-        data = {'text': 'i am doing well'}
+        data = {
+                'text': 'i am doing well',
+                'author': User.objects.get_or_create(username='yooz0r')[0],
+                'question': ProjectInvolvementQuestion.objects.get_or_create(
+                    key_string='where_to_start', is_bug_style=False)[0],
+                'project': Project.create_dummy()
+                }
         data.update(kwargs)
         ret = Answer(**data)
         ret.save()
         return ret
+
+def clear_homepage_activity_feed_cache(*args, **kwargs):
+    cache.delete('template.cache.recent_activity_feed.%s' % hashlib.md5('').hexdigest())
+
+models.signals.post_save.connect(clear_homepage_activity_feed_cache, Answer)
+models.signals.post_save.connect(clear_homepage_activity_feed_cache, ProjectInvolvementQuestion)
 
 class OpenBugsManager(models.Manager):
     def get_query_set(self):

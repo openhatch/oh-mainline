@@ -64,6 +64,7 @@ body#project .project_icon { float: left; height: 64px; margin-right: 10px; widt
 body#project .project_icon .alt-text { position: absolute; left: -999px; } /* So that screen readers will read this. */
 
 body#project #other-questions { display: block; margin-bottom: 10px; }
+body#project li:target { background-color: #ffd; }
 body#project .quotemark { color: #555; }
 
 body#project input[name='author_name'] { width: 60%; margin-bottom: 5px; }

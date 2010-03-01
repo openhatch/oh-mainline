@@ -17,6 +17,7 @@ from mysite.profile.views import display_person_web
 from mysite.base.decorators import view
 import mysite.customs.feed
 import mysite.search.controllers
+import mysite.search.models
 
 import feedparser
 import lxml.html
@@ -28,7 +29,7 @@ from django.contrib.auth.decorators import login_required
 def home(request):
 
     data = {}
-    data['entries'] = mysite.customs.feed.cached_blog_entries()[:3]
+    data['entries'] = mysite.customs.feed.cached_blog_entries()[:1]
 
     recommended_bugs = []
     if request.user.is_authenticated():
@@ -41,6 +42,7 @@ def home(request):
     random.shuffle(everybody)
     data['random_profiles'] = everybody[0:5]
 
+    data['recent_answers'] = mysite.search.models.Answer.objects.order_by('-modified_date')[:5]
 
     #get globally recommended bug search stuff (for anonymous users)
     if request.user.is_authenticated():

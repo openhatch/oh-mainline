@@ -31,28 +31,11 @@ about our members who support {{ project.name }}
                 {% for question, answers in question2answer %}
                     <li>
                         <h3><strong>Q:</strong>
-                            {% ifequal question.key_string 'where_to_start' %}
-                                I'd like to participate. How do I begin?
-                            {% endifequal %}
-
-                            {% ifequal question.key_string 'stress' %}
-                                What is a bug or issue with {{ project.name }}
-                                that you've been putting off, neglecting, or
-                                just plain avoiding?
-                            {% endifequal %}
-
-                            {% ifequal question.key_string 'newcomers' %}
-                                What's a good bug for a newcomer to tackle?
-                            {% endifequal %}
-
-                            {% ifequal question.key_string 'non_code_participation' %}
-                                Other than writing code, how can I contribute?
-
-                            {% endifequal %}
+                            {% include 'question_text.html' %}
                         </h3>
                         <ul class='answers'>
                             {% for answer in answers %}
-                                <li>
+                                <li id='answer_whose_pk_is_{{ answer.pk }}'>
                                     {% include 'project/voting_controls.html' %}
                                     {% if not question.is_bug_style %}
 

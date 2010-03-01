@@ -10,6 +10,7 @@ import mock
 import urllib
 
 import mysite.base.controllers
+import mysite.search.models
 
 def twill_setup():
     app = AdminMediaHandler(WSGIHandler())
@@ -134,5 +135,30 @@ class TestUnicodifyDecorator(TwillTests):
             self.assertEqual(type(arg), unicode)
 
         sample_thing(utf8_data)
+
+class Feed(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def test_feed_shows_recent_answers(self):
+
+        # Visit the homepage, notice that there are no answers in the context.
+
+        def get_answers_from_homepage():
+            homepage_response = self.client.get('/')
+            return homepage_response.context[0]['recent_answers']
+        
+        self.assertFalse(get_answers_from_homepage())
+
+        # Create a few answers on the project discussion page.
+        for x in range(4):
+            mysite.search.models.Answer.create_dummy()
+
+        recent_answers = mysite.search.models.Answer.objects.all().order_by('-modified_date')
+
+        # Visit the homepage, assert that the feed item data is on the page,
+        # ordered by date descending.
+        actual_answer_pks = list(get_answers_from_homepage().values_list('pk', flat=True))
+        expected_answer_pks = list(recent_answers.values_list('pk', flat=True))
+        self.assertEqual(actual_answer_pks, expected_answer_pks)
 
 # vim: set ai et ts=4 sw=4 nu:
