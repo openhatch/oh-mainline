@@ -13,6 +13,7 @@ from django.core.files.base import ContentFile
 from django.conf import settings
 from django.contrib.auth import SESSION_KEY, BACKEND_SESSION_KEY, load_backend
 from django.core.urlresolvers import reverse
+from django.core.cache import cache
 
 import datetime
 import sys
@@ -20,6 +21,7 @@ import uuid
 import urllib
 import random
 import collections
+import simplejson
 
 DEFAULT_LOCATION='Inaccessible Island'
 
@@ -203,7 +205,26 @@ class Person(models.Model):
         return sum([list(pfe.get_published_citations())
             for pfe in self.get_published_portfolio_entries()], [])
 
+    def get_tag_texts_cache_key(self):
+        return 'tag_texts_for_person_with_pk_%d' % self.pk
+
     def get_tag_texts_for_map(self):
+
+        cache_key = self.get_tag_texts_cache_key()
+        
+        # Let's check to see whether we can avoid all this expensive DB jiggery after all
+        cached_tag_texts_string = cache.get(cache_key)
+
+        if cached_tag_texts_string is None:
+            tag_texts = self._get_tag_texts_for_map_without_cache()
+            cached_tag_texts_string = simplejson.dumps(tag_texts)
+            cache.set(cache_key, cached_tag_texts_string, 864000)
+        else:
+            tag_texts = simplejson.loads(cached_tag_texts_string)
+
+        return tag_texts
+
+    def _get_tag_texts_for_map_without_cache(self):
         """Return a list of Tags linked to this Person.  Tags that would be useful from the map view of the people list"""
         exclude_me = TagType.objects.filter(name__in=['understands_not', 'studying'])
         my_tag_texts = (link.tag.text for link in Link_Person_Tag.objects.filter(person=self) if link.tag.tag_type not in exclude_me)
