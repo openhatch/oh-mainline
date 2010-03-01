@@ -45,6 +45,9 @@
                 <a href='/people/{{ person.user.username }}'>
                     {{ person.user.first_name }}
                     {{ person.user.last_name }}
+                    <span class='username' style="font-size: .7em;">
+                        ({{ person.user.username }})
+                    </span>
                 </a>
             </h1>
             {% else %}
