@@ -137,6 +137,18 @@ class Person(models.Model):
         except ValueError:
             return '/static/images/profile-photos/penguin-40px.png'
 
+    def get_photo_thumbnail_width(self):
+        try:
+            return self.photo_thumbnail.width
+        except ValueError:
+            return 40
+
+    def get_photo_thumbnail_height(self):
+        try:
+            return self.photo_thumbnail.height
+        except ValueError:
+            return 51
+
     def get_photo_thumbnail_30px_wide_url_or_default(self):
         try:
             return self.photo_thumbnail_30px_wide.url

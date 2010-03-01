@@ -184,6 +184,9 @@ People Search
 {{ block.super }}
 {% if people %}
 <script type="text/javascript">
+
+    var showEverybody = {{ show_everybody_javascript_boolean }};
+
     {% if center_json and not geocode_failed %}
         var center = {{ center_json|safe}}; /* This comes from Python geocoding the ?center= . */
         var center_name = {{ center_name_json|safe}}; /* This is the string form of the above. */

@@ -106,9 +106,10 @@ PeopleMapController.prototype.initialize = function(options) {
     update_people_count = function () {
         function update_inaccessible_island_help() {
             if (! my_visible($('.inaccessible_islander:eq(0)'))) {
+                // hide the text, "including people who have not set a location"
                 $('#people_without_locations').hide();
             } else {
-		$('#people_without_locations').show();
+                $('#people_without_locations').show();
             }
         }
 
@@ -270,13 +271,14 @@ if (mapController.the_marker_for_inaccessible_island !== null) {
                 }
 
                 all_markers.push(marker);
+
                 /* if this is the last one, call update_all_markers() */
-if (num_of_persons_who_can_be_geocoded == number_of_people_geocoded) {
-    update_all_markers();
-    google.maps.event.addListener(mapController.map,
-        'idle',
-        update_all_markers);
-}
+                if (num_of_persons_who_can_be_geocoded == number_of_people_geocoded) {
+                    if (!showEverybody) { update_all_markers(); }
+                    google.maps.event.addListener(mapController.map,
+                        'idle',
+                        update_all_markers);
+                }
             };
         } // end function create_a_callback
 
