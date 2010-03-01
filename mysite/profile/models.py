@@ -660,6 +660,10 @@ def update_link_person_tag_cache(sender, instance, **kwargs):
     from mysite.profile.tasks import UpdateSomeonesTagCache
     UpdateSomeonesTagCache.delay()
 
+def update_pf_cache(sender, instance, **kwargs):
+    from mysite.profile.tasks import UpdateSomeonesPFCache
+    UpdateSomeonesPFCache.delay()
+
 def make_forwarder_actually_work(sender, instance, **kwargs):
     from mysite.profile.tasks import RegeneratePostfixAliasesForForwarder
     RegeneratePostfixAliasesForForwarder.delay()
@@ -669,5 +673,8 @@ models.signals.post_save.connect(update_the_person_index, sender=PortfolioEntry)
 models.signals.post_save.connect(make_forwarder_actually_work, sender=Forwarder)
 models.signals.post_save.connect(update_link_person_tag_cache, sender=Link_Person_Tag)
 models.signals.post_delete.connect(update_link_person_tag_cache, sender=Link_Person_Tag)
+
+models.signals.post_save.connect(update_pf_cache, sender=PortfolioEntry)
+models.signals.post_delete.connect(update_pf_cache, sender=PortfolioEntry)
 
 # vim: set nu:
