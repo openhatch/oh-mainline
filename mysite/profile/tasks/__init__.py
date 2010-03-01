@@ -16,8 +16,8 @@ import random
 import traceback
 import mysite.profile.search_indexes
 
-## django
 from django.conf import settings
+from django.core.cache import cache
 
 def create_citations_from_ohloh_contributor_facts(dia_id, ohloh_results):
     '''Input: A sequence of Ohloh ContributionFact dicts
@@ -321,3 +321,12 @@ try:
     celery.registry.tasks.register(ReindexPerson)
 except celery.registry.AlreadyRegistered:
     pass
+
+class UpdateSomeonesTagCache(Task):
+    def run(self, person__pk, **kwargs):
+        person = mysite.profile.models.Person.objects.get(pk=person__pk)
+        cache_key = person.get_tag_texts_cache_key()
+        cache.remove(cache_key)
+
+        # This getter will populate the cache
+        _ = person.get_tag_texts_for_map()
