@@ -773,7 +773,16 @@ PortfolioEntry.Delete.deleteIt = function () {
     return false;
 }
 PortfolioEntry.Delete.bindEventHandlers = function() {
-    $('.portfolio_entry .actions li.delete_portfolio_entry a').click(PortfolioEntry.Delete.deleteIt);
+    $('.portfolio_entry .actions li.delete_portfolio_entry a').click(function(){
+        keep_going = confirm('are you sure?');
+        if(keep_going){
+            PortfolioEntry.Delete.deleteIt();
+            return false;
+        }
+        else{
+            return false;
+        }
+    });
 };
 
 
