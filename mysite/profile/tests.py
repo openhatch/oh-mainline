@@ -1491,8 +1491,13 @@ class EditContactBlurbForwarderification(TwillTests):
         it also takes said person's username or person object or something
         we're testing this:
             the controller returns a string which is the same as the one that it received, except $fwd is replaced with the output of generate_forwarder
-            the Forwarder db table contains a row for our new forwarder
+            the Forwarder db table contains a row for our new forwarder 
+                (which we created with the generate_forwarder controller)
         '''
+        # grab asheesh by the horns
+        sheesh = mysite.profile.models.Person.get_by_username('paulproteus')
+        # make them a forwarder
+        mysite.base.controllers.generate_forwarder(sheesh.user)
         # we have a string that contains the substr $fwd
         mystr = "email me here: $fwd.  it'll be great"
         user_to_forward_to = User.objects.get(username='paulproteus')

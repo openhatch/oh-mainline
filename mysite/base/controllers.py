@@ -43,7 +43,6 @@ def generate_forwarder(user):
     random_str = "%s.%s" % (user.username, base64.b64encode(os.urandom(6), altchars='_.'))
     our_new_forwarder = Forwarder(address=random_str, user=user, expires_on=datetime.datetime.utcnow() + settings.FORWARDER_LIFETIME_TIMEDELTA, stops_being_listed_on=datetime.datetime.utcnow() + settings.FORWARDER_LISTINGTIME_TIMEDELTA)
     our_new_forwarder.save()
-    return our_new_forwarder.get_email_address()
 
 def get_notification_from_request(request):
     notification_id = request.GET.get('msg', None)
