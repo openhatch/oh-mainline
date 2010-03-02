@@ -1,5 +1,6 @@
 import sys
 import os
+from datetime import timedelta
 import datetime
 from mysite.customs import ohloh
 import urllib2
@@ -9,15 +10,15 @@ import mysite.customs.github
 import mysite.customs.debianqa
 import mysite.profile.models
 from mysite.search.models import Project
-from celery.task import Task
+from celery.task import Task, PeriodicTask
 import celery.registry
 import time
 import random
 import traceback
 import mysite.profile.search_indexes
 
-## django
 from django.conf import settings
+import django.core.cache
 
 def create_citations_from_ohloh_contributor_facts(dia_id, ohloh_results):
     '''Input: A sequence of Ohloh ContributionFact dicts
@@ -264,6 +265,14 @@ class ReindexPerson(Task):
         pi = mysite.profile.search_indexes.PersonIndex(person)
         pi.update_object(person)
 
+class GarbageCollectForwarders(PeriodicTask):
+    run_every = timedelta(days=1)
+    def run(self, **kwargs):
+        logger = self.get_logger(**kwargs)
+        logger.info("Started garbage collecting profile email forwarders")
+        mysite.profile.models.Forwarder.garbage_collect()
+
+
 class RegeneratePostfixAliasesForForwarder(Task):
     def run(self, **kwargs):
         # Generate the table...
@@ -319,5 +328,26 @@ try:
     celery.registry.tasks.register(RegeneratePostfixAliasesForForwarder)
     celery.registry.tasks.register(FetchPersonDataFromOhloh)
     celery.registry.tasks.register(ReindexPerson)
+    celery.registry.tasks.register(GarbageCollectForwarders)
 except celery.registry.AlreadyRegistered:
     pass
+
+from celery.decorators import task
+
+@task
+def update_person_tag_cache(person__pk):
+    person = mysite.profile.models.Person.objects.get(pk=person__pk)
+    cache_key = person.get_tag_texts_cache_key()
+    django.core.cache.cache.delete(cache_key)
+    
+    # This getter will populate the cache
+    return person.get_tag_texts_for_map()
+
+@task
+def update_someones_pf_cache(person__pk):
+    person = mysite.profile.models.Person.objects.get(pk=person__pk)
+    cache_key = person.get_cache_key_for_projects()
+    django.core.cache.cache.delete(cache_key)
+    
+    # This getter will populate the cache
+    return person.get_list_of_project_names()

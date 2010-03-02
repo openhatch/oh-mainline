@@ -1330,7 +1330,7 @@ class DeleteAnswer(TwillTests):
         question__pk = 2
         q = ProjectInvolvementQuestion.create_dummy(pk=question__pk, is_bug_style=True)
         # create our dummy answer
-        a = BugAnswer.create_dummy(title='i want this bug fixed', details='for these reasons',question=q, project=p, author=User.objects.get(username='paulproteus'))
+        a = Answer.create_dummy(title='i want this bug fixed', text='for these reasons',question=q, project=p, author=User.objects.get(username='paulproteus'))
         # delete our answer
         POST_data = {
                 'answer__pk': a.pk,
