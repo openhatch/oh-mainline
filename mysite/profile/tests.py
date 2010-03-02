@@ -1912,4 +1912,31 @@ class PersonTagCache(TwillTests):
                                           simplejson.dumps({'value': ['Banshee']}),
                                           86400 * 10)
 
+class PersonProjectCache(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    @mock.patch('django.core.cache.cache')
+    def test(self, mock_cache):
+        '''This test:
+        * Creates one person whose tag_texts say he can mentor in Banshee
+        * Ensures that get_tag_texts_for_map() caches that
+        * Deletes the Link_Person_Tag object
+        * Ensures the celery task re-fills the cache entry as being empty.'''
+
+        # 0. Our fake cache is empty always
+        mock_cache.get.return_value = None
+
+        # 1. Give the person a PFE
+        paulproteus = Person.objects.get(user__username='paulproteus')
+        portfolio_entry, _ =PortfolioEntry.objects.get_or_create(
+            project=Project.create_dummy(name='project name'),
+            is_published=True,
+            person=paulproteus)
+
+        # 2. Make sure we cached it
+        mock_cache.set.assert_called_with(paulproteus.get_cache_key_for_projects(),
+                                          simplejson.dumps({'value': [
+                                            'project name']}),
+                                          86400 * 10)
+        
  # vim: set ai et ts=4 sw=4 nu:

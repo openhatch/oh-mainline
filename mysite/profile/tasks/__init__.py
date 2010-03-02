@@ -333,11 +333,11 @@ def update_person_tag_cache(person__pk):
     # This getter will populate the cache
     return person.get_tag_texts_for_map()
 
-class UpdateSomeonesPFCache(Task):
-    def run(self, person__pk, **kwargs):
-        person = mysite.profile.models.Person.objects.get(pk=person__pk)
-        cache_key = person.get_cache_key_for_projects()
-        cache.remove(cache_key)
-
-        # This getter will populate the cache
-        _ = person.get_list_of_project_names()
+@task
+def update_someones_pf_cache(person__pk):
+    person = mysite.profile.models.Person.objects.get(pk=person__pk)
+    cache_key = person.get_cache_key_for_projects()
+    django.core.cache.cache.delete(cache_key)
+    
+    # This getter will populate the cache
+    return person.get_list_of_project_names()

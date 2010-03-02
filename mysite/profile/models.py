@@ -165,7 +165,7 @@ class Person(models.Model):
 
     @mysite.base.decorators.cache_method('get_cache_key_for_projects')
     def get_list_of_project_names(self):
-        return self.get_published_portfolio_entries().values_list('project__name', flat=True)
+        return list(self.get_published_portfolio_entries().values_list('project__name', flat=True))
 
     @staticmethod
     def only_terms_with_results(terms):
@@ -661,8 +661,8 @@ def update_link_person_tag_cache(sender, instance, **kwargs):
     update_person_tag_cache.delay(person__pk=instance.person.pk)
 
 def update_pf_cache(sender, instance, **kwargs):
-    from mysite.profile.tasks import UpdateSomeonesPFCache
-    UpdateSomeonesPFCache.delay()
+    from mysite.profile.tasks import update_someones_pf_cache
+    update_someones_pf_cache(instance.person.pk)
 
 def make_forwarder_actually_work(sender, instance, **kwargs):
     from mysite.profile.tasks import RegeneratePostfixAliasesForForwarder
