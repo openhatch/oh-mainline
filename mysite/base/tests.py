@@ -161,4 +161,26 @@ class Feed(TwillTests):
         expected_answer_pks = list(recent_answers.values_list('pk', flat=True))
         self.assertEqual(actual_answer_pks, expected_answer_pks)
 
+class CacheMethod(TwillTests):
+    def test(self):
+        # Step 1: Create a method where we can test if it was cached (+ cache it)
+        class SomeClass:
+            def __init__(self):
+                self.call_counter = 0
+
+            def cache_key_getter_name(self):
+                return 'doodles'
+
+            @mysite.base.decorators.cache_method('cache_key_getter_name')
+            def some_method(self):
+                self.call_counter += 1
+                return self.call_counter
+
+        # Step 2: Call it once to fill the cache
+        sc = SomeClass()
+        self.assertEqual(sc.some_method(), 1)
+
+        # Step 3: Call it again and see that the cache was used this time
+        self.assertEqual(sc.someMethod(), 1)
+
 # vim: set ai et ts=4 sw=4 nu:
