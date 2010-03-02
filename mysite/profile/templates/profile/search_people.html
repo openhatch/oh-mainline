@@ -41,18 +41,19 @@ People Search
 </form>
     {% if not q %}
     <ul class='suggestions'>
+        {# this is cached in the view #}
         {% for suggestion in suggestions %}
             <li>
                 <span class='introduce_suggestions'>Popular
                     {{ suggestion.display_name}}:</span>
                 <ul>
                     {% for thing in suggestion.values|slice:":3" %}
-		    {% include 'profile/suggestion_li.html' %}
+                    {% include 'profile/suggestion_li.html' %}
                     {% endfor %}
                 </ul>
                 <ul>
                     {% for thing in suggestion.values|slice:"3:" %}
-		    {% include 'profile/suggestion_li.html' %}
+                    {% include 'profile/suggestion_li.html' %}
                     {% endfor %}
                 </ul>
             </li>
