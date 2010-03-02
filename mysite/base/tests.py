@@ -10,6 +10,7 @@ import mock
 import urllib
 
 import mysite.base.controllers
+import mysite.base.decorators
 import mysite.search.models
 
 def twill_setup():
@@ -162,7 +163,12 @@ class Feed(TwillTests):
         self.assertEqual(actual_answer_pks, expected_answer_pks)
 
 class CacheMethod(TwillTests):
-    def test(self):
+
+    @mock.patch('django.core.cache.cache')
+    def test(self, mock_cache):
+        # Step 0: mock_cache.get() needs to return None
+        mock_cache.get.return_value = None
+        
         # Step 1: Create a method where we can test if it was cached (+ cache it)
         class SomeClass:
             def __init__(self):
@@ -174,13 +180,13 @@ class CacheMethod(TwillTests):
             @mysite.base.decorators.cache_method('cache_key_getter_name')
             def some_method(self):
                 self.call_counter += 1
-                return self.call_counter
+                return str(self.call_counter)
 
         # Step 2: Call it once to fill the cache
         sc = SomeClass()
-        self.assertEqual(sc.some_method(), 1)
+        self.assertEqual(sc.some_method(), '1')
 
-        # Step 3: Call it again and see that the cache was used this time
-        self.assertEqual(sc.someMethod(), 1)
+        # Step 3: See if the cache has it now
+        mock_cache.set.assert_called_with('doodles', '"1"', 86400 * 10)
 
 # vim: set ai et ts=4 sw=4 nu:
