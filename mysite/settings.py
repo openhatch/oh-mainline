@@ -116,6 +116,7 @@ HAYSTACK_SEARCH_ENGINE='solr'
 HAYSTACK_SOLR_URL='http://127.0.0.1:8983/solr'
 
 INSTALLED_APPS = (
+    'ghettoq',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.humanize',
@@ -148,13 +149,7 @@ TEST_RUNNER = 'mysite._profiling.profile_tests'
 TEST_PROFILE = '/tmp/openhatch-profiling-data.%s' % os.environ.get('USER', 'unknown')
 
 ## AMQP, Rabbit Queue, Celery
-CELERY_BACKEND = "amqp"
-
-BROKER_HOST = "localhost"
-BROKER_PORT = 5672
-BROKER_VHOST = "/"
-BROKER_USER = "rabbiter"
-BROKER_PASSWORD = "johT4qui"
+CARROT_BACKEND = "ghettoq.taproot.Database"
 
 cooked_data_password = 'AXQaTjp3'
 AUTH_PROFILE_MODULE = "profile.Person"
