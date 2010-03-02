@@ -1865,12 +1865,6 @@ class EmailForwarderResolver(TwillTests):
 class PersonTagCache(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
-    def setUp(self):
-        TwillTests.setUp(self)
-        import django.conf
-        django.conf.settings.CELERY_ALWAYS_EAGER = True
-        
-
     @mock.patch('django.core.cache.cache')
     def test(self, mock_cache):
         '''This test:
@@ -1903,7 +1897,7 @@ class PersonTagCache(TwillTests):
 
         # 3. Delete the link() and make sure the cache has the right value
         link.delete() # should enqueue a task to update the cache (post-delete)
-        mock_cache.remove.assert_called_with(paulproteus.get_tag_texts_cache_key())
+        mock_cache.delete.assert_called_with(paulproteus.get_tag_texts_cache_key())
 
         mock_cache.set.assert_called_with(paulproteus.get_tag_texts_cache_key(),
                                           simplejson.dumps({'value': []}),

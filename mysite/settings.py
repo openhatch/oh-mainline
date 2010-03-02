@@ -202,4 +202,4 @@ FORWARDER_LIFETIME_TIMEDELTA = datetime.timedelta(days=3)
 
 POSTFIX_FORWARDER_TABLE_PATH = '/tmp/email_forwarders'
 
-#CELERY_ALWAYS_EAGER = True # This is set to True in the test runner.
+CELERY_ALWAYS_EAGER = True # This is set to True in the test runner also.
