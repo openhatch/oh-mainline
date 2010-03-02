@@ -86,6 +86,7 @@ class Project(OpenHatchModel):
     # FIXME: Remove this field and update fixtures.
     icon_url = models.URLField(max_length=200)
 
+    icon_is_wrong = models.BooleanField(default=False)
     icon_raw = models.ImageField(
             upload_to=lambda a,b: Project.generate_random_icon_path(a, b),
             null=True,
