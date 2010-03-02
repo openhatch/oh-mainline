@@ -7,31 +7,15 @@ class Migration:
     
     def forwards(self, orm):
         
-        # Adding field 'Answer.author_name'
-        db.add_column('search_answer', 'author_name', orm['search.answer:author_name'])
-        
         # Adding field 'Project.icon_is_wrong'
         db.add_column('search_project', 'icon_is_wrong', orm['search.project:icon_is_wrong'])
         
-        # Changing field 'Answer.author'
-        # (to signature: django.db.models.fields.related.ForeignKey(to=orm['auth.User'], null=True))
-        db.alter_column('search_answer', 'author_id', orm['search.answer:author'])
-        
-    
     
     def backwards(self, orm):
-        
-        # Deleting field 'Answer.author_name'
-        db.delete_column('search_answer', 'author_name')
         
         # Deleting field 'Project.icon_is_wrong'
         db.delete_column('search_project', 'icon_is_wrong')
         
-        # Changing field 'Answer.author'
-        # (to signature: django.db.models.fields.related.ForeignKey(to=orm['auth.User']))
-        db.alter_column('search_answer', 'author_id', orm['search.answer:author'])
-        
-    
     
     models = {
         'auth.group': {
