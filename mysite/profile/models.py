@@ -13,6 +13,7 @@ from django.core.files.base import ContentFile
 from django.conf import settings
 from django.contrib.auth import SESSION_KEY, BACKEND_SESSION_KEY, load_backend
 from django.core.urlresolvers import reverse
+from django.core.cache import cache
 
 import datetime
 import sys
@@ -20,6 +21,7 @@ import uuid
 import urllib
 import random
 import collections
+import simplejson
 
 DEFAULT_LOCATION='Inaccessible Island'
 
@@ -137,6 +139,18 @@ class Person(models.Model):
         except ValueError:
             return '/static/images/profile-photos/penguin-40px.png'
 
+    def get_photo_thumbnail_width(self):
+        try:
+            return self.photo_thumbnail.width
+        except ValueError:
+            return 40
+
+    def get_photo_thumbnail_height(self):
+        try:
+            return self.photo_thumbnail.height
+        except ValueError:
+            return 51
+
     def get_photo_thumbnail_30px_wide_url_or_default(self):
         try:
             return self.photo_thumbnail_30px_wide.url
@@ -146,8 +160,12 @@ class Person(models.Model):
     def get_published_portfolio_entries(self):
         return PortfolioEntry.objects.filter(person=self, is_published=True, is_deleted=False)
 
+    def get_cache_key_for_projects(self):
+        return 'projects_for_person_with_pk_%d_v2' % self.pk
+
+    @mysite.base.decorators.cache_method('get_cache_key_for_projects')
     def get_list_of_project_names(self):
-        return self.get_published_portfolio_entries().values_list('project__name', flat=True)
+        return list(self.get_published_portfolio_entries().values_list('project__name', flat=True))
 
     @staticmethod
     def only_terms_with_results(terms):
@@ -191,6 +209,10 @@ class Person(models.Model):
         return sum([list(pfe.get_published_citations())
             for pfe in self.get_published_portfolio_entries()], [])
 
+    def get_tag_texts_cache_key(self):
+        return 'tag_texts_for_person_with_pk_%d_v2' % self.pk
+
+    @mysite.base.decorators.cache_method('get_tag_texts_cache_key')
     def get_tag_texts_for_map(self):
         """Return a list of Tags linked to this Person.  Tags that would be useful from the map view of the people list"""
         exclude_me = TagType.objects.filter(name__in=['understands_not', 'studying'])
@@ -651,7 +673,13 @@ class Forwarder(models.Model):
                 lines.append(line)
         return lines
         
+def update_link_person_tag_cache(sender, instance, **kwargs):
+    from mysite.profile.tasks import update_person_tag_cache
+    update_person_tag_cache.delay(person__pk=instance.person.pk)
 
+def update_pf_cache(sender, instance, **kwargs):
+    from mysite.profile.tasks import update_someones_pf_cache
+    update_someones_pf_cache(instance.person.pk)
 
 def make_forwarder_actually_work(sender, instance, **kwargs):
     from mysite.profile.tasks import RegeneratePostfixAliasesForForwarder
@@ -660,5 +688,10 @@ def make_forwarder_actually_work(sender, instance, **kwargs):
 models.signals.post_save.connect(update_the_project_cached_contributor_count, sender=PortfolioEntry)
 models.signals.post_save.connect(update_the_person_index, sender=PortfolioEntry)
 models.signals.post_save.connect(make_forwarder_actually_work, sender=Forwarder)
+models.signals.post_save.connect(update_link_person_tag_cache, sender=Link_Person_Tag)
+models.signals.post_delete.connect(update_link_person_tag_cache, sender=Link_Person_Tag)
+
+models.signals.post_save.connect(update_pf_cache, sender=PortfolioEntry)
+models.signals.post_delete.connect(update_pf_cache, sender=PortfolioEntry)
 
 # vim: set nu:

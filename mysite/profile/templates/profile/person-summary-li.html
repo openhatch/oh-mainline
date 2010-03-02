@@ -1,8 +1,16 @@
 {% load profile_extras %}
+{% load cache %}
 {# Used, at time of writing, in profile/map.html and profile/search_people.html #}
 <li id="person_summary_{{person.pk}}" class="should_be_visible{% if not person.location_is_public %} inaccessible_islander{% endif %}">
     {% ifnotequal slug "people" %}<a href="{{ person.profile_url }}">{% endifnotequal %}
-    <img src="{{ person.get_photo_thumbnail_url_or_default }}" />
+    {% with person.get_photo_thumbnail_url_or_default as thumbnail_url %}
+        <img src="{{ thumbnail_url }}"
+            {% cache 864000 person_summary_image_dimensions thumbnail_url %}
+                width='{{ person.get_photo_thumbnail_width }}'
+                height='{{ person.get_photo_thumbnail_height }}'
+            {% endcache %}
+        />
+    {% endwith %}
     <span class="people-view-info">
         {% ifequal slug "people" %}
         <a class='profile-link person-summary-button' href='{{ person.profile_url }}' 

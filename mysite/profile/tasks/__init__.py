@@ -17,8 +17,8 @@ import random
 import traceback
 import mysite.profile.search_indexes
 
-## django
 from django.conf import settings
+import django.core.cache
 
 def create_citations_from_ohloh_contributor_facts(dia_id, ohloh_results):
     '''Input: A sequence of Ohloh ContributionFact dicts
@@ -331,3 +331,23 @@ try:
     celery.registry.tasks.register(GarbageCollectForwarders)
 except celery.registry.AlreadyRegistered:
     pass
+
+from celery.decorators import task
+
+@task
+def update_person_tag_cache(person__pk):
+    person = mysite.profile.models.Person.objects.get(pk=person__pk)
+    cache_key = person.get_tag_texts_cache_key()
+    django.core.cache.cache.delete(cache_key)
+    
+    # This getter will populate the cache
+    return person.get_tag_texts_for_map()
+
+@task
+def update_someones_pf_cache(person__pk):
+    person = mysite.profile.models.Person.objects.get(pk=person__pk)
+    cache_key = person.get_cache_key_for_projects()
+    django.core.cache.cache.delete(cache_key)
+    
+    # This getter will populate the cache
+    return person.get_list_of_project_names()
