@@ -120,7 +120,11 @@ about our members who support {{ project.name }}
                     <p style='font-size: .9em; text-align: right; margin: 5px 0 0 0;'>
                     from
                     <a href='{{ random_pfentry.person.profile_url }}'>
-                        {{ random_pfentry.person.get_full_name_or_username }}'s
+                        {% with random_pfentry.person.user as user%}
+                        {% with 1 as posessive %}
+                        {% include 'name.html' %}
+                        {% endwith %}
+                        {% endwith %}
                         {% spaceless %}
                         <span>profile</span>
                         {% endspaceless %}
