@@ -104,14 +104,14 @@ about our members who support {{ project.name }}
             <h3>About {{ project.name }}</h3>
         </div>
         <div class='body'>
-            {% if project.icon_for_profile %}
+            {% if project.icon_for_profile and not project.icon_is_wrong%}
             <div class='project_icon' 
                     style="float: left; width: 64px; margin-right: 20px; background-image: url('{{ project.icon_for_profile.url }}')"
                     ><span class='alt-text'>
                         (logo)
                     </span></div>
             {% endif %}
-            <div style='float: left; width: {% if not project.icon_for_profile %}100%{% else %}70%{% endif %};'>
+            <div style='float: left; width: {% if not project.icon_for_profile or project.icon_is_wrong %}100%{% else %}70%{% endif %};'>
                     <h2 style='font-size: 1.3em; font-weight: normal;'>
                         {% spaceless %}
                             <span>{{ random_pfentry.project_description|urlize|linebreaksbr}}</span>
