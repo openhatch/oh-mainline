@@ -134,19 +134,19 @@ class Project(OpenHatchModel):
     def get_url_of_icon_or_generic(self):
         # Recycle icon_smaller_for_badge since it's the same size as
         # the icon for most other uses (profiles, etc.).
-        if self.icon_for_profile:
+        if self.icon_for_profile and not self.icon_is_wrong:
             return self.icon_for_profile.url
         else:
             return settings.MEDIA_URL + 'no-project-icon.png'
 
     def get_url_of_badge_size_icon_or_generic(self):
-        if self.icon_smaller_for_badge:
+        if self.icon_smaller_for_badge and not self.icon_is_wrong:
             return self.icon_smaller_for_badge.url
         else:
             return settings.MEDIA_URL + 'no-project-icon-w=40.png'
 
     def get_url_of_search_result_icon_or_generic(self):
-        if self.icon_for_search_result:
+        if self.icon_for_search_result and not self.icon_is_wrong:
             return self.icon_for_search_result.url
         else:
             return settings.MEDIA_URL + 'no-project-icon-w=20.png'
