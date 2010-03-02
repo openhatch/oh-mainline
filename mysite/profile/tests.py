@@ -1862,4 +1862,58 @@ class EmailForwarderResolver(TwillTests):
         # this one isn't in the table at all
         test_possible_forwarder_address("oranges", True, False, False)
 
+class PersonTagCache(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def setUp(self):
+        import django.conf
+        django.conf.settings.CELERY_ALWAYS_EAGER = True
+
+    @mock.patch('django.core.cache.cache')
+    def test(self, mock_cache):
+        '''This test:
+        * Creates one person whose tag_texts say he can mentor in Banshee
+        * Ensures that get_tag_texts_for_map() caches that
+        * Deletes the Link_Person_Tag object
+        * Ensures the celery task re-fills the cache entry as being empty.'''
+
+        # 0. Our fake cache is empty always
+        mock_cache.get.return_value = None
+
+        # 1. Set link
+        paulproteus = Person.objects.get(user__username='paulproteus')
+        banshee = Project.create_dummy(name='Banshee')
+        can_mentor, _ = TagType.objects.get_or_create(name='can_mentor')
+        
+        willing_to_mentor_banshee, _ = Tag.objects.get_or_create(
+            tag_type=can_mentor,
+            text='Banshee')
+        link = Link_Person_Tag(person=paulproteus,
+                               tag=willing_to_mentor_banshee)
+        link.save()
+
+        # 2. Call get_tag_texts_for_map() and make sure we cached it
+        paulproteus.get_tag_texts_for_map()
+        mock_cache.set.assert_called_with(paulproteus.get_tag_texts_cache_key(),
+                                          simplejson.dumps('Banshee'),
+                                          86400 * 10)
+
+        # 3. Delete the link() and make sure the cache has the right value
+        link.delete() # should enqueue a task to update the cache (post-delete)
+        mock_cache.set.assert_called_with(paulproteus.get_tag_texts_cache_key(),
+                                          simplejson.dumps(''),
+                                          86400 * 10)
+
+        # 4. Create a new Link and make sure it's cached properly again
+        link = Link_Person_Tag(person=paulproteus,
+                               tag=willing_to_mentor_banshee)
+        link.save() # should fire bgtask to update the cache (post-save signal)
+        mock_cache.set.assert_called_with(paulproteus.get_tag_texts_cache_key(),
+                                          simplejson.dumps('Banshee'),
+                                          86400 * 10)
+
+    def tearDown(self):
+        import django.conf
+        del django.conf.settings.CELERY_ALWAYS_EAGER
+
  # vim: set ai et ts=4 sw=4 nu:
