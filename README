@@ -87,10 +87,7 @@ Ta-da. In theory we/you should do that every month, when MaxMind does a refresh.
 
 People search uses Solr. We use Haystack for managing Solr.
 
-=== Create its schema ===
-
-Start in milestone-a, then run
-    ./bin/mysite  build_solr_schema > parts/download_solr/example/solr/conf/schema.xml 
+FIXME: Asheesh, please explain how to deploy Solr with the special config file.
 
 === Run the server ===
 

@@ -3,6 +3,9 @@ from odict import odict
 import re
 import collections
 import mysite.base.helpers
+import simplejson
+from django.core.cache import cache
+from functools import partial
 
 from django.template.loader import render_to_string
 from django.shortcuts import render_to_response
@@ -55,3 +58,25 @@ def no_str_in_the_list(l):
     for elt in l:
         mysite.base.helpers.assert_or_pdb(type(l) != str)
     return l
+
+def decorator_factory(decfac): # partial is functools.partial
+    "decorator_factory(decfac) returns a one-parameter family of decorators"
+    return partial(lambda df, param: decorator(partial(df, param)), decfac)
+
+@decorator_factory 
+def cache_method(cache_key_getter_name, func, *args, **kwargs):
+    # Let's check to see whether we can avoid all this expensive DB jiggery after all
+    self = args[0]
+    cache_key = getattr(self, cache_key_getter_name)()
+    cached_json = cache.get(cache_key)
+
+    if cached_json is None:
+        value = func(*args, **kwargs)
+        cached_json = simplejson.dumps(value)
+        import logging
+        cache.set(cache_key, cached_json, 864000)
+        logging.info('cached output of func.__name__: %s' % cached_json)
+    else:
+        value = simplejson.loads(cached_json)
+
+    return value

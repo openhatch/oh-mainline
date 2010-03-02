@@ -507,6 +507,8 @@ def people(request):
         data['center_name'] = request.GET.get('center', '')
         data['center_name_json'] = simplejson.dumps(request.GET.get('center', ''))
 
+    data['show_everybody_javascript_boolean'] = simplejson.dumps(not data.get('center_json', False))
+
     data['person_id2lat_long_as_json'] = simplejson.dumps(
         dict( (person_id, simplejson.loads(mysite.base.controllers.cached_geocoding_in_json(person_id2data[person_id]['location'])))
               for person_id in person_id2data))
