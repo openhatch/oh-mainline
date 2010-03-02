@@ -1862,4 +1862,104 @@ class EmailForwarderResolver(TwillTests):
         # this one isn't in the table at all
         test_possible_forwarder_address("oranges", True, False, False)
 
+class PersonTagCache(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    @mock.patch('django.core.cache.cache')
+    def test(self, mock_cache):
+        '''This test:
+        * Creates one person whose tag_texts say he can mentor in Banshee
+        * Ensures that get_tag_texts_for_map() caches that
+        * Deletes the Link_Person_Tag object
+        * Ensures the celery task re-fills the cache entry as being empty.'''
+
+        # 0. Our fake cache is empty always
+        mock_cache.get.return_value = None
+
+        # 1. Set link
+        paulproteus = Person.objects.get(user__username='paulproteus')
+        banshee = Project.create_dummy(name='Banshee')
+        can_mentor, _ = TagType.objects.get_or_create(name='can_mentor')
+        
+        willing_to_mentor_banshee, _ = Tag.objects.get_or_create(
+            tag_type=can_mentor,
+            text='Banshee')
+        link = Link_Person_Tag(person=paulproteus,
+                               tag=willing_to_mentor_banshee)
+        link.save()
+
+        # 2. Call get_tag_texts_for_map() and make sure we cached it
+        paulproteus.get_tag_texts_for_map()
+        mock_cache.set.assert_called_with(paulproteus.get_tag_texts_cache_key(),
+                                          simplejson.dumps({'value': ['Banshee']}),
+                                          86400 * 10)
+        mock_cache.set.reset_mock()
+
+        # 3. Delete the link() and make sure the cache has the right value
+        link.delete() # should enqueue a task to update the cache (post-delete)
+        mock_cache.delete.assert_called_with(paulproteus.get_tag_texts_cache_key())
+
+        mock_cache.set.assert_called_with(paulproteus.get_tag_texts_cache_key(),
+                                          simplejson.dumps({'value': []}),
+                                          86400 * 10)
+        mock_cache.set.reset_mock()
+
+        # 4. Create a new Link and make sure it's cached properly again
+        link = Link_Person_Tag(person=paulproteus,
+                               tag=willing_to_mentor_banshee)
+        link.save() # should fire bgtask to update the cache (post-save signal)
+        mock_cache.set.assert_called_with(paulproteus.get_tag_texts_cache_key(),
+                                          simplejson.dumps({'value': ['Banshee']}),
+                                          86400 * 10)
+
+class PersonProjectCache(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    @mock.patch('django.core.cache.cache')
+    def test(self, mock_cache):
+        '''This test:
+        * Creates one person whose tag_texts say he can mentor in Banshee
+        * Ensures that get_tag_texts_for_map() caches that
+        * Deletes the Link_Person_Tag object
+        * Ensures the celery task re-fills the cache entry as being empty.'''
+
+        # 0. Our fake cache is empty always
+        mock_cache.get.return_value = None
+
+        # 1. Give the person a PFE
+        paulproteus = Person.objects.get(user__username='paulproteus')
+        portfolio_entry, _ =PortfolioEntry.objects.get_or_create(
+            project=Project.create_dummy(name='project name'),
+            is_published=True,
+            person=paulproteus)
+
+        # 2. Make sure we cached it
+        mock_cache.set.assert_called_with(paulproteus.get_cache_key_for_projects(),
+                                          simplejson.dumps({'value': [
+                                            'project name']}),
+                                          86400 * 10)
+        mock_cache.set.reset_mock()
+
+        # 3. Delete the PFE, and make sure the cache got deleted
+        portfolio_entry.delete()
+        mock_cache.delete.assert_called_with(
+            paulproteus.get_cache_key_for_projects())
+        mock_cache.set.assert_called_with(
+            paulproteus.get_cache_key_for_projects(),
+            simplejson.dumps({'value': []}),
+            86400 * 10)
+        mock_cache.set.reset_mock()
+
+        # 4. Add a new one, and make sure it's up to date
+        portfolio_entry, _ =PortfolioEntry.objects.get_or_create(
+            project=Project.create_dummy(name='other name'),
+            is_published=True,
+            person=paulproteus)
+        mock_cache.set.assert_called_with(
+            paulproteus.get_cache_key_for_projects(),
+            simplejson.dumps({'value': [
+                'other name']}),
+            86400 * 10)
+        mock_cache.set.reset_mock()
+        
  # vim: set ai et ts=4 sw=4 nu:

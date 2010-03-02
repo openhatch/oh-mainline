@@ -116,6 +116,7 @@ HAYSTACK_SEARCH_ENGINE='solr'
 HAYSTACK_SOLR_URL='http://127.0.0.1:8983/solr'
 
 INSTALLED_APPS = (
+    'ghettoq',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.humanize',
@@ -148,11 +149,7 @@ TEST_RUNNER = 'mysite._profiling.profile_tests'
 TEST_PROFILE = '/tmp/openhatch-profiling-data.%s' % os.environ.get('USER', 'unknown')
 
 ## AMQP, Rabbit Queue, Celery
-AMQP_SERVER = "localhost"
-AMQP_PORT = 5672
-AMQP_USER = "rabbiter"
-AMQP_PASSWORD = "johT4qui"
-AMQP_VHOST = "localhost"
+CARROT_BACKEND = "ghettoq.taproot.Database"
 
 cooked_data_password = 'AXQaTjp3'
 AUTH_PROFILE_MODULE = "profile.Person"
@@ -199,3 +196,5 @@ FORWARDER_DOMAIN = "forwarder.openhatch.org"
 FORWARDER_LIFETIME_TIMEDELTA = datetime.timedelta(days=3)
 
 POSTFIX_FORWARDER_TABLE_PATH = '/tmp/email_forwarders'
+
+#CELERY_ALWAYS_EAGER = True # This is set to True in the test runner also.

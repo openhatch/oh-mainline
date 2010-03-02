@@ -74,7 +74,8 @@ class Project(OpenHatchModel):
     def create_dummy(**kwargs):
         now = datetime.datetime.utcnow()
         data = dict(name=uuid.uuid4().hex,
-                icon_raw='/static/no-project-icon.png')
+                icon_raw='/static/no-project-icon.png',
+                    language='C')
         data.update(kwargs)
         ret = Project(**data)
         ret.save()

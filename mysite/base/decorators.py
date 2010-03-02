@@ -4,7 +4,7 @@ import re
 import collections
 import mysite.base.helpers
 import simplejson
-from django.core.cache import cache
+import django.core.cache
 from functools import partial
 
 from django.template.loader import render_to_string
@@ -68,15 +68,15 @@ def cache_method(cache_key_getter_name, func, *args, **kwargs):
     # Let's check to see whether we can avoid all this expensive DB jiggery after all
     self = args[0]
     cache_key = getattr(self, cache_key_getter_name)()
-    cached_json = cache.get(cache_key)
+    cached_json = django.core.cache.cache.get(cache_key)
 
     if cached_json is None:
         value = func(*args, **kwargs)
-        cached_json = simplejson.dumps(value)
+        cached_json = simplejson.dumps({'value': value})
         import logging
-        cache.set(cache_key, cached_json, 864000)
+        django.core.cache.cache.set(cache_key, cached_json, 864000)
         logging.info('cached output of func.__name__: %s' % cached_json)
     else:
-        value = simplejson.loads(cached_json)
+        value = simplejson.loads(cached_json)['value']
 
     return value
