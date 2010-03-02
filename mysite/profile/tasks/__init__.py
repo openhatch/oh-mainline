@@ -322,11 +322,13 @@ try:
 except celery.registry.AlreadyRegistered:
     pass
 
-class UpdateSomeonesTagCache(Task):
-    def run(self, person__pk, **kwargs):
-        person = mysite.profile.models.Person.objects.get(pk=person__pk)
-        cache_key = person.get_tag_texts_cache_key()
-        cache.remove(cache_key)
+from celery.decorators import task
 
-        # This getter will populate the cache
-        _ = person.get_tag_texts_for_map()
+@task
+def update_person_tag_cache(person__pk):
+    person = mysite.profile.models.Person.objects.get(pk=person__pk)
+    cache_key = person.get_tag_texts_cache_key()
+    cache.delete(cache_key)
+    
+    # This getter will populate the cache
+    return person.get_tag_texts_for_map()

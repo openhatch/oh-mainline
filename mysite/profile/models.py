@@ -658,7 +658,7 @@ class Forwarder(models.Model):
         
 def update_link_person_tag_cache(sender, instance, **kwargs):
     from mysite.profile.tasks import UpdateSomeonesTagCache
-    UpdateSomeonesTagCache.delay()
+    UpdateSomeonesTagCache.delay(person__pk=instance.person.pk)
 
 def make_forwarder_actually_work(sender, instance, **kwargs):
     from mysite.profile.tasks import RegeneratePostfixAliasesForForwarder

@@ -148,11 +148,13 @@ TEST_RUNNER = 'mysite._profiling.profile_tests'
 TEST_PROFILE = '/tmp/openhatch-profiling-data.%s' % os.environ.get('USER', 'unknown')
 
 ## AMQP, Rabbit Queue, Celery
-AMQP_SERVER = "localhost"
-AMQP_PORT = 5672
-AMQP_USER = "rabbiter"
-AMQP_PASSWORD = "johT4qui"
-AMQP_VHOST = "localhost"
+CELERY_BACKEND = "amqp"
+
+BROKER_HOST = "localhost"
+BROKER_PORT = 5672
+BROKER_VHOST = "/"
+BROKER_USER = "rabbiter"
+BROKER_PASSWORD = "johT4qui"
 
 cooked_data_password = 'AXQaTjp3'
 AUTH_PROFILE_MODULE = "profile.Person"
@@ -199,3 +201,5 @@ FORWARDER_DOMAIN = "forwarder.openhatch.org"
 FORWARDER_LIFETIME_TIMEDELTA = datetime.timedelta(days=3)
 
 POSTFIX_FORWARDER_TABLE_PATH = '/tmp/email_forwarders'
+
+#CELERY_ALWAYS_EAGER = True # This is set to True in the test runner.

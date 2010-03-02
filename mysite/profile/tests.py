@@ -1897,14 +1897,16 @@ class PersonTagCache(TwillTests):
         # 2. Call get_tag_texts_for_map() and make sure we cached it
         paulproteus.get_tag_texts_for_map()
         mock_cache.set.assert_called_with(paulproteus.get_tag_texts_cache_key(),
-                                          simplejson.dumps(['Banshee']),
+                                          simplejson.dumps({'value': ['Banshee']}),
                                           86400 * 10)
         mock_cache.set.reset_mock()
 
         # 3. Delete the link() and make sure the cache has the right value
         link.delete() # should enqueue a task to update the cache (post-delete)
+        mock_cache.remove.assert_called_with(paulproteus.get_tag_texts_cache_key())
+
         mock_cache.set.assert_called_with(paulproteus.get_tag_texts_cache_key(),
-                                          simplejson.dumps([]),
+                                          simplejson.dumps({'value': []}),
                                           86400 * 10)
         mock_cache.set.reset_mock()
 
@@ -1913,7 +1915,7 @@ class PersonTagCache(TwillTests):
                                tag=willing_to_mentor_banshee)
         link.save() # should fire bgtask to update the cache (post-save signal)
         mock_cache.set.assert_called_with(paulproteus.get_tag_texts_cache_key(),
-                                          simplejson.dumps(['Banshee']),
+                                          simplejson.dumps({'value': ['Banshee']}),
                                           86400 * 10)
 
  # vim: set ai et ts=4 sw=4 nu:
