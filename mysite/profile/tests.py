@@ -1938,5 +1938,28 @@ class PersonProjectCache(TwillTests):
                                           simplejson.dumps({'value': [
                                             'project name']}),
                                           86400 * 10)
+        mock_cache.set.reset_mock()
+
+        # 3. Delete the PFE, and make sure the cache got deleted
+        portfolio_entry.delete()
+        mock_cache.delete.assert_called_with(
+            paulproteus.get_cache_key_for_projects())
+        mock_cache.set.assert_called_with(
+            paulproteus.get_cache_key_for_projects(),
+            simplejson.dumps({'value': []}),
+            86400 * 10)
+        mock_cache.set.reset_mock()
+
+        # 4. Add a new one, and make sure it's up to date
+        portfolio_entry, _ =PortfolioEntry.objects.get_or_create(
+            project=Project.create_dummy(name='other name'),
+            is_published=True,
+            person=paulproteus)
+        mock_cache.set.assert_called_with(
+            paulproteus.get_cache_key_for_projects(),
+            simplejson.dumps({'value': [
+                'other name']}),
+            86400 * 10)
+        mock_cache.set.reset_mock()
         
  # vim: set ai et ts=4 sw=4 nu:
