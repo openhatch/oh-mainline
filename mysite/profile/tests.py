@@ -1018,14 +1018,9 @@ class AddCitationManually(TwillTests):
 class ReplaceIconWithDefault(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
 
-    def gimme_json(self):
-        url = reverse(mysite.profile.views.gimme_json_for_portfolio)
-        response = self.login_with_client().get(url)
-        return simplejson.loads(response.content)
-
     def test_view(self):
-        portfolio_entry = PortfolioEntry.objects.get_or_create(
-                    project=Project.objects.get_or_create(name='project name')[0],
+        project = Project.objects.get_or_create(name='project name')[0]
+        portfolio_entry = PortfolioEntry.objects.get_or_create(project=project,
                     person=Person.objects.get(user__username='paulproteus'))[0]
         url = reverse(mysite.profile.views.replace_icon_with_default)
         data = {
@@ -1050,11 +1045,11 @@ class ReplaceIconWithDefault(TwillTests):
         self.assert_(response_obj['success'])
         self.assertEqual(response_obj['portfolio_entry__pk'], portfolio_entry.pk)
 
-        # Test the JSON response for getting the whole portfolio
-        # make sure that it contains the empty string as the icon for our project
-        json_response = self.gimme_json()
-        the_icon_according_to_our_json_response = json_response['projects'][0]['fields']['icon_for_profile']
-        self.assertEqual(the_icon_according_to_our_json_response, '')
+        # Check that we correctly created our WrongIcon object
+        # note that 'project' still contains the old project data (before the icon was marked as wrong)
+        wrong_icon = mysite.search.models.WrongIcon.objects.get(project=project)
+        self.assertEqual(wrong_icon.icon_url, project.icon_url)
+        self.assertEqual(wrong_icon.icon_raw, project.icon_raw)
 
         # Check side-effect
         portfolio_entry = PortfolioEntry.objects.get(pk=portfolio_entry.pk)

@@ -654,9 +654,17 @@ def replace_icon_with_default(request):
             person__user=request.user)
     # FIXME: test for naughty people trying to replace others' icons with the default!
 
+    project = portfolio_entry.project
+
     # set as default
-    portfolio_entry.project.icon_raw = None
-    portfolio_entry.project.save()
+    project.icon_raw = None
+    project.save()
+
+    # make a record of the old, wrong project icon in the database
+    mysite.search.models.WrongIcon.spawn_from_project(project)
+
+    # email all@ to let them know what we've done
+    # TODO: grab the code from the other branch to do this
 
     # prepare output
     data = {}
