@@ -4,7 +4,7 @@ from mysite.base.helpers import ObjectFromDict
 import mysite.account.tests
 
 from mysite.search.models import Project
-from mysite.profile.models import Person, Tag, TagType, Link_Person_Tag, DataImportAttempt, PortfolioEntry, Citation
+from mysite.profile.models import Person, Tag, TagType, Link_Person_Tag, DataImportAttempt, PortfolioEntry, Citation, Forwarder
 import mysite.project.views
 
 import mysite.profile.views
@@ -2019,5 +2019,26 @@ class PersonProjectCache(TwillTests):
                 'other name']}),
             86400 * 10)
         mock_cache.set.reset_mock()
+
+class ForwarderGetsCreated(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def test(self):
+        # paulproteus has $fwd in his contact blurb
+        p = Person.get_by_username('paulproteus')
+        p.contact_blurb = "hi, $fwd!"
+        p.save()
+
+        # no forwarder in the db
+        self.assertFalse(Forwarder.objects.all())
+
+        # now we GET the profile...
+        response = self.client.get(p.profile_url)
+
+        new_fwd = Forwarder.objects.all()[0]
+        self.assert_(new_fwd)
+
+        # the page will contain the whole string because it's in the mailto:
+        self.assertContains(response, new_fwd.address)
         
  # vim: set ai et ts=4 sw=4 nu:
