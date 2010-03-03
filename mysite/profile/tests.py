@@ -2040,5 +2040,21 @@ class ForwarderGetsCreated(TwillTests):
 
         # the page will contain the whole string because it's in the mailto:
         self.assertContains(response, new_fwd.address)
+
+class EditYourName(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def test_settings_page_form(self):
+        # visit generic settings page
+        self.login_with_twill()
+        tc.go(make_twill_url('http://openhatch.org/'))
+        tc.follow('settings')
+        tc.follow('Name')
+        tc.fv(1, 'first_name', 'Gottfried')
+        tc.fv(1, 'last_name', 'Leibniz')
+        tc.submit()
+        tc.go(make_twill_url('http://openhatch.org' + Person.objects.get().profile_url))
+        tc.find('Gottfried Leibniz')
+        tc.notfind('Asheesh Laroia')
         
  # vim: set ai et ts=4 sw=4 nu:
