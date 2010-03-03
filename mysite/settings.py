@@ -116,6 +116,7 @@ HAYSTACK_SEARCH_ENGINE='solr'
 HAYSTACK_SOLR_URL='http://127.0.0.1:8983/solr'
 
 INSTALLED_APPS = (
+    'ghettoq',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.humanize',
@@ -148,11 +149,7 @@ TEST_RUNNER = 'mysite._profiling.profile_tests'
 TEST_PROFILE = '/tmp/openhatch-profiling-data.%s' % os.environ.get('USER', 'unknown')
 
 ## AMQP, Rabbit Queue, Celery
-AMQP_SERVER = "localhost"
-AMQP_PORT = 5672
-AMQP_USER = "rabbiter"
-AMQP_PASSWORD = "johT4qui"
-AMQP_VHOST = "localhost"
+CARROT_BACKEND = "ghettoq.taproot.Database"
 
 cooked_data_password = 'AXQaTjp3'
 AUTH_PROFILE_MODULE = "profile.Person"
@@ -176,7 +173,8 @@ INVITATIONS_PER_USER=5
 
 DEFAULT_FROM_EMAIL = 'all@openhatch.org'
 
-CACHE_BACKEND = 'file:///tmp/django_cache' #'dummy://'
+#CACHE_BACKEND = 'file:///tmp/django_cache_belonging_to_%s' % os.environ.get('USER', 'unknown')
+CACHE_BACKEND = "memcached://127.0.0.1:11211/?timeout=1"
 
 # Launchpad credentials
 LP_CREDS_BASE64_ENCODED='WzFdCmNvbnN1bWVyX3NlY3JldCA9IAphY2Nlc3NfdG9rZW4gPSBHV0tKMGtwYmNQTkJXOHRQMWR2Ygpjb25zdW1lcl9rZXkgPSBvcGVuaGF0Y2ggbGl2ZSBzaXRlCmFjY2Vzc19zZWNyZXQgPSBSNWtrcXBmUERiUjRiWFFQWGJIMkdoc3ZQamw2SjlOc1ZwMzViN0g2d3RjME56Q3R2Z3JKeGhNOVc5a2swU25CSnRHV1hYckdrOFFaMHZwSgoK'
@@ -195,6 +193,13 @@ ASSETS_EXPIRE = 'querystring'
 INTERNAL_IPS = ('127.0.0.1',)
 
 FORWARDER_DOMAIN = "forwarder.openhatch.org"
-FORWARDER_LIFETIME_TIMEDELTA = datetime.timedelta(days=3)
+FORWARDER_LISTINGTIME_TIMEDELTA = datetime.timedelta(days=2) # how long the forwarder is listed
+FORWARDER_LIFETIME_TIMEDELTA = datetime.timedelta(days=5) # how long the forwarder actually works
+# note about the above: for 3 days, 2 forwarders for the same user work.
+# at worst, you visit someone's profile and find a forwarder that works for 3 more days
+# at best, you visit someone's profile and find a forwarder that works for 5 more days
+# at worst, we run a postfixifying celery job once every two days for each user
 
 POSTFIX_FORWARDER_TABLE_PATH = '/tmp/email_forwarders'
+
+#CELERY_ALWAYS_EAGER = True # This is set to True in the test runner also.

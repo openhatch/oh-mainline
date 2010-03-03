@@ -72,7 +72,7 @@
 
 	    <div style="clear: left; float: left;">
 	      {% if person.location_display_name and person.location_confirmed %}
-          <a href="/people/?center={{ person.location_display_name }}">
+              <a style='color: #555;' href="/people/?center={{ person.location_display_name }}">
               {{ person.location_display_name }}
           </a>
 	      {% endif %}
