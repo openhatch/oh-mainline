@@ -657,14 +657,18 @@ def replace_icon_with_default(request):
     # FIXME: test for naughty people trying to replace others' icons with the default!
     project = portfolio_entry.project
 
+    project = portfolio_entry.project
+
     # set as default
-    project.icon_is_wrong = True
+    project.icon_raw = None
     project.save()
+
+    # make a record of the old, wrong project icon in the database
+    mysite.search.models.WrongIcon.spawn_from_project(project)
 
     # email all@ letting them know that we did so
     from mysite.project.tasks import send_email_to_all_because_project_icon_was_marked_as_wrong
     send_email_to_all_because_project_icon_was_marked_as_wrong.delay(project.pk, project.name, project.icon_for_profile.url)
-
 
     # prepare output
     data = {}

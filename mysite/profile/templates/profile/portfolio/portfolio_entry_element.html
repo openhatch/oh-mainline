@@ -19,7 +19,7 @@
             <div class='name_and_icon_flagger'>
                 <a href='{{ pf_entry.project.get_url }}'>
                     <div class='project_icon'
-                        {% if edit_mode or pf_entry.project.icon_is_wrong %}
+                        {% if edit_mode %}
                         style="background-image: url('/static/no-project-icon.png')"
                         {% else %}
                         style="background-image: url('{{ pf_entry.project.get_url_of_icon_or_generic }}')"

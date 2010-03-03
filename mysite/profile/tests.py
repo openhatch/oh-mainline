@@ -1021,8 +1021,8 @@ class ReplaceIconWithDefault(TwillTests):
     # mock out the django email function
     @mock.patch("mysite.project.tasks.send_email_to_all_because_project_icon_was_marked_as_wrong.delay")
     def test_view(self, send_mail_mock):
-        portfolio_entry = PortfolioEntry.objects.get_or_create(
-                    project=Project.objects.get_or_create(name='project name')[0],
+        project = Project.objects.get_or_create(name='project name')[0]
+        portfolio_entry = PortfolioEntry.objects.get_or_create(project=project,
                     person=Person.objects.get(user__username='paulproteus'))[0]
         url = reverse(mysite.profile.views.replace_icon_with_default)
         data = {
@@ -1049,6 +1049,11 @@ class ReplaceIconWithDefault(TwillTests):
 
         # Make sure that all@ was emailed
         self.assert_(send_mail_mock.called)
+        # Check that we correctly created our WrongIcon object
+        # note that 'project' still contains the old project data (before the icon was marked as wrong)
+        wrong_icon = mysite.search.models.WrongIcon.objects.get(project=project)
+        self.assertEqual(wrong_icon.icon_url, project.icon_url)
+        self.assertEqual(wrong_icon.icon_raw, project.icon_raw)
 
         # Check side-effect
         portfolio_entry = PortfolioEntry.objects.get(pk=portfolio_entry.pk)
