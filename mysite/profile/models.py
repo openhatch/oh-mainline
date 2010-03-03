@@ -637,15 +637,32 @@ class Citation(models.Model):
         return "pk=%s, summary=%s" % (pk, self.summary)
 
 class Forwarder(models.Model):
+    user = models.ForeignKey(User)
     address = models.TextField()
     expires_on = models.DateTimeField(default=datetime.datetime(1970, 1, 1))
-    user = models.ForeignKey(User)
+    stops_being_listed_on = models.DateTimeField(default=datetime.datetime(1970, 1, 1))
+    # note about the above: for 3 days, 2 forwarders for the same user work.
+    # at worst, you visit someone's profile and find a forwarder that works for 3 more days
+    # at best, you visit someone's profile and find a forwarder that works for 5 more days
+    # at worst, we run a postfixifying celery job once every two days for each user
     def generate_table_line(self):
         line = '%s %s' % (self.get_email_address(), self.user.email)
         return line
 
     def get_email_address(self): 
         return self.address + "@" + settings.FORWARDER_DOMAIN
+
+    @staticmethod
+    def garbage_collect():
+        for forwarder in Forwarder.objects.all():
+            # if it's expired delete it
+            now = datetime.datetime.utcnow()
+            if forwarder.expires_on < now:
+                forwarder.delete()
+            # else if it's too old to be displayed and they still want a forwarder: make a fresh new one
+            elif forwarder.stops_being_listed_on < now and '$fwd' in forwarder.user.get_profile().contact_blurb: 
+                mysite.base.controllers.generate_forwarder(forwarder.user)
+        pass
 
     @staticmethod
     def generate_list_of_lines_for_postfix_table():

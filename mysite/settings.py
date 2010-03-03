@@ -193,7 +193,12 @@ ASSETS_EXPIRE = 'querystring'
 INTERNAL_IPS = ('127.0.0.1',)
 
 FORWARDER_DOMAIN = "forwarder.openhatch.org"
-FORWARDER_LIFETIME_TIMEDELTA = datetime.timedelta(days=3)
+FORWARDER_LISTINGTIME_TIMEDELTA = datetime.timedelta(days=2) # how long the forwarder is listed
+FORWARDER_LIFETIME_TIMEDELTA = datetime.timedelta(days=5) # how long the forwarder actually works
+# note about the above: for 3 days, 2 forwarders for the same user work.
+# at worst, you visit someone's profile and find a forwarder that works for 3 more days
+# at best, you visit someone's profile and find a forwarder that works for 5 more days
+# at worst, we run a postfixifying celery job once every two days for each user
 
 POSTFIX_FORWARDER_TABLE_PATH = '/tmp/email_forwarders'
 

@@ -755,8 +755,8 @@ PortfolioEntry.Delete.postOptions.error = function (response) {
 PortfolioEntry.Delete.post = function () {
     $.ajax(PortfolioEntry.Delete.postOptions);
 };
-PortfolioEntry.Delete.deleteIt = function () {
-    $deleteLink = $(this);
+PortfolioEntry.Delete.deleteIt = function (deleteLink) {
+    $deleteLink = $(deleteLink);
     $pfEntry = $deleteLink.closest('.portfolio_entry');
     if ($pfEntry.hasClass('adding')) {
         // If this pfEntry element is in adding mode,
@@ -773,7 +773,17 @@ PortfolioEntry.Delete.deleteIt = function () {
     return false;
 }
 PortfolioEntry.Delete.bindEventHandlers = function() {
-    $('.portfolio_entry .actions li.delete_portfolio_entry a').click(PortfolioEntry.Delete.deleteIt);
+    $('.portfolio_entry .actions li.delete_portfolio_entry a').click(function(){
+        var deleteLink = this;
+        keep_going = confirm('are you sure?');
+        if(keep_going){
+            PortfolioEntry.Delete.deleteIt(deleteLink);
+            return false;
+        }
+        else{
+            return false;
+        }
+    });
 };
 
 

@@ -1,5 +1,6 @@
 import sys
 import os
+from datetime import timedelta
 import datetime
 from mysite.customs import ohloh
 import urllib2
@@ -9,7 +10,7 @@ import mysite.customs.github
 import mysite.customs.debianqa
 import mysite.profile.models
 from mysite.search.models import Project
-from celery.task import Task
+from celery.task import Task, PeriodicTask
 import celery.registry
 import time
 import random
@@ -264,6 +265,14 @@ class ReindexPerson(Task):
         pi = mysite.profile.search_indexes.PersonIndex(person)
         pi.update_object(person)
 
+class GarbageCollectForwarders(PeriodicTask):
+    run_every = timedelta(days=1)
+    def run(self, **kwargs):
+        logger = self.get_logger(**kwargs)
+        logger.info("Started garbage collecting profile email forwarders")
+        mysite.profile.models.Forwarder.garbage_collect()
+
+
 class RegeneratePostfixAliasesForForwarder(Task):
     def run(self, **kwargs):
         # Generate the table...
@@ -319,6 +328,7 @@ try:
     celery.registry.tasks.register(RegeneratePostfixAliasesForForwarder)
     celery.registry.tasks.register(FetchPersonDataFromOhloh)
     celery.registry.tasks.register(ReindexPerson)
+    celery.registry.tasks.register(GarbageCollectForwarders)
 except celery.registry.AlreadyRegistered:
     pass
 

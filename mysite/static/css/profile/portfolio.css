@@ -117,6 +117,8 @@ body#profile #main .submodule .other-contributors { float: left; margin-top: 20p
 body#profile #main .submodule .other-contributors label { text-transform: none; }
 body#profile #main .submodule .other-contributors li { float: left; margin-right: 2%; margin-top: 5px; width: 120px; }
 body#profile #main .submodule .other-contributors li a { float: left; width: 120px; height: 51px; overflow: hidden; }
+body#profile #main .submodule .other-contributors li a:hover { text-decoration: none; }
+body#profile #main .submodule .other-contributors li a:hover span.fullname { text-decoration: underline; }
 body#profile #main .submodule .other-contributors li img { float: left; margin-right: 5px; vertical-align: middle; width: 40px; }
 body#profile #main .submodule .other-contributors .see-all { clear: left; margin-top: 5px; float: right; }
 
