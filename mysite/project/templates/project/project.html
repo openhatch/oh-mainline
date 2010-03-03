@@ -117,17 +117,12 @@ about our members who support {{ project.name }}
                             <span>{{ random_pfentry.project_description|urlize|linebreaksbr}}</span>
                         {% endspaceless %}
                     </h2>
-                    <p style='font-size: .9em; text-align: right; margin: 5px 0 0 0;'>
-                    from
+                    <p style='font-size: .9em; margin: 5px 0 0 40px;'>
+                    from the profile of
                     <a href='{{ random_pfentry.person.profile_url }}'>
-                        {% with random_pfentry.person.user as user%}
-                        {% with 1 as posessive %}
+                        {% with random_pfentry.person.user as user %}
                         {% include 'name.html' %}
                         {% endwith %}
-                        {% endwith %}
-                        {% spaceless %}
-                        <span>profile</span>
-                        {% endspaceless %}
                     </a>
                 </p>
                 </div>
