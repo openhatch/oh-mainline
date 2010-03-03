@@ -85,14 +85,37 @@ Ta-da. In theory we/you should do that every month, when MaxMind does a refresh.
 
 == People search ==
 
-People search uses Solr. We use Haystack for managing Solr.
+We have a map at /people/. To accelerate search on those people, we use Haystack,
+a Django layer on top of search engines. In our case, we use the search engine called
+Solr.
 
-FIXME: Asheesh, please explain how to deploy Solr with the special config file.
+=== Understanding indexes and the Solr schema file ===
 
-=== Run the server ===
+We have a hand-tuned Solr schema that lives in mysite/config-files/schema.xml.
+This file was first generated using the Haystack command to auto-generate a
+schema from our people/search_indexes.py file, but since then we have adjusted
+it ourselves.
 
-Start in milestone-a, then run
-    ( cd parts/download_solr/example ; java -jar start.jar) &
+Unfortunately, this means that if you add or modify those indexes, you should
+NOT just regenerate the schema file automatically. Instead, merge it by hand
+by adding just the elements you need. If you have trouble with that, ask
+Asheesh.
+
+=== Running the Solr server (development) ==
+
+For people search to work, you must run the Solr server. On a development machine
+(e.g., laptop), do this:
+
+cd mysite
+scripts/run_solr.sh
+
+=== Running the Solr server (production) ==
+
+Steps:
+
+1. Copy the schema into place.
+
+2. Run SOLR with a config file that points at that schema.
 
 === Initialize its index ===
 
