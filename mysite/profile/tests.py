@@ -1019,11 +1019,8 @@ class ReplaceIconWithDefault(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
 
     # mock out the django email function
-    mock_emailer = mock.Mock()
-    mock_emailer.return_value = "email sent, dude"
-    @mock.patch("django.core.mail.send_mail", )
-
-    def test_view(self):
+    @mock.patch("mysite.project.tasks.send_email_to_all_because_project_icon_was_marked_as_wrong.delay")
+    def test_view(self, send_mail_mock):
         portfolio_entry = PortfolioEntry.objects.get_or_create(
                     project=Project.objects.get_or_create(name='project name')[0],
                     person=Person.objects.get(user__username='paulproteus'))[0]
@@ -1051,12 +1048,11 @@ class ReplaceIconWithDefault(TwillTests):
         self.assertEqual(response_obj['portfolio_entry__pk'], portfolio_entry.pk)
 
         # Make sure that all@ was emailed
+        self.assert_(send_mail_mock.called)
 
         # Check side-effect
         portfolio_entry = PortfolioEntry.objects.get(pk=portfolio_entry.pk)
-        self.assertFalse(portfolio_entry.project.icon_raw,
-                "Expected postcondition: portfolio entry's icon evaluates to False "
-                "because it is generic.")
+        self.assertTrue(portfolio_entry.project.icon_is_wrong, "Expected postcondition: portfolio entry's icon is marked as wrong in the db")
 
 class SavePortfolioEntry(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
