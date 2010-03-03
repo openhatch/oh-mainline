@@ -85,6 +85,14 @@ class Project(OpenHatchModel):
     name = models.CharField(max_length=200, unique=True)
     language = models.CharField(max_length=200)
 
+    def invalidate_all_icons(self):
+        self.icon_raw = None
+        self.icon_url = u''
+        self.icon_for_profile = None
+        self.icon_smaller_for_badge = None
+        self.icon_for_search_result = None
+        pass
+
     # FIXME: Remove this field and update fixtures.
     icon_url = models.URLField(max_length=200)
 
@@ -253,7 +261,7 @@ class WrongIcon(OpenHatchModel):
             'icon_for_search_result': project.icon_for_search_result,
             'logo_contains_name': project.logo_contains_name,
         }
-        wrong_icon_obj = WrongIcon(kwargs)
+        wrong_icon_obj = WrongIcon(**kwargs)
         wrong_icon_obj.save()
         return wrong_icon_obj
 

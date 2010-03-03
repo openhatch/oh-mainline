@@ -1048,7 +1048,25 @@ class ReplaceIconWithDefault(TwillTests):
         self.assertEqual(response_obj['portfolio_entry__pk'], portfolio_entry.pk)
 
         # Make sure that all@ was emailed
+        # first check that the task itself was run with the args that we expect
         self.assert_(send_mail_mock.called)
+
+        expected_call_args = {
+            'project__pk':project.pk,
+            'project__name':project.name,
+            'project_icon_url':project.icon_for_profile.url,
+        }
+        # we have to take [1] here because call_args puts an empty tuple at 0. this is the empty list of non-kw-args
+        self.assertEqual(send_mail_mock.call_args[1], expected_call_args)
+
+        # TODO: next, make sure that the task itself actually sends an email
+        mysite.project.tasks.send_email_to_all_because_project_icon_was_marked_as_wrong(**expected_call_args)
+        outbox = django.core.mail.outbox
+        self.assertEqual(len(outbox), 1)
+        sent_msg = outbox[0]
+        subject = '[OH]- ' + project.name + ' icon was marked as incorrect'
+        self.assertEqual(sent_msg.subject, subject)
+
         # Check that we correctly created our WrongIcon object
         # note that 'project' still contains the old project data (before the icon was marked as wrong)
         wrong_icon = mysite.search.models.WrongIcon.objects.get(project=project)
@@ -1057,7 +1075,10 @@ class ReplaceIconWithDefault(TwillTests):
 
         # Check side-effect
         portfolio_entry = PortfolioEntry.objects.get(pk=portfolio_entry.pk)
-        self.assertTrue(portfolio_entry.project.icon_is_wrong, "Expected postcondition: portfolio entry's icon is marked as wrong in the db")
+        self.assertFalse(portfolio_entry.project.icon_raw,
+            "Expected postcondition: portfolio entry's icon evaluates to False "
+            "because it is generic.")
+
 
 class SavePortfolioEntry(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']

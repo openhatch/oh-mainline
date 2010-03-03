@@ -659,16 +659,20 @@ def replace_icon_with_default(request):
 
     project = portfolio_entry.project
 
-    # set as default
-    project.icon_raw = None
-    project.save()
+    project_before_changes = mysite.search.models.Project.objects.get(pk=project.pk)
 
     # make a record of the old, wrong project icon in the database
     mysite.search.models.WrongIcon.spawn_from_project(project)
 
+    # set project icon as default
+    project.invalidate_all_icons()
+    project.save()
+
     # email all@ letting them know that we did so
     from mysite.project.tasks import send_email_to_all_because_project_icon_was_marked_as_wrong
-    send_email_to_all_because_project_icon_was_marked_as_wrong.delay(project.pk, project.name, project.icon_for_profile.url)
+    send_email_to_all_because_project_icon_was_marked_as_wrong.delay(project__pk=project_before_changes.pk, project__name=project_before_changes.name, project_icon_url=project_before_changes.icon_for_profile.url)
+
+
 
     # prepare output
     data = {}
