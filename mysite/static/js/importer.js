@@ -588,6 +588,8 @@ FlagIcon.postOptions.success = function (response) {
     var defaultIconCssAttr = $('#portfolio_entry_building_block .project_icon').css('background-image');
     var defaultIconUrl = defaultIconCssAttr.replace(/^url[(]/, '').replace(/[)]$/, ''); /* remove url() */
     var relative_path = defaultIconUrl.replace(/^.*?:[/][/].*?[/]/, '/'); /* remove http://domain or https://domain */
+    // we change the image url as the icon div understands it twice
+    // this is a hack that allows us to change fewer tests (the icon used to be an img)
     $portfolioEntry.find('.project_icon').attr('src', relative_path);
     $portfolioEntry.find('.project_icon').css('background-image', defaultIconCssAttr);
 
