@@ -1,7 +1,7 @@
 body#profile #bio { margin: 0; padding: 0 0 10px 0; }
 body#profile #tags-links li { list-style: square outside; margin: 0 0 0 15px; }
 body#profile #nameplate { float: left; width: 940px; margin-top: 20px; padding: 3px; }
-	body#profile #nameplate h1 { font-weight: bold; font-size: 15pt; }
+	body#profile #nameplate h1 { font-weight: bold; font-size: 15pt; text-shadow: 0 1px 0 #fff; }
 		body#profile #nameplate h1 a { color: #000; }
 	body#profile #nameplate h1, #nameplate #sep, #nameplate h2 { font-size: 19pt; font-weight: normal; margin-right: 10px; }
 	body#profile #nameplate #sep { font-weight: bold; color: #ddd; display: none; }

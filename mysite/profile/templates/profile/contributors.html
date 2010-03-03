@@ -12,7 +12,21 @@
         <li>
             <a href='{{ person.profile_url }}'>
                 <img src='{{ person.get_photo_thumbnail_url_or_default }}' />
-                <span>{{ person.get_full_name_or_username }}</span>
+                {% spaceless %}
+                <span class='fullname'>
+                    {% if person.user.first_name or person.user.last_name %}
+                        <span>{{ person.user.first_name }} {{ person.user.last_name }}</span>
+                    {% else %}
+                        <span>{{ person.user.username }}</span>
+                    {% endif %}
+                </span>
+                {% endspaceless %}
+
+                {% if person.user.first_name and person.user.last_name %}
+                    <span class='username' style="color: #888;">
+                        ({{ person.user.username }})
+                    </span>
+                {% endif %}
             </a>
         </li>
         {% endfor %}
