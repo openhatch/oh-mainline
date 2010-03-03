@@ -658,7 +658,7 @@ def replace_icon_with_default(request):
     project.icon_is_wrong = True
     project.save()
 
-    # TODO: email all@ letting them know that we did so
+    # email all@ letting them know that we did so
     mysite.profile.tasks.send_email_to_all_because_project_icon_was_marked_as_wrong.delay(project.pk, project.name, project.icon_for_profile.url)
 
 

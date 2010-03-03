@@ -1018,6 +1018,11 @@ class AddCitationManually(TwillTests):
 class ReplaceIconWithDefault(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
 
+    # mock out the django email function
+    mock_emailer = mock.Mock()
+    mock_emailer.return_value = "email sent, dude"
+    @mock.patch("django.core.mail.send_mail", )
+
     def test_view(self):
         portfolio_entry = PortfolioEntry.objects.get_or_create(
                     project=Project.objects.get_or_create(name='project name')[0],
@@ -1044,6 +1049,8 @@ class ReplaceIconWithDefault(TwillTests):
                 """
         self.assert_(response_obj['success'])
         self.assertEqual(response_obj['portfolio_entry__pk'], portfolio_entry.pk)
+
+        # Make sure that all@ was emailed
 
         # Check side-effect
         portfolio_entry = PortfolioEntry.objects.get(pk=portfolio_entry.pk)
