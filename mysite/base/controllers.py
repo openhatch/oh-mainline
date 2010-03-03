@@ -30,8 +30,9 @@ notifications_dictionary = {
 def put_forwarder_in_contact_blurb_if_they_want(str, user):
     forwarder_magic_string = u'$fwd'
     # if they want a forwarder
-    if not string.count(str, forwarder_magic_string) == 0:
-        visible_forwarders_matching_user = mysite.profile.models.Forwarder.objects.filter(user=user, stops_being_listed_on__gt=datetime.datetime.utcnow())
+    if forwarder_magic_string in str:
+        visible_forwarders_matching_user = mysite.profile.models.Forwarder.objects.filter(
+                user=user, stops_being_listed_on__gt=datetime.datetime.utcnow())
         # "we can trust that" they already have a forwarder created if they want one (we make it at edit-time and then at garbage collection time (nightly), if necessary)
         # we'd hope that this list only contains one element, but if not oh well
         forwarder = visible_forwarders_matching_user[0].get_email_address()
