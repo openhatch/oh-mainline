@@ -22,9 +22,9 @@
         <li><a href='{% url mysite.account.views.logout %}'>log out</a></li>
         <li><a href='{% url mysite.account.views.edit_contact_info %}'>settings</a></li>
         <li><a href='{% url mysite.profile.views.display_person_web the_user.username %}'>
-            {% with person as the_user.get_profile %}
+            {% with the_user.get_profile as person %}
                 {% if person.user.first_name or person.user.last_name %}
-                    {{ person.user.first_name }} {{ person.user.last_name }}
+                    {{ person.get_full_name_with_nbsps|safe }}
                 {% else %}
                     {{ person.user.username }}
                 {% endif %}
