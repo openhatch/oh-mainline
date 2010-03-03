@@ -14,6 +14,15 @@ about our members who support {{ project.name }}
 
 {% block pagetop %}
 
+    <noscript>
+        <style type='text/css'>
+            li form * { display: inherit ! important; }
+            li form strong { display: inline ! important; }
+            li form.answer_question { float: left; background-color: #ffc; }
+            body#project li form a.collapse_answer_form { display: none ! important; }
+        </style>
+    </noscript>
+
     <h3 class='supertitle'><a href='{% url mysite.project.views.projects %}'>Projects</a></h3>
     <a href='{{ project.get_url }}'>
     </a>
