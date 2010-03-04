@@ -197,7 +197,11 @@ def edit_name(request, edit_name_form = None):
         edit_name_form = mysite.account.forms.EditNameForm(instance=request.user)
 
     if request.GET.get('notification_id', None) == 'success':
-        account_notification = 'You have a new name.'
+        if request.user.first_name or request.user.last_name:
+            account_notification = 'You have a new name.'
+        else:
+            account_notification = """You've removed your full name.
+            We'll identify you by your username."""
     else:
         account_notification = ''
 
