@@ -7,9 +7,9 @@ def send_email_to_all_because_project_icon_was_marked_as_wrong(project__pk, proj
     # links you to the secret, wrong project icon
     # TODO:figure out if we should be worried about project icons getting deleted
         # i think that we dont.  provide a justification here.
-    project_page_url = 'http://openhatch.org/+projects/' + project__name
+    project_page_url = 'https://openhatch.org/+projects/' + project__name
     # FIXME: this url
-    hidden_project_icon_url = 'http://openhatch.org/static/images/icons/projects/'
+    hidden_project_icon_url = 'https://openhatch.org/static/images/icons/projects/'
     subject = '[OH]- ' + project__name + ' icon was marked as incorrect'
     body = ''
     body += 'project name: ' + project__name + '\n'

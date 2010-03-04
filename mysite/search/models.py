@@ -266,7 +266,7 @@ class WrongIcon(OpenHatchModel):
         return wrong_icon_obj
 
 
-    project = models.ForeignKey(Project, null=True)
+    project = models.ForeignKey(Project)
 
     icon_url = models.URLField(max_length=200)
 
