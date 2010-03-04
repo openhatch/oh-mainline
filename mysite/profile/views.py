@@ -657,8 +657,6 @@ def replace_icon_with_default(request):
     # FIXME: test for naughty people trying to replace others' icons with the default!
     project = portfolio_entry.project
 
-    project = portfolio_entry.project
-
     project_before_changes = mysite.search.models.Project.objects.get(pk=project.pk)
 
     # make a record of the old, wrong project icon in the database
