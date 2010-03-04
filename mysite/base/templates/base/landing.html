@@ -305,14 +305,19 @@ body#landing #right .entry { font-size: .9em; margin-top: 3px; }
         </div>
         <div class='body'>
             <ul>
-                {% cache 86400 recent_activity_feed %}
                 {% for answer in recent_answers %}
+                    {% cache 86400 recent_activity_feed answer.pk %}
                     <li style='font-size: .9em; float: left; width: 100%; margin-bottom: 15px;'>
+                        {% if answer.author %}
                         <a href='{{ answer.author.get_profile.profile_url }}'>
                             <img style='width: 30px; float: left; margin-right: 10px;' src='{{ answer.author.get_profile.get_photo_thumbnail_30px_wide_url_or_default }}' />
                         </a>
+                        {% else %}
+                            <img style='width: 30px; float: left; margin-right: 10px;' src='/static/images/profile-photos/penguin-30px.png' />
+                        {% endif %}
                         <div style='float: left; width: 80%;'>
                             <div style='float: left; width: 100%;'>
+                                {% if answer.author %}
                                 {% with answer.author as user %}
                                 <strong>
                                     {% spaceless %}
@@ -321,8 +326,11 @@ body#landing #right .entry { font-size: .9em; margin-top: 3px; }
                                     </a>
                                     {% endspaceless %}
                                 </strong>
-                                added an answer to the question 
                                 {% endwith %}
+                                {% else %}
+                                    <strong>{{ answer.author_name }}</strong>
+                                {% endif %}
+                                added an answer to the question 
                             </div>
                             {% spaceless %}
                                 {% with answer.question as question %}
@@ -337,6 +345,7 @@ body#landing #right .entry { font-size: .9em; margin-top: 3px; }
                                 {% endwith %}
                                 {% endwith %}
                             {% endspaceless %}
+                            {% endcache %}
                             <span style='color: #aaa;'>
                                 &middot;
                                 {{ answer.modified_date|timesince_terse }} ago
@@ -345,7 +354,6 @@ body#landing #right .entry { font-size: .9em; margin-top: 3px; }
                         </div>
                     </li>
                 {% endfor %}
-                {% endcache %}
             </ul>
         </div>
     </div>

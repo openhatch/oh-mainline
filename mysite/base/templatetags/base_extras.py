@@ -3,6 +3,7 @@ from django.utils.timesince import timesince
 import time
 import calendar
 import datetime
+import re
 
 register = template.Library()
 

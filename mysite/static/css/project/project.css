@@ -31,8 +31,8 @@ body#project ul.answers textarea.blur { height: 1.2em; }
 body#project .questions > li { float: left; width: 100%; margin: 10px 0 30px; }
 
 body#project .bug_answer_title { font-size: 1.1em; padding-bottom: 3px; margin-bottom: 3px; }
-body#project form.answer_question { width: 85%; padding: 4px 12px; }
-body#project form.active { float: left; background-color: #ffc;  -moz-border-radius: 8px; border-radius: 8px; margin-bottom: 20px; }
+body#project form.answer_question { float: left; width: 85%; padding: 4px 12px; -moz-border-radius: 8px; border-radius: 8px; margin-bottom: 20px; }
+body#project form.active {  background-color: #ffc; }
 body#project form.active .show_when_editing { display: block; }
 body#project form.active a.collapse_answer_form { padding: 3px; margin: 10px 0 0 0; font-size: .9em;}
 

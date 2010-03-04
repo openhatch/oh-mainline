@@ -1,5 +1,12 @@
+{% load base_extras %}
+{% spaceless %}
 {% if user.first_name or user.last_name %}
-    <span class='full_name'>{{ user.first_name }} {{ user.last_name }}</span>
-    {# opening paren #}
-    <span class='username_parenthesized'>
-    ({% endif %}<span class='username'>{{ user.username }}</span>{% if user.first_name or user.last_name %}){# closing paren #}</span>{% endif %}
+        <span class='full_name'>{{ user.get_profile.get_full_name_with_nbsps|safe }}</span>
+        {# opening paren #}
+        <span>&nbsp;</span>
+        <span>(</span><span class='username_parenthesized'>{% endif %}{{ user.username }}</span>{% if user.first_name or user.last_name %}){# closing paren #}</span>
+{% endif %}
+{% if posessive %}
+    <span>'s</span>
+{% endif %}
+{% endspaceless %}

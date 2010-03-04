@@ -30,11 +30,15 @@ notifications_dictionary = {
 def put_forwarder_in_contact_blurb_if_they_want(str, user):
     forwarder_magic_string = u'$fwd'
     # if they want a forwarder
-    if not string.count(str, forwarder_magic_string) == 0:
-        visible_forwarders_matching_user = mysite.profile.models.Forwarder.objects.filter(user=user, stops_being_listed_on__gt=datetime.datetime.utcnow())
+    if forwarder_magic_string in str:
+        visible_forwarders_matching_user = mysite.profile.models.Forwarder.objects.filter(
+                user=user, stops_being_listed_on__gt=datetime.datetime.utcnow())
         # "we can trust that" they already have a forwarder created if they want one (we make it at edit-time and then at garbage collection time (nightly), if necessary)
         # we'd hope that this list only contains one element, but if not oh well
-        forwarder = visible_forwarders_matching_user[0].get_email_address()
+        if not visible_forwarders_matching_user:
+            forwarder = generate_forwarder(user).get_email_address()
+        else:
+            forwarder = visible_forwarders_matching_user[0].get_email_address()
         str = str.replace(forwarder_magic_string, forwarder)
     return str
 
@@ -43,6 +47,7 @@ def generate_forwarder(user):
     random_str = "%s.%s" % (user.username, base64.b64encode(os.urandom(6), altchars='_.'))
     our_new_forwarder = Forwarder(address=random_str, user=user, expires_on=datetime.datetime.utcnow() + settings.FORWARDER_LIFETIME_TIMEDELTA, stops_being_listed_on=datetime.datetime.utcnow() + settings.FORWARDER_LISTINGTIME_TIMEDELTA)
     our_new_forwarder.save()
+    return our_new_forwarder
 
 def get_notification_from_request(request):
     notification_id = request.GET.get('msg', None)

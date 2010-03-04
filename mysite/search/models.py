@@ -337,12 +337,6 @@ class Answer(OpenHatchModel):
         ret.save()
         return ret
 
-def clear_homepage_activity_feed_cache(*args, **kwargs):
-    cache.delete('template.cache.recent_activity_feed.%s' % hashlib.md5('').hexdigest())
-
-models.signals.post_save.connect(clear_homepage_activity_feed_cache, Answer)
-models.signals.post_save.connect(clear_homepage_activity_feed_cache, ProjectInvolvementQuestion)
-
 class OpenBugsManager(models.Manager):
     def get_query_set(self):
         return super(OpenBugsManager, self).get_query_set().filter(

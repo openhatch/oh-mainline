@@ -3,7 +3,7 @@ from settings import *
 OHLOH_API_KEY='SXvLaGPJFaKXQC0VOocAg'
 DEBUG=False
 ADMINS=[
-    ('All OH devs', 'devel@lists.openhatch.org'),
+    ('All OH devs', 'all@openhatch.org'),
 ]
 
 INVITE_MODE=False # Suckas, invite codes are disabled everywarez

@@ -14,6 +14,15 @@ about our members who support {{ project.name }}
 
 {% block pagetop %}
 
+    <noscript>
+        <style type='text/css'>
+            li form * { display: inherit ! important; }
+            li form strong { display: inline ! important; }
+            li form.answer_question { float: left; background-color: #ffc; }
+            body#project li form a.collapse_answer_form { display: none ! important; }
+        </style>
+    </noscript>
+
     <h3 class='supertitle'><a href='{% url mysite.project.views.projects %}'>Projects</a></h3>
     <a href='{{ project.get_url }}'>
     </a>
@@ -117,13 +126,12 @@ about our members who support {{ project.name }}
                             <span>{{ random_pfentry.project_description|urlize|linebreaksbr}}</span>
                         {% endspaceless %}
                     </h2>
-                    <p style='font-size: .9em; text-align: right; margin: 5px 0 0 0;'>
-                    from
+                    <p style='font-size: .9em; margin: 5px 0 0 40px;'>
+                    from the profile of
                     <a href='{{ random_pfentry.person.profile_url }}'>
-                        {{ random_pfentry.person.get_full_name_or_username }}'s
-                        {% spaceless %}
-                        <span>profile</span>
-                        {% endspaceless %}
+                        {% with random_pfentry.person.user as user %}
+                        {% include 'name.html' %}
+                        {% endwith %}
                     </a>
                 </p>
                 </div>
