@@ -52,7 +52,7 @@ class ProfileTests(TwillTests):
         response = self.client.get('/people/')
 
     def test__portfolio_updates_when_citation_added_to_db(self):
-        # {{{
+       # {{{
         username = 'paulproteus'
 
         project_name = 'seeseehost'
@@ -72,29 +72,6 @@ class ProfileTests(TwillTests):
         # Verify that get_publish_portfolio_entries() works
         self.assert_('project name' in [pfe.project.name for pfe in paulproteus.get_published_portfolio_entries()])
 
-        # }}}
-
-    def test_change_my_name(self):
-        """Test that user can change his/her first and last name, and that it appears in the logged-in user's profile page."""
-        # {{{
-        self.login_with_twill()
-
-        tc.go(make_twill_url('http://openhatch.org/people/paulproteus'))
-
-        # No named entered yet
-        tc.notfind('Newfirst Newlast')
-
-        # Let's go enter a name
-        tc.go(make_twill_url('http://openhatch.org/edit/name'))
-        tc.fv('edit_name', 'first_name', 'Newfirst')
-        tc.fv('edit_name', 'last_name', 'Newlast')
-        tc.submit()
-
-        tc.url('/people/paulproteus')
-
-        # Has name been entered correctly? Hope so!
-        tc.find('Newfirst')
-        tc.find('Newlast')
         # }}}
 
     # }}}
