@@ -36,7 +36,7 @@
 
 
             {% if editable %}
-            <a class='name-edit-link' href='/edit/name'>
+            <a class='name-edit-link' href='{% url account.views.edit_name %}'>
                 <img src='/static/images/icons/pencil.png'
                 alt='Edit name' />
             </a>
