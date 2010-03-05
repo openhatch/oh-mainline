@@ -51,12 +51,9 @@ function my_show($obj) {
 PeopleMapController = function () {
     this.explainUninhabitedIsland = function (originatingLink) {
         var message = "People who haven't set their locations appear " + 
-            "on an uninhabited island in the South Atlantic.";
-        if(!logged_in_user_location_confirmed){
-            message = message +
-                "<br /><br />To set your location, click 'settings' in the top-right " +
-                "corner of your screen.";
-        }
+            "on an uninhabited island in the South Atlantic.<br><br>" + 
+            "To set your location, click 'settings' in the top-right " +
+            "corner of your screen.";
 
         var cssClass = 'uninhabited_island_message_triggered_by_' + originatingLink;
         var aMessageIsAlreadyVisible = ($('.jGrowl-notification.' + cssClass).size() > 0);

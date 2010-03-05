@@ -52,7 +52,7 @@ class ProfileTests(TwillTests):
         response = self.client.get('/people/')
 
     def test__portfolio_updates_when_citation_added_to_db(self):
-        # {{{
+       # {{{
         username = 'paulproteus'
 
         project_name = 'seeseehost'
@@ -72,29 +72,6 @@ class ProfileTests(TwillTests):
         # Verify that get_publish_portfolio_entries() works
         self.assert_('project name' in [pfe.project.name for pfe in paulproteus.get_published_portfolio_entries()])
 
-        # }}}
-
-    def test_change_my_name(self):
-        """Test that user can change his/her first and last name, and that it appears in the logged-in user's profile page."""
-        # {{{
-        self.login_with_twill()
-
-        tc.go(make_twill_url('http://openhatch.org/people/paulproteus'))
-
-        # No named entered yet
-        tc.notfind('Newfirst Newlast')
-
-        # Let's go enter a name
-        tc.go(make_twill_url('http://openhatch.org/edit/name'))
-        tc.fv('edit_name', 'first_name', 'Newfirst')
-        tc.fv('edit_name', 'last_name', 'Newlast')
-        tc.submit()
-
-        tc.url('/people/paulproteus')
-
-        # Has name been entered correctly? Hope so!
-        tc.find('Newfirst')
-        tc.find('Newlast')
         # }}}
 
     # }}}
@@ -1018,9 +995,11 @@ class AddCitationManually(TwillTests):
 class ReplaceIconWithDefault(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
 
-    def test_view(self):
-        portfolio_entry = PortfolioEntry.objects.get_or_create(
-                    project=Project.objects.get_or_create(name='project name')[0],
+    # mock out the django email function
+    @mock.patch("mysite.project.tasks.send_email_to_all_because_project_icon_was_marked_as_wrong.delay")
+    def test_view(self, send_mail_mock):
+        project = Project.objects.get_or_create(name='project name')[0]
+        portfolio_entry = PortfolioEntry.objects.get_or_create(project=project,
                     person=Person.objects.get(user__username='paulproteus'))[0]
         url = reverse(mysite.profile.views.replace_icon_with_default)
         data = {
@@ -1045,11 +1024,38 @@ class ReplaceIconWithDefault(TwillTests):
         self.assert_(response_obj['success'])
         self.assertEqual(response_obj['portfolio_entry__pk'], portfolio_entry.pk)
 
+        # Make sure that all@ was emailed
+        # first check that the task itself was run with the args that we expect
+        self.assert_(send_mail_mock.called)
+
+        expected_call_args = {
+            'project__pk':project.pk,
+            'project__name':project.name,
+            'project_icon_url':project.icon_for_profile.url,
+        }
+        # we have to take [1] here because call_args puts an empty tuple at 0. this is the empty list of non-kw-args
+        self.assertEqual(send_mail_mock.call_args[1], expected_call_args)
+
+        # TODO: next, make sure that the task itself actually sends an email
+        mysite.project.tasks.send_email_to_all_because_project_icon_was_marked_as_wrong(**expected_call_args)
+        outbox = django.core.mail.outbox
+        self.assertEqual(len(outbox), 1)
+        sent_msg = outbox[0]
+        subject = '[OH]- ' + project.name + ' icon was marked as incorrect'
+        self.assertEqual(sent_msg.subject, subject)
+
+        # Check that we correctly created our WrongIcon object
+        # note that 'project' still contains the old project data (before the icon was marked as wrong)
+        wrong_icon = mysite.search.models.WrongIcon.objects.get(project=project)
+        self.assertEqual(wrong_icon.icon_url, project.icon_url)
+        self.assertEqual(wrong_icon.icon_raw, project.icon_raw)
+
         # Check side-effect
         portfolio_entry = PortfolioEntry.objects.get(pk=portfolio_entry.pk)
         self.assertFalse(portfolio_entry.project.icon_raw,
-                "Expected postcondition: portfolio entry's icon evaluates to False "
-                "because it is generic.")
+            "Expected postcondition: portfolio entry's icon evaluates to False "
+            "because it is generic.")
+
 
 class SavePortfolioEntry(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
@@ -2040,5 +2046,21 @@ class ForwarderGetsCreated(TwillTests):
 
         # the page will contain the whole string because it's in the mailto:
         self.assertContains(response, new_fwd.address)
+
+class EditYourName(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def test_settings_page_form(self):
+        # visit generic settings page
+        self.login_with_twill()
+        tc.go(make_twill_url('http://openhatch.org/'))
+        tc.follow('settings')
+        tc.follow('Name')
+        tc.fv(1, 'first_name', 'Gottfried')
+        tc.fv(1, 'last_name', 'Leibniz')
+        tc.submit()
+        tc.go(make_twill_url('http://openhatch.org' + Person.objects.get().profile_url))
+        tc.find('Gottfried Leibniz')
+        tc.notfind('Asheesh Laroia')
         
  # vim: set ai et ts=4 sw=4 nu:

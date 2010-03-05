@@ -45,6 +45,7 @@ def get_image_data_scaled(image_data, width):
     image_data = new_image_fd.getvalue()
     return image_data
 
+
 class Project(OpenHatchModel):
 
     @staticmethod
@@ -83,6 +84,14 @@ class Project(OpenHatchModel):
 
     name = models.CharField(max_length=200, unique=True)
     language = models.CharField(max_length=200)
+
+    def invalidate_all_icons(self):
+        self.icon_raw = None
+        self.icon_url = u''
+        self.icon_for_profile = None
+        self.icon_smaller_for_badge = None
+        self.icon_for_search_result = None
+        pass
 
     # FIXME: Remove this field and update fixtures.
     icon_url = models.URLField(max_length=200)
@@ -237,6 +246,53 @@ def grab_project_language_from_ohloh(instance, created, *args,
 
 models.signals.post_save.connect(populate_icon_on_project_creation, Project)
 models.signals.post_save.connect(grab_project_language_from_ohloh, Project)
+
+class WrongIcon(OpenHatchModel):
+
+    @staticmethod
+    def spawn_from_project(project):
+        kwargs = {
+            'project': project,
+            'icon_url': project.icon_url,
+            'icon_raw': project.icon_raw,
+            'date_icon_was_fetched_from_ohloh': project.date_icon_was_fetched_from_ohloh,
+            'icon_for_profile': project.icon_for_profile,
+            'icon_smaller_for_badge': project.icon_smaller_for_badge,
+            'icon_for_search_result': project.icon_for_search_result,
+            'logo_contains_name': project.logo_contains_name,
+        }
+        wrong_icon_obj = WrongIcon(**kwargs)
+        wrong_icon_obj.save()
+        return wrong_icon_obj
+
+
+    project = models.ForeignKey(Project)
+
+    icon_url = models.URLField(max_length=200)
+
+    icon_raw = models.ImageField(
+            upload_to=lambda a,b: Project.generate_random_icon_path(a, b),
+            null=True,
+            default=None)
+
+    date_icon_was_fetched_from_ohloh = models.DateTimeField(null=True, default=None)
+
+    icon_for_profile = models.ImageField(
+        upload_to=lambda a,b: Project.generate_random_icon_path(a,b),
+        null=True,
+        default=None)
+
+    icon_smaller_for_badge = models.ImageField(
+        upload_to=lambda a,b: Project.generate_random_icon_path(a,b),
+        null=True,
+        default=None)
+
+    icon_for_search_result = models.ImageField(
+        upload_to=lambda a,b: Project.generate_random_icon_path(a,b),
+        null=True,
+        default=None)
+
+    logo_contains_name = models.BooleanField(default=False)
 
 class ProjectInvolvementQuestion(OpenHatchModel):
     key_string = models.CharField(max_length=255)

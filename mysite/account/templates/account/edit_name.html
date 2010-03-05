@@ -1,0 +1,22 @@
+{% extends 'account/settings_tab.html' %}
+
+{% block title %}
+Change your name - 
+{{ block.super }}
+{% endblock title %}
+
+{% block form_action %}
+'{% url mysite.account.views.edit_name_do %}'
+{% endblock form_action %}
+
+{% block submodule_head %}
+Change your name
+{% endblock submodule_head %}
+
+{% block submodule_body %}
+{{ edit_name_form.as_p }}
+{% endblock submodule_body %}
+
+{% block submit_button_text %}
+Submit
+{% endblock %}
