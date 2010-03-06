@@ -187,10 +187,10 @@ People Search
 {% block js_before_bundle %}
 <script type="text/javascript">
   var geocode_person_id_data = {{ person_id2lat_long_as_json|safe}};
-{% if the_user.is_authenticated and the_user.get_profile.location_confirmed %}
-  var logged_in_user_location_confirmed = true;
+{% if the_user.is_authenticated and not the_user.get_profile.location_confirmed %}
+  var logged_in_user_location_unconfirmed = true;
 {% else %}
-  var logged_in_user_location_confirmed = false;
+  var logged_in_user_location_unconfirmed = false;
 {% endif %}
 </script>
 
