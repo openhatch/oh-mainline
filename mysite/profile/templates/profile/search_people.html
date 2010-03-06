@@ -177,6 +177,11 @@ People Search
     </style>
     {% endif %}
 
+    {% if not the_user.is_authenticated %}
+            <span id='' style="float: right; clear: both; position: relative; height: 0; padding: 0, text-align: right;">
+                Put yourself on the map! <a href="{% url account.views.set_location %}">Create an account &raquo;</a>
+            </span>
+    {% endif %}
 {% endblock people_main %}
 
 {% block js_before_bundle %}
