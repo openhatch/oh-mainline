@@ -1,3 +1,4 @@
+{% load base_extras %}
 {% load assets %}
 
 <!doctype html>
@@ -164,6 +165,7 @@
         {% endblock js_tests %}
         {% endif %}
         {% block piwik_js %}
+{% googleanalyticsjs %}
 <script type="text/javascript">
 if (document.location.hostname == 'openhatch.org') {
 var pkBaseURL = (("https:" == document.location.protocol) ? "https://openhatch.org/piwik/" : "http://openhatch.org/piwik/");

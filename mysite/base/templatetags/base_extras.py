@@ -22,14 +22,16 @@ def timesince_terse(value, **args):
         return 'just moments'
     return ret 
 
+# Starting point for the below code 
+# was http://www.djangosnippets.org/snippets/1656/
 class ShowGoogleAnalyticsJS(template.Node):
     def render(self, context):
         code =  getattr(settings, "GOOGLE_ANALYTICS_CODE", False)
+        if 'the_user' in context and context['the_user'] and context['the_user'].is_staff:
+            return "<!-- Goggle Analytics not included because you are a staff user! -->"
+
         if not code:
             return "<!-- Goggle Analytics not included because you haven't set the settings.GOOGLE_ANALYTICS_CODE variable! -->"
-
-        if 'user' in context and context['user'] and context['user'].is_staff:
-            return "<!-- Goggle Analytics not included because you are a staff user! -->"
 
         if settings.DEBUG:
             return "<!-- Goggle Analytics not included because you are in Debug mode! -->"
