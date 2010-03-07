@@ -45,7 +45,7 @@ document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.
 try {
 var pageTracker = _gat._getTracker(CODE_HERE);
 pageTracker._trackPageview();
-} catch(err) {}</script>""".replace(CODE_HERE, code)
+} catch(err) {}</script>""".replace('CODE_HERE', code)
 
 def googleanalyticsjs(parser, token):
     return ShowGoogleAnalyticsJS()
