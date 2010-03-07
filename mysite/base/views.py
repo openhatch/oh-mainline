@@ -114,7 +114,15 @@ def page_to_js(request):
                               mimetype='application/javascript')
 
 def page_not_found(request):
-    return render_to_response('404.html', {'the_user': request.user })
+    t = loader.get_template('404.html')
+    c = Context({
+        'the_user': request.user
+    })
+
+    response = HttpResponse(t.render(c), status=404)
+    return response
+
+
 
 def geocode(request):
     address = request.GET.get('address', None)
