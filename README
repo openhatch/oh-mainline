@@ -1,16 +1,29 @@
 == How to run this code ==
 
-    sudo apt-get install rabbitmq-server python2.5-dev python-apt
-    sudo apt-get install memcached
-    echo "Dude, make sure memcahed is enabled. Read /etc/default/memcached"
+=== Python dependencies ===
 
-FIXME: Explain how to create MySQL user oh_milestone_a and grant select permissions.
+    sudo apt-get install python2.5-dev python-apt
+
+=== Memcached ===
+
+    sudo apt-get install memcached
+
+To start memcached, run:
+
+    sudo /etc/init.d/memcached start
+
+If it complains that it is not enabled, configure it by reading /etc/default/memcached .
+
+=== Buildout ===
 
     python2.5 bootstrap.py
     ./bin/buildout # Make sure you're actually in this directory
     ./bin/mysite runserver
 
 == Set up the database. ==
+
+FIXME: Explain how to create MySQL user oh_milestone_a and grant select permissions.
+
     mysql -u root -p < "CREATE DATABASE; CREATE USER 'oh_milestone_a'@'localhost' IDENTIFIED BY 'ahmaC0Th'; GRANT ALL ON oh_milestone_a.* TO 'oh_milestona_a'@'localhost';
 
 Or use 'mysql -u username', where username is a MySQL user with the appropriate privileges.
