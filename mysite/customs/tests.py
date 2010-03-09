@@ -48,6 +48,9 @@ def generate_404(self):
     raise urllib2.HTTPError('', 404, {}, {}, None)
 open_causes_404.side_effect = generate_404
 
+def generate_403(self):
+    import urllib2
+    raise urllib2.HTTPError('', 403, {}, {}, None)
 
 # Functions you'll need: {{{
 def twill_setup():
@@ -636,6 +639,15 @@ class TracBug(django.test.TestCase):
                   'concerns_just_documentation': False,
                   'as_appears_in_distribution': '',
                   }
+        self.assertEqual(wanted, got)
+
+class WhenGithubSaysPermissionDeniedForRepoList(django.test.TestCase):
+
+    @mock.patch('mysite.customs.github._github_repos_list')
+    def test(self, mock_repo_list):
+        mock_repo_list.side_effect = generate_403
+        wanted = []
+        got = list(mysite.customs.github.repos_by_username('mister_403'))
         self.assertEqual(wanted, got)
 
 class LineAcceptorTest(django.test.TestCase):

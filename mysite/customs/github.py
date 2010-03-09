@@ -4,6 +4,7 @@ import mysite.customs.ohloh
 import simplejson
 import mysite.base.helpers
 import urllib
+import urllib2
 
 _github = None
 
@@ -15,8 +16,20 @@ _github = None
 _github = github2.client.Github(username=settings.GITHUB_USERNAME,
                                api_token=settings.GITHUB_API_TOKEN)
 
+def _github_repos_list(username):
+    return _github.repos.list(username)
+
 def repos_by_username(username):
-    repos = _github.repos.list(username)
+    try:
+        repos = _github_repos_list(username)
+    except urllib2.HTTPError, e:
+        if e.code == 403:
+            # Well, Github said 403
+            # That seems to mean that there is no such Github user. So,
+            # return the empty list.
+            return
+        else:
+            raise # otherwise, wtf
     for repo in repos:
         yield repo
 
