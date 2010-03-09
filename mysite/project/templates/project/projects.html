@@ -6,9 +6,13 @@
 Projects
 {% endblock title %}
 
+{% block body_id %}projects{% endblock %}
+
+{% block body_class%}{{ block.super }} auth{% endblock %}
+
 {% block css %}
 {{ block.super }}
-@import url('/static/css/profile/search_people.css');
+#big-project-list form p label{ text-align: left; display: block; width: 100%;}
 {% endblock css %}
 
 {% block description_for_anonymous_users %}
@@ -17,13 +21,20 @@ about the projects we index
 {% endblock %}
 
 {% block main %}
-{% cache 86400 projects2 %}{# cache for one day 86400 #}
+{% cache 86400 projects4 %}{# cache for one day 86400 #}
 <div id='big-project-list' class='module'>
     <div class='head'>
         <h3>Projects on OpenHatch</h3>
-        <span class='note'>These numbers just include bugs and contributors in our network.</li>
+        <span class='note'>These numbers just include bugs and contributors in our network.</span>
     </div>
-    <div class='module-content body'>
+         <div class='module-content body'>
+         <form method="post" action="">
+             <p>
+             <label for="search_q">Search for a Project</label>
+             <input type="text" name="search_q" id="search_q" value="Go" />
+             </p>
+             <input type="submit">
+         </form>
         <h4>Projects with indexed bugs ({{ projects_with_bugs|length }})</h4>
         <ul>
             {% for project in projects_with_bugs %}
