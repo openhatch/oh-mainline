@@ -150,3 +150,6 @@ def get_uri_metadata_for_generating_absolute_links(request):
     data['uri_scheme'] = uri_scheme
     return data
 
+def haystack_results2db_objects(things):
+    things.load_all()
+    return [x.object for x in things if x.object is not None]

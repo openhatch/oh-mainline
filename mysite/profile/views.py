@@ -333,9 +333,8 @@ def tag_type_query2mappable_orm_people(tag_type_short_name, parsed_query):
     mappable_people_from_haystack = mappable_people_from_haystack.filter(**{
             tag_type_according_to_haystack: parsed_query['q'].lower()})
 
-    mappable_people_from_haystack.load_all()
-
-    mappable_people = [x.object for x in mappable_people_from_haystack if x.object]
+    mappable_people = mysite.base.controllers.haystack_results2db_objects(
+        mappable_people_from_haystack)
 
     ### and sort it the way everyone expects
     mappable_people = sorted(mappable_people, key=lambda p: p.user.username.lower())
@@ -356,9 +355,8 @@ def all_tags_query2mappable_orm_people(parsed_query):
         mappable_people_from_haystack = haystack.query.SearchQuerySet().all()
         mappable_people_from_haystack = mappable_people_from_haystack.filter(**{query: parsed_query['q'].lower()})
         
-        mappable_people_from_haystack.load_all()
-                
-        results = [x.object for x in mappable_people_from_haystack]
+        results = mysite.base.controllers.haystack_results2db_objects(
+            mappable_people_from_haystack)
         query2results[query] = results
 
         ### mappable_people
@@ -418,10 +416,9 @@ def project_query2mappable_orm_people(parsed_query):
     mappable_people_from_haystack = mappable_people_from_haystack.filter(
         **{haystack_field_name: parsed_query['q'].lower()})
     
-    mappable_people_from_haystack.load_all()
-    
-    mappable_people = sorted([x.object for x in mappable_people_from_haystack],
-                             key=lambda x: x.user.username)
+    mappable_people = sorted(
+        mysite.base.controllers.haystack_results2db_objects(mappable_people_from_haystack),
+        key=lambda x: x.user.username)
 
     extra_data = {}
 
