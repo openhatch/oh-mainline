@@ -12,6 +12,7 @@ import urllib
 import mysite.base.controllers
 import mysite.base.decorators
 import mysite.search.models
+import mysite.base.templatetags.base_extras
 
 def twill_setup():
     app = AdminMediaHandler(WSGIHandler())
@@ -188,5 +189,24 @@ class CacheMethod(TwillTests):
 
         # Step 3: See if the cache has it now
         mock_cache.set.assert_called_with('doodles', '"1"', 86400 * 10)
+
+class EnhanceNextWithNewUserMetadata(TwillTests):
+    def test_easy(self):
+        sample_input = '/'
+        wanted = '/?newuser=true'
+        got = mysite.base.templatetags.base_extras.enhance_next_to_annotate_it_with_newuser_is_true(sample_input)
+        self.assertEqual(wanted, got)
+
+    def test_with_existing_query_string(self):
+        sample_input = '/?a=b'
+        wanted = '/?a=b&newuser=true'
+        got = mysite.base.templatetags.base_extras.enhance_next_to_annotate_it_with_newuser_is_true(sample_input)
+        self.assertEqual(wanted, got)
+
+    def test_with_existing_newuser_equals_true(self):
+        sample_input = '/?a=b&newuser=true'
+        wanted = sample_input
+        got = mysite.base.templatetags.base_extras.enhance_next_to_annotate_it_with_newuser_is_true(sample_input)
+        self.assertEqual(wanted, got)
 
 # vim: set ai et ts=4 sw=4 nu:

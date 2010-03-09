@@ -5,6 +5,9 @@ import time
 import calendar
 import datetime
 import re
+import urllib
+import urlparse
+import cgi
 
 register = template.Library()
 
@@ -21,6 +24,20 @@ def timesince_terse(value, **args):
     if ret == '0 minutes':
         return 'just moments'
     return ret 
+
+@register.filter
+def enhance_next_to_annotate_it_with_newuser_is_true(value, **args):
+    # value is a URL -- the value of "next"
+    # here, we enhance it to get a query string indicating the user is a new user
+    parts = urlparse.urlsplit(value)
+    if parts.query:
+        new_query = parts.query
+        if 'newuser=true' not in new_query:
+            new_query += '&newuser=true'
+    else:
+        new_query = 'newuser=true'
+    return urlparse.urlunsplit(
+        (parts[0], parts[1], parts[2], new_query, parts.fragment))
 
 # Starting point for the below code 
 # was http://www.djangosnippets.org/snippets/1656/
