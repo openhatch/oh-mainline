@@ -2,6 +2,7 @@ from django.core.mail import send_mail
 import socket
 from mysite.search.models import Project, ProjectInvolvementQuestion, Answer
 from mysite.profile.models import Person
+import mysite.project.controllers
 import django.template
 import mysite.base.decorators
 import mysite.profile.views
@@ -74,8 +75,14 @@ def project(request, project__name = None):
             'project/project.html',
             context)
 
-@mysite.base.decorators.view
 def projects(request):
+    if request.GET.get('q', None):
+        query = request.GET['q']
+        options = mysite.project.controllers.similar_project_names(
+            query)
+        if len(options) == 1:
+            return HttpResponseRedirect(options[0].get_url())
+        
     template = "project/projects.html"
     projects_with_bugs = mysite.search.controllers.get_projects_with_bugs()
     cited_projects_lacking_bugs = (mysite.search.controllers.
@@ -85,8 +92,7 @@ def projects(request):
             'cited_projects_lacking_bugs': cited_projects_lacking_bugs,
             'explain_to_anonymous_users': True
             }
-    return (request, template, data)
-
+    return mysite.base.decorators.as_view(request, template, data)
 
 def redirect_project_to_projects(request, project__name):
     new_url = reverse(project, kwargs={'project__name': project__name})
