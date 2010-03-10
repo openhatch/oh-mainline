@@ -78,6 +78,17 @@ class ProjectNameSearch(TwillTests):
         tc.submit()
         tc.url('\?q=Twisted') # Assert that URL contains this substring.
         tc.find(query)
+
+    def test_template_get_matching_projects(self):
+        mysite.search.models.Project.create_dummy(name='Twisted System')
+        mysite.search.models.Project.create_dummy(name='Twisted Orange Drinks')
+        response = self.client.get('/+projects/',
+                                   {'q': 'Twisted'},
+                                   follow=True)
+        matching_projects = response.context[0]['matching_projects']
+        self.assertEqual(
+            sorted([p.name for p in matching_projects]),
+            sorted(['Twisted Orange Drinks', 'Twisted System']))
         
 class ProjectList(TwillTests):
     def test(self):

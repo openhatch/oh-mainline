@@ -76,6 +76,7 @@ def project(request, project__name = None):
             context)
 
 def projects(request):
+    data = {}
     query = request.GET.get('q', '')
     matching_projects = []
     if query:
@@ -88,13 +89,13 @@ def projects(request):
     projects_with_bugs = mysite.search.controllers.get_projects_with_bugs()
     cited_projects_lacking_bugs = (mysite.search.controllers.
             get_cited_projects_lacking_bugs())
-    data = {
+    data.update({
+            'matching_projects': matching_projects,
             'projects_with_bugs': projects_with_bugs,
             'query': query,
-            'matching_projects': matching_projects,
             'cited_projects_lacking_bugs': cited_projects_lacking_bugs,
             'explain_to_anonymous_users': True
-            }
+            })
     return mysite.base.decorators.as_view(request, template, data, slug=projects.__name__)
 
 def redirect_project_to_projects(request, project__name):
