@@ -30,9 +30,9 @@ about the projects we index
         <h4>
             <label for="search_q">Search for a project</label>
         </h4>
-        <form method="POST" action="">
+        <form method="GET" action="">
             <p>
-                <input type="text" name="search_q" id="search_q" value="" />
+                <input type="text" name="q" id="search_q" value="{{ query }}" />
                 <input type="submit" value='Search'>
             </p>
         </form>

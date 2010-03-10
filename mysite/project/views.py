@@ -76,11 +76,12 @@ def project(request, project__name = None):
             context)
 
 def projects(request):
-    if request.GET.get('q', None):
-        query = request.GET['q']
-        options = mysite.project.controllers.similar_project_names(
+    query = request.GET.get('q', '')
+    matching_projects = []
+    if query:
+        matching_projects = mysite.project.controllers.similar_project_names(
             query)
-        if len(options) == 1:
+        if len(matching_projects) == 1:
             return HttpResponseRedirect(options[0].get_url())
         
     template = "project/projects.html"
@@ -89,6 +90,8 @@ def projects(request):
             get_cited_projects_lacking_bugs())
     data = {
             'projects_with_bugs': projects_with_bugs,
+            'query': query,
+            'matching_projects': matching_projects,
             'cited_projects_lacking_bugs': cited_projects_lacking_bugs,
             'explain_to_anonymous_users': True
             }
