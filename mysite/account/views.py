@@ -25,6 +25,7 @@ from mysite.profile.models import Person, Tag, TagType, Link_Project_Tag, Link_S
 # and lots of other modules refer to it as mysite.account.views.view.
 # Let's fix this soon.
 from mysite.base.decorators import view
+import django.contrib.auth.views
 # }}}
 
 def signup_do(request):

@@ -1423,13 +1423,7 @@ class WeTakeOwnershipOfAnswersAtLogin(TwillTests):
 class CreateAnonymousAnswer(TwillTests):
     fixtures = ['user-paulproteus']
 
-    def test_create_answer_anonymously(self):
-        # Steps for this test
-        # 1. User fills in the form anonymously
-        # 2. We test that the Answer is not yet saved
-        # 3. User logs in
-        # 4. We test that the Answer is saved
-
+    def create_unsaved_answer(self):
         p = Project.create_dummy(name='Myproject')
         q = ProjectInvolvementQuestion.create_dummy(
                 key_string='where_to_start', is_bug_style=False)
@@ -1442,6 +1436,16 @@ class CreateAnonymousAnswer(TwillTests):
                     }
         response = self.client.post(reverse(mysite.project.views.create_answer_do), POST_data,
                                     follow=True)
+        return p, q, POST_data
+
+    def test_create_answer_anonymously(self):
+        # Steps for this test
+        # 1. User fills in the form anonymously
+        # 2. We test that the Answer is not yet saved
+        # 3. User logs in
+        # 4. We test that the Answer is saved
+        p, q, POST_data = self.create_unsaved_answer()
+
         self.assertEqual(response.redirect_chain,
                          [(u'http://testserver/+projects/Myproject', 302)])
         

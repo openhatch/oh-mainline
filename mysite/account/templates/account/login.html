@@ -1,4 +1,5 @@
 {% extends 'base/one_column.html' %}
+{% load base_extras %}
 
 {% block title %}
 Log in 
@@ -35,24 +36,31 @@ form { width: 350px; }
             {% include 'account/login_openid.html' %}
         </div>
         <div style='float: right; width: 100px;'>
+
+            {% with request|get_answers_from_session as answers %}
             <ul class='unsaved-data' style='float: right; width: 300px; padding: 16px; padding-bottom: 16px; margin-bottom: 16px; border-radius: 8px; -moz-border-radius: 8px; background-color: #f4f4f4;'>
-                <h4 style='width: 95%;'>
-                    Your reply on the Twisted page:
-                </h4>
+                {% for answer in answers %}
+                    <li>
+                        <h4 style='width: 95%;'>
+                            Your reply on the {{ answer.project.name }} page:
+                        </h4>
+                        <div class="the-data">
+                            <p> <span style='font-size: 1.1em;'>
+                                    {{ answer.text|linebreaksbr}}
+                                </span>
+                            </p>
+                            {% with answer.question as question %}
+                            {% spaceless %}
+                                <p> <small style='font-size: .95em;'>(In response to <span>&ldquo;</span>{% include 'question_text.html' %}<span>&rdquo;</span>)</small></p>
+                            {% endspaceless %}
+                            {% endwith %}
 
-                <div class="the-data">
-                    <p> <span style='font-size: 1.1em;'>See
-                            http://twistedmatrix.com/trac/wiki/ContributingToTwistedLabs
-                            for information about getting the source code,
-                            contributing patches, reviewing tickets, and more.
-                        </span>
-                    </p>
-                    <p> <small style='font-size: .95em;'>(In response to &ldquo;I'd like to participate. How do I
-                        begin?&rdquo;)</small></p>
-
-                </div>
+                        </div>
+                    </li>
+                {% endfor %}
 
             </ul>
+            {% endwith %}
             <ul class='login-links' style='float: right; width: 300px; padding: 16px; padding-bottom: 16px; border-radius: 8px; -moz-border-radius: 8px; background-color: #f4f4f4;'>
                 <h4 style='width: 95%;'>Relatedly</h4>
                 <li><a style='font-weight: bold;'

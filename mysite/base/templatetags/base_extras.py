@@ -8,6 +8,7 @@ import re
 import urllib
 import urlparse
 import cgi
+import mysite.project.controllers
 
 register = template.Library()
 
@@ -66,5 +67,9 @@ pageTracker._trackPageview();
 
 def googleanalyticsjs(parser, token):
     return ShowGoogleAnalyticsJS()
+
+@register.filter
+def get_answers_from_session(request):
+    return mysite.project.controllers.get_unsaved_answers_from_session(request.session)
 
 show_common_data = register.tag(googleanalyticsjs)
