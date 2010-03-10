@@ -106,7 +106,7 @@ class ProjectPageCreation(TwillTests):
         self.assertFalse(mysite.search.models.Project.objects.filter(name=project_name))
         
         response = self.client.post(reverse(mysite.project.views.create_project_page_do),
-                                    {'page_name': project_name}, follow=True)
+                                    {'project_name': project_name}, follow=True)
 
         # We successfully made the project...
         self.assert_(mysite.search.models.Project.objects.filter(name=project_name))
@@ -132,7 +132,7 @@ class ProjectPageCreation(TwillTests):
                          len(mysite.search.models.Project.objects.all()))
         
         response = self.client.post(reverse(mysite.project.views.create_project_page_do),
-                                    {'page_name': project_name}, follow=True)
+                                    {'project_name': project_name}, follow=True)
 
         # And we still have exactly that one project in the database.
         self.assertEqual(1,
