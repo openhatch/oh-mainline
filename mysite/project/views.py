@@ -15,6 +15,18 @@ from django.contrib.auth.decorators import login_required
 
 import random
 
+def create_project_page_do(request):
+    page_name = request.POST.get('page_name', None)
+    if page_name:
+        matches = Project.objects.filter(name__iexact=page_name)
+        if matches:
+            our_project = matches[0]
+        else:
+            our_project, was_created = Project.objects.get_or_create(name=page_name)
+        return HttpResponseRedirect(our_project.get_url())
+
+    return HttpResponseBadRequest()
+
 @mysite.base.decorators.view
 def project(request, project__name = None):
     p = get_object_or_404(Project, name=project__name)

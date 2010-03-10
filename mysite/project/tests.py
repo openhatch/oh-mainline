@@ -93,5 +93,52 @@ class ProjectNameSearch(TwillTests):
             sorted(['Twisted Orange Drinks', 'Twisted System']))
         
 class ProjectList(TwillTests):
-    def test(self):
+    def test_it_generally_works(self):
         response = self.client.get('/+projects/')
+
+class ProjectPageCreation(TwillTests):
+
+    @mock.patch('mysite.search.models.Project.populate_icon_from_ohloh')
+    @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
+    def test_post_handler(self, mock_populate_icon, mock_populate_language):
+        # Show that it works
+        project_name = 'Something novel'
+        self.assertFalse(mysite.search.models.Project.objects.filter(name=project_name))
+        
+        response = self.client.post('/+projects/create_project_page_do/',
+                                    {'page_name': project_name}, follow=True)
+
+        # We successfully made the project...
+        self.assert_(mysite.search.models.Project.objects.filter(name=project_name))
+
+        #  and redirected.
+        self.assertEqual(response.redirect_chain,
+                         [('http://testserver/+projects/Something%20novel', 302)])
+                
+        # FIXME: Enqueue a job into the session to have this user take ownership
+        # of this Project.
+        # This could easily be a log for edits.
+
+    @mock.patch('mysite.search.models.Project.populate_icon_from_ohloh')
+    @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
+    def test_post_handler_does_nothing_when_project_exists(
+        self, mock_populate_icon, mock_populate_language):
+        # Show that it works
+        project_name = 'Something novel'
+        Project.create_dummy(name=project_name.lower())
+
+        # See? We have our project in the database.
+        self.assertEqual(1,
+                         len(mysite.search.models.Project.objects.all()))
+        
+        response = self.client.post('/+projects/create_project_page_do/',
+                                    {'page_name': project_name}, follow=True)
+
+        # And we still have exactly that one project in the database.
+        self.assertEqual(1,
+                         len(mysite.search.models.Project.objects.all()))
+        
+        #  and redirected.
+        self.assertEqual(response.redirect_chain,
+                         [('http://testserver/+projects/something%20novel', 302)])
+        
