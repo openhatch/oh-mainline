@@ -1405,6 +1405,10 @@ class WeTakeOwnershipOfAnswersAtLogin(TwillTests):
         # Store the Answer IDs in the session
         mysite.project.controllers.note_in_session_we_control_answer_id(session, answer.id)
         self.assertEqual(session['answer_ids_that_are_ours'], [answer.id])
+
+        # If you want to look at those answers, you can this way:
+        stored_answers = mysite.project.controllers.get_unsaved_answers_from_session(session)
+        self.assertEqual([answer.id for answer in stored_answers], [answer.id])
         
         # Verify that the Answer object is still not available by .objects()
         self.assertFalse(Answer.objects.all())
