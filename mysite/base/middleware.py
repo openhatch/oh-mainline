@@ -22,6 +22,9 @@ class DetectLogin(object):
     # called every time a page is gotten
     # Checks for work that should be done at login time
     def process_response(self, request, response):
+        if not hasattr(request, 'user') or not hasattr(request, 'session'):
+            return response
+
         if request.user.is_authenticated() and 'post_login_stuff_run' not in request.session:
             mysite.project.controllers.take_control_of_our_answers(request.user, request.session)
             request.session['post_login_stuff_run'] = True
