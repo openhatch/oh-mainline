@@ -9,9 +9,10 @@ Log in
 form { width: 350px; }
 .login-links li { list-style: square; float: left; width: 95%; margin-top: 5px; margin-left: 15px; }
 .unsaved-data p{ margin-left: 3; padding-left: 0; list-style: square; float: left; width: 95%; margin-top: 5px; }
-.unsaved-data .the-data { float: left; border-left: 1px dashed #ddd; margin-left: 3px; padding-left: 5px; color: #555;}
+.unsaved-data .the-data { float: left; color: #555;}
 .unsaved-data .the-data .label { font-style: normal;}
-p { margin: 0 0 10px 0; }
+.unsaved-data h4 { margin: 0 0 10px 0; }
+.unsaved-data p { margin: 0 0 10px 0; }
 {% endblock css %}
 
 {% block body_class %}{{ block.super }} auth{% endblock %}
@@ -36,19 +37,21 @@ p { margin: 0 0 10px 0; }
         <div style='float: right; width: 100px;'>
             <ul class='unsaved-data' style='float: right; width: 300px; padding: 16px; padding-bottom: 16px; margin-bottom: 16px; border-radius: 8px; -moz-border-radius: 8px; background-color: #f4f4f4;'>
                 <h4 style='width: 95%;'>
-                You've saved a reply to a question on the Twisted project page:
+                    Your reply on the Twisted page:
                 </h4>
 
                 <div class="the-data">
-                    <p> <span class="label">Q:</span> I'd like to participate. How do I begin?  </p>
+                    <p> <span style='font-size: 1.1em;'>See
+                            http://twistedmatrix.com/trac/wiki/ContributingToTwistedLabs
+                            for information about getting the source code,
+                            contributing patches, reviewing tickets, and more.
+                        </span>
+                    </p>
+                    <p> <small style='font-size: .95em;'>(In response to &ldquo;I'd like to participate. How do I
+                        begin?&rdquo;)</small></p>
 
-                    <p> <span class="label">You</span> wrote: See http://twistedmatrix.com/trac/wiki/ContributingToTwistedLabs
-                    for information about getting the source code, contributing
-                    patches, reviewing tickets, and more.  </p>
                 </div>
 
-                <p> To publish this reply, confirm your identity through an account
-                    you already own (via OpenID).  </p>
             </ul>
             <ul class='login-links' style='float: right; width: 300px; padding: 16px; padding-bottom: 16px; border-radius: 8px; -moz-border-radius: 8px; background-color: #f4f4f4;'>
                 <h4 style='width: 95%;'>Relatedly</h4>
