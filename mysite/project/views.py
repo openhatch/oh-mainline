@@ -60,6 +60,9 @@ def project(request, project__name = None):
     context['question2answer'] = [(question, question.get_answers_for_project(p))
         for question in questions]
 
+    if request.GET.get('cookies', '') == 'disabled':
+        context['cookies_disabled'] = True
+
     context.update({
         'project': p,
         'contributors': p.get_contributors()[:3],
@@ -127,6 +130,12 @@ def delete_paragraph_answer_do(request):
     return HttpResponseRedirect(reverse(project, kwargs={'project__name': our_answer.project.name}))
 
 def create_answer_do(request):
+    if (request.user.is_authenticated() or
+        'cookies_work' in request.session):
+        suffix = ''
+    else:
+        suffix = '?cookies=disabled'
+
     if 'is_edit' in request.POST:
         answer = Answer.objects.get(pk=request.POST['answer__pk'])
     else:
@@ -158,7 +167,7 @@ def create_answer_do(request):
     else:
         answer.author = request.user
 
-    return HttpResponseRedirect(reverse(project, kwargs={'project__name': answer.project.name}))
+    return HttpResponseRedirect(reverse(project, kwargs={'project__name': answer.project.name}) + suffix)
 
 @login_required
 @mysite.base.decorators.view

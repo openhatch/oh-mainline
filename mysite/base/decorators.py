@@ -11,6 +11,15 @@ from django.template.loader import render_to_string
 from django.shortcuts import render_to_response
 
 def as_view(request, template, data, slug):
+    if request.user.is_authenticated() or 'cookies_work' in request.session:
+        # Great! Cookies work.
+        pass
+    else:
+        request.session.set_test_cookie()
+        if request.session.test_cookie_worked():
+            request.session.delete_test_cookie()
+            request.session['cookies_work'] = True
+    
     data['the_user'] = request.user
     data['slug'] = slug # Account settings uses this.
     return render_to_response(template, data)
