@@ -321,7 +321,6 @@ class OwnedAnswersManager(models.Manager):
             author__isnull=False)
 
 class Answer(OpenHatchModel):
-    author_name = models.CharField(null=True, max_length=255)
     title = models.CharField(null=True, max_length=255)
     text = models.TextField(blank=False)
     author = models.ForeignKey(User, null=True)
