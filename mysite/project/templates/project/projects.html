@@ -46,22 +46,21 @@ about the projects we index
             {% endfor %}
         </ul>
         {% else %}
-            {% if query %}
-                <p>
-                No matches for {{query}} :(
-                </p>
-                <p>
-                <form method="POST" action="" style='width: 100%; float: left; '>
-                    <label style='float: left; padding: 7px 5px 7px 0; font-size: 1.5em;'>Start a page for</label>
-                    <input type="text" name="project_name" id="project_name"
-                            style='width: 10em;'
-                            value="{{ query }}" />
-                    <input type="submit" value='Go &raquo;'>
-                </form>
-                </p>
-                
-            {% endif %}
+            <p style='font-size: 1.2em; float: left; width: 100%; margin-top: 10px;'>
+            No matches for {{query}} :(
+            </p>
         {% endif %}
+
+        {% if query and no_project_matches_query_exactly %}
+            <form method="POST" action="" style='clear: left; float: left; padding: 8px 16px; -moz-border-radius: 8px; border-radius: 8px; background-color: #ffc; '>
+                <label style='float: left; color: #444; padding: 8px 10px 7px 0; font-size: 1.5em;'>Start a page for</label>
+                <input type="text" name="project_name" id="project_name"
+                        style='width: 10em;'
+                        value="{{ query }}" />
+                <input type="submit" value='Go &raquo;'>
+            </form>
+        {% endif %}
+            
 
         {% if projects_with_bugs %}
         {% cache 86400 projects_with_bugs %}{# cache for one day 86400 #}

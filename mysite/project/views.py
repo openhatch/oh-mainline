@@ -92,9 +92,11 @@ def projects(request):
     query = request.GET.get('q', '')
     matching_projects = []
     if query:
+        query = query.strip()
         matching_projects = mysite.project.controllers.similar_project_names(
             query)
-        if len(matching_projects) == 1 and query.lower() == matching_projects[0].name.lower():
+        project_matches_query_exactly = query.lower() in [p.name.lower() for p in matching_projects]
+        if len(matching_projects) == 1 and project_matches_query_exactly:
             return HttpResponseRedirect(matching_projects[0].get_url())
         
     if not query:
@@ -105,6 +107,7 @@ def projects(request):
     data.update({
             'query': query,
             'matching_projects': matching_projects,
+            'no_project_matches_query_exactly': not project_matches_query_exactly,
             'explain_to_anonymous_users': True
             })
     return mysite.base.decorators.as_view(request, "project/projects.html", data,
