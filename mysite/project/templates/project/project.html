@@ -9,7 +9,7 @@ Projects - {{ project.name }}
 
 {% block description_for_anonymous_users %}
 <strong>Learn below</strong>
-about our members who support {{ project.name }}
+about how you can help {{ project.name }}
 {% endblock %}
 
 {% block pagetop %}
@@ -27,6 +27,10 @@ about our members who support {{ project.name }}
     <a href='{{ project.get_url }}'>
     </a>
     <h1>{{ project.name }}</h1>
+
+{% if cookies_disabled %}
+<blink>OMG NO COOKIES</blink>
+{% endif %}
 
 {% endblock pagetop %}
 

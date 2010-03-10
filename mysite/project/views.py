@@ -60,6 +60,9 @@ def project(request, project__name = None):
     context['question2answer'] = [(question, question.get_answers_for_project(p))
         for question in questions]
 
+    if request.GET.get('cookies', '') == 'disabled':
+        context['cookies_disabled'] = True
+
     context.update({
         'project': p,
         'contributors': p.get_contributors()[:3],
