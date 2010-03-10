@@ -1,0 +1,22 @@
+{% load profile_extras %}
+            <li
+            {% if forloop.counter0|divisibleby:"4" %}
+            class='first-in-row'
+            {% endif %}
+            >
+            <a href='{{ project.get_url }}'>
+                {{ project.name|break_long_words|safe }} 
+            </a>
+            <div class='summary'>
+                {% if project.get_open_bugs %}
+                {{ project.get_open_bugs.count }} bug{{ project.get_open_bugs.count|pluralize }}<!--
+                -->{% endif %}<!--
+                -->{% if project.get_open_bugs and project.cached_contributor_count %},{% endif %}
+                {% with project.cached_contributor_count as count %}
+                {% if count %}
+                {{ count }} contributor{{ count|pluralize }}
+                {% endif %}
+                {% endwith %}
+            </div>
+            </li>
+
