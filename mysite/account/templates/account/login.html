@@ -21,13 +21,18 @@ form { width: 350px; }
 {% block main %}
 <div id='login' class='module'>
     <div class='head'>
-        <h3>Log in rather quickly with OpenID</h3>
+        <h3>Sign in with an account you already own</h3>
     </div>
     <div class='body'>
 
+        {% with request|get_answers_from_session as answers %}
+
+        {% if answers %}
         <div style='color: #444; font-size: 1.5em; -moz-border-radius: 8px; border-radius: 8px; text-align: center; float: left; width: 98%; margin-bottom: 10px; padding: 8px; background-color: #ffc;'>
             Thanks for your reply! To post it, <strong>link it to an account</strong>.
         </div>
+        {% endif %}
+
         <div style='float: left; width: 500px;'>
 
             {% if next %}
@@ -37,7 +42,7 @@ form { width: 350px; }
         </div>
         <div style='float: right; width: 100px;'>
 
-            {% with request|get_answers_from_session as answers %}
+            {% if answers %}
             <ul class='unsaved-data' style='float: right; width: 300px; padding: 16px; padding-bottom: 16px; margin-bottom: 16px; border-radius: 8px; -moz-border-radius: 8px; background-color: #f4f4f4;'>
                 {% for answer in answers %}
                     <li>
@@ -60,7 +65,8 @@ form { width: 350px; }
                 {% endfor %}
 
             </ul>
-            {% endwith %}
+            {% endif %}
+
             <ul class='login-links' style='float: right; width: 300px; padding: 16px; padding-bottom: 16px; border-radius: 8px; -moz-border-radius: 8px; background-color: #f4f4f4;'>
                 <h4 style='width: 95%;'>Relatedly</h4>
                 <li><a style='font-weight: bold;'
@@ -73,6 +79,7 @@ form { width: 350px; }
             </ul>
         </div>
     </div>
+    {% endwith %}
 </div>
 {% endblock main %}
 
