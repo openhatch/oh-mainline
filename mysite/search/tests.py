@@ -1387,41 +1387,44 @@ class CreateBugAnswer(TwillTests):
         self.assertContains(project_page, title)
         self.assertContains(project_page, text)
 
+class CreateActionDeferredUntilLogin(TwillTests):
+    
+    def create_answer_but_take_ownership_at_login_time(self):
+        session = {}
+        
+        # Create the Answer object, but set its User to None
+        answer = Answer.create_dummy()
+        answer.author = None
+        answer.save()
+        
+        # Verify that the Answer object is not available by .objects()
+        self.assertFalse(Answer.objects.all())
+        
+        # Store the Answer IDs in the session
+        mysite.project.controllers.note_in_session_we_control_answer_id(session, answer.id)
+        self.assertEqual(session['answer_ids_that_are_ours'], [answer.id])
+        
+        # Verify that the Answer object is still not available by .objects()
+        self.assertFalse(Answer.objects.all())
+
+        # At login time, take ownership of thoe Answer IDs
+        mysite.project.controllers.take_control_of_our_answers(user, session)
+
+        # So we remove it from the session
+        self.assertFalse(session['answer_ids_that_are_ours'], [answer.id])
+        
+        # And now we own it!
+        self.assertEqual(Answer.objects.all().count(), 1)
+
 class CreateAnonymousAnswer(TwillTests):
     fixtures = ['user-paulproteus']
 
-    def exercise_answer_form(self, form_name, anonymous=True):
-        # This test just ensures that the form exists on the page with an
-        # author_name field.  It doesn't assert that the field does anything.
-        if not anonymous:
-            self.login_with_twill()
-
-        p = Project.create_dummy()
-        p.save()
-        url = "http://openhatch.org" + p.get_url()
-        url = better_make_twill_url(url)
-        tc.go(url)
-        def try_author_name_field():
-            tc.fv(form_name,'author_name','Barry Spinoza')
-
-        if anonymous:
-            try_author_name_field()
-        else:
-            self.assertRaises(twill.errors.TwillException, try_author_name_field)
-
-    def test_paragraph_style_answer_form_anonymously(self):
-        self.exercise_answer_form('question-short-1', anonymous=True)
-
-    def test_bug_style_answer_form_anonymously(self):
-        self.exercise_answer_form('question-long-3', anonymous=True)
-
-    def test_paragraph_style_answer_form_authd(self):
-        self.exercise_answer_form('question-short-1', anonymous=False)
-
-    def test_bug_style_answer_form_authd(self):
-        self.exercise_answer_form('question-long-3', anonymous=False)
-
-    def test_create_answer(self):
+    def test_create_answer_anonymously(self):
+        # Steps for this test
+        # 1. User fills in the form anonymously
+        # 2. We test that the Answer is not yet saved
+        # 3. User logs in
+        # 4. We test that the Answer is saved
 
         p = Project.create_dummy()
         q = ProjectInvolvementQuestion.create_dummy(
