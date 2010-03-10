@@ -150,6 +150,6 @@ class ProjectPageCreation(TwillTests):
         # anticipate happening sometimes
         tc.fv('create_project', 'project_name', 'NewProject')
         tc.submit()
-        tc.url('\+projects/NewProject')
-        # Assert that we're now a real new Project page (not a 404 page)
-        tc.find('How can people make NewProject better?')
+        post_handler_url = reverse(mysite.project.views.create_project_page_do)
+        import re
+        tc.url(re.escape(post_handler_url))
