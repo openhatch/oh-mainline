@@ -854,7 +854,6 @@ class PersonalData(TwillTests):
         # Views where you look only at yourself.
         navelgazing_view2args = {
                 mysite.profile.views.importer: {},
-                mysite.profile.views.display_person_edit_name: {},
                 }
 
         for view in stalking_view2args:
