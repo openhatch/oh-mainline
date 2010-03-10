@@ -1412,9 +1412,6 @@ class WeTakeOwnershipOfAnswersAtLogin(TwillTests):
         mysite.project.controllers.take_control_of_our_answers(
             User.objects.get(username='paulproteus'), session)
 
-        # So we remove it from the session
-        self.assertFalse(session.get('answer_ids_that_are_ours', False))
-        
         # And now we own it!
         self.assertEqual(Answer.objects.all().count(), 1)
 

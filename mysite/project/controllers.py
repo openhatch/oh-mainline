@@ -12,9 +12,12 @@ def note_in_session_we_control_answer_id(session, answer_id):
     session[key].append(answer_id)
 
 def take_control_of_our_answers(user, session):
+    # FIXME: This really ought to be some sort of thread-safe queue,
+    # or stored in the database, or something.
     key = 'answer_ids_that_are_ours'
     for answer_id in session.get(key, []):
         answer = mysite.search.models.Answer.all_even_unowned.get(pk=answer_id)
         answer.author = user
         answer.save()
-    del session[key]
+    # It's unsafe to remove this key from the session, in case of concurrent access.
+    # So we don't.
