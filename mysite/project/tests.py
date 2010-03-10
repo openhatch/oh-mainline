@@ -94,18 +94,27 @@ class ProjectList(TwillTests):
     def test_it_generally_works(self):
         response = self.client.get('/+projects/')
 
-class ProjectPagesForProjectsWeDoNotHave(TwillTests):
-    def test_for_page_we_do_have(self):
-        # For a project that exists, we can render its page...
-        project = mysite.search.models.Project.create_dummy(name='Twisted System')
-        response = self.client.get('/+projects/Twisted%20System')
-        self.assertContains(response, "Twisted System")
+class ProjectPageCreation(TwillTests):
 
-        # For a project that does not exist, we get a 404...
-        response = self.client.get('/+projects/Nonexistent')
-        self.assertEqual(response.status_code, 404)
+    @mock.patch('mysite.search.models.Project.populate_icon_from_ohloh')
+    @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
+    def test_post_handler(self, mock_populate_icon, mock_populate_language):
+        # FIXME: Assert this does nothing if the project already existed
+        
+        # Show that it works
+        project_name = 'Something novel'
+        self.assertFalse(mysite.search.models.Project.objects.filter(name=project_name))
+        
+        response = self.client.post('/+projects/create_project_page_do/',
+                                    {'page_name': project_name})
 
-        # For a project that does not exist, if we pass in ?creating=true,
-        # then the page renders.
-        response = self.client.get('/+projects/Nonexistent', {'creating': 'true'})
-        self.assertContains(response, "Nonexistent")
+        # We successfully made the project...
+        self.assert_(mysite.search.models.Project.objects.filter(name=project_name))
+
+        #  and redirected.
+        self.assertEqual(response.redirect_chain,
+                         [('http://testserver/+projects/Something%20novel', 302)])
+                
+        # FIXME: Enqueue a job into the session to have this user take ownership
+        # of this Project.
+        # This could easily be a log for edits.

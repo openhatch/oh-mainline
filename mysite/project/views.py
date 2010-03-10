@@ -15,6 +15,19 @@ from django.contrib.auth.decorators import login_required
 
 import random
 
+def create_project_page_do(request):
+    page_name = request.POST.get('page_name', None)
+    import pdb;pdb.set_trace()
+    if page_name:
+        matches = Project.objects.filter(name__iexact=page_name)
+        if matches:
+            our_project = matches[0]
+        else:
+            our_project, was_created = Project.objects.get_or_create(name=page_name)
+        HttpResponseRedirect(our_project.get_url())
+
+    return HttpResponseBadRequest()
+
 @mysite.base.decorators.view
 def project(request, project__name = None):
     p = get_object_or_404(Project, name=project__name)
@@ -83,7 +96,7 @@ def projects(request):
         matching_projects = mysite.project.controllers.similar_project_names(
             query)
         if len(matching_projects) == 1:
-            return HttpResponseRedirect(options[0].get_url())
+            return HttpResponseRedirect(matching_projects[0].get_url())
         
     template = "project/projects.html"
     projects_with_bugs = mysite.search.controllers.get_projects_with_bugs()
