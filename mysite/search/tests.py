@@ -1423,31 +1423,28 @@ class WeTakeOwnershipOfAnswersAtLogin(TwillTests):
 class CreateAnonymousAnswer(TwillTests):
     fixtures = ['user-paulproteus']
 
-    def create_unsaved_answer(self):
-        p = Project.create_dummy(name='Myproject')
-        q = ProjectInvolvementQuestion.create_dummy(
-                key_string='where_to_start', is_bug_style=False)
-
-        # POST some text to the answer creation post handler
-        POST_data = {
-                'project__pk': p.pk,
-                'question__pk': q.pk,
-                'answer__text': """Help produce official documentation, share the solution to a problem, or check, proof and test other documents for accuracy.""",
-                    }
-        response = self.client.post(reverse(mysite.project.views.create_answer_do), POST_data,
-                                    follow=True)
-        return p, q, POST_data
-
     def test_create_answer_anonymously(self):
         # Steps for this test
         # 1. User fills in the form anonymously
         # 2. We test that the Answer is not yet saved
         # 3. User logs in
         # 4. We test that the Answer is saved
-        p, q, POST_data = self.create_unsaved_answer()
 
+        p = Project.create_dummy(name='Myproject')
+        q = ProjectInvolvementQuestion.create_dummy(
+                key_string='where_to_start', is_bug_style=False)
+
+        # POST some text to the answer creation post handler
+        answer_text = """Help produce official documentation, share the solution to a problem, or check, proof and test other documents for accuracy."""
+        POST_data = {
+                'project__pk': p.pk,
+                'question__pk': q.pk,
+                'answer__text': answer_text,
+                    }
+        response = self.client.post(reverse(mysite.project.views.create_answer_do), POST_data,
+                                    follow=True)
         self.assertEqual(response.redirect_chain,
-                         [(u'http://testserver/+projects/Myproject', 302)])
+            [('http://testserver/account/login/?next=%2F%2Bprojects%2FMyproject', 302)])
         
         # If this were an Ajaxy post handler, we might assert something about
         # the response, like 
@@ -1475,6 +1472,10 @@ class CreateAnonymousAnswer(TwillTests):
         answer = Answer.objects.get()
         self.assertEqual(answer.text, POST_data['answer__text'])
         self.assertEqual(answer.author.username, 'paulproteus')
+
+        # Finally, go to the project page and make sure that our Answer has appeared
+        response = self.client.get(p.get_url())
+        self.assertContains(response, answer_text)
 
 class CreateAnswer(TwillTests):
     fixtures = ['user-paulproteus']

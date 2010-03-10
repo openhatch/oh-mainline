@@ -132,17 +132,9 @@ def create_answer_do(request):
     else:
         answer = Answer()
 
+
     answer.project = mysite.search.models.Project.objects.get(pk=request.POST['project__pk'])
 
-    if not request.user.is_authenticated():
-        # If user isn't logged in, send them to the login page with next
-        # parameter populated.
-        url = reverse('oh_login')
-        url += "?" + mysite.base.unicode_sanity.urlencode({u'next':
-            unicode(answer.project.get_url())})
-        return HttpResponseRedirect(url)
-
-    answer.author = request.user
 
     question = ProjectInvolvementQuestion.objects.get(pk=request.POST['question__pk'])
     question.save()
@@ -156,6 +148,15 @@ def create_answer_do(request):
     if answer.author is None:
         mysite.project.controllers.note_in_session_we_control_answer_id(request.session,
                                                                         answer.pk)
+    if not request.user.is_authenticated():
+        # If user isn't logged in, send them to the login page with next
+        # parameter populated.
+        url = reverse('oh_login')
+        url += "?" + mysite.base.unicode_sanity.urlencode({u'next':
+            unicode(answer.project.get_url())})
+        return HttpResponseRedirect(url)
+    else:
+        answer.author = request.user
 
     return HttpResponseRedirect(reverse(project, kwargs={'project__name': answer.project.name}))
 
