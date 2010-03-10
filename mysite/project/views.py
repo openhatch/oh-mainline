@@ -127,6 +127,12 @@ def delete_paragraph_answer_do(request):
     return HttpResponseRedirect(reverse(project, kwargs={'project__name': our_answer.project.name}))
 
 def create_answer_do(request):
+    if (request.user.is_authenticated() or
+        'cookies_work' in request.session):
+        suffix = ''
+    else:
+        suffix = '?cookies=disabled'
+
     if 'is_edit' in request.POST:
         answer = Answer.objects.get(pk=request.POST['answer__pk'])
     else:
@@ -152,7 +158,7 @@ def create_answer_do(request):
         mysite.project.controllers.note_in_session_we_control_answer_id(request.session,
                                                                         answer.pk)
 
-    return HttpResponseRedirect(reverse(project, kwargs={'project__name': answer.project.name}))
+    return HttpResponseRedirect(reverse(project, kwargs={'project__name': answer.project.name}) + suffix)
 
 @login_required
 @mysite.base.decorators.view
