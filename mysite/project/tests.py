@@ -68,7 +68,7 @@ class ProjectNameSearch(TwillTests):
 
     def test_search_when_two_projects_match(self):
         relevant1 = mysite.search.models.Project.create_dummy(name='Twisted System')
-        relevant1 = mysite.search.models.Project.create_dummy(name='Twisted Orange Drinks')
+        relevant2 = mysite.search.models.Project.create_dummy(name='Twisted Orange Drinks')
         response = self.client.get('/+projects/',
                                    {'q': 'Twisted'},
                                    follow=True)
@@ -78,5 +78,21 @@ class ProjectNameSearch(TwillTests):
             sorted(['Twisted Orange Drinks', 'Twisted System']))
         
 class ProjectList(TwillTests):
-    def test(self):
+    def test_it_generally_works(self):
         response = self.client.get('/+projects/')
+
+class ProjectPagesForProjectsWeDoNotHave(TwillTests):
+    def test_for_page_we_do_have(self):
+        # For a project that exists, we can render its page...
+        project = mysite.search.models.Project.create_dummy(name='Twisted System')
+        response = self.client.get('/+projects/Twisted%20System')
+        self.assertContains(response, "Twisted System")
+
+        # For a project that does not exist, we get a 404...
+        response = self.client.get('/+projects/Nonexistent')
+        self.assertEqual(response.status_code, 404)
+
+        # For a project that does not exist, if we pass in ?creating=true,
+        # then the page renders.
+        response = self.client.get('/+projects/Nonexistent', {'creating': 'true'})
+        self.assertContains(response, "Nonexistent")
