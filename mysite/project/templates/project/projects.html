@@ -45,6 +45,20 @@ about the projects we index
                 {% include 'project/project_list_item.html' %}
             {% endfor %}
         </ul>
+        {% else %}
+            {% if query %}
+                <p>
+                No matches for {{query}} :(
+                </p>
+                <p>
+                    Help us out.
+                <form method="POST" action="" style='width: 100%; float: left; '>
+                        <input type="hidden" name="project_name" id="project_name" value="{{ query }}" />
+                        <input type="submit" value='Create it'>
+                </form>
+                </p>
+                
+            {% endif %}
         {% endif %}
 
         {% if projects_with_bugs %}
