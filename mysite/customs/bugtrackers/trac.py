@@ -39,7 +39,10 @@ class TracBug:
 
     @staticmethod
     def page2date_modified(doc):
-        span = doc.cssselect ('.date p:contains("Last modified") span')[0]
+        try:
+            span = doc.cssselect ('.date p:contains("Last modified") span')[0]
+        except IndexError:
+            return TracBug.page2date_opened(doc)
         return TracBug._span2date(span)
 
     @staticmethod
