@@ -21,12 +21,6 @@
             title='Add an answer'
             name='answer__text'
             >{% ifequal edit_form 1%}{{answer.text}}{% endifequal %}</textarea>
-        <div class='show_when_editing'>
-            {% if not the_user.is_authenticated %}
-                <label for='author_name'>Your name</label>
-                <input type='text' name='author_name' />
-            {% endif %}
-        </div>
         {% ifequal edit_form 1%}
     </div>
     {% endifequal %}

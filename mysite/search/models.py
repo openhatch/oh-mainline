@@ -315,13 +315,19 @@ class ProjectInvolvementQuestion(OpenHatchModel):
         ret.save()
         return ret
 
+class OwnedAnswersManager(models.Manager):
+    def get_query_set(self):
+        return super(OwnedAnswersManager, self).get_query_set().filter(
+            author__isnull=False)
+
 class Answer(OpenHatchModel):
-    author_name = models.CharField(null=True, max_length=255)
     title = models.CharField(null=True, max_length=255)
     text = models.TextField(blank=False)
     author = models.ForeignKey(User, null=True)
     question = models.ForeignKey(ProjectInvolvementQuestion, related_name='answers')
     project = models.ForeignKey(Project)
+    objects = OwnedAnswersManager()
+    all_even_unowned = models.Manager()
 
     @staticmethod
     def create_dummy(**kwargs):

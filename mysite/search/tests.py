@@ -1387,73 +1387,90 @@ class CreateBugAnswer(TwillTests):
         self.assertContains(project_page, title)
         self.assertContains(project_page, text)
 
+class WeTakeOwnershipOfAnswersAtLogin(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+    
+    def test_create_answer_but_take_ownership_at_login_time(self):
+        session = {}
+        
+        # Create the Answer object, but set its User to None
+        answer = Answer.create_dummy()
+        answer.author = None
+        answer.is_published = False
+        answer.save()
+        
+        # Verify that the Answer object is not available by .objects()
+        self.assertFalse(Answer.objects.all())
+        
+        # Store the Answer IDs in the session
+        mysite.project.controllers.note_in_session_we_control_answer_id(session, answer.id)
+        self.assertEqual(session['answer_ids_that_are_ours'], [answer.id])
+
+        # If you want to look at those answers, you can this way:
+        stored_answers = mysite.project.controllers.get_unsaved_answers_from_session(session)
+        self.assertEqual([answer.id for answer in stored_answers], [answer.id])
+        
+        # Verify that the Answer object is still not available by .objects()
+        self.assertFalse(Answer.objects.all())
+
+        # At login time, take ownership of those Answer IDs
+        mysite.project.controllers.take_control_of_our_answers(
+            User.objects.get(username='paulproteus'), session)
+
+        # And now we own it!
+        self.assertEqual(Answer.objects.all().count(), 1)
+
 class CreateAnonymousAnswer(TwillTests):
     fixtures = ['user-paulproteus']
 
-    def exercise_answer_form(self, form_name, anonymous=True):
-        # This test just ensures that the form exists on the page with an
-        # author_name field.  It doesn't assert that the field does anything.
-        if not anonymous:
-            self.login_with_twill()
+    def test_create_answer_anonymously(self):
+        # Steps for this test
+        # 1. User fills in the form anonymously
+        # 2. We test that the Answer is not yet saved
+        # 3. User logs in
+        # 4. We test that the Answer is saved
 
-        p = Project.create_dummy()
-        p.save()
-        url = "http://openhatch.org" + p.get_url()
-        url = better_make_twill_url(url)
-        tc.go(url)
-        def try_author_name_field():
-            tc.fv(form_name,'author_name','Barry Spinoza')
-
-        if anonymous:
-            try_author_name_field()
-        else:
-            self.assertRaises(twill.errors.TwillException, try_author_name_field)
-
-    def test_paragraph_style_answer_form_anonymously(self):
-        self.exercise_answer_form('question-short-1', anonymous=True)
-
-    def test_bug_style_answer_form_anonymously(self):
-        self.exercise_answer_form('question-long-3', anonymous=True)
-
-    def test_paragraph_style_answer_form_authd(self):
-        self.exercise_answer_form('question-short-1', anonymous=False)
-
-    def test_bug_style_answer_form_authd(self):
-        self.exercise_answer_form('question-long-3', anonymous=False)
-
-    def test_create_answer(self):
-
-        p = Project.create_dummy()
+        p = Project.create_dummy(name='Myproject')
         q = ProjectInvolvementQuestion.create_dummy(
                 key_string='where_to_start', is_bug_style=False)
 
         # POST some text to the answer creation post handler
         POST_data = {
                 'project__pk': p.pk,
-                'author_name': 'anonymous coward',
                 'question__pk': q.pk,
                 'answer__text': """Help produce official documentation, share the solution to a problem, or check, proof and test other documents for accuracy.""",
                     }
-        response = self.client.post(reverse(mysite.project.views.create_answer_do), POST_data)
-        self.assertEqual(response.status_code, 302)
+        response = self.client.post(reverse(mysite.project.views.create_answer_do), POST_data,
+                                    follow=True)
+        self.assertEqual(response.redirect_chain,
+                         [(u'http://testserver/+projects/Myproject', 302)])
+        
         # If this were an Ajaxy post handler, we might assert something about
         # the response, like 
         #   self.assertEqual(response.content, '1')
 
         # check that the db contains a record with this text
         try:
-            record = Answer.objects.get(text=POST_data['answer__text'])
+            record = Answer.all_even_unowned.get(text=POST_data['answer__text'])
         except Answer.DoesNotExist:
-            print "All Answers:", Answer.objects.all()
+            print "All Answers:", Answer.all_even_unowned.all()
             raise Answer.DoesNotExist 
-        self.assertEqual(record.author_name, POST_data['author_name'])
         self.assertEqual(record.project, p)
         self.assertEqual(record.question, q)
 
-        # check that the project page now includes this text
-        project_page = self.client.get(p.get_url())
-        self.assertContains(project_page, POST_data['answer__text'])
-        self.assertContains(project_page, POST_data['author_name'])
+        self.assertFalse(Answer.objects.all()) # it's unowned
+
+        # But when the user is logged in and *then* visits the project page
+        login_worked = self.client.login(username='paulproteus',
+                                         password="paulproteus's unbreakable password")
+        self.assert_(login_worked)
+
+        self.client.get(p.get_url())
+
+        # Now, the Answer should have an author whose username is paulproteus
+        answer = Answer.objects.get()
+        self.assertEqual(answer.text, POST_data['answer__text'])
+        self.assertEqual(answer.author.username, 'paulproteus')
 
 class CreateAnswer(TwillTests):
     fixtures = ['user-paulproteus']
@@ -1487,18 +1504,9 @@ class CreateAnswer(TwillTests):
         self.assertEqual(record.project, p)
         self.assertEqual(record.question, q)
 
-        # As a sort of side-test, let's # make sure that even if an
-        # 'author_name' was stored in this object, it doesn't get printed if
-        # there's a genuine User object there too
-        record.author_name = 'don\'t print this name'
-        record.save()
-
         # check that the project page now includes this text
         project_page = self.client.get(p.get_url())
         self.assertContains(project_page, POST_data['answer__text'])
         self.assertContains(project_page, record.author.username)
-
-        # now for the side-test assertion
-        self.assertNotContains(project_page, record.author_name)
 
 # vim: set nu ai et ts=4 sw=4:
