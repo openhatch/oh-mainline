@@ -318,7 +318,7 @@ class ProjectInvolvementQuestion(OpenHatchModel):
 class OwnedAnswersManager(models.Manager):
     def get_query_set(self):
         return super(OwnedAnswersManager, self).get_query_set().filter(
-            user__isnull=False)
+            author__isnull=False)
 
 class Answer(OpenHatchModel):
     author_name = models.CharField(null=True, max_length=255)

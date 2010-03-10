@@ -1387,9 +1387,10 @@ class CreateBugAnswer(TwillTests):
         self.assertContains(project_page, title)
         self.assertContains(project_page, text)
 
-class CreateActionDeferredUntilLogin(TwillTests):
+class WeTakeOwnershipOfAnswersAtLogin(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
     
-    def create_answer_but_take_ownership_at_login_time(self):
+    def test_create_answer_but_take_ownership_at_login_time(self):
         session = {}
         
         # Create the Answer object, but set its User to None
@@ -1407,11 +1408,12 @@ class CreateActionDeferredUntilLogin(TwillTests):
         # Verify that the Answer object is still not available by .objects()
         self.assertFalse(Answer.objects.all())
 
-        # At login time, take ownership of thoe Answer IDs
-        mysite.project.controllers.take_control_of_our_answers(user, session)
+        # At login time, take ownership of those Answer IDs
+        mysite.project.controllers.take_control_of_our_answers(
+            User.objects.get(username='paulproteus'), session)
 
         # So we remove it from the session
-        self.assertFalse(session['answer_ids_that_are_ours'], [answer.id])
+        self.assertEqual(session['answer_ids_that_are_ours'], [answer.id])
         
         # And now we own it!
         self.assertEqual(Answer.objects.all().count(), 1)
