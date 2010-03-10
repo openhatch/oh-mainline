@@ -212,6 +212,9 @@ urlpatterns = patterns('',
 
         (r'^\+project/(?P<project__name>.+)', 'mysite.project.views.redirect_project_to_projects'),
 
+        (r'^\+do/project.views.create_project_page_do$',
+                'mysite.project.views.create_project_page_do'),
+
         (r'^\+yo_is_django_alive$', lambda x: HttpResponse('success')),
 
         (r'^\+bitesize$', lambda x: HttpResponseRedirect('/search/?q=&toughness=bitesize')),
