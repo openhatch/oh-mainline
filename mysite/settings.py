@@ -174,6 +174,7 @@ INVITATIONS_PER_USER=5
 DEFAULT_FROM_EMAIL = 'all@openhatch.org'
 
 #CACHE_BACKEND = 'file:///tmp/django_cache_belonging_to_%s' % os.environ.get('USER', 'unknown')
+#CACHE_BACKEND = "dummy://"
 CACHE_BACKEND = "memcached://127.0.0.1:11211/?timeout=1"
 
 # Launchpad credentials

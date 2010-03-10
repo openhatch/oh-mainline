@@ -6,9 +6,14 @@
 Projects
 {% endblock title %}
 
+{% block body_id %}projects{% endblock %}
+
 {% block css %}
 {{ block.super }}
-@import url('/static/css/profile/search_people.css');
+#big-project-list form p label{ text-align: left; display: block; width: 100%;}
+#big-project-list form input[type='text'] { float: left; width: 20em; font-size: 1.5em; padding: 4px; }
+#big-project-list form input[type='submit'] { float: left; font-weight: normal; font-size: 1.5em; padding: 4px 8px 3px 8px; position: relative; top: -1px; }
+#big-project-list .note { margin-left: 2em; font-weight: normal; }
 {% endblock css %}
 
 {% block description_for_anonymous_users %}
@@ -17,17 +22,27 @@ about the projects we index
 {% endblock %}
 
 {% block main %}
-{% cache 86400 projects2 %}{# cache for one day 86400 #}
 <div id='big-project-list' class='module'>
     <div class='head'>
         <h3>Projects on OpenHatch</h3>
-        <span class='note'>These numbers just include bugs and contributors in our network.</li>
     </div>
     <div class='module-content body'>
-        <h4>Projects with indexed bugs ({{ projects_with_bugs|length }})</h4>
+        <h4>
+            <label for="search_q">Search for a project</label>
+        </h4>
+        <form method="GET" action="">
+            <p>
+                <input type="text" name="q" id="search_q" value="{{ query }}" />
+                <input type="submit" value='Search'>
+            </p>
+        </form>
+        {% cache 86400 projects %}{# cache for one day 86400 #}
+        <h4>Projects with indexed bugs ({{ projects_with_bugs|length }})
+        <span class='note'>These numbers just include bugs and contributors in our network.</span>
+        </h4>
         <ul>
             {% for project in projects_with_bugs %}
-            <li
+                <li
             {% if forloop.counter0|divisibleby:"4" %}
             class='first-in-row'
             {% endif %}
@@ -74,6 +89,7 @@ about the projects we index
             </li>
             {% endfor %}
         </ul>
+        {% endcache %}
     </div>
 </div>
 <style>
@@ -81,7 +97,7 @@ about the projects we index
     #big-project-list li a { font-size: 120%; }
     .summary { color: #444; margin-top: 5px; }
     .first-in-row { clear: left; }
-    h4 { width: 100%; margin-bottom: 10px; }
+    h4 { width: 100%; margin-top: 20px; margin-bottom: 10px; }
+    h4:first-child { margin-top: 0px; }
 </style>
-{% endcache %}
 {% endblock main %}

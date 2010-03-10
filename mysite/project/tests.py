@@ -18,6 +18,8 @@ from django.conf import settings
 
 from mysite.customs import ohloh 
 
+from mysite.base.tests import better_make_twill_url
+
 import re
 from StringIO import StringIO
 import urllib
@@ -55,10 +57,12 @@ class ProjectNameSearch(TwillTests):
 
         # Same with lowercase name
         starts_with_twisted = mysite.project.controllers.similar_project_names(
-            'Twisted')
+            'twistEd')
         self.assertEqual(['Twisted System'], [p.name for p in starts_with_twisted])
 
     def test_search_for_one_matching_project_name(self):
+        # If there's an exactly-matching project name, we redirect to that project's page
+        # (instead of showing search results).
         relevant = mysite.search.models.Project.create_dummy(name='Twisted System')
         response = self.client.get('/+projects/',
                                    {'q': 'Twisted System'},
@@ -66,15 +70,24 @@ class ProjectNameSearch(TwillTests):
         self.assertEqual(response.redirect_chain,
                          [('http://testserver/+projects/Twisted%20System', 302)])
 
-    def test_search_when_two_projects_match(self):
-        relevant1 = mysite.search.models.Project.create_dummy(name='Twisted System')
-        relevant2 = mysite.search.models.Project.create_dummy(name='Twisted Orange Drinks')
+    def test_form_sends_data_to_get(self):
+        relevant = mysite.search.models.Project.create_dummy(name='Twisted System')
+        tc.go(better_make_twill_url('http://openhatch.org/+projects'))
+        query = 'Twisted'
+        tc.fv(1, 'search_q', query)
+        tc.submit()
+        tc.url('\?q=Twisted') # Assert that URL contains this substring.
+        tc.find(query)
+
+    def test_template_get_matching_projects(self):
+        mysite.search.models.Project.create_dummy(name='Twisted System')
+        mysite.search.models.Project.create_dummy(name='Twisted Orange Drinks')
         response = self.client.get('/+projects/',
                                    {'q': 'Twisted'},
                                    follow=True)
-        project_options = response.context[0]['project_options']
+        matching_projects = response.context[0]['matching_projects']
         self.assertEqual(
-            sorted([p.name for p in project_options]),
+            sorted([p.name for p in matching_projects]),
             sorted(['Twisted Orange Drinks', 'Twisted System']))
         
 class ProjectList(TwillTests):
