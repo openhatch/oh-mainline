@@ -131,11 +131,18 @@ def create_answer_do(request):
         answer = Answer.objects.get(pk=request.POST['answer__pk'])
     else:
         answer = Answer()
-    if request.user.is_authenticated():
-        answer.author = request.user
-    else:
-        answer.author = None # Well, there is no author right now
-        # So we should make a note in the session by the end of this function
+
+    answer.project = mysite.search.models.Project.objects.get(pk=request.POST['project__pk'])
+
+    if not request.user.is_authenticated():
+        # If user isn't logged in, send them to the login page with next
+        # parameter populated.
+        url = reverse('oh_login')
+        url += "?" + mysite.base.unicode_sanity.urlencode({u'next':
+            unicode(answer.project.get_url())})
+        return HttpResponseRedirect(url)
+
+    answer.author = request.user
 
     question = ProjectInvolvementQuestion.objects.get(pk=request.POST['question__pk'])
     question.save()
@@ -144,8 +151,6 @@ def create_answer_do(request):
     answer.text = request.POST['answer__text']
 
     answer.title = request.POST.get('answer__title', None)
-
-    answer.project_id = request.POST['project__pk']
 
     answer.save()
     if answer.author is None:
