@@ -92,7 +92,7 @@ def projects(request):
             'cited_projects_lacking_bugs': cited_projects_lacking_bugs,
             'explain_to_anonymous_users': True
             }
-    return mysite.base.decorators.as_view(request, template, data)
+    return mysite.base.decorators.as_view(request, template, data, slug=projects.__name__)
 
 def redirect_project_to_projects(request, project__name):
     new_url = reverse(project, kwargs={'project__name': project__name})

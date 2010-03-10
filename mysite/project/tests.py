@@ -67,3 +67,6 @@ class ProjectNameSearch(TwillTests):
                          [('http://testserver/+projects/Twisted%20System', 302)])
         
         
+class ProjectList(TwillTests):
+    def test(self):
+        response = self.client.get('/+projects/')

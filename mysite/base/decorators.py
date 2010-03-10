@@ -10,22 +10,17 @@ from functools import partial
 from django.template.loader import render_to_string
 from django.shortcuts import render_to_response
 
-def as_view(request, template, data):
-    data = {}
+def as_view(request, template, data, slug):
     data['the_user'] = request.user
-    data['slug'] = func.__name__ # Account settings uses this.
-    data.update(view_data)
+    data['slug'] = slug # Account settings uses this.
     return render_to_response(template, data)
 
 @decorator
 def view(func, *args, **kw):
     """Decorator for views."""
     request, template, view_data = func(*args, **kw)
-    data = {}
-    data['the_user'] = request.user
-    data['slug'] = func.__name__ # Account settings uses this.
-    data.update(view_data)
-    return render_to_response(template, data)
+    slug = func.__name__ # Used by account settings
+    return as_view(request, template, view_data, slug)
 
 # vim: ai ts=3 sts=4 et sw=4 nu
 
