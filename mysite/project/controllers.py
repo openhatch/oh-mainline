@@ -17,4 +17,4 @@ def take_control_of_our_answers(user, session):
         answer = mysite.search.models.Answer.all_even_unowned.get(pk=answer_id)
         answer.author = user
         answer.save()
-
+    del session[key]

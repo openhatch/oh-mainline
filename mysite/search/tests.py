@@ -1413,7 +1413,7 @@ class WeTakeOwnershipOfAnswersAtLogin(TwillTests):
             User.objects.get(username='paulproteus'), session)
 
         # So we remove it from the session
-        self.assertEqual(session['answer_ids_that_are_ours'], [answer.id])
+        self.assertFalse(session.get('answer_ids_that_are_ours', False))
         
         # And now we own it!
         self.assertEqual(Answer.objects.all().count(), 1)
