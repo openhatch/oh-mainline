@@ -130,11 +130,6 @@ def delete_paragraph_answer_do(request):
     return HttpResponseRedirect(reverse(project, kwargs={'project__name': our_answer.project.name}))
 
 def create_answer_do(request):
-    if (request.user.is_authenticated() or
-        'cookies_work' in request.session):
-        suffix = ''
-    else:
-        suffix = '?cookies=disabled'
 
     if 'is_edit' in request.POST:
         answer = Answer.objects.get(pk=request.POST['answer__pk'])
@@ -152,6 +147,14 @@ def create_answer_do(request):
     answer.text = request.POST['answer__text']
 
     answer.title = request.POST.get('answer__title', None)
+
+    # loltrolled--you dont have cookies, so we will throw away your data at the last minute
+    if (request.user.is_authenticated() or
+        'cookies_work' in request.session):
+        suffix = ''
+    else:
+        suffix = '?cookies=disabled'
+        return HttpResponseRedirect(reverse(project, kwargs={'project__name': answer.project.name}) + suffix)
 
     answer.save()
     if answer.author is None:

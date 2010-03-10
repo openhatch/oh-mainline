@@ -28,10 +28,6 @@ about how you can help {{ project.name }}
     </a>
     <h1>{{ project.name }}</h1>
 
-{% if cookies_disabled %}
-<blink>OMG NO COOKIES</blink>
-{% endif %}
-<noscript><blink>OMG NO JS</blink></noscript>
 
 {% endblock pagetop %}
 
@@ -41,6 +37,12 @@ about how you can help {{ project.name }}
             <h3>How can people make {{ project.name }} better?</h3>
         </div>
         <div class='body'>
+            <div style="font-size: 1.3em" class="you-are-missing-things">
+            {% if cookies_disabled %}
+            <div>Please enable cookies in order to post answers.</div>
+            {% endif %}
+            <noscript><div>Please enable javascript in order to post answers.</div></noscript>
+            </div>
             <ul id='paragraph_questions' class='questions'>
                 {% for question, answers in question2answer %}
                     <li>
