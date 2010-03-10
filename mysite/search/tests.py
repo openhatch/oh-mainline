@@ -1500,18 +1500,9 @@ class CreateAnswer(TwillTests):
         self.assertEqual(record.project, p)
         self.assertEqual(record.question, q)
 
-        # As a sort of side-test, let's # make sure that even if an
-        # 'author_name' was stored in this object, it doesn't get printed if
-        # there's a genuine User object there too
-        record.author_name = 'don\'t print this name'
-        record.save()
-
         # check that the project page now includes this text
         project_page = self.client.get(p.get_url())
         self.assertContains(project_page, POST_data['answer__text'])
         self.assertContains(project_page, record.author.username)
-
-        # now for the side-test assertion
-        self.assertNotContains(project_page, record.author_name)
 
 # vim: set nu ai et ts=4 sw=4:
