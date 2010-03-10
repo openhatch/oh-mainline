@@ -105,7 +105,7 @@ class ProjectPageCreation(TwillTests):
         project_name = 'Something novel'
         self.assertFalse(mysite.search.models.Project.objects.filter(name=project_name))
         
-        response = self.client.post('/+projects/create_project_page_do/',
+        response = self.client.post(reverse(mysite.project.views.create_project_page_do),
                                     {'page_name': project_name}, follow=True)
 
         # We successfully made the project...
@@ -121,17 +121,17 @@ class ProjectPageCreation(TwillTests):
 
     @mock.patch('mysite.search.models.Project.populate_icon_from_ohloh')
     @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
-    def test_post_handler_does_nothing_when_project_exists(
+    def test_project_creator_simply_redirects_to_project_if_it_exists(
         self, mock_populate_icon, mock_populate_language):
         # Show that it works
         project_name = 'Something novel'
         Project.create_dummy(name=project_name.lower())
 
-        # See? We have our project in the database.
+        # See? We have our project in the database (with slightly different case, but still)
         self.assertEqual(1,
                          len(mysite.search.models.Project.objects.all()))
         
-        response = self.client.post('/+projects/create_project_page_do/',
+        response = self.client.post(reverse(mysite.project.views.create_project_page_do),
                                     {'page_name': project_name}, follow=True)
 
         # And we still have exactly that one project in the database.
@@ -141,4 +141,15 @@ class ProjectPageCreation(TwillTests):
         #  and redirected.
         self.assertEqual(response.redirect_chain,
                          [('http://testserver/+projects/something%20novel', 302)])
-        
+
+    def test_form_on_project_search_page_submits_to_project_creation_post_handler(self):
+        project_search_page_url = better_make_twill_url(
+                "http://openhatch.org%s?q=newproject" % reverse(mysite.project.views.projects))
+        tc.go(project_search_page_url)
+        # Fill form out with slightly different project name, which we
+        # anticipate happening sometimes
+        tc.fv('create_project', 'project_name', 'NewProject')
+        tc.submit()
+        tc.url('\+projects/NewProject')
+        # Assert that we're now a real new Project page (not a 404 page)
+        tc.find('How can people make NewProject better?')
