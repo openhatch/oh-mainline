@@ -34,31 +34,33 @@ about the projects we index
                 <input type="submit" value='Search'>
         </form>
         
-        {% if matching_projects %}
-            <p style='float: left; width: 100%; margin-top: 0; margin-bottom: 20px;'>
-                You searched for &ldquo;{{ query }}&rdquo;.
-                Here {{ matching_projects|pluralize:"is,are" }} your
-                {{ matching_projects|length }} result{{ matching_projects|pluralize}}.
-            </p>
-        <ul>
-            {% for project in matching_projects %}
-                {% include 'project/project_list_item.html' %}
-            {% endfor %}
-        </ul>
-        {% else %}
-            <p style='font-size: 1.2em; float: left; width: 100%; margin-top: 10px;'>
-            No matches for {{query}} :(
-            </p>
-        {% endif %}
+        {% if query %}
+            {% if matching_projects %}
+                <p style='float: left; width: 100%; margin-top: 0; margin-bottom: 20px;'>
+                    You searched for &ldquo;{{ query }}&rdquo;.
+                    Here {{ matching_projects|pluralize:"is,are" }} your
+                    {{ matching_projects|length }} result{{ matching_projects|pluralize}}.
+                </p>
+                <ul>
+                    {% for project in matching_projects %}
+                        {% include 'project/project_list_item.html' %}
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p style='font-size: 1.2em; float: left; width: 100%; margin-top: 10px;'>
+                    No matches for {{query}} :(
+                </p>
+            {% endif %}
 
-        {% if query and no_project_matches_query_exactly %}
-            <form method="POST" action="" style='clear: left; float: left; padding: 8px 16px; -moz-border-radius: 8px; border-radius: 8px; background-color: #ffc; '>
-                <label style='float: left; color: #444; padding: 8px 10px 7px 0; font-size: 1.5em;'>Start a page for</label>
-                <input type="text" name="project_name" id="project_name"
-                        style='width: 10em;'
-                        value="{{ query }}" />
-                <input type="submit" value='Go &raquo;'>
-            </form>
+            {% if no_project_matches_query_exactly %}
+                <form method="POST" action="" style='clear: left; float: left; padding: 8px 16px; -moz-border-radius: 8px; border-radius: 8px; background-color: #ffc; '>
+                    <label style='float: left; color: #444; padding: 8px 10px 7px 0; font-size: 1.5em;'>Start a page for</label>
+                    <input type="text" name="project_name" id="project_name"
+                            style='width: 10em;'
+                            value="{{ query }}" />
+                    <input type="submit" value='Go &raquo;'>
+                </form>
+            {% endif %}
         {% endif %}
             
 

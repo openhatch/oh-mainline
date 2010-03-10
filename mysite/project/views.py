@@ -91,6 +91,7 @@ def projects(request):
     data = {}
     query = request.GET.get('q', '')
     matching_projects = []
+    project_matches_query_exactly = False
     if query:
         query = query.strip()
         matching_projects = mysite.project.controllers.similar_project_names(
