@@ -65,7 +65,17 @@ class ProjectNameSearch(TwillTests):
                                    follow=True)
         self.assertEqual(response.redirect_chain,
                          [('http://testserver/+projects/Twisted%20System', 302)])
-        
+
+    def test_search_when_two_projects_match(self):
+        relevant1 = mysite.search.models.Project.create_dummy(name='Twisted System')
+        relevant1 = mysite.search.models.Project.create_dummy(name='Twisted Orange Drinks')
+        response = self.client.get('/+projects/',
+                                   {'q': 'Twisted'},
+                                   follow=True)
+        project_options = response.context[0]['project_options']
+        self.assertEqual(
+            sorted([p.name for p in project_options]),
+            sorted(['Twisted Orange Drinks', 'Twisted System']))
         
 class ProjectList(TwillTests):
     def test(self):

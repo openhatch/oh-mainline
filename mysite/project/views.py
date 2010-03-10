@@ -76,22 +76,26 @@ def project(request, project__name = None):
             context)
 
 def projects(request):
+    data = {}
+    
     if request.GET.get('q', None):
         query = request.GET['q']
         options = mysite.project.controllers.similar_project_names(
             query)
         if len(options) == 1:
             return HttpResponseRedirect(options[0].get_url())
+        else:
+            data['project_options'] = options
         
     template = "project/projects.html"
     projects_with_bugs = mysite.search.controllers.get_projects_with_bugs()
     cited_projects_lacking_bugs = (mysite.search.controllers.
             get_cited_projects_lacking_bugs())
-    data = {
+    data.update({
             'projects_with_bugs': projects_with_bugs,
             'cited_projects_lacking_bugs': cited_projects_lacking_bugs,
             'explain_to_anonymous_users': True
-            }
+            })
     return mysite.base.decorators.as_view(request, template, data, slug=projects.__name__)
 
 def redirect_project_to_projects(request, project__name):
