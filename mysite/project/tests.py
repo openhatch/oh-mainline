@@ -108,7 +108,7 @@ class ProjectPageCreation(TwillTests):
         self.assertFalse(mysite.search.models.Project.objects.filter(name=project_name))
         
         response = self.client.post('/+projects/create_project_page_do/',
-                                    {'page_name': project_name})
+                                    {'page_name': project_name}, follow=True)
 
         # We successfully made the project...
         self.assert_(mysite.search.models.Project.objects.filter(name=project_name))
