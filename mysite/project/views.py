@@ -82,21 +82,21 @@ def projects(request):
     if query:
         matching_projects = mysite.project.controllers.similar_project_names(
             query)
-        if len(matching_projects) == 1:
-            return HttpResponseRedirect(options[0].get_url())
+        if len(matching_projects) == 1 and query.lower() == matching_projects[0].name.lower():
+            return HttpResponseRedirect(matching_projects[0].get_url())
         
-    template = "project/projects.html"
-    projects_with_bugs = mysite.search.controllers.get_projects_with_bugs()
-    cited_projects_lacking_bugs = (mysite.search.controllers.
-            get_cited_projects_lacking_bugs())
+    if not query:
+        data['projects_with_bugs'] = mysite.search.controllers.get_projects_with_bugs()
+        data['cited_projects_lacking_bugs'] = (mysite.search.controllers.
+                get_cited_projects_lacking_bugs())
+
     data.update({
-            'matching_projects': matching_projects,
-            'projects_with_bugs': projects_with_bugs,
             'query': query,
-            'cited_projects_lacking_bugs': cited_projects_lacking_bugs,
+            'matching_projects': matching_projects,
             'explain_to_anonymous_users': True
             })
-    return mysite.base.decorators.as_view(request, template, data, slug=projects.__name__)
+    return mysite.base.decorators.as_view(request, "project/projects.html", data,
+            slug=projects.__name__)
 
 def redirect_project_to_projects(request, project__name):
     new_url = reverse(project, kwargs={'project__name': project__name})
