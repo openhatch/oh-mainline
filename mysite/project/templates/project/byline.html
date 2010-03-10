@@ -1,10 +1,10 @@
 {% load base_extras %}
 <small style='color: #888;'>&nbsp;&nbsp;&nbsp;&mdash;
   <a style='font-weight: bold;' href='{{ answer.author.get_profile.profile_url }}'>
-    {% spaceless %}
-    {% with answer.author as user %}
-    {% include 'name.html' %}
-    {% endwith %}
+        {% spaceless %}
+        {% with answer.author as user %}
+        {% include 'name.html' %}
+        {% endwith %}
   </a>
   {% endspaceless %}
     &middot; {{ answer.created_date|timesince_terse }} ago
@@ -21,5 +21,4 @@
     {% endspaceless %}
     {% endifequal %}
 </small> 
-</li>
 {# vim: set filetype=htmldjango: #}

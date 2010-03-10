@@ -50,47 +50,49 @@ about our members who support {{ project.name }}
 
                                         {% ifequal the_user answer.author %}
                                             {% with 1 as edit_form %}
-                                            {% include 'project/forms/paragraph.html' %}
-                                        {% endwith %}
-                                    {% endifequal %}
-
-                                    <span class="answer" id="answer_{{answer.pk}}">
-                                        {{ answer.text|urlize }}
-                                        <br/>
-                                        {% include 'project/byline.html' %}
-                                    </span>
-
-                                {% else %}
-
-                                    {% ifequal the_user answer.author %}
-                                        {% with 1 as edit_form %}
-                                        {% include 'project/forms/bug.html' %}
-                                    {% endwith %}
-                                {% endifequal %}
-                                <span class="answer" id="answer_{{answer.pk}}">
-
-                                    <div class="bug_answer_title">
-                                        {% ifequal the_user answer.author %}
+                                                {% include 'project/forms/paragraph.html' %}
+                                            {% endwith %}
                                         {% endifequal %}
-                                        <strong>{{answer.title}}</strong>
-                                    </div>
-                                    {{answer.text|urlize|linebreaksbr}}
-                                    <br/>
-                                    {% include 'project/byline.html' %}
-                                </span>
 
-                            {% endif %}
+                                        <span class="answer" id="answer_{{answer.pk}}">
+                                            {{ answer.text|urlize }}
+                                            <br/>
+                                            {% include 'project/byline.html' %}
+                                        </span>
 
-                        </span>
-                    {% endfor %}
+                                    {% else %}
 
+                                        {% ifequal the_user answer.author %}
+                                            {% with 1 as edit_form %}
+                                                {% include 'project/forms/bug.html' %}
+                                            {% endwith %}
+                                        {% endifequal %}
+
+                                        <span class="answer" id="answer_{{answer.pk}}">
+
+                                            <div class="bug_answer_title">
+                                                {% ifequal the_user answer.author %}
+                                                {% endifequal %}
+                                                <strong>{{answer.title}}</strong>
+                                            </div>
+                                            {{answer.text|urlize|linebreaksbr}}
+                                            <br/>
+                                            {% include 'project/byline.html' %}
+                                        </span>
+
+                                    {% endif %}
+
+                            </span>
+                            </li>
+                        {% endfor %}
+
+                    {# this li allows you to add an answer #}
                     <li>
                         {% if question.is_bug_style %}
                             {% include 'project/forms/bug.html' %}
                         {% else %}
                             {% include 'project/forms/paragraph.html' %}
                         {% endif %}
-
                     </li>
                 </ul>
             </li>
