@@ -1,6 +1,5 @@
 {% extends 'base/one_column.html' %}
 {% load cache %}
-{% load profile_extras %}
 
 {% block title %}
 Projects
@@ -30,66 +29,48 @@ about the projects we index
         <h4>
             <label for="search_q">Search for a project</label>
         </h4>
-        <form method="GET" action="">
-            <p>
+        <form method="GET" action="" style='width: 100%; float: left; '>
                 <input type="text" name="q" id="search_q" value="{{ query }}" />
                 <input type="submit" value='Search'>
-            </p>
         </form>
-        {% cache 86400 projects %}{# cache for one day 86400 #}
+        
+        {% if matching_projects %}
+            <p style='float: left; width: 100%; margin-top: 0; margin-bottom: 20px;'>
+                You searched for &ldquo;{{ query }}&rdquo;.
+                Here {{ matching_projects|pluralize:"is,are" }} your
+                {{ matching_projects|length }} result{{ matching_projects|pluralize}}.
+            </p>
+        <ul>
+            {% for project in matching_projects %}
+                {% include 'project/project_list_item.html' %}
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        {% if projects_with_bugs %}
+        {% cache 86400 projects_with_bugs %}{# cache for one day 86400 #}
         <h4>Projects with indexed bugs ({{ projects_with_bugs|length }})
         <span class='note'>These numbers just include bugs and contributors in our network.</span>
         </h4>
         <ul>
             {% for project in projects_with_bugs %}
-                <li
-            {% if forloop.counter0|divisibleby:"4" %}
-            class='first-in-row'
-            {% endif %}
-            >
-            <a href='{{ project.get_url }}'>
-                {{ project.name|break_long_words|safe }} 
-            </a>
-            <div class='summary'>
-                {% if project.get_open_bugs %}
-                {{ project.get_open_bugs.count }} bug{{ project.get_open_bugs.count|pluralize }}<!--
-                -->{% endif %}<!--
-                -->{% if project.get_open_bugs and project.cached_contributor_count %},{% endif %}
-                {% with project.cached_contributor_count as count %}
-                {% if count %}
-                {{ count }} contributor{{ count|pluralize }}
-                {% endif %}
-                {% endwith %}
-            </div>
-            </li>
-            {% endfor %}
-        </ul>
-        <h4>Projects without bugs</h4>
-        <ul>
-            {% for project in cited_projects_lacking_bugs %}
-            <li
-            {% if forloop.counter0|divisibleby:"4" %}
-            class='first-in-row'
-            {% endif %}
-            >
-            <a href='{{ project.get_url }}'>
-                {{ project.name|break_long_words|safe }} 
-            </a>
-            <div class='summary'>
-                {% if project.get_open_bugs %}
-                {{ project.get_open_bugs.count }} bug{{ project.get_open_bugs.count|pluralize }}<!--
-                -->{% endif %}<!--
-                -->{% if project.get_open_bugs and project.cached_contributor_count %},{% endif %}
-                {% with project.cached_contributor_count as count %}
-                {% if count %}
-                {{ count }} contributor{{ count|pluralize }}
-                {% endif %}
-                {% endwith %}
-            </div>
-            </li>
+                {% include 'project/project_list_item.html' %}
             {% endfor %}
         </ul>
         {% endcache %}
+        {% endif %}
+
+        {% if cited_projects_lacking_bugs %}
+        {% cache 86400 cited_projects_lacking_bugs %}
+        <h4>Projects without bugs</h4>
+        <ul>
+            {% for project in cited_projects_lacking_bugs %}
+                {% include 'project/project_list_item.html' %}
+            {% endfor %}
+        </ul>
+        {% endcache %}
+        {% endif %}
+
     </div>
 </div>
 <style>

@@ -65,12 +65,14 @@ class ProjectNameSearch(TwillTests):
         # (instead of showing search results).
         relevant = mysite.search.models.Project.create_dummy(name='Twisted System')
         response = self.client.get('/+projects/',
-                                   {'q': 'Twisted System'},
+                                   {'q': 'twiSted SysTem'},
                                    follow=True)
         self.assertEqual(response.redirect_chain,
                          [('http://testserver/+projects/Twisted%20System', 302)])
 
     def test_form_sends_data_to_get(self):
+        # This test will fail if a query that selects one project but doesn't
+        # equal the project's name causes a redirect.
         relevant = mysite.search.models.Project.create_dummy(name='Twisted System')
         tc.go(better_make_twill_url('http://openhatch.org/+projects'))
         query = 'Twisted'
