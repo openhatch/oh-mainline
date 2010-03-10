@@ -1,6 +1,6 @@
 body {
-    font: 10pt Helvetica Neue, Helvetica, sans-serif;
-    background: #f7f9ff; /*url("/static/images/motif-eee.png") fixed;*/
+    font: 10pt sans-serif;
+    background: #fff url("/static/images/motif-eee.png") fixed;
     color: #222;
     /* color: rgb(55,84,105); dark blue */
     max-width: 1000px;
