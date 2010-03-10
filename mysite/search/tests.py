@@ -1396,6 +1396,7 @@ class WeTakeOwnershipOfAnswersAtLogin(TwillTests):
         # Create the Answer object, but set its User to None
         answer = Answer.create_dummy()
         answer.author = None
+        answer.is_published = False
         answer.save()
         
         # Verify that the Answer object is not available by .objects()
@@ -1425,37 +1426,47 @@ class CreateAnonymousAnswer(TwillTests):
         # 3. User logs in
         # 4. We test that the Answer is saved
 
-        p = Project.create_dummy()
+        p = Project.create_dummy(name='Myproject')
         q = ProjectInvolvementQuestion.create_dummy(
                 key_string='where_to_start', is_bug_style=False)
 
         # POST some text to the answer creation post handler
         POST_data = {
                 'project__pk': p.pk,
-                'author_name': 'anonymous coward',
                 'question__pk': q.pk,
                 'answer__text': """Help produce official documentation, share the solution to a problem, or check, proof and test other documents for accuracy.""",
                     }
-        response = self.client.post(reverse(mysite.project.views.create_answer_do), POST_data)
-        self.assertEqual(response.status_code, 302)
+        response = self.client.post(reverse(mysite.project.views.create_answer_do), POST_data,
+                                    follow=True)
+        self.assertEqual(response.redirect_chain,
+                         [(u'http://testserver/+projects/Myproject', 302)])
+        
         # If this were an Ajaxy post handler, we might assert something about
         # the response, like 
         #   self.assertEqual(response.content, '1')
 
         # check that the db contains a record with this text
         try:
-            record = Answer.objects.get(text=POST_data['answer__text'])
+            record = Answer.all_even_unowned.get(text=POST_data['answer__text'])
         except Answer.DoesNotExist:
-            print "All Answers:", Answer.objects.all()
+            print "All Answers:", Answer.all_even_unowned.all()
             raise Answer.DoesNotExist 
-        self.assertEqual(record.author_name, POST_data['author_name'])
         self.assertEqual(record.project, p)
         self.assertEqual(record.question, q)
 
-        # check that the project page now includes this text
-        project_page = self.client.get(p.get_url())
-        self.assertContains(project_page, POST_data['answer__text'])
-        self.assertContains(project_page, POST_data['author_name'])
+        self.assertFalse(Answer.objects.all()) # it's unowned
+
+        # But when the user is logged in and *then* visits the project page
+        login_worked = self.client.login(username='paulproteus',
+                                         password="paulproteus's unbreakable password")
+        self.assert_(login_worked)
+
+        self.client.get(p.get_url())
+
+        # Now, the Answer should have an author whose username is paulproteus
+        answer = Answer.objects.get()
+        self.assertEqual(answer.text, POST_data['answer__text'])
+        self.assertEqual(answer.author.username, 'paulproteus')
 
 class CreateAnswer(TwillTests):
     fixtures = ['user-paulproteus']

@@ -129,11 +129,9 @@ def create_answer_do(request):
         answer = Answer()
     if request.user.is_authenticated():
         answer.author = request.user
-    elif request.POST.get('author_name', None):
-        answer.author_name = request.POST['author_name']
     else:
-        return HttpResponseBadRequest('You need to be either be logged in or give us a name to attach to your answer.')
-    
+        answer.author = None # Well, there is no author right now
+        # So we should make a note in the session by the end of this function
 
     question = ProjectInvolvementQuestion.objects.get(pk=request.POST['question__pk'])
     question.save()
@@ -146,7 +144,10 @@ def create_answer_do(request):
     answer.project_id = request.POST['project__pk']
 
     answer.save()
-    
+    if answer.author is None:
+        mysite.project.controllers.note_in_session_we_control_answer_id(request.session,
+                                                                        answer.pk)
+
     return HttpResponseRedirect(reverse(project, kwargs={'project__name': answer.project.name}))
 
 @login_required

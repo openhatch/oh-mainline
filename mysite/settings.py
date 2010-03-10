@@ -91,7 +91,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django_authopenid.middleware.OpenIDMiddleware',
     'mysite.base.middleware.LocationMiddleware',
-
+    'mysite.base.middleware.DetectLogin',
     # Django debug toolbar
     #'debug_toolbar.middleware.DebugToolbarMiddleware',
 )

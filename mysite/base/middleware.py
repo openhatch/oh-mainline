@@ -17,3 +17,12 @@ class LocationMiddleware(object):
                 the_profile.location_display_name = mysite.profile.controllers.get_geoip_guess_for_ip(get_user_ip(request))[1]
                 the_profile.save()
         return None
+
+class DetectLogin(object):
+    # called every time a page is gotten
+    # Checks for work that should be done at login time
+    def process_response(self, request, response):
+        if request.user.is_authenticated() and 'post_login_stuff_run' not in request.session:
+            mysite.project.controllers.take_control_of_our_answers(request.user, request.session)
+            request.session['post_login_stuff_run'] = True
+        return response
