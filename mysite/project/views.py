@@ -17,14 +17,13 @@ import random
 
 def create_project_page_do(request):
     page_name = request.POST.get('page_name', None)
-    import pdb;pdb.set_trace()
     if page_name:
         matches = Project.objects.filter(name__iexact=page_name)
         if matches:
             our_project = matches[0]
         else:
             our_project, was_created = Project.objects.get_or_create(name=page_name)
-        HttpResponseRedirect(our_project.get_url())
+        return HttpResponseRedirect(our_project.get_url())
 
     return HttpResponseBadRequest()
 
