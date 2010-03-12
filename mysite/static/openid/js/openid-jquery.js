@@ -70,6 +70,11 @@ var providers_small = {
     name: 'ClaimID',
     label: 'Enter your ClaimID username.',
     url: 'http://claimid.com/{username}'
+  },
+  fedora: {
+    name: 'Fedora',
+    label: 'Enter your Fedora username.',
+    url: 'https://admin.fedoraproject.org/accounts/openid/id/{username}'
   }
 };
 var providers = $.extend({}, providers_large, providers_small);
