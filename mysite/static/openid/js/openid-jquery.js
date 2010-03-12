@@ -71,6 +71,11 @@ var providers_small = {
     label: 'Enter your ClaimID username.',
     url: 'http://claimid.com/{username}'
   },
+  launchpad: {
+    name: 'LaunchPad',
+    label: 'Enter your Launchpad username.',
+    url: 'https://launchpad.net/~{username}'
+  },
   fedora: {
     name: 'Fedora',
     label: 'Enter your Fedora username.',
