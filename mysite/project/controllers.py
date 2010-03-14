@@ -25,10 +25,7 @@ def get_unsaved_answers_from_session(session):
 def take_control_of_our_answers(user, session, KEY=KEY):
     # FIXME: This really ought to be some sort of thread-safe queue,
     # or stored in the database, or something.
-    for answer_id in session.get(KEY, []):
-        answer = mysite.search.models.Answer.all_even_unowned.get(pk=answer_id)
-        answer.author = user
-        answer.save()
+    answers = get_unsaved_answers_from_session(session)
     # It's unsafe to remove this KEY from the session, in case of concurrent access.
     # But we do anyway. God help us.
     if KEY in session:
