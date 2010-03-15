@@ -1,6 +1,7 @@
 from settings import *
 
-OHLOH_API_KEY='SXvLaGPJFaKXQC0VOocAg'
+OHLOH_API_KEY='0cWqe4uPw7b8Q5337ybPQ'
+#SXvLaGPJFaKXQC0VOocAg'
 DEBUG=False
 ADMINS=[
     ('All OH devs', 'all@openhatch.org'),
