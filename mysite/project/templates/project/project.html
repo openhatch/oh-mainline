@@ -9,13 +9,25 @@ Projects - {{ project.name }}
 
 {% block description_for_anonymous_users %}
 <strong>Learn below</strong>
-about our members who support {{ project.name }}
+about how you can help {{ project.name }}
 {% endblock %}
 
 {% block pagetop %}
 
+    <noscript>
+        <style type='text/css'>
+            li form * { display: inherit ! important; }
+            li form strong { display: inline ! important; }
+            li form.answer_question { float: left; background-color: #ffc; }
+            body#project li form a.collapse_answer_form { display: none ! important; }
+        </style>
+    </noscript>
+
     <h3 class='supertitle'><a href='{% url mysite.project.views.projects %}'>Projects</a></h3>
+    <a href='{{ project.get_url }}'>
+    </a>
     <h1>{{ project.name }}</h1>
+
 
 {% endblock pagetop %}
 
@@ -25,122 +37,116 @@ about our members who support {{ project.name }}
             <h3>How can people make {{ project.name }} better?</h3>
         </div>
         <div class='body'>
+            <div style="font-size: 1.3em" class="you-are-missing-things">
+            {% if cookies_disabled %}
+            <div>Please enable cookies in order to post answers.</div>
+            {% endif %}
+            <noscript><div>Please enable javascript in order to post answers.</div></noscript>
+            </div>
             <ul id='paragraph_questions' class='questions'>
                 {% for question, answers in question2answer %}
                     <li>
                         <h3><strong>Q:</strong>
-                            {% ifequal question.key_string 'where_to_start' %}
-                                I'd like to participate. How do I begin?
-                            {% endifequal %}
-
-                            {% ifequal question.key_string 'stress' %}
-                                What is a bug or issue with {{ project.name }}
-                                that you've been putting off, neglecting, or
-                                just plain avoiding?
-                            {% endifequal %}
-
-                            {% ifequal question.key_string 'newcomers' %}
-                                What's a good bug for a newcomer to tackle?
-                            {% endifequal %}
-                            
-                            {% ifequal question.key_string 'non_code_participation' %}
-                                Other than writing code, how can I contribute?
-
-                            {% endifequal %}
+                            {% include 'question_text.html' %}
                         </h3>
                         <ul class='answers'>
                             {% for answer in answers %}
-                            <li>
-                            {% include 'project/voting_controls.html' %}
-                            {% if not question.is_bug_style %}
+                                <li id='answer_whose_pk_is_{{ answer.pk }}'>
+                                    {% include 'project/voting_controls.html' %}
+                                    {% if not question.is_bug_style %}
 
-                                {% ifequal the_user answer.author %}
-                                {% with 1 as edit_form %}
-                                {% include 'project/forms/paragraph.html' %}
-                                {% endwith %}
-                                {% endifequal %}
-
-                                <span class="answer" id="answer_{{answer.pk}}">
-                                    {{ answer.text|urlize }}
-                                    <br/>
-                                    {% include 'project/byline.html' %}
-                                </span>
-
-                            {% else %}
-
-                                {% ifequal the_user answer.author %}
-                                {% with 1 as edit_form %}
-                                {% include 'project/forms/bug.html' %}
-                                {% endwith %}
-                                {% endifequal %}
-                                <span class="answer" id="answer_{{answer.pk}}">
-                        
-                                    <div class="bug_answer_title">
                                         {% ifequal the_user answer.author %}
+                                            {% with 1 as edit_form %}
+                                                {% include 'project/forms/paragraph.html' %}
+                                            {% endwith %}
                                         {% endifequal %}
-                                        <strong>{{answer.title}}</strong>
-                                    </div>
-                                    {{answer.text|urlize}}
-                                    <br/>
-                                    {% include 'project/byline.html' %}
-                                </span>
 
-                            {% endif %}
+                                        <span class="answer" id="answer_{{answer.pk}}">
+                                            {{ answer.text|urlize }}
+                                            <br/>
+                                            {% include 'project/byline.html' %}
+                                        </span>
 
-                        </span>
+                                    {% else %}
+
+                                        {% ifequal the_user answer.author %}
+                                            {% with 1 as edit_form %}
+                                                {% include 'project/forms/bug.html' %}
+                                            {% endwith %}
+                                        {% endifequal %}
+
+                                        <span class="answer" id="answer_{{answer.pk}}">
+
+                                            <div class="bug_answer_title">
+                                                {% ifequal the_user answer.author %}
+                                                {% endifequal %}
+                                                <strong>{{answer.title}}</strong>
+                                            </div>
+                                            {{answer.text|urlize|linebreaksbr}}
+                                            <br/>
+                                            {% include 'project/byline.html' %}
+                                        </span>
+
+                                    {% endif %}
+
+                            </span>
+                            </li>
                         {% endfor %}
 
-                            <li>
-                            {% if the_user.is_authenticated %}
-                            {% if question.is_bug_style %}
+                    {# this li allows you to add an answer #}
+                    <li>
+                        {% if question.is_bug_style %}
                             {% include 'project/forms/bug.html' %}
-                            {% else %}
+                        {% else %}
                             {% include 'project/forms/paragraph.html' %}
-                            {% endif %}
-                            {% else %}
-                            {# if they aren't logged in#}
-                            <a href="{% url oh_login %}?next={{ project.get_url|urlencode}}" style="">Log in to add an answer</a>
-                            {% endif %}
-
-                            </li>
-                            </ul>
-                            </li>
-                            {% endfor %}
-                        </ul>
-                        <div id="disclaimer" style="font-size: .9em;">Thanks for trying out this new feature.  The questions may change&mdash;we're still working out the details.  Feel free to <a href="/contact">drop us a line</a> with suggestions!</div>
+                        {% endif %}
+                    </li>
+                </ul>
+            </li>
+        {% endfor %}
+    </ul>
+    <strong id="other-questions">
+        <a href="{% url mysite.project.views.suggest_question %}?project__pk={{project.pk}}">
+            What else do you want to talk about?
+        </a>
+    </strong>
     </div>
 </div><!-- /.module #requests -->
 
 {% endblock left %}
 
 {% block main %}
-    {% comment %}
     {% if random_pfentry %}
     <div class='module' id='bugs'>
         <div class='head'>
-            <h3>Description</h3>
+            <h3>About {{ project.name }}</h3>
         </div>
         <div class='body'>
-            <h2 style='font-size: 1.3em; font-weight: normal;'>
-                {% spaceless %}
-                <span class='quotemark'>&ldquo;</span>
-                <span>{{ random_pfentry.project_description|urlize|linebreaksbr}}</span>
-                <span class='quotemark'>&rdquo;</span>
-                {% endspaceless %}
-            </h2>
-            <p style='font-size: .9em; margin: 5px 0 0 0;'>
-                &mdash; from
-                <a href='{{ random_pfentry.person.profile_url }}'>
-                    {{ random_pfentry.person.get_full_name_or_username }}'s
-                    {% spaceless %}
-                    <span>profile</span>
-                    {% endspaceless %}
-                </a>
-            </p>
+            {% if project.icon_for_profile %}
+            <div class='project_icon' 
+                    style="float: left; width: 64px; margin-right: 20px; background-image: url('{{ project.icon_for_profile.url }}')"
+                    ><span class='alt-text'>
+                        (logo)
+                    </span></div>
+            {% endif %}
+            <div style='float: left; width: {% if not project.icon_for_profile %}100%{% else %}70%{% endif %};'>
+                    <h2 style='font-size: 1.3em; font-weight: normal;'>
+                        {% spaceless %}
+                            <span>{{ random_pfentry.project_description|urlize|linebreaksbr}}</span>
+                        {% endspaceless %}
+                    </h2>
+                    <p style='font-size: .9em; margin: 5px 0 0 40px;'>
+                    from the profile of
+                    <a href='{{ random_pfentry.person.profile_url }}'>
+                        {% with random_pfentry.person.user as user %}
+                        {% include 'name.html' %}
+                        {% endwith %}
+                    </a>
+                </p>
+                </div>
         </div>
     </div>
     {% endif %}
-    {% endcomment %}
 
     <div class='module' id='bugs'>
         <div class='head'>

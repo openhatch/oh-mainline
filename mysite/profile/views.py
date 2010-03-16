@@ -232,7 +232,7 @@ def _project_hash(project_name):
 
 @login_required
 # this is a post handler
-def edit_person_info(request):
+def edit_person_info_do(request):
     # {{{
     person = request.user.get_profile()
 
@@ -281,6 +281,9 @@ def edit_person_info(request):
     if '$fwd' in posted_contact_blurb and not person.user.email:
         person.save()
         return edit_info(request, contact_blurb_error=True, contact_blurb_thus_far=posted_contact_blurb)
+    # if their new contact blurb contains $fwd and their old one didn't, then make them a new forwarder
+    if '$fwd' in posted_contact_blurb and not '$fwd' in person.contact_blurb:
+        mysite.base.controllers.generate_forwarder(person.user)
 
     person.contact_blurb = posted_contact_blurb
     person.save()
@@ -330,9 +333,8 @@ def tag_type_query2mappable_orm_people(tag_type_short_name, parsed_query):
     mappable_people_from_haystack = mappable_people_from_haystack.filter(**{
             tag_type_according_to_haystack: parsed_query['q'].lower()})
 
-    mappable_people_from_haystack.load_all()
-
-    mappable_people = [x.object for x in mappable_people_from_haystack]
+    mappable_people = mysite.base.controllers.haystack_results2db_objects(
+        mappable_people_from_haystack)
 
     ### and sort it the way everyone expects
     mappable_people = sorted(mappable_people, key=lambda p: p.user.username.lower())
@@ -353,9 +355,8 @@ def all_tags_query2mappable_orm_people(parsed_query):
         mappable_people_from_haystack = haystack.query.SearchQuerySet().all()
         mappable_people_from_haystack = mappable_people_from_haystack.filter(**{query: parsed_query['q'].lower()})
         
-        mappable_people_from_haystack.load_all()
-                
-        results = [x.object for x in mappable_people_from_haystack]
+        results = mysite.base.controllers.haystack_results2db_objects(
+            mappable_people_from_haystack)
         query2results[query] = results
 
         ### mappable_people
@@ -415,10 +416,9 @@ def project_query2mappable_orm_people(parsed_query):
     mappable_people_from_haystack = mappable_people_from_haystack.filter(
         **{haystack_field_name: parsed_query['q'].lower()})
     
-    mappable_people_from_haystack.load_all()
-    
-    mappable_people = sorted([x.object for x in mappable_people_from_haystack],
-                             key=lambda x: x.user.username)
+    mappable_people = sorted(
+        mysite.base.controllers.haystack_results2db_objects(mappable_people_from_haystack),
+        key=lambda x: x.user.username)
 
     extra_data = {}
 
@@ -506,6 +506,8 @@ def people(request):
             data['geocode_failed'] = True;
         data['center_name'] = request.GET.get('center', '')
         data['center_name_json'] = simplejson.dumps(request.GET.get('center', ''))
+
+    data['show_everybody_javascript_boolean'] = simplejson.dumps(not data.get('center_json', False))
 
     data['person_id2lat_long_as_json'] = simplejson.dumps(
         dict( (person_id, simplejson.loads(mysite.base.controllers.cached_geocoding_in_json(person_id2data[person_id]['location'])))
@@ -650,10 +652,22 @@ def replace_icon_with_default(request):
             pk=int(request.POST['portfolio_entry__pk']),
             person__user=request.user)
     # FIXME: test for naughty people trying to replace others' icons with the default!
+    project = portfolio_entry.project
 
-    # set as default
-    portfolio_entry.project.icon_raw = None
-    portfolio_entry.project.save()
+    project_before_changes = mysite.search.models.Project.objects.get(pk=project.pk)
+
+    # make a record of the old, wrong project icon in the database
+    mysite.search.models.WrongIcon.spawn_from_project(project)
+
+    # set project icon as default
+    project.invalidate_all_icons()
+    project.save()
+
+    # email all@ letting them know that we did so
+    from mysite.project.tasks import send_email_to_all_because_project_icon_was_marked_as_wrong
+    send_email_to_all_because_project_icon_was_marked_as_wrong.delay(project__pk=project_before_changes.pk, project__name=project_before_changes.name, project_icon_url=project_before_changes.icon_for_profile.url)
+
+
 
     # prepare output
     data = {}

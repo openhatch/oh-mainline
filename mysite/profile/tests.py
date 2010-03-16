@@ -4,7 +4,7 @@ from mysite.base.helpers import ObjectFromDict
 import mysite.account.tests
 
 from mysite.search.models import Project
-from mysite.profile.models import Person, Tag, TagType, Link_Person_Tag, DataImportAttempt, PortfolioEntry, Citation
+from mysite.profile.models import Person, Tag, TagType, Link_Person_Tag, DataImportAttempt, PortfolioEntry, Citation, Forwarder
 import mysite.project.views
 
 import mysite.profile.views
@@ -26,6 +26,7 @@ import time
 import datetime
 import tasks 
 import mock
+import UserList
 
 import django.test
 from django.test.client import Client
@@ -52,7 +53,7 @@ class ProfileTests(TwillTests):
         response = self.client.get('/people/')
 
     def test__portfolio_updates_when_citation_added_to_db(self):
-        # {{{
+       # {{{
         username = 'paulproteus'
 
         project_name = 'seeseehost'
@@ -72,29 +73,6 @@ class ProfileTests(TwillTests):
         # Verify that get_publish_portfolio_entries() works
         self.assert_('project name' in [pfe.project.name for pfe in paulproteus.get_published_portfolio_entries()])
 
-        # }}}
-
-    def test_change_my_name(self):
-        """Test that user can change his/her first and last name, and that it appears in the logged-in user's profile page."""
-        # {{{
-        self.login_with_twill()
-
-        tc.go(make_twill_url('http://openhatch.org/people/paulproteus'))
-
-        # No named entered yet
-        tc.notfind('Newfirst Newlast')
-
-        # Let's go enter a name
-        tc.go(make_twill_url('http://openhatch.org/edit/name'))
-        tc.fv('edit_name', 'first_name', 'Newfirst')
-        tc.fv('edit_name', 'last_name', 'Newlast')
-        tc.submit()
-
-        tc.url('/people/paulproteus')
-
-        # Has name been entered correctly? Hope so!
-        tc.find('Newfirst')
-        tc.find('Newlast')
         # }}}
 
     # }}}
@@ -876,7 +854,6 @@ class PersonalData(TwillTests):
         # Views where you look only at yourself.
         navelgazing_view2args = {
                 mysite.profile.views.importer: {},
-                mysite.profile.views.display_person_edit_name: {},
                 }
 
         for view in stalking_view2args:
@@ -1018,9 +995,11 @@ class AddCitationManually(TwillTests):
 class ReplaceIconWithDefault(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
 
-    def test_view(self):
-        portfolio_entry = PortfolioEntry.objects.get_or_create(
-                    project=Project.objects.get_or_create(name='project name')[0],
+    # mock out the django email function
+    @mock.patch("mysite.project.tasks.send_email_to_all_because_project_icon_was_marked_as_wrong.delay")
+    def test_view(self, send_mail_mock):
+        project = Project.objects.get_or_create(name='project name')[0]
+        portfolio_entry = PortfolioEntry.objects.get_or_create(project=project,
                     person=Person.objects.get(user__username='paulproteus'))[0]
         url = reverse(mysite.profile.views.replace_icon_with_default)
         data = {
@@ -1045,11 +1024,38 @@ class ReplaceIconWithDefault(TwillTests):
         self.assert_(response_obj['success'])
         self.assertEqual(response_obj['portfolio_entry__pk'], portfolio_entry.pk)
 
+        # Make sure that all@ was emailed
+        # first check that the task itself was run with the args that we expect
+        self.assert_(send_mail_mock.called)
+
+        expected_call_args = {
+            'project__pk':project.pk,
+            'project__name':project.name,
+            'project_icon_url':project.icon_for_profile.url,
+        }
+        # we have to take [1] here because call_args puts an empty tuple at 0. this is the empty list of non-kw-args
+        self.assertEqual(send_mail_mock.call_args[1], expected_call_args)
+
+        # TODO: next, make sure that the task itself actually sends an email
+        mysite.project.tasks.send_email_to_all_because_project_icon_was_marked_as_wrong(**expected_call_args)
+        outbox = django.core.mail.outbox
+        self.assertEqual(len(outbox), 1)
+        sent_msg = outbox[0]
+        subject = '[OH]- ' + project.name + ' icon was marked as incorrect'
+        self.assertEqual(sent_msg.subject, subject)
+
+        # Check that we correctly created our WrongIcon object
+        # note that 'project' still contains the old project data (before the icon was marked as wrong)
+        wrong_icon = mysite.search.models.WrongIcon.objects.get(project=project)
+        self.assertEqual(wrong_icon.icon_url, project.icon_url)
+        self.assertEqual(wrong_icon.icon_raw, project.icon_raw)
+
         # Check side-effect
         portfolio_entry = PortfolioEntry.objects.get(pk=portfolio_entry.pk)
         self.assertFalse(portfolio_entry.project.icon_raw,
-                "Expected postcondition: portfolio entry's icon evaluates to False "
-                "because it is generic.")
+            "Expected postcondition: portfolio entry's icon evaluates to False "
+            "because it is generic.")
+
 
 class SavePortfolioEntry(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
@@ -1491,8 +1497,13 @@ class EditContactBlurbForwarderification(TwillTests):
         it also takes said person's username or person object or something
         we're testing this:
             the controller returns a string which is the same as the one that it received, except $fwd is replaced with the output of generate_forwarder
-            the Forwarder db table contains a row for our new forwarder
+            the Forwarder db table contains a row for our new forwarder 
+                (which we created with the generate_forwarder controller)
         '''
+        # grab asheesh by the horns
+        sheesh = mysite.profile.models.Person.get_by_username('paulproteus')
+        # make them a forwarder
+        mysite.base.controllers.generate_forwarder(sheesh.user)
         # we have a string that contains the substr $fwd
         mystr = "email me here: $fwd.  it'll be great"
         user_to_forward_to = User.objects.get(username='paulproteus')
@@ -1823,6 +1834,48 @@ class PostFixGeneratorList(TwillTests):
         self.assertEqual(what_we_get, what_we_want)
         
         
+class EmailForwarderGarbageCollection(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+    # create a bunch of forwarders
+        # all possibilitied given the options: "expired," "should no longer be displayed"
+            # except if it's expired we it definitely should no longer be displayed
+    # run garbage collection
+    # make sure that whatever should have happened has happened
+
+    def test(self):
+        # args:
+            # valid = True iff we want a forwarder whose expires_on is in the future
+            # new_enough_for_dispay = True iff we want a forwarder whose stops_being_listed_on date is in the future
+        def create_forwarder(address, valid, new_enough_for_display):
+            expires_on_future_number = valid and 1 or -1
+            stops_being_listed_on_future_number = new_enough_for_display and 1 or -1
+            expires_on = datetime.datetime.utcnow() + expires_on_future_number*datetime.timedelta(minutes=10)
+            stops_being_listed_on = datetime.datetime.utcnow() + stops_being_listed_on_future_number*datetime.timedelta(minutes=10)
+            user = User.objects.get(username="paulproteus")
+            new_mapping = mysite.profile.models.Forwarder(address=address,
+                    expires_on=expires_on, user=user, stops_being_listed_on=stops_being_listed_on)
+            new_mapping.save()
+            return new_mapping
+        # asheesh wants a forwarder in his profile.  oh yes he does.
+        sheesh = mysite.profile.models.Person.get_by_username('paulproteus')
+        sheesh.contact_blurb = u'$fwd'
+        sheesh.save()
+        valid_new = create_forwarder('orange@domain.com', 1, 1)
+        valid_old = create_forwarder('red@domain.com', 1, 0)
+        invalid = create_forwarder('purple@domain.com', 0, 0)
+        # with any luck, the below will call this: mysite.profile.models.Forwarder.garbage_collect()
+        mysite.profile.tasks.GarbageCollectForwarders.apply()
+# valid_new should still be in the database
+# there should be no other forwarders for the address that valid_new has
+        self.assertEqual(1, mysite.profile.models.Forwarder.objects.filter(pk=valid_new.pk).count())
+        self.assertEqual(1, mysite.profile.models.Forwarder.objects.filter(address=valid_new.address).count())
+# valid_old should still be in the database
+        self.assertEqual(1, mysite.profile.models.Forwarder.objects.filter(pk=valid_old.pk).count())
+# invalid should not be in the database
+        self.assertEqual(0, mysite.profile.models.Forwarder.objects.filter(pk=invalid.pk).count())
+# there should be 3 forwarders in total: we gained one and we lost one
+        forwarders = mysite.profile.models.Forwarder.objects.all()
+        self.assertEqual(3, forwarders.count())
 
 class EmailForwarderResolver(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
@@ -1838,6 +1891,17 @@ class EmailForwarderResolver(TwillTests):
 
 
     def test(self):
+        # this function was only being used by this test--so i moved it here. it was in base/controllers --parker
+        def get_email_address_from_forwarder_address(forwarder_address):
+            Forwarder = mysite.profile.models.Forwarder
+            # look in Forwarder model
+            # see if the forwarder address that they gave us is expired
+            # if it isn't return the user's real email address
+            # if it is expired, or if it's not in the table at all, return None
+            try:
+                return Forwarder.objects.get(address=forwarder_address, expires_on__gt=datetime.datetime.utcnow()).user.email
+            except Forwarder.DoesNotExist:
+                return None
         def test_possible_forwarder_address(address, future, actually_create, should_work):
             future_number = future and 1 or -1
             if actually_create:
@@ -1847,7 +1911,7 @@ class EmailForwarderResolver(TwillTests):
                         expires_on=expiry_date, user=user)
                 new_mapping.save()
 
-            output = mysite.base.controllers.get_email_address_from_forwarder_address(address)
+            output = get_email_address_from_forwarder_address(address)
             if should_work:
                 self.assertEqual(output, user.email)
             else:
@@ -1862,4 +1926,152 @@ class EmailForwarderResolver(TwillTests):
         # this one isn't in the table at all
         test_possible_forwarder_address("oranges", True, False, False)
 
+class PersonTagCache(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    @mock.patch('django.core.cache.cache')
+    def test(self, mock_cache):
+        '''This test:
+        * Creates one person whose tag_texts say he can mentor in Banshee
+        * Ensures that get_tag_texts_for_map() caches that
+        * Deletes the Link_Person_Tag object
+        * Ensures the celery task re-fills the cache entry as being empty.'''
+
+        # 0. Our fake cache is empty always
+        mock_cache.get.return_value = None
+
+        # 1. Set link
+        paulproteus = Person.objects.get(user__username='paulproteus')
+        banshee = Project.create_dummy(name='Banshee')
+        can_mentor, _ = TagType.objects.get_or_create(name='can_mentor')
+        
+        willing_to_mentor_banshee, _ = Tag.objects.get_or_create(
+            tag_type=can_mentor,
+            text='Banshee')
+        link = Link_Person_Tag(person=paulproteus,
+                               tag=willing_to_mentor_banshee)
+        link.save()
+
+        # 2. Call get_tag_texts_for_map() and make sure we cached it
+        paulproteus.get_tag_texts_for_map()
+        mock_cache.set.assert_called_with(paulproteus.get_tag_texts_cache_key(),
+                                          simplejson.dumps({'value': ['Banshee']}),
+                                          86400 * 10)
+        mock_cache.set.reset_mock()
+
+        # 3. Delete the link() and make sure the cache has the right value
+        link.delete() # should enqueue a task to update the cache (post-delete)
+        mock_cache.delete.assert_called_with(paulproteus.get_tag_texts_cache_key())
+
+        mock_cache.set.assert_called_with(paulproteus.get_tag_texts_cache_key(),
+                                          simplejson.dumps({'value': []}),
+                                          86400 * 10)
+        mock_cache.set.reset_mock()
+
+        # 4. Create a new Link and make sure it's cached properly again
+        link = Link_Person_Tag(person=paulproteus,
+                               tag=willing_to_mentor_banshee)
+        link.save() # should fire bgtask to update the cache (post-save signal)
+        mock_cache.set.assert_called_with(paulproteus.get_tag_texts_cache_key(),
+                                          simplejson.dumps({'value': ['Banshee']}),
+                                          86400 * 10)
+
+class PersonProjectCache(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    @mock.patch('django.core.cache.cache')
+    def test(self, mock_cache):
+        '''This test:
+        * Creates one person whose tag_texts say he can mentor in Banshee
+        * Ensures that get_tag_texts_for_map() caches that
+        * Deletes the Link_Person_Tag object
+        * Ensures the celery task re-fills the cache entry as being empty.'''
+
+        # 0. Our fake cache is empty always
+        mock_cache.get.return_value = None
+
+        # 1. Give the person a PFE
+        paulproteus = Person.objects.get(user__username='paulproteus')
+        portfolio_entry, _ =PortfolioEntry.objects.get_or_create(
+            project=Project.create_dummy(name='project name'),
+            is_published=True,
+            person=paulproteus)
+
+        # 2. Make sure we cached it
+        mock_cache.set.assert_called_with(paulproteus.get_cache_key_for_projects(),
+                                          simplejson.dumps({'value': [
+                                            'project name']}),
+                                          86400 * 10)
+        mock_cache.set.reset_mock()
+
+        # 3. Delete the PFE, and make sure the cache got deleted
+        portfolio_entry.delete()
+        mock_cache.delete.assert_called_with(
+            paulproteus.get_cache_key_for_projects())
+        mock_cache.set.assert_called_with(
+            paulproteus.get_cache_key_for_projects(),
+            simplejson.dumps({'value': []}),
+            86400 * 10)
+        mock_cache.set.reset_mock()
+
+        # 4. Add a new one, and make sure it's up to date
+        portfolio_entry, _ =PortfolioEntry.objects.get_or_create(
+            project=Project.create_dummy(name='other name'),
+            is_published=True,
+            person=paulproteus)
+        mock_cache.set.assert_called_with(
+            paulproteus.get_cache_key_for_projects(),
+            simplejson.dumps({'value': [
+                'other name']}),
+            86400 * 10)
+        mock_cache.set.reset_mock()
+
+class ForwarderGetsCreated(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def test(self):
+        # paulproteus has $fwd in his contact blurb
+        p = Person.get_by_username('paulproteus')
+        p.contact_blurb = "hi, $fwd!"
+        p.save()
+
+        # no forwarder in the db
+        self.assertFalse(Forwarder.objects.all())
+
+        # now we GET the profile...
+        response = self.client.get(p.profile_url)
+
+        new_fwd = Forwarder.objects.all()[0]
+        self.assert_(new_fwd)
+
+        # the page will contain the whole string because it's in the mailto:
+        self.assertContains(response, new_fwd.address)
+
+class EditYourName(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def test_settings_page_form(self):
+        # visit generic settings page
+        self.login_with_twill()
+        tc.go(make_twill_url('http://openhatch.org/'))
+        tc.follow('settings')
+        tc.follow('Name')
+        tc.fv(1, 'first_name', 'Gottfried')
+        tc.fv(1, 'last_name', 'Leibniz')
+        tc.submit()
+        tc.go(make_twill_url('http://openhatch.org' + Person.objects.get().profile_url))
+        tc.find('Gottfried Leibniz')
+        tc.notfind('Asheesh Laroia')
+
+class FixAllTagsQueryWhenHaystackReturnsHalfPeople(TwillTests):
+
+    def test(self):
+        things = UserList.UserList([
+            ObjectFromDict({'object': None}),
+            ObjectFromDict({'object': 'a real thing'})])
+        things.load_all = mock.Mock()
+        just_real_thing = mysite.base.controllers.haystack_results2db_objects(things)
+        self.assertEqual(just_real_thing, ['a real thing'])
+        self.assert_(things.load_all.called)
+        
  # vim: set ai et ts=4 sw=4 nu:

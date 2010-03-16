@@ -48,7 +48,7 @@ var providers_small = {
   },
   wordpress: {
     name: 'Wordpress',
-    label: 'Enter your Wordpress.com username.',
+    label: 'Enter your Wordpress.com subdomain.',
     url: 'http://{username}.wordpress.com/'
   },
   blogger: {
@@ -70,6 +70,16 @@ var providers_small = {
     name: 'ClaimID',
     label: 'Enter your ClaimID username.',
     url: 'http://claimid.com/{username}'
+  },
+  launchpad: {
+    name: 'LaunchPad',
+    label: 'Enter your Launchpad username.',
+    url: 'https://launchpad.net/~{username}'
+  },
+  fedora: {
+    name: 'Fedora',
+    label: 'Enter your Fedora username.',
+    url: 'https://admin.fedoraproject.org/accounts/openid/id/{username}'
   }
 };
 var providers = $.extend({}, providers_large, providers_small);
@@ -204,6 +214,9 @@ var openid = {
   submit: function() {
     var url = openid.provider_url;
     if (url) {
+      if(openid.provider_name=='Wordpress'){
+        url = url.replace('http://', '')
+      }
       url = url.replace('{username}', $('#openid_username').val());
       openid.setOpenIdUrl(url);
     } 
@@ -257,6 +270,7 @@ var openid = {
     var value = '';
     var label = provider['label'];
     var style = '';
+    var before_submit = '';
 
     if (label) {
       html = '<p>' + label + '</p>';
@@ -267,7 +281,11 @@ var openid = {
       value = 'http://';
       style = 'background:#FFF url('+this.img_path+'openid-inputicon.gif) no-repeat scroll 0 50%; padding-left:18px;';
     }
-    html += '<input id="'+id+'" type="text" style="'+style+'" name="'+name+'" value="'+value+'" />' + 
+    else if (provider['name'] == 'Wordpress') {
+      value = 'http://';
+      before_submit = '<span id="wordpress-domain">.wordpress.com</span>'
+    }
+    html += '<input id="'+id+'" type="text" style="'+style+'" name="'+name+'" value="'+value+'" />' + before_submit +
     '<input id="openid_submit" type="submit" value="Sign in"/>';
 
     input_area.empty();

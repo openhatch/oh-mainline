@@ -1,3 +1,4 @@
+{% load base_extras %}
 {% load assets %}
 
 <!doctype html>
@@ -9,6 +10,7 @@
             {% endblock whole_title %}
         </title>
 
+        <link rel="shortcut icon" href="/favicon.ico" />
         <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
         <meta http-equiv='Content-Language' content='en-us' />
         <meta name='Description' content='OpenHatch, the open source involvement engine.'>
@@ -164,6 +166,7 @@
         {% endblock js_tests %}
         {% endif %}
         {% block piwik_js %}
+{% googleanalyticsjs %}
 <script type="text/javascript">
 if (document.location.hostname == 'openhatch.org') {
 var pkBaseURL = (("https:" == document.location.protocol) ? "https://openhatch.org/piwik/" : "http://openhatch.org/piwik/");

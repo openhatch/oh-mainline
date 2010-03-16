@@ -1,5 +1,6 @@
 from django.conf.urls.defaults import *
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponsePermanentRedirect
+from django.shortcuts import redirect
 
 from django.conf import settings
 
@@ -13,7 +14,15 @@ from django_authopenid import views as oid_views
 
 from voting.views import vote_on_object
 
+import mysite.account.views
+
 urlpatterns = patterns('',
+        (r'^\+projects/suggest_question/',
+            'mysite.project.views.suggest_question'),
+        (r'^\+projects/suggest_question_do/',
+            'mysite.project.views.suggest_question_do'),
+        (r'^\+projects/create_project_page_do',
+            'mysite.project.views.create_project_page_do'),
         # Generic view to vote on Link objects
         (r'^\+answer/vote/(?P<object_id>\d+)/(?P<direction>up|down|clear)vote/?$',
             vote_on_object, dict(model=mysite.search.models.Answer,
@@ -36,7 +45,6 @@ urlpatterns = patterns('',
             'mysite.profile.views.people'),
 
         (r'^\+people/list/$', lambda x: HttpResponsePermanentRedirect('/people/')),
-
 
         (r'^account/forgot_pass/$',
             'django.contrib.auth.views.password_reset', {
@@ -65,7 +73,7 @@ urlpatterns = patterns('',
                 'mysite.profile.views.widget_display_js'),
 
         (r'^people/info/edit/do$',
-            'mysite.profile.views.edit_person_info'),
+            'mysite.profile.views.edit_person_info_do'),
 
         # OpenID URL prefix for django_authopenid.urls
         url(r'^openid/signin/$', oid_views.signin, name='user_signin'),
@@ -93,6 +101,12 @@ urlpatterns = patterns('',
 
         (r'^account/settings/$',
             'mysite.account.views.settings'),
+
+        (r'^account/settings/edit_name$',
+            'mysite.account.views.edit_name'),
+
+        (r'^account/settings/edit_name_do$',
+            'mysite.account.views.edit_name_do'),
 
         (r'^account/settings/password/$',
             'mysite.account.views.change_password'),
@@ -169,13 +183,6 @@ urlpatterns = patterns('',
 
         (r'^profile/views/edit_info$', 'mysite.profile.views.edit_info'),
 
-        (r'^edit/name$',
-                'mysite.profile.views.display_person_edit_name',
-                { 'name_edit_mode': True }),
-
-        (r'^edit/name/do$',
-                'mysite.profile.views.display_person_edit_name_do'),
-
         (r'^profile/views/prepare_data_import_attempts_do$',
                 'mysite.profile.views.prepare_data_import_attempts_do'),
 
@@ -199,9 +206,14 @@ urlpatterns = patterns('',
         (r'^\+do/project.views.create_answer_do$', 'mysite.project.views.create_answer_do'),
         (r'^\+do/project.views.delete_paragraph_answer_do$', 'mysite.project.views.delete_paragraph_answer_do'),
 
+        (r'^\+do/search.views.subscribe_to_bug_alert_do$', 'mysite.search.views.subscribe_to_bug_alert_do'),
+
         (r'^\+projects/', include('mysite.project.urls')),
 
         (r'^\+project/(?P<project__name>.+)', 'mysite.project.views.redirect_project_to_projects'),
+
+        (r'^\+do/project.views.create_project_page_do$',
+                'mysite.project.views.create_project_page_do'),
 
         (r'^\+yo_is_django_alive$', lambda x: HttpResponse('success')),
 
@@ -211,7 +223,7 @@ urlpatterns = patterns('',
 
                        (r'^hearch/', include('haystack.urls')),
 
-
+        (r'^edit/name$', lambda x: redirect(to=mysite.account.views.edit_name, permanent=True)),
 
         # This dangerous regex is last
         (r'^people/(?P<user_to_display__username>[^/]+)[/?]$',

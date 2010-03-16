@@ -7,8 +7,12 @@ from StringIO import StringIO
 from django.test.client import Client
 import mysite.base.helpers
 import mock
+import urllib
 
 import mysite.base.controllers
+import mysite.base.decorators
+import mysite.search.models
+import mysite.base.templatetags.base_extras
 
 def twill_setup():
     app = AdminMediaHandler(WSGIHandler())
@@ -22,6 +26,9 @@ def make_twill_url(url):
     # modify this
     return url.replace("http://openhatch.org/",
             "http://127.0.0.1:8080/")
+
+def better_make_twill_url(url):
+    return make_twill_url(url.replace('+','%2B'))
 
 def twill_quiet():
     # suppress normal output of twill.. You don't want to
@@ -130,5 +137,76 @@ class TestUnicodifyDecorator(TwillTests):
             self.assertEqual(type(arg), unicode)
 
         sample_thing(utf8_data)
+
+class Feed(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def test_feed_shows_recent_answers(self):
+
+        # Visit the homepage, notice that there are no answers in the context.
+
+        def get_answers_from_homepage():
+            homepage_response = self.client.get('/')
+            return homepage_response.context[0]['recent_answers']
+        
+        self.assertFalse(get_answers_from_homepage())
+
+        # Create a few answers on the project discussion page.
+        for x in range(4):
+            mysite.search.models.Answer.create_dummy()
+
+        recent_answers = mysite.search.models.Answer.objects.all().order_by('-modified_date')
+
+        # Visit the homepage, assert that the feed item data is on the page,
+        # ordered by date descending.
+        actual_answer_pks = list(get_answers_from_homepage().values_list('pk', flat=True))
+        expected_answer_pks = list(recent_answers.values_list('pk', flat=True))
+        self.assertEqual(actual_answer_pks, expected_answer_pks)
+
+class CacheMethod(TwillTests):
+
+    @mock.patch('django.core.cache.cache')
+    def test(self, mock_cache):
+        # Step 0: mock_cache.get() needs to return None
+        mock_cache.get.return_value = None
+        
+        # Step 1: Create a method where we can test if it was cached (+ cache it)
+        class SomeClass:
+            def __init__(self):
+                self.call_counter = 0
+
+            def cache_key_getter_name(self):
+                return 'doodles'
+
+            @mysite.base.decorators.cache_method('cache_key_getter_name')
+            def some_method(self):
+                self.call_counter += 1
+                return str(self.call_counter)
+
+        # Step 2: Call it once to fill the cache
+        sc = SomeClass()
+        self.assertEqual(sc.some_method(), '1')
+
+        # Step 3: See if the cache has it now
+        mock_cache.set.assert_called_with('doodles', '"1"', 86400 * 10)
+
+class EnhanceNextWithNewUserMetadata(TwillTests):
+    def test_easy(self):
+        sample_input = '/'
+        wanted = '/?newuser=true'
+        got = mysite.base.templatetags.base_extras.enhance_next_to_annotate_it_with_newuser_is_true(sample_input)
+        self.assertEqual(wanted, got)
+
+    def test_with_existing_query_string(self):
+        sample_input = '/?a=b'
+        wanted = '/?a=b&newuser=true'
+        got = mysite.base.templatetags.base_extras.enhance_next_to_annotate_it_with_newuser_is_true(sample_input)
+        self.assertEqual(wanted, got)
+
+    def test_with_existing_newuser_equals_true(self):
+        sample_input = '/?a=b&newuser=true'
+        wanted = sample_input
+        got = mysite.base.templatetags.base_extras.enhance_next_to_annotate_it_with_newuser_is_true(sample_input)
+        self.assertEqual(wanted, got)
 
 # vim: set ai et ts=4 sw=4 nu:

@@ -1,16 +1,31 @@
+from django.core.mail import send_mail
+import socket
 from mysite.search.models import Project, ProjectInvolvementQuestion, Answer
 from mysite.profile.models import Person
+import mysite.project.controllers
 import django.template
 import mysite.base.decorators
 import mysite.profile.views
 
 from django.http import HttpResponse, HttpResponseRedirect, \
-        HttpResponsePermanentRedirect, HttpResponseServerError
+        HttpResponsePermanentRedirect, HttpResponseServerError, HttpResponseBadRequest
 from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 
 import random
+
+def create_project_page_do(request):
+    project_name = request.POST.get('project_name', None)
+    if project_name:
+        matches = Project.objects.filter(name__iexact=project_name)
+        if matches:
+            our_project = matches[0]
+        else:
+            our_project, was_created = Project.objects.get_or_create(name=project_name)
+        return HttpResponseRedirect(our_project.get_url())
+
+    return HttpResponseBadRequest('Bad request')
 
 @mysite.base.decorators.view
 def project(request, project__name = None):
@@ -45,6 +60,9 @@ def project(request, project__name = None):
     context['question2answer'] = [(question, question.get_answers_for_project(p))
         for question in questions]
 
+    if request.GET.get('cookies', '') == 'disabled':
+        context['cookies_disabled'] = True
+
     context.update({
         'project': p,
         'contributors': p.get_contributors()[:3],
@@ -54,24 +72,53 @@ def project(request, project__name = None):
             'can_mentor', p.language)),
         'explain_to_anonymous_users': True,
         })
+
+    question_suggestion_response = request.GET.get('question_suggestion_response', None)
+    context['notifications'] = []
+    if question_suggestion_response == 'success':
+        context['notifications'].append({
+            'id': 'question_suggestion_response',
+            'text': 'Thanks for your suggestion!'
+            })
+    elif question_suggestion_response == 'failure':
+        context['notifications'].append({
+            'id': 'question_suggestion_response',
+            'text': "Oops, there was an error submitting your suggested question--we probably couldn't connect to our outgoing mailserver. Try just sending an email to <a href='hello@openhatch.org'>hello@openhatch.org</a>"
+            })
+
     return (request,
             'project/project.html',
-            context
-            )
+            context)
 
-@mysite.base.decorators.view
+from django.views.decorators.cache import cache_page
+@cache_page(60 * 15)
+
 def projects(request):
-    template = "project/projects.html"
-    projects_with_bugs = mysite.search.controllers.get_projects_with_bugs()
-    cited_projects_lacking_bugs = (mysite.search.controllers.
-            get_cited_projects_lacking_bugs())
-    data = {
-            'projects_with_bugs': projects_with_bugs,
-            'cited_projects_lacking_bugs': cited_projects_lacking_bugs,
-            'explain_to_anonymous_users': True
-            }
-    return (request, template, data)
+    data = {}
+    query = request.GET.get('q', '')
+    matching_projects = []
+    project_matches_query_exactly = False
+    if query:
+        query = query.strip()
+        matching_projects = mysite.project.controllers.similar_project_names(
+            query)
+        project_matches_query_exactly = query.lower() in [p.name.lower() for p in matching_projects]
+        if len(matching_projects) == 1 and project_matches_query_exactly:
+            return HttpResponseRedirect(matching_projects[0].get_url())
+        
+    if not query:
+        data['projects_with_bugs'] = mysite.search.controllers.get_projects_with_bugs()
+        data['cited_projects_lacking_bugs'] = (mysite.search.controllers.
+                get_cited_projects_lacking_bugs())
 
+    data.update({
+            'query': query,
+            'matching_projects': matching_projects,
+            'no_project_matches_query_exactly': not project_matches_query_exactly,
+            'explain_to_anonymous_users': True
+            })
+    return mysite.base.decorators.as_view(request, "project/projects.html", data,
+            slug=projects.__name__)
 
 def redirect_project_to_projects(request, project__name):
     new_url = reverse(project, kwargs={'project__name': project__name})
@@ -85,12 +132,16 @@ def delete_paragraph_answer_do(request):
     our_answer.delete()
     return HttpResponseRedirect(reverse(project, kwargs={'project__name': our_answer.project.name}))
 
-@login_required
 def create_answer_do(request):
+
     if 'is_edit' in request.POST:
         answer = Answer.objects.get(pk=request.POST['answer__pk'])
     else:
         answer = Answer()
+
+
+    answer.project = mysite.search.models.Project.objects.get(pk=request.POST['project__pk'])
+
 
     question = ProjectInvolvementQuestion.objects.get(pk=request.POST['question__pk'])
     question.save()
@@ -100,10 +151,55 @@ def create_answer_do(request):
 
     answer.title = request.POST.get('answer__title', None)
 
-    answer.author = request.user
-    
-    answer.project_id = request.POST['project__pk']
+    # loltrolled--you dont have cookies, so we will throw away your data at the last minute
+    if (request.user.is_authenticated() or
+        'cookies_work' in request.session):
+        suffix = ''
+    else:
+        suffix = '?cookies=disabled'
+        return HttpResponseRedirect(reverse(project, kwargs={'project__name': answer.project.name}) + suffix)
 
     answer.save()
-    
-    return HttpResponseRedirect(reverse(project, kwargs={'project__name': answer.project.name}))
+    if answer.author is None:
+        mysite.project.controllers.note_in_session_we_control_answer_id(request.session,
+                                                                        answer.pk)
+    if not request.user.is_authenticated():
+        # If user isn't logged in, send them to the login page with next
+        # parameter populated.
+        url = reverse('oh_login')
+        url += "?" + mysite.base.unicode_sanity.urlencode({u'next':
+            unicode(answer.project.get_url())})
+        return HttpResponseRedirect(url)
+    else:
+        answer.author = request.user
+
+    return HttpResponseRedirect(reverse(project, kwargs={'project__name': answer.project.name}) + suffix)
+
+@login_required
+@mysite.base.decorators.view
+def suggest_question(request):
+    template = "project/suggest_question.html"
+    data = {
+            'project__pk': request.GET['project__pk']
+            }
+    return (request, template, data)
+
+@login_required
+def suggest_question_do(request):
+    project = mysite.search.models.Project.objects.get(pk=request.POST['project__pk'])
+    user = request.user
+    body = request.POST['suggested_question']
+    body += "\nproject name: " + project.name
+    body += "\nproject pk: " + str(project.pk)
+    body += "\nuser name: " + user.username
+    body += "\nuser pk: " + str(user.pk)
+    question_suggestion_response = ""
+    #TODO: Asheesh would really rather this be enqueued as a background job
+    try:
+        send_mail('Project Page Question Suggestion: ', body, 'all@openhatch.org', ['all@openhatch.org'], fail_silently=False)
+        question_suggestion_response = "success"
+    except socket.error:
+        #NOTE: this will probably only happen on a local server (not on the live site)
+        question_suggestion_response = "failure"
+    template = "project/project.html"
+    return HttpResponseRedirect(reverse(mysite.project.views.project, kwargs={'project__name': project.name}) + '?question_suggestion_response=' + question_suggestion_response)

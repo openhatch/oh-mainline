@@ -1,4 +1,4 @@
-from ircbot import SingleServerIRCBot
+#from ircbot import SingleServerIRCBot
 import re
 import uuid
 import mysite.customs.models
@@ -132,7 +132,7 @@ class LineAcceptingAgent(object):
         else:
             self.dict_so_far['message'] += '\n' + parsed['message']
 
-class CiaIrcWatcher(SingleServerIRCBot):
+class CiaIrcWatcher(): # SingleServerIRCBot):
     def __init__(self, callback):
         SingleServerIRCBot.__init__(self, [('chat.freenode.net', 6667)],
                                     'oh_listener', 'oh_listener')

@@ -15,36 +15,14 @@
 {% block pagetop %}
 
     <div id='nameplate'>
-    {% if name_edit_mode %}
-        <form method='POST'
-            name='edit_name'
-            action='/edit/name/do'>
-            <div class='head'>
-                <h3>What d'you go by?</h3>
-            </div>
-            <div class='body'>
-            <div class='section'>
-                <h4>First name:</h4>
-                <input type='text' name='first_name'
-                value='{{ person.user.first_name }}' />
-            </div>
-            <div class='section'>
-                <h4>Last name:</h4>
-                <input type='text' name='last_name'
-                value='{{ person.user.last_name }}' />
-            </div>
-            <div class='section'>
-                <input class='save-button' type='submit' value='Save' />
-            </div>
-            </div>
-            </table>
-        </form>
-    {% else %}
             {% if person.user.first_name or person.user.last_name %}
             <h1 class='name'>
                 <a href='/people/{{ person.user.username }}'>
                     {{ person.user.first_name }}
                     {{ person.user.last_name }}
+                    <span class='username' style="font-size: .7em;">
+                        ({{ person.user.username }})
+                    </span>
                 </a>
             </h1>
             {% else %}
@@ -58,7 +36,7 @@
 
 
             {% if editable %}
-            <a class='name-edit-link' href='/edit/name'>
+            <a class='name-edit-link' href='{% url account.views.edit_name %}'>
                 <img src='/static/images/icons/pencil.png'
                 alt='Edit name' />
             </a>
@@ -69,7 +47,7 @@
 
 	    <div style="clear: left; float: left;">
 	      {% if person.location_display_name and person.location_confirmed %}
-          <a href="/people/?center={{ person.location_display_name }}">
+              <a style='color: #555;' href="/people/?center={{ person.location_display_name }}">
               {{ person.location_display_name }}
           </a>
 	      {% endif %}
@@ -89,8 +67,6 @@
 	      
 	    </div>
 			
-
-    {% endif %}
     </div>
 
 {% endblock pagetop %}

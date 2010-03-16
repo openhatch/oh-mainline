@@ -3,19 +3,33 @@ from odict import odict
 import re
 import collections
 import mysite.base.helpers
+import simplejson
+import django.core.cache
+from functools import partial
 
 from django.template.loader import render_to_string
 from django.shortcuts import render_to_response
+
+def as_view(request, template, data, slug):
+    if request.user.is_authenticated() or 'cookies_work' in request.session:
+        # Great! Cookies work.
+        pass
+    else:
+        request.session.set_test_cookie()
+        if request.session.test_cookie_worked():
+            request.session.delete_test_cookie()
+            request.session['cookies_work'] = True
+    
+    data['the_user'] = request.user
+    data['slug'] = slug # Account settings uses this.
+    return render_to_response(template, data)
 
 @decorator
 def view(func, *args, **kw):
     """Decorator for views."""
     request, template, view_data = func(*args, **kw)
-    data = {}
-    data['the_user'] = request.user
-    data['slug'] = func.__name__ # Account settings uses this.
-    data.update(view_data)
-    return render_to_response(template, data)
+    slug = func.__name__ # Used by account settings
+    return as_view(request, template, view_data, slug)
 
 # vim: ai ts=3 sts=4 et sw=4 nu
 
@@ -55,3 +69,25 @@ def no_str_in_the_list(l):
     for elt in l:
         mysite.base.helpers.assert_or_pdb(type(l) != str)
     return l
+
+def decorator_factory(decfac): # partial is functools.partial
+    "decorator_factory(decfac) returns a one-parameter family of decorators"
+    return partial(lambda df, param: decorator(partial(df, param)), decfac)
+
+@decorator_factory 
+def cache_method(cache_key_getter_name, func, *args, **kwargs):
+    # Let's check to see whether we can avoid all this expensive DB jiggery after all
+    self = args[0]
+    cache_key = getattr(self, cache_key_getter_name)()
+    cached_json = django.core.cache.cache.get(cache_key)
+
+    if cached_json is None:
+        value = func(*args, **kwargs)
+        cached_json = simplejson.dumps({'value': value})
+        import logging
+        django.core.cache.cache.set(cache_key, cached_json, 864000)
+        logging.info('cached output of func.__name__: %s' % cached_json)
+    else:
+        value = simplejson.loads(cached_json)['value']
+
+    return value

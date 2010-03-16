@@ -1,17 +1,29 @@
 == How to run this code ==
 
-    sudo apt-get install rabbitmq-server python2.5-dev python-apt
-    sudo rabbitmqctl add_user rabbiter johT4qui
-    sudo rabbitmqctl add_vhost localhost
-    sudo rabbitmqctl set_permissions -p localhost rabbiter "" ".*" ".*" || sudo rabbitmqctl map_user_vhost rabbiter localhost || echo "Failed to set rabbitmq permissions. Complain to Asheesh."
+=== Python dependencies ===
 
-FIXME: Explain how to create MySQL user oh_milestone_a and grant select permissions.
+    sudo apt-get install python2.5-dev python-apt
+
+=== Memcached ===
+
+    sudo apt-get install memcached
+
+To start memcached, run:
+
+    sudo /etc/init.d/memcached start
+
+If it complains that it is not enabled, configure it by reading /etc/default/memcached .
+
+=== Buildout ===
 
     python2.5 bootstrap.py
     ./bin/buildout # Make sure you're actually in this directory
     ./bin/mysite runserver
 
 == Set up the database. ==
+
+FIXME: Explain how to create MySQL user oh_milestone_a and grant select permissions.
+
     mysql -u root -p < "CREATE DATABASE; CREATE USER 'oh_milestone_a'@'localhost' IDENTIFIED BY 'ahmaC0Th'; GRANT ALL ON oh_milestone_a.* TO 'oh_milestona_a'@'localhost';
 
 Or use 'mysql -u username', where username is a MySQL user with the appropriate privileges.
@@ -85,17 +97,37 @@ Ta-da. In theory we/you should do that every month, when MaxMind does a refresh.
 
 == People search ==
 
-People search uses Solr. We use Haystack for managing Solr.
+We have a map at /people/. To accelerate search on those people, we use Haystack,
+a Django layer on top of search engines. In our case, we use the search engine called
+Solr.
 
-=== Create its schema ===
+=== Understanding indexes and the Solr schema file ===
 
-Start in milestone-a, then run
-    ./bin/mysite  build_solr_schema > parts/download_solr/example/solr/conf/schema.xml 
+We have a hand-tuned Solr schema that lives in mysite/config-files/schema.xml.
+This file was first generated using the Haystack command to auto-generate a
+schema from our people/search_indexes.py file, but since then we have adjusted
+it ourselves.
 
-=== Run the server ===
+Unfortunately, this means that if you add or modify those indexes, you should
+NOT just regenerate the schema file automatically. Instead, merge it by hand
+by adding just the elements you need. If you have trouble with that, ask
+Asheesh.
 
-Start in milestone-a, then run
-    ( cd parts/download_solr/example ; java -jar start.jar) &
+=== Running the Solr server (development) ==
+
+For people search to work, you must run the Solr server. On a development machine
+(e.g., laptop), do this:
+
+cd mysite
+scripts/run_solr.sh
+
+=== Running the Solr server (production) ==
+
+Steps:
+
+1. Copy the schema into place.
+
+2. Run SOLR with a config file that points at that schema.
 
 === Initialize its index ===
 

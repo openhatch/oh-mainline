@@ -3,7 +3,8 @@
     {% if not dont_display_nav_logo %}
     <h2>
         <a href='/'>
-            <img src='/static/images/the-logo-bluegreen-87px.png' alt='openhatch' />
+            <img src='/static/images/the-logo-bluegreen-87px.png' width='87'
+                    height='60' alt='openhatch' />
         </a>
     </h2>
     {% endif %}
@@ -20,8 +21,22 @@
         {% if the_user.is_authenticated %}
         <!-- user.is_authenticated indeed -->
         <li><a href='{% url mysite.account.views.logout %}'>log out</a></li>
-        <li><a href='{% url mysite.account.views.edit_contact_info %}'>settings</a></li>
-        <li><a href='{% url mysite.profile.views.display_person_web the_user.username %}'>{{ the_user.get_profile.get_full_name_or_username }}</a></li>
+        <li><a href='{% url mysite.account.views.set_location %}'>settings</a></li>
+        <li><a href='{% url mysite.profile.views.display_person_web the_user.username %}'>
+            {% with the_user.get_profile as person %}
+                {% if person.user.first_name or person.user.last_name %}
+                    {{ person.get_full_name_with_nbsps|safe }}
+                {% else %}
+                    {{ person.user.username }}
+                {% endif %}
+
+                {% if person.user.first_name and person.user.last_name %}
+                    <span class='username' style="font-size: .9em;">
+                        ({{ person.user.username }})
+                    </span>
+                {% endif %}
+            {% endwith %}
+        </a></li>
         {% else %}
         <li><a id='login' href='/account/login'>log in / sign up</a></li>
         {% endif %}

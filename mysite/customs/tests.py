@@ -48,6 +48,9 @@ def generate_404(self):
     raise urllib2.HTTPError('', 404, {}, {}, None)
 open_causes_404.side_effect = generate_404
 
+def generate_403(self):
+    import urllib2
+    raise urllib2.HTTPError('', 403, {}, {}, None)
 
 # Functions you'll need: {{{
 def twill_setup():
@@ -574,6 +577,125 @@ class ParseCiaMessage(django.test.TestCase):
                     'message':  'merged moin/1.8'}
         self.assertEqual(mysite.customs.cia.parse_cia_tokens(tokens),
                          expected)
+
+class TracBug(django.test.TestCase):
+    def test_eval_in_description(self):
+        four_chars = r'\r\n'
+        self.assertEqual(len(four_chars), 4)
+        two_chars = mysite.customs.bugtrackers.trac.TracBug.string_un_csv(
+            four_chars)
+        self.assertEqual(len(two_chars), 2)
+        self.assertEqual(two_chars, '\r\n')
+
+    def test_unicodify_in_the_face_of_junk(self):
+        weird_chars = u'\x01'
+        unicoded = mysite.customs.bugtrackers.trac.TracBug.string_un_csv(
+            weird_chars)
+        self.assertEqual(unicoded, '')
+        
+
+    @mock.patch('mysite.customs.bugtrackers.trac.TracBug.as_bug_specific_csv_data')
+    def test_create_bug_object_data_dict(self, m):
+        m.return_value = {
+            'branch': '',
+            'branch_author': '',
+            'cc': 'thijs_ exarkun',
+            'component': 'core',
+            'description': "This package hasn't been touched in 4 years which either means it's stable or not being used at all. Let's deprecate it (also see #4111).",
+            'id': '4298',
+            'keywords': 'easy',
+            'launchpad_bug': '',
+            'milestone': '',
+            'owner': 'djfroofy',
+            'priority': 'normal',
+            'reporter': 'thijs',
+            'resolution': '',
+            'status': 'new',
+            'summary': 'Deprecate twisted.persisted.journal',
+            'type': 'task'}
+        tb = mysite.customs.bugtrackers.trac.TracBug(
+            bug_id=4298,
+            BASE_URL='http://twistedmatrix.com/trac/')
+        cached_html_filename = os.path.join(settings.MEDIA_ROOT, 'sample-data', 'twisted-trac-4298.html')
+        tb._bug_html_page = unicode(
+            open(cached_html_filename).read(), 'utf-8')
+
+        got = tb.as_data_dict_for_bug_object()
+        wanted = {'title': 'Deprecate twisted.persisted.journal',
+                  'description': "This package hasn't been touched in 4 years which either means it's stable or not being used at all. Let's deprecate it (also see #4111).",
+                  'status': 'new',
+                  'importance': 'normal',
+                  'people_involved': 5,
+                  # FIXME: Need time zone
+                  'date_reported': datetime.datetime(2010, 2, 22, 19, 46, 30),
+                  'last_touched': datetime.datetime(2010, 2, 24, 0, 8, 47),
+                  'looks_closed': False,
+                  'submitter_username': 'thijs',
+                  'submitter_realname': '',
+                  'canonical_bug_link': 'http://twistedmatrix.com/trac/ticket/4298',
+                  'good_for_newcomers': True,
+                  'looks_closed': False,
+                  'bite_size_tag_name': 'easy',
+                  'concerns_just_documentation': False,
+                  'as_appears_in_distribution': '',
+                  }
+        self.assertEqual(wanted, got)
+
+    @mock.patch('mysite.customs.bugtrackers.trac.TracBug.as_bug_specific_csv_data')
+    def test_create_bug_that_lacks_modified_date(self, m):
+        m.return_value = {
+            'branch': '',
+            'branch_author': '',
+            'cc': 'thijs_ exarkun',
+            'component': 'core',
+            'description': "This package hasn't been touched in 4 years which either means it's stable or not being used at all. Let's deprecate it (also see #4111).",
+            'id': '4298',
+            'keywords': 'easy',
+            'launchpad_bug': '',
+            'milestone': '',
+            'owner': 'djfroofy',
+            'priority': 'normal',
+            'reporter': 'thijs',
+            'resolution': '',
+            'status': 'new',
+            'summary': 'Deprecate twisted.persisted.journal',
+            'type': 'task'}
+        tb = mysite.customs.bugtrackers.trac.TracBug(
+            bug_id=4298,
+            BASE_URL='http://twistedmatrix.com/trac/')
+        cached_html_filename = os.path.join(settings.MEDIA_ROOT, 'sample-data', 'twisted-trac-4298-without-modified.html')
+        tb._bug_html_page = unicode(
+            open(cached_html_filename).read(), 'utf-8')
+
+        got = tb.as_data_dict_for_bug_object()
+        wanted = {'title': 'Deprecate twisted.persisted.journal',
+                  'description': "This package hasn't been touched in 4 years which either means it's stable or not being used at all. Let's deprecate it (also see #4111).",
+                  'status': 'new',
+                  'importance': 'normal',
+                  'people_involved': 5,
+                  # FIXME: Need time zone
+                  'date_reported': datetime.datetime(2010, 2, 22, 19, 46, 30),
+                  'last_touched': datetime.datetime(2010, 2, 22, 19, 46, 30),
+                  'looks_closed': False,
+                  'submitter_username': 'thijs',
+                  'submitter_realname': '',
+                  'canonical_bug_link': 'http://twistedmatrix.com/trac/ticket/4298',
+                  'good_for_newcomers': True,
+                  'looks_closed': False,
+                  'bite_size_tag_name': 'easy',
+                  'concerns_just_documentation': False,
+                  'as_appears_in_distribution': '',
+                  }
+        self.assertEqual(wanted, got)
+
+class WhenGithubSaysPermissionDeniedForRepoList(django.test.TestCase):
+
+    @mock.patch('mysite.customs.github._github_repos_list')
+    def test(self, mock_repo_list):
+        mock_repo_list.side_effect = generate_403
+        wanted = []
+        got = list(mysite.customs.github.repos_by_username('mister_403'))
+        self.assertEqual(wanted, got)
 
 class LineAcceptorTest(django.test.TestCase):
     def test(self):

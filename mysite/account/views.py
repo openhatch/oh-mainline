@@ -25,6 +25,7 @@ from mysite.profile.models import Person, Tag, TagType, Link_Project_Tag, Link_S
 # and lots of other modules refer to it as mysite.account.views.view.
 # Let's fix this soon.
 from mysite.base.decorators import view
+import django.contrib.auth.views
 # }}}
 
 def signup_do(request):
@@ -187,6 +188,46 @@ def change_password(request, change_password_form = None):
             {'change_password_form': change_password_form,
              'account_notification': account_notification})
     # }}}
+
+@login_required
+@view
+def edit_name(request, edit_name_form = None):
+    # {{{
+
+    if edit_name_form is None:
+        edit_name_form = mysite.account.forms.EditNameForm(instance=request.user)
+
+    if request.GET.get('notification_id', None) == 'success':
+        if request.user.first_name or request.user.last_name:
+            account_notification = 'You have a new name.'
+        else:
+            account_notification = """You've removed your full name.
+            We'll identify you by your username."""
+    else:
+        account_notification = ''
+
+    return (request, 'account/edit_name.html',
+            {'edit_name_form': edit_name_form,
+             'account_notification': account_notification})
+    # }}}
+
+@login_required
+def edit_name_do(request):
+    user = request.user
+    edit_name_form = mysite.account.forms.EditNameForm(
+        request.POST, instance=user)
+    if edit_name_form.is_valid():
+        edit_name_form.save()
+
+        # Enqueue a background task to re-index the person
+        task = mysite.profile.tasks.ReindexPerson()
+        task.delay(person_id=user.get_profile().id)
+
+        return HttpResponseRedirect(reverse(edit_name) +
+                                    '?notification_id=success')
+    else:
+        return edit_name(request,
+                edit_name_form=edit_name_form)
 
 @login_required
 @view

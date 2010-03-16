@@ -1,4 +1,5 @@
 {% extends 'base/one_column.html' %}
+{% load base_extras %}
 
 {% block title %}
 Log in 
@@ -8,7 +9,11 @@ Log in
 {{ block.super }}
 form { width: 350px; }
 .login-links li { list-style: square; float: left; width: 95%; margin-top: 5px; margin-left: 15px; }
-p { margin: 0 0 10px 0; }
+.unsaved-data p{ margin-left: 3; padding-left: 0; list-style: square; float: left; width: 95%; margin-top: 5px; }
+.unsaved-data .the-data { float: left; color: #555;}
+.unsaved-data .the-data .label { font-style: normal;}
+.unsaved-data h4 { margin: 0 0 10px 0; }
+.unsaved-data p { margin: 0 0 10px 0; }
 {% endblock css %}
 
 {% block body_class %}{{ block.super }} auth{% endblock %}
@@ -16,27 +21,65 @@ p { margin: 0 0 10px 0; }
 {% block main %}
 <div id='login' class='module'>
     <div class='head'>
-        <h3>Log in rather quickly with OpenID</h3>
+        <h3>Sign in with an account you already own</h3>
     </div>
     <div class='body'>
 
+        {% with request|get_answers_from_session as answers %}
+
+        {% if answers %}
+        <div style='color: #444; font-size: 1.5em; -moz-border-radius: 8px; border-radius: 8px; text-align: center; float: left; width: 98%; margin-bottom: 10px; padding: 8px; background-color: #ffc;'>
+            Thanks for your reply! To post it, <strong>link it to an account</strong>.
+        </div>
+        {% endif %}
+
         <div style='float: left; width: 500px;'>
-            {% if next %}
+
+            {% if next and not answers %}
                 <p>Please log in to proceed.</p>
             {% endif %}
             {% include 'account/login_openid.html' %}
         </div>
-        <ul class='login-links' style='float: right; width: 300px; padding: 16px; padding-bottom: 16px; border-radius: 8px; -moz-border-radius: 8px; background-color: #f4f4f4;'>
-            <h4 style='width: 95%;'>Relatedly</h4>
-            <li><a style='font-weight: bold;'
-                href='/blog/2009/why-we-support-openid'>
-                What is OpenID?
-            </a></li>
-            <li><a href='{% url oh_login_pwd %}?next={{ next|urlencode }}'>
-                Sign in with a password
-            </a></li>
-        </ul>
+        <div style='float: right; width: 100px;'>
+
+            {% if answers %}
+            <ul class='unsaved-data' style='float: right; width: 300px; padding: 16px; padding-bottom: 16px; margin-bottom: 16px; border-radius: 8px; -moz-border-radius: 8px; background-color: #f4f4f4;'>
+                {% for answer in answers %}
+                    <li>
+                        <h4 style='width: 95%;'>
+                            Your reply on the {{ answer.project.name }} page:
+                        </h4>
+                        <div class="the-data">
+                            <p> <span style='font-size: 1.1em;'>
+                                    {{ answer.text|linebreaksbr}}
+                                </span>
+                            </p>
+                            {% with answer.question as question %}
+                            {% spaceless %}
+                                <p> <small style='font-size: .95em;'>(In response to <span>&ldquo;</span>{% include 'question_text.html' %}<span>&rdquo;</span>)</small></p>
+                            {% endspaceless %}
+                            {% endwith %}
+
+                        </div>
+                    </li>
+                {% endfor %}
+
+            </ul>
+            {% endif %}
+
+            <ul class='login-links' style='float: right; width: 300px; padding: 16px; padding-bottom: 16px; border-radius: 8px; -moz-border-radius: 8px; background-color: #f4f4f4;'>
+                <h4 style='width: 95%;'>Relatedly</h4>
+                <li><a style='font-weight: bold;'
+                    href='/blog/2009/why-we-support-openid'>
+                    What is OpenID?
+                </a></li>
+                <li><a href='{% url oh_login_pwd %}?next={{ next|urlencode }}'>
+                    Sign in with a password
+                </a></li>
+            </ul>
+        </div>
     </div>
+    {% endwith %}
 </div>
 {% endblock main %}
 

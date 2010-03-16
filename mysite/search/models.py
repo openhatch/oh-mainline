@@ -2,6 +2,7 @@ from django.db import models
 from django.core.files.base import ContentFile
 from django.core.files.images import get_image_dimensions
 from django.contrib.auth.models import User
+from django.core.cache import cache
 from django.conf import settings
 import datetime
 import StringIO
@@ -13,6 +14,7 @@ import mysite.customs
 import mysite.base.unicode_sanity
 from django.core.urlresolvers import reverse
 import voting
+import hashlib
 
 class OpenHatchModel(models.Model):
     created_date = models.DateTimeField(null=True, auto_now_add=True)
@@ -43,6 +45,7 @@ def get_image_data_scaled(image_data, width):
     image_data = new_image_fd.getvalue()
     return image_data
 
+
 class Project(OpenHatchModel):
 
     @staticmethod
@@ -72,7 +75,8 @@ class Project(OpenHatchModel):
     def create_dummy(**kwargs):
         now = datetime.datetime.utcnow()
         data = dict(name=uuid.uuid4().hex,
-                icon_raw='/static/no-project-icon.png')
+                icon_raw='/static/no-project-icon.png',
+                    language='C')
         data.update(kwargs)
         ret = Project(**data)
         ret.save()
@@ -80,6 +84,14 @@ class Project(OpenHatchModel):
 
     name = models.CharField(max_length=200, unique=True)
     language = models.CharField(max_length=200)
+
+    def invalidate_all_icons(self):
+        self.icon_raw = None
+        self.icon_url = u''
+        self.icon_for_profile = None
+        self.icon_smaller_for_badge = None
+        self.icon_for_search_result = None
+        pass
 
     # FIXME: Remove this field and update fixtures.
     icon_url = models.URLField(max_length=200)
@@ -183,9 +195,10 @@ class Project(OpenHatchModel):
         # List the owners of those portfolio entries.
         return [pf_entry.person for pf_entry in pf_entries]
 
-    def update_cached_contributor_count(self):
+    def update_cached_contributor_count_and_save(self):
         contributors = self.get_contributors()
         self.cached_contributor_count = len(contributors)
+        self.save()
 
     def get_n_other_contributors_than(self, n, person):
         # FIXME: Use the method above.
@@ -234,6 +247,53 @@ def grab_project_language_from_ohloh(instance, created, *args,
 models.signals.post_save.connect(populate_icon_on_project_creation, Project)
 models.signals.post_save.connect(grab_project_language_from_ohloh, Project)
 
+class WrongIcon(OpenHatchModel):
+
+    @staticmethod
+    def spawn_from_project(project):
+        kwargs = {
+            'project': project,
+            'icon_url': project.icon_url,
+            'icon_raw': project.icon_raw,
+            'date_icon_was_fetched_from_ohloh': project.date_icon_was_fetched_from_ohloh,
+            'icon_for_profile': project.icon_for_profile,
+            'icon_smaller_for_badge': project.icon_smaller_for_badge,
+            'icon_for_search_result': project.icon_for_search_result,
+            'logo_contains_name': project.logo_contains_name,
+        }
+        wrong_icon_obj = WrongIcon(**kwargs)
+        wrong_icon_obj.save()
+        return wrong_icon_obj
+
+
+    project = models.ForeignKey(Project)
+
+    icon_url = models.URLField(max_length=200)
+
+    icon_raw = models.ImageField(
+            upload_to=lambda a,b: Project.generate_random_icon_path(a, b),
+            null=True,
+            default=None)
+
+    date_icon_was_fetched_from_ohloh = models.DateTimeField(null=True, default=None)
+
+    icon_for_profile = models.ImageField(
+        upload_to=lambda a,b: Project.generate_random_icon_path(a,b),
+        null=True,
+        default=None)
+
+    icon_smaller_for_badge = models.ImageField(
+        upload_to=lambda a,b: Project.generate_random_icon_path(a,b),
+        null=True,
+        default=None)
+
+    icon_for_search_result = models.ImageField(
+        upload_to=lambda a,b: Project.generate_random_icon_path(a,b),
+        null=True,
+        default=None)
+
+    logo_contains_name = models.BooleanField(default=False)
+
 class ProjectInvolvementQuestion(OpenHatchModel):
     key_string = models.CharField(max_length=255)
     text = models.TextField()
@@ -246,7 +306,6 @@ class ProjectInvolvementQuestion(OpenHatchModel):
         # TODO: sort them
         the_answers.sort(key=get_score)
         return the_answers
-        
 
     @staticmethod
     def create_dummy(**kwargs):
@@ -256,16 +315,29 @@ class ProjectInvolvementQuestion(OpenHatchModel):
         ret.save()
         return ret
 
+class OwnedAnswersManager(models.Manager):
+    def get_query_set(self):
+        return super(OwnedAnswersManager, self).get_query_set().filter(
+            author__isnull=False)
+
 class Answer(OpenHatchModel):
     title = models.CharField(null=True, max_length=255)
     text = models.TextField(blank=False)
-    author = models.ForeignKey(User)
+    author = models.ForeignKey(User, null=True)
     question = models.ForeignKey(ProjectInvolvementQuestion, related_name='answers')
     project = models.ForeignKey(Project)
+    objects = OwnedAnswersManager()
+    all_even_unowned = models.Manager()
 
     @staticmethod
     def create_dummy(**kwargs):
-        data = {'text': 'i am doing well'}
+        data = {
+                'text': 'i am doing well',
+                'author': User.objects.get_or_create(username='yooz0r')[0],
+                'question': ProjectInvolvementQuestion.objects.get_or_create(
+                    key_string='where_to_start', is_bug_style=False)[0],
+                'project': Project.create_dummy()
+                }
         data.update(kwargs)
         ret = Answer(**data)
         ret.save()
@@ -321,6 +393,12 @@ class Bug(OpenHatchModel):
     def create_dummy_with_project(**kwargs):
         kwargs['project'] = Project.create_dummy()
         return Bug.create_dummy(**kwargs)
+
+class BugAlert(OpenHatchModel):
+    user = models.ForeignKey(User, null=True)
+    query_string = models.CharField(max_length=255)
+    how_many_bugs_at_time_of_request = models.IntegerField()
+    email = models.EmailField(max_length=255)
 
 class HitCountCache(OpenHatchModel):
     hashed_query = models.CharField(max_length=40, primary_key=True) # stores a sha1 

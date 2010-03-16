@@ -588,6 +588,8 @@ FlagIcon.postOptions.success = function (response) {
     var defaultIconCssAttr = $('#portfolio_entry_building_block .project_icon').css('background-image');
     var defaultIconUrl = defaultIconCssAttr.replace(/^url[(]/, '').replace(/[)]$/, ''); /* remove url() */
     var relative_path = defaultIconUrl.replace(/^.*?:[/][/].*?[/]/, '/'); /* remove http://domain or https://domain */
+    // we change the image url as the icon div understands it twice
+    // this is a hack that allows us to change fewer tests (the icon used to be an img)
     $portfolioEntry.find('.project_icon').attr('src', relative_path);
     $portfolioEntry.find('.project_icon').css('background-image', defaultIconCssAttr);
 
@@ -755,8 +757,8 @@ PortfolioEntry.Delete.postOptions.error = function (response) {
 PortfolioEntry.Delete.post = function () {
     $.ajax(PortfolioEntry.Delete.postOptions);
 };
-PortfolioEntry.Delete.deleteIt = function () {
-    $deleteLink = $(this);
+PortfolioEntry.Delete.deleteIt = function (deleteLink) {
+    $deleteLink = $(deleteLink);
     $pfEntry = $deleteLink.closest('.portfolio_entry');
     if ($pfEntry.hasClass('adding')) {
         // If this pfEntry element is in adding mode,
@@ -773,7 +775,17 @@ PortfolioEntry.Delete.deleteIt = function () {
     return false;
 }
 PortfolioEntry.Delete.bindEventHandlers = function() {
-    $('.portfolio_entry .actions li.delete_portfolio_entry a').click(PortfolioEntry.Delete.deleteIt);
+    $('.portfolio_entry .actions li.delete_portfolio_entry a').click(function(){
+        var deleteLink = this;
+        keep_going = confirm('are you sure?');
+        if(keep_going){
+            PortfolioEntry.Delete.deleteIt(deleteLink);
+            return false;
+        }
+        else{
+            return false;
+        }
+    });
 };
 
 

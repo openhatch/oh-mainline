@@ -16,6 +16,15 @@
     clear: both;
     padding: 10px;
 }
+#openid_input_area #wordpress-domain{
+    font-size: 1.3em;
+    float: left;
+    padding: 7px 0;
+}
+#openid_input_area p{
+    margin: 0;
+
+}
 #openid_btns a { float: left; }
 #openid_btns a:hover { background-color: #ffc; }
 #openid_btns { clear: both; }
@@ -49,4 +58,4 @@ a.openid_large_btn:focus {
     border: 4px solid #DDD;
 }
 
-#openid_submit { margin-left: 0; }
+#openid_submit { left: 0; clear: both; margin-left: 0; }

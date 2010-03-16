@@ -1,4 +1,5 @@
 {% extends 'base/base.html' %}
+{% load base_extras %}
 {% load i18n %}
 
 {% block title %}Pick a username{% endblock %}
@@ -32,7 +33,7 @@ body#associate-openid .body { background: #fff;}
 
             <form name="fregister" action="{% url user_register %}"
                     method="POST" class="login">
-                <input type="hidden" name="next" value="{{ next }}" />
+                <input type="hidden" name="next" value="{{ next|enhance_next_to_annotate_it_with_newuser_is_true}}" />
                 {{ form1.as_p }}
                 <p><input type="submit" name="bnewaccount" value="ok"></p>
             </form>

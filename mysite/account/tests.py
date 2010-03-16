@@ -7,8 +7,10 @@ import mock
 from mysite.profile.models import Person
 from mysite.base.tests import make_twill_url, TwillTests
 from mysite.profile.models import Person
-import mysite.account.views
 import mysite.account.forms
+from mysite.search.models import Project, ProjectInvolvementQuestion
+import mysite.project.views
+import mysite.account.views
 
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
@@ -295,5 +297,29 @@ class GuessLocationOnLogin(TwillTests):
 
         
     #}}}
+
+class LoginPageContainsUnsavedAnswer(TwillTests):
+    
+    def test(self):
+        # Create an answer whose author isn't specified. This replicates the
+        # situation where the user isn't logged in.
+        p = Project.create_dummy(name='Myproject')
+        q = ProjectInvolvementQuestion.create_dummy(
+                key_string='where_to_start', is_bug_style=False)
+
+        # POST some text to the answer creation post handler
+        POST_data = {
+                'project__pk': p.pk,
+                'question__pk': q.pk,
+                'answer__text': """Help produce official documentation, share the solution to a problem, or check, proof and test other documents for accuracy.""",
+                    }
+        response = self.client.post(reverse(mysite.project.views.create_answer_do), POST_data,
+                                    follow=True)
+
+        # Now, the session will know about the answer, but the answer will not be published.
+        # Visit the login page, assert that the page contains the text of the answer.
+
+        response = self.client.get(reverse('oh_login'))
+        self.assertContains(response, POST_data['answer__text'])
 
 # vim: set nu:

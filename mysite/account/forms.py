@@ -73,6 +73,11 @@ class EditLocationForm(django.forms.ModelForm):
     def clean_location_display_name(self):
         return self.cleaned_data['location_display_name'].strip()
 
+class EditNameForm(django.forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ('first_name', 'last_name')
+
 class EditPhotoForm(django.forms.ModelForm):
     class Meta:
         model = Person
