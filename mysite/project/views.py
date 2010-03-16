@@ -203,3 +203,7 @@ def suggest_question_do(request):
         question_suggestion_response = "failure"
     template = "project/project.html"
     return HttpResponseRedirect(reverse(mysite.project.views.project, kwargs={'project__name': project.name}) + '?question_suggestion_response=' + question_suggestion_response)
+
+@login_required
+def wannahelp_do(request):
+    return
