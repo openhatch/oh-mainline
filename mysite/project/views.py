@@ -6,6 +6,7 @@ import mysite.project.controllers
 import django.template
 import mysite.base.decorators
 import mysite.profile.views
+import mysite.project.forms
 
 from django.http import HttpResponse, HttpResponseRedirect, \
         HttpResponsePermanentRedirect, HttpResponseServerError, HttpResponseBadRequest
@@ -71,6 +72,7 @@ def project(request, project__name = None):
         'language_mentors': (mysite.profile.controllers.people_matching(
             'can_mentor', p.language)),
         'explain_to_anonymous_users': True,
+        'wanna_help_form': mysite.project.forms.WannaHelpForm(),
         })
 
     question_suggestion_response = request.GET.get('question_suggestion_response', None)
