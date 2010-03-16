@@ -416,4 +416,13 @@ class HitCountCache(OpenHatchModel):
 models.signals.post_save.connect(HitCountCache.clear_cache, Bug)
 models.signals.post_delete.connect(HitCountCache.clear_cache, Bug)
 
+# Re-index the person when he says he likes a new project
+def update_the_person_index_from_project(sender, instance, **kwargs):
+    import mysite.profile.tasks
+    for person in instance.people_who_wanna_help.all():
+        task = mysite.profile.tasks.ReindexPerson()
+        task.delay(person.id)
+
+models.signals.post_save.connect(update_the_person_index_from_project, sender=Project)
+
 # vim: set ai ts=4 nu:

@@ -421,7 +421,7 @@ def project_query2mappable_orm_people(parsed_query):
     
     more_mappable_people_from_haystack = haystack.query.SearchQuerySet().all()
     haystack_field_name = 'all_wanna_help_projects_lowercase_exact'
-    mappable_people_from_haystack = mappable_people_from_haystack.filter(
+    more_mappable_people_from_haystack = more_mappable_people_from_haystack.filter(
         **{haystack_field_name: parsed_query['q'].lower()})
 
     wannabes = set(mysite.base.controllers.haystack_results2db_objects(
