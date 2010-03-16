@@ -150,14 +150,12 @@ about how you can help {{ project.name }}
 
     <div class='module' id='wannahelp'>
         <form>
-            <input type='submit' id='wannahelp-button' rel='tipsy' title='Newbies and old-bies are welcome!' value='I want to help make {{ project.name }} better'>
+            <input type='submit' id='wannahelp-button' rel='tipsy-south' title='Click to add yourself to the list of people who want to contribute. People of all levels are welcome!' value='I want to help make {{ project.name }} better'>
         </form>
     </div>
 
     <div class='module' id='bugs'>
-        <div class='head'>
-            <h3>Relatedly</h3>
-        </div>
+        <div class='head'> <h3>Relatedly</h3> </div>
         <div class='body'>
             {% if project.get_open_bugs %}
                 <p>
