@@ -205,5 +205,5 @@ def suggest_question_do(request):
     return HttpResponseRedirect(reverse(mysite.project.views.project, kwargs={'project__name': project.name}) + '?question_suggestion_response=' + question_suggestion_response)
 
 @login_required
-def wannahelp_do(request):
-    return
+def wanna_help_do(request):
+    return HttpResponse('')

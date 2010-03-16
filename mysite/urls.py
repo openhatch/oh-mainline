@@ -21,6 +21,8 @@ urlpatterns = patterns('',
             'mysite.project.views.suggest_question'),
         (r'^\+projects/suggest_question_do/',
             'mysite.project.views.suggest_question_do'),
+        (r'^\+projects/wanna_help_do/',
+            'mysite.project.views.wanna_help_do'),
         (r'^\+projects/create_project_page_do',
             'mysite.project.views.create_project_page_do'),
         # Generic view to vote on Link objects
