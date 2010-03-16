@@ -6,6 +6,7 @@ import mysite.project.controllers
 import django.template
 import mysite.base.decorators
 import mysite.profile.views
+import mysite.project.forms
 
 from django.http import HttpResponse, HttpResponseRedirect, \
         HttpResponsePermanentRedirect, HttpResponseServerError, HttpResponseBadRequest
@@ -71,6 +72,7 @@ def project(request, project__name = None):
         'language_mentors': (mysite.profile.controllers.people_matching(
             'can_mentor', p.language)),
         'explain_to_anonymous_users': True,
+        'wanna_help_form': mysite.project.forms.WannaHelpForm(),
         })
 
     question_suggestion_response = request.GET.get('question_suggestion_response', None)
@@ -203,3 +205,13 @@ def suggest_question_do(request):
         question_suggestion_response = "failure"
     template = "project/project.html"
     return HttpResponseRedirect(reverse(mysite.project.views.project, kwargs={'project__name': project.name}) + '?question_suggestion_response=' + question_suggestion_response)
+
+@login_required
+def wanna_help_do(request):
+    wanna_help_form = mysite.project.forms.WannaHelpForm(request.POST)
+    if wanna_help_form.is_valid():
+        project = wanna_help_form.cleaned_data['project']
+        project.people_who_wanna_help.add(request.user.get_profile())
+        project.save()
+        return HttpResponseRedirect(project.get_url())
+    return HttpResponse('no')

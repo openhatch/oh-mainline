@@ -153,3 +153,22 @@ class ProjectPageCreation(TwillTests):
         post_handler_url = reverse(mysite.project.views.create_project_page_do)
         import re
         tc.url(re.escape(post_handler_url))
+
+class ButtonClickMarksSomeoneAsWannaHelp(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+    
+    def test(self):
+        p_before = Project.create_dummy()
+        
+        self.assertFalse(p_before.people_who_wanna_help.all())
+
+        client = self.login_with_client()
+        post_to = reverse(mysite.project.views.wanna_help_do)
+        response = client.post(post_to, {u'project': unicode(p_before.pk)})
+
+        p_after = Project.objects.get(pk=p_before.pk)
+
+        self.assertEqual(
+            list(p_after.people_who_wanna_help.all()),
+            [Person.objects.get(user__username='paulproteus')])
+
