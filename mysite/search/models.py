@@ -120,7 +120,8 @@ class Project(OpenHatchModel):
 
     logo_contains_name = models.BooleanField(default=False)
 
-    people_who_wanna_help = models.ManyToManyField('profile.Person')
+    people_who_wanna_help = models.ManyToManyField('profile.Person',
+                                                   related_name='projects_i_wanna_help')
 
     # Cache the number of OpenHatch members who have contributed to this project.
     cached_contributor_count = models.IntegerField(default=0, null=True)

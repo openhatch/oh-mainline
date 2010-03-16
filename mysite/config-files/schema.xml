@@ -81,6 +81,8 @@
     <field name="django_id" type="string"   indexed="true"  stored="true"  multiValued="false" />
     
 
+    <field name="all_wanna_help_projects_lowercase_exact" type="string" indexed="true" stored="true" multiValued="true" />
+
     <field name="all_public_projects_lowercase_exact" type="string" indexed="true" stored="true" multiValued="true" />
 
     <field name="can_pitch_in_lowercase_exact" type="string" indexed="true" stored="true" multiValued="true" />

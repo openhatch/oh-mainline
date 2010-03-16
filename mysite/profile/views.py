@@ -411,15 +411,30 @@ def query2results(parsed_query):
 
 def project_query2mappable_orm_people(parsed_query):
     assert parsed_query['query_type'] == 'project'
+    
     mappable_people_from_haystack = haystack.query.SearchQuerySet().all()
     haystack_field_name = 'all_public_projects_lowercase_exact'
     mappable_people_from_haystack = mappable_people_from_haystack.filter(
         **{haystack_field_name: parsed_query['q'].lower()})
+    mappable_people = set(
+        mysite.base.controllers.haystack_results2db_objects(mappable_people_from_haystack))
     
-    mappable_people = sorted(
-        mysite.base.controllers.haystack_results2db_objects(mappable_people_from_haystack),
-        key=lambda x: x.user.username)
+    more_mappable_people_from_haystack = haystack.query.SearchQuerySet().all()
+    haystack_field_name = 'all_wanna_help_projects_lowercase_exact'
+    mappable_people_from_haystack = mappable_people_from_haystack.filter(
+        **{haystack_field_name: parsed_query['q'].lower()})
 
+    wannabes = set(mysite.base.controllers.haystack_results2db_objects(
+        more_mappable_people_from_haystack))
+    for person in wannabes:
+        person.is_wannabe = True
+
+    mappable_people.update(wannabes)
+
+    mappable_people = list(
+        sorted(mappable_people,
+               key=lambda x: x.user.username))
+    
     extra_data = {}
 
     ## populate suggestions_for_searches_regarding_people_who_can_pitch_in
