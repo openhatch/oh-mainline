@@ -42,4 +42,8 @@ RegExp.escape = function(text) {
                  );
                 }
                 return text.replace(arguments.callee.sRE, '\\$1');
-                }
+};
+
+$(function () {
+    $("a[rel='tipsy']").tipsy({'gravity': 's'});
+});
