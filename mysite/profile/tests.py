@@ -2073,5 +2073,5 @@ class FixAllTagsQueryWhenHaystackReturnsHalfPeople(TwillTests):
         just_real_thing = mysite.base.controllers.haystack_results2db_objects(things)
         self.assertEqual(just_real_thing, ['a real thing'])
         self.assert_(things.load_all.called)
-        
+
  # vim: set ai et ts=4 sw=4 nu:
