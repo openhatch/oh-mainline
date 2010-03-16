@@ -161,7 +161,7 @@ People Search
 
     {# JavaScript edits this text. #}
     
-    <ul id="people-list" class="people-list-map">
+    <ul id="people-list" class="people-list-map{%if center_json and not geocode_failed %} dont_show_until_map_loads{%endif%}">
         {% for person in people %}
             {% if person.user.username %}
                 {% include 'profile/person-summary-li.html' %}
@@ -169,12 +169,6 @@ People Search
         {% endfor %}
     </ul>
 
-    {% endif %}
-
-    {% if center_json and not geocode_failed %}
-    <style type='text/css'>
-    #people-list li { display: none; }
-    </style>
     {% endif %}
 
     {% if not the_user.is_authenticated %}
