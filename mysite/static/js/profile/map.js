@@ -188,6 +188,7 @@ PeopleMapController.prototype.initialize = function(options) {
     } // end function generate_update_all_markers
     
     update_all_markers = generate_update_all_markers(this);
+    this.update_all_markers = update_all_markers;
 
     this.the_marker_for_inaccessible_island = null;
 
