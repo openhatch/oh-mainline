@@ -108,8 +108,8 @@ PeopleMapController.prototype.initialize = function(options) {
 
     update_people_count = function () {
         function update_inaccessible_island_help() {
-            if (! my_visible($('.inaccessible_islander:eq(0)'))) {
-                // hide the text, "including people who have not set a location"
+            // hide the text, "including people who have not set a location"
+            if (! $('.inaccessible_islander:eq(0)').is(':visible')) {
                 $('#people_without_locations').hide();
             } else {
                 $('#people_without_locations').show();
