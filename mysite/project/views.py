@@ -208,10 +208,17 @@ def suggest_question_do(request):
 
 @login_required
 def wanna_help_do(request):
+
     wanna_help_form = mysite.project.forms.WannaHelpForm(request.POST)
     if wanna_help_form.is_valid():
         project = wanna_help_form.cleaned_data['project']
         project.people_who_wanna_help.add(request.user.get_profile())
         project.save()
-        return HttpResponseRedirect(project.get_url())
-    return HttpResponse('no')
+        if request.is_ajax:
+            return HttpResponse("1")
+        else:
+            return HttpResponseRedirect(project.get_url() + "?success=1")
+    if request.is_ajax:
+        return HttpResponse("0")
+    else:
+        return HttpResponseRedirect(project.get_url() + "?success=0")

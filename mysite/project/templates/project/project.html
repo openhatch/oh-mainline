@@ -149,7 +149,7 @@ about how you can help {{ project.name }}
     {% endif %}
 
     <div class='module' id='wannahelp'>
-        <form action="{% url mysite.project.views.wanna_help_do %}" method="POST">
+        <form id='want2help_form' action="{% url mysite.project.views.wanna_help_do %}" method="POST">
             <input type='hidden' name='project' value='{{project.id}}'>
             <input type='submit' id='wannahelp-button' rel='tipsy-south' title='Click to add yourself to the list of people who want to contribute. People of all levels are welcome!' value='I want to help make {{ project.name }} better'>
         </form>
@@ -297,6 +297,9 @@ about how you can help {{ project.name }}
             });
             ourJacker = new VoteHijacker();
             ourJacker.initialize();
+
+            ourOtherJacker = new Want2HelpJacker();
+            ourOtherJacker.initialize();
             
         });
 
@@ -391,6 +394,38 @@ VoteHijacker.pluralize = function(value)
     }
     return "";
 };
+</script>
+
+<script type='text/javascript'>
+    Want2HelpJacker = function () { }
+    Want2HelpJacker.prototype = {
+        'initialize': function () {
+            /* Hijack the 'I want to help' form so that it POST's asynchronously. */
+            var options = {
+                'url': "{% url mysite.project.views.wanna_help_do %}",
+                'type': 'POST',
+                'success': function (response) {
+                    if (response == '1') {
+                        /* Create a tipsy-style message that says "Success!" */
+                        $('#wanna_help').attr('title', "Great! Now people can find you in the list "
+                            + " of interested would-be contributors to {{ project.name }}. "
+                            + "<button>Next steps &raquo;</button>");
+                        $('#wanna_help').tipsy({'gravity': 'e', 'html': true});
+                        $('#wanna_help').mouseover();
+                        $('#wanna_help').unbind('mouseout');
+                        /*$.jGrowl("Great! Now people can find you in the list "
+                            + " of interested would-be contributors to {{ project.name }}. "
+                            + "<button>Next steps &raquo;</button>");*/
+                        /* Add person summary to list. */
+                    }
+                },
+                'error': function () { }
+            };
+            $('#want2help_form').ajaxForm(options);
+
+            /* On success, display a message. */
+        }
+    };
     </script>
 
 {% endblock js %}
