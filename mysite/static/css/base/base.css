@@ -1,5 +1,5 @@
 body {
-    font: 10pt sans-serif;
+    font: 10pt Helvetica, sans-serif;
     background: #fff url("/static/images/motif-eee.png") fixed;
     color: #222;
     /* color: rgb(55,84,105); dark blue */
@@ -12,6 +12,11 @@ a {
     color: #FF6D3D;
     text-decoration: none;
 }
+
+/*for FireFox*/
+input[type="submit"]::-moz-focus-inner, input[type="button"]::-moz-focus-inner, button::-moz-focus-inner { border : 0px; }
+/*for IE8 */
+input[type="submit"]:focus, input[type="button"]:focus { outline : none; }
 
 /* display: none would hide this from screenreaders. Let's hide this off stage left instead. */
 .alt-text { left: -9999px; position: absolute; }
