@@ -150,6 +150,7 @@ about how you can help {{ project.name }}
 
     <div class='module' id='wannahelp'>
         <a href='#' id='wannahelp-button'>I want to help make {{ project.name }} better</a>
+      </form> <!-- submit the v
     </div>
 
     <div class='module' id='bugs'>
@@ -223,7 +224,10 @@ about how you can help {{ project.name }}
     </div>
 </div>
 
+<form action="{% url mysite.project.views.wanna_help_do %}" method="POST">
 {{ wanna_help_form.as_p }}
+<input type="submit">
+</form>
 
 {% endblock main %}
 

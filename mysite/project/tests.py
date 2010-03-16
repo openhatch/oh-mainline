@@ -164,13 +164,15 @@ class ButtonClickMarksSomeoneAsWannaHelp(TwillTests):
 
         client = self.login_with_client()
         post_to = reverse(mysite.project.views.wanna_help_do)
-        response = client.post(post_to, {u'project__pk': unicode(p_before.pk)})
+        response = client.post(post_to, {u'project': unicode(p_before.pk)})
 
         p_after = Project.objects.get(pk=p_before.pk)
 
         self.assertEqual(
             list(p_after.people_who_wanna_help.all()),
             [Person.objects.get(user__username='paulproteus')])
+
+        
 
                               
         
