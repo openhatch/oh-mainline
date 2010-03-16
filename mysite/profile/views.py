@@ -573,7 +573,7 @@ def people(request):
     # What kind of people are these?
     if data['q']:
         if data['query_type'] == 'project':
-            data['this_query_summary'] = 'who have contributed to'
+            data['this_query_summary'] = 'who have contributed to or want to help'
         elif data['query_type'] == 'all_tags':
             data['this_query_summary'] = 'who have listed'
             data['this_query_post_summary'] = ' on their profiles'
