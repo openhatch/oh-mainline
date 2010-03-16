@@ -148,6 +148,10 @@ about how you can help {{ project.name }}
     </div>
     {% endif %}
 
+    <div class='module' id='wannahelp'>
+        <a href='#' id='wannahelp-button'>I want to help make {{ project.name }} better</a>
+    </div>
+
     <div class='module' id='bugs'>
         <div class='head'>
             <h3>Relatedly</h3>
@@ -161,7 +165,9 @@ about how you can help {{ project.name }}
                         matching
                         <strong>{{ project.name }}</strong>.
                     </a>
+            </p>
             {% else %}
+                <p>
                 No volunteer opportunities in {{project.name}} indexed here yet. 
                 <a href='/wiki/Bug_trackers'>
                     To add a bug tracker, 

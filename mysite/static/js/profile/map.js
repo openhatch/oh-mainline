@@ -108,8 +108,8 @@ PeopleMapController.prototype.initialize = function(options) {
 
     update_people_count = function () {
         function update_inaccessible_island_help() {
-            if (! my_visible($('.inaccessible_islander:eq(0)'))) {
-                // hide the text, "including people who have not set a location"
+            // hide the text, "including people who have not set a location"
+            if (! $('.inaccessible_islander:eq(0)').is(':visible')) {
                 $('#people_without_locations').hide();
             } else {
                 $('#people_without_locations').show();
@@ -150,42 +150,42 @@ PeopleMapController.prototype.initialize = function(options) {
         return function() {
             var map = mapController.map;
             /* This only makes up to 10 people show on the right. */
-	    var shown_this_many = 0;
-	    
-	    for (var i = 0; i < all_markers.length; i++) {
-		var marker = all_markers[i];
-		/* If that marker is the Inaccessible Island marker, then we should 
-		 * hide all the inaccessible people.
-		 */
-		var $person_summary = $('#person_summary_' + marker.person_id);
-		var bounds = map.getBounds();
-		if (typeof bounds != 'undefined' &&
-		    bounds.contains(marker.position)) {
-		    
-		    // If the person bullet is hidden,
-		    if(! my_visible($person_summary)) {
-			/* If the marker we found is for inaccessible people, show them all */
-			if (marker === mapController.the_marker_for_inaccessible_island) {
-			    my_show($('.inaccessible_islander'));
-			}
-			else { /* just the one guy or gal */
-			    my_show($person_summary);
-			}
-		    }
-		    shown_this_many += 1;
-		}
-		else {
-		    /* If the marker we found is for inaccessible people, hide them all */
-		    if (marker === mapController.the_marker_for_inaccessible_island) {
-			my_hide($('.inaccessible_islander'));
-		    }
-		    else {
-			/* otherwise hide just that one person */
-			my_hide($person_summary);
-		    }
-		} 
-	    }
-	    update_people_count();
+            var shown_this_many = 0;
+            
+            for (var i = 0; i < all_markers.length; i++) {
+                var marker = all_markers[i];
+                /* If that marker is the Inaccessible Island marker, then we should 
+                 * hide all the inaccessible people.
+                 */
+                var $person_summary = $('#person_summary_' + marker.person_id);
+                var bounds = map.getBounds();
+                if (typeof bounds != 'undefined' &&
+                    bounds.contains(marker.position)) {
+                    
+                    // If the person bullet is hidden,
+                    if(! my_visible($person_summary)) {
+                        /* If the marker we found is for inaccessible people, show them all */
+                        if (marker === mapController.the_marker_for_inaccessible_island) {
+                            my_show($('.inaccessible_islander'));
+                        }
+                        else { /* just the one guy or gal */
+                            my_show($person_summary);
+                        }
+                    }
+                    shown_this_many += 1;
+                }
+                else {
+                    /* If the marker we found is for inaccessible people, hide them all */
+                    if (marker === mapController.the_marker_for_inaccessible_island) {
+                        my_hide($('.inaccessible_islander'));
+                    }
+                    else {
+                    /* otherwise hide just that one person */
+                        my_hide($person_summary);
+                    }
+                } 
+            }
+            update_people_count();
         };
     } // end function generate_update_all_markers
     
