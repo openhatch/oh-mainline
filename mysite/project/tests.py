@@ -172,7 +172,3 @@ class ButtonClickMarksSomeoneAsWannaHelp(TwillTests):
             list(p_after.people_who_wanna_help.all()),
             [Person.objects.get(user__username='paulproteus')])
 
-        
-
-                              
-        

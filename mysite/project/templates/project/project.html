@@ -149,7 +149,8 @@ about how you can help {{ project.name }}
     {% endif %}
 
     <div class='module' id='wannahelp'>
-        <form>
+        <form action="{% url mysite.project.views.wanna_help_do %}" method="POST">
+	    <input type='hidden' name='project' value='{{project.id}}'>
             <input type='submit' id='wannahelp-button' rel='tipsy' title='Newbies and old-bies are welcome!' value='I want to help make {{ project.name }} better'>
         </form>
     </div>
@@ -224,11 +225,6 @@ about how you can help {{ project.name }}
         </div>
     </div>
 </div>
-
-<form action="{% url mysite.project.views.wanna_help_do %}" method="POST">
-{{ wanna_help_form.as_p }}
-<input type="submit">
-</form>
 
 {% endblock main %}
 
