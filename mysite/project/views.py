@@ -246,7 +246,7 @@ def wanna_help_do(request):
             unicode(project.get_url()) + '?wanna_help=true'})
         return HttpResponseRedirect(url)
         
-    if request.is_ajax:
+    if request.is_ajax():
         return HttpResponse("0")
     else:
         return HttpResponseRedirect(project.get_url() + "?success=0")
@@ -257,7 +257,6 @@ def unlist_self_from_wanna_help_do(request):
     if wanna_help_form.is_valid():
         project = wanna_help_form.cleaned_data['project']
         project.people_who_wanna_help.remove(request.user.get_profile())
-        project.save()
         return HttpResponseRedirect(project.get_url())
     else:
         return HttpResponseBadRequest("No project id submitted.")
