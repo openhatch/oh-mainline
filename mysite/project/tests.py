@@ -196,7 +196,7 @@ class WannaHelpWorksAnonymously(TwillTests):
         
         # check that the session can detect that we want to help Ubuntu out
         self.assertEqual(self.client.session['projects_we_want_to_help_out'],
-                         ['Ubuntu'])
+                         [project_id])
 
         # According to the database, no one wants to help our project.
         self.assertFalse(Project.objects.get(id=project_id).people_who_wanna_help.all())
