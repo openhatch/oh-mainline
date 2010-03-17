@@ -51,3 +51,6 @@ $(function () {
     $("[rel='tipsy-south']").tipsy({'gravity': 's'});
 });
 
+$.fn.getTipsy = function() {
+    return $.data(this.get(0), 'active.tipsy');
+}
