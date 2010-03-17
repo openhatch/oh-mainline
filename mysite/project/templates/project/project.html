@@ -428,8 +428,12 @@ VoteHijacker.pluralize = function(value)
                     $tipsyMe.css('background-color', '#ffc');
                     $('#wanna_help_thanks_tipsy_closer').click(function(){
                             $(this).parent().parent().hide();
-                            /* remove highlighting from new guy */
-                            $('#wanna_help .body ul li:eq(0) a').css('background-color', '#fff');
+
+                            /* remove highlighting from new guy. setting to
+                             empty string means that we don't override the
+                             pre-existing functionality.*/
+                            $('#wanna_help .body ul li:eq(0) a').css('background-color', '');
+
                             return false;
                         });
                     /*$.jGrowl("Great! Now people can find you in the list "
