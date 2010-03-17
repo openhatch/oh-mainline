@@ -206,7 +206,6 @@ def suggest_question_do(request):
     template = "project/project.html"
     return HttpResponseRedirect(reverse(mysite.project.views.project, kwargs={'project__name': project.name}) + '?question_suggestion_response=' + question_suggestion_response)
 
-@login_required
 def wanna_help_do(request):
     wanna_help_form = mysite.project.forms.WannaHelpForm(request.POST)
     if wanna_help_form.is_valid():
