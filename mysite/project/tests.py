@@ -211,6 +211,6 @@ class WannaHelpWorksAnonymously(TwillTests):
         self.client.get(Project.objects.get(id=project_id).get_url())
 
         # then the DB knows the user wants to help out!
-        self.assertEqual(Project.objects.get(id=project_id).people_who_wanna_help.all(),
+        self.assertEqual(list(Project.objects.get(id=project_id).people_who_wanna_help.all()),
                          [Person.objects.get(user__username='paulproteus')])
 
