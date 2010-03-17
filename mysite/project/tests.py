@@ -172,6 +172,14 @@ class ButtonClickMarksSomeoneAsWannaHelp(TwillTests):
             list(p_after.people_who_wanna_help.all()),
             [Person.objects.get(user__username='paulproteus')])
 
+class WannaHelpSubmitHandlesNoProjectIdGracefully(TwillTests):
+    def test(self):
+        # Submit nothing.
+        post_to = reverse(mysite.project.views.wanna_help_do)
+        response = self.client.post(post_to, {}, follow=True)
+        self.assertEqual(response.status_code, 400)
+
+
 class WannaHelpWorksAnonymously(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 

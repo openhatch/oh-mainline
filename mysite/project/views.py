@@ -211,7 +211,7 @@ def wanna_help_do(request):
     if wanna_help_form.is_valid():
         project = wanna_help_form.cleaned_data['project']
     else:
-        fixme # FIXME
+        return HttpResponseBadRequest("No project id submitted.")
 
     if request.user.is_authenticated():
         project.people_who_wanna_help.add(request.user.get_profile())
