@@ -165,26 +165,7 @@ about how you can help {{ project.name }}
         </div>
     </div>
 
-
-<div class='module' id='wanna_help'>
-    <div class='head'>
-        <h3>People who want to help ({% firstof project.people_who_wanna_help.all|length "none yet" %})</h3>
-            <ul>
-                <li>
-                <a href='{% url mysite.profile.views.people %}?q=project:"{{project.name|urlencode}}"' style='float: right; font-weight: normal;'>See all <strong>&raquo;</strong></a>
-                </li>
-            </ul>
-    </div>
-    <div class='body'>
-        <ul id='people-list'>
-            {% for person in project.people_who_wanna_help.all|slice:":3" %}
-                {% include 'profile/person-summary-li.html' %}
-            {% empty %}
-                No one yet.
-            {% endfor %}
-        </ul>
-    </div>
-</div>
+{% include 'project/project-wanna-help-box.html' %}
 
 <div class='module' id='contributors'>
     <div class='head'>
@@ -423,7 +404,7 @@ VoteHijacker.pluralize = function(value)
                 'success': function (response) {
 
                     /* Add person summary to list. */
-                    $('#wanna_help .body ul').prepend(response);
+                    $('#wanna_help').html(response);
 
                     /* Create a tipsy-style message that reports success */
                     var $tipsyMe = $('#wanna_help .body ul li:eq(0) a');

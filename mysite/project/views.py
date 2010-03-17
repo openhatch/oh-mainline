@@ -217,9 +217,11 @@ def wanna_help_do(request):
     if request.user.is_authenticated():
         project.people_who_wanna_help.add(request.user.get_profile())
         project.save()
-        if request.is_ajax:
-            t = django.template.loader.get_template('profile/person-summary-li.html')
-            c = django.template.Context({ 'person': request.user.get_profile() })
+        if request.is_ajax():
+            t = django.template.loader.get_template('project/project-wanna-help-box.html')
+            c = django.template.Context({
+                'project': project,
+                'person': request.user.get_profile() })
             rendered = t.render(c)
             return HttpResponse(rendered)
         else:
