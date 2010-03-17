@@ -21,7 +21,6 @@ class LocationMiddleware(object):
 
 class HandleWannaHelpQueue(object):
     def process_request(self, request):
-        return None
         if not hasattr(request, 'user') or not hasattr(request, 'session'):
             return None
 
