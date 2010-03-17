@@ -70,7 +70,7 @@ body#project .quotemark { color: #555; }
 body#project #wannahelp { width: 101% ! important; padding: 0; background: #fff; }
 body#project #wanna_help_thanks_tipsy_closer {float: right;}
 body#project #wannahelp-button, body#project #message_for_helpers { border: 3px solid #fff; -moz-border-radius: 8px; border-radius: 8px; float: left; padding: 10px 20px; color: #444; }
-body#project #wannahelp-button { font-family: Helvetica, sans-serif; width: 100%; font-weight: normal; cursor: pointer; cursor: hand; text-align: center; background-color: #e1faac; /* grass green */ font-size: 13pt; }
+body#project #wannahelp-button { white-space: normal; font-family: Helvetica, sans-serif; width: 100%; font-weight: normal; cursor: pointer; cursor: hand; text-align: center; background-color: #e1faac; /* grass green */ font-size: 13pt; }
 
 body#project #wannahelp-button:hover { background-color: #dafa97; text-decoration: none; color: #111; }
 body#project #message_for_helpers { background: #eee url('/static/images/icons/green-checkmark.png') 15px center no-repeat; padding-left: 85px; }
