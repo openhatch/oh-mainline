@@ -429,9 +429,9 @@ VoteHijacker.pluralize = function(value)
                     var $tipsyMe = $('#wanna_help .body ul li:eq(0) a');
                     $tipsyMe.attr('title', 
                         "<a href='#' id='wanna_help_thanks_tipsy_closer'>X</a>"
-                        + "<span>Great! Now people can find you in the list "
+                        + "<span class='left'>Great! Now people can find you in the list "
                         + " of interested would-be contributors to {{ project.name }}. "
-                        + "<button id='next_steps'>Next steps &raquo;</button></span>");
+                        + "<a href='#' id='next_steps'>Next&nbsp;steps&nbsp;&raquo;</a></span>");
                     $tipsyMe.tipsy({'gravity': 'e', 'html': true});
                     $tipsyMe.mouseover();
                     $tipsyMe.unbind('mouseout');
