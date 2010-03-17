@@ -1,4 +1,5 @@
 import mysite.profile.controllers
+import mysite.project.controllers
 
 def get_user_ip(request):
 #    return request.META['REMOTE_ADDR']

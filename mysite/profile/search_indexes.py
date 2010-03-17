@@ -31,6 +31,11 @@ class PersonIndex(indexes.SearchIndex):
     def prepare_understands_lowercase_exact(self, person_instance):
         return self._pull_lowercase_tag_texts('understands', person_instance)
 
+    all_wanna_help_projects_lowercase_exact = indexes.MultiValueField() # should be type="string"
+    def prepare_all_wanna_help_projects_lowercase_exact(self, person_instance):
+        return list(map(lambda x: x.name.lower(),
+                        person_instance.projects_i_wanna_help.all()))
+
     all_public_projects_lowercase_exact = indexes.MultiValueField() # NOTE: Hack the xml to make type="string"
     def prepare_all_public_projects_lowercase_exact(self, person_instance):
         return list(map(lambda x: x.lower(),
