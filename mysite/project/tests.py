@@ -157,7 +157,7 @@ class ProjectPageCreation(TwillTests):
 class ButtonClickMarksSomeoneAsWannaHelp(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
     
-    def test(self):
+    def test_mark_as_wanna_help(self):
         p_before = Project.create_dummy()
         
         self.assertFalse(p_before.people_who_wanna_help.all())
@@ -171,6 +171,22 @@ class ButtonClickMarksSomeoneAsWannaHelp(TwillTests):
         self.assertEqual(
             list(p_after.people_who_wanna_help.all()),
             [Person.objects.get(user__username='paulproteus')])
+
+    def test_unmark_as_wanna_help(self):
+        # We're in there...
+        p_before = Project.create_dummy()
+        p_before.people_who_wanna_help.add(Person.objects.get(user__username='paulproteus'))
+        p_before.save()
+
+        # Submit that project to unlist_self_from_wanna_help_do
+        client = self.login_with_client()
+        post_to = reverse(mysite.project.views.unlist_self_from_wanna_help_do)
+        response = client.post(post_to, {u'project': unicode(p_before.pk)})
+
+        # Are we gone yet?
+        p_after = Project.objects.get(pk=p_before.pk)
+
+        self.assertFalse(p_after.people_who_wanna_help.all())
 
 class WannaHelpSubmitHandlesNoProjectIdGracefully(TwillTests):
     def test(self):

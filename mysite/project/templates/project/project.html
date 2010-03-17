@@ -158,7 +158,7 @@ about how you can help {{ project.name }}
         <div id='message_for_helpers'
                 {% if not user_wants_to_help %}style='display: none;'{% endif %}>
             <span>You are listed as someone who is willing to help make {{ project.name }} better.</span>
-            <form id='delist_me_as_a_helper'>
+            <form action="{% url mysite.project.views.unlist_self_from_wanna_help_do %}" id='delist_me_as_a_helper' method="POST">
                 <input type='hidden' name='project' value='{{project.id}}'>
                 <input type='image' src='/static/images/icons/undo.png' id='delist_helper_button' value='x' rel='tipsy-south' title='De-list me'>
             </form>
