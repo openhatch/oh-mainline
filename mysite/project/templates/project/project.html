@@ -400,31 +400,38 @@ VoteHijacker.pluralize = function(value)
     Want2HelpJacker = function () { }
     Want2HelpJacker.prototype = {
         'initialize': function () {
+                        var theRow = $('#myRow td');
+                        var origColor = $('#myRow td').css("backgroundColor");
+
+                        $(theRow).css({backgroundColor: '#ff0'});
+                        setTimeout(function() {
+                                $(theRow).animate({backgroundColor: origColor}, 1000);
+                        }, 3000);
             /* Hijack the 'I want to help' form so that it POST's asynchronously. */
             var options = {
                 'url': "{% url mysite.project.views.wanna_help_do %}",
                 'type': 'POST',
                 'success': function (response) {
-                    if (response == '1') {
-                        /* Create a tipsy-style message that says "Success!" */
-                        $('#wanna_help').attr('title', 
-                            "<a href='#' id='wanna_help_thanks_tipsy_closer'>X</a>"
-                            + "Great! Now people can find you in the list "
-                            + " of interested would-be contributors to {{ project.name }}. "
-                            + "<button>Next steps &raquo;</button>");
-                        $('#wanna_help').tipsy({'gravity': 'e', 'html': true});
-                        $('#wanna_help').mouseover();
-                        $('#wanna_help').unbind('mouseout');
-                        $('#wanna_help').unbind('mouseover');
-                        $('#wanna_help_thanks_tipsy_closer').click(function(){
-                                $.data($('#wanna_help')[0], 'active.tipsy').hide();
-                                return false;
-                            });
-                        /*$.jGrowl("Great! Now people can find you in the list "
-                            + " of interested would-be contributors to {{ project.name }}. "
-                            + "<button>Next steps &raquo;</button>");*/
-                        /* Add person summary to list. */
-                    }
+                    /* Create a tipsy-style message that says "Success!" */
+                    $('#wanna_help .body ul').prepend(response);
+                    var $tipsyMe = $('#wanna_help .body ul li:eq(0) a');
+                    $tipsyMe.attr('title', 
+                        "<a href='#' id='wanna_help_thanks_tipsy_closer'>X</a>"
+                        + "Great! Now people can find you in the list "
+                        + " of interested would-be contributors to {{ project.name }}. "
+                        + "<button>Next steps &raquo;</button>");
+                    $tipsyMe.tipsy({'gravity': 'e', 'html': true});
+                    $tipsyMe.mouseover();
+                    $tipsyMe.unbind('mouseout');
+                    $tipsyMe.unbind('mouseover');
+                    $('#wanna_help_thanks_tipsy_closer').click(function(){
+                            $.data($tipsyMe[0], 'active.tipsy').hide();
+                            return false;
+                        });
+                    /*$.jGrowl("Great! Now people can find you in the list "
+                        + " of interested would-be contributors to {{ project.name }}. "
+                        + "<button>Next steps &raquo;</button>");*/
+                    /* Add person summary to list. */
                 },
                 'error': function () {
                         $.jGrowl("Oops! Something went wrong. Please try again.");

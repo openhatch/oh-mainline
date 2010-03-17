@@ -50,3 +50,4 @@ $(function () {
     $("[rel='tipsy-west']").tipsy({'gravity': 'w'});
     $("[rel='tipsy-south']").tipsy({'gravity': 's'});
 });
+

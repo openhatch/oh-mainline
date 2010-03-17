@@ -214,7 +214,10 @@ def wanna_help_do(request):
         project.people_who_wanna_help.add(request.user.get_profile())
         project.save()
         if request.is_ajax:
-            return HttpResponse("1")
+            t = django.template.loader.get_template('profile/person-summary-li.html')
+            c = django.template.Context({ 'person': request.user.get_profile() })
+            rendered = t.render(c)
+            return HttpResponse(rendered)
         else:
             return HttpResponseRedirect(project.get_url() + "?success=1")
     if request.is_ajax:
