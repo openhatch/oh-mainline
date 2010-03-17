@@ -73,7 +73,7 @@ def project(request, project__name = None):
             'can_mentor', p.language)),
         'explain_to_anonymous_users': True,
         'wanna_help_form': mysite.project.forms.WannaHelpForm(),
-        'user_wants_to_help': request.user.get_profile() in p.people_who_wanna_help.all(),
+        'user_wants_to_help': request.user.is_authenticated() and request.user.get_profile() in p.people_who_wanna_help.all(),
         })
 
     question_suggestion_response = request.GET.get('question_suggestion_response', None)
@@ -247,10 +247,8 @@ def unlist_self_from_wanna_help_do(request):
     wanna_help_form = mysite.project.forms.WannaHelpForm(request.POST)
     if wanna_help_form.is_valid():
         project = wanna_help_form.cleaned_data['project']
+        project.people_who_wanna_help.remove(request.user.get_profile())
+        return HttpResponseRedirect(project.get_url())
     else:
         return HttpResponseBadRequest("No project id submitted.")
 
-    project.people_who_wanna_help.remove(request.user.get_profile())
-    project.save()
-
-    return HttpResponseRedirect(project.get_url())

@@ -23,10 +23,10 @@ urlpatterns = patterns('',
         (r'^\+projects/suggest_question_do/',
             'mysite.project.views.suggest_question_do'),
 
-        (r'^\+projects/wanna_help_do/',
+        (r'^\+do/project.views.wanna_help_do',
             'mysite.project.views.wanna_help_do'),
 
-        (r'^\+projects/unlist_self_from_wanna_help_do/',
+        (r'^\+do/project.views.unlist_self_from_wanna_help_do',
             'mysite.project.views.unlist_self_from_wanna_help_do'),
 
         (r'^\+projects/create_project_page_do',
