@@ -234,7 +234,17 @@ class WannaHelpWorksAnonymously(TwillTests):
         # Visit the project page...
         self.client.get(Project.objects.get(id=project_id).get_url())
 
+        # After the GET, we've removed our note in the session
+        self.assertFalse(self.client.session.get('projects_we_want_to_help_out', None))
+
         # then the DB knows the user wants to help out!
         self.assertEqual(list(Project.objects.get(id=project_id).people_who_wanna_help.all()),
                          [Person.objects.get(user__username='paulproteus')])
+
+        # Say we're not interested anymore.
+        post_to = reverse(mysite.project.views.unlist_self_from_wanna_help_do)
+        response = self.client.post(post_to, {u'project': unicode(project_id)}, follow=True)
+
+        # And now the DB shows we have removed ourselves.
+        self.assertFalse(Project.objects.get(id=project_id).people_who_wanna_help.all())
 

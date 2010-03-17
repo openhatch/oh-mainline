@@ -34,15 +34,15 @@ def take_control_of_our_answers(user, session, KEY=KEY):
     if KEY in session:
         del session[KEY]
 
-def flush_session_wanna_help_queue_into_database(user, session, KEY=PROJECTS_TO_HELP_OUT_KEY):
+def flush_session_wanna_help_queue_into_database(user, session,
+                                                 PROJECTS_TO_HELP_OUT_KEY=PROJECTS_TO_HELP_OUT_KEY):
     # FIXME: This really ought to be some sort of thread-safe queue,
     # or stored in the database, or something.
-    for project_id in session.get(KEY, []):
+    for project_id in session.get(PROJECTS_TO_HELP_OUT_KEY, []):
         project = mysite.search.models.Project.objects.get(id=project_id)
         project.people_who_wanna_help.add(user.get_profile())
         project.save()
     # It's unsafe to remove this KEY from the session, in case of concurrent access.
     # But we do anyway. God help us.
-    if KEY in session:
-        del session[KEY]
-    
+    if PROJECTS_TO_HELP_OUT_KEY in session:
+        del session[PROJECTS_TO_HELP_OUT_KEY]

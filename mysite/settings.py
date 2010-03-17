@@ -86,12 +86,12 @@ TEMPLATE_LOADERS = (
 )
 
 MIDDLEWARE_CLASSES = (
-    'mysite.base.middleware.DetectLogin', # This must live on top of Auth + Session middleware
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django_authopenid.middleware.OpenIDMiddleware',
     'mysite.base.middleware.LocationMiddleware',
+    'mysite.base.middleware.DetectLogin', # This must live on top of Auth + Session middleware
     # Django debug toolbar
     #'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
