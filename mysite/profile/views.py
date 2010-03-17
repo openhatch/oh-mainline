@@ -398,7 +398,9 @@ def all_tags_query2mappable_orm_people(parsed_query):
 def query2results(parsed_query):
     query_type2executor = {
         'project': project_query2mappable_orm_people,
-        'all_tags': all_tags_query2mappable_orm_people}
+        'all_tags': all_tags_query2mappable_orm_people,
+        'icanhelp': people_who_want_to_help
+        }
     
     # Now add to that the TagType-based queries
     for short_name in mysite.profile.models.TagType.short_name2long_name:
@@ -408,6 +410,19 @@ def query2results(parsed_query):
 
     desired_query_type = parsed_query['query_type']
     return query_type2executor[desired_query_type](parsed_query)
+
+def people_who_want_to_help(parsed_query):
+    """Get a list of people who say they want to help a given project. This
+    function gathers a list of people in response to the search query
+    'want2help:PROJECTNAME'."""
+    haystack_results = haystack.query.SearchQuerySet().all()
+    haystack_field_name = 'all_wanna_help_projects_lowercase_exact'
+    haystack_results = haystack_results.filter(
+        **{haystack_field_name: parsed_query['q'].lower()})
+    mappable_people = set(
+        mysite.base.controllers.haystack_results2db_objects(haystack_results))
+    extra_data = {}
+    return mappable_people, extra_data
 
 def project_query2mappable_orm_people(parsed_query):
     assert parsed_query['query_type'] == 'project'
@@ -419,18 +434,6 @@ def project_query2mappable_orm_people(parsed_query):
     mappable_people = set(
         mysite.base.controllers.haystack_results2db_objects(mappable_people_from_haystack))
     
-    more_mappable_people_from_haystack = haystack.query.SearchQuerySet().all()
-    haystack_field_name = 'all_wanna_help_projects_lowercase_exact'
-    more_mappable_people_from_haystack = more_mappable_people_from_haystack.filter(
-        **{haystack_field_name: parsed_query['q'].lower()})
-
-    wannabes = set(mysite.base.controllers.haystack_results2db_objects(
-        more_mappable_people_from_haystack))
-    for person in wannabes:
-        person.is_wannabe = True
-
-    mappable_people.update(wannabes)
-
     mappable_people = list(
         sorted(mappable_people,
                key=lambda x: x.user.username))
@@ -497,6 +500,7 @@ def people(request):
     # Get the list of people to display.
 
     if parsed_query['q'].strip():
+        # "everybody" means everyone matching this query
         everybody, extra_data = query2results(parsed_query)
         data.update(extra_data)
 
@@ -508,7 +512,7 @@ def people(request):
     get_relevant_person_data = lambda p: (
             {'name': p.get_full_name_or_username(),
             'location': p.get_public_location_or_default(),
-            'wanna_help': getattr(p, 'is_wannabe', False)})
+            })
     person_id2data = dict([(person.pk, get_relevant_person_data(person))
             for person in everybody])
     data['person_id2data_as_json'] = simplejson.dumps(person_id2data)
@@ -575,6 +579,8 @@ def people(request):
     if data['q']:
         if data['query_type'] == 'project':
             data['this_query_summary'] = 'who have contributed to or want to help'
+        elif data['query_type'] == 'icanhelp':
+            data['this_query_summary'] = 'who say they want to contribute to '
         elif data['query_type'] == 'all_tags':
             data['this_query_summary'] = 'who have listed'
             data['this_query_post_summary'] = ' on their profiles'

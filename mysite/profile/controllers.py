@@ -78,7 +78,7 @@ def get_geoip_guess_for_ip(ip_as_string):
 
 def parse_string_query(s):
     parsed = {}
-    valid_prefixes = ['project']
+    valid_prefixes = ['project', 'icanhelp']
     valid_prefixes.extend(mysite.profile.models.TagType.short_name2long_name.keys())
 
     pieces_from_splitting_on_first_colon = s.split(':', 1)
