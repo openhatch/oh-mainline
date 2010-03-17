@@ -173,6 +173,7 @@ class ButtonClickMarksSomeoneAsWannaHelp(TwillTests):
             [Person.objects.get(user__username='paulproteus')])
 
 class WannaHelpWorksAnonymously(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def test_create_answer_anonymously(self):
         # Steps for this test
@@ -192,7 +193,7 @@ class WannaHelpWorksAnonymously(TwillTests):
 
         # Make sure we are redirected to the right place
         self.assertEqual(response.redirect_chain,
-            [('http://testserver/account/login/?next=%2F%2Bprojects%2FMyproject%3Fwanna_help=true', 302)])
+            [('http://testserver/account/login/?next=%2F%2Bprojects%2FMyproject%3Fwanna_help%3Dtrue', 302)])
         
         # check that the session can detect that we want to help Ubuntu out
         self.assertEqual(self.client.session['projects_we_want_to_help_out'],
