@@ -15,7 +15,8 @@ Put yourself on the map
 
 {% block submodule_body %}
 {% if the_user.get_profile.location_display_name %}
-<p style="visibility: hidden;" id="success_message">Your location is visible on <a href="{%url mysite.profile.views.people %}">the global map</a>.</p>
+<p style="visibility: hidden;" id="success_message">Your location is visible on <a href="{%url mysite.profile.views.people %}">the global map</a>.
+If you want us to forget your location, empty out the text field and hit save.</p>
 {% else %}
 <p>To appear on <a href="{%url mysite.profile.views.people %}">the global map</a>,
   set a location.</p>
