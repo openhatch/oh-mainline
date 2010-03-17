@@ -207,11 +207,14 @@ def suggest_question_do(request):
     template = "project/project.html"
     return HttpResponseRedirect(reverse(mysite.project.views.project, kwargs={'project__name': project.name}) + '?question_suggestion_response=' + question_suggestion_response)
 
-@login_required
 def wanna_help_do(request):
     wanna_help_form = mysite.project.forms.WannaHelpForm(request.POST)
     if wanna_help_form.is_valid():
         project = wanna_help_form.cleaned_data['project']
+    else:
+        return HttpResponseBadRequest("No project id submitted.")
+
+    if request.user.is_authenticated():
         project.people_who_wanna_help.add(request.user.get_profile())
         project.save()
         if request.is_ajax:
@@ -221,7 +224,33 @@ def wanna_help_do(request):
             return HttpResponse(rendered)
         else:
             return HttpResponseRedirect(project.get_url() + "?success=1")
+    else:
+        # Then store a note in the session...
+        wanna_help_queue = request.session.get('projects_we_want_to_help_out', [])
+        wanna_help_queue.append(project.id)
+        request.session['projects_we_want_to_help_out'] = wanna_help_queue
+        
+        # If user isn't logged in, send them to the login page with next
+        # parameter populated.
+        url = reverse('oh_login')
+        url += "?" + mysite.base.unicode_sanity.urlencode({u'next':
+            unicode(project.get_url()) + '?wanna_help=true'})
+        return HttpResponseRedirect(url)
+        
     if request.is_ajax:
         return HttpResponse("0")
     else:
         return HttpResponseRedirect(project.get_url() + "?success=0")
+
+@login_required
+def unlist_self_from_wanna_help_do(request):
+    wanna_help_form = mysite.project.forms.WannaHelpForm(request.POST)
+    if wanna_help_form.is_valid():
+        project = wanna_help_form.cleaned_data['project']
+    else:
+        return HttpResponseBadRequest("No project id submitted.")
+
+    project.people_who_wanna_help.remove(request.user.get_profile())
+    project.save()
+
+    return HttpResponseRedirect(project.get_url())

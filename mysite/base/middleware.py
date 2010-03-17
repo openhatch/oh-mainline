@@ -28,5 +28,7 @@ class DetectLogin(object):
 
         if request.user.is_authenticated() and 'post_login_stuff_run' not in request.session:
             mysite.project.controllers.take_control_of_our_answers(request.user, request.session)
+            mysite.project.controllers.flush_session_wanna_help_queue_into_database(
+                request.user, request.session)
             request.session['post_login_stuff_run'] = True
         return response
