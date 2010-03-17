@@ -149,10 +149,20 @@ about how you can help {{ project.name }}
     {% endif %}
 
     <div class='module' id='wannahelp'>
+        {% if not user_wants_to_help %}
         <form id='want2help_form' action="{% url mysite.project.views.wanna_help_do %}" method="POST">
             <input type='hidden' name='project' value='{{project.id}}'>
             <input type='submit' id='wannahelp-button' rel='tipsy-south' title='Click to add yourself to the list of people who want to contribute. People of all levels are welcome!' value='I want to help make {{ project.name }} better'>
         </form>
+        {% endif %}
+        <div id='message_for_helpers'
+                {% if not user_wants_to_help %}style='display: none;'{% endif %}>
+            <span>You are listed as someone who is willing to help make {{ project.name }} better.</span>
+            <form id='delist_me_as_a_helper'>
+                <input type='hidden' name='project' value='{{project.id}}'>
+                <input type='image' src='/static/images/icons/undo.png' id='delist_helper_button' value='x' rel='tipsy-south' title='De-list me'>
+            </form>
+        </div>
     </div>
 
     <div class='module' id='bugs'>
@@ -412,8 +422,11 @@ VoteHijacker.pluralize = function(value)
                 'url': "{% url mysite.project.views.wanna_help_do %}",
                 'type': 'POST',
                 'success': function (response) {
-                    /* Create a tipsy-style message that reports success */
+
+                    /* Add person summary to list. */
                     $('#wanna_help .body ul').prepend(response);
+
+                    /* Create a tipsy-style message that reports success */
                     var $tipsyMe = $('#wanna_help .body ul li:eq(0) a');
                     $tipsyMe.attr('title', 
                         "<a href='#' id='wanna_help_thanks_tipsy_closer'>X</a>"
@@ -424,18 +437,23 @@ VoteHijacker.pluralize = function(value)
                     $tipsyMe.mouseover();
                     $tipsyMe.unbind('mouseout');
                     $tipsyMe.unbind('mouseover');
+
                     /* highlight new guy */
                     $tipsyMe.css('background-color', '#ffc');
+
                     $('#wanna_help_thanks_tipsy_closer').click(function(){
                             $(this).parent().parent().hide();
-                            /* remove highlighting from new guy */
-                            $('#wanna_help .body ul li:eq(0) a').css('background-color', '#fff');
+
+                            /* remove highlighting from new guy. setting to
+                             empty string means that we don't override the
+                             pre-existing functionality.*/
+                            $('#wanna_help .body ul li:eq(0) a').css('background-color', '');
+
                             return false;
                         });
-                    /*$.jGrowl("Great! Now people can find you in the list "
-                        + " of interested would-be contributors to {{ project.name }}. "
-                        + "<button>Next steps &raquo;</button>");*/
-                    /* Add person summary to list. */
+
+                    $('#want2help_form').remove();
+                    $('#message_for_helpers').show();
                 },
                 'error': function () {
                         $.jGrowl("Oops! Something went wrong. Please try again.");
