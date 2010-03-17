@@ -107,7 +107,11 @@ People Search
         {% if q %}
             {# If there's a query, tell us the people who match it. #}
 	{{ this_query_summary }}
-            &lsquo;<strong>{{ q }}</strong>&rsquo;{{this_query_post_summary}}:
+    {% spaceless %}
+    {% if not query_is_a_project_name %}<span>&lsquo;</span>{% endif %}
+        <strong>{{ q }}</strong>
+    {% if not query_is_a_project_name %}<span>&rsquo;</span>{% endif %}
+    {% endspaceless %}{{this_query_post_summary}}:
         {% else %}
             {% comment %}
                 If there's *no query*, we list *everybody* in the DB on this page.

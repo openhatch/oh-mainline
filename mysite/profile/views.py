@@ -578,9 +578,11 @@ def people(request):
     # What kind of people are these?
     if data['q']:
         if data['query_type'] == 'project':
-            data['this_query_summary'] = 'who have contributed to or want to help'
+            data['this_query_summary'] = 'who have contributed to '
+            data['query_is_a_project_name'] = True
         elif data['query_type'] == 'icanhelp':
-            data['this_query_summary'] = 'who say they want to contribute to '
+            data['this_query_summary'] = 'who say they want to contribute to the project '
+            data['query_is_a_project_name'] = True
         elif data['query_type'] == 'all_tags':
             data['this_query_summary'] = 'who have listed'
             data['this_query_post_summary'] = ' on their profiles'
