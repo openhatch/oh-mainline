@@ -259,6 +259,8 @@ about how you can help {{ project.name }}
 
 {% block js %}
     <script type='text/javascript'>
+        {# IF YOU MOVE THIS TO AN EXTERNAL FILE DON'T FORGET THAT THERE ARE DJANGO TEMPLATE TAGS HERE! #}
+        
         $(function() {
             $('.add_an_answer')
                 .focus(function() {
@@ -427,13 +429,24 @@ VoteHijacker.pluralize = function(value)
                     var $tipsyMe = $('#wanna_help .body ul li:eq(0) a');
                     $tipsyMe.attr('title', 
                         "<a href='#' id='wanna_help_thanks_tipsy_closer'>X</a>"
-                        + "Great! Now people can find you in the list "
+                        + "<span>Great! Now people can find you in the list "
                         + " of interested would-be contributors to {{ project.name }}. "
-                        + "<button id='next_steps'>Next steps &raquo;</button>");
+                        + "<button id='next_steps'>Next steps &raquo;</button></span>");
                     $tipsyMe.tipsy({'gravity': 'e', 'html': true});
                     $tipsyMe.mouseover();
                     $tipsyMe.unbind('mouseout');
                     $tipsyMe.unbind('mouseover');
+
+                    $('#next_steps').live('click', function() {
+                        $span = $(this).parent();
+                        $span.html("<ul class='left'>"
+                        + "<strong>Next steps</strong>"
+                        + "<li><a href='{% url mysite.profile.views.edit_info %}'>Make sure that your profile talks about what "
+                        + " kinds of things you can help out with</a></li>"
+                        + "<li><a href='{% url mysite.search.views.fetch_bugs %}?q={{ project.name|urlencode }}&toughness=bitesize'>Browse bite-size bugs for {{ project.name }}</a></li>"
+                        + "<li><a href='{% url mysite.profile.views.edit_info %}#contact_blurb'>Make sure your contact info is up to date</a></li>"
+                        + "</ul>");
+                    });
 
                     /* highlight new guy */
                     $tipsyMe.css('background-color', '#ffc');
