@@ -412,7 +412,7 @@ VoteHijacker.pluralize = function(value)
                 'url': "{% url mysite.project.views.wanna_help_do %}",
                 'type': 'POST',
                 'success': function (response) {
-                    /* Create a tipsy-style message that says "Success!" */
+                    /* Create a tipsy-style message that reports success */
                     $('#wanna_help .body ul').prepend(response);
                     var $tipsyMe = $('#wanna_help .body ul li:eq(0) a');
                     $tipsyMe.attr('title', 
@@ -424,8 +424,12 @@ VoteHijacker.pluralize = function(value)
                     $tipsyMe.mouseover();
                     $tipsyMe.unbind('mouseout');
                     $tipsyMe.unbind('mouseover');
+                    /* highlight new guy */
+                    $tipsyMe.css('background-color', '#ffc');
                     $('#wanna_help_thanks_tipsy_closer').click(function(){
-                            $.data($tipsyMe[0], 'active.tipsy').hide();
+                            $(this).parent().parent().hide();
+                            /* remove highlighting from new guy */
+                            $('#wanna_help .body ul li:eq(0) a').css('background-color', '#fff');
                             return false;
                         });
                     /*$.jGrowl("Great! Now people can find you in the list "
