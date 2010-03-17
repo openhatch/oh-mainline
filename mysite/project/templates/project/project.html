@@ -165,9 +165,11 @@ about how you can help {{ project.name }}
         </div>
     </div>
 
+<div class='module' id='wanna_help'>
 {% with project.people_who_wanna_help.all as people_to_show %}
 {% include 'project/project-wanna-help-box.html' %}
 {% endwith %}
+</div>
 
 <div class='module' id='contributors'>
     <div class='head'>
