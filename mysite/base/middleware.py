@@ -21,13 +21,15 @@ class LocationMiddleware(object):
 
 class HandleWannaHelpQueue(object):
     def process_request(self, request):
+        return None
         if not hasattr(request, 'user') or not hasattr(request, 'session'):
             return None
 
         if request.user.is_authenticated() and 'wanna_help_queue_handled' not in request.session:
-            mysite.project.controllers.flush_session_wanna_help_queue_into_database(
-                request.user, request.session)
-            request.session['wanna_help_queue_handled'] = True
+            #mysite.project.controllers.flush_session_wanna_help_queue_into_database(
+            #    request.user, request.session)
+            #request.session['wanna_help_queue_handled'] = True
+            pass
         return None
         
 
