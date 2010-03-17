@@ -19,6 +19,9 @@
         </a>{% endifequal %}
 
         <span class="name">
+            {% if person.is_wannabe %}
+                <span style="color: red;">
+            {% endif %}
 
             {% if person.user.first_name or person.user.last_name %}
                 {{ person.user.first_name }} {{ person.user.last_name }}
@@ -29,6 +32,9 @@
             {% if person.user.first_name and person.user.last_name %}
                 <span class='username'>
                     {{ person.user.username }}
+                </span>
+            {% endif %}
+            {% if person.is_wannabe %}
                 </span>
             {% endif %}
         </span>

@@ -208,6 +208,8 @@ PeopleMapController.prototype.initialize = function(options) {
     for (var person_id in person_id2data) {
         var data = person_id2data[person_id];
         var location_name = data['location'];
+        var is_wannabe = data['wanna_help'];
+
         var name = data['name'];
 
         function create_a_callback(mapController, person_name, person_id) {
@@ -227,6 +229,12 @@ PeopleMapController.prototype.initialize = function(options) {
                 var person_location = new google.maps.LatLng(json_data['latitude'],
                     json_data['longitude']);
 
+        if (is_wannabe && ! is_inaccessible) {
+            icon = "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%20|00EE00|000000";
+        } else {
+            icon = null;
+        }
+
                 var marker = null;
 
                 if (is_inaccessible) {
@@ -241,6 +249,8 @@ if (mapController.the_marker_for_inaccessible_island !== null) {
                     marker = new google.maps.Marker({
                             'map': mapController.map, 
                             'title': person_name,
+                            'icon': icon,
+                            'shadow': 'http://chart.apis.google.com/chart?chst=d_map_pin_shadow',
                             'person_id': person_id,     
                             'position': person_location
                     });
