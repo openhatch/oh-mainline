@@ -149,16 +149,14 @@ about how you can help {{ project.name }}
     {% endif %}
 
     <div class='module' id='wannahelp'>
-        <form action="{% url mysite.project.views.wanna_help_do %}" method="POST">
-	    <input type='hidden' name='project' value='{{project.id}}'>
-            <input type='submit' id='wannahelp-button' rel='tipsy' title='Newbies and old-bies are welcome!' value='I want to help make {{ project.name }} better'>
+        <form id='want2help_form' action="{% url mysite.project.views.wanna_help_do %}" method="POST">
+            <input type='hidden' name='project' value='{{project.id}}'>
+            <input type='submit' id='wannahelp-button' rel='tipsy-south' title='Click to add yourself to the list of people who want to contribute. People of all levels are welcome!' value='I want to help make {{ project.name }} better'>
         </form>
     </div>
 
     <div class='module' id='bugs'>
-        <div class='head'>
-            <h3>Relatedly</h3>
-        </div>
+        <div class='head'> <h3>Relatedly</h3> </div>
         <div class='body'>
             {% if project.get_open_bugs %}
                 <p>
@@ -299,6 +297,9 @@ about how you can help {{ project.name }}
             });
             ourJacker = new VoteHijacker();
             ourJacker.initialize();
+
+            ourOtherJacker = new Want2HelpJacker();
+            ourOtherJacker.initialize();
             
         });
 
@@ -393,6 +394,54 @@ VoteHijacker.pluralize = function(value)
     }
     return "";
 };
+</script>
+
+<script type='text/javascript'>
+    Want2HelpJacker = function () { }
+    Want2HelpJacker.prototype = {
+        'initialize': function () {
+                        var theRow = $('#myRow td');
+                        var origColor = $('#myRow td').css("backgroundColor");
+
+                        $(theRow).css({backgroundColor: '#ff0'});
+                        setTimeout(function() {
+                                $(theRow).animate({backgroundColor: origColor}, 1000);
+                        }, 3000);
+            /* Hijack the 'I want to help' form so that it POST's asynchronously. */
+            var options = {
+                'url': "{% url mysite.project.views.wanna_help_do %}",
+                'type': 'POST',
+                'success': function (response) {
+                    /* Create a tipsy-style message that says "Success!" */
+                    $('#wanna_help .body ul').prepend(response);
+                    var $tipsyMe = $('#wanna_help .body ul li:eq(0) a');
+                    $tipsyMe.attr('title', 
+                        "<a href='#' id='wanna_help_thanks_tipsy_closer'>X</a>"
+                        + "Great! Now people can find you in the list "
+                        + " of interested would-be contributors to {{ project.name }}. "
+                        + "<button>Next steps &raquo;</button>");
+                    $tipsyMe.tipsy({'gravity': 'e', 'html': true});
+                    $tipsyMe.mouseover();
+                    $tipsyMe.unbind('mouseout');
+                    $tipsyMe.unbind('mouseover');
+                    $('#wanna_help_thanks_tipsy_closer').click(function(){
+                            $.data($tipsyMe[0], 'active.tipsy').hide();
+                            return false;
+                        });
+                    /*$.jGrowl("Great! Now people can find you in the list "
+                        + " of interested would-be contributors to {{ project.name }}. "
+                        + "<button>Next steps &raquo;</button>");*/
+                    /* Add person summary to list. */
+                },
+                'error': function () {
+                        $.jGrowl("Oops! Something went wrong. Please try again.");
+                  }
+            };
+            $('#want2help_form').ajaxForm(options);
+
+            /* On success, display a message. */
+        }
+    };
     </script>
 
 {% endblock js %}
