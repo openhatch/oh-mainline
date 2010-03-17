@@ -507,7 +507,8 @@ def people(request):
     data['people'] = everybody
     get_relevant_person_data = lambda p: (
             {'name': p.get_full_name_or_username(),
-            'location': p.get_public_location_or_default()})
+            'location': p.get_public_location_or_default(),
+            'wanna_help': getattr(p, 'is_wannabe', False)})
     person_id2data = dict([(person.pk, get_relevant_person_data(person))
             for person in everybody])
     data['person_id2data_as_json'] = simplejson.dumps(person_id2data)
