@@ -75,6 +75,7 @@ body#project #wannahelp-button { white-space: normal; font-family: Helvetica, sa
 body#project #wannahelp-button:hover { background-color: #dafa97; text-decoration: none; color: #111; }
 body#project #message_for_helpers { background: #eee url('/static/images/icons/green-checkmark.png') 15px center no-repeat; padding-left: 85px; }
 body#project #message_for_helpers span { float: left; width: 85%; }
+body#project #message_for_helpers span li{ list-style: circle; padding-top: 5px; margin-left: 15px; }
 body#project #message_for_helpers input[type='image'] { font-size: 0.85em; font-family: Helvetica, sans-serif; float: right; border: 0; color: #555; padding: 5px; position: relative; left: 15px; top: -5px; font-weight: bold; -moz-border-radius: 8px; border-radius: 8px; }
 body#project #message_for_helpers input[type='image']:hover { background-color: #d3d3d3; }
 body#project #next_steps { display: block; text-align: right; margin-top: 1em; }
