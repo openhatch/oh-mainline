@@ -245,6 +245,8 @@ class RefreshAllTwistedEasyBugs(PeriodicTask):
 
 class PopulateProjectLanguageFromOhloh(Task):
     def run(self, project_id, **kwargs):
+        import pdb
+        pdb.set_trace()
         logger = self.get_logger(**kwargs)
         p = mysite.search.models.Project.objects.get(id=project_id)
         if not p.language:

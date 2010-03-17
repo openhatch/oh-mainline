@@ -26,10 +26,9 @@ class HandleWannaHelpQueue(object):
             return None
 
         if request.user.is_authenticated() and 'wanna_help_queue_handled' not in request.session:
-            #mysite.project.controllers.flush_session_wanna_help_queue_into_database(
-            #    request.user, request.session)
-            #request.session['wanna_help_queue_handled'] = True
-            pass
+            mysite.project.controllers.flush_session_wanna_help_queue_into_database(
+                request.user, request.session)
+            request.session['wanna_help_queue_handled'] = True
         return None
         
 

@@ -92,7 +92,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django_authopenid.middleware.OpenIDMiddleware',
     'mysite.base.middleware.LocationMiddleware',
-#    'mysite.base.middleware.HandleWannaHelpQueue',
+    'mysite.base.middleware.HandleWannaHelpQueue',
     # Django debug toolbar
     #'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
