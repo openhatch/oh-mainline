@@ -9,7 +9,7 @@
     </div>
     <div class='body'>
         <ul id='people-list'>
-            {% for person in project.people_who_wanna_help.all|slice:":3" %}
+            {% for person in people_to_show|slice:":3" %}
                 {% include 'profile/person-summary-li.html' %}
             {% empty %}
                 No one yet.

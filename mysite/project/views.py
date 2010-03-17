@@ -215,13 +215,20 @@ def wanna_help_do(request):
         return HttpResponseBadRequest("No project id submitted.")
 
     if request.user.is_authenticated():
-        project.people_who_wanna_help.add(request.user.get_profile())
+        person = request.user.get_profile()
+        project.people_who_wanna_help.add(person)
         project.save()
+
         if request.is_ajax():
+            people_to_show = list(project.people_who_wanna_help.exclude(user=request.user))
+            people_to_show.insert(0, person)
+            
             t = django.template.loader.get_template('project/project-wanna-help-box.html')
             c = django.template.Context({
                 'project': project,
-                'person': request.user.get_profile() })
+                'person': request.user.get_profile(),
+                'people_to_show': people_to_show,
+                'just_added_myself': True})
             rendered = t.render(c)
             return HttpResponse(rendered)
         else:
