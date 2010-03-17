@@ -407,12 +407,19 @@ VoteHijacker.pluralize = function(value)
                 'success': function (response) {
                     if (response == '1') {
                         /* Create a tipsy-style message that says "Success!" */
-                        $('#wanna_help').attr('title', "Great! Now people can find you in the list "
+                        $('#wanna_help').attr('title', 
+                            "<a href='#' id='wanna_help_thanks_tipsy_closer'>X</a>"
+                            + "Great! Now people can find you in the list "
                             + " of interested would-be contributors to {{ project.name }}. "
                             + "<button>Next steps &raquo;</button>");
                         $('#wanna_help').tipsy({'gravity': 'e', 'html': true});
                         $('#wanna_help').mouseover();
                         $('#wanna_help').unbind('mouseout');
+                        $('#wanna_help').unbind('mouseover');
+                        $('#wanna_help_thanks_tipsy_closer').click(function(){
+                                $.data($('#wanna_help')[0], 'active.tipsy').hide();
+                                return false;
+                            });
                         /*$.jGrowl("Great! Now people can find you in the list "
                             + " of interested would-be contributors to {{ project.name }}. "
                             + "<button>Next steps &raquo;</button>");*/
