@@ -172,3 +172,44 @@ class ButtonClickMarksSomeoneAsWannaHelp(TwillTests):
             list(p_after.people_who_wanna_help.all()),
             [Person.objects.get(user__username='paulproteus')])
 
+class WannaHelpWorksAnonymously(TwillTests):
+
+    def test_create_answer_anonymously(self):
+        # Steps for this test
+        # 1. User fills in the form anonymously
+        # 2. We test that the Answer is not yet saved
+        # 3. User logs in
+        # 4. We test that the Answer is saved
+
+        project_id = Project.create_dummy(name='Myproject').id
+
+        # At the start, no one wants to help our project.
+        self.assertFalse(Project.objects.get(id=project_id).people_who_wanna_help.all())
+
+        # Click the button saying we want to help!
+        post_to = reverse(mysite.project.views.wanna_help_do)
+        response = self.client.post(post_to, {u'project': unicode(project_id)}, follow=True)
+
+        # Make sure we are redirected to the right place
+        self.assertEqual(response.redirect_chain,
+            [('http://testserver/account/login/?next=%2F%2Bprojects%2FMyproject%3Fwanna_help=true', 302)])
+        
+        # check that the session can detect that we want to help Ubuntu out
+        self.assertEqual(self.client.session['projects_we_want_to_help_out'],
+                         ['Ubuntu'])
+
+        # According to the database, no one wants to help our project.
+        self.assertFalse(Project.objects.get(id=project_id).people_who_wanna_help.all())
+
+        # But when the user is logged in and *then* visits the project page
+        login_worked = self.client.login(username='paulproteus',
+                                         password="paulproteus's unbreakable password") 
+        self.assert_(login_worked)
+
+        # Visit the project page...
+        self.client.get(Project.objects.get(id=project_id).get_url())
+
+        # then the DB knows the user wants to help out!
+        self.assertEqual(Project.objects.get(id=project_id).people_who_wanna_help.all(),
+                         [Person.objects.get(user__username='paulproteus')])
+
