@@ -208,7 +208,6 @@ def suggest_question_do(request):
 
 @login_required
 def wanna_help_do(request):
-
     wanna_help_form = mysite.project.forms.WannaHelpForm(request.POST)
     if wanna_help_form.is_valid():
         project = wanna_help_form.cleaned_data['project']

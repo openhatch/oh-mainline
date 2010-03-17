@@ -426,7 +426,9 @@ VoteHijacker.pluralize = function(value)
                         /* Add person summary to list. */
                     }
                 },
-                'error': function () { }
+                'error': function () {
+                        $.jGrowl("Oops! Something went wrong. Please try again.");
+                  }
             };
             $('#want2help_form').ajaxForm(options);
 
