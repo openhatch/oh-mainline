@@ -61,7 +61,7 @@ People Search
     </ul><!-- /.suggestions -->
     {% endif %}
     {% if q %}
-    {% if mentor_count or suggestions_for_searches_regarding_people_who_can_pitch_in or matching_project_suggestions %}
+    {% if mentor_count or suggestions_for_searches_regarding_people_who_can_pitch_in %}
     <div id='refine_search'>
         <ul class='filter_conjunction'>
 	  {% if suggestions_for_searches_regarding_people_who_can_mentor %}
@@ -86,59 +86,56 @@ People Search
                 </ul>
             </li>
 	    {% endif %}
-	    {% if matching_project_suggestions %}
-            <li>
-                <span class='term'>Projects matching &lsquo;{{q}}&rsquo;:</span>
-                <ul>
-		  {% for project in matching_project_suggestions %}
-                  <li style="clear: both;"><a href='?q=project:{{project.name_with_quotes_if_necessary}}'>{{project.name}}</a></li>
-		  {% endfor %}
-
-                </ul>
-            </li>
-	    {% endif %}
         </ul>
     </div><!-- /#refine_search -->
     {% endif %}
     {% endif %}
 
     <div id='search_summary'>
-        People 
-        {% if q %}
-            {# If there's a query, tell us the people who match it. #}
-	{{ this_query_summary }}
-    {% spaceless %}
-    {% if not query_is_a_project_name %}<span>&lsquo;</span>{% endif %}
-        <strong>{{ q }}</strong>
-    {% if not query_is_a_project_name %}<span>&rsquo;</span>{% endif %}
-    {% endspaceless %}{{this_query_post_summary}}:
-        {% else %}
+        <div id='search_summary_heading'>
+            People 
+            {% if q %}
+                {# If there's a query, tell us the people who match it. #}
+                {{ this_query_summary }}
+                {% spaceless %}
+                {% if not query_is_a_project_name %}<span>&lsquo;</span>{% endif %}
+                    <strong>{{ q }}</strong>
+                {% if not query_is_a_project_name %}<span>&rsquo;</span>{% endif %}
+                {% endspaceless %}{{this_query_post_summary}}:
+            {% else %}
+                {% comment %}
+                    If there's *no query*, we list *everybody* in the DB on this page.
+                {% endcomment %}
+                on OpenHatch: 
+            {% endif %}
+            <strong id='people-count'>{{ people|length }}</strong>.
+
             {% comment %}
-                If there's *no query*, we list *everybody* in the DB on this page.
+                Javascript fills these in when the map changes.
             {% endcomment %}
-            on OpenHatch: 
-        {% endif %}
-        <strong id='people-count'>{{ people|length }}</strong>.
 
-        {% comment %}
-            Javascript fills these in when the map changes.
-        {% endcomment %}
-	{% if people %}
-        <span class='hide_once_map_loads'>Loading map...</span>
-	{% endif %}
-        <span class='dont_show_until_map_loads'>
-            <span id='how_many_people_are_visible_label'>
-                Currently visible on the map:
+            {% for project in projects_that_match_q_exactly %}
+                <div class='project-yeller'>
+                    <a href='{{ project.get_url }}'>{{ project.name }}</a> is a project with 
+                    <a href='?q=project:{{project.name_with_quotes_if_necessary|urlencode}}'>
+                        {{ project.get_contributors|length }} contributor{{ project.get_contributors|length|pluralize}}.</a>
+                </div><!-- /.project-yeller -->
+            {% endfor %}
+        </div>
+
+        <div id='summary_of_mapped_people'>
+            {% if people %}
+                <span class='hide_once_map_loads'>Loading map...</span>
+            {% endif %}
+            <span class='dont_show_until_map_loads'>
+                <span id='how_many_people_are_visible_label'>
+                    Currently visible on the map:
+                </span>
+                <strong id='how_many_people_are_visible'></strong><span style="display: none;" id="people_without_locations">, including people who have not set a location <a id='about_uninhabited_island' href='#'>(?)</a></span>.
+                <a href='' {# refresh the page #} id='show_everybody'>(Show everybody.)</a>
             </span>
-            <strong id='how_many_people_are_visible'></strong><span style="display: none;" id="people_without_locations">, including people who have not set a location <a id='about_uninhabited_island' href='#'>(?)</a></span>.
-            <a href='' {# refresh the page #} id='show_everybody'>(Show everybody.)</a>
-        </span>
 
-        {% for project in projects_that_match_q_exactly %}
-            <div class='project-yeller'>
-                &lsquo;{{ project.name }}&rsquo; also refers to <a href='?q=project:{{project.name_with_quotes_if_necessary|urlencode}}'>a project with {{ project.get_contributors|length}} contributor{{ project.get_contributors|length|pluralize}}.</a>
-            </div><!-- /.project-yeller -->
-        {% endfor %}
+        </div>
     </div><!-- /#search_summary -->
 
     {% if people %}
@@ -177,8 +174,31 @@ People Search
 
     {% if not the_user.is_authenticated %}
             <span id='' style="float: right; clear: both; position: relative; height: 0; padding: 0, text-align: right;">
-                Put yourself on the map! <a href="{% url account.views.set_location %}">Create an account &raquo;</a>
+                Put yourself on the map!
+                <a href="{% url account.views.set_location %}">Create an account&nbsp;&raquo;</a>
             </span>
+    {% endif %}
+
+    {% if matching_project_suggestions %}
+    <div id='refine_search'>
+        <ul class='filter_conjunction'>
+            <li>
+                <span class='term'>
+                    {% ifequal query_type 'project' %}
+                        Other projects
+                    {% else %}
+                        Projects
+                    {% endifequal %}
+                    matching &lsquo;{{q}}&rsquo;:</span>
+                <ul>
+                    {% for project in matching_project_suggestions %}
+                        <li style="clear: both;"><a href='?q=project:{{project.name_with_quotes_if_necessary}}'>{{project.name}}</a></li>
+                    {% endfor %}
+
+                </ul>
+            </li>
+        </ul>
+    </div>
     {% endif %}
 {% endblock people_main %}
 

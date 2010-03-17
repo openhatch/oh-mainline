@@ -565,10 +565,14 @@ def people(request):
         cache.set(key_name, popular_tags, cache_timespan)
 
     # Populate matching_project_suggestions
-    data['matching_project_suggestions'] = Project.objects.filter(
-        cached_contributor_count__gt=0, name__icontains=data['q']).filter(
-        ~Q(name__iexact=data['q'])).order_by(
-        '-cached_contributor_count')
+    # (unless query is icanhelp, in which case it's not relevant enough)
+    if data['query_type'] == "icanhelp":
+        data['matching_project_suggestions'] = []
+    else:
+        data['matching_project_suggestions'] = Project.objects.filter(
+            cached_contributor_count__gt=0, name__icontains=data['q']).filter(
+            ~Q(name__iexact=data['q'])).order_by(
+            '-cached_contributor_count')
 
     MATCHING_PROJECT_SUGGESTIONS_COUNT = 3
     # limit this if we found people
