@@ -1434,6 +1434,9 @@ class CreateAnonymousAnswer(TwillTests):
         q = ProjectInvolvementQuestion.create_dummy(
                 key_string='where_to_start', is_bug_style=False)
 
+        # Do a GET on the project page to prove cookies work.
+        self.client.get(p.get_url())
+
         # POST some text to the answer creation post handler
         answer_text = """Help produce official documentation, share the solution to a problem, or check, proof and test other documents for accuracy."""
         POST_data = {
