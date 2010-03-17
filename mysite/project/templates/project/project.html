@@ -165,48 +165,6 @@ about how you can help {{ project.name }}
         </div>
     </div>
 
-    <div class='module' id='bugs'>
-        <div class='head'> <h3>Relatedly</h3> </div>
-        <div class='body'>
-            {% if project.get_open_bugs %}
-                <p>
-                    Browse {{ project.get_open_bugs|length }}+
-                    <a href='/search/?q={{ project.name_with_quotes_if_necessary|urlencode }}'>
-                        volunteer opportunit{{ project.get_open_bugs|pluralize:"y,ies"}}
-                        matching
-                        <strong>{{ project.name }}</strong>.
-                    </a>
-            </p>
-            {% else %}
-                <p>
-                No volunteer opportunities in {{project.name}} indexed here yet. 
-                <a href='/wiki/Bug_trackers'>
-                    To add a bug tracker, 
-                    visit our wiki</a>.
-
-            </p>
-        {% endif %}
-      
-      {% with mentors as mentors %}
-      {% with project.name as topic %}
-      {% with 0 as explain_language %}
-      {% include 'project/mentor_summary.html' %}
-      {% endwith %}
-      {% endwith %}
-      {% endwith %}
-
-      {% if project.language %}
-      {% with language_mentors as mentors %}
-      {% with project.language as topic %}
-      {% with 1 as explain_language %}
-      {% include 'project/mentor_summary.html' %}
-      {% endwith %}
-      {% endwith %}
-      {% endwith %}
-      {% endif %}
-
-    </div>
-</div><!-- /.module #bugs -->
 
 <div class='module' id='wanna_help'>
     <div class='head'>
@@ -225,10 +183,6 @@ about how you can help {{ project.name }}
                 No one yet.
             {% endfor %}
         </ul>
-        <div style='width: 100%; float: left; text-align: right; margin-top: 20px; font-size: 8pt;'>
-        To be listed here,
-	<strong>click the button right up there</strong>!
-        </div>
     </div>
 </div>
 
@@ -257,6 +211,49 @@ about how you can help {{ project.name }}
         </div>
     </div>
 </div>
+
+<div class='module' id='bugs'>
+    <div class='head'> <h3>Relatedly</h3> </div>
+    <div class='body'>
+        {% if project.get_open_bugs %}
+            <p>
+                Browse {{ project.get_open_bugs|length }}+
+                <a href='/search/?q={{ project.name_with_quotes_if_necessary|urlencode }}'>
+                    volunteer opportunit{{ project.get_open_bugs|pluralize:"y,ies"}}
+                    matching
+                    <strong>{{ project.name }}</strong>.
+                </a>
+        </p>
+        {% else %}
+            <p>
+            No volunteer opportunities in {{project.name}} indexed here yet. 
+            <a href='/wiki/Bug_trackers'>
+                To add a bug tracker, 
+                visit our wiki</a>.
+
+        </p>
+    {% endif %}
+  
+  {% with mentors as mentors %}
+  {% with project.name as topic %}
+  {% with 0 as explain_language %}
+  {% include 'project/mentor_summary.html' %}
+  {% endwith %}
+  {% endwith %}
+  {% endwith %}
+
+  {% if project.language %}
+  {% with language_mentors as mentors %}
+  {% with project.language as topic %}
+  {% with 1 as explain_language %}
+  {% include 'project/mentor_summary.html' %}
+  {% endwith %}
+  {% endwith %}
+  {% endwith %}
+  {% endif %}
+
+    </div>
+</div><!-- /.module #bugs -->
 
 {% endblock main %}
 
