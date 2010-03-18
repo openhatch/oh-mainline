@@ -440,10 +440,28 @@ def project_query2mappable_orm_people(parsed_query):
     
     extra_data = {}
 
+    mentor_people = mappable_people_from_haystack.filter(**{'can_mentor_lowercase_exact': parsed_query['q'].lower()})
+    can_pitch_in_people = mappable_people_from_haystack.filter(**{'can_pitch_in_lowercase_exact': parsed_query['q'].lower()})
+
+    extra_data['suggestions_for_searches_regarding_people_who_can_mentor'] = []
+    extra_data['suggestions_for_searches_regarding_people_who_can_pitch_in'] = []
+
+    ## How many possible mentors
+    if mentor_people:
+        extra_data['suggestions_for_searches_regarding_people_who_can_mentor'].append(
+            {'query': parsed_query['q'].lower(),
+             'count': len(mentor_people)})
+
+    ## Does this relate to people who can pitch in?
+    if can_pitch_in_people:
+        extra_data['suggestions_for_searches_regarding_people_who_can_pitch_in'].append(
+            {'query': parsed_query['q'].lower(), 'count': len(can_pitch_in_people)})
+    
+    orm_projects = Project.objects.filter(name__iexact=parsed_query['q'])
+
     ## populate suggestions_for_searches_regarding_people_who_can_pitch_in
     ## that expects a {'query': X, 'count': Y} dict
     suggestions_for_searches_regarding_people_who_can_pitch_in = []
-    orm_projects = Project.objects.filter(name__iexact=parsed_query['q'])
     for orm_project in orm_projects:
         people_who_can_pitch_in_with_project_language = haystack.query.SearchQuerySet(
             ).all().filter(can_pitch_in_lowercase_exact=orm_project.language.lower())
@@ -466,11 +484,11 @@ def project_query2mappable_orm_people(parsed_query):
                  'summary_addendum': ", %s's primary language" % orm_project.name})
 
     extra_data['suggestions_for_searches_regarding_people_who_can_pitch_in'
-               ] = suggestions_for_searches_regarding_people_who_can_pitch_in
+               ].extend(suggestions_for_searches_regarding_people_who_can_pitch_in)
 
     extra_data['suggestions_for_searches_regarding_people_who_can_mentor'
-               ] = suggestions_for_searches_regarding_people_who_can_mentor
-    
+               ].extend(suggestions_for_searches_regarding_people_who_can_mentor)
+
     return mappable_people, extra_data
 
 @view
