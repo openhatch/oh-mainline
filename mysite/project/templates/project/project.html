@@ -175,9 +175,7 @@ about how you can help {{ project.name }}
     </div>
 
 <div class='module' id='wanna_help'>
-{% with project.people_who_wanna_help.all as people_to_show %}
 {% include 'project/project-wanna-help-box.html' %}
-{% endwith %}
 </div>
 
 <div class='module' id='contributors'>
@@ -455,7 +453,13 @@ function yay_we_want_to_help() {
 
         }
     };
+{% if user_just_signed_up_as_wants_to_help %}
+    $(yay_we_want_to_help);
+{% endif %}
     </script>
+
+
+
 
 {% endblock js %}
 

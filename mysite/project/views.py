@@ -30,6 +30,8 @@ def create_project_page_do(request):
 
 @mysite.base.decorators.view
 def project(request, project__name = None):
+    wanna_help = bool(request.GET.get('wanna_help', False))
+    
     p = get_object_or_404(Project, name=project__name)
 
     pfentries = p.portfolioentry_set.exclude(project_description='')
@@ -70,6 +72,12 @@ def project(request, project__name = None):
     else:
         user_wants_to_help = False
 
+    if wanna_help:
+        people_to_show = list(p.people_who_wanna_help.exclude(user=request.user))
+        people_to_show.insert(0, request.user.get_profile())
+    else:
+        people_to_show = p.people_who_wanna_help.all()
+
     context.update({
         'project': p,
         'contributors': p.get_contributors()[:3],
@@ -80,6 +88,8 @@ def project(request, project__name = None):
         'explain_to_anonymous_users': True,
         'wanna_help_form': mysite.project.forms.WannaHelpForm(),
         'user_wants_to_help': user_wants_to_help,
+        'user_just_signed_up_as_wants_to_help': wanna_help,
+        'people_to_show': people_to_show,
         })
 
     question_suggestion_response = request.GET.get('question_suggestion_response', None)
