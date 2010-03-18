@@ -1468,6 +1468,12 @@ class CreateAnonymousAnswer(TwillTests):
 
         self.assertFalse(Answer.objects.all()) # it's unowned
 
+        # Now, the session will know about the answer, but the answer will not be published.
+        # Visit the login page, assert that the page contains the text of the answer.
+        response = self.client.get(reverse('oh_login'))
+        self.assertContains(response, POST_data['answer__text'])
+        
+
         # But when the user is logged in and *then* visits the project page
         login_worked = self.client.login(username='paulproteus',
                                          password="paulproteus's unbreakable password")

@@ -307,6 +307,9 @@ class LoginPageContainsUnsavedAnswer(TwillTests):
         q = ProjectInvolvementQuestion.create_dummy(
                 key_string='where_to_start', is_bug_style=False)
 
+        # Do a GET on the project page to prove cookies work.
+        self.client.get(p.get_url())
+
         # POST some text to the answer creation post handler
         POST_data = {
                 'project__pk': p.pk,
