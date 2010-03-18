@@ -174,7 +174,8 @@ class ButtonClickMarksSomeoneAsWannaHelp(TwillTests):
             list(p_after.people_who_wanna_help.all()),
             [Person.objects.get(user__username='paulproteus')])
 
-    def test_unmark_as_wanna_help(self):
+    @mock.patch("mysite.profile.models.Person.reindex_for_person_search")
+    def test_unmark_as_wanna_help(self, mock_reindex_person_method):
         # We're in there...
         p_before = Project.create_dummy()
         p_before.people_who_wanna_help.add(Person.objects.get(user__username='paulproteus'))
@@ -187,6 +188,7 @@ class ButtonClickMarksSomeoneAsWannaHelp(TwillTests):
 
         # Are we gone yet?
         p_after = Project.objects.get(pk=p_before.pk)
+        self.assert_(mock_reindex_person_method.called)
 
         self.assertFalse(p_after.people_who_wanna_help.all())
 

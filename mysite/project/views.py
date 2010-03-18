@@ -281,6 +281,7 @@ def unlist_self_from_wanna_help_do(request):
         project = wanna_help_form.cleaned_data['project']
         project.people_who_wanna_help.remove(request.user.get_profile())
         project.save()
+        request.user.get_profile().reindex_for_person_search()
         return HttpResponseRedirect(project.get_url())
     else:
         return HttpResponseBadRequest("No project id submitted.")
