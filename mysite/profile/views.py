@@ -601,7 +601,7 @@ def people(request):
             data['this_query_summary'] = 'who ' + long_name
 
     if data['query_type'] == 'icanhelp' and not data['people']:
-        data['total_query_summary'] = "No one has yet listed themselves as willing to contribute to the project <strong>%s</strong>." % data['q']
+        data['total_query_summary'] = "No one has yet listed himself/herself as willing to contribute to the project <strong>%s</strong>." % data['q']
 
     if data['query_type'] == 'icanhelp' and not Project.objects.filter(name=data['q']):
         data['total_query_summary'] = "There are no projects yet on OpenHatch named <strong>%s</strong>." % data['q']
