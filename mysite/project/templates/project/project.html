@@ -400,6 +400,21 @@ VoteHijacker.pluralize = function(value)
 </script>
 
 <script type='text/javascript'>
+function yay_we_want_to_help() {
+   /* Create a tipsy-style message that reports success */
+   var $tipsyMe = $('#wanna_help .body ul li:eq(0) a');
+
+   /* highlight new guy */
+   $tipsyMe.css('background-color', '#ffc');
+
+   /* Trigger tipsy destruction. */
+   $('#wannahelp-button').getTipsy().remove();
+
+   $('#want2help_form').remove();
+   $('#message_for_helpers').show();
+}
+
+
     Want2HelpJacker = function () { }
     Want2HelpJacker.prototype = {
         'initialize': function () {
@@ -429,17 +444,8 @@ VoteHijacker.pluralize = function(value)
                     /* Replace the list of person summaries. */
                     $('#wanna_help').html(response);
 
-                    /* Create a tipsy-style message that reports success */
-                    var $tipsyMe = $('#wanna_help .body ul li:eq(0) a');
-
-                    /* highlight new guy */
-                    $tipsyMe.css('background-color', '#ffc');
-
-                    /* Trigger tipsy destruction. */
-                    $('#wannahelp-button').getTipsy().remove();
-
-                    $('#want2help_form').remove();
-                    $('#message_for_helpers').show();
+                    // Call the "Yay, we want to help" function
+		    yay_we_want_to_help();
                 },
                 'error': function () {
                         $.jGrowl("Oops! Something went wrong. Please try again.");
