@@ -1,6 +1,7 @@
 from django import template
 import re
 from django.utils.html import escape
+from urlparse import urlparse
 
 register = template.Library()
 
@@ -57,6 +58,14 @@ def break_long_words(value):
 
     # if the word is really long, insert a <wbr> occasionally.
     return "<wbr>".join(re_too_many_letters_in_a_row.split(value))
+
+@register.filter
+def prepend_http_if_necessary(value):
+    """If someone makes "www.example.org" their homepage, then we need to prepend "http://" so it doesn't link to https://openhatch.org/people/username/www.example.org. This template filter prepends that."""
+    parsed = urlparse(value)
+    if not parsed.scheme:
+        return "http://" + parsed.geturl()
+    return value
 
 register.filter('gt', gt)
 register.filter('lt', lt)
