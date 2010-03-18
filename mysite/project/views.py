@@ -30,10 +30,17 @@ def create_project_page_do(request):
 
 @mysite.base.decorators.view
 def project(request, project__name = None):
-    wanna_help = bool(request.GET.get('wanna_help', False))
-    
     p = get_object_or_404(Project, name=project__name)
 
+    if (request.user.is_authenticated() and
+        request.user.get_profile() in p.people_who_wanna_help.all()):
+        user_wants_to_help = True
+    else:
+        user_wants_to_help = False
+
+    wanna_help = (bool(request.GET.get('wanna_help', False)) and
+                  user_wants_to_help)
+    
     pfentries = p.portfolioentry_set.exclude(project_description='')
     only_good_pfentries = lambda pfe: pfe.project_description.strip()
     pfentries = filter(only_good_pfentries, pfentries)
@@ -65,12 +72,6 @@ def project(request, project__name = None):
 
     if request.GET.get('cookies', '') == 'disabled':
         context['cookies_disabled'] = True
-
-    if (request.user.is_authenticated() and
-        request.user.get_profile() in p.people_who_wanna_help.all()):
-        user_wants_to_help = True
-    else:
-        user_wants_to_help = False
 
     if wanna_help:
         people_to_show = list(p.people_who_wanna_help.exclude(user=request.user))
