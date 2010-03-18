@@ -250,7 +250,10 @@ def wanna_help_do(request):
         url = reverse('oh_login')
         url += "?" + mysite.base.unicode_sanity.urlencode({u'next':
             unicode(project.get_url()) + '?wanna_help=true'})
-        return HttpResponseRedirect(url)
+        if request.is_ajax():
+            return HttpResponse("redirect: " + url)
+        else:
+            return HttpResponseRedirect(url)
         
     if request.is_ajax:
         return HttpResponse("0")

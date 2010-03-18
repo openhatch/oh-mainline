@@ -415,8 +415,18 @@ VoteHijacker.pluralize = function(value)
                 'url': "{% url mysite.project.views.wanna_help_do %}",
                 'type': 'POST',
                 'success': function (response) {
+                    /* HACK! In the case that we need to log in, accept a message from the server
+                     * indicating as much.
+                     */
+                    if (response.substring(0, 10) === "redirect: ") {
+                        var destination = response.substring(10);
+                        document.location = destination;
+                        return;
+                    }
 
-                    /* Add person summary to list. */
+                    // otherwise, proceed as normal.
+
+                    /* Replace the list of person summaries. */
                     $('#wanna_help').html(response);
 
                     /* Create a tipsy-style message that reports success */
