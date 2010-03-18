@@ -176,7 +176,7 @@ People Search
 
     {% endif %}
 
-    {% if not the_user.is_authenticated %}
+    {% if not the_user.is_authenticated and people %}
             <span style="float: right; padding: 5px 0 0 0;">
                 <a href="{% url account.views.set_location %}">
                     Add yourself to the map&nbsp;&raquo;</a>
