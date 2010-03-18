@@ -5,6 +5,7 @@
 {% block body_class %}
 {{ block.super }}
 people-list-page
+{% if not people %}no_results{% endif %}
 {% endblock body_class %}
 
 {% block title %}
@@ -62,7 +63,7 @@ People Search
     {% endif %}
     {% if q %}
     {% if mentor_count or suggestions_for_searches_regarding_people_who_can_pitch_in or icanhelp_count %}
-    <div id='refine_search'>
+    <div id='refine_search' class='greybox'>
         <ul class='filter_conjunction'>
 
             {% if mentor_count or suggestions_for_searches_regarding_people_who_can_pitch_in %}
@@ -223,23 +224,31 @@ People Search
     {% endif %}
 
     {% if q and matching_project_suggestions %}
-    <div id='refine_search' class='matching_project_suggestions'>
-        <ul class='filter_conjunction'>
-            <li>
-                <span class='term'>
-                    {% ifequal query_type 'project' %}
-                        Other projects
-                    {% else %}
-                        Projects
-                    {% endifequal %}
-                    matching &lsquo;{{q}}&rsquo;:</span>
-                <ul>
-                    {% for project in matching_project_suggestions %}
-                        <li style="clear: both;"><a href='?q=project:{{project.name_with_quotes_if_necessary}}'>{{project.name}}</a></li>
-                    {% endfor %}
-
-                </ul>
-            </li>
+    <div class='greybox matching_project_suggestions'>
+            {% ifequal query_type 'project' %}
+                Other projects
+            {% else %}
+                Projects
+            {% endifequal %}
+            matching &lsquo;{{q}}&rsquo;:
+        <span id='a_few_matching_project_suggestions'>
+            {% for project in a_few_matching_project_suggestions %}
+                {% spaceless %}
+                <a href='?q=project:{{project.name_with_quotes_if_necessary}}'>
+                    {{project.name}}</a>
+                {% if forloop.last %}
+                    (<a id='show_all_matching_projects' href='#'>more</a>)
+                {% else %}<span>, </span>{% endif %}
+                {% endspaceless %}
+            {% endfor %}
+        </span>
+        <ul id='all_matching_project_suggestions'>
+            {% for project in matching_project_suggestions %}
+                <li style="clear: both;"><a href='?q=project:{{project.name_with_quotes_if_necessary}}'>{{project.name}}</a></li>
+            {% endfor %}
+            {% if people %}
+                (<a id='show_fewer_matching_projects' href='#'>less</a>)
+            {% endif %}
         </ul>
     </div>
     {% endif %}
@@ -289,6 +298,18 @@ People Search
 
         $('#about_uninhabited_island').click(function () {
             mapController.explainUninhabitedIsland('question_mark');
+            return false;
+        });
+
+        $('#show_all_matching_projects').click(function () {
+            $('#all_matching_project_suggestions').show();
+            $('#a_few_matching_project_suggestions').hide();
+            return false;
+        });
+
+        $('#show_fewer_matching_projects').click(function () {
+            $('#all_matching_project_suggestions').hide();
+            $('#a_few_matching_project_suggestions').show();
             return false;
         });
     });

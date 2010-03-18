@@ -65,7 +65,8 @@ body#people-map #search_summary, body#people-map #search_modules > div { padding
 body#people-map #search_summary { width: 100%; padding: 10px 0; font-size: 1.0em; } 
 
 /* Refine your search */
-body#people-map #refine_search { border: 1px solid #e2e2e2; margin: 10px 10px 0 0; padding: 1.5%; float: left; background-color: #ececec; -moz-border-radius: 1.5%; border-radius: 1.5%; }
+body#people-map #refine_search {  margin: 10px 10px 0 0; padding: 1.5%; }
+body#people-map .greybox { padding: 8px; float: left; background-color: #ececec; -moz-border-radius: 8px; border-radius: 8px; border: 1px solid #e2e2e2; }
 body#people-map #refine_search h3 { padding: 0; margin-bottom: 10px; }
 body#people-map #refine_search .filter_conjunction { }
 body#people-map #refine_search .filter_conjunction > li { list-style: none; float: left; width: 300px; }
@@ -96,3 +97,8 @@ body#people-map #summary_of_mapped_people { margin-top: 3px; font-size: .9em; fl
 body#people-map #refine_search.matching_project_suggestions { float: left; width: 50%; }
 body#people-map #refine_search.matching_project_suggestions li { float: left; width: 100%; }
 body#people-map #people_count { margin-top: 3px; font-size: .9em; float: left; }
+body#people-map ul#all_matching_project_suggestions { list-style: circle; margin-left: 20px; float: none; display: none; }
+body#people-map.no_results ul#all_matching_project_suggestions { display: block; }
+
+body#people-map.no_results #a_few_matching_project_suggestions { display: none; }
+body#people-map .matching_project_suggestions { margin-top: 10px; }
