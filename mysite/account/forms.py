@@ -109,11 +109,8 @@ class EditPhotoForm(django.forms.ModelForm):
             old = self.cleaned_data['photo']
 
             new_image_uploaded_file = InMemoryUploadedFile(
-                name='',
-                file=new_image_fd,
-                content_type=None,
-                size=new_image_fd.len,
-                charset=None)
+                new_image_fd, '', old.name,
+                old.content_type, new_image_fd.len, old.charset)
 
             # Modify the self.cleaned_data[]
             self.cleaned_data['photo'] = new_image_uploaded_file
