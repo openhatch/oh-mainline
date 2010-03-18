@@ -600,6 +600,12 @@ def people(request):
             long_name = mysite.profile.models.TagType.short_name2long_name[data['query_type']]
             data['this_query_summary'] = 'who ' + long_name
 
+    if data['query_type'] == 'icanhelp' and not data['people']:
+        data['total_query_summary'] = "No one has yet listed themselves as willing to contribute to the project <strong>%s</strong>." % data['q']
+
+    if data['query_type'] == 'icanhelp' and not Project.objects.filter(name=data['q']):
+        data['total_query_summary'] = "There are no projects yet on OpenHatch named <strong>%s</strong>." % data['q']
+
     data['suggestions'] = [
         dict(display_name='projects',
              values=popular_projects,

@@ -93,22 +93,26 @@ People Search
 
     <div id='search_summary'>
         <div id='search_summary_heading'>
-            People 
-            {% if q %}
-                {# If there's a query, tell us the people who match it. #}
-                {{ this_query_summary }}
-                {% spaceless %}
-                {% if not query_is_a_project_name %}<span>&lsquo;</span>{% endif %}
-                    <strong>{{ q }}</strong>
-                {% if not query_is_a_project_name %}<span>&rsquo;</span>{% endif %}
-                {% endspaceless %}{{this_query_post_summary}}:
+            {% if total_query_summary %}
+                {{ total_query_summary|safe }}
             {% else %}
-                {% comment %}
-                    If there's *no query*, we list *everybody* in the DB on this page.
-                {% endcomment %}
-                on OpenHatch: 
+                People 
+                {% if q %}
+                    {# If there's a query, tell us the people who match it. #}
+                    {{ this_query_summary }}
+                    {% spaceless %}
+                    {% if not query_is_a_project_name %}<span>&lsquo;</span>{% endif %}
+                        <strong>{{ q }}</strong>
+                    {% if not query_is_a_project_name %}<span>&rsquo;</span>{% endif %}
+                    {% endspaceless %}{{this_query_post_summary}}:
+                {% else %}
+                    {% comment %}
+                        If there's *no query*, we list *everybody* in the DB on this page.
+                    {% endcomment %}
+                    on OpenHatch: 
+                {% endif %}
+                <strong id='people-count'>{{ people|length }}</strong>.
             {% endif %}
-            <strong id='people-count'>{{ people|length }}</strong>.
 
             {% comment %}
                 Javascript fills these in when the map changes.
@@ -173,14 +177,14 @@ People Search
     {% endif %}
 
     {% if not the_user.is_authenticated %}
-            <span id='' style="float: right; clear: both; position: relative; height: 0; padding: 0, text-align: right;">
-                Put yourself on the map!
-                <a href="{% url account.views.set_location %}">Create an account&nbsp;&raquo;</a>
+            <span style="float: right; padding: 5px 0 0 0;">
+                <a href="{% url account.views.set_location %}">
+                    Add yourself to the map&nbsp;&raquo;</a>
             </span>
     {% endif %}
 
     {% if q and matching_project_suggestions %}
-    <div id='refine_search'>
+    <div id='refine_search' class='matching_project_suggestions'>
         <ul class='filter_conjunction'>
             <li>
                 <span class='term'>

@@ -73,7 +73,7 @@ def project(request, project__name = None):
             'can_mentor', p.language)),
         'explain_to_anonymous_users': True,
         'wanna_help_form': mysite.project.forms.WannaHelpForm(),
-        'user_wants_to_help': request.user.get_profile() in p.people_who_wanna_help.all(),
+        'user_wants_to_help': request.user.is_authenticated() and request.user.get_profile() in p.people_who_wanna_help.all(),
         })
 
     question_suggestion_response = request.GET.get('question_suggestion_response', None)
