@@ -604,7 +604,7 @@ def people(request):
         data['total_query_summary'] = "No one has yet listed himself/herself as willing to contribute to the project <strong>%s</strong>." % data['q']
 
     if data['query_type'] == 'icanhelp' and not Project.objects.filter(name=data['q']):
-        data['total_query_summary'] = "There are no projects yet on OpenHatch named <strong>%s</strong>." % data['q']
+        data['total_query_summary'] = "Sorry, we couldn't find a project named <strong>%s</strong>." % data['q']
 
     data['suggestions'] = [
         dict(display_name='projects',
