@@ -138,7 +138,7 @@ People Search
                     {# If there's a query, tell us the people who match it. #}
                     {{ this_query_summary }}
                     {% spaceless %}
-                    {% if not query_is_a_project_name %}<span>&lsquo;</span>{% endif %}
+                    {% ifequal query_type 'all_tags' %}<span>&lsquo;</span>{% endifequal %}
                     <strong>
                         {% if query_is_a_project_name %}
                             <a href='{{ queried_project.get_url }}'>{{ q }}</a>
@@ -146,7 +146,7 @@ People Search
                             <span>{{ q }}</span>
                         {% endif %}
                     </strong>
-                    {% if not query_is_a_project_name %}<span>&rsquo;</span>{% endif %}
+                    {% ifequal query_type 'all_tags' %}<span>&rsquo;</span>{% endifequal %}
                     {% endspaceless %}{{this_query_post_summary}}
                 {% else %}
                     {% comment %}
