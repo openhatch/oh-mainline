@@ -150,7 +150,7 @@
         {% if person.homepage_url %}
         <h4>web site</h4>
         <p>
-            <a rel="me" href="{{ person.homepage_url }}">{{ person.homepage_url|break_long_words|safe }}</a>
+            <a rel="me" href="{{ person.homepage_url|prepend_http_if_necessary }}">{{ person.homepage_url|break_long_words|safe }}</a>
         </p>
         {% endif %}
 
