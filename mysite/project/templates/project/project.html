@@ -34,7 +34,7 @@ about how you can help {{ project.name }}
 {% block left %}
     <div class='module contains_questions'>
         <div class='head'>
-            <h3>How can people make {{ project.name }} better?</h3>
+            <h3>Chatter</h3>
         </div>
         <div class='body'>
             <div style="font-size: 1.3em" class="you-are-missing-things">
@@ -450,6 +450,10 @@ function yay_we_want_to_help() {
                   }
             };
             $('#want2help_form').ajaxForm(options);
+            $('#want2help_form').find('input:submit').click(function () {
+                $button = $(this);
+                $button.val('Working...')
+            });
 
         }
     };

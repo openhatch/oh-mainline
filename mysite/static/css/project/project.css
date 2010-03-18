@@ -69,11 +69,12 @@ body#project .quotemark { color: #555; }
 
 body#project #wannahelp { width: 101% ! important; padding: 0; background: transparent; }
 body#project #wanna_help_thanks_tipsy_closer {float: right;}
-body#project #wannahelp-button, body#project #message_for_helpers { border: 3px solid #fff; -moz-border-radius: 8px; border-radius: 8px; float: left; padding: 10px 20px; color: #444; }
-body#project #wannahelp-button { white-space: normal; font-family: Helvetica, sans-serif; width: 100%; font-weight: normal; cursor: pointer; cursor: hand; text-align: center; background-color: #e1faac; /* grass green */ font-size: 13pt; }
-
-body#project #wannahelp-button:hover { background-color: #dafa97; text-decoration: none; color: #111; }
-body#project #message_for_helpers { background: #eee url('/static/images/icons/green-checkmark.png') 15px center no-repeat; padding-left: 85px; }
+body#project #wannahelp-button, body#project #message_for_helpers {  -moz-border-radius: 8px; border-radius: 8px; float: left; padding: 10px 20px; color: #444; }
+body#project #wannahelp-button { border: 3px solid #fff; white-space: normal; font-family: Helvetica, sans-serif; width: 101%; font-weight: normal; cursor: pointer; cursor: hand; text-align: center; text-shadow: 0px 1px 0px #fff; background: #c8e29d url('/static/images/wannahelp-button-bg.png') repeat-x top; /* grass green */ font-size: 13pt; }
+body#project #wannahelp-button:active { background-image: url('/static/images/wannahelp-button-bg-active.png'); background-position: bottom;}
+body#project #wannahelp-button:hover, body#project #wannahelp-button:focus { background-image: url('/static/images/wannahelp-button-bg-hover.png'); text-decoration: none; color: #222; }
+body#project #wannahelp-button:hover:active { background-image: url('/static/images/wannahelp-button-bg-hover-active.png'); }
+body#project #message_for_helpers { border: 3px solid #fff; background: #eee url('/static/images/icons/green-checkmark.png') 15px 15px no-repeat; padding-left: 85px; }
 body#project #message_for_helpers span { float: left; width: 85%; }
 body#project #message_for_helpers span li{ list-style: circle; padding-top: 5px; margin-left: 15px; }
 body#project #message_for_helpers input[type='image'] { font-size: 0.85em; font-family: Helvetica, sans-serif; float: right; border: 0; color: #555; padding: 5px; position: relative; left: 15px; top: -5px; font-weight: bold; -moz-border-radius: 8px; border-radius: 8px; }
