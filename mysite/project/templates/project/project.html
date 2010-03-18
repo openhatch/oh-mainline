@@ -152,7 +152,7 @@ about how you can help {{ project.name }}
         {% if not user_wants_to_help %}
         <form id='want2help_form' action="{% url mysite.project.views.wanna_help_do %}" method="POST">
             <input type='hidden' name='project' value='{{project.id}}'>
-            <input type='submit' id='wannahelp-button' rel='tipsy-south' title='Click to add yourself to the list of people who want to contribute. People of all levels are welcome!' value='I want to help make {{ project.name }} better'>
+            <input type='submit' id='wannahelp-button' rel='tipsy-south' title='Click to add yourself to the list of people who want to contribute. People of all levels are welcome!' value='I want to help'>
         </form>
         {% endif %}
         <div id='message_for_helpers'
