@@ -164,7 +164,8 @@ People Search
         </div>
 
         <div id='people_count'>
-            {{ people|length }} results 
+            {{ people|length|pluralize:"Just," }}
+            {{ people|length }} result{{ people|length|pluralize }}
         </div>
 
         <div id='summary_of_mapped_people'>
