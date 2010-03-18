@@ -349,7 +349,8 @@ sample_launchpad_data_dump.return_value = [dict(
 class AutoCrawlTests(SearchTest):
     @mock.patch('mysite.search.launchpad_crawl.dump_data_from_project', 
                 sample_launchpad_data_dump)
-    def testSearch(self):
+    @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
+    def testSearch(self, do_nothing):
         # Verify that we can't find a bug with the right description
         self.assertRaises(mysite.search.models.Bug.DoesNotExist,
                           mysite.search.models.Bug.all_bugs.get,
@@ -375,7 +376,9 @@ class AutoCrawlTests(SearchTest):
         # thanks to fresh import
 
 class LaunchpadImporterTests(SearchTest):
-    def test_lp_update_handler(self):
+
+    @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
+    def test_lp_update_handler(self, do_nothing):
         '''Test the Launchpad import handler with some fake data.'''
         some_date = datetime.datetime(2009, 4, 1, 2, 2, 2)
         query_data = dict(project='GNOME-Do',
@@ -411,7 +414,8 @@ class LaunchpadImporterTests(SearchTest):
         for key in new_data:
             self.assertEqual(getattr(bug, key), new_data[key])
 
-    def test_lp_data_clean(self):
+    @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
+    def test_lp_data_clean(self, do_nothing):
         now_t = (2009, 4, 1, 5, 13, 2) # partial time tuple
         now_d = datetime.datetime(2009, 4, 1, 5, 13, 2)
         # NOTE: We do not test for time zone correctness.
@@ -567,7 +571,7 @@ class IconGetsScaled(SearchTest):
         field.'''
 
         # Step 1: Create a project with an icon
-        p = mysite.search.models.Project()
+        p = mysite.search.models.Project.create_dummy()
         image_data = open(mysite.account.tests.photo('static/sample-photo.png')).read()
         p.icon_raw.save('', ContentFile(image_data))
         p.save()
@@ -590,7 +594,7 @@ class IconGetsScaled(SearchTest):
     def test_short_icon_is_scaled_correctly(self):
         '''Sometimes icons are rectangular and more wide than long. These icons shouldn't be trammeled into a square, but scaled respectfully of their original ratios.'''
         # Step 1: Create a project with an icon
-        p = mysite.search.models.Project()
+        p = mysite.search.models.Project.create_dummy()
 
         # account.tests.photo finds the right path.
         image_data = open(mysite.account.tests.photo(
@@ -916,7 +920,8 @@ class QueryGetToughnessFacetOptions(SearchTest):
 
 class QueryGetPossibleLanguageFacetOptionNames(SearchTest):
 
-    def setUp(self):
+    @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
+    def setUp(self, do_nothing):
         SearchTest.setUp(self)
         python_project = Project.create_dummy(language=u'Python')
         perl_project = Project.create_dummy(language=u'Perl')
@@ -1335,7 +1340,7 @@ class DeleteAnswer(TwillTests):
         POST_data = {
                 'answer__pk': a.pk,
                 }
-        POST_handler = reverse(mysite.project.views.delete_bug_answer_do)
+        POST_handler = reverse(mysite.project.views.delete_paragraph_answer_do)
         response = self.login_with_client().post(POST_handler, POST_data)
         # go back to the project page and make sure that our answer isn't there anymore
         project_url = p.get_url()
@@ -1343,10 +1348,9 @@ class DeleteAnswer(TwillTests):
         project_page = self.login_with_client().get(project_url)
 
         self.assertNotContains(project_page, a.title)
-        self.assertNotContains(project_page, a.details)
 
         # and make sure our answer isn't in the db anymore
-        self.assertEqual(BugAnswer.objects.filter(pk=a.pk).count(), 0)
+        self.assertEqual(Answer.objects.filter(pk=a.pk).count(), 0)
 
 
 
@@ -1433,6 +1437,9 @@ class CreateAnonymousAnswer(TwillTests):
         p = Project.create_dummy(name='Myproject')
         q = ProjectInvolvementQuestion.create_dummy(
                 key_string='where_to_start', is_bug_style=False)
+
+        # Do a GET on the project page to prove cookies work.
+        self.client.get(p.get_url())
 
         # POST some text to the answer creation post handler
         answer_text = """Help produce official documentation, share the solution to a problem, or check, proof and test other documents for accuracy."""

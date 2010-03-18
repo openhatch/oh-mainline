@@ -64,6 +64,12 @@ def project(request, project__name = None):
     if request.GET.get('cookies', '') == 'disabled':
         context['cookies_disabled'] = True
 
+    if (request.user.is_authenticated() and
+        request.user.get_profile() in p.people_who_wanna_help.all()):
+        user_wants_to_help = True
+    else:
+        user_wants_to_help = False
+
     context.update({
         'project': p,
         'contributors': p.get_contributors()[:3],
