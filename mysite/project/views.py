@@ -236,6 +236,9 @@ def wanna_help_do(request):
         project.people_who_wanna_help.add(person)
         project.save()
 
+        # Reindex the guy
+        person.reindex_for_person_search()
+
         if request.is_ajax():
             people_to_show = list(project.people_who_wanna_help.exclude(user=request.user))
             people_to_show.insert(0, person)

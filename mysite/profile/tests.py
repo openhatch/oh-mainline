@@ -2074,4 +2074,14 @@ class FixAllTagsQueryWhenHaystackReturnsHalfPeople(TwillTests):
         self.assertEqual(just_real_thing, ['a real thing'])
         self.assert_(things.load_all.called)
 
+class PersonCanReindexHimself(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    @mock.patch('mysite.profile.tasks.ReindexPerson.delay')
+    def test(self, mock_delay):
+        p = Person.objects.get(user__username='paulproteus')
+        p.reindex_for_person_search()
+        self.assertEqual(mock_delay.call_args,
+                         ( (), {'person_id': p.id}))
+
  # vim: set ai et ts=4 sw=4 nu:
