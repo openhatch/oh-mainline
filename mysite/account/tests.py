@@ -42,8 +42,9 @@ class Login(TwillTests):
         url = 'http://openhatch.org/search/'
         url = make_twill_url(url)
         tc.go(url)
+        tc.notfind('log in')
         tc.follow('log out')
-        tc.notfind('settings')
+        tc.find('log in')
     # }}}
 
 class LoginWithOpenID(TwillTests):
