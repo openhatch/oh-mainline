@@ -64,7 +64,8 @@ People Search
     {% if mentor_count or suggestions_for_searches_regarding_people_who_can_pitch_in %}
     <div id='refine_search'>
         <ul class='filter_conjunction'>
-	  {% if suggestions_for_searches_regarding_people_who_can_mentor %}
+
+            {% if suggestions_for_searches_regarding_people_who_can_mentor %}
             <li>
                 <span class='term'>Looking for a mentor?</span>
                 <ul class='filter_disjunction'>
@@ -72,23 +73,37 @@ People Search
                     <li><a href='?q=can_mentor:"{{suggestion.query|urlencode}}"'>Find mentors in {{ suggestion.query }}{{ suggestion.summary_addendum}}</a> ({{ suggestion.count }})</li>
 		    {% endfor %}
                 </ul>
+            </li>
+            {% endif %}
 
-            </li>
-	    {% endif %}
-	    {% if suggestions_for_searches_regarding_people_who_can_pitch_in %}
-            <li>
-                <span class='term'>Looking for help with your project?</span>
-                <ul class='filter_disjunction'>
-		  {% for suggestion in suggestions_for_searches_regarding_people_who_can_pitch_in %}
-                  <li><a href='?q=can_pitch_in:"{{suggestion.query|urlencode}}"'>Find people who can pitch in with
-                      {{ suggestion.query }}{{suggestion.summary_addendum}}</a> ({{suggestion.count}})</li>
-		  {% endfor %}
-                </ul>
-            </li>
-	    {% endif %}
+	        {% if suggestions_for_searches_regarding_people_who_can_pitch_in %}
+                <li>
+                    <span class='term'>Looking for help with your project?</span>
+                    <ul class='filter_disjunction'>
+                        {% for suggestion in suggestions_for_searches_regarding_people_who_can_pitch_in %}
+                              <li><a href='?q=can_pitch_in:"{{suggestion.query|urlencode}}"'>
+                                      Find people who can pitch in with
+                                      {{ suggestion.query }}{{suggestion.summary_addendum}}
+                                  </a>
+                                  ({{suggestion.count}})</li>
+                      {% endfor %}
+                    </ul>
+                </li>
+	        {% endif %}
         </ul>
     </div><!-- /#refine_search -->
     {% endif %}
+
+    {% with projects_that_match_q_exactly.0 as matching_project %}
+        {% if matching_project %}
+            <div id='project_yeller'>
+                <a href='{{ matching_project.get_url }}'>{{ matching_project.name }}</a> is a project with 
+                <a href='?q=project:{{matching_project.name_with_quotes_if_necessary|urlencode}}'>
+                    {{ matching_project.get_contributors|length }} contributor{{ matching_project.get_contributors|length|pluralize}}.</a>
+            </div>
+        {% endif %}
+    {% endwith %}
+
     {% endif %}
 
     <div id='search_summary'>
@@ -107,6 +122,7 @@ People Search
                     {% endspaceless %}{{this_query_post_summary}}:
                 {% else %}
                     {% comment %}
+
                         If there's *no query*, we list *everybody* in the DB on this page.
                     {% endcomment %}
                     on OpenHatch: 
@@ -118,13 +134,6 @@ People Search
                 Javascript fills these in when the map changes.
             {% endcomment %}
 
-            {% for project in projects_that_match_q_exactly %}
-                <div class='project-yeller'>
-                    <a href='{{ project.get_url }}'>{{ project.name }}</a> is a project with 
-                    <a href='?q=project:{{project.name_with_quotes_if_necessary|urlencode}}'>
-                        {{ project.get_contributors|length }} contributor{{ project.get_contributors|length|pluralize}}.</a>
-                </div><!-- /.project-yeller -->
-            {% endfor %}
         </div>
 
         <div id='summary_of_mapped_people'>
