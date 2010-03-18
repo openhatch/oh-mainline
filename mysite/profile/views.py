@@ -585,7 +585,7 @@ def people(request):
             data['this_query_summary'] = 'who have contributed to '
             data['query_is_a_project_name'] = True
         elif data['query_type'] == 'icanhelp':
-            data['this_query_summary'] = 'who say they want to contribute to the project '
+            data['this_query_summary'] = 'willing to contribute to the project '
             data['query_is_a_project_name'] = True
         elif data['query_type'] == 'all_tags':
             data['this_query_summary'] = 'who have listed'
@@ -608,7 +608,7 @@ def people(request):
     except Project.DoesNotExist:
         pass
 
-    if data['query_type'] == 'icanhelp' and not Project.objects.filter(name=data['q']):
+    if data['query_type'] == 'icanhelp' and not data['queried_project']:
         data['total_query_summary'] = "Sorry, we couldn't find a project named <strong>%s</strong>." % data['q']
 
     data['suggestions'] = [
