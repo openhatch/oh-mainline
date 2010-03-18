@@ -32,6 +32,15 @@ def create_project_page_do(request):
 def project(request, project__name = None):
     p = get_object_or_404(Project, name=project__name)
 
+    if (request.user.is_authenticated() and
+        request.user.get_profile() in p.people_who_wanna_help.all()):
+        user_wants_to_help = True
+    else:
+        user_wants_to_help = False
+
+    wanna_help = (bool(request.GET.get('wanna_help', False)) and
+                  user_wants_to_help)
+    
     pfentries = p.portfolioentry_set.exclude(project_description='')
     only_good_pfentries = lambda pfe: pfe.project_description.strip()
     pfentries = filter(only_good_pfentries, pfentries)
@@ -64,11 +73,11 @@ def project(request, project__name = None):
     if request.GET.get('cookies', '') == 'disabled':
         context['cookies_disabled'] = True
 
-    if (request.user.is_authenticated() and
-        request.user.get_profile() in p.people_who_wanna_help.all()):
-        user_wants_to_help = True
+    if wanna_help:
+        people_to_show = list(p.people_who_wanna_help.exclude(user=request.user))
+        people_to_show.insert(0, request.user.get_profile())
     else:
-        user_wants_to_help = False
+        people_to_show = p.people_who_wanna_help.all()
 
     context.update({
         'project': p,
@@ -80,6 +89,8 @@ def project(request, project__name = None):
         'explain_to_anonymous_users': True,
         'wanna_help_form': mysite.project.forms.WannaHelpForm(),
         'user_wants_to_help': request.user.is_authenticated() and request.user.get_profile() in p.people_who_wanna_help.all(),
+        'user_just_signed_up_as_wants_to_help': wanna_help,
+        'people_to_show': people_to_show,
         })
 
     question_suggestion_response = request.GET.get('question_suggestion_response', None)
@@ -225,6 +236,9 @@ def wanna_help_do(request):
         project.people_who_wanna_help.add(person)
         project.save()
 
+        # Reindex the guy
+        person.reindex_for_person_search()
+
         if request.is_ajax():
             people_to_show = list(project.people_who_wanna_help.exclude(user=request.user))
             people_to_show.insert(0, person)
@@ -250,7 +264,10 @@ def wanna_help_do(request):
         url = reverse('oh_login')
         url += "?" + mysite.base.unicode_sanity.urlencode({u'next':
             unicode(project.get_url()) + '?wanna_help=true'})
-        return HttpResponseRedirect(url)
+        if request.is_ajax():
+            return HttpResponse("redirect: " + url)
+        else:
+            return HttpResponseRedirect(url)
         
     if request.is_ajax():
         return HttpResponse("0")
@@ -263,6 +280,7 @@ def unlist_self_from_wanna_help_do(request):
     if wanna_help_form.is_valid():
         project = wanna_help_form.cleaned_data['project']
         project.people_who_wanna_help.remove(request.user.get_profile())
+        request.user.get_profile().reindex_for_person_search()
         return HttpResponseRedirect(project.get_url())
     else:
         return HttpResponseBadRequest("No project id submitted.")

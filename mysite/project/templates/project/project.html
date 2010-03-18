@@ -175,9 +175,7 @@ about how you can help {{ project.name }}
     </div>
 
 <div class='module' id='wanna_help'>
-{% with project.people_who_wanna_help.all as people_to_show %}
 {% include 'project/project-wanna-help-box.html' %}
-{% endwith %}
 </div>
 
 <div class='module' id='contributors'>
@@ -400,6 +398,21 @@ VoteHijacker.pluralize = function(value)
 </script>
 
 <script type='text/javascript'>
+function yay_we_want_to_help() {
+   /* Create a tipsy-style message that reports success */
+   var $tipsyMe = $('#wanna_help .body ul li:eq(0) a');
+
+   /* highlight new guy */
+   $tipsyMe.css('background-color', '#ffc');
+
+   /* Trigger tipsy destruction. */
+   $('#wannahelp-button').getTipsy().remove();
+
+   $('#want2help_form').remove();
+   $('#message_for_helpers').show();
+}
+
+
     Want2HelpJacker = function () { }
     Want2HelpJacker.prototype = {
         'initialize': function () {
@@ -415,21 +428,22 @@ VoteHijacker.pluralize = function(value)
                 'url': "{% url mysite.project.views.wanna_help_do %}",
                 'type': 'POST',
                 'success': function (response) {
+                    /* HACK! In the case that we need to log in, accept a message from the server
+                     * indicating as much.
+                     */
+                    if (response.substring(0, 10) === "redirect: ") {
+                        var destination = response.substring(10);
+                        document.location = destination;
+                        return;
+                    }
 
-                    /* Add person summary to list. */
+                    // otherwise, proceed as normal.
+
+                    /* Replace the list of person summaries. */
                     $('#wanna_help').html(response);
 
-                    /* Create a tipsy-style message that reports success */
-                    var $tipsyMe = $('#wanna_help .body ul li:eq(0) a');
-
-                    /* highlight new guy */
-                    $tipsyMe.css('background-color', '#ffc');
-
-                    /* Trigger tipsy destruction. */
-                    $('#wannahelp-button').getTipsy().remove();
-
-                    $('#want2help_form').remove();
-                    $('#message_for_helpers').show();
+                    // Call the "Yay, we want to help" function
+		    yay_we_want_to_help();
                 },
                 'error': function () {
                         $.jGrowl("Oops! Something went wrong. Please try again.");
@@ -439,7 +453,13 @@ VoteHijacker.pluralize = function(value)
 
         }
     };
+{% if user_just_signed_up_as_wants_to_help %}
+    $(yay_we_want_to_help);
+{% endif %}
     </script>
+
+
+
 
 {% endblock js %}
 

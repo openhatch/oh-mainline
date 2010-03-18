@@ -156,8 +156,9 @@ class ProjectPageCreation(TwillTests):
 
 class ButtonClickMarksSomeoneAsWannaHelp(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
-    
-    def test_mark_as_wanna_help(self):
+
+    @mock.patch("mysite.profile.models.Person.reindex_for_person_search")
+    def test_mark_as_wanna_help(self, mock_reindex_person_method):
         p_before = Project.create_dummy()
         
         self.assertFalse(p_before.people_who_wanna_help.all())
@@ -165,6 +166,7 @@ class ButtonClickMarksSomeoneAsWannaHelp(TwillTests):
         client = self.login_with_client()
         post_to = reverse(mysite.project.views.wanna_help_do)
         response = client.post(post_to, {u'project': unicode(p_before.pk)})
+        self.assert_(mock_reindex_person_method.called)
 
         p_after = Project.objects.get(pk=p_before.pk)
 
@@ -172,7 +174,8 @@ class ButtonClickMarksSomeoneAsWannaHelp(TwillTests):
             list(p_after.people_who_wanna_help.all()),
             [Person.objects.get(user__username='paulproteus')])
 
-    def test_unmark_as_wanna_help(self):
+    @mock.patch("mysite.profile.models.Person.reindex_for_person_search")
+    def test_unmark_as_wanna_help(self, mock_reindex_person_method):
         # We're in there...
         p_before = Project.create_dummy()
         p_before.people_who_wanna_help.add(Person.objects.get(user__username='paulproteus'))
@@ -185,6 +188,7 @@ class ButtonClickMarksSomeoneAsWannaHelp(TwillTests):
 
         # Are we gone yet?
         p_after = Project.objects.get(pk=p_before.pk)
+        self.assert_(mock_reindex_person_method.called)
 
         self.assertFalse(p_after.people_who_wanna_help.all())
 
@@ -199,7 +203,7 @@ class WannaHelpSubmitHandlesNoProjectIdGracefully(TwillTests):
 class WannaHelpWorksAnonymously(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
-    def test_create_answer_anonymously(self):
+    def test_mark_as_helper_anonymously(self):
         # Steps for this test
         # 1. User fills in the form anonymously
         # 2. We test that the Answer is not yet saved
