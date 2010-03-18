@@ -142,8 +142,8 @@ var openid = {
             var provider_id = e.target.id;
             if (provider_id == 'google' || provider_id == 'yahoo') {
 
-                // Display explanatory message.
-                $('#please_click').html(
+                // Hide form and display explanatory message.
+                $('#openid_form').html(
                     '<div id="openid_while_u_wait">' +
                     'Requesting credentials from ' +
                     providers_large[provider_id].name +

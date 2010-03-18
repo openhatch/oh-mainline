@@ -1,5 +1,8 @@
 <form id="openid_form" name="openid_form"
     action="{% url user_signin %}" method="post">
+    {% if next and not answers %}
+        <p>Please log in to proceed.</p>
+    {% endif %}
     <p id='please_click'>Which account would you like to use?</p>
     <input type="hidden" name="action" value="verify" />
     <input type="hidden" name="next" value="{{ next }}" />

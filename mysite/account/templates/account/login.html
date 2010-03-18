@@ -35,9 +35,6 @@ form { width: 350px; }
 
         <div style='float: left; width: 500px;'>
 
-            {% if next and not answers %}
-                <p>Please log in to proceed.</p>
-            {% endif %}
             {% include 'account/login_openid.html' %}
         </div>
         <div style='float: right; width: 100px;'>
