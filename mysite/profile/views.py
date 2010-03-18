@@ -608,6 +608,11 @@ def people(request):
     except Project.DoesNotExist:
         pass
 
+    # If this is a project, determine how many people are listed as willing to
+    # contribute to that project.
+    if data['query_type'] == 'project' and data['queried_project']:
+        data['icanhelp_count'] = data['queried_project'].people_who_wanna_help.all().count()
+
     if data['query_type'] == 'icanhelp' and not data['queried_project']:
         data['total_query_summary'] = "Sorry, we couldn't find a project named <strong>%s</strong>." % data['q']
 

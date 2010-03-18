@@ -61,35 +61,55 @@ People Search
     </ul><!-- /.suggestions -->
     {% endif %}
     {% if q %}
-    {% if mentor_count or suggestions_for_searches_regarding_people_who_can_pitch_in %}
+    {% if mentor_count or suggestions_for_searches_regarding_people_who_can_pitch_in or icanhelp_count %}
     <div id='refine_search'>
         <ul class='filter_conjunction'>
 
-            {% if suggestions_for_searches_regarding_people_who_can_mentor %}
+            {% if mentor_count or suggestions_for_searches_regarding_people_who_can_pitch_in %}
             <li>
-                <span class='term'>Looking for a mentor?</span>
+                <span class='term'>Want help with {{ q }}?</span>
                 <ul class='filter_disjunction'>
-		  {% for suggestion in suggestions_for_searches_regarding_people_who_can_mentor %}
-                    <li><a href='?q=can_mentor:"{{suggestion.query|urlencode}}"'>Find mentors in {{ suggestion.query }}{{ suggestion.summary_addendum}}</a> ({{ suggestion.count }})</li>
-		    {% endfor %}
+
+                {# Link to can_mentor: search #}
+                {% if suggestions_for_searches_regarding_people_who_can_mentor %}
+                    {% for suggestion in suggestions_for_searches_regarding_people_who_can_mentor %}
+                        <li><a href='?q=can_mentor:"{{suggestion.query|urlencode}}"'>
+                                Find mentors in
+                                {{ suggestion.query }}{{ suggestion.summary_addendum}}</a>
+                            ({{ suggestion.count }})
+                        </li>
+                    {% endfor %}
+                {% endif %}
+
+                {# Link to can_pitch_in: search #}
+	            {% if suggestions_for_searches_regarding_people_who_can_pitch_in %}
+                    {% for suggestion in suggestions_for_searches_regarding_people_who_can_pitch_in %}
+                            <li><a href='?q=can_pitch_in:"{{suggestion.query|urlencode}}"'>
+                                Find people who can pitch in with
+                                {{ suggestion.query }}{{suggestion.summary_addendum}}
+                                </a>
+                                ({{suggestion.count}})
+                            </li>
+                      {% endfor %}
+	            {% endif %}
+
                 </ul>
             </li>
             {% endif %}
 
-	        {% if suggestions_for_searches_regarding_people_who_can_pitch_in %}
+            {# Link to icanhelp: search #}
+            {% if icanhelp_count %}
                 <li>
-                    <span class='term'>Looking for help with your project?</span>
-                    <ul class='filter_disjunction'>
-                        {% for suggestion in suggestions_for_searches_regarding_people_who_can_pitch_in %}
-                              <li><a href='?q=can_pitch_in:"{{suggestion.query|urlencode}}"'>
-                                      Find people who can pitch in with
-                                      {{ suggestion.query }}{{suggestion.summary_addendum}}
-                                  </a>
-                                  ({{suggestion.count}})</li>
-                      {% endfor %}
+                    <span class='term'>Want to help expand the {{ q }} community?</span>
+                    <ul>
+                        <li>
+                            <a href='?q=icanhelp:"{{ q }}"'>Find people willing
+                                to contribute to the {{ q }} project</a>
+                            ({{ icanhelp_count }})
+                        </li>
                     </ul>
                 </li>
-	        {% endif %}
+            {% endif %}
         </ul>
     </div><!-- /#refine_search -->
     {% endif %}
@@ -99,7 +119,8 @@ People Search
             <div id='project_yeller'>
                 <a href='{{ matching_project.get_url }}'>{{ matching_project.name }}</a> is a project with 
                 <a href='?q=project:{{matching_project.name_with_quotes_if_necessary|urlencode}}'>
-                    {{ matching_project.get_contributors|length }} contributor{{ matching_project.get_contributors|length|pluralize}}.</a>
+                    {{ matching_project.get_contributors|length }}
+                    contributor{{ matching_project.get_contributors|length|pluralize}}</a>.
             </div>
         {% endif %}
     {% endwith %}
@@ -118,10 +139,10 @@ People Search
                     {% spaceless %}
                     {% if not query_is_a_project_name %}<span>&lsquo;</span>{% endif %}
                     <strong>
-                        {% if queried_project %}
+                        {% if query_is_a_project_name %}
                             <a href='{{ queried_project.get_url }}'>{{ q }}</a>
                         {% else %}
-                            {{ q }}
+                            <span>{{ q }}</span>
                         {% endif %}
                     </strong>
                     {% if not query_is_a_project_name %}<span>&rsquo;</span>{% endif %}
