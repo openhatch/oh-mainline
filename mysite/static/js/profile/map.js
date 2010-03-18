@@ -250,8 +250,6 @@ if (mapController.the_marker_for_inaccessible_island !== null) {
                     marker = new google.maps.Marker({
                             'map': mapController.map, 
                             'title': person_name,
-                            'icon': icon,
-                            'shadow': 'http://chart.apis.google.com/chart?chst=d_map_pin_shadow',
                             'person_id': person_id,     
                             'position': person_location
                     });

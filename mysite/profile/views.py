@@ -603,6 +603,11 @@ def people(request):
     if data['query_type'] == 'icanhelp' and not data['people']:
         data['total_query_summary'] = "No one has yet listed himself/herself as willing to contribute to the project <strong>%s</strong>." % data['q']
 
+    try:
+        data['queried_project'] = Project.objects.get(name=data['q'])
+    except Project.DoesNotExist:
+        pass
+
     if data['query_type'] == 'icanhelp' and not Project.objects.filter(name=data['q']):
         data['total_query_summary'] = "Sorry, we couldn't find a project named <strong>%s</strong>." % data['q']
 

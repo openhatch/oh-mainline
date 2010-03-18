@@ -111,29 +111,38 @@ People Search
             {% if total_query_summary %}
                 {{ total_query_summary|safe }}
             {% else %}
-                People 
                 {% if q %}
+                    People 
                     {# If there's a query, tell us the people who match it. #}
                     {{ this_query_summary }}
                     {% spaceless %}
                     {% if not query_is_a_project_name %}<span>&lsquo;</span>{% endif %}
-                        <strong>{{ q }}</strong>
+                    <strong>
+                        {% if queried_project %}
+                            <a href='{{ queried_project.get_url }}'>{{ q }}</a>
+                        {% else %}
+                            {{ q }}
+                        {% endif %}
+                    </strong>
                     {% if not query_is_a_project_name %}<span>&rsquo;</span>{% endif %}
-                    {% endspaceless %}{{this_query_post_summary}}:
+                    {% endspaceless %}{{this_query_post_summary}}
                 {% else %}
                     {% comment %}
 
                         If there's *no query*, we list *everybody* in the DB on this page.
                     {% endcomment %}
-                    on OpenHatch: 
+                    Everybody on OpenHatch
                 {% endif %}
-                <strong id='people-count'>{{ people|length }}</strong>.
             {% endif %}
 
             {% comment %}
                 Javascript fills these in when the map changes.
             {% endcomment %}
 
+        </div>
+
+        <div id='people_count'>
+            {{ people|length }} results 
         </div>
 
         <div id='summary_of_mapped_people'>

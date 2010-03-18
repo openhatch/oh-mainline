@@ -91,7 +91,8 @@ body#people-map .dont_show_until_map_loads{ display: none; }
 /* should_be_hidden */
 body#people-map .should_be_hidden { display: none; }
 
-body#people-map #search_summary_heading { font-size: 1.1em; float: left; width: 100%; }
-body#people-map #summary_of_mapped_people { float: right; }
+body#people-map #search_summary_heading { font-size: 1.6em; float: left; width: 100%; }
+body#people-map #summary_of_mapped_people { margin-top: 3px; font-size: .9em; float: right; }
 body#people-map #refine_search.matching_project_suggestions { float: left; width: 50%; }
 body#people-map #refine_search.matching_project_suggestions li { float: left; width: 100%; }
+body#people-map #people_count { margin-top: 3px; font-size: .9em; float: left; }
