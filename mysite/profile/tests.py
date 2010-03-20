@@ -2084,4 +2084,16 @@ class PersonCanReindexHimself(TwillTests):
         self.assertEqual(mock_delay.call_args,
                          ( (), {'person_id': p.id}))
 
+class PeopleMapForNonexistentProject(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    @mock.patch('mysite.profile.views.project_query2mappable_orm_people')
+    def test(self, make_empty_list):
+        make_empty_list.return_value = ([], {})
+        mock_request = ObjectFromDict(
+            {u'GET': {u'q': u'project:Phorum'},
+             u'user': User.objects.get(username='paulproteus')})
+        response = mysite.profile.views.people(mock_request)
+        # Yay, no exception.
+
  # vim: set ai et ts=4 sw=4 nu:
