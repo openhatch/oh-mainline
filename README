@@ -22,9 +22,11 @@ If it complains that it is not enabled, configure it by reading /etc/default/mem
 
 == Set up the database. ==
 
-FIXME: Explain how to create MySQL user oh_milestone_a and grant select permissions.
+Run 'mysql -u root -p' and type at the MySQL prompt:
 
-    mysql -u root -p < "CREATE DATABASE; CREATE USER 'oh_milestone_a'@'localhost' IDENTIFIED BY 'ahmaC0Th'; GRANT ALL ON oh_milestone_a.* TO 'oh_milestona_a'@'localhost';
+    CREATE DATABASE oh_milestone_a;
+    CREATE USER 'oh_milestone_a'@'localhost' IDENTIFIED BY 'ahmaC0Th';
+    GRANT ALL ON oh_milestone_a.* TO 'oh_milestone_a'@'localhost';
 
 Or use 'mysql -u username', where username is a MySQL user with the appropriate privileges.
 
