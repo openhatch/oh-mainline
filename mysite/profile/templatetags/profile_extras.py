@@ -57,7 +57,7 @@ def break_long_words(value):
     re_too_many_letters_in_a_row = re.compile(r'([\w]{8}|[\_^/])', re.UNICODE)
 
     # if the word is really long, insert a <wbr> occasionally.
-    return "<wbr>".join(re_too_many_letters_in_a_row.split(value))
+    return "<wbr />".join(re_too_many_letters_in_a_row.split(value))
 
 @register.filter
 def prepend_http_if_necessary(value):
