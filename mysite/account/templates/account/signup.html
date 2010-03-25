@@ -1,27 +1,41 @@
-{% extends 'base/one_column.html' %}
+{% extends 'base/base.html' %}
 {% load i18n %}
 
 {% block title %}Sign up{% endblock %}
 
-{% block body_id %}signup{% endblock %}
+{% block body_id %}signup_with_password{% endblock %}
 
-{% block body_class %}{{ block.super }} auth{% endblock %}
+{% block css %}
+{{ block.super }}
+body#signup_with_password .errorlist li { width: 90%; }
+body#signup_with_password .module { margin: 0 305px; width: 350px; }
+body#signup_with_password .module .head { width: 345px; }
+body#signup_with_password .module .body { width: 310px; }
+#expand-second-form { margin-top: 20px; }
+#associate-with-existing-account { margin-top: 10px; display: none; }
+form p { float: none; display: block; margin: 0 0 10px 0; }
+form label { float: none; display: block;  }
+input[type='text'], input[type='password'] { width: 90%; }
+input[type='submit'] { padding: 2%; width: 40%; }
+body#signup_with_password form input { float: none; display: block; }
+body#signup_with_password .body { background: #fff;} 
+.help_text { font-size: .85em; }
+{% endblock %}
 
-{% block main %}
-<div id='login' class='module'>
+{% block content %}
+<div class='module'>
     <div class='head'>
         <h3>Sign up</h3>
+        <ul>
+            <li><a style='font-weight: normal;' href='/account/login/'>(or log in)</a></li>
+        </ul>
     </div>
     <div class='body'>
-      <form name="signup" action="{% url mysite.account.views.signup_do %}" method="post">
-	{{ form.as_p }}
-	<p>
-	  <input type="submit" value="Hit it" />
-	</p>
-      </form>
-    </div>
-    <div class='foot'>
-        Already have an account? <a style='font-weight: bold;' href='/'>Log in here</a>.
+        <form name="signup" action="{% url mysite.account.views.signup_do %}" method="post">
+            {{ form.as_p }}
+            <p> <input type="submit" value="Hit it" /> </p>
+        </form>
+        Or <a href='/account/login/'>sign up using an account you already have</a>.
     </div>
 </div>
-{% endblock main %}
+{% endblock content %}

@@ -12,7 +12,7 @@ from models import InvitationRequest
 
 class UserCreationFormWithEmail(django.contrib.auth.forms.UserCreationForm):
     username = django.forms.RegexField(label="Username", max_length=30, regex=r'^\w+$',
-        help_text = "Please pick a username, of 30 characters or fewer. Stick to letters, digits and underscores.",
+        help_text = "<span class='help_text'>Pick a froopy handle, with length < 31 characters. Stick to letters, digits and underscores.</span>",
         error_messages = {'invalid': "Stick to letters, digits and underscores.", 'required': "Gotta pick a username!"})
     email = django.forms.EmailField(error_messages={
         'required': "Your email address is required. We promise to use it respectfully.",

@@ -104,7 +104,7 @@ urlpatterns = patterns('',
 
         url(r'^account/forgot_pass_confirm/(?P<uidb36>[^/]+)/(?P<token>[^/]+)/$', 'django.contrib.auth.views.password_reset_confirm', {'template_name': 'account/password_reset_confirm.html'}, name='password_reset_confirm'),
 
-        (r'^account/signup/(?P<invite_code>[^/]+)?$',
+        (r'^account/signup/?$',
            'mysite.account.views.signup'),
 
         (r'^account/settings/$',

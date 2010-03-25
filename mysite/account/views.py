@@ -56,15 +56,11 @@ def signup_do(request):
         return mysite.account.views.signup(request, signup_form=signup_form)
     # }}}
 
-def signup(request, signup_form=None, invite_code=''):
-    # {{{
+def signup(request, signup_form=None):
     if signup_form is None:
-        signup_form = mysite.account.forms.UserCreationFormWithEmail(
-            initial={'invite_code': invite_code})
+        signup_form = mysite.account.forms.UserCreationFormWithEmail()
 
-    return render_to_response('account/signup.html',
-                              {'form': signup_form})
-    # }}}
+    return render_to_response('account/signup.html', {'form': signup_form})
 
 def logout(request):
     # {{{
