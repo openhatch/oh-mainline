@@ -73,7 +73,7 @@ def bug_elt2bug_dict(parsed, canonical_bug_link_format_string,
                    keywords_text.split(','))
     project = gen_project(parsed)
     status = get_tag_text_from_xml(parsed, 'bug_status')
-    looks_closed = status in ('RESOLVED', 'WONTFIX')
+    looks_closed = status in ('RESOLVED', 'WONTFIX', 'CLOSED')
 
     ret = dict(
         project = project,
