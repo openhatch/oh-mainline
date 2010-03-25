@@ -66,12 +66,18 @@ form { width: 350px; }
 
             <ul class='login-links' style='float: right; width: 300px; padding: 16px; padding-bottom: 16px; border-radius: 8px; -moz-border-radius: 8px; background-color: #f4f4f4;'>
                 <h4 style='width: 95%;'>Relatedly</h4>
+
                 <li><a style='font-weight: bold;'
                     href='/blog/2009/why-we-support-openid'>
                     What is OpenID?
                 </a></li>
+
                 <li><a href='{% url oh_login_pwd %}?next={{ next|urlencode }}'>
-                    Sign in with a password
+                    Log in with a password
+                </a></li>
+
+                <li><a href='{% url mysite.account.views.signup %}?next={{ next|urlencode }}'>
+                    Sign up without OpenID
                 </a></li>
             </ul>
         </div>
