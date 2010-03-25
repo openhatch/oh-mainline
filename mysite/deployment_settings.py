@@ -22,6 +22,8 @@ CACHE_BACKEND = "memcached://127.0.0.1:11211/?timeout=1"
 
 POSTFIX_FORWARDER_TABLE_PATH = '/etc/postfix/virtual_alias_maps'
 
+CELERY_ALWAYS_EAGER = False # srsly
+
 try:
     from deployment_settings_secret_keys import GOOGLE_ANALYTICS_CODE
 except ImportError:
