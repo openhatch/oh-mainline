@@ -5,7 +5,7 @@
         color: #222;
         font: 9pt Verdana, Bitstream Vera Sans, Arial, sans-serif;
         width: 260px ! important;
-        background: #fff url(/static/images/motif-eee.png) repeat scroll 0 0;
+        background: #fff url('{{uri_scheme}}://{{ url_prefix }}/static/images/motif-eee.png') repeat scroll 0 0;
         float: left;
         border: inherit;
     }
@@ -15,7 +15,7 @@
         margin: 0;
     }
     #openhatch-widget .module {
-        background: transparent url('/static/images/gray-60.png') repeat scroll 0 0;
+        background: transparent url('{{uri_scheme}}://{{ url_prefix }}/static/images/gray-60.png') repeat scroll 0 0;
         float: left;
         width: 252px;
         border-radius: 0;
@@ -36,7 +36,7 @@
         -moz-border-radius: 0;
     }
     #openhatch-widget .module > .foot {
-        background: #fff url('/static/images/motif.png') repeat scroll 0 0;
+        background: #fff url('{{uri_scheme}}://{{ url_prefix }}/static/images/motif.png') repeat scroll 0 0;
     }
     #openhatch-widget .module > .body {
         background: none;
@@ -104,7 +104,7 @@
     }
 
     #openhatch-widget .module > .body.contains-submodules {
-        background: #fff url('/static/images/motif.png');
+        background: #fff url('{{uri_scheme}}://{{ url_prefix }}/static/images/motif.png');
     }
 
     #openhatch-widget .submodule {
@@ -114,7 +114,7 @@
 
     #openhatch-widget .submodule > .head {
         float: left;
-        background: #fdfdfe url('/static/images/module-head-bg.png') bottom repeat-x;
+        background: #fdfdfe url('{{uri_scheme}}://{{ url_prefix }}/static/images/module-head-bg.png') bottom repeat-x;
         float: left;
         padding: 10px 20px;
     }
@@ -309,9 +309,8 @@
             </ul>
         </div>
         <div class='foot'>
-            <a href='{% url mysite.profile.views.display_person_web person.user.username %}'>See my full profile at
+            <a href='{{uri_scheme}}://{{ url_prefix }}{% url mysite.profile.views.display_person_web person.user.username %}'>See my full profile at
             <img src='{{uri_scheme}}://{{ url_prefix }}/static/images/logo-for-widget.png' height='55' width='80'></a>
-            {# FIXME: Don't hard-code our URL. #}
         </div>
     </div>
 </div>
