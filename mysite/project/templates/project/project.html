@@ -1,5 +1,6 @@
 {% extends 'base/two_columns.html' %}
 {% load profile_extras %}
+{% load base_extras %}
 
 {% block title %}
 Projects - {{ project.name }} 
@@ -82,7 +83,7 @@ about how you can help {{ project.name }}
                                                 {% endifequal %}
                                                 <strong>{{answer.title}}</strong>
                                             </div>
-                                            {{answer.text|urlize|linebreaksbr}}
+                                            {{answer.text|urlize_without_escaping_percent_signs|safe|linebreaksbr}}
                                             <br/>
                                             {% include 'project/byline.html' %}
                                         </span>
