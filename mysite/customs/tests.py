@@ -271,6 +271,8 @@ class LaunchpadDataTests(django.test.TestCase):
         self.assertEqual(langs, ['Python'])
 
 class MiroTests(django.test.TestCase):
+    fixtures = ['miro-project']
+    
     def test_miro_bug_object(self):
         # Parse XML document as if we got it from the web
         f = os.path.join(settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml')
@@ -321,6 +323,28 @@ Keywords: Torrent unittest""")
         # And the new manager does find it
         self.assertEqual(Bug.open_ones.all().count(), 1)
 
+
+    @mock.patch("mysite.customs.miro.open_xml_url")
+    @mock.patch("mysite.customs.miro.bitesized_bugs_csv_fd")
+    def test_miro_bugzilla_detects_closedness(self, mock_csv_maker, mock_xml_opener):
+        cooked_xml = open(os.path.join(
+            settings.MEDIA_ROOT, 'sample-data',
+            'miro-2294-2009-08-06.xml')).read().replace(
+            'NEW', 'CLOSED')
+        mock_xml_opener.return_value = StringIO(cooked_xml)
+        
+        mock_csv_maker.return_value = StringIO("""bug_id,useless
+1,useless""")
+        mysite.customs.miro.grab_miro_bugs()
+        all_bugs = Bug.all_bugs.all()
+        self.assertEqual(len(all_bugs), 1)
+        bug = all_bugs[0]
+        self.assertEqual(bug.canonical_bug_link,
+                         'http://bugzilla.pculture.org/show_bug.cgi?id=2294')
+        self.assert_(bug.looks_closed)
+
+        # And the new manager does find it
+        self.assertEqual(Bug.open_ones.all().count(), 1)
 
     @mock.patch("mysite.customs.miro.open_xml_url")
     @mock.patch("mysite.customs.miro.bitesized_bugs_csv_fd")

@@ -1,0 +1,3 @@
+[
+ {"pk": 3, "model": "search.project", "fields": {"icon_raw": "/static/no-project-icon.png", "name": "Miro", "language": "C++"}}
+]
