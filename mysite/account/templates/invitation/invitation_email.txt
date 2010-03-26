@@ -1,23 +1,15 @@
-Hello!
+{% load base_extras %}Hi there. I am a robot. A human named {% with invitation_key|invitation_key2user as u %}{% with u.get_full_name as n %}{{ n }}{% if n %} ({% endif %}{{ u.username }}{% if n %}){% endif %}{% endwith %}{% endwith %} asked me to let you know about a website called OpenHatch. OpenHatch makes it easier to find interesting things to do in free/libre/open source software (aka FLOSS).
 
-You've been invited to join OpenHatch, a community of open source
-programmers talking about what they know and finding opportunities
-to make a difference with their skills.
+Here 'tis: https://openhatch.org/
 
-The website is still in alpha, but you can use it right now.
+Things you can do once you get there:
+* Find a cool bug (or other sort of volunteering opportunity): https://openhatch.org/search/
+* Learn what other people in FLOSS are working on: https://openhatch.org/people/
+* Chat about how to contribute to libre software: https://openhatch.org/+projects/
 
-Please join in! Just enter your details at this URL:
+Kind regards,
 
-http://openhatch.org/account/signup/{{ invitation_key }}
-
-Feel free to keep up with us by reading our blog, available at
-http://openhatch.org/blog/.
-
-See you soon,
-
-The OpenHatch team.
+A Robot
 
 -- 
 The grass is always greener on the other side of your sunglasses.
-
-
