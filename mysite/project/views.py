@@ -262,7 +262,11 @@ def wanna_help_do(request):
         # If user isn't logged in, send them to the login page with next
         # parameter populated.
         url = reverse('oh_login')
-        url += "?" + mysite.base.unicode_sanity.urlencode({u'next':
+        url += "?"
+        if wanna_help_form.cleaned_data['from_offsite']:
+            url += mysite.base.unicode_sanity.urlencode(
+                {u'from_offsite': u'True'}) + '&'
+        url += mysite.base.unicode_sanity.urlencode({u'next':
             unicode(project.get_url()) + '?wanna_help=true'})
         if request.is_ajax():
             return HttpResponse("redirect: " + url)
