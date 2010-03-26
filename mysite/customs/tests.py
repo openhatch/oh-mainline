@@ -721,6 +721,16 @@ class WhenGithubSaysPermissionDeniedForRepoList(django.test.TestCase):
         got = list(mysite.customs.github.repos_by_username('mister_403'))
         self.assertEqual(wanted, got)
 
+    @mock.patch('mysite.customs.github._github_repos_list')
+    def test_raising_runtime_error_403(self, mock_repo_list):
+        def generate_runtime_error(*args, **kwargs):
+            raise RuntimeError("unexpected response from github.com %d: %r" % (
+                403, '{"error":[{"error":"api route not recognized"}]}'))
+        mock_repo_list.side_effect = generate_runtime_error
+        wanted = []
+        got = list(mysite.customs.github.repos_by_username('mister_explosion'))
+        self.assertEqual(wanted, got)
+
 class LineAcceptorTest(django.test.TestCase):
     def test(self):
 
