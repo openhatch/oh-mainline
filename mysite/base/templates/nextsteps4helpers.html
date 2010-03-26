@@ -1,0 +1,62 @@
+{% extends 'base/two_columns.html' %}
+
+{% block title %}
+    Next steps 
+{% endblock %}
+
+{% block body_id %}nextsteps4helpers{% endblock %}
+
+{% block body_class %}{{ block.super }} bulleted_lists{% endblock %}
+
+{% block css %}
+    {{ block.super }}
+    h1 { padding-top: .6em; text-shadow: 0 1px 0 #fff; }
+    h2 { font-weight: normal; margin-top: .6em; }
+{% endblock %}
+
+{% block pagetop %}
+    <h1>Pat yourself on the back</h1>
+    <h2>You've taken the first step toward becoming a <strong>{{ the_lucky_project.name }}</strong>
+    contributor.</h2>
+{% endblock %}
+
+{% block content %}
+    <div id='left'>
+        <div class='module'>
+            <div class='head'>
+                <h3>Now what?</h3>
+            </div>
+            <div class='body'>
+                <ul class='raquo_bullets'>
+                    <li></li>
+                    <li>jkl</li>
+                    <li>awer</li>
+                </ul>
+            </div>
+        </div>
+        <div class='module' id='me'>
+            <div class='head'>
+                <h3><a style='color: inherit;' href='{{ the_user.get_profile.profile_url }}'>
+                        You</a></h3>
+            </div>
+            <div class='body'>
+                <ul id='people-list'>
+                    {% with the_user.get_profile as person %}
+                        {% include 'profile/person-summary-li.html' %}
+                    {% endwith %}
+                </ul>
+                <p class='rabbit_hole'><a href='{% url mysite.profile.views.people %}?center={{the_user.get_profile.location_display_name}}'>Find people near you &raquo;</a></p>
+            </div>
+        </div>
+    </div>
+    <div id='main'>
+        <div class='module'>
+            <div class='head'>
+                <h3>Other people who say they're willing to help</h3>
+            </div>
+            <div class='body'>
+                asdf
+            </div>
+        </div>
+    </div>
+{% endblock content %}

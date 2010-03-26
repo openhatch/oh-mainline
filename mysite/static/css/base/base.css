@@ -371,3 +371,16 @@ body#edit_profile_info_form #contact_blurb:target label { background-color: #ffc
 .head .note { float: right; color: #777; font-size: .9em; padding: 6px; }
 .head .more { float: right; padding: 3px; }
 
+body ul.raquo_bullets{ margin-left: 0; padding-left: .6em; text-indent: -1em; list-style: none; }
+body ul.raquo_bullets li { margin-bottom: .4em; }
+body ul.raquo_bullets li:last-child { margin-bottom: 0; }
+body ul.raquo_bullets li:before { color: #999; font-family: Georgia; margin-right: 2px; font-weight: bold; content: "\00BB \0020"; }
+
+body.three_columns .column { float: left; width: 35%; margin-right: 0; margin-left: 2%; }
+body.three_columns .column:first-child { width: 30%; margin-left: 0; }
+body.three_columns .column:last-child { width: 30%; }
+body.three_columns .module .body { background: #fff; padding: 3%; width: 94%; }
+body.three_columns .module .head { width: 98%; }
+body.three_columns .module { width: 100%; }
+body.three_columns #right .body { padding: 5%; font-size: .9em; width: 90%; }
+body.three_columns #right .entry { font-size: .9em; margin-top: 3px; }

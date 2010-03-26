@@ -293,3 +293,8 @@ def unlist_self_from_wanna_help_do(request):
     else:
         return HttpResponseBadRequest("No project id submitted.")
 
+@login_required
+@mysite.base.decorators.view
+def nextsteps4helpers(request):
+    context = {'the_lucky_project': Project.objects.all()[0]}
+    return (request, "nextsteps4helpers.html", context) 
