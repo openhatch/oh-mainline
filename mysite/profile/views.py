@@ -557,7 +557,7 @@ def people(request):
     #if settings.DEBUG:
     #    cache_timespan = 0
 
-    key_name = 'most_popular_projects'
+    key_name = 'most_popular_projects_last_flushed_on_20100325'
     popular_projects = cache.get(key_name)
     if popular_projects is None:
         projects = Project.objects.all()
