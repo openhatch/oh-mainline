@@ -46,3 +46,14 @@ def flush_session_wanna_help_queue_into_database(user, session,
     # But we do anyway. God help us.
     if PROJECTS_TO_HELP_OUT_KEY in session:
         del session[PROJECTS_TO_HELP_OUT_KEY]
+
+def get_wanna_help_queue_from_session(session):
+    ret = []
+    for project_id in session.get(PROJECTS_TO_HELP_OUT_KEY, []):
+        try:
+            project = mysite.search.models.Project.objects.get(id=project_id)
+        except mysite.search.models.Project.DoesNotExist:
+            continue # uhhh, get the next ID...
+        ret.append(project)
+    return ret
+        

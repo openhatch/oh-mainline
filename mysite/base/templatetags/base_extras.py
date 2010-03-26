@@ -75,6 +75,11 @@ def get_answers_from_session(request):
     return mysite.project.controllers.get_unsaved_answers_from_session(request.session)
 
 @register.filter
+def get_projects_to_help_from_session(request):
+    return [p.name for p in
+            mysite.project.controllers.get_wanna_help_queue_from_session(request.session)]
+
+@register.filter
 def urlize_without_escaping_percent_signs(text, trim_url_limit=None, nofollow=False, autoescape=False):
     """
     Converts any URLs in text into clickable links.

@@ -19,6 +19,7 @@ form { width: 350px; }
 {% block body_class %}{{ block.super }} auth{% endblock %}
 
 {% block main %}
+
 <div id='login' class='module'>
     <div class='head'>
         <h3>Sign in with an account you already own</h3>
@@ -26,6 +27,7 @@ form { width: 350px; }
     <div class='body'>
 
         {% with request|get_answers_from_session as answers %}
+        {% with request|get_projects_to_help_from_session as projects_to_help %}
 
         {% if answers %}
         <div style='color: #444; font-size: 1.5em; -moz-border-radius: 8px; border-radius: 8px; text-align: center; float: left; width: 98%; margin-bottom: 10px; padding: 8px; background-color: #ffc;'>
@@ -39,8 +41,16 @@ form { width: 350px; }
         </div>
         <div style='float: right; width: 100px;'>
 
-            {% if answers %}
+            {% if answers or request.GET.from_offsite %}
             <ul class='unsaved-data' style='float: right; width: 300px; padding: 16px; padding-bottom: 16px; margin-bottom: 16px; border-radius: 8px; -moz-border-radius: 8px; background-color: #f4f4f4;'>
+	  {% if request.GET.from_offsite and projects_to_help %}
+	  <li><strong>What am I doing here?</strong></li>
+	  <li>If you sign in here, we'll list you as
+	  someone interested in helping with {{projects_to_help|join:", "}}</li>
+	  {% endif %}
+
+
+
                 {% for answer in answers %}
                     <li>
                         <h4 style='width: 95%;'>
@@ -82,6 +92,7 @@ form { width: 350px; }
             </ul>
         </div>
     </div>
+    {% endwith %}
     {% endwith %}
 </div>
 {% endblock main %}
