@@ -296,5 +296,9 @@ def unlist_self_from_wanna_help_do(request):
 @login_required
 @mysite.base.decorators.view
 def nextsteps4helpers(request):
-    context = {'the_lucky_project': Project.objects.all()[0]}
+    lucky_project = Project.objects.get(name='Ubuntu')
+    context = {
+            'the_lucky_project': lucky_project,
+            'helpers': lucky_project.people_who_wanna_help.exclude(pk__exact=request.user.get_profile().pk)
+            }
     return (request, "nextsteps4helpers.html", context) 

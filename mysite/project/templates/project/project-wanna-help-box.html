@@ -1,5 +1,5 @@
 <div class='head'>
-    <h3>People who want to help ({% firstof project.people_who_wanna_help.all|length "none yet" %})</h3>
+    <h3>People who want to help <span style='font-weight: normal;'>({% firstof project.people_who_wanna_help.all|length "none yet" %})</span></h3>
         <ul>
             <li>
             <a href='{% url mysite.profile.views.people %}?q=icanhelp:"{{project.name|urlencode}}"' style='float: right; font-weight: normal;'>See all <strong>&raquo;</strong></a>

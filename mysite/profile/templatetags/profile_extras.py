@@ -24,6 +24,10 @@ def gt(value, arg):
     "Returns a boolean of whether the value is greater than the argument"
     return value > int(arg)
 
+@register.filter
+def equals(value, arg):
+    return value == arg
+
 def lt(value, arg):
     "Returns a boolean of whether the value is less than the argument"
     return value < int(arg)
@@ -66,6 +70,10 @@ def prepend_http_if_necessary(value):
     if not parsed.scheme:
         return "http://" + parsed.geturl()
     return value
+
+@register.filter
+def is_logged_in(user, request):
+    return (user == request.user)
 
 register.filter('gt', gt)
 register.filter('lt', lt)

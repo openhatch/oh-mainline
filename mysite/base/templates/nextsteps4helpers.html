@@ -1,4 +1,4 @@
-{% extends 'base/two_columns.html' %}
+{% extends 'base/base.html' %}
 
 {% block title %}
     Next steps 
@@ -6,7 +6,7 @@
 
 {% block body_id %}nextsteps4helpers{% endblock %}
 
-{% block body_class %}{{ block.super }} bulleted_lists{% endblock %}
+{% block body_class %}{{ block.super }} three_columns{% endblock %}
 
 {% block css %}
     {{ block.super }}
@@ -15,29 +15,40 @@
 {% endblock %}
 
 {% block pagetop %}
-    <h1>Pat yourself on the back</h1>
-    <h2>You've taken the first step toward becoming a <strong>{{ the_lucky_project.name }}</strong>
-    contributor.</h2>
+    <h1>You're now registered as a helper for <strong>{{ the_lucky_project.name }}</strong>.</h1>
 {% endblock %}
 
 {% block content %}
-    <div id='left'>
+    <div class='column'>
         <div class='module'>
             <div class='head'>
-                <h3>Now what?</h3>
+                <h3>
+                    <span style='font-weight: normal;'>
+                        Next step #1:
+                    </span>
+                    Learn about some of the other registered helpers for
+                    {{ the_lucky_project.name }}</h3>
             </div>
             <div class='body'>
-                <ul class='raquo_bullets'>
-                    <li></li>
-                    <li>jkl</li>
-                    <li>awer</li>
+                <ul id='people-list'>
+                    {% for person in helpers|slice:":3" %}
+                        {% include 'profile/person-summary-li.html' %}
+                    {% empty %}
+                        No one yet.
+                    {% endfor %}
                 </ul>
             </div>
         </div>
+    </div>
+
+    <div class='column'>
         <div class='module' id='me'>
             <div class='head'>
-                <h3><a style='color: inherit;' href='{{ the_user.get_profile.profile_url }}'>
-                        You</a></h3>
+                <h3>
+                    <span style='font-weight: normal;'>
+                        Next step #2:
+                    </span>
+                    Complete your profile</h3>
             </div>
             <div class='body'>
                 <ul id='people-list'>
@@ -46,16 +57,6 @@
                     {% endwith %}
                 </ul>
                 <p class='rabbit_hole'><a href='{% url mysite.profile.views.people %}?center={{the_user.get_profile.location_display_name}}'>Find people near you &raquo;</a></p>
-            </div>
-        </div>
-    </div>
-    <div id='main'>
-        <div class='module'>
-            <div class='head'>
-                <h3>Other people who say they're willing to help</h3>
-            </div>
-            <div class='body'>
-                asdf
             </div>
         </div>
     </div>
