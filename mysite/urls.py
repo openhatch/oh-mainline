@@ -233,6 +233,8 @@ urlpatterns = patterns('',
 
         (r'^edit/name$', lambda x: redirect(to=mysite.account.views.edit_name, permanent=True)),
 
+        (r'^\+v/nextsteps4helpers/$', 'mysite.project.views.nextsteps4helpers'),
+        
         # This dangerous regex is last
         (r'^people/(?P<user_to_display__username>[^/]+)[/?]$',
                 'mysite.profile.views.display_person_web'),
