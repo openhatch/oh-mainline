@@ -69,14 +69,26 @@ body#project .quotemark { color: #555; }
 
 body#project #wannahelp { width: 101% ! important; padding: 0; background: transparent; }
 body#project #wanna_help_thanks_tipsy_closer {float: right;}
-body#project #wannahelp-button, body#project #message_for_helpers {  -moz-border-radius: 8px; border-radius: 8px; float: left; padding: 10px 20px; color: #444; }
-body#project #wannahelp-button { border: 3px solid #fff; white-space: normal; font-family: Helvetica, sans-serif; width: 101%; font-weight: normal; cursor: pointer; cursor: hand; text-align: center; text-shadow: 0px 1px 0px #fff; background: #c8e29d url('/static/images/wannahelp-button-bg.png') repeat-x top; /* grass green */ font-size: 13pt; }
+body#project #wannahelp-button { -moz-border-radius: 8px; border-radius: 8px; padding: 10px 20px; color: #444; float: right; border: 3px solid #fff; white-space: normal; font-family: Helvetica, sans-serif; width: 100%; font-weight: normal; cursor: pointer; cursor: hand; text-align: center; text-shadow: 0px 1px 0px #fff; background: #c8e29d url('/static/images/wannahelp-button-bg.png') repeat-x top; /* grass green */ font-size: 13pt; }
 body#project #wannahelp-button:active { background-image: url('/static/images/wannahelp-button-bg-active.png'); background-position: bottom;}
 body#project #wannahelp-button:hover, body#project #wannahelp-button:focus { background-image: url('/static/images/wannahelp-button-bg-hover.png'); text-decoration: none; color: #222; }
 body#project #wannahelp-button:hover:active { background-image: url('/static/images/wannahelp-button-bg-hover-active.png'); }
-body#project #message_for_helpers { border: 3px solid #fff; background: #eee url('/static/images/icons/green-checkmark.png') 15px 15px no-repeat; padding-left: 85px; }
-body#project #message_for_helpers span { float: left; width: 85%; }
-body#project #message_for_helpers span li{ list-style: circle; padding-top: 5px; margin-left: 15px; }
+
 body#project #message_for_helpers input[type='image'] { font-size: 0.85em; font-family: Helvetica, sans-serif; float: right; border: 0; color: #555; padding: 5px; position: relative; left: 15px; top: -5px; font-weight: bold; -moz-border-radius: 8px; border-radius: 8px; }
 body#project #message_for_helpers input[type='image']:hover { background-color: #d3d3d3; }
 body#project #next_steps { display: block; text-align: right; margin-top: 1em; }
+
+body#project .next_steps_for_helpers { background-image: url("/static/images/bg-translucent-green.png");  width: 30% ! important; }
+body#project .next_steps_for_helpers h3 { color: #222; text-shadow: 0 1px 0 #fff; }
+body#project .next_steps_for_helpers .body { width: 95.8%; }
+body#project .next_steps_for_helpers #show { display: none; }
+
+body#project .next_steps_for_helpers.contains_just_the_head.expanded { -moz-border-radius-bottomleft: 0; -moz-border-radius-bottomright: 0; border-radius-bottomleft: 0; border-radius-bottomright: 0; position: relative; padding-bottom: 0; top: 15px; float: right; width: 250px ! important; margin-top: 10px; }
+body#project .next_steps_for_helpers.contains_just_the_head { margin-top: 15px; left: -5px; }
+body#project .next_steps_for_helpers.contains_just_the_head h3 { padding-bottom: 0; }
+body#project .next_steps_for_helpers.collapsed.contains_just_the_head { padding-bottom: 8px; top: 0; float: right; width: 250px ! important; }
+body#project .next_steps_for_helpers.collapsed.contains_just_the_body { display: none; }
+body#project .next_steps_for_helpers.collapsed #show { display: inline; }
+body#project .next_steps_for_helpers.collapsed #hide { display: none; }
+
+body#project .next_steps_for_helpers li { text-indent: -1em; width: 25%; float: left; margin-right: 5%; font-size: 1.3em; }

@@ -48,6 +48,26 @@
                     <span style='font-weight: normal;'>
                         Next step #2:
                     </span>
+                    Read about getting involved in {{ the_lucky_project.name }}</h3>
+            </div>
+            <div class='body'>
+                <ul id='people-list'>
+                    {% with the_user.get_profile as person %}
+                        {% include 'profile/person-summary-li.html' %}
+                    {% endwith %}
+                </ul>
+                <p class='rabbit_hole'><a href='{% url mysite.profile.views.people %}?center={{the_user.get_profile.location_display_name}}'>Find people near you &raquo;</a></p>
+            </div>
+        </div>
+    </div>
+
+    <div class='column'>
+        <div class='module' id='me'>
+            <div class='head'>
+                <h3>
+                    <span style='font-weight: normal;'>
+                        Next step #3:
+                    </span>
                     Complete your profile</h3>
             </div>
             <div class='body'>

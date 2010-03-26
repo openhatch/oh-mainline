@@ -25,10 +25,35 @@ about how you can help {{ project.name }}
     </noscript>
 
     <h3 class='supertitle'><a href='{% url mysite.project.views.projects %}'>Projects</a></h3>
-    <a href='{{ project.get_url }}'>
-    </a>
     <h1>{{ project.name }}</h1>
 
+    <div class='next_steps_for_helpers contains_just_the_head collapsed module' style='background-image: url("/static/images/bg-translucent-green.png"); {% if not user_wants_to_help %}display: none;{% endif %}'>
+        <div class='head'>
+            <h3>Next steps for helpers
+                <a id='show' style='font-weight: normal;' href='#'>(show)</a>
+                <a id='hide' style='font-weight: normal;' href='#'>(hide)</a>
+            </h3>
+        </div>
+    </div>
+
+    <div class='next_steps_for_helpers contains_just_the_body collapsed module' style='{% if not user_wants_to_help %}display: none;{% endif %}'>
+        <div class='body'>
+                <ul class='raquo_bullets'>
+                    <li><a href='{% url mysite.profile.views.edit_info %}'>
+                            Talk about your skills and interests on your profile</a></li>
+                    <li><a href='{% url mysite.search.views.fetch_bugs %}?q={{ project.name|urlencode }}&toughness=bitesize'>
+                            Find a bite-size bug in {{ project.name }}
+                        </a></li>
+                    <li><a href='{% url mysite.profile.views.edit_info %}#contact_blurb'>
+                                Make sure your contact info is up to date</a></li>
+                </ul>
+            </span>
+            <form action="{% url mysite.project.views.unlist_self_from_wanna_help_do %}" id='delist_me_as_a_helper' method="POST">
+                <input type='hidden' name='project' value='{{project.id}}'>
+                <input type='image' src='/static/images/icons/undo.png' id='delist_helper_button' value='x' rel='tipsy-south' title='De-list me'>
+            </form>
+        </div>
+    </div>
 
 {% endblock pagetop %}
 
@@ -156,23 +181,6 @@ about how you can help {{ project.name }}
             <input type='submit' id='wannahelp-button' rel='tipsy-south' title='Click to add yourself to the list of people who want to contribute. People of all levels are welcome!' value='I want to help'>
         </form>
         {% endif %}
-        <div id='message_for_helpers'
-                {% if not user_wants_to_help %}style='display: none;'{% endif %}>
-                <span>
-                        You are listed as someone who is willing to help make {{ project.name }} better.
-                <strong style="display: block; padding-top: 10px;">Next steps</strong>
-                <ul>
-                    <li><a href='{% url mysite.profile.views.edit_info %}'>Make sure that your profile talks about what 
-                     kinds of things you can help out with</a></li>
-                    <li><a href='{% url mysite.search.views.fetch_bugs %}?q={{ project.name|urlencode }}&toughness=bitesize'>Browse bite-size bugs for {{ project.name }}</a></li>
-                    <li><a href='{% url mysite.profile.views.edit_info %}#contact_blurb'>Make sure your contact info is up to date</a></li>
-                </ul>
-            </span>
-            <form action="{% url mysite.project.views.unlist_self_from_wanna_help_do %}" id='delist_me_as_a_helper' method="POST">
-                <input type='hidden' name='project' value='{{project.id}}'>
-                <input type='image' src='/static/images/icons/undo.png' id='delist_helper_button' value='x' rel='tipsy-south' title='De-list me'>
-            </form>
-        </div>
     </div>
 
 <div class='module' id='wanna_help'>
@@ -423,20 +431,14 @@ function yay_we_want_to_help() {
    $('#wannahelp-button').getTipsy().remove();
 
    $('#want2help_form').remove();
-   $('#message_for_helpers').show();
+   $('#next_steps_for_helpers').addClass('expanded').removeClass('collapsed');
 }
 
+$('#show, #hide').click(function () { $('.next_steps_for_helpers').toggleClass('collapsed').toggleClass('expanded'); });
 
     Want2HelpJacker = function () { }
     Want2HelpJacker.prototype = {
         'initialize': function () {
-                        var theRow = $('#myRow td');
-                        var origColor = $('#myRow td').css("backgroundColor");
-
-                        $(theRow).css({backgroundColor: '#ff0'});
-                        setTimeout(function() {
-                                $(theRow).animate({backgroundColor: origColor}, 1000);
-                        }, 3000);
             /* Hijack the 'I want to help' form so that it POST's asynchronously. */
             var options = {
                 'url': "{% url mysite.project.views.wanna_help_do %}",
@@ -457,11 +459,11 @@ function yay_we_want_to_help() {
                     $('#wanna_help').html(response);
 
                     // Call the "Yay, we want to help" function
-		    yay_we_want_to_help();
+                    yay_we_want_to_help();
                 },
                 'error': function () {
-                        $.jGrowl("Oops! Something went wrong. Please try again.");
-                  }
+                    $.jGrowl("Oops! Something went wrong. Please try again.");
+                }
             };
             $('#want2help_form').ajaxForm(options);
             $('#want2help_form').find('input:submit').click(function () {
@@ -471,13 +473,10 @@ function yay_we_want_to_help() {
 
         }
     };
-{% if user_just_signed_up_as_wants_to_help %}
+    {% if user_just_signed_up_as_wants_to_help %}
     $(yay_we_want_to_help);
-{% endif %}
+    {% endif %}
     </script>
-
-
-
 
 {% endblock js %}
 
