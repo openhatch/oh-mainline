@@ -30,6 +30,9 @@ def repos_by_username(username):
             return
         else:
             raise # otherwise, wtf
+    except RuntimeError, re:
+        if re.message == 'unexpected response from github.com 403: \'{"error":[{"error":"api route not recognized"}]}\'':
+            return
     for repo in repos:
         yield repo
 
