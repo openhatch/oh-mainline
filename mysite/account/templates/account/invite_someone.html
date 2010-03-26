@@ -1,12 +1,12 @@
 {% extends 'account/settings_tab.html' %}
 
 {% block title %}
-Invite a friend 
+Tell a friend or enemy
 {% endblock title %}
 
 {% block form_action %}'{% url mysite.account.views.invite_someone_do %}'{% endblock %}
 
-{% block submodule_head %}Invite a friend to OpenHatch{% endblock %}
+{% block submodule_head %}Tell a friend (or enemy) about OpenHatch{% endblock %}
 
 {% block submodule_body %}
 <p>You have {{ remaining_invites }} invitations available.</p>
@@ -19,4 +19,4 @@ Invite a friend
 {% endfor %}
 {% endblock %}
 
-{% block submit_button_text %}Send invitation{% endblock %}
+{% block submit_button_text %}Send{% endblock %}

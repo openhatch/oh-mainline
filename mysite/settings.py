@@ -170,7 +170,7 @@ logging.basicConfig(
 # Invite codes last seven days
 ACCOUNT_INVITATION_DAYS=7
 INVITE_MODE=False # Enable this on production site ...?
-INVITATIONS_PER_USER=5
+INVITATIONS_PER_USER=100
 
 DEFAULT_FROM_EMAIL = 'all@openhatch.org'
 

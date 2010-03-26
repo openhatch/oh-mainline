@@ -137,3 +137,8 @@ def urlize_without_escaping_percent_signs(text, trim_url_limit=None, nofollow=Fa
 urlize = allow_lazy(urlize, unicode)
 
 show_common_data = register.tag(googleanalyticsjs)
+
+@register.filter
+def invitation_key2user(key):
+    from invitation.models import InvitationKey
+    return InvitationKey.objects.get(key=key).from_user
