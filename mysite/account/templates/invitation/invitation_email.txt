@@ -1,13 +1,11 @@
-{% load base_extras %}Hi there. I am a robot. A human named {% with invitation_key|invitation_key2user as u %}{% with u.get_full_name as n %}{{ n }}{% if n %} ({% endif %}{{ u.username }}{% if n %}){% endif %}{% endwith %}{% endwith %} asked me to let you know about a website called OpenHatch. OpenHatch
-<https://openhatch.org> makes it easier to find
-interesting things to do in free/libre/open source software (aka FLOSS), or at least that's the idea.
+{% load base_extras %}Hi there. I am a robot. A human named {% with invitation_key|invitation_key2user as u %}{% with u.get_full_name as n %}{{ n }}{% if n %} ({% endif %}{{ u.username }}{% if n %}){% endif %}{% endwith %}{% endwith %} asked me to let you know about a website called OpenHatch. OpenHatch makes it easier to find interesting things to do in free/libre/open source software (aka FLOSS), or at least that's the idea.
 
 Here 'tis: https://openhatch.org/
 
-Other stuff:
-* Find a cool bug (we index hundreds of major projects): https://openhatch.org/search/
+Things you can do once you get there:
+* Find a cool bug: https://openhatch.org/search/
 * Find other folks in FLOSS and learn what they do: https://openhatch.org/people/
-* Chat about FLOSS projects: https://openhatch.org/+projects/
+* Chat about how to get involved in various software projects: https://openhatch.org/+projects/
 
 Kind regards,
 
