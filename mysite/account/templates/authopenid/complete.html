@@ -31,6 +31,13 @@ body#associate-openid .body { background: #fff;}
 
         <div class='body'>
 
+	  {% if request.session.from_offsite %}
+          {% with request|get_project_names_to_help_from_session as project_names_to_help %}
+	  <h3>HOLY JESUS</h3>
+	  <p><strong>You want to help out {{project_names_to_help|join:", "}}</strong>.</p>
+	  {% endwith %}
+	  {% endif %}
+
             <form name="fregister" action="{% url user_register %}"
                     method="POST" class="login">
                 <input type="hidden" name="next" value="{{ next|enhance_next_to_annotate_it_with_newuser_is_true}}" />
