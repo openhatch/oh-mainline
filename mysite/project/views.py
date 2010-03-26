@@ -258,6 +258,10 @@ def wanna_help_do(request):
         wanna_help_queue = request.session.get('projects_we_want_to_help_out', [])
         wanna_help_queue.append(project.id)
         request.session['projects_we_want_to_help_out'] = wanna_help_queue
+
+        # If the user came from offsite, note that in the session too
+        if wanna_help_form.cleaned_data['from_offsite']:
+            request.session['from_offsite'] = True
         
         # If user isn't logged in, send them to the login page with next
         # parameter populated.

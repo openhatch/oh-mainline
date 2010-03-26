@@ -270,7 +270,10 @@ class OffsiteAnonymousWannaHelpWorks(TwillTests):
                                     {u'project': unicode(project_id),
                                      u'from_offsite': u'True'}, follow=True)
 
+        # Make sure the session knows we came from offsite. Login-related
+        # templates want this knowledge.
+        self.assert_(self.client.session.get('from_offsite', False))
+
         # Make sure we are redirected to the right place
         self.assertEqual(response.redirect_chain,
             [('http://testserver/account/login/?from_offsite=True&next=%2F%2Bprojects%2FMyproject%3Fwanna_help%3Dtrue', 302)])
-        
