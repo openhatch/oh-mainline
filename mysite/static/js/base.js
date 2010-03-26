@@ -44,13 +44,6 @@ RegExp.escape = function(text) {
                 return text.replace(arguments.callee.sRE, '\\$1');
 };
 
-$(function () {
-    $("[rel='tipsy-north']").tipsy({'gravity': 'n'});
-    $("[rel='tipsy-east']").tipsy({'gravity': 'e'});
-    $("[rel='tipsy-west']").tipsy({'gravity': 'w'});
-    $("[rel='tipsy-south']").tipsy({'gravity': 's'});
-});
-
 $.fn.getTipsy = function() {
     return $.data(this.get(0), 'active.tipsy');
 }
