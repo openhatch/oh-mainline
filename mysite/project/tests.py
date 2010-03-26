@@ -274,6 +274,9 @@ class OffsiteAnonymousWannaHelpWorks(TwillTests):
         # templates want this knowledge.
         self.assert_(self.client.session.get('from_offsite', False))
 
+        ## FIXME: There should be a cancel button letting the user
+        ## destroy the session and then go back to the Referring page.
+
         # Make sure we are redirected to the right place
         self.assertEqual(response.redirect_chain,
             [('http://testserver/account/login/?from_offsite=True&next=%2F%2Bprojects%2FMyproject%3Fwanna_help%3Dtrue', 302)])
