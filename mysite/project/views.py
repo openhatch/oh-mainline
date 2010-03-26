@@ -288,5 +288,5 @@ def unlist_self_from_wanna_help_do(request):
 @login_required
 @mysite.base.decorators.view
 def nextsteps4helpers(request):
-    context = {}
+    context = {'the_lucky_project': Project.objects.all()[0]}
     return (request, "nextsteps4helpers.html", context) 

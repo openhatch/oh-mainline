@@ -9,27 +9,11 @@ Home
 
 {% block body_id %}landing{% endblock body_id %}
 
+{% block body_class %}three_columns{% endblock body_class %}
+
 {% block css %}
 {{ block.super }}
-body#landing #welcome { float: left; width: 100%; }
-body#landing #welcome .body { padding: 1%; width: 98%;}
-body#landing #welcome h2 { padding: 1%; }
-body#landing #welcome p { padding: 0 1%; }
-body#landing #welcome .nudgebuttons li { float: left; width: 33%; margin-bottom: 0; }
-body#landing #welcome .nudgebuttons li strong { font-size: 1.8em; margin-bottom: 3px;}
-body#landing #welcome .nudgebuttons li .arrow { font-size: 3em; }
-body#landing #welcome li .notification { color: #555; }
-body#landing #welcome {color: #555; }
-
-body#landing .column { float: left; width: 35%; margin-right: 0; margin-left: 2%; }
-body#landing .column:first-child { width: 30%; margin-left: 0; }
-body#landing .column:last-child { width: 30%; }
-body#landing .module .body { background: #fff; padding: 3%; width: 94%; }
-body#landing .module .head { width: 98%; }
-body#landing .module { width: 100%; }
-body#landing #right .body { padding: 5%; font-size: .9em; width: 90%; }
-body#landing #right #recent_activity_feed .body { font-size: 1em; }
-body#landing #right .entry { font-size: .9em; margin-top: 3px; }
+body.three_columns #right #recent_activity_feed .body { font-size: 1em; }
 {% endblock css %}
 
 {% block pagetop %}
