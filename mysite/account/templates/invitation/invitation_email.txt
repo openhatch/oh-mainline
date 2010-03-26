@@ -3,7 +3,7 @@
 Here 'tis: https://openhatch.org/
 
 Things you can do once you get there:
-* Find a cool bug: https://openhatch.org/search/
+* Find a cool bug (or other sort of volunteering opportunity): https://openhatch.org/search/
 * Learn what other people in FLOSS are working on: https://openhatch.org/people/
 * Chat about how to contribute to libre software: https://openhatch.org/+projects/
 
