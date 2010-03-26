@@ -252,3 +252,25 @@ class WannaHelpWorksAnonymously(TwillTests):
         # And now the DB shows we have removed ourselves.
         self.assertFalse(Project.objects.get(id=project_id).people_who_wanna_help.all())
 
+class OffsiteAnonymousWannaHelpWorks(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def test(self):
+        # Steps for this test
+        # 1. User POSTs to the wannahelp POST handler, indicating the request came from offsite
+        # 2. User is redirected to a login page that knows the request came from offsite
+        project_id = Project.create_dummy(name='Myproject').id
+
+        # At the start, no one wants to help our project.
+        self.assertFalse(Project.objects.get(id=project_id).people_who_wanna_help.all())
+
+        # Click the button saying we want to help!
+        post_to = reverse(mysite.project.views.wanna_help_do)
+        response = self.client.post(post_to,
+                                    {u'project': unicode(project_id),
+                                     u'from_offsite': u'True'}, follow=True)
+
+        # Make sure we are redirected to the right place
+        self.assertEqual(response.redirect_chain,
+            [('http://testserver/account/login/?from_offsite=True&next=%2F%2Bprojects%2FMyproject%3Fwanna_help%3Dtrue', 302)])
+        
