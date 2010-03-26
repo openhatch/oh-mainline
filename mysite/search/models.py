@@ -210,12 +210,13 @@ class Project(OpenHatchModel):
     def get_contributors(self):
         """Return a list of Person objects who are contributors to
         this Project."""
-        from mysite.profile.models import PortfolioEntry
-        # What portfolio entries point to this project?
-        pf_entries = PortfolioEntry.published_ones.filter(project=self)
-        # List the owners of those portfolio entries.
-        people = [pf_entry.person for pf_entry in pf_entries]
-        return people
+        from mysite.profile.models import Person
+        return Person.objects.filter(
+                portfolioentry__project=self, 
+                portfolioentry__is_deleted=False,
+                portfolioentry__is_published=True
+                ).distinct()
+
 
     def update_cached_contributor_count_and_save(self):
         contributors = self.get_contributors()
