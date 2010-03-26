@@ -1,0 +1,64 @@
+<html>
+<head>
+        <script type="text/javascript" src="/static/js/jquery.js?1244261870"></script>
+        <script type="text/javascript" src="/static/js/jquery.tipsy.js?1269539649"></script>
+</head>
+
+<style>
+            @import url(/static/css/tipsy.css?1269539648);
+
+            /*]]>*/
+        </style>
+
+<body>
+
+
+<style type="text/css">
+#openhatch-wannahelp-button:hover, #openhatch-wannahelp-button:focus {
+background-image:url(https://openhatch.org/static/images/wannahelp-button-bg-hover.png);
+color:#222222;
+text-decoration:none;
+}
+#openhatch-wannahelp-button {
+-moz-background-clip:border;
+-moz-background-inline-policy:continuous;
+-moz-background-origin:padding;
+background:#C8E29D url(https://openhatch.org/static/images/wannahelp-button-bg.png) repeat-x scroll center top;
+border:3px solid #FFFFFF;
+cursor:pointer;
+font-family:Helvetica,sans-serif;
+font-size:13pt;
+font-weight:normal;
+text-align:center;
+text-shadow:0 1px 0 #FFFFFF;
+white-space:normal;
+}
+
+#openhatch-wannahelp-button {
+-moz-border-radius-bottomleft:8px;
+-moz-border-radius-bottomright:8px;
+-moz-border-radius-topleft:8px;
+-moz-border-radius-topright:8px;
+color:#444444;
+float:left;
+padding:10px 20px;
+display:block;
+padding:2px 8px;
+}
+
+#openhatch-wannahelp-button:focus {
+outline-color:-moz-use-text-color;
+outline-style:none;
+outline-width:medium;
+}
+</style>
+<p>I like traffic lights.</p>
+
+<form method="POST" action="https://openhatch.org/+do/project.views.wanna_help_do" id="want2help_form">
+            <input type="hidden" name="from_offsite" value="True" />
+            <input type="hidden" value="33" name="project"/>
+            <input type="submit" value="I want to help" rel="tipsy-south" id="openhatch-wannahelp-button" original-title="Click to add yourself to the list of people who want to contribute. People of all levels are welcome!"/>
+        </form>
+
+</body>
+</html>
