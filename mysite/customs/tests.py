@@ -731,6 +731,13 @@ class WhenGithubSaysPermissionDeniedForRepoList(django.test.TestCase):
         got = list(mysite.customs.github.repos_by_username('mister_explosion'))
         self.assertEqual(wanted, got)
 
+    @mock.patch('mysite.customs.ohloh.mechanize_get')
+    def test_list_watching_nonexistent_user(self, mock_mechanize_get):
+        mock_mechanize_get.side_effect = generate_403
+        wanted = []
+        got = list(mysite.customs.github._get_repositories_user_watches('nathan_explosion'))
+        self.assertEqual(wanted, got)
+
 class LineAcceptorTest(django.test.TestCase):
     def test(self):
 

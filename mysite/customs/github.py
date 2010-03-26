@@ -67,7 +67,16 @@ def _get_repositories_user_watches(github_username):
     '''Returns a list of repo objects.'''
     json_url = 'http://github.com/api/v2/json/repos/watched/%s' % (
         github_username)
-    response = mysite.customs.ohloh.mechanize_get(json_url).response()
+    try:
+        response = mysite.customs.ohloh.mechanize_get(json_url).response()
+    except urllib2.HTTPError, e:
+        if e.code == 403:
+            # Well, Github said 403
+            # That seems to mean that there is no such Github user. So,
+            # return the empty list.
+            return []
+        else:
+            raise # otherwise, wtf
     data = simplejson.load(response)
     return data['repositories']
 
