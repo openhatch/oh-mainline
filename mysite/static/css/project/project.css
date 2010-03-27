@@ -78,7 +78,7 @@ body#project #message_for_helpers input[type='image'] { font-size: 0.85em; font-
 body#project #message_for_helpers input[type='image']:hover { background-color: #d3d3d3; }
 body#project #next_steps { display: block; text-align: right; margin-top: 1em; }
 
-body#project .next_steps_for_helpers { background-image: url("/static/images/bg-translucent-green.png");  width: 30% ! important; }
+body#project .next_steps_for_helpers { background-image: url("/static/images/bg-translucent-green.png");  width: 100% ! important; }
 body#project .next_steps_for_helpers h3 { color: #222; text-shadow: 0 1px 0 #fff; }
 body#project .next_steps_for_helpers .body { width: 95.8%; }
 body#project .next_steps_for_helpers #show { display: none; }
