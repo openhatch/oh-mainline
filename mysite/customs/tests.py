@@ -534,6 +534,22 @@ class OnlineGithub(django.test.TestCase):
                 found_tircd_yet = True
         self.assertTrue(found_tircd_yet)
 
+class OnlineGithubFailures(django.test.TestCase):
+    def test_username_404(self):
+        '''This test gives our github info_by_username a user to 404 on .'''
+        repos = list(mysite.customs.github.repos_by_username('will_never_be_found_PDo7jHoi'))
+        self.assertEqual(repos, [])
+
+    def test_at_sign_404(self):
+        '''This test gives our github info_by_username an email to 404 on.'''
+        repos = list(mysite.customs.github.repos_by_username('will_@_never_be_found_PDo7jHoi'))
+        self.assertEqual(repos, [])
+
+    def test_at_sign_403(self):
+        '''This test gives our github info_by_username an email to 403 on.'''
+        repos = list(mysite.customs.github.repos_by_username('dummy@example.com'))
+        self.assertEqual(repos, [])
+
 class ParseCiaMessage(django.test.TestCase):
     def test_with_ansi_codes(self):
         message = '\x02XBMC:\x0f \x0303jmarshallnz\x0f * r\x0226531\x0f \x0310\x0f/trunk/guilib/ (GUIWindow.h GUIWindow.cpp)\x02:\x0f cleanup: eliminate some duplicate code.'
@@ -710,32 +726,6 @@ class TracBug(django.test.TestCase):
                   'concerns_just_documentation': False,
                   'as_appears_in_distribution': '',
                   }
-        self.assertEqual(wanted, got)
-
-class WhenGithubSaysPermissionDeniedForRepoList(django.test.TestCase):
-
-    @mock.patch('mysite.customs.github._github_repos_list')
-    def test(self, mock_repo_list):
-        mock_repo_list.side_effect = generate_403
-        wanted = []
-        got = list(mysite.customs.github.repos_by_username('mister_403'))
-        self.assertEqual(wanted, got)
-
-    @mock.patch('mysite.customs.github._github_repos_list')
-    def test_raising_runtime_error_403(self, mock_repo_list):
-        def generate_runtime_error(*args, **kwargs):
-            raise RuntimeError("unexpected response from github.com %d: %r" % (
-                403, '{"error":[{"error":"api route not recognized"}]}'))
-        mock_repo_list.side_effect = generate_runtime_error
-        wanted = []
-        got = list(mysite.customs.github.repos_by_username('mister_explosion'))
-        self.assertEqual(wanted, got)
-
-    @mock.patch('mysite.customs.ohloh.mechanize_get')
-    def test_list_watching_nonexistent_user(self, mock_mechanize_get):
-        mock_mechanize_get.side_effect = generate_403
-        wanted = []
-        got = list(mysite.customs.github._get_repositories_user_watches('nathan_explosion'))
         self.assertEqual(wanted, got)
 
 class LineAcceptorTest(django.test.TestCase):
