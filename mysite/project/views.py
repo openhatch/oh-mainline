@@ -13,6 +13,7 @@ from django.http import HttpResponse, HttpResponseRedirect, \
 from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
+from django.template.loader import render_to_string
 
 import random
 
@@ -79,6 +80,11 @@ def project(request, project__name = None):
     else:
         people_to_show = p.people_who_wanna_help.all()
 
+    button_as_widget_source = render_to_string(
+        'project/button_as_widget.html',
+        mysite.base.controllers.get_uri_metadata_for_generating_absolute_links(
+            request))
+
     context.update({
         'project': p,
         'contributors': p.get_contributors()[:3],
@@ -91,6 +97,7 @@ def project(request, project__name = None):
         'user_wants_to_help': request.user.is_authenticated() and request.user.get_profile() in p.people_who_wanna_help.all(),
         'user_just_signed_up_as_wants_to_help': wanna_help,
         'people_to_show': people_to_show,
+        'button_as_widget_source': button_as_widget_source,
         })
 
     question_suggestion_response = request.GET.get('question_suggestion_response', None)
