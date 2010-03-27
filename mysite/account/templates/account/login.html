@@ -39,9 +39,19 @@ form { width: 350px; }
 
         {% if request.GET.from_offsite %}
         <div class='post_login_action_explanation'>
-            Thanks for declaring your interest in helping {{
-            project_names_to_help }}! One quick last step:
-            <strong>choose an account</strong>.
+            Thanks for declaring your interest in helping
+            {% spaceless %}
+                {% for project_name in project_names_to_help %}
+                    {% if forloop.last %}
+                        and
+                    {% else %}
+                        {% if forloop.counter0 %}
+                        <span>, </span>
+                        {% endif %}
+                    {% endif %}
+                    <span>{{ project_name }}</span>
+                {% endfor %}
+            {% endspaceless %}! <br> To continue, please <strong>pick an account</strong>.
         </div>
         {% endif %}
 

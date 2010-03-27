@@ -57,5 +57,5 @@ def get_wanna_help_queue_from_session(session):
         except mysite.search.models.Project.DoesNotExist:
             continue # uhhh, get the next ID...
         ret.append(project)
+    ret = list(set(ret))
     return ret
-        

@@ -1,6 +1,6 @@
 <form id="openid_form" name="openid_form"
     action="{% url user_signin %}" method="post">
-    {% if next and not answers %}
+    {% if next and not answers and not request.GET.from_offsite %}
         <p>Please log in to proceed.</p>
     {% endif %}
     <p id='please_click'>Which account would you like to use?</p>
