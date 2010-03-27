@@ -75,7 +75,8 @@ class Person(models.Model):
     last_polled = models.DateTimeField(default=datetime.datetime(1970, 1, 1))
     show_email = models.BooleanField(default=False)
     bio = models.TextField(blank=True) 
-    contact_blurb = models.TextField(blank=True) 
+    contact_blurb = models.TextField(blank=True)
+    expand_next_steps = models.BooleanField(default=True)
     photo = models.ImageField(upload_to=
                               lambda a, b: 'static/photos/profile-photos/' + 
                               generate_person_photo_path(a, b),
