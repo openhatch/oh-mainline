@@ -256,7 +256,7 @@ class ProjectPageTellsNextStepsForHelpersToBeExpanded(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus',
                 'miro-project']
 
-    def test_for_false(self):
+    def test_default_to_false(self): # FIXME: Make it default to True soon
         client = self.login_with_client()
         response = client.get('/+projects/Miro')
         self.assertFalse(response.context[0].get(
