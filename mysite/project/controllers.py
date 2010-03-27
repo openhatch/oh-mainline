@@ -48,6 +48,8 @@ def flush_session_wanna_help_queue_into_database(user, session,
         del session[PROJECTS_TO_HELP_OUT_KEY]
 
 def get_wanna_help_queue_from_session(session):
+    """Get a list of projects that the user said, while browsing anonymously,
+    they would be willing to help out with."""
     ret = []
     for project_id in session.get(PROJECTS_TO_HELP_OUT_KEY, []):
         try:
@@ -55,5 +57,5 @@ def get_wanna_help_queue_from_session(session):
         except mysite.search.models.Project.DoesNotExist:
             continue # uhhh, get the next ID...
         ret.append(project)
+    ret = list(set(ret))
     return ret
-        

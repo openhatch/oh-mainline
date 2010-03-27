@@ -47,3 +47,8 @@ RegExp.escape = function(text) {
 $.fn.getTipsy = function() {
     return $.data(this.get(0), 'active.tipsy');
 }
+
+$.fn.toggleDisplay = function() { 
+    var what_to_do = this.is(':visible') ? 'hide' : 'show';
+    this[what_to_do]();
+}

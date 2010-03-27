@@ -9,6 +9,7 @@ import PIL.Image
 from django.conf import settings
 from invitation.models import InvitationKey
 from models import InvitationRequest
+import django_authopenid.forms
 
 class UserCreationFormWithEmail(django.contrib.auth.forms.UserCreationForm):
     username = django.forms.RegexField(label="Username", max_length=30, regex=r'^\w+$',
@@ -116,20 +117,19 @@ class EditPhotoForm(django.forms.ModelForm):
             self.cleaned_data['photo'] = new_image_uploaded_file
         return self.cleaned_data['photo']
 
-class InvitationRequestForm(django.forms.ModelForm):
-
-    class Meta:
-        model = InvitationRequest
-
-    first_name = django.forms.CharField(error_messages = {
-        'required': "We need at least your first name."})
-    last_name = django.forms.CharField(required=False)
-    email = django.forms.EmailField(error_messages={
-        'required': "Uh, we want to email you an invitation.",
-        'invalid': "This email address got caught in a regex; try again."})
-from django_authopenid.forms import OpenidRegisterForm
-import django.forms
-from django.conf import settings
-from invitation.models import InvitationKey
-
-OpenidRegisterFormWithInviteCode = OpenidRegisterForm
+class SignUpIfYouWantToHelpForm(django_authopenid.forms.OpenidRegisterForm):
+    how_should_people_contact_you = django.forms.ChoiceField(widget=django.forms.RadioSelect,
+            choices=(
+                ('forwarder', 'Use an email forwarder (keeps your email address private)'),
+                ('public_email', 'Use my real email address'),
+                ))
+    def clean_how_should_people_contact_you(self):
+        if self.user:
+            method2contact_info = {
+                    'forwarder': 'You can reach me by email at $fwd',
+                    'email': 'You can reach me by email at %s' % self.data['email'],
+                    }
+            info = method2contact_info[self.cleaned_data['how_should_people_contact_you']]
+            person = self.user.get_profile()
+            person.contact_info = info
+            person.save()

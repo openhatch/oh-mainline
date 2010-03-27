@@ -15,7 +15,6 @@ import urllib
 import mock
 import logging
 
-from mysite.account.forms import InvitationRequestForm
 import mysite.base.views
 import mysite.base.controllers
 from mysite.base.controllers import get_notification_from_request
