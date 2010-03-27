@@ -269,8 +269,10 @@ about how you can help {{ project.name }}
     <div class='body'>
             <ul>
                 <li>
-                <a href='#'>Get a version of the big green button for your website</a>
+                <a id='show_copypastebox' href='#'>Get a version of the big green button for your website</a>
+		<div id='copypastebox'>
 		<textarea>{{ button_as_widget_source }}</textarea>
+		</div>
                 </li>
             </ul>
     </div>
@@ -444,6 +446,7 @@ function yay_we_want_to_help() {
 $('#show, #hide').click(function () { $('.next_steps_for_helpers').toggleClass('collapsed').toggleClass('expanded'); });
 $('#show').click(function () { $('#show_form').ajaxSubmit()});
 $('#hide').click(function () { $('#hide_form').ajaxSubmit()});
+$('#show_copypastebox').click(function() { $('#copypastebox').toggleDisplay(); return false; });
 
     Want2HelpJacker = function () { }
     Want2HelpJacker.prototype = {

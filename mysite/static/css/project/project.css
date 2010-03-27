@@ -92,3 +92,5 @@ body#project .next_steps_for_helpers.collapsed #show { display: inline; }
 body#project .next_steps_for_helpers.collapsed #hide { display: none; }
 
 body#project .next_steps_for_helpers li { text-indent: -1em; width: 25%; float: left; margin-right: 5%; font-size: 1.3em; }
+
+body#project #copypastebox { display: none; }
