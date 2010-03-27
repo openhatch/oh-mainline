@@ -7,6 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import redirect_to_login
 from django_authopenid.forms import OpenidSigninForm
 from django.core.urlresolvers import reverse
+import django_authopenid.views
 
 from invitation.forms import InvitationKeyForm
 from invitation.models import InvitationKey
@@ -19,6 +20,7 @@ import mysite.base.views
 import mysite.base.controllers
 from mysite.base.controllers import get_notification_from_request
 from mysite.profile.models import Person, Tag, TagType, Link_Project_Tag, Link_SF_Proj_Dude_FM, Link_Person_Tag, DataImportAttempt
+import mysite.account.forms
 
 # FIXME: We did this because this decorator used to live here
 # and lots of other modules refer to it as mysite.account.views.view.
@@ -343,5 +345,25 @@ def invite_someone_do(request):
                                   error_message='No more invites.')
     else:
         return invite_someone(request, form=form)
+
+def register_do(request):
+    """ First process the custom field(s). Then pass execution to the third-party
+    Django registration POST handler."""
+    form = mysite.account.forms.SignUpIfYouWantToHelpForm(request.POST)
+
+    response = django_authopenid.views.register(request, **{
+        'send_email': False,
+        'register_form': mysite.account.forms.SignUpIfYouWantToHelpForm
+        })
+
+    method2contact_info = {
+            'forwarder': 'You can reach me by email at $fwd',
+            'email': 'You can reach me by email at %s' % person.user.data['email'],
+            }
+    info = method2contact_info[form.fields['username']]
+    person.contact_blurb = info
+    person.save()
+
+    return response
 
 # vim: ai ts=3 sts=4 et sw=4 nu

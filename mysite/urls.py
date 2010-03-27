@@ -95,6 +95,8 @@ urlpatterns = patterns('',
                     },
             name='user_register'),
 
+        url(r'^openid/register/do$', 'mysite.account.views.register_do'),
+
         (r'^openid/', include('django_authopenid.urls')),
                        
         url(r'^account/forgot_pass_confirm/(?P<uidb36>[^/]+)/(?P<token>[^/]+)/$', 'django.contrib.auth.views.password_reset_confirm', {'template_name': 'account/password_reset_confirm.html', 'post_reset_redirect': '/account/forgot_pass_complete/'}, name='password_reset_confirm'),

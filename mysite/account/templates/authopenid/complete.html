@@ -32,7 +32,7 @@ body#associate-openid .body { background: #fff;}
 
         <div class='body'>
 
-            <form name="fregister" action="{% url user_register %}"
+            <form name="fregister" action="{% url mysite.account.views.register_do %}"
                     method="POST" class="login">
                 <input type="hidden" name="next"
                         value="{{ next|enhance_next_to_annotate_it_with_newuser_is_true}}" />

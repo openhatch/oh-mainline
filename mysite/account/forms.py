@@ -123,13 +123,3 @@ class SignUpIfYouWantToHelpForm(django_authopenid.forms.OpenidRegisterForm):
                 ('forwarder', 'Use an email forwarder (keeps your email address private)'),
                 ('public_email', 'Use my real email address'),
                 ))
-    def clean_how_should_people_contact_you(self):
-        if self.user:
-            method2contact_info = {
-                    'forwarder': 'You can reach me by email at $fwd',
-                    'email': 'You can reach me by email at %s' % self.data['email'],
-                    }
-            info = method2contact_info[self.cleaned_data['how_should_people_contact_you']]
-            person = self.user.get_profile()
-            person.contact_info = info
-            person.save()
