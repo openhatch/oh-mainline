@@ -983,7 +983,6 @@ def set_expand_next_steps_do(request):
     input_string = request.POST.get('value', None)
     string2value = {'True': True,
                     'False': False}
-    import pdb;pdb.set_trace()
     if input_string not in string2value:
         return HttpResponseBadRequest("Bad POST.")
 

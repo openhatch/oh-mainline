@@ -31,7 +31,13 @@ about how you can help {{ project.name }}
         <div class='head'>
             <h3>Next steps for helpers
                 <a id='show' style='font-weight: normal;' href='#'>(show)</a>
+		<form style="display: none;" id="show_form" method='POST' action="{% url mysite.profile.views.set_expand_next_steps_do %}">
+		  <input type="hidden" name="value" value="True" />
+		</form>
                 <a id='hide' style='font-weight: normal;' href='#'>(hide)</a>
+		<form style="display: none;" id="hide_form" method='POST' action="{% url mysite.profile.views.set_expand_next_steps_do %}">
+		  <input type="hidden" name="value" value="False" />
+		</form>
             </h3>
         </div>
     </div>
@@ -435,6 +441,8 @@ function yay_we_want_to_help() {
 }
 
 $('#show, #hide').click(function () { $('.next_steps_for_helpers').toggleClass('collapsed').toggleClass('expanded'); });
+$('#show').click(function () { $('#show_form').ajaxSubmit()});
+$('#hide').click(function () { $('#hide_form').ajaxSubmit()});
 
     Want2HelpJacker = function () { }
     Want2HelpJacker.prototype = {
