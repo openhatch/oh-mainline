@@ -26,6 +26,9 @@ urlpatterns = patterns('',
         (r'^\+do/project.views.wanna_help_do',
             'mysite.project.views.wanna_help_do'),
 
+        (r'^\+do/profile.views.set_expand_next_steps_do',
+            'mysite.profile.views.set_expand_next_steps_do'),
+
         (r'^\+do/project.views.unlist_self_from_wanna_help_do',
             'mysite.project.views.unlist_self_from_wanna_help_do'),
 
