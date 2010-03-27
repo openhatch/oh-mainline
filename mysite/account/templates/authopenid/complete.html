@@ -23,24 +23,19 @@ body#associate-openid .body { background: #fff;}
 {% endblock css %}
 
 {% block content %}
+    {% with request|get_project_names_to_help_from_session as project_names_to_help %}
     <div class='module' id='openid-associate'>
 
         <div class='head'>
-            <h3>Pick a hip username</h3>
+            <h3>{% if project_names_to_help %}<span style='font-weight: normal;'>One last step: </span>{% endif %}Pick a hip username</h3>
         </div>
 
         <div class='body'>
 
-	  {% if request.session.from_offsite %}
-          {% with request|get_project_names_to_help_from_session as project_names_to_help %}
-	  <h3>HOLY JESUS</h3>
-	  <p><strong>You want to help out {{project_names_to_help|join:", "}}</strong>.</p>
-	  {% endwith %}
-	  {% endif %}
-
             <form name="fregister" action="{% url user_register %}"
                     method="POST" class="login">
-                <input type="hidden" name="next" value="{{ next|enhance_next_to_annotate_it_with_newuser_is_true}}" />
+                <input type="hidden" name="next"
+                        value="{{ next|enhance_next_to_annotate_it_with_newuser_is_true}}" />
                 {{ form1.as_p }}
                 <p><input type="submit" name="bnewaccount" value="ok"></p>
             </form>
@@ -57,13 +52,16 @@ body#associate-openid .body { background: #fff;}
             </form>
         </div>
     </div>
+{% endwith %}
 {% endblock content %}
 
 {% block js %}
 {{ block.super }}
 <script type='text/javascript'>
 $(function () {
-$('#expand-second-form').click(function () { $('#associate-with-existing-account').show(); });
+    $('#expand-second-form').click(function () {
+        $('#associate-with-existing-account').toggleDisplay();
+    });
 });
 </script>
 {% endblock js %}
