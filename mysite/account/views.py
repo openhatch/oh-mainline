@@ -352,9 +352,9 @@ def invite_someone_do(request):
 @django_authopenid.views.not_authenticated
 def register(request, template_name='authopenid/complete.html', 
              redirect_field_name=django.contrib.auth.REDIRECT_FIELD_NAME, 
-             register_form=mysite.account.forms.SignUpIfYouWantToHelpForm,
+             register_form=django_authopenid.forms.OpenidRegisterForm,
              auth_form=django.contrib.auth.forms.AuthenticationForm, 
-             register_account=django_authopenid.views.register_account, send_email=True, 
+             register_account=django_authopenid.views.register_account, send_email=False, 
              extra_context=None):
     """
     register an openid.
@@ -409,23 +409,28 @@ def register(request, template_name='authopenid/complete.html',
     form2 = auth_form(initial={ 
         'username': nickname,
     })
-    
+
     if request.POST:
         user_ = None
         if not redirect_to or '//' in redirect_to or ' ' in redirect_to:
             redirect_to = settings.LOGIN_REDIRECT_URL
         if 'email' in request.POST.keys():
-            form1 = register_form(data=request.POST)
+            form1 = register_form(data=request.POST)        
             if form1.is_valid():
                 user_ = register_account(form1, openid_)
-                person = user_.get_profile()
-                method2contact_info = {
-                    'forwarder': 'You can reach me by email at $fwd',
-                    'public_email': 'You can reach me by email at %s' % user_.email,
-                    }
-                info = method2contact_info[form1.cleaned_data['how_should_people_contact_you']]
-                person.contact_blurb = info
-                person.save()
+                
+                extra_profile_form = mysite.account.forms.SignUpIfYouWantToHelpForm(
+                    request.POST, prefix='extra_profile_form')
+                if extra_profile_form.is_valid():
+                    person = user_.get_profile()
+                    method2contact_info = {
+                        'forwarder': 'You can reach me by email at $fwd',
+                        'public_email': 'You can reach me by email at %s' % user_.email,
+                        }
+                    info = method2contact_info[extra_profile_form.cleaned_data[
+                        'how_should_people_contact_you']]
+                    person.contact_blurb = info
+                    person.save()
                 
         else:
             form2 = auth_form(data=request.POST)
@@ -444,6 +449,8 @@ def register(request, template_name='authopenid/complete.html',
     return render_to_response(template_name, {
         'form1': form1,
         'form2': form2,
+        'extra_profile_form': mysite.account.forms.SignUpIfYouWantToHelpForm(
+            prefix='extra_profile_form'),
         redirect_field_name: redirect_to,
         'nickname': nickname,
         'email': email

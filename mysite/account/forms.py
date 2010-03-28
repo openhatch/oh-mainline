@@ -117,7 +117,7 @@ class EditPhotoForm(django.forms.ModelForm):
             self.cleaned_data['photo'] = new_image_uploaded_file
         return self.cleaned_data['photo']
 
-class SignUpIfYouWantToHelpForm(django_authopenid.forms.OpenidRegisterForm):
+class SignUpIfYouWantToHelpForm(django.forms.Form):
     how_should_people_contact_you = django.forms.ChoiceField(
             initial='forwarder',
             widget=django.forms.RadioSelect,

@@ -48,6 +48,7 @@ label[for^='id_how_should_people_contact_you'] { float: left; width: 100%; }
                 <input type="hidden" name="next"
                         value="{{ next|enhance_next_to_annotate_it_with_newuser_is_true}}" />
                 {{ form1.as_p }}
+		{{ extra_profile_form.as_p }}
                 <p><input type="submit" name="bnewaccount" value="ok"></p>
             </form>
             
