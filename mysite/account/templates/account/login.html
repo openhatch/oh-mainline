@@ -39,10 +39,10 @@ form { width: 350px; }
 
         {% if request.GET.from_offsite %}
         <div class='post_login_action_explanation'>
-            Thanks for declaring your interest in helping
+            Yay!
             {% spaceless %}
                 {% for project_name in project_names_to_help %}
-                    {% if forloop.last %}
+                    {% if forloop.counter0 and forloop.last %}
                         and
                     {% else %}
                         {% if forloop.counter0 %}
@@ -51,7 +51,8 @@ form { width: 350px; }
                     {% endif %}
                     <span>{{ project_name }}</span>
                 {% endfor %}
-            {% endspaceless %}! <br> To continue, please <strong>pick an account</strong>.
+            {% endspaceless %}
+            will be thankful for your support! <br> To continue, please <strong>select an account</strong>.
         </div>
         {% endif %}
 
