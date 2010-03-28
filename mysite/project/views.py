@@ -80,7 +80,7 @@ def project(request, project__name = None):
     else:
         people_to_show = p.people_who_wanna_help.all()
 
-    button_widget_data = mysite.base.controllers.get_uri_metadata_for_generating_absolute_links(request))
+    button_widget_data = mysite.base.controllers.get_uri_metadata_for_generating_absolute_links(request)
     button_widget_data['project'] = p
     button_as_widget_source = render_to_string(
         'project/button_as_widget.html', button_widget_data)
