@@ -1,6 +1,6 @@
 <form method="POST" action="{{uri_scheme}}://{{ url_prefix }}/+do/project.views.wanna_help_do" id="openhatch-want2help_form">
             <input type="hidden" name="from_offsite" value="True" />
-            <input type="hidden" value="33" name="project"/>
+            <input type="hidden" value="{{project.id}}" name="project"/>
             <input type="submit" value="I want to help" rel="tipsy-south" id="openhatch-wannahelp-button" original-title="Click to add yourself to the list of people who want to contribute. People of all levels are welcome!"/>
 </form>
 
