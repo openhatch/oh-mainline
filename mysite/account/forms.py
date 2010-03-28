@@ -118,8 +118,10 @@ class EditPhotoForm(django.forms.ModelForm):
         return self.cleaned_data['photo']
 
 class SignUpIfYouWantToHelpForm(django_authopenid.forms.OpenidRegisterForm):
-    how_should_people_contact_you = django.forms.ChoiceField(widget=django.forms.RadioSelect,
+    how_should_people_contact_you = django.forms.ChoiceField(
+            widget=django.forms.RadioSelect,
+            label="You've expressed interest in helping out project. How can people from that project contact you?",
             choices=(
-                ('forwarder', 'Use an email forwarder (keeps your email address private)'),
-                ('public_email', 'Use my real email address'),
+                ('forwarder', 'By email, but mask my email address using an automatic forwarder (like Craigslist)'),
+                ('public_email', 'By email; just display my real email address'),
                 ))
