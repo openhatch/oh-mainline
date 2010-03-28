@@ -14,12 +14,18 @@ body#associate-openid .errorlist li { width: 90%; }
 #openid-associate { margin: 0 355px; width: 250px; }
 #openid-associate .head { width: 250px; }
 #openid-associate .body { width: 210px; }
-#expand-second-form { margin-top: 20px; }
+#expand-second-form { display: block; clear: both; margin-top: 20px; }
 #associate-with-existing-account { margin-top: 10px; display: none; }
-form p { float: none; display: block; margin: 0 0 10px 0; }
+form p { float: none; display: block; width: 100%; margin: 0 0 10px 0; }
 form label { float: none; display: block; }
 body#associate-openid form input { float: none; display: block; }
+body#associate-openid form input[type='radio'] { float: left; }
+body#associate-openid form input[type='submit'] { clear: both; }
+body#associate-openid form ul { float: none; display: block; }
+body#associate-openid form li { width: 100%;  }
 body#associate-openid .body { background: #fff;} 
+label[for^='id_how_should_people_contact_you'] { float: left; width: 100%; }
+
 {% endblock css %}
 
 {% block content %}
