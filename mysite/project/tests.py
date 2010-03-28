@@ -252,6 +252,16 @@ class WannaHelpWorksAnonymously(TwillTests):
         # And now the DB shows we have removed ourselves.
         self.assertFalse(Project.objects.get(id=project_id).people_who_wanna_help.all())
 
+class ProjectPageTellsNextStepsForHelpersToBeExpanded(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus',
+                'miro-project']
+
+    def test_default_to_false(self): # FIXME: Make it default to True soon
+        client = self.login_with_client()
+        response = client.get('/+projects/Miro')
+        self.assertFalse(response.context[0].get(
+            'expand_next_steps', None))
+
 class OffsiteAnonymousWannaHelpWorks(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 

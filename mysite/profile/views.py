@@ -12,7 +12,7 @@ import collections
 from django.template.loader import render_to_string
 from django.core import serializers
 from django.http import \
-        HttpResponse, HttpResponseRedirect, HttpResponseServerError, HttpResponsePermanentRedirect
+        HttpResponse, HttpResponseRedirect, HttpResponseServerError, HttpResponsePermanentRedirect, HttpResponseBadRequest
 from django.shortcuts import \
         render_to_response, get_object_or_404
 import django.contrib.auth 
@@ -977,6 +977,20 @@ def dollar_username(request):
     return HttpResponseRedirect(reverse(display_person_web,
 		kwargs={'user_to_display__username': 
                 request.user.username}))
+
+@login_required
+def set_expand_next_steps_do(request):
+    input_string = request.POST.get('value', None)
+    string2value = {'True': True,
+                    'False': False}
+    if input_string not in string2value:
+        return HttpResponseBadRequest("Bad POST.")
+
+    person = request.user.get_profile()
+    person.expand_next_steps = string2value[input_string]
+    person.save()
+
+    return HttpResponseRedirect(person.profile_url)
 
 @login_required
 @view

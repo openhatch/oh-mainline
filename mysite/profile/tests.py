@@ -2084,6 +2084,36 @@ class PersonCanReindexHimself(TwillTests):
         self.assertEqual(mock_delay.call_args,
                          ( (), {'person_id': p.id}))
 
+class PersonCanSetHisExpandNextStepsOption(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def test_set_to_true(self):
+        # Starts as false
+        p = Person.objects.get(user__username='paulproteus')
+        p.expand_next_steps = False
+        p.save()
+
+        # Now, set to True...
+        client = self.login_with_client()
+        url = reverse(mysite.profile.views.set_expand_next_steps_do)
+        response = client.post(url, {'value': 'True'})
+        p = Person.objects.get(user__username='paulproteus')
+        self.assert_(p.expand_next_steps)
+        # FIXME test response
+
+    def test_set_to_true(self):
+        # Starts as True
+        p = Person.objects.get(user__username='paulproteus')
+        p.expand_next_steps = True
+        p.save()
+
+        # Now, set to False...
+        client = self.login_with_client()
+        url = reverse(mysite.profile.views.set_expand_next_steps_do)
+        response = client.post(url, {'value': 'False'})
+        p = Person.objects.get(user__username='paulproteus')
+        self.assertFalse(p.expand_next_steps)
+
 class PeopleMapForNonexistentProject(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 

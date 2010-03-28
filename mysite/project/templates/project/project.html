@@ -27,16 +27,22 @@ about how you can help {{ project.name }}
     <h3 class='supertitle'><a href='{% url mysite.project.views.projects %}'>Projects</a></h3>
     <h1>{{ project.name }}</h1>
 
-    <div class='next_steps_for_helpers contains_just_the_head collapsed module' style='background-image: url("/static/images/bg-translucent-green.png"); {% if not user_wants_to_help %}display: none;{% endif %}'>
+    <div class='next_steps_for_helpers contains_just_the_head {% if the_user.get_profile.expand_next_steps %}expanded{% else %}collapsed{% endif %} module' style='background-image: url("/static/images/bg-translucent-green.png"); {% if not user_wants_to_help %}display: none;{% endif %}'>
         <div class='head'>
             <h3>Next steps for helpers
                 <a id='show' style='font-weight: normal;' href='#'>(show)</a>
+		<form style="display: none;" id="show_form" method='POST' action="{% url mysite.profile.views.set_expand_next_steps_do %}">
+		  <input type="hidden" name="value" value="True" />
+		</form>
                 <a id='hide' style='font-weight: normal;' href='#'>(hide)</a>
+		<form style="display: none;" id="hide_form" method='POST' action="{% url mysite.profile.views.set_expand_next_steps_do %}">
+		  <input type="hidden" name="value" value="False" />
+		</form>
             </h3>
         </div>
     </div>
 
-    <div class='next_steps_for_helpers contains_just_the_body collapsed module' style='{% if not user_wants_to_help %}display: none;{% endif %}'>
+    <div class='next_steps_for_helpers contains_just_the_body {% if the_user.get_profile.expand_next_steps %}expanded{% else %}collapsed{% endif %} module' style='{% if not user_wants_to_help %}display: none;{% endif %}'>
         <div class='body'>
                 <ul class='raquo_bullets'>
                     <li><a href='{% url mysite.profile.views.edit_info %}'>
@@ -263,7 +269,10 @@ about how you can help {{ project.name }}
     <div class='body'>
             <ul>
                 <li>
-                <a href='#'>Get a version of the big green button for your website</a>
+                <a id='show_copypastebox' href='#'>Get a version of the big green button for your website</a>
+		<div id='copypastebox'>
+		<textarea>{{ button_as_widget_source }}</textarea>
+		</div>
                 </li>
             </ul>
     </div>
@@ -435,6 +444,9 @@ function yay_we_want_to_help() {
 }
 
 $('#show, #hide').click(function () { $('.next_steps_for_helpers').toggleClass('collapsed').toggleClass('expanded'); });
+$('#show').click(function () { $('#show_form').ajaxSubmit()});
+$('#hide').click(function () { $('#hide_form').ajaxSubmit()});
+$('#show_copypastebox').click(function() { $('#copypastebox').toggleDisplay(); return false; });
 
     Want2HelpJacker = function () { }
     Want2HelpJacker.prototype = {
