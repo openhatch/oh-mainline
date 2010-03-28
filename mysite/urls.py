@@ -91,14 +91,14 @@ urlpatterns = patterns('',
 
         # OpenID URL prefix for django_authopenid.urls
         url(r'^openid/register/$',
-                oid_views.register,
+                mysite.account.views.register,
                 kwargs={
                     'send_email': False,
                     'register_form': mysite.account.forms.SignUpIfYouWantToHelpForm
                     },
             name='user_register'),
 
-        url(r'^openid/register/do$', 'mysite.account.views.register_do'),
+        url(r'^openid/register/do$', 'mysite.account.views.register'),
 
         (r'^openid/', include('django_authopenid.urls')),
                        

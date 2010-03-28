@@ -5,6 +5,7 @@ import django.contrib.auth
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import redirect_to_login
+import django.contrib.auth.forms
 from django_authopenid.forms import OpenidSigninForm
 from django.core.urlresolvers import reverse
 import django_authopenid.views
@@ -346,24 +347,106 @@ def invite_someone_do(request):
     else:
         return invite_someone(request, form=form)
 
-def register_do(request):
-    """ First process the custom field(s). Then pass execution to the third-party
-    Django registration POST handler."""
-    form = mysite.account.forms.SignUpIfYouWantToHelpForm(request.POST)
+### The following is copied here from django_authopenid, and then
+### modified trivially in the POST handler.
+@django_authopenid.views.not_authenticated
+def register(request, template_name='authopenid/complete.html', 
+             redirect_field_name=django.contrib.auth.REDIRECT_FIELD_NAME, 
+             register_form=mysite.account.forms.SignUpIfYouWantToHelpForm,
+             auth_form=django.contrib.auth.forms.AuthenticationForm, 
+             register_account=django_authopenid.views.register_account, send_email=True, 
+             extra_context=None):
+    """
+    register an openid.
 
-    response = django_authopenid.views.register(request, **{
-        'send_email': False,
-        'register_form': mysite.account.forms.SignUpIfYouWantToHelpForm
-        })
+    If user is already a member he can associate its openid with 
+    its account.
 
-    method2contact_info = {
-            'forwarder': 'You can reach me by email at $fwd',
-            'email': 'You can reach me by email at %s' % person.user.data['email'],
-            }
-    info = method2contact_info[form.fields['username']]
-    person.contact_blurb = info
-    person.save()
+    A new account could also be created and automaticaly associated
+    to the openid.
 
-    return response
+    :attr request: request object
+    :attr template_name: string, name of template to use, 
+    'authopenid/complete.html' by default
+    :attr redirect_field_name: string, field name used for redirect. by default 
+    'next'
+    :attr register_form: form use to create a new account. By default 
+    `OpenidRegisterForm`
+    :attr auth_form: form object used for legacy authentification. 
+    by default `OpenidVerifyForm` form auser auth contrib.
+    :attr register_account: callback used to create a new account from openid. 
+    It take the register_form as param.
+    :attr send_email: boolean, by default True. If True, an email will be sent 
+    to the user.
+    :attr extra_context: A dictionary of variables to add to the template 
+    context. Any callable object in this dictionary will be called to produce 
+    the end result which appears in the context.
+    """
+    is_redirect = False
+    redirect_to = request.REQUEST.get(redirect_field_name, '')
+    openid_ = request.session.get('openid', None)
+    if openid_ is None or not openid_:
+        return HttpResponseRedirect("%s?%s" % (reverse('user_signin'),
+                                urllib.urlencode({ 
+                                redirect_field_name: redirect_to })))
+
+    nickname = ''
+    email = ''
+    if openid_.sreg is not None:
+        nickname = openid_.sreg.get('nickname', '')
+        email = openid_.sreg.get('email', '')
+    if openid_.ax is not None and not nickname or not email:
+        if openid_.ax.get('http://schema.openid.net/namePerson/friendly', False):
+            nickname = openid_.ax.get('http://schema.openid.net/namePerson/friendly')[0]
+        if openid_.ax.get('http://schema.openid.net/contact/email', False):
+            email = openid_.ax.get('http://schema.openid.net/contact/email')[0]
+        
+    
+    form1 = register_form(initial={
+        'username': nickname,
+        'email': email,
+    }) 
+    form2 = auth_form(initial={ 
+        'username': nickname,
+    })
+    
+    if request.POST:
+        user_ = None
+        if not redirect_to or '//' in redirect_to or ' ' in redirect_to:
+            redirect_to = settings.LOGIN_REDIRECT_URL
+        if 'email' in request.POST.keys():
+            form1 = register_form(data=request.POST)
+            if form1.is_valid():
+                user_ = register_account(form1, openid_)
+                person = user_.get_profile()
+                method2contact_info = {
+                    'forwarder': 'You can reach me by email at $fwd',
+                    'public_email': 'You can reach me by email at %s' % user_.email,
+                    }
+                info = method2contact_info[form1.cleaned_data['how_should_people_contact_you']]
+                person.contact_blurb = info
+                person.save()
+                
+        else:
+            form2 = auth_form(data=request.POST)
+            if form2.is_valid():
+                user_ = form2.get_user()
+        if user_ is not None:
+            # associate the user to openid
+            uassoc = django_authopenid.models.UserAssociation(
+                        openid_url=str(openid_),
+                        user_id=user_.id
+            )
+            uassoc.save(send_email=send_email)
+            django.contrib.auth.login(request, user_)
+            return HttpResponseRedirect(redirect_to) 
+    
+    return render_to_response(template_name, {
+        'form1': form1,
+        'form2': form2,
+        redirect_field_name: redirect_to,
+        'nickname': nickname,
+        'email': email
+    }, context_instance=django_authopenid.views._build_context(request, extra_context=extra_context))
 
 # vim: ai ts=3 sts=4 et sw=4 nu

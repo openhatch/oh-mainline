@@ -119,6 +119,7 @@ class EditPhotoForm(django.forms.ModelForm):
 
 class SignUpIfYouWantToHelpForm(django_authopenid.forms.OpenidRegisterForm):
     how_should_people_contact_you = django.forms.ChoiceField(
+            initial='forwarder',
             widget=django.forms.RadioSelect,
             label="You've expressed interest in helping out project. How can people from that project contact you?",
             choices=(
