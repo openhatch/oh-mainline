@@ -48,11 +48,9 @@ label[for^='id_how_should_people_contact_you'] { float: left; width: 100%; }
                 <input type="hidden" name="next"
                         value="{{ next|enhance_next_to_annotate_it_with_newuser_is_true}}" />
                 {{ form1.as_p }}
-		{% with request|get_project_names_to_help_from_session as project_names_to_help %}
 		{% if project_names_to_help %}
 		{{ extra_profile_form.as_p }}
 		{% endif %}
-		{% endwith %}
                 <p><input type="submit" name="bnewaccount" value="ok"></p>
             </form>
             
