@@ -33,7 +33,12 @@ label[for^='id_how_should_people_contact_you'] { float: left; width: 100%; }
     <div class='module' id='openid-associate'>
 
         <div class='head'>
-            <h3>{% if project_names_to_help %}<span style='font-weight: normal;'>One last step: </span>{% endif %}Pick a hip username</h3>
+            <h3>{% if project_names_to_help %}
+                    <span style='font-weight: normal;'>One last step: </span>
+                    We need a bit of info
+                {% else %}
+                    Pick a hip username
+                {% endif %}</h3>
         </div>
 
         <div class='body'>
