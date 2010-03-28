@@ -1,22 +1,16 @@
-<html>
-<head>
-        <script type="text/javascript" src="/static/js/jquery.js?1244261870"></script>
-        <script type="text/javascript" src="/static/js/jquery.tipsy.js?1269539649"></script>
-        <script type="text/javascript" src="/static/js/tipsy-onload.js"></script>
-</head>
+<form method="POST" action="http://renaissance.local:8000/+do/project.views.wanna_help_do" id="openhatch-want2help_form">
+            <input type="hidden" name="from_offsite" value="True" />
+            <input type="hidden" value="33" name="project"/>
+            <input type="submit" value="I want to help" rel="tipsy-south" id="openhatch-wannahelp-button" original-title="Click to add yourself to the list of people who want to contribute. People of all levels are welcome!"/>
+</form>
 
 <style>
-            @import url(/static/css/tipsy.css?1269539648);
-
-            /*]]>*/
-        </style>
-
-<body>
-
+  @import url('http://renaissance.local:8000/static/css/tipsy.css?1269539648');
+</style>
 
 <style type="text/css">
 #openhatch-wannahelp-button:hover, #openhatch-wannahelp-button:focus {
-background-image:url(https://openhatch.org/static/images/wannahelp-button-bg-hover.png);
+background-image:url('http://renaissance.local:8000/static/images/wannahelp-button-bg-hover.png');
 color:#222222;
 text-decoration:none;
 }
@@ -24,7 +18,7 @@ text-decoration:none;
 -moz-background-clip:border;
 -moz-background-inline-policy:continuous;
 -moz-background-origin:padding;
-background:#C8E29D url(https://openhatch.org/static/images/wannahelp-button-bg.png) repeat-x scroll center top;
+background:#C8E29D url('http://renaissance.local:8000/static/images/wannahelp-button-bg.png') repeat-x scroll center top;
 border:3px solid #FFFFFF;
 cursor:pointer;
 font-family:Helvetica,sans-serif;
@@ -53,13 +47,8 @@ outline-style:none;
 outline-width:medium;
 }
 </style>
-<p>I like traffic lights.</p>
 
-<form method="POST" action="/+do/project.views.wanna_help_do" id="want2help_form">
-            <input type="hidden" name="from_offsite" value="True" />
-            <input type="hidden" value="33" name="project"/>
-            <input type="submit" value="I want to help" rel="tipsy-south" id="openhatch-wannahelp-button" original-title="Click to add yourself to the list of people who want to contribute. People of all levels are welcome!"/>
-        </form>
+<script type="text/javascript" src="http://renaissance.local:8000/static/js/jquery.js?1244261870"></script>
+<script type="text/javascript" src="http://renaissance.local:8000/static/js/jquery.tipsy.js?1269539649"></script>
+<script type="text/javascript" src="http://renaissance.local:8000/static/js/tipsy-onload.js"></script>
 
-</body>
-</html>
