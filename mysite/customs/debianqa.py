@@ -1,6 +1,7 @@
 import mysite.base.unicode_sanity
 import lxml.html
 import urllib
+import urllib2
 import mysite.customs.ohloh
 import re
 
@@ -11,7 +12,13 @@ def source_packages_maintained_by(email_address):
     htmler = lxml.etree.HTMLParser(encoding='utf-8')
     url = 'http://qa.debian.org/developer.php?' + mysite.base.unicode_sanity.urlencode({
         u'login': unicode(email_address)})
-    response = mysite.customs.ohloh.mechanize_get(url).response()
+    try:
+        response = mysite.customs.ohloh.mechanize_get(url).response()
+    except urllib2.HTTPError, he:
+        if he.code == 404:
+            return []
+        else:
+            raise
     parsed = lxml.html.parse(response).getroot()
 
     # for each H3 (Like "main" or "non-free" or "Non-maintainer uploads",

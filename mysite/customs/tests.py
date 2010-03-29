@@ -242,6 +242,10 @@ class ImportFromDebianQAReally(django.test.TestCase):
         self.assertEqual(set(source_package_names),
                          set([('ccd2iso', 'Converter from CloneCD disc image format to standard ISO'), ('alpine', 'Text-based email client, friendly for novices but powerful'), ('cue2toc', "converts CUE files to cdrdao's TOC format"), ('liblicense', 'Stores and retrieves license information in media files'), ('exempi', 'library to parse XMP metadata (Library)')]))
 
+    def test_mister_404(self):
+        source_package_names = mysite.customs.debianqa.source_packages_maintained_by('http://mister.404/dummy')
+        self.assertEqual(list(source_package_names), [])
+
 class LaunchpadDataTests(django.test.TestCase):
     def test_project2language(self):
         langs = lp_grabber.project2languages('gwibber')
