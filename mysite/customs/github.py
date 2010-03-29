@@ -73,7 +73,7 @@ def _get_repositories_user_watches(github_username):
     try:
         response = mysite.customs.ohloh.mechanize_get(json_url).response()
     except urllib2.HTTPError, e:
-        if e.code == 403:
+        if (e.code == 403) or (e.code == 404):
             # Well, Github said 403
             # That seems to mean that there is no such Github user. So,
             # return the empty list.
