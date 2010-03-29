@@ -622,11 +622,11 @@ def people(request):
     try:
         data['queried_project'] = Project.objects.get(name=data['q'])
     except Project.DoesNotExist:
-        pass
+        data['queried_project'] = None
 
     # If this is a project, determine how many people are listed as willing to
     # contribute to that project.
-    if data['query_type'] == 'project' and data.get('queried_project', ''):
+    if data['query_type'] == 'project' and data['queried_project']:
         data['icanhelp_count'] = data['queried_project'].people_who_wanna_help.all().count()
 
     if data['query_type'] == 'icanhelp' and not data['queried_project']:
