@@ -285,7 +285,7 @@ class Ohloh(object):
                 raise
         root = lxml.html.parse(b.response()).getroot()
         relevant_links = root.cssselect('a.position')
-        relevant_hrefs = [link.attrib['href'] for link in relevant_links]
+        relevant_hrefs = [link.attrib['href'] for link in relevant_links if '/contributors/' in link.attrib['href']]
         relevant_project_and_contributor_id_pairs = []
         # FIXME: do more logging here someday?
         for href in relevant_hrefs:
