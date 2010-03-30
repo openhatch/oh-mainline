@@ -158,7 +158,12 @@ class TracBug:
         all_people.update(
             map(lambda x: x.strip(),
                 page_metadata.get('Cc', '').split(',')))
-        all_people.add(page_metadata['Assigned to:'])
+        try:
+            assignee = page_metadata['Assigned to:']
+        except KeyError:
+            assignee = page_metadata['Owned by:']
+
+        all_people.add(assignee)
         ret['people_involved'] = len(all_people)
 
         # FIXME: Need time zone
