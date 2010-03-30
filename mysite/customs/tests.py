@@ -544,6 +544,11 @@ class OnlineGithubFailures(django.test.TestCase):
         repos = list(mysite.customs.github.repos_by_username('will_never_be_found_PDo7jHoi'))
         self.assertEqual(repos, [])
 
+    def test_username_space_404(self):
+        '''This test gives our github info_by_username a user to 404 on .'''
+        repos = list(mysite.customs.github.repos_by_username('will_never_be_found misterr PDo7jHoi'))
+        self.assertEqual(repos, [])
+
     def test_at_sign_404(self):
         '''This test gives our github info_by_username an email to 404 on.'''
         repos = list(mysite.customs.github.repos_by_username('will_@_never_be_found_PDo7jHoi'))

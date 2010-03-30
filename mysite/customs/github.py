@@ -17,7 +17,7 @@ _github = github2.client.Github(username=settings.GITHUB_USERNAME,
                                api_token=settings.GITHUB_API_TOKEN)
 
 def _github_repos_list(username):
-    return _github.repos.list(username)
+    return _github.repos.list(urllib.quote(username))
 
 def repos_by_username(username):
     try:
