@@ -69,7 +69,7 @@ def _pull_data_from_user_activity_feed(github_username):
 def _get_repositories_user_watches(github_username):
     '''Returns a list of repo objects.'''
     json_url = 'http://github.com/api/v2/json/repos/watched/%s' % (
-        github_username)
+        urllib.quote_plus(github_username))
     try:
         response = mysite.customs.ohloh.mechanize_get(json_url).response()
     except urllib2.HTTPError, e:

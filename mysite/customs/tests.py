@@ -558,6 +558,10 @@ class OnlineGithubFailures(django.test.TestCase):
         repos = list(mysite.customs.github._get_repositories_user_watches('will_never_be_found_PDo7jHoi'))
         self.assertEqual(repos, [])
 
+    def test_watching_404_with_space(self):
+        repos = list(mysite.customs.github._get_repositories_user_watches('will_never_be_found mister PDo7jHoi'))
+        self.assertEqual(repos, [])
+
 class ParseCiaMessage(django.test.TestCase):
     def test_with_ansi_codes(self):
         message = '\x02XBMC:\x0f \x0303jmarshallnz\x0f * r\x0226531\x0f \x0310\x0f/trunk/guilib/ (GUIWindow.h GUIWindow.cpp)\x02:\x0f cleanup: eliminate some duplicate code.'
