@@ -1611,6 +1611,35 @@ class MockGithubImport(BaseCeleryTest):
     @mock.patch('mysite.customs.github.repos_by_username')
     @mock.patch('mysite.customs.github.find_primary_language_of_repo', do_nothing)
     @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
+    def test_github_import_via_emulated_bgtask_fork_with_empty_description(self, mock_github_projects):
+        "Test that we can import data from Github. Use a mock list of "
+        "fake Github projects so we don't bother the Github API (or waste "
+        "time waiting for it."
+        # {{{
+        mock_github_projects.return_value = [ObjectFromDict({
+            'name': 'MOCK ccHost',
+            'owner': 'paulproteus', # github repo owner
+            'description': None,
+            'fork': True})]
+
+        data_we_expect = [{
+            'contributor_role': 'Forked',
+            'languages': "", # FIXME
+            'is_published': False,
+            'is_deleted': False}]
+
+        summaries_we_expect = [
+                'Forked a repository on Github.',
+                ]
+
+        return self._test_data_source_via_emulated_bgtask(
+                source='gh', data_we_expect=data_we_expect,
+                summaries_we_expect=summaries_we_expect)
+        # }}}
+
+    @mock.patch('mysite.customs.github.repos_by_username')
+    @mock.patch('mysite.customs.github.find_primary_language_of_repo', do_nothing)
+    @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
     def test_github_import_via_emulated_bgtask_nonfork(self, mock_github_projects):
         "Test that we can import data from Github. Use a mock list of "
         "fake Github projects so we don't bother the Github API (or waste "
