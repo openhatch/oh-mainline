@@ -113,7 +113,7 @@ def create_citations_from_github_results(dia_id, results,
         if mysite.profile.models.PortfolioEntry.objects.filter(person=person, project=project).count() == 0:
             portfolio_entry = mysite.profile.models.PortfolioEntry(person=person,
                                              project=project,
-                                             project_description=repo.description)
+                                             project_description=repo.description or '')
             portfolio_entry.save()
         portfolio_entry = mysite.profile.models.PortfolioEntry.objects.filter(person=person, project=project)[0]
             
