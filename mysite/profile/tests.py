@@ -1487,6 +1487,14 @@ class EditHomepage(TwillTests):
         #now we should see our bio in the edit form
         tc.go(make_twill_url('http://openhatch.org/profile/views/edit_info'))
         tc.find('asheesh.org')
+        #try an invalid url
+        tc.fv('edit-tags', 'edit-tags-homepage_url', 'htttp://www.asheesh.org/')
+        tc.submit()
+        # check that the form came back with an error
+        tc.find('has_errors')
+        # ensure it didn't get saved
+        tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
+        tc.notfind('htttp')
 
 
 class EditContactBlurbForwarderification(TwillTests):
@@ -1559,7 +1567,7 @@ class EditContactBlurb(TwillTests):
         asheesh_user.save()
         contact_blurb = 'email me here: $fwd'
         contact_blurb_escaped = 'email me here: \$fwd'
-        homepage_url = 'http://mysite.com'
+        homepage_url = 'http://mysite.com/'
         tc.fv("edit-tags", 'edit-tags-contact_blurb', contact_blurb)
         # also enter a homepage so that we can make sure that this gets saved despite our error with the forwarder stuff
         tc.fv("edit-tags", 'edit-tags-homepage_url', homepage_url)
@@ -1568,9 +1576,9 @@ class EditContactBlurb(TwillTests):
         tc.find('contact_blurb_error')
         # make sure that the form remembered the contact blurb that they posted
         tc.find(contact_blurb_escaped)
-        # make sure that their homepage was saved to the database
+        # make sure that their homepage was not saved to the database
         asheesh = Person.get_by_username('paulproteus')
-        self.assertEqual(asheesh.homepage_url, homepage_url)
+        self.assertNotEqual(asheesh.homepage_url, homepage_url)
 
 
 

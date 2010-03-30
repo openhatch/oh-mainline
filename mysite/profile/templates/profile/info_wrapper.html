@@ -46,11 +46,11 @@
         </div>
         <div class='body contains-submodules two-columns'>
             <div class='body'>
-                {% if contact_blurb_error %}
-                <!--contact_blurb_error-->
+                {% if has_errors %}
+                <!--has_errors-->
                 <ul id="error_msg" class="errorlist">
                     <li>
-                        We've saved nearly all of your information, but there was one error.  Please see below.
+                        We found an error in your information, so it wasn't saved.  Please take a look below.
                     </li>
                 </ul>
                 {% endif %}
@@ -66,16 +66,16 @@
 
                         <div class='form-row'>
                             <label>Bio:</label>
-                            <textarea name='edit-tags-bio'>{{ person.bio }}</textarea>
+                            {{ form.bio }}
                             <p class='example'>Example: I like traffic lights. On weekends, I like to make websites, destroy Twitter, and eat breakfast.</p>
                         </div>
 
                         <div class='form-row'>
                             <label>Web site:</label>
-                            <input type='text' name='edit-tags-homepage_url' value='{{ person.homepage_url }}'>
+                            {{ form.homepage_url.errors }}
+                            {{ form.homepage_url }}
                             <p class='example'>Example: http://geociti.es/Heartland/2042/</p>
                         </div>
-
 
                         <div class='form-row'>
                             <h3 style='float: left; width: 95%; margin-bottom: 3px;'>Tag yourself</h3>
@@ -84,19 +84,19 @@
 
                         <div class='form-row'>
                             <label>I understand:</label>
-                            <textarea name='edit-tags-understands'>{{ tags_flat.understands }}</textarea>
+                            {{ form.understands }}
                             <p class='example'>Example: ruby, wordpress, regular expressions, classical guitar</p>
                         </div>
 
                         <div class='form-row'>
                             <label>I will never understand:</label>
-                            <textarea name='edit-tags-understands_not'>{{ tags_flat.understands_not }}</textarea>
+                            {{ form.understands_not }}
                             <p class='example'>Example: Swing, Star Trek, the transcendental deduction, why kids love Cinnamon Toast Crunch</p>
                         </div>
 
                         <div class='form-row'>
                             <label>I'm currently studying:</label>
-                            <textarea name='edit-tags-studying'>{{ tags_flat.studying }}</textarea>
+                            {{ form.studying }}
                             <p class='example'>Example: Qt, DVD DRM circumvention, 合気道, Bayesian inference, neural networks</p>
                         </div>
 
@@ -107,25 +107,26 @@
 
                         <div class='form-row'>
                             <label>When projects need help, I'm willing to pitch in with:</label>
-                            <textarea name='edit-tags-can_pitch_in'>{{ tags_flat.can_pitch_in }}</textarea>
+                            {{ form.can_pitch_in }}
                             <p class='example'>Example: c++, documentation, testing, mac compatibility</p>
                         </div>
 
                         <div class='form-row'>
                             <label>I can mentor in:</label>
-                            <textarea name='edit-tags-can_mentor'>{{ tags_flat.can_mentor }}</textarea>
+                            {{ form.can_mentor }}
                             <p class='example'>Example: python, unicode, git, GTK+</p>
                         </div>
                         <div class='form-row' id='contact_blurb'>
                             <label>How to contact me:</label>
                             {% if contact_blurb_error %}
+                            <!--contact_blurb_error-->
                             <ul id="error_msg" class="errorlist">
                                 <li>
                                 To use our forwarding service, please <a href="{% url mysite.account.views.edit_contact_info %}">tell us your email address</a>!
                                 </li>
                             </ul>
                             {% endif %}
-                            <textarea name='edit-tags-contact_blurb'>{{ contact_blurb }}</textarea>
+                            {{ form.contact_blurb }}
                             <p class='example'>Example: "The best way to reach me is by
                             private message at http://identi.ca/rafpaf."</p>
                             <p class='example'>

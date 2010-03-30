@@ -34,4 +34,14 @@ class ManuallyAddACitationForm(django.forms.ModelForm):
             raise django.forms.ValidationError("Somehow, you submitted "
                     "regarding a portfolio entry that you do not own.")
 
+class EditInfoForm(django.forms.Form):
+  bio = django.forms.CharField(required=False, widget=django.forms.Textarea())
+  homepage_url = django.forms.URLField(required=False)
+  understands = django.forms.CharField(required=False, widget=django.forms.Textarea())
+  understands_not = django.forms.CharField(required=False, widget=django.forms.Textarea())
+  studying = django.forms.CharField(required=False, widget=django.forms.Textarea())
+  can_pitch_in = django.forms.CharField(required=False, widget=django.forms.Textarea())
+  can_mentor = django.forms.CharField(required=False, widget=django.forms.Textarea())
+  contact_blurb = django.forms.CharField(required=False, widget=django.forms.Textarea())
+
 # vim: set nu:
