@@ -17,7 +17,7 @@ _github = github2.client.Github(username=settings.GITHUB_USERNAME,
                                api_token=settings.GITHUB_API_TOKEN)
 
 def _github_repos_list(username):
-    return _github.repos.list(urllib.quote(username))
+    return _github.repos.list(mysite.base.unicode_sanity.quote(username))
 
 def repos_by_username(username):
     try:
@@ -61,7 +61,7 @@ def find_primary_language_of_repo(github_username, github_reponame):
         return '' # No best guess for primary language.
 
 def _pull_data_from_user_activity_feed(github_username):
-    json_url = 'http://github.com/%s.json' % urllib.quote(github_username)
+    json_url = 'http://github.com/%s.json' % mysite.base.unicode_sanity.quote(github_username)
     response = mysite.customs.ohloh.mechanize_get(json_url).response()
     data = simplejson.load(response)
     return data
@@ -69,7 +69,7 @@ def _pull_data_from_user_activity_feed(github_username):
 def _get_repositories_user_watches(github_username):
     '''Returns a list of repo objects.'''
     json_url = 'http://github.com/api/v2/json/repos/watched/%s' % (
-        urllib.quote_plus(github_username))
+        mysite.base.unicode_sanity.quote(github_username))
     try:
         response = mysite.customs.ohloh.mechanize_get(json_url).response()
     except urllib2.HTTPError, e:

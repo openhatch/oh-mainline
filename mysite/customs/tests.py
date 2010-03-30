@@ -538,6 +538,11 @@ class OnlineGithub(django.test.TestCase):
                 found_tircd_yet = True
         self.assertTrue(found_tircd_yet)
 
+    def test_find_unicode_username(self):
+        '''This test gives our github info_by_username a shot.'''
+        repos = list(mysite.customs.github.repos_by_username(u'\xe9 nobody but hey at least he is mister unicode'))
+        self.assertEqual(repos, [])
+
 class OnlineGithubFailures(django.test.TestCase):
     def test_username_404(self):
         '''This test gives our github info_by_username a user to 404 on .'''
