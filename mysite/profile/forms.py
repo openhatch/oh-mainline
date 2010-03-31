@@ -42,6 +42,8 @@ class EditInfoForm(django.forms.Form):
   studying = django.forms.CharField(required=False, widget=django.forms.Textarea())
   can_pitch_in = django.forms.CharField(required=False, widget=django.forms.Textarea())
   can_mentor = django.forms.CharField(required=False, widget=django.forms.Textarea())
+
+class ContactBlurbForm(django.forms.Form):
   contact_blurb = django.forms.CharField(required=False, widget=django.forms.Textarea())
 
 # vim: set nu:

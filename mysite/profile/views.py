@@ -237,33 +237,25 @@ def edit_person_info_do(request):
     person = request.user.get_profile()
 
     edit_info_form = mysite.profile.forms.EditInfoForm(request.POST, prefix='edit-tags')
-
-    if not edit_info_form.is_valid():
-        return edit_info(request, edit_info_form=edit_info_form, has_errors=True)
-
-    posted_contact_blurb = edit_info_form.cleaned_data['contact_blurb']
-    # if their new contact blurb contains $fwd,
-    # make sure that they have an email address in our database
-    # if not, give them an error
-    if '$fwd' in posted_contact_blurb and not person.user.email:
-        return edit_info(request, edit_info_form=edit_info_form, contact_blurb_error=True, has_errors=True)
-    # if their new contact blurb contains $fwd and their old one didn't, then make them a new forwarder
-    if '$fwd' in posted_contact_blurb and not '$fwd' in person.contact_blurb:
-        mysite.base.controllers.generate_forwarder(person.user)
-    person.contact_blurb = posted_contact_blurb
-
-    #grab their submitted bio
-    person.bio = edit_info_form.cleaned_data['bio']
+    contact_blurb_form = mysite.profile.forms.ContactBlurbForm(request.POST, prefix='edit-tags')
+    contact_blurb_error = False
+    errors_occurred = False
 
     # Grab the submitted homepage URL.
-    person.homepage_url = edit_info_form.cleaned_data['homepage_url']
+    if edit_info_form.is_valid():
+        person.homepage_url = edit_info_form.cleaned_data['homepage_url']
+    else:
+        errors_occurred = True
+
+    #grab their submitted bio
+    person.bio = edit_info_form['bio'].data
 
     # We can map from some strings to some TagTypes
     for known_tag_type_name in ('understands', 'understands_not',
                            'studying', 'can_pitch_in', 'can_mentor'):
         tag_type, _ = TagType.objects.get_or_create(name=known_tag_type_name)
 
-        text = edit_info_form.cleaned_data[known_tag_type_name]
+        text = edit_info_form[known_tag_type_name].data
         # Set the tags to this thing
         new_tag_texts_for_this_type_raw = text.split(',')
         new_tag_texts_for_this_type = [tag.strip()
@@ -288,12 +280,33 @@ def edit_person_info_do(request):
             new_link, _ = Link_Person_Tag.objects.get_or_create(
                     tag=tag, person=person)
 
+    posted_contact_blurb = contact_blurb_form['contact_blurb'].data
+    # if their new contact blurb contains $fwd,
+    # make sure that they have an email address in our database
+    # if not, give them an error
+    if '$fwd' in posted_contact_blurb and not person.user.email:
+        contact_blurb_error = True
+        errors_occurred = True
+    else:
+        # if their new contact blurb contains $fwd and their old one didn't, then make them a new forwarder
+        if '$fwd' in posted_contact_blurb and not '$fwd' in person.contact_blurb:
+            mysite.base.controllers.generate_forwarder(person.user)
+        person.contact_blurb = posted_contact_blurb
+
     person.save()
 
     # Enqueue a background task to re-index the person
     task = mysite.profile.tasks.ReindexPerson()
     task.delay(person_id=person.id)
-    return HttpResponseRedirect(person.profile_url)
+
+    if errors_occurred:
+        return edit_info(request,
+                         edit_info_form=edit_info_form,
+                         contact_blurb_form=contact_blurb_form,
+                         contact_blurb_error=contact_blurb_error,
+                         has_errors=errors_occurred)
+    else:
+        return HttpResponseRedirect(person.profile_url)
 
     # FIXME: This is racey. Only one of these functions should run at once.
     # }}}
@@ -996,7 +1009,7 @@ def set_expand_next_steps_do(request):
 
 @login_required
 @view
-def edit_info(request, edit_info_form=None, contact_blurb_error=False, has_errors=False):
+def edit_info(request, contact_blurb_error=False, edit_info_form=None, contact_blurb_form=None, has_errors=False):
     person = request.user.get_profile()
     data = get_personal_data(person)
     data['info_edit_mode'] = True
@@ -1009,9 +1022,13 @@ def edit_info(request, edit_info_form=None, contact_blurb_error=False, has_error
           'studying': data['tags_flat'].get('studying', ''),
           'can_pitch_in': data['tags_flat'].get('can_pitch_in', ''),
           'can_mentor': data['tags_flat'].get('can_mentor', ''),
+        }, prefix='edit-tags')
+    if contact_blurb_form is None:
+        contact_blurb_form = mysite.profile.forms.ContactBlurbForm(initial={
           'contact_blurb': person.contact_blurb,
         }, prefix='edit-tags')
     data['form'] = edit_info_form
+    data['contact_blurb_form'] = contact_blurb_form
     data['contact_blurb_error'] = contact_blurb_error
     data['has_errors'] = has_errors
     return request, 'profile/info_wrapper.html', data

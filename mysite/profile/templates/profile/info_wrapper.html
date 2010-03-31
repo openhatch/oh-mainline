@@ -50,7 +50,7 @@
                 <!--has_errors-->
                 <ul id="error_msg" class="errorlist">
                     <li>
-                        We found an error in your information, so it wasn't saved.  Please take a look below.
+                        We've saved nearly all of your information, but there was one error.  Please see below.
                     </li>
                 </ul>
                 {% endif %}
@@ -126,7 +126,7 @@
                                 </li>
                             </ul>
                             {% endif %}
-                            {{ form.contact_blurb }}
+                            {{ contact_blurb_form.contact_blurb }}
                             <p class='example'>Example: "The best way to reach me is by
                             private message at http://identi.ca/rafpaf."</p>
                             <p class='example'>

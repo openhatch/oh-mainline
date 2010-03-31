@@ -1576,9 +1576,9 @@ class EditContactBlurb(TwillTests):
         tc.find('contact_blurb_error')
         # make sure that the form remembered the contact blurb that they posted
         tc.find(contact_blurb_escaped)
-        # make sure that their homepage was not saved to the database
+        # make sure that their homepage was saved to the database
         asheesh = Person.get_by_username('paulproteus')
-        self.assertNotEqual(asheesh.homepage_url, homepage_url)
+        self.assertEqual(asheesh.homepage_url, homepage_url)
 
 
 
