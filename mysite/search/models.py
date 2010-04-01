@@ -15,6 +15,7 @@ import mysite.base.unicode_sanity
 from django.core.urlresolvers import reverse
 import voting
 import hashlib
+import celery.decorators
 
 class OpenHatchModel(models.Model):
     created_date = models.DateTimeField(null=True, auto_now_add=True)
@@ -403,6 +404,28 @@ class BugAlert(OpenHatchModel):
     how_many_bugs_at_time_of_request = models.IntegerField()
     email = models.EmailField(max_length=255)
 
+class Epoch(OpenHatchModel):
+    # The modified_date column in this can be passed to
+    # functions that cache based on their arguments. Careful
+    # updating of this table can create convenient, implicit
+    # cache expiry.
+    class_name = models.CharField(null=False,
+                                  blank=False,
+                                  unique=True,
+                                  max_length=255)
+
+    @staticmethod
+    def get_for_model(class_object):
+        return 0
+
+    @staticmethod
+    def bump_for_model(class_object):
+        class_name = unicode(class_object)
+        epoch, _ = Epoch.objects.get_or_create(
+            class_name=class_name)
+        epoch.save() # unconditionally
+        return epoch
+
 class HitCountCache(OpenHatchModel):
     hashed_query = models.CharField(max_length=40, primary_key=True) # stores a sha1 
     hit_count = models.IntegerField()
@@ -412,9 +435,18 @@ class HitCountCache(OpenHatchModel):
         # Ignore arguments passed here by Django signals.
         HitCountCache.objects.all().delete()
 
+@celery.decorators.task
+def increment_bug_epoch(sender, instance, **kwargs):
+    pass
+    
+
 # Clear the cache whenever Bugs are added or removed.
 models.signals.post_save.connect(HitCountCache.clear_cache, Bug)
 models.signals.post_delete.connect(HitCountCache.clear_cache, Bug)
+
+# Clear all people's recommended bug cache when a bug is deleted
+# (or when it has been modified to say it looks_closed)
+models.signals.post_save.connect(increment_bug_epoch, Bug)
 
 # Re-index the person when he says he likes a new project
 def update_the_person_index_from_project(sender, instance, **kwargs):
