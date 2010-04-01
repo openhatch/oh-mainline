@@ -1531,14 +1531,15 @@ class TestEpoch(TwillTests):
     def test(self):
         # There's no Epoch for bugs yet, right?
         now = mysite.search.models.Epoch.get_for_model(mysite.search.models.Bug)
-        self.assertEqual(now, 0)
+        self.assertEqual(now, mysite.search.models.Epoch.zero_hour)
 
         # Making a Bug should not bump the Epoch
         p = mysite.search.models.Project.create_dummy()
         b = mysite.search.models.Bug.create_dummy(project=p)
 
         now = mysite.search.models.Epoch.get_for_model(mysite.search.models.Bug)
-        self.assertEqual(now, 0)
+        self.assertEqual(now,
+                         mysite.search.models.Epoch.zero_hour)
 
         # Setting the bug to looks_closed should bump the Epoch
         b.looks_closed = True
@@ -1546,12 +1547,11 @@ class TestEpoch(TwillTests):
 
         # Now it's higher, right?
         now = mysite.search.models.Epoch.get_for_model(mysite.search.models.Bug)
-        self.assert_(now > 0)
+        self.assert_(now > mysite.search.models.Epoch.zero_hour)
 
         # Deleting that Bug should bump the Epoch once more
         b.delete()
         later = mysite.search.models.Epoch.get_for_model(mysite.search.models.Bug)
         self.assert_(later > now)
-
 
 # vim: set nu ai et ts=4 sw=4:

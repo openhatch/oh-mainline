@@ -405,6 +405,7 @@ class BugAlert(OpenHatchModel):
     email = models.EmailField(max_length=255)
 
 class Epoch(OpenHatchModel):
+    zero_hour = datetime.datetime.fromtimestamp(0).timetuple()
     # The modified_date column in this can be passed to
     # functions that cache based on their arguments. Careful
     # updating of this table can create convenient, implicit
@@ -416,14 +417,20 @@ class Epoch(OpenHatchModel):
 
     @staticmethod
     def get_for_model(class_object):
-        return 0
+        class_name = unicode(str(class_object))
+        matches = Epoch.objects.filter(class_name=class_name)
+        if matches:
+            match = matches[0]
+            return match.modified_date.timetuple()
+        return Epoch.zero_hour
 
     @staticmethod
     def bump_for_model(class_object):
-        class_name = unicode(class_object)
+        class_name = unicode(str(class_object))
         epoch, _ = Epoch.objects.get_or_create(
             class_name=class_name)
-        epoch.save() # unconditionally
+        epoch.modified_date = datetime.datetime.utcnow()
+        epoch.save() # definitely!
         return epoch
 
 class HitCountCache(OpenHatchModel):
@@ -435,10 +442,16 @@ class HitCountCache(OpenHatchModel):
         # Ignore arguments passed here by Django signals.
         HitCountCache.objects.all().delete()
 
-@celery.decorators.task
-def increment_bug_epoch(sender, instance, **kwargs):
-    pass
-    
+def post_bug_save_increment_bug_model_epoch(sender, instance, created, **kwargs):
+    if created:
+        return # whatever, who cares
+    if instance.looks_closed:
+        # bump it
+        mysite.search.models.Epoch.bump_for_model(sender)
+
+def post_bug_delete_increment_bug_model_epoch(sender, instance, **kwargs):
+    # always bump it
+    mysite.search.models.Epoch.bump_for_model(sender)
 
 # Clear the cache whenever Bugs are added or removed.
 models.signals.post_save.connect(HitCountCache.clear_cache, Bug)
@@ -446,7 +459,13 @@ models.signals.post_delete.connect(HitCountCache.clear_cache, Bug)
 
 # Clear all people's recommended bug cache when a bug is deleted
 # (or when it has been modified to say it looks_closed)
-models.signals.post_save.connect(increment_bug_epoch, Bug)
+models.signals.post_save.connect(
+    post_bug_save_increment_bug_model_epoch,
+    Bug)
+
+models.signals.post_delete.connect(
+    post_bug_delete_increment_bug_model_epoch,
+    Bug)
 
 # Re-index the person when he says he likes a new project
 def update_the_person_index_from_project(sender, instance, **kwargs):
