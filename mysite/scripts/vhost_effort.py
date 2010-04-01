@@ -76,7 +76,7 @@ def aggregate_stats_to_fake_du_in_cwd(**kwargs):
 
 def main():
     import glob
-    musecs, bytes, hitcount = gen_aggregate_stats_from_files(glob.glob('../*super*log'))
+    musecs, bytes, hitcount = gen_aggregate_stats_from_files(sys.argv[1:])
     aggregate_stats_to_fake_du_in_cwd(musecs=musecs, bytes=bytes, hitcount=hitcount)
 
 if __name__ == '__main__':
