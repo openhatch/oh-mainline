@@ -1,9 +1,8 @@
-#!/usr/bin/python
+#!../../bin/python
 
 import sys
 import getopt
 
-sys.path.insert(0, '/home/paulproteus/cctools/log_analysis/')
 import sisynala.main
 
 def parseApacheLine(s):
