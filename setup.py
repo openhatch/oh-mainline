@@ -26,6 +26,7 @@ setup(
                         'pygeoip==0.1.3',
                         'django-debug-toolbar==0.8.1',
                         'pysolr',
+                        'sisynala',
                         'django-haystack',
                         'hexagonit.recipe.download',
                         'django-voting',
