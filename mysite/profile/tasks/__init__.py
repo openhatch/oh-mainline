@@ -1,4 +1,5 @@
 import sys
+import logging
 import os
 from datetime import timedelta
 import datetime
@@ -354,15 +355,15 @@ def update_someones_pf_cache(person__pk):
 
 @periodic_task(run_every=datetime.timedelta(minutes=10))
 def fill_recommended_bugs_cache():
-    logger.info("Filling recommended bugs cache for all people.")
+    logging.info("Filling recommended bugs cache for all people.")
     for person in Person.objects.all():
         suggested_searches = person.get_recommended_search_terms() # expensive?
         recommended_bugs = mysite.profile.controllers.recommend_bugs(suggested_searches, n=5) # cache fill
-    logger.info("Finished filling recommended bugs cache for all people.")
+    logging.info("Finished filling recommended bugs cache for all people.")
 
 @periodic_task(run_every=datetime.timedelta(hours=1))
 def sync_bug_epoch_from_model_then_fill_recommended_bugs_cache():
-    logger.info("Syncing bug epoch...")
+    logging.info("Syncing bug epoch...")
     # Find the highest bug object modified date
     from django.db.models import Max
     highest_bug_mtime = Bug.all_bugs.all().aggregate(
@@ -373,7 +374,7 @@ def sync_bug_epoch_from_model_then_fill_recommended_bugs_cache():
     if highest_bug_mtime > epoch:
         mysite.search.models.Epoch.bump_for_model(
             mysite.search.models.Bug)
-        logger.info("Whee! Bumped the epoch. Guess I'll fill the cache.")
+        logging.info("Whee! Bumped the epoch. Guess I'll fill the cache.")
         fill_recommended_bugs_cache.delay()
-    logger.info("Done syncing bug epoch.")
+    logging.info("Done syncing bug epoch.")
     
