@@ -5,10 +5,11 @@ from django.core.handlers.wsgi import WSGIHandler
 from django.core.servers.basehttp import AdminMediaHandler 
 from StringIO import StringIO
 from django.test.client import Client
-import mysite.base.helpers
-import mock
 import urllib
 
+import mock
+
+import mysite.base.helpers
 import mysite.base.controllers
 import mysite.base.decorators
 import mysite.search.models
@@ -35,10 +36,15 @@ def twill_quiet():
     # call this if you want an interactive session
     twill.set_output(StringIO())
 
+mock_get = mock.Mock()
+mock_get.return_value = None
+
 class TwillTests(django.test.TestCase):
     '''Some basic methods needed by other testing classes.'''
     # {{{
     def setUp(self):
+        self.real_get = django.core.cache.cache.get
+        django.core.cache.cache.get = mock_get
         from django.conf import settings
         self.old_dbe = settings.DEBUG_PROPAGATE_EXCEPTIONS
         settings.DEBUG_PROPAGATE_EXCEPTIONS = True
@@ -51,6 +57,7 @@ class TwillTests(django.test.TestCase):
         from django.conf import settings
         settings.DEBUG_PROPAGATE_EXCEPTIONS = self.old_dbe
         twill_teardown()
+        django.core.cache.cache.get = self.real_get
 
     def login_with_twill(self):
         # Visit login page
