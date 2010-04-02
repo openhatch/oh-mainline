@@ -1,10 +1,13 @@
 from decorator import decorator
 from odict import odict
+import logging
+from django.http import HttpResponse
 import re
 import collections
 import mysite.base.helpers
 import simplejson
 import django.core.cache
+import sha
 from functools import partial
 
 from django.template.loader import render_to_string
@@ -73,6 +76,34 @@ def no_str_in_the_list(l):
 def decorator_factory(decfac): # partial is functools.partial
     "decorator_factory(decfac) returns a one-parameter family of decorators"
     return partial(lambda df, param: decorator(partial(df, param)), decfac)
+
+@decorator
+def cache_function_that_takes_request(func, *args, **kwargs):
+    # Let's check to see whether we can avoid all this expensive DB jiggery after all
+    request = args[0]
+
+    # Calculate the cache key...
+    key_data = []
+    # 1. user string
+    user_string = None
+    if request.user.is_authenticated():
+        user_string = request.user.username
+    key_data.append(user_string)
+    # 2. path_info
+    key_data.append(request.path_info)
+    # 3. query string
+    key_data.append(request.META.get('QUERY_STRING', ''))
+
+    key_string = 'cache_request_function_' + sha.sha(repr(key_data)).hexdigest()
+    content = django.core.cache.cache.get(key_string, None)
+    if content:
+        response = HttpResponse(content)
+    else:
+        logging.info("Cache cold for %s", repr(key_data))
+        response = func(*args, **kwargs)
+        content = response.content
+        django.core.cache.cache.set(key_string, content, 360) # uh, six minutes, sure
+    return response
 
 @decorator_factory 
 def cache_method(cache_key_getter_name, func, *args, **kwargs):

@@ -117,9 +117,7 @@ def project(request, project__name = None):
             'project/project.html',
             context)
 
-from django.views.decorators.cache import cache_page
-@cache_page(60 * 15)
-
+@mysite.base.decorators.cache_function_that_takes_request
 def projects(request):
     data = {}
     query = request.GET.get('q', '')
