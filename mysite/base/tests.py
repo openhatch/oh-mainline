@@ -195,7 +195,7 @@ class CacheMethod(TwillTests):
         self.assertEqual(sc.some_method(), '1')
 
         # Step 3: See if the cache has it now
-        mock_cache.set.assert_called_with('doodles', '"1"', 86400 * 10)
+        mock_cache.set.assert_called_with('doodles', '{"value": "1"}', 86400 * 10)
 
 class EnhanceNextWithNewUserMetadata(TwillTests):
     def test_easy(self):
