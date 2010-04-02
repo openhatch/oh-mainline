@@ -27,6 +27,7 @@ import urllib
 from urllib2 import HTTPError
 import simplejson
 import datetime
+from dateutil.tz import tzutc
 import ohloh
 import lp_grabber
 
@@ -655,6 +656,53 @@ class TracBug(django.test.TestCase):
             weird_chars)
         self.assertEqual(unicoded, '')
         
+
+    @mock.patch('mysite.customs.bugtrackers.trac.TracBug.as_bug_specific_csv_data')
+    def test_create_bug_object_data_dict_more_recent(self, m):
+        m.return_value = {
+            'branch': '',
+            'branch_author': '',
+            'cc': 'thijs_ exarkun',
+            'component': 'core',
+            'description': "This package hasn't been touched in 4 years which either means it's stable or not being used at all. Let's deprecate it (also see #4111).",
+            'id': '4298',
+            'keywords': 'easy',
+            'launchpad_bug': '',
+            'milestone': '',
+            'owner': 'djfroofy',
+            'priority': 'normal',
+            'reporter': 'thijs',
+            'resolution': '',
+            'status': 'new',
+            'summary': 'Deprecate twisted.persisted.journal',
+            'type': 'task'}
+        tb = mysite.customs.bugtrackers.trac.TracBug(
+            bug_id=4298,
+            BASE_URL='http://twistedmatrix.com/trac/')
+        cached_html_filename = os.path.join(settings.MEDIA_ROOT, 'sample-data', 'twisted-trac-4298-on-2010-04-02.html')
+        tb._bug_html_page = unicode(
+            open(cached_html_filename).read(), 'utf-8')
+
+        got = tb.as_data_dict_for_bug_object()
+        wanted = {'title': 'Deprecate twisted.persisted.journal',
+                  'description': "This package hasn't been touched in 4 years which either means it's stable or not being used at all. Let's deprecate it (also see #4111).",
+                  'status': 'new',
+                  'importance': 'normal',
+                  'people_involved': 4,
+                  # FIXME: Need time zone
+                  'date_reported': datetime.datetime(2010, 2, 23, 0, 46, 30, tzinfo=tzutc()),
+                  'last_touched': datetime.datetime(2010, 3, 12, 18, 43, 5, tzinfo=tzutc()),
+                  'looks_closed': False,
+                  'submitter_username': 'thijs',
+                  'submitter_realname': '',
+                  'canonical_bug_link': 'http://twistedmatrix.com/trac/ticket/4298',
+                  'good_for_newcomers': True,
+                  'looks_closed': False,
+                  'bite_size_tag_name': 'easy',
+                  'concerns_just_documentation': False,
+                  'as_appears_in_distribution': '',
+                  }
+        self.assertEqual(wanted, got)
 
     @mock.patch('mysite.customs.bugtrackers.trac.TracBug.as_bug_specific_csv_data')
     def test_create_bug_object_data_dict(self, m):

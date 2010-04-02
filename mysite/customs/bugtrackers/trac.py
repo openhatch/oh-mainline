@@ -1,9 +1,12 @@
 import csv
 import datetime
-import mysite.customs.ohloh
+import urlparse
+
+import dateutil.parser
 import lxml.html
 import lxml.html.clean
-import urlparse
+
+import mysite.customs.ohloh
 import mysite.search.templatetags.search
 
 def twisted_csv_of_easy_bugs():
@@ -34,13 +37,17 @@ class TracBug:
 
     @staticmethod
     def page2date_opened(doc):
-        span = doc.cssselect ('.date p:contains("Opened") span')[0]
+        span = doc.cssselect(
+            '''.date p:contains("Opened") span,
+            .date p:contains("Opened") a''')[0]
         return TracBug._span2date(span)
 
     @staticmethod
     def page2date_modified(doc):
         try:
-            span = doc.cssselect ('.date p:contains("Last modified") span')[0]
+            span = doc.cssselect(
+                '''.date p:contains("Last modified") span,
+                .date p:contains("Last modified") a''')[0]
         except IndexError:
             return TracBug.page2date_opened(doc)
         return TracBug._span2date(span)
@@ -48,22 +55,12 @@ class TracBug:
     @staticmethod
     def _span2date(span):
         date_string = span.attrib['title']
-        d = datetime.datetime.strptime(
-            date_string, '%m/%d/%Y %H:%M:%S %p')
-        # %p does not seem to affect interpretation of
-        # the hours value. strptime blows.
-
-        # for most PM hours, +12 adjustment
-        if 'PM' in date_string:
-            # but 12 PM remains 12 PM
-            if d.hour != 12:
-                d += datetime.timedelta(hours=12)
-
-        # For 12 AM, subtract 12
-        if 'AM' in date_string:
-            if d.hour == 12:
-                d -= datetime.timedelta(hours=12)
-
+        date_string = date_string.replace('in Timeline', '')
+        time_zoned = dateutil.parser.parse(date_string)
+        if time_zoned.tzinfo:
+            d = time_zoned.astimezone(dateutil.tz.tzutc())
+        else:
+            d = time_zoned # best we can do
         return d
 
     @staticmethod
@@ -158,6 +155,9 @@ class TracBug:
         all_people.update(
             map(lambda x: x.strip(),
                 page_metadata.get('Cc', '').split(',')))
+        all_people.update(
+            map(lambda x: x.strip(),
+                page_metadata.get('Cc:', '').split(',')))
         try:
             assignee = page_metadata['Assigned to:']
         except KeyError:
