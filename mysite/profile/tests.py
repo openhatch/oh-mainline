@@ -2174,4 +2174,16 @@ class PeopleMapForNonexistentProject(TwillTests):
         response = mysite.profile.views.people(mock_request)
         # Yay, no exception.
 
+class BugModificationTimeVersusEpoch(TwillTests):
+    @mock.patch('mysite.profile.tasks.fill_recommended_bugs_cache.delay')
+    def test(self, mock_thing):
+        epoch_at_start = mysite.search.models.Epoch.get_for_model(
+            mysite.search.models.Bug)
+        b = mysite.search.models.Bug.create_dummy_with_project()
+        mysite.profile.tasks.sync_bug_epoch_from_model_then_fill_recommended_bugs_cache()
+        new_epoch = mysite.search.models.Epoch.get_for_model(
+            mysite.search.models.Bug)
+        self.assert_(new_epoch > epoch_at_start)
+        self.assert_(mock_thing.called)
+
  # vim: set ai et ts=4 sw=4 nu:

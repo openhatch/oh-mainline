@@ -372,7 +372,7 @@ def sync_bug_epoch_from_model_then_fill_recommended_bugs_cache():
     epoch = mysite.search.models.Epoch.get_for_model(
         mysite.search.models.Bug)
     # if the epoch is lower, then set the epoch to that value
-    if highest_bug_mtime > epoch:
+    if highest_bug_mtime.timetuple() > epoch:
         mysite.search.models.Epoch.bump_for_model(
             mysite.search.models.Bug)
         logging.info("Whee! Bumped the epoch. Guess I'll fill the cache.")
