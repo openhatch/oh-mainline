@@ -10,12 +10,14 @@ import mysite.customs.github
 import mysite.customs.debianqa
 import mysite.profile.models
 from mysite.search.models import Project
+from celery.decorators import task, periodic_task
 from celery.task import Task, PeriodicTask
 import celery.registry
 import time
 import random
 import traceback
 import mysite.profile.search_indexes
+import mysite.profile.controllers
 
 from django.conf import settings
 import django.core.cache
@@ -332,8 +334,6 @@ try:
 except celery.registry.AlreadyRegistered:
     pass
 
-from celery.decorators import task
-
 @task
 def update_person_tag_cache(person__pk):
     person = mysite.profile.models.Person.objects.get(pk=person__pk)
@@ -351,3 +351,29 @@ def update_someones_pf_cache(person__pk):
     
     # This getter will populate the cache
     return person.get_list_of_project_names()
+
+@periodic_task(run_every=datetime.timedelta(minutes=10))
+def fill_recommended_bugs_cache():
+    logger.info("Filling recommended bugs cache for all people.")
+    for person in Person.objects.all():
+        suggested_searches = person.get_recommended_search_terms() # expensive?
+        recommended_bugs = mysite.profile.controllers.recommend_bugs(suggested_searches, n=5) # cache fill
+    logger.info("Finished filling recommended bugs cache for all people.")
+
+@periodic_task(run_every=datetime.timedelta(hours=1))
+def sync_bug_epoch_from_model_then_fill_recommended_bugs_cache():
+    logger.info("Syncing bug epoch...")
+    # Find the highest bug object modified date
+    from django.db.models import Max
+    highest_bug_mtime = Bug.all_bugs.all().aggregate(
+        Max('modified_date')).values()[0]
+    epoch = mysite.search.models.Epoch.get_for_model(
+        mysite.search.models.Bug)
+    # if the epoch is lower, then set the epoch to that value
+    if highest_bug_mtime > epoch:
+        mysite.search.models.Epoch.bump_for_model(
+            mysite.search.models.Bug)
+        logger.info("Whee! Bumped the epoch. Guess I'll fill the cache.")
+        fill_recommended_bugs_cache.delay()
+    logger.info("Done syncing bug epoch.")
+    

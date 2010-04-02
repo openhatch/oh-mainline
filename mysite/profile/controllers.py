@@ -1,9 +1,15 @@
-import mysite.search.controllers
-import mysite.profile.models
-from itertools import izip, cycle, islice
-import pygeoip
-from django.conf import settings
 import os.path
+import sha
+from itertools import izip, cycle, islice
+
+import pygeoip
+
+from django.conf import settings
+
+import mysite.search.controllers
+import mysite.search.models
+import mysite.profile.models
+import mysite.base.decorators
 
 ## roundrobin() taken from http://docs.python.org/library/itertools.html
 
@@ -20,28 +26,57 @@ def roundrobin(*iterables):
             pending -= 1
             nexts = cycle(islice(nexts, pending))
 
-def recommend_bugs(terms, n):
-    '''Input: A list of terms, like ['Python', 'C#'], designed for use in the search engine.
+class RecommendBugs(object):
+    def __init__(self, terms, n):
+        self.terms = terms
+        self.n = n
 
-    I am a generator that yields Bug objects.
-    I yield up to n Bugs in a round-robin fashion.
-    I don't yield a Bug more than once.'''
+    def get_cache_key(self):
+        prefix = 'bug_recommendation_cache_'
+        bug_epoch = mysite.search.models.Epoch.get_for_model(
+            mysite.search.models.Bug)
+        suffix_input = [self.terms, self.n, bug_epoch]
+        return prefix + '_' + sha.sha(repr(suffix_input)).hexdigest()
 
-    distinct_ids = set()
+    def recommend(self):
+        ret = []
+        for bug_id in self._recommend_as_list():
+            try:
+                bug = mysite.search.models.Bug.all_bugs.get(pk=bug_id)
+            except mysite.search.models.Bug.DoesNotExist:
+                logger.info("WTF, bug missing. Whatever.")
+                continue
+            ret.append(bug)
+        return ret
 
-    lists_of_bugs = [
-        mysite.search.controllers.order_bugs(
-            mysite.search.controllers.Query(terms=[t]).get_bugs_unordered())
-        for t in terms]
-    number_emitted = 0
+    @mysite.base.decorators.cache_method('get_cache_key')
+    def _recommend_as_list(self):
+        return list(self._recommend_as_generator())
+    
+    def _recommend_as_generator(self):
+        '''Input: A list of terms, like ['Python', 'C#'], designed for use in the search engine.
+
+        I am a generator that yields Bug objects.
+        I yield up to n Bugs in a round-robin fashion.
+        I don't yield a Bug more than once.'''
         
-    for bug in roundrobin(*lists_of_bugs):
-        if number_emitted >= n:
-            raise StopIteration
-        if bug.id not in distinct_ids:
+        distinct_ids = set()
+
+        lists_of_bugs = [
+            mysite.search.controllers.order_bugs(
+                mysite.search.controllers.Query(terms=[t]).get_bugs_unordered())
+            for t in self.terms]
+        number_emitted = 0
+
+        for bug in roundrobin(*lists_of_bugs):
+            if number_emitted >= self.n:
+                raise StopIteration
+            if bug.id in distinct_ids:
+                continue
+            # otherwise...
             number_emitted += 1
             distinct_ids.add(bug.id)
-            yield bug
+            yield bug.id
 
 def people_matching(property, value):
     links = mysite.profile.models.Link_Person_Tag.objects.filter(

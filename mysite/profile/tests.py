@@ -781,7 +781,8 @@ class BugsAreRecommended(TwillTests):
         # So if we create two Python bugs and one C# bug, and we set N to 2,
         # and paulproteus ought to get hits from Python and C#, we should see
         # only one Python bug.
-        recommended = list(mysite.profile.controllers.recommend_bugs(['Python', 'C#'], n=2))
+        recommender = mysite.profile.controllers.RecommendBugs(['Python', 'C#'], n=2)
+        recommended = list(recommender.recommend())
         python_bugs = [ bug for bug in recommended if bug.project.language == 'Python']
         self.assertEqual(len(python_bugs), 1)
         csharp_bugs = [ bug for bug in recommended if bug.project.language == 'C#']
@@ -789,7 +790,8 @@ class BugsAreRecommended(TwillTests):
         
     def test_recommendations_not_duplicated(self):
         """ Run two equivalent searches in parallel, and discover that they weed out duplicates."""
-        recommended = list(mysite.profile.controllers.recommend_bugs(['Python', 'Python'], n=2))
+        recommender = mysite.profile.controllers.RecommendBugs(['Python', 'Python'], n=2)
+        recommended = list(recommender.recommend())
         self.assertNotEqual(recommended[0], recommended[1])
 
 class PersonInfoLinksToSearch(TwillTests):

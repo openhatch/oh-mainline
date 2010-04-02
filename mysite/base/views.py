@@ -34,7 +34,9 @@ def home(request):
     recommended_bugs = []
     if request.user.is_authenticated():
         suggested_searches = request.user.get_profile().get_recommended_search_terms()
-        recommended_bugs = mysite.profile.controllers.recommend_bugs(suggested_searches, n=5)
+        recommender = mysite.profile.controllers.RecommendBugs(
+            suggested_searches, n=5)
+        recommended_bugs = recommender.recommend()
 
     data['recommended_bugs'] = list(recommended_bugs) # A list so we can tell if it's empty
 
