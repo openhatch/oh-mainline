@@ -358,7 +358,8 @@ def fill_recommended_bugs_cache():
     logging.info("Filling recommended bugs cache for all people.")
     for person in mysite.profile.models.Person.objects.all():
         suggested_searches = person.get_recommended_search_terms() # expensive?
-        recommended_bugs = mysite.profile.controllers.recommend_bugs(suggested_searches, n=5) # cache fill
+        recommender = mysite.profile.controllers.RecommendBugs(suggested_searches, n=5) # cache fill prep...
+        recommender.recommend() # cache fill do it.
     logging.info("Finished filling recommended bugs cache for all people.")
 
 @periodic_task(run_every=datetime.timedelta(hours=1))
