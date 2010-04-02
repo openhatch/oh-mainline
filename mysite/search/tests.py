@@ -1528,7 +1528,7 @@ class CreateAnswer(TwillTests):
         self.assertContains(project_page, record.author.username)
 
 class TestEpoch(TwillTests):
-    def test(self):
+    def test_on_mark_looks_closed(self):
         # There's no Epoch for bugs yet, right?
         now = mysite.search.models.Epoch.get_for_model(mysite.search.models.Bug)
         self.assertEqual(now, mysite.search.models.Epoch.zero_hour)
@@ -1549,7 +1549,20 @@ class TestEpoch(TwillTests):
         now = mysite.search.models.Epoch.get_for_model(mysite.search.models.Bug)
         self.assert_(now > mysite.search.models.Epoch.zero_hour)
 
-        # Deleting that Bug should bump the Epoch once more
+    def test_on_delete(self):
+        # There's no Epoch for bugs yet, right?
+        now = mysite.search.models.Epoch.get_for_model(mysite.search.models.Bug)
+        self.assertEqual(now, mysite.search.models.Epoch.zero_hour)
+
+        # Making a Bug should not bump the Epoch
+        p = mysite.search.models.Project.create_dummy()
+        b = mysite.search.models.Bug.create_dummy(project=p)
+
+        now = mysite.search.models.Epoch.get_for_model(mysite.search.models.Bug)
+        self.assertEqual(now,
+                         mysite.search.models.Epoch.zero_hour)
+
+        # Deleting that Bug should bump the Epoch
         b.delete()
         later = mysite.search.models.Epoch.get_for_model(mysite.search.models.Bug)
         self.assert_(later > now)
