@@ -86,7 +86,7 @@ def cache_method(cache_key_getter_name, func, *args, **kwargs):
         cached_json = simplejson.dumps({'value': value})
         import logging
         django.core.cache.cache.set(cache_key, cached_json, 864000)
-        logging.info('cached output of func.__name__: %s' % cached_json)
+        logging.info('cached output of %s: %s' % (func.__name__, cached_json))
     else:
         value = simplejson.loads(cached_json)['value']
 
