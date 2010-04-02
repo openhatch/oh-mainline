@@ -108,7 +108,7 @@ class TestUriDataHelper(TwillTests):
         self.assertEqual(data, {'uri_scheme': 'https',
                                 'url_prefix': 'name'})
 
-class Geocoder(TwillTests):
+class GeocoderCanGeocode(TwillTests):
 
     def get_geocoding_in_json_for_unicode_string(self):
         unicode_str = u'Bark\xe5ker, T\xf8nsberg, Vestfold, Norway'
@@ -119,18 +119,25 @@ class Geocoder(TwillTests):
     def test_unicode_string(self):
         self.get_geocoding_in_json_for_unicode_string()
 
+class GeocoderCanCache(django.test.TestCase):
+
+    def get_geocoding_in_json_for_unicode_string(self):
+        unicode_str = u'Bark\xe5ker, T\xf8nsberg, Vestfold, Norway'
+
+        # Just exercise the geocoder and ensure it doesn't blow up.
+        return mysite.base.controllers.cached_geocoding_in_json(unicode_str)
+
     mock_geocoder = mock.Mock()
     @mock.patch("mysite.base.controllers._geocode", mock_geocoder)
     def test_unicode_strings_get_cached(self):
-        ### WHOA This test sets the Django cache engine back to working properly.
-        django.core.cache.cache.get = self.real_get
+        ### NOTE This test uses django.tests.TestCase to skip our monkey-patching of the cache framework
         # When the geocoder's results are being cached properly, 
         # the base controller named '_geocode' will not run more than once.
         original_json = "{'key': 'original value'}"
         different_json = "{'key': 'if caching works we should never get this value'}"
-        self.mock_geocoder.return_value = original_json 
+        self.mock_geocoder.return_value = eval(original_json)
         self.assert_('original value' in self.get_geocoding_in_json_for_unicode_string()) 
-        self.mock_geocoder.return_value = different_json
+        self.mock_geocoder.return_value = eval(different_json)
         try:
             json = self.get_geocoding_in_json_for_unicode_string()
             self.assert_('original value' in json) 
