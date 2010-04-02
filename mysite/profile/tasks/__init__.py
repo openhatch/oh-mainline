@@ -356,7 +356,7 @@ def update_someones_pf_cache(person__pk):
 @periodic_task(run_every=datetime.timedelta(minutes=10))
 def fill_recommended_bugs_cache():
     logging.info("Filling recommended bugs cache for all people.")
-    for person in Person.objects.all():
+    for person in mysite.profile.models.Person.objects.all():
         suggested_searches = person.get_recommended_search_terms() # expensive?
         recommended_bugs = mysite.profile.controllers.recommend_bugs(suggested_searches, n=5) # cache fill
     logging.info("Finished filling recommended bugs cache for all people.")
@@ -366,7 +366,7 @@ def sync_bug_epoch_from_model_then_fill_recommended_bugs_cache():
     logging.info("Syncing bug epoch...")
     # Find the highest bug object modified date
     from django.db.models import Max
-    highest_bug_mtime = Bug.all_bugs.all().aggregate(
+    highest_bug_mtime = mysite.search.models.Bug.all_bugs.all().aggregate(
         Max('modified_date')).values()[0]
     epoch = mysite.search.models.Epoch.get_for_model(
         mysite.search.models.Bug)
