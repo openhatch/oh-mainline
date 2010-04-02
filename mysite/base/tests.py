@@ -122,6 +122,8 @@ class Geocoder(TwillTests):
     mock_geocoder = mock.Mock()
     @mock.patch("mysite.base.controllers._geocode", mock_geocoder)
     def test_unicode_strings_get_cached(self):
+        ### WHOA This test sets the Django cache engine back to working properly.
+        django.core.cache.cache.get = self.real_get
         # When the geocoder's results are being cached properly, 
         # the base controller named '_geocode' will not run more than once.
         original_json = "{'key': 'original value'}"
