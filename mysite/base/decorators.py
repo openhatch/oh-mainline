@@ -97,6 +97,7 @@ def cache_function_that_takes_request(func, *args, **kwargs):
     key_string = 'cache_request_function_' + sha.sha(repr(key_data)).hexdigest()
     content = django.core.cache.cache.get(key_string, None)
     if content:
+        logging.info("Cache hot for %s", repr(key_data))
         response = HttpResponse(content)
     else:
         logging.info("Cache cold for %s", repr(key_data))
