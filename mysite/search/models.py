@@ -374,6 +374,12 @@ class Bug(OpenHatchModel):
     all_bugs = models.Manager()
     open_ones = OpenBugsManager()
 
+    def data_is_more_fresh_than_one_day(self):
+        age = datetime.datetime.now() - self.last_polled
+        if age < datetime.timedelta(days=1):
+            return True
+        return False
+
     def __unicode__(self):
         return "title='%s' project='%s' project__language='%s' description='%s...'" % (self.title, self.project.name, self.project.language, self.description[:50])
 

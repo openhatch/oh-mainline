@@ -1567,4 +1567,15 @@ class TestEpoch(TwillTests):
         later = mysite.search.models.Epoch.get_for_model(mysite.search.models.Bug)
         self.assert_(later > now)
 
+class BugKnowsItsFreshness(TestCase):
+    def test(self):
+        b = mysite.search.models.Bug.create_dummy_with_project()
+        b.last_polled = datetime.datetime.now()
+        self.assertTrue(b.data_is_more_fresh_than_one_day())
+        b.last_polled -= datetime.timedelta(
+            days=1, hours=1)
+        self.assertFalse(b.data_is_more_fresh_than_one_day())
+        
+
+
 # vim: set nu ai et ts=4 sw=4:
