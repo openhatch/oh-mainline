@@ -58,7 +58,8 @@ class TracBug:
         date_string = date_string.replace('in Timeline', '')
         time_zoned = dateutil.parser.parse(date_string)
         if time_zoned.tzinfo:
-            d = time_zoned.astimezone(dateutil.tz.tzutc())
+            d_aware = time_zoned.astimezone(dateutil.tz.tzutc())
+            d = d_aware.replace(tzinfo=None)
         else:
             d = time_zoned # best we can do
         return d
