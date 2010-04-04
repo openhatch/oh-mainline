@@ -690,8 +690,8 @@ class TracBug(django.test.TestCase):
                   'importance': 'normal',
                   'people_involved': 4,
                   # FIXME: Need time zone
-                  'date_reported': datetime.datetime(2010, 2, 23, 0, 46, 30, tzinfo=tzutc()),
-                  'last_touched': datetime.datetime(2010, 3, 12, 18, 43, 5, tzinfo=tzutc()),
+                  'date_reported': datetime.datetime(2010, 2, 23, 0, 46, 30),
+                  'last_touched': datetime.datetime(2010, 3, 12, 18, 43, 5),
                   'looks_closed': False,
                   'submitter_username': 'thijs',
                   'submitter_realname': '',
