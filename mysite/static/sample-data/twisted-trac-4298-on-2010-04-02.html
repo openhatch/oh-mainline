@@ -1,0 +1,530 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+  
+
+
+  
+
+  <head>
+    <title>
+          #4298 (Deprecate twisted.persisted.journal)
+     – Twisted
+    </title>
+        <link rel="search" href="/trac/search" />
+        <link rel="prev" href="/trac/ticket/4297" title="Ticket #4297" />
+        <link rel="last" href="/trac/ticket/4389" title="Ticket #4389" />
+        <link rel="help" href="/trac/wiki/TracGuide" />
+        <link rel="alternate" href="/trac/ticket/4298?format=csv" type="text/csv" class="csv" title="Comma-delimited Text" /><link rel="alternate" href="/trac/ticket/4298?format=tab" type="text/tab-separated-values" class="tab" title="Tab-delimited Text" /><link rel="alternate" href="/trac/ticket/4298?format=rss" type="application/rss+xml" class="rss" title="RSS Feed" />
+        <link rel="next" href="/trac/ticket/4299" title="Ticket #4299" />
+        <link rel="start" href="/trac/wiki" />
+        <link rel="stylesheet" href="/trac/chrome/common/css/trac.css" type="text/css" /><link rel="stylesheet" href="/trac/chrome/common/css/ticket.css" type="text/css" />
+        <link rel="first" href="/trac/ticket/1" title="Ticket #1" />
+        <link rel="shortcut icon" href="/images/favicon.png" type="image/png" />
+        <link rel="icon" href="/images/favicon.png" type="image/png" />
+      <link type="application/opensearchdescription+xml" rel="search" href="/trac/search/opensearch" title="Search Twisted" />
+    <script type="text/javascript" src="/trac/chrome/common/js/jquery.js"></script><script type="text/javascript" src="/trac/chrome/common/js/trac.js"></script><script type="text/javascript" src="/trac/chrome/common/js/search.js"></script>
+    <!--[if lt IE 7]>
+    <script type="text/javascript" src="/trac/chrome/common/js/ie_pre7_hacks.js"></script>
+    <![endif]-->
+    <script type="text/javascript" src="/trac/chrome/common/js/wikitoolbar.js"></script><script type="text/javascript">
+      jQuery(document).ready(function($) {
+        $("div.description").find("h1,h2,h3,h4,h5,h6").addAnchor("Link to this section");
+        $("#changelog h3.change").addAnchor("Link to this change");
+        /* only enable control elements for the currently selected action */
+        var actions = $("#action input[name='action']");
+        function updateActionFields() {
+          actions.each(function () {
+            $(this).siblings().find("*[id]").enable($(this).checked());
+            $(this).siblings().filter("*[id]").enable($(this).checked());
+          });
+        }
+        actions.click(updateActionFields);
+        updateActionFields();
+      });
+    </script>
+  </head>
+  <body>
+    <div id="banner">
+	<div id="top_grad">
+		 
+	</div>
+	<div id="tab">
+		<a href="/trac/wiki">HOME</a>
+	    <a href="/trac/wiki/FrequentlyAskedQuestions">FAQ</a>
+	    <a href="/trac/wiki/Documentation">DOCS</a>
+	    <a href="/trac/wiki/Downloads">DOWNLOAD</a>
+	</div>
+      <div id="header">
+        <a id="logo" href="http://twistedmatrix.com/trac/"><img src="/trac/chrome/common/trac_banner.png" alt="Twisted" /></a>
+      </div>
+      <form id="topsearch" action="/trac/search" method="get">
+        <div>
+          <label for="proj-search">Search:</label>
+          <input type="text" id="proj-search" name="q" size="18" value="" />
+          <input type="submit" value="Search" />
+        </div>
+      </form>
+      <div id="metanav" class="nav">
+    <ul>
+      <li class="first"><a href="/trac/login">Login</a></li><li><a href="/trac/prefs">Preferences</a></li><li><a href="/trac/reset_password">Forgot your password?</a></li><li class="last"><a href="/trac/register">Register</a></li>
+    </ul>
+  </div>
+    </div>
+    <div id="mainnav" class="nav">
+    <ul>
+      <li class="first"><a href="/trac/wiki">Wiki</a></li><li><a href="/trac/timeline">Timeline</a></li><li><a href="/trac/roadmap">Roadmap</a></li><li><a href="/trac/browser">Browse Source</a></li><li class="active"><a href="/trac/report">View Tickets</a></li><li class="last"><a href="/trac/search">Search</a></li>
+    </ul>
+  </div>
+    <div id="main">
+      <div id="ctxtnav" class="nav">
+        <h2>Context Navigation</h2>
+          <ul>
+              <li class="first"><span>&larr; <a class="prev" href="/trac/ticket/4297" title="Ticket #4297">Previous Ticket</a></span></li><li class="last"><span><a class="next" href="/trac/ticket/4299" title="Ticket #4299">Next Ticket</a> &rarr;</span></li>
+          </ul>
+        <hr />
+      </div>
+    <div id="content" class="ticket">
+      <h1>
+              Ticket #4298
+          <span class="status">(assigned task)</span>
+      </h1>
+      <!-- Do not show the ticket (pre)view when the user first comes to the "New Ticket" page.
+           Wait until they hit preview. -->
+        <!-- Ticket Box (ticket fields along with description) -->
+        <div id="ticket">
+          <div class="date">
+            <p>Opened <a class="timeline" href="/trac/timeline?from=2010-02-22T19%3A46%3A30-0500&amp;precision=second" title="2010-02-22T19:46:30-0500 in Timeline">6 weeks</a> ago</p>
+            <p>Last modified <a class="timeline" href="/trac/timeline?from=2010-03-12T13%3A43%3A05-0500&amp;precision=second" title="2010-03-12T13:43:05-0500 in Timeline">3 weeks</a> ago</p>
+          </div>
+          <!-- use a placeholder if it's a new ticket -->
+          <h2 class="summary searchable">Deprecate twisted.persisted.journal</h2>
+          <table class="properties">
+            <tr>
+              <th id="h_reporter">Reported by:</th>
+              <td headers="h_reporter" class="searchable">thijs</td>
+              <th id="h_owner">Owned by:</th>
+              <td headers="h_owner">amacleod
+              </td>
+            </tr>
+            <tr>
+                <th id="h_priority">
+                  Priority:
+                </th>
+                <td headers="h_priority">
+                      normal
+                </td>
+                <th id="h_milestone">
+                  Milestone:
+                </th>
+                <td headers="h_milestone">
+                      <a class="missing milestone"></a>
+                </td>
+            </tr><tr>
+                <th id="h_component">
+                  Component:
+                </th>
+                <td headers="h_component">
+                      core
+                </td>
+                <th id="h_keywords">
+                  Keywords:
+                </th>
+                <td headers="h_keywords" class="searchable">
+                      easy
+                </td>
+            </tr><tr>
+                <th id="h_cc">
+                  Cc:
+                </th>
+                <td headers="h_cc" class="searchable">
+                      thijs, exarkun
+                </td>
+                <th id="h_branch">
+                  Branch:
+                </th>
+                <td headers="h_branch">
+                      branches/deprecatepersistedjournal-4298
+                </td>
+            </tr><tr>
+                <th id="h_branch_author">
+                  Author:
+                </th>
+                <td headers="h_branch_author">
+                      amacleod
+                </td>
+                <th id="h_launchpad_bug">
+                  Launchpad Bug:
+                </th>
+                <td headers="h_launchpad_bug">
+                </td>
+            </tr>
+          </table>
+            <div class="description">
+              <h3 id="comment:description">
+                Description
+              </h3>
+              <div class="searchable">
+                <p>
+This package hasn't been touched in 4 years which either means it's stable or not being used at all. Let's deprecate it (also see <a class="new ticket" href="/trac/ticket/4111" title="task: Remove deprecated twisted.enterprise.util (new)">#4111</a>).
+</p>
+
+              </div>
+            </div>
+        </div>
+          <h2>Attachments</h2>
+          <div id="attachments">
+            <dl class="attachments">
+                <dt>
+      <a href="/trac/attachment/ticket/4298/journalDeprecation-4298.diff" title="View attachment">journalDeprecation-4298.diff</a>
+      <a href="/trac/raw-attachment/ticket/4298/journalDeprecation-4298.diff" title="Download" class="trac-rawlink"><img src="/trac/chrome/common/download.png" alt="Download" /></a>
+      (<span title="1524 bytes">1.5 KB</span>) - added by <em>djfroofy</em>
+      <a class="timeline" href="/trac/timeline?from=2010-02-23T00%3A06%3A46-0500&amp;precision=second" title="2010-02-23T00:06:46-0500 in Timeline">6 weeks</a> ago.
+    </dt>
+                <dt>
+      <a href="/trac/attachment/ticket/4298/deprecateJournal-4298.diff" title="View attachment">deprecateJournal-4298.diff</a>
+      <a href="/trac/raw-attachment/ticket/4298/deprecateJournal-4298.diff" title="Download" class="trac-rawlink"><img src="/trac/chrome/common/download.png" alt="Download" /></a>
+      (<span title="548 bytes">0.5 KB</span>) - added by <em>djfroofy</em>
+      <a class="timeline" href="/trac/timeline?from=2010-02-23T00%3A18%3A09-0500&amp;precision=second" title="2010-02-23T00:18:09-0500 in Timeline">6 weeks</a> ago.
+    </dt>
+            </dl>
+          </div>
+          <h2>Change History</h2>
+          <div id="changelog">
+            <form method="get" action="#comment" class="printableform">
+              <div class="change">
+                <h3 class="change" id="comment:1">
+                  Changed <a class="timeline" href="/trac/timeline?from=2010-02-22T23%3A01%3A34-0500&amp;precision=second" title="2010-02-22T23:01:34-0500 in Timeline">6 weeks</a> ago by itamar
+                </h3>
+      <ul class="changes">
+        <li>
+          <strong>keywords</strong>
+            <em>easy</em> added
+        </li><li>
+          <strong>owner</strong>
+            <em>itamar</em> deleted
+        </li>
+      </ul>
+      <div class="comment searchable">
+        <p>
+I'd rather not spend typing time on this, but it's certainly worth doing.
+</p>
+
+      </div>
+              </div>
+            </form><form method="get" action="#comment" class="printableform">
+              <div class="change">
+                <h3 class="change">
+                  Changed <a class="timeline" href="/trac/timeline?from=2010-02-23T00%3A06%3A46-0500&amp;precision=second" title="2010-02-23T00:06:46-0500 in Timeline">6 weeks</a> ago by djfroofy
+                </h3>
+      <ul class="changes">
+        <li>
+          <strong>attachment</strong>
+              <a href="/trac/attachment/ticket/4298/journalDeprecation-4298.diff"><em>journalDeprecation-4298.diff</em></a>
+              <a href="/trac/raw-attachment/ticket/4298/journalDeprecation-4298.diff" title="Download" class="trac-rawlink"><img src="/trac/chrome/common/download.png" alt="Download" /></a>
+              added
+        </li>
+      </ul>
+      <div class="comment searchable">
+        
+      </div>
+              </div>
+            </form><form method="get" action="#comment" class="printableform">
+              <div class="change">
+                <h3 class="change">
+                  Changed <a class="timeline" href="/trac/timeline?from=2010-02-23T00%3A18%3A09-0500&amp;precision=second" title="2010-02-23T00:18:09-0500 in Timeline">6 weeks</a> ago by djfroofy
+                </h3>
+      <ul class="changes">
+        <li>
+          <strong>attachment</strong>
+              <a href="/trac/attachment/ticket/4298/deprecateJournal-4298.diff"><em>deprecateJournal-4298.diff</em></a>
+              <a href="/trac/raw-attachment/ticket/4298/deprecateJournal-4298.diff" title="Download" class="trac-rawlink"><img src="/trac/chrome/common/download.png" alt="Download" /></a>
+              added
+        </li>
+      </ul>
+      <div class="comment searchable">
+        
+      </div>
+              </div>
+            </form><form method="get" action="#comment" class="printableform">
+              <div class="change">
+                <h3 class="change" id="comment:2">
+                  Changed <a class="timeline" href="/trac/timeline?from=2010-02-23T00%3A18%3A44-0500&amp;precision=second" title="2010-02-23T00:18:44-0500 in Timeline">6 weeks</a> ago by djfroofy
+                </h3>
+      <ul class="changes">
+        <li>
+          <strong>keywords</strong>
+            <em>review</em> added
+        </li><li>
+          <strong>priority</strong>
+              changed from <em>normal</em> to <em>highest</em>
+        </li>
+      </ul>
+      <div class="comment searchable">
+        
+      </div>
+              </div>
+            </form><form method="get" action="#comment" class="printableform">
+              <div class="change">
+                <h3 class="change" id="comment:3">
+                  Changed <a class="timeline" href="/trac/timeline?from=2010-02-23T00%3A20%3A26-0500&amp;precision=second" title="2010-02-23T00:20:26-0500 in Timeline">6 weeks</a> ago by djfroofy
+                </h3>
+      <div class="comment searchable">
+        <p>
+Unit test from first patch is stupid and causes breakage in test suite anyhow.  I'm not sure how to correctly test deprecation warning in module import or if this is even necessary.
+</p>
+
+      </div>
+              </div>
+            </form><form method="get" action="#comment" class="printableform">
+              <div class="change">
+                <h3 class="change" id="comment:4">
+                  Changed <a class="timeline" href="/trac/timeline?from=2010-02-23T00%3A24%3A39-0500&amp;precision=second" title="2010-02-23T00:24:39-0500 in Timeline">6 weeks</a> ago by thijs
+                </h3>
+      <ul class="changes">
+        <li>
+          <strong>priority</strong>
+              changed from <em>highest</em> to <em>normal</em>
+        </li>
+      </ul>
+      <div class="comment searchable">
+        <p>
+This is blocked by <a class="new ticket" href="/trac/ticket/4111" title="task: Remove deprecated twisted.enterprise.util (new)">#4111</a> and doesn't need a higher priority, apps aren't breaking or anything.
+</p>
+
+      </div>
+              </div>
+            </form><form method="get" action="#comment" class="printableform">
+              <div class="change">
+                <h3 class="change" id="comment:5">
+                  Changed <a class="timeline" href="/trac/timeline?from=2010-02-24T00%3A08%3A47-0500&amp;precision=second" title="2010-02-24T00:08:47-0500 in Timeline">5 weeks</a> ago by exarkun
+                </h3>
+      <ul class="changes">
+        <li>
+          <strong>keywords</strong>
+            <em>review</em> removed
+        </li><li>
+          <strong>owner</strong>
+            set to <em>djfroofy</em>
+        </li>
+      </ul>
+      <div class="comment searchable">
+        <p>
+Thanks!  Some simple comments:
+</p>
+<ol><li>Missing docstrings on the test class and test method
+</li><li>The test will fail if it is run twice in one process.  You could either:
+<ol><li>pop it out of sys.modules before the test runs
+</li><li>deprecate the journal attribute of twisted.persisted instead, using <tt>deprecateModuleAttribute</tt> (although I've never done it this way and I don't know what will happen).
+</li></ol></li></ol>
+      </div>
+              </div>
+            </form><form method="get" action="#comment" class="printableform">
+              <div class="change">
+                <h3 class="change" id="comment:6">
+                  Changed <a class="timeline" href="/trac/timeline?from=2010-03-10T20%3A45%3A14-0500&amp;precision=second" title="2010-03-10T20:45:14-0500 in Timeline">3 weeks</a> ago by amacleod
+                </h3>
+      <ul class="changes">
+        <li>
+          <strong>branch</strong>
+              set to <em>branches/deprecatepersistedjournal-4298</em>
+        </li><li>
+          <strong>branch_author</strong>
+              set to <em>amacleod</em>
+        </li>
+      </ul>
+      <div class="comment searchable">
+        <p>
+(In <a class="changeset" href="/trac/changeset/28690" title="Branching to 'deprecatepersistedjournal-4298'">[28690]</a>) Branching to 'deprecatepersistedjournal-4298'
+</p>
+
+      </div>
+              </div>
+            </form><form method="get" action="#comment" class="printableform">
+              <div class="change">
+                <h3 class="change" id="comment:7">
+                  Changed <a class="timeline" href="/trac/timeline?from=2010-03-10T22%3A05%3A53-0500&amp;precision=second" title="2010-03-10T22:05:53-0500 in Timeline">3 weeks</a> ago by amacleod
+                </h3>
+      <div class="comment searchable">
+        <p>
+Updated changes in <a class="source" href="/trac/log/?revs=28590-28694">[28590:28694]</a>.
+</p>
+
+      </div>
+              </div>
+            </form><form method="get" action="#comment" class="printableform">
+              <div class="change">
+                <h3 class="change" id="comment:8">
+                  Changed <a class="timeline" href="/trac/timeline?from=2010-03-10T22%3A06%3A16-0500&amp;precision=second" title="2010-03-10T22:06:16-0500 in Timeline">3 weeks</a> ago by amacleod
+                </h3>
+      <div class="comment searchable">
+        <p>
+Er.. I mean <a class="source" href="/trac/log/?revs=28690-28694">[28690:28694]</a>.
+</p>
+
+      </div>
+              </div>
+            </form><form method="get" action="#comment" class="printableform">
+              <div class="change">
+                <h3 class="change" id="comment:9">
+                  Changed <a class="timeline" href="/trac/timeline?from=2010-03-10T22%3A12%3A38-0500&amp;precision=second" title="2010-03-10T22:12:38-0500 in Timeline">3 weeks</a> ago by amacleod
+                </h3>
+      <div class="comment searchable">
+        <p>
+Here's a better revision link: <a href="http://twistedmatrix.com/trac/changeset?new=/branches/deprecatepersistedjournal-4298@28694&amp;old=/branches/deprecatepersistedjournal-4298@28690">http://twistedmatrix.com/trac/changeset?new=/branches/deprecatepersistedjournal-4298@28694&amp;old=/branches/deprecatepersistedjournal-4298@28690</a>
+</p>
+
+      </div>
+              </div>
+            </form><form method="get" action="#comment" class="printableform">
+              <div class="change">
+                <h3 class="change" id="comment:10">
+                  Changed <a class="timeline" href="/trac/timeline?from=2010-03-10T22%3A20%3A16-0500&amp;precision=second" title="2010-03-10T22:20:16-0500 in Timeline">3 weeks</a> ago by amacleod
+                </h3>
+      <ul class="changes">
+        <li>
+          <strong>keywords</strong>
+            <em>review</em> added
+        </li>
+      </ul>
+      <div class="comment searchable">
+        <p>
+Ready for re-review.
+</p>
+
+      </div>
+              </div>
+            </form><form method="get" action="#comment" class="printableform">
+              <div class="change">
+                <h3 class="change" id="comment:11">
+                  Changed <a class="timeline" href="/trac/timeline?from=2010-03-10T23%3A05%3A28-0500&amp;precision=second" title="2010-03-10T23:05:28-0500 in Timeline">3 weeks</a> ago by cyli
+                </h3>
+      <ul class="changes">
+        <li>
+          <strong>owner</strong>
+            changed from <em>djfroofy</em> to <em>amacleod</em>
+        </li><li>
+          <strong>keywords</strong>
+            <em>review</em> removed
+        </li>
+      </ul>
+      <div class="comment searchable">
+        <p>
+Deprecation should be "as of 10.1", since the current version of Twisted is 10.0.
+</p>
+<p>
+Everything else seems to be great though, and the tests pass.  This can probably be merged into trunk after that change.
+</p>
+
+      </div>
+              </div>
+            </form><form method="get" action="#comment" class="printableform">
+              <div class="change">
+                <h3 class="change" id="comment:12">
+                  Changed <a class="timeline" href="/trac/timeline?from=2010-03-11T22%3A57%3A31-0500&amp;precision=second" title="2010-03-11T22:57:31-0500 in Timeline">3 weeks</a> ago by amacleod
+                </h3>
+      <div class="comment searchable">
+        <p>
+Incremented deprecated-at version in <a class="changeset" href="/trac/changeset/28714" title=" - Allister M. changed deprecation of twisted.persisted.journal to be 10.1 ...">r28714</a>
+</p>
+
+      </div>
+              </div>
+            </form><form method="get" action="#comment" class="printableform">
+              <div class="change">
+                <h3 class="change" id="comment:13">
+                  Changed <a class="timeline" href="/trac/timeline?from=2010-03-12T11%3A19%3A52-0500&amp;precision=second" title="2010-03-12T11:19:52-0500 in Timeline">3 weeks</a> ago by cyli
+                </h3>
+      <div class="comment searchable">
+        <p>
+Sorry, I should have spotted this last time, but it's missing an entry in the relevant topfile directory listing what change this branch will make (see <a href="http://twistedmatrix.com/trac/wiki/ReviewProcess#Newsfiles">http://twistedmatrix.com/trac/wiki/ReviewProcess#Newsfiles</a>).
+</p>
+
+      </div>
+              </div>
+            </form><form method="get" action="#comment" class="printableform">
+              <div class="change">
+                <h3 class="change" id="comment:14">
+                  Changed <a class="timeline" href="/trac/timeline?from=2010-03-12T12%3A03%3A31-0500&amp;precision=second" title="2010-03-12T12:03:31-0500 in Timeline">3 weeks</a> ago by amacleod
+                </h3>
+      <ul class="changes">
+        <li>
+          <strong>status</strong>
+              changed from <em>new</em> to <em>assigned</em>
+        </li>
+      </ul>
+      <div class="comment searchable">
+        <p>
+Thanks for the heads-up cyli.  I will add a news file next time I'm home and have free time.
+</p>
+
+      </div>
+              </div>
+            </form><form method="get" action="#comment" class="printableform">
+              <div class="change">
+                <h3 class="change" id="comment:15">
+                  Changed <a class="timeline" href="/trac/timeline?from=2010-03-12T13%3A43%3A05-0500&amp;precision=second" title="2010-03-12T13:43:05-0500 in Timeline">3 weeks</a> ago by thijs
+                </h3>
+      <div class="comment searchable">
+        <p>
+Thanks. Could you also:
+</p>
+<ul><li>update the copyright in twisted/persisted/journal/<span class="underline">init</span>.py
+</li><li>use <tt>2010</tt> instead of <tt>2001-2010</tt> in the new test_journal.py
+</li></ul><p>
+Merge after that.
+</p>
+
+      </div>
+              </div>
+            </form>
+          </div>
+      <div id="help">
+        <strong>Note:</strong> See
+        <a href="/trac/wiki/TracTickets">TracTickets</a> for help on using
+        tickets.
+      </div>
+    </div>
+    <div id="altlinks">
+      <h3>Download in other formats:</h3>
+      <ul>
+        <li class="first">
+          <a rel="nofollow" href="/trac/ticket/4298?format=csv" class="csv">Comma-delimited Text</a>
+        </li><li>
+          <a rel="nofollow" href="/trac/ticket/4298?format=tab" class="tab">Tab-delimited Text</a>
+        </li><li class="last">
+          <a rel="nofollow" href="/trac/ticket/4298?format=rss" class="rss">RSS Feed</a>
+        </li>
+      </ul>
+    </div>
+    </div>
+    <div id="footer" lang="en" xml:lang="en"><hr />
+<div>
+<!--WEBBOT bot="HTMLMarkup" startspan ALT="Site Meter" -->
+<!--
+<script type="text/javascript" language="JavaScript">var site="sm7twistedmatrix"</script>
+<script type="text/javascript" language="JavaScript1.2" src="http://sm7.sitemeter.com/js/counter.js?site=sm7twistedmatrix">
+</script>
+<noscript>
+-->
+<a href="http://sm7.sitemeter.com/stats.asp?site=sm7twistedmatrix" target="_top">
+<img src="http://sm7.sitemeter.com/meter.asp?site=sm7twistedmatrix" alt="Site Meter" border="0" /></a>
+<!-- </noscript> -->
+<!-- Copyright (c)2002 Site Meter -->
+<!--WEBBOT bot="HTMLMarkup" Endspan -->
+<!-- Google analytics, obviously. -->
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script>
+<script type="text/javascript">
+_uacct = "UA-99018-6";
+urchinTracker();
+</script>
+<!-- End of that stuff -->
+</div>
+ <p class="left2">
+    Site design<br />
+    By <a href="http://huw.ugbox.net/">huw.wilkins.</a>
+ </p>
+      <p class="right"></p>
+    </div>
+  </body>
+</html>
