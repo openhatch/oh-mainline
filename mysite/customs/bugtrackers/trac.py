@@ -6,6 +6,7 @@ import dateutil.parser
 import lxml.html
 import lxml.html.clean
 
+import mysite.base.helpers
 from mysite.base.decorators import cached_property
 import mysite.customs.ohloh
 import mysite.search.templatetags.search
@@ -61,13 +62,7 @@ class TracBug:
     def _span2date(span):
         date_string = span.attrib['title']
         date_string = date_string.replace('in Timeline', '')
-        time_zoned = dateutil.parser.parse(date_string)
-        if time_zoned.tzinfo:
-            d_aware = time_zoned.astimezone(dateutil.tz.tzutc())
-            d = d_aware.replace(tzinfo=None)
-        else:
-            d = time_zoned # best we can do
-        return d
+        return mysite.base.helpers.string2naive_datetime(date_string)
 
     @staticmethod
     def all_people_in_changes(doc):

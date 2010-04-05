@@ -4,12 +4,15 @@ import datetime
 import csv
 import urllib2
 
+import mysite.base.helpers
+
 import simplejson
 import datetime
 import glob
 import lxml
 from ..search.models import Project, Bug
 import codecs
+import dateutil.parser
 
 def get_tag_text_from_xml(xml_doc, tag_name, index = 0):
     """Given an object representing <bug><tag>text</tag></bug>,
@@ -29,24 +32,7 @@ def count_people_involved(xml_doc):
     return len(set(everyone))
 
 def bugzilla_date_to_datetime(date_string):
-    # FIXME: I make guesses as to the timezone.
-    try:
-        ret = datetime.datetime.strptime(date_string, '%Y-%m-%d %H:%M')
-    except ValueError:
-        try:
-            ret = datetime.datetime.strptime(date_string, '%Y-%m-%d %H:%M:%S')
-        except ValueError:
-            try:
-                ret = datetime.datetime.strptime(date_string, '%Y-%m-%d %H:%M:%S +0000') # UTC-only, baby
-            except ValueError:
-                try:
-                    ret = datetime.datetime.strptime(date_string, '%Y-%m-%d %H:%M:%S -0400')
-                    ret -= datetime.timedelta(hours=4)
-                except ValueError:
-                    ret = datetime.datetime.strptime(date_string, '%Y-%m-%d %H:%M:%S -0500')
-                    ret -= datetime.timedelta(hours=5)
-                    
-    return ret
+    return mysite.base.helpers.string2naive_datetime(date_string)
 
 def who_tag_to_username_and_realname(who_tag):
     username = who_tag.text

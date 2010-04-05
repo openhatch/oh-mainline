@@ -1,9 +1,13 @@
-from django.http import HttpResponse
 import simplejson
 import urllib
-import mysite.base.decorators
-import django.conf
 import os
+import datetime
+import dateutil.parser
+
+from django.http import HttpResponse
+import django.conf
+
+import mysite.base.decorators
 
 def json_response(python_object):
     json = simplejson.dumps(python_object)
@@ -23,3 +27,12 @@ def assert_or_pdb(expression):
             pdb.set_trace()
         else:
             raise ValueError, "eek"
+
+def string2naive_datetime(s):
+    time_zoned = dateutil.parser.parse(s)
+    if time_zoned.tzinfo:
+        d_aware = time_zoned.astimezone(dateutil.tz.tzutc())
+        d = d_aware.replace(tzinfo=None)
+    else:
+        d = time_zoned # best we can do
+    return d
