@@ -19,6 +19,12 @@ class GrabMiroBugs(PeriodicTask):
         logger.info("Started to grab Miro bitesized bugs")
         mysite.customs.miro.grab_miro_bugs()
 
+class GrabWikimediaBugs(PeriodicTask):
+    run_every = timedelta(days=1)
+    def run(self, **kwargs):
+        logging.info("Starting to grab Wikimedia easy bugs.")
+        mysite.customs.bugtrackers.wikimedia.grab()
+
 class GrabGnomeLoveBugs(PeriodicTask):
     run_every = timedelta(days=1)
     def run(self, **kwargs):
