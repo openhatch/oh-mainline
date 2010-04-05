@@ -682,6 +682,7 @@ class TracBug(django.test.TestCase):
         cached_html_filename = os.path.join(settings.MEDIA_ROOT, 'sample-data', 'twisted-trac-4298-on-2010-04-02.html')
         tb._bug_html_page = unicode(
             open(cached_html_filename).read(), 'utf-8')
+        self.assertEqual(tb.component, 'core')
 
         got = tb.as_data_dict_for_bug_object()
         wanted = {'title': 'Deprecate twisted.persisted.journal',

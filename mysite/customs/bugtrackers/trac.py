@@ -6,6 +6,7 @@ import dateutil.parser
 import lxml.html
 import lxml.html.clean
 
+from mysite.base.decorators import cached_property
 import mysite.customs.ohloh
 import mysite.search.templatetags.search
 
@@ -98,11 +99,17 @@ class TracBug:
     def as_bug_specific_csv_url(self):
         return self.as_bug_specific_url() +"?format=csv"
 
+    @cached_property
+    def component(self):
+        return self.as_bug_specific_csv_data()['component']
+
     def as_bug_specific_csv_data(self):
-        b = mysite.customs.ohloh.mechanize_get(
-            self.as_bug_specific_csv_url())
-        dr = csv.DictReader(b.response().readlines())
-        return dr.next()
+        if self._bug_specific_csv_data is None:
+            b = mysite.customs.ohloh.mechanize_get(
+                self.as_bug_specific_csv_url())
+            dr = csv.DictReader(b.response().readlines())
+            self._bug_specific_csv_data = dr.next()
+        return self._bug_specific_csv_data
 
     def get_bug_html_page(self):
         if self._bug_html_page is None:
