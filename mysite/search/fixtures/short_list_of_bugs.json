@@ -43,7 +43,7 @@
     "model": "search.project",
     "fields": 
     {
-        "icon_url": "http://google.com/",
+        "icon_url": "http://google.com/3",
         "name": "xxxx",
         "language": "x"
     }
@@ -80,7 +80,7 @@
         "submitter_username": "username 8",
         "project": 500,
         "good_for_newcomers": 0,
-        "canonical_bug_link": "https://bugs.launchpad.net/",
+        "canonical_bug_link": "https://bugs.launchpad.net/3",
         "date_reported": "2009-05-31 23:02:07"
     }
 
@@ -103,7 +103,7 @@
         "submitter_username": "-",
         "project": 500,
         "good_for_newcomers": 0,
-        "canonical_bug_link": "http://asdf.com/",
+        "canonical_bug_link": "http://asdf.com/1",
         "date_reported": "2009-10-08 17:10:14"
     }
 
@@ -126,7 +126,7 @@
         "submitter_username": "username 7",
         "project": 3,
         "good_for_newcomers": 0,
-        "canonical_bug_link": "https://bugs.launchpad.net/",
+        "canonical_bug_link": "https://bugs.launchpad.net/1",
         "date_reported": "2009-06-01 23:02:07"
     }
 
@@ -149,7 +149,7 @@
         "submitter_username": "username 2",
         "project": 500,
         "good_for_newcomers": 0,
-        "canonical_bug_link": "https://bugs.launchpad.net/",
+        "canonical_bug_link": "https://bugs.launchpad.net/2",
         "date_reported": "2009-06-06 23:02:07"
     }
 
@@ -172,7 +172,7 @@
         "submitter_username": "username 0",
         "project": 2,
         "good_for_newcomers": 0,
-        "canonical_bug_link": "http://google.com/",
+        "canonical_bug_link": "http://google.com/1",
         "date_reported": "2009-06-08 23:02:07"
     }
 
@@ -195,7 +195,7 @@
         "submitter_username": "username 0",
         "project": 500,
         "good_for_newcomers": 0,
-        "canonical_bug_link": "http://google.com/",
+        "canonical_bug_link": "http://google.com/2",
         "date_reported": "2009-06-08 23:02:07"
     }
 
