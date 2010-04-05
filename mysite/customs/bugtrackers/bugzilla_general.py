@@ -1,3 +1,11 @@
+import urllib2
+import logging
+import mechanize
+import lxml.etree
+
+import mysite.customs.miro
+import mysite.customs.ohloh
+import mysite.customs.models
 import mysite.search.models
 
 def bug_url2bug_id(url, BUG_URL_PREFIX):
@@ -27,7 +35,7 @@ def query_url2bug_objects(BUG_URL_PREFIX,
                           QUERY_URL,
                           project_finder_plugin,
                           detect_if_good_for_newcomers_plugin):
-    b = mysite.customs.ohloh.mechanize_get(QUERY)
+    b = mysite.customs.ohloh.mechanize_get(QUERY_URL)
 
     # find the one form with ctype XML
     ctype_xml_form_no = find_ctype_xml_form_number(b.forms())
@@ -48,7 +56,7 @@ def query_url2bug_objects(BUG_URL_PREFIX,
             )
         bug_id = mysite.customs.bugtrackers.bugzilla_general.bug_url2bug_id(
             bug_obj.canonical_bug_link, BUG_URL_PREFIX=BUG_URL_PREFIX)
-        detect_if_good_for_newcomers_plugin(bug_obj)
+        detect_if_good_for_newcomers_plugin(bug, bug_obj)
         ret[bug_id] = bug_obj
         
     return ret
@@ -57,8 +65,7 @@ def grab(current_bug_id2bug_objs,
          BUG_URL_PREFIX):
     bug_ids = mysite.customs.models.flatten(
         [current_bug_id2bug_objs.keys(),
-         mysite.customs.bugtrackers.bugzilla_general.get_remote_bug_ids_already_stored(
-             BUG_URL_PREFIX)])
+         get_remote_bug_ids_already_stored(BUG_URL_PREFIX)])
 
     for bug_id in set(bug_ids):
         # Sometimes create_bug_object_for_remote_bug_id will fail to create
@@ -81,5 +88,5 @@ def grab(current_bug_id2bug_objs,
         bug = current_bug_id2bug_objs[bug_id]
 
         # Otherwise, print and save the sucker!
-        print bug
+        logging.info("Got a bug: %s" % bug)
         bug.save()
