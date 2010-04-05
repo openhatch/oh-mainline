@@ -391,7 +391,7 @@ class Bug(OpenHatchModel):
                 date_reported=now,
                 last_touched=now,
                 last_polled=now,
-                canonical_bug_link="http://asdf.com",
+                canonical_bug_link="http://asdf.com/" + uuid.uuid4().hex,
                 submitter_username='dude',
                 description='')
         data.update(kwargs)
