@@ -3,6 +3,7 @@ import logging
 
 from celery.task import Task, PeriodicTask
 from celery.registry import tasks
+import celery.decorators
 
 import mysite.search.models
 import mysite.customs.bugtrackers.trac
@@ -80,3 +81,38 @@ class RefreshAllTwistedEasyBugs(PeriodicTask):
 tasks.register(LearnAboutNewEasyTwistedBugs)
 tasks.register(LookAtOneTwistedBug)
 tasks.register(RefreshAllTwistedEasyBugs)
+
+@celery.decorators.task
+def look_at_sugar_labs_bug(bug_id):
+    logging.info("Looking at bug %d in Sugar Labs" % bug_id)
+    tb = mysite.customs.bugtrackers.trac.TracBug(
+        bug_id=bug_id,
+        BASE_URL='http://bugs.sugarlabs.org/')
+    bug_url = tb.as_bug_specific_url()
+    
+    try:
+        bug = mysite.search.models.Bug.all_bugs.get(
+            canonical_bug_link=bug_url)
+    except mysite.search.models.Bug.DoesNotExist:
+        bug = mysite.search.models.Bug(canonical_bug_link = bug_url)
+
+    # Hopefully, the bug is so fresh it needs no refreshing.
+    if bug.data_is_more_fresh_than_one_day():
+        logging.info("Bug is fresh. Doing nothing!")
+        return # sweet
+
+    # Okay, fine, we need to actually refresh it.
+    logging.info("Refreshing bug %d from Sugar Labs." %
+                 bug_id)
+    data = tb.as_data_dict_for_bug_object()
+    for key in data:
+        value = data[key]
+        setattr(bug, key, value)
+
+    # And the project...
+    project_from_tb, _ = mysite.search.models.Project.objects.get_or_create(name=tb.component)
+    if bug.project_id != project_from_tb.id:
+        bug.project = project_from_tb
+    bug.save()
+    logging.info("Finished with %d from Sugar Labs." % bug_id)
+    

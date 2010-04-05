@@ -886,4 +886,5 @@ class LineAcceptorTest(django.test.TestCase):
         wanted = {'project_name': 'KDE', 'path': '/branches/work/doc/kget/', 'message': "kget doc was moved back to trunk", 'committer_identifier': 'lueck', 'version': 'r1071711'}
         self.assertEqual(got_response[0], wanted)
         got_response[:] = []        
+
 # vim: set nu:

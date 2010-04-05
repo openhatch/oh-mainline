@@ -77,6 +77,7 @@ class TracBug:
         return people
 
     def __init__(self, bug_id, BASE_URL):
+        self._bug_specific_csv_data = None
         self._bug_html_page = None
         self._parsed_bug_html_page = None
         self.bug_id = int(bug_id)
