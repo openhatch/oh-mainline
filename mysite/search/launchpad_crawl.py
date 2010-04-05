@@ -19,7 +19,9 @@ import codecs
 # Look, ma, a hard-coded table that maps to
 # OpenHatch project names from Launchpad.net project names.
 # TimBL would be proud.
-lpproj2ohproj = { 'lxml': 'lxml', 'do': 'GNOME-do', }
+lpproj2ohproj = { 'lxml': 'lxml',
+                  'do': 'GNOME-do',
+                  'gwibber': 'Gwibber'}
 #FIXME: Add only those of the following that actually use Launchpad for development.
 #u'apache-mod-digest' : u'apache-mod-digest' , u'bws-upload' : u'BWS-Upload' , u'pyjunitxml' : u'pyjunitxml' , u'bzr-search' : u'bzr search plugin' , u'bzr-email' : u'bzr email commit hook' , u'check' : u'check' , u'libsyncml' : u'libsyncml' , u'config-manager' : u'config-manager' , u'testscenarios' : u'testscenarios' , u'liburl' : u'liburl' , u'liblockdir' : u'lockdir' , u'bzr-guess' : u'bzr-guess' , u'etap' : u'etap' , u'gforth' : u'Gforth' , u'bitten' : u'Bitten' , u'sqlobject' : u'SQLObject' , u'bzr-ping' : u'Ping plugin for Bazaar' , u'unittest-ext' : u'unittest-ext' , u'pytz' : u'pytz' , u'funkload' : u'FunkLoad' , u'slony-i' : u'Slony-I' , u'zoneinfo' : u'The tz Database' , u'py-radius' : u'py-radius' , u'pypi' : u'Python Package Index' , u'pybabel' : u'Python Babel' , u'feedvalidator' : u'Feed Validator' , u'sphinx' : u'Sphinx' , u'mammoth-replicator' : u'Mammoth Replicator' , u'dbapi-compliance' : u'Python DBAPI Compliance Tests' , u'wget' : u'wget' , u'redhatcluster' : u'Red Hat Cluster' , u'bugzilla' : u'Bugzilla' , u'grepmap' : u'grepmap' , u'live-f1' : u'Live F1' , u'libnih' : u'libnih' , u'hct' : u'HCT' , u'upstart' : u'upstart ' , u'module-init-tools' : u'module-init-tools' , u'ubuntu-seeds' : u'Ubuntu Seeds' , u'usplash' : u'usplash' , u'merge-o-matic' : u'Merge-o-Matic' , u'uds-intrepid' : u'UDS Intrepid' , u'watershed' : u'watershed' , u'udev-extras' : u'Udev extras' , u'sreadahead' : u'sreadahead' , u'pybootchartgui' : u'pybootchartgui' , u'bootchart-collector' : u'bootchart-collector' , u'bootchart' : u'bootchart' , u'ubiquity' : u'ubiquity' , u'man-db' : u'man-db'}
 
@@ -40,23 +42,23 @@ def dump_data_from_project(project):
 
 # Callback to handle an update to a single Launchpad bug update
 def handle_launchpad_bug_update(query_data, new_data):
-    '''
+    """
     We're going to store a bug in our database. First we want to
     check to see if we've stored in the DB a stale copy of the same bug.
     We've divided the data from launchpad into bug-identifying data (query_data)
     and the rest of the data we want to store (new_data).
-
+    
     Side-effect: We create or update a bug in the database.  
     In particular, if we already have a bug for this (project,
     canonical_bug_link) pair, we modify that instead of creating a
     duplicate entry.
 
     Right now we do not store last_modified time stamps; no one has
-    yet figured out what good it would do us.'''
+    yet figured out what good it would do us."""
     real_query_data = {}
     real_query_data.update(query_data)
     real_query_data['project'], _ = Project.objects.get_or_create(
-        name=query_data['project'])
+    name=query_data['project'])
     bug, created = Bug.all_bugs.get_or_create(defaults=new_data,
                                              **real_query_data)
     if created:
@@ -68,13 +70,13 @@ def handle_launchpad_bug_update(query_data, new_data):
     return bug
     
 def clean_lp_data_dict(lp_data_dict):
-    '''Input: A single datum as returned by launchpadbugs.
+    """Input: A single datum as returned by launchpadbugs.
 
     Output: query_data, new_data - two dicts that represent
     processed data from Launchpad.
     We've divided the data from launchpad into bug-identifying data (query_data)
     and the rest of the data we want to store (new_data).
-    '''
+    """
     # These are the invariants for every bug: together (well, maybe the
     # bug link is enough, hush) they uniquely identify the bug.
     query_data = {}
@@ -106,6 +108,10 @@ def clean_lp_data_dict(lp_data_dict):
     # Handle dates
     new_data['last_touched'] = datetime.datetime(*lp_data_dict['date_updated'][:6])
     new_data['last_polled'] = datetime.datetime.now()
+
+    # Look for bitesize tag
+    if 'bitesize' in lp_data_dict['tags']:
+        new_data['good_for_newcomers'] = True
 
     status =  lp_data_dict.get('status', 'Unknown')
     if not status:

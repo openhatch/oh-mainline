@@ -19,6 +19,8 @@ def obj2serializable(obj):
                 # skip attachments for now; kinda tough
                 'comments', 'date', 'date_reported', 'date_updated',
                 'description', 'duplicate_of', 'duplicates', 'importance',
+                # do grab 'tags
+                'tags',
                 # skip 'info'
                 # skip 'mentors because it's NotImplemented
                 'milestone', 'reporter', 'security', 
@@ -48,6 +50,8 @@ def obj2serializable(obj):
         return growing
     elif type(obj) == launchpadbugs.lptime.LPTime:
         return list(obj.timetuple())
+    elif type(obj) == list:
+        return [unicode(k) for k in obj]
     else:
         raise AssertionError, "Not recognized: %s" % type(obj) 
 
