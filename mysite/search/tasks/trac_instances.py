@@ -114,6 +114,7 @@ def look_at_sugar_labs_bug(bug_id):
     project_from_tb, _ = mysite.search.models.Project.objects.get_or_create(name=tb.component)
     if bug.project_id != project_from_tb.id:
         bug.project = project_from_tb
+    bug.last_polled = datetime.datetime.utcnow()
     bug.save()
     logging.info("Finished with %d from Sugar Labs." % bug_id)
     
