@@ -121,7 +121,7 @@ class SignUpIfYouWantToHelpForm(django.forms.Form):
     how_should_people_contact_you = django.forms.ChoiceField(
             initial='forwarder',
             widget=django.forms.RadioSelect,
-            label="You've expressed interest in helping out project. How can people from that project contact you?",
+            label="You've expressed interest in helping out a project. How can people from that project contact you?",
             choices=(
                 ('forwarder', 'By email, but mask my email address using an automatic forwarder (like Craigslist)'),
                 ('public_email', 'By email; just display my real email address'),
