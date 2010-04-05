@@ -8,6 +8,8 @@ def project_finder_plugin(bug_xml_elt):
     product = bug_xml_elt.xpath('product')[0].text
     if product == 'MediaWiki extensions':
         project_name = bug_xml_elt.xpath('component')[0].text
+        if project_name in ('FCKeditor', 'Gadgets'):
+            project_name += ' for MediaWiki'
     else:
         project_name = product
         
