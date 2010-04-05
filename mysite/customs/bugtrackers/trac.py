@@ -10,10 +10,14 @@ from mysite.base.decorators import cached_property
 import mysite.customs.ohloh
 import mysite.search.templatetags.search
 
-def twisted_csv_of_easy_bugs():
-    b = mysite.customs.ohloh.mechanize_get(
-        'http://twistedmatrix.com/trac/query?status=new&status=assigned&status=reopened&format=csv&keywords=%7Eeasy&order=priority')
+def csv_of_bugs(url):
+    b = mysite.customs.ohloh.mechanize_get(url)
     return b.response()
+
+def sugar_labs_csv_of_easy_bugs():
+    b = mysite.customs.ohloh.mechanize_get(
+        'http://bugs.sugarlabs.org/query?status=new&status=assigned&status=reopened&format=csv&keywords=%7sugar-love&order=priority')
+    return b.response()    
 
 def csv_url2list_of_bug_ids(csv_fd):
     dictreader = csv.DictReader(csv_fd)
