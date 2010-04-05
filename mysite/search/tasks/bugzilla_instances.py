@@ -11,6 +11,7 @@ import mysite.customs.bugtrackers.trac
 import mysite.customs.bugtrackers.gnome_love
 import mysite.customs.bugtrackers.fedora_fitfinish
 import mysite.customs.bugtrackers.mozilla
+import mysite.customs.bugtrackers.wikimedia
 
 class GrabMiroBugs(PeriodicTask):
     run_every = timedelta(days=1)
