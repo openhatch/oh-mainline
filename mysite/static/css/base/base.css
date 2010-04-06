@@ -279,13 +279,11 @@ img {
     margin-right: 10px;
 }
 h4, .cute-header {
-    width: 900px; /* infinity */
     font-size: 9pt;
     color: #666;
     float: left;
     margin: 0;
     padding: 1px;
-    width: 100px;
 }
 input[type='submit'] {
     color: #333;
