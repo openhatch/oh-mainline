@@ -44,7 +44,12 @@ def home(request):
     random.shuffle(everybody)
     data['random_profiles'] = everybody[0:5]
 
-    data['recent_feed_items'] = mysite.search.models.Answer.objects.order_by('-modified_date')[:5]
+    feed_items = list(mysite.search.models.Answer.objects.order_by('-modified_date')[:5])
+    feed_items.extend(mysite.search.models.NoteThatSomeoneWantsToHelpAProject.objects.order_by('-modified_date')[:5])
+    feed_items.sort(key=lambda x: x.modified_date, reverse=True)
+    data['recent_feed_items'] = feed_items[:5]
+    
+    
 
     #get globally recommended bug search stuff (for anonymous users)
     if request.user.is_authenticated():

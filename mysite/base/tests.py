@@ -177,8 +177,8 @@ class Feed(TwillTests):
 
         # Visit the homepage, assert that the feed item data is on the page,
         # ordered by date descending.
-        actual_answer_pks = list(get_answers_from_homepage().values_list('pk', flat=True))
-        expected_answer_pks = list(recent_feed_items.values_list('pk', flat=True))
+        actual_answer_pks = [answer.pk for answer in get_answers_from_homepage()]
+        expected_answer_pks = [answer.pk for answer in recent_feed_items]
         self.assertEqual(actual_answer_pks, expected_answer_pks)
 
     @mock.patch("mysite.profile.models.Person.reindex_for_person_search")
