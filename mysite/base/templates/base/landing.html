@@ -290,49 +290,7 @@ body.three_columns #right #recent_activity_feed .body { font-size: 1em; }
         <div class='body'>
             <ul>
                 {% for answer in recent_feed_items %}
-                    {% cache 86400 recent_activity_feed answer.pk %}
-                    <li style='font-size: .9em; float: left; width: 100%; margin-bottom: 15px;'>
-                        {% if answer.author %}
-                        <a href='{{ answer.author.get_profile.profile_url }}'>
-                            <img style='width: 30px; float: left; margin-right: 10px;' src='{{ answer.author.get_profile.get_photo_thumbnail_30px_wide_url_or_default }}' />
-                        </a>
-                        {% else %}
-                            <img style='width: 30px; float: left; margin-right: 10px;' src='/static/images/profile-photos/penguin-30px.png' />
-                        {% endif %}
-                        <div style='float: left; width: 80%;'>
-                            <div style='float: left; width: 100%;'>
-                              {% with answer.author as user %}
-                              <strong>
-                                {% spaceless %}
-                                <a href='{{ user.get_profile.profile_url }}'>
-                                  {% include 'name.html' %}
-                                </a>
-                                {% endspaceless %}
-                              </strong>
-                              {% endwith %}
-                              added an answer to the question 
-                            </div>
-                            {% spaceless %}
-                                {% with answer.question as question %}
-                                {% with answer.project as project %}
-                                <a href='{{ answer.project.get_url }}#answer_whose_pk_is_{{ answer.pk }}'>
-                                    <span>&ldquo;</span>
-                                    {% with 1 as mention_project_name %}
-                                    {% include 'question_text.html' %}
-                                    {% endwith %}
-                                    <span>&rdquo;</span>
-                                </a>
-                                {% endwith %}
-                                {% endwith %}
-                            {% endspaceless %}
-                            {% endcache %}
-                            <span style='color: #aaa;'>
-                                &middot;
-                                {{ answer.modified_date|timesince_terse }} ago
-                            </span>
-                            <br/>
-                        </div>
-                    </li>
+                {% include answer.template_for_feed %}
                 {% endfor %}
             </ul>
         </div>

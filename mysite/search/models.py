@@ -333,6 +333,10 @@ class Answer(OpenHatchModel):
     objects = OwnedAnswersManager()
     all_even_unowned = models.Manager()
 
+    @property
+    def template_for_feed(self):
+        return 'base/answer-in-feed.html'
+
     @staticmethod
     def create_dummy(**kwargs):
         data = {
