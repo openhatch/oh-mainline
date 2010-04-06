@@ -16,12 +16,6 @@ import glob
 from .models import Project, Bug
 import codecs
 
-# Look, ma, a hard-coded table that maps to
-# OpenHatch project names from Launchpad.net project names.
-# TimBL would be proud.
-lpproj2ohproj = { 'lxml': 'lxml',
-                  'do': 'GNOME-do',
-                  'gwibber': 'Gwibber'}
 #FIXME: Add only those of the following that actually use Launchpad for development.
 #u'apache-mod-digest' : u'apache-mod-digest' , u'bws-upload' : u'BWS-Upload' , u'pyjunitxml' : u'pyjunitxml' , u'bzr-search' : u'bzr search plugin' , u'bzr-email' : u'bzr email commit hook' , u'check' : u'check' , u'libsyncml' : u'libsyncml' , u'config-manager' : u'config-manager' , u'testscenarios' : u'testscenarios' , u'liburl' : u'liburl' , u'liblockdir' : u'lockdir' , u'bzr-guess' : u'bzr-guess' , u'etap' : u'etap' , u'gforth' : u'Gforth' , u'bitten' : u'Bitten' , u'sqlobject' : u'SQLObject' , u'bzr-ping' : u'Ping plugin for Bazaar' , u'unittest-ext' : u'unittest-ext' , u'pytz' : u'pytz' , u'funkload' : u'FunkLoad' , u'slony-i' : u'Slony-I' , u'zoneinfo' : u'The tz Database' , u'py-radius' : u'py-radius' , u'pypi' : u'Python Package Index' , u'pybabel' : u'Python Babel' , u'feedvalidator' : u'Feed Validator' , u'sphinx' : u'Sphinx' , u'mammoth-replicator' : u'Mammoth Replicator' , u'dbapi-compliance' : u'Python DBAPI Compliance Tests' , u'wget' : u'wget' , u'redhatcluster' : u'Red Hat Cluster' , u'bugzilla' : u'Bugzilla' , u'grepmap' : u'grepmap' , u'live-f1' : u'Live F1' , u'libnih' : u'libnih' , u'hct' : u'HCT' , u'upstart' : u'upstart ' , u'module-init-tools' : u'module-init-tools' , u'ubuntu-seeds' : u'Ubuntu Seeds' , u'usplash' : u'usplash' , u'merge-o-matic' : u'Merge-o-Matic' , u'uds-intrepid' : u'UDS Intrepid' , u'watershed' : u'watershed' , u'udev-extras' : u'Udev extras' , u'sreadahead' : u'sreadahead' , u'pybootchartgui' : u'pybootchartgui' , u'bootchart-collector' : u'bootchart-collector' , u'bootchart' : u'bootchart' , u'ubiquity' : u'ubiquity' , u'man-db' : u'man-db'}
 
@@ -30,14 +24,7 @@ TextBugList = ConnectBugList("text")
 TextBug = ConnectBug("text")
 
 def dump_data_from_project(project):
-    url = "https://bugs.launchpad.net/%s/+bugs" % project
-    bug_filter = URLBugListFilter()
-    # no filtering; dump everything
-    l = TextBugList(bug_filter(url))
-    # convert elements into Bug objects
-    for _bug in l:
-        bug = TextBug(_bug)
-        serialized = lpb2json.obj2serializable(bug)
+
         yield serialized
 
 # Callback to handle an update to a single Launchpad bug update
@@ -80,7 +67,6 @@ def clean_lp_data_dict(lp_data_dict):
     # These are the invariants for every bug: together (well, maybe the
     # bug link is enough, hush) they uniquely identify the bug.
     query_data = {}
-    query_data['project'] = lp_data_dict['project']
     query_data['canonical_bug_link'] = lp_data_dict['url']
 
     # If the above is the "key" that we use to find or create the record,
