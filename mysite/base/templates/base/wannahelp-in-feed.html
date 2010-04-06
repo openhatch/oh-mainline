@@ -1,0 +1,41 @@
+{% load cache %}
+{% load base_extras %}
+{% load profile_extras %}
+{% with answer as feed_item %}
+{% with feed_item.person as person %}
+{% with feed_item.person.user as user %}
+{% with feed_item.project as project %}
+
+<li style='font-size: .9em; float: left; width: 100%; margin-bottom: 15px;'>
+  <a href='{{ person.profile_url }}'>
+    <img style='width: 30px; float: left; margin-right: 10px;' src='{{ feed_item.person.get_photo_thumbnail_30px_wide_url_or_default }}' />
+  </a>
+  <div style='float: left; width: 80%;'>
+    <div style='float: left; width: 100%;'>
+      <strong>
+        {% spaceless %}
+        <a href='{{ person.profile_url }}'>
+          {% include 'name.html' %}
+        </a>
+        {% endspaceless %}
+      </strong>
+    </div>
+    {% spaceless %}
+    {% with feed_item.project as project %}
+      is willing to help
+    <a href='{{ project.get_url }}'>
+      {{project.name}}
+    </a>
+    {% endwith %}
+    {% endspaceless %}
+    <span style='color: #aaa;'>
+      &middot;
+      {{ feed_item.modified_date|timesince_terse }} ago
+    </span>
+    <br/>
+  </div>
+</li>
+{% endwith %}
+{% endwith %}
+{% endwith %}
+{% endwith %}

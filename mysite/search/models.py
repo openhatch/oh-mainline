@@ -463,7 +463,7 @@ class NoteThatSomeoneWantsToHelpAProject(OpenHatchModel):
         except NoteThatSomeoneWantsToHelpAProject.DoesNotExist:
             pass
 
-    @staticmethod
+    @property
     def template_for_feed(self):
         return 'base/wannahelp-in-feed.html'
 
