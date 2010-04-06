@@ -289,7 +289,7 @@ body.three_columns #right #recent_activity_feed .body { font-size: 1em; }
         </div>
         <div class='body'>
             <ul>
-                {% for answer in recent_answers %}
+                {% for answer in recent_feed_items %}
                     {% cache 86400 recent_activity_feed answer.pk %}
                     <li style='font-size: .9em; float: left; width: 100%; margin-bottom: 15px;'>
                         {% if answer.author %}

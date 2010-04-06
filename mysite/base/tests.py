@@ -157,13 +157,13 @@ class TestUnicodifyDecorator(TwillTests):
 class Feed(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
-    def test_feed_shows_recent_answers(self):
+    def test_feed_shows_answers(self):
 
         # Visit the homepage, notice that there are no answers in the context.
 
         def get_answers_from_homepage():
             homepage_response = self.client.get('/')
-            return homepage_response.context[0]['recent_answers']
+            return homepage_response.context[0]['recent_feed_items']
         
         self.assertFalse(get_answers_from_homepage())
 
@@ -171,12 +171,12 @@ class Feed(TwillTests):
         for x in range(4):
             mysite.search.models.Answer.create_dummy()
 
-        recent_answers = mysite.search.models.Answer.objects.all().order_by('-modified_date')
+        recent_feed_items = mysite.search.models.Answer.objects.all().order_by('-modified_date')
 
         # Visit the homepage, assert that the feed item data is on the page,
         # ordered by date descending.
         actual_answer_pks = list(get_answers_from_homepage().values_list('pk', flat=True))
-        expected_answer_pks = list(recent_answers.values_list('pk', flat=True))
+        expected_answer_pks = list(recent_feed_items.values_list('pk', flat=True))
         self.assertEqual(actual_answer_pks, expected_answer_pks)
 
 class CacheMethod(TwillTests):
