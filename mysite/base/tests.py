@@ -1,4 +1,6 @@
 import django.test
+from django.core.urlresolvers import reverse
+
 import twill
 from twill import commands as tc
 from django.core.handlers.wsgi import WSGIHandler
@@ -178,6 +180,23 @@ class Feed(TwillTests):
         actual_answer_pks = list(get_answers_from_homepage().values_list('pk', flat=True))
         expected_answer_pks = list(recent_feed_items.values_list('pk', flat=True))
         self.assertEqual(actual_answer_pks, expected_answer_pks)
+
+    @mock.patch("mysite.profile.models.Person.reindex_for_person_search")
+    def test_feed_shows_wanna_help(self, mock_whatever):
+        ### set things up so there was a wanna help button click
+        person = mysite.profile.models.Person.objects.get(user__username='paulproteus')
+        p_before = mysite.search.models.Project.create_dummy()
+        client = self.login_with_client()
+        post_to = reverse(mysite.project.views.wanna_help_do)
+        response = client.post(post_to, {u'project': unicode(p_before.pk)})
+        
+        ### Now when we GET the home page, we see a Note
+        ### to that effect in the feed
+        response = client.get('/')
+        items = response.context[0]['recent_feed_items']
+        note_we_want_to_see = mysite.search.models.NoteThatSomeoneWantsToHelpAProject.objects.get(
+            person=person, project=p_before)
+        self.assert_(note_we_want_to_see in items)
 
 class CacheMethod(TwillTests):
 

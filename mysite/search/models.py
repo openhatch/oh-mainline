@@ -460,6 +460,10 @@ class NoteThatSomeoneWantsToHelpAProject(OpenHatchModel):
         note = NoteThatSomeoneWantsToHelpAProject.objects.get(person=person, project=project)
         note.delete()
 
+    @staticmethod
+    def template_for_feed(self):
+        return 'base/wannahelp-in-feed.html'
+
 class HitCountCache(OpenHatchModel):
     hashed_query = models.CharField(max_length=40, primary_key=True) # stores a sha1 
     hit_count = models.IntegerField()
