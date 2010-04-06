@@ -159,7 +159,9 @@ class ButtonClickMarksSomeoneAsWannaHelp(TwillTests):
 
     @mock.patch("mysite.profile.models.Person.reindex_for_person_search")
     def test_mark_as_wanna_help(self, mock_reindex_person_method):
+        person = Person.objects.get(user__username='paulproteus')
         p_before = Project.create_dummy()
+        self.assertFalse(mysite.search.models.NoteThatSomeoneWantsToHelpAProject.objects.all())
         
         self.assertFalse(p_before.people_who_wanna_help.all())
 
@@ -172,14 +174,20 @@ class ButtonClickMarksSomeoneAsWannaHelp(TwillTests):
 
         self.assertEqual(
             list(p_after.people_who_wanna_help.all()),
-            [Person.objects.get(user__username='paulproteus')])
+            [person])
+
+        note = mysite.search.models.NoteThatSomeoneWantsToHelpAProject.objects.get()
+        self.assertEqual(note.person, person)
+        self.assertEqual(note.project, p_after)
 
     @mock.patch("mysite.profile.models.Person.reindex_for_person_search")
     def test_unmark_as_wanna_help(self, mock_reindex_person_method):
         # We're in there...
+        person = Person.objects.get(user__username='paulproteus')
         p_before = Project.create_dummy()
-        p_before.people_who_wanna_help.add(Person.objects.get(user__username='paulproteus'))
+        p_before.people_who_wanna_help.add(person)
         p_before.save()
+        mysite.search.models.NoteThatSomeoneWantsToHelpAProject.add_person_project(person, p_before)
 
         # Submit that project to unlist_self_from_wanna_help_do
         client = self.login_with_client()
@@ -244,6 +252,7 @@ class WannaHelpWorksAnonymously(TwillTests):
         # then the DB knows the user wants to help out!
         self.assertEqual(list(Project.objects.get(id=project_id).people_who_wanna_help.all()),
                          [Person.objects.get(user__username='paulproteus')])
+        self.assert_(mysite.search.models.NoteThatSomeoneWantsToHelpAProject.objects.all())
 
         # Say we're not interested anymore.
         post_to = reverse(mysite.project.views.unlist_self_from_wanna_help_do)
@@ -251,7 +260,8 @@ class WannaHelpWorksAnonymously(TwillTests):
 
         # And now the DB shows we have removed ourselves.
         self.assertFalse(Project.objects.get(id=project_id).people_who_wanna_help.all())
-
+        self.assertFalse(mysite.search.models.NoteThatSomeoneWantsToHelpAProject.objects.all())
+        
 class ProjectPageTellsNextStepsForHelpersToBeExpanded(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus',
                 'miro-project']

@@ -42,6 +42,7 @@ def flush_session_wanna_help_queue_into_database(user, session,
     for project_id in session.get(PROJECTS_TO_HELP_OUT_KEY, []):
         project = mysite.search.models.Project.objects.get(id=project_id)
         project.people_who_wanna_help.add(user.get_profile())
+        mysite.search.models.NoteThatSomeoneWantsToHelpAProject.add_person_project(user.get_profile(), project)
         project.save()
     # It's unsafe to remove this KEY from the session, in case of concurrent access.
     # But we do anyway. God help us.

@@ -443,6 +443,23 @@ class Epoch(OpenHatchModel):
         epoch.save() # definitely!
         return epoch
 
+class NoteThatSomeoneWantsToHelpAProject(OpenHatchModel):
+    class Meta:
+        unique_together = [('project', 'person')]
+    person = models.ForeignKey('profile.Person')
+    project = models.ForeignKey(Project)
+
+    @staticmethod
+    def add_person_project(person, project):
+        note, _ = NoteThatSomeoneWantsToHelpAProject.objects.get_or_create(
+            person=person, project=project)
+        return note
+
+    @staticmethod
+    def remove_person_project(person, project):
+        note = NoteThatSomeoneWantsToHelpAProject.objects.get(person=person, project=project)
+        note.delete()
+
 class HitCountCache(OpenHatchModel):
     hashed_query = models.CharField(max_length=40, primary_key=True) # stores a sha1 
     hit_count = models.IntegerField()
