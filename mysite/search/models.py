@@ -457,8 +457,11 @@ class NoteThatSomeoneWantsToHelpAProject(OpenHatchModel):
 
     @staticmethod
     def remove_person_project(person, project):
-        note = NoteThatSomeoneWantsToHelpAProject.objects.get(person=person, project=project)
-        note.delete()
+        try:
+            note = NoteThatSomeoneWantsToHelpAProject.objects.get(person=person, project=project)
+            note.delete()
+        except NoteThatSomeoneWantsToHelpAProject.DoesNotExist:
+            pass
 
     @staticmethod
     def template_for_feed(self):
