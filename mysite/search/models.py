@@ -368,7 +368,8 @@ class Bug(OpenHatchModel):
     last_polled = models.DateTimeField(default=datetime.datetime(1970, 1, 1))
     submitter_username = models.CharField(max_length=200)
     submitter_realname = models.CharField(max_length=200, null=True)
-    canonical_bug_link = models.URLField(max_length=200, unique=True)
+    canonical_bug_link = models.URLField(max_length=200, unique=True,
+                                         blank=False, null=False)
     good_for_newcomers = models.BooleanField(default=False)
     looks_closed = models.BooleanField(default=False)
     bize_size_tag_name = models.CharField(max_length=50) 

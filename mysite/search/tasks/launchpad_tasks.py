@@ -31,9 +31,9 @@ def import_bugs_from_one_project(launchpad_project_name,
     l = mysite.search.launchpad_crawl.TextBugList(bug_filter(url))
     # convert elements into Bug objects
     for bug in l:
-        openhatch_bug_link = 'https//bugs.launchpad.net/bugs/%d' % (
-            bug.id)
-        refresh_one_launchpad_bug.delay(
+        openhatch_bug_link = 'https://bugs.launchpad.net/bugs/%d' % (
+            bug.bugnumber)
+        refresh_one_launchpad_bug(
             canonical_bug_link=openhatch_bug_link,
             openhatch_project_name=openhatch_project_name)
 
@@ -49,6 +49,7 @@ def refresh_all_launchpad_bugs():
 @celery.decorators.task
 def refresh_one_launchpad_bug(canonical_bug_link,
                               openhatch_project_name):
+    logging.info("Checking on %s..." % canonical_bug_link)
     # Either we already have the bug...
     try:
         bug = mysite.search.models.Bug.all_bugs.get(
@@ -56,18 +57,20 @@ def refresh_one_launchpad_bug(canonical_bug_link,
     # ...or we need to create it
     except mysite.search.models.Bug.DoesNotExist:
         bug = mysite.search.models.Bug()
+        bug.canonical_bug_link = canonical_bug_link
 
     if bug.data_is_more_fresh_than_one_day():
         return
 
     # Okay, so it's stale. Refresh the sucker.
+    logging.info("Refreshing %s." % canonical_bug_link)
 
     # Set the project, if necessary
     if openhatch_project_name is None:
         pass
     else:
         # Get or create the OpenHatch project
-        openhatch_project = mysite.search.models.Project.objects.get_or_create(name=openhatch_project_name)
+        openhatch_project, _ = mysite.search.models.Project.objects.get_or_create(name=openhatch_project_name)
         
         if bug.project_id != openhatch_project.id:
             bug.project = openhatch_project
