@@ -128,6 +128,12 @@ def fetch_bugs(request, invalid_subscribe_to_alert_form=None):
     from django.db.models import Q
     data['popular_projects'] = [Project.objects.get(name='Miro')] + list(Project.objects.all().filter(~Q(bug=None) & ~Q(portfolioentry__project_description=''))[5:15])
 
+    Person = mysite.profile.models.Person
+    import random
+    random_start = int(random.random() * 700)
+    data['contributors'] = Person.objects.all()[random_start:random_start+5]
+    data['contributors2'] = Person.objects.all()[random_start+10:random_start+15]
+
     if format == 'json':
         # FIXME: Why `alert`?
         return bugs_to_json_response(data, bugs, request.GET.get(
