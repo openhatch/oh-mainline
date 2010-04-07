@@ -94,6 +94,17 @@ class Project(OpenHatchModel):
         self.icon_for_search_result = None
         pass
 
+    def get_random_pfentry_that_has_a_project_description(self):
+        import random
+        pfentries = self.portfolioentry_set.exclude(project_description='')
+        only_good_pfentries = lambda pfe: pfe.project_description.strip()
+        pfentries = filter(only_good_pfentries, pfentries)
+
+        if pfentries:
+            return random.choice(pfentries)
+        else:
+            return None
+
     # FIXME: Remove this field and update fixtures.
     icon_url = models.URLField(max_length=200)
 

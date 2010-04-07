@@ -385,11 +385,26 @@ body.three_columns #right .entry { font-size: .9em; margin-top: 3px; }
 
 body#login .post_login_action_explanation { color: #444; font-size: 1.5em; -moz-border-radius: 8px; border-radius: 8px; text-align: center; float: left; width: 98%; margin-bottom: 10px; padding: 8px; background-color: #ffc; }
 
-#projects ul li { padding: 10px; width: 91%; -moz-border-radius: 8px; border-radius: 8px; float: left; margin-bottom: 5px; cursor: hand; cursor: pointer; }
-#projects ul li:hover { background-color: #ffc; }
-#projects ul li.selected { background-color: #ffa; }
+#search .head h3 { font-weight: normal; text-shadow: 0 1px 0 #fff; }
+#filters { width: 100%; }
+#filters > .head { float: left; width: 100%; }
+#filters > .body { float: left; width: 95.5%; }
+#filters > .body > ul > li { float: left; margin-right: 10px; }
+#search #projects { width: 80%; }
+#search #languages .body, #projects .body { height: 130px; background-color: rgb(255,255,255); background-color: rgba(255,255,255,.5); }
+#search #languages .body { padding: 3px; width: 96%; overflow: hidden; }
+#search #projects .body { padding: 3px; width: 96%; overflow: hidden; }
+#search #results { width: 100%; }
+#search #results .body { width: 99%; padding: 5px; }
+#search small { display: none; }
+#search .contributors { display: none; }
+
+#projects ul li { overflow-y: hidden; overflow-x: hidden; padding: 10px; height: 110px; width: 180px; -moz-border-radius: 8px; border-radius: 8px; float: left; margin-bottom: 5px; cursor: hand; cursor: pointer; }
+#projects ul li:hover { background-color: rgba(255, 255, 255, .6); }
+#projects ul li.selected { /* height: 180px; width: 250px; position: relative; top: -70px; */ background-color: rgb(255, 255, 255); background-color: rgba(255,255,255,.9); }
 #projects ul li.selected .name { text-shadow: 0 1px 0 #fff; font-weight: bold; }
 #projects ul li img { float: left; margin-right: 10px; }
-.project_info { float: left; width: 155px;}
+.project_info { float: left; width: 100%; margin-top: 5px; }
 .project_info .description { margin-top: 3px; font-size: .85em; float: left; width: 100%; }
 #projects .project_info .contributors img { float: left; margin-right: 3px; vertical-align: text-bottom; margin-top: 3px; }
+#projects .people { margin-top: 3px; float: left; width: 100%; font-size: .85em; }
