@@ -5,13 +5,14 @@ import mysite.search.models
 import mysite.customs.models
 from celery.task import Task, PeriodicTask
 from celery.registry import tasks
-from mysite.search.launchpad_crawl import grab_lp_bugs, lpproj2ohproj
+
 import mysite.customs.miro
 import mysite.customs.bugtrackers.trac
 import mysite.customs.bugtrackers.gnome_love
 import mysite.customs.bugtrackers.fedora_fitfinish
 import mysite.search.tasks.trac_instances
 import mysite.search.tasks.bugzilla_instances
+import mysite.search.tasks.launchpad_tasks
 
 class GrabLaunchpadBugs(PeriodicTask):
     run_every = timedelta(days=1)
