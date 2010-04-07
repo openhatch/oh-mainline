@@ -887,4 +887,15 @@ class LineAcceptorTest(django.test.TestCase):
         self.assertEqual(got_response[0], wanted)
         got_response[:] = []        
 
+class OhlohCitationUrlIsUseful(django.test.TestCase):
+    def test_ohloh_assemble_url(self):
+        project = 'cchost'
+        contributor_id = 65837553699824
+        wanted = 'https://www.ohloh.net/p/cchost/contributors/65837553699824'
+        got = mysite.customs.ohloh.generate_contributor_url(project, contributor_id)
+        self.assertEqual(wanted, got)
+        
+    def test(self):
+        pass
+
 # vim: set nu:

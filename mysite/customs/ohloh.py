@@ -56,6 +56,10 @@ def mechanize_get(url, referrer=None, attempts_remaining=6, person=None):
 
     return b
 
+def generate_contributor_url(project_name, contributor_id):
+    return 'https://www.ohloh.net/p/%s/contributors/%d' % (
+        project_name, contributor_id)
+
 def ohloh_url2data(url, selector, params = {}, many = False, API_KEY = None, person=None):
     '''Input: A URL to get,
     a bunch of parameters to toss onto the end url-encoded,
