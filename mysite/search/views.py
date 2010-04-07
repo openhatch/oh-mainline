@@ -124,6 +124,10 @@ def fetch_bugs(request, invalid_subscribe_to_alert_form=None):
         facet2any_query_string[facet] = query.get_facet_options(
             facet, [''])[0]['query_string']
 
+    Bug = mysite.search.models.Bug
+    from django.db.models import Q
+    data['popular_projects'] = [Project.objects.get(name='Miro')] + list(Project.objects.all().filter(~Q(bug=None) & ~Q(portfolioentry__project_description=''))[5:15])
+
     if format == 'json':
         # FIXME: Why `alert`?
         return bugs_to_json_response(data, bugs, request.GET.get(
@@ -137,7 +141,7 @@ def fetch_bugs(request, invalid_subscribe_to_alert_form=None):
         data['facet2any_query_string'] = facet2any_query_string
         data['project_count'] = mysite.search.controllers.get_project_count()
 
-        return render_to_response('search/search.html', data)
+        return render_to_response('search/opps_mockup.html', data)
 
 def bugs_to_json_response(data, bunch_of_bugs, callback_function_name=''):
     """ The search results page accesses this view via jQuery's getJSON method, 

@@ -1,9 +1,7 @@
-body#search .module { border: 5px solid #fff; }
 body#search #page-top img#hatchers { float: right; border: 0; }
 body#search #content { position: relative; top: -4px; padding-top: 0; }
 body#search #page-top img#volunteer-opportunities { position: relative; top: 1px; }
 body#search #page-top { float: left; width: 1000px; font-size: 19pt; }
-body#search #sidebar .module h4 { width: 95%; font-size: 10pt; font-weight: normal; margin-bottom: 5px; }
 body#search .no-results { color: #222; padding: 10px; font-size: 120%; line-height: 130%; width: 460px; float: left; }
 	body#search .no-results strong { background-color: #fff; }
 body#search #heading { margin: 20px 0 10px 0; }
