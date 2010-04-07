@@ -162,6 +162,8 @@ mock_gcibu = mock.Mock()
 mock_gcibu.return_value = ([{
         'man_months': 1,
         'project': u'MOCK ccHost',
+        u'permalink':
+            u'https://www.ohloh.net/p/cchost/contributors/65837553699824',
         'project_homepage_url':
             u'http://wiki.creativecommons.org/CcHost',
         'first_commit_time':
@@ -175,6 +177,8 @@ mock_gcibu.return_value = ([{
 mock_gcibou = mock.Mock()
 mock_gcibou.return_value = ([{
         'man_months': 1,
+        u'permalink':
+            u'https://www.ohloh.net/p/cchost/contributors/65837553699824',
         'project': u'MOCK ccHost',
         'project_homepage_url':
             u'http://wiki.creativecommons.org/CcHost',
@@ -296,6 +300,7 @@ class CeleryTests(BaseCeleryTest):
         # {{{
         data_we_expect = [{
                 'languages': mock_gcibu.return_value[0][0]['primary_language'],
+                'url': mock_gcibu.return_value[0][0]['permalink'],
                 'distinct_months': mock_gcibu.return_value[0][0]['man_months'],
                 'is_published': False,
                 'is_deleted': False,
@@ -320,6 +325,7 @@ class CeleryTests(BaseCeleryTest):
         # {{{
         data_we_expect = [{
                 'languages': mock_gcibou.return_value[0][0]['primary_language'],
+                'url': mock_gcibou.return_value[0][0]['permalink'],
                 'distinct_months': mock_gcibou.return_value[0][0]['man_months'],
                 'is_published': False,
                 'is_deleted': False,

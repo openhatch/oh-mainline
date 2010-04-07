@@ -635,6 +635,7 @@ class Citation(models.Model):
         citation = Citation()
         citation.distinct_months = ohloh_contrib_info['man_months']
         citation.languages = ohloh_contrib_info['primary_language']
+        citation.url = ohloh_contrib_info['permalink']
         #citation.year_started = ohloh_contrib_info['year_started']
         return citation
         # }}}
