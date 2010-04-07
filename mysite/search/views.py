@@ -135,7 +135,7 @@ def fetch_bugs(request, invalid_subscribe_to_alert_form=None):
     from django.db.models import Count
     data['contributors'] = Person.objects.all()[random_start:random_start+5]
     data['contributors2'] = Person.objects.all()[random_start+10:random_start+15]
-    data['languages'] = Project.objects.all().values_list('language', flat=True).order_by('language').distinct()[:4]
+    data['languages'] = Project.objects.all().values_list('language', flat=True).order_by('language').exclude(language='').distinct()[:4]
 
     if format == 'json':
         # FIXME: Why `alert`?
