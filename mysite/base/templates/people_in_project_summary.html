@@ -1,0 +1,11 @@
+                            {% for person in people %}
+                                {% with person.get_photo_thumbnail_20px_wide_url_or_default as thumbnail_url %}
+                                <img rel='tipsy-south'
+                                        title='{{ person.get_full_name_or_username }}'
+                                        src="{{ thumbnail_url }}"
+                                        width='{{ person.get_photo_thumbnail_width_20px }}'
+                                        height='{{ person.get_photo_thumbnail_height_20px }}'
+                                    />
+                                {% endwith %}
+                            {% endfor %}
+

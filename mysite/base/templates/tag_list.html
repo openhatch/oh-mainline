@@ -1,0 +1,12 @@
+            <li id='tags-understands'>
+                <h4>{{ tag_type_heading }}</h4>
+                <div class='tags'>
+                    {% spaceless %}
+                        {% for tag in tag_list %}
+                            <a href="{% url mysite.profile.views.people %}?q={{ tag_type_prefix }}:&quot;{{tag.text|urlencode}}&quot;">
+                                {{ tag.text }}</a>
+                            {% if not forloop.last %}<span>, </span> {% endif %}
+                        {% endfor %}
+                    {% endspaceless %}
+                </div>
+            </li>

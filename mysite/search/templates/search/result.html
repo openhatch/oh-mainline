@@ -1,113 +1,131 @@
 {% load search %}
 {% load base_extras %}
 
-<div class='first-line'>
-    <div class='head'>
-        <div class='top_left'>
-        <img alt='logo for {{bug.project.name}}' title='{{bug.project.name}}'
-        src='{{ bug.project.get_url_of_search_result_icon_or_generic }}' />
-        <span class='project__name'>
-            {{ bug.project.name|highlight:query.terms }} 
-        </span>
+<div class='project_data'>
 
-        {% if bug.as_appears_in_distribution %}
-            <span class='sep'>&middot;</span>
-            <span>
-                in {{ bug.as_appears_in_distribution|highlight:query.terms }}
-            </span>
+    {# Project logo #}
+    <img src='{{ bug.project.get_url_of_search_result_icon_or_generic }}' 
+        title='{{bug.project.name}}' />
+
+    {# Project name #}
+    <span class='project__name'>
+        {{ bug.project.name|highlight:query.terms }} 
+    </span>
+
+    {# Mentors #}
+    {% if bug.project.potential_mentors %}
+        <div class="helpers" style='margin-top: 6px; font-size: .85em;'>
+            <a href="{{ bug.project.get_mentors_search_url }}">
+                Mentors ({{bug.project.potential_mentors|length}})</a>
+        </div>
+    {% endif %}
+
+    <div class='below_the_fold'>
+        {# Primary project language #}
+        {% if bug.project.language %}
+            <div class='project__language
+                    {% if bug.project.language.lower|in_list:query.terms %}highlight{% endif %}
+                    '>{{ bug.project.language }}</div>
         {% endif %}
+    </div>
 
-        <span class='sep'>&middot;</span>
-        <span class='title'>
-            {{ bug.title|highlight:query.terms }}
-        </span>
+</div>
+<div class='opp_data'>
+    <div class='first-line'>
+        <div class='top_left'>
+
+            {% if bug.as_appears_in_distribution %}
+                <span>
+                    in {{ bug.as_appears_in_distribution|highlight:query.terms }}
+                </span>
+            {% endif %}
+
+            <a style='color: #000;' href='javascript:void(0);' class='title'>
+                <span class='truncated'>
+                    {{ bug.title|truncatewords:'13'|highlight:query.terms }}
+                </span>
+                <span class='untruncated'>
+                    {{ bug.title|highlight:query.terms }}
+                </span>
+            </a>
         </div>
         <div class='top_right'>
             <span class='expand'><a href='javascript:void(0);'>expand</a></span>
             <span class='sep'>&middot;</span>
-            <span class='link'><a target='_new' href='{{ bug.canonical_bug_link }}'>link</a></span>
+            <span class='link'><a 
+                        rel='tipsy-south'
+                        title='go to original bug report'
+                        target='_new' href='{{ bug.canonical_bug_link }}'>link</a></span>
         </div>
     </div>
-</div>
-<div class='second-line'>
-    <span class='description-container'>
-        {% if bug.good_for_newcomers %}
-        <span class='good-for-beginners'><span class="green-bullet">&#9679;</span> Bite-size</span>
-        {% endif %}
+    <div class='second-line'>
+        <span class='description-container'>
+            <span class='meta-data'>
+                {% if bug.good_for_newcomers %}
+                    <span class='good-for-beginners'>Bite-size</span>
+                {% endif %}
 
-        {% if bug.project.language %}
-        <span class='sep'>&middot;</span>
-        {% if bug.project.language.lower|in_list:query.terms %}
-        <span class='project__language highlight'>{{ bug.project.language }}</span>
-        {% else %}
-        <span class='project__language'>{{ bug.project.language }}</span>
-        {% endif %}
+                {% if bug.good_for_newcomers and bug.last_touched %}
+                    <span class='sep'>&middot;</span>
+                {% endif %}
 
-        {% endif %}
-
-        {% if bug.last_touched %}
-            <span class='sep'>&middot;</span>
-            <span class='age'>updated {{ bug.last_touched|timesince_terse }} ago</span>
-        {% endif %}
-
-
-	{% if bug.project.potential_mentors %}
-	<span class="helpers" style="color: black;">
-        <span class='sep'>&middot;</span>
-        <a href="{{ bug.project.get_mentors_search_url }}">{{bug.project.potential_mentors|length}} potential
-            mentor{{bug.project.potential_mentors|length|pluralize}}</a>
-    </span>
-	{% endif %}
-    <span class='sep separator_betw_tags_and_desc'>&middot;</span>
-        <span class='description'><p>{{ bug.description|highlight:query.terms }}</p></span>
-    </span>
-</div>
-<div class='details'>
-    <div class='fields'>
-        <span class='field people_involved'>
-            <label>People involved: </label>
-            <span class='value'>
-                {{ bug.people_involved }}
-            </span>
-        </span>
-        <span class='field status'>
-            <label>Status: </label>
-            <span class='value'>
-                {{ bug.status }}
-            </span>
-        </span>
-        <span class='field last_touched'>
-            <label>Last touched: </label>
-            <span class='value'>
                 {% if bug.last_touched %}
-                {{ bug.last_touched|timesince_terse }} ago
-                {% else %}
-                Unknown
+                    <span class='age'>updated {{ bug.last_touched|timesince_terse }} ago</span>
                 {% endif %}
             </span>
+
+
+            <span class='sep separator_betw_tags_and_desc'>&middot;</span>
+            <span class='description'><p>{{ bug.description|highlight:query.terms }}</p></span>
         </span>
-        <span class='field origin'>
-            <label>Link: </label>
-            <span class='value'>
-                <a class='canonical_bug_link'
-                        href='{{ bug.canonical_bug_link }}'>{{ bug.canonical_bug_link|urlizetrunc:"30"}}</a>
+    </div>
+    <div class='details'>
+        <div class='fields'>
+            <span class='field people_involved'>
+                <label>People involved: </label>
+                <span class='value'>
+                    {{ bug.people_involved }}
+                </span>
             </span>
-        </span>
-        <span class='field importance'>
-            <label>Importance: </label>
-            <span class='value'>
-                {{ bug.importance }}
+            <span class='field status'>
+                <label>Status: </label>
+                <span class='value'>
+                    {{ bug.status }}
+                </span>
             </span>
-        </span>
-        <span class='field date_reported'>
-            <label>First reported: </label>
-            <span class='value'>
-                {% if bug.date_reported %}
-                {{ bug.date_reported|timesince_terse }} ago
-                {% endif %}
+            <span class='field last_touched'>
+                <label>Last touched: </label>
+                <span class='value'>
+                    {% if bug.last_touched %}
+                        {{ bug.last_touched|timesince_terse }} ago
+                    {% else %}
+                        Unknown
+                    {% endif %}
+                </span>
             </span>
-            {# <a href=''>poll now</a> #}
-        </span>
+            <span class='field origin'>
+                <label>Link: </label>
+                <span class='value'>
+                    <a class='canonical_bug_link'
+                            href='{{ bug.canonical_bug_link }}'>{{ bug.canonical_bug_link|urlizetrunc:"30"}}</a>
+                </span>
+            </span>
+            <span class='field importance'>
+                <label>Importance: </label>
+                <span class='value'>
+                    {{ bug.importance }}
+                </span>
+            </span>
+            <span class='field date_reported'>
+                <label>First reported: </label>
+                <span class='value'>
+                    {% if bug.date_reported %}
+                        {{ bug.date_reported|timesince_terse }} ago
+                    {% endif %}
+                </span>
+                {# <a href=''>poll now</a> #}
+            </span>
+        </div>
     </div>
 </div>
 {# vim: set filetype=htmldjango: #}

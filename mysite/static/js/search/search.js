@@ -16,14 +16,14 @@ SearchResults.bindEventHandlers = function () {
 
     console.log('SearchResults.bindEventHandlers');
 
-    $('.first-line').click(function () {
-            $result = $(this.parentNode);
+    $('.project__name, .first-line').click(function () {
+            $result = $(this.parentNode.parentNode);
             $result.toggleExpanded();
             // don't use this, so that links work return false;
             });
 
     $('.show-details').click(function () {
-            $result = $(this.parentNode.parentNode.parentNode);
+            $result = $(this.parentNode.parentNode.parentNode.parentNode);
             $result.toggleExpanded();
             return false;
             });

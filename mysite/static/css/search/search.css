@@ -1,29 +1,32 @@
-body#search #page-top img#hatchers { float: right; border: 0; }
 body#search #content { position: relative; top: -4px; padding-top: 0; }
 body#search #page-top img#volunteer-opportunities { position: relative; top: 1px; }
 body#search #page-top { float: left; width: 1000px; font-size: 19pt; }
 body#search .no-results { color: #222; padding: 10px; font-size: 120%; line-height: 130%; width: 460px; float: left; }
 	body#search .no-results strong { background-color: #fff; }
-body#search #heading { margin: 20px 0 10px 0; }
-body#search .box { float: left; margin-bottom: 10px; }
-body#search #sidebar .box { padding: 10px; }
-body#search .box h2 { font-size: 130%; color: #3d2f25; margin-bottom: 5px; }
-body#search .search-terms { font-size: 20px; background: white; padding: 5px; width: 550px; }
 body#search #results-widget { padding: 12px; padding-bottom: 6px; float: left; width: 94.5%; font-size: 8.5pt; }
 body#search #sidebar { float: left; width: 220px; margin-right: 20px; }
 body#search #main { width: 715px; float: left; }
-	body#search #main .box { padding: 10px; width: 700px; float: left; }
 body#search #filters li { list-style: none; margin: 0; margin-bottom: 10px; }
-body#search #add-another-bug-tracker {  }
-body#search #sidebar .box { width: 200px; }
 body#search p { margin: 0; }
 
 /* --------------
  * Search results
  * -------------- */
-body#search #results.box { background: #fff; padding-right: 0; padding-bottom: 10px; }
-body#search #results ul { margin: 0; padding: 0; float: left; width: 99%; }
-    body#search #results li { overflow: hidden; -moz-border-radius: 8px; border-radius: 8px; padding: 5px 8px; font-size: 100%; float: left; list-style: none; width: 96%; white-space: nowrap; margin: 0; margin-bottom: 3px; }
+body#search #results ul { font-size: 1.1em; margin: 0; padding: 0; float: left; width: 99%; }
+    body#search #results li { overflow: hidden; border: 1px solid transparent; border-bottom-width: 3px; -moz-border-radius: 8px; border-radius: 8px; padding: 5px 8px; font-size: 100%; float: left; list-style: none; width: 99%; white-space: nowrap; margin: 0; margin-bottom: 3px; }
+
+        body#search #results .body { background-color: #fff; }
+
+        /* Project data */
+        body#search #results li .project_data { text-align: right; margin-right: 2%; padding-top: 2px; width: 13%; float: left; }
+        body#search #results li .project_data .project__name { cursor: pointer; cursor: hand; }
+        body#search #results li .project_data .project__name:hover { text-decoration: underline; }
+        body#search #results li .project_data img { vertical-align: middle; width: 20px; height: 20px; /* If ever an image is not square this rule might distort it. */ }
+        body#search #results li .project_data .project__name {  }
+        body#search #results li .project_data .below_the_fold { display: none; }
+
+        body#search #results li .opp_data { border-left: 1px solid #e3e3e3; padding-left: 1%; width: 83%; float: left; }
+
         body#search #results li .details { padding: .3em .7em; padding-top: 0; float: left; font-size: 11px; display: none; }
         body#search #results li label { color: #777; }
         body#search #results li .field { width: 33%; float: left; margin-top: .3em; }
@@ -32,35 +35,39 @@ body#search #results ul { margin: 0; padding: 0; float: left; width: 99%; }
 
         /* First line, e.g.: "Tomboy: SSH synchronisation: does not create the remote directory | expand | link" */
         body#search #results li .first-line { float: left; cursor: hand; width: 100%; cursor: pointer; border-radius-topleft: 8px; border-radius-topright: 8px; -moz-border-radius-topleft: 8px; -moz-border-radius-topright: 8px; padding: 2px 0 0 2px; }
-        body#search #results li:hover { background-color: #ffffd4; }
-            body#search #results li .first-line a { color: #2288BB; }
-                body#search #results li .first-line a:hover { color: #223366; text-decoration: none; }
+        body#search #results li:hover { border-color: #e3e3e3; background-color: rgba(255, 255, 255, .45); }
 
         body#search #results li .first-line img { vertical-align: middle; width: 20px; height: 20px; /* If ever an image is not square this rule might distort it. */ }
 
-        body#search /* Second line, e.g.:   ● Bite-size - C# - 3 potential mentors - I am using the "local folder" option for synchronizati... */
-        body#search #results li .second-line { display: block; float: left; padding: 2px 0 0 2px; width: 100%; border-radius-bottomleft: 8px; border-radius-bottomright: 8px; -moz-border-radius-bottomleft: 8px; -moz-border-radius-bottomright: 8px; }
         body#search #results li .second-line .description p { font-family: sans-serif; display: inline; }
-        body#search #results li .good-for-beginners { padding: 1px; }
+        body#search #results li .good-for-beginners { background-color: #dcffcc; padding: 1px; }
 
-        body#search .title { font-weight: bold; }
+        body#search a.title { font-size: 1.1em; }
+        body#search a.title:focus { -moz-outline: none; }
+        body#search a.title:hover { text-decoration: underline; }
+        body#search #results .title .untruncated { display: none; }
 
         body#search #results li .description-container p { margin-top: 5px; }
         body#search #results .tag-details { display: none; }
-        body#search #results li .show-details { padding: .3em .7em; float: left; width: 71px; text-align: right; }
+        body#search #results li .show-details { padding: .3em 7em; float: left; width: 71px; text-align: right; }
         body#search #results li .left { white-space: nowrap; float: left; width: 460px; overflow: hidden; }
-        body#search #results li .description-container { width: 97%; padding: .3em .7em; font-size: .9em; color: #555; float: left; overflow: hidden; white-space: nowrap; }
+        body#search #results li .description-container { width: 97%; padding: .3em 0; font-size: 0.8em; color: #555; float: left; overflow: hidden; white-space: nowrap; }
             body#search #results li .description-container * { display: inline; }
             body#search #results li .description-container br { display: none; }
-        body#search #results li .description { font-family: monospace; }
+        body#search #results li .description {  font-family: monospace; }
 
-        body#search #results li.expanded { background: #ffffb4; white-space: normal; }
-            body#search #results li.expanded .title { text-shadow: 0 1px 0 #fff; }
-            body#search #results li.expanded .description-container { white-space: normal; }
+        body#search #results li.expanded { border-color: #e7e7e7; background: #fff; white-space: normal; }
+            body#search #results li.expanded .title { font-weight: bold; text-shadow: 0 1px 0 #fff; }
+            body#search #results li.expanded .title .truncated { display: none; }
+            body#search #results li.expanded .title .untruncated { display: inline; }
+            body#search #results li.expanded .description-container { white-space: normal; float: left; }
+
+                body#search #results li.expanded .meta-data { float: left; width: 100%; }
                 body#search #results li.expanded .description-container p { font-family: monospace; color: #000; white-space: pre-wrap; word-wrap: break-word; float: left; width: 100%; margin-bottom: .3em; }
                 body#search #results li.expanded .description-container br { display: inherit; }
+                body#search #results li.expanded .description-container .description { margin-top: 1em; float: left; padding-bottom: 1em; border-bottom: 1px solid #e7e7e7; max-height: 400px; overflow-y: auto; }
             body#search #results li.expanded .second-line { border-radius: 0; -moz-border-radius: 0; overflow: visible; }
-            body#search #results li.expanded .details { display: block; float: left; width: 90%; border-radius-bottomleft: 8px; border-radius-bottomright: 8px; -moz-border-radius-bottomleft: 8px; -moz-border-radius-bottomright: 8px; padding: 5px 10px; }
+            body#search #results li.expanded .details { display: block; float: left; width: 90%; font-size: .73em; padding: 5px 0; }
                 body#search #results li.expanded .details .fields { float: left; width: 100%; }
 
             body#search #results li .tags .project { padding: .3em .7em; float: left; }
@@ -96,7 +103,7 @@ body#search #expand-collapse-all { float: right; }
 	body#search #expand-collapse-all a { float: left; padding: 5px; }
 body#search .expanded .separator_betw_tags_and_desc { display: none ! important; }
 
-body#search .highlight { background-color: #ff7; font-weight: bold; }
+body#search .highlight { background-color: #ff8; font-weight: bold; }
 body#search .sep { color: #b4b4b4; }
 
 body#search .top_left { float: left; width: 83%; overflow: hidden; }

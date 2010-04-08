@@ -1,0 +1,90 @@
+{% extends 'base/base.html' %}
+
+{% load search %}
+{% load cache %}
+
+{% block title %}
+Search bugs 
+{% endblock title %}
+
+{% block body_id %}search{% endblock %}
+
+{% block css %}
+{{ block.super }}
+{% if not bunch_of_bugs %}
+#results-sidebar {
+    display: none;
+}
+{% endif %}
+{% endblock css %}
+
+{% block pagetop %}
+<h3><img alt='Volunteer opportunities' id='volunteer-opportunities' alt='Volunteer opportunities' src='/static/images/volunteer-opportunities-full.png' /></h3>
+
+<div class='module' style='width: 50%;'>
+    <div class='body' style='width: 95.7%; padding: 10px;'>
+        <h3 style='padding: 6px; margin-right: 5px;'>Search</h3>
+        <input type='text' style='width: 80%;'/>
+    </div>
+</div>
+{% endblock pagetop %}
+
+{% block content %}
+
+<div id='filters' class='module'>
+    <div class='head'>
+        <h3>Filters</h3>
+    </div>
+    <div class='body'>
+        <ul>
+            <li>
+                Languages
+                <ul>
+                    {% for language in languages %}
+                        <li>
+                            <input id='checkbox_for_project_{{ project.pk }}'
+                                    type='checkbox' />
+                            {{ language }}</li>
+
+                    {% endfor %}
+                </ul>
+            </li>
+            <li>
+                Projects
+                <ul>
+                    {% for project in popular_projects %}
+                        <li {% if not forloop.counter0 %}class='selected'{% endif %}>
+                            <input id='checkbox_for_project_{{ project.pk }}'
+                                    type='checkbox' />
+                            <label for='checkbox_for_project_{{ project.pk }}' class='name'
+                                    style='margin-right: 10px;'>{{ project.name }}</label>
+                        </li>
+                    {% endfor %}
+                    <li>
+                        <a style='float: right; padding: 4px;' href='#'>More projects &raquo;</a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+</div>
+
+<div id='results' class='module'>
+    <div class='head'>
+        <h3>Volunteer opportunities</h3>
+    </div>
+    <div class='body'>
+        <small style='font-size: .85em;'>
+            sort: <a style='font-weight: bold;' href=''>by popularity</a> &middot; 
+            <a href=''>alphabetically</a>
+        </small>
+        <ul>
+            {% for bug in bunch_of_bugs %}
+                <li class='bug'>
+                    {% include 'search/result.html' %}
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock content %}
