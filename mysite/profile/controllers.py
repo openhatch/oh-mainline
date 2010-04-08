@@ -79,19 +79,25 @@ class RecommendBugs(object):
             yield bug.id
 
 class PeopleMatcher(object):
-    def get_cache_key(self, *args):
+    def get_cache_key(self, *args, **kwargs):
         keys = (mysite.search.models.Epoch.get_for_model(
-            mysite.search.models.Link_Person_Tag),
+            mysite.profile.models.Link_Person_Tag),
                 args)
-        return sha.sha(repr(keys))
+        return sha.sha(repr(keys)).hexdigest()
+
+    def people_matching(self, property, value):
+        return mysite.base.helpers.instances_with_ids(
+            mysite.profile.models.Person,
+            mysite.profile.models.Person.objects,
+            self._people_matching_ids(property, value))
 
     @mysite.base.decorators.cache_method('get_cache_key')
-    def people_matching(self, property, value):
+    def _people_matching_ids(self, property, value):
         links = mysite.profile.models.Link_Person_Tag.objects.filter(
             tag__tag_type__name=property, tag__text__iexact=value)
         peeps = [l.person for l in links]
         sorted_peeps = sorted(set(peeps), key = lambda thing: (thing.user.first_name, thing.user.last_name))
-        return sorted_peeps
+        return [person.id for person in sorted_peeps]
 
 _pm = PeopleMatcher()
 people_matching = _pm.people_matching
