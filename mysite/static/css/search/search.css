@@ -12,16 +12,16 @@ body#search input[type='text'].default-text-active { color: #999 ! important; }
 /*          Filters
  *---------------------- */
 
-body#search #filters { width: 60%; }
+body#search #filters { width: 65%; margin-right: 1%; }
     body#search #filters > .head { float: left; width: 100%; }
     body#search #filters li { list-style: none; margin: 0; margin-bottom: .3em; }
-    body#search #filters > .body { padding: 1em; float: left; width: 97.5%; font-size: .9em; }
+    body#search #filters > .body { padding: 1em; float: left; width: 96.1%; font-size: .9em; }
     body#search #filters > .body > ul > li { float: left; margin-right: 2em; }
 
     body#search #filters label.on { font-weight: bold; }
     body#search #filters h4 { margin-bottom: 5px; }
 
-    /*      Projects
+    /*      Facets
      *-------------------------------- */
 
     body#search ul#facets { }
@@ -29,6 +29,13 @@ body#search #filters { width: 60%; }
             body#search ul#facets ul li, #suggested_searches li { list-style: circle; margin-left: 1em; color: #999; clear: left; }
             body#search #filters > .body > ul > li > ul { margin-top: .5em; }
     body#search #facets li.active { font-weight: bold; }
+
+/*          Search field
+ *---------------------- */
+body#search #textual_search { width: 32%; }
+body#search #textual_search .body { width: 91%; padding: 1em; }
+body#search #textual_search input[type='text'] { width: 75%; }
+body#search #textual_search input[type='submit'] { width: 15%; padding: 5px; }
 
 /*          Results
  *---------------------- */

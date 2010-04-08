@@ -21,12 +21,6 @@ Search bugs
 {% block pagetop %}
 <h3><img alt='Volunteer opportunities' id='volunteer-opportunities' alt='Volunteer opportunities' src='/static/images/volunteer-opportunities-full.png' /></h3>
 
-<div class='module' style='width: 50%;'>
-    <div class='body' style='width: 95.7%; padding: 10px;'>
-        <h3 style='padding: 6px; margin-right: 5px;'>Search</h3>
-        <input type='text' style='width: 80%;'/>
-    </div>
-</div>
 {% endblock pagetop %}
 
 {% block content %}
@@ -88,6 +82,22 @@ Search bugs
         {% endif %}
     {% endcomment %}
 </div>
+
+<div id='textual_search' class='module'>
+    <div class='body'>
+        <form name='search_opps' method='GET' id='search_fulltext' action='{% url mysite.search.views.fetch_bugs %}'> 
+            <input type='text' name='q' id='q' rel='hint'
+            title='Search {% if query.active_facet_options %}within results{% else %}bugs{% endif %}'
+            value='{{ query.terms_string }}' />
+
+            {% for facet, value in query.active_facet_options.items %}
+            <input type='hidden' name='{{facet}}' value='{{value}}' />
+            {% endfor %}
+            <input type='submit' id='button' value='Go' />
+        </form>
+    </div>
+</div>
+
 
 <div id='results' class='module'>
     <div class='head'>

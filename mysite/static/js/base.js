@@ -52,3 +52,7 @@ $.fn.toggleDisplay = function() {
     var what_to_do = this.is(':visible') ? 'hide' : 'show';
     this[what_to_do]();
 }
+
+$(function () {
+    $("input[rel='hint']").hint();
+});
