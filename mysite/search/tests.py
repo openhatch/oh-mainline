@@ -1021,7 +1021,7 @@ class QueryProject(SearchTest):
     def setUp(self):
         SearchTest.setUp(self)
         python_project = Project.create_dummy(language=u'Python',
-                                              name='thingamjig')
+                                              name='thingamajig')
         c_project = Project.create_dummy(language=u'C',
                                          name='thingamabob')
 
