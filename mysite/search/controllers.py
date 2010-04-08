@@ -213,28 +213,24 @@ class Query:
                     u'sidebar_name': u"main project language",
                     u'description_above_results': u"projects primarily coded in %s",
                     u'options': language_options,
-                    u'sort_key': 0,
                     }),
                 (u'project', {
                     u'name_in_GET': u'project',
                     u'sidebar_name': u'project',
                     u'description_above_results': 'in the %s project',
                     u'options': project_options,
-                    u'sort_key': 1,
                 }),
                 (u'toughness', {
                     u'name_in_GET': u"toughness",
                     u'sidebar_name': u"toughness",
                     u'description_above_results': u"where toughness = %s",
                     u'options': toughness_options,
-                    u'sort_key': 2,
-                    }),
+                }),
                 (u'contribution type', {
                     u'name_in_GET': u"contribution_type",
                     u'sidebar_name': u"kind of help needed",
                     u'description_above_results': u"which need %s",
                     u'options': contribution_type_options,
-                    u'sort_key': 3,
                     })
             )
 
