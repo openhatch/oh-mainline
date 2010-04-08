@@ -149,7 +149,8 @@ class Query:
                 })
             query_string = mysite.base.unicode_sanity.urlencode(GET_data)
             query = Query.create_from_GET_data(GET_data)
-            name = option_name or u'any'
+            the_all_option = u'any' 
+            name = option_name or the_all_option
 
             active_option_name = caller_query.active_facet_options.get(facet_name, None)
 
@@ -163,7 +164,7 @@ class Query:
 
             # ...or if this is the 'any' option and there is no active option
             # for this facet.
-            if name == 'any' and active_option_name is None:
+            if name == the_all_option and active_option_name is None:
                 is_active = True
 
             return {
