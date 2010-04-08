@@ -1195,7 +1195,7 @@ class TestPotentialMentors(TwillTests):
             tag=willing_to_mentor_c_sharp)
         link.save()
 
-        banshee_mentors = banshee.potential_mentors()
+        banshee_mentors = banshee.potential_mentors
         self.assertEqual(len(banshee_mentors), 2)
 
 class SuggestAlertOnLastResultsPage(TwillTests):

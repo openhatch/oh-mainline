@@ -62,6 +62,7 @@ class Project(OpenHatchModel):
             return '"%s"' % self.name
         return self.name
 
+    @mysite.base.decorators.cached_property
     def potential_mentors(self):
         """Return the union of the people who can mentor in this project,
         or who can mentor in the project's language."""
@@ -226,6 +227,7 @@ class Project(OpenHatchModel):
         return reverse(mysite.project.views.project,
                 kwargs={'project__name': mysite.base.unicode_sanity.quote(self.name)}) 
 
+    @mysite.base.decorators.cached_property
     def get_mentors_search_url(self):
         query_string = mysite.base.unicode_sanity.urlencode({u'q': u'can_mentor:"%s"' %
                                          self.language})

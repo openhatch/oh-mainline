@@ -86,10 +86,8 @@ class PeopleMatcher(object):
         return sha.sha(repr(keys)).hexdigest()
 
     def people_matching(self, property, value):
-        return mysite.base.helpers.instances_with_ids(
-            mysite.profile.models.Person,
-            mysite.profile.models.Person.objects,
-            self._people_matching_ids(property, value))
+        return mysite.profile.models.Person.objects.filter(
+            pk__in=self._people_matching_ids(property, value))
 
     @mysite.base.decorators.cache_method('get_cache_key')
     def _people_matching_ids(self, property, value):
