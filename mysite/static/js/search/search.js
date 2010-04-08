@@ -31,6 +31,11 @@ SearchResults.bindEventHandlers = function () {
             return false;
             });
 
+    $('#more_projects').click(function () {
+        alert('ok');
+        return false;
+    });
+
 }
 
 $(SearchResults.bindEventHandlers);
