@@ -55,7 +55,8 @@ class Query:
 
     @staticmethod
     def create_from_GET_data(GET):
-        possible_facets = [u'language', u'toughness', u'contribution_type']
+        possible_facets = [u'language', u'toughness', u'contribution_type',
+                           u'project']
 
         active_facet_options = {}
         for facet in possible_facets:
@@ -171,6 +172,8 @@ class Query:
 
         bugs = mysite.search.models.Bug.open_ones.filter(self.get_Q())
 
+        project_options = []
+
         toughness_options = self.get_facet_options(u'toughness', [u'bitesize', u''])
 
         contribution_type_options = self.get_facet_options(
@@ -206,8 +209,14 @@ class Query:
                     u'sidebar_name': u"kind of help needed",
                     u'description_above_results': u"which need %s",
                     u'options': contribution_type_options,
-                    }
+                    },
+                u'project': {
+                    u'name_in_GET': u'project',
+                    u'sidebar_name': u'Project',
+                    u'description_above_results': 'in the %s project',
+                    u'options': project_options,
                 }
+            }
 
         return possible_facets
 
