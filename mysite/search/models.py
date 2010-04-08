@@ -498,7 +498,7 @@ def post_bug_save_increment_bug_model_epoch(sender, instance, created, **kwargs)
         return # whatever, who cares
     if instance.looks_closed:
         # bump it
-        mysite.search.models.Epoch.bump_for_model(sender)
+        Epoch.bump_for_model(sender)
         # and clear the search cache
         import mysite.search.tasks
         mysite.search.tasks.clear_search_cache.delay()
