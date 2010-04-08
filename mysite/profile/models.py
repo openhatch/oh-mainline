@@ -689,6 +689,7 @@ class Forwarder(models.Model):
 def update_link_person_tag_cache(sender, instance, **kwargs):
     from mysite.profile.tasks import update_person_tag_cache
     update_person_tag_cache.delay(person__pk=instance.person.pk)
+    mysite.search.models.Epoch.bump_for_model(Link_Person_Tag)
 
 def update_pf_cache(sender, instance, **kwargs):
     from mysite.profile.tasks import update_someones_pf_cache

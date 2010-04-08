@@ -36,3 +36,13 @@ def string2naive_datetime(s):
     else:
         d = time_zoned # best we can do
     return d
+
+def instances_with_ids(model, manager, ids):
+    ret = []
+    for id_num in ids:
+        try:
+            ret.append(manager.get(id=id_num))
+        except model.DoesNotExist:
+            logging.info("Huh, it is gone.")
+    return ret
+    

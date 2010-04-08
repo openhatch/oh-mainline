@@ -63,8 +63,8 @@ class Project(OpenHatchModel):
         return self.name
 
     def potential_mentors(self):
-        '''Return the union of the people who can mentor in this project,
-        or who can mentor in the project's language.'''
+        """Return the union of the people who can mentor in this project,
+        or who can mentor in the project's language."""
         import mysite.profile.controllers
         mentor_set = set(mysite.profile.controllers.people_matching(
             'can_mentor', self.name))
