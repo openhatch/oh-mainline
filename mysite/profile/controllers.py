@@ -44,7 +44,7 @@ class RecommendBugs(object):
             try:
                 bug = mysite.search.models.Bug.all_bugs.get(pk=bug_id)
             except mysite.search.models.Bug.DoesNotExist:
-                logger.info("WTF, bug missing. Whatever.")
+                logging.info("WTF, bug missing. Whatever.")
                 continue
             ret.append(bug)
         return ret
