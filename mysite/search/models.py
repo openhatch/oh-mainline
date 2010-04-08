@@ -198,7 +198,8 @@ class Project(OpenHatchModel):
                 Q(project=self), Q(is_deleted=False),
                 Q(is_published=True) )
         # List the owners of those portfolio entries.
-        return [pf_entry.person for pf_entry in pf_entries]
+        people = [pf_entry.person for pf_entry in pf_entries]
+        return people
 
     def update_cached_contributor_count_and_save(self):
         contributors = self.get_contributors()
@@ -215,10 +216,15 @@ class Project(OpenHatchModel):
                 ))
         import random
         random.shuffle(pf_entries)
-        pf_entries = pf_entries[:n] # Slicing the pf entries has the same effect as
-                                    # slicing the list of people.
         other_contributors = [p.person for p in pf_entries]
-        return other_contributors
+
+        photod_people = [person for person in other_contributors if person.photo]
+        unphotod_people = [person for person in other_contributors if not person.photo]
+        ret = []
+        ret.extend(photod_people)
+        ret.extend(unphotod_people)
+
+        return ret[:n]
 
     def __unicode__(self):
         return "name='%s' language='%s'" % (self.name, self.language)
