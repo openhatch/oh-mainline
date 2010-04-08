@@ -104,7 +104,7 @@ class Person(models.Model):
     def reindex_for_person_search(self):
         import mysite.profile.tasks
         task = mysite.profile.tasks.ReindexPerson()
-        task.delay(person_id=self.id)        
+        task.delay(person_id=self.id)
 
     def get_public_location_or_default(self):
         if self.location_is_public():

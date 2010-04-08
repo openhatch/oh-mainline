@@ -19,6 +19,8 @@ import random
 import traceback
 import mysite.profile.search_indexes
 import mysite.profile.controllers
+import shutil
+import staticgenerator
 
 from django.conf import settings
 import django.core.cache
@@ -378,4 +380,26 @@ def sync_bug_epoch_from_model_then_fill_recommended_bugs_cache():
         logging.info("Whee! Bumped the epoch. Guess I'll fill the cache.")
         fill_recommended_bugs_cache.delay()
     logging.info("Done syncing bug epoch.")
-    
+
+@task
+def clear_people_page_cache(*args, **kwargs):
+    shutil.rmtree(os.path.join(settings.WEB_ROOT,
+                               'people'),
+                  ignore_errors=True)
+
+def clear_people_page_cache_task(*args, **kwargs):
+    return clear_people_page_cache.delay()
+
+@periodic_task(run_every=datetime.timedelta(minutes=2))
+def fill_people_page_cache():
+    staticgenerator.quick_publish('/people/')
+
+for model in [mysite.profile.models.PortfolioEntry,
+              mysite.profile.models.Person,
+              mysite.profile.models.Link_Person_Tag]:
+    for signal_to_hook in [
+        django.db.models.signals.post_save,
+        django.db.models.signals.post_delete]:
+        signal_to_hook.connect(
+            clear_people_page_cache_task,
+            sender=model)
