@@ -446,7 +446,7 @@ class Epoch(OpenHatchModel):
         epoch.save() # definitely!
         return epoch
 
-class NoteThatSomeoneWantsToHelpAProject(OpenHatchModel):
+class WannaHelperNote(OpenHatchModel):
     class Meta:
         unique_together = [('project', 'person')]
     person = models.ForeignKey('profile.Person')
@@ -454,16 +454,16 @@ class NoteThatSomeoneWantsToHelpAProject(OpenHatchModel):
 
     @staticmethod
     def add_person_project(person, project):
-        note, _ = NoteThatSomeoneWantsToHelpAProject.objects.get_or_create(
+        note, _ = WannaHelperNote.objects.get_or_create(
             person=person, project=project)
         return note
 
     @staticmethod
     def remove_person_project(person, project):
         try:
-            note = NoteThatSomeoneWantsToHelpAProject.objects.get(person=person, project=project)
+            note = WannaHelperNote.objects.get(person=person, project=project)
             note.delete()
-        except NoteThatSomeoneWantsToHelpAProject.DoesNotExist:
+        except WannaHelperNote.DoesNotExist:
             pass
 
     @property

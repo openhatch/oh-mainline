@@ -194,7 +194,7 @@ class Feed(TwillTests):
         ### to that effect in the feed
         response = client.get('/')
         items = response.context[0]['recent_feed_items']
-        note_we_want_to_see = mysite.search.models.NoteThatSomeoneWantsToHelpAProject.objects.get(
+        note_we_want_to_see = mysite.search.models.WannaHelperNote.objects.get(
             person=person, project=p_before)
         self.assert_(note_we_want_to_see in items)
 
