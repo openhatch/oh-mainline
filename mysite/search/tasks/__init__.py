@@ -1,10 +1,10 @@
-from datetime import timedelta
 import datetime
 import logging
 import mysite.search.models
 import mysite.customs.models
 from celery.task import Task, PeriodicTask
-from celery.registry import tasks
+import celery.decorators
+import datetime
 
 import mysite.customs.miro
 import mysite.customs.bugtrackers.trac
@@ -15,7 +15,7 @@ import mysite.search.tasks.bugzilla_instances
 import mysite.search.tasks.launchpad_tasks
 
 class GrabLaunchpadBugs(PeriodicTask):
-    run_every = timedelta(days=1)
+    run_every = datetime.timedelta(days=1)
     def run(self, **kwargs):
         logger = self.get_logger(**kwargs)
         for lp_project in lpproj2ohproj:
@@ -26,7 +26,7 @@ class GrabLaunchpadBugs(PeriodicTask):
                          openhatch_project=openhatch_proj)
 
 class LearnAboutNewPythonDocumentationBugs(PeriodicTask):
-    run_every = timedelta(days=1)
+    run_every = datetime.timedelta(days=1)
     def run(self, **kwargs):
         logger = self.get_logger(**kwargs)
         logger.info("Started to grab the list of Python documentation bugs.")
@@ -38,7 +38,7 @@ class LearnAboutNewPythonDocumentationBugs(PeriodicTask):
         logger.info("Finished grabbing the list of Python documentation bugs.")
 
 class LearnAboutNewEasyPythonBugs(PeriodicTask):
-    run_every = timedelta(days=1)
+    run_every = datetime.timedelta(days=1)
     def run(self, **kwargs):
         logger = self.get_logger(**kwargs)
         logger.info("Started to grab the list of Python easy bugs.")
@@ -85,7 +85,7 @@ class LookAtOneBugInPython(Task):
         logger.info("Successfully loaded %d in as a Python bug." % bug_id)
 
 class GrabPythonBugs(PeriodicTask):
-    run_every = timedelta(days=1)
+    run_every = datetime.timedelta(days=1)
     def run(self, **kwargs):
         logger = self.get_logger(**kwargs)
         logger.info("Started to grab Python 'easy' bugs")
@@ -130,9 +130,20 @@ class PopulateProjectLanguageFromOhloh(Task):
                 logger.info("Set %s.language to %s" %
                             (p.name, p.language))
 
-tasks.register(GrabLaunchpadBugs)
-tasks.register(LearnAboutNewEasyPythonBugs)
-tasks.register(LearnAboutNewPythonDocumentationBugs)
-tasks.register(LookAtOneBugInPython)
-tasks.register(GrabPythonBugs)
-tasks.register(PopulateProjectLanguageFromOhloh)
+### Right now, we cache /search/ pages to disk. We should throw those away
+### under two circumstances.
+@celery.decorators.periodic_task(run_every=datetime.timedelta(hours=1))
+def periodically_check_if_bug_epoch_eclipsed_the_cached_search_epoch():
+    cache_time = mysite.search.models.Epoch.get_for_string('search_cache')
+    bug_time = mysite.search.models.Epoch.get_for_string('search_cache')
+    if cache_time < bug_time:
+        clear_search_cache.delay()
+        mysite.search.models.Epoch.bump_for_string('search_cache')
+
+### The second circumstance is if a bug gets marked as closed.
+@celery.decorators.task
+def clear_search_cache():
+    logging.info("Clearing the search cache.")
+    shutil.rmtree(os.path.join(settings.WEB_ROOT,
+                               'search'),
+                  ignore_errors=True)
