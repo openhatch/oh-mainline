@@ -185,6 +185,8 @@ class Query:
                                                  available_projects +
                                                  [u''])
 
+        project_options = sorted(project_options, key=lambda option: not option['is_active'])
+
         toughness_options = self.get_facet_options(u'toughness', [u'bitesize', u''])
 
         contribution_type_options = self.get_facet_options(
@@ -196,6 +198,8 @@ class Query:
         language_options_name_is_any = filter((lambda language_option_set: language_option_set[u'name'] == u'any'), language_options)
         language_options_name_is_neither_of_the_above = filter((lambda language_option_set: language_option_set[u'name']  not in [u'Unknown', u'any'] ), language_options)
         language_options = language_options_name_is_neither_of_the_above + language_options_name_is_unknown + language_options_name_is_any
+
+        language_options = sorted(language_options, key=lambda option: not option['is_active'])
 
 
         # looks something like:

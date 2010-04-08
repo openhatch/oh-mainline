@@ -47,7 +47,7 @@ body#search #results ul { margin: 0; padding: 0; float: left; width: 99%; }
 
         /* Project data */
         body#search #results li .project_data { text-align: right; margin-right: 2%; padding-top: 2px; width: 13%; float: left; }
-        body#search #results li .project__name { color: #a3a3a3; cursor: pointer; cursor: hand; }
+        body#search #results li .project__name { color: #a3a3a3; cursor: pointer; cursor: hand; white-space: normal; }
         body#search #results li .project__name:hover { color: #000; text-decoration: underline; }
         body#search #results li:hover .project__name, body#search #results li.expanded .project__name { color: #000; }
         body#search #results li:hover .project_data img, body#search #results li.expanded .project_data img { opacity: 1; }
@@ -148,5 +148,7 @@ body#search #results .body { width: 99%; padding: 5px; }
 body#search .contributors { display: none; }
 
 #define-bite-size { font-weight: normal; }
+
+body#search .facet_more_options { height: 400px; overflow-y: auto; }
 
 /* vim: set ai ts=4 sts=4 et sw=4 nowrap: */

@@ -41,45 +41,45 @@ Search bugs
             {% for facet_name, facet in query.get_possible_facets.items reversed %}
                 {% comment %}
                     facets = e.g. {
-                    'language': {
-                    'Python': 1,
-                    'Java': 8,
-                    }
+                        'language': {
+                            'Python': 1,
+                            'Java': 8,
+                        }
                     }
                 {% endcomment %}
                 <li>
                     by
                     {{ facet.sidebar_name }}
                     <ul>
-                        {% for option in facet.options %}
+                        {% for option in facet.options|slice:':4' %}
                             {% if option.name %}
 
-                                {% if facet.sidebar_name|equals:'project' and option.name|equals:'any' %}
-                                    <li>
-                                        <a id='more_projects' href='#'>
-                                            more projects &raquo;
-                                        </a>
-                                    </li>
-                                {% else %}
-                                    <li {% if option.is_active %}class='active'{% endif %}>
-                                        <a href='?{{ option.query_string }}'>
-                                            {% if facet_name|in_list:query.active_facet_options %}
-                                                {% if not option.is_active %}
-                                                    {% ifnotequal option.name "any" %}
-                                                        Switch to
-                                                    {% endifnotequal %}
-                                                {% endif %}
-                                            {% endif %}
-                                            {{ option.name }} ({{ option.count }})</a>
-                                        {% ifequal option.name 'bitesize' %}
-                                            <small style='display: block;'>
-                                                <a id='define-bite-size' href="#">What's this?</a>
-                                            </small>
-                                        {% endifequal %}
-                                    </li>
-                                {% endif %}
+                                <li {% if option.is_active %}class='active'{% endif %}>
+                                    <a href='?{{ option.query_string }}'>
+                                        {{ option.name }} ({{ option.count }})</a>
+                                    {% ifequal option.name 'bitesize' %}
+                                        <small style='display: block;'>
+                                            <a id='define-bite-size' href="#">What's this?</a>
+                                        </small>
+                                    {% endifequal %}
+                                </li>
                             {% endif %}
                         {% endfor %}
+                        {% if facet.options|length|gt:'4' %}
+                            <li>
+                                <a rel='facebox' id='more_projects' href='#{{ facet_name }}s'>
+                                    more {{ facet_name }}s &raquo;
+                                </a>
+                                <div style='display: none;' id='{{ facet_name }}s'>
+                                    <h2>Select a {{ facet_name }}</h2>
+                                    <ul class='facet_more_options'>
+                                        {% for option in facet.options %}
+                                            <li><a href='?{{ option.query_string }}'>{{ option.name }} ({{ option.count }})</a></li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </li>
+                        {% endif %}
                     </ul>
                 </li>
             {% endfor %}
@@ -124,10 +124,6 @@ Search bugs
     </div>
 </div>
 
-<div style='display: none;' id='projects'>
-    {% for project in all_projects %}
-    {% endfor %}
-</div>
 {% endblock content %}
 
 {% block js %}

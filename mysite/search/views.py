@@ -122,17 +122,18 @@ def fetch_bugs(request, invalid_subscribe_to_alert_form=None):
             facet, [''])[0]['query_string']
 
     Bug = mysite.search.models.Bug
-    from django.db.models import Q
+    from django.db.models import Q, Count
     data['popular_projects'] = list(Project.objects.filter(name__in=['Miro', 'GnuCash', 'brasero', 'Evolution Exchange', 'songbird']).order_by('name').reverse())
-    data['all_projects'] = Project.objects.all()
+    data['all_projects'] = Project.objects.values('pk','name').filter(bug__looks_closed=False).annotate(Count('bug')).order_by('name')
 
     Person = mysite.profile.models.Person
     import random
     random_start = int(random.random() * 700)
-    from django.db.models import Count
     data['contributors'] = Person.objects.all()[random_start:random_start+5]
     data['contributors2'] = Person.objects.all()[random_start+10:random_start+15]
     data['languages'] = Project.objects.all().values_list('language', flat=True).order_by('language').exclude(language='').distinct()[:4]
+
+    data['available_projects'] = query.get_possible_facets()['project']['options']
 
     if format == 'json':
         # FIXME: Why `alert`?
