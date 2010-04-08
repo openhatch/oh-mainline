@@ -33,40 +33,60 @@ Search bugs
 
 <div id='filters' class='module'>
     <div class='head'>
-        <h3>Filters</h3>
+        <h3>
+            {% if query.terms %}
+                Filter results for <strong>{{ query.terms_string }}</strong>:
+            {% else %}
+                Browse&hellip;
+            {% endif %}
+        </h3>
     </div>
     <div class='body'>
-        <ul>
-            <li>
-                Languages
-                <ul>
-                    {% for language in languages %}
-                        <li>
-                            <input id='checkbox_for_project_{{ project.pk }}'
-                                    type='checkbox' />
-                            {{ language }}</li>
-
-                    {% endfor %}
-                </ul>
-            </li>
-            <li>
-                Projects
-                <ul>
-                    {% for project in popular_projects %}
-                        <li {% if not forloop.counter0 %}class='selected'{% endif %}>
-                            <input id='checkbox_for_project_{{ project.pk }}'
-                                    type='checkbox' />
-                            <label for='checkbox_for_project_{{ project.pk }}' class='name'
-                                    style='margin-right: 10px;'>{{ project.name }}</label>
-                        </li>
-                    {% endfor %}
-                    <li>
-                        <a style='float: right; padding: 4px;' href='#'>More projects &raquo;</a>
-                    </li>
-                </ul>
-            </li>
+        <ul id='facets'>
+            {% for facet_name, facet in query.get_possible_facets.items reversed %}
+                {% comment %}
+                    facets = e.g. {
+                    'language': {
+                    'Python': 1,
+                    'Java': 8,
+                    }
+                    }
+                {% endcomment %}
+                <li>
+                    by
+                    {{ facet.sidebar_name }}
+                    <ul>
+                        {% for option in facet.options %}
+                            {% if option.name %}
+                                <li {% if option.is_active %}class='active'{% endif %}>
+                                    <a href='?{{ option.query_string }}'>
+                                        {% if facet_name|in_list:query.active_facet_options %}
+                                            {% if not option.is_active %}
+                                                {% ifnotequal option.name "any" %}
+                                                    Switch to
+                                                {% endifnotequal %}
+                                            {% endif %}
+                                        {% endif %}
+                                        {{ option.name }} ({{ option.count }})</a>
+                                    {% ifequal option.name 'bitesize' %}
+                                        <small>
+                                            (<a id='define-bite-size' href="#">what's this?</a>)
+                                        </small>
+                                    {% endifequal %}
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </li>
+            {% endfor %}
         </ul>
     </div>
+    {% comment %}
+        {% if query.terms %}
+            <a href='./' style='display: block; margin-bottom: 10px;'>&laquo;
+                Back to browsing</a>
+        {% endif %}
+    {% endcomment %}
 </div>
 
 <div id='results' class='module'>
