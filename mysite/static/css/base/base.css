@@ -1,111 +1,46 @@
-body {
-    font: 10pt Helvetica, sans-serif;
-    background: #fff url("/static/images/motif-eee.png") fixed;
-    color: #222;
-    /* color: rgb(55,84,105); dark blue */
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 0;
-}
-
-a {
-    color: #FF6D3D;
-    text-decoration: none;
-}
-
+body { font: 10pt Helvetica, sans-serif; background: #fff url("/static/images/motif-eee.png") fixed; color: #222; /* color: rgb(55,84,105); dark blue */ max-width: 1000px; margin: 0 auto; padding: 0; }
+a { color: #FF6D3D; text-decoration: none; }
 a:focus { text-decoration: underline; }
 
-/*for FireFox*/
+/* for Firefox */
 input[type="submit"]::-moz-focus-inner, input[type="button"]::-moz-focus-inner, button::-moz-focus-inner { border : 0px; }
-/*for IE8 */
+/* for IE8 */
 input[type="submit"]:focus, input[type="button"]:focus { outline : none; }
 
-/* display: none would hide this from screenreaders. Let's hide this off stage left instead. */
 .alt-text { left: -9999px; position: absolute; }
+/* ^^^ display: none would hide this from screenreaders. Let's hide this off stage left instead. */
 
 a:hover { text-decoration: underline; }
+a img { border-style: none; }
 
-a img {
-    border-style: none;
-}
+abbr { border-bottom: 1px dotted #999; }
 
-abbr {
-    border-bottom: 1px dotted #999;
-}
+h1 a { text-decoration: none; }
+h1 a:hover { text-decoration: none; }
 
-h1 a {
-    text-decoration: none;
-}
+.module { float: left; margin-bottom: 15px; padding: 4px; background: url('/static/images/gray-60.png'); -moz-border-radius: 8px; border-radius: 8px; }
 
-h1 a:hover {
-    text-decoration: none;
-}
+.module > .head { float: left; }
 
-.module {
-    float: left;
-    margin-bottom: 15px;
-    padding: 4px;
-    background: url('/static/images/gray-60.png');
-    -moz-border-radius: 8px;
-    border-radius: 8px;
-}
+.module > .body { float: left; padding: 20px; background: #fff; -moz-border-radius: 8px; border-radius: 8px; } 
 
-.module > .head {
-    float: left;
-}
-
-.module > .body {
-    float: left;
-    padding: 20px;
-    background: #fff;
-    -moz-border-radius: 8px;
-    border-radius: 8px;
-}
-
-.module > .foot, .submodule > .foot {
-    float: left;
-    border-top: 1px solid #e4e4e4;
-    padding: 15px;
-    background-color: #f4f4f4; 
-}
+.module > .foot, .submodule > .foot { float: left; border-top: 1px solid #e4e4e4; padding: 15px; background-color: #f4f4f4; }
 
 .module > .body.contains-submodules { background: #fff url('/static/images/motif.png'); }
 
-.submodule {
-    background-color: #fff;
-    margin-bottom: 20px;
-    border: 4px solid #e8e8e8;
-    border-radius: 8px;
-    -moz-border-radius: 8px;
-    float: left;
-}
+.submodule { background-color: #fff; margin-bottom: 20px; border: 4px solid #e8e8e8; border-radius: 8px; -moz-border-radius: 8px; float: left; }
 
-.submodule > .head {
-    float: left;
-    padding: 10px 20px;
-    background-color: #f4f4f4;
-    border-bottom: 1px solid #e4e4e4;
-}
+.submodule > .head { float: left; padding: 10px 20px; background-color: #f4f4f4; border-bottom: 1px solid #e4e4e4; }
 
-.submodule > .body {
-    background-color: #fff;
-}
+.submodule > .body { background-color: #fff; }
 
-ul {
-    padding: 0;
-    margin: 0;
-    list-style: none;
-}
-#outermost {
-    margin: 0 auto;
-    width: 1000px;
-}
-#penoutermost {
-    width: 1000px;
-}
-h1, h2, h3, h4 {
-    margin: 0;
-}
+ul { padding: 0; margin: 0; list-style: none; }
+
+#outermost { margin: 0 auto; width: 1000px; }
+
+#penoutermost { width: 1000px; }
+
+h1, h2, h3, h4 { margin: 0; }
 
 h1 {
     font-weight: normal;
