@@ -448,7 +448,11 @@ class Epoch(OpenHatchModel):
     @staticmethod
     def get_for_model(class_object):
         class_name = unicode(str(class_object))
-        matches = Epoch.objects.filter(class_name=class_name)
+        return Epoch.get_for_string(class_name)
+
+    @staticmethod
+    def get_for_string(s):
+        matches = Epoch.objects.filter(class_name=s)
         if matches:
             match = matches[0]
             return match.modified_date.timetuple()
@@ -457,8 +461,12 @@ class Epoch(OpenHatchModel):
     @staticmethod
     def bump_for_model(class_object):
         class_name = unicode(str(class_object))
+        return Epoch.bump_for_string(class_name)
+
+    @staticmethod
+    def bump_for_string(s):
         epoch, _ = Epoch.objects.get_or_create(
-            class_name=class_name)
+            class_name=s)
         epoch.modified_date = datetime.datetime.utcnow()
         epoch.save() # definitely!
         return epoch
@@ -501,7 +509,10 @@ def post_bug_save_increment_bug_model_epoch(sender, instance, created, **kwargs)
         return # whatever, who cares
     if instance.looks_closed:
         # bump it
-        mysite.search.models.Epoch.bump_for_model(sender)
+        Epoch.bump_for_model(sender)
+        # and clear the search cache
+        import mysite.search.tasks
+        mysite.search.tasks.clear_search_cache.delay()
 
 def post_bug_delete_increment_bug_model_epoch(sender, instance, **kwargs):
     # always bump it
