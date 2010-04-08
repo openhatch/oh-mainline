@@ -179,7 +179,7 @@ class Query:
 
         bugs = mysite.search.models.Bug.open_ones.filter(self.get_Q())
 
-        available_projects = [k['project__name'] for k in bugs.values('project__name').distinct()]
+        available_projects = [k['project__name'] for k in bugs.values('project__name').order_by('project__name').distinct()]
 
         project_options = self.get_facet_options(u'project',
                                                  available_projects +
