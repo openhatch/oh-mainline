@@ -206,33 +206,37 @@ class Query:
         # looks something like:
         # [{'count': 1180L, 'query_string': 'q=&language=Python', 'is_active': False, 'name': u'Python'}, {'count': 478L, 'query_string': 'q=&language=C%23', 'is_active': False, 'name': u'C#'}, {'count': 184L, 'query_string': 'q=&language=Unknown', 'is_active': False, 'name': 'Unknown'}, {'count': 532L, 'query_string': 'q=&language=C', 'is_active': False, 'name': u'C'}, {'count': 2374L, 'query_string': 'q=&language=', 'is_active': True, 'name': 'any'}]
 
-        possible_facets = { 
+        possible_facets = ( 
                 # The languages facet is based on the project languages, "for now"
-                u'language': {
+                (u'language', {
                     u'name_in_GET': u"language",
                     u'sidebar_name': u"main project language",
                     u'description_above_results': u"projects primarily coded in %s",
                     u'options': language_options,
-                    },
-                u'toughness': {
-                    u'name_in_GET': u"toughness",
-                    u'sidebar_name': u"toughness",
-                    u'description_above_results': u"where toughness = %s",
-                    u'options': toughness_options,
-                    },
-                u'contribution type': {
-                    u'name_in_GET': u"contribution_type",
-                    u'sidebar_name': u"kind of help needed",
-                    u'description_above_results': u"which need %s",
-                    u'options': contribution_type_options,
-                    },
-                u'project': {
+                    u'sort_key': 0,
+                    }),
+                (u'project', {
                     u'name_in_GET': u'project',
                     u'sidebar_name': u'project',
                     u'description_above_results': 'in the %s project',
                     u'options': project_options,
-                }
-            }
+                    u'sort_key': 1,
+                }),
+                (u'toughness', {
+                    u'name_in_GET': u"toughness",
+                    u'sidebar_name': u"toughness",
+                    u'description_above_results': u"where toughness = %s",
+                    u'options': toughness_options,
+                    u'sort_key': 2,
+                    }),
+                (u'contribution type', {
+                    u'name_in_GET': u"contribution_type",
+                    u'sidebar_name': u"kind of help needed",
+                    u'description_above_results': u"which need %s",
+                    u'options': contribution_type_options,
+                    u'sort_key': 3,
+                    })
+            )
 
         return possible_facets
 

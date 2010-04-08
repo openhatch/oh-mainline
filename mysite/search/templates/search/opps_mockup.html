@@ -38,7 +38,7 @@ Search bugs
     </div>
     <div class='body'>
         <ul id='facets'>
-            {% for facet_name, facet in query.get_possible_facets.items reversed %}
+            {% for facet_name, facet in query.get_possible_facets %}
                 {% comment %}
                     facets = e.g. {
                         'language': {
@@ -53,16 +53,7 @@ Search bugs
                     <ul>
                         {% for option in facet.options|slice:':4' %}
                             {% if option.name %}
-
-                                <li {% if option.is_active %}class='active'{% endif %}>
-                                    <a href='?{{ option.query_string }}'>
-                                        {{ option.name }} ({{ option.count }})</a>
-                                    {% ifequal option.name 'bitesize' %}
-                                        <small style='display: block;'>
-                                            <a id='define-bite-size' href="#">What's this?</a>
-                                        </small>
-                                    {% endifequal %}
-                                </li>
+                                {% include 'facet_option.html' %}
                             {% endif %}
                         {% endfor %}
                         {% if facet.options|length|gt:'4' %}
@@ -74,7 +65,7 @@ Search bugs
                                     <h2>Select a {{ facet_name }}</h2>
                                     <ul class='facet_more_options'>
                                         {% for option in facet.options %}
-                                            <li><a href='?{{ option.query_string }}'>{{ option.name }} ({{ option.count }})</a></li>
+                                            {% include 'facet_option.html' %}
                                         {% endfor %}
                                     </ul>
                                 </div>
@@ -108,7 +99,7 @@ Search bugs
     </div>
 </div>
 
-
+{% if bunch_of_bugs %}
 <div id='results' class='module'>
     <div class='head'>
         <h3>Volunteer opportunities</h3>
@@ -123,6 +114,7 @@ Search bugs
         </ul>
     </div>
 </div>
+{% endif %}
 
 {% endblock content %}
 

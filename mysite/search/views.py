@@ -133,8 +133,6 @@ def fetch_bugs(request, invalid_subscribe_to_alert_form=None):
     data['contributors2'] = Person.objects.all()[random_start+10:random_start+15]
     data['languages'] = Project.objects.all().values_list('language', flat=True).order_by('language').exclude(language='').distinct()[:4]
 
-    data['available_projects'] = query.get_possible_facets()['project']['options']
-
     if format == 'json':
         # FIXME: Why `alert`?
         return bugs_to_json_response(data, bugs, request.GET.get(

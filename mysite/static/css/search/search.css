@@ -28,7 +28,7 @@ body#search #filters { width: 75%; margin-right: 1%; }
         body#search ul#facets ul { margin-left: 10px; }
             body#search ul#facets ul li, #suggested_searches li, .facet_more_options li { list-style: circle; margin-left: 1em; color: #999; clear: left; }
             body#search #filters > .body > ul > li > ul { margin-top: .5em; }
-    body#search #facets li.active { font-weight: bold; }
+    body#search #facets li.active, body#search .facet_more_options li.active { font-weight: bold; }
 
 /*          Search field
  *---------------------- */
