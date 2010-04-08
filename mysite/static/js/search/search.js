@@ -40,4 +40,40 @@ SearchResults.bindEventHandlers = function () {
 
 }
 
+SearchResults.shortcutsEnabled = false;
+
+SearchResults.moveSearchResultFocusDown = function () {
+    SearchResults.lightSearchResult(SearchResults.getLitSearchResultIndex() + 1);
+};
+
+SearchResults.moveSearchResultFocusUp = function () {
+    SearchResults.lightSearchResult(SearchResults.getLitSearchResultIndex() - 1);
+};
+
+SearchResults.initializeAutoComplete = function() {
+    $input = $("#opps form input[type='text']");
+    //console.log("input", $input);
+    url = "/search/get_suggestions";
+    acOptions = {
+        'minChars': 1,
+        /*
+           'extraParams': {
+           'partial_query': '',
+           },*/
+        'multiple': true,
+        'multipleSeparator': " ",
+        'matchContains': true
+    };
+    // $input.autocomplete(url, acOptions);
+};
+
+
+$(SearchResults.bindEventHandlers);
+
+$(function() {
+        SearchResults.lightSearchResult(0);
+        });
+
+
+
 /* vim: set ai ts=4 sts=4 et sw=4: */
