@@ -207,3 +207,6 @@ POSTFIX_FORWARDER_TABLE_PATH = '/tmp/email_forwarders'
 CACHE_MIDDLEWARE_ANONYMOUS_ONLY = True
 
 #CELERY_ALWAYS_EAGER = True # This is set to True in the test runner also.
+
+WEB_ROOT = os.path.join(MEDIA_ROOT, '_cache')
+
