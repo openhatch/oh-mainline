@@ -47,9 +47,11 @@ body#search #results ul { margin: 0; padding: 0; float: left; width: 99%; }
 
         /* Project data */
         body#search #results li .project_data { text-align: right; margin-right: 2%; padding-top: 2px; width: 13%; float: left; }
-        body#search #results li .project_data .project__name { cursor: pointer; cursor: hand; }
-        body#search #results li .project_data .project__name:hover { text-decoration: underline; }
-        body#search #results li .project_data img { vertical-align: middle; width: 20px; height: 20px; /* If ever an image is not square this rule might distort it. */ }
+        body#search #results li .project__name { color: #a3a3a3; cursor: pointer; cursor: hand; }
+        body#search #results li .project__name:hover { color: #000; text-decoration: underline; }
+        body#search #results li:hover .project__name, body#search #results li.expanded .project__name { color: #000; }
+        body#search #results li:hover .project_data img, body#search #results li.expanded .project_data img { opacity: 1; }
+        body#search #results li .project_data img { vertical-align: middle; opacity: 0.5; width: 20px; height: 20px; /* If ever an image is not square this rule might distort it. */  }
         body#search #results li .project_data .project__name {  }
         body#search #results li .project_data .below_the_fold { display: none; }
 
@@ -62,7 +64,7 @@ body#search #results ul { margin: 0; padding: 0; float: left; width: 99%; }
         body#search #results li .head { font-size: 1em; float: left; padding: 5px 10px; width: 99%; overflow: hidden; }
 
         /* First line, e.g.: "Tomboy: SSH synchronisation: does not create the remote directory | expand | link" */
-        body#search #results li .first-line { float: left; cursor: hand; width: 100%; cursor: pointer; border-radius-topleft: 8px; border-radius-topright: 8px; -moz-border-radius-topleft: 8px; -moz-border-radius-topright: 8px; padding: 2px 0 0 2px; }
+        body#search #results li .first-line { float: left; cursor: hand; width: 100%; cursor: pointer; }
         body#search #results li:hover { border-color: #dedede; }
 
         body#search #results li .first-line img { vertical-align: middle; width: 20px; height: 20px; /* If ever an image is not square this rule might distort it. */ }
