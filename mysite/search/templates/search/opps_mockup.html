@@ -63,8 +63,8 @@ Search bugs
                                         {% endif %}
                                         {{ option.name }} ({{ option.count }})</a>
                                     {% ifequal option.name 'bitesize' %}
-                                        <small>
-                                            (<a id='define-bite-size' href="#">what's this?</a>)
+                                        <small style='display: block;'>
+                                            <a id='define-bite-size' href="#">What's this?</a>
                                         </small>
                                     {% endifequal %}
                                 </li>
@@ -104,10 +104,6 @@ Search bugs
         <h3>Volunteer opportunities</h3>
     </div>
     <div class='body'>
-        <small style='font-size: .85em;'>
-            sort: <a style='font-weight: bold;' href=''>by popularity</a> &middot; 
-            <a href=''>alphabetically</a>
-        </small>
         <ul>
             {% for bug in bunch_of_bugs %}
                 <li class='bug'>
@@ -118,3 +114,17 @@ Search bugs
     </div>
 </div>
 {% endblock content %}
+
+{% block js %}
+<script type='text/javascript'>
+    $(function () {
+            $('#define-bite-size').click(function () {
+                var definition = (
+                    '<dt><strong>Bite-size</strong> [\ˈbaɪtˌsaɪz\], adj.</dt>' + 
+                    '<dd>Good for newcomers; ' +
+                    'relatively easy and rewarding to fix.</dd>');
+                $.jGrowl(definition, { life: 10000 });
+                });
+            });
+</script>
+{% endblock js %}

@@ -145,7 +145,8 @@ body#search #create_bug_alert { padding: 10px 15px; -moz-border-radius: 8px; bor
 body#search .head h3 { font-weight: normal; text-shadow: 0 1px 0 #fff; }
 body#search #results { width: 100%; }
 body#search #results .body { width: 99%; padding: 5px; }
-body#search small { display: none; }
 body#search .contributors { display: none; }
+
+#define-bite-size { font-weight: normal; }
 
 /* vim: set ai ts=4 sts=4 et sw=4 nowrap: */
