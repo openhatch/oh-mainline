@@ -239,7 +239,7 @@ def wanna_help_do(request):
     if request.user.is_authenticated():
         person = request.user.get_profile()
         project.people_who_wanna_help.add(person)
-        mysite.search.models.NoteThatSomeoneWantsToHelpAProject.add_person_project(person, project)
+        mysite.search.models.WannaHelperNote.add_person_project(person, project)
         project.save()
 
         # Reindex the guy
@@ -291,7 +291,7 @@ def unlist_self_from_wanna_help_do(request):
     if wanna_help_form.is_valid():
         project = wanna_help_form.cleaned_data['project']
         project.people_who_wanna_help.remove(request.user.get_profile())
-        mysite.search.models.NoteThatSomeoneWantsToHelpAProject.remove_person_project(request.user.get_profile(), project)
+        mysite.search.models.WannaHelperNote.remove_person_project(request.user.get_profile(), project)
         request.user.get_profile().reindex_for_person_search()
         return HttpResponseRedirect(project.get_url())
     else:

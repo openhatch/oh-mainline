@@ -1016,6 +1016,39 @@ class QueryContributionType(SearchTest):
         self.assertEqual(documentation_one[u'count'], 1)
         self.assertEqual(any_one[u'count'], 3)
 
+class QueryProject(SearchTest):
+
+    def setUp(self):
+        SearchTest.setUp(self)
+        python_project = Project.create_dummy(language=u'Python',
+                                              name='thingamajig')
+        c_project = Project.create_dummy(language=u'C',
+                                         name='thingamabob')
+
+        python_bug_1 = Bug.create_dummy(project=python_project, title=u'a')
+        python_bug_2 = Bug.create_dummy(project=python_project, title=u'a',
+                                    concerns_just_documentation=True) 
+        c_bug = Bug.create_dummy(project=c_project, title=u'b')
+
+    def test_project_is_an_available_facet(self):
+        GET_data = {}
+        starting_query = mysite.search.controllers.Query.create_from_GET_data(
+            GET_data)
+        self.assert_(u'project' in starting_query.get_possible_facets())
+
+    def test_contribution_type_options_are_reasonable(self):
+        GET_data = {}
+        starting_query = mysite.search.controllers.Query.create_from_GET_data(
+            GET_data)
+        cto = starting_query.get_facet_options(u'project',
+                                               [u'thingamajig',
+                                                u'thingamabob',
+                                                u''])
+        jig_ones, = [k for k in cto if k[u'name'] == u'thingamajig']
+        any_ones, = [k for k in cto if k[u'name'] == u'any']
+        self.assertEqual(jig_ones[u'count'], 2)
+        self.assertEqual(any_ones[u'count'], 3)
+
 class QueryStringCaseInsensitive(SearchTest):
 
     def test_Language(self):
@@ -1195,7 +1228,7 @@ class TestPotentialMentors(TwillTests):
             tag=willing_to_mentor_c_sharp)
         link.save()
 
-        banshee_mentors = banshee.potential_mentors()
+        banshee_mentors = banshee.potential_mentors
         self.assertEqual(len(banshee_mentors), 2)
 
 class SuggestAlertOnLastResultsPage(TwillTests):

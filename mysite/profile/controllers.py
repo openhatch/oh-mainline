@@ -44,7 +44,7 @@ class RecommendBugs(object):
             try:
                 bug = mysite.search.models.Bug.all_bugs.get(pk=bug_id)
             except mysite.search.models.Bug.DoesNotExist:
-                logger.info("WTF, bug missing. Whatever.")
+                logging.info("WTF, bug missing. Whatever.")
                 continue
             ret.append(bug)
         return ret
@@ -78,12 +78,27 @@ class RecommendBugs(object):
             distinct_ids.add(bug.id)
             yield bug.id
 
-def people_matching(property, value):
-    links = mysite.profile.models.Link_Person_Tag.objects.filter(
-        tag__tag_type__name=property, tag__text__iexact=value)
-    peeps = [l.person for l in links]
-    sorted_peeps = sorted(set(peeps), key = lambda thing: (thing.user.first_name, thing.user.last_name))
-    return sorted_peeps
+class PeopleMatcher(object):
+    def get_cache_key(self, *args, **kwargs):
+        keys = (mysite.search.models.Epoch.get_for_model(
+            mysite.profile.models.Link_Person_Tag),
+                args)
+        return sha.sha(repr(keys)).hexdigest()
+
+    def people_matching(self, property, value):
+        return mysite.profile.models.Person.objects.filter(
+            pk__in=self._people_matching_ids(property, value))
+
+    @mysite.base.decorators.cache_method('get_cache_key')
+    def _people_matching_ids(self, property, value):
+        links = mysite.profile.models.Link_Person_Tag.objects.filter(
+            tag__tag_type__name=property, tag__text__iexact=value)
+        peeps = [l.person for l in links]
+        sorted_peeps = sorted(set(peeps), key = lambda thing: (thing.user.first_name, thing.user.last_name))
+        return [person.id for person in sorted_peeps]
+
+_pm = PeopleMatcher()
+people_matching = _pm.people_matching
 
 geoip_database = None
 def get_geoip_guess_for_ip(ip_as_string):

@@ -56,6 +56,10 @@ def mechanize_get(url, referrer=None, attempts_remaining=6, person=None):
 
     return b
 
+def generate_contributor_url(project_name, contributor_id):
+    return 'https://www.ohloh.net/p/%s/contributors/%d' % (
+        project_name.lower(), contributor_id)
+
 def ohloh_url2data(url, selector, params = {}, many = False, API_KEY = None, person=None):
     '''Input: A URL to get,
     a bunch of parameters to toss onto the end url-encoded,
@@ -197,9 +201,15 @@ class Ohloh(object):
                 continue # this contributor fact is useless
             eyedee = int(c_f['analysis_id'])
             project_data = self.analysis2projectdata(eyedee)
+
+            permalink = generate_contributor_url(
+                project_data['name'],
+                int(c_f['contributor_id']))
+            
             this = dict(
                 project=project_data['name'],
                 project_homepage_url=project_data.get('homepage_url', None),
+                permalink=permalink,
                 primary_language=c_f.get('primary_language_nice_name', ''),
                 man_months=int(c_f['man_months']))
             data.append(this)
@@ -306,9 +316,14 @@ class Ohloh(object):
                     continue # this contributor fact is useless
                 eyedee = int(c_f['analysis_id'])
                 project_data = self.analysis2projectdata(eyedee)
+
+                permalink = generate_contributor_url(
+                    project, contributor_id)
+
                 this = dict(
                     project=project_data['name'],
                     project_homepage_url=project_data.get('homepage_url', None),
+                    permalink=permalink,
                     primary_language=c_f.get(
                         'primary_language_nice_name',''),
                     man_months=int(c_f.get('man_months',0)))

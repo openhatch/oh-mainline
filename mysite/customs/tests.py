@@ -887,4 +887,43 @@ class LineAcceptorTest(django.test.TestCase):
         self.assertEqual(got_response[0], wanted)
         got_response[:] = []        
 
+class OhlohCitationUrlIsUseful(django.test.TestCase):
+    def test_ohloh_assemble_url(self):
+        project = 'cchost'
+        contributor_id = 65837553699824
+        wanted = 'https://www.ohloh.net/p/cchost/contributors/65837553699824'
+        got = mysite.customs.ohloh.generate_contributor_url(project, contributor_id)
+        self.assertEqual(wanted, got)
+
+    def test_ohloh_assemble_url(self):
+        project = 'ccHOST'
+        contributor_id = 65837553699824
+        wanted = 'https://www.ohloh.net/p/cchost/contributors/65837553699824'
+        got = mysite.customs.ohloh.generate_contributor_url(project, contributor_id)
+        self.assertEqual(wanted, got)
+
+    def test_slow_ou_paulproteus_import(self):
+        oh = mysite.customs.ohloh.get_ohloh()
+        got, _ = oh.get_contribution_info_by_ohloh_username(
+            ohloh_username='paulproteus')
+        # find the ccHost dict
+        cchost_data = None
+        for entry in got:
+            if entry['project'] == 'ccHost':
+                cchost_data = entry
+        self.assertEqual(cchost_data['permalink'],
+                         'https://www.ohloh.net/p/cchost/contributors/65837553699824')
+
+    def test_slow_rs_paulproteus_import(self):
+        oh = mysite.customs.ohloh.get_ohloh()
+        got, _ = oh.get_contribution_info_by_username(
+            username='paulproteus')
+        # find the ccHost dict
+        cchost_data = None
+        for entry in got:
+            if entry['project'] == 'ccHost':
+                cchost_data = entry
+        self.assertEqual(cchost_data['permalink'],
+                         'https://www.ohloh.net/p/cchost/contributors/65837553699824')
+        
 # vim: set nu:

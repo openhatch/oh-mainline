@@ -663,6 +663,7 @@ class Citation(models.Model):
         citation = Citation()
         citation.distinct_months = ohloh_contrib_info['man_months']
         citation.languages = ohloh_contrib_info['primary_language']
+        citation.url = ohloh_contrib_info['permalink']
         #citation.year_started = ohloh_contrib_info['year_started']
         return citation
         # }}}
@@ -716,6 +717,7 @@ class Forwarder(models.Model):
 def update_link_person_tag_cache(sender, instance, **kwargs):
     from mysite.profile.tasks import update_person_tag_cache
     update_person_tag_cache.delay(person__pk=instance.person.pk)
+    mysite.search.models.Epoch.bump_for_model(Link_Person_Tag)
 
 def update_pf_cache(sender, instance, **kwargs):
     from mysite.profile.tasks import update_someones_pf_cache
