@@ -360,10 +360,16 @@ def update_someones_pf_cache(person__pk):
 def fill_recommended_bugs_cache():
     logging.info("Filling recommended bugs cache for all people.")
     for person in mysite.profile.models.Person.objects.all():
-        suggested_searches = person.get_recommended_search_terms() # expensive?
-        recommender = mysite.profile.controllers.RecommendBugs(suggested_searches, n=5) # cache fill prep...
-        recommender.recommend() # cache fill do it.
+        fill_one_person_recommend_bugs_cache.delay(person_id=person.id)
     logging.info("Finished filling recommended bugs cache for all people.")
+
+@task(rate_limit="30/m")
+def fill_one_person_recommend_bugs_cache(person_id):
+    p = mysite.profile.models.Person.objects.get(id=person_id)
+    logging.info("Recommending bugs for %s" % p)
+    suggested_searches = p.get_recommended_search_terms() # expensive?
+    recommender = mysite.profile.controllers.RecommendBugs(suggested_searches, n=5) # cache fill prep...
+    recommender.recommend() # cache fill do it.
 
 @periodic_task(run_every=datetime.timedelta(hours=1))
 def sync_bug_epoch_from_model_then_fill_recommended_bugs_cache():
