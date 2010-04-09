@@ -26,7 +26,7 @@ class GrabKDEBugs(PeriodicTask):
     def run(self, **kwargs):
         logger = self.get_logger(**kwargs)
         logger.info("Started to grab KDE junior jobs bugs")
-        mysite.customs.bugtrackers.kde.bugs()
+        mysite.customs.bugtrackers.kde.grab()
 
 class GrabWikimediaBugs(PeriodicTask):
     run_every = timedelta(days=1)
