@@ -12,6 +12,7 @@ import mysite.customs.bugtrackers.gnome_love
 import mysite.customs.bugtrackers.fedora_fitfinish
 import mysite.customs.bugtrackers.mozilla
 import mysite.customs.bugtrackers.wikimedia
+import mysite.customs.bugtrackers.kde
 
 class GrabMiroBugs(PeriodicTask):
     run_every = timedelta(days=1)
@@ -19,6 +20,13 @@ class GrabMiroBugs(PeriodicTask):
         logger = self.get_logger(**kwargs)
         logger.info("Started to grab Miro bitesized bugs")
         mysite.customs.miro.grab_miro_bugs()
+
+class GrabKDEBugs(PeriodicTask):
+    run_every = timedelta(days=1)
+    def run(self, **kwargs):
+        logger = self.get_logger(**kwargs)
+        logger.info("Started to grab KDE junior jobs bugs")
+        mysite.customs.bugtrackers.kde.bugs()
 
 class GrabWikimediaBugs(PeriodicTask):
     run_every = timedelta(days=1)
