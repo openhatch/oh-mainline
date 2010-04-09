@@ -13,12 +13,10 @@
     </span>
 
     {# Mentors #}
-    {% if bug.project.potential_mentors %}
-        <div class="helpers" style='margin-top: 6px; font-size: .85em;'>
-            <a href="{{ bug.project.get_mentors_search_url }}">
-                Mentors ({{bug.project.potential_mentors|length}})</a>
-        </div>
-    {% endif %}
+    <div class="helpers">
+        <a href="{{ bug.project.get_mentors_search_url }}">
+            Mentors ({{bug.project.potential_mentors|length}})</a>
+    </div>
 
     <div class='below_the_fold'>
         {# Primary project language #}

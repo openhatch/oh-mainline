@@ -101,10 +101,12 @@ Search bugs
 
 {% if bunch_of_bugs %}
 <div id='results' class='module'>
-    <div class='head'>
-        <h3>Volunteer opportunities</h3>
-    </div>
     <div class='body'>
+
+        {% if query.terms_string or query.active_facet_options or bunch_of_bugs %}
+        {% include 'search/results_widget.html' %}
+        {% endif %}
+
         <ul>
             {% for bug in bunch_of_bugs %}
                 <li class='bug'>
@@ -112,6 +114,17 @@ Search bugs
                 </li>
             {% endfor %}
         </ul>
+
+        <div style="float: right; padding-right: 30px; font-size: 9.5pt;">
+            {% if show_prev_page_link %}
+            <a href='{{ prev_page_url }}' id='prev-page'>&laquo;&nbsp;Prev</a>
+            <span class='separator'>&nbsp;</span>
+            {% endif %}
+
+            {% if show_next_page_link %}
+            <a href='{{ next_page_url }}' id='next-page'>Next&nbsp;&raquo;</a>
+            {% endif %}
+        </div>
     </div>
 </div>
 {% endif %}

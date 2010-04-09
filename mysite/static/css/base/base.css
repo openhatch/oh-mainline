@@ -1,5 +1,7 @@
 body { font: 10pt Helvetica, sans-serif; background: #fff url("/static/images/motif-eee.png") fixed; color: #222; /* color: rgb(55,84,105); dark blue */ max-width: 1000px; margin: 0 auto; padding: 0; }
-a { color: #FF6D3D; text-decoration: none; }
+a { color: #ff6d3d; text-decoration: none; }
+    /* If you change the link color, be sure to change the color of the links
+     * on /static/css/search/search.css */
 a:focus { text-decoration: underline; }
 
 /* for Firefox */

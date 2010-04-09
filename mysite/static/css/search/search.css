@@ -3,7 +3,6 @@ body#search #page-top img#volunteer-opportunities { position: relative; top: 1px
 body#search #page-top { float: left; width: 1000px; font-size: 19pt; }
 body#search .no-results { color: #222; padding: 10px; font-size: 120%; line-height: 130%; width: 460px; float: left; }
 	body#search .no-results strong { background-color: #fff; }
-body#search #results-widget { padding: 12px; padding-bottom: 6px; float: left; width: 94.5%; font-size: 8.5pt; }
 body#search #sidebar { float: left; width: 220px; margin-right: 20px; }
 body#search #main { width: 715px; float: left; }
 body#search p { margin: 0; }
@@ -12,10 +11,10 @@ body#search input[type='text'].default-text-active { color: #999 ! important; }
 /*          Filters
  *---------------------- */
 
-body#search #filters { width: 75%; margin-right: 1%; }
+body#search #filters { width: 75%; margin-right: 1%; margin-bottom: 10px; }
     body#search #filters > .head { float: left; width: 100%; }
     body#search #filters li { list-style: none; margin: 0; margin-bottom: .3em; }
-    body#search #filters > .body { padding: 1em; float: left; width: 96.1%; font-size: .9em; }
+    body#search #filters > .body { padding: 1em; float: left; width: 96.5%; font-size: .9em; }
     body#search #filters > .body > ul > li { float: left; margin-right: 2em; }
 
     body#search #filters label.on { font-weight: bold; }
@@ -37,6 +36,18 @@ body#search #textual_search .body { width: 87%; padding: 1em; }
 body#search #textual_search input[type='text'] { width: 75%; }
 body#search #textual_search input[type='submit'] { width: 15%; padding: 5px; }
 
+/*          Results summary
+ *---------------------- */
+body#search .results-widget { color: #555; padding: 12px; padding-bottom: 6px; float: left; width: 97%; font-size: .75em; margin-bottom: 15px; border-bottom: 1px dashed #dedede; }
+    body#search .results-widget > span { float: left; } 
+    body#search #results-summary { width: 50%; margin-right: 2%; } 
+    body#search #expand-collapse-all { width: 25%; } 
+    body#search #expand-collapse-all img { float: left; margin-right: 5px; }
+    body#search #expand-collapse-all a { float: left; margin-right: 1em; }
+    body#search #navigation { float: right; width: 10%; } 
+
+
+
 /*          Results
  *---------------------- */
 body#search #results { font-size: 1.21em; }
@@ -45,17 +56,22 @@ body#search #results ul { margin: 0; padding: 0; float: left; width: 99%; }
 
         body#search #results .body { background-color: #fff; }
 
-        /* Project data */
+        /*      Project data
+         *----------------- */ 
         body#search #results li .project_data { text-align: right; margin-right: 2%; padding-top: 2px; width: 13%; float: left; }
         body#search #results li .project__name { color: #a3a3a3; cursor: pointer; cursor: hand; white-space: normal; }
         body#search #results li .project__name:hover { color: #000; text-decoration: underline; }
         body#search #results li:hover .project__name, body#search #results li.expanded .project__name { color: #000; }
         body#search #results li:hover .project_data img, body#search #results li.expanded .project_data img { opacity: 1; }
         body#search #results li .project_data img { vertical-align: middle; opacity: 0.5; width: 20px; height: 20px; /* If ever an image is not square this rule might distort it. */  }
-        body#search #results li .project_data .project__name {  }
-        body#search #results li .project_data .below_the_fold { display: none; }
+        body#search #results li .below_the_fold { display: none; }
+        body#search #results li .helpers { font-size: .8em; margin-top: 5px; }
+        body#search #results li .helpers a { color: #ffa588;  }
+        body#search #results li:hover .helpers a { color: #ff6d3d; }
 
-        body#search #results li .opp_data { border-left: 1px solid #e3e3e3; padding-left: 1%; width: 83%; float: left; }
+        /*      Bug data
+         *----------------- */ 
+        body#search #results li .opp_data { border-left: 1px dashed #dedede; padding-left: 1%; width: 83%; float: left; }
 
         body#search #results li .details { padding: .3em .7em; padding-top: 0; float: left; font-size: 11px; display: none; }
         body#search #results li label { color: #777; }
@@ -108,7 +124,6 @@ body#search #results ul { margin: 0; padding: 0; float: left; width: 99%; }
 
 body#search .separator { color: #aaa; }
 body#search .project-info { float: left; padding: .3em .7em; }
-body#search #results-summary { width: 67%; float: left; margin-right: 10px; }
 body#search #navigation { float: right; font-size: 9.5pt}
 body#search #about_projects, #about_bug_trackers { margin-top: 0; }
 body#search #about_projects div { float: left; margin-bottom: 10px; width: 100%; }
@@ -119,9 +134,6 @@ body#search #how_many_projects a { color: #555; }
 body#search #how_many_projects strong { background-color: #747474; -moz-border-radius: 8px; padding: 3px 4px; border-radius: 8px; color: #fff ! important; }
 body#search #about_projects #learn_more { text-align: center; margin-bottom: 0; }
 body#search #hwat-is-this ul li { list-style: square; margin: 5px 0 0 20px; }
-body#search #expand-collapse-all { float: right; }
-	body#search #expand-collapse-all img { float: left; margin-right: 5px; }
-	body#search #expand-collapse-all a { float: left; padding: 5px; }
 body#search .expanded .separator_betw_tags_and_desc { display: none ! important; }
 
 body#search .highlight { background-color: #ff8; font-weight: bold; }
