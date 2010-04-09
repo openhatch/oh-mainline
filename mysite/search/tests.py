@@ -669,7 +669,7 @@ class QueryGetPossibleFacets(SearchTest):
                 terms=[u'bug'],
                 terms_string=u'bug',
                 active_facet_options={u'language': u'c'})
-        possible_facets = query.get_possible_facets()
+        possible_facets = dict(query.get_possible_facets())
         self.compare_lists_of_dicts(
                 possible_facets[u'language'][u'options'],
                 [
@@ -704,7 +704,7 @@ class QueryGetPossibleFacets(SearchTest):
         query = mysite.search.controllers.Query.create_from_GET_data(
                 {u'q': u'nothing matches this', u'language': u'c'})
 
-        language_options = query.get_possible_facets()['language']['options']
+        language_options = dict(query.get_possible_facets())['language']['options']
         language_options_named_c = [opt for opt in language_options if opt['name'] == 'c']
         self.assertEqual(len(language_options_named_c), 1)
 
@@ -742,7 +742,7 @@ class SingleTerm(SearchTest):
         self.assertEqual(query.terms, ['screensaver'])
         self.assertFalse(query.active_facet_options) # No facets
 
-        self.output_possible_facets = query.get_possible_facets()
+        self.output_possible_facets = dict(query.get_possible_facets())
 
     def test_toughness_facet(self):
         # What options do we expect?
@@ -815,7 +815,7 @@ class SingleFacetOption(SearchTest):
         self.assertFalse(query.terms) # No terms
         self.assertEqual(query.active_facet_options, {u'language': u'Python'}) 
 
-        self.output_possible_facets = query.get_possible_facets()
+        self.output_possible_facets = dict(query.get_possible_facets())
 
     def test_toughness_facet(self):
         # What options do we expect?
@@ -986,6 +986,26 @@ class QueryGetPossibleLanguageFacetOptionNames(SearchTest):
 
         self.assertEqual(match_count, 1)
 
+class QueryGetPossibleProjectFacetOptions(SearchTest):
+
+    @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
+    def setUp(self, do_nothing):
+        SearchTest.setUp(self)
+        projects = [
+                Project.create_dummy(name=u'Miro'),
+                Project.create_dummy(name=u'Dali'),
+                Project.create_dummy(name=u'Magritte')
+                ]
+        for p in projects:
+            Bug.create_dummy(project=p)
+
+    def test_select_a_project_and_see_other_project_options(self):
+        GET_data = {u'project': u'Miro'}
+        query = mysite.search.controllers.Query.create_from_GET_data(GET_data)
+        possible_project_names = [x['name'] for x in dict(query.get_possible_facets())['project']['options']]
+        self.assertEqual(possible_project_names,
+                list(Project.objects.values_list('name', flat=True)) + ['any'])
+
 class QueryContributionType(SearchTest):
 
     def setUp(self):
@@ -1003,7 +1023,7 @@ class QueryContributionType(SearchTest):
         GET_data = {}
         starting_query = mysite.search.controllers.Query.create_from_GET_data(
             GET_data)
-        self.assert_(u'contribution type' in starting_query.get_possible_facets())
+        self.assert_(u'contribution type' in dict(starting_query.get_possible_facets()))
 
     def test_contribution_type_options_are_reasonable(self):
         GET_data = {}
@@ -1034,7 +1054,7 @@ class QueryProject(SearchTest):
         GET_data = {}
         starting_query = mysite.search.controllers.Query.create_from_GET_data(
             GET_data)
-        self.assert_(u'project' in starting_query.get_possible_facets())
+        self.assert_(u'project' in dict(starting_query.get_possible_facets()))
 
     def test_contribution_type_options_are_reasonable(self):
         GET_data = {}

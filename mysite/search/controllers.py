@@ -180,12 +180,7 @@ class Query:
 
         bugs = mysite.search.models.Bug.open_ones.filter(self.get_Q())
 
-        available_projects = [k['project__name'] for k in bugs.values('project__name').order_by('project__name').distinct()]
-
-        project_options = self.get_facet_options(u'project',
-                                                 available_projects +
-                                                 [u''])
-
+        project_options = self.get_facet_options(u'project', self.get_project_names() + [u''])
         project_options = sorted(project_options, key=lambda option: not option['is_active'])
 
         toughness_options = self.get_facet_options(u'toughness', [u'bitesize', u''])
@@ -195,9 +190,9 @@ class Query:
 
         language_options = self.get_facet_options(u'language', self.get_language_names() + [u''])
         # sort language_options so that unknown is second-to-last and any is last
-        language_options_name_is_unknown = filter((lambda language_option_set: language_option_set[u'name'] == u'Unknown'), language_options)
-        language_options_name_is_any = filter((lambda language_option_set: language_option_set[u'name'] == u'any'), language_options)
-        language_options_name_is_neither_of_the_above = filter((lambda language_option_set: language_option_set[u'name']  not in [u'Unknown', u'any'] ), language_options)
+        language_options_name_is_unknown = filter((lambda x: x[u'name'] == u'Unknown'), language_options)
+        language_options_name_is_any = filter((lambda x: x[u'name'] == u'any'), language_options)
+        language_options_name_is_neither_of_the_above = filter((lambda x: x[u'name']  not in [u'Unknown', u'any'] ), language_options)
         language_options = language_options_name_is_neither_of_the_above + language_options_name_is_unknown + language_options_name_is_any
 
         language_options = sorted(language_options, key=lambda option: not option['is_active'])
@@ -261,6 +256,25 @@ class Query:
 
         return languages
   
+    def get_project_names(self):
+
+        GET_data = self.get_GET_data()
+        if u'project' in GET_data:
+            del GET_data[u'project']
+        query_without_project_facet = Query.create_from_GET_data(GET_data)
+
+        bugs = query_without_project_facet.get_bugs_unordered()
+        project_names = bugs.values_list(u'project__name', flat=True).distinct()
+        project_names = [name or u'Unknown' for name in project_names]
+
+        # Add the active project facet, if there is one
+        if u'project' in self.active_facet_options:
+            name_of_active_project = self.active_facet_options[u'project']
+            if name_of_active_project not in project_names:
+                project_names.append(name_of_active_project)
+
+        return project_names
+
     def get_sha1(self):
 
         # first, make a dictionary mapping strings to strings
