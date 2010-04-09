@@ -205,25 +205,25 @@ class Query:
                 # The languages facet is based on the project languages, "for now"
                 (u'language', {
                     u'name_in_GET': u"language",
-                    u'sidebar_name': u"main project language",
+                    u'sidebar_heading': u"Pick a language",
                     u'description_above_results': u"projects primarily coded in %s",
                     u'options': language_options,
                     }),
                 (u'project', {
                     u'name_in_GET': u'project',
-                    u'sidebar_name': u'project',
+                    u'sidebar_heading': u'Pick a project',
                     u'description_above_results': 'in the %s project',
                     u'options': project_options,
                 }),
                 (u'toughness', {
                     u'name_in_GET': u"toughness",
-                    u'sidebar_name': u"toughness",
+                    u'sidebar_heading': u"Show just bitesize bugs?",
                     u'description_above_results': u"where toughness = %s",
                     u'options': toughness_options,
                 }),
                 (u'contribution type', {
                     u'name_in_GET': u"contribution_type",
-                    u'sidebar_name': u"kind of help needed",
+                    u'sidebar_heading': u"Just bugs labeled...",
                     u'description_above_results': u"which need %s",
                     u'options': contribution_type_options,
                     })
@@ -268,7 +268,7 @@ class Query:
 
         projects = (
                 mysite.search.models.Project.objects.filter(pk__in=list(bugs.values_list(u'project__pk', flat=True).distinct()))
-                    .filter(bug__looks_closed=True)
+                    .filter(bug__looks_closed=False)
                     .annotate(Count('bug'))
                     .order_by('-bug__count') )
         project_names = [project.name or u'Unknown' for project in projects]
