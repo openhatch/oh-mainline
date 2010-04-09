@@ -82,7 +82,7 @@ def detect_if_good_for_newcomers_plugin(bug_xml_elt, bug_object):
     keywords_blob = bug_xml_elt.xpath('keywords')[0].text
     splitted = keywords_blob.split(',')
     splitted_and_stripped = [k.strip() for k in splitted]
-    if 'junior_jobs' in splitted:
+    if 'junior-jobs' in splitted:
         bug_object.good_for_newcomers = True
     else:
         bug_object.good_for_newcomers = False
