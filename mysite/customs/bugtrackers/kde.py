@@ -6,13 +6,73 @@ QUERY_URL='https://bugs.kde.org/buglist.cgi?query_format=advanced&short_desc_typ
 BUG_URL_PREFIX = 'https://bugs.kde.org/show_bug.cgi?id='
 
 def project_finder_plugin(bug_xml_elt):
-    print "EGAD"
     import mysite.search.models
     product = bug_xml_elt.xpath('product')[0].text
+    reasonable_products = set([
+        'Akonadi',
+        'Phonon'
+        'kmail',
+        'Rocs',
+        'akregator',
+        'amarok',
+        'ark',
+        'cervisia',
+        'k3b',
+        'kappfinder',
+        'kbabel',
+        'kdeprint',
+        'kdesktop',
+        'kfile',
+        'kfourinline',
+        'khotkeys',
+        'kio',
+        'kmail',
+        'kmplot',
+        'koffice',
+        'kompare',
+        'konqueror',
+        'kopete',
+        'kpat',
+        'kphotoalbum',
+        'krita',
+        'ksmserver',
+        'kspread',
+        'ksysguard',
+        'ktimetracker',
+        'kwin',
+        'kword',
+        'marble',
+        'okular',
+        'plasma',
+        'printer-applet',
+        'rsibreak',
+        'step',
+        'systemsettings',
+        'kdelibs',
+        'kcontrol',
+        'korganizer',
+        'kipiplugins',
+        'Phonon',
+        'dolphin',
+        'umbrello']
+        )
+    products_to_be_renamed = {
+        'digikamimageplugins': 'digikam image plugins',
+        'Network Management': 'KDE Network Management',
+        'telepathy': 'telepathy for KDE',
+        'docs': 'KDE documentation',
+        }
     component = bug_xml_elt.xpath('component')[0].text
-    logging.info('Prod ' + product +
-                 'Comp ' + component)
-    project_name = 'KDE' # FOR NOW
+    things = (product, component)
+
+    if product in reasonable_products:
+        project_name = product
+    else:
+        if product in products_to_be_renamed:
+            project_name = products_to_be_renamed[product]
+        else:
+            raise ValueError, things
+
     project, _ = mysite.search.models.Project.objects.get_or_create(
         name=project_name)
     return project
@@ -24,7 +84,9 @@ def detect_if_good_for_newcomers_plugin(bug_xml_elt, bug_object):
     if 'junior_jobs' in splitted:
         bug_object.good_for_newcomers = True
     else:
-        bug_object.good_for_newcomers = False        
+        bug_object.good_for_newcomers = False
+    if bug_object.project.name == 'KDE documentation':
+        bug_object.concerns_just_documentation = True
 
 def get_current_bug_id2bug_objs():
     return mysite.customs.bugtrackers.bugzilla_general.query_url2bug_objects(
