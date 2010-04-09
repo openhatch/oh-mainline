@@ -265,6 +265,7 @@ source2result_handler = {
         }
 
 class ReindexPerson(Task):
+    rate_limit = "10/m"
     def run(self, person_id, **kwargs):
         person = mysite.profile.models.Person.objects.get(id=person_id)
         pi = mysite.profile.search_indexes.PersonIndex(person)
@@ -337,7 +338,7 @@ try:
 except celery.registry.AlreadyRegistered:
     pass
 
-@task
+@task(rate_limit = "30/m")
 def update_person_tag_cache(person__pk):
     person = mysite.profile.models.Person.objects.get(pk=person__pk)
     cache_key = person.get_tag_texts_cache_key()
@@ -346,7 +347,7 @@ def update_person_tag_cache(person__pk):
     # This getter will populate the cache
     return person.get_tag_texts_for_map()
 
-@task
+@task(rate_limit = "45/m")
 def update_someones_pf_cache(person__pk):
     person = mysite.profile.models.Person.objects.get(pk=person__pk)
     cache_key = person.get_cache_key_for_projects()
@@ -359,10 +360,16 @@ def update_someones_pf_cache(person__pk):
 def fill_recommended_bugs_cache():
     logging.info("Filling recommended bugs cache for all people.")
     for person in mysite.profile.models.Person.objects.all():
-        suggested_searches = person.get_recommended_search_terms() # expensive?
-        recommender = mysite.profile.controllers.RecommendBugs(suggested_searches, n=5) # cache fill prep...
-        recommender.recommend() # cache fill do it.
+        fill_one_person_recommend_bugs_cache.delay(person_id=person.id)
     logging.info("Finished filling recommended bugs cache for all people.")
+
+@task(rate_limit="30/m")
+def fill_one_person_recommend_bugs_cache(person_id):
+    p = mysite.profile.models.Person.objects.get(id=person_id)
+    logging.info("Recommending bugs for %s" % p)
+    suggested_searches = p.get_recommended_search_terms() # expensive?
+    recommender = mysite.profile.controllers.RecommendBugs(suggested_searches, n=5) # cache fill prep...
+    recommender.recommend() # cache fill do it.
 
 @periodic_task(run_every=datetime.timedelta(hours=1))
 def sync_bug_epoch_from_model_then_fill_recommended_bugs_cache():
