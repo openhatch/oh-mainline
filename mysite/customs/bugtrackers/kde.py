@@ -81,7 +81,7 @@ def project_finder_plugin(bug_xml_elt):
 def detect_if_good_for_newcomers_plugin(bug_xml_elt, bug_object):
     # muahaha if it starts with "JJ:" eat that
     if bug_object.title.startswith("JJ:"):
-        bug_object.title = bug_object.title[4:]
+        bug_object.title = bug_object.title[3:].strip()
     keywords_blob = bug_xml_elt.xpath('keywords')[0].text
     splitted = keywords_blob.split(',')
     splitted_and_stripped = [k.strip() for k in splitted]
