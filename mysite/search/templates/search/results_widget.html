@@ -28,13 +28,18 @@
         {% comment %} FIXME Use django filter to remove whitespace {% endcomment %}
         {% spaceless %}
             {% if query.active_facet_options %}
-                {% for facet, value in query.active_facet_options.items reversed %}
+                {% for facet, value in query.active_facet_options.items %}
+                    {% if not forloop.first and forloop.last %}
+                        {% ifnotequal forloop.counter0 1 %}
+                            and
+                        {% endifnotequal %}
+                    {% endif %}
                     <span class='active_facet_value'>
                         {% ifequal facet "language" %}
                         whose main project language is
                         {% endifequal %}
                         {% ifequal facet "project" %}
-                        in the project called
+                        in 
                         {% endifequal %}
                         {% ifequal facet "toughness" %}
                         whose toughness is
@@ -42,12 +47,13 @@
                         {% ifequal facet "contribution_type" %}
                         which need
                         {% endifequal %}
-                        <strong>{{ value }}</strong>&nbsp;<a href='?{% ifequal facet "language" %}{{ facet2any_query_string.language }}{% endifequal %}{% ifequal facet "toughness"%}{{ facet2any_query_string.toughness }}{% endifequal %}{% ifequal facet "contribution_type"%}{{ facet2any_query_string.contribution_type }}{% endifequal %}'>[x]</a>
+                        {% spaceless %}
+                        <strong>{{ value }}</strong>
+                        <span>&nbsp;</span><a rel='tipsy-south' title='Remove {{ facet }} filter' href='?{% ifequal facet "language" %}{{ facet2any_query_string.language }}{% endifequal %}{% ifequal facet "toughness"%}{{ facet2any_query_string.toughness }}{% endifequal %}{% ifequal facet "contribution_type"%}{{ facet2any_query_string.contribution_type }}{% endifequal %}'>[x]</a>
+                        {% endspaceless %}
                     </span>
                     {% if forloop.last %}
                         .
-                    {% else %}
-                        and
                     {% endif %}
                 {% endfor %}
             {% endif %}
@@ -61,20 +67,7 @@
         <a href='#' id='collapse-all-link'><img src='/static/images/icons/zoom-out.png' />Collapse all</a>
     </span>
 
-    {% if show_prev_page_link or show_next_page_link %}
-
-        <span class='navigation'>
-            {% if show_prev_page_link %}
-            <a href='{{ prev_page_url }}' id='prev-page'>&laquo; Prev</a>
-            <span class='separator'>&nbsp;</span>
-            {% endif %}
-
-            {% if show_next_page_link %}
-            <a href='{{ next_page_url }}' id='next-page'>Next&nbsp;&raquo;</a>
-            {% endif %}
-        </span>
-
-    {% endif %}
+    {% include 'search/navigation.html' %}
 
 </div><!-- /.results-widget -->
 {# vim: set filetype=htmldjango: #}

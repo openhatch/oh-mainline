@@ -150,6 +150,7 @@ def invitation_key2user(key):
 
 @register.filter("truncate_chars")  
 def truncate_chars(value, max_length):  
+    max_length = int(max_length)
     if len(value) <= max_length:  
         return value  
   

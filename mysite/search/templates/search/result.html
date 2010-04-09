@@ -104,8 +104,9 @@
             <span class='field origin'>
                 <label>Link: </label>
                 <span class='value'>
-                    <a class='canonical_bug_link'
-                            href='{{ bug.canonical_bug_link }}'>{{ bug.canonical_bug_link|urlizetrunc:"30"}}</a>
+                    <a class='canonical_bug_link' target='_new'
+                            href='{{ bug.canonical_bug_link }}'>
+                        {{ bug.canonical_bug_link|truncate_chars:"30"}}</a>
                 </span>
             </span>
             <span class='field importance'>
