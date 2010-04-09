@@ -60,7 +60,7 @@ body#search .results-widget { color: #555; padding: 12px; padding-bottom: 6px; f
     body#search #expand-collapse-all img { float: left; margin-right: 5px; }
     body#search #expand-collapse-all a { float: left; margin-right: 1em; }
     body#search span.navigation { font-weight: bold; float: right; width: 120px; } 
-    body#search .link-wrapper { float: left; width: 50px; height: 1em; }
+    body#search .link-wrapper { float: right; width: 50px; height: 1em; }
 
 
 

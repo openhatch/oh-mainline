@@ -2,14 +2,14 @@
 
         <span class='navigation'>
             <span class='link-wrapper'>
-                {% if show_prev_page_link %}
-                    <a href='{{ prev_page_url }}' id='prev-page'>&laquo; Prev</a>
-                    <span class='separator'>&nbsp;</span>
+                {% if show_next_page_link %}
+                    <a href='{{ next_page_url }}' id='next-page'>Next&nbsp;&raquo;</a>
                 {% endif %}
             </span>
             <span class='link-wrapper'>
-                {% if show_next_page_link %}
-                    <a href='{{ next_page_url }}' id='next-page'>Next&nbsp;&raquo;</a>
+                {% if show_prev_page_link %}
+                    <a href='{{ prev_page_url }}' id='prev-page'>&laquo; Prev</a>
+                    <span class='separator'>&nbsp;</span>
                 {% endif %}
             </span>
         </span>
