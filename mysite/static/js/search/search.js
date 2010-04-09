@@ -22,12 +22,12 @@ SearchResults.bindEventHandlers = function () {
             });
 
     $('#expand-all-link').click(function() {
-            $('.gewgaws li').addClass('expanded');
+            $('#results li').addClass('expanded');
             return false;
             });
 
     $('#collapse-all-link').click(function() {
-            $('.gewgaws li').removeClass('expanded');
+            $('#results li').removeClass('expanded');
             return false;
             });
 

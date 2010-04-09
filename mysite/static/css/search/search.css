@@ -38,13 +38,14 @@ body#search #textual_search input[type='submit'] { width: 15%; padding: 5px; }
 
 /*          Results summary
  *---------------------- */
-body#search .results-widget { color: #555; padding: 12px; padding-bottom: 6px; float: left; width: 97%; font-size: .75em; margin-bottom: 15px; border-bottom: 1px dashed #dedede; }
+body#search .results-widget { color: #555; padding: 12px; padding-bottom: 6px; float: left; width: 97%; font-size: .75em; margin-bottom: 15px; border: 0px dashed #dedede; border-bottom-width: 1px; }
+    body#search .results-widget:last-child { border-bottom-width: 0; border-top-width: 1px; }
     body#search .results-widget > span { float: left; } 
     body#search #results-summary { width: 50%; margin-right: 2%; } 
     body#search #expand-collapse-all { width: 25%; } 
     body#search #expand-collapse-all img { float: left; margin-right: 5px; }
     body#search #expand-collapse-all a { float: left; margin-right: 1em; }
-    body#search #navigation { float: right; width: 10%; } 
+    body#search span.navigation { font-weight: bold; float: right; width: 10%; } 
 
 
 
@@ -97,10 +98,10 @@ body#search #results ul { margin: 0; padding: 0; float: left; width: 99%; }
         body#search #results .tag-details { display: none; }
         body#search #results li .show-details { padding: .3em 7em; float: left; width: 71px; text-align: right; }
         body#search #results li .left { white-space: nowrap; float: left; width: 460px; overflow: hidden; }
-        body#search #results li .description-container { width: 97%; padding: .3em 0; font-size: 0.8em; color: #555; float: left; overflow: hidden; white-space: nowrap; }
+        body#search #results li .description-container { width: 98.5%; padding: .3em 0; font-size: 0.8em; color: #555; float: left; overflow: hidden; white-space: nowrap; }
             body#search #results li .description-container * { display: inline; }
             body#search #results li .description-container br { display: none; }
-        body#search #results li .description {  font-family: monospace; }
+        body#search #results li .description { font-family: monospace; }
 
         body#search #results li.expanded { border-color: #dedede; background: #fff; white-space: normal; }
             body#search #results li.expanded .title { font-weight: bold; text-shadow: 0 1px 0 #fff; }
@@ -111,7 +112,7 @@ body#search #results ul { margin: 0; padding: 0; float: left; width: 99%; }
                 body#search #results li.expanded .meta-data { float: left; width: 100%; }
                 body#search #results li.expanded .description-container p { font-family: monospace; color: #000; white-space: pre-wrap; word-wrap: break-word; float: left; width: 100%; margin-bottom: .3em; }
                 body#search #results li.expanded .description-container br { display: inherit; }
-                body#search #results li.expanded .description-container .description { margin-top: 1em; float: left; padding-bottom: 1em; border-bottom: 1px solid #e7e7e7; max-height: 400px; overflow-y: auto; }
+                body#search #results li.expanded .description-container .description { width: 100%; margin-top: 1em; float: left; padding-bottom: 1em; border-bottom: 1px solid #e7e7e7; max-height: 400px; overflow-y: auto; }
             body#search #results li.expanded .second-line { border-radius: 0; -moz-border-radius: 0; overflow: visible; }
             body#search #results li.expanded .details { display: block; float: left; width: 90%; font-size: .73em; padding: 5px 0; }
                 body#search #results li.expanded .details .fields { float: left; width: 100%; }
@@ -124,7 +125,6 @@ body#search #results ul { margin: 0; padding: 0; float: left; width: 99%; }
 
 body#search .separator { color: #aaa; }
 body#search .project-info { float: left; padding: .3em .7em; }
-body#search #navigation { float: right; font-size: 9.5pt}
 body#search #about_projects, #about_bug_trackers { margin-top: 0; }
 body#search #about_projects div { float: left; margin-bottom: 10px; width: 100%; }
 body#search #sidebar .module #how_many_projects { text-align: center; font-size: 140%; width: 100% ! important; }

@@ -88,7 +88,7 @@ Search bugs
     <div class='body'>
         <form name='search_opps' method='GET' id='search_fulltext' action='{% url mysite.search.views.fetch_bugs %}'> 
             <input type='text' name='q' id='q' rel='hint'
-            title='Search {% if query.active_facet_options %}within results{% else %}bugs{% endif %}'
+            title='Textual search'
             value='{{ query.terms_string }}' />
 
             {% for facet, value in query.active_facet_options.items %}
@@ -115,16 +115,18 @@ Search bugs
             {% endfor %}
         </ul>
 
-        <div style="float: right; padding-right: 30px; font-size: 9.5pt;">
-            {% if show_prev_page_link %}
-            <a href='{{ prev_page_url }}' id='prev-page'>&laquo;&nbsp;Prev</a>
-            <span class='separator'>&nbsp;</span>
-            {% endif %}
+        <span class='results-widget'>
+            <span class='navigation'>
+                {% if show_prev_page_link %}
+                    <a href='{{ prev_page_url }}' id='prev-page'>&laquo;&nbsp;Prev</a>
+                    <span class='separator'>&nbsp;</span>
+                {% endif %}
 
-            {% if show_next_page_link %}
-            <a href='{{ next_page_url }}' id='next-page'>Next&nbsp;&raquo;</a>
-            {% endif %}
-        </div>
+                {% if show_next_page_link %}
+                    <a href='{{ next_page_url }}' id='next-page'>Next&nbsp;&raquo;</a>
+                {% endif %}
+            </span>
+        </span>
     </div>
 </div>
 {% endif %}
