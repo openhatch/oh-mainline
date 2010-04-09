@@ -22,3 +22,5 @@ static/static/photos/*
 
 # User analysis tool
 static/piwik
+
+static/_cache
