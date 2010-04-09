@@ -36,7 +36,7 @@ def bugzilla_date_to_datetime(date_string):
 
 def who_tag_to_username_and_realname(who_tag):
     username = who_tag.text
-    realname = who_tag.attrib['name']
+    realname = who_tag.attrib.get('name', '')
     return username, realname
 
 def xml2bug_object(xml_fd,

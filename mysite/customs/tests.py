@@ -285,6 +285,14 @@ class BugzillaTests(django.test.TestCase):
         self.assertEqual(bug.submitter_username, 'hasso kde org')
         self.assertEqual(bug.submitter_realname, 'Hasso Tepper')
 
+    def test_kde_harder_bug(self):
+        p = Project.create_dummy(name='KDE')
+        f = os.path.join(settings.MEDIA_ROOT, 'sample-data', 'kde-182054-2010-04-09.xml')
+        xml_fd = file(f)
+        bug = mysite.customs.miro.xml2bug_object(xml_fd)
+        self.assertEqual(bug.submitter_username, 'jedd progsoc org')
+        self.assertEqual(bug.submitter_realname, '')
+
     def test_miro_bug_object(self):
         # Parse XML document as if we got it from the web
         f = os.path.join(settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml')
