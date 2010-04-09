@@ -119,9 +119,7 @@ Search bugs
 <div id='results' class='module'>
     <div class='body'>
 
-        {% if query.terms_string or query.active_facet_options or bunch_of_bugs %}
         {% include 'search/results_widget.html' %}
-        {% endif %}
 
         <ul>
             {% for bug in bunch_of_bugs %}

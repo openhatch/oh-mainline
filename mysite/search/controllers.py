@@ -257,6 +257,7 @@ class Query:
         return languages
   
     def get_project_names(self):
+        from django.db.models import Count
 
         GET_data = self.get_GET_data()
         if u'project' in GET_data:
@@ -264,8 +265,13 @@ class Query:
         query_without_project_facet = Query.create_from_GET_data(GET_data)
 
         bugs = query_without_project_facet.get_bugs_unordered()
-        project_names = bugs.values_list(u'project__name', flat=True).distinct()
-        project_names = [name or u'Unknown' for name in project_names]
+
+        projects = (
+                mysite.search.models.Project.objects.filter(pk__in=list(bugs.values_list(u'project__pk', flat=True).distinct()))
+                    .filter(bug__looks_closed=True)
+                    .annotate(Count('bug'))
+                    .order_by('-bug__count') )
+        project_names = [project.name or u'Unknown' for project in projects]
 
         # Add the active project facet, if there is one
         if u'project' in self.active_facet_options:
