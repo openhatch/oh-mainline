@@ -217,7 +217,7 @@ class Query:
                 }),
                 (u'toughness', {
                     u'name_in_GET': u"toughness",
-                    u'sidebar_heading': u"Show just bitesize bugs?",
+                    u'sidebar_heading': u"Pick a toughness",
                     u'description_above_results': u"where toughness = %s",
                     u'options': toughness_options,
                 }),

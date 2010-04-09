@@ -29,11 +29,16 @@ Search bugs
 <div id='filters' class='module'>
     <div class='body'>
         <h3 style='width: 100%; margin-bottom: 3px;'>
-            {% if query.terms %}
-                Filter results for <strong>{{ query.terms_string }}</strong>:
+            {% if not query %}
+                Select one of the links below to find something to work on.
             {% else %}
-                Browse&hellip;
+                {% if query.terms %}
+                    Filter results for <strong>{{ query.terms_string }}</strong>:
+                {% else %}
+                    Narrow or broaden your search:
+                {% endif %}
             {% endif %}
+
         </h3>
         <ul id='facets'>
             {% for facet_name, facet in query.get_possible_facets %}
@@ -48,11 +53,20 @@ Search bugs
                 <li>
                     {{ facet.sidebar_heading }}
                     <ul>
-                        {% for option in facet.options|slice:':4' %}
-                            {% if option.name %}
-                                {% include 'facet_option.html' %}
-                            {% endif %}
-                        {% endfor %}
+                        {% if query %}
+                            {% for option in facet.options|slice:':4' %}
+                                {% if option.name %}
+                                    {% include 'facet_option.html' %}
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            {% for option in facet.options|slice:':16' %}
+                                {% if option.name %}
+                                    {% include 'facet_option.html' %}
+                                {% endif %}
+                            {% endfor %}
+                        {% endif %}
+
                         {% if facet.options|length|gt:'4' %}
                             <li>
                                 <a rel='facebox' id='more_projects' href='#{{ facet_name }}s'>

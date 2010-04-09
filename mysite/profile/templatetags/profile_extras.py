@@ -56,12 +56,19 @@ def length_lte(value, arg):
     "Returns a boolean of whether the value's length is less than or equal to the argument"
     return len(value) <= int(arg)
 
-def break_long_words(value):
-    assert type(value) == unicode
-    re_too_many_letters_in_a_row = re.compile(r'([\w]{8}|[\_^/])', re.UNICODE)
-
+def break_long_words(value, max_word_length=8):
     # if the word is really long, insert a <wbr> occasionally.
-    return "<wbr />".join(re_too_many_letters_in_a_row.split(value))
+    assert type(value) == unicode
+
+    re_capitalized_word = re.compile(r'([A-Z][a-z][a-z]+)', re.UNICODE)  
+    words = re_capitalized_word.split(value)
+    re_too_many_letters_in_a_row = re.compile(r'([\w]{%d}|[.\_^/])' % max_word_length, re.UNICODE)
+    broken_words = []
+    for word in words:
+        if word:
+            broken_words += re_too_many_letters_in_a_row.split(word)
+    broken_words = filter(lambda x: x, broken_words)
+    return "<wbr>".join(broken_words)
 
 @register.filter
 def prepend_http_if_necessary(value):

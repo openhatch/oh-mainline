@@ -1,5 +1,6 @@
 {% load search %}
 {% load base_extras %}
+{% load profile_extras %}
 
 <div class='project_data'>
 
@@ -9,7 +10,7 @@
 
     {# Project name #}
     <span class='project__name'>
-        {{ bug.project.name|highlight:query.terms }} 
+        {{ bug.project.name|break_long_words:16|safe }} 
     </span>
 
     {# Mentors #}

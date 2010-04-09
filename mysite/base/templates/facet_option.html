@@ -1,7 +1,12 @@
 
                                 <li {% if option.is_active %}class='active'{% endif %}>
                                     <a href='?{{ option.query_string }}'>
-                                        {{ option.name }} ({{ option.count }})</a>
+                                        {% ifequal option.name 'any' %}
+                                        [whatever]
+                                        {% else %}
+                                        {{ option.name }}
+                                        {% endifequal %}
+                                        ({{ option.count }})</a>
                                     {% ifequal option.name 'bitesize' %}
                                         <small style='display: block;'>
                                             <a id='define-bite-size' href="#">What's this?</a>
