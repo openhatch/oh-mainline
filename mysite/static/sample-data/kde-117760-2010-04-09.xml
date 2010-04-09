@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<!DOCTYPE bugzilla SYSTEM "http://bugs.kde.org/bugzilla.dtd">
+
+<bugzilla version="3.2.5+"
+          urlbase="http://bugs.kde.org/"
+          maintainer="sysadmin@kde.org"
+>
+
+    <bug>
+          <bug_id>117760</bug_id>
+          
+          <creation_ts>2005-12-05 23:20</creation_ts>
+          <short_desc>Confusing &quot;Delete&quot; and &quot;Delete thread&quot; commands</short_desc>
+          <delta_ts>2009-12-24 14:20:14</delta_ts>
+          <reporter_accessible>1</reporter_accessible>
+          <cclist_accessible>1</cclist_accessible>
+          <classification_id>1</classification_id>
+          <classification>Unclassified</classification>
+          <product>kmail</product>
+          <component>general</component>
+          <version>1 9</version>
+          <rep_platform>Compiled Sources</rep_platform>
+          <op_sys>Linux</op_sys>
+          <bug_status>NEW</bug_status>
+          
+          
+          
+          
+          <keywords>junior-jobs</keywords>
+          <priority>NOR</priority>
+          <bug_severity>wishlist</bug_severity>
+          <target_milestone>---</target_milestone>
+          
+          
+          
+          <everconfirmed>1</everconfirmed>
+          <reporter name="Hasso Tepper">hasso kde org</reporter>
+          <assigned_to name="kdepim bugs">kdepim-bugs kde org</assigned_to>
+          <cc>bjoern ruberg-wegener de</cc>
+          
+
+      
+
+      
+          <long_desc isprivate="0">
+            <who name=""></who>
+            <bug_when>2005-12-05 23:20:51</bug_when>
+            <thetext>Version:           1.9 (using KDE KDE 3.5.0)
+Installed from:    Compiled From Sources
+OS:                Linux
+
+At the moment the &quot;Delete&quot; command behaves differently whether it&apos;s executed from mail in open thread or from parent with closed thread. I case of open thread it deletes only active letter, but in case of closed thread it deletes active letter and all its children. Current &quot;Delete thread&quot; command is found to be confusing as well - it deletes whole thread, not active letter and its children.
+
+The proposal to make it cleaner:
+* &quot;Delete thread&quot; deletes always only active letter and all its children.
+* &quot;Delete&quot; deletes always only active letter. In case of active letter being parent with closed thread, it (&quot;Delete&quot; command) shouldn&apos;t be available in menu at all.
+
+All this is valid for &quot;Move to Trash&quot; and &quot;Move Thread to Trash&quot; commands as well of course.</thetext>
+          </long_desc>
+          <long_desc isprivate="0">
+            <who name=""></who>
+            <bug_when>2009-12-24 14:20:14</bug_when>
+            <thetext>Still valid in KDE 4.3</thetext>
+          </long_desc>
+      
+      
+
+    </bug>
+
+</bugzilla>
