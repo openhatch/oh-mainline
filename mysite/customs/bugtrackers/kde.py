@@ -71,7 +71,8 @@ def project_finder_plugin(bug_xml_elt):
         if product in products_to_be_renamed:
             project_name = products_to_be_renamed[product]
         else:
-            raise ValueError, things
+            logging.info("Guessing on KDE subproject name. Found %s" %  things)
+            project_name = product
 
     project, _ = mysite.search.models.Project.objects.get_or_create(
         name=project_name)
