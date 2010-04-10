@@ -20,7 +20,7 @@ Search bugs
 {% endblock css %}
 
 {% block pagetop %}
-<h3><img alt='Volunteer opportunities' id='volunteer-opportunities' alt='Volunteer opportunities' src='/static/images/volunteer-opportunities-full.png' /></h3>
+    <h3><a href='{% url mysite.search.views.fetch_bugs %}'><img alt='Volunteer opportunities' id='volunteer-opportunities' alt='Volunteer opportunities' src='/static/images/volunteer-opportunities-full.png' /></a></h3>
 
 {% endblock pagetop %}
 
@@ -68,9 +68,12 @@ Search bugs
                                     {% endif %}
                                 {% endfor %}
                             {% endif %}
-                            {% with facet.the_any_option as option %}
-                                {% include 'facet_option.html' %}
-                            {% endwith %}
+
+                            {% if facet_name|in_list:query.active_facet_options %}
+                                {% with facet.the_any_option as option %}
+                                    {% include 'facet_option.html' %}
+                                {% endwith %}
+                            {% endif %}
 
                             {% if query and facet.options|length|gt:'4' %}
                                 {% include 'more_facet_options.html' %}

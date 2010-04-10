@@ -22,9 +22,10 @@
     <div class='below_the_fold'>
         {# Primary project language #}
         {% if bug.project.language %}
-            <div class='project__language
-                    {% if bug.project.language.lower|in_list:query.terms %}highlight{% endif %}
-                    '>{{ bug.project.language }}</div>
+            <h5>Primary language</h5>
+            <div class='{% if bug.project.language.lower|in_list:query.terms %}highlight{% endif %}'>
+                {{ bug.project.language }}
+            </div>
         {% endif %}
     </div>
 
