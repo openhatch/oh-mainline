@@ -1,0 +1,17 @@
+
+                                <li class='more_facet_options'>
+                                    <a rel='facebox' href='#{{ facet_name }}s'>
+                                        More {{ facet_name }}s &raquo;
+                                    </a>
+                                    <div style='display: none;' id='{{ facet_name }}s'>
+                                        <h2>Select a {{ facet_name }}</h2>
+                                        <ul class='facet_more_options'>
+                                            {% for option in facet.options %}
+                                                {% include 'facet_option.html' %}
+                                            {% endfor %}
+                                            {% with facet.the_any_option as option %}
+                                                {% include 'facet_option.html' %}
+                                            {% endwith %}
+                                        </ul>
+                                    </div>
+                                </li>
