@@ -26,214 +26,230 @@ Search bugs
 
 {% block content %}
 
-<div id='filters' class='module'>
-    <div class='body'>
-            {% if not query %}
-                <h2 style='font-weight: normal; font-size: 1.4em; margin-bottom: 1em;'>
-                    Select one of the links below to find something to work on.
-                </h2>
-            {% else %}
-                <h3 style='width: 100%; margin-bottom: 3px;'>
-                {% if query.terms %}
-                    Filter results for <strong>{{ query.terms_string }}</strong>:
+    <div id='filters' class='module'>
+        <div class='body'>
+                {% if not query %}
+                    <h2 style='font-weight: normal; font-size: 1.4em; margin-bottom: 1em;'>
+                        Select one of the links below to find something to work on.
+                    </h2>
                 {% else %}
-                    Change your search:
-                {% endif %}
-            </h3>
-            {% endif %}
-
-        <ul id='facets'>
-            {% for facet_name, facet in query.get_possible_facets %}
-                {% comment %}
-                    facets = e.g. {
-                        'language': {
-                            'Python': 1,
-                            'Java': 8,
-                        }
-                    }
-                {% endcomment %}
-                <li>
-                    {{ facet.sidebar_heading }}
-                    <ul>
-                        {% if query %}
-                            {% for option in facet.options|slice:':4' %}
-                                {% if option.name %}
-                                    {% include 'facet_option.html' %}
-                                {% endif %}
-                            {% endfor %}
-                        {% else %}
-                            {% for option in facet.options|slice:':8' %}
-                                {% if option.name %}
-                                    {% include 'facet_option.html' %}
-                                {% endif %}
-                            {% endfor %}
-                        {% endif %}
-
-                        {% if facet.options|length|gt:'4' %}
-                            <li>
-                                <a rel='facebox' id='more_projects' href='#{{ facet_name }}s'>
-                                    More {{ facet_name }}s &raquo;
-                                </a>
-                                <div style='display: none;' id='{{ facet_name }}s'>
-                                    <h2>Select a {{ facet_name }}</h2>
-                                    <ul class='facet_more_options'>
-                                        {% for option in facet.options %}
-                                            {% include 'facet_option.html' %}
-                                        {% endfor %}
-                                    </ul>
-                                </div>
-                            </li>
-                        {% endif %}
-                    </ul>
-                </li>
-            {% endfor %}
-        </ul>
-        <div id='examples'>
-            <h3>Recommended searches</h3>
-        </div>
-        <div id='personal_recommendations'>
-            <h3>Recommended searches</h3>
-            {% if the_user.is_authenticated %}
-            {% if suggestions %}
-            <form name='suggested_searches'
-                id='suggested_searches'
-                method='GET' action=''>
-                <ul>
-                    {% for index, term, czeched in suggestions %}
-                    <li>
-                    <a 
-                        {% ifequal term.lower query.terms_string.lower %}
-                        style='font-weight: bold;'
-                        {% endifequal %}
-                        href='?q={{ term|urlencode }}'>{{ term }}</a>
-                    </li>
-                    {% endfor %}
-                </ul>
-            </form>
-            {% else %}
-                <a href='{% url mysite.profile.views.portfolio_editor %}'>
-                    <strong>List some projects in your portfolio</strong>
-                    to receive recommendations.
-                </a>
-            {% endif %}
-            {% else %}
-            <ul>
-                <li>
-                <a href='/+me'>
-                    <strong>List your interests and experience</strong>
-                    to get personalized recommendations.
-                </a>
-                </li>
-            </ul>
-            {% endif %}
-        </div>
-    </div>
-    {% comment %}
-        {% if query.terms %}
-            <a href='./' style='display: block; margin-bottom: 10px;'>&laquo;
-                Back to browsing</a>
-        {% endif %}
-    {% endcomment %}
-</div>
-
-<div id='about_projects' class='module right'>
-    <h3>
-        Tracking opportunities in
-    </h3>
-    <h4 id='how_many_projects'>
-        <a href='{% url mysite.project.views.projects %}'>
-            <strong style='color: #FF6D3D;'>{{ project_count }}</strong>
-            projects
-        </a>
-    </h4>
-    <div id='learn_more'>
-        <a href='{% url mysite.project.views.projects %}'>See all</a>
-        <span style='color: #999;'>&bull;</span>
-        <a href='https://openhatch.org/wiki/Bug_trackers'>Add a bug tracker</a>
-    </div>
-</div>
-
-<div id='textual_search' class='module right'>
-    <div class='body'>
-        <form name='search_opps' method='GET' id='search_fulltext' action='{% url mysite.search.views.fetch_bugs %}'> 
-            <input type='text' name='q' id='q' rel='hint'
-            title='Textual search'
-            value='{{ query.terms_string }}' />
-
-            {% for facet, value in query.active_facet_options.items %}
-            <input type='hidden' name='{{facet}}' value='{{value}}' />
-            {% endfor %}
-            <input type='submit' id='button' value='Go' />
-        </form>
-    </div>
-</div>
-
-
-{% if bunch_of_bugs or query %}
-<div id='results' class='module'>
-    <div class='body'>
-
-        {% include 'search/results_widget.html' %}
-
-        <ul>
-            {% for bug in bunch_of_bugs %}
-                <li class='bug'>
-                    {% include 'search/result.html' %}
-                </li>
-            {% endfor %}
-        </ul>
-
-        <div class='results-widget'>
-            {% include 'search/navigation.html' %}
-        </div>
-
-        {% if subscribe_to_alert_form or confirm_email_alert_signup %}
-        <div class='module' id='create_bug_alert'>
-
-            {% ifequal confirm_email_alert_signup 1 %}
-            <div class='success'>
-                <strong>We have memorized your request!</strong>
-                We'll be in touch.
-                {# Keep this HTML comment to satisfy tests. #}
-                <!-- this page should confirm that an email alert has been registered -->
-            </div>
-            {% endifequal %}
-
-            {% if subscribe_to_alert_form %}
-            {# Keep this HTML comment to satisfy tests. #}
-            <!-- this page should offer a link to sign up for an email alert. -->
-
-            <p>
-                <strong>
-                {% if bunch_of_bugs %}
-                    {% if show_prev_page_link %}
-                        It's the last page of results!
+                    <h3 style='width: 100%; margin-bottom: 3px;'>
+                    {% if query.terms %}
+                        Filter results for &ldquo;{{ query.terms_string }}&rdquo;:
                     {% else %}
-                        Only one page of results?
+                        Change your search:
                     {% endif %}
-                {% else %}
-                    Not a boog in sight.
+                </h3>
                 {% endif %}
-                </strong>
-            </p>
-            <p>
-                If you didn't find what you were looking for, don't fret.  We'd
-                be happy to send you an email when we add more opportunities
-                matching this query. 
-            </p>
-            <form name='alert' method='POST' 
-                    action='{% url mysite.search.views.subscribe_to_bug_alert_do %}'>
-                {{ subscribe_to_alert_form.as_p }}
-                <input type="submit" value="Email me when this is less lame">
-            </form>
+
+            <ul id='facets'>
+                {% for facet_name, facet in query.get_possible_facets %}
+                    {% comment %}
+                        facets = e.g. {
+                            'language': {
+                                'Python': 1,
+                                'Java': 8,
+                            }
+                        }
+                    {% endcomment %}
+                    <li>
+                        {{ facet.sidebar_heading }}
+                        <ul>
+                            {% if query %}
+                                {% for option in facet.options|slice:':4' %}
+                                    {% if option.name %}
+                                        {% include 'facet_option.html' %}
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                {% for option in facet.options|slice:':8' %}
+                                    {% if option.name %}
+                                        {% include 'facet_option.html' %}
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+
+                            {% if facet.options|length|gt:'4' %}
+                                <li>
+                                    <a rel='facebox' id='more_projects' href='#{{ facet_name }}s'>
+                                        More {{ facet_name }}s &raquo;
+                                    </a>
+                                    <div style='display: none;' id='{{ facet_name }}s'>
+                                        <h2>Select a {{ facet_name }}</h2>
+                                        <ul class='facet_more_options'>
+                                            {% for option in facet.options %}
+                                                {% include 'facet_option.html' %}
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                {% endfor %}
+            </ul>
+
+            {% if not query %}
+
+                <div id='examples'>
+                    <h3>Example searches</h3>
+                    <ul>
+                        <li><a href='?q=command+line'>
+                                Bugs matching "command line"</a></li>
+                        <li><a href='?q=&amp;toughness=bitesize&amp;language=C%23'>
+                                Bitesize bugs in C#</a></li>
+                    </ul>
+                    <p style="margin-left: 5em;">
+                        <a href="https://openhatch.org/blog/how-can-openhatch-help-me-contribute-to-free-software/">Read more...</a>
+                    </p>
+                </div>
+
+                <div id='personal_recommendations'>
+                    <h3>Recommended searches</h3>
+                    {% if the_user.is_authenticated %}
+                    {% if suggestions %}
+                    <form name='suggested_searches'
+                        id='suggested_searches'
+                        method='GET' action=''>
+                        <ul>
+                            {% for index, term, czeched in suggestions %}
+                            <li>
+                            <a 
+                                {% ifequal term.lower query.terms_string.lower %}
+                                style='font-weight: bold;'
+                                {% endifequal %}
+                                href='?q={{ term|urlencode }}'>{{ term }}</a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </form>
+                    {% else %}
+                        <a href='{% url mysite.profile.views.portfolio_editor %}'>
+                            <strong>List some projects in your portfolio</strong>
+                            to receive recommendations.
+                        </a>
+                    {% endif %}
+                    {% else %}
+                    <ul>
+                        <li>
+                        <a href='/+me'>
+                            <strong>Create a profile auto-magically</strong>
+                        </a>
+                        to see some personalized recommendations here.
+                        </li>
+                    </ul>
+                    {% endif %}
+                </div>
+
             {% endif %}
+
         </div>
-        {% endif %}
-
-
+        {% comment %}
+            {% if query.terms %}
+                <a href='./' style='display: block; margin-bottom: 10px;'>&laquo;
+                    Back to browsing</a>
+            {% endif %}
+        {% endcomment %}
     </div>
-</div>
-{% endif %}
+
+    <div id='about_projects' class='module right'>
+        <h3>
+            Tracking opportunities in
+        </h3>
+        <h4 id='how_many_projects'>
+            <a href='{% url mysite.project.views.projects %}'>
+                <strong style='color: #FF6D3D;'>{{ project_count }}</strong>
+                projects
+            </a>
+        </h4>
+        <div id='learn_more'>
+            <a href='{% url mysite.project.views.projects %}'>See all</a>
+            <span style='color: #999;'>&bull;</span>
+            <a href='https://openhatch.org/wiki/Bug_trackers'>Add a bug tracker</a>
+        </div>
+    </div>
+
+    <div id='textual_search' class='module right'>
+        <div class='body'>
+            <form name='search_opps' method='GET' id='search_fulltext' action='{% url mysite.search.views.fetch_bugs %}'> 
+                <input type='text' name='q' id='q' rel='hint'
+                title='Textual search'
+                value='{{ query.terms_string }}' />
+
+                {% for facet, value in query.active_facet_options.items %}
+                <input type='hidden' name='{{facet}}' value='{{value}}' />
+                {% endfor %}
+                <input type='submit' id='button' value='Go' />
+            </form>
+        </div>
+    </div>
+
+
+    {% if bunch_of_bugs or query %}
+    <div id='results' class='module'>
+        <div class='body'>
+
+            {% include 'search/results_widget.html' %}
+
+            <ul>
+                {% for bug in bunch_of_bugs %}
+                    <li class='bug'>
+                        {% include 'search/result.html' %}
+                    </li>
+                {% endfor %}
+            </ul>
+
+            <div class='results-widget'>
+                {% include 'search/navigation.html' %}
+            </div>
+
+            {% if subscribe_to_alert_form or confirm_email_alert_signup %}
+            <div class='module' id='create_bug_alert'>
+
+                {% ifequal confirm_email_alert_signup 1 %}
+                <div class='success'>
+                    <strong>We have memorized your request!</strong>
+                    We'll be in touch.
+                    {# Keep this HTML comment to satisfy tests. #}
+                    <!-- this page should confirm that an email alert has been registered -->
+                </div>
+                {% endifequal %}
+
+                {% if subscribe_to_alert_form %}
+                {# Keep this HTML comment to satisfy tests. #}
+                <!-- this page should offer a link to sign up for an email alert. -->
+
+                <p>
+                    <strong>
+                    {% if bunch_of_bugs %}
+                        {% if show_prev_page_link %}
+                            It's the last page of results!
+                        {% else %}
+                            Only one page of results?
+                        {% endif %}
+                    {% else %}
+                        Not a boog in sight.
+                    {% endif %}
+                    </strong>
+                </p>
+                <p>
+                    If you didn't find what you were looking for, don't fret.  We'd
+                    be happy to send you an email when we add more opportunities
+                    matching this query. 
+                </p>
+                <form name='alert' method='POST' 
+                        action='{% url mysite.search.views.subscribe_to_bug_alert_do %}'>
+                    {{ subscribe_to_alert_form.as_p }}
+                    <input type="submit" value="Email me when this is less lame">
+                </form>
+                {% endif %}
+            </div>
+            {% endif %}
+
+
+        </div>
+    </div>
+    {% endif %}
 
 {% endblock content %}
 

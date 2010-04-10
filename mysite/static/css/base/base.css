@@ -308,7 +308,7 @@ body#edit_profile_info_form #contact_blurb:target label { background-color: #ffc
 .head .note { float: right; color: #777; font-size: .9em; padding: 6px; }
 .head .more { float: right; padding: 3px; }
 
-body ul.raquo_bullets{ margin-left: 0; padding-left: .6em; text-indent: -1em; list-style: none; }
+body ul.raquo_bullets { margin-left: 0; padding-left: .6em; text-indent: -1em; list-style: none; }
 body ul.raquo_bullets li { margin-bottom: .4em; }
 body ul.raquo_bullets li:last-child { margin-bottom: 0; }
 body ul.raquo_bullets li:before { color: #999; font-family: Georgia; margin-right: 2px; font-weight: bold; content: "\00BB \0020"; }
@@ -323,4 +323,3 @@ body.three_columns #right .body { width: 96.5%; }
 body.three_columns #right .entry { font-size: .9em; margin-top: 3px; }
 
 body#login .post_login_action_explanation { color: #444; font-size: 1.5em; -moz-border-radius: 8px; border-radius: 8px; text-align: center; float: left; width: 98%; margin-bottom: 10px; padding: 8px; background-color: #ffc; }
-
