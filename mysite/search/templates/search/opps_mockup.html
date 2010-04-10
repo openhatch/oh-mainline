@@ -28,18 +28,20 @@ Search bugs
 
 <div id='filters' class='module'>
     <div class='body'>
-        <h3 style='width: 100%; margin-bottom: 3px;'>
             {% if not query %}
-                Select one of the links below to find something to work on.
+                <h2 style='font-weight: normal; font-size: 1.4em; margin-bottom: 1em;'>
+                    Select one of the links below to find something to work on.
+                </h2>
             {% else %}
+                <h3 style='width: 100%; margin-bottom: 3px;'>
                 {% if query.terms %}
                     Filter results for <strong>{{ query.terms_string }}</strong>:
                 {% else %}
-                    Narrow or broaden your search:
+                    Change your search:
                 {% endif %}
+            </h3>
             {% endif %}
 
-        </h3>
         <ul id='facets'>
             {% for facet_name, facet in query.get_possible_facets %}
                 {% comment %}
@@ -145,6 +147,50 @@ Search bugs
         <div class='results-widget'>
             {% include 'search/navigation.html' %}
         </div>
+
+        {% if subscribe_to_alert_form or confirm_email_alert_signup %}
+        <div class='module' id='create_bug_alert'>
+
+            {% ifequal confirm_email_alert_signup 1 %}
+            <div class='success'>
+                <strong>We have memorized your request!</strong>
+                We'll be in touch.
+                {# Keep this HTML comment to satisfy tests. #}
+                <!-- this page should confirm that an email alert has been registered -->
+            </div>
+            {% endifequal %}
+
+            {% if subscribe_to_alert_form %}
+            {# Keep this HTML comment to satisfy tests. #}
+            <!-- this page should offer a link to sign up for an email alert. -->
+
+            <p>
+                <strong>
+                {% if bunch_of_bugs %}
+                    {% if show_prev_page_link %}
+                        It's the last page of results!
+                    {% else %}
+                        Only one page of results?
+                    {% endif %}
+                {% else %}
+                    Not a boog in sight.
+                {% endif %}
+                </strong>
+            </p>
+            <p>
+                If you didn't find what you were looking for, don't fret.  We'd
+                be happy to send you an email when we add more opportunities
+                matching this query. 
+            </p>
+            <form name='alert' method='POST' 
+                    action='{% url mysite.search.views.subscribe_to_bug_alert_do %}'>
+                {{ subscribe_to_alert_form.as_p }}
+                <input type="submit" value="Email me when this is less lame">
+            </form>
+            {% endif %}
+        </div>
+        {% endif %}
+
 
     </div>
 </div>

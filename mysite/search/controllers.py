@@ -128,53 +128,50 @@ class Query:
 
         return q
 
+    def get_facet_option_data(self, facet_name, option_name):
+
+        # Create a Query for this option. 
+
+        # This Query is sensitive to the currently active facet options...
+        GET_data = dict(self.active_facet_options)
+
+        # ...except the toughness facet option in question.
+        GET_data.update({
+            u'q': unicode(self.terms_string),
+            unicode(facet_name): unicode(option_name),
+            })
+        query_string = mysite.base.unicode_sanity.urlencode(GET_data)
+        query = Query.create_from_GET_data(GET_data)
+        the_all_option = u'any' 
+        name = option_name or the_all_option
+
+        active_option_name = self.active_facet_options.get(facet_name, None)
+
+        # This facet isn't active...
+        is_active = False
+
+        # ...unless there's an item in active_facet_options mapping the
+        # current facet_name to the option whose data we're creating...
+        if active_option_name == option_name:
+            is_active = True
+
+        # ...or if this is the 'any' option and there is no active option
+        # for this facet.
+        if name == the_all_option and active_option_name is None:
+            is_active = True
+
+        return {
+                'name': name,
+                'count': query.get_or_create_cached_hit_count(),
+                'query_string': query_string,
+                'is_active': is_active
+                }
     
     def get_facet_options(self, facet_name, option_names):
         option_names = mysite.base.decorators.no_str_in_the_list(option_names)
 
-        def get_facet_option_data(option_name):
-
-            caller_query = self
-            # ^^^ NB: The value of 'self' is determined by the caller environment.
-
-            # Create a Query for this option. 
-
-            # This Query is sensitive to the currently active facet options...
-            GET_data = dict(self.active_facet_options)
-
-            # ...except the toughness facet option in question.
-            GET_data.update({
-                u'q': unicode(self.terms_string),
-                unicode(facet_name): unicode(option_name),
-                })
-            query_string = mysite.base.unicode_sanity.urlencode(GET_data)
-            query = Query.create_from_GET_data(GET_data)
-            the_all_option = u'any' 
-            name = option_name or the_all_option
-
-            active_option_name = caller_query.active_facet_options.get(facet_name, None)
-
-            # This facet isn't active...
-            is_active = False
-
-            # ...unless there's an item in active_facet_options mapping the
-            # current facet_name to the option whose data we're creating...
-            if active_option_name == option_name:
-                is_active = True
-
-            # ...or if this is the 'any' option and there is no active option
-            # for this facet.
-            if name == the_all_option and active_option_name is None:
-                is_active = True
-
-            return {
-                    'name': name,
-                    'count': query.get_or_create_cached_hit_count(),
-                    'query_string': query_string,
-                    'is_active': is_active
-                    }
-
-        return [get_facet_option_data(n) for n in option_names]
+        options = [self.get_facet_option_data(facet_name, n) for n in option_names]
+        return sorted(options, key=lambda x: 0 - x['count'])
 
     def get_possible_facets(self):
 
@@ -258,6 +255,7 @@ class Query:
   
     def get_project_names(self):
         from django.db.models import Count
+        Project = mysite.search.models.Project
 
         GET_data = self.get_GET_data()
         if u'project' in GET_data:
@@ -265,12 +263,8 @@ class Query:
         query_without_project_facet = Query.create_from_GET_data(GET_data)
 
         bugs = query_without_project_facet.get_bugs_unordered()
-
-        projects = (
-                mysite.search.models.Project.objects.filter(pk__in=list(bugs.values_list(u'project__pk', flat=True).distinct()))
-                    .filter(bug__looks_closed=False)
-                    .annotate(Count('bug'))
-                    .order_by('-bug__count') )
+        project_ids = list(bugs.values_list(u'project__id', flat=True).distinct())
+        projects = Project.objects.filter(id__in=project_ids)
         project_names = [project.name or u'Unknown' for project in projects]
 
         # Add the active project facet, if there is one

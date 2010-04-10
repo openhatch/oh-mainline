@@ -34,7 +34,7 @@ body#search #about_projects, #about_bug_trackers { margin-top: 0; }
 body#search #about_projects { width: 21%; padding: 10px; }
 body#search #about_projects div { float: left; margin-bottom: 10px; width: 100%; }
 body#search #about_projects h3 { margin-bottom: 5px; font-weight: normal; }
-body#search #how_many_projects { font-weight: normal; text-align: center; font-size: 140%; width: 100% ! important; }
+body#search #how_many_projects { font-weight: normal; text-align: center; font-size: 140%; margin-top: .3em; width: 100% ! important; }
 body#search #how_many_projects a { color: #555; }
 	body#search #how_many_projects a:hover { color: #111; text-decoration: none; }
 		body#search #how_many_projects a:hover strong { background-color: #555; }
@@ -149,7 +149,7 @@ body#search .top_right { white-space: nowrap; float: right; width: 12%; padding:
 
 /*      Create a BugAlert
  *------------------------ */
-body#search #create_bug_alert { padding: 10px 15px; -moz-border-radius: 8px; border-radius: 8px; float: left; background: #ffc; }
+body#search #create_bug_alert { padding: 10px 15px; -moz-border-radius: 8px; border-radius: 8px; float: left; background: #ffc; font-size: .9em; }
     body#search #create_bug_alert .success { margin-bottom: 10px; -moz-border-radius: 8px; border-radius: 8px; padding: 8px; background-color: #ff7; }
     body#search #create_bug_alert .left { float: left; margin-right: 20px; width: 40%; }
     body#search #create_bug_alert .right { float: left; width: 50%; }
