@@ -36,7 +36,7 @@ def bugzilla_date_to_datetime(date_string):
 
 def who_tag_to_username_and_realname(who_tag):
     username = who_tag.text
-    realname = who_tag.attrib['name']
+    realname = who_tag.attrib.get('name', '')
     return username, realname
 
 def xml2bug_object(xml_fd,
@@ -52,7 +52,7 @@ def bug_elt2bug_dict(parsed, canonical_bug_link_format_string,
                        gen_project):
     date_reported_text = get_tag_text_from_xml(parsed, 'creation_ts')
     last_touched_text = get_tag_text_from_xml(parsed, 'delta_ts')
-    u, r = who_tag_to_username_and_realname(parsed.xpath('.//who')[0])
+    u, r = who_tag_to_username_and_realname(parsed.xpath('.//reporter')[0])
     bug_id = int(get_tag_text_from_xml(parsed, 'bug_id'))
     keywords_text = get_tag_text_from_xml(parsed, 'keywords')
     keywords = map(lambda s: s.strip(),
