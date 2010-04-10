@@ -100,11 +100,6 @@
               <td class="body"> \
                 <div class="content"> \
                 </div> \
-                <div class="footer"> \
-                  <a href="#" class="close"> \
-                    <img src="/static/images/facebox/closelabel.gif" title="close" class="close_image" /> \
-                  </a> \
-                </div> \
               </td> \
               <td class="b"/> \
             </tr> \
