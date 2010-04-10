@@ -171,30 +171,40 @@ class Query:
         option_names = mysite.base.decorators.no_str_in_the_list(option_names)
 
         options = [self.get_facet_option_data(facet_name, n) for n in option_names]
-        return sorted(options, key=lambda x: 0 - x['count'])
+
+        # Let's sort the options, with the active option first, then all the
+        # normal options, followed by the 'Unknown' option if this is a
+        # language facet
+        
+        # nb: -100 sorts before -50 and false sorts before true
+        sort_key_funcs_in_order_of_precedence = [
+                lambda x: not x['is_active'],
+                lambda x: (facet_name != 'language') or (x['name'] == 'Unknown'),
+                lambda x: 0 - x['count'],
+                ]
+
+        # Reverse the key functions, because that's the way that list.sort()
+        # works. That is to say, we want the highest-ranked sorting key to be
+        # applied last. Etc.
+        sort_key_funcs_in_order_of_precedence.reverse()
+
+        for key in sort_key_funcs_in_order_of_precedence:
+            options.sort(key=key) 
+        return options
 
     def get_possible_facets(self):
 
         bugs = mysite.search.models.Bug.open_ones.filter(self.get_Q())
 
-        project_options = self.get_facet_options(u'project', self.get_project_names() + [u''])
-        project_options = sorted(project_options, key=lambda option: not option['is_active'])
+        project_options = self.get_facet_options(u'project', self.get_project_names())
 
-        toughness_options = self.get_facet_options(u'toughness', [u'bitesize', u''])
+        toughness_options = self.get_facet_options(u'toughness', [u'bitesize'])
 
         contribution_type_options = self.get_facet_options(
-            u'contribution_type', [u'documentation', u''])
+            u'contribution_type', [u'documentation'])
 
-        language_options = self.get_facet_options(u'language', self.get_language_names() + [u''])
-        # sort language_options so that unknown is second-to-last and any is last
-        language_options_name_is_unknown = filter((lambda x: x[u'name'] == u'Unknown'), language_options)
-        language_options_name_is_any = filter((lambda x: x[u'name'] == u'any'), language_options)
-        language_options_name_is_neither_of_the_above = filter((lambda x: x[u'name']  not in [u'Unknown', u'any'] ), language_options)
-        language_options = language_options_name_is_neither_of_the_above + language_options_name_is_unknown + language_options_name_is_any
-
-        language_options = sorted(language_options, key=lambda option: not option['is_active'])
-
-
+        language_options = self.get_facet_options(u'language', self.get_language_names())
+            
         # looks something like:
         # [{'count': 1180L, 'query_string': 'q=&language=Python', 'is_active': False, 'name': u'Python'}, {'count': 478L, 'query_string': 'q=&language=C%23', 'is_active': False, 'name': u'C#'}, {'count': 184L, 'query_string': 'q=&language=Unknown', 'is_active': False, 'name': 'Unknown'}, {'count': 532L, 'query_string': 'q=&language=C', 'is_active': False, 'name': u'C'}, {'count': 2374L, 'query_string': 'q=&language=', 'is_active': True, 'name': 'any'}]
 
@@ -205,24 +215,28 @@ class Query:
                     u'sidebar_heading': u"Pick a language",
                     u'description_above_results': u"projects primarily coded in %s",
                     u'options': language_options,
+                    u'the_any_option': self.get_facet_options(u'language', [u''])[0],
                     }),
                 (u'project', {
                     u'name_in_GET': u'project',
                     u'sidebar_heading': u'Pick a project',
                     u'description_above_results': 'in the %s project',
                     u'options': project_options,
+                    u'the_any_option': self.get_facet_options(u'project', [u''])[0],
                 }),
                 (u'toughness', {
                     u'name_in_GET': u"toughness",
                     u'sidebar_heading': u"Pick a toughness",
                     u'description_above_results': u"where toughness = %s",
                     u'options': toughness_options,
+                    u'the_any_option': self.get_facet_options(u'toughness', [u''])[0],
                 }),
                 (u'contribution type', {
                     u'name_in_GET': u"contribution_type",
                     u'sidebar_heading': u"Just bugs labeled...",
                     u'description_above_results': u"which need %s",
                     u'options': contribution_type_options,
+                    u'the_any_option': self.get_facet_options(u'contribution_type', [u''])[0],
                     })
             )
 

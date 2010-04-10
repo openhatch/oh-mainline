@@ -1,6 +1,6 @@
 body#search .module { margin-bottom: 5px; margin-top: 0; }
 body#search #content { position: relative; top: -4px; padding-top: 0; }
-body#search #page-top img#volunteer-opportunities { position: relative; top: 5px; }
+body#search #page-top img#volunteer-opportunities { position: relative; top: 8px; }
 body#search #page-top { float: left; width: 1000px; font-size: 19pt; }
 body#search .no-results { color: #222; padding: 10px; font-size: 120%; line-height: 130%; width: 460px; float: left; }
 	body#search .no-results strong { background-color: #fff; }
@@ -150,7 +150,7 @@ body#search .top_right { white-space: nowrap; float: right; width: 12%; padding:
 body#search #examples { clear: left; margin-right: 1em; }
 body#search #examples ul { display: block; margin-left: 10px; }
 body#search #examples li { list-style: circle; margin-left: 1em; color: #999; clear: left; }
-body#search #examples, body#search #personal_recommendations { margin-top: 1em;  width: 45%; float: left; }
+body#search #examples, body#search #personal_recommendations { margin-top: 1em;  width: 48%; float: left; }
 body#search #examples h3, body#search #personal_recommendations h3 { font-size: 1.2em; color: #222; margin-bottom: 3px; float: left; font-weight: normal; width: 100%; }
 
 /*      Create a BugAlert

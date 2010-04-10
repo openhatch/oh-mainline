@@ -37,7 +37,7 @@ Search bugs
                     {% if query.terms %}
                         Filter results for &ldquo;{{ query.terms_string }}&rdquo;:
                     {% else %}
-                        Change your search:
+                        Filters:
                     {% endif %}
                 </h3>
                 {% endif %}
@@ -68,21 +68,15 @@ Search bugs
                                     {% endif %}
                                 {% endfor %}
                             {% endif %}
+                            {% with facet.the_any_option as option %}
+                                {% include 'facet_option.html' %}
+                            {% endwith %}
 
-                            {% if facet.options|length|gt:'4' %}
-                                <li>
-                                    <a rel='facebox' id='more_projects' href='#{{ facet_name }}s'>
-                                        More {{ facet_name }}s &raquo;
-                                    </a>
-                                    <div style='display: none;' id='{{ facet_name }}s'>
-                                        <h2>Select a {{ facet_name }}</h2>
-                                        <ul class='facet_more_options'>
-                                            {% for option in facet.options %}
-                                                {% include 'facet_option.html' %}
-                                            {% endfor %}
-                                        </ul>
-                                    </div>
-                                </li>
+                            {% if query and facet.options|length|gt:'4' %}
+                                {% include 'more_facet_options.html' %}
+                            {% endif %}
+                            {% if not query and facet.options|length|gt:'8' %}
+                                {% include 'more_facet_options.html' %}
                             {% endif %}
                         </ul>
                     </li>

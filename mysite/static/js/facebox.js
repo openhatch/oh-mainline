@@ -143,7 +143,7 @@
       if (klass) $('#facebox .content').addClass(klass)
       $('#facebox .content').append(data)
       $('#facebox .loading').remove()
-      $('#facebox .body').children().fadeIn('normal')
+      $('#facebox .body').children().slideDown('fast')
       $('#facebox').css('left', $(window).width() / 2 - ($('#facebox table').width() / 2))
       $(document).trigger('reveal.facebox').trigger('afterReveal.facebox')
     },
@@ -317,11 +317,10 @@
 
   $(document).bind('close.facebox', function() {
     $(document).unbind('keydown.facebox')
-    $('#facebox').fadeOut(function() {
-      $('#facebox .content').removeClass().addClass('content')
-      hideOverlay()
-      $('#facebox .loading').remove()
-    })
+    $('#facebox').hide()
+    $('#facebox .content').removeClass().addClass('content')
+    hideOverlay()
+    $('#facebox .loading').remove()
   })
 
 })(jQuery);
