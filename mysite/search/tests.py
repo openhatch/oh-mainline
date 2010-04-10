@@ -752,11 +752,15 @@ class SingleTerm(SearchTest):
         toughness_option_any = {'name': 'any', 'count': 3,
                 'is_active': True,
                 'query_string': 'q=screensaver&toughness='}
-        expected_toughness_facet_options = [toughness_option_bitesize, toughness_option_any]
+        expected_toughness_facet_options = [toughness_option_bitesize]
 
         self.assertEqual(
                 self.output_possible_facets['toughness']['options'],
                 expected_toughness_facet_options 
+                )
+        self.assertEqual(
+                self.output_possible_facets['toughness']['the_any_option'],
+                [toughness_option_any]
                 )
 
     def test_languages_facet(self):
@@ -773,12 +777,16 @@ class SingleTerm(SearchTest):
         expected_languages_facet_options = [
                 languages_option_python,
                 languages_option_perl,
-                languages_option_any 
                 ]
 
         self.compare_lists_of_dicts(
                 self.output_possible_facets['language']['options'],
                 expected_languages_facet_options 
+                )
+
+        self.compare_lists_of_dicts(
+                self.output_possible_facets['language']['the_any_option'],
+                [languages_option_any] 
                 )
 
 class SingleFacetOption(SearchTest):
@@ -825,11 +833,15 @@ class SingleFacetOption(SearchTest):
         toughness_option_any = {u'name': u'any', u'count': 2,
                 u'is_active': True,
                 u'query_string': u'q=&toughness=&language=Python'}
-        expected_toughness_facet_options = [toughness_option_bitesize, toughness_option_any]
+        expected_toughness_facet_options = [toughness_option_bitesize]
 
         self.compare_lists_of_dicts(
                 self.output_possible_facets[u'toughness'][u'options'],
                 expected_toughness_facet_options 
+                )
+        self.compare_lists_of_dicts(
+                self.output_possible_facets[u'toughness'][u'the_any_option'],
+                [toughness_option_any] 
                 )
 
     def test_languages_facet(self):
@@ -850,12 +862,16 @@ class SingleFacetOption(SearchTest):
                 languages_option_python, 
                 languages_option_perl,
                 languages_option_c,
-                languages_option_any 
                 ]
 
         self.compare_lists_of_dicts(
                 self.output_possible_facets[u'language'][u'options'],
                 expected_languages_facet_options 
+                )
+
+        self.compare_lists_of_dicts(
+                self.output_possible_facets[u'language'][u'the_any_option'],
+                [languages_option_any],
                 )
 
 class QueryGetToughnessFacetOptions(SearchTest):
@@ -1004,7 +1020,7 @@ class QueryGetPossibleProjectFacetOptions(SearchTest):
         query = mysite.search.controllers.Query.create_from_GET_data(GET_data)
         possible_project_names = [x['name'] for x in dict(query.get_possible_facets())['project']['options']]
         self.assertEqual(possible_project_names,
-                list(Project.objects.values_list('name', flat=True)) + ['any'])
+                list(Project.objects.values_list('name', flat=True)))
 
 class QueryContributionType(SearchTest):
 
@@ -1030,9 +1046,9 @@ class QueryContributionType(SearchTest):
         starting_query = mysite.search.controllers.Query.create_from_GET_data(
             GET_data)
         cto = starting_query.get_facet_options(u'contribution_type',
-                                               [u'documentation', u''])
+                                               [u'documentation'])
         documentation_one, = [k for k in cto if k[u'name'] == u'documentation']
-        any_one, = [k for k in cto if k[u'name'] == u'any']
+        any_one = starting_query.get_facet_options(u'contribution_type', [u''])[0]
         self.assertEqual(documentation_one[u'count'], 1)
         self.assertEqual(any_one[u'count'], 3)
 
@@ -1062,12 +1078,11 @@ class QueryProject(SearchTest):
             GET_data)
         cto = starting_query.get_facet_options(u'project',
                                                [u'thingamajig',
-                                                u'thingamabob',
-                                                u''])
+                                                u'thingamabob' ])
         jig_ones, = [k for k in cto if k[u'name'] == u'thingamajig']
-        any_ones, = [k for k in cto if k[u'name'] == u'any']
+        any_one = starting_query.get_facet_options(u'project', [u''])[0]
         self.assertEqual(jig_ones[u'count'], 2)
-        self.assertEqual(any_ones[u'count'], 3)
+        self.assertEqual(any_one[u'count'], 3)
 
 class QueryStringCaseInsensitive(SearchTest):
 
