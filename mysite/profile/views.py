@@ -272,6 +272,10 @@ def edit_person_info_do(request):
             if not tag_text.strip(): # Don't save blank tags.
                 continue
 
+            # HACK
+            if type(tag_text) == str:
+                tag_text = unicode(tag_text, 'utf-8')
+
             tag_text_case_sensitive_regex = r"^%s$" % re.escape(tag_text)
             tag, _ = Tag.objects.get_or_create(
                     text__regex=tag_text_case_sensitive_regex,
