@@ -104,3 +104,9 @@
   position: absolute;
   height: expression(document.body.scrollHeight > document.body.offsetHeight ? document.body.scrollHeight : document.body.offsetHeight + 'px');
 }
+
+#close_facebox {
+    margin-top: 5px;
+    float: right;
+    padding: 2px;
+}
