@@ -161,7 +161,7 @@ BROKER_HOST = 'localhost'
 BROKER_PORT = 5672
 BROKER_USER = 'rabbiter'
 BROKER_PASSWORD = 'johT4qui'
-BROKER_VHOST = '/'
+BROKER_VHOST = 'localhost'
 
 
 cooked_data_password = 'AXQaTjp3'
