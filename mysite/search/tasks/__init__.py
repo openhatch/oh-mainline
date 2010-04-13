@@ -4,8 +4,12 @@ import mysite.search.models
 import mysite.customs.models
 from celery.task import Task, PeriodicTask
 import shutil
+import os
+import os.path
 import celery.decorators
 import datetime
+
+from django.conf import settings
 
 import mysite.customs.miro
 import mysite.customs.bugtrackers.trac
