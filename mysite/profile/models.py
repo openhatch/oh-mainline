@@ -22,6 +22,7 @@ import urllib
 import random
 import collections
 import simplejson
+import re
 
 DEFAULT_LOCATION='Inaccessible Island'
 
@@ -289,7 +290,7 @@ class Person(models.Model):
         import mysite.search.templatetags.search
         full_name = self.get_full_name()
         full_name_escaped = mysite.search.templatetags.search.make_text_safe(full_name)
-        full_name_escaped_with_nbsps = full_name_escaped.replace(" ", "&nbsp;")
+        full_name_escaped_with_nbsps = re.sub("\s+", "&nbsp;", full_name_escaped)
         return full_name_escaped_with_nbsps 
 
     def get_full_name_or_username(self):
