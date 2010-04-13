@@ -156,7 +156,13 @@ TEST_RUNNER = 'mysite._profiling.profile_tests'
 TEST_PROFILE = '/tmp/openhatch-profiling-data.%s' % os.environ.get('USER', 'unknown')
 
 ## AMQP, Rabbit Queue, Celery
-CARROT_BACKEND = "ghettoq.taproot.Database"
+CARROT_BACKEND = 'amqp'
+BROKER_HOST = 'localhost'
+BROKER_PORT = 5672
+BROKER_USER = 'rabbiter'
+BROKER_PASSWORD = 'johT4qui'
+BROKER_VHOST = '/'
+
 
 cooked_data_password = 'AXQaTjp3'
 AUTH_PROFILE_MODULE = "profile.Person"
