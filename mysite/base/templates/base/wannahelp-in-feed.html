@@ -24,9 +24,7 @@
     {% spaceless %}
     {% with feed_item.project as project %}
       is willing to help
-    <a href='{{ project.get_url }}'>
-      {{project.name}}
-    </a>
+    <a href='{{ project.get_url }}'>{{project.name}}</a>
     {% endwith %}
     {% endspaceless %}
     {% endcache %}

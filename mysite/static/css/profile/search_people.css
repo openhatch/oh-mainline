@@ -18,6 +18,7 @@ body#people-map .profile-link{ border-radius:8px; -moz-border-radius:8px; backgr
 /* Special functionality for people map. */
 body#people-map #people-list li { float: left; width: 100%; border-radius:8px; -moz-border-radius:8px; margin-bottom:3px; width:94%; padding:8px; }
 body#people-map #people-list li:hover { background:#ffc; }
+body#people-map #people-list li a:focus { text-decoration: none; background:#ffc; }
 
 #people-list li > a:hover { background:#ffc; }
 #people-list li.highlighted {background:#ffa !important; }

@@ -7,4 +7,4 @@
 # 	ServerAliveInterval 120
 
 echo "drop database oh_milestone_a; create database oh_milestone_a" | $(dirname $0)/oh_mysql 
-ssh -C oh /home/deploy/milestone-a/mysite/scripts/oh_mysqldump | pv | $(dirname $0)/oh_mysql
+ssh -C oh /home/deploy/milestone-a/mysite/scripts/oh_mysqldump --ignore-table=oh_milestone_a.ghettoq_message | pv | $(dirname $0)/oh_mysql

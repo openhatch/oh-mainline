@@ -1,2 +1,1 @@
-mysqldump -uoh_milestone_a -pahmaC0Th oh_milestone_a
-
+mysqldump -uoh_milestone_a -pahmaC0Th oh_milestone_a "$@"
