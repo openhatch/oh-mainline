@@ -278,11 +278,22 @@ def edit_person_info_do(request):
             if type(tag_text) == str:
                 tag_text = unicode(tag_text, 'utf-8')
 
-            tag_text_case_sensitive_regex = r"^%s$" % re.escape(tag_text)
-            tag, _ = Tag.objects.get_or_create(
-                    text__regex=tag_text_case_sensitive_regex,
-                    tag_type=tag_type,
-                    defaults={'text': tag_text})
+            # The following code gets the first matching tag or creates one. We
+            # previously used a straight-up get_or_create, but the parameters
+            # (name, tagtype) no longer uniquely select a tag. We get errors
+            # like this: "MultipleObjectsReturned: get() returned more than one
+            # Tag -- it returned 25!  Lookup parameters were {'text__regex':
+            # u'^fran\\\xe7ais$', 'tag_type': <TagType: understands>}" Our
+            # data, as you can see, is not very healthy. But I don't think it
+            # will make a difference.
+            matching_tags = Tag.objects.filter(
+                    text__regex=r"^%s$" % re.escape(tag_text),
+                    tag_type=tag_type)
+            if matching_tags:
+                tag = matching_tags[0]
+            else:
+                tag = Tag.objects.create(tag_type=tag_type, text=tag_text)
+
             new_link, _ = Link_Person_Tag.objects.get_or_create(
                     tag=tag, person=person)
 
