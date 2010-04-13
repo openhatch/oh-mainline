@@ -140,7 +140,9 @@
       $('#facebox .loading').remove()
       $('#facebox .body').children().slideDown('fast')
       $('#facebox').css('left', $(window).width() / 2 - ($('#facebox table').width() / 2))
-      $(document).trigger('reveal.facebox').trigger('afterReveal.facebox')
+      $(document).trigger('reveal.facebox').trigger('afterReveal.facebox');
+      $("#close_facebox").live('click', $.facebox.close);
+
     },
 
     close: function() {
@@ -316,6 +318,8 @@
     $('#facebox .content').removeClass().addClass('content')
     hideOverlay()
     $('#facebox .loading').remove()
+    console.log('close');
+
   })
 
 })(jQuery);
