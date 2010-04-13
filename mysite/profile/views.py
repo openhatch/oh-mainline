@@ -106,6 +106,8 @@ def get_personal_data(person):
 
     data_dict['contact_blurb'] = mysite.base.controllers.put_forwarder_in_contact_blurb_if_they_want(person.contact_blurb, person.user)
 
+    data_dict['projects_i_wanna_help'] = person.projects_i_wanna_help.all()
+
     return data_dict
 
     # }}}

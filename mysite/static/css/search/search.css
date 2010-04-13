@@ -106,7 +106,7 @@ body#search #results ul { margin: 0; padding: 0; float: left; width: 99%; }
         body#search #results li .good-for-beginners { background-color: #dcffcc; padding: 1px; }
 
         body#search a.title { font-size: 1.1em; }
-        body#search a.title:focus { -moz-outline: none; }
+        body#search a.title:focus { text-decoration: underline; -moz-outline: none; }
         body#search a.title:hover { text-decoration: underline; }
         body#search #results .title .untruncated { display: none; }
 
@@ -151,8 +151,8 @@ body#search .top_left { float: left; width: 83%; overflow: hidden; }
 body#search .top_right { white-space: nowrap; float: right; width: 12%; padding: 3px 10px; text-align: right; font-size: .9em; }
 
 body#search #examples { clear: left; margin-right: 1em; }
-body#search #examples ul { display: block; margin-left: 10px; }
-body#search #examples li { list-style: circle; margin-left: 1em; color: #999; clear: left; }
+body#search #examples ul, body#search #personal_recommendations ul { display: block; margin-left: 10px; }
+body#search #examples li, body#search #personal_recommendations li { list-style: circle; margin-left: 1em; color: #999; clear: left; }
 body#search #examples, body#search #personal_recommendations { margin-top: 1em;  width: 48%; float: left; }
 body#search #examples h3, body#search #personal_recommendations h3 { font-size: 1.2em; color: #222; margin-bottom: 3px; float: left; font-weight: normal; width: 100%; }
 

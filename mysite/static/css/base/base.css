@@ -2,7 +2,6 @@ body { font: 10pt Helvetica, sans-serif; background: #fff url("/static/images/mo
 a { color: #ff6d3d; text-decoration: none; }
     /* If you change the link color, be sure to change the color of the links
      * on /static/css/search/search.css */
-a:focus { text-decoration: underline; }
 
 /* for Firefox */
 input[type="submit"]::-moz-focus-inner, input[type="button"]::-moz-focus-inner, button::-moz-focus-inner { border : 0px; }

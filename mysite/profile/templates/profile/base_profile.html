@@ -213,6 +213,20 @@
             {% endfor %}
         </div>
         {% endif %}
+
+        {% if projects_i_wanna_help %}
+        <div class='tags'>
+            <h4>wants to help</h4>
+            {% spaceless %}
+            {% for project in projects_i_wanna_help %}
+                <a href='{{ project.get_url }}'>{{ project.name }}</a>
+                {% if not forloop.last %}
+                    <span>, </span>
+                {% endif %}
+            {% endfor %}
+            {% endspaceless %}
+        </div>
+        {% endif %}
     </div>
 </div> <!-- end of person info module -->
 
