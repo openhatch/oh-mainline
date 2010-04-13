@@ -143,14 +143,12 @@ var openid = {
             if (provider_id == 'google' || provider_id == 'yahoo') {
 
                 // Hide form and display explanatory message.
-                $('#openid_form').html(
+                $('#openid_form p').hide();
+                $('#openid_btns').html(
                     '<div id="openid_while_u_wait">' +
                     'Requesting credentials from ' +
                     providers_large[provider_id].name +
                     '&hellip;</div>');
-
-                // Remove the other buttons.
-                $('#openid_btns').remove();
 
                 // If the user has recently clicked another provider,
                 // a textfield, labelled, for example, "Enter your Flickr username",
