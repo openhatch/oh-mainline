@@ -20,7 +20,10 @@ NB: All forms in pages that descend from this have the same name.
         <form name='a_settings_tab_form' method='POST'
             action={% block form_action %}{% endblock %}>
             {% block submodule_body %}{% endblock %}
-            <p> <input type='submit' value='{% block submit_button_text %}Save{% endblock %}' /> </p>
+            <p> <input type='submit'
+                        {% block submit_button_attributes %}
+                            value='Save'
+                        {% endblock %} /> </p>
         </form>
     </div>
 </div>

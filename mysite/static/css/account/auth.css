@@ -5,7 +5,7 @@ body.auth input[type='text'],
 body.auth input[type='file'],
 body.auth input[type='password'] { padding: 8px; float: left; width: 60%; }
 body.auth input[type='file'] { margin: 10px 0; width: 200px; }
-body.auth input[type='submit'] { margin-left: 30%; position: relative; left: 10px; float: left; padding: 8px; }
+body.auth input[type='submit'] { margin-left: 30%; position: relative; left: 10px; float: left; }
 body.auth #login .text, #signup .text { font-size: .7em; width: 100px; margin-right: 6px; }
 body.auth #login .button, #signup .button { font-size: .7em; margin: -17px 6px 0 0; }
 body.auth input[type='checkbox'] { position: relative; top: 10px; }
