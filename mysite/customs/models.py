@@ -173,7 +173,8 @@ class RoundupBugTracker(models.Model):
         bug.concerns_just_documentation = ('Documentation' 
                                            in metadata_dict['Components'])
         bug.status = metadata_dict['Status'] 
-        bug.looks_closed = (metadata_dict['Status'] == 'closed')
+        bug.looks_closed = (metadata_dict['Status'] == 'closed'
+                            or 'patch' in metadata_dict['Keywords'])
         bug.title = metadata_dict['Title'] 
         bug.importance = metadata_dict['Priority']
 
