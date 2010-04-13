@@ -106,7 +106,7 @@ body#search #results ul { margin: 0; padding: 0; float: left; width: 99%; }
         body#search #results li .good-for-beginners { background-color: #dcffcc; padding: 1px; }
 
         body#search a.title { font-size: 1.1em; }
-        body#search a.title:focus { -moz-outline: none; }
+        body#search a.title:focus { text-decoration: underline; -moz-outline: none; }
         body#search a.title:hover { text-decoration: underline; }
         body#search #results .title .untruncated { display: none; }
 
