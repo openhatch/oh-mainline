@@ -28,6 +28,10 @@
             {% endifequal %}
         {% endfor %}
 
+        {% if bunch_of_bugs or query %}
+            bug{{ bunch_of_bugs|pluralize }}
+        {% endif %}
+
         {% if not bunch_of_bugs %}
             {% if query.terms or query.active_facet_options %}
                 {% ifnotequal start 1 %}
@@ -38,8 +42,6 @@
             {% else %}
                 {# No search query #}
             {% endif %}
-        {% else %}
-            bug{{ bunch_of_bugs|pluralize }}
         {% endif %}
 
         {% if query.terms %}
@@ -47,7 +49,6 @@
         <strong id='results-summary-language'>{{ query.terms_string }}</strong>{% if not query.active_facet_options %}.{% endif %}
         {% endif %}
 
-        {% comment %} FIXME Use django filter to remove whitespace {% endcomment %}
         {% spaceless %}
             {% for facet, value in query.get_active_facet_options_except_toughness.items %}
                 {% if not forloop.first and forloop.last %}
