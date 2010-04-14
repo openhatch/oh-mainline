@@ -180,4 +180,6 @@ body#search .facet_more_options li { margin-top: 3px; }
 
 #facebox h2 { font-weight: normal; font-size: 1.5em; }
 
+.active_facet_value a:hover { text-decoration: line-through; }
+
 /* vim: set ai ts=4 sts=4 et sw=4 nowrap: */

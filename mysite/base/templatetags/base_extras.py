@@ -144,11 +144,18 @@ urlize = allow_lazy(urlize, unicode)
 show_common_data = register.tag(googleanalyticsjs)
 
 @register.filter
+def at(dict, key):
+    """Usage: {{ dictionary|at:'key'}}"""
+    if key in dict:
+        return dict[key]
+    return ''
+
+@register.filter
 def invitation_key2user(key):
     from invitation.models import InvitationKey
     return InvitationKey.objects.get(key=key).from_user
 
-@register.filter("truncate_chars")  
+@register.filter
 def truncate_chars(value, max_length):  
     max_length = int(max_length)
     if len(value) <= max_length:  

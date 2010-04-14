@@ -266,6 +266,14 @@ class Query:
                 languages.append(active_language)
 
         return languages
+
+    def get_active_facet_options_except_toughness(self):
+        if 'toughness' not in self.active_facet_options:
+            return self.active_facet_options
+
+        options = self.active_facet_options.copy()
+        del options['toughness']
+        return options
   
     def get_project_names(self):
         from django.db.models import Count
