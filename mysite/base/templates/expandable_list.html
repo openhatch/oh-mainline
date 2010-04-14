@@ -1,0 +1,14 @@
+
+                    {{ list|slice:':10'|join:", " }}
+                    {% with list|slice:'10:' as hide_these_elements %}
+                        {% if hide_these_elements %}
+                            <span class='and_more'>
+                                and {{ hide_these_elements|length }} more
+                            </span>
+                            <span class='collapsed'>
+                                {{ hide_these_elements|join:", " }}
+                            </span>
+                        {% endif %}
+                    {% endwith %}
+
+{# vim: set filetype=htmldjango: #}
