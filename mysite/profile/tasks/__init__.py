@@ -265,7 +265,7 @@ source2result_handler = {
         }
 
 class ReindexPerson(Task):
-    rate_limit = "10/m"
+    rate_limit = "8/m"
     def run(self, person_id, **kwargs):
         person = mysite.profile.models.Person.objects.get(id=person_id)
         pi = mysite.profile.search_indexes.PersonIndex(person)
@@ -347,7 +347,7 @@ def update_person_tag_cache(person__pk):
     # This getter will populate the cache
     return person.get_tag_texts_for_map()
 
-@task(rate_limit = "45/m")
+@task(rate_limit = "30/m")
 def update_someones_pf_cache(person__pk):
     person = mysite.profile.models.Person.objects.get(pk=person__pk)
     cache_key = person.get_cache_key_for_projects()
