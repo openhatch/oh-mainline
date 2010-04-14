@@ -1,23 +1,45 @@
+{% load search %}
+
 <div class='results-widget'>
     <span id='results-summary'>
 
         {% if bunch_of_bugs %}
-            Showing 
-            <span id='results-summary-start'>{{ start }}</span> to
-            <span id='results-summary-end'>{{ end }}</span> of 
-            {{ total_bug_count }} bugs
-        {% else %}
+            {% ifequal bunch_of_bugs|length 1 %}
+                There's just one
+            {% else %}
+                Showing 
+                <span id='results-summary-start'>{{ start }}</span> to
+                <span id='results-summary-end'>{{ end }}</span> of 
+                {{ total_bug_count }}
+            {% endifequal %}
+        {% endif %}
+            
+        {% if not bunch_of_bugs %}
+            No
+        {% endif %}
+
+        {% for facet, value in query.active_facet_options.items %}
+            {% ifequal facet "toughness" %}
+                <span class=active_facet_value>
+                    {% spaceless %}
+                        {% include 'bug_search_facet_value_in_summary.html' %}
+                    {% endspaceless %}
+                </span>
+            {% endifequal %}
+        {% endfor %}
+
+        {% if not bunch_of_bugs %}
             {% if query.terms or query.active_facet_options %}
-
                 {% ifnotequal start 1 %}
-                    No bugs on this page
+                    on this page
                 {% else %}
-                    <strong>No bugs found</strong>
+                    found
                 {% endifnotequal %}
-
-                {% else %}
-                <!-- No search query -->
+            {% else %}
+                {# No search query #}
             {% endif %}
+        {% else %}
+            bug{{ bunch_of_bugs|pluralize }}
         {% endif %}
 
         {% if query.terms %}
@@ -27,36 +49,27 @@
 
         {% comment %} FIXME Use django filter to remove whitespace {% endcomment %}
         {% spaceless %}
-            {% if query.active_facet_options %}
-                {% for facet, value in query.active_facet_options.items %}
-                    {% if not forloop.first and forloop.last %}
-                        {% ifnotequal forloop.counter0 1 %}
-                            and
-                        {% endifnotequal %}
-                    {% endif %}
-                    <span class='active_facet_value'>
-                        {% ifequal facet "language" %}
-                        whose main project language is
-                        {% endifequal %}
-                        {% ifequal facet "project" %}
-                        in 
-                        {% endifequal %}
-                        {% ifequal facet "toughness" %}
-                        whose toughness is
-                        {% endifequal %}
-                        {% ifequal facet "contribution_type" %}
-                        which need
-                        {% endifequal %}
-                        {% spaceless %}
-                        <strong>{{ value }}</strong>
-                        <span>&nbsp;</span><a rel='tipsy-south' title='Remove {{ facet }} filter' href='?{% ifequal facet "language" %}{{ facet2any_query_string.language }}{% endifequal %}{% ifequal facet "toughness"%}{{ facet2any_query_string.toughness }}{% endifequal %}{% ifequal facet "contribution_type"%}{{ facet2any_query_string.contribution_type }}{% endifequal %}'>[x]</a>
-                        {% endspaceless %}
-                    </span>
-                    {% if forloop.last %}
-                        .
-                    {% endif %}
-                {% endfor %}
-            {% endif %}
+            {% for facet, value in query.get_active_facet_options_except_toughness.items %}
+                {% if not forloop.first and forloop.last %}
+                    {% ifnotequal forloop.counter0 1 %}
+                        and
+                    {% endifnotequal %}
+                {% endif %}
+                <span class='active_facet_value'>
+                    {% ifequal facet "language" %}
+                    whose main project language is
+                    {% endifequal %}
+                    {% ifequal facet "project" %}
+                    in 
+                    {% endifequal %}
+                    {% ifequal facet "contribution_type" %}
+                    which need
+                    {% endifequal %}
+                    {% spaceless %}
+                    {% include 'bug_search_facet_value_in_summary.html' %}
+                    {% endspaceless %}
+                </span>
+            {% endfor %}
         {% endspaceless %}
 
     </span>
