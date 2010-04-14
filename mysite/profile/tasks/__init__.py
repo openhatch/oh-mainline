@@ -265,7 +265,6 @@ source2result_handler = {
         }
 
 class ReindexPerson(Task):
-    rate_limit = "8/m"
     def run(self, person_id, **kwargs):
         person = mysite.profile.models.Person.objects.get(id=person_id)
         pi = mysite.profile.search_indexes.PersonIndex(person)
@@ -338,7 +337,7 @@ try:
 except celery.registry.AlreadyRegistered:
     pass
 
-@task(rate_limit = "30/m")
+@task
 def update_person_tag_cache(person__pk):
     person = mysite.profile.models.Person.objects.get(pk=person__pk)
     cache_key = person.get_tag_texts_cache_key()
@@ -347,7 +346,7 @@ def update_person_tag_cache(person__pk):
     # This getter will populate the cache
     return person.get_tag_texts_for_map()
 
-@task(rate_limit = "30/m")
+@task
 def update_someones_pf_cache(person__pk):
     person = mysite.profile.models.Person.objects.get(pk=person__pk)
     cache_key = person.get_cache_key_for_projects()
