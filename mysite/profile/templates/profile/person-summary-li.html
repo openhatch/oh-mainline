@@ -59,9 +59,14 @@
                 <span class="people-view-projects">
                     <span style="color: #999;">projects:</span>
                     {{ project_names|slice:':10'|join:", " }}
-                    <span class='collapsed'>
-                        {{ project_names|slice:'10:'|join:", " }}
-                    </span>
+                    {% with project_names|slice:'10:' as more_projects %}
+                        {% if more_projects %}
+                            <span class='and_more'>and {{ more_projects|length }} more</span>
+                            <span class='collapsed'>
+                                {{ more_projects|join:", " }}
+                            </span>
+                        {% endif %}
+                    {% endwith %}
                 </span>
             {% endif %}
         {% endwith %}
