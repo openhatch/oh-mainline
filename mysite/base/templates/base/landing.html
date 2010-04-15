@@ -311,7 +311,7 @@ body.three_columns #right #recent_activity_feed .body { font-size: 1em; }
             <ul>
                 {% for entry in entries %}
                 <li>
-                <a style='font-weight: bold;' href="{{ entry.link }}">{{ entry.title }}</a>
+                    <a style='font-weight: bold; line-height: 110%;' href="{{ entry.link }}">{{ entry.title }}</a>
                 <div class='byline'>by {{ entry.author }} &bull; {{ entry.published_parsed|timesince_terse }} ago</div>
                 <div class="entry">
                     {{ entry.unicode_text|truncatewords:15 }}
