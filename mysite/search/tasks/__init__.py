@@ -137,8 +137,9 @@ class PopulateProjectLanguageFromOhloh(Task):
 
 ### Right now, we cache /search/ pages to disk. We should throw those away
 ### under two circumstances.
-@celery.decorators.periodic_task(run_every=datetime.timedelta(hours=1))
+@celery.decorators.periodic_task(run_every=datetime.timedelta(hours=4))
 def periodically_check_if_bug_epoch_eclipsed_the_cached_search_epoch():
+    logging.info("Checking if bug epoch eclipsed the cached search epoch")
     cache_time = mysite.search.models.Epoch.get_for_string('search_cache')
     bug_time = mysite.search.models.Epoch.get_for_string('search_cache')
     if cache_time < bug_time:
