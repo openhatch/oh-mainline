@@ -1,53 +1,23 @@
-<form method="POST" action="{{uri_scheme}}://{{ url_prefix }}/+do/project.views.wanna_help_do" id="openhatch-want2help_form">
-            <input type="hidden" name="from_offsite" value="True" />
-            <input type="hidden" value="{{project.id}}" name="project"/>
-            <input type="submit" value="I want to help" rel="tipsy-south" id="openhatch-wannahelp-button" original-title="Click to add yourself to the list of people who want to contribute. People of all levels are welcome!"/>
+{% load assets %}
+{% load base_extras %}
+
+<form method="POST" action="{{uri_scheme}}://{{ url_prefix }}/+do/project.views.wanna_help_do">
+    <input type="hidden" name="from_offsite" value="True" />
+    <input type="hidden" value="{{project.id}}" name="project"/>
+    <input type="submit" value="I want to help" rel="tipsy-south" id="openhatch-wannahelp-button" original-title="Click to add yourself to the list of people who want to contribute. People of all levels are welcome!"/>
 </form>
 
 <style>
-  @import url('{{uri_scheme}}://{{ url_prefix }}/static/css/tipsy.css?1269539648');
+    @import url('{{uri_scheme}}://{{ url_prefix }}{% version '/static/css/tipsy.css' %}');
 </style>
 
 <style type="text/css">
-#openhatch-wannahelp-button:hover, #openhatch-wannahelp-button:focus {
-background-image:url('{{uri_scheme}}://{{ url_prefix }}/static/images/wannahelp-button-bg-hover.png');
-color:#222222;
-text-decoration:none;
-}
-#openhatch-wannahelp-button {
--moz-background-clip:border;
--moz-background-inline-policy:continuous;
--moz-background-origin:padding;
-background:#C8E29D url('{{uri_scheme}}://{{ url_prefix }}/static/images/wannahelp-button-bg.png') repeat-x scroll center top;
-border:3px solid #FFFFFF;
-cursor:pointer;
-font-family:Helvetica,sans-serif;
-font-size:13pt;
-font-weight:normal;
-text-align:center;
-text-shadow:0 1px 0 #FFFFFF;
-white-space:normal;
-}
-
-#openhatch-wannahelp-button {
--moz-border-radius-bottomleft:8px;
--moz-border-radius-bottomright:8px;
--moz-border-radius-topleft:8px;
--moz-border-radius-topright:8px;
-color:#444444;
-float:left;
-padding:10px 20px;
-display:block;
-padding:2px 8px;
-}
-
-#openhatch-wannahelp-button:focus {
-outline-color:-moz-use-text-color;
-outline-style:none;
-outline-width:medium;
-}
+#openhatch-wannahelp-button:hover, #openhatch-wannahelp-button:focus { background-image:url('{{uri_scheme}}://{{ url_prefix }}{% version '/static/images/wannahelp-button-bg-hover.png' %}'); color:#222; text-decoration:none; }
+#openhatch-wannahelp-button { background: #C8E29D url('{{uri_scheme}}://{{ url_prefix }}{% version '/static/images/wannahelp-button-bg.png' %}') repeat-x scroll center top; border:3px solid #fff;  cursor:pointer; cursor: hand; font-family: Helvetica, sans-serif; font-size:13pt; font-weight:normal; text-align:center; text-shadow:0 1px 0 #fff; white-space:normal; }
+#openhatch-wannahelp-button { -moz-border-radius: 8px; color: #444; float:left; padding:10px 20px; display:block; padding:2px 8px; }
+#openhatch-wannahelp-button:focus { outline-color:-moz-use-text-color; outline-style:none; outline-width:medium; }
 </style>
 
-<script type="text/javascript" src="{{uri_scheme}}://{{ url_prefix }}/static/js/jquery.js?1244261870"></script>
-<script type="text/javascript" src="{{uri_scheme}}://{{ url_prefix }}/static/js/jquery.tipsy.js?1269539649"></script>
-<script type="text/javascript" src="{{uri_scheme}}://{{ url_prefix }}/static/js/tipsy-onload.js"></script>
+{% assets output="packed/selections_for_widget.js", "js/jquery.js", "js/jquery.tipsy.js", "js/tipsy-onload.js" %}
+<script type="text/javascript" src="{{uri_scheme}}://{{ url_prefix }}{{ ASSET_URL }}"></script>
+{% endassets %}
