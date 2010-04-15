@@ -240,7 +240,7 @@ body.three_columns #right #recent_activity_feed .body { font-size: 1em; }
             {% if recommended_bugs %}
             <ul>
                 {% for bug in recommended_bugs %}
-                <li style="list-style-image: url('{{ bug.project.get_url_of_search_result_icon_or_generic }}');">
+                <li style="list-style-image: url({% version bug.project.get_url_of_search_result_icon_or_generic %});">
                 <span>
                     <a style='font-weight: bold;'
                         href='{{ bug.canonical_bug_link }}'>

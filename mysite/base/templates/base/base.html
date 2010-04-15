@@ -18,16 +18,46 @@
 
         <style type='text/css'> /*<![CDATA[*/
             {% block css %}
+
             {% assets output="packed/openhatch2.css", "css/base/base.css", "css/jquery.autocomplete.css", "css/jquery-ui-lightness/jquery-ui-1.7.2.custom.css", "openid/css/openid.css", "css/base/jquery.jgrowl.css", "css/senseknocker/thing.css", "css/search/search.css", "css/base/landing.css", "css/profile/person_small.css", "css/project/project.css", "css/base/one_column.css", "css/base/two_columns.css", "css/account/auth.css", "css/account/settings.css", "css/account/widget.css", "css/qunit.css", "css/profile/base.css", "css/profile/portfolio.css", "css/profile/search_people.css", "css/tipsy.css", "css/facebox.css" %}
             @import url({{ ASSET_URL }});
             {% endassets %}
 
-            {# CSS declarations that use {% version %} #}
+            {% comment %}
+
+            What follows are CSS declarations that use {% version %}.  We can't
+            store these in static CSS files, naturally, because those files
+            aren't parsed by Django.
+            {% endcomment %}
+
             body { background-image: url({% version '/static/images/motif-eee.png' %}) }
             .module { background-image: url({% version '/static/images/gray-60.png' %}) }
-            .module > .body.contains-submodules { background-image: url({% version '/static/images/motif.png' %}) }
-            #landing a.blog-feed { background-image: url(/static/images/base/landing/feed-icon-16x16-sprited.png) }
-            body#profile #importer { background-image: url(/static/images/ship.png) }
+            .module > .body.contains-submodules { background-image:
+                url({% version '/static/images/motif.png' %}) }
+            #landing a.blog-feed { background-image:
+                url({% version '/static/images/base/landing/feed-icon-16x16-sprited.png' %}) }
+            body#profile #importer { background-image:
+                url({% version '/static/images/ship.png' %}) }
+            body#profile #progressbar.working .ui-progressbar-value { background-image:
+                url({% version '/static/css/jquery-ui-lightness/images/pbar-ani.gif' %}); }
+            body#profile .portfolio_entry > .actions li.save_button * { background-image:
+                url({% version '/static/images/icons/publish.png' %}); }
+            body#profile .portfolio_entry > .actions li.delete_portfolio_entry a { background-image:
+                url({% version '/static/images/icons/delete.png' %}); }
+            body#profile .citations li .actions a.delete_citation { background-image:
+                url({% version '/static/images/icons/delete-citation.png' %}); }
+            body#profile #portfolio.viewer .portfolio_entry .submodule { background-image:
+                url({% version '/static/images/profile/portfolio/portfolio-entry-bg.png' %}) }
+            body#project #wannahelp-button { background-image:
+                url({% version '/static/images/wannahelp-button-bg.png' %}) }
+            body#project #wannahelp-button:active { background-image:
+                url('{% version '/static/images/wannahelp-button-bg-active.png' %}); }
+            body#project #wannahelp-button:hover, body#project #wannahelp-button:focus { background-image:
+                url({% version '/static/images/wannahelp-button-bg-hover.png' %}); }
+            body#project #wannahelp-button:hover:active { background-image:
+                url({% version '/static/images/wannahelp-button-bg-hover-active.png' %}); }
+            body#project .next_steps_for_helpers { background-image:
+                url({% version '/static/images/bg-translucent-green.png' %}); }
 
             {% endblock css %}
             /*]]>*/

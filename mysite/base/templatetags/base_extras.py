@@ -193,7 +193,7 @@ def version(path_string):
                     return "%s?%s"% (path_string, mtime)
 
         except:
-            if DEBUG:
+            if settings.DEBUG:
                 raise
             pass
     return path_string 
