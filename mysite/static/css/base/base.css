@@ -300,3 +300,8 @@ body#login .post_login_action_explanation { color: #444; font-size: 1.5em; -moz-
 
 .collapsible { display: none; }
 .and_more { color: #888; font-variant: small-caps; }
+
+body#survey_question_suggestion_form label { margin: 6px 0 3px 0; display: block; }
+body#survey_question_suggestion_form form input[type="submit"]{display: block; float: none;}
+body#survey_question_suggestion_form form textarea { height: 120px; width: 600px;}
+body#survey_question_suggestion_form p { font-size: 1.3em; margin-top: 0; }
