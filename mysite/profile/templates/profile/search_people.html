@@ -1,5 +1,6 @@
 {% extends 'profile/people.html' %}
 {% load cache %}
+{% load body_extras %}
 
 {% block body_id %}people-map{% endblock body_id %}
 {% block body_class %}
@@ -194,7 +195,7 @@ People Search
 
     <div id="map_canvas">
         <div id='map_loading_msg'>
-            <img src='/static/images/icons/throbber.png' />
+            <img src={% version '/static/images/icons/throbber.png' %}>
             <span>Loading map&hellip;</span>
             <noscript>
                 <p> (If you enable JavaScript, you'll see a Google Map here.) </p>

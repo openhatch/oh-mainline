@@ -1,5 +1,6 @@
 {% extends 'base/three_column.html' %}
 
+{% load base_extras %}
 {% load search %}
 
 {% block title %}
@@ -16,7 +17,7 @@ Search bugs
 {% endblock css %}
 
 {% block pagetop %}
-<h3><img alt='Volunteer opportunities' id='volunteer-opportunities' alt='Volunteer opportunities' src='/static/images/volunteer-opportunities-full.png' /></h3>
+    <h3><img alt='Volunteer opportunities' id='volunteer-opportunities' alt='Volunteer opportunities' src={% version '/static/images/volunteer-opportunities-full.png' %} ></h3>
 {% endblock pagetop %}
 
 {% block left %}
@@ -219,10 +220,6 @@ Search bugs
 
 {% block js %}
 {{ block.super }}
-{% comment %}
-<script src='/static/js/search/testData.js'></script>
-<script src='/static/js/search/tests.js'></script>
-{% endcomment %}
 <script type='text/javascript'>
     $(function () {
             $('#define-bite-size').click(function () {

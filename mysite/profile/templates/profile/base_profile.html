@@ -39,7 +39,7 @@
 
             {% if editable %}
             <a class='name-edit-link' href='{% url account.views.edit_name %}'>
-                <img src='/static/images/icons/pencil.png'
+                <img src={% version '/static/images/icons/pencil.png' %}
                 alt='Edit name' />
             </a>
             <div id='edit_your_name_notification' 
@@ -77,7 +77,7 @@
 <div id='avatar' class='module'>
     {% if editable %}
     {% if person.photo %}
-    <img src='{% version photo_url %}' />
+    <img src={% version photo_url %}>
     <div class='change-photo-link'><a href="/account/edit/photo/">Change photo</a></div>
     {% else %}
     {# Haven't uploaded a photo yet #}
@@ -93,7 +93,7 @@
     </a>
     {% endif %}
     {% else %}
-<img src='{{ photo_url }}' />
+<img src={% version photo_url %}>
 
     {% endif %}
 </div>
