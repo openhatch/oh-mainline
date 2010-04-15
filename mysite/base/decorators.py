@@ -11,7 +11,7 @@ import sha
 from functools import partial
 
 from django.template.loader import render_to_string
-from mysite.base.helpers import render_to_response
+from mysite.base.helpers import render_response
 
 def as_view(request, template, data, slug):
     if request.user.is_authenticated() or 'cookies_work' in request.session:
@@ -25,7 +25,7 @@ def as_view(request, template, data, slug):
     
     data['the_user'] = request.user
     data['slug'] = slug # Account settings uses this.
-    return render_to_response(template, data)
+    return render_response(request, template, data)
 
 @decorator
 def view(func, *args, **kw):
