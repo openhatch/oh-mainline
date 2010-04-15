@@ -355,7 +355,7 @@ def update_someones_pf_cache(person__pk):
     # This getter will populate the cache
     return person.get_list_of_project_names()
 
-@periodic_task(run_every=datetime.timedelta(minutes=10))
+@periodic_task(run_every=datetime.timedelta(hours=1))
 def fill_recommended_bugs_cache():
     logging.info("Filling recommended bugs cache for all people.")
     for person in mysite.profile.models.Person.objects.all():
@@ -396,7 +396,7 @@ def clear_people_page_cache(*args, **kwargs):
 def clear_people_page_cache_task(*args, **kwargs):
     return clear_people_page_cache.delay()
 
-@periodic_task(run_every=datetime.timedelta(minutes=2))
+@periodic_task(run_every=datetime.timedelta(minutes=10))
 def fill_people_page_cache():
     staticgenerator.quick_publish('/people/')
 
