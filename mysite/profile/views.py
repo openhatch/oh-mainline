@@ -37,7 +37,7 @@ from mysite.search.models import Project
 from mysite.base.decorators import view
 import mysite.profile.forms
 import mysite.profile.tasks
-from mysite.base.helpers import render_to_response
+from mysite.base.helpers import render_response
 # }}}
 
 @login_required
@@ -149,7 +149,7 @@ def widget_display_js(request, user_to_display__username):
     encoded_for_js = simplejson.dumps(html_doc)
     # Note: using application/javascript as suggested by
     # http://www.ietf.org/rfc/rfc4329.txt
-    return render_to_response('base/append_ourselves.js',
+    return render_response(request, 'base/append_ourselves.js',
                               {'in_string': encoded_for_js},
                               mimetype='application/javascript')
 

@@ -16,7 +16,7 @@ from django.contrib.auth.decorators import login_required
 from django.template.loader import render_to_string
 
 import random
-from mysite.base.helpers import render_to_response
+from mysite.base.helpers import render_response
 
 def create_project_page_do(request):
     project_name = request.POST.get('project_name', None)
