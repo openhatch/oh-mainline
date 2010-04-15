@@ -5,6 +5,7 @@ import time
 import calendar
 import datetime
 import re
+import os
 import urllib
 import urlparse
 import cgi
@@ -168,3 +169,23 @@ def truncate_chars(value, max_length):
             truncd_val = truncd_val[:rightmost_space]  
   
     return truncd_val + "..." 
+
+STATIC_PATH="/path/to/templates/"
+version_cache = {}
+
+rx = re.compile(r"^(.*)\.(.*?)$")
+@register.simple_tag
+def version(path_string):
+    """ Courtesy of Stuart Colville at his blog post:
+    http://muffinresearch.co.uk/archives/2008/04/08/automatic-asset-versioning-in-django/
+    """
+    try:
+        if path_string in version_cache:
+            mtime = version_cache[path_string]
+        else:
+            mtime = os.path.getmtime('%s%s' % (STATIC_PATH, path_string,))
+            version_cache[path_string] = mtime
+
+        return rx.sub(r"\1.%d.\2" % mtime, path_string)
+    except:
+        return path_string 

@@ -1,4 +1,4 @@
-body { font: 10pt Helvetica, sans-serif; background: #fff url("/static/images/motif-eee.png") fixed; color: #222; /* color: rgb(55,84,105); dark blue */ max-width: 1000px; margin: 0 auto; padding: 0; }
+body { font: 10pt Helvetica, sans-serif; background-color: #fff; background-position: fixed; color: #222; max-width: 1000px; margin: 0 auto; padding: 0; }
 a { color: #ff6d3d; text-decoration: none; }
     /* If you change the link color, be sure to change the color of the links
      * on /static/css/search/search.css */
@@ -19,7 +19,7 @@ abbr { border-bottom: 1px dotted #999; }
 h1 a { text-decoration: none; }
 h1 a:hover { text-decoration: none; }
 
-.module { float: left; margin-bottom: 15px; padding: 4px; background: url('/static/images/gray-60.png'); -moz-border-radius: 8px; border-radius: 8px; }
+.module { float: left; margin-bottom: 15px; padding: 4px;  -moz-border-radius: 8px; border-radius: 8px; }
 
 .module > .head { float: left; }
 
@@ -27,7 +27,7 @@ h1 a:hover { text-decoration: none; }
 
 .module > .foot, .submodule > .foot { float: left; border-top: 1px solid #e4e4e4; padding: 15px; background-color: #f4f4f4; }
 
-.module > .body.contains-submodules { background: #fff url('/static/images/motif.png'); }
+.module > .body.contains-submodules { background-color: #fff; }
 
 .submodule { background-color: #fff; margin-bottom: 20px; border: 4px solid #e8e8e8; border-radius: 8px; -moz-border-radius: 8px; float: left; }
 
