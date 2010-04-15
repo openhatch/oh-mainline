@@ -78,34 +78,9 @@ h1 {
     padding-left: 0px;
 }
 
-#nav h2 {
-    width: 128px;
-    text-align: center;
-    float: left;
-}
-#nav h2 a {
-}
-#nav ul {
-    list-style: none;
-    margin: 0;
-    float: right;
-}
-#nav li {
-    float: right;
-    margin-left: 20px;
-    margin-top: 10px;
-}
-#links li a {
-    color: #777;
-    padding: 3px 10px 5px 10px;
-    background-color: #fff; 
-    border-top: 2px solid #e4e4dd;
-    float: left;
-}
-
-#links li a:hover {
-    color: #222;
-}
+#nav h2 { float: left; }
+#nav ul { list-style: none; margin: 0; float: right; }
+#nav li { float: right; margin-left: 20px; margin-top: 10px; }
 
 #location-suggestion-notification { width: 40em; margin-right: 10px; font-size: 1.2em; text-align: left; float: right; background-color: #FFFFAA; padding: 8px 12px; -moz-border-radius: 8px; border-radius: 8px; }
 

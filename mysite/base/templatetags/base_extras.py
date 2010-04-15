@@ -170,22 +170,32 @@ def truncate_chars(value, max_length):
   
     return truncd_val + "..." 
 
-STATIC_PATH="/path/to/templates/"
+STATIC_PATH="/home/raffi/oh/milestone-a/mysite"
 version_cache = {}
 
-rx = re.compile(r"^(.*)\.(.*?)$")
-@register.simple_tag
 def version(path_string):
-    """ Courtesy of Stuart Colville at his blog post:
+    """ Based on Stuart Colville's code at this blog post:
     http://muffinresearch.co.uk/archives/2008/04/08/automatic-asset-versioning-in-django/
     """
-    try:
-        if path_string in version_cache:
-            mtime = version_cache[path_string]
-        else:
-            mtime = os.path.getmtime('%s%s' % (STATIC_PATH, path_string,))
-            version_cache[path_string] = mtime
+    if settings.ADD_VERSION_STRING_TO_IMAGES and (
+            settings.ADD_VERSION_STRING_TO_IMAGES_IN_DEBUG_MODE
+            or not settings.DEBUG):
+        try:
+            if path_string in version_cache:
+                mtime = version_cache[path_string]
+            else:
+                mtime = os.path.getmtime('%s%s' % (STATIC_PATH, path_string,))
+                version_cache[path_string] = mtime
+                if settings.WHAT_SORT_OF_IMAGE_CACHE_BUSTING == 'filename':
+                    rx = re.compile(r"^(.*)\.(.*?)$")
+                    return rx.sub(r"\1.%d.\2" % mtime, path_string)
+                else:
+                    return "%s?%s"% (path_string, mtime)
 
-        return rx.sub(r"\1.%d.\2" % mtime, path_string)
-    except:
-        return path_string 
+        except:
+            if DEBUG:
+                raise
+            pass
+    return path_string 
+
+register.simple_tag(version)

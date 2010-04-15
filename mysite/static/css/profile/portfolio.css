@@ -11,7 +11,7 @@ body#profile .module > .body .project-display ul { float: left; }
 /*--------------*
  |   IMPORTER   |
  *--------------*/
-body#profile #importer { overflow: hidden; height: 40px; background: #798189 url('/static/images/ship.png') top right no-repeat; margin-bottom: 20px; padding: 20px; width: 865px; }
+body#profile #importer { overflow: hidden; height: 40px; background-color: #798189; background-position: top right; background-repeat: no-repeat; margin-bottom: 20px; padding: 20px; width: 865px; }
 body#profile #importer.expanded { overflow: visible; height: auto; }
 body#profile #importer .head { width: 865px; }
 body#profile #importer .howto { float: left; margin-right: 20px; width: 350px; }
