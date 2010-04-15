@@ -13,6 +13,14 @@ Projects - {{ project.name }}
 about how you can help {{ project.name }}
 {% endblock %}
 
+{% block css %}
+{{ block.super }}
+#big-project-list form p label{ text-align: left; display: block; width: 100%;}
+#big-project-list form input[type='text'] { font-family: sans-serif; float: left; width: 20em; font-size: 1.5em; padding: 4px; }
+#big-project-list form input[type='submit'] { font-family: sans-serif; float: left; font-weight: normal; font-size: 1.5em; padding: 4px 8px 3px 8px; position: relative; top: -1px; }
+#big-project-list .note { margin-left: 2em; font-weight: normal; }
+{% endblock css %}
+
 {% block pagetop %}
 
     <noscript>
