@@ -2,7 +2,11 @@ from django.http import HttpResponse, QueryDict, HttpResponseServerError, HttpRe
 from django.shortcuts import render_to_response
 from django.core import serializers
 from django.core.urlresolvers import reverse
-import urlparse
+try:
+    from urlparse import parse_qsl
+except ImportError:
+    from cgi import parse_qsl # Python 2.5 on deployment
+
 
 from mysite.search.models import Project
 import mysite.search.controllers 
@@ -306,7 +310,7 @@ def subscribe_to_bug_alert_do(request):
         # do that. What we *can* do is fiddle with the request obj we're about
         # to pass to fetch_bugs.
         # Commence fiddling.
-        request.GET = dict(urlparse.parse_qsl(query_string))
+        request.GET = dict(parse_qsl(query_string))
         return fetch_bugs(request, alert_form)
     else:
         # If user tries to do a different bug search after invalid form input
