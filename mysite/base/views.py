@@ -2,7 +2,7 @@
 
 from django.http import HttpResponse, \
         HttpResponseRedirect, HttpResponseServerError, HttpResponseBadRequest
-from django.shortcuts import render_to_response
+from mysite.base.helpers import render_response
 from django_authopenid.forms import OpenidSigninForm
 import simplejson
 from django.template import RequestContext, loader, Context
@@ -116,7 +116,7 @@ def page_to_js(request):
     encoded_for_js = simplejson.dumps(html_doc)
     # Note: using application/javascript as suggested by
     # http://www.ietf.org/rfc/rfc4329.txt
-    return render_to_response('base/append_ourselves.js',
+    return render_response(request, 'base/append_ourselves.js',
                               {'in_string': encoded_for_js},
                               mimetype='application/javascript')
 

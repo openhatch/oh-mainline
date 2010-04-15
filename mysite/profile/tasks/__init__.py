@@ -265,7 +265,6 @@ source2result_handler = {
         }
 
 class ReindexPerson(Task):
-    rate_limit = "10/m"
     def run(self, person_id, **kwargs):
         person = mysite.profile.models.Person.objects.get(id=person_id)
         pi = mysite.profile.search_indexes.PersonIndex(person)
@@ -338,7 +337,7 @@ try:
 except celery.registry.AlreadyRegistered:
     pass
 
-@task(rate_limit = "30/m")
+@task
 def update_person_tag_cache(person__pk):
     person = mysite.profile.models.Person.objects.get(pk=person__pk)
     cache_key = person.get_tag_texts_cache_key()
@@ -347,7 +346,7 @@ def update_person_tag_cache(person__pk):
     # This getter will populate the cache
     return person.get_tag_texts_for_map()
 
-@task(rate_limit = "45/m")
+@task
 def update_someones_pf_cache(person__pk):
     person = mysite.profile.models.Person.objects.get(pk=person__pk)
     cache_key = person.get_cache_key_for_projects()
@@ -356,14 +355,14 @@ def update_someones_pf_cache(person__pk):
     # This getter will populate the cache
     return person.get_list_of_project_names()
 
-@periodic_task(run_every=datetime.timedelta(minutes=10))
+@periodic_task(run_every=datetime.timedelta(hours=1))
 def fill_recommended_bugs_cache():
     logging.info("Filling recommended bugs cache for all people.")
     for person in mysite.profile.models.Person.objects.all():
         fill_one_person_recommend_bugs_cache.delay(person_id=person.id)
     logging.info("Finished filling recommended bugs cache for all people.")
 
-@task(rate_limit="30/m")
+@task
 def fill_one_person_recommend_bugs_cache(person_id):
     p = mysite.profile.models.Person.objects.get(id=person_id)
     logging.info("Recommending bugs for %s" % p)
@@ -397,7 +396,7 @@ def clear_people_page_cache(*args, **kwargs):
 def clear_people_page_cache_task(*args, **kwargs):
     return clear_people_page_cache.delay()
 
-@periodic_task(run_every=datetime.timedelta(minutes=2))
+@periodic_task(run_every=datetime.timedelta(minutes=10))
 def fill_people_page_cache():
     staticgenerator.quick_publish('/people/')
 

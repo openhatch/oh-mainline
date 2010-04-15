@@ -10,12 +10,13 @@ import mysite.project.forms
 
 from django.http import HttpResponse, HttpResponseRedirect, \
         HttpResponsePermanentRedirect, HttpResponseServerError, HttpResponseBadRequest
-from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404
+from django.shortcuts import get_object_or_404, get_list_or_404
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.template.loader import render_to_string
 
 import random
+from mysite.base.helpers import render_response
 
 def create_project_page_do(request):
     project_name = request.POST.get('project_name', None)

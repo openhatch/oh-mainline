@@ -1,13 +1,17 @@
 from django.http import HttpResponse, QueryDict, HttpResponseServerError, HttpResponseRedirect
-from django.shortcuts import render_to_response
 from django.core import serializers
 from django.core.urlresolvers import reverse
-import urlparse
+try:
+    from urlparse import parse_qsl
+except ImportError:
+    from cgi import parse_qsl # Python 2.5 on deployment
+
 
 from mysite.search.models import Project
 import mysite.search.controllers 
 import mysite.base.controllers
 import mysite.base.unicode_sanity
+from mysite.base.helpers import render_response
 
 import datetime
 from dateutil import tz
@@ -146,7 +150,7 @@ def fetch_bugs(request, invalid_subscribe_to_alert_form=None):
         data['facet2any_query_string'] = facet2any_query_string
         data['project_count'] = mysite.search.controllers.get_project_count()
 
-        return render_to_response('search/opps_mockup.html', data)
+        return render_response(request, 'search/opps_mockup.html', data)
 
 def bugs_to_json_response(data, bunch_of_bugs, callback_function_name=''):
     """ The search results page accesses this view via jQuery's getJSON method, 
@@ -306,7 +310,7 @@ def subscribe_to_bug_alert_do(request):
         # do that. What we *can* do is fiddle with the request obj we're about
         # to pass to fetch_bugs.
         # Commence fiddling.
-        request.GET = dict(urlparse.parse_qsl(query_string))
+        request.GET = dict(parse_qsl(query_string))
         return fetch_bugs(request, alert_form)
     else:
         # If user tries to do a different bug search after invalid form input
