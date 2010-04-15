@@ -362,7 +362,6 @@ def fill_recommended_bugs_cache():
         fill_one_person_recommend_bugs_cache.delay(person_id=person.id)
     logging.info("Finished filling recommended bugs cache for all people.")
 
-@task(rate_limit="30/m")
 def fill_one_person_recommend_bugs_cache(person_id):
     p = mysite.profile.models.Person.objects.get(id=person_id)
     logging.info("Recommending bugs for %s" % p)
