@@ -150,7 +150,7 @@ def fetch_bugs(request, invalid_subscribe_to_alert_form=None):
         data['facet2any_query_string'] = facet2any_query_string
         data['project_count'] = mysite.search.controllers.get_project_count()
 
-        return render_response(request, 'search/opps_mockup.html', data)
+        return render_response(request, 'search/search.html', data)
 
 def bugs_to_json_response(data, bunch_of_bugs, callback_function_name=''):
     """ The search results page accesses this view via jQuery's getJSON method, 
