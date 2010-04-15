@@ -5,6 +5,8 @@ import datetime
 import dateutil.parser
 
 from django.http import HttpResponse
+import django.shortcuts
+from django.template import RequestContext
 import django.conf
 
 import mysite.base.decorators
@@ -36,3 +38,7 @@ def string2naive_datetime(s):
     else:
         d = time_zoned # best we can do
     return d
+
+def render_response(req, *args, **kwargs):
+    kwargs['context_instance'] = RequestContext(req)
+    return django.shortcuts.render_to_response(*args, **kwargs)

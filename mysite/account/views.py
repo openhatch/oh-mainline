@@ -1,6 +1,6 @@
 # Imports {{{
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
-from django.shortcuts import render_to_response, get_object_or_404, get_list_or_404
+from django.shortcuts import get_object_or_404, get_list_or_404
 import django.contrib.auth 
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -22,6 +22,7 @@ import mysite.base.controllers
 from mysite.base.controllers import get_notification_from_request
 from mysite.profile.models import Person, Tag, TagType, Link_Project_Tag, Link_SF_Proj_Dude_FM, Link_Person_Tag, DataImportAttempt
 import mysite.account.forms
+from mysite.base.helpers import render_to_response
 
 # FIXME: We did this because this decorator used to live here
 # and lots of other modules refer to it as mysite.account.views.view.

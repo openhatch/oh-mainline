@@ -2,7 +2,7 @@
 
 from django.http import HttpResponse, \
         HttpResponseRedirect, HttpResponseServerError, HttpResponseBadRequest
-from django.shortcuts import render_to_response
+from mysite.base.helpers import render_to_response
 from django_authopenid.forms import OpenidSigninForm
 import simplejson
 from django.template import RequestContext, loader, Context

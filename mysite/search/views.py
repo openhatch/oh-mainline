@@ -1,5 +1,4 @@
 from django.http import HttpResponse, QueryDict, HttpResponseServerError, HttpResponseRedirect
-from django.shortcuts import render_to_response
 from django.core import serializers
 from django.core.urlresolvers import reverse
 try:
@@ -12,6 +11,7 @@ from mysite.search.models import Project
 import mysite.search.controllers 
 import mysite.base.controllers
 import mysite.base.unicode_sanity
+from mysite.base.helpers import render_to_response
 
 import datetime
 from dateutil import tz

@@ -11,7 +11,7 @@ import sha
 from functools import partial
 
 from django.template.loader import render_to_string
-from django.shortcuts import render_to_response
+from mysite.base.helpers import render_to_response
 
 def as_view(request, template, data, slug):
     if request.user.is_authenticated() or 'cookies_work' in request.session:

@@ -13,8 +13,7 @@ from django.template.loader import render_to_string
 from django.core import serializers
 from django.http import \
         HttpResponse, HttpResponseRedirect, HttpResponseServerError, HttpResponsePermanentRedirect, HttpResponseBadRequest
-from django.shortcuts import \
-        render_to_response, get_object_or_404
+from django.shortcuts import get_object_or_404
 import django.contrib.auth 
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -38,6 +37,7 @@ from mysite.search.models import Project
 from mysite.base.decorators import view
 import mysite.profile.forms
 import mysite.profile.tasks
+from mysite.base.helpers import render_to_response
 # }}}
 
 @login_required
