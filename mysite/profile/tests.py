@@ -2225,4 +2225,25 @@ class SaveReordering(TwillTests):
         # Verify that these projects have the right sort order
         self.assertEqual(ordering_afterwards, [pfes[1].pk, pfes[0].pk])
 
- # vim: set ai et ts=4 sw=4 nu:
+class ArchiveProjects(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def test(self):
+        # Log in 
+        client = self.login_with_client()
+
+        paul = Person.get_by_username('paulproteus')
+
+        pfes = [
+                PortfolioEntry.create_dummy(person=paul, sort_order=1),
+                PortfolioEntry.create_dummy(person=paul, sort_order=2),
+                ]
+
+        # POST to a view with a list of ids
+        view = reverse(mysite.base.views.save_portfolio_entry_ordering_do)
+        client.post(view, {'sortable_portfolio_entry[]': [str(pfes[0].pk), "FOLD", str(pfes[1].pk)]})
+
+        this_should_be_archived = PortfolioEntry.objects.get(pk=pfes[1].pk)
+        self.assert_(this_should_be_archived.is_archived)
+
+# vim: set ai et ts=4 sw=4 nu:

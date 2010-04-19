@@ -148,9 +148,14 @@ def save_portfolio_entry_ordering_do(request):
     from mysite.profile.models import PortfolioEntry
 
     list_of_ids = request.POST.getlist('sortable_portfolio_entry[]')
+    are_we_archiving_yet = False
     for n, id in enumerate(list_of_ids):
+        if id == 'FOLD': # ha not an id
+            are_we_archiving_yet = True
+            continue
         pfe = PortfolioEntry.objects.get(id=int(id), person__user=request.user)
         pfe.sort_order = n
+        pfe.is_archived = are_we_archiving_yet
         pfe.save()
     return HttpResponse('1')
 

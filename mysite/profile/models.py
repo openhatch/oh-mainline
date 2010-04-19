@@ -538,6 +538,7 @@ class PortfolioEntry(models.Model):
     date_created = models.DateTimeField(default=datetime.datetime.utcnow)
     is_published = models.BooleanField(default=False)
     is_deleted = models.BooleanField(default=False)
+    is_archived = models.BooleanField(default=False)
     sort_order = models.IntegerField(default=0)
 
     def get_published_citations(self):
