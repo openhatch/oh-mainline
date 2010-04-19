@@ -196,8 +196,8 @@ class Person(models.Model):
 
     @mysite.base.decorators.cache_method('get_cache_key_for_projects')
     def get_list_of_project_names(self):
-        return self.get_published_portfolio_entries().values_list(
-                'project__name', flat=True).distinct()[:]
+        return list(self.get_published_portfolio_entries().values_list(
+                'project__name', flat=True).distinct())
 
     @staticmethod
     def only_terms_with_results(terms):
