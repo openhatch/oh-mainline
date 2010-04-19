@@ -972,6 +972,8 @@ PortfolioEntry.Reorder = {
                 $list.append($item);
             });
 
+            $list.append("<li class='fold'>(To archive your work on a project, put it below this line.)</li>");
+
             $('#add_pf_entry').hide();
             $('#portfolio_entries').before($list);
             $('#portfolio_entries').hide();
