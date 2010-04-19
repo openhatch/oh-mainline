@@ -543,6 +543,14 @@ class PortfolioEntry(models.Model):
         return Citation.untrashed.filter(portfolio_entry=self,
                 is_published=True)
 
+    @staticmethod
+    def create_dummy(**kwargs):
+        data = {'project': Project.create_dummy()}
+        data.update(kwargs)
+        ret = PortfolioEntry(**data)
+        ret.save()
+        return ret
+
 # FIXME: Add a DataSource class to DataImportAttempt.
 
 class UntrashedCitationManager(models.Manager):
