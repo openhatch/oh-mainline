@@ -82,6 +82,7 @@ def display_person_web(request, user_to_display__username=None):
     data['editable'] = (request.user == user)
     data['notifications'] = mysite.base.controllers.get_notification_from_request(request)
     data['explain_to_anonymous_users'] = True
+    data['how_many_archived_pf_entries'] = person.get_published_portfolio_entries().filter(is_archived=True).count()
 
     return (request, 'profile/main.html', data)
 

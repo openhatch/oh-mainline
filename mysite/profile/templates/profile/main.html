@@ -26,6 +26,10 @@
                     {% include 'profile/portfolio/portfolio_entry_element.html' %}
                     {% endfor %}
                 </ul>
+                <a id='show_more_projects' href='#'>And {{ how_many_archived_pf_entries }} more&hellip;</a>
+                <noscript>
+                    Enable JavaScript to see more stuff here.
+                </noscript>
             {% else %}
                 {% if editable %}
                 {# YOUR profile lacks projects. #}
