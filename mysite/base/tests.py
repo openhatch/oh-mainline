@@ -243,34 +243,4 @@ class EnhanceNextWithNewUserMetadata(TwillTests):
         got = mysite.base.templatetags.base_extras.enhance_next_to_annotate_it_with_newuser_is_true(sample_input)
         self.assertEqual(wanted, got)
 
-class SaveReordering(TwillTests):
-
-    def test(self):
-        # Log in 
-        self.login_with_client()
-
-        pfes = [
-                PortfolioEntry.create_dummy(),
-                PortfolioEntry.create_dummy(),
-                ]
-
-        def get_ordering():
-            response = self.client.get(reverse(mysite.profile.views.gimme_json_for_portfolio))
-            obj = simplejson.loads(response)
-            return [pfe['pk'] for pfe in obj['portfolio_entries']]
-
-        ordering_beforehand = get_ordering()
-
-        # POST to a view with a list of ids
-        view = reverse(mysite.base.views.save_portfolio_entry_ordering_do)
-        self.client.post(view, {'sortable_portfolio_entry': ['1', '0']})
-
-        # Get the list of projects
-        ordering_afterwards = get_ordering()
-
-        # Verify that these projects have the right sort order
-        self.assertEqual(ordering_afterwards, [pfes[1].pk, pfes[0].pk])
-
-        # Verify that these projects have the different sort order than they began with
-
 # vim: set ai et ts=4 sw=4 nu:
