@@ -321,7 +321,11 @@ function updatePortfolio(response) {
     if (response.portfolio_entries.length === 0) {
         $('#portfolio_entries .apologies').show();
     }
+
+    var are_we_printing_archived_projects_yet = false;
+
     for (var i = 0; i < response.portfolio_entries.length; i++) {
+
         var portfolioEntry = response.portfolio_entries[i];
 	    /* portfolioEntry is something like: {'pk': 0, 'fields': {'project': 0}} 
 	     * (a JSONified PortfolioEntry)
@@ -335,6 +339,17 @@ function updatePortfolio(response) {
             $new_portfolio_entry.attr('id', id);
             $new_portfolio_entry.attr('portfolio_entry__pk', portfolioEntry.pk);
         }
+
+        // if the last one wasn't archived but this one is, add a message
+        if (! are_we_printing_archived_projects_yet && portfolioEntry.fields.is_archived) {
+            var heading = $('#archived_projects_heading');
+            if (heading.size() == 0) {
+                heading = $('<h5 id=\'archived_projects_heading\'>Archived projects</h5>');
+            }
+            $new_portfolio_entry.before(heading);
+            are_we_printing_archived_projects_yet = true;
+        }
+
 
         // published/unpublished status
         if (portfolioEntry.fields.is_published) {
@@ -966,13 +981,16 @@ PortfolioEntry.Reorder = {
 
             // print a list of project names
             PortfolioEntry.Reorder.$list = $list = $('<ul id="projects_to_be_reordered">');
-            $('#portfolio .portfolio_entry:visible').each(function () {
-                var project_name = $(this).find('.project_name').html();
-                var $item = $('<li>').html(project_name).attr('id', 'sortable_'+this.id);
-                $list.append($item);
+            $('#portfolio .portfolio_entry:visible, #archived_projects_heading').each(function () {
+                if (this.id == 'archived_projects_heading') {
+                    $list.append("<li id='sortable_portfolio_entry_FOLD' class='fold'>(To archive your work on a project, put it below this line.)</li>");
+                }
+                else {
+                    var project_name = $(this).find('.project_name').html();
+                    var $item = $('<li>').html(project_name).attr('id', 'sortable_'+this.id);
+                    $list.append($item);
+                }
             });
-
-            $list.append("<li id='sortable_portfolio_entry_FOLD' class='fold'>(To archive your work on a project, put it below this line.)</li>");
 
             $('#add_pf_entry').hide();
             $('#portfolio_entries').before($list);
