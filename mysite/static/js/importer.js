@@ -953,6 +953,7 @@ $(PortfolioEntry.Add.init);
 
 PortfolioEntry.Reorder = {
     '$list': null,
+    '$done_reordering': null,
     'init': function () {
         $('a#reorder_projects').click(function () {
 
@@ -983,9 +984,13 @@ PortfolioEntry.Reorder = {
             $('a#done_reordering').show();
             $('a#done_reordering').click(function () {
 
+                PortfolioEntry.Reorder.$done_reordering = $(this);
+
                 /* Save the new ordering.
                  * ---------------------- */
                 query_string = PortfolioEntry.Reorder.$list.sortable('serialize');
+
+                PortfolioEntry.Reorder.$list.html("<div>Just a sec...</div>");
 
                 var options = {
                     'type': 'POST',
@@ -1005,9 +1010,6 @@ PortfolioEntry.Reorder = {
                     },
                 };
                 $.ajax(options);
-
-                /* Restore the page
-                 * ---------------------- */
 
             });
             
