@@ -314,7 +314,7 @@ function updatePortfolio(response) {
     var portfolio_entry_html = $('#portfolio_entry_building_block').html();
     var citation_html = $('#citation_building_block').html();
 
-    $('#portfolio_entries .loading_message').remove();
+    $('#portfolio_entries .loading_message').hide();
    
     /* Now fill in the template */
     
@@ -956,6 +956,11 @@ PortfolioEntry.Reorder = {
     'init': function () {
         $('a#reorder_projects').click(function () {
 
+            if ($('#portfolio .unsaved, #portfolio .unpublished').size() > 0) {
+                alert('Please save your projects before you re-order them.');
+                return false;
+            }
+
             $reorder_projects_link = $(this);
 
             // print a list of project names
@@ -984,13 +989,16 @@ PortfolioEntry.Reorder = {
 
                 var options = {
                     'type': 'POST',
-                    'url': '/+do/save_pf_entry_ordering',
+                    'url': '/+do/save_portfolio_entry_ordering_do',
                     'data': query_string,
                     'success': function () {
                         PortfolioEntry.Reorder.$list.remove();
-                        $('#add_pf_entry, $portfolio_entries').show();
+                        $('#portfolio_entries *').not('.loading_message').remove();
+                        $('#add_pf_entry, #portfolio_entries').show();
                         $('a#done_reordering').hide();
                         $('a#reorder_projects').show();
+                        $('#portfolio_entries .loading_message').show();
+                        askServerForPortfolio();
                     },
                     'error': function () {
                         alert('Shit, there was an error saving your ordering.');
@@ -1003,7 +1011,7 @@ PortfolioEntry.Reorder = {
 
             });
             
-            return false
+            return false;
         });
     }
 }

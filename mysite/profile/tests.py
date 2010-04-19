@@ -2197,32 +2197,32 @@ class SaveReordering(TwillTests):
 
     def test(self):
         # Log in 
-        self.login_with_client()
+        client = self.login_with_client()
 
         paul = Person.get_by_username('paulproteus')
 
         pfes = [
-                PortfolioEntry.create_dummy(person=paul),
-                PortfolioEntry.create_dummy(person=paul),
+                PortfolioEntry.create_dummy(person=paul, sort_order=1),
+                PortfolioEntry.create_dummy(person=paul, sort_order=2),
                 ]
 
         def get_ordering():
-            response = self.client.get(reverse(mysite.profile.views.gimme_json_for_portfolio))
-            obj = simplejson.loads(response)
+            response = client.get(reverse(mysite.profile.views.gimme_json_for_portfolio))
+            obj = simplejson.loads(response.content)
             return [pfe['pk'] for pfe in obj['portfolio_entries']]
 
         ordering_beforehand = get_ordering()
 
+        self.assertEqual(ordering_beforehand, [pfes[0].pk, pfes[1].pk])
+
         # POST to a view with a list of ids
         view = reverse(mysite.base.views.save_portfolio_entry_ordering_do)
-        self.client.post(view, {'sortable_portfolio_entry': ['1', '0']})
+        client.post(view, {'sortable_portfolio_entry[]': [str(pfes[1].pk), str(pfes[0].pk)]})
 
         # Get the list of projects
         ordering_afterwards = get_ordering()
 
         # Verify that these projects have the right sort order
         self.assertEqual(ordering_afterwards, [pfes[1].pk, pfes[0].pk])
-
-        # Verify that these projects have the different sort order than they began with
 
  # vim: set ai et ts=4 sw=4 nu:

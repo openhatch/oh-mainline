@@ -538,6 +538,7 @@ class PortfolioEntry(models.Model):
     date_created = models.DateTimeField(default=datetime.datetime.utcnow)
     is_published = models.BooleanField(default=False)
     is_deleted = models.BooleanField(default=False)
+    sort_order = models.IntegerField(default=0)
 
     def get_published_citations(self):
         return Citation.untrashed.filter(portfolio_entry=self,
@@ -550,6 +551,9 @@ class PortfolioEntry(models.Model):
         ret = PortfolioEntry(**data)
         ret.save()
         return ret
+
+    class Meta:
+        ordering = ('sort_order', '-id')
 
 # FIXME: Add a DataSource class to DataImportAttempt.
 
