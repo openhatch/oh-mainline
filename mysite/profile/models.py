@@ -14,6 +14,7 @@ from django.conf import settings
 from django.contrib.auth import SESSION_KEY, BACKEND_SESSION_KEY, load_backend
 from django.core.urlresolvers import reverse
 from django.core.cache import cache
+import django.db.models.query
 
 import datetime
 import sys

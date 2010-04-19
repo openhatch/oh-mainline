@@ -110,11 +110,13 @@ def cache_function_that_takes_request(func, *args, **kwargs):
 def cache_method(cache_key_getter_name, func, *args, **kwargs):
     # Let's check to see whether we can avoid all this expensive DB jiggery after all
     self = args[0]
-    cache_key = getattr(self, cache_key_getter_name)(*args[1:], **kwargs)
+    cache_key = getattr(self, cache_key_getter_name)(*args[1:], **kwargs) + '_v2'
     cached_json = django.core.cache.cache.get(cache_key)
 
     if cached_json is None:
         value = func(*args, **kwargs)
+        if type(value) == django.db.models.query.ValuesListQuerySet:
+            value = list(value)
         cached_json = simplejson.dumps({'value': value})
         import logging
         django.core.cache.cache.set(cache_key, cached_json, 864000)
