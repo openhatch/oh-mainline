@@ -14,6 +14,7 @@ from django.conf import settings
 from django.contrib.auth import SESSION_KEY, BACKEND_SESSION_KEY, load_backend
 from django.core.urlresolvers import reverse
 from django.core.cache import cache
+import django.db.models.query
 
 import datetime
 import sys
@@ -537,10 +538,22 @@ class PortfolioEntry(models.Model):
     date_created = models.DateTimeField(default=datetime.datetime.utcnow)
     is_published = models.BooleanField(default=False)
     is_deleted = models.BooleanField(default=False)
+    sort_order = models.IntegerField(default=0)
 
     def get_published_citations(self):
         return Citation.untrashed.filter(portfolio_entry=self,
                 is_published=True)
+
+    @staticmethod
+    def create_dummy(**kwargs):
+        data = {'project': Project.create_dummy()}
+        data.update(kwargs)
+        ret = PortfolioEntry(**data)
+        ret.save()
+        return ret
+
+    class Meta:
+        ordering = ('sort_order', '-id')
 
 # FIXME: Add a DataSource class to DataImportAttempt.
 

@@ -314,7 +314,7 @@ function updatePortfolio(response) {
     var portfolio_entry_html = $('#portfolio_entry_building_block').html();
     var citation_html = $('#citation_building_block').html();
 
-    $('#portfolio_entries .loading_message').remove();
+    $('#portfolio_entries .loading_message').hide();
    
     /* Now fill in the template */
     
@@ -946,6 +946,77 @@ PortfolioEntry.Add.bindEventHandlers = function () {
 };
 
 $(PortfolioEntry.Add.init);
+
+/*
+ *      Re-order projects
+ *-------------------------*/
+
+PortfolioEntry.Reorder = {
+    '$list': null,
+    'init': function () {
+        $('a#reorder_projects').click(function () {
+
+            if ($('#portfolio .unsaved, #portfolio .unpublished').size() > 0) {
+                alert('Please save your projects before you re-order them.');
+                return false;
+            }
+
+            $reorder_projects_link = $(this);
+
+            // print a list of project names
+            PortfolioEntry.Reorder.$list = $list = $('<ul id="projects_to_be_reordered">');
+            $('#portfolio .portfolio_entry:visible').each(function () {
+                var project_name = $(this).find('.project_name').html();
+                var $item = $('<li>').html(project_name).attr('id', 'sortable_'+this.id);
+                $list.append($item);
+            });
+
+            $('#add_pf_entry').hide();
+            $('#portfolio_entries').before($list);
+            $('#portfolio_entries').hide();
+
+            // Make list sortable using jQuery UI
+            $list.sortable({'axis': 'y'});
+
+            $reorder_projects_link.hide();
+
+            $('a#done_reordering').show();
+            $('a#done_reordering').click(function () {
+
+                /* Save the new ordering.
+                 * ---------------------- */
+                query_string = PortfolioEntry.Reorder.$list.sortable('serialize');
+
+                var options = {
+                    'type': 'POST',
+                    'url': '/+do/save_portfolio_entry_ordering_do',
+                    'data': query_string,
+                    'success': function () {
+                        PortfolioEntry.Reorder.$list.remove();
+                        $('#portfolio_entries *').not('.loading_message').remove();
+                        $('#add_pf_entry, #portfolio_entries').show();
+                        $('a#done_reordering').hide();
+                        $('a#reorder_projects').show();
+                        $('#portfolio_entries .loading_message').show();
+                        askServerForPortfolio();
+                    },
+                    'error': function () {
+                        alert('Shit, there was an error saving your ordering.');
+                    },
+                };
+                $.ajax(options);
+
+                /* Restore the page
+                 * ---------------------- */
+
+            });
+            
+            return false;
+        });
+    }
+}
+
+$(PortfolioEntry.Reorder.init);
 
 $.fn.getHandler = function(handler) {
     var real_obj = this[0];

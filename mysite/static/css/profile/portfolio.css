@@ -121,5 +121,7 @@ body#profile #main .submodule .other-contributors li a:hover { text-decoration: 
 body#profile #main .submodule .other-contributors li a:hover span.fullname { text-decoration: underline; }
 body#profile #main .submodule .other-contributors li img { float: left; margin-right: 5px; vertical-align: middle; width: 40px; }
 body#profile #main .submodule .other-contributors .see-all { clear: left; margin-top: 5px; float: right; }
+body#profile #projects_to_be_reordered { float: left; width: 100%; font-size: 17px; }
+body#profile #projects_to_be_reordered li { cursor: pointer; cursor: hand; list-style: circle; margin-left: 2em; font-size: 15px; }
 
 /* vim: set nu nowrap: */
