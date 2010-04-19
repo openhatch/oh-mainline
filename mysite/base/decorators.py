@@ -11,6 +11,7 @@ import sha
 from functools import partial
 
 from django.template.loader import render_to_string
+import django.db.models.query
 from mysite.base.helpers import render_response
 
 def as_view(request, template, data, slug):
