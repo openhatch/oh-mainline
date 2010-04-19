@@ -947,6 +947,34 @@ PortfolioEntry.Add.bindEventHandlers = function () {
 
 $(PortfolioEntry.Add.init);
 
+/*
+ *      Re-order projects
+ *-------------------------*/
+
+PortfolioEntry.Reorder = {
+    'init': function () {
+        $('a#reorder_projects').click(function () {
+            // print a list of project names
+            $list = $('<ul id="projects_to_be_reordered">');
+            $('#portfolio .portfolio_entry:visible').each(function () {
+                var project_name = $(this).find('.project_name').html();
+                var $item = $('<li>').html(project_name);
+                $list.append($item);
+            });
+            $('#add_a_pf_entry').hide();
+            $('#portfolio_entries').before($list);
+            $('#portfolio_entries').hide();
+
+            // Make list sortable using jQuery UI
+            $list.sortable();
+            
+            return false
+        });
+    }
+}
+
+$(PortfolioEntry.Reorder.init);
+
 $.fn.getHandler = function(handler) {
     var real_obj = this[0];
     var handler_meta_array = $.data(real_obj, "events");
