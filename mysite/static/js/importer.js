@@ -952,21 +952,56 @@ $(PortfolioEntry.Add.init);
  *-------------------------*/
 
 PortfolioEntry.Reorder = {
+    '$list': null,
     'init': function () {
         $('a#reorder_projects').click(function () {
+
+            $reorder_projects_link = $(this);
+
             // print a list of project names
-            $list = $('<ul id="projects_to_be_reordered">');
+            PortfolioEntry.Reorder.$list = $list = $('<ul id="projects_to_be_reordered">');
             $('#portfolio .portfolio_entry:visible').each(function () {
                 var project_name = $(this).find('.project_name').html();
-                var $item = $('<li>').html(project_name);
+                var $item = $('<li>').html(project_name).attr('id', 'sortable_'+this.id);
                 $list.append($item);
             });
-            $('#add_a_pf_entry').hide();
+
+            $('#add_pf_entry').hide();
             $('#portfolio_entries').before($list);
             $('#portfolio_entries').hide();
 
             // Make list sortable using jQuery UI
-            $list.sortable();
+            $list.sortable({'axis': 'y'});
+
+            $reorder_projects_link.hide();
+
+            $('a#done_reordering').show();
+            $('a#done_reordering').click(function () {
+
+                /* Save the new ordering.
+                 * ---------------------- */
+                query_string = PortfolioEntry.Reorder.$list.sortable('serialize');
+
+                var options = {
+                    'type': 'POST',
+                    'url': '/+do/save_pf_entry_ordering',
+                    'data': query_string,
+                    'success': function () {
+                        PortfolioEntry.Reorder.$list.remove();
+                        $('#add_pf_entry, $portfolio_entries').show();
+                        $('a#done_reordering').hide();
+                        $('a#reorder_projects').show();
+                    },
+                    'error': function () {
+                        alert('Shit, there was an error saving your ordering.');
+                    },
+                };
+                $.ajax(options);
+
+                /* Restore the page
+                 * ---------------------- */
+
+            });
             
             return false
         });
