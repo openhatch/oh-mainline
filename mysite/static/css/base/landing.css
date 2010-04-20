@@ -8,7 +8,7 @@ body.three_columns .module > .body h2 { color: #555; padding: 0 10px 10px}
 	#landing h5 a { font-weight: bold; /*color: black;*/ }
 #landing h4 { color: #555; font-size: 1.0em; font-weight: bold; margin-left: 0; padding-left: 0; width: 100%; }
 #landing .entry { clear: both; margin-bottom: 5px; padding-bottom: 5px; }
-#landing #bugs .body li { color: #999; list-style: circle; margin-left: 1.5em; padding: 0; margin-top: 5px; }
+#landing #bugs .body li { color: #999; list-style: circle; margin-left: 2em; padding: 0; margin-top: 5px; }
 #landing #bugs li span { color: #222; position: relative; top: -7px; }
 #landing .module p { margin-top: 0; }
 #landing .widget-wrapper { float: left; margin-bottom: 10px; width: 100%; }
