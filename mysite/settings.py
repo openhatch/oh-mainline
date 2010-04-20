@@ -52,9 +52,11 @@ SITE_ID = 1
 # to load the internationalization machinery.
 USE_I18N = True
 
+MEDIA_ROOT_BEFORE_STATIC = os.path.dirname(__file__) # This is needed for {% version %}
+
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = os.path.join(os.path.dirname(__file__), 'static')
+MEDIA_ROOT = os.path.join(MEDIA_ROOT_BEFORE_STATIC, 'static')
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).

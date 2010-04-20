@@ -170,7 +170,6 @@ def truncate_chars(value, max_length):
   
     return truncd_val + "..." 
 
-STATIC_PATH="/home/raffi/oh/milestone-a/mysite"
 version_cache = {}
 
 def version(path_string):
@@ -184,7 +183,7 @@ def version(path_string):
             if path_string in version_cache:
                 mtime = version_cache[path_string]
             else:
-                mtime = os.path.getmtime('%s%s' % (STATIC_PATH, path_string,))
+                mtime = os.path.getmtime('%s%s' % (settings.MEDIA_ROOT_BEFORE_STATIC, path_string,))
                 version_cache[path_string] = mtime
                 if settings.WHAT_SORT_OF_IMAGE_CACHE_BUSTING == 'filename':
                     rx = re.compile(r"^(.*)\.(.*?)$")
