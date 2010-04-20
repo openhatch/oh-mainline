@@ -55,7 +55,7 @@
             </div>
             <div class='project_description-wrapper'>
                 {% if edit_mode %}
-                <label>Describe this project</label>
+                <label>Describe this project:</label>
                 <textarea class='project_description'></textarea>
                 {% else %}
                 <div class='project_description'>{{ pf_entry.project_description|urlize }}</div>
@@ -69,18 +69,19 @@
         {% with pf_entry.get_published_citations as citations %}
         {% if edit_mode or citations or pf_entry.experience_description %}
         <div class='personal-stuff'>
+            {% if not pf_entry.is_published %}
             <div class='involvement_placeholder'>
-                {% if not pf_entry.is_published %}
                 When you publish this project, you can add involvement links here.
-                {% endif %}
             </div>
+            {% endif %}
+            {% if adding_mode or edit_mode or citations %}
             <div class='citations-wrapper'>
                 <label>
                     {% if edit_mode %}
-                    Your involvement 
+                        Web pages that talk about your involvement:
                     {% else %}
                     {% if citations %}
-                    Involvement links
+                        Related pages:
                     {% endif %}
                     {% endif %}
                 </label>
@@ -93,38 +94,17 @@
                 </ul>
                 {% if edit_mode %}
                 <ul class='citation-forms'></ul>
-                <a class='add' href='#'>Add a link</a>
-                <a href='#' class='show_howto'>?</a>
-                     <div class='howto'> <a href='#' class='hide_me'>hide</a>
-                         <div class='body'>
-                             <p>
-                             These links describe your involvement, e.g.,
-                             patches, translations, design ideas,
-                             leadership roles, or any other kind of contribution.
-                             </p>
-                             <p>
-                             Example pages:
-                             <ul>
-                                 <li>bug report</li>
-                                 <li>archived post to a mailing list</li>
-                                 <li>staff page</li>
-                                 <li>WebSVN</li>
-                             </ul>
-                             </p>
-                             <p>
-                             (Cue some tactical Googling!)
-                             </p>
-                         </div>
-                     </div>
+                <a class='add' href='#'>Add a page</a>
 
                 {% endif %}
             </div>
+            {% endif %}
             <div class='experience_description-wrapper'>
                 {% if edit_mode %}
-                <label>Describe your involvement</label>
+                <label>Describe your involvement:</label>
                 {% else %}
                 {% if pf_entry.experience_description %}
-                <label style='margin-bottom: 5px;'>Involvement description</label>
+                <label style='margin-bottom: 5px;'>Involvement description:</label>
                 {% endif %}
                 {% endif %}
                 {% if edit_mode %}

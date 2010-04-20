@@ -582,7 +582,7 @@ class UntrashedCitationManager(models.Manager):
 
 class Citation(models.Model):
     portfolio_entry = models.ForeignKey(PortfolioEntry) # [0]
-    url = models.URLField(null=True)
+    url = models.URLField(null=True, verbose_name="URL")
     contributor_role = models.CharField(max_length=200, null=True)
     data_import_attempt = models.ForeignKey(DataImportAttempt, null=True)
     distinct_months = models.IntegerField(null=True)
