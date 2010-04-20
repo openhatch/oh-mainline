@@ -18,7 +18,7 @@ import mysite.customs.bugtrackers.fedora_fitfinish
 import mysite.search.tasks.trac_instances
 import mysite.search.tasks.bugzilla_instances
 import mysite.search.tasks.launchpad_tasks
-imoprt mysite.search.tasks.roundup_instances
+import mysite.search.tasks.roundup_instances
 
 class GrabLaunchpadBugs(PeriodicTask):
     run_every = datetime.timedelta(days=1)
