@@ -50,6 +50,7 @@ body#profile .portfolio_entry > .actions a,
 body#profile .portfolio_entry > .actions a:hover { background-color: #e9e9e9; }
 body#profile .portfolio_entry > .actions li.save_and_publish_button *,
 body#profile .portfolio_entry > .submodule { float: right; margin-bottom: 0;  }
+body#profile.view_mode .portfolio_entry > .submodule { border-width: 2px; margin-left: 10px; }
 body#profile #portfolio.editor .portfolio_entry > .submodule { float: right; margin-bottom: 0; width: 807px; }
 body#profile .portfolio_entry .project-stuff { padding: 2%; float: left; width: 39%; }
 body#profile .portfolio_entry .personal-stuff { background-color: #f4f4f4; float: left; border-left: 1px solid #eee; padding: 20px; float: right; width: 50%; }
@@ -63,14 +64,17 @@ body#profile .portfolio_entry .project_description-wrapper { float: left; width:
 body#profile .portfolio_entry .project_description { width: 100%; }
 body#profile .portfolio_entry .experience_description { width: 96%; }
 body#profile .portfolio_entry .citations { float: left; width: 100%; }
+body#profile .portfolio_entry .citations-wrapper { margin-bottom: 15px; }
 body#profile .portfolio_entry.adding .citations-wrapper { display: none; }
 body#profile .portfolio_entry .involvement_placeholder { display: none; }
 body#profile .portfolio_entry.adding .involvement_placeholder { display: block; }
-body#profile .portfolio_entry label { float: left; font-size: 8pt; margin: 0; padding: 0; text-transform: uppercase; width: 100%; }
+body#profile .portfolio_entry label { float: left; font-weight: bold; color: #777; font-size: 9pt; margin: 0 0 2px 0; padding: 0; width: 100%; }
 body#profile .portfolio_entry .citation-forms label { font-weight: bold; }
-body#profile .portfolio_entry .experience_description-wrapper { float: left; margin-top: 20px; width: 100%; }
-body#profile .portfolio_entry textarea { height: 100px; font-size: 9pt; font-family: sans-serif; }
-body#profile .citations > li { color: #777; float: left; list-style: square; margin-left: 20px; margin-top: 5px; position: relative; top: 15px; width: 90%; }
+body#profile .portfolio_entry .experience_description-wrapper { float: left; width: 100%; }
+body#profile .portfolio_entry textarea { font-size: 9pt; font-family: sans-serif; }
+body#profile .portfolio_entry .project_description-wrapper textarea { height: 40px; }
+body#profile .portfolio_entry .experience_description-wrapper textarea { height: 80px; }
+body#profile .citations > li { color: #777; float: left; list-style: circle; margin-left: 20px; margin-top: 5px; position: relative; top: 15px; width: 90%; }
 body#profile .citations li .actions { float: left; width: 30px; }
 body#profile .citations li .actions a { background-position: center; background-repeat: no-repeat; float: left; height: 15px; width: 15px; }
 body#profile .citations li .actions a.delete:hover { background-color: #c9c9c9; border-radius: 4px; -moz-border-radius: 4px; }
@@ -84,7 +88,7 @@ body#profile .citations-wrapper a.add:hover { color: #000; text-decoration: none
 body#profile .error-message { color: pink; font-weight: bold; }
 body#profile .citations-wrapper .howto { color: #111; }
 body#profile #main .citations-wrapper .howto .body { float: none ! important; }
-body#profile .citations li a { font-weight: bold; }
+body#profile .citations li a { }
 body#profile .citations-wrapper .howto, .citations-wrapper .show_howto { background-color: #ffa; border: 1px solid yellow; border-radius: 6px; float: right; font-size: 8pt; margin-top: 10px; -moz-border-radius: 6px; padding: 12px; width: 200px; }
 body#profile .citations-wrapper .howto ul { list-style: square; margin-bottom: .5em; }
 body#profile .citations-wrapper .howto li { margin-left: 1.5em; }
@@ -119,7 +123,11 @@ body#profile #main .submodule .other-contributors li a:hover span.fullname { tex
 body#profile #main .submodule .other-contributors li img { float: left; margin-right: 5px; vertical-align: middle; width: 40px; }
 body#profile #main .submodule .other-contributors .see-all { clear: left; margin-top: 5px; float: right; }
 body#profile #projects_to_be_reordered { float: left; width: 100%; font-size: 17px; }
-body#profile #projects_to_be_reordered li { font-size: 13pt; margin-bottom: 5px; cursor: pointer; cursor: hand; list-style: circle; margin-left: 20px; }
-body#profile #projects_to_be_reordered li.fold { padding: 3px; font-size: 11pt; background-color: #eee; color: #777; font-weight: normal; }
+body#profile #projects_to_be_reordered li { font-size: 13pt; margin-bottom: 5px; cursor: move; padding-left: 45px; background-image: url(/static/images/drag.png); background-repeat: no-repeat; background-position: 3px center; }
+body#profile #projects_to_be_reordered li.fold { padding: 3px 3px 3px 45px; font-size: 11pt; background-color: #eee; color: #777; font-weight: normal; }
+body#profile #done_reordering { margin-top: 10px; padding: 5px; }
+body#profile #reorder_projects_wrapper { display: none; }
+
+body#profile .add_a_record input[type='submit'] { height: 2.1em; float: left; }
 
 /* vim: set nu nowrap: */

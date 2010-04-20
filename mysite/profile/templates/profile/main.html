@@ -4,6 +4,8 @@
 {{ person.get_full_name_or_username }}
 {% endblock title %}
 
+{% block body_class %}{{ block.super }} view_mode{% endblock body_class %}
+
 {% block main %}
 <div id='portfolio' class='module project-display viewer'>
     <div class='head'>

@@ -257,8 +257,10 @@ class Project(OpenHatchModel):
         return self.get_open_bugs().order_by('?')
     
 def populate_icon_on_project_creation(instance, created, *args, **kwargs):
+    import mysite.search.tasks
     if created and not instance.icon_raw:
-        instance.populate_icon_from_ohloh()
+        task = mysite.search.tasks.PopulateProjectIconFromOhloh()
+        task.delay(project_id=instance.id)
 
 def grab_project_language_from_ohloh(instance, created, *args,
                                      **kwargs):
