@@ -201,11 +201,11 @@ class Person(models.Model):
                 'project__name', flat=True).distinct())
 
     def get_cache_key_for_projects(self):
-        return 'projects_for_person_with_pk_%d_v3' % self.pk
+        return 'projects_for_person_with_pk_%d_v4' % self.pk
 
     @mysite.base.decorators.cache_method('get_cache_key_for_projects')
     def get_names_of_nonarchived_projects(self):
-        return list(self.get_published_portfolio_entries().values_list(
+        return list(self.get_nonarchived_published_portfolio_entries().values_list(
                 'project__name', flat=True).distinct())
 
     @staticmethod
