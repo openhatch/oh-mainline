@@ -13,6 +13,14 @@ Projects - {{ project.name }}
 about how you can help {{ project.name }}
 {% endblock %}
 
+{% block css %}
+{{ block.super }}
+#big-project-list form p label{ text-align: left; display: block; width: 100%;}
+#big-project-list form input[type='text'] { font-family: sans-serif; float: left; width: 20em; font-size: 1.5em; padding: 4px; }
+#big-project-list form input[type='submit'] { font-family: sans-serif; float: left; font-weight: normal; font-size: 1.5em; padding: 4px 8px 3px 8px; position: relative; top: -1px; }
+#big-project-list .note { margin-left: 2em; font-weight: normal; }
+{% endblock css %}
+
 {% block pagetop %}
 
     <noscript>
@@ -27,7 +35,7 @@ about how you can help {{ project.name }}
     <h3 class='supertitle'><a href='{% url mysite.project.views.projects %}'>Projects</a></h3>
     <h1>{{ project.name }}</h1>
 
-    <div class='next_steps_for_helpers contains_just_the_head {% if the_user.get_profile.expand_next_steps %}expanded{% else %}collapsed{% endif %} module' style='background-image: url("/static/images/bg-translucent-green.png"); {% if not user_wants_to_help %}display: none;{% endif %}'>
+    <div class='next_steps_for_helpers contains_just_the_head {% if the_user.get_profile.expand_next_steps %}expanded{% else %}collapsed{% endif %} module' style='background-image: url({% version '/static/images/bg-translucent-green.png' %}); {% if not user_wants_to_help %}display: none;{% endif %}'>
         <div class='head'>
             <h3>Next steps for helpers
                 <a id='show' style='font-weight: normal;' href='#'>(show)</a>
@@ -56,7 +64,9 @@ about how you can help {{ project.name }}
             </span>
             <form action="{% url mysite.project.views.unlist_self_from_wanna_help_do %}" id='delist_me_as_a_helper' method="POST">
                 <input type='hidden' name='project' value='{{project.id}}'>
-                <input type='image' src='/static/images/icons/undo.png' id='delist_helper_button' value='x' rel='tipsy-south' title='De-list me'>
+                <input type='image'
+                        src='{% version '/static/images/icons/undo.png' %}'
+                        id='delist_helper_button' value='x' rel='tipsy-south' title='De-list me'>
             </form>
         </div>
     </div>
@@ -156,7 +166,8 @@ about how you can help {{ project.name }}
         <div class='body'>
             {% if project.icon_for_profile %}
             <div class='project_icon' 
-                    style="float: left; width: 64px; margin-right: 20px; background-image: url('{{ project.icon_for_profile.url }}')"
+                    style="float: left; width: 64px; margin-right: 20px;
+                    background-image: url({% version project.icon_for_profile.url %})"
                     ><span class='alt-text'>
                         (logo)
                     </span></div>

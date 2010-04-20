@@ -1,4 +1,5 @@
 {% load profile_extras %}
+{% load base_extras %}
 <div
     {% if adding_mode %}
     class='portfolio_entry adding unpublished'
@@ -20,9 +21,10 @@
                 <a href='{{ pf_entry.project.get_url }}'>
                     <div class='project_icon'
                         {% if edit_mode %}
-                        style="background-image: url('/static/no-project-icon.png')"
+                            style="background-image:
+                            url({% version '/static/no-project-icon.png' %})"
                         {% else %}
-                        style="background-image: url('{{ pf_entry.project.get_url_of_icon_or_generic }}')"
+                        style="background-image: url({% version pf_entry.project.get_url_of_icon_or_generic %})"
                         {% endif %}
                         ><span class='alt-text'>
                             {% if edit_mode or adding_mode %}

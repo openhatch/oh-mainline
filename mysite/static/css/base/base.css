@@ -1,4 +1,4 @@
-body { font: 10pt Helvetica, sans-serif; background: #fff url("/static/images/motif-eee.png") fixed; color: #222; /* color: rgb(55,84,105); dark blue */ max-width: 1000px; margin: 0 auto; padding: 0; }
+body { font: 10pt Helvetica, sans-serif; background-color: #fff; background-position: fixed; color: #222; max-width: 1000px; margin: 0 auto; padding: 0; }
 a { color: #ff6d3d; text-decoration: none; }
     /* If you change the link color, be sure to change the color of the links
      * on /static/css/search/search.css */
@@ -19,7 +19,7 @@ abbr { border-bottom: 1px dotted #999; }
 h1 a { text-decoration: none; }
 h1 a:hover { text-decoration: none; }
 
-.module { float: left; margin-bottom: 15px; padding: 4px; background: url('/static/images/gray-60.png'); -moz-border-radius: 8px; border-radius: 8px; }
+.module { float: left; margin-bottom: 15px; padding: 4px;  -moz-border-radius: 8px; border-radius: 8px; }
 
 .module > .head { float: left; }
 
@@ -27,7 +27,7 @@ h1 a:hover { text-decoration: none; }
 
 .module > .foot, .submodule > .foot { float: left; border-top: 1px solid #e4e4e4; padding: 15px; background-color: #f4f4f4; }
 
-.module > .body.contains-submodules { background: #fff url('/static/images/motif.png'); }
+.module > .body.contains-submodules { background-color: #fff; }
 
 .submodule { background-color: #fff; margin-bottom: 20px; border: 4px solid #e8e8e8; border-radius: 8px; -moz-border-radius: 8px; float: left; }
 
@@ -78,34 +78,9 @@ h1 {
     padding-left: 0px;
 }
 
-#nav h2 {
-    width: 128px;
-    text-align: center;
-    float: left;
-}
-#nav h2 a {
-}
-#nav ul {
-    list-style: none;
-    margin: 0;
-    float: right;
-}
-#nav li {
-    float: right;
-    margin-left: 20px;
-    margin-top: 10px;
-}
-#links li a {
-    color: #777;
-    padding: 3px 10px 5px 10px;
-    background-color: #fff; 
-    border-top: 2px solid #e4e4dd;
-    float: left;
-}
-
-#links li a:hover {
-    color: #222;
-}
+#nav h2 { float: left; }
+#nav ul { list-style: none; margin: 0; float: right; }
+#nav li { float: right; margin-left: 20px; margin-top: 10px; }
 
 #location-suggestion-notification { width: 40em; margin-right: 10px; font-size: 1.2em; text-align: left; float: right; background-color: #FFFFAA; padding: 8px 12px; -moz-border-radius: 8px; border-radius: 8px; }
 
@@ -318,3 +293,8 @@ body#login .post_login_action_explanation { color: #444; font-size: 1.5em; -moz-
 
 .collapsible { display: none; }
 .and_more { color: #888; font-variant: small-caps; }
+
+body#survey_question_suggestion_form label { margin: 6px 0 3px 0; display: block; }
+body#survey_question_suggestion_form form input[type="submit"]{display: block; float: none;}
+body#survey_question_suggestion_form form textarea { height: 120px; width: 600px;}
+body#survey_question_suggestion_form p { font-size: 1.3em; margin-top: 0; }

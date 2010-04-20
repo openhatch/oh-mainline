@@ -1,61 +1,62 @@
+{% load base_extras %}
+
 <div id='nav'>
     <div class="inner">
-    {% if not dont_display_nav_logo %}
-    <h2>
-        <a href='/'>
-            <img src='/static/images/the-logo-bluegreen-87px.png' width='87'
-                    height='60' alt='openhatch' />
-        </a>
-    </h2>
+        <h2>
+            <a href='/'>
+                <img src='{% version '/static/images/the-logo-bluegreen-87px.png' %}'
+                        width='87' height='60' alt='openhatch' />
+            </a>
+        </h2>
+        <ul id='topnavlinks'>
+            <li><a href='{% url mysite.search.views.fetch_bugs %}'>volunteer opportunities</a></li>
+            <li><a href='{% url mysite.project.views.projects %}'>{% if the_user.is_authenticated %} all {% endif %} projects</a></li>
+            <li><a href='{% url mysite.profile.views.people%}'>{% if the_user.is_authenticated %} all {% endif %} people</a></li>
+            {% if the_user.is_authenticated %}
+                <li><a href='{% url mysite.profile.views.display_person_web the_user.username %}'>profile</a></li>
+                <li><a href='{% url mysite.base.views.home %}'>home</a></li>
+            {% endif %}
+        </ul>
+        <ul id='account-links'>
+            {% if the_user.is_authenticated %}
+                <!-- user.is_authenticated indeed -->
+                <li><a href='{% url mysite.account.views.logout %}'>log out</a></li>
+                <li><a href='{% url mysite.account.views.set_location %}'>settings</a></li>
+                <li><a href='{% url mysite.profile.views.display_person_web the_user.username %}'>
+                {% with the_user.get_profile as person %}
+                    {% if person.user.first_name or person.user.last_name %}
+                        {{ person.get_full_name_with_nbsps|safe }}
+                    {% else %}
+                        {{ person.user.username }}
+                    {% endif %}
+
+                    {% if person.user.first_name and person.user.last_name %}
+                        <span class='username' style="font-size: .9em;">
+                            ({{ person.user.username }})
+                        </span>
+                    {% endif %}
+                {% endwith %}
+                </a></li>
+            {% else %}
+                <li><a id='login' href='/account/login'>log in / sign up</a></li>
+            {% endif %}
+        </ul>
+    </div><!-- /.inner -->
+
+    {% if notification_id %}
+    <!-- notification_id: {{ notification_id }} -->
     {% endif %}
-    <ul id='topnavlinks'>
-        <li><a href='{% url mysite.search.views.fetch_bugs %}'>volunteer opportunities</a></li>
-        <li><a href='{% url mysite.project.views.projects %}'>{% if the_user.is_authenticated %} all {% endif %} projects</a></li>
-        <li><a href='{% url mysite.profile.views.people%}'>{% if the_user.is_authenticated %} all {% endif %} people</a></li>
-        {% if the_user.is_authenticated %}
-        <li><a href='{% url mysite.profile.views.display_person_web the_user.username %}'>profile</a></li>
-        <li><a href='{% url mysite.base.views.home %}'>home</a></li>
-        {% endif %}
-    </ul>
-    <ul id='account-links'>
-        {% if the_user.is_authenticated %}
-        <!-- user.is_authenticated indeed -->
-        <li><a href='{% url mysite.account.views.logout %}'>log out</a></li>
-        <li><a href='{% url mysite.account.views.set_location %}'>settings</a></li>
-        <li><a href='{% url mysite.profile.views.display_person_web the_user.username %}'>
-            {% with the_user.get_profile as person %}
-                {% if person.user.first_name or person.user.last_name %}
-                    {{ person.get_full_name_with_nbsps|safe }}
-                {% else %}
-                    {{ person.user.username }}
-                {% endif %}
 
-                {% if person.user.first_name and person.user.last_name %}
-                    <span class='username' style="font-size: .9em;">
-                        ({{ person.user.username }})
-                    </span>
-                {% endif %}
-            {% endwith %}
-        </a></li>
-        {% else %}
-        <li><a id='login' href='/account/login'>log in / sign up</a></li>
-        {% endif %}
-    </ul>
-</div>
-
-{% if notification_id %}
-<!-- notification_id: {{ notification_id }} -->
-{% endif %}
-{% if notification %}
-<div class='section'>
-    <div class='center'>
-        <div class='alert'>
-            {{ notification }}
+    {% if notification %}
+        <div class='section'>
+            <div class='center'>
+                <div class='alert'>
+                    {{ notification }}
+                </div>
+            </div>
         </div>
-    </div>
-</div>
-{% endif %}
-</div>
+    {% endif %}
+</div><!-- /#nav -->
 
 <div id='senseknocker-thing'>
     <a href='/contact/'>

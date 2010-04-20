@@ -1,4 +1,5 @@
 {% load search %}
+{% load base_extras %}
 
 <div class='results-widget'>
     <span id='results-summary'>
@@ -77,8 +78,8 @@
 
 
     <span id='expand-collapse-all'>
-        <a href='#' id='expand-all-link'><img src='/static/images/icons/zoom-in.png' />Expand all</a>
-        <a href='#' id='collapse-all-link'><img src='/static/images/icons/zoom-out.png' />Collapse all</a>
+        <a href='#' id='expand-all-link'><img src={% version '/static/images/icons/zoom-in.png' %}>Expand all</a>
+        <a href='#' id='collapse-all-link'><img src={% version '/static/images/icons/zoom-out.png' %}>Collapse all</a>
     </span>
 
     {% include 'search/navigation.html' %}

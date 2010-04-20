@@ -199,10 +199,14 @@ GITHUB_API_TOKEN='6f2b15214757ff724155654c97f4ce92'
 # Set this to false to bundle files even if not in production.
 ASSETS_DEBUG = True
 
+ADD_VERSION_STRING_TO_IMAGES = True
+ADD_VERSION_STRING_TO_IMAGES_IN_DEBUG_MODE = True
+
 # The setting below adds a querystring to assets, e.g. bundle.css?1264015076
 # This querystring changes whenever we change the asset. This prevents the
 # client's cached version of an asset from overriding our new asset.
 ASSETS_EXPIRE = 'querystring'
+WHAT_SORT_OF_IMAGE_CACHE_BUSTING = ASSETS_EXPIRE
 
 INTERNAL_IPS = ('127.0.0.1',)
 
@@ -221,4 +225,3 @@ CACHE_MIDDLEWARE_ANONYMOUS_ONLY = True
 #CELERY_ALWAYS_EAGER = True # This is set to True in the test runner also.
 
 WEB_ROOT = os.path.join(MEDIA_ROOT, '_cache')
-

@@ -276,21 +276,6 @@ def set_location_do(request):
                 edit_location_form=edit_location_form)
        
 @login_required
-def confirm_location_suggestion_do(request):
-    person = request.user.get_profile()
-    person.location_confirmed = True
-    person.save()
-    return HttpResponse()
-
-@login_required
-def dont_guess_location_do(request):
-    person = request.user.get_profile()
-    person.dont_guess_my_location = True
-    person.location_display_name = ''
-    person.save()
-    return HttpResponse()
-
-@login_required
 def change_password_do(request):
     # {{{
     form = django.contrib.auth.forms.PasswordChangeForm(
