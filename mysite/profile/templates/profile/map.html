@@ -1,5 +1,7 @@
 {% extends 'profile/people.html' %}
 {% load search %}
+{% load base_extras %}
+
 {% block nav %}
 {{ block.super }}
     {% if the_user.get_profile.should_be_nudged_about_location %}
