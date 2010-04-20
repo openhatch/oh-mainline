@@ -57,3 +57,13 @@ $(function () {
     $("input[rel='hint']").hint();
     $("a[rel='facebox']").facebox();
 });
+
+ShowMoreProjects = {
+    'init': function () {
+        $('#show_more_projects').click(function () {
+            $(this).hide();
+            $('.archived').show();
+            return false;
+        });
+    }
+};

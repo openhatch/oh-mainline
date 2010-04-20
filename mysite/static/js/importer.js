@@ -992,9 +992,8 @@ PortfolioEntry.Reorder = {
                 }
             });
 
-            $('#add_pf_entry').hide();
             $('#portfolio_entries').before($list);
-            $('#portfolio_entries').hide();
+            $('#add_pf_entry, #i_get_my_own_class_name, #portfolio_entries').hide();
 
             // Make list sortable using jQuery UI
             $list.sortable({'axis': 'y'});
@@ -1019,7 +1018,7 @@ PortfolioEntry.Reorder = {
                     'success': function () {
                         PortfolioEntry.Reorder.$list.remove();
                         $('#portfolio_entries *').not('.loading_message').remove();
-                        $('#add_pf_entry, #portfolio_entries').show();
+                        $('#add_pf_entry, #i_get_my_own_class_name, #portfolio_entries').show();
                         $('a#done_reordering').hide();
                         $('a#reorder_projects').show();
                         $('#portfolio_entries .loading_message').show();
