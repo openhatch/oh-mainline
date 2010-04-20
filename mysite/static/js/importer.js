@@ -702,6 +702,7 @@ PortfolioEntry.Save.postOptions = {
     'type': 'POST',
     'dataType': 'json',
 };
+PortfolioEntry.Save.stopCheckingForNewIconsWhenWeAllReturnTrue = [];
 PortfolioEntry.Save.postOptions.success = function (response) {
     if (typeof response.pf_entry_element_id != 'undefined') {
         // This was an INSERT aka an "Add"
@@ -709,15 +710,33 @@ PortfolioEntry.Save.postOptions.success = function (response) {
         $new_pf_entry.attr('id', "portfolio_entry_"+response.portfolio_entry__pk);
         $new_pf_entry.attr('portfolio_entry__pk', response.portfolio_entry__pk);
         $old_project_name_field = $new_pf_entry.find('input:text.project_name');
+        var project_name = $old_project_name_field.val()
         $new_project_name_span = $('<span></span>').addClass('project_name')
-            .text($old_project_name_field.val());
+            .text(project_name);
         $old_project_name_field.replaceWith($new_project_name_span);
+
+        var iconLookupIsOver = function (project_name) {
+            return function (portfolio_json) { 
+                for (var p = 0; p < portfolio_json.projects.length; p++) {
+                    var project = portfolio_json.projects[p];
+                    if (project.fields.name == project_name) {
+                        var new_date = project.fields.date_icon_was_fetched_from_ohloh;
+                        if (new_date === null) { return false; }
+                        else { return true; }
+                    }
+                }
+            }
+        }(project_name);
+        PortfolioEntry.Save.stopCheckingForNewIconsWhenWeAllReturnTrue.push(iconLookupIsOver);
     }
     var $entry = $('#portfolio_entry_'+response.portfolio_entry__pk);
     $entry.removeClass('unsaved').removeClass('adding');
     var project_name = $entry.find('.project_name').text();
     Notifier.displayMessage('Saved entry for '+project_name+'.');
-    askServerForPortfolio();
+
+    // Poll until we stop looking for an icon
+    var interval = window.setTimeout(askServerForPortfolio, 1500);
+    window.pollIntervals.push(interval);
 };
 PortfolioEntry.Save.postOptions.error = function (response) {
     Notifier.displayMessage('Oh dear! There was an error saving this entry in your portfolio. '
@@ -981,7 +1000,7 @@ PortfolioEntry.Reorder = {
     'init': function () {
 
         PortfolioEntry.Reorder.$hideUsWhenSorting = $('#add_pf_entry,'
-            + 'h4 .separator, .apologies, #import_links_heading, '
+            + 'h4 .separator, .apologies, #back_to_profile, #import_links_heading, '
             + '#importer, #back_to_profile, #portfolio_entries,'
             + '#save_all_projects');
 

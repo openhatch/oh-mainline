@@ -18,7 +18,9 @@
     <div class='submodule'>
         <div class='project-stuff'>
             <div class='name_and_icon_flagger'>
+                {% if not edit_mode and not adding_mode %}
                 <a href='{{ pf_entry.project.get_url }}'>
+                {% endif %}
                     <div class='project_icon'
                         {% if edit_mode %}
                             style="background-image:
@@ -33,7 +35,9 @@
                             {{ pf_entry.project.name}}
                             {% endif %}
                         </span></div>
+                {% if not edit_mode and not adding_mode %}
                 </a>
+                {% endif %}
                 
                 {% if adding_mode %}
                     <input class='project_name' type='text' title="Type a project name" value='' />
