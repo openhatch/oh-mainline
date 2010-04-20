@@ -322,6 +322,8 @@ function updatePortfolio(response) {
         $('#portfolio_entries .apologies').show();
     }
 
+    $('#reorder_projects_wrapper')[(response.portfolio_entries.length > 1) ? "show" : "hide"]();
+
     var are_we_printing_archived_projects_yet = false;
 
     for (var i = 0; i < response.portfolio_entries.length; i++) {
@@ -340,7 +342,7 @@ function updatePortfolio(response) {
             $new_portfolio_entry.attr('portfolio_entry__pk', portfolioEntry.pk);
         }
 
-        // if the last one wasn't archived but this one is, add a message
+        // if the last one wasn't archived but this one is, add a heading
         if (! are_we_printing_archived_projects_yet && portfolioEntry.fields.is_archived) {
             var heading = $('#archived_projects_heading');
             if (heading.size() == 0) {
@@ -349,7 +351,6 @@ function updatePortfolio(response) {
             $new_portfolio_entry.before(heading);
             are_we_printing_archived_projects_yet = true;
         }
-
 
         // published/unpublished status
         if (portfolioEntry.fields.is_published) {
@@ -481,9 +482,13 @@ deleteCitationByID = function(id) {
     deleteCitation(Citation.$get(id));
 };
 deleteCitation = function($citation) {
-    $citation.removeClass('unpublished')
+    $citation.addClass('deleted').fadeOut('slow', function () {
+        $(this).remove();
+    });
+
+    /*removeClass('unpublished')
         .removeClass('published')
-        .addClass('deleted');
+        .addClass('deleted');*/
     var pk = $citation[0].id.split('_')[1];
     var ajaxOptions = {
         'type': 'POST',
@@ -521,10 +526,11 @@ Notifier.displayMessage = function(message) {
  ******************/ 
 
 deleteCitationForThisLink = function () {
+    if (!confirm('are you sure?')) return false;
     var deleteLink = this;
     var $citation = $(this).closest('.citations > li');
     deleteCitation($citation);
-    return false; // FIXME: Test this.
+    return false; 
 };
 drawAddCitationFormNearThisButton = function () {
     var button = this;
@@ -615,6 +621,8 @@ FlagIcon.postOptions.error = function (response) {
     alert('error');
 };
 FlagIcon.post = function () {
+    if (!confirm("Flag icon as incorrect: This will remove the icon - are you sure?"))
+        { return false; }
     $.ajax(FlagIcon.postOptions);
 };
 FlagIcon.flag = function () {
@@ -969,11 +977,18 @@ $(PortfolioEntry.Add.init);
 PortfolioEntry.Reorder = {
     '$list': null,
     '$done_reordering': null,
+    '$hideUsWhenSorting': null,
     'init': function () {
+
+        PortfolioEntry.Reorder.$hideUsWhenSorting = $('#add_pf_entry,'
+            + 'h4 .separator, .apologies, #import_links_heading, '
+            + '#importer, #back_to_profile, #portfolio_entries,'
+            + '#save_all_projects');
+
         $('a#reorder_projects').click(function () {
 
             if ($('#portfolio .unsaved, #portfolio .unpublished').size() > 0) {
-                alert('Please save your projects before you re-order them.');
+                alert('Please save your projects before you sort or archive them.');
                 return false;
             }
 
@@ -999,23 +1014,24 @@ PortfolioEntry.Reorder = {
             if (!have_we_created_the_fold_yet) { create_the_fold(); }
 
             $('#portfolio_entries').before($list);
-            $('#add_pf_entry, #i_get_my_own_class_name, #portfolio_entries').hide();
+            PortfolioEntry.Reorder.$hideUsWhenSorting.hide();
 
             // Make list sortable using jQuery UI
             $list.sortable({'axis': 'y'});
 
             $reorder_projects_link.hide();
 
-            $('a#done_reordering').show();
-            $('a#done_reordering').click(function () {
+            $('#projects_heading span:eq(0)').text('Sort and archive projects');
 
-                PortfolioEntry.Reorder.$done_reordering = $(this);
+            $('#done_reordering').text('Save this ordering').removeAttr('disabled').show();
+            $('#done_reordering').click(function () {
 
                 /* Save the new ordering.
                  * ---------------------- */
                 query_string = PortfolioEntry.Reorder.$list.sortable('serialize');
 
-                PortfolioEntry.Reorder.$list.html("<div>Just a sec...</div>");
+                $(this).text('Working...').attr('disabled','disabled');
+                PortfolioEntry.Reorder.$done_reordering = $(this);
 
                 var options = {
                     'type': 'POST',
@@ -1024,8 +1040,9 @@ PortfolioEntry.Reorder = {
                     'success': function () {
                         PortfolioEntry.Reorder.$list.remove();
                         $('#portfolio_entries *').not('.loading_message').remove();
-                        $('#add_pf_entry, #i_get_my_own_class_name, #portfolio_entries').show();
-                        $('a#done_reordering').hide();
+                        PortfolioEntry.Reorder.$hideUsWhenSorting.show();
+                        $('#done_reordering').hide();
+                        $('#projects_heading span:eq(0)').text('Projects');
                         $('a#reorder_projects').show();
                         $('#portfolio_entries .loading_message').show();
                         askServerForPortfolio();

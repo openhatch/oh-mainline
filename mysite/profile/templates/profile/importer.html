@@ -60,7 +60,7 @@ Manage projects
             <a href='{% url mysite.search.views.fetch_bugs %}'>
                 volunteer opportunity finder</a>.)
             </p></div>
-        <h4>Import links</h4>
+        <h4 id='import_links_heading'>Import links</h4>
         <form id='importer' class='submodule' name='import' method='POST'
             action='{% url mysite.profile.views.prepare_data_import_attempts_do %}'>
             <div class='body'>
@@ -85,20 +85,22 @@ Manage projects
             </div>
         </form>
 
-        <h4>
-            Projects
-            <span id='i_get_my_own_class_name'>&middot;</span>
+        <h4 id='projects_heading'>
+            <span>Projects</span>
+            <span class='separator'>&middot;</span>
             <a id='add_pf_entry' href='#'>Add a project</a>
-
-            &middot; <a id='reorder_projects' href='#'>Sort/archive projects</a>
-            <a style='display: none;' id='done_reordering' href='#'>Click me when you're done</a>
+            <span id='reorder_projects_wrapper'>
+                <span class='separator'>&middot;</span>
+                <a id='reorder_projects' href='#'>Sort/archive projects</a>
+            </span>
         </h4>
         <div style='width: 920px;' id="portfolio_entries">
             <div class='loading_message' style='width: 100%; float: left; text-align: center;'>Loading...</div>
             <!-- JavaScript will swoop in and replace this with useful stuff. -->
         </div>
+        <button style='display: none;' id='done_reordering'>Save this ordering</button>
         <button id='save_all_projects'>Save all projects</button>
-        <a style='padding: 5px; margin-right: 30px; float: right;'
+        <a id='back_to_profile' style='padding: 5px; margin-right: 30px; float: right;'
             href='{% url mysite.profile.views.display_person_web person.user.username %}'>
             &laquo; Back to profile
         </a>

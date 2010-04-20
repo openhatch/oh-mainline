@@ -3,10 +3,8 @@
 
 {% if contributors %}
 <div class='other-contributors'>
-    {% with project.get_contributors|length|add:"-1" as contributor_count %}
-    <label>{{ contributor_count|apnumber|title }} other
-        pe{{contributors|pluralize:"rson's,ople've"}} collaborated with
-        {% firstof user.first_name user.username %} on this project:</label>
+    {% with project.get_contributors|length as contributor_count %}
+    <label>Other contributor{{contributor_count|pluralize}} ({{ contributor_count }} total):</label>
     <ul>
         {% for person in contributors %}
         <li>
