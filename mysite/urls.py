@@ -130,6 +130,12 @@ urlpatterns = patterns('',
         (r'^account/settings/location/do$',
             'mysite.account.views.set_location_do'),
 
+        (r'^account/settings/location/confirm_suggestion/do$',
+            'mysite.account.views.confirm_location_suggestion_do'),
+
+        (r'^account/settings/location/dont_guess_location/do$',
+            'mysite.account.views.dont_guess_location_do'),
+
         (r'^account/settings/invite_someone/$',
             'mysite.account.views.invite_someone'),
 
