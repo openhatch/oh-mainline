@@ -17,7 +17,7 @@ If it complains that it is not enabled, configure it by reading /etc/default/mem
 === Buildout ===
 
     python2.5 bootstrap.py
-    ./bin/buildout # Make sure you're actually in this directory
+    ./bin/buildout # Make sure you're actually in the top level directory
     ./bin/mysite runserver
 
 == Set up the database. ==
