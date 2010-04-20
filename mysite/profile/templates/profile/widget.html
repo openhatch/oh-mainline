@@ -281,7 +281,7 @@
         </div>
         <div class='body'>
             <ul>
-            {% for entry in person.get_published_portfolio_entries %}
+            {% for entry in person.get_nonarchived_published_portfolio_entries %}
             {% if forloop.counter0|divisibleby:3 and not forloop.first %}
                 </div>
             {% endif %}

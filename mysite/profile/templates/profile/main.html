@@ -26,6 +26,13 @@
                     {% include 'profile/portfolio/portfolio_entry_element.html' %}
                     {% endfor %}
                 </ul>
+                {% if how_many_archived_pf_entries %}
+                    <a id='show_more_projects' href='#'>
+                        And {{ how_many_archived_pf_entries }} more&hellip;</a>
+                    <noscript>
+                        Enable JavaScript to see more stuff here.
+                    </noscript>
+                {% endif %}
             {% else %}
                 {% if editable %}
                 {# YOUR profile lacks projects. #}
@@ -71,3 +78,9 @@
     </div>
 </div> <!-- /#portfolio -->
 {% endblock main %}
+
+{% block js %}
+    <script type='text/javascript'>
+        $(ShowMoreProjects.init);
+    </script>
+{% endblock js %}

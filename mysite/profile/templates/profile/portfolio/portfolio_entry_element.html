@@ -12,7 +12,7 @@
             {% endif %}
         {% else %}
             {# We're in view mode, so everything is published. #}
-            class='portfolio_entry'
+            class='portfolio_entry{% if pf_entry.is_archived %} archived{% endif %}'
         {% endif %}
     {% endif %}>
     <div class='submodule'>

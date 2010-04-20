@@ -82,6 +82,7 @@ def display_person_web(request, user_to_display__username=None):
     data['editable'] = (request.user == user)
     data['notifications'] = mysite.base.controllers.get_notification_from_request(request)
     data['explain_to_anonymous_users'] = True
+    data['how_many_archived_pf_entries'] = person.get_published_portfolio_entries().filter(is_archived=True).count()
 
     return (request, 'profile/main.html', data)
 
@@ -686,7 +687,7 @@ def gimme_json_for_portfolio(request):
 
     # Citations don't naturally serialize summaries.
     citations = list(Citation.untrashed.filter(portfolio_entry__person=person))
-    portfolio_entries_unserialized = PortfolioEntry.objects.filter(person=person, is_deleted=False).order_by('-pk')
+    portfolio_entries_unserialized = PortfolioEntry.objects.filter(person=person, is_deleted=False)
     projects_unserialized = [p.project for p in portfolio_entries_unserialized]
     
     # Serialize citation summaries

@@ -133,14 +133,7 @@ h3 { margin-bottom: 0px; float: left; clear: left; font-weight: normal; font-siz
 .module > .head ul { float: right; padding: 0; margin: 0; }
 
 .module > .head ul li { float: left; margin: 0; }
-.module > .head ul li a {
-    float: right;
-    padding: 3px 5px;
-    line-height: 13pt;
-    font-weight: bold;
-    margin-left: 3px;
-    text-shadow: 0 1px 0 lightblue;
-}
+.module > .head ul li a { float: right; padding: 5px; line-height: 13pt; text-shadow: 0 1px 0 #fff; }
 img.show-more-link {
     float: right;
     position: relative;

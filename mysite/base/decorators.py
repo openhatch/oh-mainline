@@ -11,6 +11,7 @@ import sha
 from functools import partial
 
 from django.template.loader import render_to_string
+import django.db.models.query
 from mysite.base.helpers import render_response
 
 def as_view(request, template, data, slug):
@@ -115,6 +116,8 @@ def cache_method(cache_key_getter_name, func, *args, **kwargs):
 
     if cached_json is None:
         value = func(*args, **kwargs)
+        if type(value) == django.db.models.query.ValuesListQuerySet:
+            value = list(value)
         cached_json = simplejson.dumps({'value': value})
         import logging
         django.core.cache.cache.set(cache_key, cached_json, 864000)

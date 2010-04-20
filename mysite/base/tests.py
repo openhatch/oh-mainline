@@ -43,7 +43,6 @@ mock_get.return_value = None
 
 class TwillTests(django.test.TestCase):
     '''Some basic methods needed by other testing classes.'''
-    # {{{
     def setUp(self):
         self.real_get = django.core.cache.cache.get
         django.core.cache.cache.get = mock_get

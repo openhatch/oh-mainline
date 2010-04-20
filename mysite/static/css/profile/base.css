@@ -45,3 +45,5 @@ body#profile #info .tags:last-child { margin-bottom: 0; }
 
 #edit_info ul.example li {float: none}
 #edit_info .form-row ul.example li { color:#888888; font-size:8pt; list-style: circle; margin: 5px 0 0 20px; }
+
+body#profile .archived { display: none; }

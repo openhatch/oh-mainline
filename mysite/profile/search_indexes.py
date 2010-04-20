@@ -39,7 +39,7 @@ class PersonIndex(indexes.SearchIndex):
     all_public_projects_lowercase_exact = indexes.MultiValueField() # NOTE: Hack the xml to make type="string"
     def prepare_all_public_projects_lowercase_exact(self, person_instance):
         return list(map(lambda x: x.lower(),
-                        person_instance.get_list_of_project_names()))
+                        person_instance.get_list_of_all_project_names()))
 
     def get_queryset(self):
         everybody = mysite.profile.models.Person.objects.all()

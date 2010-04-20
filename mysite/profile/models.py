@@ -14,6 +14,7 @@ from django.conf import settings
 from django.contrib.auth import SESSION_KEY, BACKEND_SESSION_KEY, load_backend
 from django.core.urlresolvers import reverse
 from django.core.cache import cache
+import django.db.models.query
 
 import datetime
 import sys
@@ -190,13 +191,22 @@ class Person(models.Model):
     def get_published_portfolio_entries(self):
         return PortfolioEntry.objects.filter(person=self, is_published=True, is_deleted=False)
 
+    def get_nonarchived_published_portfolio_entries(self):
+        return PortfolioEntry.objects.filter(person=self, is_published=True, is_deleted=False, is_archived=False)
+
+    def get_list_of_all_project_names(self):
+        # if you change this method, be sure to increment the version number in
+        # the cache key above
+        return list(self.get_published_portfolio_entries().values_list(
+                'project__name', flat=True).distinct())
+
     def get_cache_key_for_projects(self):
-        return 'projects_for_person_with_pk_%d_v2' % self.pk
+        return 'projects_for_person_with_pk_%d_v4' % self.pk
 
     @mysite.base.decorators.cache_method('get_cache_key_for_projects')
-    def get_list_of_project_names(self):
-        return self.get_published_portfolio_entries().values_list(
-                'project__name', flat=True).distinct()[:]
+    def get_names_of_nonarchived_projects(self):
+        return list(self.get_nonarchived_published_portfolio_entries().values_list(
+                'project__name', flat=True).distinct())
 
     @staticmethod
     def only_terms_with_results(terms):
@@ -537,10 +547,23 @@ class PortfolioEntry(models.Model):
     date_created = models.DateTimeField(default=datetime.datetime.utcnow)
     is_published = models.BooleanField(default=False)
     is_deleted = models.BooleanField(default=False)
+    is_archived = models.BooleanField(default=False)
+    sort_order = models.IntegerField(default=0)
 
     def get_published_citations(self):
         return Citation.untrashed.filter(portfolio_entry=self,
                 is_published=True)
+
+    @staticmethod
+    def create_dummy(**kwargs):
+        data = {'project': Project.create_dummy()}
+        data.update(kwargs)
+        ret = PortfolioEntry(**data)
+        ret.save()
+        return ret
+
+    class Meta:
+        ordering = ('sort_order', '-id')
 
 # FIXME: Add a DataSource class to DataImportAttempt.
 

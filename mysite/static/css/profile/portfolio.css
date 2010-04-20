@@ -30,8 +30,9 @@ body#profile #progressbar { display: none; float: right; margin-top: 4px; margin
 /*----------------------*
  |   PORTFOLIO ENTRIES  |
  *----------------------*/
-body#profile #portfolio.editor h4 { float: left; font-size: 8pt; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; width: 900px; }
+body#profile #portfolio.editor h4 { float: left; font-size: 1.25em; font-weight: normal; margin-bottom: 10px; width: 900px; }
 body#profile #portfolio h5 { color: #555; font-size: 13pt; font-weight: normal; margin: 0 0 10px 0; }
+body#profile #portfolio.editor h5 { font-size: 8pt; font-weight: bold; text-transform: uppercase; }
 body#profile .portfolio_entry { float: left; margin-bottom: 20px; }
 body#profile #portfolio.editor .portfolio_entry { left: -7px; position: relative; width: 100%; }
 body#profile #portfolio.editor .portfolio_entry.unpublished .submodule, 
@@ -117,5 +118,8 @@ body#profile #main .submodule .other-contributors li a:hover { text-decoration: 
 body#profile #main .submodule .other-contributors li a:hover span.fullname { text-decoration: underline; }
 body#profile #main .submodule .other-contributors li img { float: left; margin-right: 5px; vertical-align: middle; width: 40px; }
 body#profile #main .submodule .other-contributors .see-all { clear: left; margin-top: 5px; float: right; }
+body#profile #projects_to_be_reordered { float: left; width: 100%; font-size: 17px; }
+body#profile #projects_to_be_reordered li { font-size: 13pt; margin-bottom: 5px; cursor: pointer; cursor: hand; list-style: circle; margin-left: 20px; }
+body#profile #projects_to_be_reordered li.fold { padding: 3px; font-size: 11pt; background-color: #eee; color: #777; font-weight: normal; }
 
 /* vim: set nu nowrap: */

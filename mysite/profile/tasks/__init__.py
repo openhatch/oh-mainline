@@ -353,7 +353,7 @@ def update_someones_pf_cache(person__pk):
     django.core.cache.cache.delete(cache_key)
     
     # This getter will populate the cache
-    return person.get_list_of_project_names()
+    return person.get_names_of_nonarchived_projects()
 
 @periodic_task(run_every=datetime.timedelta(hours=1))
 def fill_recommended_bugs_cache():
