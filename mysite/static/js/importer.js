@@ -981,9 +981,14 @@ PortfolioEntry.Reorder = {
 
             // print a list of project names
             PortfolioEntry.Reorder.$list = $list = $('<ul id="projects_to_be_reordered">');
+            var have_we_created_the_fold_yet = false;
+            var create_the_fold = function () {
+                $list.append("<li id='sortable_portfolio_entry_FOLD' class='fold'>(To archive your work on a project, put it below this line.)</li>");
+            };
             $('#portfolio .portfolio_entry:visible, #archived_projects_heading').each(function () {
                 if (this.id == 'archived_projects_heading') {
-                    $list.append("<li id='sortable_portfolio_entry_FOLD' class='fold'>(To archive your work on a project, put it below this line.)</li>");
+                    have_we_created_the_fold_yet = true;
+                    create_the_fold();
                 }
                 else {
                     var project_name = $(this).find('.project_name').html();
@@ -991,6 +996,7 @@ PortfolioEntry.Reorder = {
                     $list.append($item);
                 }
             });
+            if (!have_we_created_the_fold_yet) { create_the_fold(); }
 
             $('#portfolio_entries').before($list);
             $('#add_pf_entry, #i_get_my_own_class_name, #portfolio_entries').hide();
