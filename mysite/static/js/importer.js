@@ -461,6 +461,13 @@ function updatePortfolio(response) {
 
     SaveAllButton.updateDisplay();
 
+    var conditions = PortfolioEntry.Save.stopCheckingForNewIconsWhenWeAllReturnTrue;
+    var all_are_true = true;
+    for (var c = 0; c < conditions.length; c++) {
+        if (!conditions[c]()) { all_are_true = false; break; }
+    }
+    if (all_are_true) { window.clearInterval(window.checkForNewIconsRepeatedly); }
+
 };
 
 Citation = {};
@@ -735,8 +742,7 @@ PortfolioEntry.Save.postOptions.success = function (response) {
     Notifier.displayMessage('Saved entry for '+project_name+'.');
 
     // Poll until we stop looking for an icon
-    var interval = window.setTimeout(askServerForPortfolio, 1500);
-    window.pollIntervals.push(interval);
+    window.checkForNewIconsRepeatedly = window.setTimeout(askServerForPortfolio, 1500);
 };
 PortfolioEntry.Save.postOptions.error = function (response) {
     Notifier.displayMessage('Oh dear! There was an error saving this entry in your portfolio. '
