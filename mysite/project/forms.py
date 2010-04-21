@@ -8,6 +8,7 @@ class WannaHelpForm(django.forms.Form):
 class ProjectForm(django.forms.ModelForm):
 
     def clean_name(self):
+
         proposed_name = self.cleaned_data['name'].strip()
 
         # Only save if nothing but capitalization was changed

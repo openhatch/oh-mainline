@@ -310,13 +310,21 @@ def nextsteps4helpers(request):
 
 @login_required
 def edit_project(request, project__name):
-    project = get_object_or_404(Project, name=project__name)
+    project = old_project = get_object_or_404(Project, name=project__name)
 
     if request.POST or request.FILES:
         form = mysite.project.forms.ProjectForm(request.POST, request.FILES, instance=project)
         if form.is_valid():
             project = form.save()
             project.update_scaled_icons_from_self_icon()
+
+            import logging
+
+            # This is a good time to make a little note pertaining to the fact
+            # that someone has edited the project info.
+            logging.info("Project edit: %s just edited a project.  The project's data originally read as follows: %s.  Its data now read as follows: %s" % (
+                request.user.username, old_project.__dict__, project.__dict__))
+
             return HttpResponseRedirect(project.get_url())
     else:
         form = mysite.project.forms.ProjectForm(instance=project)
