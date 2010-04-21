@@ -76,39 +76,49 @@
         </div>
 
         {% with pf_entry.get_published_citations as citations %}
-        {% if edit_mode or adding_mode or citations or pf_entry.experience_description %}
+        {% if edit_mode or citations or pf_entry.experience_description %}
         <div class='personal-stuff'>
-            <div class='citations-wrapper'>
-                <label>
-                    {% if adding_mode or edit_mode %}
-                        Web pages that talk about your involvement:
-                    {% else %}
-                        {% if citations %}
-                            Related pages:
+
+            {# CITATIONS {{{ #}
+
+            {% if edit_mode or citations %}
+
+                <div class='citations-wrapper'>
+
+                    <label>
+                        {% if adding_mode or edit_mode %}
+                            Web pages that talk about your involvement:
+                        {% else %}
+                            {% if citations %}
+                                Related pages:
+                            {% endif %}
                         {% endif %}
+                    </label>
+
+                    {% if not pf_entry.is_published %}
+                        <div class='involvement_placeholder'>
+                            To add pages here, publish this project.
+                        </div>
                     {% endif %}
-                </label>
 
-                {% if not pf_entry.is_published %}
-                    <div class='involvement_placeholder'>
-                        To add pages here, publish this project.
-                    </div>
-                {% endif %}
+                    {% if adding_mode or edit_mode or citations %}
+                        <ul class='citations'>
+                            {% for citation in citations %}
+                                {% include 'profile/portfolio/citation_element.html' %}
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
 
-                {% if adding_mode or edit_mode or citations %}
-                    <ul class='citations'>
-                        {% for citation in citations %}
-                            {% include 'profile/portfolio/citation_element.html' %}
-                        {% endfor %}
-                    </ul>
-                {% endif %}
+                    {% if edit_mode %}
+                        <ul class='citation-forms'></ul>
+                        <a class='add' href='#'>Add a page</a>
+                    {% endif %}
 
-                {% if edit_mode %}
-                    <ul class='citation-forms'></ul>
-                    <a class='add' href='#'>Add a page</a>
-                {% endif %}
+                </div>
 
-            </div>
+            {% endif %}
+
+            {# }}} #}
 
             <div class='experience_description-wrapper'>
                 {% with 'experience_description_$PORTFOLIO_ENTRY_ID' as textarea_id %}

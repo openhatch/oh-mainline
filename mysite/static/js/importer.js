@@ -1022,7 +1022,7 @@ PortfolioEntry.Reorder = {
         $('a#reorder_projects').click(function () {
 
             if ($('#portfolio .unsaved, #portfolio .unpublished').size() > 0) {
-                alert('Please save your projects before you sort or archive them.');
+                alert('Please save all of your projects before you sort or archive them.');
                 return false;
             }
 
