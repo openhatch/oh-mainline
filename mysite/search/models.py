@@ -147,7 +147,7 @@ class Project(OpenHatchModel):
             self.date_icon_was_fetched_from_ohloh = datetime.datetime.utcnow()
         except ValueError:
             self.date_icon_was_fetched_from_ohloh = datetime.datetime.utcnow()
-            return None
+            return False
 
         # if you want to scale, use get_image_data_scaled(icon_data)
         self.icon_raw.save('', ContentFile(icon_data))
@@ -155,6 +155,7 @@ class Project(OpenHatchModel):
         # Since we are saving an icon, also update our scaled-down version of
         # that icon for the badge.
         self.update_scaled_icons_from_self_icon()
+        return True
 
     def get_url_of_icon_or_generic(self):
         # Recycle icon_smaller_for_badge since it's the same size as
