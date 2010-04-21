@@ -23,10 +23,12 @@ Editing project - {{ project.name }}
                         <div style='clear: left; margin-top: 10px; 
                                 margin-right: 15px; text-align: center; width: 100px; float: left;'>
                             <div style='text-align: center; float: left; width: 100%; height: 64px;'>
-                                <img id='icon' src='{% if project.icon_for_profile %}{{ project.icon_for_profile }}{% else %}{% version '/static/images/throbber.gif' %}{% endif %}' />
+                                <img id='icon' src='{% if project.icon_for_profile %}/static/{{ project.icon_for_profile }}{% else %}{% version '/static/images/throbber.gif' %}{% endif %}' />
+                                {% if not project.icon_for_profile %}
                                 <div style='width: 100%; height: 30px;' id='icon_loading_message'
                                         style='text-align: center;' class='example'>
                                     Looking up icon</div>
+                            {% endif %}
                             </div>
                         </div>
                     {% endifequal %}
@@ -54,6 +56,7 @@ Editing project - {{ project.name }}
 {% endblock %}
 
 {% block js %}
+    {% if not project.icon_for_profile %}
     <script type='text/javascript'>
         $(function () {
             // Grab the icon using an Ajax loop
@@ -74,4 +77,5 @@ Editing project - {{ project.name }}
             window.setTimeout(askForIcon, 1500);
         });
     </script>
+    {% endif %}
 {% endblock js %}
