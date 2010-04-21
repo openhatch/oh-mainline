@@ -1,5 +1,6 @@
 from django.http import HttpResponse, QueryDict, HttpResponseServerError, HttpResponseRedirect
 from django.core import serializers
+from django.shortcuts import get_object_or_404
 from django.core.urlresolvers import reverse
 try:
     from urlparse import parse_qsl
@@ -315,6 +316,13 @@ def subscribe_to_bug_alert_do(request):
     else:
         # If user tries to do a different bug search after invalid form input
         return HttpResponseRedirect(next + request.META['QUERY_STRING'])
+
+def project_has_icon(request, project_name):
+    p = get_object_or_404(Project, name=project_name)
+    if p.date_icon_was_fetched_from_ohloh is None:
+        return HttpResponse("keep polling")
+    return HttpResponse(p.get_url_of_icon_or_generic())
+
 
 """
 Ways we could do autocompletion:
