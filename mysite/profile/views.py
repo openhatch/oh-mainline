@@ -815,8 +815,6 @@ def importer(request, test_js = False):
     """Get the DIAs for the logged-in user's profile. Pass them to the template."""
     # {{{
 
-    add_pf_entry_for_this_project = request.GET.get('add_project')
-
     person = request.user.get_profile()
     data = get_personal_data(person)
 

@@ -986,15 +986,24 @@ PortfolioEntry.Add.init = function () {
 // We do this so that this particular method can be monkeypatched in testDeleteAdderWidget.
 PortfolioEntry.Add.whenDoneAnimating = function () { SaveAllButton.updateDisplay(); };
 
-PortfolioEntry.Add.clickHandler = function () {
+PortfolioEntry.Add.clickHandler = function (project_name) {
     // Draw a widget for adding pf entries.
     var html = $('#add_a_portfolio_entry_building_block').html();
     $add_a_pf_entry = $(html);
     $add_a_pf_entry.attr('id', generateUniqueID());
     $('#portfolio_entries').prepend($add_a_pf_entry);
-    $add_a_pf_entry.hide().fadeIn(PortfolioEntry.Add.whenDoneAnimating);
+
+    var appear = 'fadeIn';
+    // Fill the project name
+    if (project_name) {
+        $add_a_pf_entry.find('.project_name').eq(0).val(project_name);
+        appear = 'show';
+    }
+
+    $add_a_pf_entry.hide()[appear](PortfolioEntry.Add.whenDoneAnimating);
     PortfolioEntry.bindEventHandlers();
     $add_a_pf_entry.find('input[title]').hint();
+
     return false;
 };
 
@@ -1133,7 +1142,19 @@ SaveAllButton.getAllProjects = function() {
 SaveAllButton.saveAll = function() {
     SaveAllButton.getAllProjects().each(function () {
             $(this).find('.publish_portfolio_entry:visible a').trigger('click');
-            });
+    });
+};
+
+AutoSaucepan = {
+    'init': function () {
+        // Check in the query string if there is anything
+        var project_name = $.query.get('add_project_name');
+
+        if (project_name) {
+            // If so, simulate a click
+            PortfolioEntry.Add.clickHandler(project_name);
+        }
+    }
 };
 
 $(function () {
