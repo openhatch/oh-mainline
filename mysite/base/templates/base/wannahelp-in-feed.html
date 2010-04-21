@@ -6,13 +6,13 @@
 {% with feed_item.person.user as user %}
 {% with feed_item.project as project %}
 
-{% cache 86400 recent_activity_wannahelp answer.pk %}
-<li style='font-size: .9em; float: left; width: 100%; margin-bottom: 15px;'>
+{% cache 86400 recent_activity_wannahelp_v2 answer.pk %}
+<li style='font-size: .9em; float: left; width: 100%;'>
   <a href='{{ person.profile_url }}'>
     <img style='width: 30px; float: left; margin-right: 10px;' src='{{ feed_item.person.get_photo_thumbnail_30px_wide_url_or_default }}' />
   </a>
-  <div style='float: left; width: 80%;'>
-    <div style='float: left; width: 100%;'>
+  <div style='float: left; width: 85%;'>
+    <span>
       <strong>
         {% spaceless %}
         <a href='{{ person.profile_url }}'>
@@ -20,11 +20,11 @@
         </a>
         {% endspaceless %}
       </strong>
-    </div>
+    </span>
     {% spaceless %}
     {% with feed_item.project as project %}
       is willing to help
-    <a href='{{ project.get_url }}'>{{project.name}}</a>
+      <a style='font-weight: bold;' href='{{ project.get_url }}'>{{project.name}}</a>
     {% endwith %}
     {% endspaceless %}
     {% endcache %}
