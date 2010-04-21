@@ -158,38 +158,40 @@ about how you can help {{ project.name }}
 {% endblock left %}
 
 {% block main %}
-    {% if random_pfentry %}
     <div class='module' id='bugs'>
         <div class='head'>
             <h3>About {{ project.name }}</h3>
         </div>
         <div class='body'>
-            {% if project.icon_for_profile %}
             <div class='project_icon' 
                     style="float: left; width: 64px; margin-right: 20px;
-                    background-image: url({% version project.icon_for_profile.url %})"
+                    background-image: url({% version project.get_url_of_icon_or_generic %})"
                     ><span class='alt-text'>
                         (logo)
                     </span></div>
-            {% endif %}
             <div style='float: left; width: {% if not project.icon_for_profile %}100%{% else %}70%{% endif %};'>
+                {% if random_pfentry %}
                     <h2 style='font-size: 1.3em; font-weight: normal;'>
                         {% spaceless %}
                             <span>{{ random_pfentry.project_description|urlize|linebreaksbr}}</span>
                         {% endspaceless %}
                     </h2>
                     <p style='font-size: .9em; margin: 5px 0 0 40px;'>
-                    from the profile of
-                    <a href='{{ random_pfentry.person.profile_url }}'>
-                        {% with random_pfentry.person.user as user %}
-                        {% include 'name.html' %}
-                        {% endwith %}
-                    </a>
-                </p>
-                </div>
+                        from the profile of
+                        <a href='{{ random_pfentry.person.profile_url }}'>
+                            {% with random_pfentry.person.user as user %}
+                            {% include 'name.html' %}
+                            {% endwith %}
+                        </a>
+                    </p>
+                {% else %}
+                    <h2 style='font-size: 1.3em; font-weight: normal;'>
+                        <a href=''>Add a description.</a>
+                    </h2>
+                {% endif %}
+            </div>
         </div>
     </div>
-    {% endif %}
 
     <div class='module' id='wannahelp'>
         {% if not user_wants_to_help %}
