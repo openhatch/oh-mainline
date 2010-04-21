@@ -815,21 +815,10 @@ def importer(request, test_js = False):
     """Get the DIAs for the logged-in user's profile. Pass them to the template."""
     # {{{
 
-    blank_query_index = 0
-    checkboxes = []
-    for source_key, source_display in DataImportAttempt.SOURCE_CHOICES:
-        checkboxes.append({
-            'id': "%s%d" % (source_key, blank_query_index),
-            'label': source_display,
-            })
-    blank_query = {
-            'index': blank_query_index,
-            'checkboxes': checkboxes
-            }
+    add_pf_entry_for_this_project = request.GET.get('add_project')
+
     person = request.user.get_profile()
     data = get_personal_data(person)
-    data['dias'] = DataImportAttempt.objects.filter(person=person).order_by('id')
-    data['blank_query'] = blank_query
 
     # This is used to create a blank 'Add another record' form, which is printed
     # to the bottom of the importer page. The HTML underlying this form is used
