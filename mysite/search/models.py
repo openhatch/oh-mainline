@@ -86,7 +86,7 @@ class Project(OpenHatchModel):
 
     name = models.CharField(max_length=200, unique=True,
             help_text='<span class="example">You can correct capitalization here. To change the name of this project <em>for serious</em>, email hello@openhatch.org.</span>')
-    language = models.CharField(max_length=200,
+    language = models.CharField(max_length=200, blank=True, default='',
             verbose_name='Primary programming language')
 
     def invalidate_all_icons(self):

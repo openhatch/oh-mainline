@@ -44,7 +44,7 @@ Editing project - {{ project.name }}
 
                 <p style='display: block; margin-top: 30px;'>
                     To describe the project,
-                    <a target=_new href='{% url mysite.profile.views.importer %}'>
+                    <a target=_new href='{% url mysite.profile.views.importer %}?add_project_name={{ project.name|urlencode }}'>
                         add it to your profile</a>.
                 </p>
                 <input type='submit' value='Save &raquo;' />

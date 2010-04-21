@@ -1150,7 +1150,7 @@ SaveAllButton.saveAll = function() {
 AutoSaucepan = {
     'init': function () {
         // Check in the query string if there is anything
-        var project_name = $.query.get('add_project_name');
+        var project_name = decodeURIComponent(location.search.replace('?add_project_name=',''));
 
         if (project_name) {
             // If so, simulate a click
