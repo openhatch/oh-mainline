@@ -61,10 +61,12 @@
             </div>
             <div class='project_description-wrapper'>
                 {% if edit_mode %}
-                <label>Describe this project:</label>
-                <textarea class='project_description'></textarea>
+                    {% with 'project_description_$PORTFOLIO_ENTRY_ID' as textarea_id %}
+                        <label for='{{ textarea_id }}'>Describe this project:</label>
+                        <textarea id='{{ textarea_id }}' class='project_description'></textarea>
+                    {% endwith %}
                 {% else %}
-                <div class='project_description'>{{ pf_entry.project_description|urlize }}</div>
+                    <div class='project_description'>{{ pf_entry.project_description|urlize }}</div>
                 {% endif %}
             </div>
             {% if not edit_mode and not adding_mode %}
@@ -101,7 +103,7 @@
                     </ul>
                 {% endif %}
 
-                {% if edit_mode and not adding_mode %}
+                {% if edit_mode %}
                     <ul class='citation-forms'></ul>
                     <a class='add' href='#'>Add a page</a>
                 {% endif %}
@@ -109,21 +111,25 @@
             </div>
 
             <div class='experience_description-wrapper'>
-                {% if edit_mode %}
-                    <label>
-                        Describe your involvement:</label>
-                {% else %}
-                    {% if pf_entry.experience_description %}
-                        <label style='margin-bottom: 5px;'>Involvement description:</label>
+                {% with 'experience_description_$PORTFOLIO_ENTRY_ID' as textarea_id %}
+                    {% if edit_mode %}
+                        <label for='{{ textarea_id }}'>
+                            Describe your involvement:
+                        </label>
+                    {% else %}
+                        {% if pf_entry.experience_description %}
+                            <label style='margin-bottom: 5px;'>Involvement description:</label>
+                        {% endif %}
                     {% endif %}
-                {% endif %}
 
-                {% if edit_mode %}
-                    <textarea 
-                            class='experience_description'></textarea>
-                {% else %}
-                    <div class='experience_description'>{{ pf_entry.experience_description|urlize }}</div>
-                {% endif %}
+                    {% if edit_mode %}
+                        <textarea id='{{ textarea_id }}' class='experience_description'></textarea>
+                    {% else %}
+                        <div class='experience_description'>
+                            {{ pf_entry.experience_description|urlize }}
+                        </div>
+                    {% endif %}
+                {% endwith %}
             </div>
         </div>
         {% endif %}

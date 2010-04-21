@@ -67,6 +67,7 @@ body#profile .portfolio_entry .citations { float: left; width: 100%; }
 body#profile .portfolio_entry .citations-wrapper { margin-bottom: 15px; }
 body#profile .portfolio_entry .involvement_placeholder { margin-top: 5px; font-size: .9em; display: none; }
 body#profile .portfolio_entry.adding .involvement_placeholder { margin-bottom: 10px; display: block; }
+body#profile .portfolio_entry.adding .add { display: none; } /* Don't display 'Add a page' until pfentry has been added. */
 body#profile .portfolio_entry label { float: left; color: #777; font-size: 10pt; margin: 0 0 2px 0; padding: 0; width: 100%; }
 body#profile .portfolio_entry .citation-forms label { font-weight: bold; }
 body#profile .portfolio_entry .experience_description-wrapper { float: left; width: 100%; }

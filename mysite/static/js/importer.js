@@ -336,7 +336,11 @@ function updatePortfolio(response) {
 
         $new_portfolio_entry = $('#' + id);
         if ($new_portfolio_entry.size() == 0) {
-            var $new_portfolio_entry = $(portfolio_entry_html);
+
+            // The HTML must be customized a bit for this portfolio entry so
+            // that labels know which descriptions to point to.
+            var html = portfolio_entry_html.replace(/\$PORTFOLIO_ENTRY_ID/g, portfolioEntry.pk);
+            var $new_portfolio_entry = $(html);
             $('#portfolio_entries').append($new_portfolio_entry);
             $new_portfolio_entry.attr('id', id);
             $new_portfolio_entry.attr('portfolio_entry__pk', portfolioEntry.pk);
