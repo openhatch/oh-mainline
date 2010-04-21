@@ -993,14 +993,16 @@ PortfolioEntry.Add.clickHandler = function (project_name) {
     $add_a_pf_entry.attr('id', generateUniqueID());
     $('#portfolio_entries').prepend($add_a_pf_entry);
 
-    var appear = 'fadeIn';
-    // Fill the project name
-    if (project_name) {
+    if (typeof project_name == 'string') {
+        // Fill the project name
         $add_a_pf_entry.find('.project_name').eq(0).val(project_name);
-        appear = 'show';
+        $add_a_pf_entry.show(PortfolioEntry.Add.whenDoneAnimating);
+    }
+    else {
+        // project_name not specified or is an event 
+        $add_a_pf_entry.hide().fadeIn(PortfolioEntry.Add.whenDoneAnimating);
     }
 
-    $add_a_pf_entry.hide()[appear](PortfolioEntry.Add.whenDoneAnimating);
     PortfolioEntry.bindEventHandlers();
     $add_a_pf_entry.find('input[title]').hint();
 

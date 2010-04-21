@@ -192,7 +192,7 @@ about how you can help {{ project.name }}
                 {% else %}
                     <div style='color: #777; font-size: .85em;'>
                         No one has described this project yet. To describe the
-                        project, <a href='{% url mysite.profile.views.importer %}'>
+                        project, <a href='{% url mysite.profile.views.importer %}?add_project_name={{ project.name }}'>
                             add it to your profile</a>.
                     </div>
                 {% endif %}
