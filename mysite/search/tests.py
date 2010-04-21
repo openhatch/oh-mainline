@@ -1652,4 +1652,28 @@ class SugarLabsOnline(TestCase):
         bug = mysite.search.models.Bug.open_ones.get()
         self.assertEqual(bug.title, "save as html doesn't convert & to &gt;")
 
+class WeCanPollSomethingToCheckIfAProjectIconIsLoaded(TestCase):
+    def test(self):
+        # Create a dummy project
+        p = Project.create_dummy()
+
+        # Make sure its ohloh icon download time is null
+        self.assertEqual(p.date_icon_was_fetched_from_ohloh, None)
+
+        # get the thing we poll
+        response = self.client.get(reverse(
+            mysite.search.views.project_has_icon,
+            kwargs={'project_name': p.name}))
+        self.assertEqual(response.content, 'keep polling')
+
+        # okay, so now say we finished polling
+        p.date_icon_was_fetched_from_ohloh = datetime.datetime.utcnow()
+        p.save()
+
+        # so what now?
+        response = self.client.get(reverse(
+            mysite.search.views.project_has_icon,
+            kwargs={'project_name': p.name}))
+        self.assertEqual(response.content, p.get_url_of_icon_or_generic())
+
 # vim: set nu ai et ts=4 sw=4:
