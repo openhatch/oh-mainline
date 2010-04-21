@@ -731,7 +731,7 @@ PortfolioEntry.Save.postOptions.success = function (response) {
             return function (portfolio_json) { 
                 for (var p = 0; p < portfolio_json.projects.length; p++) {
                     var project = portfolio_json.projects[p];
-                    if (project.fields.name == project_name) {
+                    if (project.fields.name.toLowerCase() == project_name.toLowerCase()) {
                         var new_date = project.fields.date_icon_was_fetched_from_ohloh;
                         if (new_date === null) { return false; }
                         else { return true; }
