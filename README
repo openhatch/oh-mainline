@@ -32,19 +32,13 @@ Or use 'mysql -u username', where username is a MySQL user with the appropriate 
 
     ../bin/mysite syncdb
 
-Note that you must answer "No" to the question, "Do you want to create a superuser?"
-
-That is because you have not run the migrations for the "Profile" app yet.
+Note that you must answer "No" to the question, "Do you want to create a superuser?" That is because you have not run the migrations for the "profile" app yet.
 
 You may need to migrate using this command:
 
     ../bin/mysite migrate
 
-Sometimes the migrations don't work, and South will give you a MySQL script so you can fix things. But South isn't perfect. You might have to fix the syntax errors in this MySQL. Run this vim command for starters.
-:%s/^ = //
-For non-vimmers, that means "Delete the string ' = ' when it appears at the beginnings of lines."
-Then remove those trailing square brackets.
-Regarding dates: You may need to replace South's strange Pythonesque code for dates with proper MySQL code.
+See note on migrations below.
 
 If you have permission, get the current data and files. Run:
 
@@ -52,9 +46,18 @@ If you have permission, get the current data and files. Run:
 
 Now load http://127.0.0.1:8000/ in your web browser.
 
-== Frequently Asked Questions ==
 
-Q. Why is the Django project called 'mysite'?
+=== Note on migrations ===
+
+Sometimes the migrations don't work, and South will give you a MySQL script so you can fix things. But South isn't perfect. You might have to fix the syntax errors in this MySQL. Run this vim command for starters.
+
+    :%s/^ = //
+
+For non-vimmers, that means "Delete the string ' = ' when it appears at the beginnings of lines."
+
+Then remove those trailing square brackets.
+
+Regarding dates: You may need to replace South's strange Pythonesque code for dates with proper MySQL code.
 
 == Testing ==
 
