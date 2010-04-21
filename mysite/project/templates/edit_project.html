@@ -14,12 +14,21 @@ Editing project - {{ project.name }}
             <h3>Editing info for <strong>{{ project.name }}</strong></h3>
         </div>
         <div class='body'>
+            <style type='text/css'>
+            </style>
 
             <form enctype='multipart/form-data' method='POST' action=''>
                 {% for field in form %}
                     {% ifequal field.name 'icon_raw' %}
-                        <img style='clear: left; margin-top: 10px; margin-right: 15px; float: left;'
-                                src='{% if project.icon_for_profile %}{{ project.icon_for_profile }}{% else %}{% version '/static/images/throbber-54px.gif' %}{% endif %}' />
+                        <div style='clear: left; margin-top: 10px; 
+                                margin-right: 15px; text-align: center; width: 100px; float: left;'>
+                            <div style='text-align: center; float: left; width: 100%; height: 64px;'>
+                                <img id='icon' src='{% if project.icon_for_profile %}{{ project.icon_for_profile }}{% else %}{% version '/static/images/throbber-54px.gif' %}{% endif %}' />
+                                <div style='width: 100%; height: 30px;' id='icon_loading_message'
+                                        style='text-align: center;' class='example'>
+                                    Looking up icon</div>
+                            </div>
+                        </div>
                     {% endifequal %}
                     <p style='float: left; width: 70%;'>
                         {% if not field.is_hidden %}
@@ -48,13 +57,21 @@ Editing project - {{ project.name }}
     <script type='text/javascript'>
         $(function () {
             // Grab the icon using an Ajax loop
-            $.get('/+do/project.views.gimme_an_icon_url',
-                function (url) {
-                    if (url !== '') {
-                        $('img').attr('src', url);
+            var askForIcon = function () {
+                $.get(
+                    '/+project_icon_poll/{{ project.name }}',
+                    function (url) {
+                        if (url == 'keep polling') {
+                            window.setTimeout(askForIcon, 1500);
+                        }
+                        else {
+                            $('#icon').attr('src', url);
+                            $('#icon_loading_message').html('');
+                        }
                     }
-                }
-            );
+                );
+            };
+            window.setTimeout(askForIcon, 1500);
         });
     </script>
 {% endblock js %}

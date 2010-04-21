@@ -115,7 +115,8 @@ class Project(OpenHatchModel):
             upload_to=lambda a,b: Project.generate_random_icon_path(a, b),
             null=True,
             default=None,
-            verbose_name='Icon')
+            verbose_name='Icon',
+            )
 
     date_icon_was_fetched_from_ohloh = models.DateTimeField(null=True, default=None)
 
