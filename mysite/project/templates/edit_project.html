@@ -23,7 +23,7 @@ Editing project - {{ project.name }}
                         <div style='clear: left; margin-top: 10px; 
                                 margin-right: 15px; text-align: center; width: 100px; float: left;'>
                             <div style='text-align: center; float: left; width: 100%; height: 64px;'>
-                                <img id='icon' src='{% if project.icon_for_profile %}{{ project.icon_for_profile }}{% else %}{% version '/static/images/throbber-54px.gif' %}{% endif %}' />
+                                <img id='icon' src='{% if project.icon_for_profile %}{{ project.icon_for_profile }}{% else %}{% version '/static/images/throbber.gif' %}{% endif %}' />
                                 <div style='width: 100%; height: 30px;' id='icon_loading_message'
                                         style='text-align: center;' class='example'>
                                     Looking up icon</div>
@@ -59,7 +59,7 @@ Editing project - {{ project.name }}
             // Grab the icon using an Ajax loop
             var askForIcon = function () {
                 $.get(
-                    '/+project_icon_poll/{{ project.name }}',
+                    '/+project_icon_poll/{{ project.name|urlencode }}',
                     function (url) {
                         if (url == 'keep polling') {
                             window.setTimeout(askForIcon, 1500);
