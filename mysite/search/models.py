@@ -85,7 +85,7 @@ class Project(OpenHatchModel):
         return ret
 
     name = models.CharField(max_length=200, unique=True,
-            help_text='<span class="example">This box is for fixing capitalization mistakes. To change the name of this project <em>for serious</em>, email hello@openhatch.org.</span>')
+            help_text='<span class="example">This box is for fixing capitalization mistakes. To change the name of this project, email <a style="color: #666;" href="mailto:%s">%s</a>.</span>' % (('hello@openhatch.org',)*2))
     language = models.CharField(max_length=200, blank=True, default='',
             verbose_name='Primary programming language')
 
