@@ -1,4 +1,5 @@
 {% extends 'base/base.html' %}
+{% load base_extras %}
 
 {% block title %}
 Editing project - {{ project.name }} 
@@ -17,11 +18,12 @@ Editing project - {{ project.name }}
             <form enctype='multipart/form-data' method='POST' action=''>
                 {% for field in form %}
                     {% ifequal field.name 'icon_raw' %}
-                        <img style='clear: left; margin-top: 10px; margin-right: 15px; float: left;' src='{{ project.get_url_of_icon_or_generic }}' />
+                        <img style='clear: left; margin-top: 10px; margin-right: 15px; float: left;'
+                                src='{% if project.icon_for_profile %}{{ project.icon_for_profile }}{% else %}{% version '/static/images/throbber-54px.gif' %}{% endif %}' />
                     {% endifequal %}
                     <p style='float: left; width: 70%;'>
                         {% if not field.is_hidden %}
-                            <label>
+                            <label for='id_{{ field.name }}'>
                                 {{ field.label }}
                             </label>
                         {% endif %}
@@ -32,7 +34,8 @@ Editing project - {{ project.name }}
                 {% endfor %}
 
                 <p style='display: block; margin-top: 30px;'>
-                    To describe the project, <a target=_new href='{% url mysite.profile.views.importer %}'>
+                    To describe the project,
+                    <a target=_new href='{% url mysite.profile.views.importer %}'>
                         add it to your profile</a>.
                 </p>
                 <input type='submit' value='Save &raquo;' />
@@ -40,3 +43,18 @@ Editing project - {{ project.name }}
         </div>
     </div>
 {% endblock %}
+
+{% block js %}
+    <script type='text/javascript'>
+        $(function () {
+            // Grab the icon using an Ajax loop
+            $.get('/+do/project.views.gimme_an_icon_url',
+                function (url) {
+                    if (url !== '') {
+                        $('img').attr('src', url);
+                    }
+                }
+            );
+        });
+    </script>
+{% endblock js %}
