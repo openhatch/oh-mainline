@@ -1,0 +1,42 @@
+{% extends 'base/base.html' %}
+
+{% block title %}
+Editing project - {{ project.name }} 
+{% endblock title %}
+
+{% block body_id %}edit_project{% endblock body_id %}
+{% block body_class %}{{ block.super }} nice_form{% endblock %}
+
+{% block content %}
+    <div class='module'>
+        <div class='head'>
+            <h3>Editing info for <strong>{{ project.name }}</strong></h3>
+        </div>
+        <div class='body'>
+
+            <form enctype='multipart/form-data' method='POST' action=''>
+                {% for field in form %}
+                    {% ifequal field.name 'icon_raw' %}
+                        <img style='clear: left; margin-top: 10px; margin-right: 15px; float: left;' src='{{ project.get_url_of_icon_or_generic }}' />
+                    {% endifequal %}
+                    <p style='float: left; width: 70%;'>
+                        {% if not field.is_hidden %}
+                            <label>
+                                {{ field.label }}
+                            </label>
+                        {% endif %}
+                        {{ field.errors }}
+                        {{ field }}
+                        {{ field.help_text|safe }}
+                    </p>
+                {% endfor %}
+
+                <p style='display: block; margin-top: 30px;'>
+                    To describe the project, <a target=_new href='{% url mysite.profile.views.importer %}'>
+                        add it to your profile</a>.
+                </p>
+                <input type='submit' value='Save &raquo;' />
+            </form>
+        </div>
+    </div>
+{% endblock %}

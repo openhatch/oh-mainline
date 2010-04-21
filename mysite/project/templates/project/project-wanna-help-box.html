@@ -1,18 +1,22 @@
-<div class='head'>
-    <h3>People who want to help <span style='font-weight: normal;'>({% firstof project.people_who_wanna_help.all|length "none yet" %})</span></h3>
-        <ul>
-            <li>
-            <a href='{% url mysite.profile.views.people %}?q=icanhelp:"{{project.name|urlencode}}"' style='float: right; font-weight: normal;'>See all <strong>&raquo;</strong></a>
-            </li>
-        </ul>
-</div>
-<div class='body'>
-    <ul id='people-list'>
-        {% for person in people_to_show|slice:":3" %}
-            {% include 'profile/person-summary-li.html' %}
-        {% empty %}
-            No one yet.
-        {% endfor %}
-    </ul>
-</div>
+{% with project.people_who_wanna_help.all as helpers %}
+    <div class='head'>
+        <h3>People who want to help <span style='font-weight: normal;'>({% firstof helpers|length "none listed yet" %})</span></h3>
+        {% if helpers %}
+            <ul>
+                <li>
+                    <a href='{% url mysite.profile.views.people %}?q=icanhelp:"{{project.name|urlencode}}"' style='float: right; font-weight: normal;'>See all</a>
+                </li>
+            </ul>
+        {% endif %}
+    </div>
+    {% if helpers %}
+        <div class='body'>
+            <ul id='people-list'>
+                {% for person in people_to_show|slice:":3" %}
+                    {% include 'profile/person-summary-li.html' %}
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+{% endwith %}
 {# vim: set filetype=htmldjango: #}

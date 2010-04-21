@@ -158,9 +158,14 @@ about how you can help {{ project.name }}
 {% endblock left %}
 
 {% block main %}
-    <div class='module' id='bugs'>
+    <div class='module' id='about'>
         <div class='head'>
             <h3>About {{ project.name }}</h3>
+            <ul>
+                <li>
+                    <a href='{{ project.get_edit_page_url }}'>Edit</a>
+                </li>
+            </ul>
         </div>
         <div class='body'>
             <div class='project_icon' 
@@ -217,50 +222,52 @@ about how you can help {{ project.name }}
 
 <div class='module' id='contributors'>
     <div class='head'>
-        <h3>Registered contributors ({% firstof project.cached_contributor_count "none yet" %})</h3>
+        <h3>Contributors ({% firstof project.cached_contributor_count "none listed yet" %})</h3>
             <ul>
                 <li>
-                <a href='{% url mysite.profile.views.people %}?q=project:"{{project.name|urlencode}}"' style='float: right; font-weight: normal;'>See all <strong>&raquo;</strong></a>
+                    {% if project.cached_contributor_count %}
+                        <a href='{% url mysite.profile.views.people %}?q=project:"{{project.name|urlencode}}"' style='float: right; font-weight: normal;'>See all</a>
+                    {% else %}
+                        <a href='{% url mysite.profile.views.importer %}'
+                                style='float: right; font-weight: normal;'>Add yourself</a>
+                    {% endif %}
                 </li>
             </ul>
     </div>
-    <div class='body'>
-        <ul id='people-list'>
-            {% for person in contributors %}
-                {% include 'profile/person-summary-li.html' %}
-            {% empty %}
-                No registered contributors yet.  
-            {% endfor %}
-        </ul>
-        <div style='width: 100%; float: left; text-align: right; margin-top: 20px; font-size: 8pt;'>
-        To be listed here,
-            <a href='{% url mysite.profile.views.portfolio_editor %}'>
-                add {{ project.name }} to your
-                profile</a>.
+    {% if project.cached_contributor_count %}
+        <div class='body'>
+            <ul id='people-list'>
+                {% for person in contributors %}
+                    {% include 'profile/person-summary-li.html' %}
+                {% endfor %}
+            </ul>
         </div>
-    </div>
+    {% endif %}
 </div>
 
 <div class='module' id='bugs'>
-    <div class='head'> <h3>Relatedly</h3> </div>
+    <div class='head'> <h3>Volunteer opportunities, etc.</h3> </div>
     <div class='body'>
+        <style>
+            #bugs p { margin-top: 0; }
+        </style>
         {% if project.get_open_bugs %}
             <p>
                 Browse {{ project.get_open_bugs|length }}+
-                <a href='/search/?q={{ project.name_with_quotes_if_necessary|urlencode }}'>
-                    volunteer opportunit{{ project.get_open_bugs|pluralize:"y,ies"}}
-                    matching
-                    <strong>{{ project.name }}</strong>.
-                </a>
-        </p>
+                    <a href='/search/?q={{ project.name_with_quotes_if_necessary|urlencode }}'>
+                        volunteer opportunit{{ project.get_open_bugs|pluralize:"y,ies"}}
+                        matching
+                        <strong>{{ project.name }}</strong>.
+                    </a>
+            </p>
         {% else %}
             <p>
-            No volunteer opportunities in {{project.name}} indexed here yet. 
-            <a href='/wiki/Bug_trackers'>
-                To add a bug tracker, 
-                visit our wiki</a>.
+                No volunteer opportunities in {{project.name}} indexed here yet. 
+                <a href='/wiki/Bug_trackers'>
+                    To add a bug tracker, 
+                    visit our wiki</a>.
 
-        </p>
+            </p>
     {% endif %}
   
   {% with mentors as mentors %}
@@ -281,24 +288,13 @@ about how you can help {{ project.name }}
   {% endwith %}
   {% endif %}
 
+  You can <a id='show_copypastebox' href='#'>embed the "I want to help" button</a> on your website. (<a href='/blog/2010/let-people-help-your-project-give-them-a-button-to-click/'>More about this</a>.)
+  <div id='copypastebox'>
+      <textarea style='font-size: .8em; font-family: monospace;'>{{ button_as_widget_source }}</textarea>
+  </div>
+
     </div>
 </div><!-- /.module #bugs -->
-
-<div class='module' id='have_your_own_site'>
-    <div class='head'>
-        <h3>Have your own website?</h3>
-    </div>
-    <div class='body'>
-            <ul>
-                <li>
-                <a id='show_copypastebox' href='#'>Get a version of the big green button for your website</a>
-		<div id='copypastebox'>
-		<textarea>{{ button_as_widget_source }}</textarea>
-		</div>
-                </li>
-            </ul>
-    </div>
-</div>
 
 {% endblock main %}
 
