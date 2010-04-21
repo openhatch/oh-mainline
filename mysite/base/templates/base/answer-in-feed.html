@@ -2,9 +2,9 @@
 {% load base_extras %}
 {% load profile_extras %}
 
-{% cache 86400 recent_activity_feed answer.pk %}
+{% cache 86400 recent_activity_answer answer.pk %}
                     <li style='font-size: .9em; float: left; width: 100%; margin-bottom: 15px;'>
-		      {% if answer.author %}
+		                {% if answer.author %}
                         <a href='{{ answer.author.get_profile.profile_url }}'>
                             <img style='width: 30px; float: left; margin-right: 10px;' src={% version answer.author.get_profile.get_photo_thumbnail_30px_wide_url_or_default %} />
                         </a>
@@ -12,7 +12,7 @@
                             <img style='width: 30px; float: left; margin-right: 10px;' src={% version '/static/images/profile-photos/penguin-30px.png' %} >
                         {% endif %}
                         <div style='float: left; width: 80%;'>
-                            <div style='float: left; width: 100%;'>
+                            <span>
                               {% with answer.author as user %}
                               <strong>
                                 {% spaceless %}
@@ -23,7 +23,7 @@
                               </strong>
                               {% endwith %}
                               added an answer to the question 
-                            </div>
+                            </span>
                             {% spaceless %}
                                 {% with answer.question as question %}
                                 {% with answer.project as project %}

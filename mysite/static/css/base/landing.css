@@ -18,3 +18,5 @@ body#landing .nudgebuttons img { float: left; margin-right: 15px; margin-bottom:
 body#landing .rabbit_hole { float: right; margin: 0; font-size: .9em; }
 
 body#landing #right .body {width: 94%;}
+body#landing #right ul li { margin-bottom: 15px; }
+body#landing #recent_activity_feed ul li:last-child { margin-bottom: 0; }
