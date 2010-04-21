@@ -4,41 +4,10 @@
     Edit your info
 {% endblock %}
 {% block body_id %}edit_profile_info_form{% endblock %}
+{% block body_class %}{{ block.super }} nice_form{% endblock %}
 
 {% block content %}
     <style type='text/css'>
-        .fat {
-            width: 436px !important;
-        }
-        form  {
-            float: left;
-            width: 100%;
-        }
-        form div {
-            float: left;
-            width: 90%;
-            margin-bottom: 20px;
-        }
-        h4 {
-            width: 90%;
-        }
-        .skinny {
-            background: none;
-            border: 0;
-        }
-        blockquote {
-            margin: .5em 20px;
-        }
-        label { float: left; margin: 0; padding: 0; width: 100%; font-size: 10pt; }
-        textarea { height: 2.5em; }
-        input[type="text"], textarea {
-            width: 100%;
-        }
-        p.example { color: #888; font-size: 8pt; }
-        p.why { color: #555; font-size: 10pt; margin-bottom: 0;}
-        #edit_info { margin: 0 230px; width: 500px; }
-        #edit_info .head { width: 500px; }
-        #edit_info .body { width: 460px; }
     </style>
     <div id='edit_info' class='module'>
         <div class='head'>

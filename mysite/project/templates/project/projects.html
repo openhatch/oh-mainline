@@ -56,14 +56,12 @@ about the projects we index
                 <form method="POST"
                         name="create_project"
                         action="{% url mysite.project.views.create_project_page_do %}"
-                        style='clear: left; float: left; padding: 8px 16px;
+                        style='clear: left; float: left; padding: 8px;
                         -moz-border-radius: 8px; border-radius: 8px;
                         background-color: #ffc; '>
-                    <label style='float: left; color: #444; padding: 8px 10px 7px 0; font-size: 1.5em;'>Start a page for</label>
-                    <input type="text" name="project_name" id="project_name"
-                            style='width: 10em;'
-                            value="{{ query }}" />
-                    <input type="submit" value='Go &raquo;'>
+                    <input type='hidden' name='project_name' value='{{ query }}'>
+
+                    <input style='float: left; color: #444; padding: 8px; font-size: 1.5em;' type="submit" value='Start a page for {{ query }} &raquo;'>
                 </form>
             {% endif %}
         {% endif %}

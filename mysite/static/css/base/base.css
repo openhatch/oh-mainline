@@ -298,3 +298,20 @@ body#survey_question_suggestion_form label { margin: 6px 0 3px 0; display: block
 body#survey_question_suggestion_form form input[type="submit"]{display: block; float: none;}
 body#survey_question_suggestion_form form textarea { height: 120px; width: 600px;}
 body#survey_question_suggestion_form p { font-size: 1.3em; margin-top: 0; }
+
+
+body.nice_form .fat { width: 436px !important; }
+body.nice_form form  { float: left; width: 100%; }
+body.nice_form form div { float: left; width: 90%; margin-bottom: 15px; }
+body.nice_form form p { float: left; width: 90%; margin-bottom: 15px; }
+body.nice_form h4 { width: 90%; }
+body.nice_form .skinny { background: none; border: 0; }
+body.nice_form blockquote { margin: .5em 20px; }
+body.nice_form label { float: left; margin: 0; padding: 0; width: 100%; font-size: 10pt; }
+body.nice_form textarea { height: 2.5em; }
+body.nice_form input[type="text"], textarea { width: 100%; }
+body.nice_form .example { margin: 3px 0 0 0; color: #888; font-size: 8pt; }
+body.nice_form p.why { color: #555; font-size: 10pt; margin-bottom: 0;}
+body.nice_form .module { margin: 0 230px; width: 500px; }
+body.nice_form .module .head { width: 500px; }
+body.nice_form .module .body { width: 460px; }

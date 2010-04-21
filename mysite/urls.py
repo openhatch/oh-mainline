@@ -20,6 +20,9 @@ urlpatterns = patterns('',
         (r'^\+projects/suggest_question/',
             'mysite.project.views.suggest_question'),
 
+        (r'^\+projedit/(?P<project__name>.+)',
+            'mysite.project.views.edit_project'),
+
         (r'^\+projects/suggest_question_do/',
             'mysite.project.views.suggest_question_do'),
 

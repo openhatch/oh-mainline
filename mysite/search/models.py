@@ -84,8 +84,10 @@ class Project(OpenHatchModel):
         ret.save()
         return ret
 
-    name = models.CharField(max_length=200, unique=True)
-    language = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, unique=True,
+            help_text='<span class="example">You can correct capitalization here. To change the name of this project <em>for serious</em>, email hello@openhatch.org.</span>')
+    language = models.CharField(max_length=200,
+            verbose_name='Primary programming language')
 
     def invalidate_all_icons(self):
         self.icon_raw = None
@@ -112,7 +114,8 @@ class Project(OpenHatchModel):
     icon_raw = models.ImageField(
             upload_to=lambda a,b: Project.generate_random_icon_path(a, b),
             null=True,
-            default=None)
+            default=None,
+            verbose_name='Icon')
 
     date_icon_was_fetched_from_ohloh = models.DateTimeField(null=True, default=None)
 
@@ -243,6 +246,10 @@ class Project(OpenHatchModel):
     
     def get_url(self):
         return reverse(mysite.project.views.project,
+                kwargs={'project__name': mysite.base.unicode_sanity.quote(self.name)}) 
+
+    def get_edit_page_url(self):
+        return reverse(mysite.project.views.edit_project,
                 kwargs={'project__name': mysite.base.unicode_sanity.quote(self.name)}) 
 
     @mysite.base.decorators.cached_property

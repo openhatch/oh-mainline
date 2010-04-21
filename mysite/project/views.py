@@ -26,7 +26,7 @@ def create_project_page_do(request):
             our_project = matches[0]
         else:
             our_project, was_created = Project.objects.get_or_create(name=project_name)
-        return HttpResponseRedirect(our_project.get_url())
+        return HttpResponseRedirect(our_project.get_edit_page_url())
 
     return HttpResponseBadRequest('Bad request')
 
@@ -307,3 +307,20 @@ def nextsteps4helpers(request):
             'helpers': lucky_project.people_who_wanna_help.exclude(pk__exact=request.user.get_profile().pk)
             }
     return (request, "nextsteps4helpers.html", context) 
+
+@login_required
+def edit_project(request, project__name):
+    project = get_object_or_404(Project, name=project__name)
+
+    if request.POST or request.FILES:
+        form = mysite.project.forms.ProjectForm(request.POST, request.FILES, instance=project)
+        if form.is_valid():
+            project = form.save()
+            project.update_scaled_icons_from_self_icon()
+            return HttpResponseRedirect(project.get_url())
+    else:
+        form = mysite.project.forms.ProjectForm(instance=project)
+
+    return mysite.base.decorators.as_view(
+            request, 'edit_project.html', {'project': project, 'form': form},
+            slug=__name__)

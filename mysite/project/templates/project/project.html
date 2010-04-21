@@ -169,7 +169,7 @@ about how you can help {{ project.name }}
                     ><span class='alt-text'>
                         (logo)
                     </span></div>
-            <div style='float: left; width: {% if not project.icon_for_profile %}100%{% else %}70%{% endif %};'>
+            <div style='float: left; width: 70%;'>
                 {% if random_pfentry %}
                     <h2 style='font-size: 1.3em; font-weight: normal;'>
                         {% spaceless %}
@@ -185,10 +185,19 @@ about how you can help {{ project.name }}
                         </a>
                     </p>
                 {% else %}
-                    <h2 style='font-size: 1.3em; font-weight: normal;'>
-                        <a href=''>Add a description.</a>
-                    </h2>
+                    <div style='color: #777; font-size: .85em;'>
+                        No one has described this project yet. To describe the
+                        project, <a href='{% url mysite.profile.views.importer %}'>
+                            add it to your profile</a>.
+                    </div>
                 {% endif %}
+
+                {% if project.language %}
+                    <div style='margin-top: 10px;'>
+                        The code is mostly written in <strong>{{ project.language }}</strong>.
+                    </div>
+                {% endif %}
+
             </div>
         </div>
     </div>
