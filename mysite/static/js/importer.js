@@ -464,9 +464,14 @@ function updatePortfolio(response) {
     var conditions = PortfolioEntry.Save.stopCheckingForNewIconsWhenWeAllReturnTrue;
     var all_are_true = true;
     for (var c = 0; c < conditions.length; c++) {
-        if (!conditions[c]()) { all_are_true = false; break; }
+        if (!conditions[c](response)) { all_are_true = false; break; }
     }
-    if (all_are_true) { window.clearInterval(window.checkForNewIconsRepeatedly); }
+    if (!all_are_true) {
+        window.setTimeout(askServerForPortfolio, 1500);
+    }
+    else {
+        PortfolioEntry.Save.stopCheckingForNewIconsWhenWeAllReturnTrue = [];
+    }
 
 };
 

@@ -110,9 +110,12 @@ class GrabPythonBugs(PeriodicTask):
         p.grab()
 
 class PopulateProjectIconFromOhloh(Task):
-    def run(self, project_id, **kwargs):
-        project = Project.objects.get(id=project_id)
+    def run(self, project_id):
+        import sys
+        print >> sys.stderr, "hi" 
+        project = mysite.search.models.Project.objects.get(id=project_id)
         project.populate_icon_from_ohloh()
+        print >> sys.stderr, "ho" 
 
 class PopulateProjectLanguageFromOhloh(Task):
     def run(self, project_id, **kwargs):
