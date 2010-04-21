@@ -765,7 +765,7 @@ PortfolioEntry.Save.save = function () {
     $projectName = $pfEntry.find('input.project_name');
     if ($projectName.size() === 1) {
         if ($projectName.val() === $projectName.attr('title')) {
-            alert("Couldn't save a project: Don't forget to type a project name!");
+            alert("Couldn't save one of your projects. Did you forget to type a project name?");
             return false;
         }
     }
