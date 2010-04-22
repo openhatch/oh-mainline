@@ -13,24 +13,50 @@ Home
 
 {% block content %}
 
-    <div id='what_to_do'>
+    <div class='module' id='what_to_do'>
         
-        <h3>Get involved in free/open source software.</h3>
-            <p class='rabbit_hole'>
-                <a href='/people/'>See all <strong>&raquo;</strong></a>
-            </p>
-            <p class='rabbit_hole'>
-                <a href='/people/'>See all <strong>&raquo;</strong></a>
-            </p>
-        <ul>
-            <li><a rel='tipsy-south' title='We index easy bugs from hundreds of projects' href=''>Find something funky to work on</a></li>
-            <li><a rel='tipsy-south' title='Start a discussion about how to get involved, and make it super easy for people to indicate their interest' href=''>Recruit new contributors for your project</a></li>
-            <li><a rel='tipsy-south' title='Create a profile auto-magically using our nifty tool' href=''>Tell your free software/open source story</a></li>
-            <li><a rel='tipsy-south' title='All your friends and enemies are right here' href=''>Browse the world of FLOSS contributors</a></li>
-        </ul>
-    </div>
+        <div class='body'>
 
-<div id='right' class='column'>
+            <p style='margin-bottom: 2em; font-size: 1.8em;'>
+                <strong>OpenHatch</strong> &ndash;
+                get involved in free/open source software
+            </p>
+
+            <p class='rabbit_hole'>
+                <a href='/people/'>See all <strong>&raquo;</strong></a>
+            </p>
+            <p class='rabbit_hole'>
+                <a href='/people/'>See all <strong>&raquo;</strong></a>
+            </p>
+            <ul>
+                <li><a title='Create a profile auto-magically using our nifty tool' href=''>Tell your free software/open source story</a> <div>
+                        Be proud of everything, code or not
+                    </div></li>
+                <li>
+                    <a title='All your friends and enemies are right here' href=''>Browse the world of FLOSS contributors</a>
+                        <div>
+                            Who's in your neighborhood?
+                        </div>
+                    </li>
+                <li><a title='We index easy bugs from hundreds of projects' href=''>Find something to work on</a>
+                        <div>
+                            We have thousands of &ldquo;bitesize&rdquo; opportunities, and more
+                        </div>
+                    </li>
+                <li><a title='Start a discussion about how to get involved, and make it super easy for people to indicate their interest' href=''>Recruit for your project
+                    </a>
+                    <div>
+                        Make it easy for people to help out
+                    </div>
+                </li>
+            </ul>
+
+            <p style='display: block; margin: 2em 0 0 0; float: left; width: 100%; '>
+                OpenHatch works for projects across the Internet, no matter where they're hosted.
+            </p>
+
+        </div>
+    </div>
 
     <div class='module' id='recent_activity_feed'>
         <div class='head'>
@@ -45,7 +71,7 @@ Home
         </div>
     </div>
 
-    <div class='module' id='meta'>
+    <div class='module' id='blog_feed'>
         <div class='head'>
             <h3>
                 <a style='color: inherit;' href='/blog/'>
@@ -72,7 +98,7 @@ Home
         </div>
     </div>
 
-    {% if the_user.is_authenticated %}
+    {% if 0 and the_user.is_authenticated %}
     <div id='syndicate' class='module'>
         <div class='head'>
             <h3>Syndicate your profile</h3>

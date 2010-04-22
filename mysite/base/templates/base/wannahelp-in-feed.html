@@ -6,7 +6,7 @@
 {% with feed_item.person.user as user %}
 {% with feed_item.project as project %}
 
-{% cache 86400 recent_activity_wannahelp_v2 answer.pk %}
+{% cache 86400 recent_activity_wannahelp_v3 answer.pk %}
 <li style='font-size: .9em; float: left; width: 100%;'>
   <a href='{{ person.profile_url }}'>
     <img style='width: 30px; float: left; margin-right: 10px;' src='{{ feed_item.person.get_photo_thumbnail_30px_wide_url_or_default }}' />

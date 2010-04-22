@@ -17,15 +17,19 @@ body#landing .module > .head ul li a { font-weight: normal; }
 body#landing .nudgebuttons img { float: left; margin-right: 15px; margin-bottom: 20px; }
 body#landing .rabbit_hole { float: right; margin: 0; font-size: .9em; }
 
-body#landing #what_to_do { width: 65%; }
-body#landing #what_to_do .module { width: 100%; }
-body#landing #what_to_do .head { width: 100%; }
-body#landing #what_to_do ul { float: left; width: 100%; margin-top: 1em; }
-body#landing #what_to_do li { float: left; width: 47%; margin: 0 1em 1em 0; }
-body#landing #what_to_do a { padding: 10px; height: 2.7em; border: 4px solid #fff; font-size: 1.3em; background: url(/static/images/gray-60.png); float: left; width: 90%; margin: 0 1% 1% 0; }
+body#landing #left .module { margin-right: 2%; width: 65%; }
+body#landing #left .head { width: 100%; }
+body#landing #left .body { width: 93%; }
+body#landing #what_to_do {  }
+body#landing #what_to_do li { float: left; color: #555; width: 42%; margin-right: 8%; margin-bottom: 1em; }
+body#landing #what_to_do a { font-size: 1.4em; }
+body#landing #what_to_do li:last-child { margin-bottom: 0; }
 
 body#landing #right { width: 30%; }
 
 body#landing #right .body { padding: 3%; width: 94%; }
-body#landing #right ul li { margin-bottom: 15px; }
+body#landing #recent_activity_feed { width: 65%; }
+body#landing #recent_activity_feed ul li { margin-bottom: 15px; }
 body#landing #recent_activity_feed ul li:last-child { margin-bottom: 0; }
+
+body#landing #blog_feed { margin-left: 1%; width: 32.3%; }
