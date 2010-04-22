@@ -20,10 +20,11 @@ body#landing .rabbit_hole { float: right; margin: 0; font-size: .9em; }
 body#landing #left .module { margin-right: 2%; width: 65%; }
 body#landing #left .head { width: 100%; }
 body#landing #left .body { width: 93%; }
-body#landing #what_to_do {  }
+body#landing #what_to_do img { float: left; margin-right: 1em; }
 body#landing #what_to_do li { float: left; color: #555; width: 42%; margin-right: 8%; margin-bottom: 1em; }
-body#landing #what_to_do a { font-size: 1.4em; }
 body#landing #what_to_do li:last-child { margin-bottom: 0; }
+body#landing #what_to_do a { font-size: 1.4em; line-height: 1.2em; display: block; margin-bottom: .3em; }
+body#landing #what_to_do li div { width: 60%; float: left; }
 
 body#landing #right { width: 30%; }
 
