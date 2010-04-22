@@ -159,3 +159,14 @@ def save_portfolio_entry_ordering_do(request):
         pfe.save()
     return HttpResponse('1')
 
+@view
+def landing_for_opp_hunters(request):
+    return (request, 'landing_for_opp_hunters.html', {})
+
+@view
+def landing_for_project_maintainers(request):
+    return (request, 'landing_for_project_maintainers.html', {})
+
+@view
+def landing_for_documenters(request):
+    return (request, 'landing_for_documenters.html', {})

@@ -50,9 +50,12 @@ urlpatterns = patterns('',
         # Invitation-related URLs
         (r'^invitation/', include('invitation.urls')),
 
-        # FIXME: Automatically remove trailing slashes from input URLs,
-        # and remove trailing slashes from the urls below.
         (r'^$', 'mysite.base.views.home'),
+
+        (r'^\+landing/import$', 'mysite.base.views.landing_for_documenters'),
+        (r'^\+landing/opps$', 'mysite.base.views.landing_for_opp_hunters'),
+        (r'^\+landing/projects$', 'mysite.base.views.landing_for_project_maintainers'),
+
         (r'^search/$', 'mysite.search.views.fetch_bugs'),
         (r'^admin/(.*)', admin.site.root),
         (r'^static/(?P<path>.*)$', 'django.views.static.serve',
@@ -125,7 +128,7 @@ urlpatterns = patterns('',
         url(r'\^do/profile.views.set_pfentries_dot_use_my_description_do',
                 'mysite.profile.views.set_pfentries_dot_use_my_description_do'),
 
-        (r'^account/signup/?$',
+        (r'^account/signup/$',
            'mysite.account.views.signup'),
 
         (r'^account/settings/$',
@@ -254,10 +257,10 @@ urlpatterns = patterns('',
 
         (r'^edit/name$', lambda x: redirect(to=mysite.account.views.edit_name, permanent=True)),
 
-        (r'^\+v/nextsteps4helpers/?$', 'mysite.project.views.nextsteps4helpers'),
+        (r'^\+v/nextsteps4helpers/$', 'mysite.project.views.nextsteps4helpers'),
         
         # This dangerous regex is last
-        (r'^people/(?P<user_to_display__username>[^/]+)[/?]$',
+        (r'^people/(?P<user_to_display__username>[^/]+)/$',
                 'mysite.profile.views.display_person_web'),
 
         )
