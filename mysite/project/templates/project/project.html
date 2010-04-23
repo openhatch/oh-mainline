@@ -253,8 +253,8 @@ about how you can help {{ project.name }}
         </style>
         {% if project.get_open_bugs %}
             <p>
-                Browse {{ project.get_open_bugs|length }}+
-                    <a href='/search/?q={{ project.name_with_quotes_if_necessary|urlencode }}'>
+                Browse {{ project.get_open_bugs|length }}
+                    <a href='/search/?project={{ project.name_with_quotes_if_necessary|urlencode }}'>
                         volunteer opportunit{{ project.get_open_bugs|pluralize:"y,ies"}}
                         matching
                         <strong>{{ project.name }}</strong>.
