@@ -1,0 +1,30 @@
+{% load cache %}
+{% load base_extras %}
+{% load profile_extras %}
+
+    <div class='module' id='blog_feed'>
+        <div class='head'>
+            <h3>
+                <a style='color: inherit;' href='/blog/'>
+                    OpenHatch news
+                </a>
+            </h3> 
+            <a class='blog-feed' title='RSS feed' href='/blog/feed/'>
+                <span class='alt-text'>RSS feed</span>
+            </a>
+        </div>
+        <div class='body'>
+            <ul>
+                {% for entry in entries %}
+                <li>
+                    <a style='font-weight: bold; line-height: 110%;' href="{{ entry.link }}">{{ entry.title }}</a>
+                <div class='byline'>by {{ entry.author }} &bull; {{ entry.published_parsed|timesince_terse }} ago</div>
+                <div class="entry">
+                    {{ entry.unicode_text|truncatewords:15 }}
+                </div>
+                </li>
+                {% endfor %}
+            </ul>
+            <a style='float: right;' href='/blog/'>Get the whole blog &raquo;</a>
+        </div>
+    </div>
