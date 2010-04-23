@@ -73,45 +73,9 @@ Home
         </div>
     </div>
 
-    <div class='module' id='recent_activity_feed'>
-        <div class='head'>
-            <h3>Recent activity</h3>
-        </div>
-        <div class='body'>
-            <ul>
-                {% for answer in recent_feed_items %}
-                {% include answer.template_for_feed %}
-                {% endfor %}
-            </ul>
-        </div>
-    </div>
+    {% include 'feed_widget.html' %}
 
-    <div class='module' id='blog_feed'>
-        <div class='head'>
-            <h3>
-                <a style='color: inherit;' href='/blog/'>
-                    OpenHatch news
-                </a>
-            </h3> 
-            <a class='blog-feed' title='RSS feed' href='/blog/feed/'>
-                <span class='alt-text'>RSS feed</span>
-            </a>
-        </div>
-        <div class='body'>
-            <ul>
-                {% for entry in entries %}
-                <li>
-                    <a style='font-weight: bold; line-height: 110%;' href="{{ entry.link }}">{{ entry.title }}</a>
-                <div class='byline'>by {{ entry.author }} &bull; {{ entry.published_parsed|timesince_terse }} ago</div>
-                <div class="entry">
-                    {{ entry.unicode_text|truncatewords:15 }}
-                </div>
-                </li>
-                {% endfor %}
-            </ul>
-            <a style='float: right;' href='/blog/'>Get the whole blog &raquo;</a>
-        </div>
-    </div>
+    {% include 'blog_widget.html' %}
 
     {% if 0 and the_user.is_authenticated %}
     <div id='syndicate' class='module'>

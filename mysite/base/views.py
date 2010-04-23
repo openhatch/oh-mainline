@@ -25,11 +25,18 @@ import random
 
 from django.contrib.auth.decorators import login_required
 
-@view
-def home(request):
-
+def front_page_data():
     data = {}
     data['entries'] = mysite.customs.feed.cached_blog_entries()[:1]
+    feed_items = list(mysite.search.models.Answer.objects.order_by('-modified_date')[:5])
+    feed_items.extend(mysite.search.models.WannaHelperNote.objects.order_by('-modified_date')[:5])
+    feed_items.sort(key=lambda x: x.modified_date, reverse=True)
+    data['recent_feed_items'] = feed_items[:5]
+    return data
+
+@view
+def home(request):
+    data = front_page_data()
 
     recommended_bugs = []
     if request.user.is_authenticated():
@@ -43,13 +50,6 @@ def home(request):
     everybody = list(mysite.profile.models.Person.objects.exclude(link_person_tag=None))
     random.shuffle(everybody)
     data['random_profiles'] = everybody[0:5]
-
-    feed_items = list(mysite.search.models.Answer.objects.order_by('-modified_date')[:5])
-    feed_items.extend(mysite.search.models.WannaHelperNote.objects.order_by('-modified_date')[:5])
-    feed_items.sort(key=lambda x: x.modified_date, reverse=True)
-    data['recent_feed_items'] = feed_items[:5]
-    
-    
 
     #get globally recommended bug search stuff (for anonymous users)
     if request.user.is_authenticated():
@@ -161,12 +161,15 @@ def save_portfolio_entry_ordering_do(request):
 
 @view
 def landing_for_opp_hunters(request):
-    return (request, 'landing_for_opp_hunters.html', {})
+    return (request, 'landing_for_opp_hunters.html',
+            front_page_data())
 
 @view
 def landing_for_project_maintainers(request):
-    return (request, 'landing_for_project_maintainers.html', {})
+    return (request, 'landing_for_project_maintainers.html',
+            front_page_data())
 
 @view
 def landing_for_documenters(request):
-    return (request, 'landing_for_documenters.html', {})
+    return (request, 'landing_for_documenters.html',
+            front_page_data())

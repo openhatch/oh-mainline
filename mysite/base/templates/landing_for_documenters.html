@@ -1,16 +1,17 @@
 {% extends 'audience_specific_landing_page.html' %}
 
+{% block title %}Document your open source contributions{% endblock title %}
+
 {% block body_id %}#landing_for_documenters{% endblock body_id %}
 
 {% block main %}
-    <div class='module'>
-        <div class='head'>
-            <h3>Documenting your open source contributions with OpenHatch</h3>
+    <div class='module' style="width: 60%; float: left;">
+        <div class='head' style="width: auto;">
+            <h3>Document your open source contributions at OpenHatch</h3>
         </div>
-        <div class='body'>
+        <div class='body' style="width: auto;">
 
-            <h4><a href='{% url mysite.profile.views.importer %}'>
-                    Automagically import your contributions from other networks</a></h4>
+            <h4>Automagically import your contributions from other networks</h4>
 
             <p>Your OpenHatch profile is where you can write about your
                 involvement in free/open source projects. People contribute in
@@ -37,7 +38,7 @@
                 portfolio of your free software work so you can put it on your
                 resume.</p>
 
-            <h4><a href=''>Grab your widget</a></h4>
+            <h4>Grab your widget</h4>
 
             <p>When your profile is ready, you can embed your OpenHatch profile
                 on your own web things. You'll find a widget waiting in your
@@ -52,4 +53,14 @@
 
         </div>
     </div>
+<div class='right_side'>
+<div class='module' style="margin-bottom: 6em; text-align: right;">
+  <div class='body'>
+    <span style="font-size: 3em;">
+      <a href="{% url mysite.profile.views.importer %}">Get started →</a></span>
+  </div>
+</div>
+{% include 'blog_widget.html' %}
+{% include 'base/feed_widget.html' %}
+</div>
 {% endblock main %}
