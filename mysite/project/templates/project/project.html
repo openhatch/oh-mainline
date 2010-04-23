@@ -252,12 +252,12 @@ about how you can help {{ project.name }}
             #bugs p { margin-top: 0; }
         </style>
         {% if project.get_open_bugs %}
-            <p>
-                Browse {{ project.get_open_bugs|length }}
+            <p style='font-size: 1.1em;'>
                     <a href='/search/?project={{ project.name_with_quotes_if_necessary|urlencode }}'>
-                        volunteer opportunit{{ project.get_open_bugs|pluralize:"y,ies"}}
-                        matching
-                        <strong>{{ project.name }}</strong>.
+                        <strong>
+                            Volunteer opportunit{{ project.get_open_bugs|pluralize:"y,ies"}}
+                        </strong>
+                        matching {{ project.name }} ({{ project.get_open_bugs|length }})
                     </a>
             </p>
         {% else %}
