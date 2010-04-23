@@ -8,7 +8,48 @@
             <h3>Documenting your open source contributions with OpenHatch</h3>
         </div>
         <div class='body'>
-            (content here)
+
+            <h4><a href='{% url mysite.profile.views.importer %}'>
+                    Automagically import your contributions from other networks</a></h4>
+
+            <p>Your OpenHatch profile is where you can write about your
+                involvement in free/open source projects. People contribute in
+                lots of ways: code, documentation, translations, bug reports,
+                packaging, and more.</p>
+
+            <p>The profile editor contains an importer to pull in what we can
+                find via other websites. When you search for yourself, we
+                examine project hosting sites and source code repositories.
+                {% comment %}(You can see the current list of supported profile import
+                    sites </wiki/something>.) {% endcomment %}
+                The profile we put together
+                combines the trails you've left behind on other websites.</p>
+
+            <h4>Add what we missed</h4>
+
+            <p>The OpenHatch importer can't find the patches you submit to
+                mailing lists or the work you did organizing a documentation
+                sprint. Since we can't always detect all your contributions,
+                the profile editor lets you click to add a project.</p>
+
+            <p>Your OpenHatch profile serves as a reminder to yourself of all
+                the cool things you've done. It's also smart to maintain a
+                portfolio of your free software work so you can put it on your
+                resume.</p>
+
+            <h4><a href=''>Grab your widget</a></h4>
+
+            <p>When your profile is ready, you can embed your OpenHatch profile
+                on your own web things. You'll find a widget waiting in your
+                personal settings.</p>
+
+            <h4>Your project description defines the project</h4>
+
+            <p>When you add a project to your profile, you appear on that
+                project's page on OpenHatch. On that page, we take a random
+                contributor's description of the project to give a voice to all
+                the people involved.</p>
+
         </div>
     </div>
 {% endblock main %}

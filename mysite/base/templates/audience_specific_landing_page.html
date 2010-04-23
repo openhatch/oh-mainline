@@ -1,3 +1,10 @@
 {% extends 'base/one_column.html' %}
 
 {% block body_class %}{{ block.super }} landing_page{% endblock %}
+
+{% block css %}
+{{ block.super }}
+h4 { font-size: 1.3em; font-weight: normal; margin: .8em 0; width: 100%; }
+h4:first-child { margin-top: 0; }
+p { font-size: 1.1em; line-height: 1.3em; }
+{% endblock css %}

@@ -1,6 +1,9 @@
 {% extends 'audience_specific_landing_page.html' %}
 
+{% block title %}{{ block.super }} Finding something to do{% endblock title %}
+
 {% block body_id %}#landing_for_opp_hunters{% endblock body_id %}
+
 
 {% block main %}
     <div class='module'>
@@ -8,7 +11,35 @@
             <h3>Finding something to do</h3>
         </div>
         <div class='body'>
-            (opp hunting content here)
+
+<p>So, you want to help open source? Cool!</p>
+
+<h4>You can browse volunteer opportunities</h4>
+
+<p>Open source projects need help coding. We index bug trackers in open source projects and categorize issues by project, programming language, the kind of help needed, and how tough the bug is (<a id='how_do_we_know' href='#'>how do we know?</a>). Do you know Python and want to dive into coding? Would you like to help write documentation? You can browse for an opportunity matching your interests.</p>
+
+<h4>Project pages list more opportunities</h4>
+
+<p>Many projects have written on their OpenHatch project pages about ways you can get involved. Projects often need people to test new releases or write news for users. Some list opportunities totally outside of coding; if you know sign language, check out <a href='/+projects/Gally'>Gally</a>!</p>
+
+<p>You can look for your favorite project from our <a href='{% url mysite.project.views.projects %}'>project search page</a>.</p>
+
+<h4>Don't see a way you can help? Just click a button to express interest</h4>
+
+<p>On OpenHatch project pages, you can tell the current contributors that you want to help. You're welcome to click even if you don't know exactly what you would do for the project. If you do that, be sure to write about your skills and background on your profile.</p>
+
+<p>When the maintainer next looks at the project page, he/she will see your smiling face and the skills you can pitch in with. Keep a lookout for an email from a contributor! Note that some projects maintainers might be slow to reach out to you.</p>
         </div>
     </div>
 {% endblock main %}
+
+{% block js %}
+<script type='text/javascript'>
+    $(function () {
+        $('#how_do_we_know').click(function () {
+            alert('Contributors to projects mark bugs as "easy", "bitesized", or "junior_jobs". We group all of those under the "bitesize" label in the volunteer opportunity finder.');
+            return false;
+        });
+    });
+</script>
+{% endblock js %}
