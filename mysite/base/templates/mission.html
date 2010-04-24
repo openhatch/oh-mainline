@@ -1,0 +1,166 @@
+{% extends 'base/two_columns_fat_skinny.html' %}
+{% load cache %}
+{% load base_extras %}
+
+{% block title %}
+    Missions - Task Challenge
+{% endblock title %}
+
+{% block body_id %}mission{% endblock body_id %}
+
+{% block pagetop %}
+    <h3 class='supertitle'><a href='{% url mysite.base.views.missions %}'>Missions</a></h3>
+    <h1 style='float: left; width: 100%; margin-top: 10px;'>Task Challenge</h1>
+{% endblock %}
+
+{% block main %}
+
+    <div id='mission_module' class='module'>
+        <div class='head'>
+            <h3> Steps </h3>
+        </div>
+        <div class='body' style='font-size: 1.2em;'>
+            <form method='POST' action='{% url mysite.base.views.start_solo_bug_jam_mission_do %}'>
+                <ol>
+                    <li>
+                        <p>Think of something you want done.</p>
+                        <p>Think of someone who's up to it.</p>
+			<p>Make it a challenge!</p>
+                        <ul class='raquo_bullets'>
+                            <li>Look up the online bug tracker of your
+                                favorite project, and enter the URL of
+                                a good-looking bug here:
+                                <input rel='hint' name='bug_url' type='text' title='Paste a bug URL here' style='width: 300px; float: none; margin-top: 3px; display: block;'/>
+                            </li>
+                        </ul>
+                    </li>
+                    <li>
+                        Choose how soon you think you can do it:
+                        <input name='deadline' style='float: none; margin-top: 3px; display: block;' type='text'>
+                        (^^ date widget)
+                        <br/>
+                        <small>(You'll get a profile badge if you submit a patch for this bug on time.)</small> 
+                    </li>
+                </ol>
+                <div style='width: 100%; text-align: center;'>
+                    <input type='submit' value='Start this mission &raquo;' style='text-align: center; float: none; margin-top: 10px; padding: 6px 10px; font: 1.3em sans-serif; -moz-border-radius: 8px; border-radius: 8px; cursor: pointer; cursor: hand; ' />
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class='module'>
+        <div class='head'>
+            <h3>Missions started (34)</h3>
+        </div>
+        <div class='body'>
+            <div id='tabbed_container_of_missions'>
+                <ul class='tab_nav'>
+                    <li><a href='#ongoing'>Ongoing missions (3)</a></li>
+                    <li>&middot;</li>
+                    <li><a href='#completed'>Completed missions (31)</a></li>
+                </ul>
+                <div class='tab' id='ongoing'>
+                    <ul id='people-list'>
+                        {% for person in currently_pursuing %}
+
+                            <li style='margin-bottom: 1.8em;'>
+                                {% with person.get_photo_thumbnail_url_or_default as thumbnail_url %}
+                                <img src="{{ thumbnail_url }}"
+                                        {% cache 864000 person_summary_image_dimensions thumbnail_url %}
+                                        width='{{ person.get_photo_thumbnail_width }}'
+                                        height='{{ person.get_photo_thumbnail_height }}'
+                                    {% endcache %}
+                                />
+                                {% endwith %}
+                                <span class="people-view-info" style='overflow-x: inherit; width: 90%;'>
+
+                                    <span class="name">
+                                        {% if person.user.first_name or person.user.last_name %}
+                                            {{ person.user.first_name }} {{ person.user.last_name }}
+                                        {% else %}
+                                            {{ person.user.username }}
+                                        {% endif %}
+
+                                        {% if person.user.first_name and person.user.last_name %}
+                                            <span class='username'>
+                                                {{ person.user.username }}
+                                            </span>
+                                        {% endif %}
+                                    </span>
+
+                                    <span class='missionary_summary_body'>
+                                        is working on the bug 
+                                        &ldquo;<a href=''>{% random_bug_title %}</a>&rdquo;
+                                        &middot;
+                                        started 2 days ago 
+                                    </span>
+                                    <div class='comments' style='margin-top: 10px; margin-left: 20px;'>
+                                        &raquo; <a href=''>{% random_number %} comments</a>
+                                    </div>
+                                </span>
+
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div class='tab' id='completed'>
+                    <ul id='people-list'>
+                        {% for person in successfully_completed %}
+                            <li style='margin-bottom: 1.8em;'>
+                                {% with person.get_photo_thumbnail_url_or_default as thumbnail_url %}
+                                <img src="{{ thumbnail_url }}"
+                                    {% cache 864000 person_summary_image_dimensions thumbnail_url %}
+                                        width='{{ person.get_photo_thumbnail_width }}'
+                                        height='{{ person.get_photo_thumbnail_height }}'
+                                    {% endcache %}
+                                />
+                                {% endwith %}
+                                <span class="people-view-info"
+                                        style='overflow-x: inherit; width: 90%;'>
+                                    <span class="name">
+                                        {% if person.user.first_name or person.user.last_name %}
+                                            {{ person.user.first_name }} {{ person.user.last_name }}
+                                        {% else %}
+                                            {{ person.user.username }}
+                                        {% endif %}
+
+                                        {% if person.user.first_name and person.user.last_name %}
+                                            <span class='username'>
+                                                {{ person.user.username }}
+                                            </span>
+                                        {% endif %}
+                                    </span>
+
+                                    <span class='missionary_summary_body'>
+                                        closed the bug
+                                        &ldquo;<a href=''>{% random_bug_title %}</a>&rdquo;
+                                        &middot;
+                                        2 days ago 
+                                    </span>
+                                    <div class='comments'
+                                            style='margin-top: 10px; margin-left: 20px;'>
+                                        &raquo; <a href=''>{% random_number %} comments</a>
+                                    </div>
+                                </span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div> <!-- /.body -->
+    </div> <!-- /.module -->
+
+{% endblock main %}
+
+{% block right %}
+
+
+{% endblock right %}
+
+{% block js %}
+    {{ block.super }}
+    <script type='text/javascript'>
+        $('#tabbed_container_of_missions').tabs();
+    </script>
+{% endblock %}

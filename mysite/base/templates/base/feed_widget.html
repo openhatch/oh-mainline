@@ -1,0 +1,12 @@
+    <div class='module' id='recent_activity_feed'>
+        <div class='head'>
+            <h3>Recent activity</h3>
+        </div>
+        <div class='body'>
+            <ul>
+                {% for answer in recent_feed_items %}
+                {% include answer.template_for_feed %}
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
