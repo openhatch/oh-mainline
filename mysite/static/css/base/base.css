@@ -340,4 +340,4 @@ body.landing_page .accordion div { display: none; border-bottom: 1px dashed #ccc
 body.landing_page h4 { cursor: hand; cursor: pointer; float: none; padding: .8em 0; margin-bottom: 0; border-bottom: 1px dashed #ccc; }
 
 body.landing_page .note-wrapper { background-image: url(/static/images/downarrow-yellow.png); background-repeat: no-repeat; background-position: bottom center; padding-bottom: 10px; }
-body.landing_page .note { font-size: .95em; -moz-border-radius: 8px; border-radius: 8px; background-color: #ffa; margin: 0 10px; padding: 8px; }
+body.landing_page .note { text-shadow: 0 1px 0 #fff; font-size: 1.2em; text-align: center; -moz-border-radius: 8px; border-radius: 8px; background-color: #ffa; margin: 0 30px; padding: 8px 60px; }
