@@ -9,54 +9,71 @@
         <div class='head'>
             <h3>Document your open source contributions at OpenHatch</h3>
         </div>
-        <div class='body accordion'>
+        <div class='body'>
 
-            <h4>Automagically import your contributions from other networks</h4>
-
-            <div>
-                <p>Your OpenHatch profile is where you can write about your
-                involvement in free/open source projects. People contribute in
-                lots of ways: code, documentation, translations, bug reports,
-                packaging, and more.</p>
-
-                <p>The profile editor contains an importer to pull in what we can
-                find via other websites. When you search for yourself, we
-                examine project hosting sites and source code repositories.
-                {% comment %}(You can see the current list of supported profile import
-                sites </wiki/something>.) {% endcomment %}
-                The profile we put together
-                combines the trails you've left behind on other websites.</p>
+            <div class='note-wrapper'>
+                <p class='note'>
+                This page explains how you can use OpenHatch to automatically
+                document your contributions.
+                </p>
             </div>
 
-            <h4>Add what we missed</h4>
+            <div class='accordion'>
 
-            <div>
-                <p>The OpenHatch importer can't find the patches you submit to
-                mailing lists or the work you did organizing a documentation
-                sprint. Since we can't always detect all your contributions,
-                the profile editor lets you click to add a project.</p>
+                <h4>Automagically import your contributions
+                    from other networks</h4>
 
-                <p>Your OpenHatch profile serves as a reminder to yourself of all
-                the cool things you've done. It's also smart to maintain a
-                portfolio of your free software work so you can put it on your
-                resume.</p>
-            </div>
+                <div>
+                    <p>Your OpenHatch profile is where you can write about your
+                    involvement in free/open source projects. People contribute in
+                    lots of ways: code, documentation, translations, bug reports,
+                    packaging, and more.</p>
 
-            <h4>Grab your widget</h4>
+                    <p>The profile editor contains an importer to pull in what
+                    we can find via other websites. When you search for
+                    yourself, we examine project hosting sites and source code
+                    repositories.
+                    
+                    {% comment %}(You can see the current list
+                    of supported profile import sites </wiki/something>.)
+                    {% endcomment %}
+                    
+                    The profile we put together combines the
+                    trails you've left behind on other websites.</p>
+                </div>
 
-            <div>
-                <p>When your profile is ready, you can embed your OpenHatch
-                profile on your own web things. You'll find a widget waiting in
-                your personal settings.</p>
-            </div>
+                <h4>Add what we missed</h4>
 
-            <h4>Your project description defines the project</h4>
+                <div>
+                    <p>The OpenHatch importer can't find the patches you submitted
+                    to a mailing list, the work you did organizing a documentation
+                    sprint, and other kinds of non-committer contributions. In the
+                    profile editor, you can add projects and URLs that the importer
+                    didn't discovered automatically.</p>
 
-            <div>
-                <p>When you add a project to your profile, you appear on that
-                project's page on OpenHatch. On that page, we take a random
-                contributor's description of the project to give a voice to all
-                the people involved.</p>
+                    <p>Your OpenHatch profile serves as a reminder to yourself of all
+                    the cool things you've done. It's also smart to maintain a
+                    portfolio of your free software work so you can put it on your
+                    resume.</p>
+                </div>
+
+                <h4>Grab your widget</h4>
+
+                <div>
+                    <p>When your profile is ready, you can embed your OpenHatch
+                    profile on your own web things. You'll find a widget waiting in
+                    your personal settings.</p>
+                </div>
+
+                <h4>There is no canonical project description</h4>
+
+                <div>
+                    <p>When you add a project to your profile, you appear on that
+                    project's page on OpenHatch. On that page, we take a random
+                    contributor's description of the project to give a voice to all
+                    the people involved.</p>
+                </div>
+
             </div>
 
         </div>
@@ -75,22 +92,6 @@
     {% include 'base/feed_widget.html' %}
 
 {% endblock left %}
-
-{% block css %}
-{{ block.super }}
-body.two_columns #main { width: 60%; margin-right: 2%; }
-body.two_columns #main .module > .head { width: 96%; }
-body.two_columns #main .module > .body { width: 93%; }
-
-/* It's called #left, but it actually appears on the right. */
-body.two_columns #left { width: 35%; }
-body.two_columns #left .module { width: 100%; }
-body.two_columns #left .module > .head { width: 88%; }
-body.two_columns #left .module > .body { width: 88%; }
-
-.accordion div { display: none; border-bottom: 1px dashek #ccc; }
-h4 { cursor: hand; cursor: pointer; float: none; padding: .8em 0; margin-bottom: 0; border-bottom: 1px dashed #ccc;j}
-{% endblock css %}
 
 {% block js %}
 <script type='text/javascript'>

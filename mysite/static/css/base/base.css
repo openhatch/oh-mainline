@@ -325,3 +325,19 @@ body.nice_form .module .head { width: 500px; }
 body.nice_form .module .body { width: 460px; }
 
 .ui-tabs .ui-tabs-hide { display: none !important; }
+
+body.landing_page.two_columns #main { width: 60%; margin-right: 2%; }
+body.landing_page.two_columns #main .module > .head { width: 96%; }
+body.landing_page.two_columns #main .module > .body { width: 93%; }
+
+/* Sorry about this: It's called #left, but it actually appears on the right. */
+body.landing_page.two_columns #left { width: 35%; }
+body.landing_page.two_columns #left .module { width: 100%; }
+body.landing_page.two_columns #left .module > .head { width: 88%; }
+body.landing_page.two_columns #left .module > .body { width: 88%; }
+
+body.landing_page .accordion div { display: none; border-bottom: 1px dashed #ccc; }
+body.landing_page h4 { cursor: hand; cursor: pointer; float: none; padding: .8em 0; margin-bottom: 0; border-bottom: 1px dashed #ccc; }
+
+body.landing_page .note-wrapper { background-image: url(/static/images/downarrow-yellow.png); background-repeat: no-repeat; background-position: bottom center; padding-bottom: 10px; }
+body.landing_page .note { font-size: .95em; -moz-border-radius: 8px; border-radius: 8px; background-color: #ffa; margin: 0 10px; padding: 8px; }
