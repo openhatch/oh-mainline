@@ -29,7 +29,7 @@ class UserCreationFormWithEmail(django.contrib.auth.forms.UserCreationForm):
         custom_error_messages = {}
         custom_error_messages_dict = {
                 "A user with that username already exists.": "Oops, we've already got a user in our database with that username. Pick another one!",
-                "A user with that email already exists.": "We've already got a user in our database with that email address. Have you signed up before? (We'll have a password reset thinger shortly.)",
+                "A user with that email already exists.": "We've already got a user in our database with that email address. Have you signed up before?",
                 }
 
         for fieldname in self.errors:
