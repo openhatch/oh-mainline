@@ -857,7 +857,6 @@ bindEventHandlers = function() {
     $('.citations-wrapper .add').click(drawAddCitationFormNearThisButton);
     FlagIcon.bindEventHandlers();
     PortfolioEntry.bindEventHandlers();
-    Citation.bindEventHandlers();
 };
 $(bindEventHandlers);
 
@@ -1135,8 +1134,12 @@ SaveAllButton.saveAll = function() {
 
 AutoSaucepan = {
     'init': function () {
+        // This query string prefix triggers the automatic saucepan
+        qs_pref = /^\?add_project_name=/;
+        if (location.search.match(qs_pref) === null) return;
+
         // Check in the query string if there is anything
-        var project_name = decodeURIComponent(location.search.replace('?add_project_name=',''));
+        var project_name = decodeURIComponent(location.search.replace(qs_pref,''));
 
         if (project_name) {
             // If so, simulate a click

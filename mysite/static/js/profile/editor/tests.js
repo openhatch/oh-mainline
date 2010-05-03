@@ -532,32 +532,6 @@ testDeletePortfolioEntry = function(params) {
 
 $(testDeletePortfolioEntry);
 
-testCitationHowTo = function() {
-    var prefix = "citation howto: ";
-    $('#portfolio_entries *').remove();
-    askServerForPortfolio();
-    $howtos = $('#portfolio_entries .citations-wrapper .howto');
-    tester.ok($howtos.size() > 0, prefix + "Some howtos appear on the page.");
-
-    $firstHowtoHideLink = $howtos.eq(0).find('a.hide_me');
-    tester.ok($firstHowtoHideLink.size() == 1, prefix + "there is at least one howto hide link.");
-    $firstHowtoHideLink.trigger('click');
-
-    tester.ok($howtos.filter(':visible').size() == 0, prefix + "No howtos are visible after hide link clicked");
-    for (var i = 0; i < $howtos.size(); i++) {
-        $howto = $howtos.eq(i);
-        console.info($howto);
-        $showMeLink = $howto.closest('.citations-wrapper').find('a.show_howto:visible').assertOne('hidden show_howto link for this howto');
-        console.info("showMeLink", $showMeLink);
-        $showMeLink.trigger('click');
-        tester.ok($howto.is(':visible'), prefix + "how to is visible after showme clicked.");
-        tester.ok($showMeLink.is(':hidden'), prefix + "show me link is hidden after being clicked.");
-        console.log("howtos size", $howtos.size());
-    }
-
-};
-$(testCitationHowTo);
-
 testImporterInputs = function() {
     var prefix = "importer inputs: ";
     $inputs = $('#importer input:text').assertN(2);

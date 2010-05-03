@@ -824,7 +824,7 @@ def importer(request, test_js = False):
     data['citation_form'] = mysite.profile.forms.ManuallyAddACitationForm(auto_id=False)
 
     # This variable is checked in base/templates/base/base.html
-    data['test_js'] = test_js
+    data['test_js'] = test_js or request.GET.get('test', None)
 
     return (request, 'profile/importer.html', data)
     # }}}
