@@ -11,7 +11,7 @@
     </strong>
     how
     {% firstof person.user.first_name person.user.username %}
-    is involved in FOSS.
+    is involved in <abbr title='that is, Free/Libre and Open Source Software'>FLOSS</abbr>
 {% endblock %}
 
 {% block pagetop %}
@@ -121,8 +121,9 @@
             h4 { padding: 0;}
         </style>
 
-        {% if not editable and not person.bio and not person.homepage_url and not tags_flat %}
-        {# When someone else's info box is empty #}
+        {% if projects_i_wanna_help or editable or person.bio or person.homepage_url or tags_flat %}
+        {% else %}
+        {# When the info box is empty on this profile #}
         <small style='color: #777;'>Nothing here yet.</small>
         {% endif %}
 
