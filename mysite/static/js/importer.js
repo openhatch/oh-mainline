@@ -516,8 +516,8 @@ deleteCitation = function($citation) {
     $.ajax(ajaxOptions);
 };
 deleteCitationCallback = function (response) {
-    // No need to do anything. We already marked
-    // the citation with the css class 'deleted'.
+    // No need to do anything. We already 
+    // removed the citation element.
 };
 
 deleteCitationErrorCallback = function (request) {
@@ -847,6 +847,10 @@ PortfolioEntry.Delete.bindEventHandlers = function() {
 
 
 bindEventHandlers = function() {
+    $('a.delete_citation').hover(
+        function () { $(this).closest('.citations > li').addClass('to_be_deleted'); },
+        function () { $(this).closest('.citations > li').removeClass('to_be_deleted'); }
+    );
     $('a.delete_citation').click(deleteCitationForThisLink);
     $('.citations-wrapper .add').click(drawAddCitationFormNearThisButton);
     FlagIcon.bindEventHandlers();
