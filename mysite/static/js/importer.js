@@ -655,6 +655,8 @@ FlagIcon.bindEventHandlers = function() {
     $('.icon_flagger a').click(FlagIcon.flag);
 };
 
+// Despite the name, this is actually the Importer
+// FIXME: Rename this "Importer"
 HowTo = {
     'init': function () {
         HowTo.$element = $('#portfolio_entries .howto');
