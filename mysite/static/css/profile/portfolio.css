@@ -74,7 +74,8 @@ body#profile .portfolio_entry .experience_description-wrapper { float: left; wid
 body#profile .portfolio_entry textarea { font-size: 9pt; font-family: sans-serif; }
 body#profile .portfolio_entry .project_description-wrapper textarea { height: 40px; }
 body#profile .portfolio_entry .experience_description-wrapper textarea { height: 80px; }
-body#profile .citations > li { color: #777; float: left; list-style: circle; margin-left: 20px; margin-top: 5px; position: relative; top: 15px; width: 90%; }
+body#profile .citations > li { color: #777; float: left; list-style: circle; margin-left: 20px; margin-top: 5px; width: 90%; }
+body#profile .citations > li:first-child { margin-top: 15px; }
 body#profile .citations li .actions { float: left; width: 30px; }
 body#profile .citations li .actions a { background-position: center; background-repeat: no-repeat; float: left; height: 15px; width: 15px; }
 body#profile .citations li .actions a.delete:hover { background-color: #c9c9c9; border-radius: 4px; -moz-border-radius: 4px; }
