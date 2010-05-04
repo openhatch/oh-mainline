@@ -23,8 +23,6 @@ POSTFIX_FORWARDER_TABLE_PATH = '/etc/postfix/virtual_alias_maps'
 
 CELERY_ALWAYS_EAGER = False # srsly
 
-CARROT_BACKEND = 'amqp'
-
 ## Django search via Haystack
 HAYSTACK_SITECONF='mysite.haystack_configuration'
 HAYSTACK_SEARCH_ENGINE='solr'
