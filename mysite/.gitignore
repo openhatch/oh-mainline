@@ -25,3 +25,6 @@ static/static/photos/*
 static/piwik
 
 static/_cache
+
+# Add this to use ghettoq instead of rabbitmq 
+../use_ghettoq
