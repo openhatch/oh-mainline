@@ -5,6 +5,7 @@
 # *.[oa]
 *~
 .*.swp
+.*.swo
 *.pyc
 *.orig
 .project
