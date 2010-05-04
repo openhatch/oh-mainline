@@ -30,7 +30,6 @@ Home
             </p>
             <ul>
                 <li>
-                    <img src={% version '/static/images/base/homepage/importer-100px.png' %} />
                     <a href='{% url mysite.base.views.landing_for_documenters %}'>
                         Document your open source contributions
                     </a>
@@ -39,29 +38,27 @@ Home
                     </div>
                 </li>
                 <li>
-                    <img src={% version '/static/images/base/homepage/people.png' %} />
-                    <a href='{% url mysite.profile.views.people %}'>
-                        Browse the world of FLOSS contributors
-                    </a>
+                    <a href='{% url mysite.base.views.landing_for_opp_hunters %}'>
+                        Find something interesting to do in open source</a>
                     <div>
-                        Who's in your neighborhood?
+                        Browse thousands of opportunities
+                        &mdash; coding, writing, and more
                     </div>
                 </li>
                 <li>
-                    <img src={% version '/static/images/base/homepage/home-opps.png' %} />
-                    <a href='{% url mysite.base.views.landing_for_opp_hunters %}'>
-                        Find something to work on</a>
-                        <div>
-                            We have thousands of &ldquo;bitesize&rdquo; opportunities, and more
-                        </div>
-                    </li>
-                <li>
-                    <img src={% version '/static/images/base/homepage/recruit.png' %} />
-                    <a href='{% url mysite.base.views.landing_for_project_maintainers %}'>
-                        Recruit for your project
+                    <a href='{% url mysite.profile.views.people %}'>
+                        Find open source contributors
                     </a>
                     <div>
-                        Make it easy for people to help out
+                        Who's in your neighborhood? 
+                    </div>
+                </li>
+                <li>
+                    <a href='{% url mysite.base.views.landing_for_project_maintainers %}'>
+                        Create a contributors' page for your project
+                    </a>
+                    <div>
+                        Explain how people can get involved 
                     </div>
                 </li>
             </ul>
