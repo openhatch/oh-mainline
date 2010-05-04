@@ -19,7 +19,8 @@
                 <!--has_errors-->
                 <ul id="error_msg" class="errorlist">
                     <li>
-                        We've saved nearly all of your information, but there was an error.  Please see below.
+                        We've saved nearly all of your information, but there
+                        was an error.  Please see below.
                     </li>
                 </ul>
                 {% endif %}
@@ -36,7 +37,9 @@
                         <div class='form-row'>
                             <label>Bio:</label>
                             {{ form.bio }}
-                            <p class='example'>Example: I like traffic lights. On weekends, I like to make websites, destroy Twitter, and eat breakfast.</p>
+                            <p class='example'>Example: I like traffic lights.
+                            On weekends, I like to make websites, destroy
+                            Twitter, and eat breakfast.</p>
                         </div>
 
                         <div class='form-row'>
@@ -102,18 +105,22 @@
                                 We preserve linebreaks, and turn URLs into links.
                             </p>
                             <p class='example'>
-                                We provide a Craigslist-style email forwarding service.
-                                To use it, include the string <tt>$fwd</tt> in the text area above.
-                                Write something like &ldquo;<tt>Email me at $fwd</tt>&rdquo;
-                                and your text will appear on your profile as "Email me at
-                                {{ person.user.username}}.248y5a7@forwarder.openhatch.org.".
+                                We provide a Craigslist-style email forwarding
+                                service.  To use it, include the string
+                                <tt>$fwd</tt> in the text area above.
+                                
+                                For example, 
+                                &ldquo;<tt>Email me at $fwd</tt>&rdquo;
+                                will appear on your profile as "Email me at 
+                                {{ forwarder_sample|urlizetrunc:'23' }}".
                             </p>
                             <p class='example'>
-                            Note that this email forwarding address will change every few days
-                            to thwart spammers.
+                            Keep in mind: This information will be public and
+                            crawlable by search engines. Your email forwarding
+                            address will change every few days to thwart
+                            spammers.  
                             </p>
                             <p class='example'>
-                            Note that this information will be public and crawlable by search engines.
                             </p>
                         </div>
 

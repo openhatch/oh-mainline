@@ -1049,6 +1049,7 @@ def edit_info(request, contact_blurb_error=False, edit_info_form=None, contact_b
     data['form'] = edit_info_form
     data['contact_blurb_form'] = contact_blurb_form
     data['contact_blurb_error'] = contact_blurb_error
+    data['forwarder_sample'] = mysite.base.controllers.put_forwarder_in_contact_blurb_if_they_want("$fwd", person.user)
     data['has_errors'] = has_errors
     return request, 'profile/info_wrapper.html', data
 
