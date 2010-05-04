@@ -15,7 +15,7 @@ Home
         
         <div class='body'>
 
-            <p style='margin-bottom: 2em; font-size: 1.8em;'>
+            <p style='margin-bottom: 1em; text-align: center; font-size: 1.4em;'>
                 <strong>OpenHatch</strong> &ndash;
                 be involved in free/open source software
             </p>
@@ -34,12 +34,12 @@ Home
                         <a href='#for_opp_hunters'>
                             Find something interesting to do in open source</a>
                         <div>
-                            Browse thousands of opportunities
-                            &mdash; coding, writing, and more
+                            Browse coding, writing, and design opportunities
+                            from across open source
                         </div>
                     </li>
                     <li>
-                        <a href='{% url mysite.profile.views.people %}'>
+                        <a href='#for_people_seekers'>
                             Find open source contributors
                         </a>
                         <div>
@@ -56,10 +56,29 @@ Home
                     </li>
                 </ul>
                 <div class='tab' id='for_documenters'>
-                    for documentors
+
+                    <div style='display: none;'>
+                        <img src='' />
+                        <caption>Create a complete open source profile.</caption>
+                    </div>
+
+                    <div class='screenshot'>
+                        <div class='screenshot_image_wrapper'
+                            style='background-image: url({% version '/static/images/importer-screenshot-squared-300px.png' %})'>
+                        </div>
+                        <div class='caption'>
+                            Type your open source username(s) into our importer
+                            to find your contributions automatically. <a href=''>Try it &raquo;</a>
+                        </div>
+                    </div>
+                    
+
                 </div>
                 <div class='tab' id='for_opp_hunters'>
                     for opp hunters
+                </div>
+                <div class='tab' id='for_people_seekers'>
+                    looking for people
                 </div>
                 <div class='tab' id='for_project_maintainers'>
                     for project maints

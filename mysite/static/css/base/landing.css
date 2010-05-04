@@ -20,11 +20,14 @@ body#landing .rabbit_hole { float: right; margin: 0; font-size: .9em; }
 body#landing #left .module { margin-right: 2%; width: 65%; }
 body#landing #left .head { width: 100%; }
 body#landing #left .body { width: 93%; }
-body#landing #what_to_do img { float: left; margin-right: 1em; }
-body#landing #what_to_do li { height: 100px; float: left; color: #555; width: 22%; margin-right: 1.5%; padding-right: 1.5%; border-right: 1px dashed #b4b4b4; }
-body#landing #what_to_do li:last-child { margin-right: 0; border-right: 0; }
-body#landing #what_to_do a { font-size: 1.2em; line-height: 1.2em; display: block; margin-bottom: .3em; }
-body#landing #what_to_do li div { width: 100%; float: left; }
+
+body#landing #what_to_do .tab_nav li { text-align: center; height: 100px; float: left; color: #555; width: 22%; margin-right: 1.5%; padding-right: 1.5%; border-right: 1px dashed #b4b4b4; }
+body#landing #what_to_do .tab_nav li:last-child { margin-right: 0; border-right: 0; }
+body#landing #what_to_do .tab_nav li a { font-size: 1.2em; line-height: 1.2em; display: block; margin-bottom: .3em; }
+body#landing #what_to_do .tab { width: 100%; float: left; }
+body#landing #what_to_do .tab .screenshot { float: left; padding: 10px; width: 35%; margin-right: 2%; }
+body#landing #what_to_do .tab .screenshot_image_wrapper { width: 300px; height: 250px; border: 1px solid #ccc; border-bottom-width: 2px; -moz-border-radius: 8px; border-radius: 8px; background-repeat: no-repeat; background-position: top left; margin-bottom: 10px; }
+body#landing #what_to_do .tab .caption { padding: 10px; }
 
 body#landing #right { width: 30%; }
 
@@ -34,4 +37,3 @@ body#landing #recent_activity_feed ul li { margin-bottom: 15px; }
 body#landing #recent_activity_feed ul li:last-child { margin-bottom: 0; }
 
 body#landing #blog_feed { margin-left: 1%; width: 32.3%; }
-

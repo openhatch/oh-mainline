@@ -309,10 +309,12 @@ input[rel='hint'].blur { color: #777; }
 .tab_nav li { padding-bottom: 11px; margin-bottom: 10px; height: 20px; display: inline; margin-right: 3px; }
 .tab_nav li a { border: 0; }
 .tab_nav li a:focus { -moz-outline: 0; }
-.tab_nav .ui-tabs-selected { background: url('/static/images/tab-on.png') bottom no-repeat; }
+.tab_nav .ui-tabs-selected { background-position: bottom; background-repeat: no-repeat; }
 .tab_nav .ui-tabs-selected a { font-weight: bold; }
 
 .tab { float: left; padding-top: 10px; border-top: 1px solid #e0e0e0; }
+
+body#landing .tab { border: 0; }
 
 .ui-tabs .ui-tabs-hide { display: none !important; }
 .collapsible { display: none; }
@@ -322,7 +324,6 @@ body#survey_question_suggestion_form label { margin: 6px 0 3px 0; display: block
 body#survey_question_suggestion_form form input[type="submit"]{display: block; float: none;}
 body#survey_question_suggestion_form form textarea { height: 120px; width: 600px;}
 body#survey_question_suggestion_form p { font-size: 1.3em; margin-top: 0; }
-
 
 body.nice_form .fat { width: 436px !important; }
 body.nice_form form  { float: left; width: 100%; }
