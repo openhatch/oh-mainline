@@ -22,46 +22,51 @@ Home
                 be involved in free/open source software
             </p>
 
-            <p class='rabbit_hole'>
-                <a href='/people/'>See all <strong>&raquo;</strong></a>
-            </p>
-            <p class='rabbit_hole'>
-                <a href='/people/'>See all <strong>&raquo;</strong></a>
-            </p>
-            <ul>
-                <li>
-                    <a href='{% url mysite.base.views.landing_for_documenters %}'>
-                        Document your open source contributions
-                    </a>
-                    <div>
-                        Put your story together automagically
-                    </div>
-                </li>
-                <li>
-                    <a href='{% url mysite.base.views.landing_for_opp_hunters %}'>
-                        Find something interesting to do in open source</a>
-                    <div>
-                        Browse thousands of opportunities
-                        &mdash; coding, writing, and more
-                    </div>
-                </li>
-                <li>
-                    <a href='{% url mysite.profile.views.people %}'>
-                        Find open source contributors
-                    </a>
-                    <div>
-                        Who's in your neighborhood? 
-                    </div>
-                </li>
-                <li>
-                    <a href='{% url mysite.base.views.landing_for_project_maintainers %}'>
-                        Create a contributors' page for your project
-                    </a>
-                    <div>
-                        Explain how people can get involved 
-                    </div>
-                </li>
-            </ul>
+            <div id='tabbed_container_of_big_links'>
+                <ul>
+                    <li>
+                        <a href='#for_documenters'>
+                            Document your open source contributions
+                        </a>
+                        <div>
+                            Put your story together automagically
+                        </div>
+                    </li>
+                    <li>
+                        <a href='#for_opp_hunters'>
+                            Find something interesting to do in open source</a>
+                        <div>
+                            Browse thousands of opportunities
+                            &mdash; coding, writing, and more
+                        </div>
+                    </li>
+                    <li>
+                        <a href='{% url mysite.profile.views.people %}'>
+                            Find open source contributors
+                        </a>
+                        <div>
+                            Who's in your neighborhood? 
+                        </div>
+                    </li>
+                    <li>
+                        <a href='#for_project_maintainers'>
+                            Create a contributors' page for your project
+                        </a>
+                        <div>
+                            Explain how people can get involved 
+                        </div>
+                    </li>
+                </ul>
+                <div class='tab' id='for_documenters'>
+                    for documentors
+                </div>
+                <div class='tab' id='for_opp_hunters'>
+                    for opp hunters
+                </div>
+                <div class='tab' id='for_project_maintainers'>
+                    for project maints
+                </div>
+            </div>
 
             <p style='display: block; margin: 2em 0 0 0; float: left; width: 100%; '>
                 OpenHatch works for projects across the Internet, no matter where they're hosted.
@@ -99,7 +104,8 @@ Home
 {{ block.super }}
 <script type='text/javascript'>
 $(function(){
-$('#people-list li').hoverClass('hover');
+        $('#people-list li').hoverClass('hover');
+        $('#tabbed_container_of_big_links').tabs();
 });
 </script>
 {% endblock js %}

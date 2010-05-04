@@ -34,3 +34,5 @@ body#landing #recent_activity_feed ul li { margin-bottom: 15px; }
 body#landing #recent_activity_feed ul li:last-child { margin-bottom: 0; }
 
 body#landing #blog_feed { margin-left: 1%; width: 32.3%; }
+
+body#landing .tab { display: none; }
