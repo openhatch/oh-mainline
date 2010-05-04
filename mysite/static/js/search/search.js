@@ -33,6 +33,4 @@ SearchResults.bindEventHandlers = function () {
 
 }
 
-$(SearchResults.bindEventHandlers);
-
 /* vim: set ai ts=4 sts=4 et sw=4: */
