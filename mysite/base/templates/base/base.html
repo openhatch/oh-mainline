@@ -185,7 +185,8 @@
         {% block js_before_bundle %}
         {% endblock js_before_bundle %}
 
-        {% assets output="packed/openhatch.js", "js/jquery.js", "js/jquery.query.js", "js/jquery.json.js", "js/jquery.hint.js", "js/jquery.form.js", "js/jquery.jgrowl.js", "js/jquery-ui-1.7.2.custom.min.js", "js/jquery.cookie.js", "piwik.js", "js/base/locationDialog.js", "js/base.js", "js/search/defaultText.js", "js/profile/portfolio.js", "js/profile/map.js", "openid/js/openid-jquery.js", "js/importer.js", "js/account/set_location.js", "js/search/search.js", "js/jquery.tipsy.js", "js/tipsy-onload.js", "js/jquery.color.js", "js/facebox.js" %}
+        <script type='text/javascript' src='http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js'></script>
+        {% assets output="packed/openhatch.js", "js/jquery.query.js", "js/jquery.json.js", "js/jquery.hint.js", "js/jquery.form.js", "js/jquery.jgrowl.js", "js/jquery-ui-1.7.2.custom.min.js", "js/jquery.cookie.js", "piwik.js", "js/base/locationDialog.js", "js/base.js", "js/search/defaultText.js", "js/profile/portfolio.js", "js/profile/map.js", "openid/js/openid-jquery.js", "js/importer.js", "js/account/set_location.js", "js/search/search.js", "js/jquery.tipsy.js", "js/tipsy-onload.js", "js/jquery.color.js", "js/facebox.js" %}
         <script type="text/javascript" src="{{ ASSET_URL }}"></script>
         {% endassets %}
 
