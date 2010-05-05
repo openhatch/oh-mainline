@@ -1,7 +1,7 @@
 body#project input[type='text'], body#project textarea { padding: 4px;  }
 body#project input, body#project textarea { font-size: 10pt;   }
 body#project textarea { width: 96%;  }
-body#project input[type='text'] { width: 96%; display: block; }
+body#project input[type='text'] { width: 96%; display: block; clear: left; }
 body#project input[type='submit'] { padding: 2px 8px; display: block; }
 
 
