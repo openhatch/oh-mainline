@@ -1,0 +1,45 @@
+Pivotal tracker
+
+Stuff that has to happen today
+* Spend 2 hours making an 80% quality landing page
+
+* Map: When you're looking at the global map, use a static, non-interactive rendering.
+
+Stuff that has to happen by Monday
+* When AL receives an email from Eric Florenzano, schedule a usability event in SF - 10 people or fewer - buy people a pizza dinner, have them usability test the website. Subtask: Come up with tasks to have the testers perform. Get a camera (or use our webcam) Also then invite BayPiggies to Django event. 
+* Asheesh contacts friends who work at Google Mountain View
+* Mailman: Opt-in all of our users to the announce list. Set a policy on how frequently at most we use that list.
+* Mailman: Ensure that mailman doesn't force visibility of email addresses to all subscribers.
+* Mailman: Disable monthly password reminder.
+* Mailman: On account creation, subscribe that person to the announce list.
+
+* Write some text targeted at projects who want to be involved in GNOME Women's Outreach Program * Best to do this after we set up the mailing lists.  * Something like this: Hey, we're OpenHatch and we're looking to pick some projects to work more closely with to make your lives better. Here's what we've done so far, here's why, and we want to work with you to close the loop and make further actions better match our motivations. Please join our discuss list.
+* Write some similar text for the Twisted folks.
+* Use identicons as the "default icon"
+* Map: Use WebWorkers (move mathematical stuff into a separate thread)
+* Asheesh emails Chris the social networking dude and says hey let's meet in new york (when i go to chris chan's graduation)
+* Asheesh finds someone friendly, possibly Ziegs, who is a WebWorkers user, and maybe schedules a Hack-a-Lunch
+* Five minute: Asheesh registers for the Community Leadership Summit in July
+* Blog posts tagged with "announce" get cross-posted to the announce mailing list, mutatis mutandis for "discuss".
+
+Non-stories in the icebox
+* Our logo is kind of bland, its colors don't quite mfit
+* Cross browser compat testing
+* Site can give us better feedback on vol opp finder usage - what bugs are people looking at?
+
+
+--------------------------------------------------------------------
+
+
+Other bugs
+* Center on Washington DC and it still says "Everybody on OpenHatch"
+
+Project
+    * Who else is in this project? Invite them to OpenHatch.
+
+//
+
+Bug mission:
+    * transform bitesize bug into programming competition style thing.
+
+When you click a opp link, you go to a opp page (https://openhatch.org/opportunities/183

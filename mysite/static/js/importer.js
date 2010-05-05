@@ -516,8 +516,8 @@ deleteCitation = function($citation) {
     $.ajax(ajaxOptions);
 };
 deleteCitationCallback = function (response) {
-    // No need to do anything. We already marked
-    // the citation with the css class 'deleted'.
+    // No need to do anything. We already 
+    // removed the citation element.
 };
 
 deleteCitationErrorCallback = function (request) {
@@ -655,6 +655,8 @@ FlagIcon.bindEventHandlers = function() {
     $('.icon_flagger a').click(FlagIcon.flag);
 };
 
+// Despite the name, this is actually the Importer
+// FIXME: Rename this "Importer"
 HowTo = {
     'init': function () {
         HowTo.$element = $('#portfolio_entries .howto');
@@ -847,33 +849,16 @@ PortfolioEntry.Delete.bindEventHandlers = function() {
 
 
 bindEventHandlers = function() {
+    $('a.delete_citation').hover(
+        function () { $(this).closest('.citations > li').addClass('to_be_deleted'); },
+        function () { $(this).closest('.citations > li').removeClass('to_be_deleted'); }
+    );
     $('a.delete_citation').click(deleteCitationForThisLink);
     $('.citations-wrapper .add').click(drawAddCitationFormNearThisButton);
     FlagIcon.bindEventHandlers();
     PortfolioEntry.bindEventHandlers();
-    Citation.bindEventHandlers();
 };
 $(bindEventHandlers);
-
-Citation.bindEventHandlers = function() {
-    Citation.HowTo.bindEventHandlers();
-};
-Citation.HowTo = {};
-Citation.HowTo.hideAll = function () {
-    $('.citations-wrapper .howto').hide();
-    $('.citations-wrapper a.show_howto').show();
-    return false;
-};
-Citation.HowTo.showMyHowto = function () {
-    $showLink = $(this);
-    $showLink.parent().find('.howto').show();
-    $showLink.hide();
-    return false;
-};
-Citation.HowTo.bindEventHandlers = function () {
-    $('.citations-wrapper .howto a.hide_me').click(Citation.HowTo.hideAll);
-    $('.citations-wrapper a.show_howto').click(Citation.HowTo.showMyHowto);
-};
 
 Importer = {};
 Importer.Inputs = {};
@@ -1149,8 +1134,12 @@ SaveAllButton.saveAll = function() {
 
 AutoSaucepan = {
     'init': function () {
+        // This query string prefix triggers the automatic saucepan
+        qs_pref = /^\?add_project_name=/;
+        if (location.search.match(qs_pref) === null) return;
+
         // Check in the query string if there is anything
-        var project_name = decodeURIComponent(location.search.replace('?add_project_name=',''));
+        var project_name = decodeURIComponent(location.search.replace(qs_pref,''));
 
         if (project_name) {
             // If so, simulate a click
