@@ -76,9 +76,10 @@ Home
                 </div>
                 <div class='tab' id='for_opp_hunters'>
                     <div class='screenshot'>
-                        <div class='screenshot_image_wrapper'
+                        <a href='{% url mysite.search.views.fetch_bugs %}?toughness=bitesize'
+                            class='screenshot_image_wrapper'
                             style='background-image: url({% version '/static/images/screenshots/bitesize-opps.png' %})'>
-                        </div>
+                        </a>
                         <div class='caption'>
                             <strong>Browse thousands of bitesize bugs:</strong>
                             We collect data from all around the &lsquo;net
@@ -86,9 +87,10 @@ Home
                         </div>
                     </div>
                     <div class='screenshot'>
-                        <div class='screenshot_image_wrapper'
+                        <a href='{% url mysite.search.views.fetch_bugs %}?language=C'
+                            class='screenshot_image_wrapper'
                             style='background-image: url({% version '/static/images/screenshots/opps-in-c.png' %})'>
-                        </div>
+                        </a>
                         <div class='caption'>
                             <strong>Search bugs by language:</strong>
                             You don't have to know ahead of time what project
@@ -96,9 +98,10 @@ Home
                         </div>
                     </div>
                     <div class='screenshot'>
-                        <div class='screenshot_image_wrapper'
-                            style='background-image: url({% version '/static/images/screenshots/opps-in-c.png' %})'>
-                        </div>
+                        <a href='{% url mysite.project.views.project 'Gwibber' %}'
+                            class='screenshot_image_wrapper'
+                            style='background-image: url({% version '/static/images/screenshots/wanna-help.png' %})'>
+                        </a>
                         <div class='caption'>
                             <strong>&ldquo;Give me an assignment&rdquo;:</strong>
                             Tell a project that you want to help. Just click
