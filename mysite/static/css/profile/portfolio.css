@@ -53,7 +53,7 @@ body#profile .portfolio_entry > .submodule { float: left; margin-bottom: 0;  }
 body#profile.view_mode .portfolio_entry > .submodule { border-width: 2px; margin-left: 10px; }
 body#profile #portfolio.editor .portfolio_entry > .submodule { float: left; margin-bottom: 0; width: 807px; }
 body#profile .portfolio_entry .project-stuff { padding: 2%; float: left; width: 39%; }
-body#profile .portfolio_entry .personal-stuff { background-color: #f4f4f4; float: left; border-left: 1px solid #eee; padding: 20px; float: right; width: 50%; }
+body#profile .portfolio_entry .personal-stuff { float: left; border-left: 1px solid #eee; padding: 20px; float: right; width: 50%; }
 body#profile .portfolio_entry .project_icon { float: left; height: 64px; margin-right: 10px; width: 64px; background-position: center; background-repeat: no-repeat; }
 body#profile .portfolio_entry .project_icon .alt-text { position: absolute; left: -999px; } /* So that screen readers will read this. */
 body#profile .portfolio_entry .name_and_icon_flagger { float: left; width: 100%; }
