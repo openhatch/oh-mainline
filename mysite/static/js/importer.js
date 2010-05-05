@@ -833,18 +833,21 @@ PortfolioEntry.Delete.deleteIt = function (deleteLink) {
     }
     return false;
 }
+// NB: Keeping event handlers in a named variable like this appears to prevent
+// them from being bound more than once.  This prevents bugs where a single
+// click will cause the event handler to be executed more than once.
+PortfolioEntry.Delete.deleteButtonClickHandler = function(){
+    var deleteLink = this;
+    var project_name = $(deleteLink).closest('.portfolio_entry').find('.project_name').text()
+        keep_going = confirm('Are you sure you want to remove \'' + project_name + '\' from your profile?');
+    if (keep_going){
+        PortfolioEntry.Delete.deleteIt(deleteLink);
+    }
+    return false;
+};
 PortfolioEntry.Delete.bindEventHandlers = function() {
-    $('.portfolio_entry .actions li.delete_portfolio_entry a').click(function(){
-        var deleteLink = this;
-        keep_going = confirm('are you sure?');
-        if(keep_going){
-            PortfolioEntry.Delete.deleteIt(deleteLink);
-            return false;
-        }
-        else{
-            return false;
-        }
-    });
+    $('.portfolio_entry .actions li.delete_portfolio_entry a').click(
+            PortfolioEntry.Delete.deleteButtonClickHandler);
 };
 
 
