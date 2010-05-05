@@ -10,13 +10,13 @@ body#people-map .view-links{float:left; width:33%; }
 body#people-map .view-links ul li{display:inline; margin-right:10px; margin-bottom:10px; float:left; font-size:1.3em; }
 body#people-map .left{float:left; width:51px; }
 body#people-map .profile-link:hover {text-decoration:none; color:#000; }
-body#people-map .profile-link{ border-radius:8px; -moz-border-radius:8px; background-color:#ddf; color:#555; padding:4px 8px; border:2px solid #fff; font-size: .85em; float:right; margin-left:4px; }
+body#people-map .profile-link{ border-radius:8px; -webkit-border-radius:8px; -moz-border-radius:8px; background-color:#ddf; color:#555; padding:4px 8px; border:2px solid #fff; font-size: .85em; float:right; margin-left:4px; }
 #big-people-list,#big-people-list ul,#big-people-list .people-list-map{float:left; }
 #people-list a:hover {text-decoration: none; }
-#people-list li > a{float: left; width: 100%; border-radius:8px; -moz-border-radius:8px; margin-bottom:3px; width:94%; padding:8px; }
+#people-list li > a{float: left; width: 100%; border-radius:8px; -webkit-border-radius:8px; -moz-border-radius:8px; margin-bottom:3px; width:94%; padding:8px; }
 
 /* Special functionality for people map. */
-body#people-map #people-list li { float: left; width: 100%; border-radius:8px; -moz-border-radius:8px; margin-bottom:3px; width:94%; padding:8px; }
+body#people-map #people-list li { float: left; width: 100%; border-radius:8px; -webkit-border-radius:8px; -moz-border-radius:8px; margin-bottom:3px; width:94%; padding:8px; }
 body#people-map #people-list li:hover { background:#ffc; }
 body#people-map #people-list li a:focus { text-decoration: none; background:#ffc; }
 
@@ -67,7 +67,7 @@ body#people-map #search_summary { width: 100%; padding: 10px 0; font-size: 1.0em
 
 /* Refine your search */
 body#people-map #refine_search {  margin: 10px 10px 0 0; padding: 1.5%; }
-body#people-map .greybox { padding: 8px; float: left; background-color: #ececec; -moz-border-radius: 8px; border-radius: 8px; border: 1px solid #e2e2e2; }
+body#people-map .greybox { padding: 8px; float: left; background-color: #ececec; -webkit-border-radius: 8px; -moz-border-radius: 8px; border-radius: 8px; border: 1px solid #e2e2e2; }
 body#people-map #refine_search h3 { padding: 0; margin-bottom: 10px; }
 body#people-map #refine_search .filter_conjunction { }
 body#people-map #refine_search .filter_conjunction > li { list-style: none; float: left; width: 300px; }
@@ -84,7 +84,7 @@ body#people-map #people-list { width: 33%; }
 body#people-map #people-list .people-list-column { padding: 10px; width:45%; }
 body#people-map #people-list li .what_matched_the_search { font-size: .9em; font-weight: normal; color: #333; }
 #people-list li .username { font-size: .9em; color: #333; font-weight: normal; }
-body#people-map #project_yeller { float: left; width: 225px; padding: 15px; margin-top: 10px; background-color: #ececec; border: 1px solid #e2e2e2; -moz-border-radius: 8px; border-radius: 8px; }
+body#people-map #project_yeller { float: left; width: 225px; padding: 15px; margin-top: 10px; background-color: #ececec; border: 1px solid #e2e2e2; -webkit-border-radius: 8px; -moz-border-radius: 8px; border-radius: 8px; }
 body#people-map .dont_show_until_map_loads{ display: none; }
 
 /* Toggle */

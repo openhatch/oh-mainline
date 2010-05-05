@@ -39,7 +39,7 @@ body#search #how_many_projects { font-weight: normal; text-align: center; font-s
 body#search #how_many_projects a { color: #555; }
 	body#search #how_many_projects a:hover { color: #111; text-decoration: none; }
 		body#search #how_many_projects a:hover strong { background-color: #555; }
-body#search #how_many_projects strong { background-color: #747474; -moz-border-radius: 8px; padding: 3px 4px; border-radius: 8px; color: #fff ! important; }
+body#search #how_many_projects strong { background-color: #747474; -webkit-border-radius: 8px; -moz-border-radius: 8px; padding: 3px 4px; border-radius: 8px; color: #fff ! important; }
 body#search #about_projects #learn_more { text-align: center; margin-top: 10px; margin-bottom: 0; }
 body#search #hwat-is-this ul li { list-style: square; margin: 5px 0 0 20px; }
 body#search .expanded .separator_betw_tags_and_desc { display: none ! important; }
@@ -69,7 +69,7 @@ body#search .results-widget { color: #555; padding: 12px; padding-bottom: 6px; f
  *---------------------- */
 body#search #results { font-size: 1.21em; }
 body#search #results ul { margin: 0; padding: 0; float: left; width: 99%; }
-    body#search #results li { overflow: hidden; border: 1px solid transparent; border-bottom-width: 3px; -moz-border-radius: 8px; border-radius: 8px; padding: 5px 8px; font-size: 100%; float: left; list-style: none; width: 99%; white-space: nowrap; margin: 0; margin-bottom: 3px; }
+    body#search #results li { overflow: hidden; border: 1px solid transparent; border-bottom-width: 3px; -webkit-border-radius: 8px; -moz-border-radius: 8px; border-radius: 8px; padding: 5px 8px; font-size: 100%; float: left; list-style: none; width: 99%; white-space: nowrap; margin: 0; margin-bottom: 3px; }
 
         body#search #results .body { background-color: #fff; }
 
@@ -130,7 +130,7 @@ body#search #results ul { margin: 0; padding: 0; float: left; width: 99%; }
                 body#search #results li.expanded .description-container p { font-family: monospace; color: #000; white-space: pre-wrap; word-wrap: break-word; float: left; width: 100%; margin-bottom: .3em; }
                 body#search #results li.expanded .description-container br { display: inherit; }
                 body#search #results li.expanded .description-container .description { width: 100%; margin-top: 1em; float: left; padding-bottom: 1em; border-bottom: 1px dashed #dedede; max-height: 400px; overflow-y: auto; }
-            body#search #results li.expanded .second-line { border-radius: 0; -moz-border-radius: 0; overflow: visible; }
+            body#search #results li.expanded .second-line { border-radius: 0; -webkit-border-radius: 0; -moz-border-radius: 0; overflow: visible; }
             body#search #results li.expanded .details { display: block; float: left; width: 85%; font-size: .73em; padding: 5px 0; }
                 body#search #results li.expanded .details .fields { float: left; width: 100%; }
                 body#search #results h5 { color: #999; margin-bottom: 2px; }
@@ -158,8 +158,8 @@ body#search #examples h3, body#search #personal_recommendations h3 { font-size: 
 
 /*      Create a BugAlert
  *------------------------ */
-body#search #create_bug_alert { padding: 10px 15px; -moz-border-radius: 8px; border-radius: 8px; float: left; background: #ffc; font-size: .9em; }
-    body#search #create_bug_alert .success { margin-bottom: 10px; -moz-border-radius: 8px; border-radius: 8px; padding: 8px; background-color: #ff7; }
+body#search #create_bug_alert { padding: 10px 15px; -webkit-border-radius: 8px; -moz-border-radius: 8px; border-radius: 8px; float: left; background: #ffc; font-size: .9em; }
+    body#search #create_bug_alert .success { margin-bottom: 10px; -webkit-border-radius: 8px; -moz-border-radius: 8px; border-radius: 8px; padding: 8px; background-color: #ff7; }
     body#search #create_bug_alert .left { float: left; margin-right: 20px; width: 40%; }
     body#search #create_bug_alert .right { float: left; width: 50%; }
     body#search #create_bug_alert p { margin-bottom: 10px; }

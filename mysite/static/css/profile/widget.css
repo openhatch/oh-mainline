@@ -57,7 +57,7 @@
 #openhatch-widget input[type='text'], #openhatch-widget input[type='password'], #openhatch-widget input[type='file'], #openhatch-widget textarea { padding: 5px; font-size: 11pt; float: left; }
 #openhatch-widget input[type='submit'] { padding: 1px 8px; color: #222; font-weight: bold; float: left; }
 #openhatch-widget .alert { float: left; width: 1000px; text-align: center; padding: 15px 0; }
-#openhatch-widget .alert div { display: inline; background-color: #fca; color: #444; padding: 8px 15px; width: 250px; font-size: 11pt; -moz-border-radius: 5px; }
+#openhatch-widget .alert div { display: inline; background-color: #fca; color: #444; padding: 8px 15px; width: 250px; font-size: 11pt; -webkit-border-radius: 5px; -moz-border-radius: 5px; }
 #openhatch-widget img { border: 0; }
 #openhatch-widget .usernames { font-size: 10pt; }
 #openhatch-widget #info .tag-type { font-weight: normal; display: block; font-size: 8pt; }
@@ -70,7 +70,7 @@
 #openhatch-widget abbr.foss { border: 0; font-variant: small-caps; }
 #openhatch-widget .notification { float: left; width: 130px; background-color: #ffc; /* "Fresh Food Café!"-- Asheesh */ border-top: 2px solid #ff7; padding: 10px; margin: 0 15px; font-size: 10pt; color: #000; margin-bottom: 10px; }
 #openhatch-widget .errorlist ul { float: left; margin: 0; padding: 0; }
-#openhatch-widget .errorlist li { float: left; padding: 5px 10px; width: 410px; color: #522; background-color: #ffe4e4; margin: 10px 0; -moz-border-radius: 5px; }
+#openhatch-widget .errorlist li { float: left; padding: 5px 10px; width: 410px; color: #522; background-color: #ffe4e4; margin: 10px 0; -webkit-border-radius: 5px; -moz-border-radius: 5px; }
 #openhatch-widget .project-display { float: left; margin-right: 0; width: 705px; }
 #openhatch-widget .project-display h3 { float: left; }
 #openhatch-widget .project-display p { margin: 0; margin-bottom: 10px; float: left; }

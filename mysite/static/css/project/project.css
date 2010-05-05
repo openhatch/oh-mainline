@@ -31,7 +31,7 @@ body#project ul.answers textarea.blur { height: 1.2em; }
 body#project .questions > li { float: left; width: 100%; margin: 10px 0 30px; }
 
 body#project .bug_answer_title { font-size: 1.1em; padding-bottom: 3px; margin-bottom: 3px; }
-body#project form.answer_question { float: left; width: 85%; padding: 4px 12px; -moz-border-radius: 8px; border-radius: 8px; margin-bottom: 20px; }
+body#project form.answer_question { float: left; width: 85%; padding: 4px 12px; -webkit-border-radius: 8px; -moz-border-radius: 8px; border-radius: 8px; margin-bottom: 20px; }
 body#project form.active {  background-color: #ffc; }
 body#project form.active .show_when_editing { display: block; }
 body#project form.active a.collapse_answer_form { padding: 3px; margin: 10px 0 0 0; font-size: .9em;}
@@ -46,7 +46,7 @@ body#project .input-note li { list-style: circle; margin: 3px 0 3px 20px ! impor
 
 body#project .input-note ul.sections li { float: left; margin: 0 10px 0 0 ! important; list-style: none; width: 48%; }
 body#project .input-note ul.sections li:last-child { margin-right: 0 ! important; }
-body#project .input-note p.example { color: #555; -moz-border-radius: 4px; border-radius: 4px; padding: 3px 5px; background-color: #ffffd9; border: 1px solid #ffceb4; }
+body#project .input-note p.example { color: #555; -webkit-border-radius: 4px; -moz-border-radius: 4px; border-radius: 4px; padding: 3px 5px; background-color: #ffffd9; border: 1px solid #ffceb4; }
 
 body#project label { margin: 6px 0 3px 0; display: block; }
 
@@ -73,7 +73,7 @@ body#project #wannahelp-button { -moz-border-radius: 8px; border-radius: 8px; pa
 body#project #wannahelp-button:active { background-position: bottom;}
 body#project #wannahelp-button:hover, body#project #wannahelp-button:focus { text-decoration: none; color: #222; }
 
-body#project #message_for_helpers input[type='image'] { font-size: 0.85em; font-family: Helvetica, sans-serif; float: right; border: 0; color: #555; padding: 5px; position: relative; left: 15px; top: -5px; font-weight: bold; -moz-border-radius: 8px; border-radius: 8px; }
+body#project #message_for_helpers input[type='image'] { font-size: 0.85em; font-family: Helvetica, sans-serif; float: right; border: 0; color: #555; padding: 5px; position: relative; left: 15px; top: -5px; font-weight: bold; -webkit-border-radius: 8px; -moz-border-radius: 8px; border-radius: 8px; }
 body#project #message_for_helpers input[type='image']:hover { background-color: #d3d3d3; }
 body#project #next_steps { display: block; text-align: right; margin-top: 1em; }
 
@@ -82,7 +82,7 @@ body#project .next_steps_for_helpers h3 { color: #222; text-shadow: 0 1px 0 #fff
 body#project .next_steps_for_helpers .body { width: 95.8%; }
 body#project .next_steps_for_helpers #show { display: none; }
 
-body#project .next_steps_for_helpers.contains_just_the_head.expanded { -moz-border-radius-bottomleft: 0; -moz-border-radius-bottomright: 0; border-radius-bottomleft: 0; border-radius-bottomright: 0; position: relative; padding-bottom: 0; top: 15px; float: right; width: 250px ! important; margin-top: 10px; }
+body#project .next_steps_for_helpers.contains_just_the_head.expanded { -moz-border-radius-bottomleft: 0; -webkit-border-bottom-right-radius: 0; -moz-border-radius-bottomright: 0; border-radius-bottomleft: 0; border-radius-bottomright: 0; position: relative; padding-bottom: 0; top: 15px; float: right; width: 250px ! important; margin-top: 10px; }
 body#project .next_steps_for_helpers.contains_just_the_head { margin-top: 15px; left: -5px; }
 body#project .next_steps_for_helpers.contains_just_the_head h3 { padding-bottom: 0; }
 body#project .next_steps_for_helpers.collapsed.contains_just_the_head { padding-bottom: 8px; top: 0; float: right; width: 250px ! important; }
