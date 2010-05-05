@@ -811,7 +811,7 @@ PortfolioEntry.Delete.postOptions.success = function (response) {
     SaveAllButton.updateDisplay();
 };
 PortfolioEntry.Delete.postOptions.error = function (response) {
-    Notifier.displayMessage('Oh snap! We failed to delete your PortfolioEntry.');
+    Notifier.displayMessage('Something went awry. We failed to remove that project from your profile.');
 };
 PortfolioEntry.Delete.post = function () {
     $.ajax(PortfolioEntry.Delete.postOptions);
