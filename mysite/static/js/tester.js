@@ -25,6 +25,6 @@ StupidRunner.compare = function(a, b, message) {
 StupidRunner.testDone = function() {};
 
 // Pick a test runner here
-tester = fireunit;
+//tester = fireunit;
 //tester = QUnitRunner;
-//tester = StupidRunner;
+tester = StupidRunner;

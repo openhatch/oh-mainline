@@ -1088,7 +1088,7 @@ PortfolioEntry.Reorder = {
                         askServerForPortfolio();
                     },
                     'error': function () {
-                        alert('Shit, there was an error saving your ordering.');
+                        alert('Merde, there was an error saving your ordering.');
                     },
                 };
                 $.ajax(options);
