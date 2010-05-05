@@ -838,8 +838,15 @@ PortfolioEntry.Delete.deleteIt = function (deleteLink) {
 // click will cause the event handler to be executed more than once.
 PortfolioEntry.Delete.deleteButtonClickHandler = function(){
     var deleteLink = this;
-    var project_name = $(deleteLink).closest('.portfolio_entry').find('.project_name').text()
-        keep_going = confirm('Are you sure you want to remove \'' + project_name + '\' from your profile?');
+    var $projectNameElement = $(deleteLink).closest('.portfolio_entry').find('.project_name')
+    var projectName = $projectNameElement.text() ? $projectNameElement.text() : $projectNameElement.val();
+    if (projectName == '' || projectName == $projectNameElement.attr('title')) {
+        projectName = 'this unnamed project';
+    }
+    else { 
+        projectName = '\'' + projectName + '\''; /* put in quotes */
+    }
+    keep_going = confirm('Are you sure you want to remove ' + projectName + ' from your profile?');
     if (keep_going){
         PortfolioEntry.Delete.deleteIt(deleteLink);
     }
