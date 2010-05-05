@@ -42,7 +42,7 @@ body#profile #portfolio.editor .portfolio_entry.unpublished .submodule,
         body#profile .portfolio_entry.unpublished .project_name { font-weight: bold; }
         body#profile .portfolio_entry .project-stuff input.project_name { width: 230px; }
         body#profile .portfolio_entry .project-stuff input.project_name.blur { color: #777; }
-body#profile #portfolio.editor .portfolio_entry > .actions { font-size: 8pt; background-color: #f4f4f4; border: 4px solid #e9e9e9; border-radius: 8px; border-radius-bottomleft: 0; border-radius-topleft: 0; border-left: 0; float: left; left: -6px; -moz-border-radius: 8px; -moz-border-radius-bottomleft: 0; -moz-border-radius-topleft: 0; position: relative; width: 100px; }
+body#profile #portfolio.editor .portfolio_entry > .actions { font-size: 8pt; background-color: #f4f4f4; border: 4px solid #e9e9e9; border-radius: 8px; border-radius-bottomleft: 0; border-radius-topleft: 0; border-left: 0; float: left; left: -6px; -webkit-border-radius: 8px; -moz-border-radius: 8px; -moz-border-radius-bottomleft: 0; -webkit-border-top-left-radius: 0; -moz-border-radius-topleft: 0; position: relative; width: 100px; }
 body#profile .portfolio_entry > .actions a { color: #242424; }
 body#profile .portfolio_entry > .actions span { color: #747474; }
 body#profile .portfolio_entry > .actions a,
@@ -77,19 +77,19 @@ body#profile .portfolio_entry .experience_description-wrapper textarea { height:
 body#profile .citations > li { color: #777; float: left; list-style: circle; margin-left: 20px; margin-top: 5px; width: 90%; }
 body#profile .citations li .actions { float: left; width: 30px; }
 body#profile .citations li .actions a { background-position: center; background-repeat: no-repeat; float: left; height: 15px; width: 15px; }
-body#profile .citations li .actions a.delete:hover { background-color: #c9c9c9; border-radius: 4px; -moz-border-radius: 4px; }
+body#profile .citations li .actions a.delete:hover { background-color: #c9c9c9; border-radius: 4px; -webkit-border-radius: 4px; -moz-border-radius: 4px; }
 body#profile .citations li .summary { color: #222; float: left; width: 300px; }
 body#profile .citations-wrapper, .involvement_placeholder { float: left; width: 100%; }
 body#profile .citations li.unpublished .summary { background-color: #ffc; }
 body#profile .citations li.deleted .summary { background-color: pink; }
 body#profile .citations li.to_be_deleted a { text-decoration: line-through; }
-body#profile .citations-wrapper a.add { background-color: #c9c9c9; background-color: lightblue; border-radius: 6px; clear: left; color: #444; float: left; font-size: 8pt; font-weight: bold; margin-right: 10px; margin-top: 10px; -moz-border-radius: 6px; padding: 6px; }
+body#profile .citations-wrapper a.add { background-color: #c9c9c9; background-color: lightblue; border-radius: 6px; clear: left; color: #444; float: left; font-size: 8pt; font-weight: bold; margin-right: 10px; margin-top: 10px; -webkit-border-radius: 6px; -moz-border-radius: 6px; padding: 6px; }
 body#profile .citations-wrapper a.add:hover { color: #000; text-decoration: none; }
 body#profile .error-message { color: pink; font-weight: bold; }
 body#profile .citations-wrapper .howto { color: #111; }
 body#profile #main .citations-wrapper .howto .body { float: none ! important; }
 body#profile .citations li a { }
-body#profile .citations-wrapper .howto, .citations-wrapper .show_howto { background-color: #ffa; border: 1px solid yellow; border-radius: 6px; float: right; font-size: 8pt; margin-top: 10px; -moz-border-radius: 6px; padding: 12px; width: 200px; }
+body#profile .citations-wrapper .howto, .citations-wrapper .show_howto { background-color: #ffa; border: 1px solid yellow; border-radius: 6px; float: right; font-size: 8pt; margin-top: 10px; -webkit-border-radius: 6px; -moz-border-radius: 6px; padding: 12px; width: 200px; }
 body#profile .citations-wrapper .howto ul { list-style: square; margin-bottom: .5em; }
 body#profile .citations-wrapper .howto li { margin-left: 1.5em; }
 body#profile .citations-wrapper .howto p { margin-top: 0; margin-bottom: .5em; }
