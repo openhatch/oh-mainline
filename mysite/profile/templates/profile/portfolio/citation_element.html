@@ -1,11 +1,11 @@
 <li {% if edit_mode %} class='unpublished'{% endif %}>
+{% if edit_mode %}
+<div class='actions'>
+    <a href="#" class='delete_citation'></a>
+</div>
+{% endif %}
 <div class='summary'>
     {% include 'profile/portfolio/citation_summary.html' %}
 </div>
-{% if edit_mode %}
-<ul class='actions'>
-    <li><a href="#" class='delete_citation'></a></li>
-</ul>
-{% endif %}
 </li>
 {# vim: set filetype=htmldjango: #}
