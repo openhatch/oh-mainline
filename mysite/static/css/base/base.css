@@ -254,6 +254,7 @@ body.two_columns #portfolio .body { background: #fff; }
 ul.nudgebuttons li { float: left; width: 100%; margin-bottom: 5px;  }
 ul.nudgebuttons li:last-child { margin-bottom: 0; }
 ul.nudgebuttons a .notification { width: 100%; }
+ul.nudgebuttons a:hover { text-decoration: none; }
 ul.nudgebuttons a:hover .notification { background: #ffc;}
 ul.nudgebuttons a .notification { background: none; }
 ul.nudgebuttons a { width: 93%; }
