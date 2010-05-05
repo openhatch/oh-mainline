@@ -204,6 +204,7 @@ abbr.foss {
     width: 95%;
     background-color: #ffc; #f5fdc1; /*#edec7f; #ffa;*/
     -moz-border-radius: 8px;
+    -webkit-border-radius: 8px;
     border-radius: 8px;
     padding: 10px;
     color: #000;
