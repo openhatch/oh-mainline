@@ -1,5 +1,5 @@
 
-body#people-map img#people-search {margin:0 0 -2px; padding:0; }
+body#people-map img#people-search { position: relative; top: 8px; }
 body#people-map input[type="submit"]{ float:left; padding: 5px; position: relative; top: -1px; }
 body#people-map .map-error{background: #ffc; float: left; padding: 9px 2%; width: 36%; display: none}
 body#people-map #map_canvas{ text-align:center; float: right; width:68%; height:460px; }
