@@ -32,7 +32,6 @@ body#profile #progressbar { display: none; float: right; margin-top: 4px; margin
  *----------------------*/
 body#profile #portfolio.editor h4 { float: left; font-size: 1.25em; font-weight: normal; margin-bottom: 10px; width: 900px; }
 body#profile #portfolio h5 { color: #555; font-size: 13pt; font-weight: normal; margin: 0 0 10px 0; }
-body#profile #portfolio.editor h5 { font-size: 8pt; font-weight: bold; text-transform: uppercase; }
 body#profile .portfolio_entry { float: left; margin-bottom: 20px; }
 body#profile #portfolio.editor .portfolio_entry { position: relative; width: 100%; }
 body#profile #portfolio.editor .portfolio_entry.unpublished .submodule, 
