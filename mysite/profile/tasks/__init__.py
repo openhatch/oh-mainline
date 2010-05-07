@@ -21,9 +21,11 @@ import mysite.profile.search_indexes
 import mysite.profile.controllers
 import shutil
 import staticgenerator
+import mysite.customs.bitbucket
 
 from django.conf import settings
 import django.core.cache
+import pdb
 
 def create_citations_from_ohloh_contributor_facts(dia_id, ohloh_results):
     '''Input: A sequence of Ohloh ContributionFact dicts
@@ -189,6 +191,47 @@ def create_citations_from_debianqa_results(dia_id, results):
 
     dia.completed = True
     dia.save()
+    
+def create_citations_from_bitbucket_results(dia_id, results):
+    """
+    Given the input of results returned from a query against the 
+    bitbucket.org user api, create user related contribution
+    records.
+
+    Note that non-authenticated calls to butbuket api returns limited
+    project details.
+    """
+    
+    dia = mysite.profile.models.DataImportAttempt.objects.get(id=dia_id)
+    person = dia.person
+    for repo in results:
+
+        (project, _) = Project.objects.get_or_create(
+            name=repo['name'])
+        
+        description = repo['description']
+        if mysite.profile.models.PortfolioEntry.objects.filter(person=person, project=project).count() == 0:
+            portfolio_entry = mysite.profile.models.PortfolioEntry(person=person,
+                                             project=project,
+                                             project_description=description)
+
+            portfolio_entry.save()
+        portfolio_entry = mysite.profile.models.PortfolioEntry.objects.filter(person=person, project=project)[0]
+        
+        citation = mysite.profile.models.Citation()
+        citation.url =  'http://bitbucket.org/%s/%s/' % (dia.query, repo['name'])
+        citation.contributor_role = 'Created or forked a project on bitbucket.'
+        citation.languages = ''
+        
+        citation.portfolio_entry = portfolio_entry
+        citation.data_import_attempt = dia
+        citation.save_and_check_for_duplicates()
+
+    person.last_polled = datetime.datetime.now()
+    dia.completed = True
+    dia.save
+    person.save
+    # end create_citations_from_bitbucket_results
 
 def rs_action(dia):
     oh = ohloh.get_ohloh()
@@ -221,7 +264,6 @@ def gh_action(dia):
             key] = '' # mysite.customs.github.find_primary_language_of_repo(
             #github_username=repo.owner,
             #github_reponame=repo.name)
-        
     return (repos, dict_mapping_repos_to_languages)
 
 def db_action(dia):
@@ -246,13 +288,21 @@ def lp_action(dia):
     # permits this function to be mocked when we test it.
     return lp_grabber.get_info_for_launchpad_username(dia.query)
 
+def bb_action(dia):
+    """
+    Given a dia with a username, check to see if there are any 
+    source packages maintained by the user.
+    """
+    return mysite.customs.bitbucket.get_user_repos(dia.query)
+
 source2actual_action = {
         'rs': rs_action,
         'ou': ou_action,
         'gh': gh_action,
         'ga': ga_action,
         'db': db_action,
-        'lp': lp_action
+        'lp': lp_action,
+        'bb': bb_action
         }
 
 source2result_handler = {
@@ -262,6 +312,7 @@ source2result_handler = {
         'ga': create_citations_from_github_activity_feed_results,
         'db': create_citations_from_debianqa_results,
         'lp': create_citations_from_launchpad_results,
+        'bb': create_citations_from_bitbucket_results,
         }
 
 class ReindexPerson(Task):
