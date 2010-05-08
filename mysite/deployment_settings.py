@@ -25,6 +25,11 @@ CELERY_ALWAYS_EAGER = False # srsly
 
 CARROT_BACKEND = 'amqp'
 
+## Django search via Haystack
+HAYSTACK_SITECONF='mysite.haystack_configuration'
+HAYSTACK_SEARCH_ENGINE='solr'
+HAYSTACK_SOLR_URL='http://173.230.128.217:8983/solr/'
+
 try:
     from deployment_settings_secret_keys import GOOGLE_ANALYTICS_CODE
 except ImportError:
