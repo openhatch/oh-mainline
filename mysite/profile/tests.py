@@ -2246,4 +2246,48 @@ class ArchiveProjects(TwillTests):
         this_should_be_archived = PortfolioEntry.objects.get(pk=pfes[1].pk)
         self.assert_(this_should_be_archived.is_archived)
 
+
+class MockBitbucketImport(BaseCeleryTest):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+    
+    @mock.patch('mysite.customs.bitbucket.get_user_repos')
+    @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
+    def test_bitbucket_profile_import(self, mock_bitbucket_projects):
+        """Test that we can get projects from Bitbucket"""
+        description = 'A project designed to test imports from Bitbucket'
+        mock_bitbucket_projects.return_value = [ObjectFromDict({
+            'name': 'Bitbucket importer',
+            'description': description,})]
+        data_we_expect = [{
+            'contributor_role': 'Created or forked a project on bitbucket.',
+            'languages': '', #Bitbucket doesn't show languages via non-authenticated api.
+            'is_published': False,
+            'is_deleted': False}]
+        summaries_we_expect = [
+            'Created or forked a project on bitbucket.']
+        
+        self._test_data_source_via_emulated_bgtask(
+            source='bb', data_we_expect=data_we_expect,
+            summaries_we_expect=summaries_we_expect)
+
+        self.assertEqual(PortfolioEntry.objects.all().count(),1)
+        self.assertEqual(PortfolioEntry.objects.get().project_description,
+                         description)
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
 # vim: set ai et ts=4 sw=4 nu:
