@@ -145,3 +145,13 @@ Start in milestone-a, then run
     ./bin/mysite rebuild_index
 
 (say yes)
+
+=== Troubleshooting ===
+
+==== ctypes ====
+* If you're running Ubuntu 10.04 Lucid Lynx, when you execute bin/mysite runserver, you might see this error:
+  File "/usr/lib/python2.6/dist-packages/ctypes/__init__.py", line 20, in <module>
+    raise Exception, ("Version number mismatch", __version__, _ctypes_version)
+Exception: ('Version number mismatch', '1.0.2', '1.1.0')
+
+Here's a possible solution: "The problem can be solved by removing the python-ctypes package, which, it seems, is obsolete in Lucid and was left over from earlier versions." <https://bugs.launchpad.net/caffeine/+bug/560636>. (Note that you might see different version numbers than the ones above.) To remove the package, try "sudo apt-get remove python-ctypes".
