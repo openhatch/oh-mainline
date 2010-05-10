@@ -7,6 +7,7 @@ import urllib
 import simplejson
 import re
 import collections
+import logging
 
 # Django
 from django.template.loader import render_to_string
