@@ -1044,11 +1044,14 @@ def set_pfentries_dot_use_my_description_do(request):
     pfe_pks = project.portfolioentry_set.values_list('pk', flat=True)
     Form = mysite.profile.forms.UseDescriptionFromThisPortfolioEntryForm
     for pfe_pk in pfe_pks:
+        pfe_before_save = PortfolioEntry.objects.get(pk=pfe_pk)
         form = Form(request.POST,
-                instance=PortfolioEntry.objects.get(pk=pfe_pk),
+                instance=pfe_before_save,
                 prefix=str(pfe_pk))
         if form.is_valid():
-            form.save()
+            pfe_after_save = form.save()
+            logging.info("Project description settings edit: %s just edited a project.  The portfolioentry's data originally read as follows: %s.  Its data now read as follows: %s" % (
+                request.user.get_profile(), pfe_before_save.__dict__, pfe_after_save.__dict__))
     return HttpResponseRedirect(project.get_edit_page_url())
 
 # vim: ai ts=3 sts=4 et sw=4 nu
