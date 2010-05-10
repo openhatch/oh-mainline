@@ -102,7 +102,7 @@ body#edit_project #control_descriptions td p { margin: 0; }
 
 body#edit_project .tab_nav { float: left; width: 100%; border-bottom: 1px dashed #b4b4b4; }
 body#edit_project .tab_nav li.ui-tabs-selected { font-weight: bold; }
-body#edit_project .tab_nav li { height: 1.5em; float: left; color: #555; padding-bottom: 10px; padding-right: 1.5%;  }
+body#edit_project .tab_nav li { height: 25px; float: left; color: #555; background-position: center 20px; padding-bottom: 10px; padding-right: 1.5%;  }
 body#edit_project .tab_nav li:last-child { margin-right: 0; border-right: 0; }
 body#edit_project .tab_nav li a { font-size: 1.2em; line-height: 1.2em; display: block; margin-bottom: .3em; }
 body#edit_project .tab { float: left; width: 100%; padding-top: 10px; }

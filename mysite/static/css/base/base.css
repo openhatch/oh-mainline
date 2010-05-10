@@ -19,6 +19,7 @@ abbr { border-bottom: 1px dotted #999; }
 h1 a { text-decoration: none; }
 h1 a:hover { text-decoration: none; }
 
+
 .module { float: left; margin-bottom: 15px; padding: 4px; -webkit-border-radius: 8px; -moz-border-radius: 8px; border-radius: 8px; }
 
 .module > .head { float: left; }
@@ -47,6 +48,11 @@ h1 {
     font-weight: normal;
     font-size: 23pt;
 }
+
+.tab_nav li a { border: 0; }
+.tab_nav li a:focus { -moz-outline: 0; }
+.tab_nav .ui-tabs-selected { background-position: bottom; background-repeat: no-repeat; }
+.tab_nav .ui-tabs-selected a { font-weight: bold; }
 
 #header {
     width: 920px;
