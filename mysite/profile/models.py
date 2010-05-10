@@ -189,10 +189,10 @@ class Person(models.Model):
             return 20
 
     def get_published_portfolio_entries(self):
-        return PortfolioEntry.objects.filter(person=self, is_published=True, is_deleted=False)
+        return PortfolioEntry.published_ones.filter(person=self)
 
     def get_nonarchived_published_portfolio_entries(self):
-        return PortfolioEntry.objects.filter(person=self, is_published=True, is_deleted=False, is_archived=False)
+        return PortfolioEntry.published_ones.filter(person=self, is_archived=False)
 
     def get_list_of_all_project_names(self):
         # if you change this method, be sure to increment the version number in
@@ -538,8 +538,17 @@ class Link_SF_Proj_Dude_FM(models.Model):
                                                    is_admin, position,
                                                    date_collected)
 
+class PublishedPortfolioEntries(models.Manager):
+    def get_query_set(self):
+        return super(PublishedPortfolioEntries, self).get_query_set().filter(
+                is_deleted=False, is_published=True)
+
 class PortfolioEntry(models.Model):
-    # Constrain this so (person, project) pair uniquely finds a PortfolioEntry
+    # Managers
+    published_ones = PublishedPortfolioEntries()
+    objects = models.Manager()
+
+    # FIXME: Constrain this so (person, project) pair uniquely finds a PortfolioEntry
     person = models.ForeignKey(Person)
     project = models.ForeignKey(Project)
     project_description = models.TextField()

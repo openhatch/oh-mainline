@@ -347,9 +347,7 @@ def get_projects_with_bugs():
     return projects
 
 def get_cited_projects_lacking_bugs():
-    portfolio_entries = mysite.profile.models.PortfolioEntry.objects.filter(
-            is_published=True, is_deleted=False)
-    # Make this a manager
+    portfolio_entries = mysite.profile.models.PortfolioEntry.published_ones.all()
     one_pfe_dict_per_project = portfolio_entries.values(u'project').distinct().order_by(u'project__name')
 
     projects_with_contributors = []

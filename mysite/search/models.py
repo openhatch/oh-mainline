@@ -212,9 +212,7 @@ class Project(OpenHatchModel):
         this Project."""
         from mysite.profile.models import PortfolioEntry
         # What portfolio entries point to this project?
-        pf_entries = PortfolioEntry.objects.filter(
-                Q(project=self), Q(is_deleted=False),
-                Q(is_published=True) )
+        pf_entries = PortfolioEntry.published_ones.filter(project=self)
         # List the owners of those portfolio entries.
         people = [pf_entry.person for pf_entry in pf_entries]
         return people
@@ -225,14 +223,11 @@ class Project(OpenHatchModel):
         self.save()
 
     def get_n_other_contributors_than(self, n, person):
+        import random
         # FIXME: Use the method above.
         from mysite.profile.models import PortfolioEntry
-        pf_entries = list(PortfolioEntry.objects.filter(Q(project=self),
-                ~Q(person=person),
-                Q(is_deleted=False),
-                Q(is_published=True),
-                ))
-        import random
+        pf_entries = list(PortfolioEntry.published_ones.filter(
+            project=self).exclude(person=person))
         random.shuffle(pf_entries)
         other_contributors = [p.person for p in pf_entries]
 
