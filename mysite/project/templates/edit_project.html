@@ -99,6 +99,12 @@ Editing project - {{ project.name }}
                                         {{ form.instance.project_description }}
                                     </td>
                                 </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan='3'>
+                                    No one has described this project yet.
+                                </td>
+                            </tr>
                             {% endfor %}
                         </table>
                         <input type='submit' value='Save description settings'>
