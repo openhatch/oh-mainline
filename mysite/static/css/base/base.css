@@ -317,3 +317,5 @@ body.nice_form p.why { color: #555; font-size: 10pt; margin-bottom: 0;}
 body.nice_form .module { margin: 0 230px; width: 500px; }
 body.nice_form .module .head { width: 500px; }
 body.nice_form .module .body { width: 460px; }
+
+.ui-tabs .ui-tabs-hide { display: none !important; }
