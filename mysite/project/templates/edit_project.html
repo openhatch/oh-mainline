@@ -14,10 +14,11 @@ Editing project - {{ project.name }}
             <h3>Settings for <strong>{{ project.name }}</strong></h3>
         </div>
         <div class='body'>
-            <div class='tabbed_container'>
+            <div id='tabbed_container'>
+
                 <ul class='tab_nav'>
                     <li><a href='#info'>Project info</a></li>
-                    <li><a href='#descriptions'>Project descriptions</a></li>
+                    <li><a href='#control_descriptions'>Project descriptions</a></li>
                 </ul>
 
                 <div id='info' class='tab'>
@@ -100,7 +101,9 @@ Editing project - {{ project.name }}
 
 {% block js %}
     <script type='text/javascript'>
-        $('.tabbed_container').tabs();
+        $(function () { 
+            $('#tabbed_container').tabs();
+        });
     </script>
     {% if not project.icon_for_profile %}
     <script type='text/javascript'>
