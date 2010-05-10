@@ -1053,6 +1053,6 @@ def set_pfentries_dot_use_my_description_do(request):
             pfe_after_save = form.save()
             logging.info("Project description settings edit: %s just edited a project.  The portfolioentry's data originally read as follows: %s.  Its data now read as follows: %s" % (
                 request.user.get_profile(), pfe_before_save.__dict__, pfe_after_save.__dict__))
-    return HttpResponseRedirect(project.get_edit_page_url())
+    return HttpResponseRedirect(project.get_url())
 
 # vim: ai ts=3 sts=4 et sw=4 nu
