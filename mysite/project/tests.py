@@ -350,7 +350,6 @@ class DecideWhichProjectDescriptionsAppearOnProjectPage(TwillTests):
         tc.fv("2", name_of_checkbox_to_uncheck, False)
         tc.submit()
 
-        import pdb; pdb.set_trace()
         # Get a list of the PortfolioEntries that we use to get a random project
         # description for the project page.
         good_pfentries = project.get_pfentries_with_usable_descriptions()
