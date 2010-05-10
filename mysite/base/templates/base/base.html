@@ -24,41 +24,61 @@
             {% endassets %}
 
             {% comment %}
-
             What follows are CSS declarations that use {% version %}.  We can't
             store these in static CSS files, naturally, because those files
             aren't parsed by Django.
             {% endcomment %}
 
-            body { background-image: url({% version '/static/images/motif-eee.png' %}) }
-            .module { background-image: url({% version '/static/images/gray-60.png' %}) }
-            .module > .body.contains-submodules { background-image:
+            body { 
+                background-image:
+                url({% version '/static/images/motif-eee.png' %}) }
+            .module { 
+                background-image: 
+                url({% version '/static/images/gray-60.png' %}) }
+            .module > .body.contains-submodules { 
+                background-image:
                 url({% version '/static/images/motif.png' %}) }
-            #landing a.blog-feed { background-image:
+            #landing a.blog-feed { 
+                background-image:
                 url({% version '/static/images/base/landing/feed-icon-16x16-sprited.png' %}) }
-            body#profile #importer { background-image:
+            body#profile #importer { 
+                background-image:
                 url({% version '/static/images/ship.png' %}) }
-            body#profile #progressbar.working .ui-progressbar-value { background-image:
+            body#profile #progressbar.working .ui-progressbar-value { 
+                background-image:
                 url({% version '/static/css/jquery-ui-lightness/images/pbar-ani.gif' %}); }
             body#profile .portfolio_entry > .actions li.save_and_publish_button *,
-            body#profile .portfolio_entry > .actions li.save_button * { background-image:
+            body#profile .portfolio_entry > .actions li.save_button * { 
+                background-image:
                 url({% version '/static/images/icons/publish.png' %}); }
-            body#profile .portfolio_entry > .actions li.delete_portfolio_entry a { background-image:
+            body#profile .portfolio_entry > .actions li.delete_portfolio_entry a { 
+                background-image:
                 url({% version '/static/images/icons/delete.png' %}); }
-            body#profile .citations li .actions a.delete_citation { background-image:
+            body#profile .citations li .actions a.delete_citation { 
+                background-image:
                 url({% version '/static/images/icons/delete-citation.png' %}); }
-            body#profile #portfolio.viewer .portfolio_entry .submodule { background-image:
+            body#profile #portfolio.viewer .portfolio_entry .submodule { 
+                background-image:
                 url({% version '/static/images/profile/portfolio/portfolio-entry-bg.png' %}) }
-            body#project #wannahelp-button { background-image:
+            body#project #wannahelp-button { 
+                background-image:
                 url({% version '/static/images/wannahelp-button-bg.png' %}); }
-            body#project #wannahelp-button:active { background-image:
+            body#project #wannahelp-button:active { 
+                background-image:
                 url({% version '/static/images/wannahelp-button-bg-active.png' %}); }
-            body#project #wannahelp-button:hover, body#project #wannahelp-button:focus { background-image:
+            body#project #wannahelp-button:hover,
+            body#project #wannahelp-button:focus { 
+                background-image:
                 url({% version '/static/images/wannahelp-button-bg-hover.png' %}); }
-            body#project #wannahelp-button:hover:active { background-image:
+            body#project #wannahelp-button:hover:active { 
+                background-image:
                 url({% version '/static/images/wannahelp-button-bg-hover-active.png' %}); }
-            body#project .next_steps_for_helpers { background-image:
+            body#project .next_steps_for_helpers { 
+                background-image:
                 url({% version '/static/images/bg-translucent-green.png' %}); }
+            .tab_nav .ui-tabs-selected { 
+                background-image:
+                url({% version '/static/images/tab-on.png' %}); }
 
             {% endblock css %}
             /*]]>*/
