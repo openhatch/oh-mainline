@@ -748,7 +748,7 @@ def update_link_person_tag_cache(sender, instance, **kwargs):
 
 def update_pf_cache(sender, instance, **kwargs):
     from mysite.profile.tasks import update_someones_pf_cache
-    update_someones_pf_cache(instance.person.pk)
+    update_someones_pf_cache.delay(instance.person.pk)
 
 def make_forwarder_actually_work(sender, instance, **kwargs):
     from mysite.profile.tasks import RegeneratePostfixAliasesForForwarder
