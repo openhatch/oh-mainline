@@ -2251,13 +2251,18 @@ class MockBitbucketImport(BaseCeleryTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
     
     @mock.patch('mysite.customs.bitbucket.get_user_repos')
+    @mock.patch('mysite.customs.github.find_primary_language_of_repo', do_nothing)
     @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
     def test_bitbucket_profile_import(self, mock_bitbucket_projects):
         """Test that we can get projects from Bitbucket"""
         description = 'A project designed to test imports from Bitbucket'
-        mock_bitbucket_projects.return_value = [ObjectFromDict({
-            'name': 'Bitbucket importer',
-            'description': description,})]
+        mock_bitbucket_projects.return_value = [{
+            "website": "", 
+            "slug": "MOCK_ccHost'", 
+            "name": "MOCK ccHost'", 
+            "followers_count": 1, 
+            "description": description
+            }]
         data_we_expect = [{
             'contributor_role': 'Created or forked a project on bitbucket.',
             'languages': '', #Bitbucket doesn't show languages via non-authenticated api.
