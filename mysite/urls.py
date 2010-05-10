@@ -115,6 +115,9 @@ urlpatterns = patterns('',
         url(r'\+do/save_portfolio_entry_ordering_do',
                 'mysite.base.views.save_portfolio_entry_ordering_do'),
 
+        url(r'\+do/profile.views.set_pfentries_dot_use_my_description_do',
+                'mysite.profile.views.set_pfentries_dot_use_my_description_do'),
+
         (r'^account/signup/?$',
            'mysite.account.views.signup'),
 

@@ -49,7 +49,18 @@ Editing project - {{ project.name }}
                     <a target=_new href='{% url mysite.profile.views.importer %}?add_project_name={{ project.name|urlencode }}'>
                         add it to your profile</a>.
                 </p>
+
                 <input type='submit' value='Save &raquo;' />
+            </form>
+
+            <form action='{% url mysite.profile.views.set_pfentries_dot_use_my_description_do %}' 
+                    method='POST'>
+                <input type='hidden' name='project_pk' value='{{ project.pk}}' />
+                {% for form in pfentry_forms %}
+                    {{ form.as_p }}
+                    {{ form.instance.person.user.username }}
+                    {{ form.instance.project_description }}
+                {% endfor %}
             </form>
         </div>
     </div>

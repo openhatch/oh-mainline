@@ -26,7 +26,7 @@ class ManuallyAddACitationForm(django.forms.ModelForm):
             raise django.forms.ValidationError("For some reason, the programmer made a mistake, "
                     "and I will blame you, the user.")
 
-        # Check that the user owns this portfolio entry.
+            # Check that the user owns this portfolio entry.
         pf_entry = self.cleaned_data['portfolio_entry'] # By now this is an object, not an ID.
         if pf_entry.person.user == self.user:
             return pf_entry
@@ -35,15 +35,20 @@ class ManuallyAddACitationForm(django.forms.ModelForm):
                     "regarding a portfolio entry that you do not own.")
 
 class EditInfoForm(django.forms.Form):
-  bio = django.forms.CharField(required=False, widget=django.forms.Textarea())
-  homepage_url = django.forms.URLField(required=False)
-  understands = django.forms.CharField(required=False, widget=django.forms.Textarea())
-  understands_not = django.forms.CharField(required=False, widget=django.forms.Textarea())
-  studying = django.forms.CharField(required=False, widget=django.forms.Textarea())
-  can_pitch_in = django.forms.CharField(required=False, widget=django.forms.Textarea())
-  can_mentor = django.forms.CharField(required=False, widget=django.forms.Textarea())
+    bio = django.forms.CharField(required=False, widget=django.forms.Textarea())
+    homepage_url = django.forms.URLField(required=False)
+    understands = django.forms.CharField(required=False, widget=django.forms.Textarea())
+    understands_not = django.forms.CharField(required=False, widget=django.forms.Textarea())
+    studying = django.forms.CharField(required=False, widget=django.forms.Textarea())
+    can_pitch_in = django.forms.CharField(required=False, widget=django.forms.Textarea())
+    can_mentor = django.forms.CharField(required=False, widget=django.forms.Textarea())
 
 class ContactBlurbForm(django.forms.Form):
-  contact_blurb = django.forms.CharField(required=False, widget=django.forms.Textarea())
+    contact_blurb = django.forms.CharField(required=False, widget=django.forms.Textarea())
+
+class UseDescriptionFromThisPortfolioEntryForm(django.forms.ModelForm):
+    class Meta:
+        model = mysite.profile.models.PortfolioEntry
+        fields = ('use_my_description', )
 
 # vim: set nu:

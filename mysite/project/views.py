@@ -43,20 +43,9 @@ def project(request, project__name = None):
     wanna_help = (bool(request.GET.get('wanna_help', False)) and
                   user_wants_to_help)
     
-    pfentries = p.portfolioentry_set.exclude(project_description='')
-    only_good_pfentries = lambda pfe: pfe.project_description.strip()
-    pfentries = filter(only_good_pfentries, pfentries)
-
     context = {}
-    if pfentries:
-        context['random_pfentry'] = random.choice(pfentries)
 
-    # If description is too popular, and there are alternatives,
-    # don't use the popular description. (This avoids a feeling of
-    # 'Oh, everybody wrote the same thing.')
-    # Calculate popularity case-insensitively.
-
-    context['people'] = [pfe.person for pfe in pfentries]
+    context['random_pfentry'] = p.get_random_description()
 
     # Get or create two paragraph-y questions.
     questions = [
@@ -81,7 +70,8 @@ def project(request, project__name = None):
     else:
         people_to_show = p.people_who_wanna_help.all()
 
-    button_widget_data = mysite.base.controllers.get_uri_metadata_for_generating_absolute_links(request)
+    button_widget_data = mysite.base.controllers.get_uri_metadata_for_generating_absolute_links(
+            request)
     button_widget_data['project'] = p
     button_as_widget_source = render_to_string(
         'project/button_as_widget.html', button_widget_data)
@@ -329,6 +319,13 @@ def edit_project(request, project__name):
     else:
         form = mysite.project.forms.ProjectForm(instance=project)
 
+    context = {'project': project, 'form': form}
+
+    pfes = project.get_pfentries_with_descriptions() 
+    context['pfentries_with_descriptions'] = pfes
+
+    Form = mysite.profile.forms.UseDescriptionFromThisPortfolioEntryForm
+    context['pfentry_forms'] = [Form(instance=pfe, prefix=str(pfe.pk)) for pfe in pfes]
+
     return mysite.base.decorators.as_view(
-            request, 'edit_project.html', {'project': project, 'form': form},
-            slug=__name__)
+            request, 'edit_project.html', context, slug=__name__)

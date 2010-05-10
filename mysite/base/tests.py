@@ -33,6 +33,9 @@ def make_twill_url(url):
 def better_make_twill_url(url):
     return make_twill_url(url.replace('+','%2B'))
 
+def twill_go(url):
+    tc.go(better_make_twill_url(url))
+
 def twill_quiet():
     # suppress normal output of twill.. You don't want to
     # call this if you want an interactive session

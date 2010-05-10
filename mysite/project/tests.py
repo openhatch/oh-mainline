@@ -1,5 +1,4 @@
-# Imports {{{
-from mysite.base.tests import make_twill_url, TwillTests
+from mysite.base.tests import make_twill_url, TwillTests, twill_go
 import mysite.project.controllers
 from mysite.base.helpers import ObjectFromDict
 import mysite.account.tests
@@ -30,6 +29,7 @@ import datetime
 import tasks 
 import mock
 import UserList
+import urlparse
 
 import django.test
 from django.test.client import Client
@@ -42,7 +42,7 @@ from django.contrib.auth.models import User
 import twill
 from twill import commands as tc
 from twill.shell import TwillCommandLoop
-# }}}
+
 
 class ProjectNameSearch(TwillTests):
     def test_search_for_similar_project_names_backend(self):
@@ -303,3 +303,58 @@ class OffsiteAnonymousWannaHelpWorks(TwillTests):
 
         lucky_projects = mysite.project.controllers.get_wanna_help_queue_from_session(self.client.session)
         self.assertEqual([k.name for k in lucky_projects], ['Myproject'])
+
+class DecideWhichProjectDescriptionsAppearOnProjectPage(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus', 'user-barry', 'person-barry']
+
+    def test(self):
+
+        # Create a project.
+        project = Project.create_dummy()
+
+        # Create two profiles, each with a PortfolioEntry linking it to the
+        # project, each with descriptions.
+        def create_pfe_with_description(username):
+            return PortfolioEntry.create_dummy(project=project,
+                    person=Person.get_by_username(username))
+        pfes = {'uncheck_me': create_pfe_with_description('paulproteus'),
+                'keep_me_checked': create_pfe_with_description('barry')}
+
+        # Get a list of the PortfolioEntries that we use to get a random project
+        # description for the project page.
+        descriptions = project.get_pfentries_with_permitted_descriptions()
+
+        # Observe that the list contains both PortfolioEntries.
+        for entry in pfes.values():
+            self.assert_(entry in descriptions)
+
+        self.login_with_twill()
+
+        # Go to the project page.
+        url = urlparse.urljoin("http://openhatch.org", project.get_edit_page_url())
+        twill_go(url)
+
+        # In preparation for the next set of assertions, make sure that the
+        # entries don't have the same description.
+        self.assertNotEqual(
+                pfes['uncheck_me'].project_description,
+                pfes['keep_me_checked'].project_description)
+
+        # See a list of project descriptions on the page, which equals the list of
+        # descriptions in the DB. 
+        for entry in pfes.values():
+            tc.find(entry.project_description)
+
+        # Uncheck one of the checkboxes and submit the form
+        name_of_checkbox_to_uncheck = "%s-use_my_description" % pfes['uncheck_me'].pk
+        tc.fv("2", name_of_checkbox_to_uncheck, "0")
+        tc.submit()
+
+        # Get a list of the PortfolioEntries that we use to get a random project
+        # description for the project page.
+        good_pfentries = project.get_pfentries_with_permitted_descriptions()
+
+        # Observe that the list contains only the checked PortfolioEntry.
+        self.assert_(pfes['uncheck_me'] not in good_pfentries)
+        self.assert_(pfes['keep_me_checked'] in good_pfentries)
+

@@ -9,6 +9,7 @@ import StringIO
 import Image
 import uuid
 import urllib
+import random
 from django.db.models import Q
 import mysite.customs
 import mysite.base.unicode_sanity
@@ -265,6 +266,22 @@ class Project(OpenHatchModel):
 
     def get_open_bugs_randomly_ordered(self):
         return self.get_open_bugs().order_by('?')
+
+    def get_pfentries_with_descriptions(self):
+        pfentries = self.portfolioentry_set.exclude(project_description='')
+        has_a_description = lambda pfe: pfe.project_description.strip()
+        return filter(has_a_description, pfentries)
+
+    def get_pfentries_with_permitted_descriptions(self):
+        """Exclude pfentries that have been unchecked on the project edit page."""
+        return self.get_pfentries_with_descriptions()
+
+    def get_random_description(self):
+        pfentries = self.get_pfentries_with_permitted_descriptions()
+        if pfentries:
+            return random.choice(pfentries)
+        else:
+            return None
     
 def populate_icon_on_project_creation(instance, created, *args, **kwargs):
     import mysite.search.tasks
