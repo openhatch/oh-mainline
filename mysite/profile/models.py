@@ -390,8 +390,8 @@ class DataImportAttempt(models.Model):
     def do_what_it_says_on_the_tin(self):
         """Attempt to import data by enqueuing a job in celery."""
         # We need to import here to avoid vicious cyclical imports.
-        from mysite.profile.tasks import FetchPersonDataFromOhloh
-        FetchPersonDataFromOhloh.delay(self.id)
+        import mysite.profile.tasks
+        mysite.profile.tasks.FetchPersonDataFromOhloh.delay(self.id)
 
     def __unicode__(self):
         return "Attempt to import data, source = %s, person = <%s>, query = %s" % (self.get_source_display(), self.person, self.query)
