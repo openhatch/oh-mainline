@@ -20,7 +20,7 @@ Editing project - {{ project.name }}
                     <li><a href='#descriptions'>Project descriptions</a></li>
                 </ul>
 
-                <form id='info' enctype='multipart/form-data' method='POST' action=''>
+                <form class='tab' id='info' enctype='multipart/form-data' method='POST' action=''>
                     {% for field in form %}
                         {% ifequal field.name 'icon_raw' %}
                             <div style='clear: left; margin-top: 10px; 
@@ -50,7 +50,7 @@ Editing project - {{ project.name }}
                     <input type='submit' value='Save &raquo;' />
                 </form>
 
-                <form id='control_descriptions' 
+                <form class='tab' id='control_descriptions' 
                         action='{% url mysite.profile.views.set_pfentries_dot_use_my_description_do %}' 
                         method='POST'>
                     <input type='hidden' name='project_pk' value='{{ project.pk}}' />
