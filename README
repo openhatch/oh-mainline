@@ -106,9 +106,9 @@ Ta-da. In theory we/you should do that every month, when MaxMind does a refresh.
 
 == People search ==
 
-We have a map at /people/. To accelerate search on those people, we use Haystack,
-a Django layer on top of search engines. In our case, we use the search engine called
-Solr.
+We have a map at /people/. To accelerate search on those people, we use
+Haystack, a Django layer on top of search engines. In our case, we use the
+search engine called Solr.
 
 === Understanding indexes and the Solr schema file ===
 
@@ -118,9 +118,8 @@ schema from our people/search_indexes.py file, but since then we have adjusted
 it ourselves.
 
 Unfortunately, this means that if you add or modify those indexes, you should
-NOT just regenerate the schema file automatically. Instead, merge it by hand
-by adding just the elements you need. If you have trouble with that, ask
-Asheesh.
+NOT just regenerate the schema file automatically. Instead, merge it by hand by
+adding just the elements you need. If you have trouble with that, ask Asheesh.
 
 === Running the Solr server (development) ==
 

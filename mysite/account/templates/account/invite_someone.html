@@ -9,7 +9,6 @@ Tell a friend or enemy
 {% block submodule_head %}Tell a friend (or enemy) about OpenHatch{% endblock %}
 
 {% block submodule_body %}
-<p>You have {{ remaining_invites }} invitations available.</p>
 {% for field in invite_someone_form %}
 <div class='form-row'>
     {{ field.errors }}
