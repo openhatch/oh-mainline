@@ -65,12 +65,12 @@ Editing project - {{ project.name }}
                                 {% if i_described_this_project %}
                                     To edit your description for this project,
                                 {% else %}
-                                    To describe the project yourself,
+                                    To submit a description,
                                 {% endif %}
                                 <a target=_new href='{% url mysite.profile.views.importer %}'>
                                     edit your profile</a>.
                             {% else %}
-                                To describe the project yourself,
+                                To submit a description,
                                 <a target=_new href='{% url mysite.profile.views.importer %}?add_project_name={{ project.name|urlencode }}'>
                                     add it to your profile</a>.
                             {% endif %}
