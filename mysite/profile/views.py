@@ -1040,7 +1040,6 @@ def edit_info(request, contact_blurb_error=False, edit_info_form=None, contact_b
 
 @login_required
 def set_pfentries_dot_use_my_description_do(request):
-    import pdb; pdb.set_trace()
     project = Project.objects.get(pk=request.POST['project_pk'])
     pfe_pks = project.portfolioentry_set.values_list('pk', flat=True)
     Form = mysite.profile.forms.UseDescriptionFromThisPortfolioEntryForm
