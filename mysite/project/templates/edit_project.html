@@ -61,9 +61,19 @@ Editing project - {{ project.name }}
     
                         <p>
                             Project pages display a randomly chosen user-submitted description.
-                            To describe the project yourself,
-                            <a target=_new href='{% url mysite.profile.views.importer %}?add_project_name={{ project.name|urlencode }}'>
-                                add it to your profile</a>.
+                            {% if i_am_a_contributor %}
+                                {% if i_described_this_project %}
+                                    To edit your description for this project,
+                                {% else %}
+                                    To describe the project yourself,
+                                {% endif %}
+                                <a target=_new href='{% url mysite.profile.views.importer %}'>
+                                    edit your profile</a>.
+                            {% else %}
+                                To describe the project yourself,
+                                <a target=_new href='{% url mysite.profile.views.importer %}?add_project_name={{ project.name|urlencode }}'>
+                                    add it to your profile</a>.
+                            {% endif %}
                         </p>
                             
                         <p>

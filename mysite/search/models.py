@@ -252,6 +252,7 @@ class Project(OpenHatchModel):
                 kwargs={'project__name': mysite.base.unicode_sanity.quote(self.name)}) 
 
     def get_edit_page_url(self):
+        import mysite.project.views
         return reverse(mysite.project.views.edit_project,
                 kwargs={'project__name': mysite.base.unicode_sanity.quote(self.name)}) 
 
@@ -267,12 +268,12 @@ class Project(OpenHatchModel):
     def get_open_bugs_randomly_ordered(self):
         return self.get_open_bugs().order_by('?')
 
-    def get_pfentries_with_descriptions(self, listen_to_the_community=False):
-        pfentries = self.portfolioentry_set.exclude(project_description='')
+    def get_pfentries_with_descriptions(self, listen_to_the_community=False, **kwargs):
+        pfentries = self.portfolioentry_set.exclude(project_description='').filter(**kwargs)
         if listen_to_the_community:
             # Exclude pfentries that have been unchecked on the project edit page's
             # descriptions section.
-            pfentries = pfentries.filter(use_my_description=True)
+            pfentries = pfentries.filter(use_my_description=True, )
         has_a_description = lambda pfe: pfe.project_description.strip()
         return filter(has_a_description, pfentries)
 

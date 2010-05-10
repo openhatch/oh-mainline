@@ -321,6 +321,11 @@ def edit_project(request, project__name):
 
     context = {'project': project, 'form': form}
 
+    person = request.user.get_profile() 
+    context['i_am_a_contributor'] = ( person in project.get_contributors() )
+    context['i_described_this_project'] = bool(project.get_pfentries_with_descriptions(
+        person=person))
+
     pfes = project.get_pfentries_with_descriptions() 
     context['pfentries_with_descriptions'] = pfes
 
