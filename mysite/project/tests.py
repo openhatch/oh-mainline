@@ -322,7 +322,7 @@ class DecideWhichProjectDescriptionsAppearOnProjectPage(TwillTests):
 
         # Get a list of the PortfolioEntries that we use to get a random project
         # description for the project page.
-        descriptions = project.get_pfentries_with_permitted_descriptions()
+        descriptions = project.get_pfentries_with_usable_descriptions()
 
         # Observe that the list contains both PortfolioEntries.
         for entry in pfes.values():
@@ -347,12 +347,13 @@ class DecideWhichProjectDescriptionsAppearOnProjectPage(TwillTests):
 
         # Uncheck one of the checkboxes and submit the form
         name_of_checkbox_to_uncheck = "%s-use_my_description" % pfes['uncheck_me'].pk
-        tc.fv("2", name_of_checkbox_to_uncheck, "0")
+        tc.fv("2", name_of_checkbox_to_uncheck, False)
         tc.submit()
 
+        import pdb; pdb.set_trace()
         # Get a list of the PortfolioEntries that we use to get a random project
         # description for the project page.
-        good_pfentries = project.get_pfentries_with_permitted_descriptions()
+        good_pfentries = project.get_pfentries_with_usable_descriptions()
 
         # Observe that the list contains only the checked PortfolioEntry.
         self.assert_(pfes['uncheck_me'] not in good_pfentries)

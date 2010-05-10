@@ -267,17 +267,20 @@ class Project(OpenHatchModel):
     def get_open_bugs_randomly_ordered(self):
         return self.get_open_bugs().order_by('?')
 
-    def get_pfentries_with_descriptions(self):
+    def get_pfentries_with_descriptions(self, listen_to_the_community=False):
         pfentries = self.portfolioentry_set.exclude(project_description='')
+        if listen_to_the_community:
+            # Exclude pfentries that have been unchecked on the project edit page's
+            # descriptions section.
+            pfentries = pfentries.filter(use_my_description=True)
         has_a_description = lambda pfe: pfe.project_description.strip()
         return filter(has_a_description, pfentries)
 
-    def get_pfentries_with_permitted_descriptions(self):
-        """Exclude pfentries that have been unchecked on the project edit page."""
-        return self.get_pfentries_with_descriptions()
+    def get_pfentries_with_usable_descriptions(self):
+        return self.get_pfentries_with_descriptions(listen_to_the_community=True)
 
     def get_random_description(self):
-        pfentries = self.get_pfentries_with_permitted_descriptions()
+        pfentries = self.get_pfentries_with_usable_descriptions()
         if pfentries:
             return random.choice(pfentries)
         else:
