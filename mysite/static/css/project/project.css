@@ -93,3 +93,8 @@ body#project .next_steps_for_helpers.collapsed #hide { display: none; }
 body#project .next_steps_for_helpers li { text-indent: -1em; width: 25%; float: left; margin-right: 5%; font-size: 1.3em; }
 
 body#project #copypastebox { display: none; }
+
+body#edit_project #control_descriptions p { margin-top: 0; }
+body#edit_project #control_descriptions th { text-align: left; }
+body#edit_project #control_descriptions td { border-spacing: 0; padding: 10px 20px 5px 0; vertical-align: top; border-top: 1px dashed #ccc; }
+body#edit_project #control_descriptions td p { margin: 0; }

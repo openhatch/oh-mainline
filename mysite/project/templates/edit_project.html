@@ -11,57 +11,86 @@ Editing project - {{ project.name }}
 {% block content %}
     <div class='module'>
         <div class='head'>
-            <h3>Editing info for <strong>{{ project.name }}</strong></h3>
+            <h3>Settings for <strong>{{ project.name }}</strong></h3>
         </div>
         <div class='body'>
-            <style type='text/css'>
-            </style>
+            <div class='tabbed_container'>
+                <ul>
+                    <li><a href='#info'>Project info</a></li>
+                    <li><a href='#descriptions'>Project descriptions</a></li>
+                </ul>
 
-            <form enctype='multipart/form-data' method='POST' action=''>
-                {% for field in form %}
-                    {% ifequal field.name 'icon_raw' %}
-                        <div style='clear: left; margin-top: 10px; 
-                                margin-right: 15px; text-align: center; width: 100px; float: left;'>
-                            <div style='text-align: center; float: left; width: 100%; height: 64px;'>
-                                <img id='icon' src='{% if project.icon_for_profile %}/static/{{ project.icon_for_profile }}{% else %}{% version '/static/images/throbber.gif' %}{% endif %}' />
-                                {% if not project.icon_for_profile %}
-                                <div style='width: 100%; height: 30px;' id='icon_loading_message'
-                                        style='text-align: center;' class='example'>
-                                    Looking up icon</div>
-                            {% endif %}
+                <form id='info' enctype='multipart/form-data' method='POST' action=''>
+                    {% for field in form %}
+                        {% ifequal field.name 'icon_raw' %}
+                            <div style='clear: left; margin-top: 10px; 
+                                    margin-right: 15px; text-align: center; width: 100px; float: left;'>
+                                <div style='text-align: center; float: left; width: 100%; height: 64px;'>
+                                    <img id='icon' src='{% if project.icon_for_profile %}/static/{{ project.icon_for_profile }}{% else %}{% version '/static/images/throbber.gif' %}{% endif %}' />
+                                    {% if not project.icon_for_profile %}
+                                        <div style='width: 100%; height: 30px;' id='icon_loading_message'
+                                                style='text-align: center;' class='example'>
+                                            Looking up icon</div>
+                                    {% endif %}
+                                </div>
                             </div>
-                        </div>
-                    {% endifequal %}
-                    <p style='float: left; width: 70%;'>
-                        {% if not field.is_hidden %}
-                            <label for='id_{{ field.name }}'>
-                                {{ field.label }}
-                            </label>
-                        {% endif %}
-                        {{ field.errors }}
-                        {{ field }}
-                        {{ field.help_text|safe }}
+                        {% endifequal %}
+                        <p style='float: left; width: 70%;'>
+                            {% if not field.is_hidden %}
+                                <label for='id_{{ field.name }}'>
+                                    {{ field.label }}
+                                </label>
+                            {% endif %}
+                            {{ field.errors }}
+                            {{ field }}
+                            {{ field.help_text|safe }}
+                        </p>
+                    {% endfor %}
+
+                    <input type='submit' value='Save &raquo;' />
+                </form>
+
+                <form id='control_descriptions' 
+                        action='{% url mysite.profile.views.set_pfentries_dot_use_my_description_do %}' 
+                        method='POST'>
+                    <input type='hidden' name='project_pk' value='{{ project.pk}}' />
+
+                    <p>
+                        Project pages display a randomly chosen user-submitted description.
+                        To describe the project yourself,
+                        <a target=_new href='{% url mysite.profile.views.importer %}?add_project_name={{ project.name|urlencode }}'>
+                            add it to your profile</a>.
                     </p>
-                {% endfor %}
+                        
+                    <p>
+                        You can use this widget to control which descriptions can
+                        appear on the project page. No edit warring, please.
+                    </p>
 
-                <p style='display: block; margin-top: 30px;'>
-                    To describe the project,
-                    <a target=_new href='{% url mysite.profile.views.importer %}?add_project_name={{ project.name|urlencode }}'>
-                        add it to your profile</a>.
-                </p>
+                    <table>
+                        <tr>
+                            <th>Use?</th>
+                            <th>Contributor</th>
+                            <th>Description</th>
+                        </tr>
+                        {% for form in pfentry_forms %}
+                            <tr>
+                                <td>
+                                    {{ form.as_p }}
+                                </td>
+                                <td>
+                                    {{ form.instance.person.user.username }}
+                                </td>
+                                <td>
+                                    {{ form.instance.project_description }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                    <input type='submit' value='Save description settings'>
+                </form>
 
-                <input type='submit' value='Save &raquo;' />
-            </form>
-
-            <form action='{% url mysite.profile.views.set_pfentries_dot_use_my_description_do %}' 
-                    method='POST'>
-                <input type='hidden' name='project_pk' value='{{ project.pk}}' />
-                {% for form in pfentry_forms %}
-                    {{ form.as_p }}
-                    {{ form.instance.person.user.username }}
-                    {{ form.instance.project_description }}
-                {% endfor %}
-            </form>
+            </div>
         </div>
     </div>
 {% endblock %}
@@ -86,6 +115,8 @@ Editing project - {{ project.name }}
                 );
             };
             window.setTimeout(askForIcon, 1500);
+
+            $('.tabbed_container').tabs();
         });
     </script>
     {% endif %}

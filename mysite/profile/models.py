@@ -549,7 +549,7 @@ class PortfolioEntry(models.Model):
     is_deleted = models.BooleanField(default=False)
     is_archived = models.BooleanField(default=False)
     sort_order = models.IntegerField(default=0)
-    use_my_description = models.BooleanField(default=True, verbose_name='Use?')
+    use_my_description = models.BooleanField(default=True, verbose_name='')
 
     def get_published_citations(self):
         return Citation.untrashed.filter(portfolio_entry=self,
