@@ -229,8 +229,9 @@ def create_citations_from_bitbucket_results(dia_id, results):
 
     person.last_polled = datetime.datetime.now()
     dia.completed = True
-    dia.save
-    person.save
+    person.save()
+    dia.save()
+
     # end create_citations_from_bitbucket_results
 
 def rs_action(dia):
