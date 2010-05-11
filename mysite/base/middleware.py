@@ -14,7 +14,7 @@ class LocationMiddleware(object):
     def process_request(self, request):
         if request.user.is_authenticated():
             the_profile = request.user.get_profile()
-            if not the_profile.location_confirmed and not the_profile.dont_guess_my_location:
+            if not the_profile.location_display_name and the_profile.location_confirmed and not the_profile.dont_guess_my_location:
                 the_profile.location_display_name = mysite.profile.controllers.get_geoip_guess_for_ip(get_user_ip(request))[1]
                 the_profile.save()
         return None
