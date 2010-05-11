@@ -220,7 +220,7 @@ def create_citations_from_bitbucket_results(dia_id, results):
         
         citation = mysite.profile.models.Citation()
         citation.url =  'http://bitbucket.org/%s/%s/' % (dia.query, repo['name'])
-        citation.contributor_role = 'Created or forked a project on bitbucket.'
+        citation.contributor_role = 'Created or forked a project on Bitbucket.'
         citation.languages = ''
         
         citation.portfolio_entry = portfolio_entry
