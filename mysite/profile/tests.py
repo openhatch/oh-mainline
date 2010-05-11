@@ -2258,18 +2258,15 @@ class MockBitbucketImport(BaseCeleryTest):
         description = 'A project designed to test imports from Bitbucket'
         mock_bitbucket_projects.return_value = [{
             "website": "", 
-            "slug": "MOCK_ccHost'", 
-            "name": "MOCK ccHost'", 
+            "slug": "MOCK_ccHost", 
+            "name": "MOCK ccHost", 
             "followers_count": 1, 
             "description": description
             }]
         data_we_expect = [{
-            'contributor_role': 'Created or forked a project on bitbucket.',
-            'languages': '', #Bitbucket doesn't show languages via non-authenticated api.
-            'is_published': False,
-            'is_deleted': False}]
-        summaries_we_expect = [
-            'Created or forked a project on bitbucket.']
+            'contributor_role': u'Created or forked a project on Bitbucket.',
+            'languages': u''}] #Bitbucket doesn't show languages via non-authenticated api.
+        summaries_we_expect = [u'Created or forked a project on Bitbucket.']
         
         self._test_data_source_via_emulated_bgtask(
             source='bb', data_we_expect=data_we_expect,
