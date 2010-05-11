@@ -316,7 +316,8 @@ class DecideWhichProjectDescriptionsAppearOnProjectPage(TwillTests):
         # project, each with descriptions.
         def create_pfe_with_description(username):
             return PortfolioEntry.create_dummy(project=project,
-                    person=Person.get_by_username(username))
+                    person=Person.get_by_username(username),
+                    is_published=True)
         pfes = {'uncheck_me': create_pfe_with_description('paulproteus'),
                 'keep_me_checked': create_pfe_with_description('barry')}
 
