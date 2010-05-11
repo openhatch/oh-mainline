@@ -1037,9 +1037,9 @@ class ReplaceIconWithDefault(TwillTests):
         self.assert_(send_mail_mock.called)
 
         expected_call_args = {
-            'project__pk':project.pk,
-            'project__name':project.name,
-            'project_icon_url':project.icon_for_profile.url,
+            'project__pk': project.pk,
+            'project__name': project.name,
+            'project_icon_url': "icon_url",
         }
         # we have to take [1] here because call_args puts an empty tuple at 0. this is the empty list of non-kw-args
         self.assertEqual(send_mail_mock.call_args[1], expected_call_args)

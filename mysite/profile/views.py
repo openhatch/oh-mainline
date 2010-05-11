@@ -756,7 +756,7 @@ def replace_icon_with_default(request):
     try:
         wrong_icon_url = project_before_changes.icon_for_profile.url
     except ValueError:
-        wrong_icon_url = "Couldn't find a URL for that icon."
+        wrong_icon_url = "icon_url"
 
     # set project icon as default
     project.invalidate_all_icons()
