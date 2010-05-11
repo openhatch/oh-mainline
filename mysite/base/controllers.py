@@ -110,13 +110,16 @@ def object_to_key(python_thing):
     as_string = simplejson.dumps(python_thing)
     return sha.sha(as_string).hexdigest()
 
+def address2cache_key_name(address):
+    return object_to_key(['function_call', 'cached_geocoding', address])
+
 @mysite.base.decorators.unicodify_strings_when_inputted
 def cached_geocoding_in_json(address):
     if address == 'Inaccessible Island':
         is_inaccessible = True
     else:
         is_inaccessible = False
-    key_name = object_to_key(['function_call', 'cached_geocoding', address])
+    key_name = address2cache_key_name(address)
     geocoded = None
     geocoded_in_json = cache.get(key_name)
     if geocoded_in_json is None:

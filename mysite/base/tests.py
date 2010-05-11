@@ -9,6 +9,8 @@ from StringIO import StringIO
 from django.test.client import Client
 import urllib
 
+from django.core.cache import cache
+
 import mock
 
 import mysite.base.helpers
@@ -125,15 +127,20 @@ class GeocoderCanGeocode(TwillTests):
 
 class GeocoderCanCache(django.test.TestCase):
 
-    def get_geocoding_in_json_for_unicode_string(self):
-        unicode_str = u'Bark\xe5ker, T\xf8nsberg, Vestfold, Norway'
+    unicode_address = u'Bark\xe5ker, T\xf8nsberg, Vestfold, Norway'
 
+    def get_geocoding_in_json_for_unicode_string(self):
         # Just exercise the geocoder and ensure it doesn't blow up.
-        return mysite.base.controllers.cached_geocoding_in_json(unicode_str)
+        return mysite.base.controllers.cached_geocoding_in_json(self.unicode_address)
 
     mock_geocoder = mock.Mock()
     @mock.patch("mysite.base.controllers._geocode", mock_geocoder)
     def test_unicode_strings_get_cached(self):
+
+        # Let's make sure that the first time we run this (with original_json),
+        # that the cache is empty, and we populate it with original_json.
+        cache.delete(mysite.base.controllers.address2cache_key_name(self.unicode_address))
+
         ### NOTE This test uses django.tests.TestCase to skip our monkey-patching of the cache framework
         # When the geocoder's results are being cached properly, 
         # the base controller named '_geocode' will not run more than once.
