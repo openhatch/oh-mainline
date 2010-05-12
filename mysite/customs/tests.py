@@ -941,4 +941,28 @@ class OhlohCitationUrlIsUseful(django.test.TestCase):
         self.assertEqual(cchost_data['permalink'],
                          'https://www.ohloh.net/p/cchost/contributors/65837553699824')
         
+class OnlineBitbucket(django.test.TestCase):
+    def test_repo_for_markfreeman(self):
+        """This method test to verify an expected
+         repository exist for user markfreeman."""
+        repos = mysite.customs.bitbucket.get_user_repos('markfreeman')
+        found_expected_repo = False
+        for repo in repos:
+            if repo['name'] == 'py_bitbucket':
+                found_expected_repo = True
+        self.assertTrue(found_expected_repo)
+        
+    def test_unknown_username_404(self):
+        """This method test that passing an unknown user name 
+        will result in an empty list."""
+        repos = list(mysite.customs.bitbucket.get_user_repos('no-user-jhkhsdf'))
+        self.assertEqual(repos, [])
+        
+    def test_user_name_space_404(self):
+        """This method test that passing a user name
+         with a space will result in an empty list."""
+        repos = list(mysite.customs.bitbucket.get_user_repos('mark freeman'))
+        self.assertEqual(repos, [])
+        
+        
 # vim: set nu:
