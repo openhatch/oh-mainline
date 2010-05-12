@@ -910,13 +910,6 @@ class OhlohCitationUrlIsUseful(django.test.TestCase):
         got = mysite.customs.ohloh.generate_contributor_url(project, contributor_id)
         self.assertEqual(wanted, got)
 
-    def test_ohloh_assemble_url(self):
-        project = 'ccHOST'
-        contributor_id = 65837553699824
-        wanted = 'https://www.ohloh.net/p/cchost/contributors/65837553699824'
-        got = mysite.customs.ohloh.generate_contributor_url(project, contributor_id)
-        self.assertEqual(wanted, got)
-
     def test_slow_ou_paulproteus_import(self):
         oh = mysite.customs.ohloh.get_ohloh()
         got, _ = oh.get_contribution_info_by_ohloh_username(
