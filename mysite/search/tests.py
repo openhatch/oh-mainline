@@ -342,7 +342,7 @@ sample_launchpad_data_dump.return_value = [dict(
         url=u'', project=u'rose.makesad.us', text=u'', status=u'',
         importance=u'low', reporter={u'lplogin': 'a',
                                     'realname': 'b'},
-        comments=[], date_updated=time.localtime(),
+        tags=[], comments=[], date_updated=time.localtime(),
         date_reported=time.localtime(),
         title="Joi's Lab AFS",)]
 
@@ -357,7 +357,7 @@ class AutoCrawlTests(SearchTest):
                           title="Joi's Lab AFS")
         # Now get all the bugs about rose
         mysite.search.launchpad_crawl.grab_lp_bugs(lp_project='rose',
-                                            openhatch_project=
+                                            openhatch_project_name=
                                             u'rose.makesad.us')
         # Now see, we have one!
         b = mysite.search.models.Bug.all_bugs.get(title="Joi's Lab AFS")
@@ -394,7 +394,10 @@ class LaunchpadImporterTests(SearchTest):
                         last_polled=some_date)
 
         # Create the bug...
-        mysite.search.launchpad_crawl.handle_launchpad_bug_update(query_data, new_data)
+        mysite.search.launchpad_crawl.handle_launchpad_bug_update(
+                project_name=query_data['project'],
+                canonical_bug_link=query_data['canonical_bug_link'], 
+                new_data=new_data)
         # Verify that the bug was stored.
         bug = Bug.all_bugs.get(canonical_bug_link=
                                        query_data['canonical_bug_link'])
@@ -404,8 +407,10 @@ class LaunchpadImporterTests(SearchTest):
         # Now re-do the update, this time with more people involved
         new_data['people_involved'] = 1000 * 1000 * 1000
         # pass the data in...
-        bug = mysite.search.launchpad_crawl.handle_launchpad_bug_update(query_data,
-                                                                 new_data)
+        mysite.search.launchpad_crawl.handle_launchpad_bug_update(
+                project_name=query_data['project'],
+                canonical_bug_link=query_data['canonical_bug_link'], 
+                new_data=new_data)
         # Do a get; this will explode if there's more than one with the
         # canonical_bug_link, so it tests duplicate finding.
         bug = Bug.all_bugs.get(canonical_bug_link=
