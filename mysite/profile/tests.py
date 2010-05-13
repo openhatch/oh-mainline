@@ -2264,9 +2264,9 @@ class MockBitbucketImport(BaseCeleryTest):
             "description": description
             }]
         data_we_expect = [{
-            'contributor_role': u'Created or forked a project on Bitbucket.',
+            'contributor_role': u'Created a repository on Bitbucket.',
             'languages': u''}] #Bitbucket doesn't show languages via non-authenticated api.
-        summaries_we_expect = [u'Created or forked a project on Bitbucket.']
+        summaries_we_expect = [u'Created a repository on Bitbucket.']
         
         self._test_data_source_via_emulated_bgtask(
             source='bb', data_we_expect=data_we_expect,
