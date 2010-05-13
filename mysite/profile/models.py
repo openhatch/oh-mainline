@@ -372,6 +372,7 @@ class DataImportAttempt(models.Model):
         ('gh', "Github"),
         ('ga', "Github"),
         ('db', "Debian"),
+        ('bb', "Bitbucket")
         )
     completed = models.BooleanField(default=False)
     failed = models.BooleanField(default=False)
@@ -645,6 +646,8 @@ class Citation(models.Model):
                     self.contributor_role,
                     self.data_import_attempt.get_source_display()
                     )
+            elif self.data_import_attempt.source == 'bb':
+                    return "Created a repository on Bitbucket."
             else:
                 raise ValueError, "There's a DIA of a kind I don't know how to summarize."
         elif self.url is not None:

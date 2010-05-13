@@ -2246,4 +2246,50 @@ class ArchiveProjects(TwillTests):
         this_should_be_archived = PortfolioEntry.objects.get(pk=pfes[1].pk)
         self.assert_(this_should_be_archived.is_archived)
 
+
+class MockBitbucketImport(BaseCeleryTest):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+    
+    @mock.patch('mysite.customs.bitbucket.get_user_repos')
+    @mock.patch('mysite.customs.github.find_primary_language_of_repo', do_nothing)
+    @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
+    def test_bitbucket_profile_import(self, mock_bitbucket_projects):
+        """Test that we can get projects from Bitbucket"""
+        description = 'A project designed to test imports from Bitbucket'
+        mock_bitbucket_projects.return_value = [{
+            "website": "", 
+            "slug": "MOCK_ccHost", 
+            "name": "MOCK ccHost", 
+            "followers_count": 1, 
+            "description": description
+            }]
+        data_we_expect = [{
+            'contributor_role': u'Created a repository on Bitbucket.',
+            'languages': u''}] #Bitbucket doesn't show languages via non-authenticated api.
+        summaries_we_expect = [u'Created a repository on Bitbucket.']
+        
+        self._test_data_source_via_emulated_bgtask(
+            source='bb', data_we_expect=data_we_expect,
+            summaries_we_expect=summaries_we_expect)
+
+        self.assertEqual(PortfolioEntry.objects.all().count(),1)
+        self.assertEqual(PortfolioEntry.objects.get().project_description,
+                         description)
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+
 # vim: set ai et ts=4 sw=4 nu:
