@@ -659,26 +659,35 @@ class QueryGetPossibleFacets(SearchTest):
     E.g., search for gtk, it says C, 541."""
 
     def test_get_possible_facets(self):
+        # Create three projects
         project1 = Project.create_dummy(language=u'c')
         project2 = Project.create_dummy(language=u'd')
         project3 = Project.create_dummy(language=u'e')
+
+        # Give each project a bug
         Bug.create_dummy(project=project1, description=u'bug', good_for_newcomers=True)
         Bug.create_dummy(project=project2, description=u'bug')
         Bug.create_dummy(project=project3, description=u'bAg')
+
+        # Search for bugs matching "bug", while constraining to the language C
         query = mysite.search.controllers.Query(
                 terms=[u'bug'],
                 terms_string=u'bug',
                 active_facet_options={u'language': u'c'})
         possible_facets = dict(query.get_possible_facets())
+
+        # We expect that, language-wise, you should be able to select any of
+        # the other languages, or 'deselect' your language constraint.
+        import pdb;pdb.set_trace()
         self.compare_lists_of_dicts(
                 possible_facets[u'language'][u'options'],
                 [
-                    { u'name': u'any', u'query_string': u'q=bug&language=',
-                        u'is_active': False, u'count': 2 },
                     { u'name': u'c', u'query_string': u'q=bug&language=c', 
                         u'is_active': True, u'count': 1 },
                     { u'name': u'd', u'query_string': u'q=bug&language=d',
                         u'is_active': False, u'count': 1 },
+                    { u'name': u'any', u'query_string': u'q=bug&language=',
+                        u'is_active': False, u'count': 2 },
                     # e is excluded because its bug (u'bAg') doesn't match the term 'bug'
                     ],
                 sort_key=u'name'
@@ -687,8 +696,8 @@ class QueryGetPossibleFacets(SearchTest):
         self.compare_lists_of_dicts(
                 possible_facets[u'toughness'][u'options'],
                 [
-                    { u'name': u'any', u'is_active': True,
-                         u'query_string': u'q=bug&toughness=&language=c', u'count': 1 },
+                    # There's no 'any' option for toughness unless you've
+                    # selected a specific toughness value
                     { u'name': u'bitesize', u'is_active': False,
                         u'query_string': u'q=bug&toughness=bitesize&language=c', u'count': 1 },
                     ],

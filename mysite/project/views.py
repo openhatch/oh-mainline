@@ -24,9 +24,12 @@ def create_project_page_do(request):
         matches = Project.objects.filter(name__iexact=project_name)
         if matches:
             our_project = matches[0]
+            # If project exists, go to normal project page 
+            return HttpResponseRedirect(our_project.get_url())
         else:
+            # If project doesn't exists, create it, and go to project settings page 
             our_project, was_created = Project.objects.get_or_create(name=project_name)
-        return HttpResponseRedirect(our_project.get_edit_page_url())
+            return HttpResponseRedirect(our_project.get_edit_page_url())
 
     return HttpResponseBadRequest('Bad request')
 

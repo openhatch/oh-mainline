@@ -97,6 +97,7 @@ class ProjectList(TwillTests):
         response = self.client.get('/+projects/')
 
 class ProjectPageCreation(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
 
     @mock.patch('mysite.search.models.Project.populate_icon_from_ohloh')
     @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
@@ -105,15 +106,16 @@ class ProjectPageCreation(TwillTests):
         project_name = 'Something novel'
         self.assertFalse(mysite.search.models.Project.objects.filter(name=project_name))
         
-        response = self.client.post(reverse(mysite.project.views.create_project_page_do),
+        client = self.login_with_client()
+        response = client.post(reverse(mysite.project.views.create_project_page_do),
                                     {'project_name': project_name}, follow=True)
 
         # We successfully made the project...
         self.assert_(mysite.search.models.Project.objects.filter(name=project_name))
 
-        #  and redirected.
+        #  and redirected to the editor.
         self.assertEqual(response.redirect_chain,
-                         [('http://testserver/+projects/Something%20novel', 302)])
+                         [('http://testserver/+projedit/Something%20novel', 302)])
                 
         # FIXME: Enqueue a job into the session to have this user take ownership
         # of this Project.
@@ -128,15 +130,13 @@ class ProjectPageCreation(TwillTests):
         Project.create_dummy(name=project_name.lower())
 
         # See? We have our project in the database (with slightly different case, but still)
-        self.assertEqual(1,
-                         len(mysite.search.models.Project.objects.all()))
+        self.assertEqual(1, len(mysite.search.models.Project.objects.all()))
         
         response = self.client.post(reverse(mysite.project.views.create_project_page_do),
                                     {'project_name': project_name}, follow=True)
 
         # And we still have exactly that one project in the database.
-        self.assertEqual(1,
-                         len(mysite.search.models.Project.objects.all()))
+        self.assertEqual(1, len(mysite.search.models.Project.objects.all()))
         
         #  and redirected.
         self.assertEqual(response.redirect_chain,
