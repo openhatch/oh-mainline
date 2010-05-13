@@ -656,7 +656,7 @@ class FacetsFilterResults(SearchTest):
 
 class QueryGetPossibleFacets(SearchTest):
     """Ask a query, what facets are you going to show on the left?
-    E.g., search for gtk, it says C, 541."""
+    E.g., search for gtk, it says C (541)."""
 
     def test_get_possible_facets(self):
         # Create three projects
@@ -676,9 +676,10 @@ class QueryGetPossibleFacets(SearchTest):
                 active_facet_options={u'language': u'c'})
         possible_facets = dict(query.get_possible_facets())
 
+        self.assertEqual(query.get_bugs_unordered().count(), 1)
+
         # We expect that, language-wise, you should be able to select any of
         # the other languages, or 'deselect' your language constraint.
-        import pdb;pdb.set_trace()
         self.compare_lists_of_dicts(
                 possible_facets[u'language'][u'options'],
                 [
@@ -686,8 +687,6 @@ class QueryGetPossibleFacets(SearchTest):
                         u'is_active': True, u'count': 1 },
                     { u'name': u'd', u'query_string': u'q=bug&language=d',
                         u'is_active': False, u'count': 1 },
-                    { u'name': u'any', u'query_string': u'q=bug&language=',
-                        u'is_active': False, u'count': 2 },
                     # e is excluded because its bug (u'bAg') doesn't match the term 'bug'
                     ],
                 sort_key=u'name'
@@ -702,6 +701,12 @@ class QueryGetPossibleFacets(SearchTest):
                         u'query_string': u'q=bug&toughness=bitesize&language=c', u'count': 1 },
                     ],
                 sort_key=u'name'
+                )
+
+        self.assertEqual(
+                possible_facets['language']['the_any_option'],
+                { u'name': u'any', u'query_string': u'q=bug&language=',
+                    u'is_active': False, u'count': 2 },
                 )
 
     def test_possible_facets_always_includes_active_facet(self):
@@ -1028,8 +1033,9 @@ class QueryGetPossibleProjectFacetOptions(SearchTest):
         GET_data = {u'project': u'Miro'}
         query = mysite.search.controllers.Query.create_from_GET_data(GET_data)
         possible_project_names = [x['name'] for x in dict(query.get_possible_facets())['project']['options']]
-        self.assertEqual(possible_project_names,
-                list(Project.objects.values_list('name', flat=True)))
+        self.assertEqual(
+                possible_project_names,
+                sorted(list(Project.objects.values_list('name', flat=True))))
 
 class QueryContributionType(SearchTest):
 
