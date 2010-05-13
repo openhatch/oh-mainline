@@ -168,28 +168,46 @@ class Query:
                 }
     
     def get_facet_options(self, facet_name, option_names):
+        # Assert that there are only unicode strings in this list
         option_names = mysite.base.decorators.no_str_in_the_list(option_names)
 
         options = [self.get_facet_option_data(facet_name, n) for n in option_names]
+        # ^^ that's a list of facet options, where each "option" is a
+        # dictionary that looks like this:
+        # {
+        #   'name': name,
+        #   'count': query.get_or_create_cached_hit_count(),
+        #   'query_string': query_string,
+        #   'is_active': is_active
+        # }
 
-        # Let's sort the options, with the active option first, then all the
-        # normal options, followed by the 'Unknown' option if this is a
-        # language facet
+        # Now we're gonna sort these dictionaries.
+        # Active facet options first. Then non-'Unknowns'. Then by number of
+        # bugs. Then alphabetically. 
+
+        # Note that these keys are in ascending order of precedence. So the
+        # last one trumps all the previous sortings.
+
+        options.sort(key=lambda x: x['name'])
+        # Sort alphabetically by name. (This appears first because it has the
+        # lowest precedence.)
+
+        options.sort(key=lambda x: x['count'], reverse=True) # 3 sorts before 50
+        # We want facet options that contain lots of bugs to appear at the top.
+        # If you sort (naively) by x['count'], then the lower numbers appear
+        # higher in the list. Let's reverse that with reverse=True.
         
-        # nb: -100 sorts before -50 and false sorts before true
-        sort_key_funcs_in_order_of_precedence = [
-                lambda x: not x['is_active'],
-                lambda x: (facet_name != 'language') or (x['name'] == 'Unknown'),
-                lambda x: 0 - x['count'],
-                ]
+        options.sort(
+                key=lambda x: (facet_name == 'language') and (x['name'] == 'Unknown'))
+        # We want the Unknown language to appear last, unless it's active. If
+        # the key lambda function returns False, then those options appear
+        # first (because False appears before True), which is what we want.
 
-        # Reverse the key functions, because that's the way that list.sort()
-        # works. That is to say, we want the highest-ranked sorting key to be
-        # applied last. Etc.
-        sort_key_funcs_in_order_of_precedence.reverse()
+        options.sort(key=lambda x: x['is_active'], reverse=True)
+        # We want the value True to sort before the value False. So let's
+        # reverse this comparison (because normally False sorts before True,
+        # just like zero comes before one).
 
-        for key in sort_key_funcs_in_order_of_precedence:
-            options.sort(key=key) 
         return options
 
     def get_possible_facets(self):
