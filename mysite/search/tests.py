@@ -774,7 +774,7 @@ class SingleTerm(SearchTest):
                 )
         self.assertEqual(
                 self.output_possible_facets['toughness']['the_any_option'],
-                [toughness_option_any]
+                toughness_option_any
                 )
 
     def test_languages_facet(self):
@@ -853,9 +853,9 @@ class SingleFacetOption(SearchTest):
                 self.output_possible_facets[u'toughness'][u'options'],
                 expected_toughness_facet_options 
                 )
-        self.compare_lists_of_dicts(
+        self.assertEqual(
                 self.output_possible_facets[u'toughness'][u'the_any_option'],
-                [toughness_option_any] 
+                toughness_option_any
                 )
 
     def test_languages_facet(self):
@@ -883,9 +883,9 @@ class SingleFacetOption(SearchTest):
                 expected_languages_facet_options 
                 )
 
-        self.compare_lists_of_dicts(
+        self.assertEqual(
                 self.output_possible_facets[u'language'][u'the_any_option'],
-                [languages_option_any],
+                languages_option_any,
                 )
 
 class QueryGetToughnessFacetOptions(SearchTest):
