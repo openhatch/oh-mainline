@@ -25,7 +25,6 @@ import mysite.customs.bitbucket
 
 from django.conf import settings
 import django.core.cache
-import pdb
 
 def create_citations_from_ohloh_contributor_facts(dia_id, ohloh_results):
     '''Input: A sequence of Ohloh ContributionFact dicts
