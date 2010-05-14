@@ -33,9 +33,9 @@ def as_view(request, template, data, slug):
     is_login_required = isinstance(view_function,
             django.contrib.auth.decorators._CheckLogin)
     if is_login_required:
-        data['logout_next_page'] = '/'
+        data['go_here_after_logging_in_or_out'] = '/'
     else:
-        data['logout_next_page'] = request.get_full_path()
+        data['go_here_after_logging_in_or_out'] = request.get_full_path()
 
     data['the_user'] = request.user
     data['slug'] = slug # Account settings uses this.
