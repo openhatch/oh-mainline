@@ -113,6 +113,10 @@ var want_importer = true;
     $(function() {
         $("#progressbar").progressbar(); 
         AutoSaucepan.init();
+        $('.explain_citations').live('click', function () {
+            $.jGrowl("<strong style='color: yellow;'>Web pages that talk about your involvement</strong><p> Your involvement could include patches, translations, design ideas, leadership roles, or any other kind of contribution. Some things you could link to: <ul style='margin-left: 2em;' class='raquo_bullets'> <li>bug report</li> <li>archived post to a mailing list</li> <li>staff page</li> <li>WebSVN</li> </ul></p> <p style='margin-bottom: 0'>(Cue some tactical Googling!)</p>", {'life': 14000});
+            return false;
+        });
     });
 </script>
 
