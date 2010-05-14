@@ -71,7 +71,6 @@ urlpatterns = patterns('',
             "oh_forgot_pass"),
 
         (r'^account/catch-me$', 'mysite.account.views.catch_me'),
-        (r'^account/logout/$', 'mysite.account.views.logout'),
 
         (r'^account/login/$', 'django.contrib.auth.views.login', 
             {'template_name': 'account/login.html'},
@@ -81,6 +80,14 @@ urlpatterns = patterns('',
         (r'^account/login/old$', 'django.contrib.auth.views.login', 
             {'template_name': 'account/login_old.html'},
             'oh_login_pwd'),
+
+        (r'^account/logout/$', 'django.contrib.auth.views.logout',
+            {
+                #'next_page': '/',
+                'redirect_field_name': 'next'
+                },
+            'oh_logout'),
+
         (r'^account/signup/do$', 'mysite.account.views.signup_do'),
 
         (r'^people/(?P<user_to_display__username>[^/]+)/widget/$',
