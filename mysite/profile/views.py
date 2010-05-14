@@ -683,7 +683,17 @@ def gimme_json_for_portfolio(request):
         * The person's data.
         * DataImportAttempts.
         * other stuff"""
-    # {{{
+
+    # Since this view is meant to be accessed asynchronously, it doesn't make
+    # much sense to decorate it with @login_required, since this will redirect
+    # the user to the login page. Not much use if the browser is requesting
+    # this page async'ly! So let's use a different method that explicitly warns
+    # the user if they're not logged in. At time of writing, this error message
+    # is NOT displayed on screen. I suppose someone will see if it they're
+    # using Firebug, or accessing the page synchronously.
+    if not request.user.is_authenticated():
+        return HttpResponseServerError("Oops, you're not logged in.")
+
     person = request.user.get_profile()
 
     # Citations don't naturally serialize summaries.
@@ -732,7 +742,6 @@ def gimme_json_for_portfolio(request):
         })
 
     return HttpResponse(json, mimetype='application/json')
-    # }}}
 
 def replace_icon_with_default(request):
     "Expected postcondition: project's icon_dict says it is generic."
