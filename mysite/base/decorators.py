@@ -13,7 +13,8 @@ from functools import partial
 from django.template.loader import render_to_string
 import django.db.models.query
 from mysite.base.helpers import render_response
-from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse, resolve
+import django.contrib.auth.decorators
 
 def as_view(request, template, data, slug):
     if request.user.is_authenticated() or 'cookies_work' in request.session:
@@ -24,10 +25,22 @@ def as_view(request, template, data, slug):
         if request.session.test_cookie_worked():
             request.session.delete_test_cookie()
             request.session['cookies_work'] = True
-    
+
+
+    # Where should the user be sent if she clicks 'logout'?  
+    # Depends on whether this is a login-requiring page.
+    view_function, _, _ = resolve(request.get_full_path())
+    is_login_required = isinstance(view_function,
+            django.contrib.auth.decorators._CheckLogin)
+    if is_login_required:
+        data['logout_next_page'] = '/'
+    else:
+        data['logout_next_page'] = request.get_full_path()
+
     data['the_user'] = request.user
     data['slug'] = slug # Account settings uses this.
     return render_response(request, template, data)
+
 
 @decorator
 def view(func, *args, **kw):
@@ -35,13 +48,6 @@ def view(func, *args, **kw):
     request, template, view_data = func(*args, **kw)
     slug = func.__name__ # Used by account settings
     return as_view(request, template, view_data, slug)
-
-
-    # Where should the user be sent if she clicks 'logout'?
-    # For now, just silence errors, since this is a pretty crucial area in the
-    # codebase, and this is a pretty non-crucial thing.
-    data['logout_next_page'] = request.get_full_path()
-
 
 # vim: ai ts=3 sts=4 et sw=4 nu
 

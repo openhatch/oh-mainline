@@ -83,7 +83,7 @@ urlpatterns = patterns('',
 
         (r'^account/logout/$', 'django.contrib.auth.views.logout',
             {
-                'next_page': '/',
+                #'next_page': '/',
                 'redirect_field_name': 'next'
                 },
             'oh_logout'),
