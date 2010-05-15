@@ -2275,21 +2275,5 @@ class MockBitbucketImport(BaseCeleryTest):
         self.assertEqual(PortfolioEntry.objects.all().count(),1)
         self.assertEqual(PortfolioEntry.objects.get().project_description,
                          description)
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
 
 # vim: set ai et ts=4 sw=4 nu:

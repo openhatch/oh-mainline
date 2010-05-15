@@ -528,7 +528,6 @@ def project_query2mappable_orm_people(parsed_query):
 @view
 def people(request):
     """Display a list of people."""
-    # {{{
     data = {}
 
     # pull in q from GET
@@ -675,7 +674,6 @@ def people(request):
              query_prefix='')]
 
     return (request, 'profile/search_people.html', data)
-    # }}}
 
 def gimme_json_for_portfolio(request):
     "Get JSON used to live-update the portfolio editor."
