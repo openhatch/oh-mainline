@@ -29,13 +29,16 @@ def as_view(request, template, data, slug):
 
     # Where should the user be sent if she clicks 'logout'?  
     # Depends on whether this is a login-requiring page.
-    view_function, _, _ = resolve(request.get_full_path())
-    is_login_required = isinstance(view_function,
-            django.contrib.auth.decorators._CheckLogin)
-    if is_login_required:
+    try:
+        view_function, _, _ = resolve(request.path)
+        is_login_required = isinstance(view_function,
+                django.contrib.auth.decorators._CheckLogin)
+        if is_login_required:
+            data['go_here_after_logging_in_or_out'] = '/'
+        else:
+            data['go_here_after_logging_in_or_out'] = request.get_full_path()
+    except:
         data['go_here_after_logging_in_or_out'] = '/'
-    else:
-        data['go_here_after_logging_in_or_out'] = request.get_full_path()
 
     data['the_user'] = request.user
     data['slug'] = slug # Account settings uses this.
