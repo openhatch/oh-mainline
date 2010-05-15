@@ -161,10 +161,19 @@ def make_text_safe(s):
     '''>>> make_text_safe('<scr')
     "&lt;scr"
     '''
-    span_tag = lxml.html.builder.SPAN(s)
+    # We're going to use lxml to serialize this html with entities
+    # Since lxml will throw a ValueError if there are any null bytes in the
+    # string, let's remove those first.
+    s_without_null_bytes = s.replace('\0','')
+
+    # Serialize (which includes adding a span tag)
+    span_tag = lxml.html.builder.SPAN(s_without_null_bytes)
     span_serialized = lxml.html.tostring(span_tag)
+
+    # Remove the outer span tag we added
     span_serialized_without_leading_span_tag = span_serialized[len('<span>'):]
-    span_serialized_without_either_span_tag = span_serialized_without_leading_span_tag[:-len('</span>')]
+    span_serialized_without_either_span_tag = span_serialized_without_leading_span_tag[
+            :-len('</span>')]
     return span_serialized_without_either_span_tag
 
 def highlight(text, phrases, ignore_case=None, word_boundary=None, class_name=None):
