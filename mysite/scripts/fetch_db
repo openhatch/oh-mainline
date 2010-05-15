@@ -1,12 +1,21 @@
 #!/bin/bash
 set -e
-# To make this work, add this text to $HOME/.ssh/config
+set -x
+
+# This is a helper script that pulls data from the remote database. You'll need
+# to have a shell account on openhatch.org for this to work. You also add this
+# text to $HOME/.ssh/config (without the #'s of course):
+
 # Host oh
 # 	Hostname openhatch.org
 # 	User yourusernamehere
 # 	Compression yes
 # 	ServerAliveInterval 120
 
-ssh -C oh /home/deploy/milestone-a/mysite/scripts/oh_mysqldump --ignore-table=oh_milestone_a.ghettoq_message | pv > dump.sql
+DUMP_FILE=$(mktemp -d "/tmp/$(date -I).XXX")/dump.sql
+# Get all the schemas and data, except certain tables
+ssh -C oh /home/deploy/milestone-a/mysite/scripts/oh_mysqldump --ignore-table=oh_milestone_a.ghettoq_message --ignore-table=oh_milestone_a.customs_webresponse | pv > $DUMP_FILE
+# Get just the schema (no data) for certain tables
+ssh -C oh /home/deploy/milestone-a/mysite/scripts/oh_mysqldump customs_webresponse ghettoq_message --no-data | pv >> $DUMP_FILE
 echo "drop database oh_milestone_a; create database oh_milestone_a" | $(dirname $0)/oh_mysql 
-$(dirname $0)/oh_mysql < dump.sql
+$(dirname $0)/oh_mysql < $DUMP_FILE
