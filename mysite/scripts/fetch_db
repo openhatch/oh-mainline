@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 # To make this work, add this text to $HOME/.ssh/config
 # Host oh
 # 	Hostname openhatch.org
@@ -6,5 +7,6 @@
 # 	Compression yes
 # 	ServerAliveInterval 120
 
+ssh -C oh /home/deploy/milestone-a/mysite/scripts/oh_mysqldump --ignore-table=oh_milestone_a.ghettoq_message | pv > dump.sql
 echo "drop database oh_milestone_a; create database oh_milestone_a" | $(dirname $0)/oh_mysql 
-ssh -C oh /home/deploy/milestone-a/mysite/scripts/oh_mysqldump --ignore-table=oh_milestone_a.ghettoq_message | pv | $(dirname $0)/oh_mysql
+$(dirname $0)/oh_mysql < dump.sql
