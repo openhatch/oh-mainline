@@ -6,6 +6,7 @@ from django.core.cache import cache
 from django.conf import settings
 import pprint
 import sha
+import re
 import traceback
 import logging
 import mysite.base.decorators
@@ -28,9 +29,9 @@ notifications_dictionary = {
         }
 
 def put_forwarder_in_contact_blurb_if_they_want(string, user):
-    forwarder_regex= u'\<\$fwd\>'
+    forwarder_regex= r'\$fwd\b'
     # if they want a forwarder
-    if re.match(forwarder_regex, string):
+    if re.search(forwarder_regex, string):
         visible_forwarders_matching_user = mysite.profile.models.Forwarder.objects.filter(
                 user=user, stops_being_listed_on__gt=datetime.datetime.utcnow())
         # "we can trust that" they already have a forwarder created if they
@@ -41,7 +42,7 @@ def put_forwarder_in_contact_blurb_if_they_want(string, user):
             forwarder = generate_forwarder(user).get_email_address()
         else:
             forwarder = visible_forwarders_matching_user[0].get_email_address()
-        forwarder += "\u200B"
+        forwarder += u" " # Put a space afterwards, to ensure that it gets urlizetrunc'd properly
         string = re.sub(forwarder_regex, forwarder, string)
     return string
 
