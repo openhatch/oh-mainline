@@ -27,20 +27,23 @@ notifications_dictionary = {
         "You've got to be logged in to do that!",
         }
 
-def put_forwarder_in_contact_blurb_if_they_want(str, user):
-    forwarder_magic_string = u'$fwd'
+def put_forwarder_in_contact_blurb_if_they_want(string, user):
+    forwarder_regex= u'\<\$fwd\>'
     # if they want a forwarder
-    if forwarder_magic_string in str:
+    if re.match(forwarder_regex, string):
         visible_forwarders_matching_user = mysite.profile.models.Forwarder.objects.filter(
                 user=user, stops_being_listed_on__gt=datetime.datetime.utcnow())
-        # "we can trust that" they already have a forwarder created if they want one (we make it at edit-time and then at garbage collection time (nightly), if necessary)
+        # "we can trust that" they already have a forwarder created if they
+        # want one (we make it at edit-time and then at garbage collection time
+        # (nightly), if necessary)
         # we'd hope that this list only contains one element, but if not oh well
         if not visible_forwarders_matching_user:
             forwarder = generate_forwarder(user).get_email_address()
         else:
             forwarder = visible_forwarders_matching_user[0].get_email_address()
-        str = str.replace(forwarder_magic_string, forwarder)
-    return str
+        forwarder += "\u200B"
+        string = re.sub(forwarder_regex, forwarder, string)
+    return string
 
 def generate_forwarder(user):
     Forwarder = mysite.profile.models.Forwarder
