@@ -18,20 +18,19 @@ body.three_columns #right #recent_activity_feed .body { font-size: 1em; }
 
 {% block pagetop %}
 {% if not the_user.is_authenticated %}
-<!--
-<div class='module' id='welcome'>
-    <div class='body'>
-        <h2>OpenHatch is an open source involvement engine.</h2>
-        <div id="blurb" style="display: none;">
-            <p>
-            On OpenHatch, you can build a profile that <strong>consolidates</strong> and <strong>aggregates</strong> all of your <strong>open source contributions</strong> in one place. We'll help you <strong>connect</strong> with <strong>people</strong> and <strong>projects</strong> that are <strong>relevant to your interests</strong>.
-            </p>
-            <p>Whether you're looking for projects that need help with documentation or just hoping to find other Python hackers in your area, we'll do our best to make your open source experience more friendly and fun.
-            </p>
+    <div class='module' id='hi_slashdot' style='font-size: 1.3em; margin-bottom: 10px; text-align: center; border: 1px solid rgba(0, 0, 0, .1); background: rgba(255, 255, 100, .4); width: 940px; padding: 10px;'>
+        <h2 style='color: #444;'>Hi Slashdot reader!</h2>
+        <div id="blurb">
+            You should follow us:
+            <a style='font-weight: bold;' href='http://twitter.com/openhatchery'>@openhatchery
+                on Twitter</a>
+            <br>
+            or (if you're even hipper)
+            <a style='font-weight: bold;' href='http://identi.ca/openhatchery'>Identi.ca</a>, or
+            best of all join #openhatch on irc.freenode.net!
+            <div style='font-size: .7em; font-weight: normal;'>(<a href='http://news.slashdot.org/story/10/05/16/2121247/Getting-Started-Contributing-Back-To-Open-Source'>Here's the Slashdot article.</a>)</div>
         </div>
     </div>
-</div>
--->
 {% endif %}
 {% endblock %}
 
