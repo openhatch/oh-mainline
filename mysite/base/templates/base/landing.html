@@ -18,8 +18,8 @@ body.three_columns #right #recent_activity_feed .body { font-size: 1em; }
 
 {% block pagetop %}
 {% if not the_user.is_authenticated %}
-    <div class='module' id='hi_slashdot' style='font-size: 1.3em; margin-bottom: 10px; text-align: center; border: 1px solid rgba(0, 0, 0, .1); background: rgba(255, 255, 100, .4); width: 940px; padding: 10px;'>
-        <h2 style='color: #444;'>Hi Slashdot reader!</h2>
+    <div class='module' id='hi_slashdot' style='font-size: 1.3em; margin-bottom: 10px; text-align: center; border: solid rgba(0, 0, 0, .1); border-width: 1px 1px 3px 1px; background: rgba(200, 255, 120, .4); margin: 0 80px 10px 80px; width: 780px; padding: 10px;text-shadow: 0px 1px 0px #fff;'>
+        <h2 style='color: #444; '>Hi Slashdot!</h2>
         <div id="blurb">
             You should follow us:
             <a style='font-weight: bold;' href='http://twitter.com/openhatchery'>@openhatchery
@@ -27,7 +27,7 @@ body.three_columns #right #recent_activity_feed .body { font-size: 1em; }
             <br>
             or (if you're even hipper)
             <a style='font-weight: bold;' href='http://identi.ca/openhatchery'>Identi.ca</a>, or
-            best of all join #openhatch on irc.freenode.net!
+            best of all join <strong>#openhatch</strong> on irc.freenode.net!
             <div style='font-size: .7em; font-weight: normal;'>(<a href='http://news.slashdot.org/story/10/05/16/2121247/Getting-Started-Contributing-Back-To-Open-Source'>Here's the Slashdot article.</a>)</div>
         </div>
     </div>
