@@ -259,7 +259,7 @@ def edit_person_info_do(request):
                            'studying', 'can_pitch_in', 'can_mentor'):
         tag_type, _ = TagType.objects.get_or_create(name=known_tag_type_name)
 
-        text = edit_info_form[known_tag_type_name].data
+        text = edit_info_form[known_tag_type_name].data or ''
         # Set the tags to this thing
         new_tag_texts_for_this_type_raw = text.split(',')
         new_tag_texts_for_this_type = [tag.strip()
