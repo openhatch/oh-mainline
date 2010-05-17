@@ -161,13 +161,11 @@ def create_answer_do(request):
 
     answer.project = mysite.search.models.Project.objects.get(pk=request.POST['project__pk'])
 
-
     question = ProjectInvolvementQuestion.objects.get(pk=request.POST['question__pk'])
     question.save()
+
     answer.question = question
-
     answer.text = request.POST['answer__text']
-
     answer.title = request.POST.get('answer__title', None)
 
     # loltrolled--you dont have cookies, so we will throw away your data at the last minute
@@ -176,7 +174,8 @@ def create_answer_do(request):
         suffix = ''
     else:
         suffix = '?cookies=disabled'
-        return HttpResponseRedirect(reverse(project, kwargs={'project__name': answer.project.name}) + suffix)
+        return HttpResponseRedirect(reverse(project,
+            kwargs={'project__name': answer.project.name}) + suffix)
 
     answer.save()
     if answer.author is None:
