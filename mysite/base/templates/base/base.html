@@ -100,6 +100,25 @@
         <div id='outermost'>
 
             <div id='penoutermost'>
+
+                {% ifequal slug 'home' %}
+                    {% if not the_user.is_authenticated %}
+                        <div class='module' id='hi_slashdot' style='font-size: 1.2em; text-align: center; border: solid rgba(0, 0, 0, .1); border-width: 1px 1px 3px 1px; background: rgba(200, 255, 120, .4); margin: 20px 100px; width: 710px; padding: 10px 40px; text-shadow: 0px 1px 0px #fff;'>
+                            <h2 style='color: #444; '>Hi Slashdot!</h2>
+                            <div id="blurb">
+                                You should follow us:
+                                <a style='font-weight: bold;'
+                                        href='http://twitter.com/openhatchery'>@openhatchery
+                                    on twitter</a>
+                                or (for the truly hip)
+                                <a rel='tipsy-south' style='font-weight: bold;' href='http://identi.ca/openhatchery' title='identi.ca = the open source twitter'>identi.ca</a>,
+                                or (best of all) join <strong>#openhatch</strong> on irc.freenode.net!
+                                <span style='margin-left: 15px; font-size: .8em; font-weight: normal;'><a href='http://news.slashdot.org/story/10/05/16/2121247/Getting-Started-Contributing-Back-To-Open-Source'>What Slashdot article?</a></span>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% endifequal %}
+
                 {% block nav %}
                 {% include 'base/nav.html' %}
                 {% endblock nav %}
