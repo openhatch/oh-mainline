@@ -299,15 +299,15 @@ def edit_person_info_do(request):
             new_link, _ = Link_Person_Tag.objects.get_or_create(
                     tag=tag, person=person)
 
-    posted_contact_blurb = contact_blurb_form['contact_blurb'].data
-    # if their new contact blurb contains $fwd,
-    # make sure that they have an email address in our database
-    # if not, give them an error
+    posted_contact_blurb = contact_blurb_form['contact_blurb'].data or ''
+    # If their new contact blurb contains $fwd, but they don't have an  email
+    # address in our database, give them an error.
     if '$fwd' in posted_contact_blurb and not person.user.email:
         contact_blurb_error = True
         errors_occurred = True
     else:
-        # if their new contact blurb contains $fwd and their old one didn't, then make them a new forwarder
+        # if their new contact blurb contains $fwd and their old one didn't,
+        # then make them a new forwarder
         if '$fwd' in posted_contact_blurb and not '$fwd' in person.contact_blurb:
             mysite.base.controllers.generate_forwarder(person.user)
         person.contact_blurb = posted_contact_blurb
