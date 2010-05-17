@@ -15,6 +15,8 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.template.loader import render_to_string
 
+from django.utils.datastructures import MultiValueDictKeyError
+
 import random
 from mysite.base.helpers import render_response
 
@@ -158,15 +160,27 @@ def create_answer_do(request):
     else:
         answer = Answer()
 
+    try:
+        answer.project = mysite.search.models.Project.objects.get(pk=request.POST['project__pk'])
+        question = ProjectInvolvementQuestion.objects.get(pk=request.POST['question__pk'])
+        answer.text = request.POST['answer__text']
+        answer.title = request.POST.get('answer__title', None)
+    except MultiValueDictKeyError as (full_error_message, ):
+        return HttpResponseBadRequest("""<p>
+            Sorry, an error occurred! This post handler
+            (<tt>project.views.create_answer_do</tt>) expects to see all the following
+            variables in the POST: <tt>project__pk, question__pk, answer__text,
+            answer__title</tt>. One of them was missing.
+            </p>
+            
+            <p>
+            The full error message might be helpful: 
+            <xmp>%s</xmp>
+            </p>
+            """ % full_error_message)
 
-    answer.project = mysite.search.models.Project.objects.get(pk=request.POST['project__pk'])
-
-    question = ProjectInvolvementQuestion.objects.get(pk=request.POST['question__pk'])
     question.save()
-
     answer.question = question
-    answer.text = request.POST['answer__text']
-    answer.title = request.POST.get('answer__title', None)
 
     # loltrolled--you dont have cookies, so we will throw away your data at the last minute
     if (request.user.is_authenticated() or
