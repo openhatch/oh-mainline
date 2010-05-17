@@ -165,7 +165,7 @@ def create_answer_do(request):
         question = ProjectInvolvementQuestion.objects.get(pk=request.POST['question__pk'])
         answer.text = request.POST['answer__text']
         answer.title = request.POST.get('answer__title', None)
-    except MultiValueDictKeyError as (full_error_message, ):
+    except MultiValueDictKeyError, full_error_message:
         return HttpResponseBadRequest("""<p>
             Sorry, an error occurred! This post handler
             (<tt>project.views.create_answer_do</tt>) expects to see all the following
