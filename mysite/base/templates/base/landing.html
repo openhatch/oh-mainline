@@ -227,6 +227,13 @@ Home
 </div>
 {% endblock content %}
 
+{% block js_in_head %}
+{{ block.super }}
+<script type="text/javascript">
+document.documentElement.className = 'js';
+</script>
+{% endblock %}
+
 {% block js %}
 {{ block.super }}
 <script type='text/javascript'>
