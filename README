@@ -155,3 +155,26 @@ Start in milestone-a, then run
 Exception: ('Version number mismatch', '1.0.2', '1.1.0')
 
 Here's a possible solution: "The problem can be solved by removing the python-ctypes package, which, it seems, is obsolete in Lucid and was left over from earlier versions." <https://bugs.launchpad.net/caffeine/+bug/560636>. (Note that you might see different version numbers than the ones above.) To remove the package, try "sudo apt-get remove python-ctypes".
+
+=== Adding jQuery UI components ===
+
+When you want to add a jQuery UI component, go here:
+
+    http://jqueryui.com/download
+
+Select the following options, plus yours:
+
+    * Sortable
+    * Accordion
+    * Tabs
+    * Progressbar
+
+Note that the site will automatically select any dependencies (like jQuery UI's "Core").
+
+First, under "Theme", select "No Theme". Under "Version", select "1.7.2 (stable release, for jQuery 1.3.2). Then click your little cartoon hand on the Download button.
+
+Unzip the file in /tmp/, and just extract the file js/jquery-ui-1.7.2.custom.min.js, and cp it to mysite/static/js/. That will overwrite the existing jQuery UI bundle.
+
+Be sure to check using git diff that the change you've introduced in git's view of that file is exactly what you expect.
+
+Finally, don't forget to add your component to the list above, so the next person does the right thing.
