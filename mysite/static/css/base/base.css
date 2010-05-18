@@ -1,3 +1,7 @@
+html.javascript_is_enabled .invisible_if_js { display: none !important; }
+
+.ui-tabs-hide { display: none !important; }
+
 body { font: 10pt Helvetica, sans-serif; background-color: #fff; background-position: fixed; color: #222; max-width: 1000px; margin: 0 auto; padding: 0; }
 a { color: #ff6d3d; text-decoration: none; }
     /* If you change the link color, be sure to change the color of the links
@@ -313,7 +317,6 @@ input[rel='hint'].blur { color: #777; }
 
 body#landing .tab { border: 0; }
 
-.ui-tabs .ui-tabs-hide { display: none !important; }
 .collapsible { display: none; }
 .and_more { color: #888; font-variant: small-caps; }
 
@@ -337,8 +340,6 @@ body.nice_form p.why { color: #555; font-size: 10pt; margin-bottom: 0;}
 body.nice_form .module { margin: 0 230px; width: 500px; }
 body.nice_form .module .head { width: 500px; }
 body.nice_form .module .body { width: 460px; }
-
-.ui-tabs .ui-tabs-hide { display: none !important; }
 
 body.landing_page.two_columns #main { width: 60%; margin-right: 2%; }
 body.landing_page.two_columns #main .module > .head { width: 96%; }
