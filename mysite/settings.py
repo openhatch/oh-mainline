@@ -165,7 +165,7 @@ CARROT_BACKEND = 'amqp'
 #   cd milestone-a; touch use_ghettoq
 if os.path.exists('../use_ghettoq'):
     print "Using ghettoq"
-    CARROT_BACKEND = 'ghettoq.taproot.Database
+    CARROT_BACKEND = 'ghettoq.taproot.Database'
 
 BROKER_HOST = 'localhost'
 BROKER_PORT = 5672
