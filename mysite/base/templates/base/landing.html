@@ -11,8 +11,7 @@ Community tools for free and open source software
 
 {% block content %}
 
-
-    <p style='color: #333; margin-bottom: 10px; text-align: center; font-size: 2em;'>
+    <p style='color: #333; margin-top: 0; margin-bottom: 10px; text-align: center; font-size: 2em;'>
         <strong>OpenHatch</strong> &middot; community tools for free and open source software
     </p>
 
@@ -166,7 +165,7 @@ Community tools for free and open source software
                     </div>
 
                     <div class='screenshot'>
-                        <a href='{% url mysite.profile.views.people %}?q=project:&quot;Debian%20GNU/Linux&quot;' class='screenshot_image_wrapper' style='background-image: url({% version '/static/images/screenshots/contributors_to_debian.png' %})'> </a>
+                        <a href='{% url mysite.project.views.project 'Miro' %}' class='screenshot_image_wrapper' style='background-image: url({% version '/static/images/screenshots/i_want_to_help.png' %})'> </a>
                         <div class='caption'>
                             <strong>Turn fans into contributors</strong>:
 
@@ -180,7 +179,7 @@ Community tools for free and open source software
                     </div>
 
                     <div class='screenshot'>
-                        <a href='{% url mysite.profile.views.people %}?q=project:&quot;Debian%20GNU/Linux&quot;' class='screenshot_image_wrapper' style='background-image: url({% version '/static/images/screenshots/contributors_to_debian.png' %})'> </a>
+                        <a href='http://pyblosxom.bluesock.org' class='screenshot_image_wrapper' style='background-image: url({% version '/static/images/screenshots/pyblosxom.png' %})'> </a>
                         <div class='caption'>
                             <strong>Put the "I want to help" button on your own website.</strong>
                             See it in action: <a href='http://pyblosxom.bluesock.org/'>
