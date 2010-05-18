@@ -57,7 +57,11 @@ Home
                             url({% version '/static/images/screenshots/profile.png' %})'>
                         </div>
                         <div class='caption'>
-                            Automatically create and control your open source profile.
+                            <strong>Create your open source profile</strong>:
+                            Show off your contributions &ndash; not just
+                            commits, but patches, documentation,
+                            design<span class='oxford'>,</span> and advice.
+                            <a href='{% url oh_my_profile_redirect %}'>Get started&nbsp;&raquo;</a>
                         </div>
                     </div>
 
@@ -67,8 +71,12 @@ Home
                             url({% version '/static/images/screenshots/importer-screenshot-squared-300px.png' %})'>
                         </a>
                         <div class='caption'>
+                            <strong>Import your public activity</strong> from a
+                            <abbr rel='tipsy-east' title='Github, Launchpad, Bitbucket, Debian, and code repositories indexed by Ohloh'>growing list of services</abbr>.
                             Type your open source username(s) into our importer
-                            to find your contributions automatically. <a href=''>Try it &raquo;</a>
+                            to find your contributions auto-magically.
+                            <a href='{% url mysite.profile.views.importer %}'>
+                                Try&nbsp;it&nbsp;&raquo;</a>
                         </div>
                     </div>
 
@@ -78,7 +86,10 @@ Home
                             url({% version '/static/images/screenshots/profile_info.png' %})'>
                         </a>
                         <div class='caption'>
-                            What kind of help can you pitch in with?
+                            <strong>What sort of contributor are you?</strong>
+                            List your areas of interest, expertise, and how you're willing to help.
+                            <a href='{% url mysite.profile.views.edit_info %}'>
+                                Write&nbsp;it&nbsp;&raquo;</a>
                         </div>
                     </div>
 
@@ -88,8 +99,10 @@ Home
                         <a href='{% url mysite.search.views.fetch_bugs %}?toughness=bitesize' class='screenshot_image_wrapper' style='background-image: url({% version '/static/images/screenshots/bitesize-opps.png' %})'> </a>
                         <div class='caption'>
                             <strong>Browse thousands of bitesize bugs:</strong>
-                            We collect data from all around the &lsquo;net
-                            about easy-to-solve bugs.
+                            Projects around the 'net label opportunities for
+                            new contributors. We collect these opportunities
+                            and show them off to you here.
+                            <a href=''>Check them out&nbsp;&raquo;</a>
                         </div>
                     </div>
                     <div class='screenshot'>
@@ -117,28 +130,82 @@ Home
                     <div class='screenshot'>
                         <a href='{% url mysite.profile.views.people %}?q=can_mentor:&quot;php&quot;' class='screenshot_image_wrapper' style='background-image: url({% version '/static/images/screenshots/mentors_in_php.png' %})'> </a>
                         <div class='caption'>
-                            <strong></strong>
+                            The&nbsp;OpenHatch community includes experienced
+                            people who can chat about open source topics or
+                            review your work.
+
+                            <a style='font-weight: bold;' href="/people/?q=can_mentor=C">
+                                Find&nbsp;a mentor&nbsp;&raquo;</a>
                         </div>
                     </div>
 
                     <div class='screenshot'>
                         <a href='{% url mysite.profile.views.people %}?q=can_pitch_in:&quot;c&quot;' class='screenshot_image_wrapper' style='background-image: url({% version '/static/images/screenshots/these_people_can_pitch_in_with_c.png' %})'> </a>
                         <div class='caption'>
-                            <strong></strong>
+                            <strong>&ldquo;Who can help my project?&rdquo;:</strong>
+                                Hundreds of OpenHatchers are willing to use their skills to 
+                                help open source.
+                            <a href="/people/?q=can_mentor=C"> Find help&nbsp;&raquo; </a>
                         </div>
                     </div>
 
                     <div class='screenshot'>
                         <a href='{% url mysite.profile.views.people %}?q=project:&quot;Debian%20GNU/Linux&quot;' class='screenshot_image_wrapper' style='background-image: url({% version '/static/images/screenshots/contributors_to_debian.png' %})'> </a>
                         <div class='caption'>
-                            <strong></strong>
+                            <strong>&ldquo;What projects are my neighbors working on?&rdquo;</strong>
+                            <a href="{% url mysite.profile.views.people %}">
+                                Find&nbsp;contributors near you&nbsp;&raquo;</a>
                         </div>
                     </div>
                 </div>
+
                 <div class='tab' id='for_project_maintainers'>
-                    for project maints
+
+                    <div class='screenshot'>
+                        <a href='{% url mysite.profile.views.people %}?q=project:&quot;Debian%20GNU/Linux&quot;' class='screenshot_image_wrapper' style='background-image: url({% version '/static/images/screenshots/contributors_to_debian.png' %})'> </a>
+                        <div class='caption'>
+                            <strong>OpenHatch project pages</strong> make it
+                            easy for new contributors to see where they're
+                            needed and how they can help.                           
+                            <a href='{% url mysite.project.views.projects %}'>
+                                Find&nbsp;or&nbsp;create your project's page&nbsp;&raquo;</a>
+                        </div>
+                    </div>
+
+                    <div class='screenshot'>
+                        <a href='{% url mysite.profile.views.people %}?q=project:&quot;Debian%20GNU/Linux&quot;' class='screenshot_image_wrapper' style='background-image: url({% version '/static/images/screenshots/contributors_to_debian.png' %})'> </a>
+                        <div class='caption'>
+                            <strong>Turn fans into contributors</strong>:
+
+                            Fans can say &lsquo;I want to help&rsquo; on your
+                            project page.  You can learn more about them
+                            and assign them tasks that they might like do.
+
+                            <a href='{% url mysite.project.views.projects %}'>
+                                Find&nbsp;or&nbsp;create your project's page&nbsp;&raquo;</a>
+                        </div>
+                    </div>
+
+                    <div class='screenshot'>
+                        <a href='{% url mysite.profile.views.people %}?q=project:&quot;Debian%20GNU/Linux&quot;' class='screenshot_image_wrapper' style='background-image: url({% version '/static/images/screenshots/contributors_to_debian.png' %})'> </a>
+                        <div class='caption'>
+                            <strong>Put the "I want to help" button on your own website.</strong>
+                            See it in action: <a href='http://pyblosxom.bluesock.org/'>
+                                The&nbsp;Pyblosxom weblog system&nbsp;&raquo;</a>
+                        </div>
+                    </div>
+    
+                    <ul class='links_at_tab_bottom'>
+                        <li>
+                            <a href=''> Create a page for your project </a>
+                        </li>
+                        <li>
+                            <a href='http://openhatch.org/wiki/Bug_trackers'>Add a bug tracker</a>
+                        </li>
+                    </ul>
                 </div>
             </div>
+
 
             <p style='display: block; margin: 2em 0 0 0; float: left; width: 100%; '>
                 OpenHatch works for projects across the Internet, no matter
@@ -165,7 +232,7 @@ Home
                 #syndicate p:last-child { margin: 0; }
             </style>
             <p>Put your project list on your other web things.</p>
-            <p style='float: right;'><a href='{% url mysite.account.views.widget %}'>Get your widget &raquo;</a></p>
+            <p style='float: right;'><a href='{% url mysite.account.views.widget %}'>Get your widget&nbsp;&raquo;</a></p>
         </div>
     </div>
     {% endif %}
