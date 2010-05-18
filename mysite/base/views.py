@@ -106,7 +106,10 @@ def home(request):
 
         data[u'recommended_bug_string2Query_objects'] = recommended_bug_string2Query_objects
 
-    return (request, 'base/landing.html', data)
+    if request.user.is_authenticated():
+        return (request, 'base/landing_page_for_logged_in_users.html', data)
+    else:
+        return (request, 'base/landing.html', data)
 
 def page_to_js(request):
     # FIXME: In the future, use:
