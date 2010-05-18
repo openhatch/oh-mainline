@@ -22,7 +22,7 @@ Home
 
             <div id='tabbed_container_of_big_links'>
                 <ul class='tab_nav'>
-                    <li style='background-image: url(/static/images/motif-ruddy.png);'>
+                    <li style='background-image: url({% version '/static/images/motif-ruddy.png' %});'>
                         <a href='#for_opp_hunters'>
                             <h4> Find something interesting to work on </h4>
                             <p>
@@ -31,52 +31,57 @@ Home
                             </p>
                         </a>
                     </li>
-                    <li style='background-image: url(/static/images/motif-lavender.png);'>
+                    <li style='background-image: url({% version '/static/images/motif-lavender.png' %});'>
                         <a href='#for_documenters'>
                             <h4>Document your open source contributions</h4>
-                            <p>
-                                Put your story together automagically
-                            </p>
+                            <p> Put your story together automagically </p>
                         </a>
                     </li>
-                    <li style='background-image: url(/static/images/motif-pastelblue.png);'>
+                    <li style='background-image: url({% version '/static/images/motif-pastelblue.png' %});'>
                         <a href='#for_people_seekers'>
                             <h4> Find open source contributors </h4>
-                        <p>
-                            Who's in your neighborhood? 
-                        </p>
+                            <p> Who's in your neighborhood?  </p>
                         </a>
                     </li>
-                    <li style='background-image: url(/static/images/motif-lightgreen.png);'>
+                    <li style='background-image: url({% version '/static/images/motif-lightgreen.png' %});'>
                         <a href='#for_project_maintainers'>
                             <h4> Create a contributors' page for your project </h4>
-                        <p>
-                            Explain how people can get involved 
-                        </p>
+                            <p> Explain how people can get involved </p>
                         </a>
                     </li>
                 </ul>
                 <div class='tab' id='for_documenters'>
 
                     <div class='screenshot'>
-                        <div class='screenshot_image_wrapper'
-                            style='background-image: url({% version '/static/images/screenshots/profile.png' %})'>
+                        <div class='screenshot_image_wrapper' style='background-image:
+                            url({% version '/static/images/screenshots/profile.png' %})'>
                         </div>
-                        <caption>
+                        <div class='caption'>
                             Automatically create and control your open source profile.
-                        </caption>
+                        </div>
                     </div>
 
                     <div class='screenshot'>
-                        <div class='screenshot_image_wrapper'
-                            style='background-image: url({% version '/static/images/importer-screenshot-squared-300px.png' %})'>
-                        </div>
+                        <a href='{% url mysite.profile.views.importer %}'
+                                class='screenshot_image_wrapper' style='background-image:
+                            url({% version '/static/images/importer-screenshot-squared-300px.png' %})'>
+                        </a>
                         <div class='caption'>
                             Type your open source username(s) into our importer
                             to find your contributions automatically. <a href=''>Try it &raquo;</a>
                         </div>
                     </div>
-                    
+
+                    <div class='screenshot'>
+                        <a href='{% url mysite.profile.views.edit_info %}'
+                                class='screenshot_image_wrapper' style='background-image:
+                            url({% version '/static/images/screenshots/profile_info.png' %})'>
+                        </a>
+                        <div class='caption'>
+                            Type your open source username(s) into our importer
+                            to find your contributions automatically. <a href=''>Try it &raquo;</a>
+                        </div>
+                    </div>
 
                 </div>
                 <div class='tab' id='for_opp_hunters'>
