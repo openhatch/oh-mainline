@@ -11,54 +11,60 @@ Home
 
 {% block content %}
 
+
+    <p style='color: #333; margin-bottom: 10px; text-align: center; font-size: 2em;'>
+        <strong>OpenHatch</strong> &middot; community tools for free and open source software
+    </p>
+
     <div class='module' id='what_to_do'>
         
         <div class='body'>
 
-            <p style='margin-bottom: 1em; text-align: center; font-size: 1.4em;'>
-                <strong>OpenHatch</strong>: Community tools for free and open source software
-            </p>
-
             <div id='tabbed_container_of_big_links'>
                 <ul class='tab_nav'>
-                    <li>
-                        <a href='#for_documenters'>
-                            Document your open source contributions
-                        </a>
-                        <div>
-                            Put your story together automagically
-                        </div>
-                    </li>
-                    <li>
+                    <li style='background-image: url(/static/images/motif-ruddy.png);'>
                         <a href='#for_opp_hunters'>
-                            Find something interesting to do in open source</a>
-                        <div>
-                            Browse coding and writing opportunities
-                            from across open source
-                        </div>
+                            <h4> Find something interesting to work on </h4>
+                            <p>
+                                Browse coding and writing opportunities
+                                from across open source
+                            </p>
+                        </a>
                     </li>
-                    <li>
+                    <li style='background-image: url(/static/images/motif-lavender.png);'>
+                        <a href='#for_documenters'>
+                            <h4>Document your open source contributions</h4>
+                            <p>
+                                Put your story together automagically
+                            </p>
+                        </a>
+                    </li>
+                    <li style='background-image: url(/static/images/motif-pastelblue.png);'>
                         <a href='#for_people_seekers'>
-                            Find open source contributors
-                        </a>
-                        <div>
+                            <h4> Find open source contributors </h4>
+                        <p>
                             Who's in your neighborhood? 
-                        </div>
-                    </li>
-                    <li>
-                        <a href='#for_project_maintainers'>
-                            Create a contributors' page for your project
+                        </p>
                         </a>
-                        <div>
+                    </li>
+                    <li style='background-image: url(/static/images/motif-lightgreen.png);'>
+                        <a href='#for_project_maintainers'>
+                            <h4> Create a contributors' page for your project </h4>
+                        <p>
                             Explain how people can get involved 
-                        </div>
+                        </p>
+                        </a>
                     </li>
                 </ul>
                 <div class='tab' id='for_documenters'>
 
-                    <div style='display: none;'>
-                        <img src='' />
-                        <caption>Create a complete open source profile.</caption>
+                    <div class='screenshot'>
+                        <div class='screenshot_image_wrapper'
+                            style='background-image: url({% version '/static/images/screenshots/profile.png' %})'>
+                        </div>
+                        <caption>
+                            Automatically create and control your open source profile.
+                        </caption>
                     </div>
 
                     <div class='screenshot'>

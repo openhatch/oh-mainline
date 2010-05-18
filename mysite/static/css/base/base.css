@@ -51,8 +51,6 @@ h1 {
 
 .tab_nav li a { border: 0; }
 .tab_nav li a:focus { -moz-outline: 0; }
-.tab_nav .ui-tabs-selected { background-position: bottom; background-repeat: no-repeat; }
-.tab_nav .ui-tabs-selected a { font-weight: bold; }
 
 #header {
     width: 920px;
@@ -61,7 +59,8 @@ h1 {
     margin-top: 15px;
     padding: 5px 20px;
     padding: 5px 65px 5px 5px;
-	}
+}
+
 #headerlogo {
     float: left;
 }
@@ -309,8 +308,6 @@ input[rel='hint'].blur { color: #777; }
 .tab_nav li { padding-bottom: 11px; margin-bottom: 10px; height: 20px; display: inline; margin-right: 3px; }
 .tab_nav li a { border: 0; }
 .tab_nav li a:focus { -moz-outline: 0; }
-.tab_nav .ui-tabs-selected { background-position: bottom; background-repeat: no-repeat; }
-.tab_nav .ui-tabs-selected a { font-weight: bold; }
 
 .tab { float: left; padding-top: 10px; border-top: 1px solid #e0e0e0; }
 
