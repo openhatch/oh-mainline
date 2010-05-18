@@ -40,6 +40,11 @@ body#landing #what_to_do .tab .screenshot { float: left; padding: 10px; width: 2
 body#landing #what_to_do .tab .screenshot_image_wrapper { float: left; width: 100%; height: 250px; border: 1px solid #d4d4d4; border-bottom-width: 2px; -moz-border-radius: 8px; border-radius: 8px; background-repeat: no-repeat; background-position: top left; margin-bottom: 7px; }
 body#landing #what_to_do .tab .caption { padding: 10px; }
 
+html.js body#landing #what_to_do #for_documenters { display: none; }
+html.js body#landing #what_to_do #for_people_seekers { display: none; }
+html.js body#landing #what_to_do #for_project_maintainers { display: none; }
+
+
 body#landing #right { width: 30%; }
 
 body#landing #right .body { padding: 3%; width: 94%; }
