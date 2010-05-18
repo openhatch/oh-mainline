@@ -64,7 +64,7 @@ Home
                     <div class='screenshot'>
                         <a href='{% url mysite.profile.views.importer %}'
                                 class='screenshot_image_wrapper' style='background-image:
-                            url({% version '/static/images/importer-screenshot-squared-300px.png' %})'>
+                            url({% version '/static/images/screenshots/importer-screenshot-squared-300px.png' %})'>
                         </a>
                         <div class='caption'>
                             Type your open source username(s) into our importer
@@ -78,18 +78,14 @@ Home
                             url({% version '/static/images/screenshots/profile_info.png' %})'>
                         </a>
                         <div class='caption'>
-                            Type your open source username(s) into our importer
-                            to find your contributions automatically. <a href=''>Try it &raquo;</a>
+                            What kind of help can you pitch in with?
                         </div>
                     </div>
 
                 </div>
                 <div class='tab' id='for_opp_hunters'>
                     <div class='screenshot'>
-                        <a href='{% url mysite.search.views.fetch_bugs %}?toughness=bitesize'
-                            class='screenshot_image_wrapper'
-                            style='background-image: url({% version '/static/images/screenshots/bitesize-opps.png' %})'>
-                        </a>
+                        <a href='{% url mysite.search.views.fetch_bugs %}?toughness=bitesize' class='screenshot_image_wrapper' style='background-image: url({% version '/static/images/screenshots/bitesize-opps.png' %})'> </a>
                         <div class='caption'>
                             <strong>Browse thousands of bitesize bugs:</strong>
                             We collect data from all around the &lsquo;net
@@ -97,21 +93,16 @@ Home
                         </div>
                     </div>
                     <div class='screenshot'>
-                        <a href='{% url mysite.search.views.fetch_bugs %}?language=C'
-                            class='screenshot_image_wrapper'
-                            style='background-image: url({% version '/static/images/screenshots/opps-in-c.png' %})'>
-                        </a>
+                        <a href='{% url mysite.search.views.fetch_bugs %}?language=C' class='screenshot_image_wrapper' style='background-image: url({% version '/static/images/screenshots/opps-in-c.png' %})'> </a>
                         <div class='caption'>
                             <strong>Search bugs by language:</strong>
                             You don't have to know ahead of time what project
                             you want to work on to find a good bug to solve.
                         </div>
                     </div>
+
                     <div class='screenshot'>
-                        <a href='{% url mysite.project.views.project 'Gwibber' %}'
-                            class='screenshot_image_wrapper'
-                            style='background-image: url({% version '/static/images/screenshots/wanna-help.png' %})'>
-                        </a>
+                        <a href='{% url mysite.project.views.project 'Gwibber' %}' class='screenshot_image_wrapper' style='background-image: url({% version '/static/images/screenshots/wanna-help.png' %})'> </a>
                         <div class='caption'>
                             <strong>&ldquo;Give me an assignment&rdquo;:</strong>
                             Tell a project that you want to help. Just click
@@ -120,8 +111,29 @@ Home
                         </div>
                     </div>
                 </div>
+
                 <div class='tab' id='for_people_seekers'>
-                    looking for people
+
+                    <div class='screenshot'>
+                        <a href='{% url mysite.profile.views.people %}?q=can_mentor:&quot;php&quot;' class='screenshot_image_wrapper' style='background-image: url({% version '/static/images/screenshots/mentors_in_php.png' %})'> </a>
+                        <div class='caption'>
+                            <strong></strong>
+                        </div>
+                    </div>
+
+                    <div class='screenshot'>
+                        <a href='{% url mysite.profile.views.people %}?q=can_pitch_in:&quot;c&quot;' class='screenshot_image_wrapper' style='background-image: url({% version '/static/images/screenshots/these_people_can_pitch_in_with_c.png' %})'> </a>
+                        <div class='caption'>
+                            <strong></strong>
+                        </div>
+                    </div>
+
+                    <div class='screenshot'>
+                        <a href='{% url mysite.profile.views.people %}?q=project:&quot;Debian%20GNU/Linux&quot;' class='screenshot_image_wrapper' style='background-image: url({% version '/static/images/screenshots/contributors_to_debian.png' %})'> </a>
+                        <div class='caption'>
+                            <strong></strong>
+                        </div>
+                    </div>
                 </div>
                 <div class='tab' id='for_project_maintainers'>
                     for project maints
