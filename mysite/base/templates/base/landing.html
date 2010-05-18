@@ -22,31 +22,24 @@ Home
 
             <div id='tabbed_container_of_big_links'>
                 <ul class='tab_nav'>
-                    <li style='background-image: url({% version '/static/images/motif-ruddy.png' %});'>
+                    <li >
                         <a href='#for_opp_hunters'>
-                            <h4> Find something interesting to work on </h4>
-                            <p>
-                                Browse coding and writing opportunities
-                                from across open source
-                            </p>
+                            <h4> Find something to work on </h4>
                         </a>
                     </li>
-                    <li style='background-image: url({% version '/static/images/motif-lavender.png' %});'>
+                    <li >
                         <a href='#for_documenters'>
-                            <h4>Document your open source contributions</h4>
-                            <p> Put your story together automagically </p>
+                            <h4>Tell your open source story</h4>
                         </a>
                     </li>
-                    <li style='background-image: url({% version '/static/images/motif-pastelblue.png' %});'>
+                    <li >
                         <a href='#for_people_seekers'>
-                            <h4> Find open source contributors </h4>
-                            <p> Who's in your neighborhood?  </p>
+                            <h4> Find open source people </h4>
                         </a>
                     </li>
-                    <li style='background-image: url({% version '/static/images/motif-lightgreen.png' %});'>
+                    <li >
                         <a href='#for_project_maintainers'>
                             <h4> Create a contributors' page for your project </h4>
-                            <p> Explain how people can get involved </p>
                         </a>
                     </li>
                 </ul>
@@ -162,7 +155,7 @@ Home
                 <div class='tab' id='for_project_maintainers'>
 
                     <div class='screenshot'>
-                        <a href='{% url mysite.profile.views.people %}?q=project:&quot;Debian%20GNU/Linux&quot;' class='screenshot_image_wrapper' style='background-image: url({% version '/static/images/screenshots/contributors_to_debian.png' %})'> </a>
+                        <a href='{% url mysite.project.views.project 'Twisted' %}' class='screenshot_image_wrapper' style='background-image: url({% version '/static/images/screenshots/project.png' %})'> </a>
                         <div class='caption'>
                             <strong>OpenHatch project pages</strong> make it
                             easy for new contributors to see where they're
@@ -205,12 +198,6 @@ Home
                     </ul>
                 </div>
             </div>
-
-
-            <p style='display: block; margin: 2em 0 0 0; float: left; width: 100%; '>
-                OpenHatch works for projects across the Internet, no matter
-                where they're hosted.
-            </p>
 
         </div>
     </div>
