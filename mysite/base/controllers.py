@@ -42,7 +42,7 @@ def put_forwarder_in_contact_blurb_if_they_want(string, user):
             forwarder = generate_forwarder(user).get_email_address()
         else:
             forwarder = visible_forwarders_matching_user[0].get_email_address()
-        forwarder += " " # Put a space afterwards, to ensure that it gets urlizetrunc'd properly
+        forwarder += u" " # Put a space afterwards, to ensure that it gets urlizetrunc'd properly
         string = re.sub(forwarder_regex, forwarder, string)
     return string
 
