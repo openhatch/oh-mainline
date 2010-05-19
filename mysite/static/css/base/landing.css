@@ -3,9 +3,9 @@ body.three_columns .module > .body h2 { color: #555; padding: 0 10px 10px}
 body#landing #what_to_do { background: none; width: 950px; padding: 0; }
 body#landing #what_to_do .body { padding: 0; background: none; }
 body#landing #what_to_do .tab_nav { width: 100%; float: left; -moz-border-radius-topleft: 5px; -moz-border-radius-topright: 5px; padding: 0; }
-body#landing #what_to_do .tab_nav li { text-align: center; padding-bottom: 20px; height: 50px; -moz-border-radius-topleft: 5px; -moz-border-radius-topright: 5px;  float: left; color: #555; width: 234px; margin: 0; border-right: 5px solid #fff; }
-body#landing #what_to_do .tab_nav li:last-child { border-right: 0; width: 233px; }
-body#landing #what_to_do .tab_nav li a { background: rgba(100, 200, 255, .2); text-shadow: #fff 0 1px 0; padding: 10px 20px; float: left; height: 50px; }
+body#landing #what_to_do .tab_nav li { text-align: center; padding-bottom: 20px; height: 50px;   float: left; color: #555; width: 231px; margin: 0; border-right: 8px solid transparent; }
+body#landing #what_to_do .tab_nav li:last-child { border-right: 0; width: 232px; }
+body#landing #what_to_do .tab_nav li a { border-radius: 15px; border-radius: 15px; -moz-border-radius-topleft: 15px; -moz-border-radius-topright: 15px; background: rgba(100, 200, 255, .2); text-shadow: #fff 0 1px 0; padding: 10px 20px; float: left; height: 50px; }
 body#landing #what_to_do .tab_nav li a:hover { text-decoration: none;  }
 body#landing #what_to_do .tab_nav li a:focus { outline: none; }
 body#landing #what_to_do .tab_nav li a:hover h4 { color: #222; }
