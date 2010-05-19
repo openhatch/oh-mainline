@@ -206,8 +206,11 @@ LP_CREDS_BASE64_ENCODED='WzFdCmNvbnN1bWVyX3NlY3JldCA9IAphY2Nlc3NfdG9rZW4gPSBHV0t
 GITHUB_USERNAME='openhatched'
 GITHUB_API_TOKEN='6f2b15214757ff724155654c97f4ce92'
 
-# Set this to false to bundle files even if not in production.
-ASSETS_DEBUG = True
+# How ASSETS_DEBUG works
+# Value     Effect
+#   True        Don't pack assets in DEBUG mode
+#   False       Pack assets in DEBUG mode
+ASSETS_DEBUG = False
 
 ADD_VERSION_STRING_TO_IMAGES = True
 ADD_VERSION_STRING_TO_IMAGES_IN_DEBUG_MODE = True
