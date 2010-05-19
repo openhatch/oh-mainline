@@ -1,22 +1,23 @@
 body.three_columns .module > .body h2 { color: #555; padding: 0 10px 10px}
-#landing_page_for_logged_in_usersh1 { text-align: center; }
-#landing_page_for_logged_in_usersh5 { color: #555; font-size: 1.2em; font-weight: normal; line-height: 110%; margin: 0 0 0 0; padding: 5px 5px 0 0; }
-	#landing_page_for_logged_in_usersh5 a { font-weight: bold; /*color: black;*/ }
-#landing_page_for_logged_in_usersh4 { color: #555; font-size: 1.0em; font-weight: bold; margin-left: 0; padding-left: 0; width: 100%; }
-#landing_page_for_logged_in_users.entry { clear: both; margin-bottom: 5px; padding-bottom: 5px; }
-#landing_page_for_logged_in_users#bugs .body li { color: #999; list-style: circle; margin-left: 2em; padding: 0; margin-top: 5px; }
-#landing_page_for_logged_in_users#bugs li span { color: #222; position: relative; top: -7px; }
-#landing_page_for_logged_in_users.module p { margin-top: 0; }
-#landing_page_for_logged_in_users.widget-wrapper { float: left; margin-bottom: 10px; width: 100%; }
-#landing_page_for_logged_in_usersa.blog-feed { background-color: transparent; background-repeat: no-repeat; background-position: bottom; float: right; width: 16px; height: 16px; margin-top: 5px; margin-right: 5px; }
-#landing_page_for_logged_in_usersa.blog-feed:hover { background-position: top; }
-#landing_page_for_logged_in_users.byline { font-size: 8pt; margin-top: 2px; }
+body#landing_page_for_logged_in_users h1 { text-align: center; }
+body#landing_page_for_logged_in_users h5 { color: #555; font-size: 1.2em; font-weight: normal; line-height: 110%; margin: 0 0 0 0; padding: 5px 5px 0 0; }
+body#landing_page_for_logged_in_users h5 a { font-weight: bold; /*color: black;*/ }
+body#landing_page_for_logged_in_users h4 { color: #555; font-size: 1.0em; font-weight: bold; margin-left: 0; padding-left: 0; width: 100%; }
+body#landing_page_for_logged_in_users .entry { clear: both; margin-bottom: 5px; padding-bottom: 5px; }
+body#landing_page_for_logged_in_users #bugs .body li { color: #999; list-style: circle; margin-left: 2em; padding: 0; margin-top: 5px; }
+body#landing_page_for_logged_in_users #bugs li span { color: #222; position: relative; top: -7px; }
+body#landing_page_for_logged_in_users .module p { margin-top: 0; }
+body#landing_page_for_logged_in_users .widget-wrapper { float: left; margin-bottom: 10px; width: 100%; }
+body#landing_page_for_logged_in_users a.blog-feed { background-color: transparent; background-repeat: no-repeat; background-position: bottom; float: right; width: 16px; height: 16px; margin-top: 5px; margin-right: 5px; }
+body#landing_page_for_logged_in_users a.blog-feed:hover { background-position: top; }
+body#landing_page_for_logged_in_users .byline { font-size: 8pt; margin-top: 2px; }
 
-body#landing_page_for_logged_in_usersul.nudgebuttons a { width: 95%; }
-body#landing_page_for_logged_in_users.module > .head ul li a { font-weight: normal; }
-body#landing_page_for_logged_in_users.nudgebuttons img { float: left; margin-right: 15px; margin-bottom: 20px; }
-body#landing_page_for_logged_in_users.rabbit_hole { float: right; margin: 0; font-size: .9em; }
+body#landing_page_for_logged_in_users ul.nudgebuttons a { width: 95%; }
+body#landing_page_for_logged_in_users ul.nudgebuttons a .notification { width: 93%; }
+body#landing_page_for_logged_in_users .module > .head ul li a { font-weight: normal; }
+body#landing_page_for_logged_in_users .nudgebuttons img { float: left; margin-right: 15px; margin-bottom: 20px; }
+body#landing_page_for_logged_in_users .rabbit_hole { float: right; margin: 0; font-size: .9em; }
 
-body#landing_page_for_logged_in_users#right .body {width: 94%;}
-body#landing_page_for_logged_in_users#right ul li { margin-bottom: 15px; }
-body#landing_page_for_logged_in_users#recent_activity_feed ul li:last-child { margin-bottom: 0; }
+body#landing_page_for_logged_in_users #right .body {width: 94%;}
+body#landing_page_for_logged_in_users #right ul li { margin-bottom: 15px; }
+body#landing_page_for_logged_in_users #recent_activity_feed ul li:last-child { margin-bottom: 0; }
