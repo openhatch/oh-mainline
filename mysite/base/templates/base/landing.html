@@ -18,6 +18,9 @@ document.documentElement.className = 'javascript_is_enabled';
 
 {% block content %}
 
+    {# Remember, this page is only shown to non-logged-in users. #}
+    {% cache 60 homepage_content %}
+
     <p style='color: #333; margin-top: 0; margin-bottom: 10px; text-align: center; font-size: 2em;'>
         <strong>OpenHatch</strong> &middot; community tools for free and open source software
     </p>
@@ -237,6 +240,8 @@ document.documentElement.className = 'javascript_is_enabled';
     {% endif %}
 
 </div>
+
+{% endcache %}
 {% endblock content %}
 
 {% block js %}
