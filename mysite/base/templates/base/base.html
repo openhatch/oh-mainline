@@ -1,6 +1,5 @@
 {% load base_extras %}
 {% load assets %}
-
 <!doctype html>
 <html lang="en" dir="ltr">
     <head>
@@ -222,9 +221,28 @@
         {% endblock js_before_bundle %}
 
         <script type='text/javascript' src='http://ajax.googleapis.com/ajax/libs/jquery/1.3.2/jquery.min.js'></script>
-        {% assets output="packed/openhatch.js", "js/jquery.query.js", "js/jquery.json.js", "js/jquery.hint.js", "js/jquery.form.js", "js/jquery.jgrowl.js", "js/jquery-ui-1.7.2.custom.min.js", "js/jquery.cookie.js", "piwik.js", "js/base/locationDialog.js", "js/base.js", "js/search/defaultText.js", "js/profile/portfolio.js", "js/profile/map.js", "openid/js/openid-jquery.js", "js/importer.js", "js/account/set_location.js", "js/search/search.js", "js/jquery.tipsy.js", "js/tipsy-onload.js", "js/jquery.color.js", "js/facebox.js", "js/jquery.tabs.js" %}
-        <script type="text/javascript" src="{{ ASSET_URL }}"></script>
-        {% endassets %}
+        <script type='text/javascript' src="/static/js/jquery-ui-1.7.2.custom.min.js"></script>
+        <script type='text/javascript' src="/static/js/jquery.query.js"></script>
+        <script type='text/javascript' src="/static/js/jquery.json.js"></script>
+        <script type='text/javascript' src="/static/js/jquery.hint.js"></script>
+        <script type='text/javascript' src="/static/js/jquery.form.js"></script>
+        <script type='text/javascript' src="/static/js/jquery.jgrowl.js"></script>
+        <script type='text/javascript' src="/static/js/jquery.cookie.js"></script>
+        <script type='text/javascript' src="/static/piwik.js"></script>
+        <script type='text/javascript' src="/static/js/base.js"></script>
+        <script type='text/javascript' src="/static/js/base/locationDialog.js"></script>
+        <script type='text/javascript' src="/static/js/search/defaultText.js"></script>
+        <script type='text/javascript' src="/static/js/profile/portfolio.js"></script>
+        <script type='text/javascript' src="/static/js/profile/map.js"></script>
+        <script type='text/javascript' src="/static/openid/js/openid-jquery.js"></script>
+        <script type='text/javascript' src="/static/js/importer.js"></script>
+        <script type='text/javascript' src="/static/js/account/set_location.js"></script>
+        <script type='text/javascript' src="/static/js/facebox.js"></script>
+        <script type='text/javascript' src="/static/js/search/search.js"></script>
+        <script type='text/javascript' src="/static/js/jquery.tipsy.js"></script>
+        <script type='text/javascript' src="/static/js/tipsy-onload.js"></script>
+        <script type='text/javascript' src="/static/js/jquery.color.js"></script>
+        <script type='text/javascript' src="/static/js/jquery.tabs.js"></script>
 
         {% block js %}
         {% endblock js %}
