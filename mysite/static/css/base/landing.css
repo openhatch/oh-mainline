@@ -3,17 +3,16 @@ body.three_columns .module > .body h2 { color: #555; padding: 0 10px 10px}
 body#landing #what_to_do { background: none; width: 950px; padding: 0; }
 body#landing #what_to_do .body { padding: 0; background: none; }
 body#landing #what_to_do .tab_nav { width: 100%; float: left; -webkit-border-top-left-radius: 5px; -moz-border-radius-topleft: 5px; -webkit-border-top-right-radius: 5px; -moz-border-radius-topright: 5px; padding: 0; }
-body#landing #what_to_do .tab_nav li { text-align: center; padding-bottom: 20px; height: 50px;   float: left; color: #555; width: 231px; margin: 0; border-right: 8px solid transparent; }
+body#landing #what_to_do .tab_nav li { height: 50px; display: block; text-align: center; padding-bottom: 20px;   float: left; color: #555; width: 231px; margin: 0; border-right: 8px solid transparent; }
 body#landing #what_to_do .tab_nav li:last-child { border-right: 0; width: 232px; }
-body#landing #what_to_do .tab_nav li a { border-radius-topright: 15px; border-radius-topleft: 15px; -webkit-border-top-left-radius: 15px; -moz-border-radius-topleft: 15px; -webkit-border-top-right-radius: 15px; -moz-border-radius-topright: 15px; background: rgba(100, 200, 255, .2); text-shadow: #fff 0 1px 0; padding: 10px 20px; float: left; height: 50px; }
+body#landing #what_to_do .tab_nav li a { height: 50px; border-radius-topright: 15px; border-radius-topleft: 15px; -webkit-border-top-left-radius: 15px; -moz-border-radius-topleft: 15px; -webkit-border-top-right-radius: 15px; -moz-border-radius-topright: 15px; background: rgba(100, 200, 255, .2); text-shadow: #fff 0 1px 0; padding: 10px; float: left; }
 body#landing #what_to_do .tab_nav li a:hover { text-decoration: none;  }
 body#landing #what_to_do .tab_nav li a:focus { outline: none; }
 body#landing #what_to_do .tab_nav li a:hover h4 { color: #222; }
-body#landing #what_to_do .tab_nav li.ui-state-active { -webkit-border-top-left-radius: 5px; -moz-border-radius-topleft: 5px; -webkit-border-top-right-radius: 5px; -moz-border-radius-topright: 5px; }
 body#landing #what_to_do .tab_nav li.ui-state-active a {  background: #fff; }
 body#landing #what_to_do .tab_nav li.ui-state-active h4 { color: #000; }
 body#landing #what_to_do .tab_nav li:last-child { margin-right: 0; }
-body#landing #what_to_do .tab_nav li a h4 { font-weight: bold; text-shadow: #fff 0 1px 0; font-size: 1.4em; line-height: 1.2em; display: block; margin-bottom: .3em; }
+body#landing #what_to_do .tab_nav li a h4 { font-weight: bold; text-shadow: #fff 0 1px 0; font-size: 1.4em; line-height: 1.2em; float: left; display: block; margin-bottom: .3em; }
 body#landing #what_to_do .tab { background: #fff; width: 100%; float: left; }
 body#landing #what_to_do .tab .screenshot { float: left; padding: 10px; width: 270px; margin: 0 13px; }
 body#landing #what_to_do .tab .screenshot_image_wrapper { float: left; width: 100%; height: 250px; border: 1px solid #d4d4d4; border-bottom-width: 2px; -webkit-border-radius: 8px; -moz-border-radius: 8px; border-radius: 8px; background-repeat: no-repeat; background-position: top left; margin-bottom: 7px; }
