@@ -67,6 +67,8 @@ document.documentElement.className = 'javascript_is_enabled';
                             <strong>Search bugs by language:</strong>
                             You don't have to know ahead of time what project
                             you want to work on to find a good bug to solve.
+                            <a href='{% url mysite.search.views.fetch_bugs %}'>
+                                Try&nbsp;it&nbsp;&raquo;</a>
                         </div>
                     </div>
 
@@ -77,6 +79,8 @@ document.documentElement.className = 'javascript_is_enabled';
                             Tell a project that you want to help. Just click
                             the button, and a project maintainer will be
                             notified of your interest.
+                            <a href='{% url mysite.project.views.projects %}'>
+                                Find a project&nbsp;&raquo;</a>
                         </div>
                     </div>
                 </div>
@@ -84,9 +88,10 @@ document.documentElement.className = 'javascript_is_enabled';
                 <div class='tab invisible_if_js' id='for_documenters'>
 
                     <div class='screenshot'>
-                        <div class='screenshot_image_wrapper' style='background-image:
+                        <a href='{% url oh_my_profile_redirect %}'
+                                class='screenshot_image_wrapper' style='background-image:
                             url({% version '/static/images/screenshots/profile.png' %})'>
-                        </div>
+                        </a>
                         <div class='caption'>
                             <strong>Create your open source profile</strong>:
                             Show off your contributions &ndash; not just
