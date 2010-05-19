@@ -173,7 +173,7 @@ input[type='submit'] {
     padding: 8px 15px;
     width: 700px;
     font-size: 11pt;
-    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px; -moz-border-radius: 5px;
     border-radius: 5px;
 }
 img {
@@ -212,7 +212,7 @@ abbr.foss {
     float: left;
     width: 95%;
     background-color: #ffc; #f5fdc1; /*#edec7f; #ffa;*/
-    -moz-border-radius: 8px;
+    -webkit-border-radius: 8px; -moz-border-radius: 8px;
     -webkit-border-radius: 8px;
     border-radius: 8px;
     padding: 10px;
@@ -235,7 +235,7 @@ abbr.foss {
     color: #522;
     background-color: #ffe4e4;
     margin: 10px 0;
-    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px; -moz-border-radius: 5px;
     border-radius: 5px;
 }
 #normal_login_form li {
@@ -355,4 +355,4 @@ body.landing_page .accordion div { display: none; border-bottom: 1px dashed #ccc
 body.landing_page h4 { cursor: hand; cursor: pointer; float: none; padding: .8em 0; margin-bottom: 0; border-bottom: 1px dashed #ccc; }
 
 body.landing_page .note-wrapper { background-image: url(/static/images/downarrow-yellow.png); background-repeat: no-repeat; background-position: bottom center; padding-bottom: 10px; }
-body.landing_page .note { text-shadow: 0 1px 0 #fff; font-size: 1.2em; text-align: center; -moz-border-radius: 8px; border-radius: 8px; background-color: #ffa; margin: 0 30px; padding: 8px 60px; }
+body.landing_page .note { text-shadow: 0 1px 0 #fff; font-size: 1.2em; text-align: center; -webkit-border-radius: 8px; -moz-border-radius: 8px; border-radius: 8px; background-color: #ffa; margin: 0 30px; padding: 8px 60px; }
