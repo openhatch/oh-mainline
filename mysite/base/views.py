@@ -22,6 +22,7 @@ import mysite.search.models
 import feedparser
 import lxml.html
 import random
+import datetime
 
 from django.contrib.auth.decorators import login_required
 
@@ -145,6 +146,46 @@ def geocode(request):
         return HttpResponseBadRequest() # no address :-(
     return HttpResponse(coordinates_as_json, 
                         mimetype='application/json')
+
+@view
+def meta(request):
+    data = {}
+    data['dia_diagnostics'] = {}
+
+    # temp variable for shortness
+    my = data['dia_diagnostics']
+    
+    my['Uncompleted DIAs'] = mysite.profile.models.DataImportAttempt.objects.filter(
+        completed=False).count()
+
+    one_minute_ago = (datetime.datetime.now() -
+                      datetime.timedelta(minutes=1))
+
+    my['Uncompleted DIAs older than 1 minute'] = mysite.profile.models.DataImportAttempt.objects.filter(
+        completed=False, date_created__lt=one_minute_ago).count()
+
+    five_minute_ago = (datetime.datetime.now() -
+                      datetime.timedelta(minutes=5))
+
+    my['Uncompleted DIAs older than 5 minutes'] = mysite.profile.models.DataImportAttempt.objects.filter(
+        completed=False, date_created__lt=one_minute_ago).count()
+        
+    data['bug_diagnostics'] = {}
+    # local name for shortness
+    my = data['bug_diagnostics']
+
+    one_hour_and_one_day_ago = (datetime.datetime.now() -
+                                datetime.timedelta(days=1, hours=1))
+
+    my['Bugs older than one day + one hour ago'] = mysite.search.models.Bug.all_bugs.filter(
+        last_polled__lt=one_hour_and_one_day_ago).count()
+
+    two_days_ago = (datetime.datetime.now() -
+                    datetime.timedelta(days=2))
+    my['Bugs older than two days'] = mysite.search.models.Bug.all_bugs.filter(
+        last_polled__lt=two_days_ago).count()
+
+    return (request, 'meta.html', data)
 
 @login_required
 def save_portfolio_entry_ordering_do(request):

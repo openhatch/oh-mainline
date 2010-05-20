@@ -17,6 +17,7 @@ from voting.views import vote_on_object
 import mysite.account.views
 
 urlpatterns = patterns('',
+        (r'^\+meta/', 'mysite.base.views.meta'),
 
         (r'^\+project_icon_poll/(?P<project_name>.+)', 'mysite.search.views.project_has_icon'),
 
