@@ -92,7 +92,8 @@ class RoundupTracker(object):
         return urlparse.urljoin(self.root_url, "issue%d" % remote_bug_id)
 
     def get_remote_bug_id(self, bug):
-        return int(bug.canonical_bug_link.split(self.root_url + "/issue")[1])
+        plus_slash_issue = urlparse.urljoin(self.root_url, 'issue')
+        return int(bug.canonical_bug_link.split(plus_slash_issue)[1])
 
     def create_bug_object_for_remote_bug_id_if_necessary(self, remote_bug_id):
         """See if we have either no bug or only a stale one. If so,
