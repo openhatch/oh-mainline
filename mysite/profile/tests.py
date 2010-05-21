@@ -15,7 +15,8 @@ from mysite.profile import views
 
 from django.conf import settings
 
-from mysite.customs import ohloh 
+from mysite.customs import ohloh
+from mysite.customs.models import WebResponse
 
 import re
 from StringIO import StringIO
@@ -282,6 +283,29 @@ class BaseCeleryTest(TwillTests):
         for n, citation in enumerate(citations):
             self.assertEqual(citation.data_import_attempt, dia)
             self.assertEqual(citation.summary, summaries_we_expect[n])
+
+# Mockup of stump's contribution list as given by ohloh, stripped down and slightly tweaked for the purposes of testing.
+stumps_ohloh_results = mock.Mock()
+stumps_ohloh_results.return_value = ([
+  {u'contributor_name': u'stump', u'analysis_id': u'1145788', u'man_months': u'11', u'primary_language_nice_name': u'C',u'contributor_id': u'2008814186590608'},
+  {u'contributor_name': u'John Stumpo', u'analysis_id': u'1031175', u'man_months': u'12', u'primary_language_nice_name': u'Python', u'contributor_id': u'110891760646528'}
+], WebResponse())
+stumps_project_lookup = mock.Mock()
+stumps_project_lookup.return_value = {u'name': u'WinKexec', u'homepage_url': u'https://www.jstump.com/projects/kexec/'}
+
+class OhlohTests(TwillTests):
+
+    @mock.patch('mysite.customs.ohloh.ohloh_url2data', stumps_ohloh_results)
+    @mock.patch('mysite.customs.ohloh.Ohloh.analysis2projectdata', stumps_project_lookup)
+    def test_ohloh_doesnt_match_just_substring(self):
+        expected = [{'man_months': 11,
+          'permalink': u'https://www.ohloh.net/p/winkexec/contributors/2008814186590608',
+          'primary_language': u'C',
+          'project': u'WinKexec',
+          'project_homepage_url': u'https://www.jstump.com/projects/kexec/'}]
+
+        received = ohloh.get_ohloh().get_contribution_info_by_username('stump')[0]
+        self.assertEqual(received, expected)
 
 class CeleryTests(BaseCeleryTest):
     # {{{
