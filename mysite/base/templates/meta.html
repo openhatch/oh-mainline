@@ -1,0 +1,66 @@
+<h1>Some tables</h1>
+
+
+<h2>Diagnostics for Data Import Attempts</h2>
+
+<h3>What are we diganosing?</h3>
+
+<p>These diagnostics explain how well we are handling "DIAs".
+A DataImportAttempt is created whenever a user submits a username
+or email address to the profile importer. When that happens, we create
+a DataImportAttempt object and save it to the database. We also enqueue
+a job to the background job daemon (celeryd).
+</p>
+
+<p>
+If we're lucky, the background jobs get handled quickly. The imports
+from Ohloh can take <em>minutes</em>, whereas faster services like
+Bitbucket and Github respond within seconds.
+</p>
+
+<p>We run some number (typically 4) of celeryd workers to execute
+these jobs. That means can run that many (typically 4) tasks at once,
+or so. If users are submitting jobs faster than we're processing them,
+then their experience will suck.</p>
+
+<p>Really, at any given time, the goal is 0 uncompleted DataImportAttempts.
+As <em>soon</em> as someone hits submit to start the importer, there will
+be a few uncompleted DIAs. Hopefully we'll finish them within one minute.
+If we take more than 5 minutes, then something is <em>definitely</em> wrong!</p>
+
+<h3>Data</h3>
+
+<table>
+{% for key, value in dia_diagnostics.items %}
+<tr>
+<td>{{ key }}:</td>
+<td>{{ value }}</td>
+</tr>
+{% endfor %}
+</table>
+
+<h2>Diagnostics for bug tracker updating</h2>
+
+<h3>What are we diganosing?</h3>
+
+<p>So we store these "Bug" objects. How do they update?</p>
+
+<p>Each Bug object doesn't know how to update itself. Instead, we have
+a nightly job per bug tracker. When that job wakes up,
+it refreshes all the bugs that came from that bug tracker.
+</p>
+
+<p>So if a Bug object's last_polled stamp is more old than one day + one hour,
+then it means we're not properly updating it from its bug tracker. If it's older
+than <em>two</em> days, then something is terribly wrong!</p>
+
+<h3>Data</h3>
+
+<table>
+{% for key, value in bug_diagnostics.items %}
+<tr>
+<td>{{ key }}:</td>
+<td>{{ value }}</td>
+</tr>
+{% endfor %}
+</table>
