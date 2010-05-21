@@ -8,7 +8,6 @@ from celery.registry import tasks
 import celery.decorators
 import mysite.search.launchpad_crawl
 
-@celery.decorators.periodic_task(run_every=datetime.timedelta(days=1))
 def refresh_bugs_from_all_indexed_launchpad_projects():
     # Look, ma, a hard-coded table that maps to
     # OpenHatch project names from Launchpad.net project names.
@@ -18,8 +17,8 @@ def refresh_bugs_from_all_indexed_launchpad_projects():
                       'gwibber': 'Gwibber'}
     for launchpad_project_name in lpproj2ohproj:
         openhatch_project_name = lpproj2ohproj[launchpad_project_name]
-        import_bugs_from_one_project.delay(launchpad_project_name,
-                                           openhatch_project_name)
+        import_bugs_from_one_project(launchpad_project_name,
+                                     openhatch_project_name)
 
 @celery.decorators.task
 def import_bugs_from_one_project(launchpad_project_name,
@@ -37,12 +36,11 @@ def import_bugs_from_one_project(launchpad_project_name,
             canonical_bug_link=openhatch_bug_link,
             openhatch_project_name=openhatch_project_name)
 
-@celery.decorators.periodic_task(run_every=datetime.timedelta(days=1))
 def refresh_all_launchpad_bugs():
     logging.info("Refreshing all Launchpad bugs.")
     for lp_bug in mysite.search.models.Bug.all_bugs.filter(
         canonical_bug_link__startswith='https://bugs.launchpad.net/'):
-        refresh_one_launchpad_bug.delay(
+        refresh_one_launchpad_bug.apply(
             canonical_bug_link=lp_bug.canonical_bug_link,
             openhatch_project_name=None)
 

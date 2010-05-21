@@ -53,8 +53,7 @@ class LookAtOneTwistedBug(Task):
             bug_obj.save()
         logging.info("Finished with %d from Twisted." % bug_id)
 
-class LearnAboutNewEasyTwistedBugs(PeriodicTask):
-    run_every = datetime.timedelta(days=1)
+class LearnAboutNewEasyTwistedBugs(Task):
     def run(self, **kwargs):
         logger = self.get_logger(**kwargs)
         
@@ -63,11 +62,10 @@ class LearnAboutNewEasyTwistedBugs(PeriodicTask):
             mysite.customs.bugtrackers.trac.csv_of_bugs(
                 url='http://twistedmatrix.com/trac/query?status=new&status=assigned&status=reopened&format=csv&keywords=%7Eeasy&order=priority')):
             task = LookAtOneTwistedBug()
-            task.delay(bug_id=bug_id)
+            task.apply(bug_id=bug_id)
         logger.info('Finished grabbing the list of Twisted easy bugs.')
 
-class RefreshAllTwistedEasyBugs(PeriodicTask):
-    run_every = datetime.timedelta(days=1)
+class RefreshAllTwistedEasyBugs(Task):
     def run(self, **kwargs):
         logger = self.get_logger(**kwargs)
         logger.info("Starting refreshing all easy Twisted bugs.")
@@ -77,7 +75,7 @@ class RefreshAllTwistedEasyBugs(PeriodicTask):
             tb = mysite.customs.bugtrackers.trac.TracBug.from_url(
                 bug.canonical_bug_link)
             task = LookAtOneTwistedBug()
-            task.delay(bug_id=tb.bug_id)
+            task.apply(bug_id=tb.bug_id)
 
 tasks.register(LearnAboutNewEasyTwistedBugs)
 tasks.register(LookAtOneTwistedBug)
@@ -124,7 +122,7 @@ def learn_about_new_sugar_easy_bugs():
     for bug_id in mysite.customs.bugtrackers.trac.csv_url2list_of_bug_ids(
         mysite.customs.bugtrackers.trac.csv_of_bugs(
             url='http://bugs.sugarlabs.org/query?status=new&status=assigned&status=reopened&format=csv&keywords=%7Esugar-love&order=priority')):
-        look_at_sugar_labs_bug.delay(bug_id=bug_id)
+        look_at_sugar_labs_bug.apply(bug_id=bug_id)
     logging.info('Finished grabbing the list of Sugar Labs easy bugs.')
 
 @celery.decorators.periodic_task(run_every=datetime.timedelta(days=1))
@@ -135,4 +133,4 @@ def refresh_all_sugar_easy_bugs():
         'http://bugs.sugarlabs.org/'):
         tb = mysite.customs.bugtrackers.trac.TracBug.from_url(
             bug.canonical_bug_link)
-        look_at_sugar_labs_bug.delay(bug_id=tb.bug_id)
+        look_at_sugar_labs_bug.apply(bug_id=tb.bug_id)
