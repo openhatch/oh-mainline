@@ -16,6 +16,10 @@ If it complains that it is not enabled, configure it by reading /etc/default/mem
 
 === Buildout ===
 
+Install binary prequisites first:
+
+    sudo apt-get install python-libxml2
+
 You should be in the top-level directory in repository for these commands.
 
     python2.5 bootstrap.py
