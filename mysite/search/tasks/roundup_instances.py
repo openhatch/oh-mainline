@@ -29,7 +29,8 @@ def learn_about_new_mercurial_easy_and_documentation_bugs():
 def refresh_all_mercurial_bugs():
     logging.info("Starting refreshing all Mercurial bugs.")
     roundup = mysite.customs.bugtrackers.roundup_general.MercurialTracker()
+    count = 0
     for bug_id in roundup.get_remote_bug_ids_already_stored():
-        look_at_one_bug_in_mercurial.apply(bug_id=bug_id)
-
-
+        look_at_one_bug_in_mercurial(bug_id=bug_id)
+        count += 1
+    logging.info("Okay, looked at %d bugs from Mercurial." % count)
