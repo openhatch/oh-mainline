@@ -199,6 +199,12 @@ class Ohloh(object):
         for c_f in c_fs:
             if 'analysis_id' not in c_f:
                 continue # this contributor fact is useless
+
+            # Ohloh matches on anything containing the username we asked for as a substring,
+            # so check that the contributor fact actually matches the whole string (case-insensitive).
+            if username.lower() != c_f['contributor_name'].lower():
+                continue
+
             eyedee = int(c_f['analysis_id'])
             project_data = self.analysis2projectdata(eyedee)
 
