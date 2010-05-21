@@ -20,17 +20,6 @@ import mysite.search.tasks.bugzilla_instances
 import mysite.search.tasks.launchpad_tasks
 import mysite.search.tasks.roundup_instances
 
-class GrabLaunchpadBugs(PeriodicTask):
-    run_every = datetime.timedelta(days=1)
-    def run(self, **kwargs):
-        logger = self.get_logger(**kwargs)
-        for lp_project in lpproj2ohproj:
-            openhatch_proj = lpproj2ohproj[lp_project]
-            logger.info("Started to grab lp.net bugs for %s into %s" % (
-                    lp_project, openhatch_proj))
-            grab_lp_bugs(lp_project=lp_project,
-                         openhatch_project=openhatch_proj)
-
 class LearnAboutNewPythonDocumentationBugs(PeriodicTask):
     run_every = datetime.timedelta(days=1)
     def run(self, **kwargs):
@@ -40,7 +29,7 @@ class LearnAboutNewPythonDocumentationBugs(PeriodicTask):
         for bug_id in mysite.customs.models.RoundupBugTracker.csv_url2bugs(url):
             # enqueue a task to examine this bug
             task = LookAtOneBugInPython()
-            task.delay(bug_id=bug_id)
+            task.apply(bug_id=bug_id)
         logger.info("Finished grabbing the list of Python documentation bugs.")
 
 class LearnAboutNewEasyPythonBugs(PeriodicTask):
@@ -52,7 +41,7 @@ class LearnAboutNewEasyPythonBugs(PeriodicTask):
         for bug_id in mysite.customs.models.RoundupBugTracker.csv_url2bugs(url):
             # enqueue a task to examine this bug
             task = LookAtOneBugInPython()
-            task.delay(bug_id=bug_id)
+            task.apply(bug_id=bug_id)
         logger.info("Finished grabbing the list of Python easy bugs.")
 
 class LookAtOneBugInPython(Task):
