@@ -1551,7 +1551,7 @@ class EditContactBlurbForwarderification(TwillTests):
         mystr_forwarderified = (mysite.base.controllers.
                 put_forwarder_in_contact_blurb_if_they_want(mystr, user_to_forward_to))
         our_forwarder = mysite.profile.models.Forwarder.objects.get(user=user_to_forward_to)
-        output = "email me here: %s@%s\u200B.  it'll be great" % (
+        output = "email me here: %s@%s .  it'll be great" % (
                 our_forwarder.address, settings.FORWARDER_DOMAIN)
         # ^note that we throw in a zero-width string after the forwarder to make
         # sure it that the urlizetrunc filter, in the template, linkifies it correctly.
