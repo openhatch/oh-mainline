@@ -15,6 +15,7 @@ setup(
     license = 'AGPLv3',
 
     install_requires = ['setuptools',
+                        'multiprocessing',
                         'python-distutils-extra',
                         'twill==0.9.1-cc',
                         'invitation',
