@@ -1,5 +1,8 @@
 from settings import *
 
+# But use the linode as our MySQL server
+DATABASE_HOST='linode.openhatch.org'
+
 OHLOH_API_KEY='SXvLaGPJFaKXQC0VOocAg'
 DEBUG=False
 ADMINS=[
