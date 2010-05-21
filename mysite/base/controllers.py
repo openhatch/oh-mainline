@@ -14,6 +14,7 @@ import datetime
 import base64
 import os
 import string
+import random
 
 notifications_dictionary = {
         "edit_password_done":
@@ -86,6 +87,8 @@ def _geocode(address):
     # address. It gets back a csv file, which it then parses and
     # returns a string with the longitude and latitude of the address.
 
+    logging.info('Geocoding address: %s' % address)
+
     # This isn't an actual maps key, you'll have to get one yourself.
     # Sign up for one here: http://code.google.com/apis/maps/signup.html
     mapsUrl = 'http://maps.google.com/maps/geo?q='
@@ -119,6 +122,8 @@ def address2cache_key_name(address):
 
 @mysite.base.decorators.unicodify_strings_when_inputted
 def cached_geocoding_in_json(address):
+    A_LONG_TIME_IN_SECONDS = 60 * 60 * 24 * 7
+    JUST_FIVE_MINUTES_IN_SECONDS = 5 * 60
     if address == 'Inaccessible Island':
         is_inaccessible = True
     else:
@@ -131,8 +136,12 @@ def cached_geocoding_in_json(address):
         geocoded_and_inaccessible = {'is_inaccessible': is_inaccessible}
         geocoded_and_inaccessible.update(geocoded)
         geocoded_in_json = simplejson.dumps(geocoded_and_inaccessible)
+
         if geocoded:
-            cache.set(key_name, geocoded_in_json, 60 * 60 * 24 * 7) # cache for a week, which should be plenty
+            cache_duration = A_LONG_TIME_IN_SECONDS + random.randrange(0, JUST_FIVE_MINUTES_IN_SECONDS) # cache for a week, which should be plenty
+        else:
+            cache_duration = random.randrange(0, JUST_FIVE_MINUTES_IN_SECONDS)
+        cache.set(key_name, geocoded_in_json, cache_duration)
     return geocoded_in_json
 
 def get_uri_metadata_for_generating_absolute_links(request):
