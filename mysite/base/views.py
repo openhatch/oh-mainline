@@ -184,6 +184,10 @@ def meta(request):
                     datetime.timedelta(days=2))
     my['Bugs older than two days'] = mysite.search.models.Bug.all_bugs.filter(
         last_polled__lt=two_days_ago).count()
+    my['Bugs older than two days (in percent)'] = (
+        mysite.search.models.Bug.all_bugs.filter(
+        last_polled__lt=two_days_ago).count() * 100.0 /
+        mysite.search.models.Bug.all_bugs.count())        
 
     return (request, 'meta.html', data)
 
