@@ -116,7 +116,6 @@ def look_at_sugar_labs_bug(bug_id):
     bug.save()
     logging.info("Finished with %d from Sugar Labs." % bug_id)
     
-@celery.decorators.periodic_task(run_every=datetime.timedelta(days=1))
 def learn_about_new_sugar_easy_bugs():
     logging.info('Started to learn about new Sugar Labs easy bugs.')
     for bug_id in mysite.customs.bugtrackers.trac.csv_url2list_of_bug_ids(
@@ -125,7 +124,6 @@ def learn_about_new_sugar_easy_bugs():
         look_at_sugar_labs_bug.apply(bug_id=bug_id)
     logging.info('Finished grabbing the list of Sugar Labs easy bugs.')
 
-@celery.decorators.periodic_task(run_every=datetime.timedelta(days=1))
 def refresh_all_sugar_easy_bugs():
     logging.info("Starting refreshing all Sugar bugs.")
     for bug in mysite.search.models.Bug.all_bugs.filter(
