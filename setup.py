@@ -15,6 +15,7 @@ setup(
     license = 'AGPLv3',
 
     install_requires = ['setuptools',
+                        'multiprocessing',
                         'python-distutils-extra',
                         'twill==0.9.1-cc',
                         'invitation',
@@ -31,6 +32,7 @@ setup(
                         'hexagonit.recipe.download',
                         'django-voting',
                         'staticgenerator==1.4.1.2',
+                        'python-launchpad-bugs',
                        ],
 
     dependency_links = [dependency_path,
@@ -38,6 +40,7 @@ setup(
                         dependency_path + 'invitation-1.0.tar.gz#egg=invitation',
                         dependency_path + 'django-assets-0.2.tar.gz#egg=django-assets',
                         dependency_path + 'South-0.6_pre-py2.6.egg#egg=south',
+                        dependency_path + 'python-launchpad-bugs-0.3.6.tar.gz#egg=python-launchpad-bugs',
                         'http://linode.openhatch.org/~paulproteus/python-github2-0.1.1.tar.gz#egg=python-github2',
                         'http://pygeoip.googlecode.com/files/pygeoip-0.1.3.zip#egg=pygeoip',
                         'http://linode.openhatch.org/~rafpaf/django-debug-toolbar-0.8.1.tar.gz#egg=django-debug-toolbar',
