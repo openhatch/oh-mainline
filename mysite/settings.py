@@ -148,6 +148,7 @@ INSTALLED_APPS = (
     'mysite.base',
     'mysite.project',
     'mysite.senseknocker',
+    'mysite.missions',
     'haystack',
     'voting',
     #'debug_toolbar',

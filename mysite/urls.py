@@ -48,6 +48,9 @@ urlpatterns = patterns('',
                 #template_name='kb/link_confirm_vote.html',
                 allow_xmlhttprequest=True)),
 
+        # Mission-related URLs
+	(r'^missions/$', 'mysite.missions.views.main_page'),
+
         # Invitation-related URLs
         (r'^invitation/', include('invitation.urls')),
 
