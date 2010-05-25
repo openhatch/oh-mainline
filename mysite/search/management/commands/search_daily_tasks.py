@@ -41,7 +41,7 @@ import mysite.customs.bugtrackers.kde
 ### -- New Age Asheesh, 2010-05-31.
 
 class Command(BaseCommand):
-    help = "Enqueue jobs into celery that would cause it to recrawl various bug trackers."
+    help = "Call this once a day to make sure we run Bug search-related nightly jobs."
 
     def update_bugzilla_trackers(self):
         bugzilla_trackers = {
