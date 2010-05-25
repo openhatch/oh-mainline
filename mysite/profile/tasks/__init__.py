@@ -11,8 +11,8 @@ import mysite.customs.github
 import mysite.customs.debianqa
 import mysite.profile.models
 from mysite.search.models import Project
-from celery.decorators import task, periodic_task
-from celery.task import Task, PeriodicTask
+from celery.decorators import task
+from celery.task import Task
 import celery.registry
 import time
 import random
@@ -321,8 +321,7 @@ class ReindexPerson(Task):
         pi = mysite.profile.search_indexes.PersonIndex(person)
         pi.update_object(person)
 
-class GarbageCollectForwarders(PeriodicTask):
-    run_every = timedelta(days=1)
+class GarbageCollectForwarders(Task):
     def run(self, **kwargs):
         logger = self.get_logger(**kwargs)
         logger.info("Started garbage collecting profile email forwarders")
