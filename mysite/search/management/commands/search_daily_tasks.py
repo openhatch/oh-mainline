@@ -113,8 +113,28 @@ class Command(BaseCommand):
             # sweet sweet sugar
             mysite.search.tasks.trac_instances.learn_about_new_sugar_easy_bugs,
             mysite.search.tasks.trac_instances.refresh_all_sugar_easy_bugs,
+
+            # miro, whee
+            mysite.customs.miro.grab_miro_bugs,
+
+            # KDE
+            mysite.customs.bugtrackers.kde.grab,
+
+            # Wikimedia
+            mysite.customs.bugtrackers.wikimedia.grab,
+
+            # GNOME is in Love
+            mysite.customs.bugtrackers.gnome_love.grab,
+
+            # Mozira
+            mysite.customs.bugtrackers.mozilla.grab,
+
+            # Fedora:
+            mysite.search.tasks.bugzilla_instances.LearnAboutNewFedoraFitAndFinishBugs.apply,
+            mysite.search.tasks.bugzilla_instances.RefreshAllFedoraFitAndFinishBugs.apply,
         ]
         for callable in run_these:
+            logging.info("About to run %s" % callable")
             callable()
 
         # And for Roundup bug trackers, use our special handling

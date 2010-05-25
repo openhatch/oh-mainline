@@ -3,7 +3,7 @@ import datetime
 import logging
 import mysite.search.models
 import mysite.customs.models
-from celery.task import Task, PeriodicTask
+from celery.task import Task
 from celery.registry import tasks
 
 class LookAtOneFedoraBug(Task):
@@ -41,8 +41,7 @@ class LookAtOneFedoraBug(Task):
             bug_obj.save()
         logging.info("Finished with %d from Fedora." % bug_id)
 
-class LearnAboutNewFedoraFitAndFinishBugs(PeriodicTask):
-    run_every = timedelta(days=1)
+class LearnAboutNewFedoraFitAndFinishBugs(Task):
     def run(self, **kwargs):
         logger = self.get_logger(**kwargs)
         logger.info('Started to learn about new Fedora fit and finish bugs.')
@@ -52,8 +51,7 @@ class LearnAboutNewFedoraFitAndFinishBugs(PeriodicTask):
         logger.info('Finished grabbing the list of Fedora fit and finish bugs.')
 
 
-class RefreshAllFedoraFitAndFinishBugs(PeriodicTask):
-    run_every = timedelta(days=1)
+class RefreshAllFedoraFitAndFinishBugs(Task):
     def run(self, **kwargs):
         logger = self.get_logger(**kwargs)
         logger.info("Starting refreshing all Fedora bugs.")
@@ -64,7 +62,3 @@ class RefreshAllFedoraFitAndFinishBugs(PeriodicTask):
                                                                                 BUG_URL_PREFIX=mysite.customs.bugtrackers.fedora_fitfinish.BUG_URL_PREFIX)
             task = LookAtOneFedoraBug()
             task.apply(bug_id=bug_id)
-
-tasks.register(LookAtOneFedoraBug)
-tasks.register(LearnAboutNewFedoraFitAndFinishBugs)
-tasks.register(RefreshAllFedoraFitAndFinishBugs)
