@@ -1,7 +1,7 @@
 import datetime
 import logging
 
-from celery.task import Task, PeriodicTask
+from celery.task import Task
 from celery.registry import tasks
 import celery.decorators
 
