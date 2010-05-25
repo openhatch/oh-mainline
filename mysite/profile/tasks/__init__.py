@@ -405,11 +405,10 @@ def update_someones_pf_cache(person__pk):
     # This getter will populate the cache
     return person.get_names_of_nonarchived_projects()
 
-@periodic_task(run_every=datetime.timedelta(hours=1))
 def fill_recommended_bugs_cache():
     logging.info("Filling recommended bugs cache for all people.")
     for person in mysite.profile.models.Person.objects.all():
-        fill_one_person_recommend_bugs_cache.delay(person_id=person.id)
+        fill_one_person_recommend_bugs_cache.apply(person_id=person.id)
     logging.info("Finished filling recommended bugs cache for all people.")
 
 @task
@@ -420,7 +419,6 @@ def fill_one_person_recommend_bugs_cache(person_id):
     recommender = mysite.profile.controllers.RecommendBugs(suggested_searches, n=5) # cache fill prep...
     recommender.recommend() # cache fill do it.
 
-@periodic_task(run_every=datetime.timedelta(hours=1))
 def sync_bug_epoch_from_model_then_fill_recommended_bugs_cache():
     logging.info("Syncing bug epoch...")
     # Find the highest bug object modified date
@@ -434,7 +432,7 @@ def sync_bug_epoch_from_model_then_fill_recommended_bugs_cache():
         mysite.search.models.Epoch.bump_for_model(
             mysite.search.models.Bug)
         logging.info("Whee! Bumped the epoch. Guess I'll fill the cache.")
-        fill_recommended_bugs_cache.delay()
+        fill_recommended_bugs_cache.apply()
     logging.info("Done syncing bug epoch.")
 
 @task
