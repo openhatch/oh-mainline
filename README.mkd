@@ -79,12 +79,6 @@ Run these commands:
     python bootstrap.py
     bin/buildout -o # The o flag is for "offline", so you don't hit the network looking for dependencies
 
-## Thanks to ##
-
-* jQuery
-* jGrowl
-* Lots of other people who definitely need to be thanked here
-
 ## MaxMind GeoIP City Lite database ##
 
 This product includes GeoLite data created by MaxMind, available from http://www.maxmind.com/.
@@ -188,3 +182,13 @@ Unzip the file in /tmp/, and just extract the file js/jquery-ui-1.7.2.custom.min
 Be sure to check using git diff that the change you've introduced in git's view of that file is exactly what you expect.
 
 Finally, don't forget to add your component to the list above, so the next person does the right thing.
+
+## Thanks to ##
+
+* The Free Software projects that we depend on &mdash; see `buildout.cfg` for a list.
+* Our contributors and consultants are listed at <http://openhatch.org/+projects/OpenHatch>.
+* The fantastic people who have helped us:
+    * [Nelson Pavlosky](http://skyfaller.net)
+    * [Shotput Ventures](http://shotputventures.com), who mentored and funded us in the summer of 2009.
+    * The [Institute for Security, Technology, and Society](http://ists.dartmouth.edu) and the [Neukom Institute](http://dartmouth.edu/neukom), both at Dartmouth, who sponsored [Parker](http://madebyparker.com) [Phinney](http://openhatch.org/people/pyrak)'s internship during the winter of 2010.
+    * [Google Summer of Code](http://code.google.com/soc/), who are sponsoring [John](http://jstump.com) [Stumpo](http://openhatch.org/people/stump)'s internship during the summer of 2009.
