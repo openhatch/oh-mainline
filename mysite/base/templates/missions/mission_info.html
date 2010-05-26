@@ -1,0 +1,31 @@
+{% extends 'base/two_columns_fat_skinny.html' %}
+
+{% block main %}
+<div class="module">
+  <div class="head">
+    <h3>Mission description</h3>
+  </div>
+  <div class="body">
+    <h2>{% block mission_name %}{% endblock mission_name %}</h2>
+    {% block mission_summary %}{% endblock mission_summary %}
+  </div>
+</div>
+{% endblock main %}
+
+{% block left %}
+<div class="module">
+  <div class="head">
+    <h3>People who have done this</h3>
+  </div>
+  <div class="body">
+  </div>
+</div>
+
+<div class="module">
+  <div class="head">
+    <h3>People who are working on this</h3>
+  </div>
+  <div class="body">
+  </div>
+</div>
+{% endblock left %}

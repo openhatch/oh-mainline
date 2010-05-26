@@ -1,0 +1,13 @@
+{% extends 'missions/mission_info.html' %}
+
+{% block mission_name %}
+Using <code>diff</code> and <code>patch</code>
+{% endblock mission_name %}
+
+{% block mission_summary %}
+<p>Text about this mission.</p>
+<p>Blah, blah, blah...</p>
+
+<form method="post" action="{% url mysite.missions.views.diffpatch_start %}">
+<input type="submit" value="Start this mission &raquo;" /></form>
+{% endblock mission_summary %}

@@ -49,7 +49,10 @@ urlpatterns = patterns('',
                 allow_xmlhttprequest=True)),
 
         # Mission-related URLs
-	(r'^missions/$', 'mysite.missions.views.main_page'),
+        (r'^missions/$', 'mysite.missions.views.main_page'),
+        (r'^missions/info/diffpatch$', 'mysite.missions.views.diffpatch_info'),  # FIXME: genericity
+        (r'^missions/start/diffpatch$', 'mysite.missions.views.diffpatch_start'),
+        (r'^missions/progress/diffpatch$', 'mysite.missions.views.diffpatch_progress'),
 
         # Invitation-related URLs
         (r'^invitation/', include('invitation.urls')),
