@@ -43,6 +43,8 @@ If you have the permission to do so, get the current data and files. Run:
 
 Now load <http://localhost:8000/> in your web browser.
 
+If you're having troubles at this point, see "Troubleshooting" below, or post your question to #openhatch on irc.freenode.net.
+
 ### Note on migrations ###
 
 Sometimes the migrations don't work, and South will give you a MySQL script so you can fix things. But South isn't perfect. You might have to fix the syntax errors in this MySQL. Run this vim command for starters.
