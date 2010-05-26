@@ -186,9 +186,13 @@ Finally, don't forget to add your component to the list above, so the next perso
 ## Thanks to ##
 
 * The Free Software projects that we depend on &mdash; see `buildout.cfg` for a list.
-* Our contributors and consultants are listed at <http://openhatch.org/+projects/OpenHatch>.
+* Our contributors and consultants are listed at <http://openhatch.org/+projects/OpenHatch>. If you've helped to create OpenHatch, you deserve to be listed there!
 * The fantastic people who have helped us:
     * [Nelson Pavlosky](http://skyfaller.net)
     * [Shotput Ventures](http://shotputventures.com), who mentored and funded us in the summer of 2009.
     * The [Institute for Security, Technology, and Society](http://ists.dartmouth.edu) and the [Neukom Institute](http://dartmouth.edu/neukom), both at Dartmouth, who sponsored [Parker](http://madebyparker.com) [Phinney](http://openhatch.org/people/pyrak)'s internship during the winter of 2010.
     * [Google Summer of Code](http://code.google.com/soc/), who are sponsoring [John](http://jstump.com) [Stumpo](http://openhatch.org/people/stump)'s internship during the summer of 2009.
+
+## Stay in touch ##
+
+&hellip;on [the project blog](http://openhatch.org/blog), [Identi.ca](http://identi.ca/openhatchery), [Twitter](http://twitter.com/openhatchery), IRC (#openhatch on irc.freenode.net), and the [Face-Book](http://facebook.com/pages/OpenHatch/108578243652).
