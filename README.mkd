@@ -17,7 +17,7 @@ Run these commands from the top level directory of the repository:
 
 ### Set up the database. ###
 
-Connect to MySQL. At the risk of stating the obvious, you can use the command 'mysql -u root -p', then type your MySQL root password. Or use 'mysql -u username', where `username` is a MySQL user with the power to run the commands below.
+Connect to MySQL. At the risk of stating the obvious, you can use the command `mysql -u root -p`, then type your MySQL root password. Or use `mysql -u username`, where `username` belongs to a MySQL user with the power to run the commands below.
 
 At the MySQL prompt, enter these commands:
 
