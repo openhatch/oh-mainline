@@ -1,0 +1,188 @@
+## How to run this code ##
+
+    sudo apt-get install python2.5-dev python-apt python-libxml2 memcached # Install some dependencies
+    sudo /etc/init.d/memcached start # start memcached
+
+If memcached complains that it is not enabled, configure it by reading `/etc/default/memcached`.
+
+### Run Buildout ###
+
+OpenHatch uses to Buildout to manage dependencies.
+
+Run these commands from the top level directory of the repository:
+
+    python2.5 bootstrap.py
+    bin/buildout 
+    bin/mysite runserver
+
+### Set up the database. ###
+
+Connect to MySQL. At the risk of stating the obvious, you can use the command 'mysql -u root -p', then type your MySQL root password. Or use 'mysql -u username', where `username` is a MySQL user with the power to run the commands below.
+
+At the MySQL prompt, enter these commands:
+
+    CREATE DATABASE oh_milestone_a;
+    CREATE USER 'oh_milestone_a'@'localhost' IDENTIFIED BY 'ahmaC0Th';
+    GRANT ALL ON oh_milestone_a.* TO 'oh_milestone_a'@'localhost';
+
+Then exit from MySQL, and run this command, again from the top level directory:
+
+    bin/mysite syncdb
+
+To the question, "Do you want to create a superuser?", answer "No". That's because you haven't run the migrations for the "profile" app yet.
+
+You may need to migrate using this command:
+
+    bin/mysite migrate
+
+There's a note about migrations below.
+
+If you have the permission to do so, get the current data and files. Run:
+
+    scripts/get_data_and_images
+
+Now load <http://localhost:8000/> in your web browser.
+
+### Note on migrations ###
+
+Sometimes the migrations don't work, and South will give you a MySQL script so you can fix things. But South isn't perfect. You might have to fix the syntax errors in this MySQL. Run this vim command for starters.
+
+    :%s/^ = //
+
+For non-vimmers, that will delete the string ' = ' when it appears at the beginnings of lines.
+
+Then remove those trailing square brackets. You may need to replace South's strange, Pythonesque code for dates, with proper MySQL code.
+
+## To make the importer work ##
+
+Run the following command, which will create a Celery daemon:
+
+    bin/mysite celeryd -c 8
+
+## Testing ##
+
+As you make changes to the source code, you'll want to run unit tests to make sure that everything is still hunky-dory. To run all tests, except the rather slow tests in the `customs` app, run this command:
+
+    bin/test
+
+To run the tests in the `customs` app:
+
+    bin/mysite test customs
+
+## To forcibly regenerate scripts in ./bin/* ##
+
+Run these commands:
+
+    cd milestone-a # Make sure you're in this directory. I'm not sure if it will work elsewhere.
+    python bootstrap.py
+    bin/buildout -o # The o flag is for "offline", so you don't hit the network looking for dependencies
+
+## Thanks to ##
+
+* jQuery
+* jGrowl
+* Lots of other people who definitely need to be thanked here
+
+## MaxMind GeoIP City Lite database ##
+
+This product includes GeoLite data created by MaxMind, available from http://www.maxmind.com/.
+
+To use it, run these commands from the top level directory of the repository:
+
+	cd downloads
+	wget http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz
+	gunzip GeoLiteCity.dat.gz
+
+Ta-da. In theory we/you should do that every month, when MaxMind does a refresh.
+
+## People search ##
+
+We have a map at <http://localhost:8000/people/>. To accelerate search on those people, we use
+Haystack, a Django layer on top of search engines. In our case, we use the
+search engine called Solr.
+
+### Understanding indexes and the Solr schema file ###
+
+We have a hand-tuned Solr schema that lives in `mysite/config-files/schema.xml`.
+This file was first generated using the Haystack command to auto-generate a
+schema from our `mysite/profile/search_indexes.py` file, but since then we have adjusted
+it ourselves.
+
+Unfortunately, this means that if you add or modify those indexes, you should
+NOT just regenerate the schema file automatically. Instead, merge it by hand by
+adding just the elements you need. If you have trouble with that, ask Asheesh.
+
+### Running the Solr server (development) ###
+
+For people search to work, you must run the Solr server. On a development machine
+(e.g., laptop), do this:
+
+    cd mysite
+    scripts/run_solr.sh
+
+### Running the Solr server (production) ###
+
+Steps:
+
+1. Copy the schema into place.
+
+2. Run SOLR with a config file that points at that schema.
+
+### Initialize its index ###
+
+Start in milestone-a, then run this command:
+
+    bin/mysite rebuild_index
+
+(say yes)
+
+### Troubleshooting ###
+
+#### MySQL_python ####
+
+If you're on Ubuntu 10.04 Lucid Lynx, you might get this sort of exception:
+
+  File "/home/stump/openhatch/parts/sqlite_mysite/django/db/backends/mysql/base.py", line 13, in <module>
+    raise ImproperlyConfigured("Error loading MySQLdb module: %s" % e)
+django.core.exceptions.ImproperlyConfigured: Error loading MySQLdb module: libmysqlclient_r.so.15: cannot open shared object file: No such file or directory
+
+This is because the MySQL_python distribution is a binary egg that
+contains extension modules linked to libmysqlclient_r.so.15, while in
+Lucid the soname version number changed to 16.  To fix this, install
+the python-mysqldb package and delete the egg, as follows:
+
+   sudo apt-get install python-mysqldb
+   rm -r eggs/MySQL_python-*
+
+You will have to remove the egg each time you re-run buildout.
+
+#### ctypes ####
+* If you're running Ubuntu 10.04 Lucid Lynx, when you execute `bin/mysite runserver`, you might see this error:
+  File "/usr/lib/python2.6/dist-packages/ctypes/__init__.py", line 20, in <module>
+    raise Exception, ("Version number mismatch", __version__, _ctypes_version)
+Exception: ('Version number mismatch', '1.0.2', '1.1.0')
+
+Here's one person's solution: "The problem can be solved by removing the python-ctypes package, which, it seems, is obsolete in Lucid and was left over from earlier versions." <https://bugs.launchpad.net/caffeine/+bug/560636>. (Note that you might see different version numbers than the ones above.) To remove the package, try `sudo apt-get remove python-ctypes`.
+
+### Adding jQuery UI components ###
+
+When you want to add a jQuery UI component, go here:
+
+    http://jqueryui.com/download
+
+Select the following options, plus yours:
+
+* Sortable
+* Accordion
+* Tabs
+* Progressbar
+
+Note that the site will automatically select any dependencies (like jQuery UI's "Core").
+
+First, under "Theme", select "No Theme". Under "Version", select "1.7.2 (stable release, for jQuery 1.3.2). Then click your little cartoon hand on the Download button.
+
+Unzip the file in /tmp/, and just extract the file js/jquery-ui-1.7.2.custom.min.js, and cp it to mysite/static/js/. That will overwrite the existing jQuery UI bundle.
+
+Be sure to check using git diff that the change you've introduced in git's view of that file is exactly what you expect.
+
+Finally, don't forget to add your component to the list above, so the next person does the right thing.
