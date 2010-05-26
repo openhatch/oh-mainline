@@ -19,7 +19,7 @@ Run these commands from the top level directory of the repository:
     bin/buildout 
     bin/mysite runserver
 
-### Set up you the database ###
+### Set up the database ###
 
 Connect to MySQL. At the risk of stating the obvious, you can use the command `mysql -u root -p`, then type your MySQL root password. Or use `mysql -u username`, where `username` belongs to a MySQL user with the power to run the commands below.
 
