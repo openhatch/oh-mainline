@@ -1,3 +1,7 @@
+Thanks for checking out our repository. We love this project, hope you do too.
+
+Well, you probably want to know to how run this code.
+
 ## How to run this code ##
 
     sudo apt-get install python2.5-dev python-apt python-libxml2 memcached # Install some dependencies
@@ -15,7 +19,7 @@ Run these commands from the top level directory of the repository:
     bin/buildout 
     bin/mysite runserver
 
-### Set up the database. ###
+### Set up you the database ###
 
 Connect to MySQL. At the risk of stating the obvious, you can use the command `mysql -u root -p`, then type your MySQL root password. Or use `mysql -u username`, where `username` belongs to a MySQL user with the power to run the commands below.
 
@@ -45,7 +49,7 @@ Now load <http://localhost:8000/> in your web browser.
 
 If you're having troubles at this point, see "Troubleshooting" below, or post your question to #openhatch on irc.freenode.net.
 
-### Note on migrations ###
+### About migrations ###
 
 Sometimes the migrations don't work, and South will give you a MySQL script so you can fix things. But South isn't perfect. You might have to fix the syntax errors in this MySQL. Run this vim command for starters.
 
@@ -71,7 +75,7 @@ To run the tests in the `customs` app:
 
     bin/mysite test customs
 
-## To forcibly regenerate scripts in ./bin/* ##
+## To forcibly regenerate scripts in bin/* ##
 
 Run these commands:
 
@@ -79,7 +83,7 @@ Run these commands:
     python bootstrap.py
     bin/buildout -o # The o flag is for "offline", so you don't hit the network looking for dependencies
 
-## MaxMind GeoIP City Lite database ##
+## Geography data ##
 
 This product includes GeoLite data created by MaxMind, available from http://www.maxmind.com/.
 
