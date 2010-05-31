@@ -524,7 +524,7 @@ class MercurialRoundupGrab(django.test.TestCase):
     @mock.patch('urllib2.urlopen')
     def test_scrape_bug_status_and_mark_as_closed(self, mock_urlopen,
                                                   project_name='Mercurial',
-                                                  should_create=True,
+                                                  should_do_something=True,
                                                   should_use_urlopen=True):
         if Project.objects.filter(name=project_name):
             roundup_project = Project.objects.get(name=project_name)
@@ -535,7 +535,7 @@ class MercurialRoundupGrab(django.test.TestCase):
 
         tracker = mysite.customs.bugtrackers.roundup_general.MercurialTracker()
         did_create = tracker.create_bug_object_for_remote_bug_id_if_necessary(1)
-        self.assertEqual(did_create, should_create)
+        self.assertEqual(did_create, should_do_something)
 
         bug = Bug.all_bugs.get()
         self.assert_(bug.looks_closed)
@@ -548,7 +548,7 @@ class MercurialRoundupGrab(django.test.TestCase):
         self.test_scrape_bug_status_and_mark_as_closed()
         # Immediately we attempt to re-import it. urllib2.urlopen should never
         # be called, because the bug data is so fresh.
-        self.test_scrape_bug_status_and_mark_as_closed(should_create=False,
+        self.test_scrape_bug_status_and_mark_as_closed(should_do_something=False,
                                                        should_use_urlopen=False)
 
     def test_reimport_same_bug_works_when_bug_is_stale(self):
@@ -559,8 +559,10 @@ class MercurialRoundupGrab(django.test.TestCase):
         bug.last_polled = datetime.datetime(1970, 1,1)
         bug.save()
 
-        # Now, re-import. We should not create, but we should call urlopen.
-        self.test_scrape_bug_status_and_mark_as_closed(should_create=False,
+        # Now, re-import. We should call urlopen, and 
+        # create_bug_object_for_remote_bug_id_if_necessary should return True
+        # because that's what its return value signifies.
+        self.test_scrape_bug_status_and_mark_as_closed(should_do_something=True,
                                                        should_use_urlopen=True)
 
 class LaunchpadImportByEmail(django.test.TestCase):
