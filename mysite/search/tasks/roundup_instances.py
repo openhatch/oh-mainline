@@ -34,3 +34,26 @@ def refresh_all_mercurial_bugs():
         look_at_one_bug_in_mercurial(bug_id=bug_id)
         count += 1
     logging.info("Okay, looked at %d bugs from Mercurial." % count)
+
+@celery.decorators.task
+def look_at_one_bug_in_python(bug_id):
+    # Instantiate Roundup Tracker
+    roundup = mysite.customs.bugtrackers.roundup_general.PythonTracker()
+    roundup.create_bug_object_for_remote_bug_id_if_necessary(bug_id)
+
+def learn_about_new_python_easy_and_documentation_bugs():
+    name = 'learning about new Python easy and documentation bugs'
+    logging.info("Started " + name)
+    roundup = mysite.customs.bugtrackers.roundup_general.PythonTracker()
+    for bug_id in roundup.generate_list_of_bug_ids_to_look_at():
+        look_at_one_bug_in_mercurial.apply(bug_id=bug_id)
+    logging.info("Finished " + name)
+
+def refresh_all_python_bugs():
+    logging.info("Starting refreshing all Python bugs.")
+    roundup = mysite.customs.bugtrackers.roundup_general.PythonTracker()
+    count = 0
+    for bug_id in roundup.get_remote_bug_ids_already_stored():
+        look_at_one_bug_in_python(bug_id=bug_id)
+        count += 1
+    logging.info("Okay, looked at %d bugs from Python." % count)

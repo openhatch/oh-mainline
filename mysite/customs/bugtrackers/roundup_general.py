@@ -208,4 +208,34 @@ class MercurialTracker(RoundupTracker):
                 'http://mercurial.selenic.com/bts/issue?@action=export_csv&@columns=title,id,activity,status,assignedto&@sort=activity&@group=priority&@filter=topic&@pagesize=500&@startwith=0&topic=10'):
             yield bug_id
         
- 
+class PythonTracker(RoundupTracker):
+    def __init__(self):
+        RoundupTracker.__init__(self,
+                                root_url='http://bugs.python.org/',
+                                project_name='Python')
+
+    def extract_bug_tracker_specific_data(self, metadata_dict, bug_object):
+        # FIXME: here is special-case data for python.org
+        bug_object.good_for_newcomers = (
+            'easy' in metadata_dict['Keywords'])
+        bug_object.concerns_just_documentation = (
+            'Documentation' in metadata_dict['Components'])
+        bug_object.status = metadata_dict['Status']
+        bug_object.looks_closed = (
+            metadata_dict['Status'] == 'closed' or
+            'patch' in metadata_dict['Keywords'])
+        bug_object.importance = metadata_dict['Priority']
+
+    def generate_list_of_bug_ids_to_look_at(self):
+        ### bug queries to look at
+        queries = {
+            'Documentation bugs':
+                'http://bugs.python.org/issue?status=1%2C3&%40sort=activity&%40columns=id&%40startwith=0&%40group=priority&%40filter=status%2Ccomponents&components=4&%40action=export_csv',
+            'Easy bugs':
+                'http://bugs.python.org/issue?status=1%2C3&%40sort=activity&%40columns=id&%40startwith=0&%40group=priority&%40filter=status%2Ckeywords&keywords=6&%40action=export_csv',
+            }
+
+        for query_name in queries:
+            query_url = queries[query_name]
+            for bug_id in csv_url2bugs(query_url):
+                yield bug_id
