@@ -524,7 +524,8 @@ class MercurialRoundupGrab(django.test.TestCase):
     @mock.patch('urllib2.urlopen')
     def test_scrape_bug_status_and_mark_as_closed(self, mock_urlopen,
                                                   project_name='Mercurial',
-                                                  should_create=True):
+                                                  should_create=True,
+                                                  should_use_urlopen=True):
         if Project.objects.filter(name=project_name):
             roundup_project = Project.objects.get(name=project_name)
         else:
@@ -539,9 +540,28 @@ class MercurialRoundupGrab(django.test.TestCase):
         bug = Bug.all_bugs.get()
         self.assert_(bug.looks_closed)
 
+        if should_use_urlopen:
+            self.assert_(mock_urlopen.called)
+
     def test_reimport_same_bug_works(self):
+        # First, we do an import.
         self.test_scrape_bug_status_and_mark_as_closed()
-        self.test_scrape_bug_status_and_mark_as_closed(should_create=False)
+        # Immediately we attempt to re-import it. urllib2.urlopen should never
+        # be called, because the bug data is so fresh.
+        self.test_scrape_bug_status_and_mark_as_closed(should_create=False,
+                                                       should_use_urlopen=False)
+
+    def test_reimport_same_bug_works_when_bug_is_stale(self):
+        # First, import the bug
+        self.test_scrape_bug_status_and_mark_as_closed()
+        # Then, set it as stale
+        bug = Bug.all_bugs.get()
+        bug.last_polled = datetime.datetime(1970, 1,1)
+        bug.save()
+
+        # Now, re-import. We should not create, but we should call urlopen.
+        self.test_scrape_bug_status_and_mark_as_closed(should_create=False,
+                                                       should_use_urlopen=True)
 
 class LaunchpadImportByEmail(django.test.TestCase):
 
