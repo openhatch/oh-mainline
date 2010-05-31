@@ -520,9 +520,10 @@ class RoundupGrab(django.test.TestCase):
     # When we query for bugs, we'll always get bugs with Status=closed.
     # That's because we're patching out the method that returns a dictionary
     # of the bug's metadata. That dictionary will always contain 'closed' at 'Status'.
-    @mock.patch('urllib2.urlopen',
-            mock.Mock(return_value=open(closed_bug_filename)))
-    def test_scrape_bug_status_and_mark_as_closed(self):
+    @mock.patch('urllib2.urlopen')
+    def test_scrape_bug_status_and_mark_as_closed(self, mock_urlopen):
+        mock_urlopen.return_value=open(RoundupGrab.closed_bug_filename)
+
         roundup_project = Project.create_dummy()
         tracker = mysite.customs.models.RoundupBugTracker(
                 project=roundup_project,
@@ -531,6 +532,10 @@ class RoundupGrab(django.test.TestCase):
 
         bug = tracker.create_bug_object_for_remote_bug_id(1)
         self.assert_(bug.looks_closed)
+
+    def test_reimport_same_bug_works(self):
+        self.test_scrape_bug_status_and_mark_as_closed()
+        self.test_scrape_bug_status_and_mark_as_closed()
 
 class LaunchpadImportByEmail(django.test.TestCase):
 
