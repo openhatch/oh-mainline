@@ -1,6 +1,9 @@
 import simplejson
 import urllib
 import os
+import os.path
+import shutil
+import tempfile
 import datetime
 import dateutil.parser
 
@@ -42,3 +45,23 @@ def string2naive_datetime(s):
 def render_response(req, *args, **kwargs):
     kwargs['context_instance'] = RequestContext(req)
     return django.shortcuts.render_to_response(*args, **kwargs)
+
+def clear_static_cache(path):
+    '''Atomically destroy the static file cache for a certain path.'''
+    # Steps:
+    fully_qualified_path = os.path.join(settings.WEB_ROOT, path)
+
+    # 0. Create new temp dir
+    new_temp_path = tempfile.mkdtemp(settings.WEB_ROOT)
+
+    # 1. Atomically move the path that we want to expire into the new directory
+    try:
+        os.rename(fully_qualified_path, os.path.join(new_temp_path, 'old'))
+    except OSError, e:
+        if e.errno == 2: # No such file or directory
+            # Well, that means the cache is already clear.
+            # We still have to nuke new_temp_path though!
+            pass
+
+    # 2. shutil.rmtree() the new path
+    shutil.rmtree(new_temp_path)
