@@ -6,48 +6,6 @@ import mysite.customs.models
 from celery.task import Task, PeriodicTask
 from celery.registry import tasks
 
-import mysite.customs.miro
-import mysite.customs.bugtrackers.trac
-import mysite.customs.bugtrackers.gnome_love
-import mysite.customs.bugtrackers.fedora_fitfinish
-import mysite.customs.bugtrackers.mozilla
-import mysite.customs.bugtrackers.wikimedia
-import mysite.customs.bugtrackers.kde
-
-class GrabMiroBugs(PeriodicTask):
-    run_every = timedelta(days=1)
-    def run(self, **kwargs):
-        logger = self.get_logger(**kwargs)
-        logger.info("Started to grab Miro bitesized bugs")
-        mysite.customs.miro.grab_miro_bugs()
-
-class GrabKDEBugs(PeriodicTask):
-    run_every = timedelta(days=1)
-    def run(self, **kwargs):
-        logger = self.get_logger(**kwargs)
-        logger.info("Started to grab KDE junior jobs bugs")
-        mysite.customs.bugtrackers.kde.grab()
-
-class GrabWikimediaBugs(PeriodicTask):
-    run_every = timedelta(days=1)
-    def run(self, **kwargs):
-        logging.info("Starting to grab Wikimedia easy bugs.")
-        mysite.customs.bugtrackers.wikimedia.grab()
-
-class GrabGnomeLoveBugs(PeriodicTask):
-    run_every = timedelta(days=1)
-    def run(self, **kwargs):
-        logger = self.get_logger(**kwargs)
-        logger.info("Started to grab GNOME Love bugs")
-        mysite.customs.bugtrackers.gnome_love.grab()
-
-class GrabMozillaGoodFirstBugs(PeriodicTask):
-    run_every = timedelta(days=1)
-    def run(self, **kwargs):
-        logger = self.get_logger(**kwargs)
-        logger.info("Started to grab Good First Bugs from Mozilla")
-        mysite.customs.bugtrackers.mozilla.grab()
-
 class LookAtOneFedoraBug(Task):
     def run(self, bug_id, **kwargs):
         logger = self.get_logger(**kwargs)
@@ -107,8 +65,6 @@ class RefreshAllFedoraFitAndFinishBugs(PeriodicTask):
             task = LookAtOneFedoraBug()
             task.delay(bug_id=bug_id)
 
-tasks.register(GrabMiroBugs)
-tasks.register(GrabGnomeLoveBugs)
 tasks.register(LookAtOneFedoraBug)
 tasks.register(LearnAboutNewFedoraFitAndFinishBugs)
 tasks.register(RefreshAllFedoraFitAndFinishBugs)

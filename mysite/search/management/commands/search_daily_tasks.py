@@ -5,10 +5,61 @@ django.conf.settings.CELERY_ALWAYS_EAGER = True
 
 import mysite.search.tasks
 import mysite.customs.bugtrackers.roundup_general
+import mysite.customs.bugtrackers
 import mysite.search.tasks.launchpad_tasks
+
+import mysite.customs.miro
+import mysite.customs.bugtrackers.trac
+import mysite.customs.bugtrackers.gnome_love
+import mysite.customs.bugtrackers.fedora_fitfinish
+import mysite.customs.bugtrackers.mozilla
+import mysite.customs.bugtrackers.wikimedia
+import mysite.customs.bugtrackers.kde
+
+### All this code runs synchronously once a day.
+### For now, we can crawl all the bug trackers in serial.
+
+### One day, though, we will crawl so many bug trackers that it will take
+### too long.
+
+### I suggest that, at that point, we fork a number of worker processes, and
+### turn these lists into a queue or something. That should be easy with the
+### multiprocessing module. Then we can do N at once.
+
+### We could do something smart with statistics, detecting the average
+### refresh time within the bug tracker of a bug, then polling at some
+### approximation of that rate. (But, really, why bother?)
+
+### Since most of the time we're waiting on the network, we could also use
+### Twisted or Stackless Python or something. That would be super cool, too.
+### If somone can show me how to migrate this codebase to it, that'd be neat.
+### I'm unlikely to look into it myself, though.
+
+### (If at some point we start indexing absolutely every bug in free and open
+### source software, then the above ideas will actually become meaningful.)
+
+### -- New Age Asheesh, 2010-05-31.
 
 class Command(BaseCommand):
     help = "Enqueue jobs into celery that would cause it to recrawl various bug trackers."
+
+    def update_bugzilla_trackers(self):
+        bugzilla_trackers = {
+            'Miro':
+                mysite.customs.miro.grab_miro_bugs,
+            'KDE junior jobs':
+                mysite.customs.bugtrackers.kde.grab,
+            'Wikimedia easy bugs':
+                mysite.customs.bugtrackers.wikimedia.grab,
+            'GNOME Love':
+                mysite.customs.bugtrackers.gnome_love.grab,
+            'Mozilla "good first bug"s':
+                mysite.customs.bugtrackers.mozilla.grab,
+            }
+
+        for bugzilla_tracker in bugzilla_trackers:
+            logging.info("Refreshing bugs from %s." % bugzilla_tracker)
+            callable = bugzilla_trackers[bugzilla_tracker]
 
     def find_and_update_enabled_roundup_trackers(self):
         enabled_roundup_trackers = []
