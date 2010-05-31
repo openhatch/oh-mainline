@@ -513,33 +513,35 @@ class OhlohLogging(django.test.TestCase):
         self.assertEqual(error_dia.web_response.url, 'http://theurl.com/')
         self.assertEqual(error_dia.web_response.status, 200)
 
-class RoundupGrab(django.test.TestCase):
+class MercurialRoundupGrab(django.test.TestCase):
 
     closed_bug_filename = os.path.join(settings.MEDIA_ROOT, 'sample-data',
-            "closed-python-bug.html")
+            "closed-mercurial-bug.html")
 
     # When we query for bugs, we'll always get bugs with Status=closed.
     # That's because we're patching out the method that returns a dictionary
     # of the bug's metadata. That dictionary will always contain 'closed' at 'Status'.
     @mock.patch('urllib2.urlopen')
     def test_scrape_bug_status_and_mark_as_closed(self, mock_urlopen,
-                                                  project_name='Python'):
+                                                  project_name='Mercurial',
+                                                  should_create=True):
         if Project.objects.filter(name=project_name):
             roundup_project = Project.objects.get(name=project_name)
         else:
             roundup_project = Project.create_dummy(name=project_name)
 
-        mock_urlopen.return_value=open(RoundupGrab.closed_bug_filename)
+        mock_urlopen.return_value=open(MercurialRoundupGrab.closed_bug_filename)
 
-        tracker = mysite.customs.bugtrackers.roundup_general.RoundupTracker(
-                project_name=project_name,
-                root_url="http://example.org/")
-        bug = tracker.create_bug_object_for_remote_bug_id_if_necessary(1)
+        tracker = mysite.customs.bugtrackers.roundup_general.MercurialTracker()
+        did_create = tracker.create_bug_object_for_remote_bug_id_if_necessary(1)
+        self.assertEqual(did_create, should_create)
+
+        bug = Bug.all_bugs.get()
         self.assert_(bug.looks_closed)
 
     def test_reimport_same_bug_works(self):
         self.test_scrape_bug_status_and_mark_as_closed()
-        self.test_scrape_bug_status_and_mark_as_closed()
+        self.test_scrape_bug_status_and_mark_as_closed(should_create=False)
 
 class LaunchpadImportByEmail(django.test.TestCase):
 
