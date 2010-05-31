@@ -444,7 +444,6 @@ def clear_people_page_cache(*args, **kwargs):
 def clear_people_page_cache_task(*args, **kwargs):
     return clear_people_page_cache.delay()
 
-@periodic_task(run_every=datetime.timedelta(minutes=10))
 def fill_people_page_cache():
     staticgenerator.quick_publish('/people/')
 
