@@ -39,6 +39,7 @@ import mysite.customs.feed
 import mysite.customs.github
 
 import mysite.customs.models
+import mysite.customs.bugtrackers.roundup_general
 import mysite.customs.lp_grabber
 # }}}
 
@@ -530,12 +531,10 @@ class RoundupGrab(django.test.TestCase):
 
         mock_urlopen.return_value=open(RoundupGrab.closed_bug_filename)
 
-        tracker = mysite.customs.models.RoundupBugTracker(
-                project=roundup_project,
-                roundup_root_url="http://example.org")
-        tracker.save()
-
-        bug = tracker.create_bug_object_for_remote_bug_id(1)
+        tracker = mysite.customs.bugtrackers.roundup_general.RoundupTracker(
+                project_name=project_name,
+                root_url="http://example.org/")
+        bug = tracker.create_bug_object_for_remote_bug_id_if_necessary(1)
         self.assert_(bug.looks_closed)
 
     def test_reimport_same_bug_works(self):
