@@ -48,7 +48,7 @@ class LearnAboutNewFedoraFitAndFinishBugs(PeriodicTask):
         logger.info('Started to learn about new Fedora fit and finish bugs.')
         for bug_id in mysite.customs.bugtrackers.fedora_fitfinish.current_fit_and_finish_bug_ids():
             task = LookAtOneFedoraBug()
-            task.delay(bug_id=bug_id)
+            task.apply(bug_id=bug_id)
         logger.info('Finished grabbing the list of Fedora fit and finish bugs.')
 
 
@@ -63,7 +63,7 @@ class RefreshAllFedoraFitAndFinishBugs(PeriodicTask):
             bug_id = mysite.customs.bugtrackers.bugzilla_general.bug_url2bug_id(bug.canonical_bug_link,
                                                                                 BUG_URL_PREFIX=mysite.customs.bugtrackers.fedora_fitfinish.BUG_URL_PREFIX)
             task = LookAtOneFedoraBug()
-            task.delay(bug_id=bug_id)
+            task.apply(bug_id=bug_id)
 
 tasks.register(LookAtOneFedoraBug)
 tasks.register(LearnAboutNewFedoraFitAndFinishBugs)

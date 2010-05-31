@@ -55,6 +55,22 @@ class Command(BaseCommand):
                 mysite.customs.bugtrackers.gnome_love.grab,
             'Mozilla "good first bug"s':
                 mysite.customs.bugtrackers.mozilla.grab,
+
+            # FIXME
+            # Really, the Bugzilla import code should be reworked to be as
+            # clean and tidy as the Mercurial/Python/Roundup stuff, with
+            # an abstract class with a .update() method.
+            # Then simple sub-classes can handle each of the different projects'
+            # details.
+
+            # What the heck is up with the Fedora code being
+            # special-cased like this? Well, I'll clean it up another day,
+            # so long as it seems to work right now.
+            'Fedora "fit and finish" new bugs':
+                mysite.search.tasks.bugzilla_instances.LearnAboutNewFedoraFitAndFinishBugs.apply,
+
+            'Fedora "fit and finish" refreshing old bugs':
+                mysite.search.tasks.bugzilla_instances.RefreshAllFedoraFitAndFinishBugs.apply,
             }
 
         for bugzilla_tracker in bugzilla_trackers:
@@ -103,5 +119,8 @@ class Command(BaseCommand):
 
         # And for Roundup bug trackers, use our special handling
         self.find_and_update_enabled_roundup_trackers()
+
+        # And for Bugzilla bug trackers, use our special handling!
+        self.update_bugzilla_trackers()
         
 
