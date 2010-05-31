@@ -182,10 +182,28 @@ class RoundupTracker(object):
             # With the coast clear, we save the bug we just extracted from the Miro tracker.
             bug.save()
 
+    def update(self):
+        '''Call this nightly.'''
+        logging.info("Learning about new bugs in %s" % self.project.name)
+
+        # First, find an examine any new bugs.
+        for bug_id in self.generate_list_of_bug_ids_to_look_at():
+            self.create_bug_object_for_remote_bug_id_if_necessary(bug_id)
+        # Second, make sure old bugs in the database aren't too stale.
+        logging.info("Starting refreshing all bugs from %s." % self.project.name)
+        count = 0
+        for bug_id in self.get_remote_bug_ids_already_stored():
+            self.create_bug_object_for_remote_bug_id_if_necessary(bug_id=bug_id)
+            count += 1
+        logging.info("Okay, looked at %d bugs from %s." % (
+                count, self.project.name))
+
     def __unicode__(self):
         return "<Roundup bug tracker for %s>" % self.root_url
 
 class MercurialTracker(RoundupTracker):
+    enabled = True
+
     def __init__(self):
         RoundupTracker.__init__(self,
                                 root_url='http://mercurial.selenic.com/bts/',
@@ -209,6 +227,8 @@ class MercurialTracker(RoundupTracker):
             yield bug_id
         
 class PythonTracker(RoundupTracker):
+    enabled = True
+
     def __init__(self):
         RoundupTracker.__init__(self,
                                 root_url='http://bugs.python.org/',
