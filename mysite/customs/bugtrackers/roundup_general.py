@@ -215,7 +215,6 @@ class PythonTracker(RoundupTracker):
                                 project_name='Python')
 
     def extract_bug_tracker_specific_data(self, metadata_dict, bug_object):
-        # FIXME: here is special-case data for python.org
         bug_object.good_for_newcomers = (
             'easy' in metadata_dict['Keywords'])
         bug_object.concerns_just_documentation = (
