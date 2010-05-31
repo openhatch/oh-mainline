@@ -19,6 +19,7 @@ import mysite.search.tasks.trac_instances
 import mysite.search.tasks.bugzilla_instances
 import mysite.search.tasks.launchpad_tasks
 import mysite.search.tasks.roundup_instances
+import mysite.base.helpers
 
 class PopulateProjectIconFromOhloh(Task):
     def run(self, project_id):
@@ -61,13 +62,11 @@ def periodically_check_if_bug_epoch_eclipsed_the_cached_search_epoch():
     cache_time = mysite.search.models.Epoch.get_for_string('search_cache')
     bug_time = mysite.search.models.Epoch.get_for_string('search_cache')
     if cache_time < bug_time:
-        clear_search_cache.delay()
+        clear_search_cache()
         mysite.search.models.Epoch.bump_for_string('search_cache')
 
 ### The second circumstance is if a bug gets marked as closed.
 @celery.decorators.task
 def clear_search_cache():
     logging.info("Clearing the search cache.")
-    shutil.rmtree(os.path.join(settings.WEB_ROOT,
-                               'search'),
-                  ignore_errors=True)
+    mysite.base.helpers.clear_static_cache('search')
