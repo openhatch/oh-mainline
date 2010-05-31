@@ -157,8 +157,8 @@ class RoundupTracker(object):
 
         return bug
 
-    def extract_bug_tracker_specific_data(metadata_dict, bug_object):
-        raise NotImplemented
+    def extract_bug_tracker_specific_data(self, metadata_dict, bug_object):
+        raise RuntimeError(NotImplemented)
 
     def grab(self):
         """Loops over the Python bug tracker's easy bugs and stores/updates them in our DB.
