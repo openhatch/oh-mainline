@@ -78,7 +78,8 @@ class Command(BaseCommand):
 
         for bugzilla_tracker in bugzilla_trackers:
             logging.info("Refreshing bugs from %s." % bugzilla_tracker)
-            callable = bugzilla_trackers[bugzilla_tracker]
+            call_me = bugzilla_trackers[bugzilla_tracker]
+            call_me()
 
     def find_and_update_enabled_roundup_trackers(self):
         enabled_roundup_trackers = []
