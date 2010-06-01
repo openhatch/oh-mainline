@@ -8,6 +8,8 @@ import mysite.customs.ohloh
 import mysite.customs.models
 import mysite.search.models
 
+from itertools import chain
+
 def bug_url2bug_id(url, BUG_URL_PREFIX):
     before, after = url.split(BUG_URL_PREFIX)
     return int(after)
@@ -63,9 +65,9 @@ def query_url2bug_objects(BUG_URL_PREFIX,
 
 def grab(current_bug_id2bug_objs,
          BUG_URL_PREFIX):
-    bug_ids = mysite.customs.models.flatten(
-        [current_bug_id2bug_objs.keys(),
-         get_remote_bug_ids_already_stored(BUG_URL_PREFIX)])
+    bug_ids = chain(
+        current_bug_id2bug_objs.keys(),
+        get_remote_bug_ids_already_stored(BUG_URL_PREFIX))
 
     for bug_id in set(bug_ids):
         # Sometimes create_bug_object_for_remote_bug_id will fail to create

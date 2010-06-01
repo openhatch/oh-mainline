@@ -3,50 +3,8 @@ import datetime
 import logging
 import mysite.search.models
 import mysite.customs.models
-from celery.task import Task, PeriodicTask
+from celery.task import Task
 from celery.registry import tasks
-
-import mysite.customs.miro
-import mysite.customs.bugtrackers.trac
-import mysite.customs.bugtrackers.gnome_love
-import mysite.customs.bugtrackers.fedora_fitfinish
-import mysite.customs.bugtrackers.mozilla
-import mysite.customs.bugtrackers.wikimedia
-import mysite.customs.bugtrackers.kde
-
-class GrabMiroBugs(PeriodicTask):
-    run_every = timedelta(days=1)
-    def run(self, **kwargs):
-        logger = self.get_logger(**kwargs)
-        logger.info("Started to grab Miro bitesized bugs")
-        mysite.customs.miro.grab_miro_bugs()
-
-class GrabKDEBugs(PeriodicTask):
-    run_every = timedelta(days=1)
-    def run(self, **kwargs):
-        logger = self.get_logger(**kwargs)
-        logger.info("Started to grab KDE junior jobs bugs")
-        mysite.customs.bugtrackers.kde.grab()
-
-class GrabWikimediaBugs(PeriodicTask):
-    run_every = timedelta(days=1)
-    def run(self, **kwargs):
-        logging.info("Starting to grab Wikimedia easy bugs.")
-        mysite.customs.bugtrackers.wikimedia.grab()
-
-class GrabGnomeLoveBugs(PeriodicTask):
-    run_every = timedelta(days=1)
-    def run(self, **kwargs):
-        logger = self.get_logger(**kwargs)
-        logger.info("Started to grab GNOME Love bugs")
-        mysite.customs.bugtrackers.gnome_love.grab()
-
-class GrabMozillaGoodFirstBugs(PeriodicTask):
-    run_every = timedelta(days=1)
-    def run(self, **kwargs):
-        logger = self.get_logger(**kwargs)
-        logger.info("Started to grab Good First Bugs from Mozilla")
-        mysite.customs.bugtrackers.mozilla.grab()
 
 class LookAtOneFedoraBug(Task):
     def run(self, bug_id, **kwargs):
@@ -83,19 +41,17 @@ class LookAtOneFedoraBug(Task):
             bug_obj.save()
         logging.info("Finished with %d from Fedora." % bug_id)
 
-class LearnAboutNewFedoraFitAndFinishBugs(PeriodicTask):
-    run_every = timedelta(days=1)
+class LearnAboutNewFedoraFitAndFinishBugs(Task):
     def run(self, **kwargs):
         logger = self.get_logger(**kwargs)
         logger.info('Started to learn about new Fedora fit and finish bugs.')
         for bug_id in mysite.customs.bugtrackers.fedora_fitfinish.current_fit_and_finish_bug_ids():
             task = LookAtOneFedoraBug()
-            task.delay(bug_id=bug_id)
+            task.apply(bug_id=bug_id)
         logger.info('Finished grabbing the list of Fedora fit and finish bugs.')
 
 
-class RefreshAllFedoraFitAndFinishBugs(PeriodicTask):
-    run_every = timedelta(days=1)
+class RefreshAllFedoraFitAndFinishBugs(Task):
     def run(self, **kwargs):
         logger = self.get_logger(**kwargs)
         logger.info("Starting refreshing all Fedora bugs.")
@@ -105,10 +61,4 @@ class RefreshAllFedoraFitAndFinishBugs(PeriodicTask):
             bug_id = mysite.customs.bugtrackers.bugzilla_general.bug_url2bug_id(bug.canonical_bug_link,
                                                                                 BUG_URL_PREFIX=mysite.customs.bugtrackers.fedora_fitfinish.BUG_URL_PREFIX)
             task = LookAtOneFedoraBug()
-            task.delay(bug_id=bug_id)
-
-tasks.register(GrabMiroBugs)
-tasks.register(GrabGnomeLoveBugs)
-tasks.register(LookAtOneFedoraBug)
-tasks.register(LearnAboutNewFedoraFitAndFinishBugs)
-tasks.register(RefreshAllFedoraFitAndFinishBugs)
+            task.apply(bug_id=bug_id)
