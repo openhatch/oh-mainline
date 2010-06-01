@@ -17,6 +17,7 @@ import mysite.customs.bugtrackers.fedora_fitfinish
 import mysite.customs.bugtrackers.mozilla
 import mysite.customs.bugtrackers.wikimedia
 import mysite.customs.bugtrackers.kde
+import mysite.customs.bugtrackers.opensolaris
 
 ### All this code runs synchronously once a day.
 ### For now, we can crawl all the bug trackers in serial.
@@ -119,7 +120,11 @@ class Command(BaseCommand):
         # Second, we go through our *own* database of Launchpad-sourced bugs, and make sure they are all up to date
         mysite.search.tasks.launchpad_tasks.refresh_all_launchpad_bugs()
 
+    def update_opensolaris_osnet(self):
+        mystie.customs.bugtrackers.opensolaris.grab()
+
     def handle(self, *args, **options):
+        self.update_opensolaris_osnet()
         self.update_launchpad_hosted_projects()
         self.update_trac_instances()
         self.find_and_update_enabled_roundup_trackers()
