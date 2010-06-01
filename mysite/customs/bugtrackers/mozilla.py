@@ -46,6 +46,7 @@ def get_current_bug_id2bug_objs():
                              'support.mozilla.com': 'support.mozilla.com',
                              'Camino': 'Camino',
                              'Calendar': 'Mozilla Calendar',
+                             'Mozilla Localizations': 'Mozilla Localizations',
                              }
         if xml_project_name == 'Other Applications':
             project_name = 'Mozilla ' + bug_elt.xpath('component')[0].text
