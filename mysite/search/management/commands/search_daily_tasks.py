@@ -108,7 +108,7 @@ class Command(BaseCommand):
             mysite.search.tasks.trac_instances.LearnAboutNewEasyTwistedBugs.apply,
             mysite.search.tasks.trac_instances.RefreshAllTwistedEasyBugs.apply,
         ]
-        for callable in trac_instances_functions_to_call:
+        for callable in trac_instance_functions_to_call:
             callable()
 
     def update_launchpad_hosted_projects(self):
