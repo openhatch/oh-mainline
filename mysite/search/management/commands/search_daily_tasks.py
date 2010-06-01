@@ -95,55 +95,33 @@ class Command(BaseCommand):
             instantiated = thing()
             instantiated.update()
 
-    def handle(self, *args, **options):
-        # Make celery always eager, baby
-        
-        # A bunch of classes whose .run() we want to .delay()
-        dot_run_these = [
-            # Twisted
-            mysite.search.tasks.trac_instances.LearnAboutNewEasyTwistedBugs,
-            mysite.search.tasks.trac_instances.RefreshAllTwistedEasyBugs,
-        ]
-        for thing in dot_run_these:
-            thing().run()
-
-        # Just functions
-        run_these = [
-            # various projects hosted on Launchpad
-            mysite.search.tasks.launchpad_tasks.refresh_bugs_from_all_indexed_launchpad_projects,
-            mysite.search.tasks.launchpad_tasks.refresh_all_launchpad_bugs,
-
-            # sweet sweet sugar
+    def update_trac_instances(self):
+        # Trac instances' update functions
+        # Note that each Trac instance has two such functions for now. It would be
+        # good to rework the Trac code so it looks more like the RoundupTracker
+        # code, with just one .update() method. Another day.
+        trac_instance_functions_to_call = [
+            # Sugar
             mysite.search.tasks.trac_instances.learn_about_new_sugar_easy_bugs,
             mysite.search.tasks.trac_instances.refresh_all_sugar_easy_bugs,
-
-            # miro, whee
-            mysite.customs.miro.grab_miro_bugs,
-
-            # KDE
-            mysite.customs.bugtrackers.kde.grab,
-
-            # Wikimedia
-            mysite.customs.bugtrackers.wikimedia.grab,
-
-            # GNOME is in Love
-            mysite.customs.bugtrackers.gnome_love.grab,
-
-            # Mozira
-            mysite.customs.bugtrackers.mozilla.grab,
-
-            # Fedora:
-            mysite.search.tasks.bugzilla_instances.LearnAboutNewFedoraFitAndFinishBugs.apply,
-            mysite.search.tasks.bugzilla_instances.RefreshAllFedoraFitAndFinishBugs.apply,
+            # Twisted
+            mysite.search.tasks.trac_instances.LearnAboutNewEasyTwistedBugs.apply,
+            mysite.search.tasks.trac_instances.RefreshAllTwistedEasyBugs.apply,
         ]
-        for callable in run_these:
-            logging.info("About to run %s" % callable)
+        for callable in trac_instances_functions_to_call:
             callable()
 
-        # And for Roundup bug trackers, use our special handling
-        self.find_and_update_enabled_roundup_trackers()
+    def update_launchpad_hosted_projects(self):
+        ### For Launchpad:
+        # First, we ask the projects' bug trackers if there are new bugs we should know about
+        mysite.search.tasks.launchpad_tasks.refresh_bugs_from_all_indexed_launchpad_projects()
+        # Second, we go through our *own* database of Launchpad-sourced bugs, and make sure they are all up to date
+        mysite.search.tasks.launchpad_tasks.refresh_all_launchpad_bugs()
 
-        # And for Bugzilla bug trackers, use our special handling!
+    def handle(self, *args, **options):
+        self.update_launchpad_hosted_projects()
+        self.update_trac_instances()
+        self.find_and_update_enabled_roundup_trackers()
         self.update_bugzilla_trackers()
         
 
