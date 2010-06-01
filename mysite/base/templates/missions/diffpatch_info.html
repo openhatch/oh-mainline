@@ -5,8 +5,9 @@ Using <code>diff</code> and <code>patch</code>
 {% endblock mission_name %}
 
 {% block mission_summary %}
-<p>Text about this mission.</p>
-<p>Blah, blah, blah...</p>
+<p>One of the most critical steps in contributing to projects is showing other people what changes you have made.  The <code>diff</code> program inspects the two things you give it and outputs the differences between them.  The output of <code>diff</code> is both human readable (you can look at it and easily see where the changes fit in) and machine readable (you can use the <code>patch</code> program to automatically apply the changes to the original file or unapply the changes to the modified file).</p>
+
+<p>This mission will teach you:</p>
 
 <form method="post" action="{% url mysite.missions.views.diffpatch_start %}">
 <input type="submit" value="Start this mission &raquo;" /></form>
