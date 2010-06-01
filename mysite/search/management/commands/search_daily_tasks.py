@@ -70,10 +70,10 @@ class Command(BaseCommand):
             # special-cased like this? Well, I'll clean it up another day,
             # so long as it seems to work right now.
             'Fedora "fit and finish" new bugs':
-                mysite.search.tasks.bugzilla_instances.LearnAboutNewFedoraFitAndFinishBugs.apply,
+                mysite.search.tasks.bugzilla_instances.learn_about_new_fedora_fit_and_finish_bugs,
 
             'Fedora "fit and finish" refreshing old bugs':
-                mysite.search.tasks.bugzilla_instances.RefreshAllFedoraFitAndFinishBugs.apply,
+                mysite.search.tasks.bugzilla_instances.refresh_all_fedora_fit_and_finish_bugs,
             }
 
         for bugzilla_tracker in bugzilla_trackers:
