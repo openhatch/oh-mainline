@@ -32,7 +32,8 @@ def look_at_one_twisted_bug(bug_id):
 
     # Is that bug fresh enough?
     if bug_obj.data_is_more_fresh_than_one_day():
-        pass
+        logging.info("Skipping! It's fresh.")
+        return
     else: # it is stale.
         logging.info("Refreshing bug %d from Twisted." %
                      bug_id)
