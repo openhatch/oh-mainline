@@ -152,6 +152,22 @@ Start in milestone-a, then run
 
 === Troubleshooting ===
 
+==== MySQL_python ====
+
+If you're on Ubuntu 10.04 Lucid Lynx, you might get this exception:
+
+  File "/home/stump/openhatch/parts/sqlite_mysite/django/db/backends/mysql/base.py", line 13, in <module>
+    raise ImproperlyConfigured("Error loading MySQLdb module: %s" % e)
+django.core.exceptions.ImproperlyConfigured: Error loading MySQLdb module: libmysqlclient_r.so.15: cannot open shared object file: No such file or directory
+
+This is because the MySQL_python distribution is a binary egg that
+contains extension modules linked to libmysqlclient_r.so.15, while in
+Lucid the soname version number changed to 16.  To fix this, install
+the python-mysqldb package and delete the egg:
+   # apt-get install python-mysqldb
+   $ rm -r eggs/MySQL_python-*
+You will have to remove the egg each time you re-run buildout.
+
 ==== ctypes ====
 * If you're running Ubuntu 10.04 Lucid Lynx, when you execute bin/mysite runserver, you might see this error:
   File "/usr/lib/python2.6/dist-packages/ctypes/__init__.py", line 20, in <module>

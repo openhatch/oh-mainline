@@ -106,59 +106,60 @@ class RoundupTracker(object):
             if bug.data_is_more_fresh_than_one_day():
                 return False
         except mysite.search.models.Bug.DoesNotExist:
-            pass # whatever, we'll make it below
+            bug = mysite.search.models.Bug()
+            bug.canonical_bug_link = self.remote_bug_id2url(remote_bug_id)
 
-        # otherwise, make it rock out
-        bug = self._create_bug_object_for_remote_bug_id(remote_bug_id)
+        # otherwise, fill the bug object with fresh data
+        bug = self._update_bug_object_for_remote_bug_id(
+            bug_object=bug,
+            remote_bug_id=remote_bug_id)
         bug.save()
         logging.info(
             "Actually loaded %d in from %s" % (
                 remote_bug_id, self.project.name))
         return True
 
-    def _create_bug_object_for_remote_bug_id(self, remote_bug_id):
+    def _update_bug_object_for_remote_bug_id(self, bug_object, remote_bug_id):
         """Create but don't save a bug."""
         remote_bug_url = self.remote_bug_id2url(remote_bug_id)
         tree = lxml.html.document_fromstring(urllib2.urlopen(remote_bug_url).read())
 
-        bug = mysite.search.models.Bug()
-
         metadata_dict = RoundupTracker.roundup_tree2metadata_dict(tree)
 
-        date_reported, bug.submitter_username, last_touched, last_toucher = [
+        date_reported, bug_object.submitter_username, last_touched, last_toucher = [
                 x.text_content() for x in tree.cssselect(
                     'form[name=itemSynopsis] + p > b, form[name=itemSynopsis] + hr + p > b')]
-        bug.submitter_realname = self.get_submitter_realname(tree, bug.submitter_username)
-        bug.date_reported = self.str2datetime_obj(date_reported)
-        bug.last_touched = self.str2datetime_obj(last_touched)
-        bug.canonical_bug_link = remote_bug_url
+        bug_object.submitter_realname = self.get_submitter_realname(tree, bug_object.submitter_username)
+        bug_object.date_reported = self.str2datetime_obj(date_reported)
+        bug_object.last_touched = self.str2datetime_obj(last_touched)
+        bug_object.canonical_bug_link = remote_bug_url
 
-        bug.status = metadata_dict['Status'] 
-        bug.looks_closed = (metadata_dict['Status'] == 'closed')
-        bug.title = metadata_dict['Title'] 
-        bug.importance = metadata_dict['Priority']
+        bug_object.status = metadata_dict['Status'] 
+        bug_object.looks_closed = (metadata_dict['Status'] == 'closed')
+        bug_object.title = metadata_dict['Title'] 
+        bug_object.importance = metadata_dict['Priority']
 
         # For description, just grab the first "message"
         try:
-            bug.description = tree.cssselect('table.messages td.content')[0].text_content().strip()
+            bug_object.description = tree.cssselect('table.messages td.content')[0].text_content().strip()
         except IndexError:
             # This Roundup issue has no messages.
-            bug.description = ""
+            bug_object.description = ""
 
-        bug.project = self.project
+        bug_object.project = self.project
 
         # How many people participated?
-        bug.people_involved = len(self.get_all_submitter_realname_pairs(tree))
+        bug_object.people_involved = len(self.get_all_submitter_realname_pairs(tree))
 
-        bug.last_polled = datetime.datetime.utcnow()
+        bug_object.last_polled = datetime.datetime.utcnow()
 
         self.extract_bug_tracker_specific_data(metadata_dict=metadata_dict,
-                                               bug_object=bug)
+                                               bug_object=bug_object)
 
-        return bug
+        return bug_object
 
-    def extract_bug_tracker_specific_data(metadata_dict, bug_object):
-        raise NotImplemented
+    def extract_bug_tracker_specific_data(self, metadata_dict, bug_object):
+        raise RuntimeError(NotImplemented)
 
     def grab(self):
         """Loops over the Python bug tracker's easy bugs and stores/updates them in our DB.
