@@ -38,9 +38,11 @@ def import_bugs_from_one_project(launchpad_project_name,
 
 def refresh_all_launchpad_bugs():
     logging.info("Refreshing all Launchpad bugs.")
-    for lp_bug in mysite.search.models.Bug.all_bugs.filter(
-        canonical_bug_link__startswith='https://bugs.launchpad.net/'):
-        refresh_one_launchpad_bug.apply(
+    all_lp_bugs = mysite.search.models.Bug.all_bugs.filter(
+        canonical_bug_link__startswith='https://bugs.launchpad.net/')
+    logging.info("All %d of them." % all_lp_bugs.count())
+    for lp_bug in all_lp_bugs:
+        refresh_one_launchpad_bug(
             canonical_bug_link=lp_bug.canonical_bug_link,
             openhatch_project_name=None)
 
