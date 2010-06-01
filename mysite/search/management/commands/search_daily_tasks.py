@@ -92,7 +92,8 @@ class Command(BaseCommand):
 
         ### Okay, now update!
         for thing in enabled_roundup_trackers:
-            thing.update()
+            instantiated = thing()
+            instantiated.update()
 
     def handle(self, *args, **options):
         # Make celery always eager, baby
