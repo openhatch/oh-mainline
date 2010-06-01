@@ -193,7 +193,7 @@ class RoundupTracker(object):
         logging.info("Starting refreshing all bugs from %s." % self.project.name)
         count = 0
         for bug_id in self.get_remote_bug_ids_already_stored():
-            self.create_bug_object_for_remote_bug_id_if_necessary(bug_id=bug_id)
+            self.create_bug_object_for_remote_bug_id_if_necessary(remote_bug_id=bug_id)
             count += 1
         logging.info("Okay, looked at %d bugs from %s." % (
                 count, self.project.name))
