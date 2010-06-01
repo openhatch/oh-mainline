@@ -92,6 +92,7 @@ class Command(BaseCommand):
 
         ### Okay, now update!
         for thing in enabled_roundup_trackers:
+            logging.info("[Roundup] About to update %s" % thing)
             instantiated = thing()
             instantiated.update()
 
