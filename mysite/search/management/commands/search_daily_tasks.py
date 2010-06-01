@@ -134,7 +134,7 @@ class Command(BaseCommand):
             mysite.search.tasks.bugzilla_instances.RefreshAllFedoraFitAndFinishBugs.apply,
         ]
         for callable in run_these:
-            logging.info("About to run %s" % callable")
+            logging.info("About to run %s" % callable)
             callable()
 
         # And for Roundup bug trackers, use our special handling
