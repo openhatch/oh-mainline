@@ -4,21 +4,99 @@ import django.conf
 django.conf.settings.CELERY_ALWAYS_EAGER = True
 
 import mysite.search.tasks
+import mysite.customs.bugtrackers.roundup_general
+import mysite.customs.bugtrackers
 import mysite.search.tasks.launchpad_tasks
 
+import mysite.customs.miro
+import mysite.customs.bugtrackers.trac
+import mysite.customs.bugtrackers.gnome_love
+import mysite.customs.bugtrackers.fedora_fitfinish
+import mysite.customs.bugtrackers.mozilla
+import mysite.customs.bugtrackers.wikimedia
+import mysite.customs.bugtrackers.kde
+
+### All this code runs synchronously once a day.
+### For now, we can crawl all the bug trackers in serial.
+
+### One day, though, we will crawl so many bug trackers that it will take
+### too long.
+
+### I suggest that, at that point, we fork a number of worker processes, and
+### turn these lists into a queue or something. That should be easy with the
+### multiprocessing module. Then we can do N at once.
+
+### We could do something smart with statistics, detecting the average
+### refresh time within the bug tracker of a bug, then polling at some
+### approximation of that rate. (But, really, why bother?)
+
+### Since most of the time we're waiting on the network, we could also use
+### Twisted or Stackless Python or something. That would be super cool, too.
+### If somone can show me how to migrate this codebase to it, that'd be neat.
+### I'm unlikely to look into it myself, though.
+
+### (If at some point we start indexing absolutely every bug in free and open
+### source software, then the above ideas will actually become meaningful.)
+
+### -- New Age Asheesh, 2010-05-31.
+
 class Command(BaseCommand):
-    help = "Enqueue jobs into celery that would cause it to recrawl various bug trackers."
+    help = "Call this once a day to make sure we run Bug search-related nightly jobs."
+
+    def update_bugzilla_trackers(self):
+        bugzilla_trackers = {
+            'Miro':
+                mysite.customs.miro.grab_miro_bugs,
+            'KDE junior jobs':
+                mysite.customs.bugtrackers.kde.grab,
+            'Wikimedia easy bugs':
+                mysite.customs.bugtrackers.wikimedia.grab,
+            'GNOME Love':
+                mysite.customs.bugtrackers.gnome_love.grab,
+            'Mozilla "good first bug"s':
+                mysite.customs.bugtrackers.mozilla.grab,
+
+            # FIXME
+            # Really, the Bugzilla import code should be reworked to be as
+            # clean and tidy as the Mercurial/Python/Roundup stuff, with
+            # an abstract class with a .update() method.
+            # Then simple sub-classes can handle each of the different projects'
+            # details.
+
+            # What the heck is up with the Fedora code being
+            # special-cased like this? Well, I'll clean it up another day,
+            # so long as it seems to work right now.
+            'Fedora "fit and finish" new bugs':
+                mysite.search.tasks.bugzilla_instances.LearnAboutNewFedoraFitAndFinishBugs.apply,
+
+            'Fedora "fit and finish" refreshing old bugs':
+                mysite.search.tasks.bugzilla_instances.RefreshAllFedoraFitAndFinishBugs.apply,
+            }
+
+        for bugzilla_tracker in bugzilla_trackers:
+            logging.info("Refreshing bugs from %s." % bugzilla_tracker)
+            callable = bugzilla_trackers[bugzilla_tracker]
+
+    def find_and_update_enabled_roundup_trackers(self):
+        enabled_roundup_trackers = []
+
+        ### First, the "find" step
+        for thing_name in dir(mysite.customs.bugtrackers.roundup_general):
+            thing = getattr(mysite.customs.bugtrackers.roundup_general,
+                            thing_name)
+            if hasattr(thing, 'enabled'):
+                if getattr(thing, 'enabled'):
+                    enabled_roundup_trackers.append(thing)
+
+        ### Okay, now update!
+        for thing in enabled_roundup_trackers:
+            thing.update()
 
     def handle(self, *args, **options):
         # Make celery always eager, baby
         
         # A bunch of classes whose .run() we want to .delay()
         dot_run_these = [
-            # Yay Python
-            mysite.search.tasks.LearnAboutNewPythonDocumentationBugs,
-            mysite.search.tasks.LearnAboutNewEasyPythonBugs,
-            mysite.search.tasks.GrabPythonBugs,
-
             # Twisted
             mysite.search.tasks.trac_instances.LearnAboutNewEasyTwistedBugs,
             mysite.search.tasks.trac_instances.RefreshAllTwistedEasyBugs,
@@ -32,15 +110,37 @@ class Command(BaseCommand):
             mysite.search.tasks.launchpad_tasks.refresh_bugs_from_all_indexed_launchpad_projects,
             mysite.search.tasks.launchpad_tasks.refresh_all_launchpad_bugs,
 
-            # mercurial
-            mysite.search.tasks.roundup_instances.learn_about_new_mercurial_easy_and_documentation_bugs,
-            mysite.search.tasks.roundup_instances.refresh_all_mercurial_bugs,
-
             # sweet sweet sugar
             mysite.search.tasks.trac_instances.learn_about_new_sugar_easy_bugs,
             mysite.search.tasks.trac_instances.refresh_all_sugar_easy_bugs,
+
+            # miro, whee
+            mysite.customs.miro.grab_miro_bugs,
+
+            # KDE
+            mysite.customs.bugtrackers.kde.grab,
+
+            # Wikimedia
+            mysite.customs.bugtrackers.wikimedia.grab,
+
+            # GNOME is in Love
+            mysite.customs.bugtrackers.gnome_love.grab,
+
+            # Mozira
+            mysite.customs.bugtrackers.mozilla.grab,
+
+            # Fedora:
+            mysite.search.tasks.bugzilla_instances.LearnAboutNewFedoraFitAndFinishBugs.apply,
+            mysite.search.tasks.bugzilla_instances.RefreshAllFedoraFitAndFinishBugs.apply,
         ]
         for callable in run_these:
-            callable()                   
+            logging.info("About to run %s" % callable")
+            callable()
+
+        # And for Roundup bug trackers, use our special handling
+        self.find_and_update_enabled_roundup_trackers()
+
+        # And for Bugzilla bug trackers, use our special handling!
+        self.update_bugzilla_trackers()
         
 

@@ -1,7 +1,6 @@
 from django.core.mail import send_mail
 import datetime
 import celery.decorators
-import staticgenerator
 
 @celery.decorators.task
 def send_email_to_all_because_project_icon_was_marked_as_wrong(project__pk, project__name, project_icon_url):
@@ -19,7 +18,3 @@ def send_email_to_all_because_project_icon_was_marked_as_wrong(project__pk, proj
     body += 'project icon url (currently not displayed): ' + project_icon_url + '\n'
     body += 'thanks'
     return send_mail(subject, body, 'all@openhatch.org', ['all@openhatch.org'], fail_silently=False)
-
-@celery.decorators.periodic_task(run_every=datetime.timedelta(minutes=5))
-def refresh_project_page_cache():
-    staticgenerator.quick_publish('/+projects/')

@@ -3,7 +3,7 @@ import datetime
 import logging
 import mysite.search.models
 import mysite.customs.models
-from celery.task import Task, PeriodicTask
+from celery.task import Task
 from celery.registry import tasks
 import celery.decorators
 import mysite.search.launchpad_crawl
