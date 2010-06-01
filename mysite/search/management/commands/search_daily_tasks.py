@@ -1,3 +1,5 @@
+import logging
+
 from django.core.management.base import BaseCommand
 
 import django.conf
