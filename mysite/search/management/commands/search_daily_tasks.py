@@ -106,8 +106,8 @@ class Command(BaseCommand):
             mysite.search.tasks.trac_instances.learn_about_new_sugar_easy_bugs,
             mysite.search.tasks.trac_instances.refresh_all_sugar_easy_bugs,
             # Twisted
-            mysite.search.tasks.trac_instances.LearnAboutNewEasyTwistedBugs.apply,
-            mysite.search.tasks.trac_instances.RefreshAllTwistedEasyBugs.apply,
+            mysite.search.tasks.trac_instances.learn_about_new_easy_twisted_bugs,
+            mysite.search.tasks.trac_instances.refresh_all_twisted_bugs,
         ]
         for callable in trac_instance_functions_to_call:
             callable()

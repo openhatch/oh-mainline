@@ -1,87 +1,73 @@
 import datetime
 import logging
 
-from celery.task import Task
-from celery.registry import tasks
-import celery.decorators
-
 import mysite.search.models
 import mysite.customs.bugtrackers.trac
 
 ### Twisted
-class LookAtOneTwistedBug(Task):
-    def run(self, bug_id, **kwargs):
-        logger = self.get_logger(**kwargs)
-        logger.info("Was asked to look at bug %d in Twisted" % bug_id)
-        tb = mysite.customs.bugtrackers.trac.TracBug(
-            bug_id=bug_id,
-            BASE_URL='http://twistedmatrix.com/trac/')
+def look_at_one_twisted_bug(bug_id):
+    logging.info("Was asked to look at bug %d in Twisted" % bug_id)
+    tb = mysite.customs.bugtrackers.trac.TracBug(
+        bug_id=bug_id,
+        BASE_URL='http://twistedmatrix.com/trac/')
 
-        bug_url = tb.as_bug_specific_url()
+    bug_url = tb.as_bug_specific_url()
 
-        # If bug is already in our database, and we looked at
-        # it within the past day, skip the request.
-        try:
-            bug_obj = mysite.search.models.Bug.all_bugs.get(
-                canonical_bug_link=bug_url)
-        except mysite.search.models.Bug.MultipleObjectsReturned:
-            # delete all but the first
-            bug_objs = mysite.search.models.Bug.all_bugs.filter(
-                canonical_bug_link=bug_url)
-            bug_obj = bug_objs[0]
-            for stupid_dup in bug_objs[1:]:
-                stupid_dup.delete()
+    # If bug is already in our database, and we looked at
+    # it within the past day, skip the request.
+    try:
+        bug_obj = mysite.search.models.Bug.all_bugs.get(
+            canonical_bug_link=bug_url)
+    except mysite.search.models.Bug.MultipleObjectsReturned:
+        # delete all but the first
+        bug_objs = mysite.search.models.Bug.all_bugs.filter(
+            canonical_bug_link=bug_url)
+        bug_obj = bug_objs[0]
+        for stupid_dup in bug_objs[1:]:
+            stupid_dup.delete()
 
-        except mysite.search.models.Bug.DoesNotExist:
-            bug_obj = mysite.search.models.Bug(
-                canonical_bug_link=bug_url)
+    except mysite.search.models.Bug.DoesNotExist:
+        bug_obj = mysite.search.models.Bug(
+            canonical_bug_link=bug_url)
 
-        # Is that bug fresh enough?
-        if (datetime.datetime.now() - bug_obj.last_polled
-            ) > datetime.timedelta(days=1):
-            logging.info("Refreshing bug %d from Twisted." %
-                         bug_id)
-            # if the delta is greater than a day, refresh it.
-            data = tb.as_data_dict_for_bug_object()
-            for key in data:
-                value = data[key]
-                setattr(bug_obj, key, value)
-            # And the project...
-            if not bug_obj.project_id:
-                project, _ = mysite.search.models.Project.objects.get_or_create(name='Twisted')
-                bug_obj.project = project
-            bug_obj.save()
-        logging.info("Finished with %d from Twisted." % bug_id)
+    # Is that bug fresh enough?
+    if bug_obj.data_is_more_fresh_than_one_day():
+        pass
+    else: # it is stale.
+        logging.info("Refreshing bug %d from Twisted." %
+                     bug_id)
+        # if the delta is greater than a day, refresh it.
+        data = tb.as_data_dict_for_bug_object()
+        for key in data:
+            value = data[key]
+            setattr(bug_obj, key, value)
+        # And the project...
+        if not bug_obj.project_id:
+            project, _ = mysite.search.models.Project.objects.get_or_create(name='Twisted')
+            bug_obj.project = project
+        bug_obj.save()
+    logging.info("Finished with %d from Twisted." % bug_id)
 
-class LearnAboutNewEasyTwistedBugs(Task):
-    def run(self, **kwargs):
-        logger = self.get_logger(**kwargs)
-        
-        logger.info('Started to learn about new Twisted easy bugs.')
-        for bug_id in mysite.customs.bugtrackers.trac.csv_url2list_of_bug_ids(
-            mysite.customs.bugtrackers.trac.csv_of_bugs(
-                url='http://twistedmatrix.com/trac/query?status=new&status=assigned&status=reopened&format=csv&keywords=%7Eeasy&order=priority')):
-            task = LookAtOneTwistedBug()
-            task.apply(bug_id=bug_id)
-        logger.info('Finished grabbing the list of Twisted easy bugs.')
+def learn_about_new_easy_twisted_bugs():
+    logging.info('Started to learn about new Twisted easy bugs.')
+    for bug_id in mysite.customs.bugtrackers.trac.csv_url2list_of_bug_ids(
+        mysite.customs.bugtrackers.trac.csv_of_bugs(
+            url='http://twistedmatrix.com/trac/query?status=new&status=assigned&status=reopened&format=csv&keywords=%7Eeasy&order=priority')):
+        look_at_one_twisted_bug(bug_id=bug_id)
+    logging.info('Finished grabbing the list of Twisted easy bugs.')
 
-class RefreshAllTwistedEasyBugs(Task):
-    def run(self, **kwargs):
-        logger = self.get_logger(**kwargs)
-        logger.info("Starting refreshing all easy Twisted bugs.")
-        for bug in mysite.search.models.Bug.all_bugs.filter(
-            canonical_bug_link__contains=
-            'http://twistedmatrix.com/trac/'):
-            tb = mysite.customs.bugtrackers.trac.TracBug.from_url(
-                bug.canonical_bug_link)
-            task = LookAtOneTwistedBug()
-            task.apply(bug_id=tb.bug_id)
+def refresh_all_twisted_bugs():
+    logging.info("Starting refreshing all easy Twisted bugs.")
+    all_such_bugs = mysite.search.models.Bug.all_bugs.filter(
+        canonical_bug_link__contains=
+        'http://twistedmatrix.com/trac/')
+    logging.info("All %d of them." % all_such_bugs.count())
 
-tasks.register(LearnAboutNewEasyTwistedBugs)
-tasks.register(LookAtOneTwistedBug)
-tasks.register(RefreshAllTwistedEasyBugs)
+    for bug in all_such_bugs:
+        tb = mysite.customs.bugtrackers.trac.TracBug.from_url(
+            bug.canonical_bug_link)
+        look_at_one_twisted_bug(bug_id=tb.bug_id)
 
-@celery.decorators.task
 def look_at_sugar_labs_bug(bug_id):
     logging.info("Looking at bug %d in Sugar Labs" % bug_id)
     tb = mysite.customs.bugtrackers.trac.TracBug(
@@ -121,7 +107,7 @@ def learn_about_new_sugar_easy_bugs():
     for bug_id in mysite.customs.bugtrackers.trac.csv_url2list_of_bug_ids(
         mysite.customs.bugtrackers.trac.csv_of_bugs(
             url='http://bugs.sugarlabs.org/query?status=new&status=assigned&status=reopened&format=csv&keywords=%7Esugar-love&order=priority')):
-        look_at_sugar_labs_bug.apply(bug_id=bug_id)
+        look_at_sugar_labs_bug(bug_id=bug_id)
     logging.info('Finished grabbing the list of Sugar Labs easy bugs.')
 
 def refresh_all_sugar_easy_bugs():
@@ -131,4 +117,4 @@ def refresh_all_sugar_easy_bugs():
         'http://bugs.sugarlabs.org/'):
         tb = mysite.customs.bugtrackers.trac.TracBug.from_url(
             bug.canonical_bug_link)
-        look_at_sugar_labs_bug.apply(bug_id=tb.bug_id)
+        look_at_sugar_labs_bug(bug_id=tb.bug_id)
