@@ -9,6 +9,8 @@ import mysite.customs.models
 import mysite.search.models
 import mysite.customs.bugtrackers.bugzilla_general
 
+import itertools
+
 MOZILLA_GOOD_FIRST_BUG_QUERY='https://bugzilla.mozilla.org/buglist.cgi?resolution=---;status_whiteboard_type=substring;query_format=advanced;status_whiteboard=[good%20first%20bug]'
 BUG_URL_PREFIX = 'https://bugzilla.mozilla.org/show_bug.cgi?id='
 
@@ -78,10 +80,10 @@ def grab():
 
     current_bug_id2bug_objs = get_current_bug_id2bug_objs()
 
-    bug_ids = mysite.customs.models.flatten(
-        [current_bug_id2bug_objs.keys(),
-         mysite.customs.bugtrackers.bugzilla_general.get_remote_bug_ids_already_stored(
-             BUG_URL_PREFIX)])
+    bug_ids = itertools.chain(
+        current_bug_id2bug_objs.keys(),
+        mysite.customs.bugtrackers.bugzilla_general.get_remote_bug_ids_already_stored(
+             BUG_URL_PREFIX))
 
     for bug_id in set(bug_ids):
         # Sometimes create_bug_object_for_remote_bug_id will fail to create

@@ -2,7 +2,7 @@ import urllib2
 import urllib
 import re
 import lxml.html # scraper library
-from itertools import chain
+import itertools
 import csv
 import datetime
 import logging
@@ -165,8 +165,8 @@ class RoundupTracker(object):
         """Loops over the Python bug tracker's easy bugs and stores/updates them in our DB.
         For now, just grab the easy bugs to be kind to their servers."""
 
-        bug_ids = flatten([self.get_remote_bug_ids_to_read(),
-                self.get_remote_bug_ids_already_stored()])
+        bug_ids = itertools.chain(self.get_remote_bug_ids_to_read(),
+                                  self.get_remote_bug_ids_already_stored())
 
         for bug_id in bug_ids:
             print bug_id
