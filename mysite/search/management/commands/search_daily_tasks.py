@@ -17,6 +17,7 @@ import mysite.customs.bugtrackers.fedora_fitfinish
 import mysite.customs.bugtrackers.mozilla
 import mysite.customs.bugtrackers.wikimedia
 import mysite.customs.bugtrackers.kde
+import mysite.customs.bugtrackers.opensolaris
 
 ### All this code runs synchronously once a day.
 ### For now, we can crawl all the bug trackers in serial.
@@ -69,15 +70,16 @@ class Command(BaseCommand):
             # special-cased like this? Well, I'll clean it up another day,
             # so long as it seems to work right now.
             'Fedora "fit and finish" new bugs':
-                mysite.search.tasks.bugzilla_instances.LearnAboutNewFedoraFitAndFinishBugs.apply,
+                mysite.search.tasks.bugzilla_instances.learn_about_new_fedora_fit_and_finish_bugs,
 
             'Fedora "fit and finish" refreshing old bugs':
-                mysite.search.tasks.bugzilla_instances.RefreshAllFedoraFitAndFinishBugs.apply,
+                mysite.search.tasks.bugzilla_instances.refresh_all_fedora_fit_and_finish_bugs,
             }
 
         for bugzilla_tracker in bugzilla_trackers:
             logging.info("Refreshing bugs from %s." % bugzilla_tracker)
-            callable = bugzilla_trackers[bugzilla_tracker]
+            call_me = bugzilla_trackers[bugzilla_tracker]
+            call_me()
 
     def find_and_update_enabled_roundup_trackers(self):
         enabled_roundup_trackers = []
@@ -106,8 +108,8 @@ class Command(BaseCommand):
             mysite.search.tasks.trac_instances.learn_about_new_sugar_easy_bugs,
             mysite.search.tasks.trac_instances.refresh_all_sugar_easy_bugs,
             # Twisted
-            mysite.search.tasks.trac_instances.LearnAboutNewEasyTwistedBugs.apply,
-            mysite.search.tasks.trac_instances.RefreshAllTwistedEasyBugs.apply,
+            mysite.search.tasks.trac_instances.learn_about_new_easy_twisted_bugs,
+            mysite.search.tasks.trac_instances.refresh_all_twisted_bugs,
         ]
         for callable in trac_instance_functions_to_call:
             callable()
@@ -119,7 +121,11 @@ class Command(BaseCommand):
         # Second, we go through our *own* database of Launchpad-sourced bugs, and make sure they are all up to date
         mysite.search.tasks.launchpad_tasks.refresh_all_launchpad_bugs()
 
+    def update_opensolaris_osnet(self):
+        mysite.customs.bugtrackers.opensolaris.grab()
+
     def handle(self, *args, **options):
+        self.update_opensolaris_osnet()
         self.update_launchpad_hosted_projects()
         self.update_trac_instances()
         self.find_and_update_enabled_roundup_trackers()
