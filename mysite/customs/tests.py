@@ -72,7 +72,7 @@ def twill_quiet():
     twill.set_output(StringIO())
 # }}}
 
-class OhlohTests(django.test.TestCase):
+class OhlohTestsThatHitTheNetwork(django.test.TestCase):
     # {{{
     def testProjectDataById(self):
         # {{{
