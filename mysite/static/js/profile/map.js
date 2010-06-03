@@ -1,51 +1,17 @@
 function my_visible($obj) {
-    return $obj.hasClass('should_be_visible');
+    return ! $obj.hasClass('should_be_hidden');
 }
 
 
 function my_hide($obj) {
-    /* Assert that $obj has exactly one of the following:
-     * .should_be_hidden, or
-     * .should_be_visible
-     */
-    var hidden = $obj.hasClass('should_be_hidden');
-    var visible = $obj.hasClass('should_be_visible');
-
-    if (!hidden && !visible) {
-	console.info($obj);
-	return 0/0;
-    }
-    if (hidden && visible) {
-	console.info($obj);
-	return 0/0;
-    }
-
-    if (visible) {
-	$obj.removeClass('should_be_visible');
-	$obj.addClass('should_be_hidden');
-    }
+    $obj.addClass('should_be_hidden');
 }
 
 function my_show($obj) {
-    /* Assert that $obj has exactly one of the following:
-     * .should_be_hidden, or
-     * .should_be_visible
-     */
     var hidden = $obj.hasClass('should_be_hidden');
-    var visible = $obj.hasClass('should_be_visible');
-
-    if (!hidden && !visible) {
-	console.info($obj);
-	return 0/0;
-    }
-    if (hidden && visible) {
-	console.info($obj);
-	return 0/0;
-    }
 
     if (hidden) {
-	$obj.addClass('should_be_visible');
-	$obj.removeClass('should_be_hidden');
+	    $obj.removeClass('should_be_hidden');
     }
 }
 
@@ -123,7 +89,7 @@ PeopleMapController.prototype.initialize = function(options) {
 
         $('.hide_once_map_loads').hide();
         $('.dont_show_until_map_loads').show();
-        var mappedPeople_count = $("#people-list li.should_be_visible").size();
+        var mappedPeople_count = $("#people-list li:not(.should_be_hidden)").size();
 
         var str = mappedPeople_count;
         if (mappedPeople_count == num_of_persons_who_can_be_geocoded) {
@@ -153,8 +119,11 @@ PeopleMapController.prototype.initialize = function(options) {
     window.setTimeout(hideBGImage, 2500);
 
     function generate_update_all_markers(mapController) {
-        return function() {
+        var closure = function() {
+            /* This function is executed every time the map bounds change. */
+
             var map = mapController.map;
+
             /* This only makes up to 10 people show on the right. */
             var shown_this_many = 0;
             
@@ -193,6 +162,7 @@ PeopleMapController.prototype.initialize = function(options) {
             }
             update_people_count();
         };
+        return closure;
     } // end function generate_update_all_markers
     
     update_all_markers = generate_update_all_markers(this);
@@ -321,7 +291,7 @@ if (mapController.the_marker_for_inaccessible_island !== null) {
 //this gets called when you click a marker on the map
 PeopleMapController.prototype.highlightPerson = function(personId) {
     // Unhighlight everyone
-    $('#people-list li').removeClass("highlighted");
+    $('#people-list li.highlighted').removeClass("highlighted");
     //highlight the right person
     $('#person_summary_' + personId).addClass("highlighted");
 };
@@ -337,7 +307,7 @@ PeopleMapController.prototype.bindClickHandlersToPeopleListItems = function() {
         thePersonLi = this;
 
         // Unhighlight everyone
-        $('#people-list li').removeClass("highlighted");
+        $('#people-list li.highlighted').removeClass("highlighted");
 
         // Highlight this person.
         $(thePersonLi).addClass("highlighted");
