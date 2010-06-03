@@ -15,6 +15,7 @@ from django.contrib.auth import SESSION_KEY, BACKEND_SESSION_KEY, load_backend
 from django.core.urlresolvers import reverse
 from django.core.cache import cache
 import django.db.models.query
+from django.db.models import Q
 
 import datetime
 import sys
@@ -106,7 +107,15 @@ class Person(models.Model):
                                              verbose_name='Location')
 
     def location_is_public(self):
+        # If you change this method, change the method immediately below this
+        # one (Person.inaccessible_islanders)
         return self.location_confirmed and self.location_display_name
+
+    @staticmethod
+    def inaccessible_islanders():
+        # If you change this method, change the method immediately above this
+        # one (location_is_public)
+        return Person.objects.filter(Q(location_confirmed=False) | Q(location_display_name=''))
 
     def reindex_for_person_search(self):
         import mysite.profile.tasks

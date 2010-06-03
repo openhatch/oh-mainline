@@ -289,10 +289,16 @@ People Search
         var center = {'latitude': 0, 'longitude': 0, 'suggested_zoom_level': 1};
         var center_name = '';
     {% endif %}
-
     {% if geocode_failed %}
         $('.map-error').show();
     {% endif %}
+
+    inaccessible_islander_ids = {{ inaccessible_islander_ids|safe }};
+    inaccessible_islanders = [];
+    for (var i = 0; i < inaccessible_islander_ids.length; i++) {
+        inaccessible_islanders.push(document.getElementById(
+                'person_summary_'+inaccessible_islander_ids[i]));
+    }
 
     mapController = new PeopleMapController(); 
     $(function () {
@@ -320,6 +326,7 @@ People Search
             $('#a_few_matching_project_suggestions').show();
             return false;
         });
+
     });
 
 </script>
