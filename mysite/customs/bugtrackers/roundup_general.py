@@ -2,7 +2,7 @@ import urllib2
 import urllib
 import re
 import lxml.html # scraper library
-from itertools import chain
+import itertools
 import csv
 import datetime
 import logging
@@ -106,66 +106,67 @@ class RoundupTracker(object):
             if bug.data_is_more_fresh_than_one_day():
                 return False
         except mysite.search.models.Bug.DoesNotExist:
-            pass # whatever, we'll make it below
+            bug = mysite.search.models.Bug()
+            bug.canonical_bug_link = self.remote_bug_id2url(remote_bug_id)
 
-        # otherwise, make it rock out
-        bug = self._create_bug_object_for_remote_bug_id(remote_bug_id)
+        # otherwise, fill the bug object with fresh data
+        bug = self._update_bug_object_for_remote_bug_id(
+            bug_object=bug,
+            remote_bug_id=remote_bug_id)
         bug.save()
         logging.info(
             "Actually loaded %d in from %s" % (
                 remote_bug_id, self.project.name))
         return True
 
-    def _create_bug_object_for_remote_bug_id(self, remote_bug_id):
+    def _update_bug_object_for_remote_bug_id(self, bug_object, remote_bug_id):
         """Create but don't save a bug."""
         remote_bug_url = self.remote_bug_id2url(remote_bug_id)
         tree = lxml.html.document_fromstring(urllib2.urlopen(remote_bug_url).read())
 
-        bug = mysite.search.models.Bug()
-
         metadata_dict = RoundupTracker.roundup_tree2metadata_dict(tree)
 
-        date_reported, bug.submitter_username, last_touched, last_toucher = [
+        date_reported, bug_object.submitter_username, last_touched, last_toucher = [
                 x.text_content() for x in tree.cssselect(
                     'form[name=itemSynopsis] + p > b, form[name=itemSynopsis] + hr + p > b')]
-        bug.submitter_realname = self.get_submitter_realname(tree, bug.submitter_username)
-        bug.date_reported = self.str2datetime_obj(date_reported)
-        bug.last_touched = self.str2datetime_obj(last_touched)
-        bug.canonical_bug_link = remote_bug_url
+        bug_object.submitter_realname = self.get_submitter_realname(tree, bug_object.submitter_username)
+        bug_object.date_reported = self.str2datetime_obj(date_reported)
+        bug_object.last_touched = self.str2datetime_obj(last_touched)
+        bug_object.canonical_bug_link = remote_bug_url
 
-        bug.status = metadata_dict['Status'] 
-        bug.looks_closed = (metadata_dict['Status'] == 'closed')
-        bug.title = metadata_dict['Title'] 
-        bug.importance = metadata_dict['Priority']
+        bug_object.status = metadata_dict['Status'] 
+        bug_object.looks_closed = (metadata_dict['Status'] == 'closed')
+        bug_object.title = metadata_dict['Title'] 
+        bug_object.importance = metadata_dict['Priority']
 
         # For description, just grab the first "message"
         try:
-            bug.description = tree.cssselect('table.messages td.content')[0].text_content().strip()
+            bug_object.description = tree.cssselect('table.messages td.content')[0].text_content().strip()
         except IndexError:
             # This Roundup issue has no messages.
-            bug.description = ""
+            bug_object.description = ""
 
-        bug.project = self.project
+        bug_object.project = self.project
 
         # How many people participated?
-        bug.people_involved = len(self.get_all_submitter_realname_pairs(tree))
+        bug_object.people_involved = len(self.get_all_submitter_realname_pairs(tree))
 
-        bug.last_polled = datetime.datetime.utcnow()
+        bug_object.last_polled = datetime.datetime.utcnow()
 
         self.extract_bug_tracker_specific_data(metadata_dict=metadata_dict,
-                                               bug_object=bug)
+                                               bug_object=bug_object)
 
-        return bug
+        return bug_object
 
-    def extract_bug_tracker_specific_data(metadata_dict, bug_object):
-        raise NotImplemented
+    def extract_bug_tracker_specific_data(self, metadata_dict, bug_object):
+        raise RuntimeError(NotImplemented)
 
     def grab(self):
         """Loops over the Python bug tracker's easy bugs and stores/updates them in our DB.
         For now, just grab the easy bugs to be kind to their servers."""
 
-        bug_ids = flatten([self.get_remote_bug_ids_to_read(),
-                self.get_remote_bug_ids_already_stored()])
+        bug_ids = itertools.chain(self.get_remote_bug_ids_to_read(),
+                                  self.get_remote_bug_ids_already_stored())
 
         for bug_id in bug_ids:
             print bug_id
@@ -181,10 +182,28 @@ class RoundupTracker(object):
             # With the coast clear, we save the bug we just extracted from the Miro tracker.
             bug.save()
 
+    def update(self):
+        '''Call this nightly.'''
+        logging.info("Learning about new bugs in %s" % self.project.name)
+
+        # First, find an examine any new bugs.
+        for bug_id in self.generate_list_of_bug_ids_to_look_at():
+            self.create_bug_object_for_remote_bug_id_if_necessary(bug_id)
+        # Second, make sure old bugs in the database aren't too stale.
+        logging.info("Starting refreshing all bugs from %s." % self.project.name)
+        count = 0
+        for bug_id in self.get_remote_bug_ids_already_stored():
+            self.create_bug_object_for_remote_bug_id_if_necessary(remote_bug_id=bug_id)
+            count += 1
+        logging.info("Okay, looked at %d bugs from %s." % (
+                count, self.project.name))
+
     def __unicode__(self):
         return "<Roundup bug tracker for %s>" % self.root_url
 
 class MercurialTracker(RoundupTracker):
+    enabled = True
+
     def __init__(self):
         RoundupTracker.__init__(self,
                                 root_url='http://mercurial.selenic.com/bts/',
@@ -207,4 +226,35 @@ class MercurialTracker(RoundupTracker):
                 'http://mercurial.selenic.com/bts/issue?@action=export_csv&@columns=title,id,activity,status,assignedto&@sort=activity&@group=priority&@filter=topic&@pagesize=500&@startwith=0&topic=10'):
             yield bug_id
         
- 
+class PythonTracker(RoundupTracker):
+    enabled = True
+
+    def __init__(self):
+        RoundupTracker.__init__(self,
+                                root_url='http://bugs.python.org/',
+                                project_name='Python')
+
+    def extract_bug_tracker_specific_data(self, metadata_dict, bug_object):
+        bug_object.good_for_newcomers = (
+            'easy' in metadata_dict['Keywords'])
+        bug_object.concerns_just_documentation = (
+            'Documentation' in metadata_dict['Components'])
+        bug_object.status = metadata_dict['Status']
+        bug_object.looks_closed = (
+            metadata_dict['Status'] == 'closed' or
+            'patch' in metadata_dict['Keywords'])
+        bug_object.importance = metadata_dict['Priority']
+
+    def generate_list_of_bug_ids_to_look_at(self):
+        ### bug queries to look at
+        queries = {
+            'Documentation bugs':
+                'http://bugs.python.org/issue?status=1%2C3&%40sort=activity&%40columns=id&%40startwith=0&%40group=priority&%40filter=status%2Ccomponents&components=4&%40action=export_csv',
+            'Easy bugs':
+                'http://bugs.python.org/issue?status=1%2C3&%40sort=activity&%40columns=id&%40startwith=0&%40group=priority&%40filter=status%2Ckeywords&keywords=6&%40action=export_csv',
+            }
+
+        for query_name in queries:
+            query_url = queries[query_name]
+            for bug_id in csv_url2bugs(query_url):
+                yield bug_id

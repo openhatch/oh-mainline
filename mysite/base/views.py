@@ -177,14 +177,14 @@ def meta(request):
     one_hour_and_one_day_ago = (datetime.datetime.now() -
                                 datetime.timedelta(days=1, hours=1))
 
-    my['Bugs older than one day + one hour ago'] = mysite.search.models.Bug.all_bugs.filter(
+    my['Bugs last polled more than than one day + one hour ago'] = mysite.search.models.Bug.all_bugs.filter(
         last_polled__lt=one_hour_and_one_day_ago).count()
 
     two_days_ago = (datetime.datetime.now() -
                     datetime.timedelta(days=2))
-    my['Bugs older than two days'] = mysite.search.models.Bug.all_bugs.filter(
+    my['Bugs last polled more than two days ago'] = mysite.search.models.Bug.all_bugs.filter(
         last_polled__lt=two_days_ago).count()
-    my['Bugs older than two days (in percent)'] = (
+    my['Bugs last polled more than two days ago (in percent)'] = (
         mysite.search.models.Bug.all_bugs.filter(
         last_polled__lt=two_days_ago).count() * 100.0 /
         mysite.search.models.Bug.all_bugs.count())        

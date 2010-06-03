@@ -39,6 +39,7 @@ import mysite.customs.feed
 import mysite.customs.github
 
 import mysite.customs.models
+import mysite.customs.bugtrackers.roundup_general
 import mysite.customs.lp_grabber
 # }}}
 
@@ -512,25 +513,57 @@ class OhlohLogging(django.test.TestCase):
         self.assertEqual(error_dia.web_response.url, 'http://theurl.com/')
         self.assertEqual(error_dia.web_response.status, 200)
 
-class RoundupGrab(django.test.TestCase):
+class MercurialRoundupGrab(django.test.TestCase):
 
     closed_bug_filename = os.path.join(settings.MEDIA_ROOT, 'sample-data',
-            "closed-python-bug.html")
+            "closed-mercurial-bug.html")
 
     # When we query for bugs, we'll always get bugs with Status=closed.
     # That's because we're patching out the method that returns a dictionary
     # of the bug's metadata. That dictionary will always contain 'closed' at 'Status'.
-    @mock.patch('urllib2.urlopen',
-            mock.Mock(return_value=open(closed_bug_filename)))
-    def test_scrape_bug_status_and_mark_as_closed(self):
-        roundup_project = Project.create_dummy()
-        tracker = mysite.customs.models.RoundupBugTracker(
-                project=roundup_project,
-                roundup_root_url="http://example.org")
-        tracker.save()
+    @mock.patch('urllib2.urlopen')
+    def test_scrape_bug_status_and_mark_as_closed(self, mock_urlopen,
+                                                  project_name='Mercurial',
+                                                  should_do_something=True,
+                                                  should_use_urlopen=True):
+        if Project.objects.filter(name=project_name):
+            roundup_project = Project.objects.get(name=project_name)
+        else:
+            roundup_project = Project.create_dummy(name=project_name)
 
-        bug = tracker.create_bug_object_for_remote_bug_id(1)
+        mock_urlopen.return_value=open(MercurialRoundupGrab.closed_bug_filename)
+
+        tracker = mysite.customs.bugtrackers.roundup_general.MercurialTracker()
+        did_create = tracker.create_bug_object_for_remote_bug_id_if_necessary(1)
+        self.assertEqual(did_create, should_do_something)
+
+        bug = Bug.all_bugs.get()
         self.assert_(bug.looks_closed)
+
+        if should_use_urlopen:
+            self.assert_(mock_urlopen.called)
+
+    def test_reimport_same_bug_works(self):
+        # First, we do an import.
+        self.test_scrape_bug_status_and_mark_as_closed()
+        # Immediately we attempt to re-import it. urllib2.urlopen should never
+        # be called, because the bug data is so fresh.
+        self.test_scrape_bug_status_and_mark_as_closed(should_do_something=False,
+                                                       should_use_urlopen=False)
+
+    def test_reimport_same_bug_works_when_bug_is_stale(self):
+        # First, import the bug
+        self.test_scrape_bug_status_and_mark_as_closed()
+        # Then, set it as stale
+        bug = Bug.all_bugs.get()
+        bug.last_polled = datetime.datetime(1970, 1,1)
+        bug.save()
+
+        # Now, re-import. We should call urlopen, and 
+        # create_bug_object_for_remote_bug_id_if_necessary should return True
+        # because that's what its return value signifies.
+        self.test_scrape_bug_status_and_mark_as_closed(should_do_something=True,
+                                                       should_use_urlopen=True)
 
 class LaunchpadImportByEmail(django.test.TestCase):
 

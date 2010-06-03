@@ -1,114 +1,58 @@
-from datetime import timedelta
 import datetime
 import logging
 import mysite.search.models
 import mysite.customs.models
-from celery.task import Task, PeriodicTask
+from celery.task import Task
 from celery.registry import tasks
 
-import mysite.customs.miro
-import mysite.customs.bugtrackers.trac
-import mysite.customs.bugtrackers.gnome_love
-import mysite.customs.bugtrackers.fedora_fitfinish
-import mysite.customs.bugtrackers.mozilla
-import mysite.customs.bugtrackers.wikimedia
-import mysite.customs.bugtrackers.kde
+def look_at_one_fedora_bug(bug_id):
+    logging.info("Was asked to look at bug %d in Fedora" % bug_id)
+    # If bug is already in our database, and we looked at
+    # it within the past day, skip the request.
+    bug_url = mysite.customs.bugtrackers.bugzilla_general.bug_id2bug_url(
+        bug_id=bug_id,
+        BUG_URL_PREFIX=mysite.customs.bugtrackers.fedora_fitfinish.BUG_URL_PREFIX)
 
-class GrabMiroBugs(PeriodicTask):
-    run_every = timedelta(days=1)
-    def run(self, **kwargs):
-        logger = self.get_logger(**kwargs)
-        logger.info("Started to grab Miro bitesized bugs")
-        mysite.customs.miro.grab_miro_bugs()
+    try:
+        bug_obj = mysite.search.models.Bug.all_bugs.get(
+            canonical_bug_link=bug_url)
+    except mysite.search.models.Bug.MultipleObjectsReturned:
+        # delete all but the first
+        bug_objs = mysite.search.models.Bug.all_bugs.filter(
+            canonical_bug_link=bug_url)
+        bug_obj = bug_objs[0]
+        for stupid_dup in bug_objs[1:]:
+            stupid_dup.delete()
 
-class GrabKDEBugs(PeriodicTask):
-    run_every = timedelta(days=1)
-    def run(self, **kwargs):
-        logger = self.get_logger(**kwargs)
-        logger.info("Started to grab KDE junior jobs bugs")
-        mysite.customs.bugtrackers.kde.grab()
+    except mysite.search.models.Bug.DoesNotExist:
+        bug_obj = mysite.search.models.Bug(
+            canonical_bug_link=bug_url)
 
-class GrabWikimediaBugs(PeriodicTask):
-    run_every = timedelta(days=1)
-    def run(self, **kwargs):
-        logging.info("Starting to grab Wikimedia easy bugs.")
-        mysite.customs.bugtrackers.wikimedia.grab()
+    # Is that bug fresh enough to skip?
+    if bug_obj.data_is_more_fresh_than_one_day():
+        logging.info("Bug is fresh! Skipping.")
+        return
+    # if the delta is greater than a day, refresh it.
+    mysite.customs.bugtrackers.fedora_fitfinish.reload_bug_obj(bug_obj)
+    bug_obj.save()
+    logging.info("Finished with %d from Fedora." % bug_id)
 
-class GrabGnomeLoveBugs(PeriodicTask):
-    run_every = timedelta(days=1)
-    def run(self, **kwargs):
-        logger = self.get_logger(**kwargs)
-        logger.info("Started to grab GNOME Love bugs")
-        mysite.customs.bugtrackers.gnome_love.grab()
+def learn_about_new_fedora_fit_and_finish_bugs():
+    logging.info('Started to learn about new Fedora fit and finish bugs.')
+    for bug_id in mysite.customs.bugtrackers.fedora_fitfinish.current_fit_and_finish_bug_ids():
+        look_at_one_fedora_bug(bug_id=bug_id)
+    logging.info('Finished grabbing the list of Fedora fit and finish bugs.')
 
-class GrabMozillaGoodFirstBugs(PeriodicTask):
-    run_every = timedelta(days=1)
-    def run(self, **kwargs):
-        logger = self.get_logger(**kwargs)
-        logger.info("Started to grab Good First Bugs from Mozilla")
-        mysite.customs.bugtrackers.mozilla.grab()
+def refresh_all_fedora_fit_and_finish_bugs():
+    logging.info("Starting refreshing all Fedora bugs.")
+    all_such_bugs = mysite.search.models.Bug.all_bugs.filter(
+        canonical_bug_link__contains=
+        mysite.customs.bugtrackers.fedora_fitfinish.BUG_URL_PREFIX)
+    logging.info("All %d of them." % all_such_bugs.count())
 
-class LookAtOneFedoraBug(Task):
-    def run(self, bug_id, **kwargs):
-        logger = self.get_logger(**kwargs)
-        logger.info("Was asked to look at bug %d in Fedora" % bug_id)
-        # If bug is already in our database, and we looked at
-        # it within the past day, skip the request.
-        bug_url = mysite.customs.bugtrackers.bugzilla_general.bug_id2bug_url(
-            bug_id=bug_id,
+    for bug in all_such_bugs:
+        bug_id = mysite.customs.bugtrackers.bugzilla_general.bug_url2bug_id(
+            bug.canonical_bug_link,
             BUG_URL_PREFIX=mysite.customs.bugtrackers.fedora_fitfinish.BUG_URL_PREFIX)
+        look_at_one_fedora_bug(bug_id=bug_id)
 
-        try:
-            bug_obj = mysite.search.models.Bug.all_bugs.get(
-                canonical_bug_link=bug_url)
-        except mysite.search.models.Bug.MultipleObjectsReturned:
-            # delete all but the first
-            bug_objs = mysite.search.models.Bug.all_bugs.filter(
-                canonical_bug_link=bug_url)
-            bug_obj = bug_objs[0]
-            for stupid_dup in bug_objs[1:]:
-                stupid_dup.delete()
-
-        except mysite.search.models.Bug.DoesNotExist:
-            bug_obj = mysite.search.models.Bug(
-                canonical_bug_link=bug_url)
-
-        # Is that bug fresh enough?
-        if (datetime.datetime.now() - bug_obj.last_polled
-            ) > datetime.timedelta(days=1):
-            logging.info("Refreshing bug %d from Fedora." %
-                         bug_id)
-            # if the delta is greater than a day, refresh it.
-            mysite.customs.bugtrackers.fedora_fitfinish.reload_bug_obj(bug_obj)
-            bug_obj.save()
-        logging.info("Finished with %d from Fedora." % bug_id)
-
-class LearnAboutNewFedoraFitAndFinishBugs(PeriodicTask):
-    run_every = timedelta(days=1)
-    def run(self, **kwargs):
-        logger = self.get_logger(**kwargs)
-        logger.info('Started to learn about new Fedora fit and finish bugs.')
-        for bug_id in mysite.customs.bugtrackers.fedora_fitfinish.current_fit_and_finish_bug_ids():
-            task = LookAtOneFedoraBug()
-            task.delay(bug_id=bug_id)
-        logger.info('Finished grabbing the list of Fedora fit and finish bugs.')
-
-
-class RefreshAllFedoraFitAndFinishBugs(PeriodicTask):
-    run_every = timedelta(days=1)
-    def run(self, **kwargs):
-        logger = self.get_logger(**kwargs)
-        logger.info("Starting refreshing all Fedora bugs.")
-        for bug in mysite.search.models.Bug.all_bugs.filter(
-            canonical_bug_link__contains=
-            mysite.customs.bugtrackers.fedora_fitfinish.BUG_URL_PREFIX):
-            bug_id = mysite.customs.bugtrackers.bugzilla_general.bug_url2bug_id(bug.canonical_bug_link,
-                                                                                BUG_URL_PREFIX=mysite.customs.bugtrackers.fedora_fitfinish.BUG_URL_PREFIX)
-            task = LookAtOneFedoraBug()
-            task.delay(bug_id=bug_id)
-
-tasks.register(GrabMiroBugs)
-tasks.register(GrabGnomeLoveBugs)
-tasks.register(LookAtOneFedoraBug)
-tasks.register(LearnAboutNewFedoraFitAndFinishBugs)
-tasks.register(RefreshAllFedoraFitAndFinishBugs)

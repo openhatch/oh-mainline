@@ -7,6 +7,8 @@ import mysite.customs.models
 import mysite.search.models
 import mysite.customs.bugtrackers.bugzilla_general
 
+from itertools import chain
+
 GNOME_LOVE_QUERY='https://bugzilla.gnome.org/buglist.cgi?columnlist=id&keywords=gnome-love&query_format=advanced&resolution=---'
 BUG_URL_PREFIX = 'https://bugzilla.gnome.org/show_bug.cgi?id='
 
@@ -61,10 +63,10 @@ def grab():
 
     current_bug_id2bug_objs = get_current_bug_id2bug_objs()
 
-    bug_ids = mysite.customs.models.flatten(
-        [current_bug_id2bug_objs.keys(),
+    bug_ids = chain(
+        current_bug_id2bug_objs.keys(),
          mysite.customs.bugtrackers.bugzilla_general.get_remote_bug_ids_already_stored(
-             BUG_URL_PREFIX)])
+             BUG_URL_PREFIX))
 
     for bug_id in set(bug_ids):
         # Sometimes create_bug_object_for_remote_bug_id will fail to create

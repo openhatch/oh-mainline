@@ -153,6 +153,7 @@ class TracBug:
                'bite_size_tag_name': 'easy',
                'concerns_just_documentation': False,
                'as_appears_in_distribution': '',
+               'last_polled': datetime.datetime.utcnow(),
                }
         ret['looks_closed'] = (trac_data['status'] == 'closed')
 

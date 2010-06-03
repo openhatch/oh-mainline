@@ -23,7 +23,8 @@ from itertools import chain
 import csv
 from mysite.search.models import Bug, Project
 import datetime
-from mysite.customs.models import flatten
+
+import itertools
 
 def view_bug_table2dict(tree):
     # Find the big table that contains the bug data
@@ -104,7 +105,8 @@ def grab():
     """Loops over the OpenSolaris bug tracker's oss-bite-sized bugs and stores/updates them in our DB.
     For now, just grab the easy bugs to be kind to their servers."""
 
-    bug_ids = flatten([get_remote_bug_ids_to_read(), get_remote_bug_ids_already_stored()])
+    bug_ids = itertools.chain(
+        get_remote_bug_ids_to_read(), get_remote_bug_ids_already_stored())
 
     for bug_id in bug_ids:
         # Sometimes create_bug_object_for_remote_bug_id will fail to create

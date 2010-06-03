@@ -11,8 +11,8 @@ import mysite.customs.github
 import mysite.customs.debianqa
 import mysite.profile.models
 from mysite.search.models import Project
-from celery.decorators import task, periodic_task
-from celery.task import Task, PeriodicTask
+from celery.decorators import task
+from celery.task import Task
 import celery.registry
 import time
 import random
@@ -321,8 +321,7 @@ class ReindexPerson(Task):
         pi = mysite.profile.search_indexes.PersonIndex(person)
         pi.update_object(person)
 
-class GarbageCollectForwarders(PeriodicTask):
-    run_every = timedelta(days=1)
+class GarbageCollectForwarders(Task):
     def run(self, **kwargs):
         logger = self.get_logger(**kwargs)
         logger.info("Started garbage collecting profile email forwarders")
@@ -406,11 +405,10 @@ def update_someones_pf_cache(person__pk):
     # This getter will populate the cache
     return person.get_names_of_nonarchived_projects()
 
-@periodic_task(run_every=datetime.timedelta(hours=1))
 def fill_recommended_bugs_cache():
     logging.info("Filling recommended bugs cache for all people.")
     for person in mysite.profile.models.Person.objects.all():
-        fill_one_person_recommend_bugs_cache.delay(person_id=person.id)
+        fill_one_person_recommend_bugs_cache.apply(person_id=person.id)
     logging.info("Finished filling recommended bugs cache for all people.")
 
 @task
@@ -421,7 +419,6 @@ def fill_one_person_recommend_bugs_cache(person_id):
     recommender = mysite.profile.controllers.RecommendBugs(suggested_searches, n=5) # cache fill prep...
     recommender.recommend() # cache fill do it.
 
-@periodic_task(run_every=datetime.timedelta(hours=1))
 def sync_bug_epoch_from_model_then_fill_recommended_bugs_cache():
     logging.info("Syncing bug epoch...")
     # Find the highest bug object modified date
@@ -435,7 +432,7 @@ def sync_bug_epoch_from_model_then_fill_recommended_bugs_cache():
         mysite.search.models.Epoch.bump_for_model(
             mysite.search.models.Bug)
         logging.info("Whee! Bumped the epoch. Guess I'll fill the cache.")
-        fill_recommended_bugs_cache.delay()
+        fill_recommended_bugs_cache.apply()
     logging.info("Done syncing bug epoch.")
 
 @task
@@ -447,7 +444,6 @@ def clear_people_page_cache(*args, **kwargs):
 def clear_people_page_cache_task(*args, **kwargs):
     return clear_people_page_cache.delay()
 
-@periodic_task(run_every=datetime.timedelta(minutes=10))
 def fill_people_page_cache():
     staticgenerator.quick_publish('/people/')
 

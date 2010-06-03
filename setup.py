@@ -19,7 +19,7 @@ setup(
                         'python-distutils-extra',
                         'twill==0.9.1-cc',
                         'invitation',
-                        'celery==1.0',
+                        'celery==1.0.5',
                         'south==0.6-rc1',
                         'launchpadlib==1.5.3',
                         'django-assets==0.2',
