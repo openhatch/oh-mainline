@@ -4,7 +4,7 @@ function my_visible($obj) {
 
 
 function my_hide($obj) {
-    $obj.addClass('should_be_hidden');
+    $obj.attr('class','should_be_hidden');
 }
 
 function my_show($obj) {
