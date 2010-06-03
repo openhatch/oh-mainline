@@ -194,13 +194,16 @@ django.core.exceptions.ImproperlyConfigured: Error loading MySQLdb module: libmy
 
 This is because the MySQL_python distribution is a binary egg that
 contains extension modules linked to libmysqlclient_r.so.15, while in
-Lucid the soname version number changed to 16.  To fix this, install
-the python-mysqldb package and delete the egg, as follows:
+Lucid the soname version number changed to 16.  To fix this, simply install
+a compatibility package provided by your distribution. For Ubuntu and Debian:
 
-   sudo apt-get install python-mysqldb
-   rm -r eggs/MySQL_python-*
+   $ sudo apt-get install libmysqlclient15off
 
-You will have to remove the egg each time you re-run buildout.
+Thanks to http://meta.osqa.net/questions/2204/ubuntu-1004-problem-with-missing-libmysqlclient_rso15
+for this hint.
+
+An earlier version of this document said to remove the egg from your filesystem. You
+should not do that, but instead add the compatibility package listed above.
 
 #### ctypes ####
 * If you're running Ubuntu 10.04 Lucid Lynx, when you execute `bin/mysite runserver`, you might see this error:
