@@ -1,5 +1,5 @@
-from mysite.customs.models import WebResponse, RoundupBugTracker
+import mysite.customs.models
 from django.contrib import admin
 
-for model in [WebResponse, RoundupBugTracker]:
+for model in [mysite.customs.models.WebResponse]:
     admin.site.register(model)

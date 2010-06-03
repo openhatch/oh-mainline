@@ -1,5 +1,8 @@
 from settings import *
 
+# But use the linode as our MySQL server
+DATABASE_HOST='linode.openhatch.org'
+
 OHLOH_API_KEY='SXvLaGPJFaKXQC0VOocAg'
 DEBUG=False
 ADMINS=[
@@ -27,6 +30,19 @@ CELERY_ALWAYS_EAGER = False # srsly
 HAYSTACK_SITECONF='mysite.haystack_configuration'
 HAYSTACK_SEARCH_ENGINE='solr'
 HAYSTACK_SOLR_URL='http://173.230.128.217:8983/solr'
+
+## always use linode-one for 
+## AMQP, Rabbit Queue, Celery
+CARROT_BACKEND = 'amqp'
+
+BROKER_HOST = 'linode.openhatch.org'
+BROKER_PORT = 5672
+BROKER_USER = 'rabbiter'
+BROKER_PASSWORD = 'johT4qui'
+BROKER_VHOST = 'localhost'
+
+### always use memcached on linode-one, also
+CACHE_BACKEND = "memcached://linode.openhatch.org:11211/?timeout=1"
 
 try:
     from deployment_settings_secret_keys import GOOGLE_ANALYTICS_CODE
