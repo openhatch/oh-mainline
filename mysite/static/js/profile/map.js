@@ -1,17 +1,16 @@
-function my_visible($obj) {
-    return ! $obj.hasClass('should_be_hidden');
+function is_hidden($obj) {
+    return ($obj.attr('class') == 'should_be_hidden');
 }
 
-
 function my_hide($obj) {
-    $obj.attr('class','should_be_hidden');
+    $obj.attr('class', 'should_be_hidden');
 }
 
 function my_show($obj) {
-    var hidden = $obj.hasClass('should_be_hidden');
+    var hidden = is_hidden($obj);
 
     if (hidden) {
-	    $obj.removeClass('should_be_hidden');
+	    $obj.attr('class', '');
     }
 }
 
@@ -138,7 +137,7 @@ PeopleMapController.prototype.initialize = function(options) {
                     bounds.contains(marker.position)) {
                     
                     // If the person bullet is hidden,
-                    if(! my_visible($person_summary)) {
+                    if(is_hidden($person_summary)) {
                         /* If the marker we found is for inaccessible people, show them all */
                         if (marker === mapController.the_marker_for_inaccessible_island) {
                             my_show($('.inaccessible_islander'));
