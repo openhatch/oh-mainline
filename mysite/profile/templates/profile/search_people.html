@@ -167,6 +167,7 @@ People Search
         <div id='people_count'>
             {{ people|length|pluralize:"Just," }}
             {{ people|length }} result{{ people|length|pluralize }}
+            <span id='thinking'>Thinking&hellip;</span>
         </div>
 
         <div id='summary_of_mapped_people'>
@@ -206,8 +207,7 @@ People Search
         </div>
     </div>
 
-    {# JavaScript edits this text. #}
-    
+    {# Here's the big list of everybody with an account on the site. #}
     <ul id="people-list" class="people-list-map{%if center_json and not geocode_failed %} dont_show_until_map_loads{%endif%}">
         {% for person in people %}
             {% if person.user.username %}

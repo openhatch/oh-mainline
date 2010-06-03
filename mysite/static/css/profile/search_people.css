@@ -104,3 +104,5 @@ body#people-map.no_results ul#all_matching_project_suggestions { display: block;
 
 body#people-map.no_results #a_few_matching_project_suggestions { display: none; }
 body#people-map .matching_project_suggestions { margin-top: 10px; }
+
+body#people-map #thinking { display: none; margin-left: 10px; padding: 0 2px; background-color: #ffa; font-weight: bold; }

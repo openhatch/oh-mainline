@@ -171,7 +171,10 @@ PeopleMapController.prototype.initialize = function(options) {
                 } 
             } // end for
             update_people_count();
-        };
+            $('#thinking').hide();
+            PeopleMapController.isPeopleListThrobberVisible = false;
+
+        }; // end definition of closure
         return closure;
     } // end function generate_update_all_markers
     
@@ -180,6 +183,10 @@ PeopleMapController.prototype.initialize = function(options) {
 
     update_all_markers_eventually = function () {
         window.clearTimeout(PeopleMapController.theUpdateMarkersTimeout);
+        if (! PeopleMapController.isPeopleListThrobberVisible) {
+            $('#thinking').show();
+            PeopleMapController.isPeopleListThrobberVisible = true;
+        }
         PeopleMapController.theUpdateMarkersTimeout = window.setTimeout(
             update_all_markers, PeopleMapController.theUpdateMarkersTimeoutDelay);
     };
@@ -321,6 +328,8 @@ PeopleMapController.prototype.highlightPerson = function(personId) {
     //highlight the right person
     $('#person_summary_' + personId).addClass("highlighted");
 };
+
+PeopleMapController.isPeopleListThrobberVisible = false;
 
 //binds the clickhandlers to people list items
 PeopleMapController.prototype.bindClickHandlersToPeopleListItems = function() {
