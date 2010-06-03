@@ -2,6 +2,7 @@ function my_visible($obj) {
     return $obj.hasClass('should_be_visible');
 }
 
+
 function my_hide($obj) {
     /* Assert that $obj has exactly one of the following:
      * .should_be_hidden, or
@@ -78,6 +79,10 @@ PeopleMapController.prototype.geocode = function(data, callback) {
     }
     callback(location_object, success);
 };
+
+PeopleMapController.theUpdateMarkersTimeout = null;
+
+PeopleMapController.theUpdateMarkersTimeoutDelay = 2000;
 
 PeopleMapController.prototype.initialize = function(options) {
     this.person_locations = {};
@@ -193,6 +198,13 @@ PeopleMapController.prototype.initialize = function(options) {
     update_all_markers = generate_update_all_markers(this);
     this.update_all_markers = update_all_markers;
 
+    update_all_markers_eventually = function () {
+        window.clearTimeout(PeopleMapController.theUpdateMarkersTimeout);
+        PeopleMapController.theUpdateMarkersTimeout = window.setTimeout(
+            update_all_markers, PeopleMapController.theUpdateMarkersTimeoutDelay);
+    };
+    this.update_all_markers_eventually = update_all_markers_eventually;
+
     this.the_marker_for_inaccessible_island = null;
 
     /*
@@ -290,7 +302,7 @@ if (mapController.the_marker_for_inaccessible_island !== null) {
                     if (!showEverybody) { update_all_markers(); }
                     google.maps.event.addListener(mapController.map,
                         'idle',
-                        update_all_markers);
+                        update_all_markers_eventually);
                 }
             };
         } // end function create_a_callback
@@ -303,7 +315,7 @@ if (mapController.the_marker_for_inaccessible_island !== null) {
 
     google.maps.event.addListener(this.map,
         'bound_changed',
-        update_all_markers);
+        update_all_markers_eventually);
 };
 
 //this gets called when you click a marker on the map
