@@ -93,25 +93,28 @@ PeopleMapController.prototype.initialize = function(options) {
             }
         }
         
-        $('.hide_once_map_loads').hide();
         $('.dont_show_until_map_loads').show();
 
         var mappedPeople_count = $("#people-list li:not(.should_be_hidden)").size();
 
+        $('#show_everybody').show();
         var str = mappedPeople_count;
-        if (mappedPeople_count == num_of_persons_who_can_be_geocoded) {
-            $('#show_everybody').hide();
-            str = "All " + mappedPeople_count + " people";
-        }
-        else {
-            $('#show_everybody').show();
-            str = mappedPeople_count + " of " + num_of_persons_who_can_be_geocoded + " people";
-        }
         if (mappedPeople_count == 0) {
             str = "Nobody";
         }
+
+        str = "<strong>"+str+"</strong>";
+
+        // Add the form of "to be"
+        if (mappedPeople_count == 0 || mappedPeople_count == 1) {
+            str += " is";
+        }
+        else {
+            str += " are";
+        }
+
         $('#how_many_people_are_visible_label').show();
-        $('#how_many_people_are_visible').text(str);
+        $('#how_many_people_are_visible').html(str);
 
         update_inaccessible_island_help();
     }; // end function update_people_count

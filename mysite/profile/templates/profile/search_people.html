@@ -156,29 +156,23 @@ People Search
                     {% endcomment %}
                     Everybody on OpenHatch
                 {% endif %}
+
+                {% if people %}
+                    <span id='thinking'>Figuring out who lives here&hellip;</span>
+                {% endif %}
             {% endif %}
 
-            {% comment %}
-                Javascript fills these in when the map changes.
-            {% endcomment %}
-
-        </div>
-
-        <div id='people_count'>
-            {{ people|length|pluralize:"Just," }}
-            {{ people|length }} result{{ people|length|pluralize }}
-            <span id='thinking'>Thinking&hellip;</span>
         </div>
 
         <div id='summary_of_mapped_people'>
-            {% if people %}
-                <span class='hide_once_map_loads'>Loading map...</span>
-            {% endif %}
+            <span id='people_count'>
+                    <span>{{ people|length|pluralize:"Just," }}</span>
+                    <span>{{ people|length }}</span>
+                    {{ people|length|pluralize:"person,people" }}
+            </span>
             <span class='dont_show_until_map_loads'>
-                <span id='how_many_people_are_visible_label'>
-                    Currently visible on the map:
-                </span>
-                <strong id='how_many_people_are_visible'></strong><span style="display: none;" id="people_without_locations">, including people who have not set a location <a id='about_uninhabited_island' href='#'>(?)</a></span>.
+            &middot;
+                <span id='how_many_people_are_visible'></span> visible on the map<span style="display: none;" id="people_without_locations">, including those with no location set <a id='about_uninhabited_island' href='#'>(?)</a></span>.
                 <a href='' {# refresh the page #} id='show_everybody'>(Show everybody.)</a>
             </span>
 
