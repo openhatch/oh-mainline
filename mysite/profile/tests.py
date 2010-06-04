@@ -1,5 +1,5 @@
 # Imports {{{
-from mysite.base.tests import make_twill_url, TwillTests
+from mysite.base.tests import make_twill_url, better_make_twill_url, TwillTests
 from mysite.base.helpers import ObjectFromDict
 import mysite.account.tests
 

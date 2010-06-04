@@ -106,6 +106,8 @@ class Person(models.Model):
     location_confirmed = models.BooleanField(default=False)
     location_display_name = models.CharField(max_length=255, blank=True,
                                              verbose_name='Location')
+    email_me_weekly_re_projects = models.BooleanField( default=True,
+            verbose_name='Email me weekly about activity in my projects')
 
     def location_is_public(self):
         # If you change this method, change the method immediately below this

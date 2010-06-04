@@ -126,3 +126,8 @@ class SignUpIfYouWantToHelpForm(django.forms.Form):
                 ('forwarder', 'By email, but mask my email address using an automatic forwarder (like Craigslist)'),
                 ('public_email', 'By email; just display my real email address'),
                 ))
+
+class EmailMeForm(django.forms.ModelForm):
+    class Meta:
+        model = Person
+        fields = ('email_me_weekly_re_projects',)
