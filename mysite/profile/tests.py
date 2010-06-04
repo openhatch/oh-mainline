@@ -12,7 +12,7 @@ import mysite.project.views
 import mysite.profile.views
 import mysite.profile.models
 import mysite.profile.controllers
-import mysite.profile.management.commands.send_weekly_emails
+from mysite.profile.management.commands import send_weekly_emails
 
 from mysite.profile import views
 
@@ -2353,15 +2353,13 @@ class Notifications(TwillTests):
 
         self.assertFalse(paul.email_me_weekly_re_projects)
 
+
     # Next test: Make sure we email those and only those people who have the
     # appropriate email_me column set to True
     def test_email_the_people_with_checkboxes_checked(self):
 
-        when_were_emails_last_sent = lambda: Timestamp.get_timestamp_for_string(
-                "When did we last send those weekly emails?")
+        time_range_endpoint_at_func_top = send_weekly_emails.Command.get_time_range_endpoint_of_last_email()
 
-        locals()['When were emails last sent, as of the top of the function?'
-                ] = when_were_emails_last_sent()
         # ^^ Why use variable names when you can just ask questions? :-)
 
         # Run the email method.
@@ -2373,22 +2371,18 @@ class Notifications(TwillTests):
         self.assertEquals(mail.outbox[0].to, [User.objects.get(username='paulproteus').email])
 
         # The timestamp log should have been modified since the top of the function.
-        self.assert_(when_were_emails_last_sent() >
-                locals()['When were emails last sent, as of the top of the function?'])
+        self.assert_(
+                send_weekly_emails.Command.get_time_range_endpoint_of_last_email()
+                > time_range_endpoint_at_func_top)
 
     def test_dont_email_the_people_with_checkboxes_cleared(self):
 
-        when_were_emails_last_sent = lambda: Timestamp.get_timestamp_for_string(
-                "When did we last send those weekly emails?")
-        
         # Set Paul's email_me_weekly_re_projects to False.
         paul = Person.get_by_username('paulproteus')
         paul.email_me_weekly_re_projects = False
         paul.save()
 
-        locals()['When were emails last sent, as of the top of the function?'
-                ] = when_were_emails_last_sent()
-        # ^^ Why use variable names when you can just ask questions? :-)
+        time_range_endpoint_at_func_top = send_weekly_emails.Command.get_time_range_endpoint_of_last_email()
 
         # Run the email method.
         command = mysite.profile.management.commands.send_weekly_emails.Command()
@@ -2399,8 +2393,9 @@ class Notifications(TwillTests):
 
         # The timestamp log should (still) have been modified since the top of
         # the function.
-        self.assert_(when_were_emails_last_sent() >
-                locals()['When were emails last sent, as of the top of the function?'])
+        self.assert_(
+                send_weekly_emails.Command.get_time_range_endpoint_of_last_email()
+                > time_range_endpoint_at_func_top)
 
     # Test the content of the email (test the rendered template, and/or
     # test the context passed to that template)
@@ -2430,10 +2425,12 @@ class Notifications(TwillTests):
         eight_days_ago = now - datetime.timedelta(days=8)
 
         Timestamp.update_timestamp_for_string(
-                "When did we last send those weekly emails?",
+                send_weekly_emails.Command.TIMESTAMP_KEY,
                 override_time=seven_days_ago)
 
         veteran = Person.create_dummy()
+        veteran.user.first_name = 'VETERAN'
+        veteran.user.save()
         PortfolioEntry.create_dummy(person=veteran, project=project,
                 is_published=True, date_created=eight_days_ago)
 
@@ -2447,6 +2444,7 @@ class Notifications(TwillTests):
 
         new_contributors = list(project.get_contributors())
         new_contributors.remove(paul)
+        new_contributors.remove(veteran)
         new_contributors.sort(key=lambda x: x.get_coolness_factor())
 
         project_name2contributors = {
@@ -2460,7 +2458,7 @@ class Notifications(TwillTests):
         command = mysite.profile.management.commands.send_weekly_emails.Command()
         context = command.get_context_for_weekly_email_to(paul)
 
-        self.assertEqual(context['new_contributors'], project_name2contributors)
+        self.assertEqual(context['project_name2contributors'], project_name2contributors)
 
         #context['new_wannahelpers']
         #context['recent_chatter_answers'],

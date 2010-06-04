@@ -390,7 +390,7 @@ class Person(models.Model):
         return not self.location_confirmed and not self.dont_guess_my_location
 
     def get_coolness_factor(self):
-        return 6
+        return self.get_full_name_or_username()
 
     # }}}
 
