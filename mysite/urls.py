@@ -19,6 +19,8 @@ import mysite.account.views
 urlpatterns = patterns('',
         (r'^\+meta/', 'mysite.base.views.meta'),
 
+        (r'^\+test_weekly_email_re_projects/', 'mysite.base.views.test_weekly_email_re_projects'),
+
         (r'^\+project_icon_poll/(?P<project_name>.+)', 'mysite.search.views.project_has_icon'),
 
         (r'^\+projects/suggest_question/',

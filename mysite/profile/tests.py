@@ -2475,4 +2475,7 @@ class Notifications(TwillTests):
     def test_we_dont_send_emails_more_than_once_a_week(self):
         pass
 
+    def test_dont_include_project_if_its_just_you(self):
+        pass
+
 # vim: set ai et ts=4 sw=4 nu:

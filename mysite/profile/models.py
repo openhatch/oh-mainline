@@ -410,7 +410,7 @@ class Person(models.Model):
                       bool(self.get_tags_as_dict()),
                       bool(self.photo),
                       bool(self.projects_i_wanna_help),
-                      self.get_full_name_or_username())
+                      self.get_full_name_or_username().lower())
             stringy_factor = simplejson.dumps(factor)
             cache.set(cache_key, stringy_factor, 60)
             return factor
