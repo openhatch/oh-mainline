@@ -2460,6 +2460,15 @@ class Notifications(TwillTests):
 
         self.assertEqual(context['project_name2contributors'], project_name2contributors)
 
+        command.handle()
+
+        msg = mail.outbox[0].message()
+        for project_name, contributors_data in project_name2contributors.items():
+            self.assert_(project_name in msg)
+            self.assert_(contributors_data['contributor_count'] in msg)
+            for p in contributors_data['display_these_contributors']:
+                self.assert_(p.get_full_name_or_username() in msg)
+
         #context['new_wannahelpers']
         #context['recent_chatter_answers'],
 
