@@ -1,0 +1,41 @@
+{% load humanize %}
+<font face='arial'>
+<p>Hi {% firstof person.user.first_name person.user.username %}!</p>
+
+<p>Here's what happened in your projects in the last week on OpenHatch:</p>
+
+<dl>
+    {% for project_name, contributors_data in project_name2contributors.items %}
+        {% if contributors_data.display_these_contributors %}
+            <dt style='font-weight: bold; margin-top: 1em;'>
+                <a href='http://openhatch.org/+projects/{{ project_name|urlencode }}'>{{ project_name }}</a></dt>
+            <dd>
+                Newly marked contributors:
+                {% for contributor in contributors_data.display_these_contributors %}
+                    {% spaceless %}
+                        <strong><a href='{{ contributor.profile_url }}'>{{ contributor.get_full_name_or_username }}</a></strong>
+                        {% if contributor.location_is_public %}
+                            <span> ({{ contributor.location_display_name }})</span>
+                        {% endif %}
+                        <span>, </span>
+                    {% endspaceless %}
+                {% endfor %}
+
+                <a href='http://openhatch.org/people/?q=project:"{{ project_name|urlencode }}"'>{{ contributors_data.contributor_count }} total this week &raquo;</a>
+            </ul>
+        </dd>
+    {% endif %}
+    {% endfor %}
+</dl>
+
+<p>Yours for the next few milliseconds,</p>
+
+<p>
+    A robot &mdash; crafted with love by the OpenHatch team.
+</p>
+
+<p>
+    ---<br>
+    To unsubscribe, visit your settings at <a href='http://openhatch.org/account/settings/edit_contact_info'>http://openhatch.org/account/settings/edit_contact_info</a>.
+</p>
+</font>
