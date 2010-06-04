@@ -123,7 +123,7 @@ def get_geoip_guess_for_ip(ip_as_string):
 
     # Only add the region name if it's a string. Otherwise we add numbers to
     # the location, which can be confusing.
-    region_name = gimme('region_name'),
+    region_name = gimme('region_name')
     try:
         int(region_name)
     except ValueError:
