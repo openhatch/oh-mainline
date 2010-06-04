@@ -109,6 +109,28 @@ class Person(models.Model):
     email_me_weekly_re_projects = models.BooleanField( default=True,
             verbose_name='Email me weekly about activity in my projects')
 
+    @staticmethod
+    def create_dummy(**kwargs):
+
+        user = User(username=uuid.uuid4().hex)
+        data = {'user': user}
+
+        # If the caller of create_dummy passes in a user, then we won't use the
+        # user defined above
+        data.update(kwargs)
+
+        # Save the user after the update, so we don't save a new user if one
+        # was never needed
+        user = data['user']
+        user.save()
+        person = user.get_profile()
+
+        for key, value in data.items():
+            setattr(person, key, value)
+        person.save()
+
+        return person
+
     def location_is_public(self):
         # If you change this method, change the method immediately below this
         # one (Person.inaccessible_islanders)
@@ -366,6 +388,9 @@ class Person(models.Model):
 
     def should_be_nudged_about_location(self):
         return not self.location_confirmed and not self.dont_guess_my_location
+
+    def get_coolness_factor(self):
+        return 6
 
     # }}}
 

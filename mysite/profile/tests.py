@@ -1,7 +1,9 @@
 # Imports {{{
 from mysite.base.tests import make_twill_url, better_make_twill_url, TwillTests
 from mysite.base.helpers import ObjectFromDict
+from mysite.base.models import Timestamp
 import mysite.account.tests
+from django.core import mail
 
 from mysite.search.models import Project
 from mysite.profile.models import Person, Tag, TagType, Link_Person_Tag, DataImportAttempt, PortfolioEntry, Citation, Forwarder
@@ -10,6 +12,7 @@ import mysite.project.views
 import mysite.profile.views
 import mysite.profile.models
 import mysite.profile.controllers
+import mysite.profile.management.commands.send_weekly_emails
 
 from mysite.profile import views
 
@@ -2314,7 +2317,7 @@ class MockBitbucketImport(BaseCeleryTest):
 class Notifications(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
-    def test(self):
+    def test_checkbox_manipulates_db(self):
         self.login_with_twill()
 
         # By default, paulproteus has the column email_me_weekly_re_projects set to True
@@ -2352,8 +2355,117 @@ class Notifications(TwillTests):
 
     # Next test: Make sure we email those and only those people who have the
     # appropriate email_me column set to True
+    def test_email_the_people_with_checkboxes_checked(self):
 
-    # Last test: Test the content of email (test the rendered template, and/or
+        when_were_emails_last_sent = lambda: Timestamp.get_timestamp_for_string(
+                "When did we last send those weekly emails?")
+
+        locals()['When were emails last sent, as of the top of the function?'
+                ] = when_were_emails_last_sent()
+        # ^^ Why use variable names when you can just ask questions? :-)
+
+        # Run the email method.
+        command = mysite.profile.management.commands.send_weekly_emails.Command()
+        command.handle()
+        
+        # Paul gets an email.
+        self.assertEquals(len(mail.outbox), 1)
+        self.assertEquals(mail.outbox[0].to, [User.objects.get(username='paulproteus').email])
+
+        # The timestamp log should have been modified since the top of the function.
+        self.assert_(when_were_emails_last_sent() >
+                locals()['When were emails last sent, as of the top of the function?'])
+
+    def test_dont_email_the_people_with_checkboxes_cleared(self):
+
+        when_were_emails_last_sent = lambda: Timestamp.get_timestamp_for_string(
+                "When did we last send those weekly emails?")
+        
+        # Set Paul's email_me_weekly_re_projects to False.
+        paul = Person.get_by_username('paulproteus')
+        paul.email_me_weekly_re_projects = False
+        paul.save()
+
+        locals()['When were emails last sent, as of the top of the function?'
+                ] = when_were_emails_last_sent()
+        # ^^ Why use variable names when you can just ask questions? :-)
+
+        # Run the email method.
+        command = mysite.profile.management.commands.send_weekly_emails.Command()
+        command.handle()
+        
+        # Paul doesn't get an email from us.
+        self.assertEquals(len(mail.outbox), 0)
+
+        # The timestamp log should (still) have been modified since the top of
+        # the function.
+        self.assert_(when_were_emails_last_sent() >
+                locals()['When were emails last sent, as of the top of the function?'])
+
+    # Test the content of the email (test the rendered template, and/or
     # test the context passed to that template)
+    def test_email_context_contains_contributors(self):
+
+        paul = Person.get_by_username('paulproteus')
+
+        # To set up this test, let's create a project
+        project = Project.create_dummy()
+
+        # Paul will be the recipient of the email, and he's a contributor to
+        # the project created above, so he'll be getting information about that
+        # project's recent activity in his weekly email
+        PortfolioEntry.create_dummy(person=paul, project=project, is_published=True)
+
+        NUMBER_OF_NEW_CONTRIBUTORS_OTHER_THAN_PAUL = 5
+
+        # 5 people have joined this project in the last week
+        for i in range(NUMBER_OF_NEW_CONTRIBUTORS_OTHER_THAN_PAUL):
+            p = Person.create_dummy()
+            PortfolioEntry.create_dummy(person=p, project=project, is_published=True)
+
+        # 1 person joined this project two weeks ago (too long ago to mention
+        # in this email)
+        now = datetime.datetime.utcnow()
+        seven_days_ago = now - datetime.timedelta(days=7)
+        eight_days_ago = now - datetime.timedelta(days=8)
+
+        Timestamp.update_timestamp_for_string(
+                "When did we last send those weekly emails?",
+                override_time=seven_days_ago)
+
+        veteran = Person.create_dummy()
+        PortfolioEntry.create_dummy(person=veteran, project=project,
+                is_published=True, date_created=eight_days_ago)
+
+        # Psst, notice that we have sent out a round of weekly emails since the
+        # veteran added the project to her profile. So the veteran should not
+        # appear in the next round of weekly emails.
+        
+        # Let's assert that the email context contains enough information to
+        # say that such and such a project received 6 contributors in the
+        # last week, here are the person objects for 3 of them
+
+        new_contributors = list(project.get_contributors())
+        new_contributors.remove(paul)
+        new_contributors.sort(key=lambda x: x.get_coolness_factor())
+
+        project_name2contributors = {
+                project.name: {
+                    'contributor_count': NUMBER_OF_NEW_CONTRIBUTORS_OTHER_THAN_PAUL + 1, 
+                    'recipient_is_a_recent_contributor': True, 
+                    'display_these_contributors': new_contributors[:3]
+                    }
+                }
+
+        command = mysite.profile.management.commands.send_weekly_emails.Command()
+        context = command.get_context_for_weekly_email_to(paul)
+
+        self.assertEqual(context['new_contributors'], project_name2contributors)
+
+        #context['new_wannahelpers']
+        #context['recent_chatter_answers'],
+
+    def test_we_dont_send_emails_more_than_once_a_week(self):
+        pass
 
 # vim: set ai et ts=4 sw=4 nu:
