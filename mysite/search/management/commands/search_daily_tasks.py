@@ -56,8 +56,8 @@ class Command(BaseCommand):
                 mysite.customs.bugtrackers.wikimedia.grab,
             'GNOME Love':
                 mysite.customs.bugtrackers.gnome_love.grab,
-#            'Mozilla "good first bug"s':
-#                mysite.customs.bugtrackers.mozilla.grab,
+            'Mozilla "good first bug"s':
+                mysite.customs.bugtrackers.mozilla.grab,
 
             # FIXME
             # Really, the Bugzilla import code should be reworked to be as
