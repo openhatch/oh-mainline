@@ -464,11 +464,27 @@ class BugAlert(OpenHatchModel):
     email = models.EmailField(max_length=255)
 
 class Epoch(OpenHatchModel):
-    zero_hour = datetime.datetime.fromtimestamp(0).timetuple()
-    # The modified_date column in this can be passed to
-    # functions that cache based on their arguments. Careful
-    # updating of this table can create convenient, implicit
-    # cache expiry.
+    zero_o_clock = datetime.datetime.fromtimestamp(0).timetuple()
+
+    # This class has a modified_date column, thanks to OpenHatchModel.
+    # Instances of this class are effectively mappings of strings to
+    # modified_dates.
+
+    # We can use this table to answer the question, Which cache key should I
+    # use for such-and-such a thing? For example, which cache key should I use
+    # when retrieving a list of recommended bugs for Python lovers?  If there's
+    # a row in this table like this:
+        
+    #   class_name    modified_date
+    #   'Bug'         (a representation of yesterday's date)
+
+    # then we know to cache the output of Bug-related functions using a key like 
+    # recommended_bugs_for_python_lovers_as_of_2010_06_04
+
+    # When the Epoch table changes, then we use a new cache key to store and
+    # retrieve cached data. The old cache key and its value is ignored forever
+    # (and will eventually be flushed out of memcached).
+
     class_name = models.CharField(null=False,
                                   blank=False,
                                   unique=True,
@@ -485,7 +501,7 @@ class Epoch(OpenHatchModel):
         if matches:
             match = matches[0]
             return match.modified_date.timetuple()
-        return Epoch.zero_hour
+        return Epoch.zero_o_clock 
 
     @staticmethod
     def bump_for_model(class_object):
