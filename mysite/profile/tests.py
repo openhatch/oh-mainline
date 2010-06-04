@@ -2311,4 +2311,49 @@ class MockBitbucketImport(BaseCeleryTest):
         self.assertEqual(PortfolioEntry.objects.get().project_description,
                          description)
 
+class Notifications(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def test(self):
+        self.login_with_twill()
+
+        # By default, paulproteus has the column email_me_weekly_re_projects set to True
+        paul = Person.get_by_username('paulproteus')
+        self.assert_(paul.email_me_weekly_re_projects)
+
+        # Now let's set it to false
+
+        # Visit the homepage
+        tc.go(better_make_twill_url('http://openhatch.org/'))
+
+        # Visit the settings page
+        tc.follow('settings')
+
+        # Follow the link that says "Email"
+        tc.follow('Email')
+
+        # Click it and you find a form for changing your notification settings
+        # In the form, there's a checkbox labeled "Email me weekly about
+        # activity on my projects" (or something like that)
+
+        # Uncheck the checkbox, and submit the form
+
+        tc.fv(1, 'email_me_weekly_re_projects', '0')
+        tc.submit()
+
+        # Now you no longer receive emails. For the purposes of this test,
+        # let's just inspect the database to see whether we've written down the
+        # fact that you don't want to receive emails about recent activity on
+        # your projects.
+
+        paul = Person.get_by_username('paulproteus')
+
+        self.assertFalse(paul.email_me_weekly_re_projects)
+
+    # Next test: Make sure we email those and only those people who have the
+    # appropriate email_me column set to True
+
+    # Last test: Test the content of email (test the rendered template, and/or
+    # test the context passed to that template)
+
 # vim: set ai et ts=4 sw=4 nu:
