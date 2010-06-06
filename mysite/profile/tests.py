@@ -1435,15 +1435,8 @@ class SuggestLocation(TwillTests):
         data['geoip_has_suggestion'], data['geoip_guess'] = mysite.profile.controllers.get_geoip_guess_for_ip("89.160.147.41")
         self.assertEqual(data['geoip_has_suggestion'], True)
         self.assertEqual(type(data['geoip_guess']), unicode)
+        self.assertEqual(data['geoip_guess'], u'Reykjav\xedk, 10, Iceland')
 
-        # This test originally used this line of code:
-        #correct_decoding = u'Reykjav\xedk, 10, Iceland'
-
-        # But now we use this line of code, which doesn't include the rather
-        # confusing numerals for region names:
-        correct_decoding = u'Reykjav\xedk, Iceland'
-
-        self.assertEqual(data['geoip_guess'], 
     
 class EditLocation(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']

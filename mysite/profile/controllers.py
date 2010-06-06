@@ -117,21 +117,9 @@ def get_geoip_guess_for_ip(ip_as_string):
     if all_data_about_this_ip is None:
         return False, ''
 
-    gimme = lambda x: all_data_about_this_ip.get(x, '')
+    things_we_like = all_data_about_this_ip.get('city', ''), all_data_about_this_ip.get('region_name', ''), all_data_about_this_ip.get('country_name', '')
 
-    pieces = [gimme('city')]
-
-    # Only add the region name if it's a string. Otherwise we add numbers to
-    # the location, which can be confusing.
-    region_name = gimme('region_name'),
-    try:
-        int(region_name)
-    except ValueError:
-        pieces.append(region_name)
-
-    pieces.append(gimme('country_name'))
-
-    as_string = ', '.join([p for p in pieces if p])
+    as_string = ', '.join([portion for portion in things_we_like if portion])
     as_unicode = unicode(as_string, 'Latin-1')
 
     if as_unicode:
