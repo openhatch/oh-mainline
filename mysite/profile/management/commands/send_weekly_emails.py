@@ -5,7 +5,7 @@ from mysite.profile.models import Person
 from django.db.models import Q
 from mysite.profile.models import PortfolioEntry
 from django.template.loader import render_to_string
-
+from mysite.search.models import WannaHelperNote
 
 def push_to_end_of_list(an_object, a_list):
     try:
@@ -50,21 +50,27 @@ class Command(BaseCommand):
                 send_mail("Your weekly OpenHatch horoscope", message,
                         "all@openhatch.org", [person.user.email])
 
+    @staticmethod
+    def get_projects_this_person_cares_about(person):
+        projects_i_contributed_to = [ pfe.project
+                for pfe in person.get_published_portfolio_entries()]
+        projects_i_wanna_help = [note.project
+                for note in WannaHelperNote.objects.filter(person=person)]
+        all_projects = set(projects_i_contributed_to + projects_i_wanna_help)
+        return sorted(all_projects, key=lambda x: x.name.lower())
+
     def get_context_for_weekly_email_to(self, recipient):
         context = {}
         project_name2people = []
 
         within_range = Q(
-                date_created__gte=  self.this_run_covers_things_since,
-                date_created__lt=   self.this_run_covers_things_up_until)
+                date_created__gt=  self.this_run_covers_things_since,
+                date_created__lte=   self.this_run_covers_things_up_until)
+
+        projects = Command.get_projects_this_person_cares_about(recipient)
 
         # Add contributors and wannahelpers in recipient's projects
-        pfes = recipient.get_published_portfolio_entries()
-        for pfe in pfes.order_by('project__name'):
-
-            import pdb; pdb.set_trace() 
-
-            project = pfe.project
+        for project in projects:
 
             # Let's build a dictionary
             people_data = {}
@@ -72,22 +78,17 @@ class Command(BaseCommand):
             # Add contributors
             # ---------------------
             fellow_contributors_pfes = PortfolioEntry.published_ones.filter(
-                    within_range, project=project)
+                within_range, project=project)
             display_these_contributors = [pfe.person for pfe in fellow_contributors_pfes]
             people_data['contributor_count'] = len(display_these_contributors)
 
-            push_to_end_of_list(recipient, display_these_contributors)
 
             # Add wanna helpers
             # ---------------------
             # FIXME: Add "within_range" as a filter below
             display_these_wannahelpers = list(project.people_who_wanna_help.all())
 
-            # Temporarily add this for testing purposes
-            assert display_these_wannahelpers
-
             people_data['wannahelper_count'] = len(display_these_wannahelpers)
-            push_to_end_of_list(recipient, display_these_wannahelpers)
 
             everybody = (display_these_contributors + display_these_wannahelpers)
             if not everybody or everybody == [recipient]:
@@ -99,6 +100,11 @@ class Command(BaseCommand):
             # Sort
             display_these_contributors.sort(key=lambda x: x.get_coolness_factor())
             display_these_wannahelpers.sort(key=lambda x: x.get_coolness_factor())
+            
+            # Put the recipient of the email at the end of any list he or she
+            # appears in
+            push_to_end_of_list(recipient, display_these_wannahelpers)
+            push_to_end_of_list(recipient, display_these_contributors)
 
             # Slice
             display_these_contributors = display_these_contributors[:3]

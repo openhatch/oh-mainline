@@ -110,9 +110,9 @@ class Person(models.Model):
             verbose_name='Email me weekly about activity in my projects')
 
     @staticmethod
-    def create_dummy(email="", **kwargs):
+    def create_dummy(first_name="", email="", **kwargs):
 
-        user = User(username=uuid.uuid4().hex, email=email)
+        user = User(username=uuid.uuid4().hex, first_name=first_name, email=email)
         data = {'user': user}
 
         # If the caller of create_dummy passes in a user, then we won't use the

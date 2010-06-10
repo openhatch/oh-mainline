@@ -2387,41 +2387,51 @@ class Notifications(TwillTests):
         self.assertFalse(paul.email_me_weekly_re_projects)
 
     def add_two_people_to_a_project_and_send_weekly_emails(self,
-            people_want_emails=True, how_to_add_people=None):
+            people_want_emails=True, how_to_add_people=None, outbox_or_context=None):
+
+        self.assert_(outbox_or_context in ['outbox', 'context'])
 
         time_range_endpoint_at_func_top = send_weekly_emails.Command.get_time_range_endpoint_of_last_email()
+
+        self.assertEqual(time_range_endpoint_at_func_top, Timestamp.ZERO_O_CLOCK)
 
         project_with_two_participants = Project.create_dummy()
 
         participants_who_are_news_to_each_other = [] # initial value
         
-        email_contexts = {} # initial value
-
-        command = mysite.profile.management.commands.send_weekly_emails.Command()
-    
         if not how_to_add_people:
             how_to_add_people = [Notifications.add_contributor,
                     Notifications.add_contributor]
 
         for add_person in how_to_add_people:
             participant = Person.create_dummy(
+                    first_name=str(add_person),
                     email_me_weekly_re_projects=people_want_emails)
             add_person(participant, project_with_two_participants)
             participants_who_are_news_to_each_other.append(participant)
 
-        for participant in participants_who_are_news_to_each_other:
-            email_context = command.get_context_for_weekly_email_to(participant)
-            email_contexts[participant.pk] = email_context
+        self.assertEqual(len(participants_who_are_news_to_each_other), 2)
 
-        outbox = Notifications.send_email_and_get_outbox()
+        output = None
+
+        if outbox_or_context == 'outbox':
+            outbox = Notifications.send_email_and_get_outbox()
+            output = outbox
+
+        if outbox_or_context == 'context':
+            command = mysite.profile.management.commands.send_weekly_emails.Command()
+            email_contexts = {} # initial value
+            for participant in participants_who_are_news_to_each_other:
+                email_context = command.get_context_for_weekly_email_to(participant)
+                email_contexts[participant.pk] = email_context
+            output = email_contexts
 
         # The timestamp log should have been modified since the top of the function.
         self.assert_(
                 send_weekly_emails.Command.get_time_range_endpoint_of_last_email()
                 > time_range_endpoint_at_func_top)
 
-        return ( participants_who_are_news_to_each_other,
-                email_contexts, outbox )
+        return ( participants_who_are_news_to_each_other, output )
 
     @staticmethod
     def add_contributor(person, project):
@@ -2430,12 +2440,13 @@ class Notifications(TwillTests):
     @staticmethod
     def add_wannahelper(person, project):
         project.people_who_wanna_help.add(person)
+        WannaHelperNote.add_person_project(person, project)
         project.save()
 
     def test_email_the_people_with_checkboxes_checked(self):
-        contributors, email_contexts, outbox = (
+        contributors, outbox = (
                 self.add_two_people_to_a_project_and_send_weekly_emails(
-                    people_want_emails=True) )
+                    people_want_emails=True, outbox_or_context='outbox') )
 
         self.assertEqual(len(outbox), 2)
 
@@ -2443,9 +2454,9 @@ class Notifications(TwillTests):
     
     def test_dont_email_the_people_with_checkboxes_cleared(self):
 
-        contributors, email_contexts, outbox = (
+        contributors, outbox = (
                 self.add_two_people_to_a_project_and_send_weekly_emails(
-                    people_want_emails=False) )
+                    people_want_emails=False, outbox_or_context='outbox') )
 
         self.assertEqual(len(outbox), 0)
 
@@ -2502,6 +2513,7 @@ class Notifications(TwillTests):
         project_name2people = [
                 (project.name, {
                     'contributor_count': NUMBER_OF_NEW_CONTRIBUTORS_OTHER_THAN_PAUL + 1, 
+                    'wannahelper_count': 0, 
                     'display_these_contributors': new_contributors[:3],
                     'display_these_wannahelpers': []
                     })
@@ -2635,9 +2647,8 @@ class Notifications(TwillTests):
         # Set up the database so that a contributor will receive an email about
         # a wanna helper, and vice versa
         how_to_add_people = [Notifications.add_contributor, Notifications.add_wannahelper]
-        x = self.add_two_people_to_a_project_and_send_weekly_emails(
-                    how_to_add_people=how_to_add_people)
-        people, email_contexts, outbox = x
+        people, email_contexts = self.add_two_people_to_a_project_and_send_weekly_emails(
+                    how_to_add_people=how_to_add_people, outbox_or_context='context')
 
         contributor, wanna_helper = people
 
@@ -2658,5 +2669,28 @@ class Notifications(TwillTests):
 
         #FIXME: Rename project_name2people to project_name2participants
 
+    def test_projects_this_person_cares_about(self):
+        person = Person.create_dummy()
+
+        # three projects
+        project_i_contributed_to = Project.create_dummy()
+        project_i_wanna_help = Project.create_dummy()
+        project_i_wanna_help_and_contributed_to = Project.create_dummy()
+
+        # first project
+        Notifications.add_contributor(person, project_i_contributed_to)
+
+        # second project
+        Notifications.add_wannahelper(person, project_i_wanna_help)
+
+        # third project
+        Notifications.add_contributor(person, project_i_wanna_help_and_contributed_to)
+        Notifications.add_wannahelper(person, project_i_wanna_help_and_contributed_to)
+
+        projects_i_care_about = mysite.profile.management.commands.send_weekly_emails.Command.  get_projects_this_person_cares_about(person) 
+        expected = [project_i_contributed_to, project_i_wanna_help, 
+                project_i_wanna_help_and_contributed_to]
+        expected.sort(key=lambda x: x.name)
+        self.assertEqual(projects_i_care_about, expected)
 
 # vim: set ai et ts=4 sw=4 nu:
