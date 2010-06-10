@@ -31,10 +31,10 @@ class Command(BaseCommand):
         Timestamp.update_timestamp_for_string(Command.TIMESTAMP_KEY)
         people_who_want_email = Person.objects.filter(email_me_weekly_re_projects=True)
         for person in people_who_want_email:
-            context = get_context_for_weekly_email_to(person)
+            context = self.get_context_for_weekly_email_to(person)
             message = render_to_string('weekly_email_re_projects.txt', context)
             send_mail("Your weekly OpenHatch horoscope", message,
-                    "all@openhatch.org", [p.user.email])
+                    "all@openhatch.org", [person.user.email])
 
     def get_context_for_weekly_email_to(self, person):
         context = {}

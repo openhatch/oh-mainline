@@ -2462,10 +2462,11 @@ class Notifications(TwillTests):
 
         command.handle()
 
-        msg = mail.outbox[0].message()
+        msg = mail.outbox[0].message().as_string()
         for project_name, contributors_data in project_name2contributors.items():
+            contribs_count = str(contributors_data['contributor_count'])
             self.assert_(project_name in msg)
-            self.assert_(contributors_data['contributor_count'] in msg)
+            self.assert_(contribs_count in msg)
             for p in contributors_data['display_these_contributors']:
                 self.assert_(p.get_full_name_or_username() in msg)
 
