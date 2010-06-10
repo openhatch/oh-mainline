@@ -12,13 +12,21 @@
             <dd>
                 Newly marked contributors:
                 {% for contributor in contributors_data.display_these_contributors %}
-                    {% spaceless %}
-                        <strong><a href='{{ contributor.profile_url }}'>{{ contributor.get_full_name_or_username }}</a></strong>
-                        <span>, </span>
-                    {% endspaceless %}
+                    {% ifequal contributor.user.username person.user.username %}
+                    and you.
+                    {% else %}
+                        {% spaceless %}
+                            <strong><a href='{{ contributor.profile_url }}'>{{ contributor.get_full_name_or_username }}</a></strong>
+                            {% if not forloop.last %}
+                            <span>, </span>
+                            {% else %}
+                            <span>&hellip;</span>
+                            {% endif %}
+                        {% endspaceless %}
+                    {% endifequal %}
                 {% endfor %}
 
-                <a href='http://openhatch.org/people/?q=project:"{{ project_name|urlencode }}"'>{{ contributors_data.contributor_count }} total this week &raquo;</a>
+                (<a href='http://openhatch.org/people/?q=project:"{{ project_name|urlencode }}"'>{{ contributors_data.contributor_count }} total this week</a>)
             </ul>
         </dd>
     {% endif %}
