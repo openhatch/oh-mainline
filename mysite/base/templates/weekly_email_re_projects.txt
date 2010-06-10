@@ -11,20 +11,21 @@
                 <a href='http://openhatch.org/+projects/{{ project_name|urlencode }}'>{{ project_name }}</a></dt>
             <dd>
                 Newly marked contributors:
-                {% for contributor in contributors_data.display_these_contributors %}
-                    {% ifequal contributor.user.username person.user.username %}
-                    and you.
-                    {% else %}
-                        {% spaceless %}
-                            <strong><a href='{{ contributor.profile_url }}'>{{ contributor.get_full_name_or_username }}</a></strong>
-                            {% if not forloop.last %}
-                            <span>, </span>
-                            {% else %}
-                            <span>&hellip;</span>
-                            {% endif %}
-                        {% endspaceless %}
-                    {% endifequal %}
-                {% endfor %}
+                {% spaceless %}
+                    {% for contributor in contributors_data.display_these_contributors %}
+                        {% ifequal contributor.user.username person.user.username %}
+                        and you.
+                        {% else %}
+                                {% if not forloop.first %}
+                                <span>, </span>
+                                {% endif %}
+                                <strong><a href='{{ contributor.profile_url }}'>{{ contributor.get_full_name_or_username }}</a></strong>
+                                {% if forloop.last %}
+                                <span>&hellip;</span>
+                                {% endif %}
+                        {% endifequal %}
+                    {% endfor %}
+                {% endspaceless %}
 
                 (<a href='http://openhatch.org/people/?q=project:"{{ project_name|urlencode }}"'>{{ contributors_data.contributor_count }} total this week</a>)
             </ul>
