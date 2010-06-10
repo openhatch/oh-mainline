@@ -1,5 +1,9 @@
 {% load humanize %}
-<font face='arial'>
+<style>
+body { font-family: Arial; }
+.username_parenthesized { font-weight: normal; }
+.parenthesis { font-weight: normal; }
+</style>
 <p>Hi {% firstof person.user.first_name person.user.username %}!</p>
 
 <p>Here's what happened in your projects in the last week on OpenHatch:</p>
@@ -16,13 +20,15 @@
                         {% ifequal contributor.user.username person.user.username %}
                         and you.
                         {% else %}
-                                {% if not forloop.first %}
-                                <span>, </span>
-                                {% endif %}
-                                <strong><a href='{{ contributor.profile_url }}'>{{ contributor.get_full_name_or_username }}</a></strong>
-                                {% if forloop.last %}
+                            {% if not forloop.first %}
+                                <span> &middot; </span>
+                            {% endif %}
+                            {% with contributor.user as user %}
+                                <strong>{% include 'name.html' %}</strong>
+                            {% endwith %}
+                            {% if forloop.last %}
                                 <span>&hellip;</span>
-                                {% endif %}
+                            {% endif %}
                         {% endifequal %}
                     {% endfor %}
                 {% endspaceless %}

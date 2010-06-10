@@ -2566,12 +2566,6 @@ class Notifications(TwillTests):
         self.assertEqual(len(project_name2contributors), 1)
 
 
-    def test_we_dont_send_emails_more_than_once_a_week(self):
-        pass
-
-    def test_dont_include_project_if_its_just_you(self):
-        pass
-
     def test_dont_send_email_when_recipient_has_no_recent_fellow_contributors(self):
         # This recipient is the only recent member of her projects
         no_news_for_me = Person.create_dummy()
@@ -2613,5 +2607,13 @@ class Notifications(TwillTests):
 
         # Assert that no emails were sent
         self.assertEqual(len(Notifications.send_email_and_get_outbox()), 0)
+
+    def test_we_dont_send_emails_more_than_once_a_week(self):
+        pass
+
+    def test_that_wanna_helpers_appear_in_email(self):
+        # Set up the database so that two contributors will receive an email
+        contributors, email_contexts, outbox = (
+                self.add_two_people_to_a_project_and_send_weekly_emails() )
 
 # vim: set ai et ts=4 sw=4 nu:
