@@ -2317,6 +2317,25 @@ class MockBitbucketImport(BaseCeleryTest):
 class Notifications(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
+    @staticmethod 
+    def get_email_context(recipient):
+        """ This helper method retrieves the context of the email we're
+        currently planning to send to the recipient. """
+
+        # First move the timestamp back
+        Timestamp.update_timestamp_for_string(
+                send_weekly_emails.Command.TIMESTAMP_KEY,
+                override_time=Timestamp.ZERO_O_CLOCK)
+        command = mysite.profile.management.commands.send_weekly_emails.Command()
+        context = command.get_context_for_weekly_email_to(recipient)
+        return context
+
+    @staticmethod
+    def send_email_and_get_outbox():
+        command = mysite.profile.management.commands.send_weekly_emails.Command()
+        command.handle()
+        return mail.outbox
+
     def test_checkbox_manipulates_db(self):
         self.login_with_twill()
 
@@ -2360,15 +2379,11 @@ class Notifications(TwillTests):
 
         time_range_endpoint_at_func_top = send_weekly_emails.Command.get_time_range_endpoint_of_last_email()
 
-        # ^^ Why use variable names when you can just ask questions? :-)
-
-        # Run the email method.
-        command = mysite.profile.management.commands.send_weekly_emails.Command()
-        command.handle()
+        outbox = Notifications.send_email_and_get_outbox()
         
         # Paul gets an email.
-        self.assertEquals(len(mail.outbox), 1)
-        self.assertEquals(mail.outbox[0].to, [User.objects.get(username='paulproteus').email])
+        self.assertEquals(len(outbox), 1)
+        self.assertEquals(outbox[0].to, [User.objects.get(username='paulproteus').email])
 
         # The timestamp log should have been modified since the top of the function.
         self.assert_(
@@ -2384,12 +2399,10 @@ class Notifications(TwillTests):
 
         time_range_endpoint_at_func_top = send_weekly_emails.Command.get_time_range_endpoint_of_last_email()
 
-        # Run the email method.
-        command = mysite.profile.management.commands.send_weekly_emails.Command()
-        command.handle()
-        
+        outbox = Notifications.send_email_and_get_outbox()
+
         # Paul doesn't get an email from us.
-        self.assertEquals(len(mail.outbox), 0)
+        self.assertEquals(len(outbox), 0)
 
         # The timestamp log should (still) have been modified since the top of
         # the function.
@@ -2480,17 +2493,8 @@ class Notifications(TwillTests):
 
         paul = Person.get_by_username('paulproteus')
 
-        def get_email_context():
-            # First move the timestamp back
-            Timestamp.update_timestamp_for_string(
-                    send_weekly_emails.Command.TIMESTAMP_KEY,
-                    override_time=Timestamp.ZERO_O_CLOCK)
-            command = mysite.profile.management.commands.send_weekly_emails.Command()
-            context = command.get_context_for_weekly_email_to(paul)
-            return context
-
         def get_contributors_data():
-            context = get_email_context()
+            context = Notifications.get_email_context(paul)
             project_name, contributors_data = context['project_name2contributors'][0]
             return contributors_data
 
@@ -2505,7 +2509,7 @@ class Notifications(TwillTests):
         # Since paul is the only newly marked contributor to this project,
         # there will be no news to report, and by stipulation the context of
         # the email will simply be None
-        self.assertEqual(get_email_context(), None)
+        self.assertEqual(Notifications.get_email_context(paul), None)
 
         number_of_new_contributors_other_than_paul = 2
 
@@ -2531,8 +2535,7 @@ class Notifications(TwillTests):
         # projects to speak of)
         solo_project = Project.create_dummy(name='solo project')
         PortfolioEntry.create_dummy(person=paul, project=solo_project, is_published=True)
-        context = get_email_context()
-
+        context = Notifications.get_email_context(paul)
         project_name2contributors = context['project_name2contributors']
         first_project_name, contributors_data = project_name2contributors[0]
 
