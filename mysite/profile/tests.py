@@ -5,7 +5,7 @@ from mysite.base.models import Timestamp
 import mysite.account.tests
 from django.core import mail
 
-from mysite.search.models import Project
+from mysite.search.models import Project, WannaHelperNote
 from mysite.profile.models import Person, Tag, TagType, Link_Person_Tag, DataImportAttempt, PortfolioEntry, Citation, Forwarder
 import mysite.project.views
 
@@ -2387,28 +2387,29 @@ class Notifications(TwillTests):
         self.assertFalse(paul.email_me_weekly_re_projects)
 
     def add_two_people_to_a_project_and_send_weekly_emails(self,
-            people_want_emails=True):
+            people_want_emails=True, how_to_add_people=None):
 
         time_range_endpoint_at_func_top = send_weekly_emails.Command.get_time_range_endpoint_of_last_email()
 
-        project_with_two_contributors = Project.create_dummy()
+        project_with_two_participants = Project.create_dummy()
 
-        contributors_who_are_news_to_each_other = [] # initial value
+        participants_who_are_news_to_each_other = [] # initial value
         
-        email_contexts = [] # initial value
+        email_contexts = {} # initial value
 
         command = mysite.profile.management.commands.send_weekly_emails.Command()
+    
+        if not how_to_add_people:
+            how_to_add_people = [Notifications.add_contributor,
+                    Notifications.add_contributor]
 
-        for i in range(2):
-            contributor = Person.create_dummy(
+        for add_person in how_to_add_people:
+            participant = Person.create_dummy(
                     email_me_weekly_re_projects=people_want_emails)
-            PortfolioEntry.create_dummy(
-                    person=contributor,
-                    project=project_with_two_contributors,
-                    is_published=True)
-            contributors_who_are_news_to_each_other.append(contributor)
-            email_context = command.get_context_for_weekly_email_to(contributor)
-            email_contexts.append(email_context)
+            add_person(participant, project_with_two_participants)
+            participants_who_are_news_to_each_other.append(participant)
+            email_context = command.get_context_for_weekly_email_to(participant)
+            email_contexts[participant.pk] = email_context
 
         outbox = Notifications.send_email_and_get_outbox()
 
@@ -2417,8 +2418,18 @@ class Notifications(TwillTests):
                 send_weekly_emails.Command.get_time_range_endpoint_of_last_email()
                 > time_range_endpoint_at_func_top)
 
-        return ( contributors_who_are_news_to_each_other,
+        return ( participants_who_are_news_to_each_other,
                 email_contexts, outbox )
+
+    @staticmethod
+    def add_contributor(person, project):
+        PortfolioEntry.create_dummy( person=person, project=project, is_published=True)
+
+    @staticmethod
+    def add_wannahelper(person, project):
+        project.people_who_wanna_help.add(person)
+        WannaHelperNote.add_person_project(person, project)
+        project.save()
 
     def test_email_the_people_with_checkboxes_checked(self):
         contributors, email_contexts, outbox = (
@@ -2487,23 +2498,23 @@ class Notifications(TwillTests):
         new_contributors.remove(veteran)
         new_contributors.sort(key=lambda x: x.get_coolness_factor())
 
-        project_name2contributors = [
+        project_name2people = [
                 (project.name, {
                     'contributor_count': NUMBER_OF_NEW_CONTRIBUTORS_OTHER_THAN_PAUL + 1, 
-                    'recipient_is_a_recent_contributor': True, 
-                    'display_these_contributors': new_contributors[:3]
+                    'display_these_contributors': new_contributors[:3],
+                    'display_these_wannahelpers': []
                     })
                 ]
 
         command = mysite.profile.management.commands.send_weekly_emails.Command()
         context = command.get_context_for_weekly_email_to(paul)
 
-        self.assertEqual(context['project_name2contributors'], project_name2contributors)
+        self.assertEqual(context['project_name2people'], project_name2people)
 
         command.handle()
 
         msg = mail.outbox[0].message().as_string()
-        for project_name, contributors_data in project_name2contributors:
+        for project_name, contributors_data in project_name2people:
             contribs_count = str(contributors_data['contributor_count'])
             self.assert_(project_name in msg)
             self.assert_(contribs_count in msg)
@@ -2522,7 +2533,7 @@ class Notifications(TwillTests):
 
         def get_contributors_data():
             context = Notifications.get_email_context(paul)
-            project_name, contributors_data = context['project_name2contributors'][0]
+            project_name, contributors_data = context['project_name2people'][0]
             return contributors_data
 
         # To set up this test, let's create a project
@@ -2563,19 +2574,19 @@ class Notifications(TwillTests):
         solo_project = Project.create_dummy(name='solo project')
         PortfolioEntry.create_dummy(person=paul, project=solo_project, is_published=True)
         context = Notifications.get_email_context(paul)
-        project_name2contributors = context['project_name2contributors']
-        first_project_name, contributors_data = project_name2contributors[0]
+        project_name2people = context['project_name2people']
+        first_project_name, contributors_data = project_name2people[0]
 
         # The first project appears in the email
         self.assertEqual(first_project_name, project.name)
 
         # The second project doesn't appear
-        self.assertEqual(len(project_name2contributors), 1)
+        self.assertEqual(len(project_name2people), 1)
 
 
     def test_dont_send_email_when_recipient_has_no_recent_fellow_contributors(self):
         # This recipient is the only recent member of her projects
-        no_news_for_me = Person.create_dummy()
+        no_news_for_me = Person.create_dummy(email='dont_email_me@example.com')
         PortfolioEntry.create_dummy_with_project(person=no_news_for_me, is_published=True)
 
         # The person above should NOT get an email
@@ -2593,7 +2604,8 @@ class Notifications(TwillTests):
         contributors_who_are_news_to_each_other = [] # initial value
 
         for i in range(2):
-            contributor = Person.create_dummy()
+            contributor = Person.create_dummy(
+                    email='contributor.%d@example.com' % i)
             PortfolioEntry.create_dummy(
                     person=contributor,
                     project=project_with_two_contributors,
@@ -2601,6 +2613,7 @@ class Notifications(TwillTests):
             contributors_who_are_news_to_each_other.append(contributor)
 
         outbox = Notifications.send_email_and_get_outbox()
+        import pdb; pdb.set_trace()
 
         self.assertEqual(len(outbox), 2)
 
@@ -2618,9 +2631,27 @@ class Notifications(TwillTests):
     def test_we_dont_send_emails_more_than_once_a_week(self):
         pass
 
-    def test_that_wanna_helpers_appear_in_email(self):
-        # Set up the database so that two contributors will receive an email
-        contributors, email_contexts, outbox = (
-                self.add_two_people_to_a_project_and_send_weekly_emails() )
+    def test_that_contributors_and_wanna_helpers_are_emailed_about_one_another(self):
+        # Set up the database so that a contributor will receive an email about
+        # a wanna helper, and vice versa
+        how_to_add_people = [Notifications.add_contributor, Notifications.add_wannahelper]
+        x = self.add_two_people_to_a_project_and_send_weekly_emails(
+                    how_to_add_people=how_to_add_people)
+        people, email_contexts, outbox = x
+
+        contributor, wanna_helper = people
+
+        # Assert that contributor gets emailed about the wanna helper 
+        wanna_helpers_in_email_to_contributor = email_contexts[
+                contributor.pk]['project_name2people'][0][1]['display_these_wannahelpers']
+        self.assert_(wanna_helper in wanna_helpers_in_email_to_contributor)
+
+        # Assert that wanna helper gets emailed about the contributor 
+        contributors_in_email_to_wanna_helper = email_contexts[
+                wanna_helper.pk]['project_name2people'][0][1]['display_these_contributors']
+        self.assert_(contributor in contributors_in_email_to_wanna_helper)
+
+        #FIXME: Rename project_name2people to project_name2participants
+
 
 # vim: set ai et ts=4 sw=4 nu:

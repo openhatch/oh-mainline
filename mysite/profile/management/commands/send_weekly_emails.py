@@ -38,52 +38,84 @@ class Command(BaseCommand):
                 send_mail("Your weekly OpenHatch horoscope", message,
                         "all@openhatch.org", [person.user.email])
 
-    def get_context_for_weekly_email_to(self, person):
+    def get_context_for_weekly_email_to(self, recipient):
         context = {}
-        project_name2contributors = []
-        pfes = person.get_published_portfolio_entries()
+        project_name2people = []
+
+        within_range = Q(
+                date_created__gte=  self.this_run_covers_things_since,
+                date_created__lt=   self.this_run_covers_things_up_until)
+
+        # Add contributors and wannahelpers in recipient's projects
+        pfes = recipient.get_published_portfolio_entries()
         for pfe in pfes.order_by('project__name'):
 
-            # Let's build a dictionary
             project = pfe.project
-            contributors_data = {}
 
-            within_range = Q(
-                    date_created__gte=  self.this_run_covers_things_since,
-                    date_created__lt=   self.this_run_covers_things_up_until)
+            # Let's build a dictionary
+            people_data = {}
 
-            pfes = PortfolioEntry.published_ones.filter(within_range, project=project)
-            display_these_contributors = list([pfe.person for pfe in pfes])
-            contributors_data['contributor_count'] = len(display_these_contributors)
+            # Add contributors
+            # ---------------------
+            fellow_contributors_pfes = PortfolioEntry.published_ones.filter(
+                    within_range, project=project)
+            display_these_contributors = list([pfe.person
+                for pfe in fellow_contributors_pfes])
+            people_data['contributor_count'] = len(display_these_contributors)
+
             try:
-                display_these_contributors.remove(person)
-                recipient_is_a_recent_contributor = True
+                display_these_contributors.remove(recipient)
+
+                # If we reach this line, then the recipient was in the list
+                # before.
+                display_these_contributors.append(recipient)
             except ValueError:
-                # list.remove raises a ValueError if the person isn't in the list
-                recipient_is_a_recent_contributor = False
+                # list.remove raises a ValueError if the recipient isn't in the list
+                # But if the recipient isn't a contributor, no matter
+                pass
+
+            # Add wanna helpers
+            # ---------------------
+            display_these_wannahelpers = list(project.people_who_wanna_help.all())
+            people_data['wannahelper_count'] = len(display_these_wannahelpers)
+            try:
+                # Move recipient to the end of the list
+                display_these_wannahelpers.remove(recipient)
+
+                # If we reach this line, then the recipient was in the list
+                # before.
+                display_these_wannahelpers.append(recipient) 
+            except ValueError:
+                # list.remove raises a ValueError if the recipient isn't in the list
+                # But if the recipient isn't a wanna helper, no matter.
+                pass
+
+            everybody = (display_these_contributors + display_these_wannahelpers)
+            if not everybody or everybody == [recipient]:
+                continue # to the next PortfolioEntry
+
+            # Sort and slice lists of contributors and wannahelpers
+            # --------------------------------------------
+
+            # Sort
             display_these_contributors.sort(key=lambda x: x.get_coolness_factor())
+            display_these_wannahelpers.sort(key=lambda x: x.get_coolness_factor())
 
-            if not display_these_contributors:
-                # If there are no contributors to this project other than the
-                # email recipient, then there's really no news to report about
-                # this project
-                continue # to the next portfolio entry
-
-            # If recipient is a recent contributor, put recipient on the end of
-            # the list. They will show up if they survive the slicing below.
-            if recipient_is_a_recent_contributor:
-                display_these_contributors.append(person)
+            # Slice
             display_these_contributors = display_these_contributors[:3]
+            display_these_wannahelpers = display_these_wannahelpers[:3]
 
-            contributors_data['display_these_contributors'] = display_these_contributors
-            contributors_data['recipient_is_a_recent_contributor'
-                    ] = recipient_is_a_recent_contributor
-            project_name2contributors.append((project.name, contributors_data))
+            # Add to dictionary
+            people_data['display_these_contributors'] = display_these_contributors
+            people_data['display_these_wannahelpers'] = display_these_wannahelpers
 
-        if not project_name2contributors:
+            # Store dictionary inside tuple
+            project_name2people.append((project.name, people_data))
+
+        if not project_name2people:
             # If there's no news to report, signal this fact loudly to the caller
             return None
 
-        context['person'] = person
-        context['project_name2contributors'] = project_name2contributors
+        context['person'] = recipient
+        context['project_name2people'] = project_name2people
         return context 
