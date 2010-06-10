@@ -1,11 +1,11 @@
 from django.db import models
 
-class MissionStep(models.Model):
+class Step(models.Model):
     pass
 
-class MissionStepCompletion(models.Model):
+class StepCompletion(models.Model):
     person = models.ForeignKey('profile.Person')
-    step = models.ForeignKey('MissionStep')
+    step = models.ForeignKey('Step')
 
     class Meta:
         unique_together = ('person', 'step')
