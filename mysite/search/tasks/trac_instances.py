@@ -139,7 +139,14 @@ class TracBugTracker(object):
             self.refresh_one_bug_id(bug_id)
 
         # Then, refresh them all
-        ### FIXME
+        self.refresh_all_bugs()
+
+    def refresh_all_bugs(self):
+        for bug in mysite.search.models.Bug.all_bugs.filter(
+            canonical_bug_link__contains=self.base_url):
+            tb = mysite.customs.bugtrackers.trac.TracBug.from_url(
+                bug.canonical_bug_link)
+            self.refresh_one_bug_id(tb.bug_id)
 
     def refresh_one_bug_id(self, bug_id):
         tb = mysite.customs.bugtrackers.trac.TracBug(
