@@ -78,6 +78,11 @@ class TarUploadTests(TwillTests):
         paulproteus = Person.objects.get(user__username='paulproteus')
         self.assertEqual(len(StepCompletion.objects.filter(step__name='tar', person=paulproteus)), 1)
 
+        # Make sure that nothing weird happens if it is submitted again.
+        response = self.client.post(reverse(tar_upload), {'tarfile': open(make_testdata_filename('good.tar.gz'))})
+        self.assert_('status: success' in response.content)
+        self.assertEqual(len(StepCompletion.objects.filter(step__name='tar', person=paulproteus)), 1)
+
     def test_tar_upload_bad(self):
         response = self.client.post(reverse(tar_upload), {'tarfile': open(make_testdata_filename('bad-1.tar.gz'))})
         self.assert_('status: failure' in response.content)

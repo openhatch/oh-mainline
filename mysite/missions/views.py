@@ -22,12 +22,13 @@ def tar_upload(request):
             try:
                 TarMission.check_tarfile(form.cleaned_data['tarfile'].read())
                 data['success'] = True
-                StepCompletion(person=request.user.get_profile(), step=Step.objects.get(name='tar')).save()
+                StepCompletion.objects.get_or_create(person=request.user.get_profile(), step=Step.objects.get(name='tar'))
             except IncorrectTarFile, e:
                 data['what_was_wrong_with_the_tarball'] = str(e)
         data['form'] = form
     else:
         data['form'] = TarUploadForm()
+    data['filenames_for_tarball'] = TarMission.FILES.keys()
     return (request, 'missions/tar_upload.html', data)
 
 def tar_file_download(request, name):
