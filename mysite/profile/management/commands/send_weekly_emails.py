@@ -6,6 +6,18 @@ from django.db.models import Q
 from mysite.profile.models import PortfolioEntry
 from django.template.loader import render_to_string
 
+
+def push_to_end_of_list(an_object, a_list):
+    try:
+        a_list.remove(an_object)
+
+        # If we reach this line, then the object *was* in the list before.
+        a_list.append(an_object)
+    except ValueError:
+        # list.remove raises a ValueError if the object isn't in the list
+        # But if the object isn't a contributor, no matter
+        pass
+
 class Command(BaseCommand):
     help = "Send out emails, at most once per week, to users who've requested a running summary of OpenHatch activity in their projects."
 
@@ -50,45 +62,32 @@ class Command(BaseCommand):
         pfes = recipient.get_published_portfolio_entries()
         for pfe in pfes.order_by('project__name'):
 
+            import pdb; pdb.set_trace() 
+
             project = pfe.project
 
             # Let's build a dictionary
             people_data = {}
-
+            
             # Add contributors
             # ---------------------
             fellow_contributors_pfes = PortfolioEntry.published_ones.filter(
                     within_range, project=project)
-            display_these_contributors = list([pfe.person
-                for pfe in fellow_contributors_pfes])
+            display_these_contributors = [pfe.person for pfe in fellow_contributors_pfes]
             people_data['contributor_count'] = len(display_these_contributors)
 
-            try:
-                display_these_contributors.remove(recipient)
-
-                # If we reach this line, then the recipient was in the list
-                # before.
-                display_these_contributors.append(recipient)
-            except ValueError:
-                # list.remove raises a ValueError if the recipient isn't in the list
-                # But if the recipient isn't a contributor, no matter
-                pass
+            push_to_end_of_list(recipient, display_these_contributors)
 
             # Add wanna helpers
             # ---------------------
+            # FIXME: Add "within_range" as a filter below
             display_these_wannahelpers = list(project.people_who_wanna_help.all())
-            people_data['wannahelper_count'] = len(display_these_wannahelpers)
-            try:
-                # Move recipient to the end of the list
-                display_these_wannahelpers.remove(recipient)
 
-                # If we reach this line, then the recipient was in the list
-                # before.
-                display_these_wannahelpers.append(recipient) 
-            except ValueError:
-                # list.remove raises a ValueError if the recipient isn't in the list
-                # But if the recipient isn't a wanna helper, no matter.
-                pass
+            # Temporarily add this for testing purposes
+            assert display_these_wannahelpers
+
+            people_data['wannahelper_count'] = len(display_these_wannahelpers)
+            push_to_end_of_list(recipient, display_these_wannahelpers)
 
             everybody = (display_these_contributors + display_these_wannahelpers)
             if not everybody or everybody == [recipient]:

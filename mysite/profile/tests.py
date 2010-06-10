@@ -2408,6 +2408,8 @@ class Notifications(TwillTests):
                     email_me_weekly_re_projects=people_want_emails)
             add_person(participant, project_with_two_participants)
             participants_who_are_news_to_each_other.append(participant)
+
+        for participant in participants_who_are_news_to_each_other:
             email_context = command.get_context_for_weekly_email_to(participant)
             email_contexts[participant.pk] = email_context
 
@@ -2428,7 +2430,6 @@ class Notifications(TwillTests):
     @staticmethod
     def add_wannahelper(person, project):
         project.people_who_wanna_help.add(person)
-        WannaHelperNote.add_person_project(person, project)
         project.save()
 
     def test_email_the_people_with_checkboxes_checked(self):
@@ -2613,7 +2614,6 @@ class Notifications(TwillTests):
             contributors_who_are_news_to_each_other.append(contributor)
 
         outbox = Notifications.send_email_and_get_outbox()
-        import pdb; pdb.set_trace()
 
         self.assertEqual(len(outbox), 2)
 
@@ -2641,14 +2641,19 @@ class Notifications(TwillTests):
 
         contributor, wanna_helper = people
 
+        contributor_e_c = email_contexts[contributor.pk]
+        self.assert_(contributor_e_c)
+        wannahelper_e_c = email_contexts[wanna_helper.pk]
+        self.assert_(wannahelper_e_c)
+
         # Assert that contributor gets emailed about the wanna helper 
-        wanna_helpers_in_email_to_contributor = email_contexts[
-                contributor.pk]['project_name2people'][0][1]['display_these_wannahelpers']
+        wanna_helpers_in_email_to_contributor = contributor_e_c[
+            'project_name2people'][0][1]['display_these_wannahelpers']
         self.assert_(wanna_helper in wanna_helpers_in_email_to_contributor)
 
         # Assert that wanna helper gets emailed about the contributor 
-        contributors_in_email_to_wanna_helper = email_contexts[
-                wanna_helper.pk]['project_name2people'][0][1]['display_these_contributors']
+        contributors_in_email_to_wanna_helper = wannahelper_e_c[
+                'project_name2people'][0][1]['display_these_contributors']
         self.assert_(contributor in contributors_in_email_to_wanna_helper)
 
         #FIXME: Rename project_name2people to project_name2participants
