@@ -1,8 +1,8 @@
 from unittest import TestCase
 from mysite.base.tests import TwillTests
 from mysite.missions.controllers import TarMission, IncorrectTarFile
-from mysite.missions.views import tar_upload, tar_file_download
-from mysite.missions.models import StepCompletion
+from mysite.missions.views import tar_upload, tar_file_download, main_page
+from mysite.missions.models import StepCompletion, Step
 from mysite.profile.models import Person
 from django.test.client import Client
 from django.core.urlresolvers import reverse
@@ -84,3 +84,21 @@ class TarUploadTests(TwillTests):
 
         paulproteus = Person.objects.get(user__username='paulproteus')
         self.assertEqual(len(StepCompletion.objects.filter(step__name='tar', person=paulproteus)), 0)
+
+
+class MainPageTests(TwillTests):
+    fixtures = ['person-paulproteus', 'user-paulproteus']
+
+    def setUp(self):
+        TwillTests.setUp(self)
+        self.client = self.login_with_client()
+
+    def test_mission_completion_list_display(self):
+        response = self.client.get(reverse(main_page))
+        self.assertEqual(response.context['completed_missions'], [])
+
+        paulproteus = Person.objects.get(user__username='paulproteus')
+        StepCompletion(person=paulproteus, step=Step.objects.get(name='tar')).save()
+
+        response = self.client.get(reverse(main_page))
+        self.assertEqual(response.context['completed_missions'], ['tar'])

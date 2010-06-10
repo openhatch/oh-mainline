@@ -6,9 +6,11 @@ from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 
+@login_required
 @view
 def main_page(request):
-    return (request, 'missions/main.html', {})
+    completed_missions = [c.step.name for c in StepCompletion.objects.filter(person=request.user.get_profile())]
+    return (request, 'missions/main.html', {'completed_missions': completed_missions})
 
 @login_required
 @view
