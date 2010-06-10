@@ -1,7 +1,7 @@
 from django.db import models
 
 class Step(models.Model):
-    pass
+    name = models.CharField(max_length=255, unique=True)
 
 class StepCompletion(models.Model):
     person = models.ForeignKey('profile.Person')
