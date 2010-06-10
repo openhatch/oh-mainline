@@ -7,35 +7,36 @@ class Migration:
     
     def forwards(self, orm):
         
-        # Adding model 'MissionStepCompletion'
-        db.create_table('missions_missionstepcompletion', (
-            ('id', orm['missions.MissionStepCompletion:id']),
-            ('person', orm['missions.MissionStepCompletion:person']),
-            ('step', orm['missions.MissionStepCompletion:step']),
+        # Adding model 'StepCompletion'
+        db.create_table('missions_stepcompletion', (
+            ('id', orm['missions.StepCompletion:id']),
+            ('person', orm['missions.StepCompletion:person']),
+            ('step', orm['missions.StepCompletion:step']),
         ))
-        db.send_create_signal('missions', ['MissionStepCompletion'])
+        db.send_create_signal('missions', ['StepCompletion'])
         
-        # Adding model 'MissionStep'
-        db.create_table('missions_missionstep', (
-            ('id', orm['missions.MissionStep:id']),
+        # Adding model 'Step'
+        db.create_table('missions_step', (
+            ('id', orm['missions.Step:id']),
+            ('name', orm['missions.Step:name']),
         ))
-        db.send_create_signal('missions', ['MissionStep'])
+        db.send_create_signal('missions', ['Step'])
         
-        # Creating unique_together for [person, step] on MissionStepCompletion.
-        db.create_unique('missions_missionstepcompletion', ['person_id', 'step_id'])
+        # Creating unique_together for [person, step] on StepCompletion.
+        db.create_unique('missions_stepcompletion', ['person_id', 'step_id'])
         
     
     
     def backwards(self, orm):
         
-        # Deleting unique_together for [person, step] on MissionStepCompletion.
-        db.delete_unique('missions_missionstepcompletion', ['person_id', 'step_id'])
+        # Deleting unique_together for [person, step] on StepCompletion.
+        db.delete_unique('missions_stepcompletion', ['person_id', 'step_id'])
         
-        # Deleting model 'MissionStepCompletion'
-        db.delete_table('missions_missionstepcompletion')
+        # Deleting model 'StepCompletion'
+        db.delete_table('missions_stepcompletion')
         
-        # Deleting model 'MissionStep'
-        db.delete_table('missions_missionstep')
+        # Deleting model 'Step'
+        db.delete_table('missions_step')
         
     
     
@@ -81,14 +82,15 @@ class Migration:
             'text': ('django.db.models.fields.TextField', [], {}),
             'url': ('django.db.models.fields.TextField', [], {})
         },
-        'missions.missionstep': {
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
+        'missions.step': {
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '255'})
         },
-        'missions.missionstepcompletion': {
+        'missions.stepcompletion': {
             'Meta': {'unique_together': "(('person', 'step'),)"},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'person': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['profile.Person']"}),
-            'step': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['missions.MissionStep']"})
+            'step': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['missions.Step']"})
         },
         'profile.dataimportattempt': {
             'completed': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
