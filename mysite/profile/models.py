@@ -627,12 +627,18 @@ class PortfolioEntry(models.Model):
 
     @staticmethod
     def create_dummy(**kwargs):
-        data = {'project': Project.create_dummy(),
-                'project_description': "DESCRIPTION-----------------------------" + uuid.uuid4().hex }
+        data = { 'project_description':
+                "DESCRIPTION-----------------------------" + uuid.uuid4().hex }
         data.update(kwargs)
         ret = PortfolioEntry(**data)
         ret.save()
         return ret
+
+    @staticmethod
+    def create_dummy_with_project(**kwargs):
+        data = {'project': Project.create_dummy()}
+        data.update(kwargs)
+        return PortfolioEntry.create_dummy(**data)
 
     class Meta:
         ordering = ('sort_order', '-id')

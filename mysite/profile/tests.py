@@ -2240,8 +2240,8 @@ class SaveReordering(TwillTests):
         paul = Person.get_by_username('paulproteus')
 
         pfes = [
-                PortfolioEntry.create_dummy(person=paul, sort_order=1),
-                PortfolioEntry.create_dummy(person=paul, sort_order=2),
+                PortfolioEntry.create_dummy_with_project(person=paul, sort_order=1),
+                PortfolioEntry.create_dummy_with_project(person=paul, sort_order=2),
                 ]
 
         def get_ordering():
@@ -2273,8 +2273,8 @@ class ArchiveProjects(TwillTests):
         paul = Person.get_by_username('paulproteus')
 
         pfes = [
-                PortfolioEntry.create_dummy(person=paul, sort_order=1),
-                PortfolioEntry.create_dummy(person=paul, sort_order=2),
+                PortfolioEntry.create_dummy_with_project(person=paul, sort_order=1),
+                PortfolioEntry.create_dummy_with_project(person=paul, sort_order=2),
                 ]
 
         # POST to a view with a list of ids
