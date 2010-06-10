@@ -38,8 +38,9 @@ class Command(BaseCommand):
 
     def get_context_for_weekly_email_to(self, person):
         context = {}
-        project_name2contributors = {}
-        for pfe in person.get_published_portfolio_entries():
+        project_name2contributors = []
+        pfes = person.get_published_portfolio_entries()
+        for pfe in pfes.order_by('project__name'):
 
             # Let's build a dictionary
             project = pfe.project
@@ -62,7 +63,7 @@ class Command(BaseCommand):
             contributors_data['recipient_is_a_recent_contributor'
                     ] = recipient_is_a_recent_contributor
             contributors_data['display_these_contributors'] = display_these_contributors[:3]
-            project_name2contributors[project.name] = contributors_data
+            project_name2contributors.append((project.name, contributors_data))
 
         context['person'] = person
         context['project_name2contributors'] = project_name2contributors

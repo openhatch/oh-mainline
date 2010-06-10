@@ -2447,13 +2447,13 @@ class Notifications(TwillTests):
         new_contributors.remove(veteran)
         new_contributors.sort(key=lambda x: x.get_coolness_factor())
 
-        project_name2contributors = {
-                project.name: {
+        project_name2contributors = [
+                (project.name, {
                     'contributor_count': NUMBER_OF_NEW_CONTRIBUTORS_OTHER_THAN_PAUL + 1, 
                     'recipient_is_a_recent_contributor': True, 
                     'display_these_contributors': new_contributors[:3]
-                    }
-                }
+                    })
+                ]
 
         command = mysite.profile.management.commands.send_weekly_emails.Command()
         context = command.get_context_for_weekly_email_to(paul)
@@ -2463,7 +2463,7 @@ class Notifications(TwillTests):
         command.handle()
 
         msg = mail.outbox[0].message().as_string()
-        for project_name, contributors_data in project_name2contributors.items():
+        for project_name, contributors_data in project_name2contributors:
             contribs_count = str(contributors_data['contributor_count'])
             self.assert_(project_name in msg)
             self.assert_(contribs_count in msg)
