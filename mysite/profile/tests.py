@@ -2480,6 +2480,20 @@ class Notifications(TwillTests):
 
         paul = Person.get_by_username('paulproteus')
 
+        def get_email_context():
+            # First move the timestamp back
+            Timestamp.update_timestamp_for_string(
+                    send_weekly_emails.Command.TIMESTAMP_KEY,
+                    override_time=Timestamp.ZERO_O_CLOCK)
+            command = mysite.profile.management.commands.send_weekly_emails.Command()
+            context = command.get_context_for_weekly_email_to(paul)
+            return context
+
+        def get_contributors_data():
+            context = get_email_context()
+            project_name, contributors_data = context['project_name2contributors'][0]
+            return contributors_data
+
         # To set up this test, let's create a project
         project = Project.create_dummy()
 
@@ -2488,6 +2502,11 @@ class Notifications(TwillTests):
         # project's recent activity in his weekly email
         PortfolioEntry.create_dummy(person=paul, project=project, is_published=True)
 
+        # Since paul is the only newly marked contributor to this project,
+        # there will be no news to report, and by stipulation the context of
+        # the email will simply be None
+        self.assertEqual(get_email_context(), None)
+
         number_of_new_contributors_other_than_paul = 2
 
         # 2 people have joined this project in the last week
@@ -2495,36 +2514,42 @@ class Notifications(TwillTests):
             p = Person.create_dummy()
             PortfolioEntry.create_dummy(person=p, project=project, is_published=True)
 
-        command = mysite.profile.management.commands.send_weekly_emails.Command()
-        context = command.get_context_for_weekly_email_to(paul)
-
-        for (project_name, contributors_data) in context['project_name2contributors']:
-            self.assertEqual(len(contributors_data['display_these_contributors']), 3)
-            self.assert_(paul in contributors_data['display_these_contributors'])
+        data = get_contributors_data()
+        self.assertEqual(len(data['display_these_contributors']), 3)
+        self.assert_(paul in data['display_these_contributors'])
 
         # Now add one more person 
         p = Person.create_dummy()
         PortfolioEntry.create_dummy(person=p, project=project, is_published=True)
 
-        # Re-generate the email using the new db...
+        data = get_contributors_data()
+        self.assertEqual(len(data['display_these_contributors']), 3)
+        self.assert_(paul not in data['display_these_contributors'])
 
-        # First move the timestamp back
-        Timestamp.update_timestamp_for_string(
-                send_weekly_emails.Command.TIMESTAMP_KEY,
-                override_time=Timestamp.ZERO_O_CLOCK)
-        # Now re-generate the email
-        command = mysite.profile.management.commands.send_weekly_emails.Command()
-        context = command.get_context_for_weekly_email_to(paul)
+        # Now let's test that when there's a project containing just paul, that
+        # project doesn't show up in the summary (even when there are other
+        # projects to speak of)
+        solo_project = Project.create_dummy(name='solo project')
+        PortfolioEntry.create_dummy(person=paul, project=solo_project, is_published=True)
+        context = get_email_context()
 
-        # Paul shouldn't appear now
-        for (project_name, contributors_data) in context['project_name2contributors']:
-            self.assertEqual(len(contributors_data['display_these_contributors']), 3)
-            self.assert_(paul not in contributors_data['display_these_contributors'])
+        project_name2contributors = context['project_name2contributors']
+        first_project_name, contributors_data = project_name2contributors[0]
+
+        # The first project appears in the email
+        self.assertEqual(first_project_name, project.name)
+
+        # The second project doesn't appear
+        self.assertEqual(len(project_name2contributors), 1)
+
 
     def test_we_dont_send_emails_more_than_once_a_week(self):
         pass
 
     def test_dont_include_project_if_its_just_you(self):
+        pass
+
+    def test_dont_send_email_when_theres_nothing_to_say(self):
         pass
 
 # vim: set ai et ts=4 sw=4 nu:

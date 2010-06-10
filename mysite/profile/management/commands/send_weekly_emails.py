@@ -61,8 +61,14 @@ class Command(BaseCommand):
                 recipient_is_a_recent_contributor = False
             display_these_contributors.sort(key=lambda x: x.get_coolness_factor())
 
-            # Put recipient on the end of the list. They will show up if they
-            # survive the slicing below
+            if not display_these_contributors:
+                # If there are no contributors to this project other than the
+                # email recipient, then there's really no news to report about
+                # this project
+                continue # to the next portfolio entry
+
+            # If recipient is a recent contributor, put recipient on the end of
+            # the list. They will show up if they survive the slicing below.
             if recipient_is_a_recent_contributor:
                 display_these_contributors.append(person)
             display_these_contributors = display_these_contributors[:3]
@@ -71,6 +77,10 @@ class Command(BaseCommand):
             contributors_data['recipient_is_a_recent_contributor'
                     ] = recipient_is_a_recent_contributor
             project_name2contributors.append((project.name, contributors_data))
+
+        if not project_name2contributors:
+            # If there's no news to report, signal this fact loudly to the caller
+            return None
 
         context['person'] = person
         context['project_name2contributors'] = project_name2contributors
