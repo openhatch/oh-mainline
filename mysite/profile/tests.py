@@ -2336,6 +2336,20 @@ class Notifications(TwillTests):
         command.handle()
         return mail.outbox
 
+    def assert_only_these_people_were_emailed(self, contributors, outbox):
+        """Assert that the ONLY email recipients are the contributors who are
+        news to each other"""
+
+        recipient_emails = []
+        for email in outbox:
+            # By the way, there should be only one recipient per email
+            self.assertEqual(len(email.to), 1) 
+            recipient_emails.append(email.to[0])
+
+        contributor_emails = [c.user.email for c in contributors]
+
+        self.assertEqual(sorted(recipient_emails), sorted(contributor_emails))
+
     def test_checkbox_manipulates_db(self):
         self.login_with_twill()
 
@@ -2372,43 +2386,49 @@ class Notifications(TwillTests):
 
         self.assertFalse(paul.email_me_weekly_re_projects)
 
-
-    # Next test: Make sure we email those and only those people who have the
-    # appropriate email_me column set to True
-    def test_email_the_people_with_checkboxes_checked(self):
+    def add_two_people_to_a_project_and_send_weekly_emails(self,
+            people_want_emails=True):
 
         time_range_endpoint_at_func_top = send_weekly_emails.Command.get_time_range_endpoint_of_last_email()
 
+        project_with_two_contributors = Project.create_dummy()
+
+        contributors_who_are_news_to_each_other = [] # initial value
+
+        for i in range(2):
+            contributor = Person.create_dummy(
+                    email_me_weekly_re_projects=people_want_emails)
+            PortfolioEntry.create_dummy(
+                    person=contributor,
+                    project=project_with_two_contributors,
+                    is_published=True)
+            contributors_who_are_news_to_each_other.append(contributor)
+
         outbox = Notifications.send_email_and_get_outbox()
-        
-        # Paul gets an email.
-        self.assertEquals(len(outbox), 1)
-        self.assertEquals(outbox[0].to, [User.objects.get(username='paulproteus').email])
 
         # The timestamp log should have been modified since the top of the function.
         self.assert_(
                 send_weekly_emails.Command.get_time_range_endpoint_of_last_email()
                 > time_range_endpoint_at_func_top)
 
+        return contributors_who_are_news_to_each_other, outbox
+
+    def test_email_the_people_with_checkboxes_checked(self):
+        contributors, outbox = (
+                self.add_two_people_to_a_project_and_send_weekly_emails(
+                    people_want_emails=True) )
+
+        self.assertEqual(len(outbox), 2)
+
+        self.assert_only_these_people_were_emailed(contributors, outbox)
+    
     def test_dont_email_the_people_with_checkboxes_cleared(self):
 
-        # Set Paul's email_me_weekly_re_projects to False.
-        paul = Person.get_by_username('paulproteus')
-        paul.email_me_weekly_re_projects = False
-        paul.save()
+        contributors, outbox = (
+                self.add_two_people_to_a_project_and_send_weekly_emails(
+                    people_want_emails=False) )
 
-        time_range_endpoint_at_func_top = send_weekly_emails.Command.get_time_range_endpoint_of_last_email()
-
-        outbox = Notifications.send_email_and_get_outbox()
-
-        # Paul doesn't get an email from us.
-        self.assertEquals(len(outbox), 0)
-
-        # The timestamp log should (still) have been modified since the top of
-        # the function.
-        self.assert_(
-                send_weekly_emails.Command.get_time_range_endpoint_of_last_email()
-                > time_range_endpoint_at_func_top)
+        self.assertEqual(len(outbox), 0)
 
     # Test the content of the email (test the rendered template, and/or
     # test the context passed to that template)
@@ -2583,18 +2603,9 @@ class Notifications(TwillTests):
 
         self.assertEqual(len(outbox), 2)
 
-        # Assert that the ONLY email recipients are the contributors who are
-        # news to each other
-        recipient_emails = []
-        for email in outbox:
-            # There should be only one recipient per email
-            self.assertEqual(len(email.to), 1) 
-            recipient_emails.append(email.to[0])
-
-        contributor_emails = [c.user.email for c in
-                contributors_who_are_news_to_each_other]
-
-        self.assertEqual(sorted(recipient_emails), sorted(contributor_emails))
+        self.assert_only_these_people_were_emailed(
+                contributors_who_are_news_to_each_other,
+                outbox)
 
     def test_dont_send_email_when_recipient_has_no_projects(self):
         # The recipient has no projects
