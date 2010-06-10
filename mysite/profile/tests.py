@@ -2552,7 +2552,55 @@ class Notifications(TwillTests):
     def test_dont_include_project_if_its_just_you(self):
         pass
 
-    def test_dont_send_email_when_theres_nothing_to_say(self):
-        pass
+    def test_dont_send_email_when_recipient_has_no_recent_fellow_contributors(self):
+        # This recipient is the only recent member of her projects
+        no_news_for_me = Person.create_dummy()
+        PortfolioEntry.create_dummy_with_project(person=no_news_for_me, is_published=True)
+
+        # The person above should NOT get an email
+
+        # We could now simply run the email sender and make sure that NO email
+        # was sent. But this is consistent with a failure case, in which NO
+        # email gets sent ever (for some reason). Because sending email to our
+        # users is a pretty sensitive piece of functionality, I want to be
+        # extra careful to test for failure cases. So I'll set up the database
+        # so that some OTHER folks will get an email. Then we'll check to see
+        # that no email was ever sent to the person named "no_news_for_me."
+
+        project_with_two_contributors = Project.create_dummy()
+
+        contributors_who_are_news_to_each_other = [] # initial value
+
+        for i in range(2):
+            contributor = Person.create_dummy()
+            PortfolioEntry.create_dummy(
+                    person=contributor,
+                    project=project_with_two_contributors,
+                    is_published=True)
+            contributors_who_are_news_to_each_other.append(contributor)
+
+        outbox = Notifications.send_email_and_get_outbox()
+
+        self.assertEqual(len(outbox), 2)
+
+        # Assert that the ONLY email recipients are the contributors who are
+        # news to each other
+        recipient_emails = []
+        for email in outbox:
+            # There should be only one recipient per email
+            self.assertEqual(len(email.to), 1) 
+            recipient_emails.append(email.to[0])
+
+        contributor_emails = [c.user.email for c in
+                contributors_who_are_news_to_each_other]
+
+        self.assertEqual(sorted(recipient_emails), sorted(contributor_emails))
+
+    def test_dont_send_email_when_recipient_has_no_projects(self):
+        # The recipient has no projects
+        recipient = Person.create_dummy()
+
+        # Assert that no emails were sent
+        self.assertEqual(len(Notifications.send_email_and_get_outbox()), 0)
 
 # vim: set ai et ts=4 sw=4 nu:
