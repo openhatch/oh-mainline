@@ -9,19 +9,6 @@ def main_page(request):
     return (request, 'missions/main.html', {})
 
 @view
-def diffpatch_info(request):
-    return (request, 'missions/diffpatch_info.html', {})
-
-def diffpatch_start(request):
-    # TODO: mark mission as in progress
-    return HttpResponseRedirect(reverse(diffpatch_progress))
-
-@view
-def diffpatch_progress(request):
-    # TODO: make the mission actually do stuff
-    return (request, 'missions/diffpatch_progress.html', {})
-
-@view
 def tar_upload(request):
     data = {'success': False, 'what_was_wrong_with_the_tarball': ''}
     if request.method == 'POST':
