@@ -1,13 +1,16 @@
 from mysite.base.decorators import view
 from mysite.missions.controllers import TarMission, TarUploadForm, IncorrectTarFile
+from mysite.missions.models import Step, StepCompletion
 
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.core.urlresolvers import reverse
+from django.contrib.auth.decorators import login_required
 
 @view
 def main_page(request):
     return (request, 'missions/main.html', {})
 
+@login_required
 @view
 def tar_upload(request):
     data = {'success': False, 'what_was_wrong_with_the_tarball': ''}
@@ -17,6 +20,7 @@ def tar_upload(request):
             try:
                 TarMission.check_tarfile(form.cleaned_data['tarfile'].read())
                 data['success'] = True
+                StepCompletion(person=request.user.get_profile(), step=Step.objects.get(name='tar')).save()
             except IncorrectTarFile, e:
                 data['what_was_wrong_with_the_tarball'] = str(e)
         data['form'] = form

@@ -1,8 +1,12 @@
 from unittest import TestCase
+from mysite.base.tests import TwillTests
 from mysite.missions.controllers import TarMission, IncorrectTarFile
 from mysite.missions.views import tar_upload, tar_file_download
+from mysite.missions.models import StepCompletion
+from mysite.profile.models import Person
 from django.test.client import Client
 from django.core.urlresolvers import reverse
+from django.test import TestCase as DjangoTestCase
 
 import os
 
@@ -50,9 +54,12 @@ class TarMissionTests(TestCase):
             self.fail('no exception raised')
 
 
-class TarUploadTests(TestCase):
+class TarUploadTests(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
     def setUp(self):
-        self.client = Client()
+        TwillTests.setUp(self)
+        self.client = self.login_with_client()
 
     def test_tar_file_downloads(self):
         for filename, content in TarMission.FILES.iteritems():
@@ -68,6 +75,12 @@ class TarUploadTests(TestCase):
         response = self.client.post(reverse(tar_upload), {'tarfile': open(make_testdata_filename('good.tar.gz'))})
         self.assert_('status: success' in response.content)
 
+        paulproteus = Person.objects.get(user__username='paulproteus')
+        self.assertEqual(len(StepCompletion.objects.filter(step__name='tar', person=paulproteus)), 1)
+
     def test_tar_upload_bad(self):
         response = self.client.post(reverse(tar_upload), {'tarfile': open(make_testdata_filename('bad-1.tar.gz'))})
         self.assert_('status: failure' in response.content)
+
+        paulproteus = Person.objects.get(user__username='paulproteus')
+        self.assertEqual(len(StepCompletion.objects.filter(step__name='tar', person=paulproteus)), 0)
