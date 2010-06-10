@@ -119,3 +119,75 @@ def refresh_all_sugar_easy_bugs():
         tb = mysite.customs.bugtrackers.trac.TracBug.from_url(
             bug.canonical_bug_link)
         look_at_sugar_labs_bug(bug_id=tb.bug_id)
+
+class TracBugTracker(object):
+    enabled = False
+
+    def __init__(self, base_url, project_name, bitesized_keyword):
+        self.base_url = base_url
+        self.project_name = project_name
+        self.bitesized_keyword = bitesized_keyword
+
+    def update(self):
+        logging.info("Started refreshing all %s bugs." % self.project_name)
+
+        # First, go through and refresh all the bugs specifically marked
+        # as bugs to look at.
+
+        must_look_at_these = self.generate_list_of_bug_ids_to_look_at()
+        for bug_id in must_look_at_these:
+            self.refresh_one_bug_id(bug_id)
+
+        # Then, refresh them all
+        ### FIXME
+
+    def refresh_one_bug_id(self, bug_id):
+        tb = mysite.customs.bugtrackers.trac.TracBug(
+            bug_id=bug_id,
+            BASE_URL=self.base_url)
+        bug_url = tb.as_bug_specific_url()
+    
+        try:
+            bug = mysite.search.models.Bug.all_bugs.get(
+                canonical_bug_link=bug_url)
+        except mysite.search.models.Bug.DoesNotExist:
+            bug = mysite.search.models.Bug(canonical_bug_link = bug_url)
+
+        # Hopefully, the bug is so fresh it needs no refreshing.
+        if bug.data_is_more_fresh_than_one_day():
+            logging.info("Bug is fresh. Doing nothing!")
+            return # sweet
+
+        # Okay, fine, we need to actually refresh it.
+        logging.info("Refreshing bug %d from %s." %
+                     (bug_id, self.project_name))
+        data = tb.as_data_dict_for_bug_object()
+
+        for key in data:
+            value = data[key]
+            setattr(bug, key, value)
+
+        # If the bug has the relevant keyword, mark it as good_for_newcomers
+        ### FIXME: This done by hard-coding in the TracBug class.
+
+        # And save the project onto it
+        project_from_tb, _ = mysite.search.models.Project.objects.get_or_create(name=tb.component)
+        if bug.project_id != project_from_tb.id:
+            bug.project = project_from_tb
+        bug.last_polled = datetime.datetime.utcnow()
+        bug.save()
+        logging.info("Finished with %d from %s." % (bug_id, self.project_name))
+            
+class TahoeLafsTrac(TracBugTracker):
+    enabled = True
+
+    def __init__(self):
+        TracBugTracker.__init__(self,
+                                project_name='Tahoe-LAFS',
+                                base_url='http://tahoe-lafs.org/trac/tahoe-lafs/',
+                                bitesized_keyword='easy')
+
+    def generate_list_of_bug_ids_to_look_at(self):
+        return mysite.customs.bugtrackers.trac.csv_url2list_of_bug_ids(
+            mysite.customs.bugtrackers.trac.csv_of_bugs(
+                'http://tahoe-lafs.org/trac/tahoe-lafs/query?status=assigned&status=new&status=reopened&max=10000&reporter=~&col=id&col=summary&col=keywords&col=reporter&col=status&col=owner&col=type&col=priority&col=milestone&keywords=~&owner=~&desc=1&order=id&format=csv'))
