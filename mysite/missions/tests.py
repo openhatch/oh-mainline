@@ -95,10 +95,10 @@ class MainPageTests(TwillTests):
 
     def test_mission_completion_list_display(self):
         response = self.client.get(reverse(main_page))
-        self.assertEqual(response.context['completed_missions'], [])
+        self.assertEqual(response.context['completed_missions'], {})
 
         paulproteus = Person.objects.get(user__username='paulproteus')
         StepCompletion(person=paulproteus, step=Step.objects.get(name='tar')).save()
 
         response = self.client.get(reverse(main_page))
-        self.assertEqual(response.context['completed_missions'], ['tar'])
+        self.assertEqual(response.context['completed_missions'], {'tar': True})
