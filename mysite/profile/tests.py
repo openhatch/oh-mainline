@@ -2394,6 +2394,10 @@ class Notifications(TwillTests):
         project_with_two_contributors = Project.create_dummy()
 
         contributors_who_are_news_to_each_other = [] # initial value
+        
+        email_contexts = [] # initial value
+
+        command = mysite.profile.management.commands.send_weekly_emails.Command()
 
         for i in range(2):
             contributor = Person.create_dummy(
@@ -2403,6 +2407,8 @@ class Notifications(TwillTests):
                     project=project_with_two_contributors,
                     is_published=True)
             contributors_who_are_news_to_each_other.append(contributor)
+            email_context = command.get_context_for_weekly_email_to(contributor)
+            email_contexts.append(email_context)
 
         outbox = Notifications.send_email_and_get_outbox()
 
@@ -2411,10 +2417,11 @@ class Notifications(TwillTests):
                 send_weekly_emails.Command.get_time_range_endpoint_of_last_email()
                 > time_range_endpoint_at_func_top)
 
-        return contributors_who_are_news_to_each_other, outbox
+        return ( contributors_who_are_news_to_each_other,
+                email_contexts, outbox )
 
     def test_email_the_people_with_checkboxes_checked(self):
-        contributors, outbox = (
+        contributors, email_contexts, outbox = (
                 self.add_two_people_to_a_project_and_send_weekly_emails(
                     people_want_emails=True) )
 
@@ -2424,7 +2431,7 @@ class Notifications(TwillTests):
     
     def test_dont_email_the_people_with_checkboxes_cleared(self):
 
-        contributors, outbox = (
+        contributors, email_contexts, outbox = (
                 self.add_two_people_to_a_project_and_send_weekly_emails(
                     people_want_emails=False) )
 
