@@ -2473,6 +2473,54 @@ class Notifications(TwillTests):
         #context['new_wannahelpers']
         #context['recent_chatter_answers'],
 
+    def test_you_appear_in_summary_sometimes(self):
+        # If you're a newly marked contributor to project P, and there are
+        # fewer than 3 other newly marked contributors to P, then you appear in
+        # the shortlist of newly marked contributors to P.
+
+        paul = Person.get_by_username('paulproteus')
+
+        # To set up this test, let's create a project
+        project = Project.create_dummy()
+
+        # Paul will be the recipient of the email, and he's a contributor to
+        # the project created above, so he'll be getting information about that
+        # project's recent activity in his weekly email
+        PortfolioEntry.create_dummy(person=paul, project=project, is_published=True)
+
+        number_of_new_contributors_other_than_paul = 2
+
+        # 2 people have joined this project in the last week
+        for i in range(number_of_new_contributors_other_than_paul):
+            p = Person.create_dummy()
+            PortfolioEntry.create_dummy(person=p, project=project, is_published=True)
+
+        command = mysite.profile.management.commands.send_weekly_emails.Command()
+        context = command.get_context_for_weekly_email_to(paul)
+
+        for (project_name, contributors_data) in context['project_name2contributors']:
+            self.assertEqual(len(contributors_data['display_these_contributors']), 3)
+            self.assert_(paul in contributors_data['display_these_contributors'])
+
+        # Now add one more person 
+        p = Person.create_dummy()
+        PortfolioEntry.create_dummy(person=p, project=project, is_published=True)
+
+        # Re-generate the email using the new db...
+
+        # First move the timestamp back
+        Timestamp.update_timestamp_for_string(
+                send_weekly_emails.Command.TIMESTAMP_KEY,
+                override_time=Timestamp.ZERO_O_CLOCK)
+        # Now re-generate the email
+        command = mysite.profile.management.commands.send_weekly_emails.Command()
+        context = command.get_context_for_weekly_email_to(paul)
+
+        # Paul shouldn't appear now
+        for (project_name, contributors_data) in context['project_name2contributors']:
+            self.assertEqual(len(contributors_data['display_these_contributors']), 3)
+            self.assert_(paul not in contributors_data['display_these_contributors'])
+
     def test_we_dont_send_emails_more_than_once_a_week(self):
         pass
 

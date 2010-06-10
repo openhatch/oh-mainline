@@ -60,9 +60,16 @@ class Command(BaseCommand):
                 # list.remove raises a ValueError if the person isn't in the list
                 recipient_is_a_recent_contributor = False
             display_these_contributors.sort(key=lambda x: x.get_coolness_factor())
+
+            # Put recipient on the end of the list. They will show up if they
+            # survive the slicing below
+            if recipient_is_a_recent_contributor:
+                display_these_contributors.append(person)
+            display_these_contributors = display_these_contributors[:3]
+
+            contributors_data['display_these_contributors'] = display_these_contributors
             contributors_data['recipient_is_a_recent_contributor'
                     ] = recipient_is_a_recent_contributor
-            contributors_data['display_these_contributors'] = display_these_contributors[:3]
             project_name2contributors.append((project.name, contributors_data))
 
         context['person'] = person
