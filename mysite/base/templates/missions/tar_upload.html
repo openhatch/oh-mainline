@@ -1,0 +1,17 @@
+{% extends 'base/one_column.html' %}
+
+{% block main %}
+<div class="module">
+  <div class="body">
+    {% if success %}
+      <!-- status: success -->
+    {% else %}
+      <!-- status: failure -->
+      <form method="post" enctype="multipart/form-data" action="{% url mysite.missions.views.tar_upload %}">
+        {{ form.as_p }}
+        <p><input type="submit" /></p>
+      </form>
+    {% endif %}
+  </div>
+</div>
+{% endblock main %}

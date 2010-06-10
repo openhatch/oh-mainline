@@ -1,5 +1,8 @@
 from unittest import TestCase
 from mysite.missions.controllers import TarMission, IncorrectTarFile
+from mysite.missions.views import tar_upload, tar_file_download
+from django.test.client import Client
+from django.core.urlresolvers import reverse
 
 import os
 
@@ -46,3 +49,25 @@ class TarMissionTests(TestCase):
         else:
             self.fail('no exception raised')
 
+
+class TarUploadTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+
+    def test_tar_file_downloads(self):
+        for filename, content in TarMission.FILES.iteritems():
+            response = self.client.get(reverse(tar_file_download, kwargs={'name': filename}))
+            self.assertEqual(response['Content-Disposition'], 'attachment; filename=%s' % filename)
+            self.assertEqual(response.content, content)
+
+    def test_tar_file_download_404(self):
+        response = self.client.get(reverse(tar_file_download, kwargs={'name': 'doesnotexist.c'}))
+        self.assertEqual(response.status_code, 404)
+
+    def test_tar_upload_good(self):
+        response = self.client.post(reverse(tar_upload), {'tarfile': open(make_testdata_filename('good.tar.gz'))})
+        self.assert_('status: success' in response.content)
+
+    def test_tar_upload_bad(self):
+        response = self.client.post(reverse(tar_upload), {'tarfile': open(make_testdata_filename('bad-1.tar.gz'))})
+        self.assert_('status: failure' in response.content)

@@ -50,6 +50,8 @@ urlpatterns = patterns('',
 
         # Mission-related URLs
         (r'^missions/$', 'mysite.missions.views.main_page'),
+        (r'^missions/tar/upload$', 'mysite.missions.views.tar_upload'),
+        (r'^missions/tar/downloadfile/(?P<name>.*)', 'mysite.missions.views.tar_file_download'),
         (r'^missions/info/diffpatch$', 'mysite.missions.views.diffpatch_info'),  # FIXME: genericity
         (r'^missions/start/diffpatch$', 'mysite.missions.views.diffpatch_start'),
         (r'^missions/progress/diffpatch$', 'mysite.missions.views.diffpatch_progress'),

@@ -1,3 +1,5 @@
+from django import forms
+
 import tarfile
 from StringIO import StringIO
 import os
@@ -50,3 +52,6 @@ int main(void)
                     raise IncorrectTarFile, 'File "%s" has incorrect contents' % member.name
         if len(filenames_wanted) != 0:
             raise IncorrectTarFile, 'Archive does not contain all expected files (missing %s)' % (', '.join('"%s"' % f for f in filenames_wanted))
+
+class TarUploadForm(forms.Form):
+    tarfile = forms.FileField()
