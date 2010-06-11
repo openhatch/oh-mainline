@@ -223,7 +223,6 @@ def landing_for_documenters(request):
             front_page_data())
 
 @login_required
-@view
 def test_weekly_email_re_projects(request):
     from mysite.profile.management.commands import send_weekly_emails
     from mysite.profile.models import Person
@@ -231,4 +230,7 @@ def test_weekly_email_re_projects(request):
     command.this_run_covers_things_since = datetime.datetime(2009, 5, 28)
     command.this_run_covers_things_up_until = datetime.datetime.utcnow()
     context = command.get_context_for_weekly_email_to(request.user.get_profile()) or {}
-    return (request, 'weekly_email_re_projects.txt', context)
+    if context:
+        return mysite.base.decorators.as_view(request, 'weekly_email_re_projects.txt', context, "test_weekly_email_re_projects")
+    else:
+        return HttpResponse("(We couldn't find any recent project activity for you, so you wouldn't get an email updating you about it.)")
