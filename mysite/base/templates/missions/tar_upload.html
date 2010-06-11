@@ -3,13 +3,36 @@
 {% block main %}
 <div class="module">
   <div class="body">
+    <h1>Using tar</h1>
     {% if success %}
       <!-- status: success -->
+      <p><strong>You have successfully completed this mission.</strong></p>
+      <p>The file you uploaded passed all of our checks.</p>
+      <p><a href="{% url mysite.missions.views.main_page %}">Return to the main mission page</a></p>
     {% else %}
       <!-- status: failure -->
+      <p>The tar program creates and unpacks archives called tarballs.  Open source software is commonly released as compressed tarballs, so it is helpful to know how to create them.</p>
+      <p>When packaging a project's source code, it is customary to place the files within a directory named after the project with a version number.  This makes creating and unpacking such tarballs convenient, as you only have to name one directory to tar up when creating the tarball, and people who unpack your tarball end up with a self-contained directory that they can easily remove when they are finished using the set of files you gave them.</p>
+      <p>Tarballs are not compressed by default; compressing tarballs generally saves significantly on file size, and you can easily have the tar program deal with the compression for you.</p>
+      <h2>Your mission</h2>
+      <p>For you to experiment with creating tarballs, we made a simple project.  It is called "myproject" and is at version 0.1, and it consists of {{ filenames_for_tarball|length }} file{{ filenames_for_tarball|length|pluralize }} which you can download here:</p>
+      <ul>
+        {% for filename in filenames_for_tarball %}
+          <li><a href="{% url mysite.missions.views.tar_file_download name=filename %}">{{ filename }}</a></li>
+        {% endfor %}
+      </ul>
+      <p>Your mission is to take those files and give us back a gzipped tarball of them.  Since it's version 0.1 of the "myproject" project, we expect the files to appear in a directory called "myproject-0.1" when the tarball is unpacked.</p>
       <form method="post" enctype="multipart/form-data" action="{% url mysite.missions.views.tar_upload %}">
-        {{ form.as_p }}
-        <p><input type="submit" /></p>
+        <div class="form-row">
+          After you make the tarball, upload it here:
+          {% if what_was_wrong_with_the_tarball %}
+          <ul class="errorlist"><li>{{ what_was_wrong_with_the_tarball }}</li></ul>
+          {% endif %}
+          {{ form.tarfile.errors }}
+          <br style="clear: left;" />
+          {{ form.tarfile }}
+        </div>
+        <input type="submit" value="Upload" style="float: left; clear: left;" />
       </form>
     {% endif %}
   </div>

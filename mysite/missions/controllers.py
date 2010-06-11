@@ -54,4 +54,4 @@ int main(void)
             raise IncorrectTarFile, 'Archive does not contain all expected files (missing %s)' % (', '.join('"%s"' % f for f in filenames_wanted))
 
 class TarUploadForm(forms.Form):
-    tarfile = forms.FileField()
+    tarfile = forms.FileField(error_messages={'required': 'No file was uploaded.'})
