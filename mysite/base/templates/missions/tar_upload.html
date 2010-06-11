@@ -34,6 +34,14 @@
         </div>
         <input type="submit" value="Upload" style="float: left; clear: left;" />
       </form>
+      <br style="clear: left;" />
+
+      <h2>Hints</h2>
+      <p>The general way to create a tarball from a set of files and directories is:</p>
+      <pre>tar <em>[option letters]</em>cf <em>[tarball]</em> <em>[things to tar up]</em></pre>
+      <p>Common option letters are <code>v</code> to make tar list the things it is adding as it goes along and <code>z</code> to make tar gzip the tarball for you rather than giving you an uncompressed one.</p>
+      <p>If any of the things listed to include in the tarball is a directory, tar will automatically recursively add everything inside the directory too.  This is part of the reason for the convention of using a single wrapper directory, as then that is the only thing you have to explicitly list when creating the tarball.</p>
+
     {% endif %}
   </div>
 </div>
