@@ -1,6 +1,7 @@
 import csv
 import datetime
 import urlparse
+import cgi
 
 import dateutil.parser
 import lxml.html
@@ -127,15 +128,7 @@ class TracBug:
     @staticmethod
     @mysite.base.decorators.unicodify_strings_when_inputted
     def string_un_csv(s):
-        s = s.replace(u'\x01', '') # seriously, wtf
-
-        try:
-            safe = mysite.search.templatetags.search.make_text_safe(s)
-        except ValueError:
-            raise
-        
-        s = s.replace("'", '\\' + "'")
-        s = eval("'''" + s + "'''")
+        s = cgi.escape(s)
         return unicode(s, 'utf-8')
 
     def as_data_dict_for_bug_object(self):

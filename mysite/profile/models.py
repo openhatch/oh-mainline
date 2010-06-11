@@ -25,6 +25,7 @@ import random
 import collections
 import simplejson
 import re
+import cgi
 
 DEFAULT_LOCATION='Inaccessible Island'
 
@@ -309,7 +310,7 @@ class Person(models.Model):
     def get_full_name_with_nbsps(self):
         import mysite.search.templatetags.search
         full_name = self.get_full_name()
-        full_name_escaped = mysite.search.templatetags.search.make_text_safe(full_name)
+        full_name_escaped = cgi.escape(full_name)
         full_name_escaped_with_nbsps = re.sub("\s+", "&nbsp;", full_name_escaped)
         return full_name_escaped_with_nbsps 
 
