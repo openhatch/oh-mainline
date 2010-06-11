@@ -6,7 +6,7 @@ body { font-family: Arial; }
 .space_between_name_and_username { font-weight: normal; text-decoration: none; }
 a { text-decoration: none; }
 </style>
-<p>Hi {% firstof person.user.first_name person.user.username %}!</p>
+<p>Hi {% firstof recipient.user.first_name recipient.user.username %}!</p>
 
 <p>Here's what happened in your projects in the last week on OpenHatch:</p>
 
@@ -49,5 +49,5 @@ a { text-decoration: none; }
 
 <p>
     ---<br>
-    To unsubscribe, visit your settings at <a href='http://openhatch.org/account/settings/edit_contact_info'>http://openhatch.org/account/settings/edit_contact_info</a>.
+    To unsubscribe, visit your settings at <a href='http://openhatch.org{% url mysite.account.views.edit_contact_info %}'>http://openhatch.org{% url mysite.account.views.edit_contact_info %}</a>.
 </p>
