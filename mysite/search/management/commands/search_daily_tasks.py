@@ -114,6 +114,23 @@ class Command(BaseCommand):
         for callable in trac_instance_functions_to_call:
             callable()
 
+        ### And for my next trick...  discover the new-style Trac instances
+        enabled_ones = []
+
+        ### First, the "find" step
+        for thing_name in dir(mysite.search.tasks.trac_instances):
+            thing = getattr(mysite.search.tasks.trac_instances,
+                            thing_name)
+            if hasattr(thing, 'enabled'):
+                if getattr(thing, 'enabled'):
+                    enabled_ones.append(thing)
+
+        ### Okay, now update!
+        for thing in enabled_ones:
+            logging.info("[Trac] About to update %s" % thing)
+            instantiated = thing()
+            instantiated.update()
+
     def update_launchpad_hosted_projects(self):
         ### For Launchpad:
         # First, we ask the projects' bug trackers if there are new bugs we should know about
