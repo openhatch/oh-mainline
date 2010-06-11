@@ -1,0 +1,23 @@
+
+                {% spaceless %}
+                    {% for person in truncated_list_of_people %}
+                        {% ifequal person.user.username recipient.user.username %}
+                        and you.
+                        {% else %}
+                            {% if not forloop.first %}
+                                <span> &middot; </span>
+                            {% endif %}
+                            {% with person.user as user %}
+                                <strong>
+                                    <a href='{{ person.profile_url }}'>
+                                        <span>{% include 'name.html' %}</span>
+                                    </a>
+                                </strong>
+                            {% endwith %}
+                            {% if forloop.last %}
+                                <span>&hellip;</span>
+                            {% endif %}
+                        {% endifequal %}
+                    {% endfor %}
+                {% endspaceless %}
+                (<a href='http://openhatch.org/people/?q=project:"{{ project_name|urlencode }}"'>{{ people_count }} total this week</a>)

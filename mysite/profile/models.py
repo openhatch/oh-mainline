@@ -15,6 +15,7 @@ from django.contrib.auth import SESSION_KEY, BACKEND_SESSION_KEY, load_backend
 from django.core.urlresolvers import reverse
 from django.core.cache import cache
 import django.db.models.query
+from django.db.models import Q
 
 import datetime
 import sys
@@ -24,6 +25,7 @@ import random
 import collections
 import simplejson
 import re
+import cgi
 
 DEFAULT_LOCATION='Inaccessible Island'
 
@@ -104,9 +106,41 @@ class Person(models.Model):
     location_confirmed = models.BooleanField(default=False)
     location_display_name = models.CharField(max_length=255, blank=True,
                                              verbose_name='Location')
+    email_me_weekly_re_projects = models.BooleanField( default=True,
+            verbose_name='Email me weekly about activity in my projects')
+
+    @staticmethod
+    def create_dummy(first_name="", email="", **kwargs):
+
+        user = User(username=uuid.uuid4().hex, first_name=first_name, email=email)
+        data = {'user': user}
+
+        # If the caller of create_dummy passes in a user, then we won't use the
+        # user defined above
+        data.update(kwargs)
+
+        # Save the user after the update, so we don't save a new user if one
+        # was never needed
+        user = data['user']
+        user.save()
+        person = user.get_profile()
+
+        for key, value in data.items():
+            setattr(person, key, value)
+        person.save()
+
+        return person
 
     def location_is_public(self):
+        # If you change this method, change the method immediately below this
+        # one (Person.inaccessible_islanders)
         return self.location_confirmed and self.location_display_name
+
+    @staticmethod
+    def inaccessible_islanders():
+        # If you change this method, change the method immediately above this
+        # one (location_is_public)
+        return Person.objects.filter(Q(location_confirmed=False) | Q(location_display_name=''))
 
     def reindex_for_person_search(self):
         import mysite.profile.tasks
@@ -300,7 +334,7 @@ class Person(models.Model):
     def get_full_name_with_nbsps(self):
         import mysite.search.templatetags.search
         full_name = self.get_full_name()
-        full_name_escaped = mysite.search.templatetags.search.make_text_safe(full_name)
+        full_name_escaped = cgi.escape(full_name)
         full_name_escaped_with_nbsps = re.sub("\s+", "&nbsp;", full_name_escaped)
         return full_name_escaped_with_nbsps 
 
@@ -354,6 +388,32 @@ class Person(models.Model):
 
     def should_be_nudged_about_location(self):
         return not self.location_confirmed and not self.dont_guess_my_location
+
+    def get_coolness_factor(self):
+        '''This function's output is used as the sort order in (at least) the weekly emails.
+        You can be more cool if you:
+           * Have projects
+           * Have a picture
+           * Have user tags set
+           * Are a wannahelper of something
+        and finally we break ties by get_full_name_or_username(), just so that
+        we have a predictable sort.
+        
+        This function is vaguely expensive to run, which is why we cache its
+        output for sixty seconds.'''
+        cache_key = 'coolness_factor_for_%d' % self.pk
+        cached = cache.get(cache_key)
+        if cached:
+            return simplejson.loads(cached)
+        else:
+            factor = (bool(self.get_list_of_all_project_names()),
+                      bool(self.get_tags_as_dict()),
+                      bool(self.photo),
+                      bool(self.projects_i_wanna_help),
+                      self.get_full_name_or_username().lower())
+            stringy_factor = simplejson.dumps(factor)
+            cache.set(cache_key, stringy_factor, 60)
+            return factor
 
     # }}}
 
@@ -567,12 +627,18 @@ class PortfolioEntry(models.Model):
 
     @staticmethod
     def create_dummy(**kwargs):
-        data = {'project': Project.create_dummy(),
-                'project_description': "DESCRIPTION-----------------------------" + uuid.uuid4().hex }
+        data = { 'project_description':
+                "DESCRIPTION-----------------------------" + uuid.uuid4().hex }
         data.update(kwargs)
         ret = PortfolioEntry(**data)
         ret.save()
         return ret
+
+    @staticmethod
+    def create_dummy_with_project(**kwargs):
+        data = {'project': Project.create_dummy()}
+        data.update(kwargs)
+        return PortfolioEntry.create_dummy(**data)
 
     class Meta:
         ordering = ('sort_order', '-id')

@@ -1,7 +1,7 @@
 {% extends 'account/settings_tab.html' %}
 
 {% block title %}
-Edit your contact info - 
+Email settings -
 {{ block.super }}
 {% endblock title %}
 
@@ -10,10 +10,11 @@ Edit your contact info -
 {% endblock form_action %}
 
 {% block submodule_head %}
-Edit your contact info
+Email settings
 {% endblock submodule_head %}
 
 {% block submodule_body %}
 {{ edit_email_form.as_p }}
 {{ show_email_form.as_p }}
+{{ email_me_form.as_p }}
 {% endblock submodule_body %}

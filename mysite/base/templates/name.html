@@ -3,8 +3,8 @@
 {% if user.first_name or user.last_name %}
         <span class='full_name'>{{ user.get_profile.get_full_name_with_nbsps|safe }}</span>
         {# opening paren #}
-        <span>&nbsp;</span>
-        <span>(</span><span class='username_parenthesized'>{% endif %}{{ user.username }}{% if user.first_name or user.last_name %}<span>){# closing paren #}</span>
+        <span class='space_between_name_and_username'>&nbsp;</span>
+        <span class='parenthesis'>(</span><span class='username_parenthesized'>{% endif %}{{ user.username }}{% if user.first_name or user.last_name %}<span class='parenthesis'>){# closing paren #}</span>
 {% endif %}
 {% if posessive %}
     <span>'s</span>

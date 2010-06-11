@@ -1,0 +1,64 @@
+{% load humanize %}
+<style>
+body { font-family: Arial; }
+.username_parenthesized { font-weight: normal; }
+.parenthesis { font-weight: normal; text-decoration: none; }
+.space_between_name_and_username { font-weight: normal; text-decoration: none; }
+a { text-decoration: none; }
+.people_type { margin-top: 1em; }
+</style>
+<p>Hi {% firstof recipient.user.first_name recipient.user.username %}!</p>
+<p>Here's what happened in your projects in the last week on OpenHatch:</p>
+
+<dl>
+    {% for project_name, ppl_data in project_name2people %}
+        <dt style='font-weight: bold; margin-top: 1em;'>
+            <a href='http://openhatch.org/+projects/{{ project_name|urlencode }}'>
+                {{ project_name }}</a></dt>
+
+        <ul>
+        {% with ppl_data.display_these_contributors as truncated_list_of_people %}
+            {% if truncated_list_of_people %}
+                <li class='people_type'>
+                    Newly marked contributors:
+                    <ul>
+                    <li>
+                    {% with ppl_data.contributor_count as people_count %}
+                        {% include 'weekly_email__list_of_people.html' %}
+                    {% endwith %}
+                    </li>
+                    </ul>
+                </li>
+            {% endif %}
+        {% endwith %}
+
+        {% with ppl_data.display_these_wannahelpers as truncated_list_of_people %}
+            {% if truncated_list_of_people %}
+                <li class='people_type'>
+                    People who want to help:
+                    <ul>
+                        <li>
+                        {% with ppl_data.wannahelper_count as people_count %}
+                            {% include 'weekly_email__list_of_people.html' %}
+                        {% endwith %}
+                        </li>
+                    </ul>
+                </li>
+            {% endif %}
+        {% endwith %}
+        </ul>
+
+    {% endfor %}
+</dl>
+
+<p>Yours,</p>
+
+<p>
+    A robot<br>
+    (crafted with love by the OpenHatch team)
+</p>
+
+<p>
+    ---<br>
+    To unsubscribe, visit your settings at <a href='http://openhatch.org{% url mysite.account.views.edit_contact_info %}'>http://openhatch.org{% url mysite.account.views.edit_contact_info %}</a>.
+</p>

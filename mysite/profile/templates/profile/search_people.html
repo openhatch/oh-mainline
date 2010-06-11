@@ -156,28 +156,23 @@ People Search
                     {% endcomment %}
                     Everybody on OpenHatch
                 {% endif %}
+
+                {% if people %}
+                    <span id='thinking'>Figuring out who lives here&hellip;</span>
+                {% endif %}
             {% endif %}
 
-            {% comment %}
-                Javascript fills these in when the map changes.
-            {% endcomment %}
-
-        </div>
-
-        <div id='people_count'>
-            {{ people|length|pluralize:"Just," }}
-            {{ people|length }} result{{ people|length|pluralize }}
         </div>
 
         <div id='summary_of_mapped_people'>
-            {% if people %}
-                <span class='hide_once_map_loads'>Loading map...</span>
-            {% endif %}
+            <span id='people_count'>
+                    <span>{{ people|length|pluralize:"Just," }}</span>
+                    <span>{{ people|length }}</span>
+                    {{ people|length|pluralize:"person,people" }}
+            </span>
             <span class='dont_show_until_map_loads'>
-                <span id='how_many_people_are_visible_label'>
-                    Currently visible on the map:
-                </span>
-                <strong id='how_many_people_are_visible'></strong><span style="display: none;" id="people_without_locations">, including people who have not set a location <a id='about_uninhabited_island' href='#'>(?)</a></span>.
+            &middot;
+                <span id='how_many_people_are_visible'></span> visible on the map<span style="display: none;" id="people_without_locations">, including those with no location set <a id='about_uninhabited_island' href='#'>(?)</a></span>.
                 <a href='' {# refresh the page #} id='show_everybody'>(Show everybody.)</a>
             </span>
 
@@ -206,8 +201,7 @@ People Search
         </div>
     </div>
 
-    {# JavaScript edits this text. #}
-    
+    {# Here's the big list of everybody with an account on the site. #}
     <ul id="people-list" class="people-list-map{%if center_json and not geocode_failed %} dont_show_until_map_loads{%endif%}">
         {% for person in people %}
             {% if person.user.username %}
@@ -289,10 +283,16 @@ People Search
         var center = {'latitude': 0, 'longitude': 0, 'suggested_zoom_level': 1};
         var center_name = '';
     {% endif %}
-
     {% if geocode_failed %}
         $('.map-error').show();
     {% endif %}
+
+    inaccessible_islander_ids = {{ inaccessible_islander_ids|safe }};
+    inaccessible_islanders = [];
+    for (var i = 0; i < inaccessible_islander_ids.length; i++) {
+        inaccessible_islanders.push(document.getElementById(
+                'person_summary_'+inaccessible_islander_ids[i]));
+    }
 
     mapController = new PeopleMapController(); 
     $(function () {
@@ -320,6 +320,7 @@ People Search
             $('#a_few_matching_project_suggestions').show();
             return false;
         });
+
     });
 
 </script>

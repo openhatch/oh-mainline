@@ -1,52 +1,25 @@
-function my_visible($obj) {
-    return $obj.hasClass('should_be_visible');
+function is_hidden(obj) {
+    return (obj.className == 'should_be_hidden');
 }
 
-function my_hide($obj) {
-    /* Assert that $obj has exactly one of the following:
-     * .should_be_hidden, or
-     * .should_be_visible
-     */
-    var hidden = $obj.hasClass('should_be_hidden');
-    var visible = $obj.hasClass('should_be_visible');
+function my_hide(obj) {
+    obj.className = 'should_be_hidden';
+}
 
-    if (!hidden && !visible) {
-	console.info($obj);
-	return 0/0;
-    }
-    if (hidden && visible) {
-	console.info($obj);
-	return 0/0;
-    }
-
-    if (visible) {
-	$obj.removeClass('should_be_visible');
-	$obj.addClass('should_be_hidden');
+function my_show(obj) {
+    if (is_hidden(obj)) {
+        obj.className = '';
     }
 }
 
-function my_show($obj) {
-    /* Assert that $obj has exactly one of the following:
-     * .should_be_hidden, or
-     * .should_be_visible
-     */
-    var hidden = $obj.hasClass('should_be_hidden');
-    var visible = $obj.hasClass('should_be_visible');
-
-    if (!hidden && !visible) {
-	console.info($obj);
-	return 0/0;
-    }
-    if (hidden && visible) {
-	console.info($obj);
-	return 0/0;
-    }
-
-    if (hidden) {
-	$obj.addClass('should_be_visible');
-	$obj.removeClass('should_be_hidden');
+function do_something_to_inaccessible_islanders(func) {
+    for (var i = 0; i < inaccessible_islanders.length; i++) {
+        func(inaccessible_islanders[i]);
     }
 }
+
+
+has_the_inaccessible_marker_been_pushed_to_the_list_of_markers = false;
 
 PeopleMapController = function () {
     this.explainUninhabitedIsland = function (originatingLink) {
@@ -78,6 +51,10 @@ PeopleMapController.prototype.geocode = function(data, callback) {
     }
     callback(location_object, success);
 };
+
+PeopleMapController.theUpdateMarkersTimeout = null;
+
+PeopleMapController.theUpdateMarkersTimeoutDelay = 2000;
 
 PeopleMapController.prototype.initialize = function(options) {
     this.person_locations = {};
@@ -115,25 +92,29 @@ PeopleMapController.prototype.initialize = function(options) {
                 $('#people_without_locations').show();
             }
         }
-
-        $('.hide_once_map_loads').hide();
+        
         $('.dont_show_until_map_loads').show();
-        var mappedPeople_count = $("#people-list li.should_be_visible").size();
 
+        var mappedPeople_count = $("#people-list li:not(.should_be_hidden)").size();
+
+        $('#show_everybody').show();
         var str = mappedPeople_count;
-        if (mappedPeople_count == num_of_persons_who_can_be_geocoded) {
-            $('#show_everybody').hide();
-            str = "All " + mappedPeople_count + " people";
-        }
-        else {
-            $('#show_everybody').show();
-            str = mappedPeople_count + " of " + num_of_persons_who_can_be_geocoded + " people";
-        }
         if (mappedPeople_count == 0) {
             str = "Nobody";
         }
+
+        str = "<strong>"+str+"</strong>";
+
+        // Add the form of "to be"
+        if (mappedPeople_count == 0 || mappedPeople_count == 1) {
+            str += " is";
+        }
+        else {
+            str += " are";
+        }
+
         $('#how_many_people_are_visible_label').show();
-        $('#how_many_people_are_visible').text(str);
+        $('#how_many_people_are_visible').html(str);
 
         update_inaccessible_island_help();
     }; // end function update_people_count
@@ -148,29 +129,35 @@ PeopleMapController.prototype.initialize = function(options) {
     window.setTimeout(hideBGImage, 2500);
 
     function generate_update_all_markers(mapController) {
-        return function() {
+        var closure = function() {
+            /* This function is executed every time the map bounds change. */
+
             var map = mapController.map;
+
             /* This only makes up to 10 people show on the right. */
             var shown_this_many = 0;
-            
+
             for (var i = 0; i < all_markers.length; i++) {
+            
                 var marker = all_markers[i];
+
                 /* If that marker is the Inaccessible Island marker, then we should 
                  * hide all the inaccessible people.
                  */
-                var $person_summary = $('#person_summary_' + marker.person_id);
+                var person_summary = document.getElementById('person_summary_' +
+                        marker.person_id);
                 var bounds = map.getBounds();
                 if (typeof bounds != 'undefined' &&
                     bounds.contains(marker.position)) {
                     
                     // If the person bullet is hidden,
-                    if(! my_visible($person_summary)) {
+                    if(is_hidden(person_summary)) {
                         /* If the marker we found is for inaccessible people, show them all */
                         if (marker === mapController.the_marker_for_inaccessible_island) {
-                            my_show($('.inaccessible_islander'));
+                            do_something_to_inaccessible_islanders(my_show);
                         }
                         else { /* just the one guy or gal */
-                            my_show($person_summary);
+                            my_show(person_summary);
                         }
                     }
                     shown_this_many += 1;
@@ -178,20 +165,35 @@ PeopleMapController.prototype.initialize = function(options) {
                 else {
                     /* If the marker we found is for inaccessible people, hide them all */
                     if (marker === mapController.the_marker_for_inaccessible_island) {
-                        my_hide($('.inaccessible_islander'));
+                        do_something_to_inaccessible_islanders(my_hide);
                     }
                     else {
                     /* otherwise hide just that one person */
-                        my_hide($person_summary);
+                        my_hide(person_summary);
                     }
                 } 
-            }
+            } // end for
             update_people_count();
-        };
+            $('#thinking').hide();
+            PeopleMapController.isPeopleListThrobberVisible = false;
+
+        }; // end definition of closure
+        return closure;
     } // end function generate_update_all_markers
     
     update_all_markers = generate_update_all_markers(this);
     this.update_all_markers = update_all_markers;
+
+    update_all_markers_eventually = function () {
+        window.clearTimeout(PeopleMapController.theUpdateMarkersTimeout);
+        if (! PeopleMapController.isPeopleListThrobberVisible) {
+            $('#thinking').show();
+            PeopleMapController.isPeopleListThrobberVisible = true;
+        }
+        PeopleMapController.theUpdateMarkersTimeout = window.setTimeout(
+            update_all_markers, PeopleMapController.theUpdateMarkersTimeoutDelay);
+    };
+    this.update_all_markers_eventually = update_all_markers_eventually;
 
     this.the_marker_for_inaccessible_island = null;
 
@@ -230,20 +232,14 @@ PeopleMapController.prototype.initialize = function(options) {
                 var person_location = new google.maps.LatLng(json_data['latitude'],
                     json_data['longitude']);
 
-        if (is_wannabe && ! is_inaccessible) {
-            icon = "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%20|00EE00|000000";
-        } else {
-            icon = null;
-        }
-
                 var marker = null;
 
                 if (is_inaccessible) {
                     person_name = '';
                     /* Grab the_marker_for_inaccessible_island, if we have already made it */
-if (mapController.the_marker_for_inaccessible_island !== null) {
-    marker = mapController.the_marker_for_inaccessible_island;
-}
+                    if (mapController.the_marker_for_inaccessible_island !== null) {
+                        marker = mapController.the_marker_for_inaccessible_island;
+                    }
                 }
 
                 if (marker === null) {
@@ -283,14 +279,36 @@ if (mapController.the_marker_for_inaccessible_island !== null) {
                     });		    
                 }
 
-                all_markers.push(marker);
+                // If this person has set their location, create a marker
+                if (! is_inaccessible ) {
+                    all_markers.push(marker); 
+                }
+
+
+                // If this person hasn't set their location, create a marker
+                // only if we haven't already created the canonical
+                // inaccessible island marker
+                if ( is_inaccessible ) {
+                    if (has_the_inaccessible_marker_been_pushed_to_the_list_of_markers) {
+                        // Don't do anything, we've already pushed the
+                        // inaccessible island marker
+                    }
+                    else {
+                        all_markers.push(marker);
+                        // The above line should run only once per map bounds
+                        // change.
+                        has_the_inaccessible_marker_been_pushed_to_the_list_of_markers = true;
+                    }
+                }
 
                 /* if this is the last one, call update_all_markers() */
                 if (num_of_persons_who_can_be_geocoded == number_of_people_geocoded) {
-                    if (!showEverybody) { update_all_markers(); }
-                    google.maps.event.addListener(mapController.map,
-                        'idle',
-                        update_all_markers);
+                    if (!showEverybody) {
+                        // If the map has been summoned in a zoomed-in state, we want
+                        // to run update_all_markers after we've created all the
+                        // markers
+                        update_all_markers_eventually();
+                    }
                 }
             };
         } // end function create_a_callback
@@ -302,17 +320,19 @@ if (mapController.the_marker_for_inaccessible_island !== null) {
     } // end for loop
 
     google.maps.event.addListener(this.map,
-        'bound_changed',
-        update_all_markers);
+        'bounds_changed',
+        update_all_markers_eventually);
 };
 
 //this gets called when you click a marker on the map
 PeopleMapController.prototype.highlightPerson = function(personId) {
     // Unhighlight everyone
-    $('#people-list li').removeClass("highlighted");
+    $('#people-list li.highlighted').removeClass("highlighted");
     //highlight the right person
     $('#person_summary_' + personId).addClass("highlighted");
 };
+
+PeopleMapController.isPeopleListThrobberVisible = false;
 
 //binds the clickhandlers to people list items
 PeopleMapController.prototype.bindClickHandlersToPeopleListItems = function() {
@@ -325,7 +345,7 @@ PeopleMapController.prototype.bindClickHandlersToPeopleListItems = function() {
         thePersonLi = this;
 
         // Unhighlight everyone
-        $('#people-list li').removeClass("highlighted");
+        $('#people-list li.highlighted').removeClass("highlighted");
 
         // Highlight this person.
         $(thePersonLi).addClass("highlighted");

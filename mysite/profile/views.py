@@ -584,6 +584,12 @@ def people(request):
         dict( (person_id, simplejson.loads(mysite.base.controllers.cached_geocoding_in_json(person_id2data[person_id]['location'])))
               for person_id in person_id2data))
 
+    data['inaccessible_islander_ids'] = simplejson.dumps(
+                list(
+                    Person.inaccessible_islanders().values_list('id', flat=True)
+                )
+            )
+
     suggestion_count = 6
 
     cache_timespan = 86400 * 7

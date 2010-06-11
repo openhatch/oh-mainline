@@ -13,7 +13,7 @@ NB: All forms in pages that descend from this have the same name.
       <div class='notification'>
 	{{ account_notification }}
 	<div style="float: right; display: inline;">
-	  <a href="?">(clear this message)</a>
+	  <a id='clear_message' href="?">(clear this message)</a>
 	</div>
       </div>
       {% endif %}
@@ -28,3 +28,14 @@ NB: All forms in pages that descend from this have the same name.
     </div>
 </div>
 {% endblock settings_main %}
+{% block js %}
+    {{ block.super }}
+<script type='text/javascript'>
+    $(function () {
+        $('#clear_message').click(function () {
+            $(this).parent().parent().hide();
+            return false;
+        });
+    });
+</script>
+{% endblock %}

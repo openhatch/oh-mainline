@@ -126,20 +126,39 @@ def cache_function_that_takes_request(func, *args, **kwargs):
 
 @decorator_factory 
 def cache_method(cache_key_getter_name, func, *args, **kwargs):
-    # Let's check to see whether we can avoid all this expensive DB jiggery after all
+    # The point of cache_method is to decorate expensive methods in classes
+    # with a flexible way to store their input/output mappings in the cache.
+
+    # The object implicitly passed to this function has an instance method we
+    # can use to calculate the cache key. That instance method's name is stored
+    # in cache_key_getter_name. Let's get the cache key. Notice that the cache
+    # key also varies based on what arguments get passed to the decorated function.
     self = args[0]
     cache_key = getattr(self, cache_key_getter_name)(*args[1:], **kwargs)
+
+    # We cache objects as JSON. (We could have used Pickle, but we, er, Asheesh
+    # prefers JSON.)
     cached_json = django.core.cache.cache.get(cache_key)
 
     if cached_json is None:
+        # If there's nothing in the cache, well, shoot, we have to actually do
+        # the expensive work. Let's run it.
         value = func(*args, **kwargs)
+
+        # Then cache the input/output mapping, in a few steps:
+
+        # First transform certain objects into a cachable format.
         if type(value) == django.db.models.query.ValuesListQuerySet:
             value = list(value)
         cached_json = simplejson.dumps({'value': value})
         import logging
+
+        # Then cache the input/output mapping.
         django.core.cache.cache.set(cache_key, cached_json, 864000)
+
         logging.info('cached output of %s: %s' % (func.__name__, cached_json))
     else:
+        # Sweet, no need to run the expensive method. Just use the cached output.
         value = simplejson.loads(cached_json)['value']
 
     return value

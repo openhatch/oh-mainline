@@ -30,6 +30,7 @@ import re
 from django.utils.html import escape
 import lxml.html
 import lxml.html.builder
+import cgi # raffi and asheesh added this
 
 register = template.Library()
 
@@ -157,25 +158,6 @@ def searchexcerpt_filter(value, arg):
     return searchexcerpt(value, arg)['excerpt']
 searchexcerpt_filter.is_safe = True
 
-def make_text_safe(s):
-    '''>>> make_text_safe('<scr')
-    "&lt;scr"
-    '''
-    # We're going to use lxml to serialize this html with entities
-    # Since lxml will throw a ValueError if there are any null bytes in the
-    # string, let's remove those first.
-    s_without_null_bytes = s.replace('\0','')
-
-    # Serialize (which includes adding a span tag)
-    span_tag = lxml.html.builder.SPAN(s_without_null_bytes)
-    span_serialized = lxml.html.tostring(span_tag)
-
-    # Remove the outer span tag we added
-    span_serialized_without_leading_span_tag = span_serialized[len('<span>'):]
-    span_serialized_without_either_span_tag = span_serialized_without_leading_span_tag[
-            :-len('</span>')]
-    return span_serialized_without_either_span_tag
-
 def highlight(text, phrases, ignore_case=None, word_boundary=None, class_name=None):
     if isinstance(phrases, basestring):
         phrases = [phrases]
@@ -200,7 +182,7 @@ def highlight(text, phrases, ignore_case=None, word_boundary=None, class_name=No
     # Brian Beck's code reads:
     #highlighted = mark_safe(expr.sub(replace, text))
     # We changed this to:
-    safe_text = make_text_safe(text)
+    safe_text = cgi.escape(text)
     if phrases:
         highlighted = mark_safe(expr.sub(replace, safe_text))
     else:

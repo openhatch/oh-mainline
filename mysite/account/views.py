@@ -104,10 +104,7 @@ def settings(request):
 
 @login_required
 @view
-def edit_contact_info(request, edit_email_form = None, show_email_form = None,
-                      ):
-    # {{{
-
+def edit_contact_info(request, edit_email_form=None, show_email_form=None, email_me_form=None):
     data = {}
 
     if request.GET.get('notification_id', None) == 'success':
@@ -129,12 +126,15 @@ def edit_contact_info(request, edit_email_form = None, show_email_form = None,
     else:
         data['show_email_form'] = show_email_form
 
+    if email_me_form is None:
+        email_me_form = mysite.account.forms.EmailMeForm(
+            instance=request.user.get_profile(), prefix='email_me')
+    data['email_me_form'] = email_me_form
+
     return (request, 'account/edit_contact_info.html', data)
-    # }}}
 
 @login_required
 def edit_contact_info_do(request):
-    # {{{
     # Handle "Edit email"
     edit_email_form = mysite.account.forms.EditEmailForm(
             request.POST, prefix='edit_email', instance=request.user)
@@ -142,10 +142,16 @@ def edit_contact_info_do(request):
     show_email_form = mysite.account.forms.ShowEmailForm(
             request.POST, prefix='show_email')
 
+    email_me_form = mysite.account.forms.EmailMeForm(
+            request.POST, prefix='email_me', instance=request.user.get_profile())
+
     # Email saving functionality requires two forms to both be
     # valid. This really ought to be the same form, anyway.
     if (edit_email_form.is_valid() and show_email_form.is_valid()):
-        p = request.user.get_profile()
+
+        # Note that we don't need to check the validity of the EmailMeForm,
+        # because it contains only an optional BooleanField.
+        p = email_me_form.save()
         p.show_email = show_email_form.cleaned_data['show_email']
         p.save()
 
@@ -159,7 +165,6 @@ def edit_contact_info_do(request):
         return edit_contact_info(request,
                 edit_email_form=edit_email_form,
                 show_email_form=show_email_form)
-    # }}}
 
 @login_required
 @view

@@ -28,3 +28,6 @@ static/_cache
 
 # Add this to use ghettoq instead of rabbitmq 
 ../use_ghettoq
+
+# Settings that we don't want to appear in the distribution
+secret_settings.py
