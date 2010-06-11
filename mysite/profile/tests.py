@@ -2393,8 +2393,6 @@ class Notifications(TwillTests):
 
         time_range_endpoint_at_func_top = send_weekly_emails.Command.get_time_range_endpoint_of_last_email()
 
-        self.assertEqual(time_range_endpoint_at_func_top, Timestamp.ZERO_O_CLOCK)
-
         project_with_two_participants = Project.create_dummy()
 
         participants_who_are_news_to_each_other = [] # initial value
@@ -2640,8 +2638,72 @@ class Notifications(TwillTests):
         # Assert that no emails were sent
         self.assertEqual(len(Notifications.send_email_and_get_outbox()), 0)
 
+    # We need these functions a few times during this test
+    @staticmethod
+    def set_when_emails_were_last_sent(when):
+        Timestamp.update_timestamp_for_string(
+                send_weekly_emails.Command.TIMESTAMP_KEY,
+                override_time=when)
+
+    def try_to_send_some_emails(self):
+        add_and_send = self.add_two_people_to_a_project_and_send_weekly_emails
+        people, email_contexts = add_and_send(
+                how_to_add_people=[
+                    Notifications.add_contributor,
+                    Notifications.add_wannahelper],
+                outbox_or_context='context')
+        were_emails_sent = any(email_contexts.values()) 
+        #                   ^^ any returns True if the boolean version of any
+        #                   of the elements is True
+
+        return were_emails_sent
+
     def test_we_dont_send_emails_more_than_once_a_week(self):
-        pass
+        # Test that, no matter what, we never send out emails more than once a
+        # week.
+
+        # Here we test two scenarios.
+        
+        # First, what if we (accidentally) run the
+        # send_weekly_emails command today, when we sent the emails yesterday?
+        # We want to make sure that we can't accidentally send people two
+        # emails in a single week...
+
+        # Calculate some datetime objects we'll need during this test
+        now = datetime.datetime.utcnow()
+
+        just_under_seven_days = datetime.timedelta(days=6, hours=23)
+        just_under_seven_days_ago = now - just_under_seven_days
+
+        # Let's record that emails were sent under 7 days ago
+        Notifications.set_when_emails_were_last_sent(just_under_seven_days_ago)
+
+        # Try to send emails
+        were_emails_sent = self.try_to_send_some_emails()
+
+        # No emails were sent because we've recorded that we sent emails within
+        # the last 7 days.
+        self.assertFalse(were_emails_sent)
+
+    def test_that_we_do_email_you_if_the_last_email_was_sent_long_enough_ago(self):
+
+        # Now let's make sure that the converse scenario works as expected. We
+        # sent the emails over seven days ago, and somebody runs the
+        # send_weekly_emails command. In this scenario, emails SHOULD be sent.
+
+        now = datetime.datetime.utcnow()
+        just_over_seven_days = datetime.timedelta(days=7, hours=1)
+        just_over_seven_days_ago = now - just_over_seven_days
+
+        # Let's record that emails were sent just OVER 7 days ago
+        Notifications.set_when_emails_were_last_sent(just_over_seven_days_ago)
+
+        # Try to send emails
+        were_emails_sent = self.try_to_send_some_emails()
+
+        # Some emails WERE sent because we haven't recorded that we sent emails
+        # within the last 7 days.
+        self.assert_(were_emails_sent)
 
     def test_that_contributors_and_wanna_helpers_are_emailed_about_one_another(self):
         # Set up the database so that a contributor will receive an email about
