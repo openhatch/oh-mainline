@@ -128,8 +128,9 @@ class TracBug:
     @staticmethod
     @mysite.base.decorators.unicodify_strings_when_inputted
     def string_un_csv(s):
+        """Trac serializes bug descriptions. Undo that serialization."""
         s = cgi.escape(s)
-        return unicode(s, 'utf-8')
+        return s
 
     def as_data_dict_for_bug_object(self):
         trac_data = self.as_bug_specific_csv_data()

@@ -6,6 +6,7 @@ import mysite.customs.bugtrackers.trac
 
 ### Twisted
 def look_at_one_twisted_bug(bug_id):
+    """Import one Twisted bug. bug_id is the ticket number in the bug's URL."""
     logging.info("Was asked to look at bug %d in Twisted" % bug_id)
     tb = mysite.customs.bugtrackers.trac.TracBug(
         bug_id=bug_id,
