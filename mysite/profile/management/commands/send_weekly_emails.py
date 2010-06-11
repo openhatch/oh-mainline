@@ -90,8 +90,8 @@ class Command(BaseCommand):
 
             people_data['wannahelper_count'] = len(display_these_wannahelpers)
 
-            everybody = (display_these_contributors + display_these_wannahelpers)
-            if not everybody or everybody == [recipient]:
+            everybody = set(display_these_contributors + display_these_wannahelpers)
+            if not everybody or everybody == set([recipient]):
                 continue # to the next PortfolioEntry
 
             # Sort and slice lists of contributors and wannahelpers
@@ -121,6 +121,6 @@ class Command(BaseCommand):
             # If there's no news to report, signal this fact loudly to the caller
             return None
 
-        context['person'] = recipient
+        context['recipient'] = recipient
         context['project_name2people'] = project_name2people
         return context 
