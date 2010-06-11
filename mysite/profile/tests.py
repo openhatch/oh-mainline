@@ -2687,10 +2687,19 @@ class Notifications(TwillTests):
         Notifications.add_contributor(person, project_i_wanna_help_and_contributed_to)
         Notifications.add_wannahelper(person, project_i_wanna_help_and_contributed_to)
 
-        projects_i_care_about = mysite.profile.management.commands.send_weekly_emails.Command.  get_projects_this_person_cares_about(person) 
+        projects_i_care_about = mysite.profile.management.commands.send_weekly_emails.Command.get_projects_this_person_cares_about(person) 
         expected = [project_i_contributed_to, project_i_wanna_help, 
                 project_i_wanna_help_and_contributed_to]
         expected.sort(key=lambda x: x.name)
         self.assertEqual(projects_i_care_about, expected)
+
+    def test_dont_tell_me_about_projects_where_i_am_the_only_participant(self):
+        person = Person.create_dummy()
+        project_i_wanna_help_and_contributed_to = Project.create_dummy()
+        Notifications.add_contributor(person, project_i_wanna_help_and_contributed_to)
+        Notifications.add_wannahelper(person, project_i_wanna_help_and_contributed_to)
+        command = mysite.profile.management.commands.send_weekly_emails.Command()
+        email_context = command.get_context_for_weekly_email_to(person) 
+        self.assertEqual(None, email_context)
 
 # vim: set ai et ts=4 sw=4 nu:
