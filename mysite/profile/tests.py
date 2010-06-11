@@ -2647,15 +2647,12 @@ class Notifications(TwillTests):
 
     def try_to_send_some_emails(self):
         add_and_send = self.add_two_people_to_a_project_and_send_weekly_emails
-        people, email_contexts = add_and_send(
+        people, outbox = add_and_send(
                 how_to_add_people=[
                     Notifications.add_contributor,
                     Notifications.add_wannahelper],
-                outbox_or_context='context')
-        were_emails_sent = any(email_contexts.values()) 
-        #                   ^^ any returns True if the boolean version of any
-        #                   of the elements is True
-
+                outbox_or_context='outbox')
+        were_emails_sent = bool(outbox)
         return were_emails_sent
 
     def test_we_dont_send_emails_more_than_once_a_week(self):
