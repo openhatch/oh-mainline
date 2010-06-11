@@ -2,7 +2,9 @@
 <style>
 body { font-family: Arial; }
 .username_parenthesized { font-weight: normal; }
-.parenthesis { font-weight: normal; }
+.parenthesis { font-weight: normal; text-decoration: none; }
+.space_between_name_and_username { font-weight: normal; text-decoration: none; }
+a { text-decoration: none; }
 </style>
 <p>Hi {% firstof person.user.first_name person.user.username %}!</p>
 
