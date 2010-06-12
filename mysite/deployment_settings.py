@@ -3,7 +3,7 @@ from settings import *
 # But use the linode as our MySQL server
 DATABASE_HOST='linode.openhatch.org'
 
-OHLOH_API_KEY='SXvLaGPJFaKXQC0VOocAg'
+OHLOH_API_KEY='JeXHeaQhjXewhdktn4nUw' # SXvLaGPJFaKXQC0VOocAg'
 DEBUG=False
 ADMINS=[
     ('Everybody at OpenHatch', 'all@openhatch.org'),
