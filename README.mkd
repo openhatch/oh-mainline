@@ -4,7 +4,7 @@ Well, you probably want to know to how run this code.
 
 ## How to run this code ##
 
-    sudo apt-get install python2.5-dev python-apt python-libxml2 memcached # Install some dependencies
+    sudo apt-get install python2.6-dev python-apt python-libxml2 memcached # Install some dependencies
     sudo /etc/init.d/memcached start # start memcached
 
 If memcached complains that it is not enabled, configure it by reading `/etc/default/memcached`.
@@ -15,7 +15,7 @@ OpenHatch uses to Buildout to manage dependencies.
 
 Run these commands from the top level directory of the repository:
 
-    python2.5 bootstrap.py
+    python2.6 bootstrap.py
     bin/buildout 
     bin/mysite runserver
 
