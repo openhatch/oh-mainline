@@ -109,6 +109,12 @@ class EditContactInfo(TwillTests):
     #{{{
     fixtures = ['user-paulproteus', 'person-paulproteus']
     def test_edit_email_address(self):
+        # Opt out of the weekly emails. This way, the only "checked"
+        # checkbox is the one for if the user's email address gets shown.
+        paulproteus = Person.objects.get()
+        paulproteus.email_me_weekly_re_projects = False
+        paulproteus.save()
+
         self.login_with_twill()
         
 
