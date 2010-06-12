@@ -2,7 +2,7 @@
                 {% spaceless %}
                     {% for person in truncated_list_of_people %}
                         {% ifequal person.user.username recipient.user.username %}
-                        and you.
+                        and <strong>you</strong>.
                         {% else %}
                             {% if not forloop.first %}
                                 <span> &middot; </span>
