@@ -6,6 +6,8 @@ from django.db.models import Q
 from mysite.profile.models import PortfolioEntry
 from django.template.loader import render_to_string
 from mysite.search.models import WannaHelperNote
+import datetime
+import logging
 
 def push_to_end_of_list(an_object, a_list):
     try:
@@ -31,16 +33,31 @@ class Command(BaseCommand):
         # At initialization time, we store the timestamp that this run is with regard to
         self.this_run_covers_things_since = Command.get_time_range_endpoint_of_last_email()
 
-        # And it it covers things right up until the timestamp we're about to set
-        Timestamp.update_timestamp_for_string(Command.TIMESTAMP_KEY)
-
-        self.this_run_covers_things_up_until = Command.get_time_range_endpoint_of_last_email()
+        self.this_run_covers_things_up_until = datetime.datetime.utcnow()
 
         # Now all calls to filter() should include both of those dates: greater than ...since,
         # and less than up_until.
 
     def handle(self, *args, **options):
-        Timestamp.update_timestamp_for_string(Command.TIMESTAMP_KEY)
+
+        SEVEN_DAYS = datetime.timedelta(days=7)
+
+        # If it's been less than seven days since our last big email,
+        # stop here and don't send any emails.
+        if ((self.this_run_covers_things_up_until - self.this_run_covers_things_since) < 
+                SEVEN_DAYS):
+            logging.warn("Not sending emails; emails were last sent later than seven days ago.")
+            return
+
+        # If we made it this far in the function, it's been seven days or more
+        # since our last email. Let's make a note that the time range of this
+        # email extends until the timestamp stored in self.this_run_covers_things_up_until
+        Timestamp.update_timestamp_for_string(Command.TIMESTAMP_KEY,
+                override_time=self.this_run_covers_things_up_until)
+        # ^^ This entry in the database will be used for calculating the time
+        # range starting point of the next email
+
+        # Now let's send some emails! :-)
         people_who_want_email = Person.objects.filter(email_me_weekly_re_projects=True)
         for person in people_who_want_email:
             context = self.get_context_for_weekly_email_to(person)

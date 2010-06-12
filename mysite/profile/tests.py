@@ -2387,7 +2387,8 @@ class Notifications(TwillTests):
         self.assertFalse(paul.email_me_weekly_re_projects)
 
     def add_two_people_to_a_project_and_send_weekly_emails(self,
-            people_want_emails=True, how_to_add_people=None, outbox_or_context=None):
+            people_want_emails=True, how_to_add_people=None, outbox_or_context=None,
+            emails_should_actually_be_sent=True):
 
         self.assert_(outbox_or_context in ['outbox', 'context'])
 
@@ -2415,6 +2416,11 @@ class Notifications(TwillTests):
         if outbox_or_context == 'outbox':
             outbox = Notifications.send_email_and_get_outbox()
             output = outbox
+            if emails_should_actually_be_sent:
+                # The timestamp log should have been modified since the top of the function.
+                self.assert_(
+                        send_weekly_emails.Command.get_time_range_endpoint_of_last_email()
+                        > time_range_endpoint_at_func_top)
 
         if outbox_or_context == 'context':
             command = mysite.profile.management.commands.send_weekly_emails.Command()
@@ -2423,11 +2429,6 @@ class Notifications(TwillTests):
                 email_context = command.get_context_for_weekly_email_to(participant)
                 email_contexts[participant.pk] = email_context
             output = email_contexts
-
-        # The timestamp log should have been modified since the top of the function.
-        self.assert_(
-                send_weekly_emails.Command.get_time_range_endpoint_of_last_email()
-                > time_range_endpoint_at_func_top)
 
         return ( participants_who_are_news_to_each_other, output )
 
@@ -2645,15 +2646,16 @@ class Notifications(TwillTests):
                 send_weekly_emails.Command.TIMESTAMP_KEY,
                 override_time=when)
 
-    def try_to_send_some_emails(self):
+    def try_to_send_some_emails(self, expect_success):
         add_and_send = self.add_two_people_to_a_project_and_send_weekly_emails
         people, outbox = add_and_send(
                 how_to_add_people=[
                     Notifications.add_contributor,
                     Notifications.add_wannahelper],
-                outbox_or_context='outbox')
+                outbox_or_context='outbox',
+                emails_should_actually_be_sent=expect_success)
         were_emails_sent = bool(outbox)
-        return were_emails_sent
+        self.assertEqual(expect_success, were_emails_sent)
 
     def test_we_dont_send_emails_more_than_once_a_week(self):
         # Test that, no matter what, we never send out emails more than once a
@@ -2675,12 +2677,9 @@ class Notifications(TwillTests):
         # Let's record that emails were sent under 7 days ago
         Notifications.set_when_emails_were_last_sent(just_under_seven_days_ago)
 
-        # Try to send emails
-        were_emails_sent = self.try_to_send_some_emails()
-
-        # No emails were sent because we've recorded that we sent emails within
-        # the last 7 days.
-        self.assertFalse(were_emails_sent)
+        # Try to send emails, but expect no emails to be sent, because we've
+        # recorded that we sent emails within the last 7 days.
+        self.try_to_send_some_emails(expect_success=False)
 
     def test_that_we_do_email_you_if_the_last_email_was_sent_long_enough_ago(self):
 
@@ -2695,12 +2694,9 @@ class Notifications(TwillTests):
         # Let's record that emails were sent just OVER 7 days ago
         Notifications.set_when_emails_were_last_sent(just_over_seven_days_ago)
 
-        # Try to send emails
-        were_emails_sent = self.try_to_send_some_emails()
-
-        # Some emails WERE sent because we haven't recorded that we sent emails
-        # within the last 7 days.
-        self.assert_(were_emails_sent)
+        # Try to send emails, but expect some emails to YES be sent, because we've
+        # recorded that we sent emails over 7 days ago.
+        self.try_to_send_some_emails(expect_success=True)
 
     def test_that_contributors_and_wanna_helpers_are_emailed_about_one_another(self):
         # Set up the database so that a contributor will receive an email about
