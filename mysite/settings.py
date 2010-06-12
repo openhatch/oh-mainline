@@ -161,19 +161,8 @@ TEST_PROFILE = '/tmp/openhatch-profiling-data.%s' % os.environ.get('USER', 'unkn
 ## AMQP, Rabbit Queue, Celery
 CARROT_BACKEND = 'amqp'
 
-# Some machines (eg Raffi's laptop) have trouble running rabbitmq
-# To fall back to ghettoq, run:
-#   cd milestone-a; touch use_ghettoq
-if os.path.exists('../use_ghettoq'):
-    print "Using ghettoq"
-    CARROT_BACKEND = 'ghettoq.taproot.Database'
-
-BROKER_HOST = 'localhost'
-BROKER_PORT = 5672
-BROKER_USER = 'rabbiter'
-BROKER_PASSWORD = 'johT4qui'
-BROKER_VHOST = 'localhost'
-
+print "Using ghettoq"
+CARROT_BACKEND = 'ghettoq.taproot.Database'
 
 cooked_data_password = 'AXQaTjp3'
 AUTH_PROFILE_MODULE = "profile.Person"
