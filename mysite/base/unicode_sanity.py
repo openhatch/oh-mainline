@@ -22,8 +22,9 @@ def urlencode(unicode_dict):
             bad_values.append(value)
         utf8_dict[unicode(key).encode('utf-8')] = unicode(value).encode('utf-8')
     if bad_keys or bad_values:
-        import pdb
-        pdb.set_trace()
+        raise ProgrammingError
+        #import pdb
+        #pdb.set_trace()
     return _urlencode(utf8_dict)
     
 @mysite.base.decorators.unicodify_strings_when_inputted

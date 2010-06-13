@@ -26,6 +26,7 @@ import collections
 import simplejson
 import re
 import cgi
+import logging
 
 DEFAULT_LOCATION='Inaccessible Island'
 
@@ -738,8 +739,14 @@ class Citation(models.Model):
         else:
             if self.data_import_attempt:
                 if self.data_import_attempt.source in ['rs', 'ou']:
-                    return "http://www.ohloh.net/search?%s" % mysite.base.unicode_sanity.urlencode(
-                            {u'q': self.portfolio_entry.project.name})
+                    try:
+                        project_name = unicode(self.portfolio_entry.project.name, 'utf-8')
+                        return "http://www.ohloh.net/search?%s" % mysite.base.unicode_sanity.urlencode(
+                            {u'q': project_name })
+                    except:
+                        logging.warn("During Citation.get_url_or_guess, we failed to encode the project name correctly.")
+                        # This is just a temporary workaround since the above line was causing errors.
+                        return "http://www.ohloh.net/search?q=%s" % self.portfolio_entry.project.name
                 elif self.data_import_attempt.source == 'lp':
                     return "https://launchpad.net/~%s" % urllib.quote(
                             self.data_import_attempt.query)
