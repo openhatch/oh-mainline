@@ -61,7 +61,7 @@ def break_long_words(value, max_word_length=8):
 
     # We really want "value" to be Unicode. Sometimes it is, and sometimes it isn't. So...
     import logging
-    logging.warn("Wanted %r to be unicode. Instead it's %s. Moving on with life." % (value, type(value))
+    logging.warn("Wanted %r to be unicode. Instead it's %s. Moving on with life." % (value, type(value)))
     if type(value) == str:
         value = unicode(value, 'utf-8')
 
