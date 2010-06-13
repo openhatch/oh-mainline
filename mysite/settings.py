@@ -161,7 +161,6 @@ TEST_PROFILE = '/tmp/openhatch-profiling-data.%s' % os.environ.get('USER', 'unkn
 ## AMQP, Rabbit Queue, Celery
 CARROT_BACKEND = 'amqp'
 
-print "Using ghettoq"
 CARROT_BACKEND = 'ghettoq.taproot.Database'
 
 cooked_data_password = 'AXQaTjp3'
