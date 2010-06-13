@@ -58,7 +58,12 @@ def length_lte(value, arg):
 
 def break_long_words(value, max_word_length=8):
     # if the word is really long, insert a <wbr> occasionally.
-    assert type(value) == unicode
+
+    # We really want "value" to be Unicode. Sometimes it is, and sometimes it isn't. So...
+    import logging
+    logging.warn("Wanted %r to be unicode. Instead it's %s. Moving on with life." % (value, type(value))
+    if type(value) == str:
+        value = unicode(value, 'utf-8')
 
     re_capitalized_word = re.compile(r'([A-Z][a-z][a-z]+)', re.UNICODE)  
     words = re_capitalized_word.split(value)
@@ -68,7 +73,7 @@ def break_long_words(value, max_word_length=8):
         if word:
             broken_words += re_too_many_letters_in_a_row.split(word)
     broken_words = filter(lambda x: x, broken_words)
-    return "<wbr>".join(broken_words)
+    return "<wbr />".join(broken_words)
 
 @register.filter
 def prepend_http_if_necessary(value):
