@@ -23,6 +23,7 @@ from itertools import chain
 import csv
 from mysite.search.models import Bug, Project
 import datetime
+import logging
 
 import itertools
 
@@ -44,9 +45,36 @@ def view_bug_table2dict(tree):
 def decode_datetime(s):
     return datetime.datetime.strptime(s, '%d-%B-%Y')
 
-def create_bug_object_for_remote_bug_id(remote_bug_id):
+BUG_URL_PREFIX = 'http://bugs.opensolaris.org/bugdatabase/view_bug.do?bug_id='
+
+def create_bug_object_for_remote_bug_id_if_necessary(remote_bug_id):
+    """See if we have either no bug or only a stale one.
+    If this is the case, run a refresh."""
+    remote_bug_url = BUG_URL_PREFIX + "%d" % remote_bug_id
+    logging.info("Was asked to look at bug %d in OpenSolaris OS/Net" % remote_bug_id)
+    try:
+        bug = Bug.all_bugs.get(canonical_bug_link=remote_bug_url)
+	if bug.data_is_more_fresh_than_one_day():
+	    return False
+    except Bug.DoesNotExist:
+        bug = Bug()
+	bug.canonical_bug_link = remote_bug_url
+    # If we got to here, we either have a new bug or an stale one.
+    # So refresh away!
+    bug = _update_bug_object_for_remote_bug_id(
+        bug_object=bug,
+	remote_bug_id=remote_bug_id)
+    if bug is None:
+        # Bug doesn't exist on tracker
+        # Bug object not created, so return False
+        return False
+    bug.save()
+    logging.info("Actually loaded %d in from OpenSolaris OS/Net" % remote_bug_id)
+    return True
+
+def _update_bug_object_for_remote_bug_id(bug_object, remote_bug_id):
     '''Create but don't save a bug.'''
-    remote_bug_url = "http://bugs.opensolaris.org/bugdatabase/view_bug.do?bug_id=%d" % remote_bug_id
+    remote_bug_url = BUG_URL_PREFIX + "%d" % remote_bug_id
     try:
         tree = lxml.html.document_fromstring(urllib2.urlopen(remote_bug_url).read())
     except urllib2.HTTPError, e:
@@ -55,36 +83,32 @@ def create_bug_object_for_remote_bug_id(remote_bug_id):
         # otherwise, bubble that crazy error up.
         raise e
 
-    bug = Bug()
-
     metadata_dict = view_bug_table2dict(tree)
 
-    bug.submitter_username = '' # FIXME: Find an example of this having a value
-    bug.submitter_realname = '' # FIXME: Find an example of this having a value
-    bug.date_reported = decode_datetime(metadata_dict['Submit Date'])
-    bug.last_touched = decode_datetime(metadata_dict['Last Update Date'])
-    bug.canonical_bug_link = remote_bug_url
-    bug.good_for_newcomers = 'oss-bite-size' in metadata_dict['Keywords']
-    bug.status = metadata_dict['State']
-    status_number = int(bug.status.split('-')[0])
-    bug.looks_closed = (status_number in (8, 10, 11))
-    bug.title = metadata_dict['Synopsis']
-    bug.importance = '' # No importance, as far as I can tell.
+    bug_object.submitter_username = '' # FIXME: Find an example of this having a value
+    bug_object.submitter_realname = '' # FIXME: Find an example of this having a value
+    bug_object.date_reported = decode_datetime(metadata_dict['Submit Date'])
+    bug_object.last_touched = decode_datetime(metadata_dict['Last Update Date'])
+    bug_object.canonical_bug_link = remote_bug_url
+    bug_object.good_for_newcomers = 'oss-bite-size' in metadata_dict['Keywords']
+    bug_object.status = metadata_dict['State']
+    status_number = int(bug_object.status.split('-')[0])
+    bug_object.looks_closed = (status_number in (8, 10, 11))
+    bug_object.title = metadata_dict['Synopsis']
+    bug_object.importance = '' # No importance, as far as I can tell.
 
     # For description, just grab the first "message"
-    bug.description = metadata_dict['Description']
+    bug_object.description = metadata_dict['Description']
 
-    # We are always the project called Python.
-    bug.project, _ = Project.objects.get_or_create(name='OpenSolaris OS/Net', language='C')
+    # We are always the project called OpenSolaris OS/Net.
+    bug_object.project, _ = Project.objects.get_or_create(name='OpenSolaris OS/Net', language='C')
 
     # How many people participated?
-    bug.people_involved = None # This tracker has no idea.
+    bug_object.people_involved = None # This tracker has no idea.
 
-    bug.last_polled = datetime.datetime.utcnow()
+    bug_object.last_polled = datetime.datetime.utcnow()
 
-    return bug
-
-BUG_URL_PREFIX = 'http://bugs.opensolaris.org/bugdatabase/view_bug.do?bug_id='
+    return bug_object
 
 def get_remote_bug_ids_to_read():
     remote_bug_list = 'http://hub.opensolaris.org/bin/view/Main/oss_bite_size'
@@ -104,6 +128,7 @@ def get_remote_bug_ids_already_stored():
 def grab():
     """Loops over the OpenSolaris bug tracker's oss-bite-sized bugs and stores/updates them in our DB.
     For now, just grab the easy bugs to be kind to their servers."""
+    # FIXME: Use update() instead (should this function be removed?)
 
     bug_ids = itertools.chain(
         get_remote_bug_ids_to_read(), get_remote_bug_ids_already_stored())
@@ -133,3 +158,21 @@ def grab():
         # Otherwise, print and save the sucker!
         print bug
         bug.save()
+
+    def update():
+        """Call this nightly."""
+        logging.info("Learning about new bugs in OpenSolaris OS/Net.")
+        # Check new bugs first
+        for bug_id in get_remote_bug_ids_to_read():
+            create_bug_object_for_remote_bug_id_if_necessary(bug_id)
+        # Now scan through all bugs and refresh stale ones
+        # This will include the new ones found above, but
+        # since they are fresly added they won't be re-scanned.
+        logging.info("Starting refreshing all bugs from OpenSolaris OS/Net.")
+        count = 0
+        for bug_id in get_remote_bug_ids_already_stored():
+            create_bug_object_for_remote_bug_id_if_necessary(bug_id)
+            count += 1
+        logging.info("Okay, looked at %d bugs from OpenSolaris OS/Net." % count)
+
+# vim: set nu:

@@ -139,7 +139,7 @@ class Command(BaseCommand):
         mysite.search.tasks.launchpad_tasks.refresh_all_launchpad_bugs()
 
     def update_opensolaris_osnet(self):
-        mysite.customs.bugtrackers.opensolaris.grab()
+        mysite.customs.bugtrackers.opensolaris.update()
 
     def handle(self, *args, **options):
         self.update_opensolaris_osnet()

@@ -990,5 +990,34 @@ class OnlineBitbucket(django.test.TestCase):
         repos = list(mysite.customs.bitbucket.get_user_repos('mark freeman'))
         self.assertEqual(repos, [])
         
-        
+class OpenSolaris(django.test.TestCase):
+
+    open_bug_filename = os.path.join(settings.MEDIA_ROOT, 'sample-data',
+            "open-opensolaris-bug.html")
+
+    @mock.patch('urllib2.urlopen')
+    @mock.patch('mysite.customs.bugtrackers.opensolaris.Bug.all_bugs.get')
+    def test_existing_bug_is_updated(self, mock_bug_to_update, mock_urlopen):
+        """This method tests that an existing bug
+         which should be updated is updated"""
+        mock_urlopen.return_value = open(self.open_bug_filename)
+        bug = Bug()
+        bug.canonical_bug_link = "http://bugs.opensolaris.org/bugdatabase/view_bug.do?bug_id=1"
+        bug.last_polled = datetime.datetime.utcnow() - datetime.timedelta(days=2)
+        mock_bug_to_update.return_value = bug
+        bug_result = mysite.customs.bugtrackers.opensolaris.create_bug_object_for_remote_bug_id_if_necessary(1)
+        self.assertEquals(bug_result, True)
+
+    @mock.patch('mysite.customs.bugtrackers.opensolaris.Bug.all_bugs.get')
+    def test_existing_bug_is_not_updated(self, mock_bug_to_not_update):
+        """This method tests that an existing bug
+         which should not be updated is not updated"""
+        bug = Bug()
+        bug.canonical_bug_link = "http://bugs.opensolaris.org/bugdatabase/view_bug.do?bug_id=1"
+        bug.last_polled = datetime.datetime.utcnow()
+        mock_bug_to_not_update.return_value = bug
+        bug_result = mysite.customs.bugtrackers.opensolaris.create_bug_object_for_remote_bug_id_if_necessary(1)
+        self.assertEquals(bug_result, False)
+
+
 # vim: set nu:

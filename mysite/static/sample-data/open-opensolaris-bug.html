@@ -1,0 +1,330 @@
+
+
+
+
+        
+	
+	
+        
+        
+	
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+    <title>Bug ID: 6957932 SunVTS loopback tests hang on Niantic card after run for long duration</title>
+    
+
+
+
+
+
+<meta name="product" content="solaris">
+<meta name="category" content="">
+<meta name="subcategory" content="">
+<meta name="keywords" content="oss-bite-size">
+<meta name="synopsis" content="Random OpenSolaris bug">
+<meta name="state" content="3-Accepted">
+<meta name="submit_date" content="1-June-2010">
+<meta name="type" content="bug">
+<meta name="reported_against" content="">
+<meta name="date" content="2010-06-03">
+<meta name="commitToFix" content="">
+<meta name="sponsor" content="">
+<meta name="submitter" content="">
+<meta name="DESCRIPTION" content="This field not used" >
+<style>
+
+         pre {
+         white-space: -moz-pre-wrap;
+         white-space: -pre-wrap;
+         white-space: -o-pre-wrap;
+         white-space: pre-wrap;
+         }
+
+</style>
+
+    <script type="text/javascript" src="/js/tonic.js"></script>
+    <link rel="stylesheet" type="text/css" media="screen" href="/css/screen.css" />
+    <!--[if IE]><link rel="stylesheet" type="text/css" href="/css/ie.css" /><![endif]-->
+</head>
+
+<body>
+    <div id="PageBox">
+        <div id="Masthead">
+            <h1><a href="http://www.opensolaris.org">OpenSolaris</a></h1>
+             <a href="http://www.opensolaris.org"><div id="MastheadLogo"></div></a>
+            <div id="Iconbar">
+              <a id="DiscussionsIcon" href="http://hub.opensolaris.org/bin/view/Main/discussions">Discussions</a>
+              <a id="CommunitiesIcon" href="http://hub.opensolaris.org/bin/view/Main/communities#portal">Communities</a>
+              <a id="ProjectsIcon" href="http://hub.opensolaris.org/bin/view/Main/projects#portal">Projects</a>
+              <a id="DownloadIcon" href="http://hub.opensolaris.org/bin/view/Main/downloads">Download</a>
+              <a id="SourceBrowserIcon" href="http://src.opensolaris.org/">Source Browser</a>
+            </div>
+        </div>
+  <table id="Layout">
+  <tr>
+   <td id="Navigation"><div class="Format">
+    <ol class="siteNavigation">
+      <li>
+       <div>Quick Links</div>
+        <ol>
+            <li><a href="http://hub.opensolaris.org/bin/view/Main/TryOpenSolaris">Try OpenSolaris</a></li>
+            <li><a href="http://hub.opensolaris.org/bin/view/Main/get">Get the Source</a></li>
+            <li><a href="http://hub.opensolaris.org/bin/view/Main/package">Get More Packages</a></li>
+            <li><a href="http://hub.opensolaris.org/bin/view/Main/participate">Participate in Projects</a></li>
+            <li><a href="http://hub.opensolaris.org/bin/view/Main/usergroups">Join a User Group</a></li>
+        </ol>
+      <div>Subsites</div>
+       <ol>
+          <li><a href="http://cr.opensolaris.org">Code Reviews</a></li>
+          <li><a href="http://repo.opensolaris.org/">Code Repositories</a></li>
+          <li><a href="http://pkg.opensolaris.org/">Package Search</a></li>
+          <li><a href="http://bugs.opensolaris.org">Bugster</a></li>
+          <li><a href="http://defect.opensolaris.org">Bugzilla</a></li>
+          <li><a href="http://test.opensolaris.org">Test Machines</a></li>
+          <li><a href="http://planet.opensolaris.org">Planet</a></li>
+          <li><a href="http://mail.opensolaris.org">Mailing Lists</a></li>
+       </ol>
+        <div>General</div>
+          <ol>
+           <li><a href="http://hub.opensolaris.org/bin/view/Main/profile">Account Management</a></li>
+           <li><a href="http://hub.opensolaris.org/bin/view/Main/documentation">Documentation</a></li>
+           <li><a href="http://hub.opensolaris.org/bin/view/Main/">Help</a></li>
+           <li><a href="http://hub.opensolaris.org/bin/view/Main/about">About</a></li>
+           <li><a href="http://hub.opensolaris.org/bin/view/Main/faq">FAQs</a></li>
+           <li><a href="http://hub.opensolaris.org/bin/view/Main/values">Values</a></li>
+        </ol>
+      </li>
+    </ol>
+    </div></td>
+   <td id="Content"><div class="Format">
+    
+
+
+
+
+
+
+
+
+<table class="NoBorder" width="100%" border="0" cellpadding="4" cellspacing="2">
+    <span class="smaller">
+        <td align="left">
+            <a href="/bugdatabase/printableBug.do?bug_id=6957932" style="text-decoration: none; font-size: 13px">Printable Version</a>
+        </td>
+        <td align="right">
+            <a href="/bugdatabase" style="text-decoration: none; font-size: 13px">Enter a New Search</a>
+        </td>
+    </span>
+</table>
+
+
+         <table border="0" cellpadding="2" cellspacing="0" class="NoBorder">
+         <tbody>
+             <tr>
+                 <td align="right">
+                     <font face=""><b>Bug ID</b></font>
+                 </td>
+                 <td align="left">
+                     <font face="">1</font>
+                 </td>
+             </tr>
+             
+             <tr>
+                 <td align="right">
+                     <font face=""><b>Synopsis</b></font>  
+                 </td>
+                 <td align="left">
+                     <font face="" >Random OpenSolaris bug</font>
+                 </td>
+             </tr>
+	     <tr>
+                 <td align="right">
+                     <font face=""><b>State</b></font>
+                 </td>
+		 <td align="left">
+                     <font face="" color="red" >3-Accepted</font><font face="" > (Yes, that is a problem)</font>
+                 </td>
+             </tr>
+             <tr>
+                 <td align="right">
+                     <font face=""><b>Category:Subcategory</b></font> 
+                 </td>
+                 <td align="left">
+                     <font face="" >:</font>
+                 </td>
+             </tr>
+	     <tr>
+                 <td align="right" valign="top">
+                     <font face=""><b>Keywords</b></font>
+                 </td>
+                 <td align="left">
+                     <font face="" >oss-bite-size</font>
+                 </td>
+             </tr>
+             
+             
+                 <tr>
+                     <td align="right"  nowrap>
+                         <font face=""><b>Responsible Engineer</b></font>  
+                     </td>
+                     <td align="left">
+                         <font face="">
+                             Jack Grigg
+                         </font>
+                     </td>
+                 </tr>
+             
+             <tr>
+                 <td align="right"  nowrap>
+                     <font face=""><b>Reported Against</b></font>  
+                 </td>
+                 <td align="left">
+                     <font face="">
+                         
+                             
+                         
+                     </font>
+                 </td>
+             </tr>
+             <tr>
+                 <td align="right"  nowrap>
+                     <font face=""><b>Duplicate Of</b></font>
+                 </td>
+                 <td>
+                     
+                 </td>
+             </tr>
+	     <tr>
+                 <td align="right" nowrap>
+                     <font face=""><b>Introduced In</b></font>
+                 </td>
+                 <td align="left">
+                     <font face="" ></font>
+                 </td>
+             </tr>
+	     <tr>
+                 <td align="right">
+                     <font face=""><b>Commit to Fix</b></font>
+                 </td>
+                 <td align="left">
+                     <font face="" ></font>
+                 </td>
+             </tr>
+	     <tr>
+                 <td align="right">
+                     <font face=""><b>Fixed In</b></font>
+                 </td>
+                 <td align="left">
+                     <font face="" ></font>
+                 </td>
+             </tr>
+             <tr>
+                 <td align="right">
+                     <font face=""><b>Release Fixed</b></font> 
+                 </td>
+                 <td align="left">
+                     <font face="">
+                         
+                        
+                        <!--
+                        
+                            
+                        
+                        -->
+                     </font>
+                 </td>
+             </tr>
+             <tr>
+                 <td align="right">
+                     <font face=""><b>Related Bugs</b></font> 
+                 </td>
+                 <td align="left">
+                     <font face="">
+                         
+                         
+                     </font>
+                 </td>
+             </tr>
+             <tr>
+                 <td align="right">
+                     <font face=""><b>Submit Date</b></font> 
+                 </td>
+                 <td align="left">
+                     <font face="" >1-June-2010</font>
+                 </td>
+             </tr>
+	     <tr>
+                 <td align="right">
+                     <font face=""><b>Last Update Date</b></font>
+                 </td>
+                 <td align="left">
+                     <font face="" >2-June-2010</font>
+                 </td>
+             </tr>
+             <tr>
+                 <td align="right" valign="top">
+                     <font face=""><b>Description</b></font> 
+                 </td>
+                 <td align="left">
+                     <pre>WallOfText</pre>
+                 </td>
+             </tr>
+             <tr>
+                 <td align="right" valign="top">
+                     <font face=""><b>Work Around</b></font> 
+                 </td>
+                 <td align="left">
+                     <pre>N/A</pre>
+                 </td>
+             </tr>
+             <tr>
+                 <td align="right" valign="top">
+                     <font face=""><b>Comments</b></font>
+                 </td>
+                 <td align="left">
+                     <pre>N/A</pre>
+                 </td>
+             </tr>
+             
+             <tr>
+                 <td align="right" valign="top">
+                     &nbsp;
+                 </td>
+                 <td align="left">
+                     <a href="/bugdatabase/addToInterestList.do?bug_id=6957932"> Add Yourself to the Interest List</a>
+                 </td>
+             </tr>
+             
+         </tbody></table>
+ 
+
+
+    </div></td>
+  </tr>
+ </table>
+<div id="Footer">
+<p class="Center">
+ <a href="http://hub.opensolaris.org/bin/view/Main/tou">Terms of Use</a> |
+ <a href="http://www.sun.com/privacy/">Privacy</a> |
+ <a href="http://hub.opensolaris.org/bin/view/Main/trademark">Trademarks</a> |
+ <a href="http://hub.opensolaris.org/bin/view/Main/copyrights">Copyright Policy</a> |
+ <a href="http://hub.opensolaris.org/bin/view/Main/site_guidelines">Site Guidelines</a> |
+ <a href="http://hub.opensolaris.org/bin/view/Main/site-map">Site Map</a> |
+ <a href="http://hub.opensolaris.org/bin/view/Main/help">Help</a><br />Your use of this web site or any of its content or software indicates your agreement to be bound by these Terms of Use.<br />
+&copy; 2010, Oracle Corporation and/or its affiliates<br/>
+<img src="/images/logo_oracle_footer.gif" alt="Oracle Logo" />
+</p>
+  </div>
+</div>
+
+ 
+
+<script type="text/javascript" src="/bugdatabase/js/s_code_remote.js"></script>
+</body>
+
+</html>
+
