@@ -726,7 +726,8 @@ class TracBug(django.test.TestCase):
             'type': 'task'}
         tb = mysite.customs.bugtrackers.trac.TracBug(
             bug_id=4298,
-            BASE_URL='http://twistedmatrix.com/trac/')
+            BASE_URL='http://twistedmatrix.com/trac/',
+            bitesized_keyword='easy')
         cached_html_filename = os.path.join(settings.MEDIA_ROOT, 'sample-data', 'twisted-trac-4298-on-2010-04-02.html')
         tb._bug_html_page = unicode(
             open(cached_html_filename).read(), 'utf-8')
@@ -774,7 +775,8 @@ class TracBug(django.test.TestCase):
             'type': 'task'}
         tb = mysite.customs.bugtrackers.trac.TracBug(
             bug_id=4298,
-            BASE_URL='http://twistedmatrix.com/trac/')
+            BASE_URL='http://twistedmatrix.com/trac/',
+            bitesized_keyword='easy')
         cached_html_filename = os.path.join(settings.MEDIA_ROOT, 'sample-data', 'twisted-trac-4298.html')
         tb._bug_html_page = unicode(
             open(cached_html_filename).read(), 'utf-8')
@@ -821,7 +823,8 @@ class TracBug(django.test.TestCase):
             'type': 'task'}
         tb = mysite.customs.bugtrackers.trac.TracBug(
             bug_id=4298,
-            BASE_URL='http://twistedmatrix.com/trac/')
+            BASE_URL='http://twistedmatrix.com/trac/',
+            bitesized_keyword='easy')
         cached_html_filename = os.path.join(settings.MEDIA_ROOT, 'sample-data', 'twisted-trac-4298-without-modified.html')
         tb._bug_html_page = unicode(
             open(cached_html_filename).read(), 'utf-8')
@@ -868,7 +871,8 @@ class TracBug(django.test.TestCase):
             'type': 'task'}
         tb = mysite.customs.bugtrackers.trac.TracBug(
             bug_id=4298,
-            BASE_URL='http://twistedmatrix.com/trac/')
+            BASE_URL='http://twistedmatrix.com/trac/',
+            bitesized_keyword='easy')
         cached_html_filename = os.path.join(settings.MEDIA_ROOT, 'sample-data', 'twisted-trac-4298-without-modified-using-owned-instead-of-assigned.html')
         tb._bug_html_page = unicode(
             open(cached_html_filename).read(), 'utf-8')

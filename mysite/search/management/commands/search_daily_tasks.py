@@ -98,21 +98,23 @@ class Command(BaseCommand):
             instantiated = thing()
             instantiated.update()
 
-    def update_trac_instances(self):
+    def find_and_update_enabled_trac_instances(self):
         # Trac instances' update functions
         # Note that each Trac instance has two such functions for now. It would be
         # good to rework the Trac code so it looks more like the RoundupTracker
         # code, with just one .update() method. Another day.
-        trac_instance_functions_to_call = [
+        # FIXME: Twisted and Sugar Labs now migrated to the new-style Trac system.
+        # Remove this? Commented out for now.
+        #trac_instance_functions_to_call = [
             # Sugar
-            mysite.search.tasks.trac_instances.learn_about_new_sugar_easy_bugs,
-            mysite.search.tasks.trac_instances.refresh_all_sugar_easy_bugs,
+        #    mysite.search.tasks.trac_instances.learn_about_new_sugar_easy_bugs,
+        #    mysite.search.tasks.trac_instances.refresh_all_sugar_easy_bugs,
             # Twisted
-            mysite.search.tasks.trac_instances.learn_about_new_easy_twisted_bugs,
-            mysite.search.tasks.trac_instances.refresh_all_twisted_bugs,
-        ]
-        for callable in trac_instance_functions_to_call:
-            callable()
+        #    mysite.search.tasks.trac_instances.learn_about_new_easy_twisted_bugs,
+        #    mysite.search.tasks.trac_instances.refresh_all_twisted_bugs,
+        #]
+        #for callable in trac_instance_functions_to_call:
+        #    callable()
 
         ### And for my next trick...  discover the new-style Trac instances
         enabled_ones = []
@@ -144,7 +146,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.update_opensolaris_osnet()
         self.update_launchpad_hosted_projects()
-        self.update_trac_instances()
+        self.find_and_update_enabled_trac_instances()
         self.find_and_update_enabled_roundup_trackers()
         self.update_bugzilla_trackers()
         

@@ -16,6 +16,7 @@ def csv_of_bugs(url):
     b = mysite.customs.ohloh.mechanize_get(url)
     return b.response()
 
+# FIXME: Seems redundant given the previous method exists. Remove?
 def sugar_labs_csv_of_easy_bugs():
     b = mysite.customs.ohloh.mechanize_get(
         'http://bugs.sugarlabs.org/query?status=new&status=assigned&status=reopened&format=csv&keywords=%7sugar-love&order=priority')
@@ -76,7 +77,7 @@ class TracBug:
                     people.append(person)
         return people
 
-    def __init__(self, bug_id, BASE_URL):
+    def __init__(self, bug_id, BASE_URL, bitesized_keyword):
         self._bug_specific_csv_data = None
         self._bug_html_page = None
         self._parsed_bug_html_page = None
@@ -84,6 +85,7 @@ class TracBug:
         if not BASE_URL.endswith('/'):
             BASE_URL += '/'
         self.BASE_URL = BASE_URL
+        self.bitesized_keyword = bitesized_keyword
 
     @staticmethod
     def from_url(url):
@@ -143,8 +145,8 @@ class TracBug:
                'submitter_username': trac_data['reporter'],
                'submitter_realname': '', # can't find this in Trac
                'canonical_bug_link': self.as_bug_specific_url(),
-               'good_for_newcomers': ('easy' in trac_data['keywords']),
-               'bite_size_tag_name': 'easy',
+               'good_for_newcomers': (self.bitesized_keyword in trac_data['keywords']),
+               'bite_size_tag_name': self.bitesized_keyword,
                'concerns_just_documentation': False,
                'as_appears_in_distribution': '',
                'last_polled': datetime.datetime.utcnow(),
