@@ -16,12 +16,6 @@ def csv_of_bugs(url):
     b = mysite.customs.ohloh.mechanize_get(url)
     return b.response()
 
-# FIXME: Seems redundant given the previous method exists. Remove?
-def sugar_labs_csv_of_easy_bugs():
-    b = mysite.customs.ohloh.mechanize_get(
-        'http://bugs.sugarlabs.org/query?status=new&status=assigned&status=reopened&format=csv&keywords=%7sugar-love&order=priority')
-    return b.response()    
-
 def csv_url2list_of_bug_ids(csv_fd):
     dictreader = csv.DictReader(csv_fd)
     return [int(line['id']) for line in dictreader]
