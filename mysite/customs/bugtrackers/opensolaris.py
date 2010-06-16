@@ -125,40 +125,6 @@ def get_remote_bug_ids_already_stored():
     for bug in Bug.all_bugs.filter(canonical_bug_link__contains=BUG_URL_PREFIX):
         yield bug_url2bug_id(bug.canonical_bug_link)
 
-def grab():
-    """Loops over the OpenSolaris bug tracker's oss-bite-sized bugs and stores/updates them in our DB.
-    For now, just grab the easy bugs to be kind to their servers."""
-    # FIXME: Use update() instead (should this function be removed?)
-
-    bug_ids = itertools.chain(
-        get_remote_bug_ids_to_read(), get_remote_bug_ids_already_stored())
-
-    for bug_id in bug_ids:
-        # Sometimes create_bug_object_for_remote_bug_id will fail to create
-        # a bug because it's somehow gone missing. For those cases:
-
-        # create canonical_bug_link in this function to avoid assuming the
-        # returned bug is not None.
-        canonical_bug_link = BUG_URL_PREFIX + str(bug_id)
-
-        # Try to create a bug. Now, it might return None...
-        bug = create_bug_object_for_remote_bug_id(bug_id)
-
-        # If there is already a bug with this canonical_bug_link in
-        # the DB, just delete it. Same story if the bug doens't 404!
-        bugs_this_one_replaces = Bug.all_bugs.filter(canonical_bug_link=
-                                                     canonical_bug_link)
-        for delete_me in bugs_this_one_replaces:
-            delete_me.delete()
-
-        # If the bug is None, we're done here.
-        if bug is None:
-            continue
-
-        # Otherwise, print and save the sucker!
-        print bug
-        bug.save()
-
 def update():
     """Call this nightly."""
     logging.info("Learning about new bugs in OpenSolaris OS/Net.")
