@@ -54,16 +54,16 @@ def create_bug_object_for_remote_bug_id_if_necessary(remote_bug_id):
     logging.info("Was asked to look at bug %d in OpenSolaris OS/Net" % remote_bug_id)
     try:
         bug = Bug.all_bugs.get(canonical_bug_link=remote_bug_url)
-	if bug.data_is_more_fresh_than_one_day():
-	    return False
+        if bug.data_is_more_fresh_than_one_day():
+            return False
     except Bug.DoesNotExist:
         bug = Bug()
-	bug.canonical_bug_link = remote_bug_url
+        bug.canonical_bug_link = remote_bug_url
     # If we got to here, we either have a new bug or an stale one.
     # So refresh away!
     bug = _update_bug_object_for_remote_bug_id(
         bug_object=bug,
-	remote_bug_id=remote_bug_id)
+        remote_bug_id=remote_bug_id)
     if bug is None:
         # Bug doesn't exist on tracker
         # Bug object not created, so return False
