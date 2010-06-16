@@ -167,7 +167,7 @@ class TracBugTracker(object):
 
         # Hopefully, the bug is so fresh it needs no refreshing.
         if bug.data_is_more_fresh_than_one_day():
-            logging.info("Bug is fresh. Doing nothing!")
+            logging.info("Bug %d from %s is fresh. Doing nothing!" % (bug_id, self.project_name))
             return # sweet
 
         # Okay, fine, we need to actually refresh it.
@@ -180,9 +180,9 @@ class TracBugTracker(object):
             setattr(bug, key, value)
 
         # And save the project onto it
-        project_from_tb, _ = mysite.search.models.Project.objects.get_or_create(name=tb.component)
-        if bug.project_id != project_from_tb.id:
-            bug.project = project_from_tb
+        project_from_name, _ = mysite.search.models.Project.objects.get_or_create(name=self.project_name)
+        if bug.project_id != project_from_name.id:
+            bug.project = project_from_name
         bug.last_polled = datetime.datetime.utcnow()
         bug.save()
         logging.info("Finished with %d from %s." % (bug_id, self.project_name))
@@ -251,7 +251,7 @@ class XiphTrac(TracBugTracker):
 
     def __init__(self):
         TracBugTracker.__init__(self,
-                                project_name='Xiph.Org',
+                                project_name='Xiph',
                                 base_url='http://trac.xiph.org/',
                                 bitesized_keyword='easy') # Unconfirmed, there were no such bugs at the time
 
@@ -276,7 +276,7 @@ class OLPCTrac(TracBugTracker):
                 'http://dev.laptop.org/query?status=assigned&status=new&status=reopened&order=priority&format=csv'))
 
 class DjangoTrac(TracBugTracker):
-    enabled = True
+    enabled = False # Opened' and 'Last modified' fields aren't hyperlinked
 
     def __init__(self):
         TracBugTracker.__init__(self,
@@ -332,7 +332,7 @@ class WarFoundryTrac(TracBugTracker):
                 'http://dev.ibboard.co.uk/projects/warfoundry/query?status=accepted&status=assigned&status=confirmed&status=needinfo&status=needinfo_new&status=new&status=reopened&order=priority&format=csv'))
 
 class FedoraPythonModulesTrac(TracBugTracker):
-    enabled = True
+    enabled = False # 'Opened' and 'Last modified' bug fields aren't hyperlinked
 
     def __init__(self):
         TracBugTracker.__init__(self,
@@ -389,7 +389,7 @@ class TracTrac(TracBugTracker):
                 'http://trac.edgewall.org/query?status=!closed&keywords=~bitesized&format=csv'))
 
 class SSSDTrac(TracBugTracker):
-    enabled = True
+    enabled = False # 'Opened' and 'Last modified' fields aren't hyperlinked
 
     def __init__(self):
         TracBugTracker.__init__(self,

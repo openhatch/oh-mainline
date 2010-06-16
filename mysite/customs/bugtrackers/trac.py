@@ -34,7 +34,8 @@ class TracBug:
         for key_th in key_ths:
             key = key_th.text
             value = key_th.itersiblings().next().text
-            ret[key.strip()] = value.strip()
+            if value is not None:
+                ret[key.strip()] = value.strip()
         return ret
     
     @staticmethod
@@ -93,7 +94,8 @@ class TracBug:
         bug_id = int(num)
         assert ticket == 'ticket'
         return TracBug(bug_id=bug_id,
-                       BASE_URL=base + '/')
+                       BASE_URL=base + '/',
+                       bitesized_keyword='') # Unknown in this context (but this method is only ever used to get the bug id)
 
     def as_bug_specific_url(self):
         return urlparse.urljoin(self.BASE_URL,
@@ -104,7 +106,10 @@ class TracBug:
 
     @cached_property
     def component(self):
-        return self.as_bug_specific_csv_data()['component']
+        try:
+            return self.as_bug_specific_csv_data()['component']
+        except KeyError:
+            return ''
 
     def as_bug_specific_csv_data(self):
         if self._bug_specific_csv_data is None:
@@ -138,10 +143,12 @@ class TracBug:
         trac_data = self.as_bug_specific_csv_data()
         html_data = self.get_parsed_bug_html_page()
 
+        # Seems that some Trac bug trackers don't give all the information below.
+        # For now, just put the offending item inside a try catch and give it a
+        # null case.
         ret = {'title': trac_data['summary'],
                'description': TracBug.string_un_csv(trac_data['description']),
                'status': trac_data['status'],
-               'importance': trac_data['priority'],
                'submitter_username': trac_data['reporter'],
                'submitter_realname': '', # can't find this in Trac
                'canonical_bug_link': self.as_bug_specific_url(),
@@ -151,6 +158,11 @@ class TracBug:
                'as_appears_in_distribution': '',
                'last_polled': datetime.datetime.utcnow(),
                }
+        try:
+            ret['importance'] = trac_data['priority']
+        except KeyError:
+            ret['importance'] = 'N/A'
+
         ret['looks_closed'] = (trac_data['status'] == 'closed')
 
         page_metadata = TracBug.page2metadata_table(html_data)
