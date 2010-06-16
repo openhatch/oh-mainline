@@ -159,20 +159,20 @@ def grab():
         print bug
         bug.save()
 
-    def update():
-        """Call this nightly."""
-        logging.info("Learning about new bugs in OpenSolaris OS/Net.")
-        # Check new bugs first
-        for bug_id in get_remote_bug_ids_to_read():
-            create_bug_object_for_remote_bug_id_if_necessary(bug_id)
-        # Now scan through all bugs and refresh stale ones
-        # This will include the new ones found above, but
-        # since they are fresly added they won't be re-scanned.
-        logging.info("Starting refreshing all bugs from OpenSolaris OS/Net.")
-        count = 0
-        for bug_id in get_remote_bug_ids_already_stored():
-            create_bug_object_for_remote_bug_id_if_necessary(bug_id)
-            count += 1
-        logging.info("Okay, looked at %d bugs from OpenSolaris OS/Net." % count)
+def update():
+    """Call this nightly."""
+    logging.info("Learning about new bugs in OpenSolaris OS/Net.")
+    # Check new bugs first
+    for bug_id in get_remote_bug_ids_to_read():
+        create_bug_object_for_remote_bug_id_if_necessary(bug_id)
+    # Now scan through all bugs and refresh stale ones
+    # This will include the new ones found above, but
+    # since they are fresly added they won't be re-scanned.
+    logging.info("Starting refreshing all bugs from OpenSolaris OS/Net.")
+    count = 0
+    for bug_id in get_remote_bug_ids_already_stored():
+        create_bug_object_for_remote_bug_id_if_necessary(bug_id)
+        count += 1
+    logging.info("Okay, looked at %d bugs from OpenSolaris OS/Net." % count)
 
 # vim: set nu:
