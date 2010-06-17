@@ -17,7 +17,7 @@ Using tar
       <p><a href="{% url mysite.missions.views.main_page %}">Return to the main mission page</a></p>
     {% else %}
       <!-- status: failure -->
-      <p>The tar program creates and unpacks archives called tarballs.  Open source software is commonly released as compressed tarballs, so it is helpful to know how to create them.</p>
+      <p>The tar program creates, unpacks, and manipulates archives called tarballs.  Open source software is commonly released as compressed tarballs, so it is helpful to know how to create them.</p>
       <p>When packaging a project's source code, it is customary to place the files within a directory named after the project with a version number.  This makes creating and unpacking such tarballs convenient, as you only have to name one directory to tar up when creating the tarball, and people who unpack your tarball end up with a self-contained directory that they can easily remove when they are finished using the set of files you gave them.</p>
       <p>Tarballs are not compressed by default; compressing tarballs generally saves significantly on file size, and you can easily have the tar program deal with the compression for you.</p>
       <h2>Your mission</h2>
@@ -48,6 +48,11 @@ Using tar
       <p>Common option letters are <code>v</code> to make tar list the things it is adding as it goes along and <code>z</code> to make tar gzip the tarball for you rather than giving you an uncompressed one.</p>
       <p>If any of the things listed to include in the tarball is a directory, tar will automatically recursively add everything inside the directory too.  This is part of the reason for the convention of using a single wrapper directory, as then that is the only thing you have to explicitly list when creating the tarball.</p>
 
+      <p>Before you send out the tarball you have made, you may want to check what is in it.  That can be done with:
+      <pre>tar <em>[option letters]</em>tf <em>[tarball]</em></pre>
+      <p>This lists what the tarball contains.  Option letter <code>z</code> makes tar transparently un-gzip the tarball, and <code>v</code> shows more detail about the files inside, such as showing their permissions and sizes.</p>
+      <p>Unpacking a tarball works the same way as listing it, except that you use <code>xf</code> instead of <code>tf</code>.</p>
+      <p>There are many more options to tar, which are detailed in tar's documentation.  The ones mentioned here, though, are the most commonly used ones.</p>
     {% endif %}
   </div>
 </div>
