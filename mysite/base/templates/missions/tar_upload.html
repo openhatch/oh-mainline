@@ -20,6 +20,8 @@ Using tar
       <p>The tar program creates, unpacks, and manipulates archives called tarballs.  Open source software is commonly released as compressed tarballs, so it is helpful to know how to create them.</p>
       <p>When packaging a project's source code, it is customary to place the files within a directory named after the project with a version number.  This makes creating and unpacking such tarballs convenient, as you only have to name one directory to tar up when creating the tarball, and people who unpack your tarball end up with a self-contained directory that they can easily remove when they are finished using the set of files you gave them.</p>
       <p>Tarballs are not compressed by default; compressing tarballs generally saves significantly on file size, and you can easily have the tar program deal with the compression for you.</p>
+      <p><a href="http://en.wikipedia.org/wiki/Tar_%28file_format%29">Wikipedia has some good information about the tar program and tarballs.</a></p>
+      <p>If you are running a GNU/Linux distribution, Mac OS X, or another Unix-like operating system, your system almost certainly has the tar program on it already.  If you are running Windows, you can get tar as part of <a href="http://unxutils.sourceforge.net/">UnxUtils</a>, <a href="http://gnuwin32.sourceforge.net/">GnuWin32</a>, <a href="http://www.mingw.org/">MinGW</a>, or <a href="http://www.cygwin.com/">Cygwin</a>.</p>
       <h2>Your mission</h2>
       <p>For you to experiment with creating tarballs, we made a simple project.  It is called "myproject" and is at version 0.1, and it consists of {{ filenames_for_tarball|length }} file{{ filenames_for_tarball|length|pluralize }} which you can download here:</p>
       <ul>
