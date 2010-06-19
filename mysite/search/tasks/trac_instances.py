@@ -7,10 +7,15 @@ import mysite.customs.bugtrackers.trac
 class TracBugTracker(object):
     enabled = False
 
-    def __init__(self, base_url, project_name, bitesized_keyword):
+    def __init__(self, base_url, project_name, bitesized_keyword, bug_project_name_format):
         self.base_url = base_url
         self.project_name = project_name
         self.bitesized_keyword = bitesized_keyword
+        self.bug_project_name_format = bug_project_name_format
+
+    def generate_bug_project_name(self, trac_bug):
+        return self.bug_project_name_format.format(project=self.project_name,
+                                                   component=trac_bug.component)
 
     def update(self):
         logging.info("Started refreshing all %s bugs." % self.project_name)
@@ -60,7 +65,9 @@ class TracBugTracker(object):
             setattr(bug, key, value)
 
         # And save the project onto it
-        project_from_name, _ = mysite.search.models.Project.objects.get_or_create(name=self.project_name)
+        # Project name is taken from either overall project name or individual component name
+        # based on the value of the boolean set in the __init__ method.
+        project_from_name, _ = mysite.search.models.Project.objects.get_or_create(name=self.generate_bug_project_name(tb))
         if bug.project_id != project_from_name.id:
             bug.project = project_from_name
         bug.last_polled = datetime.datetime.utcnow()
@@ -74,7 +81,8 @@ class TahoeLafsTrac(TracBugTracker):
         TracBugTracker.__init__(self,
                                 project_name='Tahoe-LAFS',
                                 base_url='http://tahoe-lafs.org/trac/tahoe-lafs/',
-                                bitesized_keyword='easy')
+                                bitesized_keyword='easy',
+                                bug_project_name_format='{project}')
 
     def generate_list_of_bug_ids_to_look_at(self):
         return mysite.customs.bugtrackers.trac.csv_url2list_of_bug_ids(
@@ -88,7 +96,8 @@ class TwistedTrac(TracBugTracker):
         TracBugTracker.__init__(self,
                                 project_name='Twisted',
                                 base_url='http://twistedmatrix.com/trac/',
-                                bitesized_keyword='easy')
+                                bitesized_keyword='easy',
+                                bug_project_name_format='{project}')
 
     def generate_list_of_bug_ids_to_look_at(self):
         # Just index bitesized bugs
@@ -103,7 +112,8 @@ class SugarLabsTrac(TracBugTracker):
         TracBugTracker.__init__(self,
                                 project_name='Sugar Labs',
                                 base_url='http://bugs.sugarlabs.org/',
-                                bitesized_keyword='sugar-love')
+                                bitesized_keyword='sugar-love',
+                                bug_project_name_format='{component}')
 
     def generate_list_of_bug_ids_to_look_at(self):
         # Just index bitesized bugs
@@ -118,7 +128,8 @@ class StatusNetTrac(TracBugTracker):
         TracBugTracker.__init__(self,
                                 project_name='StatusNet',
                                 base_url='http://status.net/trac/',
-                                bitesized_keyword='easy')
+                                bitesized_keyword='easy',
+                                bug_project_name_format='{project}')
 
     def generate_list_of_bug_ids_to_look_at(self):
         # Only gives a list of bitesized bugs - confirm if devels want all bugs indexed
@@ -133,7 +144,8 @@ class XiphTrac(TracBugTracker):
         TracBugTracker.__init__(self,
                                 project_name='Xiph',
                                 base_url='http://trac.xiph.org/',
-                                bitesized_keyword='easy') # Unconfirmed, there were no such bugs at the time
+                                bitesized_keyword='easy', # Unconfirmed, there were no such bugs at the time
+                                bug_project_name_format='{project}')
 
     def generate_list_of_bug_ids_to_look_at(self):
         # Only gives a list of bitesized bugs - confirm if devels want all bugs indexed
@@ -142,13 +154,14 @@ class XiphTrac(TracBugTracker):
                 'https://trac.xiph.org/query?status=assigned&status=new&status=reopened&order=priority&format=csv&keywords=%7Eeasy'))
 
 class OLPCTrac(TracBugTracker):
-    enabled = True
+    enabled = False # Need to sort out naming for bug projects
 
     def __init__(self):
         TracBugTracker.__init__(self,
                                 project_name='OLPC',
                                 base_url='http://dev.laptop.org/',
-                                bitesized_keyword='easy') # Also uses 'sugar-love'.
+                                bitesized_keyword='easy', # Also uses 'sugar-love'.
+                                bug_project_name_format='{project}')
 
     def generate_list_of_bug_ids_to_look_at(self):
         return mysite.customs.bugtrackers.trac.csv_url2list_of_bug_ids(
@@ -162,7 +175,8 @@ class DjangoTrac(TracBugTracker):
         TracBugTracker.__init__(self,
                                 project_name='Django',
                                 base_url='http://code.djangoproject.com/',
-                                bitesized_keyword='easy')
+                                bitesized_keyword='easy',
+                                bug_project_name_format='{project}')
 
     def generate_list_of_bug_ids_to_look_at(self):
         return mysite.customs.bugtrackers.trac.csv_url2list_of_bug_ids(
@@ -176,7 +190,8 @@ class HelenOSTrac(TracBugTracker):
         TracBugTracker.__init__(self,
                                 project_name='HelenOS',
                                 base_url='http://trac.helenos.org/trac.fcgi/',
-                                bitesized_keyword='easy') # Unconfirmed, there were no such bugs at the time
+                                bitesized_keyword='easy', # Unconfirmed, there were no such bugs at the time
+                                bug_project_name_format='{project}')
 
     def generate_list_of_bug_ids_to_look_at(self):
         return mysite.customs.bugtrackers.trac.csv_url2list_of_bug_ids(
@@ -190,7 +205,8 @@ class Bcfg2Trac(TracBugTracker):
         TracBugTracker.__init__(self,
                                 project_name='Bcfg2',
                                 base_url='https://trac.mcs.anl.gov/projects/bcfg2/',
-                                bitesized_keyword='easy') # Unconfirmed, there were no such bugs at the time
+                                bitesized_keyword='easy', # Unconfirmed, there were no such bugs at the time
+                                bug_project_name_format='{project}')
 
     def generate_list_of_bug_ids_to_look_at(self):
         return mysite.customs.bugtrackers.trac.csv_url2list_of_bug_ids(
@@ -204,7 +220,8 @@ class WarFoundryTrac(TracBugTracker):
         TracBugTracker.__init__(self,
                                 project_name='WarFoundry',
                                 base_url='http://dev.ibboard.co.uk/projects/warfoundry/',
-                                bitesized_keyword='papercut')
+                                bitesized_keyword='papercut',
+                                bug_project_name_format='{project}')
 
     def generate_list_of_bug_ids_to_look_at(self):
         return mysite.customs.bugtrackers.trac.csv_url2list_of_bug_ids(
@@ -218,7 +235,8 @@ class FedoraPythonModulesTrac(TracBugTracker):
         TracBugTracker.__init__(self,
                                 project_name='Fedora Python Modules',
                                 base_url='https://fedorahosted.org/python-fedora/',
-                                bitesized_keyword='')
+                                bitesized_keyword='',
+                                bug_project_name_format='{project}')
 
     def generate_list_of_bug_ids_to_look_at(self):
         return mysite.customs.bugtrackers.trac.csv_url2list_of_bug_ids(
@@ -232,7 +250,8 @@ class AngbandTrac(TracBugTracker):
         TracBugTracker.__init__(self,
                                 project_name='Angband',
                                 base_url='http://trac.rephial.org/',
-                                bitesized_keyword='easy') # Unconfirmed, there were no such bugs at the time
+                                bitesized_keyword='easy', # Unconfirmed, there were no such bugs at the time
+                                bug_project_name_format='{project}')
 
     def generate_list_of_bug_ids_to_look_at(self):
         return mysite.customs.bugtrackers.trac.csv_url2list_of_bug_ids(
@@ -246,7 +265,8 @@ class GHCTrac(TracBugTracker):
         TracBugTracker.__init__(self,
                                 project_name='GHC',
                                 base_url='http://hackage.haskell.org/trac/ghc/',
-                                bitesized_keyword='Easy (less than 1 hour)') # FIXME: Does OH support spaces in keywords?
+                                bitesized_keyword='Easy (less than 1 hour)', # FIXME: Does OH support spaces in keywords?
+                                bug_project_name_format='{project}')
 
     def generate_list_of_bug_ids_to_look_at(self):
         return mysite.customs.bugtrackers.trac.csv_url2list_of_bug_ids(
@@ -260,7 +280,8 @@ class TracTrac(TracBugTracker):
         TracBugTracker.__init__(self,
                                 project_name='Trac',
                                 base_url='http://trac.edgewall.org/',
-                                bitesized_keyword='bitesized')
+                                bitesized_keyword='bitesized',
+                                bug_project_name_format='{project}')
 
     def generate_list_of_bug_ids_to_look_at(self):
         # Just index bitesized bugs
@@ -275,7 +296,8 @@ class SSSDTrac(TracBugTracker):
         TracBugTracker.__init__(self,
                                 project_name='SSSD',
                                 base_url='https://fedorahosted.org/sssd/',
-                                bitesized_keyword='easy') # They actually use the 'trivial' priority setting
+                                bitesized_keyword='easy', # They actually use the 'trivial' priority setting
+                                bug_project_name_format='{project}')
 
     def generate_list_of_bug_ids_to_look_at(self):
         return mysite.customs.bugtrackers.trac.csv_url2list_of_bug_ids(
@@ -289,7 +311,8 @@ class I2PTrac(TracBugTracker):
         TracBugTracker.__init__(self,
                                 project_name='I2P',
                                 base_url='http://trac.i2p2.de/',
-                                bitesized_keyword='easy') # Unconfirmed, there were no such bugs at the time
+                                bitesized_keyword='easy', # Unconfirmed, there were no such bugs at the time
+                                bug_project_name_format='{project}')
 
     def generate_list_of_bug_ids_to_look_at(self):
         return mysite.customs.bugtrackers.trac.csv_url2list_of_bug_ids(
@@ -301,6 +324,9 @@ class I2PTrac(TracBugTracker):
 # Notes:
 # Base URL: the URL of a bug for the bugtracker, without the 'ticket/1234'
 # Tracking URL: go to BASE_URL/query and search for the bugs you want tracked
+# bug_project_name_format: the format to be used for the bug's project name
+# "{project}" will be replaced by project_name, and "{component}" by the
+# component the bug is part of (as taken from the bug's ticket).
 class GenTrac(TracBugTracker):
     enabled = False
 
@@ -308,7 +334,8 @@ class GenTrac(TracBugTracker):
         TracBugTracker.__init__(self,
                                 project_name='',
                                 base_url='',
-                                bitesized_keyword='')
+                                bitesized_keyword='',
+                                bug_project_name_format='')
 
     def generate_list_of_bug_ids_to_look_at(self):
         return mysite.customs.bugtrackers.trac.csv_url2list_of_bug_ids(
