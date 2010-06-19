@@ -95,6 +95,14 @@ For non-vimmers, that will delete the string ' = ' when it appears at the beginn
 
 Then remove those trailing square brackets. You may need to replace South's strange, Pythonesque code for dates, with proper MySQL code.
 
+## To make the profile importer work ##
+
+Profile importing is done using the Celery daemon. Run it using the following command:
+
+    bin/mysite celeryd -c 8
+
+As with the main server, it is a good idea to run this in a separate tab or inside a GNU screen session, rather than in the background.
+
 ## To make the bug importer work ##
 
 At present, there is no inbuilt automation of bug importing (celeryd was causing too many problems). Run the following command to start a bug import:
