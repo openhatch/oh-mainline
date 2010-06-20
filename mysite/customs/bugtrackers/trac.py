@@ -155,7 +155,7 @@ class TracBug:
         try:
             ret['importance'] = trac_data['priority']
         except KeyError:
-            ret['importance'] = 'N/A'
+            ret['importance'] = ''
 
         ret['looks_closed'] = (trac_data['status'] == 'closed')
 
