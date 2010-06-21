@@ -1,9 +1,7 @@
 import datetime
 import logging
+
 import mysite.search.models
-import mysite.customs.models
-from celery.task import Task
-from celery.registry import tasks
 
 def look_at_one_fedora_bug(bug_id):
     logging.info("Was asked to look at bug %d in Fedora" % bug_id)
