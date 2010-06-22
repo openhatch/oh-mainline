@@ -67,3 +67,17 @@ int main(void)
 
 class TarUploadForm(forms.Form):
     tarfile = forms.FileField(error_messages={'required': 'No file was uploaded.'})
+
+class UntarMission(object):
+    TARBALL_NAME = 'ghello-0.4.tar.gz'
+    FILE_WE_WANT = 'ghello-0.4/ghello.c'
+
+    @classmethod
+    def get_tar_path(cls):
+        return os.path.join(os.path.dirname(__file__), 'data', cls.TARBALL_NAME)
+
+    @classmethod
+    def get_contents_we_want(cls):
+        '''Get the data for the file we want from the tarball.'''
+        tfile = tarfile.open(cls.get_tar_path(), mode='r:gz')
+        return tfile.extractfile(tfile.getmember(cls.FILE_WE_WANT)).read()

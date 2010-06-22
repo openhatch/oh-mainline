@@ -1,6 +1,6 @@
 from unittest import TestCase
 from mysite.base.tests import TwillTests
-from mysite.missions.controllers import TarMission, IncorrectTarFile
+from mysite.missions.controllers import TarMission, IncorrectTarFile, UntarMission
 from mysite.missions.views import tar_upload, tar_file_download, main_page
 from mysite.missions.models import StepCompletion, Step
 from mysite.profile.models import Person
@@ -9,6 +9,7 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase as DjangoTestCase
 
 import os
+import tarfile
 
 def make_testdata_filename(filename):
     return os.path.join(os.path.dirname(__file__), 'testdata', filename)
@@ -107,3 +108,14 @@ class MainPageTests(TwillTests):
 
         response = self.client.get(reverse(main_page))
         self.assertEqual(response.context['completed_missions'], {'tar': True})
+
+
+class UntarMissionTests(TestCase):
+
+    def test_tarball_contains_file_we_want(self):
+        tfile = tarfile.open(UntarMission.get_tar_path(), mode='r:gz')
+
+        # Check the file we want contains the right thing.
+        file_we_want = tfile.getmember(UntarMission.FILE_WE_WANT)
+        self.assert_(file_we_want.isfile())
+        self.assertEqual(tfile.extractfile(file_we_want).read(), UntarMission.get_contents_we_want())
