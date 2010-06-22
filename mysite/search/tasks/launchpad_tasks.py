@@ -14,7 +14,9 @@ def refresh_bugs_from_all_indexed_launchpad_projects():
     # TimBL would be proud.
     lpproj2ohproj = { 'lxml': 'lxml',
                       'do': 'GNOME-do',
-                      'gwibber': 'Gwibber'}
+                      'gwibber': 'Gwibber',
+                      'keryx': 'Keryx',
+                     }
     for launchpad_project_name in lpproj2ohproj:
         openhatch_project_name = lpproj2ohproj[launchpad_project_name]
         import_bugs_from_one_project(launchpad_project_name,

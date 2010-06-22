@@ -25,7 +25,7 @@ class RoundupTracker(object):
         assert root_url[-1] == '/'
         assert root_url[-2] != '/'
         self.root_url = unicode(root_url)
-        self.project = mysite.search.models.Project.objects.get(name=project_name)
+        self.project, _ = mysite.search.models.Project.objects.get_or_create(name=project_name)
 
     @staticmethod
     def roundup_tree2metadata_dict(tree):
