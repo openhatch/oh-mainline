@@ -1,5 +1,5 @@
 from mysite.base.decorators import view
-from mysite.missions.controllers import TarMission, TarUploadForm, IncorrectTarFile
+from mysite.missions.controllers import TarMission, TarUploadForm, IncorrectTarFile, UntarMission, TarExtractUploadForm
 from mysite.missions.models import Step, StepCompletion
 
 from django.http import HttpResponseRedirect, HttpResponse, Http404
@@ -40,3 +40,28 @@ def tar_file_download(request, name):
         return response
     else:
         raise Http404
+
+
+def tar_download_tarball_for_extract_mission(request):
+    response = HttpResponse(open(UntarMission.get_tar_path()).read())
+    # force presentation as download
+    response['Content-Disposition'] = 'attachment; filename=%s' % UntarMission.TARBALL_NAME
+    response['Content-Type'] = 'application/octet-stream'
+    return response
+
+@login_required
+@view
+def tar_extract_mission_upload(request):
+    data = {'success': False, 'tarball_name': UntarMission.TARBALL_NAME, 'file_we_want': UntarMission.FILE_WE_WANT}
+    if request.method == 'POST':
+        form = TarExtractUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            if form.cleaned_data['extracted_file'].read() == UntarMission.get_contents_we_want():
+                data['success'] = True
+                StepCompletion.objects.get_or_create(person=request.user.get_profile(), step=Step.objects.get(name='tar_extract'))
+            else:
+                data['what_was_wrong'] = 'The uploaded file does not have the correct contents.'
+        data['form'] = form
+    else:
+        data['form'] = TarExtractUploadForm()
+    return (request, 'missions/tar_extract.html', data)

@@ -81,3 +81,6 @@ class UntarMission(object):
         '''Get the data for the file we want from the tarball.'''
         tfile = tarfile.open(cls.get_tar_path(), mode='r:gz')
         return tfile.extractfile(tfile.getmember(cls.FILE_WE_WANT)).read()
+
+class TarExtractUploadForm(forms.Form):
+    extracted_file = forms.FileField(error_messages={'required': 'No file was uploaded.'})
