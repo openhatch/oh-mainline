@@ -11,17 +11,15 @@ Using tar
 <div class="module">
   <div class="body">
     <h1>Using tar</h1>
-      <p>The tar program creates, unpacks, and manipulates archives called tarballs.  Open source software is commonly released as compressed tarballs, so it is helpful to know how to create them.</p>
+      <p>Open source software is commonly released in the form of archives called <em>tarballs</em>.  The tar program creates, unpacks, and manipulates such archives.</p>
       <p>When packaging a project's source code, it is customary to place the files within a directory named after the project with a version number.  This makes creating and unpacking such tarballs convenient, as you only have to name one directory to tar up when creating the tarball, and people who unpack your tarball end up with a self-contained directory that they can easily remove when they are finished using the set of files you gave them.</p>
-      <p>Tarballs are not compressed by default; compressing tarballs generally saves significantly on file size, and you can easily have the tar program deal with the compression for you.</p>
       <p><a href="http://en.wikipedia.org/wiki/Tar_%28file_format%29">Wikipedia has some good information about the tar program and tarballs.</a></p>
-      <p>If you are running a GNU/Linux distribution, Mac OS X, or another Unix-like operating system, your system almost certainly has the tar program on it already.  If you are running Windows, you can get tar as part of <a href="http://unxutils.sourceforge.net/">UnxUtils</a>, <a href="http://gnuwin32.sourceforge.net/">GnuWin32</a>, <a href="http://www.mingw.org/">MinGW</a>, or <a href="http://www.cygwin.com/">Cygwin</a>.</p>
 
       <p>This mission consists of two parts: unpacking tarballs and creating tarballs.</p>
 
       <h2>Unpacking tarballs</h2>
-      <p>For you to try unpacking existing tarballs, we made a simple project tarball for you.  Download it here: <a href="{% url mysite.missions.views.tar_download_tarball_for_extract_mission %}">{{ tarball_for_unpacking_mission }}</a></p>
-      <p>Your mission is to unpack the tarball and give us back the file "{{ file_we_want }}" from it.  (Note that the tarball is following the conventions mentioned above by using a wrapper directory.)</p>
+      <p>For you to try unpacking existing tarballs, we made a simple project source archive for you, which you can download here: <a href="{% url mysite.missions.views.tar_download_tarball_for_extract_mission %}">{{ tarball_for_unpacking_mission }}</a></p>
+      <p>Your mission is to unpack it and give us back the file "{{ file_we_want }}" from it.  (Note that the tarball is following the conventions mentioned above by using a wrapper directory.)</p>
       <form method="post" enctype="multipart/form-data" action="{% url mysite.missions.views.tar_extract_mission_upload %}#unpack-form">
         <div class="form-row">
           <a name="unpack-form"></a>
@@ -57,7 +55,8 @@ Using tar
           <li><a href="{% url mysite.missions.views.tar_file_download name=filename %}">{{ filename }}</a></li>
         {% endfor %}
       </ul>
-      <p>Your mission is to take those files and give us back a gzipped tarball of them.  Since it's version 0.1 of the "myproject" project, we expect the files to appear in a directory called "myproject-0.1" when the tarball is unpacked.</p>
+      <p></p>
+      <p>Your mission is to take those files and give us back a gzipped tarball of them.  Tar archives are not compressed by default; compressing them generally saves significantly on file size, and you can easily have the tar program deal with the compression for you.  Since it's version 0.1 of the "myproject" project, we expect the files to appear in a directory called "myproject-0.1" when the tarball is unpacked.</p>
       <form method="post" enctype="multipart/form-data" action="{% url mysite.missions.views.tar_upload %}#create-form">
         <div class="form-row">
           <a name="create-form"></a>
@@ -87,16 +86,25 @@ Using tar
       <br style="clear: left;" />
 
       <h2>Hints</h2>
+      <p>If you are running a GNU/Linux distribution, Mac OS X, or another Unix-like operating system, your system almost certainly has the tar program on it already, and you can run it by typing "tar" into a terminal.  If you are running Windows and prefer to try this the Unix way, you can get tar as part of <a href="http://sourceforge.net/projects/mingw/files/MSYS/BaseSystem/msys-1.0.11/MSYS-1.0.11.exe/download">MSYS</a>; many Windows archiving programs, such as <a href="http://www.7-zip.org/">7-Zip</a>, support working with tar archives as well.</p>
       <p>The general way to create a tarball from a set of files and directories is:</p>
       <pre>tar <em>[option letters]</em>cf <em>[tarball]</em> <em>[things to tar up]</em></pre>
-      <p>Common option letters are <code>v</code> to make tar list the things it is adding as it goes along and <code>z</code> to make tar gzip the tarball for you rather than giving you an uncompressed one.</p>
+      <p>(The <code>c</code> stands for <strong>c</strong>reate, and the <code>f</code> means that the next argument is the <strong>f</strong>ile you want tar to work with.)</p>
+      <p>Common option letters are <code>v</code> (<strong>v</strong>erbose) to make tar list the things it is adding as it goes along and <code>z</code> to make tar g<strong>z</strong>ip the tarball for you rather than giving you an uncompressed one.</p>
       <p>If any of the things listed to include in the tarball is a directory, tar will automatically recursively add everything inside the directory too.  This is part of the reason for the convention of using a single wrapper directory, as then that is the only thing you have to explicitly list when creating the tarball.</p>
 
-      <p>Before you send out the tarball you have made, you may want to check what is in it.  That can be done with:
-      <pre>tar <em>[option letters]</em>tf <em>[tarball]</em></pre>
-      <p>This lists what the tarball contains.  Option letter <code>z</code> makes tar transparently un-gzip the tarball, and <code>v</code> shows more detail about the files inside, such as showing their permissions and sizes.</p>
-      <p>Unpacking a tarball works the same way as listing it, except that you use <code>xf</code> instead of <code>tf</code>.  So the command would look something like:</p>
+      <p>To unpack a tarball:</p>
       <pre>tar <em>[option letters]</em>xf <em>[tarball]</em></pre>
+      <p>(The <code>x</code> stands for e<strong>x</strong>tract.)</p>
+      <p>The tarball's contents are placed into the current directory.  Option letter <code>z</code> makes tar transparently un-gzip the tarball, and <code>v</code> shows the filenames as tar unpacks them.</p>
+
+      <p>Listing a tarball works the same way as unpacking it, except that you use <code>tf</code> instead of <code>xf</code>.  So the command would look something like:</p>
+      <pre>tar <em>[option letters]</em>tf <em>[tarball]</em></pre>
+      <p>(The <code>t</code> stands for lis<strong>t</strong>.  Go figure.)</p>
+      <p>Option letter <code>v</code>, which would otherwise be redundant because tar is already listing the contents as it examines the tarball, shows more details (such as permissions and sizes) about the files inside.<p>
+
+      <p>It is generally a good idea to try unpacking or listing a tarball you are about to send out so you can verify that it really contains what you wanted.</p>
+
       <p>There are many more options to tar, which are detailed in tar's documentation.  The ones mentioned here, though, are the most commonly used ones.</p>
       <p><a href="{% url mysite.missions.views.main_page %}">Return to the main mission page</a></p>
   </div>
