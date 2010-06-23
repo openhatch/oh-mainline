@@ -23,6 +23,11 @@ urlpatterns = patterns('',
 
         (r'^\+project_icon_poll/(?P<project_name>.+)', 'mysite.search.views.project_has_icon'),
 
+        (r'^\+unsubscribe/(?P<token_string>.+)', 'mysite.profile.views.unsubscribe'),
+
+        (r'^-profile.views.unsubscribe_do',
+            'mysite.profile.views.unsubscribe_do'),
+
         (r'^\+projects/suggest_question/',
             'mysite.project.views.suggest_question'),
 

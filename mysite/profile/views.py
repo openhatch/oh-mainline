@@ -1075,4 +1075,18 @@ def set_pfentries_dot_use_my_description_do(request):
                 request.user.get_profile(), pfe_before_save.__dict__, pfe_after_save.__dict__))
     return HttpResponseRedirect(project.get_url())
 
+@view
+def unsubscribe(request, token_string):
+    context = {'unsubscribe_this_user':
+            mysite.profile.models.UnsubscribeToken.whose_token_string_is_this(token_string),
+            'token_string': token_string}
+    return (request, 'unsubscribe.html', context)
+
+def unsubscribe_do(request):
+    token_string = request.POST.get('token_string', None)
+    person = mysite.profile.models.UnsubscribeToken.whose_token_string_is_this(token_string)
+    person.email_me_weekly_re_projects = False
+    person.save()
+    return HttpResponseRedirect(reverse(unsubscribe, kwargs={'token_string': token_string}))
+
 # vim: ai ts=3 sts=4 et sw=4 nu
