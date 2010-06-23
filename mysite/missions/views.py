@@ -1,5 +1,5 @@
 from mysite.base.decorators import view
-from mysite.missions.controllers import TarMission, TarUploadForm, IncorrectTarFile, UntarMission, TarExtractUploadForm
+from mysite.missions.controllers import TarMission, TarUploadForm, IncorrectTarFile, UntarMission, TarExtractUploadForm, mission_completed
 from mysite.missions.models import Step, StepCompletion
 
 from django.http import HttpResponseRedirect, HttpResponse, Http404
@@ -38,7 +38,9 @@ def tar_mission(request, passed_data={}):
       'unpack_form': TarExtractUploadForm(),
       'unpack_success': False,
       'tarball_for_unpacking_mission': UntarMission.TARBALL_NAME,
-      'file_we_want': UntarMission.FILE_WE_WANT
+      'file_we_want': UntarMission.FILE_WE_WANT,
+      'create_done': mission_completed(request.user.get_profile(), 'tar'),
+      'unpack_done': mission_completed(request.user.get_profile(), 'tar_extract')
     }
     data.update(passed_data)
     return (request, 'missions/tar_upload.html', data)

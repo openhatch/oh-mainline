@@ -42,6 +42,10 @@ Using tar
           <br style="clear: left;" />
           {{ unpack_form.extracted_file }}
           <input type="submit" value="Upload" style="float: none;" />
+          {% if unpack_done %}
+          <br style="clear: left;" />
+          <em>You have already completed this part of the mission.</em>
+          {% endif %}
         </div>
       </form>
       <br style="clear: left;" />
@@ -74,6 +78,10 @@ Using tar
           <br style="clear: left;" />
           {{ create_form.tarfile }}
           <input type="submit" value="Upload" style="float: none;" />
+          {% if create_done %}
+          <br style="clear: left;" />
+          <em>You have already completed this part of the mission.</em>
+          {% endif %}
         </div>
       </form>
       <br style="clear: left;" />
