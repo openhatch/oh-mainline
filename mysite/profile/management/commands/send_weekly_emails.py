@@ -70,10 +70,10 @@ class Command(BaseCommand):
                 # FIXME: Create a plain-text version of this message
                 print "Emailing %s their weekly project activity." % person.user.email
                 email = EmailMultiAlternatives(
-                        subject="News from your OpenHatch projects [%s]" % uuid.uuid4().hex,
+                        subject="News from your OpenHatch projects",
                         body=message_in_plain_text,
                         from_email="\"OpenHatch Mail-Bot\" <hello+mailbot@openhatch.org>",
-                        #headers={'X-Said-By': 'She'},
+                        # headers={ 'X-Notion': "I'm feeling a lot less evil now.", },
                         to=[person.user.email])
                 email.attach_alternative(message_in_html, "text/html")
                 email.send()
