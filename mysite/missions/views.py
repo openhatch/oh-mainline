@@ -13,22 +13,34 @@ def main_page(request):
     return (request, 'missions/main.html', {'completed_missions': completed_missions})
 
 @login_required
-@view
 def tar_upload(request):
-    data = {'success': False, 'what_was_wrong_with_the_tarball': ''}
+    data = {}
     if request.method == 'POST':
         form = TarUploadForm(request.POST, request.FILES)
         if form.is_valid():
             try:
                 TarMission.check_tarfile(form.cleaned_data['tarfile'].read())
-                data['success'] = True
+                data['create_success'] = True
                 StepCompletion.objects.get_or_create(person=request.user.get_profile(), step=Step.objects.get(name='tar'))
             except IncorrectTarFile, e:
                 data['what_was_wrong_with_the_tarball'] = str(e)
-        data['form'] = form
-    else:
-        data['form'] = TarUploadForm()
-    data['filenames_for_tarball'] = TarMission.FILES.keys()
+        data['create_form'] = form
+    return tar_mission(request, data)
+
+@login_required
+@view
+def tar_mission(request, passed_data={}):
+    data = {
+      'create_success': False,
+      'what_was_wrong_with_the_tarball': '',
+      'filenames_for_tarball': TarMission.FILES.keys(),
+      'create_form': TarUploadForm(),
+      'unpack_form': TarExtractUploadForm(),
+      'unpack_success': False,
+      'tarball_for_unpacking_mission': UntarMission.TARBALL_NAME,
+      'file_we_want': UntarMission.FILE_WE_WANT
+    }
+    data.update(passed_data)
     return (request, 'missions/tar_upload.html', data)
 
 def tar_file_download(request, name):
@@ -50,18 +62,15 @@ def tar_download_tarball_for_extract_mission(request):
     return response
 
 @login_required
-@view
 def tar_extract_mission_upload(request):
-    data = {'success': False, 'tarball_name': UntarMission.TARBALL_NAME, 'file_we_want': UntarMission.FILE_WE_WANT}
+    data = {}
     if request.method == 'POST':
         form = TarExtractUploadForm(request.POST, request.FILES)
         if form.is_valid():
             if form.cleaned_data['extracted_file'].read() == UntarMission.get_contents_we_want():
-                data['success'] = True
+                data['unpack_success'] = True
                 StepCompletion.objects.get_or_create(person=request.user.get_profile(), step=Step.objects.get(name='tar_extract'))
             else:
-                data['what_was_wrong'] = 'The uploaded file does not have the correct contents.'
-        data['form'] = form
-    else:
-        data['form'] = TarExtractUploadForm()
-    return (request, 'missions/tar_extract.html', data)
+                data['what_was_wrong_with_the_extracted_file'] = 'The uploaded file does not have the correct contents.'
+        data['unpack_form'] = form
+    return tar_mission(request, data)

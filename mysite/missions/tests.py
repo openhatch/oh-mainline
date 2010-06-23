@@ -75,19 +75,19 @@ class TarUploadTests(TwillTests):
 
     def test_tar_upload_good(self):
         response = self.client.post(reverse(views.tar_upload), {'tarfile': open(make_testdata_filename('good.tar.gz'))})
-        self.assert_('status: success' in response.content)
+        self.assert_('create status: success' in response.content)
 
         paulproteus = Person.objects.get(user__username='paulproteus')
         self.assertEqual(len(StepCompletion.objects.filter(step__name='tar', person=paulproteus)), 1)
 
         # Make sure that nothing weird happens if it is submitted again.
         response = self.client.post(reverse(views.tar_upload), {'tarfile': open(make_testdata_filename('good.tar.gz'))})
-        self.assert_('status: success' in response.content)
+        self.assert_('create status: success' in response.content)
         self.assertEqual(len(StepCompletion.objects.filter(step__name='tar', person=paulproteus)), 1)
 
     def test_tar_upload_bad(self):
         response = self.client.post(reverse(views.tar_upload), {'tarfile': open(make_testdata_filename('bad-1.tar.gz'))})
-        self.assert_('status: failure' in response.content)
+        self.assert_('create status: failure' in response.content)
 
         paulproteus = Person.objects.get(user__username='paulproteus')
         self.assertEqual(len(StepCompletion.objects.filter(step__name='tar', person=paulproteus)), 0)
@@ -138,7 +138,7 @@ class UntarViewTests(TwillTests):
         tfile = tarfile.open(fileobj=StringIO(download_response.content), mode='r:gz')
         contents_it_wants = tfile.extractfile(tfile.getmember(UntarMission.FILE_WE_WANT))
         upload_response = self.client.post(reverse(views.tar_extract_mission_upload), {'extracted_file': contents_it_wants})
-        self.assert_('status: success' in upload_response.content)
+        self.assert_('unpack status: success' in upload_response.content)
 
         paulproteus = Person.objects.get(user__username='paulproteus')
         self.assertEqual(len(StepCompletion.objects.filter(step__name='tar_extract', person=paulproteus)), 1)
@@ -148,7 +148,7 @@ class UntarViewTests(TwillTests):
         bad_file.name = os.path.basename(UntarMission.FILE_WE_WANT)
         upload_response = self.client.post(reverse(views.tar_extract_mission_upload),
                                            {'extracted_file': bad_file})
-        self.assert_('status: failure' in upload_response.content)
+        self.assert_('unpack status: failure' in upload_response.content)
 
         paulproteus = Person.objects.get(user__username='paulproteus')
         self.assertEqual(len(StepCompletion.objects.filter(step__name='tar_extract', person=paulproteus)), 0)

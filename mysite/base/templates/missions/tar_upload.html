@@ -1,5 +1,6 @@
 {% extends 'base/one_column.html' %}
 
+{% block body_id %}missions{% endblock body_id %}
 {% block body_class %}{{ block.super }} beta{% endblock body_class %}
 
 {% block title %}
@@ -10,35 +11,68 @@ Using tar
 <div class="module">
   <div class="body">
     <h1>Using tar</h1>
-    {% if success %}
-      <!-- status: success -->
-      <p><strong>You have successfully completed this mission.</strong></p>
-      <p>The file you uploaded passed all of our checks.</p>
-      <p><a href="{% url mysite.missions.views.main_page %}">Return to the main mission page</a></p>
-    {% else %}
-      <!-- status: failure -->
       <p>The tar program creates, unpacks, and manipulates archives called tarballs.  Open source software is commonly released as compressed tarballs, so it is helpful to know how to create them.</p>
       <p>When packaging a project's source code, it is customary to place the files within a directory named after the project with a version number.  This makes creating and unpacking such tarballs convenient, as you only have to name one directory to tar up when creating the tarball, and people who unpack your tarball end up with a self-contained directory that they can easily remove when they are finished using the set of files you gave them.</p>
       <p>Tarballs are not compressed by default; compressing tarballs generally saves significantly on file size, and you can easily have the tar program deal with the compression for you.</p>
       <p><a href="http://en.wikipedia.org/wiki/Tar_%28file_format%29">Wikipedia has some good information about the tar program and tarballs.</a></p>
       <p>If you are running a GNU/Linux distribution, Mac OS X, or another Unix-like operating system, your system almost certainly has the tar program on it already.  If you are running Windows, you can get tar as part of <a href="http://unxutils.sourceforge.net/">UnxUtils</a>, <a href="http://gnuwin32.sourceforge.net/">GnuWin32</a>, <a href="http://www.mingw.org/">MinGW</a>, or <a href="http://www.cygwin.com/">Cygwin</a>.</p>
-      <h2>Your mission</h2>
-      <p>For you to experiment with creating tarballs, we made a simple project.  It is called "myproject" and is at version 0.1, and it consists of {{ filenames_for_tarball|length }} file{{ filenames_for_tarball|length|pluralize }} which you can download here:</p>
+
+      <p>This mission consists of two parts: unpacking tarballs and creating tarballs.</p>
+
+      <h2>Unpacking tarballs</h2>
+      <p>For you to try unpacking existing tarballs, we made a simple project tarball for you.  Download it here: <a href="{% url mysite.missions.views.tar_download_tarball_for_extract_mission %}">{{ tarball_for_unpacking_mission }}</a></p>
+      <p>Your mission is to unpack the tarball and give us back the file "{{ file_we_want }}" from it.  (Note that the tarball is following the conventions mentioned above by using a wrapper directory.)</p>
+      <form method="post" enctype="multipart/form-data" action="{% url mysite.missions.views.tar_extract_mission_upload %}#unpack-form">
+        <div class="form-row">
+          <a name="unpack-form"></a>
+          After you extract that file, upload it here:
+    {% if unpack_success %}
+      <!-- unpack status: success -->
+      <div class="successmsg">
+        <p><strong>You have successfully completed this part of the mission.</strong></p>
+        <p>The file you uploaded has the correct contents.</p>
+      </div>
+    {% else %}
+      <!-- unpack status: failure -->
+    {% endif %}
+          {% if what_was_wrong_with_the_extracted_file %}
+          <ul class="errorlist"><li>{{ what_was_wrong_with_the_extracted_file }}</li></ul>
+          {% endif %}
+          {{ unpack_form.extracted_file.errors }}
+          <br style="clear: left;" />
+          {{ unpack_form.extracted_file }}
+          <input type="submit" value="Upload" style="float: none;" />
+        </div>
+      </form>
+      <br style="clear: left;" />
+
+      <h2>Creating tarballs</h2>
+      <p>Now that you know how to unpack tarballs, we made another simple project so you can experiment with creating them.  It is called "myproject" and is at version 0.1, and it consists of {{ filenames_for_tarball|length }} file{{ filenames_for_tarball|length|pluralize }} which you can download here:</p>
       <ul>
         {% for filename in filenames_for_tarball %}
           <li><a href="{% url mysite.missions.views.tar_file_download name=filename %}">{{ filename }}</a></li>
         {% endfor %}
       </ul>
       <p>Your mission is to take those files and give us back a gzipped tarball of them.  Since it's version 0.1 of the "myproject" project, we expect the files to appear in a directory called "myproject-0.1" when the tarball is unpacked.</p>
-      <form method="post" enctype="multipart/form-data" action="{% url mysite.missions.views.tar_upload %}">
+      <form method="post" enctype="multipart/form-data" action="{% url mysite.missions.views.tar_upload %}#create-form">
         <div class="form-row">
+          <a name="create-form"></a>
           After you make the tarball, upload it here:
+    {% if create_success %}
+      <!-- create status: success -->
+      <div class="successmsg">
+        <p><strong>You have successfully completed this part of the mission.</strong></p>
+        <p>The file you uploaded passed all of our checks.</p>
+      </div>
+    {% else %}
+      <!-- create status: failure -->
+    {% endif %}
           {% if what_was_wrong_with_the_tarball %}
           <ul class="errorlist"><li>{{ what_was_wrong_with_the_tarball }}</li></ul>
           {% endif %}
-          {{ form.tarfile.errors }}
+          {{ create_form.tarfile.errors }}
           <br style="clear: left;" />
-          {{ form.tarfile }}
+          {{ create_form.tarfile }}
           <input type="submit" value="Upload" style="float: none;" />
         </div>
       </form>
@@ -53,9 +87,10 @@ Using tar
       <p>Before you send out the tarball you have made, you may want to check what is in it.  That can be done with:
       <pre>tar <em>[option letters]</em>tf <em>[tarball]</em></pre>
       <p>This lists what the tarball contains.  Option letter <code>z</code> makes tar transparently un-gzip the tarball, and <code>v</code> shows more detail about the files inside, such as showing their permissions and sizes.</p>
-      <p>Unpacking a tarball works the same way as listing it, except that you use <code>xf</code> instead of <code>tf</code>.</p>
+      <p>Unpacking a tarball works the same way as listing it, except that you use <code>xf</code> instead of <code>tf</code>.  So the command would look something like:</p>
+      <pre>tar <em>[option letters]</em>xf <em>[tarball]</em></pre>
       <p>There are many more options to tar, which are detailed in tar's documentation.  The ones mentioned here, though, are the most commonly used ones.</p>
-    {% endif %}
+      <p><a href="{% url mysite.missions.views.main_page %}">Return to the main mission page</a></p>
   </div>
 </div>
 {% endblock main %}
