@@ -69,7 +69,7 @@ class Command(BaseCommand):
                 # FIXME: Create a plain-text version of this message
                 print "Emailing %s their weekly project activity." % person.user.email
                 email = EmailMultiAlternatives(
-                        subject="News from your OpenHatch projects~ [%s]" % person.user.username,
+                        subject="News from your OpenHatch projects [%s]" % uuid.uuid4().hex,
                         body=message_in_plain_text,
                         from_email="\"OpenHatch Mail-Bot\" <hello+mailbot@openhatch.org>",
                         #headers={'X-Said-By': 'She'},
