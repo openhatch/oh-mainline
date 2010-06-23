@@ -8,6 +8,7 @@ from django.template.loader import render_to_string
 from mysite.search.models import WannaHelperNote
 import datetime
 import logging
+import html2text 
 
 def push_to_end_of_list(an_object, a_list):
     try:
@@ -76,8 +77,24 @@ class Command(BaseCommand):
         context = self.get_context_for_weekly_email_to(recipient)
         if context is None:
             return None, None
-        message_in_plain_text = "plain text goes here" #FIXME
-        message_in_html = render_to_string('weekly_email_re_projects.html', context)
+
+        # Create two slightly different template contexts
+
+        plain_context = context.copy()
+        rich_context = context.copy()
+
+        plain_context['rich_text'] = False
+        rich_context['rich_text'] = True
+
+        message_in_simpler_html = render_to_string('weekly_email_re_projects.html', plain_context)
+        message_in_html = render_to_string('weekly_email_re_projects.html', rich_context)
+        
+        # message_in_simpler_html is a string of HTML we've hand-tuned so that
+        # when it is converted into Markdown it looks good in an email
+        html2text.BODY_WIDTH = 72 # good for emails
+        to_markdown = html2text.html2text
+        message_in_plain_text = to_markdown(message_in_simpler_html)
+        
         return message_in_plain_text, message_in_html
 
     @staticmethod

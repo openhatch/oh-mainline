@@ -98,6 +98,8 @@ def urlize_without_escaping_percent_signs(text, trim_url_limit=None, nofollow=Fa
 
     If autoescape is True, the link text and URLs will get autoescaped.
     """
+    # I think this is a copy of a function in django.utils.html with one minor
+    # change; see the comment below.
 
     trim_url = lambda x, limit=trim_url_limit: limit is not None and (len(x) > limit and ('%s...' % x[:max(0, limit - 3)])) or x
     safe_input = isinstance(text, SafeData)

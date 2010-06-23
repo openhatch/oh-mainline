@@ -7,8 +7,13 @@
                     {% for person in truncated_list_of_people %}
                         {% ifequal person.user.username recipient.user.username %}
 
-                            {% if rich_text %} and {% endif %}
-                            <strong>you</strong>.
+                            {% if rich_text %} and <strong>{% endif %}
+
+                            {% if not rich_text %} <li> {% endif %}
+                            <span>you</span>
+                            {% if not rich_text %} </li> {% endif %}
+
+                            {% if rich_text %} </strong><span>.</span> {% endif %}
 
                         {% else %}
 
@@ -30,12 +35,14 @@
                                 </a>
                             </strong>
                             {% endif %}
+
                             {% if not rich_text %}
-                            <http://openhatch.org{{ person.profile_url }}>
+                            &lt;http://openhatch.org{{ person.profile_url }}&gt;
                             {% endif %}
 
                             {% endwith %}
-                            {% if forloop.last %}
+
+                            {% if rich_text and forloop.last %}
                                 <span>&hellip;</span>
                             {% endif %}
 
@@ -47,8 +54,16 @@
                     {% endfor %}
                 {% endspaceless %}
 
+                {% if rich_text %}
+                (<a href='http://openhatch.org/people/?q=project:"{{ project_name|urlencode }}"'>{{ people_count }} total this week</a>)
+                {% else %}
+                <li>
+                {{ people_count }} total this week
+                &lt;http://openhatch.org/people/?q=project:{{ project_name|urlencode }}&gt;
+                </li>
+                {% endif %}
+
                 {% if not rich_text %}
                 </ul>
                 {% endif %}
 
-                (<a href='http://openhatch.org/people/?q=project:"{{ project_name|urlencode }}"'>{{ people_count }} total this week</a>)
