@@ -1,0 +1,11 @@
+<p>
+{% if unsubscribe_this_user.email_me_weekly_re_projects %}
+You are no longer signed up to receive periodic emails from OpenHatch about activity in your projects. You can change this in <a href='{% url mysite.account.views.edit_contact_info %}'>your settings page</a>.
+{% else %}
+This page allows you to unsubscribe from periodic emails from OpenHatch about activity in your projects.
+{% endif %}
+</p>
+<form method='POST' action='{% url mysite.profile.views.unsubscribe_do %}'>
+    <input type='hidden' name='token_string' value='{{ token_string }}'>
+    <input type='submit' value='Unsubscribe' >
+</form>
