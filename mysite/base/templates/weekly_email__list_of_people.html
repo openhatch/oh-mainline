@@ -55,10 +55,10 @@
                 {% endspaceless %}
 
                 {% if rich_text %}
-                (<a href='http://openhatch.org/people/?q=project:"{{ project_name|urlencode }}"'>{{ people_count }} total this week</a>)
+                (<a href='http://openhatch.org/people/?q=project:"{{ project_name|urlencode }}"'>{{ people_count }} total</a>)
                 {% else %}
                 <li>
-                {{ people_count }} total this week
+                {{ people_count }} total
                 &lt;http://openhatch.org/people/?q=project:{{ project_name|urlencode }}&gt;
                 </li>
                 {% endif %}

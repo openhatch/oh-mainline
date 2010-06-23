@@ -8,7 +8,9 @@ a { text-decoration: none; }
 .people_type { margin-top: 1em; }
 </style>
 <p>Hi {% firstof recipient.user.first_name recipient.user.username %}!</p>
-<p>Here's what happened in your projects in the last week on OpenHatch:</p>
+
+<p>Here's a summary of what's happened in your projects on OpenHatch. We'll
+send you these updates every once in a while (at most once weekly).</p>
 
 <dl>
     {% for project_name, ppl_data in project_name2people %}
