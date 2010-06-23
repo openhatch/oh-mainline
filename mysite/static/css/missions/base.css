@@ -1,0 +1,8 @@
+body#missions .successmsg {
+  background-color: #e4ffc0;
+  margin: 10px 0px;
+  padding: 5px 10px;
+  -moz-border-radius: 5px 5px 5px 5px;
+  -webkit-border-radius: 5px 5px 5px 5px;
+  border-radius: 5px 5px 5px 5px;
+}
