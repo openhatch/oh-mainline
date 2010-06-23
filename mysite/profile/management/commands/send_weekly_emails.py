@@ -10,6 +10,9 @@ import datetime
 import logging
 import html2text 
 
+from django.core.urlresolvers import reverse
+import mysite.profile.views
+
 def push_to_end_of_list(an_object, a_list):
     try:
         a_list.remove(an_object)
@@ -66,7 +69,7 @@ class Command(BaseCommand):
                 # FIXME: Create a plain-text version of this message
                 print "Emailing %s their weekly project activity." % person.user.email
                 email = EmailMultiAlternatives(
-                        subject="News from your OpenHatch projects (%s)" % person.user.username,
+                        subject="News from your OpenHatch projects [%s]" % person.user.username,
                         body=message_in_plain_text,
                         from_email="\"OpenHatch Mail-Bot\" <hello+mailbot@openhatch.org>",
                         #headers={'X-Said-By': 'She'},
@@ -171,4 +174,8 @@ class Command(BaseCommand):
 
         context['recipient'] = recipient
         context['project_name2people'] = project_name2people
+        token_string = recipient.generate_new_unsubscribe_token().string
+        context['unsubscribe_link'] = "http://openhatch.org" + reverse(
+                mysite.profile.views.unsubscribe, 
+                kwargs={'token_string': token_string})
         return context 

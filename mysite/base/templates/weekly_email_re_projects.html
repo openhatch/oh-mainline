@@ -112,13 +112,12 @@
 
         <p>
         ---<br>
-        To unsubscribe, visit your settings 
+        To stop receiving email like this,
         {% if rich_text %}
-        at
-        <a href='http://openhatch.org{% url mysite.account.views.edit_contact_info %}'>http://openhatch.org{% url mysite.account.views.edit_contact_info %}</a>.
+        <a href='{{ unsubscribe_link }}'>click here</a>.
         {% else %}
-        here:<br>
-        &lt;http://openhatch.org{% url mysite.account.views.edit_contact_info %}&gt;.
+        click here:
+        &lt;{{ unsubscribe_link }}&gt;.
         {% endif %}
         </p>
     </body>
