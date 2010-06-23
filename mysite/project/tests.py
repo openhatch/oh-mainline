@@ -1,4 +1,4 @@
-from mysite.base.tests import make_twill_url, TwillTests, twill_go
+from mysite.base.tests import make_twill_url, TwillTests
 import mysite.project.controllers
 from mysite.base.helpers import ObjectFromDict
 import mysite.account.tests
@@ -333,7 +333,7 @@ class DecideWhichProjectDescriptionsAppearOnProjectPage(TwillTests):
 
         # Go to the project page.
         url = urlparse.urljoin("http://openhatch.org", project.get_edit_page_url())
-        twill_go(url)
+        tc.go(better_make_twill_url(url))
 
         # In preparation for the next set of assertions, make sure that the
         # entries don't have the same description.
