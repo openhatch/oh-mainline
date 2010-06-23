@@ -324,7 +324,8 @@ class Unsubscribe(TwillTests):
 
         # Generate a valid token
         valid_token_string = dude.generate_new_unsubscribe_token().string
-        twill_goto_view(mysite.profile.views.unsubscribe, kwargs={'token_string': valid_token_string})
+        twill_goto_view(mysite.profile.views.unsubscribe,
+                kwargs={'token_string': valid_token_string})
         tc.submit()
         self.assertFalse(get_dude().email_me_weekly_re_projects)
 
