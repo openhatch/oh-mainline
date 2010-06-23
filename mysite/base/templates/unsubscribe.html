@@ -1,10 +1,48 @@
+{% extends 'base/one_column.html' %}
+
+{% block main %}
+
+<style type='text/css'>
+    p, input { font-family: Comic Sans MS; }
+    p { margin-top: 0;}
+    p:last-child { margin-bottom: 0;}
+</style>
+
+<div class='module'>
+    <div class='body' style='font-size: 1.3em;'>
+
+        {% if unsubscribe_this_user %}
+
+        <p>
+{% if unsubscribe_this_user.email_me_weekly_re_projects %}
+Hi
+{% endif %}
+{% firstof unsubscribe_this_user.user.first_name unsubscribe_this_user.user.username %},
+</p>
+
 {% if unsubscribe_this_user.email_me_weekly_re_projects %}
 <p> This page allows you to unsubscribe from periodic emails from OpenHatch about activity in your projects. </p>
 
 <form method='POST' action='{% url mysite.profile.views.unsubscribe_do %}'>
     <input type='hidden' name='token_string' value='{{ token_string }}'>
-    <input type='submit' value='Unsubscribe' >
+    <input type='submit' value='Unsubscribe and be free' >
 </form>
 {% else %}
 <p> You are no longer signed up to receive periodic emails from OpenHatch about activity in your projects. You can change this in <a href='{% url mysite.account.views.edit_contact_info %}'>your settings page</a>. </p>
 {% endif %}
+
+{% else %}
+
+<p> Oops, this particular unsubscribe link doesn't work. Try emailing us at <a href='mailto:hello@openhatch.org'>hello@openhatch.org</a>. </p>
+
+<p>
+Why are you seeing this page?, you ask. Well, we couldn't find anyone corresponding to the token <code> {{ token_string }}</code>. Possible explanations: the token string is too old (they expire after a few months); we screwed up somewhere; you were fooling with the URL, bravo.
+</p>
+
+{% endif %}
+
+
+</div>
+</div>
+
+{% endblock main %}
