@@ -253,4 +253,15 @@ class EnhanceNextWithNewUserMetadata(TwillTests):
         got = mysite.base.templatetags.base_extras.enhance_next_to_annotate_it_with_newuser_is_true(sample_input)
         self.assertEqual(wanted, got)
 
+class Unsubscribe(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def test_verify_unsubscribe_token(self):
+        """Generate a valid unsubscribe token. Use it. See that it works. Use
+        an invalid one. See that it doesn't work."""
+        dude = mysite.profile.models.Person.objects.get(user__username='paulproteus')
+        token = dude.generate_new_unsubscribe_token()
+        owner = mysite.base.models.Unsubscribe.whose_token_is_this(token)
+        self.assertEqual(owner, dude)
+
 # vim: set ai et ts=4 sw=4 nu:
