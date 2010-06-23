@@ -13,7 +13,6 @@ import mysite.profile as profile
 import mysite.account
 import mysite.profile.controllers
 import mysite.account.forms
-from mysite.profile.views import display_person_web
 from mysite.base.decorators import view
 import mysite.customs.feed
 import mysite.search.controllers
