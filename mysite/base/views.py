@@ -231,6 +231,6 @@ def test_weekly_email_re_projects(request):
     command.this_run_covers_things_up_until = datetime.datetime.utcnow()
     context = command.get_context_for_weekly_email_to(request.user.get_profile()) or {}
     if context:
-        return mysite.base.decorators.as_view(request, 'weekly_email_re_projects.txt', context, "test_weekly_email_re_projects")
+        return mysite.base.decorators.as_view(request, 'weekly_email_re_projects.html', context, "test_weekly_email_re_projects")
     else:
         return HttpResponse("(We couldn't find any recent project activity for you, so you wouldn't get an email updating you about it.)")
