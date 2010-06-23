@@ -23,7 +23,15 @@
         per week. (To unsubscribe, see the footer.) Let us know what you think
         &mdash; just hit reply. </p>
 
-        <p>To add or remove projects,
+        <p>These are the recently active projects listed on your
+        {% if rich_text %}
+        <a href='http://openhatch.org{{ recipient.profile_url }}'>
+            profile</a>.
+        {% else %}
+        profile &lt;http://openhatch.org{{ recipient.profile_url }}&gt;.
+        {% endif %}
+        
+        To add or remove projects,
         {% if rich_text %}
         <a href='http://openhatch.org{% url mysite.profile.views.importer %}'>
             edit your profile</a>.

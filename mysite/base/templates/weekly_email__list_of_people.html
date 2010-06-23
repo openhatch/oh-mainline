@@ -13,15 +13,9 @@
 
                         {% ifequal person.user.username recipient.user.username %}
 
-                            {% if rich_text %}
-                                <em>
-                            {% endif %}
-
                             {% if not rich_text %} <li> {% endif %}
-                            <span>you</span>
+                            <span>You</span>
                             {% if not rich_text %} </li> {% endif %}
-
-                            {% if rich_text %} </em><span>.</span> {% endif %}
 
                         {% else %}
 
