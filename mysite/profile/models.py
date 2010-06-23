@@ -416,7 +416,12 @@ class Person(models.Model):
             cache.set(cache_key, stringy_factor, 60)
             return factor
 
-    # }}}
+    def generate_new_unsubscribe_token(self):
+        token = UnsubscribeToken(string=uuid.uuid4().hex, owner=self)
+        token.save()
+        return token
+
+    # }}} 
 
 def create_profile_when_user_created(instance, created, *args, **kwargs):
     if created:
@@ -825,6 +830,17 @@ class Forwarder(models.Model):
                 line = live_forwarder.generate_table_line()
                 lines.append(line)
         return lines
+
+class UnsubscribeToken(mysite.search.models.OpenHatchModel):
+    string = models.CharField(null=False, blank=False, unique=True, max_length=255)
+    owner = models.ForeignKey(Person)
+    @staticmethod
+    def whose_token_string_is_this(string):
+        try:
+            expiry_date = datetime.datetime.utcnow() - datetime.timedelta(days=90)
+            return UnsubscribeToken.objects.get(string=string, created_date__gte=expiry_date).owner
+        except UnsubscribeToken.DoesNotExist:
+            return None
         
 def update_link_person_tag_cache(sender, instance, **kwargs):
     from mysite.profile.tasks import update_person_tag_cache

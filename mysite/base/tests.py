@@ -12,12 +12,14 @@ import urllib
 from django.core.cache import cache
 
 import mock
+import datetime
 
 import mysite.base.helpers
 import mysite.base.controllers
 import mysite.base.decorators
 import mysite.search.models
 import mysite.base.templatetags.base_extras
+import mysite.profile.views
 
 def twill_setup():
     app = AdminMediaHandler(WSGIHandler())
@@ -35,7 +37,8 @@ def make_twill_url(url):
 def better_make_twill_url(url):
     return make_twill_url(url.replace('+','%2B'))
 
-def twill_go(url):
+def twill_goto_view(view_name, kwargs):
+    url = "http://openhatch.org" + reverse(view_name, kwargs=kwargs)
     tc.go(better_make_twill_url(url))
 
 def twill_quiet():
@@ -262,19 +265,67 @@ class Unsubscribe(TwillTests):
         dude = mysite.profile.models.Person.objects.get(user__username='paulproteus')
 
         # Generate an invalid token (easiest to do this first)
-        plausible_but_invalid_token = dude.generate_new_unsubscribe_token()
-        # Make that token invalid by nuking the Unsubscribe table
-        mysite.base.models.Unsubscribe.objects.all().delete()
+        plausible_but_invalid_token_string = dude.generate_new_unsubscribe_token().string
+        # Make that token invalid by nuking the UnsubscribeToken table
+        mysite.profile.models.UnsubscribeToken.objects.all().delete()
 
-        valid_token = dude.generate_new_unsubscribe_token()
-        owner = mysite.base.models.Unsubscribe.whose_token_is_this(valid_token)
+        # Generate a once-valid but now-expired token
+        expired_token = dude.generate_new_unsubscribe_token()
+        just_over_three_months_ago = datetime.datetime.utcnow() - datetime.timedelta(days=91)
+        expired_token.created_date = just_over_three_months_ago
+        expired_token.save()
+
+        # Generate a valid token
+        valid_token_string = dude.generate_new_unsubscribe_token().string
+        owner = mysite.profile.models.UnsubscribeToken.whose_token_string_is_this(
+                valid_token_string)
         self.assertEqual(owner, dude)
 
         # This should definitely be false
-        self.assertNotEqual(valid_token, plausible_but_invalid_token)
+        self.assertNotEqual(valid_token_string, plausible_but_invalid_token_string)
 
         # The invalid token should fail
         self.assertFalse(
-                mysite.base.models.Unsubscribe.whose_token_is_this(plausible_but_invalid_token))
+                mysite.profile.models.UnsubscribeToken.whose_token_string_is_this(
+                    plausible_but_invalid_token_string))
+
+        self.assertFalse(
+                mysite.profile.models.UnsubscribeToken.whose_token_string_is_this(
+                    expired_token.string))
+
+    def test_unsubscribe_view(self):
+        dude = mysite.profile.models.Person.objects.get(user__username='paulproteus')
+        # Generate a valid token
+        valid_token_string = dude.generate_new_unsubscribe_token().string
+        # Test that the unsubscribe view's context contains the owner 
+        url = reverse(mysite.profile.views.unsubscribe, kwargs={'token_string': valid_token_string})
+        response = self.client.get(url)
+        self.assertEqual(
+                mysite.profile.models.Person.objects.get(),
+                response.context['unsubscribe_this_user'])
+
+    def test_unsubscribe_post_handler(self):
+        def get_dude():
+            return mysite.profile.models.Person.objects.get(user__username='paulproteus')
+        dude = get_dude()
+        self.assert_(get_dude().email_me_weekly_re_projects)
+
+        # Generate a valid token
+        valid_token_string = dude.generate_new_unsubscribe_token().string
+        self.client.post(reverse(mysite.profile.views.unsubscribe_do),
+                {'token_string': valid_token_string})
+        self.assertFalse(get_dude().email_me_weekly_re_projects)
+
+    def test_submit_form(self):
+        def get_dude():
+            return mysite.profile.models.Person.objects.get(user__username='paulproteus')
+        dude = get_dude()
+        self.assert_(get_dude().email_me_weekly_re_projects)
+
+        # Generate a valid token
+        valid_token_string = dude.generate_new_unsubscribe_token().string
+        twill_goto_view(mysite.profile.views.unsubscribe, kwargs={'token_string': valid_token_string})
+        tc.submit()
+        self.assertFalse(get_dude().email_me_weekly_re_projects)
 
 # vim: set ai et ts=4 sw=4 nu:
