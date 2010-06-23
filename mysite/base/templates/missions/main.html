@@ -17,8 +17,12 @@ Open source training missions
 
     <h3 style="float: none;">Using tar</h3>
     <p>Learn how to create good tar archives.</p>
-    {% if completed_missions.tar %}
-    <p><em>You have already completed this mission.</em></p>
+    {% if completed_missions.tar or completed_missions.tar_extract %}
+      {% if completed_missions.tar and completed_missions.tar_extract %}
+        <p><em>You have completed this mission.</em></p>
+      {% else %}
+        <p><em>You have partially completed this mission.</em></p>
+      {% endif %}
     {% endif %}
     <p><a href="{% url mysite.missions.views.tar_mission %}">Go to this mission</a></p>
   </div>
