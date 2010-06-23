@@ -1,91 +1,112 @@
 {% load humanize %}
-<style>
-body { font-family: Arial; }
-.username_parenthesized { font-weight: normal; }
-.parenthesis { font-weight: normal; text-decoration: none; }
-.space_between_name_and_username { font-weight: normal; text-decoration: none; }
-a { text-decoration: none; }
-.people_type { margin-top: 1em; }
-</style>
-<p>Hi {% firstof recipient.user.first_name recipient.user.username %}!</p>
+<html>
+    <head>
+        {% comment %}
+        <style type='text/css'>
+            a { text-decoration: none; }
+            body { font-family: Liberation Sans, Helvetica, Arial; }
+            .username_parenthesized { font-weight: normal; }
+            .parenthesis { font-weight: normal; text-decoration: none; }
+            .space_between_name_and_username { font-weight: normal; text-decoration: none; }
+            .people_type { margin-top: 1em; }
+            li { margin-left: .7em; }
+        </style>
+        {% endcomment %}
+    </head>
+    <body>
+        <p>Hi {% firstof recipient.user.first_name recipient.user.username %}!</p>
 
-<p>Here's a summary of what's happened in your projects on OpenHatch. We'll
-send you these updates every once in a while (at most once weekly).</p>
+        <p>Here's a summary of what's happened in your projects on OpenHatch. We'll
+        send you these updates every once in a while (at most once weekly).</p>
 
-<dl>
-    {% for project_name, ppl_data in project_name2people %}
-        <dt style='font-weight: bold; margin-top: 1em;'>
+        <dl>
+            {% for project_name, ppl_data in project_name2people %}
+            <dt style='font-weight: bold; margin-top: 1em;'>
 
             {% if rich_text %}
-                <a href='http://openhatch.org/+projects/{{ project_name|urlencode }}'>
-                    {{ project_name }}</a>
+            <a href='http://openhatch.org/+projects/{{ project_name|urlencode }}'>
+                {{ project_name }}</a>
             {% else %}
             ## {{ project_name }} ##<br>
             &lt;http://openhatch.org/+projects/{{ project_name|urlencode }}&gt;
             {% endif %}
             </dt>
 
-        <ul>
-        {% with ppl_data.display_these_contributors as truncated_list_of_people %}
-            {% if truncated_list_of_people %}
-                <li class='people_type'>
-                    Newly marked contributors:
-                    <ul>
-                    <li>
+            <ul>
+                {% with ppl_data.display_these_contributors as truncated_list_of_people %}
+                {% if truncated_list_of_people %}
+                <li style='margin-left: .3em;' class='people_type'>
+                Newly marked contributors:
+                <ul>
+
+                    {% if rich_text %}
+                    <li style='margin-left: .3em;'>
+                    {% endif %}
+
                     {% with ppl_data.contributor_count as people_count %}
-                        {% include 'weekly_email__list_of_people.html' %}
+                    {% with 'project' as people_search_prefix %}
+                    {% include 'weekly_email__list_of_people.html' %}
                     {% endwith %}
+                    {% endwith %}
+
+                    {% if rich_text %}
                     </li>
-                    </ul>
+                    {% endif %}
+
+                </ul>
                 </li>
-            {% endif %}
-        {% endwith %}
+                {% endif %}
+                {% endwith %}
 
-        {% with ppl_data.display_these_wannahelpers as truncated_list_of_people %}
-            {% if truncated_list_of_people %}
-                <li class='people_type'>
-                    People who want to help:
-                    <ul>
+                {% with ppl_data.display_these_wannahelpers as truncated_list_of_people %}
+                {% if truncated_list_of_people %}
+                <li style='margin-left: .3em;' class='people_type'>
+                People who want to help:
+                <ul>
 
-                        {% if rich_text %}
-                        <li>
-                        {% endif %}
+                    {% if rich_text %}
+                    <li style='margin-left: .3em;'>
+                    {% endif %}
 
-                        {% with ppl_data.wannahelper_count as people_count %}
-                            {% include 'weekly_email__list_of_people.html' %}
-                        {% endwith %}
+                    {% with ppl_data.wannahelper_count as people_count %}
+                    {% with 'icanhelp' as people_search_prefix %}
+                    {% include 'weekly_email__list_of_people.html' %}
+                    {% endwith %}
+                    {% endwith %}
 
-                        {% if rich_text %}
-                        </li>
-                        {% endif %}
+                    {% if rich_text %}
+                    </li>
+                    {% endif %}
 
-                    </ul>
+                </ul>
                 </li>
-            {% endif %}
-        {% endwith %}
-        </ul>
-        
-        {% if not rich_text %}
+                {% endif %}
+                {% endwith %}
+            </ul>
+
+            {% if not rich_text %}
             <br>
+            {% endif %}
+            {% endfor %}
+        </dl>
+
+        <p>Yours,</p>
+
+        <p>
+        A robot<br>
+        (crafted with love by the OpenHatch team)
+        </p>
+
+        <p>
+        ---<br>
+        To unsubscribe, visit your settings 
+        {% if rich_text %}
+        at
+        <a href='http://openhatch.org{% url mysite.account.views.edit_contact_info %}'>http://openhatch.org{% url mysite.account.views.edit_contact_info %}</a>.
+        {% else %}
+        here:<br>
+        &lt;http://openhatch.org{% url mysite.account.views.edit_contact_info %}&gt;.
         {% endif %}
-    {% endfor %}
-</dl>
-
-<p>Yours,</p>
-
-<p>
-    A robot<br>
-    (crafted with love by the OpenHatch team)
-</p>
-
-<p>
-    ---<br>
-    To unsubscribe, visit your settings 
-    {% if rich_text %}
-    at
-    <a href='http://openhatch.org{% url mysite.account.views.edit_contact_info %}'>http://openhatch.org{% url mysite.account.views.edit_contact_info %}</a>.
-    {% else %}
-    here:<br>
-    &lt;http://openhatch.org{% url mysite.account.views.edit_contact_info %}&gt;.
-    {% endif %}
-</p>
+        </p>
+    </body>
+</html>
