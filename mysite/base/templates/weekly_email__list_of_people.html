@@ -40,13 +40,6 @@
 
                             {% endwith %}
 
-                            {% if rich_text and forloop.last %}
-                                {# if there are more people to show, display an ellipsis #}
-                                {% if truncated_list_of_people|length|lte:people_count %}
-                                <span>&hellip;</span>
-                                {% endif %}
-                            {% endif %}
-
                             {% if not rich_text %}
                             </li>
                             {% endif %}
@@ -56,8 +49,9 @@
                 {% endspaceless %}
 
                 {% if rich_text %}
+                &middot;
                 {# if you change this url, change the one below #}
-                (<a href='http://openhatch.org/people/?q={{ people_search_prefix }}:"{{ project_name|urlencode }}"'>{{ people_count }} total</a>)
+                <a href='http://openhatch.org/people/?q={{ people_search_prefix }}:"{{ project_name|urlencode }}"'>{{ people_count }} total</a>
                 {% else %}
                 <li>
                 {{ people_count }} total
