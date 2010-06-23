@@ -14,10 +14,23 @@
         {% endcomment %}
     </head>
     <body>
-        <p>Hi {% firstof recipient.user.first_name recipient.user.username %}!</p>
+        <p>Hi {% firstof recipient.user.first_name recipient.user.username %},</p>
 
-        <p>Here's a summary of what's happened in your projects on OpenHatch. We'll
-        send you these updates every once in a while (at most once weekly).</p>
+        <p>Some of our users have asked to be kept abreast of OpenHatch-based
+        activity in the projects they're involved in. So we'll be sending you
+        a short update email every once in a while. This is email number one!
+        We hope you find this useful, and we won't send you more than one email
+        per week. (To unsubscribe, see the footer.) Let us know what you think
+        &mdash; just hit reply. </p>
+
+        <p>To add or remove projects,
+        {% if rich_text %}
+        <a href='http://openhatch.org{% url mysite.profile.views.importer %}'>
+            edit your profile</a>.
+        {% else %}
+        edit your profile &lt;http://openhatch.org{% url mysite.profile.views.importer %}&gt;.
+        {% endif %}
+        </p>
 
         <dl>
             {% for project_name, ppl_data in project_name2people %}
