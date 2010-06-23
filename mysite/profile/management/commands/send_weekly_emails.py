@@ -60,12 +60,9 @@ class Command(BaseCommand):
         # Now let's send some emails! :-)
         people_who_want_email = Person.objects.filter(email_me_weekly_re_projects=True)
         for person in people_who_want_email:
-            context = self.get_context_for_weekly_email_to(person)
-            # NB: "context" is None when there's no email to send to this person
-            if context: 
+            message_in_plain_text, message_in_html = self.get_weekly_projects_email_for(person)
+            if message_in_html: 
                 # FIXME: Create a plain-text version of this message
-                message_in_plain_text = "(plain text message here)"
-                message_in_html = render_to_string('weekly_email_re_projects.txt', context)
                 print "Emailing %s their weekly project activity." % person.user.email
                 email = EmailMultiAlternatives(
                         subject="Your weekly OpenHatch horoscope",
@@ -74,6 +71,14 @@ class Command(BaseCommand):
                         to=[person.user.email])
                 email.attach_alternative(message_in_html, "text/html")
                 email.send()
+
+    def get_weekly_projects_email_for(self, recipient):
+        context = self.get_context_for_weekly_email_to(recipient)
+        if context is None:
+            return None, None
+        message_in_plain_text = "plain text goes here" #FIXME
+        message_in_html = render_to_string('weekly_email_re_projects.html', context)
+        return message_in_plain_text, message_in_html
 
     @staticmethod
     def get_projects_this_person_cares_about(person):

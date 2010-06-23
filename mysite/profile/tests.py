@@ -2722,9 +2722,11 @@ class Notifications(TwillTests):
                 'project_name2people'][0][1]['display_these_contributors']
         self.assert_(contributor in contributors_in_email_to_wanna_helper)
 
-        #FIXME: Rename project_name2people to project_name2participants
-
     def test_projects_this_person_cares_about(self):
+        # Test this method:
+        # mysite.profile.management.commands.send_weekly_emails
+        # .Command.get_projects_this_person_cares_about(person) 
+
         person = Person.create_dummy()
 
         # three projects
@@ -2749,6 +2751,8 @@ class Notifications(TwillTests):
         self.assertEqual(projects_i_care_about, expected)
 
     def test_dont_tell_me_about_projects_where_i_am_the_only_participant(self):
+        # FIXME: This will cease to make sense when we add project answers to
+        # the email
         person = Person.create_dummy()
         project_i_wanna_help_and_contributed_to = Project.create_dummy()
         Notifications.add_contributor(person, project_i_wanna_help_and_contributed_to)
