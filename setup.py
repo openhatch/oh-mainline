@@ -33,6 +33,7 @@ setup(
                         'django-voting',
                         'staticgenerator==1.4.1.2-openhatch',
                         'python-launchpad-bugs',
+                        'html2text',
                        ],
 
     dependency_links = [dependency_path,
