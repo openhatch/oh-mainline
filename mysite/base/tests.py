@@ -260,8 +260,21 @@ class Unsubscribe(TwillTests):
         """Generate a valid unsubscribe token. Use it. See that it works. Use
         an invalid one. See that it doesn't work."""
         dude = mysite.profile.models.Person.objects.get(user__username='paulproteus')
-        token = dude.generate_new_unsubscribe_token()
-        owner = mysite.base.models.Unsubscribe.whose_token_is_this(token)
+
+        # Generate an invalid token (easiest to do this first)
+        plausible_but_invalid_token = dude.generate_new_unsubscribe_token()
+        # Make that token invalid by nuking the Unsubscribe table
+        mysite.base.models.Unsubscribe.objects.all().delete()
+
+        valid_token = dude.generate_new_unsubscribe_token()
+        owner = mysite.base.models.Unsubscribe.whose_token_is_this(valid_token)
         self.assertEqual(owner, dude)
+
+        # This should definitely be false
+        self.assertNotEqual(valid_token, plausible_but_invalid_token)
+
+        # The invalid token should fail
+        self.assertFalse(
+                mysite.base.models.Unsubscribe.whose_token_is_this(plausible_but_invalid_token))
 
 # vim: set ai et ts=4 sw=4 nu:
