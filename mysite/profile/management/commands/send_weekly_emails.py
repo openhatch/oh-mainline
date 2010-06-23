@@ -12,6 +12,7 @@ import html2text
 
 from django.core.urlresolvers import reverse
 import mysite.profile.views
+import uuid
 
 def push_to_end_of_list(an_object, a_list):
     try:

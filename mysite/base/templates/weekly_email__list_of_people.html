@@ -51,7 +51,7 @@
                 {% if rich_text %}
                 &middot;
                 {# if you change this url, change the one below #}
-                <a href='http://openhatch.org/people/?q={{ people_search_prefix }}:"{{ project_name|urlencode }}"'>{{ people_count }} total</a>
+                <a href='http://openhatch.org/people/?q={{ people_search_prefix }}:"{{ project_name|urlencode }}"'>{{ people_count }}&nbsp;total</a>
                 {% else %}
                 <li>
                 {{ people_count }} total
