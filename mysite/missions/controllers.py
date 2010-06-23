@@ -1,9 +1,19 @@
+from mysite.missions.models import Step, StepCompletion
+
 from django import forms
 
 import tarfile
 from StringIO import StringIO
 import os
 import sys
+
+
+def set_mission_completed(profile, mission_name):
+    StepCompletion.objects.get_or_create(person=profile, step=Step.objects.get(name=mission_name))
+
+def mission_completed(profile, mission_name):
+    return len(StepCompletion.objects.filter(step__name=mission_name, person=profile)) != 0
+
 
 def remove_slash_that_python_two_point_five_might_have_added(some_string):
     if sys.version_info[:2] == (2, 5):
