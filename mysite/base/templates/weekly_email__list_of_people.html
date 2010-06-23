@@ -1,23 +1,54 @@
 
+                {% if not rich_text %}
+                <ul>
+                {% endif %}
+
                 {% spaceless %}
                     {% for person in truncated_list_of_people %}
                         {% ifequal person.user.username recipient.user.username %}
-                        and <strong>you</strong>.
+
+                            {% if rich_text %} and {% endif %}
+                            <strong>you</strong>.
+
                         {% else %}
-                            {% if not forloop.first %}
-                                <span> &middot; </span>
+
+                            {% if not rich_text %}
+                            <li>
                             {% endif %}
+
+                            {% if rich_text and not forloop.first %}
+                            <span> &middot; </span>
+                            {% endif %}
+
                             {% with person.user as user %}
-                                <strong>
-                                    <a href='http://openhatch.org{{ person.profile_url }}'>
+                            {% if rich_text %}
+                            <strong>
+                                <a href='http://openhatch.org{{ person.profile_url }}'>
+                                    {% endif %}
                                         <span>{% include 'name.html' %}</span>
-                                    </a>
-                                </strong>
+                                    {% if rich_text %}
+                                </a>
+                            </strong>
+                            {% endif %}
+                            {% if not rich_text %}
+                            <http://openhatch.org{{ person.profile_url }}>
+                            {% endif %}
+
                             {% endwith %}
                             {% if forloop.last %}
                                 <span>&hellip;</span>
                             {% endif %}
+
+                            {% if not rich_text %}
+                            </li>
+                            {% endif %}
+
                         {% endifequal %}
                     {% endfor %}
                 {% endspaceless %}
+
+                {% if not rich_text %}
+                </ul>
+                {% endif %}
+
                 (<a href='http://openhatch.org/people/?q=project:"{{ project_name|urlencode }}"'>{{ people_count }} total this week</a>)
