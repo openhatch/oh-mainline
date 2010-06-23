@@ -6,10 +6,14 @@
 
                 {% spaceless %}
                     {% for person in truncated_list_of_people %}
+
+                        {% if rich_text and not forloop.first %}
+                        <span> &middot; </span>
+                        {% endif %}
+
                         {% ifequal person.user.username recipient.user.username %}
 
                             {% if rich_text %}
-                                {% if not forloop.first %} and {% endif %}
                                 <em>
                             {% endif %}
 
@@ -23,10 +27,6 @@
 
                             {% if not rich_text %}
                             <li>
-                            {% endif %}
-
-                            {% if rich_text and not forloop.first %}
-                            <span> &middot; </span>
                             {% endif %}
 
                             {% with person.user as user %}
