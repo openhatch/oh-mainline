@@ -10,7 +10,7 @@ expect "$ "
 
 send_user "\r\n*** Fetching changes from git's remote repository... ***\r\n"
 send "git fetch; echo $?\r"
-expect "0"
+expect "0\r\n"
 # Expect a success exit code from 'git fetch'
 expect "$ "
 
@@ -62,6 +62,6 @@ expect "$ "
 
 send_user "\r\n*** Reloading the web site... ***\r\n"
 send "touch bin/production.wsgi; echo $?\r"
-expect "0"
+expect "0\r\n"
 
 #send "screen -rd"
