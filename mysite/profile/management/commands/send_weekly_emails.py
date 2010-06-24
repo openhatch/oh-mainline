@@ -67,13 +67,14 @@ class Command(BaseCommand):
         for person in people_who_want_email:
             message_in_plain_text, message_in_html = self.get_weekly_projects_email_for(person)
             if message_in_html: 
-                # FIXME: Create a plain-text version of this message
                 print "Emailing %s their weekly project activity." % person.user.email
                 email = EmailMultiAlternatives(
-                        subject="News from your OpenHatch projects",
+                        subject="News about your OpenHatch projects",
                         body=message_in_plain_text,
                         from_email="\"OpenHatch Mail-Bot\" <hello+mailbot@openhatch.org>",
-                        # headers={ 'X-Notion': "I'm feeling a lot less evil now.", },
+                        headers={
+                            'X-Notion': "I'm feeling a lot less evil now.",
+                            },
                         to=[person.user.email])
                 email.attach_alternative(message_in_html, "text/html")
                 email.send()
@@ -118,6 +119,9 @@ class Command(BaseCommand):
         within_range = Q(
                 date_created__gt=  self.this_run_covers_things_since,
                 date_created__lte=   self.this_run_covers_things_up_until)
+        within_range_for_wh = Q(
+                created_date__gt=  self.this_run_covers_things_since,
+                created_date__lte=   self.this_run_covers_things_up_until)
 
         projects = Command.get_projects_this_person_cares_about(recipient)
 
@@ -137,9 +141,8 @@ class Command(BaseCommand):
 
             # Add wanna helpers
             # ---------------------
-            # FIXME: Add "within_range" as a filter below
-            display_these_wannahelpers = list(project.people_who_wanna_help.all())
-
+            notes = WannaHelperNote.objects.filter(within_range_for_wh, project=project)
+            display_these_wannahelpers = [note.person for note in notes]
             people_data['wannahelper_count'] = len(display_these_wannahelpers)
 
             everybody = set(display_these_contributors + display_these_wannahelpers)

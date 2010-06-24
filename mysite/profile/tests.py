@@ -1,23 +1,15 @@
-# Imports {{{
 from mysite.base.tests import make_twill_url, better_make_twill_url, TwillTests
 from mysite.base.helpers import ObjectFromDict
 from mysite.base.models import Timestamp
 import mysite.account.tests
-from django.core import mail
-
 from mysite.search.models import Project, WannaHelperNote
 from mysite.profile.models import Person, Tag, TagType, Link_Person_Tag, DataImportAttempt, PortfolioEntry, Citation, Forwarder
 import mysite.project.views
-
 import mysite.profile.views
 import mysite.profile.models
 import mysite.profile.controllers
 from mysite.profile.management.commands import send_weekly_emails
-
 from mysite.profile import views
-
-from django.conf import settings
-
 from mysite.customs import ohloh
 from mysite.customs.models import WebResponse
 
@@ -31,7 +23,13 @@ import datetime
 import tasks 
 import mock
 import UserList
+import twill
+from twill import commands as tc
+from twill.shell import TwillCommandLoop
+import quopri
 
+from django.core import mail
+from django.conf import settings
 import django.test
 from django.test.client import Client
 from django.core import management, serializers
@@ -40,10 +38,6 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 
-import twill
-from twill import commands as tc
-from twill.shell import TwillCommandLoop
-# }}}
 
 def do_nothing(*args, **kwargs):
     return ''
@@ -2437,9 +2431,12 @@ class Notifications(TwillTests):
         PortfolioEntry.create_dummy( person=person, project=project, is_published=True)
 
     @staticmethod
-    def add_wannahelper(person, project):
+    def add_wannahelper(person, project, created_date=None):
         project.people_who_wanna_help.add(person)
-        WannaHelperNote.add_person_project(person, project)
+        note = WannaHelperNote.add_person_project(person, project)
+        if created_date:
+            note.created_date = created_date
+            note.save()
         project.save()
 
     def test_email_the_people_with_checkboxes_checked(self):
@@ -2507,31 +2504,44 @@ class Notifications(TwillTests):
         new_contributors = list(project.get_contributors())
         new_contributors.remove(paul)
         new_contributors.remove(veteran)
-        new_contributors.sort(key=lambda x: x.get_coolness_factor())
-
-        project_name2people = [
-                (project.name, {
-                    'contributor_count': NUMBER_OF_NEW_CONTRIBUTORS_OTHER_THAN_PAUL + 1, 
-                    'wannahelper_count': 0, 
-                    'display_these_contributors': new_contributors[:3],
-                    'display_these_wannahelpers': []
-                    })
-                ]
 
         command = mysite.profile.management.commands.send_weekly_emails.Command()
         context = command.get_context_for_weekly_email_to(paul)
 
-        self.assertEqual(context['project_name2people'], project_name2people)
+        project_name, actual_people = context['project_name2people'][0]
+
+        # Assert that the truncated list of contributors that will appear in
+        # the email is a subset of the people we added above
+        for c in actual_people['display_these_contributors'] :
+            self.assert_(c in new_contributors)
+
+        self.assertEqual(
+                actual_people['contributor_count'],
+                NUMBER_OF_NEW_CONTRIBUTORS_OTHER_THAN_PAUL + 1)
+
+        self.assertEqual(actual_people['wannahelper_count'], 0)
+
+        self.assertEqual(actual_people['display_these_wannahelpers'], [])
 
         command.handle()
 
-        msg = mail.outbox[0].message().as_string()
-        for project_name, contributors_data in project_name2people:
-            contribs_count = str(contributors_data['contributor_count'])
-            self.assert_(project_name in msg)
-            self.assert_(contribs_count in msg)
-            for p in contributors_data['display_these_contributors']:
-                self.assert_(p.get_full_name_or_username() in msg)
+        email_to_paul = None
+        for email in mail.outbox:
+            if email.to[0] == paul.user.email:
+                email_to_paul = email
+                break
+
+        self.assert_(email_to_paul)
+        text_msg, html_msg = email_to_paul.message().get_payload()
+
+        for msg_encoded in [text_msg, html_msg]:
+            msg = quopri.decodestring(msg_encoded.get_payload())
+            for project_name, people_data in context['project_name2people']:
+                contribs_count = str(people_data['contributor_count'])
+                self.assert_(project_name in msg)
+                self.assert_(contribs_count in msg)
+                for p in people_data['display_these_contributors']:
+                    self.assert_(p.user.username in msg)
 
         #context['new_wannahelpers']
         #context['recent_chatter_answers'],
@@ -2760,5 +2770,47 @@ class Notifications(TwillTests):
         command = mysite.profile.management.commands.send_weekly_emails.Command()
         email_context = command.get_context_for_weekly_email_to(person) 
         self.assertEqual(None, email_context)
+
+    def test_dont_show_previously_mentioned_wannahelpers(self):
+        # Don't email somebody about a wanna-helper who we've already emailed
+        # them about
+
+        # Here's the person we're going to email
+        email_recipient = Person.create_dummy(email='recipient@example.com')
+        # Here's a project they care about
+        a_project = Project.create_dummy()
+        # because they are a contributor
+        Notifications.add_contributor(email_recipient, a_project)
+
+        # Create two wannahelpers, one of them is new and the other is old
+        new_wh = Person.create_dummy('new_wh@example.com')
+        old_wh = Person.create_dummy('old_wh@example.com')
+
+        now = datetime.datetime.utcnow()
+        seven_days_ago = now - datetime.timedelta(days=7)
+        nine_days_ago = now - datetime.timedelta(days=9)
+
+        # The timespan for this email is The Last Seven Days
+        Timestamp.update_timestamp_for_string(
+                send_weekly_emails.Command.TIMESTAMP_KEY,
+                override_time=seven_days_ago)
+
+        # This dude signs up to be a helper
+        Notifications.add_wannahelper(new_wh, a_project)
+
+        # This dude signed up too long ago to appear in this email
+        Notifications.add_wannahelper(old_wh, a_project, nine_days_ago)
+
+        # Assert that the new w.h. was included in the email and the old was not.
+        command = mysite.profile.management.commands.send_weekly_emails.Command()
+        email_context = command.get_context_for_weekly_email_to(email_recipient) 
+        self.assert_(email_context)
+        project_name2people = email_context['project_name2people']
+        self.assertEqual(len(project_name2people), 1)
+        project_name, people = project_name2people[0]
+        self.assertEqual(
+                [new_wh],
+                people['display_these_wannahelpers'],
+                )
 
 # vim: set ai et ts=4 sw=4 nu:
