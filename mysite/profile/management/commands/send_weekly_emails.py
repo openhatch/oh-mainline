@@ -64,9 +64,12 @@ class Command(BaseCommand):
 
         # Now let's send some emails! :-)
         people_who_want_email = Person.objects.filter(email_me_weekly_re_projects=True)
+
+        count = 0
         for person in people_who_want_email:
             message_in_plain_text, message_in_html = self.get_weekly_projects_email_for(person)
             if message_in_html: 
+                count += 1
                 print "Emailing %s their weekly project activity." % person.user.email
                 email = EmailMultiAlternatives(
                         subject="News about your OpenHatch projects",
@@ -78,6 +81,7 @@ class Command(BaseCommand):
                         to=[person.user.email])
                 email.attach_alternative(message_in_html, "text/html")
                 email.send()
+        print "Emailed", count 
 
     def get_weekly_projects_email_for(self, recipient):
         context = self.get_context_for_weekly_email_to(recipient)
