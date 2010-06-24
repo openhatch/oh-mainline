@@ -7,6 +7,8 @@ from StringIO import StringIO
 import os
 import sys
 
+def get_mission_data_path():
+    return os.path.join(os.path.dirname(__file__), 'data')
 
 def set_mission_completed(profile, mission_name):
     StepCompletion.objects.get_or_create(person=profile, step=Step.objects.get(name=mission_name))
@@ -79,18 +81,22 @@ class TarUploadForm(forms.Form):
     tarfile = forms.FileField(error_messages={'required': 'No file was uploaded.'})
 
 class UntarMission(object):
-    TARBALL_NAME = 'ghello-0.4.tar.gz'
-    FILE_WE_WANT = 'ghello-0.4/ghello.c'
+    TARBALL_DIR_NAME = 'ghello-0.4'
+    TARBALL_NAME = TARBALL_DIR_NAME + '.tar.gz'
+    FILE_WE_WANT = TARBALL_DIR_NAME + '/ghello.c'
 
     @classmethod
-    def get_tar_path(cls):
-        return os.path.join(os.path.dirname(__file__), 'data', cls.TARBALL_NAME)
+    def synthesize_tarball(cls):
+        tdata = StringIO()
+        tfile = tarfile.open(fileobj=tdata, mode='w:gz')
+        tfile.add(os.path.join(get_mission_data_path(), cls.TARBALL_DIR_NAME), cls.TARBALL_DIR_NAME)
+        tfile.close()
+        return tdata.getvalue()
 
     @classmethod
     def get_contents_we_want(cls):
         '''Get the data for the file we want from the tarball.'''
-        tfile = tarfile.open(cls.get_tar_path(), mode='r:gz')
-        return tfile.extractfile(tfile.getmember(cls.FILE_WE_WANT)).read()
+        return open(os.path.join(get_mission_data_path(), cls.FILE_WE_WANT)).read()
 
 class TarExtractUploadForm(forms.Form):
     extracted_file = forms.FileField(error_messages={'required': 'No file was uploaded.'})

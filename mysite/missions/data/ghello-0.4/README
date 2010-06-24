@@ -1,0 +1,7 @@
+This is stump's take on the usual GTK+ Hello World program, intended to
+serve as an example project tarball for OpenHatch's training missions.
+This program is placed into the public domain.
+
+You need the GTK+ development files (libgtk2.0-dev under Debian) to
+build the program, but you don't need to build the program to complete
+the mission.

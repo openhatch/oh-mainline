@@ -114,7 +114,7 @@ class MainPageTests(TwillTests):
 class UntarMissionTests(TestCase):
 
     def test_tarball_contains_file_we_want(self):
-        tfile = tarfile.open(UntarMission.get_tar_path(), mode='r:gz')
+        tfile = tarfile.open(fileobj=StringIO(UntarMission.synthesize_tarball()), mode='r:gz')
 
         # Check the file we want contains the right thing.
         file_we_want = tfile.getmember(UntarMission.FILE_WE_WANT)

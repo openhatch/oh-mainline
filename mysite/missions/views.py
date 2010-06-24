@@ -57,7 +57,7 @@ def tar_file_download(request, name):
 
 
 def tar_download_tarball_for_extract_mission(request):
-    response = HttpResponse(open(UntarMission.get_tar_path()).read())
+    response = HttpResponse(UntarMission.synthesize_tarball())
     # force presentation as download
     response['Content-Disposition'] = 'attachment; filename=%s' % UntarMission.TARBALL_NAME
     response['Content-Type'] = 'application/octet-stream'
