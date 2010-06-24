@@ -34,11 +34,13 @@ setup(
                         'staticgenerator==1.4.1.2-openhatch',
                         'python-launchpad-bugs',
                         'html2text',
-                        'lockfile>=0.9',
+                        'lockfile>=0.9', # as of this writing, pypi only has version 0.8
+                        'python-openid==2.2.5', # as of this writing, upstream has an HTML file where a tar.gz should be
                        ],
 
     dependency_links = [dependency_path,
                         'http://pylockfile.googlecode.com/files/lockfile-0.9.tar.gz#egg=lockfile',
+                        dependency_path + 'openid-python-openid-2.2.5-0-gb666238.tar.gz#egg=python-openid',
                         dependency_path + 'python_apt-0.6.17-py2.6-linux-i686.egg#egg=python-apt',
                         dependency_path + 'invitation-1.0.tar.gz#egg=invitation',
                         dependency_path + 'django-assets-0.2.tar.gz#egg=django-assets',
