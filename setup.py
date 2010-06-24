@@ -34,9 +34,11 @@ setup(
                         'staticgenerator==1.4.1.2-openhatch',
                         'python-launchpad-bugs',
                         'html2text',
+                        'lockfile>=0.9',
                        ],
 
     dependency_links = [dependency_path,
+                        'http://pylockfile.googlecode.com/files/lockfile-0.9.tar.gz#egg=lockfile',
                         dependency_path + 'python_apt-0.6.17-py2.6-linux-i686.egg#egg=python-apt',
                         dependency_path + 'invitation-1.0.tar.gz#egg=invitation',
                         dependency_path + 'django-assets-0.2.tar.gz#egg=django-assets',
