@@ -40,7 +40,7 @@ setup(
 
     dependency_links = [dependency_path,
                         'http://pylockfile.googlecode.com/files/lockfile-0.9.tar.gz#egg=lockfile',
-                        dependency_path + 'openid-python-openid-2.2.5-0-gb666238.tar.gz#egg=python-openid',
+                        dependency_path + 'python-openid-2.2.5.tar.gz#egg=python-openid',
                         dependency_path + 'python_apt-0.6.17-py2.6-linux-i686.egg#egg=python-apt',
                         dependency_path + 'invitation-1.0.tar.gz#egg=invitation',
                         dependency_path + 'django-assets-0.2.tar.gz#egg=django-assets',
