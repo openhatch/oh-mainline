@@ -153,8 +153,10 @@ class Command(BaseCommand):
             # --------------------------------------------
 
             # Sort
-            display_these_contributors.sort(key=lambda x: x.get_coolness_factor('contributors'))
-            display_these_wannahelpers.sort(key=lambda x: x.get_coolness_factor('wannahelpers'))
+            display_these_contributors.sort(key=lambda x: x.get_coolness_factor(
+                'contributors_for_%s_in_%s' % (recipient.user.username, project.name)))
+            display_these_wannahelpers.sort(key=lambda x: x.get_coolness_factor(
+                'wannahelpers_for_%s_in_%s' % (recipient.user.username, project.name)))
             
             # Put the recipient of the email at the end of any list he or she
             # appears in

@@ -27,6 +27,7 @@ import simplejson
 import re
 import cgi
 import logging
+import sha
 
 DEFAULT_LOCATION='Inaccessible Island'
 
@@ -393,7 +394,7 @@ class Person(models.Model):
     def should_be_nudged_about_location(self):
         return not self.location_confirmed and not self.dont_guess_my_location
 
-    def get_coolness_factor(self, cache_key_suffix):
+    def get_coolness_factor(self, unhashed_tiebreaker):
         '''This function's output is used as the sort order in (at least) the weekly emails.
         You can be more cool if you:
            * Have projects
@@ -402,22 +403,14 @@ class Person(models.Model):
            * Are a wannahelper of something
         and finally we break ties by get_full_name_or_username(), just so that
         we have a predictable sort.
-        
-        This function is vaguely expensive to run, which is why we cache its
-        output for sixty seconds.'''
-        cache_key = 'coolness_factor_for_person_%d_%s' % (self.pk, cache_key_suffix)
-        cached = cache.get(cache_key)
-        if cached:
-            return simplejson.loads(cached)
-        else:
-            factor = (bool(self.get_list_of_all_project_names()),
-                      bool(self.get_tags_as_dict()),
-                      bool(self.photo),
-                      bool(self.projects_i_wanna_help),
-                      uuid.uuid4().hex)
-            stringy_factor = simplejson.dumps(factor)
-            cache.set(cache_key, stringy_factor, 60)
-            return factor
+        .'''
+        hashed_tiebreaker = sha.sha(unhashed_tiebreaker).hexdigest()
+        factor = (bool(self.get_list_of_all_project_names()),
+                  bool(self.get_tags_as_dict()),
+                  bool(self.photo),
+                  bool(self.projects_i_wanna_help),
+                  hashed_tiebreaker)
+        return factor
 
     def generate_new_unsubscribe_token(self):
         token = UnsubscribeToken(string=uuid.uuid4().hex, owner=self)
