@@ -16,6 +16,9 @@ import os
 import string
 import random
 
+class HaystackIsDown(Exception):
+    pass
+
 notifications_dictionary = {
         "edit_password_done":
         "Your password has been changed.",
@@ -167,5 +170,8 @@ def get_uri_metadata_for_generating_absolute_links(request):
     return data
 
 def haystack_results2db_objects(things):
-    things.load_all()
-    return [x.object for x in things if x.object is not None]
+    try:
+        things.load_all()
+        return [x.object for x in things if x.object is not None]
+    except AttributeError:
+        raise HaystackIsDown()

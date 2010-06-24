@@ -39,6 +39,7 @@ from mysite.base.decorators import view
 import mysite.profile.forms
 import mysite.profile.tasks
 from mysite.base.helpers import render_response
+
 # }}}
 
 @login_required
@@ -551,9 +552,15 @@ def people(request):
     # Get the list of people to display.
 
     if parsed_query['q'].strip():
-        # "everybody" means everyone matching this query
-        everybody, extra_data = query2results(parsed_query)
-        data.update(extra_data)
+        try:
+            # "everybody" means everyone matching this query
+            everybody, extra_data = query2results(parsed_query)
+            data.update(extra_data)
+        except mysite.base.controllers.HaystackIsDown:
+            data['haystack_is_down'] = True
+            return (request, 'profile/search_people.html', data)
+            # Note that if the search engine is down, nothing in this function
+            # below this point will be incorporated into the template context.
 
     else:
         everybody = Person.objects.all().order_by('user__username')
