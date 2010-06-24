@@ -17,17 +17,17 @@
         <p>Hello {% firstof recipient.user.first_name recipient.user.username %},</p>
 
         <p>I'm a robot from OpenHatch, the open source involvement engine,
-        sending you an email about what's going on in the projects on 
+        sending you an email about what's been going on lately in the projects on 
         {% if rich_text %}
         <a href='http://openhatch.org{{ recipient.profile_url }}'>
-            your profile</a> 
+            your profile</a>.
         {% else %}
-        your profile &lt;http://openhatch.org{{ recipient.profile_url }}&gt;
+        your profile &lt;http://openhatch.org{{ recipient.profile_url }}&gt;.
         {% endif %}
         Some of our users have asked for a periodic update email like this.
-        This is email number one!  We hope you find this useful, and we won't
+        This is email number one! I hope you find this useful, and I won't
         send you more than one email per week. (To unsubscribe, see the
-        footer.) Let us know what you think &mdash; just hit reply. </p>
+        footer.) Let the humans know what you think &ndash; just hit reply. </p>
 
         <p>
         To add or remove projects, 
