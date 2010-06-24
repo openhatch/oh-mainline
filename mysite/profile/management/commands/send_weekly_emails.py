@@ -101,7 +101,7 @@ class Command(BaseCommand):
         
         # message_in_simpler_html is a string of HTML we've hand-tuned so that
         # when it is converted into Markdown it looks good in an email
-        html2text.BODY_WIDTH = 72 # good for emails
+        html2text.BODY_WIDTH = 0 # good for emails
         to_markdown = html2text.html2text
         message_in_plain_text = to_markdown(message_in_simpler_html)
         
