@@ -16,28 +16,26 @@
     <body>
         <p>Hello {% firstof recipient.user.first_name recipient.user.username %},</p>
 
-        <p>Some of our users have asked to be kept abreast of OpenHatch-based
-        activity in the projects they're involved in. So we'll be sending you
-        a short update email every once in a while. This is email number one!
-        We hope you find this useful, and we won't send you more than one email
-        per week. (To unsubscribe, see the footer.) Let us know what you think
-        &mdash; just hit reply. </p>
-
-        <p>These are the projects from 
+        <p>I'm a robot from OpenHatch, the open source involvement engine,
+        sending you an email about what's going on in the projects on 
         {% if rich_text %}
         <a href='http://openhatch.org{{ recipient.profile_url }}'>
             your profile</a> 
         {% else %}
         your profile &lt;http://openhatch.org{{ recipient.profile_url }}&gt;
         {% endif %}
-        that have seen some recent activity on OpenHatch.
-        
-        You can 
+        Some of our users have asked for a periodic update email like this.
+        This is email number one!  We hope you find this useful, and we won't
+        send you more than one email per week. (To unsubscribe, see the
+        footer.) Let us know what you think &mdash; just hit reply. </p>
+
+        <p>
+        To add or remove projects, 
         {% if rich_text %}
         <a href='http://openhatch.org{% url mysite.profile.views.importer %}'>
-            add or remove projects here</a>.
+            edit your profile</a>.
         {% else %}
-        add or remove projects here:
+        edit your profile:
         &lt;http://openhatch.org{% url mysite.profile.views.importer %}&gt;.
         {% endif %}
         </p>
@@ -116,7 +114,7 @@
         <p>Yours,</p>
 
         <p>
-        A robot<br>
+        Mail-Bot<br>
         (crafted with love by the OpenHatch team)
         </p>
 
