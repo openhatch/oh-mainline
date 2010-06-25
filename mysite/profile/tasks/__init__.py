@@ -432,7 +432,7 @@ def sync_bug_epoch_from_model_then_fill_recommended_bugs_cache():
         mysite.search.models.Epoch.bump_for_model(
             mysite.search.models.Bug)
         logging.info("Whee! Bumped the epoch. Guess I'll fill the cache.")
-        fill_recommended_bugs_cache.apply()
+        fill_recommended_bugs_cache()
     logging.info("Done syncing bug epoch.")
 
 @task

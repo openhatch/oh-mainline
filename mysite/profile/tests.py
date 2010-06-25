@@ -2213,7 +2213,7 @@ class PeopleMapForNonexistentProject(TwillTests):
         # Yay, no exception.
 
 class BugModificationTimeVersusEpoch(TwillTests):
-    @mock.patch('mysite.profile.tasks.fill_recommended_bugs_cache.delay')
+    @mock.patch('mysite.profile.tasks.fill_recommended_bugs_cache')
     def test(self, mock_thing):
         # Read the comments in the Epoch model if you haven't yet
         epoch_at_start = mysite.search.models.Epoch.get_for_model(
