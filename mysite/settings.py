@@ -154,7 +154,7 @@ INSTALLED_APPS = (
     #'debug_toolbar',
 )
 
-TEST_RUNNER = 'xmlrunner.extra.djangotestrunner.run_tests'
+TEST_RUNNER = 'mysite.testrunner.run'
 
 # Make test names prettier 
 TEST_OUTPUT_DESCRIPTIONS = True
