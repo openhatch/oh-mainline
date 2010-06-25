@@ -2215,10 +2215,16 @@ class PeopleMapForNonexistentProject(TwillTests):
 class BugModificationTimeVersusEpoch(TwillTests):
     @mock.patch('mysite.profile.tasks.fill_recommended_bugs_cache.delay')
     def test(self, mock_thing):
+        # Read the comments in the Epoch model if you haven't yet
         epoch_at_start = mysite.search.models.Epoch.get_for_model(
             mysite.search.models.Bug)
+        # This is a new bug, so we might want to invalidate the cache for
+        # recommended-bug lists, or people won't see this bug in their list of
+        # "Recommended bugs"
         b = mysite.search.models.Bug.create_dummy_with_project()
+        # Let's the invalidate the cache
         mysite.profile.tasks.sync_bug_epoch_from_model_then_fill_recommended_bugs_cache()
+        # Make sure that the cache timestamp has been updated
         new_epoch = mysite.search.models.Epoch.get_for_model(
             mysite.search.models.Bug)
         self.assert_(new_epoch > epoch_at_start)

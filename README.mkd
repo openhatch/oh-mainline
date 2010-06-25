@@ -182,6 +182,21 @@ Start in milestone-a, then run this command:
 
 (say yes)
 
+### Other maintenance tasks ###
+
+#### Run the hourly tasks related to profiles ####
+
+There's a management command that runs necessary maintenance tasks. At time of writing, it tries to keep our cache of recommended bugs more or less up to date with the state of the bug table in our database.
+
+To run this maintenance task hourly, run these commands:
+
+    # The following use of GNU screen is helpful for running maintenance tasks,
+    # but is not necessary.
+    screen -RD # Create an instance of screen, or attach to an existing one. 
+    # Type Ctrl-a, c to open a new screen
+    while (true); do ./bin/mysite profile_hourly_tasks; sleep 1h; done
+    # Type Ctrl-a, d to hide ("detach from") the screen
+
 ### Troubleshooting ###
 
 #### MySQL_python ####
