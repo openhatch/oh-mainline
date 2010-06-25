@@ -1,6 +1,6 @@
 from unittest import TestCase
 from mysite.base.tests import TwillTests
-from mysite.missions.controllers import TarMission, IncorrectTarFile, UntarMission
+from mysite.missions.controllers import TarMission, IncorrectTarFile, UntarMission, PatchSingleFileMission
 from mysite.missions import views
 from mysite.missions.models import StepCompletion, Step
 from mysite.profile.models import Person
@@ -11,6 +11,8 @@ from django.test import TestCase as DjangoTestCase
 import os
 import tarfile
 from StringIO import StringIO
+import tempfile
+import subprocess
 
 def make_testdata_filename(filename):
     return os.path.join(os.path.dirname(__file__), 'testdata', filename)
@@ -152,3 +154,22 @@ class UntarViewTests(TwillTests):
 
         paulproteus = Person.objects.get(user__username='paulproteus')
         self.assertEqual(len(StepCompletion.objects.filter(step__name='tar_extract', person=paulproteus)), 0)
+
+class PatchSingleFileTests(TestCase):
+
+    def test_generated_patch(self):
+        oldfile = tempfile.NamedTemporaryFile(delete=False)
+        file_to_patch = oldfile.name
+
+        try:
+            oldfile.write(open(PatchSingleFileMission.OLD_FILE).read())
+            oldfile.close()
+
+            patch_process = subprocess.Popen(['patch', file_to_patch], stdin=subprocess.PIPE)
+            patch_process.communicate(PatchSingleFileMission.get_patch())
+            self.assertEqual(patch_process.returncode, 0)
+
+            self.assertEqual(open(file_to_patch).read(), open(PatchSingleFileMission.NEW_FILE).read())
+
+        finally:
+            os.unlink(file_to_patch)

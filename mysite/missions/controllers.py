@@ -6,6 +6,7 @@ import tarfile
 from StringIO import StringIO
 import os
 import sys
+import difflib
 
 def get_mission_data_path():
     return os.path.join(os.path.dirname(__file__), 'data')
@@ -100,3 +101,13 @@ class UntarMission(object):
 
 class TarExtractUploadForm(forms.Form):
     extracted_file = forms.FileField(error_messages={'required': 'No file was uploaded.'})
+
+class PatchSingleFileMission(object):
+    OLD_FILE = os.path.join(get_mission_data_path(), 'fib1.c')
+    NEW_FILE = os.path.join(get_mission_data_path(), 'fib2.c')
+
+    @classmethod
+    def get_patch(cls):
+        oldlines = open(cls.OLD_FILE).readlines()
+        newlines = open(cls.NEW_FILE).readlines()
+        return ''.join(difflib.unified_diff(oldlines, newlines, os.path.basename(cls.OLD_FILE), os.path.basename(cls.NEW_FILE)))
