@@ -557,6 +557,7 @@ Keywords: Torrent unittest""")
         # Pretend there's old data lying around:
         bug = Bug.all_bugs.get()
         bug.people_involved = 1
+        bug.last_polled = datetime.datetime.now() - datetime.timedelta(days = 2)
         bug.save()
 
         mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
@@ -585,7 +586,7 @@ Keywords: Torrent unittest""")
         bug.canonical_bug_link = 'http://bugzilla.pculture.org/show_bug.cgi?id=2294'
         bug.date_reported = datetime.datetime.now()
         bug.last_touched = datetime.datetime.now()
-        bug.last_polled = datetime.datetime.now()
+        bug.last_polled = datetime.datetime.now() - datetime.timedelta(days = 2)
         bug.project, _ = Project.objects.get_or_create(name='Miro')
         bug.save()
 
