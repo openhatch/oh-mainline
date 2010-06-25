@@ -87,7 +87,13 @@ class Command(BaseCommand):
         for thing in enabled_bugzilla_instances:
             logging.info("[Bugzilla] About to update %s" % thing)
             instantiated = thing()
-            instantiated.update()
+            # FIXME: The Bugzilla trackers seem to throw error 500 a lot.
+            # For now, chuck in a dirty big try except to stop importer
+            # breaking.
+            try:
+                instantiated.update()
+            except:
+                logging.info("[Bugzilla] ERROR: Importer failed, likely HTTP500, continuing on..."
 
     def update_launchpad_hosted_projects(self):
         ### For Launchpad:
