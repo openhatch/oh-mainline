@@ -746,7 +746,7 @@ class UserCanShowEmailAddress(TwillTests):
         tc.notfind('my@ema.il')
 
         tc.follow('settings')
-        tc.follow('Contact')
+        tc.follow('Email')
         tc.fv("a_settings_tab_form", 'show_email', '1')
         tc.submit()
 
