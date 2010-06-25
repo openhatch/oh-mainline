@@ -1,0 +1,6 @@
+[report]
+	# List of file prefixes
+	omit = eggs
+	omit = parts
+	omit = /usr
+	omit = /var
