@@ -115,6 +115,23 @@ class Command(BaseCommand):
             instantiated = thing()
             instantiated.update()
 
+    def find_and_update_enabled_bugzilla_instances(self):
+        enabled_bugzilla_instances = []
+
+        ### First, the "find" step
+        for thing_name in dir(mysite.search.tasks.bugzilla_instances):
+            thing = getattr(mysite.search.tasks.bugzilla_instances,
+                            thing_name)
+            if hasattr(thing, 'enabled'):
+                if getattr(thing, 'enabled'):
+                    enabled_bugzilla_instances.append(thing)
+
+        ### Okay, now update!
+        for thing in enabled_bugzilla_instances:
+            logging.info("[Bugzilla] About to update %s" % thing)
+            instantiated = thing()
+            instantiated.update()
+
     def update_launchpad_hosted_projects(self):
         ### For Launchpad:
         # First, we ask the projects' bug trackers if there are new bugs we should know about
@@ -131,5 +148,6 @@ class Command(BaseCommand):
         self.find_and_update_enabled_trac_instances()
         self.find_and_update_enabled_roundup_trackers()
         self.update_bugzilla_trackers()
+        #self.find_and_update_enabled_bugzilla_instances()
         
 
