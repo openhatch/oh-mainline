@@ -1,6 +1,7 @@
 from django.conf import settings
 import xmlrunner.extra.djangotestrunner
 from django.test.simple import run_tests
+import os
 
 def run(*args, **kwargs):
     settings.CELERY_ALWAYS_EAGER = True
