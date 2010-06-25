@@ -154,6 +154,7 @@ INSTALLED_APPS = (
     #'debug_toolbar',
 )
 
+# testrunner allows us to control which testrunner to use
 TEST_RUNNER = 'mysite.testrunner.run'
 
 # Make test names prettier 
