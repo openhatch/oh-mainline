@@ -851,6 +851,8 @@ class PersonInfoLinksToSearch(TwillTests):
         # Now, click on "thing1"
         tc.follow("thing1")
 
+        # The following assertion will succeed if we remove Haystack.
+
         # Now find ourself there
         tc.find('Asheesh Laroia')
 
