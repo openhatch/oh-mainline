@@ -614,8 +614,8 @@ class PortfolioEntry(models.Model):
     # FIXME: Constrain this so (person, project) pair uniquely finds a PortfolioEntry
     person = models.ForeignKey(Person)
     project = models.ForeignKey(Project)
-    project_description = models.TextField()
-    experience_description = models.TextField()
+    project_description = models.TextField(blank=True)
+    experience_description = models.TextField(blank=True)
     date_created = models.DateTimeField(default=datetime.datetime.utcnow)
     is_published = models.BooleanField(default=False)
     is_deleted = models.BooleanField(default=False)
