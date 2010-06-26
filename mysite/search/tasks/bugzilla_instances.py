@@ -476,7 +476,7 @@ class XOrgBugzilla(BugzillaBugTracker):
         return ret_dict
 
 class LocamotionBugzilla(BugzillaBugTracker):
-    enabled = True
+    enabled = False # FIXME: Throws XML encoding error.
 
     def __init__(self):
         BugzillaBugTracker.__init__(self,
