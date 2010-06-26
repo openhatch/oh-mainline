@@ -14,6 +14,7 @@ class BugzillaBugTracker(object):
     def generate_bug_project_name(self, bb):
         return self.bug_project_name_format.format(
                 project = self.project_name,
+                product = bb.product,
                 component = bb.component)
 
     def create_or_refresh_one_bugzilla_bug(self, bb):
@@ -358,6 +359,8 @@ class FedoraBugzilla(BugzillaBugTracker):
 # If the project has a tracker bug for the bugs to be imported,
 # set bug_id_list_only=True in BugzillaBugTracker.__init__ and
 # replace get_current_xml_bug_tree with get_current_bug_id_list
+# bug_project_name_format can contain the tags {project},
+# {product} and {component} which will be replaced accordingly.
 class GenBugzilla(BugzillaBugTracker):
     enabled = False
 
