@@ -93,7 +93,7 @@ class Command(BaseCommand):
             try:
                 instantiated.update()
             except:
-                logging.info("[Bugzilla] ERROR: Importer failed, likely HTTP500, continuing on..."
+                logging.info("[Bugzilla] ERROR: Importer failed, likely HTTP500, continuing on...")
 
     def update_launchpad_hosted_projects(self):
         ### For Launchpad:
