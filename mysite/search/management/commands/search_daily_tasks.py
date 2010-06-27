@@ -11,6 +11,8 @@ import mysite.search.tasks.trac_instances
 import mysite.search.tasks.bugzilla_instances
 import mysite.search.tasks.launchpad_tasks
 
+import mechanize._response
+
 ### All this code runs synchronously once a day.
 ### For now, we can crawl all the bug trackers in serial.
 
@@ -92,8 +94,9 @@ class Command(BaseCommand):
             # breaking.
             try:
                 instantiated.update()
-            except:
+            except mechanize._response.httperror_seek_wrapper, e:
                 logging.info("[Bugzilla] ERROR: Importer failed, likely HTTP500, continuing on...")
+                logging.info("[Bugzilla] Error message: %s" % type(e))
 
     def update_launchpad_hosted_projects(self):
         ### For Launchpad:
