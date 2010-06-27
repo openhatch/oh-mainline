@@ -279,7 +279,7 @@ class BugzillaTests(django.test.TestCase):
     fixtures = ['miro-project']
     @mock.patch("mysite.customs.bugtrackers.bugzilla.url2bug_data")
     def test_kde(self, mock_xml_opener):
-        p = Project.create_dummy(name='KDE')
+        p = Project.create_dummy(name='kmail')
         mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
             settings.MEDIA_ROOT, 'sample-data', 'kde-117760-2010-04-09.xml')).read())
         kde = mysite.search.tasks.bugzilla_instances.KDEBugzilla()
@@ -292,7 +292,7 @@ class BugzillaTests(django.test.TestCase):
 
     @mock.patch("mysite.customs.bugtrackers.bugzilla.url2bug_data")
     def test_kde_harder_bug(self, mock_xml_opener):
-        p = Project.create_dummy(name='KDE')
+        p = Project.create_dummy(name='kphotoalbum')
         mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
             settings.MEDIA_ROOT, 'sample-data', 'kde-182054-2010-04-09.xml')).read())
         kde = mysite.search.tasks.bugzilla_instances.KDEBugzilla()
