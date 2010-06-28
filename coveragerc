@@ -1,0 +1,11 @@
+[report]
+; List of filename prefixes
+omit = eggs
+omit = parts
+omit = /usr
+omit = /var
+; This stuff just for the Hudson job, "Test all apps except search and customs"
+omit = search
+omit = customs
+
+; vim: filetype=cfg ai ts=3 sts=4 et sw=4 nu

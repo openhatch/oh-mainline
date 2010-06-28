@@ -746,7 +746,7 @@ class UserCanShowEmailAddress(TwillTests):
         tc.notfind('my@ema.il')
 
         tc.follow('settings')
-        tc.follow('Contact')
+        tc.follow('Email')
         tc.fv("a_settings_tab_form", 'show_email', '1')
         tc.submit()
 
@@ -850,6 +850,8 @@ class PersonInfoLinksToSearch(TwillTests):
 
         # Now, click on "thing1"
         tc.follow("thing1")
+
+        # The following assertion will succeed if we remove Haystack.
 
         # Now find ourself there
         tc.find('Asheesh Laroia')
@@ -982,7 +984,7 @@ class AddCitationManually(TwillTests):
         input_data = {
                 'portfolio_entry': portfolio_entry.pk,
                 'form_container_element_id': 'form_container_%d' % 0,
-                'url': 'http://google.ca/' # Needs this trailing slash to work.
+                'url': 'http://cthuugle.com/' # Needs this trailing slash to work.
                 }
 
         # Send this data to the appropriate view.
@@ -2059,26 +2061,27 @@ class PersonProjectCache(TwillTests):
     @mock.patch('django.core.cache.cache')
     def test(self, mock_cache):
         '''This test:
-        * Creates one person whose tag_texts say he can mentor in Banshee
-        * Ensures that get_tag_texts_for_map() caches that
-        * Deletes the Link_Person_Tag object
-        * Ensures the celery task re-fills the cache entry as being empty.'''
+        * Creates one person who has contributed to a certain project
+        * Ensures that when the PFE is saved, we cache the person's list of projects
+        * Remove the person from that project
+        * Ensures that when the PFE is deleted, we cache the person's list of projects
+        '''
 
         # 0. Our fake cache is empty always
         mock_cache.get.return_value = None
 
+        project = Project.create_dummy(name='project name')
+
         # 1. Give the person a PFE
         paulproteus = Person.objects.get(user__username='paulproteus')
-        portfolio_entry, _ =PortfolioEntry.objects.get_or_create(
-            project=Project.create_dummy(name='project name'),
-            is_published=True,
-            person=paulproteus)
+        portfolio_entry, pfe_was_created = PortfolioEntry.objects.get_or_create(
+            project=project, is_published=True, person=paulproteus)
+        self.assert_(pfe_was_created)
 
         # 2. Make sure we cached it
-        mock_cache.set.assert_called_with(paulproteus.get_cache_key_for_projects(),
-                                          simplejson.dumps({'value': [
-                                            'project name']}),
-                                          86400 * 10)
+        mock_cache.set.assert_called_with(
+                paulproteus.get_cache_key_for_projects(),
+                simplejson.dumps({'value': [ 'project name']}), 86400 * 10)
         mock_cache.set.reset_mock()
 
         # 3. Delete the PFE, and make sure the cache got deleted
@@ -2213,12 +2216,18 @@ class PeopleMapForNonexistentProject(TwillTests):
         # Yay, no exception.
 
 class BugModificationTimeVersusEpoch(TwillTests):
-    @mock.patch('mysite.profile.tasks.fill_recommended_bugs_cache.delay')
+    @mock.patch('mysite.profile.tasks.fill_recommended_bugs_cache')
     def test(self, mock_thing):
+        # Read the comments in the Epoch model if you haven't yet
         epoch_at_start = mysite.search.models.Epoch.get_for_model(
             mysite.search.models.Bug)
+        # This is a new bug, so we might want to invalidate the cache for
+        # recommended-bug lists, or people won't see this bug in their list of
+        # "Recommended bugs"
         b = mysite.search.models.Bug.create_dummy_with_project()
+        # Let's the invalidate the cache
         mysite.profile.tasks.sync_bug_epoch_from_model_then_fill_recommended_bugs_cache()
+        # Make sure that the cache timestamp has been updated
         new_epoch = mysite.search.models.Epoch.get_for_model(
             mysite.search.models.Bug)
         self.assert_(new_epoch > epoch_at_start)

@@ -154,9 +154,13 @@ INSTALLED_APPS = (
     #'debug_toolbar',
 )
 
-# file: settings.py #
-TEST_RUNNER = 'mysite._profiling.profile_tests'
-TEST_PROFILE = '/tmp/openhatch-profiling-data.%s' % os.environ.get('USER', 'unknown')
+# testrunner allows us to control which testrunner to use
+TEST_RUNNER = 'mysite.testrunner.run'
+
+# Make test names prettier 
+TEST_OUTPUT_DESCRIPTIONS = True
+
+TEST_OUTPUT_DIR = "test_output"
 
 ## AMQP, Rabbit Queue, Celery
 CARROT_BACKEND = 'amqp'

@@ -11,10 +11,6 @@ import datetime
 
 from django.conf import settings
 
-import mysite.customs.miro
-import mysite.customs.bugtrackers.trac
-import mysite.customs.bugtrackers.gnome_love
-import mysite.customs.bugtrackers.fedora_fitfinish
 import mysite.search.tasks.trac_instances
 import mysite.search.tasks.bugzilla_instances
 import mysite.search.tasks.launchpad_tasks

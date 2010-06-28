@@ -133,13 +133,10 @@ Run these commands:
 
 This product includes GeoLite data created by MaxMind, available from http://www.maxmind.com/.
 
-To use it, run these commands from the top level directory of the repository:
+This data is automatically downloaded by buildout. In theory we/you should re-download the database every month, when MaxMind does a refresh. To do so, run these commands from the top level directory of the repository:
 
-	cd downloads
-	wget http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz
-	gunzip GeoLiteCity.dat.gz
-
-Ta-da. In theory we/you should do that every month, when MaxMind does a refresh.
+    rm -rf parts/download_geocoding_db # Remove our cached copy
+    bin/buildout # If there's no cached copy, buildout will automatically download the file
 
 ## People search ##
 
@@ -181,6 +178,21 @@ Start in milestone-a, then run this command:
     bin/mysite rebuild_index
 
 (say yes)
+
+### Other maintenance tasks ###
+
+#### Run the hourly tasks related to profiles ####
+
+There's a management command that runs necessary maintenance tasks. At time of writing, it tries to keep our cache of recommended bugs more or less up to date with the state of the bug table in our database.
+
+To run this maintenance task hourly, run these commands:
+
+    # The following use of GNU screen is helpful for running maintenance tasks,
+    # but is not necessary.
+    screen -RD # Create an instance of screen, or attach to an existing one. 
+    # Type Ctrl-a, c to open a new screen
+    while (true); do ./bin/mysite profile_hourly_tasks; sleep 1h; done
+    # Type Ctrl-a, d to hide ("detach from") the screen
 
 ### Troubleshooting ###
 
@@ -243,8 +255,8 @@ Finally, don't forget to add your component to the list above, so the next perso
 * The fantastic people who have helped us:
     * [Nelson Pavlosky](http://skyfaller.net)
     * [Shotput Ventures](http://shotputventures.com), who mentored and funded us in the summer of 2009.
-    * The [Institute for Security, Technology, and Society](http://ists.dartmouth.edu) and the [Neukom Institute](http://dartmouth.edu/neukom), both at Dartmouth, who sponsored [Parker](http://madebyparker.com) [Phinney](http://openhatch.org/people/pyrak)'s internship during the winter of 2010.
-    * [Google Summer of Code](http://code.google.com/soc/), who are sponsoring [John](http://jstump.com) [Stumpo](http://openhatch.org/people/stump)'s internship during the summer of 2009.
+    * The [Institute for Security, Technology, and Society](http://ists.dartmouth.edu) and the [Neukom Institute](http://dartmouth.edu/neukom), both at Dartmouth, who sponsored [Parker](http://madebyparker.com) [Phinney](http://openhatch.org/people/pyrak)'s internship during the Dartmouth winter 2010 term.
+    * [Google Summer of Code](http://code.google.com/soc/), who are sponsoring [John](http://jstump.com) [Stumpo](http://openhatch.org/people/stump)'s internship during the summer of 2010.
 
 ## Stay in touch ##
 

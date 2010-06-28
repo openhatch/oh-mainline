@@ -18,29 +18,40 @@ People Search
     where {{ property }} = {{ value }}
     {% endif %}
 
-<form action=".">
-    <div id='search'>
-        <div class='keyword field'>
-            <label for='search_profiles'>Search for</label>
-            <input id='search_profiles' type='text' value="{{ raw_query }}" name="q">
+    <form action=".">
+        <div id='search'>
+            <div class='keyword field'>
+                <label for='search_profiles'>Search for</label>
+                <input id='search_profiles' type='text' value="{{ raw_query }}" name="q">
+            </div>
+            <div class='location field'>
+              <div class="input-and-labels">
+                <label for='location_for_map_centering'>Near</label>
+                <p class="map-error">We couldn't find that location.</p>
+                <input id="location_for_map_centering" name="center"
+                       type="text" value="{{ center_name }}"/>
+          </div>
+            </div>
+            <div class='stubmit field'>
+              <div class="input-and-labels">
+                <label for='search_locations'>&nbsp;</label>
+                <input id="center_the_map" type="submit" value="Search"/>
+          </div>
+            </div>
+            
         </div>
-        <div class='location field'>
-          <div class="input-and-labels">
-            <label for='location_for_map_centering'>Near</label>
-            <p class="map-error">We couldn't find that location.</p>
-            <input id="location_for_map_centering" name="center"
-                   type="text" value="{{ center_name }}"/>
-	  </div>
-        </div>
-        <div class='stubmit field'>
-          <div class="input-and-labels">
-            <label for='search_locations'>&nbsp;</label>
-            <input id="center_the_map" type="submit" value="Search"/>
-	  </div>
-        </div>
-	    
-    </div>
-</form>
+    </form>
+
+    {% if haystack_is_down %}
+
+        <p id='search_engine_is_down_message'>
+        The people directory is currently
+        <abbr title='Specifically, one of these pieces is off or not working properly: Solr or Haystack'>down</abbr> for maintenance.  Please try again later. You can still
+        view the <a href='{% url mysite.profile.views.people %}'>global map</a>.
+        </p>
+
+    {% else %}
+
     {% if not q %}
     <ul class='suggestions'>
         {# this is cached in the view #}
@@ -62,6 +73,7 @@ People Search
         {% endfor %}
     </ul><!-- /.suggestions -->
     {% endif %}
+
     {% if q %}
     {% if mentor_count or suggestions_for_searches_regarding_people_who_can_pitch_in or icanhelp_count %}
     <div id='refine_search' class='greybox'>
@@ -247,6 +259,8 @@ People Search
             {% endif %}
         </ul>
     </div>
+    {% endif %}
+
     {% endif %}
 {% endblock people_main %}
 
