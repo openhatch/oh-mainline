@@ -1038,7 +1038,7 @@ class QueryGetPossibleProjectFacetOptions(SearchTest):
         query = mysite.search.controllers.Query.create_from_GET_data(GET_data)
         possible_project_names = [x['name'] for x in dict(query.get_possible_facets())['project']['options']]
         self.assertEqual(
-                possible_project_names,
+                sorted(possible_project_names),
                 sorted(list(Project.objects.values_list('name', flat=True))))
 
 class QueryContributionType(SearchTest):
