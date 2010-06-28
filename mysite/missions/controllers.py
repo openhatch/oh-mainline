@@ -1,7 +1,5 @@
 from mysite.missions.models import Step, StepCompletion
 
-from django import forms
-
 import tarfile
 from StringIO import StringIO
 import os
@@ -78,9 +76,6 @@ int main(void)
         if len(filenames_wanted) != 0:
             raise IncorrectTarFile, 'Archive does not contain all expected files (missing %s)' % (', '.join('"%s"' % f for f in filenames_wanted))
 
-class TarUploadForm(forms.Form):
-    tarfile = forms.FileField(error_messages={'required': 'No file was uploaded.'})
-
 class UntarMission(object):
     TARBALL_DIR_NAME = 'ghello-0.4'
     TARBALL_NAME = TARBALL_DIR_NAME + '.tar.gz'
@@ -98,9 +93,6 @@ class UntarMission(object):
     def get_contents_we_want(cls):
         '''Get the data for the file we want from the tarball.'''
         return open(os.path.join(get_mission_data_path(), cls.FILE_WE_WANT)).read()
-
-class TarExtractUploadForm(forms.Form):
-    extracted_file = forms.FileField(error_messages={'required': 'No file was uploaded.'})
 
 class PatchSingleFileMission(object):
     OLD_FILE = os.path.join(get_mission_data_path(), 'fib1.c')

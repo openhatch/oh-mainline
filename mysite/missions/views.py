@@ -1,5 +1,6 @@
 from mysite.base.decorators import view
-from mysite.missions.controllers import TarMission, TarUploadForm, IncorrectTarFile, UntarMission, TarExtractUploadForm, mission_completed, PatchSingleFileMission
+from mysite.missions.controllers import TarMission, IncorrectTarFile, UntarMission, mission_completed, PatchSingleFileMission
+from mysite.missions import forms
 from mysite.missions.models import Step, StepCompletion
 
 from django.http import HttpResponseRedirect, HttpResponse, Http404
@@ -24,7 +25,7 @@ def main_page(request):
 def tar_upload(request):
     data = {}
     if request.method == 'POST':
-        form = TarUploadForm(request.POST, request.FILES)
+        form = forms.TarUploadForm(request.POST, request.FILES)
         if form.is_valid():
             try:
                 TarMission.check_tarfile(form.cleaned_data['tarfile'].read())
@@ -42,8 +43,8 @@ def tar_mission(request, passed_data={}):
       'create_success': False,
       'what_was_wrong_with_the_tarball': '',
       'filenames_for_tarball': TarMission.FILES.keys(),
-      'create_form': TarUploadForm(),
-      'unpack_form': TarExtractUploadForm(),
+      'create_form': forms.TarUploadForm(),
+      'unpack_form': forms.TarExtractUploadForm(),
       'unpack_success': False,
       'tarball_for_unpacking_mission': UntarMission.TARBALL_NAME,
       'file_we_want': UntarMission.FILE_WE_WANT,
@@ -75,7 +76,7 @@ def tar_download_tarball_for_extract_mission(request):
 def tar_extract_mission_upload(request):
     data = {}
     if request.method == 'POST':
-        form = TarExtractUploadForm(request.POST, request.FILES)
+        form = forms.TarExtractUploadForm(request.POST, request.FILES)
         if form.is_valid():
             if form.cleaned_data['extracted_file'].read() == UntarMission.get_contents_we_want():
                 data['unpack_success'] = True
