@@ -94,7 +94,7 @@ class Command(BaseCommand):
             # breaking.
             try:
                 instantiated.update()
-            except urllib.URLError, e:
+            except urllib2.URLError, e:
                 logging.info("[Bugzilla] ERROR: Importer failed, likely HTTP500, continuing on...")
                 logging.info("[Bugzilla] Error message: %s" % str(e))
 
