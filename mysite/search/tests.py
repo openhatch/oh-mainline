@@ -1663,14 +1663,6 @@ class BugKnowsItsFreshness(TestCase):
             days=1, hours=1)
         self.assertFalse(b.data_is_more_fresh_than_one_day())
         
-class SugarLabsOnline(TestCase):
-    def test(self):
-        bug_id = 1854
-        self.assertFalse(mysite.search.models.Bug.open_ones.all())
-        mysite.search.tasks.trac_instances.look_at_sugar_labs_bug(bug_id=bug_id)
-        bug = mysite.search.models.Bug.open_ones.get()
-        self.assertEqual(bug.title, "save as html doesn't convert & to &gt;")
-
 class WeCanPollSomethingToCheckIfAProjectIconIsLoaded(TestCase):
     def test(self):
         # Create a dummy project
