@@ -4,7 +4,6 @@ import mysite.base.unicode_sanity
 import mysite.account.tests
 from mysite.profile.models import Person
 import mysite.profile.models
-import mysite.customs.miro
 import mysite.search.controllers
 from mysite.search.models import Project, Bug, HitCountCache, \
         ProjectInvolvementQuestion, Answer, BugAlert
@@ -1619,7 +1618,7 @@ class TestEpoch(TwillTests):
     def test_on_mark_looks_closed(self):
         # There's no Epoch for bugs yet, right?
         now = mysite.search.models.Epoch.get_for_model(mysite.search.models.Bug)
-        self.assertEqual(now, mysite.search.models.Epoch.zero_hour)
+        self.assertEqual(now, mysite.search.models.Epoch.zero_o_clock)
 
         # Making a Bug should not bump the Epoch
         p = mysite.search.models.Project.create_dummy()
@@ -1627,7 +1626,7 @@ class TestEpoch(TwillTests):
 
         now = mysite.search.models.Epoch.get_for_model(mysite.search.models.Bug)
         self.assertEqual(now,
-                         mysite.search.models.Epoch.zero_hour)
+                         mysite.search.models.Epoch.zero_o_clock)
 
         # Setting the bug to looks_closed should bump the Epoch
         b.looks_closed = True
@@ -1635,12 +1634,12 @@ class TestEpoch(TwillTests):
 
         # Now it's higher, right?
         now = mysite.search.models.Epoch.get_for_model(mysite.search.models.Bug)
-        self.assert_(now > mysite.search.models.Epoch.zero_hour)
+        self.assert_(now > mysite.search.models.Epoch.zero_o_clock)
 
     def test_on_delete(self):
         # There's no Epoch for bugs yet, right?
         now = mysite.search.models.Epoch.get_for_model(mysite.search.models.Bug)
-        self.assertEqual(now, mysite.search.models.Epoch.zero_hour)
+        self.assertEqual(now, mysite.search.models.Epoch.zero_o_clock)
 
         # Making a Bug should not bump the Epoch
         p = mysite.search.models.Project.create_dummy()
@@ -1648,7 +1647,7 @@ class TestEpoch(TwillTests):
 
         now = mysite.search.models.Epoch.get_for_model(mysite.search.models.Bug)
         self.assertEqual(now,
-                         mysite.search.models.Epoch.zero_hour)
+                         mysite.search.models.Epoch.zero_o_clock)
 
         # Deleting that Bug should bump the Epoch
         b.delete()
