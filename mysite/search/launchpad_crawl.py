@@ -94,8 +94,12 @@ def clean_lp_data_dict(lp_data_dict):
     new_data['last_polled'] = datetime.datetime.now()
 
     # Look for bitesize tag
-    if 'bitesize' in lp_data_dict['tags']:
-        new_data['good_for_newcomers'] = True
+    # If no 'tags', pass
+    try:
+        if 'bitesize' in lp_data_dict['tags']:
+            new_data['good_for_newcomers'] = True
+    except KeyError:
+        pass
 
     status =  lp_data_dict.get('status', 'Unknown')
     if not status:
