@@ -105,6 +105,8 @@ class TarExtractUploadForm(forms.Form):
 class PatchSingleFileMission(object):
     OLD_FILE = os.path.join(get_mission_data_path(), 'fib1.c')
     NEW_FILE = os.path.join(get_mission_data_path(), 'fib2.c')
+    # This does not correspond to a real file but is merely the filename the download is presented as.
+    PATCH_FILENAME = 'fib-linear-time.patch'
 
     @classmethod
     def get_patch(cls):

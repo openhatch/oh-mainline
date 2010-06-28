@@ -1,10 +1,18 @@
 from mysite.base.decorators import view
-from mysite.missions.controllers import TarMission, TarUploadForm, IncorrectTarFile, UntarMission, TarExtractUploadForm, mission_completed
+from mysite.missions.controllers import TarMission, TarUploadForm, IncorrectTarFile, UntarMission, TarExtractUploadForm, mission_completed, PatchSingleFileMission
 from mysite.missions.models import Step, StepCompletion
 
 from django.http import HttpResponseRedirect, HttpResponse, Http404
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
+
+import os
+
+def make_download(content, filename, mimetype='application/octet-stream'):
+    resp = HttpResponse(content)
+    resp['Content-Disposition'] = 'attachment; filename=%s' % filename
+    resp['Content-Type'] = mimetype
+    return resp
 
 @login_required
 @view
@@ -76,3 +84,9 @@ def tar_extract_mission_upload(request):
                 data['what_was_wrong_with_the_extracted_file'] = 'The uploaded file does not have the correct contents.'
         data['unpack_form'] = form
     return tar_mission(request, data)
+
+def diffpatch_patchsingle_get_original_file(request):
+    return make_download(open(PatchSingleFileMission.OLD_FILE).read(), filename=os.path.basename(PatchSingleFileMission.OLD_FILE))
+
+def diffpatch_patchsingle_get_patch(request):
+    return make_download(PatchSingleFileMission.get_patch(), filename=PatchSingleFileMission.PATCH_FILENAME)

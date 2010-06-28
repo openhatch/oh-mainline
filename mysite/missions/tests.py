@@ -155,7 +155,13 @@ class UntarViewTests(TwillTests):
         paulproteus = Person.objects.get(user__username='paulproteus')
         self.assertEqual(len(StepCompletion.objects.filter(step__name='tar_extract', person=paulproteus)), 0)
 
-class PatchSingleFileTests(TestCase):
+
+class PatchSingleFileTests(TwillTests):
+    fixtures = ['person-paulproteus', 'user-paulproteus']
+
+    def setUp(self):
+        TwillTests.setUp(self)
+        self.client = self.login_with_client()
 
     def test_generated_patch(self):
         oldfile = tempfile.NamedTemporaryFile(delete=False)
@@ -173,3 +179,10 @@ class PatchSingleFileTests(TestCase):
 
         finally:
             os.unlink(file_to_patch)
+
+
+    def test_downloads_of_needed_files(self):
+        orig_response = self.client.get(reverse(views.diffpatch_patchsingle_get_original_file))
+        self.assert_(orig_response['Content-Disposition'].startswith('attachment'))
+        patch_response = self.client.get(reverse(views.diffpatch_patchsingle_get_patch))
+        self.assert_(patch_response['Content-Disposition'].startswith('attachment'))
