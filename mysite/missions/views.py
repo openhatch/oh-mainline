@@ -92,3 +92,29 @@ def diffpatch_patchsingle_get_original_file(request):
 def diffpatch_patchsingle_get_patch(request):
     return make_download(controllers.PatchSingleFileMission.get_patch(),
                          filename=controllers.PatchSingleFileMission.PATCH_FILENAME)
+
+@login_required
+@view
+def diffpatch_mission(request, passed_data={}):
+    data = {
+      'patchsingle_success': False,
+      'patchsingle_form': forms.PatchSingleUploadForm(),
+      'patchsingle_error_message': '',
+      'patchsingle_done': controllers.mission_completed(request.user.get_profile(), 'diffpatch_patchsingle')
+    }
+    data.update(passed_data)
+    return (request, 'missions/diff_patch.html', data)
+
+@login_required
+def diffpatch_patchsingle_submit(request):
+    data = {}
+    if request.method == 'POST':
+        form = forms.PatchSingleUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            if form.cleaned_data['patched_file'].read() == open(controllers.PatchSingleFileMission.NEW_FILE).read():
+                controllers.set_mission_completed(request.user.get_profile(), 'diffpatch_patchsingle')
+                data['patchsingle_success'] = True
+            else:
+                data['patchsingle_error_message'] = 'The file did not match the contents it should have.'
+        data['patchsingle_form'] = form
+    return diffpatch_mission(request, data)

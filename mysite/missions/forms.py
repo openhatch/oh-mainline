@@ -6,3 +6,5 @@ class TarExtractUploadForm(forms.Form):
 class TarUploadForm(forms.Form):
     tarfile = forms.FileField(error_messages={'required': 'No file was uploaded.'})
 
+class PatchSingleUploadForm(forms.Form):
+    patched_file = forms.FileField(error_messages={'required': 'No file was uploaded.'})

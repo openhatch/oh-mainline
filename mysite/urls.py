@@ -63,8 +63,10 @@ urlpatterns = patterns('',
         (r'^missions/tar/downloadtarball', 'mysite.missions.views.tar_download_tarball_for_extract_mission'),
         (r'^missions/tar/extractupload', 'mysite.missions.views.tar_extract_mission_upload'),
 
+        (r'^missions/diffpatch$', 'mysite.missions.views.diffpatch_mission'),
         (r'^missions/diffpatch/patchsingle/original$', 'mysite.missions.views.diffpatch_patchsingle_get_original_file'),
         (r'^missions/diffpatch/patchsingle/patch$', 'mysite.missions.views.diffpatch_patchsingle_get_patch'),
+        (r'^missions/diffpatch/patchsingle/submit$', 'mysite.missions.views.diffpatch_patchsingle_submit'),
 
         # Invitation-related URLs
         (r'^invitation/', include('invitation.urls')),

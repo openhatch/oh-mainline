@@ -186,3 +186,35 @@ class PatchSingleFileTests(TwillTests):
         self.assert_(orig_response['Content-Disposition'].startswith('attachment'))
         patch_response = self.client.get(reverse(views.diffpatch_patchsingle_get_patch))
         self.assert_(patch_response['Content-Disposition'].startswith('attachment'))
+
+    def test_do_mission_correctly(self):
+        oldfile = tempfile.NamedTemporaryFile(delete=False)
+        file_to_patch = oldfile.name
+
+        try:
+            orig_response = self.client.get(reverse(views.diffpatch_patchsingle_get_original_file))
+            oldfile.write(orig_response.content)
+            oldfile.close()
+
+            patch_response = self.client.get(reverse(views.diffpatch_patchsingle_get_patch))
+            patch_process = subprocess.Popen(['patch', file_to_patch], stdin=subprocess.PIPE)
+            patch_process.communicate(patch_response.content)
+            self.assertEqual(patch_process.returncode, 0)
+
+            submit_response = self.client.post(reverse(views.diffpatch_patchsingle_submit), {'patched_file': open(file_to_patch)})
+            self.assert_(submit_response.context['patchsingle_success'])
+
+            paulproteus = Person.objects.get(user__username='paulproteus')
+            self.assertEqual(len(StepCompletion.objects.filter(step__name='diffpatch_patchsingle', person=paulproteus)), 1)
+
+        finally:
+            os.unlink(file_to_patch)
+
+    def test_do_mission_incorrectly(self):
+        patched_file = StringIO('Some arbitrary contents so the file is incorrect.')
+        patched_file.name = 'foo.c'
+        submit_response = self.client.post(reverse(views.diffpatch_patchsingle_submit), {'patched_file': patched_file})
+        self.assertFalse(submit_response.context['patchsingle_success'])
+
+        paulproteus = Person.objects.get(user__username='paulproteus')
+        self.assertEqual(len(StepCompletion.objects.filter(step__name='diffpatch_patchsingle', person=paulproteus)), 0)
