@@ -6,5 +6,9 @@
   {"model": "missions.Step",
    "pk": 2,
    "fields": {"name": "tar_extract"}
+  },
+  {"model": "missions.Step",
+   "pk": 3,
+   "fields": {"name": "diffpatch_patchsingle"}
   }
 ]
