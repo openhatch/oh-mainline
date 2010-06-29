@@ -40,6 +40,7 @@ import mysite.customs.github
 import mysite.customs.models
 import mysite.customs.bugtrackers.roundup_general
 import mysite.customs.lp_grabber
+import mysite.search.management.commands.search_daily_tasks
 # }}}
 
 # Mocked out browser.open
@@ -1031,27 +1032,16 @@ class OpenSolaris(django.test.TestCase):
         self.assertEquals(bug_result, False)
 
 class DailyBugImporter(django.test.TestCase):
-    import mysite.search.management.commands.search_daily_tasks
 
     @mock.patch('mysite.customs.ohloh.mechanize_get')
     def test_bugzilla_http_error_504_does_not_break(self, mock_error):
         mock_error.side_effect = generate_504
-        try:
-            mysite.search.management.commands.search_daily_tasks.Command().find_and_update_enabled_bugzilla_instances()
-        except HTTPError, e:
-            if e.code == 504:
-                self.fail('504 error should have been caught')
-        except Exception, e:
-            pass
+        mysite.search.management.commands.search_daily_tasks.Command().find_and_update_enabled_bugzilla_instances()
 
     @mock.patch('mysite.customs.ohloh.mechanize_get')
     def test_bugzilla_http_generic_error_does_break(self, mock_error):
         mock_error.side_effect = ValueError()
-        try:
-            mysite.search.management.commands.search_daily_tasks.Command().find_and_update_enabled_bugzilla_instances()
-        except ValueError, e:
-            return
-        self.fail('No error occurred - should have been a 404')
+        self.assertRaises(ValueError, mysite.search.management.commands.search_daily_tasks.Command().find_and_update_enabled_bugzilla_instances())
 
 
 # vim: set nu:
