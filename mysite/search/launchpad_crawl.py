@@ -95,11 +95,8 @@ def clean_lp_data_dict(lp_data_dict):
 
     # Look for bitesize tag
     # If no 'tags', pass
-    try:
-        if 'bitesize' in lp_data_dict['tags']:
-            new_data['good_for_newcomers'] = True
-    except KeyError:
-        pass
+    if 'bitesize' in lp_data_dict.get('tags', []):
+        new_data['good_for_newcomers'] = True
 
     status =  lp_data_dict.get('status', 'Unknown')
     if not status:
