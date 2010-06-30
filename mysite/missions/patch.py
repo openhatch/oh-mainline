@@ -462,7 +462,7 @@ class Patch(object):
           line = fp.readline()
           lineno += 1
         for hline in h.text:
-          if hline.startswith("-"):
+          if hline.startswith("+"):
             continue
           if not len(line):
             debug("check failed - premature eof on hunk: %d" % (hno+1))
