@@ -221,7 +221,12 @@ class PatchSingleFileTests(TwillTests):
         self.assertEqual(len(StepCompletion.objects.filter(step__name='diffpatch_patchsingle', person=paulproteus)), 0)
 
 
-class DiffSingleFileValidatorTests(TestCase):
+class DiffSingleFileTests(TwillTests):
+    fixtures = ['person-paulproteus', 'user-paulproteus']
+
+    def setUp(self):
+        TwillTests.setUp(self)
+        self.client = self.login_with_client()
 
     def make_good_patch(self):
         oldlines = open(DiffSingleFileMission.OLD_FILE).readlines()
@@ -274,3 +279,22 @@ class DiffSingleFileValidatorTests(TestCase):
         else:
             self.fail('no exception raised')
 
+    def test_do_mission_correctly(self):
+        orig_response = self.client.get(reverse(views.diffpatch_diffsingle_get_original_file))
+        orig_lines = StringIO(orig_response.content).readlines()
+        result_lines = open(DiffSingleFileMission.NEW_FILE).readlines()
+
+        diff = ''.join(difflib.unified_diff(orig_lines, result_lines))
+
+        submit_response = self.client.post(reverse(views.diffpatch_diffsingle_submit), {'diff': diff})
+        self.assert_(submit_response.context['diffsingle_success'])
+
+        paulproteus = Person.objects.get(user__username='paulproteus')
+        self.assertEqual(len(StepCompletion.objects.filter(step__name='diffpatch_diffsingle', person=paulproteus)), 1)
+
+    def test_do_mission_incorrectly(self):
+        submit_response = self.client.post(reverse(views.diffpatch_diffsingle_submit), {'diff': self.make_swapped_patch()})
+        self.assertFalse(submit_response.context['diffsingle_success'])
+
+        paulproteus = Person.objects.get(user__username='paulproteus')
+        self.assertEqual(len(StepCompletion.objects.filter(step__name='diffpatch_diffsingle', person=paulproteus)), 0)

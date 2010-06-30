@@ -100,7 +100,11 @@ def diffpatch_mission(request, passed_data={}):
       'patchsingle_success': False,
       'patchsingle_form': forms.PatchSingleUploadForm(),
       'patchsingle_error_message': '',
-      'patchsingle_done': controllers.mission_completed(request.user.get_profile(), 'diffpatch_patchsingle')
+      'patchsingle_done': controllers.mission_completed(request.user.get_profile(), 'diffpatch_patchsingle'),
+      'diffsingle_success': False,
+      'diffsingle_form': forms.DiffSingleUploadForm(),
+      'diffsingle_error_message': '',
+      'diffsingle_done': controllers.mission_completed(request.user.get_profile(), 'diffpatch_diffsingle'),
     }
     data.update(passed_data)
     return (request, 'missions/diff_patch.html', data)
@@ -117,4 +121,23 @@ def diffpatch_patchsingle_submit(request):
             else:
                 data['patchsingle_error_message'] = 'The file did not match the contents it should have.'
         data['patchsingle_form'] = form
+    return diffpatch_mission(request, data)
+
+def diffpatch_diffsingle_get_original_file(request):
+    return make_download(open(controllers.DiffSingleFileMission.OLD_FILE).read(),
+                         filename=os.path.basename(controllers.DiffSingleFileMission.OLD_FILE))
+
+@login_required
+def diffpatch_diffsingle_submit(request):
+    data = {}
+    if request.method == 'POST':
+        form = forms.DiffSingleUploadForm(request.POST)
+        if form.is_valid():
+            try:
+                controllers.DiffSingleFileMission.validate_patch(form.cleaned_data['diff'])
+                controllers.set_mission_completed(request.user.get_profile(), 'diffpatch_diffsingle')
+                data['diffsingle_success'] = True
+            except controllers.IncorrectPatch, e:
+                data['diffsingle_error_message'] = str(e)
+        data['diffsingle_form'] = form
     return diffpatch_mission(request, data)

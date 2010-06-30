@@ -43,6 +43,35 @@ Using diff and patch
     </form>
     <br style="clear: left;" />
 
+    <h2>Diffing individual files</h2>
+    <p>When you are submitting changes to a project, you will need to run diff to create a patch that you can submit.  <a href="{% url mysite.missions.views.diffpatch_diffsingle_get_original_file %}">Here is a text file which contains some simple instructions for modifying it.</a>  Once you have the file, you can make those changes in a text editor.  Then you can make a unified diff (the universally preferred flavor of diff output) of your changes.</p>
+    <p>Large patches can be stored in files and attached to whatever medium you use to submit the patch, but since this patch is short, it can be included inline in the message.  So instead of uploading the patch in a file, your mission is to make your patch and copy and paste it into the box below.</p>
+
+    <form method="post" action="{% url mysite.missions.views.diffpatch_diffsingle_submit %}#diffsingle-form">
+      <div class="form-row">
+        <a name="diffsingle-form"></a>
+        Paste your patch here:
+  {% if diffsingle_success %}
+    <div class="successmsg">
+      <p><strong>You have successfully completed this part of the mission.</strong></p>
+      <p>The patch applies correctly and results in the correct file.</p>
+    </div>
+  {% endif %}
+        {% if diffsingle_error_message %}
+        <ul class="errorlist"><li>{{ diffsingle_error_message }}</li></ul>
+        {% endif %}
+        {{ diffsingle_form.diff.errors }}
+        <br style="clear: left;" />
+        {{ diffsingle_form.diff }}
+        <input type="submit" value="Submit" style="float: none;" />
+        {% if diffsingle_done %}
+        <br style="clear: left;" />
+        <em>You have already completed this part of the mission.</em>
+        {% endif %}
+      </div>
+    </form>
+    <br style="clear: left;" />
+
   </div>
 </div>
 {% endblock main %}
