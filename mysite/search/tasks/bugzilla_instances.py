@@ -1,58 +1,572 @@
 import datetime
 import logging
+
 import mysite.search.models
-import mysite.customs.models
-from celery.task import Task
-from celery.registry import tasks
+import mysite.customs.bugtrackers.bugzilla
 
-def look_at_one_fedora_bug(bug_id):
-    logging.info("Was asked to look at bug %d in Fedora" % bug_id)
-    # If bug is already in our database, and we looked at
-    # it within the past day, skip the request.
-    bug_url = mysite.customs.bugtrackers.bugzilla_general.bug_id2bug_url(
-        bug_id=bug_id,
-        BUG_URL_PREFIX=mysite.customs.bugtrackers.fedora_fitfinish.BUG_URL_PREFIX)
+class BugzillaBugTracker(object):
+    def __init__(self, base_url, project_name, bug_project_name_format, bug_id_list_only=False):
+        self.base_url = base_url
+        self.project_name = project_name
+        self.bug_project_name_format = bug_project_name_format
+        self.bug_id_list_only = bug_id_list_only
 
-    try:
-        bug_obj = mysite.search.models.Bug.all_bugs.get(
-            canonical_bug_link=bug_url)
-    except mysite.search.models.Bug.MultipleObjectsReturned:
-        # delete all but the first
-        bug_objs = mysite.search.models.Bug.all_bugs.filter(
-            canonical_bug_link=bug_url)
-        bug_obj = bug_objs[0]
-        for stupid_dup in bug_objs[1:]:
-            stupid_dup.delete()
+    def generate_bug_project_name(self, bb):
+        return self.bug_project_name_format.format(
+                project = self.project_name,
+                product = bb.product,
+                component = bb.component)
 
-    except mysite.search.models.Bug.DoesNotExist:
-        bug_obj = mysite.search.models.Bug(
-            canonical_bug_link=bug_url)
+    def create_or_refresh_one_bugzilla_bug(self, bb):
+        bug_id = bb.bug_id
+        bug_url = bb.as_bug_specific_url()
 
-    # Is that bug fresh enough to skip?
-    if bug_obj.data_is_more_fresh_than_one_day():
-        logging.info("Bug is fresh! Skipping.")
-        return
-    # if the delta is greater than a day, refresh it.
-    mysite.customs.bugtrackers.fedora_fitfinish.reload_bug_obj(bug_obj)
-    bug_obj.save()
-    logging.info("Finished with %d from Fedora." % bug_id)
+        try:
+            bug = mysite.search.models.Bug.all_bugs.get(
+                    canonical_bug_link=bug_url)
+            # Found an existing bug. Does it need refreshing?
+            if bug.data_is_more_fresh_than_one_day():
+                logging.info("[Bugzilla] Bug %d from %s is fresh. Doing nothing!" % (bug_id, self.project_name))
+                return False # sweet
+        except mysite.search.models.Bug.DoesNotExist:
+            # This is a new bug
+            bug = mysite.search.models.Bug(canonical_bug_link = bug_url)
 
-def learn_about_new_fedora_fit_and_finish_bugs():
-    logging.info('Started to learn about new Fedora fit and finish bugs.')
-    for bug_id in mysite.customs.bugtrackers.fedora_fitfinish.current_fit_and_finish_bug_ids():
-        look_at_one_fedora_bug(bug_id=bug_id)
-    logging.info('Finished grabbing the list of Fedora fit and finish bugs.')
+        # Looks like we have some refreshing to do.
+        logging.info("[Bugzilla] Refreshing bug %d from %s." % (bug_id, self.project_name))
+        # Get the dictionary of data to put into the bug. The function for
+        # obtaining tracker-specific data is passed in.
+        data = bb.as_data_dict_for_bug_object(self.extract_tracker_specific_data)
 
-def refresh_all_fedora_fit_and_finish_bugs():
-    logging.info("Starting refreshing all Fedora bugs.")
-    all_such_bugs = mysite.search.models.Bug.all_bugs.filter(
-        canonical_bug_link__contains=
-        mysite.customs.bugtrackers.fedora_fitfinish.BUG_URL_PREFIX)
-    logging.info("All %d of them." % all_such_bugs.count())
+        # Fill that bug!
+        for key in data:
+            value = data[key]
+            setattr(bug, key, value)
 
-    for bug in all_such_bugs:
-        bug_id = mysite.customs.bugtrackers.bugzilla_general.bug_url2bug_id(
-            bug.canonical_bug_link,
-            BUG_URL_PREFIX=mysite.customs.bugtrackers.fedora_fitfinish.BUG_URL_PREFIX)
-        look_at_one_fedora_bug(bug_id=bug_id)
+        # Find or create the project for the bug and save it
+        bug_project_name = self.generate_bug_project_name(bb)
+        if bug_project_name == '':
+            raise ValueError("Can't have bug_project_name as ''")
+        project_from_name, _ = mysite.search.models.Project.objects.get_or_create(name=bug_project_name)
+        if bug.project_id != project_from_name.id:
+            bug.project = project_from_name
+        bug.last_polled = datetime.datetime.utcnow()
+        bug.save()
+        logging.info("[Bugzilla] Finished with %d from %s." % (bug_id, self.project_name))
+        return True
+
+    def refresh_all_bugs(self):
+        for bug in mysite.search.models.Bug.all_bugs.filter(
+                canonical_bug_link__contains=self.base_url):
+            bb = mysite.customs.bugtrackers.bugzilla.BugzillaBug.from_url(
+                    bug.canonical_bug_link)
+            self.create_or_refresh_one_bugzilla_bug(bb=bb)
+
+    def update(self):
+        logging.info("[Bugzilla] Started refreshing all %s bugs" % self.project_name)
+
+        # First, go through and create or refresh all the bugs that
+        # we are configured to track. This will add new bugs and
+        # update current ones. Bugzilla doesn't return a nice
+        # CSV list of bug ids, but instead gives an entire XML tree
+        # of bug data for the bugs matching the query. To save on
+        # network traffic, the bug data will be passed to the refresher.
+        if self.bug_id_list_only:
+            # If we have a tracking bug, then we can't get an xml tree
+            # of bug data. Instead we have to use the bug ids pulled
+            # from the dependencies of the tracking bug.
+            current_bug_id_list = self.get_current_bug_id_list()
+            for bug_id in current_bug_id_list:
+                bb = mysite.customs.bugtrackers.bugzilla.BugzillaBug(
+                        BASE_URL=self.base_url,
+                        bug_id=bug_id)
+                self.create_or_refresh_one_bugzilla_bug(bb=bb)
+        else:
+            logging.info("[Bugzilla] Fetching XML data for bugs in tracker...")
+            current_xml_bug_tree = self.get_current_xml_bug_tree()
+            for bug_data in current_xml_bug_tree.xpath('bug'):
+                bb = mysite.customs.bugtrackers.bugzilla.BugzillaBug(
+                        BASE_URL=self.base_url,
+                        bug_data=bug_data)
+                self.create_or_refresh_one_bugzilla_bug(bb=bb)
+
+        # Then refresh all the bugs we have from this tracker. This
+        # should skip over all the bugs except the ones that didn't
+        # appear in the above query. Usually this is closed bugs.
+        self.refresh_all_bugs()
+
+class MiroBugzilla(BugzillaBugTracker):
+    enabled = True
+
+    def __init__(self):
+        BugzillaBugTracker.__init__(self,
+                                    base_url='http://bugzilla.pculture.org/',
+                                    project_name='Miro',
+                                    bug_project_name_format='{project}')
+
+    def get_current_xml_bug_tree(self):
+        return mysite.customs.bugtrackers.bugzilla.url2bug_data(
+                'http://bugzilla.pculture.org/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&field-1-0-0=bug_status&field-1-1-0=product&field-1-2-0=keywords&keywords=bitesized&product=Miro&query_format=advanced&remaction=&type-1-0-0=anyexact&type-1-1-0=anyexact&type-1-2-0=anywords&value-1-0-0=NEW%2CASSIGNED%2CREOPENED&value-1-1-0=Miro&value-1-2-0=bitesized')
+
+    @staticmethod
+    def extract_tracker_specific_data(xml_data, ret_dict):
+        # Make modifications to ret_dict using provided xml data
+        keywords_text = mysite.customs.bugtrackers.bugzilla.get_tag_text_from_xml(xml_data, 'keywords')
+        keywords = map(lambda s: s.strip(),
+                       keywords_text.split(','))
+        ret_dict['good_for_newcomers'] = ('bitesized' in keywords)
+        # Then pass ret_dict back
+        return ret_dict
+
+class KDEBugzilla(BugzillaBugTracker):
+    enabled = True
+
+    def __init__(self):
+        BugzillaBugTracker.__init__(self,
+                                    base_url='https://bugs.kde.org/',
+                                    project_name='KDE',
+                                    bug_project_name_format='')
+
+    def get_current_xml_bug_tree(self):
+        return mysite.customs.bugtrackers.bugzilla.url2bug_data(
+                'https://bugs.kde.org/buglist.cgi?query_format=advanced&short_desc_type=allwordssubstr&short_desc=&long_desc_type=allwordssubstr&long_desc=&bug_file_loc_type=allwordssubstr&bug_file_loc=&keywords_type=allwords&keywords=junior-jobs&bug_status=UNCONFIRMED&bug_status=NEW&bug_status=REOPENED&bug_status=NEEDSINFO&bug_status=VERIFIED&resolution=---&emailtype1=substring&email1=&emailtype2=substring&email2=&bugidtype=include&bug_id=&votes=&chfieldfrom=&chfieldto=Now&chfieldvalue=&cmdtype=doit&order=Reuse+same+sort+as+last+time&field0-0-0=noop&type0-0-0=noop&value0-0-0=')
+
+    @staticmethod
+    def extract_tracker_specific_data(xml_data, ret_dict):
+        # Make modifications to ret_dict using provided metadata
+        keywords_text = mysite.customs.bugtrackers.bugzilla.get_tag_text_from_xml(xml_data, 'keywords')
+        keywords = map(lambda s: s.strip(),
+                       keywords_text.split(','))
+        ret_dict['good_for_newcomers'] = ('junior-jobs' in keywords)
+        # Remove 'JJ:' from title if present
+        if ret_dict['title'].startswith("JJ:"):
+            ret_dict['title'] = ret_dict['title'][3:].strip()
+        # Set 'concerns_just_documentation' if needed
+        product = mysite.customs.bugtrackers.bugzilla.get_tag_text_from_xml(xml_data, 'product')
+        if product == 'docs':
+            ret_dict['concerns_just_documentation'] = True
+        # Then pass ret_dict back
+        return ret_dict
+
+    def generate_bug_project_name(self, bb):
+        product = bb.product
+        reasonable_products = set([
+            'Akonadi',
+            'Phonon'
+            'kmail',
+            'Rocs',
+            'akregator',
+            'amarok',
+            'ark',
+            'cervisia',
+            'k3b',
+            'kappfinder',
+            'kbabel',
+            'kdeprint',
+            'kdesktop',
+            'kfile',
+            'kfourinline',
+            'khotkeys',
+            'kio',
+            'kmail',
+            'kmplot',
+            'koffice',
+            'kompare',
+            'konqueror',
+            'kopete',
+            'kpat',
+            'kphotoalbum',
+            'krita',
+            'ksmserver',
+            'kspread',
+            'ksysguard',
+            'ktimetracker',
+            'kwin',
+            'kword',
+            'marble',
+            'okular',
+            'plasma',
+            'printer-applet',
+            'rsibreak',
+            'step',
+            'systemsettings',
+            'kdelibs',
+            'kcontrol',
+            'korganizer',
+            'kipiplugins',
+            'Phonon',
+            'dolphin',
+            'umbrello']
+            )
+        products_to_be_renamed = {
+            'digikamimageplugins': 'digikam image plugins',
+            'Network Management': 'KDE Network Management',
+            'telepathy': 'telepathy for KDE',
+            'docs': 'KDE documentation',
+            }
+        component = bb.component
+        things = (product, component)
+
+        if product in reasonable_products:
+            bug_project_name = product
+        else:
+            if product in products_to_be_renamed:
+                bug_project_name = products_to_be_renamed[product]
+            else:
+                logging.info("Guessing on KDE subproject name. Found %s" %  repr(things))
+                bug_project_name = product
+        return bug_project_name
+
+class MediaWikiBugzilla(BugzillaBugTracker):
+    enabled = True
+
+    def __init__(self):
+        BugzillaBugTracker.__init__(self,
+                                    base_url='https://bugzilla.wikimedia.org/',
+                                    project_name='MediaWiki',
+                                    bug_project_name_format='')
+
+    def get_current_xml_bug_tree(self):
+        return mysite.customs.bugtrackers.bugzilla.url2bug_data(
+                'https://bugzilla.wikimedia.org/buglist.cgi?keywords=easy&query_format=advanced&keywords_type=allwords&bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&bug_status=VERIFIED&resolution=LATER&resolution=---')
+
+    @staticmethod
+    def extract_tracker_specific_data(xml_data, ret_dict):
+        # Make modifications to ret_dict using provided metadata
+        # Check for the bitesized keyword
+        keywords_text = mysite.customs.bugtrackers.bugzilla.get_tag_text_from_xml(xml_data, 'keywords')
+        keywords = map(lambda s: s.strip(),
+                       keywords_text.split(','))
+        ret_dict['good_for_newcomers'] = ('easy' in keywords)
+        # Then pass ret_dict back
+        return ret_dict
+
+    def generate_bug_project_name(self, bb):
+        product = bb.product
+        if product == 'MediaWiki extensions':
+            bug_project_name = bb.component
+            if bug_project_name in ('FCKeditor', 'Gadgets'):
+                bug_project_name += ' for MediaWiki'
+        else:
+            bug_project_name = product
+        return bug_project_name
+
+class GnomeBugzilla(BugzillaBugTracker):
+    enabled = True
+
+    def __init__(self):
+        BugzillaBugTracker.__init__(self,
+                                    base_url='https://bugzilla.gnome.org/',
+                                    project_name='Gnome',
+                                    bug_project_name_format='')
+
+    def get_current_xml_bug_tree(self):
+        return mysite.customs.bugtrackers.bugzilla.url2bug_data(
+                'https://bugzilla.gnome.org/buglist.cgi?columnlist=id&keywords=gnome-love&query_format=advanced&resolution=---')
+
+    @staticmethod
+    def extract_tracker_specific_data(xml_data, ret_dict):
+        # Make modifications to ret_dict using provided metadata
+        # Check for the bitesized keyword
+        keywords_text = mysite.customs.bugtrackers.bugzilla.get_tag_text_from_xml(xml_data, 'keywords')
+        keywords = map(lambda s: s.strip(),
+                       keywords_text.split(','))
+        ret_dict['good_for_newcomers'] = ('gnome-love' in keywords)
+        # Then pass ret_dict back
+        return ret_dict
+
+    def generate_bug_project_name(self, bb):
+        bug_project_name = bb.product
+        gnome2openhatch = {'general': 'GNOME (general)',
+                           'website': 'GNOME (website)'}
+        if bug_project_name in gnome2openhatch:
+            bug_project_name=gnome2openhatch[bug_project_name]
+        return bug_project_name
+
+class MozillaBugzilla(BugzillaBugTracker):
+    enabled = True
+
+    def __init__(self):
+        BugzillaBugTracker.__init__(self,
+                                    base_url='https://bugzilla.mozilla.org/',
+                                    project_name='Mozilla',
+                                    bug_project_name_format='')
+
+    def get_current_xml_bug_tree(self):
+        return mysite.customs.bugtrackers.bugzilla.url2bug_data(
+                'https://bugzilla.mozilla.org/buglist.cgi?resolution=---;status_whiteboard_type=substring;query_format=advanced;status_whiteboard=[good%20first%20bug]')
+
+    @staticmethod
+    def extract_tracker_specific_data(xml_data, ret_dict):
+        # Make modifications to ret_dict using provided metadata
+        # Check for the bitesized keyword
+        whiteboard_text = mysite.customs.bugtrackers.bugzilla.get_tag_text_from_xml(xml_data, 'status_whiteboard')
+        ret_dict['good_for_newcomers'] = (whiteboard_text == '[good first bug]')
+        # Then pass ret_dict back
+        return ret_dict
+
+    def generate_bug_project_name(self, bb):
+        ### Special-case the project names we know about
+        mozilla2openhatch = {'Core': 'Mozilla Core',
+                             'Firefox': 'Firefox',
+                             'MailNews Core': 'Mozilla Messaging',
+                             'addons.mozilla.org': 'addons.mozilla.org',
+                             'Thunderbird': 'Thunderbird',
+                             'Testing': 'Mozilla automated testing',
+                             'Directory': 'Mozilla LDAP',
+                             'mozilla.org': 'mozilla.org',
+                             'SeaMonkey': 'SeaMonkey',
+                             'Toolkit': 'Mozilla Toolkit',
+                             'support.mozilla.com': 'support.mozilla.com',
+                             'Camino': 'Camino',
+                             'Calendar': 'Mozilla Calendar',
+                             'Mozilla Localizations': 'Mozilla Localizations',
+                             }
+        if bb.product == 'Other Applications':
+            bug_project_name = 'Mozilla ' + bb.component
+        else:
+            bug_project_name = mozilla2openhatch[bb.product]
+        return bug_project_name
+
+class FedoraBugzilla(BugzillaBugTracker):
+    enabled = True
+
+    def __init__(self):
+        BugzillaBugTracker.__init__(self,
+                                    base_url='https://bugzilla.redhat.com/',
+                                    project_name='Fedora',
+                                    bug_project_name_format='{component}',
+                                    bug_id_list_only=True)
+
+    def get_current_bug_id_list(self):
+        return mysite.customs.bugtrackers.bugzilla.tracker_bug2bug_ids(
+                'https://bugzilla.redhat.com/show_bug.cgi?ctype=xml&id=509829')
+
+    @staticmethod
+    def extract_tracker_specific_data(xml_data, ret_dict):
+        # Make modifications to ret_dict using provided metadata
+        # Check for the bitesized keyword
+        keywords_text = mysite.customs.bugtrackers.bugzilla.get_tag_text_from_xml(xml_data, 'keywords')
+        keywords = map(lambda s: s.strip(),
+                       keywords_text.split(','))
+        ret_dict['good_for_newcomers'] = True # Since they are 'fit and finish'
+        # Set the distribution tag
+        ret_dict['as_appears_in_distribution'] = 'Fedora'
+        # Then pass ret_dict back
+        return ret_dict
+
+class SongbirdBugzilla(BugzillaBugTracker):
+    enabled = True
+
+    def __init__(self):
+        BugzillaBugTracker.__init__(self,
+                                    base_url='http://bugzilla.songbirdnest.com/',
+                                    project_name='Songbird',
+                                    bug_project_name_format='{project}')
+
+    def get_current_xml_bug_tree(self):
+        # Query below returns nearly 4000 bugs if we try to index everything.
+        # For now, only import bugs with 'helpwanted' tag.
+        # (This tag doesn't equate to 'bitesized'.)
+        return mysite.customs.bugtrackers.bugzilla.url2bug_data(
+                'http://bugzilla.songbirdnest.com/buglist.cgi?query_format=advanced&resolution=---&keywords=helpwanted')
+
+    @staticmethod
+    def extract_tracker_specific_data(xml_data, ret_dict):
+        # Make modifications to ret_dict using provided metadata
+        ret_dict['good_for_newcomers'] = False # 'helpwanted' doesn't just indicate bitesized.
+        # Then pass ret_dict back
+        return ret_dict
+
+class ApertiumBugzilla(BugzillaBugTracker):
+    enabled = True
+
+    def __init__(self):
+        BugzillaBugTracker.__init__(self,
+                                    base_url='http://bugs.apertium.org/cgi-bin/bugzilla/',
+                                    project_name='Apertium',
+                                    bug_project_name_format='{project}')
+
+    def get_current_xml_bug_tree(self):
+        return mysite.customs.bugtrackers.bugzilla.url2bug_data(
+                'http://bugs.apertium.org/cgi-bin/bugzilla/buglist.cgi?query_format=advanced&resolution=---')
+
+    @staticmethod
+    def extract_tracker_specific_data(xml_data, ret_dict):
+        # Make modifications to ret_dict using provided metadata
+        ret_dict['good_for_newcomers'] = False # No bitesized keyword.
+        # Then pass ret_dict back
+        return ret_dict
+
+class MusopenBugzilla(BugzillaBugTracker):
+    enabled = False # FIXME: Haven't found actual bugtracker yet...
+
+    def __init__(self):
+        BugzillaBugTracker.__init__(self,
+                                    base_url='',
+                                    project_name='Musopen',
+                                    bug_project_name_format='{project}')
+
+    def get_current_xml_bug_tree(self):
+        return mysite.customs.bugtrackers.bugzilla.url2bug_data(
+                '')
+
+    @staticmethod
+    def extract_tracker_specific_data(xml_data, ret_dict):
+        # Make modifications to ret_dict using provided metadata
+        # Check for the bitesized keyword
+        keywords_text = mysite.customs.bugtrackers.bugzilla.get_tag_text_from_xml(xml_data, 'keywords')
+        keywords = map(lambda s: s.strip(),
+                       keywords_text.split(','))
+        ret_dict['good_for_newcomers'] = ('' in keywords)
+        # Then pass ret_dict back
+        return ret_dict
+
+    # The formt string method for generating the project name can be
+    # overloaded by uncommenting the function below.
+    #def generate_bug_project_name(self, bb):
+        #return bug_project_name
+
+class RTEMSBugzilla(BugzillaBugTracker):
+    enabled = True
+
+    def __init__(self):
+        BugzillaBugTracker.__init__(self,
+                                    base_url='https://www.rtems.org/bugzilla/',
+                                    project_name='RTEMS',
+                                    bug_project_name_format='{project}')
+
+    def get_current_xml_bug_tree(self):
+        return mysite.customs.bugtrackers.bugzilla.url2bug_data(
+                'https://www.rtems.org/bugzilla/buglist.cgi?query_format=advanced&resolution=---')
+
+    @staticmethod
+    def extract_tracker_specific_data(xml_data, ret_dict):
+        # Make modifications to ret_dict using provided metadata
+        ret_dict['good_for_newcomers'] = False # No bitesized keyword.
+        # Then pass ret_dict back
+        return ret_dict
+
+# This tracker could be extended to cover all of FreeDesktop.
+# For now, just do X.Org since it is all that was requested.
+class XOrgBugzilla(BugzillaBugTracker):
+    enabled = True
+
+    def __init__(self):
+        BugzillaBugTracker.__init__(self,
+                                    base_url='https://bugs.freedesktop.org/',
+                                    project_name='XOrg',
+                                    bug_project_name_format='{project}')
+
+    def get_current_xml_bug_tree(self):
+        # Query below returns over 2500 bugs if we try to index everything.
+        # For now just index bitesized bugs - keyword filter added to query.
+        return mysite.customs.bugtrackers.bugzilla.url2bug_data(
+                'https://bugs.freedesktop.org/buglist.cgi?query_format=advanced&keywords=janitor&resolution=---&product=xorg')
+
+    @staticmethod
+    def extract_tracker_specific_data(xml_data, ret_dict):
+        # Make modifications to ret_dict using provided metadata
+        # Check for the bitesized keyword
+        keywords_text = mysite.customs.bugtrackers.bugzilla.get_tag_text_from_xml(xml_data, 'keywords')
+        keywords = map(lambda s: s.strip(),
+                       keywords_text.split(','))
+        ret_dict['good_for_newcomers'] = ('janitor' in keywords)
+        # Then pass ret_dict back
+        return ret_dict
+
+class LocamotionBugzilla(BugzillaBugTracker):
+    enabled = False # FIXME: Throws XML encoding error.
+
+    def __init__(self):
+        BugzillaBugTracker.__init__(self,
+                                    base_url='http://bugs.locamotion.org/',
+                                    project_name='Locamotion',
+                                    bug_project_name_format='{product}')
+
+    def get_current_xml_bug_tree(self):
+        return mysite.customs.bugtrackers.bugzilla.url2bug_data(
+                'http://bugs.locamotion.org/buglist.cgi?query_format=advanced&resolution=---')
+
+    @staticmethod
+    def extract_tracker_specific_data(xml_data, ret_dict):
+        # Make modifications to ret_dict using provided metadata
+        ret_dict['good_for_newcomers'] = False # No bitesized keyword.
+        # Then pass ret_dict back
+        return ret_dict
+
+class HypertritonBugzilla(BugzillaBugTracker):
+    enabled = True
+
+    def __init__(self):
+        BugzillaBugTracker.__init__(self,
+                                    base_url='https://hypertriton.com/bugzilla/',
+                                    project_name='Hypertriton',
+                                    bug_project_name_format='{product}')
+
+    def get_current_xml_bug_tree(self):
+        return mysite.customs.bugtrackers.bugzilla.url2bug_data(
+                'https://hypertriton.com/bugzilla/buglist.cgi?query_format=advanced&resolution=---&product=Agar&product=EDAcious&product=FabBSD&product=FreeSG')
+
+    @staticmethod
+    def extract_tracker_specific_data(xml_data, ret_dict):
+        # Make modifications to ret_dict using provided metadata
+        ret_dict['good_for_newcomers'] = False # No bitesized keyword
+        # Then pass ret_dict back
+        return ret_dict
+
+class PygameBugzilla(BugzillaBugTracker):
+    enabled = True
+
+    def __init__(self):
+        BugzillaBugTracker.__init__(self,
+                                    base_url='http://pygame.motherhamster.org/bugzilla/',
+                                    project_name='pygame',
+                                    bug_project_name_format='{project}')
+
+    def get_current_xml_bug_tree(self):
+        return mysite.customs.bugtrackers.bugzilla.url2bug_data(
+                'http://pygame.motherhamster.org/bugzilla/buglist.cgi?query_format=advanced&resolution=---')
+
+    @staticmethod
+    def extract_tracker_specific_data(xml_data, ret_dict):
+        # Make modifications to ret_dict using provided metadata
+        ret_dict['good_for_newcomers'] = False # No bitesized keyword
+        # Then pass ret_dict back
+        return ret_dict
+
+# The generic class for Bugzilla trackers. Copy it.
+# If the project has a tracker bug for the bugs to be imported,
+# set bug_id_list_only=True in BugzillaBugTracker.__init__ and
+# replace get_current_xml_bug_tree with get_current_bug_id_list
+# bug_project_name_format can contain the tags {project},
+# {product} and {component} which will be replaced accordingly.
+class GenBugzilla(BugzillaBugTracker):
+    enabled = False
+
+    def __init__(self):
+        BugzillaBugTracker.__init__(self,
+                                    base_url='',
+                                    project_name='',
+                                    bug_project_name_format='')
+
+    def get_current_xml_bug_tree(self):
+        return mysite.customs.bugtrackers.bugzilla.url2bug_data(
+                '')
+
+    @staticmethod
+    def extract_tracker_specific_data(xml_data, ret_dict):
+        # Make modifications to ret_dict using provided metadata
+        # Check for the bitesized keyword
+        keywords_text = mysite.customs.bugtrackers.bugzilla.get_tag_text_from_xml(xml_data, 'keywords')
+        keywords = map(lambda s: s.strip(),
+                       keywords_text.split(','))
+        ret_dict['good_for_newcomers'] = ('' in keywords)
+        # Then pass ret_dict back
+        return ret_dict
+
+    # The format string method for generating the project name can be
+    # overloaded by uncommenting the function below.
+    #def generate_bug_project_name(self, bb):
+        #return bug_project_name
 

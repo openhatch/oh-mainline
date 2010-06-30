@@ -255,8 +255,8 @@ Finally, don't forget to add your component to the list above, so the next perso
 * The fantastic people who have helped us:
     * [Nelson Pavlosky](http://skyfaller.net)
     * [Shotput Ventures](http://shotputventures.com), who mentored and funded us in the summer of 2009.
-    * The [Institute for Security, Technology, and Society](http://ists.dartmouth.edu) and the [Neukom Institute](http://dartmouth.edu/neukom), both at Dartmouth, who sponsored [Parker](http://madebyparker.com) [Phinney](http://openhatch.org/people/pyrak)'s internship during the winter of 2010.
-    * [Google Summer of Code](http://code.google.com/soc/), who are sponsoring [John](http://jstump.com) [Stumpo](http://openhatch.org/people/stump)'s internship during the summer of 2009.
+    * The [Institute for Security, Technology, and Society](http://ists.dartmouth.edu) and the [Neukom Institute](http://dartmouth.edu/neukom), both at Dartmouth, who sponsored [Parker](http://madebyparker.com) [Phinney](http://openhatch.org/people/pyrak)'s internship during the Dartmouth winter 2010 term.
+    * [Google Summer of Code](http://code.google.com/soc/), who are sponsoring [John](http://jstump.com) [Stumpo](http://openhatch.org/people/stump)'s internship during the summer of 2010.
 
 ## Stay in touch ##
 

@@ -5,19 +5,13 @@ from django.core.management.base import BaseCommand
 import django.conf
 django.conf.settings.CELERY_ALWAYS_EAGER = True
 
-import mysite.search.tasks
+import mysite.customs.bugtrackers.opensolaris
 import mysite.customs.bugtrackers.roundup_general
-import mysite.customs.bugtrackers
+import mysite.search.tasks.trac_instances
+import mysite.search.tasks.bugzilla_instances
 import mysite.search.tasks.launchpad_tasks
 
-import mysite.customs.miro
-import mysite.customs.bugtrackers.trac
-import mysite.customs.bugtrackers.gnome_love
-import mysite.customs.bugtrackers.fedora_fitfinish
-import mysite.customs.bugtrackers.mozilla
-import mysite.customs.bugtrackers.wikimedia
-import mysite.customs.bugtrackers.kde
-import mysite.customs.bugtrackers.opensolaris
+import urllib2
 
 ### All this code runs synchronously once a day.
 ### For now, we can crawl all the bug trackers in serial.
@@ -45,41 +39,6 @@ import mysite.customs.bugtrackers.opensolaris
 
 class Command(BaseCommand):
     help = "Call this once a day to make sure we run Bug search-related nightly jobs."
-
-    def update_bugzilla_trackers(self):
-        bugzilla_trackers = {
-            'Miro':
-                mysite.customs.miro.grab_miro_bugs,
-            'KDE junior jobs':
-                mysite.customs.bugtrackers.kde.grab,
-            'Wikimedia easy bugs':
-                mysite.customs.bugtrackers.wikimedia.grab,
-            'GNOME Love':
-                mysite.customs.bugtrackers.gnome_love.grab,
-            'Mozilla "good first bug"s':
-                mysite.customs.bugtrackers.mozilla.grab,
-
-            # FIXME
-            # Really, the Bugzilla import code should be reworked to be as
-            # clean and tidy as the Mercurial/Python/Roundup stuff, with
-            # an abstract class with a .update() method.
-            # Then simple sub-classes can handle each of the different projects'
-            # details.
-
-            # What the heck is up with the Fedora code being
-            # special-cased like this? Well, I'll clean it up another day,
-            # so long as it seems to work right now.
-            'Fedora "fit and finish" new bugs':
-                mysite.search.tasks.bugzilla_instances.learn_about_new_fedora_fit_and_finish_bugs,
-
-            'Fedora "fit and finish" refreshing old bugs':
-                mysite.search.tasks.bugzilla_instances.refresh_all_fedora_fit_and_finish_bugs,
-            }
-
-        for bugzilla_tracker in bugzilla_trackers:
-            logging.info("Refreshing bugs from %s." % bugzilla_tracker)
-            call_me = bugzilla_trackers[bugzilla_tracker]
-            call_me()
 
     def find_and_update_enabled_roundup_trackers(self):
         enabled_roundup_trackers = []
@@ -115,6 +74,30 @@ class Command(BaseCommand):
             instantiated = thing()
             instantiated.update()
 
+    def find_and_update_enabled_bugzilla_instances(self):
+        enabled_bugzilla_instances = []
+
+        ### First, the "find" step
+        for thing_name in dir(mysite.search.tasks.bugzilla_instances):
+            thing = getattr(mysite.search.tasks.bugzilla_instances,
+                            thing_name)
+            if hasattr(thing, 'enabled'):
+                if getattr(thing, 'enabled'):
+                    enabled_bugzilla_instances.append(thing)
+
+        ### Okay, now update!
+        for thing in enabled_bugzilla_instances:
+            logging.info("[Bugzilla] About to update %s" % thing)
+            instantiated = thing()
+            # FIXME: The Bugzilla trackers seem to throw error 500 a lot.
+            # For now, chuck in a dirty big try except to stop importer
+            # breaking.
+            try:
+                instantiated.update()
+            except urllib2.URLError, e:
+                logging.info("[Bugzilla] ERROR: Importer failed, likely HTTP500, continuing on...")
+                logging.info("[Bugzilla] Error message: %s" % str(e))
+
     def update_launchpad_hosted_projects(self):
         ### For Launchpad:
         # First, we ask the projects' bug trackers if there are new bugs we should know about
@@ -130,6 +113,4 @@ class Command(BaseCommand):
         self.update_launchpad_hosted_projects()
         self.find_and_update_enabled_trac_instances()
         self.find_and_update_enabled_roundup_trackers()
-        self.update_bugzilla_trackers()
-        
-
+        self.find_and_update_enabled_bugzilla_instances()
