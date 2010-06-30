@@ -1,6 +1,6 @@
 from unittest import TestCase
 from mysite.base.tests import TwillTests
-from mysite.missions.controllers import TarMission, IncorrectTarFile, UntarMission, PatchSingleFileMission
+from mysite.missions.controllers import TarMission, IncorrectTarFile, UntarMission, PatchSingleFileMission, DiffSingleFileMission, IncorrectPatch
 from mysite.missions import views
 from mysite.missions.models import StepCompletion, Step
 from mysite.profile.models import Person
@@ -13,6 +13,7 @@ import tarfile
 from StringIO import StringIO
 import tempfile
 import subprocess
+import difflib
 
 def make_testdata_filename(filename):
     return os.path.join(os.path.dirname(__file__), 'testdata', filename)
@@ -218,3 +219,58 @@ class PatchSingleFileTests(TwillTests):
 
         paulproteus = Person.objects.get(user__username='paulproteus')
         self.assertEqual(len(StepCompletion.objects.filter(step__name='diffpatch_patchsingle', person=paulproteus)), 0)
+
+
+class DiffSingleFileValidatorTests(TestCase):
+
+    def make_good_patch(self):
+        oldlines = open(DiffSingleFileMission.OLD_FILE).readlines()
+        newlines = open(DiffSingleFileMission.NEW_FILE).readlines()
+        return ''.join(difflib.unified_diff(oldlines, newlines, 'old.txt', 'new.txt'))
+
+    def make_wrong_src_patch(self):
+        # Make a patch that will not apply correctly.
+        oldlines = open(DiffSingleFileMission.OLD_FILE).readlines()
+        newlines = open(DiffSingleFileMission.NEW_FILE).readlines()
+        del oldlines[0]
+        return ''.join(difflib.unified_diff(oldlines, newlines, 'old.txt', 'new.txt'))
+
+    def make_wrong_dest_patch(self):
+        # Make a patch that will apply correctly but does not result in the right file.
+        oldlines = open(DiffSingleFileMission.OLD_FILE).readlines()
+        newlines = open(DiffSingleFileMission.NEW_FILE).readlines()
+        del newlines[0]
+        return ''.join(difflib.unified_diff(oldlines, newlines, 'old.txt', 'new.txt'))
+
+    def make_swapped_patch(self):
+        oldlines = open(DiffSingleFileMission.OLD_FILE).readlines()
+        newlines = open(DiffSingleFileMission.NEW_FILE).readlines()
+        return ''.join(difflib.unified_diff(newlines, oldlines, 'new.txt', 'old.txt'))
+
+    def test_good_patch(self):
+        DiffSingleFileMission.validate_patch(self.make_good_patch())
+
+    def test_not_single_file(self):
+        try:
+            DiffSingleFileMission.validate_patch(self.make_good_patch() * 2)
+        except IncorrectPatch, e:
+            self.assert_('affects more than one file' in str(e))
+        else:
+            self.fail('no exception raised')
+
+    def test_does_not_apply_correctly(self):
+        try:
+            DiffSingleFileMission.validate_patch(self.make_wrong_src_patch())
+        except IncorrectPatch, e:
+            self.assert_('will not apply' in str(e))
+        else:
+            self.fail('no exception raised')
+
+    def test_produces_wrong_file(self):
+        try:
+            DiffSingleFileMission.validate_patch(self.make_wrong_dest_patch())
+        except IncorrectPatch, e:
+            self.assert_('does not have the correct contents' in str(e))
+        else:
+            self.fail('no exception raised')
+

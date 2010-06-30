@@ -5,6 +5,7 @@ from StringIO import StringIO
 import os
 import sys
 import difflib
+import patch
 
 def get_mission_data_path():
     return os.path.join(os.path.dirname(__file__), 'data')
@@ -94,14 +95,37 @@ class UntarMission(object):
         '''Get the data for the file we want from the tarball.'''
         return open(os.path.join(get_mission_data_path(), cls.FILE_WE_WANT)).read()
 
-class PatchSingleFileMission(object):
-    OLD_FILE = os.path.join(get_mission_data_path(), 'fib1.c')
-    NEW_FILE = os.path.join(get_mission_data_path(), 'fib2.c')
-    # This does not correspond to a real file but is merely the filename the download is presented as.
-    PATCH_FILENAME = 'fib-linear-time.patch'
+class IncorrectPatch(Exception):
+    pass
 
+class SingleFilePatch(object):
     @classmethod
     def get_patch(cls):
         oldlines = open(cls.OLD_FILE).readlines()
         newlines = open(cls.NEW_FILE).readlines()
         return ''.join(difflib.unified_diff(oldlines, newlines, os.path.basename(cls.OLD_FILE), os.path.basename(cls.NEW_FILE)))
+
+    @classmethod
+    def validate_patch(cls, patchdata):
+        the_patch = patch.fromstring(patchdata)
+        # Check that it only patches one file.
+        if len(the_patch.hunks) != 1:
+            raise IncorrectPatch, 'The patch affects more than one file.'
+
+        # Check that it will apply correctly to the file.
+        if not the_patch._match_file_hunks(cls.OLD_FILE, the_patch.hunks[0]):
+            raise IncorrectPatch, 'The patch will not apply correctly to the original file.'
+
+        # Check that the resulting file matches what is expected.
+        if ''.join(the_patch.patch_stream(open(cls.OLD_FILE), the_patch.hunks[0])) != open(cls.NEW_FILE).read():
+            raise IncorrectPatch, 'The file resulting from patching does not have the correct contents.'
+
+class PatchSingleFileMission(SingleFilePatch):
+    OLD_FILE = os.path.join(get_mission_data_path(), 'fib1.c')
+    NEW_FILE = os.path.join(get_mission_data_path(), 'fib2.c')
+    # This does not correspond to a real file but is merely the filename the download is presented as.
+    PATCH_FILENAME = 'fib-linear-time.patch'
+
+class DiffSingleFileMission(SingleFilePatch):
+    OLD_FILE = os.path.join(get_mission_data_path(), 'diffsingle.txt')
+    NEW_FILE = os.path.join(get_mission_data_path(), 'diffsingle_result.txt')

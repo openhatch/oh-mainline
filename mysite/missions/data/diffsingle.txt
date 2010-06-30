@@ -1,0 +1,30 @@
+This mission is to have you make modifications to a file and submit a
+diff of them. The changes may seem a bit silly, but they will cause the
+diff to contain examples of different types of changes - additions,
+deletions, and changes. Here is what we want you to do to this file:
+
+  1.  Keep an unmodified copy of this file handy; you'll need it to
+      make the diff once you're finished.
+
+  2.  Try to keep the formatting intact, as the result file will be
+      compared character-for-character. There is exactly one blank line
+      between each paragraph and bullet point, and all indentation is
+      done with spaces. There is never trailing whitespace.
+
+  3.  Delete this step. (Don't renumber the ones below it.)
+
+  4.  Leave this step the way it is.
+
+  5.  Move this step so it comes between #1 and #2. (Again, don't
+      renumber the steps.)
+
+  6.  Make an exact copy of this step and place it before #1; change the
+      copy's step number to be 0.
+
+  7.  There is a typo in this step, which oyu should fix.
+
+  8.  Save the changes and make a unified diff of your changes using the
+      diff command. Submit the diff on the page from which you obtained
+      this file.
+
+Good luck!
