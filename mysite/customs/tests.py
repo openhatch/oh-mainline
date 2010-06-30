@@ -1041,7 +1041,7 @@ class DailyBugImporter(django.test.TestCase):
     @mock.patch('mysite.customs.ohloh.mechanize_get')
     def test_bugzilla_http_generic_error_does_break(self, mock_error):
         mock_error.side_effect = ValueError()
-        self.assertRaises(ValueError, mysite.search.management.commands.search_daily_tasks.Command().find_and_update_enabled_bugzilla_instances())
+        self.assertRaises(ValueError, mysite.search.management.commands.search_daily_tasks.Command().find_and_update_enabled_bugzilla_instances)
 
 
 # vim: set nu:
