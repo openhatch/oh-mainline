@@ -10,5 +10,9 @@
   {"model": "missions.Step",
    "pk": 3,
    "fields": {"name": "diffpatch_patchsingle"}
+  },
+  {"model": "missions.Step",
+   "pk": 4,
+   "fields": {"name": "diffpatch_diffsingle"}
   }
 ]
