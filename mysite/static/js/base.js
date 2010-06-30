@@ -48,6 +48,31 @@ $.fn.getTipsy = function() {
     return $.data(this.get(0), 'active.tipsy');
 }
 
+$.fn.changeTipsyMessage = function (msg) {
+
+    // Change the tipsy text, which is stored in the title attribute
+    this.attr('title', msg);
+
+    // If a tipsy is currently open, update its text
+    var $tipsy = this.getTipsy();
+    if (typeof $tipsy !== 'undefined') {
+
+        if (this.attr('title') || typeof(this.attr('original-title')) != 'string') {
+            this.attr('original-title', this.attr('title') || '').removeAttr('title');
+        }
+
+        var title;
+        if (typeof opts.title == 'string') {
+            title = $(this).attr(opts.title == 'title' ? 'original-title' : opts.title);
+        } else if (typeof opts.title == 'function') {
+            title = opts.title.call(this);
+        }
+
+        var opts = $.fn.tipsy.elementOptions(this, options);
+        $tipsy.find('.tipsy-inner')[opts.html ? 'html' : 'text'](msg || opts.fallback);
+    }
+};
+
 $.fn.toggleDisplay = function() { 
     var what_to_do = this.is(':visible') ? 'hide' : 'show';
     this[what_to_do]();

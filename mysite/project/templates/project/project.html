@@ -300,7 +300,7 @@ about how you can help {{ project.name }}
 
 {% block js %}
     <script type='text/javascript'>
-        {# IF YOU MOVE THIS TO AN EXTERNAL FILE DON'T FORGET THAT THERE ARE DJANGO TEMPLATE TAGS HERE! #}
+        {# If you move this to an external .js file, check for Django template tags, there might be some. #}
         
         $(function() {
             $('.add_an_answer')
@@ -416,11 +416,25 @@ VoteHijacker.prototype =
     }
 };
 
+VoteHijacker.arrowTooltipMessages = { 
+    // $arrowType_$currentState: $messageToDisplay
+    'down_grey': 'vote down', // grey means off, mod means on
+    'up_grey': 'vote up',
+    'down_mod': 'cancel vote',
+    'up_mod': 'cancel vote'
+};
+
 VoteHijacker.updateArrow = function(arrowType, prefix, id, state)
 {
-    var img = $('#' + prefix + arrowType + "arrow" + id).get(0);
+    var $img = $('#' + prefix + arrowType + "arrow" + id);
+
+    // Change the image source
+    var img = $img.get(0);
     var re = new RegExp(arrowType + "(?:mod|grey)\\.png");
     img.src = img.src.replace(re, arrowType + state + ".png");
+
+    // Update the tipsy tooltip.
+VoteHijacker.arrowTooltipMessages[arrowType+"_"+state]
 };
 
 VoteHijacker.updateFormAction = function(formType, prefix, id, action)
