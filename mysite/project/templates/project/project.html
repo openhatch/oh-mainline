@@ -433,8 +433,16 @@ VoteHijacker.updateArrow = function(arrowType, prefix, id, state)
     var re = new RegExp(arrowType + "(?:mod|grey)\\.png");
     img.src = img.src.replace(re, arrowType + state + ".png");
 
-    // Update the tipsy tooltip.
-VoteHijacker.arrowTooltipMessages[arrowType+"_"+state]
+    // Change the tipsy text, which is stored in the title attribute
+    var msg = VoteHijacker.arrowTooltipMessages[arrowType+"_"+state];
+    $img.attr('title', msg);
+    try{
+        // fade out
+        $img.getTipsy().fadeOut('slow', function() { $(this).remove(); });
+    }
+    catch (exception) {
+        // silence errors
+    }
 };
 
 VoteHijacker.updateFormAction = function(formType, prefix, id, action)
