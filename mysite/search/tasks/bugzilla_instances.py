@@ -450,40 +450,6 @@ class ApertiumBugzilla(BugzillaBugTracker):
         # Then pass ret_dict back
         return ret_dict
 
-class MusopenBugzilla(BugzillaBugTracker):
-    enabled = False # FIXME: Haven't found actual bugtracker yet...
-
-    def __init__(self):
-        BugzillaBugTracker.__init__(self,
-                                    base_url='',
-                                    project_name='Musopen',
-                                    bug_project_name_format='{project}')
-
-    def generate_current_bug_xml(self):
-        queries = {
-                'Easy bugs':
-                    '',
-                'Documentation bugs':
-                    ''
-                }
-        return self.generate_bug_xml_from_queries(queries)
-
-    @staticmethod
-    def extract_tracker_specific_data(xml_data, ret_dict):
-        # Make modifications to ret_dict using provided metadata
-        # Check for the bitesized keyword
-        keywords_text = mysite.customs.bugtrackers.bugzilla.get_tag_text_from_xml(xml_data, 'keywords')
-        keywords = map(lambda s: s.strip(),
-                       keywords_text.split(','))
-        ret_dict['good_for_newcomers'] = ('' in keywords)
-        # Then pass ret_dict back
-        return ret_dict
-
-    # The formt string method for generating the project name can be
-    # overloaded by uncommenting the function below.
-    #def generate_bug_project_name(self, bb):
-        #return bug_project_name
-
 class RTEMSBugzilla(BugzillaBugTracker):
     enabled = True
 
