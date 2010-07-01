@@ -15,7 +15,10 @@ body#associate-openid .errorlist li { width: 90%; }
 #openid-associate .head { width: 250px; }
 #openid-associate .body { width: 210px; }
 #expand-second-form { display: block; clear: both; margin-top: 20px; }
-#associate-with-existing-account { margin-top: 10px; display: none; }
+#associate-with-existing-account { margin-top: 10px; }
+{% if not form2.errors %}
+#associate-with-existing-account { display: none; }
+{% endif %}
 form p { float: none; display: block; width: 100%; margin: 0 0 10px 0; }
 form label { float: none; display: block; }
 body#associate-openid form input { float: none; display: block; }
@@ -48,9 +51,9 @@ label[for^='id_how_should_people_contact_you'] { float: left; width: 100%; }
                 <input type="hidden" name="next"
                         value="{{ next|enhance_next_to_annotate_it_with_newuser_is_true}}" />
                 {{ form1.as_p }}
-		{% if project_names_to_help %}
-		{{ extra_profile_form.as_p }}
-		{% endif %}
+                {% if project_names_to_help %}
+                {{ extra_profile_form.as_p }}
+                {% endif %}
                 <p><input type="submit" name="bnewaccount" value="ok"></p>
             </form>
             
@@ -59,7 +62,6 @@ label[for^='id_how_should_people_contact_you'] { float: left; width: 100%; }
             </a>
 
             <form id='associate-with-existing-account' name="fverify" action="{% url user_register %}" method="POST" class='login '>
-                {{ form2.non_field_errors }}
                 <input type="hidden" name="next" value="{{ next }}" />
                 {{ form2.as_p }}
                 <p><input type="submit" name="bverify" value="Associate"></p>

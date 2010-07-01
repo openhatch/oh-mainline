@@ -6,13 +6,14 @@
 {% score_for_object answer as score %}
 <span class="voting">
     <form class="answervote" id="answerup{{ answer.id }}" action="/+answer/vote/{{ answer.id }}/{% if vote and vote.is_upvote %}clear{% else %}up{% endif %}vote/" method="POST">
-        <input type="image" id="answeruparrow{{ answer.id }}" src="/static/images/up{% if vote and vote.is_upvote %}mod{% else %}grey{% endif %}.png" >
+        <input type="image" rel='tipsy-east' title='vote up' id="answeruparrow{{ answer.id }}" src="/static/images/up{% if vote and vote.is_upvote %}mod{% else %}grey{% endif %}.png" >
         <input type="hidden" name="next" value="{{project.get_url}}">
     </form>
     <div class='score' id="answerscore{{answer.pk}}">{{ score.score|default:0 }}</div>
 
     <form class="answervote" id="answerdown{{ answer.id }}" action="/+answer/vote/{{ answer.id }}/{% if vote and vote.is_downvote %}clear{% else %}down{% endif %}vote/" method="POST">
-        <input type="image" id="answerdownarrow{{ answer.id }}" src="/static/images/down{% if vote and vote.is_downvote %}mod{% else %}grey{% endif %}.png">
+        <input type="image" rel='tipsy-east' title='vote down' id="answerdownarrow{{ answer.id }}" src="/static/images/down{% if vote and vote.is_downvote %}mod{% else %}grey{% endif %}.png">
         <input type="hidden" name="next" value="{{project.get_url}}">
     </form>
 </span>
+{# vim: set filetype=htmldjango: #}

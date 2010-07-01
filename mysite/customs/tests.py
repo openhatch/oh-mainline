@@ -40,6 +40,7 @@ import mysite.customs.github
 import mysite.customs.models
 import mysite.customs.bugtrackers.roundup_general
 import mysite.customs.lp_grabber
+import mysite.search.management.commands.search_daily_tasks
 # }}}
 
 # Mocked out browser.open
@@ -52,6 +53,10 @@ open_causes_404.side_effect = generate_404
 def generate_403(self):
     import urllib2
     raise urllib2.HTTPError('', 403, {}, {}, None)
+
+def generate_504(self):
+    import urllib2
+    raise urllib2.HTTPError('', 504, {}, {}, None)
 
 # Functions you'll need: {{{
 def twill_setup():
@@ -1025,6 +1030,18 @@ class OpenSolaris(django.test.TestCase):
         mock_bug_to_not_update.return_value = bug
         bug_result = mysite.customs.bugtrackers.opensolaris.create_bug_object_for_remote_bug_id_if_necessary(1)
         self.assertEquals(bug_result, False)
+
+class DailyBugImporter(django.test.TestCase):
+
+    @mock.patch('mysite.customs.ohloh.mechanize_get')
+    def test_bugzilla_http_error_504_does_not_break(self, mock_error):
+        mock_error.side_effect = generate_504
+        mysite.search.management.commands.search_daily_tasks.Command().find_and_update_enabled_bugzilla_instances()
+
+    @mock.patch('mysite.customs.ohloh.mechanize_get')
+    def test_bugzilla_http_generic_error_does_break(self, mock_error):
+        mock_error.side_effect = ValueError()
+        self.assertRaises(ValueError, mysite.search.management.commands.search_daily_tasks.Command().find_and_update_enabled_bugzilla_instances)
 
 
 # vim: set nu:

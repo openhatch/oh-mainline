@@ -48,6 +48,19 @@ $.fn.getTipsy = function() {
     return $.data(this.get(0), 'active.tipsy');
 }
 
+$.fn.changeTipsyMessageText = function (msg) {
+    // Note that this doesn't respect tipsy options
+
+    // Change the tipsy text, which is stored in the title attribute
+    this.attr('title', msg);
+
+    // If a tipsy is currently open, update its text
+    var $tipsy = this.getTipsy();
+    if (typeof $tipsy !== 'undefined') {
+        $tipsy.find('.tipsy-inner').text(msg);
+    }
+};
+
 $.fn.toggleDisplay = function() { 
     var what_to_do = this.is(':visible') ? 'hide' : 'show';
     this[what_to_do]();
