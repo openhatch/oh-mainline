@@ -141,10 +141,9 @@ class KDEBugzilla(BugzillaBugTracker):
         # Remove 'JJ:' from title if present
         if ret_dict['title'].startswith("JJ:"):
             ret_dict['title'] = ret_dict['title'][3:].strip()
-        # Set 'concerns_just_documentation' if needed
+        # Check whether documentation bug
         product = mysite.customs.bugtrackers.bugzilla.get_tag_text_from_xml(xml_data, 'product')
-        if product == 'docs':
-            ret_dict['concerns_just_documentation'] = True
+        ret_dict['concerns_just_documentation'] = (product == 'docs')
         # Then pass ret_dict back
         return ret_dict
 
@@ -238,6 +237,9 @@ class MediaWikiBugzilla(BugzillaBugTracker):
         keywords = map(lambda s: s.strip(),
                        keywords_text.split(','))
         ret_dict['good_for_newcomers'] = ('easy' in keywords)
+        # Check whether documentation bug
+        component = mysite.customs.bugtrackers.bugzilla.get_tag_text_from_xml(xml_data, 'component')
+        ret_dict['concerns_just_documentation'] = (component == 'Documentation')
         # Then pass ret_dict back
         return ret_dict
 
@@ -261,8 +263,12 @@ class GnomeBugzilla(BugzillaBugTracker):
                                     bug_project_name_format='')
 
     def get_current_xml_bug_tree(self):
+        # Get all bugs that contain any of the keywords 'gnome-love'
+        # or 'documentation'
         return mysite.customs.bugtrackers.bugzilla.url2bug_data(
                 'https://bugzilla.gnome.org/buglist.cgi?columnlist=id&keywords=gnome-love&query_format=advanced&resolution=---')
+        # FIXME: Query with documentation keyword causes XML syntax errors
+                #'https://bugzilla.gnome.org/buglist.cgi?columnlist=id&keywords=gnome-love%2Cdocumentation&query_format=advanced&resolution=---')
 
     @staticmethod
     def extract_tracker_specific_data(xml_data, ret_dict):
@@ -272,6 +278,8 @@ class GnomeBugzilla(BugzillaBugTracker):
         keywords = map(lambda s: s.strip(),
                        keywords_text.split(','))
         ret_dict['good_for_newcomers'] = ('gnome-love' in keywords)
+        # Check whether this is a documentation bug.
+        ret_dict['concerns_just_documentation'] = ('documentation' in keywords)
         # Then pass ret_dict back
         return ret_dict
 
@@ -375,6 +383,9 @@ class SongbirdBugzilla(BugzillaBugTracker):
     def extract_tracker_specific_data(xml_data, ret_dict):
         # Make modifications to ret_dict using provided metadata
         ret_dict['good_for_newcomers'] = False # 'helpwanted' doesn't just indicate bitesized.
+        # Check whether documentation bug
+        component = mysite.customs.bugtrackers.bugzilla.get_tag_text_from_xml(xml_data, 'component')
+        ret_dict['concerns_just_documentation'] = (component == 'Documentation')
         # Then pass ret_dict back
         return ret_dict
 
@@ -444,6 +455,9 @@ class RTEMSBugzilla(BugzillaBugTracker):
     def extract_tracker_specific_data(xml_data, ret_dict):
         # Make modifications to ret_dict using provided metadata
         ret_dict['good_for_newcomers'] = False # No bitesized keyword.
+        # Check whether documentation bug
+        component = mysite.customs.bugtrackers.bugzilla.get_tag_text_from_xml(xml_data, 'component')
+        ret_dict['concerns_just_documentation'] = (component == 'doc')
         # Then pass ret_dict back
         return ret_dict
 
@@ -472,6 +486,13 @@ class XOrgBugzilla(BugzillaBugTracker):
         keywords = map(lambda s: s.strip(),
                        keywords_text.split(','))
         ret_dict['good_for_newcomers'] = ('janitor' in keywords)
+        # Check whether documentation bug
+        component = mysite.customs.bugtrackers.bugzilla.get_tag_text_from_xml(xml_data, 'component')
+        documentation_components = [
+                'Docs/other',
+                'Documentation',
+                'Fonts/doc']
+        ret_dict['concerns_just_documentation'] = (component in documentation_components)
         # Then pass ret_dict back
         return ret_dict
 
