@@ -11,7 +11,7 @@ OPENHATCH_HOME="$HOME/milestone-a/"
 
 MAILTO=asheesh@asheesh.org
 
-@daily (cd $OPENHATCH_HOME ; ./mysite/scripts/run_with_lock.sh ./bin/production profile_daily_tasks) 2>&1 | grep -v DeprecationWarning.*sha | grep -v 'import sha'
-@hourly (cd $OPENHATCH_HOME ; ./mysite/scripts/run_with_lock.sh ./bin/production profile_hourly_tasks) 2>&1 | grep -v DeprecationWarning.*sha | grep -v 'import sha'
-*/10 * * * * (cd $OPENHATCH_HOME ; ./mysite/scripts/run_with_lock.sh ./bin/production profile_ten_minutely_tasks)  2>&1 | grep -v DeprecationWarning.*sha | grep -v 'import sha'
+@daily cd $OPENHATCH_HOME ; ./mysite/scripts/run_with_lock.sh ./bin/production profile_daily_tasks 2>&1 | grep -v DeprecationWarning.*sha | grep -v 'import sha'
+@hourly cd $OPENHATCH_HOME ; ./mysite/scripts/run_with_lock.sh ./bin/production profile_hourly_tasks 2>&1 | grep -v DeprecationWarning.*sha | grep -v 'import sha'
+*/10 * * * * cd $OPENHATCH_HOME ; ./mysite/scripts/run_with_lock.sh ./bin/production profile_ten_minutely_tasks  2>&1 | grep -v DeprecationWarning.*sha | grep -v 'import sha'
 
