@@ -17,6 +17,11 @@ from voting.views import vote_on_object
 import mysite.account.views
 
 urlpatterns = patterns('',
+        ### Okay, sometimes people link /, or /) because of bad linkification
+        ### if so, just permit it as a redirect.
+        (r'^,$', lambda x: HttpResponsePermanentRedirect('/')),
+        (r'^\)$', lambda x: HttpResponsePermanentRedirect('/')),
+
         (r'^\+meta/', 'mysite.base.views.meta'),
 
         (r'^\+test_weekly_email_re_projects/', 'mysite.base.views.test_weekly_email_re_projects'),
