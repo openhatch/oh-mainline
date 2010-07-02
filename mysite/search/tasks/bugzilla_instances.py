@@ -11,7 +11,7 @@ class BugzillaBugTracker(object):
         self.bug_project_name_format = bug_project_name_format
         self.bug_id_list_only = bug_id_list_only
 
-    def generate_bug_xml_from_queries(self, queries)
+    def generate_bug_xml_from_queries(self, queries):
         for query_name in queries:
             query_url = queries[query_name]
             query_xml = mysite.customs.bugtrackers.bugzilla.url2bug_data(query_url)
@@ -137,9 +137,6 @@ class KDEBugzilla(BugzillaBugTracker):
                                     base_url='https://bugs.kde.org/',
                                     project_name='KDE',
                                     bug_project_name_format='')
-
-    def get_current_xml_bug_tree(self):
-        return mysite.customs.bugtrackers.bugzilla.url2bug_data(
 
     def generate_current_bug_xml(self):
         queries = {
