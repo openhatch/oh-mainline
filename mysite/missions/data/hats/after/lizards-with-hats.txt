@@ -2,6 +2,6 @@ So there are 10 lizards.
 
 Half of them wear hats.
 
-Of those, one-fifth of the hats are blue.
+Lizards only wear blue hats.
 
 How many blue hats do the lizards have?
