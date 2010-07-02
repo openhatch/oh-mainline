@@ -1,0 +1,10 @@
+### This is for linode2.openhatch.org, the spare VM that doesn't have as much going on with it.
+
+### Some tasks that we run can run on linode2, the spare virtual machine!
+### Those tasks are in crontab.linode2. They include bug crawling.
+OPENHATCH_HOME="$HOME/milestone-a/"
+
+MAILTO=asheesh@asheesh.org
+
+@daily (cd $OPENHATCH_HOME ; ./mysite/scripts/run_with_lock.sh ./bin/production search_daily_tasks) 2>&1 | grep -v DeprecationWarning.*sha | grep -v 'import sha'
+
