@@ -27,7 +27,7 @@ import simplejson
 import re
 import cgi
 import logging
-import sha
+import hashlib
 
 DEFAULT_LOCATION='Inaccessible Island'
 
@@ -404,7 +404,7 @@ class Person(models.Model):
         and finally we break ties by get_full_name_or_username(), just so that
         we have a predictable sort.
         .'''
-        hashed_tiebreaker = sha.sha(unhashed_tiebreaker).hexdigest()
+        hashed_tiebreaker = hashlib.sha1(unhashed_tiebreaker).hexdigest()
         factor = (bool(self.get_list_of_all_project_names()),
                   bool(self.get_tags_as_dict()),
                   bool(self.photo),
@@ -808,15 +808,17 @@ class Forwarder(models.Model):
 
     @staticmethod
     def garbage_collect():
+        deleted_one = False
         for forwarder in Forwarder.objects.all():
             # if it's expired delete it
             now = datetime.datetime.utcnow()
             if forwarder.expires_on < now:
                 forwarder.delete()
+                deleted_one = True
             # else if it's too old to be displayed and they still want a forwarder: make a fresh new one
             elif forwarder.stops_being_listed_on < now and '$fwd' in forwarder.user.get_profile().contact_blurb: 
                 mysite.base.controllers.generate_forwarder(forwarder.user)
-        pass
+        return deleted_one
 
     @staticmethod
     def generate_list_of_lines_for_postfix_table():

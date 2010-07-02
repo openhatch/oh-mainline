@@ -325,7 +325,10 @@ class GarbageCollectForwarders(Task):
     def run(self, **kwargs):
         logger = self.get_logger(**kwargs)
         logger.info("Started garbage collecting profile email forwarders")
-        mysite.profile.models.Forwarder.garbage_collect()
+        deleted_any = mysite.profile.models.Forwarder.garbage_collect()
+        if deleted_any:
+            # Well, in that case, we should purge the staticgenerator-generated cache of the people pages.
+            clear_people_page_cache()
 
 
 class RegeneratePostfixAliasesForForwarder(Task):

@@ -7,7 +7,7 @@ import collections
 import mysite.base.helpers
 import simplejson
 import django.core.cache
-import sha
+import hashlib
 from functools import partial
 
 from django.template.loader import render_to_string
@@ -112,7 +112,7 @@ def cache_function_that_takes_request(func, *args, **kwargs):
     # 3. query string
     key_data.append(request.META.get('QUERY_STRING', ''))
 
-    key_string = 'cache_request_function_' + sha.sha(repr(key_data)).hexdigest()
+    key_string = 'cache_request_function_' + hashlib.sha1(repr(key_data)).hexdigest()
     content = django.core.cache.cache.get(key_string, None)
     if content:
         logging.info("Cache hot for %s", repr(key_data))

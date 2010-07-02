@@ -1,5 +1,5 @@
 import os.path
-import sha
+import hashlib
 from itertools import izip, cycle, islice
 
 import pygeoip
@@ -36,7 +36,7 @@ class RecommendBugs(object):
         bug_epoch = mysite.search.models.Epoch.get_for_model(
             mysite.search.models.Bug)
         suffix_input = [self.terms, self.n, bug_epoch]
-        return prefix + '_' + sha.sha(repr(suffix_input)).hexdigest()
+        return prefix + '_' + hashlib.sha1(repr(suffix_input)).hexdigest()
 
     def recommend(self):
         ret = []
@@ -83,7 +83,7 @@ class PeopleMatcher(object):
         keys = (mysite.search.models.Epoch.get_for_model(
             mysite.profile.models.Link_Person_Tag),
                 args)
-        return sha.sha(repr(keys)).hexdigest()
+        return hashlib.sha1(repr(keys)).hexdigest()
 
     def people_matching(self, property, value):
         return mysite.profile.models.Person.objects.filter(

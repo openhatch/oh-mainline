@@ -2,6 +2,7 @@ from django import template
 import re
 from django.utils.html import escape
 from urlparse import urlparse
+import logging
 
 register = template.Library()
 
@@ -60,9 +61,13 @@ def break_long_words(value, max_word_length=8):
     # if the word is really long, insert a <wbr> occasionally.
 
     # We really want "value" to be Unicode. Sometimes it is, and sometimes it isn't. So...
-    import logging
-    logging.warn("Wanted %r to be unicode. Instead it's %s. Moving on with life." % (value, type(value)))
     if type(value) == str:
+        # Django 2.6 sometimes gives us the empty string as '', not u''.
+        # Are there other cases where we do get a byte string, not a Unicode string?
+        if value != '':
+            logging.warn("Wanted %r to be unicode. Instead it's %s. Moving on with life." % (value, type(value)))
+
+        # In all cases, I guess we should just buckle up and move on with life.
         value = unicode(value, 'utf-8')
 
     re_capitalized_word = re.compile(r'([A-Z][a-z][a-z]+)', re.UNICODE)  

@@ -1,0 +1,15 @@
+### This crontab is used on linode.openhatch.org
+### In general, the tasks this crontab executes *must* be run
+### on the machine the OpenHatch code runs on.
+
+### The reason for that dependency is that memcached is on linode.openhatch.org,
+### not linode2.
+
+### Some tasks that we run can run on linode2, the spare virtual machine!
+### Those tasks are in crontab.linode2. They include bug crawling.
+MAILTO=asheesh@asheesh.org
+
+@daily cd $HOME/milestone-a ; ./mysite/scripts/run_with_lock.sh ./bin/production profile_daily_tasks 2>&1 | grep -v DeprecationWarning | grep -v 'import '
+@hourly cd $HOME/milestone-a ; ./mysite/scripts/run_with_lock.sh ./bin/production profile_hourly_tasks 2>&1 | grep -v DeprecationWarning | grep -v 'import '
+*/10 * * * * cd $HOME/milestone-a ; ./mysite/scripts/run_with_lock.sh ./bin/production profile_ten_minutely_tasks  2>&1 | grep -v DeprecationWarning | grep -v 'import '
+
