@@ -5,7 +5,7 @@ import mysite.base.decorators
 import collections
 import urllib
 import re
-import sha
+import hashlib
 from django.db.models import Q
 
 def order_bugs(query):
@@ -328,7 +328,7 @@ class Query:
 
         stringified = str(sorted(simple_dictionary.items()))
         # then return a hash of our sorted items self.
-        return sha.sha(stringified).hexdigest() # sadly we cause a 2x space blowup here
+        return hashlib.sha1(stringified).hexdigest() # sadly we cause a 2x space blowup here
     
     def get_or_create_cached_hit_count(self):
         hashed_query = self.get_sha1()

@@ -27,7 +27,7 @@ import simplejson
 import re
 import cgi
 import logging
-import sha
+import hashlib
 
 DEFAULT_LOCATION='Inaccessible Island'
 
@@ -404,7 +404,7 @@ class Person(models.Model):
         and finally we break ties by get_full_name_or_username(), just so that
         we have a predictable sort.
         .'''
-        hashed_tiebreaker = sha.sha(unhashed_tiebreaker).hexdigest()
+        hashed_tiebreaker = hashlib.sha1(unhashed_tiebreaker).hexdigest()
         factor = (bool(self.get_list_of_all_project_names()),
                   bool(self.get_tags_as_dict()),
                   bool(self.photo),

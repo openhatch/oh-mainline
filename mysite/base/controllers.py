@@ -5,7 +5,7 @@ import django.contrib.auth.views
 from django.core.cache import cache
 from django.conf import settings
 import pprint
-import sha
+import hashlib
 import re
 import traceback
 import logging
@@ -118,7 +118,7 @@ def _geocode(address):
 
 def object_to_key(python_thing):
     as_string = simplejson.dumps(python_thing)
-    return sha.sha(as_string).hexdigest()
+    return hashlib.sha1(as_string).hexdigest()
 
 def address2cache_key_name(address):
     return object_to_key(['function_call', 'cached_geocoding', address])
