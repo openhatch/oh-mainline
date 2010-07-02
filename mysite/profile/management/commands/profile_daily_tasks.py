@@ -9,3 +9,7 @@ class Command(BaseCommand):
         # Garbage collect forwarders
         mysite.profile.tasks.GarbageCollectForwarders.apply()
 
+        # Try to send the emails. The command will only actually send emails at
+        # most once per week.
+        command = mysite.profile.management.commands.send_weekly_emails.Command()
+        command.run()
