@@ -1,0 +1,7 @@
+Eight children are sitting in a circle.
+
+Half of them are wearing hats; the other half are eating lollipops.
+
+In the circle, all the lollipops are green, and all the hats are blue.
+
+How many blue hats?
