@@ -13,7 +13,7 @@
 """
 
 __author__ = "techtonik.rainforce.org"
-__version__ = "10.04-1"
+__version__ = "10.04-2"
 
 import copy
 import logging
@@ -54,7 +54,6 @@ SVN = SUBVERSION = "svn"
 def fromfile(filename):
   """ Parse patch file and return Patch() object
   """
-
   info("reading patch from file %s" % filename)
   fp = open(filename, "rb")
   patch = Patch(fp)
@@ -65,10 +64,7 @@ def fromfile(filename):
 def fromstring(s):
   """ Parse text string and return Patch() object
   """
-
-  return Patch(
-           StringIO(s)
-         )
+  return Patch( StringIO(s) )
 
 
 
