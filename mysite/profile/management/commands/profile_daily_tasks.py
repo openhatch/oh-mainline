@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand
 
+import logging
 import mysite.profile.tasks
 
 class Command(BaseCommand):
@@ -7,5 +8,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         # Garbage collect forwarders
-        mysite.profile.tasks.GarbageCollectForwarders.apply()
+        root_logger = logging.getLogger('')
+        root_logger.setLevel(logging.WARN)
+        mysite.profile.tasks.GarbageCollectForwarders().run()
 
