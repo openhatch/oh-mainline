@@ -141,3 +141,6 @@ def diffpatch_diffsingle_submit(request):
                 data['diffsingle_error_message'] = str(e)
         data['diffsingle_form'] = form
     return diffpatch_mission(request, data)
+
+def diffpatch_diffrecursive_get_original_tarball(request):
+    return make_download(controllers.DiffRecursiveMission.synthesize_tarball(), filename=controllers.DiffRecursiveMission.TARBALL_NAME)

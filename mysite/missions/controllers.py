@@ -129,3 +129,17 @@ class PatchSingleFileMission(SingleFilePatch):
 class DiffSingleFileMission(SingleFilePatch):
     OLD_FILE = os.path.join(get_mission_data_path(), 'diffsingle.txt')
     NEW_FILE = os.path.join(get_mission_data_path(), 'diffsingle_result.txt')
+
+class DiffRecursiveMission(object):
+    ORIG_DIR = 'recipes'
+    TARBALL_NAME = ORIG_DIR + '.tar.gz'
+    SUBSTITUTIONS = [('aubergine', 'eggplant'),
+                     ('Aubergine', 'Eggplant')]
+
+    @classmethod
+    def synthesize_tarball(cls):
+        tdata = StringIO()
+        tfile = tarfile.open(fileobj=tdata, mode='w:gz')
+        tfile.add(os.path.join(get_mission_data_path(), cls.ORIG_DIR), cls.ORIG_DIR)
+        tfile.close()
+        return tdata.getvalue()
