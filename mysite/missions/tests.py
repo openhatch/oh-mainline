@@ -13,6 +13,7 @@ from StringIO import StringIO
 import tempfile
 import subprocess
 import difflib
+import shutil
 
 def make_testdata_filename(filename):
     return os.path.join(os.path.dirname(__file__), 'testdata', filename)
@@ -336,3 +337,20 @@ class DiffRecursiveTests(TwillTests):
 
         paulproteus = Person.objects.get(user__username='paulproteus')
         self.assertEqual(len(StepCompletion.objects.filter(step__name='diffpatch_diffrecursive', person=paulproteus)), 0)
+
+class PatchRecursiveTests(TestCase):
+
+    def test_patch_applies_correctly(self):
+        tempdir = tempfile.mkdtemp()
+
+        try:
+            tar_process = subprocess.Popen(['tar', '-C', tempdir, '-zxv'], stdin=subprocess.PIPE)
+            tar_process.communicate(controllers.PatchRecursiveMission.synthesize_tarball())
+            self.assertEqual(tar_process.returncode, 0)
+
+            patch_process = subprocess.Popen(['patch', '-d', os.path.join(tempdir, controllers.PatchRecursiveMission.BASE_NAME), '-p1'], stdin=subprocess.PIPE)
+            patch_process.communicate(controllers.PatchRecursiveMission.get_patch())
+            self.assertEqual(patch_process.returncode, 0)
+
+        finally:
+            shutil.rmtree(tempdir)

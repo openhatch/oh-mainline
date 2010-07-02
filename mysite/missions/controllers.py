@@ -197,3 +197,31 @@ class DiffRecursiveMission(object):
 
         if len(the_patch.source) != 0:
             raise IncorrectPatch, 'The patch modifies files that it should not modify: %s' % ', '.join(the_patch.source)
+
+class PatchRecursiveMission(object):
+    OLD_DIR = os.path.join(get_mission_data_path(), 'hats', 'before')
+    NEW_DIR = os.path.join(get_mission_data_path(), 'hats', 'after')
+    BASE_NAME = 'hats'
+
+    @classmethod
+    def synthesize_tarball(cls):
+        tdata = StringIO()
+        tfile = tarfile.open(fileobj=tdata, mode='w:gz')
+        tfile.add(cls.OLD_DIR, cls.BASE_NAME)
+        tfile.close()
+        return tdata.getvalue()
+
+    @classmethod
+    def get_patch(cls):
+        patchfile = StringIO()
+        for name in os.listdir(cls.OLD_DIR):
+            oldname = os.path.join(cls.OLD_DIR, name)
+            newname = os.path.join(cls.NEW_DIR, name)
+            if not os.path.isfile(oldname):
+                continue
+
+            oldlines = open(oldname).readlines()
+            newlines = open(newname).readlines()
+            patchfile.writelines(difflib.unified_diff(oldlines, newlines, '%s-orig/%s' % (cls.BASE_NAME, name), '%s/%s' % (cls.BASE_NAME, name)))
+
+        return patchfile.getvalue()
