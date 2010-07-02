@@ -7,11 +7,9 @@
 
 ### Some tasks that we run can run on linode2, the spare virtual machine!
 ### Those tasks are in crontab.linode2. They include bug crawling.
-OPENHATCH_HOME="$HOME/milestone-a/"
-
 MAILTO=asheesh@asheesh.org
 
-@daily cd $OPENHATCH_HOME ; ./mysite/scripts/run_with_lock.sh ./bin/production profile_daily_tasks 2>&1 | grep -v DeprecationWarning.*sha | grep -v 'import sha'
-@hourly cd $OPENHATCH_HOME ; ./mysite/scripts/run_with_lock.sh ./bin/production profile_hourly_tasks 2>&1 | grep -v DeprecationWarning.*sha | grep -v 'import sha'
-*/10 * * * * cd $OPENHATCH_HOME ; ./mysite/scripts/run_with_lock.sh ./bin/production profile_ten_minutely_tasks  2>&1 | grep -v DeprecationWarning.*sha | grep -v 'import sha'
+@daily cd $HOME/milestone-a ; ./mysite/scripts/run_with_lock.sh ./bin/production profile_daily_tasks 2>&1 | grep -v DeprecationWarning.*sha | grep -v 'import sha'
+@hourly cd $HOME/milestone-a ; ./mysite/scripts/run_with_lock.sh ./bin/production profile_hourly_tasks 2>&1 | grep -v DeprecationWarning.*sha | grep -v 'import sha'
+*/10 * * * * cd $HOME/milestone-a ; ./mysite/scripts/run_with_lock.sh ./bin/production profile_ten_minutely_tasks  2>&1 | grep -v DeprecationWarning.*sha | grep -v 'import sha'
 
