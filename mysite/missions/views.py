@@ -105,6 +105,10 @@ def diffpatch_mission(request, passed_data={}):
       'diffsingle_form': forms.DiffSingleUploadForm(),
       'diffsingle_error_message': '',
       'diffsingle_done': controllers.mission_completed(request.user.get_profile(), 'diffpatch_diffsingle'),
+      'diffrecursive_success': False,
+      'diffrecursive_form': forms.DiffRecursiveUploadForm(),
+      'diffrecursive_error_message': '',
+      'diffrecursive_done': controllers.mission_completed(request.user.get_profile(), 'diffpatch_diffrecursive'),
     }
     data.update(passed_data)
     return (request, 'missions/diff_patch.html', data)
@@ -144,3 +148,18 @@ def diffpatch_diffsingle_submit(request):
 
 def diffpatch_diffrecursive_get_original_tarball(request):
     return make_download(controllers.DiffRecursiveMission.synthesize_tarball(), filename=controllers.DiffRecursiveMission.TARBALL_NAME)
+
+@login_required
+def diffpatch_diffrecursive_submit(request):
+    data = {}
+    if request.method == 'POST':
+        form = forms.DiffRecursiveUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            try:
+                controllers.DiffRecursiveMission.validate_patch(form.cleaned_data['diff'].read())
+                controllers.set_mission_completed(request.user.get_profile(), 'diffpatch_diffrecursive')
+                data['diffrecursive_success'] = True
+            except controllers.IncorrectPatch, e:
+                data['diffrecursive_error_message'] = str(e)
+        data['diffrecursive_form'] = form
+    return diffpatch_mission(request, data)

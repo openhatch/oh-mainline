@@ -11,3 +11,6 @@ class PatchSingleUploadForm(forms.Form):
 
 class DiffSingleUploadForm(forms.Form):
     diff = forms.CharField(error_messages={'required': 'No diff output was given.'}, widget=forms.Textarea())
+
+class DiffRecursiveUploadForm(forms.Form):
+    diff = forms.FileField(error_messages={'required': 'No file was uploaded.'})
