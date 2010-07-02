@@ -6,5 +6,5 @@ OPENHATCH_HOME="$HOME/milestone-a/"
 
 MAILTO=asheesh@asheesh.org
 
-@daily cd $HOME/milestone-a ; ./mysite/scripts/run_with_lock.sh ./bin/production search_daily_tasks 2>&1 | grep -v DeprecationWarning.*sha | grep -v 'import sha' >> search.log
+@daily cd $HOME/milestone-a ; ./mysite/scripts/run_with_lock.sh ./bin/production search_daily_tasks 2>&1 | grep -v DeprecationWarning.*sha | grep -v 'import sha' > search.log.$(date -I)
 
