@@ -152,10 +152,7 @@ class TracBug:
                'as_appears_in_distribution': '',
                'last_polled': datetime.datetime.utcnow(),
                }
-        try:
-            ret['importance'] = trac_data['priority']
-        except KeyError:
-            ret['importance'] = ''
+        ret['importance'] = trac_data.get('priority', '')
 
         ret['looks_closed'] = (trac_data['status'] == 'closed')
 
