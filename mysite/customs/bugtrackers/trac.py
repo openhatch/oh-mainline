@@ -72,7 +72,7 @@ class TracBug:
                     people.append(person)
         return people
 
-    def __init__(self, bug_id, BASE_URL, bitesized_keyword):
+    def __init__(self, bug_id, BASE_URL):
         self._bug_specific_csv_data = None
         self._bug_html_page = None
         self._parsed_bug_html_page = None
@@ -80,7 +80,6 @@ class TracBug:
         if not BASE_URL.endswith('/'):
             BASE_URL += '/'
         self.BASE_URL = BASE_URL
-        self.bitesized_keyword = bitesized_keyword
 
     @staticmethod
     def from_url(url):
@@ -88,8 +87,7 @@ class TracBug:
         bug_id = int(num)
         assert ticket == 'ticket'
         return TracBug(bug_id=bug_id,
-                       BASE_URL=base + '/',
-                       bitesized_keyword='') # Unknown in this context (but this method is only ever used to get the bug id)
+                       BASE_URL=base + '/')
 
     def as_bug_specific_url(self):
         return urlparse.urljoin(self.BASE_URL,
@@ -133,7 +131,7 @@ class TracBug:
         s = cgi.escape(s)
         return s
 
-    def as_data_dict_for_bug_object(self):
+    def as_data_dict_for_bug_object(self, extract_tracker_specific_data):
         trac_data = self.as_bug_specific_csv_data()
         html_data = self.get_parsed_bug_html_page()
 
@@ -146,8 +144,6 @@ class TracBug:
                'submitter_username': trac_data['reporter'],
                'submitter_realname': '', # can't find this in Trac
                'canonical_bug_link': self.as_bug_specific_url(),
-               'good_for_newcomers': (self.bitesized_keyword in trac_data['keywords']),
-               'bite_size_tag_name': self.bitesized_keyword,
                'concerns_just_documentation': False,
                'as_appears_in_distribution': '',
                'last_polled': datetime.datetime.utcnow(),
@@ -177,4 +173,6 @@ class TracBug:
         # FIXME: Need time zone
         ret['date_reported'] = TracBug.page2date_opened(html_data)
         ret['last_touched'] = TracBug.page2date_modified(html_data)
+
+        ret = extract_tracker_specific_data(trac_data, ret)
         return ret
