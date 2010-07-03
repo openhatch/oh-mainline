@@ -413,7 +413,7 @@ Keywords: Torrent unittest""")
 
 
     @mock.patch("mysite.customs.bugtrackers.bugzilla.url2bug_data")
-    @mock.patch("mysite.search.tasks.bugzilla_instances.MiroBugzilla.get_current_xml_bug_tree")
+    @mock.patch("mysite.search.tasks.bugzilla_instances.MiroBugzilla.generate_current_bug_xml")
     def test_regrab_miro_bugs_refreshes_older_bugs_even_when_missing_from_csv(self, mock_xml_bug_tree, mock_xml_opener):
         mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
             settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml')).read())
@@ -431,11 +431,8 @@ Keywords: Torrent unittest""")
         bug.project, _ = Project.objects.get_or_create(name='Miro')
         bug.save()
 
-        # Prepare a fake xml bug list that is empty
-        mock_xml_bug_tree.return_value = lxml.etree.XML('''\
-<bugzilla>
-</bugzilla>
-''')
+        # Prepare an empty generator
+        mock_xml_bug_tree.return_value = iter([])
 
         # Now, do a crawl and notice that we updated the bug even
         # though the xml bug list is empty
