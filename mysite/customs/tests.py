@@ -698,6 +698,7 @@ class ParseCiaMessage(django.test.TestCase):
                          expected)
 
 class TracBug(django.test.TestCase):
+    # FIXME: As far as I can tell, this method is defunct
     def test_eval_in_description(self):
         four_chars = r'\r\n'
         self.assertEqual(len(four_chars), 4)
@@ -706,6 +707,7 @@ class TracBug(django.test.TestCase):
         self.assertEqual(len(two_chars), 2)
         self.assertEqual(two_chars, '\r\n')
 
+    # FIXME: As far as I can tell, this method is defunct
     def test_unicodify_in_the_face_of_junk(self):
         weird_chars = u'\x01'
         unicoded = mysite.customs.bugtrackers.trac.TracBug.string_un_csv(
@@ -742,6 +744,7 @@ class TracBug(django.test.TestCase):
         self.assertEqual(tb.component, 'core')
 
         got = tb.as_data_dict_for_bug_object()
+        del got['last_polled']
         wanted = {'title': 'Deprecate twisted.persisted.journal',
                   'description': "This package hasn't been touched in 4 years which either means it's stable or not being used at all. Let's deprecate it (also see #4111).",
                   'status': 'new',
@@ -790,6 +793,7 @@ class TracBug(django.test.TestCase):
             open(cached_html_filename).read(), 'utf-8')
 
         got = tb.as_data_dict_for_bug_object()
+        del got['last_polled']
         wanted = {'title': 'Deprecate twisted.persisted.journal',
                   'description': "This package hasn't been touched in 4 years which either means it's stable or not being used at all. Let's deprecate it (also see #4111).",
                   'status': 'new',
@@ -838,6 +842,7 @@ class TracBug(django.test.TestCase):
             open(cached_html_filename).read(), 'utf-8')
 
         got = tb.as_data_dict_for_bug_object()
+        del got['last_polled']
         wanted = {'title': 'Deprecate twisted.persisted.journal',
                   'description': "This package hasn't been touched in 4 years which either means it's stable or not being used at all. Let's deprecate it (also see #4111).",
                   'status': 'new',
@@ -886,6 +891,7 @@ class TracBug(django.test.TestCase):
             open(cached_html_filename).read(), 'utf-8')
 
         got = tb.as_data_dict_for_bug_object()
+        del got['last_polled']
         wanted = {'title': 'Deprecate twisted.persisted.journal',
                   'description': "This package hasn't been touched in 4 years which either means it's stable or not being used at all. Let's deprecate it (also see #4111).",
                   'status': 'new',
