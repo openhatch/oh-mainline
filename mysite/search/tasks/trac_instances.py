@@ -12,6 +12,14 @@ class TracBugTracker(object):
         self.project_name = project_name
         self.bug_project_name_format = bug_project_name_format
 
+    def generate_bug_ids_from_queries(self, queries):
+        for query_name in queries:
+            query_url = queries[query_name]
+            query_ids = mysite.customs.bugtrackers.trac.csv_url2list_of_bug_ids(
+                mysite.customs.bugtrackers.trac.csv_of_bugs(query_url))
+            for bug_id in query_ids:
+                yield bug_id
+
     def generate_bug_project_name(self, trac_bug):
         return self.bug_project_name_format.format(project=self.project_name,
                                                    component=trac_bug.component)
@@ -22,8 +30,7 @@ class TracBugTracker(object):
         # First, go through and refresh all the bugs specifically marked
         # as bugs to look at.
 
-        must_look_at_these = self.generate_list_of_bug_ids_to_look_at()
-        for bug_id in must_look_at_these:
+        for bug_id in self.generate_list_of_bug_ids_to_look_at():
             self.refresh_one_bug_id(bug_id)
 
         # Then, refresh them all
@@ -82,9 +89,11 @@ class TahoeLafsTrac(TracBugTracker):
                                 bug_project_name_format='{project}')
 
     def generate_list_of_bug_ids_to_look_at(self):
-        return mysite.customs.bugtrackers.trac.csv_url2list_of_bug_ids(
-            mysite.customs.bugtrackers.trac.csv_of_bugs(
-                'http://tahoe-lafs.org/trac/tahoe-lafs/query?status=assigned&status=new&status=reopened&max=10000&reporter=~&col=id&col=summary&col=keywords&col=reporter&col=status&col=owner&col=type&col=priority&col=milestone&keywords=~&owner=~&desc=1&order=id&format=csv'))
+        queries = {
+                'All bugs':
+                    'http://tahoe-lafs.org/trac/tahoe-lafs/query?status=assigned&status=new&status=reopened&max=10000&reporter=~&col=id&col=summary&col=keywords&col=reporter&col=status&col=owner&col=type&col=priority&col=milestone&keywords=~&owner=~&desc=1&order=id&format=csv',
+                }
+        return self.generate_bug_ids_from_queries(queries)
 
     @staticmethod
     def extract_tracker_specific_data(trac_data, ret_dict):
@@ -107,10 +116,13 @@ class TwistedTrac(TracBugTracker):
                                 bug_project_name_format='{project}')
 
     def generate_list_of_bug_ids_to_look_at(self):
-        # Just index bitesized bugs
-        return mysite.customs.bugtrackers.trac.csv_url2list_of_bug_ids(
-            mysite.customs.bugtrackers.trac.csv_of_bugs(
-                'http://twistedmatrix.com/trac/query?status=new&status=assigned&status=reopened&format=csv&keywords=%7Eeasy&order=priority'))
+        queries = {
+                'Easy bugs':
+                    'http://twistedmatrix.com/trac/query?status=new&status=assigned&status=reopened&format=csv&keywords=%7Eeasy&order=priority',
+                'Documentation bugs':
+                    'http://twistedmatrix.com/trac/query?status=assigned&status=new&status=reopened&format=csv&order=priority&keywords=~documentation'
+                }
+        return self.generate_bug_ids_from_queries(queries)
 
     @staticmethod
     def extract_tracker_specific_data(trac_data, ret_dict):
@@ -133,10 +145,13 @@ class SugarLabsTrac(TracBugTracker):
                                 bug_project_name_format='{component}')
 
     def generate_list_of_bug_ids_to_look_at(self):
-        # Just index bitesized bugs
-        return mysite.customs.bugtrackers.trac.csv_url2list_of_bug_ids(
-            mysite.customs.bugtrackers.trac.csv_of_bugs(
-                'http://bugs.sugarlabs.org/query?status=new&status=assigned&status=reopened&format=csv&keywords=%7Esugar-love&order=priority'))
+        queries = {
+                'Easy bugs':
+                    'http://bugs.sugarlabs.org/query?status=accepted&status=new&status=assigned&status=reopened&format=csv&keywords=%7Esugar-love&order=priority',
+                'Documentation bugs':
+                    'http://bugs.sugarlabs.org/query?status=accepted&status=assigned&status=new&status=reopened&format=csv&order=priority&keywords=~documentation'
+                }
+        return self.generate_bug_ids_from_queries(queries)
 
     @staticmethod
     def extract_tracker_specific_data(trac_data, ret_dict):
@@ -174,10 +189,13 @@ class XiphTrac(TracBugTracker):
                                 bug_project_name_format='{project}')
 
     def generate_list_of_bug_ids_to_look_at(self):
-        # Only gives a list of bitesized bugs - confirm if devels want all bugs indexed
-        return mysite.customs.bugtrackers.trac.csv_url2list_of_bug_ids(
-            mysite.customs.bugtrackers.trac.csv_of_bugs(
-                'https://trac.xiph.org/query?status=assigned&status=new&status=reopened&order=priority&format=csv&keywords=%7Eeasy'))
+        queries = {
+                'Easy bugs': # Only gives a list of bitesized bugs - confirm if devels want all bugs indexed
+                    'https://trac.xiph.org/query?status=assigned&status=new&status=reopened&order=priority&format=csv&keywords=%7Eeasy',
+                #'Documentation bugs':
+                    #''
+                }
+        return self.generate_bug_ids_from_queries(queries)
 
     @staticmethod
     def extract_tracker_specific_data(trac_data, ret_dict):
@@ -200,9 +218,11 @@ class OLPCTrac(TracBugTracker):
                                 bug_project_name_format='{project}')
 
     def generate_list_of_bug_ids_to_look_at(self):
-        return mysite.customs.bugtrackers.trac.csv_url2list_of_bug_ids(
-            mysite.customs.bugtrackers.trac.csv_of_bugs(
-                'http://dev.laptop.org/query?status=assigned&status=new&status=reopened&order=priority&format=csv'))
+        queries = {
+                'All bugs':
+                    'http://dev.laptop.org/query?status=assigned&status=new&status=reopened&order=priority&format=csv',
+                }
+        return self.generate_bug_ids_from_queries(queries)
 
     @staticmethod
     def extract_tracker_specific_data(trac_data, ret_dict):
@@ -225,9 +245,11 @@ class DjangoTrac(TracBugTracker):
                                 bug_project_name_format='{project}')
 
     def generate_list_of_bug_ids_to_look_at(self):
-        return mysite.customs.bugtrackers.trac.csv_url2list_of_bug_ids(
-            mysite.customs.bugtrackers.trac.csv_of_bugs(
-                'http://code.djangoproject.com/query?status=new&status=assigned&status=reopened&order=priority&format=csv'))
+        queries = {
+                'All bugs':
+                    'http://code.djangoproject.com/query?status=new&status=assigned&status=reopened&order=priority&format=csv',
+                }
+        return self.generate_bug_ids_from_queries(queries)
 
     @staticmethod
     def extract_tracker_specific_data(trac_data, ret_dict):
@@ -251,9 +273,11 @@ class HelenOSTrac(TracBugTracker):
                                 bug_project_name_format='{project}')
 
     def generate_list_of_bug_ids_to_look_at(self):
-        return mysite.customs.bugtrackers.trac.csv_url2list_of_bug_ids(
-            mysite.customs.bugtrackers.trac.csv_of_bugs(
-                'http://trac.helenos.org/trac.fcgi/query?status=accepted&status=assigned&status=new&status=reopened&order=priority&format=csv'))
+        queries = {
+                'All bugs':
+                    'http://trac.helenos.org/trac.fcgi/query?status=accepted&status=assigned&status=new&status=reopened&order=priority&format=csv',
+                }
+        return self.generate_bug_ids_from_queries(queries)
 
     @staticmethod
     def extract_tracker_specific_data(trac_data, ret_dict):
@@ -276,9 +300,11 @@ class Bcfg2Trac(TracBugTracker):
                                 bug_project_name_format='{project}')
 
     def generate_list_of_bug_ids_to_look_at(self):
-        return mysite.customs.bugtrackers.trac.csv_url2list_of_bug_ids(
-            mysite.customs.bugtrackers.trac.csv_of_bugs(
-                'https://trac.mcs.anl.gov/projects/bcfg2/query?status=accepted&status=assigned&status=new&status=reopened&order=priority&format=csv'))
+        queries = {
+                'All bugs':
+                    'https://trac.mcs.anl.gov/projects/bcfg2/query?status=accepted&status=assigned&status=new&status=reopened&order=priority&format=csv',
+                }
+        return self.generate_bug_ids_from_queries(queries)
 
     @staticmethod
     def extract_tracker_specific_data(trac_data, ret_dict):
@@ -301,9 +327,11 @@ class WarFoundryTrac(TracBugTracker):
                                 bug_project_name_format='{project}')
 
     def generate_list_of_bug_ids_to_look_at(self):
-        return mysite.customs.bugtrackers.trac.csv_url2list_of_bug_ids(
-            mysite.customs.bugtrackers.trac.csv_of_bugs(
-                'http://dev.ibboard.co.uk/projects/warfoundry/query?status=accepted&status=assigned&status=confirmed&status=needinfo&status=needinfo_new&status=new&status=reopened&order=priority&format=csv'))
+        queries = {
+                'All bugs':
+                    'http://dev.ibboard.co.uk/projects/warfoundry/query?status=accepted&status=assigned&status=confirmed&status=needinfo&status=needinfo_new&status=new&status=reopened&order=priority&format=csv',
+                }
+        return self.generate_bug_ids_from_queries(queries)
 
     @staticmethod
     def extract_tracker_specific_data(trac_data, ret_dict):
@@ -326,9 +354,11 @@ class FedoraPythonModulesTrac(TracBugTracker):
                                 bug_project_name_format='{project}')
 
     def generate_list_of_bug_ids_to_look_at(self):
-        return mysite.customs.bugtrackers.trac.csv_url2list_of_bug_ids(
-            mysite.customs.bugtrackers.trac.csv_of_bugs(
-                'https://fedorahosted.org/python-fedora/query?status=new&status=assigned&status=reopened&order=priority&format=csv'))
+        queries = {
+                'All bugs':
+                    'https://fedorahosted.org/python-fedora/query?status=new&status=assigned&status=reopened&order=priority&format=csv',
+                }
+        return self.generate_bug_ids_from_queries(queries)
 
     @staticmethod
     def extract_tracker_specific_data(trac_data, ret_dict):
@@ -351,9 +381,11 @@ class AngbandTrac(TracBugTracker):
                                 bug_project_name_format='{project}')
 
     def generate_list_of_bug_ids_to_look_at(self):
-        return mysite.customs.bugtrackers.trac.csv_url2list_of_bug_ids(
-            mysite.customs.bugtrackers.trac.csv_of_bugs(
-                'http://trac.rephial.org/query?status=assigned&status=confirmed&status=new&status=reopened&order=priority&format=csv'))
+        queries = {
+                'All bugs':
+                    'http://trac.rephial.org/query?status=assigned&status=confirmed&status=new&status=reopened&order=priority&format=csv',
+                }
+        return self.generate_bug_ids_from_queries(queries)
 
     @staticmethod
     def extract_tracker_specific_data(trac_data, ret_dict):
@@ -376,9 +408,11 @@ class GHCTrac(TracBugTracker):
                                 bug_project_name_format='{project}')
 
     def generate_list_of_bug_ids_to_look_at(self):
-        return mysite.customs.bugtrackers.trac.csv_url2list_of_bug_ids(
-            mysite.customs.bugtrackers.trac.csv_of_bugs(
-                'http://hackage.haskell.org/trac/ghc/query?status=new&status=assigned&status=reopened&group=priority&order=id&desc=1&format=csv'))
+        queries = {
+                'All bugs':
+                    'http://hackage.haskell.org/trac/ghc/query?status=new&status=assigned&status=reopened&group=priority&order=id&desc=1&format=csv',
+                }
+        return self.generate_bug_ids_from_queries(queries)
 
     @staticmethod
     def extract_tracker_specific_data(trac_data, ret_dict):
@@ -401,10 +435,13 @@ class TracTrac(TracBugTracker):
                                 bug_project_name_format='{project}')
 
     def generate_list_of_bug_ids_to_look_at(self):
-        # Just index bitesized bugs
-        return mysite.customs.bugtrackers.trac.csv_url2list_of_bug_ids(
-            mysite.customs.bugtrackers.trac.csv_of_bugs(
-                'http://trac.edgewall.org/query?status=!closed&keywords=~bitesized&format=csv'))
+        queries = {
+                'Easy bugs':
+                    'http://trac.edgewall.org/query?status=!closed&keywords=~bitesized&format=csv',
+                #'Documentation bugs':
+                    #''
+                }
+        return self.generate_bug_ids_from_queries(queries)
 
     @staticmethod
     def extract_tracker_specific_data(trac_data, ret_dict):
@@ -427,9 +464,11 @@ class SSSDTrac(TracBugTracker):
                                 bug_project_name_format='{project}')
 
     def generate_list_of_bug_ids_to_look_at(self):
-        return mysite.customs.bugtrackers.trac.csv_url2list_of_bug_ids(
-            mysite.customs.bugtrackers.trac.csv_of_bugs(
-                'https://fedorahosted.org/sssd/query?status=new&status=assigned&status=reopened&order=priority&format=csv'))
+        queries = {
+                'All bugs':
+                    'https://fedorahosted.org/sssd/query?status=new&status=assigned&status=reopened&order=priority&format=csv',
+                }
+        return self.generate_bug_ids_from_queries(queries)
 
     @staticmethod
     def extract_tracker_specific_data(trac_data, ret_dict):
@@ -452,9 +491,11 @@ class I2PTrac(TracBugTracker):
                                 bug_project_name_format='{project}')
 
     def generate_list_of_bug_ids_to_look_at(self):
-        return mysite.customs.bugtrackers.trac.csv_url2list_of_bug_ids(
-            mysite.customs.bugtrackers.trac.csv_of_bugs(
-                'http://trac.i2p2.de/query?status=accepted&status=assigned&status=new&status=reopened&order=priority&format=csv'))
+        queries = {
+                'All bugs':
+                    'http://trac.i2p2.de/query?status=accepted&status=assigned&status=new&status=reopened&order=priority&format=csv',
+                }
+        return self.generate_bug_ids_from_queries(queries)
 
     @staticmethod
     def extract_tracker_specific_data(trac_data, ret_dict):
@@ -485,9 +526,14 @@ class GenTrac(TracBugTracker):
                                 bug_project_name_format='')
 
     def generate_list_of_bug_ids_to_look_at(self):
-        return mysite.customs.bugtrackers.trac.csv_url2list_of_bug_ids(
-            mysite.customs.bugtrackers.trac.csv_of_bugs(
-                ''))
+        # Can replace both entries below with an 'All bugs' query.
+        queries = {
+                'Easy bugs':
+                    '',
+                'Documentation bugs':
+                    ''
+                }
+        return self.generate_bug_ids_from_queries(queries)
 
     @staticmethod
     def extract_tracker_specific_data(trac_data, ret_dict):
