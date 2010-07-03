@@ -126,6 +126,7 @@ class MiroBugzilla(BugzillaBugTracker):
         keywords = map(lambda s: s.strip(),
                        keywords_text.split(','))
         ret_dict['good_for_newcomers'] = ('bitesized' in keywords)
+        ret_dict['bite_size_tag_name'] = 'bitesized'
         # Then pass ret_dict back
         return ret_dict
 
@@ -154,6 +155,7 @@ class KDEBugzilla(BugzillaBugTracker):
         keywords = map(lambda s: s.strip(),
                        keywords_text.split(','))
         ret_dict['good_for_newcomers'] = ('junior-jobs' in keywords)
+        ret_dict['bite_size_tag_name'] = 'junior-jobs'
         # Remove 'JJ:' from title if present
         if ret_dict['title'].startswith("JJ:"):
             ret_dict['title'] = ret_dict['title'][3:].strip()
@@ -258,6 +260,7 @@ class MediaWikiBugzilla(BugzillaBugTracker):
         keywords = map(lambda s: s.strip(),
                        keywords_text.split(','))
         ret_dict['good_for_newcomers'] = ('easy' in keywords)
+        ret_dict['bite_size_tag_name'] = 'easy'
         # Check whether documentation bug
         component = mysite.customs.bugtrackers.bugzilla.get_tag_text_from_xml(xml_data, 'component')
         ret_dict['concerns_just_documentation'] = (component == 'Documentation')
@@ -303,6 +306,7 @@ class GnomeBugzilla(BugzillaBugTracker):
         keywords = map(lambda s: s.strip(),
                        keywords_text.split(','))
         ret_dict['good_for_newcomers'] = ('gnome-love' in keywords)
+        ret_dict['bite_size_tag_name'] = 'gnome-love'
         # Check whether this is a documentation bug.
         ret_dict['concerns_just_documentation'] = ('documentation' in keywords)
         # Then pass ret_dict back
@@ -340,6 +344,7 @@ class MozillaBugzilla(BugzillaBugTracker):
         # Check for the bitesized keyword
         whiteboard_text = mysite.customs.bugtrackers.bugzilla.get_tag_text_from_xml(xml_data, 'status_whiteboard')
         ret_dict['good_for_newcomers'] = (whiteboard_text == '[good first bug]')
+        ret_dict['bite_size_tag_name'] = '[good first bug]'
         # Then pass ret_dict back
         return ret_dict
 
@@ -388,6 +393,7 @@ class FedoraBugzilla(BugzillaBugTracker):
         keywords = map(lambda s: s.strip(),
                        keywords_text.split(','))
         ret_dict['good_for_newcomers'] = True # Since they are 'fit and finish'
+        ret_dict['bite_size_tag_name'] = 'fitandfinish'
         # Set the distribution tag
         ret_dict['as_appears_in_distribution'] = 'Fedora'
         # Then pass ret_dict back
@@ -503,6 +509,7 @@ class XOrgBugzilla(BugzillaBugTracker):
         keywords = map(lambda s: s.strip(),
                        keywords_text.split(','))
         ret_dict['good_for_newcomers'] = ('janitor' in keywords)
+        ret_dict['bite_size_tag_name'] = 'janitor'
         # Check whether documentation bug
         component = mysite.customs.bugtrackers.bugzilla.get_tag_text_from_xml(xml_data, 'component')
         documentation_components = [
@@ -615,6 +622,7 @@ class GenBugzilla(BugzillaBugTracker):
         keywords = map(lambda s: s.strip(),
                        keywords_text.split(','))
         ret_dict['good_for_newcomers'] = ('' in keywords)
+        ret_dict['bite_size_tag_name'] = ''
         # Then pass ret_dict back
         return ret_dict
 
