@@ -6,5 +6,21 @@
   {"model": "missions.Step",
    "pk": 2,
    "fields": {"name": "tar_extract"}
+  },
+  {"model": "missions.Step",
+   "pk": 3,
+   "fields": {"name": "diffpatch_patchsingle"}
+  },
+  {"model": "missions.Step",
+   "pk": 4,
+   "fields": {"name": "diffpatch_diffsingle"}
+  },
+  {"model": "missions.Step",
+   "pk": 5,
+   "fields": {"name": "diffpatch_diffrecursive"}
+  },
+  {"model": "missions.Step",
+   "pk": 6,
+   "fields": {"name": "diffpatch_patchrecursive"}
   }
 ]

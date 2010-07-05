@@ -68,6 +68,18 @@ urlpatterns = patterns('',
         (r'^missions/tar/downloadtarball', 'mysite.missions.views.tar_download_tarball_for_extract_mission'),
         (r'^missions/tar/extractupload', 'mysite.missions.views.tar_extract_mission_upload'),
 
+        (r'^missions/diffpatch$', 'mysite.missions.views.diffpatch_mission'),
+        (r'^missions/diffpatch/patchsingle/original$', 'mysite.missions.views.diffpatch_patchsingle_get_original_file'),
+        (r'^missions/diffpatch/patchsingle/patch$', 'mysite.missions.views.diffpatch_patchsingle_get_patch'),
+        (r'^missions/diffpatch/patchsingle/submit$', 'mysite.missions.views.diffpatch_patchsingle_submit'),
+        (r'^missions/diffpatch/diffsingle/original$', 'mysite.missions.views.diffpatch_diffsingle_get_original_file'),
+        (r'^missions/diffpatch/diffsingle/submit$', 'mysite.missions.views.diffpatch_diffsingle_submit'),
+        (r'^missions/diffpatch/diffrecursive/original$', 'mysite.missions.views.diffpatch_diffrecursive_get_original_tarball'),
+        (r'^missions/diffpatch/diffrecursive/submit$', 'mysite.missions.views.diffpatch_diffrecursive_submit'),
+        (r'^missions/diffpatch/patchrecursive/original$', 'mysite.missions.views.diffpatch_patchrecursive_get_original_tarball'),
+        (r'^missions/diffpatch/patchrecursive/patch$', 'mysite.missions.views.diffpatch_patchrecursive_get_patch'),
+        (r'^missions/diffpatch/patchrecursive/submit$', 'mysite.missions.views.diffpatch_patchrecursive_submit'),
+
         # Invitation-related URLs
         (r'^invitation/', include('invitation.urls')),
 

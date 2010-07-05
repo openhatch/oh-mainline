@@ -16,7 +16,7 @@ Open source training missions
     <p>These missions will allow you to learn some skills that will help you successfully contribute to free/open source projects.</p>
 
     <h2>Using tar</h2>
-    <p>Learn how to create good tar archives.</p>
+    <p>Learn how to work with tar archives.</p>
     {% if completed_missions.tar or completed_missions.tar_extract %}
       {% if completed_missions.tar and completed_missions.tar_extract %}
         <p><em>You have completed this mission.</em></p>
@@ -25,6 +25,17 @@ Open source training missions
       {% endif %}
     {% endif %}
     <p><a href="{% url mysite.missions.views.tar_mission %}">Go to this mission</a></p>
+
+    <h2>Using diff and patch</h2>
+    <p>Learn how to use diff and patch to submit changes to a project or apply others' changes.</p>
+    {% if completed_missions.diffpatch_diffsingle or completed_missions.diffpatch_patchsingle or completed_missions.diffpatch_diffrecursive or completed_missions.diffpatch_patchrecursive %}
+      {% if completed_missions.diffpatch_diffsingle and completed_missions.diffpatch_patchsingle and completed_missions.diffpatch_diffrecursive and completed_missions.diffpatch_patchrecursive %}
+        <p><em>You have completed this mission.</em></p>
+      {% else %}
+        <p><em>You have partially completed this mission.</em></p>
+      {% endif %}
+    {% endif %}
+    <p><a href="{% url mysite.missions.views.diffpatch_mission %}">Go to this mission</a></p>
   </div>
 </div>
 {% endblock main %}
