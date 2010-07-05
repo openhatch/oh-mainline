@@ -73,6 +73,7 @@ urlpatterns = patterns('',
         (r'^missions/diffpatch/diffrecursive/submit$', 'mysite.missions.views.diffpatch_diffrecursive_submit'),
         (r'^missions/diffpatch/patchrecursive/original$', 'mysite.missions.views.diffpatch_patchrecursive_get_original_tarball'),
         (r'^missions/diffpatch/patchrecursive/patch$', 'mysite.missions.views.diffpatch_patchrecursive_get_patch'),
+        (r'^missions/diffpatch/patchrecursive/submit$', 'mysite.missions.views.diffpatch_patchrecursive_submit'),
 
         # Invitation-related URLs
         (r'^invitation/', include('invitation.urls')),

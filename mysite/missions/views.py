@@ -109,6 +109,11 @@ def diffpatch_mission(request, passed_data={}):
       'diffrecursive_form': forms.DiffRecursiveUploadForm(),
       'diffrecursive_error_message': '',
       'diffrecursive_done': controllers.mission_completed(request.user.get_profile(), 'diffpatch_diffrecursive'),
+      'patchrecursive_success': False,
+      'patchrecursive_form': forms.PatchRecursiveUploadForm(),
+      'patchrecursive_children_hats_error_message': '',
+      'patchrecursive_lizards_hats_error_message': '',
+      'patchrecursive_done': controllers.mission_completed(request.user.get_profile(), 'diffpatch_patchrecursive'),
     }
     data.update(passed_data)
     return (request, 'missions/diff_patch.html', data)
@@ -169,3 +174,20 @@ def diffpatch_patchrecursive_get_original_tarball(request):
 
 def diffpatch_patchrecursive_get_patch(request):
     return make_download(controllers.PatchRecursiveMission.get_patch(), filename=controllers.PatchRecursiveMission.BASE_NAME+'.patch')
+
+@login_required
+def diffpatch_patchrecursive_submit(request):
+    data = {}
+    wrong_answers_present = False
+    if request.method == 'POST':
+        form = forms.PatchRecursiveUploadForm(request.POST)
+        if form.is_valid():
+            for key, value in controllers.PatchRecursiveMission.ANSWERS.iteritems():
+                if form.cleaned_data[key] != value:
+                    data['patchrecursive_%s_error_message' % key] = 'This answer is incorrect.'
+                    wrong_answers_present = True
+            if not wrong_answers_present:
+                controllers.set_mission_completed(request.user.get_profile(), 'diffpatch_patchrecursive')
+                data['patchrecursive_success'] = True
+        data['patchrecursive_form'] = form
+    return diffpatch_mission(request, data)

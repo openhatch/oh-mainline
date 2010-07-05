@@ -14,3 +14,7 @@ class DiffSingleUploadForm(forms.Form):
 
 class DiffRecursiveUploadForm(forms.Form):
     diff = forms.FileField(error_messages={'required': 'No file was uploaded.'})
+
+class PatchRecursiveUploadForm(forms.Form):
+    children_hats = forms.IntegerField()
+    lizards_hats = forms.IntegerField()

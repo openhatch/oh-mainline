@@ -338,7 +338,12 @@ class DiffRecursiveTests(TwillTests):
         paulproteus = Person.objects.get(user__username='paulproteus')
         self.assertEqual(len(StepCompletion.objects.filter(step__name='diffpatch_diffrecursive', person=paulproteus)), 0)
 
-class PatchRecursiveTests(TestCase):
+class PatchRecursiveTests(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def setUp(self):
+        TwillTests.setUp(self)
+        self.client = self.login_with_client()
 
     def test_patch_applies_correctly(self):
         tempdir = tempfile.mkdtemp()
@@ -354,3 +359,20 @@ class PatchRecursiveTests(TestCase):
 
         finally:
             shutil.rmtree(tempdir)
+
+    def test_do_mission_correctly(self):
+        response = self.client.post(reverse(views.diffpatch_patchrecursive_submit), controllers.PatchRecursiveMission.ANSWERS)
+        self.assert_(response.context['patchrecursive_success'])
+
+        paulproteus = Person.objects.get(user__username='paulproteus')
+        self.assertEqual(len(StepCompletion.objects.filter(step__name='diffpatch_patchrecursive', person=paulproteus)), 1)
+
+    def test_do_mission_incorrectly(self):
+        answers = {}
+        for key, value in controllers.PatchRecursiveMission.ANSWERS.iteritems():
+            answers[key] = value + 1
+        response = self.client.post(reverse(views.diffpatch_patchrecursive_submit), answers)
+        self.assertFalse(response.context['patchrecursive_success'])
+
+        paulproteus = Person.objects.get(user__username='paulproteus')
+        self.assertEqual(len(StepCompletion.objects.filter(step__name='diffpatch_patchrecursive', person=paulproteus)), 0)

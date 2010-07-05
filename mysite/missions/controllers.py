@@ -202,6 +202,7 @@ class PatchRecursiveMission(object):
     OLD_DIR = os.path.join(get_mission_data_path(), 'hats', 'before')
     NEW_DIR = os.path.join(get_mission_data_path(), 'hats', 'after')
     BASE_NAME = 'hats'
+    ANSWERS = {'children_hats': 4, 'lizards_hats': 5}
 
     @classmethod
     def synthesize_tarball(cls):
