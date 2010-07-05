@@ -1,8 +1,23 @@
 import datetime
 import logging
 
+import mysite.base.models
 import mysite.search.models
 import mysite.customs.bugtrackers.bugzilla
+
+# FIXME: Should have this somewhere else. Maybe a decorator?
+# Could take arguments of urls and remove the fresh ones.
+def url_is_more_fresh_than_one_day(url):
+    url_timestamp = mysite.base.models.Timestamp.get_timestamp_for_string(url)
+    url_age = datetime.datetime.now() - url_timestamp
+    url_is_fresh = (url_age < datetime.timedelta(days=1))
+    try:
+        mysite.base.models.Timestamp.update_timestamp_for_string(url)
+    except Exception, e:
+        logging.error("[Bugzilla] Error generated when updating Timestamp.")
+        logging.error("[Bugzilla] Error type is %s" % type(e))
+        logging.error("[Bugzilla] Error is %s" % e)
+    return url_is_fresh
 
 class BugzillaBugTracker(object):
     def __init__(self, base_url, project_name, bug_project_name_format, bug_id_list_only=False):
@@ -14,6 +29,11 @@ class BugzillaBugTracker(object):
     def generate_bug_xml_from_queries(self, queries):
         for query_name in queries:
             query_url = queries[query_name]
+            # Check if this url has been accessed in the last day
+            if url_is_more_fresh_than_one_day(query_url):
+                # Sweet, ignore this one and go on.
+                logging.info("[Bugzilla] URL %s is fresh, skipping..." % query_url)
+                continue
             query_xml = mysite.customs.bugtrackers.bugzilla.url2bug_data(query_url)
             for bug_xml in query_xml.xpath('bug'):
                 yield bug_xml
