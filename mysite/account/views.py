@@ -23,6 +23,7 @@ from mysite.base.controllers import get_notification_from_request
 from mysite.profile.models import Person, Tag, TagType, Link_Project_Tag, Link_SF_Proj_Dude_FM, Link_Person_Tag, DataImportAttempt
 import mysite.account.forms
 from mysite.base.helpers import render_response
+import mysite.profile.views
 
 # FIXME: We did this because this decorator used to live here
 # and lots of other modules refer to it as mysite.account.views.view.
