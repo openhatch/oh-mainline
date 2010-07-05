@@ -18,5 +18,9 @@
   {"model": "missions.Step",
    "pk": 5,
    "fields": {"name": "diffpatch_diffrecursive"}
+  },
+  {"model": "missions.Step",
+   "pk": 6,
+   "fields": {"name": "diffpatch_patchrecursive"}
   }
 ]
