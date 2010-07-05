@@ -163,3 +163,9 @@ def diffpatch_diffrecursive_submit(request):
                 data['diffrecursive_error_message'] = str(e)
         data['diffrecursive_form'] = form
     return diffpatch_mission(request, data)
+
+def diffpatch_patchrecursive_get_original_tarball(request):
+    return make_download(controllers.PatchRecursiveMission.synthesize_tarball(), filename=controllers.PatchRecursiveMission.BASE_NAME+'.tar.gz')
+
+def diffpatch_patchrecursive_get_patch(request):
+    return make_download(controllers.PatchRecursiveMission.get_patch(), filename=controllers.PatchRecursiveMission.BASE_NAME+'.patch')
