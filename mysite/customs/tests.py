@@ -695,23 +695,6 @@ class ParseCiaMessage(django.test.TestCase):
                          expected)
 
 class TracBug(django.test.TestCase):
-    # FIXME: As far as I can tell, this method is defunct
-    def test_eval_in_description(self):
-        four_chars = r'\r\n'
-        self.assertEqual(len(four_chars), 4)
-        two_chars = mysite.customs.bugtrackers.trac.TracBug.string_un_csv(
-            four_chars)
-        self.assertEqual(len(two_chars), 2)
-        self.assertEqual(two_chars, '\r\n')
-
-    # FIXME: As far as I can tell, this method is defunct
-    def test_unicodify_in_the_face_of_junk(self):
-        weird_chars = u'\x01'
-        unicoded = mysite.customs.bugtrackers.trac.TracBug.string_un_csv(
-            weird_chars)
-        self.assertEqual(unicoded, '')
-        
-
     @mock.patch('mysite.customs.bugtrackers.trac.TracBug.as_bug_specific_csv_data')
     def test_create_bug_object_data_dict_more_recent(self, m):
         m.return_value = {
