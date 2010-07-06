@@ -31,3 +31,7 @@ static/_cache
 
 # Settings that we don't want to appear in the distribution
 secret_settings.py
+
+# User Subversion repositories for the missions
+missions-userdata/svn/*
+!missions-userdata/svn/README

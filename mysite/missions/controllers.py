@@ -1,4 +1,5 @@
 from mysite.missions.models import Step, StepCompletion
+from mysite import settings
 
 import tarfile
 from StringIO import StringIO
@@ -7,6 +8,9 @@ import sys
 import difflib
 import patch
 import re
+
+import subprocess
+import shutil
 
 def get_mission_data_path():
     return os.path.join(os.path.dirname(__file__), 'data')
@@ -226,3 +230,13 @@ class PatchRecursiveMission(object):
             patchfile.writelines(difflib.unified_diff(oldlines, newlines, '%s-orig/%s' % (cls.BASE_NAME, name), '%s/%s' % (cls.BASE_NAME, name)))
 
         return patchfile.getvalue()
+
+class SvnRepositoryManager(object):
+    INITIAL_CONTENT = 'svn-initial.svndump'
+
+    @classmethod
+    def reset_repository(cls, username):
+        repo_path = os.path.join(settings.SVN_REPO_PATH, username)
+        if os.path.isdir(repo_path):
+            shutil.rmtree(repo_path)
+        subprocess.check_call(['svnadmin', 'create', '--fs-type', 'fsfs', repo_path])

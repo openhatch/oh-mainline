@@ -233,3 +233,5 @@ CACHE_MIDDLEWARE_ANONYMOUS_ONLY = True
 WEB_ROOT = os.path.join(MEDIA_ROOT, '_cache')
 
 SERVER_NAME='openhatch.org'
+
+SVN_REPO_PATH = os.path.join(MEDIA_ROOT_BEFORE_STATIC, 'missions-userdata', 'svn')

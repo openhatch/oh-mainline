@@ -1,0 +1,9 @@
+This directory contains users' Subversion repositories for the
+Subversion-related training missions.  To make them accessible (and
+therefore make it possible for users to do the svn missions), you will
+have to do the following:
+
+  * TODO (we haven't decided the most appropriate way yet)
+
+This file's other purpose in life is to make sure the directory it is
+in exists because Git won't version empty directories.
