@@ -1021,6 +1021,15 @@ class OpenSolaris(django.test.TestCase):
         bug_result = mysite.customs.bugtrackers.opensolaris.create_bug_object_for_remote_bug_id_if_necessary(1)
         self.assertEquals(bug_result, False)
 
+class BugzillaImporterOnlyPerformsAQueryOncePerDay(django.test.TestCase):
+    def test_url_is_more_fresh_than_one_day(self):
+        # What the heck, let's demo this function out with the Songbird documentation query.
+        URL = 'http://bugzilla.songbirdnest.com/buglist.cgi?query_format=advanced&component=Documentation&resolution=---' 
+        originally_not_fresh = mysite.search.tasks.bugzilla_instances.url_is_more_fresh_than_one_day(URL)
+        self.assertFalse(originally_not_fresh)
+        # But now it should be fresh!
+        self.assert_(mysite.search.tasks.bugzilla_instances.url_is_more_fresh_than_one_day(URL))
+
 class DailyBugImporter(django.test.TestCase):
 
     @mock.patch('mysite.customs.ohloh.mechanize_get')
