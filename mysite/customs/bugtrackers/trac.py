@@ -393,13 +393,13 @@ class XiphTrac(TracBugTracker):
         return ret_dict
 
 class OLPCTrac(TracBugTracker):
-    enabled = False # Need to sort out naming for bug projects
+    enabled = True
 
     def __init__(self):
         TracBugTracker.__init__(self,
                                 project_name='OLPC',
                                 base_url='http://dev.laptop.org/',
-                                bug_project_name_format='{project}')
+                                bug_project_name_format='{component}')
 
     def generate_list_of_bug_ids_to_look_at(self):
         queries = {
