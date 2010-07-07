@@ -1038,11 +1038,17 @@ class BugzillaImporterOnlyPerformsAQueryOncePerDay(django.test.TestCase):
         # But now it should be fresh!
         self.assert_(mysite.search.tasks.bugzilla_instances.url_is_more_fresh_than_one_day(URL))
 
-    @mock.patch('mysite.search.tasks.bugzilla_instances.url_is_more_fresh_than_one_day')
-    def test_bugzilla_importing(self, mock_freshness):
+    @mock.patch('mysite.search.tasks.bugzilla_instances.url_is_more_fresh_than_one_day', mock.Mock(return_value=False))
+    def test_bugzilla_importing_hits_network_if_urls_are_not_fresh(self):
         # First, show that in the not-fresh case, we do hit the network.
+        # Jack, could you write this?
+        pass
+
+    @mock.patch('mysite.search.tasks.bugzilla_instances.url_is_more_fresh_than_one_day', mock.Mock(return_value=True))
+    def test_bugzilla_importing_avoids_network_if_urls_are_fresh(self):
         pass
         # Second, in the stale case, show that we do not hit the network!
+        # Jack, could you write this?
 
 class DailyBugImporter(django.test.TestCase):
 
