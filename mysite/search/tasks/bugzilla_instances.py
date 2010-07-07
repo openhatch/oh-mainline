@@ -11,12 +11,7 @@ def url_is_more_fresh_than_one_day(url):
     url_timestamp = mysite.base.models.Timestamp.get_timestamp_for_string(url)
     url_age = datetime.datetime.now() - url_timestamp
     url_is_fresh = (url_age < datetime.timedelta(days=1))
-    try:
-        mysite.base.models.Timestamp.update_timestamp_for_string(url)
-    except Exception, e:
-        logging.error("[Bugzilla] Error generated when updating Timestamp.")
-        logging.error("[Bugzilla] Error type is %s" % type(e))
-        logging.error("[Bugzilla] Error is %s" % e)
+    mysite.base.models.Timestamp.update_timestamp_for_string(url)
     return url_is_fresh
 
 class BugzillaBugTracker(object):
