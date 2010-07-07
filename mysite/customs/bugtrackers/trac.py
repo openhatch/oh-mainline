@@ -343,6 +343,8 @@ class SugarLabsTrac(TracBugTracker):
         ret_dict['good_for_newcomers'] = ('sugar-love' in trac_data['keywords'])
         # Check whether this is a documentation bug.
         ret_dict['concerns_just_documentation'] = ('documentation' in trac_data['keywords'])
+        # Set as_appears_in_distribution.
+        ret_dict['as_appears_in_distribution'] = 'Sugar'
         # Then pass ret_dict back
         return ret_dict
 
@@ -414,6 +416,8 @@ class OLPCTrac(TracBugTracker):
         ret_dict['good_for_newcomers'] = ('easy' in trac_data['keywords']) or ('sugar-love' in trac_data['keywords'])
         # Check whether this is a documentation bug.
         ret_dict['concerns_just_documentation'] = ('doc' in trac_data['keywords'])
+        # Set as_appears_in_distribution.
+        ret_dict['as_appears_in_distribution'] = 'OLPC'
         # Then pass ret_dict back
         return ret_dict
 
