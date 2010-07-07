@@ -694,6 +694,14 @@ class ParseCiaMessage(django.test.TestCase):
         self.assertEqual(mysite.customs.cia.parse_cia_tokens(tokens),
                          expected)
 
+def tracbug_tests_extract_tracker_specific_data(trac_data, ret_dict):
+    # Make modifications to ret_dict using provided metadata
+    # Check for the bitesized keyword
+    ret_dict['bite_size_tag_name'] = 'easy'
+    ret_dict['good_for_newcomers'] = ('easy' in trac_data['keywords'])
+    # Then pass ret_dict back
+    return ret_dict
+
 class TracBug(django.test.TestCase):
     @mock.patch('mysite.customs.bugtrackers.trac.TracBug.as_bug_specific_csv_data')
     def test_create_bug_object_data_dict_more_recent(self, m):
@@ -716,14 +724,13 @@ class TracBug(django.test.TestCase):
             'type': 'task'}
         tb = mysite.customs.bugtrackers.trac.TracBug(
             bug_id=4298,
-            BASE_URL='http://twistedmatrix.com/trac/',
-            bitesized_keyword='easy')
+            BASE_URL='http://twistedmatrix.com/trac/')
         cached_html_filename = os.path.join(settings.MEDIA_ROOT, 'sample-data', 'twisted-trac-4298-on-2010-04-02.html')
         tb._bug_html_page = unicode(
             open(cached_html_filename).read(), 'utf-8')
         self.assertEqual(tb.component, 'core')
 
-        got = tb.as_data_dict_for_bug_object()
+        got = tb.as_data_dict_for_bug_object(tracbug_tests_extract_tracker_specific_data)
         del got['last_polled']
         wanted = {'title': 'Deprecate twisted.persisted.journal',
                   'description': "This package hasn't been touched in 4 years which either means it's stable or not being used at all. Let's deprecate it (also see #4111).",
@@ -766,13 +773,12 @@ class TracBug(django.test.TestCase):
             'type': 'task'}
         tb = mysite.customs.bugtrackers.trac.TracBug(
             bug_id=4298,
-            BASE_URL='http://twistedmatrix.com/trac/',
-            bitesized_keyword='easy')
+            BASE_URL='http://twistedmatrix.com/trac/')
         cached_html_filename = os.path.join(settings.MEDIA_ROOT, 'sample-data', 'twisted-trac-4298.html')
         tb._bug_html_page = unicode(
             open(cached_html_filename).read(), 'utf-8')
 
-        got = tb.as_data_dict_for_bug_object()
+        got = tb.as_data_dict_for_bug_object(tracbug_tests_extract_tracker_specific_data)
         del got['last_polled']
         wanted = {'title': 'Deprecate twisted.persisted.journal',
                   'description': "This package hasn't been touched in 4 years which either means it's stable or not being used at all. Let's deprecate it (also see #4111).",
@@ -815,13 +821,12 @@ class TracBug(django.test.TestCase):
             'type': 'task'}
         tb = mysite.customs.bugtrackers.trac.TracBug(
             bug_id=4298,
-            BASE_URL='http://twistedmatrix.com/trac/',
-            bitesized_keyword='easy')
+            BASE_URL='http://twistedmatrix.com/trac/')
         cached_html_filename = os.path.join(settings.MEDIA_ROOT, 'sample-data', 'twisted-trac-4298-without-modified.html')
         tb._bug_html_page = unicode(
             open(cached_html_filename).read(), 'utf-8')
 
-        got = tb.as_data_dict_for_bug_object()
+        got = tb.as_data_dict_for_bug_object(tracbug_tests_extract_tracker_specific_data)
         del got['last_polled']
         wanted = {'title': 'Deprecate twisted.persisted.journal',
                   'description': "This package hasn't been touched in 4 years which either means it's stable or not being used at all. Let's deprecate it (also see #4111).",
@@ -864,13 +869,12 @@ class TracBug(django.test.TestCase):
             'type': 'task'}
         tb = mysite.customs.bugtrackers.trac.TracBug(
             bug_id=4298,
-            BASE_URL='http://twistedmatrix.com/trac/',
-            bitesized_keyword='easy')
+            BASE_URL='http://twistedmatrix.com/trac/')
         cached_html_filename = os.path.join(settings.MEDIA_ROOT, 'sample-data', 'twisted-trac-4298-without-modified-using-owned-instead-of-assigned.html')
         tb._bug_html_page = unicode(
             open(cached_html_filename).read(), 'utf-8')
 
-        got = tb.as_data_dict_for_bug_object()
+        got = tb.as_data_dict_for_bug_object(tracbug_tests_extract_tracker_specific_data)
         del got['last_polled']
         wanted = {'title': 'Deprecate twisted.persisted.journal',
                   'description': "This package hasn't been touched in 4 years which either means it's stable or not being used at all. Let's deprecate it (also see #4111).",
