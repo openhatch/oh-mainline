@@ -1046,7 +1046,9 @@ class BugzillaImporterOnlyPerformsAQueryOncePerDay(django.test.TestCase):
             settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml')).read())
 
         miro = mysite.search.tasks.bugzilla_instances.MiroBugzilla()
-        miro.generate_current_bug_xml()
+        bug_xml_gen = miro.generate_current_bug_xml()
+        for bug_xml in bug_xml_gen:
+            pass # Empty the generator
         self.assertTrue(mock_xml_opener.called)
 
     @mock.patch('mysite.search.tasks.bugzilla_instances.url_is_more_fresh_than_one_day', mock.Mock(return_value=True))
@@ -1057,7 +1059,9 @@ class BugzillaImporterOnlyPerformsAQueryOncePerDay(django.test.TestCase):
             settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml')).read())
 
         miro = mysite.search.tasks.bugzilla_instances.MiroBugzilla()
-        miro.generate_current_bug_xml()
+        bug_xml_gen = miro.generate_current_bug_xml()
+        for bug_xml in bug_xml_gen:
+            pass # Empty the generator
         self.assertFalse(mock_xml_opener.called)
 
 class DailyBugImporter(django.test.TestCase):
