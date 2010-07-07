@@ -1039,16 +1039,26 @@ class BugzillaImporterOnlyPerformsAQueryOncePerDay(django.test.TestCase):
         self.assert_(mysite.search.tasks.bugzilla_instances.url_is_more_fresh_than_one_day(URL))
 
     @mock.patch('mysite.search.tasks.bugzilla_instances.url_is_more_fresh_than_one_day', mock.Mock(return_value=False))
-    def test_bugzilla_importing_hits_network_if_urls_are_not_fresh(self):
+    @mock.patch('mysite.customs.bugtrackers.bugzilla.url2bug_data')
+    def test_bugzilla_importing_hits_network_if_urls_are_not_fresh(self, mock_xml_opener):
         # First, show that in the not-fresh case, we do hit the network.
-        # Jack, could you write this?
-        pass
+        mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
+            settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml')).read())
+
+        miro = mysite.search.tasks.bugzilla_instances.MiroBugzilla()
+        miro.generate_current_bug_xml()
+        self.assertTrue(mock_xml_opener.called)
 
     @mock.patch('mysite.search.tasks.bugzilla_instances.url_is_more_fresh_than_one_day', mock.Mock(return_value=True))
-    def test_bugzilla_importing_avoids_network_if_urls_are_fresh(self):
-        pass
+    @mock.patch('mysite.customs.bugtrackers.bugzilla.url2bug_data')
+    def test_bugzilla_importing_avoids_network_if_urls_are_fresh(self, mock_xml_opener):
         # Second, in the stale case, show that we do not hit the network!
-        # Jack, could you write this?
+        mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
+            settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml')).read())
+
+        miro = mysite.search.tasks.bugzilla_instances.MiroBugzilla()
+        miro.generate_current_bug_xml()
+        self.assertFalse(mock_xml_opener.called)
 
 class DailyBugImporter(django.test.TestCase):
 
