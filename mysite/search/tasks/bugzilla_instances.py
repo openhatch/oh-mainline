@@ -8,9 +8,12 @@ import mysite.customs.bugtrackers.bugzilla
 # FIXME: Should have this somewhere else. Maybe a decorator?
 # Could take arguments of urls and remove the fresh ones.
 def url_is_more_fresh_than_one_day(url):
+    # First, get a timestamp we can check
     url_timestamp = mysite.base.models.Timestamp.get_timestamp_for_string(url)
     url_age = datetime.datetime.now() - url_timestamp
+    # Does that age indicate we GET'd this URL within the past day?
     url_is_fresh = (url_age < datetime.timedelta(days=1))
+    # SIDE EFFECT: This function bumps that timestamp!
     mysite.base.models.Timestamp.update_timestamp_for_string(url)
     return url_is_fresh
 
