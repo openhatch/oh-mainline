@@ -1030,6 +1030,20 @@ class BugzillaImporterOnlyPerformsAQueryOncePerDay(django.test.TestCase):
         # But now it should be fresh!
         self.assert_(mysite.search.tasks.bugzilla_instances.url_is_more_fresh_than_one_day(URL))
 
+    def test_url_is_more_fresh_than_one_day_with_really_long_url(self):
+        # What the heck, let's demo this function out with the Songbird documentation query.
+        URL = 'http://bugzilla.songbirdnest.com/buglist.cgi?query_format=advanced&component=Documentation&resolution=---&look=at_me_I_am_really_long_oh_no_what_will_we_do&really=long_very_long_yes_long_so_long_you_will_fall_asleep_of_boredom_reading_this&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong' 
+        originally_not_fresh = mysite.search.tasks.bugzilla_instances.url_is_more_fresh_than_one_day(URL)
+        self.assertFalse(originally_not_fresh)
+        # But now it should be fresh!
+        self.assert_(mysite.search.tasks.bugzilla_instances.url_is_more_fresh_than_one_day(URL))
+
+    @mock.patch('mysite.search.tasks.bugzilla_instances.url_is_more_fresh_than_one_day')
+    def test_bugzilla_importing(self, mock_freshness):
+        # First, show that in the not-fresh case, we do hit the network.
+        pass
+        # Second, in the stale case, show that we do not hit the network!
+
 class DailyBugImporter(django.test.TestCase):
 
     @mock.patch('mysite.customs.ohloh.mechanize_get')
