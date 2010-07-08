@@ -1,17 +1,16 @@
 import logging
+import urllib2
 
 from django.core.management.base import BaseCommand
 
 import django.conf
 django.conf.settings.CELERY_ALWAYS_EAGER = True
 
+import mysite.customs.bugtrackers.bugzilla
+import mysite.customs.bugtrackers.launchpad
 import mysite.customs.bugtrackers.opensolaris
-import mysite.customs.bugtrackers.roundup_general
-import mysite.search.tasks.trac_instances
-import mysite.search.tasks.bugzilla_instances
-import mysite.search.tasks.launchpad_tasks
-
-import urllib2
+import mysite.customs.bugtrackers.roundup
+import mysite.customs.bugtrackers.trac
 
 ### All this code runs synchronously once a day.
 ### For now, we can crawl all the bug trackers in serial.
@@ -44,8 +43,8 @@ class Command(BaseCommand):
         enabled_roundup_trackers = []
 
         ### First, the "find" step
-        for thing_name in dir(mysite.customs.bugtrackers.roundup_general):
-            thing = getattr(mysite.customs.bugtrackers.roundup_general,
+        for thing_name in dir(mysite.customs.bugtrackers.roundup):
+            thing = getattr(mysite.customs.bugtrackers.roundup,
                             thing_name)
             if hasattr(thing, 'enabled'):
                 if getattr(thing, 'enabled'):
@@ -61,8 +60,8 @@ class Command(BaseCommand):
         enabled_trac_instances = []
 
         ### First, the "find" step
-        for thing_name in dir(mysite.search.tasks.trac_instances):
-            thing = getattr(mysite.search.tasks.trac_instances,
+        for thing_name in dir(mysite.customs.bugtrackers.trac):
+            thing = getattr(mysite.customs.bugtrackers.trac,
                             thing_name)
             if hasattr(thing, 'enabled'):
                 if getattr(thing, 'enabled'):
@@ -78,8 +77,8 @@ class Command(BaseCommand):
         enabled_bugzilla_instances = []
 
         ### First, the "find" step
-        for thing_name in dir(mysite.search.tasks.bugzilla_instances):
-            thing = getattr(mysite.search.tasks.bugzilla_instances,
+        for thing_name in dir(mysite.customs.bugtrackers.bugzilla):
+            thing = getattr(mysite.customs.bugtrackers.bugzilla,
                             thing_name)
             if hasattr(thing, 'enabled'):
                 if getattr(thing, 'enabled'):
@@ -101,9 +100,9 @@ class Command(BaseCommand):
     def update_launchpad_hosted_projects(self):
         ### For Launchpad:
         # First, we ask the projects' bug trackers if there are new bugs we should know about
-        mysite.search.tasks.launchpad_tasks.refresh_bugs_from_all_indexed_launchpad_projects()
+        mysite.customs.bugtrackers.launchpad.refresh_bugs_from_all_indexed_launchpad_projects()
         # Second, we go through our *own* database of Launchpad-sourced bugs, and make sure they are all up to date
-        mysite.search.tasks.launchpad_tasks.refresh_all_launchpad_bugs()
+        mysite.customs.bugtrackers.launchpad.refresh_all_launchpad_bugs()
 
     def update_opensolaris_osnet(self):
         mysite.customs.bugtrackers.opensolaris.update()

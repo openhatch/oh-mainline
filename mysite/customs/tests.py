@@ -10,6 +10,7 @@ from mysite.profile.tests import MockFetchPersonDataFromOhloh
 import mock
 import os
 import re
+import time
 import twill
 import lxml
 from twill import commands as tc
@@ -38,9 +39,10 @@ import mysite.customs.feed
 import mysite.customs.github
 
 import mysite.customs.models
-import mysite.customs.bugtrackers.roundup_general
+import mysite.customs.bugtrackers.roundup
+import mysite.customs.bugtrackers.launchpad
 import mysite.customs.lp_grabber
-import mysite.search.management.commands.search_daily_tasks
+import mysite.customs.management.commands.customs_daily_tasks
 # }}}
 
 # Mocked out browser.open
@@ -287,7 +289,7 @@ class BugzillaTests(django.test.TestCase):
         p = Project.create_dummy(name='kmail')
         mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
             settings.MEDIA_ROOT, 'sample-data', 'kde-117760-2010-04-09.xml')).read())
-        kde = mysite.search.tasks.bugzilla_instances.KDEBugzilla()
+        kde = mysite.customs.bugtrackers.bugzilla.KDEBugzilla()
         kde.update()
         all_bugs = Bug.all_bugs.all()
         self.assertEqual(len(all_bugs), 1)
@@ -300,7 +302,7 @@ class BugzillaTests(django.test.TestCase):
         p = Project.create_dummy(name='kphotoalbum')
         mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
             settings.MEDIA_ROOT, 'sample-data', 'kde-182054-2010-04-09.xml')).read())
-        kde = mysite.search.tasks.bugzilla_instances.KDEBugzilla()
+        kde = mysite.customs.bugtrackers.bugzilla.KDEBugzilla()
         kde.update()
         all_bugs = Bug.all_bugs.all()
         self.assertEqual(len(all_bugs), 1)
@@ -314,7 +316,7 @@ class BugzillaTests(django.test.TestCase):
         mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
             settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml')).read())
 
-        miro = mysite.search.tasks.bugzilla_instances.MiroBugzilla()
+        miro = mysite.customs.bugtrackers.bugzilla.MiroBugzilla()
         miro.update()
         all_bugs = Bug.all_bugs.all()
         self.assertEqual(len(all_bugs), 1)
@@ -341,7 +343,7 @@ Keywords: Torrent unittest""")
         mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
             settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml')).read())
 
-        miro = mysite.search.tasks.bugzilla_instances.MiroBugzilla()
+        miro = mysite.customs.bugtrackers.bugzilla.MiroBugzilla()
         miro.update()
         all_bugs = Bug.all_bugs.all()
         self.assertEqual(len(all_bugs), 1)
@@ -362,7 +364,7 @@ Keywords: Torrent unittest""")
             'NEW', 'CLOSED')
         mock_xml_opener.return_value = lxml.etree.XML(cooked_xml)
 
-        miro = mysite.search.tasks.bugzilla_instances.MiroBugzilla()
+        miro = mysite.customs.bugtrackers.bugzilla.MiroBugzilla()
         miro.update()
         all_bugs = Bug.all_bugs.all()
         self.assertEqual(len(all_bugs), 1)
@@ -379,7 +381,7 @@ Keywords: Torrent unittest""")
         mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
             settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06-RESOLVED.xml')).read())
 
-        miro = mysite.search.tasks.bugzilla_instances.MiroBugzilla()
+        miro = mysite.customs.bugtrackers.bugzilla.MiroBugzilla()
         miro.update()
         all_bugs = Bug.all_bugs.all()
         self.assertEqual(len(all_bugs), 1)
@@ -392,7 +394,7 @@ Keywords: Torrent unittest""")
     def test_full_grab_miro_bugs_refreshes_older_bugs(self, mock_xml_opener):
         mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
             settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml')).read())
-        miro = mysite.search.tasks.bugzilla_instances.MiroBugzilla()
+        miro = mysite.customs.bugtrackers.bugzilla.MiroBugzilla()
         miro.update()
 
         # Pretend there's old data lying around:
@@ -413,7 +415,7 @@ Keywords: Torrent unittest""")
 
 
     @mock.patch("mysite.customs.bugtrackers.bugzilla.url2bug_data")
-    @mock.patch("mysite.search.tasks.bugzilla_instances.MiroBugzilla.generate_current_bug_xml")
+    @mock.patch("mysite.customs.bugtrackers.bugzilla.MiroBugzilla.generate_current_bug_xml")
     def test_regrab_miro_bugs_refreshes_older_bugs_even_when_missing_from_csv(self, mock_xml_bug_tree, mock_xml_opener):
         mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
             settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml')).read())
@@ -437,7 +439,7 @@ Keywords: Torrent unittest""")
         # Now, do a crawl and notice that we updated the bug even
         # though the xml bug list is empty
         
-        miro = mysite.search.tasks.bugzilla_instances.MiroBugzilla()
+        miro = mysite.customs.bugtrackers.bugzilla.MiroBugzilla()
         miro.update()
         all_bugs = Bug.all_bugs.all()
         self.assertEqual(len(all_bugs), 1)
@@ -538,7 +540,7 @@ class MercurialRoundupGrab(django.test.TestCase):
 
         mock_urlopen.return_value=open(MercurialRoundupGrab.closed_bug_filename)
 
-        tracker = mysite.customs.bugtrackers.roundup_general.MercurialTracker()
+        tracker = mysite.customs.bugtrackers.roundup.MercurialTracker()
         did_create = tracker.create_bug_object_for_remote_bug_id_if_necessary(1)
         self.assertEqual(did_create, should_do_something)
 
@@ -570,11 +572,165 @@ class MercurialRoundupGrab(django.test.TestCase):
         self.test_scrape_bug_status_and_mark_as_closed(should_do_something=True,
                                                        should_use_urlopen=True)
 
+sample_launchpad_data_dump = mock.Mock()
+sample_launchpad_data_dump.return_value = [dict(
+        url=u'', project=u'rose.makesad.us', text=u'', status=u'',
+        importance=u'low', reporter={u'lplogin': 'a',
+                                    'realname': 'b'},
+        tags=[], comments=[], date_updated=time.localtime(),
+        date_reported=time.localtime(),
+        title="Joi's Lab AFS",)]
+
+class AutoCrawlTests(django.test.TestCase):
+    @mock.patch('mysite.customs.bugtrackers.launchpad.dump_data_from_project', 
+                sample_launchpad_data_dump)
+    @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
+    def testSearch(self, do_nothing):
+        # Verify that we can't find a bug with the right description
+        self.assertRaises(mysite.search.models.Bug.DoesNotExist,
+                          mysite.search.models.Bug.all_bugs.get,
+                          title="Joi's Lab AFS")
+        # Now get all the bugs about rose
+        mysite.customs.bugtrackers.launchpad.grab_lp_bugs(lp_project='rose',
+                                            openhatch_project_name=
+                                            u'rose.makesad.us')
+        # Now see, we have one!
+        b = mysite.search.models.Bug.all_bugs.get(title="Joi's Lab AFS")
+        self.assertEqual(b.project.name, u'rose.makesad.us')
+        # Ta-da.
+        return b
+
+    def test_running_job_twice_does_update(self):
+        b = self.testSearch()
+        b.description = u'Eat more potato starch'
+        b.title = u'Yummy potato paste'
+        b.save()
+
+        new_b = self.testSearch()
+        self.assertEqual(new_b.title, "Joi's Lab AFS") # bug title restored
+        # thanks to fresh import
+
+class LaunchpadImporterTests(django.test.TestCase):
+
+    @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
+    def test_lp_update_handler(self, do_nothing):
+        '''Test the Launchpad import handler with some fake data.'''
+        some_date = datetime.datetime(2009, 4, 1, 2, 2, 2)
+        query_data = dict(project='GNOME-Do',
+                          canonical_bug_link='http://example.com/1')
+        new_data = dict(title='Title', status='Godforsaken',
+                        description='Everything should be better',
+                        importance='High',
+                        people_involved=1000 * 1000,
+                        submitter_username='yourmom',
+                        submitter_realname='Your Mom',
+                        date_reported=some_date,
+                        last_touched=some_date,
+                        last_polled=some_date)
+
+        # Create the bug...
+        mysite.customs.bugtrackers.launchpad.handle_launchpad_bug_update(
+                project_name=query_data['project'],
+                canonical_bug_link=query_data['canonical_bug_link'], 
+                new_data=new_data)
+        # Verify that the bug was stored.
+        bug = Bug.all_bugs.get(canonical_bug_link=
+                                       query_data['canonical_bug_link'])
+        for key in new_data:
+            self.assertEqual(getattr(bug, key), new_data[key])
+
+        # Now re-do the update, this time with more people involved
+        new_data['people_involved'] = 1000 * 1000 * 1000
+        # pass the data in...
+        mysite.customs.bugtrackers.launchpad.handle_launchpad_bug_update(
+                project_name=query_data['project'],
+                canonical_bug_link=query_data['canonical_bug_link'], 
+                new_data=new_data)
+        # Do a get; this will explode if there's more than one with the
+        # canonical_bug_link, so it tests duplicate finding.
+        bug = Bug.all_bugs.get(canonical_bug_link=
+                                       query_data[u'canonical_bug_link'])
+
+        for key in new_data:
+            self.assertEqual(getattr(bug, key), new_data[key])
+
+    @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
+    def test_lp_data_clean(self, do_nothing):
+        now_t = (2009, 4, 1, 5, 13, 2) # partial time tuple
+        now_d = datetime.datetime(2009, 4, 1, 5, 13, 2)
+        # NOTE: We do not test for time zone correctness.
+        sample_in = dict(project='GNOME-Do', url='http://example.com/1',
+                         title='Title', text='Some long text',
+                         importance=None, status='Ready for take-off',
+                         comments=[{'user': {
+                             'lplogin': 'jones', 'realname': 'Jones'}}],
+                         reporter={'lplogin': 'bob', 'realname': 'Bob'},
+                         date_reported=now_t,
+                         date_updated=now_t,
+                         )
+        sample_out_query = dict(project='GNOME-Do',
+                                canonical_bug_link='http://example.com/1')
+        sample_out_data = dict(title='Title', description='Some long text',
+                               importance='Unknown', status='Ready for take-off',
+                               people_involved=2, submitter_realname='Bob',
+                               submitter_username='bob',
+                               date_reported=now_d,
+                               last_touched=now_d)
+        out_q, out_d = mysite.customs.bugtrackers.launchpad.clean_lp_data_dict(sample_in)
+        self.assertEqual(sample_out_query, out_q)
+        # Make sure last_polled is at least in the same year
+        self.assertEqual(out_d['last_polled'].year, datetime.date.today().year)
+        del out_d['last_polled']
+        self.assertEqual(sample_out_data, out_d)
+
 class LaunchpadImportByEmail(django.test.TestCase):
 
     def test_get_asheesh(self):
         u = mysite.customs.lp_grabber.get_launchpad_username_by_email('asheesh@asheesh.org')
         self.assertEqual(u, "paulproteus")
+
+class LaunchpadImporterMarksFixedBugsAsClosed(django.test.TestCase):
+    def test(self):
+        '''Start with a bug that is "Fix Released"
+
+        Verify that we set looks_closed to True'''
+        # retry this with committed->released
+        lp_data_dict = {'project': '',
+                        'url': '',
+                        'title': '',
+                        'text': '',
+                        'status': 'Fix Committed',
+                        'importance': '',
+                        'reporter': {'lplogin': '', 'realname': ''},
+                        'comments': '',
+                        'date_updated': datetime.datetime.now().timetuple(),
+                        'date_reported': datetime.datetime.now().timetuple()}
+        # maybe I could have done this with a defaultdict of str with
+        # just the non-str exceptions
+        query_data, new_data = mysite.customs.bugtrackers.launchpad.clean_lp_data_dict(
+            lp_data_dict)
+        self.assertTrue(new_data['looks_closed'])
+
+    def test_with_status_missing(self):
+        '''Verify we do not explode if Launchpad gives us a bug with no Status
+
+        Verify that we set looks_closed to True'''
+        # retry this with committed->released
+        lp_data_dict = {'project': '',
+                        'url': '',
+                        'title': '',
+                        'text': '',
+                        'importance': '',
+                        'reporter': {'lplogin': '', 'realname': ''},
+                        'comments': '',
+                        'date_updated': datetime.datetime.now().timetuple(),
+                        'date_reported': datetime.datetime.now().timetuple()}
+        # maybe I could have done this with a defaultdict of str with
+        # just the non-str exceptions
+        query_data, new_data = mysite.customs.bugtrackers.launchpad.clean_lp_data_dict(
+            lp_data_dict)
+        self.assertEqual(new_data['status'], 'Unknown')
+
 
 class OnlineGithub(django.test.TestCase):
     def test_get_language(self):
@@ -1025,40 +1181,40 @@ class BugzillaImporterOnlyPerformsAQueryOncePerDay(django.test.TestCase):
     def test_url_is_more_fresh_than_one_day(self):
         # What the heck, let's demo this function out with the Songbird documentation query.
         URL = 'http://bugzilla.songbirdnest.com/buglist.cgi?query_format=advanced&component=Documentation&resolution=---' 
-        originally_not_fresh = mysite.search.tasks.bugzilla_instances.url_is_more_fresh_than_one_day(URL)
+        originally_not_fresh = mysite.customs.bugtrackers.bugzilla.url_is_more_fresh_than_one_day(URL)
         self.assertFalse(originally_not_fresh)
         # But now it should be fresh!
-        self.assert_(mysite.search.tasks.bugzilla_instances.url_is_more_fresh_than_one_day(URL))
+        self.assert_(mysite.customs.bugtrackers.bugzilla.url_is_more_fresh_than_one_day(URL))
 
     def test_url_is_more_fresh_than_one_day_with_really_long_url(self):
         # What the heck, let's demo this function out with the Songbird documentation query.
         URL = 'http://bugzilla.songbirdnest.com/buglist.cgi?query_format=advanced&component=Documentation&resolution=---&look=at_me_I_am_really_long_oh_no_what_will_we_do&really=long_very_long_yes_long_so_long_you_will_fall_asleep_of_boredom_reading_this&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong' 
-        originally_not_fresh = mysite.search.tasks.bugzilla_instances.url_is_more_fresh_than_one_day(URL)
+        originally_not_fresh = mysite.customs.bugtrackers.bugzilla.url_is_more_fresh_than_one_day(URL)
         self.assertFalse(originally_not_fresh)
         # But now it should be fresh!
-        self.assert_(mysite.search.tasks.bugzilla_instances.url_is_more_fresh_than_one_day(URL))
+        self.assert_(mysite.customs.bugtrackers.bugzilla.url_is_more_fresh_than_one_day(URL))
 
-    @mock.patch('mysite.search.tasks.bugzilla_instances.url_is_more_fresh_than_one_day', mock.Mock(return_value=False))
+    @mock.patch('mysite.customs.bugtrackers.bugzilla.url_is_more_fresh_than_one_day', mock.Mock(return_value=False))
     @mock.patch('mysite.customs.bugtrackers.bugzilla.url2bug_data')
     def test_bugzilla_importing_hits_network_if_urls_are_not_fresh(self, mock_xml_opener):
         # First, show that in the not-fresh case, we do hit the network.
         mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
             settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml')).read())
 
-        miro = mysite.search.tasks.bugzilla_instances.MiroBugzilla()
+        miro = mysite.customs.bugtrackers.bugzilla.MiroBugzilla()
         bug_xml_gen = miro.generate_current_bug_xml()
         for bug_xml in bug_xml_gen:
             pass # Empty the generator
         self.assertTrue(mock_xml_opener.called)
 
-    @mock.patch('mysite.search.tasks.bugzilla_instances.url_is_more_fresh_than_one_day', mock.Mock(return_value=True))
+    @mock.patch('mysite.customs.bugtrackers.bugzilla.url_is_more_fresh_than_one_day', mock.Mock(return_value=True))
     @mock.patch('mysite.customs.bugtrackers.bugzilla.url2bug_data')
     def test_bugzilla_importing_avoids_network_if_urls_are_fresh(self, mock_xml_opener):
         # Second, in the stale case, show that we do not hit the network!
         mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
             settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml')).read())
 
-        miro = mysite.search.tasks.bugzilla_instances.MiroBugzilla()
+        miro = mysite.customs.bugtrackers.bugzilla.MiroBugzilla()
         bug_xml_gen = miro.generate_current_bug_xml()
         for bug_xml in bug_xml_gen:
             pass # Empty the generator
@@ -1069,12 +1225,12 @@ class DailyBugImporter(django.test.TestCase):
     @mock.patch('mysite.customs.ohloh.mechanize_get')
     def test_bugzilla_http_error_504_does_not_break(self, mock_error):
         mock_error.side_effect = generate_504
-        mysite.search.management.commands.search_daily_tasks.Command().find_and_update_enabled_bugzilla_instances()
+        mysite.customs.management.commands.customs_daily_tasks.Command().find_and_update_enabled_bugzilla_instances()
 
     @mock.patch('mysite.customs.ohloh.mechanize_get')
     def test_bugzilla_http_generic_error_does_break(self, mock_error):
         mock_error.side_effect = ValueError()
-        self.assertRaises(ValueError, mysite.search.management.commands.search_daily_tasks.Command().find_and_update_enabled_bugzilla_instances)
+        self.assertRaises(ValueError, mysite.customs.management.commands.customs_daily_tasks.Command().find_and_update_enabled_bugzilla_instances)
 
 
 # vim: set nu:

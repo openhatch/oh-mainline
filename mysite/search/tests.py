@@ -10,7 +10,6 @@ from mysite.search.models import Project, Bug, HitCountCache, \
 from mysite.search import views
 import lpb2json
 import datetime
-import mysite.search.launchpad_crawl
 import mysite.project.views
 
 import simplejson
@@ -335,117 +334,6 @@ class SearchResults(TwillTests):
 
         for bug in bugs:
             tc.find(bug.description)
-
-sample_launchpad_data_dump = mock.Mock()
-sample_launchpad_data_dump.return_value = [dict(
-        url=u'', project=u'rose.makesad.us', text=u'', status=u'',
-        importance=u'low', reporter={u'lplogin': 'a',
-                                    'realname': 'b'},
-        tags=[], comments=[], date_updated=time.localtime(),
-        date_reported=time.localtime(),
-        title="Joi's Lab AFS",)]
-
-class AutoCrawlTests(SearchTest):
-    @mock.patch('mysite.search.launchpad_crawl.dump_data_from_project', 
-                sample_launchpad_data_dump)
-    @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
-    def testSearch(self, do_nothing):
-        # Verify that we can't find a bug with the right description
-        self.assertRaises(mysite.search.models.Bug.DoesNotExist,
-                          mysite.search.models.Bug.all_bugs.get,
-                          title="Joi's Lab AFS")
-        # Now get all the bugs about rose
-        mysite.search.launchpad_crawl.grab_lp_bugs(lp_project='rose',
-                                            openhatch_project_name=
-                                            u'rose.makesad.us')
-        # Now see, we have one!
-        b = mysite.search.models.Bug.all_bugs.get(title="Joi's Lab AFS")
-        self.assertEqual(b.project.name, u'rose.makesad.us')
-        # Ta-da.
-        return b
-
-    def test_running_job_twice_does_update(self):
-        b = self.testSearch()
-        b.description = u'Eat more potato starch'
-        b.title = u'Yummy potato paste'
-        b.save()
-
-        new_b = self.testSearch()
-        self.assertEqual(new_b.title, "Joi's Lab AFS") # bug title restored
-        # thanks to fresh import
-
-class LaunchpadImporterTests(SearchTest):
-
-    @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
-    def test_lp_update_handler(self, do_nothing):
-        '''Test the Launchpad import handler with some fake data.'''
-        some_date = datetime.datetime(2009, 4, 1, 2, 2, 2)
-        query_data = dict(project='GNOME-Do',
-                          canonical_bug_link='http://example.com/1')
-        new_data = dict(title='Title', status='Godforsaken',
-                        description='Everything should be better',
-                        importance='High',
-                        people_involved=1000 * 1000,
-                        submitter_username='yourmom',
-                        submitter_realname='Your Mom',
-                        date_reported=some_date,
-                        last_touched=some_date,
-                        last_polled=some_date)
-
-        # Create the bug...
-        mysite.search.launchpad_crawl.handle_launchpad_bug_update(
-                project_name=query_data['project'],
-                canonical_bug_link=query_data['canonical_bug_link'], 
-                new_data=new_data)
-        # Verify that the bug was stored.
-        bug = Bug.all_bugs.get(canonical_bug_link=
-                                       query_data['canonical_bug_link'])
-        for key in new_data:
-            self.assertEqual(getattr(bug, key), new_data[key])
-
-        # Now re-do the update, this time with more people involved
-        new_data['people_involved'] = 1000 * 1000 * 1000
-        # pass the data in...
-        mysite.search.launchpad_crawl.handle_launchpad_bug_update(
-                project_name=query_data['project'],
-                canonical_bug_link=query_data['canonical_bug_link'], 
-                new_data=new_data)
-        # Do a get; this will explode if there's more than one with the
-        # canonical_bug_link, so it tests duplicate finding.
-        bug = Bug.all_bugs.get(canonical_bug_link=
-                                       query_data[u'canonical_bug_link'])
-
-        for key in new_data:
-            self.assertEqual(getattr(bug, key), new_data[key])
-
-    @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
-    def test_lp_data_clean(self, do_nothing):
-        now_t = (2009, 4, 1, 5, 13, 2) # partial time tuple
-        now_d = datetime.datetime(2009, 4, 1, 5, 13, 2)
-        # NOTE: We do not test for time zone correctness.
-        sample_in = dict(project='GNOME-Do', url='http://example.com/1',
-                         title='Title', text='Some long text',
-                         importance=None, status='Ready for take-off',
-                         comments=[{'user': {
-                             'lplogin': 'jones', 'realname': 'Jones'}}],
-                         reporter={'lplogin': 'bob', 'realname': 'Bob'},
-                         date_reported=now_t,
-                         date_updated=now_t,
-                         )
-        sample_out_query = dict(project='GNOME-Do',
-                                canonical_bug_link='http://example.com/1')
-        sample_out_data = dict(title='Title', description='Some long text',
-                               importance='Unknown', status='Ready for take-off',
-                               people_involved=2, submitter_realname='Bob',
-                               submitter_username='bob',
-                               date_reported=now_d,
-                               last_touched=now_d)
-        out_q, out_d = mysite.search.launchpad_crawl.clean_lp_data_dict(sample_in)
-        self.assertEqual(sample_out_query, out_q)
-        # Make sure last_polled is at least in the same year
-        self.assertEqual(out_d['last_polled'].year, datetime.date.today().year)
-        del out_d['last_polled']
-        self.assertEqual(sample_out_data, out_d)
 
 class Recommend(SearchTest):
     fixtures = ['user-paulproteus.json',
@@ -1205,48 +1093,6 @@ class PublicizeBugTrackerIndex(SearchTest):
         self.assertEqual(
                 self.search_page_response.context[0][u'project_count'],
                 self.bug_tracker_count)
-
-class LaunchpadImporterMarksFixedBugsAsClosed(TwillTests):
-    def test(self):
-        '''Start with a bug that is "Fix Released"
-
-        Verify that we set looks_closed to True'''
-        # retry this with committed->released
-        lp_data_dict = {'project': '',
-                        'url': '',
-                        'title': '',
-                        'text': '',
-                        'status': 'Fix Committed',
-                        'importance': '',
-                        'reporter': {'lplogin': '', 'realname': ''},
-                        'comments': '',
-                        'date_updated': datetime.datetime.now().timetuple(),
-                        'date_reported': datetime.datetime.now().timetuple()}
-        # maybe I could have done this with a defaultdict of str with
-        # just the non-str exceptions
-        query_data, new_data = mysite.search.launchpad_crawl.clean_lp_data_dict(
-            lp_data_dict)
-        self.assertTrue(new_data['looks_closed'])
-
-    def test_with_status_missing(self):
-        '''Verify we do not explode if Launchpad gives us a bug with no Status
-
-        Verify that we set looks_closed to True'''
-        # retry this with committed->released
-        lp_data_dict = {'project': '',
-                        'url': '',
-                        'title': '',
-                        'text': '',
-                        'importance': '',
-                        'reporter': {'lplogin': '', 'realname': ''},
-                        'comments': '',
-                        'date_updated': datetime.datetime.now().timetuple(),
-                        'date_reported': datetime.datetime.now().timetuple()}
-        # maybe I could have done this with a defaultdict of str with
-        # just the non-str exceptions
-        query_data, new_data = mysite.search.launchpad_crawl.clean_lp_data_dict(
-            lp_data_dict)
-        self.assertEqual(new_data['status'], 'Unknown')
 
 class TestPotentialMentors(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']

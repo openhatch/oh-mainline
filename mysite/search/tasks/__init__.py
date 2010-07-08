@@ -11,10 +11,6 @@ import datetime
 
 from django.conf import settings
 
-import mysite.search.tasks.trac_instances
-import mysite.search.tasks.bugzilla_instances
-import mysite.search.tasks.launchpad_tasks
-import mysite.search.tasks.roundup_instances
 import mysite.base.helpers
 
 class PopulateProjectIconFromOhloh(Task):
