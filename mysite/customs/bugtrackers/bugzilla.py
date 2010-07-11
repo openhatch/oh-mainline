@@ -276,6 +276,153 @@ class BugzillaBugTracker(object):
         self.refresh_all_bugs()
 
 ############################################################
+# Function that creates classes for individual trackers
+def bugzilla_tracker_factory(params):
+    # Create '__init__' method
+    def __init__(self):
+        BugzillaBugTracker.__init__(self,
+                                    base_url=params['base_url'],
+                                    project_name=params['project_name'],
+                                    bug_project_name_format=params.get('bug_project_name_format', ''))
+
+    if not (params.get('bug_queries') and params.get('tracker_bug_url')):
+        raise ValueError('Either bug_queries or tracker_bug_url must be defined.')
+
+    #Create 'generate_current_bug_xml' method
+    def generate_current_bug_xml(self):
+        queries = params.get('bug_queries')
+        return self.generate_bug_xml_from_queries(queries)
+
+    # Create 'get_current_bug_id_list' method
+    def get_current_bug_id_list(self):
+        return mysite.customs.bugtrackers.bugzilla.tracker_bug2bug_ids(params.get('tracker_bug_url'))
+
+    # Create 'extract_tracker_specific_data' method
+    @staticmethod
+    def extract_tracker_specific_data(xml_data, ret_dict):
+        # Make modifications to ret_dict using provided metadata
+        # Get keywords first since used in multiple checks
+        keywords_text = mysite.customs.bugtrackers.bugzilla.get_tag_text_from_xml(xml_data, 'keywords')
+        keywords = map(lambda s: s.strip(),
+                       keywords_text.split(','))
+
+        # Bitesized bug checks
+        # Check for the bitesized keyword if it exists
+        if params.get('bitesized_keyword'):
+            ret_dict['good_for_newcomers'] = (params['bitesized_keyword'] in keywords)
+            ret_dict['bite_size_tag_name'] = params['bitesized_keyword']
+        # No keyword. Check for the bitsized whiteboard tag if it exists
+        elif params.get('bitesized_whiteboard_tag'):
+            whiteboard_text = mysite.customs.bugtrackers.bugzilla.get_tag_text_from_xml(xml_data, 'status_whiteboard')
+            ret_dict['good_for_newcomers'] = (whiteboard_text == params['bitesized_whiteboard_tag'])
+            ret_dict['bite_size_tag_name'] = params['bitesized_whiteboard_tag']
+
+        # Documentation bug checks
+        # Check for the documentation keyword if it exists
+        if params.get('documentation_keyword'):
+            ret_dict['concerns_just_documentation'] = (params['documentation_keyword'] in keywords)
+        # No keyword. Check for the documentation component if it exists
+        elif params.get('documentation_component'):
+            component = mysite.customs.bugtrackers.bugzilla.get_tag_text_from_xml(xml_data, 'component')
+            ret_dict['concerns_just_documentation'] = (component == params['documentation_component'])
+        # No component. Check for the documentation product if it exists
+        elif params.get('documentation_product'):
+            product = mysite.customs.bugtrackers.bugzilla.get_tag_text_from_xml(xml_data, 'product')
+            ret_dict['concerns_just_documentation'] = (product == params['documentation_product'])
+
+        # Distribution tag
+        if params.get('as_appears_in_distribution'):
+            ret_dict['as_appears_in_distribution'] = params['as_appears_in_distribution']
+
+        # Tracker-specific stuff e.g. stripping 'JJ:' from KDE bug titles.
+        # FIXME: How do we efficiently implement this?
+
+        # Then pass ret_dict back
+        return ret_dict
+
+    # Create 'generate_bug_project_name' method
+    # FIXME: Implement this properly.
+    def generate_bug_project_name(self, bb):
+        return params['project_name']
+
+    # Generate class dictionary
+    # All sub-classes have '__init__' and 'extract_tracker_specific_data' methods
+    class_dict = {'__init__': __init__,
+                  'extract_tracker_specific_data': extract_tracker_specific_data}
+
+    # A sub-class will have either a 'generate_current_bug_xml' method or
+    # a 'get_current_bug_id_list' method.
+    if params.get('bug_queries'):
+        class_dict['generate_current_bug_xml'] = generate_current_bug_xml
+    else:
+        class_dict['get_current_bug_id_list'] = get_current_bug_id_list
+
+    # A sub-class will only overload the 'generate_bug_project_name' method
+    # if the 'bug_project_name_format' parameter is not used.
+    if not params.get('bug_project_name_format'):
+        class_dict['generate_bug_project_name'] = generate_bug_project_name
+
+    # Return the generated sub-class.
+    sub-class_name = '%sBugzilla' % params['project_name'].replace(' ', '')
+    return type(sub-class_name, (BugzillaBugTracker,), class_dict)
+
+############################################################
+# Generator of sub-classes from data
+
+def generate_bugzilla_tracker_classes(tracker_name=None):
+    # List of data for the trackers.
+    # FIXME: This should be replaced by a database.
+    tracker_params = {
+            'Miro':
+                {
+                    'project_name':
+                        'Miro',
+                    'base_url':
+                        'http://bugzilla.pculture.org/',
+                    'bug_project_name_format':
+                        '{project}',
+                    'bug_queries':
+                        {
+                            'Easy bugs':
+                                'http://bugzilla.pculture.org/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&field-1-0-0=bug_status&field-1-1-0=product&field-1-2-0=keywords&keywords=bitesized&product=Miro&query_format=advanced&remaction=&type-1-0-0=anyexact&type-1-1-0=anyexact&type-1-2-0=anywords&value-1-0-0=NEW%2CASSIGNED%2CREOPENED&value-1-1-0=Miro&value-1-2-0=bitesized',
+                        },
+                    'bitesized_keyword':
+                        'bitesized'
+                },
+            'KDE':
+                {
+                    'project_name':
+                        'KDE',
+                    'base_url':
+                        'https://bugs.kde.org/',
+                    'bug_queries':
+                        {
+                            'Easy bugs':
+                                'https://bugs.kde.org/buglist.cgi?query_format=advanced&keywords=junior-jobs&resolution=---',
+                            'Documentation bugs':
+                                'https://bugs.kde.org/buglist.cgi?query_format=advanced&product=docs&resolution=---'
+                        },
+                    'bitesized_keyword':
+                        'junior-jobs',
+                    'documentation_product':
+                        'docs'
+                    # FIXME: Once generate_bug_project_name is implemented, there
+                    # will be parameters here related to bug project naming.
+                }
+            }
+
+    # If a tracker name was passed in then returnb the
+    # specific sub-class for that tracker.
+    if tracker_name:
+        params = tracker_params[tracker_name]
+        return bugzilla_tracker_factory(params)
+    else:
+        # Create a generator that yields all sub-classes.
+        for tracker in tracker_params:
+            params = tracker_params[tracker]
+            yield bugzilla_tracker_factory(params)
+
+############################################################
 # Specific sub-classes for individual bug trackers
 
 class MiroBugzilla(BugzillaBugTracker):
