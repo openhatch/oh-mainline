@@ -45,10 +45,12 @@ def tar_mission_data(request, passed_data={}):
       'unpack_form': forms.TarExtractUploadForm(),
       'unpack_success': False,
       'tarball_for_unpacking_mission': controllers.UntarMission.TARBALL_NAME,
-      'file_we_want': controllers.UntarMission.FILE_WE_WANT,
-      'create_done': controllers.mission_completed(request.user.get_profile(), 'tar'),
-      'unpack_done': controllers.mission_completed(request.user.get_profile(), 'tar_extract')
-    }
+      'file_we_want': controllers.UntarMission.FILE_WE_WANT}
+    if request.user.is_authenticated():
+        data.update( {
+            'create_done': controllers.mission_completed(request.user.get_profile(), 'tar'),
+            'unpack_done': controllers.mission_completed(request.user.get_profile(), 'tar_extract')
+        })
     data.update(passed_data)
     return data
 
@@ -69,7 +71,6 @@ def tar_mission_creating(request, passed_data={}):
     data = tar_mission_data(request, passed_data)
     return (request, 'missions/tar_creating.html', data)
 
-@login_required
 @view
 def tar_mission_hints(request, passed_data={}):
     data = tar_mission_data(request, passed_data)
