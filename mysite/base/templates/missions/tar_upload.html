@@ -1,16 +1,61 @@
 {% extends 'base/one_column.html' %}
 
-{% block body_id %}missions{% endblock body_id %}
-{% block body_class %}{{ block.super }} beta{% endblock body_class %}
-
 {% block title %}
-Using tar
+Missions: Tar
 {% endblock title %}
 
+{% block body_class %}{{ block.super }} auth settings{% endblock %}
+
 {% block main %}
-<div class="module">
+<div class='module'>
+    <div class='head'>
+        <h3>Missions: Tar</h3>
+	<ul>
+          <li>
+            <a href="{% url mysite.profile.views.display_person_web the_user.username %}">
+              &laquo; Back to profile
+            </a>
+          </li>
+        </ul>
+    </div>
+    <div class='body contains-submodules two-columns'>
+        <div class='submodule skinny'>
+            <div class='body'>
+                <ul>
+                    <style>
+                        #link-{{ slug }} a {
+                            font-weight: bold;
+                        }
+                    </style>
+                    <li id='link-set_location'>
+                    <a href=''>
+                        About the mission
+                    </a>
+                    </li>
+                    <li id='link-edit_contact_info'>
+                    <a href='{% url account.views.edit_contact_info %}'>
+                        Unpacking tarballs
+                    </a>
+                    </li>
+                    <li id='link-widget'>
+                    <a href='{% url account.views.widget %}'>
+                      Creating tarballs
+                    </a>
+                    </li>
+                    <li id='link-invite_someone'>
+                    <a href='{% url account.views.invite_someone %}'>
+                        Hints
+                    </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+{% block mission_main %}
+<div class='submodule fat'>
+  <div class='head'>
+    <h3>Using tar</h3>
+  </div>
   <div class="body">
-    <h1>Using tar</h1>
       <p>Open source software is commonly released in the form of archives called <em>tarballs</em>.  The tar program creates, unpacks, and manipulates such archives.</p>
       <p>When packaging a project's source code, it is customary to place the files within a directory named after the project with a version number.  This makes creating and unpacking such tarballs convenient, as you only have to name one directory to tar up when creating the tarball, and people who unpack your tarball end up with a self-contained directory that they can easily remove when they are finished using the set of files you gave them.</p>
       <p><a href="http://en.wikipedia.org/wiki/Tar_%28file_format%29">Wikipedia has some good information about the tar program and tarballs.</a></p>
@@ -109,4 +154,8 @@ Using tar
       <p><a href="{% url mysite.missions.views.main_page %}">Return to the main mission page</a></p>
   </div>
 </div>
+{% endblock mission_main %}
+    </div>
+</div>
 {% endblock main %}
+
