@@ -407,3 +407,22 @@ class SvnBackendTests(TestCase):
         finally:
             if os.path.isdir(repo_path):
                 shutil.rmtree(repo_path)
+
+class SvnViewTests(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def setUp(self):
+        TwillTests.setUp(self)
+        self.client = self.login_with_client()
+        self.repo_path = os.path.join(settings.SVN_REPO_PATH, 'paulproteus')
+        # Make sure that our test user's svn repository does not exist.
+        if os.path.isdir(self.repo_path):
+            shutil.rmtree(self.repo_path)
+
+    def test_resetrepo_returns_error_with_get(self):
+        response = self.client.get(reverse(views.svn_resetrepo))
+        self.assert_(response.status_code == 405)
+
+    def test_resetrepo_creates_valid_repo(self):
+        self.client.post(reverse(views.svn_resetrepo))
+        subprocess.check_call(['svn', 'info', 'file://'+self.repo_path])

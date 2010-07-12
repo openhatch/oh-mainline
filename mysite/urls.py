@@ -83,6 +83,8 @@ urlpatterns = patterns('',
         (r'^missions/diffpatch/patchrecursive/patch$', 'mysite.missions.views.diffpatch_patchrecursive_get_patch'),
         (r'^missions/diffpatch/patchrecursive/submit$', 'mysite.missions.views.diffpatch_patchrecursive_submit'),
 
+        (r'^missions/svn/resetrepo$', 'mysite.missions.views.svn_resetrepo'),
+
         # Invitation-related URLs
         (r'^invitation/', include('invitation.urls')),
 

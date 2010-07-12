@@ -2,7 +2,7 @@ from mysite.base.decorators import view
 from mysite.missions import forms, controllers
 from mysite.missions.models import Step, StepCompletion
 
-from django.http import HttpResponseRedirect, HttpResponse, Http404
+from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseNotAllowed
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 
@@ -212,3 +212,10 @@ def diffpatch_patchrecursive_submit(request):
                 data['patchrecursive_success'] = True
         data['patchrecursive_form'] = form
     return diffpatch_mission(request, data)
+
+@login_required
+def svn_resetrepo(request):
+    if request.method != 'POST':
+        return HttpResponseNotAllowed(['POST'])
+    controllers.SvnRepositoryManager.reset_repository(request.user.username)
+    return HttpResponse('')  # FIXME: redirect to the svn mission page when where is one
