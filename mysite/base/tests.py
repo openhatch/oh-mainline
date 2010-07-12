@@ -13,6 +13,7 @@ from django.core.cache import cache
 
 import mock
 import datetime
+import logging
 
 import mysite.base.helpers
 import mysite.base.controllers
@@ -328,5 +329,54 @@ class Unsubscribe(TwillTests):
                 kwargs={'token_string': valid_token_string})
         tc.submit()
         self.assertFalse(get_dude().email_me_weekly_re_projects)
+
+class TimestampTests(django.test.TestCase):
+    def test_bugzilla_urls_get_and_update_timestamp_without_errors(self):
+        # List of URLs to test (from Bugzila trackers)
+        urls = {
+                'Miro bitesized':
+                    'http://bugzilla.pculture.org/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&field-1-0-0=bug_status&field-1-1-0=product&field-1-2-0=keywords&keywords=bitesized&product=Miro&query_format=advanced&remaction=&type-1-0-0=anyexact&type-1-1-0=anyexact&type-1-2-0=anywords&value-1-0-0=NEW%2CASSIGNED%2CREOPENED&value-1-1-0=Miro&value-1-2-0=bitesized',
+                'KDE bitesized':
+                    'https://bugs.kde.org/buglist.cgi?query_format=advanced&keywords=junior-jobs&resolution=---',
+                'KDE documentation':
+                    'https://bugs.kde.org/buglist.cgi?query_format=advanced&product=docs&resolution=---',
+                'MediaWiki bitesized':
+                    'https://bugzilla.wikimedia.org/buglist.cgi?keywords=easy&query_format=advanced&resolution=LATER&resolution=---',
+                'MediaWiki documentation':
+                    'https://bugzilla.wikimedia.org/buglist.cgi?query_format=advanced&component=Documentation&resolution=---',
+                'Gnome bitesized':
+                    'https://bugzilla.gnome.org/buglist.cgi?columnlist=id&keywords=gnome-love&query_format=advanced&resolution=---',
+                'Mozilla bitesized':
+                    'https://bugzilla.mozilla.org/buglist.cgi?resolution=---;status_whiteboard_type=substring;query_format=advanced;status_whiteboard=[good%20first%20bug]',
+                'Songbird helpwanted':
+                    'http://bugzilla.songbirdnest.com/buglist.cgi?query_format=advanced&resolution=---&keywords=helpwanted',
+                'Songbird documentation':
+                    'http://bugzilla.songbirdnest.com/buglist.cgi?query_format=advanced&component=Documentation&resolution=---',
+                'Apertium':
+                    'http://bugs.apertium.org/cgi-bin/bugzilla/buglist.cgi?query_format=advanced&resolution=---',
+                'RTEMS':
+                    'https://www.rtems.org/bugzilla/buglist.cgi?query_format=advanced&resolution=---',
+                'XOrg bitesized':
+                    'https://bugs.freedesktop.org/buglist.cgi?query_format=advanced&keywords=janitor&resolution=---&product=xorg',
+                'XOrg documentation':
+                    'https://bugs.freedesktop.org/buglist.cgi?query_format=advanced&component=Docs%2Fother&component=Documentation&component=Fonts%2Fdoc&resolution=---&product=xorg',
+                'Locamotion':
+                    'http://bugs.locamotion.org/buglist.cgi?query_format=advanced&resolution=---',
+                'Hypertriton':
+                    'https://hypertriton.com/bugzilla/buglist.cgi?query_format=advanced&resolution=---&product=Agar&product=EDAcious&product=FabBSD&product=FreeSG',
+                'pygame':
+                    'http://pygame.motherhamster.org/bugzilla/buglist.cgi?query_format=advanced&resolution=---'
+                }
+        for url_name in urls:
+            logging.info('Testing %s bugs URL.' % url_name)
+            url = urls[url_name]
+            # Check there is no timestamp i.e. get zero o'clock
+            first_timestamp = mysite.base.models.Timestamp.get_timestamp_for_string(url)
+            self.assertEqual(first_timestamp, mysite.base.models.Timestamp.ZERO_O_CLOCK)
+            # Check the timestamp of the URL can be updated
+            mysite.base.models.Timestamp.update_timestamp_for_string(url)
+            # Check the new timestamp is after zero o'clock
+            new_timestamp = mysite.base.models.Timestamp.get_timestamp_for_string(url)
+            self.assertTrue(new_timestamp > mysite.base.models.Timestamp.ZERO_O_CLOCK)
 
 # vim: set ai et ts=4 sw=4 nu:

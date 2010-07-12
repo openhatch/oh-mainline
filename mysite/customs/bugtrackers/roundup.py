@@ -214,6 +214,7 @@ class MercurialTracker(RoundupTracker):
             bug_object.good_for_newcomers = True
         if 'documentation' in metadata_dict['Topics']:
             bug_object.concerns_just_documentation = True
+        bug_object.looks_closed = (metadata_dict['Status'] == 'resolved')
 
     def generate_list_of_bug_ids_to_look_at(self):
         # Bitesized bugs
