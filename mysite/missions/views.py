@@ -33,7 +33,7 @@ def tar_upload(request):
             except controllers.IncorrectTarFile, e:
                 data['what_was_wrong_with_the_tarball'] = str(e)
         data['create_form'] = form
-    return tar_mission_upload(request, data)
+    return tar_mission_creating(request, data)
 
 def tar_mission_data(request, passed_data={}):
     data = {
