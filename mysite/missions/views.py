@@ -38,6 +38,7 @@ def tar_upload(request):
 
 def tar_mission_data(request, passed_data={}):
     data = {
+      'mission_name': 'Tar',
       'create_success': False,
       'what_was_wrong_with_the_tarball': '',
       'filenames_for_tarball': controllers.TarMission.FILES.keys(),
@@ -57,23 +58,27 @@ def tar_mission_data(request, passed_data={}):
 @view
 def tar_mission_about(request, passed_data={}):
     data = tar_mission_data(request, passed_data)
+    data['this_mission_page_short_name'] = 'About'
     return (request, 'missions/tar_about.html', data)
 
 @login_required
 @view
 def tar_mission_unpacking(request, passed_data={}):
     data = tar_mission_data(request, passed_data)
+    data['this_mission_page_short_name'] = 'Unpacking'
     return (request, 'missions/tar_unpacking.html', data)
 
 @login_required
 @view
 def tar_mission_creating(request, passed_data={}):
     data = tar_mission_data(request, passed_data)
+    data['this_mission_page_short_name'] = 'Creating'
     return (request, 'missions/tar_creating.html', data)
 
 @view
 def tar_mission_hints(request, passed_data={}):
     data = tar_mission_data(request, passed_data)
+    data['this_mission_page_short_name'] = 'Hints'
     return (request, 'missions/tar_hints.html', data)
 
 def tar_file_download(request, name):

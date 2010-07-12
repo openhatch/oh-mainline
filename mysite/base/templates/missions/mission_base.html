@@ -1,0 +1,39 @@
+{% extends 'base/one_column.html' %}
+
+{% block body_class %}{{ block.super }} beta auth settings{% endblock %}
+
+{% block main %}
+<div class='module'>
+    <div class='head'>
+        <h3>Missions: {{ mission_name }}</h3>
+	<ul>
+          <li>
+            <a href="{% url mysite.missions.views.main_page %}">
+              &laquo; Back to list of missions
+            </a>
+          </li>
+        </ul>
+    </div>
+    <div class='body contains-submodules two-columns'>
+        <div class='submodule skinny'>
+            <div class='body'>
+                <ul>
+                    <style>
+                        #link-{{ slug }} a {
+                            font-weight: bold;
+                        }
+                    </style>
+		    {% block side_nav_links %}
+		    {% endblock side_nav_links %}
+                </ul>
+            </div>
+        </div>
+	{% block mission_main %}
+	{% endblock mission_main %}
+    </div>
+</div>
+{% endblock main %}
+
+{% block title %}
+Missions: {{mission_name}}: {{this_mission_page_short_name}}
+{% endblock title %}
