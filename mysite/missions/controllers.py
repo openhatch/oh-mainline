@@ -1,5 +1,5 @@
 from mysite.missions.models import Step, StepCompletion
-from mysite import settings
+from django.conf import settings
 
 import tarfile
 from StringIO import StringIO

@@ -3,7 +3,7 @@ from mysite.base.tests import TwillTests
 from mysite.missions import views, controllers
 from mysite.missions.models import StepCompletion, Step
 from mysite.profile.models import Person
-from mysite import settings
+from django.conf import settings
 from django.test.client import Client
 from django.core.urlresolvers import reverse
 from django.test import TestCase as DjangoTestCase
