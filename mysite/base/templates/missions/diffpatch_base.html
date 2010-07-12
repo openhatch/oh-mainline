@@ -1,0 +1,25 @@
+{% extends 'missions/mission_base.html' %}
+
+{% block side_nav_links %}
+<li id='link-tar_mission_about'>
+  <a href='{% url mysite.missions.views.tar_mission_about %}'>
+    About this mission
+  </a>
+</li>
+<li id='link-tar_mission_unpacking'>
+  <a href='{% url mysite.missions.views.tar_mission_unpacking %}'>
+    Unpacking tarballs
+  </a>
+</li>
+<li id='link-tar_mission_creating'>
+  <a href='{% url mysite.missions.views.tar_mission_creating %}'>
+    Creating tarballs
+  </a>
+</li>
+<li id='link-tar_mission_hints'>
+  <a href='{% url mysite.missions.views.tar_mission_hints %}'>
+    Hints
+  </a>
+</li>
+{% endblock side_nav_links %}
+

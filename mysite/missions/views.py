@@ -123,6 +123,7 @@ def diffpatch_patchsingle_get_patch(request):
 
 def diffpatch_data(request, passed_data={}):
     data = {
+      'mission_name': 'Using diff and patch',
       'patchsingle_success': False,
       'patchsingle_form': forms.PatchSingleUploadForm(),
       'patchsingle_error_message': '',

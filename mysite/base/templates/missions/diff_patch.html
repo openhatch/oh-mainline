@@ -1,14 +1,10 @@
-{% extends 'base/one_column.html' %}
+{% extends 'missions/diffpatch_base.html' %}
 
-{% block body_id %}missions{% endblock body_id %}
-{% block body_class %}{{ block.super }} beta {% endblock body_class %}
-
-{% block title %}
-Using diff and patch
-{% endblock title %}
-
-{% block main %}
-<div class="module">
+{% block mission_main %}
+<div class='submodule fat'>
+  <div class='head'>
+    <h3>Using tar</h3>
+  </div>
   <div class="body">
     <h1>Using diff and patch</h1>
     <p>When you make changes to open source software, you need an efficient way to show other people your changes so your changes can be reviewed or applied.  The diff and patch programs are often used for this purpose.  The diff program analyzes the files you give it and outputs the differences between them in a compact, human-and-machine-readable format, and the patch program reads diff output and uses it to transform a copy of the original files into the modified files.  So to show other people the changes, you can send them diff output, and they can use the patch program to apply your changes to their copy of the files.  When diff output is used in this way, the output itself is often called a patch or a diff.</p>
@@ -156,7 +152,6 @@ Using diff and patch
       </div>
     </form>
     <br style="clear: left;" />
-
   </div>
 </div>
-{% endblock main %}
+{% endblock mission_main %}
