@@ -240,3 +240,7 @@ class SvnRepositoryManager(object):
         if os.path.isdir(repo_path):
             shutil.rmtree(repo_path)
         subprocess.check_call(['svnadmin', 'create', '--fs-type', 'fsfs', repo_path])
+        dumploader = subprocess.Popen(['svnadmin', 'load', '--ignore-uuid', repo_path], stdin=subprocess.PIPE)
+        dumploader.communicate(open(os.path.join(get_mission_data_path(), cls.INITIAL_CONTENT)).read())
+        if dumploader.returncode != 0:
+            raise RuntimeError, 'svnadmin load failed'
