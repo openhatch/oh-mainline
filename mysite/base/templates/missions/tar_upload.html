@@ -1,55 +1,11 @@
-{% extends 'base/one_column.html' %}
+{% extends 'missions/tar_base.html' %}
 
 {% block title %}
-Missions: Tar
+Missions: Tar: About
 {% endblock title %}
 
 {% block body_class %}{{ block.super }} auth settings{% endblock %}
 
-{% block main %}
-<div class='module'>
-    <div class='head'>
-        <h3>Missions: Tar</h3>
-	<ul>
-          <li>
-            <a href="{% url mysite.profile.views.display_person_web the_user.username %}">
-              &laquo; Back to profile
-            </a>
-          </li>
-        </ul>
-    </div>
-    <div class='body contains-submodules two-columns'>
-        <div class='submodule skinny'>
-            <div class='body'>
-                <ul>
-                    <style>
-                        #link-{{ slug }} a {
-                            font-weight: bold;
-                        }
-                    </style>
-                    <li id='link-missions_tar_about'>
-                    <a href=''>
-                        About the mission
-                    </a>
-                    </li>
-                    <li id='link-missions_tar_unpacking'>
-                    <a href='{% url account.views.edit_contact_info %}'>
-                        Unpacking tarballs
-                    </a>
-                    </li>
-                    <li id='link-missions_tar_creating'>
-                    <a href='{% url account.views.widget %}'>
-                      Creating tarballs
-                    </a>
-                    </li>
-                    <li id='link-missions_tar_hints'>
-                    <a href='{% url account.views.invite_someone %}'>
-                        Hints
-                    </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
 {% block mission_main %}
 <div class='submodule fat'>
   <div class='head'>
@@ -155,7 +111,4 @@ Missions: Tar
   </div>
 </div>
 {% endblock mission_main %}
-    </div>
-</div>
-{% endblock main %}
 
