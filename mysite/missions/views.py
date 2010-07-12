@@ -14,10 +14,11 @@ def make_download(content, filename, mimetype='application/octet-stream'):
     resp['Content-Type'] = mimetype
     return resp
 
-@login_required
 @view
 def main_page(request):
-    completed_missions = dict((c.step.name, True) for c in StepCompletion.objects.filter(person=request.user.get_profile()))
+    completed_missions = {}
+    if request.user.is_authenticated():
+        completed_missions = dict((c.step.name, True) for c in StepCompletion.objects.filter(person=request.user.get_profile()))
     return (request, 'missions/main.html', {'completed_missions': completed_missions})
 
 @login_required
