@@ -62,7 +62,10 @@ urlpatterns = patterns('',
 
         # Mission-related URLs
         (r'^missions/$', 'mysite.missions.views.main_page'),
-        (r'^missions/tar$', 'mysite.missions.views.tar_mission'),
+        (r'^missions/tar$', 'mysite.missions.views.tar_mission_about'),
+        (r'^missions/tar/unpacking$', 'mysite.missions.views.tar_mission_unpacking'),
+        (r'^missions/tar/creating$', 'mysite.missions.views.tar_mission_creating'),
+        (r'^missions/tar/hints$', 'mysite.missions.views.tar_mission_hints'),
         (r'^missions/tar/upload$', 'mysite.missions.views.tar_upload'),
         (r'^missions/tar/downloadfile/(?P<name>.*)', 'mysite.missions.views.tar_file_download'),
         (r'^missions/tar/downloadtarball', 'mysite.missions.views.tar_download_tarball_for_extract_mission'),

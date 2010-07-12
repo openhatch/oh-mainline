@@ -28,22 +28,22 @@ Missions: Tar
                         }
                     </style>
                     <li id='link-missions_tar_about'>
-                    <a href=''>
+                    <a href='{% url mysite.missions.views.tar_mission_about %}'>
                         About the mission
                     </a>
                     </li>
                     <li id='link-missions_tar_unpacking'>
-                    <a href='{% url account.views.edit_contact_info %}'>
+                    <a href='{% url mysite.missions.views.tar_mission_unpacking %}'>
                         Unpacking tarballs
                     </a>
                     </li>
                     <li id='link-missions_tar_creating'>
-                    <a href='{% url account.views.widget %}'>
+                    <a href='{% url mysite.missions.views.tar_mission_creating %}'>
                       Creating tarballs
                     </a>
                     </li>
                     <li id='link-missions_tar_hints'>
-                    <a href='{% url account.views.invite_someone %}'>
+                    <a href='{% url mysite.missions.views.tar_mission_hints %}'>
                         Hints
                     </a>
                     </li>
