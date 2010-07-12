@@ -3,6 +3,7 @@ from mysite.base.tests import TwillTests
 from mysite.missions import views, controllers
 from mysite.missions.models import StepCompletion, Step
 from mysite.profile.models import Person
+from mysite import settings
 from django.test.client import Client
 from django.core.urlresolvers import reverse
 from django.test import TestCase as DjangoTestCase
@@ -376,3 +377,33 @@ class PatchRecursiveTests(TwillTests):
 
         paulproteus = Person.objects.get(user__username='paulproteus')
         self.assertEqual(len(StepCompletion.objects.filter(step__name='diffpatch_patchrecursive', person=paulproteus)), 0)
+
+class SvnBackendTests(TestCase):
+
+    def get_info(self, path):
+        svninfo = subprocess.Popen(['svn', 'info', 'file://'+path], stdout=subprocess.PIPE)
+        stdout, stderr = svninfo.communicate()
+        if svninfo.returncode != 0:
+            raise RuntimeError, 'svn info failed'
+        info = {}
+        for line in stdout.splitlines():
+            if ': ' in line:
+                key, separator, value = line.partition(': ')
+                info[key] = value
+        return info
+
+    def test_repo_reset(self):
+        repo_path = tempfile.mkdtemp(dir=settings.SVN_REPO_PATH)
+        random_name = os.path.basename(repo_path)
+        os.rmdir(repo_path)
+        try:
+            # Check that we can run "svn info" on the created repository to get the UUID.
+            controllers.SvnRepositoryManager.reset_repository(random_name)
+            old_uuid = self.get_info(repo_path)['Repository UUID']
+            # Check that resetting the repository changes its UUID.
+            controllers.SvnRepositoryManager.reset_repository(random_name)
+            new_uuid = self.get_info(repo_path)['Repository UUID']
+            self.assertNotEqual(old_uuid, new_uuid)
+        finally:
+            if os.path.isdir(repo_path):
+                shutil.rmtree(repo_path)
