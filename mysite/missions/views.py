@@ -116,29 +116,36 @@ def diffpatch_patchsingle_get_patch(request):
     return make_download(controllers.PatchSingleFileMission.get_patch(),
                          filename=controllers.PatchSingleFileMission.PATCH_FILENAME)
 
-@login_required
-@view
-def diffpatch_mission(request, passed_data={}):
+def diffpatch_data(request, passed_data={}):
     data = {
       'patchsingle_success': False,
       'patchsingle_form': forms.PatchSingleUploadForm(),
       'patchsingle_error_message': '',
-      'patchsingle_done': controllers.mission_completed(request.user.get_profile(), 'diffpatch_patchsingle'),
       'diffsingle_success': False,
       'diffsingle_form': forms.DiffSingleUploadForm(),
       'diffsingle_error_message': '',
-      'diffsingle_done': controllers.mission_completed(request.user.get_profile(), 'diffpatch_diffsingle'),
       'diffrecursive_success': False,
       'diffrecursive_form': forms.DiffRecursiveUploadForm(),
       'diffrecursive_error_message': '',
-      'diffrecursive_done': controllers.mission_completed(request.user.get_profile(), 'diffpatch_diffrecursive'),
       'patchrecursive_success': False,
       'patchrecursive_form': forms.PatchRecursiveUploadForm(),
       'patchrecursive_children_hats_error_message': '',
       'patchrecursive_lizards_hats_error_message': '',
-      'patchrecursive_done': controllers.mission_completed(request.user.get_profile(), 'diffpatch_patchrecursive'),
     }
+    if request.user.is_authenticated():
+        data.update({
+            'patchrecursive_done': controllers.mission_completed(request.user.get_profile(), 'diffpatch_patchrecursive'),
+            'diffrecursive_done': controllers.mission_completed(request.user.get_profile(), 'diffpatch_diffrecursive'),
+            'patchsingle_done': controllers.mission_completed(request.user.get_profile(), 'diffpatch_patchsingle'),
+            'diffsingle_done': controllers.mission_completed(request.user.get_profile(), 'diffpatch_diffsingle')
+            })
     data.update(passed_data)
+    return data
+
+@login_required
+@view
+def diffpatch_mission(request, passed_data={}):
+    data = diffpatch_data(request, passed_data)
     return (request, 'missions/diff_patch.html', data)
 
 @login_required
