@@ -33,11 +33,9 @@ def tar_upload(request):
             except controllers.IncorrectTarFile, e:
                 data['what_was_wrong_with_the_tarball'] = str(e)
         data['create_form'] = form
-    return tar_mission(request, data)
+    return tar_mission_creating(request, data)
 
-@login_required
-@view
-def tar_mission(request, passed_data={}):
+def tar_mission_data(request, passed_data={}):
     data = {
       'create_success': False,
       'what_was_wrong_with_the_tarball': '',
@@ -51,7 +49,30 @@ def tar_mission(request, passed_data={}):
       'unpack_done': controllers.mission_completed(request.user.get_profile(), 'tar_extract')
     }
     data.update(passed_data)
-    return (request, 'missions/tar_upload.html', data)
+    return data
+
+@view
+def tar_mission_about(request, passed_data={}):
+    data = tar_mission_data(request, passed_data)
+    return (request, 'missions/tar_about.html', data)
+
+@login_required
+@view
+def tar_mission_unpacking(request, passed_data={}):
+    data = tar_mission_data(request, passed_data)
+    return (request, 'missions/tar_unpacking.html', data)
+
+@login_required
+@view
+def tar_mission_creating(request, passed_data={}):
+    data = tar_mission_data(request, passed_data)
+    return (request, 'missions/tar_creating.html', data)
+
+@login_required
+@view
+def tar_mission_hints(request, passed_data={}):
+    data = tar_mission_data(request, passed_data)
+    return (request, 'missions/tar_hints.html', data)
 
 def tar_file_download(request, name):
     if name in controllers.TarMission.FILES:
@@ -83,7 +104,7 @@ def tar_extract_mission_upload(request):
             else:
                 data['what_was_wrong_with_the_extracted_file'] = 'The uploaded file does not have the correct contents.'
         data['unpack_form'] = form
-    return tar_mission(request, data)
+    return tar_mission_unpacking(request, data)
 
 def diffpatch_patchsingle_get_original_file(request):
     return make_download(open(controllers.PatchSingleFileMission.OLD_FILE).read(),

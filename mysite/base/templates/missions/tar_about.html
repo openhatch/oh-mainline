@@ -1,0 +1,24 @@
+{% extends 'missions/tar_base.html' %}
+
+{% block title %}
+Missions: Tar: About
+{% endblock title %}
+
+{% block body_class %}{{ block.super }} auth settings{% endblock %}
+
+{% block mission_main %}
+<div class='submodule fat'>
+  <div class='head'>
+    <h3>Using tar</h3>
+  </div>
+  <div class="body">
+      <p>Open source software is commonly released in the form of archives called <em>tarballs</em>.  The tar program creates, unpacks, and manipulates such archives.</p>
+      <p>When packaging a project's source code, it is customary to place the files within a directory named after the project with a version number.  This makes creating and unpacking such tarballs convenient, as you only have to name one directory to tar up when creating the tarball, and people who unpack your tarball end up with a self-contained directory that they can easily remove when they are finished using the set of files you gave them.</p>
+
+      <p>This mission consists of two parts: unpacking tarballs and creating tarballs.</p>
+
+      <p style="text-align: right;">
+	<a href="{% url mysite.missions.views.tar_mission_unpacking %}">Get started with unpacking &raquo;</a></p>
+
+{% endblock mission_main %}
+
