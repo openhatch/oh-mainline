@@ -35,9 +35,7 @@ def tar_upload(request):
         data['create_form'] = form
     return tar_mission(request, data)
 
-@login_required
-@view
-def tar_mission(request, passed_data={}):
+def tar_mission_data(request, passed_data={}):
     data = {
       'create_success': False,
       'what_was_wrong_with_the_tarball': '',
@@ -51,6 +49,12 @@ def tar_mission(request, passed_data={}):
       'unpack_done': controllers.mission_completed(request.user.get_profile(), 'tar_extract')
     }
     data.update(passed_data)
+    return data
+
+@login_required
+@view
+def tar_mission(request, passed_data={}):
+    data = tar_mission_data(request, passed_data)
     return (request, 'missions/tar_upload.html', data)
 
 def tar_file_download(request, name):
