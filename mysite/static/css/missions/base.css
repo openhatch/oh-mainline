@@ -1,8 +1,16 @@
-body#missions .successmsg {
+body.missions .successmsg {
   background-color: #e4ffc0;
   margin: 10px 0px;
   padding: 5px 10px;
   -moz-border-radius: 5px 5px 5px 5px;
   -webkit-border-radius: 5px 5px 5px 5px;
   border-radius: 5px 5px 5px 5px;
+}
+
+body.missions p,ul {
+  float: left;
+}
+
+body.missions .successmsg p {
+  float: left;
 }
