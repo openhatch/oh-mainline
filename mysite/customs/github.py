@@ -21,7 +21,11 @@ def _github_repos_list(username):
 
 def repos_by_username(username):
     try:
-        repos = _github_repos_list(username)
+        if '@' in username:
+            # it's doomed. set repos to the empty list
+            repos = []
+        else:
+            repos = _github_repos_list(username)
     except urllib2.HTTPError, e:
         if e.code == 403:
             # Well, Github said 403
