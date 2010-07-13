@@ -1,0 +1,37 @@
+{% extends 'missions/svn_base.html' %}
+
+{% block mission_main %}
+<div class='submodule fat'>
+  <div class='head'>
+    <h3>Using Subversion</h3>
+  </div>
+  <div class="body">
+      <p>Most open source projects keep their code in a version control system (VCS).  Subversion is a popular VCS for open source projects.  Subversion is a non-distributed VCS, meaning that there is a single central repository that all users and developers interact with.</p>
+      <p>A VCS tracks changes that are made to the code.  Each change has a timestamp, an author name, and a log message associated with it.  If two people modify the same file, the VCS catches this and merges both sets of changes; the second person is shown any conflicts that occur so the conflicts can be resolved.  One can also look through the history of the codebase.</p>
+
+      <p>This mission consists of n parts: ....</p>
+
+      {% if the_user.is_authenticated %}
+      {% if repository_exists %}
+      <p>You already have a repository that you can use for these missions, but if you want to start over fresh, you can reset it.</p>
+
+      <form method="post" action="{% url mysite.missions.views.svn_resetrepo %}" onsubmit="return confirm('Are you sure you want to reset your repository to its original state?');">
+        <input type="submit" value="Reset your repository" />
+      </form><br style="clear: left;" />
+      {% else %}
+      <p>To do these missions, you will need to make a personal repository.  Your repository will reside on the OpenHatch server, specifically for your use in this mission.</p>
+
+      <form method="post" action="{% url mysite.missions.views.svn_resetrepo %}">
+        <input type="submit" value="Create your repository" />
+      </form><br style="clear: left;" />
+
+      <p>Then you can go on and interact with it.</p>
+      {% endif %}
+
+      <p class="next_mission_link">
+	<a href="{#{% url mysite.missions.views.svn_checkout %}#}">Checking out your repository &raquo;</a></p>
+      {% else %}
+      <p>If you were logged in, you could create a repository that you could use to do these missions.</p>
+      {% endif %}
+
+{% endblock mission_main %}

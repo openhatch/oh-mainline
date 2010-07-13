@@ -257,4 +257,21 @@ def svn_resetrepo(request):
     if request.method != 'POST':
         return HttpResponseNotAllowed(['POST'])
     controllers.SvnRepositoryManager.reset_repository(request.user.username)
-    return HttpResponse('')  # FIXME: redirect to the svn mission page when where is one
+    return HttpResponseRedirect(reverse(svn_mission_about))
+
+def svn_data(request, passed_data={}):
+    data = {
+      'mission_name': 'Using Subversion',
+    }
+    if request.user.is_authenticated():
+        data.update({
+            'repository_exists': controllers.SvnRepositoryManager.repository_exists(request.user.username),
+            })
+    data.update(passed_data)
+    return data
+
+@view
+def svn_mission_about(request, passed_data={}):
+    data = svn_data(request, passed_data)
+    data['this_mission_page_short_name'] = 'About'
+    return (request, 'missions/svn_about.html', data)

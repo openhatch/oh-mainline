@@ -244,3 +244,7 @@ class SvnRepositoryManager(object):
         dumploader.communicate(open(os.path.join(get_mission_data_path(), cls.INITIAL_CONTENT)).read())
         if dumploader.returncode != 0:
             raise RuntimeError, 'svnadmin load failed'
+
+    @classmethod
+    def repository_exists(cls, username):
+        return os.path.isdir(os.path.join(settings.SVN_REPO_PATH, username))

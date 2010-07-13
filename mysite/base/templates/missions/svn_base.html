@@ -1,0 +1,10 @@
+{% extends 'missions/mission_base.html' %}
+
+{% block side_nav_links %}
+<li id='link-svn_mission_about'>
+  <a href='{% url mysite.missions.views.svn_mission_about %}'>
+    About this mission
+  </a>
+</li>
+{% endblock side_nav_links %}
+
