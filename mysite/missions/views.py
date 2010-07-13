@@ -14,10 +14,11 @@ def make_download(content, filename, mimetype='application/octet-stream'):
     resp['Content-Type'] = mimetype
     return resp
 
-@login_required
 @view
 def main_page(request):
-    completed_missions = dict((c.step.name, True) for c in StepCompletion.objects.filter(person=request.user.get_profile()))
+    completed_missions = {}
+    if request.user.is_authenticated():
+        completed_missions = dict((c.step.name, True) for c in StepCompletion.objects.filter(person=request.user.get_profile()))
     return (request, 'missions/main.html', {'completed_missions': completed_missions})
 
 @login_required
@@ -37,6 +38,7 @@ def tar_upload(request):
 
 def tar_mission_data(request, passed_data={}):
     data = {
+      'mission_name': 'Tar',
       'create_success': False,
       'what_was_wrong_with_the_tarball': '',
       'filenames_for_tarball': controllers.TarMission.FILES.keys(),
@@ -44,34 +46,39 @@ def tar_mission_data(request, passed_data={}):
       'unpack_form': forms.TarExtractUploadForm(),
       'unpack_success': False,
       'tarball_for_unpacking_mission': controllers.UntarMission.TARBALL_NAME,
-      'file_we_want': controllers.UntarMission.FILE_WE_WANT,
-      'create_done': controllers.mission_completed(request.user.get_profile(), 'tar'),
-      'unpack_done': controllers.mission_completed(request.user.get_profile(), 'tar_extract')
-    }
+      'file_we_want': controllers.UntarMission.FILE_WE_WANT}
+    if request.user.is_authenticated():
+        data.update( {
+            'create_done': controllers.mission_completed(request.user.get_profile(), 'tar'),
+            'unpack_done': controllers.mission_completed(request.user.get_profile(), 'tar_extract')
+        })
     data.update(passed_data)
     return data
 
 @view
 def tar_mission_about(request, passed_data={}):
     data = tar_mission_data(request, passed_data)
+    data['this_mission_page_short_name'] = 'About'
     return (request, 'missions/tar_about.html', data)
 
 @login_required
 @view
 def tar_mission_unpacking(request, passed_data={}):
     data = tar_mission_data(request, passed_data)
+    data['this_mission_page_short_name'] = 'Unpacking'
     return (request, 'missions/tar_unpacking.html', data)
 
 @login_required
 @view
 def tar_mission_creating(request, passed_data={}):
     data = tar_mission_data(request, passed_data)
+    data['this_mission_page_short_name'] = 'Creating'
     return (request, 'missions/tar_creating.html', data)
 
-@login_required
 @view
 def tar_mission_hints(request, passed_data={}):
     data = tar_mission_data(request, passed_data)
+    data['this_mission_page_short_name'] = 'Hints'
     return (request, 'missions/tar_hints.html', data)
 
 def tar_file_download(request, name):
@@ -114,30 +121,62 @@ def diffpatch_patchsingle_get_patch(request):
     return make_download(controllers.PatchSingleFileMission.get_patch(),
                          filename=controllers.PatchSingleFileMission.PATCH_FILENAME)
 
-@login_required
-@view
-def diffpatch_mission(request, passed_data={}):
+def diffpatch_data(request, passed_data={}):
     data = {
+      'mission_name': 'Using diff and patch',
       'patchsingle_success': False,
       'patchsingle_form': forms.PatchSingleUploadForm(),
       'patchsingle_error_message': '',
-      'patchsingle_done': controllers.mission_completed(request.user.get_profile(), 'diffpatch_patchsingle'),
       'diffsingle_success': False,
       'diffsingle_form': forms.DiffSingleUploadForm(),
       'diffsingle_error_message': '',
-      'diffsingle_done': controllers.mission_completed(request.user.get_profile(), 'diffpatch_diffsingle'),
       'diffrecursive_success': False,
       'diffrecursive_form': forms.DiffRecursiveUploadForm(),
       'diffrecursive_error_message': '',
-      'diffrecursive_done': controllers.mission_completed(request.user.get_profile(), 'diffpatch_diffrecursive'),
       'patchrecursive_success': False,
       'patchrecursive_form': forms.PatchRecursiveUploadForm(),
       'patchrecursive_children_hats_error_message': '',
       'patchrecursive_lizards_hats_error_message': '',
-      'patchrecursive_done': controllers.mission_completed(request.user.get_profile(), 'diffpatch_patchrecursive'),
     }
+    if request.user.is_authenticated():
+        data.update({
+            'patchrecursive_done': controllers.mission_completed(request.user.get_profile(), 'diffpatch_patchrecursive'),
+            'diffrecursive_done': controllers.mission_completed(request.user.get_profile(), 'diffpatch_diffrecursive'),
+            'patchsingle_done': controllers.mission_completed(request.user.get_profile(), 'diffpatch_patchsingle'),
+            'diffsingle_done': controllers.mission_completed(request.user.get_profile(), 'diffpatch_diffsingle')
+            })
     data.update(passed_data)
-    return (request, 'missions/diff_patch.html', data)
+    return data
+
+@view
+def diffpatch_mission_about(request, passed_data={}):
+    data = diffpatch_data(request, passed_data)
+    data['this_mission_page_short_name'] = 'About'
+    return (request, 'missions/diffpatch_mission_about.html', data)
+
+@view
+def diffpatch_mission_single_file_diff(request, passed_data={}):
+    data = diffpatch_data(request, passed_data)
+    data['this_mission_page_short_name'] = 'About'
+    return (request, 'missions/diffpatch_mission_single_file_diff.html', data)
+
+@view
+def diffpatch_mission_single_file_patch(request, passed_data={}):
+    data = diffpatch_data(request, passed_data)
+    data['this_mission_page_short_name'] = 'About'
+    return (request, 'missions/diffpatch_mission_single_file_patch.html', data)
+
+@view
+def diffpatch_mission_recursive_patch(request, passed_data={}):
+    data = diffpatch_data(request, passed_data)
+    data['this_mission_page_short_name'] = 'About'
+    return (request, 'missions/diffpatch_mission_recursive_patch.html', data)
+
+@view
+def diffpatch_mission_recursive_diff(request, passed_data={}):
+    data = diffpatch_data(request, passed_data)
+    data['this_mission_page_short_name'] = 'About'
+    return (request, 'missions/diffpatch_mission_recursive_diff.html', data)
 
 @login_required
 def diffpatch_patchsingle_submit(request):
@@ -151,7 +190,7 @@ def diffpatch_patchsingle_submit(request):
             else:
                 data['patchsingle_error_message'] = 'The file did not match the contents it should have.'
         data['patchsingle_form'] = form
-    return diffpatch_mission(request, data)
+    return diffpatch_mission_single_file_patch(request, data)
 
 def diffpatch_diffsingle_get_original_file(request):
     return make_download(open(controllers.DiffSingleFileMission.OLD_FILE).read(),
@@ -170,7 +209,7 @@ def diffpatch_diffsingle_submit(request):
             except controllers.IncorrectPatch, e:
                 data['diffsingle_error_message'] = str(e)
         data['diffsingle_form'] = form
-    return diffpatch_mission(request, data)
+    return diffpatch_mission_single_file_diff(request, data)
 
 def diffpatch_diffrecursive_get_original_tarball(request):
     return make_download(controllers.DiffRecursiveMission.synthesize_tarball(), filename=controllers.DiffRecursiveMission.TARBALL_NAME)
@@ -188,7 +227,7 @@ def diffpatch_diffrecursive_submit(request):
             except controllers.IncorrectPatch, e:
                 data['diffrecursive_error_message'] = str(e)
         data['diffrecursive_form'] = form
-    return diffpatch_mission(request, data)
+    return diffpatch_mission_recursive_diff(request, data)
 
 def diffpatch_patchrecursive_get_original_tarball(request):
     return make_download(controllers.PatchRecursiveMission.synthesize_tarball(), filename=controllers.PatchRecursiveMission.BASE_NAME+'.tar.gz')
@@ -211,7 +250,7 @@ def diffpatch_patchrecursive_submit(request):
                 controllers.set_mission_completed(request.user.get_profile(), 'diffpatch_patchrecursive')
                 data['patchrecursive_success'] = True
         data['patchrecursive_form'] = form
-    return diffpatch_mission(request, data)
+    return diffpatch_mission_recursive_patch(request, data)
 
 @login_required
 def svn_resetrepo(request):

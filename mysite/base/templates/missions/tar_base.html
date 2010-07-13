@@ -1,58 +1,25 @@
-{% extends 'base/one_column.html' %}
+{% extends 'missions/mission_base.html' %}
 
-{% block title %}
-Missions: Tar
-{% endblock title %}
-
-{% block body_class %}{{ block.super }} beta auth settings{% endblock %}
-
-{% block main %}
-<div class='module'>
-    <div class='head'>
-        <h3>Missions: Tar</h3>
-	<ul>
-          <li>
-            <a href="{% url mysite.missions.views.main_page %}">
-              &laquo; Back to list of missions
-            </a>
-          </li>
-        </ul>
-    </div>
-    <div class='body contains-submodules two-columns'>
-        <div class='submodule skinny'>
-            <div class='body'>
-                <ul>
-                    <style>
-                        #link-{{ slug }} a {
-                            font-weight: bold;
-                        }
-                    </style>
-                    <li id='link-tar_mission_about'>
-                    <a href='{% url mysite.missions.views.tar_mission_about %}'>
-                        About this mission
-                    </a>
-                    </li>
-                    <li id='link-tar_mission_unpacking'>
-                    <a href='{% url mysite.missions.views.tar_mission_unpacking %}'>
-                        Unpacking tarballs
-                    </a>
-                    </li>
-                    <li id='link-tar_mission_creating'>
-                    <a href='{% url mysite.missions.views.tar_mission_creating %}'>
-                      Creating tarballs
-                    </a>
-                    </li>
-                    <li id='link-tar_mission_hints'>
-                    <a href='{% url mysite.missions.views.tar_mission_hints %}'>
-                        Hints
-                    </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-	{% block mission_main %}
-	{% endblock mission_main %}
-    </div>
-</div>
-{% endblock main %}
+{% block side_nav_links %}
+<li id='link-tar_mission_about'>
+  <a href='{% url mysite.missions.views.tar_mission_about %}'>
+    About this mission
+  </a>
+</li>
+<li id='link-tar_mission_unpacking'>
+  <a href='{% url mysite.missions.views.tar_mission_unpacking %}'>
+    Unpacking tarballs
+  </a>
+</li>
+<li id='link-tar_mission_creating'>
+  <a href='{% url mysite.missions.views.tar_mission_creating %}'>
+    Creating tarballs
+  </a>
+</li>
+<li id='link-tar_mission_hints'>
+  <a href='{% url mysite.missions.views.tar_mission_hints %}'>
+    Hints
+  </a>
+</li>
+{% endblock side_nav_links %}
 

@@ -1,11 +1,5 @@
 {% extends 'missions/tar_base.html' %}
 
-{% block title %}
-Missions: Tar: About
-{% endblock title %}
-
-{% block body_class %}{{ block.super }} auth settings{% endblock %}
-
 {% block mission_main %}
 <div class='submodule fat'>
   <div class='head'>
@@ -17,8 +11,7 @@ Missions: Tar: About
 
       <p>This mission consists of two parts: unpacking tarballs and creating tarballs.</p>
 
-      <p style="text-align: right;">
+      <p class="next_mission_link">
 	<a href="{% url mysite.missions.views.tar_mission_unpacking %}">Get started with unpacking &raquo;</a></p>
 
 {% endblock mission_main %}
-

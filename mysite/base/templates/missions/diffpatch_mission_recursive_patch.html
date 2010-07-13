@@ -1,0 +1,56 @@
+{% extends 'missions/diffpatch_base.html' %}
+
+{% block mission_main %}
+<div class='submodule fat'>
+  <div class='head'>
+    <h3>Patching entire directories</h3>
+  </div>
+  <div class="body">
+    <p>Sometimes you might have to apply a patch that affects more than one file.  The patch program can tell what parts of the patch apply to what files by examining the headers, but you might need to help it out by giving the <code>-p</code> option to tell it how many levels of directories to ignore so it finds the correct files to patch.</p>
+    <p>Here is your mission:</p>
+    <ul class="raquo_bullets">
+      <li>Download <a href="{% url mysite.missions.views.diffpatch_patchrecursive_get_original_tarball %}">this tarball</a> and <a href="{% url mysite.missions.views.diffpatch_patchrecursive_get_patch %}">this patch</a>.</li>
+      <li>Unpack the tarball and apply the patch using <code>patch -p1</code> from the <code>hats</code> directory.</li>
+      <li>Answer some questions below about the contents of the files inside.</li>
+    </ul>
+
+    <form method="post" enctype="multipart/form-data" action="{% url mysite.missions.views.diffpatch_patchrecursive_submit %}#patchrecursive-form">
+      <div class="form-row">
+        <a name="patchrecursive-form"></a>
+  {% if patchrecursive_success %}
+    <div class="successmsg">
+      <p><strong>You have successfully completed this part of the mission.</strong></p>
+      <p>The answers are all correct.</p>
+    </div>
+  {% endif %}
+        {% if patchrecursive_children_hats_error_message %}
+        <ul class="errorlist"><li>{{ patchrecursive_children_hats_error_message }}</li></ul>
+        {% endif %}
+        {{ patchrecursive_form.children_hats.errors }}
+        <br style="clear: left;" />
+        Number of children with blue hats: <br style="clear: left;" />
+        {{ patchrecursive_form.children_hats }}
+        <br style="clear: left;" />
+        {% if patchrecursive_lizards_hats_error_message %}
+        <ul class="errorlist"><li>{{ patchrecursive_lizards_hats_error_message }}</li></ul>
+        {% endif %}
+        {{ patchrecursive_form.lizards_hats.errors }}
+        <br style="clear: left;" />
+        Number of lizards with blue hats: <br style="clear: left;" />
+        {{ patchrecursive_form.lizards_hats }}
+        <br style="clear: left;" />
+        <input type="submit" value="Submit" style="float: none;" />
+        {% if patchrecursive_done %}
+        <br style="clear: left;" />
+        <em>You have already completed this part of the mission.</em>
+        {% endif %}
+      </div>
+    </form>
+    {% if patchrecursive_done %} {# FIXME add the rest of the _done things #}
+    <p class="next_mission_link">
+      Congratulations! You've totally completed the mission.
+      Want to go <a href="{% url mysite.missions.views.main_page %}">back to the list of missions</a>?</p>
+    {% endif %}
+  </div>
+</div>
+{% endblock mission_main %}

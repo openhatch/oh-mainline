@@ -1,0 +1,46 @@
+{% extends 'missions/diffpatch_base.html' %}
+
+{% block mission_main %}
+<div class='submodule fat'>
+  <div class='head'>
+    <h3>Diffing individual files</h3>
+  </div>
+  <div class="body">
+    <p>When you are submitting changes to a project, you will need to run diff to create a patch that you can submit.  Large patches can be stored in files and attached to whatever medium you use to submit the patch, but since this patch will be short, it can be included inline in the message.  So instead of uploading the patch in a file, your mission will be to make your patch and copy and paste it into the box below.</p>
+    <p>Here's the mission:</p>
+    <ul class="raquo_bullets">
+      <li><a href="{% url mysite.missions.views.diffpatch_diffsingle_get_original_file %}">Download this file.</a></li>
+      <li>Open the file in a text editor and follow the instructions inside the file.  (These instructions will involve modifying the file.)</li>
+      <li>Make a unified diff (the universally preferred flavor of diff output) of your changes.  (Try <code>diff -u originalfile.txt modifiedfile.txt</code>.)</li>
+    </ul>
+
+    <form method="post" action="{% url mysite.missions.views.diffpatch_diffsingle_submit %}#diffsingle-form">
+      <div class="form-row">
+        <a name="diffsingle-form"></a>
+        Paste the unified diff here:
+  {% if diffsingle_success %}
+    <div class="successmsg">
+      <p><strong>You have successfully completed this part of the mission.</strong></p>
+      <p>The patch applies correctly and results in the correct file.</p>
+    </div>
+  {% endif %}
+        {% if diffsingle_error_message %}
+        <ul class="errorlist"><li>{{ diffsingle_error_message }}</li></ul>
+        {% endif %}
+        {{ diffsingle_form.diff.errors }}
+        <br style="clear: left;" />
+        {{ diffsingle_form.diff }}
+        <input type="submit" value="Submit" style="float: none;" />
+        {% if not diffsingle_success and diffsingle_done %}
+        <br style="clear: left;" />
+        <em>You have already completed this part of the mission.</em>
+        {% endif %}
+      </div>
+    </form>
+    {% if diffsingle_done %}
+    <p class="next_mission_link">
+      <a href="{% url mysite.missions.views.diffpatch_mission_recursive_patch %}">On to diffing entire directories &raquo;</a></p>
+    {% endif %}
+  </div>
+</div>
+{% endblock mission_main %}

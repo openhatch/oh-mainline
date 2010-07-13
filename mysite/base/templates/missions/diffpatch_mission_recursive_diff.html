@@ -1,0 +1,52 @@
+{% extends 'missions/diffpatch_base.html' %}
+
+{% block mission_main %}
+<div class='submodule fat'>
+  <div class='head'>
+    <h3>Diffing entire directories</h3>
+  </div>
+  <div class="body">
+    <h2>Diffing entire directories</h2>
+    <p>Often your changes will involve more than one file, so it makes sense to submit all of those changes in one shot, especially if the changes depend on one another.  The <code>-r</code> option to diff makes it take two directories and compare their contents file-by-file, so you can keep one untouched copy of the project and one copy that you make your modifications to, then diff them with the <code>-r</code> option and get all of your changes in one convenient blob.</p>
+    <p>Here is your mission:</p>
+    <ul class="raquo_bullets">
+      <li><a href="{% url mysite.missions.views.diffpatch_diffrecursive_get_original_tarball %}">Download this tarball</a> containing some recipes.</li>
+      <li>Unpack the tarball.</li>
+      <li>Find all places where "aubergine" is mentioned and replace them with the synonym, "eggplant". (If you see "Aubergine" with a capital "A", replace that with a similarly-capitalized word!)</li>
+      <li>Make a unified diff of your changes.  It should be possible to apply it with "patch -p1" from the "recipes" directory.  (One way to do this is <code>diff -ur recipes-orig recipes</code>, where <code>recipes-orig</code> is an unmodified copy of the <code>recipes</code> directory.)</li>
+    </ul>
+
+    <p>Since this is a larger patch, you will be uploading it as a file rather than just pasting it in.  (Also, if you're in the mood for some cooking after you complete the mission, we'd love to know how one of those recipes turns out.  But that's not part of the mission.)</p>
+
+    <form method="post" enctype="multipart/form-data" action="{% url mysite.missions.views.diffpatch_diffrecursive_submit %}#diffrecursive-form">
+      <div class="form-row">
+        <a name="diffrecursive-form"></a>
+        Upload the unified diff here:
+  {% if diffrecursive_success %}
+    <div class="successmsg">
+      <p><strong>You have successfully completed this part of the mission.</strong></p>
+      <p>The patch applies correctly and makes all of the requested changes.</p>
+    </div>
+  {% endif %}
+        {% if diffrecursive_error_message %}
+        <ul class="errorlist"><li>{{ diffrecursive_error_message }}</li></ul>
+        {% endif %}
+        {{ diffrecursive_form.diff.errors }}
+        <br style="clear: left;" />
+        {{ diffrecursive_form.diff }}
+        <input type="submit" value="Submit" style="float: none;" />
+        {% if diffrecursive_done %}
+        <br style="clear: left;" />
+        <em>You have already completed this part of the mission.</em>
+        {% endif %}
+      </div>
+    </form>
+    {% if diffrecursive_done %}
+    <p class="next_mission_link">
+      <a href="{% url mysite.missions.views.diffpatch_mission_recursive_patch %}">
+	Try the final step, patching entire directories &raquo;
+    </a></p>
+    {% endif %}
+  </div>
+</div>
+{% endblock mission_main %}
