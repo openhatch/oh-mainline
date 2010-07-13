@@ -12,3 +12,80 @@ V 27
 2010-07-12T18:34:28.187137Z
 PROPS-END
 
+Revision-number: 1
+Prop-content-length: 133
+Content-length: 133
+
+K 7
+svn:log
+V 33
+Create initial repository layout.
+K 10
+svn:author
+V 5
+admin
+K 8
+svn:date
+V 27
+2010-07-12T22:36:53.264064Z
+PROPS-END
+
+Node-path: branches
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: tags
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: trunk
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Revision-number: 2
+Prop-content-length: 123
+Content-length: 123
+
+K 7
+svn:log
+V 22
+Add the mystery word.
+
+K 10
+svn:author
+V 6
+mr_bad
+K 8
+svn:date
+V 27
+2010-07-13T00:20:49.685892Z
+PROPS-END
+
+Node-path: trunk/word.txt
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 9
+Text-content-md5: 17a3b3836e68948e6b2b793f00f17127
+Text-content-sha1: 8e053e82b5770da61ef502622495eb3525df2777
+Content-length: 19
+
+PROPS-END
+midnight
+
+
