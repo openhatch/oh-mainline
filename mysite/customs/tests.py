@@ -679,8 +679,7 @@ class LaunchpadImporterTests(django.test.TestCase):
                          date_reported=now_t,
                          date_updated=now_t,
                          )
-        sample_out_query = dict(project='GNOME-Do',
-                                canonical_bug_link='http://example.com/1')
+        sample_out_query = dict(canonical_bug_link='http://example.com/1')
         sample_out_data = dict(title='Title', description='Some long text',
                                importance='Unknown', status='Ready for take-off',
                                people_involved=2, submitter_realname='Bob',
