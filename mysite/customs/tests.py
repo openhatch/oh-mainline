@@ -107,6 +107,11 @@ class OhlohTestsThatHitTheNetwork(django.test.TestCase):
                        'man_months': 1,
                        'primary_language': 'shell script'}
 
+        # Clean the 'permalink' values out of each project...
+        for proj in projects:
+            if 'permalink' in proj:
+                del proj['permalink']
+
         if do_contents_check:
             self.assert_(should_have in projects)
 
@@ -128,6 +133,8 @@ class OhlohTestsThatHitTheNetwork(django.test.TestCase):
                              'project_homepage_url': 'http://wiki.creativecommons.org/CcHost',
                              'man_months': 1,
                              'primary_language': 'shell script'}]
+        for proj in projects:
+            del proj['permalink']
         self.assertEqual(should_have, projects)
         # }}}
 
@@ -151,6 +158,8 @@ class OhlohTestsThatHitTheNetwork(django.test.TestCase):
         # {{{
         oh = ohloh.get_ohloh()
         projects, web_response = oh.get_contribution_info_by_ohloh_username('paulproteus')
+        for proj in projects:
+            del proj['permalink']
         
         assert {'project': u'ccHost',
                 'project_homepage_url': 'http://wiki.creativecommons.org/CcHost',
@@ -162,6 +171,8 @@ class OhlohTestsThatHitTheNetwork(django.test.TestCase):
         oh = ohloh.get_ohloh()
         username = oh.email_address_to_ohloh_username('paulproteus.ohloh@asheesh.org')
         projects, web_response = oh.get_contribution_info_by_ohloh_username(username)
+        for proj in projects:
+            del proj['permalink']
         
         assert {'project': u'ccHost',
                 'project_homepage_url': 'http://wiki.creativecommons.org/CcHost',
