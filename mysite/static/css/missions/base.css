@@ -7,10 +7,11 @@ body.missions .successmsg {
   border-radius: 5px 5px 5px 5px;
 }
 
-body.missions p,ul {
+body.missions div.body > * {
   float: left;
 }
 
-body.missions .successmsg p {
-  float: left;
+body.missions p.next_mission_link {
+    width: 100%;
+    text-align: right;
 }

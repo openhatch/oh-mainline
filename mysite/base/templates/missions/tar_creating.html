@@ -41,7 +41,7 @@
         </div>
       </form>
       {% if create_done and unpack_done %}
-      <p style="text-align: right;">
+      <p class="next_mission_link">
 	Congratulations! You've totally completed the tar mission.
 	Want to go <a href="{% url mysite.missions.views.main_page %}">back to the list of missions</a>?</p>
       {% endif %}

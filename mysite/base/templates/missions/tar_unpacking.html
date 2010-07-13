@@ -14,10 +14,6 @@
           After you extract that file, upload it here:
     {% if unpack_success %}
       <!-- unpack status: success -->
-      <div class="successmsg">
-        <p><strong>You have successfully completed this part of the mission.</strong></p>
-        <p>The file you uploaded has the correct contents.</p>
-      </div>
     {% else %}
       <!-- unpack status: failure -->
     {% endif %}
@@ -28,15 +24,18 @@
           <br style="clear: left;" />
           {{ unpack_form.extracted_file }}
           <input type="submit" value="Upload" style="float: none;" />
-          {% if unpack_done %}
-          <br style="clear: left;" />
-          <em>You have already completed this part of the mission.</em>
-          {% endif %}
         </div>
       </form>
-
+    {% if unpack_done %}
+      <div class="successmsg">
+        <p><strong>You have successfully completed this part of the mission.</strong></p>
+        {% if unpack_success %}
+        <p>The file you uploaded has the correct contents.</p>
+        {% endif %}
+      </div>
+    {% endif %}
       {% if unpack_done %}
-      <p style="text-align: right;">
+      <p class="next_mission_link">
 	<a href="{% url mysite.missions.views.tar_mission_creating %}">On to creating a tarball &raquo;</a></p>
       {% endif %}
   </div>
