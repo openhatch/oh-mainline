@@ -690,10 +690,9 @@ class SingleTerm(SearchTest):
                 expected_languages_facet_options 
                 )
 
-        self.compare_lists_of_dicts(
+        self.assertEqual(
                 self.output_possible_facets['language']['the_any_option'],
-                [languages_option_any] 
-                )
+                languages_option_any)
 
 class SingleFacetOption(SearchTest):
     """Browse bugs matching a single facet option."""
