@@ -197,7 +197,7 @@ class DiffRecursiveMission(object):
 
             # Check that the resulting file matches what is expected.
             if ''.join(the_patch.patch_stream(StringIO(old_contents), hunks)) != new_contents:
-                raise IncorrectPatch, 'The modifications to "%s" do not result in the correct contents.' % filename
+                raise IncorrectPatch, 'The modifications to "%s" do not result in the correct contents. Make sure you replaced "Aubergine", too!' % filename
 
         if len(the_patch.source) != 0:
             raise IncorrectPatch, 'The patch modifies files that it should not modify: %s' % ', '.join(the_patch.source)

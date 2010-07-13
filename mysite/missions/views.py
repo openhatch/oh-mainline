@@ -148,11 +148,35 @@ def diffpatch_data(request, passed_data={}):
     data.update(passed_data)
     return data
 
-@login_required
 @view
-def diffpatch_mission(request, passed_data={}):
+def diffpatch_mission_about(request, passed_data={}):
     data = diffpatch_data(request, passed_data)
-    return (request, 'missions/diff_patch.html', data)
+    data['this_mission_page_short_name'] = 'About'
+    return (request, 'missions/diffpatch_mission_about.html', data)
+
+@view
+def diffpatch_mission_single_file_diff(request, passed_data={}):
+    data = diffpatch_data(request, passed_data)
+    data['this_mission_page_short_name'] = 'About'
+    return (request, 'missions/diffpatch_mission_single_file_diff.html', data)
+
+@view
+def diffpatch_mission_single_file_patch(request, passed_data={}):
+    data = diffpatch_data(request, passed_data)
+    data['this_mission_page_short_name'] = 'About'
+    return (request, 'missions/diffpatch_mission_single_file_patch.html', data)
+
+@view
+def diffpatch_mission_recursive_patch(request, passed_data={}):
+    data = diffpatch_data(request, passed_data)
+    data['this_mission_page_short_name'] = 'About'
+    return (request, 'missions/diffpatch_mission_recursive_patch.html', data)
+
+@view
+def diffpatch_mission_recursive_diff(request, passed_data={}):
+    data = diffpatch_data(request, passed_data)
+    data['this_mission_page_short_name'] = 'About'
+    return (request, 'missions/diffpatch_mission_recursive_diff.html', data)
 
 @login_required
 def diffpatch_patchsingle_submit(request):
@@ -166,7 +190,7 @@ def diffpatch_patchsingle_submit(request):
             else:
                 data['patchsingle_error_message'] = 'The file did not match the contents it should have.'
         data['patchsingle_form'] = form
-    return diffpatch_mission(request, data)
+    return diffpatch_mission_single_file_patch(request, data)
 
 def diffpatch_diffsingle_get_original_file(request):
     return make_download(open(controllers.DiffSingleFileMission.OLD_FILE).read(),
@@ -185,7 +209,7 @@ def diffpatch_diffsingle_submit(request):
             except controllers.IncorrectPatch, e:
                 data['diffsingle_error_message'] = str(e)
         data['diffsingle_form'] = form
-    return diffpatch_mission(request, data)
+    return diffpatch_mission_single_file_diff(request, data)
 
 def diffpatch_diffrecursive_get_original_tarball(request):
     return make_download(controllers.DiffRecursiveMission.synthesize_tarball(), filename=controllers.DiffRecursiveMission.TARBALL_NAME)
@@ -203,7 +227,7 @@ def diffpatch_diffrecursive_submit(request):
             except controllers.IncorrectPatch, e:
                 data['diffrecursive_error_message'] = str(e)
         data['diffrecursive_form'] = form
-    return diffpatch_mission(request, data)
+    return diffpatch_mission_recursive_diff(request, data)
 
 def diffpatch_patchrecursive_get_original_tarball(request):
     return make_download(controllers.PatchRecursiveMission.synthesize_tarball(), filename=controllers.PatchRecursiveMission.BASE_NAME+'.tar.gz')
@@ -226,4 +250,4 @@ def diffpatch_patchrecursive_submit(request):
                 controllers.set_mission_completed(request.user.get_profile(), 'diffpatch_patchrecursive')
                 data['patchrecursive_success'] = True
         data['patchrecursive_form'] = form
-    return diffpatch_mission(request, data)
+    return diffpatch_mission_recursive_patch(request, data)
