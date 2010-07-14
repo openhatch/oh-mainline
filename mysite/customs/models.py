@@ -54,6 +54,29 @@ class WebResponse(models.Model):
     def create_from_http_error(error):
         return None
 
+class SeparatedValuesField(models.TextField):
+    '''As exemplified on www.davidcramer.net'''
+    __metaclass__ = models.SubfieldBase
+
+    def __init__(self, *args, **kwargs):
+        self.token = kwargs.pop('token', ',')
+        super(SeparatedValuesField, self).__init__(*args, **kwargs)
+
+    def to_python(self, value):
+        if not value: return
+        if isinstance(value, list):
+            return value
+        return value.split(self.token)
+
+    def get_db_prep_value(self, value):
+        if not value: return
+        assert(isinstance(value, list) or isinstance(value, tuple))
+        return self.token.join([unicode(s) for s in value])
+
+    def value_to_string(self, obj):
+        value = self._get_val_from_obj(obj)
+        return self.get_db_prep_value(value)
+
 class BugzillaTracker(models.Model)
     '''This model stores the data for individual Bugzilla trackers.'''
     project_name = models.CharField(max_length=200, unique=True,
@@ -66,9 +89,8 @@ class BugzillaTracker(models.Model)
             ('tracker', 'Tracker bug URL')
             )
     query_url_type = models.CharField(max_length=20, choices=QUERY_URL_TYPES)
-    # FIXME: Need to be able to store more than one URL for some XML queries.
-    query_url = models.URLField(max_length=200, unique=True,
-                                blank=False, null=False)
+    query_url = models.SeparatedValuesField(max_length=200, unique=True,
+                                            blank=False, null=False)
     BITESIZED_TYPES = (
             (None, 'None'),
             ('key', 'Keyword'),
