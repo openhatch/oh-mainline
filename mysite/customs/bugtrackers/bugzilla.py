@@ -341,9 +341,10 @@ def bugzilla_tracker_factory(params):
         return ret_dict
 
     # Create 'generate_bug_project_name' method
-    # FIXME: Implement this properly.
-    def generate_bug_project_name(self, bb):
-        return params['project_name']
+    # FIXME: Implement this properly. Until this is done, trackers that overload
+    # this function will remain as special cases.
+    #def generate_bug_project_name(self, bb):
+        #return params['project_name']
 
     # Generate class dictionary
     # All sub-classes have '__init__' and 'extract_tracker_specific_data' methods
@@ -360,7 +361,10 @@ def bugzilla_tracker_factory(params):
     # A sub-class will only overload the 'generate_bug_project_name' method
     # if the 'bug_project_name_format' parameter is not used.
     if not params.get('bug_project_name_format'):
-        class_dict['generate_bug_project_name'] = generate_bug_project_name
+        # FIXME: Once implemented properly this will be uncommented.
+        # For now, error out.
+        #class_dict['generate_bug_project_name'] = generate_bug_project_name
+        raise ValueError('bug_project_name_format must be defined - overloading not supported at this time.')
 
     # Return the generated sub-class.
     sub-class_name = '%sBugzilla' % params['project_name'].replace(' ', '')
