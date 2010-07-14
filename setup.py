@@ -32,6 +32,7 @@ setup(
                         'hexagonit.recipe.download',
                         'django-voting',
                         'staticgenerator==1.4.1.2-openhatch',
+                        'python-otp',
                         'python-launchpad-bugs',
                         'html2text',
                         'lockfile>=0.9', # as of this writing, pypi only has version 0.8
@@ -52,6 +53,7 @@ setup(
                         'http://linode.openhatch.org/~rafpaf/django-debug-toolbar-0.8.1.tar.gz#egg=django-debug-toolbar',
                         'http://linode.openhatch.org/~parker/django-voting-0.1.tar.gz#egg=django-voting',
                         dependency_path + 'staticgenerator-1.4.1.2-openhatch.tar.gz#egg=staticgenerator',
+                        dependency_path + 'python-otp.tar.gz#egg=python-otp',
                        ],
 
     zip_safe = False,
