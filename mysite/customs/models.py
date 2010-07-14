@@ -54,3 +54,36 @@ class WebResponse(models.Model):
     def create_from_http_error(error):
         return None
 
+class BugzillaTracker(models.Model)
+    '''This model stores the data for individual Bugzilla trackers.'''
+    project_name = models.CharField(max_length=200, unique=True,
+                                    blank=False, null=False)
+    base_url = models.URLField(max_length=200, unique=True,
+                               blank=False, null=False)
+    bug_project_name_format = models.CharField(max_length=200)
+    QUERY_URL_TYPES = (
+            ('xml', 'Bug XML query'),
+            ('tracker', 'Tracker bug URL')
+            )
+    query_url_type = models.CharField(max_length=20, choices=QUERY_URL_TYPES)
+    # FIXME: Need to be able to store more than one URL for some XML queries.
+    query_url = models.URLField(max_length=200, unique=True,
+                                blank=False, null=False)
+    BITESIZED_TYPES = (
+            (None, 'None'),
+            ('key', 'Keyword'),
+            ('wboard', 'Whiteboard tag')
+            )
+    bitesized_type = models.CharField(max_length=10, choices=BITESIZED_TYPES)
+    bitesized_text = models.CharField(max_length=200, blank=True, default='')
+    DOCUMENTATION_TYPES = (
+            (None, 'None'),
+            ('key', 'Keyword'),
+            ('comp', 'Component'),
+            ('prod', 'Product')
+            )
+    documentation_type = models.CharField(max_length=10, choices=DOCUMENTATION_TYPES)
+    documentation_text = models.CharField(max_length=200, blank=True, default='')
+    as_appears_in_distribution = models.CharField(max_length=200, blank=True, default='')
+
+    all_trackers = models.Manager()
