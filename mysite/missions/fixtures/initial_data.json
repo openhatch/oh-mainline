@@ -22,5 +22,9 @@
   {"model": "missions.Step",
    "pk": 6,
    "fields": {"name": "diffpatch_patchrecursive"}
+  },
+  {"model": "missions.Step",
+   "pk": 7,
+   "fields": {"name": "svn_checkout"}
   }
 ]
