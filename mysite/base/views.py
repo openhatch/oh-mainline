@@ -186,7 +186,7 @@ def meta(request):
     my['Bugs last polled more than two days ago (in percent)'] = (
         mysite.search.models.Bug.all_bugs.filter(
         last_polled__lt=two_days_ago).count() * 100.0 /
-        mysite.search.models.Bug.all_bugs.count())        
+        mysite.search.models.Bug.all_bugs.count())
 
     return (request, 'meta.html', data)
 
