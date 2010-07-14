@@ -643,7 +643,7 @@ class PortfolioEntry(models.Model):
         return PortfolioEntry.create_dummy(**data)
 
     class Meta:
-        ordering = ('sort_order', '-id')
+        ordering = ('-sort_order', '-id')
 
 # FIXME: Add a DataSource class to DataImportAttempt.
 

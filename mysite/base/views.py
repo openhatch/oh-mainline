@@ -201,7 +201,7 @@ def save_portfolio_entry_ordering_do(request):
             are_we_archiving_yet = True
             continue
         pfe = PortfolioEntry.objects.get(id=int(id), person__user=request.user)
-        pfe.sort_order = n
+        pfe.sort_order = -n # negated so we can sort descending
         pfe.is_archived = are_we_archiving_yet
         pfe.save()
     return HttpResponse('1')
