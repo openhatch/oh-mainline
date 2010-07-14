@@ -88,10 +88,14 @@ def _get_repositories_user_watches(github_username):
     return data['repositories']
 
 def repos_user_collaborates_on(github_username):
-    # First, make a big set of candidates: all the repos the user watches
-    watched = _get_repositories_user_watches(github_username)
-    # Now filter that down to just the ones not owned by the user
-    not_owned = [r for r in watched if r['owner'] != github_username]
+    if '@' in github_username:
+        watched = []
+        not_owned = []
+    else:
+        # First, make a big set of candidates: all the repos the user watches
+        watched = _get_repositories_user_watches(github_username)
+        # Now filter that down to just the ones not owned by the user
+        not_owned = [r for r in watched if r['owner'] != github_username]
     # Now ask github.com if, for each repo, github_username is a collaborator
     for repo in not_owned:
         collaborators = _github.repos.list_collaborators('%s/%s' % (

@@ -769,6 +769,26 @@ class OnlineGithubFailures(django.test.TestCase):
         repos = list(mysite.customs.github.repos_by_username('will_never_be_found_PDo7jHoi'))
         self.assertEqual(repos, [])
 
+    @mock.patch('mysite.customs.github._github_repos_list')
+    def test_username_with_at_sign(self, mock_repo_list):
+        '''This test gives our github info_by_username a user to 404 on .'''
+        repos = list(mysite.customs.github.repos_by_username('something@example.com'))
+        self.assertFalse(mock_repo_list.called)
+        self.assertEqual(repos, [])
+
+    @mock.patch('mysite.customs.github._github_repos_list')
+    def test_username_with_at_sign(self, mock_repo_list):
+        '''This test gives our github info_by_username a user to 404 on .'''
+        repos = list(mysite.customs.github.repos_by_username('something@example.com'))
+        self.assertFalse(mock_repo_list.called)
+        self.assertEqual(repos, [])
+
+    @mock.patch('mysite.customs.github._get_repositories_user_watches')
+    def test_at_sign_user_watch_list(self, mock_method_that_should_not_be_called):
+        things = list(mysite.customs.github.repos_user_collaborates_on('something@example.com'))
+        self.assertFalse(mock_method_that_should_not_be_called.called)
+        self.assertEqual(things, [])
+
     def test_username_space_404(self):
         '''This test gives our github info_by_username a user to 404 on .'''
         repos = list(mysite.customs.github.repos_by_username('will_never_be_found misterr PDo7jHoi'))
