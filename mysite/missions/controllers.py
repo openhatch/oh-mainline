@@ -8,9 +8,11 @@ import sys
 import difflib
 import patch
 import re
-
+from ConfigParser import RawConfigParser
 import subprocess
 import shutil
+import binascii
+import otp
 
 def get_mission_data_path():
     return os.path.join(os.path.dirname(__file__), 'data')
@@ -240,6 +242,24 @@ class SvnRepositoryManager(object):
         if os.path.isdir(repo_path):
             shutil.rmtree(repo_path)
         subprocess.check_call(['svnadmin', 'create', '--fs-type', 'fsfs', repo_path])
+
+        # Configure the repository so svnserve uses a password file stored within it.
+        svnserve_conf_path = os.path.join(repo_path, 'conf', 'svnserve.conf')
+        svnserve_conf = RawConfigParser()
+        svnserve_conf.read(svnserve_conf_path)
+        svnserve_conf.set('general', 'anon-access', 'read')
+        svnserve_conf.set('general', 'auth-access', 'write')
+        svnserve_conf.set('general', 'password-db', 'passwd')
+        svnserve_conf.write(open(svnserve_conf_path, 'w'))
+
+        # Assign a password for the user.
+        password = otp.OTP().reformat(binascii.hexlify(os.urandom(8)), format='words').lower()
+        passwd_path = os.path.join(repo_path, 'conf', 'passwd')
+        passwd_file = RawConfigParser()
+        passwd_file.read(passwd_path)
+        passwd_file.set('users', username, password)
+        passwd_file.write(open(passwd_path, 'w'))
+
         dumploader = subprocess.Popen(['svnadmin', 'load', '--ignore-uuid', repo_path], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
         dumploader.communicate(open(os.path.join(get_mission_data_path(), cls.INITIAL_CONTENT)).read())
         if dumploader.returncode != 0:
