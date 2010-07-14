@@ -15,6 +15,7 @@ import tempfile
 import subprocess
 import difflib
 import shutil
+import random
 
 def make_testdata_filename(filename):
     return os.path.join(os.path.dirname(__file__), 'testdata', filename)
@@ -419,6 +420,17 @@ class SvnViewTests(TwillTests):
         if os.path.isdir(self.repo_path):
             shutil.rmtree(self.repo_path)
 
+        # Fire up an svnserve for the repository path.
+        port = random.randint(50000, 50100)
+        self.svnserve = subprocess.Popen(['svnserve', '--listen-port', str(port),
+                                                      '--listen-host', '127.0.0.1',
+                                                      '--daemon', '--foreground',
+                                                      '--root', settings.SVN_REPO_PATH])
+        settings.SVN_REPO_URL_PREFIX = 'svn://127.0.0.1:%d/' % port
+
+    def tearDown(self):
+        self.svnserve.terminate()
+
     def test_resetrepo_returns_error_with_get(self):
         response = self.client.get(reverse(views.svn_resetrepo))
         self.assert_(response.status_code == 405)
@@ -426,3 +438,24 @@ class SvnViewTests(TwillTests):
     def test_resetrepo_creates_valid_repo(self):
         self.client.post(reverse(views.svn_resetrepo))
         subprocess.check_call(['svn', 'info', 'file://'+self.repo_path])
+
+    def test_do_checkout_mission_correctly(self):
+        self.client.post(reverse(views.svn_resetrepo))
+        response = self.client.get(reverse(views.svn_checkout))
+        checkoutdir = tempfile.mkdtemp()
+        try:
+            subprocess.check_call(['svn', 'checkout', response.context['checkout_url'], checkoutdir])
+            word = open(os.path.join(checkoutdir, response.context['secret_word_file'])).read().strip()
+            response = self.client.post(reverse(views.svn_checkout_submit), {'secret_word': word})
+            self.assert_(response.context['svn_checkout_success'])
+            paulproteus = Person.objects.get(user__username='paulproteus')
+            self.assert_(controllers.mission_completed(paulproteus, 'svn_checkout'))
+        finally:
+            shutil.rmtree(checkoutdir)
+
+    def test_do_checkout_mission_incorrectly(self):
+        self.client.post(reverse(views.svn_resetrepo))
+        response = self.client.post(reverse(views.svn_checkout_submit), {'secret_word': 'not_the_secret_word'})
+        self.assertFalse(response.context['svn_checkout_success'])
+        paulproteus = Person.objects.get(user__username='paulproteus')
+        self.assertFalse(controllers.mission_completed(paulproteus, 'svn_checkout'))

@@ -262,11 +262,20 @@ def svn_resetrepo(request):
 def svn_data(request, passed_data={}):
     data = {
       'mission_name': 'Using Subversion',
+      'svn_checkout_success': False,
+      'svn_checkout_form': forms.SvnCheckoutForm(),
+      'svn_checkout_error_message': '',
     }
     if request.user.is_authenticated():
         data.update({
             'repository_exists': controllers.SvnRepositoryManager.repository_exists(request.user.username),
-            })
+            'svn_checkout_done': controllers.mission_completed(request.user.get_profile(), 'svn_checkout'),
+        })
+        if data['repository_exists']:
+          data.update({
+            'checkout_url': controllers.SvnRepositoryManager.repository_trunk_url(request.user.username),
+            'secret_word_file': controllers.SvnRepositoryManager.SECRET_WORD_FILE,
+          })
     data.update(passed_data)
     return data
 
@@ -275,3 +284,24 @@ def svn_mission_about(request, passed_data={}):
     data = svn_data(request, passed_data)
     data['this_mission_page_short_name'] = 'About'
     return (request, 'missions/svn_about.html', data)
+
+@login_required
+@view
+def svn_checkout(request, passed_data={}):
+    data = svn_data(request, passed_data)
+    data['this_mission_page_short_name'] = 'Checking out'
+    return (request, 'missions/svn_checkout.html', data)
+
+@login_required
+def svn_checkout_submit(request):
+    data = {}
+    if request.method == 'POST':
+        form = forms.SvnCheckoutForm(request.POST)
+        if form.is_valid():
+            if form.cleaned_data['secret_word'] == controllers.SvnRepositoryManager.get_secret_word(request.user.username):
+                controllers.set_mission_completed(request.user.get_profile(), 'svn_checkout')
+                data['svn_checkout_success'] = True
+            else:
+                data['svn_checkout_error_message'] = 'The secret word is incorrect.'
+        data['svn_checkout_form'] = form
+    return svn_checkout(request, data)

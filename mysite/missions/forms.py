@@ -18,3 +18,6 @@ class DiffRecursiveUploadForm(forms.Form):
 class PatchRecursiveUploadForm(forms.Form):
     children_hats = forms.IntegerField()
     lizards_hats = forms.IntegerField()
+
+class SvnCheckoutForm(forms.Form):
+    secret_word = forms.CharField(error_messages={'required': 'No secret word was given.'})

@@ -235,6 +235,7 @@ class PatchRecursiveMission(object):
 
 class SvnRepositoryManager(object):
     INITIAL_CONTENT = 'svn-initial.svndump'
+    SECRET_WORD_FILE = 'word.txt'
 
     @classmethod
     def reset_repository(cls, username):
@@ -268,3 +269,16 @@ class SvnRepositoryManager(object):
     @classmethod
     def repository_exists(cls, username):
         return os.path.isdir(os.path.join(settings.SVN_REPO_PATH, username))
+
+    @classmethod
+    def repository_trunk_url(cls, username):
+        return settings.SVN_REPO_URL_PREFIX + username + '/trunk'
+
+    @classmethod
+    def get_secret_word(cls, username):
+        svn_path = 'file://' + os.path.join(settings.SVN_REPO_PATH, username, 'trunk', cls.SECRET_WORD_FILE)
+        svn_cat = subprocess.Popen(['svn', 'cat', svn_path], stdout=subprocess.PIPE)
+        word = svn_cat.stdout.read().strip()
+        if svn_cat.wait() != 0:
+            raise RuntimeError, 'svn cat failed'
+        return word
