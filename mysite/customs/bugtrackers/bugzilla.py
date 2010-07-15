@@ -293,8 +293,8 @@ def bugzilla_tracker_factory(bt):
     def __init__(self):
         BugzillaBugTracker.__init__(self,
                                     base_url=bt.base_url,
-                                    project_name=bt.project_name
-                                    bug_project_name_format=bt.bug_project_name_format
+                                    project_name=bt.project_name,
+                                    bug_project_name_format=bt.bug_project_name_format)
 
     # Create bug query methods. It doesn't matter what type of query url
     # is stored, since the incorrectly generated method will not be used
@@ -323,7 +323,7 @@ def bugzilla_tracker_factory(bt):
 
         # Bitesized bug checks
         # Check for the bitesized keyword if it exists
-        if bt.bitesized_type == 'key'::
+        if bt.bitesized_type == 'key':
             ret_dict['good_for_newcomers'] = (bt.bitesized_text in keywords)
             ret_dict['bite_size_tag_name'] = bt.bitesized_text
         # No keyword. Check for the bitsized whiteboard tag if it exists
@@ -368,14 +368,14 @@ def bugzilla_tracker_factory(bt):
 
     # A sub-class will have either a 'generate_current_bug_xml' method or
     # a 'get_current_bug_id_list' method.
-    if bt.query_url_type = 'xml':
+    if bt.query_url_type == 'xml':
         class_dict['generate_current_bug_xml'] = generate_current_bug_xml
     else:
         class_dict['get_current_bug_id_list'] = get_current_bug_id_list
 
     # Return the generated sub-class.
-    sub-class_name = '%sBugzilla' % bt.project_name.replace(' ', '')
-    return type(sub-class_name, (BugzillaBugTracker,), class_dict)
+    subclass_name = '%sBugzilla' % bt.project_name.replace(' ', '')
+    return type(subclass_name, (BugzillaBugTracker,), class_dict)
 
 ############################################################
 # Generator of sub-classes from data
@@ -386,9 +386,11 @@ def generate_bugzilla_tracker_classes(tracker_name=None):
     if tracker_name:
         try:
             bt = customs.models.BugzillaTracker.all_trackers.get(project_name=tracker_name)
-            return bugzilla_tracker_factory(bt)
+            bt_class = bugzilla_tracker_factory(bt)
         except mysite.customs.models.BugzillaTracker.DoesNotExist:
-            return None
+            bt_class = None
+        yield bt_class
+        return
     else:
         # Create a generator that yields all sub-classes.
         for bt in mysite.customs.models.BugzillaTracker.all_trackers.all():
