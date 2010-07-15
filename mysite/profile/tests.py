@@ -985,7 +985,7 @@ class AddCitationManually(TwillTests):
         input_data = {
                 'portfolio_entry': portfolio_entry.pk,
                 'form_container_element_id': 'form_container_%d' % 0,
-                'url': 'http://cthuugle.com/' # Needs this trailing slash to work.
+                'url': 'http://google.com/' # Needs this trailing slash to work.
                 }
 
         # Send this data to the appropriate view.
