@@ -977,8 +977,9 @@ class AddCitationManually(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
 
     def test_add_citation_manually(self):
+        proj = Project.create_dummy(name='project name')
         portfolio_entry, _ = PortfolioEntry.objects.get_or_create(
-            project=Project.objects.get_or_create(name='project name')[0],
+            project=proj,
             person=Person.objects.get(user__username='paulproteus'))
 
         input_data = {
