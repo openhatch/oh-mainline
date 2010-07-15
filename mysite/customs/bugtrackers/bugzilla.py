@@ -181,8 +181,10 @@ class BugzillaBugTracker(object):
         self.bug_id_list_only = bug_id_list_only
 
     def generate_bug_xml_from_queries(self, queries):
-        for query_name in queries:
-            query_url = queries[query_name]
+        # If a dictionary has been passed in, convert it to a list.
+        if type(queries) == type({}):
+            queries = [queries[query_name] for query_name in queries]
+        for query_url in queries:
             # Check if this url has been accessed in the last day
             if url_is_more_fresh_than_one_day(query_url):
                 # Sweet, ignore this one and go on.
@@ -193,6 +195,9 @@ class BugzillaBugTracker(object):
                 yield bug_xml
 
     def get_bug_id_list_from_tracker_bug_urls(self, tracker_bug_urls):
+        # If a dictionary has been passed in, convert it to a list.
+        if type(tracker_bug_urls) == type({}):
+            tracker_bug_urls = [tracker_bug_urls[tracker_bug_name] for tracker_bug_name in tracker_bug_urls]
         bug_ids = []
         for tracker_bug_url in tracker_bug_urls:
             bug_ids += mysite.customs.bugtrackers.bugzilla.tracker_bug2bug_ids(tracker_bug_url)
