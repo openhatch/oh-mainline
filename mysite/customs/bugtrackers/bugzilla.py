@@ -192,6 +192,12 @@ class BugzillaBugTracker(object):
             for bug_xml in query_xml.xpath('bug'):
                 yield bug_xml
 
+    def get_bug_id_list_from_tracker_bug_urls(self, tracker_bug_urls):
+        bug_ids = []
+        for tracker_bug_url in tracker_bug_urls:
+            bug_ids += mysite.customs.bugtrackers.bugzilla.tracker_bug2bug_ids(tracker_bug_url)
+        return list(set(bug_ids))
+
     def generate_bug_project_name(self, bb):
         return self.bug_project_name_format.format(
                 project = self.project_name,
@@ -291,12 +297,15 @@ def bugzilla_tracker_factory(bt):
 
     # Create 'generate_current_bug_xml' method
     def generate_current_bug_xml(self):
-        queries = bt.query_url
-        return self.generate_bug_xml_from_queries(queries)
+        queries = bt.bugzillaurl_set.all()
+        query_urls = [query.url for query in queries]
+        return self.generate_bug_xml_from_queries(query_urls)
 
     # Create 'get_current_bug_id_list' method
     def get_current_bug_id_list(self):
-        return mysite.customs.bugtrackers.bugzilla.tracker_bug2bug_ids(bt.query_url)
+        tracker_bugs = bt.bugzillaurl_set.all()
+        tracker_bug_urls = [tb.url for tb in tracker_bugs]
+        return self.get_bug_id_list_from_tracker_bugs(tracker_bug_urls)
 
     # Create 'extract_tracker_specific_data' method
     @staticmethod
@@ -664,8 +673,10 @@ class FedoraBugzilla(BugzillaBugTracker):
                                     bug_id_list_only=True)
 
     def get_current_bug_id_list(self):
-        return mysite.customs.bugtrackers.bugzilla.tracker_bug2bug_ids(
-                'https://bugzilla.redhat.com/show_bug.cgi?ctype=xml&id=509829')
+        tracker_bug_urls = [
+                'https://bugzilla.redhat.com/show_bug.cgi?ctype=xml&id=509829'
+                ]
+        return self.get_bug_id_list_from_tracker_bug_urls(tracker_bug_urls)
 
     @staticmethod
     def extract_tracker_specific_data(xml_data, ret_dict):
