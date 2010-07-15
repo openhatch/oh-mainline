@@ -77,19 +77,19 @@ class SeparatedValuesField(models.TextField):
         value = self._get_val_from_obj(obj)
         return self.get_db_prep_value(value)
 
-class BugzillaTracker(models.Model)
+class BugzillaTracker(models.Model):
     '''This model stores the data for individual Bugzilla trackers.'''
     project_name = models.CharField(max_length=200, unique=True,
                                     blank=False, null=False)
     base_url = models.URLField(max_length=200, unique=True,
                                blank=False, null=False)
-    bug_project_name_format = models.CharField(max_length=200)
+    bug_project_name_format = models.CharField(max_length=200, blank=False)
     QUERY_URL_TYPES = (
             ('xml', 'Bug XML query'),
             ('tracker', 'Tracker bug URL')
             )
     query_url_type = models.CharField(max_length=20, choices=QUERY_URL_TYPES)
-    query_url = models.SeparatedValuesField(max_length=200, unique=True,
+    query_url = SeparatedValuesField(max_length=200, unique=True,
                                             blank=False, null=False)
     BITESIZED_TYPES = (
             (None, 'None'),
