@@ -36,7 +36,7 @@ def signup_do(request):
     # {{{
     post = {}
     post.update(dict(request.POST.items()))
-    post['password2'] = post['password1'] 
+    post['password2'] = post.get('password1', '')
     signup_form = mysite.account.forms.UserCreationFormWithEmail(post)
     if signup_form.is_valid():
 
