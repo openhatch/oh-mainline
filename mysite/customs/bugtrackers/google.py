@@ -1,4 +1,5 @@
 import datetime
+import hashlib
 import logging
 
 import gdata.projecthosting.client
@@ -21,7 +22,7 @@ def get_client(username=None, password=None):
         # Return unauthenticated client
         return client
 
-def create_google_query(**kwargs)
+def create_google_query(**kwargs):
     # We only need to be able to search these fields.
     # So ignore any others.
     allowed_keys = [
@@ -69,7 +70,7 @@ class GoogleBug:
         self.client = client
 
     def _bug_id_from_bug_data(self):
-        id_url = self.get_bug_atom_data().id
+        id_url = self.get_bug_atom_data().id.text
         base, num = id_url.rsplit('/', 1)
         return int(num)
 
@@ -90,24 +91,27 @@ class GoogleBug:
         # FIXME: We could get absolutely everyone involved using comments,
         # but that would require an extra network call per bug.
 
-        # Add everyone who is on CC: list, if any
-        try:
-            everyone = [cc.issues.username.text for cc in issue.issues.cc]
-        except KeyError:
-            everyone = []
+        # Add everyone who is on CC: list
+        everyone = [cc.username.text for cc in issue.cc]
         # Add author
-        everyone.append(issue.author.name.text)
+        if type(issue.author) == type([]):
+            for author in issue.author:
+                everyone.append(author.name.text)
+        else:
+            everyone.append(issue.author.name.text)
         # Add owner if there
-        try:
-            everyone.append(issue.issues.owner.text)
-        except KeyError:
-            pass
+        if issue.owner:
+            if type(issue.owner) == type([]):
+                for owner in issue.owner:
+                    everyone.append(owner.username.text)
+            else:
+                everyone.append(issue.owner.username.text)
         # Return length of the unique set of everyone.
         return len(set(everyone))
 
     @staticmethod
     def google_date_to_datetime(date_string):
-        pass
+        return mysite.base.helpers.string2naive_datetime(date_string)
 
     @staticmethod
     def google_find_label_type(labels, type_string):
@@ -125,12 +129,12 @@ class GoogleBug:
                 'title': issue.title.text,
                 'description': issue.content.text,
                 'status': issue.status.text,
-                'importance': google_find_label_type(issue.label, 'Priority')
+                'importance': self.google_find_label_type(issue.label, 'Priority'),
                 'people_involved': self.google_count_people_involved(issue),
                 'date_reported': self.google_date_to_datetime(issue.published.text),
                 'last_touched': self.google_date_to_datetime(issue.updated.text),
-                'submitter_username': issue.author[0].name.text
-                'submitter_realname': '' # Can't get this from Google
+                'submitter_username': issue.author[0].name.text,
+                'submitter_realname': '', # Can't get this from Google
                 'canonical_bug_link': self.as_bug_specific_url(),
                 'looks_closed': (issue.state.text == 'closed')
                 }
@@ -143,13 +147,22 @@ class GoogleBug:
 def query_is_more_fresh_than_one_day(google_name, query):
     # Generate a key for this particular combination of google_name
     # and query.
-    data_string = google_query
-    for item in dir(query)[19:]:
-        if item is not None:
-            for n in item:
-                # This ensures that both objects in query that are lists and
-                # ones that are just strings get appended to the data_string.
-                data_string += n
+    data_string = google_name
+    allowed_keys = [
+            'issue_id',
+            'label',
+            'canned_query',
+            'owner',
+            'status',
+            'text_query',
+            'author']
+    for key in dir(query)[19:]:
+        if key in allowed_keys:
+            if getattr(query, key):
+                for n in getattr(query, key):
+                    # This ensures that both objects in query that are lists and
+                    # ones that are just strings get appended to the data_string.
+                    data_string += n
     key = '_google_freshness_' + hashlib.sha1(data_string).hexdigest()
 
     # First, get a timestamp we can check
@@ -159,7 +172,7 @@ def query_is_more_fresh_than_one_day(google_name, query):
     query_is_fresh = (query_age < datetime.timedelta(days=1))
     # SIDE EFFECT: This function bumps that timestamp!
     mysite.base.models.Timestamp.update_timestamp_for_string(key)
-    return query_is_fresh
+    return False#query_is_fresh
 
 class GoogleBugTracker(object):
     def __init__(self, project_name, google_name):
@@ -170,7 +183,7 @@ class GoogleBugTracker(object):
     def generate_bug_atom_from_queries(self, queries):
         for query in queries:
             # Check if this query has been accessed in the last day
-            if query_is_more_fresh_than_one_day(google_name, query):
+            if query_is_more_fresh_than_one_day(self.google_name, query):
                 # Sweet, ignore this one and go on.
                 logging.info("[Google] A query for %s is fresh, skipping it..." % self.project_name)
                 continue
@@ -182,7 +195,7 @@ class GoogleBugTracker(object):
         bug_id = gb.bug_id
         bug_url = gb.as_bug_specific_url()
 
-        try::
+        try:
             bug = mysite.search.models.Bug.all_bugs.get(
                     canonical_bug_link=bug_url)
             # Found an existing bug. Does it need refreshing?
@@ -206,7 +219,7 @@ class GoogleBugTracker(object):
 
         # Find or create the project for the bug and save it
         # For now, just use project_name
-        bug_project_name = project_name
+        bug_project_name = self.project_name
         project_from_name, _ = mysite.search.models.Project.objects.get_or_create(name=bug_project_name)
         if bug.project_id != project_from_name.id:
             bug.project = project_from_name
@@ -217,18 +230,18 @@ class GoogleBugTracker(object):
 
     def refresh_all_bugs(self):
         for bug in mysite.search.models.Bug.all_bugs.filter(
-                canonical_bug_link__contains="http://code.google.com/p/%/" % self.google_name):
+                canonical_bug_link__contains="http://code.google.com/p/%s/" % self.google_name):
             gb = GoogleBug.from_url(
                     bug.canonical_bug_link, self.client)
             self.create_or_refresh_one_google_bug(gb=gb)
 
     def update(self):
         logging.info("[Google] Started refreshing all %s bugs." % self.project_name)
-        logging.info("[Google] Fetching XML data for bugs in tracker...")
-        for bug_data in self.generate_current_bug_xml():
+        logging.info("[Google] Fetching Atom data for bugs in tracker...")
+        for bug_data in self.generate_current_bug_atom():
             gb = GoogleBug(
                     google_name=self.google_name,
-                    client=self.client
+                    client=self.client,
                     bug_data=bug_data)
             self.create_or_refresh_one_google_bug(gb=gb)
         # Now refresh any bugs that we missed (i.e. they are
@@ -249,10 +262,12 @@ class SymPyGoogle(GoogleBugTracker):
     def generate_current_bug_atom(self):
         query_data = [
                 {
-                    'canned_query': 'open'
+                    'canned_query': 'open',
                 }
                 ]
-        queries = map(create_google_query, query_data)
+        queries = []
+        for kwargs in query_data:
+            queries.append(create_google_query(**kwargs))
         return self.generate_bug_atom_from_queries(queries)
 
     @staticmethod
