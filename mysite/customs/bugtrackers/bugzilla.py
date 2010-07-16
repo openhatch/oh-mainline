@@ -294,7 +294,8 @@ def bugzilla_tracker_factory(bt):
         BugzillaBugTracker.__init__(self,
                                     base_url=bt.base_url,
                                     project_name=bt.project_name,
-                                    bug_project_name_format=bt.bug_project_name_format)
+                                    bug_project_name_format=bt.bug_project_name_format,
+                                    bug_id_list_only=(bt.query_url_type=='tracker'))
 
     # Create bug query methods. It doesn't matter what type of query url
     # is stored, since the incorrectly generated method will not be used
