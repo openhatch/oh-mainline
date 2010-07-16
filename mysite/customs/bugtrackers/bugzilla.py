@@ -375,7 +375,7 @@ def bugzilla_tracker_factory(bt):
 
     # Return the generated sub-class.
     subclass_name = '%sBugzilla' % bt.project_name.replace(' ', '')
-    return type(subclass_name, (BugzillaBugTracker,), class_dict)
+    return type(subclass_name.encode('ascii'), (BugzillaBugTracker,), class_dict)
 
 ############################################################
 # Generator of sub-classes from data
@@ -385,7 +385,7 @@ def generate_bugzilla_tracker_classes(tracker_name=None):
     # specific sub-class for that tracker.
     if tracker_name:
         try:
-            bt = customs.models.BugzillaTracker.all_trackers.get(project_name=tracker_name)
+            bt = mysite.customs.models.BugzillaTracker.all_trackers.get(project_name=tracker_name)
             bt_class = bugzilla_tracker_factory(bt)
         except mysite.customs.models.BugzillaTracker.DoesNotExist:
             bt_class = None
