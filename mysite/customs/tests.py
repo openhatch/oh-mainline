@@ -330,7 +330,7 @@ class BugzillaTests(django.test.TestCase):
         self.assertEqual(bug.submitter_realname, '')
 
     @mock.patch("mysite.customs.bugtrackers.bugzilla.url2bug_data")
-    def test_miro_bug_object(self, mock_xml_opener):
+    def test_old_miro_bug_object(self, mock_xml_opener):
         # Parse XML document as if we got it from the web
         mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
             settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml')).read())
@@ -358,7 +358,7 @@ Keywords: Torrent unittest""")
         self.assert_(bug.good_for_newcomers)
 
     @mock.patch("mysite.customs.bugtrackers.bugzilla.url2bug_data")
-    def test_full_grab_miro_bugs(self, mock_xml_opener):
+    def test_old_full_grab_miro_bugs(self, mock_xml_opener):
         mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
             settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml')).read())
 
@@ -376,7 +376,7 @@ Keywords: Torrent unittest""")
 
 
     @mock.patch("mysite.customs.bugtrackers.bugzilla.url2bug_data")
-    def test_miro_bugzilla_detects_closedness(self, mock_xml_opener):
+    def test_old_miro_bugzilla_detects_closedness(self, mock_xml_opener):
         cooked_xml = open(os.path.join(
             settings.MEDIA_ROOT, 'sample-data',
             'miro-2294-2009-08-06.xml')).read().replace(
@@ -396,7 +396,7 @@ Keywords: Torrent unittest""")
         self.assertEqual(Bug.open_ones.all().count(), 0)
 
     @mock.patch("mysite.customs.bugtrackers.bugzilla.url2bug_data")
-    def test_full_grab_resolved_miro_bug(self, mock_xml_opener):
+    def test_old_full_grab_resolved_miro_bug(self, mock_xml_opener):
         mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
             settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06-RESOLVED.xml')).read())
 
@@ -410,7 +410,7 @@ Keywords: Torrent unittest""")
         self.assert_(bug.looks_closed)
 
     @mock.patch("mysite.customs.bugtrackers.bugzilla.url2bug_data")
-    def test_full_grab_miro_bugs_refreshes_older_bugs(self, mock_xml_opener):
+    def test_old_full_grab_miro_bugs_refreshes_older_bugs(self, mock_xml_opener):
         mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
             settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml')).read())
         miro = mysite.customs.bugtrackers.bugzilla.MiroBugzilla()
@@ -427,6 +427,230 @@ Keywords: Torrent unittest""")
 
         # Now refresh
         miro.update()
+
+        # Now verify there is only one bug, and its people_involved is 5
+        bug = Bug.all_bugs.get()
+        self.assertEqual(bug.people_involved, 5)
+
+
+    @mock.patch("mysite.customs.bugtrackers.bugzilla.url2bug_data")
+    @mock.patch("mysite.customs.bugtrackers.bugzilla.MiroBugzilla.generate_current_bug_xml")
+    def test_old_regrab_miro_bugs_refreshes_older_bugs_even_when_missing_from_csv(self, mock_xml_bug_tree, mock_xml_opener):
+        mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
+            settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml')).read())
+
+        # Situation: Assume there are zero bitesized bugs today.
+        # Desire: We re-get old bugs that don't show up in the xml bug list.
+
+        # Prereq: We have some bug with lame data:
+        bug = Bug()
+        bug.people_involved = 1
+        bug.canonical_bug_link = 'http://bugzilla.pculture.org/show_bug.cgi?id=2294'
+        bug.date_reported = datetime.datetime.now()
+        bug.last_touched = datetime.datetime.now()
+        bug.last_polled = datetime.datetime.now() - datetime.timedelta(days = 2)
+        bug.project, _ = Project.objects.get_or_create(name='Miro')
+        bug.save()
+
+        # Prepare an empty generator
+        mock_xml_bug_tree.return_value = iter([])
+
+        # Now, do a crawl and notice that we updated the bug even
+        # though the xml bug list is empty
+        
+        miro = mysite.customs.bugtrackers.bugzilla.MiroBugzilla()
+        miro.update()
+        all_bugs = Bug.all_bugs.all()
+        self.assertEqual(len(all_bugs), 1)
+        bug = all_bugs[0]
+        self.assertEqual(bug.people_involved, 5)
+
+    # Tests below are for the new abstracted importer. The original
+    # versions of the tests are left above until this is integrated.
+
+    @mock.patch("mysite.customs.bugtrackers.bugzilla.url2bug_data")
+    def test_miro_bug_object(self, mock_xml_opener):
+        # Parse XML document as if we got it from the web
+        mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
+            settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml')).read())
+
+        miro_tracker = mysite.customs.models.BugzillaTracker(
+                project_name='Miro',
+                base_url='http://bugzilla.pculture.org/',
+                bug_project_name_format='{project}',
+                query_url_type='xml',
+                bitesized_type='key',
+                bitesized_text='bitesized'
+                )
+        miro_tracker.save()
+        miro_tracker_query_url = mysite.customs.models.BugzillaURL(
+                url='http://bugzilla.pculture.org/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&field-1-0-0=bug_status&field-1-1-0=product&field-1-2-0=keywords&keywords=bitesized&product=Miro&query_format=advanced&remaction=&type-1-0-0=anyexact&type-1-1-0=anyexact&type-1-2-0=anywords&value-1-0-0=NEW%2CASSIGNED%2CREOPENED&value-1-1-0=Miro&value-1-2-0=bitesized',
+                bugzilla_tracker=miro_tracker
+                )
+        miro_tracker_query_url.save()
+        gen_miro = mysite.customs.bugtrackers.bugzilla.generate_bugzilla_tracker_classes(tracker_name='Miro')
+        miro = gen_miro.next()
+        self.assert_(issubclass(miro, mysite.customs.bugtrackers.bugzilla.BugzillaBugTracker))
+        miro_instance = miro()
+        miro_instance.update()
+        all_bugs = Bug.all_bugs.all()
+        self.assertEqual(len(all_bugs), 1)
+        bug = all_bugs[0]
+        self.assertEqual(bug.project.name, 'Miro')
+        self.assertEqual(bug.title, "Add test for torrents that use gzip'd urls")
+        self.assertEqual(bug.description, """This broke. We should make sure it doesn't break again.
+Trac ticket id: 2294
+Owner: wguaraldi
+Reporter: nassar
+Keywords: Torrent unittest""")
+        self.assertEqual(bug.status, 'NEW')
+        self.assertEqual(bug.importance, 'normal')
+        self.assertEqual(bug.people_involved, 5)
+        self.assertEqual(bug.date_reported, datetime.datetime(2006, 6, 9, 12, 49))
+        self.assertEqual(bug.last_touched, datetime.datetime(2008, 6, 11, 23, 56, 27))
+        self.assertEqual(bug.submitter_username, 'nassar@pculture.org')
+        self.assertEqual(bug.submitter_realname, 'Nick Nassar')
+        self.assertEqual(bug.canonical_bug_link, 'http://bugzilla.pculture.org/show_bug.cgi?id=2294')
+        self.assert_(bug.good_for_newcomers)
+
+    @mock.patch("mysite.customs.bugtrackers.bugzilla.url2bug_data")
+    def test_full_grab_miro_bugs(self, mock_xml_opener):
+        mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
+            settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml')).read())
+
+        miro_tracker = mysite.customs.models.BugzillaTracker(
+                project_name='Miro',
+                base_url='http://bugzilla.pculture.org/',
+                bug_project_name_format='{project}',
+                query_url_type='xml',
+                bitesized_type='key',
+                bitesized_text='bitesized'
+                )
+        miro_tracker.save()
+        miro_tracker_query_url = mysite.customs.models.BugzillaURL(
+                url='http://bugzilla.pculture.org/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&field-1-0-0=bug_status&field-1-1-0=product&field-1-2-0=keywords&keywords=bitesized&product=Miro&query_format=advanced&remaction=&type-1-0-0=anyexact&type-1-1-0=anyexact&type-1-2-0=anywords&value-1-0-0=NEW%2CASSIGNED%2CREOPENED&value-1-1-0=Miro&value-1-2-0=bitesized',
+                bugzilla_tracker=miro_tracker
+                )
+        miro_tracker_query_url.save()
+        gen_miro = mysite.customs.bugtrackers.bugzilla.generate_bugzilla_tracker_classes(tracker_name='Miro')
+        miro = gen_miro.next()
+        self.assert_(issubclass(miro, mysite.customs.bugtrackers.bugzilla.BugzillaBugTracker))
+        miro_instance = miro()
+        miro_instance.update()
+        all_bugs = Bug.all_bugs.all()
+        self.assertEqual(len(all_bugs), 1)
+        bug = all_bugs[0]
+        self.assertEqual(bug.canonical_bug_link,
+                         'http://bugzilla.pculture.org/show_bug.cgi?id=2294')
+        self.assertFalse(bug.looks_closed)
+
+        # And the new manager does find it
+        self.assertEqual(Bug.open_ones.all().count(), 1)
+
+
+    @mock.patch("mysite.customs.bugtrackers.bugzilla.url2bug_data")
+    def test_miro_bugzilla_detects_closedness(self, mock_xml_opener):
+        cooked_xml = open(os.path.join(
+            settings.MEDIA_ROOT, 'sample-data',
+            'miro-2294-2009-08-06.xml')).read().replace(
+            'NEW', 'CLOSED')
+        mock_xml_opener.return_value = lxml.etree.XML(cooked_xml)
+
+        miro_tracker = mysite.customs.models.BugzillaTracker(
+                project_name='Miro',
+                base_url='http://bugzilla.pculture.org/',
+                bug_project_name_format='{project}',
+                query_url_type='xml',
+                bitesized_type='key',
+                bitesized_text='bitesized'
+                )
+        miro_tracker.save()
+        miro_tracker_query_url = mysite.customs.models.BugzillaURL(
+                url='http://bugzilla.pculture.org/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&field-1-0-0=bug_status&field-1-1-0=product&field-1-2-0=keywords&keywords=bitesized&product=Miro&query_format=advanced&remaction=&type-1-0-0=anyexact&type-1-1-0=anyexact&type-1-2-0=anywords&value-1-0-0=NEW%2CASSIGNED%2CREOPENED&value-1-1-0=Miro&value-1-2-0=bitesized',
+                bugzilla_tracker=miro_tracker
+                )
+        miro_tracker_query_url.save()
+        gen_miro = mysite.customs.bugtrackers.bugzilla.generate_bugzilla_tracker_classes(tracker_name='Miro')
+        miro = gen_miro.next()
+        self.assert_(issubclass(miro, mysite.customs.bugtrackers.bugzilla.BugzillaBugTracker))
+        miro_instance = miro()
+        miro_instance.update()
+        all_bugs = Bug.all_bugs.all()
+        self.assertEqual(len(all_bugs), 1)
+        bug = all_bugs[0]
+        self.assertEqual(bug.canonical_bug_link,
+                         'http://bugzilla.pculture.org/show_bug.cgi?id=2294')
+        self.assert_(bug.looks_closed)
+
+        # And the new manager successfully does NOT find it!
+        self.assertEqual(Bug.open_ones.all().count(), 0)
+
+    @mock.patch("mysite.customs.bugtrackers.bugzilla.url2bug_data")
+    def test_full_grab_resolved_miro_bug(self, mock_xml_opener):
+        mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
+            settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06-RESOLVED.xml')).read())
+
+        miro_tracker = mysite.customs.models.BugzillaTracker(
+                project_name='Miro',
+                base_url='http://bugzilla.pculture.org/',
+                bug_project_name_format='{project}',
+                query_url_type='xml',
+                bitesized_type='key',
+                bitesized_text='bitesized'
+                )
+        miro_tracker.save()
+        miro_tracker_query_url = mysite.customs.models.BugzillaURL(
+                url='http://bugzilla.pculture.org/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&field-1-0-0=bug_status&field-1-1-0=product&field-1-2-0=keywords&keywords=bitesized&product=Miro&query_format=advanced&remaction=&type-1-0-0=anyexact&type-1-1-0=anyexact&type-1-2-0=anywords&value-1-0-0=NEW%2CASSIGNED%2CREOPENED&value-1-1-0=Miro&value-1-2-0=bitesized',
+                bugzilla_tracker=miro_tracker
+                )
+        miro_tracker_query_url.save()
+        gen_miro = mysite.customs.bugtrackers.bugzilla.generate_bugzilla_tracker_classes(tracker_name='Miro')
+        miro = gen_miro.next()
+        self.assert_(issubclass(miro, mysite.customs.bugtrackers.bugzilla.BugzillaBugTracker))
+        miro_instance = miro()
+        miro_instance.update()
+        all_bugs = Bug.all_bugs.all()
+        self.assertEqual(len(all_bugs), 1)
+        bug = all_bugs[0]
+        self.assertEqual(bug.canonical_bug_link,
+                         'http://bugzilla.pculture.org/show_bug.cgi?id=2294')
+        self.assert_(bug.looks_closed)
+
+    @mock.patch("mysite.customs.bugtrackers.bugzilla.url2bug_data")
+    def test_full_grab_miro_bugs_refreshes_older_bugs(self, mock_xml_opener):
+        mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
+            settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml')).read())
+        miro_tracker = mysite.customs.models.BugzillaTracker(
+                project_name='Miro',
+                base_url='http://bugzilla.pculture.org/',
+                bug_project_name_format='{project}',
+                query_url_type='xml',
+                bitesized_type='key',
+                bitesized_text='bitesized'
+                )
+        miro_tracker.save()
+        miro_tracker_query_url = mysite.customs.models.BugzillaURL(
+                url='http://bugzilla.pculture.org/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&field-1-0-0=bug_status&field-1-1-0=product&field-1-2-0=keywords&keywords=bitesized&product=Miro&query_format=advanced&remaction=&type-1-0-0=anyexact&type-1-1-0=anyexact&type-1-2-0=anywords&value-1-0-0=NEW%2CASSIGNED%2CREOPENED&value-1-1-0=Miro&value-1-2-0=bitesized',
+                bugzilla_tracker=miro_tracker
+                )
+        miro_tracker_query_url.save()
+        gen_miro = mysite.customs.bugtrackers.bugzilla.generate_bugzilla_tracker_classes(tracker_name='Miro')
+        miro = gen_miro.next()
+        self.assert_(issubclass(miro, mysite.customs.bugtrackers.bugzilla.BugzillaBugTracker))
+        miro_instance = miro()
+        miro_instance.update()
+
+        # Pretend there's old data lying around:
+        bug = Bug.all_bugs.get()
+        bug.people_involved = 1
+        bug.last_polled = datetime.datetime.now() - datetime.timedelta(days = 2)
+        bug.save()
+
+        mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
+            settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml')).read())
+
+        # Now refresh
+        miro_instance.update()
 
         # Now verify there is only one bug, and its people_involved is 5
         bug = Bug.all_bugs.get()
@@ -458,8 +682,25 @@ Keywords: Torrent unittest""")
         # Now, do a crawl and notice that we updated the bug even
         # though the xml bug list is empty
         
-        miro = mysite.customs.bugtrackers.bugzilla.MiroBugzilla()
-        miro.update()
+        miro_tracker = mysite.customs.models.BugzillaTracker(
+                project_name='Miro',
+                base_url='http://bugzilla.pculture.org/',
+                bug_project_name_format='{project}',
+                query_url_type='xml',
+                bitesized_type='key',
+                bitesized_text='bitesized'
+                )
+        miro_tracker.save()
+        miro_tracker_query_url = mysite.customs.models.BugzillaURL(
+                url='http://bugzilla.pculture.org/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&field-1-0-0=bug_status&field-1-1-0=product&field-1-2-0=keywords&keywords=bitesized&product=Miro&query_format=advanced&remaction=&type-1-0-0=anyexact&type-1-1-0=anyexact&type-1-2-0=anywords&value-1-0-0=NEW%2CASSIGNED%2CREOPENED&value-1-1-0=Miro&value-1-2-0=bitesized',
+                bugzilla_tracker=miro_tracker
+                )
+        miro_tracker_query_url.save()
+        gen_miro = mysite.customs.bugtrackers.bugzilla.generate_bugzilla_tracker_classes(tracker_name='Miro')
+        miro = gen_miro.next()
+        self.assert_(issubclass(miro, mysite.customs.bugtrackers.bugzilla.BugzillaBugTracker))
+        miro_instance = miro()
+        miro_instance.update()
         all_bugs = Bug.all_bugs.all()
         self.assertEqual(len(all_bugs), 1)
         bug = all_bugs[0]
