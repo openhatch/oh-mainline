@@ -87,9 +87,11 @@ class Command(BaseCommand):
                 logging.error("[Trac] Error message: %s" % str(e))
 
     def find_and_update_enabled_bugzilla_instances(self):
-        enabled_bugzilla_instances = []
+        ### First, the "generate" step
+        enabled_bugzilla_instances = [subclass for subclass in
+                mysite.customs.bugtrackers.bugzilla.generate_bugzilla_tracker_classes()]
 
-        ### First, the "find" step
+        ### Second, the "find" step
         for thing_name in dir(mysite.customs.bugtrackers.bugzilla):
             thing = getattr(mysite.customs.bugtrackers.bugzilla,
                             thing_name)
