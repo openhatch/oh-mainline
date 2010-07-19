@@ -72,7 +72,7 @@ class GoogleBug(object):
         self.client = client
 
     def _bug_id_from_bug_data(self):
-        id_url = self.get_bug_atom_data().id.text
+        id_url = self.get_bug_atom_data().id['text']
         base, num = id_url.rsplit('/', 1)
         return int(num)
 

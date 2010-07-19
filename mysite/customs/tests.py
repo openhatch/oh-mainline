@@ -1262,5 +1262,13 @@ class DailyBugImporter(django.test.TestCase):
         mock_error.side_effect = ValueError()
         self.assertRaises(ValueError, mysite.customs.management.commands.customs_daily_tasks.Command().find_and_update_enabled_bugzilla_instances)
 
+class GoogleCodeBugTracker(django.test.TestCase):
+    @mock.patch('mysite.customs.bugtrackers.google.GoogleBug.get_bug_atom_data')
+    def test__bug_id_from_bug_data(self, mock_thing):
+        mock_thing.return_value = mysite.base.helpers.ObjectFromDict({'id': {'text': 'http://whatever/3'}})
+        gb = mysite.customs.bugtrackers.google.GoogleBug(google_name='ok', client=None, bug_id=3)
+        bug_id = gb._bug_id_from_bug_data()
+        self.assertEqual(bug_id, 3)
 
 # vim: set nu:
+
