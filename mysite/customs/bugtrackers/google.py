@@ -47,7 +47,7 @@ def get_google_issue_entries(client, google_name, query=None):
         feed = client.get_issues(google_name, query=query)
     return feed.entry
 
-class GoogleBug:
+class GoogleBug(object):
     @staticmethod
     def from_url(url, client):
         a, b, c, d, google_name, e, ending = url.split('/')
