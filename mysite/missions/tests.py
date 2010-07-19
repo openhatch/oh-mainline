@@ -420,17 +420,6 @@ class SvnViewTests(TwillTests):
         if os.path.isdir(self.repo_path):
             shutil.rmtree(self.repo_path)
 
-        # Fire up an svnserve for the repository path.
-        port = random.randint(50000, 50100)
-        self.svnserve = subprocess.Popen(['svnserve', '--listen-port', str(port),
-                                                      '--listen-host', '127.0.0.1',
-                                                      '--daemon', '--foreground',
-                                                      '--root', settings.SVN_REPO_PATH])
-        settings.SVN_REPO_URL_PREFIX = 'svn://127.0.0.1:%d/' % port
-
-    def tearDown(self):
-        self.svnserve.terminate()
-
     def test_resetrepo_returns_error_with_get(self):
         response = self.client.get(reverse(views.svn_resetrepo))
         self.assert_(response.status_code == 405)
