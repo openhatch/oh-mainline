@@ -7,6 +7,7 @@ import django.conf
 django.conf.settings.CELERY_ALWAYS_EAGER = True
 
 import mysite.customs.bugtrackers.bugzilla
+import mysite.customs.bugtrackers.google
 import mysite.customs.bugtrackers.launchpad
 import mysite.customs.bugtrackers.opensolaris
 import mysite.customs.bugtrackers.roundup
@@ -97,6 +98,23 @@ class Command(BaseCommand):
                 logging.error("[Bugzilla] ERROR: Importer failed, likely HTTP500, continuing on...")
                 logging.error("[Bugzilla] Error message: %s" % str(e))
 
+    def find_and_update_enabled_google_instances(self):
+        enabled_google_instances = []
+
+        ### First, the "find" step
+        for thing_name in dir(mysite.customs.bugtrackers.google):
+            thing = getattr(mysite.customs.bugtrackers.google,
+                            thing_name)
+            if hasattr(thing, 'enabled'):
+                if getattr(thing, 'enabled'):
+                    enabled_google_instances.append(thing)
+
+        ### Okay, now update!
+        for thing in enabled_google_instances:
+            logging.info("[Google] About to update %s" % thing)
+            instantiated = thing()
+            instantiated.update()
+
     def update_launchpad_hosted_projects(self):
         ### For Launchpad:
         # First, we ask the projects' bug trackers if there are new bugs we should know about
@@ -113,3 +131,4 @@ class Command(BaseCommand):
         self.find_and_update_enabled_trac_instances()
         self.find_and_update_enabled_roundup_trackers()
         self.find_and_update_enabled_bugzilla_instances()
+        self.find_and_update_enabled_google_instances()

@@ -977,14 +977,15 @@ class AddCitationManually(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
 
     def test_add_citation_manually(self):
+        proj = Project.create_dummy(name='project name')
         portfolio_entry, _ = PortfolioEntry.objects.get_or_create(
-            project=Project.objects.get_or_create(name='project name')[0],
+            project=proj,
             person=Person.objects.get(user__username='paulproteus'))
 
         input_data = {
                 'portfolio_entry': portfolio_entry.pk,
                 'form_container_element_id': 'form_container_%d' % 0,
-                'url': 'http://cthuugle.com/' # Needs this trailing slash to work.
+                'url': 'http://google.com/' # Needs this trailing slash to work.
                 }
 
         # Send this data to the appropriate view.
@@ -2243,8 +2244,8 @@ class SaveReordering(TwillTests):
         paul = Person.get_by_username('paulproteus')
 
         pfes = [
-                PortfolioEntry.create_dummy_with_project(person=paul, sort_order=1),
-                PortfolioEntry.create_dummy_with_project(person=paul, sort_order=2),
+                PortfolioEntry.create_dummy_with_project(person=paul, sort_order=-1),
+                PortfolioEntry.create_dummy_with_project(person=paul, sort_order=-2),
                 ]
 
         def get_ordering():
@@ -2276,8 +2277,8 @@ class ArchiveProjects(TwillTests):
         paul = Person.get_by_username('paulproteus')
 
         pfes = [
-                PortfolioEntry.create_dummy_with_project(person=paul, sort_order=1),
-                PortfolioEntry.create_dummy_with_project(person=paul, sort_order=2),
+                PortfolioEntry.create_dummy_with_project(person=paul, sort_order=-1),
+                PortfolioEntry.create_dummy_with_project(person=paul, sort_order=-2),
                 ]
 
         # POST to a view with a list of ids

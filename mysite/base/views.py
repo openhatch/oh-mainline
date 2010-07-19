@@ -186,7 +186,7 @@ def meta(request):
     my['Bugs last polled more than two days ago (in percent)'] = (
         mysite.search.models.Bug.all_bugs.filter(
         last_polled__lt=two_days_ago).count() * 100.0 /
-        mysite.search.models.Bug.all_bugs.count())        
+        mysite.search.models.Bug.all_bugs.count())
 
     return (request, 'meta.html', data)
 
@@ -201,7 +201,7 @@ def save_portfolio_entry_ordering_do(request):
             are_we_archiving_yet = True
             continue
         pfe = PortfolioEntry.objects.get(id=int(id), person__user=request.user)
-        pfe.sort_order = n
+        pfe.sort_order = -n # negated so we can sort descending
         pfe.is_archived = are_we_archiving_yet
         pfe.save()
     return HttpResponse('1')

@@ -107,6 +107,11 @@ class OhlohTestsThatHitTheNetwork(django.test.TestCase):
                        'man_months': 1,
                        'primary_language': 'shell script'}
 
+        # Clean the 'permalink' values out of each project...
+        for proj in projects:
+            if 'permalink' in proj:
+                del proj['permalink']
+
         if do_contents_check:
             self.assert_(should_have in projects)
 
@@ -128,6 +133,8 @@ class OhlohTestsThatHitTheNetwork(django.test.TestCase):
                              'project_homepage_url': 'http://wiki.creativecommons.org/CcHost',
                              'man_months': 1,
                              'primary_language': 'shell script'}]
+        for proj in projects:
+            del proj['permalink']
         self.assertEqual(should_have, projects)
         # }}}
 
@@ -151,6 +158,8 @@ class OhlohTestsThatHitTheNetwork(django.test.TestCase):
         # {{{
         oh = ohloh.get_ohloh()
         projects, web_response = oh.get_contribution_info_by_ohloh_username('paulproteus')
+        for proj in projects:
+            del proj['permalink']
         
         assert {'project': u'ccHost',
                 'project_homepage_url': 'http://wiki.creativecommons.org/CcHost',
@@ -162,6 +171,8 @@ class OhlohTestsThatHitTheNetwork(django.test.TestCase):
         oh = ohloh.get_ohloh()
         username = oh.email_address_to_ohloh_username('paulproteus.ohloh@asheesh.org')
         projects, web_response = oh.get_contribution_info_by_ohloh_username(username)
+        for proj in projects:
+            del proj['permalink']
         
         assert {'project': u'ccHost',
                 'project_homepage_url': 'http://wiki.creativecommons.org/CcHost',
@@ -668,8 +679,7 @@ class LaunchpadImporterTests(django.test.TestCase):
                          date_reported=now_t,
                          date_updated=now_t,
                          )
-        sample_out_query = dict(project='GNOME-Do',
-                                canonical_bug_link='http://example.com/1')
+        sample_out_query = dict(canonical_bug_link='http://example.com/1')
         sample_out_data = dict(title='Title', description='Some long text',
                                importance='Unknown', status='Ready for take-off',
                                people_involved=2, submitter_realname='Bob',
@@ -758,6 +768,26 @@ class OnlineGithubFailures(django.test.TestCase):
         '''This test gives our github info_by_username a user to 404 on .'''
         repos = list(mysite.customs.github.repos_by_username('will_never_be_found_PDo7jHoi'))
         self.assertEqual(repos, [])
+
+    @mock.patch('mysite.customs.github._github_repos_list')
+    def test_username_with_at_sign(self, mock_repo_list):
+        '''This test gives our github info_by_username a user to 404 on .'''
+        repos = list(mysite.customs.github.repos_by_username('something@example.com'))
+        self.assertFalse(mock_repo_list.called)
+        self.assertEqual(repos, [])
+
+    @mock.patch('mysite.customs.github._github_repos_list')
+    def test_username_with_at_sign(self, mock_repo_list):
+        '''This test gives our github info_by_username a user to 404 on .'''
+        repos = list(mysite.customs.github.repos_by_username('something@example.com'))
+        self.assertFalse(mock_repo_list.called)
+        self.assertEqual(repos, [])
+
+    @mock.patch('mysite.customs.github._get_repositories_user_watches')
+    def test_at_sign_user_watch_list(self, mock_method_that_should_not_be_called):
+        things = list(mysite.customs.github.repos_user_collaborates_on('something@example.com'))
+        self.assertFalse(mock_method_that_should_not_be_called.called)
+        self.assertEqual(things, [])
 
     def test_username_space_404(self):
         '''This test gives our github info_by_username a user to 404 on .'''
@@ -1232,5 +1262,13 @@ class DailyBugImporter(django.test.TestCase):
         mock_error.side_effect = ValueError()
         self.assertRaises(ValueError, mysite.customs.management.commands.customs_daily_tasks.Command().find_and_update_enabled_bugzilla_instances)
 
+class GoogleCodeBugTracker(django.test.TestCase):
+    @mock.patch('mysite.customs.bugtrackers.google.GoogleBug.get_bug_atom_data')
+    def test__bug_id_from_bug_data(self, mock_thing):
+        mock_thing.return_value = mysite.base.helpers.ObjectFromDict({'id': {'text': 'http://whatever/3'}})
+        gb = mysite.customs.bugtrackers.google.GoogleBug(google_name='ok', client=None, bug_id=3)
+        bug_id = gb._bug_id_from_bug_data()
+        self.assertEqual(bug_id, 3)
 
 # vim: set nu:
+

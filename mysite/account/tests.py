@@ -305,6 +305,14 @@ class GuessLocationOnLogin(TwillTests):
         
     #}}}
 
+class SignupWithNoPassword(TwillTests):
+    def test(self):
+        POST_data = {'username': 'mister_roboto'}
+        response = self.client.post(reverse(mysite.account.views.signup_do), POST_data)
+        form = response.context['form']
+        self.assertFalse(form.is_valid())
+        self.assertEqual(User.objects.count(), 0)
+
 class LoginPageContainsUnsavedAnswer(TwillTests):
     
     def test(self):
