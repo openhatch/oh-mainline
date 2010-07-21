@@ -16,6 +16,8 @@ or the equivalent for your system.
 
 On some Operating Systems you may not need (or be able) to install all of the above packages, depending on what comes prebuilt with Python as default. If you do find a package for any of the above for your system, you should install it.
 
+The other dependencies (like Django) are handled by "buildout", so keep reading patiently and we'll get to that.
+
 ### Caching ###
 
 Now start memcached. This is used by Django for all the website caching, such as the full list of projects, as well as individual webpage requests.
