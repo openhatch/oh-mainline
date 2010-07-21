@@ -10,7 +10,7 @@ OpenHatch is currently designed to run with Python 2.6. Most *decent* Operating 
 
 Next, install some dependencies:
 
-    sudo apt-get install python2.6-dev python-apt python-libxml2 memcached
+    sudo apt-get install python2.6-dev python-libxml2 memcached
 
 or the equivalent for your system.
 
