@@ -26,5 +26,9 @@
   {"model": "missions.Step",
    "pk": 7,
    "fields": {"name": "svn_checkout"}
+  },
+  {"model": "missions.Step",
+   "pk": 8,
+   "fields": {"name": "svn_diff"}
   }
 ]
