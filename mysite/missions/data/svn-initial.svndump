@@ -89,3 +89,40 @@ PROPS-END
 midnight
 
 
+Revision-number: 3
+Prop-content-length: 127
+Content-length: 127
+
+K 7
+svn:log
+V 26
+Put in some instructions.
+
+K 10
+svn:author
+V 6
+mr_bad
+K 8
+svn:date
+V 27
+2010-07-23T03:01:41.085472Z
+PROPS-END
+
+Node-path: trunk/README
+Node-kind: file
+Node-action: add
+Prop-content-length: 10
+Text-content-length: 142
+Text-content-md5: 29311511ef810a14250032cd3129357b
+Text-content-sha1: b9a67352317f71727310863459c9c94e2011eee6
+Content-length: 152
+
+PROPS-END
+The secret word needed to infiltrate the compound is in word.txt. Good
+luck on your mision!
+
+  -- Mr. Bad
+
+(This message will self-destruct.)
+
+
