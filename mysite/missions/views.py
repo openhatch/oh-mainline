@@ -279,7 +279,10 @@ def svn_data(request, passed_data={}):
           data.update({
             'checkout_url': controllers.SvnRepositoryManager.repository_trunk_url(request.user.username),
             'secret_word_file': controllers.SvnRepositoryManager.SECRET_WORD_FILE,
-            'file_for_svn_diff': controllers.SvnRepositoryManager.FILE_TO_BE_PATCHED_FOR_DIFF_MISSION
+            'file_for_svn_diff': controllers.SvnRepositoryManager.FILE_TO_BE_PATCHED_FOR_DIFF_MISSION,
+            'new_secret_word': controllers.SvnRepositoryManager.NEW_SECRET_WORD_FOR_COMMIT_MISSION,
+            'commit_username': request.user.username,
+            'commit_password': controllers.SvnRepositoryManager.get_password(request.user.username)
           })
     data.update(passed_data)
     return data
@@ -332,3 +335,10 @@ def svn_diff_submit(request):
                 data['svn_diff_error_message'] = str(e)
         data['svn_diff_form'] = form
     return svn_diff(request, data)
+
+@login_required
+@view
+def svn_commit(request, passed_data={}):
+    data = svn_data(request, passed_data)
+    data['this_mission_page_short_name'] = 'Committing your changes'
+    return (request, 'missions/svn_commit.html', data)

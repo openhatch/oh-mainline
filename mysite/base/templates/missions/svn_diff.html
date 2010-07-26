@@ -50,7 +50,7 @@
       </form>
     {% if svn_diff_done %}
       <p class="next_mission_link">
-	<a href="{#{% url mysite.missions.views.svn_commit %}#}">Committing your changes &raquo;</a></p>
+	<a href="{% url mysite.missions.views.svn_commit %}">Committing your changes &raquo;</a></p>
     {% endif %}
 
 {% endblock mission_main %}

@@ -239,6 +239,7 @@ class SvnRepositoryManager(object):
     SECRET_WORD_FILE = 'word.txt'
     FILE_TO_BE_PATCHED_FOR_DIFF_MISSION = 'README'
     NEW_CONTENT_FOR_DIFF_MISSION = os.path.join(get_mission_data_path(), 'README-new-for-svn-diff')
+    NEW_SECRET_WORD_FOR_COMMIT_MISSION = 'plenipotentiary'
 
     @classmethod
     def reset_repository(cls, username):
@@ -276,6 +277,13 @@ class SvnRepositoryManager(object):
     @classmethod
     def repository_trunk_url(cls, username):
         return settings.SVN_REPO_URL_PREFIX + username + '/trunk'
+
+    @classmethod
+    def get_password(cls, username):
+        passwd_path = os.path.join(settings.SVN_REPO_PATH, username, 'conf', 'passwd')
+        passwd_file = RawConfigParser()
+        passwd_file.read(passwd_path)
+        return passwd_file.get('users', username)
 
     @classmethod
     def get_secret_word(cls, username):
