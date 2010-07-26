@@ -448,3 +448,32 @@ class SvnViewTests(TwillTests):
         self.assertFalse(response.context['svn_checkout_success'])
         paulproteus = Person.objects.get(user__username='paulproteus')
         self.assertFalse(controllers.mission_completed(paulproteus, 'svn_checkout'))
+
+    def test_do_diff_mission_correctly(self):
+        self.client.post(reverse(views.svn_resetrepo))
+        response = self.client.get(reverse(views.svn_checkout))
+        checkoutdir = tempfile.mkdtemp()
+        try:
+            # Check the repository out and make the required change.
+            subprocess.check_call(['svn', 'checkout', response.context['checkout_url'], checkoutdir])
+            new_contents = open(os.path.join(controllers.get_mission_data_path(), controllers.SvnRepositoryManager.NEW_CONTENT_FOR_DIFF_MISSION)).read()
+            open(os.path.join(checkoutdir, controllers.SvnRepositoryManager.FILE_TO_BE_PATCHED_FOR_DIFF_MISSION), 'w').write(new_contents)
+
+            # Make the diff.
+            svndiff = subprocess.Popen(['svn', 'diff'], stdout=subprocess.PIPE, cwd=checkoutdir)
+            diff = svndiff.communicate()[0]
+            self.assertEqual(svndiff.returncode, 0)
+
+            # Submit the diff.
+            response = self.client.post(reverse(views.svn_diff_submit), {'diff': diff})
+            self.assert_(response.context['svn_diff_success'])
+            paulproteus = Person.objects.get(user__username='paulproteus')
+            self.assert_(controllers.mission_completed(paulproteus, 'svn_diff'))
+
+            # Check that there is a new commit that applies to the working copy cleanly.
+            svnupdate = subprocess.Popen(['svn', 'update'], stdout=subprocess.PIPE, cwd=checkoutdir)
+            update_output = svnupdate.communicate()[0]
+            self.assertEqual(svnupdate.returncode, 0)
+            self.assert_('Updated to revision ' in update_output)
+        finally:
+            shutil.rmtree(checkoutdir)

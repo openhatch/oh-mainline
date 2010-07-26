@@ -91,6 +91,8 @@ urlpatterns = patterns('',
         (r'^missions/svn/resetrepo$', 'mysite.missions.views.svn_resetrepo'),
         (r'^missions/svn/checkout$', 'mysite.missions.views.svn_checkout'),
         (r'^missions/svn/checkout/submit$', 'mysite.missions.views.svn_checkout_submit'),
+        (r'^missions/svn/diff$', 'mysite.missions.views.svn_diff'),
+        (r'^missions/svn/diff/submit$', 'mysite.missions.views.svn_diff_submit'),
 
         # Invitation-related URLs
         (r'^invitation/', include('invitation.urls')),

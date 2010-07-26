@@ -13,6 +13,7 @@ import subprocess
 import shutil
 import binascii
 import otp
+import tempfile
 
 def get_mission_data_path():
     return os.path.join(os.path.dirname(__file__), 'data')
@@ -236,6 +237,8 @@ class PatchRecursiveMission(object):
 class SvnRepositoryManager(object):
     INITIAL_CONTENT = 'svn-initial.svndump'
     SECRET_WORD_FILE = 'word.txt'
+    FILE_TO_BE_PATCHED_FOR_DIFF_MISSION = 'README'
+    NEW_CONTENT_FOR_DIFF_MISSION = os.path.join(get_mission_data_path(), 'README-new-for-svn-diff')
 
     @classmethod
     def reset_repository(cls, username):
@@ -282,3 +285,47 @@ class SvnRepositoryManager(object):
         if svn_cat.wait() != 0:
             raise RuntimeError, 'svn cat failed'
         return word
+
+    @classmethod
+    def validate_diff_and_commit_if_ok(cls, username, diff):
+        the_patch = patch.fromstring(diff)
+
+        # Check that it only patches one file.
+        if len(the_patch.hunks) != 1:
+            raise IncorrectPatch, 'The patch affects more than one file.'
+
+        # Check that the filename it patches is correct.
+        if the_patch.source[0] != cls.FILE_TO_BE_PATCHED_FOR_DIFF_MISSION or the_patch.target[0] != cls.FILE_TO_BE_PATCHED_FOR_DIFF_MISSION:
+            raise IncorrectPatch, 'The patch affects the wrong file.'
+
+        # Now we need to generate a working copy to apply the patch to.
+        # We can also use this working copy to commit the patch if it's OK.
+        wcdir = tempfile.mkdtemp()
+        try:
+            trunk_file_url = 'file://' + os.path.join(settings.SVN_REPO_PATH, username, 'trunk')
+            svncheckout = subprocess.Popen(['svn', 'co', trunk_file_url, wcdir], stdout=subprocess.PIPE)
+            svncheckout.stdout.read()  # throw output on the floor
+            if svncheckout.wait() != 0:
+                raise RuntimeError, 'svn checkout of temporary working copy failed'
+            file_to_patch = os.path.join(wcdir, cls.FILE_TO_BE_PATCHED_FOR_DIFF_MISSION)
+
+            # Check that it will apply correctly to the working copy.
+            if not the_patch._match_file_hunks(file_to_patch, the_patch.hunks[0]):
+                raise IncorrectPatch, 'The patch will not apply correctly to the latest revision.'
+
+            # Check that the resulting file matches what is expected.
+            new_content = ''.join(the_patch.patch_stream(open(file_to_patch), the_patch.hunks[0]))
+            if new_content != open(cls.NEW_CONTENT_FOR_DIFF_MISSION).read():
+                raise IncorrectPatch, 'The file resulting from patching does not have the correct contents.'
+
+            # Commit the patch.
+            open(file_to_patch, 'w').write(new_content)
+            svncommit = subprocess.Popen(['svn', 'commit', '-m', '''Fix a typo in %s.
+
+Thanks for reporting this, %s!''' % (cls.FILE_TO_BE_PATCHED_FOR_DIFF_MISSION, username), '--username', 'mr_bad', wcdir], stdout=subprocess.PIPE)
+            svncommit.stdout.read()  # throw output on the floor
+            if svncommit.wait() != 0:
+                raise RuntimeError, 'svn commit of patch failed'
+
+        finally:
+            shutil.rmtree(wcdir)
