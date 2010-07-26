@@ -105,21 +105,21 @@ mr_bad
 K 8
 svn:date
 V 27
-2010-07-23T03:01:41.085472Z
+2010-07-26T22:13:51.425111Z
 PROPS-END
 
 Node-path: trunk/README
 Node-kind: file
 Node-action: add
 Prop-content-length: 10
-Text-content-length: 142
-Text-content-md5: 29311511ef810a14250032cd3129357b
-Text-content-sha1: b9a67352317f71727310863459c9c94e2011eee6
-Content-length: 152
+Text-content-length: 187
+Text-content-md5: dfec195778cdc89572ececa603bb6d10
+Text-content-sha1: 3b10798ebe7356f8cd31066c0c15cc760384ec2a
+Content-length: 197
 
 PROPS-END
-The secret word needed to infiltrate the compound is in word.txt. Good
-luck on your mision!
+The secret word needed to infiltrate the compound is in word.txt. You
+also will need to be wearing a red hat.  Good luck on your mision!
 
   -- Mr. Bad
 
