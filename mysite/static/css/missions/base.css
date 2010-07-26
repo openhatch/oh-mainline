@@ -9,6 +9,7 @@ body.missions .successmsg {
 
 body.missions div.body > * {
   float: left;
+  width: 100%;
 }
 
 body.missions p.next_mission_link {
