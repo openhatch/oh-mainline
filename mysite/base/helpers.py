@@ -6,6 +6,7 @@ import shutil
 import tempfile
 import datetime
 import dateutil.parser
+import subprocess
 
 from django.http import HttpResponse
 import django.shortcuts
@@ -63,3 +64,15 @@ def clear_static_cache(path):
 
     # 2. shutil.rmtree() the new path
     shutil.rmtree(new_temp_path)
+
+# Implementation of something like subprocess.check_output, which didn't
+# get added to the Python standard library until 2.7.
+def subproc_check_output(*args, **kw):
+    if 'stdout' in kw:
+        raise ValueError, 'stdout must not be specified'
+    kw['stdout'] = subprocess.PIPE
+    subproc = subprocess.Popen(*args, **kw)
+    output = subproc.stdout.read()
+    if subproc.wait() != 0:
+        raise RuntimeError, 'subprocess failed with return code %d' % subproc.returncode
+    return output

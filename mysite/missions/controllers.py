@@ -1,5 +1,6 @@
 from mysite.missions.models import Step, StepCompletion
 from django.conf import settings
+from mysite.base.helpers import subproc_check_output
 
 import tarfile
 from StringIO import StringIO
@@ -288,11 +289,7 @@ class SvnRepositoryManager(object):
     @classmethod
     def get_secret_word(cls, username):
         svn_path = 'file://' + os.path.join(settings.SVN_REPO_PATH, username, 'trunk', cls.SECRET_WORD_FILE)
-        svn_cat = subprocess.Popen(['svn', 'cat', svn_path], stdout=subprocess.PIPE)
-        word = svn_cat.stdout.read().strip()
-        if svn_cat.wait() != 0:
-            raise RuntimeError, 'svn cat failed'
-        return word
+        return subproc_check_output(['svn', 'cat', svn_path]).strip()
 
     @classmethod
     def validate_diff_and_commit_if_ok(cls, username, diff):
@@ -311,10 +308,7 @@ class SvnRepositoryManager(object):
         wcdir = tempfile.mkdtemp()
         try:
             trunk_file_url = 'file://' + os.path.join(settings.SVN_REPO_PATH, username, 'trunk')
-            svncheckout = subprocess.Popen(['svn', 'co', trunk_file_url, wcdir], stdout=subprocess.PIPE)
-            svncheckout.stdout.read()  # throw output on the floor
-            if svncheckout.wait() != 0:
-                raise RuntimeError, 'svn checkout of temporary working copy failed'
+            subproc_check_output(['svn', 'co', trunk_file_url, wcdir])
             file_to_patch = os.path.join(wcdir, cls.FILE_TO_BE_PATCHED_FOR_DIFF_MISSION)
 
             # Check that it will apply correctly to the working copy.
@@ -328,12 +322,10 @@ class SvnRepositoryManager(object):
 
             # Commit the patch.
             open(file_to_patch, 'w').write(new_content)
-            svncommit = subprocess.Popen(['svn', 'commit', '-m', '''Fix a typo in %s.
+            commit_message = '''Fix a typo in %s.
 
-Thanks for reporting this, %s!''' % (cls.FILE_TO_BE_PATCHED_FOR_DIFF_MISSION, username), '--username', 'mr_bad', wcdir], stdout=subprocess.PIPE)
-            svncommit.stdout.read()  # throw output on the floor
-            if svncommit.wait() != 0:
-                raise RuntimeError, 'svn commit of patch failed'
+Thanks for reporting this, %s!''' % (cls.FILE_TO_BE_PATCHED_FOR_DIFF_MISSION, username)
+            subproc_check_output(['svn', 'commit', '-m', commit_message, '--username', 'mr_bad', wcdir])
 
         finally:
             shutil.rmtree(wcdir)

@@ -3,6 +3,7 @@ from mysite.base.tests import TwillTests
 from mysite.missions import views, controllers
 from mysite.missions.models import StepCompletion, Step
 from mysite.profile.models import Person
+from mysite.base.helpers import subproc_check_output
 from django.conf import settings
 from django.test.client import Client
 from django.core.urlresolvers import reverse
@@ -382,12 +383,9 @@ class PatchRecursiveTests(TwillTests):
 class SvnBackendTests(TestCase):
 
     def get_info(self, path):
-        svninfo = subprocess.Popen(['svn', 'info', 'file://'+path], stdout=subprocess.PIPE)
-        stdout, stderr = svninfo.communicate()
-        if svninfo.returncode != 0:
-            raise RuntimeError, 'svn info failed'
+        svninfo = subproc_check_output(['svn', 'info', 'file://'+path])
         info = {}
-        for line in stdout.splitlines():
+        for line in svninfo.splitlines():
             if ': ' in line:
                 key, separator, value = line.partition(': ')
                 info[key] = value
@@ -460,9 +458,7 @@ class SvnViewTests(TwillTests):
             open(os.path.join(checkoutdir, controllers.SvnRepositoryManager.FILE_TO_BE_PATCHED_FOR_DIFF_MISSION), 'w').write(new_contents)
 
             # Make the diff.
-            svndiff = subprocess.Popen(['svn', 'diff'], stdout=subprocess.PIPE, cwd=checkoutdir)
-            diff = svndiff.communicate()[0]
-            self.assertEqual(svndiff.returncode, 0)
+            diff = subproc_check_output(['svn', 'diff'], cwd=checkoutdir)
 
             # Submit the diff.
             response = self.client.post(reverse(views.svn_diff_submit), {'diff': diff})
@@ -471,9 +467,7 @@ class SvnViewTests(TwillTests):
             self.assert_(controllers.mission_completed(paulproteus, 'svn_diff'))
 
             # Check that there is a new commit that applies to the working copy cleanly.
-            svnupdate = subprocess.Popen(['svn', 'update'], stdout=subprocess.PIPE, cwd=checkoutdir)
-            update_output = svnupdate.communicate()[0]
-            self.assertEqual(svnupdate.returncode, 0)
+            update_output = subproc_check_output(['svn', 'update'], cwd=checkoutdir)
             self.assert_('Updated to revision ' in update_output)
         finally:
             shutil.rmtree(checkoutdir)
