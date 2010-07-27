@@ -397,10 +397,10 @@ class SvnBackendTests(TestCase):
         os.rmdir(repo_path)
         try:
             # Check that we can run "svn info" on the created repository to get the UUID.
-            controllers.SvnRepositoryManager.reset_repository(random_name)
+            controllers.SvnRepository(random_name).reset()
             old_uuid = self.get_info(repo_path)['Repository UUID']
             # Check that resetting the repository changes its UUID.
-            controllers.SvnRepositoryManager.reset_repository(random_name)
+            controllers.SvnRepository(random_name).reset()
             new_uuid = self.get_info(repo_path)['Repository UUID']
             self.assertNotEqual(old_uuid, new_uuid)
         finally:
@@ -454,8 +454,8 @@ class SvnViewTests(TwillTests):
         try:
             # Check the repository out and make the required change.
             subprocess.check_call(['svn', 'checkout', response.context['checkout_url'], checkoutdir])
-            new_contents = open(os.path.join(controllers.get_mission_data_path(), controllers.SvnRepositoryManager.NEW_CONTENT_FOR_DIFF_MISSION)).read()
-            open(os.path.join(checkoutdir, controllers.SvnRepositoryManager.FILE_TO_BE_PATCHED_FOR_DIFF_MISSION), 'w').write(new_contents)
+            new_contents = open(os.path.join(controllers.get_mission_data_path(), controllers.SvnDiffMission.NEW_CONTENT)).read()
+            open(os.path.join(checkoutdir, controllers.SvnDiffMission.FILE_TO_BE_PATCHED), 'w').write(new_contents)
 
             # Make the diff.
             diff = subproc_check_output(['svn', 'diff'], cwd=checkoutdir)

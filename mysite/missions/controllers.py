@@ -235,22 +235,23 @@ class PatchRecursiveMission(object):
 
         return patchfile.getvalue()
 
-class SvnRepositoryManager(object):
-    INITIAL_CONTENT = 'svn-initial.svndump'
-    SECRET_WORD_FILE = 'word.txt'
-    FILE_TO_BE_PATCHED_FOR_DIFF_MISSION = 'README'
-    NEW_CONTENT_FOR_DIFF_MISSION = os.path.join(get_mission_data_path(), 'README-new-for-svn-diff')
-    NEW_SECRET_WORD_FOR_COMMIT_MISSION = 'plenipotentiary'
+class SvnRepository(object):
+    INITIAL_CONTENT = os.path.join(get_mission_data_path(), 'svn-initial.svndump')
 
-    @classmethod
-    def reset_repository(cls, username):
-        repo_path = os.path.join(settings.SVN_REPO_PATH, username)
-        if os.path.isdir(repo_path):
-            shutil.rmtree(repo_path)
-        subprocess.check_call(['svnadmin', 'create', '--fs-type', 'fsfs', repo_path])
+    def __init__(self, username):
+        self.username = username
+        self.repo_path = os.path.join(settings.SVN_REPO_PATH, username)
+
+        self.file_url = 'file://' + self.repo_path
+        self.public_url = settings.SVN_REPO_URL_PREFIX + username
+
+    def reset(self):
+        if os.path.isdir(self.repo_path):
+            shutil.rmtree(self.repo_path)
+        subprocess.check_call(['svnadmin', 'create', '--fs-type', 'fsfs', self.repo_path])
 
         # Configure the repository so svnserve uses a password file stored within it.
-        svnserve_conf_path = os.path.join(repo_path, 'conf', 'svnserve.conf')
+        svnserve_conf_path = os.path.join(self.repo_path, 'conf', 'svnserve.conf')
         svnserve_conf = RawConfigParser()
         svnserve_conf.read(svnserve_conf_path)
         svnserve_conf.set('general', 'anon-access', 'read')
@@ -260,36 +261,51 @@ class SvnRepositoryManager(object):
 
         # Assign a password for the user.
         password = otp.OTP().reformat(binascii.hexlify(os.urandom(8)), format='words').lower()
-        passwd_path = os.path.join(repo_path, 'conf', 'passwd')
+        passwd_path = os.path.join(self.repo_path, 'conf', 'passwd')
         passwd_file = RawConfigParser()
         passwd_file.read(passwd_path)
-        passwd_file.set('users', username, password)
+        passwd_file.set('users', self.username, password)
         passwd_file.write(open(passwd_path, 'w'))
 
-        dumploader = subprocess.Popen(['svnadmin', 'load', '--ignore-uuid', repo_path], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-        dumploader.communicate(open(os.path.join(get_mission_data_path(), cls.INITIAL_CONTENT)).read())
+        dumploader = subprocess.Popen(['svnadmin', 'load', '--ignore-uuid', self.repo_path], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+        dumploader.communicate(open(self.INITIAL_CONTENT).read())
         if dumploader.returncode != 0:
             raise RuntimeError, 'svnadmin load failed'
 
-    @classmethod
-    def repository_exists(cls, username):
-        return os.path.isdir(os.path.join(settings.SVN_REPO_PATH, username))
+    def exists(self):
+        return os.path.isdir(self.repo_path)
 
-    @classmethod
-    def repository_trunk_url(cls, username):
-        return settings.SVN_REPO_URL_PREFIX + username + '/trunk'
+    def file_trunk_url(self):
+        return self.file_url + '/trunk'
 
-    @classmethod
-    def get_password(cls, username):
-        passwd_path = os.path.join(settings.SVN_REPO_PATH, username, 'conf', 'passwd')
+    def public_trunk_url(self):
+        return self.public_url + '/trunk'
+
+    def get_password(self):
+        passwd_path = os.path.join(self.repo_path, 'conf', 'passwd')
         passwd_file = RawConfigParser()
         passwd_file.read(passwd_path)
-        return passwd_file.get('users', username)
+        return passwd_file.get('users', self.username)
+
+    def cat(self, path):
+        return subproc_check_output(['svn', 'cat', self.file_url + path])
+
+
+class SvnCheckoutMission(object):
+    SECRET_WORD_FILE = 'word.txt'
 
     @classmethod
     def get_secret_word(cls, username):
-        svn_path = 'file://' + os.path.join(settings.SVN_REPO_PATH, username, 'trunk', cls.SECRET_WORD_FILE)
-        return subproc_check_output(['svn', 'cat', svn_path]).strip()
+        return SvnRepository(username).cat('/trunk/' + cls.SECRET_WORD_FILE).strip()
+
+
+class SvnCommitMission(object):
+    NEW_SECRET_WORD = 'plenipotentiary'
+
+
+class SvnDiffMission(object):
+    FILE_TO_BE_PATCHED = 'README'
+    NEW_CONTENT = os.path.join(get_mission_data_path(), 'README-new-for-svn-diff')
 
     @classmethod
     def validate_diff_and_commit_if_ok(cls, username, diff):
@@ -300,16 +316,16 @@ class SvnRepositoryManager(object):
             raise IncorrectPatch, 'The patch affects more than one file.'
 
         # Check that the filename it patches is correct.
-        if the_patch.source[0] != cls.FILE_TO_BE_PATCHED_FOR_DIFF_MISSION or the_patch.target[0] != cls.FILE_TO_BE_PATCHED_FOR_DIFF_MISSION:
+        if the_patch.source[0] != cls.FILE_TO_BE_PATCHED or the_patch.target[0] != cls.FILE_TO_BE_PATCHED:
             raise IncorrectPatch, 'The patch affects the wrong file.'
 
         # Now we need to generate a working copy to apply the patch to.
         # We can also use this working copy to commit the patch if it's OK.
         wcdir = tempfile.mkdtemp()
+        repo = SvnRepository(username)
         try:
-            trunk_file_url = 'file://' + os.path.join(settings.SVN_REPO_PATH, username, 'trunk')
-            subproc_check_output(['svn', 'co', trunk_file_url, wcdir])
-            file_to_patch = os.path.join(wcdir, cls.FILE_TO_BE_PATCHED_FOR_DIFF_MISSION)
+            subproc_check_output(['svn', 'co', repo.file_trunk_url(), wcdir])
+            file_to_patch = os.path.join(wcdir, cls.FILE_TO_BE_PATCHED)
 
             # Check that it will apply correctly to the working copy.
             if not the_patch._match_file_hunks(file_to_patch, the_patch.hunks[0]):
@@ -317,14 +333,14 @@ class SvnRepositoryManager(object):
 
             # Check that the resulting file matches what is expected.
             new_content = ''.join(the_patch.patch_stream(open(file_to_patch), the_patch.hunks[0]))
-            if new_content != open(cls.NEW_CONTENT_FOR_DIFF_MISSION).read():
+            if new_content != open(cls.NEW_CONTENT).read():
                 raise IncorrectPatch, 'The file resulting from patching does not have the correct contents.'
 
             # Commit the patch.
             open(file_to_patch, 'w').write(new_content)
             commit_message = '''Fix a typo in %s.
 
-Thanks for reporting this, %s!''' % (cls.FILE_TO_BE_PATCHED_FOR_DIFF_MISSION, username)
+Thanks for reporting this, %s!''' % (cls.FILE_TO_BE_PATCHED, username)
             subproc_check_output(['svn', 'commit', '-m', commit_message, '--username', 'mr_bad', wcdir])
 
         finally:

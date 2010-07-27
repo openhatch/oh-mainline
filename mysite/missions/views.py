@@ -256,7 +256,7 @@ def diffpatch_patchrecursive_submit(request):
 def svn_resetrepo(request):
     if request.method != 'POST':
         return HttpResponseNotAllowed(['POST'])
-    controllers.SvnRepositoryManager.reset_repository(request.user.username)
+    controllers.SvnRepository(request.user.username).reset()
     return HttpResponseRedirect(reverse(svn_mission_about))
 
 def svn_data(request, passed_data={}):
@@ -270,19 +270,20 @@ def svn_data(request, passed_data={}):
       'svn_diff_error_message': '',
     }
     if request.user.is_authenticated():
+        repo = controllers.SvnRepository(request.user.username)
         data.update({
-            'repository_exists': controllers.SvnRepositoryManager.repository_exists(request.user.username),
+            'repository_exists': repo.exists(),
             'svn_checkout_done': controllers.mission_completed(request.user.get_profile(), 'svn_checkout'),
             'svn_diff_done': controllers.mission_completed(request.user.get_profile(), 'svn_diff'),
         })
         if data['repository_exists']:
           data.update({
-            'checkout_url': controllers.SvnRepositoryManager.repository_trunk_url(request.user.username),
-            'secret_word_file': controllers.SvnRepositoryManager.SECRET_WORD_FILE,
-            'file_for_svn_diff': controllers.SvnRepositoryManager.FILE_TO_BE_PATCHED_FOR_DIFF_MISSION,
-            'new_secret_word': controllers.SvnRepositoryManager.NEW_SECRET_WORD_FOR_COMMIT_MISSION,
+            'checkout_url': repo.public_trunk_url(),
+            'secret_word_file': controllers.SvnCheckoutMission.SECRET_WORD_FILE,
+            'file_for_svn_diff': controllers.SvnDiffMission.FILE_TO_BE_PATCHED,
+            'new_secret_word': controllers.SvnCommitMission.NEW_SECRET_WORD,
             'commit_username': request.user.username,
-            'commit_password': controllers.SvnRepositoryManager.get_password(request.user.username)
+            'commit_password': repo.get_password()
           })
     data.update(passed_data)
     return data
@@ -306,7 +307,7 @@ def svn_checkout_submit(request):
     if request.method == 'POST':
         form = forms.SvnCheckoutForm(request.POST)
         if form.is_valid():
-            if form.cleaned_data['secret_word'] == controllers.SvnRepositoryManager.get_secret_word(request.user.username):
+            if form.cleaned_data['secret_word'] == controllers.SvnCheckoutMission.get_secret_word(request.user.username):
                 controllers.set_mission_completed(request.user.get_profile(), 'svn_checkout')
                 data['svn_checkout_success'] = True
             else:
@@ -328,7 +329,7 @@ def svn_diff_submit(request):
         form = forms.SvnDiffForm(request.POST)
         if form.is_valid():
             try:
-                controllers.SvnRepositoryManager.validate_diff_and_commit_if_ok(request.user.username, form.cleaned_data['diff'])
+                controllers.SvnDiffMission.validate_diff_and_commit_if_ok(request.user.username, form.cleaned_data['diff'])
                 controllers.set_mission_completed(request.user.get_profile(), 'svn_diff')
                 data['svn_diff_success'] = True
             except controllers.IncorrectPatch, e:
