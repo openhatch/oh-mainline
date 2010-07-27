@@ -1,4 +1,5 @@
 from mysite.missions.models import Step, StepCompletion
+from mysite.profile.models import Person
 from django.conf import settings
 from mysite.base.helpers import subproc_check_output
 
@@ -299,10 +300,6 @@ class SvnCheckoutMission(object):
         return SvnRepository(username).cat('/trunk/' + cls.SECRET_WORD_FILE).strip()
 
 
-class SvnCommitMission(object):
-    NEW_SECRET_WORD = 'plenipotentiary'
-
-
 class SvnDiffMission(object):
     FILE_TO_BE_PATCHED = 'README'
     NEW_CONTENT = os.path.join(get_mission_data_path(), 'README-new-for-svn-diff')
@@ -345,3 +342,68 @@ Thanks for reporting this, %s!''' % (cls.FILE_TO_BE_PATCHED, username)
 
         finally:
             shutil.rmtree(wcdir)
+
+# Helpers for the hook scripts for the svn commit mission.
+# We can mock these in the tests.
+def get_username_for_svn_txn(repo_path, txn_id):
+    return subproc_check_output([settings.SVNLOOK, 'author', repo_path, '-t', txn_id]).strip()
+
+def get_changes_for_svn_txn(repo_path, txn_id):
+    changes = subproc_check_output([settings.SVNLOOK, 'changed', repo_path, '-t', txn_id])
+    # Lines are in the form:
+    # <one letter for operation> <three spaces> <path in repository> <newline>
+    # as in:
+    # "U    trunk/README\n"
+    for line in StringIO(changes):
+        yield line[0], line[4:-1]
+
+def get_file_for_svn_txn(repo_path, txn_id, filename):
+    return subproc_check_output([settings.SVNLOOK, 'cat', repo_path, '-t', txn_id, filename])
+
+def get_log_for_svn_txn(repo_path, txn_id):
+    return subproc_check_output([settings.SVNLOOK, 'log', repo_path, '-t', txn_id])
+
+
+class SvnCommitMission(object):
+    SECRET_WORD_FILE = 'word.txt'
+    NEW_SECRET_WORD = 'plenipotentiary'
+    FILE_TO_BE_PATCHED = 'README'
+    NEW_CONTENT = os.path.join(get_mission_data_path(), 'README-new-for-svn-commit')
+
+    @classmethod
+    def pre_commit_hook(cls, repo_path, txn_id):
+        username = get_username_for_svn_txn(repo_path, txn_id)
+        if username == 'mr_bad':
+            return  # let it in: it's the auto-commit for the diff mission
+
+        person = Person.objects.get(user__username=username)
+
+        if not mission_completed(person, 'svn_diff'):
+            raise IncorrectPatch, 'The svn diff mission must be completed before the svn commit mission.'
+
+        # Check that the correct files are modified.
+        paths_that_should_be_modified = ['trunk/' + cls.SECRET_WORD_FILE, 'trunk/' + cls.FILE_TO_BE_PATCHED]
+        for action, path in get_changes_for_svn_txn(repo_path, txn_id):
+            if action != 'U':
+                raise IncorrectPatch, 'No files should have been added or removed.'
+            if path not in paths_that_should_be_modified:
+                raise IncorrectPatch, 'File "%s" should not have been modified.' % path
+            paths_that_should_be_modified.remove(path)
+
+        if len(paths_that_should_be_modified):
+            raise IncorrectPatch, 'File "%s" should have been modified.' % paths_that_should_be_modified[0]
+
+        # Check the secret word.
+        if get_file_for_svn_txn(repo_path, txn_id, 'trunk/'+cls.SECRET_WORD_FILE).strip() != cls.NEW_SECRET_WORD:
+            raise IncorrectPatch, 'The new secret word is incorrect.'
+
+        # Check the other patched file.
+        if get_file_for_svn_txn(repo_path, txn_id, 'trunk/'+cls.FILE_TO_BE_PATCHED) != open(cls.NEW_CONTENT).read():
+            raise IncorrectPatch, 'The new content of %s is incorrect.' % cls.FILE_TO_BE_PATCHED
+
+        # Check for a log message.
+        if get_log_for_svn_txn(repo_path, txn_id).strip() == '':
+            raise IncorrectPatch, 'No log message was provided.'
+
+        set_mission_completed(person, 'svn_commit')
+        # And let the commit in...
