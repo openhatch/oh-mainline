@@ -12,8 +12,6 @@ import django.shortcuts
 from django.template import RequestContext
 import django.conf
 
-import mysite.base.decorators
-
 def json_response(python_object):
     json = simplejson.dumps(python_object)
     return HttpResponse(json, mimetype="application/json")
