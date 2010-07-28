@@ -36,6 +36,18 @@ Open source training missions
       {% endif %}
     {% endif %}
     <p><a href="{% url mysite.missions.views.diffpatch_mission_about %}">Go to this mission</a></p>
+
+    <h2>Using Subversion</h2>
+    <p>Learn how to interact with projects that use the Subversion version control system.</p>
+    {% if completed_missions.svn_checkout or completed_missions.svn_diff or completed_missions.svn_commit %}
+      {% if completed_missions.svn_checkout and completed_missions.svn_diff and completed_missions.svn_commit %}
+        <p><em>You have completed this mission.</em></p>
+      {% else %}
+        <p><em>You have partially completed this mission.</em></p>
+      {% endif %}
+    {% endif %}
+    <p><a href="{% url mysite.missions.views.svn_mission_about %}">Go to this mission</a></p>
+
   </div>
 </div>
 {% endblock main %}
