@@ -6,22 +6,16 @@
     <h3>Diffing your changes</h3>
   </div>
   <div class="body">
-      <p>Now that you have your up-to-date working copy, you can make the changes that you want to submit to the project.</p>
+      <p>It's good of you to share with us the information you have gathered, but you still have to gain a little more of Mr. Bad's trust.</p>
+      <p>Your headquarters knows that Mr. Bad isn't the best typist, so it is likely that the plans have a typographical error somewhere.  Mr. Bad is embarrassed by typos, so if you were to fix such an error, that would make him happy.  Maybe he will even be happy enough to grant you commit access.</p>
 
-      <p>Since you are just starting to work with the project, you will not be able to commit your changes directly to the repository.  You will need to run <code>svn diff</code> to give your changes to an established developer who will commit the changes for you if your changes are good.</p>
-
-      <p><code>svn diff</code> makes a unified diff of the changes you have made to your working copy.  This diff will apply correctly with <code>patch -p0</code> in an unmodified working copy of the same revision in the same directory in which you ran <code>svn diff</code>.</p>
+      <p>You can give Mr. Bad a patch containing your changes.  If he likes it, he'll commit it for you.</p>
 
       <p>Your mission is this:</p>
       <ul class="raquo_bullets">
       <li>You can use your working copy from the previous mission.</li>
       <li>The file <code>{{ file_for_svn_diff }}</code> contains a typographical error.  Fix it in your working copy.</li>
       <li>Run <code>svn diff</code> and paste its output into the box below.</li>
-      </ul>
-      <p>Some extra notes:</p>
-      <ul class="raquo_bullets">
-      <li>The usual considerations for sending the diff output inline versus attached apply; this is a small diff, so it would go inline.</li>
-      <li>If your diff is accepted, it will be automatically committed to the repository.  This simulates the process of an established developer accepting your changes and committing them for you.</li>
       </ul>
 
       <form method="post" action="{% url mysite.missions.views.svn_diff_submit %}#svndiff-form">
