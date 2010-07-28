@@ -354,10 +354,10 @@ Thanks for reporting this, %s!''' % (cls.FILE_TO_BE_PATCHED, username)
 # Helpers for the hook scripts for the svn commit mission.
 # We can mock these in the tests.
 def get_username_for_svn_txn(repo_path, txn_id):
-    return subproc_check_output([settings.SVNLOOK, 'author', repo_path, '-t', txn_id]).strip()
+    return subproc_check_output(['svnlook', 'author', repo_path, '-t', txn_id]).strip()
 
 def get_changes_for_svn_txn(repo_path, txn_id):
-    changes = subproc_check_output([settings.SVNLOOK, 'changed', repo_path, '-t', txn_id])
+    changes = subproc_check_output(['svnlook', 'changed', repo_path, '-t', txn_id])
     # Lines are in the form:
     # <one letter for operation> <three spaces> <path in repository> <newline>
     # as in:
@@ -366,10 +366,10 @@ def get_changes_for_svn_txn(repo_path, txn_id):
         yield line[0], line[4:-1]
 
 def get_file_for_svn_txn(repo_path, txn_id, filename):
-    return subproc_check_output([settings.SVNLOOK, 'cat', repo_path, '-t', txn_id, filename])
+    return subproc_check_output(['svnlook', 'cat', repo_path, '-t', txn_id, filename])
 
 def get_log_for_svn_txn(repo_path, txn_id):
-    return subproc_check_output([settings.SVNLOOK, 'log', repo_path, '-t', txn_id])
+    return subproc_check_output(['svnlook', 'log', repo_path, '-t', txn_id])
 
 
 class SvnCommitMission(object):

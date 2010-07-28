@@ -238,7 +238,3 @@ SVN_REPO_PATH = os.path.join(MEDIA_ROOT_BEFORE_STATIC, 'missions-userdata', 'svn
 
 # This should include a trailing slash.
 SVN_REPO_URL_PREFIX = 'svn://openhatch.org/'
-
-# We need a full path to this because Subversion executes hook scripts without
-# the PATH environment variable set.
-SVNLOOK = '/usr/bin/svnlook'
