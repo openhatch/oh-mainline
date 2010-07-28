@@ -48,3 +48,5 @@ try:
     from deployment_settings_secret_keys import GOOGLE_ANALYTICS_CODE
 except ImportError:
     pass
+
+PATH_TO_MANAGEMENT_SCRIPT = '/home/deploy/milestone-a/bin/production'

@@ -16,6 +16,7 @@ import shutil
 import binascii
 import otp
 import tempfile
+import pipes
 
 def get_mission_data_path():
     return os.path.join(os.path.dirname(__file__), 'data')
@@ -276,9 +277,9 @@ class SvnRepository(object):
         # Install the pre-commit hook.
         precommit_hook_path = os.path.join(self.repo_path, 'hooks', 'pre-commit')
         open(precommit_hook_path, 'w').write('''#!/bin/sh -e
-export PATH='%s'
-exec '%s' -W ignore '%s' svn_precommit "$@"
-''' % (os.environ['PATH'], sys.executable, os.path.abspath(sys.argv[0])))
+export PATH=%s
+exec %s -W ignore %s svn_precommit "$@"
+''' % (pipes.quote(os.environ['PATH']), pipes.quote(sys.executable), pipes.quote(settings.PATH_TO_MANAGEMENT_SCRIPT)))
         os.chmod(precommit_hook_path, 0755)
 
     def exists(self):

@@ -3,6 +3,7 @@
 import os
 import logging
 import datetime
+import sys
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -238,3 +239,6 @@ SVN_REPO_PATH = os.path.join(MEDIA_ROOT_BEFORE_STATIC, 'missions-userdata', 'svn
 
 # This should include a trailing slash.
 SVN_REPO_URL_PREFIX = 'svn://openhatch.org/'
+
+# The script to invoke for management commands in this environment.
+PATH_TO_MANAGEMENT_SCRIPT = os.path.abspath(sys.argv[0])
