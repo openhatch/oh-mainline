@@ -24,6 +24,9 @@ def get_mission_data_path():
 def set_mission_completed(profile, mission_name):
     StepCompletion.objects.get_or_create(person=profile, step=Step.objects.get(name=mission_name))
 
+def unset_mission_completed(profile, mission_name):
+    StepCompletion.objects.filter(person=profile, step=Step.objects.get(name=mission_name)).delete()
+
 def mission_completed(profile, mission_name):
     return len(StepCompletion.objects.filter(step__name=mission_name, person=profile)) != 0
 

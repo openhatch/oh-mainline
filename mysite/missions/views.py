@@ -257,6 +257,9 @@ def svn_resetrepo(request):
     if request.method != 'POST':
         return HttpResponseNotAllowed(['POST'])
     controllers.SvnRepository(request.user.username).reset()
+    controllers.unset_mission_completed(request.user.get_profile(), 'svn_checkout')
+    controllers.unset_mission_completed(request.user.get_profile(), 'svn_diff')
+    controllers.unset_mission_completed(request.user.get_profile(), 'svn_commit')
     if 'stay_on_this_page' in request.GET:
         return HttpResponseRedirect(reverse(svn_mission_about))
     else:
