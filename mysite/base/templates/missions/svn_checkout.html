@@ -6,12 +6,16 @@
     <h3>Checking out a working copy</h3>
   </div>
   <div class="body">
+      <p>You are an agent for Mr. Good, and you are trying to gain the trust of Mr. Bad.  Due to your charm and wit, he has offered you read-only access to the plans for an upcoming mission for one of his agents.  To keep track of the development of his plans, he uses Subversion.  Your eventual goal is to be able to modify Mr. Bad's plans.</p>
+
+      <p>Your first task is to identify the secret word the agent will be using to complete his mission.</p>
+
       <p>The first step in interacting with a Subversion repository is checking out a <em>working copy</em>.  A working copy is a copy of the files in the repository as of a specific revision (by default, the latest).  The working copy keeps track of what revision it corresponds to, what repository it came from, and what the files originally contained so that you can create patches of your work, revert modified files to their original state, and commit changes from that working copy.</p>
 
-      <p>You can check out your repository by running:<br style="clear: left;" />
+      <p>You can check out the repository by running:<br style="clear: left;" />
       <code>svn checkout {{ checkout_url }} svn_missions</code></p>
 
-      <p>Once you check out a working copy, give us the secret word in the file <code>{{ secret_word_file }}</code>.</p>
+      <p>Once you check out a working copy, you can find the secret word in the file <code>{{ secret_word_file }}</code>.</p>
 
     {% if svn_checkout_done %}
       <div class="successmsg">
