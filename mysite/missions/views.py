@@ -316,7 +316,7 @@ def svn_checkout_submit(request):
         if form.is_valid():
             if form.cleaned_data['secret_word'] == controllers.SvnCheckoutMission.get_secret_word(request.user.username):
                 controllers.set_mission_completed(request.user.get_profile(), 'svn_checkout')
-                data['svn_checkout_success'] = True
+                return HttpResponseRedirect(reverse(svn_checkout))
             else:
                 data['svn_checkout_error_message'] = 'The secret word is incorrect.'
         data['svn_checkout_form'] = form
