@@ -273,6 +273,14 @@ class SvnRepository(object):
         if dumploader.returncode != 0:
             raise RuntimeError, 'svnadmin load failed'
 
+        # Install the pre-commit hook.
+        precommit_hook_path = os.path.join(self.repo_path, 'hooks', 'pre-commit')
+        open(precommit_hook_path, 'w').write('''#!/bin/sh -e
+export PATH='%s'
+exec '%s' -W ignore '%s' svn_precommit "$@"
+''' % (os.environ['PATH'], sys.executable, os.path.abspath(sys.argv[0])))
+        os.chmod(precommit_hook_path, 0755)
+
     def exists(self):
         return os.path.isdir(self.repo_path)
 
