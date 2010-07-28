@@ -275,6 +275,7 @@ def svn_data(request, passed_data={}):
             'repository_exists': repo.exists(),
             'svn_checkout_done': controllers.mission_completed(request.user.get_profile(), 'svn_checkout'),
             'svn_diff_done': controllers.mission_completed(request.user.get_profile(), 'svn_diff'),
+            'svn_commit_done': controllers.mission_completed(request.user.get_profile(), 'svn_commit'),
         })
         if data['repository_exists']:
           data.update({
