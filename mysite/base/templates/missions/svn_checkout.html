@@ -8,13 +8,8 @@
   <div class="body">
       <p>The first step in interacting with a Subversion repository is checking out a <em>working copy</em>.  A working copy is a copy of the files in the repository as of a specific revision (by default, the latest).  The working copy keeps track of what revision it corresponds to, what repository it came from, and what the files originally contained so that you can create patches of your work, revert modified files to their original state, and commit changes from that working copy.</p>
 
-      <p>Working copies are checked out by running:<br style="clear: left;" />
-      <code>svn checkout <em>[url]</em> <em>[destination]</em></code></p>
-
-      <p>The <em>[destination]</em> directory becomes a working copy of the latest revision of the Subversion repository at <em>[url]</em>.  The directory will be created if it doesn't exist.</p>
-
-      <p>The URL you will be using is:<br style="clear: left;" />
-      <code>{{ checkout_url }}</code></p>
+      <p>You can check out your repository by running:<br style="clear: left;" />
+      <code>svn checkout {{ checkout_url }} svn_missions</code></p>
 
       <p>Once you check out a working copy, give us the secret word in the file <code>{{ secret_word_file }}</code>.</p>
 
