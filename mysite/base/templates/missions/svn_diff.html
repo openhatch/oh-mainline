@@ -18,15 +18,16 @@
       <li>Run <code>svn diff</code> and paste its output into the box below.</li>
       </ul>
 
+    {% if svn_diff_done %}
+      <div class="successmsg">
+        <p><strong>You have successfully completed this part of the mission.</strong></p>
+      </div>
+      <p class="next_mission_link">
+	<a href="{% url mysite.missions.views.svn_commit %}">Committing your changes &raquo;</a></p>
+    {% else %}
       <form method="post" action="{% url mysite.missions.views.svn_diff_submit %}#svndiff-form">
         <div class="form-row">
           <a name="svndiff-form"></a>
-    {% if svn_diff_success %}
-      <div class="successmsg">
-        <p><strong>You have successfully completed this part of the mission.</strong></p>
-        <p>The diff makes the correct changes and has been committed to the repository.</p>
-      </div>
-    {% endif %}
           {% if svn_diff_error_message %}
           <ul class="errorlist"><li>{{ svn_diff_error_message }}</li></ul>
           {% endif %}
@@ -36,15 +37,8 @@
           {{ svn_diff_form.diff }}
           <br style="clear: left;" />
           <input type="submit" value="Submit" style="float: none;" />
-          {% if svn_diff_done %}
-          <br style="clear: left;" />
-          <em>You have already completed this part of the mission.</em>
-          {% endif %}
         </div>
       </form>
-    {% if svn_diff_done %}
-      <p class="next_mission_link">
-	<a href="{% url mysite.missions.views.svn_commit %}">Committing your changes &raquo;</a></p>
     {% endif %}
 
 {% endblock mission_main %}

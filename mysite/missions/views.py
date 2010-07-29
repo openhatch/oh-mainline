@@ -338,7 +338,7 @@ def svn_diff_submit(request):
             try:
                 controllers.SvnDiffMission.validate_diff_and_commit_if_ok(request.user.username, form.cleaned_data['diff'])
                 controllers.set_mission_completed(request.user.get_profile(), 'svn_diff')
-                data['svn_diff_success'] = True
+                return HttpResponseRedirect(reverse(svn_diff))
             except controllers.IncorrectPatch, e:
                 data['svn_diff_error_message'] = str(e)
         data['svn_diff_form'] = form
