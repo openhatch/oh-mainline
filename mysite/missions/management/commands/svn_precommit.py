@@ -18,5 +18,5 @@ class Command(BaseCommand):
         try:
             controllers.SvnCommitMission.pre_commit_hook(repo_path, txn_id)
         except controllers.IncorrectPatch, e:
-            sys.stderr.write(str(e) + '\n\n')
+            sys.stderr.write('\n    ' + str(e) + '\n\n')
             raise CommandError, 'The commit failed to validate.'
