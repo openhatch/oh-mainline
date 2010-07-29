@@ -1,5 +1,12 @@
 {% extends 'missions/svn_base.html' %}
 
+{% block js %}
+{{ block.super }}
+{% if not svn_commit_done %}
+<script type="text/javascript" src="/static/js/missions/svn-commit-poller.js"></script>
+{% endif %}
+{% endblock js %}
+
 {% block mission_main %}
 <div class='submodule fat'>
   <div class='head'>
@@ -27,10 +34,16 @@
       <p>Commit username: <code>{{ commit_username }}</code><br />
       Commit password: <code>{{ commit_password }}</code></p>
 
-      <p>For this mission, if there is something wrong with the commit you make, your commit will fail with an error message explaining what happened.  You can then fix your commit and try again.  Once your commit succeeds, this mission will be marked as completed. You will have to refresh the page to see that.</p>
+      <p>For this mission, if there is something wrong with the commit you make, your commit will fail with an error message explaining what happened.  You can then fix your commit and try again.  Once your commit succeeds, this mission will be marked as completed. <noscript>You will have to refresh the page to see that.</noscript></p>
 
-          {% if svn_commit_done %}
-    {# TODO: reverse AJAX? #}
+    {% if not svn_commit_done %}
+    <style type="text/css">
+      .hide_until_svn_commit_mission_is_complete {
+        display: none;
+      }
+    </style>
+    {% endif %}
+    <div class="hide_until_svn_commit_mission_is_complete">
       <div class="successmsg">
         <p><strong>You have successfully completed this mission.</strong></p>
       </div>
@@ -38,6 +51,6 @@
       <p>(You might be wondering -- won't Mr. Bad or his agents notice that the changes were made by you? The agents could read the output of <code>svn log</code>, but they have no reason to suspect that {{ commit_username }}'s changes are unfriendly to them. And Mr. Bad himself isn't paying attention. Many real open source projects have commit mailing lists where all changes are sent. Developers can read that to watch changes.)</p>
 
       <p>That's all we have for Subversion training missions.  <a href="{% url mysite.missions.views.main_page %}">Return to the main mission page</a></p>
-    {% endif %}
+    </div>
 
 {% endblock mission_main %}

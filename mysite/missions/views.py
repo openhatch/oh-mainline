@@ -7,6 +7,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 
 import os
+import simplejson
 
 def make_download(content, filename, mimetype='application/octet-stream'):
     resp = HttpResponse(content)
@@ -350,3 +351,7 @@ def svn_commit(request, passed_data={}):
     data = svn_data(request, passed_data)
     data['this_mission_page_short_name'] = 'Committing your changes'
     return (request, 'missions/svn_commit.html', data)
+
+@login_required
+def svn_commit_poll(request):
+    return HttpResponse(simplejson.dumps(controllers.mission_completed(request.user.get_profile(), 'svn_commit')))

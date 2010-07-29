@@ -94,6 +94,7 @@ urlpatterns = patterns('',
         (r'^missions/svn/diff$', 'mysite.missions.views.svn_diff'),
         (r'^missions/svn/diff/submit$', 'mysite.missions.views.svn_diff_submit'),
         (r'^missions/svn/commit$', 'mysite.missions.views.svn_commit'),
+        (r'^missions/svn/commit/poll$', 'mysite.missions.views.svn_commit_poll'),
 
         # Invitation-related URLs
         (r'^invitation/', include('invitation.urls')),
