@@ -1,9 +1,16 @@
 This directory contains users' Subversion repositories for the
 Subversion-related training missions.  To make them accessible (and
 therefore make it possible for users to do the svn missions), you will
-have to do the following:
+have to serve this directory out using svnserve, as we use an svnserve-
+specific authentication mechanism for commits.
 
-  * TODO (we haven't decided the most appropriate way yet)
+However you go about doing that, set SVN_REPO_URL_PREFIX in settings.py
+to whatever URL points to this directory.
 
-This file's other purpose in life is to make sure the directory it is
-in exists because Git won't version empty directories.
+For example, OpenHatch itself uses the following inetd.conf line:
+svn stream tcp nowait deploy /usr/bin/svnserve svnserve --inetd --root /home/deploy/milestone-a/mysite/missions-userdata/svn/
+
+
+(In addition to providing this information, this file is present to
+make sure the directory it is in exists because Git won't version empty
+directories.)
