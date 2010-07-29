@@ -1,5 +1,9 @@
+proc status {msg} {send_user "\033\[1;32m$msg\033\[0m"}
+proc status_error {msg} {send_user "\033\[1;31m$msg\033\[0m"}
+proc status_warning {msg} {send_user "\033\[1;33m$msg\033\[0m"}
+
 # Log into linode
-send_user "\r\n*** Dialing into remote computer... ***\r\n"
+status "\r\n*** Dialing into remote computer... ***\r\n"
 spawn ssh deploy@linode.openhatch.org
 expect "$ "
 
@@ -10,28 +14,28 @@ expect "$ "
 send "cd milestone-a\r"
 expect "$ "
 
-send_user "\r\n*** Fetching changes from git's remote repository... ***\r\n"
+status "\r\n*** Fetching changes from git's remote repository... ***\r\n"
 send "git fetch\r"
 expect "$ "
 
-send_user "\r\n*** Checking for uncommitted modifications to the remote filesystem... ***\r\n"
+status "\r\n*** Checking for uncommitted modifications to the remote filesystem... ***\r\n"
 send "git ls-files -m\r"
 expect "$ " {exp_continue} \
-           ".*" {send_user "\r\nThere were some uncommitted modifications in the remote filesystem.\r\n"; exit 3}
+           ".*" {status_error "\r\nThere were some uncommitted modifications in the remote filesystem.\r\n"; exit 3}
 
-send_user "\r\n*** Merging... ***\r\n"
+status "\r\n*** Merging... ***\r\n"
 send "git merge origin/master\r"
 
 while {true} {
     expect {
         "Fast forward" {
-            send_user "Fast forward detected. Proceeding...\r"
+            status "Fast forward detected. Proceeding...\r"
 
             # Run buildout if buildout was changed.
             expect {
                 "buildout.cfg" {
                     expect "$ "
-                    send_user "\r\n*** Change to buildout.cfg detected. Running buildout... ***\r\n"
+                    status "\r\n*** Change to buildout.cfg detected. Running buildout... ***\r\n"
                     send "./bin/buildout\r"
                     expect "$ "
                 }
@@ -40,26 +44,26 @@ while {true} {
             break
         }
         "Already up-to-date." {
-            send_user "Tried to merge, but git cried, 'Already up-to-date'. Proceeding anyway...\r\n"
+            status_warning "Tried to merge, but git cried, 'Already up-to-date'. Proceeding anyway...\r\n"
             expect "$ "
             break
         }
         "$ " {
-            send_user "There was no fast forward. Aborting...\r\n"
+            status_error "There was no fast forward. Aborting...\r\n"
             exit 1
         }
     }
 }
 
-send_user "\r\n*** Attempting to run migrations... ***\r\n"
+status "\r\n*** Attempting to run migrations... ***\r\n"
 send "./bin/production migrate --merge\r"
 expect "$ "
 
-send_user "\r\n*** Syncing the un-migrated models... ***\r\n"
+status "\r\n*** Syncing the un-migrated models... ***\r\n"
 send "./bin/production syncdb\r"
 expect "$ "
 
-send_user "\r\n*** Reloading the web site... ***\r\n"
+status "\r\n*** Reloading the web site... ***\r\n"
 send "touch bin/production.wsgi\r"
 expect "$ "
 
