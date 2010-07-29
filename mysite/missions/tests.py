@@ -435,7 +435,6 @@ class SvnViewTests(TwillTests):
             subprocess.check_call(['svn', 'checkout', response.context['checkout_url'], checkoutdir])
             word = open(os.path.join(checkoutdir, response.context['secret_word_file'])).read().strip()
             response = self.client.post(reverse(views.svn_checkout_submit), {'secret_word': word})
-            self.assert_(response.context['svn_checkout_success'])
             paulproteus = Person.objects.get(user__username='paulproteus')
             self.assert_(controllers.mission_completed(paulproteus, 'svn_checkout'))
         finally:
@@ -444,7 +443,6 @@ class SvnViewTests(TwillTests):
     def test_do_checkout_mission_incorrectly(self):
         self.client.post(reverse(views.svn_resetrepo))
         response = self.client.post(reverse(views.svn_checkout_submit), {'secret_word': 'not_the_secret_word'})
-        self.assertFalse(response.context['svn_checkout_success'])
         paulproteus = Person.objects.get(user__username='paulproteus')
         self.assertFalse(controllers.mission_completed(paulproteus, 'svn_checkout'))
 
@@ -463,7 +461,6 @@ class SvnViewTests(TwillTests):
 
             # Submit the diff.
             response = self.client.post(reverse(views.svn_diff_submit), {'diff': diff})
-            self.assert_(response.context['svn_diff_success'])
             paulproteus = Person.objects.get(user__username='paulproteus')
             self.assert_(controllers.mission_completed(paulproteus, 'svn_diff'))
 
