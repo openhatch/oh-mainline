@@ -1,17 +1,17 @@
 # Log into linode
 send_user "\r\n*** Dialing into remote computer... ***\r\n"
 spawn ssh deploy@linode.openhatch.org
+expect "$ "
 
-#FIXME: use /bin/dash -e so the remote shell simply exits on error
+# Make the remote shell exit on error.
+send "set -e\r"
 expect "$ "
 
 send "cd milestone-a\r"
 expect "$ "
 
 send_user "\r\n*** Fetching changes from git's remote repository... ***\r\n"
-send "git fetch; echo $?\r"
-expect "0\r\n"
-# Expect a success exit code from 'git fetch'
+send "git fetch\r"
 expect "$ "
 
 send_user "\r\n*** Checking for uncommitted modifications to the remote filesystem... ***\r\n"
@@ -24,32 +24,31 @@ send "git merge origin/master\r"
 
 while {true} {
     expect {
-        eof {
-            send_user "EOF"
-            exit 1
-        }
         "Fast forward" {
             send_user "Fast forward detected. Proceeding...\r"
+
+            # Run buildout if buildout was changed.
+            expect {
+                "buildout.cfg" {
+                    expect "$ "
+                    send_user "\r\n*** Change to buildout.cfg detected. Running buildout... ***\r\n"
+                    send "./bin/buildout\r"
+                    expect "$ "
+                }
+                "$ "
+            }
             break
         }
         "Already up-to-date." {
             send_user "Tried to merge, but git cried, 'Already up-to-date'. Proceeding anyway...\r\n"
+            expect "$ "
             break
         }
         "$ " {
             send_user "There was no fast forward. Aborting...\r\n"
             exit 1
-            }
+        }
     }
-}
-
-# Run buildout if buildout was changed.
-expect {
-    "buildout.cfg" {
-        send_user "\r\n*** Change to buildout.cfg detected. Running buildout... ***\r\n"
-        send "./bin/buildout\r"
-    }
-    "$ " 
 }
 
 send_user "\r\n*** Attempting to run migrations... ***\r\n"
@@ -61,7 +60,8 @@ send "./bin/production syncdb\r"
 expect "$ "
 
 send_user "\r\n*** Reloading the web site... ***\r\n"
-send "touch bin/production.wsgi; echo $?\r"
-expect "0\r\n"
+send "touch bin/production.wsgi\r"
+expect "$ "
 
-#send "screen -rd"
+send "exit\r"
+expect eof
