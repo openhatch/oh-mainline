@@ -191,7 +191,7 @@ class Patch(object):
             warning("invalid hunk no.%d at %d for target file %s" % (nexthunkno, lineno+1, self.target[nextfileno-1]))
             # add hunk status node
             self.hunks[nextfileno-1].append(hunkinfo.copy())
-            self.hunks[nextfileno-1][nexthunkno-1]["invalid"] = True
+            self.hunks[nextfileno-1][nexthunkno-1].invalid = True
             # switch to hunkskip state
             hunkbody = False
             hunkskip = True
@@ -201,7 +201,7 @@ class Patch(object):
             warning("extra hunk no.%d lines at %d for target %s" % (nexthunkno, lineno+1, self.target[nextfileno-1]))
             # add hunk status node
             self.hunks[nextfileno-1].append(hunkinfo.copy())
-            self.hunks[nextfileno-1][nexthunkno-1]["invalid"] = True
+            self.hunks[nextfileno-1][nexthunkno-1].invalid = True
             # switch to hunkskip state
             hunkbody = False
             hunkskip = True
