@@ -18,8 +18,10 @@ def json_response(python_object):
     return HttpResponse(json, mimetype="application/json")
 
 class ObjectFromDict(object):
-    def __init__(self, data):
+    def __init__(self, data, recursive = False):
         for key in data:
+            if recursive and type(data[key]) == type({}):
+                data[key] = ObjectFromDict(data[key], recursive = recursive)
             setattr(self, key, data[key])
 
 def assert_or_pdb(expression):
