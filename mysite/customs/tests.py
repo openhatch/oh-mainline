@@ -31,6 +31,7 @@ import datetime
 from dateutil.tz import tzutc
 import ohloh
 import lp_grabber
+import gdata.client
 
 from mysite.profile.tasks import FetchPersonDataFromOhloh
 import mysite.customs.debianqa
@@ -1261,6 +1262,16 @@ class DailyBugImporter(django.test.TestCase):
     def test_bugzilla_http_generic_error_does_break(self, mock_error):
         mock_error.side_effect = ValueError()
         self.assertRaises(ValueError, mysite.customs.management.commands.customs_daily_tasks.Command().find_and_update_enabled_bugzilla_instances)
+
+    @mock.patch('gdata.projecthosting.client.ProjectHostingClient.get_issues')
+    def test_google_request_error_does_not_break(self, mock_error):
+        mock_error.side_effect = gdata.client.RequestError()
+        mysite.customs.management.commands.customs_daily_tasks.Command().find_and_update_enabled_google_instances()
+
+    @mock.patch('gdata.projecthosting.client.ProjectHostingClient.get_issues')
+    def test_google_generic_error_does_break(self, mock_error):
+        mock_error.side_effect = ValueError()
+        self.assertRaises(ValueError, mysite.customs.management.commands.customs_daily_tasks.Command().find_and_update_enabled_google_instances)
 
 class GoogleCodeBugTracker(django.test.TestCase):
     @mock.patch('mysite.customs.bugtrackers.google.GoogleBug.get_bug_atom_data')

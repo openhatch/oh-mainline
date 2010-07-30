@@ -1,6 +1,8 @@
 import logging
 import urllib2
 
+import gdata.client
+
 from django.core.management.base import BaseCommand
 
 import django.conf
@@ -113,7 +115,11 @@ class Command(BaseCommand):
         for thing in enabled_google_instances:
             logging.info("[Google] About to update %s" % thing)
             instantiated = thing()
-            instantiated.update()
+            try:
+                instantiated.update()
+            except gdata.client.RequestError, e:
+                logging.error("[Google] ERROR: Importer failed, probably HTTP403, continuing on...")
+                logging.error("[Google] Error message: %s" % str(e))
 
     def update_launchpad_hosted_projects(self):
         ### For Launchpad:
