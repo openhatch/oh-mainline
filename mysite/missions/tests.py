@@ -470,6 +470,12 @@ class SvnViewTests(TwillTests):
         finally:
             shutil.rmtree(checkoutdir)
 
+    def test_diff_without_spaces_works(self):
+        self.client.post(reverse(views.svn_resetrepo))
+        self.client.post(reverse(views.svn_diff_submit), {'diff': open(make_testdata_filename('svn-diff-without-spaces-on-blank-context-lines.patch')).read()})
+        paulproteus = Person.objects.get(user__username='paulproteus')
+        self.assert_(controllers.mission_completed(paulproteus, 'svn_diff'))
+
 
 # Mocked-up svnlook output for the pre-commit hook.
 def mock_get_username(repo, txn):
