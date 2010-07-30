@@ -1291,6 +1291,16 @@ class DailyBugImporter(django.test.TestCase):
         mock_error.side_effect = ValueError()
         self.assertRaises(ValueError, mysite.customs.management.commands.customs_daily_tasks.Command().find_and_update_enabled_google_instances)
 
+def google_tests_sympy_extract_tracker_specific_data(issue, ret_dict):
+    # Make modifications to ret_dict using provided atom data
+    labels = [label.text for label in issue.label]
+    ret_dict['good_for_newcomers'] = ('EasyToFix' in labels)
+    ret_dict['bite_size_tag_name'] = 'EasyToFix'
+    # Check whether documentation bug
+    ret_dict['concerns_just_documentation'] = ('Documentation' in labels)
+    # Then pass ret_dict back
+    return ret_dict
+
 class GoogleCodeBugTracker(django.test.TestCase):
     @mock.patch('mysite.customs.bugtrackers.google.GoogleBug.get_bug_atom_data')
     def test__bug_id_from_bug_data(self, mock_thing):
@@ -1298,6 +1308,210 @@ class GoogleCodeBugTracker(django.test.TestCase):
         gb = mysite.customs.bugtrackers.google.GoogleBug(google_name='ok', client=None, bug_id=3)
         bug_id = gb._bug_id_from_bug_data()
         self.assertEqual(bug_id, 3)
+
+    @mock.patch('mysite.customs.bugtrackers.google.GoogleBug.get_bug_atom_data')
+    def test_create_google_data_dict_with_everything(self, mock_data):
+        atom_dict = {
+                'id': {'text': 'http://code.google.com/feeds/issues/p/sympy/issues/full/1215'},
+                'published': {'text': '2008-11-24T11:15:58.000Z'},
+                'updated': {'text': '2009-12-06T23:01:11.000Z'},
+                'title': {'text': 'fix html documentation'},
+                'content': {'text': """http://docs.sympy.org/modindex.html
+
+I don't see for example the solvers module"""},
+                'author': {'name': {'text': 'fabian.seoane'}},
+                'cc': [
+                    {'username': {'text': 'asmeurer'}}
+                    ],
+                'owner': {'username': {'text': 'Vinzent.Steinberg'}},
+                'label': [
+                    {'text': 'Type-Defect'},
+                    {'text': 'Priority-Critical'},
+                    {'text': 'Documentation'},
+                    {'text': 'Milestone-Release0.6.6'}
+                    ],
+                'state': {'text': 'closed'},
+                'status': {'text': 'Fixed'}
+                }
+        mock_data.return_value = mysite.base.helpers.ObjectFromDict(atom_dict, recursive=True)
+        client = mysite.customs.bugtrackers.google.get_client()
+        gb = mysite.customs.bugtrackers.google.GoogleBug(
+            google_name='sympy',
+            client=client,
+            bug_id=1215)
+
+        got = gb.as_data_dict_for_bug_object(google_tests_sympy_extract_tracker_specific_data)
+        wanted = {'title': 'fix html documentation',
+                  'description': """http://docs.sympy.org/modindex.html
+
+I don't see for example the solvers module""",
+                  'status': 'Fixed',
+                  'importance': 'Critical',
+                  'people_involved': 3,
+                  'date_reported': datetime.datetime(2008, 11, 24, 11, 15, 58),
+                  'last_touched': datetime.datetime(2009, 12, 06, 23, 01, 11),
+                  'looks_closed': True,
+                  'submitter_username': 'fabian.seoane',
+                  'submitter_realname': '',
+                  'canonical_bug_link': 'http://code.google.com/p/sympy/issues/detail?id=1215',
+                  'good_for_newcomers': False,
+                  'bite_size_tag_name': 'EasyToFix',
+                  'concerns_just_documentation': True,
+                  }
+        self.assertEqual(wanted, got)
+
+    @mock.patch('mysite.customs.bugtrackers.google.GoogleBug.get_bug_atom_data')
+    def test_create_google_data_dict_author_in_list(self, mock_data):
+        atom_dict = {
+                'id': {'text': 'http://code.google.com/feeds/issues/p/sympy/issues/full/1215'},
+                'published': {'text': '2008-11-24T11:15:58.000Z'},
+                'updated': {'text': '2009-12-06T23:01:11.000Z'},
+                'title': {'text': 'fix html documentation'},
+                'content': {'text': """http://docs.sympy.org/modindex.html
+
+I don't see for example the solvers module"""},
+                'author': [{'name': {'text': 'fabian.seoane'}}],
+                'cc': [
+                    {'username': {'text': 'asmeurer'}}
+                    ],
+                'owner': {'username': {'text': 'Vinzent.Steinberg'}},
+                'label': [
+                    {'text': 'Type-Defect'},
+                    {'text': 'Priority-Critical'},
+                    {'text': 'Documentation'},
+                    {'text': 'Milestone-Release0.6.6'}
+                    ],
+                'state': {'text': 'closed'},
+                'status': {'text': 'Fixed'}
+                }
+        mock_data.return_value = mysite.base.helpers.ObjectFromDict(atom_dict, recursive=True)
+        client = mysite.customs.bugtrackers.google.get_client()
+        gb = mysite.customs.bugtrackers.google.GoogleBug(
+            google_name='sympy',
+            client=client,
+            bug_id=1215)
+
+        got = gb.as_data_dict_for_bug_object(google_tests_sympy_extract_tracker_specific_data)
+        wanted = {'title': 'fix html documentation',
+                  'description': """http://docs.sympy.org/modindex.html
+
+I don't see for example the solvers module""",
+                  'status': 'Fixed',
+                  'importance': 'Critical',
+                  'people_involved': 3,
+                  'date_reported': datetime.datetime(2008, 11, 24, 11, 15, 58),
+                  'last_touched': datetime.datetime(2009, 12, 06, 23, 01, 11),
+                  'looks_closed': True,
+                  'submitter_username': 'fabian.seoane',
+                  'submitter_realname': '',
+                  'canonical_bug_link': 'http://code.google.com/p/sympy/issues/detail?id=1215',
+                  'good_for_newcomers': False,
+                  'bite_size_tag_name': 'EasyToFix',
+                  'concerns_just_documentation': True,
+                  }
+        self.assertEqual(wanted, got)
+
+    @mock.patch('mysite.customs.bugtrackers.google.GoogleBug.get_bug_atom_data')
+    def test_create_google_data_dict_owner_in_list(self, mock_data):
+        atom_dict = {
+                'id': {'text': 'http://code.google.com/feeds/issues/p/sympy/issues/full/1215'},
+                'published': {'text': '2008-11-24T11:15:58.000Z'},
+                'updated': {'text': '2009-12-06T23:01:11.000Z'},
+                'title': {'text': 'fix html documentation'},
+                'content': {'text': """http://docs.sympy.org/modindex.html
+
+I don't see for example the solvers module"""},
+                'author': {'name': {'text': 'fabian.seoane'}},
+                'cc': [
+                    {'username': {'text': 'asmeurer'}}
+                    ],
+                'owner': [{'username': {'text': 'Vinzent.Steinberg'}}],
+                'label': [
+                    {'text': 'Type-Defect'},
+                    {'text': 'Priority-Critical'},
+                    {'text': 'Documentation'},
+                    {'text': 'Milestone-Release0.6.6'}
+                    ],
+                'state': {'text': 'closed'},
+                'status': {'text': 'Fixed'}
+                }
+        mock_data.return_value = mysite.base.helpers.ObjectFromDict(atom_dict, recursive=True)
+        client = mysite.customs.bugtrackers.google.get_client()
+        gb = mysite.customs.bugtrackers.google.GoogleBug(
+            google_name='sympy',
+            client=client,
+            bug_id=1215)
+
+        got = gb.as_data_dict_for_bug_object(google_tests_sympy_extract_tracker_specific_data)
+        wanted = {'title': 'fix html documentation',
+                  'description': """http://docs.sympy.org/modindex.html
+
+I don't see for example the solvers module""",
+                  'status': 'Fixed',
+                  'importance': 'Critical',
+                  'people_involved': 3,
+                  'date_reported': datetime.datetime(2008, 11, 24, 11, 15, 58),
+                  'last_touched': datetime.datetime(2009, 12, 06, 23, 01, 11),
+                  'looks_closed': True,
+                  'submitter_username': 'fabian.seoane',
+                  'submitter_realname': '',
+                  'canonical_bug_link': 'http://code.google.com/p/sympy/issues/detail?id=1215',
+                  'good_for_newcomers': False,
+                  'bite_size_tag_name': 'EasyToFix',
+                  'concerns_just_documentation': True,
+                  }
+        self.assertEqual(wanted, got)
+
+    @mock.patch('mysite.customs.bugtrackers.google.GoogleBug.get_bug_atom_data')
+    def test_create_google_data_dict_without_status(self, mock_data):
+        atom_dict = {
+                'id': {'text': 'http://code.google.com/feeds/issues/p/sympy/issues/full/1215'},
+                'published': {'text': '2008-11-24T11:15:58.000Z'},
+                'updated': {'text': '2009-12-06T23:01:11.000Z'},
+                'title': {'text': 'fix html documentation'},
+                'content': {'text': """http://docs.sympy.org/modindex.html
+
+I don't see for example the solvers module"""},
+                'author': {'name': {'text': 'fabian.seoane'}},
+                'cc': [
+                    {'username': {'text': 'asmeurer'}}
+                    ],
+                'owner': {'username': {'text': 'Vinzent.Steinberg'}},
+                'label': [
+                    {'text': 'Type-Defect'},
+                    {'text': 'Priority-Critical'},
+                    {'text': 'Documentation'},
+                    {'text': 'Milestone-Release0.6.6'}
+                    ],
+                'state': {'text': 'closed'},
+                'status': None
+                }
+        mock_data.return_value = mysite.base.helpers.ObjectFromDict(atom_dict, recursive=True)
+        client = mysite.customs.bugtrackers.google.get_client()
+        gb = mysite.customs.bugtrackers.google.GoogleBug(
+            google_name='sympy',
+            client=client,
+            bug_id=1215)
+
+        got = gb.as_data_dict_for_bug_object(google_tests_sympy_extract_tracker_specific_data)
+        wanted = {'title': 'fix html documentation',
+                  'description': """http://docs.sympy.org/modindex.html
+
+I don't see for example the solvers module""",
+                  'status': '',
+                  'importance': 'Critical',
+                  'people_involved': 3,
+                  'date_reported': datetime.datetime(2008, 11, 24, 11, 15, 58),
+                  'last_touched': datetime.datetime(2009, 12, 06, 23, 01, 11),
+                  'looks_closed': True,
+                  'submitter_username': 'fabian.seoane',
+                  'submitter_realname': '',
+                  'canonical_bug_link': 'http://code.google.com/p/sympy/issues/detail?id=1215',
+                  'good_for_newcomers': False,
+                  'bite_size_tag_name': 'EasyToFix',
+                  'concerns_just_documentation': True,
+                  }
+        self.assertEqual(wanted, got)
 
 # vim: set nu:
 

@@ -20,8 +20,11 @@ def json_response(python_object):
 class ObjectFromDict(object):
     def __init__(self, data, recursive = False):
         for key in data:
-            if recursive and type(data[key]) == dict:
-                data[key] = ObjectFromDict(data[key], recursive = recursive)
+            if recursive:
+                if type(data[key]) == type({}):
+                    data[key] = ObjectFromDict(data[key], recursive=recursive)
+                elif type(data[key]) == type([]):
+                    data[key] = [ObjectFromDict(item, recursive=recursive) for item in data[key]]
             setattr(self, key, data[key])
 
 def assert_or_pdb(expression):
