@@ -1083,6 +1083,24 @@ class TracBug(django.test.TestCase):
                   }
         self.assertEqual(wanted, got)
 
+    @mock.patch('mysite.customs.ohloh.mechanize_get')
+    def test_bug_that_404s_is_deleted(self, mock_error):
+        mock_error.side_effect = generate_404
+
+        dummy_project = Project.create_dummy()
+        bug = Bug()
+        bug.project = dummy_project
+        bug.canonical_bug_link = 'http://twistedmatrix.com/trac/ticket/1234'
+        bug.date_reported = datetime.datetime.utcnow()
+        bug.last_touched = datetime.datetime.utcnow()
+        bug.last_polled = datetime.datetime.utcnow() - datetime.timedelta(days=2)
+        bug.save()
+        self.assert_(Bug.all_bugs.count() == 1)
+
+        twisted = mysite.customs.bugtrackers.trac.TwistedTrac()
+        twisted.refresh_all_bugs()
+        self.assert_(Bug.all_bugs.count() == 0)
+
 class LineAcceptorTest(django.test.TestCase):
     def test(self):
 

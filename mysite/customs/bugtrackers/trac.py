@@ -3,6 +3,7 @@ import csv
 import datetime
 import logging
 import urlparse
+import urllib2
 
 import dateutil.parser
 import lxml.html
@@ -242,7 +243,19 @@ class TracBugTracker(object):
         # Okay, fine, we need to actually refresh it.
         logging.info("[Trac] Refreshing bug %d from %s." %
                      (bug_id, self.project_name))
-        data = tb.as_data_dict_for_bug_object(self.extract_tracker_specific_data)
+        # For some unknown reason, some trackers choose to delete some bugs entirely instead
+        # of just marking them as closed. That is fine for bugs we haven't yet pulled, but
+        # if the bug is already being tracked then we get a 404 error. This catacher looks
+        # for a 404 and deletes the bug if it occurs.
+        try:
+            data = tb.as_data_dict_for_bug_object(self.extract_tracker_specific_data)
+        except urllib2.HTTPError, e:
+            if e.code == 404:
+                logging.error("[Track] ERROR: Bug %d returned 404, deleting..." % bug_id)
+                bug.delete()
+                return
+            else:
+                raise e
 
         for key in data:
             value = data[key]
