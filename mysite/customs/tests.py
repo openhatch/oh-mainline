@@ -57,6 +57,10 @@ def generate_403(self):
     import urllib2
     raise urllib2.HTTPError('', 403, {}, {}, None)
 
+def generate_408(self):
+    import urllib2
+    raise urllib2.HTTPError('', 408, {}, {}, None)
+
 def generate_504(self):
     import urllib2
     raise urllib2.HTTPError('', 504, {}, {}, None)
@@ -1272,12 +1276,32 @@ class BugzillaImporterOnlyPerformsAQueryOncePerDay(django.test.TestCase):
 class DailyBugImporter(django.test.TestCase):
 
     @mock.patch('mysite.customs.ohloh.mechanize_get')
+    def test_roundup_http_error_408_does_not_break(self, mock_error):
+        mock_error.side_effect = generate_408
+        mysite.customs.management.commands.customs_daily_tasks.Command().find_and_update_enabled_roundup_trackers()
+
+    @mock.patch('mysite.customs.ohloh.mechanize_get')
+    def test_roundup_generic_error_does_break(self, mock_error):
+        mock_error.side_effect = ValueError()
+        self.assertRaises(ValueError, mysite.customs.management.commands.customs_daily_tasks.Command().find_and_update_enabled_roundup_trackers)
+
+    @mock.patch('mysite.customs.ohloh.mechanize_get')
+    def test_trac_http_error_408_does_not_break(self, mock_error):
+        mock_error.side_effect = generate_408
+        mysite.customs.management.commands.customs_daily_tasks.Command().find_and_update_enabled_trac_instances()
+
+    @mock.patch('mysite.customs.ohloh.mechanize_get')
+    def test_trac_generic_error_does_break(self, mock_error):
+        mock_error.side_effect = ValueError()
+        self.assertRaises(ValueError, mysite.customs.management.commands.customs_daily_tasks.Command().find_and_update_enabled_trac_instances)
+
+    @mock.patch('mysite.customs.ohloh.mechanize_get')
     def test_bugzilla_http_error_504_does_not_break(self, mock_error):
         mock_error.side_effect = generate_504
         mysite.customs.management.commands.customs_daily_tasks.Command().find_and_update_enabled_bugzilla_instances()
 
     @mock.patch('mysite.customs.ohloh.mechanize_get')
-    def test_bugzilla_http_generic_error_does_break(self, mock_error):
+    def test_bugzilla_generic_error_does_break(self, mock_error):
         mock_error.side_effect = ValueError()
         self.assertRaises(ValueError, mysite.customs.management.commands.customs_daily_tasks.Command().find_and_update_enabled_bugzilla_instances)
 
@@ -1290,6 +1314,16 @@ class DailyBugImporter(django.test.TestCase):
     def test_google_generic_error_does_break(self, mock_error):
         mock_error.side_effect = ValueError()
         self.assertRaises(ValueError, mysite.customs.management.commands.customs_daily_tasks.Command().find_and_update_enabled_google_instances)
+
+    @mock.patch('urllib2.urlopen')
+    def test_opensolaris_http_error_408_does_not_break(self, mock_error):
+        mock_error.side_effect = generate_408
+        mysite.customs.management.commands.customs_daily_tasks.Command().update_opensolaris_osnet()
+
+    @mock.patch('urllib2.urlopen')
+    def test_opensolaris_generic_error_does_break(self, mock_error):
+        mock_error.side_effect = ValueError()
+        self.assertRaises(ValueError, mysite.customs.management.commands.customs_daily_tasks.Command().update_opensolaris_osnet)
 
 def google_tests_sympy_extract_tracker_specific_data(issue, ret_dict):
     # Make modifications to ret_dict using provided atom data
