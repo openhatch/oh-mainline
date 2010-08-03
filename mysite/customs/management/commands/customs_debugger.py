@@ -24,7 +24,7 @@ class Command(BaseCommand):
             print "%d - %s" % (count, str(bug))
         print "There are a total of %d closed Bug objects." % count
 
-    def delete_very_old_bugs(self, days, hours=0):
+    def delete_old_bugs(self, days, hours=0):
         x_days_ago = (datetime.datetime.now() -
                         datetime.timedelta(days=days, hours=hours))
         Bug.all_bugs.filter(last_polled__lt=x_days_ago).delete()
