@@ -20,7 +20,7 @@ def json_response(python_object):
 class ObjectFromDict(object):
     def __init__(self, data, recursive = False):
         for key in data:
-            if recursive and type(data[key]) == type({}):
+            if recursive and type(data[key]) == dict:
                 data[key] = ObjectFromDict(data[key], recursive = recursive)
             setattr(self, key, data[key])
 
