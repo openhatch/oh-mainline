@@ -72,7 +72,7 @@ class GoogleBug(object):
         self.client = client
 
     def _bug_id_from_bug_data(self):
-        id_url = self.get_bug_atom_data().id['text']
+        id_url = self.get_bug_atom_data().id.text
         base, num = id_url.rsplit('/', 1)
         return int(num)
 
@@ -130,6 +130,10 @@ class GoogleBug(object):
             status = issue.status.text
         else:
             status = ''
+        if type(issue.author) == type([]):
+            author = issue.author[0]
+        else:
+            author = issue.author
 
         ret_dict = {
                 'title': issue.title.text,
@@ -139,7 +143,7 @@ class GoogleBug(object):
                 'people_involved': self.google_count_people_involved(issue),
                 'date_reported': self.google_date_to_datetime(issue.published.text),
                 'last_touched': self.google_date_to_datetime(issue.updated.text),
-                'submitter_username': issue.author[0].name.text,
+                'submitter_username': author.name.text,
                 'submitter_realname': '', # Can't get this from Google
                 'canonical_bug_link': self.as_bug_specific_url(),
                 'looks_closed': (issue.state.text == 'closed')

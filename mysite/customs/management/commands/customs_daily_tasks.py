@@ -1,6 +1,8 @@
 import logging
 import urllib2
 
+import gdata.client
+
 from django.core.management.base import BaseCommand
 
 import django.conf
@@ -53,9 +55,14 @@ class Command(BaseCommand):
 
         ### Okay, now update!
         for thing in enabled_roundup_trackers:
-            logging.info("[Roundup] About to update %s" % thing)
             instantiated = thing()
-            instantiated.update()
+            project_name = instantiated.project.name
+            logging.info("[Roundup] About to update %s" % project_name)
+            try:
+                instantiated.update()
+            except urllib2.URLError, e:
+                logging.error("[Roundup] ERROR: %s importer failed with urllib2.URLError, skipping..." % project_name)
+                logging.error("[Roundup] Error message: %s" % str(e))
 
     def find_and_update_enabled_trac_instances(self):
         enabled_trac_instances = []
@@ -70,9 +77,14 @@ class Command(BaseCommand):
 
         ### Okay, now update!
         for thing in enabled_trac_instances:
-            logging.info("[Trac] About to update %s" % thing)
             instantiated = thing()
-            instantiated.update()
+            project_name = instantiated.project_name
+            logging.info("[Trac] About to update %s" % project_name)
+            try:
+                instantiated.update()
+            except urllib2.URLError, e:
+                logging.error("[Trac] ERROR: %s importer failed with urllib2.URLError, skipping..." % project_name)
+                logging.error("[Trac] Error message: %s" % str(e))
 
     def find_and_update_enabled_bugzilla_instances(self):
         enabled_bugzilla_instances = []
@@ -87,15 +99,16 @@ class Command(BaseCommand):
 
         ### Okay, now update!
         for thing in enabled_bugzilla_instances:
-            logging.info("[Bugzilla] About to update %s" % thing)
             instantiated = thing()
+            project_name = instantiated.project_name
+            logging.info("[Bugzilla] About to update %s" % project_name)
             # FIXME: The Bugzilla trackers seem to throw error 500 a lot.
             # For now, chuck in a dirty big try except to stop importer
             # breaking.
             try:
                 instantiated.update()
             except urllib2.URLError, e:
-                logging.error("[Bugzilla] ERROR: Importer failed, likely HTTP500, continuing on...")
+                logging.error("[Bugzilla] ERROR: %s importer failed with urllib2.URLError, skipping..." % project_name)
                 logging.error("[Bugzilla] Error message: %s" % str(e))
 
     def find_and_update_enabled_google_instances(self):
@@ -111,9 +124,14 @@ class Command(BaseCommand):
 
         ### Okay, now update!
         for thing in enabled_google_instances:
-            logging.info("[Google] About to update %s" % thing)
             instantiated = thing()
-            instantiated.update()
+            project_name = instantiated.project_name
+            logging.info("[Google] About to update %s" % project_name)
+            try:
+                instantiated.update()
+            except gdata.client.RequestError, e:
+                logging.error("[Google] ERROR: %s importer failed with gdata.client.RequestError, skipping..." % project_name)
+                logging.error("[Google] Error message: %s" % str(e))
 
     def update_launchpad_hosted_projects(self):
         ### For Launchpad:
@@ -123,7 +141,11 @@ class Command(BaseCommand):
         mysite.customs.bugtrackers.launchpad.refresh_all_launchpad_bugs()
 
     def update_opensolaris_osnet(self):
-        mysite.customs.bugtrackers.opensolaris.update()
+        try:
+            mysite.customs.bugtrackers.opensolaris.update()
+        except urllib2.URLError, e:
+            logging.error("[OpenSolaris] ERROR: Importer failed with urllib2.URLError, skipping...")
+            logging.error("[OpenSolaris] Error message: %s" % str(e))
 
     def handle(self, *args, **options):
         self.update_opensolaris_osnet()

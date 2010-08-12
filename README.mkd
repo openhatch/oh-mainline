@@ -6,15 +6,17 @@ Well, you probably want to know to how run this code.
 
 ### Dependencies ###
 
-OpenHatch is currently designed to run with Python 2.6. Most *decent* Operating Systems come with both Python 2.6 and 3.1 at present, but if you need to then install it.
+OpenHatch is currently designed to run with Python 2.6. Make sure that's installed.
 
 Next, install some dependencies:
 
-    sudo apt-get install python2.6-dev python-apt python-libxml2 memcached
+    sudo apt-get install python2.6-dev python-libxml2 memcached
 
 or the equivalent for your system.
 
 On some Operating Systems you may not need (or be able) to install all of the above packages, depending on what comes prebuilt with Python as default. If you do find a package for any of the above for your system, you should install it.
+
+The other dependencies (like Django) are handled by "buildout", so keep reading patiently and we'll get to that.
 
 ### Caching ###
 
