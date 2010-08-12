@@ -483,7 +483,7 @@ Keywords: Torrent unittest""")
                 bitesized_text='bitesized'
                 )
         miro_tracker.save()
-        miro_tracker_query_url = mysite.customs.models.BugzillaURL(
+        miro_tracker_query_url = mysite.customs.models.BugzillaUrl(
                 url='http://bugzilla.pculture.org/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&field-1-0-0=bug_status&field-1-1-0=product&field-1-2-0=keywords&keywords=bitesized&product=Miro&query_format=advanced&remaction=&type-1-0-0=anyexact&type-1-1-0=anyexact&type-1-2-0=anywords&value-1-0-0=NEW%2CASSIGNED%2CREOPENED&value-1-1-0=Miro&value-1-2-0=bitesized',
                 bugzilla_tracker=miro_tracker
                 )
@@ -527,7 +527,7 @@ Keywords: Torrent unittest""")
                 bitesized_text='bitesized'
                 )
         miro_tracker.save()
-        miro_tracker_query_url = mysite.customs.models.BugzillaURL(
+        miro_tracker_query_url = mysite.customs.models.BugzillaUrl(
                 url='http://bugzilla.pculture.org/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&field-1-0-0=bug_status&field-1-1-0=product&field-1-2-0=keywords&keywords=bitesized&product=Miro&query_format=advanced&remaction=&type-1-0-0=anyexact&type-1-1-0=anyexact&type-1-2-0=anywords&value-1-0-0=NEW%2CASSIGNED%2CREOPENED&value-1-1-0=Miro&value-1-2-0=bitesized',
                 bugzilla_tracker=miro_tracker
                 )
@@ -565,7 +565,7 @@ Keywords: Torrent unittest""")
                 bitesized_text='bitesized'
                 )
         miro_tracker.save()
-        miro_tracker_query_url = mysite.customs.models.BugzillaURL(
+        miro_tracker_query_url = mysite.customs.models.BugzillaUrl(
                 url='http://bugzilla.pculture.org/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&field-1-0-0=bug_status&field-1-1-0=product&field-1-2-0=keywords&keywords=bitesized&product=Miro&query_format=advanced&remaction=&type-1-0-0=anyexact&type-1-1-0=anyexact&type-1-2-0=anywords&value-1-0-0=NEW%2CASSIGNED%2CREOPENED&value-1-1-0=Miro&value-1-2-0=bitesized',
                 bugzilla_tracker=miro_tracker
                 )
@@ -599,7 +599,7 @@ Keywords: Torrent unittest""")
                 bitesized_text='bitesized'
                 )
         miro_tracker.save()
-        miro_tracker_query_url = mysite.customs.models.BugzillaURL(
+        miro_tracker_query_url = mysite.customs.models.BugzillaUrl(
                 url='http://bugzilla.pculture.org/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&field-1-0-0=bug_status&field-1-1-0=product&field-1-2-0=keywords&keywords=bitesized&product=Miro&query_format=advanced&remaction=&type-1-0-0=anyexact&type-1-1-0=anyexact&type-1-2-0=anywords&value-1-0-0=NEW%2CASSIGNED%2CREOPENED&value-1-1-0=Miro&value-1-2-0=bitesized',
                 bugzilla_tracker=miro_tracker
                 )
@@ -629,7 +629,7 @@ Keywords: Torrent unittest""")
                 bitesized_text='bitesized'
                 )
         miro_tracker.save()
-        miro_tracker_query_url = mysite.customs.models.BugzillaURL(
+        miro_tracker_query_url = mysite.customs.models.BugzillaUrl(
                 url='http://bugzilla.pculture.org/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&field-1-0-0=bug_status&field-1-1-0=product&field-1-2-0=keywords&keywords=bitesized&product=Miro&query_format=advanced&remaction=&type-1-0-0=anyexact&type-1-1-0=anyexact&type-1-2-0=anywords&value-1-0-0=NEW%2CASSIGNED%2CREOPENED&value-1-1-0=Miro&value-1-2-0=bitesized',
                 bugzilla_tracker=miro_tracker
                 )
@@ -691,7 +691,7 @@ Keywords: Torrent unittest""")
                 bitesized_text='bitesized'
                 )
         miro_tracker.save()
-        miro_tracker_query_url = mysite.customs.models.BugzillaURL(
+        miro_tracker_query_url = mysite.customs.models.BugzillaUrl(
                 url='http://bugzilla.pculture.org/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&field-1-0-0=bug_status&field-1-1-0=product&field-1-2-0=keywords&keywords=bitesized&product=Miro&query_format=advanced&remaction=&type-1-0-0=anyexact&type-1-1-0=anyexact&type-1-2-0=anywords&value-1-0-0=NEW%2CASSIGNED%2CREOPENED&value-1-1-0=Miro&value-1-2-0=bitesized',
                 bugzilla_tracker=miro_tracker
                 )

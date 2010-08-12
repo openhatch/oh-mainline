@@ -7,13 +7,13 @@ class Migration:
     
     def forwards(self, orm):
         
-        # Adding model 'BugzillaURL'
+        # Adding model 'BugzillaUrl'
         db.create_table('customs_bugzillaurl', (
             ('id', orm['customs.bugzillaurl:id']),
             ('url', orm['customs.bugzillaurl:url']),
             ('bugzilla_tracker', orm['customs.bugzillaurl:bugzilla_tracker']),
         ))
-        db.send_create_signal('customs', ['BugzillaURL'])
+        db.send_create_signal('customs', ['BugzillaUrl'])
         
         # Adding model 'BugzillaTracker'
         db.create_table('customs_bugzillatracker', (
@@ -37,7 +37,7 @@ class Migration:
     
     def backwards(self, orm):
         
-        # Deleting model 'BugzillaURL'
+        # Deleting model 'BugzillaUrl'
         db.delete_table('customs_bugzillaurl')
         
         # Deleting model 'BugzillaTracker'
