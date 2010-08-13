@@ -97,9 +97,9 @@ def add_tracker_url(request, tracker_type, url_form=None):
     data['finish_url'] = reverse(add_tracker_url_do, args=[tracker_type])
     if project_name:
         data['action_url'] += '?project_name=%s' % project_name
-        data['finish_url'] += '?project_name=%s&finished' % project_name
+        data['finish_url'] += '?project_name=%s&finished=true' % project_name
     else:
-        data['finish_url'] += '?finished'
+        data['finish_url'] += '?finished=true'
     return (request, 'customs/add_tracker_url.html', data)
 
 def add_tracker_url_do(request, tracker_type):
@@ -110,7 +110,7 @@ def add_tracker_url_do(request, tracker_type):
     if url_form:
         if url_form.is_valid():
             url_form.save()
-            if request.GET.get('finished', None):
+            if request.GET.get('finished', None) == 'true':
                 return HttpResponseRedirect(reverse(list_trackers) +
                                         '?notification_id=add-success')
             else:
