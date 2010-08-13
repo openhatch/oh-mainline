@@ -148,6 +148,9 @@ urlpatterns = patterns('',
         (r'^missions/git/rebase$', 'mysite.missions.git.views.rebase'),
         (r'^missions/git/rebase/submit$', 'mysite.missions.git.views.rebase_submit'),
 
+        (r'^missions/irc$', 'mysite.missions.irc.views.irc_mission'),
+        (r'^missions/irc/sessioninfo$', 'mysite.missions.irc.views.irc_session_password_submit'),
+
         (r'^missions/windows-setup',
          include(mysite.missions.setup.views.WindowsSetup.urls())),
 
