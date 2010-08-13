@@ -1,4 +1,6 @@
 from django.conf import settings
+from mysite.missions.models import IrcMissionSession
+from mysite.missions.base import controllers
 
 from ircbot import SingleServerIRCBot
 
@@ -14,3 +16,38 @@ class IrcMissionBot(SingleServerIRCBot):
 
     def on_welcome(self, conn, event):
         conn.join(self.channel)
+        IrcMissionSession.objects.all().delete()
+
+    def setup_session(self, nick, conn):
+        # Someone has joined the channel.
+        password = controllers.make_password()
+        IrcMissionSession(nick=nick, password=password).save()
+        conn.notice(nick,
+          'Hello, %(nick)s! To start the mission, here are the words to type into the mission page: %(password)s'
+            % {'nick': nick, 'password': password})
+
+    def on_join(self, conn, event):
+        nick = event.source().split('!')[0]
+        channel = event.target()
+        if channel == self.channel and nick != conn.get_nickname():
+            self.setup_session(nick, conn)
+
+    def on_namreply(self, conn, event):
+        channel = event.arguments()[1]
+        nicks = event.arguments()[2].split()
+        for nick in nicks:
+            if nick[0] in '@+':
+                nick = nick[1:]  # remove op/voice prefix
+            self.setup_session(nick, conn)
+
+    def on_part(self, conn, event):
+        nick = event.source().split('!')[0]
+        channel = event.target()
+        if channel == self.channel:
+            IrcMissionSession.objects.filter(nick=nick).delete()
+
+    def on_kick(self, conn, event):
+        nick = event.arguments()[0]
+        channel = event.target()
+        if channel == self.channel:
+            IrcMissionSession.objects.filter(nick=nick).delete()
