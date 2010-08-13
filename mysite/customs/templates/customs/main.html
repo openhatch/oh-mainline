@@ -1,0 +1,38 @@
+{% extends 'base/one_column.html' %}
+
+{% block title %}
+Customs
+{% endblock title %}
+
+{% block main %}
+<div class='module'>
+    <div class='head'>
+        <h3>{% block heading %}Customs{% endblock %}</h3>
+        <ul>
+            <li>
+            {% block top_url %}{% endblock %}
+            </li>
+        </ul>
+    </div>
+    <div class='body'>
+        {% if customs_notification %}
+        <div class='notification'>
+            {{ customs_notification }}
+            <div style="float: right; display: inline;">
+                <a id='clear_message' href="?">(clear this message)</a>
+            </div>
+        </div>
+        {% endif %}
+        <form name={% block form_name %}{% endblock %} method='POST'
+            action={% block form_action %}{% endblock %}>
+            {% block form_body %}{% endblock %}
+            <p> <input type='submit'
+                        {% block submit_button_attributes %}
+                            value='Save'
+                            {% endblock %} /> </p>
+            {% block second_form_button %}{% endblock %}
+        </form>
+        {% block content_below_form %}{% endblock %}
+    </div>
+</div>
+{% endblock main %}

@@ -96,6 +96,23 @@ urlpatterns = patterns('',
         (r'^missions/svn/commit$', 'mysite.missions.views.svn_commit'),
         (r'^missions/svn/commit/poll$', 'mysite.missions.views.svn_commit_poll'),
 
+        # Customs-related URLs
+        (r'^customs/$', 'mysite.customs.views.list_trackers'),
+        url(r'^customs/add$', 'mysite.customs.views.add_tracker', name='add_tracker_choose_type'),
+        url(r'^customs/add/do$', 'mysite.customs.views.add_tracker_do', name='add_tracker_choose_type_do'),
+        url(r'^customs/add/(?P<tracker_type>\w*)$', 'mysite.customs.views.add_tracker', name='add_tracker_specific'),
+        url(r'^customs/add/(?P<tracker_type>\w*)/do$', 'mysite.customs.views.add_tracker_do', name='add_tracker_specific_do'),
+        (r'^customs/add/(?P<tracker_type>\w*)/url$', 'mysite.customs.views.add_tracker_url'),
+        (r'^customs/add/(?P<tracker_type>\w*)/url/do$', 'mysite.customs.views.add_tracker_url_do'),
+        (r'^customs/edit/(?P<tracker_type>\w*)$', 'mysite.customs.views.edit_tracker'),
+        (r'^customs/edit/(?P<tracker_type>\w*)/do$', 'mysite.customs.views.edit_tracker_do'),
+        (r'^customs/edit/(?P<tracker_type>\w*)/url$', 'mysite.customs.views.edit_tracker_url'),
+        (r'^customs/edit/(?P<tracker_type>\w*)/url/do$', 'mysite.customs.views.edit_tracker_url_do'),
+        (r'^customs/delete/(?P<tracker_type>\w*)$', 'mysite.customs.views.delete_tracker'),
+        (r'^customs/delete/(?P<tracker_type>\w*)/do$', 'mysite.customs.views.delete_tracker_do'),
+        (r'^customs/delete/(?P<tracker_type>\w*)/url$', 'mysite.customs.views.delete_tracker_url'),
+        (r'^customs/delete/(?P<tracker_type>\w*)/url/do$', 'mysite.customs.views.delete_tracker_url_do'),
+
         # Invitation-related URLs
         (r'^invitation/', include('invitation.urls')),
 

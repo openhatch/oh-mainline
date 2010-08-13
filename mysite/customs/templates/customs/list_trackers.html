@@ -1,0 +1,37 @@
+{% extends 'customs/main.html' %}
+
+{% block top_url %}
+<a href="{% url mysite.customs.views.add_tracker %}">
+    Add a tracker
+</a>
+{% endblock top_url %}
+
+{% block form_name %}
+'list_trackers'
+{% endblock form_name %}
+
+{% block form_action %}
+'{% url mysite.customs.views.list_trackers %}'
+{% endblock form_action %}
+
+{% block form_body %}
+{{ tracker_types_form.as_p }}
+{% endblock form_body %}
+
+{% block submit_button_attributes %}
+value='List Trackers'
+{% endblock submit_button_attributes %}
+
+{% block content_below_form %}
+{% if trackers %}
+<table>
+    {% for tracker in trackers %}
+    <tr>
+        <td>{{ tracker.project_name }}</td>
+        <td><a href='{% url mysite.customs.views.edit_tracker tracker_type %}?project_name={{ tracker.project_name }}'>Edit</a></td>
+        <td><a href='{% url mysite.customs.views.delete_tracker tracker_type %}?project_name={{ tracker.project_name }}'>Delete</a></td>
+    </tr>
+    {% endfor %}
+</table>
+{% endif %}
+{% endblock content_below_form %}

@@ -59,7 +59,7 @@ class BugzillaTracker(models.Model):
     project_name = models.CharField(max_length=200, unique=True,
                                     blank=False, null=False)
     base_url = models.URLField(max_length=200, unique=True,
-                               blank=False, null=False)
+                               blank=False, null=False, verify_exists=False)
     bug_project_name_format = models.CharField(max_length=200, blank=False)
     QUERY_URL_TYPES = (
             ('xml', 'Bug XML query'),

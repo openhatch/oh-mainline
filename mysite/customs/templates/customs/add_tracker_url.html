@@ -1,0 +1,25 @@
+{% extends 'customs/main.html' %}
+
+{% block heading %}
+{{ block.super }} - Add a new tracker URL
+{% endblock heading %}
+
+{% block form_name %}
+'add_tracker_url'
+{% endblock form_name %}
+
+{% block form_action %}
+'{{ action_url }}'
+{% endblock form_action %}
+
+{% block form_body %}
+{{ url_form.as_p }}
+{% endblock form_body %}
+
+{% block submit_button_attributes %}
+value='Add Another URL'
+{% endblock submit_button_attributes %}
+
+{% block second_form_button %}
+<p> <input type='submit' value='Finish' onclick="add_tracker_url.action='{{ finish_url }}'; return true;" /> </p>
+{% endblock second_form_button %}

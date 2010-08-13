@@ -1,0 +1,21 @@
+{% extends 'customs/main.html' %}
+
+{% block heading %}
+{{ block.super }} - Add a new tracker
+{% endblock heading %}
+
+{% block form_name %}
+'add_tracker'
+{% endblock form_name %}
+
+{% block form_action %}
+'{{ action_url }}'
+{% endblock form_action %}
+
+{% block form_body %}
+{{ tracker_form.as_p }}
+{% endblock form_body %}
+
+{% block submit_button_attributes %}
+value='Next'
+{% endblock submit_button_attributes %}

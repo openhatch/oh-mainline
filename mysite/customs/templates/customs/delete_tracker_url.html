@@ -1,0 +1,27 @@
+{% extends 'customs/main.html' %}
+
+{% block heading %}
+{{ block.super }} - Delete URL from the {{ project_name }} tracker
+{% endblock heading %}
+
+{% block form_name %}
+'delete_tracker_url'
+{% endblock form_name %}
+
+{% block form_action %}
+'{% url mysite.customs.views.delete_tracker_url_do tracker_type %}?project_name={{ project_name }}&url={{ url }}'
+{% endblock form_action %}
+
+{% block form_body %}
+<p>Are you sure you want to delete the following URL from this tracker?</p>
+<p>{{ url }}</p>
+{% endblock form_body %}
+
+{% block submit_button_attributes %}
+value='Yes, delete this URL'
+{% endblock submit_button_attributes %}
+
+{% block second_form_button %}
+<p> <input type='submit' value="No, don't delete it"
+onclick="delete_tracker_url.action='{% url mysite.customs.views.edit_tracker tracker_type %}?project_name={{ project_name }}'; return true;" /> </p>
+{% endblock second_form_button %}
