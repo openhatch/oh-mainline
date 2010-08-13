@@ -60,5 +60,8 @@ def mission_completed(profile, mission_name):
 def mission_completed_at_least_once(profile, mission_name):
     return len(StepCompletion.objects.filter(step__name=mission_name, person=profile)) != 0
 
+def make_password():
+    return ' '.join(otp.OTP().reformat(binascii.hexlify(os.urandom(8)), format='words').lower().split()[:3])
+
 class IncorrectPatch(Exception):
     pass

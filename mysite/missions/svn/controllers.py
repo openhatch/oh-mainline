@@ -43,7 +43,7 @@ class SvnRepository(object):
         svnserve_conf.write(open(svnserve_conf_path, 'w'))
 
         # Assign a password for the user.
-        password = ' '.join(otp.OTP().reformat(binascii.hexlify(os.urandom(8)), format='words').lower().split()[:3])
+        password = make_password()
         passwd_path = os.path.join(self.repo_path, 'conf', 'passwd')
         passwd_file = RawConfigParser()
         passwd_file.read(passwd_path)
