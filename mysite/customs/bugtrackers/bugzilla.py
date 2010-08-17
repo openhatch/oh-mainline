@@ -182,7 +182,7 @@ class BugzillaBugTracker(object):
 
     def generate_bug_xml_from_queries(self, queries):
         # If a dictionary has been passed in, convert it to a list.
-        if type(queries) == type({}):
+        if type(queries) == dict:
             queries = [queries[query_name] for query_name in queries]
         for query_url in queries:
             # Check if this url has been accessed in the last day
@@ -196,7 +196,7 @@ class BugzillaBugTracker(object):
 
     def get_bug_id_list_from_tracker_bug_urls(self, tracker_bug_urls):
         # If a dictionary has been passed in, convert it to a list.
-        if type(tracker_bug_urls) == type({}):
+        if type(tracker_bug_urls) == dict:
             tracker_bug_urls = [tracker_bug_urls[tracker_bug_name] for tracker_bug_name in tracker_bug_urls]
         bug_ids = []
         for tracker_bug_url in tracker_bug_urls:
