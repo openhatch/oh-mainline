@@ -10,6 +10,7 @@ TOPIC_PREFIX = "OpenHatch IRC mission channel || The question: What is the answe
 class IrcMissionBot(SingleServerIRCBot):
     # States in which a session can be
     STATE_SAID_HI = 1
+    STATE_ANSWERED_TOPIC = 2
 
     def __init__(self):
         SingleServerIRCBot.__init__(self, [settings.IRC_MISSION_SERVER],
@@ -104,6 +105,13 @@ class IrcMissionBot(SingleServerIRCBot):
                 try:
                     session = IrcMissionSession.objects.get(nick=nick, person__isnull=False)
                     self.active_sessions[nick] = self.STATE_SAID_HI
-                    conn.privmsg(self.channel, "Hi! Nice to have another person here.  We're busy but we try to be friendly, so be sure to check the channel topic.")
+                    conn.privmsg(self.channel, "Hi! Nice to have another person here.  We're busy but we try to be friendly.  Say, do you know the answer to the question in the topic?")
                 except IrcMissionSession.DoesNotExist:
                     conn.privmsg(self.channel, "Good to see you, %s.  Be sure you check the private message I sent you so you can start the mission." % nick)
+
+        elif self.active_sessions[nick] == self.STATE_SAID_HI:
+            # Look for the word referred to in the topic.
+            if TOPIC_ANSWER in msg:
+                self.active_sessions[nick] = self.STATE_ANSWERED_TOPIC
+                conn.privmsg(self.channel, "That's right. Thanks!")
+
