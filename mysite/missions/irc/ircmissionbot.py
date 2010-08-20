@@ -4,6 +4,9 @@ from mysite.missions.base import controllers
 
 from ircbot import SingleServerIRCBot
 
+TOPIC_ANSWER = '42'
+TOPIC_PREFIX = "OpenHatch IRC mission channel || The question: What is the answer to life, the universe, and everything? || "
+
 class IrcMissionBot(SingleServerIRCBot):
     # States in which a session can be
     STATE_SAID_HI = 1
@@ -37,8 +40,27 @@ class IrcMissionBot(SingleServerIRCBot):
     def on_join(self, conn, event):
         nick = event.source().split('!')[0]
         channel = event.target()
-        if channel == self.channel and nick != conn.get_nickname():
-            self.setup_session(nick, conn)
+        if channel == self.channel:
+            if nick != conn.get_nickname():
+                # Somebody joined.
+                self.setup_session(nick, conn)
+            else:
+                # Our join completed.
+                self.topic = TOPIC_PREFIX + 'Who will complete the mission next?'
+                conn.topic(self.channel, self.topic)
+
+    def on_topic(self, conn, event):
+        nick = event.source().split('!')[0]
+        channel = event.target()
+        new_topic = event.arguments()[0]
+
+        # Don't verify the topic change if we're the ones who did it.
+        if nick != conn.get_nickname():
+            if not new_topic.startswith(TOPIC_PREFIX):
+                conn.topic(self.channel, self.topic)
+                conn.notice(nick, 'Please try to preserve the beginning of the topic.')
+            else:
+                self.topic = new_topic
 
     def on_namreply(self, conn, event):
         channel = event.arguments()[1]
