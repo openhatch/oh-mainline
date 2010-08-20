@@ -10,6 +10,7 @@ class IrcMissionBot(SingleServerIRCBot):
         SingleServerIRCBot.__init__(self, [settings.IRC_MISSION_SERVER],
             settings.IRC_MISSIONBOT_NICK, settings.IRC_MISSIONBOT_REALNAME)
         self.channel = settings.IRC_MISSION_CHANNEL
+        self.active_sessions = {}
 
     def on_nicknameinuse(self, conn, event):
         conn.nick(conn.get_nickname() + '_')
@@ -25,6 +26,11 @@ class IrcMissionBot(SingleServerIRCBot):
         conn.notice(nick,
           'Hello, %(nick)s! To start the mission, here are the words to type into the mission page: %(password)s'
             % {'nick': nick, 'password': password})
+
+    def destroy_session(self, nick):
+        IrcMissionSession.objects.filter(nick=nick).delete()
+        if nick in self.active_sessions:
+            del self.active_sessions[nick]
 
     def on_join(self, conn, event):
         nick = event.source().split('!')[0]
@@ -44,10 +50,10 @@ class IrcMissionBot(SingleServerIRCBot):
         nick = event.source().split('!')[0]
         channel = event.target()
         if channel == self.channel:
-            IrcMissionSession.objects.filter(nick=nick).delete()
+            self.destroy_session(nick)
 
     def on_kick(self, conn, event):
         nick = event.arguments()[0]
         channel = event.target()
         if channel == self.channel:
-            IrcMissionSession.objects.filter(nick=nick).delete()
+            self.destroy_session(nick)
