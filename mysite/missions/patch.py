@@ -320,7 +320,7 @@ class Patch(object):
           continue
 
     if not hunkskip:
-      warning("patch file incomplete - %s" % filename)
+      warning("patch file incomplete")
       # sys.exit(?)
     else:
       # duplicated message when an eof is reached
