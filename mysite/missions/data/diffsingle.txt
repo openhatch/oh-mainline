@@ -11,7 +11,8 @@ deletions, and changes. Here is what we want you to do to this file:
       between each paragraph and bullet point, and all indentation is
       done with spaces. There is never trailing whitespace.
 
-  3.  Delete this step. (Don't renumber the ones below it.)
+  3.  Delete this step (and the blank line below it). (Don't renumber the
+      ones below it.)
 
   4.  Leave this step the way it is.
 
