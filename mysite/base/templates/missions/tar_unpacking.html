@@ -6,8 +6,14 @@
     <h3>Unpacking tarballs</h3>
   </div>
   <div class="body">
-      <p>For you to try unpacking existing tarballs, we made a simple project source archive for you, which you can download here: <a href="{% url mysite.missions.views.tar_download_tarball_for_extract_mission %}">{{ tarball_for_unpacking_mission }}</a></p>
-      <p>Your mission is to unpack it and give us back the file "{{ file_we_want }}" from it.  (Note that the tarball is following the conventions mentioned above by using a wrapper directory.)</p>
+      <p>For you to try unpacking existing tarballs, we made a simple project source archive for you, which you can download here: <a href="{% url mysite.missions.views.tar_download_tarball_for_extract_mission %}">{{ tarball_for_unpacking_mission }}</a>. (Note that the tarball is following convention by using a wrapper directory.)</p>
+      <p>Your mission is to:
+        <ul class="raquo_bullets">
+            <li>download the tarball</li>
+            <li>unpack it (<abbr title="tar xvf ghello-0.4.tar.gz">hint</abbr>)</li>
+            <li>find and upload the <code>{{ file_we_want }}</code> file</li>
+        </ul>
+        <p></p>
       <form method="post" enctype="multipart/form-data" action="{% url mysite.missions.views.tar_extract_mission_upload %}#unpack-form">
         <div class="form-row">
           <a name="unpack-form"></a>
