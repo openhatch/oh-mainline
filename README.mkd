@@ -26,12 +26,6 @@ Now start memcached. This is used by Django for all the website caching, such as
 
 If memcached complains that it is not enabled, configure it by reading `/etc/default/memcached`.
 
-#### Clearing the cache ####
-
-As an aside, the Django cache is held completely in temporary memory by memcached, so clearing the cache is as simple as:
-
-    sudo /etc/init.d/memcached restart
-
 ### Run Buildout ###
 
 OpenHatch uses Buildout to manage dependencies.
@@ -223,6 +217,12 @@ for this hint.
 An earlier version of this document said to remove the egg from your filesystem. You
 should not do that, but instead add the compatibility package listed above.
 
+#### Clearing the cache ####
+
+As an aside, the Django cache is held completely in temporary memory by memcached, so clearing the cache is as simple as:
+
+    sudo /etc/init.d/memcached restart
+
 #### ctypes ####
 * If you're running Ubuntu 10.04 Lucid Lynx, when you execute `bin/mysite runserver`, you might see this error:
   File "/usr/lib/python2.6/dist-packages/ctypes/__init__.py", line 20, in <module>
@@ -267,3 +267,4 @@ Finally, don't forget to add your component to the list above, so the next perso
 ## Stay in touch ##
 
 &hellip;on [the project blog](http://openhatch.org/blog), [Identi.ca](http://identi.ca/openhatchery), [Twitter](http://twitter.com/openhatchery), IRC (#openhatch on irc.freenode.net), and the [Face-Book](http://facebook.com/pages/OpenHatch/108578243652).
+
