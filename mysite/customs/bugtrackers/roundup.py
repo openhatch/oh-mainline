@@ -275,7 +275,7 @@ class OpenHatchTracker(RoundupTracker):
             'documentation' in metadata_dict['Keywords'])
         bug_object.status = metadata_dict['Status']
         bug_object.looks_closed = (
-            metadata_dict['Status'] == 'resolved' or
+            metadata_dict['Status'] == 'resolved')
         bug_object.importance = metadata_dict['Priority']
 
     def generate_list_of_bug_ids_to_look_at(self):
