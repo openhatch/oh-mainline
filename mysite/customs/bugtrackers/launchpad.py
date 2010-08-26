@@ -217,3 +217,11 @@ def refresh_one_launchpad_bug(canonical_bug_link,
         setattr(bug, key, new_data[key])
     bug.last_polled = datetime.datetime.utcnow()
     bug.save()
+
+##########################################################
+# Specific sub-classes for individual bug trackers
+##########################################################
+
+# Oops, there aren't any in this file.
+# For Launchpad, take a look at mysite/customs/management/commands/customs_daily_tasks.py
+
