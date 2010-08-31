@@ -15,6 +15,8 @@ Next, install some dependencies:
 or the equivalent for your system.
 
 On some Operating Systems you may not need (or be able) to install all of the above packages, depending on what comes prebuilt with Python as default. If you do find a package for any of the above for your system, you should install it.
+On a Debian system using the 'stable' release, you have to setup apt-pinning to be able to install packages from 'unstable' and 'testing' as well to get _python2.6-dev_.
+<http://jaqque.sbih.org/kplug/apt-pinning.html>
 
 The other dependencies (like Django) are handled by "buildout", so keep reading patiently and we'll get to that.
 
