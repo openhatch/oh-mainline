@@ -39,14 +39,6 @@ Run these commands from the top level directory of the repository, and grab some
     python2.6 bootstrap.py
     bin/buildout
 
-### Run the server ###
-
-The following command will start the OpenHatch webserver:
-
-    bin/mysite runserver
-
-This server really doesn't like running in the background, so run it in a separate tab or inside a GNU screen session.
-
 ### Set up the database ###
 
 Connect to MySQL. At the risk of stating the obvious, you can use the command `mysql -u root -p`, then type your MySQL root password. Or use `mysql -u username`, where `username` belongs to a MySQL user with the power to run the commands below.
@@ -78,6 +70,14 @@ There's a note about troubleshooting migrations below.
 If you have the permission to do so, get the current data and files. Run:
 
     scripts/get_data_and_images
+
+### Run the server ###
+
+The following command will start the OpenHatch webserver:
+
+    bin/mysite runserver
+
+This server really doesn't like running in the background, so run it in a separate tab or inside a GNU screen session.
 
 ### Check it all works ###
 
