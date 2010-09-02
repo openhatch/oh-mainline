@@ -141,6 +141,7 @@ To run the tests in the `customs` app:
 ## To forcibly regenerate scripts in bin/* ##
 
 *Why would we need to do this?*
+
 Run these commands:
 
     cd milestone-a # Make sure you're in this directory. I'm not sure if it will work elsewhere.
