@@ -73,7 +73,7 @@ You may need to migrate using this command:
 
     bin/mysite migrate
 
-There's a note about migrations below.
+There's a note about troubleshooting migrations below.
 
 If you have the permission to do so, get the current data and files. Run:
 
