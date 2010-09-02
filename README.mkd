@@ -87,11 +87,9 @@ If you're having troubles at this point, see "Troubleshooting" below, or post yo
 
 ### About migrations ###
 
-Sometimes the migrations don't work, and South will give you a MySQL script so you can fix things. But South isn't perfect. You might have to fix the syntax errors in this MySQL. Run this vim command for starters.
+Sometimes the migrations don't work, and South will give you a MySQL script so you can fix things. But South isn't perfect. You might have to fix the syntax errors in this MySQL. For starters, you can run this vim command in normal mode, it will delete the string ' = ' when it appears at the beginning of a new line.
 
     :%s/^ = //
-
-For non-vimmers, that will delete the string ' = ' when it appears at the beginnings of lines.
 
 Then remove those trailing square brackets. You may need to replace South's strange, Pythonesque code for dates, with proper MySQL code.
 
