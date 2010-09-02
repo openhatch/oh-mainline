@@ -6,13 +6,15 @@ Well, you probably want to know to how run this code.
 
 ### Dependencies ###
 
-OpenHatch is currently designed to run with Python 2.6. Make sure that's installed.
+OpenHatch is currently designed to run on Debian testing, Python 2.6. Make sure that's installed.
 
 Next, install some dependencies. This is what we do on Debian testing/unstable:
 
     sudo apt-get install python2.6-dev python-libxml2 memcached
 
 or the equivalent for your system. (It's important that you get Python 2.6 -- some of the OpenHatch code depends on Python 2.6 or higher.)
+
+Debian stable does not currently (Sept 1 2010) have the necessary packages, you must either run Debian testing/unstable or use apt-pinning.
 
 On some Operating Systems you may not need (or be able) to install all of the above packages, depending on what comes prebuilt with Python as default. If you do find a package for any of the above for your system, you should install it.
 
@@ -30,18 +32,11 @@ If memcached complains that it is not enabled, configure it by reading `/etc/def
 
 OpenHatch uses Buildout to manage dependencies.
 
-Run these commands from the top level directory of the repository:
+Run these commands from the top level directory of the repository, and grab some coffee, snacks, or both. This may take awhile.
 
     python2.6 bootstrap.py
     bin/buildout
 
-### Run the server ###
-
-The following command will start the OpenHatch webserver:
-
-    bin/mysite runserver
-
-This server really doesn't like running in the background, so run it in a separate tab or inside a GNU screen session.
 
 ### Set up the database ###
 
@@ -69,11 +64,33 @@ You may need to migrate using this command:
 
     bin/mysite migrate
 
-There's a note about migrations below.
+There's a note about troubleshooting migrations below.
 
 If you have the permission to do so, get the current data and files. Run:
 
     scripts/get_data_and_images
+
+### Run the server ###
+
+The following command will start the OpenHatch webserver:
+
+    bin/mysite runserver
+
+This server really doesn't like running in the background, so run it in a separate tab or inside a GNU screen session.
+If everything went well and the server started you should see something like this
+
+    Django version 1.1.2, using settings 'mysite.settings'
+    Development server is running at http://127.0.0.1:8000/
+    Quit the server with CONTROL-C.
+
+To run the server on an IP other than loopback, use the command
+
+    bin/mysite runserver IP:PORT
+
+where IP and PORT are what IP and port you want the server to run on.  This and more info is available with
+
+    bin/mysite runserver --help
+
 
 ### Check it all works ###
 
@@ -83,11 +100,9 @@ If you're having troubles at this point, see "Troubleshooting" below, or post yo
 
 ### About migrations ###
 
-Sometimes the migrations don't work, and South will give you a MySQL script so you can fix things. But South isn't perfect. You might have to fix the syntax errors in this MySQL. Run this vim command for starters.
+Sometimes the migrations don't work, and South will give you a MySQL script so you can fix things. But South isn't perfect. You might have to fix the syntax errors in this MySQL. For starters, you can run this vim command in normal mode, it will delete the string ' = ' when it appears at the beginning of a new line.
 
     :%s/^ = //
-
-For non-vimmers, that will delete the string ' = ' when it appears at the beginnings of lines.
 
 Then remove those trailing square brackets. You may need to replace South's strange, Pythonesque code for dates, with proper MySQL code.
 
@@ -123,6 +138,7 @@ To run the tests in the `customs` app:
 
 ## To forcibly regenerate scripts in bin/* ##
 
+*Why would we need to do this?*
 Run these commands:
 
     cd milestone-a # Make sure you're in this directory. I'm not sure if it will work elsewhere.
