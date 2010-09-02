@@ -140,7 +140,7 @@ If you use aptitude you may see output such as this;
     Accept this solution? [Y/n/q/?] 
 
 This is normal, it's just checking with you before applying the solution it's chosen to resolve that dependency or broken package.  Press `y` and hit enter to continue to the prompt you are familiar with from apt-get [then press `y` and hit enter again].
-
+From here, you can go back up to the Run Buildout section above and continue from there.
 
 ## Testing ##
 
