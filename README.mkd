@@ -85,7 +85,7 @@ If everything went well and the server started you should see something like thi
     Development server is running at http://127.0.0.1:8000/
     Quit the server with CONTROL-C.
 
-To run the server on an IP other than loopback, use the command
+To run the server on an IP other than loopback, use the syntax
 
     bin/mysite runserver IP:PORT
 
