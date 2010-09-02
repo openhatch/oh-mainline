@@ -34,7 +34,7 @@ If memcached complains that it is not enabled, configure it by reading `/etc/def
 
 OpenHatch uses Buildout to manage dependencies.
 
-Run these commands from the top level directory of the repository:
+Run these commands from the top level directory of the repository, and grab some coffee, snacks, or both. This may take awhile.
 
     python2.6 bootstrap.py
     bin/buildout
