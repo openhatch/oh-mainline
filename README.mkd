@@ -124,6 +124,10 @@ This is required to be able to get the packages that exist in testing but don't 
 
     sudo aptitude -t testing install python2.6-dev python-libxml2 memcached python-lxml python-mysqldb python-imaging
 
+Or if you'll be installing the mysql server locally;
+
+    sudo aptitude -t testing install python2.6-dev python-libxml2 memcached python-lxml python-mysqldb python-imaging mysql-server
+
 Note this is not the same command as was used above, there are two differences.  First and most importantly, the `-t testing` argument.  This tells aptitude to install the testing version of the package, and try to meet any dependencies from testing.  Second is that this time I used aptitude instead of apt-get.  I use aptitude over apt-get especially when the system is configured to use apt pinning because aptitude is better at resolving dependancies.
 
 If you use aptitude you may see output such as this;
