@@ -6,7 +6,7 @@ Well, you probably want to know to how run this code.
 
 ### Dependencies ###
 
-OpenHatch is currently designed to run with Python 2.6. Make sure that's installed.
+OpenHatch is currently designed to run on Debian testing, Python 2.6. Make sure that's installed.
 
 Next, install some dependencies. This is what we do on Debian testing/unstable:
 
