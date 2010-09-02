@@ -122,7 +122,7 @@ As of this writing, Debian Stable is 5.0, Lenny
 [Apt pinning](http://jaqque.sbih.org/kplug/apt-pinning.html) is required, once it's configured it lets you install packages from testing (and unstable).
 This is required to be able to get the packages that exist in testing but don't exist or aren't up to date in stable.
 
-    sudo aptitude -t testing install python2.6-dev python-libxml2 memcached
+    sudo aptitude -t testing install python2.6-dev python-libxml2 memcached python-lxml python-mysqldb
 
 Note this is not the same command as was used above, there are two differences.  First and most importantly, the `-t testing` argument.  This tells aptitude to install the testing version of the package, and try to meet any dependencies from testing.  Second is that this time I used aptitude instead of apt-get.  I use aptitude over apt-get especially when the system is configured to use apt pinning because aptitude is better at resolving dependancies.
 
