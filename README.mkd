@@ -39,6 +39,7 @@ Run these commands from the top level directory of the repository, and grab some
     python2.6 bootstrap.py
     bin/buildout
 
+
 ### Set up the database ###
 
 Connect to MySQL. At the risk of stating the obvious, you can use the command `mysql -u root -p`, then type your MySQL root password. Or use `mysql -u username`, where `username` belongs to a MySQL user with the power to run the commands below.
@@ -78,6 +79,12 @@ The following command will start the OpenHatch webserver:
     bin/mysite runserver
 
 This server really doesn't like running in the background, so run it in a separate tab or inside a GNU screen session.
+If everything went well and the server started you should see something like this
+
+    Django version 1.1.2, using settings 'mysite.settings'
+    Development server is running at http://127.0.0.1:8000/
+    Quit the server with CONTROL-C.
+
 
 ### Check it all works ###
 
