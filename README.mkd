@@ -12,7 +12,7 @@ Next, install some dependencies. This is what we do on Debian testing/unstable:
 
     sudo apt-get install python2.6-dev python-libxml2 memcached
 
-or the equivalent for your system. (It's important that you get Python 2.6 -- some of the OpenHatch code depends on Python 2.6 or higher.)
+Or the equivalent for your system. (It's important that you get Python 2.6 -- some of the OpenHatch code depends on Python 2.6 or higher.)
 
 Debian stable does not currently (Sept 1 2010) have the necessary packages, you must either run Debian testing/unstable or use apt-pinning.
 
