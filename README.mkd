@@ -126,6 +126,33 @@ Since this can take a while, it is a good idea to run this somewhere where it wo
 
 Subversion repositories for the svn training missions are stored in mysite/missions-userdata/svn. This directory must be available via svnserve for users to be able to do the svn missions.  See mysite/missions-userdata/svn/README for more details.
 
+## Installing on Debian Stable ##
+
+As of this writing, Debian Stable is 5.0, Lenny
+
+[Apt pinning](http://jaqque.sbih.org/kplug/apt-pinning.html) is required, once it's configured it lets you install packages from testing (and unstable).
+This is required to be able to get the packages that exist in testing but don't exist or aren't up to date in stable.
+
+    sudo aptitude -t testing install python2.6-dev python-libxml2 memcached python-lxml python-mysqldb python-imaging
+
+Or if you'll be installing the mysql server locally;
+
+    sudo aptitude -t testing install python2.6-dev python-libxml2 memcached python-lxml python-mysqldb python-imaging mysql-server
+
+Note this is not the same command as was used above, there are two differences.  First and most importantly, the `-t testing` argument.  This tells aptitude to install the testing version of the package, and try to meet any dependencies from testing.  Second is that this time I used aptitude instead of apt-get.  I use aptitude over apt-get especially when the system is configured to use apt pinning because aptitude is better at resolving dependancies.
+
+If you use aptitude you may see output such as this;
+
+    Upgrade the following packages:
+    libc6-i686 [2.7-18lenny4 (stable, stable, stable, now) -> 2.11.2-2 (testing)]
+
+    Score is 120
+
+    Accept this solution? [Y/n/q/?] 
+
+This is normal, it's just checking with you before applying the solution it's chosen to resolve that dependency or broken package.  Press `y` and hit enter to continue to the prompt you are familiar with from apt-get [then press `y` and hit enter again].
+From here, you can go back up to the Run Buildout section above and continue from there.
+
 ## Testing ##
 
 As you make changes to the source code, you'll want to run unit tests to make sure that everything is still hunky-dory. To run all tests, except the rather slow tests in the `customs` app, run this command:
