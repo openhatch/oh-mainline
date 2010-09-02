@@ -115,6 +115,11 @@ Since this can take a while, it is a good idea to run this somewhere where it wo
 
 Subversion repositories for the svn training missions are stored in mysite/missions-userdata/svn. This directory must be available via svnserve for users to be able to do the svn missions.  See mysite/missions-userdata/svn/README for more details.
 
+## Installing on Debian Stable ##
+
+As of this writing, Debian Stable is 5.0, Lenny
+
+
 ## Testing ##
 
 As you make changes to the source code, you'll want to run unit tests to make sure that everything is still hunky-dory. To run all tests, except the rather slow tests in the `customs` app, run this command:
