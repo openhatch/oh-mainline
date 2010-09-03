@@ -4,11 +4,30 @@ Well, you probably want to know to how run this code.
 
 ## How to run this code ##
 
-### Dependencies ###
+This repository contains (mostly) Python code written on top of Django and other Python
+modules. To develop this code, you'll need some third-party software installed.
 
-OpenHatch is currently designed to run on Debian testing, Python 2.6. Make sure that's installed.
+There are two steps to this: some dependencies must be installed system-wide by the
+package manager. After that, you'll run "buildout" to pick up Python packages (more
+about buildout below).
 
-Next, install some dependencies. This is what we do on Debian testing/unstable:
+OpenHatch is currently designed to run on Python 2.6.
+
+### Operating system ###
+
+We develop on Debian 6.0 ("squeeze" AKA "testing") and on Ubuntu 9.x and 10.x,
+and we run the openhatch.org website on Debian 6.0.
+
+If you're running a different system, you might need to adjust the instructions.
+In particular, if you run Debian stable, take a look at the "Installing on Debian Stable"
+section below.
+
+### System dependencies ###
+
+Most of the dependencies are handled by "buildout" -- more on that below. But you
+must install a few using your system package manager.
+
+This is what we do on Debian testing/unstable:
 
     sudo apt-get install python2.6-dev python-libxml2 memcached
 
@@ -22,11 +41,14 @@ The other dependencies (like Django) are handled by "buildout", so keep reading 
 
 ### Caching ###
 
-Now start memcached. This is used by Django for all the website caching, such as the full list of projects, as well as individual webpage requests.
+We use memcached to save the output of particularly slow functions in the OpenHatch code.
+You already installed it in the previous section, so now start it:
 
     sudo /etc/init.d/memcached start
 
 If memcached complains that it is not enabled, configure it by reading `/etc/default/memcached`.
+
+This is used by OpenHatch/Django for all the website caching, such as the full list of projects, as well as individual webpage requests. You can read more about Django caching at http://docs.djangoproject.com/en/dev/topics/cache/.
 
 ### Run Buildout ###
 
@@ -37,6 +59,7 @@ Run these commands from the top level directory of the repository, and grab some
     python2.6 bootstrap.py
     bin/buildout
 
+You'll download a whole bunch of Python code and run other setup tasks. This is controlled by setup.py and buildout.cfg in the codebase.
 
 ### Set up the database ###
 
@@ -66,7 +89,9 @@ You may need to migrate using this command:
 
 There's a note about troubleshooting migrations below.
 
-If you have the permission to do so, get the current data and files. Run:
+You're done! The OpenHatch code will now run, and you make modifications.
+
+If you want to grab a copy of the data used on openhatch.org, and you have permission to do so, you can get the current data and files. Run:
 
     scripts/get_data_and_images
 
