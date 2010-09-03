@@ -12,6 +12,7 @@ Here are the steps you'll have to follow:
 * Install dependencies (some with the package manager, others with buildout)
 * Set up caching
 * Set up the database
+* Read the wiki pages at https://openhatch.org/wiki/Category:Hacking_OpenHatch
 
 Then you can run your own instance of the OpenHatch website and play with the code from an interactive shell.
 
