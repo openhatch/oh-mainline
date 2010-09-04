@@ -72,9 +72,12 @@ Connect to MySQL. At the risk of stating the obvious, you can use the command `m
 
 At the MySQL prompt, enter these commands:
 
+    SET NAMES utf8;
     CREATE DATABASE oh_milestone_a;
     CREATE USER 'oh_milestone_a'@'localhost' IDENTIFIED BY 'ahmaC0Th';
     GRANT ALL ON oh_milestone_a.* TO 'oh_milestone_a'@'localhost';
+
+The "SET NAMES utf8" sets the database character set, as per http://blog.awarelabs.com/2008/django-tips-utf-8-ascii-encoding-errors-urllib2-and-mysql/.
 
 In addition, if you wish to run any of the tests, you will need to grant permissions for the temporary database as well:
 
