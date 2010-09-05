@@ -1,3 +1,16 @@
+### This file is a collection of wrappers around
+### the github2.client API.
+
+### If you are writing new code that communicates
+### with the github API, you should write a new function
+### in here.
+
+### The repos_by_username() function is a good example of
+### one to clone.
+
+### By writing a function here, you can easily write a test
+### in mysite/customs/tests.py and mock out Github as necessary.
+
 import github2.client
 from django.conf import settings
 import mysite.customs.ohloh
