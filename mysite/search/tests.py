@@ -32,6 +32,7 @@ from django.db.models import Q
 
 from django.conf import settings
 from StringIO import StringIO
+import MySQLdb
 
 class SearchTest(TwillTests):
 
@@ -371,6 +372,13 @@ class Recommend(SearchTest):
                 self.assert_(term in recommended_terms,
                         "Expected %s in recommended search terms "
                         "inspired by %s." % (term, source))
+
+    # Use that to exclude 'will never understand' tags from recommended search terms.
+    @mock.patch('mysite.search.models.HitCountCache.objects.get_or_create')
+    def test_recomender_raises_integrity_error(self, mocked_get_or_create):
+        mocked_get_or_create.side_effect = MySQLdb.IntegrityError()
+        person = Person.objects.get(user__username='paulproteus')
+        recommended_terms = person.get_recommended_search_terms()
 
     # FIXME: Include recommendations from tags.
 
