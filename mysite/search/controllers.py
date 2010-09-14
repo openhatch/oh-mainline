@@ -7,6 +7,7 @@ import urllib
 import re
 import hashlib
 from django.db.models import Q
+import MySQLdb
 
 def order_bugs(query):
     # Minus sign: reverse order
@@ -332,16 +333,24 @@ class Query:
     
     def get_or_create_cached_hit_count(self):
         hashed_query = self.get_sha1()
+        hit_count = 0 # we try a few strategies to know something about the hit count, but if we
+                      # fail to gain any data on the query and its hit count, 0 is a safe enough
+                      # value to return.
 
         existing_hccs = mysite.search.models.HitCountCache.objects.filter(hashed_query=hashed_query)
         if existing_hccs:
             hcc = existing_hccs[0]
+            hit_count = hcc.hit_count
         else:
             count = self.get_bugs_unordered().count()
-            hcc, _ = mysite.search.models.HitCountCache.objects.get_or_create(
-                    hashed_query=hashed_query,
-                    defaults={'hit_count': count})
-        return hcc.hit_count
+            try:
+                hcc, _ = mysite.search.models.HitCountCache.objects.get_or_create(
+                        hashed_query=hashed_query,
+                        defaults={'hit_count': count})
+                hit_count = hcc.hit_count
+            except MySQLdb.IntegrityError:
+                hit_count = 0
+        return hit_count
 
     def get_query_string(self):
         GET_data = self.get_GET_data()
