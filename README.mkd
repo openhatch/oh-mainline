@@ -151,7 +151,7 @@ As with the main server, it is a good idea to run this in a separate tab or insi
 
 At present, there is no inbuilt automation of bug importing (celeryd was causing too many problems). Run the following command to start a bug import:
 
-    bin/mysite search_daily_tasks
+    bin/mysite customs_daily_tasks
 
 Since this can take a while, it is a good idea to run this somewhere where it won't prevent you from using your computer - for example, inside a GNU screen session.
 
