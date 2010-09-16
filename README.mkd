@@ -68,36 +68,33 @@ You'll download a whole bunch of Python code and run other setup tasks. This is 
 
 ### Set up the database ###
 
-Connect to MySQL. At the risk of stating the obvious, you can use the command `mysql -u root -p`, then type your MySQL root password. Or use `mysql -u username`, where `username` belongs to a MySQL user with the power to run the commands below.
+1. Make sure you know how to connect to MySQL. Generally, to create a database, you have to be root. You can use the command `mysql -u root -p`, then type your MySQL root password.
 
-At the MySQL prompt, enter these commands:
+2. Run the database creation script.
 
-    SET NAMES utf8;
-    CREATE DATABASE oh_milestone_a;
-    CREATE USER 'oh_milestone_a'@'localhost' IDENTIFIED BY 'ahmaC0Th';
-    GRANT ALL ON oh_milestone_a.* TO 'oh_milestone_a'@'localhost';
+    mysql -uroot < mysite/scripts/database_01_create.sql
 
-The "SET NAMES utf8" sets the database character set, as per http://blog.awarelabs.com/2008/django-tips-utf-8-ascii-encoding-errors-urllib2-and-mysql/.
+(If you want to know what it does, read the file!)
 
-In addition, if you wish to run any of the tests, you will need to grant permissions for the temporary database as well:
+3. Run the user setup script. This one sets up permissions in MySQL.
 
-    GRANT ALL ON test_oh_milestone_a.* TO 'oh_milestone_a'@'localhost';
+    mysql -uroot < mysite/scripts/database_02_users.sql
 
-There is no need to create this database, as creation and destruction is done automatically by the testing suite.
+(A note: If you ever decide you want to drop the database, just send "DROP DATABASE oh_milestone_a" to MySQL, then re-run the database creation script. You do not have to recreate the users.)
 
-Then exit from MySQL, and run this command, again from the top level directory:
+4. Exit from MySQL, and run this command, again from the top level directory:
 
     bin/mysite syncdb
 
 To the question, "Do you want to create a superuser?", answer "No". That's because you haven't run the migrations for the "profile" app yet.
 
-You may need to migrate using this command:
+5. Run the "migrations" to migrate your database from the empty state into the state it should be in.
 
     bin/mysite migrate
 
 There's a note about troubleshooting migrations below.
 
-You're done! The OpenHatch code will now run, and you make modifications.
+6. You're done! The OpenHatch code will now run, and you make modifications.
 
 If you want to grab a copy of the data used on openhatch.org, and you have permission to do so, you can get the current data and files. Run:
 
