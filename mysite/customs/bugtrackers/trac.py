@@ -339,6 +339,13 @@ class SugarLabsTrac(TracBugTracker):
                                 base_url='http://bugs.sugarlabs.org/',
                                 bug_project_name_format='{component}')
 
+    def generate_bug_project_name(self, trac_bug):
+        if trac_bug.component == 'SoaS':
+            return 'Sugar on a Stick'
+        else:
+            return self.bug_project_name_format.format(project=self.project_name,
+                                                       component=trac_bug.component)
+
     def generate_list_of_bug_ids_to_look_at(self):
         queries = {
                 'Easy bugs':
