@@ -830,34 +830,6 @@ class PadreTrac(TracBugTracker):
         # Then pass ret_dict back
         return ret_dict
 
-class OpenSlideTrac(TracBugTracker):
-    enabled = True
-
-    def __init__(self):
-        TracBugTracker.__init__(self,
-                                project_name='OpenSlide',
-                                base_url='http://openslide.cs.cmu.edu/',
-                                bug_project_name_format='{project}')
-
-    def generate_list_of_bug_ids_to_look_at(self):
-        # Can replace both entries below with an 'All bugs' query.
-        queries = {
-                'All bugs':
-                    'http://openslide.cs.cmu.edu/query?status=assigned&status=new&status=reopened&format=csv&order=priority'
-                }
-        return self.generate_bug_ids_from_queries(queries)
-
-    @staticmethod
-    def extract_tracker_specific_data(trac_data, ret_dict):
-        # Make modifications to ret_dict using provided metadata
-        # Check for the bitesized keyword
-        #ret_dict['bite_size_tag_name'] = ''
-        #ret_dict['good_for_newcomers'] = ('' in trac_data['keywords'])
-        # Check whether this is a documentation bug.
-        #ret_dict['concerns_just_documentation'] = ('' in trac_data['keywords'])
-        # Then pass ret_dict back
-        return ret_dict
-
 class EvolvingObjectsTrac(TracBugTracker):
     enabled = False
 
