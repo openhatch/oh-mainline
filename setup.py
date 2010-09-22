@@ -38,6 +38,7 @@ setup(
                         'sisynala',
                         'django-haystack',
                         'hexagonit.recipe.download',
+                        'django-registration>0.7',
                         'django-voting',
                         'staticgenerator==1.4.1.2-openhatch',
                         'python-otp',
