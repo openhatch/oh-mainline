@@ -17,6 +17,8 @@ from twill import commands as tc
 from twill.shell import TwillCommandLoop
 
 import django.test
+import django.contrib.auth.models
+import django.core.serializers
 from django.test import TestCase
 from django.test.client import Client
 from django.conf import settings
@@ -44,6 +46,7 @@ import mysite.customs.bugtrackers.roundup
 import mysite.customs.bugtrackers.launchpad
 import mysite.customs.lp_grabber
 import mysite.customs.management.commands.customs_daily_tasks
+import mysite.customs.management.commands.dump_public_user_data
 # }}}
 
 # Mocked out browser.open
@@ -1546,6 +1549,37 @@ I don't see for example the solvers module""",
                   'concerns_just_documentation': True,
                   }
         self.assertEqual(wanted, got)
+
+class DataExport(django.test.TestCase):
+    def test_dump_user_table_without_passwords(self):
+        # We'll pretend we're running the dump_public_user_data management command. But
+        # to avoid JSON data being splatted all over stdout, we create a fake_stdout to
+        # capture that data.
+        fake_stdout = StringIO()
+
+        # Now, set up the test:
+        # Create a user object
+        u = django.contrib.auth.models.User.objects.create(username='bob')
+        u.set_password('something_secret')
+        u.save()
+
+        # Dump the public version of that user's data into fake stdout
+        command = mysite.customs.management.commands.dump_public_user_data.Command()
+        command.handle(output=fake_stdout)
+
+        # Now, delete the user and see if we can reimport bob
+        u.delete()
+
+        ## This code re-imports from the dump.
+        # for more in serializers.deserialize(), read http://docs.djangoproject.com/en/dev/topics/serialization
+        for obj in django.core.serializers.deserialize('json', fake_stdout.getvalue()):
+            obj.save()
+
+        ### Now the tests:
+        # The user is back
+        new_u = django.contrib.auth.models.User.objects.get(username='bob')
+        # and the user's password is blank (instead of the real password)
+        self.assertEquals(new_u.password, '')
 
 # vim: set nu:
 
