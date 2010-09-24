@@ -1,0 +1,84 @@
+@import url('https://openhatch.org/static/packed/openhatch2.css?1280182359');
+
+body {
+	font-family: "Helvetica", sans-serif;
+	background-image: url("https://openhatch.org/static/images/motif-eee.png");
+}
+
+a {
+	color: #ff6d3d;
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+.list, .content {
+	text-align: left;
+}
+
+.sidebar p, .content {
+	-webkit-border-radius: 8px;
+	-moz-border-radius: 8px;
+	border-radius: 8px;
+	border: 3px solid #e4e4e4;
+	//background-image: url('https://openhatch.org/static/images/gray-60.png');
+	background: #ffffff;
+	//padding: 3px;
+}
+
+.list td, .content td {
+	padding: 10px 5px;
+	margin: 0;
+}
+
+.list tr:hover {
+	background: #ffc;
+}
+
+.group {
+	margin-top: 10px;
+	border-bottom: 1px dashed #DEDEDE;
+	text-transform: capitalize;
+	text-align: center;
+	background: rgba(100, 200, 255, 0.199219);
+}
+
+td.date, th.date {
+	white-space: nowrap;
+}
+
+.sidebar p {
+	padding: 3px;
+	margin: 5px 0;
+	line-height: 13pt;
+}
+
+.form-small, input {
+	float: none !important;
+	padding: 0 !important;
+	font-size: 10pt !important;
+}
+
+#searchbox {
+	float: right;
+}
+
+#submit {
+	float: none;
+}
+
+#body-title {
+	float: left;
+}
+
+.page-header-top {
+	padding: 20px 0;
+}
+
+.page-header-left {
+	width: 87px;
+	height: 60px;
+	background: url('https://openhatch.org/static/images/the-logo-bluegreen-87px.png') no-repeat;
+}
