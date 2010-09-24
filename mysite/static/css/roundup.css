@@ -1,4 +1,6 @@
-@import url('https://openhatch.org/static/packed/openhatch2.css?1280182359');
+/* You need to import the main openhatch2.css file before this. Do that with
+   a <link rel="stylesheet" type="text/css" href="/static/packed/openhatch2.css" />
+*/
 
 body {
 	font-family: "Helvetica", sans-serif;
