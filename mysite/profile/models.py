@@ -114,7 +114,10 @@ class Person(models.Model):
     @staticmethod
     def create_dummy(first_name="", email=None, **kwargs):
 
-        username = uuid.uuid4().hex
+        # Generate a random string to use as a username. Keep it short
+        # so that it doesn't overflow the username field!
+        username = uuid.uuid4().hex[:16]
+
         if email is None:
             email = "%s@example.com" % username
         user = User(username=username, first_name=first_name, email=email)
