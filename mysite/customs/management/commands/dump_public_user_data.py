@@ -6,9 +6,13 @@ import sys
 import simplejson
 from django.core.management.base import BaseCommand
 import django.core.serializers
+import django.core.serializers.json
+import mysite.search.views
+
 
 ## You can run this, and it generates a JSON file that can be
 ## passed to loaddata.
+
 
 class Command(BaseCommand):
     help = "Create a JSON file of all the public data in the Person and User models."
@@ -26,6 +30,20 @@ class Command(BaseCommand):
                     fields_that_are_safe_to_export[key] = value
                 else:
                     pass # by failing to copy it in, we remove it from the perspective of the dump
+
+            # Now, in obj, replace the fields with a safe version
+            obj['fields'] = fields_that_are_safe_to_export
+        return all
+        
+    def serialize_all_objects(self, query_set):
+        obj_serializer = django.core.serializers.get_serializer('python')()
+        all = obj_serializer.serialize(query_set)
+        for obj in all:
+            fields_that_are_safe_to_export = {}
+            for key in obj['fields']:
+                value = obj['fields'][key]
+
+                fields_that_are_safe_to_export[key] = value
 
             # Now, in obj, replace the fields with a safe version
             obj['fields'] = fields_that_are_safe_to_export
@@ -54,10 +72,8 @@ class Command(BaseCommand):
         data.extend(public_data_from_person_model)
         
         # exporting Bug data (?)
-        public_bug_data = self.serialize_objects(
-	        query_set=Bug.all_bugs.all(),
-	        whitelisted_columns = ['project', 'title', 'description', 'status'])
+        public_bug_data = self.serialize_all_objects(query_set=Bug.all_bugs.all())
         data.extend(public_bug_data)
 
         ### anyway, now we stream all this data out using simplejson
-        simplejson.dump(data, output)
+        simplejson.dump(data, output,cls=django.core.serializers.json.DjangoJSONEncoder)

@@ -1586,8 +1586,9 @@ class DataExport(django.test.TestCase):
 		# data capture, woo
 		fake_stdout = StringIO()
 		# make fake bug
-		b = Bug.create_dummy()
+		b = Bug.create_dummy_with_project()
 		b.title = 'fire-ant'
+		b.save()
 		
 		# dump fake bug into fake stdout
 		command = mysite.customs.management.commands.dump_public_user_data.Command()
@@ -1600,8 +1601,10 @@ class DataExport(django.test.TestCase):
 		for obj in django.core.serializers.deserialize('json', fake_stdout.getvalue()):
 			obj.save()
 		
+		# testing to see if there are ANY bugs
+		self.assertTrue(Bug.all_bugs.all())
 		# testing to see if fire-ant is there
-		reincarnated_b = django.contrib.auth.models.Bug.objects.get(title='fire-ant')
+		reincarnated_b = mysite.search.models.Bug.all_bugs.get(title='fire-ant')
 
 # vim: set nu:
 
