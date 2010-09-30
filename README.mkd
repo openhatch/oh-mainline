@@ -51,7 +51,7 @@ You already installed it in the previous section, so now start it:
 
     sudo /etc/init.d/memcached start
 
-If memcached complains that it is not enabled, configure it by reading `/etc/default/memcached`.
+If memcached complains that it is not enabled, configure it by reading `/etc/default/memcached`. It's also possible that memcached may have been started automatically by your system when you installed it.
 
 This is used by OpenHatch/Django for all the website caching, such as the full list of projects, as well as individual webpage requests. You can read more about Django caching at http://docs.djangoproject.com/en/dev/topics/cache/.
 
@@ -68,35 +68,35 @@ You'll download a whole bunch of Python code and run other setup tasks. This is 
 
 ### Set up the database ###
 
-1. Make sure you know how to connect to MySQL. Generally, to create a database, you have to be root. You can use the command `mysql -u root -p`, then type your MySQL root password.
+1. Make sure you know how to connect to MySQL. Generally, to create a database, you have to be root. You can use the command `mysql -u root -p`, then type your MySQL root password. This will open a mysql session. ^C out of it to continue.
 
 2. Run the database creation script.
 
-    mysql -uroot < mysite/scripts/database_01_create.sql
+    mysql -uroot -p < mysite/scripts/database_01_create.sql
 
 (If you want to know what it does, read the file!)
 
 3. Run the user setup script. This one sets up permissions in MySQL.
 
-    mysql -uroot < mysite/scripts/database_02_users.sql
+    mysql -uroot -p < mysite/scripts/database_02_users.sql
 
 (A note: If you ever decide you want to drop the database, just send "DROP DATABASE oh_milestone_a" to MySQL, then re-run the database creation script. You do not have to recreate the users.)
 
 4. Exit from MySQL, and run this command, again from the top level directory:
 
-    bin/mysite syncdb
+    ./bin/mysite syncdb
 
-To the question, "Do you want to create a superuser?", answer "No". That's because you haven't run the migrations for the "profile" app yet.
+To the question, "Do you want to create a superuser?", answer "No". That's because you haven't run the migrations for the "profile" app yet. (If you hit "Yes", everything will explode, and you'll need to delete "oh_milestone_a" and re-create your database.)
 
 5. Run the "migrations" to migrate your database from the empty state into the state it should be in.
 
-    bin/mysite migrate
+    ./bin/mysite migrate
 
 There's a note about troubleshooting migrations below.
 
 6. You're done! The OpenHatch code will now run, and you make modifications.
 
-If you want to grab a copy of the data used on openhatch.org, and you have permission to do so, you can get the current data and files. Run:
+If you want to grab a copy of the data used on openhatch.org, and you have permission to do so (hint: probably not), you can get the current data and files. Run:
 
     scripts/get_data_and_images
 
@@ -104,7 +104,7 @@ If you want to grab a copy of the data used on openhatch.org, and you have permi
 
 The following command will start the OpenHatch webserver:
 
-    bin/mysite runserver
+    ./bin/mysite runserver
 
 This server really doesn't like running in the background, so run it in a separate tab or inside a GNU screen session.
 If everything went well and the server started you should see something like this
