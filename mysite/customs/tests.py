@@ -1581,5 +1581,27 @@ class DataExport(django.test.TestCase):
         # and the user's password is blank (instead of the real password)
         self.assertEquals(new_u.password, '')
 
+
+    def test_dump_bug(self):
+		# data capture, woo
+		fake_stdout = StringIO()
+		# make fake bug
+		b = Bug.create_dummy()
+		b.title = 'fire-ant'
+		
+		# dump fake bug into fake stdout
+		command = mysite.customs.management.commands.dump_public_user_data.Command()
+		command.handle(output=fake_stdout)
+		
+		#now, delete bug...
+		b.delete()
+		
+		# let's see if we can re-import fire-ant!
+		for obj in django.core.serializers.deserialize('json', fake_stdout.getvalue()):
+			obj.save()
+		
+		# testing to see if fire-ant is there
+		reincarnated_b = django.contrib.auth.models.Bug.objects.get(title='fire-ant')
+
 # vim: set nu:
 

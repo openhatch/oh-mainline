@@ -1,6 +1,7 @@
 import logging
 
 from django.contrib.auth.models import User
+from mysite.search.models import Bug
 import sys
 import simplejson
 from django.core.management.base import BaseCommand
@@ -51,6 +52,12 @@ class Command(BaseCommand):
         # For now, since I can't write it right now, I pretend we got the empty list as the result.
         public_data_from_person_model = []
         data.extend(public_data_from_person_model)
+        
+        # exporting Bug data (?)
+        public_bug_data = self.serialize_objects(
+	        query_set=Bug.all_bugs.all(),
+	        whitelisted_columns = ['project', 'title', 'description', 'status'])
+        data.extend(public_bug_data)
 
         ### anyway, now we stream all this data out using simplejson
         simplejson.dump(data, output)

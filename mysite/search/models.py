@@ -440,6 +440,7 @@ class Bug(OpenHatchModel):
     def create_dummy(**kwargs):
         now = datetime.datetime.utcnow()
         n = str(Bug.all_bugs.count())
+        # FIXME (?) Project.objects.all()[0] call below makes an out-of-bounds error in testing...
         data = dict(title=n, project=Project.objects.all()[0], 
                 date_reported=now,
                 last_touched=now,
