@@ -149,8 +149,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         self.update_opensolaris_osnet()
-        self.update_launchpad_hosted_projects()
         self.find_and_update_enabled_trac_instances()
         self.find_and_update_enabled_roundup_trackers()
         self.find_and_update_enabled_bugzilla_instances()
         self.find_and_update_enabled_google_instances()
+        self.update_launchpad_hosted_projects()
