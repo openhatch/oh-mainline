@@ -62,9 +62,8 @@ def add_tracker_do(request, tracker_type=None):
                 request.POST, prefix='add_tracker')
         if bugzilla_tracker_form.is_valid():
             bugzilla_tracker_form.save()
-            return HttpResponseRedirect(reverse(add_tracker_url, args=[tracker_type]) +
-                                        '?project_name=' +
-                                        bugzilla_tracker_form.cleaned_data['project_name'])
+            project_name = bugzilla_tracker_form.cleaned_data['project_name']
+            return HttpResponseRedirect(reverse(add_tracker_url, args=[tracker_type, project_name]))
         else:
             return add_tracker(request,
                     tracker_type=tracker_type,
