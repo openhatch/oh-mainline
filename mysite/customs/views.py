@@ -75,9 +75,8 @@ def add_tracker_do(request, tracker_type=None):
                     tracker_form=tracker_types_form)
 
 @mysite.base.decorators.view
-def add_tracker_url(request, tracker_type, url_form=None):
+def add_tracker_url(request, tracker_type, project_name, url_form=None):
     data = {}
-    project_name = request.GET.get('project_name', None)
     if tracker_type == 'bugzilla':
         if url_form is None:
             if project_name:
@@ -93,16 +92,12 @@ def add_tracker_url(request, tracker_type, url_form=None):
             else:
                 url_form = mysite.customs.forms.BugzillaUrlForm()
         data['url_form'] = url_form
-    data['add_more_url'] = reverse(add_tracker_url_do, args=[tracker_type])
-    data['finish_url'] = reverse(add_tracker_url_do, args=[tracker_type])
-    if project_name:
-        data['add_more_url'] += '?project_name=%s' % project_name
-        data['finish_url'] += '?project_name=%s&finished=true' % project_name
-    else:
-        data['finish_url'] += '?finished=true'
+    data['add_more_url'] = reverse(add_tracker_url_do, args=[tracker_type, project_name])
+    data['finish_url'] = reverse(add_tracker_url_do, args=[tracker_type, project_name])
+    data['finish_url'] += '?finished=true'
     return (request, 'customs/add_tracker_url.html', data)
 
-def add_tracker_url_do(request, tracker_type):
+def add_tracker_url_do(request, tracker_type, project_name):
     url_form = None
     if tracker_type == 'bugzilla':
         url_form = mysite.customs.forms.BugzillaUrlForm(
@@ -119,42 +114,38 @@ def add_tracker_url_do(request, tracker_type):
         else:
             return add_tracker_url(request,
                     tracker_type=tracker_type,
+                    project_name=project_name,
                     url_form=url_form)
     else:
         # Shouldn't get here. Just go back to base.
         return HttpResponseRedirect(reverse(list_trackers))
 
-@mysite.base.decorators.view
-def edit_tracker(request, tracker_type, tracker_form=None):
+def edit_tracker(request, tracker_type, project_name, tracker_form=None):
     data = {}
-    project_name = request.GET.get('project_name', None)
     if tracker_type == 'bugzilla':
-        if tracker_form is None:
-            if project_name:
-                try:
-                    bugzilla_tracker = mysite.customs.models.BugzillaTracker.all_trackers.get(
-                            project_name=project_name)
-                    tracker_form = mysite.customs.forms.BugzillaTrackerForm(
-                            instance=bugzilla_tracker)
-                    tracker_urls = mysite.customs.models.BugzillaUrl.objects.filter(
-                            bugzilla_tracker=bugzilla_tracker)
-                except mysite.customs.models.BugzillaTracker.DoesNotExist:
-                    return HttpResponseRedirect(reverse(list_trackers) +
-                                            '?notification_id=tracker-existence-fail')
-            else:
-                return HttpResponseRedirect(reverse(list_trackers))
+        try:
+            bugzilla_tracker = mysite.customs.models.BugzillaTracker.all_trackers.get(
+                    project_name=project_name)
+            if tracker_form is None:
+                tracker_form = mysite.customs.forms.BugzillaTrackerForm(
+                        instance=bugzilla_tracker)
+            tracker_urls = mysite.customs.models.BugzillaUrl.objects.filter(
+                    bugzilla_tracker=bugzilla_tracker)
+        except mysite.customs.models.BugzillaTracker.DoesNotExist:
+            return HttpResponseRedirect(reverse(list_trackers) +
+                                        '?notification_id=tracker-existence-fail')
         data['project_name'] = project_name
         data['tracker_type'] = tracker_type
         data['tracker_form'] = tracker_form
         data['tracker_urls'] = tracker_urls
-    return (request, 'customs/edit_tracker.html', data)
+        return mysite.base.decorators.as_view(request, 'customs/edit_tracker.html', data, None)
+    else:
+        return HttpResponseRedirect(reverse(list_trackers))
 
-def edit_tracker_do(request, tracker_type):
-    tracker_form = None
+def edit_tracker_do(request, tracker_type, project_name):
     if tracker_type == 'bugzilla':
         tracker_form = mysite.customs.forms.BugzillaTrackerForm(
                 request.POST, prefix='edit_tracker')
-    if tracker_form:
         if tracker_form.is_valid():
             tracker_form.save()
             return HttpResponseRedirect(reverse(list_trackers) +
@@ -162,13 +153,13 @@ def edit_tracker_do(request, tracker_type):
         else:
             return edit_tracker(request,
                     tracker_type=tracker_type,
+                    project_name=project_name,
                     tracker_form=tracker_form)
     else:
-        # Shouldn't get here. Just go back to base.
+        # Just go back to base.
         return HttpResponseRedirect(reverse(list_trackers))
 
-@mysite.base.decorators.view
-def edit_tracker_url(request, tracker_type, url_form=None):
+def edit_tracker_url(request, tracker_type, project_name, url_form=None):
     data = {}
     url = request.GET.get('url', None)
     if tracker_type == 'bugzilla':
@@ -183,15 +174,14 @@ def edit_tracker_url(request, tracker_type, url_form=None):
                             '?notification_id=tracker-url-existence-fail')
             else:
                 return HttpResponseRedirect(reverse(list_trackers))
-        project_name = request.GET.get('project_name', None)
         data['project_name'] = project_name
         data['tracker_type'] = tracker_type
         data['url'] = url
         data['url_form'] = url_form
 
-    return (request, 'customs/edit_tracker_url.html', data)
+    return mysite.base.decorators.as_view(request, 'customs/edit_tracker_url.html', data, None)
 
-def edit_tracker_url_do(request, tracker_type):
+def edit_tracker_url_do(request, tracker_type, project_name):
     url_form = None
     old_url = request.GET.get('url', None)
     if tracker_type == 'bugzilla':
@@ -203,27 +193,25 @@ def edit_tracker_url_do(request, tracker_type):
         if url_form.is_valid():
             tracker_url.url = url_form.cleaned_data['url']
             tracker_url.save()
-            project_name = request.GET.get('project_name', None)
             return HttpResponseRedirect(reverse(edit_tracker, args=[tracker_type]) +
                                 '?project_name=' + project_name + '&edit-url-success')
         else:
             return edit_tracker_url(request,
                     tracker_type=tracker_type,
+                    project_name=project_name,
                     url_form=url_form)
     else:
         # Shouldn't get here. Just go back to base.
         return HttpResponseRedirect(reverse(list_trackers))
 
 @mysite.base.decorators.view
-def delete_tracker(request, tracker_type):
+def delete_tracker(request, tracker_type, project_name):
     data = {}
-    project_name = request.GET.get('project_name', None)
     data['project_name'] = project_name
     data['tracker_type'] = tracker_type
     return (request, 'customs/delete_tracker.html', data)
 
-def delete_tracker_do(request, tracker_type):
-    project_name = request.GET.get('project_name', None)
+def delete_tracker_do(request, tracker_type, project_name):
     if tracker_type == 'bugzilla':
         tracker = mysite.customs.models.BugzillaTracker.all_trackers.get(
                 project_name=project_name)
@@ -235,20 +223,19 @@ def delete_tracker_do(request, tracker_type):
         return HttpResponseRedirect(reverse(list_trackers))
 
 @mysite.base.decorators.view
-def delete_tracker_url(request, tracker_type):
+def delete_tracker_url(request, tracker_type, project_name):
     data = {}
-    project_name = request.GET.get('project_name', None)
     url = request.GET.get('url', None)
     data['project_name'] = project_name
     data['tracker_type'] = tracker_type
     data['url'] = url
     return (request, 'customs/delete_tracker_url.html', data)
 
-def delete_tracker_url_do(request, tracker_type):
+def delete_tracker_url_do(request, tracker_type, project_name):
     project_name = request.GET.get('project_name', None)
     url = request.GET.get('url', None)
     if tracker_type == 'bugzilla':
         tracker_url = mysite.customs.models.BugzillaUrl.objects.get(url=url)
         tracker_url.delete()
-        return HttpResponseRedirect(reverse(edit_tracker, args=[tracker_type]) +
-                            '?project_name=' + project_name + '&delete-url-success')
+        return HttpResponseRedirect(reverse(edit_tracker, args=[tracker_type, project_name]) +
+                            '?delete-url-success')

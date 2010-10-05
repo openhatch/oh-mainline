@@ -35,8 +35,8 @@ value='List Trackers'
     {% for tracker in trackers %}
     <tr>
         <td>{{ tracker.project_name }}</td>
-        <td><a href='{% url mysite.customs.views.edit_tracker tracker_type %}?project_name={{ tracker.project_name }}'>Edit</a></td>
-        <td><a href='{% url mysite.customs.views.delete_tracker tracker_type %}?project_name={{ tracker.project_name }}'>Delete</a></td>
+        <td><a href='{% url mysite.customs.views.edit_tracker tracker_type tracker.project_name %}'>Edit</a></td>
+        <td><a href='{% url mysite.customs.views.delete_tracker tracker_type tracker.project_name %}'>Delete</a></td>
     </tr>
     {% endfor %}
 </table>

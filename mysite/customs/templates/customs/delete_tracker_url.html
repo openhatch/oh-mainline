@@ -9,7 +9,7 @@
 {% endblock form_name %}
 
 {% block form_action %}
-'{% url mysite.customs.views.delete_tracker_url_do tracker_type %}?project_name={{ project_name }}&url={{ url }}'
+'{% url mysite.customs.views.delete_tracker_url_do tracker_type project_name %}?url={{ url }}'
 {% endblock form_action %}
 
 {% block form_body %}
@@ -23,5 +23,5 @@ value='Yes, delete this URL'
 
 {% block second_form_button %}
 <input type='submit' value="No, don't delete it"
-onclick="delete_tracker_url.action='{% url mysite.customs.views.edit_tracker tracker_type %}?project_name={{ project_name }}'; return true;" />
+onclick="delete_tracker_url.action='{% url mysite.customs.views.edit_tracker tracker_type project_name %}'; return true;" />
 {% endblock second_form_button %}
