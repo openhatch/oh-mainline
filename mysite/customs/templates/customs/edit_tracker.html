@@ -13,15 +13,23 @@
 {% endblock form_action %}
 
 {% block form_body %}
-{{ tracker_form.as_p }}
+{% for field in tracker_form %}
+<div class='form-row'>
+    {{ field.errors }}
+    {{ field.label_tag }}
+    {{ field }}
+    <p class="example">{{ field.help_text }}</p>
+</div>
+{% endfor %}
 {% endblock form_body %}
 
 {% block second_form_button %}
-<p> <input type='submit' value="Cancel"
-        onclick="edit_tracker.action='{% url mysite.customs.views.list_trackers %}'; return true;" /> </p>
+<input type='submit' value="Cancel"
+        onclick="edit_tracker.action='{% url mysite.customs.views.list_trackers %}'; return true;" />
 {% endblock second_form_button %}
 
 {% block content_below_form %}
+Tracker URLs
 <table>
     {% for tracker_url in tracker_urls %}
     <tr>

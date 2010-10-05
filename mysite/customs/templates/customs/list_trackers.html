@@ -15,7 +15,14 @@
 {% endblock form_action %}
 
 {% block form_body %}
-{{ tracker_types_form.as_p }}
+{% for field in tracker_types_form %}
+<div class='form-row'>
+    {{ field.errors }}
+    {{ field.label_tag }}
+    {{ field }}
+    <p class="example">{{ field.help_text }}</p>
+</div>
+{% endfor %}
 {% endblock form_body %}
 
 {% block submit_button_attributes %}

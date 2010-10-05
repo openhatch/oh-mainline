@@ -9,17 +9,24 @@
 {% endblock form_name %}
 
 {% block form_action %}
-'{{ action_url }}'
+'{{ finish_url }}'
 {% endblock form_action %}
 
 {% block form_body %}
-{{ url_form.as_p }}
+{% for field in url_form %}
+<div class='form-row'>
+    {{ field.errors }}
+    {{ field.label_tag }}
+    {{ field }}
+    <p class="example">{{ field.help_text }}</p>
+</div>
+{% endfor %}
 {% endblock form_body %}
 
 {% block submit_button_attributes %}
-value='Add Another URL'
+value='Finish'
 {% endblock submit_button_attributes %}
 
 {% block second_form_button %}
-<p> <input type='submit' value='Finish' onclick="add_tracker_url.action='{{ finish_url }}'; return true;" /> </p>
+<input type='submit' value='Add Another URL' onclick="add_tracker_url.action='{{ add_more_url }}'; return true;" />
 {% endblock second_form_button %}

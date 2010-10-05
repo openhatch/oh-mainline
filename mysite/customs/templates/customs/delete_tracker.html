@@ -21,6 +21,6 @@ value='Yes, delete this tracker'
 {% endblock submit_button_attributes %}
 
 {% block second_form_button %}
-<p> <input type='submit' value="No, don't delete it"
-        onclick="delete_tracker.action='{% url mysite.customs.views.list_trackers %}'; return true;" /> </p>
+<input type='submit' value="No, don't delete it"
+        onclick="delete_tracker.action='{% url mysite.customs.views.list_trackers %}'; return true;" />
 {% endblock second_form_button %}

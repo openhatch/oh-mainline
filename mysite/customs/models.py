@@ -59,13 +59,16 @@ class BugzillaTracker(models.Model):
     project_name = models.CharField(max_length=200, unique=True,
                                     blank=False, null=False)
     base_url = models.URLField(max_length=200, unique=True,
-                               blank=False, null=False, verify_exists=False)
-    bug_project_name_format = models.CharField(max_length=200, blank=False)
+                               blank=False, null=False, verify_exists=False,
+            help_text="This is the URL to the homepage of the Bugzilla tracker instance. Remove any homepage filenames such as 'index.cgi' from this.")
+    bug_project_name_format = models.CharField(max_length=200, blank=False,
+            help_text="Any string here will be used verbatim as the project name for each bug aside from the keys '{project}', '{component}' and '{product}', which are replaced with the relevant data from each individual bug.")
     QUERY_URL_TYPES = (
             ('xml', 'Bug XML query'),
             ('tracker', 'Tracker bug URL')
             )
-    query_url_type = models.CharField(max_length=20, choices=QUERY_URL_TYPES)
+    query_url_type = models.CharField(max_length=20, choices=QUERY_URL_TYPES,
+            help_text="We support two types of bug importing - either from search queries that return an XML dump of all the bugs, or tracking bugs that depend on all the bugs to be imported here. Any number of a particular type can be used, but as yet a single tracker cannot have both types.")
     BITESIZED_TYPES = (
             (None, 'None'),
             ('key', 'Keyword'),

@@ -1,10 +1,12 @@
-{% extends 'base/one_column.html' %}
+{% extends 'base/base.html' %}
 
 {% block title %}
 Customs
 {% endblock title %}
+{% block body_id %}edit_tracker_info_form{% endblock %}
+{% block body_class %}{{ block.super }} nice_form{% endblock %}
 
-{% block main %}
+{% block content %}
 <div class='module'>
     <div class='head'>
         <h3>{% block heading %}Customs{% endblock %}</h3>
@@ -29,10 +31,10 @@ Customs
             <p> <input type='submit'
                         {% block submit_button_attributes %}
                             value='Save'
-                            {% endblock %} /> </p>
-            {% block second_form_button %}{% endblock %}
+                            {% endblock %} />
+                            {% block second_form_button %}{% endblock %}</p>
         </form>
         {% block content_below_form %}{% endblock %}
     </div>
 </div>
-{% endblock main %}
+{% endblock content %}

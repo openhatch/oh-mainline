@@ -93,10 +93,10 @@ def add_tracker_url(request, tracker_type, url_form=None):
             else:
                 url_form = mysite.customs.forms.BugzillaUrlForm()
         data['url_form'] = url_form
-    data['action_url'] = reverse(add_tracker_url_do, args=[tracker_type])
+    data['add_more_url'] = reverse(add_tracker_url_do, args=[tracker_type])
     data['finish_url'] = reverse(add_tracker_url_do, args=[tracker_type])
     if project_name:
-        data['action_url'] += '?project_name=%s' % project_name
+        data['add_more_url'] += '?project_name=%s' % project_name
         data['finish_url'] += '?project_name=%s&finished=true' % project_name
     else:
         data['finish_url'] += '?finished=true'
