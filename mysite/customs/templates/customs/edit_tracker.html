@@ -36,8 +36,8 @@
     {% for tracker_url in tracker_urls %}
     <tr>
         <td>{{ tracker_url.url }}</td>
-        <td><a href='{% url mysite.customs.views.edit_tracker_url tracker_type project_name %}?url={{ tracker_url.url|urlencode }}'>Edit</a></td>
-        <td><a href='{% url mysite.customs.views.delete_tracker_url tracker_type project_name %}?url={{ tracker_url.url|urlencode }}'>Delete</a></td>
+        <td><a href='{% url mysite.customs.views.edit_tracker_url tracker_type project_name tracker_url.id %}'>Edit</a></td>
+        <td><a href='{% url mysite.customs.views.delete_tracker_url tracker_type project_name tracker_url.id %}'>Delete</a></td>
     </tr>
     {% endfor %}
 </table>

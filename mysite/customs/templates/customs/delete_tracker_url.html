@@ -9,7 +9,7 @@
 {% endblock form_name %}
 
 {% block form_action %}
-'{% url mysite.customs.views.delete_tracker_url_do tracker_type project_name %}?url={{ url }}'
+'{% url mysite.customs.views.delete_tracker_url_do tracker_type project_name url_id %}'
 {% endblock form_action %}
 
 {% block form_body %}
