@@ -32,6 +32,8 @@ value='List Trackers'
 {% block content_below_form %}
 {% if trackers %}
 <table>
+    <tr>
+        <th>Project Name</th>
     {% for tracker in trackers %}
     <tr>
         <td>{{ tracker.project_name }}</td>

@@ -29,8 +29,10 @@
 {% endblock second_form_button %}
 
 {% block content_below_form %}
-Tracker URLs
 <table>
+    <tr>
+        <th>Tracker URL</th>
+    </tr>
     {% for tracker_url in tracker_urls %}
     <tr>
         <td>{{ tracker_url.url }}</td>
