@@ -15,25 +15,27 @@ def list_trackers(request, tracker_types_form=None):
                 request.POST, prefix='list_trackers')
         if tracker_types_form.is_valid():
             tracker_type = tracker_types_form.cleaned_data['tracker_type']
-            if tracker_type == 'bugzilla':
-                trackers = mysite.customs.models.BugzillaTracker.all_trackers.all()
-            else:
-                trackers = []
-            data['tracker_type'] = tracker_type
-            data['trackers'] = trackers
+        else:
+            tracker_type = 'bugzilla'
+    else:
+        tracker_type = 'bugzilla'
+    if tracker_type == 'bugzilla':
+        trackers = mysite.customs.models.BugzillaTracker.all_trackers.all()
+    else:
+        trackers = []
+    data['tracker_type'] = tracker_type
+    data['trackers'] = trackers
     notification_id = request.GET.get('notification_id', None)
-    if notification_id == 'add-success':
-        data['customs_notification'] = 'Bugtracker successfully added! Bugs from this tracker should start appearing within 24 hours.'
-    elif notification_id == 'edit-success':
-        data['customs_notification'] = 'Bugtracker successfully edited! New settings should take effect within 24 hours.'
-    elif notification_id == 'delete-success':
-        data['customs_notification'] = 'Bugtracker successfully deleted!'
-    elif notification_id == 'tracker-existence-fail':
-        data['customs_notification'] = 'Hmm, could not find the requested tracker.'
-    elif notification_id == 'tracker-url-existence-fail':
-        data['customs_notification'] = 'Hmm, could not find the requested tracker URL.'
+    notifications = {
+            'add-success': 'Bugtracker successfully added! Bugs from this tracker should start appearing within 24 hours.',
+            'edit-success': 'Bugtracker successfully edited! New settings should take effect within 24 hours.',
+            'delete-success': 'Bugtracker successfully deleted!',
+            'tracker-existence-fail': 'Hmm, could not find the requested tracker.',
+            'tracker-url-existence-fail': 'Hmm, could not find the requested tracker URL.',
+            }
+    data['customs_notification'] = notifications.get(notification_id, '')
     if tracker_types_form is None:
-        tracker_types_form = mysite.customs.forms.TrackerTypesForm()
+        tracker_types_form = mysite.customs.forms.TrackerTypesForm(prefix='list_trackers')
     data['tracker_types_form'] = tracker_types_form
     return (request, 'customs/list_trackers.html', data)
 
@@ -44,12 +46,12 @@ def add_tracker(request, tracker_type=None, tracker_form=None):
     if tracker_type == 'bugzilla':
         data['action_url'] = reverse('add_tracker_specific_do', args=[tracker_type])
         if tracker_form is None:
-            tracker_form = mysite.customs.forms.BugzillaTrackerForm()
+            tracker_form = mysite.customs.forms.BugzillaTrackerForm(prefix='add_tracker')
     else:
         # Wrong or no tracker type
         data['action_url'] = reverse('add_tracker_choose_type_do')
         if tracker_form is None:
-            tracker_form = mysite.customs.forms.TrackerTypesForm()
+            tracker_form = mysite.customs.forms.TrackerTypesForm(prefix='add_tracker')
     data['tracker_form'] = tracker_form
     return (request, 'customs/add_tracker.html', data)
 
@@ -90,11 +92,11 @@ def add_tracker_url(request, tracker_type, project_name, url_form=None):
                     bugzilla_url = mysite.customs.models.BugzillaUrl(
                             bugzilla_tracker=bugzilla_tracker)
                     url_form = mysite.customs.forms.BugzillaUrlForm(
-                            instance=bugzilla_url)
+                            instance=bugzilla_url, prefix='add_tracker_url')
                 except mysite.customs.models.BugzillaTracker.DoesNotExist:
-                    url_form = mysite.customs.forms.BugzillaUrlForm()
+                    url_form = mysite.customs.forms.BugzillaUrlForm(prefix='add_tracker_url')
             else:
-                url_form = mysite.customs.forms.BugzillaUrlForm()
+                url_form = mysite.customs.forms.BugzillaUrlForm(prefix='add_tracker_url')
         data['url_form'] = url_form
     data['add_more_url'] = reverse(add_tracker_url_do, args=[tracker_type, project_name])
     data['finish_url'] = reverse(add_tracker_url_do, args=[tracker_type, project_name])
@@ -134,7 +136,7 @@ def edit_tracker(request, tracker_type, project_name, tracker_form=None):
                     project_name=project_name)
             if tracker_form is None:
                 tracker_form = mysite.customs.forms.BugzillaTrackerForm(
-                        instance=bugzilla_tracker)
+                        instance=bugzilla_tracker, prefix='edit_tracker')
             tracker_urls = mysite.customs.models.BugzillaUrl.objects.filter(
                     bugzilla_tracker=bugzilla_tracker)
         except mysite.customs.models.BugzillaTracker.DoesNotExist:
@@ -151,8 +153,10 @@ def edit_tracker(request, tracker_type, project_name, tracker_form=None):
 @login_required
 def edit_tracker_do(request, tracker_type, project_name):
     if tracker_type == 'bugzilla':
+        bugzilla_tracker = mysite.customs.models.BugzillaTracker.all_trackers.get(
+                project_name=project_name)
         tracker_form = mysite.customs.forms.BugzillaTrackerForm(
-                request.POST, prefix='edit_tracker')
+                request.POST, instance=bugzilla_tracker, prefix='edit_tracker')
         if tracker_form.is_valid():
             tracker_form.save()
             return HttpResponseRedirect(reverse(list_trackers) +
@@ -176,7 +180,7 @@ def edit_tracker_url(request, tracker_type, project_name, url_form=None):
                 try:
                     bugzilla_url = mysite.customs.models.BugzillaUrl.objects.get(url=url)
                     url_form = mysite.customs.forms.BugzillaUrlForm(
-                            instance=bugzilla_url)
+                            instance=bugzilla_url, prefix='edit_tracker_url')
                 except mysite.customs.models.BugzillaUrl.DoesNotExist:
                     return HttpResponseRedirect(reverse(list_trackers) +
                             '?notification_id=tracker-url-existence-fail')
