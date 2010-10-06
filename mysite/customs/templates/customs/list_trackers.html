@@ -1,11 +1,5 @@
 {% extends 'customs/main.html' %}
 
-{% block top_url %}
-<a href="{% url mysite.customs.views.add_tracker %}">
-    Add a tracker
-</a>
-{% endblock top_url %}
-
 {% block form_name %}
 'list_trackers'
 {% endblock form_name %}
@@ -30,10 +24,12 @@ value='List Trackers'
 {% endblock submit_button_attributes %}
 
 {% block content_below_form %}
-{% if trackers %}
 <table>
     <tr>
         <th>Project Name</th>
+        <th colspan=2><a href="{% url mysite.customs.views.add_tracker tracker_type %}">Add a tracker</a></th>
+    </tr>
+    {% if trackers %}
     {% for tracker in trackers %}
     <tr>
         <td>{{ tracker.project_name }}</td>
@@ -41,6 +37,9 @@ value='List Trackers'
         <td><a href='{% url mysite.customs.views.delete_tracker tracker_type tracker.project_name %}'>Delete</a></td>
     </tr>
     {% endfor %}
+    {% else %}
+    <tr>
+        <td> Nothing. Not a sausage.</td>
+    {% endif %}
 </table>
-{% endif %}
 {% endblock content_below_form %}

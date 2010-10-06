@@ -10,12 +10,14 @@ import mysite.customs.models
 
 all_trackers = {
         'bugzilla': {
+            'namestr': 'Bugzilla',
             'model': mysite.customs.models.BugzillaTracker,
             'form': mysite.customs.forms.BugzillaTrackerForm,
             'urlmodel': mysite.customs.models.BugzillaUrl,
             'urlform': mysite.customs.forms.BugzillaUrlForm,
             },
         'google': {
+            'namestr': 'Google Code',
             'model': mysite.customs.models.GoogleTracker,
             'form': mysite.customs.forms.GoogleTrackerForm,
             'urlmodel': mysite.customs.models.GoogleQuery,
@@ -57,24 +59,22 @@ def list_trackers(request, tracker_types_form=None):
     return (request, 'customs/list_trackers.html', data)
 
 @login_required
-@mysite.base.decorators.view
-def add_tracker(request, tracker_type=None, tracker_form=None):
+def add_tracker(request, tracker_type, tracker_form=None):
     data = {}
     if tracker_type in all_trackers:
-        data['action_url'] = reverse('add_tracker_specific_do', args=[tracker_type])
+        data['tracker_type_pretty'] = all_trackers[tracker_type]['namestr']
+        data['action_url'] = reverse(add_tracker_do, args=[tracker_type])
         if tracker_form is None:
             tracker_form = all_trackers[tracker_type]['form'](prefix='add_tracker')
+        data['tracker_form'] = tracker_form
+        return mysite.base.decorators.as_view(request, 'customs/add_tracker.html', data, None)
     else:
-        # Wrong or no tracker type
-        data['action_url'] = reverse('add_tracker_choose_type_do')
-        if tracker_form is None:
-            tracker_form = mysite.customs.forms.TrackerTypesForm(prefix='add_tracker')
-    data['tracker_form'] = tracker_form
-    return (request, 'customs/add_tracker.html', data)
+        # Wrong or no tracker type. Send back to list.
+        return HttpResponseRedirect(reverse(list_trackers))
 
 @login_required
 @revision.create_on_success
-def add_tracker_do(request, tracker_type=None):
+def add_tracker_do(request, tracker_type):
     if tracker_type in all_trackers:
         tracker_form = all_trackers[tracker_type]['form'](
                 request.POST, prefix='add_tracker')
@@ -92,14 +92,8 @@ def add_tracker_do(request, tracker_type=None):
                     tracker_type=tracker_type,
                     tracker_form=tracker_form)
     else:
-        tracker_types_form = mysite.customs.forms.TrackerTypesForm(
-                request.POST, prefix='add_tracker')
-        if tracker_types_form.is_valid():
-            tracker_type = tracker_types_form.cleaned_data['tracker_type']
-            return HttpResponseRedirect(reverse('add_tracker_specific', args=[tracker_type]))
-        else:
-            return add_tracker(request,
-                    tracker_form=tracker_types_form)
+        # Wrong or no tracker type. Send back to list.
+        return HttpResponseRedirect(reverse(list_trackers))
 
 @login_required
 def add_tracker_url(request, tracker_type, project_name, url_form=None):

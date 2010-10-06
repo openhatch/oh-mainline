@@ -1,0 +1,30 @@
+{% extends 'customs/main.html' %}
+
+{% block top_url %}
+<a href="{% url mysite.customs.views.list_trackers %}">
+    &laquo; Back to trackers list
+</a>
+{% endblock top_url %}
+
+{% block heading %}
+{{ block.super }} - {% if project_name %} History of the {{ project_name }} tracker{% else %}All History{% endif %}
+{% endblock heading %}
+
+{% block customs_content %}
+{%load base_extras %}
+<table>
+    <tr>
+        <th>Date</th>
+        <th>User</th>
+        <th>Comment</th>
+    </tr>
+    {% for version in tracker_versions %}
+    <tr>
+        <td>{{ version.revision.date_created }}</td>
+        <td>{% get_username_from_userid version.revision.user_id %}</td>
+        <td>{{ version.revision.comment }}</td>
+        <td>View</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock customs_content %}

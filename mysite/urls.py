@@ -98,10 +98,8 @@ urlpatterns = patterns('',
 
         # Customs-related URLs
         (r'^customs/$', 'mysite.customs.views.list_trackers'),
-        url(r'^customs/add$', 'mysite.customs.views.add_tracker', name='add_tracker_choose_type'),
-        url(r'^customs/add/do$', 'mysite.customs.views.add_tracker_do', name='add_tracker_choose_type_do'),
-        url(r'^customs/add/(?P<tracker_type>\w*)$', 'mysite.customs.views.add_tracker', name='add_tracker_specific'),
-        url(r'^customs/add/(?P<tracker_type>\w*)/do$', 'mysite.customs.views.add_tracker_do', name='add_tracker_specific_do'),
+        (r'^customs/add/(?P<tracker_type>\w*)$', 'mysite.customs.views.add_tracker'),
+        (r'^customs/add/(?P<tracker_type>\w*)/do$', 'mysite.customs.views.add_tracker_do'),
         (r'^customs/add/(?P<tracker_type>\w*)/(?P<project_name>\w+(\s\w+)*)/url$', 'mysite.customs.views.add_tracker_url'),
         (r'^customs/add/(?P<tracker_type>\w*)/(?P<project_name>\w+(\s\w+)*)/url/do$', 'mysite.customs.views.add_tracker_url_do'),
         (r'^customs/edit/(?P<tracker_type>\w*)/(?P<project_name>\w+(\s\w+)*)$', 'mysite.customs.views.edit_tracker'),
