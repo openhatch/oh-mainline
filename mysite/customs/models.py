@@ -6,6 +6,7 @@ from itertools import chain
 import csv
 import datetime
 from django.db import models
+from django.utils.encoding import smart_str
 import mysite.search.models
 import mysite.customs.ohloh
 
@@ -67,14 +68,14 @@ class BugzillaTracker(models.Model):
             ('xml', 'Bug XML query'),
             ('tracker', 'Tracker bug URL')
             )
-    query_url_type = models.CharField(max_length=20, choices=QUERY_URL_TYPES,
+    query_url_type = models.CharField(max_length=20, choices=QUERY_URL_TYPES, blank=False, default='xml',
             help_text="We support two types of bug importing - either from search queries that return an XML dump of all the bugs, or tracking bugs that depend on all the bugs to be imported here. Any number of a particular type can be used, but as yet a single tracker cannot have both types.")
     BITESIZED_TYPES = (
             (None, 'None'),
             ('key', 'Keyword'),
             ('wboard', 'Whiteboard tag')
             )
-    bitesized_type = models.CharField(max_length=10, choices=BITESIZED_TYPES)
+    bitesized_type = models.CharField(max_length=10, choices=BITESIZED_TYPES, blank=False, default=None)
     bitesized_text = models.CharField(max_length=200, blank=True, default='')
     DOCUMENTATION_TYPES = (
             (None, 'None'),
@@ -82,11 +83,14 @@ class BugzillaTracker(models.Model):
             ('comp', 'Component'),
             ('prod', 'Product')
             )
-    documentation_type = models.CharField(max_length=10, choices=DOCUMENTATION_TYPES)
+    documentation_type = models.CharField(max_length=10, choices=DOCUMENTATION_TYPES, blank=False, default=None)
     documentation_text = models.CharField(max_length=200, blank=True, default='')
     as_appears_in_distribution = models.CharField(max_length=200, blank=True, default='')
 
     all_trackers = models.Manager()
+
+    def __str__(self):
+        return smart_str('%s' % (self.project_name))
 
 class BugzillaUrl(models.Model):
     '''This model stores query or tracker URLs for BugzillaTracker objects.'''
