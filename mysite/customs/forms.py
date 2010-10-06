@@ -17,3 +17,4 @@ class BugzillaTrackerForm(django.forms.ModelForm):
 class BugzillaUrlForm(django.forms.ModelForm):
     class Meta:
         model = mysite.customs.models.BugzillaUrl
+        exclude = ('tracker',)

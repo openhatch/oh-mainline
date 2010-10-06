@@ -114,9 +114,12 @@ def add_tracker_url(request, tracker_type, project_name, url_form=None):
 def add_tracker_url_do(request, tracker_type, project_name):
     url_form = None
     if tracker_type in all_trackers:
+        tracker_obj = all_trackers[tracker_type]['model'].all_trackers.get(
+                project_name=project_name)
+        url_obj = all_trackers[tracker_type]['urlmodel'](
+                tracker=tracker_obj)
         url_form = all_trackers[tracker_type]['urlform'](
-                request.POST, prefix='add_tracker_url')
-    if url_form:
+                request.POST, instance=url_obj, prefix='add_tracker_url')
         if url_form.is_valid():
             url_form.save()
             if request.GET.get('finished', None) == 'true':
