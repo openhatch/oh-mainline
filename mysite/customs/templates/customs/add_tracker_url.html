@@ -1,7 +1,13 @@
 {% extends 'customs/main.html' %}
 
+{% block top_url %}
+<a href="{{ cancel_url }}">
+    &laquo; Back to tracker
+</a>
+{% endblock top_url %}
+
 {% block heading %}
-{{ block.super }} - Add a new tracker URL
+{{ block.super }} - Add new URL to the {{ project_name }} tracker
 {% endblock heading %}
 
 {% block form_name %}
@@ -30,7 +36,3 @@ value='Finish'
 {% block second_form_button %}
 <input type='submit' value='Add Another URL' onclick="add_tracker_url.action='{{ add_more_url }}'; return true;" />
 {% endblock second_form_button %}
-
-{% block third_form_button %}
-<input type='submit' value='Cancel' onclick="add_tracker_url.action='{{ cancel_url }}'; return true;" />
-{% endblock third_form_button %}

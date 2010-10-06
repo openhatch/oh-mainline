@@ -1,8 +1,14 @@
 
 {% extends 'customs/main.html' %}
 
+{% block top_url %}
+<a href="{{ cancel_url }}">
+    &laquo; Back to tracker
+</a>
+{% endblock top_url %}
+
 {% block heading %}
-{{ block.super }} - Edit tracker URL
+{{ block.super }} - Edit URL for the {{ project_name }} tracker
 {% endblock heading %}
 
 {% block form_name %}
@@ -23,7 +29,3 @@
 </div>
 {% endfor %}
 {% endblock form_body %}
-
-{% block second_form_button %}
-<input type='submit' value='Cancel' onclick="edit_tracker_url.action='{{ cancel_url }}'; return true;" />
-{% endblock second_form_button %}

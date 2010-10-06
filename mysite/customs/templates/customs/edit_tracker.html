@@ -1,5 +1,11 @@
 {% extends 'customs/main.html' %}
 
+{% block top_url %}
+<a href="{% url mysite.customs.views.list_trackers %}">
+    &laquo; Back to trackers list
+</a>
+{% endblock top_url %}
+
 {% block heading %}
 {{ block.super }} - Edit {{ project_name }} tracker
 {% endblock heading %}
@@ -22,11 +28,6 @@
 </div>
 {% endfor %}
 {% endblock form_body %}
-
-{% block second_form_button %}
-<input type='submit' value="Cancel"
-        onclick="edit_tracker.action='{% url mysite.customs.views.list_trackers %}'; return true;" />
-{% endblock second_form_button %}
 
 {% block content_below_form %}
 <table>

@@ -102,6 +102,7 @@ def add_tracker_url(request, tracker_type, project_name, url_form=None):
             except all_trackers[tracker_type]['model'].DoesNotExist:
                 url_form = all_trackers[tracker_type]['urlform'](prefix='add_tracker_url')
         data['url_form'] = url_form
+        data['project_name'] = project_name
         data['cancel_url'] = reverse(edit_tracker, args=[tracker_type, project_name])
         data['add_more_url'] = reverse(add_tracker_url_do, args=[tracker_type, project_name])
         data['finish_url'] = reverse(add_tracker_url_do, args=[tracker_type, project_name])
