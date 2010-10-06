@@ -26,3 +26,8 @@
 {% block submit_button_attributes %}
 value='Next'
 {% endblock submit_button_attributes %}
+
+{% block second_form_button %}
+<input type='submit' value="Cancel"
+        onclick="add_tracker.action='{% url mysite.customs.views.list_trackers %}'; return true;" />
+{% endblock second_form_button %}

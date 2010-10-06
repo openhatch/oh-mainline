@@ -97,6 +97,7 @@ def add_tracker_url(request, tracker_type, project_name, url_form=None):
             else:
                 url_form = mysite.customs.forms.BugzillaUrlForm(prefix='add_tracker_url')
         data['url_form'] = url_form
+    data['cancel_url'] = reverse(edit_tracker, args=[tracker_type, project_name])
     data['add_more_url'] = reverse(add_tracker_url_do, args=[tracker_type, project_name])
     data['finish_url'] = reverse(add_tracker_url_do, args=[tracker_type, project_name])
     data['finish_url'] += '?finished=true'
@@ -185,7 +186,8 @@ def edit_tracker_url(request, tracker_type, project_name, url_id, url_form=None)
         data['tracker_type'] = tracker_type
         data['url_id'] = url_id
         data['url_form'] = url_form
-
+    
+    data['cancel_url'] = reverse(edit_tracker, args=[tracker_type, project_name])
     return mysite.base.decorators.as_view(request, 'customs/edit_tracker_url.html', data, None)
 
 @login_required

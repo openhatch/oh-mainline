@@ -23,3 +23,7 @@
 </div>
 {% endfor %}
 {% endblock form_body %}
+
+{% block second_form_button %}
+<input type='submit' value='Cancel' onclick="edit_tracker_url.action='{{ cancel_url }}'; return true;" />
+{% endblock second_form_button %}
