@@ -153,6 +153,7 @@ INSTALLED_APPS = (
     'mysite.missions',
     'haystack',
     'voting',
+    'reversion',
     #'debug_toolbar',
 )
 

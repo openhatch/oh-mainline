@@ -1,12 +1,15 @@
-import urllib2
-import urllib
-import re
-import lxml.html # scraper library
-from itertools import chain
 import csv
 import datetime
+from itertools import chain
+import lxml.html # scraper library
+import re
+import reversion
+import urllib2
+import urllib
+
 from django.db import models
 from django.utils.encoding import smart_str
+
 import mysite.search.models
 import mysite.customs.ohloh
 
@@ -98,3 +101,6 @@ class BugzillaUrl(models.Model):
                           blank=False, null=False)
     description = models.CharField(max_length=200, blank=True, default='')
     tracker = models.ForeignKey(BugzillaTracker)
+
+reversion.register(BugzillaTracker, follow=["bugzillaurl_set"])
+reversion.register(BugzillaUrl)
