@@ -33,11 +33,13 @@
 <table>
     <tr>
         <th>Tracker URL</th>
+        <th>Description</th>
         <th colspan=2><a href='{% url mysite.customs.views.add_tracker_url tracker_type project_name %}'>Add Tracker URL</a></th>
     </tr>
     {% for tracker_url in tracker_urls %}
     <tr>
         <td>{{ tracker_url.url }}</td>
+        <td>{{ tracker_url.description }}</td>
         <td><a href='{% url mysite.customs.views.edit_tracker_url tracker_type project_name tracker_url.id %}'>Edit</a></td>
         <td><a href='{% url mysite.customs.views.delete_tracker_url tracker_type project_name tracker_url.id %}'>Delete</a></td>
     </tr>
