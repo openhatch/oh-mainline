@@ -25,6 +25,7 @@ Customs
             </div>
         </div>
         {% endif %}
+        {% block customs_content %}
         <form name={% block form_name %}{% endblock %} method='POST'
             action={% block form_action %}{% endblock %}>
             {% block form_body %}{% endblock %}
@@ -35,6 +36,7 @@ Customs
                             {% block second_form_button %}{% endblock %}</p>
         </form>
         {% block content_below_form %}{% endblock %}
+        {% endblock customs_content %}
     </div>
 </div>
 {% endblock content %}
