@@ -104,3 +104,41 @@ class BugzillaUrl(models.Model):
 
 reversion.register(BugzillaTracker, follow=["bugzillaurl_set"])
 reversion.register(BugzillaUrl)
+
+class GoogleTracker(models.Model):
+    '''This model stores the data for individual Bugzilla trackers.'''
+    project_name = models.CharField(max_length=200, unique=True,
+                                    blank=False, null=False,
+            help_text="This is the name that OpenHatch will use to identify the project.")
+    google_name = models.CharField(max_length=200, unique=True,
+                                    blank=False, null=False,
+            help_text="This is the name that Google uses to identify the project.")
+    BITESIZED_TYPES = (
+            (None, 'None'),
+            ('label', 'Label'),
+            )
+    bitesized_type = models.CharField(max_length=10, choices=BITESIZED_TYPES, blank=False, default=None)
+    bitesized_text = models.CharField(max_length=200, blank=True, default='',
+            help_text="This is the text that marks a bug as being ideal for newcomers.")
+    DOCUMENTATION_TYPES = (
+            (None, 'None'),
+            ('label', 'Label'),
+            )
+    documentation_type = models.CharField(max_length=10, choices=DOCUMENTATION_TYPES, blank=False, default=None)
+    documentation_text = models.CharField(max_length=200, blank=True, default='',
+            help_text="This is the label that marks a documentation bug.")
+
+    all_trackers = models.Manager()
+
+    def __str__(self):
+        return smart_str('%s' % (self.project_name))
+
+class GoogleQuery(models.Model):
+    '''This model stores queries for GoogleTracker objects.
+    At present we only allow labels to be queried.'''
+    label = models.CharField(max_length=200, blank=True, default='')
+    description = models.CharField(max_length=200, blank=True, default='')
+    tracker = models.ForeignKey(GoogleTracker)
+
+reversion.register(GoogleTracker, follow=["googlequery_set"])
+reversion.register(GoogleQuery)

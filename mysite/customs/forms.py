@@ -18,3 +18,12 @@ class BugzillaUrlForm(django.forms.ModelForm):
     class Meta:
         model = mysite.customs.models.BugzillaUrl
         exclude = ('tracker',)
+
+class GoogleTrackerForm(django.forms.ModelForm):
+    class Meta:
+        model = mysite.customs.models.GoogleTracker
+
+class GoogleQueryForm(django.forms.ModelForm):
+    class Meta:
+        model = mysite.customs.models.GoogleQuery
+        exclude = ('tracker',)
