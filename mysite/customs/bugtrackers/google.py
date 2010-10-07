@@ -259,6 +259,69 @@ class GoogleBugTracker(object):
         self.refresh_all_bugs()
 
 ############################################################
+# Function that creates classes for individual trackers
+def google_tracker_factory(gt):
+    # Create '__init__' method
+    def __init__(self):
+        GoogleBugTracker.__init__(self,
+                                  project_name=gt.project_name,
+                                  google_name=gt.google_name)
+
+    # Create 'generate_current_bug_atom' method
+    def generate_current_bug_atom(self):
+        query_data = [
+                {
+                    'canned_query': 'open',
+                }
+                ]
+        queries = []
+        for kwargs in query_data:
+            queries.append(create_google_query(**kwargs))
+        return self.generate_bug_atom_from_queries(queries)
+
+    # Create 'extract_tracker_specific_data' method
+    @staticmethod
+    def extract_tracker_specific_data(issue, ret_dict):
+        # Make modifications to ret_dict using provided atom data
+        labels = [label.text for label in issue.label]
+        ret_dict['good_for_newcomers'] = (gt.bitesized_text in labels)
+        ret_dict['bite_size_tag_name'] = gt.bitesized_text
+        # Check whether documentation bug
+        ret_dict['concerns_just_documentation'] = (gt.documentation_text in labels)
+        # Then pass ret_dict back
+        return ret_dict
+
+    # Generate class dictionary
+    # All sub-classes have '__init__', 'generate_current_bug_atom'
+    # and 'extract_tracker_specific_data' methods
+    class_dict = {'__init__': __init__,
+                  'generate_current_bug_atom': generate_current_bug_atom,
+                  'extract_tracker_specific_data': extract_tracker_specific_data}
+
+    # Return the generated sub-class.
+    subclass_name = '%sGoogle' % gt.project_name.replace(' ', '')
+    return type(subclass_name.encode('ascii'), (GoogleBugTracker,), class_dict)
+
+############################################################
+# Generator of sub-classes from data
+
+def generate_google_tracker_classes(tracker_name=None):
+    # If a tracker name was passed in then return the
+    # specific sub-class for that tracker.
+    if tracker_name:
+        try:
+            gt = mysite.customs.models.GoogleTracker.all_trackers.get(project_name=tracker_name)
+            gt_class = google_tracker_factory(gt)
+        except mysite.customs.models.GoogleTracker.DoesNotExist:
+            gt_class = None
+        yield gt_class
+        return
+    else:
+        # Create a generator that yields all sub-classes.
+        for gt in mysite.customs.models.GoogleTracker.all_trackers.all():
+            yield google_tracker_factory(gt)
+
+############################################################
 # Specific sub-classes for individual bug trackers
 
 class JMonkeyEngineGoogle(GoogleBugTracker):
