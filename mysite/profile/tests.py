@@ -38,9 +38,17 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 
+import pdb
+
 
 def do_nothing(*args, **kwargs):
     return ''
+    
+class StarlingTests(TwillTests):
+	def test_page(self):
+		url = 'http://openhatch.org/starlings'
+		place = make_twill_url(url)
+		tc.go(place)
 
 class ProfileTests(TwillTests):
     # {{{

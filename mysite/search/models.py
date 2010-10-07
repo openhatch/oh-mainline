@@ -84,6 +84,17 @@ class Project(OpenHatchModel):
         ret = Project(**data)
         ret.save()
         return ret
+        
+    @staticmethod
+    def create_dummy_no_icon(**kwargs):
+        now = datetime.datetime.utcnow()
+        data = dict(name=uuid.uuid4().hex,
+                icon_raw='',
+                    language='C')
+        data.update(kwargs)
+        ret = Project(**data)
+        ret.save()
+        return ret
 
     name = models.CharField(max_length=200, unique=True,
             help_text='<span class="example">This box is for fixing capitalization mistakes. To change the name of this project, email <a style="color: #666;" href="mailto:%s">%s</a>.</span>' % (('hello@openhatch.org',)*2))

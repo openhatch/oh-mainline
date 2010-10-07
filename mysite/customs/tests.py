@@ -2,7 +2,7 @@
 # vim: set ai et ts=4 sw=4:
 
 # Imports {{{
-from mysite.search.models import Project, Bug
+from mysite.search.models import Bug, Project
 from mysite.profile.models import Person, Tag, TagType
 import mysite.profile.views
 from mysite.profile.tests import MockFetchPersonDataFromOhloh
@@ -1846,6 +1846,26 @@ class DataExport(django.test.TestCase):
 		self.assertTrue(Bug.all_bugs.all())
 		# testing to see if fire-ant is there
 		reincarnated_b = mysite.search.models.Bug.all_bugs.get(title='fire-ant')
+		
+    def test_dump_project(self):
+        fake_stdout = StringIO()
+        # make fake Project
+        proj = Project.create_dummy_no_icon(name="karens-awesome-project")
+        
+        command = mysite.customs.management.commands.dump_public_user_data.Command()
+        command.handle(output=fake_stdout)
+        
+        # now delete fake Project...
+        proj.delete()
+        
+        # let's see if we can reincarnate it!
+        for obj in django.core.serializers.deserialize('json', fake_stdout.getvalue()):
+            obj.save()
+        
+        # test: are there ANY projects?
+        self.assertTrue(Project.objects.all())
+        # test: is our lovely fake project there?
+        reincarnated_proj = mysite.search.models.Project.objects.get(name="karens-awesome-project")
 
 # vim: set nu:
 
