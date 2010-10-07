@@ -114,9 +114,11 @@ class Command(BaseCommand):
                 logging.error("[Bugzilla] Error message: %s" % str(e))
 
     def find_and_update_enabled_google_instances(self):
-        enabled_google_instances = []
+        ### First, the "generate" step
+        enabled_google_instances = [subclass for subclass in
+                mysite.customs.bugtrackers.google.generate_google_tracker_classes()]
 
-        ### First, the "find" step
+        ### Second, the "find" step
         for thing_name in dir(mysite.customs.bugtrackers.google):
             thing = getattr(mysite.customs.bugtrackers.google,
                             thing_name)
