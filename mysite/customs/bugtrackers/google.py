@@ -269,11 +269,15 @@ def google_tracker_factory(gt):
 
     # Create 'generate_current_bug_atom' method
     def generate_current_bug_atom(self):
-        query_data = [
-                {
+        query_objs = gt.googlequery_set.all()
+        query_data = []
+        for query_obj in query_objs:
+            one_query = {
+                    'max_results': 10000,
                     'canned_query': 'open',
-                }
-                ]
+                    'label': query_obj.label
+                    }
+            query_data.append(one_query)
         queries = []
         for kwargs in query_data:
             queries.append(create_google_query(**kwargs))
@@ -284,10 +288,12 @@ def google_tracker_factory(gt):
     def extract_tracker_specific_data(issue, ret_dict):
         # Make modifications to ret_dict using provided atom data
         labels = [label.text for label in issue.label]
-        ret_dict['good_for_newcomers'] = (gt.bitesized_text in labels)
-        ret_dict['bite_size_tag_name'] = gt.bitesized_text
+        if gt.bitesized_type == 'label':
+            ret_dict['good_for_newcomers'] = (gt.bitesized_text in labels)
+            ret_dict['bite_size_tag_name'] = gt.bitesized_label
         # Check whether documentation bug
-        ret_dict['concerns_just_documentation'] = (gt.documentation_text in labels)
+        if gt.documentation_type == 'label':
+            ret_dict['concerns_just_documentation'] = (gt.documentation_text in labels)
         # Then pass ret_dict back
         return ret_dict
 
