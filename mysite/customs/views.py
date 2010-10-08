@@ -141,8 +141,7 @@ def add_tracker_url_do(request, tracker_type, project_name):
                 return HttpResponseRedirect(reverse(list_trackers) +
                                         '?notification_id=add-success')
             else:
-                return add_tracker_url(request,
-                        tracker_type=tracker_type)
+                return HttpResponseRedirect(reverse(add_tracker_url, args=[tracker_type, project_name]))
         else:
             return add_tracker_url(request,
                     tracker_type=tracker_type,
