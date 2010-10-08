@@ -330,121 +330,6 @@ def generate_google_tracker_classes(tracker_name=None):
 ############################################################
 # Specific sub-classes for individual bug trackers
 
-class JMonkeyEngineGoogle(GoogleBugTracker):
-    enabled = True
-
-    def __init__(self):
-        GoogleBugTracker.__init__(self,
-                                  project_name='jMonkey Engine',
-                                  google_name='jmonkeyengine')
-
-    def generate_current_bug_atom(self):
-        query_data = [
-                {
-                    'max_results': 10000,
-                    'canned_query': 'open',
-                }
-                ]
-        queries = []
-        for kwargs in query_data:
-            queries.append(create_google_query(**kwargs))
-        return self.generate_bug_atom_from_queries(queries)
-
-    @staticmethod
-    def extract_tracker_specific_data(issue, ret_dict):
-        # Make modifications to ret_dict using provided atom data
-        ret_dict['good_for_newcomers'] = False # No bitesized keyword.
-        # Then pass ret_dict back
-        return ret_dict
-
-class LilinaGoogle(GoogleBugTracker):
-    enabled = True
-
-    def __init__(self):
-        GoogleBugTracker.__init__(self,
-                                  project_name='Lilina',
-                                  google_name='lilina')
-
-    def generate_current_bug_atom(self):
-        query_data = [
-                {
-                    'max_results': 10000,
-                    'canned_query': 'open',
-                }
-                ]
-        queries = []
-        for kwargs in query_data:
-            queries.append(create_google_query(**kwargs))
-        return self.generate_bug_atom_from_queries(queries)
-
-    @staticmethod
-    def extract_tracker_specific_data(issue, ret_dict):
-        # Make modifications to ret_dict using provided atom data
-        labels = [label.text for label in issue.label]
-        ret_dict['good_for_newcomers'] = False # No bitesized keyword.
-        # Check whether documentation bug
-        ret_dict['concerns_just_documentation'] = ('Documentation' in labels)
-        # Then pass ret_dict back
-        return ret_dict
-
-class AnkiDroidGoogle(GoogleBugTracker):
-    enabled = True
-
-    def __init__(self):
-        GoogleBugTracker.__init__(self,
-                                  project_name='AnkiDroid',
-                                  google_name='ankidroid')
-
-    def generate_current_bug_atom(self):
-        query_data = [
-                {
-                    'max_results': 10000,
-                    'canned_query': 'open',
-                }
-                ]
-        queries = []
-        for kwargs in query_data:
-            queries.append(create_google_query(**kwargs))
-        return self.generate_bug_atom_from_queries(queries)
-
-    @staticmethod
-    def extract_tracker_specific_data(issue, ret_dict):
-        # Make modifications to ret_dict using provided atom data
-        ret_dict['good_for_newcomers'] = False # No bitesized keyword.
-        # Then pass ret_dict back
-        return ret_dict
-
-class SymPyGoogle(GoogleBugTracker):
-    enabled = True
-
-    def __init__(self):
-        GoogleBugTracker.__init__(self,
-                                  project_name='SymPy',
-                                  google_name='sympy')
-
-    def generate_current_bug_atom(self):
-        query_data = [
-                {
-                    'max_results': 10000,
-                    'canned_query': 'open',
-                }
-                ]
-        queries = []
-        for kwargs in query_data:
-            queries.append(create_google_query(**kwargs))
-        return self.generate_bug_atom_from_queries(queries)
-
-    @staticmethod
-    def extract_tracker_specific_data(issue, ret_dict):
-        # Make modifications to ret_dict using provided atom data
-        labels = [label.text for label in issue.label]
-        ret_dict['good_for_newcomers'] = ('EasyToFix' in labels)
-        ret_dict['bite_size_tag_name'] = 'EasyToFix'
-        # Check whether documentation bug
-        ret_dict['concerns_just_documentation'] = ('Documentation' in labels)
-        # Then pass ret_dict back
-        return ret_dict
-
 class MelangeGoogle(GoogleBugTracker):
     enabled = True
 
@@ -479,35 +364,6 @@ class MelangeGoogle(GoogleBugTracker):
         # Then pass ret_dict back
         return ret_dict
 
-class WkhtmltopdfGoogle(GoogleBugTracker):
-    enabled = True
-
-    def __init__(self):
-        GoogleBugTracker.__init__(self,
-                                  project_name='wkhtmltopdf',
-                                  google_name='wkhtmltopdf')
-
-    def generate_current_bug_atom(self):
-        query_data = [
-                {
-                    'max_results': 10000,
-                    'canned_query': 'open',
-                }
-                ]
-        queries = []
-        for kwargs in query_data:
-            queries.append(create_google_query(**kwargs))
-        return self.generate_bug_atom_from_queries(queries)
-
-    @staticmethod
-    def extract_tracker_specific_data(issue, ret_dict):
-        # Make modifications to ret_dict using provided atom data
-        labels = [label.text for label in issue.label]
-        ret_dict['good_for_newcomers'] = ('bite-sized' in labels)
-        ret_dict['bite_size_tag_name'] = 'bite-sized'
-        # Then pass ret_dict back
-        return ret_dict
-
 class FiftyStateProjectGoogle(GoogleBugTracker):
     enabled = True
 
@@ -534,37 +390,6 @@ class FiftyStateProjectGoogle(GoogleBugTracker):
         labels = [label.text for label in issue.label]
         ret_dict['good_for_newcomers'] = ('bite-sized' in labels)
         ret_dict['bite_size_tag_name'] = 'bite-sized'
-        # Then pass ret_dict back
-        return ret_dict
-
-class CalagatorGoogle(GoogleBugTracker):
-    enabled = True
-
-    def __init__(self):
-        GoogleBugTracker.__init__(self,
-                                  project_name='Calagator',
-                                  google_name='calagator')
-
-    def generate_current_bug_atom(self):
-        query_data = [
-                {
-                    'max_results': 10000,
-                    'canned_query': 'open',
-                }
-                ]
-        queries = []
-        for kwargs in query_data:
-            queries.append(create_google_query(**kwargs))
-        return self.generate_bug_atom_from_queries(queries)
-
-    @staticmethod
-    def extract_tracker_specific_data(issue, ret_dict):
-        # Make modifications to ret_dict using provided atom data
-        labels = [label.text for label in issue.label]
-        ret_dict['good_for_newcomers'] = ('Simple' in labels)
-        ret_dict['bite_size_tag_name'] = 'Simple'
-        # Check whether documentation bug
-        ret_dict['concerns_just_documentation'] = ('Component-docs' in labels)
         # Then pass ret_dict back
         return ret_dict
 
