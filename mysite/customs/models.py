@@ -97,7 +97,7 @@ class BugzillaTracker(models.Model):
 
 class BugzillaUrl(models.Model):
     '''This model stores query or tracker URLs for BugzillaTracker objects.'''
-    url = models.URLField(max_length=200, unique=True,
+    url = models.URLField(max_length=400,
                           blank=False, null=False)
     description = models.CharField(max_length=200, blank=True, default='')
     tracker = models.ForeignKey(BugzillaTracker)
