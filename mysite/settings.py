@@ -119,7 +119,7 @@ STATIC_GENERATOR_URLS = (
 STATIC_DOC_ROOT = 'static/'
 
 # Sessions in /tmp
-SESSION_ENGINE="django.contrib.sessions.backends.file"
+SESSION_ENGINE="django.contrib.sessions.backends.db"
 
 ## Django search via Haystack
 HAYSTACK_SITECONF='mysite.haystack_configuration'
