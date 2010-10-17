@@ -218,14 +218,14 @@ class BugzillaBugTracker(object):
                     canonical_bug_link=bug_url)
             # Found an existing bug. Does it need refreshing?
             if bug.data_is_more_fresh_than_one_day():
-                logging.info("[Bugzilla] Bug %d from %s is fresh. Doing nothing!" % (bug_id, self.project_name))
+                logging.info("[Bugzilla] Bug %d from project named %s is fresh. Doing nothing!" % (bug_id, self.project_name))
                 return False # sweet
         except mysite.search.models.Bug.DoesNotExist:
             # This is a new bug
             bug = mysite.search.models.Bug(canonical_bug_link = bug_url)
 
         # Looks like we have some refreshing to do.
-        logging.info("[Bugzilla] Refreshing bug %d from %s." % (bug_id, self.project_name))
+        logging.info("[Bugzilla] Refreshing bug %d from project named %s." % (bug_id, self.project_name))
         # Get the dictionary of data to put into the bug. The function for
         # obtaining tracker-specific data is passed in.
         data = bb.as_data_dict_for_bug_object(self.extract_tracker_specific_data)
@@ -244,7 +244,7 @@ class BugzillaBugTracker(object):
             bug.project = project_from_name
         bug.last_polled = datetime.datetime.utcnow()
         bug.save()
-        logging.info("[Bugzilla] Finished with %d from %s." % (bug_id, self.project_name))
+        logging.info("[Bugzilla] Finished with bug %d from project named %s." % (bug_id, self.project_name))
         return True
 
     def refresh_all_bugs(self):
@@ -255,7 +255,7 @@ class BugzillaBugTracker(object):
             self.create_or_refresh_one_bugzilla_bug(bb=bb)
 
     def update(self):
-        logging.info("[Bugzilla] Started refreshing all %s bugs" % self.project_name)
+        logging.info("[Bugzilla] Started refreshing all bugs from project named %s." % self.project_name)
 
         # First, go through and create or refresh all the bugs that
         # we are configured to track. This will add new bugs and

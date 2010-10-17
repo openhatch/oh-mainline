@@ -205,7 +205,7 @@ class TracBugTracker(object):
                                                    component=trac_bug.component)
 
     def update(self):
-        logging.info("Started refreshing all %s bugs." % self.project_name)
+        logging.info("[Trac] Started refreshing all bugs from project named %s." % self.project_name)
 
         # First, go through and refresh all the bugs specifically marked
         # as bugs to look at.
@@ -237,11 +237,11 @@ class TracBugTracker(object):
 
         # Hopefully, the bug is so fresh it needs no refreshing.
         if bug.data_is_more_fresh_than_one_day():
-            logging.info("[Trac] Bug %d from %s is fresh. Doing nothing!" % (bug_id, self.project_name))
+            logging.info("[Trac] Bug %d from project named %s is fresh. Doing nothing!" % (bug_id, self.project_name))
             return # sweet
 
         # Okay, fine, we need to actually refresh it.
-        logging.info("[Trac] Refreshing bug %d from %s." %
+        logging.info("[Trac] Refreshing bug %d from project named %s." %
                      (bug_id, self.project_name))
         # For some unknown reason, some trackers choose to delete some bugs entirely instead
         # of just marking them as closed. That is fine for bugs we haven't yet pulled, but
@@ -251,7 +251,7 @@ class TracBugTracker(object):
             data = tb.as_data_dict_for_bug_object(self.extract_tracker_specific_data)
         except urllib2.HTTPError, e:
             if e.code == 404:
-                logging.error("[Track] ERROR: Bug %d returned 404, deleting..." % bug_id)
+                logging.error("[Trac] ERROR: Bug %d returned 404, deleting..." % bug_id)
                 bug.delete()
                 return
             else:
@@ -269,7 +269,7 @@ class TracBugTracker(object):
             bug.project = project_from_name
         bug.last_polled = datetime.datetime.utcnow()
         bug.save()
-        logging.info("[Trac] Finished with %d from %s." % (bug_id, self.project_name))
+        logging.info("[Trac] Finished with bug %d from project named %s." % (bug_id, self.project_name))
 
 ############################################################
 # Specific sub-classes for individual bug trackers

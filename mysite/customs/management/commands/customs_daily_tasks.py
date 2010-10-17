@@ -57,7 +57,7 @@ class Command(BaseCommand):
         for thing in enabled_roundup_trackers:
             instantiated = thing()
             project_name = instantiated.project.name
-            logging.info("[Roundup] About to update %s" % project_name)
+            logging.info("[Roundup] About to update bugs from project named %s." % project_name)
             try:
                 instantiated.update()
             except urllib2.URLError, e:
@@ -79,7 +79,7 @@ class Command(BaseCommand):
         for thing in enabled_trac_instances:
             instantiated = thing()
             project_name = instantiated.project_name
-            logging.info("[Trac] About to update %s" % project_name)
+            logging.info("[Trac] About to update bugs from project named %s." % project_name)
             try:
                 instantiated.update()
             except urllib2.URLError, e:
@@ -103,7 +103,7 @@ class Command(BaseCommand):
         for thing in enabled_bugzilla_instances:
             instantiated = thing()
             project_name = instantiated.project_name
-            logging.info("[Bugzilla] About to update %s" % project_name)
+            logging.info("[Bugzilla] About to update bugs from project named %s." % project_name)
             # FIXME: The Bugzilla trackers seem to throw error 500 a lot.
             # For now, chuck in a dirty big try except to stop importer
             # breaking.
@@ -130,7 +130,7 @@ class Command(BaseCommand):
         for thing in enabled_google_instances:
             instantiated = thing()
             project_name = instantiated.project_name
-            logging.info("[Google] About to update %s" % project_name)
+            logging.info("[Google] About to update bugs from project named %s." % project_name)
             try:
                 instantiated.update()
             except gdata.client.RequestError, e:

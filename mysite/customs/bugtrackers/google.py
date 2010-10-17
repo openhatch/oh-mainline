@@ -195,7 +195,7 @@ class GoogleBugTracker(object):
             # Check if this query has been accessed in the last day
             if query_is_more_fresh_than_one_day(self.google_name, query):
                 # Sweet, ignore this one and go on.
-                logging.info("[Google] A query for %s is fresh, skipping it..." % self.project_name)
+                logging.info("[Google] A query for project named %s is fresh, skipping it..." % self.project_name)
                 continue
             issues = get_google_issue_entries(self.client, self.google_name, query)
             for issue in issues:
@@ -210,14 +210,14 @@ class GoogleBugTracker(object):
                     canonical_bug_link=bug_url)
             # Found an existing bug. Does it need refreshing?
             if bug.data_is_more_fresh_than_one_day():
-                logging.info("[Google] Bug %d from %s is fresh. Doing nothing!" % (bug_id, self.project_name))
+                logging.info("[Google] Bug %d from project named %s is fresh. Doing nothing!" % (bug_id, self.project_name))
                 return False # sweet
         except mysite.search.models.Bug.DoesNotExist:
             # This is a new bug
             bug = mysite.search.models.Bug(canonical_bug_link = bug_url)
 
         # Looks like we have some refreshing to do.
-        logging.info("[Google] Refreshing bug %d from %s." % (bug_id, self.project_name))
+        logging.info("[Google] Refreshing bug %d from project named %s." % (bug_id, self.project_name))
         # Get the dictionary of data to put into the bug. The function for
         # obtaining tracker-specific data is passed in.
         data = gb.as_data_dict_for_bug_object(self.extract_tracker_specific_data)
@@ -235,7 +235,7 @@ class GoogleBugTracker(object):
             bug.project = project_from_name
         bug.last_polled = datetime.datetime.utcnow()
         bug.save()
-        logging.info("[Google] Finished with %d from %s." % (bug_id, self.project_name))
+        logging.info("[Google] Finished with bug %d from project named %s." % (bug_id, self.project_name))
         return True
 
     def refresh_all_bugs(self):
@@ -246,7 +246,7 @@ class GoogleBugTracker(object):
             self.create_or_refresh_one_google_bug(gb=gb)
 
     def update(self):
-        logging.info("[Google] Started refreshing all %s bugs." % self.project_name)
+        logging.info("[Google] Started refreshing all bugs from project named %s." % self.project_name)
         logging.info("[Google] Fetching Atom data for bugs in tracker...")
         for bug_data in self.generate_current_bug_atom():
             gb = GoogleBug(
