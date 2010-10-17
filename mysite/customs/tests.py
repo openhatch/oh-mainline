@@ -1903,7 +1903,7 @@ class DataExport(django.test.TestCase):
         # test: is our lovely fake project there?
         reincarnated_proj = mysite.search.models.Project.objects.get(name="karens-awesome-project")
 
-    def test_dump_Person(self):
+    def test_dump_person(self):
         fake_stdout=StringIO()
         # make fake Person who doesn't care if people know where he is
         zuckerberg = Person.create_dummy(first_name="mark",location_confirmed = True, location_display_name='Palo Alto')
