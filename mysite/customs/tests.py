@@ -1917,6 +1917,8 @@ class DataExport(django.test.TestCase):
         # now, delete fake people
         zuckerberg.delete()
         munroe.delete()
+        # and delete any User objects too
+        django.contrib.auth.models.User.objects.all().delete()
         
         # go go reincarnation gadget
         for obj in django.core.serializers.deserialize('json', fake_stdout.getvalue()):
