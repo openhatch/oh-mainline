@@ -1854,26 +1854,33 @@ class DataExport(django.test.TestCase):
     def test_dump_timestamp(self):
         # data capture, woo
         fake_stdout = StringIO()
+
+        # Create local constants that refer to values we will insert and check
+        TIMESTAMP_KEY_TO_USE = 'birthday of Asheesh with arbitrary time'
+        TIMESTAMP_DATE_TO_USE = datetime.datetime(1985, 10, 20, 3, 21, 20)
+
         # make fake Timestamp
         t = Timestamp()
-        t.key = 'testing time'
+        t.key = TIMESTAMP_KEY_TO_USE
+        t.timestamp = TIMESTAMP_DATE_TO_USE
         t.save()
         
-        # dump fake bug into fake stdout
+        # dump fake timestamp into fake stdout
         command = mysite.customs.management.commands.dump_public_user_data.Command()
         command.handle(output=fake_stdout)
         
-        #now, delete bug...
+        #now, delete the timestamp...
         t.delete()
         
-        # let's see if we can re-import fire-ant!
+        # let's see if we can re-import the timestamp
         for obj in django.core.serializers.deserialize('json', fake_stdout.getvalue()):
             obj.save()
         
-        # testing to see if there are ANY bugs
+        # testing to see if there are ANY
         self.assertTrue(Timestamp.objects.all())
-        # testing to see if fire-ant is there
-        reincarnated_t = mysite.base.models.Timestamp.objects.get(key='testing time')
+        # testing to see if ours is there
+        reincarnated_t = mysite.base.models.Timestamp.objects.get(key=TIMESTAMP_KEY_TO_USE)
+        self.assertEquals(reincarnated_t.timestamp, TIMESTAMP_DATE_TO_USE)
 
     @mock.patch('mysite.search.tasks.PopulateProjectIconFromOhloh')
     def test_dump_project(self,fake_icon):
