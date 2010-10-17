@@ -1907,8 +1907,11 @@ class DataExport(django.test.TestCase):
         fake_stdout=StringIO()
         # make fake Person who doesn't care if people know where he is
         zuckerberg = Person.create_dummy(first_name="mark",location_confirmed = True, location_display_name='Palo Alto')
+        self.assertEquals(zuckerberg.get_public_location_or_default(), 'Palo Alto')
+
         # ...and make a fake Person who REALLY cares about his location being private
         munroe = Person.create_dummy(first_name="randall",location_confirmed = False, location_display_name='Cambridge')
+        self.assertEquals(munroe.get_public_location_or_default(), 'Inaccessible Island')
         
         command = mysite.customs.management.commands.dump_public_user_data.Command()
         command.handle(output=fake_stdout)
@@ -1935,5 +1938,9 @@ class DataExport(django.test.TestCase):
         # check that location_display_name is appropriate
         self.assertEquals(new_zuckerberg.location_display_name, 'Palo Alto')
         self.assertEquals(new_munroe.location_display_name, 'Inaccessible Island')
+
+        # check that we display both as appropriate
+        self.assertEquals(new_zuckerberg.get_public_location_or_default(), 'Palo Alto')
+        self.assertEquals(new_munroe.get_public_location_or_default(), 'Inaccessible Island')
 # vim: set nu:
 
