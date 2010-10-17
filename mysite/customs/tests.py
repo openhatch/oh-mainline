@@ -1824,6 +1824,42 @@ class DataExport(django.test.TestCase):
         # and the user's password is blank (instead of the real password)
         self.assertEquals(new_u.password, '')
 
+    def test_dump_user_table_without_all_email_addresses(self):
+        # We'll pretend we're running the dump_public_user_data management command. But
+        # to avoid JSON data being splatted all over stdout, we create a fake_stdout to
+        # capture that data.
+        fake_stdout = StringIO()
+
+        # Now, set up the test:
+        # Create two Person objects, with corresponding email addresses
+        u1 = django.contrib.auth.models.User.objects.create(username='privateguy', email='hidden@example.com')
+        p1 = Person.create_dummy(user=u1)
+
+        u2 = django.contrib.auth.models.User.objects.create(username='publicguy', email='public@example.com')
+        p2 = Person.create_dummy(user=u2, show_email=True)
+
+        # Dump the public version of the data into fake stdout
+        command = mysite.customs.management.commands.dump_public_user_data.Command()
+        command.handle(output=fake_stdout)
+
+        # Now, delete the them all and see if they come back
+        django.contrib.auth.models.User.objects.all().delete()
+        Person.objects.all().delete()
+
+        ## This code re-imports from the dump.
+        # for more in serializers.deserialize(), read http://docs.djangoproject.com/en/dev/topics/serialization
+        for obj in django.core.serializers.deserialize('json', fake_stdout.getvalue()):
+            obj.save()
+
+        ### Now the tests:
+        # Django user objects really should have an email address
+        # so, if we hid it, we make one up based on the user ID
+        new_p1 = Person.objects.get(user__username='privateguy')
+        self.assertEquals(new_p1.user.email,
+                 'user_id_%d_has_hidden_email_address@example.com' % new_p1.user.id)
+
+        new_p2 = Person.objects.get(user__username='publicguy')
+        self.assertEquals(new_p2.user.email, 'public@example.com')
 
     def test_dump_bug(self):
 		# data capture, woo
