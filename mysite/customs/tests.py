@@ -3,6 +3,7 @@
 
 # Imports {{{
 from mysite.search.models import Bug, Project
+from mysite.base.models import Timestamp
 from mysite.profile.models import Person, Tag, TagType
 import mysite.profile.views
 from mysite.profile.tests import MockFetchPersonDataFromOhloh
@@ -13,6 +14,7 @@ import re
 import time
 import twill
 import lxml
+import sys
 from twill import commands as tc
 from twill.shell import TwillCommandLoop
 
@@ -1847,10 +1849,37 @@ class DataExport(django.test.TestCase):
 		# testing to see if fire-ant is there
 		reincarnated_b = mysite.search.models.Bug.all_bugs.get(title='fire-ant')
 		
-    def test_dump_project(self):
+
+		
+    def test_dump_timestamp(self):
+        # data capture, woo
+        fake_stdout = StringIO()
+        # make fake Timestamp
+        t = Timestamp()
+        t.key = 'testing time'
+        t.save()
+        
+        # dump fake bug into fake stdout
+        command = mysite.customs.management.commands.dump_public_user_data.Command()
+        command.handle(output=fake_stdout)
+        
+        #now, delete bug...
+        t.delete()
+        
+        # let's see if we can re-import fire-ant!
+        for obj in django.core.serializers.deserialize('json', fake_stdout.getvalue()):
+            obj.save()
+        
+        # testing to see if there are ANY bugs
+        self.assertTrue(Timestamp.objects.all())
+        # testing to see if fire-ant is there
+        reincarnated_t = mysite.base.models.Timestamp.objects.get(key='testing time')
+
+    @mock.patch('mysite.search.tasks.PopulateProjectIconFromOhloh')
+    def test_dump_project(self,fake_icon):
         fake_stdout = StringIO()
         # make fake Project
-        proj = Project.create_dummy_no_icon(name="karens-awesome-project")
+        proj = Project.create_dummy_no_icon(name="karens-awesome-project",language="Python")
         
         command = mysite.customs.management.commands.dump_public_user_data.Command()
         command.handle(output=fake_stdout)
@@ -1867,5 +1896,37 @@ class DataExport(django.test.TestCase):
         # test: is our lovely fake project there?
         reincarnated_proj = mysite.search.models.Project.objects.get(name="karens-awesome-project")
 
+    def test_dump_Person(self):
+        fake_stdout=StringIO()
+        # make fake Person who doesn't care if people know where he is
+        zuckerberg = Person.create_dummy(first_name="mark",location_confirmed = True, location_display_name='Palo Alto')
+        # ...and make a fake Person who REALLY cares about his location being private
+        munroe = Person.create_dummy(first_name="randall",location_confirmed = False, location_display_name='Cambridge')
+        
+        command = mysite.customs.management.commands.dump_public_user_data.Command()
+        command.handle(output=fake_stdout)
+        
+        # now, delete fake people
+        zuckerberg.delete()
+        munroe.delete()
+        
+        # go go reincarnation gadget
+        for obj in django.core.serializers.deserialize('json', fake_stdout.getvalue()):
+            obj.save()
+        
+        # did we dump/save ANY Persons?
+        self.assertTrue(Person.objects.all())
+        
+        # did our fake Persons get saved?
+        new_zuckerberg = mysite.profile.models.Person.objects.get(user__first_name="mark")
+        new_munroe = mysite.profile.models.Person.objects.get(user__first_name="randall")
+        
+        # check that location_confirmed wasn't dumped
+        self.assertEquals(new_zuckerberg.location_confirmed, False)
+        self.assertEquals(new_munroe.location_confirmed, False)
+        
+        # check that location_display_name is appropriate
+        self.assertEquals(new_zuckerberg.location_display_name, 'Palo Alto')
+        self.assertEquals(new_munroe.location_display_name, 'Inaccessible Island')
 # vim: set nu:
 

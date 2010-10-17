@@ -2,6 +2,8 @@ import logging
 
 from django.contrib.auth.models import User
 from mysite.search.models import Bug, Project
+from mysite.profile.models import Person
+from mysite.base.models import Timestamp
 import sys
 import simplejson
 from django.core.management.base import BaseCommand
@@ -78,22 +80,24 @@ class Command(BaseCommand):
                 whitelisted_columns = ['id', 'username', 'first_name', 'last_name'])
         data.extend(public_user_data)
 
-        # It would be nice if we exported the Person data, too.
-        # Note: The location column is not safe to export. There's the privacy issue that
-        # not all people want to share their location data.
-
         # location_confirmed should be hidden -- that's private data
         # location_display_name should be set to the result of Person.get_public_location_or_default()
-        # For now, since I can't write it right now, I pretend we got the empty list as the result.
-        public_data_from_person_model = []
-        data.extend(public_data_from_person_model)
-        
+        everyone = Person.objects.all()
+        for dude in everyone:
+            dude.location_display_name = dude.get_public_location_or_default()
+            dude.location_confirmed = False
+        public_person_data = self.serialize_all_objects(query_set=everyone)
+        data.extend(public_person_data)
         
         # exporting Project data
         public_project_data = self.serialize_objects_except(
             query_set=Project.objects.all(),
             blacklisted_columns = ['icon_url','icon_raw'])
         data.extend(public_project_data)
+        
+        # Timestamp data needs export
+        public_timestamp_data = self.serialize_all_objects(query_set=Timestamp.objects.all())
+        data.extend(public_timestamp_data)
         
         # exporting Bug data
         public_bug_data = self.serialize_all_objects(query_set=Bug.all_bugs.all())
