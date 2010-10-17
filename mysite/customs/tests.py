@@ -1849,8 +1849,6 @@ class DataExport(django.test.TestCase):
 		# testing to see if fire-ant is there
 		reincarnated_b = mysite.search.models.Bug.all_bugs.get(title='fire-ant')
 		
-
-		
     def test_dump_timestamp(self):
         # data capture, woo
         fake_stdout = StringIO()
