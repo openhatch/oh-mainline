@@ -25,6 +25,7 @@ class Command(BaseCommand):
         url = state_manager.getUrl()
         d = twisted.web.client.getPage(url)
         d.addCallback(state_manager.handlePageContents)
+        d.addErrback(state_manager.handleError)
 
     def handle(self, *args, **options):
         self.create_tasks_from_dias()

@@ -10,12 +10,18 @@ import datetime
 import mysite.search.models
 import mysite.profile.models
 
+### Generic error handler
+class ProfileImporter(object):
+    def handleError(self, failure):
+        import logging
+        logging.warn(failure)
+
 ### This section imports package lists from qa.debian.org
 
 SECTION_NAME_AND_NUMBER_SPLITTER = re.compile(r'(.*?) [(](\d+)[)]$')
 # FIXME: Migrate this to UltimateDebianDatabase or DebianDatabaseExport
 
-class DebianQA(object):
+class DebianQA(ProfileImporter):
     def __init__(self, query, dia_id):
         self.query = query
         # dia_id can be None if you don't want to test citation creation
