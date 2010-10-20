@@ -19,6 +19,10 @@ class ProfileImporter(object):
         import logging
         logging.warn(failure)
 
+### This section imports projects from github.com
+
+
+
 ### This section imports package lists from qa.debian.org
 
 SECTION_NAME_AND_NUMBER_SPLITTER = re.compile(r'(.*?) [(](\d+)[)]$')
