@@ -34,7 +34,7 @@ class DebianQA(ProfileImporter):
         # dia_id can be None if you don't want to test citation creation
         self.dia_id = dia_id 
 
-    def getUrl(self):
+    def getUrlsAndCallbacks(self):
         if '@' in self.query:
             email_address = self.query
         else:
@@ -42,7 +42,9 @@ class DebianQA(ProfileImporter):
 
         url = 'http://qa.debian.org/developer.php?' + mysite.base.unicode_sanity.urlencode({
             u'login': unicode(email_address)})
-        return url
+        return [ {
+            'url': url,
+            'callback': self.handlePageContents } ]
 
     def handlePageContents(self, contents):
         '''contents is a string containing the data the web page contained.

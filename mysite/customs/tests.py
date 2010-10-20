@@ -279,7 +279,12 @@ class ImportFromDebianQA(django.test.TestCase):
         dqa = mysite.customs.profile_importers.DebianQA(query=dia.query, dia_id=dia.id)
 
         # Check that we generate the right URL
-        self.assertEqual('http://qa.debian.org/developer.php?login=asheesh%40asheesh.org', dqa.getUrl())
+        urlsAndCallbacks = dqa.getUrlsAndCallbacks()
+        just_one, = urlsAndCallbacks
+        url = just_one['url']
+        callback = just_one['callback']
+        self.assertEqual('http://qa.debian.org/developer.php?login=asheesh%40asheesh.org', url)
+        self.assertEqual(callback, dqa.handlePageContents)
 
         # Check that we make Citations as expected
         page_contents = open(os.path.join(
