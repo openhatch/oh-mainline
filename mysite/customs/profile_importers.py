@@ -9,6 +9,7 @@ import datetime
 
 import mysite.search.models
 import mysite.profile.models
+import mysite.base.helpers
 
 ### Generic error handler
 class ProfileImporter(object):
@@ -20,8 +21,60 @@ class ProfileImporter(object):
         logging.warn(failure)
 
 ### This section imports projects from github.com
+class GithubImporter(ProfileImporter):
+    def __init__(self, query, dia_id):
+        self.query = query
+        self.dia_id = dia_id
 
+    def handleUserRepositoryJson(self, json_string):
+        data = simplejson.loads(json_string)
+        import pdb
+        pdb.set_trace()
+        ## we think:
+        ## return data ... but what then?
 
+    def getUrlsAndCallbacks(self):
+        urls_and_callbacks = []
+
+        # Well, one thing we can do is get the repositories the user owns.
+        this_one = {}
+        this_one['url'] = ('http://github.com/api/v2/json/repos/show/' +
+            mysite.base.unicode_sanity.quote(self.query))
+        this_one['callback'] = self.handleUserRepositoryJson
+        urls_and_callbacks.append(this_one)
+
+        # Another is look at the user's activity feed.
+        this_one = {}
+        this_one['url'] = ('http://github.com/%s.json' %
+            mysite.base.unicode_sanity.quote(self.query))
+        this_one['callback'] = self.handleUserFeedJson
+        urls_and_callbacks.append(this_one)
+
+        # Another is look at the watched list for repos the user collaborates on
+        this_one = {}
+        this_one['url'] = ('http://github.com/%s.json' %
+            mysite.base.unicode_sanity.quote(self.query))
+        this_one['callback'] = self.handleUserFeedJson
+        urls_and_callbacks.append(this_one)
+
+        return urls_and_callbacks
+
+    def handleUserFeedJson(self, json_string):
+        # first, decode it
+        data = simplejson.loads(json_string)
+
+        # create a set that we add URLs to. This way, we can avoid
+        # returning duplicate URLs.
+        repo_urls_found = set()
+
+        for event in data:
+            if event['type'] == 'PushEvent':
+                repo = event['repository']
+                if repo['url'] not in repo_urls_found:
+                    if repo['owner'] == github_username:
+                        continue # skip the ones owned by this user
+                repo_urls_found.add(repo['url']) # avoid sending out duplicates
+                yield mysite.base.helpers.ObjectFromDict(repo)
 
 ### This section imports package lists from qa.debian.org
 
