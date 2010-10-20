@@ -5,6 +5,10 @@ import urllib2
 import mysite.customs.ohloh
 import cStringIO as StringIO
 import re
+import datetime
+
+import mysite.search.models
+import mysite.profile.models
 
 ### This section imports package lists from qa.debian.org
 
@@ -76,8 +80,8 @@ class DebianQA(object):
         dia = mysite.profile.models.DataImportAttempt.objects.get(id=self.dia_id)
         person = dia.person
 
-        for package_name, package_description in results:
-            (project, _) = Project.objects.get_or_create(name=package_name)
+        for package_name, package_description in package_names:
+            (project, _) = mysite.search.models.Project.objects.get_or_create(name=package_name)
 
             package_link = 'http://packages.debian.org/src:' + urllib.quote(
                 package_name)
@@ -98,7 +102,7 @@ class DebianQA(object):
             citation.save_and_check_for_duplicates()
 
             # And add a citation to the Debian portfolio entry
-            (project, _) = Project.objects.get_or_create(name='Debian GNU/Linux')
+            (project, _) = mysite.search.models.Project.objects.get_or_create(name='Debian GNU/Linux')
             if mysite.profile.models.PortfolioEntry.objects.filter(person=person, project=project).count() == 0:
                 portfolio_entry = mysite.profile.models.PortfolioEntry(person=person,
                                                  project=project,
@@ -119,3 +123,10 @@ class DebianQA(object):
 
         dia.completed = True
         dia.save()
+
+###
+
+SOURCE_TO_CLASS = {
+    'db': DebianQA,
+}
+

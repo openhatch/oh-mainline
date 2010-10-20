@@ -38,7 +38,7 @@ import lp_grabber
 import gdata.client
 
 from mysite.profile.tasks import FetchPersonDataFromOhloh
-import mysite.customs.debianqa
+import mysite.customs.profile_importers
 import mysite.customs.cia
 import mysite.customs.feed
 import mysite.customs.github
@@ -265,15 +265,32 @@ class OhlohIconTests(django.test.TestCase):
 
     # }}}
 
-class ImportFromDebianQAReally(django.test.TestCase):
-    def test_asheesh(self):
-        source_package_names = mysite.customs.debianqa.source_packages_maintained_by('asheesh@asheesh.org')
-        self.assertEqual(set(source_package_names),
-                         set([('ccd2iso', 'Converter from CloneCD disc image format to standard ISO'), ('alpine', 'Text-based email client, friendly for novices but powerful'), ('cue2toc', "converts CUE files to cdrdao's TOC format"), ('liblicense', 'Stores and retrieves license information in media files'), ('exempi', 'library to parse XMP metadata (Library)')]))
+class ImportFromDebianQA(django.test.TestCase):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+    
+    @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
+    @mock.patch('mysite.search.tasks.PopulateProjectIconFromOhloh')
+    def test_asheesh(self, do_nothing, do_nothing_also):
+        # Create a DataImportAttempt for Asheesh
+        asheesh = Person.objects.get(user__username='paulproteus')
+        dia = mysite.profile.models.DataImportAttempt.objects.create(person=asheesh, source='db', query='asheesh@asheesh.org')
 
-    def test_mister_404(self):
-        source_package_names = mysite.customs.debianqa.source_packages_maintained_by('http://mister.404/dummy')
-        self.assertEqual(list(source_package_names), [])
+        # Create the DebianQA to track the state.
+        dqa = mysite.customs.profile_importers.DebianQA(query=dia.query, dia_id=dia.id)
+
+        # Check that we generate the right URL
+        self.assertEqual('http://qa.debian.org/developer.php?login=asheesh%40asheesh.org', dqa.getUrl())
+
+        # Check that we make Citations as expected
+        page_contents = open(os.path.join(
+            settings.MEDIA_ROOT, 'sample-data', 'debianqa-asheesh.html')).read()
+        dqa.handlePageContents(page_contents)
+
+        projects = set([c.portfolio_entry.project.name for c in mysite.profile.models.Citation.objects.all()])
+        self.assertEqual(projects, set(['ccd2iso', 'liblicense', 'exempi', 'Debian GNU/Linux', 'cue2toc', 'alpine']))
+
+    def test_404(self):
+        pass # uhhh
 
 class LaunchpadDataTests(django.test.TestCase):
     def test_project2language(self):

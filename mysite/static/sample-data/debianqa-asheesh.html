@@ -1,0 +1,369 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Debian Developer's Packages Overview -- Debian Quality Assurance</title>
+  <link rev="made" href="mailto:debian-qa@lists.debian.org">
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link type="text/css" rel="stylesheet" href="revamp.css">
+  <link rel="stylesheet" type="text/css" href="developer.css">
+  <script type="text/javascript" src="sorttable.js"></script>
+<script type="text/javascript" language="JavaScript">
+function objectOver(x) {
+  x.style.color="blue";
+}
+function objectOut(x) {
+  x.style.color="black";
+}
+function collapse(x, txt){
+  var oTemp=document.getElementById("text_"+x) ;
+  var oClick=document.getElementById("click_"+x);
+  if (oTemp.style.display=="block") {
+    oTemp.style.display="none";
+    oClick.innerHTML=txt+"&nbsp<small>(click to expand)<\/small><br>";
+  } else {
+    oTemp.style.display="block";
+    oClick.innerHTML=txt+"&nbsp<small>(click to collapse)<\/small><br>";
+  }
+}
+</script>
+</head>
+<body>
+<h1 id="title"><img src="/debian.png" alt="Debian logo" width="258" height="82" style="vertical-align: middle"> Quality Assurance</h1>
+<div id="body">
+<h2 align="center">Packages overview for Asheesh Laroia &lt;asheesh@asheesh.org&gt;</h2>
+<br>
+<span id="click_1" class="span_general" onmouseover='javascript:objectOver(this)' onmouseout='javascript:objectOut(this)' onclick='javascript:collapse(1,"<b>Display configuration:</b>")'><b>Display configuration:</b><small>&nbsp;(click to collapse)</small><br>
+</span><div id="text_1" class="general" style='margin-left:0;display:block'><form method="GET" action="developer.php"><input type="hidden" name="login" value="asheesh@asheesh.org">
+<input type="hidden" name="set" value="yes">
+<small><b><em>You need to allow cookies if you want the configuration to be stored. If not, remember/bookmark the right URL that will be provided after submitting changes. </em></b>You can override the settings by providing an extra arg to the URL (e.g. &amp;buildd=1 if you want to display the buildd column). These args will not change the custom settings you defined before (the cookie is not modified).<br>
+The 'Name' ordering sorts by package name, 'Date' sorts by upload date (descending), 'N./D.' sorts by name for main/contrib/non-free packages and by date for other sections, 'Section' sorts by sections first and by name secondly.<br>
+</small><table class="small" border="1" cellpadding="3" cellspacing="1" summary=""><tr align="center"><th rowspan="1" colspan="1"><font color="green">Bugs </font><br>
+<font color="black">(&amp;bugs=)</font></th>
+<th rowspan="1" colspan="1"><font color="green">Version </font><br>
+<font color="black">(&amp;version=)</font></th>
+<th rowspan="1" colspan="1"><font color="green">Ubuntu </font><br>
+<font color="black">(&amp;ubuntu=)</font></th>
+<th rowspan="1" colspan="1"><font color="green">Excuses </font><br>
+<font color="black">(&amp;excuses=)</font></th>
+<th rowspan="1" colspan="1"><font color="green">Binary<br>
+Package </font><br>
+<font color="black">(&amp;bin=)</font></th>
+<th rowspan="1" colspan="1"><font color="green">Buildd </font><br>
+<font color="black">(&amp;buildd=)</font></th>
+<th rowspan="1" colspan="1"><font color="green">Debcheck </font><br>
+<font color="black">(&amp;problems=)</font></th>
+<th rowspan="1" colspan="1"><font color="green">Popcon </font><br>
+<font color="black">(&amp;popc=)</font></th>
+<th rowspan="1" colspan="1"><font color="green">Watch </font><br>
+<font color="black">(&amp;watch=)</font></th>
+<th rowspan="1" colspan="1"><font color="green">Section </font><br>
+<font color="black">(&amp;section=)</font></th>
+<th rowspan="1" colspan="1"><font color="green">Ordering </font><br>
+<font color="black">(&amp;ordering=)</font></th>
+<th rowspan="1" colspan="1"><font color="green">Uploads </font><br>
+<font color="black">(&amp;uploads=)</font></th>
+</tr>
+<tr align="left"><td><font color="green"><input type="radio" name="bugs" value="1" checked>Show (1)
+
+<br>
+<input type="radio" name="bugs" value="0">Hide (0)
+
+<br>
+<input type="radio" name="bugs" value="2">Sum. (2)
+
+<br>
+<input type="radio" name="bugs" value="3">Sum.&amp;RC (3)
+
+<br>
+</font></td>
+<td><font color="green"><input type="radio" name="version" value="1" checked>Show
+
+<br>
+<input type="radio" name="version" value="0">Hide
+<br>
+</font></td>
+<td><font color="green"><input type="radio" name="ubuntu" value="1" checked>Show
+
+<br>
+<input type="radio" name="ubuntu" value="0">Hide
+<br>
+</font></td>
+<td><font color="green"><input type="radio" name="excuses" value="1" checked>Show
+
+<br>
+<input type="radio" name="excuses" value="0">Hide
+<br>
+</font></td>
+<td><font color="green"><input type="radio" name="bin" value="1">Show
+
+<br>
+<input type="radio" name="bin" value="0" checked>Hide
+<br>
+</font></td>
+<td><font color="green"><input type="radio" name="buildd" value="1" checked>Show
+
+<br>
+<input type="radio" name="buildd" value="0">Hide
+<br>
+</font></td>
+<td><font color="green"><input type="radio" name="problems" value="1" checked>Show
+
+<br>
+<input type="radio" name="problems" value="0">Hide
+<br>
+</font></td>
+<td><font color="green"><input type="radio" name="popc" value="1" checked>Show
+
+<br>
+<input type="radio" name="popc" value="0">Hide
+<br>
+</font></td>
+<td><font color="green"><input type="radio" name="watch" value="1" checked>Show
+
+<br>
+<input type="radio" name="watch" value="0">Hide
+<br>
+</font></td>
+<td><font color="green"><input type="radio" name="section" value="1">Show
+
+<br>
+<input type="radio" name="section" value="0" checked>Hide
+<br>
+</font></td>
+<td><font color="green"><input type="radio" name="ordering" value="0" checked>Name (0)
+
+<br>
+<input type="radio" name="ordering" value="1">Date (1)
+
+<br>
+<input type="radio" name="ordering" value="2">N./D. (2)
+
+<br>
+<input type="radio" name="ordering" value="3">Section (3)
+
+<br>
+</font></td>
+<td><font color="green"><input type="radio" name="uploads" value="1" checked>Show
+
+<br>
+<input type="radio" name="uploads" value="0">Hide
+<br>
+</font></td>
+</tr>
+
+</table>
+<br>
+Additionally show packages: <input type="text" size="30" maxlength="80" name="packages">
+ uploaders: <input type="text" size="30" maxlength="80" name="uploader">
+<br>
+Mirror: <input type="text" size="30" maxlength="80" name="mirror" value="http://ftp.debian.org/debian">
+<br>
+<input type="submit" value="Submit">
+</form>
+<form method="GET" action="developer.php"><input type="hidden" name="login" value="asheesh@asheesh.org">
+<input type="hidden" name="reset" value="yes">
+<input type="submit" value="Show all">
+</form>
+</div>
+<script type='text/javascript'> collapse(1,"<b>Display configuration:</b>"); </script>
+<span id="click_2" class="span_general" onmouseover='javascript:objectOver(this)' onmouseout='javascript:objectOut(this)' onclick='javascript:collapse(2,"<b>Help</b>")'><b>Help</b><small>&nbsp;(click to collapse)</small><br>
+</span><div id="text_2" class="general" style='margin-left:0;display:block'><small>The description of the package is available as mouseover title from the package name. An asterisk (*) indicates the presence of co-maintainers (Uploaders: control field)<br>
+<font color="blue">Blue</font> packages are co-maintained by this developer<br>
+The 'Bugs' columns display the real number of bugs. If there are merged bugs, the total is in parentheses<br>
+Version columns are color-coded, mouseover titles show more information:<br>
+&nbsp;<span class="stable" >Cyan</span>: package in stable<br>
+&nbsp;<span class="security" >Red</span>: package in stable security (not shown if also in stable)<br>
+&nbsp;<span class="proposed-updates" >Dark blue</span>: package in stable proposed updates (not shown if also in stable security)<br>
+&nbsp;<span class="proposed-updates-new" >Light blue</span>: package <a href="http://ftp-master.debian.org/proposed-updates.html">pending</a> for stable proposed updates (not shown if also in stable security)<br>
+&nbsp;<span class="volatile" >Light purple</span>: package on <a href="http://volatile.debian.org">volatile.debian.org</a><br>
+&nbsp;<span class="bpo" >Dark purple</span>: package on <a href="http://backports.org/">backports.org</a><br>
+&nbsp;<span class="testing" >Purple</span>: testing version<br>
+&nbsp;<span class="unstable" >Green</span>: unstable version<br>
+&nbsp;<span class="nmu" >Red</span>: non-maintainer upload<br>
+&nbsp;<span class="new" >Grey</span>: version in <a href="http://ftp-master.debian.org/new.html">new</a><br>
+&nbsp;<span class="incoming" >Orange</span>: version in <a href="http://incoming.debian.org/">incoming</a><br>
+&nbsp;<span class="delayed" >Light Red</span>: version in <a href="http://people.debian.org/~djpig/delayed.html">delayed</a><br>
+Ubuntu column:<br>
+&nbsp;&nbsp;<span class="uptodate" >green</span>: Ubuntu version is in sync with version in unstable<br>
+&nbsp;&nbsp;<span class="behind" >magenta</span>: Ubuntu version is greater than version in unstable<br>
+&nbsp;&nbsp;<span class="ahead" >navy blue</span>: Ubuntu version is lower than version in unstable<br>
+The 'Popcon' column displays the maximal install count for any binary in the source package<br>
+Watch columns:<br>
+&nbsp;&nbsp;<span class="uptodate" >green</span>: upstream found version is in sync with version in unstable/experimental<br>
+&nbsp;&nbsp;<span class="behind" >magenta</span>: upstream found version is greater than version in unstable<br>
+&nbsp;&nbsp;<span class="ahead" >navy blue</span>: upstream found version is lower than version in unstable (a bug in the watch file?)<br>
+&nbsp;&nbsp;<font color="red">Error</font>: uscan had problems following the watch file<br>
+The 'pending uploads' section shows packages uploaded/Changed-By this developer in incoming, new, and delayed<br>
+The 'uploads' sections show all packages in the archive signed by this developer's key (NMUs, sponsored, QA uploads)<br>
+<br>
+</small></div>
+<script type='text/javascript'> collapse(2,"<b>Help</b>"); </script>
+<span id="click_3" class="span_general" onmouseover='javascript:objectOver(this)' onmouseout='javascript:objectOut(this)' onclick='javascript:collapse(3,"<b>General information</b>")'><b>General information</b><small>&nbsp;(click to collapse)</small><br>
+</span><div id="text_3" class="general" style='margin-left:0;display:block'><small>Bugs: <a href="http://bugs.debian.org/cgi-bin/pkgreport.cgi?which=maint&amp;data=asheesh%40asheesh.org&amp;archive=no&amp;raw=yes&amp;bug-rev=yes&amp;pend-exc=fixed&amp;pend-exc=done">open</a> - <a href="http://bugs.debian.org/cgi-bin/pkgreport.cgi?which=maint&amp;data=asheesh%40asheesh.org&amp;archive=no&amp;pend-exc=done&amp;sev-inc=critical&amp;sev-inc=grave&amp;sev-inc=serious">RC</a> - <a href="http://bugs.debian.org/cgi-bin/pkgreport.cgi?maint=asheesh%40asheesh.org">all</a> - <a href="http://bugs.debian.org/cgi-bin/pkgreport.cgi?submitter=asheesh%40asheesh.org">submitted</a> - <a href="wnpp.php?login=asheesh%40asheesh.org">WNPP</a> - <a href="http://io.debian.net/~tar/bugstats/?asheesh%40asheesh.org">statistics</a><br>
+Reports: <a href="http://buildd.debian.org/pkg.cgi?maint=asheesh%40asheesh.org">Buildd</a> - <a href="http://lintian.debian.org/reports/maintainer/asheesh%40asheesh.org.html">Lintian</a> - <a href="http://debtags.alioth.debian.org/todo.html?maint=asheesh%40asheesh.org">Debtags</a> - <a href="http://dehs.alioth.debian.org/report.php?login=asheesh%40asheesh.org">DEHS</a> - <a href="http://piuparts.debian.org/sid/maintainer/a/asheesh%40asheesh.org.html">Piuparts</a><br>
+</small></div>
+<h3><a name="main"><em>main</em> (5)</a></h3>
+<table class="small sortable" border="1" cellpadding="3" cellspacing="1" summary=""><thead><tr align="center"><th rowspan="2" colspan="1"><font color="green">Source&nbsp;Name</font></th>
+<th rowspan="1" colspan="5"><font color="green">Bugs</font></th>
+<th rowspan="1" colspan="5"><font color="green">Version</font></th>
+<th rowspan="2" colspan="1"><font color="green">Ubuntu</font></th>
+<th rowspan="2" colspan="1"><font color="green"><span title="Raw excuse and Björn Stenberg analysis">Excuses</span></font></th>
+<th rowspan="2" colspan="1"><font color="green">Buildd</font></th>
+<th rowspan="1" colspan="3"><font color="green">Debcheck</font></th>
+<th rowspan="2" colspan="1"><font color="green">Popcon</font></th>
+<th rowspan="1" colspan="2"><font color="green">Watch</font></th>
+</tr>
+<tr align="center"><th rowspan="1" colspan="1"><font color="green"><span title="All opened bugs">All</span></font></th>
+<th rowspan="1" colspan="1"><font color="green"><span title="Release Critical bugs">RC</span></font></th>
+<th rowspan="1" colspan="1"><font color="green"><span title="Important &amp; Normal bugs">I&amp;N</span></font></th>
+<th rowspan="1" colspan="1"><font color="green"><span title="Minor &amp; Wishlist bugs">M&amp;W</span></font></th>
+<th rowspan="1" colspan="1"><font color="green"><span title="Fixed &amp; Pending bugs">F&amp;P</span></font></th>
+<th rowspan="1" colspan="1"><font color="green">Oldstable</font></th>
+<th rowspan="1" colspan="1"><font color="green">Stable</font></th>
+<th rowspan="1" colspan="1"><font color="green">Testing</font></th>
+<th rowspan="1" colspan="1"><font color="green">Unstable</font></th>
+<th rowspan="1" colspan="1"><font color="green">Exp</font></th>
+<th rowspan="1" colspan="1"><font color="green">St</font></th>
+<th rowspan="1" colspan="1"><font color="green">Te</font></th>
+<th rowspan="1" colspan="1"><font color="green">Un</font></th>
+<th rowspan="1" colspan="1"><font color="green">Unstable</font></th>
+<th rowspan="1" colspan="1"><font color="green">Exp</font></th>
+</tr>
+</thead><tr align="center"><td><b><span title="Text-based email client, friendly for novices but powerful"><a name="alpine">alpine</a></span></b><span title="1 co-maintainer(s)">*</span><span title="Debian Maintainer upload allowed">[DM]</span><br>
+<a href="http://packages.qa.debian.org/a/alpine.html">PTS</a>&nbsp;<a href="http://ftp.debian.org/debian/pool/main/a/alpine/">Pool</a></td>
+<td><a class="a" href="http://bugs.debian.org/cgi-bin/pkgreport.cgi?src=alpine&amp;repeatmerged=no">23</a> <font color="blue">(</font><a class="a" href="http://bugs.debian.org/cgi-bin/pkgreport.cgi?src=alpine&amp;repeatmerged=yes">24</a><font color="blue">)</font></td>
+<td><a class="dash" href="http://bugs.debian.org/cgi-bin/pkgreport.cgi?src=alpine&amp;sev-inc=critical&amp;sev-inc=grave&amp;sev-inc=serious">-</a></td>
+<td><a class="a" href="http://bugs.debian.org/cgi-bin/pkgreport.cgi?src=alpine&amp;archive=no&amp;pend-exc=pending-fixed&amp;pend-exc=fixed&amp;pend-exc=done&amp;sev-inc=important&amp;sev-inc=normal&amp;repeatmerged=no">16</a> <font color="blue">(</font><a class="a" href="http://bugs.debian.org/cgi-bin/pkgreport.cgi?src=alpine&amp;archive=no&amp;pend-exc=pending-fixed&amp;pend-exc=fixed&amp;pend-exc=done&amp;sev-inc=important&amp;sev-inc=normal&amp;repeatmerged=yes">17</a><font color="blue">)</font></td>
+<td><a class="a" href="http://bugs.debian.org/cgi-bin/pkgreport.cgi?src=alpine&amp;archive=no&amp;pend-exc=pending-fixed&amp;pend-exc=fixed&amp;pend-exc=done&amp;sev-inc=minor&amp;sev-inc=wishlist">6</a></td>
+<td><a class="a" href="http://bugs.debian.org/cgi-bin/pkgreport.cgi?src=alpine&amp;archive=no&amp;pend-inc=pending-fixed&amp;pend-inc=fixed">1</a></td>
+<td rowspan="1" colspan="1">-</td>
+<td rowspan="1" colspan="1"><span class="stable" title="stable: 20 Mar 2008 by Asheesh Laroia <asheesh@asheesh.org> (Uploader: paulproteus@debian.org)">1.10+dfsg-3</span><br>
+<a class="bpo" href="http://www.backports.org/debian/pool/main/a/alpine/" title="lenny-backports">2.00+dfsg-6~bpo50+1</a></td>
+<td rowspan="1" colspan="1"><span class="testing" title="testing: 11 Dec 2009 by Asheesh Laroia <asheesh@asheesh.org> (Uploader: paulproteus@debian.org)">2.00+dfsg-6</span></td>
+<td rowspan="1" colspan="1"><span class="unstable" title="unstable: 03 Oct 2010 by Asheesh Laroia <asheesh@asheesh.org> (Uploader: paulproteus@debian.org)">2.02-1</span><br>
+<a class="new" href="http://ftp-master.debian.org/new/alpine_2.02-2.html" title="4 days
+ ago by Luke Faraone <lfaraone@debian.org> (Uploader: Luke Faraone <lfaraone@debian.org>)">new:&nbsp;2.02-2</a></td>
+<td rowspan="1" colspan="1">-</td>
+<td><a class="uptodate" href="https://launchpad.net/ubuntu/+source/alpine"><span class="uptodate" >2.02-1</span></a><br>
+<a href="https://bugs.launchpad.net/ubuntu/+source/alpine">7&nbsp;bugs</a> <a href="https://bugs.launchpad.net/ubuntu/+source/alpine/+patches">(1&nbsp;patch)</a></td>
+<td><a href="excuses.php?package=alpine">Excuses</a><br>
+<a href="http://release.debian.org/migration/testing.pl?package=alpine">More</a></td>
+<td><a href="http://buildd.debian.org/build.cgi?pkg=alpine">Buildd</a><br>
+<a href="http://buildd.debian.org/status/package.php?p=alpine">More</a></td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>1762<br>
+<a href="popcon.php?package=alpine">More</a></td>
+<td><span class="ahead" >2.00</span><br>
+<a href="http://dehs.alioth.debian.org/report.php?package=alpine">Details</a></td>
+<td><span >-</span></td>
+</tr>
+<tr align="center" bgcolor="#dcdcdc"><td><b><span title="Converter from CloneCD disc image format to standard ISO"><a name="ccd2iso">ccd2iso</a></span></b><span title="Debian Maintainer upload allowed">[DM]</span><br>
+<a href="http://packages.qa.debian.org/c/ccd2iso.html">PTS</a>&nbsp;<a href="http://ftp.debian.org/debian/pool/main/c/ccd2iso/">Pool</a></td>
+<td><a class="dash" href="http://bugs.debian.org/cgi-bin/pkgreport.cgi?src=ccd2iso">-</a></td>
+<td><a class="dash" href="http://bugs.debian.org/cgi-bin/pkgreport.cgi?src=ccd2iso&amp;sev-inc=critical&amp;sev-inc=grave&amp;sev-inc=serious">-</a></td>
+<td><a class="dash" href="http://bugs.debian.org/cgi-bin/pkgreport.cgi?src=ccd2iso&amp;sev-inc=important&amp;sev-inc=normal">-</a></td>
+<td><a class="dash" href="http://bugs.debian.org/cgi-bin/pkgreport.cgi?src=ccd2iso&amp;sev-inc=minor&amp;sev-inc=wishlist">-</a></td>
+<td><a class="dash" href="http://bugs.debian.org/cgi-bin/pkgreport.cgi?src=ccd2iso&amp;archive=no&amp;pend-inc=pending-fixed&amp;pend-inc=fixed">-</a></td>
+<td rowspan="1" colspan="1">-</td>
+<td rowspan="1" colspan="3"><span class="stable" title="stable: 04 Feb 2008 by Asheesh Laroia <asheesh@asheesh.org> (Uploader: mako@debian.org)">0.3-3</span></td>
+<td rowspan="1" colspan="1">-</td>
+<td><a class="uptodate" href="https://launchpad.net/ubuntu/+source/ccd2iso"><span class="uptodate" >0.3-3</span></a><br>
+<a class="dash" href="https://bugs.launchpad.net/ubuntu/+source/ccd2iso">-</a></td>
+<td>-</td>
+<td><a href="http://buildd.debian.org/build.cgi?pkg=ccd2iso">Buildd</a><br>
+<a href="http://buildd.debian.org/status/package.php?p=ccd2iso">More</a></td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>565<br>
+<a href="popcon.php?package=ccd2iso">More</a></td>
+<td><span class="uptodate" >0.3</span></td>
+<td><span >-</span></td>
+</tr>
+<tr align="center"><td><b><span title="converts CUE files to cdrdao's TOC format"><a name="cue2toc">cue2toc</a></span></b><span title="Debian Maintainer upload allowed">[DM]</span><br>
+<a href="http://packages.qa.debian.org/c/cue2toc.html">PTS</a>&nbsp;<a href="http://ftp.debian.org/debian/pool/main/c/cue2toc/">Pool</a></td>
+<td><a class="dash" href="http://bugs.debian.org/cgi-bin/pkgreport.cgi?src=cue2toc">-</a></td>
+<td><a class="dash" href="http://bugs.debian.org/cgi-bin/pkgreport.cgi?src=cue2toc&amp;sev-inc=critical&amp;sev-inc=grave&amp;sev-inc=serious">-</a></td>
+<td><a class="dash" href="http://bugs.debian.org/cgi-bin/pkgreport.cgi?src=cue2toc&amp;sev-inc=important&amp;sev-inc=normal">-</a></td>
+<td><a class="dash" href="http://bugs.debian.org/cgi-bin/pkgreport.cgi?src=cue2toc&amp;sev-inc=minor&amp;sev-inc=wishlist">-</a></td>
+<td><a class="dash" href="http://bugs.debian.org/cgi-bin/pkgreport.cgi?src=cue2toc&amp;archive=no&amp;pend-inc=pending-fixed&amp;pend-inc=fixed">-</a></td>
+<td rowspan="1" colspan="1">-</td>
+<td rowspan="1" colspan="3"><span class="stable" title="stable: 19 Feb 2008 by Asheesh Laroia <asheesh@asheesh.org> (Uploader: paulproteus@debian.org)">0.4-5</span></td>
+<td rowspan="1" colspan="1">-</td>
+<td><a class="uptodate" href="https://launchpad.net/ubuntu/+source/cue2toc"><span class="uptodate" >0.4-5</span></a><br>
+<a class="dash" href="https://bugs.launchpad.net/ubuntu/+source/cue2toc">-</a></td>
+<td>-</td>
+<td><a href="http://buildd.debian.org/build.cgi?pkg=cue2toc">Buildd</a><br>
+<a href="http://buildd.debian.org/status/package.php?p=cue2toc">More</a></td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>214<br>
+<a href="popcon.php?package=cue2toc">More</a></td>
+<td><span class="uptodate" >0.4</span></td>
+<td><span >-</span></td>
+</tr>
+<tr align="center" bgcolor="#dcdcdc"><td><b><span title="library to parse XMP metadata (Library)"><a name="exempi">exempi</a></span></b><span title="1 co-maintainer(s)">*</span><br>
+<a href="http://packages.qa.debian.org/e/exempi.html">PTS</a>&nbsp;<a href="http://ftp.debian.org/debian/pool/main/e/exempi/">Pool</a></td>
+<td><a class="dash" href="http://bugs.debian.org/cgi-bin/pkgreport.cgi?src=exempi">-</a></td>
+<td><a class="dash" href="http://bugs.debian.org/cgi-bin/pkgreport.cgi?src=exempi&amp;sev-inc=critical&amp;sev-inc=grave&amp;sev-inc=serious">-</a></td>
+<td><a class="dash" href="http://bugs.debian.org/cgi-bin/pkgreport.cgi?src=exempi&amp;sev-inc=important&amp;sev-inc=normal">-</a></td>
+<td><a class="dash" href="http://bugs.debian.org/cgi-bin/pkgreport.cgi?src=exempi&amp;sev-inc=minor&amp;sev-inc=wishlist">-</a></td>
+<td><a class="dash" href="http://bugs.debian.org/cgi-bin/pkgreport.cgi?src=exempi&amp;archive=no&amp;pend-inc=pending-fixed&amp;pend-inc=fixed">-</a></td>
+<td rowspan="1" colspan="1">-</td>
+<td rowspan="1" colspan="1"><span class="stable" title="stable: 29 Apr 2008 by Michael Biebl <biebl@debian.org>">2.0.1-1</span></td>
+<td rowspan="1" colspan="2"><span class="testing" title="testing: 01 Jul 2009 by Michael Biebl <biebl@debian.org>">2.1.1-1</span></td>
+<td rowspan="1" colspan="1">-</td>
+<td><a class="behind" href="https://launchpad.net/ubuntu/+source/exempi"><span class="behind" >2.1.1-1build2</span></a><br>
+<a href="https://bugs.launchpad.net/ubuntu/+source/exempi">7&nbsp;bugs</a></td>
+<td>-</td>
+<td><a href="http://buildd.debian.org/build.cgi?pkg=exempi">Buildd</a><br>
+<a href="http://buildd.debian.org/status/package.php?p=exempi">More</a></td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>36467<br>
+<a href="popcon.php?package=exempi">More</a></td>
+<td><span class="uptodate" >2.1.1</span></td>
+<td><span >-</span></td>
+</tr>
+<tr align="center"><td><b><span title="Stores and retrieves license information in media files"><a name="liblicense">liblicense</a></span></b><span title="Debian Maintainer upload allowed">[DM]</span><br>
+<a href="http://packages.qa.debian.org/libl/liblicense.html">PTS</a>&nbsp;<a href="http://ftp.debian.org/debian/pool/main/libl/liblicense/">Pool</a></td>
+<td><a class="a" href="http://bugs.debian.org/cgi-bin/pkgreport.cgi?src=liblicense">3</a></td>
+<td><a class="dash" href="http://bugs.debian.org/cgi-bin/pkgreport.cgi?src=liblicense&amp;sev-inc=critical&amp;sev-inc=grave&amp;sev-inc=serious">-</a></td>
+<td><a class="a" href="http://bugs.debian.org/cgi-bin/pkgreport.cgi?src=liblicense&amp;archive=no&amp;pend-exc=pending-fixed&amp;pend-exc=fixed&amp;pend-exc=done&amp;sev-inc=important&amp;sev-inc=normal">1</a></td>
+<td><a class="a" href="http://bugs.debian.org/cgi-bin/pkgreport.cgi?src=liblicense&amp;archive=no&amp;pend-exc=pending-fixed&amp;pend-exc=fixed&amp;pend-exc=done&amp;sev-inc=minor&amp;sev-inc=wishlist">2</a></td>
+<td><a class="dash" href="http://bugs.debian.org/cgi-bin/pkgreport.cgi?src=liblicense&amp;archive=no&amp;pend-inc=pending-fixed&amp;pend-inc=fixed">-</a></td>
+<td rowspan="1" colspan="2">-</td>
+<td rowspan="1" colspan="2"><span class="nmu" title="testing: 25 Feb 2010 by gregor herrmann <gregoa@debian.org>">0.8-2.1</span></td>
+<td rowspan="1" colspan="1">-</td>
+<td><a class="uptodate" href="https://launchpad.net/ubuntu/+source/liblicense"><span class="uptodate" >0.8-2.1</span></a><br>
+<a href="https://bugs.launchpad.net/ubuntu/+source/liblicense">1&nbsp;bug</a></td>
+<td>-</td>
+<td><a href="http://buildd.debian.org/build.cgi?pkg=liblicense">Buildd</a><br>
+<a href="http://buildd.debian.org/status/package.php?p=liblicense">More</a></td>
+<td>-</td>
+<td>-</td>
+<td>-</td>
+<td>11<br>
+<a href="popcon.php?package=liblicense">More</a></td>
+<td><span >-</span></td>
+<td><span >-</span></td>
+</tr>
+
+</table>
+<p><a href="developer.php">Back to main page</a></p><p><small>Updated: general information: Wed Oct 20 16:00:50 UTC 2010, projectb: Wed Oct 20 16:00:20 UTC 2010, bugs: Wed Oct 20 20:34:09 UTC 2010. Time needed to generate page: 0.49s<br>
+Report problems with DDPO to the <a href="http://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=qa.debian.org">qa.debian.org pseudopackage</a>.</small></p><p><a href="http://jigsaw.w3.org/css-validator/validator/?uri=qa.debian.org/developer.php"><img style="border:0;width:88px;height:31px" src="http://jigsaw.w3.org/css-validator/images/vcss" alt="Valid CSS!"></a>
+<a href="http://validator.w3.org/check?uri=referer"><img border="0" src="http://www.w3.org/Icons/valid-html40" alt="Valid HTML 4.0!" height="31" width="88"></a></p></div>
+<div class="footer"><p>
+Made by Igor Genibel, Christoph Berg, and others.<br>
+Last generated on Fri Sep 17 21:07:03 2010 UTC<br>
+Copyright (C) 1999-2009 <a
+href="http://www.spi-inc.org/">Software in the Public Interest</a> and others;
+See <a href="http://www.debian.org/license">license terms</a>.
+</p></div>
+</body>
+</html>
