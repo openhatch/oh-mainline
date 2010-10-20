@@ -12,6 +12,9 @@ import mysite.profile.models
 
 ### Generic error handler
 class ProfileImporter(object):
+    def __init__(self, query, dia_id):
+        raise NotImplementedException
+
     def handleError(self, failure):
         import logging
         logging.warn(failure)
