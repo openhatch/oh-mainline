@@ -267,16 +267,18 @@ class OhlohIconTests(django.test.TestCase):
 
 class ImportFromGithub(django.test.TestCase):
     fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def setUp(self):
+        # Create a DataImportAttempt for Asheesh
+        asheesh = Person.objects.get(user__username='paulproteus')
+        self.dia = mysite.profile.models.DataImportAttempt.objects.create(person=asheesh, source='db', query='asheesh@asheesh.org')
     
     @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
     @mock.patch('mysite.search.tasks.PopulateProjectIconFromOhloh')
     def test(self, do_nothing, do_nothing_1):
-        # Create a DataImportAttempt for Asheesh
-        asheesh = Person.objects.get(user__username='paulproteus')
-        dia = mysite.profile.models.DataImportAttempt.objects.create(person=asheesh, source='db', query='asheesh@asheesh.org')
-
         # Create the Github object to track the state.
-        gi = mysite.customs.profile_importers.GithubImporter(dia.query, dia_id=dia.id)
+        gi = mysite.customs.profile_importers.GithubImporter(self.dia.query,
+                        self.dia.id)
 
         # test that we get the URLs and clalbacks we expect
         urls_and_callbacks = gi.getUrlsAndCallbacks()
