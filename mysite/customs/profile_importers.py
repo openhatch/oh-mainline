@@ -51,11 +51,7 @@ class GithubImporter(ProfileImporter):
         urls_and_callbacks.append(this_one)
 
         # Another is look at the watched list for repos the user collaborates on
-        this_one = {}
-        this_one['url'] = ('http://github.com/%s.json' %
-            mysite.base.unicode_sanity.quote(self.query))
-        this_one['callback'] = self.handleUserFeedJson
-        urls_and_callbacks.append(this_one)
+        # FIXME
 
         return urls_and_callbacks
 

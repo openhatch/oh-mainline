@@ -265,6 +265,28 @@ class OhlohIconTests(django.test.TestCase):
 
     # }}}
 
+class ImportFromGithub(django.test.TestCase):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+    
+    @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
+    @mock.patch('mysite.search.tasks.PopulateProjectIconFromOhloh')
+    def test(self, do_nothing, do_nothing_1):
+        # Create a DataImportAttempt for Asheesh
+        asheesh = Person.objects.get(user__username='paulproteus')
+        dia = mysite.profile.models.DataImportAttempt.objects.create(person=asheesh, source='db', query='asheesh@asheesh.org')
+
+        # Create the Github object to track the state.
+        gi = mysite.customs.profile_importers.GithubImporter(dia.query, dia_id=dia.id)
+
+        # test that we get the URLs and clalbacks we expect
+        urls_and_callbacks = gi.getUrlsAndCallbacks()
+        self.assertEqual(urls_and_callbacks,
+            [ {'url': 'http://github.com/api/v2/json/repos/show/asheesh%40asheesh.org',
+               'callback': gi.handleUserRepositoryJson},
+              {'url': 'http://github.com/asheesh%40asheesh.org.json',
+               'callback': gi.handleUserFeedJson},
+            ])
+
 class ImportFromDebianQA(django.test.TestCase):
     fixtures = ['user-paulproteus', 'person-paulproteus']
     
@@ -1013,7 +1035,6 @@ class LaunchpadImporterMarksFixedBugsAsClosed(django.test.TestCase):
         query_data, new_data = mysite.customs.bugtrackers.launchpad.clean_lp_data_dict(
             lp_data_dict)
         self.assertEqual(new_data['status'], 'Unknown')
-
 
 class OnlineGithub(django.test.TestCase):
     def test_get_language(self):
