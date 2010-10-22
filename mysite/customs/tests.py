@@ -1937,6 +1937,22 @@ class DataExport(django.test.TestCase):
         # test: is our lovely fake project there?
         reincarnated_proj = mysite.search.models.Project.objects.get(name="karens-awesome-project")
 
+    def test_not_explode_when_user_has_no_person(self):
+        fake_stdout = StringIO()
+        # make a User
+        django.contrib.auth.models.User.objects.create(username='x')
+        # but slyly remove the Person objects
+        Person.objects.get(user__username='x').delete()
+
+        # This tests that the dumping code is safe for use even
+        # with User objects that have no profile.
+        command = mysite.customs.management.commands.dump_public_user_data.Command()
+        command.handle(output=fake_stdout)
+
+        # Check that the output is empty
+        self.assertEqual([],
+                         simplejson.loads(fake_stdout.getvalue()))
+
     @mock.patch('mysite.customs.ohloh.Ohloh.get_icon_for_project')
     def test_dump_project_with_icon(self,fake_icon):
         fake_icon_data = open(os.path.join(
