@@ -1937,6 +1937,38 @@ class DataExport(django.test.TestCase):
         # test: is our lovely fake project there?
         reincarnated_proj = mysite.search.models.Project.objects.get(name="karens-awesome-project")
 
+    @mock.patch('mysite.customs.ohloh.Ohloh.get_icon_for_project')
+    def test_dump_project_with_icon(self,fake_icon):
+        fake_icon_data = open(os.path.join(
+            settings.MEDIA_ROOT, 'no-project-icon.png')).read()
+        fake_icon.return_value = fake_icon_data
+
+        fake_stdout = StringIO()
+        # make fake Project
+        proj = Project.create_dummy(name="karens-awesome-project",language="Python")
+        proj.populate_icon_from_ohloh()
+        proj.save()
+
+        icon_raw_path = proj.icon_raw.path
+        
+        command = mysite.customs.management.commands.dump_public_user_data.Command()
+        command.handle(output=fake_stdout)
+        import pdb; pdb.set_trace()
+        
+        # now delete fake Project...
+        proj.delete()
+        
+        # let's see if we can reincarnate it!
+        for obj in django.core.serializers.deserialize('json', fake_stdout.getvalue()):
+            obj.save()
+        
+        # test: are there ANY projects?
+        self.assertTrue(Project.objects.all())
+        # test: is our lovely fake project there?
+        reincarnated_proj = mysite.search.models.Project.objects.get(name="karens-awesome-project")
+        #self.assertEquals(icon_raw_path,
+        #reincarnated_proj.icon_raw.path)
+
     def test_dump_person(self):
         fake_stdout=StringIO()
         # make fake Person who doesn't care if people know where he is
