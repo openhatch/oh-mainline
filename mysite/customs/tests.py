@@ -273,8 +273,9 @@ class ImportFromGithub(django.test.TestCase):
         asheesh = Person.objects.get(user__username='paulproteus')
         self.dia = mysite.profile.models.DataImportAttempt.objects.create(person=asheesh, source='db', query='asheesh@asheesh.org')
         # Create the Github object to track the state.
-        self.gi = mysite.customs.profile_importers.GithubImporter(self.dia.query,
-                        self.dia.id)
+        self.gi = mysite.customs.profile_importers.GithubImporter(
+            self.dia.query,
+            self.dia.id)
     
     @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
     @mock.patch('mysite.search.tasks.PopulateProjectIconFromOhloh')
