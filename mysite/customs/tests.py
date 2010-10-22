@@ -1967,8 +1967,8 @@ class DataExport(django.test.TestCase):
         new_zuckerberg = mysite.profile.models.Person.objects.get(user__first_name="mark")
         new_munroe = mysite.profile.models.Person.objects.get(user__first_name="randall")
         
-        # check that location_confirmed wasn't dumped
-        self.assertEquals(new_zuckerberg.location_confirmed, False)
+        # check that location_confirmed was saved accurately
+        self.assertEquals(new_zuckerberg.location_confirmed, True)
         self.assertEquals(new_munroe.location_confirmed, False)
         
         # check that location_display_name is appropriate
