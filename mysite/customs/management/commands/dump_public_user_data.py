@@ -77,11 +77,14 @@ class Command(BaseCommand):
         # Save the User objects, anonymizing the email address if necessary
         all_user_objects = User.objects.all()
         for user in all_user_objects:
-            if user.get_profile().show_email:
-                pass # do not mutate the email address
-            else:
-                # anonymize email address
-                user.email = 'user_id_%d_has_hidden_email_address@example.com' % user.id
+            try:
+                if user.get_profile().show_email:
+                    pass # do not mutate the email address
+                else:
+                    # anonymize email address
+                    user.email = 'user_id_%d_has_hidden_email_address@example.com' % user.id
+            except Person.DoesNotExist:
+                pass # it is okay if the user has no prefs
         public_user_data = self.serialize_objects(query_set=all_user_objects,
                                 whitelisted_columns = ['id', 'username', 'first_name', 'last_name', 'email'])
         data.extend(public_user_data)

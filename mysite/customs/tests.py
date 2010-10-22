@@ -1944,14 +1944,19 @@ class DataExport(django.test.TestCase):
         # but slyly remove the Person objects
         Person.objects.get(user__username='x').delete()
 
-        # This tests that the dumping code is safe for use even
-        # with User objects that have no profile.
+        # do a dump...
         command = mysite.customs.management.commands.dump_public_user_data.Command()
         command.handle(output=fake_stdout)
 
-        # Check that the output is empty
-        self.assertEqual([],
-                         simplejson.loads(fake_stdout.getvalue()))
+        # delete the User
+        django.contrib.auth.models.User.objects.all().delete()
+
+        # let's see if we can reincarnate it!
+        for obj in django.core.serializers.deserialize('json', fake_stdout.getvalue()):
+            obj.save()
+
+        u = django.contrib.auth.models.User.objects.get(
+            username='x')
 
     @mock.patch('mysite.customs.ohloh.Ohloh.get_icon_for_project')
     def test_dump_project_with_icon(self,fake_icon):
