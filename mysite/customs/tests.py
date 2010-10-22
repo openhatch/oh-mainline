@@ -1953,7 +1953,6 @@ class DataExport(django.test.TestCase):
         
         command = mysite.customs.management.commands.dump_public_user_data.Command()
         command.handle(output=fake_stdout)
-        import pdb; pdb.set_trace()
         
         # now delete fake Project...
         proj.delete()
