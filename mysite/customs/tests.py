@@ -272,22 +272,37 @@ class ImportFromGithub(django.test.TestCase):
         # Create a DataImportAttempt for Asheesh
         asheesh = Person.objects.get(user__username='paulproteus')
         self.dia = mysite.profile.models.DataImportAttempt.objects.create(person=asheesh, source='db', query='asheesh@asheesh.org')
+        # Create the Github object to track the state.
+        self.gi = mysite.customs.profile_importers.GithubImporter(self.dia.query,
+                        self.dia.id)
     
     @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
     @mock.patch('mysite.search.tasks.PopulateProjectIconFromOhloh')
     def test(self, do_nothing, do_nothing_1):
-        # Create the Github object to track the state.
-        gi = mysite.customs.profile_importers.GithubImporter(self.dia.query,
-                        self.dia.id)
-
         # test that we get the URLs and clalbacks we expect
-        urls_and_callbacks = gi.getUrlsAndCallbacks()
+        urls_and_callbacks = self.gi.getUrlsAndCallbacks()
         self.assertEqual(urls_and_callbacks,
             [ {'url': 'http://github.com/api/v2/json/repos/show/asheesh%40asheesh.org',
-               'callback': gi.handleUserRepositoryJson},
+               'callback': self.gi.handleUserRepositoryJson},
               {'url': 'http://github.com/asheesh%40asheesh.org.json',
-               'callback': gi.handleUserFeedJson},
+               'callback': self.gi.handleUserFeedJson},
             ])
+
+    @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
+    @mock.patch('mysite.search.tasks.PopulateProjectIconFromOhloh')
+    def test_user_repository(self, do_nothing, do_nothing_1):
+        # Check that we make Citations as expected
+        page_contents = open(os.path.join(
+            settings.MEDIA_ROOT, 'sample-data', 'github', 'paulproteus.json')).read()
+        self.gi.handleUserRepositoryJson(page_contents)
+
+        projects = set([c.portfolio_entry.project.name for c in mysite.profile.models.Citation.objects.all()])
+        self.assertEqual(projects, set(['ccd2iso', 'liblicense', 'exempi', 'Debian GNU/Linux', 'cue2toc', 'alpine']))
+
+        {"repositories":[{"homepage":"http://jibot.tumblr.com/","pushed_at":"2008/09/19 18:52:14 -0700","created_at":"2008/09/19 18:48:03 -0700","forks":0,"has_wiki":true,"open_issues":0,"watchers":1,"fork":true,"has_issues":true,"description":"Joi Ito's #jibot (संस्कृता वाक् saṃskṛtā)","private":false,"name":"jibot","owner":"paulproteus","has_downloads":true,"url":"http://github.com/paulproteus/jibot"},{"homepage":"http://code.google.com/p/tircd/","pushed_at":"2009/12/07 19:07:08 -0800","created_at":"2009/12/07 19:03:57 -0800","forks":0,"has_wiki":true,"open_issues":0,"watchers":1,"fork":true,"has_issues":false,"description":"mirror of google code project for tircd - An ircd proxy to the twitter API.","private":false,"name":"tircd","owner":"paulproteus","has_downloads":true,"url":"http://github.com/paulproteus/tircd"},{"homepage":"","pushed_at":"2010/01/08 14:50:58 -0800","created_at":"2010/01/08 14:16:43 -0800","forks":0,"has_wiki":true,"open_issues":0,"watchers":2,"fork":true,"has_issues":false,"description":"github client in python, with issues support.","private":false,"name":"python-github2","owner":"paulproteus","has_downloads":true,"url":"http://github.com/paulproteus/python-github2"},{"homepage":"","pushed_at":"2010/04/22 19:39:12 -0700","created_at":"2010/01/24 15:46:35 -0800","forks":0,"has_wiki":false,"open_issues":0,"watchers":2,"fork":true,"has_issues":false,"description":"Assets management app for Django.","private":false,"name":"django-assets","owner":"paulproteus","has_downloads":false,"url":"http://github.com/paulproteus/django-assets"},{"homepage":"http://superjared.com/projects/static-generator/","pushed_at":"2010/04/08 22:05:52 -0700","created_at":"2010/04/08 14:05:55 -0700","forks":0,"has_wiki":true,"open_issues":0,"watchers":3,"fork":true,"has_issues":false,"description":"StaticGenerator for Django","private":false,"name":"staticgenerator","owner":"paulproteus","has_downloads":true,"url":"http://github.com/paulproteus/staticgenerator"},{"homepage":"","pushed_at":"2010/08/22 14:47:58 -0700","created_at":"2010/08/22 14:47:30 -0700","forks":0,"has_wiki":true,"open_issues":0,"watchers":1,"fork":true,"has_issues":false,"description":"Migration tool for Jabber/XMPP servers.","private":false,"name":"sleekmigrate","owner":"paulproteus","has_downloads":true,"url":"http://github.com/paulproteus/sleekmigrate"}]}
+{"repositories":[{"homepage":"http://jibot.tumblr.com/","pushed_at":"2008/09/19 18:52:14 -0700","created_at":"2008/09/19 18:48:03 -0700","forks":0,"has_wiki":true,"open_issues":0,"watchers":1,"fork":true,"has_issues":true,"description":"Joi Ito's #jibot (संस्कृता वाक् saṃskṛtā)","private":false,"name":"jibot","owner":"paulproteus","has_downloads":true,"url":"http://github.com/paulproteus/jibot"},{"homepage":"http://code.google.com/p/tircd/","pushed_at":"2009/12/07 19:07:08 -0800","created_at":"2009/12/07 19:03:57 -0800","forks":0,"has_wiki":true,"open_issues":0,"watchers":1,"fork":true,"has_issues":false,"description":"mirror of google code project for tircd - An ircd proxy to the twitter API.","private":false,"name":"tircd","owner":"paulproteus","has_downloads":true,"url":"http://github.com/paulproteus/tircd"},{"homepage":"","pushed_at":"2010/01/08 14:50:58 -0800","created_at":"2010/01/08 14:16:43 -0800","forks":0,"has_wiki":true,"open_issues":0,"watchers":2,"fork":true,"has_issues":false,"description":"github client in python, with issues support.","private":false,"name":"python-github2","owner":"paulproteus","has_downloads":true,"url":"http://github.com/paulproteus/python-github2"},{"homepage":"","pushed_at":"2010/04/22 19:39:12 -0700","created_at":"2010/01/24 15:46:35 -0800","forks":0,"has_wiki":false,"open_issues":0,"watchers":2,"fork":true,"has_issues":false,"description":"Assets management app for Django.","private":false,"name":"django-assets","owner":"paulproteus","has_downloads":false,"url":"http://github.com/paulproteus/django-assets"},{"homepage":"http://superjared.com/projects/static-generator/","pushed_at":"2010/04/08 22:05:52 -0700","created_at":"2010/04/08 14:05:55 -0700","forks":0,"has_wiki":true,"open_issues":0,"watchers":3,"fork":true,"has_issues":false,"description":"StaticGenerator for Django","private":false,"name":"staticgenerator","owner":"paulproteus","has_downloads":true,"url":"http://github.com/paulproteus/staticgenerator"},{"homepage":"","pushed_at":"2010/08/22 14:47:58 -0700","created_at":"2010/08/22 14:47:30 -0700","forks":0,"has_wiki":true,"open_issues":0,"watchers":1,"fork":true,"has_issues":false,"description":"Migration tool for Jabber/XMPP servers.","private":false,"name":"sleekmigrate","owner":"paulproteus","has_downloads":true,"url":"http://github.com/paulproteus/sleekmigrate"}]}
+
+        
 
 class ImportFromDebianQA(django.test.TestCase):
     fixtures = ['user-paulproteus', 'person-paulproteus']
