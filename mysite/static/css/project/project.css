@@ -109,5 +109,4 @@ body#edit_project .tab_nav li:last-child { margin-right: 0; border-right: 0; }
 body#edit_project .tab_nav li a { font-size: 1.2em; line-height: 1.2em; display: block; margin-bottom: .3em; }
 body#edit_project .tab { float: left; width: 100%; padding-top: 10px; }
 
-body#project span { word-wrap: break-
-word;}
+body#project span { word-wrap: break-word;}
