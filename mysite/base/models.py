@@ -7,7 +7,7 @@ class Timestamp(models.Model):
     # "get_timestamp_for_string" and if there is no timestamp for that string,
     # you'll get Jan 1, 1970 0:00 UTC.
     key = models.CharField(null=False, blank=False, unique=True, max_length=255)
-    timestamp = models.DateTimeField(auto_now_add=True)
+    timestamp = models.DateTimeField(null=False)
 
     # Class attribute
     ZERO_O_CLOCK = datetime.datetime.fromtimestamp(0)
