@@ -5,6 +5,7 @@ import urllib2
 import mysite.customs.ohloh
 import cStringIO as StringIO
 import re
+import simplejson
 import datetime
 
 import mysite.search.models
@@ -26,12 +27,64 @@ class GithubImporter(ProfileImporter):
         self.query = query
         self.dia_id = dia_id
 
+    # This method takes a repository dict as returned by Github
+    # and creates a Citation, also creating the relevant
+    # PortfolioEntry if necessary.
+    def addCitationFromRepoDict(self, repo_dict, override_contrib=None):
+        # Get the DIA whose ID we stored
+        dia = mysite.profile.models.DataImportAttempt.objects.get(id=self.dia_id)
+        person = dia.person
+
+        # Get or create a project by this name
+        (project, _) = mysite.search.models.Project.objects.get_or_create(
+            name=repo_dict['name'])
+
+        # Look and see if we have a PortfolioEntry. If not, create
+        # one.
+        if mysite.profile.models.PortfolioEntry.objects.filter(person=person, project=project).count() == 0:
+            portfolio_entry = mysite.profile.models.PortfolioEntry(person=person,
+                                             project=project,
+                                             project_description=repo_dict['description'] or '')
+            portfolio_entry.save()
+
+        # Either way, it is now safe to get it.
+        portfolio_entry = mysite.profile.models.PortfolioEntry.objects.filter(person=person, project=project)[0]
+
+        citation = mysite.profile.models.Citation()
+        citation.languages = "" # FIXME ", ".join(result['languages'])
+
+        # Fill out the "contributor role", either by data we got
+        # from the network, or by special arguments to this
+        # function.
+        if repo_dict['fork']:
+            citation.contributor_role = 'Forked'
+        else:
+            citation.contributor_role = 'Started'
+        if override_contrib:
+            citation.contributor_role = override_contrib
+        citation.portfolio_entry = portfolio_entry
+        citation.data_import_attempt = dia
+        citation.url = 'http://github.com/%s/%s/' % (urllib.quote_plus(repo_dict['owner']),
+                                                     urllib.quote_plus(repo_dict['name']))
+        citation.save_and_check_for_duplicates()
+
     def handleUserRepositoryJson(self, json_string):
         data = simplejson.loads(json_string)
-        import pdb
-        pdb.set_trace()
-        ## we think:
-        ## return data ... but what then?
+        repos = data['repositories']
+        # for every repository, we need to get its primary
+        # programming language. FIXME.
+        # For now we skip that.
+        for repo in repos:
+            self.addCitationFromRepoDict(repo)
+
+        dia = mysite.profile.models.DataImportAttempt.objects.get(id=self.dia_id)
+        person = dia.person
+
+        person.last_polled = datetime.datetime.now()
+        person.save()
+
+        dia.completed = True
+        dia.save()
 
     def getUrlsAndCallbacks(self):
         urls_and_callbacks = []
