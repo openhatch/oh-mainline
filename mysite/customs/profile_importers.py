@@ -100,7 +100,7 @@ class GithubImporter(ProfileImporter):
         this_one = {}
         this_one['url'] = ('http://github.com/%s.json' %
             mysite.base.unicode_sanity.quote(self.query))
-        this_one['callback'] = self.handleUserFeedJson
+        this_one['callback'] = self.handleUserActivityFeedJson
         urls_and_callbacks.append(this_one)
 
         # Another is look at the watched list for repos the user collaborates on
@@ -108,7 +108,8 @@ class GithubImporter(ProfileImporter):
 
         return urls_and_callbacks
 
-    def handleUserFeedJson(self, json_string):
+    def handleUserActivityFeedJson(self, json_string):
+        dia = mysite.profile.models.DataImportAttempt.objects.get(id=self.dia_id)
         # first, decode it
         data = simplejson.loads(json_string)
 
@@ -117,13 +118,23 @@ class GithubImporter(ProfileImporter):
         repo_urls_found = set()
 
         for event in data:
+            repo = event['repository']
+            # Find "collaborated on..."
             if event['type'] == 'PushEvent':
-                repo = event['repository']
-                if repo['url'] not in repo_urls_found:
-                    if repo['owner'] == github_username:
-                        continue # skip the ones owned by this user
-                repo_urls_found.add(repo['url']) # avoid sending out duplicates
-                yield mysite.base.helpers.ObjectFromDict(repo)
+                if repo['owner'] != self.query:
+                    ## In that case, we need to find out if the given user is in the list of collaborats
+                    ## for the repository. Normally I would call out to a different URL, but I'm supposed to
+                    ## not block.
+                    ## FIXME: return a Deferred I guess.
+                    continue # skip the event for now
+            # Find "forked..."
+            elif event['type'] == 'ForkEvent':
+                if repo['owner'] != self.query:
+                    self.addCitationFromRepoDict(repo, override_contrib='Collaborated on')
+            elif event['type'] == 'WatchEvent':
+                continue # Skip this event.
+            else:
+                logging.info("Found unknown event type.")
 
 ### This section imports package lists from qa.debian.org
 
