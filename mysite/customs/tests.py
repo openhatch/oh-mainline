@@ -268,30 +268,53 @@ class OhlohIconTests(django.test.TestCase):
 class ImportFromGithub(django.test.TestCase):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
+    def __init__(self, *args, **kwargs):
+        django.test.TestCase.__init__(self, *args, **kwargs)
+        # Track a mapping from Github URLs to test data
+        self.url2data = {}
+        self.url2data['http://github.com/api/v2/json/repos/show/paulproteus'] = open(os.path.join(
+            settings.MEDIA_ROOT, 'sample-data', 'github', 'json-repos-show-paulproteus.json')).read()
+
     def setUp(self):
         # Create a DataImportAttempt for Asheesh
         asheesh = Person.objects.get(user__username='paulproteus')
-        self.dia = mysite.profile.models.DataImportAttempt.objects.create(person=asheesh, source='db', query='asheesh@asheesh.org')
+        self.dia = mysite.profile.models.DataImportAttempt.objects.create(person=asheesh, source='db', query='paulproteus')
         # Create the Github object to track the state.
         self.gi = mysite.customs.profile_importers.GithubImporter(
             self.dia.query,
             self.dia.id)
-    
-    @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
-    @mock.patch('mysite.search.tasks.PopulateProjectIconFromOhloh')
-    def test(self, do_nothing, do_nothing_1):
-        # test that we get the URLs and clalbacks we expect
-        urls_and_callbacks = self.gi.getUrlsAndCallbacks()
-        self.assertEqual(urls_and_callbacks,
-            [ {'url': 'http://github.com/api/v2/json/repos/show/asheesh%40asheesh.org',
-               'callback': self.gi.handleUserRepositoryJson},
-              {'url': 'http://github.com/asheesh%40asheesh.org.json',
-               'callback': self.gi.handleUserFeedJson},
-            ])
 
     @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
     @mock.patch('mysite.search.tasks.PopulateProjectIconFromOhloh')
-    def test_user_repository(self, do_nothing, do_nothing_1):
+    def test_json_repos_show(self, do_nothing, do_nothing_1):
+        # Check that the callbacks list this method as one worth executing
+        urls_and_callbacks = self.gi.getUrlsAndCallbacks()
+        URL = 'http://github.com/api/v2/json/repos/show/paulproteus'
+        self.assert_(
+            {'url': URL,
+             'callback': self.gi.handleUserRepositoryJson} in urls_and_callbacks)
+
+        # Simulate the GET, and pass the data to the callback
+        page_contents = self.url2data[URL]
+        self.gi.handleUserRepositoryJson(page_contents)
+
+        # Check that we make Citations as expected
+        projects = set([c.portfolio_entry.project.name for c in mysite.profile.models.Citation.objects.all()])
+        expected = set([u'sleekmigrate', u'staticgenerator', u'tircd', u'python-github2', u'django-assets', u'jibot'])
+        self.assertEqual(expected, projects)
+
+    @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
+    @mock.patch('mysite.search.tasks.PopulateProjectIconFromOhloh')
+    def test_create_citations_from_activity_feed(self, do_nothing, do_nothing_1):
+        # Check that we make Citations as expected
+        page_contents = open(os.path.join(
+            settings.MEDIA_ROOT, 'sample-data', 'github', 'paulproteus-activity-feed.json')).read()
+        self.gi.handleUserActivityFeedJson(page_contents)
+        
+
+    @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
+    @mock.patch('mysite.search.tasks.PopulateProjectIconFromOhloh')
+    def test_import_from_watched_repositories(self, do_nothing, do_nothing_):
         # Check that we make Citations as expected
         page_contents = open(os.path.join(
             settings.MEDIA_ROOT, 'sample-data', 'github', 'paulproteus.json')).read()
