@@ -16,3 +16,6 @@ TEMPFILE="$(mktemp --suffix -snapshot.json.gz)"
 
 ## push this somewhere so that we save it
 rsync -q "$TEMPFILE" inside@inside.openhatch.org:/var/web/inside.openhatch.org/snapshots/$(date -I).json.gz
+
+## finally, delete the local temporary file.
+rm "$TEMPFILE"
