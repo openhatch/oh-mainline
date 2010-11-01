@@ -199,7 +199,7 @@ To run the tests in the `customs` app:
 
 Run these commands:
 
-    cd milestone-a # Make sure you're in this directory. I'm not sure if it will work elsewhere.
+    cd oh-mainline # Make sure you're in this directory. I'm not sure if it will work elsewhere.
     python bootstrap.py
     bin/buildout -o # The o flag is for "offline", so you don't hit the network looking for dependencies
 
@@ -247,7 +247,7 @@ Steps:
 
 ### Initialize its index ###
 
-Start in milestone-a, then run this command:
+Start in oh-mainline, then run this command:
 
     bin/mysite rebuild_index
 
