@@ -68,33 +68,37 @@ You'll download a whole bunch of Python code and run other setup tasks. This is 
 
 ### Set up the database ###
 
-1. Make sure you know how to connect to MySQL. Generally, to create a database, you have to be root. You can use the command `mysql -u root -p`, then type your MySQL root password. This will open a mysql session. ^C out of it to continue.
+As background:
 
-2. Run the database creation script.
+Make sure you know how to connect to MySQL. Generally, to create a database, you have to be root. You can 
+use the command `mysql -u root -p`, then type your MySQL root password. This will open a mysql session. To
+exit, type "exit" and press enter.
+
+1. Run the database creation script.
 
     mysql -uroot -p < mysite/scripts/database_01_create.sql
 
 (If you want to know what it does, read the file!)
 
-3. Run the user setup script. This one sets up permissions in MySQL.
+2. Run the user setup script. This one sets up permissions in MySQL.
 
     mysql -uroot -p < mysite/scripts/database_02_users.sql
 
 (A note: If you ever decide you want to drop the database, just send "DROP DATABASE oh_milestone_a" to MySQL, then re-run the database creation script. You do not have to recreate the users.)
 
-4. Exit from MySQL, and run this command, again from the top level directory:
+3. Exit from MySQL, and run this command, again from the top level directory:
 
     ./bin/mysite syncdb
 
 To the question, "Do you want to create a superuser?", answer "No". That's because you haven't run the migrations for the "profile" app yet. (If you hit "Yes", everything will explode, and you'll need to delete "oh_milestone_a" and re-create your database.)
 
-5. Run the "migrations" to migrate your database from the empty state into the state it should be in.
+4. Run the "migrations" to migrate your database from the empty state into the state it should be in.
 
     ./bin/mysite migrate
 
 There's a note about troubleshooting migrations below.
 
-6. You're done! The OpenHatch code will now run, and you make modifications.
+5. You're done! The OpenHatch code will now run, and you make modifications.
 
 If you want to grab a copy of the data used on openhatch.org, and you have permission to do so (hint: probably not), you can get the current data and files. Run:
 
