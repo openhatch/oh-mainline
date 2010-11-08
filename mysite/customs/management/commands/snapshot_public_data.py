@@ -74,6 +74,14 @@ class Command(BaseCommand):
 
         data = []
 
+        # location_confirmed should be hidden -- that's private data
+        # location_display_name should be set to the result of Person.get_public_location_or_default()
+        everyone = Person.objects.all()
+        for dude in everyone:
+            dude.location_display_name = dude.get_public_location_or_default()
+        public_person_data = self.serialize_all_objects(query_set=everyone)
+        data.extend(public_person_data)
+
         # Save the User objects, anonymizing the email address if necessary
         all_user_objects = User.objects.all()
         for user in all_user_objects:
@@ -89,14 +97,6 @@ class Command(BaseCommand):
                                 whitelisted_columns = ['id', 'username', 'first_name', 'last_name', 'email'])
         data.extend(public_user_data)
 
-        # location_confirmed should be hidden -- that's private data
-        # location_display_name should be set to the result of Person.get_public_location_or_default()
-        everyone = Person.objects.all()
-        for dude in everyone:
-            dude.location_display_name = dude.get_public_location_or_default()
-        public_person_data = self.serialize_all_objects(query_set=everyone)
-        data.extend(public_person_data)
-        
         # exporting Project data
         public_project_data = self.serialize_objects_except(
             query_set=Project.objects.all(),
