@@ -48,7 +48,7 @@ import mysite.customs.bugtrackers.roundup
 import mysite.customs.bugtrackers.launchpad
 import mysite.customs.lp_grabber
 import mysite.customs.management.commands.customs_daily_tasks
-import mysite.customs.management.commands.dump_public_user_data
+import mysite.customs.management.commands.snapshot_public_data
 # }}}
 
 # Mocked out browser.open
@@ -834,8 +834,8 @@ class MercurialRoundupGrab(django.test.TestCase):
         self.test_scrape_bug_status_and_mark_as_closed(should_do_something=True,
                                                        should_use_urlopen=True)
 
-sample_launchpad_data_dump = mock.Mock()
-sample_launchpad_data_dump.return_value = [dict(
+sample_launchpad_data_snapshot = mock.Mock()
+sample_launchpad_data_snapshot.return_value = [dict(
         url=u'', project=u'rose.makesad.us', text=u'', status=u'',
         importance=u'low', reporter={u'lplogin': 'a',
                                     'realname': 'b'},
@@ -844,8 +844,8 @@ sample_launchpad_data_dump.return_value = [dict(
         title="Joi's Lab AFS",)]
 
 class AutoCrawlTests(django.test.TestCase):
-    @mock.patch('mysite.customs.bugtrackers.launchpad.dump_data_from_project', 
-                sample_launchpad_data_dump)
+    @mock.patch('mysite.customs.bugtrackers.launchpad.snapshot_data_from_project', 
+                sample_launchpad_data_snapshot)
     @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
     def testSearch(self, do_nothing):
         # Verify that we can't find a bug with the right description
@@ -1794,8 +1794,8 @@ I don't see for example the solvers module""",
         self.assertEqual(wanted, got)
 
 class DataExport(django.test.TestCase):
-    def test_dump_user_table_without_passwords(self):
-        # We'll pretend we're running the dump_public_user_data management command. But
+    def test_snapshot_user_table_without_passwords(self):
+        # We'll pretend we're running the snapshot_public_data management command. But
         # to avoid JSON data being splatted all over stdout, we create a fake_stdout to
         # capture that data.
         fake_stdout = StringIO()
@@ -1806,14 +1806,15 @@ class DataExport(django.test.TestCase):
         u.set_password('something_secret')
         u.save()
 
-        # Dump the public version of that user's data into fake stdout
-        command = mysite.customs.management.commands.dump_public_user_data.Command()
+        # snapshot the public version of that user's data into fake stdout
+        command = mysite.customs.management.commands.snapshot_public_data.Command()
         command.handle(output=fake_stdout)
 
         # Now, delete the user and see if we can reimport bob
         u.delete()
+        mysite.profile.models.Person.objects.all().delete() # Delete any leftover Persons too
 
-        ## This code re-imports from the dump.
+        ## This code re-imports from the snapshot.
         # for more in serializers.deserialize(), read http://docs.djangoproject.com/en/dev/topics/serialization
         for obj in django.core.serializers.deserialize('json', fake_stdout.getvalue()):
             obj.save()
@@ -1824,8 +1825,8 @@ class DataExport(django.test.TestCase):
         # and the user's password is blank (instead of the real password)
         self.assertEquals(new_u.password, '')
 
-    def test_dump_user_table_without_all_email_addresses(self):
-        # We'll pretend we're running the dump_public_user_data management command. But
+    def test_snapshot_user_table_without_all_email_addresses(self):
+        # We'll pretend we're running the snapshot_public_data management command. But
         # to avoid JSON data being splatted all over stdout, we create a fake_stdout to
         # capture that data.
         fake_stdout = StringIO()
@@ -1838,15 +1839,15 @@ class DataExport(django.test.TestCase):
         u2 = django.contrib.auth.models.User.objects.create(username='publicguy', email='public@example.com')
         p2 = Person.create_dummy(user=u2, show_email=True)
 
-        # Dump the public version of the data into fake stdout
-        command = mysite.customs.management.commands.dump_public_user_data.Command()
+        # snapshot the public version of the data into fake stdout
+        command = mysite.customs.management.commands.snapshot_public_data.Command()
         command.handle(output=fake_stdout)
 
         # Now, delete the them all and see if they come back
         django.contrib.auth.models.User.objects.all().delete()
         Person.objects.all().delete()
 
-        ## This code re-imports from the dump.
+        ## This code re-imports from the snapshot.
         # for more in serializers.deserialize(), read http://docs.djangoproject.com/en/dev/topics/serialization
         for obj in django.core.serializers.deserialize('json', fake_stdout.getvalue()):
             obj.save()
@@ -1861,7 +1862,7 @@ class DataExport(django.test.TestCase):
         new_p2 = Person.objects.get(user__username='publicguy')
         self.assertEquals(new_p2.user.email, 'public@example.com')
 
-    def test_dump_bug(self):
+    def test_snapshot_bug(self):
 		# data capture, woo
 		fake_stdout = StringIO()
 		# make fake bug
@@ -1869,8 +1870,8 @@ class DataExport(django.test.TestCase):
 		b.title = 'fire-ant'
 		b.save()
 		
-		# dump fake bug into fake stdout
-		command = mysite.customs.management.commands.dump_public_user_data.Command()
+		# snapshot fake bug into fake stdout
+		command = mysite.customs.management.commands.snapshot_public_data.Command()
 		command.handle(output=fake_stdout)
 		
 		#now, delete bug...
@@ -1885,7 +1886,7 @@ class DataExport(django.test.TestCase):
 		# testing to see if fire-ant is there
 		reincarnated_b = mysite.search.models.Bug.all_bugs.get(title='fire-ant')
 		
-    def test_dump_timestamp(self):
+    def test_snapshot_timestamp(self):
         # data capture, woo
         fake_stdout = StringIO()
 
@@ -1899,8 +1900,8 @@ class DataExport(django.test.TestCase):
         t.timestamp = TIMESTAMP_DATE_TO_USE
         t.save()
         
-        # dump fake timestamp into fake stdout
-        command = mysite.customs.management.commands.dump_public_user_data.Command()
+        # snapshot fake timestamp into fake stdout
+        command = mysite.customs.management.commands.snapshot_public_data.Command()
         command.handle(output=fake_stdout)
         
         #now, delete the timestamp...
@@ -1917,12 +1918,12 @@ class DataExport(django.test.TestCase):
         self.assertEquals(reincarnated_t.timestamp, TIMESTAMP_DATE_TO_USE)
 
     @mock.patch('mysite.search.tasks.PopulateProjectIconFromOhloh')
-    def test_dump_project(self,fake_icon):
+    def test_snapshot_project(self,fake_icon):
         fake_stdout = StringIO()
         # make fake Project
         proj = Project.create_dummy_no_icon(name="karens-awesome-project",language="Python")
         
-        command = mysite.customs.management.commands.dump_public_user_data.Command()
+        command = mysite.customs.management.commands.snapshot_public_data.Command()
         command.handle(output=fake_stdout)
         
         # now delete fake Project...
@@ -1944,8 +1945,8 @@ class DataExport(django.test.TestCase):
         # but slyly remove the Person objects
         Person.objects.get(user__username='x').delete()
 
-        # do a dump...
-        command = mysite.customs.management.commands.dump_public_user_data.Command()
+        # do a snapshot...
+        command = mysite.customs.management.commands.snapshot_public_data.Command()
         command.handle(output=fake_stdout)
 
         # delete the User
@@ -1959,7 +1960,7 @@ class DataExport(django.test.TestCase):
             username='x')
 
     @mock.patch('mysite.customs.ohloh.Ohloh.get_icon_for_project')
-    def test_dump_project_with_icon(self,fake_icon):
+    def test_snapshot_project_with_icon(self,fake_icon):
         fake_icon_data = open(os.path.join(
             settings.MEDIA_ROOT, 'no-project-icon.png')).read()
         fake_icon.return_value = fake_icon_data
@@ -1972,7 +1973,7 @@ class DataExport(django.test.TestCase):
 
         icon_raw_path = proj.icon_raw.path
         
-        command = mysite.customs.management.commands.dump_public_user_data.Command()
+        command = mysite.customs.management.commands.snapshot_public_data.Command()
         command.handle(output=fake_stdout)
         
         # now delete fake Project...
@@ -1989,7 +1990,7 @@ class DataExport(django.test.TestCase):
         #self.assertEquals(icon_raw_path,
         #reincarnated_proj.icon_raw.path)
 
-    def test_dump_person(self):
+    def test_snapshot_person(self):
         fake_stdout=StringIO()
         # make fake Person who doesn't care if people know where he is
         zuckerberg = Person.create_dummy(first_name="mark",location_confirmed = True, location_display_name='Palo Alto')
@@ -1999,7 +2000,7 @@ class DataExport(django.test.TestCase):
         munroe = Person.create_dummy(first_name="randall",location_confirmed = False, location_display_name='Cambridge')
         self.assertEquals(munroe.get_public_location_or_default(), 'Inaccessible Island')
         
-        command = mysite.customs.management.commands.dump_public_user_data.Command()
+        command = mysite.customs.management.commands.snapshot_public_data.Command()
         command.handle(output=fake_stdout)
         
         # now, delete fake people
@@ -2012,7 +2013,7 @@ class DataExport(django.test.TestCase):
         for obj in django.core.serializers.deserialize('json', fake_stdout.getvalue()):
             obj.save()
         
-        # did we dump/save ANY Persons?
+        # did we snapshot/save ANY Persons?
         self.assertTrue(Person.objects.all())
         
         # did our fake Persons get saved?
