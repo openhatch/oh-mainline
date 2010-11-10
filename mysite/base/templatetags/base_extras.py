@@ -185,7 +185,10 @@ def version(path_string):
             if path_string in version_cache:
                 mtime = version_cache[path_string]
             else:
-                mtime = os.path.getmtime('%s%s' % (settings.MEDIA_ROOT_BEFORE_STATIC, path_string,))
+                try:
+                    mtime = os.path.getmtime('%s%s' % (settings.MEDIA_ROOT_BEFORE_STATIC, path_string,))
+                except (OSError, IOError):
+                    mtime = 0
                 version_cache[path_string] = mtime
                 if settings.WHAT_SORT_OF_IMAGE_CACHE_BUSTING == 'filename':
                     rx = re.compile(r"^(.*)\.(.*?)$")
