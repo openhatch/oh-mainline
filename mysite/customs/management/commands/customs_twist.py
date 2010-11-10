@@ -9,7 +9,7 @@ class Command(BaseCommand):
     help = "Call this when you want to run a Twisted reactor."
 
     def create_tasks_from_dias(self):
-        print 'For all Debian QA dias, enqueue them.'
+        print 'For all DIAs we know how to process with Twisted: enqueue them.'
         for dia in mysite.profile.models.DataImportAttempt.objects.filter(completed=False):
             if dia.source in mysite.customs.profile_importers.SOURCE_TO_CLASS:
                 cls = mysite.customs.profile_importers.SOURCE_TO_CLASS[dia.source]
