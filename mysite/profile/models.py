@@ -168,7 +168,7 @@ class Person(models.Model):
     def get_photo_url_or_default(self):
         try:
             return self.photo.url
-        except ValueError:
+        except (IOError, ValueError):
             return '/static/images/profile-photos/penguin.png'
 
     @staticmethod
@@ -191,43 +191,43 @@ class Person(models.Model):
     def get_photo_thumbnail_url_or_default(self):
         try:
             return self.photo_thumbnail.url
-        except ValueError:
+        except (IOError, ValueError):
             return '/static/images/profile-photos/penguin-40px.png'
 
     def get_photo_thumbnail_width(self):
         try:
             return self.photo_thumbnail.width
-        except ValueError:
+        except (IOError, ValueError):
             return 40
 
     def get_photo_thumbnail_height(self):
         try:
             return self.photo_thumbnail.height
-        except ValueError:
+        except (IOError, ValueError):
             return 51
 
     def get_photo_thumbnail_30px_wide_url_or_default(self):
         try:
             return self.photo_thumbnail_30px_wide.url
-        except ValueError:
+        except (IOError, ValueError):
             return '/static/images/profile-photos/penguin-30px.png'
 
     def get_photo_thumbnail_20px_wide_url_or_default(self):
         try:
             return self.photo_thumbnail_20px_wide.url
-        except ValueError:
+        except (IOError, ValueError):
             return '/static/images/profile-photos/penguin-20px.png'
 
     def get_photo_thumbnail_width_20px(self):
         try:
             return self.photo_thumbnail_20px_wide.width
-        except ValueError:
+        except (IOError, ValueError):
             return 20
 
     def get_photo_thumbnail_height_20px(self):
         try:
             return self.photo_thumbnail_20px_wide.height
-        except ValueError:
+        except (IOError, ValueError):
             return 20
 
     def get_published_portfolio_entries(self):
