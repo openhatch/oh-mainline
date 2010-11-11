@@ -349,6 +349,24 @@ class ImportFromGithub(django.test.TestCase):
         # Check that we make Citations as expected
         # FIXME -- the test isn't clear to me
 
+    @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
+    @mock.patch('mysite.search.tasks.PopulateProjectIconFromOhloh')
+    @mock.patch('twisted.web.client.getPage', fakeGetPage)
+    def test_asheesh_dia_integration(self, do_nothing, do_nothing_also):
+        # Create a DataImportAttempt for Asheesh
+        asheesh = Person.objects.get(user__username='paulproteus')
+        dia = mysite.profile.models.DataImportAttempt.objects.create(person=asheesh, source='gh', query='asheesh@asheesh.org')
+        cmd = mysite.customs.management.commands.customs_twist.Command()
+        cmd.handle()
+
+        # And now, the dia should be completed.
+        dia = mysite.profile.models.DataImportAttempt.objects.get(person=asheesh, source='gh', query='asheesh@asheesh.org')
+        self.assertTrue(dia.completed)
+
+        # And Asheesh should have some new projects available.
+        projects = set([c.portfolio_entry.project.name for c in mysite.profile.models.Citation.objects.all()])
+        self.assertEqual(projects, set(['ccd2iso', 'liblicense', 'exempi', 'Debian GNU/Linux', 'cue2toc', 'alpine']))
+
 class ImportFromDebianQA(django.test.TestCase):
     fixtures = ['user-paulproteus', 'person-paulproteus']
     
