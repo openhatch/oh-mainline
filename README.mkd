@@ -74,35 +74,31 @@ Make sure you know how to connect to MySQL. Generally, to create a database, you
 use the command `mysql -u root -p`, then type your MySQL root password. This will open a mysql session. To
 exit, type "exit" and press enter.
 
-1. Run the database creation script.
+1. Run the database creation script. (This also sets up permissions within MySQL.)
 
     mysql -uroot -p < mysite/scripts/database_01_create.sql
 
-(If you want to know what it does, read the file!)
-
-2. Run the user setup script. This one sets up permissions in MySQL.
-
-    mysql -uroot -p < mysite/scripts/database_02_users.sql
+If you want to know what it does, read the file. It is reasonably well-commented.
 
 (A note: If you ever decide you want to drop the database, just send "DROP DATABASE oh_milestone_a" to MySQL, then re-run the database creation script. You do not have to recreate the users.)
 
-3. Exit from MySQL, and run this command, again from the top level directory:
+2. Exit from MySQL, and run this command, again from the top level directory:
 
     ./bin/mysite syncdb
 
 To the question, "Do you want to create a superuser?", answer "No". That's because you haven't run the migrations for the "profile" app yet. (If you hit "Yes", everything will explode, and you'll need to delete "oh_milestone_a" and re-create your database.)
 
-4. Run the "migrations" to migrate your database from the empty state into the state it should be in.
+3. Run the "migrations" to migrate your database from the empty state into the state it should be in.
 
     ./bin/mysite migrate
 
 There's a note about troubleshooting migrations below.
 
-5. You're done! The OpenHatch code will now run, and you make modifications.
+4. You're done! The OpenHatch code will now run, and you make modifications.
 
-If you want to grab a copy of the data used on openhatch.org, and you have permission to do so (hint: probably not), you can get the current data and files. Run:
-
-    scripts/get_data_and_images
+Now is a good time to import a data snapshot, if you want. See
+https://openhatch.org/wiki/Importing_a_data_snapshot for more information about
+that.
 
 ### Run the server ###
 
