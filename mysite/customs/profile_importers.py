@@ -274,5 +274,6 @@ class DebianQA(ProfileImporter):
 
 SOURCE_TO_CLASS = {
     'db': DebianQA,
+    'gh': GithubImporter,
 }
 
