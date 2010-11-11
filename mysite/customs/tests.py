@@ -37,6 +37,8 @@ import ohloh
 import lp_grabber
 import gdata.client
 
+import twisted.internet.defer
+
 from mysite.profile.tasks import FetchPersonDataFromOhloh
 import mysite.customs.profile_importers
 import mysite.customs.cia
@@ -48,8 +50,32 @@ import mysite.customs.bugtrackers.roundup
 import mysite.customs.bugtrackers.launchpad
 import mysite.customs.lp_grabber
 import mysite.customs.management.commands.customs_daily_tasks
+import mysite.customs.management.commands.customs_twist
 import mysite.customs.management.commands.snapshot_public_data
 # }}}
+
+class FakeGetPage(object):
+    '''In this function, we define the fake URLs we know about, and where
+    the saved data is.'''
+    def __init__(self):
+        self.url2data = {}
+        self.url2data['http://qa.debian.org/developer.php?login=asheesh%40asheesh.org'] = open(os.path.join(
+            settings.MEDIA_ROOT, 'sample-data', 'debianqa-asheesh.html')).read()
+
+    """This is a fake version of Twisted.web's getPage() function.
+    It returns a Deferred that is already 'fired', and has the page content
+    passed into it already.
+
+    It never adds the Deferred to the 'reactor', so calling reactor.start()
+    should be a no-op."""
+    def getPage(self, url):
+        d = twisted.internet.defer.Deferred()
+        # FIXME: One day, support errback.
+        d.callback(self.url2data[url])
+        return d
+
+# Create a module-level global that is the fake getPage
+fakeGetPage = FakeGetPage().getPage
 
 # Mocked out browser.open
 open_causes_404 = mock.Mock()
@@ -328,7 +354,7 @@ class ImportFromDebianQA(django.test.TestCase):
     
     @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
     @mock.patch('mysite.search.tasks.PopulateProjectIconFromOhloh')
-    def test_asheesh(self, do_nothing, do_nothing_also):
+    def test_asheesh_unit(self, do_nothing, do_nothing_also):
         # Create a DataImportAttempt for Asheesh
         asheesh = Person.objects.get(user__username='paulproteus')
         dia = mysite.profile.models.DataImportAttempt.objects.create(person=asheesh, source='db', query='asheesh@asheesh.org')
@@ -349,6 +375,24 @@ class ImportFromDebianQA(django.test.TestCase):
             settings.MEDIA_ROOT, 'sample-data', 'debianqa-asheesh.html')).read()
         dqa.handlePageContents(page_contents)
 
+        projects = set([c.portfolio_entry.project.name for c in mysite.profile.models.Citation.objects.all()])
+        self.assertEqual(projects, set(['ccd2iso', 'liblicense', 'exempi', 'Debian GNU/Linux', 'cue2toc', 'alpine']))
+
+    @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
+    @mock.patch('mysite.search.tasks.PopulateProjectIconFromOhloh')
+    @mock.patch('twisted.web.client.getPage', fakeGetPage)
+    def test_asheesh_integration(self, do_nothing, do_nothing_also):
+        # Create a DataImportAttempt for Asheesh
+        asheesh = Person.objects.get(user__username='paulproteus')
+        dia = mysite.profile.models.DataImportAttempt.objects.create(person=asheesh, source='db', query='asheesh@asheesh.org')
+        cmd = mysite.customs.management.commands.customs_twist.Command()
+        cmd.handle()
+
+        # And now, the dia should be completed.
+        dia = mysite.profile.models.DataImportAttempt.objects.get(person=asheesh, source='db', query='asheesh@asheesh.org')
+        self.assertTrue(dia.completed)
+
+        # And Asheesh should have some new projects available.
         projects = set([c.portfolio_entry.project.name for c in mysite.profile.models.Citation.objects.all()])
         self.assertEqual(projects, set(['ccd2iso', 'liblicense', 'exempi', 'Debian GNU/Linux', 'cue2toc', 'alpine']))
 

@@ -9,6 +9,10 @@ import mysite.profile.models
 class Command(BaseCommand):
     help = "Call this when you want to run a Twisted reactor."
 
+    def __init__(self, *args, **kwargs):
+        BaseCommand.__init__(self, *args, **kwargs)
+        self.keep_reacting = True
+
     def create_tasks_from_dias(self):
         print 'For all DIAs we know how to process with Twisted: enqueue them.'
         deferreds_we_created = []
@@ -37,18 +41,21 @@ class Command(BaseCommand):
             deferreds_created.append(d)
         return deferreds_created
 
+    def stop_the_reactor(self, *args):
+        self.keep_reacting = False
+
     def enqueue_reactor_death(self, deferreds):
         dl = defer.DeferredList(deferreds)
-        dl.addCallback(lambda x: reactor.stop())
+        dl.addCallback(self.stop_the_reactor)
 
     def handle(self, *args, **options):
         print "Creating getPage()-based deferreds..."
         created_deferreds = self.create_tasks_from_dias()
-        if created_deferreds:
-            print "Creating a DeferredList that, when all those are done, will quit the reactor..."
-            self.enqueue_reactor_death(created_deferreds)
+        print "Creating a DeferredList that, when all those are done, will quit the reactor..."
+        self.enqueue_reactor_death(created_deferreds)
+        if self.keep_reacting:
             print 'Starting Reactor...'
             reactor.run()
             print '...reactor finished!'
         else:
-            print "We have no work to do. Exiting."
+            print "We have nothing to react to!"
