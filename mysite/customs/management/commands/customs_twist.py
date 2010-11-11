@@ -14,22 +14,26 @@ class Command(BaseCommand):
         for dia in mysite.profile.models.DataImportAttempt.objects.filter(completed=False):
             if dia.source in mysite.customs.profile_importers.SOURCE_TO_CLASS:
                 cls = mysite.customs.profile_importers.SOURCE_TO_CLASS[dia.source]
-                d = self.add_dia_to_reactor(cls, dia.query, dia.id)
-                deferreds_we_created.append(d)
+                created = self.add_dia_to_reactor(cls, dia.query, dia.id)
+                deferreds_we_created.extend(created)
         return deferreds_we_created
 
     def add_dia_to_reactor(self, cls, query, dia_id):
+        deferreds_created = []
         ### For now, only the 'db' == Debian == qa.debian.org DIAs are in a format where
         ### they can handle asynchronous operation.
         state_manager = cls(query, dia_id)
 
         ### d is the "deferred" object. We create it using getPage(), and then
         ### we configure its next actions.
-        url = state_manager.getUrl()
-        d = twisted.web.client.getPage(url)
-        d.addCallback(state_manager.handlePageContents)
-        d.addErrback(state_manager.handleError)
-        return d
+        urls_and_callbacks = state_manager.getUrlsAndCallbacks()
+        for data_dict in urls_and_callbacks:
+            d = twisted.web.client.getPage(data_dict['url'])
+            d.addCallback(data_dict['callback'])
+            if 'errback' in data_dict:
+                d.addErrback(data_dict['errback'])
+            deferreds_created.append(d)
+        return deferreds_created
 
     def enqueue_reactor_death(self, deferreds):
         dl = defer.DeferredList(deferreds)
