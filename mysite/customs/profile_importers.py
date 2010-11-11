@@ -12,6 +12,8 @@ import mysite.search.models
 import mysite.profile.models
 import mysite.base.helpers
 
+import twisted.web
+
 ### Generic error handler
 class ProfileImporter(object):
     def __init__(self, query, dia_id):
@@ -26,6 +28,22 @@ class GithubImporter(ProfileImporter):
     def __init__(self, query, dia_id):
         self.query = query
         self.dia_id = dia_id
+
+    @staticmethod
+    def squashIrrelevantErrors(error):
+        squash_it = False
+
+        if error.type == twisted.web.error.Error:
+            if error.value.status == '404':
+                # It's cool.
+                squash_it = True
+            if error.value.response == '{"error":"api route not recognized"}':
+                # also cool.
+                squash_it = True
+
+        if squash_it:
+            return None
+        return error
 
     # This method takes a repository dict as returned by Github
     # and creates a Citation, also creating the relevant
@@ -90,14 +108,14 @@ class GithubImporter(ProfileImporter):
         urls_and_callbacks = []
 
         # Well, one thing we can do is get the repositories the user owns.
-        this_one = {}
+        this_one = {'errback': GithubImporter.squashIrrelevantErrors}
         this_one['url'] = ('http://github.com/api/v2/json/repos/show/' +
             mysite.base.unicode_sanity.quote(self.query))
         this_one['callback'] = self.handleUserRepositoryJson
         urls_and_callbacks.append(this_one)
 
         # Another is look at the user's activity feed.
-        this_one = {}
+        this_one = {'errback': GithubImporter.squashIrrelevantErrors}
         this_one['url'] = ('http://github.com/%s.json' %
             mysite.base.unicode_sanity.quote(self.query))
         this_one['callback'] = self.handleUserActivityFeedJson
