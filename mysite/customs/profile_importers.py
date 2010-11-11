@@ -140,7 +140,7 @@ class GithubImporter(ProfileImporter):
             # Find "collaborated on..."
             if event['type'] == 'PushEvent':
                 if repo['owner'] != self.query:
-                    ## In that case, we need to find out if the given user is in the list of collaborats
+                    ## In that case, we need to find out if the given user is in the list of collaborators
                     ## for the repository. Normally I would call out to a different URL, but I'm supposed to
                     ## not block.
                     ## FIXME: return a Deferred I guess.
@@ -152,7 +152,7 @@ class GithubImporter(ProfileImporter):
             elif event['type'] == 'WatchEvent':
                 continue # Skip this event.
             else:
-                logging.info("Found unknown event type.")
+                logging.info("When looking in the Github user feed, I found a Github event of unknown type.")
 
 ### This section imports package lists from qa.debian.org
 

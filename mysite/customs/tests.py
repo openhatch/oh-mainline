@@ -61,6 +61,10 @@ class FakeGetPage(object):
         self.url2data = {}
         self.url2data['http://qa.debian.org/developer.php?login=asheesh%40asheesh.org'] = open(os.path.join(
             settings.MEDIA_ROOT, 'sample-data', 'debianqa-asheesh.html')).read()
+        self.url2data['http://github.com/api/v2/json/repos/show/paulproteus'] = open(os.path.join(
+            settings.MEDIA_ROOT, 'sample-data', 'github', 'json-repos-show-paulproteus.json')).read()
+        self.url2data['http://github.com/paulproteus.json'] = open(os.path.join(
+            settings.MEDIA_ROOT, 'sample-data', 'github', 'paulproteus-personal-feed.json')).read()
 
     """This is a fake version of Twisted.web's getPage() function.
     It returns a Deferred that is already 'fired', and has the page content
@@ -75,7 +79,7 @@ class FakeGetPage(object):
         return d
 
 # Create a module-level global that is the fake getPage
-fakeGetPage = FakeGetPage().getPage
+fakeGetPage = FakeGetPage()
 
 # Mocked out browser.open
 open_causes_404 = mock.Mock()
@@ -294,15 +298,6 @@ class OhlohIconTests(django.test.TestCase):
 class ImportFromGithub(django.test.TestCase):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
-    def __init__(self, *args, **kwargs):
-        django.test.TestCase.__init__(self, *args, **kwargs)
-        # Track a mapping from Github URLs to test data
-        self.url2data = {}
-        self.url2data['http://github.com/api/v2/json/repos/show/paulproteus'] = open(os.path.join(
-            settings.MEDIA_ROOT, 'sample-data', 'github', 'json-repos-show-paulproteus.json')).read()
-        self.url2data['http://github.com/paulproteus.json'] = open(os.path.join(
-            settings.MEDIA_ROOT, 'sample-data', 'github', 'paulproteus-personal-feed.json')).read()
-
     def setUp(self):
         # Create a DataImportAttempt for Asheesh
         asheesh = Person.objects.get(user__username='paulproteus')
@@ -320,10 +315,11 @@ class ImportFromGithub(django.test.TestCase):
         URL = 'http://github.com/api/v2/json/repos/show/paulproteus'
         self.assert_(
             {'url': URL,
+             'errback': self.gi.squashIrrelevantErrors,
              'callback': self.gi.handleUserRepositoryJson} in urls_and_callbacks)
 
         # Simulate the GET, and pass the data to the callback
-        page_contents = self.url2data[URL]
+        page_contents = fakeGetPage.url2data[URL]
         self.gi.handleUserRepositoryJson(page_contents)
 
         # Check that we make Citations as expected
@@ -340,32 +336,52 @@ class ImportFromGithub(django.test.TestCase):
         DATA_CALLBACK = self.gi.handleUserActivityFeedJson
         self.assert_(
             {'url': URL,
+             'errback': self.gi.squashIrrelevantErrors,
              'callback': DATA_CALLBACK} in urls_and_callbacks)
         
         # Simulate the GET, and pass the data to the callback
-        page_contents = self.url2data[URL]
+        page_contents = fakeGetPage.url2data[URL]
         DATA_CALLBACK(page_contents)
 
         # Check that we make Citations as expected
-        # FIXME -- the test isn't clear to me
+        # FIXME -- the test isn't clear to me. Someone should read the paulproteus.json file
+        # carefully and see what kinds of Citations we should generate.
 
     @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
     @mock.patch('mysite.search.tasks.PopulateProjectIconFromOhloh')
-    @mock.patch('twisted.web.client.getPage', fakeGetPage)
+    @mock.patch('twisted.web.client.getPage', fakeGetPage.getPage)
     def test_asheesh_dia_integration(self, do_nothing, do_nothing_also):
-        # Create a DataImportAttempt for Asheesh
-        asheesh = Person.objects.get(user__username='paulproteus')
-        dia = mysite.profile.models.DataImportAttempt.objects.create(person=asheesh, source='gh', query='asheesh@asheesh.org')
+        # setUp() already created the DataImportAttempt
+        # so we just run the command:
         cmd = mysite.customs.management.commands.customs_twist.Command()
         cmd.handle()
 
         # And now, the dia should be completed.
-        dia = mysite.profile.models.DataImportAttempt.objects.get(person=asheesh, source='gh', query='asheesh@asheesh.org')
+        dia = mysite.profile.models.DataImportAttempt.objects.get(id=self.dia.id)
         self.assertTrue(dia.completed)
 
         # And Asheesh should have some new projects available.
         projects = set([c.portfolio_entry.project.name for c in mysite.profile.models.Citation.objects.all()])
-        self.assertEqual(projects, set(['ccd2iso', 'liblicense', 'exempi', 'Debian GNU/Linux', 'cue2toc', 'alpine']))
+        self.assertEqual(projects,
+                         set([u'sleekmigrate', u'staticgenerator', u'webassets', u'tircd', u'python-github2', u'django-assets', u'jibot']))
+
+    @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
+    @mock.patch('mysite.search.tasks.PopulateProjectIconFromOhloh')
+    @mock.patch('twisted.web.client.getPage', fakeGetPage.getPage)
+    def test_asheesh_dia_integration(self, do_nothing, do_nothing_also):
+        # setUp() already created the DataImportAttempt
+        # so we just run the command:
+        cmd = mysite.customs.management.commands.customs_twist.Command()
+        cmd.handle()
+
+        # And now, the dia should be completed.
+        dia = mysite.profile.models.DataImportAttempt.objects.get(id=self.dia.id)
+        self.assertTrue(dia.completed)
+
+        # And Asheesh should have some new projects available.
+        projects = set([c.portfolio_entry.project.name for c in mysite.profile.models.Citation.objects.all()])
+        self.assertEqual(projects,
+                         set([u'sleekmigrate', u'staticgenerator', u'webassets', u'tircd', u'python-github2', u'django-assets', u'jibot']))
 
 class ImportFromDebianQA(django.test.TestCase):
     fixtures = ['user-paulproteus', 'person-paulproteus']
@@ -398,7 +414,7 @@ class ImportFromDebianQA(django.test.TestCase):
 
     @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
     @mock.patch('mysite.search.tasks.PopulateProjectIconFromOhloh')
-    @mock.patch('twisted.web.client.getPage', fakeGetPage)
+    @mock.patch('twisted.web.client.getPage', fakeGetPage.getPage)
     def test_asheesh_integration(self, do_nothing, do_nothing_also):
         # Create a DataImportAttempt for Asheesh
         asheesh = Person.objects.get(user__username='paulproteus')
