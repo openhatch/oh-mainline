@@ -5,6 +5,7 @@ import mysite.customs.models
 from mysite.customs import ohloh
 import mysite.profile.controllers
 import mysite.base.unicode_sanity
+import mysite.customs.ping_twisted
 
 import django
 from django.db import models
@@ -852,6 +853,9 @@ def update_pf_cache(sender, instance, **kwargs):
     from mysite.profile.tasks import update_someones_pf_cache
     update_someones_pf_cache.delay(instance.person.pk)
 
+def ping_twisted(sender, instance, **kwargs):
+    mysite.customs.ping_twisted.ping_it()
+
 def make_forwarder_actually_work(sender, instance, **kwargs):
     from mysite.profile.tasks import RegeneratePostfixAliasesForForwarder
     RegeneratePostfixAliasesForForwarder.delay()
@@ -864,5 +868,7 @@ models.signals.post_delete.connect(update_link_person_tag_cache, sender=Link_Per
 
 models.signals.post_save.connect(update_pf_cache, sender=PortfolioEntry)
 models.signals.post_delete.connect(update_pf_cache, sender=PortfolioEntry)
+
+models.signals.post_save.connect(ping_twisted, sender=DataImportAttempt)
 
 # vim: set nu:
