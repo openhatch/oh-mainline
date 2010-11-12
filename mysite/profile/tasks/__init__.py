@@ -101,54 +101,6 @@ def create_citations_from_launchpad_results(dia_id, lp_results):
     dia.save()
     # }}}
 
-def create_citations_from_debianqa_results(dia_id, results):
-    dia = mysite.profile.models.DataImportAttempt.objects.get(id=dia_id)
-    person = dia.person
-
-    for package_name, package_description in results:
-        (project, _) = Project.objects.get_or_create(name=package_name)
-
-        package_link = 'http://packages.debian.org/src:' + urllib.quote(
-            package_name)
-
-        if mysite.profile.models.PortfolioEntry.objects.filter(person=person, project=project).count() == 0:
-            portfolio_entry = mysite.profile.models.PortfolioEntry(person=person,
-                                             project=project,
-                                             project_description=package_description)
-            portfolio_entry.save()
-        portfolio_entry = mysite.profile.models.PortfolioEntry.objects.filter(person=person, project=project)[0]
-            
-        citation = mysite.profile.models.Citation()
-        citation.languages = "" # FIXME ", ".join(result['languages'])
-        citation.contributor_role='Maintainer'
-        citation.portfolio_entry = portfolio_entry
-        citation.data_import_attempt = dia
-        citation.url = package_link
-        citation.save_and_check_for_duplicates()
-
-        # And add a citation to the Debian portfolio entry
-        (project, _) = Project.objects.get_or_create(name='Debian GNU/Linux')
-        if mysite.profile.models.PortfolioEntry.objects.filter(person=person, project=project).count() == 0:
-            portfolio_entry = mysite.profile.models.PortfolioEntry(person=person,
-                                             project=project,
-                                             project_description=
-                                             'The universal operating system')
-            portfolio_entry.save()
-        portfolio_entry = mysite.profile.models.PortfolioEntry.objects.filter(person=person, project=project)[0]
-        citation = mysite.profile.models.Citation()
-        citation.languages = '' # FIXME: ?
-        citation.contributor_role='Maintainer of %s' % package_name
-        citation.portfolio_entry = portfolio_entry
-        citation.data_import_attempt = dia
-        citation.url = package_link
-        citation.save_and_check_for_duplicates()
-
-    person.last_polled = datetime.datetime.now()
-    person.save()
-
-    dia.completed = True
-    dia.save()
-    
 def create_citations_from_bitbucket_results(dia_id, results):
     """
     Given the input of results returned from a query against the 
@@ -210,12 +162,6 @@ def ou_action(dia):
 def do_nothing_because_this_functionality_moved_to_twisted(*args):
     return None # This is moved to Twisted now.
 
-def db_action(dia):
-    # Given a dia with a username, check if there are any source packages
-    # maintained by that person.
-    return list(mysite.customs.debianqa.source_packages_maintained_by(
-        dia.query))
-
 def lp_action(dia):
     # NB: Don't change the way this is called, because calling it this way
     # permits this function to be mocked when we test it.
@@ -229,21 +175,23 @@ def bb_action(dia):
     return mysite.customs.bitbucket.get_user_repos(dia.query)
 
 source2actual_action = {
+        'gh': do_nothing_because_this_functionality_moved_to_twisted,
+        'db': do_nothing_because_this_functionality_moved_to_twisted,
+    
         'rs': rs_action,
         'ou': ou_action,
-        'gh': do_nothing_because_this_functionality_moved_to_twisted,
         'ga': do_nothing_because_this_functionality_moved_to_twisted,
-        'db': db_action,
         'lp': lp_action,
         'bb': bb_action
         }
 
 source2result_handler = {
+        'db': do_nothing_because_this_functionality_moved_to_twisted,
+        'gh': do_nothing_because_this_functionality_moved_to_twisted,
+
         'rs': create_citations_from_ohloh_contributor_facts,
         'ou': create_citations_from_ohloh_contributor_facts,
-        'gh': do_nothing_because_this_functionality_moved_to_twisted,
         'ga': do_nothing_because_this_functionality_moved_to_twisted,
-        'db': create_citations_from_debianqa_results,
         'lp': create_citations_from_launchpad_results,
         'bb': create_citations_from_bitbucket_results,
         }
