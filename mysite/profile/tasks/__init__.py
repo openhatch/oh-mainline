@@ -101,48 +101,6 @@ def create_citations_from_launchpad_results(dia_id, lp_results):
     dia.save()
     # }}}
 
-def create_citations_from_github_activity_feed_results(dia_id, results):
-    return create_citations_from_github_results(dia_id, results,
-                                                override_contrib='Collaborated on')
-
-def create_citations_from_github_results(dia_id, results,
-                                         override_contrib=None):
-    repos, dict_mapping_repos_to_languages = results
-    dia = mysite.profile.models.DataImportAttempt.objects.get(id=dia_id)
-    person = dia.person
-    
-    for repo in repos:
-        (project, _) = Project.objects.get_or_create(name=repo.name)
-
-        # FIXME: Populate project description, name, etc.
-
-        if mysite.profile.models.PortfolioEntry.objects.filter(person=person, project=project).count() == 0:
-            portfolio_entry = mysite.profile.models.PortfolioEntry(person=person,
-                                             project=project,
-                                             project_description=repo.description or '')
-            portfolio_entry.save()
-        portfolio_entry = mysite.profile.models.PortfolioEntry.objects.filter(person=person, project=project)[0]
-            
-        citation = mysite.profile.models.Citation()
-        citation.languages = "" # FIXME ", ".join(result['languages'])
-        if repo.fork:
-            citation.contributor_role = 'Forked'
-        else:
-            citation.contributor_role = 'Started'
-        if override_contrib:
-            citation.contributor_role = override_contrib
-        citation.portfolio_entry = portfolio_entry
-        citation.data_import_attempt = dia
-        citation.url = 'http://github.com/%s/%s/' % (urllib.quote_plus(repo.owner),
-                                                     urllib.quote_plus(repo.name))
-        citation.save_and_check_for_duplicates()
-
-    person.last_polled = datetime.datetime.now()
-    person.save()
-
-    dia.completed = True
-    dia.save()
-
 def create_citations_from_debianqa_results(dia_id, results):
     dia = mysite.profile.models.DataImportAttempt.objects.get(id=dia_id)
     person = dia.person
@@ -249,22 +207,8 @@ def ou_action(dia):
     dia.save()
     return data
 
-def gh_action(dia):
-    # FIXME: We should add a person parameter so that, in the
-    # case of "You should retry soon..." messages from the Github
-    # API, we notify the user.
-
-    # FIXME: Make web_response objects have a DIA attribute.
-    # The way we're doing it now is basically backwards.
-    repos = list(mysite.customs.github.repos_by_username(dia.query))
-    dict_mapping_repos_to_languages = {}
-    for repo in repos:
-        key = (repo.owner, repo.name)
-        dict_mapping_repos_to_languages[
-            key] = '' # mysite.customs.github.find_primary_language_of_repo(
-            #github_username=repo.owner,
-            #github_reponame=repo.name)
-    return (repos, dict_mapping_repos_to_languages)
+def do_nothing_because_this_functionality_moved_to_twisted(*args):
+    return None # This is moved to Twisted now.
 
 def db_action(dia):
     # Given a dia with a username, check if there are any source packages
@@ -272,17 +216,6 @@ def db_action(dia):
     return list(mysite.customs.debianqa.source_packages_maintained_by(
         dia.query))
 
-def ga_action(dia):
-    # FIXME: We should add a person parameter so that, in the
-    # case of "You should retry soon..." messages from the Github
-    # API, we notify the user.
-
-    # FIXME: Make web_response objects have a DIA attribute.
-    # The way we're doing it now is basically backwards.
-    repos = list(mysite.customs.github.repos_user_collaborates_on(
-                 github_username=dia.query))
-    return (repos, {})
-    
 def lp_action(dia):
     # NB: Don't change the way this is called, because calling it this way
     # permits this function to be mocked when we test it.
@@ -298,8 +231,8 @@ def bb_action(dia):
 source2actual_action = {
         'rs': rs_action,
         'ou': ou_action,
-        'gh': gh_action,
-        'ga': ga_action,
+        'gh': do_nothing_because_this_functionality_moved_to_twisted,
+        'ga': do_nothing_because_this_functionality_moved_to_twisted,
         'db': db_action,
         'lp': lp_action,
         'bb': bb_action
@@ -308,8 +241,8 @@ source2actual_action = {
 source2result_handler = {
         'rs': create_citations_from_ohloh_contributor_facts,
         'ou': create_citations_from_ohloh_contributor_facts,
-        'gh': create_citations_from_github_results,
-        'ga': create_citations_from_github_activity_feed_results,
+        'gh': do_nothing_because_this_functionality_moved_to_twisted,
+        'ga': do_nothing_because_this_functionality_moved_to_twisted,
         'db': create_citations_from_debianqa_results,
         'lp': create_citations_from_launchpad_results,
         'bb': create_citations_from_bitbucket_results,
