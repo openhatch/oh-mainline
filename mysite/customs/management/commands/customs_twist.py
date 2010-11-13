@@ -42,7 +42,7 @@ class Command(BaseCommand):
         return deferreds_created
 
     def stop_the_reactor(self, *args):
-        self.keep_reacting = False
+        reactor.callWhenRunning(lambda: reactor.stop())
 
     def enqueue_reactor_death(self, deferreds):
         dl = defer.DeferredList(deferreds)
