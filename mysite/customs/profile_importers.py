@@ -43,7 +43,7 @@ class GithubImporter(ProfileImporter):
 
         if squash_it:
             return None
-        return error
+        raise error.value
 
     # This method takes a repository dict as returned by Github
     # and creates a Citation, also creating the relevant
