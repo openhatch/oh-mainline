@@ -176,11 +176,11 @@ def bb_action(dia):
 
 source2actual_action = {
         'gh': do_nothing_because_this_functionality_moved_to_twisted,
+        'ga': do_nothing_because_this_functionality_moved_to_twisted,
         'db': do_nothing_because_this_functionality_moved_to_twisted,
     
         'rs': rs_action,
         'ou': ou_action,
-        'ga': do_nothing_because_this_functionality_moved_to_twisted,
         'lp': lp_action,
         'bb': bb_action
         }
@@ -188,10 +188,10 @@ source2actual_action = {
 source2result_handler = {
         'db': do_nothing_because_this_functionality_moved_to_twisted,
         'gh': do_nothing_because_this_functionality_moved_to_twisted,
+        'ga': do_nothing_because_this_functionality_moved_to_twisted,
 
         'rs': create_citations_from_ohloh_contributor_facts,
         'ou': create_citations_from_ohloh_contributor_facts,
-        'ga': do_nothing_because_this_functionality_moved_to_twisted,
         'lp': create_citations_from_launchpad_results,
         'bb': create_citations_from_bitbucket_results,
         }
