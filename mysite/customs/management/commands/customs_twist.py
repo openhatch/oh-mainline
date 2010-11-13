@@ -11,7 +11,6 @@ class Command(BaseCommand):
 
     def __init__(self, *args, **kwargs):
         BaseCommand.__init__(self, *args, **kwargs)
-        self.keep_reacting = True
 
     def create_tasks_from_dias(self):
         print 'For all DIAs we know how to process with Twisted: enqueue them.'
@@ -53,9 +52,6 @@ class Command(BaseCommand):
         created_deferreds = self.create_tasks_from_dias()
         print "Creating a DeferredList that, when all those are done, will quit the reactor..."
         self.enqueue_reactor_death(created_deferreds)
-        if self.keep_reacting:
-            print 'Starting Reactor...'
-            reactor.run()
-            print '...reactor finished!'
-        else:
-            print "We have nothing to react to!"
+        print 'Starting Reactor...'
+        reactor.run()
+        print '...reactor finished!'
