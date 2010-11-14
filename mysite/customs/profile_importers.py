@@ -76,8 +76,6 @@ class ImportActionWrapper(object):
 
         # Then we tell the ProfileImporter that we have handled the URL.
         self.pi.markThatTheDeferredFinished(self.url)
-        import pdb
-        pdb.set_trace()
         return value
 
 class GithubImporter(ProfileImporter):
