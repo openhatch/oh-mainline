@@ -62,10 +62,13 @@ class GithubImporter(ProfileImporter):
 
         if error.type == twisted.web.error.Error:
             if error.value.status == '404':
-                # It's cool.
+                # The username doesn't exist. That's okay. It just means we have gleaned no profile information
+                # from this query.
                 squash_it = True
-            if error.value.response == '{"error":"api route not recognized"}':
-                # also cool.
+            if error.value.status == '401' and error.value.response == '{"error":"api route not recognized"}':
+                # This is what we get when we query e.g. http://github.com/api/v2/json/repos/show/asheesh%40asheesh.org
+                # It just means that Github decided that asheesh@asheesh.org is not a valid username.
+                # Just like above -- no data to return.
                 squash_it = True
 
         if squash_it:
