@@ -45,7 +45,7 @@ class ProfileImporter(object):
             dia.save()
 
     def seems_finished(self):
-        if sum(self.urls_we_are_awiting_on.values()) == 0:
+        if sum(self.urls_we_are_waiting_on.values()) == 0:
             return True
         return False
 
