@@ -31,11 +31,23 @@ class Command(BaseCommand):
         for data_dict in urls_and_callbacks:
             logging.debug("Creating getPage for " + data_dict['url'] + 'due to DIA with id ' + str(dia_id))
             d = state_manager.createDeferredAndKeepTrackOfIt(data_dict['url'])
-            d.addCallback(data_dict['callback'])
+
+            # wrap the callback
+            wrapped_callback = mysite.customs.profile_importers.ImportActionWrapper(
+                url=data_dict['url'],
+                pi=state_manager,
+                fn=data_dict['callback'])
+            d.addCallback(wrapped_callback)
+
             if 'errback' in data_dict:
-                d.addErrback(data_dict['errback'])
+                # wrap the errback
+                wrapped_errback = mysite.customs.profile_importers.ImportActionWrapper(
+                    url=data_dict['url'],
+                    pi=state_manager,
+                    fn=data_dict['errback'])
+                d.addErrback(wrapped_errback)
+
             deferreds_created.append(d)
-            d.addCallback(state_manager.markThatTheDeferredFinished)
         return deferreds_created
 
     def stop_the_reactor(self, *args):

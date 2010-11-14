@@ -54,6 +54,32 @@ class ProfileImporter(object):
         logging.warn(failure)
 
 ### This section imports projects from github.com
+class ImportActionWrapper(object):
+    # This class serves to hold three things:
+    # * the URL we requested, and
+    # * the ProfileImporter object that caused the URL to be requested.
+    # * Function to call.
+    #
+    # The point of this wrapper is that we call that function for you, and
+    # afterward, we call .markThatTheDeferredFinished() on the ProfileImporter.
+    #
+    # That way, the ProfileImporter can update its records of which URLs have finished
+    # being processed.
+    def __init__(self, url, pi, fn):
+        self.url = url
+        self.pi = pi
+        self.fn = fn
+
+    def __call__(self, *args, **kwargs):
+        # Okay, so we call fn and pass in arguments to it.
+        value = self.fn(*args, **kwargs)
+
+        # Then we tell the ProfileImporter that we have handled the URL.
+        self.pi.markThatTheDeferredFinished(self.url)
+        import pdb
+        pdb.set_trace()
+        return value
+
 class GithubImporter(ProfileImporter):
 
     @staticmethod
@@ -72,8 +98,10 @@ class GithubImporter(ProfileImporter):
                 squash_it = True
 
         if squash_it:
-            return url # the url that finished
-        raise error.value
+            pass
+        else:
+            # This is low-quality logging for now!
+            logging.warn("EEK: " + error.value.status + " " + error.value.response)
 
     # This method takes a repository dict as returned by Github
     # and creates a Citation, also creating the relevant
