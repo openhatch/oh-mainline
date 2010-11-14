@@ -7,6 +7,8 @@ import cStringIO as StringIO
 import re
 import simplejson
 import datetime
+import collections
+import logging
 
 import mysite.search.models
 import mysite.profile.models
@@ -17,7 +19,35 @@ import twisted.web
 ### Generic error handler
 class ProfileImporter(object):
     def __init__(self, query, dia_id):
-        raise NotImplementedException
+        ## First, store the data we are passed in.
+        self.query = query
+        self.dia_id = dia_id
+        ## Then, create a mapping for storing the URLs we are waiting on.
+        self.urls_we_are_waiting_on = collections.defaultdict(int)
+
+    def createDeferredAndKeepTrackOfIt(self, url):
+        # First, actually create the Deferred.
+        d = twisted.web.client.getPage(url)
+        # Then, keep track of it.
+        self.urls_we_are_waiting_on[url] += 1
+        # Return the Deferred.
+        return d
+
+    def markThatTheDeferredFinished(self, url):
+        self.urls_we_are_waiting_on[url] -= 1
+        # If we just made the state totally insane, then log a warning to that effect.
+        if self.urls_we_are_waiting_on[url] < 0:
+            logging.error("Eeek, " + url + " went negative.")
+        if self.seems_finished():
+            # Grab the DataImportAttempt object, and mark it as completed.
+            dia = mysite.profile.models.DataImportAttempt.objects.get(id=self.dia_id)
+            dia.completed = True
+            dia.save()
+
+    def seems_finished(self):
+        if sum(self.urls_we_are_awiting_on.values()) == 0:
+            return True
+        return False
 
     def handleError(self, failure):
         import logging
@@ -25,9 +55,6 @@ class ProfileImporter(object):
 
 ### This section imports projects from github.com
 class GithubImporter(ProfileImporter):
-    def __init__(self, query, dia_id):
-        self.query = query
-        self.dia_id = dia_id
 
     @staticmethod
     def squashIrrelevantErrors(error):
@@ -42,7 +69,7 @@ class GithubImporter(ProfileImporter):
                 squash_it = True
 
         if squash_it:
-            return None
+            return url # the url that finished
         raise error.value
 
     # This method takes a repository dict as returned by Github
@@ -160,11 +187,6 @@ SECTION_NAME_AND_NUMBER_SPLITTER = re.compile(r'(.*?) [(](\d+)[)]$')
 # FIXME: Migrate this to UltimateDebianDatabase or DebianDatabaseExport
 
 class DebianQA(ProfileImporter):
-    def __init__(self, query, dia_id):
-        self.query = query
-        # dia_id can be None if you don't want to test citation creation
-        self.dia_id = dia_id 
-
     def getUrlsAndCallbacks(self):
         if '@' in self.query:
             email_address = self.query

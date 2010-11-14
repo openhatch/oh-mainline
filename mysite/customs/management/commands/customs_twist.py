@@ -33,11 +33,12 @@ class Command(BaseCommand):
         urls_and_callbacks = state_manager.getUrlsAndCallbacks()
         for data_dict in urls_and_callbacks:
             logging.debug("Creating getPage for " + data_dict['url'] + 'due to DIA with id ' + str(dia_id))
-            d = twisted.web.client.getPage(data_dict['url'])
+            d = state_manager.createDeferredAndKeepTrackOfIt(data_dict['url'])
             d.addCallback(data_dict['callback'])
             if 'errback' in data_dict:
                 d.addErrback(data_dict['errback'])
             deferreds_created.append(d)
+            d.addCallback(state_manager.markThatTheDeferredFinished)
         return deferreds_created
 
     def stop_the_reactor(self, *args):
