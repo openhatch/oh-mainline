@@ -157,9 +157,6 @@ class GithubImporter(ProfileImporter):
         person.last_polled = datetime.datetime.now()
         person.save()
 
-        dia.completed = True
-        dia.save()
-
     def getUrlsAndCallbacks(self):
         urls_and_callbacks = []
 
@@ -317,9 +314,6 @@ class DebianQA(ProfileImporter):
 
         person.last_polled = datetime.datetime.now()
         person.save()
-
-        dia.completed = True
-        dia.save()
 
 ###
 
