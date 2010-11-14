@@ -1,5 +1,5 @@
 from django.core.management import BaseCommand, CommandError
-from mysite.missions import controllers
+from mysite.missions.svn import controllers
 import sys
 
 class Command(BaseCommand):
