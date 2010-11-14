@@ -8,7 +8,6 @@ import urllib2
 import urllib
 from mysite.customs import lp_grabber
 import mysite.customs.github
-import mysite.customs.debianqa
 import mysite.profile.models
 from mysite.search.models import Project
 from celery.decorators import task
