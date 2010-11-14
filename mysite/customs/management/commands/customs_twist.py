@@ -9,9 +9,6 @@ import mysite.profile.models
 class Command(BaseCommand):
     help = "Call this when you want to run a Twisted reactor."
 
-    def __init__(self, *args, **kwargs):
-        BaseCommand.__init__(self, *args, **kwargs)
-
     def create_tasks_from_dias(self):
         print 'For all DIAs we know how to process with Twisted: enqueue them.'
         deferreds_we_created = []
