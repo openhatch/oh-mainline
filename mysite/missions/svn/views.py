@@ -48,14 +48,14 @@ def svn_data(request, passed_data={}):
 def svn_mission_about(request, passed_data={}):
     data = svn_data(request, passed_data)
     data['this_mission_page_short_name'] = 'About'
-    return (request, 'missions/svn_about.html', data)
+    return (request, 'missions/svn/svn_about.html', data)
 
 @login_required
 @view
 def svn_checkout(request, passed_data={}):
     data = svn_data(request, passed_data)
     data['this_mission_page_short_name'] = 'Checking out'
-    return (request, 'missions/svn_checkout.html', data)
+    return (request, 'missions/svn/svn_checkout.html', data)
 
 @login_required
 def svn_checkout_submit(request):
@@ -76,7 +76,7 @@ def svn_checkout_submit(request):
 def svn_diff(request, passed_data={}):
     data = svn_data(request, passed_data)
     data['this_mission_page_short_name'] = 'Diffing your changes'
-    return (request, 'missions/svn_diff.html', data)
+    return (request, 'missions/svn/svn_diff.html', data)
 
 @login_required
 def svn_diff_submit(request):
@@ -98,7 +98,7 @@ def svn_diff_submit(request):
 def svn_commit(request, passed_data={}):
     data = svn_data(request, passed_data)
     data['this_mission_page_short_name'] = 'Committing your changes'
-    return (request, 'missions/svn_commit.html', data)
+    return (request, 'missions/svn/svn_commit.html', data)
 
 @login_required
 def svn_commit_poll(request):

@@ -40,31 +40,31 @@ def diffpatch_data(request, passed_data={}):
 def diffpatch_mission_about(request, passed_data={}):
     data = diffpatch_data(request, passed_data)
     data['this_mission_page_short_name'] = 'About'
-    return (request, 'missions/diffpatch_mission_about.html', data)
+    return (request, 'missions/diffpatch/diffpatch_mission_about.html', data)
 
 @view
 def diffpatch_mission_single_file_diff(request, passed_data={}):
     data = diffpatch_data(request, passed_data)
     data['this_mission_page_short_name'] = 'About'
-    return (request, 'missions/diffpatch_mission_single_file_diff.html', data)
+    return (request, 'missions/diffpatch/diffpatch_mission_single_file_diff.html', data)
 
 @view
 def diffpatch_mission_single_file_patch(request, passed_data={}):
     data = diffpatch_data(request, passed_data)
     data['this_mission_page_short_name'] = 'About'
-    return (request, 'missions/diffpatch_mission_single_file_patch.html', data)
+    return (request, 'missions/diffpatch/diffpatch_mission_single_file_patch.html', data)
 
 @view
 def diffpatch_mission_recursive_patch(request, passed_data={}):
     data = diffpatch_data(request, passed_data)
     data['this_mission_page_short_name'] = 'About'
-    return (request, 'missions/diffpatch_mission_recursive_patch.html', data)
+    return (request, 'missions/diffpatch/diffpatch_mission_recursive_patch.html', data)
 
 @view
 def diffpatch_mission_recursive_diff(request, passed_data={}):
     data = diffpatch_data(request, passed_data)
     data['this_mission_page_short_name'] = 'About'
-    return (request, 'missions/diffpatch_mission_recursive_diff.html', data)
+    return (request, 'missions/diffpatch/diffpatch_mission_recursive_diff.html', data)
 
 @login_required
 def diffpatch_patchsingle_submit(request):
