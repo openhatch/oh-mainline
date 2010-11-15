@@ -1,7 +1,7 @@
-from mysite.missions.base.forms import *
+import django.forms
 
-class SvnCheckoutForm(forms.Form):
-    secret_word = forms.CharField(error_messages={'required': 'No secret word was given.'})
+class SvnCheckoutForm(django.forms.Form):
+    secret_word = django.forms.CharField(error_messages={'required': 'No secret word was given.'})
 
-class SvnDiffForm(forms.Form):
-    diff = forms.CharField(error_messages={'required': 'No svn diff output was given.'}, widget=forms.Textarea())
+class SvnDiffForm(django.forms.Form):
+    diff = django.forms.CharField(error_messages={'required': 'No svn diff output was given.'}, widget=django.forms.Textarea())

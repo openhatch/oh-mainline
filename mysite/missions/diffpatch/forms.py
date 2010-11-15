@@ -1,14 +1,14 @@
-from mysite.missions.base.forms import *
+import django.forms
 
-class PatchSingleUploadForm(forms.Form):
-    patched_file = forms.FileField(error_messages={'required': 'No file was uploaded.'})
+class PatchSingleUploadForm(django.forms.Form):
+    patched_file = django.forms.FileField(error_messages={'required': 'No file was uploaded.'})
 
-class DiffSingleUploadForm(forms.Form):
-    diff = forms.CharField(error_messages={'required': 'No diff output was given.'}, widget=forms.Textarea())
+class DiffSingleUploadForm(django.forms.Form):
+    diff = django.forms.CharField(error_messages={'required': 'No diff output was given.'}, widget=django.forms.Textarea())
 
-class DiffRecursiveUploadForm(forms.Form):
-    diff = forms.FileField(error_messages={'required': 'No file was uploaded.'})
+class DiffRecursiveUploadForm(django.forms.Form):
+    diff = django.forms.FileField(error_messages={'required': 'No file was uploaded.'})
 
-class PatchRecursiveUploadForm(forms.Form):
-    children_hats = forms.IntegerField()
-    lizards_hats = forms.IntegerField()
+class PatchRecursiveUploadForm(django.forms.Form):
+    children_hats = django.forms.IntegerField()
+    lizards_hats = django.forms.IntegerField()
