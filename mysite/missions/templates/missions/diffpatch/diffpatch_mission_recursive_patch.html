@@ -9,12 +9,12 @@
     <p>Sometimes you might have to apply a patch that affects more than one file.  The patch program can tell what parts of the patch apply to what files by examining the headers, but you might need to help it out by giving the <code>-p</code> option to tell it how many levels of directories to ignore so it finds the correct files to patch.</p>
     <p>Here is your mission:</p>
     <ul class="raquo_bullets">
-      <li>Download <a href="{% url mysite.missions.views.diffpatch_patchrecursive_get_original_tarball %}">this tarball</a> and <a href="{% url mysite.missions.views.diffpatch_patchrecursive_get_patch %}">this patch</a>.</li>
+      <li>Download <a href="{% url mysite.missions.diffpatch.views.diffpatch_patchrecursive_get_original_tarball %}">this tarball</a> and <a href="{% url mysite.missions.diffpatch.views.diffpatch_patchrecursive_get_patch %}">this patch</a>.</li>
       <li>Unpack the tarball and apply the patch using <code>patch -p1</code> from the <code>hats</code> directory.</li>
       <li>Answer some questions below about the contents of the files inside.</li>
     </ul>
 
-    <form method="post" enctype="multipart/form-data" action="{% url mysite.missions.views.diffpatch_patchrecursive_submit %}#patchrecursive-form">
+    <form method="post" enctype="multipart/form-data" action="{% url mysite.missions.diffpatch.views.diffpatch_patchrecursive_submit %}#patchrecursive-form">
       <div class="form-row">
         <a name="patchrecursive-form"></a>
   {% if patchrecursive_success %}
@@ -49,7 +49,7 @@
     {% if patchrecursive_done %} {# FIXME add the rest of the _done things #}
     <p class="next_mission_link">
       Congratulations! You've totally completed the mission.
-      Want to go <a href="{% url mysite.missions.views.main_page %}">back to the list of missions</a>?</p>
+      Want to go <a href="{% url mysite.missions.base.views.main_page %}">back to the list of missions</a>?</p>
     {% endif %}
   </div>
 </div>

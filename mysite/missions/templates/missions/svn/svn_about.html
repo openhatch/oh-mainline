@@ -15,15 +15,15 @@
       {% if repository_exists %}
       <p>You already have a repository that you can use for these missions, but if you want to start over fresh, you can reset it.</p>
 
-      <form method="post" action="{% url mysite.missions.views.svn_resetrepo %}?stay_on_this_page=1" onsubmit="return confirm('Are you sure you want to reset your repository to its original state?');">
+      <form method="post" action="{% url mysite.missions.svn.views.svn_resetrepo %}?stay_on_this_page=1" onsubmit="return confirm('Are you sure you want to reset your repository to its original state?');">
         <input type="submit" value="Reset your repository" />
       </form><br style="clear: left;" />
       <p class="next_mission_link">
-	<a href="{% url mysite.missions.views.svn_checkout %}">Checking out a working copy &raquo;</a></p>
+	<a href="{% url mysite.missions.svn.views.svn_checkout %}">Checking out a working copy &raquo;</a></p>
       {% else %}
       <p>To do these missions, you will need to make a personal repository.  Your repository will reside on the OpenHatch server, specifically for your use in these missions.  Then you can go on and interact with it.</p>
 
-      <form method="post" action="{% url mysite.missions.views.svn_resetrepo %}">
+      <form method="post" action="{% url mysite.missions.svn.views.svn_resetrepo %}">
         <input type="submit" value="Create your repository and start the missions &raquo;" />
       </form><br style="clear: left;" />
 

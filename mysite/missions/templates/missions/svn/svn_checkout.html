@@ -22,9 +22,9 @@
         <p><strong>You have successfully completed this part of the mission.</strong></p>
       </div>
       <p class="next_mission_link">
-	<a href="{% url mysite.missions.views.svn_diff %}">Creating a diff of your changes &raquo;</a></p>
+	<a href="{% url mysite.missions.svn.views.svn_diff %}">Creating a diff of your changes &raquo;</a></p>
     {% else %}
-      <form method="post" action="{% url mysite.missions.views.svn_checkout_submit %}#svncheckout-form">
+      <form method="post" action="{% url mysite.missions.svn.views.svn_checkout_submit %}#svncheckout-form">
         <div class="form-row">
           <a name="svncheckout-form"></a>
           {% if svn_checkout_error_message %}

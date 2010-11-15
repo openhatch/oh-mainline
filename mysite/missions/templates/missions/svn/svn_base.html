@@ -2,22 +2,22 @@
 
 {% block side_nav_links %}
 <li id='link-svn_mission_about'>
-  <a href='{% url mysite.missions.views.svn_mission_about %}'>
+  <a href='{% url mysite.missions.svn.views.svn_mission_about %}'>
     About this mission
   </a>
 </li>
 <li id='link-svn_checkout'>
-  <a href='{% url mysite.missions.views.svn_checkout %}'>
+  <a href='{% url mysite.missions.svn.views.svn_checkout %}'>
     Checking out a working copy
   </a>
 </li>
 <li id='link-svn_diff'>
-  <a href='{% url mysite.missions.views.svn_diff %}'>
+  <a href='{% url mysite.missions.svn.views.svn_diff %}'>
     Diffing your changes
   </a>
 </li>
 <li id='link-svn_commit'>
-  <a href='{% url mysite.missions.views.svn_commit %}'>
+  <a href='{% url mysite.missions.svn.views.svn_commit %}'>
     Committing your changes
   </a>
 </li>

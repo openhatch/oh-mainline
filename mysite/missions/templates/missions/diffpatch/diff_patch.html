@@ -2,7 +2,7 @@
     <p>Often your changes will involve more than one file, so it makes sense to submit all of those changes in one shot, especially if the changes depend on one another.  The <code>-r</code> option to diff makes it take two directories and compare their contents file-by-file, so you can keep one untouched copy of the project and one copy that you make your modifications to, then diff them with the <code>-r</code> option and get all of your changes in one convenient blob.</p>
     <p>Here is your mission:</p>
     <ul class="raquo_bullets">
-      <li><a href="{% url mysite.missions.views.diffpatch_diffrecursive_get_original_tarball %}">Download this tarball</a> containing some recipes.</li>
+      <li><a href="{% url mysite.missions.diffpatch.views.diffpatch_diffrecursive_get_original_tarball %}">Download this tarball</a> containing some recipes.</li>
       <li>Unpack the tarball.</li>
       <li>Find all places where "aubergine" is mentioned and replace them with the synonym, "eggplant".</li>
       <li>Make a unified diff of your changes.  It should be possible to apply it with "patch -p1" from the "recipes" directory.  (One way to do this is <code>diff -ur recipes-orig recipes</code>, where <code>recipes-orig</code> is an unmodified copy of the <code>recipes</code> directory.)</li>
@@ -10,7 +10,7 @@
 
     <p>Since this is a larger patch, you will be uploading it as a file rather than just pasting it in.  (Also, if you're in the mood for some cooking after you complete the mission, we'd love to know how one of those recipes turns out.  But that's not part of the mission.)</p>
 
-    <form method="post" enctype="multipart/form-data" action="{% url mysite.missions.views.diffpatch_diffrecursive_submit %}#diffrecursive-form">
+    <form method="post" enctype="multipart/form-data" action="{% url mysite.missions.diffpatch.views.diffpatch_diffrecursive_submit %}#diffrecursive-form">
       <div class="form-row">
         <a name="diffrecursive-form"></a>
         Upload the unified diff here:
@@ -39,12 +39,12 @@
     <p>Sometimes you might have to apply a patch that affects more than one file.  The patch program can tell what parts of the patch apply to what files by examining the headers, but you might need to help it out by giving the <code>-p</code> option to tell it how many levels of directories to ignore so it finds the correct files to patch.</p>
     <p>Here is your mission:</p>
     <ul class="raquo_bullets">
-      <li>Download <a href="{% url mysite.missions.views.diffpatch_patchrecursive_get_original_tarball %}">this tarball</a> and <a href="{% url mysite.missions.views.diffpatch_patchrecursive_get_patch %}">this patch</a>.</li>
+      <li>Download <a href="{% url mysite.missions.diffpatch.views.diffpatch_patchrecursive_get_original_tarball %}">this tarball</a> and <a href="{% url mysite.missions.diffpatch.views.diffpatch_patchrecursive_get_patch %}">this patch</a>.</li>
       <li>Unpack the tarball and apply the patch using <code>patch -p1</code> from the <code>hats</code> directory.</li>
       <li>Answer some questions below about the contents of the files inside.</li>
     </ul>
 
-    <form method="post" enctype="multipart/form-data" action="{% url mysite.missions.views.diffpatch_patchrecursive_submit %}#patchrecursive-form">
+    <form method="post" enctype="multipart/form-data" action="{% url mysite.missions.diffpatch.views.diffpatch_patchrecursive_submit %}#patchrecursive-form">
       <div class="form-row">
         <a name="patchrecursive-form"></a>
   {% if patchrecursive_success %}

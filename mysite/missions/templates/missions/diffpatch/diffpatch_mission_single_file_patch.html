@@ -6,10 +6,10 @@
     <h3>Patching individual files</h3>
   </div>
   <div class="body">
-    <p><a href="{% url mysite.missions.views.diffpatch_patchsingle_get_original_file %}">Here is a file</a> that contains a piece of code that could be implemented in a much better way.  Let's say that this file is part of a project you are working on, and somebody has come along, noticed the piece of code that could be improved, and <a href="{% url mysite.missions.views.diffpatch_patchsingle_get_patch %}">gave you a patch with the improved code</a>.</p>
+    <p><a href="{% url mysite.missions.diffpatch.views.diffpatch_patchsingle_get_original_file %}">Here is a file</a> that contains a piece of code that could be implemented in a much better way.  Let's say that this file is part of a project you are working on, and somebody has come along, noticed the piece of code that could be improved, and <a href="{% url mysite.missions.diffpatch.views.diffpatch_patchsingle_get_patch %}">gave you a patch with the improved code</a>.</p>
     <p>In order to review the changes, you'll need to apply the patch to the file using the patch program, and your mission is to do that.</p>
 
-    <form method="post" enctype="multipart/form-data" action="{% url mysite.missions.views.diffpatch_patchsingle_submit %}#patchsingle-form">
+    <form method="post" enctype="multipart/form-data" action="{% url mysite.missions.diffpatch.views.diffpatch_patchsingle_submit %}#patchsingle-form">
       <div class="form-row">
         <a name="patchsingle-form"></a>
         After you patch the file, upload it here:
@@ -34,7 +34,7 @@
     </form>
     {% if patchsingle_done %}
     <p class="next_mission_link">
-      <a href="{% url mysite.missions.views.diffpatch_mission_single_file_diff %}">On to diffing files &raquo;</a></p>
+      <a href="{% url mysite.missions.diffpatch.views.diffpatch_mission_single_file_diff %}">On to diffing files &raquo;</a></p>
     {% endif %}
   </div>
 </div>
