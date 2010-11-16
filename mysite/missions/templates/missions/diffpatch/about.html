@@ -1,4 +1,4 @@
-{% extends 'missions/diffpatch/diffpatch_base.html' %}
+{% extends 'missions/diffpatch/base.html' %}
 
 {% block mission_main %}
 <div class='submodule fat'>
@@ -10,7 +10,7 @@
     <p>This mission consists of four parts: diffing individual files, patching individual files, diffing entire directory hierarchies, and patching entire directory hierarchies.</p>
 
       <p class="next_mission_link">
-	<a href="{% url mysite.missions.diffpatch.views.diffpatch_mission_single_file_patch %}">Get started with patching &raquo;</a></p>
+	<a href="{% url mysite.missions.diffpatch.views.single_file_patch %}">Get started with patching &raquo;</a></p>
 
   </div>
 </div>

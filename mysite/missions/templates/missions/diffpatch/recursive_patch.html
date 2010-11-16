@@ -1,4 +1,4 @@
-{% extends 'missions/diffpatch/diffpatch_base.html' %}
+{% extends 'missions/diffpatch/base.html' %}
 
 {% block mission_main %}
 <div class='submodule fat'>
@@ -9,12 +9,12 @@
     <p>Sometimes you might have to apply a patch that affects more than one file.  The patch program can tell what parts of the patch apply to what files by examining the headers, but you might need to help it out by giving the <code>-p</code> option to tell it how many levels of directories to ignore so it finds the correct files to patch.</p>
     <p>Here is your mission:</p>
     <ul class="raquo_bullets">
-      <li>Download <a href="{% url mysite.missions.diffpatch.views.diffpatch_patchrecursive_get_original_tarball %}">this tarball</a> and <a href="{% url mysite.missions.diffpatch.views.diffpatch_patchrecursive_get_patch %}">this patch</a>.</li>
+      <li>Download <a href="{% url mysite.missions.diffpatch.views.patchrecursive_get_original_tarball %}">this tarball</a> and <a href="{% url mysite.missions.diffpatch.views.patchrecursive_get_patch %}">this patch</a>.</li>
       <li>Unpack the tarball and apply the patch using <code>patch -p1</code> from the <code>hats</code> directory.</li>
       <li>Answer some questions below about the contents of the files inside.</li>
     </ul>
 
-    <form method="post" enctype="multipart/form-data" action="{% url mysite.missions.diffpatch.views.diffpatch_patchrecursive_submit %}#patchrecursive-form">
+    <form method="post" enctype="multipart/form-data" action="{% url mysite.missions.diffpatch.views.patchrecursive_submit %}#patchrecursive-form">
       <div class="form-row">
         <a name="patchrecursive-form"></a>
   {% if patchrecursive_success %}

@@ -40,35 +40,35 @@ class SvnViewTests(TwillTests):
             shutil.rmtree(self.repo_path)
 
     def test_resetrepo_returns_error_with_get(self):
-        response = self.client.get(reverse(views.svn_resetrepo))
+        response = self.client.get(reverse(views.resetrepo))
         self.assert_(response.status_code == 405)
 
     def test_resetrepo_creates_valid_repo(self):
-        self.client.post(reverse(views.svn_resetrepo))
+        self.client.post(reverse(views.resetrepo))
         subprocess.check_call(['svn', 'info', 'file://'+self.repo_path])
 
     def test_do_checkout_mission_correctly(self):
-        self.client.post(reverse(views.svn_resetrepo))
-        response = self.client.get(reverse(views.svn_checkout))
+        self.client.post(reverse(views.resetrepo))
+        response = self.client.get(reverse(views.checkout))
         checkoutdir = tempfile.mkdtemp()
         try:
             subprocess.check_call(['svn', 'checkout', response.context['checkout_url'], checkoutdir])
             word = open(os.path.join(checkoutdir, response.context['secret_word_file'])).read().strip()
-            response = self.client.post(reverse(views.svn_checkout_submit), {'secret_word': word})
+            response = self.client.post(reverse(views.checkout_submit), {'secret_word': word})
             paulproteus = Person.objects.get(user__username='paulproteus')
             self.assert_(controllers.mission_completed(paulproteus, 'svn_checkout'))
         finally:
             shutil.rmtree(checkoutdir)
 
     def test_do_checkout_mission_incorrectly(self):
-        self.client.post(reverse(views.svn_resetrepo))
-        response = self.client.post(reverse(views.svn_checkout_submit), {'secret_word': 'not_the_secret_word'})
+        self.client.post(reverse(views.resetrepo))
+        response = self.client.post(reverse(views.checkout_submit), {'secret_word': 'not_the_secret_word'})
         paulproteus = Person.objects.get(user__username='paulproteus')
         self.assertFalse(controllers.mission_completed(paulproteus, 'svn_checkout'))
 
     def test_do_diff_mission_correctly(self):
-        self.client.post(reverse(views.svn_resetrepo))
-        response = self.client.get(reverse(views.svn_checkout))
+        self.client.post(reverse(views.resetrepo))
+        response = self.client.get(reverse(views.checkout))
         checkoutdir = tempfile.mkdtemp()
         try:
             # Check the repository out and make the required change.
@@ -80,7 +80,7 @@ class SvnViewTests(TwillTests):
             diff = subproc_check_output(['svn', 'diff'], cwd=checkoutdir)
 
             # Submit the diff.
-            response = self.client.post(reverse(views.svn_diff_submit), {'diff': diff})
+            response = self.client.post(reverse(views.diff_submit), {'diff': diff})
             paulproteus = Person.objects.get(user__username='paulproteus')
             self.assert_(controllers.mission_completed(paulproteus, 'svn_diff'))
 
@@ -91,8 +91,8 @@ class SvnViewTests(TwillTests):
             shutil.rmtree(checkoutdir)
 
     def test_diff_without_spaces_works(self):
-        self.client.post(reverse(views.svn_resetrepo))
-        self.client.post(reverse(views.svn_diff_submit), {'diff': open(make_testdata_filename('svn', 'svn-diff-without-spaces-on-blank-context-lines.patch')).read()})
+        self.client.post(reverse(views.resetrepo))
+        self.client.post(reverse(views.diff_submit), {'diff': open(make_testdata_filename('svn', 'svn-diff-without-spaces-on-blank-context-lines.patch')).read()})
         paulproteus = Person.objects.get(user__username='paulproteus')
         self.assert_(controllers.mission_completed(paulproteus, 'svn_diff'))
 

@@ -51,28 +51,28 @@ class TarUploadTests(TwillTests):
 
     def test_tar_file_downloads(self):
         for filename, content in controllers.TarMission.FILES.iteritems():
-            response = self.client.get(reverse(views.tar_file_download, kwargs={'name': filename}))
+            response = self.client.get(reverse(views.file_download, kwargs={'name': filename}))
             self.assertEqual(response['Content-Disposition'], 'attachment; filename=%s' % filename)
             self.assertEqual(response.content, content)
 
     def test_tar_file_download_404(self):
-        response = self.client.get(reverse(views.tar_file_download, kwargs={'name': 'doesnotexist.c'}))
+        response = self.client.get(reverse(views.file_download, kwargs={'name': 'doesnotexist.c'}))
         self.assertEqual(response.status_code, 404)
 
     def test_tar_upload_good(self):
-        response = self.client.post(reverse(views.tar_upload), {'tarfile': open(make_testdata_filename('tar', 'good.tar.gz'))})
+        response = self.client.post(reverse(views.upload), {'tarfile': open(make_testdata_filename('tar', 'good.tar.gz'))})
         self.assert_('create status: success' in response.content)
 
         paulproteus = Person.objects.get(user__username='paulproteus')
         self.assertEqual(len(StepCompletion.objects.filter(step__name='tar', person=paulproteus)), 1)
 
         # Make sure that nothing weird happens if it is submitted again.
-        response = self.client.post(reverse(views.tar_upload), {'tarfile': open(make_testdata_filename('tar', 'good.tar.gz'))})
+        response = self.client.post(reverse(views.upload), {'tarfile': open(make_testdata_filename('tar', 'good.tar.gz'))})
         self.assert_('create status: success' in response.content)
         self.assertEqual(len(StepCompletion.objects.filter(step__name='tar', person=paulproteus)), 1)
 
     def test_tar_upload_bad(self):
-        response = self.client.post(reverse(views.tar_upload), {'tarfile': open(make_testdata_filename('tar', 'bad-1.tar.gz'))})
+        response = self.client.post(reverse(views.upload), {'tarfile': open(make_testdata_filename('tar', 'bad-1.tar.gz'))})
         self.assert_('create status: failure' in response.content)
 
         paulproteus = Person.objects.get(user__username='paulproteus')
@@ -98,14 +98,14 @@ class UntarViewTests(TwillTests):
         self.client = self.login_with_client()
 
     def test_download_headers(self):
-        response = self.client.get(reverse(views.tar_download_tarball_for_extract_mission))
+        response = self.client.get(reverse(views.download_tarball_for_extract_mission))
         self.assertEqual(response['Content-Disposition'], 'attachment; filename=%s' % controllers.UntarMission.TARBALL_NAME)
 
     def test_do_mission_correctly(self):
-        download_response = self.client.get(reverse(views.tar_download_tarball_for_extract_mission))
+        download_response = self.client.get(reverse(views.download_tarball_for_extract_mission))
         tfile = tarfile.open(fileobj=StringIO(download_response.content), mode='r:gz')
         contents_it_wants = tfile.extractfile(tfile.getmember(controllers.UntarMission.FILE_WE_WANT))
-        upload_response = self.client.post(reverse(views.tar_extract_mission_upload), {'extracted_file': contents_it_wants})
+        upload_response = self.client.post(reverse(views.extract_mission_upload), {'extracted_file': contents_it_wants})
         self.assert_('unpack status: success' in upload_response.content)
 
         paulproteus = Person.objects.get(user__username='paulproteus')
@@ -114,7 +114,7 @@ class UntarViewTests(TwillTests):
     def test_do_mission_incorrectly(self):
         bad_file = StringIO('This is certainly not what it wants!')
         bad_file.name = os.path.basename(controllers.UntarMission.FILE_WE_WANT)
-        upload_response = self.client.post(reverse(views.tar_extract_mission_upload),
+        upload_response = self.client.post(reverse(views.extract_mission_upload),
                                            {'extracted_file': bad_file})
         self.assert_('unpack status: failure' in upload_response.content)
 

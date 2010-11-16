@@ -1,4 +1,4 @@
-{% extends 'missions/tar/tar_base.html' %}
+{% extends 'missions/tar/base.html' %}
 
 {% block mission_main %}
 <div class='submodule fat'>
@@ -9,7 +9,7 @@
       <p>Now that you know how to unpack tarballs, we made another simple project so you can experiment with creating them.  It is called "myproject" and is at version 0.1, and it consists of {{ filenames_for_tarball|length }} file{{ filenames_for_tarball|length|pluralize }} which you can download here:</p>
       <ul>
         {% for filename in filenames_for_tarball %}
-          <li><a href="{% url mysite.missions.tar.views.tar_file_download name=filename %}">{{ filename }}</a></li>
+          <li><a href="{% url mysite.missions.tar.views.file_download name=filename %}">{{ filename }}</a></li>
         {% endfor %}
       </ul>
 
@@ -26,7 +26,7 @@
       </ul>
       <p></p>
 
-      <form method="post" enctype="multipart/form-data" action="{% url mysite.missions.tar.views.tar_upload %}#create-form">
+      <form method="post" enctype="multipart/form-data" action="{% url mysite.missions.tar.views.upload %}#create-form">
         <div class="form-row">
           <a name="create-form"></a>
           After you make the tarball, upload it here:

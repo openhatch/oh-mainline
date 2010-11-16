@@ -17,14 +17,14 @@ Open source training missions
 
     <h2>Using tar</h2>
     <p>Learn how to work with tar archives.</p>
-    {% if completed_missions.tar or completed_missions.tar_extract %}
-      {% if completed_missions.tar and completed_missions.tar_extract %}
+    {% if completed_missions.tar or completed_missions.extract %}
+      {% if completed_missions.tar and completed_missions.extract %}
         <p><em>You have completed this mission.</em></p>
       {% else %}
         <p><em>You have partially completed this mission.</em></p>
       {% endif %}
     {% endif %}
-    <p><a href="{% url mysite.missions.tar.views.tar_mission_about %}">Go to this mission</a></p>
+    <p><a href="{% url mysite.missions.tar.views.about %}">Go to this mission</a></p>
 
     <h2>Using diff and patch</h2>
     <p>Learn how to use diff and patch to submit changes to a project or apply others' changes.</p>
@@ -35,7 +35,7 @@ Open source training missions
         <p><em>You have partially completed this mission.</em></p>
       {% endif %}
     {% endif %}
-    <p><a href="{% url mysite.missions.diffpatch.views.diffpatch_mission_about %}">Go to this mission</a></p>
+    <p><a href="{% url mysite.missions.diffpatch.views.about %}">Go to this mission</a></p>
 
     <h2>Using Subversion</h2>
     <p>Learn how to interact with projects that use the Subversion version control system.</p>
@@ -46,7 +46,7 @@ Open source training missions
         <p><em>You have partially completed this mission.</em></p>
       {% endif %}
     {% endif %}
-    <p><a href="{% url mysite.missions.svn.views.svn_mission_about %}">Go to this mission</a></p>
+    <p><a href="{% url mysite.missions.svn.views.about %}">Go to this mission</a></p>
 
   </div>
 </div>

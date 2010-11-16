@@ -1,28 +1,28 @@
 {% extends 'missions/mission_base.html' %}
 
 {% block side_nav_links %}
-<li id='link-diffpatch_mission_about'>
-  <a href='{% url mysite.missions.diffpatch.views.diffpatch_mission_about %}'>
+<li id='link-about'>
+  <a href='{% url mysite.missions.diffpatch.views.about %}'>
     About this mission
   </a>
 </li>
-<li id='link-diffpatch_mission_single_file_patch'>
-  <a href='{% url mysite.missions.diffpatch.views.diffpatch_mission_single_file_patch %}'>
+<li id='link-single_file_patch'>
+  <a href='{% url mysite.missions.diffpatch.views.single_file_patch %}'>
     Patching individual files
   </a>
 </li>
-<li id='link-diffpatch_mission_single_file_diff'>
-  <a href='{% url mysite.missions.diffpatch.views.diffpatch_mission_single_file_diff %}'>
+<li id='link-single_file_diff'>
+  <a href='{% url mysite.missions.diffpatch.views.single_file_diff %}'>
     Diffing individual files
   </a>
 </li>
-<li id='link-diffpatch_mission_recursive_diff' %}
-  <a href='{% url mysite.missions.diffpatch.views.diffpatch_mission_recursive_diff %}'>
+<li id='link-recursive_diff' %}
+  <a href='{% url mysite.missions.diffpatch.views.recursive_diff %}'>
     Diffing entire directories
   </a>
 </li>
-<li id='link-diffpatch_mission_recursive_patch'>
-  <a href='{% url mysite.missions.diffpatch.views.diffpatch_mission_recursive_patch %}'>
+<li id='link-recursive_patch'>
+  <a href='{% url mysite.missions.diffpatch.views.recursive_patch %}'>
     Patching entire directories
   </a>
 </li>

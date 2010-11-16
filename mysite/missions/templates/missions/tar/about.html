@@ -1,4 +1,4 @@
-{% extends 'missions/tar/tar_base.html' %}
+{% extends 'missions/tar/base.html' %}
 
 {% block mission_main %}
 <div class='submodule fat'>
@@ -12,6 +12,6 @@
       <p>This mission consists of two parts: unpacking tarballs and creating tarballs.</p>
 
       <p class="next_mission_link">
-	<a href="{% url mysite.missions.tar.views.tar_mission_unpacking %}">Get started with unpacking &raquo;</a></p>
+	<a href="{% url mysite.missions.tar.views.unpacking %}">Get started with unpacking &raquo;</a></p>
 
 {% endblock mission_main %}

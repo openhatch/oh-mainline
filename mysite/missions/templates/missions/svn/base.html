@@ -1,23 +1,23 @@
 {% extends 'missions/mission_base.html' %}
 
 {% block side_nav_links %}
-<li id='link-svn_mission_about'>
-  <a href='{% url mysite.missions.svn.views.svn_mission_about %}'>
+<li id='link-about'>
+  <a href='{% url mysite.missions.svn.views.about %}'>
     About this mission
   </a>
 </li>
-<li id='link-svn_checkout'>
-  <a href='{% url mysite.missions.svn.views.svn_checkout %}'>
+<li id='link-checkout'>
+  <a href='{% url mysite.missions.svn.views.checkout %}'>
     Checking out a working copy
   </a>
 </li>
-<li id='link-svn_diff'>
-  <a href='{% url mysite.missions.svn.views.svn_diff %}'>
+<li id='link-diff'>
+  <a href='{% url mysite.missions.svn.views.diff %}'>
     Diffing your changes
   </a>
 </li>
-<li id='link-svn_commit'>
-  <a href='{% url mysite.missions.svn.views.svn_commit %}'>
+<li id='link-commit'>
+  <a href='{% url mysite.missions.svn.views.commit %}'>
     Committing your changes
   </a>
 </li>

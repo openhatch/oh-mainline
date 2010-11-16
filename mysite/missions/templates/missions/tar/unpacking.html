@@ -1,4 +1,4 @@
-{% extends 'missions/tar/tar_base.html' %}
+{% extends 'missions/tar/base.html' %}
 
 {% block mission_main %}
 <div class='submodule fat'>
@@ -6,7 +6,7 @@
     <h3>Unpacking tarballs</h3>
   </div>
   <div class="body">
-      <p>For you to try unpacking existing tarballs, we made a simple project source archive for you, which you can download here: <a href="{% url mysite.missions.tar.views.tar_download_tarball_for_extract_mission %}">{{ tarball_for_unpacking_mission }}</a>. (Note that the tarball is following convention by using a wrapper directory.)</p>
+      <p>For you to try unpacking existing tarballs, we made a simple project source archive for you, which you can download here: <a href="{% url mysite.missions.tar.views.download_tarball_for_extract_mission %}">{{ tarball_for_unpacking_mission }}</a>. (Note that the tarball is following convention by using a wrapper directory.)</p>
       <p>Your mission is to:
         <ul class="raquo_bullets">
             <li>download the tarball</li>
@@ -14,7 +14,7 @@
             <li>find and upload the <code>{{ file_we_want }}</code> file</li>
         </ul>
         <p></p>
-      <form method="post" enctype="multipart/form-data" action="{% url mysite.missions.tar.views.tar_extract_mission_upload %}#unpack-form">
+      <form method="post" enctype="multipart/form-data" action="{% url mysite.missions.tar.views.extract_mission_upload %}#unpack-form">
         <div class="form-row">
           <a name="unpack-form"></a>
           After you extract that file, upload it here:
@@ -42,7 +42,7 @@
     {% endif %}
       {% if unpack_done %}
       <p class="next_mission_link">
-	<a href="{% url mysite.missions.tar.views.tar_mission_creating %}">On to creating a tarball &raquo;</a></p>
+	<a href="{% url mysite.missions.tar.views.creating %}">On to creating a tarball &raquo;</a></p>
       {% endif %}
   </div>
 </div>
