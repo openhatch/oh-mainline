@@ -15,6 +15,7 @@ def override_settings_for_testing():
         datetime.datetime.now().isoformat().replace(':', '.'))
     settings.GITHUB_USERNAME='openhatch-api-testing'
     settings.GITHUB_API_TOKEN='4a48b94a0f16c4483fee4cf6c46425e8'
+    settings.HAYSTACK_SEARCH_ENGINE='dummy'
 
     svnserve_port = random.randint(50000, 50100)
     subprocess.check_call(['svnserve',
