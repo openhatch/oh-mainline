@@ -7,6 +7,7 @@ import datetime
 import random
 import subprocess
 import signal
+import mock
 
 def override_settings_for_testing():
     settings.CELERY_ALWAYS_EAGER = True
@@ -15,7 +16,11 @@ def override_settings_for_testing():
         datetime.datetime.now().isoformat().replace(':', '.'))
     settings.GITHUB_USERNAME='openhatch-api-testing'
     settings.GITHUB_API_TOKEN='4a48b94a0f16c4483fee4cf6c46425e8'
-    settings.HAYSTACK_SEARCH_ENGINE='dummy'
+
+    # Radically break SOLR
+    settings.HAYSTACK_SOLR_URL='http://127.0.0.1:1/'
+    # mock out all of pysolr.Solr
+    mock.patch('pysolr.Solr')
 
     svnserve_port = random.randint(50000, 50100)
     subprocess.check_call(['svnserve',
