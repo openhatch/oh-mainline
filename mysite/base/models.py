@@ -7,7 +7,7 @@ class Timestamp(models.Model):
     # This is very simply a mapping from strings to timestamps. Use the method
     # "get_timestamp_for_string" and if there is no timestamp for that string,
     # you'll get Jan 1, 1970 0:00 UTC.
-    key = models.CharField(null=False, blank=False, unique=True, max_length=255)
+    key = models.CharField(null=False, blank=False, unique=True, max_length=64)
     timestamp = models.DateTimeField(null=False)
 
     # okay, so strings can be of arbitrary length. But our keys cannot be.
