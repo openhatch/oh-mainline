@@ -35,8 +35,8 @@ def format_data(request, passed_data={}):
         if data['repository_exists']:
           data.update({
             'checkout_url': repo.public_trunk_url(),
-            'secret_word_file': controllers.CheckoutMission.SECRET_WORD_FILE,
-            'file_for_svn_diff': controllers.DiffMission.FILE_TO_BE_PATCHED,
+            'secret_word_file': controllers.SvnCheckoutMission.SECRET_WORD_FILE,
+            'file_for_svn_diff': controllers.SvnDiffMission.FILE_TO_BE_PATCHED,
             'new_secret_word': controllers.SvnCommitMission.NEW_SECRET_WORD,
             'commit_username': request.user.username,
             'commit_password': repo.get_password()
@@ -63,7 +63,7 @@ def checkout_submit(request):
     if request.method == 'POST':
         form = forms.CheckoutForm(request.POST)
         if form.is_valid():
-            if form.cleaned_data['secret_word'] == controllers.CheckoutMission.get_secret_word(request.user.username):
+            if form.cleaned_data['secret_word'] == controllers.SvnCheckoutMission.get_secret_word(request.user.username):
                 controllers.set_mission_completed(request.user.get_profile(), 'svn_checkout')
                 return HttpResponseRedirect(reverse(checkout))
             else:
@@ -85,7 +85,7 @@ def diff_submit(request):
         form = forms.DiffForm(request.POST)
         if form.is_valid():
             try:
-                controllers.DiffMission.validate_diff_and_commit_if_ok(request.user.username, form.cleaned_data['diff'])
+                controllers.SvnDiffMission.validate_diff_and_commit_if_ok(request.user.username, form.cleaned_data['diff'])
                 controllers.set_mission_completed(request.user.get_profile(), 'svn_diff')
                 return HttpResponseRedirect(reverse(diff))
             except controllers.IncorrectPatch, e:
