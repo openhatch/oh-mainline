@@ -10,7 +10,7 @@ def resetrepo(request):
     controllers.unset_mission_completed(request.user.get_profile(), 'svn_diff')
     controllers.unset_mission_completed(request.user.get_profile(), 'svn_commit')
     if 'stay_on_this_page' in request.GET:
-        return HttpResponseRedirect(reverse(about))
+        return HttpResponseRedirect(reverse(main_page))
     else:
         return HttpResponseRedirect(reverse(checkout))
 
@@ -45,10 +45,10 @@ def format_data(request, passed_data={}):
     return data
 
 @view
-def about(request, passed_data={}):
+def main_page(request, passed_data={}):
     data = format_data(request, passed_data)
     data['this_mission_page_short_name'] = 'About'
-    return (request, 'missions/svn/about.html', data)
+    return (request, 'missions/svn/main_page.html', data)
 
 @login_required
 @view
