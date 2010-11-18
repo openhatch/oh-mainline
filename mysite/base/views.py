@@ -17,6 +17,7 @@ from mysite.base.decorators import view
 import mysite.customs.feed
 import mysite.search.controllers
 import mysite.search.models
+import mysite.missions.models
 
 import feedparser
 import lxml.html
@@ -59,6 +60,7 @@ def home(request):
 
         data['nudge_location'] = person.should_be_nudged_about_location()
         data['nudge_tags'] = not person.get_tags_for_recommendations()
+        data['nudge_missions'] = not mysite.missions.models.StepCompletion.objects.filter(person=person)
 
         # Project editor nudging. Note:
         # If the person has some dias, then no nudge!

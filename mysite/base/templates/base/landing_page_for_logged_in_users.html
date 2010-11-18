@@ -177,6 +177,19 @@ body.three_columns #right #recent_activity_feed .body { font-size: 1em; }
                             </a>
                         </li>
                     {% endif %}
+                    {% if nudge_missions %}
+                        <li>
+                            <a href='/missions/'>
+                                <span class='notification smaller'>
+                                    <span class='arrow'>&rarr;</span>
+                                    <strong>Start learning</strong>
+                                    <span class='more-text'>
+                                        Try our friendly, interactive training missions that teach you essential open source tools like diff and subversion. (You can dismiss this message by completing any part of a mission!)
+                                    </span>
+                                </span>
+                            </a>
+                        </li>
+                    {% endif %}
                     {% if nudge_location %}
                         <li>
                             <a href='/account/settings/location/'>
