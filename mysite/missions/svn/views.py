@@ -1,6 +1,11 @@
 from mysite.missions.base.views import *
 from mysite.missions.svn import forms, controllers
 
+### POST handlers
+###
+### Forms submit to this, and we use these to validate input and/or
+### modify the information stored about the user, such as recording
+### that a mission was successfully completed.
 @login_required
 def resetrepo(request):
     if request.method != 'POST':
@@ -13,6 +18,37 @@ def resetrepo(request):
         return HttpResponseRedirect(reverse(main_page))
     else:
         return HttpResponseRedirect(reverse(checkout))
+
+@login_required
+def diff_submit(request):
+    data = {}
+    if request.method == 'POST':
+        form = forms.DiffForm(request.POST)
+        if form.is_valid():
+            try:
+                controllers.SvnDiffMission.validate_diff_and_commit_if_ok(request.user.username, form.cleaned_data['diff'])
+                controllers.set_mission_completed(request.user.get_profile(), 'svn_diff')
+                return HttpResponseRedirect(reverse(diff))
+            except controllers.IncorrectPatch, e:
+                data['svn_diff_error_message'] = str(e)
+        data['svn_diff_form'] = form
+    return diff(request, data)
+
+@login_required
+def checkout_submit(request):
+    data = {}
+    if request.method == 'POST':
+        form = forms.CheckoutForm(request.POST)
+        if form.is_valid():
+            if form.cleaned_data['secret_word'] == controllers.SvnCheckoutMission.get_secret_word(request.user.username):
+                controllers.set_mission_completed(request.user.get_profile(), 'svn_checkout')
+                return HttpResponseRedirect(reverse(checkout))
+            else:
+                data['svn_checkout_error_message'] = 'The secret word is incorrect.'
+        data['svn_checkout_form'] = form
+    return checkout(request, data)
+
+### Helper functions
 
 def format_data(request, passed_data={}):
     data = {
@@ -44,6 +80,8 @@ def format_data(request, passed_data={}):
     data.update(passed_data)
     return data
 
+### Normal GET handlers. These are usually pretty short.
+
 @view
 def main_page(request, passed_data={}):
     data = format_data(request, passed_data)
@@ -58,40 +96,11 @@ def checkout(request, passed_data={}):
     return (request, 'missions/svn/checkout.html', data)
 
 @login_required
-def checkout_submit(request):
-    data = {}
-    if request.method == 'POST':
-        form = forms.CheckoutForm(request.POST)
-        if form.is_valid():
-            if form.cleaned_data['secret_word'] == controllers.SvnCheckoutMission.get_secret_word(request.user.username):
-                controllers.set_mission_completed(request.user.get_profile(), 'svn_checkout')
-                return HttpResponseRedirect(reverse(checkout))
-            else:
-                data['svn_checkout_error_message'] = 'The secret word is incorrect.'
-        data['svn_checkout_form'] = form
-    return checkout(request, data)
-
-@login_required
 @view
 def diff(request, passed_data={}):
     data = format_data(request, passed_data)
     data['this_mission_page_short_name'] = 'Diffing your changes'
     return (request, 'missions/svn/diff.html', data)
-
-@login_required
-def diff_submit(request):
-    data = {}
-    if request.method == 'POST':
-        form = forms.DiffForm(request.POST)
-        if form.is_valid():
-            try:
-                controllers.SvnDiffMission.validate_diff_and_commit_if_ok(request.user.username, form.cleaned_data['diff'])
-                controllers.set_mission_completed(request.user.get_profile(), 'svn_diff')
-                return HttpResponseRedirect(reverse(diff))
-            except controllers.IncorrectPatch, e:
-                data['svn_diff_error_message'] = str(e)
-        data['svn_diff_form'] = form
-    return diff(request, data)
 
 @login_required
 @view
