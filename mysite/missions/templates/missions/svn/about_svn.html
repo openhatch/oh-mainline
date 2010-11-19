@@ -1,0 +1,33 @@
+{% extends 'missions/svn/base.html' %}
+
+{% block mission_main %}
+<div class='submodule fat'>
+  <div class='head'>
+    <h3>About Subversion</h3>
+  </div>
+  <div class="body">
+
+      <p>Most open source projects keep their code in a version control system (<abbr title="version control system">VCS</abbr>).  Subversion is a popular VCS for open source projects.  Subversion is a non-distributed VCS, meaning that there is a single central repository that all users and developers interact with.</p>
+
+      <p>A VCS tracks changes that are made to the code.  Each change has a timestamp, an author name, and a log message associated with it.  If two people modify the same file, the VCS catches this and merges both sets of changes; the second person is shown any conflicts that occur so the conflicts can be resolved.  One can also look through the history of the codebase.</p>
+
+      <p>This mission consists of three parts: checking out a working copy, creating a diff of changes to a working copy, and committing changes.</p>
+
+      <h3>Projects that use Subversion</h3>
+      
+      <p>There are too many to list. Thousands. Hundreds of thousands?</p>
+
+      {% if the_user.is_authenticated %}
+      <p>(If your project recommends this tutorial to newcomers, we can put you in a list here!)</p>
+      {% endif %}
+
+      <h3>Other resources</h3>
+
+      <ul class="raquo_bullets">
+	<li>The Subversion Book has an excellent summary of the <a href="http://svnbook.red-bean.com/en/1.5/svn.tour.cycle.html">basic work cycle</a> of a Subversion user.</li>
+	<li>Wikipedia has <a href="https://secure.wikimedia.org/wikipedia/en/wiki/Apache_Subversion">an article about it</a>. Subversion's history as a project is quite interesting.</li>
+	<li>Many Subversion users chat using IRC in #svn on FreeNode.</li>
+      </ul>
+  </div>
+</div>
+{% endblock mission_main %}

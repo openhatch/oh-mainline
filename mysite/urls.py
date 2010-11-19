@@ -88,6 +88,7 @@ urlpatterns = patterns('',
         (r'^missions/diffpatch/patchrecursive/submit$', 'mysite.missions.diffpatch.views.patchrecursive_submit'),
 
         (r'^missions/svn$', 'mysite.missions.svn.views.main_page'),
+        (r'^missions/svn/description$', 'mysite.missions.svn.views.long_description'),
         (r'^missions/svn/resetrepo$', 'mysite.missions.svn.views.resetrepo'),
         (r'^missions/svn/checkout$', 'mysite.missions.svn.views.checkout'),
         (r'^missions/svn/checkout/submit$', 'mysite.missions.svn.views.checkout_submit'),

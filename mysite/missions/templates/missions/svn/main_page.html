@@ -16,7 +16,7 @@
 
     <p>You'll learn how to use a Subversion repository: you'll check things out, create patches, and commit.</p>
 
-    <p>If you want to know why people use Subversion, read <a href="url mysite.missions.svn.views.why_learn_svn ">more about Subversion</a>.</p>
+    <p>If you want to know why people use Subversion, read <a href="{% url mysite.missions.svn.views.long_description %}">more about Subversion</a>.</p>
 
     <h3>Get started</h3>
 
@@ -43,13 +43,7 @@
       {% else %}
       <p>If you were logged in, you could create a repository that you could use to do these missions.</p>
       {% endif %}
-
-      <!--
-
-      <p>Most open source projects keep their code in a version control system (VCS).  Subversion is a popular VCS for open source projects.  Subversion is a non-distributed VCS, meaning that there is a single central repository that all users and developers interact with.</p>
-      <p>A VCS tracks changes that are made to the code.  Each change has a timestamp, an author name, and a log message associated with it.  If two people modify the same file, the VCS catches this and merges both sets of changes; the second person is shown any conflicts that occur so the conflicts can be resolved.  One can also look through the history of the codebase.</p>
-
-      <p>This mission consists of three parts: checking out a working copy, creating a diff of changes to a working copy, and committing changes.</p>
-      -->
+  </div>
+</div>
 
 {% endblock mission_main %}

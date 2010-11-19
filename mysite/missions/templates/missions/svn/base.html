@@ -3,7 +3,12 @@
 {% block side_nav_links %}
 <li id='link-main_page'>
   <a href='{% url mysite.missions.svn.views.main_page %}'>
-    About this mission
+    Mission start page
+  </a>
+</li>
+<li id='link-long_description'>
+  <a href='{% url mysite.missions.svn.views.long_description %}'>
+    About Subversion
   </a>
 </li>
 <li id='link-checkout'>

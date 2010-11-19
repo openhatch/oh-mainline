@@ -85,8 +85,14 @@ def format_data(request, passed_data={}):
 @view
 def main_page(request, passed_data={}):
     data = format_data(request, passed_data)
-    data['this_mission_page_short_name'] = 'About'
+    data['this_mission_page_short_name'] = 'Start page'
     return (request, 'missions/svn/main_page.html', data)
+
+@view
+def long_description(request, passed_data={}):
+    data = format_data(request, passed_data)
+    data['this_mission_page_short_name'] = 'About Subversion'
+    return (request, 'missions/svn/about_svn.html', data)
 
 @login_required
 @view
