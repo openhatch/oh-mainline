@@ -106,6 +106,9 @@ def checkout(request, passed_data={}):
 def diff(request, passed_data={}):
     data = format_data(request, passed_data)
     data['this_mission_page_short_name'] = 'Diffing your changes'
+    data['mission_step_prerequisites_passed'
+         ] = controllers.mission_completed(request.user.get_profile(),
+                                           'svn_checkout')
     return (request, 'missions/svn/diff.html', data)
 
 @login_required
