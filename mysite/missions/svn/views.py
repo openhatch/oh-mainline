@@ -113,6 +113,9 @@ def diff(request, passed_data={}):
 def commit(request, passed_data={}):
     data = format_data(request, passed_data)
     data['this_mission_page_short_name'] = 'Committing your changes'
+    data['mission_step_prerequisites_passed'
+         ] = controllers.mission_completed(request.user.get_profile(),
+                                           'svn_diff')
     return (request, 'missions/svn/commit.html', data)
 
 @login_required

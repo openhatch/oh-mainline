@@ -1,44 +1,44 @@
 {% extends 'missions/svn/base.html' %}
 
-{% block mission_main %}
-<div class='submodule fat'>
-  <div class='head'>
-    <h3>Diffing your changes</h3>
-  </div>
-  <div class="body">
-      <p>It's good of you to share with us the information you have gathered, but you still have to gain a little more of Mr. Bad's trust.</p>
-      <p>Your headquarters knows that Mr. Bad isn't the best typist, so it is likely that the plans have a typographical error somewhere.  Mr. Bad is embarrassed by typos, so if you were to fix such an error, that would make him happy.  Maybe he will even be happy enough to grant you commit access.</p>
+{% block mission_missing_prerequisite_text %}
+<p>You can't do the diffing step yet. You have to do the
+  <a href="{% url mysite.missions.svn.views.checkout %}">checkout step first</a>!
+</p>
+{% endblock mission_missing_prerequisite_text %}
 
-      <p>You can give Mr. Bad a patch containing your changes.  If he likes it, he'll commit it for you.</p>
+{% block mission_main_body %}
+<p>It's good of you to share with us the information you have gathered, but you still have to gain a little more of Mr. Bad's trust.</p>
+<p>Your headquarters knows that Mr. Bad isn't the best typist, so it is likely that the plans have a typographical error somewhere.  Mr. Bad is embarrassed by typos, so if you were to fix such an error, that would make him happy.  Maybe he will even be happy enough to grant you commit access.</p>
 
-      <p>Your mission is this:</p>
-      <ul class="raquo_bullets">
-      <li>You can use your working copy from the previous mission.</li>
-      <li>The file <code>{{ file_for_svn_diff }}</code> contains a typographical error.  Fix it in your working copy.</li>
-      <li>Run <code>svn diff</code> and paste its output into the box below.</li>
-      </ul>
+<p>You can give Mr. Bad a patch containing your changes.  If he likes it, he'll commit it for you.</p>
 
-    {% if svn_diff_done %}
-      <div class="successmsg">
-        <p><strong>You have successfully completed this part of the mission.</strong></p>
-      </div>
-      <p class="next_mission_link">
-	<a href="{% url mysite.missions.svn.views.commit %}">Committing your changes &raquo;</a></p>
-    {% else %}
-    <form method="post" action="{% url mysite.missions.svn.views.diff_submit %}#svndiff-form">
-        <div class="form-row">
-          <a name="svndiff-form"></a>
-          {% if svn_diff_error_message %}
-          <ul class="errorlist"><li>{{ svn_diff_error_message }}</li></ul>
-          {% endif %}
-          {{ svn_diff_form.diff.errors }}
-          <br style="clear: left;" />
-          <code>svn diff</code> output: <br style="clear: left;" />
-          {{ svn_diff_form.diff }}
-          <br style="clear: left;" />
-          <input type="submit" value="Submit" style="float: none;" />
-        </div>
-      </form>
+<p>Your mission is this:</p>
+<ul class="raquo_bullets">
+  <li>You can use your working copy from the previous mission.</li>
+  <li>The file <code>{{ file_for_svn_diff }}</code> contains a typographical error.  Fix it in your working copy.</li>
+  <li>Run <code>svn diff</code> and paste its output into the box below.</li>
+</ul>
+
+{% if svn_diff_done %}
+<div class="successmsg">
+  <p><strong>You have successfully completed this part of the mission.</strong></p>
+</div>
+<p class="next_mission_link">
+  <a href="{% url mysite.missions.svn.views.commit %}">Committing your changes &raquo;</a></p>
+{% else %}
+<form method="post" action="{% url mysite.missions.svn.views.diff_submit %}#svndiff-form">
+  <div class="form-row">
+    <a name="svndiff-form"></a>
+    {% if svn_diff_error_message %}
+    <ul class="errorlist"><li>{{ svn_diff_error_message }}</li></ul>
     {% endif %}
-
-{% endblock mission_main %}
+    {{ svn_diff_form.diff.errors }}
+    <br style="clear: left;" />
+    <code>svn diff</code> output: <br style="clear: left;" />
+    {{ svn_diff_form.diff }}
+    <br style="clear: left;" />
+    <input type="submit" value="Submit" style="float: none;" />
+  </div>
+</form>
+{% endif %}
+{% endblock %}

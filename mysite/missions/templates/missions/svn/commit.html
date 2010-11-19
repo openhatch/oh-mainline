@@ -7,50 +7,49 @@
 {% endif %}
 {% endblock js %}
 
-{% block mission_main %}
-<div class='submodule fat'>
-  <div class='head'>
-    <h3>Committing your changes</h3>
+{% block mission_missing_prerequisite_text %}
+<p>You can't do the committing step yet. You have to do the
+  <a href="{% url mysite.missions.svn.views.diff %}">diff step first</a>!
+</p>
+{% endblock mission_missing_prerequisite_text %}
+
+{% block mission_main_body %}
+<p>Mr. Bad was very happy with your patch, so he gave you commit access.  Excellent. He even thanked you for your work.</p>
+
+<p>Take a look -- run <code>svn update</code> to get the latest files. Subversion will print the file you modified and the status letter "G", indicating that Mr. Bad's changes and yours have been "merged." Then run <code>svn log</code> to see his thank-you note!</p>
+
+<p>Now we have a new mission for you. You see, the compound that Mr. Bad's agents are getting ready to infiltrate is on our side. If you change the information in the repository, you can make Mr. Bad's agents easy to recognize: they'll say silly things and wear silly hats.</p>
+
+<p>When you have uncommitted changes to files in your working copy, you can commit some or all of them to the repository using the <code>svn commit</code> command if you have the appropriate level of access to do so.  You can also add or remove files and directories by using the <code>svn add</code> and <code>svn rm</code> commands before you commit.</p>
+
+<p>Here's your mission:</p>
+<ul class="raquo_bullets">
+  <li>Use your working copy from the previous missions.</li>
+  <li>Make sure your working copy is fully up-to-date by running <code>svn update</code>.</li>
+  <li>Change the secret word to <code>{{ new_secret_word }}</code>.</li>
+  <li>In Mr. Bad's README, he instructs his agents to wear red hats. Change that to blue so we can identify them.</li>
+  <li>Commit your changes (include both files in the commit) and provide a log message with your commit.</li>
+</ul>
+
+<p>You will need to authenticate to commit your changes.  Mr. Bad generated your commit password randomly.</p>
+<p>Commit username: <code>{{ commit_username }}</code><br />
+  Commit password: <code>{{ commit_password }}</code></p>
+
+<p>For this mission, if there is something wrong with the commit you make, your commit will fail with an error message explaining what happened.  You can then fix your commit and try again.  Once your commit succeeds, this mission will be marked as completed. <noscript>You will have to refresh the page to see that.</noscript></p>
+
+{% if not svn_commit_done %}
+<style type="text/css">
+  .hide_until_svn_commit_mission_is_complete {
+  display: none;
+  }
+</style>
+{% endif %}
+<div class="hide_until_svn_commit_mission_is_complete">
+  <div class="successmsg">
+    <p><strong>You have successfully completed this mission.</strong></p>
   </div>
-  <div class="body">
-      <p>Mr. Bad was very happy with your patch, so he gave you commit access.  Excellent. He even thanked you for your work.</p>
-      
-      <p>Take a look -- run <code>svn update</code> to get the latest files. Subversion will print the file you modified and the status letter "G", indicating that Mr. Bad's changes and yours have been "merged." Then run <code>svn log</code> to see his thank-you note!</p>
-      
-      <p>Now we have a new mission for you. You see, the compound that Mr. Bad's agents are getting ready to infiltrate is on our side. If you change the information in the repository, you can make Mr. Bad's agents easy to recognize: they'll say silly things and wear silly hats.</p>
-
-      <p>When you have uncommitted changes to files in your working copy, you can commit some or all of them to the repository using the <code>svn commit</code> command if you have the appropriate level of access to do so.  You can also add or remove files and directories by using the <code>svn add</code> and <code>svn rm</code> commands before you commit.</p>
-
-      <p>Here's your mission:</p>
-      <ul class="raquo_bullets">
-      <li>Use your working copy from the previous missions.</li>
-      <li>Make sure your working copy is fully up-to-date by running <code>svn update</code>.</li>
-      <li>Change the secret word to <code>{{ new_secret_word }}</code>.</li>
-      <li>In Mr. Bad's README, he instructs his agents to wear red hats. Change that to blue so we can identify them.</li>
-      <li>Commit your changes (include both files in the commit) and provide a log message with your commit.</li>
-      </ul>
-
-      <p>You will need to authenticate to commit your changes.  Mr. Bad generated your commit password randomly.</p>
-      <p>Commit username: <code>{{ commit_username }}</code><br />
-      Commit password: <code>{{ commit_password }}</code></p>
-
-      <p>For this mission, if there is something wrong with the commit you make, your commit will fail with an error message explaining what happened.  You can then fix your commit and try again.  Once your commit succeeds, this mission will be marked as completed. <noscript>You will have to refresh the page to see that.</noscript></p>
-
-    {% if not svn_commit_done %}
-    <style type="text/css">
-      .hide_until_svn_commit_mission_is_complete {
-        display: none;
-      }
-    </style>
-    {% endif %}
-    <div class="hide_until_svn_commit_mission_is_complete">
-      <div class="successmsg">
-        <p><strong>You have successfully completed this mission.</strong></p>
-      </div>
-
-      <p>(You might be wondering -- won't Mr. Bad or his agents notice that the changes were made by you? The agents could read the output of <code>svn log</code>, but they have no reason to suspect that {{ commit_username }}'s changes are unfriendly to them. And Mr. Bad himself isn't paying attention. Many real open source projects have commit mailing lists where all changes are sent. Developers can read that to watch changes.)</p>
-
-      <p>That's all we have for Subversion training missions.  <a href="{% url mysite.missions.base.views.main_page %}">Return to the main mission page</a></p>
-    </div>
-
-{% endblock mission_main %}
+  
+  <p>(You might be wondering -- won't Mr. Bad or his agents notice that the changes were made by you? The agents could read the output of <code>svn log</code>, but they have no reason to suspect that {{ commit_username }}'s changes are unfriendly to them. And Mr. Bad himself isn't paying attention. Many real open source projects have commit mailing lists where all changes are sent. Developers can read that to watch changes.)</p>
+  
+  <p>That's all we have for Subversion training missions.  <a href="{% url mysite.missions.base.views.main_page %}">Return to the main mission page</a></p>
+{% endblock mission_main_body %}
