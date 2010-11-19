@@ -48,78 +48,97 @@ def checkout_submit(request):
         data['svn_checkout_form'] = form
     return checkout(request, data)
 
-### Helper functions
+### State manager
+class SvnMissionPageState(object):
+    def __init__(self, request, passed_data):
+        self.prerequisites = []
+        self.request = request
+        self.mission_name = 'Using Subversion'
+        self.this_mission_page_short_name = ''
+        self.mission_step_prerequisite = None
+        self.passed_data = passed_data
 
-def format_data(request, passed_data={}):
-    data = {
-      'mission_name': 'Using Subversion',
-      'svn_checkout_success': False,
-      'svn_checkout_form': forms.CheckoutForm(),
-      'svn_checkout_error_message': '',
-      'svn_diff_success': False,
-      'svn_diff_form': forms.DiffForm(),
-      'svn_diff_error_message': '',
-    }
-    if request.user.is_authenticated():
-        repo = controllers.SvnRepository(request.user.username)
-        data.update({
-            'repository_exists': repo.exists(),
-            'svn_checkout_done': controllers.mission_completed(request.user.get_profile(), 'svn_checkout'),
-            'svn_diff_done': controllers.mission_completed(request.user.get_profile(), 'svn_diff'),
-            'svn_commit_done': controllers.mission_completed(request.user.get_profile(), 'svn_commit'),
-        })
-        if data['repository_exists']:
-          data.update({
-            'checkout_url': repo.public_trunk_url(),
-            'secret_word_file': controllers.SvnCheckoutMission.SECRET_WORD_FILE,
-            'file_for_svn_diff': controllers.SvnDiffMission.FILE_TO_BE_PATCHED,
-            'new_secret_word': controllers.SvnCommitMission.NEW_SECRET_WORD,
-            'commit_username': request.user.username,
-            'commit_password': repo.get_password()
-          })
-    data.update(passed_data)
-    return data
+    def as_dict_for_template_context(self):
+        user = self.request.user
+        data = {
+            'this_mission_page_short_name': self.this_mission_page_short_name,
+            'mission_name': self.mission_name,
+            'svn_checkout_success': False,
+            'svn_checkout_form': forms.CheckoutForm(),
+            'svn_checkout_error_message': '',
+            'svn_diff_success': False,
+            'svn_diff_form': forms.DiffForm(),
+            'svn_diff_error_message': '',
+            'mission_step_prerequisites_passed': True,
+        }
+        if self.passed_data:
+            data.update(self.passed_data) # NOTE: Weird quasi security hole
+        if user.is_authenticated():
+            person = self.request.user.get_profile()
+            repo = controllers.SvnRepository(user.username)
+            data.update({
+                'repository_exists': repo.exists(),
+                'svn_checkout_done': controllers.mission_completed(person, 'svn_checkout'),
+                'svn_diff_done': controllers.mission_completed(person, 'svn_diff'),
+                'svn_commit_done': controllers.mission_completed(person, 'svn_commit'),
+            })
+            if self.mission_step_prerequisite:
+                data['mission_step_prerequisites_passed'
+                     ] = controllers.mission_completed(person,
+                                                       self.mission_step_prerequisite)
+                    
+            if data['repository_exists']:
+              data.update({
+                'checkout_url': repo.public_trunk_url(),
+                'secret_word_file': controllers.SvnCheckoutMission.SECRET_WORD_FILE,
+                'file_for_svn_diff': controllers.SvnDiffMission.FILE_TO_BE_PATCHED,
+                'new_secret_word': controllers.SvnCommitMission.NEW_SECRET_WORD,
+                'commit_username': self.request.user.username,
+                'commit_password': repo.get_password()
+              })
+        return data
 
 ### Normal GET handlers. These are usually pretty short.
 
 @view
-def main_page(request, passed_data={}):
-    data = format_data(request, passed_data)
-    data['this_mission_page_short_name'] = 'Start page'
-    return (request, 'missions/svn/main_page.html', data)
+def main_page(request, passed_data = None):
+    state = SvnMissionPageState(request, passed_data)
+    state.this_mission_page_short_name = 'Start page'
+    return (request, 'missions/svn/main_page.html',
+            state.as_dict_for_template_context())
 
 @view
-def long_description(request, passed_data={}):
-    data = format_data(request, passed_data)
-    data['this_mission_page_short_name'] = 'About Subversion'
-    return (request, 'missions/svn/about_svn.html', data)
-
-@login_required
-@view
-def checkout(request, passed_data={}):
-    data = format_data(request, passed_data)
-    data['this_mission_page_short_name'] = 'Checking out'
-    return (request, 'missions/svn/checkout.html', data)
+def long_description(request, passed_data = None):
+    state = SvnMissionPageState(request, passed_data)
+    state.this_mission_page_short_name = 'About Subversion'
+    return (request, 'missions/svn/about_svn.html',
+            state.as_dict_for_template_context())
 
 @login_required
 @view
-def diff(request, passed_data={}):
-    data = format_data(request, passed_data)
-    data['this_mission_page_short_name'] = 'Diffing your changes'
-    data['mission_step_prerequisites_passed'
-         ] = controllers.mission_completed(request.user.get_profile(),
-                                           'svn_checkout')
-    return (request, 'missions/svn/diff.html', data)
+def checkout(request, passed_data = None):
+    state = SvnMissionPageState(request, passed_data)
+    state.this_mission_page_short_name = 'Checking out'
+    return (request, 'missions/svn/checkout.html',
+            state.as_dict_for_template_context())
 
 @login_required
 @view
-def commit(request, passed_data={}):
-    data = format_data(request, passed_data)
-    data['this_mission_page_short_name'] = 'Committing your changes'
-    data['mission_step_prerequisites_passed'
-         ] = controllers.mission_completed(request.user.get_profile(),
-                                           'svn_diff')
-    return (request, 'missions/svn/commit.html', data)
+def diff(request, passed_data = None):
+    state = SvnMissionPageState(request, passed_data)
+    state.this_mission_page_short_name = 'Diffing your changes'
+    state.mission_step_prerequisite = 'svn_checkout'
+    return (request, 'missions/svn/diff.html',
+            state.as_dict_for_template_context())
+
+@login_required
+@view
+def commit(request, passed_data = None):
+    state = SvnMissionPageState(request, passed_data)
+    state.this_mission_page_short_name = 'Committing your changes'
+    state.mission_step_prerequisite = 'svn_diff'
+    return (request, 'missions/svn/commit.html',
+            state.as_dict_for_template_context())
 
 @login_required
 def commit_poll(request):
