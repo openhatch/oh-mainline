@@ -1,49 +1,42 @@
 {% extends 'missions/svn/base.html' %}
 
-{% block mission_main %}
-<div class='submodule fat'>
-  <div class='head'>
-    <h3>Using Subversion</h3>
-  </div>
-  <div class="body">
-    <h3>The set-up</h3>
+{% block mission_main_body %}
+<h3>The set-up</h3>
 
-    <p>You are an agent for Mr. Good, and you are trying to gain the trust  of Mr. Bad.</p>
+<p>You are an agent for Mr. Good, and you are trying to gain the trust  of Mr. Bad.</p>
 
-    <p>Due to your charm and wit, he has offered you read-only access to the plans for an upcoming mission for one of his agents. He uses Subversion to keep track of the development of his plans. Your  eventual goal is to modify Mr. Bad's plans. Your plan is to submit patches until he gives you commit access.</p>
+<p>Due to your charm and wit, he has offered you read-only access to the plans for an upcoming mission for one of his agents. He uses Subversion to keep track of the development of his plans. Your  eventual goal is to modify Mr. Bad's plans. Your plan is to submit patches until he gives you commit access.</p>
 
-    <h3>What you'll learn</h3>
+<h3>What you'll learn</h3>
 
-    <p>You'll learn how to use a Subversion repository: you'll check things out, create patches, and commit.</p>
+<p>You'll learn how to use a Subversion repository: you'll check things out, create patches, and commit.</p>
 
-    <p>If you want to know why people use Subversion, read <a href="{% url mysite.missions.svn.views.long_description %}">more about Subversion</a>.</p>
+<p>If you want to know why people use Subversion, read <a href="{% url mysite.missions.svn.views.long_description %}">more about Subversion</a>.</p>
 
-    <h3>Get started</h3>
+<h3>Get started</h3>
 
-    <p>This mission consists of three parts: checking out a working copy, creating a diff of changes to a working copy, and committing changes.</p>
-    
-      {% if the_user.is_authenticated %}
-      {% if repository_exists %}
-      <p>You already have a repository that you can use for these missions, but if you want to start over fresh, you can reset it.</p>
+<p>This mission consists of three parts: checking out a working copy, creating a diff of changes to a working copy, and committing changes.</p>
 
-      <form method="post" action="{% url mysite.missions.svn.views.resetrepo %}?stay_on_this_page=1" onsubmit="return confirm('Are you sure you want to reset your repository to its original state?');">
-        <input type="submit" value="Reset your repository" />
-      </form><br style="clear: left;" />
-      <p class="next_mission_link">
-	<a href="{% url mysite.missions.svn.views.checkout %}">Checking out a working copy &raquo;</a></p>
-      {% else %}
-      <p>To do these missions, you will need to make a personal repository.  Your repository will reside on the OpenHatch server, specifically for your use in these missions.  Then you can go on and interact with it.</p>
+{% if the_user.is_authenticated %}
+{% if repository_exists %}
+<p>You already have a repository that you can use for these missions, but if you want to start over fresh, you can reset it.</p>
 
-      <form method="post" action="{% url mysite.missions.svn.views.resetrepo %}">
-        <input type="submit" value="Create your repository and start the missions &raquo;" />
-      </form><br style="clear: left;" />
+<form method="post" action="{% url mysite.missions.svn.views.resetrepo %}?stay_on_this_page=1" onsubmit="return confirm('Are you sure you want to reset your repository to its original state?');">
+  <input type="submit" value="Reset your repository" />
+</form><br style="clear: left;" />
+<p class="next_mission_link">
+  <a href="{% url mysite.missions.svn.views.checkout %}">Checking out a working copy &raquo;</a></p>
+{% else %}
+<p>To do these missions, you will need to make a personal repository.  Your repository will reside on the OpenHatch server, specifically for your use in these missions.  Then you can go on and interact with it.</p>
 
-      {% endif %}
+<form method="post" action="{% url mysite.missions.svn.views.resetrepo %}">
+  <input type="submit" value="Create your repository and start the missions &raquo;" />
+</form><br style="clear: left;" />
 
-      {% else %}
-      <p>If you were logged in, you could create a repository that you could use to do these missions.</p>
-      {% endif %}
-  </div>
-</div>
+{% endif %}
 
-{% endblock mission_main %}
+{% else %}
+<p>If you were logged in, you could create a repository that you could use to do these missions.</p>
+{% endif %}
+
+{% endblock mission_main_body %}
