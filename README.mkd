@@ -84,9 +84,9 @@ If you want to know what it does, read the file. It is reasonably well-commented
 
 2. Exit from MySQL, and run this command, again from the top level directory:
 
-    ./bin/mysite syncdb
+    ./bin/mysite syncdb --noinput
 
-To the question, "Do you want to create a superuser?", answer "No". That's because you haven't run the migrations for the "profile" app yet. (If you hit "Yes", everything will explode, and you'll need to delete "oh_milestone_a" and re-create your database.)
+By passing "noinput", you request that Django not ask you questions. It's important that we not let Django create a super-user at this stage.
 
 3. Run the "migrations" to migrate your database from the empty state into the state it should be in.
 
