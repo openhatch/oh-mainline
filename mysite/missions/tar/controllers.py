@@ -30,24 +30,22 @@ int main(void)
         # Check the filename list.
         filenames_wanted = [cls.WRAPPER_DIR_NAME] + [os.path.join(cls.WRAPPER_DIR_NAME, filename) for filename in cls.FILES.keys()]
         for member in tfile.getmembers():
-            name_as_if_this_were_python_two_point_six = remove_slash_that_python_two_point_five_might_have_added(member.name)
-
-            if '/' not in name_as_if_this_were_python_two_point_six:
-                if name_as_if_this_were_python_two_point_six in cls.FILES.keys():
+            if '/' not in member.name:
+                if member.name in cls.FILES.keys():
                     raise IncorrectTarFile, 'No wrapper directory is present'
-                elif member.isdir() and name_as_if_this_were_python_two_point_six != cls.WRAPPER_DIR_NAME:
-                    raise IncorrectTarFile, 'Wrapper directory name is incorrect: "%s"' % name_as_if_this_were_python_two_point_six
-            if name_as_if_this_were_python_two_point_six not in filenames_wanted:
-                raise IncorrectTarFile, 'An unexpected entry "%s" is present' % name_as_if_this_were_python_two_point_six
-            filenames_wanted.remove(name_as_if_this_were_python_two_point_six)
-            if name_as_if_this_were_python_two_point_six == cls.WRAPPER_DIR_NAME:
+                elif member.isdir() and member.name != cls.WRAPPER_DIR_NAME:
+                    raise IncorrectTarFile, 'Wrapper directory name is incorrect: "%s"' % member.name
+            if member.name not in filenames_wanted:
+                raise IncorrectTarFile, 'An unexpected entry "%s" is present' % member.name
+            filenames_wanted.remove(member.name)
+            if member.name == cls.WRAPPER_DIR_NAME:
                 if not member.isdir():
-                    raise IncorrectTarFile, '"%s" should be a directory but is not' % name_as_if_this_were_python_two_point_six
+                    raise IncorrectTarFile, '"%s" should be a directory but is not' % member.name
             else:
                 if not member.isfile():
-                    raise IncorrectTarFile, 'Entry "%s" is not a file' % name_as_if_this_were_python_two_point_six
-                if tfile.extractfile(member).read() != cls.FILES[name_as_if_this_were_python_two_point_six.split('/')[-1]]:
-                    raise IncorrectTarFile, 'File "%s" has incorrect contents' % name_as_if_this_were_python_two_point_six
+                    raise IncorrectTarFile, 'Entry "%s" is not a file' % member.name
+                if tfile.extractfile(member).read() != cls.FILES[member.name.split('/')[-1]]:
+                    raise IncorrectTarFile, 'File "%s" has incorrect contents' % member.name
         if len(filenames_wanted) != 0:
             raise IncorrectTarFile, 'Archive does not contain all expected files (missing %s)' % (', '.join('"%s"' % f for f in filenames_wanted))
 

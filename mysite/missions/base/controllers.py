@@ -31,14 +31,5 @@ def mission_completed(profile, mission_name):
     return len(StepCompletion.objects.filter(step__name=mission_name, person=profile)) != 0
 
 
-def remove_slash_that_python_two_point_five_might_have_added(some_string):
-    if sys.version_info[:2] == (2, 5):
-        # zomg, geez. Let's ditch Python 2.5 real soon now.
-        # Not because it's busted necessarily, but just because we could
-        # stop wasting time on inter-Python-version compatibility code like...
-        if some_string[-1] == '/':
-            return some_string[:-1]
-    return some_string
-
 class IncorrectPatch(Exception):
     pass
