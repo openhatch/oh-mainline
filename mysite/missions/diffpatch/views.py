@@ -1,6 +1,11 @@
 from mysite.missions.base.views import *
 from mysite.missions.diffpatch import forms, controllers
 
+### POST handlers
+###
+### Forms submit to this, and we use these to validate input and/or
+### modify the information stored about the user, such as recording
+### that a mission was successfully completed.
 def patchsingle_get_original_file(request):
     return make_download(open(controllers.PatchSingleFileMission.OLD_FILE).read(),
                          filename=os.path.basename(controllers.PatchSingleFileMission.OLD_FILE))
@@ -8,63 +13,6 @@ def patchsingle_get_original_file(request):
 def patchsingle_get_patch(request):
     return make_download(controllers.PatchSingleFileMission.get_patch(),
                          filename=controllers.PatchSingleFileMission.PATCH_FILENAME)
-
-def format_data(request, passed_data={}):
-    data = {
-      'mission_name': 'Using diff and patch',
-      'patchsingle_success': False,
-      'patchsingle_form': forms.PatchSingleUploadForm(),
-      'patchsingle_error_message': '',
-      'diffsingle_success': False,
-      'diffsingle_form': forms.DiffSingleUploadForm(),
-      'diffsingle_error_message': '',
-      'diffrecursive_success': False,
-      'diffrecursive_form': forms.DiffRecursiveUploadForm(),
-      'diffrecursive_error_message': '',
-      'patchrecursive_success': False,
-      'patchrecursive_form': forms.PatchRecursiveUploadForm(),
-      'patchrecursive_children_hats_error_message': '',
-      'patchrecursive_lizards_hats_error_message': '',
-    }
-    if request.user.is_authenticated():
-        data.update({
-            'patchrecursive_done': controllers.mission_completed(request.user.get_profile(), 'diffpatch_patchrecursive'),
-            'diffrecursive_done': controllers.mission_completed(request.user.get_profile(), 'diffpatch_diffrecursive'),
-            'patchsingle_done': controllers.mission_completed(request.user.get_profile(), 'diffpatch_patchsingle'),
-            'diffsingle_done': controllers.mission_completed(request.user.get_profile(), 'diffpatch_diffsingle')
-            })
-    data.update(passed_data)
-    return data
-
-@view
-def about(request, passed_data={}):
-    data = format_data(request, passed_data)
-    data['this_mission_page_short_name'] = 'About'
-    return (request, 'missions/diffpatch/about.html', data)
-
-@view
-def single_file_diff(request, passed_data={}):
-    data = format_data(request, passed_data)
-    data['this_mission_page_short_name'] = 'About'
-    return (request, 'missions/diffpatch/single_file_diff.html', data)
-
-@view
-def single_file_patch(request, passed_data={}):
-    data = format_data(request, passed_data)
-    data['this_mission_page_short_name'] = 'About'
-    return (request, 'missions/diffpatch/single_file_patch.html', data)
-
-@view
-def recursive_patch(request, passed_data={}):
-    data = format_data(request, passed_data)
-    data['this_mission_page_short_name'] = 'About'
-    return (request, 'missions/diffpatch/recursive_patch.html', data)
-
-@view
-def recursive_diff(request, passed_data={}):
-    data = format_data(request, passed_data)
-    data['this_mission_page_short_name'] = 'About'
-    return (request, 'missions/diffpatch/recursive_diff.html', data)
 
 @login_required
 def patchsingle_submit(request):
@@ -139,3 +87,71 @@ def patchrecursive_submit(request):
                 data['patchrecursive_success'] = True
         data['patchrecursive_form'] = form
     return recursive_patch(request, data)
+
+### State manager
+class DiffPatchMissionPageState(MissionPageState):
+    def __init__(self, request, passed_data):
+        MissionPageState.__init__(self, request, passed_data, 'Using diff and patch')
+
+    def as_dict_for_template_context(self):
+        (data, person) = self.get_base_data_dict_and_person()
+        data.update({
+            'patchsingle_success': False,
+            'patchsingle_form': forms.PatchSingleUploadForm(),
+            'patchsingle_error_message': '',
+            'diffsingle_success': False,
+            'diffsingle_form': forms.DiffSingleUploadForm(),
+            'diffsingle_error_message': '',
+            'diffrecursive_success': False,
+            'diffrecursive_form': forms.DiffRecursiveUploadForm(),
+            'diffrecursive_error_message': '',
+            'patchrecursive_success': False,
+            'patchrecursive_form': forms.PatchRecursiveUploadForm(),
+            'patchrecursive_children_hats_error_message': '',
+            'patchrecursive_lizards_hats_error_message': '',
+            })
+        if person:
+            data.update({
+                'patchrecursive_done': controllers.mission_completed(person, 'diffpatch_patchrecursive'),
+                'diffrecursive_done': controllers.mission_completed(person, 'diffpatch_diffrecursive'),
+                'patchsingle_done': controllers.mission_completed(person, 'diffpatch_patchsingle'),
+                'diffsingle_done': controllers.mission_completed(person, 'diffpatch_diffsingle')
+            })
+        return data
+
+### Normal GET handlers. These are usually pretty short.
+
+@view
+def about(request, passed_data={}):
+    state = DiffPatchMissionPageState(request, passed_data)
+    state.this_mission_page_short_name = 'About'
+    return (request, 'missions/diffpatch/about.html',
+            state.as_dict_for_template_context())
+
+@view
+def single_file_diff(request, passed_data={}):
+    state = DiffPatchMissionPageState(request, passed_data)
+    state.this_mission_page_short_name = 'Single file diff'
+    return (request, 'missions/diffpatch/single_file_diff.html',
+            state.as_dict_for_template_context())
+
+@view
+def single_file_patch(request, passed_data={}):
+    state = DiffPatchMissionPageState(request, passed_data)
+    state.this_mission_page_short_name = 'Single file patch'
+    return (request, 'missions/diffpatch/single_file_patch.html',
+            state.as_dict_for_template_context())
+
+@view
+def recursive_patch(request, passed_data={}):
+    state = DiffPatchMissionPageState(request, passed_data)
+    state.this_mission_page_short_name = 'Recursive patch'
+    return (request, 'missions/diffpatch/recursive_patch.html',
+            state.as_dict_for_template_context())
+
+@view
+def recursive_diff(request, passed_data={}):
+    state = DiffPatchMissionPageState(request, passed_data)
+    state.this_mission_page_short_name = 'Recursive diff'
+    return (request, 'missions/diffpatch/recursive_diff.html',
+            state.as_dict_for_template_context())

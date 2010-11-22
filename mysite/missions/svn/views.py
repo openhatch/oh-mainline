@@ -49,20 +49,13 @@ def checkout_submit(request):
     return checkout(request, data)
 
 ### State manager
-class SvnMissionPageState(object):
+class SvnMissionPageState(MissionPageState):
     def __init__(self, request, passed_data):
-        self.prerequisites = []
-        self.request = request
-        self.mission_name = 'Using Subversion'
-        self.this_mission_page_short_name = ''
-        self.mission_step_prerequisite = None
-        self.passed_data = passed_data
+        MissionPageState.__init__(self, request, passed_data, 'Using Subversion')
 
     def as_dict_for_template_context(self):
-        user = self.request.user
-        data = {
-            'this_mission_page_short_name': self.this_mission_page_short_name,
-            'mission_name': self.mission_name,
+        (data, person) = self.get_base_data_dict_and_person()
+        data.update({
             'svn_checkout_success': False,
             'svn_checkout_form': forms.CheckoutForm(),
             'svn_checkout_error_message': '',
@@ -70,11 +63,8 @@ class SvnMissionPageState(object):
             'svn_diff_form': forms.DiffForm(),
             'svn_diff_error_message': '',
             'mission_step_prerequisites_passed': True,
-        }
-        if self.passed_data:
-            data.update(self.passed_data) # NOTE: Weird quasi security hole
-        if user.is_authenticated():
-            person = self.request.user.get_profile()
+        })
+        if person:
             repo = controllers.SvnRepository(user.username)
             data.update({
                 'repository_exists': repo.exists(),
@@ -82,11 +72,6 @@ class SvnMissionPageState(object):
                 'svn_diff_done': controllers.mission_completed(person, 'svn_diff'),
                 'svn_commit_done': controllers.mission_completed(person, 'svn_commit'),
             })
-            if self.mission_step_prerequisite:
-                data['mission_step_prerequisites_passed'
-                     ] = controllers.mission_completed(person,
-                                                       self.mission_step_prerequisite)
-                    
             if data['repository_exists']:
               data.update({
                 'checkout_url': repo.public_trunk_url(),

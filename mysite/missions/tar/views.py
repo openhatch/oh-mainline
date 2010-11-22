@@ -1,6 +1,11 @@
 from mysite.missions.base.views import *
 from mysite.missions.tar import forms, controllers
 
+### POST handlers
+###
+### Forms submit to this, and we use these to validate input and/or
+### modify the information stored about the user, such as recording
+### that a mission was successfully completed.
 def upload(request):
     data = {}
     if request.method == 'POST':
@@ -14,51 +19,6 @@ def upload(request):
                 data['what_was_wrong_with_the_tarball'] = str(e)
         data['create_form'] = form
     return creating(request, data)
-
-def format_data(request, passed_data={}):
-    data = {
-      'mission_name': 'Tar',
-      'create_success': False,
-      'what_was_wrong_with_the_tarball': '',
-      'filenames_for_tarball': controllers.TarMission.FILES.keys(),
-      'create_form': forms.UploadForm(),
-      'unpack_form': forms.ExtractUploadForm(),
-      'unpack_success': False,
-      'tarball_for_unpacking_mission': controllers.UntarMission.TARBALL_NAME,
-      'file_we_want': controllers.UntarMission.FILE_WE_WANT}
-    if request.user.is_authenticated():
-        data.update( {
-            'create_done': controllers.mission_completed(request.user.get_profile(), 'tar'),
-            'unpack_done': controllers.mission_completed(request.user.get_profile(), 'tar_extract')
-        })
-    data.update(passed_data)
-    return data
-
-@view
-def about(request, passed_data={}):
-    data = format_data(request, passed_data)
-    data['this_mission_page_short_name'] = 'About'
-    return (request, 'missions/tar/about.html', data)
-
-@login_required
-@view
-def unpacking(request, passed_data={}):
-    data = format_data(request, passed_data)
-    data['this_mission_page_short_name'] = 'Unpacking'
-    return (request, 'missions/tar/unpacking.html', data)
-
-@login_required
-@view
-def creating(request, passed_data={}):
-    data = format_data(request, passed_data)
-    data['this_mission_page_short_name'] = 'Creating'
-    return (request, 'missions/tar/creating.html', data)
-
-@view
-def hints(request, passed_data={}):
-    data = format_data(request, passed_data)
-    data['this_mission_page_short_name'] = 'Hints'
-    return (request, 'missions/tar/hints.html', data)
 
 def file_download(request, name):
     if name in controllers.TarMission.FILES:
@@ -91,4 +51,59 @@ def extract_mission_upload(request):
                 data['what_was_wrong_with_the_extracted_file'] = 'The uploaded file does not have the correct contents.'
         data['unpack_form'] = form
     return unpacking(request, data)
+
+### State manager
+class TarMissionPageState(MissionPageState):
+    def __init__(self, request, passed_data):
+        MissionPageState.__init__(self, request, passed_data, 'Tar')
+
+    def as_dict_for_template_context(self):
+        (data, person) = self.get_base_data_dict_and_person()
+        data.update({
+            'create_success': False,
+            'what_was_wrong_with_the_tarball': '',
+            'filenames_for_tarball': controllers.TarMission.FILES.keys(),
+            'create_form': forms.UploadForm(),
+            'unpack_form': forms.ExtractUploadForm(),
+            'unpack_success': False,
+            'tarball_for_unpacking_mission': controllers.UntarMission.TARBALL_NAME,
+            'file_we_want': controllers.UntarMission.FILE_WE_WANT})
+        if person:
+            data.update( {
+                'create_done': controllers.mission_completed(person, 'tar'),
+                'unpack_done': controllers.mission_completed(person, 'tar_extract')
+            })
+        return data
+
+### Normal GET handlers. These are usually pretty short.
+
+@view
+def about(request, passed_data={}):
+    state = TarMissionPageState(request, passed_data)
+    state.this_mission_page_short_name = 'About'
+    return (request, 'missions/tar/about.html',
+            state.as_dict_for_template_context())
+
+@login_required
+@view
+def unpacking(request, passed_data={}):
+    state = TarMissionPageState(request, passed_data)
+    state.this_mission_page_short_name = 'Unpacking'
+    return (request, 'missions/tar/unpacking.html',
+            state.as_dict_for_template_context())
+
+@login_required
+@view
+def creating(request, passed_data={}):
+    state = TarMissionPageState(request, passed_data)
+    state.this_mission_page_short_name = 'Creating'
+    return (request, 'missions/tar/creating.html',
+            state.as_dict_for_template_context())
+
+@view
+def hints(request, passed_data={}):
+    state = TarMissionPageState(request, passed_data)
+    state.this_mission_page_short_name = 'Hints'
+    return (request, 'missions/tar/hints.html',
+            state.as_dict_for_template_context())
 
