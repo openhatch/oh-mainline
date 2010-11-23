@@ -14,6 +14,12 @@ class SingleFilePatch(object):
         if len(the_patch.hunks) != 1:
             raise IncorrectPatch, 'The patch affects more than one file.'
 
+        # Check if the diff is in the wrong order.
+        if ''.join(the_patch.patch_stream(open(cls.NEW_FILE), the_patch.hunks[0])) == open(cls.OLD_FILE).read():
+            raise IncorrectPatch, 'It looks like the order of files passed to diff was flipped. \
+        To generate a diff representing the changes you made to originalfile.txt \
+        to get to modifiedfile.txt, do "diff -u originalfile.txt modifiedfile.txt".'
+
         # Check that it will apply correctly to the file.
         if not the_patch._match_file_hunks(cls.OLD_FILE, the_patch.hunks[0]):
             raise IncorrectPatch, 'The patch will not apply correctly to the original file.'

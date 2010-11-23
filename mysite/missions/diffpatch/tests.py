@@ -92,6 +92,7 @@ class DiffSingleFileTests(TwillTests):
         return ''.join(difflib.unified_diff(oldlines, newlines, 'old.txt', 'new.txt'))
 
     def make_swapped_patch(self):
+        # make a backwards diff.
         oldlines = open(controllers.DiffSingleFileMission.OLD_FILE).readlines()
         newlines = open(controllers.DiffSingleFileMission.NEW_FILE).readlines()
         return ''.join(difflib.unified_diff(newlines, oldlines, 'new.txt', 'old.txt'))
@@ -123,6 +124,17 @@ class DiffSingleFileTests(TwillTests):
         else:
             self.fail('no exception raised')
 
+    def test_backwards_diff(self):
+        """
+        A backwards diff generates a special IncorrectPatch exception.
+        """
+        try:
+            controllers.DiffSingleFileMission.validate_patch(self.make_swapped_patch())
+        except controllers.IncorrectPatch, e:
+            self.assert_('order of files passed to diff was flipped' in str(e))
+        else:
+            self.fail('no exception raised')
+
     def test_do_mission_correctly(self):
         orig_response = self.client.get(reverse(views.diffsingle_get_original_file))
         orig_lines = StringIO(orig_response.content).readlines()
@@ -137,7 +149,22 @@ class DiffSingleFileTests(TwillTests):
         self.assertEqual(len(StepCompletion.objects.filter(step__name='diffpatch_diffsingle', person=paulproteus)), 1)
 
     def test_do_mission_incorrectly(self):
+        """
+        Submitting a generically incorrect diff generates a generic failure message.
+        """
+        submit_response = self.client.post(reverse(views.diffsingle_submit), {'diff': self.make_wrong_dest_patch()})
+        self.assert_('does not have the correct contents' in submit_response.content)
+        self.assertFalse(submit_response.context['diffsingle_success'])
+
+        paulproteus = Person.objects.get(user__username='paulproteus')
+        self.assertEqual(len(StepCompletion.objects.filter(step__name='diffpatch_diffsingle', person=paulproteus)), 0)
+
+    def test_do_mission_backwards_diff(self):
+        """
+        Submitting a backwards diff generates a special failure message.
+        """
         submit_response = self.client.post(reverse(views.diffsingle_submit), {'diff': self.make_swapped_patch()})
+        self.assert_('order of files passed to diff was flipped' in submit_response.content)
         self.assertFalse(submit_response.context['diffsingle_success'])
 
         paulproteus = Person.objects.get(user__username='paulproteus')
