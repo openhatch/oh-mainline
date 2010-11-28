@@ -1,7 +1,6 @@
 #{{{ imports
 import os
 import Image
-import urllib
 import mock
 import tempfile
 import StringIO
@@ -9,7 +8,6 @@ import logging
 
 from mysite.profile.models import Person
 from mysite.base.tests import make_twill_url, TwillTests
-from mysite.profile.models import Person
 import mysite.account.forms
 from mysite.search.models import Project, ProjectInvolvementQuestion
 import mysite.project.views
@@ -18,14 +16,9 @@ import mysite.account.views
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from django.test.client import Client
-from django.core.files.images import get_image_dimensions
 from django.core.urlresolvers import reverse
-import django.core.mail
 
-from django.conf import settings
 from twill import commands as tc
-
-from invitation.models import InvitationKey
 #}}}
 
 class Login(TwillTests):
@@ -54,9 +47,6 @@ class LoginWithOpenID(TwillTests):
     #{{{
     fixtures = ['user-paulproteus']
     def test_login_creates_user_profile(self):
-        # Front page
-        url = 'http://openhatch.org/'
-
         # Even though we didn't add the person-paulproteus
         # fixture, a Person object is created.
         self.assert_(list(
