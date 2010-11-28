@@ -68,11 +68,21 @@ def signup(request, signup_form=None):
 
 @login_required
 @view
-def edit_photo(request, form = None):
+def edit_photo(request, form=None, non_validation_error=False):
+    """
+    Set or change your profile photo.
+
+    If non_validation_error is True, there was an error outside the scope of
+    form validation, eg an exception was raised while processing the photo.
+    """
     if form is None:
         form = mysite.account.forms.EditPhotoForm()
     data = mysite.profile.views.get_personal_data(request.user.get_profile())
     data['edit_photo_form'] = form
+
+    if non_validation_error:
+        data['non_validation_error'] = True
+
     return (request, 'account/edit_photo.html', data)
 
 @login_required
@@ -82,13 +92,27 @@ def edit_photo_do(request, mock=None):
     form = mysite.account.forms.EditPhotoForm(request.POST,
                                        request.FILES,
                                        instance=person)
-    if form.is_valid():
+
+    try:
+        # Exceptions can be raised by the photo manipulation libraries while
+        # "cleaning" the photo during form validation.
+        valid = form.is_valid()
+    except Exception, e:
+            logging.error("%s while preparing the image: %s"
+                          % (str(type(e)), str(e)))
+            # Don't pass in the form. This gives the user an empty form and a
+            # nice error message, instead of the displaying the details of the
+            # error.
+            return edit_photo(request, form=None, non_validation_error=True)
+
+    if valid:
         person = form.save()
         person.generate_thumbnail_from_photo()
 
-        return HttpResponseRedirect(reverse(mysite.profile.views.display_person_web, kwargs={
-            'user_to_display__username': request.user.username
-            }))
+        return HttpResponseRedirect(
+            reverse(mysite.profile.views.display_person_web, kwargs={
+                    'user_to_display__username': request.user.username
+                    }))
     else:
         return edit_photo(request, form)
 

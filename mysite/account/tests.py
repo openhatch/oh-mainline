@@ -3,6 +3,9 @@ import os
 import Image
 import urllib
 import mock
+import tempfile
+import StringIO
+import logging
 
 from mysite.profile.models import Person
 from mysite.base.tests import make_twill_url, TwillTests
@@ -223,6 +226,61 @@ class EditPhoto(TwillTests):
             image_as_stored = Image.open(p.photo.file)
             w, h = image_as_stored.size
             self.assertEqual(w, 200)
+
+    def test_invalid_photo(self):
+        """
+        If the uploaded image is detected as being invalid, report a helpful
+        message to the user. The photo is not added to the user's profile.
+        """
+        bad_image = tempfile.NamedTemporaryFile(delete=False)
+        self.login_with_twill()
+
+        try:
+            bad_image.write("garbage")
+            bad_image.close()
+
+            tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
+            tc.follow('photo')
+            tc.formfile('edit_photo', 'photo', bad_image.name)
+            tc.submit()
+            tc.code(200)
+            self.assert_("The file you uploaded was either not an image or a "
+                         "corrupted image" in tc.show())
+
+            p = Person.objects.get(user__username='paulproteus')
+            self.assertFalse(p.photo.name)
+        finally:
+            os.unlink(bad_image.name)
+
+    def test_image_processing_libarary_error(self):
+        """
+        If the image processing library errors while preparing a photo, report a
+        helpful message to the user and log the error. The photo is not added
+        to the user's profile.
+        """
+        # Get a copy of the error log.
+        string_log = StringIO.StringIO()
+        logger = logging.getLogger()
+        my_log = logging.StreamHandler(string_log)
+        logger.addHandler(my_log)
+        logger.setLevel(logging.ERROR)
+
+        self.login_with_twill()
+        tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
+        tc.follow('photo')
+        # This is a special image from issue166 that passes Django's image
+        # validation tests but causes an exception during zlib decompression.
+        tc.formfile('edit_photo', 'photo', photo('static/images/corrupted.png'))
+        tc.submit()
+        tc.code(200)
+
+        self.assert_("Something went wrong while preparing this" in tc.show())
+        p = Person.objects.get(user__username='paulproteus')
+        self.assertFalse(p.photo.name)
+
+        # an error message was logged during photo processing.
+        self.assert_("zlib.error" in string_log.getvalue())
+        logger.removeHandler(my_log)
 
     #}}}
 

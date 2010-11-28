@@ -32,6 +32,15 @@
                     <h3>Change your profile photo</h3>
                 </div>
                 <div class='body'>
+		    {% if non_validation_error %}
+		    <ul class="errorlist">
+		      <li>
+			Oops! Something went wrong while preparing this
+			photo. Please <a href="../../../contact/">contact
+			us</a>, and we'll do our best to figure out why.
+		      </li>
+		    </ul>
+		    {% endif %}
                     {% for field in edit_photo_form %}
                         <div class='form-row'>
                             {{ field.errors }}
