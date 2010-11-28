@@ -1,12 +1,8 @@
 # Imports {{{
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseServerError
-from django.shortcuts import get_object_or_404, get_list_or_404
+from django.http import HttpResponse, HttpResponseRedirect
 import django.contrib.auth 
-from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.views import redirect_to_login
 import django.contrib.auth.forms
-from django_authopenid.forms import OpenidSigninForm
 from django.core.urlresolvers import reverse
 import django_authopenid.views
 
@@ -14,13 +10,10 @@ from invitation.forms import InvitationKeyForm
 from invitation.models import InvitationKey
 
 import urllib
-import mock
 import logging
 
 import mysite.base.views
 import mysite.base.controllers
-from mysite.base.controllers import get_notification_from_request
-from mysite.profile.models import Person, Tag, TagType, Link_Project_Tag, Link_SF_Proj_Dude_FM, Link_Person_Tag, DataImportAttempt
 import mysite.account.forms
 from mysite.base.helpers import render_response
 import mysite.profile.views
@@ -88,7 +81,6 @@ def edit_photo(request, form=None, non_validation_error=False):
 @login_required
 def edit_photo_do(request, mock=None):
     person = request.user.get_profile()
-    data = mysite.profile.views.get_personal_data(person)
     form = mysite.account.forms.EditPhotoForm(request.POST,
                                        request.FILES,
                                        instance=person)
@@ -407,7 +399,6 @@ def register(request, template_name='authopenid/complete.html',
     context. Any callable object in this dictionary will be called to produce 
     the end result which appears in the context.
     """
-    is_redirect = False
     redirect_to = request.REQUEST.get(redirect_field_name, '')
     openid_ = request.session.get('openid', None)
     if openid_ is None or not openid_:
