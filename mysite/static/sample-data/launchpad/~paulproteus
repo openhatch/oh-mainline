@@ -1,0 +1,740 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+      lang="en" dir="ltr">
+  <head>
+<base href="https://launchpad.net/%7Epaulproteus/+index" />
+
+    <title>Asheesh Laroia in Launchpad</title>
+    <link rel="shortcut icon" href="/@@/launchpad.png" />
+
+    
+      <link rel="alternate" type="application/atom+xml"
+            href="http://feeds.launchpad.net/~paulproteus/latest-bugs.atom"
+            title="Latest Bugs for Asheesh Laroia" />
+      <link rel="alternate" type="application/atom+xml"
+            href="http://feeds.launchpad.net/~paulproteus/branches.atom"
+            title="Latest Branches for Asheesh Laroia" />
+      <link rel="alternate" type="application/atom+xml"
+            href="http://feeds.launchpad.net/~paulproteus/revisions.atom"
+            title="Latest Revisions by Asheesh Laroia" />
+    
+
+    
+  
+  <link type="text/css" rel="stylesheet"
+        media="screen, print"
+        href="/+icing/rev12004/combo.css" />
+
+
+    
+
+    
+    <style type="text/css">
+      fieldset.collapsed div, fieldset div.collapsed {display: none;}
+    </style>
+    <noscript>
+      <style type="text/css">
+        fieldset.collapsible div, fieldset div.collapsed {display: block;}
+      </style>
+    </noscript>
+
+    
+  
+
+  
+
+  
+  
+  <script type="text/javascript"
+          src="/+icing/rev12004/MochiKit.js"></script>
+
+  
+  
+    <script type="text/javascript"
+            src="/+icing/rev12004/build/launchpad.js"></script>
+  
+
+  <script type="text/javascript">var cookie_scope = '; Path=/; Secure; Domain=.launchpad.net';</script>
+  <script type="text/javascript">
+    // Define a global YUI sandbox that should be used by everyone.
+    var LPS = YUI();
+  </script>
+
+
+  <script id="base-layout-load-scripts" type="text/javascript">
+    LPS.use('node', 'lp', function(Y) {
+        Y.on('load', function(e) {
+            sortables_init();
+            initInlineHelp();
+            Y.lp.activate_collapsibles();
+            activateFoldables();
+            activateConstrainBugExpiration();
+        }, window);
+
+        // Hook up the function that dismisses the help window if we click
+        // anywhere outside of it.
+        Y.on('click', handleClickOnPage, window);
+    });
+
+    LPS.use('lp.app.links',
+      function(Y) {
+        Y.on('load', function(e) {
+            Y.lp.app.links.check_valid_lp_links();
+        }, window);
+    });
+  </script>
+
+    
+    
+      <link rel="meta" type="application/rdf+xml"
+            title="FOAF" href="+rdf" />
+    
+    
+    
+      
+        <link rel="openid.server"
+              href="https://login.launchpad.net/+openid" />
+        <link rel="openid.delegate"
+              href="https://login.launchpad.net/+id/AXBWpce" />
+        <link rel="openid2.provider"
+              href="https://login.launchpad.net/+openid" />
+        <link rel="openid2.local_id"
+              href="https://login.launchpad.net/+id/AXBWpce" />
+
+        <meta http-equiv="X-XRDS-Location"
+              content="https://login.launchpad.net/+id/AXBWpce/+xrds" />
+      
+    
+  
+  </head>
+
+  <body id="document"
+        class="tab-overview
+      main_side
+      public
+      yui-skin-sam">
+        <script type="text/javascript">
+          var _gaq = _gaq || [];
+          _gaq.push(['_setAccount', 'UA-12833497-1']);
+          _gaq.push(['_setDomainName', '.launchpad.net']);
+          _gaq.push(['_setAllowHash', false]);
+          _gaq.push(['_trackPageview']);
+
+          (function() {
+            var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+            ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(ga);
+          })();
+        </script>
+    <div class="yui-d0">
+      <div id="locationbar" class="login-logout">
+        
+
+<div id="logincontrol"><a href="https://launchpad.net/~paulproteus/+login">Log in / Register</a></div>
+
+
+
+      </div><!--id="locationbar"-->
+
+      <div id="watermark" class="watermark-apps-portlet">
+        <div class="flowed-block">
+          <img alt="" width="64" height="64" src="/@@/person-logo" />
+        </div>
+        <div class="flowed-block wide">
+          <h2>Asheesh Laroia</h2>
+          
+  <!-- Application Menu -->
+  <ul class="facetmenu">
+    
+      <li class="overview active"
+          title="General information about Asheesh Laroia"><span>Overview</span></li>
+      
+      
+    
+    
+      
+      <li class="branches"
+          title="Bazaar Branches and revisions registered and authored by Asheesh Laroia"><a
+    href="https://code.launchpad.net/~paulproteus">Code</a></li>
+      
+    
+    
+      
+      <li class="bugs"
+          title="Bug reports that Asheesh Laroia is involved with"><a
+    href="https://bugs.launchpad.net/~paulproteus">Bugs</a></li>
+      
+    
+    
+      
+      <li class="specifications"
+          title="Feature specifications that Asheesh Laroia is involved with"><a
+    href="https://blueprints.launchpad.net/~paulproteus">Blueprints</a></li>
+      
+    
+    
+      
+      <li class="translations"
+          title="Software that Asheesh Laroia is involved in translating"><a
+    href="https://translations.launchpad.net/~paulproteus">Translations</a></li>
+      
+    
+    
+      
+      <li class="answers"
+          title="Questions that Asheesh Laroia is involved with"><a
+    href="https://answers.launchpad.net/~paulproteus">Answers</a></li>
+      
+    
+  </ul>
+
+        </div>
+      </div>
+
+      <div class="yui-t4">
+        <div id="maincontent" class="yui-main">
+          <div class="yui-b" dir="ltr">
+            <div class="context-publication">
+              
+              
+
+              <div id="registration" class="registering">
+                
+              </div>
+            </div>
+
+            
+            
+              <div>
+  
+
+    <div class="description"><p>Currently working on OpenHatch.</p></div>
+    <ul class="horizontal">
+      
+      <li>
+        <a class="sprite info"
+           href="https://launchpad.net/~paulproteus/+related-software">
+          Related software and packages
+        </a>
+      </li>
+      
+    </ul>
+
+    <div class="yui-g">
+      <div>
+
+<div class="portlet" id="contact-details">
+
+  <h2>User information</h2>
+
+  <div class="first yui-u">
+    <dl id="launchpad-id">
+        <dt>Launchpad Id:</dt>
+        <dd>paulproteus</dd>
+    </dl>
+    <dl id="email-addresses">
+      <dt>Email:
+        
+      </dt>
+      <dd>
+        
+          <a href="+login">Log in</a> for email information.
+        
+
+        
+
+        
+
+      </dd>
+    </dl>
+
+
+    <dl id="jabber-ids">
+      <dt>Jabber:
+        
+      </dt>
+      <dd>
+        
+          &lt;email address hidden&gt;
+        
+        
+      </dd>
+    </dl>
+
+    
+
+    <dl>
+      <dt>Member since:</dt>
+      <dd id="member-since">2005-06-15</dd>
+    </dl>
+
+    <div id="teams_with_icons">
+      <a href="/~revu-uploaders"><img
+    src="https://launchpadlibrarian.net/16362567/revu14.png"
+    alt="Icon of REVU Uploaders"
+    title="Member of REVU Uploaders" /></a>
+      <a href="/~ubuntu-cyclists"><img
+    src="https://launchpadlibrarian.net/17549130/logo_14.png"
+    alt="Icon of Ubuntu Cyclists"
+    title="Member of Ubuntu Cyclists" /></a>
+    </div>
+
+    <dl id="ubuntu-coc">
+      <dt>Signed Ubuntu Code of Conduct:</dt>
+      <dd>
+        
+         <span id="ubuntu_coc_signer">Yes</span>
+      </dd>
+      
+    </dl>
+  </div>
+
+  <div class="yui-u two-column-list">
+    <dl>
+      <dt>Wiki:
+        
+      </dt>
+      <dd>
+        <div>
+          <a href="http://openhatch.org//">http://openhatch.org//</a>
+        </div>
+        <div>
+          <a href="http://www.asheesh.org//">http://www.asheesh.org//</a>
+        </div>
+        <div>
+          <a href="https://wiki.ubuntu.com/AsheeshLaroia">https://wiki.ubuntu.com/AsheeshLaroia</a>
+        </div>
+        
+      </dd>
+    </dl>
+    <dl>
+      <dt>IRC:
+        
+      </dt>
+      <dd>
+        <strong>paulproteus</strong>
+        <span class="discreet">on network</span>
+        <strong>irc.freenode.net</strong>
+      </dd>
+      
+    </dl>
+
+    <dl id="pgp-keys">
+      <dt>OpenPGP keys:
+        
+      </dt>
+      <dd>
+        
+          
+            70096AD1
+        
+        
+      </dd>
+    </dl>
+
+    <dl id="sshkeys">
+      <dt>SSH keys:
+        
+      </dt>
+      <dd>
+        
+          <a href="+sshkeys">paulproteus@supercore
+</a>
+          <br />
+        
+        
+          <a href="+sshkeys">paulproteus@asheesh
+</a>
+          <br />
+        
+        
+          <a href="+sshkeys">paulproteus@vellum
+</a>
+          <br />
+        
+        
+          <a href="+sshkeys">paulproteus@renaissance
+</a>
+          <br />
+        
+        
+      </dd>
+    </dl>
+
+    <dl id="languages">
+      <dt>Languages:
+        
+      </dt>
+      <dd>
+        English
+      </dd>
+    </dl>
+
+    <dl>
+      <dt>Time zone:
+        
+      </dt>
+      <dd>America/New_York</dd>
+    </dl>
+
+    <dl id="karma">
+      <dt>Karma:</dt>
+      <dd><a id="karma-total"
+             href="https://launchpad.net/~paulproteus/+karma">72</a>
+      </dd>
+    </dl>
+  </div>
+
+</div>
+
+
+</div>
+    </div>
+
+    <div>
+  <div id="working-on" class="yui-g">
+    <div class="yui-u first">
+      
+    </div>
+
+    <div class="yui-u">
+      
+    </div>
+  </div>
+
+</div>
+
+    <div class="yui-g">
+      <!-- First portlet column. -->
+      <div class="first yui-u">
+        <div>
+  <div id="ppas" class="portlet">
+    <h2>Personal package archives</h2>
+
+    
+  <div>
+    <table>
+      
+        <tr>
+          <td><a href="/~paulproteus/+archive/gobby" class="sprite ppa-icon">gobby</a></td>
+        </tr>
+      
+      
+        <tr>
+          <td><a href="/~paulproteus/+archive/ppa" class="sprite ppa-icon">gobby-0.5</a></td>
+        </tr>
+      
+    </table>
+  </div>
+
+
+
+    <ul class="horizontal">
+      
+
+      
+        
+      
+
+    </ul>
+  </div>
+  
+
+
+
+</div>
+        <div>
+  <div class="portlet">
+    <h2>
+      <span class="see-all">
+        <a href="https://launchpad.net/~paulproteus/+participation">
+          All memberships
+        </a>
+      </span>
+      Latest memberships
+    </h2>
+
+    
+      <table id="participation">
+        
+
+<tr>
+  <td colspan="2">
+    <div>
+      <a href="/~ubuntu-cyclists" class="bg-image" style="background-image: url(https://launchpadlibrarian.net/17549130/logo_14.png)">Ubuntu Cyclists</a>
+    </div>
+    <div class="registered">
+      Joined
+      <span title="2008-11-02 04:14:42 UTC">on 2008-11-02</span>
+    </div>
+  </td>
+</tr>
+
+
+        
+
+<tr>
+  <td colspan="2">
+    <div>
+      <a href="/~revu-uploaders" class="bg-image" style="background-image: url(https://launchpadlibrarian.net/16362567/revu14.png)">REVU Uploaders</a>
+    </div>
+    <div class="registered">
+      Joined
+      <span title="2006-12-05 22:57:41 UTC">on 2006-12-05</span>
+    </div>
+  </td>
+</tr>
+
+
+        
+
+<tr>
+  <td colspan="2">
+    <div>
+      <a href="/~fcowebteam" class="sprite team">Fcowebteam</a>
+    </div>
+    <div class="registered">
+      Joined
+      <span title="2006-03-26 20:41:49 UTC">on 2006-03-26</span>
+    </div>
+  </td>
+</tr>
+
+
+      </table>
+
+    
+
+    
+  </div>
+
+</div>
+      </div>
+      <div class="yui-u">
+        <div>
+  <div class="portlet">
+    <h2>
+      <span class="see-all">
+        <a href="https://launchpad.net/~paulproteus/+karma">Recent activities</a>
+      </span>
+      Most active in
+    </h2>
+    <table class="contributions" id="contributions">
+      <tbody>
+        
+        <tr>
+          <th>
+            <a href="/web" class="bg-image" style="background-image: url(https://launchpadlibrarian.net/7112607/14-netscape.png)">Web Team projects</a>
+          </th>
+          <td>
+            
+          </td>
+          <td>
+            <img height="14" width="14" alt="" title="Bug Management" src="/@@/bug" />
+          </td>
+        </tr>
+        
+        
+        <tr>
+          <th>
+            <a href="/debian" class="bg-image" style="background-image: url(https://launchpadlibrarian.net/23668929/debian14.png)">Debian</a>
+          </th>
+          <td>
+            <img height="14" width="14" alt="" title="Bazaar Branches" src="/@@/branch" />
+          </td>
+          <td>
+            
+          </td>
+        </tr>
+        
+        
+        <tr>
+          <th>
+            <a href="/zc.buildout" class="sprite product">Buildout</a>
+          </th>
+          <td>
+            
+          </td>
+          <td>
+            <img height="14" width="14" alt="" title="Bug Management" src="/@@/bug" />
+          </td>
+        </tr>
+        
+        
+        <tr>
+          <th>
+            <a href="/lxml" class="sprite product">lxml</a>
+          </th>
+          <td>
+            
+          </td>
+          <td>
+            <img height="14" width="14" alt="" title="Bug Management" src="/@@/bug" />
+          </td>
+        </tr>
+        
+        
+        <tr>
+          <th>
+            <a href="/ubuntu" class="bg-image" style="background-image: url(https://launchpadlibrarian.net/49558154/14_logo.png)">Ubuntu</a>
+          </th>
+          <td>
+            
+          </td>
+          <td>
+            <img height="14" width="14" alt="" title="Bug Management" src="/@@/bug" />
+          </td>
+        </tr>
+        
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+      </div>
+    </div>
+
+    <div>
+
+<div class="portlet" id="portlet-map">
+
+  
+    <h2>Location</h2>
+
+    <div>
+      <strong>Time zone:</strong>
+      America/New_York
+      
+    </div>
+  
+
+</div>
+
+</div>
+  
+
+  
+
+</div>
+          </div><!-- yui-b -->
+        </div><!-- yui-main -->
+
+        <div id="side-portlets" class="yui-b side">
+          <div>
+  
+
+  
+  
+
+
+  <div id="involvement" class="portlet involvement">
+    <h2>Participation</h2>
+
+    <ul>
+      <li>
+        <a class="sprite bugs"
+           href="https://bugs.launchpad.net/~paulproteus">Bugs</a>
+      </li>
+      <li>
+        <a class="sprite answers"
+           href="https://answers.launchpad.net/~paulproteus">Answers</a>
+      </li>
+      <li>
+        <a class="sprite translations"
+           href="https://translations.launchpad.net/~paulproteus">Translations</a>
+      </li>
+      <li>
+        <a class="sprite code"
+           href="https://code.launchpad.net/~paulproteus">Code</a>
+      </li>
+      <li>
+        <a class="sprite blueprints"
+           href="https://blueprints.launchpad.net/~paulproteus">Blueprints</a>
+      </li>
+    </ul>
+  </div>
+</div>
+        </div><!-- yui-b side -->
+      </div><!-- yui-t4 -->
+
+      
+  <div id="footer" class="footer">
+    <div class="lp-arcana">
+        <div class="lp-branding">
+          <a href="https://launchpad.net/"><img src="/@@/launchpad-logo-and-name-hierarchy.png" alt="Launchpad" /></a>
+          &nbsp;&bull;&nbsp;
+          <a href="https://launchpad.net/+tour">Take the tour</a>
+          &nbsp;&bull;&nbsp;
+          <a href="https://help.launchpad.net/">Read the guide</a>
+          &nbsp;
+          <form id="globalsearch" method="get"
+                accept-charset="UTF-8"
+                action="https://launchpad.net/+search">
+            <input type="search" id="search-text" name="field.text" />
+            <input type="submit" value="" class="icon-only sprite search-icon" />
+          </form>
+        </div>
+        
+  
+
+    </div>
+
+    <div class="colophon">
+      &copy; 2004-2010
+      <a href="http://canonical.com/">Canonical&nbsp;Ltd.</a>
+      &nbsp;&bull;&nbsp;
+      <a href="https://launchpad.net/legal">Terms of use</a>
+      &nbsp;&bull;&nbsp;
+      <a href="/feedback">Contact Launchpad Support</a>
+      
+      &nbsp;&bull;&nbsp;
+      <a href="http://identi.ca/launchpadstatus">System status</a>
+      <span id="lp-version">
+      &nbsp;&bull;&nbsp;
+        r12004
+        
+        
+        (<a href="https://code.launchpad.net/~launchpad-pqm/launchpad/stable/">get the code</a>)
+      </span>
+    </div>
+  </div>
+
+    </div><!-- yui-d0-->
+
+    <div id="help-pane" class="invisible">
+      <div id="help-body">
+        
+        <iframe id="help-pane-content" class="invisible" src="javascript:void(0);"></iframe>
+      </div>
+      <div id="help-footer">
+        <span id="help-close"></span>
+      </div>
+    </div>
+
+    
+  
+
+  <script>LP.client.cache['context'] =
+                 {"languages_collection_link": "https://launchpad.net/api/devel/~paulproteus/languages", "members_collection_link": "https://launchpad.net/api/devel/~paulproteus/members", "sub_teams_collection_link": "https://launchpad.net/api/devel/~paulproteus/sub_teams", "open_membership_invitations_collection_link": "https://launchpad.net/api/devel/~paulproteus/open_membership_invitations", "ppas_collection_link": "https://launchpad.net/api/devel/~paulproteus/ppas", "private": false, "proposed_members_collection_link": "https://launchpad.net/api/devel/~paulproteus/proposed_members", "memberships_details_collection_link": "https://launchpad.net/api/devel/~paulproteus/memberships_details", "all_specifications_collection_link": "https://launchpad.net/api/devel/~paulproteus/all_specifications", "is_probationary": false, "mugshot_link": "https://launchpad.net/api/devel/~paulproteus/mugshot", "invited_members_collection_link": "https://launchpad.net/api/devel/~paulproteus/invited_members", "gpg_keys_collection_link": "https://launchpad.net/api/devel/~paulproteus/gpg_keys", "archive_link": "https://launchpad.net/api/devel/~paulproteus/+archive/ppa", "deactivated_members_collection_link": "https://launchpad.net/api/devel/~paulproteus/deactivated_members", "irc_nicknames_collection_link": "https://launchpad.net/api/devel/~paulproteus/irc_nicknames", "http_etag": "\"622debd40b64921e4db2c43375e48d3dda51c43a-30a4cdc48887e79be5c9ab259498a89f77ac46a6\"", "is_valid": true, "self_link": "https://launchpad.net/api/devel/~paulproteus", "confirmed_email_addresses_collection_link": "https://launchpad.net/api/devel/~paulproteus/confirmed_email_addresses", "mailing_list_auto_subscribe_policy": "Ask me when I join a team", "team_owner_link": null, "members_details_collection_link": "https://launchpad.net/api/devel/~paulproteus/members_details", "hide_email_addresses": false, "admins_collection_link": "https://launchpad.net/api/devel/~paulproteus/admins", "valid_specifications_collection_link": "https://launchpad.net/api/devel/~paulproteus/valid_specifications", "visibility": "Public", "latitude": 39.9502139955, "date_created": "2005-06-15T02:17:43.115113+00:00", "preferred_email_address_link": "https://launchpad.net/api/devel/~paulproteus/+email/ubuntu@asheesh.org", "is_ubuntu_coc_signer": true, "display_name": "Asheesh Laroia", "expired_members_collection_link": "https://launchpad.net/api/devel/~paulproteus/expired_members", "sshkeys_collection_link": "https://launchpad.net/api/devel/~paulproteus/sshkeys", "name": "paulproteus", "resource_type_link": "https://launchpad.net/api/devel/#person", "super_teams_collection_link": "https://launchpad.net/api/devel/~paulproteus/super_teams", "participants_collection_link": "https://launchpad.net/api/devel/~paulproteus/participants", "time_zone": "America/New_York", "longitude": -75.217466354400003, "hardware_submissions_collection_link": "https://launchpad.net/api/devel/~paulproteus/hardware_submissions", "logo_link": "https://launchpad.net/api/devel/~paulproteus/logo", "is_team": false, "karma": 72, "wiki_names_collection_link": "https://launchpad.net/api/devel/~paulproteus/wiki_names", "homepage_content": "Currently working on OpenHatch.", "jabber_ids_collection_link": "https://launchpad.net/api/devel/~paulproteus/jabber_ids"};</script>
+
+  </body>
+</html>
+
+
+  <!--
+    Facet name: overview
+    Page type: main_side
+    Has global search: True
+    Has application tabs: True
+    Has side portlets: True
+
+    At least 85 queries/external actions issued in 0.90 seconds
+
+    Features: {u'code.recipes_enabled': None, 'hard_timeout': u'15000'} 
+    in scopes {'pageid:BugTask:+create-question': False, 'pageid:Archive:+packages': False, 'default': True, 'pageid:Distribution:+bugs': False, 'pageid:Archive:EntryResource:getBuildSummariesForSourceIds': False, 'pageid:MailingListApplication:MailingListAPIView': False, 'pageid:POFile:+translate': False, 'pageid:Person:+commentedbugs': False, 'pageid:Archive:+index': False, 'pageid:BugTask:+index': False, 'pageid:CodeImportSchedulerApplication:CodeImportSchedulerAPI': False, 'pageid:Person:+bugs': False, 'team:launchpad-recipe-beta': False, 'pageid:Milestone:+index': False} 
+
+    r12004
+  -->
+
+
