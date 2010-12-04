@@ -65,6 +65,10 @@ class FakeGetPage(object):
             settings.MEDIA_ROOT, 'sample-data', 'github', 'json-repos-show-paulproteus.json')).read()
         self.url2data['http://github.com/paulproteus.json'] = open(os.path.join(
             settings.MEDIA_ROOT, 'sample-data', 'github', 'paulproteus-personal-feed.json')).read()
+        self.url2data['https://api.launchpad.net/1.0/people?ws.op=find&text=asheesh%40asheesh.org'] = open(os.path.join(
+            settings.MEDIA_ROOT, 'sample-data', 'launchpad', 'people?ws.op=find&text=asheesh@asheesh.org')).read()
+        self.url2data['https://launchpad.net/~paulproteus'] = open(os.path.join(
+            settings.MEDIA_ROOT, 'sample-data', 'launchpad', '~paulproteus')).read()
 
     """This is a fake version of Twisted.web's getPage() function.
     It returns a Deferred that is already 'fired', and has the page content
@@ -446,7 +450,7 @@ class LaunchpadProfileImport(django.test.TestCase):
 
         # Create the LPPS to track the state.
         lpps = mysite.customs.profile_importers.LaunchpadProfilePageScraper(
-            query=dia.query, dia_id=dia.id)
+            query=dia.query, dia_id=dia.id, command=None)
 
         # Check that we generate the right URL
         urlsAndCallbacks = lpps.getUrlsAndCallbacks()
@@ -455,6 +459,29 @@ class LaunchpadProfileImport(django.test.TestCase):
         callback = just_one['callback']
         self.assertEqual(url, 'https://api.launchpad.net/1.0/people?ws.op=find&text=asheesh%40asheesh.org')
         self.assertEqual(callback, lpps.parseAndProcessUserSearch)
+
+    @mock.patch('twisted.web.client.getPage', fakeGetPage.getPage)
+    @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
+    @mock.patch('mysite.search.tasks.PopulateProjectIconFromOhloh')
+    def test_email_address_to_username_discovery(self, do_nothing, do_nothing_1):
+        # Create a DataImportAttempt for Asheesh
+        asheesh = Person.objects.get(user__username='paulproteus')
+        dia = mysite.profile.models.DataImportAttempt.objects.create(person=asheesh, source='lp', query='asheesh@asheesh.org')
+
+        # setUp() already created the DataImportAttempt
+        # so we just run the command:
+        cmd = mysite.customs.management.commands.customs_twist.Command()
+        cmd.handle()
+
+        # And now, the dia should be completed.
+        dia = mysite.profile.models.DataImportAttempt.objects.get(id=dia.id)
+        self.assertTrue(dia.completed)
+
+        # And Asheesh should have some new projects available.
+        projects = set([c.portfolio_entry.project.name for c in mysite.profile.models.Citation.objects.all()])
+        self.assertEqual(projects,
+                         set([u'Web Team projects', u'Debian GNU/Linux', u'lxml', u'Buildout', u'Ubuntu']))
+
         
 class LaunchpadDataTests(django.test.TestCase):
     def test_project2language(self):
