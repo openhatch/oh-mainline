@@ -6,7 +6,6 @@ import datetime
 from mysite.customs import ohloh
 import urllib2
 import urllib
-from mysite.customs import lp_grabber
 import mysite.customs.github
 import mysite.profile.models
 from mysite.search.models import Project
@@ -49,55 +48,6 @@ def create_citations_from_ohloh_contributor_facts(dia_id, ohloh_results):
     dia.completed = True
     dia.save()
     person.save()
-    # }}}
-
-def create_citations_from_launchpad_results(dia_id, lp_results):
-    "Input: A dictionary that maps from a project name to information "
-    "about that project, e.g. "
-    """
-         {
-             'F-Spot': {
-                 'url': 'http://launchpad.net/f-spot',
-                 'involvement_types': ['Bug Management', 'Bazaar Branches'],
-                 'languages': ['python', 'ruby'],
-                 'citation_url': "https://launchpad.net/~paulproteus",
-             }
-         }
-    and the id of the DataImportAttempt they came from.
-
-    Side-effect: Create matching structures in the DB
-    and mark our success in the database."""
-    # {{{
-    dia = mysite.profile.models.DataImportAttempt.objects.get(id=dia_id)
-    person = dia.person
-    for project_name in lp_results:
-        result = lp_results[project_name]
-        for involvement_type in result['involvement_types']:
-
-            (project, _) = Project.objects.get_or_create(name=project_name)
-
-            # This works like a 'get_first_or_create'.
-            # Sometimes there are more than one existing PortfolioEntry
-            # with the details in question.
-            # FIXME: This is untested.
-            if mysite.profile.models.PortfolioEntry.objects.filter(person=person, project=project).count() == 0:
-                portfolio_entry = mysite.profile.models.PortfolioEntry(person=person, project=project)
-                portfolio_entry.save()
-            portfolio_entry = mysite.profile.models.PortfolioEntry.objects.filter(person=person, project=project)[0]
-
-            citation = mysite.profile.models.Citation()
-            citation.languages = ", ".join(result['languages'])
-            citation.contributor_role = involvement_type
-            citation.portfolio_entry = portfolio_entry
-            citation.data_import_attempt = dia
-            citation.url = result['citation_url']
-            citation.save_and_check_for_duplicates()
-
-    person.last_polled = datetime.datetime.now()
-    person.save()
-
-    dia.completed = True
-    dia.save()
     # }}}
 
 def create_citations_from_bitbucket_results(dia_id, results):
@@ -161,11 +111,6 @@ def ou_action(dia):
 def do_nothing_because_this_functionality_moved_to_twisted(*args):
     return None # This is moved to Twisted now.
 
-def lp_action(dia):
-    # NB: Don't change the way this is called, because calling it this way
-    # permits this function to be mocked when we test it.
-    return lp_grabber.get_info_for_launchpad_username(dia.query)
-
 def bb_action(dia):
     """
     Given a dia with a username, check to see if there are any 
@@ -177,6 +122,7 @@ source2actual_action = {
         'gh': do_nothing_because_this_functionality_moved_to_twisted,
         'ga': do_nothing_because_this_functionality_moved_to_twisted,
         'db': do_nothing_because_this_functionality_moved_to_twisted,
+        'lp': do_nothing_because_this_functionality_moved_to_twisted,
     
         'rs': rs_action,
         'ou': ou_action,
@@ -188,10 +134,10 @@ source2result_handler = {
         'db': do_nothing_because_this_functionality_moved_to_twisted,
         'gh': do_nothing_because_this_functionality_moved_to_twisted,
         'ga': do_nothing_because_this_functionality_moved_to_twisted,
+        'lp': do_nothing_because_this_functionality_moved_to_twisted,
 
         'rs': create_citations_from_ohloh_contributor_facts,
         'ou': create_citations_from_ohloh_contributor_facts,
-        'lp': create_citations_from_launchpad_results,
         'bb': create_citations_from_bitbucket_results,
         }
 

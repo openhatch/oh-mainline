@@ -34,7 +34,6 @@ import simplejson
 import datetime
 from dateutil.tz import tzutc
 import ohloh
-import lp_grabber
 import gdata.client
 
 import twisted.internet.defer
@@ -48,7 +47,6 @@ import mysite.customs.github
 import mysite.customs.models
 import mysite.customs.bugtrackers.roundup
 import mysite.customs.bugtrackers.launchpad
-import mysite.customs.lp_grabber
 import mysite.customs.management.commands.customs_daily_tasks
 import mysite.customs.management.commands.customs_twist
 import mysite.customs.management.commands.snapshot_public_data
@@ -483,34 +481,6 @@ class LaunchpadProfileImport(django.test.TestCase):
                          set([u'Web Team projects', u'Debian GNU/Linux', u'lxml', u'Buildout', u'Ubuntu']))
 
         
-class LaunchpadDataTests(django.test.TestCase):
-    def test_project2language(self):
-        langs = lp_grabber.project2languages('gwibber')
-        self.assertEqual(langs, ['Python'])
-
-        # The project, lazr, is registered on Launchpad, but doesn't
-        # have a language assigned to it.
-        no_langs = lp_grabber.project2languages('lazr')
-        self.assertEqual(no_langs, [])
-
-    @mock.patch('mechanize.Browser.open', open_causes_404)
-    def test_person_who_404s(self):
-        info = lp_grabber.get_info_for_launchpad_username('Mr. 404')
-        self.assertEqual(info, {})
-
-    def test_greg_has_branch_for_gwibber(self):
-        info = lp_grabber.get_info_for_launchpad_username(
-            'greg.grossmeier')
-        self.assertEqual(info['Gwibber']['involvement_types'],
-                         set(['Bazaar Branches', 'Bug Management']))
-        self.assertEqual(info['Gwibber']['url'],
-                         'https://launchpad.net/gwibber')
-        return info
-
-    def test_greg_has_python_involvement(self):
-        langs = lp_grabber.person_to_bazaar_branch_languages('greg.grossmeier')
-        self.assertEqual(langs, ['Python'])
-
 class BugzillaTests(django.test.TestCase):
     fixtures = ['miro-project']
     @mock.patch("mysite.customs.bugtrackers.bugzilla.url2bug_data")
@@ -1151,12 +1121,6 @@ class LaunchpadImporterTests(django.test.TestCase):
         self.assertEqual(out_d['last_polled'].year, datetime.date.today().year)
         del out_d['last_polled']
         self.assertEqual(sample_out_data, out_d)
-
-class LaunchpadImportByEmail(django.test.TestCase):
-
-    def test_get_asheesh(self):
-        u = mysite.customs.lp_grabber.get_launchpad_username_by_email('asheesh@asheesh.org')
-        self.assertEqual(u, "paulproteus")
 
 class LaunchpadImporterMarksFixedBugsAsClosed(django.test.TestCase):
     def test(self):

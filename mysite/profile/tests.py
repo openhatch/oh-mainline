@@ -192,17 +192,6 @@ mock_gcibou.return_value = ([{
         None #WebResponse
         )
 
-# Create a mock Launchpad get_info_for_launchpad_username
-mock_giflu = mock.Mock()
-mock_giflu.return_value = {
-        'MOCK ccHost': {
-            'url': 'http://launchpad.net/ccHost', # ok this url doesn't really exist
-            'involvement_types': ['Bug Management', 'Bazaar Branches'],
-            'languages': ['python', 'ruby'],
-            'citation_url': 'https://launchpad.net/~paulproteus',
-            }
-        }
-
 # FIXME: If this is made dynamically, it would be easier!
 class MockFetchPersonDataFromOhloh(object):
     real_task_class = tasks.FetchPersonDataFromOhloh
@@ -366,41 +355,6 @@ class CeleryTests(BaseCeleryTest):
 
         return self._test_data_source_via_emulated_bgtask(
                 source='ou', data_we_expect=data_we_expect,
-                summaries_we_expect=summaries_we_expect)
-        # }}}
-
-    @mock.patch('mysite.customs.lp_grabber.get_info_for_launchpad_username', mock_giflu)
-    @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
-    def test_launchpad_import_via_emulated_bgtask(self):
-        "Test that we can import data from Ohloh, except don't test "
-        "that Ohloh actually gives data. Instead, create a little "
-        "placeholder that acts like Ohloh, and make sure we respond "
-        "to it correctly."
-        # {{{
-        lp_result = mock_giflu.return_value.values()[0]
-        data_we_expect = [
-                {
-                    'contributor_role': lp_result['involvement_types'][0],
-                    'languages': ", ".join(lp_result['languages']),
-                    'is_published': False,
-                    'is_deleted': False,
-                    },
-                {
-                    'contributor_role': lp_result['involvement_types'][1],
-                    'languages': ", ".join(lp_result['languages']),
-                    'is_published': False,
-                    'is_deleted': False,
-                    }
-                ]
-
-        # FIXME: Write these properly.
-        summaries_we_expect = [
-                'Participated in Bug Management (Launchpad)',
-                'Participated in Bazaar Branches (Launchpad)',
-                ]
-
-        return self._test_data_source_via_emulated_bgtask(
-                source='lp', data_we_expect=data_we_expect,
                 summaries_we_expect=summaries_we_expect)
         # }}}
 
@@ -729,35 +683,6 @@ mock_launchpad_debian_response.return_value = {
             'languages': '',
             }
         }
-
-class LaunchpadCallsDebianDGL(TwillTests):
-    fixtures = ['user-paulproteus', 'person-paulproteus']
-
-    @mock.patch('mysite.search.models.Project.populate_icon_from_ohloh',
-                do_nothing)
-    @mock.patch('mysite.customs.lp_grabber._get_info_for_launchpad_username',
-                mock_launchpad_debian_response)
-    @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
-    def test(self):
-        # at start, no portfolio entries
-        # Let's run this test using a sample user, paulproteus.
-        username = 'paulproteus'
-        person = Person.objects.get(user__username=username)
-
-        # Store a note in the DB that we're about to run a background task
-        dia = DataImportAttempt(query=username, source='lp', person=person)
-        dia.save()
-        dia.do_what_it_says_on_the_tin()
-        self.assert_(DataImportAttempt.objects.get(id=dia.id).completed)
-
-        # There ought now to be a PortfolioEntry for Debian
-        portfolio_entry = PortfolioEntry.objects.get()
-
-        # Project is called...?
-        name = portfolio_entry.project.name
-
-        self.assertEqual(name, "Debian GNU/Linux")
-        
 
 class BugsAreRecommended(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus',
