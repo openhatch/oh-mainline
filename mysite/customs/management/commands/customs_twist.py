@@ -25,24 +25,28 @@ class Command(BaseCommand):
         ### we configure its next actions.
         urls_and_callbacks = state_manager.getUrlsAndCallbacks()
         for data_dict in urls_and_callbacks:
-            logging.debug("Creating getPage for " + data_dict['url'] + 'due to DIA with id ' + str(dia_id))
-            d = state_manager.createDeferredAndKeepTrackOfIt(data_dict['url'])
-            self.running_deferreds += 1
-            # wrap the callback
-            wrapped_callback = mysite.customs.profile_importers.ImportActionWrapper(
+            self.call_getPage_on_data_dict(state_manager, data_dict)
+
+    def call_getPage_on_data_dict(self, state_manager, data_dict):
+        logging.debug("Creating getPage for " + data_dict['url'])
+        d = state_manager.createDeferredAndKeepTrackOfIt(data_dict['url'])
+        self.running_deferreds += 1
+        # wrap the callback
+        wrapped_callback = mysite.customs.profile_importers.ImportActionWrapper(
+            url=data_dict['url'],
+            pi=state_manager,
+            fn=data_dict['callback'])
+        d.addCallback(wrapped_callback)
+
+        if 'errback' in data_dict:
+            # wrap the errback
+            wrapped_errback = mysite.customs.profile_importers.ImportActionWrapper(
                 url=data_dict['url'],
                 pi=state_manager,
-                fn=data_dict['callback'])
-            d.addCallback(wrapped_callback)
-            d.addCallback(self.decrement_deferred_count_and_maybe_quit)
+                fn=data_dict['errback'])
+            d.addErrback(wrapped_errback)
 
-            if 'errback' in data_dict:
-                # wrap the errback
-                wrapped_errback = mysite.customs.profile_importers.ImportActionWrapper(
-                    url=data_dict['url'],
-                    pi=state_manager,
-                    fn=data_dict['errback'])
-                d.addErrback(wrapped_errback)
+        d.addCallback(self.decrement_deferred_count_and_maybe_quit)
 
     def decrement_deferred_count_and_maybe_quit(self, *args):
         self.running_deferreds -= 1
@@ -52,10 +56,15 @@ class Command(BaseCommand):
             raise ValueError("Uh, number of running deferreds went negative.")
 
     def stop_the_reactor(self, *args):
-        reactor.callWhenRunning(lambda: reactor.stop())
+        if self.already_enqueued_stop_command:
+            return
+        else:
+            self.already_enqueued_stop_command = True
+            reactor.callWhenRunning(lambda *args: reactor.stop())
 
     def handle(self, *args, **options):
         self.running_deferreds = 0
+        self.already_enqueued_stop_command = False
 
         print "Creating getPage()-based deferreds..."
         self.create_tasks_from_dias()
