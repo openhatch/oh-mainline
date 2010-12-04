@@ -43,6 +43,7 @@ class ProfileImporter(object):
         return False
 
     def handleError(self, failure):
+        # FIXME: Use Django default exception logic to make an email get sent.
         import logging
         logging.warn(failure)
 
