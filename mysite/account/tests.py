@@ -242,7 +242,7 @@ class EditPhoto(TwillTests):
         finally:
             os.unlink(bad_image.name)
 
-    def test_image_processing_libarary_error(self):
+    def test_image_processing_library_error(self):
         """
         If the image processing library errors while preparing a photo, report a
         helpful message to the user and log the error. The photo is not added
