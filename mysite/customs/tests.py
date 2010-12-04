@@ -433,6 +433,29 @@ class ImportFromDebianQA(django.test.TestCase):
     def test_404(self):
         pass # uhhh
 
+class LaunchpadProfileImport(django.test.TestCase):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    @mock.patch('twisted.web.client.getPage', fakeGetPage.getPage)
+    @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
+    @mock.patch('mysite.search.tasks.PopulateProjectIconFromOhloh')
+    def test_asheesh_unit(self, do_nothing, do_nothing_also):
+        # Create a DataImportAttempt for Asheesh
+        asheesh = Person.objects.get(user__username='paulproteus')
+        dia = mysite.profile.models.DataImportAttempt.objects.create(person=asheesh, source='lp', query='asheesh@asheesh.org')
+
+        # Create the LPPS to track the state.
+        lpps = mysite.customs.profile_importers.LaunchpadProfilePageScraper(
+            query=dia.query, dia_id=dia.id)
+
+        # Check that we generate the right URL
+        urlsAndCallbacks = lpps.getUrlsAndCallbacks()
+        just_one, = urlsAndCallbacks
+        url = just_one['url']
+        callback = just_one['callback']
+        self.assertEqual(url, 'https://api.launchpad.net/1.0/people?ws.op=find&text=asheesh%40asheesh.org')
+        self.assertEqual(callback, lpps.parseAndProcessUserSearch)
+        
 class LaunchpadDataTests(django.test.TestCase):
     def test_project2language(self):
         langs = lp_grabber.project2languages('gwibber')

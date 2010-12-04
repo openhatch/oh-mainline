@@ -311,6 +311,35 @@ class DebianQA(ProfileImporter):
         person.last_polled = datetime.datetime.now()
         person.save()
 
+class LaunchpadProfilePageScraper(ProfileImporter):
+    def getUrlsAndCallbacks(self):
+        urls_and_callbacks = []
+
+        # If the query has an '@' in it, enqueue a task to
+        # find the username.
+        if '@' in self.query:
+            this_one = {}
+            this_one['url'] = ('https://api.launchpad.net/1.0/people?' +
+                               'ws.op=find&text=' +
+                               mysite.base.unicode_sanity.quote(
+                                   self.query))
+            this_one['callback'] = self.parseAndProcessUserSearch
+            urls_and_callbacks.append(this_one)
+        else:
+            # Enqueue a task to actually get the user page
+            this_one = {}
+            this_one['url'] = ('https://launchpad.net/~' +
+                               mysite.base.unicode_sanity.quote(self.query))
+            this_one['callback'] = self.parseAndProcessUserSearch
+
+        return urls_and_callbacks
+
+    def parseAndProcessProfilePage(self, profile_html):
+        pass
+
+    def parseAndProcessUserSearch(self, user_search_json):
+        pass
+
 ###
 
 SOURCE_TO_CLASS = {
