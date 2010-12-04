@@ -305,7 +305,7 @@ class ImportFromGithub(django.test.TestCase):
         # Create the Github object to track the state.
         self.gi = mysite.customs.profile_importers.GithubImporter(
             self.dia.query,
-            self.dia.id)
+            self.dia.id, None)
 
     @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
     @mock.patch('mysite.search.tasks.PopulateProjectIconFromOhloh')
@@ -394,7 +394,7 @@ class ImportFromDebianQA(django.test.TestCase):
         dia = mysite.profile.models.DataImportAttempt.objects.create(person=asheesh, source='db', query='asheesh@asheesh.org')
 
         # Create the DebianQA to track the state.
-        dqa = mysite.customs.profile_importers.DebianQA(query=dia.query, dia_id=dia.id)
+        dqa = mysite.customs.profile_importers.DebianQA(query=dia.query, dia_id=dia.id, command=None)
 
         # Check that we generate the right URL
         urlsAndCallbacks = dqa.getUrlsAndCallbacks()

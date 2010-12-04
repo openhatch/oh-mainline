@@ -18,20 +18,13 @@ import twisted.web
 
 ### Generic error handler
 class ProfileImporter(object):
-    def __init__(self, query, dia_id):
+    def __init__(self, query, dia_id, command):
         ## First, store the data we are passed in.
         self.query = query
         self.dia_id = dia_id
+        self.command = command
         ## Then, create a mapping for storing the URLs we are waiting on.
         self.urls_we_are_waiting_on = collections.defaultdict(int)
-
-    def createDeferredAndKeepTrackOfIt(self, url):
-        # First, actually create the Deferred.
-        d = twisted.web.client.getPage(url)
-        # Then, keep track of it.
-        self.urls_we_are_waiting_on[url] += 1
-        # Return the Deferred.
-        return d
 
     def markThatTheDeferredFinished(self, url):
         self.urls_we_are_waiting_on[url] -= 1

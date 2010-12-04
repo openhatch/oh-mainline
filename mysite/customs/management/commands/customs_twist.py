@@ -19,7 +19,7 @@ class Command(BaseCommand):
     def add_dia_to_reactor(self, cls, query, dia_id):
         ### For now, only the 'db' == Debian == qa.debian.org DIAs are in a format where
         ### they can handle asynchronous operation.
-        state_manager = cls(query, dia_id)
+        state_manager = cls(query, dia_id, self)
 
         ### d is the "deferred" object. We create it using getPage(), and then
         ### we configure its next actions.
@@ -28,22 +28,32 @@ class Command(BaseCommand):
             self.call_getPage_on_data_dict(state_manager, data_dict)
 
     def call_getPage_on_data_dict(self, state_manager, data_dict):
-        logging.debug("Creating getPage for " + data_dict['url'])
-        d = state_manager.createDeferredAndKeepTrackOfIt(data_dict['url'])
+        url = data_dict['url']
+        callback = data_dict['callback']
+        errback = data_dict.get('errback', None)
+        
+        logging.debug("Creating getPage for " + url)
+
+        # First, actually create the Deferred.
+        d = twisted.web.client.getPage(url)
+        
+        # Then, keep track of it.
+        state_manager.urls_we_are_waiting_on[url] += 1
         self.running_deferreds += 1
+        
         # wrap the callback
         wrapped_callback = mysite.customs.profile_importers.ImportActionWrapper(
-            url=data_dict['url'],
+            url=url,
             pi=state_manager,
-            fn=data_dict['callback'])
+            fn=callback)
         d.addCallback(wrapped_callback)
 
-        if 'errback' in data_dict:
+        if errback is not None:
             # wrap the errback
             wrapped_errback = mysite.customs.profile_importers.ImportActionWrapper(
-                url=data_dict['url'],
+                url=url,
                 pi=state_manager,
-                fn=data_dict['errback'])
+                fn=errback)
             d.addErrback(wrapped_errback)
 
         d.addCallback(self.decrement_deferred_count_and_maybe_quit)
