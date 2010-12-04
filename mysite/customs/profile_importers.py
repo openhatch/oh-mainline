@@ -95,11 +95,13 @@ class GithubImporter(ProfileImporter):
                 # Just like above -- no data to return.
                 squash_it = True
 
-        if squash_it:
-            pass
+            if squash_it:
+                pass
+            else:
+                # This is low-quality logging for now!
+                logging.warn("EEK: " + error.value.status + " " + error.value.response)
         else:
-            # This is low-quality logging for now!
-            logging.warn("EEK: " + error.value.status + " " + error.value.response)
+            raise error.value
 
     # This method takes a repository dict as returned by Github
     # and creates a Citation, also creating the relevant
