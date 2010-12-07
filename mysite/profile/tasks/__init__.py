@@ -126,7 +126,6 @@ source2actual_action = {
     
         'rs': rs_action,
         'ou': ou_action,
-        'lp': lp_action,
         'bb': bb_action
         }
 
