@@ -1443,9 +1443,9 @@ class CreateAnswer(TwillTests):
         POST_data = {
                 'project__pk': p.pk,
                 'question__pk': q.pk,
-                'answer__text': """Help produce official documentation, share the
-                    solution to a problem, or check, proof and test other
-                    documents for accuracy.""",
+                'answer__text': """Help produce official documentation, share \
+the solution to a problem, or check, proof and test other documents for \
+accuracy.""",
                     }
         response = self.login_with_client().post(reverse(mysite.project.views.create_answer_do), POST_data)
         # If this were an Ajaxy post handler, we might assert something about
@@ -1466,6 +1466,33 @@ class CreateAnswer(TwillTests):
         project_page = self.client.get(p.get_url())
         self.assertContains(project_page, POST_data['answer__text'])
         self.assertContains(project_page, record.author.username)
+
+    def test_multiparagraph_answer(self):
+        """
+        If a multi-paragraph answer is submitted, display it as a
+        multi-paragraph answer.
+        """
+        # go to the project page
+        p = Project.create_dummy(name='Ubuntu')
+        q = ProjectInvolvementQuestion.create_dummy(
+            key_string='where_to_start', is_bug_style=False)
+        q.save()
+        text = ['This is a multiparagraph answer.',
+                'This is the second paragraph.',
+                'This is the third paragraph.']
+        POST_data = {
+                'project__pk': p.pk,
+                'question__pk': q.pk,
+                'answer__text': "\n".join(text)
+                }
+
+        POST_handler = reverse(mysite.project.views.create_answer_do)
+        self.login_with_client().post(POST_handler, POST_data)
+        project_page = self.login_with_client().get(p.get_url())
+
+        # Django documents publicly that linebreaksbr replaces "\n" with "<br />".
+        # http://docs.djangoproject.com/en/dev/ref/templates/builtins/#linebreaksbr
+        self.assertContains(project_page, "<br />".join(text))
 
 class TestEpoch(TwillTests):
     def test_on_mark_looks_closed(self):

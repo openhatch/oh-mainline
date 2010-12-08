@@ -104,7 +104,7 @@ about how you can help {{ project.name }}
                                         {% endifequal %}
 
                                         <span class="answer" id="answer_{{answer.pk}}">
-                                            {{ answer.text|urlize_without_escaping_percent_signs|safe }}
+                                            {{ answer.text|urlize_without_escaping_percent_signs|safe|linebreaks }}
                                             <br/>
                                             {% include 'project/byline.html' %}
                                         </span>
