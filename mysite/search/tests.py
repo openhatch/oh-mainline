@@ -1,4 +1,4 @@
-from mysite.base.tests import make_twill_url, better_make_twill_url, TwillTests
+from mysite.base.tests import make_twill_url, TwillTests
 import mysite.base.unicode_sanity
 
 import mysite.account.tests
@@ -8,30 +8,20 @@ import mysite.search.controllers
 from mysite.search.models import Project, Bug, HitCountCache, \
         ProjectInvolvementQuestion, Answer, BugAlert
 from mysite.search import views
-import lpb2json
 import datetime
 import mysite.project.views
 
 import simplejson
-import os
 import mock
-import time
-import twill
 from twill import commands as tc
-from twill.shell import TwillCommandLoop
-import twill
 
 from django.test import TestCase
-from django.core.servers.basehttp import AdminMediaHandler
-from django.core.handlers.wsgi import WSGIHandler
 from django.core.urlresolvers import reverse
 from django.core.files.base import ContentFile
 from django.contrib.auth.models import User
 
 from django.db.models import Q 
 
-from django.conf import settings
-from StringIO import StringIO
 import MySQLdb
 
 class SearchTest(TwillTests):
@@ -247,7 +237,7 @@ class TestThatQueryTokenizesRespectingQuotationMarks(TwillTests):
         self.assertEqual(query.terms, [difficult])
         # Make there be a bug to find
         project = Project.create_dummy(name=difficult)
-        bug = Bug.create_dummy(project=project)
+        Bug.create_dummy(project=project)
         # How many bugs?
         num_bugs = query.get_bugs_unordered().count()
         self.assertEqual(num_bugs, 1)
@@ -378,7 +368,7 @@ class Recommend(SearchTest):
     def test_recomender_raises_integrity_error(self, mocked_get_or_create):
         mocked_get_or_create.side_effect = MySQLdb.IntegrityError()
         person = Person.objects.get(user__username='paulproteus')
-        recommended_terms = person.get_recommended_search_terms()
+        person.get_recommended_search_terms()
 
     # FIXME: Include recommendations from tags.
 
@@ -523,8 +513,8 @@ class IconGetsScaled(SearchTest):
 
 class SearchOnFullWords(SearchTest):
     def test_find_perl_not_properly(self):
-        project = Project.create_dummy()
-        properly_bug = Bug.create_dummy(description='properly')
+        Project.create_dummy()
+        Bug.create_dummy(description='properly')
         perl_bug = Bug.create_dummy(description='perl')
         self.assertEqual(Bug.all_bugs.all().count(), 2)
         results = mysite.search.controllers.Query(
@@ -548,7 +538,7 @@ class FacetsFilterResults(SearchTest):
 
         # But not this bug
         not_python_project = Project.create_dummy(language='Nohtyp')
-        not_python_bug = Bug.create_dummy(project=not_python_project)
+        Bug.create_dummy(project=not_python_project)
 
         results = mysite.search.controllers.Query(
                 terms=[], active_facet_options=facets).get_bugs_unordered()
@@ -612,8 +602,8 @@ class QueryGetPossibleFacets(SearchTest):
     def test_possible_facets_always_includes_active_facet(self):
         # even when active facet has no results.
         c = Project.create_dummy(language=u'c')
-        d = Project.create_dummy(language=u'd')
-        e = Project.create_dummy(language=u'e')
+        Project.create_dummy(language=u'd')
+        Project.create_dummy(language=u'e')
         Bug.create_dummy(project=c, description=u'bug')
         query = mysite.search.controllers.Query.create_from_GET_data(
                 {u'q': u'nothing matches this', u'language': u'c'})
@@ -631,25 +621,21 @@ class SingleTerm(SearchTest):
         perl_project = Project.create_dummy(language='Perl')
         c_project = Project.create_dummy(language='C')
 
-        bitesize_matching_bug_in_python = Bug.create_dummy(
-                project=python_project,
-                good_for_newcomers=True, 
-                description='screensaver')
+        # bitesize, matching bug in Python
+        Bug.create_dummy(project=python_project, good_for_newcomers=True,
+                         description='screensaver')
 
-        nonbitesize_matching_bug_in_python = Bug.create_dummy(
-                project=python_project,
-                good_for_newcomers=False, 
-                description='screensaver')
+        # nonbitesize, matching bug in Python
+        Bug.create_dummy(project=python_project, good_for_newcomers=False,
+                         description='screensaver')
 
-        nonbitesize_matching_bug_in_perl = Bug.create_dummy(
-                project=perl_project,
-                good_for_newcomers=False, 
-                description='screensaver')
+        # nonbitesize, matching bug in Perl
+        Bug.create_dummy(project=perl_project, good_for_newcomers=False,
+                         description='screensaver')
 
-        nonbitesize_nonmatching_bug_in_c = Bug.create_dummy(
-                project=c_project,
-                good_for_newcomers=False, 
-                description='toast')
+        # nonbitesize, nonmatching bug in C
+        Bug.create_dummy(project=c_project, good_for_newcomers=False,
+                         description='toast')
 
         GET_data = { 'q': 'screensaver' }
         query = mysite.search.controllers.Query.create_from_GET_data(GET_data)
@@ -711,25 +697,21 @@ class SingleFacetOption(SearchTest):
         perl_project = Project.create_dummy(language='Perl')
         c_project = Project.create_dummy(language='C')
 
-        bitesize_matching_bug_in_python = Bug.create_dummy(
-                project=python_project,
-                good_for_newcomers=True, 
-                description='screensaver')
+        # bitesize, matching bug in Python
+        Bug.create_dummy(project=python_project, good_for_newcomers=True,
+                         description='screensaver')
 
-        nonbitesize_matching_bug_in_python = Bug.create_dummy(
-                project=python_project,
-                good_for_newcomers=False, 
-                description='screensaver')
+        # nonbitesize, matching bug in Python
+        Bug.create_dummy(project=python_project, good_for_newcomers=False,
+                         description='screensaver')
 
-        nonbitesize_matching_bug_in_perl = Bug.create_dummy(
-                project=perl_project,
-                good_for_newcomers=False, 
-                description='screensaver')
+        # nonbitesize, matching bug in Perl
+        Bug.create_dummy(project=perl_project, good_for_newcomers=False,
+                         description='screensaver')
 
-        nonbitesize_nonmatching_bug_in_c = Bug.create_dummy(
-                project=c_project,
-                good_for_newcomers=False, 
-                description='toast')
+        # nonbitesize, nonmatching bug in C
+        Bug.create_dummy(project=c_project, good_for_newcomers=False,
+                         description='toast')
 
         GET_data = { u'language': u'Python' }
         query = mysite.search.controllers.Query.create_from_GET_data(GET_data)
@@ -798,17 +780,9 @@ class QueryGetToughnessFacetOptions(SearchTest):
         python_project = Project.create_dummy(language=u'Python')
         perl_project = Project.create_dummy(language=u'Perl')
 
-        bitesize_bug_in_python = Bug.create_dummy(
-                project=python_project,
-                good_for_newcomers=True, )
-
-        nonbitesize_bug_in_python = Bug.create_dummy(
-                project=python_project,
-                good_for_newcomers=False, )
-
-        bitesize_bug_in_perl = Bug.create_dummy(
-                project=perl_project,
-                good_for_newcomers=True, )
+        Bug.create_dummy(project=python_project, good_for_newcomers=True)
+        Bug.create_dummy(project=python_project, good_for_newcomers=False)
+        Bug.create_dummy(project=perl_project, good_for_newcomers=True)
 
         query = mysite.search.controllers.Query(
                 active_facet_options={u'language': u'Python'},
@@ -824,20 +798,14 @@ class QueryGetToughnessFacetOptions(SearchTest):
         python_project = Project.create_dummy(language=u'Python')
         perl_project = Project.create_dummy(language=u'Perl')
 
-        bitesize_bug_that_matches = Bug.create_dummy(
-                project=python_project,
-                good_for_newcomers=True,
-                description=u'a')
+        Bug.create_dummy(project=python_project, good_for_newcomers=True,
+                         description=u'a')
 
-        nonbitesize_bug_that_matches = Bug.create_dummy(
-                project=python_project,
-                good_for_newcomers=False,
-                description=u'a')
+        Bug.create_dummy(project=python_project, good_for_newcomers=False,
+                         description=u'a')
 
-        bitesize_bug_that_doesnt_match = Bug.create_dummy(
-                project=perl_project,
-                good_for_newcomers=True,
-                description=u'b')
+        Bug.create_dummy(project=perl_project, good_for_newcomers=True,
+                         description=u'b')
 
         GET_data = {u'q': u'a'}
         query = mysite.search.controllers.Query.create_from_GET_data(GET_data)
@@ -857,10 +825,10 @@ class QueryGetPossibleLanguageFacetOptionNames(SearchTest):
         c_project = Project.create_dummy(language=u'C')
         unknown_project = Project.create_dummy(language=u'')
 
-        python_bug = Bug.create_dummy(project=python_project, title=u'a')
-        perl_bug = Bug.create_dummy(project=perl_project, title=u'a') 
-        c_bug = Bug.create_dummy(project=c_project, title=u'b') 
-        unknowable_bug = Bug.create_dummy(project=unknown_project, title=u'unknowable') 
+        Bug.create_dummy(project=python_project, title=u'a')
+        Bug.create_dummy(project=perl_project, title=u'a') 
+        Bug.create_dummy(project=c_project, title=u'b') 
+        Bug.create_dummy(project=unknown_project, title=u'unknowable') 
 
     def test_with_term(self):
         # In the setUp we create three bugs, but only two of them would match
@@ -944,10 +912,10 @@ class QueryContributionType(SearchTest):
         perl_project = Project.create_dummy(language=u'Perl')
         c_project = Project.create_dummy(language=u'C')
 
-        python_bug = Bug.create_dummy(project=python_project, title=u'a')
-        perl_bug = Bug.create_dummy(project=perl_project, title=u'a',
-                                    concerns_just_documentation=True) 
-        c_bug = Bug.create_dummy(project=c_project, title=u'b')
+        Bug.create_dummy(project=python_project, title=u'a')
+        Bug.create_dummy(project=perl_project, title=u'a',
+                         concerns_just_documentation=True) 
+        Bug.create_dummy(project=c_project, title=u'b')
 
     def test_contribution_type_is_an_available_facet(self):
         GET_data = {}
@@ -975,10 +943,10 @@ class QueryProject(SearchTest):
         c_project = Project.create_dummy(language=u'C',
                                          name='thingamabob')
 
-        python_bug_1 = Bug.create_dummy(project=python_project, title=u'a')
-        python_bug_2 = Bug.create_dummy(project=python_project, title=u'a',
-                                    concerns_just_documentation=True) 
-        c_bug = Bug.create_dummy(project=c_project, title=u'b')
+        Bug.create_dummy(project=python_project, title=u'a')
+        Bug.create_dummy(project=python_project, title=u'a',
+                         concerns_just_documentation=True) 
+        Bug.create_dummy(project=c_project, title=u'b')
 
     def test_project_is_an_available_facet(self):
         GET_data = {}
@@ -1047,7 +1015,7 @@ class QueryGrabHitCount(SearchTest):
 
         project = Project.create_dummy(language=u'shoutNOW')
 
-        bug = Bug.create_dummy(project=project)
+        Bug.create_dummy(project=project)
         data = {u'language': u'shoutNOW'}
         query = mysite.search.controllers.Query.create_from_GET_data(data)
 
@@ -1083,7 +1051,7 @@ class ClearCacheWhenBugsChange(SearchTest):
 class DontRecommendFutileSearchTerms(TwillTests):
 
     def test_removal_of_futile_terms(self):
-        bug = mysite.search.models.Bug.create_dummy_with_project(description=u'useful')
+        mysite.search.models.Bug.create_dummy_with_project(description=u'useful')
         self.assertEqual(
                 Person.only_terms_with_results([u'useful', u'futile']),
                 [u'useful'])
@@ -1447,7 +1415,7 @@ class CreateAnswer(TwillTests):
 the solution to a problem, or check, proof and test other documents for \
 accuracy.""",
                     }
-        response = self.login_with_client().post(reverse(mysite.project.views.create_answer_do), POST_data)
+        self.login_with_client().post(reverse(mysite.project.views.create_answer_do), POST_data)
         # If this were an Ajaxy post handler, we might assert something about
         # the response, like 
         #   self.assertEqual(response.content, '1')
