@@ -20,20 +20,20 @@ from django.core.urlresolvers import reverse
 from django.core.files.base import ContentFile
 from django.contrib.auth.models import User
 
-from django.db.models import Q 
+from django.db.models import Q
 
 import MySQLdb
 
 class SearchTest(TwillTests):
 
     def search_via_twill(self, query=None):
-        search_url = "http://openhatch.org/search/" 
+        search_url = "http://openhatch.org/search/"
         if query:
             search_url += '?q=%s' % query
         tc.go(make_twill_url(search_url))
 
     def search_via_client(self, query=None):
-        search_url = "/search/" 
+        search_url = "/search/"
         return self.client.get(search_url, {u'q': query})
 
     def compare_lists(self, one, two):
@@ -152,15 +152,15 @@ class SearchResultsSpecificBugs(SearchTest):
         # except perhaps the specified one.'
         other_c_filters = Q() # Initial value
         for cf in self.canonical_filters:
-            if cf != except_one: 
-                other_c_filters = other_c_filters | cf 
+            if cf != except_one:
+                other_c_filters = other_c_filters | cf
 
         # Read this as "Just that one filter and no others."
         return except_one & ~other_c_filters
 
     def test_that_fixture_works_properly(self):
         """Is the fixture is wired correctly?
-        
+
         To test the search engine, I've loaded the fixture with six
         'canonical' bugs. Four of them are canonical matches, two
         are canonical non-matches. A working search engine will return
@@ -180,7 +180,7 @@ class SearchResultsSpecificBugs(SearchTest):
         This test checks the fixture for the existence of these
         canonical bugs.
 
-        If the fixture is wired correctly, when we search it for 
+        If the fixture is wired correctly, when we search it for
         'python', it will return bugs 1, 2, 3 and 4, and exclude
         bugs 400 and 401. """
 
@@ -351,9 +351,9 @@ class Recommend(SearchTest):
 
         # By 'source' I mean a source of recommendations.
         source2terms = {
-                'languages in citations': ['Automake', 'C#', 'C++', 'Make', 
+                'languages in citations': ['Automake', 'C#', 'C++', 'Make',
                     'Python', 'shell script', 'XUL'],
-                'projects in citations': ['Mozilla Firefox'], 
+                'projects in citations': ['Mozilla Firefox'],
                 'tags': ['algol', 'symbolist poetry', 'rails', 'chinese chess']
                 }
 
@@ -386,9 +386,9 @@ class Recommend(SearchTest):
         response = client.get('/search/')
 
         source2terms = {
-                'languages in citations': ['Automake', 'C#', 'C++', 'Make', 
+                'languages in citations': ['Automake', 'C#', 'C++', 'Make',
                     'Python', 'shell script', 'XUL'],
-                'projects in citations': ['Mozilla Firefox'], 
+                'projects in citations': ['Mozilla Firefox'],
                 'tags': ['algol', 'symbolist poetry', 'rails', 'chinese chess']
                 }
 
@@ -474,7 +474,7 @@ class IconGetsScaled(SearchTest):
         p.save()
 
         # Assertion 2: Verify that it is now a true value
-        self.assert_(p.icon_smaller_for_badge, 
+        self.assert_(p.icon_smaller_for_badge,
                      "Expected p.icon_smaller_for_badge to be a true value.")
 
         # Assertion 3: Verify that it has the right width
@@ -500,7 +500,7 @@ class IconGetsScaled(SearchTest):
         p.save()
 
         # Assertion 2: Verify that it is now a true value
-        self.assert_(p.icon_smaller_for_badge, 
+        self.assert_(p.icon_smaller_for_badge,
                      "Expected p.icon_smaller_for_badge to be a true value.")
 
         # Assertion 3: Verify that it has the right width
@@ -573,7 +573,7 @@ class QueryGetPossibleFacets(SearchTest):
         self.compare_lists_of_dicts(
                 possible_facets[u'language'][u'options'],
                 [
-                    { u'name': u'c', u'query_string': u'q=bug&language=c', 
+                    { u'name': u'c', u'query_string': u'q=bug&language=c',
                         u'is_active': True, u'count': 1 },
                     { u'name': u'd', u'query_string': u'q=bug&language=d',
                         u'is_active': False, u'count': 1 },
@@ -656,7 +656,7 @@ class SingleTerm(SearchTest):
 
         self.assertEqual(
                 self.output_possible_facets['toughness']['options'],
-                expected_toughness_facet_options 
+                expected_toughness_facet_options
                 )
         self.assertEqual(
                 self.output_possible_facets['toughness']['the_any_option'],
@@ -681,7 +681,7 @@ class SingleTerm(SearchTest):
 
         self.compare_lists_of_dicts(
                 self.output_possible_facets['language']['options'],
-                expected_languages_facet_options 
+                expected_languages_facet_options
                 )
 
         self.assertEqual(
@@ -716,7 +716,7 @@ class SingleFacetOption(SearchTest):
         GET_data = { u'language': u'Python' }
         query = mysite.search.controllers.Query.create_from_GET_data(GET_data)
         self.assertFalse(query.terms) # No terms
-        self.assertEqual(query.active_facet_options, {u'language': u'Python'}) 
+        self.assertEqual(query.active_facet_options, {u'language': u'Python'})
 
         self.output_possible_facets = dict(query.get_possible_facets())
 
@@ -732,7 +732,7 @@ class SingleFacetOption(SearchTest):
 
         self.compare_lists_of_dicts(
                 self.output_possible_facets[u'toughness'][u'options'],
-                expected_toughness_facet_options 
+                expected_toughness_facet_options
                 )
         self.assertEqual(
                 self.output_possible_facets[u'toughness'][u'the_any_option'],
@@ -754,14 +754,14 @@ class SingleFacetOption(SearchTest):
                 u'is_active': False,
                 u'query_string': u'q=&language='}
         expected_languages_facet_options = [
-                languages_option_python, 
+                languages_option_python,
                 languages_option_perl,
                 languages_option_c,
                 ]
 
         self.compare_lists_of_dicts(
                 self.output_possible_facets[u'language'][u'options'],
-                expected_languages_facet_options 
+                expected_languages_facet_options
                 )
 
         self.assertEqual(
@@ -826,9 +826,9 @@ class QueryGetPossibleLanguageFacetOptionNames(SearchTest):
         unknown_project = Project.create_dummy(language=u'')
 
         Bug.create_dummy(project=python_project, title=u'a')
-        Bug.create_dummy(project=perl_project, title=u'a') 
-        Bug.create_dummy(project=c_project, title=u'b') 
-        Bug.create_dummy(project=unknown_project, title=u'unknowable') 
+        Bug.create_dummy(project=perl_project, title=u'a')
+        Bug.create_dummy(project=c_project, title=u'b')
+        Bug.create_dummy(project=unknown_project, title=u'unknowable')
 
     def test_with_term(self):
         # In the setUp we create three bugs, but only two of them would match
@@ -914,7 +914,7 @@ class QueryContributionType(SearchTest):
 
         Bug.create_dummy(project=python_project, title=u'a')
         Bug.create_dummy(project=perl_project, title=u'a',
-                         concerns_just_documentation=True) 
+                         concerns_just_documentation=True)
         Bug.create_dummy(project=c_project, title=u'b')
 
     def test_contribution_type_is_an_available_facet(self):
@@ -945,7 +945,7 @@ class QueryProject(SearchTest):
 
         Bug.create_dummy(project=python_project, title=u'a')
         Bug.create_dummy(project=python_project, title=u'a',
-                         concerns_just_documentation=True) 
+                         concerns_just_documentation=True)
         Bug.create_dummy(project=c_project, title=u'b')
 
     def test_project_is_an_available_facet(self):
@@ -1079,7 +1079,7 @@ class TestPotentialMentors(TwillTests):
 
         banshee = Project.create_dummy(name='Banshee', language='C#')
         can_mentor, _ = mysite.profile.models.TagType.objects.get_or_create(name=u'can_mentor')
-        
+
         willing_to_mentor_banshee, _ = mysite.profile.models.Tag.objects.get_or_create(
             tag_type=can_mentor,
             text=u'Banshee')
@@ -1152,7 +1152,7 @@ class SuggestAlertOnLastResultsPage(TwillTests):
         email_address = 'yetanother@ema.il'
         tc.fv('alert', 'email', email_address)
         tc.submit()
-        
+
         if anonymous:
             client = self.client
         else:
@@ -1168,7 +1168,7 @@ class SuggestAlertOnLastResultsPage(TwillTests):
         # Django's built-in testing sweeeet
         response = client.post(reverse(mysite.search.views.subscribe_to_bug_alert_do), alert_data_in_form)
 
-        # This response should be a HTTP redirect instruction 
+        # This response should be a HTTP redirect instruction
         self.assertEqual(response.status_code, 302)
         redirect_target_url = response._headers['location'][1]
         self.assert_(query_string in redirect_target_url)
@@ -1189,7 +1189,7 @@ class SuggestAlertOnLastResultsPage(TwillTests):
         self.assert_(alert_record)
 
         assert_that_record_has_this_data = alert_data_in_form
-        
+
         # For the logged-in user, also check that the record contains the
         # identity of the user who made the alert request.
 
@@ -1206,7 +1206,7 @@ class SuggestAlertOnLastResultsPage(TwillTests):
     def test_alert_logged_in(self):
         self.exercise_alert(anonymous=False)
 
-            
+
 class DeleteAnswer(TwillTests):
     fixtures = ['user-paulproteus']
 
@@ -1301,19 +1301,19 @@ class CreateBugAnswer(TwillTests):
 
 class WeTakeOwnershipOfAnswersAtLogin(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
-    
+
     def test_create_answer_but_take_ownership_at_login_time(self):
         session = {}
-        
+
         # Create the Answer object, but set its User to None
         answer = Answer.create_dummy()
         answer.author = None
         answer.is_published = False
         answer.save()
-        
+
         # Verify that the Answer object is not available by .objects()
         self.assertFalse(Answer.objects.all())
-        
+
         # Store the Answer IDs in the session
         mysite.project.controllers.note_in_session_we_control_answer_id(session, answer.id)
         self.assertEqual(session['answer_ids_that_are_ours'], [answer.id])
@@ -1321,7 +1321,7 @@ class WeTakeOwnershipOfAnswersAtLogin(TwillTests):
         # If you want to look at those answers, you can this way:
         stored_answers = mysite.project.controllers.get_unsaved_answers_from_session(session)
         self.assertEqual([answer.id for answer in stored_answers], [answer.id])
-        
+
         # Verify that the Answer object is still not available by .objects()
         self.assertFalse(Answer.objects.all())
 
@@ -1360,9 +1360,9 @@ class CreateAnonymousAnswer(TwillTests):
                                     follow=True)
         self.assertEqual(response.redirect_chain,
             [('http://testserver/account/login/?next=%2F%2Bprojects%2FMyproject', 302)])
-        
+
         # If this were an Ajaxy post handler, we might assert something about
-        # the response, like 
+        # the response, like
         #   self.assertEqual(response.content, '1')
 
         # check that the db contains a record with this text
@@ -1370,7 +1370,7 @@ class CreateAnonymousAnswer(TwillTests):
             record = Answer.all_even_unowned.get(text=POST_data['answer__text'])
         except Answer.DoesNotExist:
             print "All Answers:", Answer.all_even_unowned.all()
-            raise Answer.DoesNotExist 
+            raise Answer.DoesNotExist
         self.assertEqual(record.project, p)
         self.assertEqual(record.question, q)
 
@@ -1380,7 +1380,7 @@ class CreateAnonymousAnswer(TwillTests):
         # Visit the login page, assert that the page contains the text of the answer.
         response = self.client.get(reverse('oh_login'))
         self.assertContains(response, POST_data['answer__text'])
-        
+
 
         # But when the user is logged in and *then* visits the project page
         login_worked = self.client.login(username='paulproteus',
@@ -1417,7 +1417,7 @@ accuracy.""",
                     }
         self.login_with_client().post(reverse(mysite.project.views.create_answer_do), POST_data)
         # If this were an Ajaxy post handler, we might assert something about
-        # the response, like 
+        # the response, like
         #   self.assertEqual(response.content, '1')
 
         # check that the db contains a record with this text
@@ -1425,7 +1425,7 @@ accuracy.""",
             record = Answer.objects.get(text=POST_data['answer__text'])
         except Answer.DoesNotExist:
             print "All Answers:", Answer.objects.all()
-            raise Answer.DoesNotExist 
+            raise Answer.DoesNotExist
         self.assertEqual(record.author, User.objects.get(username='paulproteus'))
         self.assertEqual(record.project, p)
         self.assertEqual(record.question, q)
@@ -1510,7 +1510,7 @@ class BugKnowsItsFreshness(TestCase):
         b.last_polled -= datetime.timedelta(
             days=1, hours=1)
         self.assertFalse(b.data_is_more_fresh_than_one_day())
-        
+
 class WeCanPollSomethingToCheckIfAProjectIconIsLoaded(TestCase):
     def test(self):
         # Create a dummy project
