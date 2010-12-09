@@ -124,7 +124,7 @@ about how you can help {{ project.name }}
                                                 {% endifequal %}
                                                 <strong>{{answer.title}}</strong>
                                             </div>
-                                            {{answer.text|urlize_without_escaping_percent_signs|safe|linebreaksbr}}
+                                            {{answer.text|urlize_without_escaping_percent_signs|safe|linebreaks}}
                                             <br/>
                                             {% include 'project/byline.html' %}
                                         </span>
@@ -178,7 +178,7 @@ about how you can help {{ project.name }}
                 {% if random_pfentry %}
                     <h2 style='font-size: 1.3em; font-weight: normal;'>
                         {% spaceless %}
-                            <span>{{ random_pfentry.project_description|urlize|linebreaksbr}}</span>
+                            <span>{{ random_pfentry.project_description|urlize|linebreaks}}</span>
                         {% endspaceless %}
                     </h2>
                     <p style='font-size: .9em; margin: 5px 0 0 40px;'>

@@ -1458,8 +1458,8 @@ accuracy.""",
         self.login_with_client().post(POST_handler, POST_data)
         project_page = self.login_with_client().get(p.get_url())
 
-        # Django documents publicly that linebreaksbr replaces "\n" with "<br />".
-        # http://docs.djangoproject.com/en/dev/ref/templates/builtins/#linebreaksbr
+        # Django documents publicly that linebreaks replaces one "\n" with "<br />".
+        # http://docs.djangoproject.com/en/dev/ref/templates/builtins/#linebreaks
         self.assertContains(project_page, "<br />".join(text))
 
 class TestEpoch(TwillTests):
