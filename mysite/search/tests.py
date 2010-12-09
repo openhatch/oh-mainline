@@ -420,7 +420,7 @@ class Recommend(SearchTest):
 #        # Check that if you click checkboxes,
 #        # you get the right list of bugs.
 #        # Test for bugs that ought to be there
-#        # and bugs that ought not to be. 
+#        # and bugs that ought not to be.
 #        tc.find("Yo! This is a bug in XUL but not Firefox")
 #        tc.find("Oy! This is a bug in XUL and Firefox")
 #
@@ -774,7 +774,7 @@ class QueryGetToughnessFacetOptions(SearchTest):
         # We create three "bitesize" bugs, but constrain the Query so
         # that we're only looking at bugs in Python.
 
-        # Since only two of the bitesize bugs are in Python (one is 
+        # Since only two of the bitesize bugs are in Python (one is
         # in a project whose language is Perl), we expect only 1 bitesize
         # bug to show up, and 2 total bugs.
         python_project = Project.create_dummy(language=u'Python')
