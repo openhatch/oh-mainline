@@ -95,7 +95,7 @@ def ohloh_url2data(url, selector, params = {}, many = False, API_KEY = None, per
 
     # FIXME: We return more than just "ret" these days! Rename this variable.
     ret = []
-    
+
     encoded = mysite.base.unicode_sanity.urlencode(params)
     url += encoded
     try:
@@ -118,7 +118,7 @@ def ohloh_url2data(url, selector, params = {}, many = False, API_KEY = None, per
     except xml.parsers.expat.ExpatError:
         # well, I'll be. it doesn't parse.
         return None, web_response
-        
+
     # Did Ohloh return an error?
     root = tree.getroot()
     if root.find('error') is not None:
@@ -159,7 +159,7 @@ class Ohloh(object):
             project_query)
         data, web_response = ohloh_url2data(url=url, selector='result/project')
         return data
-    
+
     def project_name2projectdata(self, project_name_query):
         url = 'http://www.ohloh.net/projects.xml?'
         args = {u'query': unicode(project_name_query)}
@@ -182,13 +182,13 @@ class Ohloh(object):
 
         # Otherwise, trust Ohloh's full-text relevance ranking and return the first hit
         return data[0]
-    
+
     @accepts(object, int)
     def analysis2projectdata(self, analysis_id):
         data, web_response = self.analysis_id2analysis_data(analysis_id)
         proj_id = data['project_id']
         return self.project_id2projectdata(int(proj_id))
-        
+
     @accepts(object, int)
     def analysis_id2analysis_data(self, analysis_id):
         url = 'http://www.ohloh.net/analyses/%d.xml?' % analysis_id
@@ -207,7 +207,7 @@ class Ohloh(object):
         data = []
         url = 'http://www.ohloh.net/contributors.xml?'
         c_fs, web_response = ohloh_url2data(
-            url=url, selector='result/contributor_fact', 
+            url=url, selector='result/contributor_fact',
             params={u'query': unicode(username)}, many=True, person=person)
 
         # For each contributor fact, grab the project it was for
@@ -226,7 +226,7 @@ class Ohloh(object):
             permalink = generate_contributor_url(
                 project_data['name'],
                 int(c_f['contributor_id']))
-            
+
             this = dict(
                 project=project_data['name'],
                 project_homepage_url=project_data.get('homepage_url', None),
@@ -285,7 +285,7 @@ class Ohloh(object):
         except urllib2.HTTPError:
             # well, it failed. get outta here
             return None
-            
+
         parsed = lxml.html.parse(b.response()).getroot()
         one, two = parsed.cssselect('h1 a')[0], parsed.cssselect('a.avatar')[0]
         href1, href2 = one.attrib['href'], two.attrib['href']
@@ -326,7 +326,7 @@ class Ohloh(object):
                 (project, int(contributor_id)))
 
         ret = []
-        
+
         for (project, contributor_id) in relevant_project_and_contributor_id_pairs:
             url = 'https://www.ohloh.net/p/%s/contributors/%d.xml?' % (
                 urllib.quote(project), contributor_id)
@@ -398,7 +398,7 @@ class Ohloh(object):
                                         'bits.ohloh.net/attachments/')
         b = mechanize_get(med_logo)
         return b.response().read()
-        
+
 
     def get_icon_for_project_by_id(self, project):
         try:
@@ -414,7 +414,7 @@ class Ohloh(object):
                                         'bits.ohloh.net/attachments/')
         b = mechanize_get(med_logo)
         return b.response().read()
-        
+
 _ohloh = Ohloh()
 def get_ohloh():
     return _ohloh
