@@ -1571,6 +1571,13 @@ class OhlohCitationUrlIsUseful(django.test.TestCase):
         got = mysite.customs.ohloh.generate_contributor_url(project, contributor_id)
         self.assertEqual(wanted, got)
 
+    def test_ohloh_assemble_url_on_remote_error(self):
+        project = 'kde pim (work branch)'
+        contributor_id = 46520938457549
+        wanted = None
+        got = mysite.customs.ohloh.generate_contributor_url(project, contributor_id)
+        self.assertEqual(wanted, got)
+
     def test_slow_ou_paulproteus_import(self):
         oh = mysite.customs.ohloh.get_ohloh()
         got, _ = oh.get_contribution_info_by_ohloh_username(

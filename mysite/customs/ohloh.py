@@ -8,6 +8,7 @@ from urlparse import urlparse
 from urllib2 import HTTPError
 from django.conf import settings
 import mysite.customs.models
+import logging
 
 def uni_text(s):
     if type(s) == unicode:
@@ -57,8 +58,22 @@ def mechanize_get(url, referrer=None, attempts_remaining=6, person=None):
     return b
 
 def generate_contributor_url(project_name, contributor_id):
-    return 'https://www.ohloh.net/p/%s/contributors/%d' % (
+    '''Returns either a nice, deep link into Ohloh for data on the contribution,
+    or None if such a link could not be made.'''
+    nice_url = 'https://www.ohloh.net/p/%s/contributors/%d' % (
         project_name.lower(), contributor_id)
+    # Sometimes the nice URL 404s. There's probably some reliable way to generate
+    # URLs that don't 404, but for sure if the URL does, then we should not link to it.
+    #
+    # So, check it. NOTE: This uses urllib2 in a blocking fashion. That's kind of lame!
+
+    try:
+        req = mechanize_get(nice_url)
+    except urllib2.URLError, e:
+        logging.warn("Sigh, error %d: we could not generate a proper URL for %s and %d " % (
+            e.code, repr(project_name), contributor_id))
+        return None
+    return nice_url # Sweet, this is a nice URL that actually works.
 
 def ohloh_url2data(url, selector, params = {}, many = False, API_KEY = None, person=None):
     '''Input: A URL to get,
