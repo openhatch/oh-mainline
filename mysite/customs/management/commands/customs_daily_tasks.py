@@ -151,7 +151,23 @@ class Command(BaseCommand):
             logging.error("[OpenSolaris] ERROR: Importer failed with urllib2.URLError, skipping...")
             logging.error("[OpenSolaris] Error message: %s" % str(e))
 
+    def check_for_broken_ohloh_links(self):
+        for citation in mysite.profile.models.Citation.untrashed.filter(
+            data_import_attempt__source__in=('oh', 'rs')):
+            # check citation URL for being a 404
+            # if so, remove set the URL to None. Also, log it.
+            if citation.url:
+                if mysite.customs.ohloh.link_works(citation.url):
+                    # then we do nothing
+                    pass
+                else:
+                    # aww shucks, I guess we have to remove it.
+                    logging.warning("We had to remove the url %s from the citation whose PK is %d" % (
+                        citation.url, citation.pk))
+                    citation.update(url=None)
+
     def handle(self, *args, **options):
+        self.check_for_broken_ohloh_links()
         self.update_opensolaris_osnet()
         self.find_and_update_enabled_trac_instances()
         self.find_and_update_enabled_roundup_trackers()
