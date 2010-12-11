@@ -6,6 +6,7 @@ import urllib2
 import cStringIO as StringIO
 from urlparse import urlparse
 from urllib2 import HTTPError
+from httplib import BadStatusLine
 from django.conf import settings
 import mysite.customs.models
 import logging
@@ -37,23 +38,34 @@ def mechanize_get(url, referrer=None, attempts_remaining=6, person=None):
         addheaders.extend([('Referer',
                            referrer)])
     b.addheaders = addheaders
+
+    retry = False
+    reason = None
+
     try:
         b.open(url)
+    except BadStatusLine, e:
+        retry = True
+        reason = 'BadStatusLine'
     except HTTPError, e:
-        # FIXME: Test with mock object.
         if (e.code == 504 or e.code == 502) and attempts_remaining > 0:
-            message_schema = "Tried to talk to %s, got %d, retrying %d more times..."
-
-            long_message = message_schema % (url, e.code, attempts_remaining)
-            print >> sys.stderr, long_message
-
-            if person:
-                short_message = message_schema % (urlparse(url).hostname,
-                        e.code, attempts_remaining)
-                person.user.message_set.create(message=short_message)
-            return mechanize_get(url, referrer, attempts_remaining-1, person)
+            retry = True
+            reason = str(e.code)
         else:
             raise
+
+    ## Okay, so sometimes we should retry:
+    if retry and attempts_remaining > 0:
+        # FIXME: Test with mock object.
+        message_schema = "Tried to talk to %s, got %s, retrying %d more times..."
+        long_message = message_schema % (url, reason, attempts_remaining)
+        logging.warn(long_message)
+
+        if person:
+            short_message = message_schema % (urlparse(url).hostname,
+                    reason, attempts_remaining)
+            person.user.message_set.create(message=short_message)
+        return mechanize_get(url, referrer, attempts_remaining-1, person)
 
     return b
 
