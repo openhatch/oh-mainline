@@ -69,6 +69,13 @@ def mechanize_get(url, referrer=None, attempts_remaining=6, person=None):
 
     return b
 
+def link_works(url):
+    try:
+        req = mechanize_get(nice_url)
+    except urllib2.URLError, e:
+        return False
+    return True
+
 def generate_contributor_url(project_name, contributor_id):
     '''Returns either a nice, deep link into Ohloh for data on the contribution,
     or None if such a link could not be made.'''
@@ -78,14 +85,12 @@ def generate_contributor_url(project_name, contributor_id):
     # URLs that don't 404, but for sure if the URL does, then we should not link to it.
     #
     # So, check it. NOTE: This uses urllib2 in a blocking fashion. That's kind of lame!
-
-    try:
-        req = mechanize_get(nice_url)
-    except urllib2.URLError, e:
+    if link_works(nice_url):
+        return nice_url
+    else:
         logging.warn("Sigh, error %d: we could not generate a proper URL for %s and %d " % (
             e.code, repr(project_name), contributor_id))
         return None
-    return nice_url # Sweet, this is a nice URL that actually works.
 
 def ohloh_url2data(url, selector, params = {}, many = False, API_KEY = None, person=None):
     '''Input: A URL to get,
