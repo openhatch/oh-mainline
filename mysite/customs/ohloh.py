@@ -71,7 +71,7 @@ def mechanize_get(url, referrer=None, attempts_remaining=6, person=None):
 
 def link_works(url):
     try:
-        req = mechanize_get(nice_url)
+        req = mechanize_get(url)
     except urllib2.URLError, e:
         return False
     return True
