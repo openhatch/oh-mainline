@@ -164,7 +164,8 @@ class Command(BaseCommand):
                     # aww shucks, I guess we have to remove it.
                     logging.warning("We had to remove the url %s from the citation whose PK is %d" % (
                         citation.url, citation.pk))
-                    citation.update(url=None)
+                    citation.url = None
+                    citation.save()
 
     def handle(self, *args, **options):
         self.check_for_broken_ohloh_links()
