@@ -98,7 +98,7 @@ There's a note about troubleshooting migrations below.
 
 Now is a good time to import a data snapshot, if you want. See
 https://openhatch.org/wiki/Importing_a_data_snapshot for more information about
-that.
+that. You can read our privacy policy at https://openhatch.org/policies-etc/.
 
 ### Run the server ###
 
