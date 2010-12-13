@@ -1876,7 +1876,7 @@ class PersonCanSetHisExpandNextStepsOption(TwillTests):
         self.assert_(p.expand_next_steps)
         # FIXME test response
 
-    def test_set_to_true(self):
+    def test_set_to_false(self):
         # Starts as True
         p = Person.objects.get(user__username='paulproteus')
         p.expand_next_steps = True
