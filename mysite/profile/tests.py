@@ -13,33 +13,22 @@ from mysite.profile import views
 from mysite.customs import ohloh
 from mysite.customs.models import WebResponse
 
-import re
-from StringIO import StringIO
-import urllib
 import simplejson
 import BeautifulSoup
-import time
 import datetime
 import tasks 
 import mock
 import UserList
-import twill
 from twill import commands as tc
-from twill.shell import TwillCommandLoop
 import quopri
 
 from django.core import mail
 from django.conf import settings
 import django.test
-from django.test.client import Client
-from django.core import management, serializers
+from django.core import serializers
 from django.core.files.base import ContentFile
 from django.core.urlresolvers import reverse
-from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
-
-import pdb
-
 
 def do_nothing(*args, **kwargs):
     return ''
@@ -56,15 +45,10 @@ class ProfileTests(TwillTests):
             'cchost-data-imported-from-ohloh']
 
     def testSlash(self):
-        response = self.client.get('/people/')
+        self.client.get('/people/')
 
     def test__portfolio_updates_when_citation_added_to_db(self):
        # {{{
-        username = 'paulproteus'
-
-        project_name = 'seeseehost'
-        #description = 'did some work'
-        #url = 'http://example.com/'
         paulproteus = Person.objects.get(user__username='paulproteus')
         citation = Citation(
                 portfolio_entry=PortfolioEntry.objects.get_or_create(
@@ -87,7 +71,7 @@ class DebTagsTests(TwillTests):
     # {{{
 
     def testAddOneDebtag(self):
-        tag = views.add_one_debtag_to_project('alpine', 'implemented-in::c')
+        views.add_one_debtag_to_project('alpine', 'implemented-in::c')
         self.assertEqual(views.list_debtags_of_project('alpine'),
                          ['implemented-in::c'])
 
@@ -521,7 +505,8 @@ class Portfolio(TwillTests):
                 )
         citation.save()
 
-        finished_dia = citation.data_import_attempt
+        # finished dia
+        citation.data_import_attempt
         unfinished_dia = DataImportAttempt(source='rs', query='foo',
                 completed=False, person=paulproteus)
         unfinished_dia.save()
@@ -751,13 +736,13 @@ class Widget(TwillTests):
         widget_url = reverse(mysite.profile.views.widget_display,
                 kwargs={'user_to_display__username': 'paulproteus'})
         client = self.login_with_client()
-        response = client.get(widget_url)
+        client.get(widget_url)
 
     def test_widget_display_js(self):
         widget_js_url = reverse(mysite.profile.views.widget_display_js,
                 kwargs={'user_to_display__username': 'paulproteus'})
         client = self.login_with_client()
-        response = client.get(widget_js_url)
+        client.get(widget_js_url)
 
 class PersonalData(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry',
@@ -878,7 +863,7 @@ class AddCitationManually(TwillTests):
 
         # Send this data to the appropriate view.
         url = reverse(mysite.profile.views.add_citation_manually_do)
-        response = self.login_with_client().post(url, input_data)
+        self.login_with_client().post(url, input_data)
 
         # Check that a citation was created.
         c = Citation.untrashed.get(url=input_data['url'])
@@ -1323,7 +1308,7 @@ class ProjectGetMentors(TwillTests):
         * one person who is listed as able to mentor in Banshee
         * one person who is not
         and asks the Banshee project to list its available mentors.'''
-        banshee = Project.create_dummy(name='Banshee')
+        Project.create_dummy(name='Banshee')
         can_mentor, _ = TagType.objects.get_or_create(name='can_mentor')
         
         willing_to_mentor_banshee, _ = Tag.objects.get_or_create(
@@ -1731,7 +1716,7 @@ class PersonTagCache(TwillTests):
 
         # 1. Set link
         paulproteus = Person.objects.get(user__username='paulproteus')
-        banshee = Project.create_dummy(name='Banshee')
+        Project.create_dummy(name='Banshee')
         can_mentor, _ = TagType.objects.get_or_create(name='can_mentor')
         
         willing_to_mentor_banshee, _ = Tag.objects.get_or_create(
@@ -1886,7 +1871,7 @@ class PersonCanSetHisExpandNextStepsOption(TwillTests):
         # Now, set to True...
         client = self.login_with_client()
         url = reverse(mysite.profile.views.set_expand_next_steps_do)
-        response = client.post(url, {'value': 'True'})
+        client.post(url, {'value': 'True'})
         p = Person.objects.get(user__username='paulproteus')
         self.assert_(p.expand_next_steps)
         # FIXME test response
@@ -1900,7 +1885,7 @@ class PersonCanSetHisExpandNextStepsOption(TwillTests):
         # Now, set to False...
         client = self.login_with_client()
         url = reverse(mysite.profile.views.set_expand_next_steps_do)
-        response = client.post(url, {'value': 'False'})
+        client.post(url, {'value': 'False'})
         p = Person.objects.get(user__username='paulproteus')
         self.assertFalse(p.expand_next_steps)
 
@@ -1913,7 +1898,7 @@ class PeopleMapForNonexistentProject(TwillTests):
         mock_request = ObjectFromDict(
             {u'GET': {u'q': u'project:Phorum'},
              u'user': User.objects.get(username='paulproteus')})
-        response = mysite.profile.views.people(mock_request)
+        mysite.profile.views.people(mock_request)
         # Yay, no exception.
 
     @mock.patch('mysite.profile.views.project_query2mappable_orm_people')
@@ -1922,7 +1907,7 @@ class PeopleMapForNonexistentProject(TwillTests):
         mock_request = ObjectFromDict(
             {u'GET': {u'q': u'icanhelp:Phorum'},
              u'user': User.objects.get(username='paulproteus')})
-        response = mysite.profile.views.people(mock_request)
+        mysite.profile.views.people(mock_request)
         # Yay, no exception.
 
 class BugModificationTimeVersusEpoch(TwillTests):
@@ -1934,7 +1919,7 @@ class BugModificationTimeVersusEpoch(TwillTests):
         # This is a new bug, so we might want to invalidate the cache for
         # recommended-bug lists, or people won't see this bug in their list of
         # "Recommended bugs"
-        b = mysite.search.models.Bug.create_dummy_with_project()
+        mysite.search.models.Bug.create_dummy_with_project()
         # Let's the invalidate the cache
         mysite.profile.tasks.sync_bug_epoch_from_model_then_fill_recommended_bugs_cache()
         # Make sure that the cache timestamp has been updated
@@ -2363,7 +2348,7 @@ class Notifications(TwillTests):
 
     def test_dont_send_email_when_recipient_has_no_projects(self):
         # The recipient has no projects
-        recipient = Person.create_dummy()
+        Person.create_dummy()
 
         # Assert that no emails were sent
         self.assertEqual(len(Notifications.send_email_and_get_outbox()), 0)
@@ -2541,7 +2526,7 @@ class AfterCreatingADiaPingTwisted(TwillTests):
         # * Create a DIA
         # * Ensure the pingTwisted() function was called.
         asheesh = Person.objects.get(user__username='paulproteus')
-        dia = mysite.profile.models.DataImportAttempt.objects.create(person=asheesh, source='gh', query='paulproteus')
+        mysite.profile.models.DataImportAttempt.objects.create(person=asheesh, source='gh', query='paulproteus')
         self.assertTrue(mock_ping_it.called)
 
 # vim: set ai et ts=4 sw=4 nu:
