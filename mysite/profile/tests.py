@@ -16,7 +16,7 @@ from mysite.customs.models import WebResponse
 import simplejson
 import BeautifulSoup
 import datetime
-import tasks 
+import tasks
 import mock
 import UserList
 from twill import commands as tc
@@ -32,7 +32,7 @@ from django.contrib.auth.models import User
 
 def do_nothing(*args, **kwargs):
     return ''
-    
+
 class StarlingTests(TwillTests):
 	def test_page(self):
 		url = 'http://openhatch.org/starlings'
@@ -208,17 +208,17 @@ class BaseCeleryTest(TwillTests):
         dia.save()
 
         gimme_json_url = reverse(mysite.profile.views.gimme_json_for_portfolio)
-        
+
         client = self.login_with_client()
 
         # Ask if background task has been completed.
-        # We haven't even created the background task, so 
+        # We haven't even created the background task, so
         # the answer should be no.
         response_before_task_is_run = client.get(gimme_json_url)
         response_json = simplejson.loads(response_before_task_is_run.content)
         self.assertEqual(response_json['dias'][0]['pk'], dia.id)
         self.assertFalse(response_json['dias'][0]['fields']['completed'])
-        
+
         # Are there any PortfolioEntries for ccHost
         # before we import data? Expected: no.
         portfolio_entries = PortfolioEntry.objects.filter(project__name='MOCK ccHost')
@@ -233,7 +233,7 @@ class BaseCeleryTest(TwillTests):
         self.assert_(DataImportAttempt.objects.get(id=dia.id).completed)
 
         #######################################################
-        # Let's see if the browser's method of checking agrees. 
+        # Let's see if the browser's method of checking agrees.
         #######################################################
 
         # First, request the JSON again.
@@ -359,7 +359,7 @@ class UserListTests(TwillTests):
         tc.find(r'Barry Spinoza')
 
         tc.follow('paulproteus')
-        tc.url('people/paulproteus') 
+        tc.url('people/paulproteus')
         tc.find('paulproteus')
         # }}}
 
@@ -439,7 +439,7 @@ class Portfolio(TwillTests):
 
         response = client.get(
                 reverse(mysite.profile.views.gimme_json_for_portfolio))
-        
+
         # Response consists of JSON like:
         # {'dias': ..., 'citations': ..., 'summaries': ...}
         response = simplejson.loads(response.content)
@@ -448,7 +448,7 @@ class Portfolio(TwillTests):
         for citation_in_response in response['citations']:
             self.assert_(str(citation_in_response['pk']) in response['summaries'].keys(),
                     "Expected that this Citation's pk would have a summary.")
-         
+
         ###########################################################
         # Are the DIAs and citations in the response
         # exactly what we expected?
@@ -516,7 +516,7 @@ class Portfolio(TwillTests):
         for portfolio_entry in portfolio_entries:
             portfolio_entry.is_deleted = True
             portfolio_entry.save()
-            
+
         # Get the JSON
 
         response = self.login_with_client().get(
@@ -525,7 +525,7 @@ class Portfolio(TwillTests):
 
         self.assertEqual(len(response_decoded['projects']), 0,
                          "Expected no projects back.")
-        
+
         self.assertEqual(len(response_decoded['citations']), 0,
                          "Expected no citations back.")
         # Who cares about DIAS.
@@ -687,7 +687,7 @@ class BugsAreRecommended(TwillTests):
         self.assertEqual(len(python_bugs), 1)
         csharp_bugs = [ bug for bug in recommended if bug.project.language == 'C#']
         self.assertEqual(len(csharp_bugs), 1)
-        
+
     def test_recommendations_not_duplicated(self):
         """ Run two equivalent searches in parallel, and discover that they weed out duplicates."""
         recommender = mysite.profile.controllers.RecommendBugs(['Python', 'Python'], n=2)
@@ -696,7 +696,7 @@ class BugsAreRecommended(TwillTests):
 
 class PersonInfoLinksToSearch(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
-    
+
     def test_whatever(self):
         '''
         * Have a user, say that he understands+wantstolearn+currentlylearns+canmentor something
@@ -712,7 +712,7 @@ class PersonInfoLinksToSearch(TwillTests):
             }
 
         # Log in as paulproteus
-        
+
         self.login_with_twill()
 
         # Update paulproteus's tags
@@ -814,13 +814,13 @@ class DeletePortfolioEntry(TwillTests):
 
         view = mysite.profile.views.delete_portfolio_entry_do
         response = self.login_with_client().post(reverse(view), {'portfolio_entry__pk': failing_pk})
-        self.assertEqual(simplejson.loads(response.content), 
+        self.assertEqual(simplejson.loads(response.content),
                          {'success': False})
 
     def test_delete_portfolio_entry_fails_when_portfolio_entry_not_given(self):
         view = mysite.profile.views.delete_portfolio_entry_do
         response = self.login_with_client().post(reverse(view))
-        self.assertEqual(simplejson.loads(response.content), 
+        self.assertEqual(simplejson.loads(response.content),
                          {'success': False})
 
     def test_delete_portfolio_entry_fails_when_portfolio_entry_not_yours(self):
@@ -840,7 +840,7 @@ class DeletePortfolioEntry(TwillTests):
         view = mysite.profile.views.delete_portfolio_entry_do
         response = self.login_with_client_as_barry().post(reverse(view))
 
-        self.assertEqual(simplejson.loads(response.content), 
+        self.assertEqual(simplejson.loads(response.content),
                          {'success': False})
 
         # Still there betch.
@@ -893,7 +893,7 @@ class AddCitationManually(TwillTests):
         self.assertEqual(Citation.untrashed.filter(url=input_data['url']).count(), 0,
                 "Expected no citation to be created when you try "
                 "to add one for someone else.")
-        
+
         # Check that an error is reported in the response.
         self.assert_(len(simplejson.loads(response.content)['error_msgs']) == 1)
 
@@ -1004,7 +1004,7 @@ class SavePortfolioEntry(TwillTests):
     def test_save_portfolio_entry(self):
         expected_output = {
             'success': True,
-            'pf_entry_element_id': 'blargle', 
+            'pf_entry_element_id': 'blargle',
             'portfolio_entry__pk': self.portfolio_entry.pk
         }
 
@@ -1068,10 +1068,10 @@ class GimmeJsonTellsAboutImport(TwillTests):
         not_my_dia = DataImportAttempt(date_created=self.get_n_min_ago(1),
                                 query="banans", person=self.get_barry())
         not_my_dia.save()
-        
+
         # Verify that the JSON reports import running is False
         self.assertFalse(self.gimme_json()['import']['running'])
-                                                      
+
     def test_for_running_import(self):
         "When there are dias from the past five minutes, import.running = True "
         "and progress percentage is accurate"
@@ -1090,7 +1090,7 @@ class GimmeJsonTellsAboutImport(TwillTests):
         not_my_dia = DataImportAttempt(date_created=self.get_n_min_ago(1), person=self.get_barry(),
                 query="bananas")
         not_my_dia.save()
-        
+
         self.assert_(self.gimme_json()['import']['running'],
                 "Expected that the JSON reports that an import is running")
         self.assertEqual(self.gimme_json()['import']['progress_percentage'], 50,
@@ -1122,7 +1122,7 @@ class PortfolioEntryAdd(TwillTests):
                 'project_name': 'new project name',
                 'project_description': 'new project description',
                 'experience_description': 'new experience description',
-                'pf_entry_element_id': 'element_18', 
+                'pf_entry_element_id': 'element_18',
                 }
         url = reverse(mysite.profile.views.save_portfolio_entry_do)
         response = self.login_with_client().post(url, post_data)
@@ -1145,7 +1145,7 @@ class PortfolioEntryAdd(TwillTests):
         expected_response_obj = {
             'success': True,
             'pf_entry_element_id': 'element_18',
-            'portfolio_entry__pk': new_pk, 
+            'portfolio_entry__pk': new_pk,
         }
         self.assertEqual(simplejson.loads(response.content), expected_response_obj)
 
@@ -1170,7 +1170,7 @@ class OtherContributors(TwillTests):
 
 class UserGetsHisQueuedMessages(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
-    
+
     def gimme_json(self):
         url = reverse(mysite.profile.views.gimme_json_for_portfolio)
         response = self.login_with_client().get(url)
@@ -1193,7 +1193,7 @@ class IgnoreNewDuplicateCitations(TwillTests):
     def test_old_citations_supersede_their_new_duplicates(self):
         paulproteus = Person.objects.get(user__username='paulproteus')
         project1 = Project.create_dummy(name='1')
-        project2 = Project.create_dummy(name='2') 
+        project2 = Project.create_dummy(name='2')
         repo_search = DataImportAttempt.objects.get_or_create(
                     source='rs', query='paulproteus', completed=True, person=paulproteus)[0]
         citation = Citation(
@@ -1217,12 +1217,12 @@ class IgnoreNewDuplicateCitations(TwillTests):
                 data_import_attempt=DataImportAttempt.objects.get_or_create(
                     source='rs', query='paulproteus', completed=True, person=paulproteus)[0]
                 )
-        citation_of_different_project.save_and_check_for_duplicates() 
+        citation_of_different_project.save_and_check_for_duplicates()
 
         # This is the normal case: citations of different projects
         # do not supersede one another.
         self.assertEqual(
-                list(Citation.untrashed.all().order_by('pk')), 
+                list(Citation.untrashed.all().order_by('pk')),
                 [citation, citation_of_different_project])
 
         # Create a second citation with all the same attributes as the first.
@@ -1310,7 +1310,7 @@ class ProjectGetMentors(TwillTests):
         and asks the Banshee project to list its available mentors.'''
         Project.create_dummy(name='Banshee')
         can_mentor, _ = TagType.objects.get_or_create(name='can_mentor')
-        
+
         willing_to_mentor_banshee, _ = Tag.objects.get_or_create(
             tag_type=can_mentor,
             text='Banshee')
@@ -1345,7 +1345,7 @@ class SuggestLocation(TwillTests):
         correct_decoding = u'Reykjav\xedk, Iceland'
 
         self.assertEqual(data['geoip_guess'], correct_decoding)
-    
+
 class EditLocation(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
 
@@ -1445,7 +1445,7 @@ class EditContactBlurbForwarderification(TwillTests):
         it also takes said person's username or person object or something
         we're testing this:
             the controller returns a string which is the same as the one that it received, except $fwd is replaced with the output of generate_forwarder
-            the Forwarder db table contains a row for our new forwarder 
+            the Forwarder db table contains a row for our new forwarder
                 (which we created with the generate_forwarder controller)
         '''
         # grab asheesh by the horns
@@ -1606,8 +1606,8 @@ class PostFixGeneratorList(TwillTests):
         what_we_want = [mysite.profile.models.Forwarder.objects.filter(user__username='paulproteus')[0].generate_table_line()]
         # make sure that the list of strings that we get back contains an item for the user with an email address and no item for the user without
         self.assertEqual(what_we_get, what_we_want)
-        
-        
+
+
 class EmailForwarderGarbageCollection(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
     # create a bunch of forwarders
@@ -1657,7 +1657,7 @@ class EmailForwarderResolver(TwillTests):
     * put some mappings of forwarder addresses to dates and user objects in the Forwarder table
     * one of these will be expired
     * one of these will not
-    * try 
+    * try
         * email forwarder address that's not in the database at all
         * email forwarder that's in the db but is expired
         * email forwarder that's in the db and is not expired
@@ -1718,7 +1718,7 @@ class PersonTagCache(TwillTests):
         paulproteus = Person.objects.get(user__username='paulproteus')
         Project.create_dummy(name='Banshee')
         can_mentor, _ = TagType.objects.get_or_create(name='can_mentor')
-        
+
         willing_to_mentor_banshee, _ = Tag.objects.get_or_create(
             tag_type=can_mentor,
             text='Banshee')
@@ -1932,7 +1932,7 @@ class SaveReordering(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def test(self):
-        # Log in 
+        # Log in
         client = self.login_with_client()
 
         paul = Person.get_by_username('paulproteus')
@@ -1965,7 +1965,7 @@ class ArchiveProjects(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
     def test(self):
-        # Log in 
+        # Log in
         client = self.login_with_client()
 
         paul = Person.get_by_username('paulproteus')
@@ -1985,7 +1985,7 @@ class ArchiveProjects(TwillTests):
 
 class MockBitbucketImport(BaseCeleryTest):
     fixtures = ['user-paulproteus', 'person-paulproteus']
-    
+
     @mock.patch('mysite.customs.bitbucket.get_user_repos')
     @mock.patch('mysite.customs.github.find_primary_language_of_repo', do_nothing)
     @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
@@ -1993,17 +1993,17 @@ class MockBitbucketImport(BaseCeleryTest):
         """Test that we can get projects from Bitbucket"""
         description = 'A project designed to test imports from Bitbucket'
         mock_bitbucket_projects.return_value = [{
-            "website": "", 
-            "slug": "MOCK_ccHost", 
-            "name": "MOCK ccHost", 
-            "followers_count": 1, 
+            "website": "",
+            "slug": "MOCK_ccHost",
+            "name": "MOCK ccHost",
+            "followers_count": 1,
             "description": description
             }]
         data_we_expect = [{
             'contributor_role': u'Created a repository on Bitbucket.',
             'languages': u''}] #Bitbucket doesn't show languages via non-authenticated api.
         summaries_we_expect = [u'Created a repository on Bitbucket.']
-        
+
         self._test_data_source_via_emulated_bgtask(
             source='bb', data_we_expect=data_we_expect,
             summaries_we_expect=summaries_we_expect)
@@ -2015,7 +2015,7 @@ class MockBitbucketImport(BaseCeleryTest):
 class Notifications(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
-    @staticmethod 
+    @staticmethod
     def get_email_context(recipient):
         """ This helper method retrieves the context of the email we're
         currently planning to send to the recipient. """
@@ -2041,7 +2041,7 @@ class Notifications(TwillTests):
         recipient_emails = []
         for email in outbox:
             # By the way, there should be only one recipient per email
-            self.assertEqual(len(email.to), 1) 
+            self.assertEqual(len(email.to), 1)
             recipient_emails.append(email.to[0])
 
         contributor_emails = [c.user.email for c in contributors]
@@ -2095,7 +2095,7 @@ class Notifications(TwillTests):
         project_with_two_participants = Project.create_dummy()
 
         participants_who_are_news_to_each_other = [] # initial value
-        
+
         if not how_to_add_people:
             how_to_add_people = [Notifications.add_contributor,
                     Notifications.add_contributor]
@@ -2151,7 +2151,7 @@ class Notifications(TwillTests):
         self.assertEqual(len(outbox), 2)
 
         self.assert_only_these_people_were_emailed(contributors, outbox)
-    
+
     def test_dont_email_the_people_with_checkboxes_cleared(self):
 
         contributors, outbox = (
@@ -2200,7 +2200,7 @@ class Notifications(TwillTests):
         # Psst, notice that we have sent out a round of weekly emails since the
         # veteran added the project to her profile. So the veteran should not
         # appear in the next round of weekly emails.
-        
+
         # Let's assert that the email context contains enough information to
         # say that such and such a project received 6 contributors in the
         # last week, here are the person objects for 3 of them
@@ -2286,7 +2286,7 @@ class Notifications(TwillTests):
         self.assertEqual(len(data['display_these_contributors']), 3)
         self.assert_(paul in data['display_these_contributors'])
 
-        # Now add one more person 
+        # Now add one more person
         p = Person.create_dummy()
         PortfolioEntry.create_dummy(person=p, project=project, is_published=True)
 
@@ -2376,7 +2376,7 @@ class Notifications(TwillTests):
         # week.
 
         # Here we test two scenarios.
-        
+
         # First, what if we (accidentally) run the
         # send_weekly_emails command today, when we sent the emails yesterday?
         # We want to make sure that we can't accidentally send people two
@@ -2426,12 +2426,12 @@ class Notifications(TwillTests):
         wannahelper_e_c = email_contexts[wanna_helper.pk]
         self.assert_(wannahelper_e_c)
 
-        # Assert that contributor gets emailed about the wanna helper 
+        # Assert that contributor gets emailed about the wanna helper
         wanna_helpers_in_email_to_contributor = contributor_e_c[
             'project_name2people'][0][1]['display_these_wannahelpers']
         self.assert_(wanna_helper in wanna_helpers_in_email_to_contributor)
 
-        # Assert that wanna helper gets emailed about the contributor 
+        # Assert that wanna helper gets emailed about the contributor
         contributors_in_email_to_wanna_helper = wannahelper_e_c[
                 'project_name2people'][0][1]['display_these_contributors']
         self.assert_(contributor in contributors_in_email_to_wanna_helper)
@@ -2439,7 +2439,7 @@ class Notifications(TwillTests):
     def test_projects_this_person_cares_about(self):
         # Test this method:
         # mysite.profile.management.commands.send_weekly_emails
-        # .Command.get_projects_this_person_cares_about(person) 
+        # .Command.get_projects_this_person_cares_about(person)
 
         person = Person.create_dummy()
 
@@ -2458,8 +2458,8 @@ class Notifications(TwillTests):
         Notifications.add_contributor(person, project_i_wanna_help_and_contributed_to)
         Notifications.add_wannahelper(person, project_i_wanna_help_and_contributed_to)
 
-        projects_i_care_about = mysite.profile.management.commands.send_weekly_emails.Command.get_projects_this_person_cares_about(person) 
-        expected = [project_i_contributed_to, project_i_wanna_help, 
+        projects_i_care_about = mysite.profile.management.commands.send_weekly_emails.Command.get_projects_this_person_cares_about(person)
+        expected = [project_i_contributed_to, project_i_wanna_help,
                 project_i_wanna_help_and_contributed_to]
         expected.sort(key=lambda x: x.name)
         self.assertEqual(projects_i_care_about, expected)
@@ -2472,7 +2472,7 @@ class Notifications(TwillTests):
         Notifications.add_contributor(person, project_i_wanna_help_and_contributed_to)
         Notifications.add_wannahelper(person, project_i_wanna_help_and_contributed_to)
         command = mysite.profile.management.commands.send_weekly_emails.Command()
-        email_context = command.get_context_for_weekly_email_to(person) 
+        email_context = command.get_context_for_weekly_email_to(person)
         self.assertEqual(None, email_context)
 
     def test_dont_show_previously_mentioned_wannahelpers(self):
@@ -2507,7 +2507,7 @@ class Notifications(TwillTests):
 
         # Assert that the new w.h. was included in the email and the old was not.
         command = mysite.profile.management.commands.send_weekly_emails.Command()
-        email_context = command.get_context_for_weekly_email_to(email_recipient) 
+        email_context = command.get_context_for_weekly_email_to(email_recipient)
         self.assert_(email_context)
         project_name2people = email_context['project_name2people']
         self.assertEqual(len(project_name2people), 1)
