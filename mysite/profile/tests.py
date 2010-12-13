@@ -976,55 +976,83 @@ class ReplaceIconWithDefault(TwillTests):
             "Expected postcondition: portfolio entry's icon evaluates to False "
             "because it is generic.")
 
-
 class SavePortfolioEntry(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
 
-    def test_save_portfolio_entry(self):
-        url = reverse(mysite.profile.views.save_portfolio_entry_do)
-
-        # setup
-        portfolio_entry = PortfolioEntry.objects.get_or_create(
-                    project=Project.objects.get_or_create(name='project name')[0],
-                    person=Person.objects.get(user__username='paulproteus'))[0]
+    def setUp(self):
+        TwillTests.setUp(self)
+        self.user = "paulproteus"
+        self.portfolio_entry = PortfolioEntry.objects.get_or_create(
+            project=Project.objects.get_or_create(name='project name')[0],
+            person=Person.objects.get(user__username=self.user))[0]
         citation = Citation(
-                portfolio_entry=portfolio_entry,
-                data_import_attempt=DataImportAttempt.objects.get_or_create(
-                    source='rs', query='paulproteus', completed=True,
-                    person=Person.objects.get(user__username='paulproteus'))[0]
-                )
+            portfolio_entry=self.portfolio_entry,
+            data_import_attempt=DataImportAttempt.objects.get_or_create(
+                source='rs', query=self.user, completed=True,
+                person=Person.objects.get(user__username=self.user))[0]
+            )
         citation.is_published = False
         citation.save()
 
-        input = {
-            'portfolio_entry__pk': portfolio_entry.pk,
+        self.experience_description = [
+            'This is a multiparagraph experience description.',
+            'This is the second paragraph.',
+            'This is the third paragraph.']
+
+        self.project_description = [
+            'This is a multiparagraph project description.',
+            'This is the second paragraph.',
+            'This is the third paragraph.']
+
+        self.POST_data = {
+            'portfolio_entry__pk': self.portfolio_entry.pk,
             'pf_entry_element_id': 'blargle', # this can be whatever
-            'project_description': "project description",
-            'experience_description': "experience description",
+            'project_description': "\n".join(self.project_description),
+            'experience_description': "\n".join(self.experience_description)
         }
 
+        POST_handler = reverse(mysite.profile.views.save_portfolio_entry_do)
+        self.post_result = self.login_with_client().post(POST_handler, self.POST_data)
+        self.contribution_page = self.login_with_client().get(
+            make_twill_url("http://openhatch.org/people/%s/" % (self.user,)))
+
+    def test_save_portfolio_entry(self):
         expected_output = {
             'success': True,
             'pf_entry_element_id': 'blargle', 
-            'portfolio_entry__pk': portfolio_entry.pk
+            'portfolio_entry__pk': self.portfolio_entry.pk
         }
 
-        # call view and check output
-        self.assertEqual(
-                simplejson.loads(self.login_with_client().post(url, input).content),
-                expected_output)
+        # check output
+        self.assertEqual(simplejson.loads(self.post_result.content), expected_output)
 
         # postcondition
-        portfolio_entry = PortfolioEntry.objects.get(pk=portfolio_entry.pk)
+        portfolio_entry = PortfolioEntry.objects.get(pk=self.portfolio_entry.pk)
         self.assertEqual(portfolio_entry.project_description,
-                input['project_description'])
+                         self.POST_data['project_description'])
         self.assertEqual(portfolio_entry.experience_description,
-                input['experience_description'])
+                         self.POST_data['experience_description'])
         self.assert_(portfolio_entry.is_published, "pf entry is published.")
 
         citations = Citation.untrashed.filter(portfolio_entry=portfolio_entry)
         for c in citations:
             self.assert_(c.is_published)
+
+    def test_multiparagraph_contribution_description(self):
+        """
+        If a multi-paragraph project contribution description is submitted,
+        display it as a multi-paragraph description.
+        """
+        self.assertContains(
+            self.contribution_page, "<br />".join(self.experience_description))
+
+    def test_multiparagraph_project_description(self):
+        """
+        If a multi-paragraph project description is submitted, display it as a
+        multi-paragraph description.
+        """
+        self.assertContains(
+            self.contribution_page, "<br />".join(self.project_description))
 
 class GimmeJsonTellsAboutImport(TwillTests):
     fixtures = ['user-paulproteus', 'user-barry', 'person-barry', 'person-paulproteus']
