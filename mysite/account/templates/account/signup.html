@@ -31,6 +31,7 @@ body#signup_with_password .body { background: #fff;}
         </ul>
     </div>
     <div class='body'>
+        <p>Now is a good time to <a href="/policies-etc/">read our privacy policy</a>.</p>
         <form name="signup" action="{% url mysite.account.views.signup_do %}" method="post">
             {{ form.as_p }}
             <p> <input type="submit" value="Hit it" /> </p>
