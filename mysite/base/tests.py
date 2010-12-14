@@ -14,12 +14,14 @@ from django.core.cache import cache
 import mock
 import datetime
 import logging
+import unittest
 
 import mysite.base.helpers
 import mysite.base.controllers
 import mysite.base.decorators
 import mysite.search.models
 import mysite.base.templatetags.base_extras
+import mysite.base.unicode_sanity
 import mysite.profile.views
 
 def twill_setup():
@@ -128,6 +130,17 @@ class GeocoderCanGeocode(TwillTests):
 
     def test_unicode_string(self):
         self.get_geocoding_in_json_for_unicode_string()
+
+class RemoveByteOrderMarker(unittest.TestCase):
+    def test(self):
+        sample_bytes = '\xef\xbb\xbf' + 'hi'
+        as_fd = StringIO(sample_bytes)
+        self.assertNotEqual('hi', as_fd.read())
+        as_fd = StringIO(sample_bytes)
+        cleaned_up_fd = mysite.base.unicode_sanity.wrap_file_object_in_utf8_check(as_fd)
+        result = cleaned_up_fd.read() 
+        self.assertEqual(type(result), str) # not unicode
+        self.assertEqual(result, 'hi')
 
 class GeocoderCanCache(django.test.TestCase):
 

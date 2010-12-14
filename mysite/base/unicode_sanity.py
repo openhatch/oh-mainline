@@ -5,6 +5,7 @@
 
 ### Sadly our dependencies use them, so I can't.
 import urllib
+import cStringIO as StringIO
 
 import mysite.base.decorators
 
@@ -30,3 +31,11 @@ def urlencode(unicode_dict):
 @mysite.base.decorators.unicodify_strings_when_inputted
 def quote(str):
     return urllib.quote(str.encode('utf-8'))
+
+def wrap_file_object_in_utf8_check(f):
+    ### For now, this does the horrifying thing of reading in the whole file.
+    ### Better ways would be apprediated.
+    bytes = f.read()
+    as_unicode = unicode(bytes, 'utf-8-sig')
+    as_utf8 = as_unicode.encode('utf-8')
+    return StringIO.StringIO(as_utf8)
