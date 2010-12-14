@@ -11,6 +11,7 @@ import lxml.html.clean
 
 from mysite.base.decorators import cached_property
 import mysite.base.helpers
+import mysite.base.unicode_sanity
 import mysite.customs.ohloh
 import mysite.search.models
 import mysite.search.templatetags.search
@@ -23,7 +24,7 @@ def csv_of_bugs(url):
     return b.response()
 
 def csv_url2list_of_bug_ids(csv_fd):
-    dictreader = csv.DictReader(csv_fd)
+    dictreader = csv.DictReader(mysite.base.unicode_sanity.wrap_file_object_in_utf8_check(csv_fd))
     return [int(line['id']) for line in dictreader]
 
 class TracBug:
