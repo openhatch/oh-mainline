@@ -27,6 +27,17 @@ class ProfileImporter(object):
         ## Then, create a mapping for storing the URLs we are waiting on.
         self.urls_we_are_waiting_on = collections.defaultdict(int)
 
+    def get_dia(self):
+        """We have this method so to avoid holding on to any objects from
+        the database for a long time.
+
+        Event handler methods should use a fresh database object while they
+        run, rather than using some old object that got created when the class
+        was instantiated.
+        """
+        return mysite.profile.models.DataImportAttempt.objects.get(
+            id=self.dia_id)
+
     def markThatTheDeferredFinished(self, url):
         self.urls_we_are_waiting_on[url] -= 1
         # If we just made the state totally insane, then log a warning to that effect.
