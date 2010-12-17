@@ -164,6 +164,7 @@ class GithubImporter(ProfileImporter):
         person.last_polled = datetime.datetime.now()
         person.save()
 
+
     def getUrlsAndCallbacks(self):
         urls_and_callbacks = []
 
@@ -438,7 +439,68 @@ class LaunchpadProfilePageScraper(ProfileImporter):
         # Now enqueue a task to do the real work.
         self.command.call_getPage_on_data_dict(self,
             self.getUrlAndCallbackForProfilePage(query=username))
+
+class BitbucketImporter(ProfileImporter):
+    ROOT_URL = 'http://api.bitbucket.org/1.0/'
+
+    def getUrlsAndCallbacks(self):
+        return [{
+            'url': self.url_for_query(self.query),
+            'callback': self.processUserJson,
+            }]
+
+    def url_for_query(self, query):
+        url = self.ROOT_URL
+        url += 'users/%s/' % (mysite.base.unicode_sanity.quote(self.query))
+        return url
+
+    def url_for_project(self, project_name):
+        import pdb
+        pdb.set_trace()
+        return 'http://bitbucket.org/%s/%s/' % (
+            user_name, project_name)
+
+    def processUserJson(self, json_string):
+        json_data = simplejson.loads(json_string)
+        repositories = json_data['repositories']
+        ### The repositories list contains a sequence of dictionaries.
+        ### The keys are:
+        # slug: The url slug for the project
+        # name: The name of the project
+        # website: The website associated wit the project, defined by the user
+        # followers_count: Number of followers
+        # description: The project description
+        person = self.get_dia().person
         
+        for repo in repositories:
+            # The project name and description we pull out of the data
+            # provided by Bitbucket.
+            project_name = repo['name']
+            description = repo['description']
+
+            # Get the corresponding project object, if it exists.
+            (project, _) = Project.objects.get_or_create(
+                name=repo['name'])
+
+            # Get the most recent PortfolioEntry for this person and that
+            # project.
+            #
+            # If there is no such PortfolioEntry, then set its project
+            # description to the one provided by Bitbucket.
+            portfolio_entry, _ = mysite.profile.models.PortfolioEntry.objects.get_or_create(
+                person=person,
+                project=project,
+                defaults={'project_description': description})
+            # Create a Citation that links to the Bitbucket page
+            citation, _ = mysite.profile.models.Citation.objects.get_or_create(
+                url = self.url_for_query(project_name),
+                portfolio_entry = portfolio_entry,
+                defaults = dict(
+                    contributor_role='Created a repository on Bitbucket.',
+                    data_import_attempt = self.get_dia(),
+                    languages=''))
+            citation.languages = ''
+            citation.save_and_check_for_duplicates()
 ###
 
 SOURCE_TO_CLASS = {
