@@ -12,7 +12,7 @@
             "slug": "fix-crash-in-kwallet-handling-code", 
             "name": "Fix crash in kwallet handling code", 
             "followers_count": 0, 
-            "description": "I ran into a type error while using the python-keyring module. The patch(es) here fix it."
+            "description": ""
         }, 
         {
             "website": null, 
