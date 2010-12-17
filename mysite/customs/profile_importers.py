@@ -45,7 +45,7 @@ class ProfileImporter(object):
             logging.error("Eeek, " + url + " went negative.")
         if self.seems_finished():
             # Grab the DataImportAttempt object, and mark it as completed.
-            dia = mysite.profile.models.DataImportAttempt.objects.get(id=self.dia_id)
+            dia = self.get_dia()
             dia.completed = True
             dia.save()
 
@@ -114,7 +114,7 @@ class GithubImporter(ProfileImporter):
     # PortfolioEntry if necessary.
     def addCitationFromRepoDict(self, repo_dict, override_contrib=None):
         # Get the DIA whose ID we stored
-        dia = mysite.profile.models.DataImportAttempt.objects.get(id=self.dia_id)
+        dia = self.get_dia()
         person = dia.person
 
         # Get or create a project by this name
@@ -159,8 +159,7 @@ class GithubImporter(ProfileImporter):
         for repo in repos:
             self.addCitationFromRepoDict(repo)
 
-        dia = mysite.profile.models.DataImportAttempt.objects.get(id=self.dia_id)
-        person = dia.person
+        person = self.get_dia().person
 
         person.last_polled = datetime.datetime.now()
         person.save()
@@ -188,7 +187,6 @@ class GithubImporter(ProfileImporter):
         return urls_and_callbacks
 
     def handleUserActivityFeedJson(self, json_string):
-        dia = mysite.profile.models.DataImportAttempt.objects.get(id=self.dia_id)
         # first, decode it
         data = simplejson.loads(json_string)
 
@@ -405,7 +403,7 @@ class LaunchpadProfilePageScraper(ProfileImporter):
                 project_name, contributions[project_name])
 
     def _save_parsed_launchpad_data_in_database(self, project_name, result):
-        dia = mysite.profile.models.DataImportAttempt.objects.get(id=self.dia_id)
+        dia = self.get_dia()
         person = dia.person
         
         for involvement_type in result['involvement_types']:
