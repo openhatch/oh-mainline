@@ -19,7 +19,6 @@ import mysite.profile.search_indexes
 import mysite.profile.controllers
 import shutil
 import staticgenerator
-import mysite.customs.bitbucket
 
 from django.conf import settings
 import django.core.cache
@@ -50,48 +49,6 @@ def create_citations_from_ohloh_contributor_facts(dia_id, ohloh_results):
     person.save()
     # }}}
 
-def create_citations_from_bitbucket_results(dia_id, results):
-    """
-    Given the input of results returned from a query against the 
-    bitbucket.org user api, create user related contribution
-    records.
-
-    Note that non-authenticated calls to butbuket api returns limited
-    project details.
-    """
-    
-    dia = mysite.profile.models.DataImportAttempt.objects.get(id=dia_id)
-    person = dia.person
-    for repo in results:
-
-        (project, _) = mysite.search.models.Project.objects.get_or_create(
-            name=repo['name'])
-        
-        description = repo['description']
-        if mysite.profile.models.PortfolioEntry.objects.filter(person=person, project=project).count() == 0:
-            portfolio_entry = mysite.profile.models.PortfolioEntry(person=person,
-                                             project=project,
-                                             project_description=description)
-
-            portfolio_entry.save()
-        portfolio_entry = mysite.profile.models.PortfolioEntry.objects.filter(person=person, project=project)[0]
-        
-        citation = mysite.profile.models.Citation()
-        citation.url =  'http://bitbucket.org/%s/%s/' % (dia.query.lower(), repo['name'])
-        citation.contributor_role = 'Created a repository on Bitbucket.'
-        citation.languages = ''
-        
-        citation.portfolio_entry = portfolio_entry
-        citation.data_import_attempt = dia
-        citation.save_and_check_for_duplicates()
-
-    person.last_polled = datetime.datetime.now()
-    dia.completed = True
-    person.save()
-    dia.save()
-
-    # end create_citations_from_bitbucket_results
-
 def rs_action(dia):
     oh = ohloh.get_ohloh()
     data, web_response = oh.get_contribution_info_by_username(
@@ -111,22 +68,15 @@ def ou_action(dia):
 def do_nothing_because_this_functionality_moved_to_twisted(*args):
     return None # This is moved to Twisted now.
 
-def bb_action(dia):
-    """
-    Given a dia with a username, check to see if there are any 
-    source packages maintained by the user.
-    """
-    return mysite.customs.bitbucket.get_user_repos(dia.query)
-
 source2actual_action = {
         'gh': do_nothing_because_this_functionality_moved_to_twisted,
         'ga': do_nothing_because_this_functionality_moved_to_twisted,
         'db': do_nothing_because_this_functionality_moved_to_twisted,
         'lp': do_nothing_because_this_functionality_moved_to_twisted,
+        'bb': do_nothing_because_this_functionality_moved_to_twisted,
     
         'rs': rs_action,
         'ou': ou_action,
-        'bb': bb_action
         }
 
 source2result_handler = {
@@ -134,10 +84,10 @@ source2result_handler = {
         'gh': do_nothing_because_this_functionality_moved_to_twisted,
         'ga': do_nothing_because_this_functionality_moved_to_twisted,
         'lp': do_nothing_because_this_functionality_moved_to_twisted,
+        'bb': do_nothing_because_this_functionality_moved_to_twisted,
 
         'rs': create_citations_from_ohloh_contributor_facts,
         'ou': create_citations_from_ohloh_contributor_facts,
-        'bb': create_citations_from_bitbucket_results,
         }
 
 class ReindexPerson(Task):
