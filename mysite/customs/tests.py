@@ -356,25 +356,7 @@ class ImportFromGithub(django.test.TestCase):
         # setUp() already created the DataImportAttempt
         # so we just run the command:
         cmd = mysite.customs.management.commands.customs_twist.Command()
-        cmd.handle()
-
-        # And now, the dia should be completed.
-        dia = mysite.profile.models.DataImportAttempt.objects.get(id=self.dia.id)
-        self.assertTrue(dia.completed)
-
-        # And Asheesh should have some new projects available.
-        projects = set([c.portfolio_entry.project.name for c in mysite.profile.models.Citation.objects.all()])
-        self.assertEqual(projects,
-                         set([u'sleekmigrate', u'staticgenerator', u'webassets', u'tircd', u'python-github2', u'django-assets', u'jibot']))
-
-    @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
-    @mock.patch('mysite.search.tasks.PopulateProjectIconFromOhloh')
-    @mock.patch('twisted.web.client.getPage', fakeGetPage.getPage)
-    def test_asheesh_dia_integration(self, do_nothing, do_nothing_also):
-        # setUp() already created the DataImportAttempt
-        # so we just run the command:
-        cmd = mysite.customs.management.commands.customs_twist.Command()
-        cmd.handle()
+        cmd.handle(use_reactor=False)
 
         # And now, the dia should be completed.
         dia = mysite.profile.models.DataImportAttempt.objects.get(id=self.dia.id)
@@ -422,7 +404,7 @@ class ImportFromDebianQA(django.test.TestCase):
         asheesh = Person.objects.get(user__username='paulproteus')
         dia = mysite.profile.models.DataImportAttempt.objects.create(person=asheesh, source='db', query='asheesh@asheesh.org')
         cmd = mysite.customs.management.commands.customs_twist.Command()
-        cmd.handle()
+        cmd.handle(use_reactor=False)
 
         # And now, the dia should be completed.
         dia = mysite.profile.models.DataImportAttempt.objects.get(person=asheesh, source='db', query='asheesh@asheesh.org')
@@ -469,7 +451,7 @@ class LaunchpadProfileImport(django.test.TestCase):
         # setUp() already created the DataImportAttempt
         # so we just run the command:
         cmd = mysite.customs.management.commands.customs_twist.Command()
-        cmd.handle()
+        cmd.handle(use_reactor=False)
 
         # And now, the dia should be completed.
         dia = mysite.profile.models.DataImportAttempt.objects.get(id=dia.id)
@@ -483,11 +465,10 @@ class LaunchpadProfileImport(django.test.TestCase):
 class ImportFromBitbucket(django.test.TestCase):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
-    @mock.patch('twisted.internet.reactor.run')
     @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh',)
     @mock.patch('mysite.search.tasks.PopulateProjectIconFromOhloh')
     @mock.patch('twisted.web.client.getPage', fakeGetPage.getPage)
-    def setUp(self, do_nothing, do_nothing_1, do_nothing_2):
+    def setUp(self, do_nothing, do_nothing_1):
         # Create a DataImportAttempt for Asheesh
         asheesh = Person.objects.get(user__username='paulproteus')
         mysite.profile.models.DataImportAttempt.objects.create(person=asheesh, source='bb', query='paulproteus')
@@ -495,7 +476,7 @@ class ImportFromBitbucket(django.test.TestCase):
         # With the DIA in place, we run the command and simulate
         # going out to Twisted.
         mysite.customs.management.commands.customs_twist.Command(
-            ).handle()
+            ).handle(use_reactor=False)
 
         # Extract the citation objects so tests can easily refer to them.
         self.bayberry_data = mysite.profile.models.Citation.objects.get(

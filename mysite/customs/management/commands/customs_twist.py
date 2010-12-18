@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 import twisted.web.client
-from twisted.internet import reactor, defer
+import twisted.internet
 import mysite.customs.profile_importers
 import logging
 
@@ -70,14 +70,15 @@ class Command(BaseCommand):
             return
         else:
             self.already_enqueued_stop_command = True
-            reactor.callWhenRunning(lambda *args: reactor.stop())
+            twisted.internet.reactor.callWhenRunning(lambda *args: twisted.internet.reactor.stop())
 
-    def handle(self, *args, **options):
+    def handle(self, use_reactor=True, *args, **options):
         self.running_deferreds = 0
         self.already_enqueued_stop_command = False
 
         print "Creating getPage()-based deferreds..."
         self.create_tasks_from_dias()
-        print 'Starting Reactor...'
-        reactor.run()
-        print '...reactor finished!'
+        if use_reactor:
+            print 'Startingq Reactor...'
+            twisted.internet.reactor.run()
+            print '...reactor finished!'
