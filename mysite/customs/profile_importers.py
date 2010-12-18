@@ -454,14 +454,17 @@ class BitbucketImporter(ProfileImporter):
         url += 'users/%s/' % (mysite.base.unicode_sanity.quote(self.query))
         return url
 
-    def url_for_project(self, project_name):
-        import pdb
-        pdb.set_trace()
+    def url_for_project(self, user_name, project_name):
         return 'http://bitbucket.org/%s/%s/' % (
-            user_name, project_name)
+            mysite.base.unicode_sanity.quote(user_name),
+            mysite.base.unicode_sanity.quote(project_name))
 
     def processUserJson(self, json_string):
+        person = self.get_dia().person
+
         json_data = simplejson.loads(json_string)
+
+        bitbucket_username = json_data['user']['username']
         repositories = json_data['repositories']
         ### The repositories list contains a sequence of dictionaries.
         ### The keys are:
@@ -470,17 +473,17 @@ class BitbucketImporter(ProfileImporter):
         # website: The website associated wit the project, defined by the user
         # followers_count: Number of followers
         # description: The project description
-        person = self.get_dia().person
         
         for repo in repositories:
             # The project name and description we pull out of the data
             # provided by Bitbucket.
             project_name = repo['name']
+            slug = repo['slug']
             description = repo['description']
 
             # Get the corresponding project object, if it exists.
-            (project, _) = Project.objects.get_or_create(
-                name=repo['name'])
+            (project, _) = mysite.search.models.Project.objects.get_or_create(
+                name=repo['slug'])
 
             # Get the most recent PortfolioEntry for this person and that
             # project.
@@ -490,13 +493,15 @@ class BitbucketImporter(ProfileImporter):
             portfolio_entry, _ = mysite.profile.models.PortfolioEntry.objects.get_or_create(
                 person=person,
                 project=project,
-                defaults={'project_description': description})
+                defaults={'project_description':
+                          description.rstrip() or project_name})
             # Create a Citation that links to the Bitbucket page
             citation, _ = mysite.profile.models.Citation.objects.get_or_create(
-                url = self.url_for_query(project_name),
+                url = self.url_for_project(bitbucket_username,
+                                           slug),
                 portfolio_entry = portfolio_entry,
                 defaults = dict(
-                    contributor_role='Created a repository on Bitbucket.',
+                    contributor_role='Contributed to a repository on Bitbucket.',
                     data_import_attempt = self.get_dia(),
                     languages=''))
             citation.languages = ''
@@ -505,6 +510,7 @@ class BitbucketImporter(ProfileImporter):
 
 SOURCE_TO_CLASS = {
     'db': DebianQA,
+    'bb': BitbucketImporter,
     'gh': GithubImporter,
     'lp': LaunchpadProfilePageScraper,
 }

@@ -64,7 +64,7 @@ def create_citations_from_bitbucket_results(dia_id, results):
     person = dia.person
     for repo in results:
 
-        (project, _) = Project.objects.get_or_create(
+        (project, _) = mysite.search.models.Project.objects.get_or_create(
             name=repo['name'])
         
         description = repo['description']
