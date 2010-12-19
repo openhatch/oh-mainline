@@ -1064,7 +1064,7 @@ sample_launchpad_data_snapshot.return_value = [dict(
         title="Joi's Lab AFS",)]
 
 class AutoCrawlTests(django.test.TestCase):
-    @mock.patch('mysite.customs.bugtrackers.launchpad.snapshot_data_from_project', 
+    @mock.patch('mysite.customs.bugtrackers.launchpad.dump_data_from_project',
                 sample_launchpad_data_snapshot)
     @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
     def testSearch(self, do_nothing):
