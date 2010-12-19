@@ -24,6 +24,8 @@ TEST_DATABASE_OPTIONS = {
 }
 
 DATABASE_CHARSET = 'utf8'           # omg I hate you MySQL
+TEST_DATABASE_CHARSET = 'utf8'      # have to apply it to the test database, too
+
 DATABASE_ENGINE = 'mysql'           # Other options:
                                     # 'postgresql_psycopg2', 'postgresql', 'mysql',
                                     # 'sqlite3' or 'oracle'.
