@@ -63,7 +63,7 @@ def extract_mission_upload(request):
 ### State manager
 class TarMissionPageState(MissionPageState):
     def __init__(self, request, passed_data):
-        MissionPageState.__init__(self, request, passed_data, 'Tar')
+        super(TarMissionPageState, self).__init__(request, passed_data, 'Tar')
 
     def as_dict_for_template_context(self):
         (data, person) = self.get_base_data_dict_and_person()

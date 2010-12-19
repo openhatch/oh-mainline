@@ -57,7 +57,7 @@ def checkout_submit(request):
 ### State manager
 class SvnMissionPageState(MissionPageState):
     def __init__(self, request, passed_data):
-        MissionPageState.__init__(self, request, passed_data, 'Using Subversion')
+        super(SvnMissionPageState, self).__init__(request, passed_data, 'Using Subversion')
 
     def as_dict_for_template_context(self):
         (data, person) = self.get_base_data_dict_and_person()
