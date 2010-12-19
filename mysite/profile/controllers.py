@@ -6,6 +6,7 @@ import pygeoip
 
 from django.conf import settings
 
+import logging
 import mysite.search.controllers
 import mysite.search.models
 import mysite.profile.models
@@ -110,7 +111,8 @@ def get_geoip_guess_for_ip(ip_as_string):
             geoip_database = pygeoip.GeoIP(os.path.join(settings.MEDIA_ROOT,
                                                         '../../downloads/GeoLiteCity.dat'))
         except IOError:
-            return False, u'' # maybe log this?
+            logging.warn("Uh, we could not find the GeoIP database.")
+            return False, u''
     
     all_data_about_this_ip = geoip_database.record_by_addr(ip_as_string)
 
