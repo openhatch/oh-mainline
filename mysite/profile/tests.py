@@ -277,7 +277,7 @@ class OhlohTests(TwillTests):
     @mock.patch('mysite.customs.ohloh.Ohloh.analysis2projectdata', stumps_project_lookup)
     def test_ohloh_doesnt_match_just_substring(self):
         expected = [{'man_months': 11,
-          'permalink': u'https://www.ohloh.net/p/winkexec/contributors/2008814186590608',
+          'permalink': None,
           'primary_language': u'C',
           'project': u'WinKexec',
           'project_homepage_url': u'https://www.jstump.com/projects/kexec/'}]
