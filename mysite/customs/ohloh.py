@@ -88,8 +88,8 @@ def generate_contributor_url(project_name, contributor_id):
     if link_works(nice_url):
         return nice_url
     else:
-        logging.warn("Sigh, error %d: we could not generate a proper URL for %s and %d " % (
-            e.code, repr(project_name), contributor_id))
+        logging.warn("Sigh, error: we could not generate a proper URL for %s and %d " % (
+            repr(project_name), contributor_id))
         return None
 
 def ohloh_url2data(url, selector, params = {}, many = False, API_KEY = None, person=None):
