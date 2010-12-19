@@ -65,7 +65,7 @@ class SvnMissionPageState(MissionPageState):
             'mission_step_prerequisites_passed': True,
         })
         if person:
-            repo = controllers.SvnRepository(user.username)
+            repo = controllers.SvnRepository(self.request.user.username)
             data.update({
                 'repository_exists': repo.exists(),
                 'svn_checkout_done': controllers.mission_completed(person, 'svn_checkout'),
