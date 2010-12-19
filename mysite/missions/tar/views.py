@@ -7,7 +7,11 @@ from mysite.missions.tar import forms, controllers
 ### modify the information stored about the user, such as recording
 ### that a mission was successfully completed.
 def upload(request):
+    # Initialize data array and some default values.
     data = {}
+    data['create_form'] = forms.UploadForm()
+    data['create_success'] = False
+    data['what_was_wrong_with_the_tarball'] = ''
     if request.method == 'POST':
         form = forms.UploadForm(request.POST, request.FILES)
         if form.is_valid():
@@ -40,7 +44,11 @@ def download_tarball_for_extract_mission(request):
 
 @login_required
 def extract_mission_upload(request):
+    # Initialize data array and some default values.
     data = {}
+    data['unpack_form'] = forms.ExtractUploadForm()
+    data['unpack_success'] = False
+    data['what_was_wrong_with_the_extracted_file'] = ''
     if request.method == 'POST':
         form = forms.ExtractUploadForm(request.POST, request.FILES)
         if form.is_valid():
@@ -60,12 +68,7 @@ class TarMissionPageState(MissionPageState):
     def as_dict_for_template_context(self):
         (data, person) = self.get_base_data_dict_and_person()
         data.update({
-            'create_success': False,
-            'what_was_wrong_with_the_tarball': '',
             'filenames_for_tarball': controllers.TarMission.FILES.keys(),
-            'create_form': forms.UploadForm(),
-            'unpack_form': forms.ExtractUploadForm(),
-            'unpack_success': False,
             'tarball_for_unpacking_mission': controllers.UntarMission.TARBALL_NAME,
             'file_we_want': controllers.UntarMission.FILE_WE_WANT})
         if person:

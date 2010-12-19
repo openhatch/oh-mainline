@@ -21,7 +21,10 @@ def resetrepo(request):
 
 @login_required
 def diff_submit(request):
+    # Initialize data array and some default values.
     data = {}
+    data['svn_diff_form'] = forms.DiffForm()
+    data['svn_diff_error_message'] = ''
     if request.method == 'POST':
         form = forms.DiffForm(request.POST)
         if form.is_valid():
@@ -36,7 +39,10 @@ def diff_submit(request):
 
 @login_required
 def checkout_submit(request):
+    # Initialize data array and some default values.
     data = {}
+    data['svn_checkout_form'] = forms.CheckoutForm()
+    data['svn_checkout_error_message'] = ''
     if request.method == 'POST':
         form = forms.CheckoutForm(request.POST)
         if form.is_valid():
@@ -55,15 +61,6 @@ class SvnMissionPageState(MissionPageState):
 
     def as_dict_for_template_context(self):
         (data, person) = self.get_base_data_dict_and_person()
-        data.update({
-            'svn_checkout_success': False,
-            'svn_checkout_form': forms.CheckoutForm(),
-            'svn_checkout_error_message': '',
-            'svn_diff_success': False,
-            'svn_diff_form': forms.DiffForm(),
-            'svn_diff_error_message': '',
-            'mission_step_prerequisites_passed': True,
-        })
         if person:
             repo = controllers.SvnRepository(self.request.user.username)
             data.update({

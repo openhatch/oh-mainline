@@ -16,7 +16,11 @@ def patchsingle_get_patch(request):
 
 @login_required
 def patchsingle_submit(request):
+    # Initialize data array and some default values.
     data = {}
+    data['patchsingle_form'] = forms.PatchSingleUploadForm()
+    data['patchsingle_success'] = False
+    data['patchsingle_error_message'] = ''
     if request.method == 'POST':
         form = forms.PatchSingleUploadForm(request.POST, request.FILES)
         if form.is_valid():
@@ -34,7 +38,11 @@ def diffsingle_get_original_file(request):
 
 @login_required
 def diffsingle_submit(request):
+    # Initialize data array and some default values.
     data = {}
+    data['diffsingle_form'] = forms.DiffSingleUploadForm()
+    data['diffsingle_success'] = False
+    data['diffsingle_error_message'] = ''
     if request.method == 'POST':
         form = forms.DiffSingleUploadForm(request.POST)
         if form.is_valid():
@@ -52,7 +60,11 @@ def diffrecursive_get_original_tarball(request):
 
 @login_required
 def diffrecursive_submit(request):
+    # Initialize data array and some default values.
     data = {}
+    data['diffrecursive_form'] = forms.DiffRecursiveUploadForm()
+    data['diffrecursive_success'] = False
+    data['diffrecursive_error_message'] = ''
     if request.method == 'POST':
         form = forms.DiffRecursiveUploadForm(request.POST, request.FILES)
         if form.is_valid():
@@ -73,7 +85,10 @@ def patchrecursive_get_patch(request):
 
 @login_required
 def patchrecursive_submit(request):
+    # Initialize data array and some default values.
     data = {}
+    data['patchrecursive_form'] = forms.PatchRecursiveUploadForm()
+    data['patchrecursive_success'] = False
     wrong_answers_present = False
     if request.method == 'POST':
         form = forms.PatchRecursiveUploadForm(request.POST)
@@ -82,6 +97,8 @@ def patchrecursive_submit(request):
                 if form.cleaned_data[key] != value:
                     data['patchrecursive_%s_error_message' % key] = 'This answer is incorrect.'
                     wrong_answers_present = True
+                else:
+                    data['patchrecursive_%s_error_message' % key] = ''
             if not wrong_answers_present:
                 controllers.set_mission_completed(request.user.get_profile(), 'diffpatch_patchrecursive')
                 data['patchrecursive_success'] = True
@@ -95,21 +112,6 @@ class DiffPatchMissionPageState(MissionPageState):
 
     def as_dict_for_template_context(self):
         (data, person) = self.get_base_data_dict_and_person()
-        data.update({
-            'patchsingle_success': False,
-            'patchsingle_form': forms.PatchSingleUploadForm(),
-            'patchsingle_error_message': '',
-            'diffsingle_success': False,
-            'diffsingle_form': forms.DiffSingleUploadForm(),
-            'diffsingle_error_message': '',
-            'diffrecursive_success': False,
-            'diffrecursive_form': forms.DiffRecursiveUploadForm(),
-            'diffrecursive_error_message': '',
-            'patchrecursive_success': False,
-            'patchrecursive_form': forms.PatchRecursiveUploadForm(),
-            'patchrecursive_children_hats_error_message': '',
-            'patchrecursive_lizards_hats_error_message': '',
-            })
         if person:
             data.update({
                 'patchrecursive_done': controllers.mission_completed(person, 'diffpatch_patchrecursive'),
