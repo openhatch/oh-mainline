@@ -408,14 +408,8 @@ class Ohloh(object):
             raise ValueError, "Ohloh gave us back nothing."
         except KeyError:
             raise ValueError, "The project exists, but Ohloh knows no icon."
-        # The URL is often something like s3.amazonws.com/bits.ohloh.net/...
-        # But sometimes Ohloh has a typo in their URLs.
-        if '/bits.ohloh.net/' not in med_logo:
-            med_logo = med_logo.replace('attachments/',
-                                        'bits.ohloh.net/attachments/')
         b = mechanize_get(med_logo)
         return b.response().read()
-
 
     def get_icon_for_project_by_id(self, project):
         try:
@@ -426,9 +420,6 @@ class Ohloh(object):
             med_logo = data['medium_logo_url']
         except KeyError:
             raise ValueError, "The project exists, but Ohloh knows no icon."
-        if '/bits.ohloh.net/' not in med_logo:
-            med_logo = med_logo.replace('attachments/',
-                                        'bits.ohloh.net/attachments/')
         b = mechanize_get(med_logo)
         return b.response().read()
 
