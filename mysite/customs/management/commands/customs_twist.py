@@ -80,5 +80,6 @@ class Command(BaseCommand):
         self.create_tasks_from_dias()
         if self.running_deferreds:
             print 'Starting Reactor...'
+            assert use_reactor
             twisted.internet.reactor.run()
             print '...reactor finished!'
