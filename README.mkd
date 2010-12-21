@@ -34,7 +34,7 @@ must install a few using your system package manager.
 
 This is what we do on Debian testing/unstable:
 
-    sudo apt-get install python2.6-dev python-libxml2 memcached python-mysqldb python-setuptools libxml2-dev libxslt-dev mysql-server mysql-client
+    sudo apt-get install python2.6-dev python-libxml2 memcached python-mysqldb python-setuptools libxml2-dev libxslt-dev mysql-server mysql-client python-xapian
 
 Or the equivalent for your system. (It's important that you get Python 2.6 or greater -- some of the OpenHatch code depends on Python 2.6 or higher.)
 
