@@ -215,35 +215,10 @@ This data is automatically downloaded by buildout. In theory we/you should re-do
 ## People search ##
 
 We have a map at <http://localhost:8000/people/>. To accelerate search on those people, we use
-Haystack, a Django layer on top of search engines. In our case, we use the
-search engine called Solr.
+Haystack, a Django layer on top of search engines. In our case, we use the search
+engine known as Xapian.
 
-### Understanding indexes and the Solr schema file ###
-
-We have a hand-tuned Solr schema that lives in `mysite/config-files/schema.xml`.
-This file was first generated using the Haystack command to auto-generate a
-schema from our `mysite/profile/search_indexes.py` file, but since then we have adjusted
-it ourselves.
-
-Unfortunately, this means that if you add or modify those indexes, you should
-NOT just regenerate the schema file automatically. Instead, merge it by hand by
-adding just the elements you need. If you have trouble with that, ask Asheesh.
-
-### Running the Solr server (development) ###
-
-For people search to work, you must run the Solr server. On a development machine
-(e.g., laptop), do this:
-
-    cd mysite
-    scripts/run_solr.sh
-
-### Running the Solr server (production) ###
-
-Steps:
-
-1. Copy the schema into place.
-
-2. Run SOLR with a config file that points at that schema.
+We used to use SOLR, which was complicated to set up and deploy.
 
 ### Initialize its index ###
 
