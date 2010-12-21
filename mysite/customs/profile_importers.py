@@ -443,8 +443,27 @@ class LaunchpadProfilePageScraper(ProfileImporter):
 class BitbucketImporter(ProfileImporter):
     ROOT_URL = 'http://api.bitbucket.org/1.0/'
 
+    @staticmethod
+    def squashIrrelevantErrors(error):
+        squash_it = False
+
+        if error.type == twisted.web.error.Error:
+            if error.value.status == '404':
+                # The username doesn't exist. That's okay. It just means we have gleaned no profile information
+                # from this query.
+                squash_it = True
+
+            if squash_it:
+                pass
+            else:
+                # This is low-quality logging for now!
+                logging.warn("EEK: " + error.value.status + " " + error.value.response)
+        else:
+            raise error.value
+
     def getUrlsAndCallbacks(self):
         return [{
+            'errback': BitbucketImporter.squashIrrelevantErrors,
             'url': self.url_for_query(self.query),
             'callback': self.processUserJson,
             }]

@@ -1644,17 +1644,6 @@ class OhlohCitationUrlIsUseful(django.test.TestCase):
         self.assertEqual(cchost_data['permalink'],
                          'https://www.ohloh.net/p/cchost/contributors/65837553699824')
         
-class OnlineBitbucket(django.test.TestCase):
-    def test_unknown_username_404(self):
-        """This method test that passing an unknown user name 
-        will result in an empty list."""
-        raise AssertionError, "What if you search for a nonexistent user?"
-        
-    def test_user_name_space_404(self):
-        """This method test that passing a user name
-         with a space will result in an empty list."""
-        raise AssertionError, "What if you search for a username with a space in it?"
-        
 class OpenSolaris(django.test.TestCase):
 
     open_bug_filename = os.path.join(settings.MEDIA_ROOT, 'sample-data',
