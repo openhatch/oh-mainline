@@ -78,7 +78,7 @@ class Command(BaseCommand):
 
         print "Creating getPage()-based deferreds..."
         self.create_tasks_from_dias()
-        if use_reactor:
+        if self.running_deferreds:
             print 'Starting Reactor...'
             twisted.internet.reactor.run()
             print '...reactor finished!'
