@@ -1,10 +1,15 @@
-# Django settings for mysite project.
+# Django settings for the basic OpenHatch 'mysite' project
 
+## Imports
 import os
 import logging
 import datetime
 import sys
 
+## Figure out where in the filesystem we are.
+MEDIA_ROOT_BEFORE_STATIC = os.path.dirname(__file__) # This is needed for {% version %}
+
+## Now, actual settings
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
@@ -55,7 +60,7 @@ SITE_ID = 1
 # to load the internationalization machinery.
 USE_I18N = True
 
-MEDIA_ROOT_BEFORE_STATIC = os.path.dirname(__file__) # This is needed for {% version %}
+HAYSTACK_XAPIAN_PATH = os.path.join(MEDIA_ROOT_BEFORE_STATIC, 'indexes')
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
@@ -125,8 +130,7 @@ SESSION_ENGINE="django.contrib.sessions.backends.db"
 
 ## Django search via Haystack
 HAYSTACK_SITECONF='mysite.haystack_configuration'
-HAYSTACK_SEARCH_ENGINE='solr'
-HAYSTACK_SOLR_URL='http://127.0.0.1:8983/solr'
+HAYSTACK_SEARCH_ENGINE='xapian'
 
 INSTALLED_APPS = (
     'ghettoq',
