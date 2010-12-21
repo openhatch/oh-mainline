@@ -27,6 +27,10 @@ def mechanize_get(url, referrer=None, attempts_remaining=6, person=None):
     """Input: Some stuff regarding a web URL to request.
     Output: A browser instance that just open()'d that, plus an unsaved
     WebResponse object representing that browser's final state."""
+    # if url is a Unicode object, make it utf-8 bytestring
+    if type(url) == unicode:
+        url = url.encode('utf-8')
+
     web_response = mysite.customs.models.WebResponse()
 
     b = mechanize.Browser()
