@@ -26,11 +26,6 @@ POSTFIX_FORWARDER_TABLE_PATH = '/etc/postfix/virtual_alias_maps'
 
 CELERY_ALWAYS_EAGER = False # srsly
 
-## Django search via Haystack
-HAYSTACK_SITECONF='mysite.haystack_configuration'
-HAYSTACK_SEARCH_ENGINE='solr'
-HAYSTACK_SOLR_URL='http://173.230.128.217:8983/solr'
-
 ## always use linode-one for 
 ## AMQP, Rabbit Queue, Celery
 CARROT_BACKEND = 'amqp'
