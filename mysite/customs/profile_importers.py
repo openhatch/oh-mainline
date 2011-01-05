@@ -48,6 +48,8 @@ class ProfileImporter(object):
             dia = self.get_dia()
             dia.completed = True
             dia.save()
+        # Finally, if there is more work to do, enqueue it.
+        self.command.create_tasks_from_dias(max=1)
 
     def seems_finished(self):
         if sum(self.urls_we_are_waiting_on.values()) == 0:

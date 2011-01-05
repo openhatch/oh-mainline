@@ -6,15 +6,24 @@ import logging
 
 import mysite.profile.models
 
+MAX_DIAS = 10
+
 class Command(BaseCommand):
     help = "Call this when you want to run a Twisted reactor."
 
-    def create_tasks_from_dias(self):
+    def create_tasks_from_dias(self, max = 20):
         print 'For all DIAs we know how to process with Twisted: enqueue them.'
+        enqueued_dias_count = 0
+
         for dia in mysite.profile.models.DataImportAttempt.objects.filter(completed=False):
+            # If we have done too much work, just stop enqueuing DIAs.
+            if enqueued_dias_count >= max:
+                print 'Stopped after enqueuing', max, 'dias.'
+                return
             if dia.source in mysite.customs.profile_importers.SOURCE_TO_CLASS:
                 cls = mysite.customs.profile_importers.SOURCE_TO_CLASS[dia.source]
                 self.add_dia_to_reactor(cls, dia.query, dia.id)
+                enqueued_dias_count += 1
 
     def add_dia_to_reactor(self, cls, query, dia_id):
         ### For now, only the 'db' == Debian == qa.debian.org DIAs are in a format where
