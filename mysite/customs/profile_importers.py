@@ -535,4 +535,3 @@ SOURCE_TO_CLASS = {
     'gh': GithubImporter,
     'lp': LaunchpadProfilePageScraper,
 }
-
