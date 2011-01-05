@@ -19,6 +19,25 @@ import twisted.web
 
 ### Generic error handler
 class ProfileImporter(object):
+    SQUASH_THESE_HTTP_CODES = []
+
+    def squashIrrelevantErrors(self, error):
+        squash_it = False
+
+        if error.type == twisted.web.error.Error:
+            if error.value.status in self.SQUASH_THESE_HTTP_CODES:
+                # The username doesn't exist. That's okay. It just means we have gleaned no profile information
+                # from this query.
+                squash_it = True
+
+            if squash_it:
+                pass
+            else:
+                # This is low-quality logging for now!
+                logging.warn("EEK: " + error.value.status + " " + error.value.response)
+        else:
+            raise error.value
+
     def __init__(self, query, dia_id, command):
         ## First, store the data we are passed in.
         self.query = query
@@ -88,8 +107,7 @@ class ImportActionWrapper(object):
 
 class GithubImporter(ProfileImporter):
 
-    @staticmethod
-    def squashIrrelevantErrors(error):
+    def squashIrrelevantErrors(self, error):
         squash_it = False
 
         if error.type == twisted.web.error.Error:
@@ -171,14 +189,14 @@ class GithubImporter(ProfileImporter):
         urls_and_callbacks = []
 
         # Well, one thing we can do is get the repositories the user owns.
-        this_one = {'errback': GithubImporter.squashIrrelevantErrors}
+        this_one = {'errback': self.squashIrrelevantErrors}
         this_one['url'] = ('http://github.com/api/v2/json/repos/show/' +
             mysite.base.unicode_sanity.quote(self.query))
         this_one['callback'] = self.handleUserRepositoryJson
         urls_and_callbacks.append(this_one)
 
         # Another is look at the user's activity feed.
-        this_one = {'errback': GithubImporter.squashIrrelevantErrors}
+        this_one = {'errback': self.squashIrrelevantErrors}
         this_one['url'] = ('http://github.com/%s.json' %
             mysite.base.unicode_sanity.quote(self.query))
         this_one['callback'] = self.handleUserActivityFeedJson
@@ -222,6 +240,8 @@ SECTION_NAME_AND_NUMBER_SPLITTER = re.compile(r'(.*?) [(](\d+)[)]$')
 # FIXME: Migrate this to UltimateDebianDatabase or DebianDatabaseExport
 
 class DebianQA(ProfileImporter):
+    SQUASH_THESE_HTTP_CODES = ['404',]
+
     def getUrlsAndCallbacks(self):
         if '@' in self.query:
             email_address = self.query
@@ -232,6 +252,7 @@ class DebianQA(ProfileImporter):
             u'login': unicode(email_address)})
         return [ {
             'url': url,
+            'errback': self.squashIrrelevantErrors,
             'callback': self.handlePageContents } ]
 
     def handlePageContents(self, contents):
@@ -325,6 +346,8 @@ class DebianQA(ProfileImporter):
         person.save()
 
 class LaunchpadProfilePageScraper(ProfileImporter):
+    SQUASH_THESE_HTTP_CODES = ['404',]
+
     def getUrlsAndCallbacks(self):
         # If the query has an '@' in it, enqueue a task to
         # find the username.
@@ -343,6 +366,7 @@ class LaunchpadProfilePageScraper(ProfileImporter):
                            mysite.base.unicode_sanity.quote(
                                query))
         this_one['callback'] = self.parseAndProcessUserSearch
+        this_one['errback'] = self.squashIrrelevantErrors
         return this_one
 
     def getUrlAndCallbackForProfilePage(self, query=None):
@@ -353,6 +377,7 @@ class LaunchpadProfilePageScraper(ProfileImporter):
         this_one['url'] = ('https://launchpad.net/~' +
                            mysite.base.unicode_sanity.quote(query))
         this_one['callback'] = self.parseAndProcessProfilePage
+        this_one['errback'] = self.squashIrrelevantErrors
         return this_one
     
     def parseAndProcessProfilePage(self, profile_html):
@@ -444,28 +469,11 @@ class LaunchpadProfilePageScraper(ProfileImporter):
 
 class BitbucketImporter(ProfileImporter):
     ROOT_URL = 'http://api.bitbucket.org/1.0/'
-
-    @staticmethod
-    def squashIrrelevantErrors(error):
-        squash_it = False
-
-        if error.type == twisted.web.error.Error:
-            if error.value.status == '404':
-                # The username doesn't exist. That's okay. It just means we have gleaned no profile information
-                # from this query.
-                squash_it = True
-
-            if squash_it:
-                pass
-            else:
-                # This is low-quality logging for now!
-                logging.warn("EEK: " + error.value.status + " " + error.value.response)
-        else:
-            raise error.value
+    SQUASH_THESE_HTTP_CODES = ['404',]
 
     def getUrlsAndCallbacks(self):
         return [{
-            'errback': BitbucketImporter.squashIrrelevantErrors,
+            'errback': self.squashIrrelevantErrors,
             'url': self.url_for_query(self.query),
             'callback': self.processUserJson,
             }]
