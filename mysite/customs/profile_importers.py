@@ -219,6 +219,9 @@ class GithubImporter(ProfileImporter):
         repo_urls_found = set()
 
         for event in data:
+            if 'repository' not in event:
+                print 'weird, okay'
+                continue
             repo = event['repository']
             # Find "collaborated on..."
             if event['type'] == 'PushEvent':
