@@ -16,11 +16,16 @@ class Command(BaseCommand):
         enqueued_dias_count = 0
 
         for dia in mysite.profile.models.DataImportAttempt.objects.filter(completed=False):
+            # If for some reason this dia is one we are working on, skip past it.
+            if dia.pk in self.active_dia_pks:
+                continue
+
             # If we have done too much work, just stop enqueuing DIAs.
             if enqueued_dias_count >= max:
                 print 'Stopped after enqueuing', max, 'dias.'
                 return
             if dia.source in mysite.customs.profile_importers.SOURCE_TO_CLASS:
+                self.active_dia_pks.add(dia.id)
                 cls = mysite.customs.profile_importers.SOURCE_TO_CLASS[dia.source]
                 self.add_dia_to_reactor(cls, dia.query, dia.id)
                 enqueued_dias_count += 1
@@ -84,6 +89,7 @@ class Command(BaseCommand):
     def handle(self, use_reactor=True, *args, **options):
         self.running_deferreds = 0
         self.already_enqueued_stop_command = False
+        self.active_dia_pks = set()
 
         print "Creating getPage()-based deferreds..."
         self.create_tasks_from_dias()
