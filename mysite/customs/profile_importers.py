@@ -404,6 +404,8 @@ class LaunchpadProfilePageScraper(ProfileImporter):
 ##         }
 ##        }
         # Extract Launchpad username from page
+        if not tree.cssselect('#launchpad-id dd'):
+            return # Well, there's no launchpad ID here, so that's that.
         username = tree.cssselect('#launchpad-id dd')[0].text_content().strip()
         for row in tree.cssselect('.contributions tr'):
             project_link = row.cssselect('a')[0]
