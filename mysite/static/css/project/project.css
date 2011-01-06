@@ -8,6 +8,7 @@ body#project input[type='submit'] { padding: 2px 8px; display: block; }
 body#project h1 { float: left; margin-top: 10px; }
 body#project h3.supertitle { font-size: 10pt; margin-top: 20px; display: block; width: 100%;}
 body#project .head { width: 100% ! important; }
+body#project h3 a { color: #555; }
 body#project #left { width: 60%; margin-right: 20px; }
 body#project #left .module { width: 92.8%; }
 body#project #left .module > .body { width: 92.5%; }
@@ -20,7 +21,6 @@ body#project #bugs ul li { margin: 5px 0 5px 10px; color: #777; margin-bottom: 1
 body#project input, body#project textarea, body#project input[type='submit'] { float: none; }
 body#project .contains_questions .body h3 { font-size: 1.2em; font-weight: normal; float: none; margin-bottom: 10px; }
 body#project .contains_questions .body h3 strong { font-weight: normal; color: #949494; }
-body#project .contains_questions .body h3 b { font-weight: normal; }
 body#project ul.answers > li { float: left; width: 100%; border-bottom: 0px dashed #d7d7d7; padding: 10px 0; }
 body#project ul.answers > li:last-child { border: 0; }
 
@@ -110,3 +110,124 @@ body#edit_project .tab_nav li a { font-size: 1.2em; line-height: 1.2em; display:
 body#edit_project .tab { float: left; width: 100%; padding-top: 10px; }
 
 body#project span { word-wrap: break-word;}
+
+
+body#project .tab_nav li, body#project .tab_nav h3 {
+    display: inline;
+    clear: none;
+    padding-bottom: 5px;
+    }
+body#project .tab_nav .ui-state-active h3 {
+    background: white;
+    }
+/* buildhelper stuff */
+
+.explanation {
+    background: #efefea;
+    padding: 5px 5px 1px 5px;
+    margin-bottom: 10px;
+    }
+
+.explanation p {
+    margin: 0 0 10px 0;
+    }
+    
+.step {
+    border-bottom: 1px solid #ddd;
+    padding-top: 1px;
+    margin-bottom: 15px;
+    }
+.step-checkbox, a.step-checkbox, .step-checkbox:link, .step-checkbox:visited {
+    text-decoration: none;
+    margin-bottom: -15px;
+    padding: 15px 20px;
+    }
+    
+.step-checkbox-unchecked, a.step-checkbox-unchecked, .step-checkbox-unchecked:link, .step-checkbox-unchecked:visited {
+    background: url('/static/images/buildhelper/checkbox-empty.png') no-repeat;
+    }
+.step-checkbox-unchecked:hover, .step-checkbox-unchecked:active {
+    background: url('/static/images/buildhelper/checkbox-active.png') no-repeat;
+    }
+    
+.step-checkbox-checked, a.step-checkbox-checked, .step-checkbox-checked:link, .step-checkbox-checked:visited {
+    background: url('/static/images/buildhelper/checkbox-checked.png') no-repeat;
+    }
+    
+.step-checkbox-checked:hover, .step-checkbox-checked:active {
+    background: url('/static/images/buildhelper/checkbox-checked.png') no-repeat;
+    }
+    
+.step-name {
+    background: #dcdcdc;
+    border-radius: 15px;
+    -moz-border-radius: 15px;
+    -webkit-border-radius: 15px;
+    margin: 0;
+    padding: 15px 10px 5px 10px;
+    color: #333;
+    }
+    
+.prereq .step-name {
+    background-color: #BEF;
+    }
+    
+.step-name-text {
+    }
+    
+.step-commands {
+    display: block;
+    margin: 0 1px 0 20px;
+    padding: 1px 10px;
+    background-color: rgba(225, 225, 200, 0.5);
+    font-family: monospace;
+    font-size: .9em;
+    border: 2pt dashed #dedede;
+    }
+.step-icon-holder {
+    height: 70px;
+    padding-bottom: 10px;
+    }
+.step-icons {
+    float: right;
+    }
+    
+.step-button {
+    background: #efefea;
+    width: 150px;
+    height: 110px;
+    padding: 22px 8px 13px 8px;
+    margin-left: 10px;
+    -moz-border-radius: 15px;
+    -webkit-border-radius: 15px;
+    border-radius: 15px;
+    display: inline;
+    }
+
+.step-button-hint {
+    background: #FFFFBB;
+    }
+    
+span.hint {
+    background: #FFFFBB;
+    }
+    
+.step-button-hint:hover {
+    background: #FFFF66;
+    }
+    
+.step-button-frustration {
+    background: #FDBDCA;
+    }
+    
+span.frustration {
+    background: #FDBDCA;
+    }
+    
+.step-button-frustration:hover {
+    background: #FF88AA;
+    }
+    
+.step-button img {
+    margin-bottom: -8px;
+    }

@@ -40,39 +40,6 @@ about how you can help {{ project.display_name }}
 #big-project-list form input[type='text'] { font-family: sans-serif; float: left; width: 20em; font-size: 1.5em; padding: 4px; }
 #big-project-list form input[type='submit'] { font-family: sans-serif; float: left; font-weight: normal; font-size: 1.5em; padding: 4px 8px 3px 8px; position: relative; top: -1px; }
 #big-project-list .note { margin-left: 2em; font-weight: normal; }
-
-.step {
-    border-bottom: 1px solid #ddd;
-    padding-top: 5px;
-    margin-bottom: 15px;
-    }
-.step-checkbox, a.step-checkbox, .step-checkbox:link, .step-checkbox:visited {
-    text-decoration: none;
-    width: 40px;
-    height: 30px;
-    margin-top: 5px;
-    padding: 15px 20px;
-    background: url('/static/images/buildhelper/checkbox-empty.png') no-repeat;
-    }
-.step-checkbox:hover, .step-checkbox:active {
-    background: url('/static/images/buildhelper/checkbox-active.png') no-repeat;
-    }
-.step-name {
-    border-bottom: 1px solid #666;
-    }
-.step-commands {
-    display: block;
-    margin: 0 15px;
-    padding: 1px 10px;
-    background: #eee;
-    }
-.step-icon-holder {
-    height: 50px;
-    padding-bottom: 10px;
-    }
-.step-icons {
-    float: right;
-    }
 {% endblock css %}
 
 {% block pagetop %}
@@ -128,12 +95,18 @@ about how you can help {{ project.display_name }}
 {% endblock pagetop %}
 
 {% block left %}
-    <div class='module contains_questions'>
-        <div class='head'>
-            <h3>Chatter</h3>
-            {% if buildhelper_steps %}<h3>Buildhelper</h3>{% endif %}
-        </div>
-        <div class='body'>
+    <div id='project-tab-container' class='module contains_questions'>
+            <ul class='head tab_nav'>
+                    <li class='ui-state-active'>
+                        <h3><a href='#chatter'>Chatter</a></h3>
+                    </li>
+                    {% if buildhelper_steps %}
+                    <li >
+                        <h3><a href='#buildhelper'>Buildhelper</a></h3>
+                    </li>
+                    {% endif %}
+            </ul>
+        <div id="chatter" class='body tab'>
             <div style="font-size: 1.3em" class="you-are-missing-things">
             {% if cookies_disabled %}
             <div>Please enable cookies in order to post answers.</div>
@@ -208,18 +181,17 @@ about how you can help {{ project.display_name }}
         </a>
     </strong>
     </div>
-</div><!-- /.module #requests -->
-{% if buildhelper_steps %}
-<div class='module contains_questions'>
-        <div class='head'>
-        <h3>Buildhelper</h3>
-        </div>
-        <div class='body'>
+    {% if buildhelper_steps %}
+        <div id="buildhelper" class='body tab invisible_if_js'>
+            <div class="explanation">
+                <p>This is the buildhelper for the {{ project.display_name }} project. It should help you get a working {{ project.display_name }} developer environment up and running on your computer. Check the checkboxes to track your progress!</p> 
+                <p>If you run into trouble with a certain step, look for a <span class="hint">hint</span> link for more information, or if you're stumped, a <span class="frustration">frustration</span> link to get help from {{ project.display_name }} volunteers.</p>
+            </div>
             <ul>
             {% for step in buildhelper_steps %}
             <li class="step {% if step.is_prerequisite %}prereq{% endif %}">
-                <h3 class="step-name">{% if step.is_checked %}<a href="" class="step-checkbox">&nbsp;</a>{% else %}<a href="" class="step-checkbox">&nbsp;</a>{% endif %}{% if step.is_prerequisite %}Prerequisite: {% endif %}{{ step.name }}</h3>
-                {% if step.command %}
+                <h3 class="step-name">{% if step.is_checked %}<a href="" class="step-checkbox step-checkbox-unchecked">&nbsp;</a>{% else %}<a href="" class="step-checkbox step-checkbox-unchecked">&nbsp;</a>{% endif %}<span class="step-name-text">{% if step.is_prerequisite %}<b>Prerequisite:</b> {% endif %}{{ step.name }}</span></h3>
+                {% if step.command.strip %}
                 <code class="step-commands">
                 {{ step.command|linebreaks }}
                 </code>
@@ -231,17 +203,24 @@ about how you can help {{ project.display_name }}
                 {% endif %}
                 <div class="step-icon-holder">
                     <span class="step-icons">
-                    <img src="/static/images/buildhelper/time.png" />{{ step.time }} minutes 
-                    {% if step.hint %}<a href="{{ step.hint }}"><img src="/static/images/buildhelper/tutorial-button.png" /></a>{% endif %}
-                    {% if step.frustration_handler %}<a href="{{ step.frustration_handler }}"><img src="/static/images/buildhelper/frustration-handler.png" /></a>{% endif %}
+                    <div class="step-button">
+                    <img src="/static/images/buildhelper/time.png" height="35" /> {{ step.time }} min{{ step.time|pluralize }}
+                    </div>
+                    {% if step.hint %}
+                        <a href="{{ step.hint }}" class="step-button step-button-hint" title="Want a hint?"><img src="/static/images/buildhelper/tutorial-button.png" height="40" /></a>
+                    {% endif %}
+                    {% if step.frustration_handler %}
+                        <a href="{{ step.frustration_handler }}" class="step-button step-button-frustration" title="Frustrated?"><img src="/static/images/buildhelper/frustration-handler.png" height="40" /></a>
+                    {% endif %}
                     </span>
                 </div>
             </li>
             {% endfor %}
             </ul>
         </div>
-</div>
-{% endif %}
+    {% endif %}
+</div><!-- /.module #requests -->
+
 {% endblock left %}
 
 {% block main %}
@@ -391,6 +370,28 @@ about how you can help {{ project.display_name }}
 {% endblock main %}
 
 {% block js %}
+<script type='text/javascript'>
+    $(function(){
+        $('.step-checkbox').click(function() {
+            $(this).toggleClass('step-checkbox-checked');
+            $(this).toggleClass('step-checkbox-unchecked');
+            return false;
+        });
+    });
+</script>
+
+<script type='text/javascript'>
+$(function(){
+        $('#project-tab-container').tabs({
+            cookie: {
+                // keeps tab choice for one day
+                expires: 1
+            }
+        });
+        $('.invisible_if_js').removeClass('invisible_if_js');
+});
+</script>
+
     <script type='text/javascript'>
         {# If you move this to an external .js file, check for Django template tags, there might be some. #}
         

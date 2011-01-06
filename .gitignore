@@ -16,7 +16,6 @@ parts
 src/*.egg-info
 .coverage
 .figleaf
-html/
 htmlcov/
 build/
 *.orig
