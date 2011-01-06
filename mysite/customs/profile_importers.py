@@ -172,6 +172,9 @@ class GithubImporter(ProfileImporter):
 
     def handleUserRepositoryJson(self, json_string):
         data = simplejson.loads(json_string)
+        if 'repositories' not in data:
+            return
+
         repos = data['repositories']
         # for every repository, we need to get its primary
         # programming language. FIXME.
