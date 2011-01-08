@@ -663,6 +663,7 @@ class MozillaBugzilla(BugzillaBugTracker):
                              'Camino': 'Camino',
                              'Calendar': 'Mozilla Calendar',
                              'Mozilla Localizations': 'Mozilla Localizations',
+                             'Mozilla QA': 'Mozilla QA',
                              }
         if bb.product == 'Other Applications':
             bug_project_name = 'Mozilla ' + bb.component
