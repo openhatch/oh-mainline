@@ -290,7 +290,7 @@ def google_tracker_factory(gt):
         labels = [label.text for label in issue.label]
         if gt.bitesized_type == 'label':
             ret_dict['good_for_newcomers'] = (gt.bitesized_text in labels)
-            ret_dict['bite_size_tag_name'] = gt.bitesized_label
+            ret_dict['bite_size_tag_name'] = gt.bitesized_text
         # Check whether documentation bug
         if gt.documentation_type == 'label':
             ret_dict['concerns_just_documentation'] = (gt.documentation_text in labels)
