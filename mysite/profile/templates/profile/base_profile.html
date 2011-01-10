@@ -128,7 +128,7 @@
         {% endif %}
 
         {% if not person.bio and not person.homepage_url and not tags_flat %}
-        {% ifequal the_user.get_profile person %}
+        {% ifequal user.get_profile person %}
         <ul class='nudgebuttons'>
             <li>
             <a href='{% url mysite.profile.views.edit_info %}'>

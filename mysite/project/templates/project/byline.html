@@ -8,7 +8,7 @@
   </a>
   {% endspaceless %}
     &middot; {{ answer.modified_date|timesince_terse }} ago
-    {% ifequal the_user answer.author %}
+    {% ifequal user answer.author %}
     &middot;
     <a href="#" style='text-decoration: none ! important;' class="edit_link" id="edit_link_{{answer.pk}}">edit</a>
     &middot;{% spaceless %}

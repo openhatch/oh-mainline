@@ -1,8 +1,8 @@
 {% load voting_tags %}
-{% votes_by_user the_user on link_list as vote_dict %}
+{% votes_by_user user on link_list as vote_dict %}
 {% scores_for_objects link_list as score_dict %}
 {% dict_entry_for_item answer from vote_dict as vote %}
-{% vote_by_user the_user on answer as vote %}
+{% vote_by_user user on answer as vote %}
 {% score_for_object answer as score %}
 <span class="voting">
     <form class="answervote" id="answerup{{ answer.id }}" action="/+answer/vote/{{ answer.id }}/{% if vote and vote.is_upvote %}clear{% else %}up{% endif %}vote/" method="POST">

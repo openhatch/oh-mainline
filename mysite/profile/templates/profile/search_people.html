@@ -224,7 +224,7 @@ People Search
 
     {% endif %}
 
-    {% if not the_user.is_authenticated and people %}
+    {% if not user.is_authenticated and people %}
             <span style="float: right; padding: 5px 0 0 0;">
                 <a href="{% url account.views.set_location %}">
                     Add yourself to the map&nbsp;&raquo;</a>
@@ -274,7 +274,7 @@ People Search
         {% endcomment %}
         nudgeUserAboutLocation = true;
 
-        {% if the_user.get_profile.location_is_public %}
+        {% if user.get_profile.location_is_public %}
         {# Unless they've confirmed the display of a location. #}
         nudgeUserAboutLocation = false;
         {% endif %}

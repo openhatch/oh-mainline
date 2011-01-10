@@ -40,7 +40,6 @@ def as_view(request, template, data, slug):
     except:
         data['go_here_after_logging_in_or_out'] = '/'
 
-    data['the_user'] = request.user
     data['slug'] = slug # Account settings uses this.
     return render_response(request, template, data)
 

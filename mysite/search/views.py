@@ -144,7 +144,7 @@ def fetch_bugs(request, invalid_subscribe_to_alert_form=None):
         return bugs_to_json_response(data, bugs, request.GET.get(
             'jsoncallback', 'alert'))
     else:
-        data['the_user'] = request.user
+        data['user'] = request.user
         data['suggestions'] = suggestions
         data['bunch_of_bugs'] = bugs
         data['url'] = 'http://launchpad.net/'

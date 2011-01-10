@@ -35,7 +35,7 @@ about how you can help {{ project.name }}
     <h3 class='supertitle'><a href='{% url mysite.project.views.projects %}'>Projects</a></h3>
     <h1>{{ project.name }}</h1>
 
-    <div class='next_steps_for_helpers contains_just_the_head {% if the_user.get_profile.expand_next_steps %}expanded{% else %}collapsed{% endif %} module' style='background-image: url({% version '/static/images/bg-translucent-green.png' %}); {% if not user_wants_to_help %}display: none;{% endif %}'>
+    <div class='next_steps_for_helpers contains_just_the_head {% if user.get_profile.expand_next_steps %}expanded{% else %}collapsed{% endif %} module' style='background-image: url({% version '/static/images/bg-translucent-green.png' %}); {% if not user_wants_to_help %}display: none;{% endif %}'>
         <div class='head'>
             <h3>Next steps for helpers
                 <a id='show' style='font-weight: normal;' href='#'>(show)</a>
@@ -50,7 +50,7 @@ about how you can help {{ project.name }}
         </div>
     </div>
 
-    <div class='next_steps_for_helpers contains_just_the_body {% if the_user.get_profile.expand_next_steps %}expanded{% else %}collapsed{% endif %} module' style='{% if not user_wants_to_help %}display: none;{% endif %}'>
+    <div class='next_steps_for_helpers contains_just_the_body {% if user.get_profile.expand_next_steps %}expanded{% else %}collapsed{% endif %} module' style='{% if not user_wants_to_help %}display: none;{% endif %}'>
         <div class='body'>
                 <ul class='raquo_bullets'>
                     <li><a href='{% url mysite.profile.views.edit_info %}'>
@@ -97,7 +97,7 @@ about how you can help {{ project.name }}
                                     {% include 'project/voting_controls.html' %}
                                     {% if not question.is_bug_style %}
 
-                                        {% ifequal the_user answer.author %}
+                                        {% ifequal user answer.author %}
                                             {% with 1 as edit_form %}
                                                 {% include 'project/forms/paragraph.html' %}
                                             {% endwith %}
@@ -111,7 +111,7 @@ about how you can help {{ project.name }}
 
                                     {% else %}
 
-                                        {% ifequal the_user answer.author %}
+                                        {% ifequal user answer.author %}
                                             {% with 1 as edit_form %}
                                                 {% include 'project/forms/bug.html' %}
                                             {% endwith %}
@@ -120,7 +120,7 @@ about how you can help {{ project.name }}
                                         <span class="answer" id="answer_{{answer.pk}}">
 
                                             <div class="bug_answer_title">
-                                                {% ifequal the_user answer.author %}
+                                                {% ifequal user answer.author %}
                                                 {% endifequal %}
                                                 <strong>{{answer.title}}</strong>
                                             </div>

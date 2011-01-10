@@ -48,7 +48,7 @@ def enhance_next_to_annotate_it_with_newuser_is_true(value, **args):
 class ShowGoogleAnalyticsJS(template.Node):
     def render(self, context):
         code =  getattr(settings, "GOOGLE_ANALYTICS_CODE", False)
-        if 'the_user' in context and context['the_user'] and context['the_user'].is_staff:
+        if 'user' in context and context['user'] and context['user'].is_staff:
             return "<!-- Goggle Analytics not included because you are a staff user! -->"
 
         if not code:

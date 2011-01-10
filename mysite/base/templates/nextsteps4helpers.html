@@ -52,11 +52,11 @@
             </div>
             <div class='body'>
                 <ul id='people-list'>
-                    {% with the_user.get_profile as person %}
+                    {% with user.get_profile as person %}
                         {% include 'profile/person-summary-li.html' %}
                     {% endwith %}
                 </ul>
-                <p class='rabbit_hole'><a href='{% url mysite.profile.views.people %}?center={{the_user.get_profile.location_display_name}}'>Find people near you &raquo;</a></p>
+                <p class='rabbit_hole'><a href='{% url mysite.profile.views.people %}?center={{user.get_profile.location_display_name}}'>Find people near you &raquo;</a></p>
             </div>
         </div>
     </div>
@@ -72,11 +72,11 @@
             </div>
             <div class='body'>
                 <ul id='people-list'>
-                    {% with the_user.get_profile as person %}
+                    {% with user.get_profile as person %}
                         {% include 'profile/person-summary-li.html' %}
                     {% endwith %}
                 </ul>
-                <p class='rabbit_hole'><a href='{% url mysite.profile.views.people %}?center={{the_user.get_profile.location_display_name}}'>Find people near you &raquo;</a></p>
+                <p class='rabbit_hole'><a href='{% url mysite.profile.views.people %}?center={{user.get_profile.location_display_name}}'>Find people near you &raquo;</a></p>
             </div>
         </div>
     </div>

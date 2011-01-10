@@ -14,14 +14,14 @@ Put yourself on the map
 {% endblock submodule_head %}
 
 {% block submodule_body %}
-{% if the_user.get_profile.location_display_name %}
+{% if user.get_profile.location_display_name %}
 <p style="visibility: hidden;" id="success_message">Your location is visible on <a href="{%url mysite.profile.views.people %}">the global map</a>.
 If you want us to forget your location, empty out the text field and hit save.</p>
 {% else %}
 <p>To appear on <a href="{%url mysite.profile.views.people %}">the global map</a>,
   set a location.</p>
 {% endif %}
-{% if not the_user.get_profile.location_confirmed and the_user.get_profile.location_display_name and not the_user.get_profile.dont_guess_my_location  and not dont_suggest_location %}
+{% if not user.get_profile.location_confirmed and user.get_profile.location_display_name and not user.get_profile.dont_guess_my_location  and not dont_suggest_location %}
 <p>
   <label></label>
   <span class="notification" style="width: 311px; margin-bottom: 0;">We've tried to guess your location.</span>
@@ -29,7 +29,7 @@ If you want us to forget your location, empty out the text field and hit save.</
 {% endif %}
 {{ edit_location_form.as_p }}
 
-{% if the_user.get_profile.location_display_name %}
+{% if user.get_profile.location_display_name %}
 <div style="position: relative; left: -16px;">
   <label style="visibility: hidden;" id="geocode_description">You on a map! <br /><br />(If we got it wrong, try being more specific.)
 </label>

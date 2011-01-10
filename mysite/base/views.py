@@ -128,7 +128,7 @@ def page_to_js(request):
 def page_not_found(request):
     t = loader.get_template('404.html')
     c = Context({
-        'the_user': request.user
+        'user': request.user
     })
 
     response = HttpResponse(t.render(c), status=404)

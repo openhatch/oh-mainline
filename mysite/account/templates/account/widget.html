@@ -15,11 +15,11 @@ Widgetize yourself -
     <div class='body'>
         <p>Show off your open source participation on your web things.</p>
         <script type='text/javascript'
-            src='{% url mysite.profile.views.widget_display_js the_user.username %}'></script>
+            src='{% url mysite.profile.views.widget_display_js user.username %}'></script>
 
         <div id='widget-instructions'>
             Include this <acronym title="Hot Taxidermists Making Latkes">HTML</acronym> wherever in your page you want to put the widget:
-            <textarea style="width: 220px; height: 100px; "><script type='text/javascript' src='{{uri_scheme}}://{{ url_prefix}}/people/{{ the_user.username }}/openhatch-widget.js'></script></textarea>
+            <textarea style="width: 220px; height: 100px; "><script type='text/javascript' src='{{uri_scheme}}://{{ url_prefix}}/people/{{ user.username }}/openhatch-widget.js'></script></textarea>
         </div>
     </div>
 </div>

@@ -17,7 +17,7 @@ body.three_columns #right #recent_activity_feed .body { font-size: 1em; }
 {% endblock css %}
 
 {% block pagetop %}
-{% if not the_user.is_authenticated %}
+{% if not user.is_authenticated %}
 <!--
 <div class='module' id='welcome'>
     <div class='body'>
@@ -39,24 +39,24 @@ body.three_columns #right #recent_activity_feed .body { font-size: 1em; }
 
 <div id='left' class='column'>
 
-{% if the_user.is_authenticated %}
+{% if user.is_authenticated %}
 
     <div class='module' id='me'>
         <div class='head'>
-            <h3><a style='color: inherit;' href='{{ the_user.get_profile.profile_url }}'>
+            <h3><a style='color: inherit;' href='{{ user.get_profile.profile_url }}'>
                     You</a></h3>
         </div>
         <div class='body'>
             <ul id='people-list'>
-                {% with the_user.get_profile as person %}
+                {% with user.get_profile as person %}
                     {% include 'profile/person-summary-li.html' %}
                 {% endwith %}
             </ul>
-            <p class='rabbit_hole'><a href='{% url mysite.profile.views.people %}?center={{the_user.get_profile.location_display_name}}'>Find people near you &raquo;</a></p>
+            <p class='rabbit_hole'><a href='{% url mysite.profile.views.people %}?center={{user.get_profile.location_display_name}}'>Find people near you &raquo;</a></p>
         </div>
     </div>
 
-    {% with the_user.get_profile.get_collaborators_for_landing_page as collaborators %}
+    {% with user.get_profile.get_collaborators_for_landing_page as collaborators %}
     <div class='module' id='people'>
         <div class='head'>
             {% if collaborators %}
@@ -115,12 +115,12 @@ body.three_columns #right #recent_activity_feed .body { font-size: 1em; }
     {% if show_nudge_box %}
     <div class='module' id='todo'>
         <div class="head">
-        {% if the_user.is_authenticated %}
+        {% if user.is_authenticated %}
             <h3>How to get started on OpenHatch</h3>
         {% endif %}
         </div>
         <div class='body'>
-        {% if not the_user.is_authenticated %}
+        {% if not user.is_authenticated %}
         <h2>OpenHatch is an open source involvement engine.</h2>
         <p style='font-size: .9em; color: #555; margin: 0 0 5px 10px;'>Here you can:</p>
         {% endif %}
@@ -163,7 +163,7 @@ body.three_columns #right #recent_activity_feed .body { font-size: 1em; }
                         </a>
                     </li>
                 {% endif %}
-                {% if the_user.is_authenticated %}
+                {% if user.is_authenticated %}
                     {% if nudge_tags %}
                         <li>
                             <a href='/profile/views/edit_info'>
@@ -336,7 +336,7 @@ body.three_columns #right #recent_activity_feed .body { font-size: 1em; }
         </div>
     </div>
 
-    {% if the_user.is_authenticated %}
+    {% if user.is_authenticated %}
     <div id='syndicate' class='module'>
         <div class='head'>
             <h3>Syndicate your profile</h3>

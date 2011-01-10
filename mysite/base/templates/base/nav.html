@@ -11,19 +11,19 @@
         <ul id='topnavlinks'>
             <li><a href='{% url mysite.missions.base.views.main_page %}'>missions</a></li>
             <li><a href='{% url mysite.search.views.fetch_bugs %}'>volunteer opportunities</a></li>
-            <li><a href='{% url mysite.project.views.projects %}'>{% if the_user.is_authenticated %} all {% endif %} projects</a></li>
-            <li><a href='{% url mysite.profile.views.people%}'>{% if the_user.is_authenticated %} all {% endif %} people</a></li>
-            {% if the_user.is_authenticated %}
-                <li><a href='{% url mysite.profile.views.display_person_web the_user.username %}'>profile</a></li>
+            <li><a href='{% url mysite.project.views.projects %}'>{% if user.is_authenticated %} all {% endif %} projects</a></li>
+            <li><a href='{% url mysite.profile.views.people%}'>{% if user.is_authenticated %} all {% endif %} people</a></li>
+            {% if user.is_authenticated %}
+                <li><a href='{% url mysite.profile.views.display_person_web user.username %}'>profile</a></li>
                 <li><a href='{% url mysite.base.views.home %}'>home</a></li>
             {% endif %}
         </ul>
         <ul id='account-links'>
-            {% if the_user.is_authenticated %}
+            {% if user.is_authenticated %}
                 <li><a href='{% url oh_logout %}?next={% if go_here_after_logging_in_or_out %}{{ go_here_after_logging_in_or_out|urlencode }}{% else %}/{% endif %}'>log out</a></li>
                 <li><a href='{% url mysite.account.views.set_location %}'>settings</a></li>
-                <li><a href='{% url mysite.profile.views.display_person_web the_user.username %}'>
-                {% with the_user.get_profile as person %}
+                <li><a href='{% url mysite.profile.views.display_person_web user.username %}'>
+                {% with user.get_profile as person %}
                     {% if person.user.first_name or person.user.last_name %}
                         {{ person.get_full_name_with_nbsps|safe }}
                     {% else %}

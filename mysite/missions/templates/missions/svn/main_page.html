@@ -17,7 +17,7 @@
 
 <p>This mission consists of three parts: checking out a working copy, creating a diff of changes to a working copy, and committing changes.</p>
 
-{% if the_user.is_authenticated %}
+{% if user.is_authenticated %}
 {% if repository_exists %}
 <p>You already have a repository that you can use for these missions, but if you want to start over fresh, you can reset it.</p>
 

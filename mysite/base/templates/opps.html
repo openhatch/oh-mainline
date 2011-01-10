@@ -75,7 +75,7 @@ Search bugs
 
 <div id='recommendations' class='box module'>
     <h4>Recommended searches</h4>
-    {% if the_user.is_authenticated %}
+    {% if user.is_authenticated %}
     {% if suggestions %}
     <form name='suggested_searches'
         id='suggested_searches'
