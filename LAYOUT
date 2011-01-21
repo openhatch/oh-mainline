@@ -3,6 +3,15 @@ There are a whole bunch of files here. Here's what you need to know:
 Important files in git
 ----------------------
 
+README.mkd
+    Read the README! Read it first.
+
+    It has a ".mkd" extension because it is in Markdown format.
+
+COPYING
+    This file explains what permissions you have, if you want to re-use
+    source code you find in this repository.
+
 mysite/
     This directory contains the OpenHatch website and all the "apps" that
     are part of it. Each subdirectory is an app.
