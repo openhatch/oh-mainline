@@ -31,8 +31,6 @@ class Command(BaseCommand):
                 enqueued_dias_count += 1
 
     def add_dia_to_reactor(self, cls, query, dia_id):
-        ### For now, only the 'db' == Debian == qa.debian.org DIAs are in a format where
-        ### they can handle asynchronous operation.
         state_manager = cls(query, dia_id, self)
 
         ### d is the "deferred" object. We create it using getPage(), and then
