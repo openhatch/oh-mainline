@@ -1,3 +1,22 @@
+# This file is part of OpenHatch.
+# Copyright (C) 2010 Parker Phinney
+# Copyright (C) 2010 Jeff Welling
+# Copyright (C) 2009, 2010 OpenHatch
+# Copyright (C) 2010 Mister Deployed, Jr
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 # This file:
 # 1. Provides metadata about the openhatch codebase. This metadata creates a Python "package". This is done by the call to the setup() function -- for example, the "name" parameter sets the name of the package.
 # 2. In doing so, it declares the most urgent dependencies without which the code will not function. That is done through the "install_requires" parameter to setup().
