@@ -559,6 +559,137 @@ class BitbucketImporter(ProfileImporter):
                     languages=''))
             citation.languages = ''
             citation.save_and_check_for_duplicates()
+
+class AbstractOhlohAccountImporter(ProfileImporter):
+    SQUASH_THESE_HTTP_CODES = ['404',]
+
+    def ohloh_data_to_citations(self, ohloh_data):
+        '''This takes post-processed responses from Ohloh, in a
+        particular arbitrary format, and turns them into Citation objects
+        suitable to be stored in the OpenHatch database.'''
+        for ohloh_contrib_info in ohloh_results:
+            self.store_one_ohloh_contrib_info(ohloh_contrib_info)
+
+    def store_one_ohloh_contrib_info(self, ohloh_contrib_info):
+        (project, _) = Project.objects.get_or_create(
+                name=ohloh_contrib_info['project'])
+        # FIXME: don't import if blacklisted
+        (portfolio_entry, _) = mysite.profile.models.PortfolioEntry.objects.get_or_create(
+                person=person, project=project)
+        citation = mysite.profile.models.Citation.create_from_ohloh_contrib_info(ohloh_contrib_info)
+        citation.portfolio_entry = portfolio_entry
+        citation.data_import_attempt = dia
+        citation.save_and_check_for_duplicates()
+
+    def url_for_ohloh_query(self, params=None, API_KEY=None):
+        if API_KEY is None:
+            API_KEY = settings.OHLOH_API_KEY
+
+        my_params = {u'api_key': unicode(API_KEY)}
+        if params:
+            my_params.update(params)
+        params = my_params ; del my_params
+
+        encoded = mysite.base.unicode_sanity.urlencode(params)
+        url += encoded
+        return url
+
+    def parse_ohloh_xml(self, xml_string):
+        try:
+            s = xml_string
+            tree = ET.parse(StringIO.StringIO(s))
+        except xml.parsers.expat.ExpatError:
+            # well, I'll be. it doesn't parse.
+            # There's nothing to do.
+            return None
+
+        # Did Ohloh return an error?
+        root = tree.getroot()
+        if root.find('error') is not None:
+            # FIXME: We could log this, but for now, we'll just eat it.
+            return None # The callback chain is over.
+
+        return tree
+
+    def filter_ohloh_xml(self, root, selector, many=False):
+        relevant_tag_dicts = []
+        interestings = root.findall(selector)
+        for interesting in interestings:
+            # Turn each interesting element into a dictionary,
+            # just because I feel more comfortable passing native
+            # Python objects around rather than thick, heavy XML things.
+            #
+            # (that, and dictionaries are easier to use in the test suite)
+            for child in interesting.getchildren():
+                if child.text:
+                    this[unicode(child.tag)] = uni_text(child.text)
+            # Good, now we have a dictionary version of the XML tag.
+            if many:
+                relevant_tag_dicts.append(this)
+            else:
+                return this
+
+        if many:
+            return relevant_tag_dicts
+
+    def enhance_ohloh_contributor_facts(self, c_fs):
+        ret = []
+        for c_f in c_fs:
+            if 'analysis_id' not in c_f:
+                continue # this contributor fact is useless
+
+            # Ohloh matches on anything containing the username we asked for as a substring,
+            # so check that the contributor fact actually matches the whole string (case-insensitive).
+            if username.lower() != c_f['contributor_name'].lower():
+                continue
+
+            eyedee = int(c_f['analysis_id'])
+            # project_data = self.analysis2projectdata(eyedee)
+            # FIXME: BLOCKING
+
+            # permalink = generate_contributor_url(
+            # project_data['name'],
+            # int(c_f['contributor_id'])) # FIXME: BLOCKING
+            permalink = 'http://example.com/'
+
+            this = dict(
+                project='EXAMPLE', # FIXME: project_data['name'],
+                project_homepage_url=project_data.get('homepage_url', None),
+                permalink=permalink,
+                primary_language=c_f.get('primary_language_nice_name', ''),
+                man_months=int(c_f['man_months']))
+            ret.append(this)
+        return ret
+
+    def parse_then_filter_then_interpret_ohloh_xml(self, xml_string):
+        tree = self.parse_ohloh_xml(xml_string)
+        if tree is None:
+            return
+
+        list_of_dicts = self.filter_ohloh_xml(tree, 'result/contributor_fact', many=True)
+        if not list_of_dicts:
+            return
+
+        list_of_dicts = self.enhance_ohloh_contributor_facts(list_of_dicts)
+
+        # Okay, so we know we got some XML back, and that we have converted
+        # its tags to unicode<->unicode dictionaries.
+        self.ohloh_data_to_citations(list_of_dicts)
+
+class RepositorySearchOhlohImporter(AbstractOhlohAccountImporter):
+
+    def getUrlsAndCallbacks(self):
+        callback = (
+            lambda xml_string: self.parse_then_filter_then_interpret_ohloh_xml(
+                selector='result/contributor_fact',
+                many=True,
+                xml_string=xml_string))
+
+        return [{
+                'url': self.url_for_ohloh_query({'query': self.query}),
+                'errback': self.squashIrrelevantErrors,
+                'callback': callback}]
+
 ###
 
 SOURCE_TO_CLASS = {
@@ -566,4 +697,5 @@ SOURCE_TO_CLASS = {
     'bb': BitbucketImporter,
     'gh': GithubImporter,
     'lp': LaunchpadProfilePageScraper,
+    'rs': RepositorySearchOhlohImporter,
 }

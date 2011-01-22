@@ -557,7 +557,67 @@ class ImportFromBitbucket(django.test.TestCase):
         self.assertEqual(
             "Fix crash in kwallet handling code",
             self.long_kwallet_thing.portfolio_entry.project_description)
-        
+
+class TestAbstractOhlohAccountImporter(django.test.TestCase):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh',)
+    @mock.patch('mysite.search.tasks.PopulateProjectIconFromOhloh')
+    @mock.patch('twisted.web.client.getPage', fakeGetPage.getPage)
+    def setUp(self, do_nothing, do_nothing_1):
+        # Create a DataImportAttempt for Asheesh
+        asheesh = Person.objects.get(user__username='paulproteus')
+        self.dia = mysite.profile.models.DataImportAttempt.objects.create(
+            person=asheesh, source='rs', query='paulproteus')
+
+        self.aoai = mysite.customs.profile.importers.AbstractOhlohAccountImporter(
+            query=dia.query, dia_id=dia.id, command=None)
+
+    @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh',)
+    @mock.patch('mysite.search.tasks.PopulateProjectIconFromOhloh')
+    @mock.patch('twisted.web.client.getPage', fakeGetPage.getPage)
+    def test_store_one_citation(self, do_nothing, do_nothing_1):
+        # Before-hand: no citations and no portfolio_entryes
+        self.assertFalse(mysite.profile.models.PortfolioEntry.objects.all().count())
+        self.assertFalse(mysite.profile.models.Citation.objects.all().count())
+
+        contrib_info = {
+            'project': 'project_name',
+            'man_months': 3,
+            'primary_language': 'Python',
+            'permalink': 'http://example.com/',
+            }
+        self.aoai.store_one_ohloh_contrib_info(contrib_info)
+
+        # Hey, look, it made a Citation.
+        self.assert_(mysite.profile.models.PortfolioEntry.objects.all().count())
+        self.assert_(mysite.profile.models.Citation.objects.all().count())
+
+    @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh',)
+    @mock.patch('mysite.search.tasks.PopulateProjectIconFromOhloh')
+    @mock.patch('twisted.web.client.getPage', fakeGetPage.getPage)
+    def test_filter_fake_matches(self, do_nothing, do_nothing_1):
+        c_fs = [
+        # One real match
+            {
+                'project': 'project_name',
+                'contributor_name': 'paulproteus',
+                'man_months': 3,
+                'primary_language': 'Python',
+                'permalink': 'http://example.com/',
+                },
+            # One irrelevant match
+            {
+                'project': 'project_name_2',
+                'contributor_name': 'paulproteuss',
+                'man_months': 3,
+                'primary_language': 'Python',
+                'permalink': 'http://example.com/',
+                }
+            ]
+
+        output = self.aoai.enhance_ohloh_contributor_facts(c_fs)
+        self.assertEqual(output, [c_fs[0]])
         
 class BugzillaTests(django.test.TestCase):
     fixtures = ['miro-project']
