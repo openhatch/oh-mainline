@@ -621,26 +621,17 @@ class TestAbstractOhlohAccountImporter(django.test.TestCase):
         self.assertEquals(expected_query_items,
                           sorted(urlparse.parse_qsl(rest)))
 
-    @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh',)
-    @mock.patch('mysite.search.tasks.PopulateProjectIconFromOhloh')
-    @mock.patch('twisted.web.client.getPage', fakeGetPage.getPage)
-    def test_parse_ohloh_invalid_xml(self, do_nothing, do_nothing_1):
+    def test_parse_ohloh_invalid_xml(self):
         # No exception on invalid XML
         parsed = self.aoai.parse_ohloh_xml('''<broken''')
         self.assert_(parsed is None)
 
-    @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh',)
-    @mock.patch('mysite.search.tasks.PopulateProjectIconFromOhloh')
-    @mock.patch('twisted.web.client.getPage', fakeGetPage.getPage)
-    def test_parse_ohloh_error_xml(self, do_nothing, do_nothing_1):
+    def test_parse_ohloh_error_xml(self):
         # returns None if the XML is an Ohloh error
         parsed = self.aoai.parse_ohloh_xml('''<response><error /></response>''')
         self.assert_(parsed is None)
 
-    @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh',)
-    @mock.patch('mysite.search.tasks.PopulateProjectIconFromOhloh')
-    @mock.patch('twisted.web.client.getPage', fakeGetPage.getPage)
-    def test_parse_ohloh_valid_xml(self, do_nothing, do_nothing_1):
+    def test_parse_ohloh_valid_xml(self):
         # returns some True value if there is a document
         parsed = self.aoai.parse_ohloh_xml('''<something></something>''')
         self.assertTrue(parsed)
