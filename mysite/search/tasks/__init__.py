@@ -2,7 +2,6 @@
 # Copyright (C) 2010 Parker Phinney
 # Copyright (C) 2010 Jack Grigg
 # Copyright (C) 2009, 2010 OpenHatch, Inc.
-# Copyright (C) 2010 Mister Deployed
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
