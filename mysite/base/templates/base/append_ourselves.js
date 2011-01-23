@@ -1,6 +1,6 @@
 /*
 # This file is part of OpenHatch.
-# Copyright (C) 2009 OpenHatch
+# Copyright (C) 2009 OpenHatch, Inc.
 # Copyright (C) 2010 John Stumpo
 #
 # This program is free software: you can redistribute it and/or modify

@@ -1,5 +1,5 @@
 # This file is part of OpenHatch.
-# Copyright (C) 2009 OpenHatch
+# Copyright (C) 2009 OpenHatch, Inc.
 # Copyright (C) 2009 Matthew Ziegelbaum
 #
 # This program is free software: you can redistribute it and/or modify

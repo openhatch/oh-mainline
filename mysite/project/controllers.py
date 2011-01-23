@@ -1,6 +1,6 @@
 # This file is part of OpenHatch.
 # Copyright (C) 2010 Parker Phinney
-# Copyright (C) 2010 OpenHatch
+# Copyright (C) 2010 OpenHatch, Inc.
 # Copyright (C) 2010 Mister Deployed
 #
 # This program is free software: you can redistribute it and/or modify

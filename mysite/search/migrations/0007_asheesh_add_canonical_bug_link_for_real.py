@@ -1,6 +1,6 @@
 # This file is part of OpenHatch.
 # Copyright (C) 2009 Karen Rustad
-# Copyright (C) 2009 OpenHatch
+# Copyright (C) 2009 OpenHatch, Inc.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
