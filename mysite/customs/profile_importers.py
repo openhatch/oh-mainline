@@ -571,7 +571,7 @@ class AbstractOhlohAccountImporter(ProfileImporter):
         '''This takes post-processed responses from Ohloh, in a
         particular arbitrary format, and turns them into Citation objects
         suitable to be stored in the OpenHatch database.'''
-        for ohloh_contrib_info in ohloh_results:
+        for ohloh_contrib_info in ohloh_data:
             self.store_one_ohloh_contrib_info(ohloh_contrib_info)
 
     def store_one_ohloh_contrib_info(self, ohloh_contrib_info):
@@ -587,6 +587,7 @@ class AbstractOhlohAccountImporter(ProfileImporter):
 
     def url_for_ohloh_query(self, url, params=None, API_KEY=None):
         if API_KEY is None:
+            from django.conf import settings
             API_KEY = settings.OHLOH_API_KEY
 
         my_params = {u'api_key': unicode(API_KEY)}
@@ -659,7 +660,7 @@ class AbstractOhlohAccountImporter(ProfileImporter):
                 continue
 
             eyedee = int(c_f['analysis_id'])
-            project_data = {'name': c_f['project']}
+            project_data = {'name': eyedee}
             # project_data = self.analysis2projectdata(eyedee)
             # FIXME: BLOCKING
 
@@ -692,19 +693,17 @@ class AbstractOhlohAccountImporter(ProfileImporter):
         # its tags to unicode<->unicode dictionaries.
         self.ohloh_data_to_citations(list_of_dicts)
 
-class RepositorySearchOhlohImporter(AbstractOhlohAccountImporter):
-
     def getUrlsAndCallbacks(self):
-        callback = (
-            lambda xml_string: self.parse_then_filter_then_interpret_ohloh_xml(
-                selector='result/contributor_fact',
-                many=True,
-                xml_string=xml_string))
+        url = self.url_for_ohloh_query(url=self.BASE_URL,
+                                       params={u'query': self.query})
 
         return [{
-                'url': self.url_for_ohloh_query({'query': self.query}),
+                'url': url,
                 'errback': self.squashIrrelevantErrors,
-                'callback': callback}]
+                'callback': self.parse_then_filter_then_interpret_ohloh_xml}]
+
+class RepositorySearchOhlohImporter(AbstractOhlohAccountImporter):
+    BASE_URL = 'http://www.ohloh.net/contributors.xml'
 
 ###
 
