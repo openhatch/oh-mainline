@@ -571,14 +571,14 @@ class AbstractOhlohAccountImporter(ProfileImporter):
             self.store_one_ohloh_contrib_info(ohloh_contrib_info)
 
     def store_one_ohloh_contrib_info(self, ohloh_contrib_info):
-        (project, _) = Project.objects.get_or_create(
+        (project, _) = mysite.search.models.Project.objects.get_or_create(
                 name=ohloh_contrib_info['project'])
         # FIXME: don't import if blacklisted
         (portfolio_entry, _) = mysite.profile.models.PortfolioEntry.objects.get_or_create(
-                person=person, project=project)
+                person=self.get_dia().person, project=project)
         citation = mysite.profile.models.Citation.create_from_ohloh_contrib_info(ohloh_contrib_info)
         citation.portfolio_entry = portfolio_entry
-        citation.data_import_attempt = dia
+        citation.data_import_attempt = self.get_dia()
         citation.save_and_check_for_duplicates()
 
     def url_for_ohloh_query(self, params=None, API_KEY=None):

@@ -570,8 +570,8 @@ class TestAbstractOhlohAccountImporter(django.test.TestCase):
         self.dia = mysite.profile.models.DataImportAttempt.objects.create(
             person=asheesh, source='rs', query='paulproteus')
 
-        self.aoai = mysite.customs.profile.importers.AbstractOhlohAccountImporter(
-            query=dia.query, dia_id=dia.id, command=None)
+        self.aoai = mysite.customs.profile_importers.AbstractOhlohAccountImporter(
+            query=self.dia.query, dia_id=self.dia.id, command=None)
 
     @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh',)
     @mock.patch('mysite.search.tasks.PopulateProjectIconFromOhloh')
