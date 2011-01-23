@@ -26,6 +26,7 @@ import datetime
 import collections
 import logging
 import urlparse
+import hashlib
 import xml.etree.ElementTree as ET
 import xml.parsers.expat
 
@@ -718,6 +719,24 @@ class RepositorySearchOhlohImporter(AbstractOhlohAccountImporter):
 
 class OhlohUsernameImporter(AbstractOhlohAccountImporter):
 
+    def getUrlsAndCallbacksForUsername(self, username):
+        # First, we load download the user's profile page and look for
+        # (project, contributor_id) pairs.
+        #
+        # Then, eventually, we will ask the Ohloh API about each of
+        # those projects.
+        #
+        # It would be nice if there were a way to do this using only
+        # the Ohloh API, but I don't think there is.
+
+        # FIXME: Handle unicode input for username
+
+        return [{
+                'url': ('https://www.ohloh.net/accounts/%s' %
+                        urllib.quote(username)),
+                'callback': self.process_user_page,
+                'errback': self.squashIrrelevantErrors}]
+
     def getUrlsAndCallbacks(self):
         # First, we load download the user's profile page and look for
         # (project, contributor_id) pairs.
@@ -727,11 +746,22 @@ class OhlohUsernameImporter(AbstractOhlohAccountImporter):
         #
         # It would be nice if there were a way to do this using only
         # the Ohloh API, but I don't think there is.
-        return [{
-                'url': ('https://www.ohloh.net/accounts/%s' %
-                        urllib.quote(self.query)),
-                'callback': self.process_user_page,
-                'errback': self.squashIrrelevantErrors}]
+        if '@' in self.query:
+            # To handle email addresses with Ohloh, all we have to do
+            # is turn them into their MD5 hashes.
+            #
+            # If an account with that username exists, then Ohloh will redirect
+            # us to the actual account page.
+            #
+            # If not, we will probably get a 404.
+            hasher = hashlib.md5(); hasher.update(self.query)
+            hashed = hasher.hexdigest()
+            query = hashed
+        else:
+            # If it is not an email address, we can just pass it straight through.
+            query = self.query
+
+        return self.getUrlsAndCallbacksForUsername(query)
 
     def getUrlAndCallbackForProjectAndContributor(self, project_name,
                                                   contributor_id):

@@ -95,6 +95,7 @@ class FakeGetPage(object):
         self.url2data['https://www.ohloh.net/accounts/paulproteus'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', 'paulproteus')).read()
         self.url2data['https://www.ohloh.net/p/debian/contributors/18318035536880.xml?api_key=JeXHeaQhjXewhdktn4nUw'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', '18318035536880.xml')).read()
         self.url2data['https://www.ohloh.net/p/cchost/contributors/65837553699824.xml?api_key=JeXHeaQhjXewhdktn4nUw'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', '65837553699824.xml')).read()
+        self.url2data['https://www.ohloh.net/accounts/44c4e8d8ef5137fd8bcd78f9cee164ef'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', '44c4e8d8ef5137fd8bcd78f9cee164ef')).read()
     """This is a fake version of Twisted.web's getPage() function.
     It returns a Deferred that is already 'fired', and has the page content
     passed into it already.
@@ -752,6 +753,18 @@ class TestOhlohAccountImport(django.test.TestCase):
         self.assertEqual(set(['debian', 'cchost']),
                          projects)
         
+class TestOhlohAccountImportWithEmailAddress(TestOhlohAccountImport):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh',)
+    @mock.patch('mysite.search.tasks.PopulateProjectIconFromOhloh')
+    @mock.patch('twisted.web.client.getPage', fakeGetPage.getPage)
+    def setUp(self, do_nothing, do_nothing_1):
+        # Create a DataImportAttempt for Asheesh
+        asheesh = Person.objects.get(user__username='paulproteus')
+        self.dia = mysite.profile.models.DataImportAttempt.objects.create(
+            person=asheesh, source='oh', query='paulproteus.ohloh@asheesh.org')
+
 class BugzillaTests(django.test.TestCase):
     fixtures = ['miro-project']
     @mock.patch("mysite.customs.bugtrackers.bugzilla.url2bug_data")
