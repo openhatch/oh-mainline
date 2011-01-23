@@ -1,0 +1,507 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <title>Asheesh Laroia - Ohloh</title>
+  <meta name="description" content="Asheesh Laroia's Developer Profile on Ohloh." />
+  <meta name="keywords" content="ohloh, Asheesh Laroia, paulproteus" />
+
+  <link href="https://www.ohloh.net/stylesheets/main.css?1295542775" media="screen" rel="stylesheet" type="text/css" />
+  <link href="https://www.ohloh.net/stylesheets/thickbox.css?1295542694" media="screen" rel="stylesheet" type="text/css" />
+  <!--[if IE]>
+	<link href="https://www.ohloh.net/stylesheets/ie_hacks.css?1295542694" media="screen" rel="stylesheet" type="text/css" />
+  <script defer type="text/javascript" src="/javascripts/pngfix.js"></script>
+  <![endif]-->
+
+  <script src="https://www.ohloh.net/javascripts/jquery-1.2.6-with-plugins.min.js?1295542694" type="text/javascript"></script>
+  <script src="https://www.ohloh.net/javascripts/main.js?1295542694" type="text/javascript"></script>
+
+
+
+
+  
+
+  
+  </head>
+<body>
+  <div id="page">
+    <div class='row' id='mast'>
+  <div class='logos'>
+    <a class='ohloh' href='https://www.ohloh.net/'>    </a>
+    <a class='root' href='https://www.ohloh.net/'>    </a>
+  </div>
+</div>
+    <div class='row'>
+  <ul class='select_ main_menu clear'>
+    <li class='search'>
+      <form action='/search' class='search'>
+        <input class='text' name='q' type='text' />
+      </form>
+    </li>
+    <li class='session'>
+      <a href="https://www.ohloh.net/accounts/new"><span>Register</span></a>
+    </li>
+    <li class='session'>
+      <a href="https://www.ohloh.net/sessions/new"><span>Login</span></a>
+    </li>
+    <li class='home'><a href="/"><span>Home</span></a></li>
+    <li class='people'><a href="/people"><span>People</span></a></li>
+    <li class='projects'><a href="/p"><span>Projects</span></a></li>
+    <li class='forums'><a href="/forums"><span>Forums</span></a></li>
+    <li class='tools'><a href="/tools"><span>Tools</span></a></li>
+    <li class='blog'><a href="/blog"><span style="color:#cc3300">Blog</span></a></li>
+  </ul>
+  <ul class='nomargin session' style='display:none'>
+    <li><a href="/sessions/new">Login</a></li>
+    <li><a href="/accounts/new">Register</a></li>
+  </ul>
+</div>
+
+    
+    
+    
+
+    <div class="row">
+      <div class="col span_13 prepend_3 last">
+      </div>
+    </div>
+<div class='row'>
+  <div class='col span_3 layout_anchor'>
+    <div class='inset_middle'>
+      <div class='account_topleft float_right'>
+        <a href="/accounts/paulproteus" class="avatar "><img alt="Avatar" class="avatar" height="56" src="https://secure.gravatar.com/avatar.php?gravatar_id=44c4e8d8ef5137fd8bcd78f9cee164ef&amp;rating=PG&amp;size=56&amp;default=https%3a%2f%2fwww.ohloh.net%2fimages%2fanon%2fanon80.gif" width="56" /></a>
+      </div>
+    </div>
+  </div>
+  <div class='col span_13 last layout_h1 float_right'>
+    <div class='inset_middle'>
+      <h1><a href="/accounts/paulproteus">Asheesh Laroia</a></h1>
+    </div>
+  </div>
+</div>
+<div class='row'>
+  <div class='col span_3'>
+        <div class='sidebar mezzo sidebar_account'>
+      <div class='actions'>
+        <h6>
+          Summary
+        </h6>
+        <ul>
+          <li class=' selected first'>
+            <a class='' href='/accounts/paulproteus'>
+              Profile
+            </a>
+          </li>
+          <li class=' '>
+            <a class='' href='/accounts/paulproteus/messages'>
+              Journal
+            </a>
+          </li>
+          <li class=' '>
+            <a class='' href='/accounts/paulproteus/news'>
+              News
+            </a>
+          </li>
+          <li class=' '>
+            <a class='' href='/accounts/paulproteus/kudos'>
+              Kudos
+            </a>
+          </li>
+          <li class=' '>
+            <a class='' href='/accounts/paulproteus/widgets'>
+              Widgets
+            </a>
+          </li>
+          <li class=' '>
+            <a class='' href='/accounts/paulproteus/stacks'>
+              Stacks
+            </a>
+          </li>
+          <li class=' '>
+            <a class='' href='/accounts/paulproteus/projects'>
+              My Projects
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <hr class='one' />
+  </div>
+  <div class='col span_13 last mezzo'>
+    
+    <div class='col span_8'>
+      <div class='inset'>
+        <a class='needs_login follow' href='#'>
+          Follow
+        </a>
+        <a class='float_right follow_count' href='/accounts/paulproteus/followers'>
+          2 followers
+        </a>
+        <h4><a href="/accounts/paulproteus/messages">Journal</a></h4>
+        
+        <strong>No journal entries yet.</strong>
+      </div>
+      <div class='inset mezzo'>
+        <h4 class='nomargin'><a href="/accounts/paulproteus/positions">Experience</a></h4>
+      </div>
+      
+      <a class='position' href='/p/debian/contributors/18318035536880'>
+        <div class='inset'>
+              <h6>
+            Debian GNU/Linux
+            <span class='datespan'>
+              &mdash;
+            </span>
+            <span class='datespan'>
+              Nov 2006 to Present
+            </span>
+          </h6>
+      
+          
+          
+        </div>
+      </a>
+      
+      <a class='position' href='/p/cchost/contributors/65837553699824'>
+        <div class='inset'>
+              <h6>
+            ccHost
+            <span class='datespan'>
+              &mdash;
+            </span>
+            <span class='datespan'>
+              Jul 2007 to May 2009
+            </span>
+          </h6>
+      
+              <p class='nomargin'>
+            <span class='title'>
+              Software engineer
+            </span>
+            <span class='at'>
+              at
+            </span>
+            <span class='organization'>
+              Creative Commons
+            </span>
+          </p>
+      
+              <div class='metrics clear'>
+            <p class='nomargin committer small_caps'>
+              3 commits
+            </p>
+            <img alt="activity chart for Asheesh Laroia's contribution" class='nomargin' height='39' src='/accounts/19440/positions/37315/commits_compound_spark.png' width='378' />
+            <div class='subtitle float_right small_caps'>
+              Commit Timeline
+            </div>
+          </div>
+      
+        </div>
+      </a>
+      <div class='inset'>
+        <p class='nomargin'><a href="/accounts/paulproteus/positions">See All</a></p>
+      </div>
+      <div class='inset_top mezzo'>
+        <h4 class='nomargin'>Kudos</h4>
+        <div class='kudo_mantle'>
+          <div class='arrow_up'></div>
+          <div class='arrow_down'></div>
+          <a href="/people/rankings?show=19440" class="laurel"><img width='72' height='57' src='/images/icons/laurel_1.png' alt='KudoRank 1' /></a>
+          <div class='position'>
+                Ranked 
+            <a href="/people/rankings?show=19440">296182</a>
+             of 424490.
+        
+            
+          </div>
+        </div>
+      </div>
+      <div class='clear'>
+        <div class='col span_4 pp'>
+          <div class='inset_bottom'>
+            <h5 class='alt'>Kudos Received</h5>
+            
+            <p class='more_kudos'></p>
+            <p>No kudos received yet.</p>
+          </div>
+        </div>
+        <div class='col span_4 pp last'>
+          <div class='inset_bottom'>
+            <h5 class='alt'>Kudos Given</h5>
+            
+            <p>No kudos given yet.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class='col span_5 last'>
+      <div class='inset mezzo'>
+        <h4>About Me</h4>
+        <p></p>
+        <dl class='nomargin'>
+        </dl>
+      </div>
+      
+      <div class='inset mezzo'>
+        <h4>Ohloh Activity</h4>
+        <p class='nomargin date'>
+          Joined Ohloh
+          <span class='date'>09 Jun 2008</span>
+        </p>
+          <p class='nomargin'>
+          <a href="https://www.ohloh.net/accounts/paulproteus/edits">8 Ohloh website edits</a>
+        </p>
+      
+          <p class='nomargin'>
+          <a href="https://www.ohloh.net/accounts/paulproteus/posts">1 post</a>
+        </p>
+      
+          <p>
+          No project reviewed.
+        </p>
+      
+      </div>
+      <div class='mezzo' id='managed_projects'>
+        <div class='inset'>
+          <h4 class='nomargin'>I manage these projects:</h4>
+          <p class='nomargin'>
+            <a href="https://www.ohloh.net/p/ccsearch-" class="noborder">Creative Commons search engine</a>
+          </p>
+        </div>
+      </div>
+      <div class='inset mezzo'>
+        <h4>Language Experience</h4>
+      </div>
+      <table cellpadding='0' cellspacing='0' class='clean' summary='Coding experience by language for Asheesh Laroia' width='100%'>
+        <tr>
+          <th class='nobg' scope='col' width='60%'></th>
+          <th scope='col' width='20%'>Experience</th>
+          <th class='measure' scope='col' width='20%'>Measured</th>
+        </tr>
+        <tr class='even'>
+          <th class='lang small' scope='row' width='60%'>
+                  <span class='key' style='background:#EEE'>
+              &nbsp;
+            </span>
+      
+            <a href="/languages/52">Make</a>
+          </th>
+          <td class='right'>4y 2m</td>
+          <td class='measure right'>
+            0m
+          </td>
+        </tr>
+        <tr class='odd'>
+          <th class='lang small' scope='row' width='60%'>
+                  <span class='key' style='background:#777777'>
+              &nbsp;
+            </span>
+      
+            <a href="/languages/11">shell script</a>
+          </th>
+          <td class='right'>1m</td>
+          <td class='measure right'>
+            1m
+          </td>
+        </tr>
+      </table>
+      <hr class='one' />
+      <a class='promo' href='/accounts/paulproteus/widgets'>
+        <div class='inset'>
+          <h4>Widgets</h4>
+          <p>Learn how to embed this and other widgets on your site.</p>
+          <div class='badge_preview' style='text-align:center'>
+            <img src='/accounts/19440/widgets/account_rank.gif' />
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+</div>
+    <div class="clear" style="padding:1px;"></div>
+    <div id='footer'>
+  <div class='row'>
+    <div class='col span_3 mezzo'>
+      <div class='inset'>
+        <h4>Ohloh</h4>
+        <ul>
+          <li>
+            <a href='https://www.ohloh.net/about/us'>About</a>
+          </li>
+          <li>
+            <a href='https://www.ohloh.net/help/support'>Support</a>
+          </li>
+          <li>
+            <a href='https://www.ohloh.net/blog'>Blog</a>
+          </li>
+          <li>
+            <a href='https://www.ohloh.net/releases'>Releases</a>
+          </li>
+          <li>
+            <a href='https://www.ohloh.net/about/news'>News</a>
+          </li>
+          <li><a href="https://www.ohloh.net/forums">Forums</a></li>
+          <li>
+            <a href='https://www.ohloh.net/api/getting_started'>API</a>
+          </li>
+          <li>
+            <a href='https://www.ohloh.net/about/terms'>Terms</a>
+          </li>
+          <li>
+            <a href='https://www.ohloh.net/about/privacy'>Privacy</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class='col span_3 mezzo'>
+      <div class='inset'>
+        <h4>New Projects</h4>
+        <ul>
+          <li><a href="https://www.ohloh.net/p/klipped">klipped</a></li>
+          <li><a href="https://www.ohloh.net/p/moka-release-manager">Moka Release Manager</a></li>
+          <li><a href="https://www.ohloh.net/p/thunar-archive-plugin">thunar-archive-plugin</a></li>
+          <li><a href="https://www.ohloh.net/p/udisks-glue">udisks-glue</a></li>
+          <li><a href="https://www.ohloh.net/p/reak">Reak</a></li>
+          <li><a href="https://www.ohloh.net/p/dectmon">dectmon</a></li>
+          <li><a href="https://www.ohloh.net/p/chan_dect">chan_dect</a></li>
+          <li><a href="https://www.ohloh.net/p/libdect">libdect</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class='col span_5 mezzo'>
+      <div class='inset'>
+        <h4><a href="/posts">Recent Posts</a></h4>
+        <ul>
+          <li>
+            <a class='listing_block' href='/forums/11/topics/6114#posts-17144'>
+              Nokia N97 (20GB) $450usd
+              <span class='author'>
+                by
+                phonesaller
+              </span>
+              <br />
+              <div class='comment'>
+                Dear Customers,
+                We are Lee Phone Shop Ltd. Co.. We are on our Esther promo “Buy 3(three) get 1(on...
+              </div>
+            </a>
+          </li>
+          <li>
+            <a class='listing_block' href='/forums/3492/topics/6113#posts-17143'>
+              Blackberry Storm 9500————————-$270USD
+              <span class='author'>
+                by
+                phonesaller
+              </span>
+              <br />
+              <div class='comment'>
+                Dear Customers,
+                We are Lee Phone Shop Ltd. Co.. We are on our Esther promo “Buy 3(three) get 1(on...
+              </div>
+            </a>
+          </li>
+          <li>
+            <a class='listing_block' href='/forums/8/topics/6112#posts-17142'>
+              Apple iPhone 3GS 32gb——————–300USD
+              <span class='author'>
+                by
+                phonesaller
+              </span>
+              <br />
+              <div class='comment'>
+                Dear Customers,
+                We are Lee Phone Shop Ltd. Co.. We are on our Esther promo “Buy 3(three) get 1(on...
+              </div>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class='col span_5 mezzo last'>
+      <div class='inset'>
+        <h4><a href="/reviews?sort_by=recently_added">Recent Reviews</a></h4>
+        <ul>
+          <li>
+            <a class='listing_block' href='https://www.ohloh.net/p/kaltura-ce/reviews'>
+              Kaltura On Prem Community Edition (CE)
+              <span class='author'>
+                by
+                Zohar Babin
+              </span>
+              <br />
+              			<span id="footer_star_2094">
+              			<span style="font-size:1px;float:left;display:inline;height:13px;width:57px;background:url(/images/stars/stars_ro_mini.png) left bottom">&nbsp;</span>
+              			</span>
+              <br />
+              <span class='comment'>
+                If you need to create a media archive for your library, create your own Web TV channel (or networ...
+              </span>
+            </a>
+          </li>
+          <li>
+            <a class='listing_block' href='https://www.ohloh.net/p/fblmapviewer/reviews'>
+              fbl map viewer editor
+              <span class='author'>
+                by
+                djeghel147
+              </span>
+              <br />
+              			<span class='stars' id="footer_star_2093">
+              			<span style="font-size:1px;float:left;display:inline;height:13px;width:57px;background:url(/images/stars/stars_0_mini.png) right bottom">&nbsp;</span>
+              			</span>
+              <br />
+              <span class='comment'>
+                147
+              </span>
+            </a>
+          </li>
+          <li>
+            <a class='listing_block' href='https://www.ohloh.net/p/ow2_chameleon/reviews'>
+              OW2 Chameleon
+              <span class='author'>
+                by
+                doncorley
+              </span>
+              <br />
+              			<span id="footer_star_2092">
+              			<span style="font-size:1px;float:left;display:inline;height:13px;width:57px;background:url(/images/stars/stars_ro_mini.png) left bottom">&nbsp;</span>
+              			</span>
+              <br />
+              <span class='comment'>
+                This is a great project to use if your want a template for creating you own OSGi bundles. Also, t...
+              </span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <p style='clear:left'>&nbsp;</p>
+  <p class='copyright clear'>
+    Copyright ©
+    2011
+    <a href="http://www.blackducksoftware.com">Black Duck Software, Inc.</a>,
+    All Rights Reserved.
+  </p>
+</div>
+
+  <script type="text/javascript">
+
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-20399350-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+
+  </script>
+
+  
+
+  </div>
+</body>
+</html>

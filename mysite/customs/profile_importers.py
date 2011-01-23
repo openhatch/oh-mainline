@@ -648,38 +648,46 @@ class AbstractOhlohAccountImporter(ProfileImporter):
         if many:
             return relevant_tag_dicts
 
-    def enhance_ohloh_contributor_facts(self, c_fs, filter_out_based_on_query=True):
+    def enhance_ohloh_contributor_facts(self, c_fs, filter_out_based_on_query=True, override_project_name=None):
         ret = []
         for c_f in c_fs:
-            if 'analysis_id' not in c_f:
-                continue # this contributor fact is useless
-
             # Ohloh matches on anything containing the username we asked for as a substring,
             # so check that the contributor fact actually matches the whole string (case-insensitive).
+            if override_project_name:
+                # FIXME: In this case, do a check with Ohloh that we have the right
+                # canonicalization of the project name.
+                project_data = {'name': override_project_name}
+            else:
+                if 'analysis_id' not in c_f:
+                    continue # this contributor fact is useless
+                eyedee = int(c_f['analysis_id'])
+                project_data = {'name': eyedee}
+                # project_data = self.analysis2projectdata(eyedee)
+                # FIXME: BLOCKING
+
             if filter_out_based_on_query:
                 if self.query.lower() != c_f['contributor_name'].lower():
                     continue
-
-            eyedee = int(c_f['analysis_id'])
-            project_data = {'name': eyedee}
-            # project_data = self.analysis2projectdata(eyedee)
-            # FIXME: BLOCKING
 
             # permalink = generate_contributor_url(
             # project_data['name'],
             # int(c_f['contributor_id'])) # FIXME: BLOCKING
             permalink = 'http://example.com/'
+            if 'man_months' in c_f:
+                man_months = int(c_f['man_months'])
+            else:
+                man_months = None # Unknown
 
             this = dict(
                 project=project_data['name'],
                 project_homepage_url=project_data.get('homepage_url', None),
                 permalink=permalink,
                 primary_language=c_f.get('primary_language_nice_name', ''),
-                man_months=int(c_f['man_months']))
+                man_months=man_months)
             ret.append(this)
         return ret
 
-    def parse_then_filter_then_interpret_ohloh_xml(self, xml_string, filter_out_based_on_query=True):
+    def parse_then_filter_then_interpret_ohloh_xml(self, xml_string, filter_out_based_on_query=True, override_project_name=None):
         tree = self.parse_ohloh_xml(xml_string)
         if tree is None:
             return
@@ -688,7 +696,7 @@ class AbstractOhlohAccountImporter(ProfileImporter):
         if not list_of_dicts:
             return
 
-        list_of_dicts = self.enhance_ohloh_contributor_facts(list_of_dicts, filter_out_based_on_query)
+        list_of_dicts = self.enhance_ohloh_contributor_facts(list_of_dicts, filter_out_based_on_query, override_project_name)
 
         # Okay, so we know we got some XML back, and that we have converted
         # its tags to unicode<->unicode dictionaries.
@@ -721,7 +729,7 @@ class OhlohUsernameImporter(AbstractOhlohAccountImporter):
         # the Ohloh API, but I don't think there is.
         return [{
                 'url': ('https://www.ohloh.net/accounts/%s' %
-                        urllib.quote(ohloh_username)),
+                        urllib.quote(self.query)),
                 'callback': self.process_user_page,
                 'errback': self.squashIrrelevantErrors}]
 
@@ -736,14 +744,14 @@ class OhlohUsernameImporter(AbstractOhlohAccountImporter):
         # The parse_then_... method typically checks each Ohloh contributor_fact
         # to make sure it is relevant. Since we know they are all relevant,
         # we can skip that check.
-        callback = lambda data: self.parse_then_filter_then_interpret_ohloh_xml(data, filter_out_based_on_query=False)
+        callback = lambda data: self.parse_then_filter_then_interpret_ohloh_xml(data, filter_out_based_on_query=False, override_project_name=project_name)
 
         return {'url': self.url_for_ohloh_query(base_url),
                 'callback': callback,
                 'errback': self.squashIrrelevantErrors}
 
     def process_user_page(self, html_string):
-        root = lxml.html.parse(StringIO.StringIO(html_string))
+        root = lxml.html.parse(StringIO.StringIO(html_string)).getroot()
         relevant_links = root.cssselect('a.position')
         relevant_hrefs = [link.attrib['href'] for link in relevant_links if '/contributors/' in link.attrib['href']]
         relevant_project_and_contributor_id_pairs = []
@@ -756,6 +764,7 @@ class OhlohUsernameImporter(AbstractOhlohAccountImporter):
 
         for (project_name, contributor_id) in relevant_project_and_contributor_id_pairs:
             self.command.call_getPage_on_data_dict(
+                self,
                 self.getUrlAndCallbackForProjectAndContributor(
                     project_name, contributor_id))
 
@@ -767,4 +776,5 @@ SOURCE_TO_CLASS = {
     'gh': GithubImporter,
     'lp': LaunchpadProfilePageScraper,
     'rs': RepositorySearchOhlohImporter,
+    'oh': OhlohUsernameImporter,
 }

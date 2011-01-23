@@ -92,6 +92,9 @@ class FakeGetPage(object):
             settings.MEDIA_ROOT, 'sample-data', 'launchpad', '~Mozilla')).read()
         self.url2data['http://api.bitbucket.org/1.0/users/paulproteus/'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'bitbucket', 'paulproteus.json')).read()
         self.url2data['http://www.ohloh.net/contributors.xml?query=paulproteus&api_key=JeXHeaQhjXewhdktn4nUw'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', 'contributors.xml?query=paulproteus&api_key=JeXHeaQhjXewhdktn4nUw')).read()
+        self.url2data['https://www.ohloh.net/accounts/paulproteus'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', 'paulproteus')).read()
+        self.url2data['https://www.ohloh.net/p/debian/contributors/18318035536880.xml?api_key=JeXHeaQhjXewhdktn4nUw'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', '18318035536880.xml')).read()
+        self.url2data['https://www.ohloh.net/p/cchost/contributors/65837553699824.xml?api_key=JeXHeaQhjXewhdktn4nUw'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', '65837553699824.xml')).read()
     """This is a fake version of Twisted.web's getPage() function.
     It returns a Deferred that is already 'fired', and has the page content
     passed into it already.
@@ -694,7 +697,7 @@ class TestOhlohRepositorySearch(django.test.TestCase):
         self.dia = mysite.profile.models.DataImportAttempt.objects.create(
             person=asheesh, source='rs', query='paulproteus')
 
-        self.aoai = mysite.customs.profile_importers.AbstractOhlohAccountImporter(
+        self.aoai = mysite.customs.profile_importers.RepositorySearchOhlohImporter(
             query=self.dia.query, dia_id=self.dia.id, command=None)
 
     @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh',)
@@ -716,6 +719,38 @@ class TestOhlohRepositorySearch(django.test.TestCase):
         projects = set([c.portfolio_entry.project.name for c in mysite.profile.models.Citation.objects.all()])
         self.assertEqual(projects,
                          set([u'1454281', u'1143684']))
+        
+class TestOhlohAccountImport(django.test.TestCase):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh',)
+    @mock.patch('mysite.search.tasks.PopulateProjectIconFromOhloh')
+    @mock.patch('twisted.web.client.getPage', fakeGetPage.getPage)
+    def setUp(self, do_nothing, do_nothing_1):
+        # Create a DataImportAttempt for Asheesh
+        asheesh = Person.objects.get(user__username='paulproteus')
+        self.dia = mysite.profile.models.DataImportAttempt.objects.create(
+            person=asheesh, source='oh', query='paulproteus')
+
+    @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh',)
+    @mock.patch('mysite.search.tasks.PopulateProjectIconFromOhloh')
+    @mock.patch('twisted.web.client.getPage', fakeGetPage.getPage)
+    def test_integration(self, ignore, ignore_2):
+        # setUp() already created the DataImportAttempt
+        # so we just run the command:
+        cmd = mysite.customs.management.commands.customs_twist.Command()
+        cmd.handle(use_reactor=False)
+
+        # And now, the dia should be completed.
+        dia = mysite.profile.models.DataImportAttempt.objects.get(id=self.dia.id)
+        self.assertTrue(dia.completed)
+
+        # And Asheesh should have some new projects available.
+        # FIXME: This should use the project name, not just the lame
+        # current Ohloh analysis ID.
+        projects = set([c.portfolio_entry.project.name for c in mysite.profile.models.Citation.objects.all()])
+        self.assertEqual(set(['debian', 'cchost']),
+                         projects)
         
 class BugzillaTests(django.test.TestCase):
     fixtures = ['miro-project']
