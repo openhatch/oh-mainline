@@ -26,6 +26,8 @@ import datetime
 import collections
 import logging
 import urlparse
+import xml.etree.ElementTree as ET
+import xml.parsers.expat
 
 import mysite.search.models
 import mysite.profile.models
