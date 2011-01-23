@@ -92,8 +92,8 @@ source2actual_action = {
         'db': do_nothing_because_this_functionality_moved_to_twisted,
         'lp': do_nothing_because_this_functionality_moved_to_twisted,
         'bb': do_nothing_because_this_functionality_moved_to_twisted,
-    
-        'rs': rs_action,
+        'rs': do_nothing_because_this_functionality_moved_to_twisted,
+
         'ou': ou_action,
         }
 

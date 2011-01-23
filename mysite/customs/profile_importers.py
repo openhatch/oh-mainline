@@ -693,6 +693,9 @@ class AbstractOhlohAccountImporter(ProfileImporter):
         # its tags to unicode<->unicode dictionaries.
         self.ohloh_data_to_citations(list_of_dicts)
 
+class RepositorySearchOhlohImporter(AbstractOhlohAccountImporter):
+    BASE_URL = 'http://www.ohloh.net/contributors.xml'
+
     def getUrlsAndCallbacks(self):
         url = self.url_for_ohloh_query(url=self.BASE_URL,
                                        params={u'query': self.query})
@@ -702,8 +705,7 @@ class AbstractOhlohAccountImporter(ProfileImporter):
                 'errback': self.squashIrrelevantErrors,
                 'callback': self.parse_then_filter_then_interpret_ohloh_xml}]
 
-class RepositorySearchOhlohImporter(AbstractOhlohAccountImporter):
-    BASE_URL = 'http://www.ohloh.net/contributors.xml'
+###
 
 ###
 

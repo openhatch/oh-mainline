@@ -674,13 +674,13 @@ class TestAbstractOhlohAccountImporter(django.test.TestCase):
                 'man_months': 3,
                 'primary_language': 'Python',
                 'permalink': 'http://example.com/',
-                'analysis_id': 17, # dummy
+                'analysis_id': 1717, # dummy
                 }
             ]
 
         output = self.aoai.enhance_ohloh_contributor_facts(c_fs)
         self.assertEqual(1, len(output))
-        self.assertEqual('project_name', output[0]['project'])
+        self.assertEqual(17, output[0]['project']) # FIXME
 
 class TestOhlohRepositorySearch(django.test.TestCase):
     fixtures = ['user-paulproteus', 'person-paulproteus']
