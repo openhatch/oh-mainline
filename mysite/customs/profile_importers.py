@@ -648,7 +648,7 @@ class AbstractOhlohAccountImporter(ProfileImporter):
         if many:
             return relevant_tag_dicts
 
-    def enhance_ohloh_contributor_facts(self, c_fs):
+    def enhance_ohloh_contributor_facts(self, c_fs, filter_out_based_on_query=True):
         ret = []
         for c_f in c_fs:
             if 'analysis_id' not in c_f:
@@ -656,8 +656,9 @@ class AbstractOhlohAccountImporter(ProfileImporter):
 
             # Ohloh matches on anything containing the username we asked for as a substring,
             # so check that the contributor fact actually matches the whole string (case-insensitive).
-            if self.query.lower() != c_f['contributor_name'].lower():
-                continue
+            if filter_out_based_on_query:
+                if self.query.lower() != c_f['contributor_name'].lower():
+                    continue
 
             eyedee = int(c_f['analysis_id'])
             project_data = {'name': eyedee}
@@ -678,7 +679,7 @@ class AbstractOhlohAccountImporter(ProfileImporter):
             ret.append(this)
         return ret
 
-    def parse_then_filter_then_interpret_ohloh_xml(self, xml_string):
+    def parse_then_filter_then_interpret_ohloh_xml(self, xml_string, filter_out_based_on_query=True):
         tree = self.parse_ohloh_xml(xml_string)
         if tree is None:
             return
@@ -687,7 +688,7 @@ class AbstractOhlohAccountImporter(ProfileImporter):
         if not list_of_dicts:
             return
 
-        list_of_dicts = self.enhance_ohloh_contributor_facts(list_of_dicts)
+        list_of_dicts = self.enhance_ohloh_contributor_facts(list_of_dicts, filter_out_based_on_query)
 
         # Okay, so we know we got some XML back, and that we have converted
         # its tags to unicode<->unicode dictionaries.
@@ -706,6 +707,57 @@ class RepositorySearchOhlohImporter(AbstractOhlohAccountImporter):
                 'callback': self.parse_then_filter_then_interpret_ohloh_xml}]
 
 ###
+
+class OhlohUsernameImporter(AbstractOhlohAccountImporter):
+
+    def getUrlsAndCallbacks(self):
+        # First, we load download the user's profile page and look for
+        # (project, contributor_id) pairs.
+        #
+        # Then, eventually, we will ask the Ohloh API about each of
+        # those projects.
+        #
+        # It would be nice if there were a way to do this using only
+        # the Ohloh API, but I don't think there is.
+        return [{
+                'url': ('https://www.ohloh.net/accounts/%s' %
+                        urllib.quote(ohloh_username)),
+                'callback': self.process_user_page,
+                'errback': self.squashIrrelevantErrors}]
+
+    def getUrlAndCallbackForProjectAndContributor(self, project_name,
+                                                  contributor_id):
+        base_url = 'https://www.ohloh.net/p/%s/contributors/%d.xml' % (
+            urllib.quote(project_name), contributor_id)
+
+        # Since we know that the contributor ID truly does correspond
+        # to this OpenHatch user, we pass in filter_out_based_on_query=False.
+        #
+        # The parse_then_... method typically checks each Ohloh contributor_fact
+        # to make sure it is relevant. Since we know they are all relevant,
+        # we can skip that check.
+        callback = lambda data: self.parse_then_filter_then_interpret_ohloh_xml(data, filter_out_based_on_query=False)
+
+        return {'url': self.url_for_ohloh_query(base_url),
+                'callback': callback,
+                'errback': self.squashIrrelevantErrors}
+
+    def process_user_page(self, html_string):
+        root = lxml.html.parse(StringIO.StringIO(html_string))
+        relevant_links = root.cssselect('a.position')
+        relevant_hrefs = [link.attrib['href'] for link in relevant_links if '/contributors/' in link.attrib['href']]
+        relevant_project_and_contributor_id_pairs = []
+        # FIXME: do more logging here someday?
+        for href in relevant_hrefs:
+            project, contributor_id = re.split('[/][a-z]+[/]', href, 1
+                                               )[1].split('/contributors/')
+            relevant_project_and_contributor_id_pairs.append(
+                (project, int(contributor_id)))
+
+        for (project_name, contributor_id) in relevant_project_and_contributor_id_pairs:
+            self.command.call_getPage_on_data_dict(
+                self.getUrlAndCallbackForProjectAndContributor(
+                    project_name, contributor_id))
 
 ###
 
