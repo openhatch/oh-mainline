@@ -3,7 +3,7 @@
 
 # This file is part of OpenHatch.
 # Copyright (C) 2010 Jack Grigg
-# Copyright (C) 2010 Karen
+# Copyright (C) 2010 Karen Rustad
 # Copyright (C) 2009, 2010, 2011 OpenHatch
 # Copyright (C) 2010 Mark Freeman
 #

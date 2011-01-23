@@ -1,6 +1,6 @@
 # This file is part of OpenHatch.
 # Copyright (C) 2010 Parker Phinney
-# Copyright (C) 2010 Karen
+# Copyright (C) 2010 Karen Rustad
 # Copyright (C) 2009, 2010 OpenHatch
 # Copyright (C) 2010 Mark Freeman
 # Copyright (C) 2010 Jessica McKellar
