@@ -636,6 +636,22 @@ class TestAbstractOhlohAccountImporter(django.test.TestCase):
         parsed = self.aoai.parse_ohloh_xml('''<something></something>''')
         self.assertTrue(parsed)
 
+    def test_parse_ohloh_error_xml(self):
+        # returns None if the XML is an Ohloh error
+        parsed = self.aoai.parse_ohloh_xml('''<response><error /></response>''')
+        self.assert_(parsed is None)
+
+    def test_xml_tag_to_dict(self):
+        parsed = self.aoai.parse_ohloh_xml('''<response>
+        <wrapper><key>value</key></wrapper>
+        </response>''')
+        self.assertTrue(parsed)
+
+        as_dict_list = self.aoai.filter_ohloh_xml(
+            parsed, selector='/wrapper', many=True)
+        self.assertEquals([{'key': 'value'}],
+                          as_dict_list)
+
     @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh',)
     @mock.patch('mysite.search.tasks.PopulateProjectIconFromOhloh')
     @mock.patch('twisted.web.client.getPage', fakeGetPage.getPage)

@@ -29,6 +29,8 @@ import urlparse
 import xml.etree.ElementTree as ET
 import xml.parsers.expat
 
+from django.utils.encoding import force_unicode
+
 import mysite.search.models
 import mysite.profile.models
 import mysite.base.helpers
@@ -616,18 +618,26 @@ class AbstractOhlohAccountImporter(ProfileImporter):
 
         return tree
 
+    def xml_tag_to_dict(self, tag):
+        '''This method turns the input tag into a dictionary of
+        Unicode strings.
+
+        We use this across the Ohloh import code because I feel more
+        comfortable passing native Python dictionaries around, rather
+        than thick, heavy XML things.
+
+        (That, and dictionaries are easier to use in the test suite.'''
+        this = {}
+        for child in tag.getchildren():
+            if child.text:
+                this[unicode(child.tag)] = force_unicode(child.text)
+        return this
+
     def filter_ohloh_xml(self, root, selector, many=False):
         relevant_tag_dicts = []
         interestings = root.findall(selector)
         for interesting in interestings:
-            # Turn each interesting element into a dictionary,
-            # just because I feel more comfortable passing native
-            # Python objects around rather than thick, heavy XML things.
-            #
-            # (that, and dictionaries are easier to use in the test suite)
-            for child in interesting.getchildren():
-                if child.text:
-                    this[unicode(child.tag)] = uni_text(child.text)
+            this = self.xml_tag_to_dict(interesting)
             # Good, now we have a dictionary version of the XML tag.
             if many:
                 relevant_tag_dicts.append(this)
