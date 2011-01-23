@@ -1,5 +1,7 @@
 # This file is part of OpenHatch.
 # Copyright (C) 2010 Jack Grigg
+# Copyright (C) 2010, 2011 OpenHatch, Inc.
+# Copyright (C) 2010 John Stumpo
 # Copyright (C) 2010 Jessica McKellar
 #
 # This program is free software: you can redistribute it and/or modify
