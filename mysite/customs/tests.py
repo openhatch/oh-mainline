@@ -605,6 +605,7 @@ class TestAbstractOhlohAccountImporter(django.test.TestCase):
                 'man_months': 3,
                 'primary_language': 'Python',
                 'permalink': 'http://example.com/',
+                'analysis_id': 17, # dummy
                 },
             # One irrelevant match
             {
@@ -613,11 +614,13 @@ class TestAbstractOhlohAccountImporter(django.test.TestCase):
                 'man_months': 3,
                 'primary_language': 'Python',
                 'permalink': 'http://example.com/',
+                'analysis_id': 17, # dummy
                 }
             ]
 
         output = self.aoai.enhance_ohloh_contributor_facts(c_fs)
-        self.assertEqual(output, [c_fs[0]])
+        self.assertEqual(1, len(output))
+        self.assertEqual('project_name', output[0]['project'])
         
 class BugzillaTests(django.test.TestCase):
     fixtures = ['miro-project']

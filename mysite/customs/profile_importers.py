@@ -640,10 +640,11 @@ class AbstractOhlohAccountImporter(ProfileImporter):
 
             # Ohloh matches on anything containing the username we asked for as a substring,
             # so check that the contributor fact actually matches the whole string (case-insensitive).
-            if username.lower() != c_f['contributor_name'].lower():
+            if self.query.lower() != c_f['contributor_name'].lower():
                 continue
 
             eyedee = int(c_f['analysis_id'])
+            project_data = {'name': c_f['project']}
             # project_data = self.analysis2projectdata(eyedee)
             # FIXME: BLOCKING
 
@@ -653,7 +654,7 @@ class AbstractOhlohAccountImporter(ProfileImporter):
             permalink = 'http://example.com/'
 
             this = dict(
-                project='EXAMPLE', # FIXME: project_data['name'],
+                project=project_data['name'],
                 project_homepage_url=project_data.get('homepage_url', None),
                 permalink=permalink,
                 primary_language=c_f.get('primary_language_nice_name', ''),
