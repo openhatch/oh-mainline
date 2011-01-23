@@ -581,7 +581,7 @@ class AbstractOhlohAccountImporter(ProfileImporter):
         citation.data_import_attempt = self.get_dia()
         citation.save_and_check_for_duplicates()
 
-    def url_for_ohloh_query(self, params=None, API_KEY=None):
+    def url_for_ohloh_query(self, url, params=None, API_KEY=None):
         if API_KEY is None:
             API_KEY = settings.OHLOH_API_KEY
 
@@ -591,6 +591,9 @@ class AbstractOhlohAccountImporter(ProfileImporter):
         params = my_params ; del my_params
 
         encoded = mysite.base.unicode_sanity.urlencode(params)
+        if url[-1] != '?':
+            url += u'?'
+
         url += encoded
         return url
 

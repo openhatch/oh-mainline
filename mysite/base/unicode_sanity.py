@@ -39,7 +39,7 @@ def urlencode(unicode_dict):
             bad_values.append(value)
         utf8_dict[unicode(key).encode('utf-8')] = unicode(value).encode('utf-8')
     if bad_keys or bad_values:
-        raise ProgrammingError
+        raise ValueError
         #import pdb
         #pdb.set_trace()
     return _urlencode(utf8_dict)

@@ -35,6 +35,7 @@ import time
 import twill
 import lxml
 import sys
+import urlparse
 from twill import commands as tc
 from twill.shell import TwillCommandLoop
 
@@ -592,6 +593,33 @@ class TestAbstractOhlohAccountImporter(django.test.TestCase):
         # Hey, look, it made a Citation.
         self.assert_(mysite.profile.models.PortfolioEntry.objects.all().count())
         self.assert_(mysite.profile.models.Citation.objects.all().count())
+
+    @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh',)
+    @mock.patch('mysite.search.tasks.PopulateProjectIconFromOhloh')
+    @mock.patch('twisted.web.client.getPage', fakeGetPage.getPage)
+    def test_generate_url(self, do_nothing, do_nothing_1):
+        params = {u'query': unicode(self.dia.query)}
+        expected_query_items = sorted(
+            {u'api_key': u'key',
+             u'query': unicode(self.dia.query)}.items())
+            
+        url = self.aoai.url_for_ohloh_query(
+            url=u'http://example.com/',
+            params=params,
+            API_KEY='key')
+        base, rest = url.split('?', 1)
+        self.assertEquals('http://example.com/', base)
+        self.assertEquals(expected_query_items,
+                          sorted(urlparse.parse_qsl(rest)))
+
+        url = self.aoai.url_for_ohloh_query(
+            url='http://example.com/?',
+            params=params,
+            API_KEY='key')
+        base, rest = url.split('?', 1)
+        self.assertEquals('http://example.com/', base)
+        self.assertEquals(expected_query_items,
+                          sorted(urlparse.parse_qsl(rest)))
 
     @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh',)
     @mock.patch('mysite.search.tasks.PopulateProjectIconFromOhloh')
