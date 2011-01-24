@@ -312,14 +312,20 @@ class Project(OpenHatchModel):
         else:
             return None
     
-def populate_icon_on_project_creation(instance, created, *args, **kwargs):
+def populate_icon_on_project_creation(instance, raw, created, *args, **kwargs):
+    if raw:
+        return
+
     import mysite.search.tasks
     if created and not instance.icon_raw:
         task = mysite.search.tasks.PopulateProjectIconFromOhloh()
         task.delay(project_id=instance.id)
 
-def grab_project_language_from_ohloh(instance, created, *args,
+def grab_project_language_from_ohloh(instance, raw, created, *args,
                                      **kwargs):
+    if raw:
+        return
+
     import mysite.search.tasks
     if created and not instance.language:
         task = mysite.search.tasks.PopulateProjectLanguageFromOhloh()
@@ -579,7 +585,10 @@ class HitCountCache(OpenHatchModel):
         # Ignore arguments passed here by Django signals.
         HitCountCache.objects.all().delete()
 
-def post_bug_save_increment_bug_model_epoch(sender, instance, created, **kwargs):
+def post_bug_save_increment_bug_model_epoch(sender, raw, instance, created, **kwargs):
+    if raw:
+        return # this is coming in from loaddata. You must know what you are doing.
+
     if created:
         return # whatever, who cares
     if instance.looks_closed:
