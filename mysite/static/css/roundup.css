@@ -84,3 +84,20 @@ td.date, th.date {
 	height: 60px;
 	background: url('https://openhatch.org/static/images/the-logo-bluegreen-87px.png') no-repeat;
 }
+
+p.ok-message {
+    background-color: #c4ee7e;
+    padding: 5px;
+    font-weight: bold;
+}
+
+p.error-message {
+    background-color: #f98;
+    padding: 5px;
+    font-weight: bold;
+}
+
+p.error-message a[href] {
+    color: white;
+    text-decoration: underline;
+}
