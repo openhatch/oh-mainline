@@ -283,9 +283,18 @@ class Project(OpenHatchModel):
 
     @mysite.base.decorators.cached_property
     def get_mentors_search_url(self):
-        query_string = mysite.base.unicode_sanity.urlencode({u'q': u'can_mentor:"%s"' %
-                                         self.language})
-        return reverse(mysite.profile.views.people) + '?' + query_string
+        import mysite.profile.controllers
+        mentor_count = len(set(mysite.profile.controllers.people_matching(
+            'can_mentor', self.name)))
+        if mentor_count > 0 or self.language:
+            query_var = self.name
+            if mentor_count == 0:
+                query_var = self.language
+            query_string = mysite.base.unicode_sanity.urlencode({u'q': u'can_mentor:"%s"' %
+                                             query_var})
+            return reverse(mysite.profile.views.people) + '?' + query_string
+        else:
+            return ""
 
     def get_open_bugs(self):
         return Bug.open_ones.filter(project=self)

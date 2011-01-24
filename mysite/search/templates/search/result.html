@@ -15,8 +15,12 @@
 
     {# Mentors #}
     <div class="helpers">
+        {% if bug.project.get_mentors_search_url and bug.project.potential_mentors %}
         <a href="{{ bug.project.get_mentors_search_url }}">
             Mentors ({{bug.project.potential_mentors|length}})</a>
+        {% else %}
+        <div class="no_mentors">No Mentors</div>
+        {% endif %}
     </div>
 
     <div class='below_the_fold'>

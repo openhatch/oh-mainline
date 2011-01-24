@@ -84,6 +84,7 @@ body#search #results ul { margin: 0; padding: 0; float: left; width: 99%; }
         body#search #results li .below_the_fold { color: #555; display: none; }
         body#search #results li .helpers { font-size: .8em; margin-top: 5px; }
         body#search #results li .helpers a { color: #ffa588;  }
+        body#search #results li .helpers .no_mentors { color: #555;  }
         body#search #results li:hover .helpers a, body#search #results li.expanded .helpers a { color: #ff6d3d; }
 
         /*      Bug data
