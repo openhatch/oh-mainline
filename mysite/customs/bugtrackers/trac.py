@@ -1,5 +1,5 @@
 # This file is part of OpenHatch.
-# Copyright (C) 2010 Jack Grigg
+# Copyright (C) 2010, 2011 Jack Grigg
 # Copyright (C) 2010 OpenHatch, Inc.
 #
 # This program is free software: you can redistribute it and/or modify
@@ -18,6 +18,7 @@
 import cgi
 import csv
 import datetime
+import feedparser
 import logging
 import urlparse
 import urllib2
@@ -29,6 +30,7 @@ import lxml.html.clean
 from mysite.base.decorators import cached_property
 import mysite.base.helpers
 import mysite.base.unicode_sanity
+from mysite.customs.models import TracTimeline, TracBugTimes
 import mysite.customs.ohloh
 import mysite.search.models
 import mysite.search.templatetags.search
@@ -155,7 +157,7 @@ class TracBug:
         s = cgi.escape(s)
         return s
 
-    def as_data_dict_for_bug_object(self, extract_tracker_specific_data):
+    def as_data_dict_for_bug_object(self, extract_tracker_specific_data, old_trac):
         trac_data = self.as_bug_specific_csv_data()
         html_data = self.get_parsed_bug_html_page()
 
@@ -199,20 +201,106 @@ class TracBug:
         ret['people_involved'] = len(all_people)
 
         # FIXME: Need time zone
-        ret['date_reported'] = TracBug.page2date_opened(html_data)
-        ret['last_touched'] = TracBug.page2date_modified(html_data)
+        if not old_trac:
+            # All is fine, proceed as normal.
+            ret['date_reported'] = TracBug.page2date_opened(html_data)
+            ret['last_touched'] = TracBug.page2date_modified(html_data)
 
         ret = extract_tracker_specific_data(trac_data, ret)
         return ret
+
+class TracBugTimeline(object):
+    def __init__(self, base_url, project_name):
+        self.project_name = project_name
+        try:
+            self.timeline = TracTimeline.all_timelines.get(base_url = base_url)
+        except TracTimeline.DoesNotExist:
+            self.timeline = TracTimeline(base_url = base_url)
+        # Unsure if this is required here, but can't hurt.
+        self.timeline.save()
+
+    def generate_timeline_entries_from_rss(self, days_back):
+        rss_url = urlparse.urljoin(self.timeline.base_url,
+                            "timeline?ticket=on&daysback=%d&format=rss" % days_back)
+        logging.info("[Trac] Fetching timeline RSS...")
+        feed = feedparser.parse(rss_url)
+        for entry in feed.entries:
+            yield entry
+
+    def update(self):
+        logging.info("[Trac] Started refreshing timeline for project named %s." % self.project_name)
+
+        # Check when the timeline was last updated.
+        timeline_age = datetime.datetime.utcnow() - self.timeline.last_polled
+
+        # First step is to use the actual timeline to update the date_reported and
+        # last_touched fields for each bug.
+        # Add one to days count here to account for possible timezone differences.
+        for entry in self.generate_timeline_entries_from_rss(timeline_age.days + 1):
+            # Format the data.
+            entry_url = entry.link.rsplit("#", 1)[0]
+            entry_date = datetime.datetime(*entry.date_parsed[0:6])
+            entry_status = entry.title.split("): ", 1)[0].rsplit(" ", 1)[1]
+
+            logging.info("[Trac] Updating %s entry on %s for %s" % (entry_status, entry_date, entry_url))
+            # Get or create a TracBugTimes object.
+            try:
+                tb_times = self.timeline.tracbugtimes_set.get(canonical_bug_link = entry_url)
+            except TracBugTimes.DoesNotExist:
+                tb_times = TracBugTimes(canonical_bug_link = entry_url,
+                                        timeline = self.timeline)
+
+            # Set the date values as appropriate.
+            if 'created' in entry_status:
+                tb_times.date_reported = entry_date
+            if tb_times.last_touched < entry_date:
+                tb_times.last_touched = entry_date
+                # Store entry status as well for use in second step.
+                tb_times.latest_timeline_status = entry_status
+
+            # Save the TracBugTimes object.
+            tb_times.save()
+
+        # Second step is to use the RSS feed for each individual bug to update the
+        # last_touched field. This would be unneccessary if the timeline showed
+        # update events as well as creation and closing ones, and in fact later
+        # versions of Trac have this option - but then the later versions of Trac
+        # also hyperlink to the timeline from the bug, making this all moot.
+        # Also, we cannot just use the RSS feed for everything, as it is missing
+        # the date_reported time, as well as a lot of information about the bug
+        # itself (e.g. Priority).
+        for tb_times in self.timeline.tracbugtimes_set.all():
+            # Check that the bug has not beeen seen as 'closed' in the timeline.
+            # This will reduce network load by not grabbing the RSS feed of bugs
+            # whose last_touched info is definitely correct.
+            if 'closed' not in tb_times.latest_timeline_status:
+                logging.info("[Trac] Grabbing RSS feed for %s" % tb_times.canonical_bug_link)
+                feed = feedparser.parse(tb_times.canonical_bug_link + '?format=rss')
+                comment_dates =  [datetime.datetime(*e.date_parsed[0:6]) for e in feed.entries]
+                # Check if there are comments to grab from.
+                if comment_dates:
+                    tb_times.last_polled = max(comment_dates)
+                    tb_times.save()
+
+        # Finally, update the timeline's last_polled.
+        self.timeline.last_polled = datetime.datetime.utcnow()
+        self.timeline.save()
+
+    def get_times(self, bug_url):
+        bug_times = self.timeline.tracbugtimes_set.get(canonical_bug_link = bug_url)
+        return (bug_times.date_reported, bug_times.last_touched)
 
 ############################################################
 # General bug importing class
 
 class TracBugTracker(object):
-    def __init__(self, base_url, project_name, bug_project_name_format):
+    def __init__(self, base_url, project_name, bug_project_name_format, old_trac=False):
         self.base_url = base_url
         self.project_name = project_name
         self.bug_project_name_format = bug_project_name_format
+        self.old_trac = old_trac
+        if self.old_trac:
+            self.tbt = TracBugTimeline(self.base_url, self.project_name)
 
     def generate_bug_ids_from_queries(self, queries):
         for query_name in queries:
@@ -227,6 +315,12 @@ class TracBugTracker(object):
                                                    component=trac_bug.component)
 
     def update(self):
+        if self.old_trac:
+            # It's an old version of Trac that doesn't have links from the
+            # bugs to the timeline. So we need to update our local copy of
+            # the timeline so it is accurate for use later.
+            self.tbt.update()
+
         logging.info("[Trac] Started refreshing all bugs from project named %s." % self.project_name)
 
         # First, go through and refresh all the bugs specifically marked
@@ -270,7 +364,7 @@ class TracBugTracker(object):
         # if the bug is already being tracked then we get a 404 error. This catacher looks
         # for a 404 and deletes the bug if it occurs.
         try:
-            data = tb.as_data_dict_for_bug_object(self.extract_tracker_specific_data)
+            data = tb.as_data_dict_for_bug_object(self.extract_tracker_specific_data, self.old_trac)
         except urllib2.HTTPError, e:
             if e.code == 404:
                 logging.error("[Trac] ERROR: Bug %d returned 404, deleting..." % bug_id)
@@ -278,6 +372,11 @@ class TracBugTracker(object):
                 return
             else:
                 raise e
+        if self.old_trac:
+            # It's an old version of Trac that doesn't have links from the
+            # bugs to the timeline. So we need to fetch these times from
+            # the database built earlier.
+            (data['date_reported'], data['last_touched']) = self.tbt.get_times(bug_url)
 
         for key in data:
             value = data[key]
@@ -466,13 +565,14 @@ class OLPCTrac(TracBugTracker):
         return ret_dict
 
 class DjangoTrac(TracBugTracker):
-    enabled = False # Opened' and 'Last modified' fields aren't hyperlinked
+    enabled = False
 
     def __init__(self):
         TracBugTracker.__init__(self,
                                 project_name='Django',
                                 base_url='http://code.djangoproject.com/',
-                                bug_project_name_format='{project}')
+                                bug_project_name_format='{project}',
+                                old_trac=True)
 
     def generate_list_of_bug_ids_to_look_at(self):
         queries = {
@@ -575,13 +675,14 @@ class WarFoundryTrac(TracBugTracker):
         return ret_dict
 
 class FedoraPythonModulesTrac(TracBugTracker):
-    enabled = False # 'Opened' and 'Last modified' bug fields aren't hyperlinked
+    enabled = True
 
     def __init__(self):
         TracBugTracker.__init__(self,
                                 project_name='Fedora Python Modules',
                                 base_url='https://fedorahosted.org/python-fedora/',
-                                bug_project_name_format='{project}')
+                                bug_project_name_format='{project}',
+                                old_trac=True)
 
     def generate_list_of_bug_ids_to_look_at(self):
         queries = {
@@ -685,13 +786,14 @@ class TracTrac(TracBugTracker):
         return ret_dict
 
 class SSSDTrac(TracBugTracker):
-    enabled = False # 'Opened' and 'Last modified' fields aren't hyperlinked
+    enabled = True
 
     def __init__(self):
         TracBugTracker.__init__(self,
                                 project_name='SSSD',
                                 base_url='https://fedorahosted.org/sssd/',
-                                bug_project_name_format='{project}')
+                                bug_project_name_format='{project}',
+                                old_trac=True)
 
     def generate_list_of_bug_ids_to_look_at(self):
         queries = {
@@ -881,13 +983,14 @@ class EvolvingObjectsTrac(TracBugTracker):
         return ret_dict
 
 class TangoTrac(TracBugTracker):
-    enabled = False # Trac version too low, Opened and Last Modified  dates not hyperlinked. 
+    enabled = True
 
     def __init__(self):
         TracBugTracker.__init__(self,
                                 project_name='Tango',
                                 base_url='http://dsource.org/projects/tango/',
-                                bug_project_name_format='{project}')
+                                bug_project_name_format='{project}',
+                                old_trac=True)
 
     def generate_list_of_bug_ids_to_look_at(self):
         # Can replace both entries below with an 'All bugs' query.
@@ -924,6 +1027,35 @@ class TheButterflyEffectTrac(TracBugTracker):
         queries = {
                 'All bugs':
                     'http://sourceforge.net/apps/trac/tbe/query?status=accepted&status=assigned&status=new&status=reopened&format=csv&order=priority'
+                }
+        return self.generate_bug_ids_from_queries(queries)
+
+    @staticmethod
+    def extract_tracker_specific_data(trac_data, ret_dict):
+        # Make modifications to ret_dict using provided metadata
+        # Check for the bitesized keyword
+        #ret_dict['bite_size_tag_name'] = ''
+        #ret_dict['good_for_newcomers'] = ('' in trac_data['keywords'])
+        # Check whether this is a documentation bug.
+        #ret_dict['concerns_just_documentation'] = ('' in trac_data['keywords'])
+        # Then pass ret_dict back
+        return ret_dict
+
+class FedoraDesignTeamTrac(TracBugTracker):
+    enabled = False
+
+    def __init__(self):
+        TracBugTracker.__init__(self,
+                                project_name='Fedora Design Team',
+                                base_url='https://fedorahosted.org/design-team/',
+                                bug_project_name_format='{project}',
+                                old_trac = True)
+
+    def generate_list_of_bug_ids_to_look_at(self):
+        # Can replace both entries below with an 'All bugs' query.
+        queries = {
+                'Ownerless bugs':
+                'https://fedorahosted.org/design-team/query?status=new&status=assigned&status=reopened&owner=nobody&order=priority&format=csv'
                 }
         return self.generate_bug_ids_from_queries(queries)
 

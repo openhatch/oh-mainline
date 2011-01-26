@@ -159,3 +159,23 @@ class GoogleQuery(models.Model):
 
 reversion.register(GoogleTracker, follow=["googlequery_set"])
 reversion.register(GoogleQuery)
+
+class TracTimeline(models.Model):
+    base_url = models.URLField(max_length=200, unique=True,
+                               blank=False, null=False)
+    last_polled = models.DateTimeField(default=datetime.datetime(1970, 1, 1))
+
+    all_timelines = models.Manager()
+
+class TracBugTimes(models.Model):
+    '''This model stores times for bugs extracted from Trac timelines.
+    To be nice to the Trac servfers, this is updated all at once,
+    before any bugs are updated. As such, it is possible for there
+    to be entries here that do not yet correspond to Bugs in our
+    database.'''
+    canonical_bug_link = models.URLField(max_length=200, unique=True,
+                                         blank=False, null=False)
+    date_reported = models.DateTimeField(default=datetime.datetime(1970, 1, 1))
+    last_touched = models.DateTimeField(default=datetime.datetime(1970, 1, 1))
+    latest_timeline_status = models.CharField(max_length=15, blank=True, default='')
+    timeline = models.ForeignKey(TracTimeline)
