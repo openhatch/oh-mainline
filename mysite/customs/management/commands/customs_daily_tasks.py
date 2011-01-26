@@ -57,7 +57,18 @@ import mysite.customs.bugtrackers.trac
 ### -- New Age Asheesh, 2010-05-31.
 
 class Command(BaseCommand):
-    help = "Call this once a day to make sure we run Bug search-related nightly jobs."
+    args = '<tracker_type tracker_type ...> <ohloh>'
+    help = """Call this once a day to make sure we run Bug search-related nightly jobs.
+If argument(s) are supplied, only the corresponding functions are run.
+With no arguments, all importers and the Ohloh broken link expunger are run.
+
+Supported tracker types:
+ * opensolaris
+ * roundup
+ * trac
+ * bugzilla
+ * google
+ * launchpad"""
 
     def find_and_update_enabled_roundup_trackers(self):
         enabled_roundup_trackers = []
@@ -185,10 +196,17 @@ class Command(BaseCommand):
                     citation.save()
 
     def handle(self, *args, **options):
-        self.check_for_broken_ohloh_links()
-        self.update_opensolaris_osnet()
-        self.find_and_update_enabled_trac_instances()
-        self.find_and_update_enabled_roundup_trackers()
-        self.find_and_update_enabled_bugzilla_instances()
-        self.find_and_update_enabled_google_instances()
-        self.update_launchpad_hosted_projects()
+        cdt_fns = {
+                'ohloh': self.check_for_broken_ohloh_links,
+                'opensolaris': self.update_opensolaris_osnet,
+                'trac': self.find_and_update_enabled_trac_instances,
+                'roundup': self.find_and_update_enabled_roundup_trackers,
+                'bugzilla': self.find_and_update_enabled_bugzilla_instances,
+                'google': self.find_and_update_enabled_google_instances,
+                'launchpad': self.update_launchpad_hosted_projects
+                }
+        if args:
+            for arg in args:
+                cdt_fns[arg]()
+        else:
+            [cdt_fns[f]() for f in cdt_fns]
