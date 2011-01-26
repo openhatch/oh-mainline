@@ -189,9 +189,13 @@ class TracBug:
         try:
             assignee = page_metadata['Assigned to:']
         except KeyError:
-            assignee = page_metadata['Owned by:']
+            try:
+                assignee = page_metadata['Owned by:']
+            except KeyError:
+                assignee = ''
+        if assignee:
+            all_people.add(assignee)
 
-        all_people.add(assignee)
         ret['people_involved'] = len(all_people)
 
         # FIXME: Need time zone
