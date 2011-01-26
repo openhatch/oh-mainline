@@ -205,8 +205,14 @@ Supported tracker types:
                 'google': self.find_and_update_enabled_google_instances,
                 'launchpad': self.update_launchpad_hosted_projects
                 }
+        ## Which ones do we plan to do this, time we run?
+        # Well, if the user supplied arguments on the command line, then put those in the list.
         if args:
-            for arg in args:
-                cdt_fns[arg]()
+            tasks = args
         else:
-            [cdt_fns[f]() for f in cdt_fns]
+            # Plan to do them all, since the user did not sub-specify.
+            tasks = cdt_fns.keys()
+
+        # Okay, so do the work.
+        for key in tasks:
+            cdt_fns[key]()
