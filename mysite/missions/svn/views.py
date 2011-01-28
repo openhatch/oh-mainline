@@ -1,6 +1,7 @@
 # This file is part of OpenHatch.
 # Copyright (C) 2010 Jack Grigg
 # Copyright (C) 2010 John Stumpo
+# Copyright (C) 2011 Krzysztof Tarnowski (krzysztof.tarnowski@ymail.com)
 # Copyright (C) 2010, 2011 OpenHatch, Inc.
 #
 # This program is free software: you can redistribute it and/or modify
@@ -119,8 +120,9 @@ def long_description(request, passed_data = None):
 def checkout(request, passed_data = None):
     state = SvnMissionPageState(request, passed_data)
     state.this_mission_page_short_name = 'Checking out'
-    return (request, 'missions/svn/checkout.html',
-            state.as_dict_for_template_context())
+    data = state.as_dict_for_template_context()
+    data['svn_checkout_form'] = forms.CheckoutForm()
+    return (request, 'missions/svn/checkout.html', data)
 
 @login_required
 @view
@@ -128,8 +130,9 @@ def diff(request, passed_data = None):
     state = SvnMissionPageState(request, passed_data)
     state.this_mission_page_short_name = 'Diffing your changes'
     state.mission_step_prerequisite = 'svn_checkout'
-    return (request, 'missions/svn/diff.html',
-            state.as_dict_for_template_context())
+    data = state.as_dict_for_template_context()
+    data['svn_diff_form'] = forms.DiffForm()
+    return (request, 'missions/svn/diff.html', data)
 
 @login_required
 @view

@@ -1,6 +1,7 @@
 # This file is part of OpenHatch.
 # Copyright (C) 2010 Jack Grigg
 # Copyright (C) 2010 John Stumpo
+# Copyright (C) 2011 Krzysztof Tarnowski (krzysztof.tarnowski@ymail.com)
 # Copyright (C) 2010, 2011 OpenHatch, Inc.
 #
 # This program is free software: you can redistribute it and/or modify
@@ -110,16 +111,18 @@ def about(request, passed_data={}):
 def unpacking(request, passed_data={}):
     state = TarMissionPageState(request, passed_data)
     state.this_mission_page_short_name = 'Unpacking'
-    return (request, 'missions/tar/unpacking.html',
-            state.as_dict_for_template_context())
+    data = state.as_dict_for_template_context()
+    data['unpack_form'] = forms.ExtractUploadForm()
+    return (request, 'missions/tar/unpacking.html', data)
 
 @login_required
 @view
 def creating(request, passed_data={}):
     state = TarMissionPageState(request, passed_data)
     state.this_mission_page_short_name = 'Creating'
-    return (request, 'missions/tar/creating.html',
-            state.as_dict_for_template_context())
+    data = state.as_dict_for_template_context()
+    data['create_form'] = forms.UploadForm()
+    return (request, 'missions/tar/creating.html', data)
 
 @view
 def hints(request, passed_data={}):

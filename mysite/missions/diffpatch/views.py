@@ -1,6 +1,7 @@
 # This file is part of OpenHatch.
 # Copyright (C) 2010 Jack Grigg
 # Copyright (C) 2010 John Stumpo
+# Copyright (C) 2011 Krzysztof Tarnowski (krzysztof.tarnowski@ymail.com)
 # Copyright (C) 2010, 2011 OpenHatch, Inc.
 #
 # This program is free software: you can redistribute it and/or modify
@@ -152,26 +153,30 @@ def about(request, passed_data={}):
 def single_file_diff(request, passed_data={}):
     state = DiffPatchMissionPageState(request, passed_data)
     state.this_mission_page_short_name = 'Single file diff'
-    return (request, 'missions/diffpatch/single_file_diff.html',
-            state.as_dict_for_template_context())
+    data = state.as_dict_for_template_context()
+    data['diffsingle_form'] = forms.DiffSingleUploadForm()
+    return (request, 'missions/diffpatch/single_file_diff.html', data)
 
 @view
 def single_file_patch(request, passed_data={}):
     state = DiffPatchMissionPageState(request, passed_data)
     state.this_mission_page_short_name = 'Single file patch'
-    return (request, 'missions/diffpatch/single_file_patch.html',
-            state.as_dict_for_template_context())
+    data = state.as_dict_for_template_context()
+    data['patchsingle_form'] = forms.PatchSingleUploadForm()
+    return (request, 'missions/diffpatch/single_file_patch.html', data)
 
 @view
 def recursive_patch(request, passed_data={}):
     state = DiffPatchMissionPageState(request, passed_data)
     state.this_mission_page_short_name = 'Recursive patch'
-    return (request, 'missions/diffpatch/recursive_patch.html',
-            state.as_dict_for_template_context())
+    data = state.as_dict_for_template_context()
+    data['patchrecursive_form'] = forms.PatchRecursiveUploadForm()
+    return (request, 'missions/diffpatch/recursive_patch.html', data)
 
 @view
 def recursive_diff(request, passed_data={}):
     state = DiffPatchMissionPageState(request, passed_data)
     state.this_mission_page_short_name = 'Recursive diff'
-    return (request, 'missions/diffpatch/recursive_diff.html',
-            state.as_dict_for_template_context())
+    data = state.as_dict_for_template_context()
+    data['diffrecursive_form'] = forms.DiffRecursiveUploadForm()
+    return (request, 'missions/diffpatch/recursive_diff.html', data)
