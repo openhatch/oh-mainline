@@ -27,6 +27,7 @@ import celery.decorators
 
 import mysite.customs.models
 import mysite.search.models
+from mysite.base.helpers import sanitize_wide_unicode
 
 # Initialize Launchpad scraper thing
 from launchpadbugs.connector import ConnectBug, ConnectBugList
@@ -129,6 +130,10 @@ def clean_lp_data_dict(lp_data_dict):
     # else looks_closed will be False due to the Bug default
     new_data['date_reported'] = datetime.datetime(
         *lp_data_dict['date_reported'][:6])
+
+    # Strip any wide Unicode from the dict
+    new_data = sanitize_wide_unicode(new_data)
+
     return query_data, new_data
     
 def dict2hashable(d):

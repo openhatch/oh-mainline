@@ -45,6 +45,18 @@ class ObjectFromDict(object):
                     data[key] = [ObjectFromDict(item, recursive=recursive) for item in data[key]]
             setattr(self, key, data[key])
 
+def sanitize_wide_unicode(data):
+    # Recurse on dicts and lists.
+    if type(data) == type({}):
+        for key in data:
+            data[key] = sanitize_wide_unicode(data[key])
+    elif type(data) == type([]):
+        data = [sanitize_wide_unicode(item) for item in data]
+    elif type(data) == type(u''):
+        # Replace any wide unicode or surrogate code points with a unicode question mark.
+        data = u''.join(c if not (0xD800 <= ord(c) <= 0xDFFF or ord(c) >= 0x10000) else u'\ufffd' for c in data)
+    return data
+
 def assert_or_pdb(expression):
     if expression:
         pass
