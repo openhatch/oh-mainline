@@ -20,6 +20,7 @@
 
 from mysite.base.decorators import view
 from mysite.missions.models import Step, StepCompletion
+from mysite.missions.base import controllers
 
 from django.http import HttpResponseRedirect, HttpResponse, Http404, HttpResponseNotAllowed
 from django.core.urlresolvers import reverse
