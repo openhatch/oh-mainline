@@ -681,6 +681,7 @@ class MozillaBugzilla(BugzillaBugTracker):
                              'Calendar': 'Mozilla Calendar',
                              'Mozilla Localizations': 'Mozilla Localizations',
                              'Mozilla QA': 'Mozilla QA',
+                             'Mozilla Services': 'Mozilla Services',
                              }
         if bb.product == 'Other Applications':
             bug_project_name = 'Mozilla ' + bb.component
