@@ -869,21 +869,19 @@ class MonkeyProjectTrac(TracBugTracker):
         return ret_dict
 
 class MapbenderTrac(TracBugTracker):
-    enabled = False # URL non-responsive...
+    enabled = True
 
     def __init__(self):
         TracBugTracker.__init__(self,
                                 project_name='Mapbender',
-                                base_url='',
-                                bug_project_name_format='')
+                                base_url='https://trac.osgeo.org/mapbender/',
+                                bug_project_name_format='{project}')
 
     def generate_list_of_bug_ids_to_look_at(self):
         # Can replace both entries below with an 'All bugs' query.
         queries = {
-                'Easy bugs':
-                    '',
-                'Documentation bugs':
-                    ''
+                'All bugs':
+                'https://trac.osgeo.org/mapbender/query?status=assigned&status=new&status=reopened&order=priority&format=csv'
                 }
         return self.generate_bug_ids_from_queries(queries)
 
@@ -891,10 +889,10 @@ class MapbenderTrac(TracBugTracker):
     def extract_tracker_specific_data(trac_data, ret_dict):
         # Make modifications to ret_dict using provided metadata
         # Check for the bitesized keyword
-        ret_dict['bite_size_tag_name'] = ''
-        ret_dict['good_for_newcomers'] = ('' in trac_data['keywords'])
+        #ret_dict['bite_size_tag_name'] = ''
+        #ret_dict['good_for_newcomers'] = ('' in trac_data['keywords'])
         # Check whether this is a documentation bug.
-        ret_dict['concerns_just_documentation'] = ('' in trac_data['keywords'])
+        ret_dict['concerns_just_documentation'] = ('documentation' in trac_data['component'])
         # Then pass ret_dict back
         return ret_dict
 
@@ -955,7 +953,7 @@ class PadreTrac(TracBugTracker):
         return ret_dict
 
 class EvolvingObjectsTrac(TracBugTracker):
-    enabled = False
+    enabled = True
 
     def __init__(self):
         TracBugTracker.__init__(self,
@@ -1014,7 +1012,7 @@ class TangoTrac(TracBugTracker):
         return ret_dict
 
 class TheButterflyEffectTrac(TracBugTracker):
-    enabled = False
+    enabled = True
 
     def __init__(self):
         TracBugTracker.__init__(self,
@@ -1042,7 +1040,7 @@ class TheButterflyEffectTrac(TracBugTracker):
         return ret_dict
 
 class FedoraDesignTeamTrac(TracBugTracker):
-    enabled = False
+    enabled = True
 
     def __init__(self):
         TracBugTracker.__init__(self,
@@ -1055,7 +1053,7 @@ class FedoraDesignTeamTrac(TracBugTracker):
         # Can replace both entries below with an 'All bugs' query.
         queries = {
                 'Ownerless bugs':
-                'https://fedorahosted.org/design-team/query?status=new&status=assigned&status=reopened&owner=nobody&order=priority&format=csv'
+                    'https://fedorahosted.org/design-team/query?status=new&status=assigned&status=reopened&owner=nobody&order=priority&format=csv'
                 }
         return self.generate_bug_ids_from_queries(queries)
 
@@ -1067,6 +1065,174 @@ class FedoraDesignTeamTrac(TracBugTracker):
         #ret_dict['good_for_newcomers'] = ('' in trac_data['keywords'])
         # Check whether this is a documentation bug.
         #ret_dict['concerns_just_documentation'] = ('' in trac_data['keywords'])
+        # Then pass ret_dict back
+        return ret_dict
+
+class MetalinkTrac(TracBugTracker):
+    enabled = True
+
+    def __init__(self):
+        TracBugTracker.__init__(self,
+                                project_name='Metalink',
+                                base_url='http://sourceforge.net/apps/trac/metalinks/',
+                                bug_project_name_format='{project}')
+
+    def generate_list_of_bug_ids_to_look_at(self):
+        # Can replace both entries below with an 'All bugs' query.
+        queries = {
+                'All bugs':
+                    'http://sourceforge.net/apps/trac/metalinks/query?status=new&status=accepted&status=assigned&status=reopened&format=csv'
+                }
+        return self.generate_bug_ids_from_queries(queries)
+
+    @staticmethod
+    def extract_tracker_specific_data(trac_data, ret_dict):
+        # Make modifications to ret_dict using provided metadata
+        # Check for the bitesized keyword
+        #ret_dict['bite_size_tag_name'] = ''
+        #ret_dict['good_for_newcomers'] = ('' in trac_data['keywords'])
+        # Check whether this is a documentation bug.
+        #ret_dict['concerns_just_documentation'] = ('' in trac_data['keywords'])
+        # Then pass ret_dict back
+        return ret_dict
+
+class NokiaDataGatheringTrac(TracBugTracker):
+    enabled = True
+
+    def __init__(self):
+        TracBugTracker.__init__(self,
+                                project_name='Nokia Data Gathering',
+                                base_url='https://projects.forum.nokia.com/ndg/',
+                                bug_project_name_format='{project}')
+
+    def generate_list_of_bug_ids_to_look_at(self):
+        # Can replace both entries below with an 'All bugs' query.
+        queries = {
+                'All bugs':
+                    'https://projects.forum.nokia.com/ndg/query?status=accepted&status=assigned&status=new&status=reopened&order=priority&format=csv'
+                }
+        return self.generate_bug_ids_from_queries(queries)
+
+    @staticmethod
+    def extract_tracker_specific_data(trac_data, ret_dict):
+        # Make modifications to ret_dict using provided metadata
+        # Check for the bitesized keyword
+        #ret_dict['bite_size_tag_name'] = ''
+        #ret_dict['good_for_newcomers'] = ('' in trac_data['keywords'])
+        # Check whether this is a documentation bug.
+        #ret_dict['concerns_just_documentation'] = ('' in trac_data['keywords'])
+        # Then pass ret_dict back
+        return ret_dict
+
+class InitNGTrac(TracBugTracker):
+    enabled = True
+
+    def __init__(self):
+        TracBugTracker.__init__(self,
+                                project_name='InitNG',
+                                base_url='http://initng.sourceforge.net/trac/',
+                                bug_project_name_format='{project}')
+
+    def generate_list_of_bug_ids_to_look_at(self):
+        # Can replace both entries below with an 'All bugs' query.
+        queries = {
+                'All bugs':
+                    'http://initng.sourceforge.net/trac/query?status=accepted&status=assigned&status=new&status=reopened&order=priority&format=csv'
+                }
+        return self.generate_bug_ids_from_queries(queries)
+
+    @staticmethod
+    def extract_tracker_specific_data(trac_data, ret_dict):
+        # Make modifications to ret_dict using provided metadata
+        # Check for the bitesized keyword
+        #ret_dict['bite_size_tag_name'] = ''
+        #ret_dict['good_for_newcomers'] = ('' in trac_data['keywords'])
+        # Check whether this is a documentation bug.
+        #ret_dict['concerns_just_documentation'] = ('' in trac_data['keywords'])
+        # Then pass ret_dict back
+        return ret_dict
+
+class TwoLayeredGUIToolkitTrac(TracBugTracker):
+    enabled = True
+
+    def __init__(self):
+        TracBugTracker.__init__(self,
+                                project_name='The Two-Layered GUI Toolkit',
+                                base_url='http://sourceforge.net/apps/trac/twolayeredgui/',
+                                bug_project_name_format='{project}')
+
+    def generate_list_of_bug_ids_to_look_at(self):
+        # Can replace both entries below with an 'All bugs' query.
+        queries = {
+                'All bugs':
+                    'http://sourceforge.net/apps/trac/twolayeredgui/query?status=new&status=accepted&status=assigned&status=reopened&format=csv'
+                }
+        return self.generate_bug_ids_from_queries(queries)
+
+    @staticmethod
+    def extract_tracker_specific_data(trac_data, ret_dict):
+        # Make modifications to ret_dict using provided metadata
+        # Check for the bitesized keyword
+        ret_dict['bite_size_tag_name'] = 'bitesized'
+        ret_dict['good_for_newcomers'] = ('bitesized' in trac_data['keywords'])
+        # Check whether this is a documentation bug.
+        #ret_dict['concerns_just_documentation'] = ('' in trac_data['keywords'])
+        # Then pass ret_dict back
+        return ret_dict
+
+class FlexibleLocalizationTrac(TracBugTracker):
+    enabled = True
+
+    def __init__(self):
+        TracBugTracker.__init__(self,
+                                project_name='Flexible Localization',
+                                base_url='http://sourceforge.net/apps/trac/flexiblel10n/',
+                                bug_project_name_format='{project}')
+
+    def generate_list_of_bug_ids_to_look_at(self):
+        # Can replace both entries below with an 'All bugs' query.
+        queries = {
+                'All bugs':
+                    'http://sourceforge.net/apps/trac/flexiblel10n/query?status=new&status=accepted&status=assigned&status=reopened&format=csv'
+                }
+        return self.generate_bug_ids_from_queries(queries)
+
+    @staticmethod
+    def extract_tracker_specific_data(trac_data, ret_dict):
+        # Make modifications to ret_dict using provided metadata
+        # Check for the bitesized keyword
+        ret_dict['bite_size_tag_name'] = 'bitesized'
+        ret_dict['good_for_newcomers'] = ('bitesized' in trac_data['keywords'])
+        # Check whether this is a documentation bug.
+        #ret_dict['concerns_just_documentation'] = ('' in trac_data['keywords'])
+        # Then pass ret_dict back
+        return ret_dict
+
+class QEasyBackupTrac(TracBugTracker):
+    enabled = True
+
+    def __init__(self):
+        TracBugTracker.__init__(self,
+                                project_name='QEasyBackup',
+                                base_url='http://trac.deder.at/qeasybackup/',
+                                bug_project_name_format='{project}')
+
+    def generate_list_of_bug_ids_to_look_at(self):
+        # Can replace both entries below with an 'All bugs' query.
+        queries = {
+                'All bugs':
+                'http://trac.deder.at/qeasybackup/query?status=accepted&status=assigned&status=new&status=reopened&order=priority&format=csv'
+                }
+        return self.generate_bug_ids_from_queries(queries)
+
+    @staticmethod
+    def extract_tracker_specific_data(trac_data, ret_dict):
+        # Make modifications to ret_dict using provided metadata
+        # Check for the bitesized keyword
+        ret_dict['bite_size_tag_name'] = 'trivial'
+        ret_dict['good_for_newcomers'] = ('trivial' in trac_data['priority'])
+        # Check whether this is a documentation bug.
+        ret_dict['concerns_just_documentation'] = ('documentation' in trac_data['component'])
         # Then pass ret_dict back
         return ret_dict
 
