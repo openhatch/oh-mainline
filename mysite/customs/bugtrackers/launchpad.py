@@ -164,6 +164,8 @@ def refresh_bugs_from_all_indexed_launchpad_projects():
                       'do': 'GNOME-do',
                       'gwibber': 'Gwibber',
                       'keryx': 'Keryx',
+                      'pynagram': 'Pynagram',
+                      'hardwar': 'Hardwar',
                      }
     for launchpad_project_name in lpproj2ohproj:
         openhatch_project_name = lpproj2ohproj[launchpad_project_name]
