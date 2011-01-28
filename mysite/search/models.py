@@ -117,6 +117,8 @@ class Project(OpenHatchModel):
 
     name = models.CharField(max_length=200, unique=True,
             help_text='<span class="example">This box is for fixing capitalization mistakes. To change the name of this project, email <a style="color: #666;" href="mailto:%s">%s</a>.</span>' % (('hello@openhatch.org',)*2))
+    homepage = models.URLField(max_length=200, blank=True, default='',
+            verbose_name='Project homepage URL')
     language = models.CharField(max_length=200, blank=True, default='',
             verbose_name='Primary programming language')
 
@@ -451,7 +453,7 @@ class OpenBugsManager(models.Manager):
 
 class Bug(OpenHatchModel):
     project = models.ForeignKey(Project)
-    title = models.CharField(max_length=200)
+    title = models.CharField(max_length=500)
     description = models.TextField()
     status = models.CharField(max_length=200)
     importance = models.CharField(max_length=200)

@@ -197,6 +197,12 @@ about how you can help {{ project.name }}
                     </div>
                 {% endif %}
 
+                {% if project.homepage %}
+                    <div style='margin-top: 10px;'>
+                        Homepage: <a href="{{ project.homepage }}">{{ project.homepage }}</a>
+                    </div>
+                {% endif %}
+
                 {% if project.language %}
                     <div style='margin-top: 10px;'>
                         The code is mostly written in <strong>{{ project.language }}</strong>.
