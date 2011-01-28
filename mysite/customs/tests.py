@@ -1206,6 +1206,58 @@ class LaunchpadImporterTests(django.test.TestCase):
         del out_d['last_polled']
         self.assertEqual(sample_out_data, out_d)
 
+    @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
+    def test_lp_data_wide_utf8(self, do_nothing):
+        sample_in = dict(affects=u'Do',
+                         assignee=u'',
+                         bugnumber=657268,
+                         comments=[{'date': [2010, 10, 9, 10, 24, 48, 5, 282, -1],
+                                    'number': 1,
+                                    'text': u'Above characters may need a shaw font to be viewed, such as Andagii\n(7k):\nhttp://svn.gna.org/viewcvs/*checkout*/wesnoth/trunk/fonts/Andagii.ttf',
+                                    'user': {'lplogin': u'arcriley',
+                                             'realname': u'Arc "warthog" Riley'
+                                             }
+                                    }],
+                         date=[2010, 10, 9, 10, 22, 6, 5, 282, -1],
+                         date_reported=[2010, 10, 9, 10, 22, 6, 5, 282, -1],
+                         date_updated=[2010, 10, 9, 10, 24, 49, 5, 282, -1],
+                         description=u'Gnome-Do crashes randomly... enter a few keys such as \U00010451\U0001047b\U00010465\n("term" with en@shaw locale) then backspace...',
+                         duplicate_of=None,
+                         duplicates=[],
+                         importance=u'Undecided',
+                         milestone=u'',
+                         private=False,
+                         reporter={'lplogin': u'arcriley', 'realname': u'Arc "warthog" Riley'},
+                         security=False,
+                         sourcepackage=u'do',
+                         status=u'New',
+                         summary=u'crashes on wide utf-8 input',
+                         tags=[],
+                         text=u'Gnome-Do crashes randomly... enter a few keys such as \U00010451\U0001047b\U00010465\n("term" with en@shaw locale) then backspace...',
+                         title=u'crashes on wide utf-8 input',
+                         url=u'https://bugs.launchpad.net/bugs/657268'
+                         )
+        bug_dr = datetime.datetime(2010, 10, 9, 10, 22, 6)
+        bug_du = datetime.datetime(2010, 10, 9, 10, 24, 49)
+        # NOTE: We do not test for time zone correctness.
+        sample_out_query = dict(canonical_bug_link='https://bugs.launchpad.net/bugs/657268')
+        sample_out_data = dict(title=u'crashes on wide utf-8 input',
+                               description=u'Gnome-Do crashes randomly... enter a few keys such as ���\n("term" with en@shaw locale) then backspace...',
+                               importance=u'Undecided',
+                               status=u'New',
+                               people_involved=1,
+                               submitter_realname=u'Arc "warthog" Riley',
+                               submitter_username=u'arcriley',
+                               date_reported=bug_dr,
+                               last_touched=bug_du
+                               )
+        out_q, out_d = mysite.customs.bugtrackers.launchpad.clean_lp_data_dict(sample_in)
+        self.assertEqual(sample_out_query, out_q)
+        # Make sure last_polled is at least in the same year
+        self.assertEqual(out_d['last_polled'].year, datetime.date.today().year)
+        del out_d['last_polled']
+        self.assertEqual(sample_out_data, out_d)
+
 class LaunchpadImporterMarksFixedBugsAsClosed(django.test.TestCase):
     def test(self):
         '''Start with a bug that is "Fix Released"
