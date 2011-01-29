@@ -18,7 +18,6 @@ import mysite.base.unicode_sanity
 import lxml.html
 import urllib
 import urllib2
-import mysite.customs.ohloh
 import cStringIO as StringIO
 import re
 import simplejson
