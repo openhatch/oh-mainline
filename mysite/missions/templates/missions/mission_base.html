@@ -34,7 +34,7 @@
 	    <h3>{{ this_mission_page_short_name}}</h3>
 	  </div>
 	  <div class="body">
-	    {% if mission_step_prerequisites_passed == True %}
+	    {% if mission_step_prerequisites_passed %}
 	    {% block mission_main_body %}
 	    Eek, this mission has no body!
 	    {% endblock mission_main_body %}
