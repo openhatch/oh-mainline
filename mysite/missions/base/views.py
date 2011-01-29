@@ -63,6 +63,8 @@ class MissionPageState(object):
                 data['mission_step_prerequisites_passed'
                      ] = controllers.mission_completed(person,
                                                        self.mission_step_prerequisite)
+            else:
+                data['mission_step_prerequisites_passed'] = True
         return (data, person)
 
 # This is the /missions/ page.
