@@ -1,6 +1,6 @@
 # This file is part of OpenHatch.
 # Copyright (C) 2010 Parker Phinney
-# Copyright (C) 2010 Jack Grigg
+# Copyright (C) 2010, 2011 Jack Grigg
 # Copyright (C) 2009 Karen Rustad
 # Copyright (C) 2009, 2010 OpenHatch, Inc.
 # Copyright (C) 2010 John Stumpo
@@ -35,6 +35,12 @@ from django_authopenid import views as oid_views
 from voting.views import vote_on_object
 
 import mysite.account.views
+
+from mysite.base.feeds import RecommendedBugsFeed
+
+feeds = {
+        'recbugs': RecommendedBugsFeed,
+        }
 
 urlpatterns = patterns('',
         ### Okay, sometimes people link /, or /) because of bad linkification
@@ -79,6 +85,9 @@ urlpatterns = patterns('',
                 #template_object_name='answer',
                 #template_name='kb/link_confirm_vote.html',
                 allow_xmlhttprequest=True)),
+
+        # Feed URL pattern
+        (r'^\+feeds/(?P<url>.*)/$', 'django.contrib.syndication.views.feed', {'feed_dict': feeds}),
 
         # Mission-related URLs
         (r'^missions/$', 'mysite.missions.base.views.main_page'),
