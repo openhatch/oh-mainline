@@ -16,3 +16,20 @@ body.missions p.next_mission_link {
     width: 100%;
     text-align: right;
 }
+
+body.missions .file-upload-row {
+  width: 100%
+}
+
+body.missions .file-upload {
+  margin-top: 5px;
+  padding: 5px;
+  -webkit-border-radius: 5px;
+  width: 100%;
+  background: #F4F4F4
+}
+
+body.missions .file-upload input[type="file"] {
+  padding: 0;
+  font-size: 100%
+}
