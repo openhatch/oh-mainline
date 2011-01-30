@@ -909,6 +909,35 @@ class PygameBugzilla(BugzillaBugTracker):
         # Then pass ret_dict back
         return ret_dict
 
+class OTRSBugzilla(BugzillaBugTracker):
+    enabled = False
+
+    def __init__(self):
+        BugzillaBugTracker.__init__(self,
+                                    base_url='http://bugs.otrs.org/',
+                                    project_name='OTRS',
+                                    bug_project_name_format='{project}')
+
+    def generate_current_bug_xml(self):
+        # Can replace both entries below with an 'All bugs' query.
+        queries = {
+                'All bugs':
+                    'http://bugs.otrs.org/buglist.cgi?query_format=advanced&resolution=---'
+                }
+        return self.generate_bug_xml_from_queries(queries)
+
+    @staticmethod
+    def extract_tracker_specific_data(xml_data, ret_dict):
+        # Make modifications to ret_dict using provided metadata
+        ret_dict['good_for_newcomers'] = False # No bitesized keyword
+        # Then pass ret_dict back
+        return ret_dict
+
+    # The format string method for generating the project name can be
+    # overloaded by uncommenting the function below.
+    #def generate_bug_project_name(self, bb):
+        #return bug_project_name
+
 # The generic class for Bugzilla trackers. Copy it.
 # If the project has a tracker bug for the bugs to be imported,
 # set bug_id_list_only=True in BugzillaBugTracker.__init__ and
