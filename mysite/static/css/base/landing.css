@@ -41,10 +41,10 @@ body#landing #left .body { width: 93%; }
 
 body#landing #right { width: 30%; }
 body#landing #right .body { padding: 3%; width: 94%; }
-body#landing #recent_activity_feed { width: 65%; }
+body#landing #recent_activity_feed { width: 50%; }
 body#landing #recent_activity_feed ul li { margin-bottom: 15px; }
 body#landing #recent_activity_feed ul li:last-child { margin-bottom: 0; }
-body#landing #blog_feed { margin-left: 1%; width: 32.3%; }
+body#landing #blog_feed { margin-left: 1%; width: 47%; }
 body#landing .links_at_tab_bottom { float: left; padding-bottom: 10px; width: 100%; text-align: center; }
 body#landing .links_at_tab_bottom li { display: inline; }
 
