@@ -45,7 +45,7 @@
       <p></p>
 
       <form method="post" enctype="multipart/form-data" action="{% url mysite.missions.tar.views.upload %}#create-form">
-        <div class="form-row">
+        <div class="form-row file-upload-row">
           <a name="create-form"></a>
           After you make the tarball, upload it here:
     {% if create_success %}
@@ -61,9 +61,10 @@
           <ul class="errorlist"><li>{{ what_was_wrong_with_the_tarball }}</li></ul>
           {% endif %}
           {{ create_form.tarfile.errors }}
-          <br style="clear: left;" />
+          <div class="file-upload">
           {{ create_form.tarfile }}
           <input type="submit" value="Upload" style="float: none;" />
+          </div>
           {% if not create_success and create_done %}
           <br style="clear: left;" />
           <em>You have already completed this part of the mission.</em>

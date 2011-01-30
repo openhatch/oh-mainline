@@ -33,7 +33,7 @@
         </ul>
         <p></p>
       <form method="post" enctype="multipart/form-data" action="{% url mysite.missions.tar.views.extract_mission_upload %}#unpack-form">
-        <div class="form-row">
+        <div class="form-row file-upload-row">
           <a name="unpack-form"></a>
           After you extract that file, upload it here:
     {% if unpack_success %}
@@ -45,9 +45,10 @@
           <ul class="errorlist"><li>{{ what_was_wrong_with_the_extracted_file }}</li></ul>
           {% endif %}
           {{ unpack_form.extracted_file.errors }}
-          <br style="clear: left;" />
+          <div class="file-upload">
           {{ unpack_form.extracted_file }}
           <input type="submit" value="Upload" style="float: none;" />
+          </div>
         </div>
       </form>
     {% if unpack_done %}
