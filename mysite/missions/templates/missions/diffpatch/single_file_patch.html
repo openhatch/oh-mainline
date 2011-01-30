@@ -28,7 +28,7 @@
     <p>In order to review the changes, you'll need to apply the patch to the file using the patch program, and your mission is to do that.</p>
 
     <form method="post" enctype="multipart/form-data" action="{% url mysite.missions.diffpatch.views.patchsingle_submit %}#patchsingle-form">
-      <div class="form-row">
+      <div class="form-row file-upload-row">
         <a name="patchsingle-form"></a>
         After you patch the file, upload it here:
   {% if patchsingle_success %}
@@ -41,9 +41,10 @@
         <ul class="errorlist"><li>{{ patchsingle_error_message }}</li></ul>
         {% endif %}
         {{ patchsingle_form.patched_file.errors }}
-        <br style="clear: left;" />
+        <div class="file-upload">
         {{ patchsingle_form.patched_file }}
         <input type="submit" value="Upload" style="float: none;" />
+        </div>
         {% if not patchsingle_success and patchsingle_done %}
         <br style="clear: left;" />
         <em>You have already completed this part of the mission.</em>
