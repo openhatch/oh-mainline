@@ -28,7 +28,7 @@ body.missions .file-upload {
   -moz-border-radius: 5px;
   border-radius: 5px;
   width: 100%;
-  background: #F4F4F4
+  background: #F9F9F9
 }
 
 body.missions .file-upload input[type="file"] {
