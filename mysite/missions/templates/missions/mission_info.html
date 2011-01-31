@@ -17,8 +17,16 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 {% endcomment %}
 
+{% block css %}
+{{ block.super }}
+.up-top {
+    padding: 0;
+    margin-bottom: -19px;
+    }
+{% endblock css %}
+
 {% block pagetop %}
-    <h3><img alt='Training Missions' id='training-missions' alt='Training Missions' src='/static/images/training-missions-blank.png' /></h3>
+    <h3 class="up-top"><img alt='Training Missions' id='training-missions' alt='Training Missions' src='/static/images/training-missions-blank.png' /></h3>
 {% endblock pagetop %}
 
 {% block main %}
