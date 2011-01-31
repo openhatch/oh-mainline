@@ -50,5 +50,4 @@ body#landing .links_at_tab_bottom li { display: inline; }
 
 body#landing #about-message { width: 98.5% }
 body#landing #about-message .body { width: 96%; font-size: 110% }
-body#landing #about-message .body p { font-weight: bold }
 .link-more { float: right; font-size: 90% }
