@@ -25,6 +25,8 @@ body.missions .file-upload {
   margin-top: 5px;
   padding: 5px;
   -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
   width: 100%;
   background: #F4F4F4
 }
