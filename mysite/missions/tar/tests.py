@@ -16,6 +16,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from mysite.base.tests import TwillTests
 from mysite.missions.base.tests import *
 from mysite.missions.tar import views, controllers
 
@@ -139,3 +140,28 @@ class UntarViewTests(TwillTests):
         paulproteus = Person.objects.get(user__username='paulproteus')
         self.assertEqual(len(StepCompletion.objects.filter(step__name='tar_extract', person=paulproteus)), 0)
 
+class MissionPageStateTests(TwillTests):
+    fixtures = ['person-paulproteus', 'user-paulproteus',]
+    
+    def setUp(self):
+        TwillTests.setUp(self)
+        self.client = self.login_with_client()
+        
+    def test_mission_completion_full_reset(self):
+        paulproteus = Person.objects.get(user__username='paulproteus')
+        StepCompletion(person=paulproteus, step=Step.objects.get(name='tar')).save()
+        
+        response = self.client.post(reverse(views.reset), {'mission_steps': 'tar' })
+        self.assert_('Operation successful' in response.content)
+        self.assertEqual(len(StepCompletion.objects.filter(step__name='tar', person=paulproteus)), 0)        
+        
+        
+    def test_mission_completion_partial_reset(self):
+        paulproteus = Person.objects.get(user__username='paulproteus')
+        StepCompletion(person=paulproteus, step=Step.objects.get(name='tar')).save()
+        StepCompletion(person=paulproteus, step=Step.objects.get(name='tar_extract')).save()
+        
+        response = self.client.post(reverse(views.reset), {'mission_steps': 'tar,tar_extract' })
+        self.assert_('Operation successful' in response.content)
+        self.assertEqual(len(StepCompletion.objects.filter(step__name='tar', person=paulproteus)), 0)
+        self.assertEqual(len(StepCompletion.objects.filter(step__name='tar_extract', person=paulproteus)), 0)                  
