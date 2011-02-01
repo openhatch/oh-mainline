@@ -41,48 +41,6 @@ import staticgenerator
 from django.conf import settings
 import django.core.cache
 
-def create_citations_from_ohloh_contributor_facts(dia_id, ohloh_results):
-    '''Input: A sequence of Ohloh ContributionFact dicts
-    and the id of the DataImport they came from.
-
-    Side-effect: Create matching structures in the DB
-    and mark our success in the database.'''
-    # {{{
-    dia = mysite.profile.models.DataImportAttempt.objects.get(id=dia_id)
-    person = dia.person
-    for ohloh_contrib_info in ohloh_results:
-        (project, _) = Project.objects.get_or_create(
-                name=ohloh_contrib_info['project'])
-        # FIXME: don't import if blacklisted
-        (portfolio_entry, _) = mysite.profile.models.PortfolioEntry.objects.get_or_create(
-                person=person, project=project)
-        citation = mysite.profile.models.Citation.create_from_ohloh_contrib_info(ohloh_contrib_info)
-        citation.portfolio_entry = portfolio_entry
-        citation.data_import_attempt = dia 
-        citation.save_and_check_for_duplicates()
-
-    person.last_polled = datetime.datetime.now()
-    dia.completed = True
-    dia.save()
-    person.save()
-    # }}}
-
-def rs_action(dia):
-    oh = ohloh.get_ohloh()
-    data, web_response = oh.get_contribution_info_by_username(
-            dia.query, person=dia.person)
-    dia.web_response = web_response
-    dia.save()
-    return data
-
-def ou_action(dia):
-    oh = ohloh.get_ohloh()
-    data, web_response = oh.get_contribution_info_by_ohloh_username(
-            dia.query, person=dia.person)
-    dia.web_response = web_response
-    dia.save()
-    return data
-
 def do_nothing_because_this_functionality_moved_to_twisted(*args):
     return None # This is moved to Twisted now.
 
@@ -93,8 +51,7 @@ source2actual_action = {
         'lp': do_nothing_because_this_functionality_moved_to_twisted,
         'bb': do_nothing_because_this_functionality_moved_to_twisted,
         'rs': do_nothing_because_this_functionality_moved_to_twisted,
-
-        'ou': ou_action,
+        'ou': do_nothing_because_this_functionality_moved_to_twisted,
         }
 
 source2result_handler = {
@@ -103,9 +60,8 @@ source2result_handler = {
         'ga': do_nothing_because_this_functionality_moved_to_twisted,
         'lp': do_nothing_because_this_functionality_moved_to_twisted,
         'bb': do_nothing_because_this_functionality_moved_to_twisted,
-
-        'rs': create_citations_from_ohloh_contributor_facts,
-        'ou': create_citations_from_ohloh_contributor_facts,
+        'rs': do_nothing_because_this_functionality_moved_to_twisted,
+        'ou': do_nothing_because_this_functionality_moved_to_twisted,
         }
 
 class ReindexPerson(Task):
