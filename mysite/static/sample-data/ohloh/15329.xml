@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<response>
+  <status>success</status>
+  <result>
+    <project>
+      <id>15329</id>
+      <name>ccHost</name>
+      <created_at>2008-07-04T17:54:55Z</created_at>
+      <updated_at>2010-04-16T15:59:05Z</updated_at>
+      <description></description>
+      <homepage_url>http://wiki.creativecommons.org/CcHost</homepage_url>
+      <download_url>http://wiki.creativecommons.org/CcHost#Download</download_url>
+      <url_name>cchost</url_name>
+      <user_count>0</user_count>
+      <average_rating></average_rating>
+      <rating_count>0</rating_count>
+      <analysis_id>1143684</analysis_id>
+      <analysis>
+        <id>1143684</id>
+        <project_id>15329</project_id>
+        <updated_at>2011-02-01T01:04:31Z</updated_at>
+        <logged_at>2011-02-01T01:00:42Z</logged_at>
+        <min_month>2005-04-01T00:00:00Z</min_month>
+        <max_month>2010-04-01T00:00:00Z</max_month>
+        <twelve_month_contributor_count>1</twelve_month_contributor_count>
+        <total_code_lines>75408</total_code_lines>
+        <main_language_id>2</main_language_id>
+        <main_language_name>PHP</main_language_name>
+      </analysis>
+      <licenses>
+        <license>
+          <name>gpl</name>
+          <nice_name>GNU General Public License 2</nice_name>
+        </license>
+      </licenses>
+    </project>
+  </result>
+</response>

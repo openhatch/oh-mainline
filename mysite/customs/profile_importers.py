@@ -574,16 +574,42 @@ class AbstractOhlohAccountImporter(ProfileImporter):
         for ohloh_contrib_info in ohloh_data:
             self.store_one_ohloh_contrib_info(ohloh_contrib_info)
 
-    def store_one_ohloh_contrib_info(self, ohloh_contrib_info):
+    def convert_ohloh_contributor_fact_to_citation(self, ohloh_contrib_info, project_data):
+        """Create a new Citation from a dictionary roughly representing an Ohloh ContributionFact."""
+        # {{{
+        # FIXME: Enforce uniqueness on (source, vcs_committer_identifier, project)
+        # Which is to say, overwrite the previous citation with the same source,
+        # vcs_committer_identifier and project.
+        # FIXME: Also store ohloh_contrib_info somewhere so we can parse it later.
+        # FIXME: Also store the launchpad HttpResponse object somewhere so we can parse it l8r.
+        # "We'll just pickle the sucker and throw it into a database column. This is going to be
+        # very exciting. just Hhhomphf." -- Asheesh.
+        permalink = self.generate_contributor_url(
+            project_data['name'],
+            int(ohloh_contrib_info['contributor_id']))
+        self.command.call_getPage_on_data_dict(
+            self,
+            {'url': permalink,
+             'callback': lambda _ignored:
+                 self.convert_ohloh_contributor_fact_and_contributor_url_to_citation(ohloh_contrib_info, project_data, permalink),
+             'errback': lambda _ignored:
+                 self.convert_ohloh_contributor_fact_and_contributor_url_to_citation(ohloh_contrib_info, project_data, None)})
+        
+    def convert_ohloh_contributor_fact_and_contributor_url_to_citation(self, ohloh_contrib_info, project_data, contributor_url):
         (project, _) = mysite.search.models.Project.objects.get_or_create(
-                name=ohloh_contrib_info['project'])
-        # FIXME: don't import if blacklisted
+            name__iexact=project_data['name'],
+            defaults={'name': project_data['name']})
         (portfolio_entry, _) = mysite.profile.models.PortfolioEntry.objects.get_or_create(
                 person=self.get_dia().person, project=project)
-        citation = mysite.profile.models.Citation.create_from_ohloh_contrib_info(ohloh_contrib_info)
-        citation.portfolio_entry = portfolio_entry
+
+        citation = mysite.profile.models.Citation()
+        citation.distinct_months = int(ohloh_contrib_info.get('man_months', 0)) or None
+        citation.languages = project_data.get('primary_language_nice_name', '')
+        citation.url = contributor_url
         citation.data_import_attempt = self.get_dia()
+        citation.portfolio_entry = portfolio_entry
         citation.save_and_check_for_duplicates()
+        return citation
 
     def url_for_ohloh_query(self, url, params=None, API_KEY=None):
         if API_KEY is None:
@@ -721,19 +747,29 @@ class AbstractOhlohAccountImporter(ProfileImporter):
                 self.convert_ohloh_contributor_fact_to_citation(data_dict, project_data)
 
             else:
-                self.get_project_data_then_convert(data_dict)
+                self.get_analysis_data_then_convert(data_dict)
+
+    def get_analysis_data_then_convert(self, c_f):
+        url = self.url_for_ohloh_query('http://www.ohloh.net/analyses/%d.xml' % int(c_f['analysis_id']))
+        callback = lambda xml_string: self.parse_analysis_data_and_get_project_data_then_convert(xml_string, c_f)
+        errback = self.squashIrrelevantErrors
+        self.command.call_getPage_on_data_dict(
+            self,
+            {'url': url,
+             'callback': callback,
+             'errback': errback})
 
     def parse_analysis_data_and_get_project_data_then_convert(self, analysis_data_xml_string, c_f):
         # We are interested in grabbing the Ohloh project ID out of the project analysis
         # data dump.
-        tree = self.parse_ohloh_xml(xml_string)
+        tree = self.parse_ohloh_xml(analysis_data_xml_string)
         if tree is None:
             return
         
         analysis_data = self.filter_ohloh_xml(tree, 'result/analysis', many=False)
-        eyedee = analysis_data['project_id']
+        eyedee = int(analysis_data['project_id'])
         # Now we go look for the project data XML blob.
-        url = 'http://www.ohloh.net/projects/%d.xml' % eyedee
+        url = self.url_for_ohloh_query('http://www.ohloh.net/projects/%d.xml' % eyedee)
         callback = lambda xml_string: self.parse_project_data_then_convert(xml_string, c_f)
         errback = self.squashIrrelevantErrors # No error recovery available to us
         self.command.call_getPage_on_data_dict(
@@ -742,8 +778,8 @@ class AbstractOhlohAccountImporter(ProfileImporter):
              'callback': callback,
              'errback': errback})
 
-    def parse_project_data_and_then_convert(self, project_data_xml_string, c_f):
-        tree = self.parse_ohloh_xml(xml_string)
+    def parse_project_data_then_convert(self, project_data_xml_string, c_f):
+        tree = self.parse_ohloh_xml(project_data_xml_string)
         if tree is None:
             return
         
@@ -753,16 +789,6 @@ class AbstractOhlohAccountImporter(ProfileImporter):
 
         self.convert_ohloh_contributor_fact_to_citation(c_f, project_data)
         
-    def project_id2projectdata(self, project_id=None, project_name=None):
-        if project_name is None:
-            project_query = str(int(project_id))
-        else:
-            project_query = str(project_name)
-        url = 'http://www.ohloh.net/projects/%s.xml?' % urllib.quote(
-            project_query)
-        data, web_response = ohloh_url2data(url=url, selector='result/project')
-        return data
-
 class RepositorySearchOhlohImporter(AbstractOhlohAccountImporter):
     BASE_URL = 'http://www.ohloh.net/contributors.xml'
 

@@ -783,25 +783,6 @@ class Citation(models.Model):
             self.ignored_due_to_duplicate = True
         return self.save()
 
-    @staticmethod
-    def create_from_ohloh_contrib_info(ohloh_contrib_info):
-        """Create a new Citation from a dictionary roughly representing an Ohloh ContributionFact."""
-        # {{{
-        # FIXME: Enforce uniqueness on (source, vcs_committer_identifier, project)
-        # Which is to say, overwrite the previous citation with the same source,
-        # vcs_committer_identifier and project.
-        # FIXME: Also store ohloh_contrib_info somewhere so we can parse it later.
-        # FIXME: Also store the launchpad HttpResponse object somewhere so we can parse it l8r.
-        # "We'll just pickle the sucker and throw it into a database column. This is going to be
-        # very exciting. just Hhhomphf." -- Asheesh.
-        citation = Citation()
-        citation.distinct_months = ohloh_contrib_info['man_months']
-        citation.languages = ohloh_contrib_info['primary_language']
-        citation.url = ohloh_contrib_info['permalink']
-        #citation.year_started = ohloh_contrib_info['year_started']
-        return citation
-        # }}}
-
     # [0]: FIXME: Let's learn how to use Django's ManyToManyField etc.
 
     def __unicode__(self):
