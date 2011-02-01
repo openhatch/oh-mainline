@@ -4,6 +4,7 @@
 # Copyright (C) 2009 Karen Rustad
 # Copyright (C) 2009, 2010 OpenHatch, Inc.
 # Copyright (C) 2010 John Stumpo
+# Copyright (C) 2011 Krzysztof Tarnowski (krzysztof.tarnowski@ymail.com)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -92,6 +93,7 @@ urlpatterns = patterns('',
         # Mission-related URLs
         (r'^missions/$', 'mysite.missions.base.views.main_page'),
         (r'^missions/tar$', 'mysite.missions.tar.views.about'),
+        (r'^missions/tar/reset$', 'mysite.missions.tar.views.reset'),
         (r'^missions/tar/unpacking$', 'mysite.missions.tar.views.unpacking'),
         (r'^missions/tar/creating$', 'mysite.missions.tar.views.creating'),
         (r'^missions/tar/hints$', 'mysite.missions.tar.views.hints'),

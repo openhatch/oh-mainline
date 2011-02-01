@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from django.http import HttpResponse
+
 from mysite.missions.base.views import *
 from mysite.missions.tar import forms, controllers
 
@@ -25,6 +27,19 @@ from mysite.missions.tar import forms, controllers
 ### Forms submit to this, and we use these to validate input and/or
 ### modify the information stored about the user, such as recording
 ### that a mission was successfully completed.
+def reset(request):
+    ''' Resets the state of the Tar mission '''
+    if request.method == 'POST' and request.POST['mission_parts']:
+        mission_parts = request.POST['mission_parts'].split(',')
+    
+        state = TarMissionPageState(request, None)
+        state.reset(mission_parts)
+        message = 'Operation successful'
+    else:
+        message = 'An error occured'
+    
+    return HttpResponse(message)
+
 def upload(request):
     # Initialize data array and some default values.
     data = {}
@@ -83,6 +98,7 @@ def extract_mission_upload(request):
 class TarMissionPageState(MissionPageState):
     def __init__(self, request, passed_data):
         super(TarMissionPageState, self).__init__(request, passed_data, 'Tar')
+        self.mission_parts = ['tar', 'tar_extract',]
 
     def as_dict_for_template_context(self):
         (data, person) = self.get_base_data_dict_and_person()
@@ -130,4 +146,3 @@ def hints(request, passed_data={}):
     state.this_mission_page_short_name = 'Hints'
     return (request, 'missions/tar/hints.html',
             state.as_dict_for_template_context())
-
