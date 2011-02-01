@@ -28,6 +28,7 @@ import StringIO
 import Image
 import uuid
 import urllib
+from urlparse import urljoin
 import random
 from django.db.models import Q
 import mysite.customs
@@ -460,7 +461,7 @@ class Answer(OpenHatchModel):
                 self.get_question_text())
 
     def get_absolute_url(self):
-        return "".join([reverse('mysite.project.views.project', args=[self.project.name]), "#answer_whose_pk_is_%d" % self.pk])
+        return urljoin(reverse('mysite.project.views.project', args=[self.project.name]), "#answer_whose_pk_is_%d" % self.pk)
 
     @staticmethod
     def create_dummy(**kwargs):
@@ -626,7 +627,7 @@ class WannaHelperNote(OpenHatchModel):
         return self.get_title_for_atom()
 
     def get_absolute_url(self):
-        return "".join([reverse('mysite.project.views.project', args=[self.project.name]), "#person_summary_%d" % self.person.pk])
+        return urljoin(reverse('mysite.project.views.project', args=[self.project.name]), "#person_summary_%d" % self.person.pk)
 
 class HitCountCache(OpenHatchModel):
     hashed_query = models.CharField(max_length=40, primary_key=True) # stores a sha1 
