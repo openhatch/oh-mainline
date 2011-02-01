@@ -101,6 +101,7 @@ class FakeGetPage(object):
         self.url2data['http://www.ohloh.net/projects/15329.xml?api_key=JeXHeaQhjXewhdktn4nUw'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', '15329.xml')).read()
         self.url2data['http://www.ohloh.net/projects/479665.xml?api_key=JeXHeaQhjXewhdktn4nUw'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', '479665.xml')).read()
         self.url2data['https://www.ohloh.net/p/cchost/contributors/65837553699824'] = ''
+        self.url2data['https://www.ohloh.net/p/ccsearch-/contributors/2060147635589231'] = ''
         
     """This is a fake version of Twisted.web's getPage() function.
     It returns a Deferred that is already 'fired', and has the page content
@@ -726,7 +727,7 @@ class TestOhlohRepositorySearch(django.test.TestCase):
         # current Ohloh analysis ID.
         projects = set([c.portfolio_entry.project.name for c in mysite.profile.models.Citation.objects.all()])
         self.assertEqual(projects,
-                         set([u'1454281', u'1143684']))
+                         set([u'Creative Commons search engine', u'ccHost']))
         
 class TestOhlohAccountImport(django.test.TestCase):
     fixtures = ['user-paulproteus', 'person-paulproteus']

@@ -585,7 +585,7 @@ class AbstractOhlohAccountImporter(ProfileImporter):
         # "We'll just pickle the sucker and throw it into a database column. This is going to be
         # very exciting. just Hhhomphf." -- Asheesh.
         permalink = self.generate_contributor_url(
-            project_data['name'],
+            project_data['url_name'],
             int(ohloh_contrib_info['contributor_id']))
         self.command.call_getPage_on_data_dict(
             self,
