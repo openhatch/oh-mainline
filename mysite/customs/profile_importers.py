@@ -665,10 +665,6 @@ class AbstractOhlohAccountImporter(ProfileImporter):
                 # project_data = self.analysis2projectdata(eyedee)
                 # FIXME: BLOCKING
 
-            if filter_out_based_on_query:
-                if self.query.lower() != c_f['contributor_name'].lower():
-                    continue
-
             # permalink = generate_contributor_url(
             # project_data['name'],
             # int(c_f['contributor_id'])) # FIXME: BLOCKING
@@ -687,6 +683,21 @@ class AbstractOhlohAccountImporter(ProfileImporter):
             ret.append(this)
         return ret
 
+    def generate_contributor_url(self, project_name, contributor_id):
+        '''Returns either a nice, deep link into Ohloh for data on the contribution,
+        or None if such a link could not be made.'''
+        nice_url = 'https://www.ohloh.net/p/%s/contributors/%d' % (
+            project_name.lower(), contributor_id)
+        return nice_url
+
+    def filter_out_irrelevant_ohloh_dicts(self, data_dicts):
+        out = []
+        for data_dict in data_dicts:
+            if data_dict.get('contributor_name', '').lower() != self.query.lower():
+                continue # If we were asked-to, we can skip data dicts that are irrelevant.
+            out.append(data_dict)
+        return out
+
     def parse_then_filter_then_interpret_ohloh_xml(self, xml_string, filter_out_based_on_query=True, override_project_name=None):
         tree = self.parse_ohloh_xml(xml_string)
         if tree is None:
@@ -696,11 +707,61 @@ class AbstractOhlohAccountImporter(ProfileImporter):
         if not list_of_dicts:
             return
 
-        list_of_dicts = self.enhance_ohloh_contributor_facts(list_of_dicts, filter_out_based_on_query, override_project_name)
+        if filter_out_based_on_query:
+            list_of_dicts = self.filter_out_irrelevant_ohloh_dicts(list_of_dicts)
 
-        # Okay, so we know we got some XML back, and that we have converted
-        # its tags to unicode<->unicode dictionaries.
-        self.ohloh_data_to_citations(list_of_dicts)
+        ### Now that we have as much information as we do, we pass each dictionary
+        ### individually to a function that creates a Citation.
+        ###
+        ### To do that, it might have to make some more web requests.
+        for data_dict in list_of_dicts:
+            if override_project_name:
+                # If we got this far, we should actually convert the data dict to a Citation.
+                project_data = {'name': override_project_name}
+                self.convert_ohloh_contributor_fact_to_citation(data_dict, project_data)
+
+            else:
+                self.get_project_data_then_convert(data_dict)
+
+    def parse_analysis_data_and_get_project_data_then_convert(self, analysis_data_xml_string, c_f):
+        # We are interested in grabbing the Ohloh project ID out of the project analysis
+        # data dump.
+        tree = self.parse_ohloh_xml(xml_string)
+        if tree is None:
+            return
+        
+        analysis_data = self.filter_ohloh_xml(tree, 'result/analysis', many=False)
+        eyedee = analysis_data['project_id']
+        # Now we go look for the project data XML blob.
+        url = 'http://www.ohloh.net/projects/%d.xml' % eyedee
+        callback = lambda xml_string: self.parse_project_data_then_convert(xml_string, c_f)
+        errback = self.squashIrrelevantErrors # No error recovery available to us
+        self.command.call_getPage_on_data_dict(
+            self,
+            {'url': url,
+             'callback': callback,
+             'errback': errback})
+
+    def parse_project_data_and_then_convert(self, project_data_xml_string, c_f):
+        tree = self.parse_ohloh_xml(xml_string)
+        if tree is None:
+            return
+        
+        project_data = self.filter_ohloh_xml(tree, 'result/project', many=False)
+        if not project_data:
+            return
+
+        self.convert_ohloh_contributor_fact_to_citation(c_f, project_data)
+        
+    def project_id2projectdata(self, project_id=None, project_name=None):
+        if project_name is None:
+            project_query = str(int(project_id))
+        else:
+            project_query = str(project_name)
+        url = 'http://www.ohloh.net/projects/%s.xml?' % urllib.quote(
+            project_query)
+        data, web_response = ohloh_url2data(url=url, selector='result/project')
+        return data
 
 class RepositorySearchOhlohImporter(AbstractOhlohAccountImporter):
     BASE_URL = 'http://www.ohloh.net/contributors.xml'

@@ -682,9 +682,10 @@ class TestAbstractOhlohAccountImporter(django.test.TestCase):
                 }
             ]
 
-        output = self.aoai.enhance_ohloh_contributor_facts(c_fs)
+        
+        output = self.aoai.filter_out_irrelevant_ohloh_dicts(c_fs)
         self.assertEqual(1, len(output))
-        self.assertEqual(17, output[0]['project']) # FIXME
+        self.assertEqual(17, output[0]['analysis_id'])
 
 class TestOhlohRepositorySearch(django.test.TestCase):
     fixtures = ['user-paulproteus', 'person-paulproteus']
