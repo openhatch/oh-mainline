@@ -567,13 +567,6 @@ class BitbucketImporter(ProfileImporter):
 class AbstractOhlohAccountImporter(ProfileImporter):
     SQUASH_THESE_HTTP_CODES = ['404',]
 
-    def ohloh_data_to_citations(self, ohloh_data):
-        '''This takes post-processed responses from Ohloh, in a
-        particular arbitrary format, and turns them into Citation objects
-        suitable to be stored in the OpenHatch database.'''
-        for ohloh_contrib_info in ohloh_data:
-            self.store_one_ohloh_contrib_info(ohloh_contrib_info)
-
     def convert_ohloh_contributor_fact_to_citation(self, ohloh_contrib_info, project_data):
         """Create a new Citation from a dictionary roughly representing an Ohloh ContributionFact."""
         # {{{
@@ -674,41 +667,6 @@ class AbstractOhlohAccountImporter(ProfileImporter):
         if many:
             return relevant_tag_dicts
 
-    def enhance_ohloh_contributor_facts(self, c_fs, filter_out_based_on_query=True, override_project_name=None):
-        ret = []
-        for c_f in c_fs:
-            # Ohloh matches on anything containing the username we asked for as a substring,
-            # so check that the contributor fact actually matches the whole string (case-insensitive).
-            if override_project_name:
-                # FIXME: In this case, do a check with Ohloh that we have the right
-                # canonicalization of the project name.
-                project_data = {'name': override_project_name}
-            else:
-                if 'analysis_id' not in c_f:
-                    continue # this contributor fact is useless
-                eyedee = int(c_f['analysis_id'])
-                project_data = {'name': eyedee}
-                # project_data = self.analysis2projectdata(eyedee)
-                # FIXME: BLOCKING
-
-            # permalink = generate_contributor_url(
-            # project_data['name'],
-            # int(c_f['contributor_id'])) # FIXME: BLOCKING
-            permalink = 'http://example.com/'
-            if 'man_months' in c_f:
-                man_months = int(c_f['man_months'])
-            else:
-                man_months = None # Unknown
-
-            this = dict(
-                project=project_data['name'],
-                project_homepage_url=project_data.get('homepage_url', None),
-                permalink=permalink,
-                primary_language=c_f.get('primary_language_nice_name', ''),
-                man_months=man_months)
-            ret.append(this)
-        return ret
-
     def generate_contributor_url(self, project_name, contributor_id):
         '''Returns either a nice, deep link into Ohloh for data on the contribution,
         or None if such a link could not be made.'''
@@ -724,7 +682,7 @@ class AbstractOhlohAccountImporter(ProfileImporter):
             out.append(data_dict)
         return out
 
-    def parse_then_filter_then_interpret_ohloh_xml(self, xml_string, filter_out_based_on_query=True, override_project_name=None):
+    def parse_then_filter_then_interpret_ohloh_xml(self, xml_string, filter_out_based_on_query=True):
         tree = self.parse_ohloh_xml(xml_string)
         if tree is None:
             return
@@ -741,13 +699,7 @@ class AbstractOhlohAccountImporter(ProfileImporter):
         ###
         ### To do that, it might have to make some more web requests.
         for data_dict in list_of_dicts:
-            if override_project_name:
-                # If we got this far, we should actually convert the data dict to a Citation.
-                project_data = {'name': override_project_name}
-                self.convert_ohloh_contributor_fact_to_citation(data_dict, project_data)
-
-            else:
-                self.get_analysis_data_then_convert(data_dict)
+            self.get_analysis_data_then_convert(data_dict)
 
     def get_analysis_data_then_convert(self, c_f):
         url = self.url_for_ohloh_query('http://www.ohloh.net/analyses/%d.xml' % int(c_f['analysis_id']))
@@ -767,9 +719,11 @@ class AbstractOhlohAccountImporter(ProfileImporter):
             return
         
         analysis_data = self.filter_ohloh_xml(tree, 'result/analysis', many=False)
-        eyedee = int(analysis_data['project_id'])
         # Now we go look for the project data XML blob.
-        url = self.url_for_ohloh_query('http://www.ohloh.net/projects/%d.xml' % eyedee)
+        return self.get_project_data_then_continue(int(analysis_data['project_id']), c_f)
+
+    def get_project_data_then_continue(self, project_id, c_f):
+        url = self.url_for_ohloh_query('http://www.ohloh.net/projects/%d.xml' % project_id)
         callback = lambda xml_string: self.parse_project_data_then_convert(xml_string, c_f)
         errback = self.squashIrrelevantErrors # No error recovery available to us
         self.command.call_getPage_on_data_dict(
@@ -860,7 +814,7 @@ class OhlohUsernameImporter(AbstractOhlohAccountImporter):
         # The parse_then_... method typically checks each Ohloh contributor_fact
         # to make sure it is relevant. Since we know they are all relevant,
         # we can skip that check.
-        callback = lambda data: self.parse_then_filter_then_interpret_ohloh_xml(data, filter_out_based_on_query=False, override_project_name=project_name)
+        callback = lambda data: self.parse_then_filter_then_interpret_ohloh_xml(data, filter_out_based_on_query=False)
 
         return {'url': self.url_for_ohloh_query(base_url),
                 'callback': callback,
@@ -871,19 +825,62 @@ class OhlohUsernameImporter(AbstractOhlohAccountImporter):
         relevant_links = root.cssselect('a.position')
         relevant_hrefs = [link.attrib['href'] for link in relevant_links if '/contributors/' in link.attrib['href']]
         relevant_project_and_contributor_id_pairs = []
-        # FIXME: do more logging here someday?
+
         for href in relevant_hrefs:
-            project, contributor_id = re.split('[/][a-z]+[/]', href, 1
+            url_name, contributor_id = re.split('[/][a-z]+[/]', href, 1
                                                )[1].split('/contributors/')
-            relevant_project_and_contributor_id_pairs.append(
-                (project, int(contributor_id)))
+            self.process_url_name_and_contributor_id(
+                url_name, int(contributor_id))
 
-        for (project_name, contributor_id) in relevant_project_and_contributor_id_pairs:
-            self.command.call_getPage_on_data_dict(
-                self,
-                self.getUrlAndCallbackForProjectAndContributor(
-                    project_name, contributor_id))
+    def process_url_name_and_contributor_id(self, url_name, contributor_id):
+        # The Ohloh url_name that we get back is not actually enough to get the project information
+        # we need. So we have to first convert it into an Ohloh project id.
+        #
+        # The only way I can see to do that is to load up the project page, and look
+        # for the badge image URL. It contains the project ID.
+        #
+        # FIXME: Maybe if we use the "position" ID (also available through an image, namely the
+        # activity chart), we skip a scraping step. Who knows.
+        url = 'https://www.ohloh.net/p/%s' % url_name
+        callback = lambda page_text: self.get_project_id_then_continue(page_text, contributor_id)
+        errback = self.squashIrrelevantErrors # There is no going back.
+        self.command.call_getPage_on_data_dict(
+            self,
+            {'url': url,
+             'callback': callback,
+             'errback': errback})
 
+    def get_project_id_then_continue(self, project_page_text, contributor_id):
+        # First, extract the project ID from the page text
+        file_descriptor_wrapping_contents = StringIO.StringIO(project_page_text)
+        parsed = lxml.html.parse(file_descriptor_wrapping_contents).getroot()
+        badge_images = parsed.cssselect('.badge_preview img')
+        if not badge_images:
+            return # Oh, well.
+        badge_image_link = badge_images[0].attrib['src']
+        badge_image_link_parsed = [x for x in badge_image_link.split('/') if x]
+        project_id = int(badge_image_link_parsed[1])
+
+        ### We'll need to get the the ContributorFact XML blob before anything else goes on
+        self.command.call_getPage_on_data_dict(
+            self,
+            {'url': self.url_for_ohloh_query(
+                    'https://www.ohloh.net/p/%d/contributors/%d.xml' %
+                    (project_id, contributor_id)),
+             'callback': lambda xml_string: self.parse_contributor_facts_then_continue(xml_string, project_id),
+             'errback': self.squashIrrelevantErrors})
+
+    def parse_contributor_facts_then_continue(self, xml_string, project_id):
+        tree = self.parse_ohloh_xml(xml_string)
+        if tree is None:
+            return
+        
+        c_f = self.filter_ohloh_xml(tree, 'result/contributor_fact', many=False)
+        if not c_f:
+            return
+
+        # Now we go look for the project data XML blob.
+        return self.get_project_data_then_continue(project_id, c_f)
 ###
 
 SOURCE_TO_CLASS = {

@@ -1,0 +1,931 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html>
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <title>Debian GNU/Linux</title>
+  <meta name="description" content="Debian is a free operating system (OS) for your computer. An operating system is the set of basic programs and utilities that make your computer run. Debian uses the Linux kernel (the core of an operating system), but most of the basic OS tools come from the GNU project; hence the name GNU/Linux." />
+  <meta name="keywords" content="Debian GNU/Linux, license, code,code quality, m32r, gnu_linux, linux, operating_system, os, s390, m68k, system, ia64, xen, mips32, ppc, sparc64, spi, unix, desktop_environment, debian, distro, posix, kernel, ia32, amd64, ppc32, smp, ppc64, arm, operating, hppa, sh, mksh, sh4, avr32" />
+
+  <link href="https://www.ohloh.net/stylesheets/main.css?1295542775" media="screen" rel="stylesheet" type="text/css" />
+  <link href="https://www.ohloh.net/stylesheets/thickbox.css?1295542694" media="screen" rel="stylesheet" type="text/css" />
+  <!--[if IE]>
+	<link href="https://www.ohloh.net/stylesheets/ie_hacks.css?1295542694" media="screen" rel="stylesheet" type="text/css" />
+  <script defer type="text/javascript" src="/javascripts/pngfix.js"></script>
+  <![endif]-->
+
+  <script src="https://www.ohloh.net/javascripts/jquery-1.2.6-with-plugins.min.js?1295542694" type="text/javascript"></script>
+  <script src="https://www.ohloh.net/javascripts/main.js?1295542694" type="text/javascript"></script>
+
+
+
+
+  
+
+  
+  </head>
+<body>
+  <div id="page">
+    <div class='row' id='mast'>
+  <div class='logos'>
+    <a class='ohloh' href='https://www.ohloh.net/'>    </a>
+    <a class='root' href='https://www.ohloh.net/'>    </a>
+  </div>
+</div>
+    <div class='row'>
+  <ul class='select_ main_menu clear'>
+    <li class='search'>
+      <form action='/search' class='search'>
+        <input class='text' name='q' type='text' />
+      </form>
+    </li>
+    <li class='session'>
+      <a href="https://www.ohloh.net/accounts/new"><span>Register</span></a>
+    </li>
+    <li class='session'>
+      <a href="https://www.ohloh.net/sessions/new"><span>Login</span></a>
+    </li>
+    <li class='home'><a href="/"><span>Home</span></a></li>
+    <li class='people'><a href="/people"><span>People</span></a></li>
+    <li class='projects'><a href="/p"><span>Projects</span></a></li>
+    <li class='forums'><a href="/forums"><span>Forums</span></a></li>
+    <li class='tools'><a href="/tools"><span>Tools</span></a></li>
+    <li class='blog'><a href="/blog"><span style="color:#cc3300">Blog</span></a></li>
+  </ul>
+  <ul class='nomargin session' style='display:none'>
+    <li><a href="/sessions/new">Login</a></li>
+    <li><a href="/accounts/new">Register</a></li>
+  </ul>
+</div>
+
+    
+    
+    
+
+    <div class="row">
+      <div class="col span_13 prepend_3 last">
+      </div>
+    </div>
+<div class='row'>
+  <div class='col span_3 layout_anchor'>
+    <div class='inset_middle'>
+      <a href='/p/debian'>
+        <img alt="Openlogo-nd-100_med" class="logo" src="https://s3.amazonaws.com/cloud.ohloh.net/attachments/271/openlogo-nd-100_med.png" />
+      </a>
+    </div>
+  </div>
+  <div class='col span_13 last layout_h1 float_right'>
+    <div class='inset_middle'>
+      <h1><a href="/p/debian">Debian GNU/Linux</a></h1>
+    </div>
+  </div>
+</div>
+<div class='row'>
+  <div class='col span_3'>
+        <div class='sidebar mezzo sidebar_project'>
+      <div class='actions'>
+        <h6>
+          General
+        </h6>
+        <ul>
+          <li class=' selected first'>
+            <a class='' href='/p/debian'>
+              Summary
+            </a>
+          </li>
+          <li class=' '>
+            <a class='' href='/p/debian/messages'>
+              Journal Entries
+            </a>
+          </li>
+          <li class=' '>
+            <a class='' href='/p/debian/reviews'>
+              Reviews
+            </a>
+          </li>
+          <li class=' '>
+            <a class='' href='/p/debian/links'>
+              Links
+            </a>
+          </li>
+          <li class=' '>
+            <a class='' href='/p/debian/rss_articles'>
+              News
+            </a>
+          </li>
+          <li class=' '>
+            <a class='' href='/p/debian/managers'>
+              Managers
+            </a>
+          </li>
+          <li class=' '>
+            <a class='' href='/p/debian/widgets'>
+              Widgets
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class='actions'>
+        <h6>
+          Development
+        </h6>
+        <ul>
+          <li class=' first'>
+            <a class='' href='/p/debian/analyses/latest'>
+              Code Analysis
+            </a>
+          </li>
+          <li class=' '>
+            <a class='' href='/p/debian/contributors'>
+              Contributors
+            </a>
+          </li>
+          <li class=' '>
+            <a class='' href='/p/debian/commits'>
+              Commits
+            </a>
+          </li>
+          <li class=' '>
+            <a class='' href='/p/debian/enlistments'>
+              Enlistments
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class='actions'>
+        <h6>
+          Edit
+        </h6>
+        <ul>
+          <li class=' first'>
+            <a class='' href='/p/debian/permissions'>
+              Permissions
+            </a>
+          </li>
+          <li class=' '>
+            <a class='' href='/p/debian/edits'>
+              History
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <hr class='one' />
+  </div>
+  <div class='col span_13 last mezzo'>
+    
+    <div class='col span_7 mezzo'>
+      <div class='clear inset'>
+        <p>Debian is a free operating system (OS) for your computer. An operating system is the set of basic programs and utilities that make your computer run. Debian uses the Linux kernel (the core of an operating system), but most of the basic OS tools come from the GNU project; hence the name GNU/Linux.</p>
+      </div>
+      <div class='clear inset mezzo'>
+        <a class='needs_login follow' href='#'>
+          Follow
+        </a>
+        <a class='float_right follow_count' href='/p/debian/followers'>
+          45 followers
+        </a>
+        <h4 class='nomargin'>Journal Entries</h4>
+        <div class='clear'>
+          <div class='float_right'>
+            <a class='timeline_link' href='/p/debian/messages/timeline'>Timeline View</a>
+          </div>
+        </div>
+        <div class='message clear'>
+          <a href="/accounts/mirabilos" class="avatar "><img alt="Avatar" class="avatar" height="20" src="https://secure.gravatar.com/avatar.php?gravatar_id=4a1f42a59e40446158ce872818a963a3&amp;rating=PG&amp;size=20&amp;default=https%3a%2f%2fwww.ohloh.net%2fimages%2fanon%2fanon32.gif" width="20" /></a>
+          <div class='content'>
+            <p class='body'>
+              <strong>I win</strong>
+              <a href='http://www.ohloh.net/projects/Android'>Android</a> Honeycomb preview comes with <a href='http://www.ohloh.net/projects/mksh'>mksh</a> preinstalled. <a href='http://www.ohloh.net/projects/mksh'>mksh</a> now got a “no job signals” mode, with which it works even on <a href='http://www.ohloh.net/projects/klibc'>klibc</a> (and maybe <a href='http://www.ohloh.net/projects/Syllable'>Syllable</a> or our beloved Plan 9 <a href='http://www.ohloh.net/projects/Glenda'>Glenda</a>). I ported klibc to <a href='http://www.ohloh.net/projects/Debian'>Debian</a> m68k (mostly…) too. See you at FOSDEM!
+              <span class='attribution'>
+                <a href="/accounts/mirabilos">mirabilos</a>
+                <span class='date'>
+                  &mdash;
+                  2 days
+                  ago
+                </span>
+              </span>
+            </p>
+          </div>
+        </div>
+        <div class='message clear'>
+          <a href="/accounts/mirabilos" class="avatar "><img alt="Avatar" class="avatar" height="20" src="https://secure.gravatar.com/avatar.php?gravatar_id=4a1f42a59e40446158ce872818a963a3&amp;rating=PG&amp;size=20&amp;default=https%3a%2f%2fwww.ohloh.net%2fimages%2fanon%2fanon32.gif" width="20" /></a>
+          <div class='content'>
+            <p class='body'>
+              <strong>also work related</strong>
+              It’s dangerous to send in patches to <a href='http://www.ohloh.net/projects/Debian'>Debian</a> projects… you might end up maintainer of even more packages…
+              <span class='attribution'>
+                <a href="/accounts/mirabilos">mirabilos</a>
+                <span class='date'>
+                  &mdash;
+                  13 days
+                  ago
+                </span>
+              </span>
+            </p>
+          </div>
+        </div>
+        <div class='message clear'>
+          <a href="/accounts/mirabilos" class="avatar "><img alt="Avatar" class="avatar" height="20" src="https://secure.gravatar.com/avatar.php?gravatar_id=4a1f42a59e40446158ce872818a963a3&amp;rating=PG&amp;size=20&amp;default=https%3a%2f%2fwww.ohloh.net%2fimages%2fanon%2fanon32.gif" width="20" /></a>
+          <div class='content'>
+            <p class='body'>
+              <strong>ohlol</strong>
+              cleaned up all failed enlistments in <a href='http://www.ohloh.net/projects/debian'>debian</a> several times already… please, hamster, run a few rounds now ;)
+              <span class='attribution'>
+                <a href="/accounts/mirabilos">mirabilos</a>
+                <span class='date'>
+                  &mdash;
+                  4 months
+                  ago
+                </span>
+              </span>
+            </p>
+          </div>
+        </div>
+        <div class='message clear'>
+          <a href="/accounts/xtaran" class="avatar "><img alt="Avatar" class="avatar" height="20" src="https://secure.gravatar.com/avatar.php?gravatar_id=5a9a0dd7c2b187d6115116f72cb0e487&amp;rating=PG&amp;size=20&amp;default=https%3a%2f%2fwww.ohloh.net%2fimages%2fanon%2fanon32.gif" width="20" /></a>
+          <div class='content'>
+            <p class='body'>
+              Released <a href='http://www.ohloh.net/projects/xen-tools'>xen-tools</a> 4.2 Beta 1 last night and uploaded it to <a href='http://www.ohloh.net/projects/Debian'>Debian</a> Unstable.
+              <span class='attribution'>
+                <a href="/accounts/xtaran">xtaran</a>
+                <span class='date'>
+                  &mdash;
+                  8 months
+                  ago
+                </span>
+              </span>
+            </p>
+          </div>
+        </div>
+        <div class='message clear'>
+          <a href="/accounts/mirabilos" class="avatar "><img alt="Avatar" class="avatar" height="20" src="https://secure.gravatar.com/avatar.php?gravatar_id=4a1f42a59e40446158ce872818a963a3&amp;rating=PG&amp;size=20&amp;default=https%3a%2f%2fwww.ohloh.net%2fimages%2fanon%2fanon32.gif" width="20" /></a>
+          <div class='content'>
+            <p class='body'>
+              <strong>dash</strong>
+              Considering my own experience with <a href='http://www.ohloh.net/projects/netbsd'>netbsd</a> ash (segfaults, bad code), <a href='http://www.ohloh.net/projects/android'>android</a> (ugly, no functionality), Jilles' Austin/POSIX mailing list statements, <a href='http://forums.freebsd.org/showthread.php?p=75143'>http://forums.freebsd.org/showthread.php?p=75143</a> and usability, I think <a href='http://www.ohloh.net/projects/debian'>debian</a> should just RoQA dash (84k i386, 133k mipsel, 76 bugs: 4 RC, 47 I&N, 16 M&W, 9 F&P) and make <a href='http://www.ohloh.net/projects/mksh'>mksh</a> (224/148k i386, 280/248k mipsel, 3 M&W bugs) the default shell
+              <span class='attribution'>
+                <a href="/accounts/mirabilos">mirabilos</a>
+                <span class='date'>
+                  &mdash;
+                  10 months
+                  ago
+                </span>
+              </span>
+            </p>
+          </div>
+        </div>
+        <a href="/p/debian/messages">See All Journal Entries</a>
+      </div>
+      <hr class='one' />
+      <div class='clear c1_light piano'>
+        <div class='inset'>
+          <h4>Ohloh Analysis Summary</h4>
+                        <ul class="factoids">
+                                <li class="neutral"><a href="/wiki/mostly_written">Mostly written in C</a></li>
+                              <li class="good"><a href="https://www.ohloh.net/p/debian/factoids/4051857">Mature, well-established codebase</a></li>
+                    <li class="good"><a href="https://www.ohloh.net/p/debian/factoids/4051856">Very large, active development team</a></li>
+                    <li class="warning"><a href="https://www.ohloh.net/p/debian/factoids/4051858">Decreasing year-over-year development activity</a></li>
+                  </ul>
+          <p class='updated'>Updated 20 Oct 2010 09:17 UTC</p>
+        </div>
+      </div>
+      <hr class='one' />
+      <div class='piano'>
+        <div class='inset_top'>
+          <h4>Ratings & Reviews</h4>
+        </div>
+        <div class='clear' id='community_and_your_rating'>
+          <div class='col span_3'>
+            <div class='inset_middle'>
+              <h6 class='soft'>Community Rating</h6>
+              <div class='nomargin clear'>
+                <span class='score_text'>4.7/5.0</span>
+                <span class='jrating' id='average_rating_stars' read_only='t' score='4.68273' star_style='big'>        </span>
+              </div>
+              <p class='soft small' id='average_rating_details_2'>
+                Based on
+                498
+                user ratings.
+              </p>
+            </div>
+          </div>
+          <div class='col span_3 last'>
+            <div class='inset_middle'>
+              <h6 class='soft'>Your Rating</h6>
+              <div class='nomargin clear'>
+                <div class='needs_login jrating' id='debian' score='0' star_style='big'>        </div>
+              </div>
+              <p class='soft small'>
+                Click to rate this project.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class='review hreview helpful_container clear inset' id='review_135'>
+          <abbr class='dtreviewed date' title='Tue Apr 17 13:53:33 UTC 2007'>
+            over 4 years
+            ago
+          </abbr>
+          <img alt="Avatar" class="avatar" height="48" src="https://secure.gravatar.com/avatar.php?gravatar_id=a99ed98318c2e4c4a724958cd445d8a3&amp;rating=PG&amp;size=48&amp;default=https%3a%2f%2fwww.ohloh.net%2fimages%2fanon%2fanon80.gif" width="48" />
+          <h6 class='title'>
+            Debian, not just another Linux distribution
+          </h6>
+          <p class='subline'>
+            			<span id="rating_135">
+            			<span style="font-size:1px;float:left;display:inline;height:13px;width:57px;background:url(/images/stars/stars_ro_mini.png) left bottom">&nbsp;</span>
+            			</span>
+            <span class='reviewer vcard'>
+              <span class='by'>by</span>
+              <a class='url fn' href='https://www.ohloh.net/accounts/lping'>lping</a>
+            </span>
+          </p>
+          <p class='description'>
+            			I've installed Debian servers in all the organizations I was working for, for the past 10 years. Debian is not just like RedHat or SLES. Debian is the only Linux distribution with which I was able to provide four 9 availability (99.99%) on standalone servers (no clusters).<br/><br/>This is not only a Kernel problem, it is also related to the way the packages are maintained. Most of the updates are running moothly without services interruption.
+            			<span class="expander">
+            				<span>... <a href="#">[More]</a></span>
+            				<span style="display:none"> Several important migrations have been held other the years with a pretty good success.<br/><br/>The next goal would be to certify the distribution for several hardware (like SANs), to allow the use of Debian in some professional environments (datacenters).<br/><br/>Note that Debian is the only distribution with which HP is making a significant amount of money, providing support and certified material. <a href="#">[Less]</a></span>
+            			</span>
+          </p>
+          <p class='helpful soft'>
+            <span class='helpful_above'>
+              <span>
+                13 of 13 users found the following review helpful.
+              </span>
+            </span>
+            <span class='helpful_below soft'>
+              Was this review helpful to you?
+              <a class='needs_login'>Yes</a>
+              |
+              <a class='needs_login'>No</a>
+            </span>
+          </p>
+        </div>
+        <div class='inset'>
+          <a href="https://www.ohloh.net/p/debian/reviews/new" class="needs_login">What do you think? Share your opinion!</a>
+        </div>
+      </div>
+      <div class='piano'>
+        <div class='inset'>
+          <h4><a href="https://www.ohloh.net/p/debian/links">Links</a></h4>
+          <p class='nomargin'>
+            1 link
+            submitted so far.
+            <a href="https://www.ohloh.net/p/debian/links/new">Submit your own links.</a>
+          </p>
+        </div>
+        <div class='link inset' id='link_470'>
+          <a class='command float_right' href='/p/debian/links/470/edit'>Edit</a>
+          <div class='vote'>
+            <a class='needs_login up' href='#'>    </a>
+            <a class='needs_login down' href='#'>    </a>
+          </div>
+          <div class='text'>
+            <p class='nomargin'>
+              <strong>
+                <a href="http://planet.debian.org/">Planet Debian</a>
+              </strong>
+              <span class='domain'>planet.debian.org</span>
+            </p>
+            <p class='nomargin byline'>
+              <span class='points'>
+                4
+                points
+              </span>
+              <span>Category</span>
+              Forums
+            </p>
+          </div>
+        </div>
+        <div class='inset'>
+        </div>
+      </div>
+      <div class='piano'>
+        <div class='inset'>
+          <h4><a href="https://www.ohloh.net/p/debian/rss_articles">News</a></h4>
+          <p><a href="https://www.ohloh.net/p/debian/rss_subscriptions">Edit RSS feeds.</a></p>
+          <ul>
+            <div class='rss_article inset'>
+              <h6>
+                <a href="http://www.debian.org/News/project/2011/02/index.en.html#13">Important Debian Security Advisories</a>
+              </h6>
+              <p class='byline nomargin soft'>
+                <span>
+                  Posted
+                  about 5 hours
+                  ago
+                </span>
+              </p>
+              <p>Debian's Security Team recently released<br/>	advisories for these packages (among others):<br/>wireshark,<br/>libsmi,<br/>mydms,<br/>pimd,<br/>tor,<br/>dbus,<br/>request-tracker3.6,<br/>openoffice.org,<br/>hplip,<br/>linux-2.6,<br/>exim4 and<br/>freetype.<br/>	Please read them carefully and take the proper measures.</p>
+            </div>
+            <div class='rss_article inset'>
+              <h6>
+                <a href="http://www.debian.org/News/project/2011/02/index.en.html#12">Release-critical bugs statistics for the upcoming release</a>
+              </h6>
+              <p class='byline nomargin soft'>
+                <span>
+                  Posted
+                  about 5 hours
+                  ago
+                </span>
+              </p>
+              <p>
+                			According to the Bugs Search<br/>        interface of the Ultimate Debian Database, the upcoming release,<br/>	Debian 6.0 "Squeeze", is currently affected by<br/>8 release-critical bugs. Ignoring bugs which are easily solved<br/>	or on the way to
+                			<span class="expander">
+                				<span>... <a href="#">[More]</a></span>
+                				<span style="display:none"> being solved, roughly speaking, only about<br/>5 release-critical bugs remain to be solved for the<br/>	release to happen! <a href="#">[Less]</a></span>
+                			</span>
+              </p>
+            </div>
+            <div class='rss_article inset'>
+              <h6>
+                <a href="http://www.debian.org/News/project/2011/02/index.en.html#11">New Debian Contributors</a>
+              </h6>
+              <p class='byline nomargin soft'>
+                <span>
+                  Posted
+                  about 5 hours
+                  ago
+                </span>
+              </p>
+              <p>
+                			3 applicants have been accepted as<br/>Debian Developers, 1 applicant has been accepted<br/>as Debian Maintainer, and 3 people have started<br/>maintaining packages since the previous issue of the Debian<br/>Project News. Please welcome Kamal
+                			<span class="expander">
+                				<span>... <a href="#">[More]</a></span>
+                				<span style="display:none"> Mostafa, Scott Howard, Kai<br/>Wasserb&auml;ch, Vincent Legout, Christer Edwards, Rico Tzschichholz,<br/>and Krzysztof Klimonda into our project! <a href="#">[Less]</a></span>
+                			</span>
+              </p>
+            </div>
+            <div class='rss_article inset'>
+              <h6>
+                <a href="http://www.debian.org/News/project/2011/02/index.en.html#10">Other news</a>
+              </h6>
+              <p class='byline nomargin soft'>
+                <span>
+                  Posted
+                  about 5 hours
+                  ago
+                </span>
+              </p>
+              <p>Aur&eacute;lien Jarno announced the new debian-ports<br/>archive signing key, which will be used to sign the archive on<br/>unofficial ports.</p>
+            </div>
+            <div class='rss_article inset'>
+              <h6>
+                <a href="http://www.debian.org/News/project/2011/02/index.en.html#9">Further &#34;This week in Debian&#34; interviews</a>
+              </h6>
+              <p class='byline nomargin soft'>
+                <span>
+                  Posted
+                  about 5 hours
+                  ago
+                </span>
+              </p>
+              <p>Since the last issue of the Debian Project News, one new issue of the<br/>"This week in<br/>Debian" podcast has been published: an interview with<br/>Jonas<br/>Smedegaard, discussing the Freedom Box.</p>
+            </div>
+          </ul>
+          <p><a href="https://www.ohloh.net/p/debian/rss_articles">Read all Debian GNU/Linux articles&#0133;</a></p>
+        </div>
+      </div>
+    </div>
+    <div class='col span_6 mezzo last'>
+      <div class='inset'>
+        <a href="/p/debian/external_download" class="external" onclick="var f = document.createElement('form'); f.style.display = 'none'; this.parentNode.appendChild(f); f.method = 'POST'; f.action = this.href;var m = document.createElement('input'); m.setAttribute('type', 'hidden'); m.setAttribute('name', '_method'); m.setAttribute('value', 'post'); f.appendChild(m);f.submit();return false;">Download Page</a>
+        <dd class='small soft'>116 downloads</dd>
+      </div>
+      <div class='c1_light'>
+        <div class='inset'>
+          <dl class='nomargin'>
+            <dt class='first'><a href="http://www.debian.org/">Homepage</a></dt>
+            <dd class='small soft'><a href="http://www.debian.org/">http://www.debian.org/</a></dd>
+            <dt class='first'>Licensed under</dt>
+            <dd><a href="https://www.ohloh.net/licenses/132">Distributable</a></dd>
+            <dt class='first'>Tagged as</dt>
+            <dd>
+              <a class='noborder' href='/p/debian/tags/select'>
+                <img alt='Project Tags' height='16' src='/images/tag_yellow.png' style='vertical-align:middle' width='16' />
+              </a>
+              <a href="/tags/debian/m32r" class="tag">m32r</a> <a href="/tags/debian/gnu_linux" class="tag">gnu_linux</a> <a href="/tags/debian/linux" class="tag">linux</a> <a href="/tags/debian/operating_system" class="tag">operating_system</a> <a href="/tags/debian/os" class="tag">os</a> <a href="/tags/debian/s390" class="tag">s390</a> <a href="/tags/debian/m68k" class="tag">m68k</a> <a href="/tags/debian/system" class="tag">system</a> <a href="/tags/debian/ia64" class="tag">ia64</a> <a href="/tags/debian/xen" class="tag">xen</a> <a href="/tags/debian/mips32" class="tag">mips32</a> <a href="/tags/debian/ppc" class="tag">ppc</a> <a href="/tags/debian/sparc64" class="tag">sparc64</a> <a href="/tags/debian/spi" class="tag">spi</a> <a href="/tags/debian/unix" class="tag">unix</a> <a href="/tags/debian/desktop_environment" class="tag">desktop_environment</a> <a href="/tags/debian/debian" class="tag">debian</a> <a href="/tags/debian/distro" class="tag">distro</a> <a href="/tags/debian/posix" class="tag">posix</a> <a href="/tags/debian/kernel" class="tag">kernel</a> <a href="/tags/debian/ia32" class="tag">ia32</a> <a href="/tags/debian/amd64" class="tag">amd64</a> <a href="/tags/debian/ppc32" class="tag">ppc32</a> <a href="/tags/debian/smp" class="tag">smp</a> <a href="/tags/debian/ppc64" class="tag">ppc64</a> <a href="/tags/debian/arm" class="tag">arm</a> <a href="/tags/debian/operating" class="tag">operating</a> <a href="/tags/debian/hppa" class="tag">hppa</a> <a href="/tags/debian/sh" class="tag">sh</a> <a href="/tags/debian/mksh" class="tag">mksh</a> <a href="/tags/debian/sh4" class="tag">sh4</a> <a href="/tags/debian/avr32" class="tag">avr32</a>
+              |
+              <a href="/p/debian/tags/select">edit tags</a>
+            </dd>
+          </dl>
+        </div>
+      </div>
+      <hr class='one' />
+      <div class='piano inset'>
+        <h4 class='iusethis'>Who uses Debian GNU/Linux?</h4>
+        <div class='iusethis'>
+          <a class='iusethis needs_login' href='#' id='stackit_debian' onMouseOut="this.style.background = 'url(https://www.ohloh.net/images/iuseit_small.png) 0px 0px no-repeat'" onMouseOver="this.style.background = 'url(https://www.ohloh.net/images/iuseit_small.png) 0 -69px no-repeat'" style='display:block;float:left;background: url(https://www.ohloh.net/images/iuseit_small.png) 0px 0px no-repeat; text-decoration: none; width: 70px; height: 69px;' title='Debian GNU/Linux has been stacked by 1471 users. Click here to add it to your stack.'>
+            <div style='width: 70px; line-height: 1.2em; height: 69px'>
+              <p style='font-weight: bold; font-size:18pt; text-align:center; padding:4px 0px 0px 0px; color:#fff; font-family:helvetica; letter-spacing:-0.05em; line-height: 1.2em; '>1471</p>
+            </div>
+          </a>
+        </div>
+        <div class='users lightup_avatar clear'>
+          <a href="/accounts/przemoc" class="avatar " title="Przemysław Pawełczyk"><img alt="Avatar" class="avatar" height="24" src="https://secure.gravatar.com/avatar.php?gravatar_id=a57a7e311098f773ded2e82dc72d65e4&amp;rating=PG&amp;size=24&amp;default=https%3a%2f%2fwww.ohloh.net%2fimages%2fanon%2fanon32.gif" width="24" /></a>
+          <a href="/accounts/pete_m" class="avatar " title="pete_m"><img alt="Avatar" class="avatar" height="24" src="https://secure.gravatar.com/avatar.php?gravatar_id=985dd8206f0b727e22711f5092957e2e&amp;rating=PG&amp;size=24&amp;default=https%3a%2f%2fwww.ohloh.net%2fimages%2fanon%2fanon32.gif" width="24" /></a>
+          <a href="/accounts/abatishchev" class="avatar " title="abatishchev"><img alt="Avatar" class="avatar" height="24" src="https://secure.gravatar.com/avatar.php?gravatar_id=b9da2ca6abf3a1e28fb470f2b3ae2c34&amp;rating=PG&amp;size=24&amp;default=https%3a%2f%2fwww.ohloh.net%2fimages%2fanon%2fanon32.gif" width="24" /></a>
+          <a href="/accounts/petri" class="avatar " title="petri"><img alt="Avatar" class="avatar" height="24" src="https://secure.gravatar.com/avatar.php?gravatar_id=cc86d18ec0fdb7c449f62d15fa0a1073&amp;rating=PG&amp;size=24&amp;default=https%3a%2f%2fwww.ohloh.net%2fimages%2fanon%2fanon32.gif" width="24" /></a>
+          <a href="/accounts/michela" class="avatar " title="Michela Ledwidge"><img alt="Avatar" class="avatar" height="24" src="https://secure.gravatar.com/avatar.php?gravatar_id=18efc792c0732f67dc18604052cb9e91&amp;rating=PG&amp;size=24&amp;default=https%3a%2f%2fwww.ohloh.net%2fimages%2fanon%2fanon32.gif" width="24" /></a>
+          <a href="/accounts/Vadmium" class="avatar " title="Vadmium"><img alt="Avatar" class="avatar" height="24" src="https://secure.gravatar.com/avatar.php?gravatar_id=98dba21a7cfadfe105a95784016e28af&amp;rating=PG&amp;size=24&amp;default=https%3a%2f%2fwww.ohloh.net%2fimages%2fanon%2fanon32.gif" width="24" /></a>
+          <a href="/accounts/jmafc" class="avatar " title="Joe Abbate"><img alt="Avatar" class="avatar" height="24" src="https://secure.gravatar.com/avatar.php?gravatar_id=0d235d4094b8dbf2cd9932667d828795&amp;rating=PG&amp;size=24&amp;default=https%3a%2f%2fwww.ohloh.net%2fimages%2fanon%2fanon32.gif" width="24" /></a>
+          <a href="/accounts/cjac" class="avatar " title="cjac"><img alt="Avatar" class="avatar" height="24" src="https://secure.gravatar.com/avatar.php?gravatar_id=cc7ad0d32c7f0c64dc8e093033892249&amp;rating=PG&amp;size=24&amp;default=https%3a%2f%2fwww.ohloh.net%2fimages%2fanon%2fanon32.gif" width="24" /></a>
+          <a href="/accounts/simohe" class="avatar " title="simohe"><img alt="Avatar" class="avatar" height="24" src="https://secure.gravatar.com/avatar.php?gravatar_id=fa7ba4c8ca1f7d725f0f1bc4f2d470c2&amp;rating=PG&amp;size=24&amp;default=https%3a%2f%2fwww.ohloh.net%2fimages%2fanon%2fanon32.gif" width="24" /></a>
+          <a href="/accounts/vaidyagi" class="avatar " title="Gaurav Vaidya"><img alt="Avatar" class="avatar" height="24" src="https://secure.gravatar.com/avatar.php?gravatar_id=ef10e56567f5d6e20bc3f7f4ab4e3254&amp;rating=PG&amp;size=24&amp;default=https%3a%2f%2fwww.ohloh.net%2fimages%2fanon%2fanon32.gif" width="24" /></a>
+          <a href="/accounts/terrywang" class="avatar " title="terrywang"><img alt="Avatar" class="avatar" height="24" src="https://secure.gravatar.com/avatar.php?gravatar_id=7947e33262522e37b102e533aca4389d&amp;rating=PG&amp;size=24&amp;default=https%3a%2f%2fwww.ohloh.net%2fimages%2fanon%2fanon32.gif" width="24" /></a>
+          <a href="/accounts/chrissharp123" class="avatar " title="chrissharp123"><img alt="Avatar" class="avatar" height="24" src="https://secure.gravatar.com/avatar.php?gravatar_id=455d00a55c00365b60c48b496d26b5d9&amp;rating=PG&amp;size=24&amp;default=https%3a%2f%2fwww.ohloh.net%2fimages%2fanon%2fanon32.gif" width="24" /></a>
+        </div>
+        <div class='float_right'>
+          <a href='https://www.ohloh.net/p/debian/stacks'>See all...</a>
+        </div>
+      </div>
+      <hr class='one' />
+      <div class='piano inset'>
+        <h4 class='iusethis'>Who contributes to Debian GNU/Linux?</h4>
+        <div class='users lightup_avatar clear'>
+          <a href="/accounts/jdanjou" class="avatar " title="Julien Danjou"><img alt="Avatar" class="avatar" height="24" src="https://secure.gravatar.com/avatar.php?gravatar_id=c8cf9bd8e8e6cb1860dc384426f89951&amp;rating=PG&amp;size=24&amp;default=https%3a%2f%2fwww.ohloh.net%2fimages%2fanon%2fanon32.gif" width="24" /></a>
+          <a href="/accounts/fjp" class="avatar " title="Frans Pop"><img alt="Avatar" class="avatar" height="24" src="https://secure.gravatar.com/avatar.php?gravatar_id=77e19fe12956ff753b0c6ebfd2109629&amp;rating=PG&amp;size=24&amp;default=https%3a%2f%2fwww.ohloh.net%2fimages%2fanon%2fanon32.gif" width="24" /></a>
+          <a href="/accounts/lool" class="avatar " title="lool"><img alt="Avatar" class="avatar" height="24" src="https://secure.gravatar.com/avatar.php?gravatar_id=25bb72f6d1db0489bc01e53d57c5857c&amp;rating=PG&amp;size=24&amp;default=https%3a%2f%2fwww.ohloh.net%2fimages%2fanon%2fanon32.gif" width="24" /></a>
+          <a href="/accounts/cjwatson" class="avatar " title="cjwatson"><img alt="Avatar" class="avatar" height="24" src="https://secure.gravatar.com/avatar.php?gravatar_id=8f5d7d6dfd4c13acf04a2a965667f405&amp;rating=PG&amp;size=24&amp;default=https%3a%2f%2fwww.ohloh.net%2fimages%2fanon%2fanon32.gif" width="24" /></a>
+          <a href="/accounts/aurel32" class="avatar " title="Aurelien Jarno"><img alt="Avatar" class="avatar" height="24" src="https://secure.gravatar.com/avatar.php?gravatar_id=8b0b59c2333bd5ecc25ecad49e9f2165&amp;rating=PG&amp;size=24&amp;default=https%3a%2f%2fwww.ohloh.net%2fimages%2fanon%2fanon32.gif" width="24" /></a>
+          <a href="/accounts/meebey" class="avatar " title="Mirco 'meebey' Bauer"><img alt="Avatar" class="avatar" height="24" src="https://secure.gravatar.com/avatar.php?gravatar_id=33eb2ee73188dd34df5afacc153d4846&amp;rating=PG&amp;size=24&amp;default=https%3a%2f%2fwww.ohloh.net%2fimages%2fanon%2fanon32.gif" width="24" /></a>
+          <a href="/accounts/Ryan52" class="avatar " title="Ryan52"><img alt="Avatar" class="avatar" height="24" src="https://secure.gravatar.com/avatar.php?gravatar_id=a653dea964053d70e5ac1ef7def7f6df&amp;rating=PG&amp;size=24&amp;default=https%3a%2f%2fwww.ohloh.net%2fimages%2fanon%2fanon32.gif" width="24" /></a>
+          <a href="/accounts/fmarier" class="avatar " title="Francois Marier"><img alt="Avatar" class="avatar" height="24" src="https://secure.gravatar.com/avatar.php?gravatar_id=7cc352a2907216992f0f16d2af50b070&amp;rating=PG&amp;size=24&amp;default=https%3a%2f%2fwww.ohloh.net%2fimages%2fanon%2fanon32.gif" width="24" /></a>
+        </div>
+        <div class='float_right'>
+          <a href='/p/debian/contributors'>See All Contributors</a>
+        </div>
+      </div>
+      <hr class='one' />
+      <div class='piano inset'>
+        <h4 class='iusethis'>Who manages Debian GNU/Linux?</h4>
+        <div class='users lightup_avatar clear'>
+        </div>
+        <a href='/p/debian/manages/new'>I'm a manager</a>
+      </div>
+      <div class='piano inset'>
+        <h4 class='nomargin'>Where in the world?</h4>
+      </div>
+      
+      <div class='multipanel clear' id='map_container'>
+        <ul class='nav clear'>
+          <li class='selected' id='li_users'>
+            <a href="#" id="a_users" onclick="">Users</a>
+          </li>
+          <li id='li_contributors'>
+            <a href="#" id="a_contributors" onclick="return ProjectMap.getContributors();">Contributors</a>
+          </li>
+          <li>
+            <a href="/p/debian/map">View Larger Map</a>
+          </li>
+        </ul>
+        <div class='content'>
+          <div id='map'></div>
+          <p class='nomargin' id='map_status'></p>
+        </div>
+      </div>
+      <hr class='one' />
+      <hr class='one' />
+      <div class='piano c3_light'>
+        <div class='inset'>
+          <h4>Related Projects by Tags</h4>
+          <p class='nomargin'>
+            <a href="https://www.ohloh.net/p/AuroraUX">AuroraUX</a>, <a href="https://www.ohloh.net/p/freebsd">FreeBSD</a>, <a href="https://www.ohloh.net/p/gentoo">Gentoo Linux</a>, <a href="https://www.ohloh.net/p/helenos">HelenOS</a>, <a href="https://www.ohloh.net/p/netbsd">NetBSD</a>
+          </p>
+        </div>
+      </div>
+      <hr class='one' />
+      <div class='piano c2_light'>
+        <div class='inset'>
+          <h4>People who use Debian GNU/Linux also use:</h4>
+          <p class='nomargin'>
+            <a href="https://www.ohloh.net/p/dpkg"><img alt="dpkg" class="related_by_logo" height="20" src="https://s3.amazonaws.com/cloud.ohloh.net/attachments/1189/console.png" title="dpkg" width="20" /></a> <a href="https://www.ohloh.net/p/openssh"><img alt="OpenSSH" class="related_by_logo" height="20" src="https://s3.amazonaws.com/cloud.ohloh.net/attachments/1343/OpenSSH_logo.png" title="OpenSSH" width="20" /></a> <a href="https://www.ohloh.net/p/wapua">wApua</a> <a href="https://www.ohloh.net/p/7976">initramfs-tools</a> <a href="https://www.ohloh.net/p/gnupg"><img alt="GnuPG" class="related_by_logo" height="20" src="https://s3.amazonaws.com/cloud.ohloh.net/attachments/1361/thomas_wittek-logo-2.png" title="GnuPG" width="20" /></a> <a href="https://www.ohloh.net/p/grub"><img alt="GNU GRUB" class="related_by_logo" height="20" src="https://s3.amazonaws.com/cloud.ohloh.net/attachments/1981/grub-favicon-64x64.png" title="GNU GRUB" width="20" /></a> <a href="https://www.ohloh.net/p/screen"><img alt="GNU Screen" class="related_by_logo" height="20" src="https://s3.amazonaws.com/cloud.ohloh.net/attachments/1189/console.png" title="GNU Screen" width="20" /></a> <a href="https://www.ohloh.net/p/rsync"><img alt="rsync" class="related_by_logo" height="20" src="https://s3.amazonaws.com/cloud.ohloh.net/attachments/816/rsync.png" title="rsync" width="20" /></a> <a href="https://www.ohloh.net/p/bzip2"><img alt="bzip2" class="related_by_logo" height="20" src="https://s3.amazonaws.com/cloud.ohloh.net/attachments/1323/bzip2-logo.png" title="bzip2" width="20" /></a> <a href="https://www.ohloh.net/p/postfix"><img alt="Postfix" class="related_by_logo" height="20" src="https://s3.amazonaws.com/cloud.ohloh.net/attachments/1346/mysza.png" title="Postfix" width="20" /></a> <a href="https://www.ohloh.net/p/aptitude"><img alt="Aptitude" class="related_by_logo" height="20" src="https://s3.amazonaws.com/cloud.ohloh.net/attachments/1189/console.png" title="Aptitude" width="20" /></a> <a href="https://www.ohloh.net/p/tar"><img alt="GNU tar" class="related_by_logo" height="20" src="https://s3.amazonaws.com/cloud.ohloh.net/attachments/135/Torchlight_tar.png" title="GNU tar" width="20" /></a>
+          </p>
+        </div>
+      </div>
+      <div class='col span_6 last'>
+        <hr class='one' />
+      </div>
+      <script type='text/javascript'>
+        //<![CDATA[
+          var project_analysis = {"logic_man_years": 17040.2738048718, "markup_man_years": 1540.66268919105};
+          
+        //]]>
+      </script>
+      <div class='col span_6 last' id='cocomo'>
+        <table cellpadding='0' cellspacing='0' width='100%'>
+          <tr>
+            <th>
+              <h4 class='nomargin'>Project Cost</h4>
+            </th>
+            <th class='last'></th>
+          </tr>
+          <tr class='prolog'>
+            <td colspan='2'>
+              This calculator estimates how much it would cost to hire a team to write this project from scratch.
+              <a href="/wiki/project_codebase_cost">More &raquo</a>
+            </td>
+          </tr>
+          <tr>
+            <td>Include</td>
+            <td class='value'>
+              <select id='cocomo_loc_dropdown'>
+                <option class='selected' value='59681447'>Markup And Code</option>
+                <option value='5030344'>Markup Only</option>
+                <option value='49620759'>Code Only</option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td>Codebase</td>
+            <td class='value'>
+              <span id='cocomo_loc'>54,651,103</span>
+            </td>
+          </tr>
+          <tr>
+            <td>Effort (est.)</td>
+            <td class='value'>
+              <span id='cocomo_years'>18581</span>
+              Person Years
+            </td>
+          </tr>
+          <tr>
+            <td>Avg. Salary</td>
+            <td class='value'>
+              $
+              <input class='right' id='cocomo_salary' size='7' type='text' value='55000' />
+              year
+            </td>
+          </tr>
+          <tr class='last'>
+            <td class='value' colspan='2'>
+              $
+              <span id='cocomo_value'>1,021,951,507</span>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class='col span_6 last'>
+        <hr class='one' />
+        <a class='promo' href='/p/debian/widgets'>
+          <div class='inset'>
+            <h4>Widgets</h4>
+            <p>Learn how to embed this and other widgets on your site.</p>
+            <div class='badge_preview' style='text-align:center'>
+              <img src='/p/4265/widgets/project_thin_badge.gif' />
+            </div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="clear" style="padding:1px;"></div>
+    <div id='footer'>
+  <div class='row'>
+    <div class='col span_3 mezzo'>
+      <div class='inset'>
+        <h4>Ohloh</h4>
+        <ul>
+          <li>
+            <a href='https://www.ohloh.net/about/us'>About</a>
+          </li>
+          <li>
+            <a href='https://www.ohloh.net/help/support'>Support</a>
+          </li>
+          <li>
+            <a href='https://www.ohloh.net/blog'>Blog</a>
+          </li>
+          <li>
+            <a href='https://www.ohloh.net/releases'>Releases</a>
+          </li>
+          <li>
+            <a href='https://www.ohloh.net/about/news'>News</a>
+          </li>
+          <li><a href="https://www.ohloh.net/forums">Forums</a></li>
+          <li>
+            <a href='https://www.ohloh.net/api/getting_started'>API</a>
+          </li>
+          <li>
+            <a href='https://www.ohloh.net/about/terms'>Terms</a>
+          </li>
+          <li>
+            <a href='https://www.ohloh.net/about/privacy'>Privacy</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class='col span_3 mezzo'>
+      <div class='inset'>
+        <h4>New Projects</h4>
+        <ul>
+          <li><a href="https://www.ohloh.net/p/freoffice-online-services-plugin">Freoffice Online Services Plugin</a></li>
+          <li><a href="https://www.ohloh.net/p/freoffice-blog-plugin">Freoffice Blog Plugin</a></li>
+          <li><a href="https://www.ohloh.net/p/guile-gir">guile-gir</a></li>
+          <li><a href="https://www.ohloh.net/p/atptgit">a-test-project-testing-gitty</a></li>
+          <li><a href="https://www.ohloh.net/p/heredar">Heredar</a></li>
+          <li><a href="https://www.ohloh.net/p/android-romupdater">ROM Updater</a></li>
+          <li><a href="https://www.ohloh.net/p/vauto">vauto</a></li>
+          <li><a href="https://www.ohloh.net/p/hornetq-rest-war">HornetQ-Rest WAR</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class='col span_5 mezzo'>
+      <div class='inset'>
+        <h4><a href="/posts">Recent Posts</a></h4>
+        <ul>
+          <li>
+            <a class='listing_block' href='/forums/11/topics/6145#posts-17226'>
+              CRM Software
+              <span class='author'>
+                by
+                crm-admirer
+              </span>
+              <br />
+              <div class='comment'>
+                Hi guys,
+                My feed back about ohloh is good but as per my experience regarding CRM business solutio...
+              </div>
+            </a>
+          </li>
+          <li>
+            <a class='listing_block' href='/forums/10/topics/6144#posts-17225'>
+              Avogadro failed enlistment
+              <span class='author'>
+                by
+                Marcus D. Hanwell
+              </span>
+              <br />
+              <div class='comment'>
+                The Avogadro project failed to update 12 days ago, and it seems to be stuck now.
+                
+                https://www.ohl...
+              </div>
+            </a>
+          </li>
+          <li>
+            <a class='listing_block' href='/forums/10/topics/6131#posts-17224'>
+              Analysis for project 'Boost C++ Libraries' stalled for several month
+              <span class='author'>
+                by
+                Rene Rivera
+              </span>
+              <br />
+              <div class='comment'>
+                I removed some extraneous enlistments.. Which seems to have kick-started the processing. Unfortun...
+              </div>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class='col span_5 mezzo last'>
+      <div class='inset'>
+        <h4><a href="/reviews?sort_by=recently_added">Recent Reviews</a></h4>
+        <ul>
+          <li>
+            <a class='listing_block' href='https://www.ohloh.net/p/visualnunit/reviews'>
+              Visual Nunit
+              <span class='author'>
+                by
+                onetester
+              </span>
+              <br />
+              			<span class='stars' id="footer_star_2099">
+              			<span style="font-size:1px;float:left;display:inline;height:13px;width:57px;background:url(/images/stars/stars_0_mini.png) right bottom">&nbsp;</span>
+              			</span>
+              <br />
+              <span class='comment'>
+                You say "Visual Nunit 2010 1.1.7 Released", but on the site there's only 1.1.3. That's on SourceF...
+              </span>
+            </a>
+          </li>
+          <li>
+            <a class='listing_block' href='https://www.ohloh.net/p/365/reviews'>
+              Atlas
+              <span class='author'>
+                by
+                DarwinNE
+              </span>
+              <br />
+              			<span id="footer_star_2098">
+              			<span style="font-size:1px;float:left;display:inline;height:13px;width:57px;background:url(/images/stars/stars_ro_mini.png) left bottom">&nbsp;</span>
+              			</span>
+              <br />
+              <span class='comment'>
+                Atlas can provide a very useful basic automatically tuned linear algebra package when an optimize...
+              </span>
+            </a>
+          </li>
+          <li>
+            <a class='listing_block' href='https://www.ohloh.net/p/apache/reviews'>
+              Apache HTTP Server
+              <span class='author'>
+                by
+                Thila
+              </span>
+              <br />
+              			<span class='stars' id="footer_star_2097">
+              			<span style="font-size:1px;float:left;display:inline;height:13px;width:57px;background:url(/images/stars/stars_0_mini.png) right bottom">&nbsp;</span>
+              			</span>
+              <br />
+              <span class='comment'>
+                Very Good
+              </span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <p style='clear:left'>&nbsp;</p>
+  <p class='copyright clear'>
+    Copyright ©
+    2011
+    <a href="http://www.blackducksoftware.com">Black Duck Software, Inc.</a>,
+    All Rights Reserved.
+  </p>
+</div>
+
+  <script type="text/javascript">
+
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-20399350-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+
+  </script>
+
+  <script type="text/javascript">
+//<![CDATA[
+var ProjectMap = {
+	getStacks: function() {
+		$('#a_users').onclick=null;
+		$('#a_contributors').onclick=null;
+
+		$('#li_users').addClass('selected');
+		$('#li_contributors').removeClass('selected');
+
+		Map.map.clearOverlays();
+		$('#map_status').innerHTML='Loading users...';
+		Map.defaultIconImage='/images/map_gray.png';
+		Map.url='/p/debian/stacks/near';
+		Map.onComplete=function(jsonData){
+			if(jsonData && jsonData.accounts && jsonData.accounts.length > 0){
+				$('#map_status').html('Showing ' + jsonData.accounts.length +
+					' of <a href="https://www.ohloh.net/p/debian/stacks">1471 users</a>.');
+			}else{
+				$('#map_status').html('No users located.');
+			}
+			$('#a_contributors').onclick=ProjectMap.getContributors;
+		};
+		Map.getMarkers();
+		return false;
+	},
+	getContributors: function() {
+		$('#a_users').onclick=null;
+		$('#a_contributors').onclick=null;
+
+		$('#li_users').removeClass('selected');
+		$('#li_contributors').addClass('selected');
+
+		Map.map.clearOverlays();
+		$('#map_status').innerHTML='Loading contributors...';
+		Map.defaultIconImage='/images/map_yellow.png';
+		Map.url='/p/debian/contributors/near';
+		Map.onComplete=function(jsonData){
+			if(jsonData && jsonData.accounts && jsonData.accounts.length > 0){
+				$('#map_status').html('Showing ' + jsonData.accounts.length +
+										' of <a href="https://www.ohloh.net/p/debian/contributors">4261 contributors</a>.');
+								}else{
+				$('#map_status').html('No contributors located.');
+			}
+			$('#a_users').bind('click', ProjectMap.getStacks);
+		};
+		Map.getMarkers();
+		return false;
+	}
+}
+//]]>
+</script>
+<script src='http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAchKtP8sqcRD35MfSaUWftRS9_JF4cRcfPwG-aXRJHg4WOCZxNBRBki7ZWqp4LTQhBtwTAbJN8LgzUQ' type='text/javascript'></script><script type="text/javascript">
+//<![CDATA[
+		  $(document).ready(function(){ Map.load(0, null); Map.moveTo(10,20,0);});
+			$(window).bind('unload', function(){ GUnload(); });
+
+//]]>
+</script><script type="text/javascript">
+//<![CDATA[
+Map.postMap = ProjectMap.getStacks;
+//]]>
+</script>
+
+
+  </div>
+</body>
+</html>

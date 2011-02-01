@@ -102,6 +102,12 @@ class FakeGetPage(object):
         self.url2data['http://www.ohloh.net/projects/479665.xml?api_key=JeXHeaQhjXewhdktn4nUw'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', '479665.xml')).read()
         self.url2data['https://www.ohloh.net/p/cchost/contributors/65837553699824'] = ''
         self.url2data['https://www.ohloh.net/p/ccsearch-/contributors/2060147635589231'] = ''
+        self.url2data['https://www.ohloh.net/p/debian'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', 'debian')).read()
+        self.url2data['https://www.ohloh.net/p/cchost'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', 'cchost')).read()
+        self.url2data['https://www.ohloh.net/p/15329/contributors/65837553699824.xml?api_key=JeXHeaQhjXewhdktn4nUw'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', '65837553699824.xml')).read()
+        self.url2data['https://www.ohloh.net/p/4265/contributors/18318035536880.xml?api_key=JeXHeaQhjXewhdktn4nUw'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', '18318035536880.xml')).read()
+        self.url2data['http://www.ohloh.net/projects/4265.xml?api_key=JeXHeaQhjXewhdktn4nUw'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', '4265.xml')).read()
+        self.url2data['https://www.ohloh.net/p/debian/contributors/18318035536880'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', '18318035536880')).read()
         
     """This is a fake version of Twisted.web's getPage() function.
     It returns a Deferred that is already 'fired', and has the page content
@@ -589,26 +595,6 @@ class TestAbstractOhlohAccountImporter(django.test.TestCase):
     @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh',)
     @mock.patch('mysite.search.tasks.PopulateProjectIconFromOhloh')
     @mock.patch('twisted.web.client.getPage', fakeGetPage.getPage)
-    def test_store_one_citation(self, do_nothing, do_nothing_1):
-        # Before-hand: no citations and no portfolio_entryes
-        self.assertFalse(mysite.profile.models.PortfolioEntry.objects.all().count())
-        self.assertFalse(mysite.profile.models.Citation.objects.all().count())
-
-        contrib_info = {
-            'project': 'project_name',
-            'man_months': 3,
-            'primary_language': 'Python',
-            'permalink': 'http://example.com/',
-            }
-        self.aoai.store_one_ohloh_contrib_info(contrib_info)
-
-        # Hey, look, it made a Citation.
-        self.assert_(mysite.profile.models.PortfolioEntry.objects.all().count())
-        self.assert_(mysite.profile.models.Citation.objects.all().count())
-
-    @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh',)
-    @mock.patch('mysite.search.tasks.PopulateProjectIconFromOhloh')
-    @mock.patch('twisted.web.client.getPage', fakeGetPage.getPage)
     def test_generate_url(self, do_nothing, do_nothing_1):
         params = {u'query': unicode(self.dia.query)}
         expected_query_items = sorted(
@@ -758,7 +744,7 @@ class TestOhlohAccountImport(django.test.TestCase):
         # FIXME: This should use the project name, not just the lame
         # current Ohloh analysis ID.
         projects = set([c.portfolio_entry.project.name for c in mysite.profile.models.Citation.objects.all()])
-        self.assertEqual(set(['debian', 'cchost']),
+        self.assertEqual(set(['Debian GNU/Linux', 'ccHost']),
                          projects)
         
 class TestOhlohAccountImportWithEmailAddress(TestOhlohAccountImport):
