@@ -321,7 +321,11 @@ body.three_columns #right #recent_activity_feed .body { font-size: 1em; }
 
     <div class='module' id='recent_activity_feed'>
         <div class='head'>
-            <h3>Recent activity</h3>
+            <h3>
+                <a href={% url oh_feed_url 'activity' %}>
+                    <img src="{% version '/static/images/icons/feed-icon-14x14.png' %}" >
+                </a>
+                Recent activity</h3>
         </div>
         <div class='body'>
             <ul>
