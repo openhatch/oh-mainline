@@ -28,7 +28,22 @@
       <p>When packaging a project's source code, it is customary to place the files within a directory named after the project with a version number.  This makes creating and unpacking such tarballs convenient, as you only have to name one directory to tar up when creating the tarball, and people who unpack your tarball end up with a self-contained directory that they can easily remove when they are finished using the set of files you gave them.</p>
 
       <p>This mission consists of two parts: unpacking tarballs and creating tarballs.</p>
-
+      {%if create_done and unpack_done %}
+      <div id="success-msg" class="successmsg">
+        <p><strong>You have successfully completed this mission.</strong></p>
+        <p>You can <a id="mission-reset-btn" href="#" title="Click to reset this part of the mission">reset its state</a> and try again.</p>
+        {% block js %}
+        {{ block.super }}        
+        <script type='text/javascript' src="/static/js/missions/base.js?x"></script>
+        <script type='text/javascript'>
+        if (typeof OH === 'undefined') OH = {};
+        if (typeof OH.Page === 'undefined') OH.Page = {};        
+        OH.Page['post_url'] = '{% url mysite.missions.tar.views.reset %}';
+        OH.Page['mission_parts'] = 'tar,tar_extract';
+        </script>
+        {% endblock %}
+      </div>
+      {% endif %}          
       <p class="next_mission_link">
 	<a href="{% url mysite.missions.tar.views.unpacking %}">Get started with unpacking &raquo;</a></p>
 

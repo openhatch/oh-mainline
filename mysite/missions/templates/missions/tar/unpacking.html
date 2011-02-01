@@ -52,10 +52,22 @@
         </div>
       </form>
     {% if unpack_done %}
-      <div class="successmsg">
+      <div id="success-msg" class="successmsg">
         <p><strong>You have successfully completed this part of the mission.</strong></p>
         {% if unpack_success %}
         <p>The file you uploaded has the correct contents.</p>
+        {% else %}
+        <p>You can <a id="mission-reset-btn" href="#" title="Click to reset this part of the mission">reset this part of the mission</a> and try again.</p>
+        {% block js %}
+        {{ block.super }}        
+        <script type='text/javascript' src="/static/js/missions/base.js?x"></script>
+        <script type='text/javascript'>
+        if (typeof OH === 'undefined') OH = {};
+        if (typeof OH.Page === 'undefined') OH.Page = {};        
+        OH.Page['post_url'] = '{% url mysite.missions.tar.views.reset %}';
+        OH.Page['mission_parts'] = 'tar_extract';
+        </script>
+        {% endblock %}
         {% endif %}
       </div>
     {% endif %}

@@ -2,6 +2,7 @@
 {% comment %}
 # This file is part of OpenHatch.
 # Copyright (C) 2010 Jack Grigg
+# Copyright (C) 2011 Krzysztof Tarnowski (krzysztof.tarnowski@ymail.com)
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -48,15 +49,6 @@
         <div class="form-row file-upload-row">
           <a name="create-form"></a>
           After you make the tarball, upload it here:
-    {% if create_success %}
-      <!-- create status: success -->
-      <div class="successmsg">
-        <p><strong>You have successfully completed this part of the mission.</strong></p>
-        <p>The file you uploaded passed all of our checks.</p>
-      </div>
-    {% else %}
-      <!-- create status: failure -->
-    {% endif %}
           {% if what_was_wrong_with_the_tarball %}
           <ul class="errorlist"><li>{{ what_was_wrong_with_the_tarball }}</li></ul>
           {% endif %}
@@ -64,20 +56,36 @@
           <div class="file-upload">
           {{ create_form.tarfile }}
           <input type="submit" value="Upload" style="float: none;" />
-          </div>
-          {% if not create_success and create_done %}
-          <br style="clear: left;" />
-          <em>You have already completed this part of the mission.</em>
-          {% endif %}
+          </div>     
         </div>
       </form>
+      {% if create_done %}
+      <!-- create status: success -->
+      <div id="success-msg" class="successmsg">
+        <p><strong>You have successfully completed this part of the mission.</strong></p>
+        {% if create_success %}
+        <p>The file you uploaded passed all of our checks.</p>
+        {% else %}
+        <p>You can <a id="mission-reset-btn" href="#" title="Click to reset this part of the mission">reset this part of the mission</a> and try again.</p>
+        {% block js %}
+        {{ block.super }}        
+        <script type='text/javascript' src="/static/js/missions/base.js?x"></script>
+        <script type='text/javascript'>
+        if (typeof OH === 'undefined') OH = {};
+        if (typeof OH.Page === 'undefined') OH.Page = {};        
+        OH.Page['post_url'] = '{% url mysite.missions.tar.views.reset %}';
+        OH.Page['mission_parts'] = 'tar';
+        </script>
+        {% endblock %}
+        {% endif %}
+      </div>
+      {% else %}
+      <!-- create status: failure -->
+      {% endif %}       
       {% if create_done and unpack_done %}
-      <p class="next_mission_link">
-	Congratulations! You've totally completed the tar mission.
-	Want to go <a href="{% url mysite.missions.base.views.main_page %}">back to the list of missions</a>?</p>
+      <p id="next-mission-link" class="next_mission_link">
+	Congratulations! You've totally completed the tar mission. Want to go <a href="{% url mysite.missions.base.views.main_page %}">back to the list of missions</a>?</p>
       {% endif %}
-      
-
   </div>
 </div>
 {% endblock mission_main %}

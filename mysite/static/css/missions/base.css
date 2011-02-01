@@ -14,7 +14,6 @@ body.missions div.body > * {
 
 body.missions p.next_mission_link {
     width: 100%;
-    text-align: right;
 }
 
 body.missions .file-upload-row {
