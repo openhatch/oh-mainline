@@ -63,6 +63,7 @@ class StarlingTests(TwillTests):
 class ProfileTests(TwillTests):
     # {{{
     fixtures = ['user-paulproteus', 'person-paulproteus',
+            'user-paulproteus-nameless', 'person-paulproteus-nameless',
             'cchost-data-imported-from-ohloh']
 
     def testSlash(self):
@@ -87,6 +88,16 @@ class ProfileTests(TwillTests):
         # }}}
 
     # }}}
+
+    def test_get_full_name_and_username(self):
+        paulproteus = Person.objects.get(user__username='paulproteus')
+        returned_string = paulproteus.get_full_name_and_username()
+        self.assertEqual(returned_string, 'Asheesh Laroia (paulproteus)')
+
+    def test_get_full_name_and_username_for_user_with_no_full_name(self):
+        paulproteus_nameless = Person.objects.get(user__username='paulproteus-nameless')
+        returned_string = paulproteus_nameless.get_full_name_and_username()
+        self.assertEqual(returned_string, 'paulproteus-nameless')
 
 class DebTagsTests(TwillTests):
     # {{{

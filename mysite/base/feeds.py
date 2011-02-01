@@ -20,6 +20,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils.feedgenerator import Atom1Feed
 from mysite.profile.models import Person
 from mysite.profile.controllers import RecommendBugs
+from mysite.search.models import Answer, WannaHelperNote
 
 class RecommendedBugsFeed(Feed):
     feed_type = Atom1Feed
@@ -46,3 +47,15 @@ class RecommendedBugsFeed(Feed):
 
     def item_link(self, obj):
         return obj.canonical_bug_link
+
+class RecentActivityFeed(Feed):
+    feed_type = Atom1Feed
+    title = "Recent activity"
+    subtitle = "Recent activity on OpenHatch"
+    link = "/"
+
+    def items(self):
+        feed_items = list(Answer.objects.order_by('-modified_date')[:15])
+        feed_items.extend(WannaHelperNote.objects.order_by('-modified_date')[:15])
+        feed_items.sort(key=lambda x: x.modified_date, reverse=True)
+        return feed_items[:15]

@@ -367,6 +367,13 @@ class Person(models.Model):
     def get_full_name_or_username(self):
         return self.get_full_name() or self.user.username
 
+    def get_full_name_and_username(self):
+        full_name_start = ("%s (" % self.get_full_name()
+                if self.user.first_name or self.user.last_name
+                else "")
+        full_name_end = (")" if self.user.first_name or self.user.last_name else "")
+        return "%s%s%s" % (full_name_start, self.user.username, full_name_end)
+
     def generate_thumbnail_from_photo(self):
         if self.photo:
             width = 40

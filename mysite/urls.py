@@ -37,10 +37,11 @@ from voting.views import vote_on_object
 
 import mysite.account.views
 
-from mysite.base.feeds import RecommendedBugsFeed
+from mysite.base.feeds import RecommendedBugsFeed, RecentActivityFeed
 
 feeds = {
         'recbugs': RecommendedBugsFeed,
+        'activity': RecentActivityFeed,
         }
 
 urlpatterns = patterns('',

@@ -428,9 +428,39 @@ class Answer(OpenHatchModel):
     objects = OwnedAnswersManager()
     all_even_unowned = models.Manager()
 
+    def get_question_text(self, mention_project_name=True):
+        if self.question.key_string == 'where_to_start':
+            retval =  "I'd like to participate%s. How do I begin?" % (
+                        " in %s" % self.project.name if mention_project_name else "")
+        elif self.question.key_string == 'stress':
+            retval = "What is a bug or issue%s that you've been putting off, neglecting or just plain avoiding?" % (
+                        " with %s" % self.project.name if mention_project_name else "")
+        elif self.question.key_string == 'newcomers':
+            retval =  "What's a good bug%s for a newcomer to tackle?" % (
+                        " in %s" % self.project.name if mention_project_name else "")
+        elif self.question.key_string == 'non_code_participation':
+            retval =  "Other than writing code, how can I contribute%s?" % (
+                        " to %s" % self.project.name if mention_project_name else "")
+        else: # Shouldn't get here.
+            retval = ""
+        return retval
+
     @property
     def template_for_feed(self):
         return 'base/answer-in-feed.html'
+
+    def get_title_for_atom(self):
+        return "%s added an answer for %s" % (
+                self.author.get_profile().get_full_name_and_username(),
+                self.project.name)
+
+    def get_description_for_atom(self):
+        return "%s added an answer to the question \"%s\"" % (
+                self.author.get_profile().get_full_name_and_username(),
+                self.get_question_text())
+
+    def get_absolute_url(self):
+        return "".join([reverse('mysite.project.views.project', args=[self.project.name]), "#answer_whose_pk_is_%d" % self.pk])
 
     @staticmethod
     def create_dummy(**kwargs):
@@ -587,6 +617,16 @@ class WannaHelperNote(OpenHatchModel):
     @property
     def template_for_feed(self):
         return 'base/wannahelp-in-feed.html'
+
+    def get_title_for_atom(self):
+        return "%s is willing to help %s" % (
+                self.person.get_full_name_and_username(), self.project.name)
+
+    def get_description_for_atom(self):
+        return self.get_title_for_atom()
+
+    def get_absolute_url(self):
+        return "".join([reverse('mysite.project.views.project', args=[self.project.name]), "#person_summary_%d" % self.person.pk])
 
 class HitCountCache(OpenHatchModel):
     hashed_query = models.CharField(max_length=40, primary_key=True) # stores a sha1 
