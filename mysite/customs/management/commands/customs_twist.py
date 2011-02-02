@@ -25,7 +25,7 @@ import mysite.profile.models
 class Command(BaseCommand):
     help = "Call this when you want to run a Twisted reactor."
 
-    def create_tasks_from_dias(self, max = 20):
+    def create_tasks_from_dias(self, max = 8):
         print 'For all DIAs we know how to process with Twisted: enqueue them.'
         enqueued_dias_count = 0
 
