@@ -27,9 +27,9 @@ class Migration:
     def forwards(self, orm):
         "Write your forwards migration here"
         # OH MY GOD THIS is theoretically lame. But I don't care, so there.
-        for project in Project.objects.all():
-            print 'rescaling', project.name
-            project.update_scaled_icons_from_self_icon()
+        #for project in Project.objects.all():
+        #    print 'rescaling', project.name
+        #    project.update_scaled_icons_from_self_icon()
     
     
     def backwards(self, orm):
