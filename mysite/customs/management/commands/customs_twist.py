@@ -22,8 +22,6 @@ import logging
 
 import mysite.profile.models
 
-MAX_DIAS = 10
-
 class Command(BaseCommand):
     help = "Call this when you want to run a Twisted reactor."
 
