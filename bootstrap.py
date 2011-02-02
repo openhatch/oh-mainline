@@ -36,6 +36,13 @@ except ImportError:
 
     import pkg_resources
 
+try:
+    import setuptools
+except ImportError:
+    print "You have to have setuptools installed first. Maybe you should run:"
+    print "    $ sudo apt-get install python-setuptools"
+    sys.exit(1)
+
 if sys.platform == 'win32':
     def quote(c):
         if ' ' in c:
