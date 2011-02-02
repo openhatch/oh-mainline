@@ -116,6 +116,7 @@ class FakeGetPage(object):
     It never adds the Deferred to the 'reactor', so calling reactor.start()
     should be a no-op."""
     def getPage(self, url):
+        assert type(url) == str
         d = twisted.internet.defer.Deferred()
         # FIXME: One day, support errback.
         d.callback(self.url2data[url])

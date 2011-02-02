@@ -57,6 +57,8 @@ class Command(BaseCommand):
 
     def call_getPage_on_data_dict(self, state_manager, data_dict):
         url = data_dict['url']
+        if type(url) == unicode:
+            url = url.encode('utf-8')
         callback = data_dict['callback']
         errback = data_dict.get('errback', None)
         
