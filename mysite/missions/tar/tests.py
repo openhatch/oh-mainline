@@ -151,7 +151,7 @@ class MissionPageStateTests(TwillTests):
         paulproteus = Person.objects.get(user__username='paulproteus')
         StepCompletion(person=paulproteus, step=Step.objects.get(name='tar')).save()
         
-        response = self.client.post(reverse(views.reset), {'mission_steps': 'tar' })
+        response = self.client.post(reverse(views.reset), {'mission_parts': 'tar' })
         self.assert_('Operation successful' in response.content)
         self.assertEqual(len(StepCompletion.objects.filter(step__name='tar', person=paulproteus)), 0)        
         
