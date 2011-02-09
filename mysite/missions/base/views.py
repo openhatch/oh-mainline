@@ -56,7 +56,8 @@ class MissionPageState(object):
         person = None
         data = {
             'this_mission_page_short_name': self.this_mission_page_short_name,
-            'mission_name': self.mission_name}
+            'mission_name': self.mission_name,
+            'mission_step_prerequisites_passed': not self.mission_step_prerequisite}
         if (self.passed_data):
             data.update(self.passed_data)
         if user.is_authenticated():
