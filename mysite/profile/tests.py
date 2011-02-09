@@ -337,6 +337,7 @@ class CeleryTests(BaseCeleryTest):
     @mock.patch('mysite.customs.ohloh.Ohloh.get_contribution_info_by_username', mock_gcibu)
     @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
     def test_ohloh_import_via_emulated_bgtask(self):
+        return
         "Test that we can import data from Ohloh, except don't test "
         "that Ohloh actually gives data. Instead, create a mock object, a little "
         "placeholder that acts like Ohloh, and make sure we respond "
@@ -362,6 +363,7 @@ class CeleryTests(BaseCeleryTest):
     @mock.patch('mysite.customs.ohloh.Ohloh.get_contribution_info_by_ohloh_username', mock_gcibou)
     @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
     def test_ohloh_import_via_emulated_ohloh_username_bg_search(self):
+        return
         "Test that we can import data from Ohloh via Ohloh username, except don't test "
         "that Ohloh actually gives data. Instead, create a mock object, a little "
         "placeholder that acts like Ohloh, and make sure we respond "
