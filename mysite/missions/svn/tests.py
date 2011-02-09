@@ -118,6 +118,11 @@ class SvnViewTests(TwillTests):
         response = self.client.get(reverse(views.main_page))
         self.assertTrue(response.context[0]['mission_step_prerequisites_passed'])
 
+    def test_main_page_does_not_complain_about_prereqs_even_if_logged_out(self):
+        self.client.logout()
+        response = self.client.get(reverse(views.main_page))
+        self.assertTrue(response.context[0]['mission_step_prerequisites_passed'])
+
 # Mocked-up svnlook output for the pre-commit hook.
 def mock_get_username(repo, txn):
     return 'paulproteus'
