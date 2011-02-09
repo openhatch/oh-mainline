@@ -118,8 +118,15 @@ class SvnViewTests(TwillTests):
         response = self.client.get(reverse(views.main_page))
         self.assertTrue(response.context[0]['mission_step_prerequisites_passed'])
 
-    def test_main_page_does_not_complain_about_prereqs_even_if_logged_out(self):
+class SvnViewTestsWhileLoggedOut(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def setUp(self):
+        TwillTests.setUp(self)
+        self.client = self.login_with_client()
         self.client.logout()
+
+    def test_main_page_does_not_complain_about_prereqs_even_if_logged_out(self):
         response = self.client.get(reverse(views.main_page))
         self.assertTrue(response.context[0]['mission_step_prerequisites_passed'])
 
