@@ -68,6 +68,8 @@ You'll download a whole bunch of Python code and run other setup tasks. This is 
 
 ### Set up the database ###
 
+In this section, we create an empty MySQL database, and then create the tables that you need to store data for the OpenHatch instance you'll run. If you want, you can load data from the main openhatch.org site into your instance! Keep reading; that's called "importing a data snapshot."
+
 As background:
 
 Make sure you know how to connect to MySQL. Generally, to create a database, you have to be root. You can 
