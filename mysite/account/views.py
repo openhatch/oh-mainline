@@ -490,4 +490,8 @@ def register(request, template_name='authopenid/complete.html',
         'email': email
     }, context_instance=django_authopenid.views._build_context(request, extra_context=extra_context))
 
+### We use this "not_authenticated" wrapper so that if you *are* logged in, you go
+### straight to the ?next= value.
+login = django_authopenid.views.not_authenticated(django.contrib.auth.views.login)
+
 # vim: ai ts=3 sts=4 et sw=4 nu

@@ -172,7 +172,7 @@ urlpatterns = patterns('',
 
         (r'^account/catch-me$', 'mysite.account.views.catch_me'),
 
-        (r'^account/login/$', 'django.contrib.auth.views.login', 
+        (r'^account/login/$', 'mysite.account.views.login',
             {'template_name': 'account/login.html'},
             'oh_login'),
         (r'^account/login/do$', 'django.contrib.auth.views.login', 
