@@ -44,7 +44,7 @@ setup(
                         'python-distutils-extra',
                         'twill==0.9.1-cc',
                         'invitation',
-                        'django-authopenid==1.0.1-openhatch1',
+                        'django-authopenid==1.0.1-openhatch2',
                         'celery==1.0.5',
                         'south==0.6-rc1',
                         'launchpadlib',
