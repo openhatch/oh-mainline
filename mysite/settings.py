@@ -99,6 +99,7 @@ MIDDLEWARE_CLASSES = (
     'mysite.base.middleware.DetectLogin', # This must live on top of Auth + Session middleware
     'django.middleware.common.CommonMiddleware',
     'staticgenerator.middleware.StaticGeneratorMiddleware',
+    'sessionprofile.middleware.SessionProfileMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django_authopenid.middleware.OpenIDMiddleware',
@@ -161,6 +162,7 @@ INSTALLED_APPS = (
     'voting',
     'reversion',
     #'debug_toolbar',
+    'sessionprofile',
 )
 
 # testrunner allows us to control which testrunner to use

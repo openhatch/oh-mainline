@@ -65,6 +65,7 @@ setup(
                         'html2text',
                         'lockfile>=0.9', # as of this writing, pypi only has version 0.8
                         'python-openid==2.2.5', # as of this writing, upstream has an HTML file where a tar.gz should be
+                        'sessionprofile==1.0',
                        ],
 
     # dependency_links is a list of URLs. If you need to override the URL
@@ -93,6 +94,7 @@ setup(
                         'http://linode.openhatch.org/~parker/django-voting-0.1.tar.gz#egg=django-voting',
                         dependency_path + 'staticgenerator-1.4.1.2-openhatch.tar.gz#egg=staticgenerator',
                         dependency_path + 'python-otp.tar.gz#egg=python-otp',
+                        dependency_path + 'sessionprofile-1.0.tar.gz#egg=sessionprofile',
                        ],
 
     # FIXME: Write a reasonable comment about zip_safe and include_package_data
