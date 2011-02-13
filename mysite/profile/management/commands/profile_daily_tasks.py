@@ -18,6 +18,7 @@ from django.core.management.base import BaseCommand
 
 import logging
 import mysite.profile.tasks
+import mysite.profile.management.commands.send_weekly_emails
 
 class Command(BaseCommand):
     help = "Run this once daily for the OpenHatch profile app."
