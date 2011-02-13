@@ -83,6 +83,11 @@ class Command(BaseCommand):
 
         count = 0
         for person in people_who_want_email:
+
+            if not person.user.email:
+                loggin.warn("Uh, the person has no email address: %s" % person.user.username)
+                continue # if the user has no email address, we skip the user.
+
             message_in_plain_text, message_in_html = self.get_weekly_projects_email_for(person)
             if message_in_html: 
                 count += 1
