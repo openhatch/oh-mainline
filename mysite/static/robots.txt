@@ -1,3 +1,7 @@
 User-agent: *
 Disallow: /search/*?*
 
+Disallow: /w/
+Disallow: /wiki/Special:Search
+Disallow: /wiki/Special:Random
+
