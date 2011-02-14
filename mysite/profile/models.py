@@ -863,7 +863,7 @@ def ping_twisted(sender, instance, **kwargs):
 
 def make_forwarder_actually_work(sender, instance, **kwargs):
     from mysite.profile.tasks import RegeneratePostfixAliasesForForwarder
-    RegeneratePostfixAliasesForForwarder.run()
+    RegeneratePostfixAliasesForForwarder().run()
 
 models.signals.post_save.connect(update_the_project_cached_contributor_count, sender=PortfolioEntry)
 models.signals.post_save.connect(update_the_person_index, sender=PortfolioEntry)
