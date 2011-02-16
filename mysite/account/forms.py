@@ -28,6 +28,13 @@ from invitation.models import InvitationKey
 from models import InvitationRequest
 import django_authopenid.forms
 
+RESERVED_USERNAMES =  (
+        'admin',
+        'anonymous',
+        'sufjan',
+        'Spam cleanup script',
+        )
+
 class UserCreationFormWithEmail(django.contrib.auth.forms.UserCreationForm):
     username = django.forms.RegexField(label="Username", max_length=30, regex=r'^\w+$',
         help_text = "<span class='help_text'>Pick a froopy handle, with length < 31 characters. Stick to letters, digits and underscores.</span>",
@@ -53,6 +60,13 @@ class UserCreationFormWithEmail(django.contrib.auth.forms.UserCreationForm):
             for index, error_text in enumerate(self.errors[fieldname]):
                 uet = unicode(error_text)
                 self.errors[fieldname][index] = custom_error_messages_dict.get(uet, uet)
+
+    def clean_username(self):
+        username = super(UserCreationFormWithEmail, self).clean_username()
+        if username not in RESERVED_USERNAMES:
+            return username
+        raise django.forms.ValidationError(
+                "That username is reserved.")
 
     def clean_email(self):
         """Verify that their email is unique."""

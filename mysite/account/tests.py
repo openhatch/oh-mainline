@@ -94,6 +94,16 @@ class Signup(TwillTests):
         tc.fv('signup', 'password2', 'blahblahblah')
         tc.submit()
         tc.find('already got a user in our database with that username')
+
+    def test_reserved_username(self):
+        tc.go(make_twill_url('http://openhatch.org/account/signup/'))
+        tc.notfind('That username is reserved.')
+        tc.fv('signup', 'username', 'admin')
+        tc.fv('signup', 'email', 'someone@somewhere.com')
+        tc.fv('signup', 'password1', 'blahblahblah')
+        tc.fv('signup', 'password2', 'blahblahblah')
+        tc.submit()
+        tc.find('That username is reserved.')
     # }}}
 
 class EditPassword(TwillTests):
