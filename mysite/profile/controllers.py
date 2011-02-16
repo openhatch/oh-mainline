@@ -1,5 +1,6 @@
 # This file is part of OpenHatch.
 # Copyright (C) 2010 Parker Phinney
+# Copyright (C) 2011 Krzysztof Tarnowski (krzysztof.tarnowski@ymail.com)
 # Copyright (C) 2009, 2010 OpenHatch, Inc.
 #
 # This program is free software: you can redistribute it and/or modify
@@ -22,6 +23,7 @@ from itertools import izip, cycle, islice
 import pygeoip
 
 from django.conf import settings
+from django.core.cache import cache
 
 import logging
 import mysite.search.controllers
@@ -55,6 +57,8 @@ class RecommendBugs(object):
             mysite.search.models.Bug)
         suffix_input = [self.terms, self.n, bug_epoch]
         return prefix + '_' + hashlib.sha1(repr(suffix_input)).hexdigest()
+
+    def is_cache_empty(self): return cache.get(self.get_cache_key()) == None
 
     def recommend(self):
         ret = []

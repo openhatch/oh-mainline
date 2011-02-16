@@ -2,6 +2,7 @@
 
 # This file is part of OpenHatch.
 # Copyright (C) 2010 Parker Phinney
+# Copyright (C) 2011 Krzysztof Tarnowski (krzysztof.tarnowski@ymail.com)
 # Copyright (C) 2009, 2010, 2011 OpenHatch, Inc.
 #
 # This program is free software: you can redistribute it and/or modify
@@ -54,16 +55,8 @@ def front_page_data():
 
 @view
 def home(request):
+    template_path = 'base/landing.html'
     data = front_page_data()
-
-    recommended_bugs = []
-    if request.user.is_authenticated():
-        suggested_searches = request.user.get_profile().get_recommended_search_terms()
-        recommender = mysite.profile.controllers.RecommendBugs(
-            suggested_searches, n=5)
-        recommended_bugs = recommender.recommend()
-
-    data['recommended_bugs'] = list(recommended_bugs) # A list so we can tell if it's empty
 
     everybody = list(mysite.profile.models.Person.objects.exclude(link_person_tag=None))
     random.shuffle(everybody)
@@ -71,7 +64,7 @@ def home(request):
 
     #get globally recommended bug search stuff (for anonymous users)
     if request.user.is_authenticated():
-        # for logged-in users:
+        template_path = 'base/landing_page_for_logged_in_users.html' 
         # figure oout which nudges we want to show them
         person = request.user.get_profile()
 
@@ -98,37 +91,18 @@ def home(request):
         data['show_nudge_box'] = (data['nudge_location'] or 
                 'nudge_importer_when_user_has_no_projects' in data or data['nudge_tags'] or
                                   'nudge_importer_when_user_has_some_projects' in data)
+        
+        # Bug recommendations
+        suggested_searches = request.user.get_profile().get_recommended_search_terms()
+        recommender = mysite.profile.controllers.RecommendBugs(
+            suggested_searches, n=5)
+        if not recommender.is_cache_empty():
+            data['recommended_bugs'] = list(recommender.recommend())
+        
     else: # no user logged in. Show front-page importer nudge.
         data['nudge_importer_when_user_has_no_projects'] = True
-
-    if not data['recommended_bugs']:
-        data['show_nudge_box'] = True
-        # a dict pairing two things:
-        # * GET data dicts (to be passed to Query's create_from_GET_data)
-        # * strings of HTML representing the bug classification
-        recommended_bug_string2GET_data_dicts = {
-        "<strong>Bitesize</strong> bugs whose main project language is <strong>C</strong>":
-            {u'language':u'C', u'toughness':u'bitesize'},
-        "<strong>Bitesize</strong> bugs matching &lsquo;<strong>audio</strong>&rsquo;":
-            {u'q':u'audio', u'toughness':u'bitesize'},
-        "Bugs matching &lsquo;<strong>unicode</strong>&rsquo;":
-            {u'q':u'unicode'},
-        "Requests for <strong>documentation writing/editing</strong>":
-            {u'contribution_type':u'documentation'},
-        #"Requests for <strong>documentation writing/editing</strong>":
-        #    {u'contribution_type':u'documentation'},
-        }
-        recommended_bug_string2Query_objects = {}
-        for (string, GET_data_dict) in recommended_bug_string2GET_data_dicts.items():
-            query = mysite.search.controllers.Query.create_from_GET_data(GET_data_dict)
-            recommended_bug_string2Query_objects[string] = query
-
-        data[u'recommended_bug_string2Query_objects'] = recommended_bug_string2Query_objects
-
-    if request.user.is_authenticated():
-        return (request, 'base/landing_page_for_logged_in_users.html', data)
-    else:
-        return (request, 'base/landing.html', data)
+    
+    return (request, template_path, data)
 
 def page_to_js(request):
     # FIXME: In the future, use:
