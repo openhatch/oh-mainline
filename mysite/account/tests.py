@@ -73,7 +73,27 @@ class LoginWithOpenID(TwillTests):
 
 class Signup(TwillTests):
     """ Tests for signup without invite code. """
-    pass
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def test_usernames_case_sensitive(self):
+        tc.go(make_twill_url('http://openhatch.org/account/signup/'))
+        tc.notfind('already got a user in our database with that username')
+        tc.fv('signup', 'username', 'paulproteus')
+        tc.fv('signup', 'email', 'someone@somewhere.com')
+        tc.fv('signup', 'password1', 'blahblahblah')
+        tc.fv('signup', 'password2', 'blahblahblah')
+        tc.submit()
+        tc.find('already got a user in our database with that username')
+
+    def test_usernames_case_insensitive(self):
+        tc.go(make_twill_url('http://openhatch.org/account/signup/'))
+        tc.notfind('already got a user in our database with that username')
+        tc.fv('signup', 'username', 'PaulProteus')
+        tc.fv('signup', 'email', 'someone@somewhere.com')
+        tc.fv('signup', 'password1', 'blahblahblah')
+        tc.fv('signup', 'password2', 'blahblahblah')
+        tc.submit()
+        tc.find('already got a user in our database with that username')
     # }}}
 
 class EditPassword(TwillTests):
