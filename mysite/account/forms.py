@@ -63,10 +63,16 @@ class UserCreationFormWithEmail(django.contrib.auth.forms.UserCreationForm):
 
     def clean_username(self):
         username = super(UserCreationFormWithEmail, self).clean_username()
-        if username not in RESERVED_USERNAMES:
-            return username
-        raise django.forms.ValidationError(
+        username = self.cleaned_data["username"]
+        try:
+            User.objects.get(username__iexact=username)
+        except User.DoesNotExist:
+            if username not in RESERVED_USERNAMES:
+                return username
+            raise django.forms.ValidationError(
                 "That username is reserved.")
+        raise django.forms.ValidationError(
+            "A user with that username already exists.")
 
     def clean_email(self):
         """Verify that their email is unique."""
