@@ -2,6 +2,7 @@
 {% comment %}
 # This file is part of OpenHatch.
 # Copyright (C) 2011 Jack Grigg
+# Copyright (C) 2011 Krzysztof Tarnowski (krzysztof.tarnowski@ymail.com)
 # Copyright (C) 2010, 2011 OpenHatch, Inc.
 #
 # This program is free software: you can redistribute it and/or modify
@@ -35,31 +36,8 @@ Home
 body.three_columns #right #recent_activity_feed .body { font-size: 1em; }
 {% endblock css %}
 
-{% block pagetop %}
-{% if not user.is_authenticated %}
-<!--
-<div class='module' id='welcome'>
-    <div class='body'>
-        <h2>OpenHatch is an open source involvement engine.</h2>
-        <div id="blurb" style="display: none;">
-            <p>
-            On OpenHatch, you can build a profile that <strong>consolidates</strong> and <strong>aggregates</strong> all of your <strong>open source contributions</strong> in one place. We'll help you <strong>connect</strong> with <strong>people</strong> and <strong>projects</strong> that are <strong>relevant to your interests</strong>.
-            </p>
-            <p>Whether you're looking for projects that need help with documentation or just hoping to find other Python hackers in your area, we'll do our best to make your open source experience more friendly and fun.
-            </p>
-        </div>
-    </div>
-</div>
--->
-{% endif %}
-{% endblock %}
-
 {% block content %}
-
 <div id='left' class='column'>
-
-{% if user.is_authenticated %}
-
     <div class='module' id='me'>
         <div class='head'>
             <h3><a style='color: inherit;' href='{{ user.get_profile.profile_url }}'>
@@ -104,45 +82,15 @@ body.three_columns #right #recent_activity_feed .body { font-size: 1em; }
         </div>
     </div>
     {% endwith %}
-
-{% else %}
-
-    {# if anonymous #}
-    <div class='module' id='people'>
-        <div class='head'>
-            <h3>People on OpenHatch</h3>
-             <ul>
-                <li>
-            <a href='/people/' style='float: right;'>See all <strong>&raquo;</strong></a>
-                </li>
-            </ul>
-        </div>
-        <div class='body'>
-            <ul id='people-list'>
-                {% for person in random_profiles %}
-                    {% include 'profile/person-summary-li.html' %}
-                {% endfor %}
-            </ul>
-        </div>
-    </div>
-
-{% endif %}
-
 </div>
 
 <div id='middle' class='column'>
     {% if show_nudge_box %}
     <div class='module' id='todo'>
         <div class="head">
-        {% if user.is_authenticated %}
             <h3>How to get started on OpenHatch</h3>
-        {% endif %}
         </div>
         <div class='body'>
-        {% if not user.is_authenticated %}
-        <h2>OpenHatch is an open source involvement engine.</h2>
-        <p style='font-size: .9em; color: #555; margin: 0 0 5px 10px;'>Here you can:</p>
-        {% endif %}
             <ul class='nudgebuttons'>
                 {% if nudge_importer_when_user_has_no_projects %}
                     <li>
@@ -182,20 +130,18 @@ body.three_columns #right #recent_activity_feed .body { font-size: 1em; }
                         </a>
                     </li>
                 {% endif %}
-                {% if user.is_authenticated %}
-                    {% if nudge_tags %}
-                        <li>
-                            <a href='/profile/views/edit_info'>
-                                <span class='notification smaller'>
-                                    <span class='arrow'>&rarr;</span>
-                                    <strong>Describe yourself</strong>
-                                    <span class='more-text'>
-                                        Add tags to your profile and get recommendations for nifty stuff to hack on.
-                                    </span>
+                {% if nudge_tags %}
+                    <li>
+                        <a href='/profile/views/edit_info'>
+                            <span class='notification smaller'>
+                                <span class='arrow'>&rarr;</span>
+                                <strong>Describe yourself</strong>
+                                <span class='more-text'>
+                                    Add tags to your profile and get recommendations for nifty stuff to hack on.
                                 </span>
-                            </a>
-                        </li>
-                    {% endif %}
+                            </span>
+                        </a>
+                    </li>
                     {% if nudge_missions %}
                         <li>
                             <a href='/missions/'>
@@ -222,55 +168,19 @@ body.three_columns #right #recent_activity_feed .body { font-size: 1em; }
                                 </a>
                         </li>
                     {% endif %}
-                {% else %}
-                {# User is browsing anonymously #}
-            <li>
-                <a href='/search/'>
-                    <span class='notification smaller'>
-                        <img src={% version '/static/images/base/homepage/home-opps.png' %} >
-                        <span class='arrow'>&rarr;</span>
-                        <strong>Browse volunteering opportunities </strong>
-                        <span class='more-text'>
-                            We index thousands of bugs from over 100 open source projects, and growing.
-                        </span>
-                    </span>
-                </a>
-            </li>
-            <li>
-                <a href='/people/'>
-                    <span class='notification smaller'>
-                        <img src={% version '/static/images/base/homepage/people-100px.png' %} >
-                        <span class='arrow'>&rarr;</span>
-                        <strong>Find contributors near you</strong>
-                        <span class='more-text'>
-                            Use our awesome map!
-                        </span>
-                    </span>
-                </a>
-            </li>
                 {% endif %}
             </ul>
         </div>
     </div>
     {% endif %}
-
     <div class='module' id='bugs'>
         <div class='head'>
-        {% if recommended_bugs %}
             <h3>
                 <a href="/+feeds/recbugs/{{ user.username }}/">
                     <img src="{% version '/static/images/icons/feed-icon-14x14.png' %}" >
                 </a>
             Recommended bugs</h3>
             <span class='note'>based on your profile</span>
-        {% else %}
-            <h3>Volunteer opportunities</h3>
-            <ul>
-                <li>
-            <a href="/search" >See all &raquo;</a>
-                </li>
-            </ul>
-        {% endif %}
         </div>
         <div class='body'>
             {% if recommended_bugs %}
@@ -290,6 +200,22 @@ body.three_columns #right #recent_activity_feed .body { font-size: 1em; }
             </ul>
             <p><a href='/search/' style='float: right; text-align: right;'>Find more recommendations and other opportunities <strong>&raquo;</strong></a></p>
             {% else %}
+            LOADING
+            {% endif %}
+        </div> 
+    </div>
+    
+    {% if not recommended_bugs %}    
+    <div class='module' id='volunteer-opportunities'>
+        <div class='head'>
+            <h3>Volunteer opportunities</h3>
+            <ul>
+                <li>
+            <a href="/search" >See all &raquo;</a>
+                </li>
+            </ul>            
+        </div>
+        <div class='body'>
             Discover new ways that you can contribute to
             free and open source software. For example:
             {# If no recommended bugs: #}
@@ -299,22 +225,20 @@ body.three_columns #right #recent_activity_feed .body { font-size: 1em; }
                 {# Don't show an example if no volunteer opportunities match it. #}
                 <li><a href='/search?{{query.get_query_string}}'>{{string|safe}} ({{query.get_or_create_cached_hit_count}})</a></li>
                 {% endif %}
-                {% endwith %}
+                {% endwith %}         
             {% endfor %}
-
-
-        <style type='text/css'>
-            #bugs ul { list-style: none; }
-        </style>
             {% comment %}
             {% for category in popular_bug_categories %}
                 <li><a href='{{ category.url }}'>{{ category.name }}</a></li>
             {% endfor %}
-            {% endcomment %}
-            <p style='margin-top: 10px;' class='rabbit_hole'><a href='{% url mysite.search.views.fetch_bugs %}'>See all volunteering opportunities &raquo;</a></p>
-            {% endif %}
+            {% endcomment %}            
+            <p style='margin-top: 10px;' class='rabbit_hole'><a href='{% url mysite.search.views.fetch_bugs %}'>See all volunteering opportunities &raquo;</a></p>                               
         </div>
     </div>
+    {% endif %}
+    <style type='text/css'>
+        #bugs ul, #volunteer-opportunities ul { list-style: none }
+    </style>
 </div>
 
 <div id='right' class='column'>
@@ -363,7 +287,6 @@ body.three_columns #right #recent_activity_feed .body { font-size: 1em; }
         </div>
     </div>
 
-    {% if user.is_authenticated %}
     <div id='syndicate' class='module'>
         <div class='head'>
             <h3>Syndicate your profile</h3>
@@ -379,7 +302,6 @@ body.three_columns #right #recent_activity_feed .body { font-size: 1em; }
             <p style='float: right;'><a href='{% url mysite.account.views.widget %}'>Get your widget &raquo;</a></p>
         </div>
     </div>
-    {% endif %}
 
 </div>
 {% endblock content %}
