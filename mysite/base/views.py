@@ -55,14 +55,12 @@ def front_page_data():
 
 @view
 def home(request):
-    template_path = 'base/landing.html'
     data = front_page_data()
 
     everybody = list(mysite.profile.models.Person.objects.exclude(link_person_tag=None))
     random.shuffle(everybody)
     data['random_profiles'] = everybody[0:5]
 
-    #get globally recommended bug search stuff (for anonymous users)
     if request.user.is_authenticated():
         template_path = 'base/landing_page_for_logged_in_users.html' 
         # figure oout which nudges we want to show them
@@ -96,11 +94,35 @@ def home(request):
         suggested_searches = request.user.get_profile().get_recommended_search_terms()
         recommender = mysite.profile.controllers.RecommendBugs(
             suggested_searches, n=5)
+        
         if not recommender.is_cache_empty():
             data['recommended_bugs'] = list(recommender.recommend())
+        else:
+            data['show_nudge_box'] = True
+            # a dict pairing two things:
+            # * GET data dicts (to be passed to Query's create_from_GET_data)
+            # * strings of HTML representing the bug classification
+            recommended_bug_string2GET_data_dicts = {
+            "<strong>Bitesize</strong> bugs whose main project language is <strong>C</strong>":
+                {u'language':u'C', u'toughness':u'bitesize'},
+            "<strong>Bitesize</strong> bugs matching &lsquo;<strong>audio</strong>&rsquo;":
+                {u'q':u'audio', u'toughness':u'bitesize'},
+            "Bugs matching &lsquo;<strong>unicode</strong>&rsquo;":
+                {u'q':u'unicode'},
+            "Requests for <strong>documentation writing/editing</strong>":
+                {u'contribution_type':u'documentation'},
+            #"Requests for <strong>documentation writing/editing</strong>":
+            #    {u'contribution_type':u'documentation'},
+            }
+            recommended_bug_string2Query_objects = {}
+            for (string, GET_data_dict) in recommended_bug_string2GET_data_dicts.items():
+                query = mysite.search.controllers.Query.create_from_GET_data(GET_data_dict)
+                recommended_bug_string2Query_objects[string] = query
+    
+            data[u'recommended_bug_string2Query_objects'] = recommended_bug_string2Query_objects            
         
-    else: # no user logged in. Show front-page importer nudge.
-        data['nudge_importer_when_user_has_no_projects'] = True
+    else: # no user logged in. Show front-page
+        template_path = 'base/landing.html'
     
     return (request, template_path, data)
 
