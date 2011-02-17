@@ -386,35 +386,6 @@ class MelangeGoogle(GoogleBugTracker):
         # Then pass ret_dict back
         return ret_dict
 
-class FiftyStateProjectGoogle(GoogleBugTracker):
-    enabled = True
-
-    def __init__(self):
-        GoogleBugTracker.__init__(self,
-                                  project_name='Fifty State Project',
-                                  google_name='fiftystates')
-
-    def generate_current_bug_atom(self):
-        query_data = [
-                {
-                    'max_results': 10000,
-                    'canned_query': 'open',
-                }
-                ]
-        queries = []
-        for kwargs in query_data:
-            queries.append(create_google_query(**kwargs))
-        return self.generate_bug_atom_from_queries(queries)
-
-    @staticmethod
-    def extract_tracker_specific_data(issue, ret_dict):
-        # Make modifications to ret_dict using provided atom data
-        labels = [label.text for label in issue.label]
-        ret_dict['good_for_newcomers'] = ('bite-sized' in labels)
-        ret_dict['bite_size_tag_name'] = 'bite-sized'
-        # Then pass ret_dict back
-        return ret_dict
-
 # The generic class for Google trackers.
 class GenGoogle(GoogleBugTracker):
     enabled = False
