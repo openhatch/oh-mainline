@@ -300,6 +300,9 @@ urlpatterns = patterns('',
 
         (r'^profile/views/delete_portfolio_entry_do$',
                 'mysite.profile.views.delete_portfolio_entry_do'),
+                
+        (r'^\+profile/bug_recommendation_list_as_template_fragment$',
+                'mysite.profile.views.bug_recommendation_list_as_template_fragment'),                
 
         (r'^people/portfolio/import/$',
                 'mysite.profile.views.importer'),
