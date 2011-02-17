@@ -176,7 +176,8 @@ class RoundupTracker(object):
         return bug_object
 
     def extract_bug_tracker_specific_data(self, metadata_dict, bug_object):
-        raise RuntimeError(NotImplemented)
+        # Override this in a project-tracker-specific subclass.
+        raise NotImplementedError
 
     def grab(self):
         """Loops over the Python bug tracker's easy bugs and stores/updates them in our DB.

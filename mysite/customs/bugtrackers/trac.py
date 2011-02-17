@@ -314,6 +314,11 @@ class TracBugTracker(object):
         return self.bug_project_name_format.format(project=self.project_name,
                                                    component=trac_bug.component)
 
+    @staticmethod
+    def extract_tracker_specific_data(trac_data, ret_dict):
+        # Override this in a project-tracker-specific subclass.
+        raise NotImplementedError
+
     def update(self):
         if self.old_trac:
             # It's an old version of Trac that doesn't have links from the

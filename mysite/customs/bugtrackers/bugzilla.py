@@ -226,6 +226,11 @@ class BugzillaBugTracker(object):
                 product = bb.product,
                 component = bb.component)
 
+    @staticmethod
+    def extract_tracker_specific_data(xml_data, ret_dict):
+        # Override this in a project-tracker-specific subclass.
+        raise NotImplementedError
+
     def create_or_refresh_one_bugzilla_bug(self, bb):
         bug_id = bb.bug_id
         bug_url = bb.as_bug_specific_url()
