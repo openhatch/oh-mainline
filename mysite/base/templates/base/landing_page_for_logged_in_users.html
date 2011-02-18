@@ -186,9 +186,6 @@ body.three_columns #right #recent_activity_feed .body { font-size: 1em; }
             {% if recommended_bugs %}
             {% include "base/recommended_bugs_content.html" %}
             {% else %}
-            <style>
-                .ajax-loader-horizontal-medium { display: inline-block; height: 24px; width: 100%; background: url('static/images/ajax/ajax-loader-horizontal-medium.gif') no-repeat center }
-            </style>
             <div id='bug-recommendations' class='hidden'></div>
             <span id='ajax-loader-rec-bugs' class='ajax-loader-horizontal-medium'></span>
             <div id='volunteer-opportunities' class='hidden'>
