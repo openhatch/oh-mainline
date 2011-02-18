@@ -1,7 +1,8 @@
 # This file is part of OpenHatch.
 # Copyright (C) 2010 Parker Phinney
 # Copyright (C) 2010 Jack Grigg
-# Copyright (C) 2009, 2010 OpenHatch, Inc.
+# Copyright (C) 2011 Krzysztof Tarnowski (krzysztof.tarnowski@ymail.com)
+# Copyright (C) 2009, 2010, 2011 OpenHatch, Inc.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -268,6 +269,19 @@ class CacheMethod(TwillTests):
 
         # Step 3: See if the cache has it now
         mock_cache.set.assert_called_with('doodles', '{"value": "1"}', 86400 * 10)
+
+class RecommendBugs(TwillTests):
+    @mock.patch('mysite.profile.controllers.RecommendBugs')
+    def test_no_synchronous_processing_on_empty(self, RecommendBugsMock):
+        RecommendBugsMock.is_cache_empty.return_value = True
+        
+        self.client.login(username='testclient', password='password')
+        response = self.client.get('/')
+        
+        # Login was required
+        self.assertEqual(response.status_code, 200)
+        # No synchronous call to costly recommend() method 
+        self.assertFalse(RecommendBugsMock.recommend.called)
 
 class EnhanceNextWithNewUserMetadata(TwillTests):
     def test_easy(self):
