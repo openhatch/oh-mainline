@@ -42,8 +42,3 @@ $(function() {
         );
     }
 });
-
-/* People list box */
-$(function() {
-    $('#people-list li').hoverClass('hover');
-});
