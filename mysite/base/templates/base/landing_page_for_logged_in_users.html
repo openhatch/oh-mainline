@@ -199,7 +199,7 @@ body.three_columns #right #recent_activity_feed .body { font-size: 1em; }
                     {# Don't show an example if no volunteer opportunities match it. #}
                     <li><a href='/search?{{query.get_query_string}}'>{{string|safe}} ({{query.get_or_create_cached_hit_count}})</a></li>
                     {% endif %}
-                    {% endwith %}         
+                    {% endwith %}
                 {% endfor %}
                 {% comment %}
                 {% for category in popular_bug_categories %}
@@ -209,7 +209,7 @@ body.three_columns #right #recent_activity_feed .body { font-size: 1em; }
                 </ul>
                 {% endif %}
                 <p style='margin-top: 10px;' class='rabbit_hole'><a href='{% url mysite.search.views.fetch_bugs %}'>See all volunteering opportunities &raquo;</a></p>
-            </div>            
+            </div>
             {% endif %}
         </div>
     </div>

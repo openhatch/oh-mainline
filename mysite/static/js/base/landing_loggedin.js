@@ -24,7 +24,7 @@ $(function() {
             '/+profile/bug_recommendation_list_as_template_fragment',
             function(response) {
                 var elem = null;
-                
+
                 if (response.result == 'OK') {
                     var bug_rec = $('#bug-recommendations');
                     bug_rec.html(response.html);
@@ -35,7 +35,7 @@ $(function() {
                     $('#bug-recommendations').html('An error occured');
                     elem = $('#bug-recommendations');
                 }
-                
+
                 $('#ajax-loader-rec-bugs').fadeOut();
                 elem.fadeIn();
             }

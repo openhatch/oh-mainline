@@ -62,7 +62,7 @@ def home(request):
     data['random_profiles'] = everybody[0:5]
 
     if request.user.is_authenticated():
-        template_path = 'base/landing_page_for_logged_in_users.html' 
+        template_path = 'base/landing_page_for_logged_in_users.html'
         # figure oout which nudges we want to show them
         person = request.user.get_profile()
 
@@ -89,12 +89,12 @@ def home(request):
         data['show_nudge_box'] = (data['nudge_location'] or 
                 'nudge_importer_when_user_has_no_projects' in data or data['nudge_tags'] or
                                   'nudge_importer_when_user_has_some_projects' in data)
-        
+
         # Bug recommendations
         suggested_searches = request.user.get_profile().get_recommended_search_terms()
         recommender = mysite.profile.controllers.RecommendBugs(
             suggested_searches, n=5)
-        
+
         if not recommender.is_cache_empty():
             data['recommended_bugs'] = list(recommender.recommend())
         else:
@@ -118,8 +118,8 @@ def home(request):
             for (string, GET_data_dict) in recommended_bug_string2GET_data_dicts.items():
                 query = mysite.search.controllers.Query.create_from_GET_data(GET_data_dict)
                 recommended_bug_string2Query_objects[string] = query
-    
-            data[u'recommended_bug_string2Query_objects'] = recommended_bug_string2Query_objects            
+
+            data[u'recommended_bug_string2Query_objects'] = recommended_bug_string2Query_objects
         
     else: # no user logged in. Show front-page
         template_path = 'base/landing.html'
