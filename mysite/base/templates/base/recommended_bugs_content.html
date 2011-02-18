@@ -18,7 +18,6 @@
 {% endcomment %}
 {% load cache %}
 {% load base_extras %}
-Hello!
 <ul>
     {% for bug in recommended_bugs %}
     <li style="list-style-image: url({% version bug.project.get_url_of_search_result_icon_or_generic %});">
