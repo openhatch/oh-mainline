@@ -361,5 +361,4 @@ body.landing_page .note { text-shadow: 0 1px 0 #fff; font-size: 1.2em; text-alig
 
 body#people-map #search_engine_is_down_message { float: left; display: block; margin-top: 1em; margin-bottom: 0; font-size: 1.3em; }
 
-.ajax-loader-horizontal-medium { display: inline-block; height: 24px; width: 100%; background: url('/static/images/ajax/ajax-loader-horizontal-medium.gif') no-repeat center }
 .ajax-loader-circle-txt-medium { display: inline-block; line-height: 32px; padding-left: 32px; background: url('/static/images/throbber.gif') no-repeat left; font-weight: bold; color: #444 }
