@@ -21,3 +21,9 @@ body#landing_page_for_logged_in_users .rabbit_hole { float: right; margin: 0; fo
 body#landing_page_for_logged_in_users #right .body {width: 94%;}
 body#landing_page_for_logged_in_users #right ul li { margin-bottom: 15px; }
 body#landing_page_for_logged_in_users #recent_activity_feed ul li:last-child { margin-bottom: 0; }
+
+#bugs ul { list-style: none }
+#syndicate ul { margin: 0; }
+#syndicate li { list-style: square; color: #888; margin-left: 1.2em; }
+#syndicate p { margin: 0 0 5px 0; }
+#syndicate p:last-child { margin: 0; }
