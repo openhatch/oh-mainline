@@ -187,31 +187,31 @@ body.three_columns #right #recent_activity_feed .body { font-size: 1em; }
             {% include "base/recommended_bugs_content.html" %}
             {% else %}
             <div id='bug-recommendations' class='hidden'></div>
-            <span id='ajax-loader-rec-bugs' class='ajax-loader-horizontal-medium'></span>
+            <span id='ajax-loader-rec-bugs' class='ajax-loader-circle-txt-medium'>Loading bug recommendations...</span>
             <div id='volunteer-opportunities' class='hidden'>
-                <p>We are sorry, but we cannot recommend any bugs at the moment.</p>
-            {% if recommended_bug_string2Query_objects.items %}
-            <p>You can always search for bugs manually. For example:</p>
-            <ul>
-            {% for string, query in recommended_bug_string2Query_objects.items %}
-                {% with query.get_or_create_cached_hit_count as count %}
-                {% if count %}
-                {# Don't show an example if no volunteer opportunities match it. #}
-                <li><a href='/search?{{query.get_query_string}}'>{{string|safe}} ({{query.get_or_create_cached_hit_count}})</a></li>
+                <p>There are currently no bug recommendation available.</p>
+                {% if recommended_bug_string2Query_objects.items %}
+                <p>You can always search for bugs manually. For example:</p>
+                <ul>
+                {% for string, query in recommended_bug_string2Query_objects.items %}
+                    {% with query.get_or_create_cached_hit_count as count %}
+                    {% if count %}
+                    {# Don't show an example if no volunteer opportunities match it. #}
+                    <li><a href='/search?{{query.get_query_string}}'>{{string|safe}} ({{query.get_or_create_cached_hit_count}})</a></li>
+                    {% endif %}
+                    {% endwith %}         
+                {% endfor %}
+                {% comment %}
+                {% for category in popular_bug_categories %}
+                    <li><a href='{{ category.url }}'>{{ category.name }}</a></li>
+                {% endfor %}
+                {% endcomment %}
+                </ul>
                 {% endif %}
-                {% endwith %}         
-            {% endfor %}
-            {% comment %}
-            {% for category in popular_bug_categories %}
-                <li><a href='{{ category.url }}'>{{ category.name }}</a></li>
-            {% endfor %}
-            {% endcomment %}
-            </ul> 
-            {% endif %}           
-            <p style='margin-top: 10px;' class='rabbit_hole'><a href='{% url mysite.search.views.fetch_bugs %}'>See all volunteering opportunities &raquo;</a></p>            
+                <p style='margin-top: 10px;' class='rabbit_hole'><a href='{% url mysite.search.views.fetch_bugs %}'>See all volunteering opportunities &raquo;</a></p>
+            </div>            
             {% endif %}
-            </div>
-        </div> 
+        </div>
     </div>
 </div>
 
