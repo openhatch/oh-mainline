@@ -184,41 +184,18 @@ body.three_columns #right #recent_activity_feed .body { font-size: 1em; }
         </div>
         <div class='body'>
             {% if recommended_bugs %}
-            <ul>
-                {% for bug in recommended_bugs %}
-                <li style="list-style-image: url({% version bug.project.get_url_of_search_result_icon_or_generic %});">
-                <span>
-                    <a style='font-weight: bold;'
-                        href='{{ bug.canonical_bug_link }}'>
-                        {{ bug.title }}</a>
-                    in&nbsp;{{ bug.project.name }}
-                    {% if bug.project.language %}
-                    (project&nbsp;language:&nbsp;{{ bug.project.language }})
-                    {% endif %}
-                </span></li>
-                {% endfor %}
-            </ul>
-            <p><a href='/search/' style='float: right; text-align: right;'>Find more recommendations and other opportunities <strong>&raquo;</strong></a></p>
+            {% include "base/recommended_bugs_content.html" %}
             {% else %}
-            LOADING
-            {% endif %}
-        </div> 
-    </div>
-    
-    {% if not recommended_bugs %}    
-    <div class='module' id='volunteer-opportunities'>
-        <div class='head'>
-            <h3>Volunteer opportunities</h3>
+            <style>
+                .ajax-loader-horizontal-medium { display: inline-block; height: 24px; width: 100%; background: url('static/images/ajax/ajax-loader-horizontal-medium.gif') no-repeat center }
+            </style>
+            <div id='bug-recommendations' class='hidden'></div>
+            <span id='ajax-loader-rec-bugs' class='ajax-loader-horizontal-medium'></span>
+            <div id='volunteer-opportunities' class='hidden'>
+                <p>We are sorry, but we cannot recommend any bugs at the moment.</p>
+            {% if recommended_bug_string2Query_objects.items %}
+            <p>You can always search for bugs manually. For example:</p>
             <ul>
-                <li>
-            <a href="/search" >See all &raquo;</a>
-                </li>
-            </ul>            
-        </div>
-        <div class='body'>
-            Discover new ways that you can contribute to
-            free and open source software. For example:
-            {# If no recommended bugs: #}
             {% for string, query in recommended_bug_string2Query_objects.items %}
                 {% with query.get_or_create_cached_hit_count as count %}
                 {% if count %}
@@ -231,14 +208,14 @@ body.three_columns #right #recent_activity_feed .body { font-size: 1em; }
             {% for category in popular_bug_categories %}
                 <li><a href='{{ category.url }}'>{{ category.name }}</a></li>
             {% endfor %}
-            {% endcomment %}            
-            <p style='margin-top: 10px;' class='rabbit_hole'><a href='{% url mysite.search.views.fetch_bugs %}'>See all volunteering opportunities &raquo;</a></p>                               
-        </div>
+            {% endcomment %}
+            </ul> 
+            {% endif %}           
+            <p style='margin-top: 10px;' class='rabbit_hole'><a href='{% url mysite.search.views.fetch_bugs %}'>See all volunteering opportunities &raquo;</a></p>            
+            {% endif %}
+            </div>
+        </div> 
     </div>
-    {% endif %}
-    <style type='text/css'>
-        #bugs ul, #volunteer-opportunities ul { list-style: none }
-    </style>
 </div>
 
 <div id='right' class='column'>
@@ -276,10 +253,10 @@ body.three_columns #right #recent_activity_feed .body { font-size: 1em; }
                 {% for entry in entries %}
                 <li>
                     <a style='font-weight: bold; line-height: 110%;' href="{{ entry.link }}">{{ entry.title }}</a>
-                <div class='byline'>by {{ entry.author }} &bull; {{ entry.published_parsed|timesince_terse }} ago</div>
-                <div class="entry">
+                    <div class='byline'>by {{ entry.author }} &bull; {{ entry.published_parsed|timesince_terse }} ago</div>
+                    <div class="entry">
                     {{ entry.unicode_text|truncatewords:15 }}
-                </div>
+                    </div>
                 </li>
                 {% endfor %}
             </ul>
@@ -292,25 +269,14 @@ body.three_columns #right #recent_activity_feed .body { font-size: 1em; }
             <h3>Syndicate your profile</h3>
         </div>
         <div class='body'>
-            <style type='text/css'>
-                #syndicate ul { margin: 0; }
-                #syndicate li { list-style: square; color: #888; margin-left: 1.2em; }
-                #syndicate p { margin: 0 0 5px 0; }
-                #syndicate p:last-child { margin: 0; }
-            </style>
             <p>Put your project list on your other web things.</p>
             <p style='float: right;'><a href='{% url mysite.account.views.widget %}'>Get your widget &raquo;</a></p>
         </div>
     </div>
-
 </div>
 {% endblock content %}
 
 {% block js %}
 {{ block.super }}
-<script type='text/javascript'>
-$(function(){
-$('#people-list li').hoverClass('hover');
-});
-</script>
+<script src='static/js/base/landing_loggedin.js' type='text/javascript'></script>
 {% endblock js %}
