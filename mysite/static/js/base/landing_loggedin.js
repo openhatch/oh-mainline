@@ -30,7 +30,7 @@ $(function() {
                     bug_rec.html(response.html);
                     elem = bug_rec;
                 } else if (response.result == 'NO_BUGS'){
-                    elem = $('#volunteer-opportunities').fadeIn();
+                    elem = $('#volunteer-opportunities');
                 } else {
                     $('#bug-recommendations').html('An error occured');
                     elem = $('#bug-recommendations');
@@ -43,7 +43,7 @@ $(function() {
     }
 });
 
-/* People's list */
+/* People list box */
 $(function() {
     $('#people-list li').hoverClass('hover');
 });
