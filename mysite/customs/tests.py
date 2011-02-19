@@ -2525,3 +2525,30 @@ class DataExport(django.test.TestCase):
         self.assertEquals(new_munroe.get_public_location_or_default(), 'Inaccessible Island')
 # vim: set nu:
 
+class TestOhlohAccountImportWithException(django.test.TestCase):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh',)
+    @mock.patch('mysite.search.tasks.PopulateProjectIconFromOhloh')
+    @mock.patch('twisted.web.client.getPage', fakeGetPage.getPage)
+    def setUp(self, do_nothing, do_nothing_1):
+        # Create a DataImportAttempt for Asheesh
+        asheesh = Person.objects.get(user__username='paulproteus')
+        self.dia = mysite.profile.models.DataImportAttempt.objects.create(
+            person=asheesh, source='oh', query='paulproteus')
+
+    @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh',)
+    @mock.patch('mysite.search.tasks.PopulateProjectIconFromOhloh')
+    @mock.patch('twisted.web.client.getPage', fakeGetPage.getPage)
+    @mock.patch('mysite.customs.profile_importers.AbstractOhlohAccountImporter.convert_ohloh_contributor_fact_to_citation', mock.Mock(side_effect=KeyError))
+    def test_exception_email(self, ignore, ignore_2):
+        # setUp() already created the DataImportAttempt
+        # so we just run the command:
+        cmd = mysite.customs.management.commands.customs_twist.Command()
+        cmd.handle(use_reactor=False)
+
+        from django.core import mail
+
+        self.assertTrue(mail.outbox)
+        self.assertEqual("[Django] Async error on the site",
+                         mail.outbox[0].subject)

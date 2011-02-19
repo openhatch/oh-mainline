@@ -41,7 +41,39 @@ import twisted.web
 class ProfileImporter(object):
     SQUASH_THESE_HTTP_CODES = []
 
+    def errbackOfLastResort(self, error):
+        # So the error is something intense -- probably, an actual code bug.
+        #
+        # The important thing to do is to log the error somewhere in an attempt to make
+        # it easier to debug.
+        #
+        # Twisted errors have a printDetailedTraceback() method
+        message = """Uh oh. Asynchronous code hit an unhandled exception.
+
+Here is the details:
+
+"""
+        buf = StringIO.StringIO()
+        error.printDetailedTraceback(file=buf)
+        message += buf.getvalue()
+
+        # Send an email to the admins
+        from django.core.mail import mail_admins
+        mail_admins(subject="Async error on the site",
+                    message=message,
+                    fail_silently=True)
+        # fail_silently since exceptions here would be bad.
+
     def squashIrrelevantErrors(self, error):
+        ### The way we set up the callbacks and errbacks, this function should process any
+        ### exceptions raised by the actual callback.
+        ###
+        ### It's important that this function never raise an error.
+        ###
+        ### Once it returns successfully, the DIA processing will continue, and the DIA will
+        ### get marked as "completed". So if this function raises an exception, then the DIA
+        ### will never get marked as "completed", and then users would be staring at progress
+        ### bars for ever and ever!
         squash_it = False
 
         if error.type == twisted.web.error.Error:
@@ -56,7 +88,7 @@ class ProfileImporter(object):
                 # This is low-quality logging for now!
                 logging.warn("EEK: " + error.value.status + " " + error.value.response)
         else:
-            raise error.value
+            self.errbackOfLastResort(error)
 
     def __init__(self, query, dia_id, command):
         ## First, store the data we are passed in.
