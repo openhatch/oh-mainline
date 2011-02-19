@@ -211,6 +211,10 @@ class BugzillaBugTracker(object):
             for bug_xml in query_xml.xpath('bug'):
                 yield bug_xml
 
+    def generate_current_bug_xml(self):
+        # Override this in a project-tracker-specific subclass.
+        raise NotImplementedError
+
     def get_bug_id_list_from_tracker_bug_urls(self, tracker_bug_urls):
         # If a dictionary has been passed in, convert it to a list.
         if type(tracker_bug_urls) == dict:

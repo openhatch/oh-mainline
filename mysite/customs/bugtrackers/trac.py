@@ -310,6 +310,10 @@ class TracBugTracker(object):
             for bug_id in query_ids:
                 yield bug_id
 
+    def generate_list_of_bug_ids_to_look_at(self):
+        # Override this in a project-tracker-specific subclass.
+        raise NotImplementedError
+
     def generate_bug_project_name(self, trac_bug):
         return self.bug_project_name_format.format(project=self.project_name,
                                                    component=trac_bug.component)

@@ -218,6 +218,10 @@ class GoogleBugTracker(object):
             for issue in issues:
                 yield issue
 
+    def generate_current_bug_atom(self):
+        # Override this in a project-tracker-specific subclass.
+        raise NotImplementedError
+
     @staticmethod
     def extract_tracker_specific_data(issue, ret_dict):
         # Override this in a project-tracker-specific subclass.

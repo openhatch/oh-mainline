@@ -175,6 +175,10 @@ class RoundupTracker(object):
 
         return bug_object
 
+    def generate_list_of_bug_ids_to_look_at(self):
+        # Override this in a project-tracker-specific subclass.
+        raise NotImplementedError
+
     def extract_bug_tracker_specific_data(self, metadata_dict, bug_object):
         # Override this in a project-tracker-specific subclass.
         raise NotImplementedError
