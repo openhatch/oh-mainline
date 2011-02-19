@@ -2518,3 +2518,5 @@ class TestOhlohAccountImportWithException(django.test.TestCase):
         self.assertTrue(mail.outbox)
         self.assertEqual("[Django] Async error on the site",
                          mail.outbox[0].subject)
+
+        self.assertTrue(all(d.completed for d in mysite.profile.models.DataImportAttempt.objects.all()))
