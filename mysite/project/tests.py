@@ -32,8 +32,6 @@ from mysite.profile import views
 
 from django.conf import settings
 
-from mysite.customs import ohloh 
-
 from mysite.base.tests import better_make_twill_url
 
 import re
