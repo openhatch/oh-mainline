@@ -55,7 +55,6 @@ from urllib2 import HTTPError
 import simplejson
 import datetime
 from dateutil.tz import tzutc
-import ohloh
 import gdata.client
 
 import twisted.internet.defer
@@ -1076,7 +1075,7 @@ class UserGetsMessagesDuringImport(django.test.TestCase):
 
         self.assertEqual(len(paulproteus.user.get_and_delete_messages()), 0)
 
-        self.assertRaises(HTTPError, mysite.customs.ohloh.mechanize_get, 'http://ohloh.net/somewebsiteonohloh', attempts_remaining=1, person=paulproteus)
+        self.assertRaises(HTTPError, mysite.customs.mechanize_helpers.mechanize_get, 'http://ohloh.net/somewebsiteonohloh', attempts_remaining=1, person=paulproteus)
 
         self.assertEqual(len(paulproteus.user.get_and_delete_messages()), 1)
 
@@ -1676,7 +1675,7 @@ class TracBug(django.test.TestCase):
                   }
         self.assertEqual(wanted, got)
 
-    @mock.patch('mysite.customs.ohloh.mechanize_get')
+    @mock.patch('mysite.customs.mechanize_helpers.mechanize_get')
     def test_bug_that_404s_is_deleted(self, mock_error):
         mock_error.side_effect = generate_404
 
@@ -1848,36 +1847,36 @@ class BugzillaImporterOnlyPerformsAQueryOncePerDay(django.test.TestCase):
 
 class DailyBugImporter(django.test.TestCase):
 
-    @mock.patch('mysite.customs.ohloh.mechanize_get')
+    @mock.patch('mysite.customs.mechanize_helpers.mechanize_get')
     def test_roundup_http_error_408_does_not_break(self, mock_error):
         mock_error.side_effect = generate_408
         mysite.customs.management.commands.customs_daily_tasks.Command().find_and_update_enabled_roundup_trackers()
 
-    @mock.patch('mysite.customs.ohloh.mechanize_get')
+    @mock.patch('mysite.customs.mechanize_helpers.mechanize_get')
     @mock.patch('feedparser.parse')
     def test_roundup_generic_error_does_break(self, mock_timeline_error, mock_error):
         mock_error.side_effect = ValueError()
         mock_timeline_error.side_effect = ValueError()
         self.assertRaises(ValueError, mysite.customs.management.commands.customs_daily_tasks.Command().find_and_update_enabled_roundup_trackers)
 
-    @mock.patch('mysite.customs.ohloh.mechanize_get')
+    @mock.patch('mysite.customs.mechanize_helpers.mechanize_get')
     @mock.patch('feedparser.parse')
     def test_trac_http_error_408_does_not_break(self, mock_timeline_error, mock_error):
         mock_error.side_effect = generate_408
         mock_timeline_error.side_effect = generate_408
         mysite.customs.management.commands.customs_daily_tasks.Command().find_and_update_enabled_trac_instances()
 
-    @mock.patch('mysite.customs.ohloh.mechanize_get')
+    @mock.patch('mysite.customs.mechanize_helpers.mechanize_get')
     def test_trac_generic_error_does_break(self, mock_error):
         mock_error.side_effect = ValueError()
         self.assertRaises(ValueError, mysite.customs.management.commands.customs_daily_tasks.Command().find_and_update_enabled_trac_instances)
 
-    @mock.patch('mysite.customs.ohloh.mechanize_get')
+    @mock.patch('mysite.customs.mechanize_helpers.mechanize_get')
     def test_bugzilla_http_error_504_does_not_break(self, mock_error):
         mock_error.side_effect = generate_504
         mysite.customs.management.commands.customs_daily_tasks.Command().find_and_update_enabled_bugzilla_instances()
 
-    @mock.patch('mysite.customs.ohloh.mechanize_get')
+    @mock.patch('mysite.customs.mechanize_helpers.mechanize_get')
     def test_bugzilla_generic_error_does_break(self, mock_error):
         mock_error.side_effect = ValueError()
         self.assertRaises(ValueError, mysite.customs.management.commands.customs_daily_tasks.Command().find_and_update_enabled_bugzilla_instances)
