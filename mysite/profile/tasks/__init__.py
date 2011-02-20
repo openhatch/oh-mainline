@@ -21,7 +21,6 @@ import logging
 import os
 from datetime import timedelta
 import datetime
-from mysite.customs import ohloh
 import urllib2
 import urllib
 import mysite.customs.github

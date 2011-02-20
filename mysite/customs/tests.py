@@ -27,6 +27,7 @@ from mysite.base.models import Timestamp
 from mysite.profile.models import Person, Tag, TagType
 import mysite.profile.views
 from mysite.profile.tests import MockFetchPersonDataFromOhloh
+from mysite.customs import ohloh
 
 import mock
 import os

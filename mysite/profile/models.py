@@ -20,7 +20,6 @@
 
 from mysite.search.models import Project, Bug, get_image_data_scaled
 import mysite.customs.models
-from mysite.customs import ohloh
 import mysite.profile.controllers
 import mysite.base.unicode_sanity
 import mysite.customs.ping_twisted

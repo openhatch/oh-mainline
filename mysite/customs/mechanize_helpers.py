@@ -16,6 +16,7 @@
 import logging
 from httplib import BadStatusLine
 from urllib2 import HTTPError
+from urlparse import urlparse
 
 import mechanize
 
