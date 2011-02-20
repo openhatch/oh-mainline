@@ -32,7 +32,6 @@ import mysite.profile.models
 import mysite.profile.controllers
 from mysite.profile.management.commands import send_weekly_emails
 from mysite.profile import views
-from mysite.customs import ohloh
 from mysite.customs.models import WebResponse
 
 import simplejson
@@ -312,81 +311,6 @@ stumps_ohloh_results.return_value = ([
 ], WebResponse())
 stumps_project_lookup = mock.Mock()
 stumps_project_lookup.return_value = {u'name': u'WinKexec', u'homepage_url': u'https://www.jstump.com/projects/kexec/'}
-
-class OhlohTests(TwillTests):
-
-    @mock.patch('mysite.customs.ohloh.ohloh_url2data', stumps_ohloh_results)
-    @mock.patch('mysite.customs.ohloh.Ohloh.analysis2projectdata', stumps_project_lookup)
-    def test_ohloh_doesnt_match_just_substring(self):
-        expected = [{'man_months': 11,
-          'permalink': None,
-          'primary_language': u'C',
-          'project': u'WinKexec',
-          'project_homepage_url': u'https://www.jstump.com/projects/kexec/'}]
-
-        received = ohloh.get_ohloh().get_contribution_info_by_username('stump')[0]
-        self.assertEqual(received, expected)
-
-class CeleryTests(BaseCeleryTest):
-    # {{{
-    fixtures = ['user-paulproteus', 'person-paulproteus']
-
-    # FIXME: One day, test that after self.test_slow_loading_via_emulated_bgtask
-    # getting the data does not go out to Ohloh.
-
-    @mock.patch('mysite.customs.ohloh.Ohloh.get_contribution_info_by_username', mock_gcibu)
-    @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
-    def test_ohloh_import_via_emulated_bgtask(self):
-        return
-        "Test that we can import data from Ohloh, except don't test "
-        "that Ohloh actually gives data. Instead, create a mock object, a little "
-        "placeholder that acts like Ohloh, and make sure we respond "
-        "to it correctly."
-        # {{{
-        data_we_expect = [{
-                'languages': mock_gcibu.return_value[0][0]['primary_language'],
-                'url': mock_gcibu.return_value[0][0]['permalink'],
-                'distinct_months': mock_gcibu.return_value[0][0]['man_months'],
-                'is_published': False,
-                'is_deleted': False,
-                }]
-
-        summaries_we_expect = [
-                "Coded for 1 month in shell script (Ohloh)",
-                ]
-
-        return self._test_data_source_via_emulated_bgtask(
-                source='rs', data_we_expect=data_we_expect,
-                summaries_we_expect=summaries_we_expect)
-        # }}}
-
-    @mock.patch('mysite.customs.ohloh.Ohloh.get_contribution_info_by_ohloh_username', mock_gcibou)
-    @mock.patch('mysite.profile.tasks.FetchPersonDataFromOhloh', MockFetchPersonDataFromOhloh)
-    def test_ohloh_import_via_emulated_ohloh_username_bg_search(self):
-        return
-        "Test that we can import data from Ohloh via Ohloh username, except don't test "
-        "that Ohloh actually gives data. Instead, create a mock object, a little "
-        "placeholder that acts like Ohloh, and make sure we respond "
-        "to it correctly."
-        # {{{
-        data_we_expect = [{
-                'languages': mock_gcibou.return_value[0][0]['primary_language'],
-                'url': mock_gcibou.return_value[0][0]['permalink'],
-                'distinct_months': mock_gcibou.return_value[0][0]['man_months'],
-                'is_published': False,
-                'is_deleted': False,
-                }]
-
-        summaries_we_expect = [
-                "Coded for 1 month in Vala (Ohloh)",
-                ]
-
-        return self._test_data_source_via_emulated_bgtask(
-                source='ou', data_we_expect=data_we_expect,
-                summaries_we_expect=summaries_we_expect)
-        # }}}
-
-    # }}}
 
 class UserListTests(TwillTests):
     # {{{
