@@ -15,6 +15,9 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+### This file is just a wrapper around the Ohloh.net API that helps
+### us get icons for projects.
+
 import mysite.base.unicode_sanity
 import xml.etree.ElementTree as ET
 import xml.parsers.expat
