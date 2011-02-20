@@ -40,55 +40,7 @@ import re
 from typecheck import accepts, returns
 from typecheck import Any as __
 
-def mechanize_get(url, referrer=None, attempts_remaining=6, person=None):
-    """Input: Some stuff regarding a web URL to request.
-    Output: A browser instance that just open()'d that, plus an unsaved
-    WebResponse object representing that browser's final state."""
-    # if url is a Unicode object, make it utf-8 bytestring
-    if type(url) == unicode:
-        url = url.encode('utf-8')
-
-    web_response = mysite.customs.models.WebResponse()
-
-    b = mechanize.Browser()
-    b.set_handle_robots(False)
-    addheaders = [('User-Agent',
-                     'Mozilla/4.0 (compatible; MSIE 5.0; Windows 98; (compatible;))')]
-    if referrer is not None:
-        b.set_handle_referer(False)
-        addheaders.extend([('Referer',
-                           referrer)])
-    b.addheaders = addheaders
-
-    retry = False
-    reason = None
-
-    try:
-        b.open(url)
-    except BadStatusLine, e:
-        retry = True
-        reason = 'BadStatusLine'
-    except HTTPError, e:
-        if (e.code == 504 or e.code == 502) and attempts_remaining > 0:
-            retry = True
-            reason = str(e.code)
-        else:
-            raise
-
-    ## Okay, so sometimes we should retry:
-    if retry and attempts_remaining > 0:
-        # FIXME: Test with mock object.
-        message_schema = "Tried to talk to %s, got %s, retrying %d more times..."
-        long_message = message_schema % (url, reason, attempts_remaining)
-        logging.warn(long_message)
-
-        if person:
-            short_message = message_schema % (urlparse(url).hostname,
-                    reason, attempts_remaining)
-            person.user.message_set.create(message=short_message)
-        return mechanize_get(url, referrer, attempts_remaining-1, person)
-
-    return b
+from mysite.customs.mechanize_helpers import mechanize_get
 
 def link_works(url):
     try:

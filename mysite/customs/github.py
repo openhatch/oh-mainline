@@ -29,7 +29,7 @@
 
 import github2.client
 from django.conf import settings
-import mysite.customs.ohloh
+import mysite.customs.mechanize_helpers
 import simplejson
 import mysite.base.helpers
 import urllib
@@ -80,7 +80,7 @@ def find_primary_language_of_repo(github_username, github_reponame):
 
     json_url = 'http://github.com/api/v2/json/repos/show/%s/%s/languages' % (
         github_username, github_reponame)
-    response = mysite.customs.ohloh.mechanize_get(json_url).response()
+    response = mysite.customs.mechanize_helpers.mechanize_get(json_url).response()
     data = simplejson.load(response)
     if 'languages' in data:
         language_name_count_tuples = data['languages'].items()
@@ -93,7 +93,7 @@ def find_primary_language_of_repo(github_username, github_reponame):
 
 def _pull_data_from_user_activity_feed(github_username):
     json_url = 'http://github.com/%s.json' % mysite.base.unicode_sanity.quote(github_username)
-    response = mysite.customs.ohloh.mechanize_get(json_url).response()
+    response = mysite.customs.mechanize_helpers.mechanize_get(json_url).response()
     data = simplejson.load(response)
     return data
 
@@ -102,7 +102,7 @@ def _get_repositories_user_watches(github_username):
     json_url = 'http://github.com/api/v2/json/repos/watched/%s' % (
         mysite.base.unicode_sanity.quote(github_username))
     try:
-        response = mysite.customs.ohloh.mechanize_get(json_url).response()
+        response = mysite.customs.mechanize_helpers.mechanize_get(json_url).response()
     except urllib2.HTTPError, e:
         if (e.code == 403) or (e.code == 404):
             # Well, Github said 403

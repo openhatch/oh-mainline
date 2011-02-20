@@ -28,7 +28,6 @@ from django.db import models
 from django.utils.encoding import smart_str
 
 import mysite.search.models
-import mysite.customs.ohloh
 
 class RecentMessageFromCIA(models.Model):
     '''This model logs all messages from CIA.vc.

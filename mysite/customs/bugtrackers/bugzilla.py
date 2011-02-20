@@ -25,7 +25,7 @@ import lxml.etree
 from mysite.base.decorators import cached_property
 import mysite.base.helpers
 import mysite.base.models
-import mysite.customs.ohloh
+import mysite.customs.mechanize_helpers
 import mysite.search.models
 
 ############################################################
@@ -44,13 +44,13 @@ def find_ctype_xml_form_number(forms):
 def url2bug_data(url):
     # If we are looking at a single bug then get the XML link
     if url.find('show_bug.cgi?id=') >= 0:
-        b = mysite.customs.ohloh.mechanize_get(
+        b = mysite.customs.mechanize_helpers.mechanize_get(
                 url + '&ctype=xml')
     else:
         # We are looking at a page of bugs.
 
         # Get the page of bugs
-        b = mysite.customs.ohloh.mechanize_get(url)
+        b = mysite.customs.mechanize_helpers.mechanize_get(url)
 
         # Find the one form with ctype XML
         ctype_xml_form_no = find_ctype_xml_form_number(b.forms())
@@ -66,7 +66,7 @@ def url2bug_data(url):
     return bug_data
 
 def tracker_bug2bug_ids(tracker_bug_url):
-    b = mysite.customs.ohloh.mechanize_get(tracker_bug_url)
+    b = mysite.customs.mechanize_helpers.mechanize_get(tracker_bug_url)
     xml = lxml.etree.XML(b.response().read())
     depends = xml.findall('bug/dependson')
     depends_bug_ids = [int(depend.text) for depend in depends]

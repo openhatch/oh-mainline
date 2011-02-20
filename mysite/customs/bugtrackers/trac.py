@@ -31,7 +31,6 @@ from mysite.base.decorators import cached_property
 import mysite.base.helpers
 import mysite.base.unicode_sanity
 from mysite.customs.models import TracTimeline, TracBugTimes
-import mysite.customs.ohloh
 import mysite.search.models
 import mysite.search.templatetags.search
 
@@ -39,7 +38,7 @@ import mysite.search.templatetags.search
 # Functions and classes for interacting with the tracker
 
 def csv_of_bugs(url):
-    b = mysite.customs.ohloh.mechanize_get(url)
+    b = mysite.customs.mechanize_helpers.mechanize_get(url)
     return b.response()
 
 def csv_url2list_of_bug_ids(csv_fd):
@@ -131,7 +130,7 @@ class TracBug:
 
     def as_bug_specific_csv_data(self):
         if self._bug_specific_csv_data is None:
-            b = mysite.customs.ohloh.mechanize_get(
+            b = mysite.customs.mechanize_helpers.mechanize_get(
                 self.as_bug_specific_csv_url())
             dr = csv.DictReader(b.response().readlines())
             self._bug_specific_csv_data = dr.next()
@@ -139,7 +138,7 @@ class TracBug:
 
     def get_bug_html_page(self):
         if self._bug_html_page is None:
-            b = mysite.customs.ohloh.mechanize_get(
+            b = mysite.customs.mechanize_helpers.mechanize_get(
                 self.as_bug_specific_url())
             self._bug_html_page = b.response().read()
         return self._bug_html_page

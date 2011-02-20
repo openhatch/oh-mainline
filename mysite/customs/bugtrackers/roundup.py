@@ -28,10 +28,10 @@ import urlparse
 from django.db import models
 
 import mysite.search.models
-import mysite.customs.ohloh
+import mysite.customs.mechanize_helpers
 
 def csv_url2bugs(csv_url):
-    csv_fd = mysite.customs.ohloh.mechanize_get(
+    csv_fd = mysite.customs.mechanize_helpers.mechanize_get(
         csv_url).response()
     dict_reader = csv.DictReader(csv_fd)
     for thing in dict_reader:
