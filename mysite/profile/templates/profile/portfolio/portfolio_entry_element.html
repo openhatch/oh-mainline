@@ -88,6 +88,20 @@
                     <div class='project_description'>{{ pf_entry.project_description|urlize|linebreaks }}</div>
                 {% endif %}
             </div>
+	    <div class='receive_maintainer_updates'>
+                {% if edit_mode %}
+                    {% with 'receive_maintainer_updates_$PORTFOLIO_ENTRY_ID' as updates_id %}
+		        <input type='checkbox' class='receive_maintainer_updates'
+		               value='{{ updates_id }}'
+			       {% if pf_entry.receive_mainatiner_updates %}
+			       checked
+			       {% endif %}
+			       >
+			Receive maintainer updates
+			<a class='explain_maintainer_updates' href='#'>(explain this)</a>
+		    {% endwith %}
+		{% endif %}
+	    </div>
             {% if not edit_mode and not adding_mode %}
             {# We're in view mode #}
             {% show_other_contributors pf_entry.project person.user 4 %}

@@ -376,6 +376,10 @@ function updatePortfolio(response) {
 	    /* project_description */
 	    $(".project_description", $new_portfolio_entry).textSmart(portfolioEntry.fields.project_description);
 
+	    /* receive_maintainer_updates */
+	    $('.receive_maintainer_updates',
+	      $new_portfolio_entry).attr('checked', portfolioEntry.fields.receive_maintainer_updates);
+
 	    /* project_icon */
         if (project_we_refer_to.fields.icon_for_profile == '') {
             $new_portfolio_entry.find('.icon_flagger').hide();
@@ -706,11 +710,18 @@ PortfolioEntry.bindEventHandlers = function() {
     PortfolioEntry.Save.bindEventHandlers();
     PortfolioEntry.Delete.bindEventHandlers();
     $('#portfolio_entries .portfolio_entry textarea').keydown(pfEntryFieldKeydownHandler);
+    $('#portfolio_entries .portfolio_entry input').change(pfEntryFieldKeydownHandler);
 };
 
 pfEntryFieldKeydownHandler = function () {
     var $textarea = $(this);
     $textarea.closest('.portfolio_entry').not('.unpublished, .unsaved').addClass('unsaved');
+    SaveAllButton.updateDisplay();
+};
+
+pfCheckboxChangeHandler = function () {
+    var $checkbox = $(this);
+    $checkbox.closest('.portfolio_entry').not('.unpublished, .unsaved').addClass('unsaved');
     SaveAllButton.updateDisplay();
 };
 
@@ -780,6 +791,7 @@ PortfolioEntry.Save.save = function () {
         'project_name': $pfEntry.find('.project_name').val(),
         'project_description': $pfEntry.find('.project_description').val(),
         'experience_description': $pfEntry.find('.experience_description').val(),
+        'receive_maintainer_updates': $pfEntry.find('.receive_maintainer_updates').is(':checked'),
 
         // Send this always, but really it's only used when the pf entry has no pk yet.
         'pf_entry_element_id': $pfEntry.attr('id'), 
