@@ -962,7 +962,8 @@ class SavePortfolioEntry(TwillTests):
             'portfolio_entry__pk': self.portfolio_entry.pk,
             'pf_entry_element_id': 'blargle', # this can be whatever
             'project_description': "\n".join(self.project_description),
-            'experience_description': "\n".join(self.experience_description)
+            'experience_description': "\n".join(self.experience_description),
+            'receive_maintainer_updates': 'false',
         }
 
         POST_handler = reverse(mysite.profile.views.save_portfolio_entry_do)
@@ -987,6 +988,7 @@ class SavePortfolioEntry(TwillTests):
         self.assertEqual(portfolio_entry.experience_description,
                          self.POST_data['experience_description'])
         self.assert_(portfolio_entry.is_published, "pf entry is published.")
+        self.assertFalse(portfolio_entry.receive_maintainer_updates)
 
         citations = Citation.untrashed.filter(portfolio_entry=portfolio_entry)
         for c in citations:
@@ -1091,6 +1093,7 @@ class PortfolioEntryAdd(TwillTests):
                 'project_name': 'new project name',
                 'project_description': 'new project description',
                 'experience_description': 'new experience description',
+                'receive_maintainer_updates': 'false',
                 'pf_entry_element_id': 'element_18',
                 }
         url = reverse(mysite.profile.views.save_portfolio_entry_do)
