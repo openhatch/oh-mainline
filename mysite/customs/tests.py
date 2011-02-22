@@ -2019,13 +2019,17 @@ class DailyBugImporter(django.test.TestCase):
         mysite.customs.management.commands.customs_daily_tasks.Command().find_and_update_enabled_roundup_trackers()
 
     @mock.patch('mysite.customs.ohloh.mechanize_get')
-    def test_roundup_generic_error_does_break(self, mock_error):
+    @mock.patch('feedparser.parse')
+    def test_roundup_generic_error_does_break(self, mock_timeline_error, mock_error):
         mock_error.side_effect = ValueError()
+        mock_timeline_error.side_effect = ValueError()
         self.assertRaises(ValueError, mysite.customs.management.commands.customs_daily_tasks.Command().find_and_update_enabled_roundup_trackers)
 
     @mock.patch('mysite.customs.ohloh.mechanize_get')
-    def test_trac_http_error_408_does_not_break(self, mock_error):
+    @mock.patch('feedparser.parse')
+    def test_trac_http_error_408_does_not_break(self, mock_timeline_error, mock_error):
         mock_error.side_effect = generate_408
+        mock_timeline_error.side_effect = generate_408
         mysite.customs.management.commands.customs_daily_tasks.Command().find_and_update_enabled_trac_instances()
 
     @mock.patch('mysite.customs.ohloh.mechanize_get')
