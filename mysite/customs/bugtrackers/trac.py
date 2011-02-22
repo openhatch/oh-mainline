@@ -157,7 +157,7 @@ class TracBug:
         s = cgi.escape(s)
         return s
 
-    def as_data_dict_for_bug_object(self, extract_tracker_specific_data, old_trac):
+    def as_data_dict_for_bug_object(self, extract_tracker_specific_data, old_trac=False):
         trac_data = self.as_bug_specific_csv_data()
         html_data = self.get_parsed_bug_html_page()
 
