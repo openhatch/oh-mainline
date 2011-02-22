@@ -98,7 +98,6 @@ def home(request):
         if not recommender.is_cache_empty():
             data['recommended_bugs'] = list(recommender.recommend())
         else:
-            data['show_nudge_box'] = True
             # a dict pairing two things:
             # * GET data dicts (to be passed to Query's create_from_GET_data)
             # * strings of HTML representing the bug classification
