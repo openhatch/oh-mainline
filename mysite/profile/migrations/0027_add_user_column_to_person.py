@@ -24,7 +24,7 @@ class Migration:
     def forwards(self, orm):
         
         # Adding field 'Person.user'
-        db.add_column('profile_person', 'user', models.ForeignKey(orm['auth.User']))
+        db.add_column('profile_person', 'user', models.ForeignKey(orm['auth.User'], null=True))
         
         # Adding field 'TagType.name'
         try:

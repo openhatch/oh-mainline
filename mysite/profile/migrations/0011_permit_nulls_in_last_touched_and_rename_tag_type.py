@@ -27,10 +27,10 @@ class Migration:
         db.add_column('profile_projectexp', 'time_start', models.DateTimeField(null=True))
         
         # Adding field 'ProjectExp.last_touched'
-        db.add_column('profile_projectexp', 'last_touched', models.DateTimeField())
+        db.add_column('profile_projectexp', 'last_touched', models.DateTimeField(null=True))
         
         # Adding field 'Tag.tag_type'
-        db.add_column('profile_tag', 'tag_type', models.ForeignKey(orm.TagType))
+        db.add_column('profile_tag', 'tag_type', models.ForeignKey(orm.TagType, null=True))
         
         # Adding field 'ProjectExp.time_finish'
         db.add_column('profile_projectexp', 'time_finish', models.DateTimeField(null=True))

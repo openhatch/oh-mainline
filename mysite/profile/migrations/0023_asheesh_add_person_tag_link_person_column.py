@@ -24,7 +24,7 @@ class Migration:
     def forwards(self, orm):
         
         # Adding field 'Link_Person_Tag.person'
-        db.add_column('profile_link_person_tag', 'person', models.ForeignKey(orm.Person))
+        db.add_column('profile_link_person_tag', 'person', models.ForeignKey(orm.Person, null=True))
         
         # Deleting field 'Link_Person_Tag.project'
         db.delete_column('profile_link_person_tag', 'project_id')

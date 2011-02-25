@@ -183,7 +183,7 @@ class Migration:
             'person': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['profile.Person']"}),
             'project': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['search.Project']"}),
             'project_description': ('django.db.models.fields.TextField', [], {}),
-            'sort_order': ('django.db.models.fields.IntegerField', [], {})
+            'sort_order': ('django.db.models.fields.IntegerField', [], {'default': '0'})
         },
         'profile.repositorycommitter': {
             'Meta': {'unique_together': "(('project', 'data_import_attempt'),)"},

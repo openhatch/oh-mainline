@@ -118,7 +118,7 @@ class Migration:
             'completed': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'failed': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'person': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['profile.Person']"}),
+            'person': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['profile.Person']", 'null': 'True'}),
             'person_wants_data': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'query': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
             'source': ('django.db.models.fields.CharField', [], {'max_length': '2'})

@@ -24,10 +24,10 @@ class Migration:
     def forwards(self, orm):
         
         # Adding field 'Person.last_touched'
-        db.add_column('profile_person', 'last_touched', models.DateTimeField())
+        db.add_column('profile_person', 'last_touched', models.DateTimeField(null=True))
         
         # Adding field 'Person.last_polled'
-        db.add_column('profile_person', 'last_polled', models.DateTimeField())
+        db.add_column('profile_person', 'last_polled', models.DateTimeField(null=True))
         
         # Adding field 'Person.time_record_was_created'
         db.add_column('profile_person', 'time_record_was_created', models.DateTimeField(default=datetime.date(2009, 6, 18)))
