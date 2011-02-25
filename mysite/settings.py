@@ -253,3 +253,4 @@ SVN_REPO_URL_PREFIX = 'svn://openhatch.org/'
 # The script to invoke for management commands in this environment.
 PATH_TO_MANAGEMENT_SCRIPT = os.path.abspath(sys.argv[0])
 CELERY_ALWAYS_EAGER = True
+SOUTH_TESTS_MIGRATE = False
