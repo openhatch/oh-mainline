@@ -53,183 +53,83 @@ document.documentElement.className = 'javascript_is_enabled';
             <div id='tabbed_container_of_big_links'>
                 <ul class='tab_nav'>
                     <li class='ui-state-active'>
-                        <a href='#for_opp_hunters'>
-                            <h4> Join an open source project </h4>
-                        </a>
-                    </li>
-                    <li >
-                        <a href='#for_documenters'>
-                            <h4>Tell your open source story</h4>
-                        </a>
-                    </li>
-                    <li >
-                        <a href='#for_people_seekers'>
-                            <h4> Find people to work with </h4>
+                        <a href='#for_contributors'>
+                            <h4>Contribute to open source!</h4>
                         </a>
                     </li>
                     <li >
                         <a href='#for_project_maintainers'>
-                            <h4> Create a contributors page for your project </h4>
+                            <h4>Attract contributors to your project!</h4>
                         </a>
                     </li>
                 </ul>
 
-                <div class='tab' id='for_opp_hunters'>
+                <div class='tab' id='for_contributors'>
                     <div class='screenshot'>
-                        <a href='{% url mysite.search.views.fetch_bugs %}?toughness=bitesize' class='screenshot_image_wrapper' style='background-image: url({% version '/static/images/screenshots/bitesize-opps.png' %})'> </a>
+                        <a href='{% url mysite.missions.base.views.main_page %}' class='screenshot_image_wrapper' style='background-image: url({% version '/static/images/screenshots/missions.png' %})'> </a>
                         <div class='caption'>
-                            <strong>Browse thousands of bitesize bugs:</strong>
-                            Projects around the 'net label opportunities for
-                            new contributors. We collect these opportunities
-                            and show them off to you here.
-                            <a href='{% url mysite.search.views.fetch_bugs %}?q=&toughness=bitesize'>Check them out&nbsp;&raquo;</a>
+                            Get up to speed on tools often used in open source software development with our <a href='{% url mysite.missions.base.views.main_page %}'>training missions</a>
                         </div>
                     </div>
                     <div class='screenshot'>
-                        <a href='{% url mysite.search.views.fetch_bugs %}?language=C%2B%2B' class='screenshot_image_wrapper' style='background-image: url({% version '/static/images/screenshots/opps_in_c_plus_plus.png' %})'> </a>
+                        <a href='{% url mysite.profile.views.people%}' class='screenshot_image_wrapper' style='background-image: url({% version '/static/images/screenshots/people.png' %})'> </a>
                         <div class='caption'>
-                            <strong>Search bugs by language:</strong>
-                            You don't have to know ahead of time what project
-                            you want to work on to find a good bug to solve.
-                            <a href='{% url mysite.search.views.fetch_bugs %}'>
-                                Try&nbsp;it&nbsp;&raquo;</a>
+                            Find a mentor in a language or project you're interested in among our <a href='{% url mysite.profile.views.people%}'>people</a>
                         </div>
                     </div>
 
                     <div class='screenshot'>
-                        <a href='{% url mysite.project.views.project 'Gwibber' %}' class='screenshot_image_wrapper' style='background-image: url({% version '/static/images/screenshots/wanna-help.png' %})'> </a>
+                        <a href='{% url mysite.search.views.fetch_bugs %}?toughness=bitesize' class='screenshot_image_wrapper' style='background-image: url({% version '/static/images/screenshots/opportunities.png' %})'> </a>
                         <div class='caption'>
-                            <strong>&ldquo;Give me an assignment&rdquo;:</strong>
-                            Tell a project that you want to help. Just click
-                            the button, and existing contributors will able
-                            to see that you're interested.
-                            <a href='{% url mysite.project.views.projects %}'>
-                                Find a project&nbsp;&raquo;</a>
+                            Find a 'bitesize' (easy) bug to work on in a language you know with our <a href='{% url mysite.search.views.fetch_bugs %}?toughness=bitesize'>volunteer opportunity finder</a>
                         </div>
                     </div>
-                </div>
-
-                <div class='tab invisible_if_js' id='for_documenters'>
-
                     <div class='screenshot'>
-                        <a href='{% url oh_my_profile_redirect %}'
-                                class='screenshot_image_wrapper' style='background-image:
-                            url({% version '/static/images/screenshots/profile.png' %})'>
-                        </a>
+                        <a href='{% url mysite.project.views.projects %}' class='screenshot_image_wrapper' style='background-image: url({% version '/static/images/screenshots/wanna-help.png' %})'> </a>
                         <div class='caption'>
-                            <strong>Create your open source profile</strong>:
-                            Show off your contributions &ndash; not just
-                            commits, but patches, documentation,
-                            design<span class='oxford'>,</span> and advice.
-                            <a href='{% url oh_my_profile_redirect %}'>Get started&nbsp;&raquo;</a>
+                            Want to help a specific project but don't know where to jump in? Click 'I want to help' on <a href='{% url mysite.project.views.projects %}'>the project's OpenHatch page</a>
                         </div>
                     </div>
-
-                    <div class='screenshot'>
-                        <a href='{% url mysite.profile.views.importer %}'
-                                class='screenshot_image_wrapper' style='background-image:
-                            url({% version '/static/images/screenshots/importer-screenshot-squared-300px.png' %})'>
-                        </a>
-                        <div class='caption'>
-                            <strong>Import your public activity</strong> from a
-                            <abbr rel='tipsy-east' title='Github, Launchpad, Bitbucket, Debian, and code repositories indexed by Ohloh'>growing list of services</abbr>.
-                            Type your open source username(s) into our importer
-                            to find your contributions auto-magically.
-                            <a href='{% url mysite.profile.views.importer %}'>
-                                Try&nbsp;it&nbsp;&raquo;</a>
-                        </div>
-                    </div>
-
-                    <div class='screenshot'>
-                        <a href='{% url mysite.profile.views.edit_info %}'
-                                class='screenshot_image_wrapper' style='background-image:
-                            url({% version '/static/images/screenshots/profile_info.png' %})'>
-                        </a>
-                        <div class='caption'>
-                            <strong>What sort of contributor are you?</strong>
-                            List how you're willing to help, and your areas of
-                            interest and expertise.
-                            <a href='{% url mysite.profile.views.edit_info %}'>
-                                Write&nbsp;it&nbsp;&raquo;</a>
-                        </div>
-                    </div>
-
-                </div>
-
-                <div class='tab invisible_if_js' id='for_people_seekers'>
-
-                    <div class='screenshot'>
-                        <a href='{% url mysite.profile.views.people %}?q=can_mentor:&quot;php&quot;' class='screenshot_image_wrapper' style='background-image: url({% version '/static/images/screenshots/mentors_in_php.png' %})'> </a>
-                        <div class='caption'>
-                            The&nbsp;OpenHatch community includes experienced
-                            people who can chat about open source topics or
-                            review your work.
-
-                            <a style='font-weight: bold;' href="/people/?q=can_mentor:C">
-                                Find&nbsp;a mentor&nbsp;&raquo;</a>
-                        </div>
-                    </div>
-
-                    <div class='screenshot'>
-                        <a href='{% url mysite.profile.views.people %}?q=can_pitch_in:&quot;c&quot;' class='screenshot_image_wrapper' style='background-image: url({% version '/static/images/screenshots/these_people_can_pitch_in_with_c.png' %})'> </a>
-                        <div class='caption'>
-                            <strong>&ldquo;Who can help my project?&rdquo;:</strong>
-                                Hundreds of OpenHatchers are willing to use their skills to 
-                                help open source.
-                            <a href="/people/?q=can_mentor:C"> Find help&nbsp;&raquo; </a>
-                        </div>
-                    </div>
-
-                    <div class='screenshot'>
-                        <a href='{% url mysite.profile.views.people %}?q=project:&quot;Debian%20GNU/Linux&quot;' class='screenshot_image_wrapper' style='background-image: url({% version '/static/images/screenshots/contributors_to_debian.png' %})'> </a>
-                        <div class='caption'>
-                            <strong>&ldquo;What projects are my neighbors working on?&rdquo;</strong>
-                            <a href="{% url mysite.profile.views.people %}">
-                                Find&nbsp;contributors near you&nbsp;&raquo;</a>
-                        </div>
-                    </div>
+                    <ul class='links_at_tab_bottom'>
+                        <li>
+                        <a href='{% url oh_login %}'>Try it out! &raquo;</a>
+                        </li>
+                    </ul>
                 </div>
 
                 <div class='tab invisible_if_js' id='for_project_maintainers'>
 
                     <div class='screenshot'>
-                        <a href='{% url mysite.project.views.project 'Twisted' %}' class='screenshot_image_wrapper' style='background-image: url({% version '/static/images/screenshots/project.png' %})'> </a>
+                        <a href='{% url mysite.project.views.projects %}' class='screenshot_image_wrapper' style='background-image: url({% version '/static/images/screenshots/project-page.png' %})'> </a>
                         <div class='caption'>
-                            <strong>OpenHatch project pages</strong> make it
-                            easy for new contributors to see where they're
-                            needed and how they can help.                           
-                            <a href='{% url mysite.project.views.projects %}'>
-                                Find&nbsp;or&nbsp;create your project's page&nbsp;&raquo;</a>
+                            Let interested new contributors know where to begin on <a href='{% url mysite.project.views.projects %}'>
+                                your project's OpenHatch page</a>
+                        </div>
+                    </div>
+                    
+                    <div class='screenshot'>
+                        <a href='' class='screenshot_image_wrapper' style='background-image: url({% version '/static/images/screenshots/wanna-help.png' %})'> </a>
+                        <div class='caption'>
+                            Tell people who have clicked your project's 'I want to help' button <a href="">how they can contribute</a>
                         </div>
                     </div>
 
                     <div class='screenshot'>
-                        <a href='{% url mysite.project.views.project 'Miro' %}' class='screenshot_image_wrapper' style='background-image: url({% version '/static/images/screenshots/i_want_to_help.png' %})'> </a>
+                        <a href='http://openhatch.org/wiki/Bug_trackers' class='screenshot_image_wrapper' style='background-image: url({% version '/static/images/screenshots/opportunities.png' %})'> </a>
                         <div class='caption'>
-                            <strong>Turn fans into contributors</strong>:
-
-                            Fans can say &ldquo;I want to help&rdquo; on your
-                            project's page.  You can learn more about these people, 
-                            and assign them tasks that they might like to do.
-
-                            <a href='{% url mysite.project.views.projects %}'>
-                                Find&nbsp;or&nbsp;create your project's page&nbsp;&raquo;</a>
+                            <a href='http://openhatch.org/wiki/Bug_trackers'>Submit your project's bugtracker</a> so your bugs appear in the volunteer opportunities finder
                         </div>
                     </div>
-
                     <div class='screenshot'>
-                        <a href='http://pyblosxom.bluesock.org' class='screenshot_image_wrapper' style='background-image: url({% version '/static/images/screenshots/pyblosxom.png' %})'> </a>
+                        <a href='{% url mysite.profile.views.edit_info %}' class='screenshot_image_wrapper' style='background-image: url({% version '/static/images/screenshots/project-page.png' %})'> </a>
                         <div class='caption'>
-                            <strong>Put the "I want to help" button on your own website.</strong>
-                            See it in action on the <a href='http://pyblosxom.bluesock.org/'>
-                                Pyblosxom project site&nbsp;&raquo;</a>
+                            <a href='{% url mysite.profile.views.edit_info %}'>Create a profile</a> to talk about your open source software involvement
                         </div>
                     </div>
-    
+
                     <ul class='links_at_tab_bottom'>
-                        Relatedly:
                         <li>
-                            <a href='http://openhatch.org/wiki/Bug_trackers'>Add a bug tracker</a>
+                        <a href='{% url oh_login %}'>Try it out! &raquo;</a>
                         </li>
                     </ul>
                 </div>
