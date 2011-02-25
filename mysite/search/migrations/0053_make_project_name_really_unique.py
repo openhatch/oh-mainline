@@ -23,7 +23,10 @@ class Migration:
     
     def forwards(self, orm):
         "Write your forwards migration here"
-        db.execute('ALTER TABLE search_project add unique (name);')
+        try:
+            db.execute('ALTER TABLE search_project add unique (name);')
+        except:
+            pass
     
     
     def backwards(self, orm):

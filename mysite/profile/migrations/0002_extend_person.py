@@ -56,8 +56,8 @@ class Migration:
     models = {
         'profile.person': {
             'id': ('models.AutoField', [], {'primary_key': 'True'}),
-            'last_polled': ('models.DateTimeField', [], {}),
-            'last_touched': ('models.DateTimeField', [], {}),
+            'last_polled': ('models.DateTimeField', [], {'null': 'True'}),
+            'last_touched': ('models.DateTimeField', [], {'null': 'True'}),
             'name': ('models.CharField', [], {'max_length': '200'}),
             'password_hash_md5': ('models.CharField', [], {'max_length': '200'}),
             'poll_on_next_web_view': ('models.BooleanField', [], {'default': 'True'}),
@@ -78,9 +78,9 @@ class Migration:
             'project': ('models.ForeignKey', ["orm['search.Project']"], {}),
             'source': ('models.CharField', [], {'max_length': '100'}),
             'tags': ('models.TextField', [], {}),
-            'time_finish': ('models.DateTimeField', [], {}),
-            'time_record_was_created': ('models.DateTimeField', [], {}),
-            'time_start': ('models.DateTimeField', [], {}),
+            'time_finish': ('models.DateTimeField', [], {'null': 'True'}),
+            'time_record_was_created': ('models.DateTimeField', [], {'null': 'True'}),
+            'time_start': ('models.DateTimeField', [], {'null': 'True'}),
             'url': ('models.URLField', [], {'max_length': '200'})
         }
     }

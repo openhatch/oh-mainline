@@ -17,6 +17,7 @@
 
 from south.db import db
 from django.db import models
+import datetime
 from mysite.search.models import *
 
 class Migration:
@@ -30,16 +31,16 @@ class Migration:
         db.add_column('search_project', 'icon_url', models.URLField(max_length=200))
         
         # Adding field 'Bug.last_touched'
-        db.add_column('search_bug', 'last_touched', models.DateField())
+        db.add_column('search_bug', 'last_touched', models.DateField(default=datetime.datetime(1970, 1, 1, 12, 0, 0)))
         
         # Adding field 'Bug.importance'
         db.add_column('search_bug', 'importance', models.CharField(max_length=200))
         
         # Adding field 'Bug.people_involved'
-        db.add_column('search_bug', 'people_involved', models.IntegerField())
+        db.add_column('search_bug', 'people_involved', models.IntegerField(default=0))
         
         # Adding field 'Bug.last_polled'
-        db.add_column('search_bug', 'last_polled', models.DateField())
+        db.add_column('search_bug', 'last_polled', models.DateField(default=datetime.datetime(1970, 1, 1, 12, 0, 0)))
         
         # Adding field 'Bug.submitter_username'
         db.add_column('search_bug', 'submitter_username', models.CharField(max_length=200))

@@ -61,7 +61,7 @@ class Migration:
             'hit_count': ('django.db.models.fields.IntegerField', [], {})
         },
         'search.project': {
-            'cached_contributor_count': ('django.db.models.fields.IntegerField', [], {}),
+            'cached_contributor_count': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
             'date_icon_was_fetched_from_ohloh': ('django.db.models.fields.DateTimeField', [], {'default': 'None', 'null': 'True'}),
             'icon_for_profile': ('django.db.models.fields.files.ImageField', [], {'default': 'None', 'max_length': '100', 'null': 'True'}),
             'icon_for_search_result': ('django.db.models.fields.files.ImageField', [], {'default': 'None', 'max_length': '100', 'null': 'True'}),

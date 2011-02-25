@@ -17,6 +17,7 @@
 
 from south.db import db
 from django.db import models
+import datetime
 from mysite.search.models import *
 
 class Migration:
@@ -24,7 +25,7 @@ class Migration:
     def forwards(self, orm):
         
         # Adding field 'Bug.date_reported'
-        db.add_column('search_bug', 'date_reported', models.DateField())
+        db.add_column('search_bug', 'date_reported', models.DateField(default=datetime.datetime(1970, 1, 1, 12, 0, 0)))
         
     
     

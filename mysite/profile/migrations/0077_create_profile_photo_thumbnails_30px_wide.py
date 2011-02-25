@@ -27,10 +27,13 @@ class Migration:
         "Write your forwards migration here"
 
         for person in orm['profile.person'].objects.all():
-            django_person = Person.objects.get(pk=person.pk)
-            django_person.generate_thumbnail_from_photo()
-            django_person.save()
-            print "Generated thumbnail for", django_person
+            try:
+                django_person = Person.objects.get(pk=person.pk)
+                django_person.generate_thumbnail_from_photo()
+                django_person.save()
+                print "Generated thumbnail for", django_person
+            except:
+                pass # who cares.
     
     def backwards(self, orm):
         "Write your backwards migration here"
