@@ -78,6 +78,19 @@ Open source training missions
     {% endif %}
     <p><a href="{% url mysite.missions.svn.views.main_page %}">Go to this mission</a></p>
 
+    <h2>Using Git</h2>
+    <p>Learn how to interact with projects that use the Git version control
+    system.</p>
+    {% if completed_missions.git_checkout or completed_missions.git_diff or completed_missions.git_rebase%}
+        {% if completed_missions.git_checkout and completed_missions.git_diff and completed_missions.git_rebase%}
+            <p><em>You have completed this mission.</em></p>
+        {% else %}
+            <p><em>You have partially completed this mission.</em></p>
+        {% endif %}
+    {% endif %}
+    <p><a href="{% url mysite.missions.git.views.main_page %}">Go to this
+    mission</a></p>
+
   </div>
 </div>
 {% endblock main %}

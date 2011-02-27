@@ -1,0 +1,22 @@
+From be60b4f864c862e353079eea2659f3989e32ddd9 Mon Sep 17 00:00:00 2001
+From: The Brain <the.brain@pinkyandthebrain.com>
+Date: Sun, 3 Apr 2011 17:22:00 -0500
+Subject: [PATCH] Thanks.
+
+---
+ hello.py |    2 +-
+ 1 files changed, 1 insertions(+), 1 deletions(-)
+
+diff --git a/hello.py b/hello.py
+index 680b306..21dec4d 100644
+--- a/hello.py
++++ b/hello.py
+@@ -1,4 +1,4 @@
+ #! /usr/bin/env python
+ 
+ #Author: The Brain
+-print "Goodbye world!"
++print "Hello world!"
+-- 
+1.7.2.5
+

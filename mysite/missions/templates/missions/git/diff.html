@@ -1,0 +1,63 @@
+{% extends 'missions/git/base.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2010 Jack Grigg
+# Copyright (C) 2010 OpenHatch, Inc.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Ayffero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+
+
+{% block mission_missing_prerequisite_text %}
+<p>You can't do the diffing step yet. You have to do the
+  <a href="{% url mysite.missions.git.views.checkout %}">checkout step first</a>!
+</p>
+{% endblock mission_missing_prerequisite_text %}
+
+{% block mission_main_body %}
+<p>Now that you have a copy of the repository, you can fix the problem before it spreads further.</p>
+<p>In most cases, especially when starting to contribute to an open source project, you will not have rights to commit directly to the code base. Your contributions will be sent to the project maintainers using a patch file.  This file contains the contents of your changes.  The maintainers can review your work and then merge the changes into the main project, when ready. Using these steps, you can give The Brain a patch containing your changes.  If he likes it, he'll commit it for you!</p>
+
+<p>Your mission is this:</p>
+<ul class="raquo_bullets">
+  <li>You can use your working copy from the previous mission.</li>
+  <li>The file <code>{{ file_for_git_diff }}</code> contains a terrible error.  Fix it in your working copy to print "Hello world", rather than "Goodbye world".</li>
+  <li>Check your changes into your local copy.</li>
+  <li>Run <code>git format-patch origin/master</code> to create a file containing the patch.  
+  <li>Open the patch file and paste the results in the box below.</li>
+</ul>
+
+{% if git_diff_done %}
+<div class="successmsg">
+  <p><strong>You have successfully completed this part of the mission.</strong></p>
+</div>
+<p class="next_mission_link">
+  <a href="{% url mysite.missions.git.views.rebase %}">Updating your local project with changes from the master repository &raquo;</a></p>
+{% else %}
+<form method="post" action="{% url mysite.missions.git.views.diff_submit %}#gitdiff-form">
+  <div class="form-row">
+    <a name="gitdiff-form"></a>
+    {% if git_diff_error_message %}
+    <ul class="errorlist"><li>{{ git_diff_error_message }}</li></ul>
+    {% endif %}
+    {{ git_diff_form.diff.errors }}
+    <br style="clear: left;" />
+    <code>git diff</code> output: <br style="clear: left;" />
+    {{ git_diff_form.diff }}
+    <br style="clear: left;" />
+    <input type="submit" value="Submit" style="float: none;" />
+  </div>
+</form>
+{% endif %}
+{% endblock %}

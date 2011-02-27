@@ -132,6 +132,16 @@ urlpatterns = patterns('',
         (r'^missions/svn/commit$', 'mysite.missions.svn.views.commit'),
         (r'^missions/svn/commit/poll$', 'mysite.missions.svn.views.commit_poll'),
 
+        (r'^missions/git$', 'mysite.missions.git.views.main_page'),
+        (r'^missions/git/description$', 'mysite.missions.git.views.long_description'),
+        (r'^missions/git/checkout$', 'mysite.missions.git.views.checkout'),
+        (r'^missions/git/resetrepo$', 'mysite.missions.git.views.resetrepo'),
+        (r'^missions/git/checkout/submit$', 'mysite.missions.git.views.checkout_submit'),
+        (r'^missions/git/diff$', 'mysite.missions.git.views.diff'),
+        (r'^missions/git/diff/submit$', 'mysite.missions.git.views.diff_submit'),
+        (r'^missions/git/rebase$', 'mysite.missions.git.views.rebase'),
+        (r'^missions/git/rebase/submit$', 'mysite.missions.git.views.rebase_submit'),
+
         # Customs-related URLs
         (r'^customs/$', 'mysite.customs.views.list_trackers'),
         (r'^customs/add/(?P<tracker_type>\w*)$', 'mysite.customs.views.add_tracker'),

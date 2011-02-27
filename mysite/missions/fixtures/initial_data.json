@@ -34,5 +34,17 @@
   {"model": "missions.Step",
    "pk": 9,
    "fields": {"name": "svn_commit"}
+  },
+  {"model": "missions.Step",
+   "pk": 10,
+   "fields": {"name": "git_checkout"}
+  },
+  {"model": "missions.Step",
+   "pk": 11,
+   "fields": {"name": "git_diff"}
+  },
+  {"model": "missions.Step",
+   "pk": 12,
+   "fields": {"name": "git_rebase"}
   }
 ]

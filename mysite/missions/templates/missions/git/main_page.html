@@ -1,0 +1,69 @@
+{% extends 'missions/git/base.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2010, 2011 OpenHatch, Inc.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+
+
+{% block mission_main_body %}
+<h3>The set-up</h3>
+
+<p>Somobody out there tried to write a 'Hello, world!" program, but they wrote
+it as "Goodbye, world!". What a mess! Luckily, you can step in and submit a
+patch.  I bet the maintainer would gladly accept it too!</p>
+
+<h3>Audience</h3>
+
+<p>The intended audience are new contributors to open source. If you can edit a
+text file and use a terminal, you can complete this mission. </p>
+
+<h3>What you'll learn</h3>
+
+<p>You will learn how to clone a git repository, make a commit, submit a patch,
+and rebase your work onto the new version provided by the maintainer.</p>
+
+<p>If you want to know more about git, read <a href="{% url
+mysite.missions.git.views.long_description %}">more about Git</a>.</p>
+
+{% if user.is_authenticated %}
+{% if repository_exists %}
+<p>You already have a repository that you can use for these missions, but if
+you want to start over fresh, you can reset it.</p>
+
+<form method="post" action="{% url mysite.missions.git.views.resetrepo %}?stay_on_this_page=1" onsubmit="return confirm('Are you sure you want to reset your repository to its original state?');">
+    <input type="submit" value="Reset your repository" />
+</form><br style="clear: left;" />
+
+<p class="next_mission_link">
+  <a href="{% url mysite.missions.git.views.checkout %}">Checking out a
+  working copy &raquo;</a></p>
+  {% else %}
+  <p>To do these missions, you will need to make a personal repository.  Your
+  repository will reside on the OpenHatch server, specifically for your use in
+  these missions.  Then you can go on and interact with it.</p>
+
+<form method="post" action="{% url mysite.missions.git.views.resetrepo %}">
+  <input type="submit" value="Create your repository and start the missions &raquo;" />
+  </form><br style="clear: left;" />
+
+  {% endif %}
+
+  {% else %}
+  <p>If you were logged in, you could create a repository that you could use to
+  do these missions.</p>
+  {% endif %}
+
+  {% endblock mission_main_body %}

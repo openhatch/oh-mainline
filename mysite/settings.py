@@ -256,3 +256,6 @@ SVN_REPO_URL_PREFIX = 'svn://openhatch.org/'
 PATH_TO_MANAGEMENT_SCRIPT = os.path.abspath(sys.argv[0])
 CELERY_ALWAYS_EAGER = True
 SOUTH_TESTS_MIGRATE = False
+
+GIT_REPO_PATH = os.path.join(MEDIA_ROOT_BEFORE_STATIC, 'missions-userdata', 'git')
+GIT_REPO_URL_PREFIX = 'git://openhatch.org/'

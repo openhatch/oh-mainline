@@ -1,0 +1,46 @@
+{% extends 'missions/git/base.html' %}
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2010, 2011 OpenHatch, Inc.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+
+
+{% block mission_main_body %}
+
+<p>Git is a version control system (VCS) created by Linux Torvalds,  the creator of the Linux kernel. Git is known as a 'distributed” VCS, or DVCS. This means that each user's copy of the code is a fully working repository and includes all previous commit information.  Rather than connecting to a remote server as you would with Subversion or CVS, users can work productively offline, choosing to later sync their changes with a remote repository or create a patch file.</p>
+
+<p>The purpose of this mission is to teach you how to clone a remote repository, make changes to a file, check them into your local copy, and finally create a patch file.</p>
+
+<h3>Preparing for the mission</h3>
+<ul class="raquo_bullets">
+  <li>Install git onto your machine.  In linux, the package is typically named "git-core" and is likely available via your package manager.  The <a href="http://git-scm.com/download">git website</a> contains options for downloading the latest version and builds for other platforms.</li>
+  <li>Configure your user name: git config –global user.name 'First Last'</li>
+  <li>Configure your user email: git config –global user.email 'name@domain.com'</li>
+</ul>
+
+{% if user.is_authenticated %}
+<p>(If your project recommends this tutorial to newcomers, we can put you in a list here!)</p>
+{% endif %}
+<p>
+<h3>Other resources</h3>
+
+<ul class="raquo_bullets">
+  <li>The <a href="http://git-scm.com/">website</a> for the git project contains a quickstart guide and links to <a href="http://git-scm.com/documentation"> other useful resources</a>.</li>
+  <li>The <a href="http://book.git-scm.com/"> Git Community Book</a> is a wonderful resource for more in depth explanation of git's features.</li>
+  <li>Many git users chat on the #git channel on IRC</li>
+</ul>
+</p>
+{% endblock mission_main_body %}
