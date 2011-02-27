@@ -18,30 +18,25 @@
 
 # vim: set ai ts=4 sw=4 et:
 
-from mysite.search.models import Project, Bug, get_image_data_scaled
+from mysite.search.models import Project, get_image_data_scaled
 import mysite.customs.models
 import mysite.profile.controllers
 import mysite.base.unicode_sanity
 import mysite.customs.ping_twisted
 
-import django
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.files.base import ContentFile
 from django.conf import settings
 from django.contrib.auth import SESSION_KEY, BACKEND_SESSION_KEY, load_backend
 from django.core.urlresolvers import reverse
-from django.core.cache import cache
-import django.db.models.query
 from django.db.models import Q
 
 import datetime
-import sys
 import uuid
 import urllib
 import random
 import collections
-import simplejson
 import re
 import cgi
 import logging
@@ -365,7 +360,6 @@ class Person(models.Model):
         # }}}
 
     def get_full_name_with_nbsps(self):
-        import mysite.search.templatetags.search
         full_name = self.get_full_name()
         full_name_escaped = cgi.escape(full_name)
         full_name_escaped_with_nbsps = re.sub("\s+", "&nbsp;", full_name_escaped)
