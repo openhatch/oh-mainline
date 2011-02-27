@@ -129,13 +129,8 @@ class Command(BaseCommand):
         return message_in_plain_text, message_in_html
 
     @staticmethod
-    def get_projects_this_person_cares_about(person):
-        projects_i_contributed_to = [ pfe.project
-                for pfe in person.get_published_portfolio_entries()]
-        projects_i_wanna_help = [note.project
-                for note in WannaHelperNote.objects.filter(person=person)]
-        all_projects = set(projects_i_contributed_to + projects_i_wanna_help)
-        return sorted(all_projects, key=lambda x: x.name.lower())
+    def get_maintainer_projects(person):
+        return [pfe.project for pfe in person.get_maintainer_portfolio_entries()]
 
     def get_context_for_weekly_email_to(self, recipient):
         context = {}
@@ -148,7 +143,7 @@ class Command(BaseCommand):
                 created_date__gt=  self.this_run_covers_things_since,
                 created_date__lte=   self.this_run_covers_things_up_until)
 
-        projects = Command.get_projects_this_person_cares_about(recipient)
+        projects = Command.get_maintainer_projects(recipient)
 
         # Add contributors and wannahelpers in recipient's projects
         for project in projects:

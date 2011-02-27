@@ -253,6 +253,14 @@ class Person(models.Model):
     def get_nonarchived_published_portfolio_entries(self):
         return PortfolioEntry.published_ones.filter(person=self, is_archived=False)
 
+    def get_maintainer_portfolio_entries(self):
+        """
+        Return the PortfolioEntries for which this person wants to receive
+        maintainer updates.
+        """
+        return PortfolioEntry.published_ones.filter(person=self,
+                                                    receive_maintainer_updates=True)
+
     def get_list_of_all_project_names(self):
         # if you change this method, be sure to increment the version number in
         # the cache key above

@@ -2077,6 +2077,11 @@ class Notifications(TwillTests):
         PortfolioEntry.create_dummy( person=person, project=project, is_published=True)
 
     @staticmethod
+    def add_contributor_with_maintainer_status(person, project, is_maintainer):
+        PortfolioEntry.create_dummy(person=person, project=project, is_published=True,
+                                    receive_maintainer_updates=is_maintainer)
+
+    @staticmethod
     def add_wannahelper(person, project, created_date=None):
         project.people_who_wanna_help.add(person)
         note = WannaHelperNote.add_person_project(person, project)
@@ -2354,57 +2359,31 @@ class Notifications(TwillTests):
         # recorded that we sent emails over 7 days ago.
         self.try_to_send_some_emails(expect_success=True)
 
-    def test_that_contributors_and_wanna_helpers_are_emailed_about_one_another(self):
-        # Set up the database so that a contributor will receive an email about
-        # a wanna helper, and vice versa
-        how_to_add_people = [Notifications.add_contributor, Notifications.add_wannahelper]
-        people, email_contexts = self.add_two_people_to_a_project_and_send_weekly_emails(
-                    how_to_add_people=how_to_add_people, outbox_or_context='context')
-
-        contributor, wanna_helper = people
-
-        contributor_e_c = email_contexts[contributor.pk]
-        self.assert_(contributor_e_c)
-        wannahelper_e_c = email_contexts[wanna_helper.pk]
-        self.assert_(wannahelper_e_c)
-
-        # Assert that contributor gets emailed about the wanna helper
-        wanna_helpers_in_email_to_contributor = contributor_e_c[
-            'project_name2people'][0][1]['display_these_wannahelpers']
-        self.assert_(wanna_helper in wanna_helpers_in_email_to_contributor)
-
-        # Assert that wanna helper gets emailed about the contributor
-        contributors_in_email_to_wanna_helper = wannahelper_e_c[
-                'project_name2people'][0][1]['display_these_contributors']
-        self.assert_(contributor in contributors_in_email_to_wanna_helper)
-
-    def test_projects_this_person_cares_about(self):
-        # Test this method:
-        # mysite.profile.management.commands.send_weekly_emails
-        # .Command.get_projects_this_person_cares_about(person)
-
+    def test_get_maintainer_projects(self):
+        """
+        get_maintainer_projects returns only the projects for which the user has
+        indicated that they want to receive maintainer updates.
+        """
         person = Person.create_dummy()
 
         # three projects
         project_i_contributed_to = Project.create_dummy()
         project_i_wanna_help = Project.create_dummy()
-        project_i_wanna_help_and_contributed_to = Project.create_dummy()
+        project_i_maintain = Project.create_dummy()
 
         # first project
-        Notifications.add_contributor(person, project_i_contributed_to)
+        Notifications.add_contributor_with_maintainer_status(
+            person, project_i_contributed_to, False)
 
         # second project
         Notifications.add_wannahelper(person, project_i_wanna_help)
 
         # third project
-        Notifications.add_contributor(person, project_i_wanna_help_and_contributed_to)
-        Notifications.add_wannahelper(person, project_i_wanna_help_and_contributed_to)
+        Notifications.add_contributor_with_maintainer_status(
+            person, project_i_maintain, True)
 
-        projects_i_care_about = mysite.profile.management.commands.send_weekly_emails.Command.get_projects_this_person_cares_about(person)
-        expected = [project_i_contributed_to, project_i_wanna_help,
-                project_i_wanna_help_and_contributed_to]
-        expected.sort(key=lambda x: x.name)
-        self.assertEqual(projects_i_care_about, expected)
+        maintainer_projects = mysite.profile.management.commands.send_weekly_emails.Command.get_maintainer_projects(person)
+        self.assertEqual(maintainer_projects, [project_i_maintain])
 
     def test_dont_tell_me_about_projects_where_i_am_the_only_participant(self):
         # FIXME: This will cease to make sense when we add project answers to
