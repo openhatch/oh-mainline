@@ -69,7 +69,7 @@
         <p>You can <a id="mission-reset-btn" href="#" title="Click to reset this part of the mission">reset this part of the mission</a> and try again.</p>
         {% block js %}
         {{ block.super }}        
-        <script type='text/javascript' src="/static/js/missions/base.js?x"></script>
+        <script type='text/javascript' src="{% version '/static/js/missions/base.js' %}"></script>
         <script type='text/javascript'>
         if (typeof OH === 'undefined') OH = {};
         if (typeof OH.Page === 'undefined') OH.Page = {};        
