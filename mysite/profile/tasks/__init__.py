@@ -23,6 +23,7 @@ from datetime import timedelta
 import datetime
 import urllib2
 import urllib
+import mysite.base.models
 import mysite.customs.github
 import mysite.profile.models
 from mysite.search.models import Project
@@ -170,21 +171,21 @@ def fill_one_person_recommend_bugs_cache(person_id):
     recommender = mysite.profile.controllers.RecommendBugs(suggested_searches, n=5) # cache fill prep...
     recommender.recommend() # cache fill do it.
 
-def sync_bug_epoch_from_model_then_fill_recommended_bugs_cache():
-    logging.info("Syncing bug epoch...")
+def sync_bug_timestamp_from_model_then_fill_recommended_bugs_cache():
+    logging.info("Syncing bug timestamp...")
     # Find the highest bug object modified date
     from django.db.models import Max
     highest_bug_mtime = mysite.search.models.Bug.all_bugs.all().aggregate(
         Max('modified_date')).values()[0]
-    epoch = mysite.search.models.Epoch.get_for_model(
-        mysite.search.models.Bug)
-    # if the epoch is lower, then set the epoch to that value
-    if highest_bug_mtime.timetuple() > epoch:
-        mysite.search.models.Epoch.bump_for_model(
-            mysite.search.models.Bug)
-        logging.info("Whee! Bumped the epoch. Guess I'll fill the cache.")
+    timestamp = mysite.base.models.Timestamp.get_timestamp_for_string(
+        str(mysite.search.models.Bug))
+    # if the timestamp is lower, then set the timestamp to that value
+    if highest_bug_mtime.timetuple() > timestamp:
+        mysite.base.models.Timestamp.update_timestamp_for_string(
+            str(mysite.search.models.Bug))
+        logging.info("Whee! Bumped the timestamp. Guess I'll fill the cache.")
         fill_recommended_bugs_cache()
-    logging.info("Done syncing bug epoch.")
+    logging.info("Done syncing bug timestamp.")
 
 @task
 def clear_people_page_cache(*args, **kwargs):

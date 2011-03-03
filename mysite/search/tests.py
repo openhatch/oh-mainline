@@ -18,6 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from mysite.base.tests import make_twill_url, TwillTests
+import mysite.base.models
 import mysite.base.unicode_sanity
 
 import mysite.account.tests
@@ -1481,44 +1482,44 @@ accuracy.""",
         # http://docs.djangoproject.com/en/dev/ref/templates/builtins/#linebreaks
         self.assertContains(project_page, "<br />".join(text))
 
-class TestEpoch(TwillTests):
+class TestBugClassTimestamp(TwillTests):
     def test_on_mark_looks_closed(self):
-        # There's no Epoch for bugs yet, right?
-        now = mysite.search.models.Epoch.get_for_model(mysite.search.models.Bug)
-        self.assertEqual(now, mysite.search.models.Epoch.zero_o_clock)
+        # There's no Timestamp for Bug class yet, right?
+        now = mysite.base.models.Timestamp.get_timestamp_for_string(str(mysite.search.models.Bug))
+        self.assertEqual(now, mysite.base.models.Timestamp.ZERO_O_CLOCK)
 
-        # Making a Bug should not bump the Epoch
+        # Making a Bug should not bump the Bug class Timestamp
         p = mysite.search.models.Project.create_dummy()
         b = mysite.search.models.Bug.create_dummy(project=p)
 
-        now = mysite.search.models.Epoch.get_for_model(mysite.search.models.Bug)
+        now = mysite.base.models.Timestamp.get_timestamp_for_string(str(mysite.search.models.Bug))
         self.assertEqual(now,
-                         mysite.search.models.Epoch.zero_o_clock)
+                         mysite.base.models.Timestamp.ZERO_O_CLOCK)
 
-        # Setting the bug to looks_closed should bump the Epoch
+        # Setting the bug to looks_closed should bump the Bug class Timestamp
         b.looks_closed = True
         b.save()
 
         # Now it's higher, right?
-        now = mysite.search.models.Epoch.get_for_model(mysite.search.models.Bug)
-        self.assert_(now > mysite.search.models.Epoch.zero_o_clock)
+        now = mysite.base.models.Timestamp.get_timestamp_for_string(str(mysite.search.models.Bug))
+        self.assert_(now > mysite.base.models.Timestamp.ZERO_O_CLOCK)
 
     def test_on_delete(self):
-        # There's no Epoch for bugs yet, right?
-        now = mysite.search.models.Epoch.get_for_model(mysite.search.models.Bug)
-        self.assertEqual(now, mysite.search.models.Epoch.zero_o_clock)
+        # There's no Timestamp for Bug class yet, right?
+        now = mysite.base.models.Timestamp.get_timestamp_for_string(str(mysite.search.models.Bug))
+        self.assertEqual(now, mysite.base.models.Timestamp.ZERO_O_CLOCK)
 
-        # Making a Bug should not bump the Epoch
+        # Making a Bug should not bump the Bug class Timestamp
         p = mysite.search.models.Project.create_dummy()
         b = mysite.search.models.Bug.create_dummy(project=p)
 
-        now = mysite.search.models.Epoch.get_for_model(mysite.search.models.Bug)
+        now = mysite.base.models.Timestamp.get_timestamp_for_string(str(mysite.search.models.Bug))
         self.assertEqual(now,
-                         mysite.search.models.Epoch.zero_o_clock)
+                         mysite.base.models.Timestamp.ZERO_O_CLOCK)
 
-        # Deleting that Bug should bump the Epoch
+        # Deleting that Bug should bump the Bug class Timestamp
         b.delete()
-        later = mysite.search.models.Epoch.get_for_model(mysite.search.models.Bug)
+        later = mysite.base.models.Timestamp.get_timestamp_for_string(str(mysite.search.models.Bug))
         self.assert_(later > now)
 
 class BugKnowsItsFreshness(TestCase):

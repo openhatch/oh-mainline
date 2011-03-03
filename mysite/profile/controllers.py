@@ -27,6 +27,7 @@ from django.core.cache import cache
 
 import logging
 import mysite.search.controllers
+import mysite.base.models
 import mysite.search.models
 import mysite.profile.models
 import mysite.base.decorators
@@ -53,9 +54,9 @@ class RecommendBugs(object):
 
     def get_cache_key(self):
         prefix = 'bug_recommendation_cache_'
-        bug_epoch = mysite.search.models.Epoch.get_for_model(
-            mysite.search.models.Bug)
-        suffix_input = [self.terms, self.n, bug_epoch]
+        bug_timestamp = mysite.base.models.Timestamp.get_timestamp_for_string(
+            str(mysite.search.models.Bug))
+        suffix_input = [self.terms, self.n, bug_timestamp]
         return prefix + '_' + hashlib.sha1(repr(suffix_input)).hexdigest()
 
     def is_cache_empty(self): return cache.get(self.get_cache_key()) == None
@@ -102,8 +103,8 @@ class RecommendBugs(object):
 
 class PeopleMatcher(object):
     def get_cache_key(self, *args, **kwargs):
-        keys = (mysite.search.models.Epoch.get_for_model(
-            mysite.profile.models.Link_Person_Tag),
+        keys = (mysite.base.models.Timestamp.get_timestamp_for_string(
+            str(mysite.profile.models.Link_Person_Tag)),
                 args)
         return hashlib.sha1(repr(keys)).hexdigest()
 

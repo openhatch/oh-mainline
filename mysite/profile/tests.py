@@ -1882,22 +1882,43 @@ class PeopleMapForNonexistentProject(TwillTests):
         mysite.profile.views.people(mock_request)
         # Yay, no exception.
 
-class BugModificationTimeVersusEpoch(TwillTests):
+class BugModificationTimeVersusTimestamp(TwillTests):
     @mock.patch('mysite.profile.tasks.fill_recommended_bugs_cache')
     def test(self, mock_thing):
-        # Read the comments in the Epoch model if you haven't yet
-        epoch_at_start = mysite.search.models.Epoch.get_for_model(
-            mysite.search.models.Bug)
+        # The following comment is from the old Epoch class, now superseded by the
+        # Timestamp class. It is here as a reference.
+
+        # This class has a modified_date column, thanks to OpenHatchModel.
+        # Instances of this class are effectively mappings of strings to
+        # modified_dates.
+        #
+        # We can use this table to answer the question, Which cache key should I
+        # use for such-and-such a thing? For example, which cache key should I use
+        # when retrieving a list of recommended bugs for Python lovers?  If there's
+        # a row in this table like this:
+        #
+        #   class_name    modified_date
+        #   'Bug'         (a representation of yesterday's date)
+        #
+        # then we know to cache the output of Bug-related functions using a key like 
+        # recommended_bugs_for_python_lovers_as_of_2010_06_04
+        #
+        # When the Epoch table changes, then we use a new cache key to store and
+        # retrieve cached data. The old cache key and its value is ignored forever
+        # (and will eventually be flushed out of memcached).
+
+        timestamp_at_start = mysite.base.models.Timestamp.get_timestamp_for_string(
+            str(mysite.search.models.Bug))
         # This is a new bug, so we might want to invalidate the cache for
         # recommended-bug lists, or people won't see this bug in their list of
         # "Recommended bugs"
         mysite.search.models.Bug.create_dummy_with_project()
         # Let's the invalidate the cache
-        mysite.profile.tasks.sync_bug_epoch_from_model_then_fill_recommended_bugs_cache()
+        mysite.profile.tasks.sync_bug_timestamp_from_model_then_fill_recommended_bugs_cache()
         # Make sure that the cache timestamp has been updated
-        new_epoch = mysite.search.models.Epoch.get_for_model(
-            mysite.search.models.Bug)
-        self.assert_(new_epoch > epoch_at_start)
+        new_timestamp = mysite.base.models.Timestamp.get_timestamp_for_string(
+            str(mysite.search.models.Bug))
+        self.assert_(new_timestamp > timestamp_at_start)
         self.assert_(mock_thing.called)
 
 class SaveReordering(TwillTests):

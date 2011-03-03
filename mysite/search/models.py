@@ -543,59 +543,6 @@ class BugAlert(OpenHatchModel):
     how_many_bugs_at_time_of_request = models.IntegerField()
     email = models.EmailField(max_length=255)
 
-class Epoch(OpenHatchModel):
-    zero_o_clock = datetime.datetime.fromtimestamp(0).timetuple()
-
-    # This class has a modified_date column, thanks to OpenHatchModel.
-    # Instances of this class are effectively mappings of strings to
-    # modified_dates.
-
-    # We can use this table to answer the question, Which cache key should I
-    # use for such-and-such a thing? For example, which cache key should I use
-    # when retrieving a list of recommended bugs for Python lovers?  If there's
-    # a row in this table like this:
-        
-    #   class_name    modified_date
-    #   'Bug'         (a representation of yesterday's date)
-
-    # then we know to cache the output of Bug-related functions using a key like 
-    # recommended_bugs_for_python_lovers_as_of_2010_06_04
-
-    # When the Epoch table changes, then we use a new cache key to store and
-    # retrieve cached data. The old cache key and its value is ignored forever
-    # (and will eventually be flushed out of memcached).
-
-    class_name = models.CharField(null=False,
-                                  blank=False,
-                                  unique=True,
-                                  max_length=255)
-
-    @staticmethod
-    def get_for_model(class_object):
-        class_name = unicode(str(class_object))
-        return Epoch.get_for_string(class_name)
-
-    @staticmethod
-    def get_for_string(s):
-        matches = Epoch.objects.filter(class_name=s)
-        if matches:
-            match = matches[0]
-            return match.modified_date.timetuple()
-        return Epoch.zero_o_clock 
-
-    @staticmethod
-    def bump_for_model(class_object):
-        class_name = unicode(str(class_object))
-        return Epoch.bump_for_string(class_name)
-
-    @staticmethod
-    def bump_for_string(s):
-        epoch, _ = Epoch.objects.get_or_create(
-            class_name=s)
-        epoch.modified_date = datetime.datetime.utcnow()
-        epoch.save() # definitely!
-        return epoch
-
 class WannaHelperNote(OpenHatchModel):
     class Meta:
         unique_together = [('project', 'person')]
@@ -639,7 +586,7 @@ class HitCountCache(OpenHatchModel):
         # Ignore arguments passed here by Django signals.
         HitCountCache.objects.all().delete()
 
-def post_bug_save_increment_bug_model_epoch(sender, raw, instance, created, **kwargs):
+def post_bug_save_increment_bug_model_timestamp(sender, raw, instance, created, **kwargs):
     if raw:
         return # this is coming in from loaddata. You must know what you are doing.
 
@@ -647,14 +594,16 @@ def post_bug_save_increment_bug_model_epoch(sender, raw, instance, created, **kw
         return # whatever, who cares
     if instance.looks_closed:
         # bump it
-        Epoch.bump_for_model(sender)
+        import mysite.base.models
+        mysite.base.models.Timestamp.update_timestamp_for_string(str(sender))
         # and clear the search cache
         import mysite.search.tasks
         mysite.search.tasks.clear_search_cache.delay()
 
-def post_bug_delete_increment_bug_model_epoch(sender, instance, **kwargs):
+def post_bug_delete_increment_bug_model_timestamp(sender, instance, **kwargs):
     # always bump it
-    mysite.search.models.Epoch.bump_for_model(sender)
+    import mysite.base.models
+    mysite.base.models.Timestamp.update_timestamp_for_string(str(sender))
 
 # Clear the cache whenever Bugs are added or removed.
 models.signals.post_save.connect(HitCountCache.clear_cache, Bug)
@@ -663,11 +612,11 @@ models.signals.post_delete.connect(HitCountCache.clear_cache, Bug)
 # Clear all people's recommended bug cache when a bug is deleted
 # (or when it has been modified to say it looks_closed)
 models.signals.post_save.connect(
-    post_bug_save_increment_bug_model_epoch,
+    post_bug_save_increment_bug_model_timestamp,
     Bug)
 
 models.signals.post_delete.connect(
-    post_bug_delete_increment_bug_model_epoch,
+    post_bug_delete_increment_bug_model_timestamp,
     Bug)
 
 # Re-index the person when he says he likes a new project
