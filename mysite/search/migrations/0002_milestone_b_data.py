@@ -21,29 +21,49 @@ import datetime
 from mysite.search.models import *
 
 class Migration:
-    
     def forwards(self, orm):
         
-        # Adding field 'Bug.submitter_realname'
-        db.add_column('search_bug', 'submitter_realname', models.CharField(max_length=200))
+        try:
+            # Adding field 'Bug.submitter_realname'
+            db.add_column('search_bug', 'submitter_realname', models.CharField(max_length=200))
+        except:
+            pass
+
+        try:
+             # Adding field 'Project.icon_url'
+            db.add_column('search_project', 'icon_url', models.URLField(max_length=200))
+        except:
+            pass
         
-        # Adding field 'Project.icon_url'
-        db.add_column('search_project', 'icon_url', models.URLField(max_length=200))
+        try:
+            # Adding field 'Bug.last_touched'
+            db.add_column('search_bug', 'last_touched', models.DateField(default=datetime.datetime(1970, 1, 1, 12, 0, 0)))
+        except:
+            pass
         
-        # Adding field 'Bug.last_touched'
-        db.add_column('search_bug', 'last_touched', models.DateField(default=datetime.datetime(1970, 1, 1, 12, 0, 0)))
+        try:
+            # Adding field 'Bug.importance'
+            db.add_column('search_bug', 'importance', models.CharField(max_length=200))
+        except:
+            pass
         
-        # Adding field 'Bug.importance'
-        db.add_column('search_bug', 'importance', models.CharField(max_length=200))
+        try:
+            # Adding field 'Bug.people_involved'
+            db.add_column('search_bug', 'people_involved', models.IntegerField(default=0))
+        except:
+            pass
         
-        # Adding field 'Bug.people_involved'
-        db.add_column('search_bug', 'people_involved', models.IntegerField(default=0))
+        try:
+            # Adding field 'Bug.last_polled'
+            db.add_column('search_bug', 'last_polled', models.DateField(default=datetime.datetime(1970, 1, 1, 12, 0, 0)))
+        except:
+            pass
         
-        # Adding field 'Bug.last_polled'
-        db.add_column('search_bug', 'last_polled', models.DateField(default=datetime.datetime(1970, 1, 1, 12, 0, 0)))
-        
-        # Adding field 'Bug.submitter_username'
-        db.add_column('search_bug', 'submitter_username', models.CharField(max_length=200))
+        try:
+            # Adding field 'Bug.submitter_username'
+            db.add_column('search_bug', 'submitter_username', models.CharField(max_length=200))
+        except:
+            pass
         
     
     
