@@ -160,8 +160,8 @@ def geocode(request):
     return HttpResponse(coordinates_as_json, 
                         mimetype='application/json')
 
-@view
-def meta(request):
+# Obtains meta data for request return
+def meta_data():
     data = {}
     data['dia_diagnostics'] = {}
 
@@ -202,7 +202,37 @@ def meta(request):
         last_polled__lt=two_days_ago).count() * 100.0 /
         mysite.search.models.Bug.all_bugs.count())
 
-    return (request, 'meta.html', data)
+    import pdb
+    pdb.set_trace()
+
+    return data
+
+def meta_exit_code(data=None):
+    if data is None:
+        data = meta_data()
+
+    # Temp variable for shortness
+    my = data['bug_diagnostics']
+
+    # More temp variables for shortness
+    bug1 = my['Bugs last polled more than than one day + one hour ago']
+    bug2 = my['Bugs last polled more than two days ago']
+    perbug = my['Bugs last polled more than two days ago (in percent)']
+
+    # Exit codes and stdout for Nagios integration
+    if bug2:
+        print "{0} - Polled 1+: {1} Polled 2+: {2} ({3}%)".format("CRITICAL", bug1, bug2, perbug)
+        return 2 
+    elif bug1:
+        print "{0} - Polled 1+: {1} Polled 2+: {2} ({3}%)".format("WARNING", bug1, bug2, perbug)
+        return 1
+    else:
+        print "{0} - Polled 1+: {1} Polled 2+: {2} ({3}%)".format("OK", bug1, bug2, perbug)
+        return 0
+        
+@view
+def meta(request):
+    return (request, 'meta.html', meta_data())
 
 @login_required
 def save_portfolio_entry_ordering_do(request):

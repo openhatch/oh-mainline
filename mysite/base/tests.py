@@ -42,6 +42,7 @@ import mysite.search.models
 import mysite.base.templatetags.base_extras
 import mysite.base.unicode_sanity
 import mysite.profile.views
+import mysite.base.views
 
 def twill_setup():
     app = AdminMediaHandler(WSGIHandler())
@@ -423,5 +424,49 @@ class TimestampTests(django.test.TestCase):
             # Check the new timestamp is after zero o'clock
             new_timestamp = mysite.base.models.Timestamp.get_timestamp_for_string(url)
             self.assertTrue(new_timestamp > mysite.base.models.Timestamp.ZERO_O_CLOCK)
+
+# Test cases for Nagios integration
+class NagiosTests(django.test.TestCase):
+    # Test for OK Nagios return (0)
+    def test_nagios_return_ok(self):
+        data = {}
+        data['dia_diagnostics'] = {}
+        data['bug_diagnostics'] = {}
+
+        my = data['bug_diagnostics']
+
+        my['Bugs last polled more than than one day + one hour ago'] = 0
+        my['Bugs last polled more than two days ago'] = 0
+        my['Bugs last polled more than two days ago (in percent)'] = 0.0
+
+        self.assertEqual(0, mysite.base.views.meta_exit_code(data))
+
+    # Test for WARNING Nagios return (1)
+    def test_nagios_return_warning(self):
+        data = {}
+        data['dia_diagnostics'] = {}
+        data['bug_diagnostics'] = {}
+
+        my = data['bug_diagnostics']
+
+        my['Bugs last polled more than than one day + one hour ago'] = 1
+        my['Bugs last polled more than two days ago'] = 0
+        my['Bugs last polled more than two days ago (in percent)'] = 0.0
+
+        self.assertEqual(1, mysite.base.views.meta_exit_code(data))
+
+    # Test for CRITICAL Nagios return (2)
+    def test_nagios_return_critical(self):
+        data = {}
+        data['dia_diagnostics'] = {}
+        data['bug_diagnostics'] = {}
+
+        my = data['bug_diagnostics']
+
+        my['Bugs last polled more than than one day + one hour ago'] = 0
+        my['Bugs last polled more than two days ago'] = 1 
+        my['Bugs last polled more than two days ago (in percent)'] = 0.0
+
+        self.assertEqual(2, mysite.base.views.meta_exit_code(data))
 
 # vim: set ai et ts=4 sw=4 nu:
