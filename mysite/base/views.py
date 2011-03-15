@@ -203,9 +203,6 @@ def meta_data():
         last_polled__lt=two_days_ago).count() * 100.0 /
         mysite.search.models.Bug.all_bugs.count())
 
-    import pdb
-    pdb.set_trace()
-
     return data
 
 def meta_exit_code(data=None):
