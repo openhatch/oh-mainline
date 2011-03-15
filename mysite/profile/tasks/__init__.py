@@ -180,7 +180,7 @@ def sync_bug_timestamp_from_model_then_fill_recommended_bugs_cache():
     timestamp = mysite.base.models.Timestamp.get_timestamp_for_string(
         str(mysite.search.models.Bug))
     # if the timestamp is lower, then set the timestamp to that value
-    if highest_bug_mtime.timetuple() > timestamp:
+    if highest_bug_mtime.timetuple() > timestamp.timetuple():
         mysite.base.models.Timestamp.update_timestamp_for_string(
             str(mysite.search.models.Bug))
         logging.info("Whee! Bumped the timestamp. Guess I'll fill the cache.")
