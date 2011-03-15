@@ -198,10 +198,15 @@ def meta_data():
                     datetime.timedelta(days=2))
     my['Bugs last polled more than two days ago'] = mysite.search.models.Bug.all_bugs.filter(
         last_polled__lt=two_days_ago).count()
-    my['Bugs last polled more than two days ago (in percent)'] = (
-        mysite.search.models.Bug.all_bugs.filter(
-        last_polled__lt=two_days_ago).count() * 100.0 /
-        mysite.search.models.Bug.all_bugs.count())
+
+    # Test for 0 division
+    allbug = mysite.search.models.Bug.all_bugs.count()
+    perbug = 0.0
+    if allbug:
+        perbug = ( mysite.search.models.Bug.all_bugs.filter(
+            last_polled__lt=two_days_ago).count() * 100.0 / allbug)
+
+    my['Bugs last polled more than two days ago (in percent)'] = perbug
 
     return data
 

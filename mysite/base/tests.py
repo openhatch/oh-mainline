@@ -470,4 +470,9 @@ class NagiosTests(django.test.TestCase):
 
         self.assertEqual(2, mysite.base.views.meta_exit_code(data))
 
+# Test cases for meta data generation 
+class MetaDataTests(django.test.TestCase):
+    def test_meta_data_zero_div(self):
+        mysite.base.views.meta_data()
+        
 # vim: set ai et ts=4 sw=4 nu:
