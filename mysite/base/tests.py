@@ -24,7 +24,7 @@ from django.core.urlresolvers import reverse
 import twill
 from twill import commands as tc
 from django.core.handlers.wsgi import WSGIHandler
-from django.core.servers.basehttp import AdminMediaHandler 
+from django.core.servers.basehttp import AdminMediaHandler
 from StringIO import StringIO
 from django.test.client import Client
 import urllib
@@ -44,6 +44,9 @@ import mysite.base.templatetags.base_extras
 import mysite.base.unicode_sanity
 import mysite.profile.views
 import mysite.base.views
+
+import mysite.base.management.commands.nagios
+import mysite.profile.management.commands.send_weekly_emails
 
 def twill_setup():
     app = AdminMediaHandler(WSGIHandler())
@@ -128,7 +131,7 @@ class MySQLRegex(TwillTests):
                 }
         for before, after in before2after.items():
             self.assertEqual(
-                    mysite.base.controllers.mysql_regex_escape(before), 
+                    mysite.base.controllers.mysql_regex_escape(before),
                     after)
 
 class TestUriDataHelper(TwillTests):
@@ -159,7 +162,7 @@ class RemoveByteOrderMarker(unittest.TestCase):
         self.assertNotEqual('hi', as_fd.read())
         as_fd = StringIO(sample_bytes)
         cleaned_up_fd = mysite.base.unicode_sanity.wrap_file_object_in_utf8_check(as_fd)
-        result = cleaned_up_fd.read() 
+        result = cleaned_up_fd.read()
         self.assertEqual(type(result), str) # not unicode
         self.assertEqual(result, 'hi')
 
@@ -180,16 +183,16 @@ class GeocoderCanCache(django.test.TestCase):
         cache.delete(mysite.base.controllers.address2cache_key_name(self.unicode_address))
 
         ### NOTE This test uses django.tests.TestCase to skip our monkey-patching of the cache framework
-        # When the geocoder's results are being cached properly, 
+        # When the geocoder's results are being cached properly,
         # the base controller named '_geocode' will not run more than once.
         original_json = "{'key': 'original value'}"
         different_json = "{'key': 'if caching works we should never get this value'}"
         self.mock_geocoder.return_value = eval(original_json)
-        self.assert_('original value' in self.get_geocoding_in_json_for_unicode_string()) 
+        self.assert_('original value' in self.get_geocoding_in_json_for_unicode_string())
         self.mock_geocoder.return_value = eval(different_json)
         try:
             json = self.get_geocoding_in_json_for_unicode_string()
-            self.assert_('original value' in json) 
+            self.assert_('original value' in json)
         except AssertionError:
             raise AssertionError, "Geocoded location in json was not cached; it now equals " + json
 
@@ -213,7 +216,7 @@ class Feed(TwillTests):
         def get_answers_from_homepage():
             homepage_response = self.client.get('/')
             return homepage_response.context[0]['recent_feed_items']
-        
+
         self.assertFalse(get_answers_from_homepage())
 
         # Create a few answers on the project discussion page.
@@ -236,7 +239,7 @@ class Feed(TwillTests):
         client = self.login_with_client()
         post_to = reverse(mysite.project.views.wanna_help_do)
         response = client.post(post_to, {u'project': unicode(p_before.pk)})
-        
+
         ### Now when we GET the home page, we see a Note
         ### to that effect in the feed
         response = client.get('/')
@@ -251,7 +254,7 @@ class CacheMethod(TwillTests):
     def test(self, mock_cache):
         # Step 0: mock_cache.get() needs to return None
         mock_cache.get.return_value = None
-        
+
         # Step 1: Create a method where we can test if it was cached (+ cache it)
         class SomeClass:
             def __init__(self):
@@ -345,7 +348,7 @@ class Unsubscribe(TwillTests):
         dude = mysite.profile.models.Person.objects.get(user__username='paulproteus')
         # Generate a valid token
         valid_token_string = dude.generate_new_unsubscribe_token().string
-        # Test that the unsubscribe view's context contains the owner 
+        # Test that the unsubscribe view's context contains the owner
         url = reverse(mysite.profile.views.unsubscribe, kwargs={'token_string': valid_token_string})
         response = self.client.get(url)
         self.assertEqual(
@@ -428,8 +431,8 @@ class TimestampTests(django.test.TestCase):
 
 # Test cases for Nagios integration
 class NagiosTests(django.test.TestCase):
-    # Test for OK Nagios return (0)
-    def test_nagios_return_ok(self):
+    # Test for OK Nagios meta data return (0)
+    def test_nagios_meta_return_ok(self):
         data = {}
         data['dia_diagnostics'] = {}
         data['bug_diagnostics'] = {}
@@ -442,8 +445,8 @@ class NagiosTests(django.test.TestCase):
 
         self.assertEqual(0, mysite.base.views.meta_exit_code(data))
 
-    # Test for WARNING Nagios return (1)
-    def test_nagios_return_warning(self):
+    # Test for WARNING Nagios meta data return (1)
+    def test_nagios_meta_return_warning(self):
         data = {}
         data['dia_diagnostics'] = {}
         data['bug_diagnostics'] = {}
@@ -456,8 +459,8 @@ class NagiosTests(django.test.TestCase):
 
         self.assertEqual(1, mysite.base.views.meta_exit_code(data))
 
-    # Test for CRITICAL Nagios return (2)
-    def test_nagios_return_critical(self):
+    # Test for CRITICAL Nagios meta data return (2)
+    def test_nagios_meta_return_critical(self):
         data = {}
         data['dia_diagnostics'] = {}
         data['bug_diagnostics'] = {}
@@ -465,14 +468,41 @@ class NagiosTests(django.test.TestCase):
         my = data['bug_diagnostics']
 
         my['Bugs last polled more than than one day + one hour ago'] = 0
-        my['Bugs last polled more than two days ago'] = 1 
+        my['Bugs last polled more than two days ago'] = 1
         my['Bugs last polled more than two days ago (in percent)'] = 0.0
 
         self.assertEqual(2, mysite.base.views.meta_exit_code(data))
 
-# Test cases for meta data generation 
+    # Test for OK Nagios weekly mail return (0)
+    def test_nagios_weeklymail_return_ok(self):
+        newtime = datetime.datetime.utcnow() - datetime.timedelta(days=4)
+
+        self.assertEqual(0, mysite.base.management.commands.nagios.Command.send_weekly_exit_code(newtime))
+
+    # Test for OK Nagios weekly mail return (0) after send_weekly_emails is
+    # run as a management command
+    def test_nagios_weeklymail_return_ok_after_send(self):
+        # Run the send_weekly_mail
+        command = mysite.profile.management.commands.send_weekly_emails.Command()
+        command.handle()
+
+        # Now run to see if the function sees things are ok in the
+        # database
+        self.assertEqual(0, mysite.base.management.commands.nagios.Command.send_weekly_exit_code())
+
+    # Test for CRITICAL Nagios weekly mail return (2)
+    def test_nagios_weeklymail_return_critical(self):
+        newtime = datetime.datetime.utcnow() - datetime.timedelta(days=8)
+
+        self.assertEqual(2, mysite.base.management.commands.nagios.Command.send_weekly_exit_code(newtime))
+
+    # Test for CRITICAL Nagios weekly mail return (2) on new database
+    def test_nagios_weeklymail_return_critical_newdb(self):
+        self.assertEqual(2, mysite.base.management.commands.nagios.Command.send_weekly_exit_code())
+
+# Test cases for meta data generation
 class MetaDataTests(django.test.TestCase):
     def test_meta_data_zero_div(self):
         mysite.base.views.meta_data()
-        
+
 # vim: set ai et ts=4 sw=4 nu:
