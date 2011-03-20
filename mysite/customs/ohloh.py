@@ -43,7 +43,7 @@ import re
 from typecheck import accepts, returns
 from typecheck import Any as __
 
-from mysite.customs.mechanize_helpers import mechanize_get
+import mysite.customs.mechanize_helpers
 
 def ohloh_url2data(url, selector, params = {}, many = False, API_KEY = None, person=None):
     '''Input: A URL to get,
@@ -69,7 +69,7 @@ def ohloh_url2data(url, selector, params = {}, many = False, API_KEY = None, per
     encoded = mysite.base.unicode_sanity.urlencode(params)
     url += encoded
     try:
-        b = mechanize_get(url, person)
+        b = mysite.customs.mechanize_helpers.mechanize_get(url, person)
         web_response = mysite.customs.models.WebResponse.create_from_browser(b)
         web_response.save() # Always save the WebResponse, even if we don't know
         # that any other object will store a pointer here.
@@ -130,7 +130,7 @@ class Ohloh(object):
             raise ValueError, "Ohloh gave us back nothing."
         except KeyError:
             raise ValueError, "The project exists, but Ohloh knows no icon."
-        b = mechanize_get(med_logo)
+        b = mysite.customs.mechanize_helpers.mechanize_get(med_logo)
         return b.response().read()
 
     def get_icon_for_project_by_id(self, project):
@@ -142,7 +142,7 @@ class Ohloh(object):
             med_logo = data['medium_logo_url']
         except KeyError:
             raise ValueError, "The project exists, but Ohloh knows no icon."
-        b = mechanize_get(med_logo)
+        b = mysite.customs.mechanize_helpers.mechanize_get(med_logo)
         return b.response().read()
 
     def project_id2projectdata(self, project_id=None, project_name=None):
