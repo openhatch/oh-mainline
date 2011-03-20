@@ -32,18 +32,26 @@ Projects
 #big-project-list form input[type='text'] { font-family: sans-serif; float: left; width: 20em; font-size: 1.5em; padding: 4px; }
 #big-project-list form input[type='submit'] { font-family: sans-serif; float: left; font-weight: normal; font-size: 1.5em; padding: 4px 8px 3px 8px; position: relative; top: -1px; }
 #big-project-list .note { margin-left: 2em; font-weight: normal; }
+#big-project-list { margin-top: -19px;}
 {% endblock css %}
+
+{% load base_extras %}
 
 {% block description_for_anonymous_users %}
 <strong>Learn below</strong>
 about the projects we index
 {% endblock %}
 
+{% block pagetop %}
+    <h3>
+        <a href='{% url mysite.project.views.projects %}'>
+            <img alt='Projects on OpenHatch' id='projects' alt='Projects on OpenHatch' src={% version '/static/images/projects.png' %} width='960' height='141'/>
+        </a>
+    </h3>
+{% endblock pagetop %}
+
 {% block main %}
 <div id='big-project-list' class='module'>
-    <div class='head'>
-        <h3>Projects on OpenHatch</h3>
-    </div>
     <div class='module-content body'>
         <h4>
             <label for="search_q">Search for a project</label>
