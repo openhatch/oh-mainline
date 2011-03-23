@@ -17,6 +17,7 @@ import logging
 from httplib import BadStatusLine
 from urllib2 import HTTPError
 from urlparse import urlparse
+import urllib2
 
 import mechanize
 
@@ -73,3 +74,9 @@ def mechanize_get(url, referrer=None, attempts_remaining=6, person=None):
 
     return b
 
+def link_works(url):
+    try:
+        req = mechanize_get(url)
+    except urllib2.URLError, e:
+        return False
+    return True
