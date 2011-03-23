@@ -25,6 +25,8 @@ from django.core.management.base import BaseCommand
 import django.conf
 django.conf.settings.CELERY_ALWAYS_EAGER = True
 
+import mysite.customs.mechanize_helpers
+
 import mysite.customs.bugtrackers.bugzilla
 import mysite.customs.bugtrackers.google
 import mysite.customs.bugtrackers.launchpad
@@ -185,7 +187,7 @@ Supported tracker types:
             # check citation URL for being a 404
             # if so, remove set the URL to None. Also, log it.
             if citation.url:
-                if mysite.customs.ohloh.link_works(citation.url):
+                if mysite.customs.mechanize_helpers.link_works(citation.url):
                     # then we do nothing
                     pass
                 else:
