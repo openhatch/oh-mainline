@@ -1,0 +1,675 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  
+  
+
+  
+
+
+  <head>
+    <title>
+      #3275 (Show line numbers when embedding source code in wiki pages)
+     – The Trac Project
+    </title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <link rel="search" href="/search" />
+        <link rel="prev" href="/ticket/3274" title="Ticket #3274" />
+        <link rel="last" href="/ticket/10092" title="Ticket #10092" />
+        <link rel="help" href="/wiki/TracGuide" />
+        <link rel="alternate" href="/ticket/3275?format=csv" type="text/csv" class="csv" title="Comma-delimited Text" /><link rel="alternate" href="/ticket/3275?format=tab" type="text/tab-separated-values" class="tab" title="Tab-delimited Text" /><link rel="alternate" href="/ticket/3275?format=rss" type="application/rss+xml" class="rss" title="RSS Feed" />
+        <link rel="next" href="/ticket/3276" title="Ticket #3276" />
+        <link rel="start" href="/wiki" />
+        <link rel="stylesheet" href="http://www.edgewall.org/chrome/common13/css/trac.css" type="text/css" /><link rel="stylesheet" href="http://www.edgewall.org/chrome/common13/css/ticket.css" type="text/css" /><link rel="stylesheet" href="/chrome/vote/css/tracvote.css" type="text/css" />
+        <link rel="first" href="/ticket/1" title="Ticket #1" />
+        <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+        <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+      <link type="application/opensearchdescription+xml" rel="search" href="/search/opensearch" title="Search The Trac Project" />
+    <script type="text/javascript">
+      var auto_preview_timeout=2.0;
+      var form_token="5af149f66d5f9be758c53289";
+    </script>
+      <script type="text/javascript" charset="utf-8" src="http://www.edgewall.org/chrome/common13/js/jquery.js"></script>
+      <script type="text/javascript" charset="utf-8" src="http://www.edgewall.org/chrome/common13/js/babel.js"></script>
+      <script type="text/javascript" charset="utf-8" src="http://www.edgewall.org/chrome/common13/js/messages/en_US.js"></script>
+      <script type="text/javascript" charset="utf-8" src="http://www.edgewall.org/chrome/common13/js/trac.js"></script>
+      <script type="text/javascript" charset="utf-8" src="http://www.edgewall.org/chrome/common13/js/search.js"></script>
+      <script type="text/javascript" charset="utf-8" src="http://www.edgewall.org/chrome/common13/js/folding.js"></script>
+      <script type="text/javascript" charset="utf-8" src="http://www.edgewall.org/chrome/common13/js/wikitoolbar.js"></script>
+      <script type="text/javascript" charset="utf-8" src="http://www.edgewall.org/chrome/common13/js/resizer.js"></script>
+      <script type="text/javascript" charset="utf-8" src="http://www.edgewall.org/chrome/common13/js/auto_preview.js"></script>
+    <script type="text/javascript" src="http://www.edgewall.org/chrome/common13/js/threaded_comments.js"></script>
+    <script type="text/javascript">
+      jQuery(document).ready(function($) {
+        $("div.description").find("h1,h2,h3,h4,h5,h6").addAnchor(_("Link to this section"));
+        $(".foldable").enableFolding(false, true);
+      /*<![CDATA[*/
+        $("#modify").parent().toggleClass("collapsed");
+        $(".trac-topnav a").click(function() { $("#modify").parent().removeClass("collapsed"); });
+        /* only enable control elements for the currently selected action */
+        var actions = $("#action input[name='action']");
+        function updateActionFields() {
+          actions.each(function () {
+            $(this).siblings().find("*[id]").enable($(this).checked());
+            $(this).siblings().filter("*[id]").enable($(this).checked());
+          });
+        }
+        actions.click(updateActionFields);
+        updateActionFields();
+        var comment_focused = false;
+        $("#comment").focus(function() { comment_focused = true; })
+                     .blur(function() { comment_focused = false; });
+        $("#propertyform").autoSubmit({preview: '1'}, function(data, reply) {
+          var items = $(reply);
+          $("#ticket").replaceWith(items.filter('#ticket'));
+          var changes = $("#ticketchange-content").html(items.filter('ul.changes, div.comment'));
+          var show_preview = changes.children().length != 0;
+          $("#ticketchange").toggle(show_preview);
+          if (show_preview && comment_focused)
+            $("#modify").parent().addClass("collapsed");
+        });
+        $("#trac-comment-editor").autoSubmit({preview_comment: '1'}, function(data, reply) {
+          var comment = $("#trac-comment-editor").next("div.comment").html(reply);
+          comment.toggle(comment.children().length != 0);
+        });
+        /*]]>*/
+      });
+    </script>
+    <link rel="stylesheet" type="text/css" href="http://www.edgewall.org/css/projects.css" />
+  </head>
+  <body>
+    <div id="wrapper">
+      <div id="topbar">
+        <a id="home-link" href="http://www.edgewall.org/">Edgewall Software</a>
+      </div>
+      <div id="ew-header">
+        <div id="topnav"><ul>
+         <li><a href="http://www.edgewall.org/">Home</a></li>
+         <li class="active">
+           <a class="trac" href="http://trac.edgewall.org/">Trac</a>
+         </li>
+         <li>
+           <a class="genshi" href="http://genshi.edgewall.org/">Genshi</a>
+         </li>
+         <li>
+           <a class="babel" href="http://babel.edgewall.org/">Babel</a>
+         </li>
+         <li>
+           <a class="bitten" href="http://bitten.edgewall.org/">Bitten</a>
+         </li>
+         <li>
+           <a class="posterity" href="http://posterity.edgewall.org/">Posterity</a>
+         </li></ul>
+       </div>
+     </div>
+     <div id="ew-main">
+       <div id="ew-content">
+         <div>
+<script src="http://www.google-analytics.com/urchin.js" type="text/javascript"></script>
+<script type="text/javascript">_uacct = "UA-598265-1";urchinTracker();</script>
+<div id="left">
+  <div class="block"><ul>
+    <li><a href="/">Home</a></li><li><a href="/wiki/TracDownload">Download</a></li><li><a href="/wiki/TracGuide">Documentation</a></li><li><a href="/wiki/MailingList">Mailing Lists</a></li><li><a href="/wiki/TracLicense">License</a></li><li><a href="/wiki/TracFaq">FAQ</a></li>
+  </ul></div>
+</div>
+</div>
+    <div id="banner">
+      <div id="header">
+        <a id="logo" href="http://trac.edgewall.org/"><img src="http://www.edgewall.org/gfx/trac_logo.png" alt="Trac" height="61" width="214" /></a>
+      </div>
+      <form id="search" action="/search" method="get">
+        <div>
+          <label for="proj-search">Search:</label>
+          <input type="text" id="proj-search" name="q" size="18" value="" />
+          <input type="submit" value="Search" />
+        </div>
+      </form>
+      <div id="metanav" class="nav">
+    <ul>
+      <li class="first"><a href="/login">Login</a></li><li><a href="/prefs">Preferences</a></li><li><a href="/wiki/TracGuide">Help/Guide</a></li><li class="last"><a href="/about">About Trac</a></li>
+    </ul>
+  </div>
+    </div>
+    <div id="mainnav" class="nav">
+    <ul>
+      <li class="first"><a href="/wiki">Wiki</a></li><li><a href="/timeline">Timeline</a></li><li><a href="/roadmap">Roadmap</a></li><li><a href="/browser">Browse Source</a></li><li class="active"><a href="/report">View Tickets</a></li><li><a href="/wiki/NewTicket">New Ticket</a></li><li class="last"><a href="/search">Search</a></li>
+    </ul>
+  </div>
+    <div id="main">
+      <div id="ctxtnav" class="nav">
+        <h2>Context Navigation</h2>
+          <ul>
+              <li class="first"><span id="vote" title="Vote count"><img src="/chrome/vote/aupgray.png" alt="Up-vote" /><span id="votes">+0</span><img src="/chrome/vote/adowngray.png" alt="Down-vote" /></span></li><li><span>&larr; <a class="prev" href="/ticket/3274" title="Ticket #3274">Previous Ticket</a></span></li><li class="last"><span><a class="next" href="/ticket/3276" title="Ticket #3276">Next Ticket</a> &rarr;</span></li>
+          </ul>
+        <hr />
+      </div>
+    <div id="content" class="ticket">
+      <div class="trac-topnav">
+        <a href="#propertyform" title="Go to the ticket editor">Modify</a> ↓
+      </div>
+      <h1 id="trac-ticket-title">
+          <a href="/ticket/3275">Ticket #3275</a>
+          <span class="status">(new enhancement)</span>
+      </h1>
+        <div id="ticket">
+  <div class="date">
+    <p>Opened <a class="timeline" href="/timeline?from=2006-06-16T15%3A01%3A52%2B02%3A00&amp;precision=second" title="See timeline at Jun 16, 2006 3:01:52 PM">5 years ago</a></p>
+    <p>Last modified <a class="timeline" href="/timeline?from=2010-11-26T13%3A45%3A45%2B01%3A00&amp;precision=second" title="See timeline at Nov 26, 2010 1:45:45 PM">4 months ago</a></p>
+  </div>
+  <h2 class="summary searchable">Show line numbers when embedding source code in wiki pages</h2>
+  <table class="properties">
+    <tr>
+      <th id="h_reporter">Reported by:</th>
+      <td headers="h_reporter" class="searchable">
+        erik@…
+      </td>
+      <th id="h_owner">Owned by:</th>
+      <td headers="h_owner">
+        <a href="/query?status=!closed&amp;owner=cboos">cboos</a>
+      </td>
+    </tr>
+    <tr>
+        <th id="h_priority">
+          Priority:
+        </th>
+        <td headers="h_priority">
+              <a href="/query?status=!closed&amp;priority=high">high</a>
+        </td>
+        <th id="h_milestone">
+          Milestone:
+        </th>
+        <td headers="h_milestone">
+              <a class="milestone" href="/milestone/next-major-0.1X">next-major-0.1X</a>
+        </td>
+    </tr><tr>
+        <th id="h_component">
+          Component:
+        </th>
+        <td headers="h_component">
+              <a href="/query?status=!closed&amp;component=wiki+system">wiki system</a>
+        </td>
+        <th id="h_version">
+          Version:
+        </th>
+        <td headers="h_version">
+              <a href="/query?status=!closed&amp;version=0.9.5">0.9.5</a>
+        </td>
+    </tr><tr>
+        <th id="h_severity">
+          Severity:
+        </th>
+        <td headers="h_severity">
+              <a href="/query?status=!closed&amp;severity=normal">normal</a>
+        </td>
+        <th id="h_keywords">
+          Keywords:
+        </th>
+        <td headers="h_keywords" class="searchable">
+              <a href="/query?status=!closed&amp;keywords=~line">line</a> <a href="/query?status=!closed&amp;keywords=~number">number</a> <a href="/query?status=!closed&amp;keywords=~annotate">annotate</a> <a href="/query?status=!closed&amp;keywords=~wikiprocessor">wikiprocessor</a> <a href="/query?status=!closed&amp;keywords=~bitesized">bitesized</a>
+        </td>
+    </tr><tr>
+        <th id="h_cc">
+          Cc:
+        </th>
+        <td headers="h_cc" class="searchable">
+              lists@…
+        </td>
+        <th>
+        </th>
+        <td>
+        </td>
+    </tr><tr>
+        <th id="h_changelog">
+          Release Notes:
+        </th>
+        <td headers="h_changelog" colspan="3">
+        </td>
+    </tr><tr>
+        <th id="h_apichanges">
+          API Changes:
+        </th>
+        <td headers="h_apichanges" colspan="3">
+        </td>
+    </tr>
+  </table>
+  <div class="description">
+    <h3 id="comment:description">
+      Description
+    </h3>
+    <form id="addreply" method="get" action="#comment">
+      <div class="inlinebuttons">
+        <input type="hidden" name="replyto" value="description" />
+        <input type="submit" name="reply" value="Reply" title="Reply, quoting this description" />
+      </div>
+    </form>
+    <div class="searchable">
+      <p>
+Hi<br />
+</p>
+<p>
+When embedding sourcecode in wiki pages using the {{{-Makro, I would sometimes like to have line numbers displayed. This would make it possible to reference some lines in a text, like: <br />
+</p>
+<p>
+<em>We got some c-sourcecode here, in line 1, a buffer is allocated, in line 35, some data is copied to the buffer without checking the size of the data...</em><br />
+</p>
+<p>
+The svn browser shows line numbers, so I hope this will not be so difficult.<br />
+</p>
+
+    </div>
+  </div>
+</div>
+          
+    <div id="attachments">
+        <h2 class="foldable">Attachments</h2>
+        <div class="attachments">
+          <form method="get" action="/attachment/ticket/3275/" id="attachfile">
+  <div>
+    <input type="hidden" name="action" value="new" />
+    <input type="submit" name="attachfilebutton" value="Attach file" />
+  </div>
+</form>
+        </div>
+    </div>
+
+        <div>
+          <form id="trac-threaded-form" method="get" action="" style="display: none">
+            <div>
+              <input id="trac-threaded-toggle" type="checkbox" />
+              <label for="trac-threaded-toggle">Threaded Comments</label>
+            </div>
+          </form>
+          <h2 class="foldable">Change History</h2>
+          <div id="changelog">
+              <div class="change" id="trac-change-1">
+                <h3 class="change">
+                  <span class="threading">
+                    <span id="comment:1" class="cnum">
+      <a href="#comment:1">comment:1</a>
+    </span>
+                  </span>
+                  Changed <a class="timeline" href="/timeline?from=2006-12-06T04%3A00%3A19%2B01%3A00&amp;precision=second" title="See timeline at Dec 6, 2006 4:00:19 AM">4 years ago</a> by sid
+                </h3>
+                  <form id="reply-to-comment-1" method="get" action="#comment">
+                    <div class="inlinebuttons">
+                      <input type="hidden" name="replyto" value="1" />
+                      <input type="submit" value="Reply" title="Reply to comment 1" />
+                    </div>
+                  </form>
+                
+    <div class="comment searchable">
+      <p>
+Essentially the ability to replicate the browser view in <a class="wiki" href="/wiki/WikiProcessors">WikiProcessors</a>. This could be useful, although the syntax might be unwieldy.<br />
+</p>
+<p>
+One idea to kick things off:<br />
+</p>
+<pre class="wiki">{{{
+#!c +line-numbers
+... C code ...
+}}}
+</pre>
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-2">
+                <h3 class="change">
+                  <span class="threading">
+                    <span id="comment:2" class="cnum">
+      <a href="#comment:2">comment:2</a>
+    </span>
+                  </span>
+                  Changed <a class="timeline" href="/timeline?from=2006-12-06T09%3A04%3A06%2B01%3A00&amp;precision=second" title="See timeline at Dec 6, 2006 9:04:06 AM">4 years ago</a> by cboos
+                </h3>
+                  <form id="reply-to-comment-2" method="get" action="#comment">
+                    <div class="inlinebuttons">
+                      <input type="hidden" name="replyto" value="2" />
+                      <input type="submit" value="Reply" title="Reply to comment 2" />
+                    </div>
+                  </form>
+                
+  <ul class="changes">
+    <li>
+      <strong>Keywords</strong>
+        <em>annotate</em> <em>wikiprocessor</em> added; <em>wiki</em> removed
+    </li><li>
+      <strong>Milestone</strong>
+        set to <em>0.11</em>
+    </li><li>
+      <strong>Owner</strong>
+        changed from <em>jonas</em> to <em>cboos</em>
+    </li>
+  </ul>
+    <div class="comment searchable">
+      <p>
+I once did that, now I have to find where I put the patch ;)<br />
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-3">
+                <h3 class="change">
+                  <span class="threading">
+                    <span id="comment:3" class="cnum">
+      <a href="#comment:3">comment:3</a>
+    </span>
+                  </span>
+                  Changed <a class="timeline" href="/timeline?from=2007-05-18T09%3A02%3A43%2B02%3A00&amp;precision=second" title="See timeline at May 18, 2007 9:02:43 AM">4 years ago</a> by cboos
+                </h3>
+                  <form id="reply-to-comment-3" method="get" action="#comment">
+                    <div class="inlinebuttons">
+                      <input type="hidden" name="replyto" value="3" />
+                      <input type="submit" value="Reply" title="Reply to comment 3" />
+                    </div>
+                  </form>
+                
+  <ul class="changes">
+    <li>
+      <strong>Milestone</strong>
+        changed from <em>0.11</em> to <em>0.12</em>
+    </li>
+  </ul>
+    <div class="comment searchable">
+      <p>
+Patch was lost ;-)<br />
+</p>
+<p>
+<a class="wiki" href="/wiki/WikiEngine">WikiEngine</a> refactoring and related fixes postponed.<br />
+</p>
+
+    </div>
+
+              </div>
+              <div class="change" id="trac-change-4">
+                <h3 class="change">
+                  <span class="threading">
+                    <span id="comment:4" class="cnum">
+      <a href="#comment:4">comment:4</a>
+    </span>
+                  </span>
+                  Changed <a class="timeline" href="/timeline?from=2010-06-24T19%3A04%3A14%2B02%3A00&amp;precision=second" title="See timeline at Jun 24, 2010 7:04:14 PM">9 months ago</a> by cboos
+                </h3>
+                  <form id="reply-to-comment-4" method="get" action="#comment">
+                    <div class="inlinebuttons">
+                      <input type="hidden" name="replyto" value="4" />
+                      <input type="submit" value="Reply" title="Reply to comment 4" />
+                    </div>
+                  </form>
+                
+  <ul class="changes">
+    <li>
+      <strong>Keywords</strong>
+        <em>bitesized</em> added
+    </li><li>
+      <strong>Priority</strong>
+        changed from <em>normal</em> to <em>high</em>
+    </li>
+  </ul>
+
+              </div>
+              <div class="change" id="trac-change-5">
+                <h3 class="change">
+                  <span class="threading">
+                    <span id="comment:5" class="cnum">
+      <a href="#comment:5">comment:5</a>
+    </span>
+                  </span>
+                  Changed <a class="timeline" href="/timeline?from=2010-11-26T13%3A45%3A45%2B01%3A00&amp;precision=second" title="See timeline at Nov 26, 2010 1:45:45 PM">4 months ago</a> by Thijs Triemstra &lt;lists@…&gt;
+                </h3>
+                  <form id="reply-to-comment-5" method="get" action="#comment">
+                    <div class="inlinebuttons">
+                      <input type="hidden" name="replyto" value="5" />
+                      <input type="submit" value="Reply" title="Reply to comment 5" />
+                    </div>
+                  </form>
+                
+  <ul class="changes">
+    <li>
+      <strong>Cc</strong>
+        <em>lists@…</em> added
+    </li>
+  </ul>
+    <div class="comment searchable">
+      <p>
+I like this syntax Sphinx <a class="ext-link" href="http://sphinx.pocoo.org/markup/code.html#line-numbers"><span class="icon"> </span>uses</a> for this.<br />
+</p>
+
+    </div>
+
+              </div>
+          </div>
+        </div>
+      <form method="post" id="propertyform" action="/ticket/3275#trac-add-comment"><div><input type="hidden" name="__FORM_TOKEN" value="5af149f66d5f9be758c53289" /></div>
+    <div class="field">
+          <div class="trac-nav">
+            <a href="#content" title="View ticket fields and description">View</a> ↑
+          </div>
+          <h2 id="trac-add-comment">
+            <a id="edit" onfocus="$('#comment').get(0).focus()">Add a comment</a>
+          </h2>
+          <fieldset class="iefix">
+            <label for="comment">You may use
+              <a tabindex="42" href="/wiki/WikiFormatting">WikiFormatting</a>
+              here.</label>
+            <textarea id="comment" name="comment" class="wikitext trac-resizable" rows="10" cols="78">
+</textarea>
+          </fieldset>
+        </div><div>
+          <h2 class="foldable">Modify Ticket</h2>
+          <div id="modify">
+            <fieldset id="properties">
+              <legend>
+                  Change Properties
+              </legend>
+              <table>
+                <tr>
+                  <th><label for="field-summary">Summary:</label></th>
+                  <td class="fullrow" colspan="3">
+                    <input type="text" id="field-summary" name="field_summary" value="Show line numbers when embedding source code in wiki pages" size="70" />
+                  </td>
+                </tr>
+                <tr>
+                    <th class="col1">
+                      <label for="field-type">Type:</label>
+                    </th>
+                    <td class="col1">
+                        <select id="field-type" name="field_type">
+                          <option value="defect">defect</option><option selected="selected" value="enhancement">enhancement</option><option value="task">task</option>
+                        </select>
+                    </td>
+                    <th class="col2">
+                      <label for="field-priority">Priority:</label>
+                    </th>
+                    <td class="col2">
+                        <select id="field-priority" name="field_priority">
+                          <option value="highest">highest</option><option selected="selected" value="high">high</option><option value="normal">normal</option><option value="low">low</option><option value="lowest">lowest</option>
+                        </select>
+                    </td>
+                </tr><tr>
+                    <th class="col1">
+                      <label for="field-milestone">Milestone:</label>
+                    </th>
+                    <td class="col1">
+                        <select id="field-milestone" name="field_milestone">
+                          <option></option>
+                          <optgroup label="Open (by due date)">
+                            <option value="0.13">0.13</option><option value="0.12.3">0.12.3</option><option value="0.14">0.14</option>
+                          </optgroup><optgroup label="Open (no due date)">
+                            <option value="0.14-multiproject">0.14-multiproject</option><option value="0.14-wikiengine">0.14-wikiengine</option><option selected="selected" value="next-major-0.1X">next-major-0.1X</option><option value="next-minor-0.12.x">next-minor-0.12.x</option><option value="not applicable">not applicable</option><option value="plugin - mercurial">plugin - mercurial</option><option value="plugin - spam-filter">plugin - spam-filter</option><option value="translations">translations</option><option value="unscheduled">unscheduled</option>
+                          </optgroup>
+                        </select>
+                    </td>
+                    <th class="col2">
+                      <label for="field-component">Component:</label>
+                    </th>
+                    <td class="col2">
+                        <select id="field-component" name="field_component">
+                          <option value="admin/console">admin/console</option><option value="admin/web">admin/web</option><option value="attachment">attachment</option><option value="contrib">contrib</option><option value="database backend">database backend</option><option value="general">general</option><option value="i18n">i18n</option><option value="notification">notification</option><option value="plugin/mercurial">plugin/mercurial</option><option value="plugin/spamfilter">plugin/spamfilter</option><option value="project">project</option><option value="rendering">rendering</option><option value="report system">report system</option><option value="roadmap">roadmap</option><option value="search system">search system</option><option value="ticket system">ticket system</option><option value="timeline">timeline</option><option value="version control">version control</option><option value="version control/browser">version control/browser</option><option value="version control/changeset view">version control/changeset view</option><option value="version control/log view">version control/log view</option><option value="web frontend">web frontend</option><option value="web frontend/mod_python">web frontend/mod_python</option><option value="web frontend/tracd">web frontend/tracd</option><option selected="selected" value="wiki system">wiki system</option>
+                        </select>
+                    </td>
+                </tr><tr>
+                    <th class="col1">
+                      <label for="field-version">Version:</label>
+                    </th>
+                    <td class="col1">
+                        <select id="field-version" name="field_version">
+                          <option></option>
+                          <option value="0.12dev">0.12dev</option><option value="0.12-stable">0.12-stable</option><option value="0.11-stable">0.11-stable</option><option value="0.10-stable">0.10-stable</option><option value="0.12.2">0.12.2</option><option value="0.12.2rc1">0.12.2rc1</option><option value="0.12.1">0.12.1</option><option value="0.13dev">0.13dev</option><option value="0.12">0.12</option><option value="0.12rc1">0.12rc1</option><option value="0.12b1">0.12b1</option><option value="0.11.7">0.11.7</option><option value="0.11.6">0.11.6</option><option value="0.11.5">0.11.5</option><option value="0.11.5rc2">0.11.5rc2</option><option value="0.11.4">0.11.4</option><option value="0.11.4rc2">0.11.4rc2</option><option value="0.11.4rc1">0.11.4rc1</option><option value="0.11.3">0.11.3</option><option value="0.11.2.1">0.11.2.1</option><option value="0.11.2">0.11.2</option><option value="0.11.1">0.11.1</option><option value="0.11">0.11</option><option value="0.10.5">0.10.5</option><option value="0.11rc2">0.11rc2</option><option value="0.11rc1">0.11rc1</option><option value="0.11b2">0.11b2</option><option value="0.11b1">0.11b1</option><option value="0.10.4">0.10.4</option><option value="0.10.3.1">0.10.3.1</option><option value="0.10.3">0.10.3</option><option value="0.10.2">0.10.2</option><option value="0.10.1">0.10.1</option><option value="0.10">0.10</option><option value="0.9.6">0.9.6</option><option selected="selected" value="0.9.5">0.9.5</option><option value="0.9.4">0.9.4</option><option value="0.9.3">0.9.3</option><option value="0.9.2">0.9.2</option><option value="0.9.1">0.9.1</option><option value="0.9">0.9</option><option value="0.8.4">0.8.4</option>
+                        </select>
+                    </td>
+                    <th class="col2">
+                      <label for="field-severity">Severity:</label>
+                    </th>
+                    <td class="col2">
+                        <select id="field-severity" name="field_severity">
+                          <option value="blocker">blocker</option><option value="critical">critical</option><option value="major">major</option><option selected="selected" value="normal">normal</option><option value="minor">minor</option><option value="trivial">trivial</option>
+                        </select>
+                    </td>
+                </tr><tr>
+                    <th class="col1">
+                      <label for="field-keywords">Keywords:</label>
+                    </th>
+                    <td class="col1">
+                            <input type="text" id="field-keywords" name="field_keywords" value="line number annotate wikiprocessor bitesized" />
+                    </td>
+                    <th class="col2">
+                      <label for="field-cc">Add/Remove from Cc:</label>
+                    </th>
+                    <td class="col2">
+                            <span>
+                              <em>&lt;Author field&gt;</em>
+                              <input type="checkbox" id="field-cc" name="cc_update" title="This checkbox allows you to add or remove yourself from the CC list." />
+                            </span>
+                    </td>
+                </tr><tr>
+                    <th class="col1">
+                      <label for="field-changelog">Release Notes:</label>
+                    </th>
+                    <td class="col1" colspan="3">
+                        <textarea id="field-changelog" name="field_changelog" cols="60" rows="1" class="wikitext trac-resizable">
+</textarea>
+                    </td>
+                </tr><tr>
+                    <th class="col1">
+                      <label for="field-apichanges">API Changes:</label>
+                    </th>
+                    <td class="col1" colspan="3">
+                        <textarea id="field-apichanges" name="field_apichanges" cols="60" rows="1" class="wikitext trac-resizable">
+</textarea>
+                    </td>
+                </tr>
+              </table>
+            </fieldset>
+                <fieldset id="action">
+                  <legend>Action</legend>
+                  <div>
+                      <input type="radio" id="action_leave" name="action" value="leave" checked="checked" />
+                      <label for="action_leave">leave</label>
+                      as new
+                      <span class="hint"></span>
+                  </div><div>
+                      <input type="radio" id="action_resolve" name="action" value="resolve" />
+                      <label for="action_resolve">resolve</label>
+                      as <select name="action_resolve_resolve_resolution" id="action_resolve_resolve_resolution"><option selected="selected" value="fixed">fixed</option><option value="invalid">invalid</option><option value="wontfix">wontfix</option><option value="duplicate">duplicate</option><option value="worksforme">worksforme</option><option value="cantfix">cantfix</option></select>
+                      <span class="hint">The resolution will be set. Next status will be 'closed'</span>
+                  </div><div>
+                      <input type="radio" id="action_reassign" name="action" value="reassign" />
+                      <label for="action_reassign">reassign</label>
+                      to <input type="text" name="action_reassign_reassign_owner" value="anonymous" id="action_reassign_reassign_owner" />
+                      <span class="hint">The owner will be changed from cboos. Next status will be 'new'</span>
+                  </div><div>
+                      <input type="radio" id="action_accept" name="action" value="accept" />
+                      <label for="action_accept">accept</label>
+                      <span class="hint">The owner will be changed from cboos to anonymous. Next status will be 'assigned'</span>
+                  </div>
+                </fieldset>
+          </div>
+        </div><div class="field">
+          <fieldset>
+            <legend>Author</legend>
+            <table>
+              <tr>
+                <th>
+                  <label for="author">Your email or username:</label><br />
+                </th>
+                <td>
+                  <input type="text" id="author" name="author" size="40" value="anonymous" />
+                  <br />
+                </td>
+              </tr>
+            </table>
+            <p class="hint">
+              E-mail address and user name can be saved in the <a href="/prefs">Preferences</a>.
+            </p>
+          </fieldset>
+        </div><div id="ticketchange" class="ticketdraft" style="display: none">
+          <h3 class="change">
+            Changed by anonymous
+          </h3>
+          <div id="ticketchange-content">
+</div>
+        </div><div class="trac-nav">
+          <a href="#attachments" title="Go to the list of attachments">Attachments</a> ↑
+        </div><div class="buttons">
+            <input type="hidden" name="ts" value="2010-11-26 12:45:45.705098+00:00" />
+            <input type="hidden" name="replyto" />
+            <input type="hidden" name="cnum" value="6" />
+          <input type="submit" name="preview" value="Preview" /> 
+          <input type="submit" name="submit" value="Submit changes" />
+        </div>
+  </form>
+      <div id="help"><strong>Note:</strong> See
+        <a href="/wiki/TracTickets">TracTickets</a> for help on using
+        tickets.</div>
+    </div>
+    <div id="altlinks">
+      <h3>Download in other formats:</h3>
+      <ul>
+        <li class="first">
+          <a rel="nofollow" href="/ticket/3275?format=csv" class="csv">Comma-delimited Text</a>
+        </li><li>
+          <a rel="nofollow" href="/ticket/3275?format=tab" class="tab">Tab-delimited Text</a>
+        </li><li class="last">
+          <a rel="nofollow" href="/ticket/3275?format=rss" class="rss">RSS Feed</a>
+        </li>
+      </ul>
+    </div>
+    </div>
+    <div id="footer" lang="en" xml:lang="en"><hr />
+      <a id="tracpowered" href="http://trac.edgewall.org/"><img src="http://www.edgewall.org/chrome/common13/trac_logo_mini.png" height="30" width="107" alt="Trac Powered" /></a>
+      <p class="left">Powered by <a href="/about"><strong>Trac 0.13dev-r10641</strong></a><br />
+        By <a href="http://www.edgewall.org/">Edgewall Software</a>.</p>
+      <p class="right">Visit the Trac open source project at<br /><a href="http://trac.edgewall.org/">http://trac.edgewall.org/</a></p>
+    </div>
+        </div><!-- #ew-content -->
+      </div>
+    </div>
+    <div id="ew-footer">
+      <p><a href="mailto:info@edgewall.com">info@edgewall.com</a></p>
+      <p>Copyright © 2003-2010 Edgewall Software. All rights reserved.</p>
+    </div>
+    <div id="right">
+      <div id="ohloh-badge">
+  <script type="text/javascript" src="http://www.ohloh.net/projects/3052/badge_js"></script>
+</div>
+ <script type="text/javascript"><!--
+  google_ad_client = "pub-3746245347013177";
+  google_ad_width = 120;
+  google_ad_height = 600;
+  google_ad_format = "120x600_as";
+  google_ad_channel ="9044578517";
+  google_ad_type = "text_image";
+  google_color_border = "8b8d8d";
+  /*google_color_border = "6b6d6d";*/
+  google_color_bg = "6b6d6d";
+  /*google_color_bg = "4b4d4d";*/
+  google_color_link = "336699";
+  google_color_url = "E2B200";
+  google_color_text = "8c8c8c";
+  /*google_color_text = "cccccc";*/
+  //--></script>
+ <script type="text/javascript" src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+ </script>
+   </div>
+  </body>
+</html>

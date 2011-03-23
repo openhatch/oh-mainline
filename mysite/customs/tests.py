@@ -1675,6 +1675,32 @@ class TracBug(django.test.TestCase):
                   }
         self.assertEqual(wanted, got)
 
+    @mock.patch('mysite.customs.bugtrackers.trac.TracBug.as_bug_specific_csv_data')
+    def test_create_bug_that_has_new_date_format(self, m):
+        m.return_value = {
+                  'description': u"Hi\r\n\r\nWhen embedding sourcecode in wiki pages using the {{{-Makro, I would sometimes like to have line numbers displayed. This would make it possible to reference some lines in a text, like: \r\n\r\n''We got some c-sourcecode here, in line 1, a buffer is allocated, in line 35, some data is copied to the buffer without checking the size of the data...''\r\n\r\nThe svn browser shows line numbers, so I hope this will not be so difficult.",
+                  'status': 'new',
+                  'keywords': '',
+                  'summary': 'Show line numbers when embedding source code in wiki pages',
+                  'priority': '',
+                  'reporter': 'erik@\xe2\x80\xa6',
+                  'id': '3275'}
+        tb = mysite.customs.bugtrackers.trac.TracBug(
+            bug_id=3275,
+            BASE_URL='http://trac.edgewall.org/')
+        cached_html_filename = os.path.join(settings.MEDIA_ROOT, 'sample-data', 'trac-3275.html')
+        tb._bug_html_page = unicode(
+            open(cached_html_filename).read(), 'utf-8')
+
+        got = tb.as_data_dict_for_bug_object(tracbug_tests_extract_tracker_specific_data)
+        del got['last_polled']
+        wanted = {'status': 'new', 'as_appears_in_distribution': '',
+                  'description': u"Hi\r\n\r\nWhen embedding sourcecode in wiki pages using the {{{-Makro, I would sometimes like to have line numbers displayed. This would make it possible to reference some lines in a text, like: \r\n\r\n''We got some c-sourcecode here, in line 1, a buffer is allocated, in line 35, some data is copied to the buffer without checking the size of the data...''\r\n\r\nThe svn browser shows line numbers, so I hope this will not be so difficult.",
+                  'importance': '', 'bite_size_tag_name': 'easy', 'canonical_bug_link': 'http://trac.edgewall.org/ticket/3275', 'date_reported': datetime.datetime(2006, 6, 16, 15, 1, 52),
+                  'submitter_realname': '', 'title': 'Show line numbers when embedding source code in wiki pages', 'people_involved': 3, 'last_touched': datetime.datetime(2010, 11, 26, 13, 45, 45),
+                  'submitter_username': 'erik@\xe2\x80\xa6', 'looks_closed': False, 'good_for_newcomers': False, 'concerns_just_documentation': False}
+        self.assertEqual(wanted, got)
+
     @mock.patch('mysite.customs.mechanize_helpers.mechanize_get')
     def test_bug_that_404s_is_deleted(self, mock_error):
         mock_error.side_effect = generate_404

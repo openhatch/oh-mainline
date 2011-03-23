@@ -84,6 +84,7 @@ class TracBug:
     def _span2date(span):
         date_string = span.attrib['title']
         date_string = date_string.replace('in Timeline', '')
+        date_string = date_string.replace('See timeline at ', '')
         return mysite.base.helpers.string2naive_datetime(date_string)
 
     @staticmethod
