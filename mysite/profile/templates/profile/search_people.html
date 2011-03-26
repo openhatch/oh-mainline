@@ -286,7 +286,7 @@ People Search
 
 {% block js_before_bundle %}
     <script type="text/javascript"
-    src="{% url mysite.profile.views.person_id2data_as_javascript %}?q={{ raw_query | urlencode }}"></script>
+    src="{% url mysite.profile.views.person_id2data_as_javascript %}?q={{raw_query|urlencode}}"></script>
     <script type="text/javascript">
         {% comment %}
         Normally, we nudge user about the location when they click the
