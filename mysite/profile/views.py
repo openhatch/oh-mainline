@@ -546,6 +546,44 @@ def project_query2mappable_orm_people(parsed_query):
 
     return mappable_people, extra_data
 
+# FIXME: Change the map so this is JSON, not a big JavaScript variable.
+def person_id2data_as_javascript(request):
+    # The point of this view is to provide a JSON dump of the public
+    # locations for people relevant to this request.
+    #
+    # (Before we wrote this, location data was part of every request to
+    # the map page, which made that page extremely large. I prefer to have t
+    # be a separate request, like this. Plus, one day, we can apply
+    # reasonable caching to this request.)
+    #
+    # FIXME: Come up with some sort of reasonable caching for this.
+
+    # So, the user might have requested just a subset of the people. Let's grab
+    # just that subset.
+    query = request.GET.get('q', '')
+    parsed_query = mysite.profile.controllers.parse_string_query(query)
+
+    # If there is a query constraint, the relevant_people are just those
+    # that are returned by query2results.
+    if parsed_query['q'].strip():
+        try:
+            # query2results returns some "extra_data" that we don't
+            # use in this view.
+            relevant_people, extra_data = query2results(parsed_query)
+        except mysite.base.controllers.HaystackIsDown:
+            relevant_people = []
+    else:
+        # If there is no query constraint, then everyone is a relevant person!
+        relevant_people = Person.objects.all().order_by('user__username')
+
+    # The map only needs a subset of the data about each person. This subset, in fact:
+    person_id2data = mysite.profile.controllers.get_people_location_data_as_dict(relevant_people)
+
+    as_json = simplejson.dumps(person_id2data)
+    response_text = "var geocode_person_id_data = " + as_json + ";"
+    return HttpResponse(response_text,
+                        mimetype='application/javascript')
+
 @view
 def people(request):
     """Display a list of people."""

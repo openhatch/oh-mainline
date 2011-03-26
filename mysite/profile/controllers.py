@@ -183,3 +183,18 @@ def parse_string_query(s):
         parsed['q'] = parsed['q'][1:-1]
 
     return parsed
+
+### This is a helper used by the map to pull out just the information that the map can use
+def get_person_data_for_map(person):
+    return {
+        'name': person.get_full_name_or_username(),
+        'location': person.get_public_location_or_default(),
+        }
+
+# This is a helper function for generating the mapping of person IDs -> location data,
+# as a dictionary, so that we can provide it to the map JavaScript.
+def get_people_location_data_as_dict(people):
+    person_id2data = dict([
+            (person.pk, get_person_data_for_map(person))
+            for person in people])
+    return person_id2data
