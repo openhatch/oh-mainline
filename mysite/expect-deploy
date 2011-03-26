@@ -14,8 +14,8 @@ expect "$ "
 send "cd milestone-a\r"
 expect "$ "
 
-status "\r\n*** Fetching changes from git's remote repository... ***\r\n"
 send "git fetch\r"
+status "\r\n*** Fetching changes from git's remote repository... ***\r\n"
 expect "$ "
 
 status "\r\n*** Checking for uncommitted modifications to the remote filesystem... ***\r\n"
