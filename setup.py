@@ -50,7 +50,6 @@ setup(
                         'django-assets==0.2.1',
                         'python-github2==0.1.1',
                         'pygeoip==0.1.3',
-                        'django-debug-toolbar==0.8.1',
                         'mechanize',
                         'keyring==0.5.0.1',
                         'pysolr',
