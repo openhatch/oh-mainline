@@ -36,11 +36,11 @@ class Command(BaseCommand):
 
         covers_things_until = datetime.datetime.utcnow()
 
-        SEVEN_DAYS = datetime.timedelta(days=7)
+        EIGHT_DAYS = datetime.timedelta(days=8)
 
-        if ((covers_things_until - SEVEN_DAYS) < covers_things_since):
-            print "OK - Last email sent less than 7 days ago"
+        if ((covers_things_until - EIGHT_DAYS) < covers_things_since):
+            print "OK - Last email sent less than 8 days ago"
             return 0
         else:
-            print "CRITICAL - Last email sent more than 7 days ago"
+            print "CRITICAL - Last email sent more than 8 days ago"
             return 2
