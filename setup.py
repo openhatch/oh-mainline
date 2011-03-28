@@ -64,7 +64,7 @@ setup(
                         'python-launchpad-bugs',
                         'html2text',
                         'lockfile>=0.9', # as of this writing, pypi only has version 0.8
-                        'python-openid==2.2.5', # as of this writing, upstream has an HTML file where a tar.gz should be
+                        'python-openid==2.2.5-openhatch1', # as of this writing, upstream has an HTML file where a tar.gz should be
                         'sessionprofile==1.0',
                        ],
 
