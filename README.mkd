@@ -20,12 +20,9 @@ OpenHatch is currently designed to run on Python 2.6.
 
 ### Operating system ###
 
-We develop on Debian 6.0 ("squeeze" AKA "testing") and on Ubuntu 9.x and 10.x,
-and we run the openhatch.org website on Debian 6.0.
+We develop on Debian 6.0 and Ubuntu 10.x, and currently we run the openhatch.org website on Debian 6.0.
 
-If you're running a different system, you might need to adjust the instructions.
-In particular, if you run Debian stable, take a look at the "Installing on Debian Stable"
-section below.
+If you're running a different Operating system, you might need to adjust the instructions.
 
 ### System dependencies ###
 
@@ -37,8 +34,6 @@ This is what we do on Debian testing/unstable:
     sudo apt-get install python2.6-dev python-libxml2 memcached python-mysqldb python-setuptools libxml2-dev libxslt-dev mysql-server mysql-client python-xapian python-setuptools python-imaging
 
 Or the equivalent for your system. (It's important that you get Python 2.6 or greater -- some of the OpenHatch code depends on Python 2.6 or higher.)
-
-Debian stable does not currently (Sept 1 2010) have the necessary packages, you must either run Debian testing/unstable or use apt-pinning.  See below for how to install on Debian stable.
 
 On some Operating Systems you may not need (or be able) to install all of the above packages, depending on what comes prebuilt with Python as default. If you do find a package for any of the above for your system, you should install it.
 
@@ -157,33 +152,6 @@ Since this can take a while, it is a good idea to run this somewhere where it wo
 ## To make the svn missions work ##
 
 Subversion repositories for the svn training missions are stored in mysite/missions-userdata/svn. This directory must be available via svnserve for users to be able to do the svn missions.  See mysite/missions-userdata/svn/README for more details.
-
-## Installing on Debian Stable ##
-
-As of this writing, Debian Stable is 5.0, Lenny
-
-[Apt pinning](http://jaqque.sbih.org/kplug/apt-pinning.html) is required, once it's configured it lets you install packages from testing (and unstable).
-This is required to be able to get the packages that exist in testing but don't exist or aren't up to date in stable.
-
-    sudo aptitude -t testing install python2.6-dev python-libxml2 memcached python-lxml python-mysqldb python-imaging
-
-Or if you'll be installing the mysql server locally;
-
-    sudo aptitude -t testing install python2.6-dev python-libxml2 memcached python-lxml python-mysqldb python-imaging mysql-server
-
-Note this is not the same command as was used above, there are two differences.  First and most importantly, the `-t testing` argument.  This tells aptitude to install the testing version of the package, and try to meet any dependencies from testing.  Second is that this time I used aptitude instead of apt-get.  I use aptitude over apt-get especially when the system is configured to use apt pinning because aptitude is better at resolving dependencies.
-
-If you use aptitude you may see output such as this;
-
-    Upgrade the following packages:
-    libc6-i686 [2.7-18lenny4 (stable, stable, stable, now) -> 2.11.2-2 (testing)]
-
-    Score is 120
-
-    Accept this solution? [Y/n/q/?] 
-
-This is normal, it's just checking with you before applying the solution its chosen to resolve that dependency or broken package.  Press `y` and hit enter to continue to the prompt you are familiar with from apt-get [then press `y` and hit enter again].
-From here, you can go back up to the Run Buildout section above and continue from there.
 
 ## Testing ##
 
