@@ -546,7 +546,6 @@ def project_query2mappable_orm_people(parsed_query):
 
     return mappable_people, extra_data
 
-# FIXME: Change the map so this is JSON, not a big JavaScript variable.
 def person_id2data_as_javascript(request):
     # The point of this view is to provide a JSON dump of the public
     # locations for people relevant to this request.
@@ -580,8 +579,7 @@ def person_id2data_as_javascript(request):
     person_id2data = mysite.profile.controllers.get_people_location_data_as_dict(relevant_people)
 
     as_json = simplejson.dumps(person_id2data)
-    response_text = "var geocode_person_id_data = " + as_json + ";"
-    return HttpResponse(response_text,
+    return HttpResponse(as_json,
                         mimetype='application/javascript')
 
 @view
