@@ -185,7 +185,7 @@ def url_is_more_fresh_than_one_day(url):
     url_timestamp = mysite.base.models.Timestamp.get_timestamp_for_string(key)
     url_age = datetime.datetime.now() - url_timestamp
     # Does that age indicate we GET'd this URL within the past day?
-    url_is_fresh = (url_age < datetime.timedelta(days=1))
+    url_is_fresh = (url_age < datetime.timedelta(hours=20))
     # SIDE EFFECT: This function bumps that timestamp!
     mysite.base.models.Timestamp.update_timestamp_for_string(key)
     return url_is_fresh

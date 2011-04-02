@@ -508,7 +508,7 @@ class Bug(OpenHatchModel):
 
     def data_is_more_fresh_than_one_day(self):
         age = datetime.datetime.now() - self.last_polled
-        if age < datetime.timedelta(days=1):
+        if age < datetime.timedelta(hours=20):
             return True
         return False
 

@@ -196,7 +196,7 @@ def query_is_more_fresh_than_one_day(google_name, query):
     query_timestamp = mysite.base.models.Timestamp.get_timestamp_for_string(key)
     query_age = datetime.datetime.now() - query_timestamp
     # Does that age indicate we GET'd this query within the past day?
-    query_is_fresh = (query_age < datetime.timedelta(days=1))
+    query_is_fresh = (query_age < datetime.timedelta(hours=20))
     # SIDE EFFECT: This function bumps that timestamp!
     mysite.base.models.Timestamp.update_timestamp_for_string(key)
     return query_is_fresh
