@@ -17,6 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import mysite.base.unicode_sanity
+import mysite.base.disk_cache
 import simplejson
 from django.core.urlresolvers import reverse
 import django.contrib.auth.views
@@ -151,7 +152,11 @@ def cached_geocoding_in_json(address):
         is_inaccessible = False
     key_name = address2cache_key_name(address)
     geocoded = None
-    geocoded_in_json = cache.get(key_name)
+    if settings.DEBUG:
+        geocoded_in_json = mysite.base.disk_cache.get(key_name)
+    else:
+        geocoded_in_json = cache.get(key_name)
+
     if geocoded_in_json is None:
         geocoded = _geocode(address) or {}
         geocoded_and_inaccessible = {'is_inaccessible': is_inaccessible}
@@ -162,7 +167,10 @@ def cached_geocoding_in_json(address):
             cache_duration = A_LONG_TIME_IN_SECONDS + random.randrange(0, JUST_FIVE_MINUTES_IN_SECONDS) # cache for a week, which should be plenty
         else:
             cache_duration = random.randrange(0, JUST_FIVE_MINUTES_IN_SECONDS)
-        cache.set(key_name, geocoded_in_json, cache_duration)
+        if settings.DEBUG:
+            mysite.base.disk_cache.set(key_name, geocoded_in_json)
+        else:
+            cache.set(key_name, geocoded_in_json, cache_duration)
     return geocoded_in_json
 
 def get_uri_metadata_for_generating_absolute_links(request):
