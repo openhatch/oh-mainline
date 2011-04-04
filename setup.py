@@ -82,7 +82,7 @@ setup(
     dependency_links = [dependency_path,
                         'http://pylockfile.googlecode.com/files/lockfile-0.9.tar.gz#egg=lockfile',
                         'http://pygeoip.googlecode.com/files/pygeoip-0.1.3.zip#egg=pygeoip',
-                        'http://static.palbakulich.me/files/django-debug-toolbar-0.8.4.tar.gz#egg=django-debug-toolbar',
+                        'http://linode.openhatch.org/~paulproteus/django-debug-toolbar-0.8.4.tar.gz#egg=django-debug-toolbar',
                        ],
 
     # FIXME: Write a reasonable comment about zip_safe and include_package_data
