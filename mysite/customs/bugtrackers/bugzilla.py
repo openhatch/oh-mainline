@@ -324,7 +324,7 @@ class BugzillaBugTracker(object):
 def bugzilla_tracker_factory(bt):
 
     def provide_hints_for_how_to_recreate_self(self):
-        return {'bug_tracker_id': bt.id,
+        return {'corresponding_pk': bt.id,
                 'bug_tracker_class': mysite.customs.models.BugzillaTracker}
 
     # Create '__init__' method

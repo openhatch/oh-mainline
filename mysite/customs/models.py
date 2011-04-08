@@ -111,6 +111,15 @@ class BugzillaTracker(models.Model):
     def __str__(self):
         return smart_str('%s' % (self.project_name))
 
+    def create_class_that_can_actually_crawl_bugs(self):
+        # FIXME: This is totally busted.
+        # If you run the tests, you'll see that the project_name isn't somehow
+        # flowing through, and I don't know why. :-(
+        import mysite.customs.bugtrackers.bugzilla
+        factory = mysite.customs.bugtrackers.bugzilla.bugzilla_tracker_factory(self)
+        instance = factory()
+        return instance
+
 class BugzillaUrl(models.Model):
     '''This model stores query or tracker URLs for BugzillaTracker objects.'''
     url = models.URLField(max_length=400,
