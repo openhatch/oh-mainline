@@ -322,6 +322,11 @@ class BugzillaBugTracker(object):
 ############################################################
 # Function that creates classes for individual trackers
 def bugzilla_tracker_factory(bt):
+
+    def provide_hints_for_how_to_recreate_self(self):
+        return {'bug_tracker_id': bt.id,
+                'bug_tracker_class': mysite.customs.models.BugzillaTracker}
+
     # Create '__init__' method
     def __init__(self):
         BugzillaBugTracker.__init__(self,
@@ -398,6 +403,7 @@ def bugzilla_tracker_factory(bt):
     # Generate class dictionary
     # All sub-classes have '__init__' and 'extract_tracker_specific_data' methods
     class_dict = {'__init__': __init__,
+                  'provide_hints_for_how_to_recreate_self': provide_hints_for_how_to_recreate_self,
                   'extract_tracker_specific_data': extract_tracker_specific_data}
 
     # A sub-class will have either a 'generate_current_bug_xml' method or
