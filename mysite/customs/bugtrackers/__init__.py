@@ -14,3 +14,9 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+# This is an extremely skeletal bug tracker-like class,
+# used by the mysite.search.tests.BugCanRefreshItself test.
+class BugTracker(object):
+    def refresh_one_bug(self, bug):
+        pass
+
