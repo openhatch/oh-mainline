@@ -1559,7 +1559,7 @@ class WeCanPollSomethingToCheckIfAProjectIconIsLoaded(TestCase):
 class BugCanRefreshItself(TestCase):
 
     @mock.patch('mysite.customs.bugtrackers.BugTracker.refresh_one_bug')
-    def test(self, mock_refresh_one):
+    def test_from_static_class(self, mock_refresh_one):
         refresh_was_successfully_called = False
         bt = mysite.customs.bugtrackers.BugTracker()
 
