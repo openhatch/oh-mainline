@@ -163,6 +163,7 @@ INSTALLED_APPS = (
     'reversion',
     'debug_toolbar',
     'sessionprofile',
+    'model_utils',
 )
 
 # testrunner allows us to control which testrunner to use

@@ -67,6 +67,7 @@ setup(
                         'lockfile>=0.9', # as of this writing, pypi only has version 0.8
                         'python-openid==2.2.5-openhatch1', # as of this writing, upstream has an HTML file where a tar.gz should be
                         'sessionprofile==1.0',
+                        'django-model-utils',
                        ],
 
     # dependency_links is a list of URLs. If you need to override the URL
@@ -83,6 +84,7 @@ setup(
                         'http://pylockfile.googlecode.com/files/lockfile-0.9.tar.gz#egg=lockfile',
                         'http://pygeoip.googlecode.com/files/pygeoip-0.1.3.zip#egg=pygeoip',
                         'http://linode.openhatch.org/~paulproteus/django-debug-toolbar-0.8.4.tar.gz#egg=django-debug-toolbar',
+                        'http://pypi.python.org/packages/source/d/django-model-utils/django-model-utils-0.6.0.tar.gz#egg=django-model-utils',
                        ],
 
     # FIXME: Write a reasonable comment about zip_safe and include_package_data
