@@ -2379,3 +2379,63 @@ class TestOhlohAccountImportWithException(django.test.TestCase):
                          mail.outbox[0].subject)
 
         self.assertTrue(all(d.completed for d in mysite.profile.models.DataImportAttempt.objects.all()))
+
+class BugsCreatedByBugzillaTrackersCanRefreshThemselves(django.test.TestCase):
+
+    @mock.patch("mysite.customs.bugtrackers.bugzilla.url2bug_data")
+    def setUp(self, mock_xml_opener):
+        # This is a lot of jiggery-pokery to create a BugzillaTracker
+        # corresponding to Miro.  In the actual test, we mock out the
+        # network activity so that when we download bug data, we use
+        # data from a file.
+        #
+        # This setUp() method creates self.miro_instance, which is an
+        # instance of the Miro BugzillaTracker model.
+        mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
+                    settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml')).read())
+
+        miro_tracker = mysite.customs.models.BugzillaTracker(
+                project_name='Miro video player',
+                base_url='http://bugzilla.pculture.org/',
+                bug_project_name_format='{project}',
+                query_url_type='xml',
+                bitesized_type='key',
+                bitesized_text='bitesized',
+                documentation_type='key',
+            )
+        miro_tracker.save()
+        miro_tracker_query_url = mysite.customs.models.BugzillaUrl(
+                url='http://bugzilla.pculture.org/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&field-1-0-0=bug_status&field-1-1-0=product&field-1-2-0=keywords&keywords=bitesized&product=Miro&query_format=advanced&remaction=&type-1-0-0=anyexact&type-1-1-0=anyexact&type-1-2-0=anywords&value-1-0-0=NEW%2CASSIGNED%2CREOPENED&value-1-1-0=Miro&value-1-2-0=bitesized',
+                tracker=miro_tracker,
+                )
+        miro_tracker_query_url.save()
+        gen_miro = mysite.customs.bugtrackers.bugzilla.generate_bugzilla_tracker_classes(tracker_name='Miro video player')
+        miro = gen_miro.next()
+        self.miro_instance = miro()
+
+    @mock.patch("mysite.customs.bugtrackers.bugzilla.url2bug_data")
+    def test_full_grab_miro_bugs(self, mock_xml_opener):
+        mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
+                    settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml')).read())
+
+        # self.miro_instance is the BugzillaTracker instance that corresponds to the Miro bug tracker
+        self.miro_instance.update()
+        all_bugs = Bug.all_bugs.all()
+        self.assertEqual(len(all_bugs), 1)
+        bug = all_bugs[0]
+
+        self.assertEqual(1, mock_xml_opener.call_count)
+
+        # Okay, so now that the BugzillaTracker created a Bug object,
+        # push its polled_date back into the distant past. We will
+        # then ask it to refresh itself.
+        #
+        # We check the mock_xml_opener to make sure that the
+        # BugzillaTracker tried to download the bug data.
+        bug.last_polled = datetime.datetime(1970, 1, 1, 0, 0, 0)
+        bug.save()
+
+        bug.bug_tracker.make_instance().refresh_one_bug(bug)
+
+        self.assertEqual(2, mock_xml_opener.call_count)
+
