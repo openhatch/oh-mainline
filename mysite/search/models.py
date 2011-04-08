@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import importlib
+
 from django.db import models
 from django.core.files.base import ContentFile
 from django.core.files.images import get_image_dimensions
@@ -478,6 +480,51 @@ class Answer(OpenHatchModel):
         ret.save()
         return ret
 
+class BugTracker(OpenHatchModel):
+    # The purpose of this BugTracker model is to permit Bug objects to
+    # find and instantiate their bug tracker, whatever type of bug tracker
+    # it is.
+    #
+    # For now, it can only represent static classes, like the various Bugzilla
+    # bug trackers.
+    #
+    # It is a Model so that Bug objects can simply use a ForeignKey to point at a
+    # BugTracker object.
+    #
+    # I do realize there is some duplication between this and the various bug tracker
+    # classes in customs. This model should probably be renamed.
+    #
+    # We could maybe use the Content Types framework in Django instead of writing
+    # our own wrapper: http://docs.djangoproject.com/en/dev/ref/contrib/contenttypes/
+    # See the (very exciting) "Generic relations" section of that page.
+    #
+    # However, right now, some of our bug tracker classes are not models at all, so
+    # we can't access them through the Django content types framework. Once we convert
+    # those classes to be model instances, then we can ditch this BugTracker class.
+    module_name = models.CharField(max_length=500, blank=True)
+    class_name = models.CharField(max_length=500, blank=True)
+
+    @staticmethod
+    def get_or_create_from_bug_tracker_instance(bug_tracker_instance):
+        # Hopefully, this is just a static class.
+        #
+        # FIXME: Handle dynamically-generated classes, created from database objects.
+
+        # First, make sure that the bug tracker is actually capable of refreshing this bug,
+        # if we asked it.
+        assert hasattr(bug_tracker_instance.__class__, 'refresh_one_bug')
+        module_name = bug_tracker_instance.__class__.__module__
+        class_name = bug_tracker_instance.__class__.__name__
+
+        obj, was_created = BugTracker.objects.get_or_create(module_name=module_name,
+                                                            class_name=class_name)
+        return obj
+
+    def make_instance(self):
+        module = importlib.import_module(self.module_name)
+        cls = getattr(module, self.class_name)
+        return cls()
+
 class OpenBugsManager(models.Manager):
     def get_query_set(self):
         return super(OpenBugsManager, self).get_query_set().filter(
@@ -503,6 +550,8 @@ class Bug(OpenHatchModel):
     concerns_just_documentation = models.BooleanField(default=False)
     as_appears_in_distribution = models.CharField(max_length=200, default='')
 
+    bug_tracker = models.ForeignKey(BugTracker, null=True)
+
     all_bugs = models.Manager()
     open_ones = OpenBugsManager()
 
@@ -514,6 +563,9 @@ class Bug(OpenHatchModel):
 
     def __unicode__(self):
         return "title='%s' project='%s' project__language='%s' description='%s...'" % (self.title, self.project.name, self.project.language, self.description[:50])
+
+    def set_bug_tracker_class_from_instance(self, instance):
+        self.bug_tracker = BugTracker.get_or_create_from_bug_tracker_instance(instance)
 
     @staticmethod
     def create_dummy(**kwargs):
