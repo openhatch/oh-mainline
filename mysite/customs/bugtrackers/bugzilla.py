@@ -250,6 +250,10 @@ class BugzillaBugTracker(object):
             # This is a new bug
             bug = mysite.search.models.Bug(canonical_bug_link = bug_url)
 
+        # If the Bug does not know who made it, tell it:
+        if not bug.bug_tracker:
+            bug.set_bug_tracker_class_from_instance(self)
+
         # Looks like we have some refreshing to do.
         logging.info("[Bugzilla] Refreshing bug %d from project named %s." % (bug_id, self.project_name))
         # Get the dictionary of data to put into the bug. The function for
@@ -276,9 +280,12 @@ class BugzillaBugTracker(object):
     def refresh_all_bugs(self):
         for bug in mysite.search.models.Bug.all_bugs.filter(
                 canonical_bug_link__contains=self.base_url):
-            bb = mysite.customs.bugtrackers.bugzilla.BugzillaBug.from_url(
-                    bug.canonical_bug_link)
-            self.create_or_refresh_one_bugzilla_bug(bb=bb)
+            self.refresh_one_bug(bug)
+
+    def refresh_one_bug(self, bug):
+        bb = mysite.customs.bugtrackers.bugzilla.BugzillaBug.from_url(
+            bug.canonical_bug_link)
+        self.create_or_refresh_one_bugzilla_bug(bb=bb)
 
     def update(self):
         logging.info("[Bugzilla] Started refreshing all bugs from project named %s." % self.project_name)
