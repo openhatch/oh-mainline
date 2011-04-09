@@ -439,9 +439,9 @@ class NagiosTests(django.test.TestCase):
 
         my = data['bug_diagnostics']
 
-        my['Bugs last polled more than than one day + one hour ago'] = 0
-        my['Bugs last polled more than two days ago'] = 0
-        my['Bugs last polled more than two days ago (in percent)'] = 0.0
+        my['Bugs last polled more than than two days + one hour ago'] = 0
+        my['Bugs last polled more than three days ago'] = 0
+        my['Bugs last polled more than three days ago (in percent)'] = 0.0
 
         self.assertEqual(0, mysite.base.views.meta_exit_code(data))
 
@@ -453,9 +453,9 @@ class NagiosTests(django.test.TestCase):
 
         my = data['bug_diagnostics']
 
-        my['Bugs last polled more than than one day + one hour ago'] = 1
-        my['Bugs last polled more than two days ago'] = 0
-        my['Bugs last polled more than two days ago (in percent)'] = 0.0
+        my['Bugs last polled more than than two days + one hour ago'] = 1
+        my['Bugs last polled more than three days ago'] = 0
+        my['Bugs last polled more than three days ago (in percent)'] = 0.0
 
         self.assertEqual(1, mysite.base.views.meta_exit_code(data))
 
@@ -467,9 +467,9 @@ class NagiosTests(django.test.TestCase):
 
         my = data['bug_diagnostics']
 
-        my['Bugs last polled more than than one day + one hour ago'] = 0
-        my['Bugs last polled more than two days ago'] = 1
-        my['Bugs last polled more than two days ago (in percent)'] = 0.0
+        my['Bugs last polled more than than two days + one hour ago'] = 0
+        my['Bugs last polled more than three days ago'] = 1
+        my['Bugs last polled more than three days ago (in percent)'] = 0.0
 
         self.assertEqual(2, mysite.base.views.meta_exit_code(data))
 
