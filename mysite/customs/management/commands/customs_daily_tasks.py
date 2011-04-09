@@ -30,7 +30,6 @@ import mysite.customs.mechanize_helpers
 import mysite.customs.bugtrackers.bugzilla
 import mysite.customs.bugtrackers.google
 import mysite.customs.bugtrackers.launchpad
-import mysite.customs.bugtrackers.opensolaris
 import mysite.customs.bugtrackers.roundup
 import mysite.customs.bugtrackers.trac
 
@@ -65,7 +64,6 @@ If argument(s) are supplied, only the corresponding functions are run.
 With no arguments, all importers and the Ohloh broken link expunger are run.
 
 Supported tracker types:
- * opensolaris
  * roundup
  * trac
  * bugzilla
@@ -174,13 +172,6 @@ Supported tracker types:
         # Second, we go through our *own* database of Launchpad-sourced bugs, and make sure they are all up to date
         mysite.customs.bugtrackers.launchpad.refresh_all_launchpad_bugs()
 
-    def update_opensolaris_osnet(self):
-        try:
-            mysite.customs.bugtrackers.opensolaris.update()
-        except urllib2.URLError, e:
-            logging.error("[OpenSolaris] ERROR: Importer failed with urllib2.URLError, skipping...")
-            logging.error("[OpenSolaris] Error message: %s" % str(e))
-
     def check_for_broken_ohloh_links(self):
         for citation in mysite.profile.models.Citation.untrashed.filter(
             data_import_attempt__source__in=('oh', 'rs')):
@@ -200,7 +191,6 @@ Supported tracker types:
     def handle(self, *args, **options):
         cdt_fns = {
                 'ohloh': self.check_for_broken_ohloh_links,
-                'opensolaris': self.update_opensolaris_osnet,
                 'trac': self.find_and_update_enabled_trac_instances,
                 'roundup': self.find_and_update_enabled_roundup_trackers,
                 'bugzilla': self.find_and_update_enabled_bugzilla_instances,

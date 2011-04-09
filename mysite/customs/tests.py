@@ -1760,35 +1760,6 @@ class LineAcceptorTest(django.test.TestCase):
         self.assertEqual(got_response[0], wanted)
         got_response[:] = []        
 
-class OpenSolaris(django.test.TestCase):
-
-    open_bug_filename = os.path.join(settings.MEDIA_ROOT, 'sample-data',
-            "open-opensolaris-bug.html")
-
-    @mock.patch('urllib2.urlopen')
-    @mock.patch('mysite.customs.bugtrackers.opensolaris.Bug.all_bugs.get')
-    def test_existing_bug_is_updated(self, mock_bug_to_update, mock_urlopen):
-        """This method tests that an existing bug
-         which should be updated is updated"""
-        mock_urlopen.return_value = open(self.open_bug_filename)
-        bug = Bug()
-        bug.canonical_bug_link = "http://bugs.opensolaris.org/bugdatabase/view_bug.do?bug_id=1"
-        bug.last_polled = datetime.datetime.utcnow() - datetime.timedelta(days=2)
-        mock_bug_to_update.return_value = bug
-        bug_result = mysite.customs.bugtrackers.opensolaris.create_bug_object_for_remote_bug_id_if_necessary(1)
-        self.assertEquals(bug_result, True)
-
-    @mock.patch('mysite.customs.bugtrackers.opensolaris.Bug.all_bugs.get')
-    def test_existing_bug_is_not_updated(self, mock_bug_to_not_update):
-        """This method tests that an existing bug
-         which should not be updated is not updated"""
-        bug = Bug()
-        bug.canonical_bug_link = "http://bugs.opensolaris.org/bugdatabase/view_bug.do?bug_id=1"
-        bug.last_polled = datetime.datetime.utcnow()
-        mock_bug_to_not_update.return_value = bug
-        bug_result = mysite.customs.bugtrackers.opensolaris.create_bug_object_for_remote_bug_id_if_necessary(1)
-        self.assertEquals(bug_result, False)
-
 class BugzillaImporterOnlyPerformsAQueryOncePerDay(django.test.TestCase):
     def test_url_is_more_fresh_than_one_day(self):
         # What the heck, let's demo this function out with the Songbird documentation query.
@@ -1877,16 +1848,6 @@ class DailyBugImporter(django.test.TestCase):
     def test_google_generic_error_does_break(self, mock_error):
         mock_error.side_effect = ValueError()
         self.assertRaises(ValueError, mysite.customs.management.commands.customs_daily_tasks.Command().find_and_update_enabled_google_instances)
-
-    @mock.patch('urllib2.urlopen')
-    def test_opensolaris_http_error_408_does_not_break(self, mock_error):
-        mock_error.side_effect = generate_408
-        mysite.customs.management.commands.customs_daily_tasks.Command().update_opensolaris_osnet()
-
-    @mock.patch('urllib2.urlopen')
-    def test_opensolaris_generic_error_does_break(self, mock_error):
-        mock_error.side_effect = ValueError()
-        self.assertRaises(ValueError, mysite.customs.management.commands.customs_daily_tasks.Command().update_opensolaris_osnet)
 
 def google_tests_sympy_extract_tracker_specific_data(issue, ret_dict):
     # Make modifications to ret_dict using provided atom data
