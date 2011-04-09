@@ -83,10 +83,10 @@ def render_response(req, *args, **kwargs):
 def clear_static_cache(path):
     '''Atomically destroy the static file cache for a certain path.'''
     # Steps:
-    fully_qualified_path = os.path.join(settings.WEB_ROOT, path)
+    fully_qualified_path = os.path.join(django.conf.settings.WEB_ROOT, path)
 
     # 0. Create new temp dir
-    new_temp_path = tempfile.mkdtemp(settings.WEB_ROOT)
+    new_temp_path = tempfile.mkdtemp(django.conf.settings.WEB_ROOT)
 
     # 1. Atomically move the path that we want to expire into the new directory
     try:
