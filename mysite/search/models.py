@@ -554,6 +554,7 @@ class BugTracker(OpenHatchModel):
             return cls.all_trackers.get(pk=self.bug_tracker_model_pk).create_class_that_can_actually_crawl_bugs()
 
         # Otherwise, it's a raw, hard-coded class that we can import.
+        module = importlib.import_module(self.module_name)
         cls = getattr(module, self.class_name)
         return cls()
 
