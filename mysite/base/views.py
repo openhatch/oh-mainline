@@ -189,25 +189,25 @@ def meta_data():
     # local name for shortness
     my = data['bug_diagnostics']
 
-    one_hour_and_one_day_ago = (datetime.datetime.now() -
-                                datetime.timedelta(days=1, hours=1))
+    one_hour_and_two_days_ago = (datetime.datetime.now() -
+                                datetime.timedelta(days=2, hours=1))
 
-    my['Bugs last polled more than than one day + one hour ago'] = mysite.search.models.Bug.all_bugs.filter(
-        last_polled__lt=one_hour_and_one_day_ago).count()
+    my['Bugs last polled more than than two days + one hour ago'] = mysite.search.models.Bug.all_bugs.filter(
+        last_polled__lt=one_hour_and_two_days_ago).count()
 
-    two_days_ago = (datetime.datetime.now() -
-                    datetime.timedelta(days=2))
-    my['Bugs last polled more than two days ago'] = mysite.search.models.Bug.all_bugs.filter(
-        last_polled__lt=two_days_ago).count()
+    three_days_ago = (datetime.datetime.now() -
+                    datetime.timedelta(days=3))
+    my['Bugs last polled more than three days ago'] = mysite.search.models.Bug.all_bugs.filter(
+        last_polled__lt=three_days_ago).count()
 
     # Test for 0 division
     allbug = mysite.search.models.Bug.all_bugs.count()
     perbug = 0.0
     if allbug:
         perbug = ( mysite.search.models.Bug.all_bugs.filter(
-            last_polled__lt=two_days_ago).count() * 100.0 / allbug)
+            last_polled__lt=three_days_ago).count() * 100.0 / allbug)
 
-    my['Bugs last polled more than two days ago (in percent)'] = perbug
+    my['Bugs last polled more than three days ago (in percent)'] = perbug
 
     return data
 
@@ -219,19 +219,19 @@ def meta_exit_code(data=None):
     my = data['bug_diagnostics']
 
     # More temp variables for shortness
-    bug1 = my['Bugs last polled more than than one day + one hour ago']
-    bug2 = my['Bugs last polled more than two days ago']
-    perbug = my['Bugs last polled more than two days ago (in percent)']
+    bug1 = my['Bugs last polled more than than two days + one hour ago']
+    bug2 = my['Bugs last polled more than three days ago']
+    perbug = my['Bugs last polled more than three days ago (in percent)']
 
     # Exit codes and stdout for Nagios integration
     if bug2:
-        print "{0} - Polled 1+: {1} Polled 2+: {2} ({3}%)".format("CRITICAL", bug1, bug2, perbug)
+        print "{0} - Polled 2+: {1} Polled 3+: {2} ({3}%)".format("CRITICAL", bug1, bug2, perbug)
         return 2 
     elif bug1:
-        print "{0} - Polled 1+: {1} Polled 2+: {2} ({3}%)".format("WARNING", bug1, bug2, perbug)
+        print "{0} - Polled 2+: {1} Polled 3+: {2} ({3}%)".format("WARNING", bug1, bug2, perbug)
         return 1
     else:
-        print "{0} - Polled 1+: {1} Polled 2+: {2} ({3}%)".format("OK", bug1, bug2, perbug)
+        print "{0} - Polled 2+: {1} Polled 3+: {2} ({3}%)".format("OK", bug1, bug2, perbug)
         return 0
         
 @view
