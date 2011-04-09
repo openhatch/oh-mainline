@@ -590,9 +590,8 @@ class Bug(OpenHatchModel):
 
     def data_is_more_fresh_than_one_day(self):
         age = datetime.datetime.now() - self.last_polled
-        if age < datetime.timedelta(hours=20):
-            return True
-        return False
+        seems_really_fresh = age < datetime.timedelta(hours=20)
+        return seems_really_fresh
 
     def __unicode__(self):
         return "title='%s' project='%s' project__language='%s' description='%s...'" % (self.title, self.project.name, self.project.language, self.description[:50])
