@@ -514,7 +514,10 @@ class BugTracker(OpenHatchModel):
     @staticmethod
     def _instance2module_and_class(instance):
         module_name = instance.__module__
-        class_name = instance.__name__
+        try:
+            class_name = instance.__name__
+        except AttributeError:
+            class_name = instance.__class__.__name__
         return module_name, class_name
 
     @staticmethod
