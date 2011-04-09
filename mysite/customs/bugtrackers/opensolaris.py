@@ -64,18 +64,26 @@ def decode_datetime(s):
 
 BUG_URL_PREFIX = 'http://bugs.opensolaris.org/bugdatabase/view_bug.do?bug_id='
 
-def create_bug_object_for_remote_bug_id_if_necessary(remote_bug_id):
+def create_bug_object_for_remote_bug_id_if_necessary(remote_bug_id, override_bug_object=None):
     """See if we have either no bug or only a stale one.
     If this is the case, run a refresh."""
     remote_bug_url = BUG_URL_PREFIX + "%d" % remote_bug_id
     logging.info("Was asked to look at bug %d in OpenSolaris OS/Net" % remote_bug_id)
-    try:
-        bug = Bug.all_bugs.get(canonical_bug_link=remote_bug_url)
-        if bug.data_is_more_fresh_than_one_day():
-            return False
-    except Bug.DoesNotExist:
-        bug = Bug()
-        bug.canonical_bug_link = remote_bug_url
+    if override_bug_object:
+        bug = override_bug_object
+    else:
+        try:
+            bug = Bug.all_bugs.get(canonical_bug_link=remote_bug_url)
+        except Bug.DoesNotExist:
+            bug = Bug()
+            bug.canonical_bug_link = remote_bug_url
+
+    if bug.data_is_more_fresh_than_one_day():
+        return False
+
+    if not bug.bug_tracker:
+        bug.set_bug_tracker_class_from_instance(DummyClassToSatisfyNewBugTrackerAPI())
+
     # If we got to here, we either have a new bug or an stale one.
     # So refresh away!
     bug = _update_bug_object_for_remote_bug_id(
@@ -157,5 +165,13 @@ def update():
         create_bug_object_for_remote_bug_id_if_necessary(bug_id)
         count += 1
     logging.info("Okay, looked at %d bugs from OpenSolaris OS/Net." % count)
+
+class DummyClassToSatisfyNewBugTrackerAPI(object):
+    def __init__(self):
+        self.__name__ = 'DummyClassToSatisfyNewBugTrackerAPI' # really necessary?
+
+    def refresh_one_bug(self, bug_object):
+        remote_bug_id = bug_url2bug_id(bug_object.canonical_bug_link)
+        create_bug_object_for_remote_bug_id_if_necessary(remote_bug_id, override_bug_object=bug_object)
 
 # vim: set nu:
