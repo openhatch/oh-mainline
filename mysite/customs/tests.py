@@ -2,7 +2,7 @@
 # vim: set ai et ts=4 sw=4:
 
 # This file is part of OpenHatch.
-# Copyright (C) 2010 Jack Grigg
+# Copyright (C) 2010, 2011 Jack Grigg
 # Copyright (C) 2010 Karen Rustad
 # Copyright (C) 2009, 2010, 2011 OpenHatch, Inc.
 # Copyright (C) 2010 Mark Freeman
@@ -66,6 +66,7 @@ import mysite.customs.feed
 import mysite.customs.github
 
 import mysite.customs.models
+import mysite.customs.bugimporters.trac
 import mysite.customs.bugtrackers.roundup
 import mysite.customs.bugtrackers.launchpad
 import mysite.customs.management.commands.customs_daily_tasks
@@ -118,8 +119,21 @@ class FakeGetPage(object):
     def getPage(self, url):
         assert type(url) == str
         d = twisted.internet.defer.Deferred()
-        # FIXME: One day, support errback.
         d.callback(self.url2data[url])
+        return d
+
+    """This is a fake version of Twisted.web's getPage() function.
+    It returns a Deferred that is already 'fired', and has been passed a
+    Failure containing an HTTP 404 Error.
+
+    It never adds the Deferred to the 'reactor', so calling reactor.start()
+    should be a no-op."""
+    def get404(self, url):
+        d = twisted.internet.defer.Deferred()
+        d.errback(
+                twisted.python.failure.Failure(
+                    twisted.web.error.Error(
+                        404, 'File Not Found', None)))
         return d
 
 # Create a module-level global that is the fake getPage
@@ -1717,6 +1731,322 @@ class TracBug(django.test.TestCase):
 
         twisted = mysite.customs.bugtrackers.trac.TwistedTrac()
         twisted.refresh_all_bugs()
+        self.assert_(Bug.all_bugs.count() == 0)
+
+class TracBugParser(django.test.TestCase):
+    def setUp(self):
+        # Set up the Twisted TrackerModels that will be used here.
+        self.tm = mysite.customs.models.TracTracker.all_trackers.create(
+                project_name='Twisted',
+                base_url='http://twistedmatrix.com/trac/',
+                bug_project_name_format='{project}',
+                bitesized_type='keywords',
+                bitesized_text='easy',
+                documentation_type='keywords',
+                documentation_text='documentation')
+        self.tm2 = mysite.customs.models.TracTracker.all_trackers.create(
+                project_name='Trac',
+                base_url='http://trac.edgewall.org/',
+                bug_project_name_format='{project}',
+                bitesized_type='keywords',
+                bitesized_text='bitesized',
+                documentation_type=None)
+
+    def test_create_bug_object_data_dict_more_recent(self):
+        tbp = mysite.customs.bugimporters.trac.TracBugParser(
+            bug_url='http://twistedmatrix.com/trac/ticket/4298')
+        tbp.bug_csv = {
+            'branch': '',
+            'branch_author': '',
+            'cc': 'thijs_ exarkun',
+            'component': 'core',
+            'description': "This package hasn't been touched in 4 years which either means it's stable or not being used at all. Let's deprecate it (also see #4111).",
+            'id': '4298',
+            'keywords': 'easy',
+            'launchpad_bug': '',
+            'milestone': '',
+            'owner': 'djfroofy',
+            'priority': 'normal',
+            'reporter': 'thijs',
+            'resolution': '',
+            'status': 'new',
+            'summary': 'Deprecate twisted.persisted.journal',
+            'type': 'task'}
+        cached_html_filename = os.path.join(settings.MEDIA_ROOT, 'sample-data', 'twisted-trac-4298-on-2010-04-02.html')
+        tbp.set_bug_html_data(unicode(
+            open(cached_html_filename).read(), 'utf-8'))
+        self.assertEqual(tbp.component, 'core')
+
+        got = tbp.get_parsed_data_dict(self.tm)
+        del got['last_polled']
+        wanted = {'title': 'Deprecate twisted.persisted.journal',
+                  'description': "This package hasn't been touched in 4 years which either means it's stable or not being used at all. Let's deprecate it (also see #4111).",
+                  'status': 'new',
+                  'importance': 'normal',
+                  'people_involved': 4,
+                  # FIXME: Need time zone
+                  'date_reported': datetime.datetime(2010, 2, 23, 0, 46, 30),
+                  'last_touched': datetime.datetime(2010, 3, 12, 18, 43, 5),
+                  'looks_closed': False,
+                  'submitter_username': 'thijs',
+                  'submitter_realname': '',
+                  'canonical_bug_link': 'http://twistedmatrix.com/trac/ticket/4298',
+                  'good_for_newcomers': True,
+                  'looks_closed': False,
+                  'bite_size_tag_name': 'easy',
+                  'concerns_just_documentation': False,
+                  'as_appears_in_distribution': '',
+                  }
+        self.assertEqual(wanted, got)
+
+    def test_create_bug_object_data_dict(self):
+        tbp = mysite.customs.bugimporters.trac.TracBugParser(
+            bug_url='http://twistedmatrix.com/trac/ticket/4298')
+        tbp.bug_csv = {
+            'branch': '',
+            'branch_author': '',
+            'cc': 'thijs_ exarkun',
+            'component': 'core',
+            'description': "This package hasn't been touched in 4 years which either means it's stable or not being used at all. Let's deprecate it (also see #4111).",
+            'id': '4298',
+            'keywords': 'easy',
+            'launchpad_bug': '',
+            'milestone': '',
+            'owner': 'djfroofy',
+            'priority': 'normal',
+            'reporter': 'thijs',
+            'resolution': '',
+            'status': 'new',
+            'summary': 'Deprecate twisted.persisted.journal',
+            'type': 'task'}
+        cached_html_filename = os.path.join(settings.MEDIA_ROOT, 'sample-data', 'twisted-trac-4298.html')
+        tbp.set_bug_html_data(unicode(
+            open(cached_html_filename).read(), 'utf-8'))
+
+        got = tbp.get_parsed_data_dict(self.tm)
+        del got['last_polled']
+        wanted = {'title': 'Deprecate twisted.persisted.journal',
+                  'description': "This package hasn't been touched in 4 years which either means it's stable or not being used at all. Let's deprecate it (also see #4111).",
+                  'status': 'new',
+                  'importance': 'normal',
+                  'people_involved': 5,
+                  # FIXME: Need time zone
+                  'date_reported': datetime.datetime(2010, 2, 22, 19, 46, 30),
+                  'last_touched': datetime.datetime(2010, 2, 24, 0, 8, 47),
+                  'looks_closed': False,
+                  'submitter_username': 'thijs',
+                  'submitter_realname': '',
+                  'canonical_bug_link': 'http://twistedmatrix.com/trac/ticket/4298',
+                  'good_for_newcomers': True,
+                  'looks_closed': False,
+                  'bite_size_tag_name': 'easy',
+                  'concerns_just_documentation': False,
+                  'as_appears_in_distribution': '',
+                  }
+        self.assertEqual(wanted, got)
+
+    def test_create_bug_that_lacks_modified_date(self):
+        tbp = mysite.customs.bugimporters.trac.TracBugParser(
+            bug_url='http://twistedmatrix.com/trac/ticket/4298')
+        tbp.bug_csv = {
+            'branch': '',
+            'branch_author': '',
+            'cc': 'thijs_ exarkun',
+            'component': 'core',
+            'description': "This package hasn't been touched in 4 years which either means it's stable or not being used at all. Let's deprecate it (also see #4111).",
+            'id': '4298',
+            'keywords': 'easy',
+            'launchpad_bug': '',
+            'milestone': '',
+            'owner': 'djfroofy',
+            'priority': 'normal',
+            'reporter': 'thijs',
+            'resolution': '',
+            'status': 'new',
+            'summary': 'Deprecate twisted.persisted.journal',
+            'type': 'task'}
+        cached_html_filename = os.path.join(settings.MEDIA_ROOT, 'sample-data', 'twisted-trac-4298-without-modified.html')
+        tbp.set_bug_html_data(unicode(
+            open(cached_html_filename).read(), 'utf-8'))
+
+        got = tbp.get_parsed_data_dict(self.tm)
+        del got['last_polled']
+        wanted = {'title': 'Deprecate twisted.persisted.journal',
+                  'description': "This package hasn't been touched in 4 years which either means it's stable or not being used at all. Let's deprecate it (also see #4111).",
+                  'status': 'new',
+                  'importance': 'normal',
+                  'people_involved': 5,
+                  # FIXME: Need time zone
+                  'date_reported': datetime.datetime(2010, 2, 22, 19, 46, 30),
+                  'last_touched': datetime.datetime(2010, 2, 22, 19, 46, 30),
+                  'looks_closed': False,
+                  'submitter_username': 'thijs',
+                  'submitter_realname': '',
+                  'canonical_bug_link': 'http://twistedmatrix.com/trac/ticket/4298',
+                  'good_for_newcomers': True,
+                  'looks_closed': False,
+                  'bite_size_tag_name': 'easy',
+                  'concerns_just_documentation': False,
+                  'as_appears_in_distribution': '',
+                  }
+        self.assertEqual(wanted, got)
+
+    def test_create_bug_that_lacks_modified_date_and_uses_owned_by_instead_of_assigned_to(self):
+        tbp = mysite.customs.bugimporters.trac.TracBugParser(
+            bug_url='http://twistedmatrix.com/trac/ticket/4298')
+        tbp.bug_csv = {
+            'branch': '',
+            'branch_author': '',
+            'cc': 'thijs_ exarkun',
+            'component': 'core',
+            'description': "This package hasn't been touched in 4 years which either means it's stable or not being used at all. Let's deprecate it (also see #4111).",
+            'id': '4298',
+            'keywords': 'easy',
+            'launchpad_bug': '',
+            'milestone': '',
+            'owner': 'djfroofy',
+            'priority': 'normal',
+            'reporter': 'thijs',
+            'resolution': '',
+            'status': 'new',
+            'summary': 'Deprecate twisted.persisted.journal',
+            'type': 'task'}
+        cached_html_filename = os.path.join(settings.MEDIA_ROOT, 'sample-data', 'twisted-trac-4298-without-modified-using-owned-instead-of-assigned.html')
+        tbp.set_bug_html_data(unicode(
+            open(cached_html_filename).read(), 'utf-8'))
+
+        got = tbp.get_parsed_data_dict(self.tm)
+        del got['last_polled']
+        wanted = {'title': 'Deprecate twisted.persisted.journal',
+                  'description': "This package hasn't been touched in 4 years which either means it's stable or not being used at all. Let's deprecate it (also see #4111).",
+                  'status': 'new',
+                  'importance': 'normal',
+                  'people_involved': 5,
+                  # FIXME: Need time zone
+                  'date_reported': datetime.datetime(2010, 2, 22, 19, 46, 30),
+                  'last_touched': datetime.datetime(2010, 2, 22, 19, 46, 30),
+                  'looks_closed': False,
+                  'submitter_username': 'thijs',
+                  'submitter_realname': '',
+                  'canonical_bug_link': 'http://twistedmatrix.com/trac/ticket/4298',
+                  'good_for_newcomers': True,
+                  'looks_closed': False,
+                  'bite_size_tag_name': 'easy',
+                  'concerns_just_documentation': False,
+                  'as_appears_in_distribution': '',
+                  }
+        self.assertEqual(wanted, got)
+
+    def test_create_bug_that_has_new_date_format(self):
+        tbp = mysite.customs.bugimporters.trac.TracBugParser(
+            bug_url='http://trac.edgewall.org/ticket/3275')
+        tbp.bug_csv = {
+                  'description': u"Hi\r\n\r\nWhen embedding sourcecode in wiki pages using the {{{-Makro, I would sometimes like to have line numbers displayed. This would make it possible to reference some lines in a text, like: \r\n\r\n''We got some c-sourcecode here, in line 1, a buffer is allocated, in line 35, some data is copied to the buffer without checking the size of the data...''\r\n\r\nThe svn browser shows line numbers, so I hope this will not be so difficult.",
+                  'status': 'new',
+                  'keywords': '',
+                  'summary': 'Show line numbers when embedding source code in wiki pages',
+                  'priority': '',
+                  'reporter': 'erik@\xe2\x80\xa6',
+                  'id': '3275'}
+        cached_html_filename = os.path.join(settings.MEDIA_ROOT, 'sample-data', 'trac-3275.html')
+        tbp.set_bug_html_data(unicode(
+            open(cached_html_filename).read(), 'utf-8'))
+
+        got = tbp.get_parsed_data_dict(self.tm2)
+        del got['last_polled']
+        wanted = {'status': 'new', 'as_appears_in_distribution': u'',
+                  'description': u"Hi\r\n\r\nWhen embedding sourcecode in wiki pages using the {{{-Makro, I would sometimes like to have line numbers displayed. This would make it possible to reference some lines in a text, like: \r\n\r\n''We got some c-sourcecode here, in line 1, a buffer is allocated, in line 35, some data is copied to the buffer without checking the size of the data...''\r\n\r\nThe svn browser shows line numbers, so I hope this will not be so difficult.",
+                  'importance': '', 'bite_size_tag_name': 'bitesized', 'canonical_bug_link': 'http://trac.edgewall.org/ticket/3275', 'date_reported': datetime.datetime(2006, 6, 16, 15, 1, 52),
+                  'submitter_realname': '', 'title': 'Show line numbers when embedding source code in wiki pages', 'people_involved': 3, 'last_touched': datetime.datetime(2010, 11, 26, 13, 45, 45),
+                  'submitter_username': 'erik@\xe2\x80\xa6', 'looks_closed': False, 'good_for_newcomers': False, 'concerns_just_documentation': False}
+        self.assertEqual(wanted, got)
+
+class TracBugImporterTests(django.test.TestCase):
+    def setUp(self):
+        # Set up the Twisted TrackerModels that will be used here.
+        self.tm = mysite.customs.models.TracTrackerModel.all_trackers.create(
+                tracker_name='Twisted',
+                base_url='http://twistedmatrix.com/trac/',
+                bug_project_name_format='{tracker_name}',
+                bitesized_type='keywords',
+                bitesized_text='easy',
+                documentation_type='keywords',
+                documentation_text='documentation')
+        self.im = mysite.customs.bugimporters.trac.TracBugImporter(self.tm, None)
+
+    def test_handle_query_csv(self):
+        # Zero the bug_ids list just in case.
+        self.im.bug_ids = []
+        # Pass in a query CSV.
+        cached_csv_filename = os.path.join(settings.MEDIA_ROOT, 'sample-data', 'twisted-trac-query-easy-bugs-on-2011-04-13.csv')
+        self.im.handle_query_csv(unicode(
+            open(cached_csv_filename).read(), 'utf-8'))
+        # Check the extracted bugs.
+        self.assertEqual(len(self.im.bug_ids), 18)
+
+    def test_handle_bug_html_for_new_bug(self, second_run=False):
+        # Check the number of Bugs present.
+        all_bugs = Bug.all_bugs.all()
+        if second_run:
+            self.assertEqual(len(all_bugs), 1)
+            old_last_polled = all_bugs[0].last_polled
+        else:
+            self.assertEqual(len(all_bugs), 0)
+        # Create a TracBugParser
+        tbp = mysite.customs.bugimporters.trac.TracBugParser(
+            bug_url='http://twistedmatrix.com/trac/ticket/4298')
+        tbp.bug_csv = {
+            'branch': '',
+            'branch_author': '',
+            'cc': 'thijs_ exarkun',
+            'component': 'core',
+            'description': "This package hasn't been touched in 4 years which either means it's stable or not being used at all. Let's deprecate it (also see #4111).",
+            'id': '4298',
+            'keywords': 'easy',
+            'launchpad_bug': '',
+            'milestone': '',
+            'owner': 'djfroofy',
+            'priority': 'normal',
+            'reporter': 'thijs',
+            'resolution': '',
+            'status': 'new',
+            'summary': 'Deprecate twisted.persisted.journal',
+            'type': 'task'}
+        cached_html_filename = os.path.join(settings.MEDIA_ROOT, 'sample-data', 'twisted-trac-4298-on-2010-04-02.html')
+        self.im.handle_bug_html(unicode(
+            open(cached_html_filename).read(), 'utf-8'), tbp)
+
+        # Check there is now one Bug.
+        all_bugs = Bug.all_bugs.all()
+        self.assertEqual(len(all_bugs), 1)
+        # Check that the Bug is correct.
+        bug = all_bugs[0]
+        if second_run:
+            self.assert_(bug.last_polled > old_last_polled)
+        self.assertEqual(bug.title, 'Deprecate twisted.persisted.journal')
+        self.assertEqual(bug.submitter_username, 'thijs')
+        self.assertEqual(bug.tracker, self.tm)
+
+    def test_handle_bug_html_for_existing_bug(self):
+        self.test_handle_bug_html_for_new_bug()
+        time.sleep(2)
+        self.test_handle_bug_html_for_new_bug(second_run=True)
+
+    @mock.patch('twisted.web.client.getPage', fakeGetPage.get404)
+    def test_bug_that_404s_is_deleted(self):
+        dummy_project = Project.create_dummy()
+        bug = Bug()
+        bug.project = dummy_project
+        bug.canonical_bug_link = 'http://twistedmatrix.com/trac/ticket/1234'
+        bug.date_reported = datetime.datetime.utcnow()
+        bug.last_touched = datetime.datetime.utcnow()
+        bug.last_polled = datetime.datetime.utcnow() - datetime.timedelta(days=2)
+        bug.tracker = self.tm
+        bug.save()
+        self.assert_(Bug.all_bugs.count() == 1)
+
+        cmd = mysite.customs.management.commands.customs_twist.Command()
+        cmd.handle(use_reactor=False)
         self.assert_(Bug.all_bugs.count() == 0)
 
 class LineAcceptorTest(django.test.TestCase):
