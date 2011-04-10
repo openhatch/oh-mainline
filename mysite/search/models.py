@@ -72,6 +72,10 @@ def get_image_data_scaled(image_data, width):
 
 
 class Project(OpenHatchModel):
+    def save(self, *args, **kwargs):
+        if not self.display_name:
+            self.display_name = self.name
+        super(Project, self).save(*args, **kwargs)
 
     @staticmethod
     def generate_random_icon_path(instance, filename):
@@ -121,6 +125,7 @@ class Project(OpenHatchModel):
 
     name = models.CharField(max_length=200, unique=True,
             help_text='<span class="example">This box is for fixing capitalization mistakes. To change the name of this project, email <a style="color: #666;" href="mailto:%s">%s</a>.</span>' % (('hello@openhatch.org',)*2))
+    display_name = models.CharField(max_length=200, default='')
     homepage = models.URLField(max_length=200, blank=True, default='',
             verbose_name='Project homepage URL')
     language = models.CharField(max_length=200, blank=True, default='',
@@ -277,7 +282,7 @@ class Project(OpenHatchModel):
         return ret[:n]
 
     def __unicode__(self):
-        return "name='%s' language='%s'" % (self.name, self.language)
+        return "name='%s' display_name='%s' language='%s'" % (self.name, self.display_name, self.language)
     
     def get_url(self):
         return reverse(mysite.project.views.project,
