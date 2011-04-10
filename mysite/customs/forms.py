@@ -43,3 +43,12 @@ class GoogleQueryForm(django.forms.ModelForm):
     class Meta:
         model = mysite.customs.models.GoogleQueryModel
         exclude = ('tracker', 'last_polled',)
+
+class TracTrackerForm(django.forms.ModelForm):
+    class Meta:
+        model = mysite.customs.models.TracTrackerModel
+
+class TracQueryForm(django.forms.ModelForm):
+    class Meta:
+        model = mysite.customs.models.TracQueryModel
+        exclude = ('tracker', 'last_polled',)

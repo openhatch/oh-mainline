@@ -40,6 +40,13 @@ all_trackers = {
             'urlmodel': mysite.customs.models.GoogleQueryModel,
             'urlform': mysite.customs.forms.GoogleQueryForm,
             },
+        'trac': {
+            'namestr': 'Trac',
+            'model': mysite.customs.models.TracTrackerModel,
+            'form': mysite.customs.forms.TracTrackerForm,
+            'urlmodel': mysite.customs.models.TracQueryModel,
+            'urlform': mysite.customs.forms.TracQueryForm,
+            },
         }
 
 # Lists all the stored trackers of a selected type (Bugzilla, Trac etc.)
