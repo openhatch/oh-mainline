@@ -210,8 +210,8 @@ class TracBug:
         return ret
 
 class TracBugTimeline(object):
-    def __init__(self, base_url, project_name):
-        self.project_name = project_name
+    def __init__(self, base_url, tracker_name):
+        self.tracker_name = tracker_name
         try:
             self.timeline = TracTimeline.all_timelines.get(base_url = base_url)
         except TracTimeline.DoesNotExist:
@@ -228,7 +228,7 @@ class TracBugTimeline(object):
             yield entry
 
     def update(self):
-        logging.info("[Trac] Started refreshing timeline for project named %s." % self.project_name)
+        logging.info("[Trac] Started refreshing timeline for tracker named %s." % self.tracker_name)
 
         # Check when the timeline was last updated.
         timeline_age = datetime.datetime.utcnow() - self.timeline.last_polled
@@ -294,13 +294,13 @@ class TracBugTimeline(object):
 # General bug importing class
 
 class TracBugTracker(object):
-    def __init__(self, base_url, project_name, bug_project_name_format, old_trac=False):
+    def __init__(self, base_url, tracker_name, bug_project_name_format, old_trac=False):
         self.base_url = base_url
-        self.project_name = project_name
+        self.tracker_name = tracker_name
         self.bug_project_name_format = bug_project_name_format
         self.old_trac = old_trac
         if self.old_trac:
-            self.tbt = TracBugTimeline(self.base_url, self.project_name)
+            self.tbt = TracBugTimeline(self.base_url, self.tracker_name)
 
     def generate_bug_ids_from_queries(self, queries):
         for query_name in queries:
@@ -315,7 +315,7 @@ class TracBugTracker(object):
         raise NotImplementedError
 
     def generate_bug_project_name(self, trac_bug):
-        return self.bug_project_name_format.format(project=self.project_name,
+        return self.bug_project_name_format.format(tracker_name=self.tracker_name,
                                                    component=trac_bug.component)
 
     @staticmethod
@@ -330,7 +330,7 @@ class TracBugTracker(object):
             # the timeline so it is accurate for use later.
             self.tbt.update()
 
-        logging.info("[Trac] Started refreshing all bugs from project named %s." % self.project_name)
+        logging.info("[Trac] Started refreshing all bugs from tracker named %s." % self.tracker_name)
 
         # First, go through and refresh all the bugs specifically marked
         # as bugs to look at.
@@ -362,12 +362,12 @@ class TracBugTracker(object):
 
         # Hopefully, the bug is so fresh it needs no refreshing.
         if bug.data_is_more_fresh_than_one_day():
-            logging.info("[Trac] Bug %d from project named %s is fresh. Doing nothing!" % (bug_id, self.project_name))
+            logging.info("[Trac] Bug %d from tracker named %s is fresh. Doing nothing!" % (bug_id, self.tracker_name))
             return # sweet
 
         # Okay, fine, we need to actually refresh it.
-        logging.info("[Trac] Refreshing bug %d from project named %s." %
-                     (bug_id, self.project_name))
+        logging.info("[Trac] Refreshing bug %d from tracker named %s." %
+                     (bug_id, self.tracker_name))
         # For some unknown reason, some trackers choose to delete some bugs entirely instead
         # of just marking them as closed. That is fine for bugs we haven't yet pulled, but
         # if the bug is already being tracked then we get a 404 error. This catacher looks
@@ -399,7 +399,7 @@ class TracBugTracker(object):
             bug.project = project_from_name
         bug.last_polled = datetime.datetime.utcnow()
         bug.save()
-        logging.info("[Trac] Finished with bug %d from project named %s." % (bug_id, self.project_name))
+        logging.info("[Trac] Finished with bug %d from tracker named %s." % (bug_id, self.tracker_name))
 
 ############################################################
 # Specific sub-classes for individual bug trackers
@@ -409,9 +409,9 @@ class TahoeLafsTrac(TracBugTracker):
 
     def __init__(self):
         TracBugTracker.__init__(self,
-                                project_name='Tahoe-LAFS',
+                                tracker_name='Tahoe-LAFS',
                                 base_url='http://tahoe-lafs.org/trac/tahoe-lafs/',
-                                bug_project_name_format='{project}')
+                                bug_project_name_format='{tracker_name}')
 
     def generate_list_of_bug_ids_to_look_at(self):
         queries = {
@@ -436,9 +436,9 @@ class TwistedTrac(TracBugTracker):
 
     def __init__(self):
         TracBugTracker.__init__(self,
-                                project_name='Twisted',
+                                tracker_name='Twisted',
                                 base_url='http://twistedmatrix.com/trac/',
-                                bug_project_name_format='{project}')
+                                bug_project_name_format='{tracker_name}')
 
     def generate_list_of_bug_ids_to_look_at(self):
         queries = {
@@ -465,7 +465,7 @@ class SugarLabsTrac(TracBugTracker):
 
     def __init__(self):
         TracBugTracker.__init__(self,
-                                project_name='Sugar Labs',
+                                tracker_name='Sugar Labs',
                                 base_url='http://bugs.sugarlabs.org/',
                                 bug_project_name_format='{component}')
 
@@ -473,7 +473,7 @@ class SugarLabsTrac(TracBugTracker):
         if trac_bug.component == 'SoaS':
             return 'Sugar on a Stick'
         else:
-            return self.bug_project_name_format.format(project=self.project_name,
+            return self.bug_project_name_format.format(tracker_name=self.tracker_name,
                                                        component=trac_bug.component)
 
     def generate_list_of_bug_ids_to_look_at(self):
@@ -505,9 +505,9 @@ class StatusNetTrac(TracBugTracker):
 
     def __init__(self):
         TracBugTracker.__init__(self,
-                                project_name='StatusNet',
+                                tracker_name='StatusNet',
                                 base_url='http://status.net/trac/',
-                                bug_project_name_format='{project}')
+                                bug_project_name_format='{tracker_name}')
 
     def generate_list_of_bug_ids_to_look_at(self):
         # Only gives a list of bitesized bugs - confirm if devels want all bugs indexed
@@ -520,9 +520,9 @@ class XiphTrac(TracBugTracker):
 
     def __init__(self):
         TracBugTracker.__init__(self,
-                                project_name='Xiph',
+                                tracker_name='Xiph',
                                 base_url='http://trac.xiph.org/',
-                                bug_project_name_format='{project}')
+                                bug_project_name_format='{tracker_name}')
 
     def generate_list_of_bug_ids_to_look_at(self):
         queries = {
@@ -549,7 +549,7 @@ class OLPCTrac(TracBugTracker):
 
     def __init__(self):
         TracBugTracker.__init__(self,
-                                project_name='OLPC',
+                                tracker_name='OLPC',
                                 base_url='http://dev.laptop.org/',
                                 bug_project_name_format='{component}')
 
@@ -578,9 +578,9 @@ class DjangoTrac(TracBugTracker):
 
     def __init__(self):
         TracBugTracker.__init__(self,
-                                project_name='Django',
+                                tracker_name='Django',
                                 base_url='http://code.djangoproject.com/',
-                                bug_project_name_format='{project}',
+                                bug_project_name_format='{tracker_name}',
                                 old_trac=True)
 
     def generate_list_of_bug_ids_to_look_at(self):
@@ -607,9 +607,9 @@ class HelenOSTrac(TracBugTracker):
 
     def __init__(self):
         TracBugTracker.__init__(self,
-                                project_name='HelenOS',
+                                tracker_name='HelenOS',
                                 base_url='http://trac.helenos.org/trac.fcgi/',
-                                bug_project_name_format='{project}')
+                                bug_project_name_format='{tracker_name}')
 
     def generate_list_of_bug_ids_to_look_at(self):
         queries = {
@@ -634,9 +634,9 @@ class Bcfg2Trac(TracBugTracker):
 
     def __init__(self):
         TracBugTracker.__init__(self,
-                                project_name='Bcfg2',
+                                tracker_name='Bcfg2',
                                 base_url='https://trac.mcs.anl.gov/projects/bcfg2/',
-                                bug_project_name_format='{project}')
+                                bug_project_name_format='{tracker_name}')
 
     def generate_list_of_bug_ids_to_look_at(self):
         queries = {
@@ -661,9 +661,9 @@ class WarFoundryTrac(TracBugTracker):
 
     def __init__(self):
         TracBugTracker.__init__(self,
-                                project_name='WarFoundry',
+                                tracker_name='WarFoundry',
                                 base_url='http://dev.ibboard.co.uk/projects/warfoundry/',
-                                bug_project_name_format='{project}')
+                                bug_project_name_format='{tracker_name}')
 
     def generate_list_of_bug_ids_to_look_at(self):
         queries = {
@@ -688,9 +688,9 @@ class FedoraPythonModulesTrac(TracBugTracker):
 
     def __init__(self):
         TracBugTracker.__init__(self,
-                                project_name='Fedora Python Modules',
+                                tracker_name='Fedora Python Modules',
                                 base_url='https://fedorahosted.org/python-fedora/',
-                                bug_project_name_format='{project}',
+                                bug_project_name_format='{tracker_name}',
                                 old_trac=True)
 
     def generate_list_of_bug_ids_to_look_at(self):
@@ -716,9 +716,9 @@ class AngbandTrac(TracBugTracker):
 
     def __init__(self):
         TracBugTracker.__init__(self,
-                                project_name='Angband',
+                                tracker_name='Angband',
                                 base_url='http://trac.rephial.org/',
-                                bug_project_name_format='{project}')
+                                bug_project_name_format='{tracker_name}')
 
     def generate_list_of_bug_ids_to_look_at(self):
         queries = {
@@ -743,9 +743,9 @@ class GHCTrac(TracBugTracker):
 
     def __init__(self):
         TracBugTracker.__init__(self,
-                                project_name='GHC',
+                                tracker_name='GHC',
                                 base_url='http://hackage.haskell.org/trac/ghc/',
-                                bug_project_name_format='{project}')
+                                bug_project_name_format='{tracker_name}')
 
     def generate_list_of_bug_ids_to_look_at(self):
         queries = {
@@ -770,9 +770,9 @@ class TracTrac(TracBugTracker):
 
     def __init__(self):
         TracBugTracker.__init__(self,
-                                project_name='Trac',
+                                tracker_name='Trac',
                                 base_url='http://trac.edgewall.org/',
-                                bug_project_name_format='{project}')
+                                bug_project_name_format='{tracker_name}')
 
     def generate_list_of_bug_ids_to_look_at(self):
         queries = {
@@ -799,9 +799,9 @@ class SSSDTrac(TracBugTracker):
 
     def __init__(self):
         TracBugTracker.__init__(self,
-                                project_name='SSSD',
+                                tracker_name='SSSD',
                                 base_url='https://fedorahosted.org/sssd/',
-                                bug_project_name_format='{project}',
+                                bug_project_name_format='{tracker_name}',
                                 old_trac=True)
 
     def generate_list_of_bug_ids_to_look_at(self):
@@ -827,9 +827,9 @@ class I2PTrac(TracBugTracker):
 
     def __init__(self):
         TracBugTracker.__init__(self,
-                                project_name='I2P',
+                                tracker_name='I2P',
                                 base_url='http://trac.i2p2.de/',
-                                bug_project_name_format='{project}')
+                                bug_project_name_format='{tracker_name}')
 
     def generate_list_of_bug_ids_to_look_at(self):
         queries = {
@@ -854,9 +854,9 @@ class MonkeyProjectTrac(TracBugTracker):
 
     def __init__(self):
         TracBugTracker.__init__(self,
-                                project_name='Monkey HTTP Daemon',
+                                tracker_name='Monkey HTTP Daemon',
                                 base_url='http://bugs.monkey-project.com/',
-                                bug_project_name_format='{project}')
+                                bug_project_name_format='{tracker_name}')
 
     def generate_list_of_bug_ids_to_look_at(self):
         # Can replace both entries below with an 'All bugs' query.
@@ -882,9 +882,9 @@ class MapbenderTrac(TracBugTracker):
 
     def __init__(self):
         TracBugTracker.__init__(self,
-                                project_name='Mapbender',
+                                tracker_name='Mapbender',
                                 base_url='https://trac.osgeo.org/mapbender/',
-                                bug_project_name_format='{project}')
+                                bug_project_name_format='{tracker_name}')
 
     def generate_list_of_bug_ids_to_look_at(self):
         # Can replace both entries below with an 'All bugs' query.
@@ -910,9 +910,9 @@ class MV3DTrac(TracBugTracker):
 
     def __init__(self):
         TracBugTracker.__init__(self,
-                                project_name='MV3D',
+                                tracker_name='MV3D',
                                 base_url='http://www.mv3d.com/trac',
-                                bug_project_name_format='{project}')
+                                bug_project_name_format='{tracker_name}')
 
     def generate_list_of_bug_ids_to_look_at(self):
         # Can replace both entries below with an 'All bugs' query.
@@ -938,9 +938,9 @@ class PadreTrac(TracBugTracker):
 
     def __init__(self):
         TracBugTracker.__init__(self,
-                                project_name='Padre',
+                                tracker_name='Padre',
                                 base_url='http://padre.perlide.org/trac/',
-                                bug_project_name_format='{project}')
+                                bug_project_name_format='{tracker_name}')
 
     def generate_list_of_bug_ids_to_look_at(self):
         # Can replace both entries below with an 'All bugs' query.
@@ -966,9 +966,9 @@ class EvolvingObjectsTrac(TracBugTracker):
 
     def __init__(self):
         TracBugTracker.__init__(self,
-                                project_name='Evolving Objects',
+                                tracker_name='Evolving Objects',
                                 base_url='http://sourceforge.net/apps/trac/eodev',
-                                bug_project_name_format='{project}')
+                                bug_project_name_format='{tracker_name}')
 
     def generate_list_of_bug_ids_to_look_at(self):
         # Can replace both entries below with an 'All bugs' query.
@@ -994,9 +994,9 @@ class TangoTrac(TracBugTracker):
 
     def __init__(self):
         TracBugTracker.__init__(self,
-                                project_name='Tango',
+                                tracker_name='Tango',
                                 base_url='http://dsource.org/projects/tango/',
-                                bug_project_name_format='{project}',
+                                bug_project_name_format='{tracker_name}',
                                 old_trac=True)
 
     def generate_list_of_bug_ids_to_look_at(self):
@@ -1025,9 +1025,9 @@ class TheButterflyEffectTrac(TracBugTracker):
 
     def __init__(self):
         TracBugTracker.__init__(self,
-                                project_name='The Butterfly Effect',
+                                tracker_name='The Butterfly Effect',
                                 base_url='http://sourceforge.net/apps/trac/tbe/',
-                                bug_project_name_format='{project}')
+                                bug_project_name_format='{tracker_name}')
 
     def generate_list_of_bug_ids_to_look_at(self):
         # Can replace both entries below with an 'All bugs' query.
@@ -1053,9 +1053,9 @@ class FedoraDesignTeamTrac(TracBugTracker):
 
     def __init__(self):
         TracBugTracker.__init__(self,
-                                project_name='Fedora Design Team',
+                                tracker_name='Fedora Design Team',
                                 base_url='https://fedorahosted.org/design-team/',
-                                bug_project_name_format='{project}',
+                                bug_project_name_format='{tracker_name}',
                                 old_trac = True)
 
     def generate_list_of_bug_ids_to_look_at(self):
@@ -1082,9 +1082,9 @@ class MetalinkTrac(TracBugTracker):
 
     def __init__(self):
         TracBugTracker.__init__(self,
-                                project_name='Metalink',
+                                tracker_name='Metalink',
                                 base_url='http://sourceforge.net/apps/trac/metalinks/',
-                                bug_project_name_format='{project}')
+                                bug_project_name_format='{tracker_name}')
 
     def generate_list_of_bug_ids_to_look_at(self):
         # Can replace both entries below with an 'All bugs' query.
@@ -1110,9 +1110,9 @@ class NokiaDataGatheringTrac(TracBugTracker):
 
     def __init__(self):
         TracBugTracker.__init__(self,
-                                project_name='Nokia Data Gathering',
+                                tracker_name='Nokia Data Gathering',
                                 base_url='https://projects.forum.nokia.com/ndg/',
-                                bug_project_name_format='{project}')
+                                bug_project_name_format='{tracker_name}')
 
     def generate_list_of_bug_ids_to_look_at(self):
         # Can replace both entries below with an 'All bugs' query.
@@ -1138,9 +1138,9 @@ class InitNGTrac(TracBugTracker):
 
     def __init__(self):
         TracBugTracker.__init__(self,
-                                project_name='InitNG',
+                                tracker_name='InitNG',
                                 base_url='http://initng.sourceforge.net/trac/',
-                                bug_project_name_format='{project}')
+                                bug_project_name_format='{tracker_name}')
 
     def generate_list_of_bug_ids_to_look_at(self):
         # Can replace both entries below with an 'All bugs' query.
@@ -1166,9 +1166,9 @@ class TwoLayeredGUIToolkitTrac(TracBugTracker):
 
     def __init__(self):
         TracBugTracker.__init__(self,
-                                project_name='The Two-Layered GUI Toolkit',
+                                tracker_name='The Two-Layered GUI Toolkit',
                                 base_url='http://sourceforge.net/apps/trac/twolayeredgui/',
-                                bug_project_name_format='{project}')
+                                bug_project_name_format='{tracker_name}')
 
     def generate_list_of_bug_ids_to_look_at(self):
         # Can replace both entries below with an 'All bugs' query.
@@ -1194,9 +1194,9 @@ class FlexibleLocalizationTrac(TracBugTracker):
 
     def __init__(self):
         TracBugTracker.__init__(self,
-                                project_name='Flexible Localization',
+                                tracker_name='Flexible Localization',
                                 base_url='http://sourceforge.net/apps/trac/flexiblel10n/',
-                                bug_project_name_format='{project}')
+                                bug_project_name_format='{tracker_name}')
 
     def generate_list_of_bug_ids_to_look_at(self):
         # Can replace both entries below with an 'All bugs' query.
@@ -1222,9 +1222,9 @@ class QEasyBackupTrac(TracBugTracker):
 
     def __init__(self):
         TracBugTracker.__init__(self,
-                                project_name='QEasyBackup',
+                                tracker_name='QEasyBackup',
                                 base_url='http://trac.deder.at/qeasybackup/',
-                                bug_project_name_format='{project}')
+                                bug_project_name_format='{tracker_name}')
 
     def generate_list_of_bug_ids_to_look_at(self):
         # Can replace both entries below with an 'All bugs' query.
@@ -1251,14 +1251,14 @@ class QEasyBackupTrac(TracBugTracker):
 # Base URL: the URL of a bug for the bugtracker, without the 'ticket/1234'
 # Tracking URL: go to BASE_URL/query and search for the bugs you want tracked
 # bug_project_name_format: the format to be used for the bug's project name
-# "{project}" will be replaced by project_name, and "{component}" by the
+# "{tracker_name}" will be replaced by tracker_name, and "{component}" by the
 # component the bug is part of (as taken from the bug's ticket).
 class GenTrac(TracBugTracker):
     enabled = False
 
     def __init__(self):
         TracBugTracker.__init__(self,
-                                project_name='',
+                                tracker_name='',
                                 base_url='',
                                 bug_project_name_format='')
 

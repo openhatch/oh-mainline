@@ -191,9 +191,9 @@ def url_is_more_fresh_than_one_day(url):
     return url_is_fresh
 
 class BugzillaBugTracker(object):
-    def __init__(self, base_url, project_name, bug_project_name_format, bug_id_list_only=False):
+    def __init__(self, base_url, tracker_name, bug_project_name_format, bug_id_list_only=False):
         self.base_url = base_url
-        self.project_name = project_name
+        self.tracker_name = tracker_name
         self.bug_project_name_format = bug_project_name_format
         self.bug_id_list_only = bug_id_list_only
 
@@ -226,7 +226,7 @@ class BugzillaBugTracker(object):
 
     def generate_bug_project_name(self, bb):
         return self.bug_project_name_format.format(
-                project = self.project_name,
+                tracker_name = self.tracker_name,
                 product = bb.product,
                 component = bb.component)
 
@@ -244,7 +244,7 @@ class BugzillaBugTracker(object):
                     canonical_bug_link=bug_url)
             # Found an existing bug. Does it need refreshing?
             if bug.data_is_more_fresh_than_one_day():
-                logging.info("[Bugzilla] Bug %d from project named %s is fresh. Doing nothing!" % (bug_id, self.project_name))
+                logging.info("[Bugzilla] Bug %d from tracker named %s is fresh. Doing nothing!" % (bug_id, self.tracker_name))
                 return False # sweet
         except mysite.search.models.Bug.DoesNotExist:
             # This is a new bug
@@ -255,7 +255,7 @@ class BugzillaBugTracker(object):
             bug.set_bug_tracker_class_from_instance(self)
 
         # Looks like we have some refreshing to do.
-        logging.info("[Bugzilla] Refreshing bug %d from project named %s." % (bug_id, self.project_name))
+        logging.info("[Bugzilla] Refreshing bug %d from tracker named %s." % (bug_id, self.tracker_name))
         # Get the dictionary of data to put into the bug. The function for
         # obtaining tracker-specific data is passed in.
         data = bb.as_data_dict_for_bug_object(self.extract_tracker_specific_data)
@@ -274,7 +274,7 @@ class BugzillaBugTracker(object):
             bug.project = project_from_name
         bug.last_polled = datetime.datetime.utcnow()
         bug.save()
-        logging.info("[Bugzilla] Finished with bug %d from project named %s." % (bug_id, self.project_name))
+        logging.info("[Bugzilla] Finished with bug %d from tracker named %s." % (bug_id, self.tracker_name))
         return True
 
     def refresh_all_bugs(self):
@@ -288,7 +288,7 @@ class BugzillaBugTracker(object):
         self.create_or_refresh_one_bugzilla_bug(bb=bb)
 
     def update(self):
-        logging.info("[Bugzilla] Started refreshing all bugs from project named %s." % self.project_name)
+        logging.info("[Bugzilla] Started refreshing all bugs from tracker named %s." % self.tracker_name)
 
         # First, go through and create or refresh all the bugs that
         # we are configured to track. This will add new bugs and
@@ -331,7 +331,7 @@ def bugzilla_tracker_factory(bt):
     def __init__(self):
         BugzillaBugTracker.__init__(self,
                                     base_url=bt.base_url,
-                                    project_name=bt.project_name,
+                                    tracker_name=bt.tracker_name,
                                     bug_project_name_format=bt.bug_project_name_format,
                                     bug_id_list_only=(bt.query_url_type=='tracker'))
 
@@ -398,7 +398,7 @@ def bugzilla_tracker_factory(bt):
     # FIXME: Implement this properly. Until this is done, trackers that overload
     # this function will remain as special cases.
     #def generate_bug_project_name(self, bb):
-        #return bt.project_name
+        #return bt.tracker_name
 
     # Generate class dictionary
     # All sub-classes have '__init__' and 'extract_tracker_specific_data' methods
@@ -414,7 +414,7 @@ def bugzilla_tracker_factory(bt):
         class_dict['get_current_bug_id_list'] = get_current_bug_id_list
 
     # Return the generated sub-class.
-    subclass_name = '%sBugzilla' % bt.project_name.replace(' ', '')
+    subclass_name = '%sBugzilla' % bt.tracker_name.replace(' ', '')
     return type(subclass_name.encode('ascii'), (BugzillaBugTracker,), class_dict)
 
 ############################################################
@@ -425,7 +425,7 @@ def generate_bugzilla_tracker_classes(tracker_name=None):
     # specific sub-class for that tracker.
     if tracker_name:
         try:
-            bt = mysite.customs.models.BugzillaTracker.all_trackers.get(project_name=tracker_name)
+            bt = mysite.customs.models.BugzillaTracker.all_trackers.get(tracker_name=tracker_name)
             bt_class = bugzilla_tracker_factory(bt)
         except mysite.customs.models.BugzillaTracker.DoesNotExist:
             bt_class = None
@@ -445,8 +445,8 @@ class MiroBugzilla(BugzillaBugTracker):
     def __init__(self):
         BugzillaBugTracker.__init__(self,
                                     base_url='http://bugzilla.pculture.org/',
-                                    project_name='Miro',
-                                    bug_project_name_format='{project}')
+                                    tracker_name='Miro',
+                                    bug_project_name_format='{tracker_name}')
 
     def generate_current_bug_xml(self):
         queries = {
@@ -474,7 +474,7 @@ class KDEBugzilla(BugzillaBugTracker):
     def __init__(self):
         BugzillaBugTracker.__init__(self,
                                     base_url='https://bugs.kde.org/',
-                                    project_name='KDE',
+                                    tracker_name='KDE',
                                     bug_project_name_format='')
 
     def generate_current_bug_xml(self):
@@ -578,7 +578,7 @@ class MediaWikiBugzilla(BugzillaBugTracker):
     def __init__(self):
         BugzillaBugTracker.__init__(self,
                                     base_url='https://bugzilla.wikimedia.org/',
-                                    project_name='MediaWiki',
+                                    tracker_name='MediaWiki',
                                     bug_project_name_format='')
 
     def generate_current_bug_xml(self):
@@ -621,7 +621,7 @@ class GnomeBugzilla(BugzillaBugTracker):
     def __init__(self):
         BugzillaBugTracker.__init__(self,
                                     base_url='https://bugzilla.gnome.org/',
-                                    project_name='Gnome',
+                                    tracker_name='Gnome',
                                     bug_project_name_format='')
 
     def generate_current_bug_xml(self):
@@ -664,7 +664,7 @@ class MozillaBugzilla(BugzillaBugTracker):
     def __init__(self):
         BugzillaBugTracker.__init__(self,
                                     base_url='https://bugzilla.mozilla.org/',
-                                    project_name='Mozilla',
+                                    tracker_name='Mozilla',
                                     bug_project_name_format='')
 
     def generate_current_bug_xml(self):
@@ -718,7 +718,7 @@ class FedoraBugzilla(BugzillaBugTracker):
     def __init__(self):
         BugzillaBugTracker.__init__(self,
                                     base_url='https://bugzilla.redhat.com/',
-                                    project_name='Fedora',
+                                    tracker_name='Fedora',
                                     bug_project_name_format='{component}',
                                     bug_id_list_only=True)
 
@@ -748,8 +748,8 @@ class SongbirdBugzilla(BugzillaBugTracker):
     def __init__(self):
         BugzillaBugTracker.__init__(self,
                                     base_url='http://bugzilla.songbirdnest.com/',
-                                    project_name='Songbird',
-                                    bug_project_name_format='{project}')
+                                    tracker_name='Songbird',
+                                    bug_project_name_format='{tracker_name}')
 
     def generate_current_bug_xml(self):
         # Query below returns nearly 4000 bugs if we try to index everything.
@@ -779,8 +779,8 @@ class ApertiumBugzilla(BugzillaBugTracker):
     def __init__(self):
         BugzillaBugTracker.__init__(self,
                                     base_url='http://bugs.apertium.org/cgi-bin/bugzilla/',
-                                    project_name='Apertium',
-                                    bug_project_name_format='{project}')
+                                    tracker_name='Apertium',
+                                    bug_project_name_format='{tracker_name}')
 
     def generate_current_bug_xml(self):
         queries = {
@@ -802,8 +802,8 @@ class RTEMSBugzilla(BugzillaBugTracker):
     def __init__(self):
         BugzillaBugTracker.__init__(self,
                                     base_url='https://www.rtems.org/bugzilla/',
-                                    project_name='RTEMS',
-                                    bug_project_name_format='{project}')
+                                    tracker_name='RTEMS',
+                                    bug_project_name_format='{tracker_name}')
 
     def generate_current_bug_xml(self):
         queries = {
@@ -830,8 +830,8 @@ class XOrgBugzilla(BugzillaBugTracker):
     def __init__(self):
         BugzillaBugTracker.__init__(self,
                                     base_url='https://bugs.freedesktop.org/',
-                                    project_name='XOrg',
-                                    bug_project_name_format='{project}')
+                                    tracker_name='XOrg',
+                                    bug_project_name_format='{tracker_name}')
 
     def generate_current_bug_xml(self):
         # Query below returns over 2500 bugs if we try to index everything.
@@ -869,7 +869,7 @@ class LocamotionBugzilla(BugzillaBugTracker):
     def __init__(self):
         BugzillaBugTracker.__init__(self,
                                     base_url='http://bugs.locamotion.org/',
-                                    project_name='Locamotion',
+                                    tracker_name='Locamotion',
                                     bug_project_name_format='{product}')
 
     def generate_current_bug_xml(self):
@@ -892,7 +892,7 @@ class HypertritonBugzilla(BugzillaBugTracker):
     def __init__(self):
         BugzillaBugTracker.__init__(self,
                                     base_url='https://hypertriton.com/bugzilla/',
-                                    project_name='Hypertriton',
+                                    tracker_name='Hypertriton',
                                     bug_project_name_format='{product}')
 
     def generate_current_bug_xml(self):
@@ -915,8 +915,8 @@ class PygameBugzilla(BugzillaBugTracker):
     def __init__(self):
         BugzillaBugTracker.__init__(self,
                                     base_url='http://pygame.motherhamster.org/bugzilla/',
-                                    project_name='pygame',
-                                    bug_project_name_format='{project}')
+                                    tracker_name='pygame',
+                                    bug_project_name_format='{tracker_name}')
 
     def generate_current_bug_xml(self):
         queries = {
@@ -938,8 +938,8 @@ class OTRSBugzilla(BugzillaBugTracker):
     def __init__(self):
         BugzillaBugTracker.__init__(self,
                                     base_url='http://bugs.otrs.org/',
-                                    project_name='OTRS',
-                                    bug_project_name_format='{project}')
+                                    tracker_name='OTRS',
+                                    bug_project_name_format='{tracker_name}')
 
     def generate_current_bug_xml(self):
         # Can replace both entries below with an 'All bugs' query.
@@ -965,7 +965,7 @@ class OTRSBugzilla(BugzillaBugTracker):
 # If the project has a tracker bug for the bugs to be imported,
 # set bug_id_list_only=True in BugzillaBugTracker.__init__ and
 # replace get_current_xml_bug_tree with get_current_bug_id_list
-# bug_project_name_format can contain the tags {project},
+# bug_project_name_format can contain the tags {tracker_name},
 # {product} and {component} which will be replaced accordingly.
 class GenBugzilla(BugzillaBugTracker):
     enabled = False
@@ -973,7 +973,7 @@ class GenBugzilla(BugzillaBugTracker):
     def __init__(self):
         BugzillaBugTracker.__init__(self,
                                     base_url='',
-                                    project_name='',
+                                    tracker_name='',
                                     bug_project_name_format='')
 
     def generate_current_bug_xml(self):

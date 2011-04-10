@@ -38,11 +38,13 @@ def csv_url2bugs(csv_url):
         yield int(thing['id'])
 
 class RoundupTracker(object):
-    def __init__(self, root_url, project_name):
+    def __init__(self, root_url, tracker_name):
         assert root_url[-1] == '/'
         assert root_url[-2] != '/'
         self.root_url = unicode(root_url)
-        self.project, _ = mysite.search.models.Project.objects.get_or_create(name=project_name)
+        # For now, just make the project name equal to the tracker name.
+        bug_project_name = tracker_name
+        self.project, _ = mysite.search.models.Project.objects.get_or_create(name=bug_project_name)
 
     @staticmethod
     def roundup_tree2metadata_dict(tree):
@@ -229,7 +231,7 @@ class MercurialTracker(RoundupTracker):
     def __init__(self):
         RoundupTracker.__init__(self,
                                 root_url='http://mercurial.selenic.com/bts/',
-                                project_name='Mercurial')
+                                tracker_name='Mercurial')
 
     def extract_bug_tracker_specific_data(self, metadata_dict, bug_object):
         if 'bitesized' in metadata_dict['Topics']:
@@ -255,7 +257,7 @@ class PythonTracker(RoundupTracker):
     def __init__(self):
         RoundupTracker.__init__(self,
                                 root_url='http://bugs.python.org/',
-                                project_name='Python')
+                                tracker_name='Python')
 
     def extract_bug_tracker_specific_data(self, metadata_dict, bug_object):
         bug_object.good_for_newcomers = (
@@ -288,7 +290,7 @@ class OpenHatchTracker(RoundupTracker):
     def __init__(self):
         RoundupTracker.__init__(self,
                                 root_url='http://openhatch.org/bugs/',
-                                project_name='OpenHatch')
+                                tracker_name='OpenHatch')
 
     def extract_bug_tracker_specific_data(self, metadata_dict, bug_object):
         bug_object.good_for_newcomers = (

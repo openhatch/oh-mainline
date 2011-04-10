@@ -76,13 +76,13 @@ class WebResponse(models.Model):
 
 class BugzillaTracker(models.Model):
     '''This model stores the data for individual Bugzilla trackers.'''
-    project_name = models.CharField(max_length=200, unique=True,
+    tracker_name = models.CharField(max_length=200, unique=True,
                                     blank=False, null=False)
     base_url = models.URLField(max_length=200, unique=True,
                                blank=False, null=False, verify_exists=False,
             help_text="This is the URL to the homepage of the Bugzilla tracker instance. Remove any homepage filenames such as 'index.cgi' from this.")
     bug_project_name_format = models.CharField(max_length=200, blank=False,
-            help_text="Any string here will be used verbatim as the project name for each bug aside from the keys '{project}', '{component}' and '{product}', which are replaced with the relevant data from each individual bug.")
+            help_text="Any string here will be used verbatim as the project name for each bug aside from the keys '{tracker_name}', '{component}' and '{product}', which are replaced with the tracker's name from above and the relevant data from each individual bug respectively.")
     QUERY_URL_TYPES = (
             ('xml', 'Bug XML query'),
             ('tracker', 'Tracker bug URL')
@@ -95,7 +95,8 @@ class BugzillaTracker(models.Model):
             ('wboard', 'Whiteboard tag')
             )
     bitesized_type = models.CharField(max_length=10, choices=BITESIZED_TYPES, blank=False, default=None)
-    bitesized_text = models.CharField(max_length=200, blank=True, default='')
+    bitesized_text = models.CharField(max_length=200, blank=True, default='',
+            help_text="This is the text that the field type selected above will contain that indicates a bite-sized bug.")
     DOCUMENTATION_TYPES = (
             (None, 'None'),
             ('key', 'Keyword'),
@@ -103,13 +104,14 @@ class BugzillaTracker(models.Model):
             ('prod', 'Product')
             )
     documentation_type = models.CharField(max_length=10, choices=DOCUMENTATION_TYPES, blank=False, default=None)
-    documentation_text = models.CharField(max_length=200, blank=True, default='')
+    documentation_text = models.CharField(max_length=200, blank=True, default='',
+            help_text="This is the text that the field type selected above will contain that indicates a documentation bug.")
     as_appears_in_distribution = models.CharField(max_length=200, blank=True, default='')
 
     all_trackers = models.Manager()
 
     def __str__(self):
-        return smart_str('%s' % (self.project_name))
+        return smart_str('%s' % (self.tracker_name))
 
     def create_class_that_can_actually_crawl_bugs(self):
         # FIXME: This is totally busted.
@@ -132,7 +134,7 @@ reversion.register(BugzillaUrl)
 
 class GoogleTracker(models.Model):
     '''This model stores the data for individual Bugzilla trackers.'''
-    project_name = models.CharField(max_length=200, unique=True,
+    tracker_name = models.CharField(max_length=200, unique=True,
                                     blank=False, null=False,
             help_text="This is the name that OpenHatch will use to identify the project.")
     google_name = models.CharField(max_length=200, unique=True,
@@ -156,7 +158,7 @@ class GoogleTracker(models.Model):
     all_trackers = models.Manager()
 
     def __str__(self):
-        return smart_str('%s' % (self.project_name))
+        return smart_str('%s' % (self.tracker_name))
 
 class GoogleQuery(models.Model):
     '''This model stores queries for GoogleTracker objects.

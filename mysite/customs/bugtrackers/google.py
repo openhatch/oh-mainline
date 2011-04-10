@@ -202,8 +202,8 @@ def query_is_more_fresh_than_one_day(google_name, query):
     return query_is_fresh
 
 class GoogleBugTracker(object):
-    def __init__(self, project_name, google_name):
-        self.project_name = project_name
+    def __init__(self, tracker_name, google_name):
+        self.tracker_name = tracker_name
         self.google_name = google_name
         self.client = get_client()
 
@@ -212,7 +212,7 @@ class GoogleBugTracker(object):
             # Check if this query has been accessed in the last day
             if query_is_more_fresh_than_one_day(self.google_name, query):
                 # Sweet, ignore this one and go on.
-                logging.info("[Google] A query for project named %s is fresh, skipping it..." % self.project_name)
+                logging.info("[Google] A query for tracker named %s is fresh, skipping it..." % self.tracker_name)
                 continue
             issues = get_google_issue_entries(self.client, self.google_name, query)
             for issue in issues:
@@ -236,14 +236,14 @@ class GoogleBugTracker(object):
                     canonical_bug_link=bug_url)
             # Found an existing bug. Does it need refreshing?
             if bug.data_is_more_fresh_than_one_day():
-                logging.info("[Google] Bug %d from project named %s is fresh. Doing nothing!" % (bug_id, self.project_name))
+                logging.info("[Google] Bug %d from tracker named %s is fresh. Doing nothing!" % (bug_id, self.tracker_name))
                 return False # sweet
         except mysite.search.models.Bug.DoesNotExist:
             # This is a new bug
             bug = mysite.search.models.Bug(canonical_bug_link = bug_url)
 
         # Looks like we have some refreshing to do.
-        logging.info("[Google] Refreshing bug %d from project named %s." % (bug_id, self.project_name))
+        logging.info("[Google] Refreshing bug %d from tracker named %s." % (bug_id, self.tracker_name))
         # Get the dictionary of data to put into the bug. The function for
         # obtaining tracker-specific data is passed in.
         data = gb.as_data_dict_for_bug_object(self.extract_tracker_specific_data)
@@ -254,14 +254,14 @@ class GoogleBugTracker(object):
             setattr(bug, key, value)
 
         # Find or create the project for the bug and save it
-        # For now, just use project_name
-        bug_project_name = self.project_name
+        # For now, just use tracker_name
+        bug_project_name = self.tracker_name
         project_from_name, _ = mysite.search.models.Project.objects.get_or_create(name=bug_project_name)
         if bug.project_id != project_from_name.id:
             bug.project = project_from_name
         bug.last_polled = datetime.datetime.utcnow()
         bug.save()
-        logging.info("[Google] Finished with bug %d from project named %s." % (bug_id, self.project_name))
+        logging.info("[Google] Finished with bug %d from tracker named %s." % (bug_id, self.tracker_name))
         return True
 
     def refresh_all_bugs(self):
@@ -272,7 +272,7 @@ class GoogleBugTracker(object):
             self.create_or_refresh_one_google_bug(gb=gb)
 
     def update(self):
-        logging.info("[Google] Started refreshing all bugs from project named %s." % self.project_name)
+        logging.info("[Google] Started refreshing all bugs from tracker named %s." % self.tracker_name)
         logging.info("[Google] Fetching Atom data for bugs in tracker...")
         for bug_data in self.generate_current_bug_atom():
             gb = GoogleBug(
@@ -290,7 +290,7 @@ def google_tracker_factory(gt):
     # Create '__init__' method
     def __init__(self):
         GoogleBugTracker.__init__(self,
-                                  project_name=gt.project_name,
+                                  tracker_name=gt.tracker_name,
                                   google_name=gt.google_name)
 
     # Create 'generate_current_bug_atom' method
@@ -331,7 +331,7 @@ def google_tracker_factory(gt):
                   'extract_tracker_specific_data': extract_tracker_specific_data}
 
     # Return the generated sub-class.
-    subclass_name = '%sGoogle' % gt.project_name.replace(' ', '')
+    subclass_name = '%sGoogle' % gt.tracker_name.replace(' ', '')
     return type(subclass_name.encode('ascii'), (GoogleBugTracker,), class_dict)
 
 ############################################################
@@ -342,7 +342,7 @@ def generate_google_tracker_classes(tracker_name=None):
     # specific sub-class for that tracker.
     if tracker_name:
         try:
-            gt = mysite.customs.models.GoogleTracker.all_trackers.get(project_name=tracker_name)
+            gt = mysite.customs.models.GoogleTracker.all_trackers.get(tracker_name=tracker_name)
             gt_class = google_tracker_factory(gt)
         except mysite.customs.models.GoogleTracker.DoesNotExist:
             gt_class = None
@@ -361,7 +361,7 @@ class MelangeGoogle(GoogleBugTracker):
 
     def __init__(self):
         GoogleBugTracker.__init__(self,
-                                  project_name='Melange',
+                                  tracker_name='Melange',
                                   google_name='soc')
 
     def generate_current_bug_atom(self):
@@ -396,7 +396,7 @@ class GenGoogle(GoogleBugTracker):
 
     def __init__(self):
         GoogleBugTracker.__init__(self,
-                                  project_name='',
+                                  tracker_name='',
                                   google_name='')
 
     def generate_current_bug_atom(self):

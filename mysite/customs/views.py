@@ -96,14 +96,14 @@ def add_tracker_do(request, tracker_type):
         tracker_form = all_trackers[tracker_type]['form'](
                 request.POST, prefix='add_tracker')
         if tracker_form.is_valid():
-            project_name = tracker_form.cleaned_data['project_name']
+            tracker_name = tracker_form.cleaned_data['tracker_name']
             # Tracker form is valid, so save away!
             tracker_form.save()
             # Set the revision meta data.
             revision.user = request.user
-            revision.comment = 'Added the %s tracker' % project_name
+            revision.comment = 'Added the %s tracker' % tracker_name
             # Send them off to add some URLs
-            return HttpResponseRedirect(reverse(add_tracker_url, args=[tracker_type, project_name]))
+            return HttpResponseRedirect(reverse(add_tracker_url, args=[tracker_type, tracker_name]))
         else:
             return add_tracker(request,
                     tracker_type=tracker_type,
@@ -113,13 +113,13 @@ def add_tracker_do(request, tracker_type):
         return HttpResponseRedirect(reverse(list_trackers))
 
 @login_required
-def add_tracker_url(request, tracker_type, project_name, url_form=None):
+def add_tracker_url(request, tracker_type, tracker_name, url_form=None):
     data = {}
     if tracker_type in all_trackers:
         if url_form is None:
             try:
                 tracker_obj = all_trackers[tracker_type]['model'].all_trackers.get(
-                        project_name=project_name)
+                        tracker_name=tracker_name)
                 url_obj = all_trackers[tracker_type]['urlmodel'](
                         tracker=tracker_obj)
                 url_form = all_trackers[tracker_type]['urlform'](
@@ -127,10 +127,10 @@ def add_tracker_url(request, tracker_type, project_name, url_form=None):
             except all_trackers[tracker_type]['model'].DoesNotExist:
                 url_form = all_trackers[tracker_type]['urlform'](prefix='add_tracker_url')
         data['url_form'] = url_form
-        data['project_name'] = project_name
-        data['cancel_url'] = reverse(edit_tracker, args=[tracker_type, project_name])
-        data['add_more_url'] = reverse(add_tracker_url_do, args=[tracker_type, project_name])
-        data['finish_url'] = reverse(add_tracker_url_do, args=[tracker_type, project_name])
+        data['tracker_name'] = tracker_name
+        data['cancel_url'] = reverse(edit_tracker, args=[tracker_type, tracker_name])
+        data['add_more_url'] = reverse(add_tracker_url_do, args=[tracker_type, tracker_name])
+        data['finish_url'] = reverse(add_tracker_url_do, args=[tracker_type, tracker_name])
         data['finish_url'] += '?finished=true'
         return mysite.base.decorators.as_view(request, 'customs/add_tracker_url.html', data, None)
     else:
@@ -138,11 +138,11 @@ def add_tracker_url(request, tracker_type, project_name, url_form=None):
 
 @login_required
 @revision.create_on_success
-def add_tracker_url_do(request, tracker_type, project_name):
+def add_tracker_url_do(request, tracker_type, tracker_name):
     url_form = None
     if tracker_type in all_trackers:
         tracker_obj = all_trackers[tracker_type]['model'].all_trackers.get(
-                project_name=project_name)
+                tracker_name=tracker_name)
         url_obj = all_trackers[tracker_type]['urlmodel'](
                 tracker=tracker_obj)
         url_form = all_trackers[tracker_type]['urlform'](
@@ -152,29 +152,29 @@ def add_tracker_url_do(request, tracker_type, project_name):
             url_form.save()
             # Set the revision meta data.
             revision.user = request.user
-            revision.comment = 'Added URL to the %s tracker' % project_name
+            revision.comment = 'Added URL to the %s tracker' % tracker_name
             # Do they want to add another URL?
             if request.GET.get('finished', None) == 'true':
                 return HttpResponseRedirect(reverse(list_trackers) +
                                         '?notification_id=add-success')
             else:
-                return HttpResponseRedirect(reverse(add_tracker_url, args=[tracker_type, project_name]))
+                return HttpResponseRedirect(reverse(add_tracker_url, args=[tracker_type, tracker_name]))
         else:
             return add_tracker_url(request,
                     tracker_type=tracker_type,
-                    project_name=project_name,
+                    tracker_name=tracker_name,
                     url_form=url_form)
     else:
         # Shouldn't get here. Just go back to base.
         return HttpResponseRedirect(reverse(list_trackers))
 
 @login_required
-def edit_tracker(request, tracker_type, project_name, tracker_form=None):
+def edit_tracker(request, tracker_type, tracker_name, tracker_form=None):
     data = {}
     if tracker_type in all_trackers:
         try:
             tracker_obj = all_trackers[tracker_type]['model'].all_trackers.get(
-                    project_name=project_name)
+                    tracker_name=tracker_name)
             if tracker_form is None:
                 tracker_form = all_trackers[tracker_type]['form'](
                         instance=tracker_obj, prefix='edit_tracker')
@@ -183,7 +183,7 @@ def edit_tracker(request, tracker_type, project_name, tracker_form=None):
         except all_trackers[tracker_type]['model'].DoesNotExist:
             return HttpResponseRedirect(reverse(list_trackers) +
                                         '?notification_id=tracker-existence-fail')
-        data['project_name'] = project_name
+        data['tracker_name'] = tracker_name
         data['tracker_type'] = tracker_type
         data['tracker_form'] = tracker_form
         data['tracker_urls'] = tracker_urls
@@ -193,30 +193,30 @@ def edit_tracker(request, tracker_type, project_name, tracker_form=None):
 
 @login_required
 @revision.create_on_success
-def edit_tracker_do(request, tracker_type, project_name):
+def edit_tracker_do(request, tracker_type, tracker_name):
     if tracker_type in all_trackers:
         tracker_obj = all_trackers[tracker_type]['model'].all_trackers.get(
-                project_name=project_name)
+                tracker_name=tracker_name)
         tracker_form = all_trackers[tracker_type]['form'](
                 request.POST, instance=tracker_obj, prefix='edit_tracker')
         if tracker_form.is_valid():
             tracker_form.save()
             # Set the revision meta data.
             revision.user = request.user
-            revision.comment = 'Edited the %s tracker' % project_name
+            revision.comment = 'Edited the %s tracker' % tracker_name
             return HttpResponseRedirect(reverse(list_trackers) +
                                 '?notification_id=edit-success')
         else:
             return edit_tracker(request,
                     tracker_type=tracker_type,
-                    project_name=project_name,
+                    tracker_name=tracker_name,
                     tracker_form=tracker_form)
     else:
         # Just go back to base.
         return HttpResponseRedirect(reverse(list_trackers))
 
 @login_required
-def edit_tracker_url(request, tracker_type, project_name, url_id, url_form=None):
+def edit_tracker_url(request, tracker_type, tracker_name, url_id, url_form=None):
     data = {}
     if tracker_type in all_trackers:
         try:
@@ -227,17 +227,17 @@ def edit_tracker_url(request, tracker_type, project_name, url_id, url_form=None)
         except all_trackers[tracker_type]['urlmodel'].DoesNotExist:
             return HttpResponseRedirect(reverse(list_trackers) +
                     '?notification_id=tracker-url-existence-fail')
-        data['project_name'] = project_name
+        data['tracker_name'] = tracker_name
         data['tracker_type'] = tracker_type
         data['url_id'] = url_id
         data['url_form'] = url_form
     
-    data['cancel_url'] = reverse(edit_tracker, args=[tracker_type, project_name])
+    data['cancel_url'] = reverse(edit_tracker, args=[tracker_type, tracker_name])
     return mysite.base.decorators.as_view(request, 'customs/edit_tracker_url.html', data, None)
 
 @login_required
 @revision.create_on_success
-def edit_tracker_url_do(request, tracker_type, project_name, url_id):
+def edit_tracker_url_do(request, tracker_type, tracker_name, url_id):
     url_form = None
     if tracker_type in all_trackers:
         url_obj = all_trackers[tracker_type]['urlmodel'].objects.get(
@@ -249,13 +249,13 @@ def edit_tracker_url_do(request, tracker_type, project_name, url_id):
             url_form.save()
             # Set the revision meta data.
             revision.user = request.user
-            revision.comment = 'Edited URL for the %s tracker' % project_name
-            return HttpResponseRedirect(reverse(edit_tracker, args=[tracker_type, project_name]) +
+            revision.comment = 'Edited URL for the %s tracker' % tracker_name
+            return HttpResponseRedirect(reverse(edit_tracker, args=[tracker_type, tracker_name]) +
                                         '?edit-url-success')
         else:
             return edit_tracker_url(request,
                     tracker_type=tracker_type,
-                    project_name=project_name,
+                    tracker_name=tracker_name,
                     url_id=url_id,
                     url_form=url_form)
     else:
@@ -264,22 +264,22 @@ def edit_tracker_url_do(request, tracker_type, project_name, url_id):
 
 @login_required
 @mysite.base.decorators.view
-def delete_tracker(request, tracker_type, project_name):
+def delete_tracker(request, tracker_type, tracker_name):
     data = {}
-    data['project_name'] = project_name
+    data['tracker_name'] = tracker_name
     data['tracker_type'] = tracker_type
     return (request, 'customs/delete_tracker.html', data)
 
 @login_required
 @revision.create_on_success
-def delete_tracker_do(request, tracker_type, project_name):
+def delete_tracker_do(request, tracker_type, tracker_name):
     if tracker_type in all_trackers:
         tracker = all_trackers[tracker_type]['model'].all_trackers.get(
-                project_name=project_name)
+                tracker_name=tracker_name)
         tracker.delete()
         # Set the revision meta data.
         revision.user = request.user
-        revision.comment = 'Deleted the %s tracker' % project_name
+        revision.comment = 'Deleted the %s tracker' % tracker_name
         # Tell them it worked.
         return HttpResponseRedirect(reverse(list_trackers) +
                         '?notification_id=delete-success')
@@ -288,10 +288,10 @@ def delete_tracker_do(request, tracker_type, project_name):
         return HttpResponseRedirect(reverse(list_trackers))
 
 @login_required
-def delete_tracker_url(request, tracker_type, project_name, url_id):
+def delete_tracker_url(request, tracker_type, tracker_name, url_id):
     data = {}
     if tracker_type in all_trackers:
-        data['project_name'] = project_name
+        data['tracker_name'] = tracker_name
         data['tracker_type'] = tracker_type
         data['url_id'] = url_id
         url_obj = all_trackers_[tracker_type]['urlmodel'].objects.get(id=url_id)
@@ -303,15 +303,15 @@ def delete_tracker_url(request, tracker_type, project_name, url_id):
 
 @login_required
 @revision.create_on_success
-def delete_tracker_url_do(request, tracker_type, project_name, url_id):
+def delete_tracker_url_do(request, tracker_type, tracker_name, url_id):
     if tracker_type in all_trackers:
         url_obj = all_trackers[tracker_type]['urlmodel'].objects.get(id=url_id)
         url_obj.delete()
         # Set the revision meta data.
         revision.user = request.user
-        revision.comment = 'Deleted URL from the %s tracker' % project_name
+        revision.comment = 'Deleted URL from the %s tracker' % tracker_name
         # Tell them it worked.
-        return HttpResponseRedirect(reverse(edit_tracker, args=[tracker_type, project_name]) +
+        return HttpResponseRedirect(reverse(edit_tracker, args=[tracker_type, tracker_name]) +
                             '?delete-url-success')
     else:
-        return HttpResponseRedirect(reverse(edit_tracker, args=[tracker_type, project_name]))
+        return HttpResponseRedirect(reverse(edit_tracker, args=[tracker_type, tracker_name]))
