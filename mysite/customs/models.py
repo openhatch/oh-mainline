@@ -225,3 +225,51 @@ class TracBugTimes(models.Model):
     last_touched = models.DateTimeField(default=datetime.datetime(1970, 1, 1))
     latest_timeline_status = models.CharField(max_length=15, blank=True, default='')
     timeline = models.ForeignKey(TracTimeline)
+
+class TracTrackerModel(TrackerModel):
+    '''This model stores the data for individual Trac trackers.'''
+    tracker_name = models.CharField(max_length=200, unique=True,
+                                    blank=False, null=False)
+    base_url = models.URLField(max_length=200, unique=True,
+                               blank=False, null=False, verify_exists=False,
+            help_text="This is the URL to the homepage of the Trac tracker instance. Remove any subpaths like 'ticket/' or 'query' from this.")
+    bug_project_name_format = models.CharField(max_length=200, blank=False,
+            help_text="Any string here will be used verbatim as the project name for each bug aside from the keys '{project}' and '{component}', which are replaced with the relevant data from each individual bug.")
+    BITESIZED_TYPES = (
+            (None, 'None'),
+            ('keywords', 'Keyword')
+            )
+    bitesized_type = models.CharField(max_length=10, choices=BITESIZED_TYPES, blank=False, default=None)
+    bitesized_text = models.CharField(max_length=200, blank=True, default='',
+            help_text="This is the text that the above field will contain that indicates a bite-sized bug. Separate multiple values with single commas (,) only.")
+    DOCUMENTATION_TYPES = (
+            (None, 'None'),
+            ('keywords', 'Keyword'),
+            ('component', 'Component')
+            )
+    documentation_type = models.CharField(max_length=10, choices=DOCUMENTATION_TYPES, blank=False, null=True, default=None)
+    documentation_text = models.CharField(max_length=200, blank=True, default='',
+            help_text="This is the text that the above field will contain that indicates a documentation bug. Separate multiple values with single commas (,) only.")
+    as_appears_in_distribution = models.CharField(max_length=200, blank=True, default='')
+    old_trac = models.BooleanField(default=False)
+
+    all_trackers = models.Manager()
+
+    def __str__(self):
+        return smart_str('%s' % (self.tracker_name))
+
+    def get_base_url(self):
+        return self.base_url
+
+class TracQueryModel(TrackerQueryModel):
+    '''This model stores query URLs for TracTracker objects.'''
+    url = models.URLField(max_length=400,
+                          blank=False, null=False)
+    description = models.CharField(max_length=200, blank=True, default='')
+    tracker = models.ForeignKey(TracTrackerModel)
+
+    def get_query_url(self):
+        return self.url
+
+reversion.register(TracTrackerModel, follow=["tracquerymodel_set"])
+reversion.register(TracQueryModel)
