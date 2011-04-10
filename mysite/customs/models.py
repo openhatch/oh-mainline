@@ -1,5 +1,5 @@
 # This file is part of OpenHatch.
-# Copyright (C) 2010 Jack Grigg
+# Copyright (C) 2010, 2011 Jack Grigg
 # Copyright (C) 2009, 2010 OpenHatch, Inc.
 #
 # This program is free software: you can redistribute it and/or modify
@@ -26,6 +26,7 @@ import urllib
 
 from django.db import models
 from django.utils.encoding import smart_str
+from model_utils.managers import InheritanceManager
 
 import mysite.search.models
 
@@ -74,7 +75,26 @@ class WebResponse(models.Model):
     def create_from_http_error(error):
         return None
 
-class BugzillaTracker(models.Model):
+class TrackerModel(models.Model):
+    '''This is the base Model that tracker types subclass.'''
+    max_connections = models.IntegerField(blank=True, default=8,
+            help_text="This is the maximum number of simultaneous connections that our bug importer will make to the tracker server.")
+
+    def get_base_url(self):
+        # Implement this in a subclass
+        raise NotImplementedError
+
+class TrackerQueryModel(models.Model):
+    '''This model just exists to provide a way to grab a QuerySet
+    containing all tracker queries.'''
+    last_polled = models.DateTimeField(default=datetime.datetime(1970, 1, 1))
+    objects = InheritanceManager()
+
+    def get_query_url(self):
+        # Implement this in a subclass
+        raise NotImplementedError
+
+class BugzillaTrackerModel(TrackerModel):
     '''This model stores the data for individual Bugzilla trackers.'''
     tracker_name = models.CharField(max_length=200, unique=True,
                                     blank=False, null=False)
@@ -113,6 +133,9 @@ class BugzillaTracker(models.Model):
     def __str__(self):
         return smart_str('%s' % (self.tracker_name))
 
+    def get_base_url(self):
+        return self.base_url
+
     def create_class_that_can_actually_crawl_bugs(self):
         # FIXME: This is totally busted.
         # If you run the tests, you'll see that the project_name isn't somehow
@@ -122,18 +145,21 @@ class BugzillaTracker(models.Model):
         instance = factory()
         return instance
 
-class BugzillaUrl(models.Model):
+class BugzillaQueryModel(TrackerQueryModel):
     '''This model stores query or tracker URLs for BugzillaTracker objects.'''
     url = models.URLField(max_length=400,
                           blank=False, null=False)
     description = models.CharField(max_length=200, blank=True, default='')
-    tracker = models.ForeignKey(BugzillaTracker)
+    tracker = models.ForeignKey(BugzillaTrackerModel)
 
-reversion.register(BugzillaTracker, follow=["bugzillaurl_set"])
-reversion.register(BugzillaUrl)
+    def get_query_url(self):
+        return self.url
 
-class GoogleTracker(models.Model):
-    '''This model stores the data for individual Bugzilla trackers.'''
+reversion.register(BugzillaTrackerModel, follow=["bugzillaquerymodel_set"])
+reversion.register(BugzillaQueryModel)
+
+class GoogleTrackerModel(TrackerModel):
+    '''This model stores the data for individual Google trackers.'''
     tracker_name = models.CharField(max_length=200, unique=True,
                                     blank=False, null=False,
             help_text="This is the name that OpenHatch will use to identify the project.")
@@ -160,15 +186,21 @@ class GoogleTracker(models.Model):
     def __str__(self):
         return smart_str('%s' % (self.tracker_name))
 
-class GoogleQuery(models.Model):
+    def get_base_url(self):
+        return 'http://code.google.com/p/%s/' % self.google_name
+
+class GoogleQueryModel(TrackerQueryModel):
     '''This model stores queries for GoogleTracker objects.
     At present we only allow labels to be queried.'''
     label = models.CharField(max_length=200, blank=True, default='')
     description = models.CharField(max_length=200, blank=True, default='')
-    tracker = models.ForeignKey(GoogleTracker)
+    tracker = models.ForeignKey(GoogleTrackerModel)
 
-reversion.register(GoogleTracker, follow=["googlequery_set"])
-reversion.register(GoogleQuery)
+    def get_query_url(self):
+        return 'https://code.google.com/feeds/issues/p/%s/issues/full?can=open&max-results=10000&label=&%s' % (self.tracker.google_name, self.label)
+
+reversion.register(GoogleTrackerModel, follow=["googlequerymodel_set"])
+reversion.register(GoogleQueryModel)
 
 class TracTimeline(models.Model):
     base_url = models.URLField(max_length=200, unique=True,
@@ -176,6 +208,10 @@ class TracTimeline(models.Model):
     last_polled = models.DateTimeField(default=datetime.datetime(1970, 1, 1))
 
     all_timelines = models.Manager()
+
+    def get_times(self, bug_url):
+        bug_times = self.tracbugtimes_set.get(canonical_bug_link = bug_url)
+        return (bug_times.date_reported, bug_times.last_touched)
 
 class TracBugTimes(models.Model):
     '''This model stores times for bugs extracted from Trac timelines.

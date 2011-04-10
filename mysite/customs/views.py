@@ -1,5 +1,5 @@
 # This file is part of OpenHatch.
-# Copyright (C) 2010 Jack Grigg
+# Copyright (C) 2010, 2011 Jack Grigg
 # Copyright (C) 2009 OpenHatch, Inc.
 #
 # This program is free software: you can redistribute it and/or modify
@@ -28,16 +28,16 @@ import mysite.customs.models
 all_trackers = {
         'bugzilla': {
             'namestr': 'Bugzilla',
-            'model': mysite.customs.models.BugzillaTracker,
+            'model': mysite.customs.models.BugzillaTrackerModel,
             'form': mysite.customs.forms.BugzillaTrackerForm,
-            'urlmodel': mysite.customs.models.BugzillaUrl,
-            'urlform': mysite.customs.forms.BugzillaUrlForm,
+            'urlmodel': mysite.customs.models.BugzillaQueryModel,
+            'urlform': mysite.customs.forms.BugzillaQueryForm,
             },
         'google': {
             'namestr': 'Google Code',
-            'model': mysite.customs.models.GoogleTracker,
+            'model': mysite.customs.models.GoogleTrackerModel,
             'form': mysite.customs.forms.GoogleTrackerForm,
-            'urlmodel': mysite.customs.models.GoogleQuery,
+            'urlmodel': mysite.customs.models.GoogleQueryModel,
             'urlform': mysite.customs.forms.GoogleQueryForm,
             },
         }

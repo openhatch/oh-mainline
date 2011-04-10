@@ -1,5 +1,5 @@
 # This file is part of OpenHatch.
-# Copyright (C) 2010 Jack Grigg
+# Copyright (C) 2010, 2011 Jack Grigg
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as published by
@@ -28,18 +28,18 @@ class TrackerTypesForm(django.forms.Form):
 
 class BugzillaTrackerForm(django.forms.ModelForm):
     class Meta:
-        model = mysite.customs.models.BugzillaTracker
+        model = mysite.customs.models.BugzillaTrackerModel
 
-class BugzillaUrlForm(django.forms.ModelForm):
+class BugzillaQueryForm(django.forms.ModelForm):
     class Meta:
-        model = mysite.customs.models.BugzillaUrl
-        exclude = ('tracker',)
+        model = mysite.customs.models.BugzillaQueryModel
+        exclude = ('tracker', 'last_polled',)
 
 class GoogleTrackerForm(django.forms.ModelForm):
     class Meta:
-        model = mysite.customs.models.GoogleTracker
+        model = mysite.customs.models.GoogleTrackerModel
 
 class GoogleQueryForm(django.forms.ModelForm):
     class Meta:
-        model = mysite.customs.models.GoogleQuery
-        exclude = ('tracker',)
+        model = mysite.customs.models.GoogleQueryModel
+        exclude = ('tracker', 'last_polled',)
