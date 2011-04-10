@@ -25,7 +25,7 @@
         <a style='font-weight: bold;'
             href='{{ bug.canonical_bug_link }}'>
             {{ bug.title }}</a>
-        in&nbsp;{{ bug.project.name }}
+        in&nbsp;{{ bug.project.display_name }}
         {% if bug.project.language %}
         (project&nbsp;language:&nbsp;{{ bug.project.language }})
         {% endif %}

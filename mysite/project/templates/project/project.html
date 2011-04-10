@@ -24,14 +24,14 @@
 {% load base_extras %}
 
 {% block title %}
-Projects - {{ project.name }} 
+Projects - {{ project.display_name }} 
 {% endblock title %}
 
 {% block body_id %}project{% endblock body_id %}
 
 {% block description_for_anonymous_users %}
 <strong>Learn below</strong>
-about how you can help {{ project.name }}
+about how you can help {{ project.display_name }}
 {% endblock %}
 
 {% block css %}
@@ -54,7 +54,7 @@ about how you can help {{ project.name }}
     </noscript>
 
     <h3 class='supertitle'><a href='{% url mysite.project.views.projects %}'>Projects</a></h3>
-    <h1>{{ project.name }}</h1>
+    <h1>{{ project.display_name }}</h1>
 
     <div class='next_steps_for_helpers contains_just_the_head {% if user.get_profile.expand_next_steps %}expanded{% else %}collapsed{% endif %} module' style='background-image: url({% version '/static/images/bg-translucent-green.png' %}); {% if not user_wants_to_help %}display: none;{% endif %}'>
         <div class='head'>
@@ -77,7 +77,7 @@ about how you can help {{ project.name }}
                     <li><a href='{% url mysite.profile.views.edit_info %}'>
                             Talk about your skills and interests on your profile</a></li>
                     <li><a href='{% url mysite.search.views.fetch_bugs %}?q={{ project.name|urlencode }}&toughness=bitesize'>
-                            Find a bite-size bug in {{ project.name }}
+                            Find a bite-size bug in {{ project.display_name }}
                         </a></li>
                     <li><a href='{% url mysite.profile.views.edit_info %}#contact_blurb'>
                                 Make sure your contact info is up to date</a></li>
@@ -181,7 +181,7 @@ about how you can help {{ project.name }}
 {% block main %}
     <div class='module' id='about'>
         <div class='head'>
-            <h3>About {{ project.name }}</h3>
+            <h3>About {{ project.display_name }}</h3>
             <ul>
                 <li>
                     <a href='{{ project.get_edit_page_url }}'>Edit</a>
@@ -213,7 +213,7 @@ about how you can help {{ project.name }}
                 {% else %}
                     <div style='color: #777; font-size: .85em;'>
                         No one has described this project yet. To describe the
-                        project, <a href='{% url mysite.profile.views.importer %}?add_project_name={{ project.name|urlencode }}'>
+                        project, <a href='{% url mysite.profile.views.importer %}?add_project_name={{ project.display_name|urlencode }}'>
                             add it to your profile</a>.
                     </div>
                 {% endif %}
@@ -284,12 +284,12 @@ about how you can help {{ project.name }}
                         <strong>
                             Volunteer opportunit{{ project.get_open_bugs|pluralize:"y,ies"}}
                         </strong>
-                        matching {{ project.name }} ({{ project.get_open_bugs|length }})
+                        matching {{ project.display_name }} ({{ project.get_open_bugs|length }})
                     </a>
             </p>
         {% else %}
             <p>
-                No volunteer opportunities in {{project.name}} indexed here yet. 
+                No volunteer opportunities in {{project.display_name}} indexed here yet. 
                 <a href='/wiki/Bug_trackers'>
                     To add a bug tracker, 
                     visit our wiki</a>.
@@ -298,7 +298,7 @@ about how you can help {{ project.name }}
     {% endif %}
   
   {% with mentors as mentors %}
-  {% with project.name as topic %}
+  {% with project.display_name as topic %}
   {% with 0 as explain_language %}
   {% include 'project/mentor_summary.html' %}
   {% endwith %}

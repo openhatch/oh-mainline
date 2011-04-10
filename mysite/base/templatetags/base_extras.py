@@ -93,8 +93,8 @@ def get_answers_from_session(request):
     return mysite.project.controllers.get_unsaved_answers_from_session(request.session)
 
 @register.filter
-def get_project_names_to_help_from_session(request):
-    return [p.name for p in
+def get_project_display_names_to_help_from_session(request):
+    return [p.display_name for p in
             mysite.project.controllers.get_wanna_help_queue_from_session(request.session)]
 
 @register.filter

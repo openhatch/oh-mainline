@@ -74,11 +74,11 @@
         {% endif %}
 
         {# PROJECTS #}
-        {% with person.get_names_of_nonarchived_projects as project_names %}
-            {% if project_names %}
+        {% with person.get_display_names_of_nonarchived_projects as project_display_names %}
+            {% if project_display_names %}
                 <span class="people-view-projects">
                     <span style="color: #999;">projects:</span>
-                    {% with project_names as list %}
+                    {% with project_display_names as list %}
                         {% include 'expandable_list.html' %}
                     {% endwith %}
                 </span>

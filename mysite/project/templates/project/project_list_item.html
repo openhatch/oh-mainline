@@ -23,7 +23,7 @@
             {% endif %}
             >
             <a href='{{ project.get_url }}'>
-                {{ project.name|break_long_words|safe }} 
+                {{ project.display_name|break_long_words|safe }} 
             </a>
             <div class='summary'>
                 {% if project.get_open_bugs %}

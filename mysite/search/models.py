@@ -124,7 +124,9 @@ class Project(OpenHatchModel):
         return ret
 
     name = models.CharField(max_length=200, unique=True,
-            help_text='<span class="example">This box is for fixing capitalization mistakes. To change the name of this project, email <a style="color: #666;" href="mailto:%s">%s</a>.</span>' % (('hello@openhatch.org',)*2))
+            help_text='<span class="example">This is the name that will uniquely identify this project (e.g. in URLs), and this box is fixing capitalization mistakes. To change the name of this project, email <a style="color: #666;" href="mailto:%s">%s</a>.</span>' % (('hello@openhatch.org',)*2))
+    display_name = models.CharField(max_length=200, default='',
+            help_text='<span class="example">This is the name that will be displayed for this project, and is freely editable.</span>')
     display_name = models.CharField(max_length=200, default='')
     homepage = models.URLField(max_length=200, blank=True, default='',
             verbose_name='Project homepage URL')
@@ -440,16 +442,16 @@ class Answer(OpenHatchModel):
     def get_question_text(self, mention_project_name=True):
         if self.question.key_string == 'where_to_start':
             retval =  "I'd like to participate%s. How do I begin?" % (
-                        " in %s" % self.project.name if mention_project_name else "")
+                        " in %s" % self.project.display_name if mention_project_name else "")
         elif self.question.key_string == 'stress':
             retval = "What is a bug or issue%s that you've been putting off, neglecting or just plain avoiding?" % (
-                        " with %s" % self.project.name if mention_project_name else "")
+                        " with %s" % self.project.display_name if mention_project_name else "")
         elif self.question.key_string == 'newcomers':
             retval =  "What's a good bug%s for a newcomer to tackle?" % (
-                        " in %s" % self.project.name if mention_project_name else "")
+                        " in %s" % self.project.display_name if mention_project_name else "")
         elif self.question.key_string == 'non_code_participation':
             retval =  "Other than writing code, how can I contribute%s?" % (
-                        " to %s" % self.project.name if mention_project_name else "")
+                        " to %s" % self.project.display_name if mention_project_name else "")
         else: # Shouldn't get here.
             retval = ""
         return retval
@@ -461,7 +463,7 @@ class Answer(OpenHatchModel):
     def get_title_for_atom(self):
         return "%s added an answer for %s" % (
                 self.author.get_profile().get_full_name_and_username(),
-                self.project.name)
+                self.project.display_name)
 
     def get_description_for_atom(self):
         return "%s added an answer to the question \"%s\"" % (
@@ -661,7 +663,7 @@ class WannaHelperNote(OpenHatchModel):
 
     def get_title_for_atom(self):
         return "%s is willing to help %s" % (
-                self.person.get_full_name_and_username(), self.project.name)
+                self.person.get_full_name_and_username(), self.project.display_name)
 
     def get_description_for_atom(self):
         return self.get_title_for_atom()

@@ -182,10 +182,11 @@ def bugs_to_json_response(data, bunch_of_bugs, callback_function_name=''):
     bugs = obj_serializer.serialize(bunch_of_bugs)
 
     # Step 2: With a (tragically) large number of database calls, 
-    # loop over these objects, replacing project primary keys with project names.
+    # loop over these objects, replacing project primary keys with project
+    # display names.
     for bug in bugs:
         project = Project.objects.get(pk=int(bug['fields']['project']))
-        bug['fields']['project'] = project.name
+        bug['fields']['project'] = project.display_name
 
     # Step 3: Create a JSON-happy list of key-value pairs
     data_list = [{'bugs': bugs}]
@@ -239,7 +240,7 @@ def get_autocompletion_suggestions(input):
     This method returns a list of suggested queries.
     It checks the query substring against a number of
     fields in the database:
-      - project.name
+      - project.display_name
       - project.language
 
     Not yet implemented:
@@ -279,13 +280,16 @@ def get_autocompletion_suggestions(input):
     if sf_project.is_queried:
 
         # Compile list of projects
+        # XXX: This searches on display_name, as that is what the user is more
+        # likely to be trying to type. And also because it is display_name that
+        # search uses to query projects.
         projects_by_name = Project.objects.filter(
-                name__istartswith=partial_query)
+                display_name__istartswith=partial_query)
         # FIXME: Is __istartswith faster than
         # lowercasing and using startswith?
 
         # Produce a list of names like ['Exaile', 'GNOME-DO', ...]
-        project_names = projects_by_name.values_list('name', flat=True)
+        project_names = projects_by_name.values_list('display_name', flat=True)
 
         # Limit
         project_names = project_names[:project_max]

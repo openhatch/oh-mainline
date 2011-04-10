@@ -48,7 +48,7 @@ form { width: 350px; }
     <div class='body'>
 
         {% with request|get_answers_from_session as answers %}
-        {% with request|get_project_names_to_help_from_session as project_names_to_help %}
+        {% with request|get_project_display_names_to_help_from_session as project_names_to_help %}
 
         {% if answers %}
         <div class='post_login_action_explanation'>
@@ -86,7 +86,7 @@ form { width: 350px; }
                 {% for answer in answers %}
                     <li>
                         <h4 style='width: 95%;'>
-                            Your reply on the {{ answer.project.name }} page:
+                            Your reply on the {{ answer.project.display_name }} page:
                         </h4>
                         <div class="the-data">
                             <p> <span style='font-size: 1.1em;'>

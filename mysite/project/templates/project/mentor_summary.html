@@ -24,7 +24,7 @@
                   {{ mentors|length|pluralize:"person,people" }}
                   who can mentor in
                   <strong>{{ topic }}</strong></a>{% if explain_language %},
-              {{ project.name }}'s primary language{% endif %}.
+              {{ project.display_name }}'s primary language{% endif %}.
           </p>
 {% else %}
 

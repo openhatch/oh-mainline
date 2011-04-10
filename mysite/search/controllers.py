@@ -116,11 +116,14 @@ class Query:
             q &= Q(project__language__iexact=language_value)
 
         # project facet
+        # FIXME: Because of the way the search page is set up, we have to use
+        # the project's display_name to identify the project, which isn't
+        # very nice.
         project_is_active = (u'project' in self.active_facet_options.keys())
         exclude_project = exclude_active_facets and project_is_active
         if u'project' in self.active_facet_options and not exclude_project:
             project_value = self.active_facet_options[u'project']
-            q &= Q(project__name__iexact=project_value)
+            q &= Q(project__display_name__iexact=project_value)
 
         # contribution type facet
         contribution_type_is_active = ('contribution_type' in
@@ -323,7 +326,7 @@ class Query:
         bugs = query_without_project_facet.get_bugs_unordered()
         project_ids = list(bugs.values_list(u'project__id', flat=True).distinct())
         projects = Project.objects.filter(id__in=project_ids)
-        project_names = [project.name or u'Unknown' for project in projects]
+        project_names = [project.display_name or u'Unknown' for project in projects]
 
         # Add the active project facet, if there is one
         if u'project' in self.active_facet_options:
@@ -382,7 +385,7 @@ def get_project_count():
 
 def get_projects_with_bugs():
     bugs = mysite.search.models.Bug.all_bugs.all()
-    one_bug_dict_per_project = bugs.values(u'project').distinct().order_by(u'project__name')
+    one_bug_dict_per_project = bugs.values(u'project').distinct().order_by(u'project__display_name')
     #project_names = [b[u'project__name'] for b in one_bug_dict_per_project]
     projects = []
     for bug_dict in one_bug_dict_per_project:

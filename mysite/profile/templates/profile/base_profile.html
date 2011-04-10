@@ -241,7 +241,7 @@
             <h4>is interested in helping</h4>
             {% spaceless %}
             {% for project in projects_i_wanna_help %}
-                <a href='{{ project.get_url }}'>{{ project.name }}</a>
+                <a href='{{ project.get_url }}'>{{ project.display_name }}</a>
                 {% if not forloop.last %}
                     <span>, </span>
                 {% endif %}

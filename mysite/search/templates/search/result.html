@@ -26,11 +26,11 @@
 
     {# Project logo #}
     <img src='{{ bug.project.get_url_of_search_result_icon_or_generic }}' 
-        title='{{bug.project.name}}' />
+        title='{{bug.project.display_name}}' />
 
     {# Project name #}
     <span class='project__name'>
-        {{ bug.project.name|break_long_words:16|safe }} 
+        {{ bug.project.display_name|break_long_words:16|safe }} 
     </span>
 
     {# Mentors #}

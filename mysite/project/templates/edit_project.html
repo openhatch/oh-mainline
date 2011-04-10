@@ -20,7 +20,7 @@
 {% load base_extras %}
 
 {% block title %}
-Editing project - {{ project.name }} 
+Editing project - {{ project.display_name }} 
 {% endblock title %}
 
 {% block body_id %}edit_project{% endblock body_id %}
@@ -29,7 +29,7 @@ Editing project - {{ project.name }}
 {% block content %}
     <div class='module'>
         <div class='head'>
-            <h3>Settings for <strong>{{ project.name }}</strong></h3>
+            <h3>Settings for <strong>{{ project.display_name }}</strong></h3>
         </div>
         <div class='body'>
             <div id='tabbed_container'>

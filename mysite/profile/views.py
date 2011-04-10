@@ -524,7 +524,7 @@ def project_query2mappable_orm_people(parsed_query):
             suggestions_for_searches_regarding_people_who_can_pitch_in.append(
                 {'query': orm_project.language,
                  'count': len(people_who_can_pitch_in_with_project_language),
-                 'summary_addendum': ", %s's primary language" % orm_project.name})
+                 'summary_addendum': ", %s's primary language" % orm_project.display_name})
 
 
     # Suggestions for possible mentors
@@ -536,7 +536,7 @@ def project_query2mappable_orm_people(parsed_query):
             suggestions_for_searches_regarding_people_who_can_mentor.append(
                 {'query': orm_project.language,
                  'count': len(people_who_could_mentor_in_the_project_language),
-                 'summary_addendum': ", %s's primary language" % orm_project.name})
+                 'summary_addendum': ", %s's primary language" % orm_project.display_name})
 
     extra_data['suggestions_for_searches_regarding_people_who_can_pitch_in'
                ].extend(suggestions_for_searches_regarding_people_who_can_pitch_in)
@@ -689,10 +689,15 @@ def people(request):
     if data['query_type'] == "icanhelp":
         data['matching_project_suggestions'] = []
     else:
-        data['matching_project_suggestions'] = Project.objects.filter(
+        mps1 = Project.objects.filter(
             cached_contributor_count__gt=0, name__icontains=data['q']).filter(
             ~Q(name__iexact=data['q'])).order_by(
             '-cached_contributor_count')
+        mps2 = Project.objects.filter(
+            cached_contributor_count__gt=0, display_name__icontains=data['q']).filter(
+            ~Q(name__iexact=data['q'])).order_by(
+            '-cached_contributor_count')
+        data['matching_project_suggestions'] = mps1 | mps2
 
     if data['people']:
         data['a_few_matching_project_suggestions'] = data['matching_project_suggestions'][:3]
@@ -724,7 +729,15 @@ def people(request):
     try:
         data['queried_project'] = Project.objects.get(name=data['q'])
     except Project.DoesNotExist:
-        data['queried_project'] = None
+        try:
+            # See if what they have typed in matches a display name
+            data['queried_project'] = Project.objects.get(display_name=data['q'])
+        except Project.DoesNotExist:
+            data['queried_project'] = None
+            data['multiple_projects_matching'] = False
+        except Project.MultipleObjectsReturned:
+            data['queried_project'] = None
+            data['multiple_projects_matching'] = True
 
     # If this is a project, determine how many people are listed as willing to
     # contribute to that project.
@@ -732,7 +745,10 @@ def people(request):
         data['icanhelp_count'] = data['queried_project'].people_who_wanna_help.all().count()
 
     if data['query_type'] == 'icanhelp' and not data['queried_project']:
-        data['total_query_summary'] = "Sorry, we couldn't find a project named <strong>%s</strong>." % data['q']
+        if data['multiple_projects_matching']:
+            data['total_query_summary'] = "Your query <strong>%s</strong> matched multiple projects, which is incompatible with this search type." % data['q']
+        else:
+            data['total_query_summary'] = "Sorry, we couldn't find a project named <strong>%s</strong>." % data['q']
 
     data['suggestions'] = [
         dict(display_name='projects',

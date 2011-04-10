@@ -34,7 +34,7 @@
 {% endblock %}
 
 {% block pagetop %}
-    <h1>You're now registered as a helper for <strong>{{ the_lucky_project.name }}</strong>.</h1>
+    <h1>You're now registered as a helper for <strong>{{ the_lucky_project.display_name }}</strong>.</h1>
 {% endblock %}
 
 {% block content %}
@@ -46,7 +46,7 @@
                         Next step #1:
                     </span>
                     Learn about some of the other registered helpers for
-                    {{ the_lucky_project.name }}</h3>
+                    {{ the_lucky_project.display_name }}</h3>
             </div>
             <div class='body'>
                 <ul id='people-list'>
@@ -67,7 +67,7 @@
                     <span style='font-weight: normal;'>
                         Next step #2:
                     </span>
-                    Read about getting involved in {{ the_lucky_project.name }}</h3>
+                    Read about getting involved in {{ the_lucky_project.display_name }}</h3>
             </div>
             <div class='body'>
                 <ul id='people-list'>

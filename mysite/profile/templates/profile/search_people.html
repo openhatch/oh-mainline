@@ -151,7 +151,7 @@ People Search
     {% with projects_that_match_q_exactly.0 as matching_project %}
         {% if matching_project %}
             <div id='project_yeller'>
-                <a href='{{ matching_project.get_url }}'>{{ matching_project.name }}</a> is a project with 
+                <a href='{{ matching_project.get_url }}'>{{ matching_project.display_name }}</a> is a project with 
                 <a href='?q=project:{{matching_project.name_with_quotes_if_necessary|urlencode}}'>
                     {{ matching_project.get_contributors|length }}
                     contributor{{ matching_project.get_contributors|length|pluralize}}</a>.
@@ -263,7 +263,7 @@ People Search
             {% for project in a_few_matching_project_suggestions %}
                 {% spaceless %}
                 <a href='?q=project:{{project.name_with_quotes_if_necessary}}'>
-                    {{project.name}}</a>
+                    {{project.display_name}}</a>
                 {% if forloop.last %}
                     (<a id='show_all_matching_projects' href='#'>more</a>)
                 {% else %}<span>, </span>{% endif %}
@@ -272,7 +272,7 @@ People Search
         </span>
         <ul id='all_matching_project_suggestions'>
             {% for project in matching_project_suggestions %}
-                <li style="clear: both;"><a href='?q=project:{{project.name_with_quotes_if_necessary}}'>{{project.name}}</a></li>
+                <li style="clear: both;"><a href='?q=project:{{project.name_with_quotes_if_necessary}}'>{{project.display_name}}</a></li>
             {% endfor %}
             {% if people %}
                 (<a id='show_fewer_matching_projects' href='#'>less</a>)

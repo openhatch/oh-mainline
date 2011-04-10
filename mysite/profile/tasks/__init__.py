@@ -155,7 +155,7 @@ def update_someones_pf_cache(person__pk):
     django.core.cache.cache.delete(cache_key)
     
     # This getter will populate the cache
-    return person.get_names_of_nonarchived_projects()
+    return person.get_display_names_of_nonarchived_projects()
 
 def fill_recommended_bugs_cache():
     logging.info("Filling recommended bugs cache for all people.")

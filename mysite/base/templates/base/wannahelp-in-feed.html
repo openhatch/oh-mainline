@@ -42,7 +42,7 @@
     {% spaceless %}
     {% with feed_item.project as project %}
       is willing to help
-      <a style='font-weight: bold;' href='{{ project.get_url }}'>{{project.name}}</a>
+      <a style='font-weight: bold;' href='{{ project.get_url }}'>{{project.display_name}}</a>
     {% endwith %}
     {% endspaceless %}
     {% endcache %}

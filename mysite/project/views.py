@@ -239,6 +239,7 @@ def suggest_question_do(request):
     user = request.user
     body = request.POST['suggested_question']
     body += "\nproject name: " + project.name
+    body += "\nproject display name: " + project.display_name
     body += "\nproject pk: " + str(project.pk)
     body += "\nuser name: " + user.username
     body += "\nuser pk: " + str(user.pk)

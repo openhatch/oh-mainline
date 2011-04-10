@@ -133,7 +133,7 @@ class Command(BaseCommand):
 
     def get_context_for_weekly_email_to(self, recipient):
         context = {}
-        project_name2people = []
+        project2people = []
 
         within_range = Q(
                 date_created__gt=  self.this_run_covers_things_since,
@@ -191,14 +191,14 @@ class Command(BaseCommand):
             people_data['display_these_wannahelpers'] = display_these_wannahelpers
 
             # Store dictionary inside tuple
-            project_name2people.append((project.name, people_data))
+            project2people.append((project, people_data))
 
-        if not project_name2people:
+        if not project2people:
             # If there's no news to report, signal this fact loudly to the caller
             return None
 
         context['recipient'] = recipient
-        context['project_name2people'] = project_name2people
+        context['project2people'] = project2people
         token_string = recipient.generate_new_unsubscribe_token().string
         context['unsubscribe_link'] = "http://openhatch.org" + reverse(
                 mysite.profile.views.unsubscribe, 

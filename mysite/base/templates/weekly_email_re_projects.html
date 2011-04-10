@@ -58,15 +58,15 @@
         </p>
 
         <dl>
-            {% for project_name, ppl_data in project_name2people %}
+            {% for project, ppl_data in project2people %}
             <dt style='font-weight: bold; margin-top: 1em;'>
 
             {% if rich_text %}
-            <a href='http://openhatch.org/+projects/{{ project_name|urlencode }}'>
-                {{ project_name }}</a>
+            <a href='http://openhatch.org/+projects/{{ project.name|urlencode }}'>
+                {{ project.display_name }}</a>
             {% else %}
-            ## {{ project_name }} ##<br>
-            &lt;http://openhatch.org/+projects/{{ project_name|urlencode }}&gt;
+            ## {{ project.display_name }} ##<br>
+            &lt;http://openhatch.org/+projects/{{ project.name|urlencode }}&gt;
             {% endif %}
             </dt>
 
