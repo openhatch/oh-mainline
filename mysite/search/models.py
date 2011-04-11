@@ -23,6 +23,8 @@ from django.db import models
 from django.core.files.base import ContentFile
 from django.core.files.images import get_image_dimensions
 from django.contrib.auth.models import User
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes import generic
 from django.core.cache import cache
 from django.conf import settings
 import datetime
@@ -508,6 +510,10 @@ class BugTracker(OpenHatchModel):
     # However, right now, some of our bug tracker classes are not models at all, so
     # we can't access them through the Django content types framework. Once we convert
     # those classes to be model instances, then we can ditch this BugTracker class.
+    #
+    # EDIT: The Content Types framework is used for all trackers (including hard-coded
+    # special cases) handled by the asynchronous bug importer. Once all existing bug
+    # importers have been migrated over, this BugTracker class can be removed.
 
     # If it is a hard-coded class, use these
     module_name = models.CharField(max_length=500, blank=True)
@@ -592,6 +598,10 @@ class Bug(OpenHatchModel):
     bize_size_tag_name = models.CharField(max_length=50) 
     concerns_just_documentation = models.BooleanField(default=False)
     as_appears_in_distribution = models.CharField(max_length=200, default='')
+
+    tracker_type = models.ForeignKey(ContentType, null=True)
+    tracker_id = models.PositiveIntegerField(null=True)
+    tracker = generic.GenericForeignKey('tracker_type', 'tracker_id')
 
     bug_tracker = models.ForeignKey(BugTracker, null=True)
 
