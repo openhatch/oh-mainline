@@ -2180,7 +2180,7 @@ class Notifications(TwillTests):
         command = mysite.profile.management.commands.send_weekly_emails.Command()
         context = command.get_context_for_weekly_email_to(paul)
 
-        project_name, actual_people = context['project_name2people'][0]
+        project, actual_people = context['project2people'][0]
 
         # Assert that the truncated list of contributors that will appear in
         # the email is a subset of the people we added above
@@ -2208,9 +2208,9 @@ class Notifications(TwillTests):
 
         for msg_encoded in [text_msg, html_msg]:
             msg = quopri.decodestring(msg_encoded.get_payload())
-            for project_name, people_data in context['project_name2people']:
+            for project, people_data in context['project2people']:
                 contribs_count = str(people_data['contributor_count'])
-                self.assert_(project_name in msg)
+                self.assert_(project.display_name in msg)
                 self.assert_(contribs_count in msg)
                 for p in people_data['display_these_contributors']:
                     self.assert_(p.user.username in msg)
@@ -2227,7 +2227,7 @@ class Notifications(TwillTests):
 
         def get_contributors_data():
             context = Notifications.get_email_context(paul)
-            project_name, contributors_data = context['project_name2people'][0]
+            project, contributors_data = context['project2people'][0]
             return contributors_data
 
         # To set up this test, let's create a project
@@ -2268,14 +2268,14 @@ class Notifications(TwillTests):
         solo_project = Project.create_dummy(name='solo project')
         PortfolioEntry.create_dummy(person=paul, project=solo_project, is_published=True)
         context = Notifications.get_email_context(paul)
-        project_name2people = context['project_name2people']
-        first_project_name, contributors_data = project_name2people[0]
+        project2people = context['project2people']
+        first_project, contributors_data = project2people[0]
 
         # The first project appears in the email
-        self.assertEqual(first_project_name, project.name)
+        self.assertEqual(first_project.name, project.name)
 
         # The second project doesn't appear
-        self.assertEqual(len(project_name2people), 1)
+        self.assertEqual(len(project2people), 1)
 
 
     def test_dont_send_email_when_recipient_has_no_recent_fellow_contributors(self):
@@ -2451,9 +2451,9 @@ class Notifications(TwillTests):
         command = mysite.profile.management.commands.send_weekly_emails.Command()
         email_context = command.get_context_for_weekly_email_to(email_recipient)
         self.assert_(email_context)
-        project_name2people = email_context['project_name2people']
-        self.assertEqual(len(project_name2people), 1)
-        project_name, people = project_name2people[0]
+        project2people = email_context['project2people']
+        self.assertEqual(len(project2people), 1)
+        project, people = project2people[0]
         self.assertEqual(
                 [new_wh],
                 people['display_these_wannahelpers'],
