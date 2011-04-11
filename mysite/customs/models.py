@@ -234,14 +234,14 @@ class TracTrackerModel(TrackerModel):
                                blank=False, null=False, verify_exists=False,
             help_text="This is the URL to the homepage of the Trac tracker instance. Remove any subpaths like 'ticket/' or 'query' from this.")
     bug_project_name_format = models.CharField(max_length=200, blank=False,
-            help_text="Any string here will be used verbatim as the project name for each bug aside from the keys '{project}' and '{component}', which are replaced with the relevant data from each individual bug.")
+            help_text="Any string here will be used verbatim as the project name for each bug aside from the keys '{tracker_name}' and '{component}', which are replaced with the tracker's name from above and the relevant data from each individual bug respectively.")
     BITESIZED_TYPES = (
             (None, 'None'),
             ('keywords', 'Keyword')
             )
     bitesized_type = models.CharField(max_length=10, choices=BITESIZED_TYPES, blank=False, default=None)
     bitesized_text = models.CharField(max_length=200, blank=True, default='',
-            help_text="This is the text that the above field will contain that indicates a bite-sized bug. Separate multiple values with single commas (,) only.")
+            help_text="This is the text that the field type selected above will contain that indicates a bite-sized bug. Separate multiple values with single commas (,) only.")
     DOCUMENTATION_TYPES = (
             (None, 'None'),
             ('keywords', 'Keyword'),
@@ -249,7 +249,7 @@ class TracTrackerModel(TrackerModel):
             )
     documentation_type = models.CharField(max_length=10, choices=DOCUMENTATION_TYPES, blank=False, null=True, default=None)
     documentation_text = models.CharField(max_length=200, blank=True, default='',
-            help_text="This is the text that the above field will contain that indicates a documentation bug. Separate multiple values with single commas (,) only.")
+            help_text="This is the text that the field type selected above will contain that indicates a documentation bug. Separate multiple values with single commas (,) only.")
     as_appears_in_distribution = models.CharField(max_length=200, blank=True, default='')
     old_trac = models.BooleanField(default=False)
 
