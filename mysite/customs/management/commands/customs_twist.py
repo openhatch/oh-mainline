@@ -1,4 +1,5 @@
 # This file is part of OpenHatch.
+# Copyright (C) 2011 Jack Grigg
 # Copyright (C) 2010, 2011 OpenHatch, Inc.
 #
 # This program is free software: you can redistribute it and/or modify
@@ -14,16 +15,97 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from collections import defaultdict
 from django.core.management.base import BaseCommand
 import twisted.web.client
 import twisted.internet
 import mysite.customs.profile_importers
+import datetime
 import logging
 
+import mysite.customs.models
+import mysite.customs.bugimporters.base
+import mysite.customs.bugimporters.trac
 import mysite.profile.models
+from mysite.search.models import Bug
+
+tracker2importer = {
+        # This first one catches any Bugs with bug.tracker = None and updates
+        # that field. Then it passes the bugs back here for updating.
+        None.__class__:
+            mysite.customs.bugimporters.base.AddTrackerForeignKeysToBugs,
+        # The rest of these link specific subclasses of TrackerModel to the
+        # relevant BugImporter class. This includes the hard-coded special
+        # cases, where the TrackerModel is just a shell linking to the location
+        # of the hard-coded class and the BugImporter is a special one that
+        # handles them specifically.
+        mysite.customs.models.TracTrackerModel:
+            mysite.customs.bugimporters.trac.TracBugImporter
+        }
 
 class Command(BaseCommand):
     help = "Call this when you want to run a Twisted reactor."
+
+    def update_trackers(self):
+        # Fetch a list of Queries that are stale.
+        queries = mysite.customs.models.TrackerQueryModel.objects.filter(
+                last_polled__lt = datetime.datetime.utcnow() - datetime.timedelta(days = 1)
+                ).select_subclasses()
+        # Convert this list to a dictionary of TrackerModules.
+        tm_list = [(query, query.tracker) for query in queries]
+        tm_dict = defaultdict ( list )
+        [tm_dict[k].append(v) for v, k in tm_list]
+        # For each TrackerModel, process its stale Queries.
+        for tm, queries in tm_dict.items():
+            try:
+                icls = tracker2importer[tm.__class__]
+            except KeyError:
+                # This TrackerModule doesn't have a BugImporter yet.
+                continue
+            else:
+                # See if there is already an importer running for this tracker.
+                im = self.running_importers.get(tm, None)
+                if not im:
+                    # There isn't, so create one.
+                    im = icls(tm, self)
+                    # And store it.
+                    self.running_importers[tm] = im
+                # Give the importer queries to process.
+                im.process_queries(queries)
+
+    def update_bugs(self, bug_list = None):
+        # Check if we have been specifically passed Bugs to update.
+        if bug_list:
+            bugs = bug_list
+        else:
+            # Fetch a list of all Bugs that are stale.
+            bugs = Bug.all_bugs.filter(
+                    last_polled__lt = datetime.datetime.utcnow() - datetime.timedelta(days = 1))
+        # Convert this list to a dictionary of TrackerModules.
+        tm_list = [(bug, bug.tracker) for bug in bugs]
+        tm_dict = defaultdict ( list )
+        [tm_dict[k].append(v) for v, k in tm_list]
+        # For each TrackerModel, process its stale Bugs.
+        for tm, bugs in tm_dict.items():
+            try:
+                icls = tracker2importer[tm.__class__]
+            except KeyError:
+                # This TrackerModule doesn't have a BugImporter yet.
+                continue
+            else:
+                # See if there is already an importer running for this tracker.
+                im = self.running_importers.get(tm, None)
+                if not im:
+                    # There isn't, so create one.
+                    im = icls(tm, self)
+                    # And store it.
+                    self.running_importers[tm] = im
+                # Give the importer bug URLs to process.
+                bug_urls = [bug.canonical_bug_link for bug in bugs]
+                # Put the bug list in the form required for process_bugs.
+                # The second entry of the tuple is None as we obviously have no data yet.
+                bug_list = [(bug_url, None) for bug_url in bug_urls]
+                im.process_bugs(bug_list)
 
     def create_tasks_from_dias(self, max = 8):
         print 'For all DIAs we know how to process with Twisted: enqueue them.'
@@ -87,11 +169,17 @@ class Command(BaseCommand):
         d.addCallback(self.decrement_deferred_count_and_maybe_quit)
 
     def decrement_deferred_count_and_maybe_quit(self, *args):
+        self.decrement_deferred_count()
+        self.maybe_quit()
+
+    def decrement_deferred_count(self, *args):
         self.running_deferreds -= 1
-        if self.running_deferreds == 0:
-            self.stop_the_reactor()
         if self.running_deferreds < 0:
             raise ValueError("Uh, number of running deferreds went negative.")
+
+    def maybe_quit(self, *args):
+        if self.running_deferreds == 0:
+            self.stop_the_reactor()
 
     def stop_the_reactor(self, *args):
         if self.already_enqueued_stop_command:
@@ -102,11 +190,14 @@ class Command(BaseCommand):
 
     def handle(self, use_reactor=True, *args, **options):
         self.running_deferreds = 0
+        self.running_importers = {}
         self.already_enqueued_stop_command = False
         self.active_dia_pks = set()
 
         print "Creating getPage()-based deferreds..."
         self.create_tasks_from_dias()
+        self.update_trackers()
+        self.update_bugs()
         if self.running_deferreds:
             print 'Starting Reactor...'
             assert use_reactor

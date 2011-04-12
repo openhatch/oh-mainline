@@ -79,6 +79,7 @@ class TrackerModel(models.Model):
     '''This is the base Model that tracker types subclass.'''
     max_connections = models.IntegerField(blank=True, default=8,
             help_text="This is the maximum number of simultaneous connections that our bug importer will make to the tracker server.")
+    objects = InheritanceManager()
 
     def get_base_url(self):
         # Implement this in a subclass
