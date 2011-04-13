@@ -806,9 +806,9 @@ Keywords: Torrent unittest""")
             settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml')).read())
 
         miro_tracker = mysite.customs.models.BugzillaTracker(
-                project_name='Miro',
+                tracker_name='Miro',
                 base_url='http://bugzilla.pculture.org/',
-                bug_project_name_format='{project}',
+                bug_project_name_format='{tracker_name}',
                 query_url_type='xml',
                 bitesized_type='key',
                 bitesized_text='bitesized',
@@ -851,9 +851,9 @@ Keywords: Torrent unittest""")
             settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml')).read())
 
         miro_tracker = mysite.customs.models.BugzillaTracker(
-                project_name='Miro',
+                tracker_name='Miro',
                 base_url='http://bugzilla.pculture.org/',
-                bug_project_name_format='{project}',
+                bug_project_name_format='{tracker_name}',
                 query_url_type='xml',
                 bitesized_type='key',
                 bitesized_text='bitesized',
@@ -890,9 +890,9 @@ Keywords: Torrent unittest""")
         mock_xml_opener.return_value = lxml.etree.XML(cooked_xml)
 
         miro_tracker = mysite.customs.models.BugzillaTracker(
-                project_name='Miro',
+                tracker_name='Miro',
                 base_url='http://bugzilla.pculture.org/',
-                bug_project_name_format='{project}',
+                bug_project_name_format='{tracker_name}',
                 query_url_type='xml',
                 bitesized_type='key',
                 bitesized_text='bitesized',
@@ -925,9 +925,9 @@ Keywords: Torrent unittest""")
             settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06-RESOLVED.xml')).read())
 
         miro_tracker = mysite.customs.models.BugzillaTracker(
-                project_name='Miro',
+                tracker_name='Miro',
                 base_url='http://bugzilla.pculture.org/',
-                bug_project_name_format='{project}',
+                bug_project_name_format='{tracker_name}',
                 query_url_type='xml',
                 bitesized_type='key',
                 bitesized_text='bitesized',
@@ -956,9 +956,9 @@ Keywords: Torrent unittest""")
         mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
             settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml')).read())
         miro_tracker = mysite.customs.models.BugzillaTracker(
-                project_name='Miro',
+                tracker_name='Miro',
                 base_url='http://bugzilla.pculture.org/',
-                bug_project_name_format='{project}',
+                bug_project_name_format='{tracker_name}',
                 query_url_type='xml',
                 bitesized_type='key',
                 bitesized_text='bitesized',
@@ -1019,9 +1019,9 @@ Keywords: Torrent unittest""")
         # though the xml bug list is empty
         
         miro_tracker = mysite.customs.models.BugzillaTracker(
-                project_name='Miro',
+                tracker_name='Miro',
                 base_url='http://bugzilla.pculture.org/',
-                bug_project_name_format='{project}',
+                bug_project_name_format='{tracker_name}',
                 query_url_type='xml',
                 bitesized_type='key',
                 bitesized_text='bitesized',
@@ -2356,9 +2356,9 @@ class BugsCreatedByBugzillaTrackersCanRefreshThemselves(django.test.TestCase):
                     settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml')).read())
 
         miro_tracker = mysite.customs.models.BugzillaTracker(
-                project_name='Miro video player',
+                tracker_name='Miro video player',
                 base_url='http://bugzilla.pculture.org/',
-                bug_project_name_format='{project}',
+                bug_project_name_format='{tracker_name}',
                 query_url_type='xml',
                 bitesized_type='key',
                 bitesized_text='bitesized',
