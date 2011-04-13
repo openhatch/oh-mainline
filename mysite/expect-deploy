@@ -43,6 +43,21 @@ while {true} {
             }
             break
         }
+        "Fast-forward" {
+            status "Fast forward detected. Proceeding...\r"
+
+            # Run buildout if buildout was changed.
+            expect {
+                "buildout.cfg" {
+                    expect "$ "
+                    status "\r\n*** Change to buildout.cfg detected. Running buildout... ***\r\n"
+                    send "./bin/buildout\r"
+                    expect "$ "
+                }
+                "$ "
+            }
+            break
+        }
         "Already up-to-date." {
             status_warning "Tried to merge, but git cried, 'Already up-to-date'. Proceeding anyway...\r\n"
             expect "$ "
