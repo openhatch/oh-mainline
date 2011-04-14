@@ -325,7 +325,7 @@ def bugzilla_tracker_factory(bt):
 
     def provide_hints_for_how_to_recreate_self(self):
         return {'corresponding_pk': bt.id,
-                'bug_tracker_class': mysite.customs.models.BugzillaTracker}
+                'bug_tracker_class': mysite.customs.models.BugzillaTrackerModel}
 
     # Create '__init__' method
     def __init__(self):
@@ -341,13 +341,13 @@ def bugzilla_tracker_factory(bt):
 
     # Create 'generate_current_bug_xml' method
     def generate_current_bug_xml(self):
-        queries = bt.bugzillaurl_set.all()
+        queries = bt.bugzillaquerymodel_set.all()
         query_urls = [query.url for query in queries]
         return self.generate_bug_xml_from_queries(query_urls)
 
     # Create 'get_current_bug_id_list' method
     def get_current_bug_id_list(self):
-        tracker_bugs = bt.bugzillaurl_set.all()
+        tracker_bugs = bt.bugzillaquerymodel_set.all()
         tracker_bug_urls = [tb.url for tb in tracker_bugs]
         return self.get_bug_id_list_from_tracker_bugs(tracker_bug_urls)
 
@@ -425,15 +425,15 @@ def generate_bugzilla_tracker_classes(tracker_name=None):
     # specific sub-class for that tracker.
     if tracker_name:
         try:
-            bt = mysite.customs.models.BugzillaTracker.all_trackers.get(tracker_name=tracker_name)
+            bt = mysite.customs.models.BugzillaTrackerModel.all_trackers.get(tracker_name=tracker_name)
             bt_class = bugzilla_tracker_factory(bt)
-        except mysite.customs.models.BugzillaTracker.DoesNotExist:
+        except mysite.customs.models.BugzillaTrackerModel.DoesNotExist:
             bt_class = None
         yield bt_class
         return
     else:
         # Create a generator that yields all sub-classes.
-        for bt in mysite.customs.models.BugzillaTracker.all_trackers.all():
+        for bt in mysite.customs.models.BugzillaTrackerModel.all_trackers.all():
             yield bugzilla_tracker_factory(bt)
 
 ############################################################

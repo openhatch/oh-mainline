@@ -819,7 +819,7 @@ Keywords: Torrent unittest""")
         mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
             settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml')).read())
 
-        miro_tracker = mysite.customs.models.BugzillaTracker(
+        miro_tracker = mysite.customs.models.BugzillaTrackerModel(
                 tracker_name='Miro',
                 base_url='http://bugzilla.pculture.org/',
                 bug_project_name_format='{tracker_name}',
@@ -829,7 +829,7 @@ Keywords: Torrent unittest""")
                 documentation_type='key',
                 )
         miro_tracker.save()
-        miro_tracker_query_url = mysite.customs.models.BugzillaUrl(
+        miro_tracker_query_url = mysite.customs.models.BugzillaQueryModel(
                 url='http://bugzilla.pculture.org/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&field-1-0-0=bug_status&field-1-1-0=product&field-1-2-0=keywords&keywords=bitesized&product=Miro&query_format=advanced&remaction=&type-1-0-0=anyexact&type-1-1-0=anyexact&type-1-2-0=anywords&value-1-0-0=NEW%2CASSIGNED%2CREOPENED&value-1-1-0=Miro&value-1-2-0=bitesized',
                 tracker=miro_tracker,
                 )
@@ -864,7 +864,7 @@ Keywords: Torrent unittest""")
         mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
             settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml')).read())
 
-        miro_tracker = mysite.customs.models.BugzillaTracker(
+        miro_tracker = mysite.customs.models.BugzillaTrackerModel(
                 tracker_name='Miro',
                 base_url='http://bugzilla.pculture.org/',
                 bug_project_name_format='{tracker_name}',
@@ -874,7 +874,7 @@ Keywords: Torrent unittest""")
                 documentation_type='key',
             )
         miro_tracker.save()
-        miro_tracker_query_url = mysite.customs.models.BugzillaUrl(
+        miro_tracker_query_url = mysite.customs.models.BugzillaQueryModel(
                 url='http://bugzilla.pculture.org/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&field-1-0-0=bug_status&field-1-1-0=product&field-1-2-0=keywords&keywords=bitesized&product=Miro&query_format=advanced&remaction=&type-1-0-0=anyexact&type-1-1-0=anyexact&type-1-2-0=anywords&value-1-0-0=NEW%2CASSIGNED%2CREOPENED&value-1-1-0=Miro&value-1-2-0=bitesized',
                 tracker=miro_tracker,
                 )
@@ -903,7 +903,7 @@ Keywords: Torrent unittest""")
             'NEW', 'CLOSED')
         mock_xml_opener.return_value = lxml.etree.XML(cooked_xml)
 
-        miro_tracker = mysite.customs.models.BugzillaTracker(
+        miro_tracker = mysite.customs.models.BugzillaTrackerModel(
                 tracker_name='Miro',
                 base_url='http://bugzilla.pculture.org/',
                 bug_project_name_format='{tracker_name}',
@@ -913,7 +913,7 @@ Keywords: Torrent unittest""")
                 documentation_type='key',
                 )
         miro_tracker.save()
-        miro_tracker_query_url = mysite.customs.models.BugzillaUrl(
+        miro_tracker_query_url = mysite.customs.models.BugzillaQueryModel(
                 url='http://bugzilla.pculture.org/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&field-1-0-0=bug_status&field-1-1-0=product&field-1-2-0=keywords&keywords=bitesized&product=Miro&query_format=advanced&remaction=&type-1-0-0=anyexact&type-1-1-0=anyexact&type-1-2-0=anywords&value-1-0-0=NEW%2CASSIGNED%2CREOPENED&value-1-1-0=Miro&value-1-2-0=bitesized',
                 tracker=miro_tracker
                 )
@@ -938,7 +938,7 @@ Keywords: Torrent unittest""")
         mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
             settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06-RESOLVED.xml')).read())
 
-        miro_tracker = mysite.customs.models.BugzillaTracker(
+        miro_tracker = mysite.customs.models.BugzillaTrackerModel(
                 tracker_name='Miro',
                 base_url='http://bugzilla.pculture.org/',
                 bug_project_name_format='{tracker_name}',
@@ -948,7 +948,7 @@ Keywords: Torrent unittest""")
                 documentation_type='key',
                 )
         miro_tracker.save()
-        miro_tracker_query_url = mysite.customs.models.BugzillaUrl(
+        miro_tracker_query_url = mysite.customs.models.BugzillaQueryModel(
                 url='http://bugzilla.pculture.org/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&field-1-0-0=bug_status&field-1-1-0=product&field-1-2-0=keywords&keywords=bitesized&product=Miro&query_format=advanced&remaction=&type-1-0-0=anyexact&type-1-1-0=anyexact&type-1-2-0=anywords&value-1-0-0=NEW%2CASSIGNED%2CREOPENED&value-1-1-0=Miro&value-1-2-0=bitesized',
                 tracker=miro_tracker
                 )
@@ -969,7 +969,7 @@ Keywords: Torrent unittest""")
     def test_full_grab_miro_bugs_refreshes_older_bugs(self, mock_xml_opener):
         mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
             settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml')).read())
-        miro_tracker = mysite.customs.models.BugzillaTracker(
+        miro_tracker = mysite.customs.models.BugzillaTrackerModel(
                 tracker_name='Miro',
                 base_url='http://bugzilla.pculture.org/',
                 bug_project_name_format='{tracker_name}',
@@ -979,7 +979,7 @@ Keywords: Torrent unittest""")
                 documentation_type='key',
                 )
         miro_tracker.save()
-        miro_tracker_query_url = mysite.customs.models.BugzillaUrl(
+        miro_tracker_query_url = mysite.customs.models.BugzillaQueryModel(
                 url='http://bugzilla.pculture.org/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&field-1-0-0=bug_status&field-1-1-0=product&field-1-2-0=keywords&keywords=bitesized&product=Miro&query_format=advanced&remaction=&type-1-0-0=anyexact&type-1-1-0=anyexact&type-1-2-0=anywords&value-1-0-0=NEW%2CASSIGNED%2CREOPENED&value-1-1-0=Miro&value-1-2-0=bitesized',
                 tracker=miro_tracker
                 )
@@ -1032,7 +1032,7 @@ Keywords: Torrent unittest""")
         # Now, do a crawl and notice that we updated the bug even
         # though the xml bug list is empty
         
-        miro_tracker = mysite.customs.models.BugzillaTracker(
+        miro_tracker = mysite.customs.models.BugzillaTrackerModel(
                 tracker_name='Miro',
                 base_url='http://bugzilla.pculture.org/',
                 bug_project_name_format='{tracker_name}',
@@ -1042,7 +1042,7 @@ Keywords: Torrent unittest""")
                 documentation_type='key',
                 )
         miro_tracker.save()
-        miro_tracker_query_url = mysite.customs.models.BugzillaUrl(
+        miro_tracker_query_url = mysite.customs.models.BugzillaQueryModel(
                 url='http://bugzilla.pculture.org/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&field-1-0-0=bug_status&field-1-1-0=product&field-1-2-0=keywords&keywords=bitesized&product=Miro&query_format=advanced&remaction=&type-1-0-0=anyexact&type-1-1-0=anyexact&type-1-2-0=anywords&value-1-0-0=NEW%2CASSIGNED%2CREOPENED&value-1-1-0=Miro&value-1-2-0=bitesized',
                 tracker=miro_tracker
                 )
@@ -1736,18 +1736,18 @@ class TracBug(django.test.TestCase):
 class TracBugParser(django.test.TestCase):
     def setUp(self):
         # Set up the Twisted TrackerModels that will be used here.
-        self.tm = mysite.customs.models.TracTracker.all_trackers.create(
-                project_name='Twisted',
+        self.tm = mysite.customs.models.TracTrackerModel.all_trackers.create(
+                tracker_name='Twisted',
                 base_url='http://twistedmatrix.com/trac/',
-                bug_project_name_format='{project}',
+                bug_project_name_format='{tracker_name}',
                 bitesized_type='keywords',
                 bitesized_text='easy',
                 documentation_type='keywords',
                 documentation_text='documentation')
-        self.tm2 = mysite.customs.models.TracTracker.all_trackers.create(
-                project_name='Trac',
+        self.tm2 = mysite.customs.models.TracTrackerModel.all_trackers.create(
+                tracker_name='Trac',
                 base_url='http://trac.edgewall.org/',
-                bug_project_name_format='{project}',
+                bug_project_name_format='{tracker_name}',
                 bitesized_type='keywords',
                 bitesized_text='bitesized',
                 documentation_type=None)
@@ -2671,21 +2671,21 @@ class TestOhlohAccountImportWithException(django.test.TestCase):
 
         self.assertTrue(all(d.completed for d in mysite.profile.models.DataImportAttempt.objects.all()))
 
-class BugsCreatedByBugzillaTrackersCanRefreshThemselves(django.test.TestCase):
+class BugsCreatedByBugzillaTrackerModelsCanRefreshThemselves(django.test.TestCase):
 
     @mock.patch("mysite.customs.bugtrackers.bugzilla.url2bug_data")
     def setUp(self, mock_xml_opener):
-        # This is a lot of jiggery-pokery to create a BugzillaTracker
+        # This is a lot of jiggery-pokery to create a BugzillaTrackerModel
         # corresponding to Miro.  In the actual test, we mock out the
         # network activity so that when we download bug data, we use
         # data from a file.
         #
         # This setUp() method creates self.miro_instance, which is an
-        # instance of the Miro BugzillaTracker model.
+        # instance of the Miro BugzillaTrackerModel model.
         mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
                     settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml')).read())
 
-        miro_tracker = mysite.customs.models.BugzillaTracker(
+        miro_tracker = mysite.customs.models.BugzillaTrackerModel(
                 tracker_name='Miro video player',
                 base_url='http://bugzilla.pculture.org/',
                 bug_project_name_format='{tracker_name}',
@@ -2695,7 +2695,7 @@ class BugsCreatedByBugzillaTrackersCanRefreshThemselves(django.test.TestCase):
                 documentation_type='key',
             )
         miro_tracker.save()
-        miro_tracker_query_url = mysite.customs.models.BugzillaUrl(
+        miro_tracker_query_url = mysite.customs.models.BugzillaQueryModel(
                 url='http://bugzilla.pculture.org/buglist.cgi?bug_status=NEW&bug_status=ASSIGNED&bug_status=REOPENED&field-1-0-0=bug_status&field-1-1-0=product&field-1-2-0=keywords&keywords=bitesized&product=Miro&query_format=advanced&remaction=&type-1-0-0=anyexact&type-1-1-0=anyexact&type-1-2-0=anywords&value-1-0-0=NEW%2CASSIGNED%2CREOPENED&value-1-1-0=Miro&value-1-2-0=bitesized',
                 tracker=miro_tracker,
                 )
@@ -2709,7 +2709,7 @@ class BugsCreatedByBugzillaTrackersCanRefreshThemselves(django.test.TestCase):
         mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
                     settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml')).read())
 
-        # self.miro_instance is the BugzillaTracker instance that corresponds to the Miro bug tracker
+        # self.miro_instance is the BugzillaTrackerModel instance that corresponds to the Miro bug tracker
         self.miro_instance.update()
         all_bugs = Bug.all_bugs.all()
         self.assertEqual(len(all_bugs), 1)
@@ -2717,12 +2717,12 @@ class BugsCreatedByBugzillaTrackersCanRefreshThemselves(django.test.TestCase):
 
         self.assertEqual(1, mock_xml_opener.call_count)
 
-        # Okay, so now that the BugzillaTracker created a Bug object,
+        # Okay, so now that the BugzillaTrackerModel created a Bug object,
         # push its polled_date back into the distant past. We will
         # then ask it to refresh itself.
         #
         # We check the mock_xml_opener to make sure that the
-        # BugzillaTracker tried to download the bug data.
+        # BugzillaTrackerModel tried to download the bug data.
         bug.last_polled = datetime.datetime(1970, 1, 1, 0, 0, 0)
         bug.save()
 

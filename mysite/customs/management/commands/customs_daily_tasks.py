@@ -106,12 +106,12 @@ Supported tracker types:
         ### Okay, now update!
         for thing in enabled_trac_instances:
             instantiated = thing()
-            project_name = instantiated.tracker_name
-            logging.info("[Trac] About to update bugs from project named %s." % project_name)
+            tracker_name = instantiated.tracker_name
+            logging.info("[Trac] About to update bugs from project named %s." % tracker_name)
             try:
                 instantiated.update()
             except urllib2.URLError, e:
-                logging.error("[Trac] ERROR: %s importer failed with urllib2.URLError, skipping..." % project_name)
+                logging.error("[Trac] ERROR: %s importer failed with urllib2.URLError, skipping..." % tracker_name)
                 logging.error("[Trac] Error message: %s" % str(e))
 
     def find_and_update_enabled_bugzilla_instances(self):
@@ -130,15 +130,15 @@ Supported tracker types:
         ### Okay, now update!
         for thing in enabled_bugzilla_instances:
             instantiated = thing()
-            project_name = instantiated.tracker_name
-            logging.info("[Bugzilla] About to update bugs from project named %s." % project_name)
+            tracker_name = instantiated.tracker_name
+            logging.info("[Bugzilla] About to update bugs from project named %s." % tracker_name)
             # FIXME: The Bugzilla trackers seem to throw error 500 a lot.
             # For now, chuck in a dirty big try except to stop importer
             # breaking.
             try:
                 instantiated.update()
             except urllib2.URLError, e:
-                logging.error("[Bugzilla] ERROR: %s importer failed with urllib2.URLError, skipping..." % project_name)
+                logging.error("[Bugzilla] ERROR: %s importer failed with urllib2.URLError, skipping..." % tracker_name)
                 logging.error("[Bugzilla] Error message: %s" % str(e))
 
     def find_and_update_enabled_google_instances(self):
@@ -157,12 +157,12 @@ Supported tracker types:
         ### Okay, now update!
         for thing in enabled_google_instances:
             instantiated = thing()
-            project_name = instantiated.tracker_name
-            logging.info("[Google] About to update bugs from project named %s." % project_name)
+            tracker_name = instantiated.tracker_name
+            logging.info("[Google] About to update bugs from project named %s." % tracker_name)
             try:
                 instantiated.update()
             except gdata.client.RequestError, e:
-                logging.error("[Google] ERROR: %s importer failed with gdata.client.RequestError, skipping..." % project_name)
+                logging.error("[Google] ERROR: %s importer failed with gdata.client.RequestError, skipping..." % tracker_name)
                 logging.error("[Google] Error message: %s" % str(e))
 
     def update_launchpad_hosted_projects(self):

@@ -295,7 +295,7 @@ def google_tracker_factory(gt):
 
     # Create 'generate_current_bug_atom' method
     def generate_current_bug_atom(self):
-        query_objs = gt.googlequery_set.all()
+        query_objs = gt.googlequerymodel_set.all()
         query_data = []
         for query_obj in query_objs:
             one_query = {
@@ -342,15 +342,15 @@ def generate_google_tracker_classes(tracker_name=None):
     # specific sub-class for that tracker.
     if tracker_name:
         try:
-            gt = mysite.customs.models.GoogleTracker.all_trackers.get(tracker_name=tracker_name)
+            gt = mysite.customs.models.GoogleTrackerModel.all_trackers.get(tracker_name=tracker_name)
             gt_class = google_tracker_factory(gt)
-        except mysite.customs.models.GoogleTracker.DoesNotExist:
+        except mysite.customs.models.GoogleTrackerModel.DoesNotExist:
             gt_class = None
         yield gt_class
         return
     else:
         # Create a generator that yields all sub-classes.
-        for gt in mysite.customs.models.GoogleTracker.all_trackers.all():
+        for gt in mysite.customs.models.GoogleTrackerModel.all_trackers.all():
             yield google_tracker_factory(gt)
 
 ############################################################
