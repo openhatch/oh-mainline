@@ -150,14 +150,15 @@ class TracBugImporter(BugImporter):
         fresh_bug_urls = mysite.search.models.Bug.all_bugs.filter(
                 canonical_bug_link__in = bug_url_list,
                 last_polled__lt = datetime.datetime.now() - datetime.timedelta(days = 1)
-            ).values_list('canonical_bug_link', flat = True)
+            ).values_list('canonical_bug_link', flat=True)
 
         # Remove the fresh URLs to be let with stale or new URLs.
-        stale_bug_urls = [bug_url_list.remove(bug_url) for bug_url in fresh_bug_urls]
+        for bug_url in fresh_bug_urls:
+            bug_url_list.remove(bug_url)
 
         # Put the bug list in the form required for process_bugs.
         # The second entry of the tuple is None as Trac never supplies data via queries.
-        bug_list = [(bug_url, None) for bug_url in stale_bug_urls]
+        bug_list = [(bug_url, None) for bug_url in bug_url_list]
 
         # And now go on to process the bug list
         self.process_bugs(bug_list)
@@ -206,8 +207,10 @@ class TracBugImporter(BugImporter):
                 bug.delete()
             except mysite.search.models.Bug.DoesNotExist:
                 pass
-            return
+            # To keep the callback chain happy, explicity return None.
+            return None
         else:
+            # Pass the Failure on.
             return failure
 
     def handle_bug_html(self, bug_html, tbp):

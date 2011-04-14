@@ -22,6 +22,7 @@ import twisted.internet
 import mysite.customs.profile_importers
 import datetime
 import logging
+from types import NoneType
 
 import mysite.customs.models
 import mysite.customs.bugimporters.base
@@ -32,7 +33,7 @@ from mysite.search.models import Bug
 tracker2importer = {
         # This first one catches any Bugs with bug.tracker = None and updates
         # that field. Then it passes the bugs back here for updating.
-        None.__class__:
+        NoneType:
             mysite.customs.bugimporters.base.AddTrackerForeignKeysToBugs,
         # The rest of these link specific subclasses of TrackerModel to the
         # relevant BugImporter class. This includes the hard-coded special
@@ -49,11 +50,11 @@ class Command(BaseCommand):
     def update_trackers(self):
         # Fetch a list of Queries that are stale.
         queries = mysite.customs.models.TrackerQueryModel.objects.filter(
-                last_polled__lt = datetime.datetime.utcnow() - datetime.timedelta(days = 1)
+                last_polled__lt=datetime.datetime.utcnow()-datetime.timedelta(days=1)
                 ).select_subclasses()
         # Convert this list to a dictionary of TrackerModules.
         tm_list = [(query, query.tracker) for query in queries]
-        tm_dict = defaultdict ( list )
+        tm_dict = defaultdict(list)
         [tm_dict[k].append(v) for v, k in tm_list]
         # For each TrackerModel, process its stale Queries.
         for tm, queries in tm_dict.items():
@@ -80,10 +81,10 @@ class Command(BaseCommand):
         else:
             # Fetch a list of all Bugs that are stale.
             bugs = Bug.all_bugs.filter(
-                    last_polled__lt = datetime.datetime.utcnow() - datetime.timedelta(days = 1))
+                    last_polled__lt=datetime.datetime.utcnow()-datetime.timedelta(days=1))
         # Convert this list to a dictionary of TrackerModules.
         tm_list = [(bug, bug.tracker) for bug in bugs]
-        tm_dict = defaultdict ( list )
+        tm_dict = defaultdict(list)
         [tm_dict[k].append(v) for v, k in tm_list]
         # For each TrackerModel, process its stale Bugs.
         for tm, bugs in tm_dict.items():

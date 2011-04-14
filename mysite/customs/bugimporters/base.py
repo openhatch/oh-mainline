@@ -32,10 +32,9 @@ class BugImporter(object):
         # If there are no more waiting URLs, returns None.
         # Otherwise, returns a (url, callback, c_args, errback, e_args) tuple.
         try:
-            url, (callback, c_args, errback, e_args) = self.waiting_urls.items().pop()
-        except IndexError:
+            url, (callback, c_args, errback, e_args) = self.waiting_urls.popitem()
+        except KeyError:
             return None
-        del self.waiting_urls[url]
         return (url, callback, c_args, errback, e_args)
 
     def add_url_to_deferred_list(self, url):
