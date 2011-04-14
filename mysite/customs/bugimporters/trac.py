@@ -397,10 +397,14 @@ class TracBugParser(object):
             ret['bite_size_tag_name'] = tm.bitesized_text
             b_list = tm.bitesized_text.split(',')
             ret['good_for_newcomers'] = any(b in self.bug_csv[tm.bitesized_type] for b in b_list)
+        else:
+            ret['good_for_newcomers'] = False
         # Check whether this is a documentation bug.
         if tm.documentation_type:
             d_list = tm.documentation_text.split(',')
             ret['concerns_just_documentation'] = any(d in self.bug_csv[tm.documentation_type] for d in d_list)
+        else:
+            ret['concerns_just_documentation'] = False
 
         # Set as_appears_in_distribution.
         ret['as_appears_in_distribution'] = tm.as_appears_in_distribution
