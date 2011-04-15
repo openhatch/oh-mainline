@@ -2401,6 +2401,209 @@ I don't see for example the solvers module""",
                   }
         self.assertEqual(wanted, got)
 
+class GoogleCodeBugImporter(django.test.TestCase):
+    def setUp(self):
+        # Set up the Twisted TrackerModels that will be used here.
+        self.tm = mysite.customs.models.GoogleTrackerModel.all_trackers.create(
+                tracker_name='SymPy',
+                google_name='sympy',
+                bitesized_type='label',
+                bitesized_text='EasyToFix',
+                documentation_type='label',
+                documentation_text='Documentation')
+
+    def test_create_google_data_dict_with_everything(self):
+        atom_dict = {
+                'id': {'text': 'http://code.google.com/feeds/issues/p/sympy/issues/full/1215'},
+                'published': {'text': '2008-11-24T11:15:58.000Z'},
+                'updated': {'text': '2009-12-06T23:01:11.000Z'},
+                'title': {'text': 'fix html documentation'},
+                'content': {'text': """http://docs.sympy.org/modindex.html
+
+I don't see for example the solvers module"""},
+                'author': {'name': {'text': 'fabian.seoane'}},
+                'cc': [
+                    {'username': {'text': 'asmeurer'}}
+                    ],
+                'owner': {'username': {'text': 'Vinzent.Steinberg'}},
+                'label': [
+                    {'text': 'Type-Defect'},
+                    {'text': 'Priority-Critical'},
+                    {'text': 'Documentation'},
+                    {'text': 'Milestone-Release0.6.6'}
+                    ],
+                'state': {'text': 'closed'},
+                'status': {'text': 'Fixed'}
+                }
+        bug_atom = mysite.base.helpers.ObjectFromDict(atom_dict, recursive=True)
+        gbp = mysite.customs.bugimporters.google.GoogleBugParser(
+                bug_url='http://code.google.com/p/sympy/issues/detail?id=1215')
+        gbp.bug_atom = bug_atom
+
+        got = gbp.get_parsed_data_dict(self.tm)
+        wanted = {'title': 'fix html documentation',
+                  'description': """http://docs.sympy.org/modindex.html
+
+I don't see for example the solvers module""",
+                  'status': 'Fixed',
+                  'importance': 'Critical',
+                  'people_involved': 3,
+                  'date_reported': datetime.datetime(2008, 11, 24, 11, 15, 58),
+                  'last_touched': datetime.datetime(2009, 12, 06, 23, 01, 11),
+                  'looks_closed': True,
+                  'submitter_username': 'fabian.seoane',
+                  'submitter_realname': '',
+                  'canonical_bug_link': 'http://code.google.com/p/sympy/issues/detail?id=1215',
+                  'good_for_newcomers': False,
+                  'bite_size_tag_name': 'EasyToFix',
+                  'concerns_just_documentation': True,
+                  }
+        self.assertEqual(wanted, got)
+
+    def test_create_google_data_dict_author_in_list(self):
+        atom_dict = {
+                'id': {'text': 'http://code.google.com/feeds/issues/p/sympy/issues/full/1215'},
+                'published': {'text': '2008-11-24T11:15:58.000Z'},
+                'updated': {'text': '2009-12-06T23:01:11.000Z'},
+                'title': {'text': 'fix html documentation'},
+                'content': {'text': """http://docs.sympy.org/modindex.html
+
+I don't see for example the solvers module"""},
+                'author': [{'name': {'text': 'fabian.seoane'}}],
+                'cc': [
+                    {'username': {'text': 'asmeurer'}}
+                    ],
+                'owner': {'username': {'text': 'Vinzent.Steinberg'}},
+                'label': [
+                    {'text': 'Type-Defect'},
+                    {'text': 'Priority-Critical'},
+                    {'text': 'Documentation'},
+                    {'text': 'Milestone-Release0.6.6'}
+                    ],
+                'state': {'text': 'closed'},
+                'status': {'text': 'Fixed'}
+                }
+        bug_atom = mysite.base.helpers.ObjectFromDict(atom_dict, recursive=True)
+        gbp = mysite.customs.bugimporters.google.GoogleBugParser(
+                bug_url='http://code.google.com/p/sympy/issues/detail?id=1215')
+        gbp.bug_atom = bug_atom
+
+        got = gbp.get_parsed_data_dict(self.tm)
+        wanted = {'title': 'fix html documentation',
+                  'description': """http://docs.sympy.org/modindex.html
+
+I don't see for example the solvers module""",
+                  'status': 'Fixed',
+                  'importance': 'Critical',
+                  'people_involved': 3,
+                  'date_reported': datetime.datetime(2008, 11, 24, 11, 15, 58),
+                  'last_touched': datetime.datetime(2009, 12, 06, 23, 01, 11),
+                  'looks_closed': True,
+                  'submitter_username': 'fabian.seoane',
+                  'submitter_realname': '',
+                  'canonical_bug_link': 'http://code.google.com/p/sympy/issues/detail?id=1215',
+                  'good_for_newcomers': False,
+                  'bite_size_tag_name': 'EasyToFix',
+                  'concerns_just_documentation': True,
+                  }
+        self.assertEqual(wanted, got)
+
+    def test_create_google_data_dict_owner_in_list(self):
+        atom_dict = {
+                'id': {'text': 'http://code.google.com/feeds/issues/p/sympy/issues/full/1215'},
+                'published': {'text': '2008-11-24T11:15:58.000Z'},
+                'updated': {'text': '2009-12-06T23:01:11.000Z'},
+                'title': {'text': 'fix html documentation'},
+                'content': {'text': """http://docs.sympy.org/modindex.html
+
+I don't see for example the solvers module"""},
+                'author': {'name': {'text': 'fabian.seoane'}},
+                'cc': [
+                    {'username': {'text': 'asmeurer'}}
+                    ],
+                'owner': [{'username': {'text': 'Vinzent.Steinberg'}}],
+                'label': [
+                    {'text': 'Type-Defect'},
+                    {'text': 'Priority-Critical'},
+                    {'text': 'Documentation'},
+                    {'text': 'Milestone-Release0.6.6'}
+                    ],
+                'state': {'text': 'closed'},
+                'status': {'text': 'Fixed'}
+                }
+        bug_atom = mysite.base.helpers.ObjectFromDict(atom_dict, recursive=True)
+        gbp = mysite.customs.bugimporters.google.GoogleBugParser(
+                bug_url='http://code.google.com/p/sympy/issues/detail?id=1215')
+        gbp.bug_atom = bug_atom
+
+        got = gbp.get_parsed_data_dict(self.tm)
+        wanted = {'title': 'fix html documentation',
+                  'description': """http://docs.sympy.org/modindex.html
+
+I don't see for example the solvers module""",
+                  'status': 'Fixed',
+                  'importance': 'Critical',
+                  'people_involved': 3,
+                  'date_reported': datetime.datetime(2008, 11, 24, 11, 15, 58),
+                  'last_touched': datetime.datetime(2009, 12, 06, 23, 01, 11),
+                  'looks_closed': True,
+                  'submitter_username': 'fabian.seoane',
+                  'submitter_realname': '',
+                  'canonical_bug_link': 'http://code.google.com/p/sympy/issues/detail?id=1215',
+                  'good_for_newcomers': False,
+                  'bite_size_tag_name': 'EasyToFix',
+                  'concerns_just_documentation': True,
+                  }
+        self.assertEqual(wanted, got)
+
+    def test_create_google_data_dict_without_status(self):
+        atom_dict = {
+                'id': {'text': 'http://code.google.com/feeds/issues/p/sympy/issues/full/1215'},
+                'published': {'text': '2008-11-24T11:15:58.000Z'},
+                'updated': {'text': '2009-12-06T23:01:11.000Z'},
+                'title': {'text': 'fix html documentation'},
+                'content': {'text': """http://docs.sympy.org/modindex.html
+
+I don't see for example the solvers module"""},
+                'author': {'name': {'text': 'fabian.seoane'}},
+                'cc': [
+                    {'username': {'text': 'asmeurer'}}
+                    ],
+                'owner': {'username': {'text': 'Vinzent.Steinberg'}},
+                'label': [
+                    {'text': 'Type-Defect'},
+                    {'text': 'Priority-Critical'},
+                    {'text': 'Documentation'},
+                    {'text': 'Milestone-Release0.6.6'}
+                    ],
+                'state': {'text': 'closed'},
+                'status': None
+                }
+        bug_atom = mysite.base.helpers.ObjectFromDict(atom_dict, recursive=True)
+        gbp = mysite.customs.bugimporters.google.GoogleBugParser(
+                bug_url='http://code.google.com/p/sympy/issues/detail?id=1215')
+        gbp.bug_atom = bug_atom
+
+        got = gbp.get_parsed_data_dict(self.tm)
+        wanted = {'title': 'fix html documentation',
+                  'description': """http://docs.sympy.org/modindex.html
+
+I don't see for example the solvers module""",
+                  'status': '',
+                  'importance': 'Critical',
+                  'people_involved': 3,
+                  'date_reported': datetime.datetime(2008, 11, 24, 11, 15, 58),
+                  'last_touched': datetime.datetime(2009, 12, 06, 23, 01, 11),
+                  'looks_closed': True,
+                  'submitter_username': 'fabian.seoane',
+                  'submitter_realname': '',
+                  'canonical_bug_link': 'http://code.google.com/p/sympy/issues/detail?id=1215',
+                  'good_for_newcomers': False,
+                  'bite_size_tag_name': 'EasyToFix',
+                  'concerns_just_documentation': True,
+                  }
+        self.assertEqual(wanted, got)
+
 class DataExport(django.test.TestCase):
     def test_snapshot_user_table_without_passwords(self):
         # We'll pretend we're running the snapshot_public_data management command. But

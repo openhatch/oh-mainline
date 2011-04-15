@@ -198,7 +198,10 @@ class GoogleQueryModel(TrackerQueryModel):
     tracker = models.ForeignKey(GoogleTrackerModel)
 
     def get_query_url(self):
-        return 'https://code.google.com/feeds/issues/p/%s/issues/full?can=open&max-results=10000&label=&%s' % (self.tracker.google_name, self.label)
+        query_url = 'https://code.google.com/feeds/issues/p/%s/issues/full?can=open&max-results=10000' % self.tracker.google_name
+        if self.label:
+            query_url = '%s&label=%s' % (query_url, self.label)
+        return query_url
 
 reversion.register(GoogleTrackerModel, follow=["googlequerymodel_set"])
 reversion.register(GoogleQueryModel)

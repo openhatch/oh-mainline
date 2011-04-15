@@ -26,6 +26,7 @@ from types import NoneType
 
 import mysite.customs.models
 import mysite.customs.bugimporters.base
+import mysite.customs.bugimporters.google
 import mysite.customs.bugimporters.trac
 import mysite.profile.models
 from mysite.search.models import Bug
@@ -35,11 +36,17 @@ tracker2importer = {
         # that field. Then it passes the bugs back here for updating.
         NoneType:
             mysite.customs.bugimporters.base.AddTrackerForeignKeysToBugs,
+
         # The rest of these link specific subclasses of TrackerModel to the
         # relevant BugImporter class. This includes the hard-coded special
         # cases, where the TrackerModel is just a shell linking to the location
         # of the hard-coded class and the BugImporter is a special one that
         # handles them specifically.
+
+        # Google Code Issue Tracker
+        mysite.customs.models.GoogleTrackerModel:
+            mysite.customs.bugimporters.google.GoogleBugImporter,
+        # Trac
         mysite.customs.models.TracTrackerModel:
             mysite.customs.bugimporters.trac.TracBugImporter
         }
