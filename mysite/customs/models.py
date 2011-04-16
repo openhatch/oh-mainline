@@ -109,7 +109,7 @@ class BugzillaTrackerModel(TrackerModel):
             ('tracker', 'Tracker bug URL')
             )
     query_url_type = models.CharField(max_length=20, choices=QUERY_URL_TYPES, blank=False, default='xml',
-            help_text="We support two types of bug importing - either from search queries that return an XML dump of all the bugs, or tracking bugs that depend on all the bugs to be imported here. Any number of a particular type can be used, but as yet a single tracker cannot have both types.")
+            help_text="This field is deprecated, and will be removed once all Bugzilla trackers are in the asynchronous framework.")
     BITESIZED_TYPES = (
             (None, 'None'),
             ('key', 'Keyword'),
@@ -117,7 +117,7 @@ class BugzillaTrackerModel(TrackerModel):
             )
     bitesized_type = models.CharField(max_length=10, choices=BITESIZED_TYPES, blank=False, default=None)
     bitesized_text = models.CharField(max_length=200, blank=True, default='',
-            help_text="This is the text that the field type selected above will contain that indicates a bite-sized bug.")
+            help_text="This is the text that the field type selected above will contain that indicates a bite-sized bug. Separate multiple values with single commas (,) only.")
     DOCUMENTATION_TYPES = (
             (None, 'None'),
             ('key', 'Keyword'),
@@ -126,7 +126,7 @@ class BugzillaTrackerModel(TrackerModel):
             )
     documentation_type = models.CharField(max_length=10, choices=DOCUMENTATION_TYPES, blank=False, default=None)
     documentation_text = models.CharField(max_length=200, blank=True, default='',
-            help_text="This is the text that the field type selected above will contain that indicates a documentation bug.")
+            help_text="This is the text that the field type selected above will contain that indicates a documentation bug. Separate multiple values with single commas (,) only.")
     as_appears_in_distribution = models.CharField(max_length=200, blank=True, default='')
 
     all_trackers = models.Manager()
@@ -150,6 +150,12 @@ class BugzillaQueryModel(TrackerQueryModel):
     '''This model stores query or tracker URLs for BugzillaTracker objects.'''
     url = models.URLField(max_length=400,
                           blank=False, null=False)
+    QUERY_TYPES = (
+            ('xml', 'Bug XML query'),
+            ('tracker', 'Tracker bug URL')
+            )
+    query_type = models.CharField(max_length=20, choices=QUERY_TYPES, blank=False, default='xml',
+            help_text="We support two types of bug importing from Bugzilla - search queries that return an XML dump of all the bugs, and tracking bugs that depend on all the bugs to be imported here.")
     description = models.CharField(max_length=200, blank=True, default='')
     tracker = models.ForeignKey(BugzillaTrackerModel)
 

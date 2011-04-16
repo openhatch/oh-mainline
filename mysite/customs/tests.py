@@ -1057,6 +1057,129 @@ Keywords: Torrent unittest""")
         bug = all_bugs[0]
         self.assertEqual(bug.people_involved, 5)
 
+class BugzillaBugImporterTests(django.test.TestCase):
+    fixtures = ['miro-project']
+    def setUp(self):
+        # Set up the BugzillaTrackerModels that will be used here.
+        self.tm = mysite.customs.models.BugzillaTrackerModel.all_trackers.create(
+                tracker_name='Miro',
+                base_url='http://bugzilla.pculture.org/',
+                bug_project_name_format='{tracker_name}',
+                bitesized_type='key',
+                bitesized_text='bitesized',
+                documentation_type='key',
+                )
+        self.im = mysite.customs.bugimporters.bugzilla.BugzillaBugImporter(self.tm, None)
+
+    def test_miro_bug_object(self):
+        # Check the number of Bugs present.
+        all_bugs = Bug.all_bugs.all()
+        self.assertEqual(len(all_bugs), 0)
+
+        # Parse XML document as if we got it from the web
+        self.im.handle_bug_xml(open(os.path.join(
+            settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml')).read())
+
+        all_bugs = Bug.all_bugs.all()
+        self.assertEqual(len(all_bugs), 1)
+        bug = all_bugs[0]
+        self.assertEqual(bug.project.name, 'Miro')
+        self.assertEqual(bug.title, "Add test for torrents that use gzip'd urls")
+        self.assertEqual(bug.description, """This broke. We should make sure it doesn't break again.
+Trac ticket id: 2294
+Owner: wguaraldi
+Reporter: nassar
+Keywords: Torrent unittest""")
+        self.assertEqual(bug.status, 'NEW')
+        self.assertEqual(bug.importance, 'normal')
+        self.assertEqual(bug.people_involved, 5)
+        self.assertEqual(bug.date_reported, datetime.datetime(2006, 6, 9, 12, 49))
+        self.assertEqual(bug.last_touched, datetime.datetime(2008, 6, 11, 23, 56, 27))
+        self.assertEqual(bug.submitter_username, 'nassar@pculture.org')
+        self.assertEqual(bug.submitter_realname, 'Nick Nassar')
+        self.assertEqual(bug.canonical_bug_link, 'http://bugzilla.pculture.org/show_bug.cgi?id=2294')
+        self.assert_(bug.good_for_newcomers)
+
+    def test_full_grab_miro_bugs(self):
+        # Check the number of Bugs present.
+        all_bugs = Bug.all_bugs.all()
+        self.assertEqual(len(all_bugs), 0)
+
+        # Parse XML document as if we got it from the web
+        self.im.handle_bug_xml(open(os.path.join(
+            settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml')).read())
+
+        all_bugs = Bug.all_bugs.all()
+        self.assertEqual(len(all_bugs), 1)
+        bug = all_bugs[0]
+        self.assertEqual(bug.canonical_bug_link,
+                         'http://bugzilla.pculture.org/show_bug.cgi?id=2294')
+        self.assertFalse(bug.looks_closed)
+
+        # And the new manager does find it
+        self.assertEqual(Bug.open_ones.all().count(), 1)
+
+
+    def test_miro_bugzilla_detects_closedness(self):
+        # Check the number of Bugs present.
+        all_bugs = Bug.all_bugs.all()
+        self.assertEqual(len(all_bugs), 0)
+
+        # Parse XML document as if we got it from the web
+        self.im.handle_bug_xml(open(os.path.join(
+            settings.MEDIA_ROOT, 'sample-data',
+            'miro-2294-2009-08-06.xml')).read().replace(
+            'NEW', 'CLOSED'))
+
+        all_bugs = Bug.all_bugs.all()
+        self.assertEqual(len(all_bugs), 1)
+        bug = all_bugs[0]
+        self.assertEqual(bug.canonical_bug_link,
+                         'http://bugzilla.pculture.org/show_bug.cgi?id=2294')
+        self.assert_(bug.looks_closed)
+
+        # And the new manager successfully does NOT find it!
+        self.assertEqual(Bug.open_ones.all().count(), 0)
+
+    def test_full_grab_resolved_miro_bug(self):
+        # Check the number of Bugs present.
+        all_bugs = Bug.all_bugs.all()
+        self.assertEqual(len(all_bugs), 0)
+
+        # Parse XML document as if we got it from the web
+        self.im.handle_bug_xml(open(os.path.join(
+            settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06-RESOLVED.xml')).read())
+
+        all_bugs = Bug.all_bugs.all()
+        self.assertEqual(len(all_bugs), 1)
+        bug = all_bugs[0]
+        self.assertEqual(bug.canonical_bug_link,
+                         'http://bugzilla.pculture.org/show_bug.cgi?id=2294')
+        self.assert_(bug.looks_closed)
+
+    def test_full_grab_miro_bugs_refreshes_older_bugs(self):
+        # Check the number of Bugs present.
+        all_bugs = Bug.all_bugs.all()
+        self.assertEqual(len(all_bugs), 0)
+
+        # Parse XML document as if we got it from the web
+        self.im.handle_bug_xml(open(os.path.join(
+            settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml')).read())
+
+        # Pretend there's old data lying around:
+        bug = Bug.all_bugs.get()
+        bug.people_involved = 1
+        bug.last_polled = datetime.datetime.now() - datetime.timedelta(days = 2)
+        bug.save()
+
+        # Now refresh.
+        self.im.handle_bug_xml(open(os.path.join(
+            settings.MEDIA_ROOT, 'sample-data', 'miro-2294-2009-08-06.xml')).read())
+
+        # Now verify there is only one bug, and its people_involved is 5
+        bug = Bug.all_bugs.get()
+        self.assertEqual(bug.people_involved, 5)
+
 class BlogCrawl(django.test.TestCase):
     def test_summary2html(self):
         yo_eacute = mysite.customs.feed.summary2html('Yo &eacute;')

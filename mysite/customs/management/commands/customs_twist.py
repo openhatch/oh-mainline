@@ -26,6 +26,7 @@ from types import NoneType
 
 import mysite.customs.models
 import mysite.customs.bugimporters.base
+import mysite.customs.bugimporters.bugzilla
 import mysite.customs.bugimporters.google
 import mysite.customs.bugimporters.trac
 import mysite.profile.models
@@ -43,6 +44,9 @@ tracker2importer = {
         # of the hard-coded class and the BugImporter is a special one that
         # handles them specifically.
 
+        # Bugzilla
+        mysite.customs.models.BugzillaTrackerModel:
+            mysite.customs.bugimporters.bugzilla.BugzillaBugImporter,
         # Google Code Issue Tracker
         mysite.customs.models.GoogleTrackerModel:
             mysite.customs.bugimporters.google.GoogleBugImporter,
