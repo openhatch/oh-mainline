@@ -51,6 +51,14 @@ td.date, th.date {
 	white-space: nowrap;
 }
 
+th {
+    font-weight: normal;
+}
+
+th.required {
+    font-weight: bold;
+}
+
 .sidebar p {
 	padding: 3px;
 	margin: 5px 0;
