@@ -51,6 +51,11 @@ import mysite.customs.bugtrackers.trac
 ### Twisted or Stackless Python or something. That would be super cool, too.
 ### If somone can show me how to migrate this codebase to it, that'd be neat.
 ### I'm unlikely to look into it myself, though.
+###
+### ### UPDATE: We now have an asynchronous bug importer based on Twisted. It
+### ### will eventually handle all bug importing, making this file obsolete.
+### ### And it didn't even take a year!
+### ### -- Jack - 2011-04-16
 
 ### (If at some point we start indexing absolutely every bug in free and open
 ### source software, then the above ideas will actually become meaningful.)
@@ -115,11 +120,9 @@ Supported tracker types:
                 logging.error("[Trac] Error message: %s" % str(e))
 
     def find_and_update_enabled_bugzilla_instances(self):
-        ### First, the "generate" step
-        enabled_bugzilla_instances = [subclass for subclass in
-                mysite.customs.bugtrackers.bugzilla.generate_bugzilla_tracker_classes()]
+        enabled_bugzilla_instances = []
 
-        ### Second, the "find" step
+        ### First, the "find" step
         for thing_name in dir(mysite.customs.bugtrackers.bugzilla):
             thing = getattr(mysite.customs.bugtrackers.bugzilla,
                             thing_name)
@@ -142,11 +145,9 @@ Supported tracker types:
                 logging.error("[Bugzilla] Error message: %s" % str(e))
 
     def find_and_update_enabled_google_instances(self):
-        ### First, the "generate" step
-        enabled_google_instances = [subclass for subclass in
-                mysite.customs.bugtrackers.google.generate_google_tracker_classes()]
+        enabled_google_instances = []
 
-        ### Second, the "find" step
+        ### First, the "find" step
         for thing_name in dir(mysite.customs.bugtrackers.google):
             thing = getattr(mysite.customs.bugtrackers.google,
                             thing_name)
