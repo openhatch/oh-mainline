@@ -151,5 +151,6 @@ class AddTrackerForeignKeysToBugs(object):
                 bug.tracker = tms_shortlist[0]
                 bug.save()
                 bugs_to_retry.append(bug)
-        # Now that these Bugs all have TrackerModels, update them.
-        self.rm.update_bugs(bugs_to_retry)
+        # For the Bugs that now have TrackerModels, update them.
+        if bugs_to_retry:
+            self.rm.update_bugs(bugs_to_retry)
