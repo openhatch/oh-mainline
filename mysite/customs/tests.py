@@ -1943,7 +1943,7 @@ class TracBugParser(django.test.TestCase):
                 bug_project_name_format='{tracker_name}',
                 bitesized_type='keywords',
                 bitesized_text='bitesized',
-                documentation_type=None)
+                documentation_type='')
 
     def test_create_bug_object_data_dict_more_recent(self):
         tbp = mysite.customs.bugimporters.trac.TracBugParser(
