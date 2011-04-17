@@ -40,6 +40,13 @@ all_trackers = {
             'urlmodel': mysite.customs.models.GoogleQueryModel,
             'urlform': mysite.customs.forms.GoogleQueryForm,
             },
+        'roundup': {
+            'namestr': 'Roundup',
+            'model': mysite.customs.models.RoundupTrackerModel,
+            'form': mysite.customs.forms.RoundupTrackerForm,
+            'urlmodel': mysite.customs.models.RoundupQueryModel,
+            'urlform': mysite.customs.forms.RoundupQueryForm,
+            },
         'trac': {
             'namestr': 'Trac',
             'model': mysite.customs.models.TracTrackerModel,

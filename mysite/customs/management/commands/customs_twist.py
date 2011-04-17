@@ -28,6 +28,7 @@ import mysite.customs.models
 import mysite.customs.bugimporters.base
 import mysite.customs.bugimporters.bugzilla
 import mysite.customs.bugimporters.google
+import mysite.customs.bugimporters.roundup
 import mysite.customs.bugimporters.trac
 import mysite.profile.models
 from mysite.search.models import Bug
@@ -50,15 +51,19 @@ tracker2importer = {
         # Google Code Issue Tracker
         mysite.customs.models.GoogleTrackerModel:
             mysite.customs.bugimporters.google.GoogleBugImporter,
+        # Roundup1
+        mysite.customs.models.RoundupTrackerModel:
+            mysite.customs.bugimporters.roundup.RoundupBugImporter,
         # Trac
         mysite.customs.models.TracTrackerModel:
-            mysite.customs.bugimporters.trac.TracBugImporter
+            mysite.customs.bugimporters.trac.TracBugImporter,
         }
 
 class Command(BaseCommand):
     help = "Call this when you want to run a Twisted reactor."
 
     def update_trackers(self):
+        print "For all tracker queries we know about, enqueue the stale ones."
         # Fetch a list of Queries that are stale.
         queries = mysite.customs.models.TrackerQueryModel.objects.filter(
                 last_polled__lt=datetime.datetime.utcnow()-datetime.timedelta(days=1)
@@ -86,6 +91,7 @@ class Command(BaseCommand):
                 im.process_queries(queries)
 
     def update_bugs(self, bug_list = None):
+        print "For all Bugs we know of, enqueue the stale ones."
         # Check if we have been specifically passed Bugs to update.
         if bug_list:
             bugs = bug_list

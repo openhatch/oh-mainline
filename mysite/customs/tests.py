@@ -1268,6 +1268,76 @@ class MercurialRoundupGrab(django.test.TestCase):
         self.test_scrape_bug_status_and_mark_as_closed(should_do_something=True,
                                                        should_use_urlopen=True)
 
+class RoundupBugImporterTests(django.test.TestCase):
+    def setUp(self):
+        # Set up the RoundupTrackerModel that will be used here.
+        self.tm = mysite.customs.models.RoundupTrackerModel.all_trackers.create(
+                tracker_name='Mercurial',
+                base_url='http://mercurial.selenic.com/bts/',
+                closed_status='resolved',
+                bitesized_field='Topics',
+                bitesized_text='bitesized',
+                documentation_field='Topics',
+                documentation_text='documentation',
+                )
+        self.im = mysite.customs.bugimporters.roundup.RoundupBugImporter(self.tm, None)
+
+    def test_new_mercurial_bug_import(self, second_run=False):
+        # Check the number of Bugs present.
+        all_bugs = Bug.all_bugs.all()
+        if second_run:
+            self.assertEqual(len(all_bugs), 1)
+            old_last_polled = all_bugs[0].last_polled
+        else:
+            self.assertEqual(len(all_bugs), 0)
+
+        rbp = mysite.customs.bugimporters.roundup.RoundupBugParser(
+                bug_url='http://mercurial.selenic.com/bts/issue1550')
+        # Parse HTML document as if we got it from the web
+        self.im.handle_bug_html(open(os.path.join(
+            settings.MEDIA_ROOT, 'sample-data', 'closed-mercurial-bug.html')).read(), rbp)
+
+        all_bugs = Bug.all_bugs.all()
+        self.assertEqual(len(all_bugs), 1)
+        bug = all_bugs[0]
+        if second_run:
+            self.assert_(bug.last_polled > old_last_polled)
+        self.assertEqual(bug.project.name, 'Mercurial')
+        self.assertEqual(bug.title, "help('modules') broken by several 3rd party libraries (svn patch attached)")
+        self.assertEqual(bug.description, """Instead of listing installed modules, help('modules') prints a "please
+wait" message, then a traceback noting that a module raised an exception
+during import, then nothing else.
+This happens in 2.5 and 2.6a0, but not in 2.4, which apparently doesn't
+__import__() EVERY module.
+Tested only on Gentoo Linux 2.6.19, but same behavior is probable on
+other platforms because pydoc and pkgutil are written in cross-platform
+Python.
+
+Prominent 3rd party libraries that break help('modules') include Django,
+Pyglet, wxPython, SymPy, and Pypy. Arguably, the bug is in those
+libraries, but they have good reasons for their behavior. Also, the Unix
+philosophy of forgiving input is a good one. Also, __import__()ing every
+module takes a significant run-time hit, especially if libraries compute
+eg. configuration.
+
+The patch utilizes a pre-existing hook in pkgutil to simply quietly add
+the module to the output. (Long live lambda.)""")
+        self.assertEqual(bug.status, 'resolved')
+        self.assertEqual(bug.importance, 'normal')
+        self.assertEqual(bug.people_involved, 2)
+        self.assertEqual(bug.date_reported, datetime.datetime(2007, 12, 3, 16, 34))
+        self.assertEqual(bug.last_touched, datetime.datetime(2008, 1, 13, 11, 32))
+        self.assertEqual(bug.submitter_username, 'benjhayden')
+        self.assertEqual(bug.submitter_realname, 'Ben Hayden')
+        self.assertEqual(bug.canonical_bug_link, 'http://mercurial.selenic.com/bts/issue1550')
+        self.assert_(bug.good_for_newcomers)
+        self.assert_(bug.looks_closed)
+
+    def test_reimport_same_bug_works(self):
+        self.test_new_mercurial_bug_import()
+        time.sleep(2)
+        self.test_new_mercurial_bug_import(second_run=True)
+
 sample_launchpad_data_snapshot = mock.Mock()
 sample_launchpad_data_snapshot.return_value = [dict(
         url=u'', project=u'rose.makesad.us', text=u'', status=u'',

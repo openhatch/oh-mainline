@@ -283,3 +283,45 @@ class TracQueryModel(TrackerQueryModel):
 
 reversion.register(TracTrackerModel, follow=["tracquerymodel_set"])
 reversion.register(TracQueryModel)
+
+class RoundupTrackerModel(TrackerModel):
+    '''This model stores the data for individual Roundup trackers.'''
+    tracker_name = models.CharField(max_length=200, unique=True,
+                                    blank=False, null=False,
+            help_text="This is the name that OpenHatch will use to identify the project.")
+    base_url = models.URLField(max_length=200, unique=True,
+                               blank=False, null=False, verify_exists=False,
+            help_text="This is the URL to the homepage of the Roundup tracker instance. Remove any subpaths like 'issue42' or 'user37' from this.")
+    closed_status = models.CharField(max_length=200, blank=False,
+            help_text="This is the text that the 'Status' field will contain that indicates a bug is closed.")
+    bitesized_field = models.CharField(max_length=50, blank=True, default='',
+            help_text="This is the name of the field (as it appears on an issue page) that will contain the indicator of a bite-sized bug. Leave blank if none.")
+    bitesized_text = models.CharField(max_length=200, blank=True, default='',
+            help_text="This is the text that the field above will contain that indicates a bite-sized bug. Separate multiple values with single commas (,) only.")
+    documentation_field = models.CharField(max_length=50, blank=True, default='',
+            help_text="This is the name of the field (as it appears on an issue page) that will contain the indicator of a documentation bug. Leave blank if none.")
+    documentation_text = models.CharField(max_length=200, blank=True, default='',
+            help_text="This is the text that the field above will contain that indicates a documentation bug. Separate multiple values with single commas (,) only.")
+    as_appears_in_distribution = models.CharField(max_length=200, blank=True, default='')
+
+    all_trackers = models.Manager()
+
+    def __str__(self):
+        return smart_str('%s' % (self.tracker_name))
+
+    def get_base_url(self):
+        return self.base_url
+
+class RoundupQueryModel(TrackerQueryModel):
+    '''This model stores query URLs for RoundupTracker objects.'''
+    url = models.URLField(max_length=400, blank=False, null=False,
+            help_text="This is the URL of the Roundup query containing the bugs that you want us to index. Get it by navigating to the page, query, search etc. that shows the bugs you want indexed, and copy the URL of the 'Download as CSV' link at the bottom of the page.")
+    description = models.CharField(max_length=200, blank=True, default='',
+            help_text="This is just an identifier to help people work out what bugs this URL corresponds to, and isn't used anywhere else.")
+    tracker = models.ForeignKey(RoundupTrackerModel)
+
+    def get_query_url(self):
+        return self.url
+
+reversion.register(RoundupTrackerModel, follow=["roundupquerymodel_set"])
+reversion.register(RoundupQueryModel)

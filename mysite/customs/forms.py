@@ -22,7 +22,8 @@ class TrackerTypesForm(django.forms.Form):
     TRACKER_TYPES = (
             ('bugzilla', 'Bugzilla'),
             ('google', 'Google Code'),
-            ('trac', 'Trac')
+            ('roundup', 'Roundup'),
+            ('trac', 'Trac'),
             )
     tracker_type = django.forms.ChoiceField(choices=TRACKER_TYPES)
 
@@ -51,4 +52,13 @@ class TracTrackerForm(django.forms.ModelForm):
 class TracQueryForm(django.forms.ModelForm):
     class Meta:
         model = mysite.customs.models.TracQueryModel
+        exclude = ('tracker', 'last_polled',)
+
+class RoundupTrackerForm(django.forms.ModelForm):
+    class Meta:
+        model = mysite.customs.models.RoundupTrackerModel
+
+class RoundupQueryForm(django.forms.ModelForm):
+    class Meta:
+        model = mysite.customs.models.RoundupQueryModel
         exclude = ('tracker', 'last_polled',)
