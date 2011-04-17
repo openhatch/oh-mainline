@@ -37,7 +37,7 @@ NB: All forms in pages that descend from this have the same name.
       </div>
       {% endif %}
         <form name='a_settings_tab_form' method='POST'
-            action={% block form_action %}{% endblock %}>
+            action={% block form_action %}{% endblock %}>{% csrf_token %}
             {% block submodule_body %}{% endblock %}
             <p> <input type='submit'
                         {% block submit_button_attributes %}

@@ -41,7 +41,7 @@ Hi
 {% if unsubscribe_this_user.email_me_weekly_re_projects %}
 <p> This page allows you to unsubscribe from periodic emails from OpenHatch about activity in your projects. </p>
 
-<form method='POST' action='{% url mysite.profile.views.unsubscribe_do %}'>
+<form method='POST' action='{% url mysite.profile.views.unsubscribe_do %}'>{% csrf_token %}
     <input type='hidden' name='token_string' value='{{ token_string }}'>
     <input type='submit' value='Unsubscribe and be free' >
 </form>

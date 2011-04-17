@@ -68,7 +68,7 @@ label[for^='id_how_should_people_contact_you'] { float: left; width: 100%; }
             <p>Now is a good time to <a href="/policies-etc/">read our privacy policy</a>.</p>
 
             <form name="fregister" action="{% url mysite.account.views.register %}"
-                    method="POST" class="login">
+                    method="POST" class="login">{% csrf_token %}
                 <input type="hidden" name="next"
                         value="{{ next|enhance_next_to_annotate_it_with_newuser_is_true}}" />
                 {{ form1.as_p }}
@@ -82,7 +82,7 @@ label[for^='id_how_should_people_contact_you'] { float: left; width: 100%; }
                 Or associate this OpenID with an existing account.
             </a>
 
-            <form id='associate-with-existing-account' name="fverify" action="{% url user_register %}" method="POST" class='login '>
+            <form id='associate-with-existing-account' name="fverify" action="{% url user_register %}" method="POST" class='login '>{% csrf_token %}
                 <input type="hidden" name="next" value="{{ next }}" />
                 {{ form2.as_p }}
                 <p><input type="submit" name="bverify" value="Associate"></p>

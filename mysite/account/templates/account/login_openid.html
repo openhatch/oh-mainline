@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 {% endcomment %}
 <form id="openid_form" name="openid_form"
-    action="{% url user_signin %}" method="post">
+    action="{% url user_signin %}" method="post">{% csrf_token %}
     {% if next and not answers and not request.GET.from_offsite %}
         <p>Please log in to proceed.</p>
     {% endif %}

@@ -227,7 +227,7 @@ Search bugs
         when we add more opportunities matching this query. Sign up right here:
     </p>
     <form name='alert' method='POST' 
-            action='{% url mysite.search.views.subscribe_to_bug_alert_do %}'>
+            action='{% url mysite.search.views.subscribe_to_bug_alert_do %}'>{% csrf_token %}
         {{ subscribe_to_alert_form.as_p }}
         <input type="submit" value="Email me when this is less lame">
     </form>

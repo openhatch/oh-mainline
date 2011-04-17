@@ -27,7 +27,7 @@
 
     <p>Since this is a larger patch, you will be uploading it as a file rather than just pasting it in.  (Also, if you're in the mood for some cooking after you complete the mission, we'd love to know how one of those recipes turns out.  But that's not part of the mission.)</p>
 
-    <form method="post" enctype="multipart/form-data" action="{% url mysite.missions.diffpatch.views.diffpatch_diffrecursive_submit %}#diffrecursive-form">
+    <form method="post" enctype="multipart/form-data" action="{% url mysite.missions.diffpatch.views.diffpatch_diffrecursive_submit %}#diffrecursive-form">{% csrf_token %}
       <div class="form-row">
         <a name="diffrecursive-form"></a>
         Upload the unified diff here:
@@ -61,7 +61,7 @@
       <li>Answer some questions below about the contents of the files inside.</li>
     </ul>
 
-    <form method="post" enctype="multipart/form-data" action="{% url mysite.missions.diffpatch.views.diffpatch_patchrecursive_submit %}#patchrecursive-form">
+    <form method="post" enctype="multipart/form-data" action="{% url mysite.missions.diffpatch.views.diffpatch_patchrecursive_submit %}#patchrecursive-form">{% csrf_token %}
       <div class="form-row">
         <a name="patchrecursive-form"></a>
   {% if patchrecursive_success %}

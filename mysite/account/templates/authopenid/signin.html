@@ -17,7 +17,7 @@
 {% endcomment %}
 {% load i18n %}
 
-<form id="openid_form" name="openid_form" action="{% url user_signin %}" method="post">
+<form id="openid_form" name="openid_form" action="{% url user_signin %}" method="post">{% csrf_token %}
     <input type="hidden" name="action" value="verify" />
     <input type="hidden" name="next" value="{{ next }}" />
         <fieldset>
