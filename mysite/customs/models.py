@@ -106,25 +106,23 @@ class BugzillaTrackerModel(TrackerModel):
             help_text="Any string here will be used verbatim as the project name for each bug aside from the keys '{tracker_name}', '{component}' and '{product}', which are replaced with the tracker's name from above and the relevant data from each individual bug respectively.")
     QUERY_URL_TYPES = (
             ('xml', 'Bug XML query'),
-            ('tracker', 'Tracker bug URL')
+            ('tracker', 'Tracker bug URL'),
             )
     query_url_type = models.CharField(max_length=20, choices=QUERY_URL_TYPES, blank=False, default='xml',
             help_text="This field is deprecated, and will be removed once all Bugzilla trackers are in the asynchronous framework.")
     BITESIZED_TYPES = (
-            (None, 'None'),
             ('key', 'Keyword'),
-            ('wboard', 'Whiteboard tag')
+            ('wboard', 'Whiteboard tag'),
             )
-    bitesized_type = models.CharField(max_length=10, choices=BITESIZED_TYPES, blank=False, default=None)
+    bitesized_type = models.CharField(max_length=10, choices=BITESIZED_TYPES, blank=True)
     bitesized_text = models.CharField(max_length=200, blank=True, default='',
             help_text="This is the text that the field type selected above will contain that indicates a bite-sized bug. Separate multiple values with single commas (,) only.")
     DOCUMENTATION_TYPES = (
-            (None, 'None'),
             ('key', 'Keyword'),
             ('comp', 'Component'),
-            ('prod', 'Product')
+            ('prod', 'Product'),
             )
-    documentation_type = models.CharField(max_length=10, choices=DOCUMENTATION_TYPES, blank=False, default=None)
+    documentation_type = models.CharField(max_length=10, choices=DOCUMENTATION_TYPES, blank=True)
     documentation_text = models.CharField(max_length=200, blank=True, default='',
             help_text="This is the text that the field type selected above will contain that indicates a documentation bug. Separate multiple values with single commas (,) only.")
     as_appears_in_distribution = models.CharField(max_length=200, blank=True, default='')
@@ -152,7 +150,7 @@ class BugzillaQueryModel(TrackerQueryModel):
                           blank=False, null=False)
     QUERY_TYPES = (
             ('xml', 'Bug XML query'),
-            ('tracker', 'Tracker bug URL')
+            ('tracker', 'Tracker bug URL'),
             )
     query_type = models.CharField(max_length=20, choices=QUERY_TYPES, blank=False, default='xml',
             help_text="We support two types of bug importing from Bugzilla - search queries that return an XML dump of all the bugs, and tracking bugs that depend on all the bugs to be imported here.")
@@ -174,17 +172,15 @@ class GoogleTrackerModel(TrackerModel):
                                     blank=False, null=False,
             help_text="This is the name that Google uses to identify the project.")
     BITESIZED_TYPES = (
-            (None, 'None'),
             ('label', 'Label'),
             )
-    bitesized_type = models.CharField(max_length=10, choices=BITESIZED_TYPES, blank=False, default=None)
+    bitesized_type = models.CharField(max_length=10, choices=BITESIZED_TYPES, blank=True)
     bitesized_text = models.CharField(max_length=200, blank=True, default='',
             help_text="This is the text that marks a bug as being ideal for newcomers.")
     DOCUMENTATION_TYPES = (
-            (None, 'None'),
             ('label', 'Label'),
             )
-    documentation_type = models.CharField(max_length=10, choices=DOCUMENTATION_TYPES, blank=False, default=None)
+    documentation_type = models.CharField(max_length=10, choices=DOCUMENTATION_TYPES, blank=True)
     documentation_text = models.CharField(max_length=200, blank=True, default='',
             help_text="This is the label that marks a documentation bug.")
 
@@ -246,18 +242,16 @@ class TracTrackerModel(TrackerModel):
     bug_project_name_format = models.CharField(max_length=200, blank=False,
             help_text="Any string here will be used verbatim as the project name for each bug aside from the keys '{tracker_name}' and '{component}', which are replaced with the tracker's name from above and the relevant data from each individual bug respectively.")
     BITESIZED_TYPES = (
-            (None, 'None'),
-            ('keywords', 'Keyword')
+            ('keywords', 'Keyword'),
             )
-    bitesized_type = models.CharField(max_length=10, choices=BITESIZED_TYPES, blank=False, default=None)
+    bitesized_type = models.CharField(max_length=10, choices=BITESIZED_TYPES, blank=True)
     bitesized_text = models.CharField(max_length=200, blank=True, default='',
             help_text="This is the text that the field type selected above will contain that indicates a bite-sized bug. Separate multiple values with single commas (,) only.")
     DOCUMENTATION_TYPES = (
-            (None, 'None'),
             ('keywords', 'Keyword'),
-            ('component', 'Component')
+            ('component', 'Component'),
             )
-    documentation_type = models.CharField(max_length=10, choices=DOCUMENTATION_TYPES, blank=False, null=True, default=None)
+    documentation_type = models.CharField(max_length=10, choices=DOCUMENTATION_TYPES, blank=True)
     documentation_text = models.CharField(max_length=200, blank=True, default='',
             help_text="This is the text that the field type selected above will contain that indicates a documentation bug. Separate multiple values with single commas (,) only.")
     as_appears_in_distribution = models.CharField(max_length=200, blank=True, default='')
