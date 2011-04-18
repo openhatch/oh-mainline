@@ -41,6 +41,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.core.cache import cache
+from django.views.decorators.csrf import csrf_exempt
 
 # Haystack
 import haystack.query
@@ -868,6 +869,7 @@ def replace_icon_with_default(request):
     return mysite.base.helpers.json_response(data)
 
 @login_required
+@csrf_exempt
 def prepare_data_import_attempts_do(request):
     """
     Input: request.POST contains a list of usernames or email addresses.
