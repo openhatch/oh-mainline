@@ -64,7 +64,7 @@ class Command(BaseCommand):
                 last_polled__lt=datetime.datetime.utcnow()-datetime.timedelta(days=1)
                 ).select_subclasses()
         # Convert this list to a dictionary of TrackerModules.
-        tm_list = [(query, query.tracker) for query in queries]
+        tm_list = [(query, query.tracker) for query in queries if hasattr(query, 'tracker')]
         tm_dict = defaultdict(list)
         [tm_dict[k].append(v) for v, k in tm_list]
         # For each TrackerModel, process its stale Queries.
