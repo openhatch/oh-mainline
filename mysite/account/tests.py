@@ -18,7 +18,6 @@
 
 #{{{ imports
 import os
-import Image
 import mock
 import tempfile
 import StringIO
@@ -37,6 +36,11 @@ from django.test.client import Client
 from django.core.urlresolvers import reverse
 
 from twill import commands as tc
+
+try:
+    import Image
+except:
+    from PIL import Image
 #}}}
 
 class Login(TwillTests):

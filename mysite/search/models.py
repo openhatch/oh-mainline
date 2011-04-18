@@ -29,7 +29,6 @@ from django.core.cache import cache
 from django.conf import settings
 import datetime
 import StringIO
-import Image
 import uuid
 import urllib
 from urlparse import urljoin
@@ -42,6 +41,10 @@ import voting
 import hashlib
 import celery.decorators
 import mysite.customs.ohloh
+try:
+    import Image
+except:
+    from PIL import Image
 
 class OpenHatchModel(models.Model):
     created_date = models.DateTimeField(null=True, auto_now_add=True)
