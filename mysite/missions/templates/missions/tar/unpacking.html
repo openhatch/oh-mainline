@@ -32,7 +32,7 @@
             <li>find and upload the <code>{{ file_we_want }}</code> file</li>
         </ul>
         <p></p>
-      <form method="post" enctype="multipart/form-data" action="{% url mysite.missions.tar.views.extract_mission_upload %}#unpack-form">
+      <form method="post" enctype="multipart/form-data" action="{% url mysite.missions.tar.views.extract_mission_upload %}#unpack-form">{% csrf_token %}
         <div class="form-row file-upload-row">
           <a name="unpack-form"></a>
           After you extract that file, upload it here:

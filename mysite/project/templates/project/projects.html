@@ -85,7 +85,7 @@ about the projects we index
                         action="{% url mysite.project.views.create_project_page_do %}"
                         style='clear: left; float: left; padding: 8px;
                         -moz-border-radius: 8px; border-radius: 8px;
-                        background-color: #ffc; '>
+                        background-color: #ffc; '>{% csrf_token %}
                     <input type='hidden' name='project_name' value='{{ query }}'>
 
                     <input style='float: left; color: #444; padding: 8px; font-size: 1.5em;' type="submit" value='Start a page for {{ query }} &raquo;'>

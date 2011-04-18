@@ -55,7 +55,7 @@ Manage projects
             </p></div>
         <h4 id='import_links_heading'>Find projects automatically</h4>
         <form id='importer' class='submodule' name='import' method='POST'
-            action='{% url mysite.profile.views.prepare_data_import_attempts_do %}'>
+            action='{% url mysite.profile.views.prepare_data_import_attempts_do %}'>{% csrf_token %}
             <div class='body'>
                 <div class='howto'>
                     <h5><a style='position: relative; top: -10px;' href='#'>Start here &raquo;</a></h5>

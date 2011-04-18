@@ -41,7 +41,7 @@ Editing project - {{ project.display_name }}
                 </ul>
 
                 <div id='info' class='tab'>
-                    <form enctype='multipart/form-data' method='POST' action=''>
+                    <form enctype='multipart/form-data' method='POST' action=''>{% csrf_token %}
                         {% for field in form %}
                             {% ifequal field.name 'icon_raw' %}
                                 <div style='clear: left; margin-top: 10px; 
@@ -74,7 +74,7 @@ Editing project - {{ project.display_name }}
 
                 <div id='control_descriptions' class='tab'>
                     <form action='{% url mysite.profile.views.set_pfentries_dot_use_my_description_do %}' 
-                            method='POST'>
+                            method='POST'>{% csrf_token %}
                         <input type='hidden' name='project_pk' value='{{ project.pk}}' />
     
                         <p>

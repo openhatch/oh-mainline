@@ -32,7 +32,7 @@
       <li>Make a unified diff (the universally preferred flavor of diff output) of your changes.  (Try <code>diff -u originalfile.txt modifiedfile.txt</code>.)</li>
     </ul>
 
-    <form method="post" action="{% url mysite.missions.diffpatch.views.diffsingle_submit %}#diffsingle-form">
+    <form method="post" action="{% url mysite.missions.diffpatch.views.diffsingle_submit %}#diffsingle-form">{% csrf_token %}
       <div class="form-row">
         <a name="diffsingle-form"></a>
         Paste the unified diff here:

@@ -32,7 +32,7 @@
     &middot;{% spaceless %}
     <form method='post'
         action='{% url mysite.project.views.delete_paragraph_answer_do %}'
-        class='delete' id="delete_form_{{answer.pk}}">
+        class='delete' id="delete_form_{{answer.pk}}">{% csrf_token %}
         <input type="hidden" name="answer__pk" value="{{answer.pk}}" />
         <input type="submit" value="delete" />
     </form>

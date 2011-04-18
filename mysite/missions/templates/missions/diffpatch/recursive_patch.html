@@ -32,7 +32,7 @@
       <li>Answer some questions below about the contents of the files inside.</li>
     </ul>
 
-    <form method="post" enctype="multipart/form-data" action="{% url mysite.missions.diffpatch.views.patchrecursive_submit %}#patchrecursive-form">
+    <form method="post" enctype="multipart/form-data" action="{% url mysite.missions.diffpatch.views.patchrecursive_submit %}#patchrecursive-form">{% csrf_token %}
       <div class="form-row">
         <a name="patchrecursive-form"></a>
   {% if patchrecursive_success %}

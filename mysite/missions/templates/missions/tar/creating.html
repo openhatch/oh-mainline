@@ -45,7 +45,7 @@
       </ul>
       <p></p>
 
-      <form method="post" enctype="multipart/form-data" action="{% url mysite.missions.tar.views.upload %}#create-form">
+      <form method="post" enctype="multipart/form-data" action="{% url mysite.missions.tar.views.upload %}#create-form">{% csrf_token %}
         <div class="form-row file-upload-row">
           <a name="create-form"></a>
           After you make the tarball, upload it here:
