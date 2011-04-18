@@ -638,8 +638,8 @@ class PublishedPortfolioEntries(models.Manager):
 
 class PortfolioEntry(models.Model):
     # Managers
-    published_ones = PublishedPortfolioEntries()
     objects = models.Manager()
+    published_ones = PublishedPortfolioEntries()
 
     # FIXME: Constrain this so (person, project) pair uniquely finds a PortfolioEntry
     person = models.ForeignKey(Person)

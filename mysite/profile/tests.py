@@ -832,7 +832,7 @@ class AddCitationManually(TwillTests):
 
         # Send this data to the appropriate view.
         url = reverse(mysite.profile.views.add_citation_manually_do)
-        self.login_with_client().post(url, input_data)
+        response = self.login_with_client().post(url, input_data)
 
         # Check that a citation was created.
         c = Citation.untrashed.get(url=input_data['url'])
