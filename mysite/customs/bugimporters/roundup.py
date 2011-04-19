@@ -76,7 +76,7 @@ class RoundupBugImporter(BugImporter):
         # Put the bug list in the form required for process_bugs.
         # The second entry of the tuple is None as Roundup never supplies data
         # via queries.
-        bug_list = [(bug_url, None) for bug_url in stale_bug_url_list]
+        bug_list = [(bug_url, None) for bug_url in stale_bug_urls]
 
         # And now go on to process the bug list
         self.process_bugs(bug_list)
