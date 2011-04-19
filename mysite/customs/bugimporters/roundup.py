@@ -72,13 +72,13 @@ class RoundupBugImporter(BugImporter):
             ).values_list('canonical_bug_link', flat=True)
 
         # Remove the fresh URLs to be let with stale or new URLs.
-        for bug_url in fresh_bug_urls:
-            bug_url_list.remove(bug_url)
+        stale_bug_urls = [bug_url for bug_url in bug_url_list
+                          if bug_url not in fresh_bug_urls]
 
         # Put the bug list in the form required for process_bugs.
         # The second entry of the tuple is None as Roundup never supplies data
         # via queries.
-        bug_list = [(bug_url, None) for bug_url in bug_url_list]
+        bug_list = [(bug_url, None) for bug_url in stale_bug_url_list]
 
         # And now go on to process the bug list
         self.process_bugs(bug_list)
