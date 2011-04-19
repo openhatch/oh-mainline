@@ -185,7 +185,12 @@ document.documentElement.className = 'javascript_is_enabled';
 <script type='text/javascript'>
 $(function(){
         $('#people-list li').hoverClass('hover');
-        $('#tabbed_container_of_big_links').tabs();
+        $('#tabbed_container_of_big_links').tabs({
+            cookie: {
+                // keeps tab choice for one day
+                expires: 1
+            }
+        });
         $('.invisible_if_js').removeClass('invisible_if_js');
 });
 </script>
