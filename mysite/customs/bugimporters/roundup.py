@@ -53,9 +53,9 @@ class RoundupBugImporter(BugImporter):
         self.bug_ids.extend([int(line['id']) for line in dictreader])
 
     def prepare_bug_urls(self):
-        # Pull bug_ids our of the internal storage. This is done in case the
+        # Pull bug_ids out of the internal storage. This is done in case the
         # list is simultaneously being written to, in which case just copying
-        # the entire thing followed by ddeleting the contents could lead to
+        # the entire thing followed by deleting the contents could lead to
         # lost IDs.
         bug_id_list = []
         while self.bug_ids:
