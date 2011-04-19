@@ -57,9 +57,7 @@ class RoundupBugImporter(BugImporter):
         # list is simultaneously being written to, in which case just copying
         # the entire thing followed by deleting the contents could lead to
         # lost IDs.
-        bug_id_list = []
-        while self.bug_ids:
-            bug_id_list.append(self.bug_ids.pop())
+        bug_id_list = self.bug_ids[:] # this is called 'slice copy'
 
         # Convert the obtained bug ids to URLs.
         bug_url_list = [urlparse.urljoin(self.tm.get_base_url(),
