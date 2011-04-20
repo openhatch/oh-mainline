@@ -26,6 +26,7 @@
         color: #222;
         font: 9pt Verdana, Bitstream Vera Sans, Arial, sans-serif;
         width: 260px ! important;
+        height: 280px ! important;
         background: #fff url('{{uri_scheme}}://{{ url_prefix }}{% version '/static/images/motif-eee.png' %}') repeat scroll 0 0;
         float: left;
         border: inherit;
@@ -39,6 +40,7 @@
         background: transparent url('{{uri_scheme}}://{{ url_prefix }}{% version '/static/images/gray-60.png' %}') repeat scroll 0 0;
         float: left;
         width: 252px;
+        height: 272px ! important;
         border-radius: 0;
         -moz-border-radius: 0;
         padding: 4px;
@@ -67,12 +69,13 @@
         vertical-align: middle;
     }
     #openhatch-widget a {
-        color: darkorange; 
-        text-decoration: none;
+        color: darkorange ! important; 
+        text-decoration: none ! important;
     }
 
     #openhatch-widget a:hover {
-        color: orange; 
+        background-color: #ffffff ! important;
+        color: orange ! important; 
     }
 
     #openhatch-widget a img {
@@ -93,6 +96,7 @@
 
     #openhatch-widget h1 a:hover {
         color: #223366;
+        background-color #ffffff ! important;
         text-decoration: none;
     }
 
@@ -106,6 +110,7 @@
     #openhatch-widget .module > .body {
         float: left;
         padding: 10px 5px ! important;
+        height: 145px ! important;
     }
 
     #openhatch-widget .module > .foot {
@@ -122,6 +127,7 @@
     
     #openhatch-widget .module > .foot a:hover {
         color: black;
+        background-color: #ffffff ! important;
     }
 
     #openhatch-widget .module > .body.contains-submodules {
@@ -166,8 +172,10 @@
         margin-right: 3px;
     }
     #openhatch-widget .module > .head ul li a:hover {
+        background-color: #ffffff ! important;
         color: orange;
         text-decoration: underline;
+        
     }
     #openhatch-widget img {
         border: 0;
