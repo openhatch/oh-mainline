@@ -13,7 +13,7 @@ DATABASE_HOST='linode.openhatch.org'
 OHLOH_API_KEY='SXvLaGPJFaKXQC0VOocAg'
 DEBUG=False
 ADMINS=[
-    ('Everybody at OpenHatch', 'openhatch@asheesh.org',)
+    ('Private Server Monitoring List', 'monitoring-private@lists.openhatch.org',)
 ]
 
 INVITE_MODE=False # Suckas, invite codes are disabled everywarez
