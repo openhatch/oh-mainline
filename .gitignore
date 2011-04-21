@@ -4,6 +4,8 @@ mysite/static/images/icons/projects/*
 mysite/static/images/icons/projects/**
 *.pyc
 *.pyo
+*.swp
+*.patch
 .installed.cfg
 bin
 develop-eggs
