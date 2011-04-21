@@ -1,4 +1,11 @@
+# This settings file is loaded by ./bin/production, which is
+# what we use on the main OpenHatch deployment.
+#
+# The live site needs some slightly different settings.
+#
+# So we start by loading the settings module in the same directory...
 from settings import *
+# ...and then we override some values.
 
 # But use the linode as our MySQL server
 DATABASE_HOST='linode.openhatch.org'
