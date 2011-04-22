@@ -292,6 +292,7 @@ class Project(OpenHatchModel):
         return "name='%s' display_name='%s' language='%s'" % (self.name, self.display_name, self.language)
     
     def get_url(self):
+        import mysite.project.views
         return reverse(mysite.project.views.project,
                 kwargs={'project__name': mysite.base.unicode_sanity.quote(self.name)}) 
 
