@@ -115,7 +115,13 @@ class DiffRecursiveMission(object):
 
             # Check that it will apply correctly to the file.
             if not the_patch._match_file_hunks(full_filename, hunks):
-                raise IncorrectPatch, 'The modifications to "%s" will not apply correctly to the original file.' % filename
+
+                # Check for reverse patch by seeing if there is "-firstSubstitute" and "+firstOriginal" in the diff.
+                # (If they did everything perfectly and reversed the patch, there will be two lines following these conditions)
+                if patchdata.find('-'+ cls.SUBSTITUTIONS[1][1]) != -1 and patchdata.find('+'+ cls.SUBSTITUTIONS[1][0]) != -1:
+                    raise IncorrectPatch, 'You submitted a patch that would revert the correct changes back to the originals.  You may have mixed the parameters for diff, or performed a reverse patch.'
+                else:
+                    raise IncorrectPatch, 'The modifications to "%s" will not apply correctly to the original file.' % filename
 
             # Check that the resulting file matches what is expected.
             if ''.join(the_patch.patch_stream(StringIO(old_contents), hunks)) != new_contents:

@@ -228,6 +228,31 @@ class DiffRecursiveTests(TwillTests):
         paulproteus = Person.objects.get(user__username='paulproteus')
         self.assertEqual(len(StepCompletion.objects.filter(step__name='diffpatch_diffrecursive', person=paulproteus)), 0)
 
+    def test_do_mission_incorrectly_revdiff(self):
+        orig_response = self.client.get(reverse(views.diffrecursive_get_original_tarball))
+        tfile = tarfile.open(fileobj=StringIO(orig_response.content), mode='r:gz')
+        diff = StringIO()
+        for fileinfo in tfile:
+            if not fileinfo.isfile():
+                continue
+            oldlines = tfile.extractfile(fileinfo).readlines()
+            newlines = []
+            for line in oldlines:
+                for old, new in controllers.DiffRecursiveMission.SUBSTITUTIONS:
+                    line = line.replace(old, new)
+                newlines.append(line)
+
+            # We're very similar to test_do_mission-correctly, but here we switch newlines and oldlines, to create a reverse patch
+            diff.writelines(difflib.unified_diff(newlines, oldlines, 'orig-'+fileinfo.name, fileinfo.name))
+        diff.seek(0)
+        diff.name = 'foo.patch'
+
+        # Submit, and see if we get the same error message we expect.
+        error = self.client.post(reverse(views.diffrecursive_submit), {'diff': diff})
+        self.assert_('You submitted a patch that would revert the correct changes back to the originals.  You may have mixed the parameters for diff, or performed a reverse patch.' in str(error))
+        paulproteus = Person.objects.get(user__username='paulproteus')
+        self.assertEqual(len(StepCompletion.objects.filter(step__name='diffpatch_diffrecursive', person=paulproteus)), 0)
+
 class PatchRecursiveTests(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
