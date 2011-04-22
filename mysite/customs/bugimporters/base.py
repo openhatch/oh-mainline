@@ -134,7 +134,9 @@ class AddTrackerForeignKeysToBugs(object):
         # Store the reactor manager
         self.rm = reactor_manager
 
-    def process_bugs(self, bug_urls):
+    def process_bugs(self, list_of_url_data_pairs):
+        # Unzip the list of bugs and discard the data field.
+        bug_urls = [bug_url for (bug_url, bug_data) in list_of_url_data_pairs]
         # Fetch a list of all Bugs that are stale.
         bugs = Bug.all_bugs.filter(
                 canonical_bug_link__in = bug_urls)
