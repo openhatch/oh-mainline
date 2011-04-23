@@ -86,7 +86,15 @@ def clear_static_cache(path):
     fully_qualified_path = os.path.join(django.conf.settings.WEB_ROOT, path)
 
     # 0. Create new temp dir
-    new_temp_path = tempfile.mkdtemp(django.conf.settings.WEB_ROOT)
+    try:
+        new_temp_path = tempfile.mkdtemp(dir=django.conf.settings.WEB_ROOT + '/')
+    except OSError, e:
+        if e.errno == 28: # No space left on device
+           # Aww shucks, we can't do it the smart way.
+           # We just set new_temp_path to the old path, then
+           # and let shutil remove it.
+           shutil.rmtree(fully_qualified_path)
+           return # We are done.
 
     # 1. Atomically move the path that we want to expire into the new directory
     try:
@@ -96,6 +104,8 @@ def clear_static_cache(path):
             # Well, that means the cache is already clear.
             # We still have to nuke new_temp_path though!
             pass
+        else:
+            raise
 
     # 2. shutil.rmtree() the new path
     shutil.rmtree(new_temp_path)
