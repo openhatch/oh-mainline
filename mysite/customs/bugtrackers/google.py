@@ -356,40 +356,6 @@ def generate_google_tracker_classes(tracker_name=None):
 ############################################################
 # Specific sub-classes for individual bug trackers
 
-class MelangeGoogle(GoogleBugTracker):
-    enabled = True
-
-    def __init__(self):
-        GoogleBugTracker.__init__(self,
-                                  tracker_name='Melange',
-                                  google_name='soc')
-
-    def generate_current_bug_atom(self):
-        query_data = [
-                {
-                    'max_results': 10000,
-                    'canned_query': 'open',
-                    'label': 'Effort-Minimal,Easy,Fair'
-                }
-                ]
-        queries = []
-        for kwargs in query_data:
-            queries.append(create_google_query(**kwargs))
-        return self.generate_bug_atom_from_queries(queries)
-
-    @staticmethod
-    def extract_tracker_specific_data(issue, ret_dict):
-        # Make modifications to ret_dict using provided atom data
-        labels = [label.text for label in issue.label]
-        ret_dict['good_for_newcomers'] = (('Effort-Minimal' in labels) or
-                                          ('Effort-Easy' in labels) or
-                                          ('Effort-Fair' in labels))
-        ret_dict['bite_size_tag_name'] = 'Minimal, Easy or Fair effort'
-        # Check whether documentation bug
-        ret_dict['concerns_just_documentation'] = ('Component-Docs' in labels)
-        # Then pass ret_dict back
-        return ret_dict
-
 # The generic class for Google trackers.
 class GenGoogle(GoogleBugTracker):
     enabled = False

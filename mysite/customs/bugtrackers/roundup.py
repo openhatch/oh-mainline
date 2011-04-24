@@ -225,32 +225,6 @@ class RoundupTracker(object):
     def __unicode__(self):
         return "<Roundup bug tracker for %s>" % self.root_url
 
-class MercurialTracker(RoundupTracker):
-    enabled = True
-
-    def __init__(self):
-        RoundupTracker.__init__(self,
-                                root_url='http://mercurial.selenic.com/bts/',
-                                tracker_name='Mercurial')
-
-    def extract_bug_tracker_specific_data(self, metadata_dict, bug_object):
-        if 'bitesized' in metadata_dict['Topics']:
-            bug_object.good_for_newcomers = True
-        if 'documentation' in metadata_dict['Topics']:
-            bug_object.concerns_just_documentation = True
-        bug_object.looks_closed = (metadata_dict['Status'] == 'resolved')
-
-    def generate_list_of_bug_ids_to_look_at(self):
-        # Bitesized bugs
-        for bug_id in csv_url2bugs(
-            'http://mercurial.selenic.com/bts/issue?@action=export_csv&@columns=title,id,activity,status,assignedto&@sort=activity&@group=priority&@filter=topic&@pagesize=500&@startwith=0&topic=61'):
-            yield bug_id
-            
-        # Documentation bugs
-        for bug_id in csv_url2bugs(
-                'http://mercurial.selenic.com/bts/issue?@action=export_csv&@columns=title,id,activity,status,assignedto&@sort=activity&@group=priority&@filter=topic&@pagesize=500&@startwith=0&topic=10'):
-            yield bug_id
-        
 class PythonTracker(RoundupTracker):
     enabled = True
 
@@ -284,32 +258,3 @@ class PythonTracker(RoundupTracker):
             for bug_id in csv_url2bugs(query_url):
                 yield bug_id
 
-class OpenHatchTracker(RoundupTracker):
-    enabled = True
-
-    def __init__(self):
-        RoundupTracker.__init__(self,
-                                root_url='http://openhatch.org/bugs/',
-                                tracker_name='OpenHatch')
-
-    def extract_bug_tracker_specific_data(self, metadata_dict, bug_object):
-        bug_object.good_for_newcomers = (
-            'bitesize' in metadata_dict['Keywords'])
-        bug_object.concerns_just_documentation = (
-            'documentation' in metadata_dict['Keywords'])
-        bug_object.status = metadata_dict['Status']
-        bug_object.looks_closed = (
-            metadata_dict['Status'] == 'resolved')
-        bug_object.importance = metadata_dict['Priority']
-
-    def generate_list_of_bug_ids_to_look_at(self):
-        ### bug queries to look at
-        queries = {
-            'All bugs':
-                'https://openhatch.org/bugs/issue?@action=export_csv&@columns=title,id,activity,status,assignedto&@sort=activity&@group=priority&@pagesize=50&@startwith=0',
-            }
-
-        for query_name in queries:
-            query_url = queries[query_name]
-            for bug_id in csv_url2bugs(query_url):
-                yield bug_id
