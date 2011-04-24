@@ -1026,58 +1026,6 @@ class UserGetsMessagesDuringImport(django.test.TestCase):
 
         self.assertEqual(len(paulproteus.user.get_and_delete_messages()), 1)
 
-class MercurialRoundupGrab(django.test.TestCase):
-
-    closed_bug_filename = os.path.join(settings.MEDIA_ROOT, 'sample-data',
-            "closed-mercurial-bug.html")
-
-    # When we query for bugs, we'll always get bugs with Status=closed.
-    # That's because we're patching out the method that returns a dictionary
-    # of the bug's metadata. That dictionary will always contain 'closed' at 'Status'.
-    @mock.patch('urllib2.urlopen')
-    def test_scrape_bug_status_and_mark_as_closed(self, mock_urlopen,
-                                                  project_name='Mercurial',
-                                                  should_do_something=True,
-                                                  should_use_urlopen=True):
-        if Project.objects.filter(name=project_name):
-            roundup_project = Project.objects.get(name=project_name)
-        else:
-            roundup_project = Project.create_dummy(name=project_name)
-
-        mock_urlopen.return_value=open(MercurialRoundupGrab.closed_bug_filename)
-
-        tracker = mysite.customs.bugtrackers.roundup.MercurialTracker()
-        did_create = tracker.create_bug_object_for_remote_bug_id_if_necessary(1)
-        self.assertEqual(did_create, should_do_something)
-
-        bug = Bug.all_bugs.get()
-        self.assert_(bug.looks_closed)
-
-        if should_use_urlopen:
-            self.assert_(mock_urlopen.called)
-
-    def test_reimport_same_bug_works(self):
-        # First, we do an import.
-        self.test_scrape_bug_status_and_mark_as_closed()
-        # Immediately we attempt to re-import it. urllib2.urlopen should never
-        # be called, because the bug data is so fresh.
-        self.test_scrape_bug_status_and_mark_as_closed(should_do_something=False,
-                                                       should_use_urlopen=False)
-
-    def test_reimport_same_bug_works_when_bug_is_stale(self):
-        # First, import the bug
-        self.test_scrape_bug_status_and_mark_as_closed()
-        # Then, set it as stale
-        bug = Bug.all_bugs.get()
-        bug.last_polled = datetime.datetime(1970, 1,1)
-        bug.save()
-
-        # Now, re-import. We should call urlopen, and 
-        # create_bug_object_for_remote_bug_id_if_necessary should return True
-        # because that's what its return value signifies.
-        self.test_scrape_bug_status_and_mark_as_closed(should_do_something=True,
-                                                       should_use_urlopen=True)
-
 class RoundupBugImporterTests(django.test.TestCase):
     def setUp(self):
         # Set up the RoundupTrackerModel that will be used here.
@@ -1717,24 +1665,6 @@ class TracBug(django.test.TestCase):
                   'submitter_realname': '', 'title': 'Show line numbers when embedding source code in wiki pages', 'people_involved': 3, 'last_touched': datetime.datetime(2010, 11, 26, 13, 45, 45),
                   'submitter_username': 'erik@\xe2\x80\xa6', 'looks_closed': False, 'good_for_newcomers': False, 'concerns_just_documentation': False}
         self.assertEqual(wanted, got)
-
-    @mock.patch('mysite.customs.mechanize_helpers.mechanize_get')
-    def test_bug_that_404s_is_deleted(self, mock_error):
-        mock_error.side_effect = generate_404
-
-        dummy_project = Project.create_dummy()
-        bug = Bug()
-        bug.project = dummy_project
-        bug.canonical_bug_link = 'http://twistedmatrix.com/trac/ticket/1234'
-        bug.date_reported = datetime.datetime.utcnow()
-        bug.last_touched = datetime.datetime.utcnow()
-        bug.last_polled = datetime.datetime.utcnow() - datetime.timedelta(days=2)
-        bug.save()
-        self.assert_(Bug.all_bugs.count() == 1)
-
-        twisted = mysite.customs.bugtrackers.trac.TwistedTrac()
-        twisted.refresh_all_bugs()
-        self.assert_(Bug.all_bugs.count() == 0)
 
 class TracBugParser(django.test.TestCase):
     def setUp(self):
