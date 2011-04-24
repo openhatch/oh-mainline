@@ -19,3 +19,42 @@
 from mysite.missions.tar.tests import *
 from mysite.missions.diffpatch.tests import *
 from mysite.missions.svn.tests import *
+
+import django.test
+from mysite.missions.base.controllers import *
+from mysite.missions.models import Step, StepCompletion
+from mysite.profile.models import Person
+
+class MissionCompletionTestCase(django.test.TestCase):
+    fixtures = ['initial-data.json', 'person-barry.json']	
+        
+    def test_unset_mission_completed_sets_is_currently_completed_to_false(self):
+        """When user unsets step completion
+        'StepCompletion' object 'is_currently_completed' param becomes true"""
+        profile = Person.objects.all()[0]
+        step = Step.objects.all()[0]	
+        #creates StepCompletion object
+        set_mission_completed(profile, step.name)
+
+        unset_mission_completed(profile, step.name)
+        obj_after = StepCompletion.objects.get(person = profile, step = step)
+		
+        self.assertTrue(mission_completed_at_least_once(profile, step.name))
+        self.assertFalse(mission_completed(profile, step.name))
+        self.assertFalse(obj_after.is_currently_completed)
+
+        obj_after.delete()
+
+    def test_set_mission_completed_sets_is_currently_completed_to_true(self):
+        profile = Person.objects.all()[0]
+        step = Step.objects.all()[0]
+
+        set_mission_completed(profile, step.name)
+        # sets StepCompletion.is_currently_completed to True
+        unset_mission_completed(profile, step.name)
+        # should make StepCompletion.is_currently_completed False again 
+        set_mission_completed(profile, step.name)
+        obj_after = StepCompletion.objects.get(person = profile, step = step)
+        
+        self.assertTrue(mission_completed(profile, step.name))
+        self.assertTrue(obj_after.is_currently_completed)

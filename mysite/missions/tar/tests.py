@@ -153,7 +153,7 @@ class MissionPageStateTests(TwillTests):
         
         response = self.client.post(reverse(views.reset), {'mission_parts': 'tar' })
         self.assert_('Operation successful' in response.content)
-        self.assertEqual(len(StepCompletion.objects.filter(step__name='tar', person=paulproteus)), 0)        
+        self.assertEqual(len(StepCompletion.objects.filter(step__name='tar', person=paulproteus, is_currently_completed=True)), 0)        
         
         
     def test_mission_completion_partial_reset(self):
@@ -163,5 +163,5 @@ class MissionPageStateTests(TwillTests):
         
         response = self.client.post(reverse(views.reset), {'mission_parts': 'tar,tar_extract' })
         self.assert_('Operation successful' in response.content)
-        self.assertEqual(len(StepCompletion.objects.filter(step__name='tar', person=paulproteus)), 0)
-        self.assertEqual(len(StepCompletion.objects.filter(step__name='tar_extract', person=paulproteus)), 0)                  
+        self.assertEqual(len(StepCompletion.objects.filter(step__name='tar', person=paulproteus, is_currently_completed=True)), 0)
+        self.assertEqual(len(StepCompletion.objects.filter(step__name='tar_extract', person=paulproteus, is_currently_completed=True)), 0)                  

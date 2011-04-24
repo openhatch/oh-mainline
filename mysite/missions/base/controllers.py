@@ -40,14 +40,21 @@ def get_mission_data_path(mission_type):
     return os.path.join(os.path.dirname(__file__), '..', mission_type, 'data')
 
 def set_mission_completed(profile, mission_name):
-    StepCompletion.objects.get_or_create(person=profile, step=Step.objects.get(name=mission_name))
+    s, _ = StepCompletion.objects.get_or_create(person=profile, step=Step.objects.get(name=mission_name))
+    s.is_currently_completed = True
+    s.save()
 
 def unset_mission_completed(profile, mission_name):
-    StepCompletion.objects.filter(person=profile, step=Step.objects.get(name=mission_name)).delete()
+    s = StepCompletion.objects.filter(person=profile, step=Step.objects.get(name=mission_name), is_currently_completed=True)
+    if len(s):
+        s[0].is_currently_completed = False
+        s[0].save()
 
 def mission_completed(profile, mission_name):
-    return len(StepCompletion.objects.filter(step__name=mission_name, person=profile)) != 0
+    return len(StepCompletion.objects.filter(step__name=mission_name, person=profile, is_currently_completed=True)) != 0
 
+def mission_completed_at_least_once(profile, mission_name):
+    return len(StepCompletion.objects.filter(step__name=mission_name, person=profile)) != 0
 
 class IncorrectPatch(Exception):
     pass
