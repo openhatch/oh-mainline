@@ -33,6 +33,9 @@ import mysite.account.forms
 
 from django_authopenid import views as oid_views
 
+#used for the robots.txt redirection
+from django.views.generic.simple import direct_to_template
+
 from voting.views import vote_on_object
 
 import mysite.account.views
@@ -361,7 +364,10 @@ urlpatterns = patterns('',
         (r'^edit/name$', lambda x: redirect(to=mysite.account.views.edit_name, permanent=True)),
 
         (r'^\+v/nextsteps4helpers/$', 'mysite.project.views.nextsteps4helpers'),
-        
+
+        #regex for the robots.txt file, for search engine exclusion
+        (r'^robots\.txt$', direct_to_template, {'template': 'robots.txt', 'mimetype': 'text/plain'}),
+
         # This dangerous regex is last
         (r'^people/(?P<user_to_display__username>[^/]+)/$',
                 'mysite.profile.views.display_person_web'),
