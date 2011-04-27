@@ -18,7 +18,7 @@ import logging
 
 from django.contrib.auth.models import User
 from mysite.search.models import Bug, Project
-from mysite.profile.models import Person
+from mysite.profile.models import Person, Tag, TagType, Link_Person_Tag
 from mysite.base.models import Timestamp
 import sys
 import simplejson
@@ -126,7 +126,18 @@ class Command(BaseCommand):
         # exporting Bug data
         public_bug_data = self.serialize_all_objects(query_set=Bug.all_bugs.all())
         data.extend(public_bug_data)
-        
+
+        #exporting tags
+        public_tags_data = self.serialize_all_objects(query_set=Tag.objects.all())
+        data.extend(public_tags_data)
+
+        #exporting tagtypes
+        public_tagtypes_data = self.serialize_all_objects(query_set=TagType.objects.all())
+        data.extend(public_tagtypes_data)
+
+        #exporting tags-persons links
+        public_persons_tags_links = self.serialize_all_objects(query_set=Link_Person_Tag.objects.all())
+        data.extend(public_persons_tags_links)
 
         ### anyway, now we stream all this data out using simplejson
         simplejson.dump(data, output,cls=django.core.serializers.json.DjangoJSONEncoder)

@@ -24,7 +24,7 @@
 # Imports {{{
 from mysite.search.models import Bug, Project
 from mysite.base.models import Timestamp
-from mysite.profile.models import Person, Tag, TagType
+from mysite.profile.models import Person, Tag, TagType, Link_Person_Tag
 import mysite.profile.views
 from mysite.profile.tests import MockFetchPersonDataFromOhloh
 from mysite.customs import ohloh
@@ -2709,6 +2709,7 @@ class DataExport(django.test.TestCase):
         #reincarnated_proj.icon_raw.path)
 
     def test_snapshot_person(self):
+
         fake_stdout=StringIO()
         # make fake Person who doesn't care if people know where he is
         zuckerberg = Person.create_dummy(first_name="mark",location_confirmed = True, location_display_name='Palo Alto')
@@ -2717,16 +2718,46 @@ class DataExport(django.test.TestCase):
         # ...and make a fake Person who REALLY cares about his location being private
         munroe = Person.create_dummy(first_name="randall",location_confirmed = False, location_display_name='Cambridge')
         self.assertEquals(munroe.get_public_location_or_default(), 'Inaccessible Island')
-        
+
+
+        # Creating dummy tags, tags_persons and tagtypes
+        # Dummy TagTypes
+        tagtype_understands = TagType(name="understands")
+        tagtype_understands.save()
+        tagtype_can_mentor = TagType(name="can_mentor")
+        tagtype_can_mentor.save()
+
+        # Dummy Tags
+        tag_facebook_development = Tag(text="Facebook development", tag_type=tagtype_understands)
+        tag_facebook_development.save()
+        tag_something_interesting = Tag(text="Something interesting", tag_type=tagtype_can_mentor)
+        tag_something_interesting.save()
+
+        # Dummy Links
+        link_zuckerberg = Link_Person_Tag(person=zuckerberg, tag=tag_facebook_development)
+        link_zuckerberg.save()
+        link_munroe = Link_Person_Tag(person=munroe, tag=tag_something_interesting)
+        link_munroe.save()
+
         command = mysite.customs.management.commands.snapshot_public_data.Command()
         command.handle(output=fake_stdout)
         
         # now, delete fake people
         zuckerberg.delete()
         munroe.delete()
+        # ...and tags, tagtypes, and links too
+        tag_facebook_development.delete()
+        tag_something_interesting.delete()
+        tagtype_understands.delete()
+        tagtype_can_mentor.delete()
+        link_zuckerberg.delete()
+        link_munroe.delete()
+
         # and delete any User objects too
         django.contrib.auth.models.User.objects.all().delete()
-        
+        mysite.profile.models.Tag.objects.all().delete()
+        mysite.profile.models.TagType.objects.all().delete()
+        mysite.profile.models.Link_Person_Tag.objects.all().delete()
         # go go reincarnation gadget
         for obj in django.core.serializers.deserialize('json', fake_stdout.getvalue()):
             obj.save()
@@ -2749,6 +2780,28 @@ class DataExport(django.test.TestCase):
         # check that we display both as appropriate
         self.assertEquals(new_zuckerberg.get_public_location_or_default(), 'Palo Alto')
         self.assertEquals(new_munroe.get_public_location_or_default(), 'Inaccessible Island')
+
+        # get tags linked to our two dummy users...
+        new_link_zuckerberg = mysite.profile.models.Link_Person_Tag.objects.get(id = new_zuckerberg.user_id)
+        new_link_munroe = mysite.profile.models.Link_Person_Tag.objects.get(id = new_munroe.user_id)
+
+        new_tag_facebook_development = mysite.profile.models.Tag.objects.get(link_person_tag__person = new_zuckerberg)
+        new_tag_something_interesting = mysite.profile.models.Tag.objects.get(link_person_tag__person = new_munroe)
+
+        # ...and tagtypes for the tags
+        new_tagtype_understands = mysite.profile.models.TagType.objects.get(tag__tag_type = new_tag_facebook_development.tag_type)
+        new_tagtype_can_mentor = mysite.profile.models.TagType.objects.get(tag__tag_type = new_tag_something_interesting.tag_type)
+
+        # finally, check values
+        self.assertEquals(new_link_zuckerberg.person, new_zuckerberg)
+        self.assertEquals(new_link_munroe.person, new_munroe)
+
+        self.assertEquals(new_tag_facebook_development.text, 'Facebook development')
+        self.assertEquals(new_tag_something_interesting.text, 'Something interesting')
+
+        self.assertEquals(new_tagtype_understands.name, 'understands')
+        self.assertEquals(new_tagtype_can_mentor.name, 'can_mentor')
+
 # vim: set nu:
 
 class TestOhlohAccountImportWithException(django.test.TestCase):
