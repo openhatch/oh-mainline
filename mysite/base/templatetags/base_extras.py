@@ -23,9 +23,7 @@ import calendar
 import datetime
 import re
 import os
-import urllib
 import urlparse
-import cgi
 import mysite.project.controllers
 
 from django.utils.html import * 
