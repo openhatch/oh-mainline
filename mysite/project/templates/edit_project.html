@@ -139,7 +139,7 @@ Editing project - {{ project.display_name }}
 		    stores bugs for your project:</p>
 		  <ul class="raquo_bullets">
 		    {% for tracker in trackers %}
-		    <li><a href="{% url mysite.customs.views.edit_tracker tracker.tracker_type tracker.tracker_name %}">
+		    <li><a href="{% url mysite.customs.views.edit_tracker tracker. tracker.tracker_name %}">
 			{{ tracker.tracker_name }}
 		    </a></li>
 		    {% endfor %}
@@ -147,8 +147,8 @@ Editing project - {{ project.display_name }}
 		    {% else %}
 		  <p>If you register bug trackers with OpenHatch, we will crawl them
 		    for bugs.
-		   We'll put those bugs on the <a href="{% url mysite.search.views.fetch_bugs %}">volunteer opportunity finder</a>, highlighting those that are <em>bitesize</em> (meaning, good for newcomers)
-		    and those related to non-code tasks like documentation.
+		   Those bugs will appear on the <a href="{% url mysite.search.views.fetch_bugs %}">volunteer opportunity finder</a>; we'll highlight the ones that are <em>bitesize</em> (meaning, good for newcomers)
+		    and those related to non-code tasks (e.g., documentation, graphic design, outreach).
 		  </p>
 		  <p>FIXME: Add bug tracker form</p>
 		  {% endif %}
