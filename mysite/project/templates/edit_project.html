@@ -150,7 +150,14 @@ Editing project - {{ project.display_name }}
 		   Those bugs will appear on the <a href="{% url mysite.search.views.fetch_bugs %}">volunteer opportunity finder</a>; we'll highlight the ones that are <em>bitesize</em> (meaning, good for newcomers)
 		    and those related to non-code tasks (e.g., documentation, graphic design, outreach).
 		  </p>
-		  <p>FIXME: Add bug tracker form</p>
+		  <p>What sort of bug tracker does your project use?</p>
+		  <p>(These will link to the "add bug tracker of type $TYPE" form.)
+		  <ul class="raquo_bullets">
+		    <li><a href="{% url mysite.customs.views.add_tracker bugzilla%}bugzilla">Bugzilla</a></li>
+		    <li><a href="{% url mysite.customs.views.add_tracker google %}google">Google Code</li>
+		    <li><a href="{% url mysite.customs.views.add_tracker google %}roundup">Roundup</li>
+		    <li><a href="{% url mysite.customs.views.add_tracker google %}trac">Trac</li>
+		    </ul>
 		  {% endif %}
 		</div>
             </div>
