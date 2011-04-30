@@ -73,10 +73,10 @@ Editing project - {{ project.display_name }}
                 </div>
 
                 <div id='control_descriptions' class='tab'>
-                    <form action='{% url mysite.profile.views.set_pfentries_dot_use_my_description_do %}' 
+                    <form action='{% url mysite.profile.views.set_pfentries_dot_use_my_description_do %}'
                             method='POST'>{% csrf_token %}
                         <input type='hidden' name='project_pk' value='{{ project.pk}}' />
-    
+
                         <p>
                             Project pages display a randomly chosen user-submitted description.
                             {% if i_am_a_contributor %}
@@ -93,13 +93,13 @@ Editing project - {{ project.display_name }}
                                     add it to your profile</a>.
                             {% endif %}
                         </p>
-                            
+
                         <p>
                             You can use this widget to control which descriptions can
                             appear on the project page. If you are thrilled by
                             the idea of an edit war, this can be your playground.
                         </p>
-    
+
                         <table>
                             <tr>
                                 <th>Use?</th>
