@@ -15,20 +15,12 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import csv
 import datetime
-from itertools import chain
-import lxml.html # scraper library
-import re
 import reversion
-import urllib2
-import urllib
 
 from django.db import models
 from django.utils.encoding import smart_str
 from model_utils.managers import InheritanceManager
-
-import mysite.search.models
 
 class RecentMessageFromCIA(models.Model):
     '''This model logs all messages from CIA.vc.
