@@ -308,7 +308,7 @@ def delete_tracker_url(request, tracker_type, tracker_name, url_id):
         data['tracker_name'] = tracker_name
         data['tracker_type'] = tracker_type
         data['url_id'] = url_id
-        url_obj = all_trackers_[tracker_type]['urlmodel'].objects.get(id=url_id)
+        url_obj = all_trackers[tracker_type]['urlmodel'].objects.get(id=url_id)
         data['url'] = url_obj.url
         return mysite.base.decorators.as_view(request, 'customs/delete_tracker_url.html', data, None)
     else:
