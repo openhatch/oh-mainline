@@ -82,6 +82,15 @@ class Project(OpenHatchModel):
             self.display_name = self.name
         super(Project, self).save(*args, **kwargs)
 
+    def get_corresponding_bug_trackers(self):
+        '''This method returns all the bug trackers that should appear in the
+        project's +projedit page.
+
+        This is probably pretty inefficient, but it's not called very often.'''
+        all_corresponding_bug_trackers = set([b.tracker for b in self.bug_set.all()
+                                          if b.tracker])
+        return all_corresponding_bug_trackers
+
     @staticmethod
     def generate_random_icon_path(instance, filename):
         # MEDIA_ROOT is prefixed automatically.

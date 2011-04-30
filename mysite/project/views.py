@@ -366,5 +366,11 @@ def edit_project(request, project__name):
     Form = mysite.profile.forms.UseDescriptionFromThisPortfolioEntryForm
     context['pfentry_forms'] = [Form(instance=pfe, prefix=str(pfe.pk)) for pfe in pfes]
 
+    context['trackers'] = project.get_corresponding_bug_trackers()
+    all_corresponding_bug_trackers = [b.tracker for b in project.bug_set.all()
+                                      if b.tracker]
+    # We use set() to eliminate duplicates.
+    trackers = set(all_corresponding_bug_trackers)
+
     return mysite.base.decorators.as_view(
             request, 'edit_project.html', context, slug=__name__)
