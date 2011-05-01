@@ -52,4 +52,4 @@ except ImportError:
     pass
 
 PATH_TO_MANAGEMENT_SCRIPT = '/home/deploy/milestone-a/bin/production'
-GIT_REPO_URL_PREFIX = 'http://openhatch.org/git-missions/'
+GIT_REPO_URL_PREFIX = 'git://openhatch.org/git/'
