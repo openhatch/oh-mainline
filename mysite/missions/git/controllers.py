@@ -36,7 +36,7 @@ class GitRepository(object):
         subprocess.Popen(['git', 'commit', '-m', '"Initial commit"'], cwd=self.repo_path)
 
         # Touch the git-daemon-export-ok file
-        file_obj = file(os.path.join(self.repo_path, 'git-daemon-export-ok'), 'w')
+        file_obj = file(os.path.join(self.repo_path, '.git', 'git-daemon-export-ok'), 'w')
         file_obj.close()
 
         person = Person.objects.get(user__username=self.username)
