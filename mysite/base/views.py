@@ -37,7 +37,8 @@ from mysite.base.decorators import view
 import mysite.customs.feed
 import mysite.search.controllers
 import mysite.search.models
-import mysite.missions.models
+import mysite.missions.models 
+from mysite.missions.models import Step, StepCompletion
 
 import feedparser
 import lxml.html
@@ -121,6 +122,12 @@ def home(request):
                 recommended_bug_string2Query_objects[string] = query
 
             data[u'recommended_bug_string2Query_objects'] = recommended_bug_string2Query_objects
+        
+        completed_missions = dict((c.step.name, True) for c in StepCompletion.objects.filter(person=request.user.get_profile()))
+        data[u'completed_missions'] = completed_missions
+        
+        data[u'projects_i_wanna_help'] = person.projects_i_wanna_help.all()
+        data[u'projects_i_helped'] = person.get_published_portfolio_entries()
         
     else: # no user logged in. Show front-page
         template_path = 'base/landing.html'
