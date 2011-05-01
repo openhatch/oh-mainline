@@ -258,4 +258,4 @@ CELERY_ALWAYS_EAGER = True
 SOUTH_TESTS_MIGRATE = False
 
 GIT_REPO_PATH = os.path.join(MEDIA_ROOT_BEFORE_STATIC, 'missions-userdata', 'git')
-GIT_REPO_URL_PREFIX = 'git://openhatch.org/'
+GIT_REPO_URL_PREFIX = GIT_REPO_PATH + '/' # For local sites, this is what you clone
