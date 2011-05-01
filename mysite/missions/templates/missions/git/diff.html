@@ -33,11 +33,11 @@
 <ul class="raquo_bullets">
   <li>You can use your working copy from the previous mission.</li>
   <li>The file <code>{{ file_for_git_diff }}</code> contains a terrible error.  Fix it in your working copy to print "Hello world", rather than "Goodbye world".</li>
-  <li>Check your changes into your local copy.</li>
+  <li>Check your changes into your local copy using git add then git commit -m (or by using git commit -am "Fixed hello world").</li>
   <li>Run <code>git format-patch origin/master</code> to create a file containing the patch.  
-  <li>Open the patch file and paste the results in the box below.</li>
+  <li>Open the patch file with a text editor and paste the results in the box below.</li>
 </ul>
-
+<br style="clear: left;" />
 {% if git_diff_done %}
 <div class="successmsg">
   <p><strong>You have successfully completed this part of the mission.</strong></p>
@@ -59,5 +59,6 @@
     <input type="submit" value="Submit" style="float: none;" />
   </div>
 </form>
+<p>Note: Files created by git format-patch are like normal <a href="{% url mysite.missions.diffpatch.views.about %}">patch files</a>, but they also carry information about the git commit that created the patch: the author, the date, and the commit log message are all there at the top of the patch.</p>
 {% endif %}
 {% endblock %}
