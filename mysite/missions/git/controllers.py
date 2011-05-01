@@ -34,6 +34,7 @@ class GitRepository(object):
         subprocess.Popen(['cp', '../../../missions/git/data/hello.py', '.'], cwd=self.repo_path)
         subprocess.Popen(['git', 'add', '.'], cwd=self.repo_path)
         subprocess.Popen(['git', 'commit', '-m', '"Initial commit"'], cwd=self.repo_path)
+        subprocess.Popen(['touch' 'git-daemon-export-ok'], cwd=self.repo_path)
         person = Person.objects.get(user__username=self.username)
         
     def exists(self):
