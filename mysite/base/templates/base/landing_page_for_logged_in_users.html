@@ -137,18 +137,36 @@ document.documentElement.className = 'javascript_is_enabled';
                                     <h5>Start learning:</h5>
                                     <p>Try our friendly, interactive training missions that teach you essential open source tools like diff and subversion.</p> 
                                 {% else %}
-                                    <h5>Completed missions:</h5>
                                     {% if completed_missions %}
                                         <ul class="missions">
-                                            {% if completed_missions.diffpatch_diffsingle and completed_missions.diffpatch_patchsingle and completed_missions.diffpatch_diffrecursive and completed_missions.diffpatch_patchrecursive %}
-                                                <li><a href="{% url mysite.missions.diffpatch.views.about %}">Diff and patch</a></li>
+                                            {% if completed_missions.tar or completed_missions.tar_extract %}
+                                                {% if completed_missions.tar and completed_missions.tar_extract %}
+                                                    <li>You have completed the <a href="{% url mysite.missions.tar.views.about %}">Tar mission.</a></li>
+                                                {% else %}
+                                                    <li style='list-style-image: url("http://openhatch.org/static/images/cross.gif");'>You have partially completed the <a href="{% url mysite.missions.tar.views.about %}">Tar mission.</a></li>
+                                                {% endif %}
                                             {% endif %}
-                                            {% if completed_missions.svn_checkout and completed_missions.svn_diff and completed_missions.svn_commit %}
-                                                <li><a href="{% url mysite.missions.svn.views.main_page %}">SVN</a></li>
+                                            {% if completed_missions.diffpatch_diffsingle or completed_missions.diffpatch_patchsingle or completed_missions.diffpatch_diffrecursive or completed_missions.diffpatch_patchrecursive %}
+                                                {% if completed_missions.diffpatch_diffsingle and completed_missions.diffpatch_patchsingle and completed_missions.diffpatch_diffrecursive and completed_missions.diffpatch_patchrecursive %}
+                                                    <li>You have completed the <a href="{% url mysite.missions.diffpatch.views.about %}">Diff and Patch mission.</a></li>
+                                                {% else %}
+                                                    <li style='list-style-image: url("http://openhatch.org/static/images/cross.gif");'>You have partially completed this <a href="{% url mysite.missions.diffpatch.views.about %}">Diff and Patch mission.</a></li>
+                                                {% endif %}
                                             {% endif %}
-                                            {% if completed_missions.tar and completed_missions.tar_extract %}
-                                                <li><a href="{% url mysite.missions.tar.views.about %}">Tar</a></li>
+                                            {% if completed_missions.svn_checkout or completed_missions.svn_diff or completed_missions.svn_commit %}
+                                                {% if completed_missions.svn_checkout and completed_missions.svn_diff and completed_missions.svn_commit %}
+                                                    <li>You have completed the <a href="{% url mysite.missions.svn.views.main_page %}">SVN mission.</a></li>
+                                                {% else %}
+                                                    <li style='list-style-image: url("http://openhatch.org/static/images/cross.gif");'>You have partially completed the <a href="{% url mysite.missions.svn.views.main_page %}">SVN mission.</a></li>
+                                                {% endif %}
                                             {% endif %}
+                                          {% if completed_missions.git_checkout or completed_missions.git_diff or completed_missions.git_rebase%}
+                                                {% if completed_missions.git_checkout and completed_missions.git_diff and completed_missions.git_rebase%}
+                                                    <li>You have completed the <a href="{% url mysite.missions.git.views.long_description %}">Git mission.</a></li>
+                                                {% else %}
+                                                    <li style='list-style-image: url("http://openhatch.org/static/images/cross.gif");'>You have partially completed the <a href="{% url mysite.missions.git.views.long_description %}">Git mission.</a></li>
+                                        {% endif %}
+                                    {% endif %}
                                         </ul>
                                     {% else %}
                                         <p>You haven't completed any missions yet.</p>
