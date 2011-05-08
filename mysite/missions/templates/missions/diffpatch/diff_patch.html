@@ -21,7 +21,7 @@
     <ul class="raquo_bullets">
       <li><a href="{% url mysite.missions.diffpatch.views.diffpatch_diffrecursive_get_original_tarball %}">Download this tarball</a> containing some recipes.</li>
       <li>Unpack the tarball.</li>
-      <li>Find all places in the files where "aubergine" is mentioned and replace them with the synonym, "eggplant". You do not have to change anything in the filenames.</li>
+      <li>Find all places in the files where "aubergine" is mentioned and replace them with the synonym, "eggplant". (Just change the contents of the files, not the filenames.)</li>
       <li>Make a unified diff of your changes.  It should be possible to apply it with "patch -p1" from the "recipes" directory.  (One way to do this is <code>diff -ur recipes-orig recipes</code>, where <code>recipes-orig</code> is an unmodified copy of the <code>recipes</code> directory.)</li>
     </ul>
 
