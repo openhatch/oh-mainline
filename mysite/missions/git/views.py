@@ -86,7 +86,7 @@ def rebase_submit(request):
             else:
                 data['git_rebase_error_message'] = "The author's name is incorrect."
         data['git_rebase_form'] = form
-    return checkout(request, data)
+    return rebase(request, data)
 
 ### State manager
 class GitMissionPageState(MissionPageState):
