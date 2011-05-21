@@ -275,6 +275,9 @@ def edit_person_info_do(request):
 
     #grab their submitted bio
     person.bio = edit_info_form['bio'].data
+    
+    #grab the irc nick
+    person.irc_nick = edit_info_form['irc_nick'].data
 
     # We can map from some strings to some TagTypes
     for known_tag_type_name in ('understands', 'understands_not',
@@ -1125,6 +1128,7 @@ def edit_info(request, contact_blurb_error=False, edit_info_form=None, contact_b
         edit_info_form = mysite.profile.forms.EditInfoForm(initial={
           'bio': person.bio,
           'homepage_url': person.homepage_url,
+          'irc_nick': person.irc_nick,
           'understands': data['tags_flat'].get('understands', ''),
           'understands_not': data['tags_flat'].get('understands_not', ''),
           'studying': data['tags_flat'].get('studying', ''),

@@ -1408,6 +1408,32 @@ class EditHomepage(TwillTests):
         tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
         tc.notfind('htttp')
 
+class EditIrcNick(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def test(self):
+        '''
+        * Goes to paulproteus's profile
+        * checks that they don't already have a ircnick that says "paulproteusnick"
+        * clicks edit on the Info area
+        * enters a string as irc nick
+        * checks that his irc nick now contains string
+        '''
+        self.login_with_twill()
+        tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
+        tc.notfind('paulproteusnick')
+        tc.go(make_twill_url('http://openhatch.org/profile/views/edit_info'))
+        #make sure our irc nick is not already on the form
+        tc.notfind('paulproteusnick')
+        # set the irc nick in the form
+        tc.fv("edit-tags", 'edit-tags-irc_nick', 'paulproteusnick')
+        tc.submit()
+        #find the string we just submitted as our irc nick
+        tc.find('paulproteusnick')
+        self.assertEqual(Person.get_by_username('paulproteus').irc_nick, "paulproteusnick")
+        #now we should see our irc nick in the edit form
+        tc.go(make_twill_url('http://openhatch.org/profile/views/edit_info'))
+        tc.find('paulproteusnick')
 
 class EditContactBlurbForwarderification(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']

@@ -70,6 +70,13 @@
                         </div>
 
                         <div class='form-row'>
+                            <label>IRC nick:</label>
+                            {{ form.irc_nick.errors }}
+                            {{ form.irc_nick }}
+                            <p class='example'>Example: sufjan</p>
+                        </div>
+
+                        <div class='form-row'>
                             <h3 style='float: left; width: 95%; margin-bottom: 3px;'>Tag yourself</h3>
                             <p class='why'>After you save, these tags will appear on your profile. Click them to find similar people. {# In the near future, this information will help people find you in the <a href='/people/'>People Search</a>.#} </p>
                         </div>
