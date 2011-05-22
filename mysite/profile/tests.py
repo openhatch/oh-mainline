@@ -1384,22 +1384,22 @@ class EditHomepage(TwillTests):
         '''
         self.login_with_twill()
         tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
-        #not so vain.. yet
+        # not so vain.. yet
         tc.notfind('asheesh.org')
         tc.go(make_twill_url('http://openhatch.org/profile/views/edit_info'))
-        #make sure our bio is not already on the form
+        # make sure our bio is not already on the form
         tc.notfind('asheesh.org')
         # set the bio in ze form
         tc.fv("edit-tags", 'edit-tags-homepage_url', 'http://www.asheesh.org/')
         tc.submit()
-        #find the string we just submitted as our bio
+        # find the string we just submitted as our bio
         tc.find('asheesh.org')
         self.assertEqual(Person.get_by_username('paulproteus').homepage_url,
         "http://www.asheesh.org/")
-        #now we should see our bio in the edit form
+        # now we should see our bio in the edit form
         tc.go(make_twill_url('http://openhatch.org/profile/views/edit_info'))
         tc.find('asheesh.org')
-        #try an invalid url
+        # try an invalid url
         tc.fv('edit-tags', 'edit-tags-homepage_url', 'htttp://www.asheesh.org/')
         tc.submit()
         # check that the form came back with an error
@@ -1423,15 +1423,15 @@ class EditIrcNick(TwillTests):
         tc.go(make_twill_url('http://openhatch.org/people/paulproteus/'))
         tc.notfind('paulproteusnick')
         tc.go(make_twill_url('http://openhatch.org/profile/views/edit_info'))
-        #make sure our irc nick is not already on the form
+        # make sure our irc nick is not already on the form
         tc.notfind('paulproteusnick')
         # set the irc nick in the form
         tc.fv("edit-tags", 'edit-tags-irc_nick', 'paulproteusnick')
         tc.submit()
-        #find the string we just submitted as our irc nick
+        # find the string we just submitted as our irc nick
         tc.find('paulproteusnick')
         self.assertEqual(Person.get_by_username('paulproteus').irc_nick, "paulproteusnick")
-        #now we should see our irc nick in the edit form
+        # now we should see our irc nick in the edit form
         tc.go(make_twill_url('http://openhatch.org/profile/views/edit_info'))
         tc.find('paulproteusnick')
 

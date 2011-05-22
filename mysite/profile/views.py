@@ -273,10 +273,10 @@ def edit_person_info_do(request):
     else:
         errors_occurred = True
 
-    #grab their submitted bio
+    # grab their submitted bio
     person.bio = edit_info_form['bio'].data
     
-    #grab the irc nick
+    # grab the irc nick
     person.irc_nick = edit_info_form['irc_nick'].data
 
     # We can map from some strings to some TagTypes
