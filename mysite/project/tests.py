@@ -353,3 +353,13 @@ class DecideWhichProjectDescriptionsAppearOnProjectPage(TwillTests):
         # Observe that the list contains only the checked PortfolioEntry.
         self.assert_(pfes['uncheck_me'] not in good_pfentries)
         self.assert_(pfes['keep_me_checked'] in good_pfentries)
+
+class BugTrackersOnProjectEditPage(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus', 'user-barry', 'person-barry']
+
+    def setUp(self):
+        super(BugTrackersOnProjectEditPage, self).setUp()
+        self.twisted = mysite.search.models.Project.create_dummy(name='Twisted System')
+
+    def test_empty_at_start(self):
+        self.assertFalse(self.twisted.get_corresponding_bug_trackers())
