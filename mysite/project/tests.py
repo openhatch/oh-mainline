@@ -363,3 +363,16 @@ class BugTrackersOnProjectEditPage(TwillTests):
 
     def test_empty_at_start(self):
         self.assertFalse(self.twisted.get_corresponding_bug_trackers())
+
+    def test_trackers_created_for_project_show_up(self):
+        # Create a Roundup model
+        bug_tracker = mysite.customs.models.RoundupTrackerModel(
+            tracker_name='dummy',
+            base_url='http://example.com/',
+            closed_status='resolved')
+        bug_tracker.created_for_project = self.twisted
+        bug_tracker.save()
+
+        # Now, the Twisted project should have one corresponding bug tracker
+        trackers_from_project = list(self.twisted.get_corresponding_bug_trackers())
+        self.assertEqual([bug_tracker], trackers_from_project)
