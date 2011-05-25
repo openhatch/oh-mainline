@@ -152,10 +152,10 @@ Editing project - {{ project.display_name }}
 		  </p>
 		  <p>What sort of bug tracker does your project use?</p>
 		  <ul class="raquo_bullets">
-		    <li><a href="{% url mysite.customs.views.add_tracker bugzilla %}bugzilla">Bugzilla</a></li>
-		    <li><a href="{% url mysite.customs.views.add_tracker google %}google">Google Code</li>
-		    <li><a href="{% url mysite.customs.views.add_tracker roundup %}roundup">Roundup</li>
-		    <li><a href="{% url mysite.customs.views.add_tracker google %}trac">Trac</li>
+		    <li><a href="{% url mysite.customs.views.add_tracker bugzilla %}bugzilla?project_id={{ project.id }}">Bugzilla</a></li>
+		    <li><a href="{% url mysite.customs.views.add_tracker google %}google?project_id={{ project.id }}">Google Code</li>
+		    <li><a href="{% url mysite.customs.views.add_tracker roundup %}roundup?project_id={{ project.id }}">Roundup</li>
+		    <li><a href="{% url mysite.customs.views.add_tracker google %}trac?project_id={{ project.id }}">Trac</li>
 		    </ul>
 		  {% endif %}
 		</div>
