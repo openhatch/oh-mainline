@@ -15,49 +15,26 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from mysite.base.tests import make_twill_url, TwillTests
+from mysite.base.tests import TwillTests
 import mysite.project.controllers
-from mysite.base.helpers import ObjectFromDict
 import mysite.account.tests
 
 from mysite.search.models import Project
-from mysite.profile.models import Person, Tag, TagType, Link_Person_Tag, DataImportAttempt, PortfolioEntry, Citation, Forwarder
+from mysite.profile.models import Person, PortfolioEntry
 import mysite.project.views
 
 import mysite.profile.views
 import mysite.profile.models
 import mysite.profile.controllers
 
-from mysite.profile import views
-
-from django.conf import settings
-
 from mysite.base.tests import better_make_twill_url
 
-import re
-from StringIO import StringIO
-import urllib
-import simplejson
-import BeautifulSoup
-import time
-import datetime
-import tasks 
 import mock
-import UserList
 import urlparse
 
-import django.test
-from django.test.client import Client
-from django.core import management, serializers
-from django.core.files.base import ContentFile
 from django.core.urlresolvers import reverse
-from django.contrib.auth import authenticate
-from django.contrib.auth.models import User
 
-import twill
 from twill import commands as tc
-from twill.shell import TwillCommandLoop
-
 
 class ProjectNameSearch(TwillTests):
     def test_search_for_similar_project_names_backend(self):
