@@ -38,14 +38,7 @@
 
 {% block form_body %}
 {% for field in tracker_form %}
-<div class='form-row' {% if field.is_hidden %}style="display: none;"{% endif %}>
-    {{ field.errors }}
-    {{ field.label_tag }}
-    {{ field }}
-    {% if field.help_text %}
-    <p class="example">{{ field.help_text }}</p>
-    {% endif %}
-</div>
+{% include 'customs/form-row.html' %}
 {% endfor %}
 {% endblock form_body %}
 
