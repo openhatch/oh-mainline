@@ -95,9 +95,27 @@ def add_tracker(request, tracker_type, tracker_form=None):
     if tracker_type in all_trackers:
         data['tracker_type_pretty'] = all_trackers[tracker_type]['namestr']
         data['action_url'] = reverse(add_tracker_do, args=[tracker_type])
+
         if tracker_form is None:
-            tracker_form = all_trackers[tracker_type]['form'](prefix='add_tracker')
+            # This is what we'll pass in to the form. By default: blank.
+            initial_data = {}
+
+            # If the user passed in a ?project_id= value, then store that in
+            # the form's created_for_project values.
+            project_id = request.GET.get('project_id', None)
+            if project_id is not None:
+                try:
+                    project = mysite.search.models.Project.objects.get(id=project_id)
+                    initial_data['created_for_project'] = project
+                except mysite.search.models.Project.DoesNotExist:
+                    pass # no biggie
+
+            tracker_form = all_trackers[tracker_type]['form'](
+                prefix='add_tracker',
+                initial=initial_data)
+
         data['tracker_form'] = tracker_form
+
         return mysite.base.decorators.as_view(request, 'customs/add_tracker.html', data, None)
     else:
         # Wrong or no tracker type. Send back to list.

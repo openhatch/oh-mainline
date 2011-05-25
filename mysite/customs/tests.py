@@ -22,11 +22,15 @@
 
 
 # Imports {{{
+from mysite.base.tests import TwillTests
 from mysite.search.models import Bug, Project
 from mysite.base.models import Timestamp
 from mysite.profile.models import Person, Tag, TagType, Link_Person_Tag
 import mysite.profile.views
 from mysite.customs import ohloh
+import mysite.customs.views
+
+from django.core.urlresolvers import reverse
 
 import mock
 import os
@@ -2637,3 +2641,18 @@ class BugsCreatedByBugzillaTrackerModelsCanRefreshThemselves(django.test.TestCas
 
         self.assertEqual(2, mock_xml_opener.call_count)
 
+class BugTrackerEditingViews(TwillTests):
+    fixtures = ['user-paulproteus', 'person-paulproteus']
+
+    def setUp(self):
+        super(BugTrackerEditingViews, self).setUp()
+        self.twisted = mysite.search.models.Project.create_dummy(name='Twisted System')
+
+    def test_bug_tracker_edit_form_fills_in_hidden_field(self):
+        client = self.login_with_client()
+        url = reverse(mysite.customs.views.add_tracker,
+                      kwargs={'tracker_type': 'trac'}
+                      ) + '?project_id=%d' % (self.twisted.id, )
+        response = client.get(url)
+        self.assertEqual(self.twisted,
+                         response.context['tracker_form'].initial['created_for_project'])
