@@ -31,12 +31,17 @@ class BugzillaTrackerForm(django.forms.ModelForm):
     class Meta:
         model = mysite.customs.models.BugzillaTrackerModel
 
+class TrackerFormThatHidesCreatedForProject(django.forms.ModelForm):
+    created_for_project = django.forms.ModelChoiceField(
+            queryset=mysite.search.models.Project.objects.all(),
+            widget=django.forms.HiddenInput())
+
 class BugzillaQueryForm(django.forms.ModelForm):
     class Meta:
         model = mysite.customs.models.BugzillaQueryModel
         exclude = ('tracker', 'last_polled',)
 
-class GoogleTrackerForm(django.forms.ModelForm):
+class GoogleTrackerForm(TrackerFormThatHidesCreatedForProject):
     class Meta:
         model = mysite.customs.models.GoogleTrackerModel
 
@@ -45,7 +50,7 @@ class GoogleQueryForm(django.forms.ModelForm):
         model = mysite.customs.models.GoogleQueryModel
         exclude = ('tracker', 'last_polled',)
 
-class TracTrackerForm(django.forms.ModelForm):
+class TracTrackerForm(TrackerFormThatHidesCreatedForProject):
     class Meta:
         model = mysite.customs.models.TracTrackerModel
 
@@ -54,7 +59,7 @@ class TracQueryForm(django.forms.ModelForm):
         model = mysite.customs.models.TracQueryModel
         exclude = ('tracker', 'last_polled',)
 
-class RoundupTrackerForm(django.forms.ModelForm):
+class RoundupTrackerForm(TrackerFormThatHidesCreatedForProject):
     class Meta:
         model = mysite.customs.models.RoundupTrackerModel
 
