@@ -26,40 +26,28 @@ from mysite.search.models import Bug, Project
 from mysite.base.models import Timestamp
 from mysite.profile.models import Person, Tag, TagType, Link_Person_Tag
 import mysite.profile.views
-from mysite.profile.tests import MockFetchPersonDataFromOhloh
 from mysite.customs import ohloh
 
 import mock
 import os
-import re
 import time
 import twill
 import lxml
-import sys
 import urlparse
-from twill import commands as tc
-from twill.shell import TwillCommandLoop
 
 import django.test
 import django.contrib.auth.models
 import django.core.serializers
-from django.test import TestCase
-from django.test.client import Client
 from django.conf import settings
 from django.core.servers.basehttp import AdminMediaHandler
 from django.core.handlers.wsgi import WSGIHandler
 
 from StringIO import StringIO
-import urllib
 from urllib2 import HTTPError
-import simplejson
 import datetime
-from dateutil.tz import tzutc
-import gdata.client
 
 import twisted.internet.defer
 
-from mysite.profile.tasks import FetchPersonDataFromOhloh
 import mysite.customs.profile_importers
 import mysite.customs.cia
 import mysite.customs.feed
@@ -109,7 +97,7 @@ class FakeGetPage(object):
         self.url2data['https://www.ohloh.net/p/4265/contributors/18318035536880.xml?api_key=JeXHeaQhjXewhdktn4nUw'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', '18318035536880.xml')).read()
         self.url2data['http://www.ohloh.net/projects/4265.xml?api_key=JeXHeaQhjXewhdktn4nUw'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', '4265.xml')).read()
         self.url2data['https://www.ohloh.net/p/debian/contributors/18318035536880'] = open(os.path.join(settings.MEDIA_ROOT, 'sample-data', 'ohloh', '18318035536880')).read()
-        
+
     """This is a fake version of Twisted.web's getPage() function.
     It returns a Deferred that is already 'fired', and has the page content
     passed into it already.
@@ -268,7 +256,7 @@ class ImportFromGithub(django.test.TestCase):
             {'url': URL,
              'errback': self.gi.squashIrrelevantErrors,
              'callback': DATA_CALLBACK} in urls_and_callbacks)
-        
+
         # Simulate the GET, and pass the data to the callback
         page_contents = fakeGetPage.url2data[URL]
         DATA_CALLBACK(page_contents)
@@ -297,7 +285,7 @@ class ImportFromGithub(django.test.TestCase):
 
 class ImportFromDebianQA(django.test.TestCase):
     fixtures = ['user-paulproteus', 'person-paulproteus']
-    
+
     @mock.patch('mysite.search.tasks.PopulateProjectLanguageFromOhloh')
     @mock.patch('mysite.search.tasks.PopulateProjectIconFromOhloh')
     def test_asheesh_unit(self, do_nothing, do_nothing_also):
@@ -487,7 +475,7 @@ class TestAbstractOhlohAccountImporter(django.test.TestCase):
         expected_query_items = sorted(
             {u'api_key': u'key',
              u'query': unicode(self.dia.query)}.items())
-            
+
         url = self.aoai.url_for_ohloh_query(
             url=u'http://example.com/',
             params=params,
@@ -520,11 +508,6 @@ class TestAbstractOhlohAccountImporter(django.test.TestCase):
         # returns some True value if there is a document
         parsed = self.aoai.parse_ohloh_xml('''<something></something>''')
         self.assertTrue(parsed)
-
-    def test_parse_ohloh_error_xml(self):
-        # returns None if the XML is an Ohloh error
-        parsed = self.aoai.parse_ohloh_xml('''<response><error /></response>''')
-        self.assert_(parsed is None)
 
     def test_xml_tag_to_dict(self):
         parsed = self.aoai.parse_ohloh_xml('''<response>
@@ -562,7 +545,7 @@ class TestAbstractOhlohAccountImporter(django.test.TestCase):
                 }
             ]
 
-        
+
         output = self.aoai.filter_out_irrelevant_ohloh_dicts(c_fs)
         self.assertEqual(1, len(output))
         self.assertEqual(17, output[0]['analysis_id'])
@@ -601,7 +584,7 @@ class TestOhlohRepositorySearch(django.test.TestCase):
         projects = set([c.portfolio_entry.project.name for c in mysite.profile.models.Citation.objects.all()])
         self.assertEqual(projects,
                          set([u'Creative Commons search engine', u'ccHost']))
-        
+
 class TestOhlohAccountImport(django.test.TestCase):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -633,7 +616,7 @@ class TestOhlohAccountImport(django.test.TestCase):
         projects = set([c.portfolio_entry.project.name for c in mysite.profile.models.Citation.objects.all()])
         self.assertEqual(set(['Debian GNU/Linux', 'ccHost']),
                          projects)
-        
+
 class TestOhlohAccountImportWithEmailAddress(TestOhlohAccountImport):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
@@ -650,7 +633,7 @@ class BugzillaTests(django.test.TestCase):
     fixtures = ['miro-project']
     @mock.patch("mysite.customs.bugtrackers.bugzilla.url2bug_data")
     def test_kde(self, mock_xml_opener):
-        p = Project.create_dummy(name='kmail')
+        Project.create_dummy(name='kmail')
         mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
             settings.MEDIA_ROOT, 'sample-data', 'kde-117760-2010-04-09.xml')).read())
         kde = mysite.customs.bugtrackers.bugzilla.KDEBugzilla()
@@ -663,7 +646,7 @@ class BugzillaTests(django.test.TestCase):
 
     @mock.patch("mysite.customs.bugtrackers.bugzilla.url2bug_data")
     def test_kde_harder_bug(self, mock_xml_opener):
-        p = Project.create_dummy(name='kphotoalbum')
+        Project.create_dummy(name='kphotoalbum')
         mock_xml_opener.return_value = lxml.etree.XML(open(os.path.join(
             settings.MEDIA_ROOT, 'sample-data', 'kde-182054-2010-04-09.xml')).read())
         kde = mysite.customs.bugtrackers.bugzilla.KDEBugzilla()
@@ -1155,7 +1138,7 @@ class LaunchpadImporterTests(django.test.TestCase):
         # Create the bug...
         mysite.customs.bugtrackers.launchpad.handle_launchpad_bug_update(
                 project_name=query_data['project'],
-                canonical_bug_link=query_data['canonical_bug_link'], 
+                canonical_bug_link=query_data['canonical_bug_link'],
                 new_data=new_data)
         # Verify that the bug was stored.
         bug = Bug.all_bugs.get(canonical_bug_link=
@@ -1168,7 +1151,7 @@ class LaunchpadImporterTests(django.test.TestCase):
         # pass the data in...
         mysite.customs.bugtrackers.launchpad.handle_launchpad_bug_update(
                 project_name=query_data['project'],
-                canonical_bug_link=query_data['canonical_bug_link'], 
+                canonical_bug_link=query_data['canonical_bug_link'],
                 new_data=new_data)
         # Do a get; this will explode if there's more than one with the
         # canonical_bug_link, so it tests duplicate finding.
@@ -1325,13 +1308,6 @@ class OnlineGithubFailures(django.test.TestCase):
     def test_username_404(self):
         '''This test gives our github info_by_username a user to 404 on .'''
         repos = list(mysite.customs.github.repos_by_username('will_never_be_found_PDo7jHoi'))
-        self.assertEqual(repos, [])
-
-    @mock.patch('mysite.customs.github._github_repos_list')
-    def test_username_with_at_sign(self, mock_repo_list):
-        '''This test gives our github info_by_username a user to 404 on .'''
-        repos = list(mysite.customs.github.repos_by_username('something@example.com'))
-        self.assertFalse(mock_repo_list.called)
         self.assertEqual(repos, [])
 
     @mock.patch('mysite.customs.github._github_repos_list')
@@ -1988,7 +1964,7 @@ class LineAcceptorTest(django.test.TestCase):
         got_response = []
         def callback(obj, got_response=got_response):
             got_response.append(obj)
-            
+
         lines = [
             '\x02FreeBSD:\x0f \x0303trasz\x0f * r\x02201794\x0f \x0310\x0f/head/sys/ (4 files in 4 dirs)\x02:\x0f ',
             "\x02FreeBSD:\x0f Replace several instances of 'if (!a & b)' with 'if (!(a &b))' in order",
@@ -2001,7 +1977,7 @@ class LineAcceptorTest(django.test.TestCase):
         # expecting no full message for the first THREE lines
         agent.handle_message(lines[0])
         self.assertFalse(got_response)
-        
+
         agent.handle_message(lines[1])
         self.assertFalse(got_response)
 
@@ -2021,12 +1997,12 @@ class LineAcceptorTest(django.test.TestCase):
         agent.handle_message(lines[4])
         wanted = {'project_name': 'KDE', 'path': '/branches/work/doc/kget/', 'message': "kget doc was moved back to trunk", 'committer_identifier': 'lueck', 'version': 'r1071711'}
         self.assertEqual(got_response[0], wanted)
-        got_response[:] = []        
+        got_response[:] = []
 
 class BugzillaImporterOnlyPerformsAQueryOncePerDay(django.test.TestCase):
     def test_url_is_more_fresh_than_one_day(self):
         # What the heck, let's demo this function out with the Songbird documentation query.
-        URL = 'http://bugzilla.songbirdnest.com/buglist.cgi?query_format=advanced&component=Documentation&resolution=---' 
+        URL = 'http://bugzilla.songbirdnest.com/buglist.cgi?query_format=advanced&component=Documentation&resolution=---'
         originally_not_fresh = mysite.customs.bugtrackers.bugzilla.url_is_more_fresh_than_one_day(URL)
         self.assertFalse(originally_not_fresh)
         # But now it should be fresh!
@@ -2034,7 +2010,7 @@ class BugzillaImporterOnlyPerformsAQueryOncePerDay(django.test.TestCase):
 
     def test_url_is_more_fresh_than_one_day_with_really_long_url(self):
         # What the heck, let's demo this function out with the Songbird documentation query.
-        URL = 'http://bugzilla.songbirdnest.com/buglist.cgi?query_format=advanced&component=Documentation&resolution=---&look=at_me_I_am_really_long_oh_no_what_will_we_do&really=long_very_long_yes_long_so_long_you_will_fall_asleep_of_boredom_reading_this&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong' 
+        URL = 'http://bugzilla.songbirdnest.com/buglist.cgi?query_format=advanced&component=Documentation&resolution=---&look=at_me_I_am_really_long_oh_no_what_will_we_do&really=long_very_long_yes_long_so_long_you_will_fall_asleep_of_boredom_reading_this&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong&really=veryverylong'
         originally_not_fresh = mysite.customs.bugtrackers.bugzilla.url_is_more_fresh_than_one_day(URL)
         self.assertFalse(originally_not_fresh)
         # But now it should be fresh!
@@ -2320,10 +2296,10 @@ class DataExport(django.test.TestCase):
         # Now, set up the test:
         # Create two Person objects, with corresponding email addresses
         u1 = django.contrib.auth.models.User.objects.create(username='privateguy', email='hidden@example.com')
-        p1 = Person.create_dummy(user=u1)
+        Person.create_dummy(user=u1)
 
         u2 = django.contrib.auth.models.User.objects.create(username='publicguy', email='public@example.com')
-        p2 = Person.create_dummy(user=u2, show_email=True)
+        Person.create_dummy(user=u2, show_email=True)
 
         # snapshot the public version of the data into fake stdout
         command = mysite.customs.management.commands.snapshot_public_data.Command()
@@ -2355,23 +2331,23 @@ class DataExport(django.test.TestCase):
 		b = Bug.create_dummy_with_project()
 		b.title = 'fire-ant'
 		b.save()
-		
+
 		# snapshot fake bug into fake stdout
 		command = mysite.customs.management.commands.snapshot_public_data.Command()
 		command.handle(output=fake_stdout)
-		
+
 		#now, delete bug...
 		b.delete()
-		
+
 		# let's see if we can re-import fire-ant!
 		for obj in django.core.serializers.deserialize('json', fake_stdout.getvalue()):
 			obj.save()
-		
+
 		# testing to see if there are ANY bugs
 		self.assertTrue(Bug.all_bugs.all())
 		# testing to see if fire-ant is there
-		reincarnated_b = mysite.search.models.Bug.all_bugs.get(title='fire-ant')
-		
+		mysite.search.models.Bug.all_bugs.get(title='fire-ant')
+
     def test_snapshot_timestamp(self):
         # data capture, woo
         fake_stdout = StringIO()
@@ -2385,18 +2361,18 @@ class DataExport(django.test.TestCase):
         t.key = TIMESTAMP_KEY_TO_USE
         t.timestamp = TIMESTAMP_DATE_TO_USE
         t.save()
-        
+
         # snapshot fake timestamp into fake stdout
         command = mysite.customs.management.commands.snapshot_public_data.Command()
         command.handle(output=fake_stdout)
-        
+
         #now, delete the timestamp...
         t.delete()
-        
+
         # let's see if we can re-import the timestamp
         for obj in django.core.serializers.deserialize('json', fake_stdout.getvalue()):
             obj.save()
-        
+
         # testing to see if there are ANY
         self.assertTrue(Timestamp.objects.all())
         # testing to see if ours is there
@@ -2408,21 +2384,21 @@ class DataExport(django.test.TestCase):
         fake_stdout = StringIO()
         # make fake Project
         proj = Project.create_dummy_no_icon(name="karens-awesome-project",language="Python")
-        
+
         command = mysite.customs.management.commands.snapshot_public_data.Command()
         command.handle(output=fake_stdout)
-        
+
         # now delete fake Project...
         proj.delete()
-        
+
         # let's see if we can reincarnate it!
         for obj in django.core.serializers.deserialize('json', fake_stdout.getvalue()):
             obj.save()
-        
+
         # test: are there ANY projects?
         self.assertTrue(Project.objects.all())
         # test: is our lovely fake project there?
-        reincarnated_proj = mysite.search.models.Project.objects.get(name="karens-awesome-project")
+        mysite.search.models.Project.objects.get(name="karens-awesome-project")
 
     def test_not_explode_when_user_has_no_person(self):
         fake_stdout = StringIO()
@@ -2442,7 +2418,7 @@ class DataExport(django.test.TestCase):
         for obj in django.core.serializers.deserialize('json', fake_stdout.getvalue()):
             obj.save()
 
-        u = django.contrib.auth.models.User.objects.get(
+        django.contrib.auth.models.User.objects.get(
             username='x')
 
     @mock.patch('mysite.customs.ohloh.Ohloh.get_icon_for_project')
@@ -2458,21 +2434,21 @@ class DataExport(django.test.TestCase):
         proj.save()
 
         icon_raw_path = proj.icon_raw.path
-        
+
         command = mysite.customs.management.commands.snapshot_public_data.Command()
         command.handle(output=fake_stdout)
-        
+
         # now delete fake Project...
         proj.delete()
-        
+
         # let's see if we can reincarnate it!
         for obj in django.core.serializers.deserialize('json', fake_stdout.getvalue()):
             obj.save()
-        
+
         # test: are there ANY projects?
         self.assertTrue(Project.objects.all())
         # test: is our lovely fake project there?
-        reincarnated_proj = mysite.search.models.Project.objects.get(name="karens-awesome-project")
+        mysite.search.models.Project.objects.get(name="karens-awesome-project")
         #self.assertEquals(icon_raw_path,
         #reincarnated_proj.icon_raw.path)
 
@@ -2509,7 +2485,7 @@ class DataExport(django.test.TestCase):
 
         command = mysite.customs.management.commands.snapshot_public_data.Command()
         command.handle(output=fake_stdout)
-        
+
         # now, delete fake people
         zuckerberg.delete()
         munroe.delete()
@@ -2529,18 +2505,18 @@ class DataExport(django.test.TestCase):
         # go go reincarnation gadget
         for obj in django.core.serializers.deserialize('json', fake_stdout.getvalue()):
             obj.save()
-        
+
         # did we snapshot/save ANY Persons?
         self.assertTrue(Person.objects.all())
-        
+
         # did our fake Persons get saved?
         new_zuckerberg = mysite.profile.models.Person.objects.get(user__first_name="mark")
         new_munroe = mysite.profile.models.Person.objects.get(user__first_name="randall")
-        
+
         # check that location_confirmed was saved accurately
         self.assertEquals(new_zuckerberg.location_confirmed, True)
         self.assertEquals(new_munroe.location_confirmed, False)
-        
+
         # check that location_display_name is appropriate
         self.assertEquals(new_zuckerberg.location_display_name, 'Palo Alto')
         self.assertEquals(new_munroe.location_display_name, 'Inaccessible Island')
