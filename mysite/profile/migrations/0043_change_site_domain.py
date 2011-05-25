@@ -26,7 +26,11 @@ class Migration:
     
     def forwards(self, orm):
         "Write your forwards migration here"
-        my_site = django.contrib.sites.models.Site.objects.get_current()
+        try:
+            my_site = django.contrib.sites.models.Site.objects.get_current()
+        except django.contrib.sites.models.Site.DoesNotExist:
+            from django.conf import settings
+            my_site = django.contrib.sites.models.Site.objects.create(id=getattr(settings, 'SITE_ID', 1))
         my_site.domain = 'openhatch.org'
         my_site.save()
     
