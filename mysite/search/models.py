@@ -87,8 +87,13 @@ class Project(OpenHatchModel):
         project's +projedit page.
 
         This is probably pretty inefficient, but it's not called very often.'''
+        # Grab all the bug trackers that bugs refer to
         all_corresponding_bug_trackers = set([b.tracker for b in self.bug_set.all()
                                           if b.tracker])
+        # Grab all the bug trackers that refer to the project
+        for tracker in mysite.customs.models.TrackerModel.objects.filter(created_for_project=self).select_subclasses():
+            all_corresponding_bug_trackers.add(tracker)
+
         return all_corresponding_bug_trackers
 
     @staticmethod
