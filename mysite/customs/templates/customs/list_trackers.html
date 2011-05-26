@@ -28,12 +28,7 @@
 
 {% block form_body %}
 {% for field in tracker_types_form %}
-<div class='form-row'>
-    {{ field.errors }}
-    {{ field.label_tag }}
-    {{ field }}
-    <p class="example">{{ field.help_text }}</p>
-</div>
+{% include 'customs/form-row.html' %}
 {% endfor %}
 {% endblock form_body %}
 
