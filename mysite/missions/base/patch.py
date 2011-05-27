@@ -321,6 +321,11 @@ class Patch(object):
 
     if not hunkskip:
       warning("patch file incomplete")
+      if not hunkinfo.invalid:
+        self.hunks[nextfileno-1].append(hunkinfo.copy())
+        # switch to hunkskip state
+        hunkbody = False
+        hunkskip = True
       # sys.exit(?)
     else:
       # duplicated message when an eof is reached

@@ -121,6 +121,35 @@ class SvnViewTests(TwillTests):
         finally:
             shutil.rmtree(checkoutdir)
 
+    def test_do_diff_mission_correctly_except_omit_the_final_whitespace(self):
+        self.client.post(reverse(views.resetrepo))
+        response = self.client.get(reverse(views.checkout))
+        checkoutdir = tempfile.mkdtemp()
+        try:
+            # Check the repository out and make the required change.
+            subprocess.check_call(['svn', 'checkout', response.context['checkout_url'], checkoutdir])
+            new_contents = open(os.path.join(controllers.get_mission_data_path('svn'), controllers.SvnDiffMission.NEW_CONTENT)).read()
+            open(os.path.join(checkoutdir, controllers.SvnDiffMission.FILE_TO_BE_PATCHED), 'w').write(new_contents)
+
+            # Make the diff.
+            diff = subproc_check_output(['svn', 'diff'], cwd=checkoutdir)
+
+            # Many users fail to copy-paste the diff properly. In particular,
+            # they omit trailing whitespace characters. Let's remove the last line.
+            self.assertEqual(' \n', diff[-2:])
+            diff = diff[:-2]
+
+            # Submit the diff.
+            response = self.client.post(reverse(views.diff_submit), {'diff': diff})
+            paulproteus = Person.objects.get(user__username='paulproteus')
+            self.assert_(controllers.mission_completed(paulproteus, 'svn_diff'))
+
+            # Check that there is a new commit that applies to the working copy cleanly.
+            update_output = subproc_check_output(['svn', 'update'], cwd=checkoutdir)
+            self.assert_('Updated to revision ' in update_output)
+        finally:
+            shutil.rmtree(checkoutdir)
+
     def test_diff_without_spaces_works(self):
         self.client.post(reverse(views.resetrepo))
         self.client.post(reverse(views.diff_submit), {'diff': open(make_testdata_filename('svn', 'svn-diff-without-spaces-on-blank-context-lines.patch')).read()})
