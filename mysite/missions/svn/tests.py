@@ -16,7 +16,20 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from mysite.missions.base.tests import *
+import tempfile
+import mock
+import os.path
+import subprocess
+import os
+import shutil
+
+from django.test import TestCase as DjangoTestCase
+from django.core.urlresolvers import reverse
+from django.conf import settings
+
+from mysite.profile.models import Person
+from mysite.base.tests import TwillTests
+from mysite.missions.base.tests import TestCase, subproc_check_output, make_testdata_filename
 from mysite.missions.svn import views, controllers
 
 class SvnBackendTests(TestCase):
