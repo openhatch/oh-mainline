@@ -139,7 +139,7 @@ Editing project - {{ project.display_name }}
 		    stores bugs for your project:</p>
 		  <ul class="raquo_bullets">
 		    {% for tracker in trackers %}
-		    <li><a href="{% url mysite.customs.views.edit_tracker tracker. tracker.tracker_name %}">
+		    <li><a href="{% url mysite.customs.views.edit_tracker tracker.tracker_type_for_urls tracker.tracker_name %}">
 			{{ tracker.tracker_name }}
 		    </a></li>
 		    {% endfor %}

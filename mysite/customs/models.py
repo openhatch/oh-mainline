@@ -92,6 +92,8 @@ class TrackerQueryModel(models.Model):
 
 class BugzillaTrackerModel(TrackerModel):
     '''This model stores the data for individual Bugzilla trackers.'''
+    tracker_type_for_urls = 'bugzilla'
+
     tracker_name = models.CharField(max_length=200, unique=True,
                                     blank=False, null=False)
     base_url = models.URLField(max_length=200, unique=True,
@@ -160,6 +162,8 @@ reversion.register(BugzillaQueryModel)
 
 class GoogleTrackerModel(TrackerModel):
     '''This model stores the data for individual Google trackers.'''
+    tracker_type_for_urls = 'google'
+
     tracker_name = models.CharField(max_length=200, unique=True,
                                     blank=False, null=False,
             help_text="This is the name that OpenHatch will use to identify the project.")
@@ -229,6 +233,8 @@ class TracBugTimes(models.Model):
 
 class TracTrackerModel(TrackerModel):
     '''This model stores the data for individual Trac trackers.'''
+    tracker_type_for_urls = 'trac'
+
     tracker_name = models.CharField(max_length=200, unique=True,
                                     blank=False, null=False)
     base_url = models.URLField(max_length=200, unique=True,
@@ -275,6 +281,8 @@ reversion.register(TracQueryModel)
 
 class RoundupTrackerModel(TrackerModel):
     '''This model stores the data for individual Roundup trackers.'''
+    tracker_type_for_urls = 'roundup'
+
     tracker_name = models.CharField(max_length=200, unique=True,
                                     blank=False, null=False,
             help_text="This is the name that OpenHatch will use to identify the project.")
