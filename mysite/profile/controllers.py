@@ -20,6 +20,8 @@ import os.path
 import hashlib
 from itertools import izip, cycle, islice
 
+import simplejson
+
 import pygeoip
 
 from django.conf import settings
@@ -185,16 +187,22 @@ def parse_string_query(s):
     return parsed
 
 ### This is a helper used by the map to pull out just the information that the map can use
-def get_person_data_for_map(person):
-    return {
-        'name': person.get_full_name_or_username(),
-        'location': person.get_public_location_or_default(),
+def get_person_data_for_map(person, include_latlong=False):
+    location = person.get_public_location_or_default()
+    name = person.get_full_name_or_username()
+    ret = {
+        'name': name,
+        'location': location,
         }
+    if include_latlong:
+        lat_long_data = simplejson.loads(mysite.base.controllers.cached_geocoding_in_json(location))
+        ret['lat_long_data'] = lat_long_data
+    return ret
 
 # This is a helper function for generating the mapping of person IDs -> location data,
 # as a dictionary, so that we can provide it to the map JavaScript.
-def get_people_location_data_as_dict(people):
+def get_people_location_data_as_dict(people, include_latlong=False):
     person_id2data = dict([
-            (person.pk, get_person_data_for_map(person))
+            (person.pk, get_person_data_for_map(person, include_latlong))
             for person in people])
     return person_id2data

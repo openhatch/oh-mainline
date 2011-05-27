@@ -580,7 +580,8 @@ def person_id2data_as_javascript(request):
         relevant_people = Person.objects.all().order_by('user__username')
 
     # The map only needs a subset of the data about each person. This subset, in fact:
-    person_id2data = mysite.profile.controllers.get_people_location_data_as_dict(relevant_people)
+    person_id2data = mysite.profile.controllers.get_people_location_data_as_dict(
+        relevant_people, include_latlong=True)
 
     as_json = simplejson.dumps(person_id2data)
     return HttpResponse(as_json,
