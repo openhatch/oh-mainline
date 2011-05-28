@@ -196,7 +196,13 @@ def get_person_data_for_map(person, include_latlong=False):
         }
     if include_latlong:
         lat_long_data = simplejson.loads(mysite.base.controllers.cached_geocoding_in_json(location))
+        extra_person_info = {'username': person.username,
+                             'photo_thumbnail_url': person.get_photo_url_or_default(),
+                             'tags': person.get_tag_texts_for_map(),
+                             'projects': person.get_display_names_of_nonarchived_projects()}
         ret['lat_long_data'] = lat_long_data
+        ret['extra_person_info'] = extra_person_info
+
     return ret
 
 # This is a helper function for generating the mapping of person IDs -> location data,
