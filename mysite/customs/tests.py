@@ -1027,6 +1027,9 @@ class RoundupBugImporterTests(django.test.TestCase):
                 )
         self.im = mysite.customs.bugimporters.roundup.RoundupBugImporter(self.tm, None)
 
+    def test_get_url_does_not_crash(self):
+        self.assertTrue(self.tm.get_edit_url())
+
     def test_new_mercurial_bug_import(self, second_run=False):
         # Check the number of Bugs present.
         all_bugs = Bug.all_bugs.all()

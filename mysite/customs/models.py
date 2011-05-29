@@ -19,6 +19,7 @@ import datetime
 import reversion
 
 from django.db import models
+from django.core.urlresolvers import reverse
 from django.utils.encoding import smart_str
 from model_utils.managers import InheritanceManager
 
@@ -75,6 +76,34 @@ class TrackerModel(models.Model):
         'search.Project', null=True,
         help_text='The project (if any) whose edit page caused the creation of this bug tracker model')
     objects = InheritanceManager()
+
+    def get_edit_url(self):
+        '''This method returns the URL you can use to access this tracker's edit
+        link.
+
+        It is part of this superclass so that derived classes can use the
+        functionality without implementing it themselves. It relies on
+        the classes being manually added to
+        mysite.customs.bugtrackers.all_trackers.'''
+        import mysite.customs.bugtrackers
+        my_short_name = None
+
+        for short_name in mysite.customs.bugtrackers.all_trackers:
+            klass = mysite.customs.bugtrackers.all_trackers[short_name]['model']
+            if self.__class__ == klass:
+                my_short_name = short_name
+                break
+
+        # Did we find a short name suitable for use in a URL? If not, let's
+        # just crash.
+        if my_short_name is None:
+            raise ValueError, ("The tracker class seems to be misconfigured. "
+                               "Read the comments around this message.")
+
+        return reverse('mysite.customs.views.edit_tracker', kwargs={
+                'tracker_type': my_short_name,
+                'tracker_name': self.tracker_name})
+
 
     def get_base_url(self):
         # Implement this in a subclass
