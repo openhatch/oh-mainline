@@ -63,6 +63,9 @@ from mysite.base.helpers import render_response
 
 # }}}
 
+# Name constants
+SUGGESTION_COUNT = 6
+
 @login_required
 def add_citation_manually_do(request):
     # {{{
@@ -649,8 +652,6 @@ def people(request):
                 )
             )
 
-    suggestion_count = 6
-
     cache_timespan = 86400 * 7
     #if settings.DEBUG:
     #    cache_timespan = 0
@@ -659,7 +660,7 @@ def people(request):
     popular_projects = cache.get(key_name)
     if popular_projects is None:
         projects = Project.objects.all()
-        popular_projects = sorted(projects, key=lambda proj: len(proj.get_contributors())*(-1))[:suggestion_count]
+        popular_projects = sorted(projects, key=lambda proj: len(proj.get_contributors())*(-1))[:SUGGESTION_COUNT]
         #extract just the names from the projects
         popular_projects = [project.name for project in popular_projects]
         # cache it for a week
@@ -676,7 +677,7 @@ def people(request):
         #lowercase them all and then remove duplicates
         tags_with_no_duplicates = list(set(map(lambda tag: tag.name.lower(), tags)))
         #take the popular ones
-        popular_tags = sorted(tags_with_no_duplicates, key=lambda tag_name: len(Tag.get_people_by_tag_name(tag_name))*(-1))[:suggestion_count]
+        popular_tags = sorted(tags_with_no_duplicates, key=lambda tag_name: len(Tag.get_people_by_tag_name(tag_name))*(-1))[:SUGGESTION_COUNT]
         # cache it for a week
         cache.set(key_name, popular_tags, cache_timespan)
 
