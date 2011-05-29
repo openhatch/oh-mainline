@@ -52,11 +52,16 @@ class GitDiffMission(object):
         success_count = diff.find(EXPECTED_DIFF_LINE)
         repo = GitRepository(username)
         if success_count != -1:
-            subprocess.Popen(['git', 'apply', '../../../missions/git/data/hello.patch'], cwd=repo.repo_path)
-            commit_msg = """Fixed a terrible mistake. Thanks for reporting this %s. 
-                Come to my house for a dinner party.  
-                Knock 3 times and give the secret password: Pinky.""" % username
-            subprocess.Popen(['git', 'commit', '-a', '-m', '"' + commit_msg + '"'], cwd=repo.repo_path)
-            return True
+            commit_diff = subprocess.Popen(['git', 'am'], cwd=repo.repo_path, stdin=subprocess.PIPE)
+            commit_diff.communicate(str(diff))
+            if commit_diff.returncode != 1:
+                commit_msg = """Fixed a terrible mistake. Thanks for reporting this %s.
+                    Come to my house for a dinner party.
+                    Knock 3 times and give the secret password: Pinky.""" % username
+                subprocess.Popen(['git', 'commit', '--allow-empty', '-m', commit_msg], cwd=repo.repo_path)
+                return True
+            else:
+                subprocess.check_call(['git', 'am', '--abort'], cwd=repo.repo_path)
+                return False
         else:
             return False
