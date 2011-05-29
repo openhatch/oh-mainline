@@ -24,7 +24,8 @@ from django.template.loader import render_to_string
 from mysite.search.models import WannaHelperNote
 import datetime
 import logging
-import html2text 
+import HTMLParser
+import html2text
 
 from django.core.urlresolvers import reverse
 import mysite.profile.views
@@ -118,13 +119,19 @@ class Command(BaseCommand):
 
         message_in_simpler_html = render_to_string('weekly_email_re_projects.html', plain_context)
         message_in_html = render_to_string('weekly_email_re_projects.html', rich_context)
-        
-        # message_in_simpler_html is a string of HTML we've hand-tuned so that
+
         # when it is converted into Markdown it looks good in an email
         html2text.BODY_WIDTH = 0 # good for emails
         to_markdown = html2text.html2text
-        message_in_plain_text = to_markdown(message_in_simpler_html)
-        
+        try:
+            message_in_plain_text = to_markdown(message_in_simpler_html)
+        except HTMLParser.HTMLParseError:
+            # Oh, snap. There is something terribly wrong.
+            raise ValueError(("We failed to parse the HTML of the message, which means "
+                              "that we could not create a text version. You might want "
+                              "to look at the message:\n\n" +
+                              message_in_simpler_html))
+
         return message_in_plain_text, message_in_html
 
     @staticmethod
