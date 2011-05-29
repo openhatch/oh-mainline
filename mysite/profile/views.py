@@ -595,23 +595,14 @@ def people(request):
     # pull in q from GET
     query = request.GET.get('q', '')
 
+    # Store the raw query in the template data
     data['raw_query'] = query
+
+    # Parse the query, and store that in the template.
     parsed_query = mysite.profile.controllers.parse_string_query(query)
     data.update(parsed_query)
 
-    if parsed_query['query_type'] != 'project':
-        # Figure out which projects happen to match that
-        projects_that_match_q_exactly = []
-        for word in [parsed_query['q']]: # This is now tokenized smartly.
-            name_matches = Project.objects.filter(name__iexact=word)
-            for project in name_matches:
-                if project.cached_contributor_count:
-                    # only add those projects that have people in them
-                    projects_that_match_q_exactly.append(project)
-        data['projects_that_match_q_exactly'] = projects_that_match_q_exactly
-
     # Get the list of people to display.
-
     if parsed_query['q'].strip():
         try:
             # "everybody" means everyone matching this query

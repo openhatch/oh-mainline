@@ -184,6 +184,10 @@ def parse_string_query(s):
         parsed['q'][0] == '"' == parsed['q'][-1]):
         parsed['q'] = parsed['q'][1:-1]
 
+    # If this is not a project-related search, but there are projects
+    # that directly match the input, provide that info to the template.
+    parsed.update(provide_project_query_hint(parsed))
+
     return parsed
 
 ### This is a helper used by the map to pull out just the information that the map can use
@@ -246,3 +250,21 @@ def query_type2query_summary(template_data):
             "to the project <strong>%s</strong>." % template_data['q'])
 
     return output_dict
+
+def provide_project_query_hint(parsed_query):
+    output_dict = {}
+
+    if parsed_query['query_type'] != 'project':
+        # Figure out which projects happen to match that
+        projects_that_match_q_exactly = []
+        for word in [parsed_query['q']]: # This is now tokenized smartly.
+            name_matches = mysite.search.models.Project.objects.filter(name__iexact=word)
+            for project in name_matches:
+                if project.cached_contributor_count:
+                    # only add those projects that have people in them
+                    projects_that_match_q_exactly.append(project)
+        output_dict['projects_that_match_q_exactly'] = projects_that_match_q_exactly
+
+    return output_dict
+
+
