@@ -709,27 +709,8 @@ def people(request):
 
     # What kind of people are these?
     if data['q']:
-        if data['query_type'] == 'project':
-            data['this_query_summary'] = 'who have contributed to '
-            data['query_is_a_project_name'] = True
-        elif data['query_type'] == 'icanhelp':
-            data['this_query_summary'] = 'willing to contribute to the project '
-            data['query_is_a_project_name'] = True
-        elif data['query_type'] == 'all_tags':
-            data['this_query_summary'] = 'who have listed'
-            data['this_query_post_summary'] = ' on their profiles'
-        elif data['query_type'] == 'understands_not':
-            data['this_query_summary'] = 'tagged with understands_not = '
-        elif data['query_type'] == 'understands':
-            data['this_query_summary'] = 'who understand '
-        elif data['query_type'] == 'studying':
-            data['this_query_summary'] = 'who are currently studying '
-        else:
-            long_name = mysite.profile.models.TagType.short_name2long_name[data['query_type']]
-            data['this_query_summary'] = 'who ' + long_name
-
-    if data['query_type'] == 'icanhelp' and not data['people']:
-        data['total_query_summary'] = "No one has yet listed himself/herself as willing to contribute to the project <strong>%s</strong>." % data['q']
+        data.update(
+            mysite.profile.controllers.query_type2query_summary(data))
 
     try:
         data['queried_project'] = Project.objects.get(name=data['q'])

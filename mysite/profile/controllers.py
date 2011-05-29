@@ -212,3 +212,37 @@ def get_people_location_data_as_dict(people, include_latlong=False):
             (person.pk, get_person_data_for_map(person, include_latlong))
             for person in people])
     return person_id2data
+
+# These are helper functions for showing information about the query.
+def query_type2query_summary(template_data):
+    output_dict = {}
+
+    if not template_data['q']:
+        return output_dict
+
+    if template_data['query_type'] == 'project':
+        output_dict['this_query_summary'] = 'who have contributed to '
+        output_dict['query_is_a_project_name'] = True
+    elif template_data['query_type'] == 'icanhelp':
+        output_dict['this_query_summary'] = 'willing to contribute to the project '
+        output_dict['query_is_a_project_name'] = True
+    elif template_data['query_type'] == 'all_tags':
+        output_dict['this_query_summary'] = 'who have listed'
+        output_dict['this_query_post_summary'] = ' on their profiles'
+    elif template_data['query_type'] == 'understands_not':
+        output_dict['this_query_summary'] = 'tagged with understands_not = '
+    elif template_data['query_type'] == 'understands':
+        output_dict['this_query_summary'] = 'who understand '
+    elif template_data['query_type'] == 'studying':
+        output_dict['this_query_summary'] = 'who are currently studying '
+    else:
+        long_name = mysite.profile.models.TagType.short_name2long_name[template_data['query_type']]
+        output_dict['this_query_summary'] = 'who ' + long_name
+
+
+    if template_data['query_type'] == 'icanhelp' and not template_data['people']:
+        output_dict['total_query_summary'] = (
+            "No one has yet listed himself/herself as willing to contribute "
+            "to the project <strong>%s</strong>." % template_data['q'])
+
+    return output_dict
