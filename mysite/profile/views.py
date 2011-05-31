@@ -622,35 +622,6 @@ def people(request):
 
     # filter by query, if it is set
     data['people'] = everybody
-    get_relevant_person_data = lambda p: (
-            {'name': p.get_full_name_or_username(),
-            'location': p.get_public_location_or_default(),
-            })
-    person_id2data = dict([(person.pk, get_relevant_person_data(person))
-            for person in everybody])
-    data['person_id2data_as_json'] = simplejson.dumps(person_id2data)
-    data['test_js'] = request.GET.get('test', None)
-    data['num_of_persons_with_locations'] = len(person_id2data)
-    if request.GET.get('center', False):
-        data['center_json'] = mysite.base.controllers.cached_geocoding_in_json(
-            request.GET.get('center', ''))
-        # the below is true when we fail to geocode the center that we got from GET
-        if data['center_json'] == 'null':
-            data['geocode_failed'] = True;
-        data['center_name'] = request.GET.get('center', '')
-        data['center_name_json'] = simplejson.dumps(request.GET.get('center', ''))
-
-    data['show_everybody_javascript_boolean'] = simplejson.dumps(not data.get('center_json', False))
-
-    data['person_id2lat_long_as_json'] = simplejson.dumps(
-        dict( (person_id, simplejson.loads(mysite.base.controllers.cached_geocoding_in_json(person_id2data[person_id]['location'])))
-              for person_id in person_id2data))
-
-    data['inaccessible_islander_ids'] = simplejson.dumps(
-                list(
-                    Person.inaccessible_islanders().values_list('id', flat=True)
-                )
-            )
 
     cache_timespan = 86400 * 7
     #if settings.DEBUG:
