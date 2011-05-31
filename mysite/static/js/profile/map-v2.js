@@ -70,7 +70,7 @@ function handleResults(data) {
 }
 
 function init() {
-    map = new OpenLayers.Map("map");
+    map = new OpenLayers.Map("map_canvas");
     var l = new OpenLayers.Layer.OSM();
     l.transitionEffect = "resize";
     map.addLayer(l);
