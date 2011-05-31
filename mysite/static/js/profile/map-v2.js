@@ -20,8 +20,8 @@ function drawAllPeopleDivsAtOnce(list_of_people_data) {
         div.append(span);
         $results.append(div);
     }
-    if (list_of_people_data.length > MAX_TO_DISPLAY) {
-	$results.append($("<div>and " + list_of_people.data.length - MAX_TO_DISPLAY + " more; zoom in to see them.</div>"));
+    if (list_of_people_data.length >= MAX_TO_DISPLAY) {
+	$results.append($("<div>and " + (list_of_people_data.length - MAX_TO_DISPLAY) + " more; zoom the map to see them, or search for them specifically.</div>"));
     }
 
     $text.replaceWith($results);
