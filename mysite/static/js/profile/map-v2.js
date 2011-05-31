@@ -93,7 +93,7 @@ function init() {
     layer = new OpenLayers.Layer.Vector("", {strategies: [ s ], styleMap: styleMap});
     map.addLayer(layer);
     s.activate();
-    map.zoomToMaxExtent();
+    map.setCenter(new OpenLayers.LonLat(0, 0), 1);
     jQuery.getJSON("/+people/location_data", handleResults);
     map.events.register("moveend", null, drawResults);
 }
