@@ -79,14 +79,21 @@ class GitViewTests(TwillTests):
         self.assertFalse(controllers.mission_completed(paulproteus, 'git_rebase'))
         
     def test_do_diff_mission_correctly(self):
-        expected_diff = '+print "Hello world!"'
+        self.client.post(reverse(views.resetrepo))
+        cwd=self.repo_path
+        with open(os.path.join(cwd, '../../../missions/git/data/hello.patch'), 'r') as expected_diff_file:
+            expected_diff = expected_diff_file.read()
         response = self.client.post(reverse(views.resetrepo))
         response = self.client.post(reverse(views.diff_submit), {'diff': expected_diff})
         paulproteus = Person.objects.get(user__username='paulproteus')
         self.assert_(controllers.mission_completed(paulproteus, 'git_diff'))
         
     def test_do_diff_mission_incorrectly(self):
-        unexpected_diff = '+print "Goodbye world!"'
+        self.client.post(reverse(views.resetrepo))
+        cwd=self.repo_path
+        with open(os.path.join(cwd, '../../../missions/git/data/hello.patch'), 'r') as expected_diff_file:
+            expected_diff = expected_diff_file.read()
+        unexpected_diff = expected_diff.replace('Hello', 'Goodbye')
         response = self.client.post(reverse(views.resetrepo))
         response = self.client.post(reverse(views.diff_submit), {'diff': unexpected_diff})
         paulproteus = Person.objects.get(user__username='paulproteus')
