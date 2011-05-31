@@ -54,7 +54,7 @@ class GitDiffMission(object):
         if success_count != -1:
             commit_diff = subprocess.Popen(['git', 'am'], cwd=repo.repo_path, stdin=subprocess.PIPE)
             commit_diff.communicate(str(diff))
-            if commit_diff.returncode != 1:
+            if commit_diff.returncode == 0: # for shell commands, success is 0
                 commit_msg = """Fixed a terrible mistake. Thanks for reporting this %s.
                     Come to my house for a dinner party.
                     Knock 3 times and give the secret password: Pinky.""" % username
