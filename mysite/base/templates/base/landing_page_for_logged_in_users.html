@@ -183,12 +183,12 @@ document.documentElement.className = 'javascript_is_enabled';
                                 <div class='body'>
                                     <ul id='people-list'>
                                         {% if collaborators %}
-                                        <h5>Collaborators:</h5>
+                                        <li class="heading">Collaborators:</li>
                                             {% for person in collaborators %}
                                                 {% include 'profile/person-summary-li.html' %}
                                             {% endfor %}
                                         {% else %}
-                                        <h5>Some awesome people:</h5>
+                                        <li class="heading">Some awesome people:</li>
                                             {% for person in random_profiles %}
                                                 {% include 'profile/person-summary-li.html' %}
                                             {% endfor %}
