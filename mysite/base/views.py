@@ -128,7 +128,19 @@ def home(request):
         
         data[u'projects_i_wanna_help'] = person.projects_i_wanna_help.all()
         data[u'projects_i_helped'] = person.get_published_portfolio_entries()
-        
+
+        # These are for project maintainers
+        data[u'projects_with_wannahelpers'] = [
+            pfe.project for pfe in person.get_published_portfolio_entries()
+            if pfe.project.wannahelpernote_set.all().count()]
+        data[u'maintainer_nudges'] = maintainer_nudges = {}
+        maintainer_nudges['show_project_page'] = (
+            person.get_published_portfolio_entries() and
+            not person.user.answer_set.all())
+        maintainer_nudges[u'add_bug_tracker'] = (
+            person.get_published_portfolio_entries() and
+            (not any([pfe.project.bug_set.all()
+                      for pfe in person.get_published_portfolio_entries()])))
     else: # no user logged in. Show front-page
         template_path = 'base/landing.html'
     
