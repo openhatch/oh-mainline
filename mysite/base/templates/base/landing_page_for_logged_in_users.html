@@ -38,56 +38,28 @@ document.documentElement.className = 'javascript_is_enabled';
 
 {% block content %}
 
-     <div class='module' id='what_to_do'>
-        
-        <div class='body'>
+<div class='module' id='what_to_do'>
+  <div class='body'>
 
-            <div id='tabbed_container_of_big_links'>
-                <ul class='tab_nav'>
-                    <li class='ui-state-active'>
-                        <a href='#for_contributors'>
-                            <h4>Contribute to open source!</h4>
-                        </a>
-                    </li>
-                    <li >
-                        <a href='#for_project_maintainers'>
-                            <h4>Attract contributors to your project!</h4>
-                        </a>
-                    </li>
-                </ul>
-		{% include 'base/landing_page_for_contributors_tab.html' %}
-
-                <div class='tab  invisible_if_js' id='for_project_maintainers'>
-                    <div class='tab_interior'>
-                        <div class='screenshot'>
-                            <a href='{% url mysite.project.views.projects %}' class='screenshot_image_wrapper' style='background-image: url({% version '/static/images/screenshots/project-page.png' %})'> </a>
-                            <div class='caption'>
-                                Let interested new contributors know where to begin on <a href='{% url mysite.project.views.projects %}'>
-                                    your project's OpenHatch page</a>
-                            </div>
-                        </div>
-
-                        <div class='screenshot'>
-                            <a href='https://openhatch.org/wiki/Contacting_new_contributors' class='screenshot_image_wrapper' style='background-image: url({% version '/static/images/screenshots/wanna-help.png' %})'> </a>
-                            <div class='caption'>
-                                Tell people who have clicked your project's 'I want to help' button <a href="https://openhatch.org/wiki/Contacting_new_contributors">how they can contribute</a>
-                            </div>
-                        </div>
-
-                        <div class='screenshot'>
-                            <a href='http://openhatch.org/wiki/Bug_trackers' class='screenshot_image_wrapper' style='background-image: url({% version '/static/images/screenshots/opportunities.png' %})'> </a>
-                            <div class='caption'>
-                                <a href='http://openhatch.org/wiki/Bug_trackers'>Submit your project's bugtracker</a> so your bugs appear in the volunteer opportunities finder
-                            </div>
-                        </div>
-                        
-                    </div>
-                </div>
-            </div>
-
-        </div>
+    <div id='tabbed_container_of_big_links'>
+      <ul class='tab_nav'>
+        <li class='ui-state-active'>
+          <a href='#for_contributors'>
+            <h4>Contribute to open source!</h4>
+          </a>
+        </li>
+        <li >
+          <a href='#for_project_maintainers'>
+            <h4>Attract contributors to your project!</h4>
+          </a>
+        </li>
+      </ul>
+      {% include 'base/landing_page_for_contributors_tab.html' %}
+      {% include 'base/landing_page_for_maintainers_tab.html' %}
     </div>
- 
+  </div>
+</div>
+
      <div class='module' id='recent_activity_feed'>
         <div class='head'>
             <h3>Recent activity</h3>

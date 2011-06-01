@@ -1,0 +1,49 @@
+{% comment %}
+# This file is part of OpenHatch.
+# Copyright (C) 2011 Jack Grigg
+# Copyright (C) 2011 Krzysztof Tarnowski (krzysztof.tarnowski@ymail.com)
+# Copyright (C) 2010, 2011 OpenHatch, Inc.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU Affero General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+{% endcomment %}
+
+{% load cache %}
+{% load base_extras %}
+{% load profile_extras %}
+
+<div class='tab  invisible_if_js' id='for_project_maintainers'>
+  <div class='tab_interior'>
+    <div class='screenshot'>
+      <a href='{% url mysite.project.views.projects %}' class='screenshot_image_wrapper' style='background-image: url({% version '/static/images/screenshots/project-page.png' %})'> </a>
+      <div class='caption'>
+        Let interested new contributors know where to begin on <a href='{% url mysite.project.views.projects %}'>
+          your project's OpenHatch page</a>
+      </div>
+    </div>
+
+    <div class='screenshot'>
+      <a href='https://openhatch.org/wiki/Contacting_new_contributors' class='screenshot_image_wrapper' style='background-image: url({% version '/static/images/screenshots/wanna-help.png' %})'> </a>
+      <div class='caption'>
+        Tell people who have clicked your project's 'I want to help' button <a href="https://openhatch.org/wiki/Contacting_new_contributors">how they can contribute</a>
+      </div>
+    </div>
+
+    <div class='screenshot'>
+      <a href='http://openhatch.org/wiki/Bug_trackers' class='screenshot_image_wrapper' style='background-image: url({% version '/static/images/screenshots/opportunities.png' %})'> </a>
+      <div class='caption'>
+        <a href='http://openhatch.org/wiki/Bug_trackers'>Submit your project's bugtracker</a> so your bugs appear in the volunteer opportunities finder
+      </div>
+    </div>
+  </div>
+</div>
