@@ -32,7 +32,7 @@
         {% endcomment %}
     </head>
     <body>
-        <p>Hello {% firstof recipient.user.first_name recipient.user.username %},</p>
+        <p>Hello {% filter force_escape %}{% firstof recipient.user.first_name recipient.user.username %}{% endfilter %},</p>
 
         <p>I'm a robot from OpenHatch, the open source involvement engine,
         sending you an email about what's been going on lately in the projects on 
