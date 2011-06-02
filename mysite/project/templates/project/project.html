@@ -290,7 +290,7 @@ about how you can help {{ project.display_name }}
         {% else %}
             <p>
                 No volunteer opportunities in {{project.display_name}} indexed here yet. 
-                <a href="/+projedit/{{ project.name }}#edit_bug_trackers">
+                <a href='{% url mysite.project.views.edit_project project.name %}#edit_bug_trackers'>
                     Add a bug tracker</a>.
 
             </p>
