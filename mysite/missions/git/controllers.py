@@ -30,10 +30,10 @@ class GitRepository(object):
         if os.path.isdir(self.repo_path):
             shutil.rmtree(self.repo_path)
         subprocess.check_call(['git', 'init', self.repo_path])
-        subprocess.Popen(['git', 'config', 'user.name', '"The Brain"'], cwd=self.repo_path)
-        subprocess.Popen(['cp', '../../../missions/git/data/hello.py', '.'], cwd=self.repo_path)
-        subprocess.Popen(['git', 'add', '.'], cwd=self.repo_path)
-        subprocess.Popen(['git', 'commit', '-m', '"Initial commit"'], cwd=self.repo_path)
+        subprocess.check_call(['git', 'config', 'user.name', '"The Brain"'], cwd=self.repo_path)
+        subprocess.check_call(['cp', '../../../missions/git/data/hello.py', '.'], cwd=self.repo_path)
+        subprocess.check_call(['git', 'add', '.'], cwd=self.repo_path)
+        subprocess.check_call(['git', 'commit', '-m', '"Initial commit"'], cwd=self.repo_path)
 
         # Touch the git-daemon-export-ok file
         file_obj = file(os.path.join(self.repo_path, '.git', 'git-daemon-export-ok'), 'w')
