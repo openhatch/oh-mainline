@@ -59,19 +59,23 @@ class GitViewTests(TwillTests):
         response = self.client.post(reverse(views.checkout_submit), {'secret_word': word})
         paulproteus = Person.objects.get(user__username='paulproteus')
         self.assert_(controllers.mission_completed(paulproteus, 'git_checkout'))
-        
-    def test_do_checkout_mission_incorrectly(self):
-        word = 'the wrong word'
-        response = self.client.post(reverse(views.checkout_submit), {'secret_word': word})
+
+    def email_address_is_rejected(self, email_address):
+        response = self.client.post(reverse(views.long_description_submit), {'user_email': email_address})
+        self.assertEqual(200, response.status_code)
+
+    def test_do_git_description_mission_incorrectly(self):
+        self.assertFalse(self.email_address_is_rejected('paulproteus@pathi.local'))
+        self.assertFalse(self.email_address_is_rejected('filipovskii_off@Puppo.(none)'))
         paulproteus = Person.objects.get(user__username='paulproteus')
-        self.assertFalse(controllers.mission_completed(paulproteus, 'git_checkout'))
-        
-    def test_do_rebase_mission_correctly(self):
-        word = 'pinky'
-        response = self.client.post(reverse(views.rebase_submit), {'secret_word': word})
+        self.assertFalse(controllers.mission_completed(paulproteus, 'git_config'))
+
+    def test_do_git_description_mission_correctly(self):
+        correct_email = 'paulproteus@openhatch.org'
+        response = self.client.post(reverse(views.long_description_submit), {'user_email': correct_email})
         paulproteus = Person.objects.get(user__username='paulproteus')
-        self.assert_(controllers.mission_completed(paulproteus, 'git_rebase'))
-        
+        self.assertTrue(controllers.mission_completed(paulproteus, 'git_config'))
+
     def test_do_rebase_mission_incorrectly(self):
         word = 'the wrong word'
         response = self.client.post(reverse(views.rebase_submit), {'secret_word': word})

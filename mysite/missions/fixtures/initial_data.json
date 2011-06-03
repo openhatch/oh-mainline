@@ -46,5 +46,9 @@
   {"model": "missions.Step",
    "pk": 12,
    "fields": {"name": "git_rebase"}
-  }
+  },
+  {"model": "missions.Step",
+   "pk": 13,
+   "fields": {"name": "git_config"}
+   }
 ]

@@ -29,13 +29,14 @@ def resetrepo(request):
     if request.method != 'POST':
         return HttpResponseNotAllowed(['POST'])
     controllers.GitRepository(request.user.username).reset()
+    controllers.unset_mission_completed(request.user.get_profile(), 'git_config')
     controllers.unset_mission_completed(request.user.get_profile(), 'git_checkout')
     controllers.unset_mission_completed(request.user.get_profile(), 'git_diff')
     controllers.unset_mission_completed(request.user.get_profile(), 'git_rebase')
     if 'stay_on_this_page' in request.GET:
         return HttpResponseRedirect(reverse(main_page))
     else:
-        return HttpResponseRedirect(reverse(checkout))
+        return HttpResponseRedirect(reverse(long_description))
 
 @login_required
 def checkout_submit(request):
@@ -53,6 +54,25 @@ def checkout_submit(request):
                 data['git_checkout_error_message'] = "The author's name is incorrect."
         data['git_checkout_form'] = form
     return checkout(request, data)
+
+@login_required
+def long_description_submit(request):
+    # Initialize data array and some default values.
+    data = {}
+    data['git_config_form'] = forms.ConfigForm()
+    data['git_config_error_message'] = ''
+    if request.method == 'POST':
+        form = forms.ConfigForm(request.POST)
+        if form.is_valid():
+            gitemail = form.cleaned_data['user_email']
+            if ('local' in gitemail or 'none' in gitemail or 'host' in gitemail):
+                data['git_config_error_message'] = 'The email address is invalid \
+                because it contains one of these words: <b>local, none or host!</b>'
+            else:
+                controllers.set_mission_completed(request.user.get_profile(), 'git_config')
+                return HttpResponseRedirect(reverse(long_description))
+            data['git_config_form'] = form
+    return long_description(request, data)
 
 @login_required
 def diff_submit(request):
@@ -99,6 +119,7 @@ class GitMissionPageState(MissionPageState):
             repo = controllers.GitRepository(self.request.user.username)
             data.update({
                 'repository_exists': repo.exists(),
+                'git_config_done': controllers.mission_completed(person, 'git_config'),
                 'git_checkout_done': controllers.mission_completed(person, 'git_checkout'),
                 'git_diff_done': controllers.mission_completed(person, 'git_diff'),
                 'git_rebase_done': controllers.mission_completed(person, 'git_rebase'),
@@ -123,15 +144,17 @@ def main_page(request, passed_data = None):
 @view
 def long_description(request, passed_data = None):
     state = GitMissionPageState(request, passed_data)
-    state.this_mission_page_short_name = 'About Git'
-    return (request, 'missions/git/about_git.html',
-            state.as_dict_for_template_context())
+    state.this_mission_page_short_name = 'Setup Git'
+    data = state.as_dict_for_template_context()
+    data['git_config_form'] = forms.ConfigForm()
+    return (request, 'missions/git/about_git.html', data)
 
 @login_required
 @view
 def checkout(request, passed_data = None):
     state = GitMissionPageState(request, passed_data)
     state.this_mission_page_short_name = 'Cloning'
+    state.mission_step_prerequisite = 'git_config'
     data = state.as_dict_for_template_context()
     data['git_checkout_form'] = forms.CheckoutForm()
     return (request, 'missions/git/checkout.html', data)

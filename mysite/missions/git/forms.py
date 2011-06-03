@@ -18,6 +18,9 @@
 
 import django.forms
 
+class ConfigForm(django.forms.Form):
+    user_email = django.forms.EmailField()
+
 class CheckoutForm(django.forms.Form):
     secret_word = django.forms.CharField(error_messages={'required': 'No author was given.'})
 

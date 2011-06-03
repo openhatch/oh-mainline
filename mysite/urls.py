@@ -134,6 +134,7 @@ urlpatterns = patterns('',
 
         (r'^missions/git$', 'mysite.missions.git.views.main_page'),
         (r'^missions/git/description$', 'mysite.missions.git.views.long_description'),
+        (r'^missions/git/description/submit$', 'mysite.missions.git.views.long_description_submit'),
         (r'^missions/git/checkout$', 'mysite.missions.git.views.checkout'),
         (r'^missions/git/resetrepo$', 'mysite.missions.git.views.resetrepo'),
         (r'^missions/git/checkout/submit$', 'mysite.missions.git.views.checkout_submit'),
