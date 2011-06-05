@@ -74,6 +74,7 @@ class DiffRecursiveMission(object):
     @classmethod
     def validate_patch(cls, patchdata):
         the_patch = patch.fromstring(patchdata)
+        
 
         # Strip one level of directories from the left of the filenames.
         for i, filename in enumerate(the_patch.source):
@@ -106,7 +107,7 @@ class DiffRecursiveMission(object):
                 raise IncorrectPatch, 'Patch does not modify file "%s", which it should modify.' % filename
             if the_patch.target[index] != filename:
                 raise IncorrectPatch, 'Patch headers for file "%s" have inconsistent filenames.' % filename
-
+            
             hunks = the_patch.hunks[index]
             del the_patch.source[index]
             del the_patch.target[index]
@@ -122,6 +123,11 @@ class DiffRecursiveMission(object):
                     raise IncorrectPatch, 'You submitted a patch that would revert the correct changes back to the originals.  You may have mixed the parameters for diff, or performed a reverse patch.'
                 else:
                     raise IncorrectPatch, 'The modifications to "%s" will not apply correctly to the original file.' % filename
+
+            # Check for BOM issues.  Likely a Windows-only issue, and only when using a text editor that 
+            # includes UTF-8 BOM markers when saving files.
+            if '\xef\xbb\xbf' in ''.join(the_patch.patch_stream(StringIO(old_contents),hunks)):
+                raise IncorrectPatch, 'It appears the text editor you used to modify "%s" leaves UTF-8 BOM characters.  Try an editor like Notepad++ or something similar.' % filename
 
             # Check that the resulting file matches what is expected.
             if ''.join(the_patch.patch_stream(StringIO(old_contents), hunks)) != new_contents:

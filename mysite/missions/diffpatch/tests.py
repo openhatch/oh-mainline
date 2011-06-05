@@ -253,6 +253,16 @@ class DiffRecursiveTests(TwillTests):
         paulproteus = Person.objects.get(user__username='paulproteus')
         self.assertEqual(len(StepCompletion.objects.filter(step__name='diffpatch_diffrecursive', person=paulproteus)), 0)
 
+    def test_do_mission_incorrectly_BOM(self):
+        diff = StringIO('--- a/foo.txt\n+++ b/foo.txt\n@@ -0,0 +0,1 @@\n+\xef\xbb\xbfHello World\n')
+        diff.name = 'foo.patch'
+        submit_response = self.client.post(reverse(views.diffrecursive_submit), {'diff': diff})
+        self.assertFalse(submit_response.context['diffrecursive_success'])
+
+        paulproteus = Person.objects.get(user__username='paulproteus')
+        self.assertEqual(len(StepCompletion.objects.filter(step__name='diffpatch_diffrecursive', person=paulproteus)), 0)
+
+
 class PatchRecursiveTests(TwillTests):
     fixtures = ['user-paulproteus', 'person-paulproteus']
 
