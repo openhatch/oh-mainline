@@ -25,22 +25,22 @@
     About this mission
   </a>
 </li>
-<li id='link-single_file_patch'>
+<li id='link-single_file_patch' {% if patchsingle_done %}class='tick-progress'{% else %}class='cross-progress'{% endif %}>
   <a href='{% url mysite.missions.diffpatch.views.single_file_patch %}'>
     Patching individual files
   </a>
 </li>
-<li id='link-single_file_diff'>
+<li id='link-single_file_diff' {% if diffsingle_done %}class='tick-progress'{% else %}class='cross-progress'{% endif %}>
   <a href='{% url mysite.missions.diffpatch.views.single_file_diff %}'>
     Diffing individual files
   </a>
 </li>
-<li id='link-recursive_diff'>
+<li id='link-recursive_diff' {% if diffrecursive_done %}class='tick-progress'{% else %}class='cross-progress'{% endif %}>
   <a href='{% url mysite.missions.diffpatch.views.recursive_diff %}'>
     Diffing entire directories
   </a>
 </li>
-<li id='link-recursive_patch'>
+<li id='link-recursive_patch' {% if patchrecursive_done %}class='tick-progress'{% else %}class='cross-progress'{% endif %}>
   <a href='{% url mysite.missions.diffpatch.views.recursive_patch %}'>
     Patching entire directories
   </a>

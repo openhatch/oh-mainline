@@ -30,17 +30,17 @@
     About Git
   </a>
 </li>
-<li id='link-checkout'>
+<li id='link-checkout' {% if git_checkout_done %}class='tick-progress'{% else %}class='cross-progress'{% endif %}>
   <a href='{% url mysite.missions.git.views.checkout %}'>
     Cloning a project
   </a>
 </li>
-<li id='link-diff'>
+<li id='link-diff' {% if git_diff_done %}class='tick-progress'{% else %}class='cross-progress'{% endif %}>
   <a href='{% url mysite.missions.git.views.diff %}'>
     Creating a patch
   </a>
 </li>
-<li id='link-rebase'>
+<li id='link-rebase' {% if git_rebase_done %}class='tick-progress'{% else %}class='cross-progress'{% endif %}>
   <a href='{% url mysite.missions.git.views.rebase %}'>
     Rebase and merge
   </a>

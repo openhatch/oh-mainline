@@ -20,7 +20,7 @@
 
 
 {% block side_nav_links %}
-<li id='link-main_page'>
+<li id='link-main_page' {% if repository_exists %}class='tick-progress'{% else %}class='cross-progress'{% endif %}>
   <a href='{% url mysite.missions.svn.views.main_page %}'>
     Mission start page
   </a>
@@ -30,17 +30,17 @@
     About Subversion
   </a>
 </li>
-<li id='link-checkout'>
+<li id='link-checkout' {% if svn_checkout_done %}class='tick-progress'{% else %}class='cross-progress'{% endif %}>
   <a href='{% url mysite.missions.svn.views.checkout %}'>
     Checking out a working copy
   </a>
 </li>
-<li id='link-diff'>
+<li id='link-diff' {% if svn_diff_done %}class='tick-progress'{% else %}class='cross-progress'{% endif %}>
   <a href='{% url mysite.missions.svn.views.diff %}'>
     Diffing your changes
   </a>
 </li>
-<li id='link-commit'>
+<li id='link-commit' {% if svn_commit_done %}class='tick-progress'{% else %}class='cross-progress'{% endif %}>
   <a href='{% url mysite.missions.svn.views.commit %}'>
     Committing your changes
   </a>
