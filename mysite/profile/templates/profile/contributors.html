@@ -29,7 +29,7 @@
                 <label>Other contributor:</label>
             {% endif %}
         {% else %}
-            <label>Other contributors 1-4 of ({{ contributor_count|sub:1 }}):</label>
+            <label>Other contributors 1-4 (of {{ contributor_count|sub:1 }}):</label>
         {% endif %}
     <ul>
         {% for person in contributors %}
