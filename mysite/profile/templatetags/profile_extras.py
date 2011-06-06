@@ -75,6 +75,11 @@ def length_lte(value, arg):
     "Returns a boolean of whether the value's length is less than or equal to the argument"
     return len(value) <= int(arg)
 
+@register.filter
+def sub(value, arg):
+    "Subtracts the arg from the value"
+    return int(value) - int(arg)
+
 def break_long_words(value, max_word_length=8):
     # if the word is really long, insert a <wbr> occasionally.
 

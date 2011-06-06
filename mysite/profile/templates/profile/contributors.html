@@ -22,7 +22,15 @@
 {% if contributors %}
 <div class='other-contributors'>
     {% with project.get_contributors|length as contributor_count %}
-    <label>Other contributor{{contributor_count|pluralize}} ({{ contributor_count }} total):</label>
+        {% if contributor_count <= 4 %}
+            {% if contributor_count >= 2 %}
+                <label>Other contributors ({{ contributor_count|sub:1 }}):</label>
+            {% else %}
+                <label>Other contributor:</label>
+            {% endif %}
+        {% else %}
+            <label>Other contributors 1-4 of ({{ contributor_count|sub:1 }}):</label>
+        {% endif %}
     <ul>
         {% for person in contributors %}
         <li>
@@ -47,9 +55,16 @@
         </li>
         {% endfor %}
     </ul>
-    <a class='see-all'
+    {% if contributor_count <= 4 %}
+        <a class='see-all'
             href='{% url mysite.profile.views.people %}?q=project:{{ project.name|urlencode }}'
-        >See all &raquo;</a>
+        >Show on map &raquo;</a>
+    {% else %}
+        <a class='see-all'
+                href='{% url mysite.profile.views.people %}?q=project:{{ project.name|urlencode }}'
+            >Show all on map &raquo;</a>
+    {% endif %}
+
     {% endwith %}
 </div>
 {% endif %}
