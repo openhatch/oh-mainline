@@ -22,7 +22,7 @@
 {% if contributors %}
 <div class='other-contributors'>
     {% with project.get_contributors|length as contributor_count %}
-        {% if contributor_count <= 4 %}
+        {% if contributor_count <= 5 %}
             {% if contributor_count >= 2 %}
                 <label>Other contributors ({{ contributor_count|sub:1 }}):</label>
             {% else %}
@@ -55,7 +55,7 @@
         </li>
         {% endfor %}
     </ul>
-    {% if contributor_count <= 4 %}
+    {% if contributor_count <= 5 %}
         <a class='see-all'
             href='{% url mysite.profile.views.people %}?q=project:{{ project.name|urlencode }}'
         >Show on map &raquo;</a>
