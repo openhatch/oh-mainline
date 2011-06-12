@@ -21,6 +21,17 @@
 
 {% block mission_main_body %}
 
+{% if not repository_exists %}
+
+{% block mission_missing_prerequisite_text %}
+<p>You can't do the git checkout step yet! <br />
+You have to create your repository on the
+  <a href='{% url mysite.missions.git.views.main_page %}'>Mission start page</a>!
+</p>
+{% endblock mission_missing_prerequisite_text %}
+
+{% else %}
+
 <p>Your first mission is to obtain a copy of the remote git repository. For this mission, we will use the git repository you created in step one.  Running the following command will clone the remote repository and create a copy on your hard drive.</p>
 
 <p>You can clone the repository by running:<br style="clear: left;" />
@@ -35,7 +46,7 @@
 <p class="next_mission_link">
   <a href="{% url mysite.missions.git.views.diff %}">Creating a patch of your changes &raquo;</a></p>
 {% else %}
-<form method="post" action="{% url mysite.missions.git.views.checkout_submit %}#gitcheckout-form">
+<form method="post" action="{% url mysite.missions.git.views.checkout_submit %}">
   <div class="form-row">
     <a name="gitcheckout-form"></a>
     {% if git_checkout_error_message %}
@@ -50,6 +61,7 @@
   </div>
 </form>
 
+{% endif %}
 {% endif %}
 
 {% endblock mission_main_body %}

@@ -35,9 +35,6 @@ text file and use a terminal, you can complete this mission. </p>
 <p>You will learn how to clone a git repository, make a commit, submit a patch,
 and rebase your work onto the new version provided by the maintainer.</p>
 
-<p>If you want to know more about git, read 
-<a href="{% url mysite.missions.git.views.long_description %}">more about Git</a>.</p>
-
 {% if user.is_authenticated %}
 {% if repository_exists %}
 <p>You already have a repository that you can use for these missions, but if
@@ -48,8 +45,7 @@ you want to start over fresh, you can reset it.</p>
 </form><br style="clear: left;" />
 
 <p class="next_mission_link">
-  <a href="{% url mysite.missions.git.views.checkout %}">Checking out a
-  working copy &raquo;</a></p>
+    <a href="{% url mysite.missions.git.views.long_description %}">Now let's get Git set up &raquo;</a>.</p>
   {% else %}
   <p>To do these missions, you will need to make a personal repository.  Your
   repository will reside on the OpenHatch server, specifically for your use in

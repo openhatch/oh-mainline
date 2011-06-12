@@ -22,6 +22,14 @@
 
 <p>Git is a version control system (VCS) created by Linus Torvalds,  the creator of the Linux kernel. Git is known as a 'distributed” VCS, or DVCS. This means that each user's copy of the code is a fully working repository and includes all previous commit information.  Rather than connecting to a remote server as you would with Subversion or CVS, users can work productively offline, choosing to later sync their changes with a remote repository or create a patch file.</p>
 
+<h3>Other resources</h3>
+
+<ul class="raquo_bullets">
+  <li>The <a href="http://git-scm.com/">website</a> for the git project contains a quickstart guide and links to <a href="http://git-scm.com/documentation"> other useful resources</a>.</li>
+  <li>The <a href="http://book.git-scm.com/"> Git Community Book</a> is a wonderful resource for more in depth explanation of git's features.</li>
+  <li>Many git users chat on the #git channel on IRC</li>
+</ul>
+
 <p>The purpose of this mission is to teach you how to clone a remote repository, make changes to a file, check them into your local copy, and finally create a patch file.</p>
 
 <h3>Preparing for the mission</h3>
@@ -32,15 +40,29 @@
 </ul>
 
 {% if user.is_authenticated %}
-<p>(If your project recommends this tutorial to newcomers, we can put you in a list here!)</p>
+    {% if git_config_done %}
+        <div class="successmsg">
+          <p><strong>You have successfully completed the first part of the mission.</strong></p>
+        </div>
+        <p class="next_mission_link">
+          <a href="{% url mysite.missions.git.views.checkout %}">Checking out a
+          working copy &raquo;</a></p>
+        {% else %}
+        <form method="post" action="#gitconfig-form">
+            <div class="form-row">
+            <a name="gitconfig-form"></a>
+            <br style="clear: left;" />
+            {% if git_config_error_message or git_config_form.user_email.errors %}
+                <ul class="errorlist"><li>{{ git_config_form.user_email.errors }}  {{ git_config_error_message|safe|escape }}</li></ul><br style="clear: left;" />
+            {% endif %}
+            To confirm that you have setup git correctly, please copy the output from...<br />
+            <code>git config --global user.email</code><br style="clear: left;" /><br />
+            {{ git_config_form.user_email }}
+            <br style="clear: left;" />
+            <input type="submit" value="Submit" style="float: right; margin-top: -20px; margin-right: 200px;" />
+          </div>
+        </form>
+        {% endif %}
 {% endif %}
-<p>
-<h3>Other resources</h3>
 
-<ul class="raquo_bullets">
-  <li>The <a href="http://git-scm.com/">website</a> for the git project contains a quickstart guide and links to <a href="http://git-scm.com/documentation"> other useful resources</a>.</li>
-  <li>The <a href="http://book.git-scm.com/"> Git Community Book</a> is a wonderful resource for more in depth explanation of git's features.</li>
-  <li>Many git users chat on the #git channel on IRC</li>
-</ul>
-</p>
 {% endblock mission_main_body %}
