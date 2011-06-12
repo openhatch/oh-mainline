@@ -760,6 +760,8 @@ PortfolioEntry.Save.postOptions.success = function (response) {
     }
     var $entry = $('#portfolio_entry_'+response.portfolio_entry__pk);
     $entry.removeClass('unsaved').removeClass('adding');
+    var $newupdateIcon = $entry.find('.actions li#update_icon');
+    $newupdateIcon.toggle();
     var project_name = $entry.find('.project_name').text();
     Notifier.displayMessage('Saved entry for '+project_name+'.');
 
@@ -777,6 +779,13 @@ PortfolioEntry.Save.save = function () {
     $saveLink = $(this);
 
     $pfEntry = $saveLink.closest('.portfolio_entry');
+    Notifier.displayMessage('Saving, please wait!');
+    var $updateIcon = $pfEntry.find('.actions li#update_icon');
+    $updateIcon.toggle();
+    if ($pfEntry.find('.actions li.save_and_publish_button')) {
+        var $savePublishButton = $pfEntry.find('.actions li.save_and_publish_button');
+        $savePublishButton.remove();
+    }
 
     // Do some client-side validation.
     $projectName = $pfEntry.find('input.project_name');
