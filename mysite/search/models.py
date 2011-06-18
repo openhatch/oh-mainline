@@ -699,21 +699,13 @@ class WannaHelperNote(OpenHatchModel):
     def get_absolute_url(self):
         return urljoin(reverse('mysite.project.views.project', args=[self.project.name]), "#person_summary_%d" % self.person.pk)
 
-class HitCountCache(OpenHatchModel):
-    hashed_query = models.CharField(max_length=40, primary_key=True) # stores a sha1 
-    hit_count = models.IntegerField()
 
-    @staticmethod
-    def clear_cache(*args, **kwargs):
-        # Ignore arguments passed here by Django signals.
-        HitCountCache.objects.all().delete()
+def post_bug_save_delete_increment_hit_count_cache_timestamp(sender, instance, **kwargs):
+         # always bump it
+         import mysite.base.models
+         mysite.base.models.Timestamp.update_timestamp_for_string('hit_count_cache_timestamp'),
 
-def post_bug_save_increment_bug_model_timestamp(sender, raw, instance, created, **kwargs):
-    if raw:
-        return # this is coming in from loaddata. You must know what you are doing.
-
-    if created:
-        return # whatever, who cares
+def post_bug_save_increment_bug_model_timestamp(sender, instance, **kwargs):
     if instance.looks_closed:
         # bump it
         import mysite.base.models
@@ -727,19 +719,18 @@ def post_bug_delete_increment_bug_model_timestamp(sender, instance, **kwargs):
     import mysite.base.models
     mysite.base.models.Timestamp.update_timestamp_for_string(str(sender))
 
-# Clear the cache whenever Bugs are added or removed.
-models.signals.post_save.connect(HitCountCache.clear_cache, Bug)
-models.signals.post_delete.connect(HitCountCache.clear_cache, Bug)
-
+# Clear the hit count cache whenever Bugs are added or removed. This is
+# simply done by bumping the Timestamp used to generate the cache keys.
+# The hit count cache is used in get_or_create_cached_hit_count() in
+# mysite.search.controllers.Query.
 # Clear all people's recommended bug cache when a bug is deleted
 # (or when it has been modified to say it looks_closed)
 models.signals.post_save.connect(
-    post_bug_save_increment_bug_model_timestamp,
+    post_bug_save_delete_increment_hit_count_cache_timestamp,
     Bug)
-
 models.signals.post_delete.connect(
-    post_bug_delete_increment_bug_model_timestamp,
-    Bug)
+    post_bug_save_delete_increment_hit_count_cache_timestamp
+    ,Bug)
 
 # Re-index the person when he says he likes a new project
 def update_the_person_index_from_project(sender, instance, **kwargs):
