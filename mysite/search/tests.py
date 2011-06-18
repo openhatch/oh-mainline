@@ -25,18 +25,20 @@ import mysite.account.tests
 from mysite.profile.models import Person
 import mysite.profile.models
 import mysite.search.controllers
-from mysite.search.models import Project, Bug, HitCountCache, \
+from mysite.search.models import Project, Bug, \
         ProjectInvolvementQuestion, Answer, BugAlert
 from mysite.search import views
 import datetime
 import mysite.project.views
 import mysite.customs.bugtrackers
 
+import hashlib
 import simplejson
 import mock
 from twill import commands as tc
 
 from django.test import TestCase
+from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.core.files.base import ContentFile
 from django.contrib.auth.models import User
@@ -1027,9 +1029,11 @@ class QueryGrabHitCount(SearchTest):
         data = {u'q': u'eventhive', u'language': u'shoutNOW'}
         query = mysite.search.controllers.Query.create_from_GET_data(data)
         stored_hit_count = 10
-        HitCountCache.objects.create(
-                hashed_query=query.get_sha1(),
-                hit_count=stored_hit_count)
+        # Get the cache key used to store the hit count.
+        hit_count_cache_key = query.get_hit_count_cache_key()
+        # Set the cache value.
+        cache.set(hit_count_cache_key, stored_hit_count)
+        # Test that it is fetched correctly.
         self.assertEqual(query.get_or_create_cached_hit_count(), stored_hit_count)
 
     def test_shoutnow_cache_hitcount_on_grab(self):
@@ -1043,8 +1047,13 @@ class QueryGrabHitCount(SearchTest):
         expected_hit_count = 1
         self.assertEqual(query.get_or_create_cached_hit_count(), expected_hit_count)
 
-        hcc = HitCountCache.objects.get(hashed_query=query.get_sha1())
-        self.assertEqual(hcc.hit_count, expected_hit_count)
+        # Get the cache key used to store the hit count.
+        hit_count_cache_key = query.get_hit_count_cache_key()
+        # Get the cache value.
+        stored_hit_count = cache.get(hit_count_cache_key)
+        print "Stored: %s" % stored_hit_count
+        # Test that it was stored correctly.
+        self.assertEqual(stored_hit_count, expected_hit_count)
 
 class ClearCacheWhenBugsChange(SearchTest):
 
@@ -1052,22 +1061,30 @@ class ClearCacheWhenBugsChange(SearchTest):
         data = {u'language': u'shoutNOW'}
         query = mysite.search.controllers.Query.create_from_GET_data(data)
 
+        old_hcc_timestamp = mysite.base.models.Timestamp.get_timestamp_for_string(
+        'hit_count_cache_timestamp')
+
         # Cache entry created after hit count retrieval
         query.get_or_create_cached_hit_count()
-        self.assert_(HitCountCache.objects.all())
-
+        new_hcc_timestamp = mysite.base.models.Timestamp.get_timestamp_for_string(
+                'hit_count_cache_timestamp')
+        self.assertEqual(old_hcc_timestamp, new_hcc_timestamp)
         # Cache cleared after bug save
         project = Project.create_dummy(language=u'shoutNOW')
         bug = Bug.create_dummy(project=project)
-        self.assertFalse(HitCountCache.objects.all())
-
+        newer_hcc_timestamp = mysite.base.models.Timestamp.get_timestamp_for_string(
+            'hit_count_cache_timestamp')
+        self.assertNotEqual(new_hcc_timestamp, newer_hcc_timestamp)
         # Cache entry created after hit count retrieval
         query.get_or_create_cached_hit_count()
-        self.assert_(HitCountCache.objects.all())
-
+        newest_hcc_timestamp = mysite.base.models.Timestamp.get_timestamp_for_string(
+                'hit_count_cache_timestamp')
+        self.assertEqual(newer_hcc_timestamp, newest_hcc_timestamp)
         # Cache cleared after bug deletion
         bug.delete()
-        self.assertFalse(HitCountCache.objects.all())
+        newester_hcc_timestamp = mysite.base.models.Timestamp.get_timestamp_for_string(
+             'hit_count_cache_timestamp'),
+        self.assertNotEqual(newest_hcc_timestamp, newester_hcc_timestamp)
 
 class DontRecommendFutileSearchTerms(TwillTests):
 
