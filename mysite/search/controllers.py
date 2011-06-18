@@ -15,16 +15,22 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from mysite.base.models import Timestamp
 import mysite.search.models
 import mysite.search.views
 import mysite.base.unicode_sanity
+import collections
 import mysite.base.decorators
 import collections
 import urllib
 import re
 import hashlib
+from django.core.cache import cache
 from django.db.models import Q
 import MySQLdb
+import logging
+
+CCT = 'hit_count_cache_timestamp'
 
 def order_bugs(query):
     # Minus sign: reverse order
@@ -351,30 +357,39 @@ class Query:
         # then return a hash of our sorted items self.
         return hashlib.sha1(stringified).hexdigest() # sadly we cause a 2x space blowup here
     
-    def get_or_create_cached_hit_count(self):
+    def get_hit_count_cache_key(self):
         hashed_query = self.get_sha1()
-        hit_count = 0 # we try a few strategies to know something about the hit count, but if we
-                      # fail to gain any data on the query and its hit count, 0 is a safe enough
-                      # value to return.
+        hcc_timestamp = Timestamp.get_timestamp_for_string(CCT)
+        hit_count_cache_key = "hcc_%s_%s" % (hashlib.sha1(hcc_timestamp.__str__()).hexdigest(), hashed_query)
+        return hit_count_cache_key
 
-        existing_hccs = mysite.search.models.HitCountCache.objects.filter(hashed_query=hashed_query)
-        if existing_hccs:
-            hcc = existing_hccs[0]
-            hit_count = hcc.hit_count
-        else:
-            count = self.get_bugs_unordered().count()
-            try:
-                hcc, _ = mysite.search.models.HitCountCache.objects.get_or_create(
-                        hashed_query=hashed_query,
-                        defaults={'hit_count': count})
-                hit_count = hcc.hit_count
-            except MySQLdb.IntegrityError:
-                hit_count = 0
+    def get_or_create_cached_hit_count(self):
+        # Get the cache key used to store the hit count.
+        hit_count_cache_key = self.get_hit_count_cache_key()
+        # Fetch the hit count from the cache.
+        hit_count = cache.get(hit_count_cache_key)
+        logging.debug( "Cached hit count: " + str(hit_count))
+        # We need to be careful here, as a cached count of zero would be
+        # read here as a None value, when we only want to pick up an
+        # actual None value (corresponding to the cache key not
+        # existing).
+        if hit_count is None:
+            # There is nothing in the cache for this key. Either the
+            # query has not been counted before, or the Timestamp has
+            # been refreshed due to a change in the Bug objects. So get
+            # a new count.
+            hit_count = self.get_bugs_unordered().count()
+            cache.set(hit_count_cache_key, hit_count)
+            logging.info("Set hit count: " + str(hit_count))
+        # TODO: Add sql query in the logging
+        logging.info("Hit Count:" + str(hit_count))
+
         return hit_count
 
     def get_query_string(self):
         GET_data = self.get_GET_data()
         query_string = mysite.base.unicode_sanity.urlencode(GET_data)
+        logging.info("Query is " + query_string)
         return query_string
 
        
