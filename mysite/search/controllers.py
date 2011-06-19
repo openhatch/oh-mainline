@@ -15,7 +15,6 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from mysite.base.models import Timestamp
 import mysite.search.models
 import mysite.search.views
 import mysite.base.unicode_sanity
@@ -359,7 +358,7 @@ class Query:
     
     def get_hit_count_cache_key(self):
         hashed_query = self.get_sha1()
-        hcc_timestamp = Timestamp.get_timestamp_for_string(CCT)
+        hcc_timestamp = mysite.base.models.Timestamp.get_timestamp_for_string(CCT)
         hit_count_cache_key = "hcc_%s_%s" % (hashlib.sha1(hcc_timestamp.__str__()).hexdigest(), hashed_query)
         return hit_count_cache_key
 
