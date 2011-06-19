@@ -369,10 +369,10 @@ class Query:
         # Fetch the hit count from the cache.
         hit_count = cache.get(hit_count_cache_key)
         logging.debug( "Cached hit count: " + str(hit_count))
-        # We need to be careful here, as a cached count of zero would be
-        # read here as a None value, when we only want to pick up an
-        # actual None value (corresponding to the cache key not
-        # existing).
+        # We need to be careful to check if the count is None, rather than just if the
+        # count is a false value. That's because a value of zero is still a cached value;
+        # if we just use a boolean test, we would mistake the zero value for an empty
+        # cache and regenerate the cache needlessly.
         if hit_count is None:
             # There is nothing in the cache for this key. Either the
             # query has not been counted before, or the Timestamp has
