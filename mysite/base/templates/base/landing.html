@@ -42,13 +42,12 @@ document.documentElement.className = 'javascript_is_enabled';
     {# Remember, this page is only shown to non-logged-in users. #}
     {% cache 60 homepage_content %}
 
-    <p style='color: #333; margin-top: 0; margin-bottom: 10px; text-align: center; font-size: 2em;'>
-        <strong>OpenHatch</strong> &middot; community tools for free and open source software
-    </p>
-
     <div class="module" id="about-message">
-      <div class="head"><h3>About OpenHatch.org</h3></div>
-      <div class="body">
+      <div class="head">
+          <p style='color: #333; margin-top: 0; margin-bottom: 10px; text-align: center; font-size: 2em;'>
+              <strong>OpenHatch</strong> &middot; community tools for free and open source software
+      </div>
+    <div class="body">
 	<p>
 	  Free, open source software <strong>loses tons of prospective contributors</strong> because it is difficult to learn how and where you can fit in.
 	</p>
