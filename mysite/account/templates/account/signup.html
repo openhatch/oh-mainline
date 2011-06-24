@@ -53,7 +53,7 @@ body#signup_with_password .body { background: #fff;}
         <p>Now is a good time to <a href="/policies-etc/">read our privacy policy</a>.</p>
         <form name="signup" action="{% url mysite.account.views.signup_do %}" method="post">{% csrf_token %}
             {{ form.as_p }}
-            <p> <input type="submit" value="Hit it" /> </p>
+            <p> <input type="submit" value="Done!" /> </p>
         </form>
         Or <a href='/account/login/'>sign up using an account you already have</a>.
     </div>

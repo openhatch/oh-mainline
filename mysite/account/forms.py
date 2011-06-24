@@ -37,7 +37,7 @@ RESERVED_USERNAMES =  (
 
 class UserCreationFormWithEmail(django.contrib.auth.forms.UserCreationForm):
     username = django.forms.RegexField(label="Username", max_length=30, regex=r'^\w+$',
-        help_text = "<span class='help_text'>Pick a froopy handle, with length < 31 characters. Stick to letters, digits and underscores.</span>",
+        help_text = "<span class='help_text'>Pick a username with length < 31 characters. Stick to letters, digits and underscores.</span>",
         error_messages = {'invalid': "Stick to letters, digits and underscores.", 'required': "Gotta pick a username!"})
     email = django.forms.EmailField(error_messages={
         'required': "Your email address is required. We promise to use it respectfully.",
