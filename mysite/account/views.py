@@ -361,6 +361,15 @@ def invite_someone(request, form=None,success_message=''):
             'invite_someone_form': invite_someone_form,
             'remaining_invites': remaining_invites})
 
+@view
+def proxyconnect_sso(request):
+    '''This function implements the ProxyConnect single
+    sign-on API described by Vanilla Forums.
+
+    More documentation: http://vanillaforums.org/page/singlesignon
+    '''
+    return (request, 'vanilla-proxy-connect-sso.txt', {})
+
 @login_required
 def invite_someone_do(request):
     remaining_invitations = InvitationKey.objects.remaining_invitations_for_user(

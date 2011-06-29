@@ -179,6 +179,8 @@ urlpatterns = patterns('',
 
         (r'^\+people/list/$', lambda x: HttpResponsePermanentRedirect('/people/')),
 
+        (r'^account/proxyconnect-sso$', 'mysite.account.views.proxyconnect_sso'),
+
         (r'^account/forgot_pass/$',
             'django.contrib.auth.views.password_reset', {
                 'template_name': 'account/password_reset.html',
