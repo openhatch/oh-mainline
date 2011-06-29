@@ -53,3 +53,4 @@ except ImportError:
 
 PATH_TO_MANAGEMENT_SCRIPT = '/home/deploy/milestone-a/bin/production'
 GIT_REPO_URL_PREFIX = 'git://openhatch.org/git/'
+SESSION_COOKIE_DOMAIN='.openhatch.org' # Share cookies with subdomain (necessary for Vanilla)
