@@ -361,14 +361,17 @@ def invite_someone(request, form=None,success_message=''):
             'invite_someone_form': invite_someone_form,
             'remaining_invites': remaining_invites})
 
-@view
 def proxyconnect_sso(request):
     '''This function implements the ProxyConnect single
     sign-on API described by Vanilla Forums.
 
     More documentation: http://vanillaforums.org/page/singlesignon
     '''
-    return (request, 'vanilla-proxy-connect-sso.txt', {})
+    if request.user.is_authenticated():
+        return mysite.base.decorators.as_view(
+            request, 'vanilla-proxy-connect-sso.txt', {}, 'proxyconnect-sso')
+    # Vanilla wants a 0-byte response if you are not logged in.
+    return HttpResponse("")
 
 @login_required
 def invite_someone_do(request):
