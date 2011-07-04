@@ -11,19 +11,6 @@ class openhatch_code {
     ensure => installed,
   }
 
-  # We do not use the vcsrepo type because
-  # it does not support setting the user
-  # who will own the resulting git clone.
-  exec { "/usr/bin/git clone git://gitorious.org/openhatch/oh-mainline.git":
-    user => 'vagrant',
-    group => '',
-    require => [User['deploy'], Package['git-core'], File['/home/deploy']],
-    cwd => '/home/deploy/',
-    logoutput => "on_failure",
-    unless => '/usr/bin/test -d /home/deploy/oh-mainline',
-    subscribe => [File['/home/deploy']],
-  }
-
 }
 
 node default {
