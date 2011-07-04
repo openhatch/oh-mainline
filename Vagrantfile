@@ -9,8 +9,8 @@ Vagrant::Config.run do |config|
   # This virtual machine (VM) is created based off a pre-configured
   # simple Ubuntu VM. We'll call it lucid32, and we'll download it
   # from vagrantup.com if necessary.
-  config.vm.box = "lucid32"
-  config.vm.box_url = "http://files.vagrantup.com/lucid32.box"
+  config.vm.box = "squeeze"
+  config.vm.box_url = "http://mathie-vagrant-boxes.s3.amazonaws.com/debian_squeeze_32.box"
 
   # Configure the VM so that it launches Puppet when it first runs.
   config.vm.provision :puppet do |puppet|
