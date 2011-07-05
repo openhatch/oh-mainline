@@ -3,6 +3,14 @@
 # them to have access to them.
 import "classes/*"
 
+stage { 'first': before => Stage['main'] }
+
+class {
+  'openhatch_dependencies': stage => first;
+  'apt_get_update': stage => first
+}
+
+
 class openhatch_code {
   # Run bootstrap.py to make sure buildout can run
   exec { "/usr/bin/python2.6 /vagrant/bootstrap.py":
@@ -10,7 +18,6 @@ class openhatch_code {
     user => 'vagrant',
     group => 'vagrant',
     cwd => '/vagrant/',
-    require => [Package['python2.6-dev']],
   }
 
   exec { "/vagrant/bin/buildout":
