@@ -6,9 +6,9 @@
 # http://vagrantup.com/
 
 Vagrant::Config.run do |config|
-  # This virtual machine (VM) is created based off a pre-configured
-  # simple Ubuntu VM. We'll call it lucid32, and we'll download it
-  # from vagrantup.com if necessary.
+  # This virtual machine (VM) is created based off a tiny pre-configured
+  # Debian VM. We'll call it squeeze, and we'll download it from
+  # the creator's S3 URL, if necessary.
   config.vm.box = "squeeze"
   config.vm.box_url = "http://mathie-vagrant-boxes.s3.amazonaws.com/debian_squeeze_32.box"
 
