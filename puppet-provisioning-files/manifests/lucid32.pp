@@ -16,6 +16,7 @@ class openhatch_code {
   exec { "/vagrant/bin/buildout":
     creates => '/vagrant/bin/mysite',
     user => 'vagrant',
+    timeout => 0,
     group => 'vagrant',
     cwd => '/vagrant/',
     logoutput => true,
