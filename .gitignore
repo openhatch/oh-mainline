@@ -26,3 +26,5 @@ build/
 git_pivot.yml
 mysite.egg-info/
 .vagrant
+deactivate/
+mysite/indexes/

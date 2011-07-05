@@ -83,6 +83,9 @@ def project(request, project__name = None):
     context['question2answer'] = [(question, question.get_answers_for_project(p))
         for question in questions]
 
+    buildhelper = p.buildhelper_set.all()[0]
+    buildhelper_steps = buildhelper.buildhelperstep_set.all()
+    
     if request.GET.get('cookies', '') == 'disabled':
         context['cookies_disabled'] = True
 
@@ -100,6 +103,7 @@ def project(request, project__name = None):
 
     context.update({
         'project': p,
+        'buildhelper_steps' : buildhelper_steps,
         'contributors': p.get_contributors()[:3],
         'mentors': (mysite.profile.controllers.people_matching(
             'can_mentor', project__name)),

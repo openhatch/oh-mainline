@@ -40,6 +40,39 @@ about how you can help {{ project.display_name }}
 #big-project-list form input[type='text'] { font-family: sans-serif; float: left; width: 20em; font-size: 1.5em; padding: 4px; }
 #big-project-list form input[type='submit'] { font-family: sans-serif; float: left; font-weight: normal; font-size: 1.5em; padding: 4px 8px 3px 8px; position: relative; top: -1px; }
 #big-project-list .note { margin-left: 2em; font-weight: normal; }
+
+.step {
+    border-bottom: 1px solid #ddd;
+    padding-top: 5px;
+    margin-bottom: 15px;
+    }
+.step-checkbox, a.step-checkbox, .step-checkbox:link, .step-checkbox:visited {
+    text-decoration: none;
+    width: 40px;
+    height: 30px;
+    margin-top: 5px;
+    padding: 15px 20px;
+    background: url('/static/images/buildhelper/checkbox-empty.png') no-repeat;
+    }
+.step-checkbox:hover, .step-checkbox:active {
+    background: url('/static/images/buildhelper/checkbox-active.png') no-repeat;
+    }
+.step-name {
+    border-bottom: 1px solid #666;
+    }
+.step-commands {
+    display: block;
+    margin: 0 15px;
+    padding: 1px 10px;
+    background: #eee;
+    }
+.step-icon-holder {
+    height: 50px;
+    padding-bottom: 10px;
+    }
+.step-icons {
+    float: right;
+    }
 {% endblock css %}
 
 {% block pagetop %}
@@ -98,6 +131,7 @@ about how you can help {{ project.display_name }}
     <div class='module contains_questions'>
         <div class='head'>
             <h3>Chatter</h3>
+            {% if buildhelper_steps %}<h3>Buildhelper</h3>{% endif %}
         </div>
         <div class='body'>
             <div style="font-size: 1.3em" class="you-are-missing-things">
@@ -175,7 +209,39 @@ about how you can help {{ project.display_name }}
     </strong>
     </div>
 </div><!-- /.module #requests -->
-
+{% if buildhelper_steps %}
+<div class='module contains_questions'>
+        <div class='head'>
+        <h3>Buildhelper</h3>
+        </div>
+        <div class='body'>
+            <ul>
+            {% for step in buildhelper_steps %}
+            <li class="step {% if step.is_prerequisite %}prereq{% endif %}">
+                <h3 class="step-name">{% if step.is_checked %}<a href="" class="step-checkbox">&nbsp;</a>{% else %}<a href="" class="step-checkbox">&nbsp;</a>{% endif %}{% if step.is_prerequisite %}Prerequisite: {% endif %}{{ step.name }}</h3>
+                {% if step.command %}
+                <code class="step-commands">
+                {{ step.command|linebreaks }}
+                </code>
+                {% endif %}
+                {% if step.description %}
+                <div class="step-description">
+                {{ step.description|linebreaks }}
+                </div>
+                {% endif %}
+                <div class="step-icon-holder">
+                    <span class="step-icons">
+                    <img src="/static/images/buildhelper/time.png" />{{ step.time }} minutes 
+                    {% if step.hint %}<a href="{{ step.hint }}"><img src="/static/images/buildhelper/tutorial-button.png" /></a>{% endif %}
+                    {% if step.frustration_handler %}<a href="{{ step.frustration_handler }}"><img src="/static/images/buildhelper/frustration-handler.png" /></a>{% endif %}
+                    </span>
+                </div>
+            </li>
+            {% endfor %}
+            </ul>
+        </div>
+</div>
+{% endif %}
 {% endblock left %}
 
 {% block main %}
