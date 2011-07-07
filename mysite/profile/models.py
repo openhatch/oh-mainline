@@ -124,7 +124,7 @@ class Person(models.Model):
     email_me_weekly_re_projects = models.BooleanField( default=True,
             verbose_name='Email me weekly about activity in my projects')
     
-    irc_nick = models.CharField(max_length=30, blank=True, null=True);
+    irc_nick = models.CharField(max_length=30, blank=True, null=True)
     
     @staticmethod
     def create_dummy(first_name="", email=None, **kwargs):
