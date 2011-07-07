@@ -386,13 +386,6 @@ class Recommend(SearchTest):
                         "Expected %s in recommended search terms "
                         "inspired by %s." % (term, source))
 
-    # Use that to exclude 'will never understand' tags from recommended search terms.
-    @mock.patch('mysite.search.models.HitCountCache.objects.get_or_create')
-    def test_recomender_raises_integrity_error(self, mocked_get_or_create):
-        mocked_get_or_create.side_effect = MySQLdb.IntegrityError()
-        person = Person.objects.get(user__username='paulproteus')
-        person.get_recommended_search_terms()
-
     # FIXME: Include recommendations from tags.
 
     @mock.patch('mysite.search.controllers.Query.get_or_create_cached_hit_count')
