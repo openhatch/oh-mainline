@@ -16,3 +16,4 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # NB: The Project model is currently in the 'search' app, in search/models.py
+# This includes models like WannaHelperNote and models related to the buildhelper.
