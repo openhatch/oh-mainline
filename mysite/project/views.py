@@ -83,8 +83,12 @@ def project(request, project__name = None):
     context['question2answer'] = [(question, question.get_answers_for_project(p))
         for question in questions]
 
-    buildhelper = p.buildhelper_set.all()[0]
-    buildhelper_steps = buildhelper.buildhelperstep_set.all()
+    if p.buildhelper_set.all():
+        buildhelper = p.buildhelper_set.all()[0]
+        buildhelper_steps = buildhelper.buildhelperstep_set.all()
+    else:
+        buildhelper = None
+        buildhelper_steps = []
     
     if request.GET.get('cookies', '') == 'disabled':
         context['cookies_disabled'] = True
