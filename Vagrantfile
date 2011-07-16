@@ -12,7 +12,7 @@ Vagrant::Config.run do |config|
   config.vm.box = "squeeze"
   config.vm.box_url = "http://mathie-vagrant-boxes.s3.amazonaws.com/debian_squeeze_32.box"
 
-  config.vm.share_folder("my-puppet-hack", "/tmp/vagrant-puppet", "puppet-provisioning-files/manifests")
+  config.vm.share_folder("my-puppet-hack", "/tmp/vagrant-puppet", "puppet-provisioning-files")
 
   # Configure the VM so that it launches Puppet when it first runs.
   config.vm.provision :puppet do |puppet|
