@@ -12,8 +12,9 @@ class openhatch_database {
     timeout => 0,
     group => 'vagrant',
     cwd => '/vagrant/',
-    logoutput => true,
-    require => [Exec["/usr/bin/python2.6 /vagrant/bootstrap.py"]],
+    logoutput => on_failure,
+    require => [Exec["/usr/bin/python2.6 /vagrant/bootstrap.py"],
+                Exec['/usr/bin/mysql -uroot < /vagrant/mysite/scripts/database_01_create.sql']],
   }
 
   exec { "/vagrant/bin/mysite migrate":
@@ -21,9 +22,9 @@ class openhatch_database {
     timeout => 0,
     group => 'vagrant',
     cwd => '/vagrant/',
-    logoutput => true,
+    logoutput => on_failure,
     require => [Exec["/usr/bin/python2.6 /vagrant/bootstrap.py"],
-                Exec["/usr/bin/mysql -uroot < /vagrant/mysite/scripts/database_01_create.sql"]],
+                Exec["/vagrant/bin/mysite syncdb --noinput"]],
   }
 
 }
