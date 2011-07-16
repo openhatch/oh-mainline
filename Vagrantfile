@@ -12,6 +12,8 @@ Vagrant::Config.run do |config|
   config.vm.box = "squeeze"
   config.vm.box_url = "http://mathie-vagrant-boxes.s3.amazonaws.com/debian_squeeze_32.box"
 
+  # This is a workaround for an apparent bug in Vagrant, where sometimes it
+  # fails to properly share the Puppet manifests with the VM.
   config.vm.share_folder("my-puppet-hack", "/tmp/vagrant-puppet", "puppet-provisioning-files")
 
   # Configure the VM so that it launches Puppet when it first runs.
