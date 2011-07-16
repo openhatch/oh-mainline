@@ -62,7 +62,7 @@ setup(
                         'django-voting',
                         'staticgenerator==1.4.1.2-openhatch',
                         'python-otp',
-                        'python-launchpad-bugs',
+                        'python-launchpad-bugs==0.3.6.openhatch1',
                         'html2text',
                         'lockfile>=0.9', # as of this writing, pypi only has version 0.8
                         'python-openid==2.2.5-openhatch1', # as of this writing, upstream has an HTML file where a tar.gz should be
