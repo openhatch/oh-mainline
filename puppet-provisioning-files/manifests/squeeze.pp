@@ -14,4 +14,5 @@ node default {
   include apt_get_update
   include openhatch_dependencies
   include openhatch_code
+  include openhatch_database
 }
