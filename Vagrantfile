@@ -17,5 +17,10 @@ Vagrant::Config.run do |config|
     puppet.manifests_path = "puppet-provisioning-files/manifests"
   end
 
+  # Forward port 8000 into the VM
+  # We use 8000 because it is the default port for Django,
+  # so that is what all the documentation uses.
+  config.vm.forward_port("web", 8000, 8000)
+
 end
 
