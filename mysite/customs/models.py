@@ -327,6 +327,9 @@ class RoundupTrackerModel(TrackerModel):
     def __str__(self):
         return smart_str('%s' % (self.tracker_name))
 
+    def get_base_url(self):
+        return self.base_url
+
 class RoundupQueryModel(TrackerQueryModel):
     '''This model stores query URLs for RoundupTracker objects.'''
     url = models.URLField(max_length=400, blank=False, null=False,
