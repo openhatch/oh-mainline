@@ -50,7 +50,7 @@ class TracBugImporter(BugImporter):
             # Set up timeline URL.
             timeline_url = urlparse.urljoin(self.timeline.base_url,
                                 "timeline?ticket=on&daysback=%d&format=rss" %
-                                timeline_age.days + 1)
+                                (timeline_age.days + 1))
             # Add the URL to the waiting list
             self.add_url_to_waiting_list(
                 url=timeline_url,
