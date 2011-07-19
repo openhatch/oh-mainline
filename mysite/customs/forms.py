@@ -16,6 +16,7 @@
 
 import django.forms
 
+import mysite.search.models
 import mysite.customs.models
 
 class TrackerTypesForm(django.forms.Form):
