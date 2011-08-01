@@ -45,7 +45,7 @@ setup(
                         'twill==0.9.1-cc',
                         'invitation',
                         'django-authopenid==1.0.1-openhatch2',
-                        'celery==1.0.5',
+                        'celery==2.2.7',
                         'launchpadlib',
                         'django-assets==0.2.1',
                         'python-github2==0.1.1',
