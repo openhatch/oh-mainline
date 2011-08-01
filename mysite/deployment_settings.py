@@ -33,16 +33,6 @@ POSTFIX_FORWARDER_TABLE_PATH = '/etc/postfix/virtual_alias_maps'
 
 CELERY_ALWAYS_EAGER = False # srsly
 
-## always use linode-one for 
-## AMQP, Rabbit Queue, Celery
-CARROT_BACKEND = 'amqp'
-
-BROKER_HOST = 'linode.openhatch.org'
-BROKER_PORT = 5672
-BROKER_USER = 'rabbiter'
-BROKER_PASSWORD = 'johT4qui'
-BROKER_VHOST = 'localhost'
-
 ### always use memcached on linode-one, also
 CACHE_BACKEND = "memcached://linode.openhatch.org:11211/?timeout=1"
 
