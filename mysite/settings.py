@@ -164,6 +164,8 @@ INSTALLED_APPS = (
     'debug_toolbar',
     'sessionprofile',
     'model_utils',
+    'djcelery',
+    'djkombu',
 )
 
 # testrunner allows us to control which testrunner to use
@@ -175,9 +177,7 @@ TEST_OUTPUT_DESCRIPTIONS = True
 TEST_OUTPUT_DIR = "test_output"
 
 ## AMQP, Rabbit Queue, Celery
-CARROT_BACKEND = 'amqp'
-
-CARROT_BACKEND = 'ghettoq.taproot.Database'
+BROKER_BACKEND='django'
 
 cooked_data_password = 'AXQaTjp3'
 AUTH_PROFILE_MODULE = "profile.Person"
@@ -259,3 +259,7 @@ SOUTH_TESTS_MIGRATE = False
 
 GIT_REPO_PATH = os.path.join(MEDIA_ROOT_BEFORE_STATIC, 'missions-userdata', 'git')
 GIT_REPO_URL_PREFIX = GIT_REPO_PATH + '/' # For local sites, this is what you clone
+
+### Initialize celery
+import djcelery
+djcelery.setup_loader()
