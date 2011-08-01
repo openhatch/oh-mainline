@@ -48,7 +48,7 @@ setup(
                         'celery==2.2.7',
                         'launchpadlib',
                         'django-assets==0.2.1',
-                        'django-kombu==0.9.2.openhatch1',
+                        'django-kombu==0.9.4',
                         'python-github2==0.1.1',
                         'pygeoip==0.1.3',
                         'django-debug-toolbar==0.8.4',
