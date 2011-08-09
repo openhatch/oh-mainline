@@ -167,7 +167,7 @@ urlpatterns = patterns('',
         (r'^\+landing/projects$', 'mysite.base.views.landing_for_project_maintainers'),
 
         (r'^search/$', 'mysite.search.views.fetch_bugs'),
-        (r'^admin/(.*)', admin.site.root),
+        (r'^admin/(.*)', admin.site.urls),
         (r'^static/(?P<path>.*)$', 'django.views.static.serve',
             {'document_root': settings.MEDIA_ROOT}),
 
