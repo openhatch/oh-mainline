@@ -675,6 +675,7 @@ class MozillaBugzilla(BugzillaBugTracker):
                              'Mozilla QA': 'Mozilla QA',
                              'Mozilla Services': 'Mozilla Services',
                              'Webtools': 'Mozilla Webtools',
+                             'Input': 'Mozilla Input',
                              }
         if bb.product == 'Other Applications':
             bug_project_name = 'Mozilla ' + bb.component
