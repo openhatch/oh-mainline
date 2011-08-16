@@ -53,30 +53,6 @@ Manage projects
             <a href='{% url mysite.search.views.fetch_bugs %}'>
                 volunteer opportunity finder</a>.)
             </p></div>
-        <h4 id='import_links_heading'>Find projects automatically</h4>
-        <form id='importer' class='submodule' name='import' method='POST'
-            action='{% url mysite.profile.views.prepare_data_import_attempts_do %}'>{% csrf_token %}
-            <div class='body'>
-                <div class='howto'>
-                    <h5><a style='position: relative; top: -10px;' href='#'>Start here &raquo;</a></h5>
-                    <p style='margin-top: 60px;'>
-                    Please enter the usernames or email addresses you use to contribute to FLOSS.
-                    We'll find links to your activity and involvement in
-                    various projects.
-                    <a target="_blank" href="http://openhatch.org/blog/about-the-project-importer/">
-                        How does it work?</a>
-                    </p>
-                    <p>
-                    <a href='mailto:suggestions@openhatch.org?subject=Suggested%20data%20source'>
-                        Suggest a data source</a>
-                    </p>
-                </div>
-                <div id='importer-form-footer'>
-                    <input type='submit' value='Submit' id='submit_data_sources' />
-                    <div id='progressbar'></div>
-                </div>
-            </div>
-        </form>
 
         <h4 id='projects_heading'>
             <span>Projects</span>
