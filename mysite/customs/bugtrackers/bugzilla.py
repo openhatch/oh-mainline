@@ -701,6 +701,10 @@ class FedoraBugzilla(BugzillaBugTracker):
 
     @staticmethod
     def extract_tracker_specific_data(xml_data, ret_dict):
+        # FIXME: This is wrong. It ignores the data in the xml_data function,
+        # which means that as remote bugs get updated, we might accidentally
+        # still mark a bug as bitesized when it is no longer!
+        #
         # Make modifications to ret_dict using provided metadata
         # Check for the bitesized keyword
         keywords_text = mysite.customs.bugtrackers.bugzilla.get_tag_text_from_xml(xml_data, 'keywords')
