@@ -234,8 +234,6 @@ class Query:
 
     def get_possible_facets(self):
 
-        bugs = mysite.search.models.Bug.open_ones.filter(self.get_Q())
-
         project_options = self.get_facet_options(u'project', self.get_project_names())
 
         toughness_options = self.get_facet_options(u'toughness', [u'bitesize'])
