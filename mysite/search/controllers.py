@@ -18,15 +18,11 @@
 import mysite.search.models
 import mysite.search.views
 import mysite.base.unicode_sanity
-import collections
 import mysite.base.decorators
-import collections
-import urllib
 import re
 import hashlib
 from django.core.cache import cache
 from django.db.models import Q
-import MySQLdb
 import logging
 
 CCT = 'hit_count_cache_timestamp'
@@ -320,7 +316,6 @@ class Query:
         return options
 
     def get_project_names(self):
-        from django.db.models import Count
         Project = mysite.search.models.Project
 
         GET_data = self.get_GET_data()
