@@ -39,8 +39,8 @@ def order_bugs(query):
     return query.order_by('-good_for_newcomers', '-last_touched')
 
 class Query:
-    
-    def __init__(self, terms=None, active_facet_options=None, terms_string=None): 
+
+    def __init__(self, terms=None, active_facet_options=None, terms_string=None):
         self.terms = terms or []
         self.active_facet_options = (mysite.base.decorators.no_str_in_the_dict(active_facet_options)
                                      or {})
@@ -52,7 +52,7 @@ class Query:
     def terms_string(self):
         if self._terms_string is None:
             raise ValueError
-        return self._terms_string 
+        return self._terms_string
 
     @staticmethod
     def split_into_terms(string):
@@ -114,7 +114,7 @@ class Query:
         # language facet
         language_is_active = (u'language' in self.active_facet_options.keys())
         exclude_language = exclude_active_facets and language_is_active
-        if u'language' in self.active_facet_options and not exclude_language: 
+        if u'language' in self.active_facet_options and not exclude_language:
             language_value = self.active_facet_options[u'language']
             if language_value == 'Unknown':
                 language_value=''
@@ -156,7 +156,7 @@ class Query:
 
     def get_facet_option_data(self, facet_name, option_name):
 
-        # Create a Query for this option. 
+        # Create a Query for this option.
 
         # This Query is sensitive to the currently active facet options...
         GET_data = dict(self.active_facet_options)
@@ -168,7 +168,7 @@ class Query:
             })
         query_string = mysite.base.unicode_sanity.urlencode(GET_data)
         query = Query.create_from_GET_data(GET_data)
-        the_all_option = u'any' 
+        the_all_option = u'any'
         name = option_name or the_all_option
 
         active_option_name = self.active_facet_options.get(facet_name, None)
@@ -192,7 +192,7 @@ class Query:
                 'query_string': query_string,
                 'is_active': is_active
                 }
-    
+
     def get_facet_options(self, facet_name, option_names):
         # Assert that there are only unicode strings in this list
         option_names = mysite.base.decorators.no_str_in_the_list(option_names)
@@ -209,7 +209,7 @@ class Query:
 
         # Now we're gonna sort these dictionaries.
         # Active facet options first. Then non-'Unknowns'. Then by number of
-        # bugs. Then alphabetically. 
+        # bugs. Then alphabetically.
 
         # Note that these keys are in ascending order of precedence. So the
         # last one trumps all the previous sortings.
@@ -222,7 +222,7 @@ class Query:
         # We want facet options that contain lots of bugs to appear at the top.
         # If you sort (naively) by x['count'], then the lower numbers appear
         # higher in the list. Let's reverse that with reverse=True.
-        
+
         options.sort(
                 key=lambda x: (facet_name == 'language') and (x['name'] == 'Unknown'))
         # We want the Unknown language to appear last, unless it's active. If
@@ -248,11 +248,11 @@ class Query:
             u'contribution_type', [u'documentation'])
 
         language_options = self.get_facet_options(u'language', self.get_language_names())
-            
+
         # looks something like:
         # [{'count': 1180L, 'query_string': 'q=&language=Python', 'is_active': False, 'name': u'Python'}, {'count': 478L, 'query_string': 'q=&language=C%23', 'is_active': False, 'name': u'C#'}, {'count': 184L, 'query_string': 'q=&language=Unknown', 'is_active': False, 'name': 'Unknown'}, {'count': 532L, 'query_string': 'q=&language=C', 'is_active': False, 'name': u'C'}, {'count': 2374L, 'query_string': 'q=&language=', 'is_active': True, 'name': 'any'}]
 
-        possible_facets = ( 
+        possible_facets = (
                 # The languages facet is based on the project languages, "for now"
                 (u'language', {
                     u'name_in_GET': u"language",
@@ -318,7 +318,7 @@ class Query:
         options = self.active_facet_options.copy()
         del options['toughness']
         return options
-  
+
     def get_project_names(self):
         from django.db.models import Count
         Project = mysite.search.models.Project
@@ -355,7 +355,7 @@ class Query:
         stringified = str(sorted(simple_dictionary.items()))
         # then return a hash of our sorted items self.
         return hashlib.sha1(stringified).hexdigest() # sadly we cause a 2x space blowup here
-    
+
     def get_hit_count_cache_key(self):
         hashed_query = self.get_sha1()
         hcc_timestamp = mysite.base.models.Timestamp.get_timestamp_for_string(CCT)
@@ -391,7 +391,6 @@ class Query:
         logging.info("Query is " + query_string)
         return query_string
 
-       
 def get_project_count():
     """Retrieve the number of projects currently indexed."""
     bugs = mysite.search.models.Bug.all_bugs.all()
