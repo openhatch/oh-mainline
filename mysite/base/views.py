@@ -93,35 +93,7 @@ def home(request):
                 'nudge_importer_when_user_has_no_projects' in data or data['nudge_tags'] or
                                   'nudge_importer_when_user_has_some_projects' in data)
 
-        # Bug recommendations
-        suggested_searches = request.user.get_profile().get_recommended_search_terms()
-        recommender = mysite.profile.controllers.RecommendBugs(
-            suggested_searches, n=5)
-
-        if not recommender.is_cache_empty():
-            data['recommended_bugs'] = list(recommender.recommend())
-        else:
-            # a dict pairing two things:
-            # * GET data dicts (to be passed to Query's create_from_GET_data)
-            # * strings of HTML representing the bug classification
-            recommended_bug_string2GET_data_dicts = {
-            "<strong>Bitesize</strong> bugs whose main project language is <strong>C</strong>":
-                {u'language':u'C', u'toughness':u'bitesize'},
-            "<strong>Bitesize</strong> bugs matching &lsquo;<strong>audio</strong>&rsquo;":
-                {u'q':u'audio', u'toughness':u'bitesize'},
-            "Bugs matching &lsquo;<strong>unicode</strong>&rsquo;":
-                {u'q':u'unicode'},
-            "Requests for <strong>documentation writing/editing</strong>":
-                {u'contribution_type':u'documentation'},
-            #"Requests for <strong>documentation writing/editing</strong>":
-            #    {u'contribution_type':u'documentation'},
-            }
-            recommended_bug_string2Query_objects = {}
-            for (string, GET_data_dict) in recommended_bug_string2GET_data_dicts.items():
-                query = mysite.search.controllers.Query.create_from_GET_data(GET_data_dict)
-                recommended_bug_string2Query_objects[string] = query
-
-            data[u'recommended_bug_string2Query_objects'] = recommended_bug_string2Query_objects
+        # For performance reasons, we do not send bug recommendations here.
         
         completed_missions = dict((c.step.name, True) for c in StepCompletion.objects.filter(person=request.user.get_profile()))
         data[u'completed_missions'] = completed_missions
