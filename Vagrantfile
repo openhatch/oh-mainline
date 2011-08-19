@@ -9,8 +9,8 @@ Vagrant::Config.run do |config|
   # This virtual machine (VM) is created based off a tiny pre-configured
   # Debian VM. We'll call it squeeze, and we'll download it from
   # the creator's S3 URL, if necessary.
-  config.vm.box = "squeeze"
-  config.vm.box_url = "http://mathie-vagrant-boxes.s3.amazonaws.com/debian_squeeze_32.box"
+  config.vm.box = "lucid32"
+  config.vm.box_url = "http://files.vagrantup.com/lucid32.box"
 
   # This is a workaround for an apparent bug in Vagrant, where sometimes it
   # fails to properly share the Puppet manifests with the VM.
