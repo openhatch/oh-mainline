@@ -48,3 +48,9 @@ body.missions .bump-over {
 body.missions .submodule.skinny ul li a{
   vertical-align: 3px;
 }
+
+body.missions .mission-help {
+    padding: 3px;
+    padding-right: 7px;
+    background-color: yellow;
+}
