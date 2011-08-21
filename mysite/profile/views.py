@@ -81,9 +81,9 @@ def add_citation_manually_do(request):
         # Manually added citations are published automatically.
         citation.is_published = True
         citation.save()
-        
+
         json = simplejson.dumps(output)
-        return HttpResponse(json, mimetype='application/json') 
+        return HttpResponse(json, mimetype='application/json')
 
     else:
         error_msgs = []
@@ -122,7 +122,7 @@ def get_personal_data(person):
     data_dict = {
             'person': person,
             'photo_url': person.get_photo_url_or_default(),
-            } 
+            }
 
     data_dict['tags'] = tags_dict_for_person(person)
     data_dict['tags_flat'] = dict(
@@ -278,7 +278,7 @@ def edit_person_info_do(request):
 
     # grab their submitted bio
     person.bio = edit_info_form['bio'].data
-    
+
     # grab the irc nick
     person.irc_nick = edit_info_form['irc_nick'].data
 
@@ -371,20 +371,20 @@ def cut_list_of_people_in_three_columns(people):
 def cut_list_of_people_in_two_columns(people):
     half = len(people)/2
     return [people[0:half], people[half:]]
-    
+
 def permanent_redirect_to_people_search(request, property, value):
     '''Property is the "tag name", and "value" is the text in it.'''
     if property == 'seeking':
         property = 'can_pitch_in'
-    
+
     if ' ' in value:
         escaped_value = '"' + value + '"'
     else:
         escaped_value = value
-    
+
     q = '%s:%s' % (property, escaped_value)
     get_args = {u'q': q}
-    destination_url = (reverse('mysite.profile.views.people') + '?' + 
+    destination_url = (reverse('mysite.profile.views.people') + '?' +
                        mysite.base.unicode_sanity.urlencode(get_args))
     return HttpResponsePermanentRedirect(destination_url)
 
@@ -416,7 +416,7 @@ def all_tags_query2mappable_orm_people(parsed_query):
         # ask haystack...
         mappable_people_from_haystack = haystack.query.SearchQuerySet().all()
         mappable_people_from_haystack = mappable_people_from_haystack.filter(**{query: parsed_query['q'].lower()})
-        
+
         results = mysite.base.controllers.haystack_results2db_objects(
             mappable_people_from_haystack)
         query2results[query] = results
@@ -463,7 +463,7 @@ def query2results(parsed_query):
         'all_tags': all_tags_query2mappable_orm_people,
         'icanhelp': people_who_want_to_help
         }
-    
+
     # Now add to that the TagType-based queries
     for short_name in mysite.profile.models.TagType.short_name2long_name:
         def thingamabob(parsed_query, short_name=short_name):
@@ -488,18 +488,18 @@ def people_who_want_to_help(parsed_query):
 
 def project_query2mappable_orm_people(parsed_query):
     assert parsed_query['query_type'] == 'project'
-    
+
     mappable_people_from_haystack = haystack.query.SearchQuerySet().all()
     haystack_field_name = 'all_public_projects_lowercase_exact'
     mappable_people_from_haystack = mappable_people_from_haystack.filter(
         **{haystack_field_name: parsed_query['q'].lower()})
     mappable_people = set(
         mysite.base.controllers.haystack_results2db_objects(mappable_people_from_haystack))
-    
+
     mappable_people = list(
         sorted(mappable_people,
                key=lambda x: x.user.username))
-    
+
     extra_data = {}
 
     mentor_people = mappable_people_from_haystack.filter(**{'can_mentor_lowercase_exact': parsed_query['q'].lower()})
@@ -518,7 +518,7 @@ def project_query2mappable_orm_people(parsed_query):
     if can_pitch_in_people:
         extra_data['suggestions_for_searches_regarding_people_who_can_pitch_in'].append(
             {'query': parsed_query['q'].lower(), 'count': len(can_pitch_in_people)})
-    
+
     orm_projects = Project.objects.filter(name__iexact=parsed_query['q'])
 
     ## populate suggestions_for_searches_regarding_people_who_can_pitch_in
@@ -806,8 +806,8 @@ def replace_icon_with_default(request):
     # email all@ letting them know that we did so
     from mysite.project.tasks import send_email_to_all_because_project_icon_was_marked_as_wrong
     send_email_to_all_because_project_icon_was_marked_as_wrong.delay(
-            project__pk=project_before_changes.pk, 
-            project__name=project_before_changes.name, 
+            project__pk=project_before_changes.pk,
+            project__name=project_before_changes.name,
             project_icon_url=wrong_icon_url)
 
     # prepare output
@@ -823,12 +823,12 @@ def prepare_data_import_attempts_do(request):
     Input: request.POST contains a list of usernames or email addresses.
     These are identifiers under which the authorized user has committed code
     to an open-source repository, or at least so says the user.
-    
+
     Side-effects: Create DataImportAttempts that a user might want to execute.
 
     Not yet implemented: This means, don't show the user DIAs that relate to
-    non-existent accounts on remote networks. And what *that* means is, 
-    before bothering the user, ask those networks beforehand if they even 
+    non-existent accounts on remote networks. And what *that* means is,
+    before bothering the user, ask those networks beforehand if they even
     have accounts named identifiers[0], etc."""
     # {{{
 
@@ -1013,7 +1013,7 @@ def delete_portfolio_entry_do(request):
     return mysite.base.helpers.json_response({
             'success': True,
             'portfolio_entry__pk': pk})
-         
+
 
 @login_required
 def save_portfolio_entry_do(request):
@@ -1046,7 +1046,7 @@ def save_portfolio_entry_do(request):
 @login_required
 def dollar_username(request):
     return HttpResponseRedirect(reverse(display_person_web,
-		kwargs={'user_to_display__username': 
+		kwargs={'user_to_display__username':
                 request.user.username}))
 
 @login_required
